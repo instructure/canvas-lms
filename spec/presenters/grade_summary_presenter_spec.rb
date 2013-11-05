@@ -56,22 +56,39 @@ describe GradeSummaryPresenter do
         presenter.selectable_courses.should include(course)
       end
     end
+  end
 
-    describe '#assignment_stats' do
-      it 'works' do
-        teacher_in_course
-        s1, s2, s3 = n_students_in_course(3)
-        a = @course.assignments.create! points_possible: 10
-        a.grade_student s1, grade:  0
-        a.grade_student s2, grade:  5
-        a.grade_student s3, grade: 10
-        p = GradeSummaryPresenter.new(@course, @teacher, nil)
-        stats = p.assignment_stats
-        assignment_stats = stats[a.id]
-        assignment_stats.max.to_f.should == 10
-        assignment_stats.min.to_f.should == 0
-        assignment_stats.avg.to_f.should == 5
-      end
+  describe '#assignment_stats' do
+    it 'works' do
+      teacher_in_course
+      s1, s2, s3 = n_students_in_course(3)
+      a = @course.assignments.create! points_possible: 10
+      a.grade_student s1, grade:  0
+      a.grade_student s2, grade:  5
+      a.grade_student s3, grade: 10
+      p = GradeSummaryPresenter.new(@course, @teacher, nil)
+      stats = p.assignment_stats
+      assignment_stats = stats[a.id]
+      assignment_stats.max.to_f.should == 10
+      assignment_stats.min.to_f.should == 0
+      assignment_stats.avg.to_f.should == 5
+    end
+  end
+
+  describe '#submissions' do
+    it "doesn't return submissions for deleted assignments" do
+      teacher_in_course
+      student_in_course
+      a1, a2 = 2.times.map {
+        @course.assignments.create! points_possible: 10
+      }
+      a1.grade_student @student, grade: 10
+      a2.grade_student @student, grade: 10
+
+      a2.destroy
+
+      p = GradeSummaryPresenter.new(@course, @teacher, @student)
+      p.submissions.map(&:assignment_id).should == [a1.id]
     end
   end
 end
