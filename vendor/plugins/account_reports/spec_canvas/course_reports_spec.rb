@@ -76,7 +76,7 @@ describe "Course Account Reports" do
     it "should run unpublished courses report on a term" do
       parameters = {}
       parameters["enrollment_term_id"] = @default_term.id
-      parsed = ReportSpecHelper.run_report(@account, @report, parameters)
+      parsed = ReportSpecHelper.run_report(@account, @report, parameters, 1)
 
       parsed.should == [[@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
                          "Science 101", nil, nil]]
@@ -85,7 +85,7 @@ describe "Course Account Reports" do
     end
 
     it "should run unpublished courses report on sub account" do
-      parsed = ReportSpecHelper.run_report(@sub_account, @report)
+      parsed = ReportSpecHelper.run_report(@sub_account, @report, {}, 1)
 
       parsed.should == [[@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
                          "English 101", @course1.start_at.iso8601,
@@ -94,7 +94,7 @@ describe "Course Account Reports" do
     end
 
     it "should run unpublished courses report" do
-      parsed = ReportSpecHelper.run_report(@account, @report)
+      parsed = ReportSpecHelper.run_report(@account, @report, {}, 1)
       parsed.should == [[@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
                          "English 101", @course1.start_at.iso8601,
                          @course1.conclude_at.iso8601],
@@ -113,27 +113,26 @@ describe "Course Account Reports" do
       @course1.destroy
       parameters = {}
       parameters["enrollment_term_id"] = @default_term.id
-      parsed = ReportSpecHelper.run_report(@account, @report, parameters)
-
-      parsed.length.should == 1
+      parsed = ReportSpecHelper.run_report(@account, @report, parameters, 1)
 
       parsed[0].should == [@course2.id.to_s, "SIS_COURSE_ID_2", "MAT101",
                            "Math 101", nil, nil]
+      parsed.length.should == 1
     end
 
     it "should run recently deleted courses report on sub account" do
       @course1.destroy
-      parsed = ReportSpecHelper.run_report(@sub_account, @report)
-      parsed.length.should == 1
+      parsed = ReportSpecHelper.run_report(@sub_account, @report, {}, 1)
 
       parsed[0].should == [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
                            "English 101", @course1.start_at.iso8601,
                            @course1.conclude_at.iso8601]
+      parsed.length.should == 1
     end
 
     it "should run recently deleted courses report" do
       @course1.destroy
-      parsed = ReportSpecHelper.run_report(@account, @report)
+      parsed = ReportSpecHelper.run_report(@account, @report, {}, 1)
       parsed.length.should == 2
 
       parsed[0].should == [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
