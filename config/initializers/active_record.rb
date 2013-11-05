@@ -782,13 +782,16 @@ class ActiveRecord::Base
           add_limit!(sql, {}, scope)
           return connection.delete(sql, "#{name} Delete all")
         else
-          # I would just use this relation in the where below, but
+          # I would just use a relation in the where below, but
           # it gets confused with the with_exclusive_scope, and
           # doesn't apply current_scoped_methods_when_defined
-          # so just serialize it here
-          sql = except(:select).select(:id).to_sql
+          # so just serialize it here (carefully, to avoid
+          # method_missing magic causing the scope to be multiplied)
+          scope = scope(:find) || {}
+          scope[:select] = "#{quoted_table_name}.#{connection.quote_column_name(primary_key)}"
+          sql = with_exclusive_scope(find: scope) { to_sql }
           with_exclusive_scope do
-            return where("id IN (#{sql})").delete_all
+            return where("#{connection.quote_column_name(primary_key)} IN (#{sql})").delete_all
           end
         end
       end
