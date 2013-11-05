@@ -12,7 +12,7 @@ class AddSisBatchesIndex < ActiveRecord::Migration
       # select * from sis_batches where account_id = ? and workflow_state = 'created' order by created_at
       # select count(*) from sis_batches where account_id = ? and workflow_state = 'created'
       # this index is highly optimized for the sis batch job processor workflow
-      add_index :sis_batches, [:account_id, :created_at], :algorithm => :concurrently, :where => "workflow_state='created'"
+      add_index :sis_batches, [:account_id, :created_at], :algorithm => :concurrently, :where => "workflow_state='created'", name: "index_sis_batches_pending_for_accounts"
       # select * from sis_batches where account_id = ? order by created_at desc limit 1
     else
       add_index :sis_batches, [:workflow_state, :account_id, :created_at], :name => "index_sis_batches_pending_for_accounts"
