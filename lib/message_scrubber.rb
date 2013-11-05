@@ -16,10 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Public: Delete old (> 90 days) records from delayed_messages.
+# Public: Delete old (> 360 days) records from messages table.
 class MessageScrubber
+
   # Public: The minimum wait time in seconds between processing batches.
   MIN_DELAY = 1
+
+  # Public: The default batch size.
+  BATCH_SIZE = 1000
 
   attr_reader :batch_size, :delay, :limit, :logger
 
@@ -30,8 +34,8 @@ class MessageScrubber
   #   - delay: The delay, in seconds, between batches (default: 1).
   #   - logger: A logger object to log messages to (default: Rails.logger).
   def initialize(options = {})
-    @batch_size = options.fetch(:batch_size, 1000)
-    @limit      = Integer(Setting.get('message_scrubber_limit', 90)).days.ago
+    @batch_size = options.fetch(:batch_size, BATCH_SIZE)
+    @limit      = Integer(Setting.get(limit_setting, limit_size)).days.ago
     @delay      = options.fetch(:delay, MIN_DELAY)
     @logger     = options.fetch(:logger, Rails.logger)
   end
@@ -44,7 +48,7 @@ class MessageScrubber
   # Returns nothing.
   def scrub(options = {})
     dry_run = options.fetch(:dry_run, false)
-    scope   = DelayedMessage.where('send_at < ?', limit)
+    scope   = klass.where("#{filter_attribute} < ?", limit)
     dry_run ? log(scope) : delete_messages(scope)
   end
 
@@ -58,7 +62,7 @@ class MessageScrubber
     Shard.with_each_shard { scrub(options) }
   end
 
-  private
+  protected
 
   # Internal: Delete the current batch of messages.
   #
@@ -77,12 +81,40 @@ class MessageScrubber
     total
   end
 
+  # Internal: The column name to filter messages on (e.g. 'sent_at').
+  #
+  # Returns a column name string.
+  def filter_attribute
+    'sent_at'
+  end
+
+  # Internal: The class object to delete records from (e.g. 'Message').
+  #
+  # Returns class object.
+  def klass
+    Message
+  end
+
+  # Internal: The name of the Canvas setting this class' limit is stored in.
+  #
+  # Returns a setting name string.
+  def limit_setting
+    'message_scrubber_limit'
+  end
+
+  # Internal: The default limit (in days) to delete messages after.
+  #
+  # Returns a setting name string.
+  def limit_size
+    360
+  end
+
   # Internal: Log expected action.
   #
   # scope - The ActiveRecord scope to log.
   #
   # Returns nothing.
   def log(scope)
-    logger.info("MessageScrubber: #{scope.count} records would be deleted (older than #{limit})")
+    logger.info("#{self.class.to_s}: #{scope.count} records would be deleted (older than #{limit})")
   end
 end

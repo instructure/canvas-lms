@@ -19,23 +19,23 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 # Helpers
-def delayed_message(send_at)
-  message = DelayedMessage.new(notification: @notification, context: @context,
+def message(sent_at)
+  message = Message.new(notification: @notification, context: @context,
           communication_channel: @recipient.communication_channel)
-  message.send_at = send_at
+  message.sent_at = sent_at
   message.save!
   message
 end
 
 def old_messages(count = 2)
   (1..count).map do
-    delayed_message(100.days.ago)
+    message(700.days.ago)
   end
 end
 
 def new_messages(count = 2)
   (1..count).map do
-    delayed_message(Time.now)
+    message(Time.now)
   end
 end
 
@@ -51,19 +51,19 @@ describe MessageScrubber do
       @recipient.communication_channels.create!(path_type: 'email', path: 'user@example.com')
     end
 
-    it 'should delete delayed messages older than 90 days' do
+    it 'should delete delayed messages older than 360 days' do
       messages = old_messages(2)
       scrubber = MessageScrubber.new
       scrubber.scrub
-      DelayedMessage.where(id: messages.map(&:id)).count.should == 0
+      Message.where(id: messages.map(&:id)).count.should == 0
     end
 
-    it 'should not delete messages younger than 90 days' do
+    it 'should not delete messages younger than 360 days' do
       messages = old_messages(1) + new_messages(1)
 
       scrubber = MessageScrubber.new
       scrubber.scrub
-      DelayedMessage.where(id: messages.map(&:id)).count.should == 1
+      Message.where(id: messages.map(&:id)).count.should == 1
     end
 
     it 'should log predicted results if passed dry_run=true' do
@@ -104,7 +104,7 @@ describe MessageScrubber do
       scrubber.scrub_all
       [@shard1, @shard2].each do |shard|
         shard.activate do
-          DelayedMessage.where(id: @messages.map(&:id)).count.should == 0
+          Message.where(id: @messages.map(&:id)).count.should == 0
         end
       end
     end
