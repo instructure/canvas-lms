@@ -5,10 +5,11 @@ define [
   'compiled/collections/AssignmentGroupCollection'
   'compiled/views/assignments/AssignmentGroupListView'
   'compiled/views/assignments/IndexView'
+  'compiled/views/assignments/ToggleShowByView'
   'jquery'
   'helpers/jquery.simulate'
   'helpers/fakeENV'
-], (Backbone, AssignmentGroup, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, $) ->
+], (Backbone, AssignmentGroup, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, ToggleShowByView, $) ->
 
 
   fixtures = $('#fixtures')
@@ -33,12 +34,18 @@ define [
       collection: assignmentGroups
       course: course
 
+    showByView = false
+    if !ENV.PERMISSIONS.manage
+      showByView = new ToggleShowByView
+        course: course
+        assignmentGroups: assignmentGroups
+
     app = new IndexView
       assignmentGroupsView: assignmentGroupsView
       collection: assignmentGroups
       createGroupView: false
       assignmentSettingsView: false
-      showByView: false
+      showByView: showByView
 
     app.render()
 
@@ -70,11 +77,9 @@ define [
     view.filterResults()
     equal view.$el.find('.assignment').not('.hidden').length, 2
 
-
   test 'should have search disabled on render', ->
     view = assignmentIndex()
     ok view.$('#search_term').is(':disabled')
-
 
   test 'should enable search on assignmentGroup reset', ->
     view = assignmentIndex()
@@ -99,3 +104,22 @@ define [
     ok view.$("#assignment_1 .modules .tooltip_link").text().match(/Multiple Modules/)
     ok view.$("#assignment_1 .modules").text().match(/One\s+Two/)
     ok view.$("#assignment_2 .modules").text().match(/Three Module/)
+
+
+  module 'student index view',
+    setup: ->
+      ENV.PERMISSIONS = {manage: false}
+
+    teardown: ->
+      ENV.PERMISSIONS = {}
+      assignmentGroups = null
+      $('#fixtures').empty()
+
+  test 'should clear search on toggle', ->
+    clear_spy = sinon.spy(IndexView.prototype, 'clearSearch')
+    view = assignmentIndex()
+    view.$('#search_term').val('something')
+    view.showByView.toggleShowBy({preventDefault: -> })
+    equal view.$('#search_term').val(), ""
+    ok clear_spy.called
+    clear_spy.restore()
