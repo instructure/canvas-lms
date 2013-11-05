@@ -110,6 +110,7 @@ class GradeSummaryPresenter
       .includes(:visible_submission_comments,
                 {:rubric_assessments => [:rubric, :rubric_association]},
                 :content_participations)
+      .where("assignments.workflow_state != 'deleted'")
       .find_all_by_user_id(student)
 
       assignments_index = assignments.index_by(&:id)
