@@ -479,7 +479,6 @@ describe Quiz do
   end
 
   describe "#generate_submission" do
-
     it "should generate a valid submission for a given user" do
       u = User.create!(:name => "some user")
       q = @course.quizzes.create!(:title => "some quiz")
@@ -532,6 +531,42 @@ describe Quiz do
       sub.save!
       sub2 = q.generate_submission(u)
       sub2.end_at.should be_nil
+    end
+
+    it "should shuffle submission questions" do
+      u1 = User.create!(:name => "user 1")
+      u2 = User.create!(:name => "user 2")
+      u3 = User.create!(:name => "user 3")
+
+      quiz = @course.quizzes.create!(:title => "some quiz")
+
+      # create a bunch of questions to make it more likely that they'll shuffle randomly
+      group = quiz.quiz_groups.create!(:name => "group 1", :pick_count => 4, :question_points => 2)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 1" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 2" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 3" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 4" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 5" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 6" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 7" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 8" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 9" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 10" }, :quiz_group => group)
+      quiz.quiz_data.should be_nil
+      quiz.generate_quiz_data
+      quiz.save
+
+      original = quiz.quiz_questions.map {|q| q.question_data["question_text"] }
+
+      selected1 = quiz.generate_submission(u1).questions.map {|q| q["question_text"] }
+      selected2 = quiz.generate_submission(u2).questions.map {|q| q["question_text"] }
+
+      # make sure at least one is shuffled
+      is_shuffled1 = (original != selected1)
+      is_shuffled2 = (original != selected2)
+
+      # it's possible but unlikely that shuffled version is same as original
+      (is_shuffled1 || is_shuffled2).should be_true
     end
   end
 

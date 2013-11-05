@@ -583,9 +583,10 @@ class Quiz < ActiveRecord::Base
             end
           end
         else
+          questions = q[:questions].shuffle
           q[:pick_count].times do |i|
-            if q[:questions][i]
-              question = q[:questions][i]
+            if questions[i]
+              question = questions[i]
               question[:points_possible] = q[:question_points]
               user_questions << generate_submission_question(question)
             end
