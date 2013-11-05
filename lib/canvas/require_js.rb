@@ -10,7 +10,7 @@ module Canvas
       JS_ROOT = "#{Rails.root}/public/javascripts"
 
       def matcher
-        ENV['JS_SPEC_MATCHER'] || '**/*Spec.js'
+        ENV['JS_SPEC_MATCHER'] || '**/*{Spec,.spec}.js'
       end
 
       # get all regular canvas (and plugin) bundles

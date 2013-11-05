@@ -105,9 +105,10 @@
     var onSpecsLoaded = null;
     require(<%=
       Dir[
+        "public/javascripts/#{matcher}",
         "spec/javascripts/compiled/#{matcher}",
         "spec/plugins/*/javascripts/compiled/#{matcher}"
-      ].map{ |file| file.sub(/\.js$/, '') }.inspect
+      ].map{ |file| file.sub(/\.js$/, '').sub(/public\/javascripts\//, '') }.inspect
     %>, function() {
       specsLoading = false;
       if (onSpecsLoaded) onSpecsLoaded();

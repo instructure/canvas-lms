@@ -2,7 +2,16 @@ require 'timeout'
 
 namespace :js do
 
+  desc 'run testem as you develop, can use `rake js:dev <ember app name>`'
   task :dev do
+    app = ARGV[1]
+    if app
+      ENV['JS_SPEC_MATCHER'] = "**/#{app}/**/*.spec.js"
+      unless File.exists?("app/coffeescripts/ember/#{app}")
+        puts "no app found at app/coffeescripts/ember/#{app}"
+        exit
+      end
+    end
     Rake::Task['js:generate_runner'].invoke
     exec('testem -f config/testem.yml')
   end
