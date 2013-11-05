@@ -3,8 +3,8 @@ define [
   'compiled/models/AssignmentGroup'
   'underscore'
   'i18n!assignments'
-  'compiled/collections/PaginatedCollection'
-], (Backbone, AssignmentGroup, _, I18n, PaginatedCollection) ->
+  'compiled/collections/SubmissionCollection'
+], (Backbone, AssignmentGroup, _, I18n, SubmissionCollection) ->
 
   PER_PAGE_LIMIT = 50
 
@@ -41,7 +41,7 @@ define [
     comparator: 'position'
 
     getGrades: ->
-      collection = new PaginatedCollection
+      collection = new SubmissionCollection
       collection.url = => "#{@courseSubmissionsURL}?per_page=#{PER_PAGE_LIMIT}"
       collection.loadAll = true
       collection.on 'fetched:last', =>

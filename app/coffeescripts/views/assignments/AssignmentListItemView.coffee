@@ -185,7 +185,7 @@ define [
 
     _setJSONForGrade: (json) ->
       if submission = @model.get('submission')
-        submissionJSON = submission.toJSON()
+        submissionJSON = if submission.present then submission.present() else submission.toJSON()
         score = submission.get('score')
         if typeof score is 'number' && !isNaN(score)
           submissionJSON.score = round score, round.DEFAULT

@@ -1,7 +1,8 @@
 define [
   'compiled/models/Assignment'
+  'compiled/models/Submission'
   'compiled/models/DateGroup'
-], (Assignment, DateGroup) ->
+], (Assignment, Submission, DateGroup) ->
 
   module "Assignment"
 
@@ -258,35 +259,11 @@ define [
     assignment.set 'submission_types': [ 'external_tool', 'on_paper', 'attendance' ]
     deepEqual assignment.allowedToSubmit(), false
 
-  module "Assignment#isGraded"
-
-  test "returns true if notYetGraded is null", ->
-    assignment = new Assignment name: 'foo'
-    assignment.set 'submission': new Backbone.Model {'notYetGraded': null}
-    deepEqual assignment.isGraded(), true
-
-  test "returns false if notYetGraded is true", ->
-    assignment = new Assignment name: 'foo'
-    assignment.set 'submission': new Backbone.Model {'notYetGraded': true}
-    deepEqual assignment.isGraded(), false
-
-  module "Assignment#hasSubmission"
-
-  test "returns false if submission is null", ->
-    assignment = new Assignment name: 'foo'
-    assignment.set 'submission': null
-    deepEqual assignment.hasSubmission(), false
-
-  test "returns true if submission has a submission type", ->
-    assignment = new Assignment name: 'foo'
-    assignment.set 'submission': new Backbone.Model {'submission_type': 'online'}
-    deepEqual assignment.hasSubmission(), true
-
   module "Assignment#withoutGradedSubmission"
 
   test "returns false if there is a submission", ->
     assignment = new Assignment name: 'foo'
-    assignment.set 'submission': new Backbone.Model {'submission_type': 'online'}
+    assignment.set 'submission': new Submission {'submission_type': 'online'}
     deepEqual assignment.withoutGradedSubmission(), false
 
   test "returns true if there is no submission", ->
@@ -296,12 +273,12 @@ define [
 
   test "returns true if there is a submission, but no grade", ->
     assignment = new Assignment name: 'foo'
-    assignment.set 'submission': new Backbone.Model {'notYetGraded': true}
+    assignment.set 'submission': new Submission
     deepEqual assignment.withoutGradedSubmission(), true
 
   test "returns false if there is a submission and a grade", ->
     assignment = new Assignment name: 'foo'
-    assignment.set 'submission': new Backbone.Model {'grade': 305}
+    assignment.set 'submission': new Submission {'grade': 305}
     deepEqual assignment.withoutGradedSubmission(), false
 
   module "Assignment#acceptsOnlineUpload"

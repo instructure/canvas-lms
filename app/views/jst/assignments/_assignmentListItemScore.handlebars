@@ -1,14 +1,7 @@
 <span class="non-screenreader" aria-hidden=true>
   {{#unless hideGrade}}
-    {{#unless submission}}
+    {{#ifAll submission submission.submitted_or_graded}}
 
-      <span data-tooltip="" class="span5 score-display ellipsis text-right" title='{{#t "no_submission"}}No Submission{{/t}}'>
-        {{#t "empty_points_possible"}}
-        -/{{pointsPossible}} pts
-        {{/t}}
-      </span>
-
-    {{else}}
       {{#with submission}}
         {{#if notYetGraded}}
 
@@ -24,6 +17,7 @@
           </span>
 
         {{else}}
+
           <span class="score-display span5 text-right ellipsis">
               {{#t "score_with_points_possible"}}
               <b>{{score}}</b>/{{pointsPossible}} pts
@@ -36,10 +30,17 @@
           </span>
 
         {{/if}}
-
       {{/with}}
 
-    {{/unless}}
+    {{else}}
+
+      <span data-tooltip="" class="span5 score-display ellipsis text-right" title='{{#t "no_submission"}}No Submission{{/t}}'>
+        {{#t "empty_points_possible"}}
+        -/{{pointsPossible}} pts
+        {{/t}}
+      </span>
+
+    {{/ifAll}}
   {{/unless}}
 </span>
 
@@ -49,13 +50,8 @@
       This assignment will not be assigned a grade.
     {{/t}}
   {{else}}
-    {{#unless submission}}
+    {{#ifAll submission submission.submitted_or_graded}}
 
-      {{#t "no_submission_for_assignment_screenreader"}}
-        No submission for this assignment. {{pointsPossible}} points possible.
-      {{/t}}
-
-    {{else}}
       {{#with submission}}
         {{#if notYetGraded}}
 
@@ -74,7 +70,13 @@
 
       {{/with}}
 
-    {{/unless}}
+    {{else}}
+
+      {{#t "no_submission_for_assignment_screenreader"}}
+        No submission for this assignment. {{pointsPossible}} points possible.
+      {{/t}}
+
+    {{/ifAll}}
   {{/if}}
 
 </span>

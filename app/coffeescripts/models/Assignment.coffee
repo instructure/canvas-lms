@@ -110,16 +110,9 @@ define [
       submissionTypes = @_submissionTypes()
       @expectsSubmission() && !@get('locked_for_user') && !_.include(submissionTypes, 'online_quiz') && !_.include(submissionTypes, 'attendance')
 
-    isGraded: =>
-      submission = @get('submission') || new Backbone.Model {}
-      !submission.get('notYetGraded')?
-
-    hasSubmission: =>
-      submission = @get('submission') || new Backbone.Model {}
-      !!submission.get('submission_type')
-
     withoutGradedSubmission: =>
-      !@get('submission')? || (!@hasSubmission() && !@isGraded())
+      sub = @get('submission')
+      !sub? || sub.withoutGradedSubmission()
 
     acceptsOnlineUpload: =>
       !! _.include @_submissionTypes(), 'online_upload'

@@ -1,11 +1,12 @@
 define [
   'Backbone'
   'compiled/models/Assignment'
+  'compiled/models/Submission'
   'compiled/views/assignments/AssignmentListItemView'
   'jquery'
   'helpers/jquery.simulate'
   'helpers/fakeENV'
-], (Backbone, Assignment, AssignmentListItemView, $) ->
+], (Backbone, Assignment, Submission, AssignmentListItemView, $) ->
   screenreaderText = null
   nonScreenreaderText = null
 
@@ -114,25 +115,22 @@ define [
 
     view
 
-
   genSetup = (model=assignment1()) ->
     ENV = window.ENV ||= {}
     ENV.PERMISSIONS = {manage: false}
     window.ENV = ENV
 
     @model = model
-    @submission = new Backbone.Model
+    @submission = new Submission
     @view = createView(@model, canManage: false)
     screenreaderText = =>
       $.trim @view.$('.js-score .screenreader-only').text()
     nonScreenreaderText = =>
       $.trim @view.$('.js-score .non-screenreader').text()
 
-
   genTeardown = ->
     ENV.PERMISSIONS = {}
     $('#fixtures').empty()
-
 
 
   module 'AssignmentListItemViewSpec',
@@ -177,21 +175,23 @@ define [
 
     ENV.context_asset_string = old_asset_string
 
-  test "updating grades from model change", ->
-    @submission.set 'score', 1.5555
+  test "show score if score is set", ->
+    @submission.set 'score': 1.5555, 'grade': '1.5555'
     @model.set 'submission', @submission
     @model.trigger 'change:submission'
 
     equal screenreaderText(), 'Score: 1.56 out of 2 points.', 'sets screenreader text'
     equal nonScreenreaderText(), '1.56/2 pts', 'sets non-screenreader text'
 
-    @model.set 'submission', null
+  test "show show no submission if none exists", ->
+    @model.set 'submission': null
     equal screenreaderText(), 'No submission for this assignment. 2 points possible.',
       'sets screenreader text for null points'
     equal nonScreenreaderText(), '-/2 pts',
       'sets non-screenreader text for null points'
 
-    @submission.set 'score', 0
+  test "show score if 0 correctly", ->
+    @submission.set 'score': 0, 'grade': '0'
     @model.set 'submission', @submission
 
     equal screenreaderText(), 'Score: 0 out of 2 points.',
@@ -199,7 +199,16 @@ define [
     equal nonScreenreaderText(), '0/2 pts',
       'sets non-screenreader text for 0 points'
 
-    @submission.set 'notYetGraded', true
+  test "show no submission if submission object with no submission type", ->
+    @model.set 'submission', @submission
+    @model.trigger 'change:submission'
+    equal screenreaderText(), 'No submission for this assignment. 2 points possible.',
+      'sets correct screenreader text for not yet graded'
+    equal nonScreenreaderText(), '-/2 pts',
+      'sets correct non-screenreader text for not yet graded'
+
+  test "show not yet graded if submission type but no grade", ->
+    @submission.set 'submission_type': 'online', 'notYetGraded': true
     @model.set 'submission', @submission
     @model.trigger 'change:submission'
     equal screenreaderText(), 'Assignment not yet graded. 2 points possible.',
@@ -245,7 +254,6 @@ define [
     ok nonScreenreaderText().match('Complete')[0], 'sets non-screenreader grade text'
 
 
-
   module 'AssignmentListItemViewSpec—alternate grading type: letter_grade',
     setup: ->
       genSetup.call @, assignment_grade_letter_grade()
@@ -264,7 +272,6 @@ define [
     ok nonScreenreaderText().match('B')[0], 'sets non-screenreader grade text'
 
 
-
   module 'AssignmentListItemViewSpec—alternate grading type: not_graded',
     setup: ->
       genSetup.call @, assignment_grade_not_graded()
@@ -279,5 +286,3 @@ define [
 
     equal screenreaderText(), 'This assignment will not be assigned a grade.', 'sets screenreader text'
     equal nonScreenreaderText(), '', 'sets non-screenreader text'
-
-
