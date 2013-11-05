@@ -1092,7 +1092,7 @@ class CoursesController < ApplicationController
 
       if params[:account_id]
         @account = api_find(Account.active, params[:account_id])
-        scope = @account.all_courses
+        scope = @account.root_account? ? @account.all_courses : @account.associated_courses
       else
         scope = Course
       end
