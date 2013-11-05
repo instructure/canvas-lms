@@ -4,6 +4,7 @@ define [
   'compiled/fn/preventDefault'
   'jst/DialogFormWrapper'
   'jqueryui/dialog'
+  'compiled/jquery/fixDialogButtons'
 ], ($, ValidatedFormView, preventDefault, wrapper) ->
 
   ##
@@ -71,7 +72,10 @@ define [
     ##
     # @api public
     close: ->
-      @dialog.close()
+      # could be calling this from the close event
+      # so we want to check if it's open
+      if @dialog?.isOpen()
+        @dialog.close()
       @focusReturnsTo()?.focus()
 
     ##
@@ -166,7 +170,9 @@ define [
       opts =
         autoOpen: false
         title: @getDialogTitle()
-        close: => @trigger 'close'
+        close: =>
+          @close()
+          @trigger 'close'
         open: => @trigger 'open'
       opts.width = @options.width
       opts.height = @options.height

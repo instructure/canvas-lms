@@ -227,6 +227,18 @@ define [
       'sets correct non-screenreader text for not yet graded'
     ok nonScreenreaderText().match('Not Yet Graded')[0]
 
+  test "focus returns to cog after dismissing dialog", ->
+    view = createView(@model, canManage: true)
+    trigger = view.$("#assign_#{@model.id}_manage_link")
+    ok(trigger.length, 'there is an a node with the correct id')
+    #show menu
+    trigger.click()
+
+    view.$("#assignment_#{@model.id}_settings_edit_item").click()
+    view.editAssignmentView.close()
+
+    equal document.activeElement, trigger.get(0)
+
 
   module 'AssignmentListItemViewSpec—alternate grading type: percent',
     setup: ->
@@ -296,3 +308,5 @@ define [
 
     equal screenreaderText(), 'This assignment will not be assigned a grade.', 'sets screenreader text'
     equal nonScreenreaderText(), '', 'sets non-screenreader text'
+
+
