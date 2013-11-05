@@ -71,7 +71,9 @@
       <% end %>
     </table>
   </fieldset>
-  <%= form_for :pseudonym, :url => user_pseudonyms_url(@user.id), :html => {:id => 'edit_pseudonym_form', :style => 'display: none;'} do |f| %>
+  <%= form_for :pseudonym, :url => user_pseudonyms_url(@user.id),
+               :html => {:id => 'edit_pseudonym_form', :class => 'form-dialog form-horizontal',
+                         :style => 'display: none;'} do |f| %>
     <table class="formtable" style="margin-top: 20px;">
       <tr>
         <td><%= f.blabel :unique_id, :en => "Login" %></td>
@@ -84,11 +86,11 @@
       <% if can_do(Account.site_admin, @current_user, :manage_user_logins) %>
         <% js_env :PASSWORD_POLICIES => Hash[Account.root_accounts.active.map{ |a| [a.id, a.password_policy]}] %>
         <tr class="account_id">
-            <td><%= f.blabel :account_id, :en => "Account" %></td>
-            <td>
-              <% accounts = Account.root_accounts.active.map{|a| [a.name, a.id] }.sort_by(&:first) %>
-              <%= f.select :account_id, accounts, {:selected => @domain_root_account.id}, :class => "account_id_select" %>
-            </td>
+          <td><%= f.blabel :account_id, :en => "Account" %></td>
+          <td>
+            <% accounts = Account.root_accounts.active.map{|a| [a.name, a.id] }.sort_by(&:first) %>
+            <%= f.select :account_id, accounts, {:selected => @domain_root_account.id}, :class => "account_id_select" %>
+          </td>
         </tr>
       <% else %>
         <tr style="display: none;">
@@ -103,13 +105,10 @@
         <td>&nbsp;</td>
         <td><%= f.password_field :password_confirmation, :style => "width: 150px;" %></td>
       </tr>
-      <tr>
-        <td colspan="2">
-          <div class="button-container">
-            <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', 'Cancel') %></button>
-            <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.update_login', 'Update Login') %></button>
-          </div>
-        </td>
-      </tr>
     </table>
+
+    <div class='form-controls'>
+      <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', 'Cancel') %></button>
+      <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.update_login', 'Update Login') %></button>
+    </div>
   <% end %>

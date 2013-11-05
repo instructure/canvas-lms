@@ -100,7 +100,7 @@ $(document).ready(function() {
           $form.data('unique_id_text').parents(".login").remove();
         }
       }
-    }).fixDialogButtons();
+    });
     $form.dialog('option', 'title', I18n.t('titles.update_login', 'Update Login'))
       .find(".submit_button").text(I18n.t('buttons.update_login', "Update Login"));
     $form.dialog('option', 'beforeClose', function(){
