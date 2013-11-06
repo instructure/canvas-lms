@@ -23,6 +23,9 @@ define [
       'click .ig-row': 'manageEvent'
       'keydown .ig-row': 'manageEvent'
 
+    messages:
+      loading_more_items: I18n.t('loading_more_items', "Loading more items.")
+
     @optionProperty 'calendar'
 
     constructor: ->
@@ -71,7 +74,19 @@ define [
     loadMore: (e) ->
       e.preventDefault()
       @$spinner.show()
-      @_fetch(@nextPageDate, @appendEvents)
+      @_fetch(@nextPageDate, @loadMoreFinished)
+      $.screenReaderFlashMessage(@messages.loading_more_items)
+
+    loadMoreFinished: (events) =>
+      @appendEvents(events)
+      @focusFirstNewDate(events)
+
+    focusFirstNewDate: (events) ->
+      firstNewEvent = _.min(events, (e) -> e.start)
+      $firstEvent = @$("li[data-event-id='#{firstNewEvent.id}']")
+      $firstEventDay = $firstEvent.closest('.agenda-day')
+      $firstEventDayDate = $firstEventDay.find('.agenda-date')
+      $firstEventDayDate[0].focus() if $firstEventDayDate.length
 
     manageEvent: (e) ->
       return if e.type == 'keydown' && e.keyCode != 13 && e.keyCode != 32
