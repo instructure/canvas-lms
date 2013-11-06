@@ -3816,7 +3816,7 @@ ja:
       slide7: "スライド 7"
       slide8: "スライド 8"
       slide9: "スライド 9"
-  correct_answer: これが正解。
+  correct_answer: これが正解です。
   course: 
     access_denied: アクセスは拒否されました
     batch_update_message: 
@@ -5548,7 +5548,7 @@ ja:
       help_link: "ヘルプ リンク"
       rate_tool: このツールを評価
     app_review_view: 
-      posted_by_on: "*%{user.name}* によって *%{created_at}* に投稿"
+      posted_by_on: "*%{user.name}* が *%{created_at}* に投稿"
     app_saved_message: "%{app} が正常に保存されました。"
     borderless_launch: 
       load_tool_button: "%{tool} を手動で読み込む"
@@ -5971,7 +5971,7 @@ ja:
       scored_less_than: "次のスコアに満たない: "
       scored_less_than_on: "%{assignment} の成績が %{cutoff} 未満"
       scored_more_than: "次のスコアを上回る: "
-      scored_more_than_on: "%{assignment} の成績が %{cutoff} より高い"
+      scored_more_than_on: "%{assignment} の成績が %{cutoff} より上"
     submission_information: 提出情報
     teacher_muted_title: 課題はミュートになっています
     titles: 
@@ -6060,11 +6060,11 @@ ja:
       havent_submitted_yet: まだ提出していない
       no_grade_for: "%{assignment} の成績なし"
       no_submission_for: "%{assignment} の提出なし"
-      not_submitted_yet: まだ提出していない
+      not_submitted_yet: 未提出
       scored_less_than: "次のスコアに満たない: "
       scored_less_than_on: "%{assignment} の成績が %{cutoff} 未満"
       scored_more_than: "次のスコアを上回る: "
-      scored_more_than_on: "%{assignment} の成績が %{cutoff} より高い"
+      scored_more_than_on: "%{assignment} の成績が %{cutoff} より上"
     submitted_late: 遅れて提出
     title: 
       quiz: クイズへの提出物
@@ -6726,7 +6726,7 @@ ja:
       assign_to_group_menu: 
         add_to_group: グループに追加
         all_groups_full: いずれのグループにも空きがありません。
-        all_groups_full_suggestion: グループの定員を変更するか、またはグループを追加してください。
+        all_groups_full_suggestion: グループの定員を変更するか、グループを追加してください。
         assign_user_to_group: このグループにユーザを割り当て
         no_groups_created: ユーザを追加する前に、グループを作成する必要があります。
       group: 
@@ -6736,10 +6736,10 @@ ja:
         group_settings: 設定
         show_group_details: グループの詳細情報の表示
       group_categories: 
-        account_group_explanation: "アカウント レベルの受講生グループは、受講生を特定のコースに関連付けずにグループ化するための良い方法です。すべての受講生グループが、独自のカレンダー、掲示板、および共同作用ツールを手に入れることができます。そのため、受講生自らがグループを管理でき、より効率的に共同作業を行うことができます。"
+        account_group_explanation: "アカウント レベルの受講生グループは、受講生を特定のコースに関連付けずにグループ化するための便利な方法です。すべての受講生グループにグループ専用のカレンダー、掲示板、および共同作用ツールが提供されるため、受講生が自らグループを管理でき、より効率的に共同作業を行うことができます。"
         add_group_set: "グループ セットの追加"
-        course_group_explanation: "受講生グループは、グループ プロジェクトやグループ論文のような事柄のために受講生を編成する際に役立ちます。すべての受講生グループが、独自のカレンダー、掲示板、および共同作用ツールを手に入れることができます。そのため、受講生自らがグループを管理でき、より効率的に共同作業を行うことができます。"
-        group_assignment_instructions: "指定したサイズのグループに、受講生を無作為に割り当てることができます。または、手動でグループを作成し編成することもできます。グループを作成したら、\"グループ提出\" の課題となるように、課題を設定することができます。つまり、それぞれのグループが 1 つの提出物を、そのグループの全ユーザのために作成します。"
+        course_group_explanation: "受講生グループは、グループ プロジェクトやグループ論文などのために受講生を組織化する際に役立ちます。すべての受講生グループにグループ専用のカレンダー、掲示板、および共同作用ツールが提供されるため、受講生が自らグループを管理でき、より効率的に共同作業を行うことができます。"
+        group_assignment_instructions: "指定したサイズのグループに受講生を無作為に割り当てることも、手動でグループを作成して編成することもできます。グループを作成すると、\"グループ提出\" の課題 (グループ全体で 1 つの提出物を作成する課題) を設定できます。"
         group_set: "グループ セット"
         headings: 
           account_groups: "アカウント レベルの受講生グループ"
@@ -6806,7 +6806,7 @@ ja:
         randomly_assign_students_dialog: 未割り当ての全受講生を、自動的に、できるだけ均等に、既存の受講生グループに割り当てます。
       self_signup_help: 
         about_self_signup_groups: "セルフ サインアップ グループについて"
-        self_signup_description: "受講生が自分でサインアップできるグループのセットを作成できます。受講生はセット内の 1 つのグループにしかサインアップできませんが、このオプションを使用すると、講師が受講生をグループに振り分けなくても、受講生が自分でグループを選択できます。このオプションを有効にしている場合は、受講生が自分で別のグループに移動できることに注意してください。"
+        self_signup_description: "受講生によるセルフ サインアップが可能なグループ セットを作成できます。受講生はグループ セット内の 1 つのグループにしかサインアップできませんが、このオプションを使用すると、講師が受講生をグループに振り分けなくても、受講生が自分でグループを選択できます。このオプションを有効にしている場合は、受講生が自分で別のグループに移動できることに注意してください。"
     member: 
       one: "%{count} 人のメンバー"
       other: "%{count} 人のメンバー"
@@ -10481,7 +10481,7 @@ ja:
       show_details: 問題の詳細情報の表示
       title: 
         move_copy_questions: 問題の移動/コピー
-  question_unanswered: まだ解答していない
+  question_unanswered: 未回答
   quick_start_bar: 
     announcement: 
       saving: 保存しています...
@@ -11251,9 +11251,9 @@ ja:
       labels: 
         final_score: 最終的なスコア
         fudge_points: 調整点
-        fudge_points_changed_points_quiz: "%{user} さんがこのクイズを受けてから、クイズの配点が %{difference} 変更されました。この変更分の調整として、このボックスを使用して正または負の点数を手動で追加することができます。"
-        fudge_points_changed_points_survey: "%{user} さんがこのサーベイを受けてから、サーベイの配点が %{difference} 変更されました。この変更分の調整として、このボックスを使用して正または負の点数を手動で追加することができます。"
-        fudge_points_generic_explanation: このボックスに正または負の点数を追加して、スコアを手動で調整することができます。
+        fudge_points_changed_points_quiz: "%{user} がこのクイズに回答した後に、クイズの配点が %{difference} 変更されました。この変更分を調整するために、このボックスに手動で正または負の点数を指定できます。"
+        fudge_points_changed_points_survey: "%{user} がこのサーベイに回答した後に、サーベイの配点が %{difference} 変更されました。この変更分を調整するために、このボックスに手動で正または負の点数を指定できます。"
+        fudge_points_generic_explanation: このボックスに正または負の点数を指定することで、スコアを手動で調整できます。
         questions_need_review: 次の問題はレビューが必要です
         quiz_score: クイズのスコア
         score_for_attempt: この試行のスコア
