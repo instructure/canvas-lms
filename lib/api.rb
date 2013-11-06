@@ -187,9 +187,13 @@ module Api
     return find_params
   end
 
+  def self.max_per_page
+    Setting.get('api_max_per_page', '50').to_i
+  end
+
   def self.per_page_for(controller, options={})
     per_page = controller.params[:per_page] || options[:default] || Setting.get('api_per_page', '10')
-    max = options[:max] || Setting.get('api_max_per_page', '50')
+    max = options[:max] || max_per_page
     [[per_page.to_i, 1].max, max.to_i].min
   end
 
