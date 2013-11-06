@@ -779,6 +779,7 @@ class ApplicationController < ActionController::Base
   # to generate access reports per student per course.
   def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil)
     return unless @current_user && @context && asset
+    return if asset.respond_to?(:new_record?) && asset.new_record?
     @accessed_asset = {
       :code => asset.is_a?(String) ? asset : asset.asset_string,
       :group_code => asset_group.is_a?(String) ? asset_group : (asset_group.asset_string rescue 'unknown'),
