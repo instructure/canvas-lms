@@ -1343,8 +1343,6 @@ zh:
     imported_assignments_group: 导入的分配
     labels: 
       due: 到期日期
-    messages: 
-      assignment_created: "作业 \"%{assignment}\" 已创建"
     name_is_required: 需要名称
     points_possible: "对于百分制，最高分必须大于 0"
     select_external_tool_dialog_title: 配置外部工具
@@ -1360,9 +1358,6 @@ zh:
       a_website_url: "网站 URL"
     titles: 
       grading_scheme_info: 查看/编辑评分方案
-    warnings: 
-      group_assignment: "作业 \"%{assignment}\" 是组作业，您需要针对这个新的上下文重置组设置"
-      peer_assignment: "作业 \"%{assignment}\" 是同伴审阅作业，您需要针对这个新的上下文重置同伴审阅设置"
   assignment_details_dialog: 
     average_score: "平均分数:"
     count_of_submissions: "%{cnt} 个提交文件"
@@ -1477,8 +1472,18 @@ zh:
       move: 移动到...
       move_assignment_title: 移动作业
       multiple_modules: 多个单元
+      no_points_possible: 无最高分
       points_possible: "%{pointsPossible} 分"
+      points_possible_screen_reader: "%{pointsPossible} 最高分"
       settings: 设置
+    assignment_list_item_score: 
+      assignment_not_yet_graded_screenreader: "作业尚未评分。%{pointsPossible} 最高分。"
+      no_submission: 无提交
+      no_submission_for_assignment_screenreader: "此作业无提交。%{pointsPossible} 最高分。"
+      no_submission_with_points_possible: "-/%{pointsPossible} 分"
+      not_yet_graded_with_points_possible: "*尚未评分*/%{pointsPossible} 分"
+      score_with_points_possible: "%{grade}/%{pointsPossible} 分"
+      score_with_points_possible_screenreader: "分数: %{grade} 超出 %{pointsPossible} 分"
     assignment_locked: 
       assignment_locked: "此作业锁定于 *%{lock_at}*"
       assignment_unlocked_from: "此作业锁定至 *%{unlock_at}*"
@@ -1535,6 +1540,7 @@ zh:
       delete_group: 删除组
       submit_assignment: 提交作业
     cannot_delete_group: 您必须至少有一个作业组
+    cant_unpublish_when_students_submit: 如有学生提交文件，则无法取消发布
     confirm: 
       delete_assignment: 是否确定要删除此作业?
       delete_group: 是否确定要删除此组?
@@ -2236,6 +2242,10 @@ zh:
     last_formula_row: 最后一个公式行将用于计算最终的答案
     sample_final_answer: 此值是该问题类型的典型最终答案
   calendar: 
+    agenda_view: 
+      delete: 删除
+      due: 到期日期
+      edit: 编辑
     appointment_group_deletion_details: 删除它也会删除学生已注册的任何约会。
     appointment_group_list: 
       location: "位置:"
@@ -2256,13 +2266,16 @@ zh:
       create_event: 创建新事件
       done_go_back_to_list: 完成，返回列表
       links: 
+        calendar_agenda: 议程
         calendar_month: 月
         calendar_scheduler: 计划程序
         calendar_week: 周
+      loading: 正在加载
       my_appointment_groups: 我的约会组
       refresh: 刷新
       use_old_calendar: 旧日历
     calendar_navigator: 
+      enter_jump_date: "输入一个日期，然后按 Enter 跳到该日期。"
       next: 下一个
       previous: 上一个
       today: 今天
@@ -2355,6 +2368,7 @@ zh:
       slots_available: 可用时段
     event_event_title: 事件标题：
     event_on_this_day: 在这一天有一个事件
+    invalid_date: 数据无效
     labels: 
       due: 到期日期
     message_participants: 
@@ -3343,6 +3357,7 @@ zh:
         modules: 
           before_students_view: 在学生可以查看此单元之前
         new_tab: 在新选项卡中加载此工具
+        publish_final_grade: 此模块完成时为学生发布最终评分
         require_sequential_progress: 学生必须按顺序浏览此单元中的要求
         sort_by: 排序方式
         title: 标题
@@ -3802,6 +3817,7 @@ zh:
       slide7: "第 7 页"
       slide8: "第 8 页"
       slide9: "第 9 页"
+  correct_answer: 这是正确答案。
   course: 
     access_denied: 访问被拒绝
     batch_update_message: 
@@ -4155,6 +4171,7 @@ zh:
       headings: 
         future_enrollments: 未来的注册情况
         my_courses: 我的课程
+        my_groups: 我的组
         past_enrollments: 以前的注册
       start_new_course: 开始新课程
       titles: 
@@ -4402,41 +4419,35 @@ zh:
     show: 
       acting_as: "您正在使用此角色查看本课程:%{enrollment_type}。您只有适用于此角色用户的权限。"
       buttons: 
-        update_layout: 更新布局
+        update_layout: 保存
       details: 
-        assignments: 此视图显示本课程的**作业列表**，即将到来和近期的作业显示在顶部。
         confirm_unenroll: 是否确定要取消注册此课程?您将不再能够看到课程清单或与教师直接沟通，并且在您的通信流和通知中不再看到课程事件。
-        custom_page: 您可以**设计自己的课程主页**，在其中包含您喜欢的任何链接、图像或富媒体。
-        modules: |-
-            您可以将课程组织成**单元或章节**，每节包含一组相关的文件、作业和页面等。如果需要，还可以通过定义每个单元解锁之前需要完成的标准和先决条件，来组织序列单元。
-            
-            这种布局可能最适合没有特定时间表（例如学期）的课程。
-        recent_activity_dashboard: "**最近活动仪表板**让参加者能看到此课程最近的谈话、公告、讨论和互动。它很类似于用户在第一次登录时看到的仪表板，但只显示此特定课程的内容。"
-        syllabus: "**提纲视图**允许您编写有关课程期望的说明或通过链接、图像方式等介绍课程。还显示涵盖所有作业和课程事件的日历视图。"
       empty_body: 无内容
       headings: 
         confirm_unenroll: 确认取消注册
+        edit_homepage_title: 编辑主页
         importing: 课程正在导入
         set_layout: 设置主页布局
         unpublished: 此课程未发布
       importing: 课程复制/迁移进行中。这意味着某些内容可能暂时不可用。
       labels: 
-        set_layout: 当用户访问课程页面时，显示它们
+        set_layout: 选择您要在主页上显示的内容。
       license_notice: "此课程的内容根据 %{license_type} 许可证提供。本课程的内容可用性取决于此许可证，除非另有说明。"
       links: 
         change_layout: 更改主页布局
         course_setup: 课程设置清单
-        course_stream: 查看课程流
         drop_course: 放弃此课程
+        edit_homepage: 编辑主页
         join_course: 参与此课程
         new_announcement: 新通告
         restore_role: 恢复角色和权限
+        view_course_stream: 查看课程流
       options: 
         assignments: 作业列表
-        custom_page: 自定义页面
-        modules: 课程单元/章节
+        custom_page: 页面首页
+        modules: 课程单元
         recent_activity_dashboard: 最近活动仪表板
-        syllabus: 含有提纲的作业
+        syllabus: 提纲
       period_name: 最近两周
       re_sending: 正在重新发送...
       send_done: 完成！收到消息可能需要几分钟。
@@ -4691,6 +4702,7 @@ zh:
       short: "%b %e"
       short_month: "%b"
       short_weekday: "%a"
+      short_with_weekday: "%a, %b %-d"
       weekday: "%A"
     month_names: 
       - ~
@@ -4848,7 +4860,6 @@ zh:
   discussion_entry: 
     atom_no_author: 无作者
     default_user_name: 用户名
-    file_added_warning: "添加的文件 \"%{file_path}\" 是主题 \"%{discussion_topic_title}\" 中的条目所需的文件"
   discussion_topic: 
     atom_no_author: 无作者
     default_title: 无标题
@@ -4934,8 +4945,6 @@ zh:
     error_draft_state_announcement: 此主题无法设置为草稿状态，因为这是一个通告。
     error_draft_state_unauthorized: 您无权将此主题设置为草稿状态。
     error_draft_state_with_posts: 此主题无法设置为草稿状态，因为它包含帖子。
-    errors: 
-      bad_scope: 范围矛盾
     group_assignment_discussion_entry: 
       posts: 
         one: "%{count} 条公告"
@@ -5536,10 +5545,9 @@ zh:
       education_levels: 教育级别
       extensions: 延时
       help_link: 帮助链接
-      privacy_level: 隐私级别
       rate_tool: 对此工具评分
     app_review_view: 
-      posted_by_on: "由 *%{user_name}* 在 *%{created}* 上发布"
+      posted_by_on: "由 *%{user.name}* 于 *%{created_at}* 发布"
     app_saved_message: "%{app} 已成功保存！"
     borderless_launch: 
       load_tool_button: "手动加载 %{tool}"
@@ -5957,9 +5965,13 @@ zh:
     students_who: 
       havent_been_graded: 还未打分
       havent_submitted_yet: 尚未提交
+      no_grade_for: "%{assignment} 无评分"
+      no_submission_for: "%{assignment} 无提交"
       not_submitted_yet: 尚未提交
       scored_less_than: 分数低于
+      scored_less_than_on: "%{assignment} 的得分少于 %{cutoff} "
       scored_more_than: 分数高于
+      scored_more_than_on: "%{assignment} 的得分高于 %{cutoff}"
     submission_information: 提交文件信息
     teacher_muted_title: 作业被屏蔽
     titles: 
@@ -6046,8 +6058,13 @@ zh:
     students_who: 
       havent_been_graded: 尚未评分
       havent_submitted_yet: 尚未提交
+      no_grade_for: "%{assignment} 无评分"
+      no_submission_for: "%{assignment} 无提交"
+      not_submitted_yet: 尚未提交
       scored_less_than: 分数低于
+      scored_less_than_on: "%{assignment} 的得分少于 %{cutoff} "
       scored_more_than: 分数高于
+      scored_more_than_on: "%{assignment} 的得分高于 %{cutoff} "
     submitted_late: 提交过迟
     title: 
       quiz: 测验提交
@@ -6389,6 +6406,7 @@ zh:
         add_comment: 添加评论
         average: 平均
         grade: 评分
+        grade_by_question_beta: "按问题评分 (beta)"
         group_comment: 发送评论到全组
         hide_names: "在 SpeedGrader 中隐藏学生姓名"
         show_assessment_by: 显示评估依据
@@ -6510,6 +6528,8 @@ zh:
   group: 
     default_collection_name: "%{group_name} 集合"
     memeber: 成员
+    name_required: 需要名称
+    name_too_long: 输入一个更短的组名
     tabs: 
       chat: 聊天
       discussions: 讨论
@@ -6643,7 +6663,7 @@ zh:
       page_title: 课程组
       page_title_accounts: 帐户组
     create_group_set: 创建组设置
-    delete_confirm: 是否确定要删除此组类别?
+    delete_confirm: 是否确实要删除此组设置?
     edit: 
       buttons: 
         update: 更新组
@@ -6671,8 +6691,8 @@ zh:
       update_failed: 更新失败，请重试
     feed_title: "%{course_or_account_name} 馈送"
     flash: 
-      removeError: 无法删除该组类别。请稍后重试。
-      removed: 组类别已成功删除。
+      removeError: 无法删除该组设置。请稍后重试。
+      removed: 组设置已成功删除。
     group: 
       actions: 
         ask_to_join_group: 要求加入此组
@@ -6687,10 +6707,8 @@ zh:
       no_members: 无成员
       one: "1 个组"
       other: "%{count} 个组"
-    group_count: 
-      one: "%{count} 个组"
-      other: "%{count} 个组"
     group_name: 组名称
+    groups_count: "组 (%{count})"
     index: 
       heading_current_groups: 当前组
       no_groups: 无组
@@ -6707,7 +6725,10 @@ zh:
         too_short: 请输入具有三个或更多字符的搜索条件
       assign_to_group_menu: 
         add_to_group: 添加到组
+        all_groups_full: 所有组已满。
+        all_groups_full_suggestion: 更改组限制或添加更多组。
         assign_user_to_group: 将用户分配到此组
+        no_groups_created: 在用户添加组之前需要创建组。
       group: 
         add_user_to_group: 将用户分配到组
         group_delete: 删除
@@ -6715,11 +6736,18 @@ zh:
         group_settings: 设置
         show_group_details: 显示组详细信息
       group_categories: 
-        group_set_create: 添加组集
+        account_group_explanation: 帐户级学生组是一种不依附特定课程而组织学生团体的良好方式。每个学生组有自己的日历、讨论板和协作工具，从而能够更加有效地组织和合作。
+        add_group_set: 添加组集
+        course_group_explanation: 学生组是组织学生开展团体项目或论文等工作的良好方式。每个学生组有自己的日历、讨论板和协作工具，从而能够更加有效地组织和合作。
+        group_assignment_instructions: "您可以随机分配学生到指定规模的组，或手动创建并组织组。创建组之后，您可以设置作业为 \"组提交\" 作业，这意味着每个组的所有用户将提交相同主题的提交文件。"
+        group_set: 组设置
+        headings: 
+          account_groups: 帐户级学生组
+          course_groups: 学生组
       group_category: 
         randomly_assigning_students: 随机分配学生
-        unassigned_students: 未分配的学生
-        unassigned_users: 未分配的用户
+        search: 搜索
+        search_groups: 搜索组
       group_category_create: 
         allow_self_signup: 允许自行注册
         cancel: 取消
@@ -6741,16 +6769,14 @@ zh:
         category_settings: 设置
         delete_category_option: 删除
         edit_category_option: 编辑
-        group_limit_blurb: "组仅限 *%{count}* 个成员"
+        group: 组
+        group_limit_blurb: "组仅限 *%{group_limit}* 个成员。"
         message_all_unassigned_option: 向所有未分配的学生发送消息
         randomly_assign_students_option: 随机分配学生
         restricted_self_signup_blurb: 组内所有学生需要在相同的章节中
-        search: 搜索
         self_organized_warning: 这些组是学生自发组织的。与其他类型的组不同，在这些组中，学生可以同时属于多个组，因此这些组未必是评分作业的最佳解决方案。
         self_signup_blurb: 对这些组启用自行注册。
-        self_signup_help_tooltip: 什么是自行注册组?
-        student_group_instructions: (拖动学生以分配)
-        user_group_instructions: (拖动用户以分配)
+        settings: 设置
       group_category_edit: 
         allow_self_signup: 允许自行注册
         cancel: 取消
@@ -6760,8 +6786,6 @@ zh:
         require_same_section: 要求组成员在相同的章节中
         save: 保存
         saving: 正在保存...
-        self_signup_description: "您可以创建学生能自己注册的组集。学生仍限于集中的某个组， 这样他们就可将自己组织成组，而不需要教师这样做。请记住，只要启用此选项，学生可以将自己从一组移至另一组。"
-        what_is_this: 这是什么?
       group_edit: 
         cancel: 取消
         group_name: 组名称
@@ -6774,14 +6798,15 @@ zh:
         no_students: 无学生
         no_users: 无用户
       groups: 
-        groups: 组
         no_groups: 无组。
-        search: 搜索
-        search_groups: 搜索组
+        no_matching_groups: 无匹配组。
       randomly_assign_members: 
         add_more_users: 取消
         close: 确定
         randomly_assign_students_dialog: 这会将所有未分配的学生尽可能均匀地自动分配到现有的学生组。
+      self_signup_help: 
+        about_self_signup_groups: 关于自行注册组
+        self_signup_description: "您可以创建学生能自己注册的组集。学生仍限于集中的某个组， 这样他们就可将自己组织成组，而不需要教师这样做。请记住，只要启用此选项，学生可以将自己从一组移至另一组。"
     member: 
       one: "%{count} 个成员"
       other: "%{count} 个成员"
@@ -6819,6 +6844,8 @@ zh:
     titles: 
       add_group_category: 添加组设置
       self_signup_help: 自行注册组
+    unassigned_students: "未分配的学生 (%{count})"
+    unassigned_users: "未分配的用户 (%{count})"
   help_dialog: 
     Back: 返回
     Help: 帮助
@@ -6955,6 +6982,7 @@ zh:
       id: id
       priority: 优先级
       run_at: 运行位置
+      runtime: 运行时
       strand: 股
       tag: 标签
       worker: 工作者
@@ -9212,6 +9240,7 @@ zh:
     submission_comments: 提交评论
     sure_you_want_to_mute: "是否确定要静音此作业?此作业静音时，学生将不会收到关于以下内容的新通知或无法看到:"
   name: 学术基准导入器
+  new_facebook_message: "您有来自 Canvas 的新消息"
   not_applicable: 不适用
   notification: 
     added_to_conversation_description: 已将您添加到会话
@@ -9650,9 +9679,6 @@ zh:
       description: "这个插件集成了 Crocodoc ，可以提供 HTML5 文档预览功能。这使得教师和学生能够对文档进行注释。"
       labels: 
         api_key: "Crocodoc API 密钥"
-    dim_dim: 
-      description: "DimDim Web 会议支持"
-      name: DimDim
     dim_dim_settings: 
       description: "您将需要访问 Dim Dim 实例。"
       labels: 
@@ -9838,6 +9864,10 @@ zh:
       labels: 
         download_url: "LockDown Browser 下载 URL"
         plugin_enabled: 已启用
+    med_cornell_export: 
+      labels: 
+        password: 身份验证密码
+        username: 身份验证用户名
     notices: 
       settings_updated: 插件设置已成功更新。
     qti_converter_settings: 
@@ -9862,6 +9892,7 @@ zh:
           从个人资料中的\"设置 -> API\"提供。
       labels: 
         api_key: "API 密钥"
+        enable_html5_viewer: "启用 HTML5 Document Viewer"
         secret_key: "API 密码"
     sessions: 
       description: 管理会话超时
@@ -10383,6 +10414,7 @@ zh:
   qti_display: QTI
   qti_file_description: "QTI .zip 文件"
   qti_name: "QTI 转换器"
+  question_answered: 已回答
   question_bank: 
     align_outcomes: 调整结果
     remove_outcome_from_bank: 是否确定要从库中删除此结果?
@@ -10470,6 +10502,7 @@ zh:
       show_details: 显示问题详细信息
       title: 
         move_copy_questions: 移动/复制问题
+  question_unanswered: 尚未回答
   quick_start_bar: 
     announcement: 
       saving: 正在保存...
@@ -10579,14 +10612,12 @@ zh:
     default_response_to_file_upload: 在学生提交答案后响应以显示学生
     default_title: 新测验
     display_answer: 
-      correct_answer: 这是正确答案。
       labels: 
         answer_with_margin: 带页边距
         your_answer: 您的答案
       margin_of_error: 误差
       plus_or_minus: +/-
       range_answer: "在 %{lower_bound} 到 %{upper_bound} 之间"
-      selected_answer: 您已选择此答案。
       you_left_this_blank: 您将此项留空
     display_question: 
       default_question_answer: "[选择]"
@@ -10849,7 +10880,6 @@ zh:
       anonymous_username: 学生
       buttons: 
         allow_extra_attempt: 允许此学生进行额外的尝试
-        update_scores: 更新分数
       count_attempts_left: 
         one: "%{user} 有 %{count} 次剩余尝试机会"
         other: "%{user} 有 %{count} 次剩余尝试机会"
@@ -11134,8 +11164,6 @@ zh:
     question_list_right_side: 
       headers: 
         questions: 问题
-      question_answered: 已回答
-      question_unanswered: 尚未回答
     question_statistic: 
       attempts: 
         one: "%{count} 次尝试"
@@ -11237,12 +11265,14 @@ zh:
       view_responses: 查看响应
     quiz_submission: 
       attempt_duration: "此尝试进行了 %{duration}。"
+      buttons: 
+        update_scores: 更新分数
       labels: 
         final_score: 最终分数
         fudge_points: 虚假分数
-        fudge_points_changed_points_quiz: "由于 %{user} 进行了此测验，因此测验的最高分已通过 %{difference} 更改。您可以调整此更改并使用此框手动添加正负分数:"
-        fudge_points_changed_points_survey: "由于 %{user} 进行了此调查，因此调查的最高分已通过 %{difference} 更改。您可以调整此更改并使用此框手动添加正负分数:"
-        fudge_points_generic_explanation: "您可以通过将正负分数添加到此框手动调整分数:"
+        fudge_points_changed_points_quiz: "由于 %{user} 进行了此测验，因此最高分已通过 %{difference} 更改。您可以调整此更改并使用此框手动添加正负分数。"
+        fudge_points_changed_points_survey: "由于 %{user} 进行了此调查，因此最高分已通过 %{difference} 更改。您可以调整此更改并使用此框手动添加正负分数。"
+        fudge_points_generic_explanation: 您可以通过将正负分数添加到此框手动调整分数。
         questions_need_review: 以下问题需要审阅
         quiz_score: 测验分数
         score_for_attempt: 此尝试的分数
@@ -11476,9 +11506,7 @@ zh:
         other: "%{count} 秒"
       show_time_link: 显示
       titles: 
-        answered: 已回答
         come_back_later: 您已标记此问题以稍后返回
-        not_answered: 尚未回答
         times_up: 时间到！
       years_count: 
         one: "%{count} 年"
@@ -11838,6 +11866,7 @@ zh:
     titles: 
       add_item_to_module: 添加项目到单元
       find_links_using_service: "使用 %{service} 查找链接"
+  selected_answer: 您已选择此答案。
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "您已经登记了 **%{course}**。"
@@ -12175,6 +12204,7 @@ zh:
       for_title: "有关 %{title}"
       labels: 
         body: 消息
+        subject: 主题
       message_students_who: 发送消息到学生...
       out_of_points: "超出 %{points_possible}"
     mute_dialog: 
@@ -12289,12 +12319,14 @@ zh:
           other: "请记住，已使用此题目评估了 1 个学生。若更改将会影响对他/她的评价。 请记住，已使用此题目评估了 %{count} 个学生。若更改将会影响对他们的评价。"
         rubric_in_use2: 您已使用此题目评估学生。任何重大更改都可能会影响其评估结果。
       out_of: "%{points}*，满分 %{total}*"
+      rubric: 题目
       rubric_title: 标题
       titles: 
         find_existing_rubric: 查找现有题目
     rubric_criterion: 
       defaults: 
         description: 标准说明
+      delete_criterion_link: 删除标准链接
       description: 
         custom_comments_area: 此区域将供评估人员留下有关此标准的评论。
       full_marks: 满分
@@ -12311,7 +12343,8 @@ zh:
       options: 
         select: "[选择]"
       points: "%{points} 分"
-      points_abbreviation: "*Points* 分"
+      points_label: 分数
+      points_out_of2: "%{points} / %{total} 分"
       titles: 
         linked_to_learning_outcome: 此标准已链接至学习结果
     rubric_criterion_dialog: 
@@ -12342,6 +12375,7 @@ zh:
       labels: 
         total_points: 总分
       points_out_of: "*%{points}*，满分 **%{total}**"
+      rubric: 题目
     rubric_summary_criterion: 
       defaults: 
         description: 标准说明
@@ -12698,6 +12732,7 @@ zh:
         save_comment: 保存评论
       crumbs: 
         assignments: 作业
+      hide_rubric_button: 隐藏题目按钮
       labels: 
         add_a_comment: 添加评论
         grade: 评分
@@ -12890,6 +12925,7 @@ zh:
     announcement: 通告
     announcements: 通告
     assignments: 作业
+    come_back_later: 您已标记此问题以稍后返回
     delete_quiz: 删除测验
     delete_survey: 删除调查
     discussion: 讨论
@@ -13334,8 +13370,11 @@ zh:
     is_required: 此字段为必填字段
   warnings: 
     test_install: 
-      message: "此 Canvas 安装仅用于测试，且每周都将重置。"
+      periodic_message: "此 Canvas 安装仅用于测试，且将定期重置。"
       title: "Canvas 测试安装"
+      weekly_message: 
+        one: "此 Canvas 安装仅用于测试，且每 %{count} 周将重置。"
+        other: "此 Canvas 安装仅用于测试，且每 %{count} 周将重置。"
   web_conference: 
     default_name_for_courses: "课程 Web 会议"
     default_name_for_groups: "组 Web 会议"
@@ -13445,9 +13484,6 @@ zh:
       blank_title: 标题不能为空
       title_characters: 标题必须包含至少一个字母或数字
       title_too_long: "标题不能超过 %{max_characters} 个字符"
-    missing_name: 未命名页面
-    notices: 
-      wiki_page_created: "维基页面\"%{title}\"已创建"
     title_for_topics_category: "%{category} 主题"
     unknown_user_name: 未知
     warnings: 
