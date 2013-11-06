@@ -1563,8 +1563,6 @@ class User < ActiveRecord::Base
   def account
     self.pseudonym.account rescue Account.default
   end
-  memoize :account
-
 
   # this finds the reverse account chain starting at in_root_account and ending
   # at the lowest account such that all of the accounts to which the user is
