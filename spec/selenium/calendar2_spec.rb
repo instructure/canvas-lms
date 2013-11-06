@@ -734,7 +734,7 @@ describe "calendar2" do
         f('.fc-button-prev').click
         f('.fc-day-number').click
         wait_for_ajaximations
-        ffj('.ig-row').length.should == 1
+        keep_trying_until { ffj('.ig-row').length.should == 1 }
       end
 
       it "should persist the start date across reloads" do
