@@ -19,6 +19,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/import_helper')
 
 describe "Quiz Import" do
+  before(:each) do
+    course_model.root_account.disable_draft!
+  end
 
   it "should get the quiz properties" do
     context = course_model
@@ -82,7 +85,7 @@ describe "Quiz Import" do
     quiz.assignment.should be_nil
   end
   
-  it "should create an assignment if it is an assessment" do
+  it "should create an assignment if it is an assessment when enable_drafts is not on" do
     context = get_import_context
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
@@ -94,6 +97,22 @@ describe "Quiz Import" do
     
     quiz = Quiz.find_by_migration_id data[:migration_id]
     quiz.assignment.should be_nil
+    quiz.quiz_type.should == 'assignment'
+  end
+
+  it "should create an assignment if it is an assessment when enable_drafts is on" do
+    context = get_import_context
+    context.root_account.enable_draft!
+    question_data = import_example_questions context
+    data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
+    Quiz.import_from_migration(data, context, question_data)
+    Quiz.import_from_migration(data, context, question_data)
+
+    Assignment.count.should == 1
+    Quiz.count.should == 1
+
+    quiz = Quiz.find_by_migration_id data[:migration_id]
+    quiz.assignment.should_not be_nil
     quiz.quiz_type.should == 'assignment'
   end
   

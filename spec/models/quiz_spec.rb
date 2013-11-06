@@ -21,6 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe Quiz do
   before(:each) do
     course
+    @course.root_account.disable_draft!
   end
 
   describe ".mark_quiz_edited" do
@@ -274,13 +275,45 @@ describe Quiz do
     q.assignment_id.should be_nil
   end
 
-  it "should not create the assignment if unpublished" do
+  it "should not create the assignment if unpublished and draft_states are not enabled" do
+    @course.root_account.disable_draft!
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
     q.save!
     q.should_not be_available
     q.assignment_id.should be_nil
     q.assignment_group_id.should eql(g.id)
+  end
+
+  context "when draft_states are enabled" do
+    before :each do
+      @course.root_account.enable_draft!
+    end
+
+    after :each do
+      @course.root_account.disable_draft!
+    end
+
+    it "should always have an assignment" do
+      g = @course.assignment_groups.create!(:name => "new group")
+      q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
+      q.save!
+      q.should_not be_available
+      q.assignment_id.should_not be_nil
+      q.assignment_group_id.should eql(g.id)
+    end
+
+    it "should update assignment published?" do
+      g = @course.assignment_groups.create!(:name => "new group")
+      q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
+      q.save!
+      q.should_not be_available
+      q.assignment_id.should_not be_nil
+      q.assignment.published?.should be false
+      q.assignment_group_id.should eql(g.id)
+      q.publish!
+      q.assignment.published?.should be true
+    end
   end
 
   it "should create the assignment if created in published state" do
@@ -294,7 +327,8 @@ describe Quiz do
     q.assignment.assignment_group_id.should eql(g.id)
   end
 
-  it "should create the assignment if published after being created" do
+  it "should create the assignment if published after being created when draft_state not enabled" do
+    @course.root_account.disable_draft!
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
     q.save!

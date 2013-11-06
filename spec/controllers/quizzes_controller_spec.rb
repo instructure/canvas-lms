@@ -882,6 +882,7 @@ describe QuizzesController do
       course_quiz
       @quiz.update_attributes(quiz_type: 'ungraded_survey')
       # make sure the assignment doesn't exist
+      @quiz.assignment = nil if @quiz.context.draft_state_enabled?
       @quiz.assignment.should_not be_present
       post 'update', course_id: @course.id, id: @quiz.id, activate: true,
         quiz: {quiz_type: 'assignment'}

@@ -141,11 +141,16 @@ class Quiz < ActiveRecord::Base
   end
 
   def build_assignment
-    if self.available? && !self.assignment_id && self.graded? && @saved_by != :assignment && @saved_by != :clone
+    if (context.draft_state_enabled? || self.available?) &&
+        !self.assignment_id && self.graded? && @saved_by != :assignment &&
+        @saved_by != :clone
       assignment = self.assignment
       assignment ||= self.context.assignments.build(:title => self.title, :due_at => self.due_at, :submission_types => 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
       assignment.saved_by = :quiz
+      if context.draft_state_enabled? && !deleted?
+        assignment.workflow_state = self.published? ? 'published' : 'unpublished'
+      end
       assignment.save
       self.assignment_id = assignment.id
     end
