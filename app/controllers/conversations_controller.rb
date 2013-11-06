@@ -710,6 +710,9 @@ class ConversationsController < ApplicationController
   def remove_messages
     if params[:remove]
       @conversation.remove_messages(*@conversation.messages.find_all_by_id(*params[:remove]))
+      if @conversation.conversation_message_participants.where('workflow_state <> ?', 'deleted').length == 0
+        @conversation.update_attribute(:last_message_at, nil)
+      end
       render :json => conversation_json(@conversation, @current_user, session)
     end
   end
