@@ -7,9 +7,11 @@
     </div>
     {{#if showAgenda}}
     <div class="calendar_action_buttons header-table-cell header-table-right">
-      <a href="#" id="refresh_calendar_link" class="" title="{{#t "loading"}}Loading{{/t}}" data-tooltip>
+      <span id="refresh_calendar_link"
+            title="{{#t "loading"}}Loading{{/t}}"
+            data-tooltip>
         <span class="screenreader-only">{{#t "loading"}}Loading{{/t}}</span>
-      </a>
+      </span>
       <span class="calendar_view_buttons">
         <input type="radio" id="week"      name="calendar_view" /><label for="week">{{#t "links.calendar_week"}}Week{{/t}}</label>
         <input type="radio" id="month"     name="calendar_view" checked="checked" /><label for="month">{{#t "links.calendar_month"}}Month{{/t}}</label>
