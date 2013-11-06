@@ -204,6 +204,11 @@ Spec::Runner.configure do |config|
     Notification.after_create { Notification.reset_cache! }
   end
 
+  def delete_fixtures!
+    # noop for now, needed for plugin spec tweaks. implementation coming
+    # in g/24755
+  end
+
   config.before :each do
     I18n.locale = :en
     Time.zone = 'UTC'
