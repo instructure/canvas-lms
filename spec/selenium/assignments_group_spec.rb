@@ -250,13 +250,13 @@ describe "assignment groups" do
       ag = @course.assignment_groups.first
 
       f("#assignment_group_#{ag.id} .add_assignment").click
-      wait_for_ajaximations
+      wait_for_animations
 
       replace_content(f("#ag_#{ag.id}_assignment_name"), "Disappear")
       fj('.create_assignment:visible').click
       wait_for_ajaximations
 
-      f("#assignment_group_#{ag.id} .ig-title").text.should match "Disappear"
+      fj("#assignment_group_#{ag.id} .assignment:eq(1) .ig-title").text.should match "Disappear"
 
       f("#assignment_group_#{ag.id} .al-trigger").click
       f("#assignment_group_#{ag.id} .edit_group").click
@@ -266,7 +266,7 @@ describe "assignment groups" do
       fj('.create_group:visible').click
       wait_for_ajaximations
 
-      f("#assignment_group_#{ag.id} .ig-title").text.should match "Disappear"
+      fj("#assignment_group_#{ag.id} .assignment:eq(1) .ig-title").text.should match "Disappear"
     end
 
     it "should save drop rules" do
@@ -465,7 +465,7 @@ describe "assignment groups" do
       it "should show a single module's name" do
         refresh_page
         wait_for_ajaximations
-        f("#assignment_group_#{@assignment_group.id} .ig-row .ig-details .modules").text.should == "#{@module.name} Module"
+        fj("#assignment_group_#{@assignment_group.id} .assignment:eq(1) .ig-row .ig-details .modules").text.should == "#{@module.name} Module"
       end
 
       it "should correctly display multiple modules" do
