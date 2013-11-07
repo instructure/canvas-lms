@@ -40,13 +40,19 @@ define [
 
     comparator: 'position'
 
+    userIsStudent: ->
+      _.include(ENV.current_user_roles, "student")
+
     getGrades: ->
-      collection = new SubmissionCollection
-      collection.url = => "#{@courseSubmissionsURL}?per_page=#{PER_PAGE_LIMIT}"
-      collection.loadAll = true
-      collection.on 'fetched:last', =>
-        @loadGradesFromSubmissions(collection.toArray())
-      collection.fetch()
+      if @userIsStudent()
+        collection = new SubmissionCollection
+        collection.url = => "#{@courseSubmissionsURL}?per_page=#{PER_PAGE_LIMIT}"
+        collection.loadAll = true
+        collection.on 'fetched:last', =>
+          @loadGradesFromSubmissions(collection.toArray())
+        collection.fetch()
+      else
+        @trigger 'change:submissions'
 
     loadGradesFromSubmissions: (submissions) ->
       submissionsHash = {}

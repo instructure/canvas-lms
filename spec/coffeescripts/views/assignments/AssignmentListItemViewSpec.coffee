@@ -183,7 +183,17 @@ define [
     equal screenreaderText(), 'Score: 1.56 out of 2 points.', 'sets screenreader text'
     equal nonScreenreaderText(), '1.56/2 pts', 'sets non-screenreader text'
 
-  test "show show no submission if none exists", ->
+  test 'do not show score if viewing as non-student', ->
+    old_user_roles = ENV.current_user_roles
+    ENV.current_user_roles = ["user"]
+
+    view = createView(@model, canManage: false)
+    str = view.$(".js-score:eq(0) .non-screenreader").html()
+    ok str.search("2 pts") != -1
+
+    ENV.current_user_roles = old_user_roles
+
+  test "show no submission if none exists", ->
     @model.set 'submission': null
     equal screenreaderText(), 'No submission for this assignment. 2 points possible.',
       'sets screenreader text for null points'
