@@ -148,8 +148,9 @@ class Group < ActiveRecord::Base
     self.shard.activate { self.participating_group_memberships.moderators.find_by_user_id(user.id) }
   end
 
-  def should_add_creator?
-    self.group_category && (self.group_category.communities? || self.group_category.student_organized?)
+  def should_add_creator?(creator)
+    self.group_category &&
+      (self.group_category.communities? || (self.group_category.student_organized? && self.context.user_is_student?(creator)))
   end
 
   def short_name

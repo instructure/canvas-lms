@@ -386,7 +386,7 @@ class GroupsController < ApplicationController
     if authorized_action(@group, @current_user, :create)
       respond_to do |format|
         if @group.save
-          @group.add_user(@current_user, 'accepted', true) if @group.should_add_creator?
+          @group.add_user(@current_user, 'accepted', true) if @group.should_add_creator?(@current_user)
           @group.invitees = params[:invitees]
           flash[:notice] = t('notices.create_success', 'Group was successfully created.')
           format.html { redirect_to group_url(@group) }
