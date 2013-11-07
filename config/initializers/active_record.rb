@@ -381,7 +381,7 @@ class ActiveRecord::Base
     when /sqlite/
       "DATE(STRFTIME('%s', #{column}) + #{offset}, 'unixepoch')"
     when 'PostgreSQL'
-      "(#{column} AT TIME ZONE '#{Time.zone.tzinfo.name}')::DATE"
+      "((#{column} || '-00')::TIMESTAMPTZ AT TIME ZONE '#{Time.zone.tzinfo.name}')::DATE"
     end
 
     result = count(
