@@ -1680,9 +1680,16 @@ describe ContentMigration do
       date2 = "Jun 21 2012 00:00am"
       asmnt = @copy_from.assignments.create!(:title => 'all day', :due_at => date)
       asmnt.all_day.should be_true
-      cal = @copy_from.calendar_events.create(:title => "haha", :description => "oi", :start_at => date2, :end_at => date2)
 
-      run_course_copy
+      cal = nil
+      Time.use_zone('America/Denver') do
+        cal = @copy_from.calendar_events.create!(:title => "haha", :description => "oi", :start_at => date2, :end_at => date2)
+        cal.start_at.strftime("%H:%M").should == "00:00"
+      end
+
+      Time.use_zone('UTC') do
+        run_course_copy
+      end
 
       asmnt_2 = @copy_to.assignments.find_by_migration_id(mig_id(asmnt))
       asmnt_2.all_day.should be_true
@@ -1692,7 +1699,7 @@ describe ContentMigration do
       cal_2 = @copy_to.calendar_events.find_by_migration_id(mig_id(cal))
       cal_2.all_day.should be_true
       cal_2.all_day_date.should == Date.parse("Jun 21 2012")
-      cal_2.start_at.strftime("%H:%M").should == "00:00"
+      cal_2.start_at.utc.should == cal.start_at.utc
     end
 
     it "should leave file references in AQ context as-is on copy" do

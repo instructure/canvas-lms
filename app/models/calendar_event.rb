@@ -25,7 +25,7 @@ class CalendarEvent < ActiveRecord::Base
       :location_address, :time_zone_edited, :cancel_reason,
       :participants_per_appointment, :child_event_data,
       :remove_child_events, :all_day
-  attr_accessor :cancel_reason
+  attr_accessor :cancel_reason, :imported
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:description) { [self.effective_context, nil] }
 
@@ -176,7 +176,7 @@ class CalendarEvent < ActiveRecord::Base
     self.title ||= (self.context_type.to_s + " Event") rescue "Event"
 
     populate_missing_dates
-    populate_all_day_flag
+    populate_all_day_flag unless self.imported
 
     if parent_event
       populate_with_parent_event
@@ -554,6 +554,9 @@ class CalendarEvent < ActiveRecord::Base
     hash[:end_at] ||= hash[:end_date]
     item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at]) unless hash[:start_at].nil?
     item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) unless hash[:end_at].nil?
+
+    item.all_day_date = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:all_day_date]).to_date if hash[:all_day_date].present?
+    item.imported = true
 
     item.save_without_broadcasting!
     if context.respond_to?(:content_migration) && context.content_migration
