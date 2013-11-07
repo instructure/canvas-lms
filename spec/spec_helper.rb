@@ -286,6 +286,8 @@ Spec::Runner.configure do |config|
         account.save!
         @course.enable_draft = true
         @course.save!
+        # to reload the @course.root_account
+        @course.reload
       end
     end
     @course
