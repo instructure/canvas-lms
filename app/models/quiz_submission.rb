@@ -637,6 +637,11 @@ class QuizSubmission < ActiveRecord::Base
     (self.finished_at || self.started_at) - self.started_at rescue 0
   end
 
+  def time_spent
+    return unless finished_at.present?
+    (finished_at - started_at + (extra_time||0)).round
+  end
+
   def self.score_question(q, params)
     params = params.with_indifferent_access
     # TODO: undefined_if_blank - we need a better solution for the

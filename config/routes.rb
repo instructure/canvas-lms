@@ -1310,6 +1310,10 @@ routes.draw do
       post 'courses/:course_id/quizzes/:quiz_id/quiz_submissions/self/files', :action => :create, :path_name => 'quiz_submission_files'
     end
 
+    scope(:controller => :quiz_submissions_api) do
+      get 'courses/:course_id/quizzes/:quiz_id/quiz_submissions', :action => :index, :path_name => 'course_quiz_submissions'
+    end
+
     scope(:controller => :outcome_groups_api) do
       def og_routes(context)
         prefix = (context == "global" ? context : "#{context}s/:#{context}_id")

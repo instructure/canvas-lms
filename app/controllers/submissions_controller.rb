@@ -106,7 +106,7 @@ class SubmissionsController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
       if params[:zip]
-        submission_zip
+        generate_submission_zip(@assignment, @context)
       else
         respond_to do |format|
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
@@ -529,44 +529,6 @@ class SubmissionsController < ApplicationController
 
   protected
 
-  def submission_zip
-    @attachments = @assignment.attachments.where(:display_name => 'submissions.zip', :workflow_state => ['to_be_zipped', 'zipping', 'zipped', 'errored', 'unattached'], :user_id => @current_user).order(:created_at).all
-    @attachment = @attachments.pop
-    @attachments.each{|a| a.destroy! }
-    if @attachment && (@attachment.created_at < 1.hour.ago || @attachment.created_at < (@assignment.submissions.map{|s| s.submitted_at}.compact.max || @attachment.created_at))
-      @attachment.destroy!
-      @attachment = nil
-    end
-    if !@attachment
-      @attachment = @assignment.attachments.build(:display_name => 'submissions.zip')
-      @attachment.workflow_state = 'to_be_zipped'
-      @attachment.file_state = '0'
-      @attachment.user = @current_user
-      @attachment.save!
-      ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, @attachment)
-      render :json => @attachment
-    else
-      respond_to do |format|
-        if @attachment.zipped?
-          if Attachment.s3_storage?
-            format.html { redirect_to @attachment.cacheable_s3_inline_url }
-            format.zip { redirect_to @attachment.cacheable_s3_inline_url }
-          else
-            cancel_cache_buster
-            format.html { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
-            format.zip { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
-          end
-          format.json { render :json => @attachment.as_json(:methods => :readable_size) }
-        else
-          flash[:notice] = t('still_zipping', "File zipping still in process...")
-          format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-          format.zip { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-          format.json { render :json => @attachment }
-        end
-      end
-    end
-  end
-
   def update_student_entered_score(score)
     if score.present? && score != "null"
       @submission.student_entered_score = score.to_f.round(2)
@@ -574,5 +536,47 @@ class SubmissionsController < ApplicationController
       @submission.student_entered_score = nil
     end
     @submission.save
+  end
+
+  def generate_submission_zip(assignment, context)
+    attachment = submission_zip(assignment)
+
+    respond_to do |format|
+      if attachment.zipped?
+        if Attachment.s3_storage?
+          format.html { redirect_to attachment.cacheable_s3_inline_url }
+          format.zip { redirect_to attachment.cacheable_s3_inline_url }
+        else
+          cancel_cache_buster
+
+          format.html do
+            send_file(attachment.full_filename, {
+              :type => attachment.content_type_with_encoding,
+              :disposition => 'inline'
+            })
+          end
+
+          format.zip do
+            send_file(attachment.full_filename, {
+              :type => attachment.content_type_with_encoding,
+              :disposition => 'inline'
+            })
+          end
+        end
+        format.json { render :json => attachment.as_json(:methods => :readable_size) }
+      else
+        flash[:notice] = t('still_zipping', "File zipping still in process...")
+
+        format.html do
+          redirect_to named_context_url(context, :context_assignment_url, assignment.id)
+        end
+
+        format.zip do
+          redirect_to named_context_url(context, :context_assignment_url, assignment.id)
+        end
+
+        format.json { render :json => attachment }
+      end
+    end
   end
 end

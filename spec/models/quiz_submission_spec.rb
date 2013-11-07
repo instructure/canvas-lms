@@ -66,6 +66,35 @@ describe QuizSubmission do
     end
   end
 
+  describe "#time_spent" do
+    it "should return nil if there's no finished_at" do
+      q = @quiz.quiz_submissions.new
+      q.finished_at = nil
+
+      q.time_spent.should be_nil
+    end
+
+    it "should return the correct time spent in seconds" do
+      anchor = Time.now
+
+      q = @quiz.quiz_submissions.new
+      q.started_at = anchor
+      q.finished_at = anchor + 1.hour
+      q.time_spent.should eql(1.hour.to_i)
+    end
+
+    it "should account for extra time" do
+      anchor = Time.now
+
+      q = @quiz.quiz_submissions.new
+      q.started_at = anchor
+      q.finished_at = anchor + 1.hour
+      q.extra_time = 5.minutes
+
+      q.time_spent.should eql((1.hour + 5.minutes).to_i)
+    end
+  end
+
   describe "#update_scores" do
     before(:each) do
       student_in_course
