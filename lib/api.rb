@@ -187,16 +187,21 @@ module Api
     return find_params
   end
 
-  def self.per_page_for(controller)
-    [(controller.params[:per_page] || Setting.get('api_per_page', '10')).to_i, Setting.get('api_max_per_page', '50').to_i].min
+  def self.per_page_for(controller, options={})
+    per_page = controller.params[:per_page] || options[:default] || Setting.get('api_per_page', '10')
+    max = options[:max] || Setting.get('api_max_per_page', '50')
+    [[per_page.to_i, 1].max, max.to_i].min
   end
 
   # Add [link HTTP Headers](http://www.w3.org/Protocols/9707-link-header.html) for pagination
   # The collection needs to be a will_paginate collection (or act like one)
   # a new, paginated collection will be returned
   def self.paginate(collection, controller, base_url, pagination_args = {})
-    per_page = per_page_for(controller)
-    pagination_args.reverse_merge!({ :page => controller.params[:page], :per_page => per_page })
+    pagination_args.reverse_merge!(
+      page: controller.params[:page],
+      per_page: per_page_for(controller,
+        default: pagination_args.delete(:default_per_page),
+        max: pagination_args.delete(:max_per_page)))
     collection = collection.paginate(pagination_args)
     return unless collection.respond_to?(:next_page)
 

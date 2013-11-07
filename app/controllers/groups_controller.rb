@@ -123,7 +123,7 @@ class GroupsController < ApplicationController
     category = @context.group_categories.find_by_id(params[:category_id])
     return render :json => {}, :status => :not_found unless category
     page = (params[:page] || 1).to_i rescue 1
-    per_page = [[(params[:per_page] || 15).to_i, 1].max, 100].min
+    per_page = Api.per_page_for(self, default: 15, max: 100)
     if category && !category.student_organized?
       groups = category.groups.active
     else

@@ -282,11 +282,17 @@ class ContextController < ApplicationController
   def discussion_replies
     add_crumb(t('#crumb.conversations', "Conversations"), conversations_url)
     add_crumb(t('#crumb.discussion_replies', "Discussion Replies"), discussion_replies_url)
-    @messages = @current_user.inbox_items.active.paginate(:page => params[:page], :per_page => 15)
+    @messages = @current_user.inbox_items.active
     log_asset_access("inbox:#{@current_user.asset_string}", "inbox", 'other')
     respond_to do |format|
-      format.html { render :action => :inbox }
-      format.json { render :json => @messages.map{ |m| m.as_json(methods: [:sender_name]) } }
+      format.html do
+        @messages = @messages.paginate(page: params[:page], per_page: 15)
+        render :action => :inbox
+      end
+      format.json do
+        @messages = Api.paginate(@messages, self, discussion_replies_url, default_per_page: 15)
+        render :json => @messages.map{ |m| m.as_json(methods: [:sender_name]) }
+      end
     end
   end
   
@@ -383,10 +389,15 @@ class ContextController < ApplicationController
   def roster_user_usage
     if authorized_action(@context, @current_user, :read_reports)
       @user = @context.users.find(params[:user_id])
-      @accesses = AssetUserAccess.for_user(@user).for_context(@context).most_recent.paginate(:page => params[:page], :per_page => 50)
+      @accesses = AssetUserAccess.for_user(@user).for_context(@context).most_recent
       respond_to do |format|
-        format.html
-        format.json { render :json => @accesses.map{ |a| a.as_json(methods: [:readable_name, :asset_class_name]) } }
+        format.html do
+          @accesses = @accesses.paginate(page: params[:page], per_page: 50)
+        end
+        format.json do
+          @accesses = Api.paginate(@accesses, self, polymorphic_url([@context, :user_usage], user_id: @user), default_per_page: 50)
+          render :json => @accesses.map{ |a| a.as_json(methods: [:readable_name, :asset_class_name]) }
+        end
       end
     end
   end

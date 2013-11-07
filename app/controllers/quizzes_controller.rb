@@ -585,12 +585,17 @@ class QuizzesController < ApplicationController
       @all_students = @context.students_visible_to(@current_user).order_by_sortable_name
       @students = @all_students
       @students = @students.order(:uuid) if @quiz.survey? && @quiz.anonymous_submissions
-      @students = @students.paginate(:per_page => 50, :page => params[:page])
       last_updated_at = Time.parse(params[:last_updated_at]) rescue nil
-      @submissions = @quiz.quiz_submissions.updated_after(last_updated_at).for_user_ids(@students.map(&:id))
       respond_to do |format|
-        format.html
-        format.json { render :json => @submissions.map{ |s| s.as_json(include_root: false, except: [:submission_data, :quiz_data], methods: ['extendable?', :finished_in_words, :attempts_left]) }}
+        format.html do
+          @students = @students.paginate(page: params[:page], per_page: 50)
+          @submissions = @quiz.quiz_submissions.updated_after(last_updated_at).for_user_ids(@students.map(&:id))
+        end
+        format.json do
+          @students = Api.paginate(@students, self, course_quiz_moderate_url(@context, @quiz), default_per_page: 50)
+          @submissions = @quiz.quiz_submissions.updated_after(last_updated_at).for_user_ids(@students.map(&:id))
+          render :json => @submissions.map{ |s| s.as_json(include_root: false, except: [:submission_data, :quiz_data], methods: ['extendable?', :finished_in_words, :attempts_left]) }
+        end
       end
     end
   end

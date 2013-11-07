@@ -37,7 +37,7 @@ class AppCenterController < ApplicationController
   end
 
   def index
-    per_page = params['per_page'] || 72
+    per_page = Api.per_page_for(self, default: 72, max: 72)
     endpoint_scope = (@context.is_a?(Account) ? 'account' : 'course')
     base_url = send("api_v1_#{endpoint_scope}_app_center_apps_url")
     response = app_api.get_apps(page, per_page) || {}
@@ -55,7 +55,7 @@ class AppCenterController < ApplicationController
   end
 
   def reviews
-    per_page = params['per_page'] || 15
+    per_page = Api.per_page_for(self, default: 15)
     endpoint_scope = (@context.is_a?(Account) ? 'account' : 'course')
     base_url = send("api_v1_#{endpoint_scope}_app_center_app_reviews_url")
     force_refresh = params['force_refresh'] == '1'

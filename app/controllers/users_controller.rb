@@ -265,9 +265,7 @@ class UsersController < ApplicationController
           format.json {
             cancel_cache_buster
             expires_in 30.minutes
-            api_request? ?
-              render(:json => @users.map { |u| user_json(u, @current_user, session) }) :
-              render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
+            render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
           }
         end
       end
