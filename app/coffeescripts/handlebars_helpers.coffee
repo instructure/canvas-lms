@@ -245,6 +245,10 @@ define [
     #                      checked="true"
     #                      name="likes[tacos]"
     #                      class="foo bar" >
+    # you can append a unique string to the id with uniqid:
+    #   if you pass id=someid" and uniqid=true as parameters
+    #   the result is like doing id="someid-{{uniqid}}" inside a manually
+    #   created input tag.
     checkbox: (propertyName, {hash}) ->
       splitPropertyName = propertyName.split(/\./)
       snakeCase = splitPropertyName.join('_')
@@ -274,6 +278,10 @@ define [
           inputProps[prop] = prop
         else
           delete inputProps[prop]
+      
+      if inputProps.uniqid and inputProps.id  
+        inputProps.id += "-#{Handlebars.helpers.uniqid.call this}"
+      delete inputProps.uniqid
 
       attributes = for key, val of inputProps when val?
         "#{htmlEscape key}=\"#{htmlEscape val}\""
@@ -373,6 +381,13 @@ define [
       words = str.split(/[ _]+/)
       titleizedWords = _(words).map (w) -> w[0].toUpperCase() + w.slice(1)
       titleizedWords.join(' ')
+    
+    uniqid: (context) ->
+      context = @ if arguments.length <= 1
+      unless context._uniqid_
+        chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        context._uniqid_ = (chars.charAt(Math.floor(Math.random() * chars.length)) for [1..8]).join ''
+      return context._uniqid_
   }
 
   # not a function helper, just a way to make ENV available in any scope

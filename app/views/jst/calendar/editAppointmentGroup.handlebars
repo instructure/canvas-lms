@@ -1,26 +1,26 @@
 <form action='#' id='edit_appointment_form'>
   <div class="left-column-wrapper">
     <p>
-      <b>{{#t "name"}}Name{{/t}}</b><br />
-      <input type="text" name="title" value="{{appointment_group.title}}">
+      <label for="edit-appointment-name-{{uniqid}}"><b>{{#t "name"}}Name{{/t}}</b></label><br />
+      <input type="text" id="edit-appointment-name-{{uniqid}}" name="title" value="{{appointment_group.title}}"/>
     </p>
     <p>
-      <b>{{#t "location"}}Location{{/t}}</b><br />
-      <input type="text" name="location" value="{{appointment_group.location_name}}">
+      <label for="edit-appointment-location-{{uniqid}}"><b>{{#t "location"}}Location{{/t}}</b></label><br />
+      <input type="text" id="edit-appointment-location-{{uniqid}}" name="location" value="{{appointment_group.location_name}}"/>
     </p>
     <div class="select-calendar-container">
-      <b>{{#t "calendar"}}Calendar{{/t}}</b><br />
+        <b>{{#t "calendar"}}Calendar{{/t}}</b><br />
       <button class="btn ag_contexts_selector"></button>
       <div class="ag-menu-container"></div>
     </div>
     <p>
-      {{checkbox "use_group_signup" id="group-signup-checkbox" class="group-signup-checkbox"}}
-      <label for="group-signup-checkbox">{{#t "group_signup"}}Have students sign up in groups.{{/t}}</label>
+      {{checkbox "use_group_signup" id="group-signup-checkbox" uniqid=true class="group-signup-checkbox"}}
+      <label for="group-signup-checkbox-{{uniqid}}">{{#t "group_signup"}}Have students sign up in groups.{{/t}}</label>
     </p>
     <div class="group-signup" style="display: none">
-      <b>{{#t "group_category"}}Group Category{{/t}}</b><br />
+      <label for="edit-appointment-group-cat-{{uniqid}}"><b>{{#t "group_category"}}Group Category{{/t}}</b></label><br />
       <div class="group_select">
-        <select name="group_category_id"></select>
+        <select id="edit-appointment-group-cat-{{uniqid}}" name="group_category_id"></select>
       </div>
     </div>
   </div>
@@ -38,7 +38,11 @@
         </div>
         <div class="splitter">
           <p>
-            <a class="split-link btn" href="#">Split</a>into slots of <input type="number" name="duration" value="30" style="width: 40px" /> minutes each.
+            <a class="split-link btn" href="#">Split</a>
+            into slots of 
+            <input type="number" name="duration" value="30" style="width: 40px"
+              aria-label="{{t "slot_duration_label" "Minutes per slot"}}" />
+            minutes each.
           </p>
         </div>
       </div>
@@ -51,10 +55,15 @@
       <b>Options</b>
       <ul class="ag-options">
         <li>
-          {{checkbox "per_slot_option" id="appointment-blocks-per-slot-option-button"}}
-          <label for="appointment-blocks-per-slot-option-button">Limit each time slot to</label>
-          <input type="number" name="participants_per_appointment" value="{{appointment_group.participants_per_appointment}}" min="1" style="width: 40px;" />
-          <label for="appointment-blocks-per-slot-option-button">
+          {{checkbox "per_slot_option" id="appointment-blocks-per-slot-option-button"
+            class="appointment-blocks-per-slot-option-button" uniqid=true
+          }}
+          <label for="appointment-blocks-per-slot-option-button-{{uniqid}}">Limit each time slot to</label>
+          <input type="number" name="participants_per_appointment" 
+            value="{{appointment_group.participants_per_appointment}}" min="1"
+            style="width: 40px;"
+            aria-label="{{t "participants_per_appointment_label" "Max users/groups per appointment"}}" />
+          <label for="appointment-blocks-per-slot-option-button-{{uniqid}}">
             <span {{#ifEqual participant_type "Group"}} {{else}} style="display:none;" {{/ifEqual}} class="per_appointment_groups_label">groups.</span>
             <span {{#ifEqual participant_type "Group"}} style="display:none;" {{/ifEqual}} class="per_appointment_users_label">users.</span>
           </label>
@@ -63,13 +72,18 @@
           </a>
         </li>
         <li>
-          <label for="appointment-blocks-participant-visibility-button">{{checkbox "participant_visibility" id="appointment-blocks-participant-visibility-button"}} Allow students to see who has signed up for time slots.</label>
+          <label for="appointment-blocks-participant-visibility-button-{{uniqid}}">{{checkbox "participant_visibility" id="appointment-blocks-participant-visibility-button" uniqid=true}} Allow students to see who has signed up for time slots.</label>
         </li>
         <li>
-          {{checkbox "max_appointments_per_participant_option" id="max-per-student-option"}}
-          <label for="max-per-student-option">Limit participants to attend</label>
-          <input type="number" name="max_appointments_per_participant" value="{{appointment_group.max_appointments_per_participant}}" min="1" style="width: 40px">
-          <label for="max-per-student-option">appointment(s).</label>
+          {{checkbox "max_appointments_per_participant_option"
+            id="max-per-student-option" uniqid=true class="max-per-student-option"
+          }}
+          <label for="max-per-student-option-{{uniqid}}">Limit participants to attend </label>
+          <input type="number" name="max_appointments_per_participant"
+            value="{{appointment_group.max_appointments_per_participant}}" min="1"
+            style="width: 40px"
+            aria-label="{{t "appointments_per_participant_label" "Maximum number of appointments a participant can attend"}}" />
+          <label for="max-per-student-option-{{uniqid}}">appointment(s).</label>
           <a href="#" class="reservation_help hidden" title="{{#t "affect_reservations"}}How will this affect reservations?{{/t}}">
             <img alt="Help" src="/images/help.png">
           </a>
@@ -78,7 +92,7 @@
     </div>
   </div>
   <div class="details-wrapper">
-    <b>{{#t "details"}}Details:{{/t}}</b><br />
-    <textarea name="description" class="input-block-level">{{appointment_group.description}}</textarea>
+    <label for="edit-appointment-details-{{uniqid}}"><b>{{#t "details"}}Details:{{/t}}</b></label><br />
+    <textarea id="edit-appointment-details-{{uniqid}}" name="description" class="input-block-level">{{appointment_group.description}}</textarea>
   </div>
 </form>
