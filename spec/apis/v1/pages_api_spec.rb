@@ -342,16 +342,19 @@ describe "Pages API", :type => :integration do
         json.should == [
           {
             'revision_id' => 3,
+            'latest' => true,
             'updated_at' => @timestamps[2].as_json,
             'edited_by' => user_display_json(@ta, @course).stringify_keys!,
           },
           {
             'revision_id' => 2,
+            'latest' => false,
             'updated_at' => @timestamps[1].as_json,
             'edited_by' => user_display_json(@teacher, @course).stringify_keys!,
           },
           {
             'revision_id' => 1,
+            'latest' => false,
             'updated_at' => @timestamps[0].as_json,
           }
         ]
@@ -363,6 +366,7 @@ describe "Pages API", :type => :integration do
                         :course_id => @course.to_param, :url => @vpage.url, :summary => 'true')
         json.should == {
             'revision_id' => 3,
+            'latest' => true,
             'updated_at' => @timestamps[2].as_json,
             'edited_by' => user_display_json(@ta, @course).stringify_keys!,
         }
@@ -387,7 +391,8 @@ describe "Pages API", :type => :integration do
             'title' => 'version test page',
             'url' => @vpage.url,
             'updated_at' => @timestamps[0].as_json,
-            'revision_id' => 1
+            'revision_id' => 1,
+            'latest' => false
         }
       end
 
@@ -400,6 +405,7 @@ describe "Pages API", :type => :integration do
             'url' => @vpage.url,
             'updated_at' => @timestamps[2].as_json,
             'revision_id' => 3,
+            'latest' => true,
             'edited_by' => user_display_json(@ta, @course).stringify_keys!
         }
       end

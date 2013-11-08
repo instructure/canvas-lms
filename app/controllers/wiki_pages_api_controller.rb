@@ -87,6 +87,9 @@
 #       // the time when this revision was saved
 #       "updated_at": "2012-08-07T11:23:58-06:00",
 #
+#       // whether this is the latest revision or not
+#       "latest": true,
+#
 #       // the User who saved this revision, if applicable
 #       // (this may not be present if the page was imported from another system)
 #       "edited_by": {
@@ -409,7 +412,7 @@ class WikiPagesApiController < ApplicationController
       route = polymorphic_url([:api_v1, @context, @page, :revisions])
       scope = @page.versions
       revisions = Api.paginate(scope, self, route)
-      render :json => wiki_page_revisions_json(revisions, @current_user, session)
+      render :json => wiki_page_revisions_json(revisions, @current_user, session, @page.current_version)
     end
   end
 
@@ -444,7 +447,7 @@ class WikiPagesApiController < ApplicationController
                         else
                           true
                         end
-      render :json => wiki_page_revision_json(revision, @current_user, session, include_content)
+      render :json => wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
     end
   end
 
@@ -471,7 +474,7 @@ class WikiPagesApiController < ApplicationController
       @page.url = @revision.url
       @page.user_id = @current_user.id if @current_user
       if @page.save
-        render :json => wiki_page_revision_json(@page.versions.current, @current_user, session, true)
+        render :json => wiki_page_revision_json(@page.versions.current, @current_user, session, true, @page.current_version)
       else
         render :json => @page.errors, :status => :bad_request
       end
