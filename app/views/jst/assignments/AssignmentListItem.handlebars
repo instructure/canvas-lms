@@ -85,7 +85,7 @@
             id="assignment_{{id}}_settings_edit_item"
             tabindex="-1"
             role="menuitem"
-            title='{{#t "edit_assignment_title"}}Edit Assignment{{/t}}'
+            aria-label="{{#t 'assignment_edit'}}Edit Assignment{{/t}}"
             data-focus-returns-to="assign_{{id}}_manage_link"
           >{{#t "edit"}}Edit{{/t}}</a>
         </li>
@@ -97,7 +97,7 @@
             id="assignment_{{id}}_settings_delete_item"
             tabindex="-1"
             role="menuitem"
-            title="{{#t "delete_asssignment_title"}}Delete this assignment{{/t}}"
+            aria-label="{{#t 'assignment_delete'}}Delete Assignment{{/t}}"
           >{{#t "delete"}}Delete{{/t}}</a>
         </li>
         {{/unless}}
@@ -107,7 +107,7 @@
             href="#"
             class="move_assignment icon-updown"
             id="assignment_{{id}}_settings_move_item"
-            title='{{#t "move_assignment_title"}}Move Assignment{{/t}}'
+            aria-label='{{#t 'assignment_move'}}Move Assignment{{/t}}'
             data-focus-returns-to="assign_{{id}}_manage_link"
           >{{#t "move"}}Move To&hellip;{{/t}}</a>
         </li>
