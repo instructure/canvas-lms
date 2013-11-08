@@ -71,6 +71,12 @@ define [
 
       if showRegion
         $region.dialog('open')
+
+        if $region.data('read-on-open')
+          $region.dialog('widget')
+            .attr('aria-live', 'assertive')
+            .attr('aria-atomic', 'true')
+
       else if $region.dialog('isOpen')
         $region.dialog('close')
 

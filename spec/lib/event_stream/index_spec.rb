@@ -29,7 +29,8 @@ describe EventStream::Index do
       :database => @database,
       :available? => true,
       :record_type => EventStream::Record,
-      :ttl_seconds => 1.year)
+      :ttl_seconds => 1.year,
+      :read_consistency_clause => nil)
   end
 
   context "setup block" do
@@ -213,7 +214,7 @@ describe EventStream::Index do
       end
 
       it "should include the ttl" do
-        @database.expects(:update).once.with(regexp_matches(/ USING TTL /), anything, anything, anything, @stream.ttl_seconds(@record))
+        @database.expects(:update).once.with(regexp_matches(/ USING TTL /), anything, anything, anything, @stream.ttl_seconds(@timestamp))
         @index.insert(@record, @key)
       end
     end

@@ -22,32 +22,32 @@
 # in order to automatically create announcements for each new item in
 # the feed.
 #
-# @object External Feed
+# @object ExternalFeed
 #     {
 #       // The ID of the feed
-#       id: 5,
+#       "id": 5,
 #
 #       // The title of the feed, pulled from the feed itself
 #       // If the feed hasn't yet been pulled, a temporary name will be
 #       // synthesized based on the URL
-#       display_name: "My Blog",
+#       "display_name": "My Blog",
 #
 #       // The HTTP/HTTPS URL to the feed
-#       url: "http://example.com/myblog.rss",
+#       "url": "http://example.com/myblog.rss",
 #
 #       // If not null, only feed entries whose title contains this string will
 #       // trigger new posts in Canvas
-#       header_match: "pattern",
+#       "header_match": "pattern",
 #
 #       // When this external feed was added to Canvas
-#       created_at: "2012-06-01T00:00:00-06:00",
+#       "created_at": "2012-06-01T00:00:00-06:00",
 #
 #       // The verbosity setting determines how much of the feed's content is
 #       // imported into Canvas as part of the posting.
 #       // "link_only" means that only the title and a link to the item.
 #       // "truncate" means that a summary of the first portion of the item body will be used.
 #       // "full" means that the full item body will be used.
-#       verbosity: "truncate",
+#       "verbosity": "truncate"
 #     }
 #
 class ExternalFeedsController < ApplicationController
@@ -63,7 +63,7 @@ class ExternalFeedsController < ApplicationController
   #     curl https://<canvas>/api/v1/courses/<course_id>/external_feeds \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns [External Feed]
+  # @returns [ExternalFeed]
   def index
     if authorized_action(@context.announcements.new, @current_user, :create)
       api_route = polymorphic_url([:api, :v1, @context, :external_feeds])
@@ -76,9 +76,13 @@ class ExternalFeedsController < ApplicationController
   #
   # Create a new external feed for the course or group.
   #
-  # @argument url The url to the external rss or atom feed
-  # @argument header_match If given, only feed entries that contain this string in their title will be imported
-  # @argument verbosity ["full", "truncate", "link_only"]
+  # @argument url [String]
+  #   The url to the external rss or atom feed
+  #
+  # @argument header_match [Optional, Boolean]
+  #   If given, only feed entries that contain this string in their title will be imported
+  #
+  # @argument verbosity [String, "full"|"truncate"|"link_only"]
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/external_feeds \ 
@@ -87,14 +91,14 @@ class ExternalFeedsController < ApplicationController
   #         -F verbosity='full' \ 
   #         -H 'Authorization: Bearer <token>'
   #
-  # @returns External Feed
+  # @returns ExternalFeed
   def create
     if authorized_action(@context.announcements.new, @current_user, :create)
       @feed = create_api_external_feed(@context, params, @current_user)
       if @feed.save
         render :json => external_feed_api_json(@feed, @context, @current_user, session)
       else
-        render :json => @feed.errors.to_json, :status => :bad_request
+        render :json => @feed.errors, :status => :bad_request
       end
     end
   end
@@ -107,14 +111,14 @@ class ExternalFeedsController < ApplicationController
   #     curl -X DELETE https://<canvas>/api/v1/courses/<course_id>/external_feeds/<feed_id> \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns External Feed
+  # @returns ExternalFeed
   def destroy
     if authorized_action(@context.announcements.new, @current_user, :create)
       @feed = @context.external_feeds.find(params[:external_feed_id])
       if @feed.destroy
         render :json => external_feed_api_json(@feed, @context, @current_user, session)
       else
-        render :json => @feed.errors.to_json, :status => :bad_request
+        render :json => @feed.errors, :status => :bad_request
       end
     end
   end

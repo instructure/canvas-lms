@@ -38,7 +38,7 @@ TEXT
   </ul>
 <% end %>
 
-<% form_for :group, :url => context_url(@context, :context_groups_url), :html => {:id => "add_group_form", :style => "display: none;"} do |f| %>
+<%= form_for :group, :url => context_url(@context, :context_groups_url), :html => {:id => "add_group_form", :style => "display: none;"} do |f| %>
 <h2><%= t 'headings.new_group', 'Make a New Group' %></h2>
 <%= image_tag "warning.png" %>
 <%= t :student_group_warning, <<-TEXT

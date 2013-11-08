@@ -1,7 +1,7 @@
 <div class="form-dialog-content">
   <div class="form-horizontal">
     <label class="checkbox" id="weight-groups" >
-      <input type="checkbox" id="apply_assignment_group_weights" name="apply_assignment_group_weights" {{#if apply_assignment_group_weights}}checked="checked"{{/if}} />
+      {{checkbox "apply_assignment_group_weights"}}
       {{#t "weight_groups"}}Weight final grade based on assignment groups{{/t}}
     </label>
 

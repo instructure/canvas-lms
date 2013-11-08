@@ -478,7 +478,7 @@ describe AppointmentGroup do
       @group1.participating_users << @users.last
       @group1.save!
       @gc = @group1.group_category
-      @group2 = @gc.groups.create!(:name => "group2")
+      @group2 = @gc.groups.create!(:name => "group2", :context => @course)
 
       @ag = AppointmentGroup.create!(:title => "test", :contexts => [@course], :participants_per_appointment => 2, :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
     end

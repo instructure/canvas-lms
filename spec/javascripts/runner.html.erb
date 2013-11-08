@@ -35,7 +35,7 @@
   <div id="fixtures"></div>
 
   <script src="support/qunit/qunit.js"></script>
-  <script src="support/sinon/sinon-1.5.2.js"></script>
+  <script src="support/sinon/sinon-1.7.3.js"></script>
   <script src="support/sinon/sinon-patch.js"></script>
   <script src="support/sinon/sinon-qunit-1.0.0.js"></script>
   <script>
@@ -103,6 +103,8 @@
     stop();
     require(<%= Dir["spec/javascripts/#{matcher}"].map{ |file| file.sub(/\.js$/, '') }.inspect %>, function() {
       // run specs once they've all loaded
+       <%= puts Dir["/mnt/hudson/workspace/canvas-plugins-aux/spec/javascripts/**/*Spec.js"].count %>
+       <%= Dir["spec/javascripts/#{matcher}"].each { |file| puts("File being required: #{file.to_s}") }  %>
       start();
     });
   </script>

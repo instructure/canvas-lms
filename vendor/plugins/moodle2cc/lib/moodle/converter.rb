@@ -12,8 +12,23 @@ module Moodle
       cc_converter = CC::Importer::Canvas::Converter.new(@settings)
       cc_converter.export
       @course = cc_converter.course
+      add_question_warnings
+
+      File.open(@course[:full_export_file_path], 'w') { |file| file << @course.to_json}
+      @course
     ensure
       FileUtils.rm migrator.imscc_path if migrator && File.exists?(migrator.imscc_path)
+    end
+
+    def add_question_warnings
+      return unless @course[:assessment_questions] && @course[:assessment_questions][:assessment_questions]
+
+      @course[:assessment_questions][:assessment_questions].each do |q_hash|
+        if q_hash['question_type'] == 'multiple_dropdowns_question'
+          q_hash['import_warnings'] ||= []
+          q_hash['import_warnings'] << I18n.t(:moodle_dropdown_warning_title, 'Multiple Dropdowns question may have been imported incorrectly')
+        end
+      end
     end
 
   end

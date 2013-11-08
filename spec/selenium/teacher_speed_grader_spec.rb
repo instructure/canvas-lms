@@ -25,7 +25,7 @@ describe "speed grader" do
       @enrollment.course_section = @section; @enrollment.save
 
       @assignment.submission_types = "online_upload"
-      @assignment.save
+      @assignment.save!
 
       @submission1 = @assignment.submit_homework(@student1, :submission_type => "online_text_entry", :body => "hi")
       @submission2 = @assignment.submit_homework(@student2, :submission_type => "online_text_entry", :body => "there")
@@ -33,7 +33,6 @@ describe "speed grader" do
 
     it "should list the correct number of students" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      wait_for_ajax_requests
 
       f("#x_of_x_students").should include_text("1 of 1")
       ff("#students_selectmenu-menu li").count.should == 1
@@ -47,7 +46,10 @@ describe "speed grader" do
     @assignment.save!
     @quiz = Quiz.find_by_assignment_id(@assignment.id)
     @quiz.update_attribute(:anonymous_submissions, true)
-    student_submission
+    student_in_course
+    qs = @quiz.generate_submission(@student)
+    qs.start_grading
+    qs.complete
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     keep_trying_until {
       fj('#this_student_has_a_submission').should be_displayed
@@ -116,6 +118,37 @@ describe "speed grader" do
     end
   end
 
+  it "lets you view previous quiz submissions" do
+    @assignment.update_attributes! points_possible: 10,
+                                   submission_types: 'online_quiz',
+                                   title: "Quiz"
+    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+
+    student_in_course
+    2.times do |i|
+      qs = @quiz.generate_submission(@student)
+      opts = i == 0 ? {finished_at: Date.today - 7} : {}
+      qs.grade_submission(opts)
+    end
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+    submission_dropdown = f("#submission_to_view")
+    submission_dropdown.should be_displayed
+
+    submissions = submission_dropdown.find_elements(:css, "option")
+    submissions.size.should == 2
+
+    submissions.each do |s|
+      s.click
+      submission_date = s.text
+      in_frame('speedgrader_iframe') do
+        wait_for_ajaximations
+        f('.quiz-submission').text.should include submission_date
+      end
+    end
+  end
+
   it "should display discussion entries for only one student" do
     #make assignment a discussion assignment
     @assignment.points_possible = 5
@@ -177,7 +210,7 @@ describe "speed grader" do
     @association.save!
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
 
     #test opening and closing rubric
     keep_trying_until do
@@ -185,7 +218,7 @@ describe "speed grader" do
       f('#rubric_full').should be_displayed
     end
     f('#rubric_holder .hide_rubric_link').click
-    wait_for_animations
+    wait_for_ajaximations
     f('#rubric_full').should_not be_displayed
     f('.toggle_full_rubric').click
     rubric = f('#rubric_full')
@@ -200,7 +233,7 @@ describe "speed grader" do
     second_criterion.find_element(:css, '.ratings .edge_rating').click
     rubric.find_element(:css, '.rubric_total').should include_text('8')
     f('#rubric_full .save_rubric_button').click
-    keep_trying_until { f('#rubric_summary_container > table').should be_displayed }
+    keep_trying_until { f('#rubric_summary_container > .rubric_container').should be_displayed }
     f('#rubric_summary_container').should include_text(@rubric.title)
     f('#rubric_summary_container .rubric_total').should include_text('8')
     wait_for_ajaximations
@@ -212,7 +245,7 @@ describe "speed grader" do
 
     student_submission
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
 
     #check media comment
     keep_trying_until do
@@ -245,7 +278,7 @@ describe "speed grader" do
   it "should show comment post time" do
     @submission = student_submission
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
 
     #add comment
     f('#add_a_comment > textarea').send_keys('grader comment')
@@ -261,7 +294,7 @@ describe "speed grader" do
 
     # after refresh
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
     f('#comments > .comment .posted_at').should include_text(expected_posted_at)
   end
 
@@ -295,7 +328,7 @@ describe "speed grader" do
     @account.save!
     @account.service_enabled?(:avatars).should be_false
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
 
     ff("#avatar_image").length.should == 0
     ff("#comments > .comment .avatar").length.should == 1
@@ -344,7 +377,7 @@ describe "speed grader" do
     student_submission
     student_submission(:username => 'otherstudent@example.com', :section => @course.course_sections.create(:name => "another section"))
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_animations
+    wait_for_ajaximations
 
     keep_trying_until { ffj('#students_selectmenu option').size > 0 }
     ffj('#students_selectmenu option').size.should == 1 # just the one student
@@ -387,8 +420,14 @@ describe "speed grader" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
 
+    # sort by submission date
     f("#settings_link").click
     f('select#eg_sort_by option[value="submitted_at"]').click
+    expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
+    keep_trying_until { f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "student@example.com" }
+
+    # hide student names
+    f("#settings_link").click
     f('#hide_student_names').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     keep_trying_until { f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }
@@ -432,14 +471,13 @@ describe "speed grader" do
                                        :learning_outcome_id => @ignored.id,
                                        :ignore_for_scoring => '1',
                                    }]
-    @rubric.alignments_changed = true
     @rubric.save!
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
     f('button.toggle_full_rubric').click
-    f("table.rubric.assessing tr:nth-child(1) table.ratings td:nth-child(1)").click
-    f("table.rubric.assessing tr:nth-child(3) table.ratings td:nth-child(1)").click
+    f(".rubric.assessing table.rubric_table tr:nth-child(1) table.ratings td:nth-child(1)").click
+    f(".rubric.assessing table.rubric_table tr:nth-child(3) table.ratings td:nth-child(1)").click
     f("#rubric_holder button.save_rubric_button").click
     wait_for_ajaximations
 

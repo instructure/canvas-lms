@@ -14,6 +14,7 @@ require [
   'compiled/views/DiscussionTopic/TopicView'
   'compiled/views/DiscussionTopic/EntriesView'
   'compiled/jquery/sticky'
+  'compiled/jquery/ModuleSequenceFooter'
 ], (EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, _, Backbone, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, TopicView, EntriesView) ->
 
   descendants = 5
@@ -138,6 +139,12 @@ require [
 
   ##
   # routes
+  router.route 'topic', 'topic', ->
+    $container.scrollTop $('#discussion_topic')
+    setTimeout ->
+      $('#discussion_topic .author').focus()
+      $container.one "scroll", -> router.navigate('')
+    , 10
   router.route 'entry-:id', 'id', entriesView.goToEntry
   router.route 'page-:page', 'page', (page) ->
     entriesView.render page
@@ -162,6 +169,15 @@ require [
 
   topicView.render()
   toolbarView.render()
+
+  ##
+  # Add module sequence footer
+  if ENV.DISCUSSION.SEQUENCE?
+    $('#module_sequence_footer').moduleSequenceFooter(
+      assetType: 'Discussion'
+      assetID: ENV.DISCUSSION.SEQUENCE.ASSET_ID
+      courseID: ENV.DISCUSSION.SEQUENCE.COURSE_ID
+      )
 
   ##
   # Get the party started

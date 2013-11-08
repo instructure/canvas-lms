@@ -16,6 +16,10 @@ define [
     #
     # each group needs fields: id, rules, group_weight, assignments
     #   rules is { drop_lowest: n, drop_highest: n, never_drop: [id...] }
+    #   assignments is [
+    #    { id, points_possible, submission_types},
+    #    ...
+    #   ]
     #
     # if weighting_scheme is "percent", group weights are used, otherwise no
     # weighting is applied

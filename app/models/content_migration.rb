@@ -29,30 +29,9 @@ class ContentMigration < ActiveRecord::Base
   has_many :migration_issues
   has_one :job_progress, :class_name => 'Progress', :as => :context
   serialize :migration_settings
-  before_save :infer_defaults
   cattr_accessor :export_file_path
   DATE_FORMAT = "%m/%d/%Y"
-  DEFAULT_TO_EXPORT = {
-          'all_files' => false,
-          'announcements' => false,
-          'assessments' => false,
-          'assignment_groups' => true,
-          'assignments' => false,
-          'calendar_events' => false,
-          'calendar_start' => 1.year.ago.strftime(DATE_FORMAT),
-          'calendar_end' => 1.year.from_now.strftime(DATE_FORMAT),
-          'course_outline' => true,
-          'discussions' => false,
-          'discussion_responses' => false,
-          'goals' => false,
-          'groups' => false,
-          'learning_modules' => false,
-          'question_bank' => false,
-          'rubrics' => false,
-          'tasks' => false,
-          'web_links' => false,
-          'wikis' => false
-  }
+
   attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type
   attr_accessor :outcome_to_id_map
 
@@ -97,11 +76,7 @@ class ContentMigration < ActiveRecord::Base
 
   def update_migration_settings(new_settings)
     new_settings.each do |key, val|
-      if key == 'only'
-        process_to_scrape val
-      else
-        migration_settings[key] = val
-      end
+      migration_settings[key] = val
     end
   end
   
@@ -132,22 +107,6 @@ class ContentMigration < ActiveRecord::Base
   def migration_ids_to_import=(val)
     migration_settings[:migration_ids_to_import] = val
     set_date_shift_options val[:copy]
-  end
-
-  def infer_defaults
-    migration_settings[:to_scrape] ||= DEFAULT_TO_EXPORT
-  end
-
-  def process_to_scrape(hash)
-    migrate_only = migration_settings[:to_scrape] || DEFAULT_TO_EXPORT
-    hash.each do |key, arg|
-      migrate_only[key] = arg == '1' ? true : false if arg
-      if key == 'calendar_events' && migrate_only[key]
-        migrate_only['calendar_start'] = 1.year.ago.strftime(DATE_FORMAT)
-        migrate_only['calendar_end'] = 1.year.from_now.strftime(DATE_FORMAT)
-      end
-    end
-    migration_settings[:to_scrape] = migrate_only
   end
 
   def zip_path=(val)
@@ -297,6 +256,7 @@ class ContentMigration < ActiveRecord::Base
   def file_upload_success_callback(att)
     if att.file_state == "available"
       self.attachment = att
+      self.migration_issues.delete_all if self.migration_issues.any?
       self.workflow_state = :pre_processed
       self.save
       self.queue_migration
@@ -324,7 +284,8 @@ class ContentMigration < ActiveRecord::Base
 
   def queue_migration
     reset_job_progress
-    check_quiz_id_prepender
+
+    set_default_settings
     plugin = Canvas::Plugin.find(migration_type)
     if plugin
       queue_opts = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1}
@@ -370,6 +331,13 @@ class ContentMigration < ActiveRecord::Base
   end
   alias_method :export_content, :queue_migration
 
+  def set_default_settings
+    if !migration_settings.has_key?(:overwrite_quizzes)
+      migration_settings[:overwrite_quizzes] = for_course_copy? || (self.migration_type && self.migration_type == 'canvas_cartridge_importer')
+    end
+    check_quiz_id_prepender
+  end
+
   def check_quiz_id_prepender
     if !migration_settings[:id_prepender] && (!migration_settings[:overwrite_questions] || !migration_settings[:overwrite_quizzes])
       # only prepend an id if the course already has some migrated questions/quizzes
@@ -392,7 +360,7 @@ class ContentMigration < ActiveRecord::Base
 
     return true if is_set?(to_import("all_#{asset_type}"))
 
-    return false unless to_import(asset_type)
+    return false unless to_import(asset_type).present?
 
     is_set?(to_import(asset_type)[mig_id])
   end
@@ -587,4 +555,30 @@ class ContentMigration < ActiveRecord::Base
     Canvas::Migration::Helpers::SelectiveContentFormatter.new(self, base_url).get_content_list(type)
   end
 
+  UPLOAD_TIMEOUT = 1.hour
+  def check_for_pre_processing_timeout
+    if self.pre_processing? && (self.updated_at.utc + UPLOAD_TIMEOUT) < Time.now.utc
+      add_error(t(:upload_timeout_error, "The file upload process timed out."))
+      self.workflow_state = :failed
+      job_progress.fail if job_progress && !skip_job_progress
+      self.save
+    end
+  end
+
+  # strips out the "id_" prepending the migration ids in the form
+  def self.process_copy_params(hash)
+    return {} if hash.blank? || !hash.is_a?(Hash)
+    hash.values.each do |sub_hash|
+      next unless sub_hash.is_a?(Hash) # e.g. second level in :copy => {:context_modules => {:id_100 => true, etc}}
+
+      clean_hash = {}
+      sub_hash.keys.each do |k|
+        if k.is_a?(String) && k.start_with?("id_")
+          clean_hash[k.sub("id_", "")] = sub_hash.delete(k)
+        end
+      end
+      sub_hash.merge!(clean_hash)
+    end
+    hash
+  end
 end

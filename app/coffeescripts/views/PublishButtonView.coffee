@@ -3,6 +3,7 @@ define [
   'jquery'
   'compiled/fn/preventDefault'
   'Backbone'
+  'jquery.instructure_forms'
 ], (I18n, $, preventDefault, Backbone) ->
 
   class PublishButton extends Backbone.View
@@ -21,9 +22,14 @@ define [
       '.publish-text': '$text'
       '.desc':         '$desc'
 
+    initialize: ->
+      super
+      @model?.on 'change:unpublishable', =>
+        @disable() if !@model.get('unpublishable')
+
     setElement: ->
       super
-      @disable() unless @model.get 'publishable'
+      @disable() if !@model.get('unpublishable')
 
     # events
 
@@ -56,10 +62,17 @@ define [
 
     unpublish: (event) ->
       @renderUnpublishing()
-      @model.unpublish().always =>
+      @model.unpublish()
+      .done =>
         @trigger("unpublish")
-        @enable()
+        @disable()
         @render()
+      .fail (error) =>
+        errors = JSON.parse(error.responseText)['errors']
+        $.flashError errors.published[0].message
+        @model.set 'unpublishable', true
+        @disable()
+        @renderPublished()
 
     # state
 
@@ -77,6 +90,7 @@ define [
 
     disable: ->
       @$el.addClass @disabledClass
+      @$el.attr('data-tooltip', '')
 
     enable: ->
       @$el.removeClass @disabledClass
@@ -152,8 +166,9 @@ define [
       @$desc.addClass 'screenreader-only'
       @$el.attr 'aria-describedby', descId
 
-      # publishable
-      if @model.get 'publishable'
+      # unpublishable 
+      if !@model.get('unpublishable')? or @model.get('unpublishable')
+        @enable()
         @$el.attr 'title', options.text
 
         # description for screen readers
@@ -164,6 +179,7 @@ define [
 
       # disabled
       else
+        @disable()
         @$el.attr 'aria-disabled', true
         @$el.attr 'title', @model.disabledMessage()
         @$desc.html  @model.disabledMessage()

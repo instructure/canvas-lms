@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -106,6 +106,8 @@ module Kaltura
               next
             end
 
+            hash[:hasWarnings] = true if asset[:description] && asset[:description].include?("warnings")
+
             sources << hash
           else
             # if it was deleted or if it did not convert because it did not need to
@@ -134,9 +136,11 @@ module Kaltura
     # preferring converted assets over the original (since they're likely to stream better)
     # and sorting by descending bitrate for identical file types.
     def sort_source_list(sources)
-      sources.sort_by do |a|
-        [a[:isOriginal] == '0' ? 0 : 1, PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1, 0 - a[:bitrate].to_i]
+      sources = sources.sort_by do |a|
+        [a[:hasWarnings] || a[:isOriginal] != '0' ? SortLast : SortFirst, a[:isOriginal] == '0' ? SortFirst : SortLast, PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1, 0 - a[:bitrate].to_i]
       end
+      sources.each{|a| a.delete(:hasWarnings)}
+      sources
     end
 
     def thumbnail_url(entryId, opts = {})
@@ -208,8 +212,7 @@ module Kaltura
         :ks => @ks,
         :entryId => entryId
       }
-      result = sendRequest(:media, :delete, hash)
-      result
+      sendRequest(:media, :delete, hash)
     end
 
     def mediaTypeToSymbol(type)
@@ -304,7 +307,7 @@ module Kaltura
       result = sendRequest(:flavorAsset, :getDownloadUrl,
                            :ks => @ks,
                            :id => assetId)
-      return result.content
+      return result.content if result
     end
 
     # This is not a true Kaltura API call, but generates the url for a "playlist"
@@ -333,25 +336,28 @@ module Kaltura
       mp = Multipart::MultipartPost.new
       query, headers = mp.prepare_query(params)
       res = nil
-      Net::HTTP.start(@host) {|con|
-        req = Net::HTTP::Post.new(@endpoint + "/?service=#{service}&action=#{action}", headers)
-        con.read_timeout = 30
-        begin
+      Canvas.timeout_protection("kaltura", fallback_timeout_length: 30) do
+        Net::HTTP.start(@host) {|con|
+          req = Net::HTTP::Post.new(@endpoint + "/?service=#{service}&action=#{action}", headers)
           res = con.request(req, query) #con.post(url.path, query, headers)
-        rescue => e
-          puts "POSTING Failed #{e}... #{Time.now}"
-        end
-      }
+        }
+      end
+      raise Timeout::Error if res.nil?
       doc = Nokogiri::XML(res.body)
       doc.css('result').first
     end
+
     def sendRequest(service, action, params)
       requestParams = "service=#{service}&action=#{action}"
       params.each do |key, value|
         next if value.nil?
         requestParams += "&#{URI.escape(key.to_s)}=#{URI.escape(value.to_s)}"
       end
-      res = Net::HTTP.get_response(@host, "#{@endpoint}/?#{requestParams}")
+      res = nil
+      Canvas.timeout_protection("kaltura",fallback_timeout_length: 30) do
+        res = Net::HTTP.get_response(@host, "#{@endpoint}/?#{requestParams}")
+      end
+      raise Timeout::Error if res.nil?
       doc = Nokogiri::XML(res.body)
       doc.css('result').first
     end

@@ -52,7 +52,7 @@ describe "Migration package importers" do
   
   context "migrator" do
     file = File.new(File.dirname(__FILE__) + "/../../fixtures/migration/whatthebackslash.zip")
-    cm = ContentMigration.new
+    cm = ContentMigration.create!(:context => course)
     
     mig = Canvas::Migration::Migrator.new({:archive_file => file, :content_migration => cm}, "test")
     mig.unzip_archive

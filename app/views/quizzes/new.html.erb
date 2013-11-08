@@ -5,6 +5,13 @@
   content_for :page_title, (@quiz.quiz_title || !@quiz.quiz_title.empty? ? @quiz.quiz_title : t(:default_page_title, 'New Quiz'))
 %>
 
+<%
+  # these titles are used in more than one spot below
+  admin_manage_title = t('manage', 'Manage')
+  admin_delete_title = t('titles.delete', "Delete")
+  admin_show_rubric_title = t('links.show_assignment_rubric', "Show Rubric")
+%>
+
 <% content_for :right_side do %>
   <%= render :partial => "shared/wiki_sidebar" %>
 
@@ -18,7 +25,7 @@
   </ul>
 <% end %>
 
-<% if @domain_root_account.enable_draft? %>
+<% if @context.draft_state_enabled? %>
 <div class="header-bar" id="quiz_edit_header">
   <div class="header-bar-right">
     <div class="header-group-left">
@@ -27,39 +34,41 @@
       </span>
 
       <% if @quiz.published? %>
+        <% quiz_draft_state_title = t('buttons.published', "Published") %>
         <span id='quiz-draft-state' class='published-status published'>
-          <i class="icon-publish"></i>
-          <%= t('buttons.published', "Published") %>
+          <i class="icon-publish"><span class="screenreader-only"><%= quiz_draft_state_title %></span></i>
+          <%= quiz_draft_state_title %>
         </span>
       <% else %>
+        <% quiz_draft_state_title = t('buttons.not_published', "Not Published") %>
         <span id='quiz-draft-state' class='published-status unpublished'>
-          <i class="icon-unpublished"></i>
-          <%= t('buttons.not_published', "Not Published") %>
+          <i class="icon-unpublished"><span class="screenreader-only"><%= quiz_draft_state_title %></span></i>
+          <%= quiz_draft_state_title %>
         </span>
       <% end %>
     </div>
 
     <div class="header-group-right">
       <div class="admin-links">
-        <a class="al-trigger btn">
-          <span class="screenreader-only">Manage</span>
-          <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+        <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="manage-toolbar" href="#">
+          <i class="icon-settings"></i>
+          <i class="icon-mini-arrow-down"></i>
+          <span class="screenreader-only"><%= admin_manage_title %></span>
         </a>
-        <ul class="al-options">
+        <ul id="manage-toolbar" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
           <% if @assignment %>
-          <li>
-            <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link">
-              <i class="icon-rubric"></i>
-              <%= t('links.show_assignment_rubric', "Show Rubric") %>
-            </a>
-          </li>
-          <a href="<%= context_url(@context, :context_rubrics_url) %>" class="icon-rubric" id="add_rubric_url" style="display:none">&nbsp;</a>
-
+            <li role="presentation">
+              <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link" tabindex="-1" role="menuitem">
+                <i class="icon-rubric"><span class="screenreader-only"><%= admin_show_rubric_title %></span></i>
+                <%= admin_show_rubric_title %>
+              </a>
+            </li>
+            <a href="<%= context_url(@context, :context_rubrics_url) %>" class="icon-rubric" id="add_rubric_url" style="display:none">&nbsp;</a>
           <% end %>
-          <li>
-            <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link">
-              <i class="icon-trash"></i>
-              <%= t('titles.delete', "Delete") %>
+          <li role="presentation">
+            <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link" tabindex="-1" role="menuitem">
+              <i class="icon-trash"><span class="screenreader-only"><%= admin_delete_title %></span></i>
+              <%= admin_delete_title %>
             </a>
           </li>
         </ul>
@@ -74,18 +83,20 @@
   <div class="form">
 
   <% if @has_student_submissions %>
-    <div class="alert alert-info" id="student_submissions_warning">
-      <i class="icon-warning"></i> <%= t('warnings.has_student_submissions', <<-TEXT)
+    <% has_student_submissions_title = t('warnings.has_student_submissions', <<-TEXT)
       Students have either already taken or started taking this quiz, so be careful
       about editing it.  If you change any quiz questions in a significant way, you
-      may want to consider re-grading students who took the old version of the quiz.
+      may want to consider regrading students who took the old version of the quiz.
       TEXT
-      %>
+    %>
+    <div class="alert alert-info" id="student_submissions_warning">
+      <i class="icon-warning"><span class="screenreader-only"><%= has_student_submissions_title %></span></i> <%= has_student_submissions_title %>
     </div>
   <% end %>
 
-  <% if @domain_root_account.enable_draft? %>
+  <% if @context.draft_state_enabled? %>
   <div class="title">
+    <label for="quiz_title" class="screenreader-only"><%= t('quiz_title', 'Quiz Title') %></label>
     <%= text_field :quiz, :title, :placeholder => "Quiz Title", :maxlength => "254" %>
   </div>
   <% else %>
@@ -96,26 +107,26 @@
     <div class="span6">
       <div class="admin-link-hover-area">
         <div class="admin-links">
-          <a class="al-trigger btn">
-            <span class="screenreader-only">Manage</span>
+          <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="manage-toolbar" href="#">
             <i class="icon-settings"></i>
             <i class="icon-mini-arrow-down"></i>
+            <span class="screenreader-only"><%= admin_manage_title %></span>
           </a>
-          <ul class="al-options">
+          <ul id="manage-toolbar" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
             <% if @assignment %>
-              <li>
-                <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link">
-                  <i class="icon-rubric"></i>
-                  <%= t('links.show_assignment_rubric', "Show Rubric") %>
+              <li role="presentation">
+                <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link" tabindex="-1" role="menuitem">
+                  <i class="icon-rubric"><span class="screenreader-only"><%= admin_show_rubric_title %></span></i>
+                  <%= admin_show_rubric_title %>
                 </a>
               </li>
               <a href="<%= context_url(@context, :context_rubrics_url) %>" class="icon-rubric" id="add_rubric_url" style="display:none">&nbsp;</a>
             <% end %>
 
-            <li>
-              <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link">
-                <i class="icon-trash"></i>
-                <%= t('titles.delete', "Delete") %>
+            <li role="presentation">
+              <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link" tabindex="-1" role="menuitem">
+                <i class="icon-trash"><span class="screenreader-only"><%= admin_delete_title %></span></i>
+                <%= admin_delete_title %>
               </a>
             </li>
 
@@ -145,7 +156,7 @@
     </ul>
 
     <div id="options_tab">
-      <% form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :id => "quiz_options_form", :class => 'form-horizontal bootstrap-form'} do %>
+      <%= form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :id => "quiz_options_form", :class => 'form-horizontal bootstrap-form'} do %>
         <div style="position: relative;">
           <div style="margin: 15px 0 25px;">
             <%= before_label(:quiz_instructions, "Quiz Instructions") %>
@@ -323,11 +334,11 @@
     <div id="questions_tab">
       <div id="show_question_details_wrap">
         <input type="checkbox" id="show_question_details"
-               <%= "disabled='disabled'" if @quiz.quiz_questions.count > QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT %>
+               <%= "disabled='disabled'" if @quiz.active_quiz_questions.size> QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT %>
         />
         <label for="show_question_details"> <%= t('labels.show_question_details', "Show Question Details") %></label>
         <br/>
-        <% if @quiz.quiz_questions.count > QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT %>
+        <% if @quiz.quiz_questions.active.size > QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT %>
         <span id='question-detail-disabled' class='hint'>
           <%= t('hints.question_detail_disabled', 'NOTE: Question details not available when more than %{question_count}.',
                 :question_count => QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT) %>
@@ -339,7 +350,7 @@
           <% if question[:entry_type] == "quiz_group" %>
             <%= render :partial => "quizzes/question_group", :object => question %>
           <% else %>
-            <%= render :partial => (@quiz.quiz_questions.count > QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT ? "quizzes/question_teaser" : "quizzes/display_question"), :object => question, :locals => {:editing => true, :asset_string => "quiz_question_#{question['id']}"} %>
+            <%= render :partial => (@quiz.quiz_questions.active.size > QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT ? "quizzes/question_teaser" : "quizzes/display_question"), :object => question, :locals => {:editing => true, :asset_string => "quiz_question_#{question['id']}"} %>
           <% end %>
         <% end %>
       </div>
@@ -351,18 +362,21 @@
       <%= render :partial => "quizzes/question_group", :object => nil %>
       <%= render :partial => "quizzes/find_question_from_bank" %>
       <div style="text-align: center; margin: -1px 1px 1px" class="add_question question_editing">
+        <% new_question_title = t('links.new_question', "New Question") %>
+        <% new_question_group_title = t('links.new_question_group', "New Question Group") %>
         <a href="#" class="add_question_link btn">
-          <i class="icon-add"></i>
-          <%= t('links.new_question', "New Question") %>
+          <i class="icon-add"><span class="screenreader-only"><%= new_question_title %></span></i>
+          <%= new_question_title %>
         </a>
         <a href="#" class="add_question_group_link btn" style="margin-left: 20px; margin-right: 20px;">
-          <i class="icon-add"></i>
-          <%= t('links.new_question_group', "New Question Group") %>
+          <i class="icon-add"><span class="screenreader-only"><%= new_question_group_title %></span></i>
+          <%= new_question_group_title %>
         </a>
         <% if feature_enabled?(:question_banks) %>
+          <% find_questions_title = t('links.find_questions', "Find Questions") %>
           <a href="#" class="find_question_link btn">
-            <i class="icon-search"></i>
-            <%= t('links.find_questions', "Find Questions") %>
+            <i class="icon-search"><span class="screenreader-only"><%= find_questions_title %></span></i>
+            <%= find_questions_title %>
           </a>
         <% end %>
       </div>
@@ -371,7 +385,7 @@
 
   </div>
 
-  <% if @domain_root_account.enable_draft? %>
+  <% if @context.draft_state_enabled? %>
   <div class="form-actions" id="quiz_edit_actions">
     <div class="row-fluid">
       <div class="span6 notify">

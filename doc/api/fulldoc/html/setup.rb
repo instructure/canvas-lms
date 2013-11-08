@@ -16,6 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+$:.unshift(File.join(File.dirname(__FILE__), 'swagger'))
+require 'controller_list_view'
+
 include Helpers::ModuleHelper
 include Helpers::FilterHelper
 
@@ -119,6 +122,12 @@ module YARD::Templates::Helpers::HtmlHelper
     str.gsub(' ', '_').underscore
   end
 
+  def url_for_file(filename, anchor = nil)
+    link = filename.filename
+    link += (anchor ? '#' + urlencode(anchor) : '')
+    link
+  end
+
   # override yard-appendix link_appendix
   def link_appendix(ref)
     __errmsg = "unable to locate referenced appendix '#{ref}'"
@@ -144,6 +153,7 @@ def init
   options[:resources] = options[:objects].
     group_by { |o| o.tags('API').first.text }.
     sort_by  { |o| o.first }
+  generate_swagger_json
 
   options[:page_title] = "Canvas LMS REST API Documentation"
 
@@ -164,6 +174,34 @@ def init
   options[:resources].each do |resource, controllers|
     serialize_resource(resource, controllers)
   end
+end
+
+def generate_swagger(filename, json)
+  output_dir = File.join(%w(public doc api))
+  FileUtils.mkdir_p output_dir
+
+  path = File.join(output_dir, filename)
+  File.open(path, "w") do |file|
+    file.puts JSON.pretty_generate(json)
+  end
+end
+
+def generate_swagger_json
+  api_resources = []
+  model_resources = []
+  options[:resources].each do |name, controllers|
+    view = ControllerListView.new(name, controllers)
+    api_resources << view.swagger_reference
+    generate_swagger(view.swagger_file, view.swagger_api_listing)
+  end
+
+  resource_listing = {
+    "apiVersion" => "1.0",
+    "swaggerVersion" => "1.2",
+    "apis" => api_resources
+  }
+
+  generate_swagger("api-docs.json", resource_listing)
 end
 
 def serialize(object)
@@ -237,7 +275,7 @@ def build_json_objects_map
   resource_obj_list = {}
   options[:resources].each do |r,cs|
     cs.each do |controller|
-      controller.tags(:object).each do |obj|
+      (controller.tags(:object) + controller.tags(:model)).each do |obj|
         name, json = obj.text.split(%r{\n+}, 2).map(&:strip)
         obj_map[name] = topicize r
         resource_obj_list[r] ||= []

@@ -1,0 +1,4 @@
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.quiz.context) %>/<%= polymorphic_path([asset.quiz.context,asset.quiz]) %>
+<% end %>
+  <%= t :body, "Canvas Alert - Quiz Regraded : %{quiz}", :quiz => asset.quiz.title %>

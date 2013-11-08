@@ -161,7 +161,7 @@ describe AssignmentOverride do
     it "should accept group sets" do
       @category = group_category
       @override.assignment.group_category = @category
-      @override.set = @category.groups.create!
+      @override.set = @category.groups.create!(context: @override.assignment.context)
       @override.should be_valid
     end
 
@@ -198,7 +198,7 @@ describe AssignmentOverride do
     it "should not reject groups in different category than assignment when deleted" do
       @assignment.group_category = group_category
       @category = group_category(name: "bar")
-      @override.set = @category.groups.create
+      @override.set = @category.groups.create!(context: @assignment.context)
       @override.workflow_state = 'deleted'
       @override.should be_valid
     end
@@ -258,7 +258,7 @@ describe AssignmentOverride do
 
     it "should default title to the name of the group" do
       @assignment.group_category = group_category
-      @group = @assignment.group_category.groups.create!
+      @group = @assignment.group_category.groups.create!(context: @assignment.context)
       @group.name = 'Group Test Value'
       @override.set = @group
       @override.title = 'Other Value'

@@ -26,8 +26,7 @@ def attachment_model(opts={})
 end
   
 def valid_attachment_attributes(opts={})
-  @context = opts[:context] || @context
-  @context ||= Course.first || course_model(:reusable => true)
+  @context = opts[:context] || @context || @course || course_model(:reusable => true)
   if opts[:folder]
     folder = opts[:folder]
   else

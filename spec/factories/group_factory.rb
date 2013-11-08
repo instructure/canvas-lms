@@ -22,6 +22,7 @@ end
 
 def valid_group_attributes
   {
-    :name => 'value for name'
+    :name => 'value for name',
+    :context => Account.default
   }
 end

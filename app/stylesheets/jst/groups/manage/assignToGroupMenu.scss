@@ -1,0 +1,23 @@
+.assign-to-groups {
+  a.set-group {
+    display: block;
+  }
+}
+
+.popover-content {
+  overflow: auto;
+  max-height: 400px;
+  .form-search {
+   padding-right: 16px;
+  }
+
+  p {
+    line-height: 20px;
+
+    &.separated {
+      margin-bottom: 10px;
+    }
+  }
+
+}
+

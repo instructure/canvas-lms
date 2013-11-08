@@ -10,7 +10,7 @@
   <% end %>
 <% end %>
 
-<% form_tag course_enroll_users_url(@context), {:id => "enroll_users_form", :class => "form-inline", :style => "display: none;"} do  %>
+<%= form_tag course_enroll_users_url(@context), {:id => "enroll_users_form", :class => "form-inline", :style => "display: none;"} do  %>
   <h2><%= t('headings.add_users', %{Add Course Users}) %></h2>
 
   <div class="add-course-users">

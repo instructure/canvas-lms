@@ -1,0 +1,92 @@
+{{#canvas-modal title="Add Module"}}
+  <div class="test-modal-titlebar">
+    <div class="test-modal-close">
+        {{#linkTo 'modules.index' class="btn btn-mini test2"}}
+          <i class="icon-x"></i>
+        {{/linkTo}}
+    </div>
+    Add Module
+  </div>
+  <form class="form">
+    <div class="test-modal-content">
+      <div class="control-group">
+        <label class="control-label" for="inputEmail">Module name:</label>
+        <div class="controls">
+          <input type="text" autofocus required style="width: 350px">
+        </div>
+      </div>
+      <hr />
+      <div>
+        <div>
+          <strong>Before students can view this module, they must complete:</strong>
+        </div>
+        <div class="muted">
+          <em>No prerequisites defined</em>
+        </div>
+        <div>
+          <small>
+            <a>
+              <i class="icon-add"></i>
+              Add prerequisite
+            </a>
+          </small>
+        </div>
+      </div>
+      <hr />
+      <div>
+        <div>
+          <strong>This module is complete when:</strong>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>For</th>
+              <th style="text-align: left;">users must</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody style="border: 0 none">
+            <tr>
+              <td style="width: 20%;">
+                <select>
+                  <option>First quiz</option>
+                </select>
+              </td>
+              <td style="width: 20%;">
+                <select>
+                  <option>Score at least</option>
+                </select>
+              </td>
+              <td style="white-space: nowrap;">
+                <input type="number" style="width: 20px;" />
+                out of
+                900
+                <a><i class="icon-end"></i></a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div>
+          <small>
+            <a>
+              <i class="icon-add"></i>
+              Add requirement
+            </a>
+          </small>
+        </div>
+
+        <div style="margin-top: 12px;margin-bottom: 12px;">
+          <label class="checkbox">
+            <input type="checkbox" />
+            Students must move through requirements in this module in sequential order
+          </lable>
+        </div>
+      </div>
+    </div>
+    <div class="test-modal-footer">
+      {{#linkTo 'modules.index' class="btn"}}Cancel{{/linkTo}}
+      <button class="btn btn-primary">Add Module</button>
+    </div>
+  </form>
+{{/canvas-modal}}

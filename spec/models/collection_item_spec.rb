@@ -44,7 +44,10 @@ describe 'CollectionItem' do
 
     it "should handle user upvotes on another shard" do
       @shard1.activate { @user1 = user_model }
-      @shard2.activate { @item = collection_item_model(:collection => group_model.collections.create!, :user => user_model) }
+      @shard2.activate do
+        account = Account.create!
+        @item = collection_item_model(:collection => group_model(context: account).collections.create!, :user => user_model)
+      end
       @upvote = CollectionItemUpvote.create!(:user => @user1, :collection_item_data => @item.data)
       @upvote.shard.should == @user1.shard
       @upvote.reload.user.should == @user1
@@ -70,7 +73,10 @@ describe 'CollectionItem' do
 
     it "should handle clones on another shard" do
       @shard1.activate { @user1 = user_model }
-      @shard2.activate { @item1 = collection_item_model(:collection => group_model.collections.create!, :user => user_model) }
+      @shard2.activate do
+        account = Account.create!
+        @item1 = collection_item_model(:collection => group_model(:context => account).collections.create!, :user => user_model)
+      end
       @item2 = @user1.collections.create!.collection_items.create!(:collection_item_data => @item1.data, :user => @user1)
       @item2.shard.should == @user1.shard
       @data = @item1.data.reload

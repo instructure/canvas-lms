@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssessmentRequest do
   describe "workflow" do
-    let(:request) { AssessmentRequest.create! }
+    let(:request) { user; AssessmentRequest.create!(user: @user, asset: @user, assessor_asset: @user, assessor: @user) }
 
     it "defaults to assigned" do
       request.should be_assigned
@@ -42,7 +42,7 @@ describe AssessmentRequest do
       NotificationPolicy.create!(:notification => notification,
         :communication_channel => @user.communication_channel, :frequency => 'immediately')
 
-      request = AssessmentRequest.new(:user => @user)
+      request = AssessmentRequest.new(:user => @user, :asset => @student, :assessor_asset => @student, :assessor => @user)
       request.send_reminder!
 
       request.messages_sent.keys.should include(notification_name)

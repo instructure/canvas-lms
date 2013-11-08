@@ -89,7 +89,7 @@ define [
 
     ##
     # this is for getting the topic 'full view' from the api
-    # see: http://<canvas>/doc/api/discussion_topics.html#method.discussion_topics_api.view
+    # see: https://<canvas>/doc/api/discussion_topics.html#method.discussion_topics_api.view
     fetchEntries: ->
       baseUrl = _.result this, 'url'
       $.get "#{baseUrl}/view", ({unread_entries, forced_entries, participants, view: entries}) =>

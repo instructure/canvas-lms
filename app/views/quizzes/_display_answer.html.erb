@@ -10,6 +10,7 @@
   show_correct_answers = @quiz && @quiz.display_correct_answers?(@current_user, @submission) || (!assessment_results && !user_answer)
   show_correct_answers = false if @quiz.try(:survey?)
   answer_id = hash_get(answer, :id)
+  question_id = hash_get(question, :id)
   selected_answer = user_answer && answer && hash_get(user_answer, :answer_id) == answer_id
   selected_answer = true if user_answer && question_type.answer_type == "matching_answer"
   selected_answer = (hash_get(user_answer, "answer_#{answer[:id]}")  == "1") if user_answer && hash_get(question, :question_type) == "multiple_answers_question"
@@ -35,11 +36,22 @@
   <% if false %>
     <!-- Display skipped -->
   <% else %>
-    <div class="answer answer_for_<%= hash_get(answer, :blank_id) %> <%= "hide_right_arrow" if hide_right_arrow %> <%= 'skipped' if should_skip %> <%= 'wrong_answer' if wrong_answer && show_correct_answers %> <%= 'no_answer' if no_answer %> <%= "selected_answer" if selected_answer %> <%= correct_answer_class %>" id="answer_<%= hash_get(answer, :id, "template") %>" style="<%= hidden unless answer %>" title="<%= t(:selected_answer, "You selected this answer.") if selected_answer %> <%= t(:correct_answer, "This was the correct answer.") if correct_answer && show_correct_answers %>">
+    <div class="answer answer_for_<%= hash_get(answer, :blank_id) %>
+         <%= "hide_right_arrow" if hide_right_arrow %>
+         <%= 'skipped' if should_skip %>
+         <%= 'wrong_answer' if wrong_answer && show_correct_answers %>
+         <%= 'no_answer' if no_answer %>
+         <%= "selected_answer" if selected_answer %> <%= correct_answer_class %>"
+       id="answer_<%= hash_get(answer, :id, "template") %>"
+       style="<%= hidden unless answer %>"
+       <%= answer_title(selected_answer, correct_answer, show_correct_answers) %>>
+
+      <span class='hidden id'><%= answer_id %></span>
+
     <% if !user_answer || question_type.display_answers != "xsingle" %>
     <div class="select_answer answer_type" <%= hidden(true) unless answer_type == "select_answer" %>>
       <% if %w{radio checkbox}.include?(question_type.entry_type) %>
-        <input id="answer-<%= answer_id %>" type="<%= question_type.entry_type %>" <%= 'checked' if selected_answer %> class="question_input" />&nbsp;
+        <input id="answer-<%= answer_id %>" name="question-<%= question_id %>" type="<%= question_type.entry_type %>" <%= 'checked' if selected_answer %> class="question_input" aria-hidden="true" />&nbsp;
       <% end %>
       <label for="answer-<%= answer_id %>">
         <div class="answer_text" <%= hidden(true) if hash_get(answer, :html).present? %>><%= hash_get(answer, :text) %></div>
@@ -109,8 +121,11 @@
     <% end %>
     <div class="numerical_range_answer answer_type" <%= hidden(true) unless number_type == 'equation' %>>
       <span class="answer_equation"><%= hash_get(answer, :answer) || hash_get(answer, :exact) %></span>
-      <span class="margin" style="<%= hidden unless hash_get(question, :answer_tolerance, 0) > 0 %>">
-        <span style="font-size: 0.8em;"><%= t(:plus_or_minus, "+/-") %></span>
+      <span class="margin" style="<%= hidden unless hash_get(question, :answer_tolerance, 0).to_f > 0 %>">
+        <%= t(:margin_of_error, "margin of error") %>
+        <span style="font-size: 0.8em;">
+          <%= t(:plus_or_minus, "+/-") %>
+        </span>
         <span class="answer_tolerance"><%= hash_get(question, :answer_tolerance) %></span>
       </span>
     </div>

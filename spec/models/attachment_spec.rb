@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -86,25 +86,6 @@ describe Attachment do
           @attachment.scribd_mime_type.should be_nil
         end
       end
-    end
-
-    it "should create a ScribdAccount if one isn't present" do
-      scribd_mime_type_model(:extension => 'pdf')
-      course_model
-      @course.scribd_account.should be_nil
-      attachment_obj_with_context(@course, :content_type => 'application/pdf')
-      @attachment.context.should eql(@course)
-      @attachment.context.scribd_account.should be_nil
-      expect {
-        @attachment.save!
-        @attachment.context.scribd_account.should_not be_nil
-        @attachment.context.scribd_account.should be_is_a(ScribdAccount)
-      }.to change(ScribdAccount, :count).by(1)
-    end
-
-    it "should set the attachment.scribd_account to the context scribd_account" do
-      scribdable_attachment_model
-      @attachment.scribd_account.should eql(@attachment.context.scribd_account)
     end
 
   end
@@ -633,7 +614,7 @@ describe Attachment do
       self.use_transactional_fixtures = false
 
       before do
-        attachment_model(:context => Group.create!, :filename => 'test.mp4', :content_type => 'video')
+        attachment_model(:context => Account.default.groups.create!, :filename => 'test.mp4', :content_type => 'video')
       end
 
       after do
@@ -720,6 +701,21 @@ describe Attachment do
       @attachment.file_state = 'available'
       @attachment.save!
     end
+    
+    it "should disassociate but not delete the associated media object" do
+      @attachment.media_entry_id = '0_feedbeef'
+      @attachment.save!
+      
+      media_object = @course.media_objects.build :media_id => '0_feedbeef'
+      media_object.attachment_id = @attachment.id
+      media_object.save!
+      
+      @attachment.destroy
+      
+      media_object.reload
+      media_object.should_not be_deleted
+      media_object.attachment_id.should be_nil
+    end
   end
 
   context "destroy" do
@@ -752,6 +748,23 @@ describe Attachment do
       a.should be_deleted
       @course.attachments.should be_include(a)
       @course.attachments.active.should_not be_include(a)
+    end
+
+    it "should still destroy without error if file data is lost" do
+      a = attachment_model(:uploaded_data => default_uploaded_data)
+      a.stubs(:downloadable?).returns(false)
+      a.destroy
+      a.should be_deleted
+    end
+  end
+
+  context "destroy!" do
+    it "should not delete the s3 object, even here" do
+      s3_storage!
+      a = attachment_model
+      s3object = a.s3object
+      s3object.expects(:delete).never
+      a.destroy!
     end
   end
 
@@ -839,6 +852,27 @@ describe Attachment do
       b.update_attribute(:root_attachment_id, nil)
       new_b = b.clone_for(courseb, nil, :overwrite => true)
       new_b.root_attachment_id.should be_nil
+    end
+
+    it "should maintain namespace across clones" do
+      a = attachment_model(uploaded_data: stub_png_data, content_type: 'image/png')
+      a.root_attachment_id.should be_nil
+      coursea = @course
+      @context = courseb = course
+
+      # emulate the situation where a namespace doesn't match what
+      # infer_namespace now returns
+      a.update_attribute(:namespace, "test_ns")
+
+      b = a.clone_for(courseb, nil, overwrite: true)
+      b.save
+      b.root_attachment.should == a
+      b.namespace.should == "test_ns"
+
+      new_a = b.clone_for(coursea, nil, overwrite: true)
+      new_a.save
+      new_a.should == a
+      new_a.namespace.should == "test_ns"
     end
   end
 
@@ -1380,7 +1414,7 @@ describe Attachment do
     end
 
     it "should not fail if the attachment context does not have participants" do
-      cm = ContentMigration.create!
+      cm = ContentMigration.create!(:context => course)
       attachment_model(:context => cm, :uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
 
       Attachment.where(:id => @attachment).update_all(:need_notify => true)
@@ -1418,6 +1452,107 @@ describe Attachment do
         file = @attachment.open
         file.should be_a(Tempfile)
         file.read.should == "test"
+      end
+    end
+  end
+
+  context "#process_s3_details!" do
+    before do
+      Attachment.stubs(:local_storage?).returns(false)
+      Attachment.stubs(:s3_storage?).returns(true)
+      attachment_model(filename: 'new filename', cached_scribd_thumbnail: "THUMBNAIL_URL")
+      @attachment.stubs(:s3object).returns(mock('s3object'))
+      @attachment.stubs(:after_attachment_saved)
+    end
+
+    context "deduplication" do
+      before do
+        attachment = @attachment
+        @existing_attachment = attachment_model(filename: 'existing filename', cached_scribd_thumbnail: "THUMBNAIL_URL")
+        @child_attachment = attachment_model(root_attachment: @existing_attachment, cached_scribd_thumbnail: "THUMBNAIL_URL")
+        @attachment = attachment
+
+        @existing_attachment.stubs(:s3object).returns(mock('existing_s3object'))
+        @attachment.stubs(:find_existing_attachment_for_md5).returns(@existing_attachment)
+      end
+
+      context "existing attachment has s3object" do
+        before do
+          @existing_attachment.s3object.stubs(:exists?).returns(true)
+          @attachment.s3object.stubs(:delete)
+        end
+
+        it "should delete the new (redundant) s3object" do
+          @attachment.s3object.expects(:delete).once
+          @attachment.process_s3_details!({})
+        end
+
+        it "should put the new attachment under the existing attachment" do
+          @attachment.process_s3_details!({})
+          @attachment.reload.root_attachment.should == @existing_attachment
+        end
+
+        it "should retire the new attachment's filename" do
+          @attachment.process_s3_details!({})
+          @attachment.reload.filename.should == @existing_attachment.filename
+        end
+
+        it "should retire the new attachment's cached_scribd_thumbnail" do
+          @attachment.process_s3_details!({})
+          @attachment.reload.cached_scribd_thumbnail.should be_nil
+        end
+      end
+
+      context "existing attachment is missing s3object" do
+        before do
+          @existing_attachment.s3object.stubs(:exists?).returns(false)
+        end
+
+        it "should not delete the new s3object" do
+          @attachment.s3object.expects(:delete).never
+          @attachment.process_s3_details!({})
+        end
+
+        it "should not put the new attachment under the existing attachment" do
+          @attachment.process_s3_details!({})
+          @attachment.reload.root_attachment.should be_nil
+        end
+
+        it "should not retire the new attachment's filename" do
+          @attachment.process_s3_details!({})
+          @attachment.reload.filename == 'new filename'
+        end
+
+        it "should not retire the new attachment's cached_scribd_thumbnail" do
+          @attachment.process_s3_details!({})
+          @attachment.reload.cached_scribd_thumbnail == 'scribd url'
+        end
+
+        it "should put the existing attachment under the new attachment" do
+          @attachment.process_s3_details!({})
+          @existing_attachment.reload.root_attachment.should == @attachment
+        end
+
+        it "should retire the existing attachment's filename" do
+          @attachment.process_s3_details!({})
+          @existing_attachment.reload.read_attribute(:filename).should be_nil
+          @existing_attachment.filename.should == @attachment.filename
+        end
+
+        it "should retire the existing attachment's cached_scribd_thumbnail" do
+          @attachment.process_s3_details!({})
+          @existing_attachment.reload.cached_scribd_thumbnail.should be_nil
+        end
+
+        it "should reparent the child attachment under the new attachment" do
+          @attachment.process_s3_details!({})
+          @child_attachment.reload.root_attachment.should == @attachment
+        end
+
+        it "should retire the child attachment's cached_scribd_thumbnail" do
+          @attachment.process_s3_details!({})
+          @child_attachment.reload.cached_scribd_thumbnail.should be_nil
+        end
       end
     end
   end

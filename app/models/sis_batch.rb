@@ -28,6 +28,8 @@ class SisBatch < ActiveRecord::Base
 
   before_save :limit_size_of_messages
 
+  validates_presence_of :account_id, :workflow_state
+
   attr_accessor :zip_path
   attr_accessible :batch_mode, :batch_mode_term
 
@@ -83,13 +85,25 @@ class SisBatch < ActiveRecord::Base
   end
 
   def process
-    process_delay = Setting.get_cached('sis_batch_process_start_delay', '0').to_f
-    job_args = { :singleton => "sis_batch:account:#{Shard.birth.activate { self.account_id }}", :priority => Delayed::LOW_PRIORITY }
+    process_delay = Setting.get('sis_batch_process_start_delay', '0').to_f
+    job_args = { :singleton => "sis_batch:account:#{Shard.birth.activate { self.account_id }}",
+                 :priority => Delayed::LOW_PRIORITY,
+                 :max_attempts => 1 }
     if process_delay > 0
       job_args[:run_at] = process_delay.seconds.from_now
     end
 
-    SisBatch.send_later_enqueue_args(:process_all_for_account, job_args, self.account)
+    work = SisBatch::Work.new(SisBatch, :process_all_for_account, [self.account])
+    Delayed::Job.enqueue(work, job_args)
+  end
+
+  class Work < Delayed::PerformableMethod
+    def on_permanent_failure(error)
+      account = args.first
+      account.sis_batches.importing.each do |batch|
+        batch.finish(false)
+      end
+    end
   end
 
   # this method name is to stay backwards compatible with existing jobs when we deploy
@@ -119,6 +133,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   scope :needs_processing, where(:workflow_state => 'created').order(:created_at)
+  scope :importing, where(:workflow_state => 'importing')
 
   def self.process_all_for_account(account)
     loop do
@@ -187,7 +202,7 @@ class SisBatch < ActiveRecord::Base
     if data[:supplied_batches].include?(:section)
       # delete sections who weren't in this batch, whose course was in the selected term
       scope = CourseSection.where("course_sections.workflow_state='active' AND course_sections.root_account_id=? AND course_sections.sis_batch_id IS NOT NULL AND course_sections.sis_batch_id<>?", self.account, self)
-      if Rails.version < '3.0'
+      if CANVAS_RAILS2
         scope = scope.scoped(:joins => "INNER JOIN courses ON courses.id=COALESCE(nonxlist_course_id, course_id)", :select => "course_sections.*")
       else
         scope = scope.joins("INNER JOIN courses ON courses.id=COALESCE(nonxlist_course_id, course_id)").select("course_sections.*")
@@ -200,15 +215,26 @@ class SisBatch < ActiveRecord::Base
 
     if data[:supplied_batches].include?(:enrollment)
       # delete enrollments for courses that weren't in this batch, in the selected term
-      scope = Enrollment.active.joins(:course).select("enrollments.*").where("courses.root_account_id=? AND enrollments.sis_batch_id IS NOT NULL AND enrollments.sis_batch_id<>?", self.account, self)
-      scope = scope.where(:courses =>  { :enrollment_term_id => self.batch_mode_term })
+
+      if CANVAS_RAILS2
+        scope = Enrollment.active.scoped(joins: :course, select: "enrollments.*")
+      else
+        scope = Enrollment.active.joins(:course).select("enrollments.*")
+      end
+
+      params = {root_account: self.account, batch: self, term: self.batch_mode_term}
+      scope = scope.where("courses.root_account_id=:root_account
+                           AND enrollments.sis_batch_id IS NOT NULL
+                           AND enrollments.sis_batch_id<>:batch
+                           AND courses.enrollment_term_id=:term", params)
+
       scope.find_each do |enrollment|
         enrollment.destroy
       end
     end
   end
 
-  def api_json
+  def as_json(options={})
     data = {
       "created_at" => self.created_at,
       "ended_at" => self.ended_at,
@@ -220,7 +246,7 @@ class SisBatch < ActiveRecord::Base
     }
     data["processing_errors"] = self.processing_errors if self.processing_errors.present?
     data["processing_warnings"] = self.processing_warnings if self.processing_warnings.present?
-    return data.to_json
+    data
   end
 
   private
@@ -230,7 +256,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def self.max_messages
-    Setting.get_cached('sis_batch_max_messages', '1000').to_i
+    Setting.get('sis_batch_max_messages', '1000').to_i
   end
 
   def limit_size_of_messages

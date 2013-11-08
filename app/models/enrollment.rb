@@ -29,14 +29,14 @@ class Enrollment < ActiveRecord::Base
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
 
-  validates_presence_of :user_id, :course_id
+  validates_presence_of :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state
   validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
   validates_inclusion_of :associated_user_id, :in => [nil],
                          :unless => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' },
                          :message => "only ObserverEnrollments may have an associated_user_id"
 
   before_save :assign_uuid
-  before_save :assert_section
+  before_validation :assert_section
   after_save :update_user_account_associations_if_necessary
   before_save :audit_groups_for_deleted_enrollments
   before_validation :infer_privileges
@@ -108,6 +108,7 @@ class Enrollment < ActiveRecord::Base
     p.dispatch :enrollment_invitation
     p.to { self.user }
     p.whenever { |record|
+      !record.self_enrolled and
       record.course and
       record.user.registered? and
       ((record.just_created && record.invited?) || record.changed_state(:invited) || @re_send_confirmation)
@@ -116,6 +117,7 @@ class Enrollment < ActiveRecord::Base
     p.dispatch :enrollment_registration
     p.to { self.user.communication_channel }
     p.whenever { |record|
+      !record.self_enrolled and
       record.course and
       !record.user.registered? and
       ((record.just_created && record.invited?) || record.changed_state(:invited) || @re_send_confirmation)
@@ -124,6 +126,7 @@ class Enrollment < ActiveRecord::Base
     p.dispatch :enrollment_notification
     p.to { self.user }
     p.whenever { |record|
+      !record.self_enrolled and
       record.course &&
       !record.course.created? &&
       record.just_created && record.active?
@@ -246,6 +249,11 @@ class Enrollment < ActiveRecord::Base
     types_with_indefinite_article[type] || types_with_indefinite_article['StudentEnrollment']
   end
 
+  def reload(options = nil)
+    @enrollment_dates = nil
+    super
+  end
+
   def should_update_user_account_association?
     self.new_record? || self.course_id_changed? || self.course_section_id_changed? || self.root_account_id_changed?
   end
@@ -344,9 +352,7 @@ class Enrollment < ActiveRecord::Base
 
   def update_cached_due_dates
     if workflow_state_changed? && course
-      course.assignments.each do |assignment|
-        DueDateCacher.recompute(assignment)
-      end
+      DueDateCacher.recompute_course(course)
     end
   end
 
@@ -435,8 +441,8 @@ class Enrollment < ActiveRecord::Base
   end
 
   def assert_section
-    self.course_section ||= self.course.default_section if self.course
-    self.root_account_id = self.course.root_account_id rescue nil
+    self.course_section = self.course.default_section if !self.course_section_id && self.course
+    self.root_account_id ||= self.course.root_account_id rescue nil
   end
 
   def infer_privileges
@@ -543,7 +549,8 @@ class Enrollment < ActiveRecord::Base
   end
 
   def enrollment_dates
-    Canvas::Builders::EnrollmentDateBuilder.build(self)
+    Canvas::Builders::EnrollmentDateBuilder.preload([self]) unless @enrollment_dates
+    @enrollment_dates
   end
 
   def state_based_on_date
@@ -561,8 +568,8 @@ class Enrollment < ActiveRecord::Base
     return state unless global_start_at = ranges.map(&:compact).map(&:min).compact.min
     if global_start_at < now
       :completed
-    # Allow student view students to use the course before the term starts
-    elsif self.fake_student? || (state == :invited && !self.root_account.settings[:restrict_student_future_view])
+    # Allow admins and student view students to use the course before the term starts
+    elsif self.admin? || self.fake_student? || (state == :invited && !self.root_account.settings[:restrict_student_future_view])
       state
     else
       :inactive
@@ -770,7 +777,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def self.recompute_final_score_if_stale(course, user=nil)
-    Rails.cache.fetch(['recompute_final_scores', course.id, user].cache_key, :expires_in => Setting.get_cached('recompute_grades_window', 600).to_i.seconds) do
+    Rails.cache.fetch(['recompute_final_scores', course.id, user].cache_key, :expires_in => Setting.get('recompute_grades_window', 600).to_i.seconds) do
       recompute_final_score user ? user.id : course.student_enrollments.map(&:user_id), course.id
       yield if block_given?
       true
@@ -872,7 +879,7 @@ class Enrollment < ActiveRecord::Base
   scope :currently_online, joins(:pseudonyms).where("pseudonyms.last_request_at>?", 5.minutes.ago)
   # this returns enrollments for creation_pending users; should always be used in conjunction with the invited scope
   scope :for_email, lambda { |email|
-    if Rails.version < '3.0'
+    if CANVAS_RAILS2
       {
         :joins => { :user => :communication_channels },
         :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=LOWER(?)", email],
@@ -1051,7 +1058,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def record_recent_activity_threshold
-    Setting.get_cached('enrollment_last_activity_at_threshold', 10.minutes).to_i
+    Setting.get('enrollment_last_activity_at_threshold', 10.minutes).to_i
   end
 
   def record_recent_activity_worthwhile?(as_of, threshold)

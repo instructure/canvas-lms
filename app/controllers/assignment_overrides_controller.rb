@@ -29,40 +29,40 @@
 #       // release.
 #
 #       // the ID of the assignment override
-#       id: 4,
+#       "id": 4,
 #
 #       // the ID of the assignment the override applies to
-#       assignment_id: 123,
+#       "assignment_id": 123,
 #
 #       // the IDs of the override's target students (present if the override
 #       // targets an adhoc set of students)
-#       student_ids: [1, 2, 3],
+#       "student_ids": [1, 2, 3],
 #
 #       // the ID of the override's target group (present if the override
 #       // targets a group and the assignment is a group assignment)
-#       group_id: 2,
+#       "group_id": 2,
 #
 #       // the ID of the overrides's target section (present if the override
 #       // targets a section)
-#       course_section_id: 1
+#       "course_section_id": 1,
 #
 #       // the title of the override
-#       title: "an assignment override",
+#       "title": "an assignment override",
 #
 #       // the overridden due at (present if due_at is overridden)
-#       due_at: "2012-07-01T23:59:00-06:00",
+#       "due_at": "2012-07-01T23:59:00-06:00",
 #
 #       // the overridden all day flag (present if due_at is overridden)
-#       all_day: true,
+#       "all_day": true,
 #
 #       // the overridden all day date (present if due_at is overridden)
-#       all_day_date: "2012-07-01",
+#       "all_day_date": "2012-07-01",
 #
 #       // the overridden unlock at (present if unlock_at is overridden)
-#       unlock_at: "2012-07-01T23:59:00-06:00",
+#       "unlock_at": "2012-07-01T23:59:00-06:00",
 #
 #       // the overridden lock at, if any (present if lock_at is overridden)
-#       lock_at: "2012-07-01T23:59:00-06:00"
+#       "lock_at": "2012-07-01T23:59:00-06:00"
 #     }
 #
 class AssignmentOverridesController < ApplicationController
@@ -153,19 +153,19 @@ class AssignmentOverridesController < ApplicationController
   #   section of the assignment's course not already targetted by a different
   #   override.
   #
-  # @argument assignment_override[due_at] [Timestamp, Optional] The day/time
+  # @argument assignment_override[due_at] [Optional, Timestamp] The day/time
   #   the overridden assignment is due. Accepts times in ISO 8601 format, e.g.
   #   2011-10-21T18:48Z. If absent, this override will not affect due date. May
   #   be present but null to indicate the override removes any previous due
   #   date.
   #
-  # @argument assignment_override[unlock_at] [Timestamp, Optional] The day/time
+  # @argument assignment_override[unlock_at] [Optional, Timestamp] The day/time
   #   the overridden assignment becomes unlocked. Accepts times in ISO 8601
   #   format, e.g. 2011-10-21T18:48Z. If absent, this override will not affect
   #   the unlock date. May be present but null to indicate the override removes
   #   any previous unlock date.
   #
-  # @argument assignment_override[lock_at] [Timestamp, Optional] The day/time
+  # @argument assignment_override[lock_at] [Optional, Timestamp] The day/time
   #   the overridden assignment becomes locked. Accepts times in ISO 8601
   #   format, e.g. 2011-10-21T18:48Z. If absent, this override will not affect
   #   the lock date. May be present but null to indicate the override removes
@@ -180,7 +180,7 @@ class AssignmentOverridesController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/1/assignments/2/overrides.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/overrides.json' \
   #        -X POST \ 
   #        -F 'assignment_override[student_ids][]=8' \ 
   #        -F 'assignment_override[title]=Fred Flinstone' \ 
@@ -194,7 +194,7 @@ class AssignmentOverridesController < ApplicationController
     return bad_request(:errors => errors) if errors
 
     if update_assignment_override(@override, data)
-      render :json => assignment_override_json(@override).to_json, :status => 201
+      render :json => assignment_override_json(@override), :status => 201
     else
       bad_request(@override.errors)
     end
@@ -203,28 +203,28 @@ class AssignmentOverridesController < ApplicationController
   # @API Update an assignment override
   # @beta
   #
-  # @argument assignment_override[student_ids] [[Integer], Optional] The IDs of the
+  # @argument assignment_override[student_ids][] [Optional, Integer] The IDs of the
   #   override's target students. If present, the IDs must each identify a
   #   user with an active student enrollment in the course that is not already
   #   targetted by a different adhoc override. Ignored unless the override
   #   being updated is adhoc.
   #
-  # @argument assignment_override[title] [Optional] The title of an adhoc
+  # @argument assignment_override[title] [Optional, String] The title of an adhoc
   #   assignment override. Ignored unless the override being updated is adhoc.
   #
-  # @argument assignment_override[due_at] [Timestamp, Optional] The day/time
+  # @argument assignment_override[due_at] [Optional, Timestamp] The day/time
   #   the overridden assignment is due. Accepts times in ISO 8601 format, e.g.
   #   2011-10-21T18:48Z. If absent, this override will not affect due date. May
   #   be present but null to indicate the override removes any previous due
   #   date.
   #
-  # @argument assignment_override[unlock_at] [Timestamp, Optional] The day/time
+  # @argument assignment_override[unlock_at] [Optional, Timestamp] The day/time
   #   the overridden assignment becomes unlocked. Accepts times in ISO 8601
   #   format, e.g. 2011-10-21T18:48Z. If absent, this override will not affect
   #   the unlock date. May be present but null to indicate the override removes
   #   any previous unlock date.
   #
-  # @argument assignment_override[lock_at] [Timestamp, Optional] The day/time
+  # @argument assignment_override[lock_at] [Optional, Timestamp] The day/time
   #   the overridden assignment becomes locked. Accepts times in ISO 8601
   #   format, e.g. 2011-10-21T18:48Z. If absent, this override will not affect
   #   the lock date. May be present but null to indicate the override removes
@@ -240,7 +240,7 @@ class AssignmentOverridesController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/1/assignments/2/overrides/3.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/overrides/3.json' \
   #        -X PUT \ 
   #        -F 'assignment_override[title]=Fred Flinstone' \ 
   #        -F 'assignment_override[due_at]=2012-10-08T21:00:00Z' \ 
@@ -251,7 +251,7 @@ class AssignmentOverridesController < ApplicationController
     return bad_request(:errors => errors) if errors
 
     if update_assignment_override(@override, data)
-      render :json => assignment_override_json(@override).to_json
+      render :json => assignment_override_json(@override)
     else
       bad_request(@override.errors)
     end
@@ -266,7 +266,7 @@ class AssignmentOverridesController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/1/assignments/2/overrides/3.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/overrides/3.json' \
   #        -X DELETE \ 
   #        -H "Authorization: Bearer <token>"
   def destroy
@@ -309,7 +309,7 @@ class AssignmentOverridesController < ApplicationController
   end
 
   def bad_request(errors)
-    render :json => errors.to_json, :status => :bad_request
+    render :json => errors, :status => :bad_request
   end
 
   # @!appendix Group assignments

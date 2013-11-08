@@ -1,6 +1,14 @@
-<div id="summary_quiz_{{id}}" class="ig-row {{#if publishable}}ig-publishable{{/if}}
-                                            {{#if published}}ig-published{{/if}}
-                                            {{#if can_update}}ig-editable{{/if}}">
+<div id="summary_quiz_{{id}}"
+  {{#if can_update}}
+    class="
+    ig-row
+    {{#if publishable}}ig-publishable{{/if}}
+    {{#if published}}ig-published{{/if}}
+    ig-editable"
+  {{else}}
+    class="ig-row"
+  {{/if}}
+>
   <a href="{{url}}" class="ig-title ellipses">
     <i class="icon-quiz"></i> {{title_label}}
   </a>
@@ -32,7 +40,7 @@
   <div class="ig-admin">
     <span data-view="publish-icon" class="publish-icon"></span>
 
-    <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="ui-id-{{id}}-1" tabindex="-1">
+    <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="ui-id-{{id}}-1" href="#">
       <i class="icon-settings"></i>
       <i class="icon-mini-arrow-down"></i>
       <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>

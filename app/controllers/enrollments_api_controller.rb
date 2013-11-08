@@ -45,14 +45,20 @@ class EnrollmentsApiController < ApplicationController
   # note: Currently, only an admin user can return other users' enrollments. A
   # user can, however, return his/her own enrollments.
   #
-  # @argument type[] A list of enrollment types to return. Accepted values are 'StudentEnrollment', 'TeacherEnrollment',
-  #   'TaEnrollment', 'DesignerEnrollment', and 'ObserverEnrollment.' If omitted, all enrollment types are returned.
-  #   This argument is ignored if `role` is given.
-  # @argument role[] A list of enrollment roles to return. Accepted values include course-level roles created by the
-  #   {api:RoleOverridesController#add_role Add Role API} as well as the base enrollment types accepted by the `type`
-  #   argument above.
-  # @argument state[] Filter by enrollment state. Accepted values are 'active', 'invited', and 'creation_pending',
-  #   'deleted', 'rejected', 'completed', and 'inactive'. If omitted, 'active' and 'invited' enrollments are returned.
+  # @argument type[] [String]
+  #   A list of enrollment types to return. Accepted values are
+  #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment',
+  #   'DesignerEnrollment', and 'ObserverEnrollment.' If omitted, all enrollment
+  #   types are returned. This argument is ignored if `role` is given.
+  #
+  # @argument role[] [String]
+  #   A list of enrollment roles to return. Accepted values include course-level
+  #   roles created by the {api:RoleOverridesController#add_role Add Role API}
+  #   as well as the base enrollment types accepted by the `type` argument above.
+  #
+  # @argument state[] [String, "active"|"invited"|"creation_pending"|"deleted"|"rejected"|"completed"|"inactive"]
+  #   Filter by enrollment state. If omitted, 'active' and 'invited' enrollments
+  #   are returned.
   #
   # @response_field id The unique id of the enrollment.
   # @response_field course_id The unique id of the course.
@@ -141,15 +147,14 @@ class EnrollmentsApiController < ApplicationController
   #   ]
   def index
     endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
-    scope_arguments = {
-      :conditions => enrollment_index_conditions,
-      :order => 'enrollments.type ASC, users.sortable_name ASC',
-      :include => [:user, :course, :course_section]
-    }
 
     return unless enrollments = @context.is_a?(Course) ?
-      course_index_enrollments(scope_arguments) :
-      user_index_enrollments(scope_arguments)
+      course_index_enrollments :
+      user_index_enrollments
+
+    enrollments = enrollments.
+      includes(:user, :course, :course_section).
+      order("enrollments.type, #{User.sortable_name_order_by_clause("users")}")
 
     enrollments = Api.paginate(
       enrollments,
@@ -163,13 +168,33 @@ class EnrollmentsApiController < ApplicationController
   # @API Enroll a user
   # Create a new user enrollment for a course or section.
   #
-  # @argument enrollment[user_id] [String] The ID of the user to be enrolled in the course.
-  # @argument enrollment[type] [String] [StudentEnrollment|TeacherEnrollment|TaEnrollment|ObserverEnrollment|DesignerEnrollment] Enroll the user as a student, teacher, TA, observer, or designer. If no value is given, the type will be inferred by enrollment[role] if supplied, otherwise 'StudentEnrollment' will be used.
-  # @argument enrollment[role] [String] [Optional] Assigns a custom course-level role to the user.
-  # @argument enrollment[enrollment_state] [String] [Optional, active|invited] [String] If set to 'active,' student will be immediately enrolled in the course. Otherwise they will be required to accept a course invitation. Default is 'invited.'
-  # @argument enrollment[course_section_id] [Integer] [Optional] The ID of the course section to enroll the student in. If the section-specific URL is used, this argument is redundant and will be ignored
-  # @argument enrollment[limit_privileges_to_course_section] [Boolean] [Optional] If a teacher or TA enrollment, teacher/TA will be restricted to the section given by course_section_id.
-  # @argument enrollment[notify] [Boolean] [Optional] If false (0 or "false"), a notification will not be sent to the enrolled user. Notifications are sent by default.
+  # @argument enrollment[user_id] [String]
+  #   The ID of the user to be enrolled in the course.
+  #
+  # @argument enrollment[type] [String, "StudentEnrollment"|"TeacherEnrollment"|"TaEnrollment"|"ObserverEnrollment"|"DesignerEnrollment"]
+  #   Enroll the user as a student, teacher, TA, observer, or designer. If no
+  #   value is given, the type will be inferred by enrollment[role] if supplied,
+  #   otherwise 'StudentEnrollment' will be used.
+  #
+  # @argument enrollment[role] [Optional, String]
+  #   Assigns a custom course-level role to the user.
+  #
+  # @argument enrollment[enrollment_state] [Optional, String, "active"|"invited"]
+  #   If set to 'active,' student will be immediately enrolled in the course.
+  #   Otherwise they will be required to accept a course invitation. Default is
+  #   'invited.'
+  # @argument enrollment[course_section_id] [Optional, Integer]
+  #   The ID of the course section to enroll the student in. If the
+  #   section-specific URL is used, this argument is redundant and will be
+  #   ignored.
+  #
+  # @argument enrollment[limit_privileges_to_course_section] [Optional, Boolean]
+  #   If a teacher or TA enrollment, teacher/TA will be restricted to the
+  #   section given by course_section_id.
+  #
+  # @argument enrollment[notify] [Optional, Boolean]
+  #   If false, a notification will not be sent to the enrolled user.
+  #   Notifications are sent by default.
   def create
     # error handling
     errors = []
@@ -226,14 +251,15 @@ class EnrollmentsApiController < ApplicationController
     user = api_find(User, params[:enrollment].delete(:user_id))
     @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
     @enrollment.valid? ?
-      render(:json => enrollment_json(@enrollment, @current_user, session).to_json) :
-      render(:json => @enrollment.errors.to_json)
+      render(:json => enrollment_json(@enrollment, @current_user, session)) :
+      render(:json => @enrollment.errors)
   end
 
   # @API Conclude an enrollment
   # Delete or conclude an enrollment.
   #
-  # @argument task [conclude|delete] [String] The action to take on the enrollment.
+  # @argument task [String, "conclude"|"delete"]
+  #   The action to take on the enrollment.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/enrollments/:enrollment_id \ 
@@ -267,7 +293,7 @@ class EnrollmentsApiController < ApplicationController
     if @enrollment.send(task)
       render :json => enrollment_json(@enrollment, @current_user, session)
     else
-      render :json => @enrollment.errors.to_json, :status => :bad_request
+      render :json => @enrollment.errors, :status => :bad_request
     end
   end
 
@@ -275,13 +301,10 @@ class EnrollmentsApiController < ApplicationController
   # Internal: Collect course enrollments that @current_user has permissions to
   # read.
   #
-  # scope_arguments - A hash to be passed as :conditions to an AR scope.
-  #                   Allowed keys are any keys allowed in :conditions.
-  #
   # Returns an ActiveRecord scope of enrollments on success, false on failure.
-  def course_index_enrollments(scope_arguments)
+  def course_index_enrollments
     if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
-      scope = @context.enrollments_visible_to(@current_user, :type => :all, :include_priors => true).scoped(scope_arguments)
+      scope = @context.enrollments_visible_to(@current_user, :type => :all, :include_priors => true).where(enrollment_index_conditions)
       unless params[:state].present?
         scope = scope.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')")
       end
@@ -294,45 +317,40 @@ class EnrollmentsApiController < ApplicationController
   # Internal: Collect user enrollments that @current_user has permissions to
   # read.
   #
-  # scope_arguments - A hash to be passed as :conditions to an AR scope.
-  #                   Allowed keys are any keys allowed in :conditions.
-  #
   # Returns an ActiveRecord scope of enrollments on success, false on failure.
-  def user_index_enrollments(scope_arguments)
+  def user_index_enrollments
     user = api_find(User, params[:user_id])
 
-    # if user is requesting for themselves, just return all of their
-    # enrollments without any extra checking.
     if user == @current_user
-      enrollments = if params[:state].present?
-                      user.enrollments.scoped(scope_arguments.merge(
-                        :conditions => enrollment_index_conditions(true)))
-                    else
-                      user.current_and_invited_enrollments.scoped(scope_arguments)
-                    end
+      # if user is requesting for themselves, just return all of their
+      # enrollments without any extra checking.
+      if params[:state].present?
+        enrollments = user.enrollments.where(enrollment_index_conditions(true))
+      else
+        enrollments = user.current_and_invited_enrollments.where(enrollment_index_conditions)
+      end
+    else
+      # otherwise check for read_roster rights on all of the requested
+      # user's accounts
+      approved_accounts = user.associated_root_accounts.inject([]) do |accounts, ra|
+        accounts << ra.id if ra.grants_right?(@current_user, session, :read_roster)
+        accounts
+      end
 
-      return enrollments
+      # if there aren't any ids in approved_accounts, then the user doesn't have
+      # permissions.
+      render_unauthorized_action(@user) and return false if approved_accounts.empty?
+
+      enrollments = user.enrollments.where(enrollment_index_conditions).
+        where(root_account_id: approved_accounts)
+
+      # by default, return active and invited courses. don't use the existing
+      # current_and_invited_enrollments scope because it won't return enrollments
+      # on unpublished courses.
+      enrollments = enrollments.where(workflow_state: %w{active invited}) unless params[:state].present?
     end
 
-    # otherwise check for read_roster rights on all of the requested
-    # user's accounts
-    approved_accounts = user.associated_root_accounts.inject([]) do |accounts, ra|
-      accounts << ra.id if ra.grants_right?(@current_user, session, :read_roster)
-      accounts
-    end
-
-    # if there aren't any ids in approved_accounts, then the user doesn't have
-    # permissions.
-    render_unauthorized_action(@user) and return false if approved_accounts.empty?
-
-    additional_conditions = { 'enrollments.root_account_id' => approved_accounts }
-
-    # by default, return active and invited courses. don't use the existing
-    # current_and_invited_enrollments scope because it won't return enrollments
-    # on unpublished courses.
-    additional_conditions.merge!({:workflow_state => %w{active invited}}) unless params[:state].present?
-
-    user.enrollments.scoped(scope_arguments).where(additional_conditions)
+    enrollments
   end
 
   # Internal: Collect type, section, state, and role info from params and format them

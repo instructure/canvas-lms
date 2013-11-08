@@ -122,4 +122,4 @@ define [
     # @api private
     # Convert an option label to the displayed selectmenu item.
     _formatOption: (label) =>
-      "<span class='ui-selectmenu-item'>#{label}</span>"
+      "<span class='ui-selectmenu-item'>#{htmlEscape label}</span>"

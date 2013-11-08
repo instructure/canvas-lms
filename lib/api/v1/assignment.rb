@@ -50,7 +50,11 @@ module Api::V1::Assignment
   }
 
   def assignment_json(assignment, user, session, opts = {})
-    opts.reverse_merge! include_discussion_topic: true, override_dates: true
+    opts.reverse_merge!(
+      include_discussion_topic: true,
+      include_all_dates: false,
+      override_dates: true
+    )
 
     if opts[:override_dates] && !assignment.new_record?
       assignment = assignment.overridden_for(user)
@@ -149,9 +153,24 @@ module Api::V1::Assignment
         !:include_assignment)
     end
 
+    if opts[:include_all_dates] && assignment.assignment_overrides
+      hash['all_dates'] = assignment.dates_hash_visible_to(user)
+    end
+
+    if opts[:include_module_ids]
+      thing_in_module = case assignment.submission_types
+                        when "online_quiz" then assignment.quiz
+                        when "discussion_topic" then assignment.discussion_topic
+                        else assignment
+                        end
+      module_ids = thing_in_module.context_module_tags.map &:context_module_id
+      hash['module_ids'] = module_ids
+    end
+
     #show published/unpublished if account.settings[:enable_draft]
     if @domain_root_account.enable_draft?
       hash['published'] = ! assignment.unpublished?
+      hash['unpublishable'] = !assignment.has_student_submissions?
     end
 
     if submission = opts[:submission]

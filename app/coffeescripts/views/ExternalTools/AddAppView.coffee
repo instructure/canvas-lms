@@ -18,19 +18,20 @@ define [
       @app = @options.app
 
       @model.set 'name', @app.get('name')
-      @model.set 'config_url', @app.get('config_url')
+      @model.set 'config_url', @app.get('config_xml_url')
       @model.set 'description', @app.get('description')
       @model.set('config_type', 'by_url')
 
       @model.on 'error', @onSaveFail, this
+      @model.on 'sync', @onSaveSuccess, this
 
       @configOptions = @app.get('config_options') || []
 
-      if @app.get('any_key')
+      if @app.get('requires_secret')
+        @configOptions = @keySecretConfigOptions().concat @configOptions
+      else
         @model.set 'consumer_key', 'N/A'
         @model.set 'shared_secret', 'N/A'
-      else
-        @configOptions = @keySecretConfigOptions().concat @configOptions
 
     afterRender: ->
       @$el.dialog
@@ -49,15 +50,18 @@ define [
       @$el.submit (e) =>
         @submit()
         return false
+
+      if @configOptions.length == 0 && !@app.get('is_installed')
+        @submit()
       this
 
     toJSON: =>
       json = super
-      json.anyKey = @app.get('any_key')
+      json.requiresSecret = @app.get('requires_secret')
       json.configOptions = []
       _.each @configOptions, (option) ->
-        option.isCheckbox = true if option.type is 'checkbox'
-        option.isText = true if option.type is 'text'
+        option.isCheckbox = true if option.param_type is 'checkbox'
+        option.isText = true if option.param_type is 'text'
         json.configOptions.push option
       json
 
@@ -67,8 +71,8 @@ define [
         @model.set 'name', formData['canvas_app_name'] if formData['canvas_app_name']
         @model.set 'consumer_key', formData['consumer_key'] if formData['consumer_key']
         @model.set 'shared_secret', formData['shared_secret'] if formData['shared_secret']
-        disablingDfd = new $.Deferred()
         @updateConfigUrl(formData)
+        disablingDfd = new $.Deferred()
         @model.save
           error: ->
             disablingDfd.reject()
@@ -87,7 +91,7 @@ define [
 
     validate: (formData) ->
       @removeErrors()
-      errors = (option for option in @configOptions when !formData[option['name']] && option['required'])
+      errors = (option for option in @configOptions when !formData[option['name']] && option['is_required'])
       @addError "input[name='#{error['name']}']", 'Required' for error in errors
       errors.length == 0
 
@@ -108,19 +112,23 @@ define [
       message = I18n.t 'generic_error', 'There was an error in processing your request'
       @$el.prepend("<div class='alert alert-error'>#{message}</span>")
 
+    onSaveSuccess: (model) =>
+      @app.set('is_installed', true)
+      model.off 'sync', @onSaveSuccess
+
     keySecretConfigOptions: ->
       [
         {
-          type: 'text'
+          param_type: 'text'
           name: 'consumer_key'
           description: I18n.t 'consumer_key', 'Consumer Key'
-          required: true
+          is_required: true
         },
         {
-          type: 'text'
+          param_type: 'text'
           name: 'shared_secret'
           description: I18n.t 'shared_secret', 'Shared Secret'
-          required: true
+          is_required: true
         }
       ]
 

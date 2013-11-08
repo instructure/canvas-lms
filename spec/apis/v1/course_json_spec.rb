@@ -197,6 +197,21 @@ module Api
           hash.should == {}
         end
       end
+
+      describe '#permissions' do
+        let(:course) { stub(:public_description => 'an eloquent anecdote' ) }
+
+        it 'returns the permissions when its configured for inclusion' do
+          includes << :permissions
+          course_json.include_permissions.should be_true
+          course_json.permissions_to_include.should == [ :create_discussion_topic ]
+        end
+
+        it 'is nil when configured not to be included' do
+          includes.clear
+          course_json.permissions_to_include.should be_nil
+        end
+      end
     end
   end
 end

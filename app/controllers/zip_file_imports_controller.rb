@@ -27,7 +27,7 @@ class ZipFileImportsController < ApplicationController
   def show
     @import = @context.zip_file_imports.find(params[:id])
     if authorized_action(@import, @current_user, :read)
-      render :json => @import.to_json
+      render :json => @import
     end
   end
 
@@ -48,7 +48,7 @@ class ZipFileImportsController < ApplicationController
       @import.save
       @import.process # happens async
 
-      render :json => @import.to_json
+      render :json => @import
     end
   end
 end

@@ -17,6 +17,7 @@ define([
 
   $(document).ready(function() {
     $("#account_settings").submit(function() {
+      var $this = $(this);
       $(".ip_filter .value").each(function() {
         $(this).removeAttr('name');
       }).filter(":not(.blank)").each(function() {
@@ -25,6 +26,19 @@ define([
           $(this).attr('name', 'account[ip_filters][' + name + ']');
         }
       });
+      var validations = {
+        object_name: 'account',
+        required: ['name'],
+        property_validations: {
+          'name': function(value){
+            if (value && value.length > 255) { return I18n.t("account_name_too_long", "Account Name is too long")}
+          }
+        }
+      };
+      var result = $this.validateForm(validations);
+      if(!result) {
+        return false;
+      }
     });
     $(".datetime_field").datetime_field();
     $("#add_notification_form textarea").editorBox().width('100%');
@@ -91,6 +105,13 @@ define([
       event.preventDefault();
       $("#ip_filters_dialog").dialog({
         title: I18n.t('titles.what_are_quiz_ip_filters', "What are Quiz IP Filters?"),
+        width: 400
+      });
+    });
+    $(".allow_draft_help_link").click(function(event) {
+      event.preventDefault();
+      $("#allow_draft_help_dialog").dialog({
+        title: I18n.t('titles.allow_draft_help_title', "What is Draft State?"),
         width: 400
       });
     });

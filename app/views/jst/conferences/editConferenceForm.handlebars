@@ -42,10 +42,9 @@
     <div class="controls">
       <div class="web_conference_user_settings"></div>
       <label class="checkbox" for="web_conference_long_running">
-        <input name="web_conference[long_running]" type="hidden" value="0">
-        <input id="web_conference_long_running" name="web_conference[long_running]" type="checkbox"
-               value="1" {{#if conferenceData.long_running}}checked{{/if}}
-               {{#if settings.disable_duration_changes}}disabled='disabled'{{/if}}>
+        {{checkbox "web_conference.long_running"
+          checked=conferenceData.long_running
+          disabled=settings.disable_duration_changes}}
         {{#t "long_running"}}No time limit (for long-running conferences){{/t}}
       </label>
     </div>
@@ -58,8 +57,7 @@
   </div>
   <legend>{{#t "members"}}Members{{/t}}</legend>
   <label class="checkbox" for="user_all">
-    <input name="user[all]" type="hidden" value="0">
-    <input class="all_users_checkbox" id="user_all" name="user[all]" type="checkbox" value="1" {{#if inviteAll}}checked{{/if}}>
+    {{checkbox "user.all" class="all_users_checkbox" checked=inviteAll}}
     {{#t "invite_all"}}Invite All Course Members{{/t}}
   </label>
   <div>

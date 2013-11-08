@@ -133,21 +133,21 @@ describe "scheduler" do
       }
       # assert options are checked
       open_edit_dialog
-      f('[name="per_slot_option"]').selected?.should be_true
-      f('[name="participant_visibility"]').selected?.should be_true
-      f('[name="max_appointments_per_participant_option"]').selected?.should be_true
+      f('[type=checkbox][name="per_slot_option"]').selected?.should be_true
+      f('[type=checkbox][name="participant_visibility"]').selected?.should be_true
+      f('[type=checkbox][name="max_appointments_per_participant_option"]').selected?.should be_true
 
       # uncheck the options
-      f('[name="per_slot_option"]').click
-      f('[name="participant_visibility"]').click
-      f('[name="max_appointments_per_participant_option"]').click
+      f('[type=checkbox][name="per_slot_option"]').click
+      f('[type=checkbox][name="participant_visibility"]').click
+      f('[type=checkbox][name="max_appointments_per_participant_option"]').click
       submit_dialog('.ui-dialog-buttonset', '.ui-button')
       wait_for_ajaximations
       # assert options are not checked
       open_edit_dialog
-      f('[name="per_slot_option"]').selected?.should be_false
-      f('[name="participant_visibility"]').selected?.should be_false
-      f('[name="max_appointments_per_participant_option"]').selected?.should be_false
+      f('[type=checkbox][name="per_slot_option"]').selected?.should be_false
+      f('[type=checkbox][name="participant_visibility"]').selected?.should be_false
+      f('[type=checkbox][name="max_appointments_per_participant_option"]').selected?.should be_false
     end
 
     it "should delete an appointment group after clicking appointment group link" do
@@ -199,8 +199,8 @@ describe "scheduler" do
           set_value(form.find_element(:css, '#body'), 'hello')
           submit_dialog(fj('.ui-dialog:visible'), '.ui-button')
           wait_for_ajaximations
-
-          fj('#message_participants_form').should be_nil # using fj to avoid selenium caching
+          # using fj to avoid selenium caching
+          keep_trying_until { fj('#message_participants_form').should be_nil }
         end
       end
       student1.conversations.first.messages.size.should == 6 # registered/all * 3
@@ -375,7 +375,7 @@ describe "scheduler" do
       ag.participants_per_appointment.should == 2
 
       open_edit_event_dialog
-      f('[name=max_participants_option]').click
+      f('[type=checkbox][name=max_participants_option]').click
       fj('.ui-button:contains(Update)').click
       wait_for_ajaximations
 

@@ -47,35 +47,38 @@ module Canvas::AccountReports
       courses = add_course_sub_account_scope(courses)
       courses = add_term_scope(courses)
 
-      total = courses.count
-      i = 0
-
       filename = Canvas::AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
         csv << ['id', 'sis id', 'short name', 'name', 'start date', 'end date']
 
-        courses.find_each do |c|
-          row = []
-          row << c.id
-          row << c.sis_source_id
-          row << c.course_code
-          row << c.name
+        Shackles.activate(:slave) do
+          @total = courses.count
+          i = 0
 
-          if c.restrict_enrollments_to_course_dates
-            row << default_timezone_format(c.start_at)
-            row << default_timezone_format(c.conclude_at)
-          else
-            row << nil
-            row << nil
+          courses.find_each do |c|
+            row = []
+            row << c.id
+            row << c.sis_source_id
+            row << c.course_code
+            row << c.name
+
+            if c.restrict_enrollments_to_course_dates
+              row << default_timezone_format(c.start_at)
+              row << default_timezone_format(c.conclude_at)
+            else
+              row << nil
+              row << nil
+            end
+
+            csv << row
+            i += 1
+            if i % 5 == 0
+              Shackles.activate(:master) do
+                @account_report.update_attribute(:progress, (i.to_f/@total)*100)
+              end
+            end
+
           end
-
-          csv << row
-          i += 1
-
-          if i % 5 == 0
-            @account_report.update_attribute(:progress, (i.to_f/total)*100)
-          end
-
         end
       end
       send_report(filename)
@@ -102,7 +105,7 @@ module Canvas::AccountReports
                              FROM attachments at
                              WHERE at.context_id = courses.id
                                AND at.context_type = 'Course'
-                               AND at.workflow_state <> 'deleted')
+                               AND at.file_state <> 'deleted')
              AND NOT EXISTS (SELECT NULL
                              FROM discussion_topics d
                              WHERE d.context_id = courses.id

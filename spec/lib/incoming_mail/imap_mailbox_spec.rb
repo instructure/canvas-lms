@@ -32,7 +32,12 @@ describe IncomingMail::ImapMailbox do
   end
 
   def mock_net_imap
-    @imap_mock = stub_everything('Net::IMAP instance')
+    @imap_mock = Object.new
+    class <<@imap_mock
+      IncomingMail::ImapMailbox::UsedImapMethods.each do |method_name|
+        define_method(method_name) { |*args, &block| }
+      end
+    end
 
     Net::IMAP.expects(:new).
       with("mail.example.com", {:port => 993, :ssl => true}).
@@ -77,9 +82,11 @@ describe IncomingMail::ImapMailbox do
 
   end
 
-  it "should connect to the server" do
-    @imap_mock.expects(:login).with("user", "password").once
-    @mailbox.connect
+  describe "connect" do
+    it "should connect to the server" do
+      @imap_mock.expects(:login).with("user", "password").once
+      @mailbox.connect
+    end
   end
 
   context "connected" do
@@ -166,4 +173,30 @@ describe IncomingMail::ImapMailbox do
     end
   end
 
+  describe "timeouts" do
+    it "should use timeout method on connect call" do
+      @mailbox.set_timeout_method { raise Timeout::Error }
+      lambda { @mailbox.connect }.should raise_error(Timeout::Error)
+    end
+    # if these work, others are likely wrapped with timeouts as well because of wrap_with_timeout
+
+    # disconnect is allowed to swallow timeout errors
+    it "should use timeout method on disconnect call" do
+      @mailbox.connect
+      @mailbox.set_timeout_method { raise Timeout::Error }
+      @mailbox.disconnect #.should_not raise_error
+      @mailbox.set_timeout_method { raise SyntaxError }
+
+      # rspec .should raise_error doesn't catch outside of StandardError hierarchy
+      exception_propegated = false
+      begin
+        @mailbox.disconnect
+      rescue SyntaxError => e
+        exception_propegated = true
+      end
+      exception_propegated.should be_true
+    end
+
+
+  end
 end

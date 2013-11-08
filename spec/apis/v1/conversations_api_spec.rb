@@ -21,6 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe ConversationsController, :type => :integration do
   before do
+    @other = user(active_all: true)
+
     course_with_teacher(:active_course => true, :active_enrollment => true, :user => user_with_pseudonym(:active_user => true))
     @course.update_attribute(:name, "the course")
     @course.default_section.update_attributes(:name => "the section")
@@ -76,7 +78,8 @@ describe ConversationsController, :type => :integration do
             {"id" => @me.id, "name" => @me.name},
             {"id" => @billy.id, "name" => @billy.name},
             {"id" => @bob.id, "name" => @bob.name}
-          ]
+          ],
+          "context_name" => @c2.context_name
         },
         {
           "id" => @c1.conversation_id,
@@ -100,7 +103,8 @@ describe ConversationsController, :type => :integration do
           "participants" => [
             {"id" => @me.id, "name" => @me.name},
             {"id" => @bob.id, "name" => @bob.name}
-          ]
+          ],
+          "context_name" => @c1.context_name
         }
       ]
     end
@@ -163,9 +167,46 @@ describe ConversationsController, :type => :integration do
             {"id" => @me.id, "name" => @me.name},
             {"id" => @billy.id, "name" => @billy.name},
             {"id" => @bob.id, "name" => @bob.name}
-          ]
+          ],
+          "context_name" => @c2.context_name
         }
       ]
+    end
+
+    describe "context_name" do
+      before :each do
+        @c1 = conversation(@bob, :workflow_state => 'read') # implicit tag from shared context
+        @c2 = conversation(@bob, @billy, :workflow_state => 'unread', :subscribed => false) # manually specified context which would not be implied
+        course_with_student(:course_name => 'the other course')
+        conversation = @c2.conversation
+        conversation.context = @course
+        conversation.save!
+        @c2.save!
+        @c3 = conversation(@student) # no context
+        @user = @me
+      end
+
+      describe 'index' do
+        it "should prefer the context but fall back to the first context tag" do
+          json = api_call(:get, "/api/v1/conversations.json",
+                          { :controller => 'conversations', :action => 'index', :format => 'json' })
+          json.map{|c| c["context_name"]}.should eql([nil, 'the other course', 'the course'])
+        end
+      end
+
+      describe 'show' do
+        it "should prefer the context but fall back to the first context tag" do
+          json = api_call(:get, "/api/v1/conversations/#{@c1.conversation.id}",
+                          { :controller => 'conversations', :action => 'show', :id => @c1.conversation.id.to_s, :format => 'json' })
+          json["context_name"].should eql('the course')
+          json = api_call(:get, "/api/v1/conversations/#{@c2.conversation.id}",
+                          { :controller => 'conversations', :action => 'show', :id => @c2.conversation.id.to_s, :format => 'json' })
+          json["context_name"].should eql('the other course')
+          json = api_call(:get, "/api/v1/conversations/#{@c3.conversation.id}",
+                          { :controller => 'conversations', :action => 'show', :id => @c3.conversation.id.to_s, :format => 'json' })
+          json["context_name"].should be_nil
+        end
+      end        
     end
 
     context "filtering by tags" do
@@ -728,6 +769,33 @@ describe ConversationsController, :type => :integration do
           c["subject"].should eql 'dinner'
         }
       end
+
+      it "should constrain subject length" do
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id], :body => "test", :subject => "a" * 256 },
+                headers={},
+                {expected_status: 400})
+        json["errors"].should_not be_nil
+        json["errors"]["subject"].should_not be_nil
+      end
+
+      it "should send bulk group messages" do
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id, @joe.id], :body => "test",
+                  :group_conversation => "true", :bulk_message => "true" })
+        puts json.inspect
+        json.size.should eql 2
+      end
+
+      it "should send bulk group messages with a single recipient" do
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id], :body => "test",
+                  :group_conversation => "true", :bulk_message => "true" })
+        json.size.should eql 1
+      end
     end
   end
 
@@ -814,7 +882,8 @@ describe ConversationsController, :type => :integration do
           },
           {"id" => conversation.messages.last.id, "created_at" => conversation.messages.last.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
         ],
-        "submissions" => []
+        "submissions" => [],
+        "context_name" => conversation.context_name
       })
     end
 
@@ -866,7 +935,8 @@ describe ConversationsController, :type => :integration do
           "messages" => [
               {"id" => @conversation.messages.last.id, "created_at" => @conversation.messages.last.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
           ],
-          "submissions" => []
+          "submissions" => [],
+          "context_name" => @conversation.context_name
         }
         json.should == expected
       end
@@ -1010,6 +1080,229 @@ describe ConversationsController, :type => :integration do
           {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "another", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
         ]
       })
+    end
+
+    it "should only add participants for the new message to the given recipients" do
+      conversation = conversation(@bob, private: false)
+
+      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+              { :controller => 'conversations', :action => 'add_message', :id => conversation.conversation_id.to_s, :format => 'json' },
+              { :body => "another", :recipients => [@billy.id]})
+      conversation.reload
+      json.delete("avatar_url")
+      json["participants"].each{ |p|
+        p.delete("avatar_url")
+      }
+      json["audience"].sort!
+      json["messages"].each {|m| m["participating_user_ids"].sort!}
+      json.should eql({
+        "id" => conversation.conversation_id,
+        "subject" => nil,
+        "workflow_state" => "read",
+        "last_message" => "another",
+        "last_message_at" => conversation.last_message_at.to_json[1, 20],
+        "last_authored_message" => "another",
+        "last_authored_message_at" => conversation.last_authored_at.to_json[1, 20],
+        "message_count" => 2, # two messages total now, though we'll only get the latest one in the response
+        "subscribed" => true,
+        "private" => false,
+        "starred" => false,
+        "properties" => ["last_author"],
+        "visible" => true,
+        "audience" => [@bob.id, @billy.id].sort,
+        "audience_contexts" => {
+          "groups" => {},
+          "courses" => {@course.id.to_s => []}
+        },
+        "participants" => [
+          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @billy.id, "name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+        ],
+        "messages" => [
+          {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "another", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @billy.id].sort}
+        ]
+      })
+    end
+
+    it "should add participants for the given messages to the given recipients" do
+      conversation = conversation(@bob, private: false)
+      message = conversation.add_message("another one")
+
+      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+              { :controller => 'conversations', :action => 'add_message', :id => conversation.conversation_id.to_s, :format => 'json' },
+              { :body => "partially hydrogenated context oils", :recipients => [@billy.id], :included_messages => [message.id]})
+      conversation.reload
+      json.delete("avatar_url")
+      json["participants"].each{ |p|
+        p.delete("avatar_url")
+      }
+      json["audience"].sort!
+      json["messages"].each {|m| m["participating_user_ids"].sort!}
+      json.should eql({
+        "id" => conversation.conversation_id,
+        "subject" => nil,
+        "workflow_state" => "read",
+        "last_message" => "partially hydrogenated context oils",
+        "last_message_at" => conversation.last_message_at.to_json[1, 20],
+        "last_authored_message" => "partially hydrogenated context oils",
+        "last_authored_message_at" => conversation.last_authored_at.to_json[1, 20],
+        "message_count" => 3,
+        "subscribed" => true,
+        "private" => false,
+        "starred" => false,
+        "properties" => ["last_author"],
+        "visible" => true,
+        "audience" => [@bob.id, @billy.id].sort,
+        "audience_contexts" => {
+          "groups" => {},
+          "courses" => {@course.id.to_s => []}
+        },
+        "participants" => [
+          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @billy.id, "name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+        ],
+        "messages" => [
+          {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "partially hydrogenated context oils", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @billy.id].sort}
+        ]
+      })
+      message.reload
+      message.conversation_message_participants.where(:user_id => @billy.id).exists?.should be_true
+    end
+
+    it "should exclude participants that aren't in the recipient list" do
+      conversation = conversation(@bob, @billy, private: false)
+      message = conversation.add_message("another one")
+
+      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+              { :controller => 'conversations', :action => 'add_message', :id => conversation.conversation_id.to_s, :format => 'json' },
+              { :body => "partially hydrogenated context oils", :recipients => [@billy.id], :included_messages => [message.id]})
+      conversation.reload
+      json.delete("avatar_url")
+      json["participants"].each{ |p|
+        p.delete("avatar_url")
+      }
+      json["audience"].sort!
+      json["messages"].each {|m| m["participating_user_ids"].sort!}
+      json.should eql({
+        "id" => conversation.conversation_id,
+        "subject" => nil,
+        "workflow_state" => "read",
+        "last_message" => "partially hydrogenated context oils",
+        "last_message_at" => conversation.last_message_at.to_json[1, 20],
+        "last_authored_message" => "partially hydrogenated context oils",
+        "last_authored_message_at" => conversation.last_authored_at.to_json[1, 20],
+        "message_count" => 3,
+        "subscribed" => true,
+        "private" => false,
+        "starred" => false,
+        "properties" => ["last_author"],
+        "visible" => true,
+        "audience" => [@bob.id, @billy.id].sort,
+        "audience_contexts" => {
+          "groups" => {},
+          "courses" => {@course.id.to_s => []}
+        },
+        "participants" => [
+          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @billy.id, "name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+        ],
+        "messages" => [
+          {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "partially hydrogenated context oils", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @billy.id].sort}
+        ]
+      })
+      message.reload
+      message.conversation_message_participants.where(:user_id => @billy.id).exists?.should be_true
+    end
+
+    it "should add message participants for all conversation participants (if recipients are not specified) to included messages only" do
+      conversation = conversation(@bob, private: false)
+      message = conversation.add_message("you're swell, @bob")
+
+      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+              { :controller => 'conversations', :action => 'add_message', :id => conversation.conversation_id.to_s, :format => 'json' },
+              { :body => "man, @bob sure does suck", :recipients => [@billy.id] })
+      # at this point, @billy can see ^^^ that message, but not the first one. @bob can't see ^^^ that one. everyone is a conversation participant now
+      conversation.reload
+      bob_sucks = conversation.conversation.conversation_messages.first
+
+      # implicitly send to all the conversation participants, including the original message. this will let @billy see it
+      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+              { :controller => 'conversations', :action => 'add_message', :id => conversation.conversation_id.to_s, :format => 'json' },
+              { :body => "partially hydrogenated context oils", :included_messages => [message.id]})
+      conversation.reload
+      json.delete("avatar_url")
+      json["participants"].each{ |p|
+        p.delete("avatar_url")
+      }
+      json["audience"].sort!
+      json["messages"].each {|m| m["participating_user_ids"].sort!}
+      json.should eql({
+        "id" => conversation.conversation_id,
+        "subject" => nil,
+        "workflow_state" => "read",
+        "last_message" => "partially hydrogenated context oils",
+        "last_message_at" => conversation.last_message_at.to_json[1, 20],
+        "last_authored_message" => "partially hydrogenated context oils",
+        "last_authored_message_at" => conversation.last_authored_at.to_json[1, 20],
+        "message_count" => 4,
+        "subscribed" => true,
+        "private" => false,
+        "starred" => false,
+        "properties" => ["last_author"],
+        "visible" => true,
+        "audience" => [@bob.id, @billy.id].sort,
+        "audience_contexts" => {
+          "groups" => {},
+          "courses" => {@course.id.to_s => []}
+        },
+        "participants" => [
+          {"id" => @me.id, "name" => @me.name, "common_courses" => {}, "common_groups" => {}},
+          {"id" => @billy.id, "name" => @billy.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}},
+          {"id" => @bob.id, "name" => @bob.name, "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {}}
+        ],
+        "messages" => [
+          {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "partially hydrogenated context oils", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id, @billy.id].sort}
+        ]
+      })
+      message.reload
+      message.conversation_message_participants.where(:user_id => @billy.id).exists?.should be_true
+      bob_sucks.reload
+      bob_sucks.conversation_message_participants.where(:user_id => @billy.id).exists?.should be_true
+      bob_sucks.conversation_message_participants.where(:user_id => @bob.id).exists?.should be_false
+    end
+
+    it "should allow users to respond to admin initiated conversations" do
+      account_admin_user active_all: true
+      cp = conversation(@other, sender: @admin, private: false)
+      real_conversation = cp.conversation
+
+      @user = @other
+      json = api_call(:post, "/api/v1/conversations/#{real_conversation.id}/add_message",
+        { :controller => 'conversations', :action => 'add_message', :id => real_conversation.id.to_s, :format => 'json' },
+        { :body => "ok", :recipients => [@admin.id.to_s] })
+      real_conversation.reload
+      new_message = real_conversation.conversation_messages.first
+      #debugger
+      new_message.conversation_message_participants.size.should == 2
+    end
+
+    it "should allow users to respond to anyone who is already a participant" do
+      cp = conversation(@bob, @billy, @jane, @joe, sender: @bob)
+      real_conversation = cp.conversation
+      real_conversation.context = @course
+      real_conversation.save!
+
+      @joe.enrollments.each { |e| e.destroy }
+      @user = @billy
+      json = api_call(:post, "/api/v1/conversations/#{real_conversation.id}/add_message",
+        { :controller => 'conversations', :action => 'add_message', :id => real_conversation.id.to_s, :format => 'json' },
+        { :body => "ok", :recipients => [@bob, @billy, @jane, @joe].map(&:id).map(&:to_s) })
+      real_conversation.reload
+      new_message = real_conversation.conversation_messages.first
+      new_message.conversation_message_participants.size.should == 4
     end
 
     it "should create a media object if it doesn't exist" do

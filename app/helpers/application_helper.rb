@@ -234,12 +234,31 @@ module ApplicationHelper
     @context_url_lookup[lookup] = res
   end
 
+  def full_url(path)
+    uri = URI.parse(request.url)
+    uri.path = ''
+    uri.query = ''
+    URI.join(uri, path).to_s
+  end
+
   def url_helper_context_from_object(context)
     (context ? context.class.base_ar_class : context.class).name.underscore
   end
 
-  def message_user_path(user)
-    conversations_path(:user_id => user.id)
+  def message_user_path(user, context = nil)
+    context = context || @context
+    context = nil unless context.is_a?(Course)
+    conversations_path(user_id: user.id, user_name: user.name,
+                       context_id: context.try(:asset_string))
+  end
+
+  # Public: Determine if the currently logged-in user is an account or site admin.
+  #
+  # Returns a boolean.
+  def current_user_is_account_admin
+    [@domain_root_account, Account.site_admin].map do |account|
+      account.membership_for_user(@current_user)
+    end.any?
   end
 
   def hidden(include_style=false)
@@ -323,9 +342,9 @@ module ApplicationHelper
     output = js_blocks.inject('') do |str, e|
       # print file and line number for debugging in development mode.
       value = ""
-      value << "<!-- BEGIN SCRIPT BLOCK FROM: " + e[:file_and_line] + " --> \n" if Rails.env == "development"
+      value << "<!-- BEGIN SCRIPT BLOCK FROM: " + e[:file_and_line] + " --> \n" if Rails.env.development?
       value << e[:contents]
-      value << "<!-- END SCRIPT BLOCK FROM: " + e[:file_and_line] + " --> \n" if Rails.env == "development"
+      value << "<!-- END SCRIPT BLOCK FROM: " + e[:file_and_line] + " --> \n" if Rails.env.development?
       str << value
     end
     raw(output)
@@ -399,6 +418,10 @@ module ApplicationHelper
     end
   end
 
+  def include_common_stylesheets
+    include_stylesheets :vendor, :common, media: "all"
+  end
+
   def section_tabs
     @section_tabs ||= begin
       if @context
@@ -458,6 +481,55 @@ module ApplicationHelper
     end
   end
 
+  def embedded_chat_quicklaunch_params
+    {user_id: @current_user.id, course_id: @context.id, canvas_url: "#{HostUrl.protocol}://#{HostUrl.default_host}"}
+  end
+
+  def embedded_chat_url
+    chat_tool = active_external_tool_by_id('chat')
+    return unless chat_tool && chat_tool.url && chat_tool.custom_fields['mini_view_url']
+    uri = URI.parse(chat_tool.url)
+    uri.path = chat_tool.custom_fields['mini_view_url']
+    uri.to_s
+  end
+
+  def embedded_chat_enabled
+    chat_tool = active_external_tool_by_id('chat')
+    chat_tool && chat_tool.url && chat_tool.custom_fields['mini_view_url'] && Canvas::Plugin.value_to_boolean(chat_tool.custom_fields['embedded_chat_enabled'])
+  end
+
+  def embedded_chat_visible
+    @show_embedded_chat != false &&
+      !@embedded_view &&
+      !@body_class_no_headers &&
+      @current_user &&
+      @context.is_a?(Course) &&
+      embedded_chat_enabled &&
+      external_tool_tab_visible('chat')
+  end
+
+  def active_external_tool_by_id(tool_id)
+    # don't use for groups. they don't have account_chain_ids
+    tool = @context.context_external_tools.active.find_by_tool_id(tool_id)
+    return tool if tool
+
+    # account_chain_ids is in the order we need to search for tools
+    # unfortunately, the db will return an arbitrary one first.
+    # so, we pull all the tools (probably will only have one anyway) and look through them here
+    tools = ContextExternalTool.active.where(:context_type => 'Account', :context_id => @context.account_chain_ids, :tool_id => tool_id).all
+    @context.account_chain_ids.each do |account_id|
+      tool = tools.find {|t| t.context_id == account_id}
+      return tool if tool
+    end
+    nil
+  end
+
+  def external_tool_tab_visible(tool_id)
+    tool = active_external_tool_by_id(tool_id)
+    return false unless tool
+    @context.tabs_available(@current_user).find {|tc| tc[:id] == tool.asset_string}.present?
+  end
+
   def license_help_link
     @include_license_dialog = true
     link_to(image_tag('help.png'), '#', :class => 'license_help_link no-hover', :title => "Help with content licensing")
@@ -512,14 +584,15 @@ module ApplicationHelper
     global_inst_object = { :environment =>  Rails.env }
     {
       :allowMediaComments       => Kaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
-      :kalturaSettings          => Kaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes'),
+      :kalturaSettings          => Kaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes', 'do_analytics'),
       :equellaEnabled           => !!equella_enabled?,
-      :googleAnalyticsAccount   => Setting.get_cached('google_analytics_key', nil),
+      :googleAnalyticsAccount   => Setting.get('google_analytics_key', nil),
       :http_status              => @status,
       :error_id                 => @error && @error.id,
       :disableGooglePreviews    => !service_enabled?(:google_docs_previews),
       :disableScribdPreviews    => !feature_enabled?(:scribd),
       :disableCrocodocPreviews  => !feature_enabled?(:crocodoc),
+      :enableScribdHtml5        => feature_enabled?(:scribd_html5),
       :logPageViews             => !@body_class_no_headers,
       :maxVisibleEditorButtons  => 3,
       :editorButtons            => editor_buttons,
@@ -601,15 +674,19 @@ module ApplicationHelper
     opts[:indent_width] ||= 3
     opts[:depth] ||= 0
     opts[:options_so_far] ||= []
+    if opts.has_key?(:all_folders)
+      opts[:sub_folders] = opts.delete(:all_folders).to_a.group_by{|f| f.parent_folder_id}
+    end
+
     folders.each do |folder|
       opts[:options_so_far] << %{<option value="#{folder.id}" #{'selected' if opts[:selected_folder_id] == folder.id}>#{"&nbsp;" * opts[:indent_width] * opts[:depth]}#{"- " if opts[:depth] > 0}#{html_escape folder.name}</option>}
       if opts[:max_depth].nil? || opts[:depth] < opts[:max_depth]
-        child_folders = if opts[:all_folders]
-                          opts[:all_folders].select {|f| f.parent_folder_id == folder.id }
+        child_folders = if opts[:sub_folders]
+                          opts[:sub_folders][folder.id] || []
                         else
                           folder.active_sub_folders.by_position
                         end
-        folders_as_options(child_folders, opts.merge({:depth => opts[:depth] + 1}))
+        folders_as_options(child_folders, opts.merge({:depth => opts[:depth] + 1})) if child_folders.any?
       end
     end
     opts[:depth] == 0 ? raw(opts[:options_so_far].join("\n")) : nil
@@ -721,7 +798,7 @@ module ApplicationHelper
 
   def help_link
     url = ((@domain_root_account && @domain_root_account.settings[:support_url]) || (Account.default && Account.default.settings[:support_url]))
-    show_feedback_link = Setting.get_cached("show_feedback_link", "false") == "true"
+    show_feedback_link = Setting.get("show_feedback_link", "false") == "true"
     css_classes = []
     css_classes << "support_url" if url
     css_classes << "help_dialog_trigger" if show_feedback_link
@@ -768,30 +845,35 @@ module ApplicationHelper
     @global_includes
   end
 
-  def include_account_js
+  def include_account_js(options = {})
     return if params[:global_includes] == '0'
-    includes = get_global_includes.inject([]) do |js_includes, global_include|
-      js_includes << "'#{global_include[:js]}'" if global_include[:js].present?
-      js_includes
+    includes = get_global_includes.map do |global_include|
+      global_include[:js] if global_include[:js].present?
     end
+    includes.compact!
     if includes.length > 0
-      str = <<-ENDSCRIPT
-        (function() {
-          var inject = function(src) {
-            var s = document.createElement('script');
-            s.src = src;
-            s.type = 'text/javascript';
-            document.body.appendChild(s);
-          };
-          var srcs = [#{includes.join(', ')}];
-          require(['jquery'], function() {
-            for (var i = 0, l = srcs.length; i < l; i++) {
-              inject(srcs[i]);
-            }
-          });
-        })();
-      ENDSCRIPT
-      content_tag(:script, str, {}, false)
+      if options[:raw]
+        includes.unshift("/optimized/vendor/jquery-1.7.2.js")
+        javascript_include_tag(includes)
+      else
+        str = <<-ENDSCRIPT
+          (function() {
+            var inject = function(src) {
+              var s = document.createElement('script');
+              s.src = src;
+              s.type = 'text/javascript';
+              document.body.appendChild(s);
+            };
+            var srcs = #{includes.to_json};
+            require(['jquery'], function() {
+              for (var i = 0, l = srcs.length; i < l; i++) {
+                inject(srcs[i]);
+              }
+            });
+          })();
+        ENDSCRIPT
+        javascript_tag(str)
+      end
     end
   end
 
@@ -811,8 +893,14 @@ module ApplicationHelper
   def friendly_datetime(datetime, opts={})
     attributes = { :title => datetime }
     attributes[:pubdate] = true if opts[:pubdate]
-    content_tag(:time, attributes) do
-      datetime_string(datetime)
+    if CANVAS_RAILS2 # see config/initializers/rails2.rb
+      content_tag_without_nil_return(:time, attributes) do
+        datetime_string(datetime)
+      end
+    else
+      content_tag(:time, attributes) do
+        datetime_string(datetime)
+      end
     end
   end
 

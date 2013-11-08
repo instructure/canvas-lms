@@ -24,7 +24,8 @@ class EportfolioCategory < ActiveRecord::Base
   belongs_to :eportfolio
   before_save :infer_unique_slug
   validates_presence_of :eportfolio_id
-  
+  validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
+
   acts_as_list :scope => :eportfolio
   
   def infer_unique_slug

@@ -7,6 +7,8 @@
   <itemBody><![CDATA[<div>The ]]><textEntryInteraction responseIdentifier="l1" expectedLength="10"/><![CDATA[ brown ]]>
     <textEntryInteraction responseIdentifier="l2" expectedLength="10"/><![CDATA[ jumped over the lazy ]]>
     <textEntryInteraction responseIdentifier="l3" expectedLength="10"/><![CDATA[.</div>]]><![CDATA[<div></div>]]>
+    <textEntryInteraction responseIdentifier="l4" expectedLength="10"/>
+    <textEntryInteraction responseIdentifier="l5" expectedLength="10"/>
   </itemBody>
   <responseDeclaration identifier="l1" cardinality="single" baseType="string"/>
   <outcomeDeclaration identifier="l1_score" cardinality="single" baseType="float">
@@ -22,6 +24,18 @@
   </outcomeDeclaration>
   <responseDeclaration identifier="l3" cardinality="single" baseType="string"/>
   <outcomeDeclaration identifier="l3_score" cardinality="single" baseType="float">
+    <defaultValue>
+      <value>0</value>
+    </defaultValue>
+  </outcomeDeclaration>
+  <responseDeclaration identifier="l4" cardinality="single" baseType="string"/>
+  <outcomeDeclaration identifier="l4_score" cardinality="single" baseType="float">
+    <defaultValue>
+      <value>0</value>
+    </defaultValue>
+  </outcomeDeclaration>
+  <responseDeclaration identifier="l5" cardinality="single" baseType="string"/>
+  <outcomeDeclaration identifier="l5_score" cardinality="single" baseType="float">
     <defaultValue>
       <value>0</value>
     </defaultValue>
@@ -80,19 +94,25 @@
     </responseCondition>
     <responseCondition>
       <responseIf>
-        <lt>
-          <variable identifier="SCORE"/>
-          <baseValue baseType="float">0</baseValue>
-        </lt>
+        <equalRounded roundingMode="decimalPlaces" figures="0">
+          <variable identifier="l4"/>
+          <baseValue baseType="float">0.02</baseValue>
+        </equalRounded>
+        <setOutcomeValue identifier="l4_score">
+          <baseValue baseType="float">0.7</baseValue>
+        </setOutcomeValue>
         <setOutcomeValue identifier="SCORE">
           <baseValue baseType="float">0</baseValue>
         </setOutcomeValue>
       </responseIf>
       <responseElseIf>
-        <gt>
-          <variable identifier="SCORE"/>
-          <baseValue baseType="float">1</baseValue>
-        </gt>
+        <equal>
+          <variable identifier="l5"/>
+          <baseValue baseType="integer">5</baseValue>
+        </equal>
+        <setOutcomeValue identifier="l5_score">
+          <baseValue baseType="float">0.8</baseValue>
+        </setOutcomeValue>
         <setOutcomeValue identifier="SCORE">
           <baseValue baseType="float">1</baseValue>
         </setOutcomeValue>

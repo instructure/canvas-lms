@@ -173,10 +173,16 @@ class SubmissionComment < ActiveRecord::Base
 
 
   def attachments
-    ids = (self.attachment_ids || "").split(",").map{|id| id.to_i}
+    ids = Set.new((attachment_ids || "").split(",").map { |id| id.to_i})
     attachments = associated_attachments
-    attachments += self.submission.assignment.attachments rescue []
-    attachments.select{|a| ids.include?(a.id) }
+    attachments += submission.assignment.attachments rescue []
+    attachments.select { |a| ids.include?(a.id) }
+  end
+
+  def self.preload_attachments(comments)
+    SubmissionComment.send :preload_associations, comments, [:associated_attachments, :submission]
+    submissions = comments.map(&:submission).uniq
+    Submission.send :preload_associations, submissions, :assignment => :attachments
   end
 
   def update_submission
@@ -208,13 +214,8 @@ class SubmissionComment < ActiveRecord::Base
     !hidden? && submission.possible_participants_ids.include?(author_id)
   end
 
-  alias_method :ar_to_json, :to_json
-  def to_json(options = {}, &block)
-    if self.context.root_account.service_enabled?(:avatars)
-      options[:methods] ||= []
-      options[:methods] << :avatar_path
-    end
-    self.ar_to_json(options, &block)
+  def serialization_methods
+    context.root_account.service_enabled?(:avatars) ? [:avatar_path] : []
   end
 
   scope :visible, where(:hidden => false)

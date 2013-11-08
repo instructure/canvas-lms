@@ -24,5 +24,6 @@ shared_examples_for 'Mailbox' do
     it { should respond_to :delete_message }
     it { should respond_to :move_message }
     it { should respond_to :disconnect }
+    it { should respond_to :set_timeout_method }
   end
 end

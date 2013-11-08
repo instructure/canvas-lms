@@ -22,7 +22,7 @@ class MediaObject < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :attachment
   belongs_to :root_account, :class_name => 'Account'
-  validates_presence_of :media_id
+  validates_presence_of :media_id, :workflow_state
   has_many :media_tracks, :dependent => :destroy, :order => 'locale'
   after_create :retrieve_details_later
   after_save :update_title_on_kaltura_later
@@ -85,7 +85,13 @@ class MediaObject < ActiveRecord::Base
       if wait_for_completion
         bulk_upload_id = res[:id]
         Rails.logger.debug "waiting for bulk upload id: #{bulk_upload_id}"
+        started_at = Time.now
+        timeout = Setting.get('media_bulk_upload_timeout', 30.minutes.to_s).to_i
         while !res[:ready]
+          if Time.now > started_at + timeout
+            MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => 1.minute.from_now, :priority => Delayed::LOW_PRIORITY}, res[:id], attachments.map(&:id), root_account_id)
+            break
+          end
           sleep(1.minute.to_i)
           res = client.bulkUploadGet(bulk_upload_id)
         end
@@ -150,7 +156,7 @@ class MediaObject < ActiveRecord::Base
         attachment.update_attribute(:media_entry_id, entry[:entryId])
         # check for attachments that were created temporarily, just to import a media object
         if attachment.full_path.starts_with?(File.join(Folder::ROOT_FOLDER_NAME, CC::CCHelper::MEDIA_OBJECTS_FOLDER) + '/')
-          attachment.destroy(false)
+          attachment.destroy
         end
       end
       mo.context ||= mo.root_account

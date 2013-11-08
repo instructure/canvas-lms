@@ -46,7 +46,7 @@ describe "profile communication settings" do
   it "should render" do
     get "/profile/communication"
     # Page title should match expected
-    f('title').text.should == 'Notification Preferences'
+    driver.execute_script("return document.title").should == 'Notification Preferences'
     # Expect breadcrumbs to correctly display page name
     f('#breadcrumbs').should include_text('Notification Preferences')
     # Expect h2 with

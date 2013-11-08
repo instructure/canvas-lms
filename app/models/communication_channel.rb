@@ -33,7 +33,7 @@ class CommunicationChannel < ActiveRecord::Base
 
   before_save :consider_retiring, :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
-  validates_presence_of :path
+  validates_presence_of :path, :path_type, :user, :workflow_state
   validate :uniqueness_of_path
   validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
 
@@ -54,7 +54,7 @@ class CommunicationChannel < ActiveRecord::Base
   RETIRE_THRESHOLD = 5
 
   def self.sms_carriers
-    @sms_carriers ||= (Setting.from_config('sms', false) ||
+    @sms_carriers ||= Canvas::ICU.collate_by((Setting.from_config('sms', false) ||
         { 'AT&T' => 'txt.att.net',
           'Alltel' => 'message.alltel.com',
           'Boost' => 'myboostmobile.com',
@@ -66,7 +66,7 @@ class CommunicationChannel < ActiveRecord::Base
           'Sprint PCS' => 'messaging.sprintpcs.com',
           'T-Mobile' => 'tmomail.net',
           'Verizon' => 'vtext.com',
-          'Virgin Mobile' => 'vmobl.com' }).map.sort
+          'Virgin Mobile' => 'vmobl.com' }), &:first)
   end
 
   def pseudonym
@@ -192,7 +192,7 @@ class CommunicationChannel < ActiveRecord::Base
     m = self.messages.new
     m.to = self.path
     m.body = t :body, "Your Canvas verification code is %{verification_code}", :verification_code => code
-    Mailer.deliver_message(m) rescue nil # omg! just ignore delivery failures
+    Mailer.message(m).deliver rescue nil # omg! just ignore delivery failures
   end
 
   # If you are creating a new communication_channel, do nothing, this just

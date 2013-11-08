@@ -26,7 +26,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   before_save :infer_defaults
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
-  validates_presence_of :title
+  validates_presence_of :title, :workflow_state
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
 
   attr_accessor :building_default
@@ -130,11 +130,6 @@ class LearningOutcomeGroup < ActiveRecord::Base
     ancestor_ids.member?(id)
   end
 
-  # use_outcome should be a lambda that takes an outcome and returns a boolean
-  def clone_for(context, parent, opts={})
-    parent.add_outcome_group(self, opts)
-  end
-
   # adds a new link to an outcome to this group. does nothing if a link already
   # exists (an outcome can be linked into a context multiple times by multiple
   # groups, but only once per group).
@@ -209,13 +204,21 @@ class LearningOutcomeGroup < ActiveRecord::Base
     group
   end
 
+  attr_accessor :skip_tag_touch
   alias_method :destroy!, :destroy
   def destroy
     transaction do
       # delete the children of the group, both links and subgroups, then delete
       # the group itself
-      self.child_outcome_links.active.includes(:content).each{ |outcome_link| outcome_link.destroy }
-      self.child_outcome_groups.active.each{ |outcome_group| outcome_group.destroy }
+      self.child_outcome_links.active.includes(:content).each do |outcome_link|
+        outcome_link.skip_touch = true if @skip_tag_touch
+        outcome_link.destroy
+      end
+      self.child_outcome_groups.active.each do |outcome_group|
+        outcome_group.skip_tag_touch = true if @skip_tag_touch
+        outcome_group.destroy
+      end
+
       self.workflow_state = 'deleted'
       save!
     end

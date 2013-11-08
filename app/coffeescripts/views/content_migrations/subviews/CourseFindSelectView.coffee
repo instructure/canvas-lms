@@ -16,7 +16,7 @@ define [
 
     events: 
       'change #courseSelect' : 'updateSearch'
-      'change [name=include_completed_courses]' : 'toggleConcludedCourses'
+      'change #include_completed_courses' : 'toggleConcludedCourses'
 
     render: ->
       super
@@ -70,7 +70,7 @@ define [
 
     # Build a list of courses that our template and autocomplete can use
     # objects look like
-    #   {label: 'Plant Science', value: 'Plant Science', id: 42}
+    #   {label: 'Plant Science', value: 'Plant Science', id: '42'}
     # @api private
 
     autocompleteCourses: ->
@@ -93,7 +93,7 @@ define [
     # @api private
 
     updateSearch: (event) => 
-      value = parseInt(event.target.value, 10)
+      value = event.target.value && String(event.target.value)
       @setSourceCourseId value
 
       courses = @autocompleteCourses()

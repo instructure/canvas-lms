@@ -21,7 +21,10 @@ require 'socket'
 
 describe Course do
   before(:each) do
-    @course = Course.new
+    @course = Account.default.courses.build
+    @course.workflow_state = 'claimed'
+    @course.root_account = Account.default
+    @course.enrollment_term = Account.default.default_enrollment_term
   end
 
   it "should propery determine if group weights are active" do
@@ -33,24 +36,57 @@ describe Course do
     @course.apply_group_weights?.should == true
   end
 
-  it "should know if it has been soft-concluded" do
-    @course.enrollment_term = EnrollmentTerm.create!
+  describe "soft-concluded?" do
+    before do
+      @course.enrollment_term = Account.default.enrollment_terms.create!
+    end
 
-    # Both course and term end_at dates are nil
-    @course.should_not be_soft_concluded
+    context "without term end date" do
+      it "should know if it has been soft-concluded" do
+        @course.update_attribute(:conclude_at, nil)
+        @course.should_not be_soft_concluded
 
-    # Course end_at is in the past
-    @course.update_attribute(:conclude_at, Time.now - 1.week)
-    @course.should be_soft_concluded
+        @course.update_attribute(:conclude_at, 1.week.from_now)
+        @course.should_not be_soft_concluded
 
-    # Course end_at in the future, term end_at in the past
-    @course.update_attribute(:conclude_at, Time.now + 1.week)
-    @course.enrollment_term.update_attribute(:end_at, Time.now - 1.week)
-    @course.should be_soft_concluded
+        @course.update_attribute(:conclude_at, 1.week.ago)
+        @course.should be_soft_concluded
+      end
+    end
 
-    # Both course and term end_at dates are in the future
-    @course.enrollment_term.update_attribute(:end_at, Time.now + 1.week)
-    @course.should_not be_soft_concluded
+    context "with term end date in the past" do
+      before do
+        @course.enrollment_term.update_attribute(:end_at, 1.week.ago)
+      end
+
+      it "should know if it has been soft-concluded" do
+        @course.update_attribute(:conclude_at, nil)
+        @course.should be_soft_concluded
+
+        @course.update_attribute(:conclude_at, 1.week.from_now)
+        @course.should_not be_soft_concluded
+
+        @course.update_attribute(:conclude_at, 1.week.ago)
+        @course.should be_soft_concluded
+      end
+    end
+
+    context "with term end date in the future" do
+      before do
+        @course.enrollment_term.update_attribute(:end_at, 1.week.from_now)
+      end
+
+      it "should know if it has been soft-concluded" do
+        @course.update_attribute(:conclude_at, nil)
+        @course.should_not be_soft_concluded
+
+        @course.update_attribute(:conclude_at, 1.week.from_now)
+        @course.should_not be_soft_concluded
+
+        @course.update_attribute(:conclude_at, 1.week.ago)
+        @course.should be_soft_concluded
+      end
+    end
   end
 
   context "#old_gradebook_visible?" do
@@ -214,6 +250,7 @@ describe Course do
       @enrollment.start_at = 4.days.ago
       @enrollment.end_at = 2.days.ago
       @enrollment.save!
+      @enrollment.reload
       @enrollment.state_based_on_date.should == :completed
     end
 
@@ -252,7 +289,7 @@ describe Course do
       @enrollment.start_at = 4.days.ago
       @enrollment.end_at = 2.days.ago
       @enrollment.save!
-      @enrollment.state_based_on_date.should == :completed
+      @enrollment.reload.state_based_on_date.should == :completed
       @course.prior_enrollments.should == []
       @course.grants_right?(@designer, nil, :read_as_admin).should be_true
       @course.grants_right?(@designer, nil, :read_roster).should be_true
@@ -307,14 +344,6 @@ describe Course do
       @course.grants_right?(:read, @student).should be_false
     end
 
-    it "should not grant read to soft-inactive teachers" do
-      course_with_teacher(:active_user => 1)
-      @course.enrollment_term.update_attributes(:start_at => 2.days.from_now, :end_at => 4.days.from_now)
-      @enrollment.update_attribute(:workflow_state, 'active')
-      @enrollment.state_based_on_date.should == :inactive
-      @course.grants_right?(:read, @teacher).should be_false
-    end
-
     it "should grant :read_outcomes to teachers in the course" do
       course_with_teacher(:active_all => 1)
       @course.grants_right?(@teacher, :read_outcomes).should be_true
@@ -332,70 +361,91 @@ describe Course do
     end
   end
 
-  it "should clear content when resetting" do
-    course_with_student
-    @course.discussion_topics.create!
-    @course.quizzes.create!
-    @course.assignments.create!
-    @course.wiki.front_page.save!
-    @course.self_enrollment = true
-    @course.sis_source_id = 'sis_id'
-    @course.stuck_sis_fields = [].to_set
-    @course.save!
-    @course.course_sections.should_not be_empty
-    @course.students.should == [@student]
-    @course.stuck_sis_fields.should == [].to_set
-    self_enrollment_code = @course.self_enrollment_code
-    self_enrollment_code.should_not be_nil
+  describe "#reset_content" do
+    it "should clear content" do
+      course_with_student
+      @course.discussion_topics.create!
+      @course.quizzes.create!
+      @course.assignments.create!
+      @course.wiki.front_page.save!
+      @course.self_enrollment = true
+      @course.sis_source_id = 'sis_id'
+      @course.stuck_sis_fields = [].to_set
+      @course.save!
+      @course.course_sections.should_not be_empty
+      @course.students.should == [@student]
+      @course.stuck_sis_fields.should == [].to_set
+      self_enrollment_code = @course.self_enrollment_code
+      self_enrollment_code.should_not be_nil
 
-    @new_course = @course.reset_content
+      @new_course = @course.reset_content
 
-    @course.reload
-    @course.stuck_sis_fields.should == [:workflow_state].to_set
-    @course.course_sections.should be_empty
-    @course.students.should be_empty
-    @course.sis_source_id.should be_nil
-    @course.self_enrollment_code.should be_nil
+      @course.reload
+      @course.stuck_sis_fields.should == [:workflow_state].to_set
+      @course.course_sections.should be_empty
+      @course.students.should be_empty
+      @course.sis_source_id.should be_nil
+      @course.self_enrollment_code.should be_nil
 
-    @new_course.reload
-    @new_course.course_sections.should_not be_empty
-    @new_course.students.should == [@student]
-    @new_course.discussion_topics.should be_empty
-    @new_course.quizzes.should be_empty
-    @new_course.assignments.should be_empty
-    @new_course.sis_source_id.should == 'sis_id'
-    @new_course.syllabus_body.should be_blank
-    @new_course.stuck_sis_fields.should == [].to_set
-    @new_course.self_enrollment_code.should == self_enrollment_code
+      @new_course.reload
+      @new_course.course_sections.should_not be_empty
+      @new_course.students.should == [@student]
+      @new_course.discussion_topics.should be_empty
+      @new_course.quizzes.should be_empty
+      @new_course.assignments.should be_empty
+      @new_course.sis_source_id.should == 'sis_id'
+      @new_course.syllabus_body.should be_blank
+      @new_course.stuck_sis_fields.should == [].to_set
+      @new_course.self_enrollment_code.should == self_enrollment_code
 
-    @course.uuid.should_not == @new_course.uuid
-    @course.wiki_id.should_not == @new_course.wiki_id
-    @course.replacement_course_id.should == @new_course.id
-  end
+      @course.uuid.should_not == @new_course.uuid
+      @course.wiki_id.should_not == @new_course.wiki_id
+      @course.replacement_course_id.should == @new_course.id
+    end
 
-  it "should preserve sticky fields when resetting content" do
-    course_with_student
-    @course.sis_source_id = 'sis_id'
-    @course.course_code = "cid"
-    @course.save!
-    @course.stuck_sis_fields = [].to_set
-    @course.name = "course_name"
-    @course.stuck_sis_fields.should == [:name].to_set
-    @course.save!
-    @course.stuck_sis_fields.should == [:name].to_set
+    it "should retain original course profile" do
+      data = {:something => 'special here'}
+      description = 'simple story'
+      course_with_student
+      @course.profile.should_not be_nil
+      @course.profile.tap do |p|
+        p.description = description
+        p.data = data
+        p.save!
+      end
+      @course.reload
 
-    @new_course = @course.reset_content
+      @new_course = @course.reset_content
 
-    @course.reload
-    @course.stuck_sis_fields.should == [:workflow_state, :name].to_set
-    @course.sis_source_id.should be_nil
+      @new_course.profile.data.should == data
+      @new_course.profile.description.should == description
+    end
 
-    @new_course.reload
-    @new_course.sis_source_id.should == 'sis_id'
-    @new_course.stuck_sis_fields.should == [:name].to_set
+    it "should preserve sticky fields" do
+      course_with_student
+      @course.sis_source_id = 'sis_id'
+      @course.course_code = "cid"
+      @course.save!
+      @course.stuck_sis_fields = [].to_set
+      @course.name = "course_name"
+      @course.stuck_sis_fields.should == [:name].to_set
+      @course.save!
+      @course.stuck_sis_fields.should == [:name].to_set
 
-    @course.uuid.should_not == @new_course.uuid
-    @course.replacement_course_id.should == @new_course.id
+      @new_course = @course.reset_content
+
+      @course.reload
+      @course.stuck_sis_fields.should == [:workflow_state, :name].to_set
+      @course.sis_source_id.should be_nil
+
+      @new_course.reload
+      @new_course.sis_source_id.should == 'sis_id'
+      @new_course.stuck_sis_fields.should == [:name].to_set
+
+      @course.uuid.should_not == @new_course.uuid
+      @course.replacement_course_id.should == @new_course.id
+    end
+
   end
 
   it "group_categories should not include deleted categories" do
@@ -1325,7 +1375,7 @@ describe Course, 'grade_publishing' do
 
       it 'should check whether or not grade export is enabled - success' do
         grade_publishing_user
-        @course.expects(:send_final_grades_to_endpoint).with(@user).returns(nil)
+        @course.expects(:send_final_grades_to_endpoint).with(@user, nil).returns(nil)
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user)
@@ -1345,7 +1395,7 @@ describe Course, 'grade_publishing' do
         @student_enrollments.map(&:workflow_state).should == ["active"] * 6 + ["inactive"] + ["active"] * 2
         @student_enrollments.map(&:last_publish_attempt_at).should == [nil] * 9
         grade_publishing_user
-        @course.expects(:send_final_grades_to_endpoint).with(@user).returns(nil)
+        @course.expects(:send_final_grades_to_endpoint).with(@user, nil).returns(nil)
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user)
@@ -1363,15 +1413,25 @@ describe Course, 'grade_publishing' do
 
       it 'should kick off the actual grade send' do
         grade_publishing_user
-        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user).returns(nil)
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).returns(nil)
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user)
       end
 
+      it 'should kick off the actual grade send for a specific user' do
+        grade_publishing_user
+        make_student_enrollments
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, @student_enrollments.first.user_id).returns(nil)
+        @plugin.stubs(:enabled?).returns(true)
+        @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
+        @course.publish_final_grades(@user, @student_enrollments.first.user_id)
+        @student_enrollments.first.reload.grade_publishing_status.should == "pending"
+      end
+
       it 'should kick off the timeout when a success timeout is defined and waiting is configured' do
         grade_publishing_user
-        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user).returns(nil)
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).returns(nil)
         current_time = Time.now.utc
         Time.stubs(:now).returns(current_time)
         current_time.stubs(:utc).returns(current_time)
@@ -1387,7 +1447,7 @@ describe Course, 'grade_publishing' do
 
       it 'should not kick off the timeout when a success timeout is defined and waiting is not configured' do
         grade_publishing_user
-        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user).returns(nil)
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).returns(nil)
         current_time = Time.now.utc
         Time.stubs(:now).returns(current_time)
         current_time.stubs(:utc).returns(current_time)
@@ -1403,7 +1463,7 @@ describe Course, 'grade_publishing' do
 
       it 'should not kick off the timeout when a success timeout is not defined and waiting is not configured' do
         grade_publishing_user
-        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user).returns(nil)
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).returns(nil)
         current_time = Time.now.utc
         Time.stubs(:now).returns(current_time)
         current_time.stubs(:utc).returns(current_time)
@@ -1419,7 +1479,7 @@ describe Course, 'grade_publishing' do
 
       it 'should not kick off the timeout when a success timeout is not defined and waiting is configured' do
         grade_publishing_user
-        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user).returns(nil)
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).returns(nil)
         current_time = Time.now.utc
         Time.stubs(:now).returns(current_time)
         current_time.stubs(:utc).returns(current_time)
@@ -1487,8 +1547,8 @@ describe Course, 'grade_publishing' do
                 }
               }
           })
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1")
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2")
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {})
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {})
         @course.send_final_grades_to_endpoint @user
         @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["unpublishable", "unpublishable", "published", "unpublishable", "published", "published", "unpublished", "unpublishable", "published"]
         @student_enrollments.map(&:grade_publishing_message).should == [nil] * 9
@@ -1520,6 +1580,35 @@ describe Course, 'grade_publishing' do
               }
           })
         @course.send_final_grades_to_endpoint @user
+        @checked.should be_true
+      end
+
+      it "should try to publish appropriate enrollments (limited users)" do
+        plugin_settings = Course.valid_grade_export_types["instructure_csv"]
+        Course.stubs(:valid_grade_export_types).returns(plugin_settings.merge({
+                "instructure_csv" => { :requires_grading_standard => true, :requires_publishing_pseudonym => true }}))
+        @course.grading_standard_enabled = true
+        @course.save!
+        grade_publishing_user
+        @plugin.stubs(:enabled?).returns(true)
+        @plugin_settings.merge!({
+                                    :publish_endpoint => "http://localhost/endpoint",
+                                    :format_type => "instructure_csv"
+                                })
+        @checked = false
+        Course.stubs(:valid_grade_export_types).returns({
+                                                            "instructure_csv" => {
+                                                                :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
+                                                                  course.should == @course
+                                                                  enrollments.should == [@student_enrollments.first]
+                                                                  publishing_pseudonym.should == @pseudonym
+                                                                  publishing_user.should == @user
+                                                                  @checked = true
+                                                                  return []
+                                                                }
+                                                            }
+                                                        })
+        @course.send_final_grades_to_endpoint @user, @student_enrollments.first.user_id
         @checked.should be_true
       end
 
@@ -1593,8 +1682,8 @@ describe Course, 'grade_publishing' do
                 }
               }
           })
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1")
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2")
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {})
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {})
         @course.send_final_grades_to_endpoint @user
         @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["unpublishable", published_status, "unpublishable", published_status, published_status, "unpublishable", "unpublished", "unpublishable", published_status]
         @student_enrollments.map(&:grade_publishing_message).should == [nil] * 9
@@ -1654,9 +1743,9 @@ describe Course, 'grade_publishing' do
                 }
               }
           })
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1")
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2").raises("waaah fail")
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post3", "test/mime3")
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {})
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {}).raises("waaah fail")
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post3", "test/mime3", {})
         (lambda {@course.send_final_grades_to_endpoint(@user)}).should raise_error("waaah fail")
         @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["published", "published", "published", "published", "error", "unpublishable", "unpublished", "unpublishable", "error"]
         @student_enrollments.map(&:grade_publishing_message).should == [nil] * 4 + ["waaah fail"] + [nil] * 3 + ["waaah fail"]
@@ -1687,9 +1776,9 @@ describe Course, 'grade_publishing' do
                 }
               }
           })
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1").raises("waaah fail")
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2").raises("waaah fail")
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post3", "test/mime3")
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {}).raises("waaah fail")
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {}).raises("waaah fail")
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post3", "test/mime3", {})
         (lambda {@course.send_final_grades_to_endpoint(@user)}).should raise_error("waaah fail")
         @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["published", "error", "published", "error", "error", "unpublishable", "unpublished", "unpublishable", "error"]
         @student_enrollments.map(&:grade_publishing_message).should == [nil, "waaah fail", nil, "waaah fail", "waaah fail", nil, nil, nil, "waaah fail"]
@@ -1710,6 +1799,62 @@ describe Course, 'grade_publishing' do
         (lambda {@course.send_final_grades_to_endpoint(@user)}).should raise_error("waaah fail")
         @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["error", "error", "error", "error", "error", "error", "unpublished", "error", "error"]
         @student_enrollments.map(&:grade_publishing_message).should == ["waaah fail"] * 6 + [nil] + ["waaah fail"] * 2
+      end
+
+      it "should pass header parameters to post" do
+        @plugin.stubs(:enabled?).returns(true)
+        @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint", :format_type => "test_format"
+        grade_publishing_user
+        @ase = @student_enrollments.find_all{|e| e.workflow_state == 'active'}
+        Course.stubs(:valid_grade_export_types).returns({
+                                                            "test_format" => {
+                                                                :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
+                                                                  course.should == @course
+                                                                  enrollments.sort_by(&:id).should == @ase.sort_by(&:id)
+                                                                  publishing_pseudonym.should == @pseudonym
+                                                                  publishing_user.should == @user
+                                                                  return [
+                                                                      [[@ase[1].id, @ase[3].id],
+                                                                       "post1",
+                                                                       "test/mime1",{"header_param" => "header_value"}],
+                                                                      [[@ase[4].id, @ase[5].id],
+                                                                       "post2",
+                                                                       "test/mime2"]]
+                                                                }
+                                                            }
+                                                        })
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {"header_param" => "header_value"})
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {})
+        @course.send_final_grades_to_endpoint(@user)
+        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["unpublishable", "published", "unpublishable", "published", "published", "published", "unpublished", "unpublishable", "unpublishable"]
+      end
+
+      it 'should update enrollment status if no resource provided' do
+        @plugin.stubs(:enabled?).returns(true)
+        @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint", :format_type => "test_format"
+        grade_publishing_user
+        @ase = @student_enrollments.find_all{|e| e.workflow_state == 'active'}
+        Course.stubs(:valid_grade_export_types).returns({
+                                                            "test_format" => {
+                                                                :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
+                                                                  course.should == @course
+                                                                  enrollments.sort_by(&:id).should == @ase.sort_by(&:id)
+                                                                  publishing_pseudonym.should == @pseudonym
+                                                                  publishing_user.should == @user
+                                                                  return [
+                                                                      [[@ase[1].id, @ase[3].id],
+                                                                       nil,
+                                                                       nil],
+                                                                      [[@ase[4].id, @ase[7].id],
+                                                                       nil,
+                                                                       nil]]
+                                                                }
+                                                            }
+                                                        })
+        SSLCommon.expects(:post_data).never
+        @course.send_final_grades_to_endpoint @user
+        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["unpublishable", "published", "unpublishable", "published", "published", "unpublishable", "unpublished", "unpublishable", "published"]
+        @student_enrollments.map(&:grade_publishing_message).should == [nil] * 9
       end
 
     end
@@ -2554,7 +2699,7 @@ describe Course, "conclusions" do
     @user.reload
     @user.cached_current_enrollments(:reload)
 
-    enrollment.state.should == :active
+    enrollment.reload.state.should == :active
     enrollment.state_based_on_date.should == :completed
     enrollment.should_not be_participating_student
 
@@ -2772,8 +2917,9 @@ describe Course, ".import_from_migration" do
     # no course imports
     @course.should_not have_open_course_imports
 
+    course2 = @course.account.courses.create!
     # created course import
-    @course.course_imports.create!
+    @course.course_imports.create!(source: course2, import_type: 'test')
     @course.should have_open_course_imports
 
     # started course import
@@ -3131,8 +3277,8 @@ describe Course do
       end
 
       it 'can be read by a prior user' do
-        user.enrollments.create!(:workflow_state => 'completed', :course => @course)
-        @course.check_policy(user).should == [:read, :read_outcomes]
+        user.student_enrollments.create!(:workflow_state => 'completed', :course => @course)
+        @course.check_policy(user).should == [:read, :read_outcomes, :read_grades, :read_forum]
       end
 
       it 'can have its forum read by an observer' do
@@ -3546,6 +3692,47 @@ describe Course do
 
     it "should be true if no visibilities are given" do
       @course.visibility_limited_to_course_sections?(nil, []).should be_true
+    end
+  end
+
+  describe "#draft_state_enabled?" do
+    before(:each) do
+      @account = Account.create!
+      @account.settings[:allow_draft] = true
+      @account.save!
+      course(active_all: true)
+      @course.root_account = @account
+      @course.save!
+    end
+
+    context "a course with enable_draft enabled" do
+      it "should check its own enable_draft setting" do
+        @course.enable_draft = true
+        @course.save!
+
+        @course.should be_draft_state_enabled
+      end
+    end
+
+    context "a course with an enable_draft account" do
+      it "should check its root_account's enable_draft setting" do
+        @course.root_account.settings[:enable_draft] = true
+        @course.root_account.save!
+
+        @course.should be_draft_state_enabled
+      end
+    end
+
+    context "a course with an account that doesn't allow draft state" do
+      it "shouldn't be able to enable draft state" do
+        @account.settings[:allow_draft] = false
+        @account.save!
+
+        @course.enable_draft = true
+        @course.save!
+
+        @course.should_not be_draft_state_enabled
+      end
     end
   end
 end

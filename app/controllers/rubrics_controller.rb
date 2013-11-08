@@ -26,7 +26,7 @@ class RubricsController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage)
     js_env :ROOT_OUTCOME_GROUP => get_root_outcome
     @rubric_associations = @context.rubric_associations.bookmarked.include_rubric.to_a
-    @rubric_associations = @rubric_associations.select(&:rubric_id).once_per(&:rubric_id).sort_by{|a| a.rubric.title }
+    @rubric_associations = Canvas::ICU.collate_by(@rubric_associations.select(&:rubric_id).once_per(&:rubric_id)) { |r| r.rubric.title }
     @rubrics = @rubric_associations.map(&:rubric)
     @context.is_a?(User) ? render(:action => 'user_index') : render
   end
@@ -38,15 +38,7 @@ class RubricsController < ApplicationController
     @actual_rubric = @rubric_association.rubric
   end
 
-  def assessments
-    if authorized_action(@context, @current_user, :manage)
-      @rubric_associations = @context.rubric_associations.bookmarked
-      @rubrics = @rubric_associations.map{|r| r.rubric}
-    end
-  end
-  
   def create
-    @invitees = params[:rubric_association].delete(:invitations) rescue nil
     update
   end
   
@@ -58,7 +50,6 @@ class RubricsController < ApplicationController
   # instead of the old one.
   def update
     params[:rubric_association] ||= {}
-    params[:rubric_association].delete(:invitations)
     @association_object = RubricAssociation.get_association_object(params[:rubric_association])
     params[:rubric][:user] = @current_user if params[:rubric]
     if (!@association_object || authorized_action(@association_object, @current_user, :read)) && authorized_action(@context, @current_user, :manage_rubrics)
@@ -84,14 +75,14 @@ class RubricsController < ApplicationController
         @rubric.user = @current_user
       end
       if params[:rubric] && (@rubric.grants_right?(@current_user, session, :update) || (@association && @association.grants_right?(@current_user, session, :update))) #authorized_action(@rubric, @current_user, :update)
-        @association = @rubric.update_with_association(@current_user, params[:rubric], @context, params[:rubric_association], @invitees)
+        @association = @rubric.update_with_association(@current_user, params[:rubric], @context, params[:rubric_association])
         @rubric = @association.rubric if @association
       end
       json_res = {}
       json_res[:rubric] = @rubric.as_json(:methods => :criteria, :include_root => false, :permissions => {:user => @current_user, :session => session}) if @rubric
       json_res[:rubric_association] = @association.as_json(:include_root => false, :include => [:rubric_assessments, :assessment_requests], :methods => :assessor_name, :permissions => {:user => @current_user, :session => session}) if @association
       json_res[:rubric_association][:skip_updating_points_possible] = skip_points_update if json_res && json_res[:rubric_association]
-      render :json => json_res.to_json
+      render :json => json_res
     end
   end
   
@@ -99,7 +90,7 @@ class RubricsController < ApplicationController
     @rubric = RubricAssociation.find_by_rubric_id_and_context_id_and_context_type(params[:id], @context.id, @context.class.to_s, :include => :rubric).rubric
     if authorized_action(@rubric, @current_user, :delete_associations)
       @rubric.destroy_for(@context)
-      render :json => @rubric.to_json
+      render :json => @rubric
     end
   end
 

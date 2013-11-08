@@ -2,24 +2,24 @@
 
 <div class="due-date-override-headers clearfix">
   <div class="section-header">
-    {{#t "overrides.for"}}
-      For
-    {{/t}}
+    <label id="overrides_course_section">
+    {{#t "overrides.for"}}For{{/t}}
+    </label>
   </div>
   <div class="due-date-header">
-    {{#t "overrides.due_date"}}
-      Due Date
-    {{/t}}
+    <label id="overrides_due_date">
+    {{#t "overrides.due_date"}}Due Date{{/t}}
+    </label>
   </div>
   <div class="lock-header">
-    {{#t "overrides.available_from"}}
-      Available From
-    {{/t}}
+    <label id="overrides_unlock_at">
+    {{#t "overrides.available_from"}}Available From{{/t}}
+    </label>
   </div>
   <div class="unlock-header">
-    {{#t "until"}}
-      Until
-    {{/t}}
+    <label id="overrides_lock_at">
+    {{#t "until"}}Until{{/t}}
+    </label>
   </div>
 
 </div>
@@ -28,6 +28,7 @@
 
 <div class="due-date-override-footer">
   <button class="btn" id="add_due_date" style="{{hiddenIf shouldHideDueDate}}">
-    <i class="icon-add"></i> {{#t "overrides.due_date"}}Due Date{{/t}}
+    <i class="icon-add"><span class=screenreader-only>Add</span></i>
+    {{#t "overrides.due_date"}}Due Date{{/t}}
   </button>
 </div>

@@ -3,11 +3,12 @@
   jammit_css :speed_grader
   js_env({
     :RUBRIC_ASSESSMENT => {
-      :assessor_id => @current_user ? @current_user.id : "null",
+      :assessor_id => @current_user.id.to_s,
       :assessment_type => can_do(@assignment, @current_user, :grade) ? "grading" : "peer_review"
     }
   })
   @show_left_side = false
+  @show_embedded_chat = false
   @body_classes << 'full-width'
   @can_edit_anything = !@context.completed?
 %>
@@ -16,7 +17,7 @@
   <%= t(:loading, "loading...") %>
 </h4>
 <div id="gradebook_header" style="display:none;">
-  <% form_tag({ :controller => :gradebooks, :course_id => @context.id, :action => :update_submission }) do %>
+  <%= form_tag({ :controller => :gradebooks, :course_id => @context.id, :action => :update_submission }) do %>
     <div class="left">
       <% if service_enabled?(:avatars) %>
          <div id="avatar">
@@ -27,7 +28,7 @@
       <div id="combo_box_container"></div>
       <a href="#" class="next"><%= t('links.next', "Next") %></a>
       <div id='x_of_x_students'>
-        (<%= t(:student_index_of_total, "student %{index} of %{total_students}", :index => raw('<span>???</span>'), :total_students => @assignment.context.students_visible_to(@current_user).count(:id, :distinct => true)) %>)<br />
+        <span id='x_of_x_students_frd'></span><br>
         <a href="<%= gradebook_url_for(@current_user, @context, @assignment) %>" id="speed_grader_gradebook_link">
           <%= t('links.gradebook', "Gradebook") %>
         </a>
@@ -35,13 +36,13 @@
       </div>
     </div>
     <div class="right">
-      <a data-muted="<%= @assignment.muted? ? "true" : "false" %>" id="mute_link" href="#"><span class="ui-icon ui-icon-volume-<%= @assignment.muted? ? "on" : "off" %>"></span><span><%= @assignment.muted? ? t("gradebook.unmute_assignment", "Unmute Assignment") : t("gradebook.mute_assignment", "Mute Assignment") %></span></a>
+      <a data-muted="<%= @assignment.muted? ? "true" : "false" %>" id="mute_link" href="#"><span class="ui-icon ui-icon-volume-<%= @assignment.muted? ? "on" : "off" %>"></span><span class=mute_label><%= @assignment.muted? ? t("gradebook.unmute_assignment", "Unmute Assignment") : t("gradebook.mute_assignment", "Mute Assignment") %></span></a>
       <a id="settings_link" href="#"><span class="ui-icon ui-icon-wrench"></span><%= t('links.settings', "Settings") %></a>
       <% if help_link %>
         | <%= help_link %>
       <% end %>
       <div>
-        <span id="x_of_x_graded"><%= t(:portion_graded, "%{x} / %{y} Graded", :x => raw('<span>0</span>'), :y => raw("<span>#{@assignment.context.students.length}</span>")) %></span>
+        <span id="x_of_x_graded"></span>
         <span id='average_score_wrapper' style='display:none; padding-left: 10px;'><%= before_label(:average, "Avg") %> <span id='average_score'>0.0</span></span>
       </div>
     </div>
@@ -62,7 +63,13 @@
       </div>
       <div id='submissions_container'>
         <div id="this_student_does_not_have_a_submission">
-          <h3><%= t('headers.no_submission', "This student does not have a submission for this assignment") %></h3>
+          <h3>
+            <% if @assignment.grade_as_group? %>
+              <%= t('headers.no_group_submission', "This group does not have a submission for this assignment") %>
+            <% else %>
+              <%= t('headers.no_submission', "This student does not have a submission for this assignment") %>
+            <% end %>
+          </h3>
         </div>
         <div id="this_student_has_a_submission">
           <h3>
@@ -151,7 +158,7 @@
           <% end %>
           <% if @assignment.rubric_association %>
           <div id="rubric_summary_holder">
-            <div id="rubric_assessments_list_and_edit_button_holder"  class="content_box">
+            <div id="rubric_assessments_list_and_edit_button_holder" class="content_box">
               <span id="rubric_assessments_list">
                 <%= before_label(:show_assessment_by, "Show Assessment By") %>
                 <select id="rubric_assessments_select">
@@ -267,6 +274,14 @@
     <input type="checkbox" id="hide_student_names" name="hide_student_names"/>
     <label for="hide_student_names"><%= t('labels.hide_names', "Hide student names in the SpeedGrader") %></label>
   </p>
+
+  <p <% unless @assignment.quiz %>class=hidden<% end %>>
+    <%= check_box_tag :enable_speedgrader_grade_by_question, "1",
+      @current_user.preferences[:enable_speedgrader_grade_by_question] %>
+    <%= label_tag :enable_speedgrader_grade_by_question,
+      t('labels.grade_by_question_beta', 'Grade by question (beta)') %>
+  </p>
+
   <div class="button-container">
     <button class="btn dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
     <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.save_settings', "Save Settings") %></button>

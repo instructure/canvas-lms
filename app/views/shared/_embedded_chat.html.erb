@@ -1,0 +1,33 @@
+<script>
+  window.addEventListener('message', function(event) {
+    var iframes = document.getElementsByTagName('iframe'),
+      iframe;
+    for (var i=0, l=iframes.length; i < l; i++) {
+        if (iframes[i].contentWindow === event.source) {
+        iframe = iframes[i];
+        break;
+      }
+    }
+    if (!iframe) {return;}
+
+    var data = JSON.parse(event.data)
+
+    if (data.request_launch_url) {
+      event.source.postMessage(JSON.stringify({launch_url: iframe.getAttribute('data-launch-url')}), '*');
+      return;
+    }
+
+      if (data.quicklaunch) {
+        event.source.postMessage(JSON.stringify({quicklaunch: <%= embedded_chat_quicklaunch_params.to_json.html_safe %>}), '*');
+        return;
+      }
+    if (!data.width) {return;}
+    if (data.width > document.documentElement.clientWidth / 2) {return;}
+    iframe.style.width = data.width+'px';
+    iframe.style.height = data.height+'px';
+  }, false);
+</script>
+<iframe
+  data-launch-url="<%= full_url(context_url(@context, :context_external_tool_resource_selection_url, active_external_tool_by_id('chat').id, launch_type: 'course_navigation')) %>"
+  style="position: fixed; right: 0; bottom: 0; width: 0; height: 0; border: 1px solid #808080; z-index: 100"
+  src="<%= embedded_chat_url %>"></iframe>

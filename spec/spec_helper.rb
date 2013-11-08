@@ -18,7 +18,7 @@
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
   require 'simplecov'
-  SimpleCov.start('rails') do
+  SimpleCov.start do
     SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
     add_filter '/spec/'
     add_filter '/config/'
@@ -44,12 +44,12 @@ end
 ENV["RAILS_ENV"] = 'test'
 
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
-if CANVAS_RAILS3
-  require 'rspec/rails'
-else
+if CANVAS_RAILS2
   require 'spec'
   # require 'spec/autorun'
   require 'spec/rails'
+else
+  require 'rspec/rails'
 end
 require 'webrat'
 require 'mocha/api'
@@ -106,7 +106,7 @@ end
 def truncate_all_cassandra_tables
   Canvas::Cassandra::Database.config_names.each do |cass_config|
     db = Canvas::Cassandra::Database.from_config(cass_config)
-    db.keyspace_information.tables.each do |table|
+    db.tables.each do |table|
       db.execute("TRUNCATE #{table}")
     end
   end
@@ -123,6 +123,46 @@ class ActiveRecord::ConnectionAdapters::MysqlAdapter < ActiveRecord::ConnectionA
     # and then can't release it because it doesn't exist, we're not in a transaction
     execute('SAVEPOINT outside_transaction')
     !!execute('RELEASE SAVEPOINT outside_transaction') rescue true
+  end
+end
+
+
+# Be sure to actually test serializing things to non-existent caches,
+# but give Mocks a pass, since they won't exist in dev/prod
+Mocha::Mock.class_eval do
+  def marshal_dump
+    nil
+  end
+
+  def marshal_load(data)
+    raise "Mocks aren't really serializeable!"
+  end
+
+  def respond_to_with_marshalling?(symbol, include_private = false)
+    return true if [:marshal_dump, :marshal_load].include?(symbol)
+    respond_to_without_marshalling?(symbol, include_private)
+  end
+  alias_method_chain :respond_to?, :marshalling
+end
+
+[ActiveSupport::Cache::MemoryStore, NilStore].each do |store|
+  store.class_eval do
+    def write_with_serialization_check(name, value, options = nil)
+      Marshal.dump(value)
+      write_without_serialization_check(name, value, options)
+    end
+    alias_method_chain :write, :serialization_check
+  end
+end
+
+unless CANVAS_RAILS2
+  NilStore.class_eval do
+    def fetch_with_serialization_check(name, options = {}, &block)
+      result = fetch_without_serialization_check(name, options, &block)
+      Marshal.dump(result) if result
+      result
+    end
+    alias_method_chain :fetch, :serialization_check
   end
 end
 
@@ -236,6 +276,12 @@ Spec::Runner.configure do |config|
         e.save!
         @teacher = u
       end
+      if opts[:draft_state]
+        account.settings[:allow_draft] = true
+        account.save!
+        @course.enable_draft = true
+        @course.save!
+      end
     end
     @course
   end
@@ -270,7 +316,10 @@ Spec::Runner.configure do |config|
 
   def user(opts={})
     @user = User.create!(opts.slice(:name, :short_name))
-    @user.register! if opts[:active_user] || opts[:active_all]
+    if opts[:active_user] || opts[:active_all]
+      @user.accept_terms
+      @user.register!
+    end
     @user.update_attribute :workflow_state, opts[:user_state] if opts[:user_state]
     @user
   end
@@ -308,7 +357,8 @@ Spec::Runner.configure do |config|
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
     account = opts[:account] || Account.default
-    @pseudonym = account.pseudonyms.create!(:user => user, :unique_id => username, :password => password, :password_confirmation => password)
+    @pseudonym = account.pseudonyms.build(:user => user, :unique_id => username, :password => password, :password_confirmation => password)
+    @pseudonym.save_without_session_maintenance
     @pseudonym.communication_channel = communication_channel(user, opts)
     @pseudonym
   end
@@ -412,6 +462,18 @@ Spec::Runner.configure do |config|
     user_session(@user)
   end
 
+  def set_course_draft_state(enabled=true, opts={})
+    course = opts[:course] || @course
+    account = opts[:account] || course.account
+
+    account.settings[:allow_draft] = true
+    account.save! unless opts[:no_save]
+    course.enable_draft = enabled
+    course.save! unless opts[:no_save]
+
+    enabled
+  end
+
   def add_section(section_name)
     @course_section = @course.course_sections.create!(:name => section_name)
     @course.reload
@@ -434,7 +496,8 @@ Spec::Runner.configure do |config|
   VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
 
   def group(opts={})
-    @group = (opts[:group_context].try(:groups) || Group).create! opts.slice(*VALID_GROUP_ATTRIBUTES)
+    context = opts[:group_context] || Account.default
+    @group = context.groups.create! opts.slice(*VALID_GROUP_ATTRIBUTES)
   end
 
   def group_with_user(opts={})
@@ -610,52 +673,52 @@ Spec::Runner.configure do |config|
     @outcome_group.add_outcome(@outcome)
     @outcome_group.save!
 
-    @rubric = Rubric.generate(:context => @course,
-                              :data => {
-                                  :title => 'My Rubric',
-                                  :hide_score_total => false,
-                                  :criteria => {
-                                      "0" => {
-                                          :points => 3,
-                                          :mastery_points => 0,
-                                          :description => "Outcome row",
-                                          :long_description => @outcome.description,
-                                          :ratings => {
-                                              "0" => {
-                                                  :points => 3,
-                                                  :description => "Rockin'",
-                                              },
-                                              "1" => {
-                                                  :points => 0,
-                                                  :description => "Lame",
-                                              }
-                                          },
-                                          :learning_outcome_id => @outcome.id
-                                      },
-                                      "1" => {
-                                          :points => 5,
-                                          :description => "no outcome row",
-                                          :long_description => 'non outcome criterion',
-                                          :ratings => {
-                                              "0" => {
-                                                  :points => 5,
-                                                  :description => "Amazing",
-                                              },
-                                              "1" => {
-                                                  :points => 3,
-                                                  :description => "not too bad",
-                                              },
-                                              "2" => {
-                                                  :points => 0,
-                                                  :description => "no bueno",
-                                              }
-                                          }
-                                      }
-                                  }
-                              })
-    @rubric.instance_variable_set('@alignments_changed', true)
-    @rubric.save!
-    @rubric.update_alignments
+    rubric_params = {
+      :title => 'My Rubric',
+      :hide_score_total => false,
+      :criteria => {
+        "0" => {
+          :points => 3,
+          :mastery_points => 0,
+          :description => "Outcome row",
+          :long_description => @outcome.description,
+          :ratings => {
+            "0" => {
+              :points => 3,
+              :description => "Rockin'",
+            },
+            "1" => {
+              :points => 0,
+              :description => "Lame",
+            }
+          },
+          :learning_outcome_id => @outcome.id
+        },
+        "1" => {
+          :points => 5,
+          :description => "no outcome row",
+          :long_description => 'non outcome criterion',
+          :ratings => {
+            "0" => {
+              :points => 5,
+              :description => "Amazing",
+            },
+            "1" => {
+              :points => 3,
+              :description => "not too bad",
+            },
+            "2" => {
+              :points => 0,
+              :description => "no bueno",
+            }
+          }
+        }
+      }
+    }
+
+    @rubric = @course.rubrics.build
+    @rubric.update_criteria(rubric_params)
+    @rubric.reload
   end
 
   def grading_standard_for(context, opts={})
@@ -684,7 +747,7 @@ Spec::Runner.configure do |config|
 
   def conversation(*users)
     options = users.last.is_a?(Hash) ? users.pop : {}
-    @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users)
+    @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users, options.delete(:private))
     @message = @conversation.add_message('test')
     @conversation.update_attributes(options)
     @conversation.reload
@@ -988,11 +1051,6 @@ Spec::Runner.configure do |config|
     send(method, url, query, headers.merge(http_headers))
   end
 
-  def run_transaction_commit_callbacks(conn = ActiveRecord::Base.connection)
-    conn.after_transaction_commit_callbacks.each { |cb| cb.call }
-    conn.after_transaction_commit_callbacks.clear
-  end
-
   def force_string_encoding(str, encoding = "UTF-8")
     if str.respond_to?(:force_encoding)
       str.force_encoding(encoding)
@@ -1106,6 +1164,11 @@ Spec::Runner.configure do |config|
     @quiz.workflow_state = "available" if active
     @quiz.save!
     @quiz
+  end
+
+  def n_students_in_course(n, opts={})
+    opts.reverse_merge active_all: true
+    n.times.map { student_in_course(opts); @student }
   end
 end
 

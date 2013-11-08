@@ -168,7 +168,11 @@ module CCHelper
         if match.obj_id.nil?
           "#{COURSE_TOKEN}/files"
         else
-          obj = match.obj_class.find_by_id(match.obj_id)
+          if @course && match.obj_class == Attachment
+            obj = @course.attachments.find(match.obj_id)
+          else
+            obj = match.obj_class.find_by_id(match.obj_id)
+          end
           next(match.url) unless obj && @rewriter.user_can_view_content?(obj)
           folder = obj.folder.full_name.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
           @referenced_files[obj.id] = CCHelper.create_key(obj) if @track_referenced_files && !@referenced_files[obj.id]

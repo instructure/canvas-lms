@@ -44,7 +44,7 @@ describe LtiApiController, :type => :integration do
   end
 
   it "should respond 'unsupported' for any unknown xml body" do
-    body = %{<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/lis/oms1p0/pox"></imsx_POXEnvelopeRequest>}
+    body = %{<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
     make_call('body' => body)
     check_failure
   end
@@ -83,7 +83,7 @@ describe LtiApiController, :type => :integration do
     
     body = %{
 <?xml version = "1.0" encoding = "UTF-8"?>
-<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/lis/oms1p0/pox">
+<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
   <imsx_POXHeader>
     <imsx_POXRequestHeaderInfo>
       <imsx_version>V1.0</imsx_version>
@@ -111,7 +111,7 @@ describe LtiApiController, :type => :integration do
     sourceid ||= BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @student)
     body = %{
 <?xml version = "1.0" encoding = "UTF-8"?>
-<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/lis/oms1p0/pox">
+<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
   <imsx_POXHeader>
     <imsx_POXRequestHeaderInfo>
       <imsx_version>V1.0</imsx_version>
@@ -135,7 +135,7 @@ describe LtiApiController, :type => :integration do
     sourceid ||= BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @student)
     body = %{
 <?xml version = "1.0" encoding = "UTF-8"?>
-<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/lis/oms1p0/pox">
+<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
   <imsx_POXHeader>
     <imsx_POXRequestHeaderInfo>
       <imsx_version>V1.0</imsx_version>

@@ -22,7 +22,7 @@ class SubAccountsController < ApplicationController
 
   def sub_accounts_of(account, current_depth = 0)
     account_data = @accounts[account.id] = { :account => account, :course_count => 0}
-    sub_accounts = account.sub_accounts.active.order(:name).limit(101) unless current_depth == 2
+    sub_accounts = account.sub_accounts.active.order(Account.best_unicode_collation_key('name')).limit(101) unless current_depth == 2
     sub_account_ids = (sub_accounts || []).map(&:id)
     if current_depth == 2 || sub_accounts.length > 100
       account_data[:sub_account_ids] = []
@@ -85,7 +85,7 @@ class SubAccountsController < ApplicationController
   
   def show
     @sub_account = subaccount_or_self(params[:id])
-    render :json => @sub_account.to_json(:include => [:sub_accounts, :courses], :methods => [:course_count, :sub_account_count])
+    render :json => @sub_account.as_json(:include => [:sub_accounts, :courses], :methods => [:course_count, :sub_account_count])
   end
   
   def create
@@ -93,9 +93,9 @@ class SubAccountsController < ApplicationController
     @sub_account = @parent_account.sub_accounts.build(params[:account])
     @sub_account.root_account = @context.root_account
     if @sub_account.save
-      render :json => @sub_account.to_json
+      render :json => @sub_account
     else
-      render :json => @sub_account.errors.to_json
+      render :json => @sub_account.errors
     end
   end
   
@@ -103,16 +103,16 @@ class SubAccountsController < ApplicationController
     @sub_account = subaccount_or_self(params[:id])
     params[:account].delete(:parent_account_id)
     if @sub_account.update_attributes(params[:account])
-      render :json => @sub_account.to_json
+      render :json => @sub_account
     else
-      render :json => @sub_account.errors.to_json
+      render :json => @sub_account.errors
     end
   end
   
   def destroy
     @sub_account = subaccount_or_self(params[:id])
     @sub_account.destroy
-    render :json => @sub_account.to_json
+    render :json => @sub_account
   end
 
   protected

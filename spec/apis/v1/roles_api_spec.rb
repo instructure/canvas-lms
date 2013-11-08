@@ -207,7 +207,7 @@ describe "Roles API", :type => :integration do
 
         @account.roles.active.map(&:name).should include(@role)
 
-        course1 = Course.new(:name => "blah", :account => @account)
+        course1 = Course.create!(:name => "blah", :account => @account)
         user1 = user()
 
         account_admin_user(:account => @account)

@@ -27,3 +27,59 @@ define [
 
     equal $previousEl.parent().length, 0, 'previous content removed'
     equal view.publishIconView.$el.data('test-data'), 'test-is-good', 'test data preserved (by detach)'
+
+  test 'delegate useAsFrontPage to the model', ->
+    model = new WikiPage
+      front_page: false
+      published: true
+    view = new WikiPageIndexItemView
+      model: model
+    stub = sinon.stub(model, 'setFrontPage')
+
+    view.useAsFrontPage()
+    ok stub.calledOnce
+
+
+  module 'WikiPageIndexItemView:JSON'
+
+  testRights = (subject, options) ->
+    test "#{subject}", ->
+      model = new WikiPage
+      view = new WikiPageIndexItemView
+        model: model
+        contextName: options.contextName
+        WIKI_RIGHTS: options.WIKI_RIGHTS
+      json = view.toJSON()
+      for key of options.CAN
+        strictEqual json.CAN[key], options.CAN[key], "CAN.#{key}"
+
+  testRights 'CAN (manage course)',
+    contextName: 'courses'
+    WIKI_RIGHTS:
+      read: true
+      manage: true
+    CAN:
+      MANAGE: true
+      PUBLISH: true
+
+  testRights 'CAN (manage group)',
+    contextName: 'groups'
+    WIKI_RIGHTS:
+      read: true
+      manage: true
+    CAN:
+      MANAGE: true
+      PUBLISH: false
+
+  testRights 'CAN (read)',
+    contextName: 'courses'
+    WIKI_RIGHTS:
+      read: true
+    CAN:
+      MANAGE: false
+      PUBLISH: false
+
+  testRights 'CAN (null)',
+    CAN:
+      MANAGE: false
+      PUBLISH: false

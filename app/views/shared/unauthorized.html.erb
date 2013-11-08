@@ -7,6 +7,7 @@
 
 <% end %>
 <% @show_left_side = false %>
+<% @show_embedded_chat = false %>
 <% needs_login = (!@current_user && !@files_domain) %>
 <div id="unauthorized_holder">
 <% if (@unauthorized_user && @current_user && @current_user != @unauthorized_user) || @unauthorized_user || @unauthorized_message || @context || @needs_cookies %>
@@ -43,7 +44,7 @@
           <%= mt 'public_course', 'This page is part of the content for the course, **%{course}**.', :course => @context.name %>
         <% end %>
       <%= t('unauthorized_1', %{It appears that you don't have permission to access this page.  Please make sure you're authorized to view this content.}) %>
-      <% if Setting.get_cached("show_feedback_link", "false") == "true" %>
+      <% if Setting.get("show_feedback_link", "false") == "true" %>
         <%= t('unauthorized_2', %{If you think you should be able to view this page, please use the "Help" link to notify support of the problem.}) %>
       <% end %>
       </p>

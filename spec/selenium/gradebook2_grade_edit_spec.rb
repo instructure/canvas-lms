@@ -278,7 +278,7 @@ describe "edititing grades" do
     wait_for_ajaximations
     edit_grade(f('#gradebook_grid [row="0"] .l0'), 0)
     keep_trying_until do
-      f('.ui-state-error').text.should match(/refresh/)
+      flash_message_present?(:error, /refresh/).should be_true
     end
   end
 end

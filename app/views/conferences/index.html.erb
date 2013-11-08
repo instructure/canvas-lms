@@ -15,41 +15,56 @@
   </header>
 <% end %>
 
-<div class="conference-wrapper item-box">
-  <h2>
-    <a class="element_toggler"
-        href="#"
-        aria-controls="new-conference-list">
-      <i class="icon-arrow-down"></i>
-      <%= t(:new_conferences, 'New Conferences') %>
-    </a>
-  </h2>
+<div class="item-group-container item-box">
 
-  <div class="table" id="new-conference-list" aria-expanded="true">
-    <div class="table-row no-new-conferences">
-      <div class="table-cell">
-        <%= t(:no_new_conferences, 'There are no new conferences') %>
-      </div>
+  <div class="item-group-condensed">
+    <div class="ig-header">
+      <h2 class="ig-header-title">
+        <a class="element_toggler"
+           aria-controls="new-conference-list"
+           aria-expanded="true">
+          <i class="icon-mini-arrow-down"></i>
+          <%= t(:new_conferences, 'New Conferences') %>
+        </a>
+      </h2>
+    </div>
+    <div class="item-group-expandable" id="new-conference-list">
+      <ul class="ig-list">
+        <li class="no-new-conferences">
+          <div class="ig-row ig-row-empty">
+            <div class="ig-empty-msg">
+              <%= t(:no_new_conferences, 'There are no new conferences') %>
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
   </div>
-</div>
-<div class="conference-wrapper item-box">
-  <h2>
-    <a class="element_toggler"
-       href="#"
-       aria-controls="concluded-conference-list">
-      <i class="icon-arrow-down"></i>
-      <%= t(:concluded_conferences, 'Concluded Conferences') %>
-    </a>
-  </h2>
 
-  <div class="table" id="concluded-conference-list" aria-expanded="true">
-    <div class="table-row no-concluded-conferences">
-      <div class="table-cell">
-        <%= t(:no_concluded_conferences, 'There are no concluded conferences') %>
-      </div>
+  <div class="item-group-condensed">
+    <div class="ig-header">
+      <h2 class="ig-header-title">
+        <a class="element_toggler"
+            aria-controls="concluded-conference-list"
+            aria-expanded="true">
+          <i class="icon-mini-arrow-down"></i>
+          <%= t(:concluded_conferences, 'Concluded Conferences') %>
+        </a>
+      </h2>
+    </div>
+    <div class="item-group-expandable" id="concluded-conference-list">
+      <ul class="ig-list">
+        <li class="no-concluded-conferences">
+          <div class="ig-row ig-row-empty">
+            <div class="ig-empty-msg">
+              <%= t(:no_concluded_conferences, 'There are no concluded conferences') %>
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
   </div>
+
 </div>
 
-<div id='add_conference_form'></div>
+<div id="add_conference_form"></div>

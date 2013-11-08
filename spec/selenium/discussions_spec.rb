@@ -58,6 +58,25 @@ describe "discussions" do
       get url
       check_permissions(what_to_create.count)
     end
+
+    it "should bucket topics based on section-specific locks" do
+      sec = @course.course_sections.create!(:name => "Section 2")
+      topic = @course.discussion_topics.build(:title => "topic closed to section 2", :user => @user)
+      topic.assignment = @course.assignments.build
+      topic.save!
+      topic.assignment.assignment_overrides.create! { |override|
+        override.set = sec 
+        override.lock_at = 1.day.ago
+        override.lock_at_overridden = true
+      }
+
+      student = user_with_pseudonym({:unique_id => 'sectionuser@example.com', :password => 'asdfasdf'})
+      @course.enroll_user(student, 'StudentEnrollment', :section => sec).accept!
+      login_as(student.primary_pseudonym.unique_id, 'asdfasdf')
+      get url
+      wait_for_ajaximations
+      f('#locked-discussions .collectionViewItems .discussion').should_not be_nil 
+    end
   end
 
   context "as a teacher" do
@@ -340,6 +359,22 @@ describe "discussions" do
           ffj('.open.discussion-list li.discussion:visible').length.should == 1
         end
 
+        it "should allow pinning of all pages of topics" do
+          100.times do |n|
+            DiscussionTopic.create!(context: @course, user: @teacher,
+              title: "Discussion Topic #{n+1}")
+          end
+          topic = DiscussionTopic.where(context_id: @course.id).order('id DESC').last
+          topic.should_not be_pinned
+          get(url)
+          wait_for_ajaximations
+          keep_trying_until { fj(".al-trigger") }
+          fj("[data-id=#{topic.id}] .al-trigger").click
+          fj('.icon-pin:visible').click
+          wait_for_ajaximations
+          topic.reload.should be_pinned
+        end
+
         it "should allow locking a pinned topic" do
           topic = @course.discussion_topics.create!(title: 'Test Discussion', user: @user, pinned: true)
           get(url)
@@ -613,7 +648,7 @@ describe "discussions" do
           fj('.due-date-overrides:first [name="due_at"]').send_keys(due_at1.strftime('%b %-d, %y'))
 
           f('#add_due_date').click
-          wait_for_animations
+          wait_for_ajaximations
 
           click_option('.due-date-row:last select', sec2.name)
           ff('.due-date-overrides [name="due_at"]')[1].send_keys(due_at2.strftime('%b %-d, %y'))
@@ -839,6 +874,24 @@ describe "discussions" do
       @topic.subscribed?(@student).should be_false
     end
 
+    it "should display the subscribe button after an initial post" do
+      @topic.unsubscribe(@student)
+      @topic.require_initial_post = true
+      @topic.save!
+
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/"
+      wait_for_ajaximations
+      f('.topic-unsubscribe-button').should_not be_displayed
+      f('.topic-subscribe-button').should_not be_displayed
+
+      f('.discussion-reply-action').click
+      wait_for_ajaximations
+      type_in_tiny 'textarea', 'initial post text'
+      submit_form('.discussion-reply-form')
+      wait_for_ajaximations
+      f('.topic-unsubscribe-button').should be_displayed
+    end
+
     it "should allow subscribing after an initial post" do
       @topic.unsubscribe(@student)
       @topic.require_initial_post = true
@@ -1057,7 +1110,7 @@ describe "discussions" do
         wait_for_ajax_requests
 
         f('.discussion-entries .discussion-reply-action').click
-        wait_for_animations
+        wait_for_ajaximations
         type_in_tiny 'textarea', side_comment_text
         submit_form('.discussion-entries .discussion-reply-form')
         wait_for_ajaximations
@@ -1120,6 +1173,8 @@ describe "discussions" do
     end
 
     it "should automatically mark things as read" do
+      resize_screen_to_default
+
       reply_count = 2
       reply_count.times { @topic.discussion_entries.create!(:message => 'Lorem ipsum dolor sit amet', :user => @student) }
       @topic.create_materialized_view
@@ -1130,6 +1185,7 @@ describe "discussions" do
       f('.new-and-total-badge .new-items').text.should == reply_count.to_s
 
       #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
+      driver.execute_script("$('.entry_content').last().get(0).scrollIntoView()")
       keep_trying_until { ff('.discussion_entry.unread').should be_empty }
       ff('.discussion_entry.read').length.should == reply_count + 1 # +1 because the topic also has the .discussion_entry class
 
@@ -1148,6 +1204,8 @@ describe "discussions" do
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       ff(".discussion_entry.unread").size.should == 2
       f('.new-and-total-badge .new-items').text.should == '2'
+
+      driver.execute_script("$('.entry_content').last().get(0).scrollIntoView()")
       keep_trying_until { ff('.discussion_entry.unread').size < 2 }
       wait_for_ajaximations
       ff(".discussion_entry.unread").size.should == 1
@@ -1190,16 +1248,16 @@ describe "discussions" do
       @topic.create_materialized_view
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      wait_for_animations
-      f('.topic-unsubscribe-button').displayed?.should be_true
-      f('.topic-subscribe-button').displayed?.should be_false
+      wait_for_ajaximations
+      f('.topic-unsubscribe-button').should be_displayed
+      f('.topic-subscribe-button').should_not be_displayed
 
       @topic.unsubscribe(@teacher)
       @topic.update_materialized_view
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      wait_for_animations
-      f('.topic-unsubscribe-button').displayed?.should be_false
-      f('.topic-subscribe-button').displayed?.should be_true
+      wait_for_ajaximations
+      f('.topic-unsubscribe-button').should_not be_displayed
+      f('.topic-subscribe-button').should be_displayed
     end
 
     it "should unsubscribe from topic" do
@@ -1207,7 +1265,7 @@ describe "discussions" do
       @topic.create_materialized_view
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      wait_for_animations
+      wait_for_ajaximations
       f('.topic-unsubscribe-button').click
       wait_for_ajaximations
       @topic.reload
@@ -1219,7 +1277,7 @@ describe "discussions" do
       @topic.create_materialized_view
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      wait_for_animations
+      wait_for_ajaximations
       f('.topic-subscribe-button').click
       wait_for_ajaximations
       @topic.reload
@@ -1234,22 +1292,22 @@ describe "discussions" do
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       wait_for_ajax_requests
       # shouldn't see subscribe button until after posting
-      f('.topic-subscribe-button').displayed?.should be_false
+      f('.topic-subscribe-button').should_not be_displayed
       add_reply new_student_entry_text
       # now the subscribe button should be available.
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       wait_for_ajax_requests
       # already subscribed because they posted
-      f('.topic-unsubscribe-button').displayed?.should be_true
+      f('.topic-unsubscribe-button').should be_displayed
     end
 
     it "should updated subscribed button when user posts to a topic" do
       course_with_student_logged_in(:course => @course)
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       wait_for_ajax_requests
-      f('.topic-subscribe-button').displayed?.should be_true
+      f('.topic-subscribe-button').should be_displayed
       add_reply "student posting"
-      f('.topic-unsubscribe-button').displayed?.should be_true
+      f('.topic-unsubscribe-button').should be_displayed
     end
   end
 

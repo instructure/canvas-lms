@@ -1892,8 +1892,7 @@ define([
         $form.find("form")
              .attr('action', $("#file_context_links ." + 
                                 itemData.context_string + 
-                                "_attachments_url").attr('href') + 
-                                ".text");
+                                "_attachments_url").attr('href'));
         $form.mouseover();
         $form.find(":text:first")
              .focus()
@@ -2039,7 +2038,7 @@ define([
           modal: true,
           width: 350,
           title: item_type == 'folder' ? I18n.t('titles.lock_folder', "Lock Folder") : I18n.t('titles.lock_file', 'Lock File')
-        });
+        }).find('.datetime_field').datetime_field();;
       });
 
       $("#folder_just_hide,#attachment_just_hide").change(function() {
@@ -2057,6 +2056,8 @@ define([
 
       $("#lock_attachment_form").formSubmit({
         processData: function(data) {
+          data['attachment[unlock_at]'] = $.datetime.process(data['attachment[unlock_at]']);
+          data['attachment[lock_at]'] = $.datetime.process(data['attachment[lock_at]']);
           return data;
         },
         beforeSubmit: function(data) {
@@ -2071,6 +2072,8 @@ define([
 
       $("#lock_folder_form").formSubmit({
         processData: function(data) {
+          data['folder[unlock_at]'] = $.datetime.process(data['folder[unlock_at]']);
+          data['folder[lock_at]'] = $.datetime.process(data['folder[lock_at]']);
           return data;
         },
         beforeSubmit: function(data) {

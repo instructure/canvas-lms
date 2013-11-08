@@ -37,6 +37,15 @@ class ActiveRecord::Base
   def self.add_any_instantiation(ar_obj)
     raise(ArgumentError, "need to save first") if ar_obj.new_record?
     @@any_instantiation[ [ar_obj.class.base_ar_class, ar_obj.id] ] = ar_obj
+    # calling any_instantiation is likely to be because you're stubbing it,
+    # and to later be cached inadvertently from code that *thinks* it
+    # has a non-stubbed object. So let it dump, but not load (i.e.
+    # the MemoryStore and NilStore dumps that are just for testing,
+    # but just discard the result of dump)
+    def ar_obj.marshal_dump
+      nil
+    end
+    # no marshal_load; will raise an exception on load
     ar_obj
   end
 

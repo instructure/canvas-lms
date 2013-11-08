@@ -26,9 +26,14 @@ class MediaTracksController < ApplicationController
   #
   # Create a new media track to be used as captions for different languages or deaf users. for more info, {https://developer.mozilla.org/en-US/docs/HTML/HTML_Elements/track read the MDN docs}
   #
-  # @argument kind one of: [subtitles, captions, descriptions, chapters, metadata]. default: 'subtitles'
-  # @argument locale Language code of the track being uploaded, examples: ["en", "es", "ru"]
-  # @argument content The contets of the track, in SRT or WebVTT format
+  # @argument kind [String, "subtitles"|"captions"|"descriptions"|"chapters"|"metadata"]
+  #   Default is 'subtitles'.
+  #
+  # @argument locale [String]
+  #   Language code of the track being uploaded, examples: ["en", "es", "ru"]
+  #
+  # @argument content [String]
+  #   The contets of the track, in SRT or WebVTT format
   #
   # @example_request
   #     curl https://<canvas>/media_objects/<media_object_id>/media_tracks \
@@ -37,7 +42,7 @@ class MediaTracksController < ApplicationController
   #         -F content='0\n00:00:00,000 --> 00:00:01,000\nInstructor…This is the first sentance\n\n\n1\n00:00:01,000 --> 00:00:04,000\nand a second...' \ 
   #         -H 'Authorization: Bearer <token>'
   #
-  # @returns Media Object
+  # @returns MediaObject
   def create
     @media_object = MediaObject.active.by_media_id(params[:media_object_id]).first
     if authorized_action(@media_object, @current_user, :add_captions)
@@ -72,7 +77,7 @@ class MediaTracksController < ApplicationController
   #     curl -X DELETE https://<canvas>/media_objects/<media_object_id>/media_tracks/<media_track_id> \
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns Media Object
+  # @returns MediaObject
   def destroy
     @media_object = MediaObject.by_media_id(params[:media_object_id]).first
     if authorized_action(@media_object, @current_user, :delete_captions)
@@ -80,7 +85,7 @@ class MediaTracksController < ApplicationController
       if @track.destroy
         render :json => media_object_api_json(@media_object, @current_user, session)
       else
-        render :json => @track.errors.to_json, :status => :bad_request
+        render :json => @track.errors, :status => :bad_request
       end
     end
   end

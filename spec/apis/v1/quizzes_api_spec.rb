@@ -76,7 +76,22 @@ describe QuizzesApiController, :type => :integration do
   end
 
   describe "GET /courses/:course_id/quizzes/:id (show)" do
-    before { teacher_in_course(:active_all => true) }
+    before { course_with_teacher_logged_in(:active_all => true, :course => @course) }
+
+    context "as a student" do
+
+      it "doesn't show access codes" do
+        course_with_student_logged_in(active_all: true)
+        quiz = @course.quizzes.create!(
+          title: "Access code Test",
+          access_code: "hello!"
+        )
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{quiz.id}",
+                        :controller=>"quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "#{quiz.id}")
+
+        json.should_not have_key('access_code')
+      end
+    end
 
     context "valid quiz" do
       before do
@@ -294,13 +309,17 @@ describe QuizzesApiController, :type => :integration do
       it "allows un/publishing an unpublished quiz" do
         api_update_quiz({},{})
         @quiz.reload.should_not be_published # in 'created' state by default
-        api_update_quiz({}, {published: false})
+        json = api_update_quiz({}, {published: false})
+        json['unpublishable'].should == true
         @quiz.reload.should be_unpublished
-        api_update_quiz({}, {published: true})
+        json = api_update_quiz({}, {published: true})
+        json['unpublishable'].should == true
         @quiz.reload.should be_published
         api_update_quiz({},{published: nil}) # nil shouldn't change published
         @quiz.reload.should be_published
         @quiz.any_instantiation.stubs(:has_student_submissions?).returns true
+        json = api_update_quiz({},{}) # nil shouldn't change published
+        json['unpublishable'].should == false
         json = api_update_quiz({}, {published: false}, {expected_status: 400})
         json['errors']['published'].should_not be_nil
         ActiveRecord::Base.reset_any_instantiation!

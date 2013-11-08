@@ -90,7 +90,7 @@ describe "assignment rubrics" do
       f('#rubric_dialog_'+@rubric.id.to_s+' .title').should include_text(@rubric.title)
       f('#rubric_dialog_'+@rubric.id.to_s+' .select_rubric_link').click
       wait_for_ajaximations
-      f('#rubric_'+@rubric.id.to_s+' > thead .title').should include_text(@rubric.title)
+      f('#rubric_'+@rubric.id.to_s+' .rubric_title .title').should include_text(@rubric.title)
     end
 
     it "should not adjust assignment points possible for grading rubric" do
@@ -167,7 +167,7 @@ describe "assignment rubrics" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       f(".toggle_full_rubric").click
-      wait_for_animations
+      wait_for_ajaximations
       f('#criterion_1 .long_description_link').click
       keep_trying_until { f('#rubric_long_description_dialog').should be_displayed }
       f("#rubric_long_description_dialog div.displaying .long_description").
@@ -182,7 +182,6 @@ describe "assignment rubrics" do
       @submission = @assignment.submit_homework(@student, {:url => "http://www.instructure.com/"})
       @rubric.data[0][:ignore_for_scoring] = '1'
       @rubric.points_possible = 5
-      @rubric.alignments_changed = true
       @rubric.save!
       @assignment.points_possible = 5
       @assignment.save!

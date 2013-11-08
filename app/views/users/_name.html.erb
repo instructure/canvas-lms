@@ -69,7 +69,7 @@
   </fieldset>
 <div title="<%= t 'titles.edit_user_details', 'Edit User Details' %>" id="edit_student_dialog" style="display: none;">
   <p><%= t('update_instructions', "You can update some of this user's information, but they can change it back if they choose.") %></p>
-  <% form_for @user, :url => user_url(@user), :html => {:id => "edit_student_form"} do |f| %>
+  <%= form_for @user, :url => user_url(@user), :html => {:id => "edit_student_form"} do |f| %>
     <table class="formtable">
       <tr>
         <td><%= f.blabel :name, :en => "Full Name" %></td>

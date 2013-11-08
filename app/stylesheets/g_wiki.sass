@@ -1,6 +1,8 @@
 @import environment.sass
+@import wiki_animations.scss
 
 $subdued-text-color: #696969
+$darkened-text-color: #4d4d4d
 $published-text-color: #34832b
 $unpublished-text-color: $subdued-text-color
 
@@ -10,45 +12,93 @@ $unpublished-icon-color: #b4b7ba
 $border-color: #c1c7cf
 $border-radius: 3px
 
+$pages-border: 1px solid #c1c7cf
+$pages-dashed-border: 1px dashed #c1c7cf
+$pages-inner-border: 1px solid #e1e3e4
+
 $index-background: #e8ecef
 $item-background: #ffffff
 $item-hover-background: #eef7ff
 
 $shadow: 0 1px 0 rgba(0,0,0,0.15)
+$table-shadow: 0 1px 0 #dde0e4
+
+.pages .sticky
+  position: fixed
+  z-index: 1000
+  top: 0px
+  left: 0px
+  right: 0px
+  margin-left: 1px
+  background: white
+  height: 33px
+  max-width: $max_main_width
+  border-color: $menu-border-color
+
+.pages.with-left-side .sticky
+  margin-left: $left_side_width + 1px
+.pages.with-right-side .sticky
+  margin-right: $right_side_width + 1px
 
 .pages
-
   #breadcrumbs
-    :border-bottom 1px solid $border-color
-  .toolbar-buttons
-    :padding 1em
-    :border-bottom 1px solid $border-color
-    :box-shadow $shadow
-    .left-buttons
-      :float left
-    .right-buttons
-      :float right
+    :border-bottom $pages-border
 
-  .toolbar-buttons.sticky
-    position: fixed
-    z-index: 1000
-    top: 0px
-    right: 0px
-    left: 0px
-    margin-left: $left_side_width + 1px
-    background: white
-    height: 33px
-    max-width: $max_main_width - 26px
-    border-color: $menu-border-color
+  .header-bar-outer-container
+    :height 64px
+    :clear right
+    .header-bar-container
+      :min-width $min_main_width - 2px
+      :height 64px
+      .page-changed-alert
+        :overflow hidden
+        :height 0
+      .page-changed-alert .alert
+        :border-radius 0
+      .header-bar
+        :box-shadow $shadow
+
+  .header-bar-outer-container.page-changed
+    :height 103px
+    :animation page-changed-header-bar 1.15s
+    :-webkit-animation page-changed-header-bar 1.15s
+    .header-bar-container
+      :height 103px
+      :animation page-changed-header-bar 1.15s
+      :-webkit-animation page-changed-header-bar 1.15s
+
+      .page-changed-alert
+        :margin -1px 0 0 0
+        :border-bottom $pages-border
+        :box-shadow $shadow
+        :height 39px
+        :animation page-changed-alert 1.15s
+        :-webkit-animation page-changed-alert 1.15s
 
 .pages.index
+  #main
+    :background $index-background
+
   .index-content-container
     :margin-top 1px
+
+  .page-edit-dialog .edit-content
+    :margin 8px 5px
+    .edit-label
+      :padding-top 5px
+      :width 75px
+      :float left
+      :text-align right
+    .edit-controls
+      :margin-left 85px
+    .edit-control-text
+      :width 270px
+
   .index-content
-    :background $index-background
     :padding 0 1em 1em
 
     .table
+      :margin-bottom 0
       :border-collapse separate
       :border-spacing 0
       td, th
@@ -57,23 +107,25 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
         &:last-child
           :padding-right 12px
           
-      .canvas-sortable-header-row
+      .header-row
         :text-transform uppercase
-        a.canvas-sort-field
+        a.sort-field
           :cursor pointer
           :user-select none
           :color inherit
+          :white-space nowrap
           i
             :color #ccc
-        a.canvas-sort-field:hover
+        a.sort-field:hover
           :text-decoration none
           i
             :color #0088cc
-        a.canvas-sort-field-active
+        a.sort-field-active
           i
             :color black
 
     .table thead
+      :background $index-background
       tr
         :height 40px
       th
@@ -93,23 +145,26 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
         :background $item-background
         :text-decoration inherit
         :color inherit
-        &:hover
+        &.clickable:hover
           :background $item-hover-background
           :text-decoration inherit
           :color inherit
         td:first-child
-          :border-left 1px solid $border-color
+          :border-left $pages-border
         td:last-child
-          :border-right 1px solid $border-color
+          :border-right $pages-border
 
       tr:first-child
+        td
+          :border-top $pages-border
         td:first-child
           :border-top-left-radius $border-radius
         td:last-child
           :border-top-right-radius $border-radius
       tr:last-child
         td
-          :border-bottom 1px solid $border-color
+          :border-bottom $pages-border
+          :box-shadow $table-shadow
         td:first-child
           :border-bottom-left-radius $border-radius
         td:last-child
@@ -118,41 +173,97 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
       td
         :font-size 11px
         :color $subdued-text-color
-        :border-top 1px solid $border-color
+        :border-top $pages-inner-border
 
-        .published
-          :color $published-text-color
-        .unpublished
-          :color $unpublished-text-color
-        .published, .unpublished
+        .wiki-page-link
           :font-size 13px
           :font-weight bold
+          :color $darkened-text-color
+        .wiki-page-link.published
+          :color $published-text-color
+        .wiki-page-link.unpublished
+          :color $unpublished-text-color
 
         .icon-publish
           :color $published-icon-color
         .icon-unpublished
           :color $unpublished-icon-color
 
+    .table .no-pages .no-pages-cell
+      :border $pages-dashed-border
+
+    .loading
+      :text-align center
+      :color #8f9295
+
+      img
+        :margin-top -3px
+        :opacity 0.75
+      &.loading
+        :border 1px solid transparent
+      &.loading-more
+        :border $pages-dashed-border
+        :border-top-width 0
+        :border-bottom-left-radius $border-radius
+        :border-bottom-right-radius $border-radius
+        :margin-top 1px
+        :padding 4px 12px
+        :background #f4f6f8
+
 .pages.show
-  .toolbar-buttons
-    .publish, .unpublish
-      :margin 0 1em
+  .course-title
+    :display none
+    :font-size 1.8em
+    :font-weight bold
+    :line-height 30px
+    :margin 0
+    :color #666
+
+  .page-title
+    :font-size 2.5em
+    :font-weight 200
+    :margin 15px 0
+    :color #666
+
+  .header-bar
+    .publish-button
+      :margin 0 12px 0 0
+    .front-page.label
+      :margin 6px 12px 6px 0
+
+  .locked-alert ul
+    :margin 4px 0 6px 25px
 
   .show-content
-    :padding 1em
-    .page-title
-      :font-weight bold
-      :margin-top 0
+    :padding 15px 25px
+
+  .floating_links
+    :margin-right 15px
+
+  .public-license
+    :margin-left 15px
+    :margin-bottom 15px
+
+.pages.show.home
+  .course-title
+    :display block
+  .page-title
+    :display none
+  .show-content
+    :padding-top 25px
 
 .pages.edit
   .form-actions
     :padding-left 1em
     
-  .toolbar-buttons
+  .header-bar
     .published
       :color $published-text-color
     .unpublished
       :color $unpublished-text-color
+    .published, .unpublished
+      :display inline-block
+      :margin 5px 8px 5px 5px
 
   .edit-form
     :margin 0
@@ -163,6 +274,9 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
       .edit-header
         :position relative
         :margin-bottom 1em
+
+      .edit-header h2
+        :margin 0
 
       .switch_views
         :right 5px
@@ -182,6 +296,10 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
       :margin-top 0
       :margin-bottom 0
 
+@media print
+  #breadcrumbs, .header-bar-outer-container
+    :display none
+
 #wiki_show_view_main
   :overflow auto
 
@@ -198,54 +316,8 @@ $shadow: 0 1px 0 rgba(0,0,0,0.15)
 
 #page_history
   :float right
-#wiki_page_comments
-  margin-top: 50px
-  textarea
-    width: 97%
-    +border-radius(4px)
-    border: 1px solid #aaa
-    height: 50px
-  .wiki_page_comment
-    margin-bottom: 20px
-    .commenting
-      display: none
-    &.commenting
-      .commenting
-        display: block
-      .formatted_body .not_commenting
-        display: none
-    .header
-      border-bottom: 1px solid #ccc
-      margin-bottom: 2px
-      color: #888
-      font-size: 0.8em
-      .user_name
-        float: left
-      .links
-        float: right
-        .delete_comment_link
-          display: none
-    &.deletable_comment
-      .header 
-        .links .delete_comment_link
-          display: inline
-          opacity: 0.5
-        &:hover
-          .links .delete_comment_link
-            opacity: 1.0
-    .formatted_body
-      margin: 0 10px
-      .add_comment_link
-        width: 97%
-        +border-radius(4px)
-        border: 1px solid #aaa
-        cursor: text
-        display: block
-        padding: 2px 4px
-        text-decoration: none
-        color: #888
-        
-// this is to fix a bug that was reported that if you shrink your browser window width to something small 
+
+// this is to fix a bug that was reported that if you shrink your browser window width to something small
 // that it would just cut off the right side of the tiny WYSIWYG editor box and make it dissapear beind the right side.
 #wiki_page_body_parent.mceEditor
   display: block

@@ -53,6 +53,7 @@ module Canvas
 
       def paths(cache_busting = false)
         @paths ||= {
+          :ember => 'vendor/ember/ember',
           :common => 'compiled/bundles/common',
           :jqueryui => 'vendor/jqueryui',
           :use => 'vendor/use',

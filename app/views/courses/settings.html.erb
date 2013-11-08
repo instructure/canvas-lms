@@ -20,9 +20,6 @@
   <ul>
     <li id="course_details_tab"><a href="#tab-details"><%= t('tabs.details', %{Course Details}) %></a></li>
     <li id="sections_tab"><a href="#tab-sections"><%= t('tabs.sections', %{Sections}) %></a></li>
-    <% if can_see_users %>
-      <li id="users_tab"><a href="#tab-users" id="tab-users-link"><%= t('tabs.users', %{Users}) %></a></li>
-    <% end %>
     <% if can_do @context, @current_user, :update %>
       <li id="navigation_tab"><a href="#tab-navigation"><%= t('tabs.navigation', %{Navigation}) %></a></li>
     <% end %>
@@ -38,7 +35,7 @@
   </ul>
   <div id="tab-details">
     <h2><%= t('headings.details', %{Course Details}) %></h2>
-    <% form_for @context, :html => {:id => "course_form"} do |f| %>
+    <%= form_for @context, :html => {:id => "course_form"} do |f| %>
     <table class="coursesettings">
       <tr>
         <td class="form-label"><%= f.blabel :name, :course_name, :en => "Name" %></td>
@@ -114,7 +111,7 @@
           <span class="course_form">
             <% if can_do(@context.root_account, @current_user, :manage_courses) %>
               <select name="course[enrollment_term_id]" id="course_enrollment_term_id">
-                <% @context.root_account.enrollment_terms.active.sort_by{|t| t.start_at || Time.parse("Jan 1 2000")}.each do |term| %>
+                <% @context.root_account.enrollment_terms.active.sort_by{|t| t.start_at || SortFirst}.each do |term| %>
                   <option value="<%= term.id %>" <%= 'selected' if term.id == @context.enrollment_term_id %>><%= term.name %></option>
                 <% end %>
               </select>
@@ -273,6 +270,24 @@ TEXT
             <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
             <%= f.check_box :hide_distribution_graphs %>
             <%= f.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
+            <% if @context.root_account.allow_draft? && !@context.root_account.draft_state_enabled? %>
+              <%= f.check_box :enable_draft %>
+              <label for="course_enable_draft"><%= t('enable_draft', 'Enable Draft State (beta)') %>
+                <% draft_help_text = t('draft_explanation', 'Explanation of Draft State') %>
+                <a href="#" class="element_toggler" aria-controls="helpDialog" aria-label="<%= draft_help_text %>" title="<%= draft_help_text %>"><i class="icon-question"></i></a>
+                <div id="helpDialog" data-turn-into-dialog='{"width":400,"modal":true,"title":"<%= draft_help_text %>"}' style="display:none" title=<%= draft_help_text %>>
+                  <%= mt(:draft_state_description, <<-DRAFT )
+Draft state is a *beta* feature that allows course content to be published and unpublished.
+Unpublished content won't be visible to students and won't affect grades.
+It also includes a redesign of some course areas to make them more consistent in look and functionality.
+
+Unpublished content may not be available if Draft State is disabled.
+                  DRAFT
+                    %>
+                </div>
+              </label>
+              <br/>
+            <% end %>
             <%= f.check_box :lock_all_announcements %>
             <%= label_tag :course_lock_all_announcements, :en => 'Disable comments on announcements' %><br />
             <%= f.select :default_wiki_editing_roles, [
@@ -354,7 +369,7 @@ TEXT
       </li>
       <% if can_do(@context.course_sections.new, @current_user, :create) %>
         <li>
-          <% form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
+          <%= form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
             <h3><%= f.blabel :name, :course_section_name, :en => "Add a New Section" %></h3>
             <%= f.text_field :name %>
             <button class="btn btn-primary" type="submit"><i class="icon-add"></i> <%= t('buttons.add_section', %{Add Section}) %></button>
@@ -362,14 +377,10 @@ TEXT
         </li>
       <% end %>
     </ul>
-    <% form_for :course_section, :url => "", :html => {:id => "edit_section_form", :method => :put, :style => "display: none;"} do |f| %>
+    <%= form_for :course_section, :url => "", :html => {:id => "edit_section_form", :method => :put, :style => "display: none;"} do |f| %>
       <%= f.text_field :name %>
     <% end %>
   </div>
-  <% if can_see_users %>
-  <div id="tab-users">
-    <%= render :partial => 'user_tab' %></div>
-  <% end %>
   <% if can_do @context, @current_user, :update %>
 
   <div id="tab-navigation">
@@ -393,7 +404,7 @@ TEXT
          {:key => t('keycodes.toggle_navigation_dragging', 'Space'), :description => t('keycode_descriptions.toggle_navigation_dragging', 'Select link to begin dragging, or drop previously selected link')}
      ]) %>
 
-    <% form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
+    <%= form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
       <input type="hidden" name="tabs_json" id="tabs_json" value="[]" />
       <% tabs = sortable_tabs %>
       <p style="margin-bottom: 4px; padding-top: 10px">
@@ -438,7 +449,7 @@ TEXT
   <% if publishing_enabled %>
     <div id="tab-grade-publishing">
       <h2><%= t('headings.grade_publishing', %{Grade Publishing}) %></h2>
-      <% form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %><% end %>
+      <%= form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %><% end %>
       <a href="#" id="publish_grades_link" class="btn disabled">...</a>
       <ul id="publish_grades_messages"></ul>
     </div>
@@ -456,7 +467,7 @@ TEXT
   <div id="move_course_dialog" style="display: none;">
     <h2><%= t('headings.move_course', %{Move the course to another root account}) %></h2>
     <%= t('deatils.move_course', %{Select a new root account for this course.  After you move the course you'll want to specify a new department for the course as well.}) %>
-    <% form_for :course, :url => course_url(@context), :html => {:method => :put} do |f| %>
+    <%= form_for :course, :url => course_url(@context), :html => {:method => :put} do |f| %>
       <table class="formtable">
         <tr>
           <td>

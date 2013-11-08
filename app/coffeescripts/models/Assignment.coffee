@@ -4,8 +4,11 @@ define [
   'Backbone'
   'compiled/backbone-ext/DefaultUrlMixin'
   'compiled/models/TurnitinSettings'
+  'compiled/models/DateGroup'
   'compiled/collections/AssignmentOverrideCollection'
-], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, AssignmentOverrideCollection ) ->
+  'compiled/collections/DateGroupCollection'
+  'i18n!assignments'
+], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection, I18n) ->
 
   class Assignment extends Model
     @mixin DefaultUrlMixin
@@ -15,6 +18,8 @@ define [
 
     defaults:
       "publishable": true
+      "hidden": false
+      "unpublishable": true
 
     initialize: ->
       if (overrides = @get('assignment_overrides'))?
@@ -22,6 +27,8 @@ define [
       if (turnitin_settings = @get('turnitin_settings'))?
         @set 'turnitin_settings', new TurnitinSettings(turnitin_settings),
           silent: true
+      if (all_dates = @get('all_dates'))?
+        @set 'all_dates', new DateGroupCollection(all_dates)
 
     isQuiz: => @_hasOnlyType 'online_quiz'
     isDiscussionTopic: => @_hasOnlyType 'discussion_topic'
@@ -94,6 +101,25 @@ define [
       else if _.include submissionTypes, 'on_paper' then 'on_paper'
       else if _.include submissionTypes, 'external_tool' then 'external_tool'
       else 'online'
+
+    expectsSubmission: =>
+      submissionTypes = @_submissionTypes()
+      submissionTypes.length > 0 && !_.include(submissionTypes, "") && !_.include(submissionTypes, 'none') && !_.include(submissionTypes, 'not_graded') && !_.include(submissionTypes, 'on_paper') && !_.include(submissionTypes, 'external_tool')
+
+    allowedToSubmit: =>
+      submissionTypes = @_submissionTypes()
+      @expectsSubmission() && !@get('locked_for_user') && !_.include(submissionTypes, 'online_quiz') && !_.include(submissionTypes, 'attendance')
+
+    isGraded: =>
+      submission = @get('submission') || new Backbone.Model {}
+      !submission.get('notYetGraded')?
+
+    hasSubmission: =>
+      submission = @get('submission') || new Backbone.Model {}
+      !!submission.get('submission_type')
+
+    withoutGradedSubmission: =>
+      !@get('submission')? || (!@hasSubmission() && !@isGraded())
 
     acceptsOnlineUpload: =>
       !! _.include @_submissionTypes(), 'online_upload'
@@ -190,19 +216,38 @@ define [
       return @get 'published' unless arguments.length > 0
       @set 'published', newPublished
 
+    position: (newPosition) ->
+      return @get('position') || 0 unless arguments.length > 0
+      @set 'position', newPosition
+
     iconType: =>
       return 'quiz' if @isQuiz()
       return 'discussion' if @isDiscussionTopic()
       return 'assignment'
 
-    htmlUrl: => @get 'html_url'
+    htmlUrl: =>
+      @get 'html_url'
 
-    modules: (names)  =>
-      return @get 'modules' unless arguments.length > 0
-      @set 'modules', names
+    htmlEditUrl: =>
+      "#{@get 'html_url'}/edit"
 
     labelId: =>
       return @id
+
+    defaultDates: =>
+      group = new DateGroup
+        due_at:    @get("due_at")
+        unlock_at: @get("unlock_at")
+        lock_at:   @get("lock_at")
+
+    multipleDueDates: =>
+      dateGroups = @get("all_dates")
+      dateGroups && dateGroups.length > 1
+
+    allDates: =>
+      groups = @get("all_dates")
+      models = (groups and groups.models) or []
+      result = _.map models, (group) -> group.toJSON()
 
     toView: =>
       fields = [
@@ -217,7 +262,8 @@ define [
         'gradeGroupStudentsIndividually', 'groupCategoryId', 'frozen',
         'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
         'gradingStandardId', 'isLetterGraded', 'assignmentGroupId', 'iconType',
-        'published', 'htmlUrl', 'modules', 'labelId'
+        'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position',
+        'multipleDueDates', 'allDates', 'isQuiz'
       ]
       hash = id: @get 'id'
       for field in fields
@@ -228,6 +274,17 @@ define [
       data = super
       data = @_filterFrozenAttributes(data)
       if @alreadyScoped then data else { assignment: data }
+
+    search: (regex) ->
+      if @get('name').match(regex)
+        @set 'hidden', false
+        return true
+      else
+        @set 'hidden', true
+        return false
+
+    endSearch: ->
+      @set 'hidden', false
 
     parse: (data) ->
       data = super data
@@ -286,3 +343,6 @@ define [
 
     publish: -> @save("published", true)
     unpublish: -> @save("published", false)
+
+    disabledMessage: ->
+      I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")

@@ -124,8 +124,8 @@ describe ProfileController do
     end
 
     it "should let you set visibility on user_services" do
-      @user.user_services.create! :service => 'skype', :service_user_name => 'user', :visible => true
-      @user.user_services.create! :service => 'twitter', :service_user_name => 'user', :visible => false
+      @user.user_services.create! :service => 'skype', :service_user_name => 'user', :service_user_id => 'user', :visible => true
+      @user.user_services.create! :service => 'twitter', :service_user_name => 'user', :service_user_id => 'user', :visible => false
 
       put 'update_profile',
         :user_profile => {:bio => '...'},

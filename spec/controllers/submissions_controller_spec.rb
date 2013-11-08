@@ -153,7 +153,7 @@ describe SubmissionsController do
         student_in_course(:course => @course)
         @u2 = @user
         @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_text_entry", :group_category => GroupCategory.create!(:name => "groups", :context => @course), :grade_group_students_individually => true)
-        @group = @assignment.group_category.groups.create!(:name => 'g1')
+        @group = @assignment.group_category.groups.create!(:name => 'g1', :context => @course)
         @group.users << @u1
         @group.users << @user
       end
@@ -240,7 +240,7 @@ describe SubmissionsController do
       student_in_course(:course => @course)
       @u2 = @user
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "discussion_topic", :group_category => GroupCategory.create!(:name => "groups", :context => @course), :grade_group_students_individually => true)
-      @group = @assignment.group_category.groups.create!(:name => 'g1')
+      @group = @assignment.group_category.groups.create!(:name => 'g1', :context => @course)
       @group.users << @u1
       @group.users << @user
       put 'update', :course_id => @course.id, :assignment_id => @assignment.id, :id => @u1.id, :submission => {:comment => "some comment", :group_comment => '1'}

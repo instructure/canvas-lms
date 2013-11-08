@@ -20,34 +20,34 @@ class AlertsController < ApplicationController
   before_filter :require_context
 
   def create
-    if authorized_action(@context, @current_user, :manage_alerts)
+    if authorized_action(@context, @current_user, :manage_interaction_alerts)
       @alert = @context.alerts.build(params[:alert])
       if @alert.save
         headers['Location'] = named_context_url(@context, :context_alert_url, @alert.id)
-        render :json => @alert.to_json(:include => :criteria)
+        render :json => @alert.as_json(:include => :criteria)
       else
-        render :json => @alert.errors.to_json, :status => :bad_request
+        render :json => @alert.errors, :status => :bad_request
       end
     end
   end
 
   def update
-    if authorized_action(@context, @current_user, :manage_alerts)
+    if authorized_action(@context, @current_user, :manage_interaction_alerts)
       @alert = @context.alerts.find(params[:id])
       if @alert.update_attributes(params[:alert])
         headers['Location'] = named_context_url(@context, :context_alert_url, @alert.id)
-        render :json => @alert.to_json(:include => :criteria)
+        render :json => @alert.as_json(:include => :criteria)
       else
-        render :json => @alert.errors.to_json, :status => :bad_request
+        render :json => @alert.errors, :status => :bad_request
       end
     end
   end
 
   def destroy
-    if authorized_action(@context, @current_user, :manage_alerts)
+    if authorized_action(@context, @current_user, :manage_interaction_alerts)
       @alert = @context.alerts.find(params[:id])
       @alert.destroy
-      render :json => @alert.to_json
+      render :json => @alert
     end
   end
 end

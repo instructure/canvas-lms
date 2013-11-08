@@ -3,19 +3,19 @@
 
 require File.expand_path("../config/canvas_rails3", __FILE__)
 
-if CANVAS_RAILS3
-  require File.expand_path('../config/application', __FILE__)
-else
+if CANVAS_RAILS2
   require File.expand_path('../config/boot', __FILE__)
+else
+  require File.expand_path('../config/application', __FILE__)
 end
 
 require 'rake'
 require 'rake/testtask'
 require 'rdoc/task'
 
-if CANVAS_RAILS3
-  CanvasRails::Application.load_tasks
-else
+if CANVAS_RAILS2
   require 'tasks/rails'
   begin; require 'parallelized_specs/tasks'; rescue LoadError; end
+else
+  CanvasRails::Application.load_tasks
 end

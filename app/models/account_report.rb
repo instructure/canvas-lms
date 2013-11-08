@@ -23,6 +23,8 @@ class AccountReport < ActiveRecord::Base
   belongs_to :user
   belongs_to :attachment
 
+  validates_presence_of :account_id, :user_id, :workflow_state
+
   serialize :parameters
 
   workflow do
@@ -66,7 +68,7 @@ class AccountReport < ActiveRecord::Base
       self.save
     end
   end
-  handle_asynchronously :run_report
+  handle_asynchronously :run_report, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
 
   def has_parameter?(key)
     self.parameters.is_a?(Hash) && self.parameters[key].presence

@@ -23,13 +23,26 @@ describe "gradebook2" do
   DEFAULT_PASSWORD = "qwerty"
 
   context "as a teacher" do
-    before (:each) do
+    before(:each) do
       data_setup
+    end
+
+    it "hides unpublished/shows published assignments" do
+      @course.root_account.enable_draft!
+      assignment = @course.assignments.create! title: 'unpublished'
+      assignment.unpublish
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      f('#gradebook_grid .slick-header').should_not include_text(assignment.title)
+
+      @first_assignment.publish
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      f('#gradebook_grid .slick-header').should include_text(@first_assignment.title)
     end
 
     it "should not show 'not-graded' assignments" do
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
 
       f('.slick-header-columns').should_not include_text(@ungraded_assignment.title)
     end
@@ -45,7 +58,6 @@ describe "gradebook2" do
 
     it 'should filter students' do
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
       get_visible_students.length.should == @all_students.size
       filter_student 'student 1'
       visible_students = get_visible_students
@@ -55,7 +67,6 @@ describe "gradebook2" do
 
     it "should link to a students grades page" do
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
       els = ff('.student-name')
       links = els.map { |e| URI.parse(e.find_element(:css, 'a').attribute('href')).path }
       expected_links = @all_students.map { |s| "/courses/#{@course.id}/grades/#{s.id}" }
@@ -88,7 +99,6 @@ describe "gradebook2" do
 
     it "should validate correct number of students showing up in gradebook" do
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
 
       ff('.student-name').count.should == @course.students.count
     end
@@ -100,7 +110,6 @@ describe "gradebook2" do
       @course.all_students.count.should == @all_students.size
 
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
 
       ff('.student-name').count.should == @course.students.count
 
@@ -118,7 +127,6 @@ describe "gradebook2" do
       @course.all_students.count.should == @all_students.size
 
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
       driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
 
       # the checkbox should fire an alert rather than changing to not showing concluded
@@ -128,15 +136,12 @@ describe "gradebook2" do
 
     it "should show students sorted by their sortable_name" do
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-
       dom_names = ff('.student-name').map(&:text)
       dom_names.should == @all_students.map(&:name)
     end
 
     it "should not show student avatars until they are enabled" do
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
 
       ff('.student-name').length.should == @all_students.size
       ff('.avatar img').length.should == 0
@@ -155,27 +160,40 @@ describe "gradebook2" do
 
     it "should allow showing only a certain section" do
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
       # grade the first assignment
       edit_grade(f('#gradebook_grid [row="0"] .l0'), 0)
       edit_grade(f('#gradebook_grid [row="1"] .l0'), 1)
 
-      button = f('#section_to_show')
-      button.should include_text "All Sections"
-      switch_to_section(@other_section)
-      button.should include_text @other_section.name
+      keep_trying_until do
+        button = fj('#section_to_show')
+        button.click
+        wait_for_js
+        fj('#section-to-show-menu').should be_displayed
+        ffj('#section-to-show-menu a').first.click
+        wait_for_js
+        button.should include_text("All Sections")
+        button.click
+        wait_for_js
+        ffj('#section-to-show-menu a').last.click
+        wait_for_js
+        button.should include_text(@other_section.name)
+      end
       validate_cell_text(f('#gradebook_grid [row="0"] .l0'), '1')
 
       # verify that it remembers the section to show across page loads
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-      button = f('#section_to_show')
+      button = fj('#section_to_show')
       button.should include_text @other_section.name
       validate_cell_text(f('#gradebook_grid [row="0"] .l0'), '1')
 
       # now verify that you can set it back
-      switch_to_section()
-      button.should include_text "All Sections"
+
+      button.click
+      wait_for_ajaximations
+      keep_trying_until { fj('#section-to-show-menu').should be_displayed }
+      fj("label[for='section_option_#{''}']").click
+      keep_trying_until { button.should include_text "All Sections" }
+
       # validate all grades (i.e. submissions) were loaded
       validate_cell_text(f('#gradebook_grid [row="0"] .l0'), '0')
       validate_cell_text(f('#gradebook_grid [row="1"] .l0'), '1')
@@ -184,7 +202,6 @@ describe "gradebook2" do
 
     it "should handle muting/unmuting correctly" do
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
 
       toggle_muting(@second_assignment)
       fj(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
@@ -204,9 +221,7 @@ describe "gradebook2" do
     context "concluded course" do
       before do
         @course.complete!
-
         get "/courses/#{@course.id}/gradebook2"
-        wait_for_ajaximations
       end
 
       it "should not allow editing grades" do
@@ -235,7 +250,6 @@ describe "gradebook2" do
       comment_text = "This is a new comment!"
 
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
 
       dialog = open_comment_dialog
       set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
@@ -267,7 +281,6 @@ describe "gradebook2" do
       comment_text = "This is a new group comment!"
 
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
 
       dialog = open_comment_dialog(3)
       set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
@@ -287,7 +300,6 @@ describe "gradebook2" do
       submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
 
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
 
       open_assignment_options(1)
       f('[data-action="showAssignmentDetails"]').click
@@ -299,22 +311,21 @@ describe "gradebook2" do
     end
 
     it "should not throw an error when setting the default grade when concluded enrollments exist" do
-      pending("bug 7413 - Error assigning default grade for all students when one student's enrollment has been concluded.") do
-        conclude_and_unconclude_course
-        3.times { student_in_course }
+      pending("bug 7413 - Error assigning default grade for all students when one student's enrollment has been concluded.")
+      conclude_and_unconclude_course
+      3.times { student_in_course }
 
-        get "/courses/#{@course.id}/gradebook2"
-        wait_for_ajaximations
+      get "/courses/#{@course.id}/gradebook2"
 
-        #TODO - when show concluded enrollments fix goes in we probably have to add that code right here
-        #for the test to work correctly
 
-        set_default_grade(2, 5)
-        grade_grid = f('#gradebook_grid')
-        @course.student_enrollments.each_with_index do |e, n|
-          next if e.completed?
-          find_slick_cells(n, grade_grid)[2].text.should == 5
-        end
+      #TODO - when show concluded enrollments fix goes in we probably have to add that code right here
+      #for the test to work correctly
+
+      set_default_grade(2, 5)
+      grade_grid = f('#gradebook_grid')
+      @course.student_enrollments.each_with_index do |e, n|
+        next if e.completed?
+        find_slick_cells(n, grade_grid)[2].text.should == 5
       end
     end
 
@@ -323,7 +334,6 @@ describe "gradebook2" do
         message_text = "This is a message"
 
         get "/courses/#{@course.id}/gradebook2"
-        wait_for_ajaximations
 
         open_assignment_options(2)
         f('[data-action="messageStudentsWho"]').click
@@ -347,7 +357,6 @@ describe "gradebook2" do
 
         message_text = "This is a message"
         get "/courses/#{@course.id}/gradebook2"
-        wait_for_ajaximations
         open_assignment_options(2)
         f('[data-action="messageStudentsWho"]').click
         expect {
@@ -362,7 +371,6 @@ describe "gradebook2" do
       it "should send messages when Scored more than X points" do
         message_text = "This is a message"
         get "/courses/#{@course.id}/gradebook2"
-        wait_for_ajaximations
 
         open_assignment_options(1)
         f('[data-action="messageStudentsWho"]').click
@@ -382,7 +390,6 @@ describe "gradebook2" do
         submission.save!
 
         get "/courses/#{@course.id}/gradebook2"
-        wait_for_ajaximations
         # set grade for first student, 3rd assignment
         edit_grade(f('#gradebook_grid [row="0"] .l2'), 0)
         open_assignment_options(2)
@@ -397,6 +404,21 @@ describe "gradebook2" do
         visible_students.size.should == 2
         visible_students[0].text.strip.should == STUDENT_NAME_2
         visible_students[1].text.strip.should == STUDENT_NAME_3
+      end
+
+      it "should create separate conversations" do
+        message_text = "This is a message"
+
+        get "/courses/#{@course.id}/gradebook2"
+
+        open_assignment_options(2)
+        f('[data-action="messageStudentsWho"]').click
+        expect {
+          message_form = f('#message_assignment_recipients')
+          message_form.find_element(:css, '#body').send_keys(message_text)
+          submit_form(message_form)
+          wait_for_ajax_requests
+        }.to change(Conversation, :count).by_at_least(2)
       end
     end
 
@@ -431,8 +453,7 @@ describe "gradebook2" do
                           :membership_type => 'CustomAdmin')
 
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-      ff('.ui-state-error').count.should == 0
+      flash_message_present?(:error).should be_false
     end
 
     it "should display for users with only :manage_grades permissions" do
@@ -446,8 +467,7 @@ describe "gradebook2" do
                           :membership_type => 'CustomAdmin')
 
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-      ff('.ui-state-error').count.should == 0
+      flash_message_present?(:error).should be_false
     end
 
     it "should include student view student for grading" do
@@ -455,7 +475,6 @@ describe "gradebook2" do
       @fake_submission = @first_assignment.submit_homework(@fake_student, :body => 'fake student submission')
 
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
 
       ff('.student-name').map(&:text).join(" ").should match @fake_student.name
     end
@@ -533,13 +552,15 @@ describe "gradebook2" do
 
         # make sure it appears in each submission dialog
         icons.each do |icon|
+          cell = icon.find_element(:xpath, '..')
+
           keep_trying_until do
-            cell = icon.find_element(:xpath, '..')
-            driver.action.move_to(cell).perform
-            cell.find_element(:css, "a").click
-            wait_for_ajaximations
-            fj('.turnitin_similarity_score:visible').should be_present
+            driver.action.move_to(f('#gradebook_settings')).move_to(cell).perform
+            cell.find_element(:css, "a").should be_displayed
           end
+          cell.find_element(:css, "a").click
+          wait_for_ajaximations
+
           fj('.ui-icon-closethick:visible').click
         end
       end
@@ -553,7 +574,6 @@ describe "gradebook2" do
 
         # When I go to the gradebook
         get "/courses/#{@course.id}/gradebook2"
-        wait_for_ajaximations
 
         # And I click the dropdown menu on the assignment
         f('.gradebook-header-drop').click
@@ -588,7 +608,6 @@ describe "gradebook2" do
 
     it "should show late submissions" do
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
       ff('.late').count.should == 0
 
       @student_3_submission.write_attribute(:cached_due_date, 1.week.ago)
@@ -602,7 +621,6 @@ describe "gradebook2" do
       Course.any_instance.stubs(:large_roster?).returns(true)
 
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
 
       f('.gradebook-header-drop').click
       f('.gradebook-header-menu').text.should_not match(/SpeedGrader/)

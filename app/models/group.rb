@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -23,6 +23,7 @@ class Group < ActiveRecord::Base
   include UserFollow::FollowedItem
 
   attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment, :storage_quota_mb
+  validates_presence_of :context_id, :context_type, :account_id, :root_account_id, :workflow_state
   validates_allowed_transitions :is_public, false => true
 
   has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
@@ -54,7 +55,6 @@ class Group < ActiveRecord::Base
   belongs_to :wiki
   has_many :web_conferences, :as => :context, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
-  has_one :scribd_account, :as => :scribdable
   has_many :media_objects, :as => :context
   has_many :zip_file_imports, :as => :context
   has_many :collections, :as => :context
@@ -62,13 +62,20 @@ class Group < ActiveRecord::Base
   has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
   has_many :user_follows, :foreign_key => 'following_user_id'
 
-  before_save :ensure_defaults, :maintain_category_attribute
+  before_validation :ensure_defaults
+  before_save :maintain_category_attribute
   after_save :close_memberships_if_deleted
 
   include StickySisFields
   are_sis_sticky :name
 
-  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+  validates_each :name do |record, attr, value|
+    if value.blank?
+      record.errors.add attr, t(:name_required, "Name is required")
+    elsif value.length > maximum_string_length
+      record.errors.add attr, t(:name_too_long, "Enter a shorter group name")
+    end
+  end
 
   alias_method :participating_users_association, :participating_users
 
@@ -154,11 +161,11 @@ class Group < ActiveRecord::Base
     Group.find(ids)
   end
 
-  def self.not_in_group_sql_fragment(groups, prepend_and = true)
+  def self.not_in_group_sql_fragment(group_ids, prepend_and = true)
     "#{"AND" if prepend_and} NOT EXISTS (SELECT * FROM group_memberships gm
                       WHERE gm.user_id = users.id AND
                       gm.workflow_state != 'deleted' AND
-                      gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?
+                      gm.group_id IN (#{group_ids.map(&:to_i).join ','}))" unless group_ids.empty?
 
   end
 
@@ -411,10 +418,6 @@ class Group < ActiveRecord::Base
     true
   end
 
-  def file_structure_for(user)
-    User.file_structure_for(self, user)
-  end
-
   def is_a_context?
     true
   end
@@ -440,7 +443,7 @@ class Group < ActiveRecord::Base
   end
 
   def self.default_storage_quota
-    Setting.get_cached('group_default_quota', 50.megabytes.to_s).to_i
+    Setting.get('group_default_quota', 50.megabytes.to_s).to_i
   end
 
   def storage_quota_mb
@@ -562,5 +565,20 @@ class Group < ActiveRecord::Base
 
   def associated_shards
     [Shard.default]
+  end
+
+  # Public: Determine if the current context has draft_state enabled.
+  #
+  # Returns a boolean.
+  def draft_state_enabled?
+    # shouldn't matter, but most specs create anonymous (contextless) groups :(
+    return false if context.nil?
+    context.draft_state_enabled?
+  end
+
+  def serialize_permissions(permissions_hash, user, session)
+    permissions_hash.merge(
+      create_discussion_topic: DiscussionTopic.context_allows_user_to_create?(self, user, session)
+    )
   end
 end

@@ -28,7 +28,9 @@ describe "Group Categories API", :type => :integration do
       'self_signup' => category.self_signup,
       'context_type' => category.context_type,
       "#{category.context_type.downcase}_id" => category.context_id,
-      'group_limit' => category.group_limit
+      'group_limit' => category.group_limit,
+      'groups_count' => category.groups.size,
+      'unassigned_users_count' => category.unassigned_users.count
     }
   end
 

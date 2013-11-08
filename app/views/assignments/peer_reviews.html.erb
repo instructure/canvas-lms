@@ -6,7 +6,7 @@
   <p><%= t :details, "To the left you can see the list of students for this assignment, and also
   which student submissions (if any) they have been assigned to review." %></p>
   <% unless @submissions.empty? %>
-    <% form_tag context_url(@context, :context_assignment_assign_peer_reviews_url, @assignment.id), {} do %>
+    <%= form_tag context_url(@context, :context_assignment_assign_peer_reviews_url, @assignment.id), {} do %>
       <h3 style="margin-bottom: 0;"><%= t 'titles.automatically_assign_reviews', "Automatically Assign Reviews" %></h3>
       <p><%= t 'descriptions.automatically_assign_reviews', "You can assign peer reviews to those users who have submitted but don't already have
       reviews assigned by clicking the button below." %></p>
@@ -168,7 +168,7 @@ require([
       <ul class="unstyled_list peer_reviews" style="padding-left: 30px; font-size: 0.8em; width: 50%;">
         <li class="peer_review no_requests_message" style="<%= hidden unless !submission || submission.assigned_assessments.empty? %>"><%= t :none_assigned, "None Assigned" %></li>
         <% if submission %>
-        <% submission.assigned_assessments.sort_by{|r| r.asset.user.last_name_first}.each do |request| %>
+        <% Canvas::ICU.collate_by(submission.assigned_assessments) {|r| r.asset.user.sortable_name }.each do |request| %>
           <% if (request && request.asset && request.asset.user) %>
             <%= render :partial => 'peer_review_assignment', :object => request %>
           <% end %>
@@ -183,7 +183,7 @@ require([
     </li>
   <% end %>
 </ul>
-<% form_tag ".", {:id => "assign_peer_review_form", :style => "display: none;"} do %>
+<%= form_tag ".", {:id => "assign_peer_review_form", :style => "display: none;"} do %>
   <select name="reviewee_id">
     <option value=""><%= t 'options.select_student', "[ Select Student ]" %></option>
     <% @students.each do |student| %>

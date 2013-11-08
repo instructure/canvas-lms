@@ -1,0 +1,37 @@
+<tr class="<%= 'kept' if kept %>">
+  <td>
+    <% if kept %>
+      <%= t 'kept', 'KEPT' %>
+    <% elsif version.version_number == @submission.version_number %>
+      <%= t 'latest', 'LATEST' %>
+    <% end %>
+  </td>
+  <td>
+    <a href="<%= polymorphic_path([@context,@quiz,:history], version: version.version_number)%>">
+      <%= t 'attempt_number', 'Attempt %{att_no}', :att_no => index %>
+    </a>
+  </td>
+  <td>
+    <%= duration_in_minutes((version.finished_at || version.end_at || version.started_at) - version.started_at) %>
+  </td>
+
+  <% if submission_has_regrade?(@submission) && version.score_before_regrade.present? %>
+    <td>
+      <%= score_out_of_points_possible(version.score_before_regrade, params[:preview] ? version.points_possible_at_submission_time : @quiz.points_possible) %>
+    </td>
+    <td class="regraded">
+      <%= score_out_of_points_possible(version.score, params[:preview] ? version.points_possible_at_submission_time : @quiz.points_possible) %>
+    </td>
+
+  <% elsif submission_has_regrade?(@submission) %>
+    <td>
+      <%= score_out_of_points_possible(version.score, params[:preview] ? version.points_possible_at_submission_time : @quiz.points_possible) %>
+    </td>
+    <td class="regraded">-</td>
+
+  <% else %>
+    <td>
+      <%= score_out_of_points_possible(version.score, params[:preview] ? version.points_possible_at_submission_time : @quiz.points_possible) %>
+    </td>
+  <% end %>
+</tr>

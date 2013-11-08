@@ -59,8 +59,8 @@ class ExternalContentController < ApplicationController
     endpoint = params[:endpoint]
     url = params[:url]
     uri = URI.parse(endpoint + (endpoint.match(/\?/) ? '&url=' : '?url=') + CGI.escape(url) + '&format=json')
-    res = Net::HTTP.get(uri) rescue "{}"
-    data = JSON.parse(res) rescue {}
+    res = Canvas::HTTP.get(uri.to_s) rescue '{}'
+    data = JSON.parse(res.body) rescue {}
     if data['type']
       if data['type'] == 'photo' && data['url'].try(:match, /^http/)
         @retrieved_data = {
@@ -89,7 +89,7 @@ class ExternalContentController < ApplicationController
         :message => t("#application.errors.invalid_oembed_url", "There was a problem retrieving this resource. The external tool provided invalid information about the resource.")
       }
     end
-    render :json => @retrieved_data.to_json
+    render :json => @retrieved_data
   end
 
   # this is a simple LTI link selection extension example

@@ -23,9 +23,9 @@ define [
         disabledMessage: ->
           "can't unpublish"
 
-      @publish   = new Publishable(published: false, publishable: true)
-      @published = new Publishable(published: true,  publishable: true)
-      @disabled  = new Publishable(published: true,  publishable: false)
+      @publish   = new Publishable(published: false, unpublishable: true)
+      @published = new Publishable(published: true,  unpublishable: true)
+      @disabled  = new Publishable(published: true,  unpublishable: false)
 
   # initialize
   test 'initialize publish', ->
@@ -38,7 +38,6 @@ define [
     btnView = new PublishIconView(model: @publish).render()
     equal btnView.$el.attr("data-tooltip"), ""
 
-
   test 'initialize published', ->
     btnView = new PublishIconView(model: @published).render()
     ok btnView.isPublished()
@@ -47,7 +46,6 @@ define [
   test 'initialize published adds tooltip', ->
     btnView = new PublishIconView(model: @published).render()
     equal btnView.$el.attr("data-tooltip"), ""
-
 
   test 'initialize disabled published', ->
     btnView = new PublishIconView(model: @disabled).render()

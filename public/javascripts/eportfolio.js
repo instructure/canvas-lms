@@ -44,6 +44,16 @@ define([
   'jqueryui/sortable' /* /\.sortable/ */
 ], function(I18n, $) {
 
+  var ePortfolioValidations = {
+    object_name: 'eportfolio',
+    property_validations: {
+      'name': function(value){
+        if (!value || value.trim() == '') { return I18n.t("errors.name_required", "Name is required")}
+        if (value && value.length > 255) { return I18n.t("errors.name_too_long", "Name is too long")}
+      }
+    }
+  };
+
   function ePortfolioFormData() {
     var data = $("#edit_page_form").getFormData({
       object_name: "eportfolio_entry", 
@@ -81,11 +91,30 @@ define([
         title: I18n.t('eportfolio_settings', "ePortfolio Settings")
       }).fixDialogButtons();
     });
+    // Add ePortfolio related
+    $(".add_eportfolio_link").click(function(event) {
+      event.preventDefault();
+      $("#whats_an_eportfolio").slideToggle();
+      $("#add_eportfolio_form").slideToggle(function() {
+        $(this).find(":text:first").focus().select();
+      });
+    });
+    $("#add_eportfolio_form .cancel_button").click(function() {
+      $("#add_eportfolio_form").slideToggle();
+      $("#whats_an_eportfolio").slideToggle();
+    });
+    $('#add_eportfolio_form').submit(function(){
+      var $this = $(this);
+      var result = $this.validateForm(ePortfolioValidations);
+      if(!result) {
+        return false;
+      }
+    });
+    // Edit ePortfolio related
     $("#edit_eportfolio_form .cancel_button").click(function(event) {
       $("#edit_eportfolio_form").dialog('close');
     });
-    $("#edit_eportfolio_form").formSubmit({
-      object_name: 'eportfolio', 
+    $("#edit_eportfolio_form").formSubmit($.extend(ePortfolioValidations, {
       beforeSubmit: function(data) {
         $(this).loadingImage();
       },
@@ -93,7 +122,7 @@ define([
         $(this).loadingImage('remove');
         $(this).dialog('close');
       }
-    });
+    }));
     $(".edit_content_link").click(function(event) {
       event.preventDefault();
       $(".edit_content_link_holder").hide();
@@ -513,7 +542,6 @@ define([
   function saveObject($obj, type) {
     var isSaving = $obj.data('event_pending');
     if(isSaving || $obj.length === 0) { return; }
-    $obj.data('event_pending', true);
     var method = "PUT";
     var url = $obj.find(".rename_" + type + "_url").attr('href');
     if($obj.attr('id') == type + '_new') {
@@ -538,6 +566,7 @@ define([
     if(method == "POST") {
       $obj.attr('id', type + '_saving');
     }
+    $obj.data('event_pending', true);
     $obj.addClass('event_pending');
     $.ajaxJSON(url, method, data, function(data) {
       $obj.removeClass('event_pending');
@@ -556,7 +585,27 @@ define([
       });
       $obj.data('event_pending', false);
       countObjects(type);
-    });
+    },
+    // error callback
+    function(data, xhr, textStatus, errorThrown){
+      $obj.removeClass('event_pending');
+      $obj.data('event_pending', false);
+      var name_message = I18n.t("errors.section_name_invalid", "Section name is not valid")
+      if (xhr['name'] && xhr['name'].length > 0 && xhr['name'][0]['message'] == 'too_long') {
+        name_message = I18n.t("errors.section_name_too_long", "Section name is too long");
+      }
+      if ($obj.hasClass('unsaved')) {
+        alert(name_message);
+        $obj.remove();
+      }
+      else {
+        // put back in "edit" mode
+        $obj.find('.edit_section_link').click();
+        $obj.find('#section_name').errorBox(name_message).css('z-index', 20)
+      }
+    },
+    // options
+    {skipDefaultError: true});
     return true;
   }
   function editObject($obj, type) {

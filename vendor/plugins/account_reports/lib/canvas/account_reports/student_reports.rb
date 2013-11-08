@@ -24,25 +24,53 @@ module Canvas::AccountReports
 
     def initialize(account_report)
       @account_report = account_report
-      extra_text_term(@account_report)
     end
 
-    def students_with_no_submissions()
+    def start_and_end_times
+      #if there is not a supplied end_date, make it now
+      #force the window of time to be limited to 2 weeks
+
+      #if both dates are specified use them or change the start date if range is over 2 week
+      if start_at && end_at
+        if end_at - start_at > 2.weeks
+          @start = end_at - 2.weeks
+          @account_report.parameters["start_at"] = @start
+        end
+      end
+
+      #if no end date is specified, make one 2 weeks after the start date
+      if start_at && !end_at
+        @end = start_at + 2.weeks
+        @account_report.parameters["end_at"] = @end
+      end
+
+      #if no start date is specified, make one 2 weeks before the end date
+      if !start_at && end_at
+        @start = end_at - 2.weeks
+        @account_report.parameters["start_at"] = @start
+      end
+
+      #if not dates are supplied assume the past 2 weeks
+      if !start_at && !end_at
+        @start = 2.weeks.ago
+        @account_report.parameters["start_at"] = @start
+        @end = Time.now
+        @account_report.parameters["end_at"] = @end
+      end
+    end
+
+    def students_with_no_submissions
+      start_and_end_times
+      report_extra_text
+
       file = Canvas::AccountReports.generate_file(@account_report)
       CSV.open(file, "w") do |csv|
 
         condition = [""]
-        if start_at
-          condition.first << " AND submitted_at > ?"
-          condition << start_at
-          @account_report.parameters["extra_text"] << " Start At: #{start_at};"
-        end
-
-        if end_at
-          condition.first << " AND submitted_at < ?"
-          condition << end_at
-          @account_report.parameters["extra_text"] << " End At: #{end_at};"
-        end
+        condition.first << " AND submitted_at > ?"
+        condition << start_at
+        condition.first << " AND submitted_at < ?"
+        condition << end_at
 
         time_span_join = Pseudonym.send(:sanitize_sql, condition)
 
@@ -69,7 +97,7 @@ module Canvas::AccountReports
 
         no_subs = add_term_scope(no_subs)
         no_subs = add_course_enrollments_scope(no_subs, 'e')
-        no_subs = add_course_sub_account_scope(no_subs)
+        no_subs = add_course_sub_account_scope(no_subs) unless course
 
         csv << ['user id','user sis id','user name','section id',
                 'section sis id', 'section name','course id',
@@ -94,6 +122,7 @@ module Canvas::AccountReports
     end
 
     def zero_activity
+      report_extra_text
       file = Canvas::AccountReports.generate_file(@account_report)
       CSV.open(file, "w") do |csv|
 
@@ -116,7 +145,6 @@ module Canvas::AccountReports
         param = {}
 
         if start_at
-          @account_report.parameters["extra_text"] << " Start At: #{start_at};"
           param[:start_at] = start_at
           start = " AND aua.updated_at > :start_at"
         else
@@ -131,11 +159,7 @@ module Canvas::AccountReports
                                AND aua.context_type = 'Course'
                              #{start})",param)
 
-        if course
-          data = data.where(:enrollments => { :course_id => course })
-          @account_report.parameters['extra_text'] << " For Course: #{course.id};"
-        end
-
+        data = data.where(:enrollments => {:course_id => course}) if course
         data = add_term_scope(data, 'c')
         data = add_course_sub_account_scope(data, 'c') unless course
 
@@ -162,6 +186,7 @@ module Canvas::AccountReports
     end
 
     def last_user_access
+      report_extra_text
       file = Canvas::AccountReports.generate_file(@account_report)
       CSV.open(file, "w") do |csv|
 
@@ -185,7 +210,6 @@ module Canvas::AccountReports
             joins('INNER JOIN enrollments e ON e.user_id = pseudonyms.user_id
                    INNER JOIN courses c on c.id = e.course_id').
             where('c.id = ?', course)
-          @account_report.parameters['extra_text'] << " For Course: #{course.id};"
         end
 
         csv << ['user id','user sis id','user name','last access at','last ip']

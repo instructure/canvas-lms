@@ -1,18 +1,30 @@
-<div id="assignment_{{id}}" class="ig-row {{#if published}}ig-published{{/if}}" data-item-id="{{labelId}}">
+<div
+  id="assignment_{{id}}"
+  class="ig-row {{#ifAll canManage published}}ig-published{{/ifAll}}"
+  data-item-id="{{labelId}}"
+>
   <a href="{{htmlUrl}}" class="ig-title ellipses">
+    {{#if ENV.PERMISSIONS.manage}}
+      <span class="draggable-handle">
+        <i class="icon-drag-handle"></i>
+      </span>
+    {{/if}}
     <i class='icon-{{iconType}}'></i>
     {{name}}
   </a>
   <div class="ig-details row-fluid">
-    {{#if ENV.PERMISSIONS.manage}}
-      <div class="span4 ellipses modules">
+    {{#if canManage}}
+      <div class="{{spanWidth}} ellipses modules">
         {{#if has_modules}}
           {{#ifEqual module_count 1}}
             {{module_name}} {{#t "module"}}Module{{/t}}
           {{else}}
-            <a href='#' title='{{joined_names}}' class="tooltip_link" data-tooltip-selector="#module_tooltip_{{labelId}}">
-              {{#t "multiple_modules"}}Multiple Modules{{/t}}
-            </a>
+            <a
+              href='#'
+              title='{{joined_names}}'
+              class="tooltip_link"
+              data-tooltip-selector="#module_tooltip_{{labelId}}"
+            >{{#t "multiple_modules"}}Multiple Modules{{/t}}</a>
           {{/ifEqual}}
           <div id="module_tooltip_{{labelId}}" style="display:none;">
             {{#each modules}}
@@ -23,22 +35,86 @@
       </div>
     {{/if}}
 
-    <div class="span4 ellipses">
-      <!-- TODO: VDD -->
-      {{#if dueAt}}
-        <strong>{{#t "due_date"}}Due{{/t}}</strong>
-        {{datetimeFormatted dueAt}}
-      {{/if}}
+    <div class="{{spanWidth}} ellipses" data-view="date-available"></div>
+    <div class="{{spanWidth}} ellipses" data-view="date-due"></div>
+
+    <div class="{{spanWidth}} ellipses js-score {{alignTextClass}}">
+      <span class="screenreader-only">
+        {{#if pointsPossible}}
+          {{#t "points_possible_screen_reader"}}{{pointsPossible}} Points Possible{{/t}}
+        {{else}}
+          {{#t "no_points_possible"}}No Points Possible{{/t}}
+        {{/if}}
+      </span>
+      <span class="non-screenreader" aria-hidden="true">
+        {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}
+      </span>
     </div>
 
-    <div class="span4 ellipses">
-      {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}
-    </div>
   </div>
 
-  {{#if ENV.PERMISSIONS.manage}}
+  {{#if canManage}}
     <div class="ig-admin">
       <span class="publish-icon" data-view="publish-icon"></span>
+
+      <a
+        class="al-trigger al-trigger-gray"
+        role="button"
+        aria-haspopup="true"
+        aria-owns="assignment_{{id}}_settings_list"
+        tabindex="-1"
+      >
+        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+        <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
+      </a>
+
+      <ul
+        id="assignment_{{id}}_settings_list"
+        class="al-options"
+        role="menu"
+        tabindex="0"
+        aria-hidden="true"
+        aria-expanded="false"
+        aria-activedescendant="assignment_{{id}}_settings_delete_item"
+      >
+        <li role="presentation">
+          <a
+            href="#"
+            class="edit_assignment icon-edit"
+            id="assignment_{{id}}_settings_edit_item"
+            tabindex="-1"
+            role="menuitem"
+            title='{{#t "edit_assignment_title"}}Edit Assignment{{/t}}'
+            data-focus-returns-to="assign_{{id}}_manage_link"
+          >{{#t "edit"}}Edit{{/t}}</a>
+        </li>
+        {{#unless frozen }}
+        <li role="presentation">
+          <a
+            href="#"
+            class="delete_assignment icon-trash"
+            id="assignment_{{id}}_settings_delete_item"
+            tabindex="-1"
+            role="menuitem"
+            title="{{#t "delete_asssignment_title"}}Delete this assignment{{/t}}"
+          >{{#t "delete"}}Delete{{/t}}</a>
+        </li>
+        {{/unless}}
+        {{#if canMove}}
+        <li role="presentation">
+          <a
+            href="#"
+            class="move_assignment icon-updown"
+            id="assignment_{{id}}_settings_move_item"
+            title='{{#t "move_assignment_title"}}Move Assignment{{/t}}'
+            data-focus-returns-to="assign_{{id}}_manage_link"
+          >{{#t "move"}}Move To&hellip;{{/t}}</a>
+        </li>
+        {{/if}}
+      </ul>
     </div>
+
+    <form data-view="edit-assignment" class="form-dialog"></form>
+    <form data-view="moveAssignment" class="form-dialog"></form>
   {{/if}}
 </div>

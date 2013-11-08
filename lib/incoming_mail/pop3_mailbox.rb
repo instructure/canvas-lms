@@ -17,10 +17,15 @@
 #
 
 require 'net/pop'
+require File.expand_path('../configurable_timeout', __FILE__)
 
 module IncomingMail
 
   class Pop3Mailbox
+    include ConfigurableTimeout
+
+    UsedPopMethods = [:start, :mails, :finish]
+
     attr_accessor :server, :port, :ssl, :username, :password
 
     def initialize(options = {})
@@ -32,7 +37,8 @@ module IncomingMail
     end
 
     def connect
-      @pop = Net::POP3.new(server, port)
+      @pop = with_timeout { Net::POP3.new(server, port) }
+      wrap_with_timeout(@pop, UsedPopMethods)
       @pop.enable_ssl(OpenSSL::SSL::VERIFY_NONE) if ssl
       @pop.start(username, password)
     end
@@ -43,18 +49,19 @@ module IncomingMail
     end
 
     def each_message
-      @pop.each_mail do |message|
-        yield message, message.pop      
+      mails = @pop.mails
+      mails.each do |message|
+        yield message, message.pop
       end
     end
 
     def delete_message(pop_message)
-      pop_message.delete
+      with_timeout { pop_message.delete }
     end
 
     def move_message(pop_message, target_folder)
       # pop can't do this -- just delete the message
-      pop_message.delete
+      delete_message(pop_message)
     end
   end
 

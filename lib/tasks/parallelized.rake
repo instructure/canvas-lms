@@ -14,42 +14,52 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     end
 
     task :nonselenium, :count do |t, args|
-      Rake::Task['spec:single'].invoke #first rake task to run the files that fail in parallel in a single thread
-      Rake::Task['parallel:nonseleniumparallel'].invoke(args[:count])
+
+      Rake::Task['spec:single'].execute #first rake task to run the files that fail in parallel in a single thread
+
+      if File.zero?('tmp/parallel_log/rspec.failures')
+        Rake::Task['parallel:nonseleniumparallel'].invoke(args[:count])
+      else
+        abort(`cat tmp/parallel_log/rspec.failures`)
+      end
+
     end
 
     task :selenium, :count, :build_section do |t, args|
       require "parallelized_specs"
-
       #used to split selenium builds when :build_section is set split it in two.
       test_files = FileList['spec/selenium/**/*_spec.rb'] + FileList['vendor/plugins/*/spec_canvas/selenium/*_spec.rb']
-      test_files = test_files.to_a.sort_by! {|file| File.size(file)}
+      test_files = test_files.to_a.sort_by! { |file| File.size(file) }
+      args[:build_section].to_i == 0 ? section = nil : section = args[:build_section].to_i
 
-      test_files_a_sum = 0
-      test_files_b_sum = 0
-      test_files_a = []
-      test_files_b = []
-      test_files.each do |file|
-        if (test_files_a_sum < test_files_b_sum)
-          test_files_a << file
-          test_files_a_sum += File.size(file)
-        else
-          test_files_b << file
-          test_files_b_sum += File.size(file)
+      unless section.nil?
+        test_files_a_sum = 0
+        test_files_b_sum = 0
+        test_files_a = []
+        test_files_b = []
+        test_files.each do |file|
+          if test_files_a_sum < test_files_b_sum
+            test_files_a << file
+            test_files_a_sum += File.size(file)
+          else
+            test_files_b << file
+            test_files_b_sum += File.size(file)
+          end
+        end
+
+        case section
+          when 1
+            puts "INFO: running section 1"
+            #runs upper half of selenium tests
+            test_files = test_files_a
+          when 2
+            puts "INFO: running section 2"
+            #runs lower half of selenium tests
+            test_files = test_files_b
+          else
+            test_files = test_files_a + test_files_b
         end
       end
-
-      case args[:build_section]
-        when 1
-          #runs upper half of selenium tests
-          test_files = test_files_a
-        when 2
-          #runs lower half of selenium tests
-          test_files = test_files_b
-        else
-          test_files = test_files_a + test_files_b
-      end
-
       test_files.map! { |f| "#{Rails.root}/#{f}" }
       Rake::Task['parallel:spec'].invoke(args[:count], '', '', test_files.join(' '))
     end

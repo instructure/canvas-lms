@@ -123,6 +123,25 @@ describe Conversation do
       convo.participants.size.should == 3 # includes the sender (though we don't show him in the ui)
     end
 
+    it "should only add participants to messages the existing user has participants on" do
+      sender = user
+      recipient = user
+      root_convo = Conversation.initiate([sender, recipient], false)
+      msgs = []
+      msgs << root_convo.add_message(sender, "first message body")  <<
+              root_convo.add_message(sender, "second message body") <<
+              root_convo.add_message(sender, "third message body")  <<
+              root_convo.add_message(sender, "fourth message body")
+      sender.conversations.first.remove_messages(msgs[0])
+      sender.conversations.first.delete_messages(msgs[1])
+
+      new_guy = user
+      root_convo.add_participants(sender, [new_guy])
+      # -1 for hard delete msg, +1 for generated message. soft deleted should still be added.
+      new_guy.conversations.first.messages.size.should eql(msgs.size - 1 + 1)
+    end
+
+
     it "should not re-add existing participants to group conversations" do
       sender = user
       recipient = user
@@ -195,6 +214,18 @@ describe Conversation do
         @recipient.conversations.first.message_count.should eql 2
 
         @sender.conversations.first.remove_messages(msg)
+        @sender.conversations.first.reload.message_count.should eql 1
+        @recipient.conversations.first.reload.message_count.should eql 2
+      end
+
+      it "should decrement when deleting messages" do
+        root_convo = Conversation.initiate([@sender, @recipient], false)
+        root_convo.add_message(@sender, 'test')
+        msg = root_convo.add_message(@sender, 'test2')
+        @sender.conversations.first.message_count.should eql 2
+        @recipient.conversations.first.message_count.should eql 2
+
+        @sender.conversations.first.delete_messages(msg)
         @sender.conversations.first.reload.message_count.should eql 1
         @recipient.conversations.first.reload.message_count.should eql 2
       end
@@ -486,6 +517,36 @@ describe Conversation do
       conversation.conversation_messages.size.should eql 1
     end
 
+    it "should undelete visible soft-deleted message participants" do
+      u1 = user
+      u2 = user
+      conversation = Conversation.initiate([u1, u2], true)
+      # a message to keep the conversation visible to u2 after remove_messages on the asset's message
+      previous_message = conversation.add_message(u1, 'hello')
+      message = conversation.add_message(u1, 'test message')
+
+      # make u1's conversation invisible so they won't be updated.
+      u1.conversations.first.remove_messages(previous_message, message)
+      u1.conversations.should be_empty
+
+      # u2 only deletes the asset's message, but conversations is still visible
+      u2.conversations.first.remove_messages(message)
+      u2.conversations.first.messages.size.should eql 1
+
+      asset = Submission.new(:user => u1)
+      asset.expects(:conversation_groups).returns([[u1, u2]])
+      asset.expects(:lock!).returns(true)
+      asset.expects(:conversation_messages).at_least_once.returns([message])
+      asset.expects(:conversation_message_data).returns({:created_at => Time.now.utc, :author => u1, :body => "asdf"})
+
+      Conversation.update_all_for_asset asset, :update_message => true, :only_existing => true
+      conversation.conversation_messages.size.should eql 2
+      u1.conversations.should be_empty
+      # but u1 should still have the soft-deleted participant
+      u1.all_conversations.first.all_messages.size.should eql 2
+      u2.conversations.first.messages.size.should eql 2
+    end
+
     context "sharding" do
       specs_require_sharding
 
@@ -710,10 +771,9 @@ describe Conversation do
         u2.conversations.first.tags.should == [@course1.asset_string]
         u3.conversations.first.tags.should == [@course2.asset_string]
         broken_one = u3.conversations.first
-        broken_one.user_id = nil
-        broken_one.tags = []
-        broken_one.save!
+        ConversationParticipant.where(id: broken_one).update_all(user_id: -1, tags: '')
 
+        conversation.reload
         conversation.add_message(u1, 'another', :tags => [@course2.asset_string, "course_0"])
         u1.conversations.first.tags.should == [@course1.asset_string]
         u2.conversations.first.tags.sort.should == [@course1.asset_string]
@@ -860,8 +920,7 @@ describe Conversation do
 
       it "should ignore conversation_participants without a user" do
         broken_one = @u3.conversations.first
-        broken_one.user_id = nil
-        broken_one.save!
+        ConversationParticipant.where(id: broken_one).update_all(user_id: -1)
 
         @conversation.migrate_context_tags!
 
@@ -894,6 +953,7 @@ describe Conversation do
         third_course.offer!
         third_course.enroll_teacher(@teacher).accept!
 
+        conversation.reload
         conversation.add_message(@student, 'second message')
 
         conversation.conversation_participants.each do |participant|
@@ -993,6 +1053,7 @@ describe Conversation do
         new_group.users << student1
         new_group.users << student2
 
+        conversation.reload
         conversation.add_message(student2, 'second message')
 
         conversation.conversation_participants.each do |participant|

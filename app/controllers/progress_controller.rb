@@ -49,7 +49,7 @@
 #       "updated_at": "2013-01-15T15:04:00Z",
 #
 #       // optional details about the job
-#       "message": "17 courses processed"
+#       "message": "17 courses processed",
 #
 #       // url where a progress update can be retrieved
 #       "url": "https://canvas.example.edu/api/v1/progress/1"

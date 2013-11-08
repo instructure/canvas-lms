@@ -50,7 +50,6 @@ describe "course rubrics" do
       @association = @rubric.associate_with(@assignment, @course, :use_for_grading => true, :purpose => 'grading')
       @rubric.data[0][:ignore_for_scoring] = '1'
       @rubric.points_possible = 5
-      @rubric.alignments_changed = true
       @rubric.save!
 
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
@@ -83,17 +82,9 @@ describe "course rubrics" do
       outcome_model(:context => @course)
 
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
-      f('.edit_rubric_link').click
       wait_for_ajaximations
-      f('.rubric.editing tr.criterion .delete_criterion_link').click
-      wait_for_ajaximations
-      f('.rubric.editing .find_outcome_link').click
-      wait_for_ajaximations
-      f('.outcome-link').click
-      wait_for_ajaximations
-      f('.ui-dialog .btn-primary').click
-      accept_alert
-      wait_for_ajaximations
+      import_outcome
+
       f('tr.learning_outcome_criterion .criterion_description .description').text.should == @outcome.title
       ff('tr.learning_outcome_criterion td.rating .description').map(&:text).should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:description] }
       ff('tr.learning_outcome_criterion td.rating .points').map(&:text).should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points].to_s }
@@ -104,39 +95,27 @@ describe "course rubrics" do
       rubric.data.first[:ratings].map { |r| r[:points] }.should == @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points] }
     end
 
+    it "should not allow editing a criterion row linked to an outcome" do
+      rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
+      outcome_model(:context => @course)
+      rubric = Rubric.last
+
+      get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+      wait_for_ajaximations
+      import_outcome
+
+      f('.edit_rubric_link').click
+      wait_for_ajaximations
+
+      links = ffj("#rubric_#{rubric.id}.editing .ratings:first .edit_rating_link")
+      links.any?(&:displayed?).should be_false
+    end
+
     it "should not show 'use for grading' as an option" do
       course_with_teacher_logged_in
       get "/courses/#{@course.id}/rubrics"
       f('.add_rubric_link').click
       fj('.rubric_grading:hidden').should_not be_nil
-    end
-
-    context "importing" do
-
-      it "should create a allow immediate editing when adding an imported rubric to a new assignment" do
-        rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
-
-        @old_course = @course
-        @course = nil
-        course_with_teacher(:user => @user, :active_all => true)
-
-        @course.merge_into_course(@old_course, :everything => true)
-        @assignment = @course.assignments.create!(assignment_valid_attributes.merge({:title => "New Course Assignment"}))
-
-        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        f(".add_rubric_link").click
-        fj(".find_rubric_link:visible").click
-        wait_for_ajaximations
-        fj(".select_rubric_link:visible").click
-        wait_for_ajaximations
-        fj(".edit_rubric_link:visible").click
-        fj(".rubric_custom_rating:visible").click
-        fj(".save_button:visible").click
-        wait_for_ajax_requests
-
-        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        ffj(".custom_ratings:visible").size.should == 1
-      end
     end
   end
 
@@ -162,13 +141,13 @@ describe "course rubrics" do
 
     get "/courses/#{@course.id}/grades"
     f('.toggle_rubric_assessments_link').click
-    wait_for_animations
+    wait_for_ajaximations
     f('.rubric .criterion .custom_rating_comments').text.should == comment
     f('.rubric .criterion .custom_rating_comments a').should have_attribute('href', 'http://www.example.com/')
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     f('.assess_submission_link').click
-    wait_for_animations
+    wait_for_ajaximations
     f('.rubric .criterion .custom_rating_comments').text.should == comment
     f('.rubric .criterion .custom_rating_comments a').should have_attribute('href', 'http://www.example.com/')
   end

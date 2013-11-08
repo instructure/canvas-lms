@@ -18,7 +18,7 @@
 
 class QuizSubmission < ActiveRecord::Base
   include Workflow
-  attr_accessible :quiz, :user, :temporary_user_code, :submission_data
+  attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade
   attr_readonly :quiz_id, :user_id
   validates_presence_of :quiz_id
 
@@ -341,10 +341,17 @@ class QuizSubmission < ActiveRecord::Base
   end
 
   def highest_score_so_far(exclude_version_id=nil)
-    scores = []
-    scores << self.score if self.score
-    scores += versions.reload.reject{|v| v.id == exclude_version_id}.map{|v| v.model.score || 0.0} rescue []
-    scores.max
+    scores = {}
+    scores[attempt] = self.score if self.score
+
+    versions = self.versions.reload.reject {|v| v.id == exclude_version_id } rescue []
+
+    # only most recent version for each attempt - some have regraded a version
+    versions.sort_by(&:number).reverse.each do |ver|
+      scores[ver.model.attempt] ||= ver.model.score || 0.0
+    end
+
+    scores.values.max
   end
   private :highest_score_so_far
 
@@ -398,6 +405,11 @@ class QuizSubmission < ActiveRecord::Base
     @skip_after_save_score_updates = false
   end
 
+  def time_left
+    return unless end_at
+    (end_at - Time.zone.now).round
+  end
+
   def less_than_allotted_time?
     self.started_at && self.end_at && self.quiz && self.quiz.time_limit && (self.end_at - self.started_at) < self.quiz.time_limit.minutes
   end
@@ -445,6 +457,17 @@ class QuizSubmission < ActiveRecord::Base
     end
   end
 
+  def attempt_versions
+    versions = self.versions.order("number desc").each_with_object({}) do |ver, hash|
+      hash[ver.model.attempt] ||= ver
+    end
+    versions.sort.map {|attempt, version| version }
+  end
+
+  def submitted_attempts
+    attempt_versions.map {|ver| ver.model }
+  end
+
   def attempts_left
     return -1 if self.quiz.allowed_attempts < 0
     [0, self.quiz.allowed_attempts - (self.attempt || 0) + (self.extra_attempts || 0)].max
@@ -474,6 +497,7 @@ class QuizSubmission < ActiveRecord::Base
     @user_answers.each do |answer|
       self.workflow_state = "pending_review" if answer[:correct] == "undefined"
     end
+    self.score_before_regrade = nil
     self.finished_at = Time.now
     self.manually_unlocked = nil
     self.finished_at = opts[:finished_at] if opts[:finished_at]
@@ -486,7 +510,21 @@ class QuizSubmission < ActiveRecord::Base
     end
     self.context_module_action
     track_outcomes(self.attempt)
-    true
+    quiz = self.quiz
+    previous_version = quiz.versions.where(number: quiz_version).first
+    if previous_version && quiz_version != quiz.version_number
+      quiz = previous_version.model.reload
+    end
+    # let's just write the options here in case we decide to do individual
+    # submissions asynchronously later.
+    options = {
+      quiz: quiz,
+      # Leave version_number out for now as we may be passing the version
+      # and we're not starting it as a delayed job
+      # version_number: quiz.version_number,
+      submissions: [self]
+    }
+    QuizRegrader.regrade!(options)
   end
 
   # Updates a simply_versioned version instance in-place.  We want
@@ -642,7 +680,7 @@ class QuizSubmission < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     # evizitei: These broadcast policies use templates designed for
-    # submissions, not quiz submissions.  The necessary delegations 
+    # submissions, not quiz submissions.  The necessary delegations
     # are at the bottom of this class.
     p.dispatch :submission_graded
     p.to { user }
@@ -676,6 +714,46 @@ class QuizSubmission < ActiveRecord::Base
 
   def valid_token?(token)
     self.validation_token.blank? || self.validation_token == token
+  end
+
+  # TODO: this could probably be put in as a convenience method in simply_versioned
+  def save_with_versioning!
+    self.with_versioning(true) { self.save! }
+  end
+
+  # Schedules the submission for grading when it becomes overdue.
+  #
+  # Only applicable if the submission is set to become overdue, per the `end_at`
+  # field.
+  #
+  # @throw ArgumentError If the submission does not have an end_at timestamp set.
+  def grade_when_overdue
+    unless self.end_at.present?
+      raise ArgumentError,
+        'QuizSubmission is not applicable for overdue enforced grading!'
+    end
+
+    self.send_later_enqueue_args(:grade_if_untaken, {
+      # 6 seconds because DJ polls at 5 second intervals, and we need at least
+      # 1 second for the submission to become overdue
+      :run_at => self.end_at + 6.seconds,
+      :priority => Delayed::LOW_PRIORITY,
+      :max_attempts => 1
+    })
+  end
+
+  # don't use this directly, see #grade_when_overdue
+  def grade_if_untaken
+    # We can skip the needs_grading? test because we know that the submission
+    # is overdue since the job will be processed after submission.end_at ...
+    # so we simply test its workflow state.
+    #
+    # Also, we can't use QuizSubmission#overdue? because as of 10/2013 it adds
+    # a graceful period of 1 minute after the true end date of the submission,
+    # which doesn't work for us here.
+    if self.untaken?
+      self.grade_submission(:finished_at => self.end_at)
+    end
   end
 
   # evizitei: these 3 delegations allow quiz submissions to be used in

@@ -30,7 +30,9 @@ module Canvas::Plugins::Validators::ScribdValidator
           plugin_setting.errors.add_to_base(res)
           false
         else
-          settings.slice(:api_key, :secret_key)
+          settings.slice(:api_key, :secret_key, :enable_html5_viewer).tap do |hash|
+            hash[:enable_html5_viewer] = Canvas::Plugin.value_to_boolean(hash[:enable_html5_viewer])
+          end
         end
       end
     end

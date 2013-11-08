@@ -118,9 +118,6 @@ body.with-right-side.with-left-side {
     margin-right: 0px;
     margin-top: 0px;
   }
-  .ellipsis {
-    padding-right: 70px;
-  }
 }
 
 .new-and-total-badge {
@@ -129,7 +126,6 @@ body.with-right-side.with-left-side {
 
 .discussion-section {
   padding: 4px 10px 3px 10px;
-  position: relative;
   a {
     color: #396eb2;
   }
@@ -602,6 +598,9 @@ body.with-right-side.with-left-side {
 .toolbarView {
   background: white;
   min-height: 50px;
+  .admin-links {
+    text-align: left;
+  }
   .al-trigger {
     margin-left: 4px;
   }
@@ -609,6 +608,12 @@ body.with-right-side.with-left-side {
     padding: 10px 10px 6px 14px;
     border-bottom: solid 1px $border;
     min-height: 33px;
+    overflow: visible;
+  }
+  .headerBar:after {
+    clear: both;
+    content: "";
+    display: block;
   }
   .sticky {
     position: fixed;

@@ -1,13 +1,19 @@
 define [
   'Backbone'
+  'underscore'
   'compiled/backbone-ext/DefaultUrlMixin'
-], (Backbone, DefaultUrlMixin) ->
+  'compiled/collections/AssignmentCollection'
+], (Backbone, _, DefaultUrlMixin, AssignmentCollection) ->
 
   class AssignmentGroup extends Backbone.Model
     @mixin DefaultUrlMixin
     resourceName: 'assignment_groups'
 
     urlRoot: -> @_defaultUrl()
+
+    initialize: ->
+      if (assignments = @get('assignments'))?
+        @set 'assignments', new AssignmentCollection(assignments)
 
     name: (newName) ->
       return @get 'name' unless arguments.length > 0
@@ -29,3 +35,26 @@ define [
       rules = @rules()
       if rules.never_drop
         delete rules.never_drop
+
+    hasRules: ->
+      @countRules() > 0
+
+    countRules: ->
+      rules = @rules() or {}
+      aids = @assignmentIds()
+      count = 0
+      for k,v of rules
+        if k == "never_drop"
+          count += _.intersection(aids, v).length
+        else
+          count++
+      count
+
+    assignmentIds: ->
+      assignments = @get('assignments')
+      return [] unless assignments?
+      assignments.pluck('id')
+
+    hasFrozenAssignments: ->
+      @get('assignments').any (m) ->
+        m.get('frozen')

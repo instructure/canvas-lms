@@ -18,22 +18,6 @@ describe GradeSummaryPresenter do
       it 'includes courses where the user is enrolled' do
         presenter.selectable_courses.should include(course)
       end
-
-      describe "submissions_by_assignment" do
-        before do
-          Setting.set('grade_distributions_submission_count_threshold', '2')
-          assignment.submissions.create!(:user => @user)
-        end
-
-        it "loads submissions in a small course" do
-          presenter.submissions_by_assignment[assignment.id].size.should == 1
-        end
-
-        it "doesn't load in a large course" do
-          assignment.submissions.create!(:user => student_in_course(:course => course).user)
-          presenter.submissions_by_assignment.size.should == 0
-        end
-      end
     end
 
     describe 'across shards' do
@@ -73,5 +57,21 @@ describe GradeSummaryPresenter do
       end
     end
 
+    describe '#assignment_stats' do
+      it 'works' do
+        teacher_in_course
+        s1, s2, s3 = n_students_in_course(3)
+        a = @course.assignments.create! points_possible: 10
+        a.grade_student s1, grade:  0
+        a.grade_student s2, grade:  5
+        a.grade_student s3, grade: 10
+        p = GradeSummaryPresenter.new(@course, @teacher, nil)
+        stats = p.assignment_stats
+        assignment_stats = stats[a.id]
+        assignment_stats.max.to_f.should == 10
+        assignment_stats.min.to_f.should == 0
+        assignment_stats.avg.to_f.should == 5
+      end
+    end
   end
 end

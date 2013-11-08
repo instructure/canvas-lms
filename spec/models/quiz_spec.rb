@@ -323,6 +323,25 @@ describe Quiz do
     q.unpublished_question_count.should eql(3)
   end
 
+  it "should return an available question count for unpublished questions" do
+    q = @course.quizzes.create!(:title => "new quiz")
+    q.quiz_questions.create!
+    q.quiz_questions.create!
+    q.save
+
+    q.reload.available_question_count.should eql(2)
+  end
+
+  it "should return an available question count for published questions" do
+    q = @course.quizzes.create!(:title => "new quiz")
+    q.quiz_questions.create!
+    q.quiz_questions.create!
+    q.save
+    q.publish!
+
+    q.reload.available_question_count.should eql(2)
+  end
+
   it "should return processed root entries for each question/group" do
     q = @course.quizzes.create!(:title => "new quiz")
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
@@ -335,9 +354,9 @@ describe Quiz do
     q.quiz_questions.create!(:question_data => { :name => "test 3" })
     q.quiz_questions.create!(:question_data => { :name => "test 4" })
     q.save
-    q.quiz_questions.length.should eql(4)
+    q.active_quiz_questions.size.should eql(4)
     q.quiz_groups.length.should eql(1)
-    g.quiz_questions(true).length.should eql(2)
+    g.quiz_questions(true).active.size.should eql(2)
 
     entries = q.root_entries(true)
     entries.length.should eql(3)
@@ -573,75 +592,6 @@ describe Quiz do
     q.quiz_submissions.first.submission.assignment.should == q.assignment
   end
 
-  context "clone_for" do
-    it "should clone for other contexts" do
-      u = User.create!(:name => "some user")
-      q = @course.quizzes.create!(:title => "some quiz")
-      q = @course.quizzes.create!(:title => "new quiz")
-      g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
-      q.quiz_questions.create!(:question_data => { :name => "test 1", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 2", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 3", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 4", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 5", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 6", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 7", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 8", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 9", })
-      q.quiz_questions.create!(:question_data => { :name => "test 10", })
-      q.quiz_data.should be_nil
-      q.generate_quiz_data
-      q.save
-      course
-      new_q = q.clone_for(@course)
-      new_q.context.should eql(@course)
-      new_q.context.should_not eql(q.context)
-      new_q.title.should eql(q.title)
-      new_q.quiz_groups.length.should eql(q.quiz_groups.length)
-      new_q.quiz_questions.length.should eql(q.quiz_questions.length)
-      new_q.quiz_questions.first.question_data[:id].should be_nil
-      new_q.quiz_questions.first.data[:id].should == new_q.quiz_questions.first.id
-    end
-
-    it "should set the related assignment's group correctly" do
-      ag = @course.assignment_groups.create!(:name => 'group')
-      a = @course.assignments.create!(:title => "some assignment", :points_possible => 5, :assignment_group => ag)
-      a.points_possible.should eql(5.0)
-      a.submission_types.should_not eql("online_quiz")
-      q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10)
-      q.workflow_state = 'available'
-      q.save
-
-      course
-      new_q = q.clone_for(@course)
-      new_q.context.should eql(@course)
-      new_q.context.should_not eql(q.context)
-      new_q.assignment.assignment_group.should_not eql(ag)
-      new_q.assignment.assignment_group.context.should eql(@course)
-    end
-
-    it "should not blow up when a quiz question has a link to the quiz it's in" do
-      q = @course.quizzes.create!(:title => "some quiz")
-      question_text = "<a href='/courses/#{@course.id}/quizzes/#{q.id}/edit'>hi</a>"
-      q.quiz_questions.create!(:question_data => { :name => "test 1", :question_text => question_text })
-      q.generate_quiz_data
-      q.save
-      course
-      new_q = q.clone_for(@course)
-      new_q.quiz_questions.first.question_data[:question_text].should match /\/courses\/#{@course.id}\/quizzes\/#{new_q.id}\/edit/
-    end
-
-    it "should only create one associated assignment for a graded quiz" do
-      q = @course.quizzes.create!(:title => "graded quiz", :quiz_type => 'assignment')
-      q.workflow_state = 'available'
-      q.save
-      course
-      expect {
-        new_q = q.clone_for(@course)
-      }.to change(@course.assignments, :count).by(1)
-    end
-  end
-
   describe "Quiz with QuestionGroup pointing to QuestionBank" do
     before(:each) do
       course_with_student
@@ -804,12 +754,12 @@ describe Quiz do
     end
 
     it 'is false if the user is not part of this course' do
-      @user.student_enrollments.delete_all
+      @user.student_enrollments.scoped.delete_all
       @quiz.has_student_submissions?.should be_false
     end
 
     it 'is false if there are no submissions' do
-      @quiz.quiz_submissions.delete_all
+      @quiz.quiz_submissions.scoped.delete_all
       @quiz.has_student_submissions?.should be_false
     end
 
@@ -946,6 +896,7 @@ describe Quiz do
 
       it "should not validate quiz_type if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :quiz_type => 'invalid'
+        quiz.workflow_state = 'created'
         quiz.save(false).should be_true  # save without validation
         quiz.reload
         quiz.save.should be_true
@@ -964,6 +915,7 @@ describe Quiz do
 
       it "should not validate ip_filter if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :ip_filter => '123.fourfivesix'
+        quiz.workflow_state = 'created'
         quiz.save(false).should be_true  # save without validation
         quiz.reload
         quiz.save.should be_true
@@ -1004,6 +956,7 @@ describe Quiz do
 
       it "should not validate hide_results if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :hide_results => 'invalid'
+        quiz.workflow_state = 'created'
         quiz.save(false).should be_true  # save without validation
         quiz.reload
         quiz.save.should be_true
@@ -1084,5 +1037,103 @@ describe Quiz do
       @quiz.workflow_state = 'deleted'
       @quiz.should_not be_published
     end
+  end
+
+  context "#current_regrade" do
+
+    before { @quiz = @course.quizzes.create! title: 'Test Quiz' }
+
+    it "returns the regrade for the quiz and quiz version" do
+      course_with_teacher_logged_in(active_all: true, course: @course)
+      regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id,@quiz.version_number) { |qr| qr.user_id = @teacher.id }
+      @quiz.current_regrade.should == regrade
+    end
+  end
+
+  context "#current_regrade_question_ids" do
+
+    before { @quiz = @course.quizzes.create! title: 'Test Quiz' }
+
+    it "returns the correct question ids" do
+      course_with_teacher_logged_in(active_all: true, course: @course)
+      q = @quiz.quiz_questions.create!
+      regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) { |qr| qr.user_id = @teacher.id }
+      rq = regrade.quiz_question_regrades.create! quiz_question_id: q.id, regrade_option: 'current_correct_only'
+      @quiz.current_quiz_question_regrades.should == [rq]
+    end
+  end
+
+  context "#last_regrade_performed" do
+    before { @quiz = @course.quizzes.create! title: 'Test Quiz' }
+
+    it "returns the last regrade for the quiz, regardless of version" do
+      course_with_teacher_logged_in(active_all: true, course: @course)
+      versioned_regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) { |qr| qr.user_id = @teacher.id }
+      last_regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number-1) { |qr| qr.user_id = @teacher.id }
+
+      @quiz.last_regrade_performed.should == last_regrade
+    end
+  end
+
+  context "#regrade_if_published" do
+
+    it "queues a job to regrade if there are current question regrades" do
+      course_with_teacher_logged_in(course: @course, active_all: true)
+      quiz = @course.quizzes.create!
+      q = quiz.quiz_questions.create!
+      regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(quiz.id,quiz.version_number) { |qr| qr.user_id = @teacher.id }
+      regrade.quiz_question_regrades.create!(
+        quiz_question_id: q.id,
+        regrade_option: 'current_correct_only')
+      QuizRegrader.expects(:send_later).once.
+        with(:regrade!, quiz: quiz, version_number: quiz.version_number)
+      quiz.save!
+    end
+
+    it "does not queue a job to regrade when no current question regrades" do
+      course_with_teacher_logged_in(course: @course, active_all: true)
+      QuizRegrader.expects(:send_later).never
+      quiz = @course.quizzes.create!
+      quiz.save!
+    end
+  end
+
+  context "#destroy" do
+    it "should logical delete published quiz" do
+      quiz = @course.quizzes.create(title: 'test quiz')
+      quiz.context.root_account.enable_draft!
+      quiz.stubs(:has_student_submissions? => true)
+      quiz.publish!
+      quiz.assignment.stubs(:has_student_submissions? => true)
+
+      quiz.destroy
+      quiz.deleted?.should be_true
+    end
+
+    it "should logical delete the published quiz's associated assignment" do
+      quiz = @course.quizzes.create(title: 'test quiz')
+      quiz.context.root_account.enable_draft!
+      quiz.stubs(:has_student_submissions?).returns true
+      quiz.publish!
+      assignment = quiz.assignment
+      assignment.stubs(:has_student_submissions?).returns true
+
+      quiz.destroy
+      assignment.deleted?.should be_true
+    end
+  end
+
+  context "draft_state" do
+
+    it "updates the assignment's workflow state" do
+      @quiz = @course.quizzes.create!(title: 'Test Quiz')
+      @quiz.context.root_account.enable_draft!
+      @quiz.publish!
+      @quiz.unpublish!
+      @quiz.assignment.should_not be_published
+      @quiz.publish!
+      @quiz.assignment.should be_published
+    end
+
   end
 end

@@ -120,6 +120,21 @@ describe QuizSubmissionsController do
 
       @qs.reload.submission_data[:a].should == 'test'
     end
+
+    it "should return the time left to finish a quiz" do
+      course_with_student_logged_in(:active_all => true)
+      quiz_model(:course => @course)
+      submission = @quiz.generate_submission(@student, false)
+      submission.update_attribute(:end_at, Time.now + 1.hour)
+      QuizSubmission.where(:id => submission).update_all(:updated_at => 1.hour.ago)
+
+      put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test', :validation_token => submission.validation_token
+      json = JSON.parse(response.body)
+
+      json.should have_key('time_left')
+      json['time_left'].should == 60 * 60
+    end
+
   end
 
   describe "POST 'record_answer'" do

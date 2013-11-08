@@ -17,7 +17,7 @@
 #
 
 class QuizGroup < ActiveRecord::Base
-  attr_accessible :name, :pick_count, :question_points, :assessment_question_bank
+  attr_accessible :name, :pick_count, :question_points, :assessment_question_bank_id
   attr_readonly :quiz_id
   belongs_to :quiz
   belongs_to :assessment_question_bank
@@ -40,19 +40,10 @@ class QuizGroup < ActiveRecord::Base
       # don't do a valid question check because we don't want to instantiate all the bank's questions
       count = self.assessment_question_bank.assessment_question_count
     else
-      count = self.quiz_questions.select{|q| q.unsupported != true}.length rescue self.quiz_questions.length
+      count = self.quiz_questions.active.count
     end
     
     [self.pick_count.to_i, count].min
-  end
-  
-  def clone_for(quiz, dup=nil, options={})
-    dup ||= QuizGroup.new
-    self.attributes.delete_if{|k,v| [:id, :quiz_id].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.quiz_id = quiz.id
-    dup
   end
 
   # QuizGroup.data is used when creating and editing a quiz, but 
@@ -66,7 +57,7 @@ class QuizGroup < ActiveRecord::Base
       "name" => self.name,
       "pick_count" => self.pick_count,
       "question_points" => self.question_points,
-      "questions" => self.assessment_question_bank_id ? [] : self.quiz_questions.map{|q| q.data},
+      "questions" => self.assessment_question_bank_id ? [] : self.quiz_questions.active.map{|q| q.data},
       "assessment_question_bank_id" => self.assessment_question_bank_id
     }.with_indifferent_access
   end
@@ -121,6 +112,7 @@ class QuizGroup < ActiveRecord::Base
             QuizQuestion.import_from_migration(aq_hash, context, quiz, item)
           else
             aq_hash = AssessmentQuestion.import_from_migration(qq, context)
+            qq['assessment_question_id'] = aq_hash['assessment_question_id']
             QuizQuestion.import_from_migration(aq_hash, context, quiz, item)
           end
         end

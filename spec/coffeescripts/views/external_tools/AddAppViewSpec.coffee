@@ -103,6 +103,7 @@ define [
           "ratings_count": 4,
           "comments_count": 4,
           "avg_rating": 4.5,
+          "requires_secret": true
           "banner_url": "https://www.edu-apps.org/tools/redirect/banner.png",
           "logo_url": "https://www.edu-apps.org/tools/redirect/logo.png",
           "icon_url": "https://www.edu-apps.org/tools/redirect/icon.png",

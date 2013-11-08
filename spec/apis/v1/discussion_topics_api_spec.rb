@@ -355,6 +355,7 @@ describe DiscussionTopicsController, :type => :integration do
           topic.save!
         end
         [@sub, @topic2, @topic3].each(&:lock!)
+        @topic2.update_attribute(:pinned, true)
         
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=unlocked",
                         {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, 
@@ -373,6 +374,21 @@ describe DiscussionTopicsController, :type => :integration do
         links.each do |link|
           link.should match('scope=locked')
         end
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=pinned",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
+                         :per_page => '10', :scope => 'pinned'})
+        json.size.should == 1
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=unpinned",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
+                         :per_page => '10', :scope => 'unpinned'})
+        json.size.should == 3
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=locked,unpinned",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
+                         :per_page => '10', :scope => 'locked,unpinned'})
+        json.size.should == 2
       end
       
       it "should include all parameters in pagination urls" do
@@ -979,6 +995,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :message => @message, :attachment => data })
       @entry = DiscussionEntry.find_by_id(json['id'])
       @entry.attachment.should_not be_nil
+      @entry.attachment.context.should eql @user
     end
 
     it "should include attachments on replies to top-level entries" do
@@ -993,6 +1010,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :message => @message, :attachment => data })
       @entry = DiscussionEntry.find_by_id(json['id'])
       @entry.attachment.should_not be_nil
+      @entry.attachment.context.should eql @user
     end
 
     it "should include attachment info in the json response" do
@@ -1006,6 +1024,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :message => @message, :attachment => data })
       json['attachment'].should_not be_nil
       json['attachment'].should_not be_empty
+      json['attachment']['url'].should be_include 'verifier='
     end
 
     it "should create a submission from an entry on a graded topic" do
@@ -1254,63 +1273,75 @@ describe DiscussionTopicsController, :type => :integration do
       @topic.save
     end
 
-    it "should allow admins to see posts without posting" do
-      @topic.reply_from(:user => @student, :text => 'hai')
-      @user = @teacher
-      json = api_call(
-        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-      json.length.should == 1
+    describe "teacher" do
+      before(:each) do
+        @user = @teacher
+        @url  = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries"
+      end
+
+      it "should see topic entries without posting" do
+        @topic.reply_from(user: @student, text: 'hai')
+        json = api_call(:get, @url, controller: 'discussion_topics_api',
+          action: 'entries', format: 'json', course_id: @course.to_param,
+          topic_id: @topic.to_param)
+
+        json.length.should == 1
+      end
     end
 
-    it "shouldn't allow student who hasn't posted to see" do
-      @topic.reply_from(:user => @teacher, :text => 'hai')
-      @user = @student
-      raw_api_call(
-        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-      response.status.should == '403 Forbidden'
-      response.body.should == 'require_initial_post'
+    describe "student" do
+      before(:each) do
+        @topic.reply_from(user: @teacher, text: 'Lorem ipsum dolor')
+        @user = @student
+        @url  = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      end
 
-      raw_api_call(
-        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-        { :controller => 'discussion_topics_api', :action => 'show', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-      response.status.should == '403 Forbidden'
-      response.body.should == 'require_initial_post'
+      it "should see topic information before posting" do
+        json = api_call(:get, @url, controller: 'discussion_topics_api',
+          action: 'show', format: 'json', course_id: @course.to_param,
+          topic_id: @topic.to_param)
+        response.code.should == '200'
+      end
+
+      it "should not see entries before posting" do
+        raw_api_call(:get, "#{@url}/entries", controller: 'discussion_topics_api',
+          action: 'entries', format: 'json', course_id: @course.to_param,
+          topic_id: @topic.to_param)
+        response.body.should == 'require_initial_post'
+        response.code.should == '403'
+      end
+
+      it "should see entries after posting" do
+        @topic.reply_from(:user => @student, :text => 'hai')
+        json = api_call(:get, "#{@url}/entries", controller: 'discussion_topics_api',
+          action: 'entries', format: 'json', course_id: @course.to_param,
+          topic_id: @topic.to_param)
+        response.code.should == '200'
+      end
     end
 
-    it "shouldn't allow student's observer who hasn't posted to see" do
-      @topic.reply_from(:user => @teacher, :text => 'hai')
-      @user = @observer
-      raw_api_call(
-        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-      response.status.should == '403 Forbidden'
-      response.body.should == 'require_initial_post'
-    end
+    describe "observer" do
+      before(:each) do
+        @topic.reply_from(user: @teacher, text: 'Lorem ipsum')
+        @user = @observer
+        @url  = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries"
+      end
 
-    it "should allow student who has posted to see" do
-      @topic.reply_from(:user => @student, :text => 'hai')
-      @user = @student
-      json = api_call(
-        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-      json.length.should == 1
-    end
+      it "should not see entries before posting" do
+        raw_api_call(:get, @url, controller: 'discussion_topics_api',
+          action: 'entries', format: 'json', course_id: @course.to_param,
+          topic_id: @topic.to_param)
+        response.body.should == 'require_initial_post'
+        response.code.should == '403'
+      end
 
-    it "should allow student's observer who has posted to see" do
-      @topic.reply_from(:user => @student, :text => 'hai')
-      @user = @observer
-      json = api_call(
-        :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-      json.length.should == 1
+      it "should see entries after posting" do
+        @topic.reply_from(user: @student, text: 'Lorem ipsum dolor')
+        json = api_call(:get, @url, controller: 'discussion_topics_api',
+          action: 'entries', format: 'json', course_id: @course.to_param,
+          topic_id: @topic.to_param)
+        response.code.should == '200'
+      end
     end
   end
 
@@ -1809,7 +1840,8 @@ describe DiscussionTopicsController, :type => :integration do
 
       @all_entries.each &:reload
 
-      run_transaction_commit_callbacks
+      # materialized view jobs are now delayed
+      Timecop.travel(Time.now + 20.seconds)
       run_jobs
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
@@ -1906,7 +1938,8 @@ describe DiscussionTopicsController, :type => :integration do
       @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')
       @root1 = @topic.reply_from(:user => @student, :html => "root1")
 
-      run_transaction_commit_callbacks
+      # materialized view jobs are now delayed
+      Timecop.travel(Time.now + 20.seconds)
       run_jobs
 
       # make everything slightly in the past to test updating
@@ -2031,7 +2064,6 @@ describe DiscussionTopicsController, :type => :integration do
       json = raw_api_call(:put, "/api/v1/collection_items/#{@item.id}/discussion_topics/self/entries/#{entry.id}/read.json",
                 { :controller => 'discussion_topics_api', :action => 'mark_entry_read', :format => 'json',
                   :collection_item_id => @item.id.to_s, :topic_id => "self", :entry_id => entry.id.to_s })
-      puts json
       entry.reload.read?(@user).should be_true
     end
   end

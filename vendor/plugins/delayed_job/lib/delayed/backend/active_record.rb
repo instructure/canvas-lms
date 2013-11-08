@@ -97,10 +97,6 @@ module Delayed
           where(:locked_by => worker_name).update_all(:locked_by => nil, :locked_at => nil)
         end
 
-        def self.unlock_expired_jobs(max_run_time = Delayed::Worker.max_run_time)
-          where("locked_by<>'on hold' AND locked_at<?", db_time_now - max_run_time).update_all(:locked_by => nil, :locked_at => nil)
-        end
-
         def self.strand_size(strand)
           self.where(:strand => strand).count
         end
@@ -197,7 +193,7 @@ module Delayed
             end
 
           scope = scope.group(:tag).offset(offset).limit(limit)
-          (Rails.version < "3.0" ?
+          (CANVAS_RAILS2 ?
               scope.count(:tag, :order => "COUNT(tag) DESC") :
               scope.order("COUNT(tag) DESC").count).map { |t,c| { :tag => t, :count => c } }
         end
@@ -210,9 +206,9 @@ module Delayed
           check_queue(queue)
           check_priorities(min_priority, max_priority)
 
-          self.batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
+          self.batch_size ||= Setting.get('jobs_get_next_batch_size', '5').to_i
           if self.select_random.nil?
-            self.select_random = Setting.get_cached('jobs_select_random', 'false') == 'true'
+            self.select_random = Setting.get('jobs_select_random', 'false') == 'true'
           end
           loop do
             jobs = find_available(@batch_size, queue, min_priority, max_priority)

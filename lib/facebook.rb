@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,11 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-###
-# Warning: Facebook has deprecated the Dashboard API. See https://developers.facebook.com/blog/post/615/
-##
-
 module Facebook
+  API_URL   = 'https://api.facebook.com'
+  GRAPH_URL = 'https://graph.facebook.com'
+
   def self.parse_signed_request(signed_request)
     sig, str = signed_request.split('.')
     generated_sig = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha256'), config['secret'], str)).strip.tr('+/', '-_').sub(/=+$/, '')
@@ -30,11 +29,9 @@ module Facebook
   end
   
   def self.dashboard_increment_count(service)
-    send_request("dashboard.incrementCount", service, :uid => service.service_user_id)
-  end
-  
-  def self.dashboard_clear_count(service)
-    send_request("dashboard.setCount", service, :uid => service.service_user_id, :count => 0)
+    path = "#{service.service_user_id}/apprequests"
+    msg  = I18n.t(:new_facebook_message, 'You have a new message from Canvas')
+    send_graph_request(path, :post, service, message: msg)
   end
   
   def self.protocol
@@ -96,29 +93,32 @@ module Facebook
     end
   end
   
-  def self.send_graph_request(path, method, service, params={})
-    params[:format] = 'json'
-    params[:access_token] = service.token if service
-    url = "https://graph.facebook.com/#{path}" + ActionController::Routing::Route.new.build_query_string(params)
-    uri = URI.parse(url)
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    tmp_url = uri.path+"?"+uri.query
-    request = Net::HTTP::Get.new(tmp_url)
-    response = http.request(request)
-    res = JSON.parse(response.body)
-    if res['error']
-      Rails.logger.error(res['error']['message'])
+  def self.send_graph_request(path, method, service, params = {})
+    params[:access_token] = service.token
+    query_string          = ActionController::Routing::Route.new.build_query_string(params)
+    uri                   = URI("#{GRAPH_URL}/#{path}#{query_string}")
+    client                = Net::HTTP.new(uri.host, uri.port)
+    client.use_ssl        = true
+
+    response = if method == :get
+                 client.get(uri.request_uri)
+               else
+                 client.post(uri.request_uri, '')
+               end
+    body = JSON.parse(response.body)
+
+    if body['error']
+      Rails.logger.error(body['error']['message'])
       nil
     else
-      res
+      body
     end
   end
   
   def self.send_request(method, service, params)
     params[:format] = 'json'
     params[:access_token] = service.token if service
-    url = "https://api.facebook.com/method/#{method}" + ActionController::Routing::Route.new.build_query_string(params)
+    url = "#{API_URL}/method/#{method}" + ActionController::Routing::Route.new.build_query_string(params)
     uri = URI.parse(url)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true

@@ -4,7 +4,7 @@
   <td>
     <%= datetime_string(account_config.last_timeout_failure) %>
     <p>
-      <%= t :ldap_timeout_failure_help, "If Canvas times out communicating with the LDAP server, it will block further login attempts from using that LDAP server for %{time}.", :time => distance_of_time_in_words(AccountAuthorizationConfig.ldap_failure_wait_time) %>
+      <%= t :ldap_timeout_failure_help2, "If Canvas times out too many times communicating with the LDAP server, it will block further login attempts from using that LDAP server for %{time}.", :time => distance_of_time_in_words(AccountAuthorizationConfig.ldap_failure_wait_time) %>
     </p>
   </td>
 </tr>

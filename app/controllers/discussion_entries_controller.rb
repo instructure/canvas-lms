@@ -29,7 +29,7 @@ class DiscussionEntriesController < ApplicationController
     if authorized_action(@entry, @current_user, :read)
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id)}
-        format.json  { render :json => @entry.to_json(:methods => :read_state) }
+        format.json  { render :json => @entry.as_json(:methods => :read_state) }
       end
     end
   end
@@ -59,12 +59,12 @@ class DiscussionEntriesController < ApplicationController
           end
           flash[:notice] = t :created_entry_notice, 'Entry was successfully created.'
           format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @topic.id) }
-          format.json { render :json => @entry.to_json(:include => :attachment, :methods => [:user_name, :read_state], :permissions => {:user => @current_user, :session => session}), :status => :created }
-          format.text { render :json => @entry.to_json(:include => :attachment, :methods => [:user_name, :read_state], :permissions => {:user => @current_user, :session => session}), :status => :created }
+          format.json { render :json => @entry.as_json(:include => :attachment, :methods => [:user_name, :read_state], :permissions => {:user => @current_user, :session => session}), :status => :created }
+          format.text { render :json => @entry.as_json(:include => :attachment, :methods => [:user_name, :read_state], :permissions => {:user => @current_user, :session => session}), :status => :created }
         else
           format.html { render :action => "new" }
-          format.json { render :json => @entry.errors.to_json, :status => :bad_request }
-          format.text { render :json => @entry.errors.to_json, :status => :bad_request }
+          format.json { render :json => @entry.errors, :status => :bad_request }
+          format.text { render :json => @entry.errors, :status => :bad_request }
         end
       end
     end
@@ -78,10 +78,10 @@ class DiscussionEntriesController < ApplicationController
   # The entry must have been created by the current user, or the current user
   # must have admin rights to the discussion. If the edit is not allowed, a 401 will be returned.
   #
-  # @argument message The updated body of the entry.
+  # @argument message [String] The updated body of the entry.
   #
   # @example_request
-  #   curl -X PUT 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>' \ 
+  #   curl -X PUT 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>' \
   #        -F 'message=<message>' \ 
   #        -H "Authorization: Bearer <token>"
   def update
@@ -120,8 +120,8 @@ class DiscussionEntriesController < ApplicationController
           format.text {  render :json => discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name]).first }
         else
           format.html { render :action => "edit" }
-          format.json { render :json => @entry.errors.to_json, :status => :bad_request }
-          format.text { render :json => @entry.errors.to_json, :status => :bad_request }
+          format.json { render :json => @entry.errors, :status => :bad_request }
+          format.text { render :json => @entry.errors, :status => :bad_request }
         end
       end
     end
@@ -137,7 +137,7 @@ class DiscussionEntriesController < ApplicationController
   #
   # @example_request
   #
-  #   curl -X DELETE 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>' \ 
+  #   curl -X DELETE 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>' \
   #        -H "Authorization: Bearer <token>"
   def destroy
     @topic = @context.all_discussion_topics.active.find(params[:topic_id]) if params[:topic_id].present?

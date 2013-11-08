@@ -22,6 +22,8 @@ class GradingStandard < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :user
   has_many :assignments
+  validates_presence_of :context_id, :context_type, :workflow_state
+
   # version 1 data is an array of [ letter, max_integer_value ]
   # we created a version 2 because this is ambiguous once we added support for
   # fractional values -- 89 used to actually mean < 90, so 89.9999... , but
@@ -52,7 +54,7 @@ class GradingStandard < ActiveRecord::Base
   end
   
   scope :active, where("grading_standards.workflow_state<>'deleted'")
-  scope :sorted, order("usage_count >= 3 DESC, title ASC")
+  scope :sorted, lambda { order("usage_count >= 3 DESC, #{best_unicode_collation_key('title')}") }
 
   VERSION = 2
 

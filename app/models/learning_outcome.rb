@@ -25,7 +25,8 @@ class LearningOutcome < ActiveRecord::Base
   serialize :data
   before_save :infer_defaults
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_presence_of :short_description
+  validates_length_of :short_description, :maximum => maximum_string_length
+  validates_presence_of :short_description, :workflow_state
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
 
   set_policy do
@@ -73,7 +74,7 @@ class LearningOutcome < ActiveRecord::Base
     order_hash = {}
     order.each_with_index{|o, i| order_hash[o.to_i] = i; order_hash[o] = i }
     tags = self.alignments.find_all_by_context_id_and_context_type_and_tag_type(context.id, context.class.to_s, 'learning_outcome')
-    tags = tags.sort_by{|t| order_hash[t.id] || order_hash[t.content_asset_string] || 999 }
+    tags = tags.sort_by{|t| order_hash[t.id] || order_hash[t.content_asset_string] || SortLast }
     updates = []
     tags.each_with_index do |tag, idx|
       tag.position = idx + 1
@@ -91,12 +92,16 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def self.update_alignments(asset, context, new_outcome_ids)
-    old_alignments = asset.learning_outcome_alignments
-    old_outcome_ids = old_alignments.map(&:learning_outcome_id).compact.uniq
+    old_outcome_ids = asset.learning_outcome_alignments.
+      where("learning_outcome_id IS NOT NULL").
+      pluck(:learning_outcome_id).
+      uniq
 
     defunct_outcome_ids = old_outcome_ids - new_outcome_ids
     unless defunct_outcome_ids.empty?
-      asset.learning_outcome_alignments.where(:learning_outcome_id => defunct_outcome_ids).update_all(:workflow_state => 'deleted')
+      asset.learning_outcome_alignments.
+        where(:learning_outcome_id => defunct_outcome_ids).
+        update_all(:workflow_state => 'deleted')
     end
 
     missing_outcome_ids = new_outcome_ids - old_outcome_ids
@@ -186,18 +191,6 @@ class LearningOutcome < ActiveRecord::Base
       end
     end
     self.learning_outcome_results.for_context_codes(codes).count
-  end
-  
-  def clone_for(context, parent)
-    lo = context.created_learning_outcomes.new
-    lo.context = context
-    lo.short_description = self.short_description
-    lo.description = self.description
-    lo.data = self.data
-    lo.save
-    parent.add_outcome(lo)
-    
-    lo
   end
 
   def self.delete_if_unused(ids)
@@ -299,7 +292,7 @@ class LearningOutcome < ActiveRecord::Base
   scope :has_result_for, lambda { |user|
     joins(:learning_outcome_results).
         where("learning_outcomes.id=learning_outcome_results.learning_outcome_id AND learning_outcome_results.user_id=?", user).
-        order(:short_description)
+        order(best_unicode_collation_key('short_description'))
   }
 
   scope :global, where(:context_id => nil)

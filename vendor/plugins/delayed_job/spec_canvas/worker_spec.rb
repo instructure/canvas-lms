@@ -5,13 +5,6 @@ shared_examples_for 'Delayed::Worker' do
   def worker_create(opts = {})
     Delayed::Worker.new(opts.merge(:max_priority => nil, :min_priority => nil, :quiet => true))
   end
-  def adjust_max_run_time(new_time)
-    old_max_run_time = Delayed::Worker.max_run_time
-    Delayed::Worker.max_run_time = new_time
-    yield
-  ensure
-    Delayed::Worker.max_run_time = old_max_run_time
-  end
 
   before(:each) do
     @worker = worker_create
@@ -21,15 +14,6 @@ shared_examples_for 'Delayed::Worker' do
   end
 
   describe "running a job" do
-    it "should fail after Worker.max_run_time" do
-      adjust_max_run_time 0.01 do
-        @job = Delayed::Job.create :payload_object => LongRunningJob.new
-        @worker.perform(@job)
-        @job.reload.last_error.should =~ /expired/
-        @job.attempts.should == 1
-      end
-    end
-
     it "should not fail when running a job with a % in the name" do
       @job = User.send_later_enqueue_args(:name_parts, { no_delay: true }, "Some % Name")
       @worker.perform(@job.reload)
@@ -72,30 +56,6 @@ shared_examples_for 'Delayed::Worker' do
         to_retry[0].last_error.should =~ /divided by 0/
         to_retry[0].attempts.should == 1
       end
-
-      it "should fail an individual job after Worker.max_run_time, but not the batch itself" do
-        adjust_max_run_time 0.01 do
-          foo = "foo"
-          foo.expects(:reverse).once
-          bar = "bar"
-          bar.expects(:scan).once
-  
-          batch = Delayed::Batch::PerformableBatch.new(:serial, [
-            { :payload_object => Delayed::PerformableMethod.new(foo, :reverse, []) },
-            { :payload_object => Delayed::PerformableMethod.new(Kernel, :sleep, [250]) },
-            { :payload_object => Delayed::PerformableMethod.new(bar, :scan, ["r"]) },
-          ])
-          batch_job = Delayed::Job.create :payload_object => batch
-          
-          Delayed::Stats.expects(:job_complete).times(3) # batch, plus two successful jobs
-          @worker.perform(batch_job).should == 3
-  
-          failed_jobs = Delayed::Job.list_jobs(:future, 100)
-          failed_jobs.size.should eql 1
-          failed_jobs[0].last_error.should =~ /expired/
-          failed_jobs[0].attempts.should == 1
-        end
-      end
   
       it "should retry a failed individual job" do
         batch = Delayed::Batch::PerformableBatch.new(:serial, [
@@ -137,7 +97,7 @@ shared_examples_for 'Delayed::Worker' do
     end
   end
 
-  context "while running with locked and expired jobs" do
+  context "while running with locked jobs" do
     before(:each) do
       @worker.name = 'worker1'
     end
@@ -145,19 +105,10 @@ shared_examples_for 'Delayed::Worker' do
     it "should not run jobs locked by another worker" do
       job_create(:locked_by => 'other_worker', :locked_at => (Delayed::Job.db_time_now - 1.minutes))
       lambda { @worker.run }.should_not change { SimpleJob.runs }
-      Delayed::Job.unlock_expired_jobs
-      lambda { @worker.run }.should_not change { SimpleJob.runs }
     end
     
     it "should run open jobs" do
       job_create
-      lambda { @worker.run }.should change { SimpleJob.runs }.from(0).to(1)
-    end
-    
-    it "should run expired jobs" do
-      expired_time = Delayed::Job.db_time_now - (1.minutes + Delayed::Worker.max_run_time)
-      job_create(:locked_by => 'other_worker', :locked_at => expired_time)
-      Delayed::Job.unlock_expired_jobs
       lambda { @worker.run }.should change { SimpleJob.runs }.from(0).to(1)
     end
   end

@@ -24,7 +24,10 @@
       <% if editable %>
         <li class="context-module-toolbar-item">
           <div class="admin-links">
-            <a class="al-trigger" aria-haspopup="true" aria-owns="ui-id-1" tabindex="0"><i class="icon-settings"></i><i class="icon-mini-arrow-down"></i></a>
+            <a class="al-trigger" aria-haspopup="true" aria-owns="ui-id-1" href="#">
+              <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+              <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
+            </a>
             <ul class="al-options">
               <li>
                 <a href="#" rel="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items" class="add_module_item_link icon-plus"><%= t('links.add_item', %{Add Content}) %></a>
@@ -55,6 +58,7 @@
 
     <div class="clear"></div>
     <div style="display: none;">
+      <span class="publish_final_grade"><%= context_module.try_rescue(:publish_final_grade?) || nbsp %></span>
       <span class="require_sequential_progress"><%= context_module.try_rescue(:require_sequential_progress) || nbsp %></span>
       <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/reorder" rel="nofollow" class="reorder_items_url" style="display: none;">&nbsp;</a>
     </div>

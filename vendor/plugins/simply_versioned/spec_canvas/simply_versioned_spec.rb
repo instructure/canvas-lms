@@ -80,6 +80,31 @@ describe 'simply_versioned' do
     end
   end
 
+  describe "#model=" do
+    let(:woozel) { Woozel.create!(:name => 'Eeyore') }
+
+    it "should assign the model for the version" do
+      woozel.versions.length.should eql(1)
+      woozel.versions.current.model.name.should eql('Eeyore')
+
+      woozel.name = 'Piglet'
+      woozel.with_versioning(:explicit => true, &:save!)
+
+      woozel.versions.length.should eql(2)
+
+      first_version = woozel.versions.first
+      first_model   = first_version.model
+      first_model.name.should eql('Eeyore')
+
+      first_model.name = 'Foo'
+      first_version.model = first_model
+      first_version.save!
+
+      versions = woozel.reload.versions
+      versions.first.model.name.should eql('Foo')
+    end
+  end
+
   describe "#current_version?" do
     before do
       @woozel = Woozel.create! name: 'test'

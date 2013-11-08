@@ -1,0 +1,27 @@
+<table>
+  <%=  render :partial => 'terms_parameters',
+              :locals => { :all_terms_option => true } %>
+  <%=  render :partial => 'include_deleted_parameter' %>
+  <tr><td><h4><%= t('account_reports.outcomes.order.label', 'Order') %></h4></td></tr>
+  <tr>
+    <td>
+      <%= radio_button_tag("parameters[order]", "Users", true) %>
+      <%= label_tag(:Users, t('account_reports.outcomes.user.radio', 'Users'),
+                    "for" => 'parameters_order') %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <%= radio_button_tag("parameters[order]", "Courses", false) %>
+      <%= label_tag(:Courses, t('account_reports.outcomes.course.radio', 'Courses'),
+                    "for" => 'parameters_order') %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <%= radio_button_tag("parameters[order]", "Outcomes", false) %>
+      <%= label_tag(:Outcomes, t('account_reports.outcomes.outcome.radio', 'Outcomes'),
+                    "for" => 'parameters_order') %>
+    </td>
+  </tr>
+</table>

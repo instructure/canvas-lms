@@ -23,7 +23,7 @@ require([
 });
 </script>
 <% end %>
-<% form_tag context_url(@context, :context_group_categories_url), {:id => "add_category_form", :style => "display: none;"} do %>
+<%= form_tag context_url(@context, :context_group_categories_url), {:id => "add_category_form", :style => "display: none;"} do %>
   <table>
     <tr>
       <td style="vertical-align: top; padding: 0.5em;"><%= before_label :name_for_groups, "Name for Groups" %></td>

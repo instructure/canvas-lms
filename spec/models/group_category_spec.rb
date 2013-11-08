@@ -279,8 +279,8 @@ describe GroupCategory do
 
     it "should return nil if no active groups in category" do
       group = @category.groups.create(:context => @course)
-      group.add_user(@student)
-      group.destroy!
+      gm = group.add_user(@student)
+      group.destroy
       @category.group_for(@student).should be_nil
     end
 
@@ -316,6 +316,18 @@ describe GroupCategory do
       grouped_memberships = memberships.group_by { |m| m.group_id }
       grouped_memberships[group1.id].size.should == 1
       grouped_memberships[group2.id].size.should == 3
+    end
+
+    it "should update cached due dates for affected assignments" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = @course.group_categories.create(:name => "Group Category")
+      assignment1 = @course.assignments.create!
+      assignment2 = @course.assignments.create! group_category: category
+      group = category.groups.create(:name => "Group 1", :context => @course)
+      student = @course.enroll_student(user_model).user
+
+      DueDateCacher.expects(:recompute_course).with(@course.id, [assignment2.id])
+      category.distribute_members_among_groups([student], [group])
     end
   end
 

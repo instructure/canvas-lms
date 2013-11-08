@@ -88,7 +88,7 @@ describe "submissions" do
       wait_for_ajaximations
       f('#submit_file_button').click
       wait_for_ajaximations
-      f('#flash_message_holder .ui-state-error').should be_displayed
+      flash_message_present?(:error).should be_true
 
       # navigate off the page and dismiss the alert box to avoid problems
       # with other selenium tests

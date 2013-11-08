@@ -19,10 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe AssignmentsController do
-  # it "should use AssignmentsController" do
-  #   controller.should be_an_instance_of(AssignmentsController)
-  # end
-
   def course_assignment(course = nil)
     course ||= @course
     @group = course.assignment_groups.create(:name => "some group")
@@ -39,7 +35,7 @@ describe AssignmentsController do
       get 'index'
       assert_status(404)
     end
-    
+
     it "should return unauthorized without a valid session" do
       course_with_student(:active_all => true)
       get 'index', :course_id => @course.id

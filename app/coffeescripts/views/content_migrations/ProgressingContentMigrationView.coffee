@@ -1,6 +1,7 @@
 define [
   'jquery'
   'Backbone'
+  'i18n!content_migrations'
   'jst/content_migrations/ProgressingContentMigration'
   'jst/content_migrations/ProgressingIssues'
   'compiled/views/PaginatedCollectionView'
@@ -9,7 +10,7 @@ define [
   'compiled/views/content_migrations/ProgressStatusView'
   'compiled/views/content_migrations/SelectContentView'
   'compiled/views/content_migrations/SourceLinkView'
-], ($, Backbone, template, progressingIssuesTemplate, PaginatedCollectionView, ContentMigrationIssueView, ProgressBarView, ProgressStatusView, SelectContentView, SourceLinkView) ->
+], ($, Backbone, I18n, template, progressingIssuesTemplate, PaginatedCollectionView, ContentMigrationIssueView, ProgressBarView, ProgressStatusView, SelectContentView, SourceLinkView) ->
   class ProgressingContentMigrationView extends Backbone.View
     template: template
     tagName: 'li'
@@ -19,7 +20,8 @@ define [
       'click .showIssues'       : 'toggleIssues'
       'click .selectContentBtn' : 'showSelectContentDialog'
 
-    els: 
+    els:
+      '.showIssues'                          : '$showIssues'
       '.migrationIssues'                     : '$migrationIssues'
       '.changable'                           : '$changable'
       '.progressStatus'                      : '$progressStatus'
@@ -57,7 +59,7 @@ define [
 
       json
 
-    displayName: ->          @model.get('migration_type_title')  ||  'Content Migration'
+    displayName: ->          @model.get('migration_type_title')  ||  I18n.t('content_migration', 'Content Migration')
     createdAt:   ->          @model.get('created_at')            ||  $.dateToISO8601UTC(new Date()) 
 
     # Render a collection view that represents issues for this migration. 
@@ -136,6 +138,7 @@ define [
 
       if @issuesLoaded
         @$migrationIssues.toggle()
+        @$migrationIssues.attr('aria-expanded', @$migrationIssues.attr('aria-expanded') != 'true')
         @setIssuesButtonText()
       else
         dfd = @fetchIssues()
@@ -147,7 +150,7 @@ define [
     # @api private
 
     fetchIssues: () -> 
-      @model.set('issuesButtonText', 'Loading...')
+      @model.set('issuesButtonText', I18n.t('loading', 'Loading...'))
       dfd = @issues.fetch()
       @$el.disableWhileLoading dfd
       dfd
@@ -158,14 +161,22 @@ define [
     #
     # @api private
 
-    setIssuesButtonText: -> 
+    setIssuesButtonText: ->
       btnText = @model.get('issuesButtonText')
-      if btnText.indexOf("issues") != -1 || btnText.indexOf("Loading...") != -1
+      if !@hiddenIssues
         @$issuesCount.hide()
-        @model.set('issuesButtonText', 'Hide Issues')
+        @model.set('issuesButtonText', I18n.t('hide_issues', 'Hide Issues'))
+        @$showIssues.attr('aria-label', I18n.t('hide_issues', 'Hide Issues'))
+        @$showIssues.attr('title', I18n.t('hide_issues', 'Hide Issues'))
+        @$showIssues.blur().focus() if $(document.activeElement).is(@$showIssues)
+        @hiddenIssues = true
       else 
         @$issuesCount.show()
-        @model.set('issuesButtonText', 'issues')
+        @$showIssues.attr('aria-label', I18n.t('show_issues', 'Show Issues'))
+        @$showIssues.attr('title', I18n.t('show_issues', 'Show Issues'))
+        @$showIssues.blur().focus() if $(document.activeElement).is(@$showIssues)
+        @model.set('issuesButtonText', I18n.t('issues', 'issues'))
+        @hiddenIssues = false
 
     # Render's a new SelectContentDialog which allows someone to select the migration
     # content to be migrated. 
@@ -178,7 +189,7 @@ define [
       @selectContentView ||= new SelectContentView 
                               model: @model
                               el: @$selectContentDialog
-                              title: 'Select Content'
+                              title: I18n.t('#select_content', 'Select Content')
                               width: 900
                               height: 700
 

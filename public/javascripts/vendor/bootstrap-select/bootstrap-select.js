@@ -40,6 +40,8 @@
             this.$element.hide();
             this.multiple = this.$element.prop('multiple');
             var id = this.$element.attr('id');
+            // INSTRUCTURE
+            this.id = id ? id+'-bs' : 'bs-'+((window.$ || window).guid++);
             this.$newElement = this.createView();
             this.$element.after(this.$newElement);
             this.$menu = this.$newElement.find('> .dropdown-menu');
@@ -52,6 +54,12 @@
                     _this.button.focus();
                 })
             }
+
+            // INSTRUCTURE
+            this.$menu.attr('id', this.id);
+            this.button.attr('aria-owns', this.id);
+            this.button.attr('aria-label', this.$element.attr('aria-label'));
+            this.button.attr('aria-labelledby', this.$element.attr('aria-labelledby'));
 
             //If we are multiple, then add the show-tick class by default
             if (this.multiple) {
@@ -108,6 +116,8 @@
         createLi: function() {
             var _this = this,
                 _liA = [],
+                _subLiA = [],
+                _optgroup = null,
                 _liHtml = '';
 
             this.$element.find('option').each(function(index) {
@@ -116,7 +126,7 @@
                 //Get the class and text for the option
                 var optionClass = $this.attr("class") || '';
                 var inline = $this.attr("style") || '';
-                var text =  $this.html();
+                var text =  $this.data('content') ? $this.data('content') : $this.html(); 
                 var subtext = $this.data('subtext') !== undefined ? '<small class="muted">' + $this.data('subtext') + '</small>' : '';
                 var icon = $this.data('icon') !== undefined ? '<i class="'+$this.data('icon')+'"></i> ' : '';
                 if (icon !== '' && ($this.is(':disabled') || $this.parent().is(':disabled'))) {
@@ -130,8 +140,10 @@
                   value = text;
                 }
 
-                //Prepend any icon and append any subtext to the main text.
-                text = icon + '<span class="text" data-value="'+value+'">' + text + subtext + '</span>';
+                if (!$this.data('content')) {
+                  //Prepend any icon and append any subtext to the main text.
+                  text = icon + '<span class="text" data-value="'+value+'">' + text + subtext + '</span>';
+                } 
 
                 if (_this.options.hideDisabled && ($this.is(':disabled') || $this.parent().is(':disabled'))) {
                     _liA.push('<a style="min-height: 0; padding: 0"></a>');
@@ -143,31 +155,53 @@
                         var labelIcon = $this.parent().data('icon') ? '<i class="'+$this.parent().data('icon')+'"></i> ' : '';
                         label = labelIcon + '<span class="text">' + label + labelSubtext + '</span>';
 
-                        if ($this[0].index != 0) {
+                        // INSTRUCTURE
+                        if (_this.options.useSubmenus) {
+                          _liA.push(
+                            '<div class="div-contain"><div class="divider"></div></div>'+
+                            '<a role="menuitem" aria-haspopup="true" tabindex="-1" href="#">'+label+'</a>'+
+                            '<div class="dropdown-menu open"><ul class="dropdown-menu inner" role="group">'
+                            );
+                          _subLiA.push(_this.createA(text, "opt " + optionClass, inline, index, $this ));
+                        } else if ($this[0].index != 0) {
                             _liA.push(
                                 '<div class="div-contain"><div class="divider"></div></div>'+
                                 '<dt>'+label+'</dt>'+
-                                _this.createA(text, "opt " + optionClass, inline )
+                                _this.createA(text, "opt " + optionClass, inline, index, $this )
                                 );
                         } else {
                             _liA.push(
                                 '<dt>'+label+'</dt>'+
-                                _this.createA(text, "opt " + optionClass, inline ));
+                                _this.createA(text, "opt " + optionClass, inline, index, $this ));
                         }
                     } else {
-                         _liA.push( _this.createA(text, "opt " + optionClass, inline )  );
+                         // INSTRUCTURE
+                         var container = _this.options.useSubmenus ? _subLiA : _liA;
+                         container.push( _this.createA(text, "opt " + optionClass, inline, index, $this )  );
                     }
                 } else if ($this.data('divider') == true) {
                     _liA.push('<div class="div-contain"><div class="divider"></div></div>');
                 } else if ($(this).data('hidden') == true) {
                     _liA.push('');
                 } else {
-                    _liA.push( _this.createA(text, optionClass, inline ) );
+                    _liA.push( _this.createA(text, optionClass, inline, index, $this ) );
+                }
+
+                if (_subLiA.length && !$this.next().length) {
+                  var group = _liA.pop();
+                  $.each(_subLiA, function(i, item) {
+                      group += "<li rel='" + i + "'>" + item + "</li>";
+                  });
+                  group += '</ul></div>'; 
+                  _liA.push(group);
+                  _subLiA = [];
                 }
             });
 
             $.each(_liA, function(i, item) {
-                _liHtml += "<li rel=" + i + ">" + item + "</li>";
+                // INSTRUCTURE
+                var isMenu = item.indexOf('<ul') != -1;
+                _liHtml += "<li rel='" + i + "'" + (isMenu ? " class='dropdown-submenu'" : "") + ">" + item + "</li>";
             });
 
             //If we are not multiple, and we dont have a selected item, and we dont have a title, select the first element so something is set in the button
@@ -178,14 +212,19 @@
             return $(_liHtml);
         },
 
-        createA: function(text, classes, inline) {
-         return '<a tabindex="0" class="'+classes+'" style="'+inline+'">' +
+        createA: function(text, classes, inline, index, $option) {
+          // INSTRUCTURE: added role and aria-label and the $option parameter
+          var ariaLabel = ''
+          if ($option.attr('aria-label') !== undefined) {
+            ariaLabel = ' aria-label="' + $option.attr('aria-label') + '"'
+          }
+         return '<a tabindex="-1" class="'+classes+'" style="'+inline+'" role="menuitemcheckbox"' + ariaLabel + '>' +
                  text +
                  '<i class="icon-ok check-mark"></i>' +
                  '</a>';
         },
 
-        render: function() {
+        render: function(inUse) {
             var _this = this;
 
             //Update the LI to match the SELECT
@@ -203,7 +242,9 @@
                 } else {
                     subtext = '';
                 }
-                if ($this.attr('title') != undefined) {
+                if ($this.data('content') && _this.options.showContent) {
+                    return $this.data('content');
+                } else if ($this.attr('title') != undefined) { 
                     return $this.attr('title');
                 } else {
                     return icon + $this.html() + subtext;
@@ -236,6 +277,11 @@
             }
 
             _this.$newElement.find('.filter-option').html(title + subtext);
+
+            // INSTRUCTURE
+            if (inUse) {
+              $('li:not(.divider):visible > a', _this.$newElement).first().focus();
+            }
         },
 
         setStyle: function(style, status) {
@@ -264,7 +310,7 @@
         setSize: function() {
             var _this = this,
                 menu = this.$newElement.find('> .dropdown-menu'),
-                menuInner = menu.find('.inner'),
+                menuInner = menu.find('> .inner'), // INSTRUCTURE added >
                 menuA = menuInner.find('li > a'),
                 selectHeight = this.$newElement.outerHeight(),
                 liHeight = this.$newElement.data('liHeight'),
@@ -292,8 +338,8 @@
                     } else {
                         minHeight = 0;
                     }
-                    menu.css({'max-height' : menuHeight + 'px', 'overflow' : 'hidden', 'min-height' : minHeight + 'px'});
-                    menuInner.css({'max-height' : (menuHeight - menuPadding) + 'px', 'overflow-y' : 'auto'});
+                    menu.css({'max-height' : menuHeight + 'px', 'overflow' : 'visible', 'min-height' : minHeight + 'px'});
+                    menuInner.css({'max-height' : (menuHeight - menuPadding) + 'px', 'overflow-y' : 'visible'});
             }
                 getSize();
                 $(window).resize(getSize);
@@ -350,26 +396,34 @@
         },
 
         refresh: function() {
+            // INSTRUCTURE
+            // TODO: it would be nice to refocus the equivalent element if present
+            var inUse = this.$newElement.hasClass('open') && $.contains(this.$menu[0], document.activeElement);
+
             this.reloadLi();
-            this.render();
+            this.render(inUse);
             this.setWidth();
             this.setStyle();
             this.checkDisabled();
         },
 
         setSelected: function(index, selected) {
+            var link = this.$menu.find('a[role=menuitemcheckbox]').eq(index);
             if (selected) {
-                this.$menu.find('li').eq(index).addClass('selected');
+                link.parent().addClass('selected');
             } else {
-                this.$menu.find('li').eq(index).removeClass('selected');
+                link.parent().removeClass('selected');
             }
+            // INSTRUCTURE
+            link.attr('aria-checked', selected ? 'true' : 'false');
         },
 
         setDisabled: function(index, disabled) {
             if (disabled) {
                 this.$menu.find('li').eq(index).addClass('disabled').find('a').attr('href','#').attr('tabindex',-1);
             } else {
-                this.$menu.find('li').eq(index).removeClass('disabled').find('a').removeAttr('href').attr('tabindex',0);
+                // INSTRUCTURE: remove tabindex
+                this.$menu.find('li').eq(index).removeClass('disabled').find('a').removeAttr('href');
             }
         },
 
@@ -412,7 +466,9 @@
             });
 
             this.$menu.on('click', 'li a', function(e) {
-                var clickedIndex = $(this).parent().index(),
+                // INSTRUCTURE
+                if ($(this).closest('li').hasClass('dropdown-submenu')) {return;}
+                var clickedIndex = _this.$newElement.find('a[role=menuitemcheckbox]').index(this),
                     $this = $(this).parent(),
                     prevValue = _this.$element.val();
 
@@ -496,70 +552,58 @@
                 first,
                 last,
                 prev,
-                nextPrev;
+                nextPrev,
+                $target,
+                $list;
 
             $this = $(this);
-
             $parent = $this.parent();
+            $target = $(e.target);
 
-            $items = $('[role=menu] li:not(.divider):visible a', $parent);
+            // INSTRUCTURE
+            if ($target.is('input')) {
+              return;
+            } else if ($target.is('a')) {
+              $list = $(e.target).closest('ul');
+            } else {
+              $list = $('[role=menu]', $parent);
+            }
+            $items = $('> li:not(.divider):visible > a', $list);
 
             if (!$items.length) return;
 
-            if (/(38|40)/.test(e.keyCode)) {
-
-                index = $items.index($items.filter(':focus'));
-
-                first = $items.parent(':not(.disabled)').first().index();
-                last = $items.parent(':not(.disabled)').last().index();
-                next = $items.eq(index).parent().nextAll(':not(.disabled)').eq(0).index();
-                prev = $items.eq(index).parent().prevAll(':not(.disabled)').eq(0).index();
-                nextPrev = $items.eq(next).parent().prevAll(':not(.disabled)').eq(0).index();
-
-                if (e.keyCode == 38) {
-                    if (index != nextPrev && index > prev) index = prev;
-                    if (index < first) index = first;
-                }
-
-                if (e.keyCode == 40) {
-                    if (index != nextPrev && index < next) index = next;
-                    if (index > last) index = last;
-                }
-
-                $items.eq(index).focus()
-            } else {
-                var keyCodeMap = {
-                    48:"0", 49:"1", 50:"2", 51:"3", 52:"4", 53:"5", 54:"6", 55:"7", 56:"8", 57:"9", 59:";",
-                    65:"a", 66:"b", 67:"c", 68:"d", 69:"e", 70:"f", 71:"g", 72:"h", 73:"i", 74:"j", 75:"k", 76:"l",
-                    77:"m", 78:"n", 79:"o", 80:"p", 81:"q", 82:"r", 83:"s", 84:"t", 85:"u", 86:"v", 87:"w", 88:"x", 89:"y", 90:"z",
-                    96:"0", 97:"1", 98:"2", 99:"3", 100:"4", 101:"5", 102:"6", 103:"7", 104:"8", 105:"9"
-                }
-
-                var keyIndex = [];
-
-                $items.each(function() {
-                    if ($(this).parent().is(':not(.disabled)')) {
-                        if ($.trim($(this).text().toLowerCase()).substring(0,1) == keyCodeMap[e.keyCode]) {
-                            keyIndex.push($(this).parent().index());
-                        }
-                    }
-                });
-
-                var count = $(document).data('keycount');
-                count++;
-                $(document).data('keycount',count);
-
-                var prevKey = $.trim($(':focus').text().toLowerCase()).substring(0,1);
-
-                if (prevKey != keyCodeMap[e.keyCode]) {
-                    count = 1;
-                    $(document).data('keycount',count);
-                } else if (count >= keyIndex.length) {
-                    $(document).data('keycount',0);
-                }
-
-                $items.eq(keyIndex[count - 1]).focus();
+            // INSTRUCTURE: bootstrap-dropdown handles arrow key movement
+            var keyCodeMap = {
+                48:"0", 49:"1", 50:"2", 51:"3", 52:"4", 53:"5", 54:"6", 55:"7", 56:"8", 57:"9", 59:";",
+                65:"a", 66:"b", 67:"c", 68:"d", 69:"e", 70:"f", 71:"g", 72:"h", 73:"i", 74:"j", 75:"k", 76:"l",
+                77:"m", 78:"n", 79:"o", 80:"p", 81:"q", 82:"r", 83:"s", 84:"t", 85:"u", 86:"v", 87:"w", 88:"x", 89:"y", 90:"z",
+                96:"0", 97:"1", 98:"2", 99:"3", 100:"4", 101:"5", 102:"6", 103:"7", 104:"8", 105:"9"
             }
+
+            var keyIndex = [];
+
+            $items.each(function() {
+                if ($(this).parent().is(':not(.disabled)')) {
+                    if ($.trim($(this).text().toLowerCase()).substring(0,1) == keyCodeMap[e.keyCode]) {
+                        keyIndex.push($(this).parent().index());
+                    }
+                }
+            });
+
+            var count = $(document).data('keycount');
+            count++;
+            $(document).data('keycount',count);
+
+            var prevKey = $.trim($(':focus').text().toLowerCase()).substring(0,1);
+
+            if (prevKey != keyCodeMap[e.keyCode]) {
+                count = 1;
+                $(document).data('keycount',count);
+            } else if (count >= keyIndex.length) {
+                $(document).data('keycount',0);
+            }
+
+            $items.eq(keyIndex[count - 1]).focus();
 
             if (/(13)/.test(e.keyCode)) {
                 $(':focus').click();
@@ -634,7 +678,10 @@
         container: false,
         hideDisabled: false,
         showSubtext: false,
-        showIcon: true
+        showIcon: true,
+        showContent: true,
+        // INSTRUCTURE
+        useSubmenus: false
     }
 
     $(document)

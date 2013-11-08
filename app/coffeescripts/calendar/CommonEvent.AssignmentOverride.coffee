@@ -32,6 +32,7 @@ define [
       @lock_explanation = @assignment.lock_explanation
       @description = @assignment.description
       @start = @parseStartDate()
+      @end = null # in case it got set by midnight fudging
       @originalStartDate = new Date(@start) if @start
 
     copyDataFromOverride: (override) ->

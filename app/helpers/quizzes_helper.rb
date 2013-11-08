@@ -18,7 +18,13 @@
 
 module QuizzesHelper
   def needs_unpublished_warning?(quiz=@quiz)
+    return false if quiz.available? && !can_publish(quiz)
+
     !quiz.available? || quiz.unpublished_changes?
+  end
+
+  def can_publish(quiz)
+    can_do(quiz, @current_user, :update) || can_do(quiz, @current_user, :manage)
   end
 
   def unpublished_quiz_warning
@@ -298,23 +304,33 @@ module QuizzesHelper
     answers  = hash_get(options, :answers).dup
     answer_list = hash_get(options, :answer_list)
     res      = user_content hash_get(question, :question_text)
-    readonly_markup = hash_get(options, :editable) ? ' />' : 'readonly="readonly" />'
-    # If given answer list, insert the values into the text inputs for displaying user's answers.
-    if answer_list && !answer_list.empty?
-      index  = 0
-      res.gsub %r{<input.*?name=['"](question_.*?)['"].*?/>} do |match|
-        a = h(answer_list[index])
-        index += 1
+    readonly_markup = hash_get(options, :editable) ? " />" : 'readonly="readonly" />'
+    label_attr = "aria-label='#{I18n.t('#quizzes.labels.multiple_blanks_question', "Fill in the blank, read surrounding text")}'"
+    index  = 0
+
+    res.gsub! %r{<input.*?name=['"](question_.*?)['"].*?/>} do |match|
+      a = h(answer_list[index])
+      index += 1
+      # If given answer list, insert the values into the text inputs for displaying user's answers.
+      if answer_list && !answer_list.empty?
+
         #  Replace the {{question_BLAH}} template text with the user's answer text.
-        match.sub(/\{\{question_.*?\}\}/, a).
+        match = match.sub(/\{\{question_.*?\}\}/, a).
           # Match on "/>" but only when at the end of the string and insert "readonly" if set to be readonly
           sub(/\/\>\Z/, readonly_markup)
       end
-    else
+
+      # add labelling to input element regardless
+      match.sub(/\/\>\Z/, "#{label_attr} />")
+    end
+
+    unless answer_list && !answer_list.empty?
       answers.delete_if { |k, v| !k.match /^question_#{hash_get(question, :id)}/ }
       answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, v }
-      res.gsub /\{\{question_[^}]+\}\}/, ""
+      res.gsub! /\{\{question_[^}]+\}\}/, ""
     end
+
+    res
   end
 
   def multiple_dropdowns_question(options)
@@ -429,6 +445,47 @@ module QuizzesHelper
     quiz.scoring_policy == "keep_highest" ?
       t('#quizzes.links.will_keep_highest_score', "Will keep the highest of all your scores") :
       t('#quizzes.links.will_keep_latest_score', "Will keep the latest of all your scores")
+  end
+
+  def quiz_edit_text(quiz=@quiz)
+    if quiz.survey?
+      I18n.t('titles.edit_survey', 'Edit Survey')
+    else
+      I18n.t('titles.edit_quiz', 'Edit Quiz')
+    end
+  end
+
+  def quiz_delete_text(quiz=@quiz)
+    if quiz.survey?
+      I18n.t('titles.delete_survey', 'Delete Survey')
+    else
+      I18n.t('titles.delete_quiz', 'Delete Quiz')
+    end
+  end
+
+  def has_regraded_version?(versions)
+    versions.detect {|v| v.score_before_regrade.present? }
+  end
+
+  def submission_has_regrade?(submission)
+    submission && submission.score_before_regrade.present?
+  end
+
+  def score_affected_by_regrade?(submission)
+    submission && submission.score_before_regrade != submission.kept_score
+  end
+
+  def answer_title(selected_answer, correct_answer, show_correct_answers)
+    titles = []
+    if selected_answer
+      titles << I18n.t(:selected_answer, "You selected this answer.")
+    end
+
+    if correct_answer && show_correct_answers
+      titles << I18n.t(:correct_answer, "This was the correct answer.")
+    end
+
+    title = "title=\"#{titles.join(' ')}\"" if titles.length > 0
   end
 
 end

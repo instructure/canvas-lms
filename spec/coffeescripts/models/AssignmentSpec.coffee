@@ -1,6 +1,7 @@
 define [
   'compiled/models/Assignment'
-], (Assignment) ->
+  'compiled/models/DateGroup'
+], (Assignment, DateGroup) ->
 
   module "Assignment"
 
@@ -226,6 +227,83 @@ define [
     assignment.set 'submission_types', [ 'online_upload' ]
     deepEqual assignment.submissionType(), 'online'
 
+  module "Assignment#expectsSubmission"
+
+  test "returns false if assignment submission type is not online", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission_types': [ 'external_tool', 'on_paper' ]
+    deepEqual assignment.expectsSubmission(), false
+
+  test "returns true if an assignment submission type is online", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission_types': [ 'online' ]
+    deepEqual assignment.expectsSubmission(), true
+
+  module "Assignment#allowedToSubmit"
+
+  test "returns false if assignment is locked", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission_types': [ 'online' ]
+    assignment.set 'locked_for_user': true
+    deepEqual assignment.allowedToSubmit(), false
+
+  test "returns true if an assignment is not locked", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission_types': [ 'online' ]
+    assignment.set 'locked_for_user': false
+    deepEqual assignment.allowedToSubmit(), true
+
+  test "returns false if a submission is not expected", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission_types': [ 'external_tool', 'on_paper', 'attendance' ]
+    deepEqual assignment.allowedToSubmit(), false
+
+  module "Assignment#isGraded"
+
+  test "returns true if notYetGraded is null", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission': new Backbone.Model {'notYetGraded': null}
+    deepEqual assignment.isGraded(), true
+
+  test "returns false if notYetGraded is true", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission': new Backbone.Model {'notYetGraded': true}
+    deepEqual assignment.isGraded(), false
+
+  module "Assignment#hasSubmission"
+
+  test "returns false if submission is null", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission': null
+    deepEqual assignment.hasSubmission(), false
+
+  test "returns true if submission has a submission type", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission': new Backbone.Model {'submission_type': 'online'}
+    deepEqual assignment.hasSubmission(), true
+
+  module "Assignment#withoutGradedSubmission"
+
+  test "returns false if there is a submission", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission': new Backbone.Model {'submission_type': 'online'}
+    deepEqual assignment.withoutGradedSubmission(), false
+
+  test "returns true if there is no submission", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission': null
+    deepEqual assignment.withoutGradedSubmission(), true
+
+  test "returns true if there is a submission, but no grade", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission': new Backbone.Model {'notYetGraded': true}
+    deepEqual assignment.withoutGradedSubmission(), true
+
+  test "returns false if there is a submission and a grade", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission': new Backbone.Model {'grade': 305}
+    deepEqual assignment.withoutGradedSubmission(), false
+
   module "Assignment#acceptsOnlineUpload"
 
   test "returns true if record submission types includes online_upload", ->
@@ -237,7 +315,7 @@ define [
     assignment = new Assignment name: 'foo'
     assignment.set 'submission_types', []
     deepEqual assignment.acceptsOnlineUpload(), false
-  
+
   module "Assignment#acceptsOnlineURL"
 
   test "returns true if assignment allows online url", ->
@@ -301,6 +379,34 @@ define [
     assignment = new Assignment name: 'foo'
     assignment.notifyOfUpdate( false )
     deepEqual assignment.notifyOfUpdate(), false
+
+  module "Assignment#multipleDueDates"
+
+  test "checks for multiple due dates from assignment overrides", ->
+    assignment = new Assignment all_dates: [{title: "Winter"}, {title: "Summer"}]
+    ok assignment.multipleDueDates()
+
+  test "checks for no multiple due dates from assignment overrides", ->
+    assignment = new Assignment
+    ok !assignment.multipleDueDates()
+
+  module "Assignment#allDates"
+
+  test "gets the due dates from the assignment overrides", ->
+    dueAt = new Date("2013-08-20 11:13:00")
+    dates = [
+      new DateGroup due_at: dueAt, title: "Everyone"
+    ]
+    assignment = new Assignment all_dates: dates
+    allDates = assignment.allDates()
+    first    = allDates[0]
+
+    equal first.dueAt+"", dueAt+""
+    equal first.dueFor,   "Everyone"
+
+  test "gets empty due dates when there are no dates", ->
+    assignment = new Assignment
+    deepEqual assignment.allDates(), []
 
   module "Assignment#toView"
 
@@ -408,3 +514,28 @@ define [
     assignment.allowedExtensions []
     json = assignment.toView()
     deepEqual json.allowedExtensions, []
+
+  test "includes htmlUrl", ->
+    assignment = new Assignment html_url: 'http://example.com/assignments/1'
+    json = assignment.toView()
+    deepEqual json.htmlUrl, 'http://example.com/assignments/1'
+
+  test "includes htmlEditUrl", ->
+    assignment = new Assignment html_url: 'http://example.com/assignments/1'
+    json = assignment.toView()
+    deepEqual json.htmlEditUrl, 'http://example.com/assignments/1/edit'
+
+  test "includes multipleDueDates", ->
+    assignment = new Assignment all_dates: [{title: "Summer"}, {title: "Winter"}]
+    json = assignment.toView()
+    deepEqual json.multipleDueDates, true
+
+  test "includes allDates", ->
+    assignment = new Assignment all_dates: [{title: "Summer"}, {title: "Winter"}]
+    json = assignment.toView()
+    equal json.allDates.length, 2
+
+  test "includes isQuiz", ->
+    assignment = new Assignment("submission_types":["online_quiz"])
+    json = assignment.toView()
+    ok json.isQuiz

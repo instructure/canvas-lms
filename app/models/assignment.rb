@@ -17,6 +17,7 @@
 #
 
 require 'set'
+require 'canvas/draft_state_validations'
 
 class Assignment < ActiveRecord::Base
   include Workflow
@@ -27,6 +28,7 @@ class Assignment < ActiveRecord::Base
   include ContextModuleItem
   include DatesOverridable
   include SearchTermHelper
+  include Canvas::DraftStateValidations
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :min_score, :max_score, :mastery_score, :grading_type, :submission_types,
@@ -52,12 +54,12 @@ class Assignment < ActiveRecord::Base
   has_one :teacher_enrollment, :class_name => 'TeacherEnrollment', :foreign_key => 'course_id', :primary_key => 'context_id', :include => :user, :conditions => ["enrollments.workflow_state = 'active' AND enrollments.type = 'TeacherEnrollment'"]
   has_many :ignores, :as => :asset
   belongs_to :context, :polymorphic => true
-  belongs_to :cloned_item
   belongs_to :grading_standard
   belongs_to :group_category
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
+  validate :validate_draft_state_change, :if => :workflow_state_changed?
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
     # only accept the url and new_tab params, the other accessible
@@ -116,10 +118,10 @@ class Assignment < ActiveRecord::Base
     self.submission_types == 'external_tool'
   end
 
-  validates_presence_of :context_id
-  validates_presence_of :context_type
+  validates_presence_of :context_id, :context_type, :workflow_state
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :allowed_extensions, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
 
   acts_as_list :scope => :assignment_group_id
@@ -213,10 +215,13 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_student_submissions
-    submissions.graded.find_each do |submission|
-      submission.grade = score_to_grade(submission.score)
-      submission.graded_at = Time.zone.now
-      submission.with_versioning(:explicit => true) { submission.save! }
+    graded_at = Time.zone.now
+    submissions.graded.includes(:user).find_each do |s|
+      s.grade = score_to_grade(s.score)
+      s.graded_at = graded_at
+      s.assignment = self
+      s.assignment_changed_not_sub = true
+      s.with_versioning(:explicit => true) { s.save! }
     end
   end
 
@@ -372,6 +377,9 @@ class Assignment < ActiveRecord::Base
       quiz.assignment_group_id = self.assignment_group_id
       quiz.workflow_state = 'created' if quiz.deleted?
       quiz.saved_by = :assignment
+      if self.context.draft_state_enabled?
+        quiz.workflow_state = published? ? 'available' : 'unpublished'
+      end
       quiz.save if quiz.changed?
     elsif self.submission_types == "discussion_topic" && @saved_by != :discussion_topic
       topic = self.discussion_topic || self.context.discussion_topics.build(:user => @updating_user)
@@ -606,7 +614,7 @@ class Assignment < ActiveRecord::Base
     when %r{%$}
       # interpret as a percentage
       percentage = grade.to_f / 100.0
-      (points_possible * percentage * 100.0).round / 100.0
+      (points_possible.to_f * percentage * 100.0).round / 100.0
     when %r{[\d\.]+}
       # interpret as a numerical score
       (grade.to_f * 100.0).round / 100.0
@@ -723,6 +731,12 @@ class Assignment < ActiveRecord::Base
         locked = {:asset_string => assignment_for_user.asset_string, :lock_at => assignment_for_user.lock_at}
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
+      elsif self.submission_types == 'discussion_topic' && self.discussion_topic &&
+          topic_locked = self.discussion_topic.locked_for?(user, opts.merge(:skip_assignment => true))
+        locked = topic_locked
+      elsif self.submission_types == 'online_quiz' && self.quiz &&
+          quiz_locked = self.quiz.locked_for?(user, opts.merge(:skip_assignment => true))
+        locked = quiz_locked
       end
       locked
     end
@@ -758,9 +772,10 @@ class Assignment < ActiveRecord::Base
     given { |user, session| self.cached_context_grants_right?(user, session, :read) && self.published? }
     can :read and can :read_own_submission
 
-    given { |user, session| self.submittable_type? &&
-      self.cached_context_grants_right?(user, session, :participate_as_student) &&
-      !self.locked_for?(user)
+    given { |user, session|
+      (submittable_type? || submission_types == "discussion_topic") &&
+      cached_context_grants_right?(user, session, :participate_as_student) &&
+      !locked_for?(user)
     }
     can :submit and can :attach_submission_comment_files
 
@@ -776,21 +791,6 @@ class Assignment < ActiveRecord::Base
       hash.delete('description')
       hash['lock_info'] = lock_info
     end
-  end
-
-  def grade_distribution(submissions = nil)
-    submissions ||= self.submissions
-    tally = 0
-    cnt = 0
-    scores = submissions.map{|s| s.score}.compact
-    scores.each do |score|
-      tally += score
-      cnt += 1
-    end
-    high = scores.max
-    low = scores.min
-    mean = tally.to_f / cnt.to_f
-    [high, low, mean]
   end
 
   # Everyone, students, TAs, teachers
@@ -849,13 +849,13 @@ class Assignment < ActiveRecord::Base
   def group_students(student)
     group = nil
     students = [student]
-    if self.has_group_category?
-      group = self.group_category.group_for(student)
-      if group
-        students = group.users.joins("INNER JOIN enrollments ON enrollments.user_id=users.id").
-          where(:enrollments => { :course_id => self.context}).
-          where(Course.reflections[:student_enrollments].options[:conditions]).all
-      end
+    if has_group_category? && group = group_category.group_for(student)
+      students = group.users
+        .joins("INNER JOIN enrollments ON enrollments.user_id=users.id")
+        .where(:enrollments => { :course_id => self.context})
+        .where(Course.reflections[:student_enrollments].options[:conditions])
+        .uniq
+        .all
     end
     [group, students]
   end
@@ -890,7 +890,7 @@ class Assignment < ActiveRecord::Base
 
     students.each do |student|
       submission_updated = false
-      submission = self.find_or_create_submission(student) #submissions.find_or_create_by_user_id(student.id) #(:first, :conditions => {:assignment_id => self.id, :user_id => student.id})
+      submission = self.find_or_create_submission(student)
       if student == original_student || !grade_group_students_individually
         previously_graded = submission.grade.present?
         submission.attributes = opts
@@ -916,12 +916,6 @@ class Assignment < ActiveRecord::Base
         submission.group = group
         submission.graded_at = Time.zone.now if did_grade
         previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
-
-        unless self.rubric_association
-          self.learning_outcome_alignments.each do |alignment|
-            submission.create_outcome_result(alignment)
-          end
-        end
       end
       submission.add_comment(comment) if comment && (group_comment == "1" || student == original_student)
       submissions << submission if group_comment == "1" || student == original_student || submission_updated
@@ -948,9 +942,18 @@ class Assignment < ActiveRecord::Base
     s
   end
 
+  def self.find_or_initialize_submission(assignment_id, user_id)
+    Submission.find_or_initialize_by_assignment_id_and_user_id(assignment_id, user_id)
+  end
+
   def find_or_create_submission(user)
     user_id = user.is_a?(User) ? user.id : user
     Assignment.find_or_create_submission(self.id, user_id)
+  end
+
+  def find_or_initialize_submission(user)
+    user_id = user.is_a?(User) ? user.id : user
+    Assignment.find_or_initialize_submission(self.id, user_id)
   end
 
   def find_asset_for_assessment(association, user_id)
@@ -1002,7 +1005,6 @@ class Assignment < ActiveRecord::Base
       opts.delete(k) unless [:body, :url, :attachments, :submission_type, :comment, :media_comment_id, :media_comment_type, :group_comment].include?(k.to_sym)
     }
     raise "Student Required" unless original_student
-    raise "User must be enrolled in the course as a student to submit homework" unless context.student_enrollments.except(:includes).where(:user_id => original_student).exists?
     comment = opts.delete(:comment)
     group_comment = opts.delete(:group_comment)
     group, students = group_students(original_student)
@@ -1099,16 +1101,28 @@ class Assignment < ActiveRecord::Base
       },
       :include_root => false
     )
-    avatar_methods = avatars ? [:avatar_path] : []
-    visible_students = context.students_visible_to(user).order_by_sortable_name.uniq
-    res[:context][:students] = visible_students.
-      map{|u| u.as_json(:include_root => false, :methods => avatar_methods, :only => [:name, :id])}
+
+    avatar_methods = (avatars && !grade_as_group?) ? [:avatar_path] : []
+
+    res[:context][:rep_for_student] = {}
+
+    students = representatives(user) do |rep, others|
+      others.each { |s|
+        res[:context][:rep_for_student][s.id] = rep.id
+      }
+    end
+
+    res[:context][:students] = students.map { |u|
+      u.as_json(:include_root => false,
+                :methods => avatar_methods,
+                :only => [:name, :id])
+    }
     res[:context][:active_course_sections] = context.sections_visible_to(user).
       map{|s| s.as_json(:include_root => false, :only => [:id, :name]) }
     res[:context][:enrollments] = context.enrollments_visible_to(user).
-      map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
+        map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
-    res[:submissions] = submissions.where(:user_id => visible_students).map{|sub|
+    res[:submissions] = submissions.where(:user_id => students).map do |sub|
       json = sub.as_json(:include_root => false,
         :include => {
           :submission_comments => {
@@ -1122,36 +1136,84 @@ class Assignment < ActiveRecord::Base
         :methods => [:scribdable?, :scribd_doc, :submission_history, :late],
         :only => submission_fields
       )
-      if json['submission_history']
-        json['submission_history'].map! do |version|
-          version.as_json(
-            :include => {
-              :submission_comments => { :only => comment_fields }
-            },
-            :only => submission_fields,
-            :methods => [:versioned_attachments, :late]
-          ).tap do |version_json|
-            if version_json['submission'] && version_json['submission']['versioned_attachments']
-              version_json['submission']['versioned_attachments'].map! do |a|
-                a.as_json(
-                  :only => attachment_fields,
-                  :methods => [:view_inline_ping_url, :scribd_render_url]
-                )
-              end
-            end
-          end
-        end
-      end
+      json['submission_history'] = if json['submission_history'] && quiz.nil?
+                                     json['submission_history'].map do |version|
+                                       version.as_json(
+                                         :include => {
+                                           :submission_comments => { :only => comment_fields }
+                                         },
+                                         :only => submission_fields,
+                                         :methods => [:versioned_attachments, :late]
+                                       ).tap do |version_json|
+                                         if version_json['submission'] && version_json['submission']['versioned_attachments']
+                                           version_json['submission']['versioned_attachments'].map! do |a|
+                                             a.as_json(
+                                               :only => attachment_fields,
+                                               :methods => [:view_inline_ping_url, :scribd_render_url]
+                                             )
+                                           end
+                                         end
+                                       end
+                                     end
+                                   elsif quiz && sub.quiz_submission
+                                     quiz_submission_versions = sub.quiz_submission.versions.reverse
+                                     quiz_submission_versions.map do |v|
+                                       qs = v.model
+                                       {submission: {
+                                         grade: qs.score,
+                                         show_grade_in_dropdown: true,
+                                         submitted_at: qs.finished_at,
+                                         late: sub.late?,
+                                         version: v.number,
+                                       }}
+                                     end
+                                   end
       json
-    }
+    end
+    res[:GROUP_GRADING_MODE] = grade_as_group?
     res
   ensure
     Attachment.skip_thumbnails = nil
   end
 
+  def grade_as_group?
+    has_group_category? && !grade_group_students_individually?
+  end
+
+  # for group assignments, returns a single "student" for each
+  # group's submission.  the students name will be changed to the group's
+  # name.  for non-group assignments this just returns all visible users
+  def representatives(user)
+    visible_students = (
+      user ?
+        context.students_visible_to(user) :
+        context.participating_students
+    ).order_by_sortable_name.uniq
+
+    if grade_as_group?
+      group_category.groups.includes(:group_memberships => :user).map { |g|
+        [g.name, g.users]
+      }.map { |group_name, group_students|
+        representative, *others = (group_students & visible_students)
+        next unless representative
+
+        representative.readonly!
+        representative.name = group_name
+        representative.sortable_name = group_name
+        representative.short_name = group_name
+
+        yield representative, others if block_given?
+
+        representative
+      }.compact
+    else
+      visible_students
+    end
+  end
+
   def visible_rubric_assessments_for(user)
     if self.rubric_association
-      self.rubric_association.rubric_assessments.select{|a| a.grants_rights?(user, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? '0' : '1', a.assessor_name] }
+      self.rubric_association.rubric_assessments.select{|a| a.grants_rights?(user, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? SortFirst : SortLast, Canvas::ICU.collation_key(a.assessor_name)] }
     end
   end
 
@@ -1166,14 +1228,22 @@ class Assignment < ActiveRecord::Base
     # Creates a list of hashes, each one with a :user, :filename, and :submission entry.
     @ignored_files = []
     file_map = zip_extractor.unzip_files.map { |f| infer_comment_context_from_filename(f) }.compact
-    comment_map = partition_for_user(file_map)
-    comments = []
-    comment_map.each do |group|
-      comment = t :comment_from_files, { :one => "See attached file", :other => "See attached files" }, :count => group.size
-      submission = group.first[:submission]
-      user = group.first[:user]
-      attachments = group.map { |g| FileInContext.attach(self, g[:filename], g[:display_name]) }
-      comments << submission.add_comment({:comment => comment, :author => commenter, :attachments => attachments, :hidden => self.muted?})
+    files_for_user = file_map.group_by { |f| f[:user] }
+    comments = files_for_user.map do |user, files|
+      attachments = files.map { |g|
+        FileInContext.attach(self, g[:filename], g[:display_name])
+      }
+      comment = {
+        comment: t(:comment_from_files, {one: "See attached file", other: "See attached files"}, count: files.size),
+        author: commenter,
+        hidden: muted?,
+        attachments: attachments,
+      }
+      group, students = group_students(user)
+      students.map { |student|
+        submission = find_or_create_submission(student)
+        submission.add_comment(comment)
+      }
     end
     [comments.compact, @ignored_files]
   end
@@ -1241,7 +1311,7 @@ class Assignment < ActiveRecord::Base
       }.sort_by { |c|
         [
           # prefer those who still need more reviews done.
-          assessment_request_counts[c.id] < self.peer_review_count ? 0 : 1,
+          assessment_request_counts[c.id] < self.peer_review_count ? SortFirst : SortLast,
           # then prefer those who are assigned fewer reviews at this point --
           # this helps avoid loops where everybody is reviewing those who are
           # reviewing them, leaving the final assignee out in the cold.
@@ -1419,77 +1489,6 @@ class Assignment < ActiveRecord::Base
   end
   protected :readable_submission_type
 
-  CLONE_FOR_EXCLUDE_ATTRIBUTES = [:id, :assignment_group_id, :group_category, :peer_review_count, :peer_reviews_assigned, :needs_grading_count]
-
-  attr_accessor :clone_updated
-  def clone_for(context, dup=nil, options={}) #migrate=true)
-    options[:migrate] = true if options[:migrate] == nil
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save!
-    end
-    existing = context.assignments.active.find_by_id(self.id)
-    existing ||= context.assignments.active.find_by_cloned_item_id(self.cloned_item_id || 0)
-    return existing if existing && !options[:overwrite]
-    dup ||= Assignment.new
-    dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| CLONE_FOR_EXCLUDE_ATTRIBUTES.include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-
-    context.log_merge_result(t('warnings.group_assignment', "The Assignment \"%{assignment}\" was a group assignment, and you'll need to re-set the group settings for this new context", :assignment => self.title)) if self.has_group_category?
-    context.log_merge_result(t('warnings.peer_assignment', "The Assignment \"%{assignment}\" was a peer review assignment, and you'll need to re-set the peer review settings for this new context", :assignment => self.title)) if self.peer_review_count && self.peer_review_count > 0
-
-    dup.context = context
-    dup.description = context.migrate_content_links(self.description, self.context) if options[:migrate]
-    dup.saved_by = :quiz if options[:cloning_for_quiz]
-    dup.saved_by = :discussion_topic if options[:cloning_for_topic]
-    dup.save_without_broadcasting!
-    if self.rubric_association
-      old_association = self.rubric_association
-      new_association = RubricAssociation.new(
-        :rubric => old_association.rubric,
-        :association => dup,
-        :use_for_grading => old_association.use_for_grading,
-        :title => old_association.title,
-        :description => old_association.description,
-        :summary_data => old_association.summary_data,
-        :purpose => old_association.purpose,
-        :url => old_association.url,
-        :context => dup.context
-      )
-      new_association.save_without_broadcasting!
-    end
-    if self.submission_types == 'online_quiz' && self.quiz && !options[:cloning_for_quiz]
-      new_quiz = Quiz.find_by_assignment_id(dup.id)
-      new_quiz = self.quiz.clone_for(context, new_quiz, :cloning_for_assignment=>true)
-      new_quiz.assignment_id = dup.id
-      new_quiz.save! #_without_broadcasting!
-    elsif self.submission_types == 'discussion_topic' && self.discussion_topic && !options[:cloning_for_topic]
-      new_topic = DiscussionTopic.find_by_assignment_id(dup.id)
-      new_topic = self.discussion_topic.clone_for(context, new_topic, :cloning_for_assignment=>true)
-      new_topic.assignment_id = dup.id
-      dup.submission_types = 'discussion_topic'
-      new_topic.save!
-    elsif self.submission_types == 'external_tool' && self.external_tool_tag
-      tag = dup.build_external_tool_tag(:url => external_tool_tag.url, :new_tab => external_tool_tag.new_tab)
-      tag.content_type = 'ContextExternalTool'
-      tag.save
-    end
-    dup.assignment_group_id = context.merge_mapped_id(self.assignment_group) rescue nil
-    if dup.assignment_group_id.nil? && self.assignment_group
-      new_group = self.assignment_group.clone_for(context)
-      new_group.save_without_broadcasting!
-      dup.assignment_group = new_group
-      context.map_merge(self.assignment_group, new_group)
-    end
-    context.log_merge_result(t('messages.assignment_created', "Assignment \"%{assignment}\" created", :assignment => self.title))
-    context.may_have_links_to_migrate(dup)
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
-  end
-
   def self.process_migration(data, migration)
     assignments = data['assignments'] ? data['assignments']: []
     to_import = migration.to_import 'assignments'
@@ -1514,7 +1513,7 @@ class Assignment < ActiveRecord::Base
   end
 
 
-  def self.import_from_migration(hash, context, item=nil)
+  def self.import_from_migration(hash, context, item=nil, quiz=nil)
     hash = hash.with_indifferent_access
     return nil if hash[:migration_id] && hash[:assignments_to_import] && !hash[:assignments_to_import][hash[:migration_id]]
     item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
@@ -1603,14 +1602,18 @@ class Assignment < ActiveRecord::Base
       gs = context.grading_standards.find_by_migration_id(hash[:grading_standard_migration_id])
       item.grading_standard = gs if gs
     end
-    if hash[:quiz_migration_id]
-      if quiz = context.quizzes.find_by_migration_id(hash[:quiz_migration_id])
-        # the quiz is published because it has an assignment
-        quiz.assignment = item
-        quiz.generate_quiz_data
-        quiz.published_at = Time.now
-        quiz.workflow_state = 'available'
-        quiz.save
+    if quiz
+      item.quiz = quiz
+    elsif hash[:quiz_migration_id]
+      if q = context.quizzes.find_by_migration_id(hash[:quiz_migration_id])
+        if !item.quiz || item.quiz.id == q.id
+          # the quiz is published because it has an assignment
+          q.assignment = item
+          q.generate_quiz_data
+          q.published_at = Time.now
+          q.workflow_state = 'available'
+          q.save
+        end
       end
       item.submission_types = 'online_quiz'
       item.saved_by = :quiz
@@ -1682,7 +1685,7 @@ class Assignment < ActiveRecord::Base
 
   def sort_key
     # undated assignments go last
-    [due_at ? 0 : 1, due_at || 0, title]
+    [due_at || SortLast, Canvas::ICU.collation_key(title)]
   end
 
   def special_class; nil; end
@@ -1694,21 +1697,6 @@ class Assignment < ActiveRecord::Base
       t :submission_action_turn_in_assignment, "Turn in %{title}", :title => title
     end
   end
-
-
-    # Takes an array of hashes and groups them by their :user entry.  All
-    # hashes must have a user entry.
-    def partition_for_user(list)
-      return [] if list.empty?
-      index = list.first[:user]
-      found, remainder = list.partition { |e| e[:user] == index }
-      if remainder.empty?
-        [found]
-      else
-        [found] + partition_for_user(remainder)
-      end
-    end
-    protected :partition_for_user
 
   # Infers the user, submission, and attachment from a filename
   def infer_comment_context_from_filename(fullpath)
@@ -1843,4 +1831,21 @@ class Assignment < ActiveRecord::Base
       raise "Assignment#available? is deprecated. Use #published?"
     end
   end
+
+  def has_student_submissions?
+    self.submissions.any? { |s| context.includes_student?(s.user) }
+  end
+
+  # override so validations are called
+  def publish
+    self.workflow_state = 'published'
+    self.save
+  end
+
+  # override so validations are called
+  def unpublish
+    self.workflow_state = 'unpublished'
+    self.save
+  end
+
 end

@@ -8,7 +8,9 @@ module Authlogic
   end
 end
 
-callback_chain = Rails.version < "3.0" ? Authlogic::Session::Base.persist_callback_chain : Authlogic::Session::Base._persist_callbacks
+callback_chain = CANVAS_RAILS2 ?
+  Authlogic::Session::Base.persist_callback_chain :
+  Authlogic::Session::Base._persist_callbacks
 
 # we need http basic auth to take precedence over the session cookie, for the api.
 cb = callback_chain.delete(:persist_by_http_auth)
@@ -37,7 +39,7 @@ end
 # i18n fix so the error gets translated at run time, not initialization time.
 # this is fixed in new authlogic
 # https://github.com/jovoto-team/authlogic/commit/db01cf108985bd176e1885a3c85450020d4bcc45
-if Rails.version < '3.0'
+if CANVAS_RAILS2
   module Authlogic
     module ActsAsAuthentic
       module Login

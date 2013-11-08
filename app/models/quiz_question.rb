@@ -19,6 +19,8 @@
 require 'quiz_question_link_migrator'
 
 class QuizQuestion < ActiveRecord::Base
+  include Workflow
+
   attr_accessible :quiz, :quiz_group, :assessment_question, :question_data, :assessment_question_version
   attr_readonly :quiz_id
   belongs_to :quiz
@@ -31,11 +33,18 @@ class QuizQuestion < ActiveRecord::Base
   validates_presence_of :quiz_id
   serialize :question_data
   after_save :update_quiz
+
+  workflow do
+    state :active
+    state :deleted
+  end
+
+  scope :active, where("workflow_state='active' OR workflow_state IS NULL")
   
   def infer_defaults
     if !self.position && self.quiz
       if self.quiz_group
-        self.position = (self.quiz_group.quiz_questions.map(&:position).compact.max || 0) + 1
+        self.position = (self.quiz_group.quiz_questions.active.map(&:position).compact.max || 0) + 1
       else
         self.position = self.quiz.root_entries_max_position + 1
       end
@@ -48,6 +57,10 @@ class QuizQuestion < ActiveRecord::Base
   end
   
   def question_data=(data)
+    if data[:regrade_option] && self.quiz.context.root_account.enable_quiz_regrade?
+      update_question_regrade(data[:regrade_option], data[:regrade_user])
+    end
+
     if data.is_a?(String)
       data = ActiveSupport::JSON.decode(data) rescue nil
     elsif data.class == Hash
@@ -108,21 +121,6 @@ class QuizQuestion < ActiveRecord::Base
 
     hash
   end
-  
-  def clone_for(quiz, dup=nil, options={})
-    dup ||= QuizQuestion.new
-    self.attributes.delete_if{|k,v| [:id, :quiz_id, :quiz_group_id, :question_data].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    data = self.question_data || HashWithIndifferentAccess.new
-    data.delete(:id)
-    if options[:old_context] && options[:new_context]
-      data = QuizQuestion.migrate_question_hash(data, options)
-    end
-    dup.write_attribute(:question_data, data)
-    dup.quiz_id = quiz.id
-    dup
-  end
 
   # QuizQuestion.data is used when creating and editing a quiz, but 
   # once the quiz is "saved" then the "rendered" version of the
@@ -157,7 +155,8 @@ class QuizQuestion < ActiveRecord::Base
     else
       query = "INSERT INTO quiz_questions (quiz_id, quiz_group_id, assessment_question_id, question_data, created_at, updated_at, migration_id, position)"
       query += " VALUES (#{q_id}, #{g_id}, #{aq_id},#{question_data},'#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', '#{hash[:migration_id]}', #{position})"
-      id = self.connection.insert(query)
+      self.connection.insert(query, "#{name} Create",
+                             primary_key, nil, sequence_name)
     end
     hash
   end
@@ -173,5 +172,23 @@ class QuizQuestion < ActiveRecord::Base
         question.save
       end
     end
+  end
+
+  alias_method :destroy!, :destroy
+  def destroy
+    self.workflow_state = 'deleted'
+    self.save
+  end
+
+  private
+
+  def update_question_regrade(regrade_option, regrade_user)
+    regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(quiz.id, quiz.version_number) do |qr|
+      qr.user_id = regrade_user.id
+    end
+
+    question_regrade = QuizQuestionRegrade.find_or_initialize_by_quiz_question_id_and_quiz_regrade_id(id, regrade.id)
+    question_regrade.regrade_option = regrade_option
+    question_regrade.save!
   end
 end

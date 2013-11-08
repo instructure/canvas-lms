@@ -80,18 +80,6 @@ describe ActiveRecord::Base do
       @e6 = c2.enroll_student(u3, :enrollment_state => 'active')
     end
 
-    it "should find each enrollment from course using temp table" do
-      e = Course.active.select("enrollments.id AS e_id").
-                        joins(:enrollments).order("e_id asc")
-      es = []
-      e.find_each_with_temp_table(:batch_size => 2) do |record|
-        es << record["e_id"]
-      end
-      es.length.should == 6
-      es.should == [@e1.id.to_s,@e2.id.to_s,@e3.id.to_s,@e4.id.to_s,@e5.id.to_s,@e6.id.to_s]
-
-    end
-
     it "should find all enrollments from course join in batches" do
       e = Course.active.select("enrollments.id AS e_id").
                         joins(:enrollments).order("e_id asc")
@@ -100,11 +88,11 @@ describe ActiveRecord::Base do
       e.find_in_batches_with_temp_table(:batch_size => batch_size) do |batch|
         batch.size.should == batch_size
         batch.each do |r|
-          es << r["e_id"]
+          es << r["e_id"].to_i
         end
       end
       es.length.should == 6
-      es.should == [@e1.id.to_s,@e2.id.to_s,@e3.id.to_s,@e4.id.to_s,@e5.id.to_s,@e6.id.to_s]
+      es.should == [@e1.id,@e2.id,@e3.id,@e4.id,@e5.id,@e6.id]
     end
 
     it "should honor includes when using a cursor" do
@@ -357,16 +345,16 @@ describe ActiveRecord::Base do
 
   context "bulk_insert" do
     it "should work" do
-      Course.connection.bulk_insert "courses", [
-        {:name => "foo"},
-        {:name => "bar"}
+      User.bulk_insert [
+        {:name => "foo", :workflow_state => "registered"},
+        {:name => "bar", :workflow_state => "registered"}
       ]
-      Course.all.map(&:name).sort.should eql ["bar", "foo"]
+      User.order(:name).pluck(:name).should eql ["bar", "foo"]
     end
 
     it "should not raise an error if there are no records" do
-      lambda { Course.connection.bulk_insert "courses", [] }.should_not raise_error
-      Course.all.size.should eql 0
+      lambda { Course.bulk_insert [] }.should_not raise_error
+      Course.count.should eql 0
     end
   end
 
@@ -425,6 +413,10 @@ describe ActiveRecord::Base do
 
   context "after_transaction_commit" do
     self.use_transactional_fixtures = false
+
+    before do
+      Rails.env.stubs(:test?).returns(false)
+    end
 
     it "should execute the callback immediately if not in a transaction" do
       a = 0
@@ -610,6 +602,50 @@ describe ActiveRecord::Base do
       it "should merge group" do
         User.group(:id).group(:name).scope(:find, :group).should == 'id, name'
       end
+    end
+  end
+
+  describe "add_index" do
+    it "should raise an error on too long of name" do
+      name = 'some_really_long_name_' * 10
+      lambda { User.connection.add_index :users, [:id], name: name }.should raise_error
+    end
+  end
+
+  describe "nested conditions" do
+    it "should not barf if the condition has a question mark" do
+      User.joins(:enrollments).where(enrollments: { sis_source_id: 'a?c'}).first.should be_nil
+    end
+  end
+
+  describe ".nulls" do
+    before do
+      @u1 = User.create!
+      User.where(id: @u1).update_all(name: nil)
+      @u2 = User.create!(name: 'a')
+      @u3 = User.create!
+      User.where(id: @u3).update_all(name: nil)
+      @u4 = User.create!(name: 'b')
+
+      @us = [@u1, @u2, @u3, @u4]
+      # for sanity
+      User.where(id: @us, name: nil).order(:id).all.should == [@u1, @u3]
+    end
+
+    it "should sort nulls first" do
+      User.where(id: @us).order(User.nulls(:first, :name), :id).all.should == [@u1, @u3, @u2, @u4]
+    end
+
+    it "should sort nulls last" do
+      User.where(id: @us).order(User.nulls(:last, :name), :id).all.should == [@u2, @u4, @u1, @u3]
+    end
+
+    it "should sort nulls first, desc" do
+      User.where(id: @us).order(User.nulls(:first, :name, :desc), :id).all.should == [@u1, @u3, @u4, @u2]
+    end
+
+    it "should sort nulls last, desc" do
+      User.where(id: @us).order(User.nulls(:last, :name, :desc), :id).all.should == [@u4, @u2, @u1, @u3]
     end
   end
 end

@@ -463,7 +463,7 @@ class Message < ActiveRecord::Base
     end
 
     # not sure what this is even doing?
-    message_types.to_a.sort_by { |m| m[0] == 'Other' ? 'ZZZZ' : m[0] }
+    message_types.to_a.sort_by { |m| m[0] == 'Other' ? SortLast : m[0] }
   end
 
   # Public: Format and return the body for this message.
@@ -603,7 +603,7 @@ class Message < ActiveRecord::Base
     logger.info "Delivering mail: #{self.inspect}"
 
     begin
-      res = Mailer.deliver_message(self)
+      res = Mailer.message(self).deliver
     rescue Net::SMTPServerBusy => e
       @exception = e
       logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"

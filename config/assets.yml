@@ -15,15 +15,19 @@ css_compressor: 'sass'
 javascripts:
 
 stylesheets:
+  course_show: 
+    - public/stylesheets/compiled/course_show.css
   content_migrations: 
     - public/stylesheets/compiled/content_migrations.css
+  vendor:
+    - public/stylesheets/compiled/g_vendor.css
   common:
     - public/stylesheets/compiled/g_base.css
     - public/stylesheets/static/mediaelementplayer.css
     - public/stylesheets/compiled/g_instructure.css
     - public/stylesheets/compiled/g_assignments.css
     - public/stylesheets/compiled/g_context_inbox.css
-    - public/stylesheets/compiled/g_groups.css
+    - public/stylesheets/compiled/g_groups.css # TODO: remove me when new manage_groups lands
     - public/stylesheets/compiled/g_media_comments.css
     - public/stylesheets/compiled/g_context_modules.css
     - public/stylesheets/compiled/g_collaborations.css
@@ -40,6 +44,8 @@ stylesheets:
     - public/stylesheets/compiled/context_modules.css
   context_modules2: 
     - public/stylesheets/compiled/context_modules2.css
+  context_module_progressions:
+      - public/stylesheets/compiled/context_module_progressions.css
   dashboard:
     - public/stylesheets/compiled/dashboard_messages.css
     - public/stylesheets/compiled/dashboard_activity.css
@@ -71,6 +77,8 @@ stylesheets:
     - public/stylesheets/compiled/calendar/sidebar.css
     - public/stylesheets/compiled/calendar/scheduler.css
     - public/stylesheets/compiled/calendar/calendarHeader.css
+  agenda_view:
+    - public/stylesheets/compiled/agenda_view.css
   course_settings:
     - public/stylesheets/compiled/course_settings.css
     - public/stylesheets/compiled/external_tools.css
@@ -111,6 +119,8 @@ stylesheets:
     - public/stylesheets/compiled/grading_standards.css
   login:
     - public/stylesheets/compiled/login.css
+  otp_login:
+    - public/stylesheets/compiled/otp_login.css
   roster:
     - public/stylesheets/compiled/roster.css
   roster_user:

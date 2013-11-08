@@ -19,15 +19,15 @@
 # @object Favorite
 #     {
 #       // The ID of the object the Favorite refers to
-#       context_id: 1170,
+#       "context_id": 1170,
 #
 #       // The type of the object the Favorite refers to (currently, only "Course" is supported)
-#       context_type: "Course"
+#       "context_type": "Course"
 #     }
 class FavoritesController < ApplicationController
 
   before_filter :require_user
-  before_filter :check_defaults, :only => [:add_favorite_course, :remove_favorite_course]
+  before_filter :check_defaults, :only => [:remove_favorite_course]
   after_filter :touch_user, :only => [:add_favorite_course, :remove_favorite_course, :reset_course_favorites]
 
   include Api::V1::Favorite
@@ -58,8 +58,9 @@ class FavoritesController < ApplicationController
   # Add a course to the current user's favorites.  If the course is already
   # in the user's favorites, nothing happens.
   #
-  # @argument id the ID or SIS ID of the course to add.  The current user
-  # must be registered in the course.
+  # @argument id [String]
+  #   The ID or SIS ID of the course to add.  The current user must be
+  #   registered in the course.
   #
   # @returns Favorite
   #
@@ -72,17 +73,22 @@ class FavoritesController < ApplicationController
   def add_favorite_course
     course = api_find(Course, params[:id])
     fave = nil
-    Favorite.unique_constraint_retry do
-      fave = @current_user.favorites.where(:context_type => 'Course', :context_id => course).first
-      fave ||= @current_user.favorites.create!(:context => course)
+
+    @current_user.shard.activate do
+      Favorite.unique_constraint_retry do
+        fave = @current_user.favorites.where(:context_type => 'Course', :context_id => course).first
+        fave ||= @current_user.favorites.create!(:context => course)
+      end
     end
+
     render :json => favorite_json(fave, @current_user, session)
   end
 
   # @API Remove course from favorites
   # Remove a course from the current user's favorites.
   #
-  # @argument id the ID or SIS ID of the course to remove
+  # @argument id [String]
+  #   the ID or SIS ID of the course to remove
   #
   # @returns Favorite
   #
@@ -95,12 +101,12 @@ class FavoritesController < ApplicationController
     # allow removing a Favorite whose context object no longer exists
     # but also allow referencing by sis id, if possible
     courses = api_find_all(Course, [params[:id]])
-    course_id = courses.any? ? courses.first.id : params[:id]
+    course_id = Shard.relative_id_for(courses.any? ? courses.first.id : params[:id], @current_user.shard)
     fave = @current_user.favorites.where(:context_type => 'Course', :context_id => course_id).first
     if fave
       result = favorite_json(fave, @current_user, session)
       fave.destroy
-      render :json => result 
+      render :json => result
     else
       # can't really return a 404 here without making browsers freak out
       # in the Courses UI (it's easy for the client's state to get out of

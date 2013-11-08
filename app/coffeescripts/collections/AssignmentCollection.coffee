@@ -6,3 +6,5 @@ define [
   class AssignmentCollection extends Backbone.Collection
 
     model: Assignment
+
+    comparator: 'position'

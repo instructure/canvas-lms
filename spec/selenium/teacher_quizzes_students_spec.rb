@@ -16,9 +16,7 @@ describe "quizzes students" do
       quiz.generate_quiz_data
       quiz.workflow_state = 'available'
       quiz.save
-
       @fake_student = @course.student_view_student
-
       enter_student_view
       get "/courses/#{@course.id}/quizzes/#{quiz.id}"
 
@@ -26,10 +24,14 @@ describe "quizzes students" do
       wait_for_ajaximations
 
       q = quiz.stored_questions[0]
-      f("#question_#{q[:id]}_answer_#{q[:answers][0][:id]}").click
 
-      f("#submit_quiz_button").click
-      wait_for_ajaximations
+      fj("input[type=radio][value=#{q[:answers][0][:id]}]").click
+      fj("input[type=radio][value=#{q[:answers][0][:id]}]").selected?.should be_true
+
+      wait_for_js
+      driver.execute_script("$('#submit_quiz_form .btn-primary').click()")
+
+      keep_trying_until { f('.quiz-submission .quiz_score .score_value').should be_displayed }
       quiz_sub = @fake_student.reload.submissions.find_by_assignment_id(quiz.assignment.id)
       quiz_sub.should be_present
       quiz_sub.workflow_state.should == "graded"

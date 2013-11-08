@@ -33,7 +33,8 @@ module Api::V1::AssignmentGroup
 
     hash = api_json(group, user, session,
                     :only => %w(id name position group_weight))
-    hash['rules'] = group.rules_hash
+
+    hash['rules'] = group.rules_hash(stringify_json_ids: opts[:stringify_json_ids])
 
     if includes.include?('assignments')
       assignment_scope = group.active_assignments
@@ -46,7 +47,6 @@ module Api::V1::AssignmentGroup
         assignment_scope = assignment_scope.published
       end
 
-      include_discussion_topic = includes.include?('discussion_topic')
       user_content_attachments   = opts[:preloaded_user_content_attachments]
       user_content_attachments ||= api_bulk_load_user_content_attachments(
         assignment_scope.map(&:description),
@@ -56,7 +56,9 @@ module Api::V1::AssignmentGroup
       hash['assignments'] = assignment_scope.map { |a|
         a.context = group.context
         assignment_json(a, user, session,
-          include_discussion_topic: include_discussion_topic,
+          include_discussion_topic: includes.include?('discussion_topic'),
+          include_all_dates: includes.include?('all_dates'),
+          include_module_ids: includes.include?('module_ids'),
           override_dates: opts[:override_assignment_dates],
           preloaded_user_content_attachments: user_content_attachments)
       }

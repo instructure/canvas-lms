@@ -26,11 +26,11 @@ class PageCommentsController < ApplicationController
       respond_to do |format|
         if @comment.save
           format.html { redirect_to eportfolio_named_category_entry_url(@portfolio.id, @page.eportfolio_category.slug, @page.slug) }
-          format.json { render :json => @comment.to_json }
+          format.json { render :json => @comment }
         else
           flash[:error] = t('errors.create_failed', "Comment creation failed")
           format.html { redirect_to eportfolio_named_category_entry_url(@portfolio.id, @page.eportfolio_category.slug, @page.slug) }
-          format.json { render :json => @comment.errors.to_json, :status => :bad_request }
+          format.json { render :json => @comment.errors, :status => :bad_request }
         end
       end
     end
@@ -42,7 +42,7 @@ class PageCommentsController < ApplicationController
     @comment = @page.page_comments.find(params[:id])
     if authorized_action(@portfolio, @current_user, :update)
       @comment.destroy
-      render :json => @comment.to_json
+      render :json => @comment
     end
   end
 end

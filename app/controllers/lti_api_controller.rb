@@ -68,7 +68,7 @@ class LtiApiController < ApplicationController
 
     timestamp = Time.zone.at(@signature.request.timestamp.to_i)
     # 90 minutes is suggested by the LTI spec
-    allowed_delta = Setting.get_cached('oauth.allowed_timestamp_delta', 90.minutes.to_s).to_i
+    allowed_delta = Setting.get('oauth.allowed_timestamp_delta', 90.minutes.to_s).to_i
     if timestamp < allowed_delta.ago || timestamp > allowed_delta.from_now
       raise BasicLTI::BasicOutcomes::Unauthorized, "Timestamp too old or too far in the future, request has expired"
     end

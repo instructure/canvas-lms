@@ -17,6 +17,7 @@
  */
 
 define([
+  'underscore',
   'INST' /* INST */,
   'i18n!gradebook',
   'jquery' /* $ */,
@@ -47,7 +48,7 @@ define([
   'vendor/scribd.view' /* scribd */,
   'vendor/spin' /* new Spinner */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(INST, I18n, $, userSettings, htmlEscape, rubricAssessment, turnitinInfoTemplate, turnitinScoreTemplate) {
+], function(_, INST, I18n, $, userSettings, htmlEscape, rubricAssessment, turnitinInfoTemplate, turnitinScoreTemplate) {
 
   // fire off the request to get the jsonData
   window.jsonData = {};
@@ -89,8 +90,8 @@ define([
       $submissions_container = $("#submissions_container"),
       $iframe_holder = $("#iframe_holder"),
       $avatar_image = $("#avatar_image"),
-      $x_of_x_students = $("#x_of_x_students span"),
-      $grded_so_far = $("#x_of_x_graded span:first"),
+      $x_of_x_students = $("#x_of_x_students_frd"),
+      $grded_so_far = $("#x_of_x_graded"),
       $average_score = $("#average_score"),
       $this_student_does_not_have_a_submission = $("#this_student_does_not_have_a_submission").hide(),
       $this_student_has_a_submission = $('#this_student_has_a_submission').hide(),
@@ -119,13 +120,16 @@ define([
       $mute_link = $('#mute_link'),
       $no_annotation_warning = $('#no_annotation_warning'),
       $selectmenu = null,
-      broswerableCssClasses = /^(image|html|code)$/,
+      browserableCssClasses = /^(image|html|code)$/,
       windowLastHeight = null,
       resizeTimeOut = null,
       iframes = {},
       snapshotCache = {},
       sectionToShow,
       header,
+      studentLabel = I18n.t("student", "Student"),
+      groupLabel = I18n.t("group", "Group"),
+      gradeeLabel = studentLabel,
       utils;
 
   utils = {
@@ -158,6 +162,10 @@ define([
       this.submission = $.grep(jsonData.submissions, function(submission, i){
         return submission.user_id === student.id;
       })[0];
+      $.each(visibleRubricAssessments, function(i, rubricAssessment) {
+        rubricAssessment.user_id = rubricAssessment.user_id && String(rubricAssessment.user_id);
+        rubricAssessment.assessor_id = rubricAssessment.assessor_id && String(rubricAssessment.assessor_id);
+      });
       this.rubric_assessments = $.grep(visibleRubricAssessments, function(rubricAssessment, i){
         return rubricAssessment.user_id === student.id;
       });
@@ -166,7 +174,10 @@ define([
 
     // handle showing students only in a certain section.
     // the sectionToShow will be remembered for a given user in a given browser across all assignments in this course
-    sectionToShow = userSettings.contextGet('grading_show_only_section');
+    if (!jsonData.GROUP_GRADING_MODE) {
+      sectionToShow = userSettings.contextGet('grading_show_only_section');
+      sectionToShow = sectionToShow && String(sectionToShow);
+    }
     if (sectionToShow) {
       var tempArray  = $.grep(jsonData.studentsWithSubmissions, function(student, i){
         return $.inArray(sectionToShow, student.section_ids) != -1;
@@ -183,28 +194,39 @@ define([
     //by defaut the list is sorted alphbetically by student last name so we dont have to do any more work here, 
     // if the cookie to sort it by submitted_at is set we need to sort by submitted_at.
     var hideStudentNames = utils.shouldHideStudentNames();
+    var compareBy = function(f) {
+      return function(a, b) {
+        a = f(a);
+        b = f(b);
+        if ((!a && !b) || a === b) { return 0; }
+        if (!a || a > b) { return +1; }
+        else { return -1; }
+      };
+    };
     if(hideStudentNames) {
-      jsonData.studentsWithSubmissions.sort(function(a,b){
-        return ((a && a.submission && a.submission.id) || Number.MAX_VALUE) - 
-               ((b && b.submission && b.submission.id) || Number.MAX_VALUE);
-      });          
+      jsonData.studentsWithSubmissions.sort(compareBy(function(student) {
+        return student &&
+          student.submission &&
+          student.submission.id;
+      }));
     } else if (userSettings.get("eg_sort_by") == "submitted_at") {
-      jsonData.studentsWithSubmissions.sort(function(a,b){
-        return ((a && a.submission && a.submission.submitted_at && $.parseFromISO(a.submission.submitted_at).timestamp) || Number.MAX_VALUE) - 
-               ((b && b.submission && b.submission.submitted_at && $.parseFromISO(b.submission.submitted_at).timestamp) || Number.MAX_VALUE);
-      });
+      jsonData.studentsWithSubmissions.sort(compareBy(function(student){
+        return student &&
+          student.submission &&
+          student.submission.submitted_at &&
+          $.parseFromISO(student.submission.submitted_at).timestamp;
+      }));
     } else if (userSettings.get("eg_sort_by") == "submission_status") {
-      jsonData.studentsWithSubmissions.sort(function(a,b) {
-        var states = {
-          "not_graded": 1,
-          "resubmitted": 2,
-          "not_submitted": 3,
-          "graded": 4
-        };
-        var stateA = submissionStateName(a.submission);
-        var stateB = submissionStateName(b.submission);
-        return states[stateA] - states[stateB];
-      });
+      var states = {
+        "not_graded": 1,
+        "resubmitted": 2,
+        "not_submitted": 3,
+        "graded": 4
+      };
+      jsonData.studentsWithSubmissions.sort(compareBy(function(student){
+        return student &&
+          states[submissionStateName(student.submission)];
+      }));
     }
   }
 
@@ -263,7 +285,7 @@ define([
         EG.handleStudentChanged();
       });
       
-    if (jsonData.context.active_course_sections.length && jsonData.context.active_course_sections.length > 1) {
+    if (jsonData.context.active_course_sections.length && jsonData.context.active_course_sections.length > 1 && !jsonData.GROUP_GRADING_MODE) {
       var $selectmenu_list = $selectmenu.data('selectmenu').list,
           $menu = $("#section-menu");
           
@@ -316,7 +338,7 @@ define([
     elements: {
       mute: {
         icon: $('#mute_link .ui-icon'),
-        label: $('#mute_link .label'),
+        label: $('#mute_link .mute_label'),
         link: $('#mute_link'),
         modal: $('#mute_dialog')
       },
@@ -344,8 +366,8 @@ define([
     addEvents: function(){
       this.elements.nav.click($.proxy(this.toAssignment, this));
       this.elements.mute.link.click($.proxy(this.onMuteClick, this));
-      this.elements.settings.form.submit($.proxy(this.submitForm, this));
-      this.elements.settings.link.click($.proxy(this.showSettingsModal, this));
+      this.elements.settings.form.submit(this.submitSettingsForm.bind(this));
+      this.elements.settings.link.click(this.showSettingsModal.bind(this));
     },
     addSpinner: function(){
       this.elements.mute.link.append(this.elements.spinner.el);
@@ -387,15 +409,21 @@ define([
       EG[e.target.getAttribute('class')]();
     },
 
-    submitForm: function(e){
+    submitSettingsForm: function(e){
+      e.preventDefault();
       userSettings.set('eg_sort_by', $('#eg_sort_by').val());
       userSettings.set('eg_hide_student_names', $("#hide_student_names").prop('checked'));
       $(e.target).find(".submit_button").attr('disabled', true).text(I18n.t('buttons.saving_settings', "Saving Settings..."));
-      window.location.reload();
-      return false;
+      var gradeByQuestion = $("#enable_speedgrader_grade_by_question").prop('checked');
+      $.post(ENV.settings_url, {
+        enable_speedgrader_grade_by_question: gradeByQuestion
+      }).then(function() {
+        window.location.reload();
+      });
     },
 
     showSettingsModal: function(e){
+      e.preventDefault();
       this.elements.settings.form.dialog('open');
     },
 
@@ -417,7 +445,7 @@ define([
 
     toggleMute: function(){
       this.muted = !this.muted;
-      var label = this.muted ? I18n.t('unmute_assignment', 'Unmute Assignment') : I18n.t('mute_assignment', 'Mute Assignment');
+      var label = this.muted ? I18n.t('unmute_assignment', 'Unmute Assignment') : I18n.t('mute_assignment', 'Mute Assignment'),
           action = this.muted ? 'mute' : 'unmute',
           actions = {
         /* Mute action */
@@ -631,7 +659,18 @@ define([
       }
     });
   }
-  
+
+  function initGroupAssignmentMode() {
+    if (jsonData.GROUP_GRADING_MODE) {
+      gradeeLabel = groupLabel;
+      disableGroupCommentCheckbox();
+    }
+  }
+
+  function disableGroupCommentCheckbox() {
+    $("#submission_group_comment").prop({checked: true, disabled: true});
+  }
+
   function resizingFunction(){
     var windowHeight = $window.height(),
         delta,
@@ -841,7 +880,7 @@ define([
         EG.currentStudent.submission.currentSelectedIndex = parseInt($(this).val(), 10);
         EG.handleSubmissionSelectionChange();
       });
-      
+
       initRubricStuff();
       initCommentBox();
       EG.initComments();
@@ -873,6 +912,7 @@ define([
         $("#speed_grader_loading").hide();
         $("#gradebook_header, #full_width_container").show();
         initDropdown();
+        initGroupAssignmentMode();
         EG.handleFragmentChange();
       }
     },
@@ -898,20 +938,22 @@ define([
     },
 
     toggleFullRubric: function(force){
-      //if there is no rubric associated with this assignment, then the edit rubric thing should never be shown.
-      //the view should make sure that the edit rubric html is not even there but we also want to
-      //make sure that pressing "r" wont make it appear either
+      // if there is no rubric associated with this assignment, then the edit
+      // rubric thing should never be shown.  the view should make sure that
+      // the edit rubric html is not even there but we also want to make sure
+      // that pressing "r" wont make it appear either
       if (!jsonData.rubric_association){ return false; }
 
       if ($rubric_full.filter(":visible").length || force === "close") {
         $("#grading").height("auto").children().show();
         $rubric_full.fadeOut();
         this.resizeFullHeight();
-      }
-      else {
+        $(".toggle_full_rubric").focus()
+      } else {
         $rubric_full.fadeIn();
         $("#grading").children().hide();
         this.refreshFullRubric();
+        $rubric_full.find('.rubric_title .title').focus()
       }
     },
 
@@ -933,19 +975,22 @@ define([
         hash = {};
       }
 
-      //if there is not a valid student_id in the location.hash then force it to be the first student in the class with an assignment to grade.
-      if (typeof(hash.student_id) != "number" ||
-          !jsonData.studentMap[hash.student_id]) {
-        hash.student_id = jsonData.studentsWithSubmissions[0].id;
+      // use the group representative if possible
+      var studentId = jsonData.context.rep_for_student[hash.student_id] ||
+                      hash.student_id;
+
+      // choose the first ungraded student if the requested one doesn't exist
+      if (!jsonData.studentMap[studentId]) {
+        studentId = jsonData.studentsWithSubmissions[0].id;
         for (var i = 0, max = jsonData.studentsWithSubmissions.length; i < max; i++){
           if (typeof jsonData.studentsWithSubmissions[i].submission !== 'undefined' && jsonData.studentsWithSubmissions[i].submission.workflow_state !== 'graded'){
-            hash.student_id = jsonData.studentsWithSubmissions[i].id;
+            studentId = jsonData.studentsWithSubmissions[i].id;
             break;
           }
         }
       }
 
-      EG.goToStudent(hash.student_id);
+      EG.goToStudent(studentId);
     },
 
     goToStudent: function(student_id){
@@ -975,16 +1020,16 @@ define([
     },
 
     handleStudentChanged: function(){
-      var id = parseInt( $selectmenu.val(), 10 );
+      var id = $selectmenu.val();
       this.currentStudent = jsonData.studentMap[id];
-  	  document.location.hash = "#" + encodeURIComponent(JSON.stringify({
-  	    "student_id": this.currentStudent.id
-  	  }));
+      document.location.hash = "#" + encodeURIComponent(JSON.stringify({
+        "student_id": this.currentStudent.id
+      }));
 
-  	  this.showGrade();
-  	  this.showDiscussion();
-  	  this.showRubric();
-  	  this.updateStatsInHeader();
+      this.showGrade();
+      this.showDiscussion();
+      this.showRubric();
+      this.updateStatsInHeader();
       this.showSubmissionDetails();
       this.refreshFullRubric();
     },
@@ -1088,7 +1133,7 @@ define([
               $.isPreviewable(attachment.content_type, 'google')) {
             inlineableAttachments.push(attachment);
           }
-          if (broswerableCssClasses.test(attachment.mime_class)) {
+          if (browserableCssClasses.test(attachment.mime_class)) {
             browserableAttachments.push(attachment);
           }
           $submission_file = $submission_file_hidden.clone(true).fillTemplateData({
@@ -1150,26 +1195,31 @@ define([
 
     refreshSubmissionsToView: function(){
       var innerHTML = "";
-      if (this.currentStudent.submission.submission_history.length > 0) {
-        submissionToSelect = this.currentStudent.submission.submission_history[this.currentStudent.submission.submission_history.length - 1].submission;
+      var s = this.currentStudent.submission;
+      var submissionHistory;
 
-        $.each(this.currentStudent.submission.submission_history, function(i, s){
-          s = s.submission;
-          var submittedAt = s.submitted_at && $.parseFromISO(s.submitted_at),
-              late        = s['late'];
+      if ((submissionHistory = s.submission_history).length > 0) {
+        var submissionToSelect = _(submissionHistory).last();
 
-          innerHTML += "<option " + (late ? "class='late'" : "") + " value='" + i + "' " +
-                        (s == submissionToSelect ? "selected='selected'" : "") + ">" +
+        _(submissionHistory).each(function(o, i) {
+          var s           = o.submission;
+              submittedAt = s.submitted_at && $.parseFromISO(s.submitted_at),
+              late        = s.late,
+              value       = s.version || i;
+
+          innerHTML += "<option " + (late ? "class='late'" : "") + " value='" + value + "' " +
+                        (o == submissionToSelect ? "selected='selected'" : "") + ">" +
                         (submittedAt ? submittedAt.datetime_formatted : I18n.t('no_submission_time', 'no submission time')) +
                         (late ? " " + I18n.t('loud_late', "LATE") : "") +
-                        (s.grade && s.grade_matches_current_submission ? " (" + I18n.t('grade', "grade: %{grade}", {'grade': s.grade}) + ')' : "") +
+                        (s.grade && (s.grade_matches_current_submission || s.show_grade_in_dropdown) ? " (" + I18n.t('grade', "grade: %{grade}", {'grade': s.grade}) + ')' : "") +
                        "</option>";
+
         });
       }
       $submission_to_view.html(innerHTML);
 
       //if there are multiple submissions
-      if (this.currentStudent && this.currentStudent.submission && this.currentStudent.submission.submission_history && this.currentStudent.submission.submission_history.length > 1 ) {
+      if (submissionHistory.length > 1) {
         $multiple_submissions.show();
         $single_submission.hide();
       }
@@ -1192,7 +1242,13 @@ define([
     },
 
     updateStatsInHeader: function(){
-      $x_of_x_students.html( EG.currentIndex() + 1 );
+      $x_of_x_students.html(
+        I18n.t('gradee_index_of_total', '%{gradee} %{x} of %{y}', {
+          gradee: gradeeLabel,
+          x: EG.currentIndex() + 1,
+          y: jsonData.context.students.length
+        })
+      );
 
       var gradedStudents = $.grep(jsonData.studentsWithSubmissions, function(s){
         return (s.submission && s.submission.workflow_state === 'graded');
@@ -1222,7 +1278,12 @@ define([
       else { //there are no submissions that have been graded.
         $average_score_wrapper.hide();
       }
-      $grded_so_far.html(scores.length);
+      $grded_so_far.html(
+        I18n.t('portion_graded', '%{x} / %{y} Graded', {
+          x: scores.length,
+          y: jsonData.context.students.length
+        })
+      );
     },
 
     loadAttachmentInline: function(attachment){
@@ -1280,7 +1341,7 @@ define([
           }
           $iframe_holder.show().loadDocPreview(previewOptions);
 	      }
-	      else if (attachment && broswerableCssClasses.test(attachment.mime_class)) {
+	      else if (attachment && browserableCssClasses.test(attachment.mime_class)) {
 	        var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
 	                  .replace("{{submissionId}}", this.currentStudent.submission.user_id)
 	                  .replace("{{attachmentId}}", attachment.id);
@@ -1381,7 +1442,7 @@ define([
               }
             });
           }).showIf(commentIsDeleteableByMe);
-          
+
           if (comment.media_comment_type && comment.media_comment_id) {
             $comment.find(".play_comment_link").data(comment).show();
           }
@@ -1410,7 +1471,11 @@ define([
         // but it still works in all other browsers.
         setTimeout(function(){ $add_a_comment_textarea.trigger('keyup'); }, 0);
 
-        $add_a_comment.find(":input").attr("disabled", false);
+        $add_a_comment.find(":input").prop("disabled", false);
+        if (jsonData.GROUP_GRADING_MODE) {
+          disableGroupCommentCheckbox();
+        }
+
         $add_a_comment_submit_button.text(I18n.t('buttons.submit_comment', "Submit Comment"));
     },
     
@@ -1451,7 +1516,7 @@ define([
       }
 
       $("#comment_attachments").empty();
-      $add_a_comment.find(":input").attr("disabled", true);
+      $add_a_comment.find(":input").prop("disabled", true);
       $add_a_comment_submit_button.text(I18n.t('buttons.submitting', "Submitting..."));
       hideMediaRecorderContainer();
     },
@@ -1459,6 +1524,8 @@ define([
     setOrUpdateSubmission: function(submission){
       // find the student this submission belongs to and update their submission with this new one, if they dont have a submission, set this as their submission.
       var student =  jsonData.studentMap[submission.user_id];
+      if (!student) return;
+
       student.submission = student.submission || {};
 
       // stuff that comes back from ajax doesnt have a submission history but handleSubmissionSelectionChange

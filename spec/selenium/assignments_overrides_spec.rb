@@ -106,7 +106,7 @@ describe "assignment groups" do
       get "/courses/#{@course.id}/assignments"
       f('.assignment_list .assignment_due').should include_text "Multiple Due Dates"
       driver.mouse.move_to f(".assignment_list .assignment_due a")
-      wait_for_animations
+      wait_for_ajaximations
 
       tooltip = fj('.vdd_tooltip_content:visible')
       tooltip.should include_text 'New Section'
@@ -122,7 +122,7 @@ describe "assignment groups" do
       get "/assignments"
       f('.group_assignment .date_text').should include_text "Multiple Due Dates"
       driver.mouse.move_to f(".group_assignment .date_text a")
-      wait_for_animations
+      wait_for_ajaximations
 
       tooltip = fj('.vdd_tooltip_content:visible')
       tooltip.should include_text 'New Section'

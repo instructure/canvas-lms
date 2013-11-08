@@ -91,10 +91,8 @@ shared_examples_for "quizzes selenium tests" do
     @context = @course
     bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
     @q = quiz_model
-    a = AssessmentQuestion.create!
-    b = AssessmentQuestion.create!
-    bank.assessment_questions << a
-    bank.assessment_questions << b
+    a = bank.assessment_questions.create!
+    b = bank.assessment_questions.create!
     answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}, 'answer_2' => {'id' => 3}}
     @quest1 = @q.quiz_questions.create!(:question_data => {:name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
     @quest2 = @q.quiz_questions.create!(:question_data => {:name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
@@ -114,8 +112,46 @@ shared_examples_for "quizzes selenium tests" do
     fj('#quiz_tabs ul:first a:eq(1)').click
   end
 
+  # Locate an anchor using its text() node value. The anchor is expected to
+  # contain an "accessible variant"; a span.screenreader-only with a clone of its
+  # text() value.
+  #
+  # @argument text [String]
+  #   The label, or text() value, of the anchor.
+  #
+  # We can't use Selenium's `:link_text` because the text() of <a> will actually
+  # contain two times the text value for the reason above, so we'll use XPath
+  # instead.
+  #
+  # We can't use Selenium's `:partial_link_text` or XPath's `fn:contains` either
+  # because we're not after a partial match (ie, "New Question" would match
+  # "New Question Group" and that's incorrect.)
+  def find_accessible_link(text)
+    driver.find_elements(:xpath, "//a[normalize-space(.)=\"#{text} #{text}\"]")[0]
+  end
+
+  # Matcher for a label (or a word) to be used against a block of text that
+  # contains an accessible variant.
+  #
+  # @argument label [String]
+  #   The label, or text() value of the element, to create the matcher for.
+  #
+  # Example: testing the content of an accessible link whose label is 'Publish'
+  #
+  #     my_link.text.should match accessible_variant_of 'Publish' # => passes
+  #     my_link.text.should == 'Publish' # => fails, text will be 'Publish Publish'
+  #
+  # See #find_accessible_link for more info.
+  def accessible_variant_of(label)
+    /(?:#{label}\s*){2}/
+  end
+
   def click_new_question_button
-    driver.find_element(:link_text, 'New Question').click
+    find_accessible_link('New Question').click
+  end
+
+  def click_quiz_statistics_button
+    find_accessible_link('Quiz Statistics').click
   end
 
   def click_save_settings_button
@@ -169,7 +205,7 @@ shared_examples_for "quizzes selenium tests" do
   def edit_first_question
     hover_first_question
     f('.edit_question_link').click
-    wait_for_animations
+    wait_for_ajaximations
   end
 
   def save_question
@@ -215,7 +251,7 @@ shared_examples_for "quizzes selenium tests" do
   # creates a question group through the browser
   def create_question_group
     click_questions_tab
-    driver.find_element(:link_text, 'New Question Group').click
+    find_accessible_link('New Question Group').click
     submit_form('#group_top_new form')
     wait_for_ajax_requests
     @group = QuizGroup.last

@@ -25,11 +25,24 @@ class EventStream::Failure < ActiveRecord::Base
   serialize :backtrace, Array
 
   def self.log!(operation, stream, record, exception)
+    log_to_statsd!(stream, exception)
     create!(:operation => operation.to_s,
             :event_stream => stream.identifier,
             :record_id => record.id.to_s,
             :payload => stream.operation_payload(operation, record),
             :exception => exception.message.to_s,
             :backtrace => exception.backtrace)
+  end
+
+  def self.log_to_statsd!(stream, exception)
+    Canvas::Statsd.increment("event_stream_failure.stream.#{Canvas::Statsd.escape(stream.identifier)}")
+    message = exception.message.to_s
+    if message.blank?
+      Canvas::Statsd.increment("event_stream_failure.exception.blank")
+    elsif message.include?("No live servers")
+      Canvas::Statsd.increment("event_stream_failure.exception.no_live_servers")
+    else
+      Canvas::Statsd.increment("event_stream_failure.exception.other")
+    end
   end
 end

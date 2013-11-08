@@ -3,8 +3,9 @@ define([
   'str/htmlEscape',
   'str/pluralize',
   'str/escapeRegex',
+  'compiled/str/i18nLolcalize',
   'vendor/date' /* Date.parse, Date.UTC */
-], function($, htmlEscape, pluralize, escapeRegex) {
+], function($, htmlEscape, pluralize, escapeRegex, i18nLolcalize) {
 
 // Instantiate the object, export globally for tinymce/specs
 var I18n = window.I18n = {};
@@ -26,8 +27,8 @@ I18n.isValidNode = function(obj, node) {
   // handle names like "foo.bar.baz"
   var nameParts = node.split('.');
   for (var j=0; j < nameParts.length; j++) {
-    if (!(nameParts[j] in obj)) return false;
     obj = obj[nameParts[j]];
+    if (typeof obj === 'undefined' || obj === null) return false;
   }
   return true; 
 };
@@ -36,10 +37,6 @@ I18n.lookup = function(scope, options) {
   var translations = this.prepareOptions(I18n.translations);
   var messages = translations[I18n.currentLocale()];
   options = this.prepareOptions(options);
-
-  if (!messages) {
-    return;
-  }
 
   if (typeof(scope) == "object") {
     scope = scope.join(this.defaultSeparator);
@@ -51,13 +48,9 @@ I18n.lookup = function(scope, options) {
 
   scope = scope.split(this.defaultSeparator);
 
-  while (scope.length > 0) {
+  while (messages && scope.length > 0) {
     var currentScope = scope.shift();
     messages = messages[currentScope];
-
-    if (!messages) {
-      break;
-    }
   }
 
   if (!messages && this.isValidNode(options, "defaultValue")) {
@@ -532,6 +525,11 @@ I18n.l = I18n.localize;
 I18n.p = I18n.pluralize;
 
 
+var normalizeDefault = function(str) { return str };
+if (window.ENV && window.ENV.lolcalize) {
+  normalizeDefault = i18nLolcalize;
+}
+
 I18n.scoped = function(scope, callback) {
   var i18n_scope = new I18n.scope(scope);
   if (callback) {
@@ -558,7 +556,7 @@ I18n.scope.prototype = {
     if (typeof(options.count) != 'undefined' && typeof(defaultValue) == "string" && defaultValue.match(/^[\w\-]+$/)) {
       defaultValue = pluralize.withCount(options.count, defaultValue);
     }
-    options.defaultValue = defaultValue;
+    options.defaultValue = normalizeDefault(defaultValue);
     return I18n.translate(this.resolveScope(scope), options);
   },
   localize: function(scope, value) {

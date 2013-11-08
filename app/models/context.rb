@@ -117,7 +117,7 @@ module Context
 
   def sorted_rubrics(user, context)
     associations = RubricAssociation.bookmarked.for_context_codes(context.asset_string).include_rubric
-    associations.to_a.once_per(&:rubric_id).select{|r| r.rubric }.sort_by{|r| r.rubric.title || "zzzz" }
+    Canvas::ICU.collate_by(associations.to_a.once_per(&:rubric_id).select{|r| r.rubric }) { |r| r.rubric.title || SortLast }
   end
 
   def rubric_contexts(user)
@@ -140,7 +140,7 @@ module Context
         :name => context_name
       }
     end
-    contexts.sort_by{|c| codes_order[c[:context_code]] || 999 }
+    contexts.sort_by{|c| codes_order[c[:context_code]] || SortLast }
   end
 
   def active_record_types
@@ -167,6 +167,22 @@ module Context
     res = Context.find_asset_by_asset_string(asset_string, self, allowed_types)
     res = nil if res.respond_to?(:deleted?) && res.deleted?
     res
+  end
+
+  # [[context_type, context_id], ...] -> {[context_type, context_id] => name, ...}
+  def self.names_by_context_types_and_ids(context_types_and_ids)
+    ids_by_type = Hash.new([])
+    context_types_and_ids.each do |type, id|
+      next unless type && ContextTypes.const_defined?(type)
+      ids_by_type[type] += [id]
+    end
+
+    result = Hash.new
+    ids_by_type.each do |type, ids|
+      klass = ContextTypes.const_get(type)
+      klass.where(:id => ids).select([:id, :name]).map {|c| result[[type, c.id]] = c.name}
+    end
+    result
   end
 
   def self.find_by_asset_string(string)
@@ -208,5 +224,13 @@ module Context
 
   def is_a_context?
     true
+  end
+
+  # Public: Boolean flag re: whether draft state is enabled or not. This
+  # method should be overridden in classes that include Context.
+  #
+  # Returns false
+  def draft_state_enabled?
+    false
   end
 end

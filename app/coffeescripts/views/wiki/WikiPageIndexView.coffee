@@ -1,60 +1,131 @@
 define [
+  'jquery'
+  'i18n!pages'
+  'wikiSidebar'
+  'compiled/models/WikiPage'
   'compiled/views/PaginatedCollectionView'
+  'compiled/views/wiki/WikiPageEditView'
   'compiled/views/wiki/WikiPageIndexItemView'
   'jst/wiki/WikiPageIndex'
-  'jquery'
   'compiled/views/StickyHeaderMixin'
+  'compiled/str/splitAssetString'
   'jquery.disableWhileLoading'
-], (PaginatedCollectionView, itemView, template,$, StickyHeaderMixin) ->
+], ($, I18n, wikiSidebar, WikiPage, PaginatedCollectionView, WikiPageEditView, itemView, template, StickyHeaderMixin, splitAssetString) ->
 
   class WikiPageIndexView extends PaginatedCollectionView
-    initialize: ->
-      super
-      @sortOrders =
-        title: 'asc'
-        created_at: 'desc'
-        updated_at: 'desc'
-
-      # Next sort order to use when column is clicked
-      @nextSortOrders =
-        title: 'desc'
-        created_at: 'desc'
-        updated_at: 'desc'
-
     @mixin StickyHeaderMixin
     @mixin
-      el: '#content'
-      template: template
-      itemView: itemView
-
       events:
         'click .new_page': 'createNewPage'
-        'click .canvas-sortable-header-row a[data-sort-field]': 'sort'
+        'click .header-row a[data-sort-field]': 'sort'
+
+      els:
+        '.no-pages': '$noPages'
+        '.no-pages a:first-child': '$noPagesLink'
+        '.header-row a[data-sort-field]': '$sortHeaders'
+
+    template: template
+    itemView: itemView
+
+    @optionProperty 'default_editing_roles'
+    @optionProperty 'WIKI_RIGHTS'
+
+    initialize: (options) ->
+      super
+      @WIKI_RIGHTS ||= {}
+
+      @itemViewOptions ||= {}
+      @itemViewOptions.indexView = @
+      @itemViewOptions.collection = @collection
+      @itemViewOptions.WIKI_RIGHTS = @WIKI_RIGHTS
+
+      @contextAssetString = options?.contextAssetString
+      [@contextName, @contextId] = splitAssetString(@contextAssetString) if @contextAssetString
+      @itemViewOptions.contextName = @contextName
+
+      @collection.on 'fetch', =>
+        unless @fetched
+          @fetched = true
+          @render()
+      @collection.on 'fetched:last', =>
+        @fetchedLast = true
+        @render()
+
+      @collection.on 'sortChanged', @sortChanged
+      @currentSortField = @collection.currentSortField
+
+    afterRender: ->
+      super
+      @$noPages.redirectClickTo(@$noPagesLink)
+      @renderSortHeaders()
 
     sort: (event) ->
-      currentTarget = $(event.currentTarget)
-      currentSortField = @collection.options.params?.sort or "title"
-      newSortField = $(event.currentTarget).data 'sort-field'
+      event?.preventDefault()
 
-      if currentSortField is newSortField
-        @sortOrders[newSortField] = if @sortOrders[newSortField] is 'asc' then 'desc' else 'asc'
-        @nextSortOrders[newSortField] = if @sortOrders[newSortField] is 'asc' then 'desc' else 'asc'
-        currentTarget.data 'sort-order',@sortOrders[newSortField]
+      sortField = $(event.currentTarget).data('sort-field')
+      sortOrder = @collection.sortOrders[sortField] unless @currentSortField
+      @$el.disableWhileLoading @collection.sortByField(sortField, sortOrder)
 
-      @collection.setParam 'sort',newSortField
-      @collection.setParam 'order',@sortOrders[newSortField]
-      @$el.disableWhileLoading @collection.fetch().then ->
-        $('.canvas-sortable-header-row a[data-sort-field="' + newSortField + '"]').focus()
+    sortChanged: (currentSortField) =>
+      @currentSortField = currentSortField
+      @renderSortHeaders()
+
+    renderSortHeaders: ->
+      return unless @$sortHeaders
+
+      sortOrders = @collection.sortOrders
+      for sortHeader in @$sortHeaders
+        $sortHeader = $(sortHeader)
+        $i = $sortHeader.find('i')
+
+        sortField = $sortHeader.data('sort-field')
+        sortOrder = if sortOrders[sortField] == 'asc' then 'up' else 'down'
+
+        if sortOrder == 'up'
+          $sortHeader.attr('aria-label', I18n.t('headers.sort_ascending', 'Sort ascending'))
+        else
+          $sortHeader.attr('aria-label', I18n.t('headers.sort_descending', 'Sort descending'))
+
+        $sortHeader.toggleClass 'sort-field-active', sortField == @currentSortField
+        $i.removeClass('icon-mini-arrow-up icon-mini-arrow-down')
+        $i.addClass("icon-mini-arrow-#{sortOrder}")
 
     createNewPage: (ev) ->
       ev?.preventDefault()
 
-      alert('This will eventually create a new page')
+      @$el.hide()
+      $('body').removeClass('index')
+      $('body').addClass('edit with-right-side')
+
+      @editModel = new WikiPage {editing_roles: @default_editing_roles}, contextAssetString: @contextAssetString
+      @editView = new WikiPageEditView
+        model: @editModel
+        wiki_pages_path: ENV.WIKI_PAGES_PATH
+        WIKI_RIGHTS: ENV.WIKI_RIGHTS
+        PAGE_RIGHTS:
+          update: ENV.WIKI_RIGHTS.update_page
+          update_content: ENV.WIKI_RIGHTS.update_page_content
+          read_revisions: ENV.WIKI_RIGHTS.read_revisions
+      @$el.parent().append(@editView.$el)
+
+      @editView.render()
+
+      # override the cancel behavior
+      @editView.on 'cancel', =>
+        @editView.$el.remove()
+        wikiSidebar.hide()
+
+        $('body').removeClass('edit with-right-side')
+        $('body').addClass('index')
+        @$el.show()
 
     toJSON: ->
       json = super
-      json.fetched = @fetched
-      json.sortField = @collection.options.params?.sort or "title"
-      json.sortOrders = @sortOrders
-      json.nextSortOrders = @nextSortOrders
+      json.CAN =
+        CREATE: !!@WIKI_RIGHTS.create_page
+        MANAGE: !!@WIKI_RIGHTS.manage
+        PUBLISH: !!@WIKI_RIGHTS.manage && @contextName == 'courses'
+      json.CAN.VIEW_TOOLBAR = json.CAN.CREATE
+      json.fetched = !!@fetched
+      json.fetchedLast = !!@fetchedLast
       json

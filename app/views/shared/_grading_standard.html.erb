@@ -3,6 +3,9 @@
 <div class="grading_standard" id="grading_standard_<%= grading_standard ? grading_standard.id : 'blank' %>">
   <div class="display_grading_standard">
     <table style="width: 100%;">
+      <caption class="screenreader-only">
+        <%= t('grading_standard_name_table_summary', "A table with only one editable cell containing the name of your grading scheme.") %>
+      </caption>
       <thead>
         <tr>
           <th colspan="4" class="standard_title">
@@ -21,13 +24,13 @@
               <%= grading_standard.title rescue nbsp %>
             </div>
             <div class="editing_box">
-              <%= before_label('scheme_name', 'Scheme Name') %>
-              <input type="text" name="grading_standard[title]" class="scheme_name" value="<%= grading_standard.title rescue "" %>" style="width: 100px;"/>
+              <label for="grading_standard_title"><%= before_label('scheme_name', 'Scheme Name') %></label>
+              <input type="text" id="grading_standard_title" name="grading_standard[title]" class="scheme_name" value="<%= grading_standard.title rescue "" %>" style="width: 100px;"/>
             </div>
           </th>
         </tr>
         <tr>
-          <th style="text-align: left; padding-right: 10px; width: 25%;"><%= before_label('name', 'Name') %></th>
+          <th id="name_header" style="text-align: left; padding-right: 10px; width: 25%;"><%= before_label('name', 'Name') %></th>
           <th colspan="3" style="width: 75%;">
             <div style="float: left; margin-left: 10px;"><%= before_label('range', 'Range') %></div>
             <div class="clear"></div>
@@ -37,6 +40,10 @@
     </table>
     <div class="data_holder">
     <table style="width: 100%; margin-bottom: 20px;" class="grading_standard_data">
+      <caption class="screenreader-only">
+        <%= t('grading_standard_summary', "A table that contains your grading scheme. The name of the value and the range are on the top. Each row contains a minimum and maximum percentage value.") %>
+      </caption>
+      <thead aria-hidden="true"><tr><td></td><td></td><td></td><td></td></tr></thead>
       <tr class="insert_grading_standard" style="display: none; font-size: 0.7em; line-height: 0.6em;">
         <td colspan="4">
           <a href="#" class="insert_grading_standard_link"><%= t('insert_here', 'insert here') %></a>
@@ -46,14 +53,14 @@
         <tr class="grading_standard_row">
           <td style="width: 25%;">
             <div class="editing_box">
-              <input type="text" class="standard_name" name="grading_standard[standard_data][scheme_<%= idx %>][name]" value="<%= row[0] %>" style="width: 25px;"/>
+              <input type="text" class="standard_name" name="grading_standard[standard_data][scheme_<%= idx %>][name]" value="<%= row[0] %>" style="width: 25px;" aria-labelledby="name_header"/>
             </div>
             <div class="displaying name">
               <%= row[0] %>
             </div>
           </td>
-          <td style="padding: 2px 5px; width: 25%;">
-            <div class="editing_box">
+          <td style="padding: 2px 5px; width: 25%;" class="max_score_cell" aria-label="<%= t('range_upper', 'Upper limit of range') %>">
+            <div class="editing_box" aria-hidden="true">
               <span class="edit_max_score"><%= idx == 0 ? 100 : "< #{data[idx - 1][1] * 100}" %></span>%
             </div>
             <div class="displaying">
@@ -62,8 +69,9 @@
           </td>
           <td style="padding: 2px 5px; width: 25%;">
             <div class="editing_box">
-              <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
-              <input type="text" class="standard_value" name="grading_standard[standard_data][scheme_<%= idx %>][value]" value="<%= row[1] * 100 %>" style="width: 30px;"/>%
+              <span style="padding-right: 5px;" aria-hidden="true"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
+              <input type="text" class="standard_value" title="<%= t('range_lower', 'Lower limit of range') %>"
+                     aria-label="<%= t('range_lower', 'Lower limit of range') %>" name="grading_standard[standard_data][scheme_<%= idx %>][value]" value="<%= row[1] * 100 %>" style="width: 30px;"/>%
             </div>
             <div class="displaying">
               <span style="padding-right: 5px;"><%= t('range_of_numbers', '%{lower_number} to %{higher_number}', :lower_number => '', :higher_number => '') %></span>
@@ -71,7 +79,7 @@
             </div>
           </td>
           <td class="editing_box" style="padding: 2px 5px 2px 15px; width: 25%;">
-            <a href="#" class="delete_row_link no-hover"><i class="icon-end standalone-icon"></i></a>
+            <a href="#" class="delete_row_link no-hover" tabindex="0" aria-label="<%= t('remove_row', 'Remove row')%>" title="<%= t('remove_row', 'Remove row')%>"><i class="icon-end standalone-icon"></i></a>
           </td>
         </tr>
         <tr class="insert_grading_standard" style="display: none; font-size: 0.7em; line-height: 0.6em;">

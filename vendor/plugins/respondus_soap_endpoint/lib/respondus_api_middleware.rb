@@ -22,7 +22,7 @@ class RespondusAPIMiddleware
     # code ensures that our gem is on the front of the load order, before the
     # system ruby load path.
     # see http://code.google.com/p/phusion-passenger/issues/detail?id=133
-    soap_gem_path_idx = $LOAD_PATH.index { |p| p =~ /\/soap4r-[\d.]+\/lib/ }
+    soap_gem_path_idx = $LOAD_PATH.index { |p| p.to_s =~ /\/soap4r-[\d.]+\/lib/ }
     if soap_gem_path_idx
       soap_gem_path = $LOAD_PATH.delete_at(soap_gem_path_idx)
       $LOAD_PATH.unshift(soap_gem_path)

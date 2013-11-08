@@ -1,5 +1,5 @@
-<% 
-  question = display_question 
+<%
+  question = display_question
   question_type = answer_type(question)
   user_answer ||= nil
   user_answer_hash ||= {}
@@ -14,7 +14,7 @@
   correct = user_answer && hash_get(user_answer, :correct) == true
   incorrect = user_answer && hash_get(user_answer, :correct) == false
   unanswered = (%w{multiple_choice_question true_false_question}.include?(hash_get(question, 'question_type')) && incorrect && hash_get(user_answer, 'text').blank?) ||
-    (hash_get(question, 'question_type') == 'multiple_answers_question' && incorrect && user_answer.select{|k, v| k.to_s.match(/answer_/) && v.to_s != '0' }.length == 0) || 
+    (hash_get(question, 'question_type') == 'multiple_answers_question' && incorrect && user_answer.select{|k, v| k.to_s.match(/answer_/) && v.to_s != '0' }.length == 0) ||
     (hash_get(question, 'question_type') == 'file_upload_question' && hash_get(user_answer, 'attachment_ids').blank?) ||
     false
   partial_credit = user_answer && hash_get(user_answer, :correct) == 'partial'
@@ -27,10 +27,13 @@
 <div class="question_holder <%= "group" if in_group %>" id="<%= "question_template" unless question %>" style="<%= hidden unless question %>">
   <div style="display: block; height: 1px; overflow: hidden;">&nbsp;</div>
   <a name="question_<%= hash_get(question, :id, "blank") %>"></a>
-  <div class="display_question question <%= question_type.question_type %> <%= "marked" if assessing && @stored_params && @stored_params["question_#{hash_get(question, :id)}_marked"].present? %> <%= "correct" if correct %> <%= "incorrect" if incorrect %> <%= "unanswered" if unanswered %> <%= "partial_credit" if partial_credit %>" id="question_<%= hash_get(question, :id, "new") %>">
+  <% marked = assessing && @stored_params && @stored_params["question_#{hash_get(question, :id)}_marked"].present? %>
+  <div class="display_question question <%= question_type.question_type %> <%= "marked" if marked %> <%= "correct" if correct %> <%= "incorrect" if incorrect %> <%= "unanswered" if unanswered %> <%= "partial_credit" if partial_credit %>" id="question_<%= hash_get(question, :id, "new") %>">
     <div class="move"><%= image_tag "move.png", :class => "move_icon" %></div>
     <% if assessing && @quiz_presenter.can_go_back? %>
-      <div class="flag_question"></div>
+      <div class="flag_question" role="checkbox" aria-checked="<%= marked ? "true" : "false" %>">
+        <span class="screenreader-only"><%= t(:flag_this_question, "Flag this Question") %></span>
+      </div>
     <% end %>
     <div class="header" <%= hidden(true) if (assessing || assessment_results) && question_type && question_type.entry_type == "none" %>>
       <span class="name question_name" tabindex="0" role="heading"><%= hash_get(question, :question_name) %></span>
@@ -43,25 +46,39 @@
             <% if hash_get(user_answer, :correct) == "undefined" %>
               <%= t(:not_yet_graded, 'Not yet graded') %>
             <% else %>
-              <%= render_score(hash_get(user_answer, :points)) %>
+              <% if hash_get(user_answer,:score_before_regrade)%>
+                <%= t('original_score', 'Original Score:') %>
+                <%= render_score(hash_get(user_answer, :score_before_regrade)) %>
+              <% else %>
+                <%= render_score(hash_get(user_answer, :points)) %>
+              <% end %>
             <% end %>
           <% end %>
           <% question[:points_possible] = 0 if question_type.answer_type == 'none' %>
           <%= t(:points_possible, "%{points_possible} pts", :points_possible => raw("<span class=\"points question_points\"> / #{hash_get(question, :points_possible, "0")}</span>")) %>
+          <% if hash_get(user_answer, :score_before_regrade) %>
+            <span class=user-regrade-points>
+              <%= t('regraded_score', 'Regraded Score:') %>
+              <%= render_score hash_get(user_answer, :points) %>
+              <%= t(:points_possible, "%{points_possible} pts", :points_possible => raw("<span class=\"points question_points\"> / #{hash_get(question, :points_possible, "0")}</span>")) %>
+            </span>
+          <% end %>
         </div>
       <% else %>
         <%= t(:points_possible, "%{points_possible} pts", :points_possible => raw("<span class=\"points question_points\">#{hash_get(question, :points_possible, "0")}</span>")) %>
       <% end %>
-      </span>
+    </span>
       <% if question && hash_get(question, :question_type) != "missing_word_question" && hash_get(question, :question_text) && hash_get(question, :question_text).length < 255 %>
         <span class='ui-helper-hidden-accessible'><%= hash_get(question, :question_text) %></span>
-      <% else %> 
+      <% else %>
         <a class='ui-helper-hidden-accessible' href="#question_<%= hash_get(question, :id, "new") %>_question_text"><%= t(:skip_question_text, "Skip to question text.") %></a>
       <% end %>
     </div>
     <div class="links" style="<%= hidden if user_answer || assessing %>">
-      <a href="#" class="edit_question_link no-hover" title="<%= t 'links.edit_question', 'Edit this Question' %>"><i class="icon-edit standalone-icon"></i></a>
-      <a href="#" class="delete_question_link no-hover" title="<%= t 'links.delete_question', 'Delete this Question' %>"><i class="icon-end standalone-icon"></i></a>
+      <% edit_question_title = t('links.edit_question', 'Edit this Question') %>
+      <% delete_question_title = t('links.delete_question', 'Delete this Question') %>
+      <a href="#" class="edit_question_link no-hover" title="<%= edit_question_title %>"><i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_question_title %></span></i></a>
+      <a href="#" class="delete_question_link no-hover" title="<%= delete_question_title %>"><i class="icon-end standalone-icon"><span class="screenreader-only"><%= delete_question_title %></span></i></a>
     </div>
     <div style="display: none;">
       <span class="question_type"><%= (question_type.try_rescue(:question_type)) %></span>
@@ -79,7 +96,19 @@
         <textarea style="display: none;" name="question_text" class="textarea_question_text"><%= h(hash_get(question, :question_text)) %></textarea>
       </div>
       <div id="question_<%= hash_get(question, :id, "new") %>_question_text" class="question_text user_content">
+        <% if user_answer && user_answer[:regrade_option] %>
+          <p class="ui-widget">
+            <div class="ui-state-warning ui-corner-all pad-box-micro text-center">
+              <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
+              <strong>
+                <%= t('submission_was_regraded',
+                      'This question has been regraded; your score was affected.') %>
+               </strong>
+            </div>
+          </p>
+        <% end %>
         <% if question && hash_get(question, :question_type) == "missing_word_question" %>
+
           <span class="text_before_answers"><%= user_content(hash_get(question, :question_text)) %></span>
           <select class="answer_select question_input" name="question_<%= hash_get(question, :id, "blank") %>">
             <option value=""><%= t(:default_question_answer, "[ Choose ]") %></option>
@@ -89,6 +118,7 @@
           </select>
           <span class="text_after_answers"><%= user_content(hash_get(question, :text_after_answers)) %></span>
         <% elsif question && hash_get(question, :question_type) == "fill_in_multiple_blanks_question" && @stored_params %>
+
           <% answer_list = []
              if assessment_results
                variables = hash_get(question, :answers, []).map{|a| hash_get(a, :blank_id) }.compact.uniq
@@ -340,7 +370,7 @@
     <% end %>
     <% if question_bank_id %>
       <div class="bottom_links">
-        <a href="#" class="move_question_link"><%= t('links.move_copy_question', "move/copy question to another bank") %></a> 
+        <a href="#" class="move_question_link"><%= t('links.move_copy_question', "move/copy question to another bank") %></a>
       </div>
     <% end %>
     <div class="clear"></div>

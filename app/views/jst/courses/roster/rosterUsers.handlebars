@@ -25,7 +25,9 @@
     <p>{{#t "you_can_search_by"}}You can search by:{{/t}}</p>
     <ul>
       <li>{{#t "name"}}Name{{/t}}</li>
+      {{#if canViewLoginIdColumn}}
       <li>{{#t "login_name_or_sis_id"}}Login / SIS ID{{/t}}</li>
+      {{/if}}
       <li>{{#t "canvas_user_id"}}Canvas User ID{{/t}}</li>
     </ul>
   </div>

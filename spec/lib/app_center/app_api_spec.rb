@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 # Manually stubbing the actual API request
 describe AppCenter::AppApi do
-  let(:api){ AppCenter::AppApi.new }
+  let(:api) { AppCenter::AppApi.new }
 
   before(:each) do
     default_settings = api.app_center.default_settings
@@ -43,7 +43,7 @@ describe AppCenter::AppApi do
       response = mock
       response.stubs(:body).returns(
           {
-              'meta' => { "next" => "https://www.example.com/api/v1/apps?offset=60"},
+              'meta' => {"next" => "https://www.example.com/api/v1/apps?offset=60"},
               'current_offset' => 0,
               'limit' => 50,
               'objects' => %w(object1 object2 object3 object4)
@@ -70,16 +70,16 @@ describe AppCenter::AppApi do
       enable_cache do
         response.stubs(:body).returns('')
         Canvas::HTTP.expects(:get).returns(response).twice()
-        api.fetch_app_center_response('', 13.minutes, 7,4).should == {}
-        api.fetch_app_center_response('', 13.minutes, 7,4).should == {}
+        api.fetch_app_center_response('', 13.minutes, 7, 4).should == {}
+        api.fetch_app_center_response('', 13.minutes, 7, 4).should == {}
       end
     end
 
     it "can handle an error response" do
-      message = {"message" => "Tool not found","type" =>"error"}
+      message = {"message" => "Tool not found", "type" => "error"}
       response.stubs(:body).returns(message.to_json)
       Canvas::HTTP.expects(:get).returns(response)
-      api.fetch_app_center_response('', 13.minutes, 6,9).should == message
+      api.fetch_app_center_response('', 13.minutes, 6, 9).should == message
     end
 
     it "respects per_page param" do
@@ -115,7 +115,7 @@ describe AppCenter::AppApi do
       response = mock
       response.stubs(:body).returns(
           {
-              'meta' => { "next" => "https://www.example.com/api/v1/apps?offset=72"},
+              'meta' => {"next" => "https://www.example.com/api/v1/apps?offset=72"},
               'current_offset' => 0,
               'limit' => 72,
               'objects' => [
@@ -135,7 +135,7 @@ describe AppCenter::AppApi do
 
     it "gets a list of apps" do
       Canvas::HTTP.stubs(:get).returns(response)
-      apps = api.get_apps()['objects']
+      apps = api.get_apps()['lti_apps']
       apps.should be_a Array
       apps.size.should == 2
     end
@@ -177,24 +177,181 @@ describe AppCenter::AppApi do
         api.get_apps(1)
       end
     end
+
+    it "can handle an edu-apps api v1 response" do
+      app = {
+          "name" => "Wikipedia",
+          "id" => "wikipedia",
+          "categories" => [
+              "Completely Free",
+              "Open Content",
+              "Web 2.0"
+          ],
+          "levels" => [
+              "K-6th Grade",
+              "7th-12th Grade",
+              "Postsecondary"
+          ],
+          "description" => "Search through English Wikipedia articles and link to or embed these articles into course material.",
+          "app_type" => "open_launch",
+          "short_description" => "Articles from The Free Encyclopedia",
+          "extensions" => [
+              "editor_button",
+              "resource_selection"
+          ],
+          "beta" => false,
+          "test_instructions" => "",
+          "support_link" => "https://twitter.com/whitmer",
+          "ims_link" => "",
+          "author_name" => "Brian Whitmer",
+          "privacy_level" => "anonymous",
+          "width" => 590,
+          "height" => 450,
+          "added" => "2012-03-22T00:00:00Z",
+          "uses" => 30,
+          "submitter_name" => nil,
+          "submitter_url" => nil,
+          "ratings_count" => 1,
+          "comments_count" => 1,
+          "avg_rating" => 5,
+          "banner_url" => "http://mosdef.instructure.com/tools/wikipedia/banner.png",
+          "logo_url" => "http://mosdef.instructure.com/tools/wikipedia/logo.png",
+          "icon_url" => "http://mosdef.instructure.com/tools/wikipedia/icon.png",
+          "new" => false,
+          "config_url" => "http://mosdef.instructure.com/tools/wikipedia/config.xml",
+          "any_key" => true,
+          "preview" => {
+              "url" => "/tools/wikipedia/index.html",
+              "height" => 450
+          },
+          "short_name" => "wikipedia",
+          "banner_image_url" => "http://mosdef.instructure.com/tools/wikipedia/banner.png",
+          "logo_image_url" => "http://mosdef.instructure.com/tools/wikipedia/logo.png",
+          "icon_image_url" => "http://mosdef.instructure.com/tools/wikipedia/icon.png",
+          "config_xml_url" => "http://mosdef.instructure.com/tools/wikipedia/config.xml",
+          "average_rating" => 5,
+          "total_ratings" => 1,
+          "config_options" => [
+            {
+                "name" => "launch_url",
+                "description" => "Launch URL",
+                "type" => "text",
+                "value" => "example.com",
+                "required" => true
+            }
+          ]
+      }
+
+      response.stubs(:body).returns({"objects" => [app]}.to_json)
+      Canvas::HTTP.expects(:get).returns(response)
+      json = api.get_apps(0)
+      tool = json['lti_apps'].first
+      tool['short_name'].should == app['id']
+      tool['banner_image_url'].should == app['banner_url']
+      tool['logo_image_url'].should == app['logo_url']
+      tool['icon_image_url'].should == app['icon_url']
+      tool['config_xml_url'].should == app['config_url']
+      tool['average_rating'].should == app['avg_rating']
+      tool['total_ratings'].should == app['ratings_count']
+      tool['requires_secret'].should == !app['any_key']
+      opt = tool['config_options'].first
+      opt['name'].should == app['config_options'].first['name']
+      opt['description'].should == app['config_options'].first['description']
+      opt['param_type'].should == app['config_options'].first['type']
+      opt['value'].should == app['config_options'].first['value']
+      opt['is_required'].should == app['config_options'].first['required']
+    end
+
+    it "can handle an edu-apps api v2 response" do
+      app = {
+          'id' => 2,
+          'short_name' => "public_collections",
+          'name' => "Public Collections",
+          'short_description' => "",
+          'status' => "active",
+          'is_public' => true,
+          'app_type' => "open_launch",
+          'preview_url' => "http://www.edu-apps.org/tools/public_collections/index.html",
+          'banner_image_url' => "http://www.edu-apps.org/tools/public_collections/banner.png",
+          'logo_image_url' => "http://www.edu-apps.org/tools/public_collections/logo.png",
+          'icon_image_url' => nil,
+          'average_rating' => 0,
+          'total_ratings' => 0,
+          'is_certified' => false,
+          'config_xml_url' => "http://localhost:3001/configurations/b1us84b2fewp5gqr.xml",
+          'requires_secret' => true,
+          'tags' => [
+              {
+                  'id' => 11,
+                  'short_name' => "media",
+                  'name' => "Media",
+                  'context' => "category"
+              },
+              {
+                  'id' => 12,
+                  'short_name' => "open_content",
+                  'name' => "Open Content",
+                  'context' => "category"
+              },
+              {
+                  'id' => 16,
+                  'short_name' => "web_20",
+                  'name' => "Web 2.0",
+                  'context' => "category"
+              },
+              {
+                  'id' => 17,
+                  'short_name' => "free",
+                  'name' => "Completely Free",
+                  'context' => "category"
+              },
+              {
+                  'id' => 19,
+                  'short_name' => "K-6",
+                  'name' => "K-6th Grade",
+                  'context' => "education_level"
+              },
+              {
+                  'id' => 20,
+                  'short_name' => "7-12",
+                  'name' => "7th-12th Grade",
+                  'context' => "education_level"
+              },
+              {
+                  'id' => 21,
+                  'short_name' => "postsecondary",
+                  'name' => "Postsecondary",
+                  'context' => "education_level"
+              }
+          ]
+      }
+      response.stubs(:body).returns({"lti_apps" => [app]}.to_json)
+      Canvas::HTTP.expects(:get).returns(response)
+      json = api.get_apps(0)
+      tool = json['lti_apps'].first
+
+      tool['categories'].length.should == 4
+      tool['extensions'].should be_nil
+      tool['levels'].length.should == 3
+    end
   end
 
   describe '#get_app_review' do
     let(:response) do
       response = mock
       response.stubs(:body).returns(
-        {
-          'user_avatar_url' => "http://example.com/user/avatar/50x50.png",
-          'source_name'     => "Human-readable name of platform/app where user posted",
-          'tool_name'       => "Human-readable name of the app",
-          'rating'          => 3,
-          'source_url'      => "http://example.com/platform_or_app/homepage",
-          'user_name'       => "User name",
-          'user_url'        => "http://example.com/user/profile",
-          'id'              => 1,
-          'comments'        => "user-provided comments, if any",
-          'created'         => "Jun 19, 2012"
-        }.to_json
+          {
+              'user_avatar_url' => "http://example.com/user/avatar/50x50.png",
+              'source_name' => "Human-readable name of platform/app where user posted",
+              'tool_name' => "Human-readable name of the app",
+              'rating' => 3,
+              'source_url' => "http://example.com/platform_or_app/homepage",
+              'user_name' => "User name",
+              'user_url' => "http://example.com/user/profile",
+              'id' => 1,
+              'comments' => "user-provided comments, if any",
+              'created' => "Jun 19, 2012"
+          }.to_json
       )
       response
     end
@@ -224,61 +381,70 @@ describe AppCenter::AppApi do
     let(:response) do
       response = mock
       response.stubs(:body).returns(
-        {
-          "created"=>"May 30, 2013",
-          "id"=>91,
-          "user_name"=>"User name",
-          "user_url"=>"http://coderberry.me",
-          "user_avatar_url"=>"https://si0.twimg.com/profile_images/3254281604/08df82139b53dfa4a3a5adfa7e99426e_bigger.jpeg",
-          "tool_name"=>"uCertify",
-          "rating"=>3,
-          "comments"=>"Lorem ipsum dolor sit amet, consectetur adipisicing elit.",
-          "source_name"=>"EricB Local",
-          "source_url"=>"localhost",
-          "app" => {
-            "name" => "uCertify",
-            "id" => "ucertify",
-            "categories" => ["Assessment", "Science", "Study Helps"],
-            "levels"=>["7th-12th Grade", "Postsecondary"],
-            "description"=>"Embed test preparation resources for IT certifications.<br/><br/>\r\nConfiguration instructions should be provided by your account representative.",
-            "beta"=>false,
-            "test_instructions"=>"",
-            "support_link"=>"",
-            "ims_link"=>"http://www.imsglobal.org/cc/detail.cfm?ID=126",
-            "author_name"=>"",
-            "privacy_level"=>"public",
-            "launch_url"=>"{{ launch_url }}",
-            "config_options"=>[
-              {
-                "name"=>"launch_url",
-                "description"=>"Launch URL",
-                "type"=>"text",
-                "value"=>"",
-                "required"=>true
+          {
+              "created" => "May 30, 2013",
+              "id" => 91,
+              "user_name" => "User name",
+              "user_url" => "http://coderberry.me",
+              "user_avatar_url" => "https://si0.twimg.com/profile_images/3254281604/08df82139b53dfa4a3a5adfa7e99426e_bigger.jpeg",
+              "tool_name" => "uCertify",
+              "rating" => 3,
+              "comments" => "Lorem ipsum dolor sit amet, consectetur adipisicing elit.",
+              "source_name" => "EricB Local",
+              "source_url" => "localhost",
+              "app" => {
+                  "name" => "uCertify",
+                  "id" => "ucertify",
+                  "categories" => ["Assessment", "Science", "Study Helps"],
+                  "levels" => ["7th-12th Grade", "Postsecondary"],
+                  "description" => "Embed test preparation resources for IT certifications.<br/><br/>\r\nConfiguration instructions should be provided by your account representative.",
+                  "beta" => false,
+                  "test_instructions" => "",
+                  "support_link" => "",
+                  "ims_link" => "http://www.imsglobal.org/cc/detail.cfm?ID=126",
+                  "author_name" => "",
+                  "privacy_level" => "public",
+                  "launch_url" => "{{ launch_url }}",
+                  "config_options" => [
+                      {
+                          "name" => "launch_url",
+                          "description" => "Launch URL",
+                          "type" => "text",
+                          "value" => "",
+                          "required" => true
+                      }
+                  ],
+                  "added" => "2013-04-06T21:23:44Z",
+                  "uses" => 0,
+                  "submitter_name" => "whitmer",
+                  "submitter_url" => "https://twitter.com/whitmer",
+                  "related" => [],
+                  "ratings_count" => 1,
+                  "comments_count" => 1,
+                  "avg_rating" => 3.0,
+                  "banner_url" => "https://www.edu-apps.org/tools/ucertify/banner.png",
+                  "logo_url" => "https://www.edu-apps.org/tools/ucertify/logo.png",
+                  "icon_url" => "https://www.edu-apps.org/tools/ucertify/icon.png",
+                  "new" => true,
+                  "config_url" => "https://www.edu-apps.org/tools/ucertify/config.xml"
               }
-            ],
-            "added"=>"2013-04-06T21:23:44Z",
-            "uses"=>0,
-            "submitter_name"=>"whitmer",
-            "submitter_url"=>"https://twitter.com/whitmer",
-            "related"=>[],
-            "ratings_count"=>1,
-            "comments_count"=>1,
-            "avg_rating"=>3.0,
-            "banner_url"=>"https://www.edu-apps.org/tools/ucertify/banner.png",
-            "logo_url"=>"https://www.edu-apps.org/tools/ucertify/logo.png",
-            "icon_url"=>"https://www.edu-apps.org/tools/ucertify/icon.png",
-            "new"=>true,
-            "config_url"=>"https://www.edu-apps.org/tools/ucertify/config.xml"
-          }
-        }.to_json
+          }.to_json
       )
       response
     end
 
+    let(:user) do
+      user = User.new()
+      user.uuid = 12345
+      user.name = "User name"
+      user
+    end
+
+
     it "adds an app review" do
       Net::HTTP.any_instance.stubs(:request).returns(response)
-      review = api.add_app_review('first_tool', 12345, "User name", 3, "Lorem ipsum dolor sit amet, consectetur adipisicing elit.", 'http://images2.fanpop.com/image/photos/12300000/Avatar-avatar-12304477-1280-720.jpg')
+
+      review = api.add_app_review('first_tool', user, 3, "Lorem ipsum dolor sit amet, consectetur adipisicing elit.")
       review.should be_a Hash
 
       review['rating'].should == 3
@@ -292,7 +458,8 @@ describe AppCenter::AppApi do
 
       api.app_center.should_not be_enabled
 
-      response = api.add_app_review('first_tool', 12345, "User name", 3, "Lorem ipsum dolor sit amet, consectetur adipisicing elit.", 'http://images2.fanpop.com/image/photos/12300000/Avatar-avatar-12304477-1280-720.jpg')
+      response = api.add_app_review('first_tool', user, 3, "Lorem ipsum dolor sit amet, consectetur adipisicing elit.")
+
       response.should be_a Hash
       response.size.should == 0
     end
@@ -303,7 +470,7 @@ describe AppCenter::AppApi do
       response = mock
       response.stubs(:body).returns(
           {
-              'meta' => { "next" => "https://www.example.com/api/v1/apps/first_tool/reviews?offset=15"},
+              'meta' => {"next" => "https://www.example.com/api/v1/apps/first_tool/reviews?offset=15"},
               'current_offset' => 0,
               'limit' => 15,
               'objects' => [
@@ -325,7 +492,7 @@ describe AppCenter::AppApi do
 
     it "gets an apps reviews" do
       Canvas::HTTP.stubs(:get).returns(response)
-      reviews = api.get_app_reviews('first_tool')['objects']
+      reviews = api.get_app_reviews('first_tool')['reviews']
       reviews.should be_a Array
       reviews.size.should == 2
     end
@@ -359,11 +526,20 @@ describe AppCenter::AppApi do
     it "caches multiple calls" do
       enable_cache do
         Canvas::HTTP.expects(:get).returns(response).times(2)
-        api.get_app_reviews('first_tool',0)
-        api.get_app_reviews('first_tool',1)
-        api.get_app_reviews('first_tool',0)
-        api.get_app_reviews('first_tool',1)
+        api.get_app_reviews('first_tool', 0)
+        api.get_app_reviews('first_tool', 1)
+        api.get_app_reviews('first_tool', 0)
+        api.get_app_reviews('first_tool', 1)
       end
+    end
+
+    it "can handle an edu-apps api v1 response" do
+      Canvas::HTTP.stubs(:get).returns(response)
+      reviews = api.get_app_reviews('first_tool')['reviews']
+      reviews.first.should be_key('user')
+      reviews.first['user'].should be_key('name')
+      reviews.first['user'].should be_key('url')
+      reviews.first['user'].should be_key('avatar_url')
     end
   end
 end

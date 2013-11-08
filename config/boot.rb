@@ -3,7 +3,7 @@
 
 require File.expand_path("../canvas_rails3", __FILE__)
 
-if CANVAS_RAILS3
+unless CANVAS_RAILS2
   require 'rubygems'
 
   # Set up gems listed in the Gemfile.

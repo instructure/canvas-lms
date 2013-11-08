@@ -80,25 +80,27 @@ define([
       updateModuleItemPositions: function(event, ui) {
         var $module = ui.item.parents(".context_module");
         var url = $module.find(".reorder_items_url").attr('href');
-        $module.find(".content").loadingImage();
         var items = [];
         $module.find(".context_module_items .context_module_item").each(function() {
           items.push($(this).getTemplateData({textValues: ['id']}).id);
         });
-        $.ajaxJSON(url, 'POST', {order: items.join(",")}, function(data) {
-          $module.find(".content").loadingImage('remove');
-          if(data && data.context_module && data.context_module.content_tags) {
-            for(var idx in data.context_module.content_tags) {
-              var tag = data.context_module.content_tags[idx].content_tag;
-              $module.find("#context_module_item_" + tag.id).fillTemplateData({
-                data: {position: tag.position}
-              });
+        $module.find(".context_module_items.ui-sortable").sortable('disable');
+        $module.disableWhileLoading(
+          $.ajaxJSON(url, 'POST', {order: items.join(",")}, function(data) {
+            if(data && data.context_module && data.context_module.content_tags) {
+              for(var idx in data.context_module.content_tags) {
+                var tag = data.context_module.content_tags[idx].content_tag;
+                $module.find("#context_module_item_" + tag.id).fillTemplateData({
+                  data: {position: tag.position}
+                });
+              }
             }
-          }
-        }, function(data) {
-          $module.find(".content").loadingImage('remove');
-          $module.find(".content").errorBox(I18n.t('errors.reorder', 'Reorder failed, please try again.'));
-        });
+            $module.find(".context_module_items.ui-sortable").sortable('enable');
+          }, function(data) {
+            $module.find(".content").loadingImage('remove');
+            $module.find(".content").errorBox(I18n.t('errors.reorder', 'Reorder failed, please try again.'));
+          })
+        );
       },
 
       refreshProgressions: function(show_links) {
@@ -245,7 +247,7 @@ define([
       editModule: function($module) {
         var $form = $("#add_context_module_form");
         $form.data('current_module', $module);
-        var data = $module.getTemplateData({textValues: ['name', 'unlock_at', 'require_sequential_progress']});
+        var data = $module.getTemplateData({textValues: ['name', 'unlock_at', 'require_sequential_progress', 'publish_final_grade']});
         $form.fillFormData(data, {object_name: 'context_module'});
         var isNew = false;
         if($module.attr('id') == 'context_module_new') {
@@ -262,6 +264,7 @@ define([
         }
         $form.find("#unlock_module_at").prop('checked', data.unlock_at);
         $form.find("#require_sequential_progress").attr('checked', data.require_sequential_progress == "true" || data.require_sequential_progress == "1");
+        $form.find("#publish_final_grade").attr('checked', data.publish_final_grade == "true" || data.publish_final_grade == "1");
         $form.find(".prerequisites_entry").showIf($("#context_modules .context_module").length > 1);
         var prerequisites = [];
         $module.find(".prerequisites .criterion").each(function() {
@@ -804,17 +807,17 @@ define([
         options.submit = function(item_data) {
           var $module = $("#context_module_" + module.id);
           var $item = modules.addItemToModule($module, item_data);
-          $module.find(".context_module_items.ui-sortable").sortable('refresh');
+          $module.find(".context_module_items.ui-sortable").sortable('refresh').sortable('disable');
           var url = $module.find(".add_module_item_link").attr('rel');
-          $item.loadingImage({image_size: 'small'});
-          $.ajaxJSON(url, 'POST', item_data, function(data) {
-            $item.loadingImage('remove');
-            $item.remove();
-            data.content_tag.type = item_data['item[type]'];
-            modules.addItemToModule($module, data.content_tag);
-            $module.find(".context_module_items.ui-sortable").sortable('refresh');
-            modules.updateAssignmentData();
-          });
+          $module.disableWhileLoading(
+            $.ajaxJSON(url, 'POST', item_data, function(data) {
+              $item.remove();
+              data.content_tag.type = item_data['item[type]'];
+              modules.addItemToModule($module, data.content_tag);
+              $module.find(".context_module_items.ui-sortable").sortable('enable').sortable('refresh');
+              modules.updateAssignmentData();
+            })
+          );
         };
         INST.selectContentDialog(options);
       }
@@ -1229,9 +1232,13 @@ define([
       });
     });
     $(document).fragmentChange(function(event, hash) {
-      var module = $(hash.replace(/module/, "context_module"));
-      if (module.hasClass('collapsed_module')) {
-        module.find(".expand_module_link").triggerHandler('click');
+      if (hash == '#student_progressions') {
+        $(".module_progressions_link").trigger('click');
+      } else {
+        var module = $(hash.replace(/module/, "context_module"));
+        if (module.hasClass('collapsed_module')) {
+          module.find(".expand_module_link").triggerHandler('click');
+        }
       }
     });
 

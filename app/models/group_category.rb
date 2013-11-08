@@ -200,34 +200,41 @@ class GroupCategory < ActiveRecord::Base
     smallest_group_size = groups_by_size.keys.min
     members_count = members.size
 
-    members.sort_by{ rand }.each_with_index do |member, i|
-      group = groups_by_size[smallest_group_size].first
-      membership = group.add_user(member)
-      if membership.valid?
-        new_memberships << membership
-        touched_groups << group.id
+    GroupMembership.skip_callback(:update_cached_due_dates) do
+      members.sort_by{ rand }.each_with_index do |member, i|
+        group = groups_by_size[smallest_group_size].first
+        membership = group.add_user(member)
+        if membership.valid?
+          new_memberships << membership
+          touched_groups << group.id
 
-        # successfully added member to group, move it to the new size bucket
-        groups_by_size[smallest_group_size].shift
-        groups_by_size[smallest_group_size + 1] ||= []
-        groups_by_size[smallest_group_size + 1] << group
+          # successfully added member to group, move it to the new size bucket
+          groups_by_size[smallest_group_size].shift
+          groups_by_size[smallest_group_size + 1] ||= []
+          groups_by_size[smallest_group_size + 1] << group
 
-        # was that the last group of that size?
-        if groups_by_size[smallest_group_size].empty?
-          groups_by_size.delete(smallest_group_size)
-          smallest_group_size += 1
+          # was that the last group of that size?
+          if groups_by_size[smallest_group_size].empty?
+            groups_by_size.delete(smallest_group_size)
+            smallest_group_size += 1
+          end
         end
+        update_progress(i, members_count)
       end
-      update_progress(i, members_count)
     end
-    Group.where(:id => touched_groups.to_a).update_all(:updated_at => Time.now.utc) unless touched_groups.empty?
+    if !touched_groups.empty?
+      Group.where(:id => touched_groups.to_a).update_all(:updated_at => Time.now.utc)
+      if context_type == 'Course'
+        DueDateCacher.recompute_course(context_id, Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id))
+      end
+    end
     complete_progress
     return new_memberships
   end
 
   def create_group_count=(num)
     @create_group_count = num && num > 0 ?
-      [num, Setting.get_cached('max_groups_in_new_category', '200').to_i].min :
+      [num, Setting.get('max_groups_in_new_category', '200').to_i].min :
       nil
   end
 
@@ -246,9 +253,12 @@ class GroupCategory < ActiveRecord::Base
     end
   end
 
+  def unassigned_users
+    context.users_not_in_groups(groups.active)
+  end
+
   def assign_unassigned_members
-    potential_members = context.users_not_in_groups(groups.active)
-    distribute_members_among_groups(potential_members, groups.active)
+    distribute_members_among_groups(unassigned_users, groups.active)
   end
 
   def assign_unassigned_members_in_background

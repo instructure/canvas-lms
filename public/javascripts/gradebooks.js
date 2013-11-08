@@ -71,6 +71,7 @@ define([
       $courseSections  = $(".outer_student_name .course_section"),
       contextId = $("#current_context_code").text().split("_")[1],
       sectionToShow = userSettings.contextGet('grading_show_only_section');
+  sectionToShow = sectionToShow && String(sectionToShow);
 
   $courseSections.each(function(){
     possibleSections[$(this).data('course_section_id')] = $(this).attr('title'); 
@@ -571,6 +572,7 @@ define([
                   title: title,
                   points_possible: data.points_possible,
                   students: students,
+                  context_code: data.context_code,
                   callback: function(selected, cutoff, students) {
                     students = $.grep(students, function($student, idx) {
                       var student = $student.user_data;
@@ -585,6 +587,18 @@ define([
                       }
                     });
                     return $.map(students, function(student) { return student.user_data.id; });
+                  },
+                  subjectCallback: function(selected, cutoff) {
+                    cutoff = cutoff || '';
+                    if(selected == I18n.t('students_who.not_submitted_yet', "Haven't submitted yet")) {
+                      return I18n.t('students_who.no_submission_for', 'No submission for %{assignment}', {assignment: data.title});
+                    } else if (selected == I18n.t("students_who.havent_been_graded", "Haven't been graded")) {
+                      return I18n.t('students_who.no_grade_for', 'No grade for %{assignment}', {assignment: data.title});
+                    } else if(selected == I18n.t('students_who.scored_less_than', "Scored less than")) {
+                      return I18n.t('students_who.scored_less_than_on', 'Scored less than %{cutoff} on %{assignment}', {assignment: data.title, cutoff: cutoff});
+                    } else if(selected == I18n.t('students_who.scored_more_than', "Scored more than")) {
+                      return I18n.t('students_who.scored_more_than_on', 'Scored more than %{cutoff} on %{assignment}', {assignment: data.title, cutoff: cutoff});
+                    }
                   }
                 });
               });

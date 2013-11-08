@@ -89,6 +89,10 @@ class EventStream
       index.for_key(key, options)
     end
 
+    singleton_class.send(:define_method, "#{name}_index") do
+      index
+    end
+
     index
   end
 
@@ -104,14 +108,25 @@ class EventStream
     "#{database_name}.#{table}"
   end
 
-  def ttl_seconds(record)
-    ((record.created_at + time_to_live) - Time.now).to_i
+  def ttl_seconds(timestamp)
+    timestamp.to_i - time_to_live.ago.to_i
+  end
+
+  def fetch_cql
+    "SELECT * FROM #{table} #{read_consistency_clause}WHERE #{id_column} IN (?)"
+  end
+
+  def read_consistency_clause
+    if read_consistency_level
+      "USING CONSISTENCY #{read_consistency_level} "
+    end
   end
 
   private
 
-  def fetch_cql
-    "SELECT * FROM #{table} WHERE #{id_column} IN (?)"
+  def read_consistency_level
+    Setting.get("event_stream.read_consistency.#{database_name}", nil) ||
+      Setting.get("event_stream.read_consistency", nil)
   end
 
   def callbacks_for(operation)
@@ -120,7 +135,7 @@ class EventStream
   end
 
   def execute(operation, record)
-    ttl_seconds = self.ttl_seconds(record)
+    ttl_seconds = self.ttl_seconds(record.created_at)
     return if ttl_seconds < 0
 
     database.batch do

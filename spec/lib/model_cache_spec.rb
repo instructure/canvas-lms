@@ -24,6 +24,8 @@ describe ModelCache do
       set_table_name :users # reuse exiting tables so AR doesn't asplode
       include ModelCache
       cacheable_by :id, :name
+
+      attr_protected
     end
 
     class TestModelCachePseudonym < ActiveRecord::Base
@@ -93,7 +95,7 @@ describe ModelCache do
 
     it "should add to the cache if records are created" do
       ModelCache.with_cache(:test_model_cache_users => [@user]) do
-        user = TestModelCacheUser.create
+        user = TestModelCacheUser.create(workflow_state: 'registered')
 
         u1 = TestModelCacheUser.find_by_id(user.id)
         u1.should equal(user)

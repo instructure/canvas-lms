@@ -174,12 +174,13 @@ module MigratorHelper
   end
   
   def add_assessment_id_prepend
-    if id_prepender
+    if id_prepender && !@settings[:overwrite_quizzes]
       if @course[:assessment_questions] && @course[:assessment_questions][:assessment_questions]
         prepend_id_to_questions(@course[:assessment_questions][:assessment_questions])
       end
       if @course[:assessments] && @course[:assessments][:assessments]
         prepend_id_to_assessments(@course[:assessments][:assessments])
+        prepend_id_to_linked_assessment_module_items(@course[:modules]) if @course[:modules]
       end
     end
   end
@@ -194,6 +195,10 @@ module MigratorHelper
   def prepend_id_to_assessments(assessments, prepend_value=nil)
     assessments.each do |a|
       a[:migration_id] = prepend_id(a[:migration_id], prepend_value)
+      if h = a[:assignment]
+        h[:migration_id] = prepend_id(h[:migration_id], prepend_value)
+      end
+
       a[:questions].each do |q|
         if q[:question_type] == "question_reference"
           q[:migration_id] = prepend_id(q[:migration_id], prepend_value)
@@ -202,6 +207,18 @@ module MigratorHelper
           q[:questions].each do |gq|
             gq[:migration_id] = prepend_id(gq[:migration_id], prepend_value)
           end
+        end
+      end
+    end
+  end
+
+  def prepend_id_to_linked_assessment_module_items(modules, prepend_value=nil)
+    modules.each do |m|
+      next unless m[:items]
+      m[:items].each do |i|
+        if i[:linked_resource_type] =~ /assessment|quiz/i
+          i[:item_migration_id] = prepend_id(i[:item_migration_id], prepend_value)
+          i[:linked_resource_id] = prepend_id(i[:linked_resource_id], prepend_value)
         end
       end
     end
@@ -269,6 +286,9 @@ module MigratorHelper
           assmnt[:max_points] = a[:max_points]
           assmnt[:duration] = a[:duration]
           assmnt[:error_message] = a[:error_message] if a[:error_message]
+          if a[:assignment] && a[:assignment][:migration_id]
+            assmnt[:assignment_migration_id] = a[:assignment][:migration_id]
+          end
         end
       end
     end
@@ -329,6 +349,8 @@ module MigratorHelper
         assign[:title] = a[:title]
         assign[:due_date] = a[:due_date]
         assign[:migration_id] = a[:migration_id]
+        assign[:quiz_migration_id] = a[:quiz_migration_id] if a[:quiz_migration_id]
+        assign[:assignment_group_migration_id] = a[:assignment_group_migration_id] if a[:assignment_group_migration_id]
         assign[:error_message] = a[:error_message] if a[:error_message]
       end
     end
@@ -346,6 +368,12 @@ module MigratorHelper
         topic[:topic_type] = t[:type]
         topic[:migration_id] = t[:migration_id]
         topic[:error_message] = t[:error_message] if t[:error_message]
+        if t[:assignment] && a_mig_id = t[:assignment][:migration_id]
+          if assign = @overview[:assignments].find{|a| a[:migration_id] == a_mig_id}
+            assign[:topic_migration_id] = t[:migration_id]
+            topic[:assignment_migration_id] = a_mig_id
+          end
+        end
       end
     end
     if @course[:assignment_groups]

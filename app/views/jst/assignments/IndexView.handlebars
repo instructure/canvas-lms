@@ -9,14 +9,14 @@
       name="search_term"
       type="search"
       value=""
-      data-view="inputFilter"
+      disabled
       placeholder="{{#t "search_for_assignment"}}Search for Assignment{{/t}}"
       aria-label="{{#t "search_for_assignment"}}Search for Assignment{{/t}}"
     >
   </div>
 
-  {{#if ENV.PERMISSIONS.manage}}
-    <div class="header-bar-right form-inline">
+  <div class="header-bar-right">
+    {{#if ENV.PERMISSIONS.manage}}
       <a
         href="#"
         class="btn icon-plus"
@@ -35,18 +35,20 @@
       >{{#t "add_assignment"}}Assignment{{/t}}</a>
 
       <a
-        class="btn"
         href="#"
+        class="btn"
         id="assignmentSettingsCog"
         role="button"
         title='{{#t "assignments_settings"}}Assignments Settings{{/t}}'
         aria-label="{{#t "assignments_settings_screenreader"}}Assignments Settings{{/t}}"
       ><i class="icon-settings"></i></a>
-    </div>
-  {{/if}}
+    {{else}}
+      <div data-view="showBy"></div>
+    {{/if}}
+  </div>
 </div>
 
-<div data-view="assignmentGroups" class="item-group-container"></div>
+<div data-view="assignmentGroups" class="item-group-container" id="ag-list"></div>
 
 {{#if ENV.PERMISSIONS.manage}}
   <form data-view="createGroup" class="form-dialog"></form>

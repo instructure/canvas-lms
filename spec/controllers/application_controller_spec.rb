@@ -47,6 +47,21 @@ describe ApplicationController do
     end
   end
 
+  describe "set_js_rights" do
+    it "should populate js_env with policy rights" do
+      @controller = WikiPagesController.new
+      @controller.stubs(:default_url_options).returns({})
+
+      course_with_teacher_logged_in :active_all => true
+      @controller.instance_variable_set(:@context, @course)
+
+      get 'pages_index', :course_id => @course.id
+
+      @controller.js_env.should include(:WIKI_RIGHTS)
+      @controller.js_env[:WIKI_RIGHTS].should include(Hash[@course.wiki.check_policy(@teacher).map {|right| [right, true]}])
+    end
+  end
+
   describe "clean_return_to" do
     before do
       req = stub('request obj', :protocol => 'https://', :host_with_port => 'canvas.example.com')

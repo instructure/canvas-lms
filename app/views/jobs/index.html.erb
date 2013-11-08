@@ -5,10 +5,10 @@
     position: relative;
     padding: 10px;
   }
-  span.has-failed-attempts, span.on-hold {
+  span.has-failed-attempts, span.on-hold, span.slow {
     color: orange;
   }
-  span.has-failed-max-attempts {
+  span.has-failed-max-attempts, span.super-slow {
     color: red;
   }
   dl#job-attributes dt {
@@ -155,6 +155,8 @@ jobs_opts = {
   :on_hold_attempt_count => Delayed::Job::ON_HOLD_COUNT,
   :limit => JobsController::LIMIT,
   :starting_query => params[:q],
+  :slow_threshold => Setting.get('jobs.slow_threshold', 600).to_f,
+  :super_slow_threshold => Setting.get('jobs.super_slow_threshold', 3600).to_f
 }
 running_opts = jobs_opts.merge({
   :url => jobs_url(:only => :running),

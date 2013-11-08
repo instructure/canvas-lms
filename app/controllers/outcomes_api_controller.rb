@@ -97,18 +97,30 @@ class OutcomesApiController < ApplicationController
   # description". Any new ratings lacking a point value are given a default of
   # 0.
   #
-  # @argument title [Optional] The new outcome title.
-  # @argument description [Optional] The new outcome description.
-  # @argument vendor_guid [Optional] A custom GUID for the learning standard.
-  # @argument mastery_points [Optional, Integer] The new mastery threshold for the embedded rubric criterion.
-  # @argument ratings[][description] [Optional] The description of a new rating level for the embedded rubric criterion.
-  # @argument ratings[][points] [Optional, Integer] The points corresponding to a new rating level for the embedded rubric criterion.
+  # @argument title [Optional, String]
+  #   The new outcome title.
+  #
+  # @argument description [Optional, String]
+  #   The new outcome description.
+  #
+  # @argument vendor_guid [Optional, String]
+  #   A custom GUID for the learning standard.
+  #
+  # @argument mastery_points [Optional, Integer]
+  #   The new mastery threshold for the embedded rubric criterion.
+  #
+  # @argument ratings[][description] [Optional, String]
+  #   The description of a new rating level for the embedded rubric criterion.
+  #
+  # @argument ratings[][points] [Optional, Integer]
+  #   The points corresponding to a new rating level for the embedded rubric
+  #   criterion.
   #
   # @returns Outcome
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/outcomes/1.json' \ 
+  #   curl 'https://<canvas>/api/v1/outcomes/1.json' \
   #        -X PUT \ 
   #        -F 'title=Outcome Title' \ 
   #        -F 'description=Outcome description' \
@@ -124,7 +136,7 @@ class OutcomesApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/outcomes/1.json' \ 
+  #   curl 'https://<canvas>/api/v1/outcomes/1.json' \
   #        -X PUT \ 
   #        --data-binary '{
   #              "title": "Outcome Title",

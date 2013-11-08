@@ -46,6 +46,11 @@ require [
                                  template: progressingMigrationCollectionTemplate
                                  emptyTemplate: -> "There are no migrations currently running"
                                  itemView: ProgressingContentMigrationView
+
+  progressingCollectionView.getStatusView = (migProgress) ->
+    if getView = ConverterViewControl.getView(migProgress.get('migration_type'))?.view?.getStatusView
+      getView(migProgress)
+
   progressingCollectionView.render()
 
   migrationConverterView    = new MigrationConverterView
@@ -140,6 +145,7 @@ require [
                                    fileSizeLimit: ENV.UPLOAD_LIMIT
 
             selectContent:       new SelectContentCheckboxView(model: ConverterViewControl.getModel())
+            overwriteAssessmentContent: new OverwriteAssessmentContentView(model: ConverterViewControl.getModel())
 
             questionBank:        new QuestionBankView
                                    questionBanks: ENV.QUESTION_BANKS

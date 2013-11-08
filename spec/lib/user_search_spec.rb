@@ -19,6 +19,8 @@ describe UserSearch do
         student = User.create!(:name => name)
         StudentEnrollment.create!(:user => student, :course => course, :workflow_state => 'active')
       end
+      User.create!(:name => "admin")
+      TeacherEnrollment.create!(:user => user, :course => course, :workflow_state => 'active')
     end
 
     describe 'with complex search enabled' do
@@ -68,7 +70,7 @@ describe UserSearch do
         describe 'filtering by role' do
           subject { names }
           describe 'to a single role' do
-            let(:users) { UserSearch.for_user_in_context('Tyler', course, user, :enrollment_type => 'student' ).to_a }
+            let(:users) { UserSearch.for_user_in_context('Tyler', course, user, nil, :enrollment_type => 'student' ).to_a }
 
             it { should include('Rose Tyler') }
             it { should include('Tyler Pickett') }
@@ -76,7 +78,7 @@ describe UserSearch do
           end
 
           describe 'to multiple roles' do
-            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, :enrollment_type => ['ta', 'teacher'] ).to_a }
+            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, nil, :enrollment_type => ['ta', 'teacher'] ).to_a }
             before do
               ta = User.create!(:name => 'Tyler TA')
               TaEnrollment.create!(:user => ta, :course => course, :workflow_state => 'active')
@@ -89,7 +91,7 @@ describe UserSearch do
 
           describe 'with the broader role parameter' do
 
-            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, :enrollment_role => 'ObserverEnrollment' ).to_a }
+            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, nil, :enrollment_role => 'ObserverEnrollment' ).to_a }
 
             before do
               ta = User.create!(:name => 'Tyler Observer')

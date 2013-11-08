@@ -69,7 +69,7 @@ class InfoController < ApplicationController
     respond_to do |format|
       flash[:notice] = t('notices.error_reported', "Thanks for your help!  We'll get right on this")
       format.html { redirect_to root_url }
-      format.json { render :json => {:logged => true, :id => @report.try(:id) }.to_json }
+      format.json { render :json => {:logged => true, :id => @report.try(:id) } }
     end
   end
 
@@ -90,7 +90,7 @@ class InfoController < ApplicationController
 
     respond_to do |format|
       format.html { render :text => 'canvas ok' }
-      format.json { render :json => { :status => 'canvas ok' } }
+      format.json { render :json => { :status => 'canvas ok', :revision => Canvas.revision } }
     end
   end
 end

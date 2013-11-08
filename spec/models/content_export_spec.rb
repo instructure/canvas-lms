@@ -22,7 +22,7 @@ describe ContentExport do
 
   context "export_object?" do
     before do
-      @ce = ContentExport.new
+      @ce = ContentExport.new(course: Account.default.courses.create!)
     end
 
     it "should return true for everything if there are no copy options" do
@@ -62,7 +62,7 @@ describe ContentExport do
 
   context "add_item_to_export" do
     before do
-      @ce = ContentExport.new
+      @ce = ContentExport.new(course: Account.default.courses.create!)
     end
 
     it "should not add nil" do
@@ -124,7 +124,7 @@ describe ContentExport do
     end
 
     it "should not send emails as part of a content migration (course copy)" do
-      @cm = ContentMigration.new(:user => @user, :copy_options => {:everything => "1"})
+      @cm = ContentMigration.new(:user => @user, :copy_options => {:everything => "1"}, :context => @course)
       @ce.content_migration = @cm
       @ce.save!
 

@@ -15,7 +15,7 @@ module QuizQuestionDataFixer
             question.write_attribute(:question_data, good_data)
             question.with_versioning(&:save)
 
-            question.quiz_questions.each do |qq|
+            question.quiz_questions.active.each do |qq|
               if !is_valid_data(qq.question_data)
                 if qq.quiz && qq.quiz.published_at && !seen_quizzes[qq.quiz_id]
                   Rails.logger.info("The quiz #{qq.quiz_id} may need to be republished.")
@@ -58,7 +58,7 @@ module QuizQuestionDataFixer
     end
 
     #try to find a good quiz question
-    aq.quiz_questions.each do |qq|
+    aq.quiz_questions.active.each do |qq|
       return qq.question_data if qq.question_data && is_valid_data(qq.question_data)
     end
 

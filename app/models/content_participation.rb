@@ -26,6 +26,8 @@ class ContentParticipation < ActiveRecord::Base
 
   after_save :update_participation_count
 
+  validates_presence_of :content_type, :content_id, :user_id, :workflow_state
+
   workflow do
     state :unread
     state :read

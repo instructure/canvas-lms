@@ -44,7 +44,6 @@ class DiscussionTopic < ActiveRecord::Base
   has_one :external_feed_entry, :as => :asset
   belongs_to :external_feed
   belongs_to :context, :polymorphic => true
-  belongs_to :cloned_item
   belongs_to :attachment
   belongs_to :assignment
   belongs_to :editor, :class_name => 'User'
@@ -213,7 +212,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def create_participant
-    self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0, :subscribed => true) if self.user
+    self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0, :subscribed => !subscription_hold(self.user, nil, nil)) if self.user
   end
 
   def update_materialized_view
@@ -276,7 +275,7 @@ class DiscussionTopic < ActiveRecord::Base
 
         if new_state == "read"
           new_entry_ids = entry_ids - existing_entry_participants.map(&:discussion_entry_id)
-          connection.bulk_insert('discussion_entry_participants', new_entry_ids.map { |entry_id|
+          DiscussionEntryParticipant.bulk_insert(new_entry_ids.map { |entry_id|
             {
               :discussion_entry_id => entry_id,
               :user_id => current_user.id,
@@ -294,8 +293,10 @@ class DiscussionTopic < ActiveRecord::Base
   def unread_count(current_user = nil)
     current_user ||= self.current_user
     return 0 unless current_user # default for logged out users
-    topic_participant = discussion_topic_participants.lock.find_by_user_id(current_user)
-    topic_participant.try(:unread_entry_count) || self.default_unread_count
+    Shackles.activate(:master) do
+      topic_participant = discussion_topic_participants.lock.find_by_user_id(current_user)
+      topic_participant.try(:unread_entry_count) || self.default_unread_count
+    end
   end
 
   # Cases where you CAN'T subscribe:
@@ -328,7 +329,7 @@ class DiscussionTopic < ActiveRecord::Base
       if participant.subscribed.nil?
         # if there is no explicit subscription, assume the author and posters
         # are subscribed, everyone else is not subscribed
-        current_user == user || participant.discussion_topic.posters.include?(current_user)
+        (current_user == user || participant.discussion_topic.posters.include?(current_user)) && !participant.discussion_topic.subscription_hold(current_user, nil, nil)
       else
         participant.subscribed
       end
@@ -374,18 +375,20 @@ class DiscussionTopic < ActiveRecord::Base
     return nil unless current_user
 
     topic_participant = nil
-    DiscussionTopic.uncached do
-      DiscussionTopic.unique_constraint_retry do
-        topic_participant = self.discussion_topic_participants.where(:user_id => current_user).lock.first
-        topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
-                                                                       :unread_entry_count => self.unread_count(current_user),
-                                                                       :workflow_state => "unread",
-                                                                       :subscribed => current_user == user)
-        topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
-        topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
-        topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
-        topic_participant.subscribed = opts[:subscribed] if opts.has_key?(:subscribed)
-        topic_participant.save
+    Shackles.activate(:master) do
+      DiscussionTopic.uncached do
+        DiscussionTopic.unique_constraint_retry do
+          topic_participant = self.discussion_topic_participants.where(:user_id => current_user).lock.first
+          topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
+                                                                         :unread_entry_count => self.unread_count(current_user),
+                                                                         :workflow_state => "unread",
+                                                                         :subscribed => current_user == user && !subscription_hold(current_user, nil, nil))
+          topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
+          topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
+          topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
+          topic_participant.subscribed = opts[:subscribed] if opts.has_key?(:subscribed)
+          topic_participant.save
+        end
       end
     end
     topic_participant
@@ -499,7 +502,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def user_can_see_posts?(user, session=nil)
     return false unless user
-    !self.require_initial_post || self.grants_right?(user, session, :update) || user_ids_who_have_posted_and_admins.member?(user.id)
+    !self.require_initial_post? || self.grants_right?(user, session, :update) || user_ids_who_have_posted_and_admins.member?(user.id)
   end
 
   def reply_from(opts)
@@ -560,17 +563,6 @@ class DiscussionTopic < ActiveRecord::Base
     self.child_topics.each do |child|
       child.restore
     end
-  end
-
-  def self.find_or_create_for_new_context(new_context, old_context, old_id)
-    res = new_context.discussion_topics.active.find_by_cloned_item_id(old_context.discussion_topics.find_by_id(old_id).cloned_item_id || 0) rescue nil
-    res = nil if res && !res.cloned_item_id
-    if !res
-      old = old_context.discussion_topics.active.find_by_id(old_id)
-      res = old.clone_for(new_context) if old
-      res.save if res
-    end
-    res
   end
 
   def unlink_from(type)
@@ -649,6 +641,10 @@ class DiscussionTopic < ActiveRecord::Base
     can :read and can :update and can :delete and can :reply
   end
 
+  def self.context_allows_user_to_create?(context, user, session)
+    DiscussionTopic.new(context: context).grants_right?(user, session, :create)
+  end
+
   def context_allows_user_to_create?(user)
     return true unless context.respond_to?(:allow_student_discussion_topics)
     return true unless context.user_is_student?(user)
@@ -687,7 +683,7 @@ class DiscussionTopic < ActiveRecord::Base
     tags_to_update = self.context_module_tags.to_a
     if self.for_assignment?
       tags_to_update += self.assignment.context_module_tags
-      self.ensure_submission(user) if self.assignment.context.includes_student?(user) && action == :contributed
+      self.ensure_submission(user) if assignment.grants_right?(user, :submit) && action == :contributed
     end
     tags_to_update.each { |tag| tag.context_module_action(user, action, points) }
   end
@@ -754,12 +750,26 @@ class DiscussionTopic < ActiveRecord::Base
     self.user ? self.user.name : nil
   end
 
-  def visible_for?(user=nil, opts={})
+  # Public: Determine if the given user can view this discussion topic.
+  #
+  # user - The user attempting to view the topic (default: nil).
+  # options - Options passed to the locked_for? call (default: {}).
+  #
+  # Returns a boolean.
+  def visible_for?(user = nil, options = {})
+    # user is the topic's author
     return true if user == self.user
-    if unlock_at = locked_for?(user, opts).try_rescue(:[], :unlock_at)
+
+    # user is an admin in the context (teacher/ta/designer)
+    return true if context.grants_right?(user, :manage, nil)
+
+    # unlock date exists and has passed
+    if unlock_at = locked_for?(user, options).try_rescue(:[], :unlock_at)
       unlock_at < Time.now
+    # topic is not published
     elsif !published?
       false
+    # everything else
     else
       true
     end
@@ -776,7 +786,7 @@ class DiscussionTopic < ActiveRecord::Base
         locked = {:asset_string => self.asset_string, :unlock_at => self.delayed_post_at}
       elsif (self.lock_at && self.lock_at < Time.now)
         locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
-      elsif (self.assignment && l = self.assignment.locked_for?(user, opts))
+      elsif !opts[:skip_assignment] && (self.assignment && l = self.assignment.locked_for?(user, opts))
         locked = l
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
@@ -785,63 +795,6 @@ class DiscussionTopic < ActiveRecord::Base
       end
       locked
     end
-  end
-
-  attr_accessor :clone_updated
-  attr_accessor :assignment_clone_updated
-  def clone_for(context, dup=nil, options={})
-    options[:migrate] = true if options[:migrate] == nil
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save!
-    end
-    existing = context.discussion_topics.active.find_by_id(self.id)
-    existing ||= context.discussion_topics.active.find_by_cloned_item_id(self.cloned_item_id || 0)
-    return existing if existing && !options[:overwrite]
-    if context.merge_mapped_id(self.assignment)
-      dup ||= context.discussion_topics.find_by_assignment_id(context.merge_mapped_id(self.assignment))
-    end
-    dup ||= DiscussionTopic.new
-    dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| [:id, :assignment_id, :attachment_id, :root_topic_id].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.assignment_id = context.merge_mapped_id(self.assignment)
-    if !dup.assignment_id && self.assignment_id && self.assignment && !options[:cloning_for_assignment]
-      new_assignment = self.assignment.clone_for(context, nil, :cloning_for_topic=>true)
-      assignment_clone_updated = new_assignment.clone_updated
-      new_assignment.save_without_broadcasting!
-      context.map_merge(self.assignment, new_assignment)
-      dup.assignment_id = new_assignment.id
-    end
-    if !dup.attachment_id && self.attachment
-      attachment = self.attachment.clone_for(context)
-      attachment.folder_id = nil
-      attachment.save_without_broadcasting!
-      context.map_merge(self.attachment, attachment)
-      context.warn_merge_result("Added file \"#{attachment.folder.full_name}/#{attachment.display_name}\" which is needed for the topic \"#{self.title}\"")
-      dup.attachment_id = attachment.id
-    end
-    dup.context = context
-    dup.message = context.migrate_content_links(self.message, self.context) if options[:migrate]
-    dup.saved_by = :assignment if options[:cloning_for_assignment]
-    dup.save_without_broadcasting!
-    context.log_merge_result("Discussion \"#{dup.title}\" created")
-    if options[:include_entries]
-      self.discussion_entries.sort_by{|e| e.created_at }.each do |entry|
-        dup_entry = entry.clone_for(context, nil, :migrate => options[:migrate])
-        dup_entry.parent_id = context.merge_mapped_id("discussion_entry_#{entry.parent_id}")
-        dup_entry.discussion_topic_id = dup.id
-        dup_entry.save!
-        context.map_merge(entry, dup_entry)
-        dup_entry
-      end
-      context.log_merge_result("Included #{dup.discussion_entries.length} entries for the topic \"#{dup.title}\"")
-    end
-    context.may_have_links_to_migrate(dup)
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
   end
 
   def self.process_migration(data, migration)
@@ -890,6 +843,7 @@ class DiscussionTopic < ActiveRecord::Base
     item.title = hash[:title]
     item.discussion_type = hash[:discussion_type]
     item.pinned = !!hash[:pinned] if hash[:pinned]
+    item.require_initial_post = !!hash[:require_initial_post] if hash[:require_initial_post]
     hash[:missing_links] = []
     item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context, {:missing_links => (hash[:missing_links])})
     item.message = t('#discussion_topic.empty_message', "No message") if item.message.blank?
@@ -899,6 +853,7 @@ class DiscussionTopic < ActiveRecord::Base
     item.delayed_post_at ||= Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_date]) if hash[:start_date]
     item.position = hash[:position] if hash[:position]
     item.workflow_state = 'active' if item.deleted?
+    item.workflow_state = 'post_delayed' if item.should_not_post_yet
     if hash[:attachment_migration_id]
       item.attachment = context.attachments.find_by_migration_id(hash[:attachment_migration_id])
     end

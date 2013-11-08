@@ -20,31 +20,53 @@ class WikiPagesController < ApplicationController
   include KalturaHelper
 
   before_filter :require_context
-  before_filter :get_wiki_page, :except => [:index]
-  add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_wiki_pages_url }
+  before_filter :get_wiki_page
+  before_filter :set_js_rights, :only => [:pages_index, :show_page, :edit_page]
+  before_filter :set_js_wiki_data, :only => [:pages_index, :show_page, :edit_page]
+  add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
+    url = nil
+    context = c.instance_variable_get('@context')
+    current_user = c.instance_variable_get('@current_user')
+    if context.grants_right?(current_user, :read)
+      if context.draft_state_enabled?
+        url = c.send :polymorphic_path, [context, :pages]
+      else
+        url = c.send :named_context_url, c.instance_variable_get("@context"), :context_wiki_pages_url
+      end
+    end
+    url
+  end
   before_filter { |c| c.active_tab = "pages" }
 
+  def js_rights
+    [:wiki, :page]
+  end
+
   def show
+    if @context.draft_state_enabled?
+      redirect_to polymorphic_url([@context, :named_page], :wiki_page_id => @page)
+      return
+    end
     hash = { :CONTEXT_ACTION_SOURCE => :wiki }
     append_sis_data(hash)
     js_env(hash)
     @editing = true if Canvas::Plugin.value_to_boolean(params[:edit])
-    if @page.deleted?
-      flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
-      if @wiki.has_front_page? && !@page.is_front_page?
-        redirect_to named_context_url(@context, :context_wiki_page_url, @wiki.get_front_page_url)
-      else
-        redirect_to named_context_url(@context, :context_url)
+
+    unless is_authorized_action?(@page, @current_user, [:update, :update_content]) || @page.is_front_page?
+      wiki_page = @wiki.wiki_pages.deleted_last.find_by_url(@page.url) if @page.new_record?
+      if wiki_page && wiki_page.deleted?
+        flash[:warning] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
+        return redirect_to named_context_url(@context, :context_wiki_page_url, @wiki.get_front_page_url)
       end
-      return
     end
+
     if is_authorized_action?(@page, @current_user, :read)
       add_crumb(@page.title)
       @page.increment_view_count(@current_user, @context)
       log_asset_access(@page, "wiki", @wiki)
       respond_to do |format|
         format.html {render :action => "show" }
-        format.json {render :json => @page.to_json }
+        format.json {render :json => @page }
       end
     else
       render_unauthorized_action(@page)
@@ -53,7 +75,12 @@ class WikiPagesController < ApplicationController
 
   def index
     return unless tab_enabled?(@context.class::TAB_PAGES)
-    redirect_to named_context_url(@context, :context_wiki_page_url, @context.wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL)
+
+    if @context.draft_state_enabled?
+      front_page
+    else
+      redirect_to named_context_url(@context, :context_wiki_page_url, @context.wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL)
+    end
   end
 
   def update
@@ -77,12 +104,11 @@ class WikiPagesController < ApplicationController
   end
 
   def perform_update
-    if @page.deleted? && @domain_root_account.enable_draft? && !@context.is_a?(Group)
-      @page.workflow_state = 'unpublished'
-    elsif @page.deleted?
-      @page.workflow_state = 'active'
-    end
     if @page.update_attributes(params[:wiki_page].merge(:user_id => @current_user.id))
+      unless @page.context.draft_state_enabled?
+        @page.set_as_front_page! if !@page.wiki.has_front_page? and @page.url == Wiki::DEFAULT_FRONT_PAGE_URL
+      end
+
       log_asset_access(@page, "wiki", @wiki, 'participate')
       generate_new_page_view
       @page.context_module_action(@current_user, @context, :contributed)
@@ -98,7 +124,7 @@ class WikiPagesController < ApplicationController
     else
       respond_to do |format|
         format.html { render :action => "show" }
-        format.json { render :json => @page.errors.to_json, :status => :bad_request }
+        format.json { render :json => @page.errors, :status => :bad_request }
       end
     end
   end
@@ -126,24 +152,44 @@ class WikiPagesController < ApplicationController
   def front_page
     return unless tab_enabled?(@context.class::TAB_PAGES)
 
-    wiki = @context.wiki
-    if wiki.has_front_page?
-      redirect_to named_context_url(@context, :context_wiki_page_url, @context.wiki.get_front_page_url)
+    if @context.wiki.has_front_page?
+      redirect_to polymorphic_url([@context, :named_page], :wiki_page_id => @context.wiki.front_page)
     else
-      redirect_to named_context_url(@context, :context_wiki_pages_url)
+      redirect_to polymorphic_url([@context, :pages])
     end
   end
 
   def pages_index
+    if !@context.draft_state_enabled?
+      redirect_to polymorphic_url([@context, :wiki_pages])
+      return
+    end
+
     if authorized_action(@context.wiki, @current_user, :read)
       @padless = true
     end
   end
 
   def show_page
-    if @page.deleted?
-      flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
-      return front_page # delegate to front_page logic
+    if !@context.draft_state_enabled?
+      redirect_to polymorphic_url([@context, :named_wiki_page], :id => @page)
+      return
+    end
+
+    if @page.new_record?
+      if is_authorized_action?(@page, @current_user, [:update, :update_content])
+        flash[:info] = t('notices.create_non_existent_page', 'The page "%{title}" does not exist, but you can create it below', :title => @page.title)
+        redirect_to polymorphic_url([@context, :edit_named_page], :wiki_page_id => @page)
+        return
+      else
+        wiki_page = @wiki.wiki_pages.deleted_last.find_by_url(@page.url)
+        if wiki_page && wiki_page.deleted?
+          flash[:warning] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
+        else
+          flash[:warning] = t('notices.page_does_not_exist', 'The page "%{title}" does not exist.', :title => @page.title)
+        end
+        return front_page # delegate to front_page logic
+      end
     end
 
     if authorized_action(@page, @current_user, :read)
@@ -151,32 +197,25 @@ class WikiPagesController < ApplicationController
       @page.increment_view_count(@current_user, @context)
       log_asset_access(@page, 'wiki', @wiki)
 
-      js_env :wiki_pages_url => polymorphic_path([@context, :pages])
-      js_env :EDIT_WIKI_PATH => polymorphic_path([@context, :edit_named_page], :wiki_page_id => @page)
-      js_env :wiki_page => wiki_page_json(@page, @current_user, session)
-
       @padless = true
       render
     end
   end
 
   def edit_page
-    if @page.deleted?
-      flash[:notice] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
-      return front_page # delegate to front_page logic
+    if !@context.draft_state_enabled?
+      redirect_to polymorphic_url([@context, :named_wiki_page], :id => @page) + '#edit'
+      return
     end
 
     if is_authorized_action?(@page, @current_user, [:update, :update_content])
       add_crumb(@page.title)
 
-      js_env :wiki_pages_url => polymorphic_path([@context, :pages])
-      js_env :wiki_page => wiki_page_json(@page, @current_user, session)
-
       @padless = true
       render
     else
       if authorized_action(@page, @current_user, :read)
-        flash[:error] = t('notices.cannot_edit', 'You are not allowed to edit the page "%{title}".', :title => @page.title)
+        flash[:warning] = t('notices.cannot_edit', 'You are not allowed to edit the page "%{title}".', :title => @page.title)
         redirect_to polymorphic_url([@context, :named_page], :wiki_page_id => @page)
       end
     end
@@ -192,5 +231,5 @@ class WikiPagesController < ApplicationController
     end
    res
   end
- 
+
 end

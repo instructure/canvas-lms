@@ -1,4 +1,4 @@
-<form method="post"
+<form class="compose_form" method="post"
   {{#if conversation}}
       action="/conversations/{{conversation.id}}/add_message" class="form-horizontal"
   {{else}}
@@ -10,6 +10,7 @@
     <input type="hidden" name="mode" value="async">
     <input type="hidden" name="scope" value="{{scope}}">
     <input type="hidden" name="filter" value="{{filter}}">
+    <input type="hidden" name="group_conversation" value="true">
 
     <ul class="conversations" style='display:none;'>
       <li>
@@ -38,8 +39,9 @@
                   data-track-label="Course"
                   class="message_course"
                   value="{{course}}">
-            <option>{{#t "labels.select_course"}}Select course{{/t}}</option>
+            <option>{{#t "labels.select_course"}}Select a course{{/t}}</option>
           </select>
+          <input type="hidden" name="context_code" />
         </div>
       </div>
 
@@ -61,9 +63,23 @@
                      role="combobox" />
             </div>
 
-            <ul class="ac-result-list"
-                id="ac-result-list-1"
-                aria-hidden="true"></ul>
+            <button class="btn ac-search-btn"
+                    id="recipient-search-btn"
+                    type="button">
+              <i class="icon-address-book"></i>
+              <span class="screenreader-only">
+                {{#t "search_names_groups_courses"}}Search names, groups, and courses{{/t}}
+              </span>
+            </button>
+
+            <div class="ac-result-wrapper" id="ac-result-list-1" aria-hidden="true">
+              <div class="ac-result-container">
+                <div class="ac-result-contents">
+                  <ul class="ac-result-list collectionViewItems"></ul>
+                  <div class="paginatedLoadingIndicator"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -78,11 +94,31 @@
                  data-track-action="Edit"
                  data-track-label="Subject"
                  class="message_subject"
-                 value="{{subject}}">
+                 value="{{subject}}"
+                 placeholder="{{#t "no_subject"}}No subject{{/t}}"
+                 maxlength="255">
         </div>
       </div>
 
-      <div class='message-header-row'>
+      {{#unless conversation}}
+        <div class="message-header-row">
+          <div class="message-header-label"></div>
+          <div class="message-header-input">
+            <input type="hidden" name="bulk_message" value="0" />
+            <label class="checkbox">
+              <input type="checkbox" name="bulk_message" value="1" />
+              {{#t "bulk_message"}}Bulk message{{/t}}
+
+              <i class="icon-question"
+                 data-tooltip
+                 title="{{#t "bulk_explanation"}}This option creates individual messages to all recipients in the To: field.{{/t}}"></i>
+            </label>
+
+          </div>
+        </div>
+      {{/unless}}
+
+      <div class="message-header-row">
         <div class='message-header-label'></div>
         <div class='message-header-input'>
           <div class="media_comment" style="display: none;" title="{{#t "titles.media_comment"}}Recorded media comment{{/t}}">
@@ -106,50 +142,36 @@
         </div>
       </div>
 
-      {{#unless conversation}}
-        <div class='message-header-row group_conversation_info' style="display: none" >
-          <div class='message-header-label'></div>
-          <div class='message-header-input'>
-            <label class="checkbox" for="compose-message-group_conversation">
-              <input type="checkbox" id="compose-message-group_conversation"
-                     name="group_conversation"
-                     value="1"
-                     class="group_conversation">
-              {{#t "labels.group_conversation"}}This is a group conversation. Participants will see everyone's replies{{/t}}
-            </label>
-          </div>
-        </div>
-      {{/unless}}
-
       <div class='message-header-row user_note_info' style="display: none">
         <div class='message-header-label'></div>
         <div class='message-header-input'>
           <label class="checkbox" for="compose-message-user_note">
-            <input type="checkbox"
-                   name="user_note"
-                   id="compose-message-user_note"
-                   value="1"
-                   data-track-category="Compose Message"
-                   data-track-action="Edit"
-                   data-track-label="Faculty Journal"
-                   class="user_note" />
+            {{checkbox "user_note"
+              id="compose-message-user_note"
+              data-track-category="Compose Message"
+              data-track-action="Edit"
+              data-track-label="Faculty Journal"
+              class="user_note"}}
             {{#t "labels.add_to_faculty_journal"}}Add as a Faculty Journal entry{{/t}}
           </label>
         </div>
       </div>
     </div>
-    <hr class='header-separator' />
   </div>
+  <hr class='header-separator' />
 
   <div class='message-body'>
     <textarea name="body"
               data-track-category="Compose Message"
               data-track-action="Edit"
               data-track-label="Body"
+              aria-label="{{#t "body"}}Body{{/t}}"
               class="conversation_body">{{message}}</textarea>
+    <div class='context_messages'></div>
   </div>
 
   <div class='attachments-pane'>
     <ul class='attachment_list' aria-label='{{#t "labels.attachments"}}Attachments{{/t}}' aria-live='polite'></ul>
   </div>
+
 </form>

@@ -33,7 +33,6 @@ describe "Alerts" do
 
     @alerts.first.criteria.length.should == 1
 
-    wait_for_animations
     (edit = alert.find_element(:css, '.edit_link')).click
     add_criterion.click
     wait_for_ajaximations

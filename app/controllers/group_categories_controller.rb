@@ -22,18 +22,18 @@
 # different built-in group categories used, or custom ones can be created. The
 # built in group categories are:  "communities", "student_organized", and "imported".
 #
-# @object Group Category
+# @object GroupCategory
 #     {
 #       // The ID of the group category.
-#       id: 17,
+#       "id": 17,
 #
 #       // The display name of the group category.
-#       name: "Math Groups",
+#       "name": "Math Groups",
 #
 #       // Certain types of group categories have special role designations. Currently,
 #       // these include: "communities", "student_organized", and "imported".
 #       // Regular course/account group categories have a role of null.
-#       role: "communities",
+#       "role": "communities",
 #
 #       // If the group category allows users to join a group themselves, thought they may
 #       // only be a member of one group per group category at a time.
@@ -41,18 +41,18 @@
 #       // "enabled" allows students to assign themselves to a group
 #       // "restricted" restricts them to only joining a group in their section
 #       // null disallows students from joining groups
-#       self_signup: null,
+#       "self_signup": null,
 #
 #       // The course or account that the category group belongs to. The pattern here is
 #       // that whatever the context_type is, there will be an _id field named
 #       // after that type. So if instead context_type was "Course", the
 #       // course_id field would be replaced by an course_id field.
-#       context_type: "Account",
-#       account_id: 3,
+#       "context_type": "Account",
+#       "account_id": 3,
 #
 #       // If self-signup is enabled, group_limit can be set to cap the number of users
 #       // in each group. If null, there is no limit.
-#       group_limit: null
+#       "group_limit": null,
 #
 #       // If the group category has not yet finished a randomly student assignment request,
 #       // a progress object will be attached, which will contain information related to the
@@ -71,7 +71,6 @@
 #            "workflow_state": "running",
 #            "url": "http://localhost:3000/api/v1/progress/217"
 #        }
-#
 #     }
 #
 class GroupCategoriesController < ApplicationController
@@ -134,19 +133,28 @@ class GroupCategoriesController < ApplicationController
   # @API Create a Group Category
   # Create a new group category
   #
-  # @argument name
-  # @argument self_signup [Optional] [Course Only] allow students to sign up for a group themselves
-  #     valid values are:
-  #           "enabled" allows students to self sign up for any group in course
-  #           "restricted" allows students to self sign up only for groups in the same section
-  #           null disallows self sign up
-  # @argument group_limit [Optional] [Course Only] Limit the maximum number of users in each group. Requires self signup.
-  # @argument create_group_count [Optional] [Course Only] create this number of groups
-  # @argument split_group_count [Optional] [Course Only] [Deprecated]
-  #           create this number of groups, and evenly distribute students
-  #           among them. not allowed with "enable_self_signup". because
-  #           the group assignment happens synchronously, it's recommended
-  #           that you instead use the assign_unassigned_members endpoint
+  # @argument name [String]
+  #   Name of the group category
+  #
+  # @argument self_signup [Optional, "enabled"|"restricted"]
+  #   Allow students to sign up for a group themselves (Course Only).
+  #   valid values are:
+  #   "enabled":: allows students to self sign up for any group in course
+  #   "restricted":: allows students to self sign up only for groups in the
+  #                  same section null disallows self sign up
+  # @argument group_limit [Optional]
+  #   Limit the maximum number of users in each group (Course Only). Requires
+  #   self signup.
+  #
+  # @argument create_group_count [Optional]
+  #   Create this number of groups (Course Only).
+  #
+  # @argument split_group_count [Optional] (Deprecated)
+  #   Create this number of groups, and evenly distribute students
+  #   among them. not allowed with "enable_self_signup". because
+  #   the group assignment happens synchronously, it's recommended
+  #   that you instead use the assign_unassigned_members endpoint.
+  #   (Course Only)
   #
   # @example_request
   #     curl htps://<canvas>/api/v1/courses/<course_id>/group_categories \ 
@@ -160,10 +168,10 @@ class GroupCategoriesController < ApplicationController
       @group_category = @context.group_categories.build
       if populate_group_category_from_params
         if api_request?
-          render :json => group_category_json(@group_category, @current_user, session)
+          render :json => group_category_json(@group_category, @current_user, session, include: ["unassigned_users_count", "groups_count"])
         else
           flash[:notice] = t('notices.create_category_success', 'Category was successfully created.')
-          render :json => [@group_category.as_json, @group_category.groups.map { |g| g.as_json(:include => :users) }].to_json
+          render :json => [@group_category.as_json, @group_category.groups.map { |g| g.as_json(:include => :users) }]
         end
       end
     end
@@ -172,19 +180,28 @@ class GroupCategoriesController < ApplicationController
   # @API Update a Group Category
   # Modifies an existing group category.
   #
-  # @argument name
-  # @argument self_signup [Optional] [Course Only] allow students to signup for a group themselves
-  #     valid values are:
-  #           "enabled" allows students to self sign up for any group in course
-  #           "restricted" allows students to self sign up only for groups in the same section
-  #           null disallows self sign up
-  # @argument group_limit [Optional] [Course Only] Limit the maximum number of users in each group. Requires self signup.
-  # @argument create_group_count [Optional] [Course Only] create this number of groups
-  # @argument split_group_count [Optional] [Course Only] [Deprecated]
-  #           create this number of groups, and evenly distribute students
-  #           among them. not allowed with "enable_self_signup". because
-  #           the group assignment happens synchronously, it's recommended
-  #           that you instead use the assign_unassigned_members endpoint
+  # @argument name [String]
+  #   Name of the group category
+  #
+  # @argument self_signup [Optional, "enabled"|"restricted"]
+  #   Allow students to sign up for a group themselves (Course Only).
+  #   Valid values are:
+  #   "enabled":: allows students to self sign up for any group in course
+  #   "restricted":: allows students to self sign up only for groups in the
+  #                  same section null disallows self sign up
+  # @argument group_limit [Optional]
+  #   Limit the maximum number of users in each group (Course Only). Requires
+  #   self signup.
+  #
+  # @argument create_group_count [Optional]
+  #   Create this number of groups (Course Only).
+  #
+  # @argument split_group_count [Optional] (Deprecated)
+  #   Create this number of groups, and evenly distribute students
+  #   among them. not allowed with "enable_self_signup". because
+  #   the group assignment happens synchronously, it's recommended
+  #   that you instead use the assign_unassigned_members endpoint.
+  #   (Course Only)
   #
   # @example_request
   #     curl https://<canvas>/api/v1/group_categories/<group_category_id> \ 
@@ -206,7 +223,7 @@ class GroupCategoriesController < ApplicationController
         return render(:json => {'status' => 'unauthorized'}, :status => :unauthorized) if @group_category.protected?
         if populate_group_category_from_params
           flash[:notice] = t('notices.update_category_success', 'Category was successfully updated.')
-          render :json => @group_category.to_json
+          render :json => @group_category
         end
       end
     end
@@ -261,16 +278,17 @@ class GroupCategoriesController < ApplicationController
   end
 
   include Api::V1::User
-  # @API List users
+  # @API List users in group category
   #
   # Returns a list of users in the group category.
   #
-  # @argument search_term (optional)
-  #   The partial name or full ID of the users to match and return in the results list.
-  #   Must be at least 3 characters.
+  # @argument search_term [Optional, String]
+  #   The partial name or full ID of the users to match and return in the results
+  #   list. Must be at least 3 characters.
   #
-  # @argument unassigned (optional)
-  #   Set this value to true if you wish only to search unassigned users in the group category
+  # @argument unassigned [Optional, Boolean]
+  #   Set this value to true if you wish only to search unassigned users in the
+  #   group category.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/group_categories/1/users \
@@ -290,11 +308,11 @@ class GroupCategoriesController < ApplicationController
     search_params[:enrollment_role] = "StudentEnrollment" if @context.is_a? Course
 
     @group_category ||= @context.group_categories.find_by_id(params[:category_id])
-    exclude_groups = params[:unassigned] ? @group_category.groups.active : []
+    exclude_groups = value_to_boolean(params[:unassigned]) ? @group_category.groups.active.pluck(:id) : []
     search_params[:exclude_groups] = exclude_groups
 
     if search_term
-      users = UserSearch.for_user_in_context(search_term, @context, @current_user, search_params)
+      users = UserSearch.for_user_in_context(search_term, @context, @current_user, session, search_params)
     else
       users = UserSearch.scope_for(@context, @current_user, search_params)
     end
@@ -308,7 +326,7 @@ class GroupCategoriesController < ApplicationController
   # Assign all unassigned members as evenly as possible among the existing
   # student groups.
   #
-  # @argument sync (optional)
+  # @argument sync [Optional, Boolean]
   #   The assigning is done asynchronously by default. If you would like to
   #   override this and have the assigning done synchronously, set this value
   #   to true.
@@ -392,7 +410,7 @@ class GroupCategoriesController < ApplicationController
   #      }
   #    ]
   #
-  # @returns Group Membership or Progress
+  # @returns GroupMembership | Progress
   def assign_unassigned_members
     return unless authorized_action(@context, @current_user, :manage_groups)
 

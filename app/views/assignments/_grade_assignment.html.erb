@@ -1,8 +1,14 @@
 <ul class='page-action-list'>
   <h2><%= t 'titles.related_items', "Related Items" %></h2>
   <% if @context.allows_speed_grader? %>
-    <li>
-      <a target="_blank" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) %>"
+    <li id="assignment-speedgrader-link"
+      <% if @context.draft_state_enabled? && @assignment.unpublished? %>
+        class="hidden"
+      <% end %>
+    >
+    <a
+      target="_blank"
+      href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) %>"
         class="icon-speed-grader">
         SpeedGrader&trade;
       </a>
@@ -21,7 +27,7 @@
         <a href="#" class="upload_submissions_link icon-upload" style="<%= hidden unless @assignment.submissions_downloaded? %>">
           <%= t 'links.reupload_submissions', "Re-Upload Submissions" %>
         </a>
-        <% form_tag context_url(@context, :submissions_upload_context_gradebook_url, @assignment.id), {:id => "re_upload_submissions_form", :multipart => true, :style => "margin-top: 10px; display: none;"} do %>
+        <%= form_tag context_url(@context, :submissions_upload_context_gradebook_url, @assignment.id), {:id => "re_upload_submissions_form", :multipart => true, :style => "margin-top: 10px; display: none;"} do %>
           <div style="font-size: 0.8em;">
             <%= mt :reupload_instructions, <<-EOT
 If you made changes to the student submission files you downloaded

@@ -21,102 +21,106 @@
 # @object Quiz
 #     {
 #       // the ID of the quiz
-#       id: 5,
+#       "id": 5,
 #
 #       // the title of the quiz
-#       title: "Hamlet Act 3 Quiz",
+#       "title": "Hamlet Act 3 Quiz",
 #
 #       // the HTTP/HTTPS URL to the quiz
-#       html_url: "http://canvas.example.edu/courses/1/quizzes/2",
+#       "html_url": "http://canvas.example.edu/courses/1/quizzes/2",
 #
 #       // a url suitable for loading the quiz in a mobile webview.  it will
 #       // persiste the headless session and, for quizzes in public courses, will
 #       // force the user to login
-#       mobile_url: "http://canvas.example.edu/courses/1/quizzes/2?persist_healdess=1&force_user=1",
+#       "mobile_url": "http://canvas.example.edu/courses/1/quizzes/2?persist_healdess=1&force_user=1",
 #
 #       // the description of the quiz
-#       description: "This is a quiz on Act 3 of Hamlet",
+#       "description": "This is a quiz on Act 3 of Hamlet",
 #
 #       // type of quiz
 #       // possible values: "practice_quiz", "assignment", "graded_survey", "survey"
-#       quiz_type: "assignment",
+#       "quiz_type": "assignment",
 #
 #       // the ID of the quiz's assignment group:
-#       assignment_group_id: 3,
+#       "assignment_group_id": 3,
 #
 #       // quiz time limit in minutes
-#       time_limit: 5,
+#       "time_limit": 5,
 #
 #       // shuffle answers for students?
-#       shuffle_answers: false,
+#       "shuffle_answers": false,
 #
 #       // let students see their quiz responses?
 #       // possible values: null, "always", "until_after_last_attempt"
-#       hide_results: "always",
+#       "hide_results": "always",
 #
 #       // show which answers were correct when results are shown?
 #       // only valid if hide_results=null
-#       show_correct_answers: true,
+#       "show_correct_answers": true,
 #
 #       // which quiz score to keep (only if allowed_attempts != 1)
 #       // possible values: "keep_highest", "keep_latest"
-#       scoring_policy: "keep_highest",
+#       "scoring_policy": "keep_highest",
 #
 #       // how many times a student can take the quiz
 #       // -1 = unlimited attempts
-#       allowed_attempts: 3,
+#       "allowed_attempts": 3,
 #
 #       // show one question at a time?
-#       one_question_at_a_time: false,
+#       "one_question_at_a_time": false,
 #
 #       // the number of questions in the quiz
-#       question_count: 12,
+#       "question_count": 12,
 # 
 #       // The total point value given to the quiz
-#       points_possible: 20,
+#       "points_possible": 20,
 #
 #       // lock questions after answering?
 #       // only valid if one_question_at_a_time=true
-#       cant_go_back: false,
+#       "cant_go_back": false,
 #
 #       // access code to restrict quiz access
-#       access_code: "2beornot2be",
+#       "access_code": "2beornot2be",
 #
 #       // IP address or range that quiz access is limited to
-#       ip_filter: "123.123.123.123",
+#       "ip_filter": "123.123.123.123",
 #
 #       // when the quiz is due
-#       due_at: "2013-01-23T23:59:00-07:00",
+#       "due_at": "2013-01-23T23:59:00-07:00",
 #
 #       // when to lock the quiz
-#       lock_at: null,
+#       "lock_at": null,
 #
 #       // when to unlock the quiz
-#       unlock_at: "2013-01-21T23:59:00-07:00",
+#       "unlock_at": "2013-01-21T23:59:00-07:00",
 #
 #       // whether the quiz has a published or unpublished draft state.
-#       published: true,
+#       "published": true,
+#
+#       // Whether the assignment's "published" state can be changed to false.
+#       // Will be false if there are student submissions for the quiz.
+#       "unpublishable": true,
 #
 #       // Whether or not this is locked for the user.
-#       locked_for_user: false,
+#       "locked_for_user": false,
 #
 #       // (Optional) Information for the user about the lock. Present when locked_for_user is true.
-#       lock_info: {
+#       "lock_info": {
 #         // Asset string for the object causing the lock
-#         asset_string: "quiz_5",
+#         "asset_string": "quiz_5",
 #
 #         // (Optional) Time at which this was/will be unlocked.
-#         unlock_at: "2013-01-01T00:00:00-06:00",
+#         "unlock_at": "2013-01-01T00:00:00-06:00",
 #
 #         // (Optional) Time at which this was/will be locked.
-#         lock_at: "2013-02-01T00:00:00-06:00",
+#         "lock_at": "2013-02-01T00:00:00-06:00",
 #
 #         // (Optional) Context module causing the lock.
-#         context_module: { ... }
+#         "context_module": {}
 #       },
 #
 #       // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
-#       lock_explanation: "This quiz is locked until September 1 at 12:00am"
+#       "lock_explanation": "This quiz is locked until September 1 at 12:00am"
 #     }
 #
 class QuizzesApiController < ApplicationController
@@ -133,7 +137,8 @@ class QuizzesApiController < ApplicationController
   #
   # Returns the list of Quizzes in this course.
   #
-  # @argument search_term (optional) The partial title of the quizzes to match and return.
+  # @argument search_term [Optional, String]
+  #   The partial title of the quizzes to match and return.
   #
   # @example_request    
   #     curl https://<canvas>/api/v1/courses/<course_id>/quizzes \ 
@@ -164,64 +169,65 @@ class QuizzesApiController < ApplicationController
   #
   # Create a new quiz for this course.
   #
-  # @argument quiz[title] [String] The quiz title.
+  # @argument quiz[title] [String]
+  #   The quiz title.
   #
-  # @argument quiz[description] [String] A description of the quiz.
+  # @argument quiz[description] [String]
+  #   A description of the quiz.
   #
   # @argument quiz[quiz_type] ["practice_quiz"|"assignment"|"graded_survey"|"survey"]
   #   The type of quiz.
   #
   # @argument quiz[assignment_group_id] [Integer]
-  #   The assignment group id to put the assignment in.
-  #   Defaults to the top assignment group in the course.
-  #   Only valid if the quiz is graded, i.e. if quiz_type is "assignment" or "graded_survey"
+  #   The assignment group id to put the assignment in. Defaults to the top
+  #   assignment group in the course. Only valid if the quiz is graded, i.e. if
+  #   quiz_type is "assignment" or "graded_survey".
   #
   # @argument quiz[time_limit] [Integer]
-  #   Time limit to take this quiz, in minutes.
-  #   Set to null for no time limit.
+  #   Time limit to take this quiz, in minutes. Set to null for no time limit.
   #   Defaults to null.
   #
   # @argument quiz[shuffle_answers] [Boolean]
-  #   If true, quiz answers for multiple choice questions will be randomized for each student.
-  #   Defaults to false.
+  #   If true, quiz answers for multiple choice questions will be randomized for
+  #   each student. Defaults to false.
   #
-  # @argument quiz[hide_results] [null|"always"|"until_after_last_attempt"]
+  # @argument quiz[hide_results] [Optional, String, "always"|"until_after_last_attempt"]
   #   Dictates whether or not quiz results are hidden from students.
   #   If null, students can see their results after any attempt.
   #   If "always", students can never see their results.
-  #   If "until_after_last_attempt", students can only see results after their last attempt. (Only valid if allowed_attempts > 1)
-  #   Defaults to null.
+  #   If "until_after_last_attempt", students can only see results after their
+  #   last attempt. (Only valid if allowed_attempts > 1). Defaults to null.
   #
-  # @argument quiz[show_correct_answers] [Boolean]
+  # @argument quiz[show_correct_answers] [Optional, Boolean]
   #   Only valid if hide_results=null
   #   If false, hides correct answers from students when quiz results are viewed.
   #   Defaults to true.
   #
-  # @argument quiz[allowed_attempts] [Integer]
+  # @argument quiz[allowed_attempts] [Optional, Integer]
   #   Number of times a student is allowed to take a quiz.
   #   Set to -1 for unlimited attempts.
   #   Defaults to 1.
   #
-  # @argument quiz[scoring_policy] ["keep_highest"|"keep_latest"]
+  # @argument quiz[scoring_policy] [String, "keep_highest"|"keep_latest"]
   #   Required and only valid if allowed_attempts > 1.
   #   Scoring policy for a quiz that students can take multiple times.
   #   Defaults to "keep_highest".
   #
-  # @argument quiz[one_question_at_a_time] [Boolean]
+  # @argument quiz[one_question_at_a_time] [Optional, Boolean]
   #   If true, shows quiz to student one question at a time.
   #   Defaults to false.
   #
-  # @argument quiz[cant_go_back] [Boolean]
+  # @argument quiz[cant_go_back] [Optional, Boolean]
   #   Only valid if one_question_at_a_time=true
   #   If true, questions are locked after answering.
   #   Defaults to false.
   #
-  # @argument quiz[access_code] [Optional,String]
+  # @argument quiz[access_code] [Optional, String]
   #   Restricts access to the quiz with a password.
   #   For no access code restriction, set to null.
   #   Defaults to null.
   #
-  # @argument quiz[ip_filter] [Optional,String]
+  # @argument quiz[ip_filter] [Optional, String]
   #   Restricts access to the quiz to computers in a specified IP range.
   #   Filters can be a comma-separated list of addresses, or an address followed by a mask
   #
@@ -261,7 +267,7 @@ class QuizzesApiController < ApplicationController
       else
         # TODO: we don't really have a strategy in the API yet for returning
         # errors.
-        render :json => {:errors => @quiz.errors.to_json}, :status => 400
+        render :json => {:errors => @quiz.errors}, :status => 400
       end
     end
   end
@@ -284,7 +290,7 @@ class QuizzesApiController < ApplicationController
       else
         errors = @quiz.errors.as_json[:errors]
         errors['published'] = errors.delete('workflow_state') if errors.has_key?('workflow_state')
-        render :json => {:errors => errors.to_json}, :status => 400
+        render :json => {:errors => errors}, :status => 400
       end
     end
   end

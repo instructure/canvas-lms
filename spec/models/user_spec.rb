@@ -1242,6 +1242,51 @@ describe User do
     end
   end
 
+  describe "favorites" do
+    before :each do
+      @user = User.create!
+
+      @courses = []
+      (1..3).each do |x|
+        course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
+        @courses << course
+        @user.favorites.build(context: course)
+      end
+
+      @user.save!
+    end
+
+    it "should default favorites to enrolled courses when favorite courses do not exist" do
+      @user.favorites.by("Course").destroy_all
+      @user.menu_courses.should == @courses
+    end
+
+    it "should only include favorite courses when set" do
+      course = @courses.shift
+      @user.favorites.where(context_type: "Course", context_id: course).first.destroy
+      @user.menu_courses.should == @courses
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      before :each do
+        (4..6).each do |x|
+          course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
+          @courses << course
+          @user.favorites.build(context: course)
+        end
+
+        @user.save!
+      end
+
+      it "should include cross shard favorite courses" do
+        @user.favorites.by("Course").where("id % 2 = 0").destroy_all
+        @user.menu_courses.size.should eql(@courses.length / 2)
+      end
+    end
+  end
+
   describe "cached_current_enrollments" do
     it "should include temporary invitations" do
       user_with_pseudonym(:active_all => 1)
@@ -2318,6 +2363,22 @@ describe User do
         @shard1.activate{ @user.stamp_logout_time! }
         @user.reload.last_logged_out.should_not be_nil
       end
+    end
+  end
+
+  describe "delete_enrollments" do
+    before do
+      course
+      2.times { @course.course_sections.create! }
+      2.times { @course.assignments.create! }
+    end
+
+    it "should batch DueDateCacher jobs" do
+      DueDateCacher.expects(:recompute).never
+      DueDateCacher.expects(:recompute_course).twice # sync_enrollments and destroy_enrollments
+      test_student = @course.student_view_student
+      test_student.destroy
+      test_student.reload.enrollments.each { |e| e.should be_deleted }
     end
   end
 end

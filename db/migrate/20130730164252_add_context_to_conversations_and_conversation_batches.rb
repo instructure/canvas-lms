@@ -1,6 +1,5 @@
 class AddContextToConversationsAndConversationBatches < ActiveRecord::Migration
   tag :predeploy
-  self.transactional = false
 
   def self.up
     add_column :conversations, :context_type, :string

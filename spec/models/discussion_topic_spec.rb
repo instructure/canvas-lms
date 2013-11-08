@@ -151,6 +151,13 @@ describe DiscussionTopic do
       
       @topic.visible_for?(@student).should be_false
     end
+
+    it "should be visible to all teachers in the course" do
+      @topic.update_attribute(:delayed_post_at, Time.now + 1.day)
+      new_teacher = user
+      @course.enroll_teacher(new_teacher).accept!
+      @topic.visible_for?(new_teacher).should be_true
+    end
   end
 
   describe "allow_student_discussion_topics setting" do
@@ -338,19 +345,6 @@ describe DiscussionTopic do
         topic.workflow_state.should eql 'active'
         topic.locked?.should be_false
       end
-    end
-  end
-
-  context "clone_for" do
-    it "should clone to another context" do
-      course_model
-      topic = @course.discussion_topics.create!(:message => "<a href='#' onclick='alert(12);'>only this should stay</a>", :title => "some topic")
-      course
-      new_topic = topic.clone_for(@course)
-      new_topic.context.should eql(@course)
-      new_topic.context.should_not eql(topic.context)
-      new_topic.message.should eql(topic.message)
-      new_topic.title.should eql(topic.title)
     end
   end
 
@@ -612,6 +606,17 @@ describe DiscussionTopic do
       @topic.user_can_see_posts?(@student).should == true
     end
 
+    it "should work the same for group discussions" do
+      group_discussion_assignment
+      @topic.require_initial_post = true
+      @topic.save!
+      ct = @topic.child_topics.first
+      ct.context.add_user(@student)
+      ct.user_can_see_posts?(@student).should be_false
+      ct.reply_from(user: @student, text: 'ohai')
+      ct.user_ids_who_have_posted_and_admins(true) # clear the memoization
+      ct.user_can_see_posts?(@student).should be_true
+    end
   end
 
   context "subscribers" do
@@ -727,7 +732,7 @@ describe DiscussionTopic do
     end
 
     def build_submitted_assignment
-      student_in_course(:active_all => true)
+      student_in_course(name: 'student in course', active_all: true)
       @assignment = @course.assignments.create!(:title => "some discussion assignment")
       @assignment.submission_types = 'discussion_topic'
       @assignment.save!
@@ -740,7 +745,7 @@ describe DiscussionTopic do
     end
 
     it "should not re-flag graded discussion as needs grading if student make another comment" do
-      student_in_course(:name => 'student in course')
+      student_in_course(name: 'student in course', active_all: true)
       assignment = @course.assignments.create(:title => "discussion assignment", :points_possible => 20)
       topic = @course.discussion_topics.create!(:title => 'discussion topic 1', :message => "this is a new discussion topic", :assignment => assignment)
       topic.discussion_entries.create!(:message => "student message for grading", :user => @student)
@@ -1047,6 +1052,16 @@ describe DiscussionTopic do
       @topic.subscription_hold(@teacher, nil, nil).should eql(:not_in_group_set)
       @topic.subscribed?(@teacher).should be_false
     end
+
+    it "should set the topic participant subscribed field to false when there is a hold" do
+      teacher_in_course(:active_all => true)
+      group_discussion_assignment
+      group_discussion = @topic.child_topics.first
+      group_discussion.user = @teacher
+      group_discussion.save!
+      group_discussion.change_read_state('read', @teacher) # quick way to make a participant
+      group_discussion.discussion_topic_participants.where(:user_id => @teacher.id).first.subscribed.should == false
+    end
   end
 
   context "a group topic subscription" do
@@ -1096,7 +1111,8 @@ describe DiscussionTopic do
   context "materialized view" do
     before do
       topic_with_nested_replies
-      run_transaction_commit_callbacks
+      # materialized view jobs are now delayed
+      Timecop.travel(Time.now + 20.seconds)
     end
 
     it "should return nil if the view has not been built yet, and schedule a job" do
@@ -1116,7 +1132,6 @@ describe DiscussionTopic do
       run_jobs
       Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 0
       @topic.reply_from(:user => @user, :text => "ohai")
-      run_transaction_commit_callbacks
       Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 1
     end
 
@@ -1125,7 +1140,6 @@ describe DiscussionTopic do
       run_jobs
       Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 0
       reply.update_attributes(:message => "i got that wrong before")
-      run_transaction_commit_callbacks
       Delayed::Job.strand_size("materialized_discussion:#{@topic.id}").should == 1
     end
 

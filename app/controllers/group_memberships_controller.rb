@@ -20,24 +20,24 @@
 #
 # Group memberships are the objects that tie users and groups together. 
 #
-# @object Group Membership
+# @object GroupMembership
 #     {
 #       // The id of the membership object
-#       id: 92
+#       "id": 92,
 #
 #       // The id of the group object to which the membership belongs
-#       group_id: 17
+#       "group_id": 17,
 #
 #       // The id of the user object to which the membership belongs
-#       user_id: 3
+#       "user_id": 3,
 #
 #       // The current state of the membership. Current possible values are
 #       // "accepted", "invited", and "requested"
-#       workflow_state: "accepted"
+#       "workflow_state": "accepted",
 #
 #       // Whether or not the user is a moderator of the group (the must also
 #       // be an active member of the group to moderate)
-#       moderator: true
+#       "moderator": true
 #     }
 #
 class GroupMembershipsController < ApplicationController
@@ -53,16 +53,16 @@ class GroupMembershipsController < ApplicationController
   #
   # List the members of a group.
   #
-  # @argument filter_states[] [Optional] Only list memberships with the given
-  #   workflow_states. Allowed values are "accepted", "invited", and
-  #   "requested". By default it will return all memberships.
+  # @argument filter_states[] [Optional, String, "accepted"|"invited"|"requested"]
+  #   Only list memberships with the given workflow_states. By default it will
+  #   return all memberships.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id>/memberships \ 
   #          -F 'filter_states[]=invited&filter_states[]=requested' \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns [Group Membership]
+  # @returns [GroupMembership]
   def index
     if authorized_action(@group, @current_user, :read_roster)
       memberships_route = polymorphic_url([:api_v1, @group, :memberships])
@@ -85,19 +85,23 @@ class GroupMembershipsController < ApplicationController
   # group.  If the membership or join request already exists, then it is simply
   # returned
   #
-  # @argument user_id
+  # @argument user_id [String]
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id>/memberships \ 
   #          -F 'user_id=self'
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns Group Membership
+  # @returns GroupMembership
   def create
     @user = api_find(User, params[:user_id])
     if authorized_action(GroupMembership.new(:group => @group, :user => @user), @current_user, :create)
       @membership = @group.add_user(@user)
-      render :json => group_membership_json(@membership, @current_user, session)
+      if @membership.valid?
+        render :json => group_membership_json(@membership, @current_user, session)
+      else
+        render :json => @membership.errors, :status => :bad_request
+      end
     end
   end
 
@@ -109,7 +113,9 @@ class GroupMembershipsController < ApplicationController
   #
   # Accept a membership request, or add/remove moderator rights.
   #
-  # @argument workflow_state Currently, the only allowed value is "accepted"
+  # @argument workflow_state [Optional, String, "accepted"]
+  #   Currently, the only allowed value is "accepted"
+  #
   # @argument moderator
   #
   # @example_request
@@ -121,7 +127,7 @@ class GroupMembershipsController < ApplicationController
   #          -F 'moderator=true'
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns Group Membership
+  # @returns GroupMembership
   def update
     find_membership
     if authorized_action(@membership, @current_user, :update)

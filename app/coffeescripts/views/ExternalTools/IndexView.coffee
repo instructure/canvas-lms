@@ -21,6 +21,7 @@ define [
       '.view_app_center_link': '$viewAppCenterLink'
       '.add_tool_link': '$addToolLink'
       '#app_center_filter': '$appCenterFilter'
+      '#app_center_filter_wrapper': '$appCenterFilterWrapper'
       '[data-view=appFull]': '$appFull'
 
     events:
@@ -32,6 +33,7 @@ define [
       'click [data-delete-external-tool]': 'deleteTool'
       'change #app_center_filter': 'filterApps'
       'keyup #app_center_filter': 'filterApps'
+      'click [data-toggle-installed-state]': 'toggleInstalledState'
 
     currentAppCenterPosition: 0
 
@@ -50,7 +52,7 @@ define [
     hideAppCenterView: =>
       @currentAppCenterPosition = $(document).scrollTop()
       @appCenterView.hide()
-      @$appCenterFilter.hide()
+      @$appCenterFilterWrapper.hide()
       @$viewAppCenterLink.show() if @options.appCenterEnabled
 
     removeAppFullView: ->
@@ -70,7 +72,7 @@ define [
       @hideExternalToolsView()
       @$viewAppCenterLink.hide()
       @appCenterView.show()
-      @$appCenterFilter.show()
+      @$appCenterFilterWrapper.show()
       $(document).scrollTop(@currentAppCenterPosition)
 
     showAppFullView: (event) ->
@@ -124,7 +126,17 @@ define [
         ,
           text: I18n.t 'buttons.delete', 'Delete'
           click: =>
-            tool.on('sync', => @externalToolsView.collection.fetch())
+            tool.on('sync', =>
+                @externalToolsView.collection.fetch()
+                @appCenterView.collection.fetch()
+            )
             tool.destroy()
             dialog.dialog 'close'
         ]
+
+    toggleInstalledState: (event) =>
+      elm = @$(event.currentTarget)
+      @appCenterView.targetInstalledState = elm.data('toggle-installed-state')
+      @$('[data-installed-state]').removeClass('active')
+      @$('[data-installed-state="' + @appCenterView.targetInstalledState + '"]').addClass('active')
+      @appCenterView.render()

@@ -540,7 +540,7 @@ Implemented for: Canvas LMS}]
     migration.update_migration_settings(settings)
     if itemType == 'qdb'
       # skip creating the quiz, just import the questions into the bank
-      migration.migration_ids_to_import = { :copy => { :quizzes => {} } }
+      migration.migration_ids_to_import = { :copy => { :all_quizzes => false, :all_assessment_question_banks => true} }
     end
     migration.save!
 
@@ -556,7 +556,7 @@ Implemented for: Canvas LMS}]
     session['pending_migration_id'] = migration.id
     session['pending_migration_itemType'] = itemType
 
-    if Setting.get_cached('respondus_endpoint.polling_api', 'true') != 'false'
+    if Setting.get('respondus_endpoint.polling_api', 'true') != 'false'
       return poll_for_completion()
     else
       # Deprecated in-line waiting for the migration. We've worked with Respondus
@@ -565,7 +565,7 @@ Implemented for: Canvas LMS}]
         loop do
           ret = poll_for_completion()
           if ret == ['pending']
-            sleep(Setting.get_cached('respondus_endpoint.polling_time', '2').to_f)
+            sleep(Setting.get('respondus_endpoint.polling_time', '2').to_f)
           else
             return ret
           end

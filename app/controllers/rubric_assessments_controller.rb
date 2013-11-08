@@ -60,26 +60,14 @@ class RubricAssessmentsController < ApplicationController
   def create
     update
   end
-  
-  def invite
-    @association = @context.rubric_associations.find(params[:rubric_association_id])
-    @rubric = @association.rubric
-    assessor_email = params[:rubric_assessment][:assessor_email]
-    # If an email address is specified, this is an invitation for someone to assess
-    if authorized_action(@association, @current_user, :manage)
-      @assessment_requests = @association.invite_assessors(@current_user, assessor_email, @association.association.find_asset_for_assessment(@association, @current_user.id)[0])
-      @assessment_request = @assessment_requests.first
-      render :json => @assessment_request.to_json(:methods => :assessor_name)
-    end
-  end
-  
+
   def remind
     @association = @context.rubric_associations.find(params[:rubric_association_id])
     @rubric = @association.rubric
     @request = @association.assessment_requests.find(params[:assessment_request_id])
     if authorized_action(@association, @current_user, :manage)
       @request.send_reminder!
-      render :json => @request.to_json
+      render :json => @request
     end
   end
   
@@ -99,7 +87,7 @@ class RubricAssessmentsController < ApplicationController
         :artifact => Submission.json_serialization_full_parameters,
         :rubric_association => {}
       } : [:artifact, :rubric_association]
-      render :json => @assessment.to_json(:methods => [:ratings, :assessor_name, :related_group_submissions_and_assessments], :include => artifact_includes, :include_root => false)
+      render :json => @assessment.as_json(:methods => [:ratings, :assessor_name, :related_group_submissions_and_assessments], :include => artifact_includes, :include_root => false)
     end
   end
   
@@ -109,9 +97,9 @@ class RubricAssessmentsController < ApplicationController
     @assessment = @rubric.rubric_assessments.find(params[:id])
     if authorized_action(@assessment, @current_user, :delete)
       if @assessment.destroy
-        render :json => @assessment.to_json
+        render :json => @assessment
       else
-        render :json => @assessment.errors.to_json, :status => :bad_request
+        render :json => @assessment.errors, :status => :bad_request
       end
     end
   end

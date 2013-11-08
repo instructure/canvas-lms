@@ -2,16 +2,20 @@ define [
   'i18n!assignments'
   'underscore'
   'compiled/class/cache'
-  'compiled/collections/AssignmentCollection'
-  'compiled/views/CollectionView'
+  'compiled/views/DraggableCollectionView'
   'compiled/views/assignments/AssignmentListItemView'
   'compiled/views/assignments/CreateAssignmentView'
   'compiled/views/assignments/CreateGroupView'
   'compiled/views/assignments/DeleteGroupView'
+  'compiled/views/MoveDialogView'
+  'compiled/fn/preventDefault'
   'jst/assignments/AssignmentGroupListItem'
-], (I18n, _, Cache, AssignmentCollection, CollectionView, AssignmentListItemView, CreateAssignmentView, CreateGroupView, DeleteGroupView, template) ->
+], (I18n, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,
+  CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template) ->
 
-  class AssignmentGroupListItemView extends CollectionView
+  class AssignmentGroupListItemView extends DraggableCollectionView
+    @optionProperty 'course'
+
     tagName: "li"
     className: "item-group-condensed"
     itemView: AssignmentListItemView
@@ -20,31 +24,38 @@ define [
     @child 'createAssignmentView', '[data-view=createAssignment]'
     @child 'editGroupView', '[data-view=editAssignmentGroup]'
     @child 'deleteGroupView', '[data-view=deleteAssignmentGroup]'
+    @child 'moveGroupView', '[data-view=moveAssignmentGroup]'
 
     els: _.extend({}, @::els, {
       '.add_assignment': '$addAssignmentButton'
       '.delete_group': '$deleteGroupButton'
       '.edit_group': '$editGroupButton'
+      '.move_group': '$moveGroupButton'
     })
 
     events:
       'click .element_toggler': 'toggleArrow'
+      'click .tooltip_link': preventDefault ->
 
     messages:
-      toggleMessage: I18n.t('toggle_message',"toggle assignment visibility")
+      toggleMessage: I18n.t('toggle_message', "toggle assignment visibility")
 
     # call remove on children so that they can clean up old dialogs.
     # this should eventually happen at a higher level (eg for all views), but
     # we need to make sure that all children view are also children dom
     # elements first.
-    render: ->
+    render: =>
       @createAssignmentView.remove() if @createAssignmentView
       @editGroupView.remove() if @editGroupView
-      super
+      @deleteGroupView.remove() if @deleteGroupView
+      @moveGroupView.remove() if @moveGroupView
+      super(@canManage())
+
+      # reset the model's view property; it got overwritten by child views
+      @model.view = this if @model
 
     afterRender: ->
       # need to hide child views and set trigger manually
-
       if @createAssignmentView
         @createAssignmentView.hide()
         @createAssignmentView.setTrigger @$addAssignmentButton
@@ -57,46 +68,56 @@ define [
         @deleteGroupView.hide()
         @deleteGroupView.setTrigger @$deleteGroupButton
 
-      #listen for events that cause auto-expanding
-      @collection.on('add', => if !@isExpanded() then @toggle() )
+      if @moveGroupView
+        @moveGroupView.hide()
+        @moveGroupView.setTrigger @$moveGroupButton
+
+      if @model.hasRules()
+        @createRulesToolTip()
+
+    createRulesToolTip: =>
+      link = @$el.find('.tooltip_link')
+      link.tooltip
+        position:
+          my: 'center top'
+          at: 'center bottom+10'
+          collision: 'fit fit'
+        tooltipClass: 'center top vertical'
+        content: ->
+          $(link.data('tooltipSelector')).html()
 
     initialize: ->
-      @collection = new AssignmentCollection @model.get('assignments')
-      @collection.on('add remove', @refreshDeleteDialog)
-      modules = @model.collection.modules
-      @collection.each (assign) ->
-        assign.doNotParse()
-        #set modules
-        assign.modules modules[assign.id]
+      @initializeCollection()
       super
+      @initializeChildViews()
 
       # we need the following line in order to access this view later
       @model.groupView = @
       @initCache()
 
+    initializeCollection: ->
+      @model.get('assignments').each (assign) ->
+        assign.doNotParse() if assign.multipleDueDates()
+
+      @collection = @model.get('assignments')
+      @collection.on 'add',  => @expand(false)
+
+    initializeChildViews: ->
       @editGroupView = false
       @createAssignmentView = false
       @deleteGroupView = false
+      @moveGroupView = false
 
-      if ENV.PERMISSIONS.manage
+      if @canManage()
         @editGroupView = new CreateGroupView
           assignmentGroup: @model
-          assignments: @collection.models
         @createAssignmentView = new CreateAssignmentView
           assignmentGroup: @model
-          collection: @collection
         @deleteGroupView = new DeleteGroupView
           model: @model
-          assignments: @collection
-
-    # this is the only way to get the number of assignments to update properly
-    # when an assignment is created in a new assignment group (before refreshing the page)
-    refreshDeleteDialog: =>
-      if @deleteGroupView
-        @deleteGroupView.remove()
-        @deleteGroupView = new DeleteGroupView
+        @moveGroupView = new MoveDialogView
           model: @model
-          assignments: @collection
+          saveURL: -> ENV.URLS.sort_url
 
     initCache: ->
       $.extend true, @, Cache
@@ -105,47 +126,158 @@ define [
       if !@cache.get(key)?
         @cache.set(key, true)
 
-    toJSON: ->
-      count = @countRules()
-      showRules = count != 0 and ENV.PERMISSIONS.manage
+    initSort: ->
+      super
+      @$list.on('sortactivate', @startSort)
+        .on('sortdeactivate', @endSort)
 
+    startSort: (e, ui) =>
+      # When there is 1 assignment in this group and you drag an assignment
+      # from another group, don't insert the noItemView
+      if @collection.length == 1 && $(ui.placeholder).data("group") == @model.id
+        @insertNoItemView()
+
+    endSort: (e, ui) =>
+      if @collection.length == 0 && @$list.children().length < 1
+        @insertNoItemView()
+      else if @$list.children().length > 1
+        @removeNoItemView()
+
+    toJSON: ->
       data = @model.toJSON()
-      showWeight = @model.collection.course?.get('apply_assignment_group_weights')
+      showWeight = @course?.get('apply_assignment_group_weights') and data.group_weight?
+      canMove = @model.collection.length > 1
 
       attributes = _.extend(data, {
-        showRules: showRules
-        rulesText: I18n.t('rules_text', "Rule", { count: count })
+        canMove: canMove
+        showRules: @model.hasRules()
+        rulesText: I18n.t('rules_text', "Rule", { count: @model.countRules() })
+        displayableRules: @displayableRules()
         showWeight: showWeight
         groupWeight: data.group_weight
         toggleMessage: @messages.toggleMessage
+        hasFrozenAssignments: @model.hasFrozenAssignments? and @model.hasFrozenAssignments()
       })
 
-    countRules: ->
-      rules = @model.get('rules')
-      count = 0
-      for k,v of rules
-        if k == "never_drop"
-          count += v.length
-        else
-          count++
-      count
+    displayableRules: ->
+      rules = @model.rules() or {}
+      results = []
 
-    isExpanded: ->
+      if rules.drop_lowest? and rules.drop_lowest > 0
+        results.push(I18n.t('drop_lowest_rule', {
+          'one': 'Drop the lowest score',
+          'other': 'Drop the lowest %{count} scores'
+        }, {
+          'count': rules.drop_lowest
+        }))
+
+      if rules.drop_highest? and rules.drop_highest > 0
+        results.push(I18n.t('drop_highest_rule', {
+          'one': 'Drop the highest score',
+          'other': 'Drop the highest %{count} scores'
+        }, {
+          'count': rules.drop_highest
+        }))
+
+      if rules.never_drop? and rules.never_drop.length > 0
+        _.each rules.never_drop, (never_drop_assignment_id) =>
+          assign = @model.get('assignments').findWhere(id: never_drop_assignment_id)
+
+          # TODO: students won't see never drop rules for unpublished
+          # assignments because we don't know if the assignment is missing
+          # because it is unpublished or because it has been moved or deleted.
+          # Once those cases are handled better, we can add a default here.
+          if name = assign?.get('name')
+            results.push(I18n.t('never_drop_rule', 'Never drop %{assignment_name}', {
+              'assignment_name': name
+            }))
+
+      results
+
+    search: (regex) ->
+      @resetBorders()
+
+      atleastone = false
+      @collection.each (as) =>
+        atleastone = true if as.search(regex)
+      if atleastone
+        @show()
+        @expand(false)
+        @borderFix()
+      else
+        @hide()
+      atleastone
+
+    endSearch: ->
+      @resetBorders()
+
+      @show()
+      @collapseIfNeeded()
+      @resetNoToggleCache()
+      @collection.each (as) =>
+        as.endSearch()
+
+    resetBorders: ->
+      @$('.first_visible').removeClass('first_visible')
+      @$('.last_visible').removeClass('last_visible')
+
+    borderFix: ->
+      @$('.search_show').first().addClass("first_visible")
+      @$('.search_show').last().addClass("last_visible")
+
+
+    shouldBeExpanded: ->
       @cache.get(@cacheKey())
 
-    toggle: (setTo=false) ->
+    collapseIfNeeded: ->
+      @collapse(false) unless @shouldBeExpanded()
+
+    expand: (toggleCache=true) =>
+      @_setNoToggleCache() unless toggleCache
+      @toggleCollapse() unless @currentlyExpanded()
+
+    collapse: (toggleCache=true) =>
+      @_setNoToggleCache() unless toggleCache
+      @toggleCollapse() if @currentlyExpanded()
+
+    toggleCollapse: (toggleCache=true) ->
+      @_setNoToggleCache() unless toggleCache
       @$el.find('.element_toggler').click()
-      @cache.set(@cacheKey(), setTo)
+
+    _setNoToggleCache: ->
+      @$el.find('.element_toggler').data("noToggleCache", true)
+
+    currentlyExpanded: ->
+      # the 2 states of the element toggler are true and "false"
+      if @$el.find('.element_toggler').attr("aria-expanded") == "false"
+        false
+      else
+        true
 
     cacheKey: ->
-      "ag_#{@model.id}_expanded"
+      ["course", @course.get('id'), "user", @currentUserId(), "ag", @model.get('id'), "expanded"]
 
-    toggleArrow: (ev) ->
+    toggleArrow: (ev) =>
       arrow = $(ev.currentTarget).children('i')
       arrow.toggleClass('icon-mini-arrow-down').toggleClass('icon-mini-arrow-right')
-      @toggleExpanded()
+      @toggleCache() unless $(ev.currentTarget).data("noToggleCache")
+      #reset noToggleCache because it is a one-time-use-only flag
+      @resetNoToggleCache(ev.currentTarget)
 
-    toggleExpanded: ->
+    resetNoToggleCache: (selector=null) ->
+      if selector?
+        obj = $(selector)
+      else
+        obj = @$el.find('.element_toggler')
+      obj.data("noToggleCache", false)
+
+    toggleCache: ->
       key = @cacheKey()
       expanded = !@cache.get(key)
       @cache.set(key, expanded)
+
+    canManage: ->
+      ENV.PERMISSIONS.manage
+
+    currentUserId: ->
+      ENV.current_user_id

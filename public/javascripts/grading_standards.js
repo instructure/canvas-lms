@@ -99,6 +99,7 @@ define([
       event.preventDefault();
       var $standard = $(this).parents(".grading_standard");
       $standard.addClass('editing');
+      $standard.find(".max_score_cell").attr('tabindex', '0');
       if($(this).hasClass('read_only')) {
         $standard.attr('id', 'grading_standard_blank');
       }
@@ -197,6 +198,7 @@ define([
       $(this).parents(".grading_standard").removeClass('editing')
         .find(".insert_grading_standard").hide();
       var $standard = $(this).parents(".grading_standard");
+      $standard.find(".max_score_cell").removeAttr('tabindex');
       $standard.find(".to_add").remove();
       $standard.find(".to_delete").removeClass('to_delete').show();
       if($standard.attr('id') == 'grading_standard_new') {
@@ -296,6 +298,12 @@ define([
         $(this).next(".insert_grading_standard").show();
       } else {
         $(this).prev(".insert_grading_standard").show();
+      }
+    });
+    $(".grading_standard *").focus(function(event) {
+      $(this).trigger('mouseover');
+      if ($(this).hasClass('delete_row_link')) {
+        $(this).parents(".grading_standard_row").nextAll('.grading_standard_row').first().trigger('mouseover');
       }
     });
     $(".grading_standard .insert_grading_standard_link").click(function(event) {
@@ -404,6 +412,14 @@ define([
         }
       });
       $list.filter(":first").find(".edit_max_score").text(100);
+      $list.find('.max_score_cell').each(function() {
+        if (!$(this).data('label')) {
+          $(this).data('label', $(this).attr('aria-label'));
+        }
+        var label = $(this).data('label');
+        $(this).attr('aria-label', label + ' ' + $(this).find('.edit_max_score').text() + '%');
+        debugger;
+      });
     });
   });
 });

@@ -20,10 +20,13 @@
       <% end %>
       </div>
       <div class="rating description" style="<%= hidden unless criterion %>"><%= assessment_rating ? assessment_rating.description : "" %></div>
-      <div class="rating_comments_dialog_link" title="<%= t 'titles.full_comments', "Click to see full comments" %>" style="margin-top: 5px;">
-        <% comments = assessment_rating.comments if assessment_rating && assessment_rating.comments_enabled %>
-        <div class="rating rating_custom"><%= comments || "" %></div>
-      </div>
+      <% comments = assessment_rating.comments if assessment_rating && assessment_rating.comments_enabled %>
+      <a
+        href="#"
+        class="rating_comments_dialog_link"
+        title="<%= t 'titles.full_comments', "Click to see full comments" %>"
+        style="margin-top: 5px;"
+      ><span class="rating rating_custom"><%= comments || "" %></span></a>
       <div class="displaying">
         <span class="nobr x_out_of_x">
           <% ot(:out_of_points, "%{points}/%{total} pts", :points => capture { %>

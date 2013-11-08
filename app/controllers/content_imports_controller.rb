@@ -82,14 +82,16 @@ class ContentImportsController < ApplicationController
   # content. You can control specific types to copy by using either the 'except' option
   # or the 'only' option.
   #
-  # @argument source_course ID or SIS-ID of the course to copy the content from
+  # @argument source_course [String]
+  #   ID or SIS-ID of the course to copy the content from
   #
-  # @argument except[] A list of the course content types to exclude, all areas not listed will be copied.
+  # @argument except[] [String, "course_settings"|"assignments"|"external_tools"|"files"|"topics"|"calendar_events"|"quizzes"|"wiki_pages"|"modules"|"outcomes"]
+  #   A list of the course content types to exclude, all areas not listed will
+  #   be copied.
   #
-  # @argument only[] A list of the course content types to copy, all areas not listed will not be copied.
-  #
-  # The possible items for 'except' and 'only' are: "course_settings", "assignments", "external_tools", 
-  # "files", "topics", "calendar_events", "quizzes", "wiki_pages", "modules", "outcomes"
+  # @argument only[] [String, "course_settings"|"assignments"|"external_tools"|"files"|"topics"|"calendar_events"|"quizzes"|"wiki_pages"|"modules"|"outcomes"]
+  #   A list of the course content types to copy, all areas not listed will not
+  #   be copied.
   #
   # The response is the same as the course copy status endpoint
   #
@@ -103,7 +105,7 @@ class ContentImportsController < ApplicationController
         @source_course = api_find(Course, params[:source_course])
         copy_params = {:everything => false}
         if params[:only] && params[:except]
-          render :json => {"errors"=>t('errors.no_only_and_except', 'You can not use "only" and "except" options at the same time.')}.to_json, :status => :bad_request
+          render :json => {"errors"=>t('errors.no_only_and_except', 'You can not use "only" and "except" options at the same time.')}, :status => :bad_request
           return
         elsif params[:only]
           convert_to_table_name(params[:only]).each {|o| copy_params["all_#{o}".to_sym] = true}

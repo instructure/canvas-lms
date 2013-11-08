@@ -1,0 +1,37 @@
+<tr {{bindAttr data-module-item-id="item.id" class=":module-item item.visible:visible:hidden2"}}>
+  <td class="long">
+    {{#if editable}}
+      <img class="drag-handler" src="img/item-handle.png" style="height: 12px;padding-bottom: 4px;" />
+    {{/if}}
+
+    <div style="display: inline-block;" {{bindAttr class=item.indentClass}}>
+      <span class="type_icon" {{bindAttr title=item.type}}>
+        {{moduleIcon item.type}}
+      </span>
+      <a class="module-item-title" {{bindAttr href=item.url target="item.new_tab:_blank"}} "">{{item.title}}</a>
+    </div>
+  </td>
+
+  <td>
+    {{#if item.content_details.unlock_at}}
+      Available until {{item.content_details.unlock_at}}
+    {{/if}}
+  </td>
+  <td>
+    {{#if item.content_details.due_at}}
+      Available until {{item.content_details.due_at}}
+    {{/if}}
+  </td>
+  <td>
+    {{#if content_details.points_possible}}
+      - / {{content_details.points_possible}} pts
+    {{/if}}
+  </td>
+
+  <td class="align-right">
+    {{canvas-module-item-publish published=item.published}}
+  </td>
+  <td>
+    {{canvas-module-item-cog item=item}}
+    </td> 
+</tr>

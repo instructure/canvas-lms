@@ -4,16 +4,14 @@ class ContextExternalTool < ActiveRecord::Base
 
   has_many :content_tags, :as => :content
   belongs_to :context, :polymorphic => true
-  belongs_to :cloned_item
   attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, 
                   :name, :description, :custom_fields, :custom_fields_string,
                   :course_navigation, :account_navigation, :user_navigation,
                   :resource_selection, :editor_button, :homework_submission,
                   :config_type, :config_url, :config_xml, :tool_id
-  validates_presence_of :name
+  validates_presence_of :context_id, :context_type, :workflow_state
+  validates_presence_of :name, :consumer_key, :shared_secret
   validates_length_of :name, :maximum => maximum_string_length
-  validates_presence_of :consumer_key
-  validates_presence_of :shared_secret
   validates_presence_of :config_url, :if => lambda { |t| t.config_type == "by_url" }
   validates_presence_of :config_xml, :if => lambda { |t| t.config_type == "by_xml" }
   validates_length_of :domain, :maximum => 253, :allow_blank => true
@@ -432,7 +430,7 @@ class ContextExternalTool < ActiveRecord::Base
     contexts.each do |context|
       tools += context.context_external_tools.active
     end
-    tools.sort_by(&:name)
+    Canvas::ICU.collate_by(tools, &:name)
   end
   
   # Order of precedence: Basic LTI defines precedence as first
@@ -471,7 +469,7 @@ class ContextExternalTool < ActiveRecord::Base
     preferred_tool = ContextExternalTool.active.find_by_id(preferred_tool_id)
     return preferred_tool if preferred_tool && preferred_tool.resource_selection
 
-    sorted_external_tools = contexts.collect{|context| context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? 0 : 1] }}.flatten(1)
+    sorted_external_tools = contexts.collect{|context| context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? SortFirst : SortLast] }}.flatten(1)
 
     res = sorted_external_tools.detect{|tool| tool.url && tool.matches_url?(url) }
     return res if res
@@ -540,26 +538,6 @@ class ContextExternalTool < ActiveRecord::Base
         end
       end
     end
-  end
-
-  def clone_for(context, dup=nil, options={})
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item = ClonedItem.create(:original_item => self)
-      self.save!
-    end
-    existing = ContextExternalTool.active.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, self.id)
-    existing ||= ContextExternalTool.active.find_by_context_type_and_context_id_and_cloned_item_id(context.class.to_s, context.id, self.cloned_item_id)
-    return existing if existing && !options[:overwrite]
-    new_tool = existing
-    new_tool ||= ContextExternalTool.new
-    new_tool.context = context
-    new_tool.settings = self.settings.clone
-    [:name, :shared_secret, :url, :domain, :consumer_key, :workflow_state, :description].each do |att|
-      new_tool.write_attribute(att, self.read_attribute(att))
-    end
-    new_tool.cloned_item_id = self.cloned_item_id
-    
-    new_tool
   end
 
   def resource_selection_settings

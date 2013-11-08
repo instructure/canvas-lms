@@ -19,42 +19,22 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe AppCenterController do
-  describe "#generate_app_api_collection" do
-    let(:controller) do
-      controller = AppCenterController.new
-      controller.params = {}
-      controller
-    end
+  describe "#map_tools_to_apps!" do
+    it "maps tools" do
+      course_model
+      tool1 = @course.account.context_external_tools.create(:tool_id => 'tool1', :name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "google.com")
+      tool2 = @course.context_external_tools.create(:tool_id => 'tool2', :name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "google.com")
+      apps = [
+          {'short_name' => tool1.tool_id},
+          {'short_name' => tool2.tool_id},
+          {'short_name' => 'not_installed'}
+      ]
 
-    it "generates a valid paginated collection" do
-      objects = ['object1', 'object2']
-      next_page = 10
-      will_paginate = controller.generate_app_api_collection('www.example.com/endpoint') do |app_api, page|
-        app_api.should be_a AppCenter::AppApi
-        page.should == 1
-        {
-            'objects' => ['object1', 'object2'],
-            'meta' => {"next_page" => next_page}
-        }
-      end
-      will_paginate.should be_a PaginatedCollection::Proxy
-      collection = will_paginate.paginate(:per_page => 72)
-      collection.should == objects
-      collection.next_page.should == next_page
-    end
+      controller.map_tools_to_apps!(@course, apps)
 
-    it "handles an empty response" do
-      will_paginate = controller.generate_app_api_collection('') {}
-      will_paginate.paginate(:per_page => 50).should == []
-    end
-
-    it "passes the page param as the offset" do
-      controller.params['page'] = 32
-      controller.params['per_page'] = 12
-      will_paginate = controller.generate_app_api_collection('') do |app_api, page, per_page|
-        page.should == controller.params['page']
-        per_page.should == controller.params['per_pages']
-      end
+      apps.should include({'short_name' => tool1.tool_id, 'is_installed' => true})
+      apps.should include({'short_name' => tool2.tool_id, 'is_installed' => true})
+      apps.should include({'short_name' => 'not_installed'})
     end
   end
 end

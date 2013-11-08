@@ -24,7 +24,7 @@
 # In this API, the `:user_id` parameter can always be replaced with `self` if
 # the requesting user is asking for his/her own information.
 #
-# @object Communication Channel
+# @object CommunicationChannel
 #     {
 #       // The ID of the communication channel.
 #       "id": 16,
@@ -63,7 +63,7 @@ class CommunicationChannelsController < ApplicationController
   #     curl https://<canvas>/api/v1/users/12345/communication_channels \ 
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns [Communication Channel]
+  # @returns [CommunicationChannel]
   def index
     @user = api_find(User, params[:user_id])
     return unless authorized_action(@user, @current_user, :read)
@@ -80,9 +80,17 @@ class CommunicationChannelsController < ApplicationController
   #
   # Creates a new communication channel for the specified user.
   #
-  # @argument communication_channel[address] An email address or SMS number.
-  # @argument communication_channel[type] [email|sms] The type of communication channel.
-  # @argument skip_confirmation [Optional] Only valid for site admins making requests; If '1', the channel is automatically validated and no confirmation email or SMS is sent. Otherwise, the user must respond to a confirmation message to confirm the channel.
+  # @argument communication_channel[address] [String]
+  #   An email address or SMS number.
+  #
+  # @argument communication_channel[type] [String, "email"|"sms"]
+  #   The type of communication channel.
+  #
+  # @argument skip_confirmation [Optional, Boolean]
+  #   Only valid for site admins making requests; If true, the channel is
+  #   automatically validated and no confirmation email or SMS is sent.
+  #   Otherwise, the user must respond to a confirmation message to confirm the
+  #   channel.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/users/1/communication_channels \ 
@@ -90,7 +98,7 @@ class CommunicationChannelsController < ApplicationController
   #          -d 'communication_channel[address]=new@example.com' \ 
   #          -d 'communication_channel[type]=email' \ 
   #
-  # @returns Communication Channel
+  # @returns CommunicationChannel
   def create
     @user = api_request? ? api_find(User, params[:user_id]) : @current_user
 
@@ -98,7 +106,7 @@ class CommunicationChannelsController < ApplicationController
 
     params.delete(:build_pseudonym) if api_request?
 
-    skip_confirmation = params[:skip_confirmation].present? &&
+    skip_confirmation = value_to_boolean(params[:skip_confirmation]) &&
       Account.site_admin.grants_right?(@current_user, :manage_students)
 
     # If a new pseudonym is requested, build (but don't save) a pseudonym to ensure
@@ -176,7 +184,7 @@ class CommunicationChannelsController < ApplicationController
         flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
         return respond_to do |format|
           format.html { redirect_back_or_default(user_profile_url(@current_user)) }
-          format.json { render :json => cc.to_json(:except => [:confirmation_code] ) }
+          format.json { render :json => cc.as_json(:except => [:confirmation_code] ) }
         end
       end
 
@@ -198,12 +206,12 @@ class CommunicationChannelsController < ApplicationController
             (account_to_pseudonyms_hash[p.account] ||= []) << p
           end
           @merge_opportunities << [user, account_to_pseudonyms_hash.map do |(account, pseudonyms)|
-            pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort { |a, b| a.position <=> b.position }.first
+            pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort_by(&:position).first
           end]
-          @merge_opportunities.last.last.sort! { |a, b| a.account.name <=> b.account.name }
+          @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
         end
       end
-      @merge_opportunities.sort! { |a, b| [a.first == @current_user ? 0 : 1, a.first.name] <=> [b.first == @current_user ? 0 : 1, b.first.name] }
+      @merge_opportunities.sort_by! { |a| [a.first == @current_user ? SortFirst : SortLast, Canvas::ICU.collation_key(a.first.name)] }
 
       js_env :PASSWORD_POLICY => @domain_root_account.password_policy
 
@@ -258,9 +266,6 @@ class CommunicationChannelsController < ApplicationController
 
         # User chose to continue with this cc/pseudonym/user combination on confirmation page
         if @pseudonym && params[:register]
-          if Canvas.redis_enabled? && @merge_opportunities.length == 1
-            Canvas.redis.rpush('single_user_registered_new_account_stats', {:user_id => @user.id, :registered_at => Time.now.utc }.to_json)
-          end
           @user.require_acceptance_of_terms = require_terms?
           @user.attributes = params[:user]
           @pseudonym.attributes = params[:pseudonym]
@@ -318,7 +323,7 @@ class CommunicationChannelsController < ApplicationController
     if failed
       respond_to do |format|
         format.html { render :action => "confirm_failed", :status => :bad_request }
-        format.json { render :json => {}.to_json, :status => :bad_request }
+        format.json { render :json => {}, :status => :bad_request }
       end
     else
       flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
@@ -351,7 +356,7 @@ class CommunicationChannelsController < ApplicationController
   #          -H 'Authorization: Bearer <token>
   #          -X DELETE
   #
-  # @returns Communication Channel
+  # @returns CommunicationChannel
   def destroy
     @user = api_request? ? api_find(User, params[:user_id]) : @current_user
     @cc   = @user.communication_channels.find(params[:id]) if params[:id]
@@ -369,7 +374,7 @@ class CommunicationChannelsController < ApplicationController
         render :json => @cc.as_json
       end
     else
-      render :json => @cc.errors.to_json, :status => :bad_request
+      render :json => @cc.errors, :status => :bad_request
     end
   end
 

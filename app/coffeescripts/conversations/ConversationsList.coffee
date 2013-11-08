@@ -19,12 +19,12 @@ define [
         itemsKey: 'conversations'
         sortKey: 'last_message_at'
         sortDir: 'desc'
-        baseUrl: '/conversations?include_all_conversation_ids=1'
+        baseUrl: '/conversations?include_all_conversation_ids=1&include_beta=1'
         noAutoLoad: true
 
       $('#menu-wrapper').on('click', 'a.standard_action', @triggerConversationAction)
       @$list.on('click', 'li[data-id] > a.standard_action', @triggerConversationAction)
-      @$list.on('click', 'button.al-trigger', @pane.filterMenu.bind(@pane))
+      @$list.on('mousedown keydown', 'button.al-trigger', @pane.filterMenu.bind(@pane))
 
       $(window).unload(=> clearTimeout(@markAsUnread))
 

@@ -189,7 +189,8 @@ class SubmissionList
     # Produce @list, wich is a sorted, filtered, list of submissions with
     # all the meta data we need and no banned keys included. 
     def process
-      @list = self.submission_entries.sort(&sort_block_for_displaying).inject(Dictionary.new) do |d, se|
+      @list = self.submission_entries.sort_by { |a| [a[:graded_at] ? -a[:graded_at].to_f : SortLast, a[:safe_grader_id], a[:assignment_id]] }.
+          inject(Dictionary.new) do |d, se|
         d[se[:graded_on]] ||= []
         d[se[:graded_on]] << se
         d
@@ -231,7 +232,9 @@ class SubmissionList
     # * current_grader
     def filtered_submissions
       return @filtered_submissions if @filtered_submissions
-      full_hash_list.sort! &sort_block_for_filtering
+      # Sorts by submission then updated at in ascending order.  So:
+      # submission 1 1/1/2009, submission 1 1/15/2009, submission 2 1/1/2009
+      full_hash_list.sort_by! { |a| [a[:id], a[:updated_at]] }
       prior_submission_id, prior_grade, prior_score, prior_graded_at, prior_grader = nil
       
       @filtered_submissions = full_hash_list.inject([]) do |l, h|
@@ -283,48 +286,7 @@ class SubmissionList
         l
       end
     end
-    
-    # Sorts by submission then updated at in ascending order.  So:
-    # submission 1 1/1/2009, submission 1 1/15/2009, submission 2 1/1/2009
-    def sort_block_for_filtering
-      lambda{|a, b|
-        tier_1 = a[:id] <=> b[:id]
-        tier_2 = a[:updated_at] <=> b[:updated_at]
-        tier_1 == 0 ? tier_2 : tier_1
-      }
-    end
-    
-    def sort_block_for_displaying
-      lambda{|a, b|
-        
-        first_tier = if b[:graded_at] and a[:graded_at]
-          b[:graded_at] <=> a[:graded_at]
-        elsif b[:graded_at]
-          1
-        elsif a[:graded_at]
-          -1
-        else
-          0
-        end
-        
-        case first_tier
-        when -1
-          -1
-        when 1
-          1
-        when 0
-          case a[:safe_grader_id] <=> b[:safe_grader_id]
-          when -1
-            -1
-          when 1
-            1
-          when 0
-            a[:assignment_id] <=> b[:assignment_id]
-          end
-        end
-      }
-    end
-    
+
     # A list of all versions in YAML format
     def yaml_list
       @yaml_list ||= self.course.submissions.map {|s| s.versions.map { |v| v.yaml } }.flatten

@@ -19,17 +19,20 @@
 define [
   'i18n!conversation_dialog'
   'underscore'
+  'Backbone'
   'compiled/views/DialogBaseView'
   'jst/conversations/MessageFormDialog'
-  'compiled/conversations/MessageProgressTracker'
   'compiled/fn/preventDefault'
   'jst/conversations/composeTitleBar'
   'jst/conversations/composeButtonBar'
   'jst/conversations/addAttachment'
+  'compiled/models/Message'
   'compiled/views/conversations/AutocompleteView'
   'compiled/views/conversations/CourseSelectionView'
+  'compiled/views/conversations/ContextMessagesView'
   'compiled/widget/ContextSearch'
-], (I18n, _, DialogBaseView, template, MessageProgressTracker, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, AutocompleteView, CourseSelectionView) ->
+  'vendor/jquery.elastic'
+], (I18n, _, {Collection}, DialogBaseView, template, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, Message, AutocompleteView, CourseSelectionView, ContextMessagesView) ->
 
   ##
   # reusable message composition dialog
@@ -39,13 +42,21 @@ define [
 
     els:
       '.message_course':                '$messageCourse'
+      'input[name=context_code]':       '$contextCode'
+      '.message_subject':               '$messageSubject'
+      '.context_messages':              '$contextMessages'
       '.media_comment':                 '$mediaComment'
       'input[name=media_comment_id]':   '$mediaCommentId'
       'input[name=media_comment_type]': '$mediaCommentType'
       '.ac':                            '$recipients'
       '.attachment_list':               '$attachments'
       '.attachments-pane':              '$attachmentsPane'
+      '.message-body':                  '$messageBody'
       '.conversation_body':             '$conversationBody'
+      '.compose_form':                  '$form'
+
+    messages:
+      flashSuccess: I18n.t('message_sent', 'Message sent!')
 
     dialogOptions: ->
       id: 'compose-new-message'
@@ -74,7 +85,13 @@ define [
         click: (e) => @sendMessage(e)
       ]
 
-    show: ->
+    show: (model, options) ->
+      if @model = model
+        @message = options?.message || @model.messageCollection.at(0)
+      @to            = options?.to
+      @returnFocusTo = options.trigger if options.trigger
+      @launchParams = _.pick(options, 'context', 'user') if options.remoteLaunch
+
       @render()
       super
       @initializeForm()
@@ -83,6 +100,7 @@ define [
     ##
     # detach events that were dynamically added when the dialog is closed.
     afterClose: ->
+      @$fullDialog.off 'click', '.message-body'
       @$fullDialog.off 'click', '.attach-file'
       @$fullDialog.off 'click', '.attachment .remove_link'
       @$fullDialog.off 'keydown', '.attachment'
@@ -92,12 +110,15 @@ define [
       @$fullDialog.off 'click', '.attach-media'
       @$fullDialog.off 'click', '.media-comment .remove_link'
       @trigger('close')
+      if @returnFocusTo
+        @returnFocusTo.focus()
+        delete @returnFocusTo
 
     sendMessage: (e) ->
       e.preventDefault()
       e.stopPropagation()
       @removeEmptyAttachments()
-      @$el.submit()
+      @$form.submit()
 
     initialize: ->
       super
@@ -121,12 +142,11 @@ define [
         if e.which is 13 and e.shiftKey
           $(e.target).closest('form').submit()
           false
-
-    initializeTokenInputs: ($scope) ->
-      @recipientView = new AutocompleteView(el: @$recipients).render()
+      $textArea.elastic()
 
     onCourse: (course) =>
-      @recipientView.setCourse(course)
+      @recipientView.setContext(course, true)
+      @$contextCode.val(if course?.id then course.id else '')
 
     defaultCourse: null
     setDefaultCourse: (course) ->
@@ -134,15 +154,25 @@ define [
 
     initializeForm: ->
       @prepareTextarea(@$el)
-      @initializeTokenInputs(@$el)
+      @recipientView = new AutocompleteView(
+        el: @$recipients
+        disabled: @model?.get('private')
+      ).render()
 
+      @$messageCourse.prop('disabled', !!@model)
       @courseView = new CourseSelectionView(
         el: @$messageCourse,
         courses: @options.courses,
         defaultOption: I18n.t('select_course', 'Select course')
       )
       @courseView.on('course', @onCourse)
-      @courseView.setValue(@defaultCourse)
+      if @model
+        # TODO: I imagine we'll be changing this
+        @courseView.setValue("course_" + _.keys(@model.get('audience_contexts').courses)[0])
+      else if @launchParams
+        @courseView.setValue(@launchParams.context) if @launchParams.context
+      else
+        @courseView.setValue(@defaultCourse)
       @courseView.focus()
 
       if @tokenInput = @$el.find('.recipients').data('token_input')
@@ -157,9 +187,36 @@ define [
                 text: data[0].name
                 data: data[0]
 
+      if @to && @to != 'forward' && @message
+        tokens = [] 
+        tokens.push(@message.get('author'))
+        if @to == 'replyAll' || ENV.current_user_id == @message.get('author').id
+          tokens = tokens.concat(@message.get('participants'))
+          if tokens.length > 1
+            tokens = _.filter(tokens, (t) -> t.id != ENV.current_user_id)
+        @recipientView.setTokens(tokens)
+
+      @recipientView.setTokens([@launchParams.user]) if @launchParams
+
       if @tokenInput
         @tokenInput.change = @recipientIdsChanged
 
+      @$messageSubject.prop('disabled', !!@model)
+      @$messageSubject.val(@model?.get('subject'))
+
+      if messages = @model?.messageCollection
+        # include only messages which
+        #   1) are older than @message
+        #   2) have as participants a superset of the participants of @message
+        date = new Date(@message.get('created_at'))
+        participants = @message.get('participating_user_ids')
+        includedMessages = new Collection messages.filter (m) ->
+          new Date(m.get('created_at')) <= date &&
+            !_.find(participants, (p) -> !_.contains(m.get('participating_user_ids'), p))
+        contextView = new ContextMessagesView(el: @$contextMessages, collection: includedMessages)
+        contextView.render()
+
+      @$fullDialog.on 'click', '.message-body', @handleBodyClick
       @$fullDialog.on 'click', '.attach-file', preventDefault =>
         @addAttachment()
       @$fullDialog.on 'click', '.attachment .remove_link', preventDefault (e) =>
@@ -175,8 +232,9 @@ define [
         @removeMediaComment($(e.currentTarget))
       @$addMediaComment[if !!INST.kalturaSettings then 'show' else 'hide']()
 
-      @$el.formSubmit
-        fileUpload: => (@$form.find(".file_input").length > 0)
+      @$form.formSubmit
+        fileUpload: => (@$fullDialog.find(".attachment_list").length > 0)
+        files: => (@$fullDialog.find(".file_input")) 
         preparedFileUpload: true
         context_code: "user_" + ENV.current_user_id
         folder_id: @options.folderId
@@ -185,19 +243,32 @@ define [
         disableWhileLoading: true
         required: ['body']
         property_validations:
-          token_capture: => I18n.t('errors.field_is_required', "This field is required") if @tokenInput and !@tokenInput.tokenValues().length
+          token_capture: => I18n.t('errors.field_is_required', "This field is required") if @recipientView and !@recipientView.tokens.length
         handle_files: (attachments, data) ->
           data.attachment_ids = (a.attachment.id for a in attachments)
           data
         onSubmit: (@request, submitData) =>
-          data = @messageData(submitData)
-          @tracker.track(data, @request)
           # close dialog after submitting the message
+          dfd = $.Deferred()
+          @trigger('submitting', dfd)
           @close()
           # update conversation when message confirmed sent
-          $.when(@request).then (data) =>
-            data = [data] unless data.length?
-            @app.updatedConversation(data)
+          # TODO: construct the new message object and pass it to the MessageDetailView which will need to create a MessageItemView for it
+          # store @to for the closure in case there are multiple outstanding send requests
+          localTo = @to
+          @to = null
+          $.when(@request).then (response) =>
+            dfd.resolve()
+            $.flashMessage(@messages.flashSuccess)
+            if localTo
+              message = response.messages[0]
+              message.author =
+                name: ENV.current_user.display_name
+                avatar_url: ENV.current_user.avatar_image_url
+              message = new Message(response, parse: true)
+              @trigger('addMessage', message.toJSON().conversation.messages[0], response)
+            else
+              @trigger('newConversations', response)
 
     recipientIdsChanged: (recipientIds) =>
       if recipientIds.length > 1 or recipientIds[0]?.match(/^(course|group)_/)
@@ -210,7 +281,7 @@ define [
       # place the attachment pane at the bottom of the form
       @$attachmentsPane.css('top', @$attachmentsPane.height())
       # Compute desired height of body
-      @$conversationBody.height( (@$el.offset().top + @$el.height()) - @$conversationBody.offset().top - @$attachmentsPane.height())
+      @$messageBody.height( (@$el.offset().top + @$el.height()) - @$messageBody.offset().top - @$attachmentsPane.height())
 
     addAttachment: ->
       $attachment = $(addAttachmentTemplate())
@@ -220,6 +291,9 @@ define [
       @focusAddAttachment()
 
     imageTypes: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg']
+
+    handleBodyClick: (e) =>
+      @$conversationBody.focus() if e.target == e.currentTarget
 
     handleAttachmentClick: (e) =>
       # IE doesn't do this automatically
@@ -342,5 +416,5 @@ define [
 #      for key, enabled of options
 #        $node = @$form.find(".#{key}_info")
 #        $node.showIf(enabled)
-#        $node.find("input[name=#{key}]").prop('checked', false) unless enabled
+#        $node.find("input[type=checkbox][name=#{key}]").prop('checked', false) unless enabled
 #

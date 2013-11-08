@@ -4,11 +4,13 @@ skip_locale_loading = (Rails.env.development? || Rails.env.test? || $0 == 'irb')
 if skip_locale_loading
   I18n.load_path = I18n.load_path.grep(%r{/(locales|en)\.yml\z})
 end
-unless CANVAS_RAILS3
+if CANVAS_RAILS2
   I18n.backend = I18nema::Backend.new
   I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
   I18n.backend.init_translations
 end
+
+I18n.send :extend, I18n::Lolcalize if ENV['LOLCALIZE']
 
 module I18nUtilities
   def before_label(text_or_key, default_value = nil, *args)
@@ -154,7 +156,7 @@ I18n.class_eval do
   def self.apply_wrappers(string, wrappers)
     string = ERB::Util.h(string) unless string.html_safe?
     wrappers = { '*' => wrappers } unless wrappers.is_a?(Hash)
-    wrappers.sort { |a, b| -(a.first.length <=> b.first.length) }.each do |sym, replace|
+    wrappers.sort_by { |a| -a.first.length }.each do |sym, replace|
       regex = (WRAPPER_REGEXES[sym] ||= %r{#{Regexp.escape(sym)}([^#{Regexp.escape(sym)}]*)#{Regexp.escape(sym)}})
       string = string.gsub(regex, replace)
     end
@@ -163,7 +165,7 @@ I18n.class_eval do
 end
 
 ActionView::Base.class_eval do
-  if Rails.version < "3.0"
+  if CANVAS_RAILS2
     def i18n_scope
       "#{template.base_path}.#{template.name.sub(/\A_/, '')}"
     end

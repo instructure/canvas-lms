@@ -1,5 +1,6 @@
 <form id="editCalendarEventFull" class="{{#if use_section_dates}}use_section_dates{{/if}}">
   <input type="text"
+         name="title"
          class="title input-block-level"
          aria-label="{{#t "event_title"}}Event Title{{/t}}"
          placeholder="{{#t "event_title"}}Event Title{{/t}}"
@@ -13,10 +14,7 @@
 
   {{#if course_sections}}
     <label class="label_with_checkbox">
-      <input type="checkbox"
-             name="use_section_dates"
-             value="1"
-             {{#if use_section_dates}}checked{{/if}} />
+      {{checkbox "use_section_dates"}}
       {{#t "different_date_for_each_section"}}Use a different date for each section{{/t}}
     </label>
 

@@ -165,7 +165,7 @@ es:
       test_ldap_search_label: "Probando la búsqueda LDAP..."
     ldap_timeout_error: 
       last_ldap_timeout_failure: "Fallo del último tiempo de espera"
-      ldap_timeout_failure_help: "Si el tiempo de espera de la comunicación de Canvas con el servidor LDAP se ha terminado, se bloquearán los futuros intentos de inicio de sesión usando ese servidor LDAP por %{time}."
+      ldap_timeout_failure_help2: "Si el tiempo de espera en las comunicaciones entre Canvas y el servidor LDAP se ha agotado en diversas ocasiones, Canvas bloqueará cualquier otro intento de inicio de sesión a través de ese servidor LDAP durante %{time}."
     login_required: "debe ser suministrado"
     no_auth_mixing: "No se pueden mezclar los tipos de autenticación"
     no_changing_auth_types: "No se puede cambiar el tipo de configuración de la autorización, elimínelo y cree una configuración nueva."
@@ -243,18 +243,31 @@ es:
     announcement_deleted_notice: "Anuncio borrado"
     permission_denied_notice: "No puede crear alertas para esta cuenta"
   account_reports: 
+    ccp: 
+      course: 
+        check_box: "Para el curso: %{course_id};"
+      courses_only: "Solo cursos online"
+      start_at: "Inicio: %{start_at};"
     default: 
       all_terms: "Todos los términos"
+      course_text: "Para el curso: %{course};"
+      end_text: "Finaliza el: %{end_at};"
       extra_text_term: "Período: %{term_name};"
       message: "%{type} informe generado con éxito con la siguiente configuración. Cuenta: %{account}; %{options}"
+      section_text: "Para la sección: %{section};"
+      start_text: "Inicio: %{start_at};"
+      term_text: "Período: %{term_name};"
     grades: 
       deleted: "Incluir objetos eliminados: verdadero;"
     mississippi: 
       reports: "Informes: %{files}"
+    outcomes: 
+      order: "Orden: %{order}"
     sis_exporter: 
       deleted: "Incluir objetos eliminados: verdadero;"
       reports: "Informes: %{files}"
   account_settings: 
+    account_name_too_long: "El nombre de la cuenta es demasiado largo"
     confirms: 
       delete_announcement: "¿Seguro que quiere borrar este anuncio?"
       global_announcement: "Debe confirmar el anuncio global"
@@ -269,6 +282,7 @@ es:
         invalid_settings: "configuraciones de Turnitin inválidas, por favor revise su identificación de cuenta y su secreto compartido de Turnitin"
         setings_confirmed: "¡Configuraciones de Turnitin confirmadas!"
     titles: 
+      allow_draft_help_title: "¿Qué es el estado Borrador?"
       configure_report: "Configurar el Reporte"
       open_registration_delegated_warning_dialog: "Un proveedor de identidad externo está activo"
       what_are_quiz_ip_filters: "¿Cuáles son los Filtros para las Evaluaciones IP?"
@@ -277,6 +291,8 @@ es:
       account_admin: "Administrador de Cuenta"
   accounts: 
     account_name_required: "El nombre de la cuenta no puede estar vacío"
+    account_quotas_not_updated: "No se han actualizado las cuotas de la cuenta"
+    account_quotas_updated: "Se han actualizado las cuotas de las cuentas"
     account_user: 
       remove_admin_tooltip: "Remover este administrador"
     add_course_button: "Agregar Curso"
@@ -286,7 +302,7 @@ es:
       add_course_link: "Agregar un curso nuevo"
       add_user_button: "Agregar un usuario"
       add_user_link: "Agregar un usuario nuevo"
-      display_name_help: "La gente verá este nombre en discusiones, mensajes y comentarios."
+      display_name_help: "La gente verá este nombre en foros, mensajes y comentarios."
       full_name_description: "Este nombre será usado por los profesores para la calificación."
       labels: 
         account_id: Departamento
@@ -314,10 +330,18 @@ es:
         unsuspend: "Anular la suspensión de una cuenta"
     admin_tools: 
       admin_tools: 
+        auth_logging: "Iniciando sesión"
         tab_labels: 
           restore_course: "Restaurar cursos"
         view_messages: "Ver notificaciones"
       admin_tools_cumb: "Herramientas de administración"
+      auth_logging_content_pane: 
+        auth_logging: "Actividad de inicio/fin de sesión del usuario"
+      auth_logging_search_results: 
+        activity: Actividad
+        date: Fecha
+        no_item_found: "No se ha encontrado ningún elemento"
+        time: Tiempo
       comm_message_item: 
         created_at: "Creado en"
         from_name: De
@@ -325,13 +349,8 @@ es:
         sent_at: "Enviado en"
         to: Para
       comm_messages_content_pane: 
-        search_info: "Para ver todas las notificaciones enviadas a un usuario de Canvas, introduzca su ID de usuario de Canvas y el intervalo de fechas de su búsqueda."
+        search_info2: "Para ver todas las notificaciones que se han enviado a un usuario de Canvas, seleccione el usuario y el intervalo de fechas en su búsqueda. "
         view_notifications: "Ver notificaciones"
-      comm_messages_search_form: 
-        canvas_user_id: "ID de usuario de Canvas"
-        find: Buscar
-        message_date_from: "Desde la fecha"
-        message_date_to: "Hasta la fecha"
       comm_messages_search_overview: 
         messages_viewed: "Notificaciones enviadas a *%{user}* desde el *%{start_date}* hasta el *%{end_date}*."
       comm_messages_search_results: 
@@ -362,6 +381,38 @@ es:
           add_enrollments: "Agregar inscripciones"
           subtext: "¿Qué desea hacer a continuación?"
       page_title: "Herramientas administrativas para %{account}"
+      user_date_range_search_form: 
+        find: Buscar
+        generate_activity_userid: "ID de usuario: *%{user_id}*"
+        generate_activity_username: "Generar actividad para *%{user}*"
+        message_date_from: "Desde la fecha"
+        message_date_to: "Hasta la fecha"
+        search: Buscar
+        search_people: "Buscar personas"
+    assignment_scheduling_csv_description: 
+      account_reports: 
+        newark: 
+          description: 
+            header: Ejemplo
+          student_activity: 
+            text: "Este informe muestra todas las tareas y la información correspondiente a las tareas incluidas en un grupo o varios grupos de tareas específicos y en un intervalo de fechas específico. Este informe ofrece datos útiles para programar tareas y gestionar la cantidad de tareas de los alumnos, mostrando solo los alumnos y las tareas en las que hay dos o más tareas en conflicto que vencen en la misma fecha para el mismo alumno."
+    assignment_scheduling_csv_parameters: 
+      account_reports: 
+        newark: 
+          assignment_groups: 
+            label: "Grupos de trabajo que se incluirán:"
+          major: 
+            check_box: Principal
+          papers: 
+            check_box: Artículos
+          projects: 
+            check_box: Proyectos
+          reports: 
+            check_box: Informes
+          section_id: 
+            field: "ID de sección:"
+          tests: 
+            check_box: Pruebas
     avatars: 
       all_link: 
         one: "Todo %{count}"
@@ -391,6 +442,24 @@ es:
       unlock_link: desbloquear
     cannot_manage_account: "No tiene permiso para gestionar la configuración de la cuenta"
     cannot_manage_quotas: "No tiene permiso para gestionar la configuración de la cuota"
+    ccp_zero_activity_csv_description: 
+      account_reports: 
+        ccp: 
+          ccp_zero_activity_csv: 
+            header: Ejemplo
+            text: "En este informe aparecen todos los alumnos inscritos en cualquier curso en un periodo en concreto.  El archivo csv que se genera incluirá una línea por inscripción de usuario que no haya visitado el curso desde la fecha."
+    ccp_zero_activity_csv_parameters: 
+      account_reports: 
+        ccp: 
+          filter_online: 
+            check_box: "Solo clases online"
+    chcp_student_activity_csv_description: 
+      account_reports: 
+        chcp: 
+          student_activity: 
+            description: 
+              header: Ejemplo
+            text: "Este informe muestra la participación de los alumnos en sus respectivos cursos. El archivo csv que se genera muestra las inscripciones en filas y contiene información sobre la ID de SIS del alumno, el nombre del alumno, su número de teléfono, su dirección de correo elecrónico, el nombre del curso, el último envío, los días transcurridos desde el último envío, el porcentaje de realización actual del curso y la fecha de inicio de su período."
     confirm_delete_user: 
       confirm_delete: |-
           ¿Está seguro de que quiere borrar este usuario de la cuenta %{account}?
@@ -448,7 +517,28 @@ es:
         ross: 
           parameters: 
             note: "Los cursos con tareas desactivadas pueden no reflejar las calificaciones con exactitud en este informe."
+    custom_outcomes_csv_description: 
+      account_reports: 
+        edison: 
+          description: 
+            header: Ejemplo
+            text: "Este informe muestra los resultados finales del aprendizaje de los alumnos. El archivo csv resultante incluirá una línea por par de resultados finales de cada usuario y mostrará la información del resultado con las correspondientes tareas asociadas."
+    custom_outcomes_csv_parameters: 
+      account_reports: 
+        edison: 
+          course: 
+            text: "course_id:"
+          outcome: 
+            text: "outcome_id:"
     date_picker_parameter: 
+      account_reports: 
+        default: 
+          end: 
+            parameters: 
+              header: "Finaliza el:"
+          start: 
+            parameters: 
+              header: "Comienza el:"
       custom_reports: 
         end: 
           parameters: 
@@ -485,6 +575,12 @@ es:
       page_title: Cuentas
       title: "Cuentas que Administro"
     integer_required: "Valor entero obligatorio"
+    last_user_access_csv_description: 
+      account_reports: 
+        default: 
+          last_user_access: 
+            header: Ejemplo
+            text: "Este informe muestra los últimos inicios de sesión de los usuarios activos."
     mississippi_sis_csv_description: 
       account_reports: 
         mississisppi: 
@@ -500,6 +596,23 @@ es:
           users: 
             check_box: "CSV de los usuarios"
     no_user_message: "No se encontró ningun usuario con esa identificación"
+    outcome_results_csv_description: 
+      account_reports: 
+        outcomes: 
+          description: 
+            header: Ejemplo
+            text: "Este informe muestra los resultados finales del aprendizaje de los alumnos. El archivo csv resultante incluirá una línea por par de resultados finales de cada usuario y mostrará la información del resultado con las correspondientes tareas asociadas."
+    outcome_results_csv_parameters: 
+      account_reports: 
+        outcomes: 
+          course: 
+            radio: Cursos
+          order: 
+            label: Orden
+          outcome: 
+            radio: Resultados
+          user: 
+            radio: Usuarios
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
@@ -532,11 +645,47 @@ es:
     root_accounts: 
       labels: 
         name: "Nombre de la cuenta"
+    safety_drill_csv_description: 
+      account_reports: 
+        newark: 
+          description: 
+            header: Ejemplo
+          student_activity: 
+            text: "Este informe muestra todas las tareas y la información correspondiente a las tareas incluidas en un grupo o varios grupos de tareas específicas en un intervalo de fechas específico. Este informe ofrece datos útiles para la programación de simulacros de seguridad con la menor interrupción posible en las evaluaciones principales en clase."
+    safety_drill_csv_parameters: 
+      account_reports: 
+        newark: 
+          assignment_groups: 
+            label: "Grupos de trabajo que se incluirán:"
+          major: 
+            check_box: Principal
+          papers: 
+            check_box: Artículos
+          projects: 
+            check_box: Proyectos
+          reports: 
+            check_box: Informes
+          tests: 
+            check_box: Pruebas
+    scantron_quiz_csv_parameters: 
+      account_reports: 
+        edison: 
+          quiz_id: 
+            field: "ID de evaluación"
+          section_id: 
+            field: "ID de sección"
     settings: 
       about_google_docs: "Para poder facilitar las cosas para los usuarios, en vez de forzarlos a descargar cosas como Word docs, PDFs, hojas de Excel y documentos de open (Además de requerir que esos programas sean instalados en su computadora), en muchas áreas a través de Canvas, le permitirá tener una vista previa del documento.\n\n\
           Si Scribd ha sido activado para esta cuenta, tratará de usarlo para mostrar la vista previa. Pero ya que Scribd usa flash para visualizar los documentos, y muchos usuarios (especialmente aquellos usando una iPad/iPhone) no tienen Flash instalado, esa vista previa no funcionará. Al dejar las vistas previas de Google Docs activas, usará las vistas previas proporcionadas por Google Docs. Usando este servicio está sujeto a los [términos de servicio](%{terms_url}) de Google Viewer "
       about_google_docs_tooltip: "Acerca de vista previa en Google Docs"
       account_admins_title: "Administradores de Cuenta"
+      account_quotas: 
+        file_quota: "Cuota del archivo"
+        gigabytes: gigabytes
+        media_quota: "Cuota del contenido audiovisual"
+        site_admin_quotas: "Cuotas del administrador del sitio"
+        student_quota: "Cuota de los alumnos"
+        update: Actualizar
       account_settings_title: "Configuraciones de Cuenta"
       add_a_custom_help_link: "Agregar un enlace de ayuda personalizado"
       add_admin_title: "Agregar Administradores de Cuenta"
@@ -550,6 +699,14 @@ es:
       alert_icon_warning_option: alerta
       alert_timespan: "de %{start_at} a %{end_at}"
       alerts_title: Alertas
+      allow_draft: "Permitir estado Borrador (beta)"
+      allow_draft_help_message: |-
+          El estado Borrador es una función en beta que permite publicar y ocultar el contenido del curso.
+          El contenido oculto no estará visible para los alumnos y no afectará a las calificaciones.
+          También incluye un rediseño de algunas de las áreas de los cursos para hacerlas más uniformes en lo que respecta al diseño y las funciones.
+          
+          Permitir el estado Borrador aquí facilitará que los profesores puedan habilitarlo para sus cursos individuales.
+      allow_draft_help_tooltip: "¿Qué es el estado Borrador?"
       announcement_sent_to_subset: "Enviar a 1 / %{denominator} de usuarios cada mes"
       buttons: 
         add_users: "OK se ve Bien, Agregue estos Usuarios"
@@ -621,6 +778,7 @@ es:
         prevent_course_renaming_by_teachers: "No permita que los profesores vuelvan a nombrar sus cursos"
         restrict_student_future_view: "Restringir que los alumnos vean los cursos antes de la fecha de inicio"
         self_enrollment: "Permitir la Auto-Inscripción"
+        self_registration: Autorregistro
         show_scheduler: "Habilitar Scheduler"
         sis_source_id: "Identificación de SIS"
         start_at: Comienza
@@ -840,6 +998,12 @@ es:
             header: Ejemplo
           student_activity: 
             text: "Este informe muestra toda la actividad de los alumnos inscritos en un curso determinado o todos los cursos de un período determinado. El archivo csv resultante incluirá una fila por actividad de alumno y tendrá los siguientes encabezados: ID de la sección, ID sis de la sección, nombre de la sección, ID del curso, ID sis del curso, nombre del curso, ID de usuario, ID sis de usuario, tipo de contenido, contenido, número de veces que se ha visto, número de veces en que se ha participado, última vez que se vio. El número de veces que se ha visto o en que se ha participado son contadores que registran las veces desde el principio hasta el momento en el que se genera el informe."
+    student_assignment_outcome_map_csv_description: 
+      account_reports: 
+        student_assignment_map: 
+          description: 
+            header: Ejemplo
+            text: "Este informe muestra los resultados finales del aprendizaje de los alumnos. El archivo csv resultante incluirá una línea por par de resultados finales de cada usuario y mostrará la información del resultado con las correspondientes tareas asociadas. Este informe solo muestra resultados finales por tarea y no incluye los resultados vinculados a grupos de preguntas."
     student_ip_csv_description: 
       account_reports: 
         dubspot: 
@@ -870,16 +1034,31 @@ es:
             text: "Este infome muestra todos los usuarios inscritos en un curso en un determinado periodo que han enviado una tarea. Este informe incluye una fila por envío de alumno."
     students_with_no_submissions_csv_description: 
       account_reports: 
-        vilas: 
-          description: 
-            header: Ejemplo
+        default: 
           students_with_no_submissions: 
-            text: "Este infome muestra todos los alumnos inscritos en un curso en un determinado periodo que no han enviado ninguna tarea dentro de un intervalo de tiempo determinado en el curso. Este informe incluye una fila por alumno inscrito."
+            description: 
+              header: Ejemplo
+            text: "Este infome muestra todos los alumnos inscritos en un curso en un determinado período que no han enviado tareas en un intervalo de tiempo determinado en el curso. Este informe incluye una fila por alumno inscrito que cumpla los criterios. El intervalo de tiempo no puede ser mayor de dos semanas."
     submission_data_csv_description: 
       account_reports: 
         submission_data: 
           description: 
             text: "Este informe incluye las fechas de envío de la herramienta de asistencia."
+    tempe_grade_export_csv_description: 
+      account_reports: 
+        tempe: 
+          description: 
+            header: Ejemplo
+          grade_export: 
+            text: "En este informe aparecen los resultados de las calificaciones finales de todos los alumnos en un periodo en concreto. El archivo delimitado por tabulaciones que se genera incluirá una línea por inscripción de usuario, en la que aparecerá la calificación final y varios campos de información de los cursos, que se utilizarán para cargar los datos de las calificaciones en Synergy SIS."
+    tempe_grade_export_csv_parameters: 
+      account_reports: 
+        tempe: 
+          course: 
+            text: "ID del curso"
+          parameters: 
+            note1: "La ID del curso puede dejarse en blanco para generar el informe de todos los cursos del período."
+            note2: "En este informe, los cursos con tareas desactivadas pueden no reflejar con exactitud las calificaciones."
     terms_parameters: 
       account_reports: 
         default: 
@@ -901,11 +1080,11 @@ es:
     unrecognized_time_zone: "'%{timezone}' no se reconoce como zona horaria"
     unused_courses_csv_description: 
       account_reports: 
-        uw: 
+        unused_courses: 
           description: 
             header: Ejemplo
-          student_submissions: 
-            text: "Este informe muestra todos los cursos que no tienen ninguno de los siguientes elementos: tareas, anuncios, debates, módulos, páginas o cuestionarios."
+          main: 
+            text: "Este informe muestra todos los cursos que no tienen ninguno de los siguientes elementos: tareas, anuncios, debates, archivos, módulos, páginas o cuestionarios."
     update_failed_notice: "Configuraciones de actualización de cuenta falló"
     user_add_failed_message: "La adición del usuario falló, intente de nuevo"
     user_added_message: "%{user} corectamente agregado"
@@ -923,6 +1102,17 @@ es:
         webster: 
           login: 
             day_drop: "Número mínimo de elementos de un curso visitados:"
+    users_list: 
+      login_name_or_sis_id: "ID de inicio de sesión/SIS"
+      name: Nombre
+      no_people_found: "No se han econtrado personas"
+      you_can_search_by: "Puede buscar por:"
+    zero_activity_csv_description: 
+      account_reports: 
+        default: 
+          zero_activity: 
+            header: Ejemplo
+            text: "En este informe aparecen todos los alumnos inscritos en cualquier curso en un periodo en concreto.  El archivo csv que se genera incluirá una línea por inscripción de usuario que no haya visitado el curso desde la fecha."
   activerecord: 
     errors: 
       full_messages: 
@@ -1028,6 +1218,7 @@ es:
     file_copy_fail: "No se ha podido copiar la carpeta \"%{base_path}\""
     file_copy_fail_message: "No se ha podido cambiar el nombre de directorio a la ruta de acceso \"%{path}\" "
     file_import_fail: "No se ha podido importar el archivo \"%{file_path}\""
+  angel_display: "ANGEL Learning"
   angel_file_description: "Formato .zip de exportación de Angel"
   announcement: 
     no_title: "Sin Título"
@@ -1156,6 +1347,7 @@ es:
     messages: 
       assignment_created: "Tarea \"%{assignment}\" creada"
     name_is_required: "Es obligatorio escribir un nombre"
+    points_possible: "El número de puntos posible debe ser mayor que 0 si la calificación es porcentual"
     select_external_tool_dialog_title: "Configurar herramienta externa"
     show_advanced_options: "Mostrar opciones avanzadas"
     submission_action_take_quiz: "Realizar %{title}"
@@ -1211,7 +1403,6 @@ es:
     unmute_dialog: "Esta tarea está obviada. Esto significa que los estudiantes no pueden ver sus calificaciones ni retroalimentación. ¿Quiere activarla ahora?"
     unmuting_assignment: "Activando la tarea..."
   assignments: 
-    add_another_never_drop_rule: "Agregar otra tarea"
     add_assignment_form: 
       assignment_name: "Nombre de la Tarea"
       labels: 
@@ -1246,7 +1437,6 @@ es:
         never_drop: "Nunca Eliminar"
         no_assignments: "[Sin Tareas]"
         weighted_by_points: "Ponderado por Puntos"
-    add_first_never_drop_rule: "Agregar una tarea"
     assignment_count: 
       one: "1 Tarea"
       other: "%{count} Tareas"
@@ -1259,6 +1449,18 @@ es:
         cancel: Cancelar
       links: 
         add_assignment_group: "Agregar un grupo de tarea\""
+    assignment_group_list: 
+      no_assignment_groups: "No se encontraron grupos de trabajo"
+    assignment_group_list_item: 
+      add_assignment_to: "Agregar tarea a %{name}"
+      delete: Borrar
+      edit: Editar
+      group_weight: "%{groupWeight}% del total"
+      manage: Gestionar
+      move: "Mover a&hellip;"
+      title_delete: "¿Borrar grupo de trabajo?"
+      title_edit: "Editar grupo de trabajo"
+      title_move: "Mover grupo de trabajo"
     assignment_group_selector: 
       assignment_group: "Grupo de tarea"
       assignment_group_options: 
@@ -1266,10 +1468,26 @@ es:
     assignment_groups_count: 
       one: "1 Grupo"
       other: "%{count} Grupos"
+    assignment_list_item: 
+      delete: Borrar
+      delete_asssignment_title: "Borrar esta tarea"
+      edit: Editar
+      edit_assignment_title: "Editar tarea"
+      module: Módulo
+      move: "Mover a&hellip;"
+      move_assignment_title: "Mover tarea"
+      multiple_modules: "Varios módulos"
+      points_possible: "%{pointsPossible} pts"
+      settings: Configuraciones
     assignment_locked: 
       assignment_locked: "Esta tarea está bloqueada desde *%{lock_at}*"
       assignment_unlocked_from: "Esta tarea esta bloqueada hasta *%{unlock_at}*"
       assignment_unlocked_from_to: "Esta tarea solo esta bloqueada de *%{unlock_at}* hasta *%{lock_at}*"
+    assignment_settings: 
+      cancel: Cancelar
+      save: Guardar
+      validating: Guardando...
+      weight_groups: "Nota media final basada en el grupo de trabajo"
     assignment_sidebar: 
       links: 
         submit: "Enviar Tarea"
@@ -1316,11 +1534,71 @@ es:
       add_group: "Agregar grupo"
       delete_group: "Borrar el Grupo"
       submit_assignment: "Enviar Tarea"
+    cannot_delete_group: "Debe tener al menos un grupo de trabajo"
     confirm: 
       delete_assignment: "¿Seguro que quiere borrar esta tarea?"
       delete_group: "¿Seguro que quiere borrar este grupo?"
+    confirm_delete_group: "¿Está seguro de que desea borrar este grupo de trabajo?"
+    confirms: 
+      delete_assignment: "¿Está seguro de que desea borrar esta tarea?"
+    create_assignment: 
+      assignment: Tarea
+      assignment_due_at: "Fecha límite:"
+      assignment_name: "Nombre:"
+      assignment_points: "Puntos:"
+      assignment_type: "Tipo:"
+      cancel: Cancelar
+      discussion_type: Debate
+      external_tool_type: "Herramienta externa"
+      more: "Más opciones"
+      multiple_due_dates: "Varias fechas límite"
+      not_graded_type: "No calificado"
+      quiz_type: Evaluación
+      save: Guardar
+      saving: Guardando...
+    create_group: 
+      cancel: Cancelar
+      drop_highest: "Notas más altas:"
+      drop_lowest: "Notas más bajas:"
+      example_group_name: "p.ej. Trabajo del grupo 1"
+      group_name: "Nombre del grupo:"
+      never_drop: "No eliminar nunca:"
+      percent_of_total: "% de la calificación total"
+      save: Guardar
+      saving: Guardando...
     create_new_crumb: "Crear nuevo"
+    date_available_column_view: 
+      available: Disponible
+      available_on: "Disponible en"
+      available_until: "Disponible hasta"
+      closed: Cerrado
+      multiple_dates: "Varias fechas"
+      not_available_until: "No disponible hasta"
+    date_due_column_view: 
+      due: "Fecha límite"
+      due_date: "Fecha límite"
+      multiple_dates: "Varias fechas"
+    delete_group: 
+      cancel: Cancelar
+      delete: "Borrar grupo"
+      deleting: Borrando...
+      labels: 
+        delete_assignments_in_group: "Borrar las tareas"
+        move_assignments_to: "Mover las tareas a"
+      options: 
+        select_group: "Seleccionar un grupo"
+      tooltips: 
+        target_group: "Seleccione el grupo al que desea mover esta tarea"
+      warnings: 
+        delete_assignment_group: "Está a punto de borrar  *%{name}*, que contiene **%{assignment_count}** tareas."
+      would_you_like: "¿Desea...?:"
+    drop_highest_rule: 
+      one: "Elimine la puntuación más alta"
+      other: "Elimine las %{count} puntuaciones más altas"
     drop_highest_scores: "Elimine las %{number} Calificaciones Mayores"
+    drop_lowest_rule: 
+      one: "Elimine la puntuación más baja"
+      other: "Elimine las %{count} puntuaciones más bajas"
     drop_lowest_scores: "Elimine las %{number} Calificaciones Menores"
     due_date_override: 
       overrides: 
@@ -1328,10 +1606,19 @@ es:
         due_date: "Fecha de vencimiento"
         for: Para
       until: Hasta
+    due_date_view: 
+      overrides: 
+        remove_these_dates: "Eliminar estas fechas"
     edit: 
       edit_assignment: "Editar la tarea"
       new_discussion: "Nuevo debate"
       new_quiz: "Nuevo cuestionario"
+    edit_header_view: 
+      buttons: 
+        not_published: "No publicado"
+        published: Publicado
+      titles: 
+        delete: Borrar
     edit_view: 
       assignment_name: "Nombre de tarea"
       buttons: 
@@ -1349,6 +1636,7 @@ es:
       delete_reminder_failed: "El borrado falló"
       google_docs_masquerade_rejected: "Imposible conectar con Google Docs como un usuario enmascarado."
       reminder_failed: "El recordatorio falló"
+    everyone_else: "Todos los demás"
     external_grader_sidebar: 
       edit_assignment_settings: "Editar Configuraciones de la Tarea"
       speed_grader: "Calificador Rápido"
@@ -1420,8 +1708,20 @@ es:
       links: 
         wizard: "¿Como hago...?"
       page_title: Tareas
+    index_view: 
+      add_assignment: Tarea
+      add_group: Grupo
+      assignments: Tareas
+      assignments_settings: "Configuración de tareas"
+      assignments_settings_screenreader: "Configuración de tareas"
+      search_for_assignment: "Buscar tarea"
+      title_add_assignment: "Agregar tarea"
+      title_add_group: "Agregar grupo de trabajo"
     invalid_file_retrieval: "Se ha producido un problema al intentar recuperar el archivo enviado desde esta herramienta."
     invalid_tool_return: "La herramienta que se ha ejecutado ha dado como resultado un recurso no válido para esta tarea"
+    labels: 
+      assignment_group_move_label: "Grupo de trabajo"
+      label_place_before: "Colocar antes"
     loading_tools_failed: "Ha fallado la carga de herramientas"
     messages: 
       adding_group: "Añadiendo grupo..."
@@ -1434,8 +1734,20 @@ es:
       submitting: Enviando...
     multiple_due_dates: "Muchas fechas de vencimiento"
     needs_grading_count: "%{needs_grading_count} envíos para esta tarea todavía necesitan ser calificados"
+    never_drop: 
+      remove_rule: "Eliminar regla"
+    never_drop_collection: 
+      add_another_assignment: "Agregar otra tarea"
+      add_first_assignment: "Agregar una tarea"
+    never_drop_rule: "No eliminar nunca %{assignment_name}"
     never_drop_scores: "Nunca Eliminar %{assignment_name}"
     no_assignments: "[Sin Tareas]"
+    no_assignments_list_item: 
+      no_assignments_in_this_group: "No hay tareas en este grupo"
+    no_assignments_search: 
+      aria_assignments: Tareas
+      assignments: Tareas
+      no_assignments_found: "No se encontraron tareas"
     no_tools_found: "No se han encontrado herramientas"
     notices: 
       assignment_delete: "Esta tarea ha sido borrada."
@@ -1648,63 +1960,14 @@ es:
     syllabus_right_side: 
       links: 
         edit_syllabus_description: "Editar la Descripción del Programa de Estudio"
-    teacher_index: 
-      add_assignment: "Agregar tarea"
-      add_group: "Agregar grupo"
-      assignment_group_list: 
-        no_assignment_groups: "No hay grupos de trabajo."
-      assignment_group_list_item: 
-        add_assignment_to: "Agregar tarea a %{name}"
-        delete: Borrar
-        edit: Editar
-        group_weight: "%{groupWeight}% del total"
-        manage: Administrar
-        title_delete: "Borrar grupo de trabajo"
-        title_edit: "Editar grupo de trabajo"
-      assignment_list_item: 
-        due_date: "Fecha Límite"
-        points_possible: "%{pointsPossible} pts"
-      assignment_settings: 
-        cancel: Cancelar
-        save: Guardar
-        validating: Guardando...
-        weight_groups: "Calificación media final basada en el grupo de trabajo"
-      assignments_settings: "Configuración de tareas"
-      assignments_settings_screenreader: "Configuración de tareas"
-      create_assignment: 
-        assignment: Tarea
-        assignment_due_at: "Fecha límite:"
-        assignment_name: "Nombre:"
-        assignment_points: "Puntos:"
-        assignment_type: "Tipo:"
-        cancel: Cancelar
-        discussion_type: Debate
-        external_tool_type: "Herramienta externa"
-        more: "Más opciones"
-        not_graded_type: "No calificado"
-        quiz_type: Evaluación
-        save: Guardar
-        saving: Guardando...
-      create_group: 
-        add_first_assignment: "Agregar una tarea"
-        cancel: Cancelar
-        drop_highest: "Calificaciones más altas:"
-        drop_lowest: "Calificaciones más bajas:"
-        example_group_name: "p.ej. Trabajo del grupo 1"
-        group_name: "Nombre del grupo:"
-        never_drop: "No eliminar nunca:"
-        percent_of_total: "% de la calificación total"
-        save: Guardar
-        saving: Guardando...
-      never_drop: 
-        remove_rule: "Eliminar regla"
-      search: Buscar
-      search_for_assignment: "Buscar tarea"
-      title_add_assignment: "Agregar tarea"
-      title_add_group: "Agregar grupo de trabajo"
     titles: 
       add_assignment_group: "Añadir grupo de trabajo"
       uploading: "Cargando el envío"
+    toggle_message: "Cambiar la visibilidad de la tarea"
+    toggle_show_by: 
+      date: Fecha
+      show_by: "Mostrar por:"
+      type: Tipo
     turnitin_settings_dialog: 
       assignments: 
         turnitin_settings: 
@@ -1785,8 +2048,12 @@ es:
     titles: 
       attendance_help: "Ayuda de Asistencia"
       new_attendance_column: "Columna Nueva de Asistencia"
+  auth_logging: 
+    login: "INICIAR SESIÓN"
+    logout: "CERRAR SESIÓN"
+  bb_display: "Blackboard Learn"
   bb_file_description: "Archivo .zip de exportación de Blackboard 6/7/8/9"
-  bb_name: "Exportador de Blackboard"
+  bb_name: "Blackboard Converter"
   big_blue_button_conference: 
     recording_setting: Grabación
     recording_setting_description: "Grabar esta conferencia"
@@ -2326,8 +2593,10 @@ es:
         login_expiration_minimum: "El vencimiento de la sesión debe producirse a los 20 minutos o más"
         need_integer: "Introduzca números enteros para la memoria de la lista de reproducción"
   canvas_cartridge_description: "Esta función permite convertir una exportación de canvas al formato intemedio json que será el que se importará"
+  canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Paquete de exportación de cursos de Canvas"
   canvas_cartridge_name: "Importador de cartuchos de Canvas"
+  canvas_revision_unknown: Desconocido
   cc: 
     by: "Atribución de CC"
     by_nc: "Atribución No Comercial de CC"
@@ -2436,6 +2705,7 @@ es:
     from_beginning: "el comienzo"
     to_now: ahora
   common_cartridge_description: "Esta función permite convertir un paquete común de cartucho al formato intermedio json que será el que se importará"
+  common_cartridge_display: "Common Cartridge"
   common_cartridge_file_description: "Paquete de cartucho común 1.0/1.1/1.2"
   common_cartridge_name: "Importador de cartucho común"
   communication_channel: 
@@ -2482,7 +2752,7 @@ es:
       labels: 
         password: Contraseña
         subscribe_to_emails: "Quiero recibir información, noticias y ayuda de Instructure"
-        time_zone: "Uso Horario"
+        time_zone: "Huso horario"
         unique_id: "Correo Electrónico"
       page_title: "Registrar %{email}"
       titles: 
@@ -2502,8 +2772,11 @@ es:
   conferences: 
     concluded_conference: 
       delete: Borrar
-      no_recording: "Sin grabación"
+      no_recording: "No hay grabaciones"
       preparing_video: "Preparando el vídeo"
+      recording: "1 grabación "
+      recordings: "%{recordingCount} grabaciones"
+      setings: Configuración
       view: Vista
     confirm: 
       close: |-
@@ -2545,7 +2818,11 @@ es:
       end_it_now: Fin
       in_progress: "En progreso"
       join: Unirse
+      recording: "1 grabación"
+      recordings: "%{recordingCount} grabaciones"
+      setings: configuración
       start: Comenzar
+      view: Vista
     new_conference_title: "Nueva conferencia"
     no_settings_error: "La conferencia no tiene una página de configuraciones avanzadas"
     no_urls_error: "Perdon, parece que no hay páginas %{type} para esta conferencia todavía."
@@ -2651,8 +2928,13 @@ es:
     missing_content_links_title: "Faltan enlaces en el contenido importado"
     unexpected_error: "Se ha producido un error inesperado. Por favor, póngase en contacto con el servicio de asistencia técnica."
     unknown: Desconocido
+    upload_timeout_error: "El tiempo de espera del proceso de carga del archivo."
   content_migrations: 
+    angel_exporter: 
+      options: Opciones
     bad_migration_type: "Tipo de migración inválido"
+    blackboard_export: 
+      options: Opciones
     canvas_export: 
       options: Opciones
     common_cartridge: 
@@ -2660,58 +2942,116 @@ es:
     content_checkbox: 
       select_all: "Seleccionar todo"
       select_non: "No seleccionar ninguna"
+    content_migration: "Migración de contenido"
     content_migration_issue: 
       error_report: "Informe de errores"
     copy_course: 
       options: Opciones
+    course_list_error: "No se pudieron recuperar los cursos. ¿Está conectado a Internet?"
+    d2_l_export: 
+      options: Opciones
+    file_required: "Debe seleccionar un archivo de donde importar el contenido"
+    file_too_large: "Su migración no puede superar el límite de %{file_size}"
+    hide_issues: "Ocultar incidencias"
+    index: 
+      page_title: "Importar Contenido"
+    issues: Incidencias
+    loading: Cargando...
     migration_converter: 
       cancel_migration: Cancelar
       default_option: "Seleccionar una"
       header: "Importar contenido"
       import_from_label: "Tipo de contenido"
       import_migration: Importar
-      subtext: "Esta función le ayudará a importar el contenido que ya posea, como archivos, tareas y evaluaciones, desde otros sistemas de gestión de cursos en Canvas."
     moodle_zip: 
       options: Opciones
     must_upload_file: "Carga de archivo obligatoria"
+    no_content_selected: "No ha seleccionado ningún contenido para importar."
     progressing_content_migration: 
       issues_text: Incidencias
       select_content: "Seleccionar contenido"
+      show_issues: "Mostrar incidencias"
     progressing_content_migration_collection: 
       no_items: "No se han puesto trabajos en cola"
       progress_label: "Trabajos actuales"
+    progressing_issues: 
+      loading: Cargando
     qti_zip: 
       options: Opciones
+    school_required: "Debe seleccionar una escuela."
     select_content: 
       select_content_btn: "Seleccionar contenido"
+    select_course: "Seleccionar curso"
+    show_issues: "Mostrar incidencias"
     subviews: 
       choose_migration_file: 
         migration_text: Original
       course_find_select: 
+        course_name: "Nombre del curso"
+        include_completed_courses: "Incluir los cursos finalizados"
         or: o
         search_label: "Buscar un curso"
         select_default: "Seleccionar un curso"
       date_shift: 
+        add_day_sub_title: "Agregar día de sustitución"
         beginning_change_to: "cambiar a"
         beginning_date: "Fecha de inicio"
         checkbox_label: "Ajustar eventos y fechas límites"
         ending_change_to: "cambiar a"
         ending_date: "Fecha de finalización"
+        new_end_date_label: "Cambiar fecha de finalización a"
+        new_end_date_title: "Cambiar fecha de finalización a"
+        new_start_date_label: "Cambiar fecha de inicio a"
+        new_start_date_title: "Cambiar fecha de inicio a"
+        old_end_date_label: "Fecha de finalización"
+        old_end_date_title: "Fecha de finalización"
+        old_start_date_label: "Fecha de inicio"
+        old_start_date_title: "Fecha de inicio"
         substitution: Sustitución
       day_substitution: 
         move_from: "Trasladar desde"
+        move_from_select_label: "Trasladar de día de la semana"
+        move_from_select_title: "Trasladar de día de la semana"
+        move_to_select_label: "Trasladar a día de la semana"
+        move_to_select_title: "Trasladar a día de la semana"
+        remove_day_substitution_link: "Eliminar día de sustitución"
+        remove_day_substitution_link_label: "Eliminar día de sustitución"
         to_happen_on: para
       folder_picker: 
         default_select_folder: "Seleccionar carpeta"
         upload_to: "Cargar a"
       overwrite_assessment_content: 
+        assessment_help_label: "Icono de ayuda para sobrescribir tareas"
+        assessment_help_text: "Algunos sistemas reciclan sus IDs para cada exportación nueva. Por lo tanto, si exporta dos grupos de preguntas separadas tendrán el mismo ID. Para evitar la pérdida de información, tratamos estos dos objetos como diferentes a pesar de las IDs. Si escoge esta opción desactivará esta característica de seguridad y permitirá que la información de la tarea sobrescriba información existente con la misma ID."
+        assessment_help_title: "\"Ayuda para sobrescribir tareas\""
+        assessment_help_title_icon: "Icono de ayuda para sobrescribir tareas"
         overwrite_assessment_content: "Sobrescribir el contenido de la tarea con IDs parecidos"
       question_bank: 
+        aria_new_label: "Crear un nuevo grupo de preguntas"
         create_new_question: "-- Crear nuevo grupo de preguntas --"
         question_bank_label: "Grupo de preguntas"
+        question_bank_placeholder: "\"Nombre del grupo de preguntas\""
+        question_bank_placeholder_aria: "\"Introducir nuevo nombre de grupo de preguntas\""
+        question_bank_title: "Nombre de grupo de preguntas nuevo"
         select_question_bank: "Seleccionar grupo de preguntas"
       select_content_checkbox: 
-        select_migration_label: "¿Seleccionar contenido de migración?"
+        select_migration_label: "Seleccionar el contenido de migración"
+    upload_warning: "Si decide salir de esta página, se cancelará el proceso de carga."
+    uploading: Cargando...
+    web_ct: 
+      cancel: Cancelar
+      get_courses: "Obtener cursos"
+      password: Contraseña
+      select_school: "Seleccionar escuela"
+      username: "Nombre de usuario"
+    web_ct_course_list: 
+      course_list: Curso(s)
+      no_files_help_label: "Más información sobre la opción \"No descargar archivos\""
+      no_files_help_text: "Descargar archivos de los cursos WebCT puede llevar mucho tiempo y puede ocasionar fallos en el proceso de migración. En su lugar, puede copiar los archivos manualmente y después seleccionar esta opción para migrar el resto del contenido."
+      no_files_help_title: "\"Más información sobre la opción \"No descargar archivos\"\""
+      no_files_help_title_icon: "Más información sobre la opción \"No descargar archivos\""
+      options: Opciones
+      skip_all_files: "No descargar archivos del curso"
   content_tag: 
     no_title: "Sin título"
   content_tags: 
@@ -2731,10 +3071,10 @@ es:
     chat_not_enabled: "Chat no ha sido activado para este sitio de Canvas"
     communication: 
       headings: 
-        discussions: Discusiones
+        discussions: Foros
       links: 
         feeds: 
-          course_discussions: "Canal Atom para Discusiones del Curso"
+          course_discussions: "Canal Atom para Foros del Curso"
         start_collaboration: "Comenzar una Colaboración"
         start_conference: "Comenzar una Conferencia en Línea"
         start_topic: "Comenzar una Tema Nuevo"
@@ -2751,7 +3091,7 @@ es:
       errors: 
         mark_as_read_failed: "No se pudo marcar como leído, intente de nuevo"
       inbox: 
-        discussion_replies: "Contestaciones a Discusiones"
+        discussion_replies: "Contestaciones a Foros"
       status: 
         marking_all_as_read: "Marcando Todo como Leído..."
     inbox_item: 
@@ -3064,6 +3404,7 @@ es:
           delete_module: "Borrar este módulo"
           edit_module: Editar
           student_progress: "Ver el Progreso del Estudiante para este Módulo"
+      manage: Manejar
       module_will_unlock_at: "se desbloqueará en *%{unlock_date}*"
       progression_complete_count: "*%{count}*Completo"
       progression_started_count: "*%{count}* En Progreso"
@@ -3076,6 +3417,7 @@ es:
     index: 
       titles: 
         course_modules: "Módulos del Curso"
+    module_complete: Completo
     module_empty: "No hay elementos en el módulo \"%{module}\""
     module_item: 
       drag_to_reorder: "Arrastrar para reordenar o mover un elemento a otro módulo"
@@ -3120,10 +3462,13 @@ es:
       must_view: 
         fulfilled: "observó la página"
         unfulfilled: "debe ver la página"
+    module_locked: Bloqueado
+    module_started: "En progreso"
+    module_unlocked: Desbloqueado
     none_in_progress: "nada en progreso"
     optgroup: 
       assignments: Tareas
-      discussion_topics: Discusiones
+      discussion_topics: Foros
       external_tools: "Herramientas Externas"
       external_urls: "URLs Externos"
       files: Archivos
@@ -3137,6 +3482,10 @@ es:
       links: 
         title: 
           remove_prerequisite: "Eliminar este requisito previo"
+    progressions: 
+      titles: 
+        student_progress: "Progreso del alumno"
+        student_progression: "Progresión del módulo por alumno"
     still_needs_completing: "Todavía necesita ser completado"
     titles: 
       add: "Agregar Módulo"
@@ -3148,13 +3497,10 @@ es:
   context_modules_api: 
     invalid_position: "Posición inválida"
   conversation_dialog: 
-    enrollments_everyone: Todos
     errors: 
       field_is_required: "Este campo es obligatorio"
-    people_count: 
-      one: "1 persona"
-      other: "%{count} personas"
-    select_all: "Seleccionar todo"
+    message_sent: "Mensaje enviado"
+    select_course: "Seleccionar curso"
   conversation_message: 
     subject: "Mensaje privado, %{timestamp}"
     users_added: 
@@ -3170,10 +3516,21 @@ es:
       titles: 
         attachment: "Archivo para adjuntar"
         remove_attachment: "Remover el archivo adjunto"
+    all_courses: "Todos los cursos"
+    all_in_context: "Todo lo incluido en %{context}"
+    archive: Archivo
+    archive_conversation: "Archivar conversación"
     attachment_error: "No se pudo cargar el archivo adjunto. Por favor, inténtelo de nuevo."
+    autocomplete_result: 
+      group_people: "Personas: %{people}"
+      no_results: "Sin resultados"
+    autocomplete_token: 
+      remove_recipient: "Eliminar destinatario"
+    back: Volver
     buttons: 
       add_people: "Agregar personas"
       send_message: Enviar
+    cannot_add_to_private: "No puede añadir participantes a una conversación privada."
     cannot_be_empty: "El mensaje no puede estar vacío"
     compose_button_bar: 
       titles: 
@@ -3183,8 +3540,14 @@ es:
       buttons: 
         close: cerrar
     confirm: 
+      delete_conversation: "¿Está seguro de que desea borrar su copia de esta conversación? Esta acción no se puede deshacer."
       delete_message: "¿Está seguro de que quiere borrar su copia de este mensaje? Esta acción no se puede deshacer."
       delete_messages: "¿Está seguro de que quiere borrar su copia de estos mensajes? Esta acción no se puede deshacer."
+    context_message: 
+      delete_message: "Borrar mensaje"
+      labels: 
+        less: menos...
+        more: más...
     conversation_context: "De una conversación con"
     conversation_item: 
       has_attachments: "Esta conversación tiene uno o más elementos adjuntos"
@@ -3211,6 +3574,11 @@ es:
     conversations_pane: 
       confirm: 
         delete_conversation: "¿Está seguro que quiere borrar su copia de esta conversación? Esta acción no puede deshacerse."
+    course_name: "Nombre del curso"
+    course_options: 
+      course_options: 
+        concluded: Finalizado
+        more_courses: "Más cursos"
     enrollments_everyone: Todos
     errors: 
       field_is_required: "Este campo es requerido"
@@ -3218,8 +3586,11 @@ es:
     filter_by_group: "Filtrar por este grupo"
     headings: 
       new_message: "Mensaje Nuevo"
+    hide: Esconder
     index: 
       add_recipients_instructions: "Gente que agrega a la conversación verán todos los mensajes previos."
+      conversations_intro: "Introducción a las conversaciones"
+      help: Ayuda
       inbox_actions: 
         delete: Borrar
         forward: "Enviar Copia"
@@ -3250,23 +3621,53 @@ es:
         submission_author: "Autor del Envío"
         submission_score: "Calificación del Envío"
         view_submission: "Abra el envío en una ventana nueva."
+      try_new_conversations: "Probar conversaciones nuevas"
     index_new: 
+      archive: Archivo
+      archive_conversation: "Archivar conversación"
+      archived: Archivado
+      clear_search: "Borrar los resultados de la búsqueda"
+      compose_new_message: "Redactar un nuevo mensaje"
+      delete: Borrar
       delete_conversation: "Borrar conversación"
       enter_name_group_or_course: "Introducir un nombre, grupo o curso"
       filter_messages_by_course: "Filtrar mensajes por curso"
       filter_messages_by_type: "Filtrar mensajes por tipo"
-      new_message: "Nuevo mensaje"
+      forward: Reenviar
+      help: Ayuda
+      inbox: "Bandeja de entrada"
+      mark_as_unread: "Marcar como no leído"
+      more_options: "Más opciones"
       reply: Responder
       reply_all: "Responder a todos"
+      search_for_recipients: "Buscar destinatarios"
       search_names_groups_courses: "Buscar nombres, grupos y cursos"
+      sending: enviando
+      sent: Enviado
       settings: Configuraciones
+      starred: Señalado
+      switch_to_old_conversations: "Cambiar de nuevo a conversaciones antiguas"
+      titles: 
+        conversations: Conversaciones
+      unread: "No leído"
+    mark_as_read: "Marcar como leído"
+    mark_as_unread: "Marcar como no leído"
     message: 
+      mark_as_read: "Marcar como leído"
+      mark_as_unread: "Marcar como no leído"
+      no_subject: "Sin asunto"
       open_message: "Abrir mensaje"
-      star: Señalar
-      toggle_read: "Alternar de leído a no leído"
+      star_conversation: "Marcar la conversación como destacada"
+      starred: Destacado
       total_messages: "Total de mensajes"
+      unread: "No leído"
+      unstar_conversation: "Eliminar la conversación de destacados"
+    message_detail: 
+      no_subject: "Sin asunto"
     message_form: 
       buttons: 
+        reply: Responder
+        reply_all: "Responder a todos"
         send_message: Enviar
       headings: 
         new_message: "Mensaje nuevo"
@@ -3287,32 +3688,49 @@ es:
         record_media_comment: "Grabar un comentario de audio o vídeo"
         remove_media_comment: "Eliminar comentario de contenido audiovisual"
     message_form_dialog: 
+      body: Cuerpo
+      bulk_explanation: "Esta opción crea mensajes individuales para todos los destinatarios en el campo Para:"
+      bulk_message: "Mensaje en bloque"
       headings: 
         new_message: "Mensaje nuevo"
       inbox_actions: 
         add_people: "Agregar personas"
       labels: 
         add_to_faculty_journal: "Agregar como entrada del historial para profesores"
+        attachments: "Archivos adjuntos"
         course: Curso
-        group_conversation: "Esta es una conversación de grupo. Los participantes verán todos los mensajes"
+        select_course: "Seleccionar un curso"
         subject: Tema
         to: A
       links: 
         media_comment: Grabar
       media_comment: "Comentario audiovisual"
+      no_subject: "Sin asunto"
+      search_names_groups_courses: "Buscar nombres, grupos y cursos"
       titles: 
         media_comment: "Comentario audiovisual grabado"
         record_media_comment: "Grabar un comentario de audio o vídeo"
         remove_media_comment: "Elminar un comentario audiovisual"
+    message_item: 
+      delete: Borrar
+      forward: "Enviar Copia"
+      message_actions: "Acciones de mensaje"
+      more_options: "Más opciones"
+      reply: Responder
+      reply_all: "Responder a todos"
     message_list: 
       messages: Mensajes
     message_progress_bar_text: 
       done_sending_message: "Enviado *%{message_preview}* a *%{num_people}*"
       error_sending_message: "Error al enviar el mensaje:"
       sending_message: "Enviando *%{message_preview}* a *%{num_people}*"
+    more_participants: "+%{total} más"
     no_message: 
+      beta_description: "Está utilizando una versión beta de la bandeja de entrada de Canvas"
+      beta_version: "Versión beta"
       no_conversations_selected: "No se han seleccionado conversaciones"
     no_recipients_choose_another_group: "No hay destinatarios en este grupo. Por favor, elija otro grupo."
+    no_results_found: "No se encontraron resultados"
     not_applicable: N/A
     not_scored: "sin puntuación"
     notes_to_self: Monólogo
@@ -3326,7 +3744,10 @@ es:
       one: "1 persona"
       other: "%{count} personas"
     recipient_error: "El curso o grupo que ha seleccionado no tiene destinatarios válidos"
+    search_category: "Buscar %{category}"
     select_all: "Seleccionar Todo"
+    star: Señalar
+    star_conversation: "Marcar conversación como destacada"
     title: 
       add_recipients: "Agregar destinatarios"
       forward_messages: "Reeviar Mensaje"
@@ -3334,8 +3755,12 @@ es:
       expand_inline: "Mostrar más comentarios"
       rss_feed: "Feed de conversaciones"
       view_submission: "Abra el envío en una ventana nueva."
+    unarchive: Desarchivar
+    unarchive_conversation: "Desarchivar conversación"
     unknown_user: "Usuario desconocido"
     unspecified_error: "Ha ocurrido un error inesperado. Inténtelo de nuevo."
+    unstar: "No Señalar"
+    unstar_conversation: "Eliminar la conversación de destacados"
   conversations_intro: 
     slide1: 
       paragraph1: "Revise su bandeja de correo."
@@ -3424,6 +3849,7 @@ es:
       teachers_students: "Profesor y Estudiantes"
   course_copy_argument_error: "Para copiar un curso es necesario que exista un curso original."
   course_copy_description: "Complemento de migración para copiar cursos de Canvas"
+  course_copy_display: "Copia del curso"
   course_copy_file_description: "Copiar un curso de Canvas"
   course_copy_name: "Copiar curso de Canvas"
   course_copy_no_course_error: "No se ha encontrado el curso original."
@@ -3447,6 +3873,7 @@ es:
       lti_links: "No se pudieron exportar algunos enlaces a páginas web"
       media_file: "Un archivo de media no se pudo exportar"
       media_files: "No se pudieron exportar algunos archivos de media"
+      media_files_too_large: "No se han exportado los archivos multimedia porque el tamaño total del archivo era demasiado grande."
       module_meta: "No se pudieron exportar información meta del módulo"
       organization: "No se pudo generar una estructura de organización"
       question_bank: "El grupo de preguntas \"%{title}\" no se pudo exportar"
@@ -3491,6 +3918,7 @@ es:
     course_dates_enforced: "Usuarios sólo pueden participar en el curso entre estas fechas"
     course_dates_unenforced: "Estas fechas no afectarán la disponibilidad del curso"
     edit_sections_placeholder: "Introduzca el nombre de una sección"
+    edit_sections_title: "Nombre de la sección"
     errors: 
       invalid_sis_status: "Estatus inválido de publicación en SIS"
       invitation: "La invitación falló. Intente de nuevo."
@@ -3520,6 +3948,7 @@ es:
     private_course: Privado
     public_course: Público
     re_send_invitation: "Renviar la invitación"
+    remove_user_from_course_section: "Eliminar usuario de %{course_section} "
     titles: 
       click_to_edit: "Haga Click para Editar"
       link_to_students: "Enlazar a alumnos"
@@ -3528,19 +3957,6 @@ es:
       section_enrollments: "Inscripciones por sección"
   course_statistics: 
     unknown: desconocido
-  course_subscriptions: 
-    already_subscribed: 
-      already_subscribed_message: "Hola, *%{subscriber_name}*: ya está inscrito en *%{course_name}*"
-    logged_in_confirm_form: 
-      logged_in_confirm_message: "Hola, *%{user_name}*. Gracias por su interés en el curso *%{course_name}*. Por favor, haga clic en el botón suscribir que aparece a continuación para recibir actualizaciones sobre este curso."
-    new: 
-      subscribe: Suscribirse
-    show: 
-      thanks: "Gracias. Ahora está suscrito al curso *%{course_name}*."
-    subscribe_form: 
-      email: "Dirección de correo electrónico"
-      subscribe_form_text: "Gracias por su interés en el curso *%{course_name}*. Para recibir actualizaciones sobre este curso, facilite su nombre completo y dirección de correo electrónico a continuación."
-      your_name: "Su nombre"
   course_users: 
     greater_than_three: "Introduzca un término de busqueda que contenga tres o más caracteres"
     unknown_error: "Se ha producido un error en su búsqueda. Inténtelo de nuevo."
@@ -3602,15 +4018,14 @@ es:
       buttons: 
         create_course: "Crear un Curso"
       choose_content: "Elija los elementos que desea copiar"
+      conclude_at: "Fecha límite"
+      course_code: "Código del curso"
       details: "Ingrese los siguientes detalles para comenzar creando una copia de este curso."
+      enrollment_term_id: Período
       headings: 
         copy_course: "Copiar %{course}"
-      labels: 
-        conclude_at: "Fecha Límite"
-        course_code: "Código del Curso"
-        enrollment_term_id: Período
-        name: Nombre
-        start_at: "Fecha de Inicio"
+      name: Nombre
+      start_at: "Fecha de inicio"
       titles: 
         copy_course: "Copiar el Curso"
     course_wizard_box: 
@@ -3648,7 +4063,7 @@ es:
               La publicación enviará invitaciones a todos los usuarios del curso para que puedan inscribirse y comiencen a participar. "
           not_registered: "Este curso está reclamado y listo, pero deberá de finalizar el proceso de inscripción antes de que pueda publicar el curso. Debería recibir un correo electrónico de Canvas con un enlace para terminar el proceso. Asegúrese de revisar su bandeja de spam."
         students: "Definitivamente quiere algunos de estos. ¿Cuál es la gracia de enseñar un curso si nadie está poniendo atención?"
-        tas: "Querrá asignar algunos APs para ayudarle con el curso. Los APs pueden clasificar tareas, ayudar a moderar las discusiones y hasta actualizar fechas límites y detalles de tareas para usted."
+        tas: "Querrá asignar algunos APs para ayudarle con el curso. Los APs pueden clasificar tareas, ayudar a moderar las foros y hasta actualizar fechas límites y detalles de tareas para usted."
       headings: 
         next_steps: "Siguientes Pasos"
       links: 
@@ -3808,7 +4223,6 @@ es:
         add_people: "Añadir personas"
         cannot_add_users: "No se pueden incorporar nuevos usuarios porque este curso ha finalizado"
         role_to_search: "Limitar la búsqueda a la función"
-        search: Buscar
         search_people: "Buscar personas"
       invitations_view: 
         accepted_invitation: "%{name} ya ha recibido y aceptado la invitación para unirse al curso, pero aún puede reenviar la invitación si es necesario."
@@ -3832,16 +4246,19 @@ es:
           remove_from_course: "Eliminar del curso"
           resend_invitation: "Reenviar la invitación"
           user_details: "Detalles del usuario"
-        manage: Administrar
+        manage_user: "Gestionar %{name}"
         pending_acceptance_explanation: "Este usuario no ha aceptado aún la invitación para el curso"
         pending_acceptance_of_invitation: pendiente
       roster_users: 
+        canvas_user_id: "ID de usuario de Canvas"
         login_name_or_sis_id: "ID de inicio de sesión/SIS"
         name: Nombre
         no_people_found: "No se han econtrado personas"
         role: Función
         section: Sección
         you_can_search_by: "Puede buscar por:"
+      section: 
+        remove_user_from_course_section: "Eliminar al usuario de %{name}"
     section: 
       enrollment: 
         links: 
@@ -3856,8 +4273,16 @@ es:
       date_restricted: "Usuarios sólo pueden participar en el curso entre estas fechas"
       deatils: 
         move_course: "Seleccione una cuenta principal nueva para este curso. Después que mueva el curso querrá especificar un departamento nuevo para el curso también."
+      draft_explanation: "Explicación del estado Borrador"
+      draft_state_description: |-
+          El estado Borrador es una función en beta que permite publicar y ocultar el contenido del curso. 
+          El contenido oculto no estará visible para los alumnos y no afectará a las calificaciones.
+          También incluye un rediseño de algunas de las áreas de los cursos para hacerlas más uniformes en lo que respecta al diseño y las funciones. 
+          
+          Es posible que el contenido oculto no esté disponible si se deshabilita el estado Borrador.
       drag_details: "Desactivar la mayoría de las páginas hará que los estudiantes que visitan estas páginas sean re-dirigidos a la página de inicio del curso."
       drag_to_hide: "Arrastre elementos aquí para esconderlos de los estudiantes."
+      enable_draft: "Habilitar el estado Borrador (beta)"
       enrollment_count: 
         one: "1 Usuario"
         other: "%{count} Usuarios"
@@ -3945,13 +4370,12 @@ es:
         navigation: Navegación
         sections: Secciones
         tools: Aplicaciones
-        users: Usuarios
       titles: 
         edit_navigation: "Editar la Navegación del Curso"
       transifex_message: "Únase a la [Canvas Translation Community](%{transifex_url})"
       turnitin: "estos comentarios serán mostrados a los estudiantes cuando envíen una tarea Turnitin"
       view_grading_scheme: "ver el esquema de calificación"
-      wiki_editing_roles: "puede editar las páginas wiki del curso"
+      wiki_editing_roles: "puede crear, renombrar y editar las páginas wiki del curso de manera predeterminada"
       wiki_editing_roles_change_existing: "Cambios en páginas pueden ser editados por \"%{current_setting}\" a \"%{new_setting}\"."
     settings_sidebar: 
       buttons: 
@@ -4036,7 +4460,7 @@ es:
       course_rubrics: "Rúbricas del Curso"
       discussion_posts: "Mensajes de la Discusión"
       discussion_topic: "Tema de Discusión"
-      discussions: Discusiones
+      discussions: Foros
       file_count: 
         one: "1 archivo"
         other: "%{count} archivos"
@@ -4053,7 +4477,7 @@ es:
         uploaded_files: "Archivos Cargados"
       new: Nuevo
       new_discussion_entries: "Nuevas Entradas en la Discusión"
-      new_discussions: "Nuevas Discusiones"
+      new_discussions: "Nuevos Foros"
       num_assignments: "# de Tareas"
       num_submissions: "# de Contribuciones"
       page_title: "Estadísticas del Curso"
@@ -4083,13 +4507,11 @@ es:
       rss_feed: "Canal de %{course}"
     unauthorized: 
       invalid_link: "El enlace de inscripción que usó aparece que ya no es válido. Por favor contacte al instructor del curso y asegúrese que sigue inscrito."
-    user_tab: 
-      page_moved_to_people_section_notice: "Esta página se ha trasladado a la *Sección de personas*"
   create_users_view: 
     required: "Introduzca algunas direcciones de correo electrónico"
   crumb: 
     conversations: Conversaciones
-    discussion_replies: "Contestaciones a Discusiones"
+    discussion_replies: "Responder al Foro"
   crumbs: 
     access_report: "Reportar el Acceso"
     announcements: Anuncios
@@ -4100,7 +4522,7 @@ es:
     confirmation: Confirmación
     copy_course: "Copiar el Curso"
     developer_keys: "Claves del elaborador"
-    discussions: Discusiones
+    discussions: Foros
     eportfolio_welcome: "Bienvenido a Su ePortafolio"
     error_reports: "Reportes de Errores"
     files: Archivos
@@ -4184,15 +4606,41 @@ es:
       assign_blanks: "Asignar cero a estudiantes que no han hecho envíos"
     out_of_points_possible: "de %{assignment.points_possible}"
     this_is_permanent: "No se puede deshacer la aplicación de la curva a las calificaciones. Se proporcionarán los historiales de calificación previos a la curva, pero la aplicación de la curva es irreversible."
+  d2l_display: Desire2Learn
   d2l_file_description: "Formato .zip de exportación D2L"
   d2l_name: "Conversor de D2L"
   dashboard: 
+    announcements_collapse: 
+      one: "Contraer %{count} anuncio"
+      other: "Contraer %{count} anuncios"
+    announcements_expand: 
+      one: "Expandir %{count} anuncio"
+      other: "Expandir %{count} anuncios"
+    assignments_collapse: 
+      one: "Contraer %{count} notificación de tarea"
+      other: "Contraer %{count} notificaciones de tareas"
+    assignments_expand: 
+      one: "Expandir %{count} notificación de tarea"
+      other: "Expandir %{count} notificaciones de tareas"
+    conversations_collapse: 
+      one: "Contraer %{count} mensaje de conversación"
+      other: "Contraer %{count} mensajes de conversaciones"
+    conversations_expand: 
+      one: "Contraer %{count} mensaje de conversación"
+      other: "Expandir %{count} mensajes de conversaciones"
     disable_dashboard: "Regresar al antiguo panel de control"
+    discussions_collapse: 
+      one: "Contraer %{count} debate"
+      other: "Contraer %{count} debates"
+    discussions_expand: 
+      one: "Expandir %{count} debate"
+      other: "Expandir %{count} debates"
     enable_dashboard: "Pruebe el nuevo panel de control"
     event_created: "Evento creado"
     message_sent: "Mensaje enviado"
-    show_less: "Mostrar menos"
-    show_more: "Mostrar más"
+    show_more_link: 
+      show_less: "Mostrar menos"
+      show_more: "Mostrar más"
   date: 
     abbr_day_names: 
       - Dom
@@ -4306,6 +4754,19 @@ es:
         school_name: "Nombre de la escuela"
         username: "Dirección de correo electrónico"
     register: 
+      add_site: "Agregar sitio"
+      agree_to_terms: "Acepto  las *condiciones de uso* y la **política de privacidad**."
+      begin_trial: "Comenzar prueba"
+      choose: Escoger
+      cio: "Director informático"
+      corporate: Corporativo
+      dean: Decano
+      director: Director
+      higher_education: "Educación superior"
+      incorrect: "Incorrecto. Inténtelo de nuevo."
+      instructional_designer: "Diseñador del curso"
+      invalid_email: "Correo electrónico no válido"
+      k12: K12
       labels: 
         current_lms: "LMS actual"
         name: Nombre
@@ -4314,7 +4775,32 @@ es:
         phone: "Número de teléfono"
         school_name: Escuela/organización
         school_position: Título
+        type_what_you_hear: "Teclee lo que oye"
+        type_what_you_see: "Teclee lo que ve"
         username: "Correo electrónico"
+      lms_admin: "Administrador LMS"
+      no_lms: Ninguno
+      one: Otro
+      other: Otro
+      other_lms: Otro
+      other_title: Otro
+      personalize_demo: "Personalice su demo"
+      personalizing: Personalizando...
+      proprietary_lms: "Producción propia / Propietario"
+      provost: Rector
+      ready: ¡Listo!
+      school_admin: "Administrador del centro"
+      sign_up_to_canvas: "Regístrese para probar Canvas"
+      specify_lms: "Especifique su LMS actual o elija \"ninguno\""
+      specify_size: "Especifique el tamaño de su organización"
+      student: Estudiante
+      subscribe: "Deseo recibir noticias, consejos e información de Instructure"
+      support: "Asistencia técnica"
+      teacher: Profesor/Instructor
+      technologist: Técnico
+      try_again: "Inténtelo de nuevo"
+      vice_president: VP
+      you_must_agree_to_terms: "Debe aceptar los términos de uso"
   developer_key: 
     api_key: "Clave: *%{api_key}*"
     created: "Creado:"
@@ -4389,6 +4875,7 @@ es:
       delete: Borrar
       due: "Fecha Límite"
       graded_discussion: "Debate con calificación"
+      manage: Manejar
       no_due_date: "No hay fecha límite"
       open_to_comments: "Admite comentarios"
       pin: Anclar
@@ -4443,13 +4930,15 @@ es:
     error_draft_state_announcement: "Este tema no se puede marcar como borrador porque es un anuncio."
     error_draft_state_unauthorized: "No tiene permiso para marcar este tema como borrador."
     error_draft_state_with_posts: "Este tema no se puede marcar como borrador porque contiene publicaciones."
+    errors: 
+      bad_scope: "el ámbito es contradictorio"
     group_assignment_discussion_entry: 
       posts: 
         one: "1 Contribución"
         other: "%{count} Contribuciones"
       separated_conversation_notice: "La conversación para este tema ha sido separado en grupos diferentes. Debajo están todos los grupos de temas al que se tiene acceso."
     index: 
-      course_discussions_atom_feed_title: "Canal Atom de Discusiones del Curso"
+      course_discussions_atom_feed_title: "Canal Atom de Foros del Curso"
     index_view: 
       assignments: Tareas
       delete: Borrar
@@ -4516,7 +5005,6 @@ es:
       reply_to_message: "Contestar al Mensaje Actual"
       reply_to_topic: "Contestar al Tema"
       retrieved_from_feed: "Recuperado de %{feed}"
-      search_entries: "Buscar entradas o autores"
       search_entries_placeholder: "Buscar entradas o autor"
       show_rubric: "Mostrar Rúbrica"
       speed_grader: "Calificador Rápido"
@@ -4548,6 +5036,8 @@ es:
       my_settings: "Mi configuración"
   discussions: 
     are_your_sure_delete: "¿Seguro que quiere borrar esta entrada?"
+    cant_subscribe_not_in_group: "Debe pertenecer a este grupo para poder suscribirse"
+    cant_subscribe_not_in_group_set: "Debe pertenecer a un grupo asociado para poder suscribirse"
     closed_for_comments: "No admite comentarios"
     confirm_delete_discussion_topic: "¿Está seguro de que desea borrar este tema de debate?"
     delete: Borrar
@@ -4565,6 +5055,7 @@ es:
       manage_discussion_entry: "Gestionar la entrada de debate"
       open_in_speedgrader: "Abrir en el calificador rápido"
       unknown_author: "Autor desconocido"
+      write_a_reply: Responder
     entry_stats: 
       show_more: "Mostrar más"
     hide_due_dates: "Ocultar las fechas de vencimiento"
@@ -4606,6 +5097,7 @@ es:
     subscribe: "Suscribirse a este tema"
     subscribed: Suscrito
     subscribed_hint: "Está susctrito a este tema. Haga clic aquí para cancelar la suscripción."
+    toggle_message: "Cambiar la visibilidad del debate"
     uknown_author: "Autor desconocido"
     unknown: Desconocido
     unknown_author: "Autor desconocido"
@@ -4731,6 +5223,10 @@ es:
     errors: 
       compiling: "Hubo un error en la compilación de su eportafolio. Intente de nuevo en un momento."
       missing_file: "Por favor seleccione un archivo"
+      name_required: "Nombre obligatorio"
+      name_too_long: "El nombre es demasiado largo"
+      section_name_invalid: "El nombre de la sección no es válido"
+      section_name_too_long: "El nombre de la sección es demasiado largo"
       upload_failed: "La Carga Falló."
     first_category: "Página de Inicio"
     first_entry: 
@@ -5029,11 +5525,20 @@ es:
     account_navigation_configured: "Se ha configurado la navegación de la cuenta "
     app_full_view: 
       add_tool: "Añadir herramienta"
+      app_already_installed: "Esta aplicación ya se ha instalado"
+      average_rating: "Calificación media"
       back_to_app_center: "Volver al Centro de aplicaciones"
+      education_levels: "Nivel(es) de educación"
+      extensions: Extensiones
+      help_link: "Enlace de ayuda"
+      privacy_level: "Nivel de privacidad"
       rate_tool: "Califique esta herramienta"
     app_review_view: 
       posted_by_on: "Publicado por *%{user_name}* el *%{created}*"
     app_saved_message: "%{app} guardada correctamente"
+    borderless_launch: 
+      load_tool_button: "Cargar %{tool} manualmente"
+      redirecting_to_lti: "Redireccionando a la aplicación LTI, por favor, espere..."
     buttons: 
       cancel: Cancelar
       delete: Borrar
@@ -5091,12 +5596,15 @@ es:
     homework_submission_configured: "Envío de deberes configurado"
     index_view: 
       add_new_tool: "Añadir nueva aplicación"
+      all: Todo
       app_headder: "Aplicaciones externas"
       external_tools_note: "Las aplicaciones permiten añadir nuevas funciones a Canvas de manera sencilla.  Se pueden incorporar a cursos individuales o a todos los cursos de una cuenta. Una vez que se ha configurado, puede enlazarlas a través de los módulos del curso y crear tareas para las herramientas de evaluación."
       external_tools_references: "Haga clic *aquí* para descubrir algunas herramientas LTI que funcionan muy bien con Canvas. También puede echarle un vistazo a los temas sobre herramientas LTI de Canvas Community **aquí**"
+      installed: Instalada
+      not_installed: "No instalada"
       search_filter: "Filtrar por nombre"
       view_app_center: "Ver el Centro de aplicaciones"
-      view_installed_tools: "Ver aplicaciones instaladas"
+      view_installed_tools: "Ver las configuraciones de las aplicaciones"
     missing_stars: "Debe elegir una calificación por estrellas."
     rate_tool_view: 
       rate_tool: "¿Cómo califica esta herramienta?"
@@ -5104,9 +5612,6 @@ es:
     resource_selection_configured: "Selección del recurso configurada"
     save_failed: "No ha sido posible guardar la revisión: %{message}"
     saving: Guardando...
-    sessionless_launch: 
-      load_tool_button: "Cargar %{tool} manualmente"
-      redirecting_to_lti: "Redireccionando a la aplicación LTI, por favor, espere..."
     shared_secret: "Secreto compartido"
     submit: Enviar
     tool_show: 
@@ -5404,6 +5909,8 @@ es:
     grade: "grado: %{grade}"
     graded_by_me: "%{graded_time} por mí"
     graded_then_resubmitted: "calificado, luego reenviado (%{when})"
+    gradee_index_of_total: "%{gradee} %{x} de %{y}"
+    group: Grupo
     hide_all_things: "Esconder %{things}"
     hide_column: "Esconder Columna"
     hide_student_name: "Esconder los Nombres de los Estudiantes"
@@ -5424,6 +5931,7 @@ es:
     new_assessment: "[Tarea Nueva]"
     no_submission_time: "ningun tiempo de envío"
     nth_student: "Estudiante %{n}"
+    portion_graded: "%{x} / %{y} Calificado"
     publish_to_sis: "Publicar calificaciones a SIS"
     reupload_submission_files: "Recargar los Archivos de Envío"
     reupload_submissions: "Recargar los Envíos"
@@ -5674,6 +6182,9 @@ es:
         name: Nombre
         out_of: De
         score: Calificación
+      icons: 
+        rubric_results: "Ver los resultados de la rúbrica"
+        turnitin_results: "Ver los resultados Turnitin"
       labels: 
         final_grade_hidden: "Cálculo del total ha sido desactivado"
         high: Alta
@@ -5809,8 +6320,8 @@ es:
       unauthorized: "No tiene autorización para ver la asistencia de este curso"
       updated: "El envío de la tarea se actualizó con éxito."
       uploaded: 
-        one: "Se crearon archivos y comentarios para los envíos de 1 usuario"
-        other: "Archivos y comentarios creados para los envíos de %{count} usuarios"
+        one: "Archivos y comentarios creados para 1 envío"
+        other: "Archivos y comentarios creados para %{count} envíos"
     out_of_final: "%{weight} del Final"
     out_of_points_possible: "de %{points_possible}"
     show: 
@@ -5846,8 +6357,14 @@ es:
         assessment: Evaluación
         discussion: Discusión
         grading: Calificación
+        no_group_submission: "Este grupo no ha realizado ningún envío para esta tarea"
         no_submission: "Este estudiante no tiene un envío para esta tarea"
         submission: "Este alumno ha enviado la tarea"
+      icons: 
+        delete_comment: "Borrar comentario"
+        file_attachment: "Adjuntar archivos"
+        media_comment: "Comentario multimedia"
+        speech_recognition: "Reconocimiento de voz"
       keycode_descriptions: 
         change_grade: "Cambiar la Calificación"
         leave_comment: "Añadir un Comentario"
@@ -5888,12 +6405,10 @@ es:
       no_annotation: "No hay anotaciones disponibles para este documento"
       not_newest_notice: "Aviso: Este no es el envío más reciente"
       page_title: "%{assignment_name}, SpeedGrader, %{course_name}"
-      portion_graded: "%{x} / %{y} Calificado"
       sort_by: 
         status: "por estatus de envíos (necesita calificación, no enviado, etc)"
         student_name: "por nombre de estudiante (alfabéticamente)"
         submitted_at: "la fecha en la que se envío la tarea"
-      student_index_of_total: "estudiante %{index} de %{total_students}"
       submitted_files: "Archivos Enviados: (haga click para cargar)"
       titles: 
         download_file: "Descargar este archivo"
@@ -5906,6 +6421,7 @@ es:
         media_comment: "Comentario de Media"
         speech_recognition: "Reconocimiento de Voz"
     speed_grader_disabled: "SpeedGrader está deshabilitado para este curso"
+    speedgrader_enabled_only_for_published_content: "Speedgrader está habilitado solo para el contenido publicado."
     student: 
       new_student: "Estudiante Nuevo"
       student: Estudiante
@@ -5927,6 +6443,13 @@ es:
     submission: 
       titles: 
         submission_review: "Este envío necesita revisión"
+    submission_score: 
+      icons: 
+        discussion_submission: "Envío del debate"
+        file_upload_submission: "Envío de archivos cargados"
+        online_url_submission: "Envío de URL online"
+        quiz_submission: "Envío de evaluación"
+        text_entry_submission: "Envío de introducción de texto"
     submissions_zip_upload: 
       comments_made: 
         one: "Se ha hecho 1 Comentario"
@@ -5981,27 +6504,29 @@ es:
     memeber: Miembro
     tabs: 
       chat: Chat
-      discussions: Discusiones
+      discussions: Foros
       files: Archivos
       home: "Página Principal"
       pages: Páginas
       people: Personas
   group_categories: 
-    default_category_title: "Grupos de Estudio"
-    errors: 
-      cant_restrict_self_signup: "No se puede activar mientras exista un grupo de diferentes secciones en la categoría."
-      category_name_reserved: "%{category_name} es un nombre reservado."
-      category_name_too_long: "Introduzca un nombre de categoría más corto para dividir a los alumnos en grupos"
-      category_name_unavailable: "%{category_name} ya está en uso."
     notices: 
       create_category_success: "La categoría se ha creado."
       delete_category_success: "La categoría se ha eliminado."
       update_category_success: "La categoría se ha actualizado."
   group_category: 
+    cant_restrict_self_signup: "No se puede restringir el autorregistro mientras exista un grupo con mezcla de secciones en esta categoría"
+    greater_than_1: "Debe ser mayor que 1"
     group_categories: 
       communities: Comunidades
       imported: "Grupos Importados"
       student_organized: "Grupos de Estudiantes"
+    invalid_self_signup: "El autorregistro debe tener uno de los siguientes valores: %{values}"
+    name_required: "Nombre obligatorio"
+    name_reserved: "%{name} es un nombre reservado."
+    name_too_long: "Introduzca un nombre de categoría más corto"
+    name_unavailable: "%{name} ya está en uso."
+    self_signup_for_courses: "El autorregistro puede estar habilitado solo para grupos de curso o comunidades"
   group_membership: 
     errors: 
       group_full: "El grupo está lleno."
@@ -6009,6 +6534,7 @@ es:
   group_settings: 
     invitation_sent: "Invitación enviada"
   groups: 
+    add_group: "Agregar grupo"
     add_group_category: 
       allow_self_signup: "Permitir la auto-inscripción"
       buttons: 
@@ -6080,7 +6606,7 @@ es:
       buttons: 
         create: "Crear un Grupo"
       course_groups: "Grupos del Curso"
-      group_explanation: "Grupos son un buen lugar para colaborar en proyectos o para establecer calendarios para sesiones de estudio y otras. Todos los grupos tienen un calendario, un wiki, discusiones, y un poco de espacio para almacenar archivos. Grupos pueden colaborar en documentos, o programar conferencias en línea. En realidad es un mini-curso donde puede trabajar con un número más pequeño de estudiantes o en un proyecto más enfocado.\n"
+      group_explanation: "Grupos son un buen lugar para colaborar en proyectos o para establecer calendarios para sesiones de estudio y otras. Todos los grupos tienen un calendario, un wiki, foros, y un poco de espacio para almacenar archivos. Grupos pueden colaborar en documentos, o programar conferencias en línea. En realidad es un mini-curso donde puede trabajar con un número más pequeño de estudiantes o en un proyecto más enfocado."
       groups_disabled: "Grupos organizados por estudiantes han sido desactivados para este curso, entonces solo tendrá los grupos creados por el maestro para usted."
       headings: 
         available_groups: "Grupos Disponibles"
@@ -6111,6 +6637,8 @@ es:
       messages: 
         no_students: "Ningún estudiante se ha agregado a este curso"
       page_title: "Grupos del Curso"
+      page_title_accounts: "Grupos de cuentas"
+    create_group_set: "Crear conjunto de grupos"
     delete_confirm: "¿Está seguro de que desea eliminar esta categoría de grupo?"
     edit: 
       buttons: 
@@ -6121,12 +6649,14 @@ es:
         description: Descripción
         join_level: "Permisos para unirse"
         name: "Nombre del Grupo"
+    edit_group: "Editar grupo"
     edit_group_category: 
       allow_self_signup: "Permitir la auto-inscripción"
       group_limit_blank: "(dejar en blanco si no se establece un límite)"
       group_structure_group_limit: "*Limitar los grupos a* %{group_limit} miembros"
       restricted_self_signup: "Requerir que miembros de grupos pertenezcan a la misma sección"
       self_signup_help_tooltip: "¿Que son Grupos con Auto-inscripción?"
+    edit_group_set: "Editar conjunto de grupos"
     errors: 
       category_in_use: "\"%{category_name}\" ya está en uso"
       creating_category_failed: "Falló la Creación de la Categoría, Intente de Nuevo"
@@ -6165,7 +6695,6 @@ es:
       add_unassigned_menu: 
         add_unassigned_student: "Agregar alumno no asignado"
         add_unassigned_user: "Agregar usuario no asignado"
-        search: Buscar
         search_people: "Buscar personas"
       add_unassigned_user: 
         assign_to_group: "Asignar a un grupo"
@@ -6177,15 +6706,40 @@ es:
         assign_user_to_group: "Asignar usuario a este grupo"
       group: 
         add_user_to_group: "Asignar usuario a grupo"
-        delete_group: "Borrar grupo"
-        edit_group: "Editar grupo"
+        group_delete: Borrar
+        group_edit: Editar
+        group_settings: Configuraciones
         show_group_details: "Mostrar la información del grupo"
+      group_categories: 
+        group_set_create: "Agregar conjunto de grupos"
       group_category: 
+        randomly_assigning_students: "Asignar alumnos al azar"
         unassigned_students: "Alumnos no asignados"
         unassigned_users: "Usuarios no asignados"
+      group_category_create: 
+        allow_self_signup: "Permitir la auto-inscripción"
+        cancel: Cancelar
+        create_groups: "Crear %h{num_groups} grupos ahora"
+        create_groups_manually: "Crearé los grupos manualmente"
+        group_set_name: "Nombre del conjunto de grupos"
+        group_structure: "Estructura de los grupos"
+        leave_group_limit_blank: "Dejar en blanco si no se establece un límite"
+        limit_group_size: "Limitar los grupos a %h{group_limit} miembros"
+        require_same_section: "Hacer obligatorio que los miembros del grupo pertenezcan a la misma sección"
+        save: Guardar
+        saving: Guardando...
+        self_signup: Auto-Inscripción
+        self_signup_description: "Puede crear conjuntos de grupos en los que los alumnos se puedan registrar solos. Los alumnos seguirán teniendo que pertenecer a un solo grupo del conjunto, pero de esta forma se podrán organizar en grupos ellos mismos en vez de tener que hacerlo el profesor. Recuerde que mientras esta función esté habilitada, los estudiantes podrán moverse de un grupo a otro."
+        split_into_groups: "Dividir a los alumnos en %h{split_num} grupos equitativos"
+        what_is_this: "¿Qué es esto?"
       group_category_detail: 
         add_group: "Agregar grupo"
+        category_settings: Configuraciones
+        delete_category_option: Borrar
+        edit_category_option: Editar
         group_limit_blurb: "Los grupos están limitados a un máximo de *%{count}* miembros"
+        message_all_unassigned_option: "Enviar un mensaje a todos los alumnos no asignados"
+        randomly_assign_students_option: "Asignar alumnos al azar"
         restricted_self_signup_blurb: "Todos los estudiantes de un mismo grupo deben estar en la misma sección."
         search: buscar
         self_organized_warning: "Los alumnos organizan este tipo de grupo. A diferencia a otros tipos de grupos, los alumnos pueden pertenecer a más de un grupo a la vez, por lo que es posible que estos grupos no sean la mejor solución para su calificación."
@@ -6193,8 +6747,25 @@ es:
         self_signup_help_tooltip: "¿Qué son los grupos con inscripción automática?"
         student_group_instructions: "(arrastrar alumnos para asignarlos)"
         user_group_instructions: "(arrastrar usuarios para asignarlos)"
+      group_category_edit: 
+        allow_self_signup: "Permitir la auto-inscripción"
+        cancel: Cancelar
+        group_set_name: "Nombre del conjunto de grupos"
+        leave_group_limit_blank: "Dejar en blanco si no se establece un límite"
+        limit_group_size: "Limitar grupos a %h{group_limit} miembros"
+        require_same_section: "Hacer obligatorio que los miembros de grupos pertenezcan a la misma sección"
+        save: Guardar
+        saving: Guardando...
+        self_signup_description: "Puede crear conjuntos de grupos en los que los alumnos se puedan registrar solos. Los alumnos seguirán teniendo que pertenecer a un solo grupo del conjunto, pero de esta forma se podrán organizar en grupos ellos mismos en vez de tener que hacerlo el profesor. Recuerde que mientras esta función esté habilitada, los estudiantes podrán moverse de un grupo a otro."
+        what_is_this: "¿Qué es esto?"
+      group_edit: 
+        cancel: Cancelar
+        group_name: "Nombre del grupo"
+        save: Guardar
+        saving: Guardando...
       group_user: 
         assign_to_group: "Asignar a grupo"
+        remove_from_group: "Eliminar del grupo"
       group_users: 
         no_students: "No hay alumnos"
         no_users: "No hay usuarios"
@@ -6203,6 +6774,10 @@ es:
         no_groups: "No hay grupos."
         search: Buscar
         search_groups: "Buscar grupos"
+      randomly_assign_members: 
+        add_more_users: Cancelar
+        close: Okay
+        randomly_assign_students_dialog: "Esta acción asignará automáticamente, de la manera más equitativa posible, a todos los alumnos no asignados a los diferentes grupos de alumnos disponibles."
     member: 
       one: "1 miembro"
       other: "%{count} miembros"
@@ -6214,6 +6789,7 @@ es:
       group_join_request_info: "Este grupo ha recibido su solicitud de suscripción. Será notificado una vez que acepten o rechacen su solicitud."
     messages: 
       creating_group: "Creando Grupo..."
+    name_too_long: "El nombre es demasiado largo"
     notices: 
       already_deleted: "Ese grupo ha sido borrado"
       create_success: "El grupo fue creado con éxito."
@@ -6223,6 +6799,7 @@ es:
       students_assigned: "Alumnos asignados a grupos"
       update_success: "El grupo fue actualizado con éxito."
       welcome: "¡Bienvenido al grupo %{group_name}!"
+    randomly_assigning_members: "Asignar alumnos al azar"
     show: 
       coming_up: Siguiente
       group_atom_feed: "Canal Atom del Grupo"
@@ -6300,6 +6877,8 @@ es:
     old_styleguide: 
       create_collection: "Crear una colección"
       start_a_group: "Comenzar un grupo"
+    styleguide: 
+      manage: Manejar
   instructions: 
     authorize_google_docs: "Antes de poder colaborar en documentos, debe autorizar a Canvas para poder tener acceso a su cuenta de Google Docs:"
   instructure: 
@@ -6320,12 +6899,14 @@ es:
     draft: Borrador
     errors: 
       cannot_view_document_inline: "Este documento no puede ser visto en línea, puede que no tenga permiso para verlo o puede que esté borrado."
+      document_preview_processing: "Todavía se está procesando la vista previa del documento. Inténtelo de nuevo más tarde."
       field_is_required: "Este campo es requerido"
       invalid_datetime: "Valor de fecha/tiempo inválido"
       invalid_entry_for_field: "Entrada inválida: %{field}"
       invalid_number: "Este debería ser un número."
       not_a_date: "¡Esa no es una fecha!"
       posting_message_failed: "Contribución Falló, Intente de nuevo"
+      required: "Campo obligatorio"
       search_failed: "Búsqueda falló, Intente de nuevo."
     ignore_forever: "Ignorar por Siempre"
     ignore_until_new_submission: "Ignorar Hasta un Nuevo Envío"
@@ -6418,6 +6999,10 @@ es:
     titles: 
       job_handler: "Controlador de trabajos"
       last_error: "Último Error"
+  jquery: 
+    module_sequence_footer: 
+      next: Siguiente
+      previous: Anterior
   labels: 
     lock_module_until: "bloquear el modulo hasta una fecha dada"
   layouts: 
@@ -6490,6 +7075,7 @@ es:
           porque la asignación no tiene puntos posibles.
       no_points_possible: "La asignación no tiene puntos posibles."
       no_score: "No se ha asignado calificación"
+      no_submission_created: "La solicitud de resultados no pudo crear un nuevo envío de deberes."
     canvas: 
       migration: 
         announcements: Anuncios
@@ -6549,6 +7135,9 @@ es:
       no_link: "[ Sin Enlace ]"
     titles: 
       link_to_student: "Enlazar a Estudiante"
+  linked_assignment_message: "vinculado con la tarea '%{title}'"
+  linked_discussion_topic_message: "vinculado con el tema de debate '%{title}'"
+  linked_quiz_message: "vinculado con la evaluación '%{title}'"
   links: 
     dashboard: "Mi Tablero de Instrumentos"
     errors: 
@@ -6590,6 +7179,7 @@ es:
     errors: 
       file_too_large: "*Este archivo es muy grande.* El tamaño máximo es de %{size}MB."
       load_failed: "La carga de medios de aplicación de comentario parecen haber fallado. Intente de nuevo."
+      media_comment_installation_broken: "La función de carga de comentarios multimedia no se ha configurado correctamente. Por favor, póngase en contacto con el administrador."
       must_be_logged_in: "Debe estar conectado para grabar media."
       persistent_problem: "Si este problema sigue ocurriendo, puede tratar de grabar su media localmente y luego cargar el archivo guardado."
       save_failed: "El guardado parece haber fallado. Por favor cierre esta ventana emergente e intente de nuevo."
@@ -7395,14 +7985,14 @@ es:
     course_already_started: 
       email: 
         body: |-
-            Hola, %{user}:⏎
-            ⏎
-            %{course}, su curso en Canvas Network, empezó hace un par de días y nos hemos dado cuenta de que aún no ha iniciado sesión. Solo queríamos enviarle un recordatorio en caso de que lo haya olvidado.⏎
-            ⏎
-            Para iniciar sesión, vaya a %{site} e introduzca su nombre de usuario y contraseña. Si no ha configurado una contraseña todavía, podrá hacerlo aquí: %{password_url}. Si simplemente no puede realizar este curso en particular, le invitamos a que navegue por nuestro catálogo de cursos en %{site} para encontrar algún otro que le inspire. ¡Cada día se añaden nuevos cursos!⏎
-            ⏎
-            Esperamos verle pronto.⏎
-            ⏎
+            Hola, %{user}:⏎ 
+            ⏎ 
+            %{course}, su curso en Canvas Network, empezó hace un par de días y nos hemos dado cuenta de que aún no ha iniciado sesión. Solo queríamos enviarle un recordatorio en caso de que lo haya olvidado.⏎ 
+            ⏎ 
+            Para iniciar sesión, vaya a %{site} e introduzca su nombre de usuario y contraseña. Si no ha configurado una contraseña todavía, podrá hacerlo aquí: %{password_url}. Si simplemente no puede realizar este curso en particular, le invitamos a que navegue por nuestro catálogo de cursos en %{site} para encontrar algún otro que le inspire. ¡Cada día se añaden nuevos cursos!⏎ 
+            ⏎ 
+            Esperamos verle pronto.⏎ 
+            ⏎ 
             Canvas Network
         course_already_started: "Su curso ya ha comenzado"
     course_required_materials: 
@@ -8198,6 +8788,25 @@ es:
     quiz_locked_at: "Esta evaluación fue bloqueada en %{at}."
     quiz_locked_module: "Esta evaluación es parte del módulo *%{module}* y aún no ha sido desbloqueada."
     quiz_locked_until: "Esta evaluación ha sido bloqueada hasta %{date}."
+    quiz_regrade_finished: 
+      email: 
+        body: "El cambio de calificación para la evaluación %{quiz} ha finalizado"
+        html: 
+          body: "El cambio de calificación para la evaluación %{quiz} ha finalizado"
+          link_message: "Puede ver la evaluación aquí:"
+          subject: "Cambio de calificación de la evaluación finalizado: %{quiz}, %{context}"
+        link_message: "Puede ver la evaluación aquí:"
+        subject: "Cambio de calificación de la evaluación finalizado: %{quiz}, %{context}"
+      facebook: 
+        body: "Cambio de calificación de la evaluación finalizado: %{title}"
+      sms: 
+        body_sms: "Cambio de calificación de la evaluación %{title} finalizado en %{context}."
+        more_info: "Más información en %{url}"
+      summary: 
+        body: "El cambio de calificación para la evaluación %{title} ha finalizado."
+        subject: "Cambio de calificación de la evaluación: %{quiz}, %{context}"
+      twitter: 
+        body: "Alerta de Canvas: Cambio de calificación en evaluación: %{quiz}"
     quiz_unpublished_module: "Este cuestionario es parte de un módulo sin publicar y aún no está disponible."
     report_generated: 
       email: 
@@ -8249,6 +8858,26 @@ es:
         subject: "Evaluación Nueva: %{title}, %{context}"
       twitter: 
         tweet: "Alerta de Canvas - Evaluación Nueva: %{title}, %{context}."
+    self_enrollment_registration: 
+      email: 
+        body: |-
+            Hola, %{user}:⏎ 
+            
+            Su inscripción en %{course}, el curso de Canvas Network, se ha realizado correctamente. ⏎
+            
+            No olvide configurar su perfil de Canvas Network de modo que el resto del curso le conozca. Puede actualizar su perfil en %{profile_url}⏎ 
+            ⏎ 
+            ¡Siga aprendiendo!⏎ 
+            ⏎ 
+            Canvas Network
+        html: 
+          farewell: "Siga aprendiendo,"
+          greetings: "Hola, %{user}:"
+          profile_reminder: "No olvide configurar su *perfil de Canvas Network*, de modo que el resto del curso le conozca."
+          self_enrollment_confirmation: "Su inscripción en %{course}, el curso de Canvas Network, se ha realizado correctamente."
+          self_enrollment_registration: "Su inscripción en %{course}"
+          signature: "Canvas Network"
+        self_enrollment_registration: "Su inscripción en %{course}"
     send_form: 
       labels: 
         message_body: Mensaje
@@ -8505,9 +9134,63 @@ es:
   migration_issues: 
     errors: 
       valid_workflow_state: "Debe enviar un estado de flujo de trabajo válido"
+  module_item_types: 
+    assignment: Tarea
+    disuccsion: Debate
+    external_tool: "Herramienta externa"
+    external_url: "URL externa"
+    file: Archivo
+    page: Página
+    quiz: Evaluación
+    sub_header: "Encabezado secundario"
   modules: 
+    add_module_item_dialog: 
+      item_type: "Tipo:"
+    add_module_item_dialog_wrapper: 
+      Save: Guardar
+      cancel: Cancelar
+      creating: Creando...
+    dialog_title: "Agregar elemento a %{moduleName}"
     module_collection_view: 
+      button: 
+        preview: "Vista previa"
       course_modules: "Módulos del curso"
+      header: 
+        module: Módulo
+    module_item_view: 
+      button: 
+        delete: Borrar
+        edit: Editar
+      manage: Manejar
+      module_item: 
+        available: Disponible
+        due: "Fecha límite"
+        points_abbreviated: pts
+    module_view: 
+      module: 
+        prerequisites: "Requisitos previos"
+        published: Publicado
+    progression_module_collection: 
+      module_progress_for: "Progreso del módulo para %h{student_link}"
+      module_progress_for_student: "Progreso del módulo para %{student.name}"
+      no_modules_found: "No se han encontrado módulos"
+    progression_module_view: 
+      items: "Elementos pendientes de finalización"
+      items_below: "Elementos pendientes de finalización a continuación"
+    progression_student_view: 
+      show_progressions_for_student: "Mostrar progresión para %{name}"
+    progressions_index: 
+      back_to_modules: "Volver a la página de módulos"
+      no_students_found: "No se han encontrado alumnos"
+      student_progress: "Progreso del alumno"
+  moodle_dropdown_warning_title: "Es posible que las preguntas con varios menús desplegables se hayan importado de manera incorrecta"
+  move_dialog: 
+    cancel: Cancelar
+    save: Guardar
+    saving: Guardando...
+    where_to_move: "¿Dónde desea mover *%{name}*?"
+  move_dialog_select: 
+    move_to_end: "-- A la parte de abajo --"
   mute_dialog: 
     curving_assignments: "Aplicando Curvas a tareas"
     grade_change_notifications: "Notificaciones de Cambios de Calificaciones"
@@ -8689,15 +9372,12 @@ es:
       alerts: Alertas
       communication: Conversaciones
       course: "Actividades del curso"
-      discussions: Discusiones
+      discussions: Foros
       groups: Grupos
       one: Otro
       other: Otro
       parent: "Correos principales"
       scheduling: Planificación
-  notifications_search: 
-    cant_be_blank: "La ID de usuario de Canvas no puede estar vacía"
-    cant_come_before_from: "'Hasta la fecha' no puede ser anterior a 'Desde la fecha'"
   number: 
     currency: 
       format: 
@@ -8774,6 +9454,7 @@ es:
       importError: "Se ha producido un error al importar. Inténtelo de nuevo más tarde."
       importSuccess: "Importación correcta"
       updateSuccess: "Actualización correcta"
+    length_error: "Debe tener 255 caracteres o menos"
     loading_more_results: "Cargando más resultados"
     main_instructions: 
       instructions: 
@@ -8875,10 +9556,28 @@ es:
         url: URL
         user_agent: "Agente de Usuario"
   pages: 
+    cancel_button: Cancelar
+    cannot_unpublish_front_page: "No se puede ocultar la página principal"
+    delete_button: Borrar
     delete_confirmation: "¿Está seguro de que desea borrar esta página wiki?"
-    delete_title: "Borrar página wiki"
+    delete_dialog_title: "Borrar página wiki"
+    deleting_button: Borrando...
+    edit_dialog_title: "Editar página wiki"
     errors: 
       require_title: "Debe introducir un título"
+    headers: 
+      sort_ascending: "Orden ascendente"
+      sort_descending: "Orden descendente"
+    notices: 
+      delete_failed: "No se puede borrar la página \"%{title}\"."
+      page_deleted: "Se ha borrado la página \"%{title}\"."
+    reload_editing_page: "Esta página ha cambiado desde que comenzó a editarla. Si la *recarga* perderá todos los cambios."
+    reload_viewing_page: "Esta página ha cambiado desde que comenzó a verla. *Recargar*"
+    save_button: Guardar
+    saving_button: Guardando...
+    warnings: 
+      overwrite_changes: "Está a punto de sobrescribir otros cambios que se han realizado desde que comenzó a editar.\\n\\n¿Sobrescribir los cambios?"
+      unsaved_changes: "No ha guardado los cambios. ¿Desea continuar sin guardar esos cambios?"
   paginated_collection: 
     no_items: "No hay elementos."
   paginated_list: 
@@ -9057,7 +9756,6 @@ es:
         term_start_days_adjustment: "Ajuste de días de comienzo de periodo"
     index: 
       author: Autor
-      canvas_revision_unknown: Desconocido
       description: Descripción
       name: Nombre
       no_plugins: "No hay complementos de Canvas instalados"
@@ -9093,6 +9791,7 @@ es:
       kaltura_sis_explanation: "Si el usuario y los datos SIS del curso marcados se proporcionan a Kaltura. "
       labels: 
         cache_play_list_seconds: "Segundos para cargar la URL de la lista de reproducción de la memoria"
+        do_analytics: "Enviar eventos de análisis"
         domain: Dominio
         kaltura_sis: "Escribir los datos SIS en Kaltura"
         kcw_ui_conf: "ID de Configuración KCW UI"
@@ -9346,7 +10045,7 @@ es:
         expires_at: "dejar en blanco para que no expire"
         language: "Esto anulará las configuraciones de cualquier navegador o cuenta."
         name: "Este nombre será usado por los profesores para las calificaciones."
-        short_name: "Otros verán este nombre en las discusiones, mensajes y comentarios."
+        short_name: "Otros verán este nombre en las foross, mensajes y comentarios."
         sortable_name: "Este nombre aparece en listas clasificables."
       labels: 
         change_password: "Cambiar Contraseña"
@@ -9367,7 +10066,7 @@ es:
         show_user_services: "Permitir que miembros con los que comparte cursos/grupos vea cuales servicios he enlazado a mi perfil."
         skype_name: "Nombre de Skype"
         sortable_name: "Nombre clasificable"
-        time_zone: "Uso Horario"
+        time_zone: "Huso horario"
         token: "Componente léxico"
         token_application: Aplicación
         token_created: Creado
@@ -9424,6 +10123,7 @@ es:
           yourself, and won't appear in your public stream.
       unknown_service: Desconocido
       web_services: "Canvas puede hacer su vida más fácil al unirse con las herramientas en línea que ya usa. Haga click en cualquiera de los servicios en \"Otros Servicios\" para ver lo que queremos decir. "
+    purpose_required: "Es obligatorio escribir un motivo"
     resending: renviando...
     secondary_nav: 
       links: 
@@ -9643,13 +10343,18 @@ es:
   publish_btn_module: 
     buttons: 
       publish: Publicar
+      publish_desc: "Sin publicar. Haga clic para publicarlo"
       published: Publicado
+      published_desc: "Publicado. Haga clic para ocultar"
       publishing: Publicando...
       unpublish: Ocultar
       unpublishing: Ocultando...
+  publishable: 
+    cant_unpublish: "No se puede ocultar"
   purchases: 
     new: 
       payment_info: "Información de pago"
+  qti_display: QTI
   qti_file_description: "archivo .zip QTI "
   qti_name: "Conversor de QTI"
   question_bank: 
@@ -9739,7 +10444,6 @@ es:
       show_details: "Mostrar los Detalles de la Pregunta"
       title: 
         move_copy_questions: "Mover/Copiar las Preguntas"
-  question_blank: "Respuesta en blanco"
   quick_start_bar: 
     announcement: 
       saving: Guardando...
@@ -9763,6 +10467,12 @@ es:
       invalid_ip_filter: "El filtro IP no es válido"
       invalid_quiz_type: "El tipo de cuestionario no es válido"
     question_name_counter: "Pregunta %{question_number}"
+    regrade: 
+      give_everyone_full_credit: "Otorgar a todo el mundo la puntuación máxima para esta pregunta."
+      no_scores_reduced: "Conceder puntos tanto por las respuestas correctas anteriores como por las corregidas (*las puntuaciones no serán menores*)"
+      regrade_options: "Opciones de cambio de calificación *(para los alumnos que ya hayan respondido a esta pregunta):*"
+      some_scores_reduced: "Solo conceder puntos a la respuesta correcta (*las puntuaciones de algunos estudiantes serán menores*)"
+      update_question_without_regrading: "Actualizar pregunta sin cambio de calificación"
     types: 
       quiz: Evaluación
       survey: Encuesta
@@ -9810,6 +10520,9 @@ es:
     always: Siempre
     answer_comments: "Contestar comentarios"
     answer_text: "Texto de respuesta"
+    assignment_points_possible: 
+      one: "1 pto"
+      other: "%{count} pts"
     buttons: 
       add_selected_questions: "Agregar Preguntas Seleccionadas"
       adding_questions: "Agregando Preguntas..."
@@ -9844,12 +10557,14 @@ es:
       labels: 
         answer_with_margin: "con margen"
         your_answer: "Su Respuesta"
+      margin_of_error: "margen de error"
       plus_or_minus: +/-
       range_answer: "Entre %{lower_bound} y %{upper_bound}"
       selected_answer: "Seleccionó esta respuesta."
       you_left_this_blank: "Dejó esto en Blanco"
     display_question: 
       default_question_answer: "[ Escoger ]"
+      flag_this_question: "Marcar esta pregunta"
       headers: 
         formulas: Formulas
         possible_solutions: "Soluciones Posibles"
@@ -9862,14 +10577,18 @@ es:
       labels: 
         additional_comments: "Comentarios Adicionales"
         for_answer_number: "Para la respuesta %{answer_number}"
+        warning_icon: Aviso
       links: 
         delete_question: "Borrar esta Pregunta"
         edit_question: "Editar esta Pregunta"
         move_copy_question: "mover/copiar la pregunta a otro grupo de preguntas"
       not_yet_graded: "Sin calificar"
+      original_score: "Puntuación original:"
       points_possible: "%{points_possible} pts"
+      regraded_score: "Puntuación con cambio de calificación:"
       show_ansers_for_variable: "Mostrar Respuestas para %{variable}"
       skip_question_text: "Saltar al texto de la pregunta."
+      submission_was_regraded: "Esta pregunta se ha calificado de nuevo: su puntuación ha cambiado."
       titles: 
         question_correct_comment: "Los estudiantes verán este comentario si la respuesta es correcta"
         question_incorrect_comment: "Los estudiantes ven este comentario si su respuesta es errónea"
@@ -9963,6 +10682,7 @@ es:
     form_answer: 
       answer_in_range_accessible: "entre *range start* y #range end#"
       answer_text: "Texto de respuesta"
+      answer_weight: "Ponderación de respuestas"
       exact_answer_with_error_margin_accessible: "*exact answer* con margen de error #error margin#"
       labels: 
         answer_comments: "Comentarios, si el estudiante escoge esta respuesta"
@@ -10053,6 +10773,7 @@ es:
         text_only: "Texto (sin pregunta)"
         true_false: Verdadero/Falso
       show_possible_answers: "Mostrar Respuestas Posibles para %{question}"
+      show_possible_answers_no_question: "Mostrar posibles respuestas para"
       titles: 
         click_to_enter_correct_answer_comments: "Haga click para ingresar comentarios para una respuesta correcta"
         click_to_enter_general_answer_comments: "Haga click para ingresar comentarios generales"
@@ -10061,6 +10782,8 @@ es:
     graded_quiz: "Cuestionario calificado"
     graded_survey: "Encuesta calificada"
     headers: 
+      assignment_quizzes: "Evaluaciones para tareas"
+      practice_quizzes: "Evaluaciones de prácticas"
       submitted_students_quiz_title: 
         one: "Alumnos que han realizado el cuestionario (%{count})"
         other: "Alumnos que han realizado el cuestionario (%{count})"
@@ -10069,6 +10792,7 @@ es:
         one: "Alumnos que han realizado la encuesta (%{count})"
         other: "Alumnos que han realizado la encuesta (%{count})"
         zero: "Alumnos que han realizado la encuesta"
+      surveys: Encuestas
       unsubmitted_students_quiz_title: 
         one: "Alumnos que no han realizado el cuestionario (%{count})"
         other: "Alumnos que no han realizado el cuestionario (%{count})"
@@ -10103,9 +10827,11 @@ es:
         back_to_survey: "Regresar a la encuesta"
       logged_out_user: "Usuario desconectado %{index}"
       named_quiz_results: "Resultados de %{quiz_name} para %{user}"
+      next_questions_arrow_title: "Preguntas siguientes"
       no_more_attempts: "%{user} no tiene más intentos"
       page_title_quiz: "Historial de Evaluación para %{user}"
       page_title_survey: "Historial de Encuestas para %{user}"
+      prev_questions_arrow_title: "Preguntas anteriores"
       quiz_not_yet_taken: "La evaluación aún no se ha completado."
       quiz_not_yet_taken_or_in_progress: "La evaluación no se ha completado o está en progreso"
       quiz_unlimited_attempts: "Esta evaluación tiene intentos ilimitados"
@@ -10138,10 +10864,18 @@ es:
         create_new_quiz: "Crear una Evaluación Nueva"
         manage_question_banks: "Manejar Grupos de Preguntos"
         publish_multiple_quizzes: "Publicar Varias Evaluaciones"
+      multiple_due_dates: "Varias fechas"
       no_quizzes: "No hay evaluaciones disponibles"
       page_titles: Evaluaciones
       titles: 
         this_quiz_is_locked: "Esta evaluación está bloqueada. Haga click para más detalles."
+    index_view: 
+      links: 
+        create_new_quiz: "Nueva evaluación"
+        manage_question_banks: "Gestionar grupos de preguntas"
+        publish_multiple_quizzes: "Publicar varias evaluaciones"
+        settings: Configuraciones
+      search_for_quiz: "Buscar evaluación"
     invalid_ip: 
       quiz_protected: "Esta evaluación está protegida y sólo está disponible de ciertas localidades. La computadora que está usando no aparece estar en una localidad válida para tomar esa evaluación."
       survey_protected: "Esta encuesta está protegida y sólo está disponible de ciertas localidades. La computadora que está usando no aparece estar en una localidad válida para tomar esa encuesta."
@@ -10160,6 +10894,7 @@ es:
       comments_on_question: "Comentarios para esta pregunta"
       comments_on_wrong_match: "Comentarios si el usuario obtiene este apareo mal"
       message_text: "Texto del Mensaje"
+      multiple_blanks_question: "Rellene el espacio en blanco, lea el texto que lo acompaña"
       other_incorrect_matches: "Otras Opciones Incorrectas de Apareo"
       possible_answer: "Respuesta Posible"
     links: 
@@ -10294,11 +11029,13 @@ es:
         new_question_group: "Grupo Nuevo de Preguntas"
         show_assignment_rubric: "Mostrar rúbrica"
         switch_views: "Cambiar Vistas"
+      manage: Manejar
       minutes: Minutos
       new_assignment: "Nueva tarea"
       new_discussion: "Nuevo debate"
       one_question_at_a_time: "Mostrar una pregunta de cada vez"
       points_possible: "Puntos %{n} "
+      quiz_title: "Título de la evaluación"
       quiz_type: "Tipo de cuestionario"
       require_lockdown_browser: "Es obligatorio utilizar el navegador Respondus LockDown Browser"
       require_lockdown_browser_for_results: "Obligatorio para ver los resultados del cuestionario"
@@ -10312,8 +11049,12 @@ es:
         delete: Borrar
         find_ip_address_filter: "Encontrar Filtro para la Dirección IP"
       warnings: 
-        has_student_submissions: " Estudiantes ya han tomado o han comenzado esta evaluación, por favor no la edite. Si cambia cualquier pregunta de manera significante, puede considerar volver a calificar a los estudiantes que tomaron la versión anterior. "
+        has_student_submissions: "Los alumnos ya han realizado esta evaluación o la han comenzado, por lo que deberá tener cuidado al editarla. Si cambia cualquier pregunta importante, es posible que deba volver a calificar a los alumnos que realizaron la versión anterior de la evaluación."
     no_filters_found: "No se encontraron filtros"
+    no_quizzes_view: 
+      headers: 
+        course_quizzes: "Evaluaciones del curso"
+      no_quizzes: "No hay evaluaciones disponibles"
     notices: 
       cant_view_submission_while_muted: "No puede ver el historial de la evaluación mientras esté bloqueada."
       has_submissions_already: "Recuerde, algunos estudiantes ya han completado o han comenzado esta evaluación"
@@ -10329,12 +11070,18 @@ es:
         other: "%{count} evaluaciones se han ocultado correctamente"
     practice_quiz: "Cuestionario de práctica"
     question_colon: "Pregunta:"
+    question_count: 
+      one: "1 pregunta"
+      other: "%{count} preguntas"
     question_group: 
       buttons: 
         update: Actualizar
       default_group_name: Grupo
       edit_questions_and_points: "Escoja *%{num_questions}* preguntas, #%{num_points}# puntos por pregunta"
       labels: 
+        group_name: "Nombre del grupo"
+        number_of_questions: "Número de preguntas"
+        points_per_question: "Puntos por pregunta"
         question_bank: "Preguntas serán tomadas del Grupo de Preguntas"
       links: 
         link_to_a_question_bank: "Enlazar a un Grupo de Preguntas"
@@ -10390,6 +11137,18 @@ es:
         one: "1 Minuto"
         other: "%{count} Minutos"
       unlimited: Ilimitado
+    quiz_item_group_view: 
+      no_quizzes: "No se han encontrado evaluaciones"
+      no_surveys: "No se han encontrado encuestas"
+    quiz_item_view: 
+      links: 
+        delete: Borrar
+        edit: Editar
+      quiz_available: Disponible
+      quiz_due: "Fecha límite"
+      settings: Configuraciones
+      title_delete: "Borrar la evaluación"
+      title_edit: "Editar la evaluación"
     quiz_right_side: 
       attempts_left: 
         one: "1 intento extra disponible"
@@ -10494,11 +11253,6 @@ es:
         one: "1 Punto"
         other: "%{count} Puntos"
       student_mute_notification: "El instructor está calificando"
-      titles: 
-        delete_quiz: "Borrar la Evaluación"
-        delete_survey: "Borrar la Encuesta"
-        edit_quiz: "Editar la Evaluación"
-        edit_survey: "Editar la Encuesta"
       unlimited_attempts: "Intentos Ilimitados"
     read_only: 
       default_page_title: "Evaluación Nueva"
@@ -10543,6 +11297,7 @@ es:
       labels: 
         available_until: Hasta
         no_time_limit: "Sin tiempo límite"
+        warning_icon: Aviso
       links: 
         edit: "Editar "
         hide_student_quiz_results: "Ocultar los resultados de las evaluaciones de los alumnos"
@@ -10561,6 +11316,10 @@ es:
         survey_statistics: "Estadísticas de la Encuesta"
       manage: Administrar
       only_registered_users: "Sólo usuarios registrados e inscritos pueden tomar evaluaciones calificadas"
+      quiz_regraded_your_score_affected: 
+        one: "Esta evaluación se ha calificado de nuevo y su puntuación ha cambiado."
+        other: "Esta evaluación se ha calificado de nuevo y su nueva puntuación muestra las %{count} preguntas que cambiaron."
+      quiz_regraded_your_score_not_affected: "Esta evaluación se ha calificado de nuevo, pero su puntuación no ha cambiado."
       speed_grader: "Calificador Rápido™"
       students_submitted_so_far: 
         one: "1 estudiante ha enviado hasta ahora"
@@ -10609,6 +11368,17 @@ es:
         one: "1 envío extra"
         other: "%{count} envíos extras"
     statistics_crumb: Estadísticas
+    submission_version: 
+      attempt_number: "Intento %{att_no}"
+      kept: MANTENER
+      latest: "EL ÚLTIMO"
+    submission_versions: 
+      attempt: Intento
+      attempt_history: "Historial de intentos"
+      quiz_attempt_history_description: "Una tabla que muestra su historial de intentos de realizar la evaluación. Cada intento se encuentra en la parte izquierda. EL intento, hora y puntuación están a lo largo de la parte superior."
+      regraded: "Calificada de nuevo"
+      score: Calificación
+      time: Tiempo
     take_quiz: 
       buttons: 
         next: Siguiente
@@ -10639,6 +11409,7 @@ es:
         other: "%{count} Horas"
       labels: 
         started: Comenzado
+        time_elapsed: "Tiempo transcurrido"
         times_up: "¡Se acabó el tiempo! Enviando resultados en"
       logged_out_of_canvas: "*Ha cerrado su sesión en Canvas.* Para continuar, inicie sesión"
       login_required: "Inicio de sesión obligatorio"
@@ -10661,6 +11432,7 @@ es:
       quiz_instructions: "Instrucciones de la evaluación"
       saved_at: "Evaluación guardada en %{t}"
       saving: Guardando...
+      saving_not_needed: "No hay datos nuevos para guardar. Última comprobación a las %{t}"
       seconds_count: 
         one: "1 Segundo"
         other: "%{count} Segundos"
@@ -10702,6 +11474,7 @@ es:
       help_with_formulas: "Ayudar con las Formulas de las Preguntas de la Evaluación"
       ip_address_filtering: "Filtración de Dirección IP"
       set_as_correct: "Esta respuesta está establecida como correcta"
+    toggle_message: "Cambiar la visibilidad de la evaluación"
     ? "true"
     : Verdadero
     ungraded_survey: "Encuesta no calificada"
@@ -10718,6 +11491,7 @@ es:
     last_logged_in: "último inicio de sesión en %{last_login}"
   recipient_input: 
     context_search_placeholder: "Introduzca un nombre, curso o grupo"
+    context_search_title: "Nombre, curso o grupo"
     groups_count: 
       one: "1 grupo"
       other: "%{count} grupos"
@@ -10738,7 +11512,7 @@ es:
       remember_me: Recordarme
       sign_in: "Iniciar sesión"
     parent_dialog: 
-      agree_to_terms_and_pp: "Acepte las *condiciones de uso* y la **política de privacidad**."
+      agree_to_terms_and_pp: "Acepta las *condiciones de uso* y la **política de privacidad**."
       buttons: 
         start_participating: "Comenzar a participar"
       labels: 
@@ -10747,7 +11521,7 @@ es:
         password: "Contraseña de su hijo"
         username: "Nombre de usuario de su hijo"
     student_dialog: 
-      agree_to_terms_and_pp: "Acepte las *condiciones de uso* y la **política de privacidad**."
+      agree_to_terms_and_pp: "Acepta las *condiciones de uso* y la **política de privacidad**."
       buttons: 
         start_learning: "Comenzar a aprender"
       labels: 
@@ -10757,7 +11531,7 @@ es:
         password_confirmation: "Confirmar la Contraseña"
         username: "Nombre de Usuario"
     teacher_dialog: 
-      agree_to_terms_and_pp: "Acepte las *condiciones de uso* y la **política de privacidad**."
+      agree_to_terms_and_pp: "Acepta las *condiciones de uso* y la **política de privacidad**."
       buttons: 
         start_teaching: "Comenzar a enseñar"
       labels: 
@@ -10778,7 +11552,7 @@ es:
       manage_account_memberships: "Agregar/remover otros administradores para esta cuenta"
       manage_account_settings: "Maneje las configuraciones a nivel de cuenta"
       manage_admin_users: "Agregar/remover otros profesores, diseñadores de curso o APs del curso"
-      manage_alerts: "Manejar las alertas globales"
+      manage_announcements: "Gestionar anuncios globales"
       manage_assignments: "Maneje (agregar / editar / borrar) tareas y evaluaciones"
       manage_calendar: "Agregue, edite y borre eventos en el calendario del curso"
       manage_canvasnet_courses: "Gestionar cursos de Canvas Network"
@@ -10805,8 +11579,8 @@ es:
       manage_user_notes: "Manejar las entradas a la revista de los profesores"
       manage_wiki: "Manejar las wiki (agregar / editar / borrar páginas)"
       managed_jobs: "Manejar los trabajos del fondo"
-      moderate_form: "Moderar discusiones ( borrar / editar otras contribuciones, bloquear temas)"
-      post_to_forum: "Publicar a discusiones"
+      moderate_form: "Moderar foros ( borrar / editar otras contribuciones, bloquear temas)"
+      post_to_forum: "Publicar a foros"
       read_course_content: "Ver contenido del curso"
       read_course_list: "Ver la lista de los cursos"
       read_forum: "Ver los debates"
@@ -10889,10 +11663,6 @@ es:
   rubric_association: 
     no_details: "Sin detalles"
   rubrics: 
-    assessments: 
-      add_rubric_assessment: "Agregar Rúbrica para la Evaluación"
-      are_you_sure_prompt: "¿Seguro que quiere borrar esta evaluación? Todos los resultados serán eliminados."
-      page_title: Evaluaciones
     index: 
       account_rubrics: "Rúbricas de cuenta"
       are_you_sure_prompt: "¿Seguro que quiere borrar esta rúbrica? Cualquier sitio usando esta rúbrica todavía tendrá acceso a ella, pero nadie más podrá usarla."
@@ -10906,33 +11676,6 @@ es:
         other: "%{count} puntos posibles"
       user_rubrics: "Rúbricas del usuario"
     loading: cargando...
-    rubric_association: 
-      assessment_completed: "Evaluación finalizada"
-      assessment_name: "Nombre de Evaluación"
-      buttons: 
-        invite: Invitar
-        save_assessment: "Guardar Evaluación"
-      emails_to_invite: "\"Pegue aquí las direcciones de correo electrónico de aquellos que quiere que participen en la evaluación de este trabajo\""
-      instructions: Instrucciones
-      invite_new_assessor: "Invitar Evaluador Nuevo"
-      labels: 
-        completed_assessments: "Evaluaciones Completadas"
-        description: "Instrucciones para la Evaluación"
-        invitations: "Personas a Evaluar"
-        invited_assessors: "Evaluadores Invitados"
-        submitted_and_completed_assessments: "Enviado y Completado"
-        submitted_and_incomplete_assessments: "Enviado e Incompleto"
-        title: Nombre
-        unsubmitted_assessments: "No enviado"
-        url: "URL para Evaluar"
-      links: 
-        show_rubric: "Mostrar Rúbrica"
-      no_description: "Sin Descripción"
-      no_name: "Sin Nombre"
-      none_invited: "Nadie ha sido Invitado"
-      special_instructions: "Incluya cualquier instrucción especial para aquellos evaluando su trabajo"
-      submitting_instructions: "Ingrese instrucciones para aquellos enviando archivos para ser evaluados"
-      view_assessed_page: "Ver la Hoja siendo Evaluada"
     show: 
       buttons: 
         delete: "Borrar Rúbrica"
@@ -11044,6 +11787,7 @@ es:
         crosslist_this_section: "Hacer el listado cruzado de esta sección"
         current_enrollments: "Inscripciones Actuales"
         decrosslist_section: "Eliminar el listado cruzado de esta sección"
+  select_content: "Seleccionar contenido"
   select_content_dialog: 
     buttons: 
       add_item: "Agregar Elemento"
@@ -11102,6 +11846,13 @@ es:
         go_to_course: "Ir al curso"
         go_to_dashboard: "Ir a su panel de control"
       not_available_yet: "Le enviaremos un correo electrónico antes de que comience el curso."
+  sequence_footer: 
+    next_module: "Módulo siguiente:"
+    next_module_desc: "Módulo siguiente: *módulo*"
+    next_module_item_desc: "Siguiente: *elemento*"
+    prev_module: "Módulo anterior:"
+    prev_module_desc: "Módulo anterior: *módulo*"
+    prev_module_item_desc: "Anterior: *elemento*"
   services_api: 
     must_be_logged_in: "Debe haber ingresado a su cuenta para usar Kaltura"
   set_default_grade_dialog: 
@@ -11305,6 +12056,8 @@ es:
       find: Encontrar
       find_existing_scheme: "Encontrar el Esquema Existente de Calificación"
       full_name: "Nombre completo, texto más pequeño"
+      grading_standard_name_table_summary: "Una tabla con una sola celda editable que incluye el nombre de su esquema de calificaciones."
+      grading_standard_summary: "Una tabla que incluye su esquema de calificaciones. El nombre del valor y el rango se encuentran en la parte superior. Cada línea contiene un valor porcentual mínimo y máximo."
       insert_here: "insertar aquí"
       labels: 
         name: Nombre
@@ -11312,7 +12065,10 @@ es:
         scheme_name: "Nombre del Esquema"
       loading_grading_standards: "Cargando los Estándares de Calificación ..."
       managing_grading_standards: "Manejar los esquemas de Calificación"
+      range_lower: "Límite inferior del rango"
       range_of_numbers: "%{lower_number} a %{higher_number}"
+      range_upper: "Límite superior del rango"
+      remove_row: "Eliminar fila"
       remove_scheme: "Remover el Esquema de Calificación"
       some_standard: "Algún estándar"
       use_this_standard: "Usar este Estándar de Calificación"
@@ -11409,7 +12165,7 @@ es:
       sample_course_code: Curso-101
       start_a_new_course: "Comenzar un nuevo curso"
     no_recent_activity: 
-      empty_stream_message: " No tiene mensajes que mostrar aún en su stream. Una vez comience a participar en sus cursos verá este stream llenarse de mensajes de las discusiones, actualizaciones de calificaciones, mensajes privados entre usted y otros usuarios, etc. "
+      empty_stream_message: " No tiene mensajes que mostrar aún en su stream. Una vez comience a participar en sus cursos verá este stream llenarse de mensajes de las foros, actualizaciones de calificaciones, mensajes privados entre usted y otros usuarios, etc. "
       no_recent_messages: "No hay Mensajes Recientes"
     pending_enrollment: 
       designer: "%{course} como un diseñador."
@@ -11448,7 +12204,6 @@ es:
       message_column: Mensaje
       recent_activity: "Actividad Reciente"
       recent_activity_in_course: "Actividad reciente en %{course_or_group}"
-      show_more: "Mostrar más"
       unread_column: "No leído"
       unread_count_badge: 
         one: "1 *elemento sin leer*"
@@ -11492,6 +12247,7 @@ es:
           other: "Recuerde que %{count} estudiantes ya han sido evaluados usando esta rúbrica. Si la cambia afectará sus evaluaciones."
         rubric_in_use2: "Ya ha clasificado estudiantes con esta rúbrica. Cambios mayores podrían afectar sus resultados de tareas."
       out_of: "%{points} *de %{total}*"
+      rubric_title: Título
       titles: 
         find_existing_rubric: "Encontrar una Rúbrica Existente"
     rubric_criterion: 
@@ -11500,6 +12256,8 @@ es:
       description: 
         custom_comments_area: "Esta área será usada por el evaluador para que pueda dejar comentarios relacionados al criterio."
       full_marks: "Marcas Completas"
+      icons: 
+        additional_comments: "Comentarios adicionales"
       instructor_comments: "Comentarios del instructor"
       labels: 
         save_criterion_for_reuse: "Guardar este comentario para reusarlo"
@@ -11511,7 +12269,7 @@ es:
       options: 
         select: "[ Seleccionar ]"
       points: "%{points} pts"
-      points_out_of: "%{points} / %{total} pts"
+      points_abbreviation: "*Puntos* pts"
       titles: 
         linked_to_learning_outcome: "Este criterio depende de un Resultado de Aprendizaje"
     rubric_criterion_dialog: 
@@ -11604,6 +12362,9 @@ es:
       assignment: Tarea
       grading_alt: calificando
       submission_comment: "Comentario de Envío"
+    terms_required: 
+      terms_have_changed: "Las *condiciones de uso* han cambiado. Por favor, dedique un momento a leerlas antes de continuar utilizando Canvas."
+      updated_terms_of_use: "Condiciones de uso actualizadas"
     unauthorized: 
       headings: 
         needs_cookies: "Se requieren Cookies"
@@ -11669,7 +12430,7 @@ es:
         assignments_page: "Haga click para insertar un enlace a la página de tareas"
         collaborations_page: "Hacer click para insertar un enlace a la página de colaboraciones"
         discussions: "Haga click para insertar un enlace a este tema"
-        discussions_page: "Haga click para insertar un enlace a la página de discusiones"
+        discussions_page: "Haga click para insertar un enlace a la página de foros"
         files_page: "Haga click para insertar un enlace a la página de archivos"
         grades_page: "Haga click para insertar un enlace a la página de calificaciones"
         modules: "Haga click para insertar un enlace a este módulo"
@@ -11687,8 +12448,8 @@ es:
         assignments: "Lista de Tareas"
         assignments_page: "Lista de Tareas"
         collaborations_page: Colaboraciones
-        discussions: "Índice de Discusiones"
-        discussions_page: "Índice de Discusiones"
+        discussions: "Índice de Foros"
+        discussions_page: "Índice de Foros"
         files_page: "Índice de Archivos"
         find_on_flickr: "Encontrar imagenes en flickr creative commons"
         grades_page: Calificaciones
@@ -11704,7 +12465,7 @@ es:
       links_to: 
         announcements: Anuncios
         assignments: Tareas
-        discussions: Discusiones
+        discussions: Foros
         modules: Módulos
         nav: 
           course: "Navegación del Curso"
@@ -11734,6 +12495,8 @@ es:
         uploading: "Cargando, Por favor espere."
   sis_batch: 
     errors: 
+      too_many_errors: "Se habían producido %{count} errores más"
+      too_many_warnings: "Había %{count} avisos más"
       unrecorgnized_type: "Tipo de importación no reconocido"
     instructure_csv: "CSV formateado para Instructure o archivo comprimido zip de CSVs"
     upload_filename: "sis_upload_%{id}.zip"
@@ -11971,7 +12734,7 @@ es:
     chat: Chat
     collaborations: Colaboraciones
     conferences: Conferencias
-    discussions: Discusiones
+    discussions: Foros
     eportfolios: ePortafolios
     files: Archivos
     grades: Calificaciones
@@ -12083,16 +12846,28 @@ es:
     announcement: Anuncio
     announcements: Anuncios
     assignments: Tareas
+    delete_quiz: "Borrar la Evaluación"
+    delete_survey: "Borrar la Encuesta"
     discussion: Discusión
-    discussions: Discusiones
+    discussions: Foros
+    edit_quiz: "Editar la Evaluación"
+    edit_survey: "Editar la Encuesta"
     error_reports: "Reportes de Error"
     learning_outcomes: "Resultados de Aprendizaje"
     messages: Mensajes
     outcome_artifacts: "Elementos de Resultados"
+    people: Personas
     view_in_separate_window: "Ver en una ventana separada"
   tooltips: 
     vdd: 
       more_message: "y %{count} más..."
+  tours: 
+    quiz_regrade: 
+      first_bullet: "Una vez que haya cambiado la respuesta, deberá elegir una opción antes de actualizar la pregunta."
+      got_it: Entendido
+      second_bullet: "Asegúrese de elegir la opción más adecuada, ya que las calificaciones de los alumnos PUEDEN cambiar."
+      third_bullet: "Canvas volverá a calificar todos sus envíos cuando haya guardado la evaluación. Este proceso puede tardar algunos minutos."
+      try_later: "Ahora podrá establecer las opciones de cambio de calificaciones para los alumnos que ya hayan realizado la evaluación."
   turnitin: 
     error_1007: "El archivo cargado es demasiado grande."
     error_1009: "Tipo de archivo no válido. (Los tipos de archivo válidos son MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) y RTF.)"
@@ -12122,8 +12897,11 @@ es:
       terms: "Debe aceptar estos términos"
       too_long: "No puede exceder de %{max} caracteres"
     registration: 
-      agree_to_terms: "Acepta los *términos de uso*."
+      agree_to_terms_and_privacy_policy: "Acepta las *condiciones de uso* y la **política de privacidad**."
       agree_to_terms_with_code_of_conduct: "Usted acepta los *términos de uso* y el **código de conducta**."
+  user_date_range_search: 
+    cant_be_blank: "La ID de usuario de Canvas no puede estar vacía"
+    cant_come_before_from: "'Hasta la fecha' no puede ser anterior a 'Desde la fecha'"
   user_follow: 
     errors: 
       follow_own_collection: "No puede seguir su propia colección"
@@ -12231,6 +13009,7 @@ es:
         student: Estudiante
       page_title: "Revista de Profesores"
   user_profile: 
+    profile_title_too_long: "El título es demasiado largo"
     tabs: 
       notifications: Notificaciones
       profile: Perfil
@@ -12410,7 +13189,7 @@ es:
         profile_picture: "Imagen de Perfil"
         short_name: "Mostrar el Nombre"
         sortable_name: "Nombre clasificable"
-        time_zone: "Uso Horario"
+        time_zone: "Huso horario"
       merge_with_another_user: "Unirse con Otro Usuario"
       none: Ninguno
       remove_avatar: "Remover el avatar"
@@ -12421,6 +13200,8 @@ es:
       update_instructions: "Puede actualizar alguna de la información de este usuario, pero pueden volver a cambiarla si lo deciden."
     new: 
       create_a_canvas_account: "Crear una cuenta de Canvas"
+      privacy_policy: "Política de privacidad"
+      terms_of_use: "Condiciones de uso"
     no_deleting_sis_user: "No puede borrar un usuario generado por el sistema"
     no_self_registration: "No se ha habilitado la función de autoinscripción para esta cuenta. "
     oauth_fail: "La solicitud de OAuth falló. No se pudo encontrar una solicitud válida"
@@ -12517,6 +13298,7 @@ es:
         : Encendido
   webct_credentials: 
     credential_not_found: "Credencial no encontrada."
+  webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Curso Blackboard Vista/CE, WebCT 6+"
   webct_name: "Blackboard Vista/CE (WebCT)"
   widget: 
@@ -12553,57 +13335,56 @@ es:
     wiki_page: 
       buttons: 
         edit: Editar
-        publish: Publicar
-        unpublish: Publicado
         view_all_pages: "Ver todas las páginas"
-      publish: Publicar
+      delete_wiki: Borrar
+      labels: 
+        front_page: "Página de Inicio"
+      page_locked: "Esta página está bloqueada"
+      page_locked_by_modules: "Esta página estará disponible cuando haya finalizado estos módulos:"
+      page_locked_by_modules_until: "Esta página estará disponible el %{lock_info.unlock_at} si ha finalizado estos módulos:"
+      page_locked_until: "Esta página estará disponible el %{lock_info.unlock_at}"
       toolbar_menu: 
         settings: Configuraciones
-      unpublish: Ocultar
-    wiki_page_delete_dialog: 
-      cancel: Cancelar
-      delete_page: Borrar
-      deleting: Borrando...
+      view_page_history_wiki: "Ver el historial de páginas"
     wiki_page_edit: 
       buttons: 
         cancel: Cancelar
-        preview: "Vista previa"
-        publish: "No publicado"
         save: Guardar
-        unpublish: Publicado
       course_editing_roles: 
         anyone: Cualquiera
         only_teachers: "Solo profesores"
         teachers_and_students: "Profesores y alumnos"
-      delete_wiki: Borrar
       editing_roles: 
         anyone: Cualquiera
         can_edit_page: "puede(n) editar esta página"
         only_members: "Solo miembros"
-      hide_from_students: "Ocultar esta página a los alumnos"
       notify_users_text: "Notificar a los usuarios que este contenido ha cambiado"
       options_label: Opciones
-      publish: Publicar
-      toolbar_menu: 
-        settings: Configuraciones
-      unpublish: Ocultar
+      title_label: "Título de la página"
     wiki_page_index: 
       add_page: "Agregar uno"
       buttons: 
-        new_page: "Nueva página"
+        new_page: Página
+        new_page_label: "Añadir una página"
       headers: 
         creation_date: "Fecha de creación"
         last_edit: "Última edición"
         page_title: "Título de la página"
         published: Publicado
-        sort_ascending: "Orden ascendente"
-        sort_descending: "Orden descendente"
+        settings: Configuraciones
+      loading: Cargando...
+      loading_more: "Cargando más..."
       no_pages: "Todavía no se ha creado ninguna página."
+    wiki_page_index_edit_dialog: 
+      page_title: Título
     wiki_page_index_item: 
       labels: 
         front_page: "Página de Inicio"
-      published: Publicado
-      unpublished: "No publicado"
+      menu: 
+        delete: Borrar
+        edit: Editar
+        settings: Configuraciones
+        use_front_page: "Utilizar como página de inicio"
   wiki_page: 
     atom_author: "Página Wiki"
     atom_entry_title: "Página Wiki, %{course_or_group_name}: %{page_title}"
@@ -12646,8 +13427,6 @@ es:
       not_most_recent_version_warning: "Esta NO es la versión más reciente"
       saved_by: "Saved: *%{time_ago}* por %{user}"
   wiki_pages: 
-    buttons: 
-      add_comment: "Agregar Comentario"
     content: 
       buttons: 
         save_changes: "Guardar Cambios"
@@ -12668,8 +13447,6 @@ es:
         only_members: "Sólo Miembros"
         prompt: "%{options} puede editar esta página"
       group_wiki_warning: "Esta página es parte del wiki del grupo, *no* del grupo. Si esta buscando el wiki del curso, [haga click aquí](%{link})."
-      headings: 
-        page_comments: "Comentarios de la Página"
       labels: 
         hide_from_students: "Esconder esta Página de los Estudiantes"
         last_edited: "Editado por última vez por %{name} hace %{time_ago}"
@@ -12682,29 +13459,20 @@ es:
         page_edited_while_viewing: "Esta página ha sido actualizada por alguien más desde que comenzó a verla. [Haga click aquí para recargar la página.](%{link})"
         page_edited_while_viewing_detailed: "Alguien ha editado esta página desde que la cargó por primera vez. Si hace un envío ahora, sobrescribirá los cambios. Puede volver a cargar la página e introducir de nuevo sus cambios para asegurarse de que no se pierde el trabajo de otro. "
       welcome_message: "Bienvenido al Wiki de este Curso"
-    delete_comment_confirmation: "¿Seguro que quiere borrar este comentario?"
     errors: 
       cannot_delete_front_page: "No puede eliminar la página principal."
     front_page: "Página de Inicio"
-    loading_comments: "Cargando más resultados"
     notices: 
-      add_comment_failed: "No se pudo agregar el comentario, intente de nuevo"
-      adding_comment: "Agregando Comentario..."
+      cannot_edit: "No tiene permiso para editar la página \"%{title}\"."
+      create_non_existent_page: "La página \"%{title}\" no existe, pero puede crearla a continuación"
       page_deleted: "Esta página \"%{title}\" ha sido borrada."
+      page_does_not_exist: "La página \"%{title}\" no existe."
       page_updated: "La página se actualizó."
     page_link: 
       link_hidden_from_students_warning: "Los estudiantes no verán este enlace"
     pages_index: 
       titles: 
         pages: Páginas
-    wiki_page_comment: 
-      links: 
-        delete_comment: "Borrar Comentario"
-    wiki_page_comment_form: 
-      buttons: 
-        add_comment: "Agregar Comentario"
-      links: 
-        new_comment: "Crear un Comentario Nuevo"
     wiki_right_side: 
       buttons: 
         create: Crear
@@ -12727,13 +13495,22 @@ es:
       wiki_description_for_group: "Piense en esto como un lugar abierto para retener contenido. Puede usarlo para describir su grupo, proveer explicaciones a temas difíciles, y permitir que miembros colaboren en proyectos. "
       wiki_description_header: "¿Para que sirve un Wiki?"
   wiki_pages_api: 
-    no_wiki_front_page: "No se ha establecido ninguna página principal"
+    cannot_delete_front_page: "La página de inicio no se puede eliminar"
+    cannot_have_unpublished_front_page: "La página de inicio no puede estar oculta"
+    cannot_hide_front_page: "La página de inicio no puede permanecer oculta para los alumnos"
+    cannot_update_editing_roles: "No tiene permiso para actualizar las funciones de edición de esta página wiki"
+    cannot_update_front_page: "No tiene permiso para cambiar la página wiki de inicio"
+    cannot_update_hide_from_students: "No tiene permiso para actualizar las marcas ocultas de los alumnos de esta página wiki"
+    cannot_update_published: "No tiene permiso para actualizar el estado de publicación de esta página wiki"
+    cannot_update_title: "No tiene permiso para actualizar el título de esta página wiki"
+    invalid_editing_roles: "Las funciones de edición que aparecen no son válidas"
   wimba_conference: 
     external_urls: 
       archive: Archivo
       archive_link: "Ver archivo(s)"
   zip_argument_error: "La carga de archivos .zip necesita que exista una carpeta en la que se vayan a cargar los archivos."
   zip_file_description: "Complemento de migración para descomprimir archivos .zip normales en un curso"
+  zip_file_display: "Importación de archivos"
   zip_file_file_description: "Descomprimir archivo .zip en la carpeta"
   zip_file_imports: 
     errors: 

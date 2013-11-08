@@ -1,0 +1,63 @@
+<span class="non-screenreader" aria-hidden=true>
+
+  {{#unless submission}}
+
+    <span data-tooltip="" title='{{#t "no_submission"}}No Submission{{/t}}'>
+      {{#t "no_submission_with_points_possible"}}
+        -/{{pointsPossible}} pts
+      {{/t}}
+    </span>
+
+  {{else}}
+    {{#with submission}}
+      {{#if notYetGraded}}
+
+        {{#t "not_yet_graded_with_points_possible"}}
+          <em>Not Yet Graded</em>/{{pointsPossible}} pts
+        {{/t}}
+
+      {{else}}
+
+        <strong>
+          {{#t "score_with_points_possible"}}
+            {{grade}}/{{pointsPossible}} pts
+          {{/t}}
+        </strong>
+
+      {{/if}}
+
+    {{/with}}
+
+  {{/unless}}
+
+</span>
+
+<span class="screenreader-only">
+
+  {{#unless submission}}
+
+    {{#t "no_submission_for_assignment_screenreader"}}
+      No submission for this assignment. {{pointsPossible}} points possible.
+    {{/t}}
+
+  {{else}}
+    {{#with submission}}
+      {{#if notYetGraded}}
+
+        {{#t "assignment_not_yet_graded_screenreader"}}
+          Assignment not yet graded. {{pointsPossible}} points possible.
+        {{/t}}
+
+      {{else}}
+
+        {{#t "score_with_points_possible_screenreader"}}
+          Score: {{grade}} out of {{pointsPossible}} points
+        {{/t}}
+
+      {{/if}}
+
+    {{/with}}
+
+  {{/unless}}
+
+</span>

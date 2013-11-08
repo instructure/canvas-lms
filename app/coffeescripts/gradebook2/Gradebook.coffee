@@ -57,6 +57,7 @@ define [
       @rows = []
       @assignmentsToHide = userSettings.contextGet('hidden_columns') || []
       @sectionToShow = userSettings.contextGet 'grading_show_only_section'
+      @sectionToShow = @sectionToShow && String(@sectionToShow)
       @show_attendance = userSettings.contextGet 'show_attendance'
       @include_ungraded_assignments = userSettings.contextGet 'include_ungraded_assignments'
       @userFilterRemovedRows = []
@@ -115,6 +116,8 @@ define [
       for group in assignmentGroups
         htmlEscape(group)
         @assignmentGroups[group.id] = group
+        if ENV.GRADEBOOK_OPTIONS.draft_state_enabled
+          group.assignments = _.select group.assignments, (a) -> a.published
         for assignment in group.assignments
           htmlEscape(assignment)
           assignment.assignment_group = group
@@ -584,7 +587,7 @@ define [
         )()
         $('#section_to_show').after($sectionToShowMenu).show().kyleMenu()
         $sectionToShowMenu.bind 'menuselect', (event, ui) =>
-          @sectionToShow = Number($sectionToShowMenu.find('[aria-checked="true"] input[name="section_to_show_radio"]').val()) || undefined
+          @sectionToShow = $sectionToShowMenu.find('[aria-checked="true"] input[name="section_to_show_radio"]').val()
           userSettings[ if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
           updateSectionBeingShownText()
           @buildRows()

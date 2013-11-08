@@ -20,34 +20,40 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe RubricAssociation do
-  context "when course has multiple students enrolled" do
+
+  def rubric_association_params_for_assignment(assign)
+    HashWithIndifferentAccess.new({
+      hide_score_total: "0",
+      purpose: "grading",
+      skip_updating_points_possible: false,
+      update_if_existing: true,
+      use_for_grading: "1",
+      association: assign
+    })
+  end
+
+  context "course rubrics" do
     before :each do
       # Create a course, 2 students and enroll them
-      @test_course = course(:active_course => true)
-      @teacher = @test_course.teachers.first
-      @student_1 = user(:active_user => true)
-      @student_2 = user(:active_user => true)
-      @test_course.enroll_student(@student_1)
-      @test_course.enroll_student(@student_2)
+      course_with_teacher(:active_course => true, :active_user => true)
+      @student_1 = student_in_course(:active_user => true).user
+      @student_2 = student_in_course(:active_user => true).user
     end
 
     context "when a peer-review assignment has been completed AFTER rubric created" do
       before :each do
         # Create the assignment
-        @assignment = course.assignments.create!(:title => 'Test Assignment', :peer_reviews => true)
-        @assignment.workflow_state = 'published'
-        @assignment.submission_types = 'online_text_entry'
-        @assignment.context = @test_course
+        @assignment = @course.assignments.create!(
+          :title => 'Test Assignment',
+          :peer_reviews => true,
+          :submission_types => 'online_text_entry'
+        )
 
         # Create the rubric
-        @rubric = @test_course.rubrics.build
-        @rubric.user = @teacher
-        @rubric.save!
-        rubric_association = HashWithIndifferentAccess.new({"hide_score_total"=>"0", "purpose"=>"grading",
-                                                            "skip_updating_points_possible"=>false, "update_if_existing"=>true,
-                                                            "use_for_grading"=>"1", "association"=>@assignment}) #, "id"=>3})
+        @rubric = @course.rubrics.create! { |r| r.user = @teacher }
 
-        @rubric_assoc = RubricAssociation.generate_with_invitees(@teacher, @rubric, @test_course, rubric_association)
+        ra_params = rubric_association_params_for_assignment(@assignment)
+        @rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
 
         # students complete it
         @assignment.submit_homework(@student_1, :submission_type => 'online_text_entry', :body => 'Finished first')
@@ -70,10 +76,11 @@ describe RubricAssociation do
     context "when a peer-review assignment has been completed BEFORE rubric created" do
       before :each do
         # Create the assignment
-        @assignment = course.assignments.create!(:title => 'Test Assignment', :peer_reviews => true)
-        @assignment.workflow_state = 'published'
-        @assignment.submission_types = 'online_text_entry'
-        @assignment.context = @test_course
+        @assignment = @course.assignments.create!(
+          :title => 'Test Assignment',
+          :peer_reviews => true,
+          :submission_types => 'online_text_entry'
+        )
 
         # students complete it
         @assignment.submit_homework(@student_1, :submission_type => 'online_text_entry', :body => 'Finished first')
@@ -89,14 +96,9 @@ describe RubricAssociation do
 
         context "and a rubric is created" do
           before :each do
-            @rubric = @test_course.rubrics.build
-            @rubric.user = @teacher
-            @rubric.save!
-            rubric_association = HashWithIndifferentAccess.new({"hide_score_total"=>"0", "purpose"=>"grading",
-                                                                "skip_updating_points_possible"=>false, "update_if_existing"=>true,
-                                                                "use_for_grading"=>"1", "association"=>@assignment}) #, "id"=>3})
-
-            @rubric_assoc = RubricAssociation.generate_with_invitees(@teacher, @rubric, @test_course, rubric_association)
+            @rubric = @course.rubrics.create! { |r| r.user = @teacher }
+            ra_params = rubric_association_params_for_assignment(@assignment)
+            @rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
           end
 
           it "should have 2 assessment_requests" do
@@ -104,6 +106,67 @@ describe RubricAssociation do
           end
         end
       end
+    end
+
+    context "#update_alignments" do
+      it "should do nothing if it is not associated to an assignment" do
+        rubric = @course.rubrics.create!
+        ra = RubricAssociation.create!(
+          :rubric => rubric,
+          :association => @course,
+          :context => @course,
+          :purpose => 'bookmark'
+        )
+        LearningOutcome.expects(:update_alignments).never
+        ra.update_alignments
+      end
+
+      it "should align the outcome to the assignment when created and remove when destroyed" do
+        assignment = @course.assignments.create!(
+          :title => 'Test Assignment',
+          :peer_reviews => true,
+          :submission_types => 'online_text_entry'
+        )
+        outcome_with_rubric
+        ra = @rubric.rubric_associations.create!(
+          :association => assignment,
+          :context => @course,
+          :purpose => 'grading'
+        )
+        assignment.reload.learning_outcome_alignments.count.should == 1
+
+        ra.destroy
+        assignment.reload.learning_outcome_alignments.count.should == 0
+      end
+    end
+
+    it "should not delete assessments when an association is destroyed" do
+      assignment = @course.assignments.create!(
+        :title => 'Test Assignment',
+        :peer_reviews => true,
+        :submission_types => 'online_text_entry'
+      )
+      outcome_with_rubric
+      ra = @rubric.rubric_associations.create!(
+        :association => assignment,
+        :context => @course,
+        :purpose => 'grading'
+      )
+      assess = ra.assess({
+        :user => @student_1,
+        :assessor => @teacher,
+        :artifact => assignment.find_or_create_submission(@student_1),
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_crit1 => {
+            :points => 5
+          }
+        }
+      })
+      
+      assess.should_not be_nil
+      ra.destroy
+      assess.reload.should_not be_nil
     end
   end
 
@@ -116,7 +179,7 @@ describe RubricAssociation do
       rubric_params = HashWithIndifferentAccess.new({"title"=>"Some Rubric", "criteria"=>{"0"=>{"learning_outcome_id"=>"", "ratings"=>{"0"=>{"points"=>"5", "id"=>"blank", "description"=>"Full Marks"}, "1"=>{"points"=>"0", "id"=>"blank_2", "description"=>"No Marks"}}, "points"=>"5", "long_description"=>"", "id"=>"", "description"=>"Description of criterion"}}, "points_possible"=>"5", "free_form_criterion_comments"=>"0"})
       rubric_association_params = HashWithIndifferentAccess.new({:association=>@account, :hide_score_total=>"0", :use_for_grading=>"0", :purpose=>"bookmark"})
       #8864: the below raised a MethodNotFound error by trying to call @account.submissions
-      lambda { @rubric.update_with_association(@user, rubric_params, @account, rubric_association_params, nil) }.should_not raise_error
+      lambda { @rubric.update_with_association(@user, rubric_params, @account, rubric_association_params) }.should_not raise_error
     end
   end
 end

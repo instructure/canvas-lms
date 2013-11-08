@@ -37,7 +37,7 @@ describe "quizzes" do
       get "/courses/#{@course.id}/quizzes"
       f('.quiz_list .description').should include_text "Multiple Dates"
       driver.mouse.move_to f('.quiz_list .description a')
-      wait_for_animations
+      wait_for_ajaximations
       tooltip = fj('.vdd_tooltip_content:visible')
       tooltip.should include_text 'New Section'
       tooltip.should include_text 'Everyone else'
@@ -162,8 +162,7 @@ describe "quizzes" do
     end
 
     it "should republish on save" do
-      Account.default.settings[:enable_draft] = true
-      Account.default.save!
+      Account.default.enable_draft!
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f(".new-quiz-link").click }
       quiz = Quiz.last
@@ -171,6 +170,9 @@ describe "quizzes" do
         click_save_settings_button
         wait_for_ajax_requests
       end
+
+      # Hides SpeedGrader link when unpublished
+      f('.icon-speed-grader').should be_nil
 
       f('#quiz-publish-link').should_not include_text("Published")
       f('#quiz-publish-link').should include_text("Publish")
@@ -182,14 +184,17 @@ describe "quizzes" do
       quiz.versions.length.should == 2
       get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
       expect_new_page_load {
-        f('#quiz-draft-state').text.strip.should == 'Published'
+        f('#quiz-draft-state').text.strip.should match accessible_variant_of 'Published'
         expect_new_page_load do
           click_save_settings_button
           wait_for_ajax_requests
         end
-        quiz.reload
-        quiz.versions.length.should == 3
       }
+      quiz.reload
+      quiz.versions.length.should == 3
+
+      # Shows speedgrader when published
+      f('.icon-speed-grader').should_not be_nil
     end
 
     it "should create a new question group" do
@@ -322,8 +327,7 @@ describe "quizzes" do
 
     it "should validate numerical input data" do
       @quiz = quiz_with_new_questions do |bank, quiz|
-        aq = AssessmentQuestion.create!
-        bank.assessment_questions << aq
+        aq = bank.assessment_questions.create!
         quiz.quiz_questions.create!(:question_data => {:name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq)
       end
       take_quiz do
@@ -347,10 +351,8 @@ describe "quizzes" do
 
     it "should mark questions as answered when the window loses focus" do
       @quiz = quiz_with_new_questions do |bank, quiz|
-        aq1 = AssessmentQuestion.create!
-        aq2 = AssessmentQuestion.create!
-        bank.assessment_questions << aq1
-        bank.assessment_questions << aq2
+        aq1 = bank.assessment_questions.create!
+        aq2 = bank.assessment_questions.create!
         quiz.quiz_questions.create!(:question_data => {:name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq1)
         quiz.quiz_questions.create!(:question_data => {:name => "essay", 'question_type' => 'essay_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq2)
       end
@@ -433,10 +435,8 @@ describe "quizzes" do
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
-      a = AssessmentQuestion.create!
-      b = AssessmentQuestion.create!
-      bank.assessment_questions << a
-      bank.assessment_questions << b
+      a = bank.assessment_questions.create!
+      b = bank.assessment_questions.create!
       answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
       question = q.quiz_questions.create!(:question_data => {
           :name => "first question",
@@ -457,21 +457,23 @@ describe "quizzes" do
 
       # force a save to create a submission
       answer_one.click
-      wait_for_ajax_requests
+      wait_for_ajaximations
 
-      # increase the time limit on the quiz
-      q.update_attribute(:time_limit, 20)
-      q.update_quiz_submission_end_at_times
+      # add time as a the moderator. this code replicates what happens in
+      # QuizSubmissions#extensions when a moderator extends a student's
+      # quiz time.
+
+
+      quiz_original_end_time = QuizSubmission.last.end_at
 
       keep_trying_until do
+        submission = QuizSubmission.last
+        submission.end_at = Time.now + 20.minutes
+        submission.save!
+        quiz_original_end_time < QuizSubmission.last.end_at
         assert_flash_notice_message /You have been given extra time on this attempt/
-        f('.time_running').text.should match /^[19]{2}\sMinutes/
+        f('.time_running').text.should match /19 Minutes/
       end
-
-      #This step is to prevent selenium from freezing when the dialog appears when leaving the page
-      driver.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
-      confirm_dialog = driver.switch_to.alert
-      confirm_dialog.accept
     end
 
     def upload_attachment_answer
@@ -487,7 +489,7 @@ describe "quizzes" do
 
     def file_upload_submission_data
       @quiz.reload.quiz_submissions.first.
-        submission_data["question_#{@question.id}".to_sym]
+          submission_data["question_#{@question.id}".to_sym]
     end
 
     def file_upload_attachment
@@ -499,10 +501,8 @@ describe "quizzes" do
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
-      a = AssessmentQuestion.create!
-      b = AssessmentQuestion.create!
-      bank.assessment_questions << a
-      bank.assessment_questions << b
+      a = bank.assessment_questions.create!
+      b = bank.assessment_questions.create!
       answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
       @question = q.quiz_questions.create!(:question_data => {
           :name => "first question",
@@ -513,17 +513,17 @@ describe "quizzes" do
       }, :assessment_question => a)
       q.generate_quiz_data
       q.save!
-      filename,@fullpath,data = get_file "testfile1.txt"
+      filename, @fullpath, data = get_file "testfile1.txt"
       get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
       expect_new_page_load do
         driver.find_element(:link_text, 'Take the Quiz').click
       end
-      wait_for_animations
+      wait_for_ajaximations
       # so we can .send_keys to the input, can't if it's invisible to
       # the browser
       driver.execute_script "$('.file-upload').removeClass('hidden')"
       upload_attachment_answer
-      file_upload_submission_data.should == [ file_upload_attachment.id.to_s ]
+      file_upload_submission_data.should == [file_upload_attachment.id.to_s]
       # delete the attachment id
       fj('.delete-attachment').click
       keep_trying_until do
@@ -539,7 +539,7 @@ describe "quizzes" do
         driver.get driver.current_url
         driver.switch_to.alert.accept
       end
-      wait_for_animations
+      wait_for_ajaximations
       attachment = file_upload_attachment
       fj('.file-upload-box').text.should include attachment.display_name
       f('#submit_quiz_button').click
@@ -549,13 +549,12 @@ describe "quizzes" do
     end
 
     it "should notify a student of extra time given by a moderator" do
+      pending('broken')
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
-      a = AssessmentQuestion.create!
-      b = AssessmentQuestion.create!
-      bank.assessment_questions << a
-      bank.assessment_questions << b
+      a = bank.assessment_questions.create!
+      b = bank.assessment_questions.create!
       answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
       question = q.quiz_questions.create!(:question_data => {
           :name => "first question",
@@ -576,25 +575,22 @@ describe "quizzes" do
 
       # force a save to create a submission
       answer_one.click
-      wait_for_ajax_requests
+      wait_for_ajaximations
 
       # add time as a the moderator. this code replicates what happens in
       # QuizSubmissions#extensions when a moderator extends a student's
       # quiz time.
+
+
+      quiz_original_end_time = QuizSubmission.last.end_at
+
+
       submission = QuizSubmission.last
       submission.end_at = Time.now + 20.minutes
       submission.save!
-
-      keep_trying_until do
-        assert_flash_notice_message /You have been given extra time on this attempt/
-        f('.time_running').text.should match /^[19]{2}\sMinutes/
-        true
-      end
-
-      #This step is to prevent selenium from freezing when the dialog appears when leaving the page
-      driver.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
-      confirm_dialog = driver.switch_to.alert
-      confirm_dialog.accept
+      quiz_original_end_time < QuizSubmission.last.end_at
+      assert_flash_notice_message /You have been given extra time on this attempt/
+      f('.time_running').text.should match /19 Minutes/
     end
 
 
@@ -602,7 +598,7 @@ describe "quizzes" do
       quiz_with_submission
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-      driver.find_element(:link, "Quiz Statistics").click
+      click_quiz_statistics_button
 
       f('#content .question_name').should include_text("Question 1")
     end
@@ -751,7 +747,7 @@ describe "quizzes" do
         get "/courses/#{@course.id}/quizzes"
         f('.ig-details .description').should include_text "Multiple Dates"
         driver.mouse.move_to f('.ig-details .description a')
-        wait_for_animations
+        wait_for_ajaximations
         tooltip = fj('.vdd_tooltip_content:visible')
         tooltip.should include_text 'New Section'
         tooltip.should include_text 'Everyone else'

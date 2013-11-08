@@ -26,6 +26,7 @@ class NotificationPolicy < ActiveRecord::Base
   attr_accessible :notification, :communication_channel, :frequency, :notification_id, :communication_channel_id
 
   validates_presence_of :communication_channel_id
+  validates_inclusion_of :broadcast, in: [true, false]
   
   # This is for choosing a policy for another context, so:
   # NotificationPolicy.for(notification) or
@@ -114,7 +115,7 @@ class NotificationPolicy < ActiveRecord::Base
         notifications.each do |notification_id|
           # can't use hash syntax for the where cause Rails 2 will try to call communication_channels= for the
           # or_initialize portion
-          if Rails.version < '3.0'
+          if CANVAS_RAILS2
             p = NotificationPolicy.includes(:communication_channel).where("communication_channels.user_id=?", user).
                 find_or_initialize_by_communication_channel_id_and_notification_id(params[:channel_id], notification_id)
           else

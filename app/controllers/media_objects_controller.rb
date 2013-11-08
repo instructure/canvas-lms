@@ -21,7 +21,7 @@
 #
 # When you upload or record webcam video/audio to kaltura, it makes a Media Object
 #
-# @object Media Object
+# @object MediaObject
 #   {
 #     // whether or not the current user can upload media_tracks (subtitles) to this Media Object
 #     "can_add_captions": true,
@@ -30,14 +30,14 @@
 #       "kind": "captions",
 #       "created_at": "2012-09-27T16:46:50-06:00",
 #       "updated_at": "2012-09-27T16:46:50-06:00",
-#       "url": "http://<canvas>/media_objects/0_r949z9lk/media_tracks/1",
+#       "url": "https://<canvas>/media_objects/0_r949z9lk/media_tracks/1",
 #       "id": 1,
 #       "locale": "af"
 #     }, {
 #       "kind": "subtitles",
 #       "created_at": "2012-09-27T20:29:17-06:00",
 #       "updated_at": "2012-09-27T20:29:17-06:00",
-#       "url": "http://<canvas>/media_objects/0_r949z9lk/media_tracks/14",
+#       "url": "https://<canvas>/media_objects/0_r949z9lk/media_tracks/14",
 #       "id": 14,
 #       "locale": "cs"
 #     }],
@@ -76,7 +76,7 @@ class MediaObjectsController < ApplicationController
   #     curl https://<canvas>/media_objects/<media_object_id> \
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns Media Object
+  # @returns MediaObject
   def show
     media_object = MediaObject.by_media_id(params[:media_object_id]).first
     unless media_object

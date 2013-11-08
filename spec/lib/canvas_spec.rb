@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,16 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Canvas do
-  describe "sampling methods" do
-    it "should sample the cpu on linux" do
-      if File.directory?("/proc")
-        sample = Canvas.sample_cpu_time
-        sample[0].should be > 0.0
-        sample[1].should be > 0.0
-      end
-    end
-  end
-
   describe ".timeout_protection" do
     it "should wrap the block in a timeout" do
       Setting.set("service_generic_timeout", "2")
@@ -43,6 +33,22 @@ describe Canvas do
       ran = false
       Canvas.timeout_protection("spec") { ran = true }
       ran.should == true
+    end
+
+    it "should raise on timeout if raise_on_timeout option is specified" do
+      Timeout.expects(:timeout).raises(Timeout::Error)
+      lambda { Canvas.timeout_protection("spec", raise_on_timeout: true) {} }.should raise_error(Timeout::Error)
+    end
+
+    it "should use the timeout argument over the generic default" do
+      Timeout.expects(:timeout).with(23)
+      Canvas.timeout_protection("foo", fallback_timeout_length: 23)
+    end
+
+    it "should use the settings timeout over the timeout argument" do
+      Setting.set("service_foo_timeout", "1")
+      Timeout.expects(:timeout).with(1)
+      Canvas.timeout_protection("foo", fallback_timeout_length: 23)
     end
 
     if Canvas.redis_enabled?
@@ -64,6 +70,12 @@ describe Canvas do
         Timeout.expects(:timeout).with(15).yields
         Canvas.timeout_protection("spec") { ran = true }
         ran.should == true
+      end
+
+      it "should raise on cutoff if raise_on_timeout option is specified" do
+        Canvas.redis.set("service:timeouts:spec", 42)
+        lambda { Canvas.timeout_protection("spec", raise_on_timeout: true) {} }.should raise_error(Timeout::Error)
+        Canvas.redis.get("service:timeouts:spec").should == "42"
       end
     end
   end

@@ -399,17 +399,20 @@ table.full_assignment_table {
 .vdd_tooltip_link {
   cursor: pointer
 }
+.ui-widget.ui-tooltip {
+  max-width: 240px;
+}
 .dl-horizontal.vdd_tooltip_content {
   margin: 7px 0;
   dt {
-    width: 95px;
+    width: 115px;
     white-space: normal;
     line-height: 12px;
     margin-bottom: 5px;
   }
   dd {
-    margin-left: 105px;
-    width: 95px;
+    margin-left: 125px;
+    width: 115px;
     line-height: 12px;
     text-align: left;
   }

@@ -27,7 +27,8 @@ module Api::V1::ContextModule
   # optionally pass progression to include 'state', 'completed_at'
   def module_json(context_module, current_user, session, progression = nil, includes = [], opts = {})
     hash = api_json(context_module, current_user, session, :only => MODULE_JSON_ATTRS)
-    hash['require_sequential_progress'] = !!context_module.require_sequential_progress
+    hash['require_sequential_progress'] = !!context_module.require_sequential_progress?
+    hash['publish_final_grade'] = context_module.publish_final_grade?
     hash['prerequisite_module_ids'] = context_module.prerequisites.reject{|p| p[:type] != 'context_module'}.map{|p| p[:id]}
     if progression
       hash['state'] = progression.workflow_state
@@ -39,7 +40,7 @@ module Api::V1::ContextModule
     count = tags.count
     hash['items_count'] = count
     hash['items_url'] = polymorphic_url([:api_v1, context_module.context, context_module, :items])
-    if includes.include?('items') && count <= Setting.get_cached('api_max_per_page', '50').to_i
+    if includes.include?('items') && count <= Setting.get('api_max_per_page', '50').to_i
       if opts[:search_term].present? && !context_module.matches_attribute?(:name, opts[:search_term])
         tags = ContentTag.search_by_attribute(tags, :title, opts[:search_term])
         return nil if tags.count == 0

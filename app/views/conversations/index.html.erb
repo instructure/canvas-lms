@@ -88,11 +88,36 @@
       </div>
     </div>
     <ul id="message_status"></ul>
-    <a id="help_crumb"
-       data-track-category="Help"
-       data-track-action="Click"
-       data-track-label="Question Mark"
-       href="#"><i class="icon-question standalone-icon"></i></a>
+      <div>
+        <a id="help-btn"
+           class="al-trigger"
+           data-track-category="Help"
+           data-track-action="Click"
+           data-track-label="Question Mark"
+           href="#"
+           role="button"
+           aria-haspopup="true"
+           aria-owns="help-menu-items">
+          <i class="icon-question"></i>
+          <i class="icon-mini-arrow-down"></i>
+          <span class="screenreader-only"><%= t 'help', "Help" %></span>
+        </a>
+
+        <ul id="help-menu-items"
+            class="al-options"
+            role="menu"
+            tabindex="0"
+            aria-hidden="true"
+            aria-expanded="false"
+            aria-activedescendant="new-conversations-opt-in-menu-item">
+          <li role="presentation">
+            <a id="try-new-conversations-menu-item" href="/conversations/toggle_new_conversations?use_new_conversations=1" data-method="post" rel="nofollow" tabindex="-1" role="menuitem" title="<%= t 'try_new_conversations', "Try New Conversations" %>"><%= t 'try_new_conversations', "Try New Conversations" %></a>
+          </li>
+          <li role="presentation">
+            <a href="#" id="conversations-intro-menu-item" tabindex="-1" role="menuitem" title="<%= t 'conversations_intro', "Conversations Intro" %>"><%= t 'conversations_intro', "Conversations Intro" %></a>
+          </li>
+        </ul>
+      </div>
     <div id="create_message_form"></div>
     <ul class="messages">
     </ul>
@@ -181,7 +206,7 @@
   <%= text_field_tag :recipients, nil, :id => 'add_recipients', 'data-finder_url' => search_recipients_url, :class => "recipients", :style => "width: 370px" %>
 </form>
 
-<% form_tag conversations_url, :id => 'forward_message_form' do %>
+<%= form_tag conversations_url, :id => 'forward_message_form' do %>
   <table>
     <tr id="recipient_info">
       <th><%= label_tag :forward_recipients, :to, :en => "To", :before => true %></th>

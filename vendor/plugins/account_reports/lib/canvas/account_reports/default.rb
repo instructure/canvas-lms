@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,7 +20,11 @@ module Canvas::AccountReports
   module Default
 
     def self.student_assignment_outcome_map_csv(account_report)
-      GradeReports.new(account_report).student_assignment_outcome_map
+      OutcomeReports.new(account_report).student_assignment_outcome_map
+    end
+
+    def self.outcome_results_csv(account_report)
+      OutcomeReports.new(account_report).outcome_results
     end
 
     def self.grade_export_csv(account_report)

@@ -99,6 +99,10 @@ $.widget("ui.dialog", {
 
 			uiDialog = ( this.uiDialog = $( "<div>" ) )
 				.addClass( uiDialogClasses + options.dialogClass )
+				.attr({
+					role: "dialog",
+					"aria-hidden": true,
+				})
 				.css({
 					display: "none",
 					outline: 0, // TODO: move to stylesheet
@@ -132,6 +136,7 @@ $.widget("ui.dialog", {
 			uiDialogTitlebarClose = $( "<a href='#'></a>" )
 				.addClass( "ui-dialog-titlebar-close  ui-corner-all" )
 				.attr( "role", "button" )
+				.attr( "tabindex", 0)
 				.click(function( event ) {
 					event.preventDefault();
 					that.close( event );
@@ -147,6 +152,7 @@ $.widget("ui.dialog", {
 				.uniqueId()
 				.addClass( "ui-dialog-title" )
 				.html( title )
+				.attr("role", "heading")
 				.prependTo( uiDialogTitlebar ),
 
 			uiDialogButtonPane = ( this.uiDialogButtonPane = $( "<div>" ) )
@@ -156,10 +162,9 @@ $.widget("ui.dialog", {
 				.addClass( "ui-dialog-buttonset" )
 				.appendTo( uiDialogButtonPane );
 
-		uiDialog.attr({
-			role: "dialog",
-			"aria-labelledby": uiDialogTitle.attr( "id" )
-		});
+		if (uiDialogContent.attr("id") === undefined) {
+			uiDialogContent.uniqueId();
+		}
 
 		uiDialogTitlebar.find( "*" ).add( uiDialogTitlebar ).disableSelection();
 		this._hoverable( uiDialogTitlebarClose );
@@ -244,6 +249,7 @@ $.widget("ui.dialog", {
 			this._trigger( "close", event );
 		}
 
+		this.uiDialog.attr('aria-hidden', true);
 		$.ui.dialog.overlay.resize();
 
 		// adjust the maxZ to allow other modal dialogs to continue to work (see #4309)
@@ -348,7 +354,11 @@ $.widget("ui.dialog", {
 				hasFocus = uiDialog;
 			}
 		}
-		hasFocus.eq( 0 ).focus();
+
+		this.uiDialog.attr('aria-hidden', false);
+		if ($.browser && $.browser.safari) {
+			hasFocus.eq( 0 ).focus();
+		}
 
 		this._isOpen = true;
 		this._trigger( "open" );
@@ -715,7 +725,11 @@ $.extend( $.ui.dialog.overlay, {
 					$( document ).bind( $.ui.dialog.overlay.events, function( event ) {
 						// stop events if the z-index of the target is < the z-index of the overlay
 						// we cannot return true when we don't want to cancel the event (#3523)
-						if ( $( event.target ).zIndex() < $.ui.dialog.overlay.maxZ ) {
+						//
+						// INSTRUCTURE - make sure that the element isn't in the dialog
+						// before stopping all events
+						if ( $( event.target ).zIndex() < $.ui.dialog.overlay.maxZ &&
+								!(dialog.element.has(event.target).length ) ) {
 							return false;
 						}
 					});

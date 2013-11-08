@@ -461,6 +461,47 @@ describe IncomingMail::IncomingMessageProcessor do
       usernames.count('bar').should eql 1
       usernames.count(nil).should eql 1
     end
+  end
 
+  describe "timeouts" do
+    class TimeoutMailbox
+      include IncomingMail::ConfigurableTimeout
+
+      def initialize(config)
+        @config = config
+      end
+    end
+
+    before do
+      IncomingMessageProcessor.stubs(:get_mailbox_class).returns(TimeoutMailbox)
+
+      [:connect, :each_message, :delete_message, :move_message, :disconnect].each do |f|
+        TimeoutMailbox.any_instance.stubs(f)
+      end
+    end
+
+    it "should abort processing on timeout, but continue with next account" do
+      IncomingMessageProcessor.configure({
+        'imap' => {
+          'accounts' => [
+            {'username' => 'first'},
+            {'username' => 'second'},
+          ]
+        }
+      })
+      processed_second = false
+
+      TimeoutMailbox.send(:define_method, :each_message) do
+        if @config[:username] == 'first'
+          raise Timeout::Error
+        else
+          processed_second = true
+        end
+      end
+
+      ErrorReport.expects(:log_exception)
+      IncomingMessageProcessor.process
+      processed_second.should be_true
+    end
   end
 end

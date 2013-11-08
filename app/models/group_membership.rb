@@ -29,6 +29,7 @@ class GroupMembership < ActiveRecord::Base
   before_save :auto_join
   before_save :capture_old_group_id
 
+  validates_presence_of :group_id, :user_id, :workflow_state
   before_validation :verify_section_homogeneity_if_necessary
   validate :validate_within_group_limit
 
@@ -140,10 +141,8 @@ class GroupMembership < ActiveRecord::Base
   end
 
   def update_cached_due_dates
-    if workflow_state_changed? && group.try(:group_category) && group.context_type != 'Account'
-      group.group_category.assignments.pluck(:id).each do |assignment|
-        DueDateCacher.recompute(assignment)
-      end
+    if workflow_state_changed? && group.group_category_id && group.context_type == 'Course'
+      DueDateCacher.recompute_course(group.context_id, Assignment.where(context_type: group.context_type, context_id: group.context_id, group_category_id: group.group_category_id).pluck(:id))
     end
   end
   

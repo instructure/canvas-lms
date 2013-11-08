@@ -28,28 +28,51 @@ class EnrollmentDateBuilder
     @enrollment_dates = []
   end
 
+  def self.preload(enrollments)
+    return if enrollments.empty?
+    Enrollment.send(:preload_associations, enrollments, :course) unless enrollments.first.loaded_course?
+
+    to_preload = enrollments.reject { |e| fetch(e) }
+    return if to_preload.empty?
+    Enrollment.send(:preload_associations, to_preload, :course_section)
+    Course.send(:preload_associations, to_preload.map(&:course).uniq, :enrollment_term)
+    to_preload.each { |e| build(e) }
+  end
+
+  def self.cache_key(enrollment)
+    [enrollment, enrollment.course, 'enrollment_date_ranges'].cache_key
+  end
+
+  def self.fetch(enrollment)
+    result = Rails.cache.fetch(cache_key(enrollment))
+    enrollment.instance_variable_set(:@enrollment_dates, result)
+  end
+
   def self.build(enrollment)
     EnrollmentDateBuilder.new(enrollment).build
   end
 
-  def build
-    Rails.cache.fetch([@enrollment, @course, 'enrollment_date_ranges'].cache_key) do
-      if enrollment_is_restricted?
-        add_enrollment_dates(@enrollment)
-      elsif section_is_restricted?
-        add_enrollment_dates(@section)
-        add_term_dates if @enrollment.admin?
-      elsif course_is_restricted?
-        add_enrollment_dates(@course)
-        add_term_dates if @enrollment.admin?
-      elsif @term
-        add_term_dates
-      else
-        @enrollment_dates << default_dates
-      end
+  def cache_key
+    @cache_key ||= self.class.cache_key(@enrollment)
+  end
 
-      @enrollment_dates
+  def build
+    if enrollment_is_restricted?
+      add_enrollment_dates(@enrollment)
+    elsif section_is_restricted?
+      add_enrollment_dates(@section)
+      add_term_dates if @enrollment.admin?
+    elsif course_is_restricted?
+      add_enrollment_dates(@course)
+      add_term_dates if @enrollment.admin?
+    elsif @term
+      add_term_dates
+    else
+      @enrollment_dates << default_dates
     end
+
+    Rails.cache.write(cache_key, @enrollment_dates)
+    @enrollment.instance_variable_set(:@enrollment_dates, @enrollment_dates)
   end
 
   private

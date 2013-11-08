@@ -43,6 +43,19 @@ describe "gradebook1" do
     )
   end
 
+  it "hides/shows assignments based on their draft state" do
+    @course.root_account.enable_draft!
+    @assignment.unpublish
+    get "/courses/#{@course.id}/gradebook"
+    wait_for_ajaximations
+    f('body').text.should_not match @assignment.title
+
+    @assignment.publish
+    get "/courses/#{@course.id}/gradebook"
+    wait_for_ajaximations
+    f('body').text.should match @assignment.title
+  end
+
   def switch_to_section(section_name="All")
     f("#gradebook_options").click
     wait_for_ajaximations

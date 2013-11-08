@@ -33,21 +33,21 @@
 # @object Group
 #     {
 #       // The ID of the group.
-#       id: 17,
+#       "id": 17,
 #
 #       // The display name of the group.
-#       name: "Math Group 1",
+#       "name": "Math Group 1",
 #
 #       // A description of the group. This is plain text.
-#       description: null,
+#       "description": null,
 #
 #       // Whether or not the group is public.  Currently only community groups
 #       // can be made public.  Also, once a group has been set to public, it
 #       // cannot be changed back to private.
-#       is_public: false,
+#       "is_public": false,
 #
 #       // Whether or not the current user is following this group.
-#       followed_by_user: false,
+#       "followed_by_user": false,
 #
 #       // How people are allowed to join the group.  For all groups except for
 #       // community groups, the user must share the group's parent course or
@@ -64,31 +64,37 @@
 #       //   must be approved by a group moderator.
 #       // * If "invitation_only", only those how have received an
 #       //   invitation my join the group, by accepting that invitation.
-#       join_level: "invitation_only",
+#       "join_level": "invitation_only",
 #
 #       // The number of members currently in the group
-#       members_count: 0,
+#       "members_count": 0,
 #
 #       // The url of the group's avatar
-#       avatar_url: "https://<canvas>/files/avatar_image.png",
+#       "avatar_url": "https://<canvas>/files/avatar_image.png",
 #
 #       // The course or account that the group belongs to. The pattern here is
 #       // that whatever the context_type is, there will be an _id field named
 #       // after that type. So if instead context_type was "account", the
 #       // course_id field would be replaced by an account_id field.
-#       context_type: "Course",
-#       course_id: 3,
+#       "context_type": "Course",
+#       "course_id": 3,
 #
 #       // Certain types of groups have special role designations. Currently,
 #       // these include: "communities", "student_organized", and "imported".
 #       // Regular course/account groups have a role of null.
-#       role: null,
+#       "role": null,
 #
 #       // The ID of the group's category.
-#       group_category_id: 4,
+#       "group_category_id": 4,
 #
 #       // the storage quota for the group, in megabytes
-#       storage_quota_mb: 50
+#       "storage_quota_mb": 50,
+#
+#       // optional: the permissions the user has for the group.
+#       // returned only for a single group and include[]=permissions
+#       "permissions": {
+#          "create_discussion_topic": true
+#        }
 #     }
 #
 class GroupsController < ApplicationController
@@ -97,6 +103,7 @@ class GroupsController < ApplicationController
 
   include Api::V1::Attachment
   include Api::V1::Group
+  include Api::V1::GroupCategory
   include Api::V1::UserFollow
 
   SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment storage_quota_mb)
@@ -146,8 +153,8 @@ class GroupsController < ApplicationController
   #
   # Returns a list of active groups for the current user.
   #
-  # @argument context_type [Optional] only include groups that are in this type of
-  #  context. Can be 'Account' or 'Course'
+  # @argument context_type [Optional, String, "Account"|"Course"]
+  #  Only include groups that are in this type of context.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/users/self/groups?context_type=Account \ 
@@ -190,31 +197,44 @@ class GroupsController < ApplicationController
   def context_index
     return unless authorized_action(@context, @current_user, :read_roster)
 
-    @groups      = @context.groups.active.by_name
-    @categories  = @context.group_categories.order("role <> 'student_organized'", :name)
+    @groups      = all_groups = @context.groups.active.by_name
+    @categories  = @context.group_categories.order("role <> 'student_organized'", GroupCategory.best_unicode_collation_key('name'))
     @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
     unless api_request?
-      add_crumb (@context.is_a?(Account) ? t('#crumbs.users', "Users") : t('#crumbs.people', "People")), named_context_url(@context, :context_users_url)
-      add_crumb t('#crumbs.groups', "Groups"), named_context_url(@context, :context_groups_url)
-      @active_tab = @context.is_a?(Account) ? "users" : "people"
-
-      @user_groups = @groups & (@user_groups || [])
-
-      @available_groups = (@groups - @user_groups).select do |group|
-        group.grants_right?(@current_user, :join)
+      if @context.is_a?(Account)
+        user_crumb = t('#crumbs.users', "Users")
+        @active_tab = "users"
+        @group_user_type = "user"
+        @allow_self_signup = false
+      else
+        user_crumb = t('#crumbs.people', "People")
+        @active_tab = "people"
+        @group_user_type = "student"
+        @allow_self_signup = true
       end
+
+      add_crumb user_crumb, named_context_url(@context, :context_users_url)
+      add_crumb t('#crumbs.groups', "Groups"), named_context_url(@context, :context_groups_url)
     end
 
     unless @context.grants_right?(@current_user, session, :manage_groups)
-      @groups = @user_groups
+      @groups = @user_groups = @groups & (@user_groups || [])
     end
 
     respond_to do |format|
       format.html do
         if @context.grants_right?(@current_user, session, :manage_groups)
+          if @domain_root_account.enable_manage_groups2?
+            js_env group_categories: @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) },
+                   group_user_type: @group_user_type,
+                   allow_self_signup: @allow_self_signup
+          end
           render :action => 'context_manage_groups'
         else
+          @available_groups = (all_groups - @user_groups).select do |group|
+            group.grants_right?(@current_user, :join)
+          end
           render :action => 'context_groups'
         end
       end
@@ -237,6 +257,10 @@ class GroupsController < ApplicationController
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id> \ 
   #          -H 'Authorization: Bearer <token>'
+  #
+  # @argument include[] [String, "permissions"]
+  #   - "permissions": Include permissions the current user has
+  #     for the group.
   #
   # @returns Group
   def show
@@ -289,7 +313,7 @@ class GroupsController < ApplicationController
       end
       format.json do
         if authorized_action(@group, @current_user, :read)
-          render :json => group_json(@group, @current_user, session)
+          render :json => group_json(@group, @current_user, session, :include => Array(params[:include]))
         end
       end
     end
@@ -306,15 +330,20 @@ class GroupsController < ApplicationController
   # Creates a new group. Groups created using the "/api/v1/groups/"
   # endpoint will be community groups.
   #
-  # @argument name the name of the group
-  # @argument description a description of the group
-  # @argument is_public whether the group is public (applies only to
-  #   community groups)
-  # @argument join_level parent_context_auto_join, parent_context_request,
-  #   or invitation_only
-  # @argument storage_quota_mb The allowed file storage for the group,
-  #   in megabytes. This parameter is ignored if the caller does not have
-  #   the manage_storage_quotas permission.
+  # @argument name [String]
+  #  The name of the group
+  #
+  # @argument description [String]
+  #  A description of the group
+  #
+  # @argument is_public [Boolean]
+  #   whether the group is public (applies only to community groups)
+  #
+  # @argument join_level [String, "parent_context_auto_join"|"parent_context_request"|"invitation_only"]
+  #
+  # @argument storage_quota_mb [Integer]
+  #   The allowed file storage for the group, in megabytes. This parameter is
+  #   ignored if the caller does not have the manage_storage_quotas permission.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups \ 
@@ -376,16 +405,25 @@ class GroupsController < ApplicationController
   # {file:file_uploads.html File Upload Documentation} for details on the file
   # upload workflow.
   #
-  # @argument name
-  # @argument description
-  # @argument is_public Currently you cannot set a group back to private once
-  #   it has been made public.
-  # @argument join_level
-  # @argument avatar_id The id of the attachment previously uploaded to the
-  #   group that you would like to use as the avatar image for this group.
-  # @argument storage_quota_mb The allowed file storage for the group,
-  #   in megabytes. This parameter is ignored if the caller does not have
-  #   the manage_storage_quotas permission.
+  # @argument name [String]
+  #  The name of the group
+  #
+  # @argument description [String]
+  #  A description of the group
+  #
+  # @argument is_public [Boolean]
+  #   Whether the group is public (applies only to community groups). Currently
+  #   you cannot set a group back to private once it has been made public.
+  #
+  # @argument join_level [String, "parent_context_auto_join"|"parent_context_request"|"invitation_only"]
+  #
+  # @argument avatar_id [Integer]
+  #   The id of the attachment previously uploaded to the group that you would
+  #   like to use as the avatar image for this group.
+  #
+  # @argument storage_quota_mb [Integer]
+  #   The allowed file storage for the group, in megabytes. This parameter is
+  #   ignored if the caller does not have the manage_storage_quotas permission.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id> \ 
@@ -512,7 +550,8 @@ class GroupsController < ApplicationController
   # Sends an invitation to all supplied email addresses which will allow the
   # receivers to join the group.
   #
-  # @argument invitees An array of email addresses to be sent invitations
+  # @argument invitees[] [String]
+  #   An array of email addresses to be sent invitations.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id>/invite \ 
@@ -555,9 +594,9 @@ class GroupsController < ApplicationController
       @membership = @group.add_user(User.find(params[:user_id]))
       if @membership.valid?
         @group.touch
-        render :json => @membership.to_json
+        render :json => @membership
       else
-        render :json => @membership.errors.to_json, :status => :bad_request
+        render :json => @membership.errors, :status => :bad_request
       end
     end
   end
@@ -567,7 +606,7 @@ class GroupsController < ApplicationController
     if authorized_action(@group, @current_user, :manage)
       @membership = @group.group_memberships.find_by_user_id(params[:user_id])
       @membership.destroy
-      render :json => @membership.to_json
+      render :json => @membership
     end
   end
 
@@ -576,9 +615,9 @@ class GroupsController < ApplicationController
   #
   # Returns a list of users in the group.
   #
-  # @argument search_term (optional)
-  #   The partial name or full ID of the users to match and return in the results list.
-  #   Must be at least 3 characters.
+  # @argument search_term [Optional, String]
+  #   The partial name or full ID of the users to match and return in the
+  #   results list. Must be at least 3 characters.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/1/users \
@@ -591,7 +630,7 @@ class GroupsController < ApplicationController
     search_term = params[:search_term].presence
 
     if search_term
-      users = UserSearch.for_user_in_context(search_term, @context, @current_user)
+      users = UserSearch.for_user_in_context(search_term, @context, @current_user, session)
     else
       users = UserSearch.scope_for(@context, @current_user)
     end
@@ -660,7 +699,8 @@ class GroupsController < ApplicationController
   #
   # Preview html content processed for this group
   #
-  # @argument html The html content to process
+  # @argument html [String]
+  #   The html content to process
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id>/preview_html \

@@ -188,7 +188,7 @@ module Api
   end
 
   def self.per_page_for(controller)
-    [(controller.params[:per_page] || Setting.get_cached('api_per_page', '10')).to_i, Setting.get_cached('api_max_per_page', '50').to_i].min
+    [(controller.params[:per_page] || Setting.get('api_per_page', '10')).to_i, Setting.get('api_max_per_page', '50').to_i].min
   end
 
   # Add [link HTTP Headers](http://www.w3.org/Protocols/9707-link-header.html) for pagination
@@ -209,6 +209,7 @@ module Api
     links = build_links(base_url, {
       :query_parameters => controller.request.query_parameters,
       :per_page => collection.per_page,
+      :current => collection.current_page || first_page,
       :next => collection.next_page,
       :prev => collection.previous_page,
       :first => first_page,
@@ -225,7 +226,7 @@ module Api
     qp = opts[:query_parameters] || {}
     qp = qp.with_indifferent_access.except(*EXCLUDE_IN_PAGINATION_LINKS)
     base_url += "#{qp.to_query}&" if qp.present?
-    [:next, :prev, :first, :last].each do |k|
+    [:current, :next, :prev, :first, :last].each do |k|
       if opts[k].present?
         links << "<#{base_url}page=#{opts[k]}&per_page=#{opts[:per_page]}>; rel=\"#{k}\""
       end
@@ -467,7 +468,22 @@ module Api
                     "Quiz" => "Quiz",
                     "ContextModuleSubHeader" => "SubHeader",
                     "ExternalUrl" => "ExternalUrl",
-                    "ContextExternalTool" => "ExternalTool" }.freeze
+                    "ContextExternalTool" => "ExternalTool",
+                    "ContextModule" => "Module",
+                    "ContentTag" => "ModuleItem" }.freeze
+
+  # matches the other direction, case insensitively
+  def self.api_type_to_canvas_name(api_type)
+    unless @inverse_map
+      m = {}
+      API_DATA_TYPE.each do |k, v|
+        m[v.downcase] = k
+      end
+      @inverse_map = m
+    end
+    return nil unless api_type
+    @inverse_map[api_type.downcase]
+  end
 
   # maps canvas URLs to API URL helpers
   # target array is return type, helper, name of each capture, and optionally a Hash of extra arguments
@@ -529,4 +545,24 @@ module Api
     {}
   end
 
+  def self.stringify_json_ids(value)
+    return unless value.is_a?(Hash)
+    value.keys.each do |key|
+      if key =~ /(^|_)id$/
+        # id, foo_id, etc.
+        value[key] = stringify_json_id(value[key])
+      elsif key =~ /(^|_)ids$/ && value[key].is_a?(Array)
+        # ids, foo_ids, etc.
+        value[key].map!{ |id| stringify_json_id(id) }
+      end
+    end
+  end
+
+  def self.stringify_json_id(id)
+    id.is_a?(Integer) ? id.to_s : id
+  end
+
+  def accepts_jsonapi?
+    !!(/application\/vnd\.api\+json/ =~ request.headers['Accept'].to_s)
+  end
 end

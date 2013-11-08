@@ -38,7 +38,8 @@ class CutyCapt
     :timeout => 60000,
     :ip_blacklist => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '169.254.169.254' ],
     :domain_blacklist => [ ],
-    :allowed_schemes => [ 'http', 'https' ]
+    :allowed_schemes => [ 'http', 'https' ],
+    :lang => 'en,*;q=0.9'
   }
 
   cattr_writer :config
@@ -89,8 +90,8 @@ class CutyCapt
     true
   end
 
-  def self.cuty_arguments(path, url, img_file, format, delay, timeout)
-    [ path, "--url=#{url}", "--out=#{img_file}", "--out-format=#{format}", "--delay=#{delay}", "--max-wait=#{timeout}" ]
+  def self.cuty_arguments(path, url, img_file, format, delay, timeout, lang)
+    [ path, "--url=#{url}", "--out=#{img_file}", "--out-format=#{format}", "--delay=#{delay}", "--max-wait=#{timeout}", "--header=Accept-Language:#{lang}" ]
   end
 
   def self.snapshot_url(url, format = "png", &block)
@@ -110,7 +111,7 @@ class CutyCapt
 
     if (pid = fork).nil?
       ENV["DISPLAY"] = config[:display] if config[:display]
-      Kernel.exec(*cuty_arguments(config[:path], url, img_file, format, config[:delay], config[:timeout]))
+      Kernel.exec(*cuty_arguments(config[:path], url, img_file, format, config[:delay], config[:timeout], config[:lang]))
     else
       begin
         Timeout::timeout(config[:timeout].to_i / 1000) do

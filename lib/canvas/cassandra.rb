@@ -53,6 +53,11 @@ module Canvas::Cassandra
 
     def initialize(cluster_name, environment, servers, opts, thrift_opts)
       Bundler.require 'cassandra'
+      CassandraCQL::Database.class_eval do
+        def use_cql3?
+          false
+        end
+      end
       @db = CassandraCQL::Database.new(servers, opts, thrift_opts)
       @cluster_name = cluster_name
       @environment = environment
@@ -78,14 +83,18 @@ module Canvas::Cassandra
     end
 
     # private Struct used to store batch information
-    class Batch < Struct.new(:statements, :args)
+    class Batch < Struct.new(:statements, :args, :counter_statements, :counter_args)
       def initialize
         self.statements = []
         self.args = []
+        self.counter_statements = []
+        self.counter_args = []
       end
-      delegate :empty?, :present?, :blank?, :to => :statements
 
-      def to_cql_ary
+      def to_cql_ary(field = nil)
+        field = "#{field}_" if field
+        statements = send("#{field}statements")
+        args = send("#{field}args")
         case statements.size
         when 0
           raise "Cannot execute an empty batch"
@@ -95,7 +104,7 @@ module Canvas::Cassandra
           # http://www.datastax.com/docs/1.1/references/cql/BATCH
           # note there's no semicolons between statements in the batch
           cql = []
-          cql << "BEGIN BATCH"
+          cql << "BEGIN #{'COUNTER ' if field == 'counter_'}BATCH"
           cql.concat statements
           cql << "APPLY BATCH"
           # join with spaces rather than newlines, because cassandra doesn't care
@@ -118,6 +127,17 @@ module Canvas::Cassandra
       nil
     end
 
+    def update_counter(query, *args)
+      return update(query, *args) unless db.use_cql3?
+      if in_batch?
+        @batch.counter_statements << query
+        @batch.counter_args.concat args
+      else
+        execute(query, *args)
+      end
+      nil
+    end
+
     # Batch up all execute statements inside the given block, executing when
     # the block returns successfully.
     # Note that this only batches up update calls, not execute calls, since
@@ -133,8 +153,11 @@ module Canvas::Cassandra
         begin
           @batch = Batch.new
           yield
-          unless @batch.empty?
+          unless @batch.statements.empty?
             execute(*@batch.to_cql_ary)
+          end
+          unless @batch.counter_statements.empty?
+            execute(*@batch.to_cql_ary(:counter))
           end
         ensure
           @batch = nil
@@ -173,8 +196,14 @@ module Canvas::Cassandra
       result_row && result_row.to_hash.values.first
     end
 
-    def keyspace_information
-      @db.keyspaces.find { |k| k.name == @db.keyspace }
+    def tables
+      if @db.use_cql3?
+        @db.execute("SELECT columnfamily_name FROM system.schema_columnfamilies WHERE keyspace_name=?", @db.keyspace).map do |row|
+          row['columnfamily_name']
+        end
+      else
+        @db.schema.tables
+      end
     end
 
     # returns a CQL snippet and list of arguments given a hash of conditions

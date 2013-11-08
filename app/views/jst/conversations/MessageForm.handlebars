@@ -39,7 +39,7 @@
       <th></th>
       <td>
         <label>
-          <input type="checkbox" name="group_conversation" value="1" class="group_conversation">
+          {{checkbox "group_conversation" class="group_conversation"}}
           {{#t "labels.group_conversation"}}This is a group conversation. Participants will see everyone's replies{{/t}}
         </label>
       </td>
@@ -49,13 +49,11 @@
       <th></th>
       <td>
         <label>
-          <input type="checkbox"
-                 name="user_note"
-                 value="1"
-                  data-track-category="Compose Message"
-                  data-track-action="Edit"
-                  data-track-label="Faculty Journal"
-                 class="user_note" />
+          {{checkbox "user_note"
+            data-track-category="Compose Message"
+            data-track-action="Edit"
+            data-track-label="Faculty Journal"
+            class="user_note"}}
           {{#t "labels.add_to_faculty_journal"}}Add as a Faculty Journal entry{{/t}}
         </label>
       </td>
@@ -67,7 +65,9 @@
           <div class="media_comment" style="display: none;" title="{{#t "titles.media_comment"}}Recorded media comment{{/t}}">
             <img src="/images/messages/media-gray.png">
             {{#t "media_comment"}}Media Comment{{/t}}
-            <a href="#" class="remove_link icon-end black" style="float: right;" title="{{#t "titles.remove_media_comment"}}Remove media comment{{/t}}"></a>
+            <a href="#" class="remove_link icon-end black" style="float: right;" title="{{#t "titles.remove_media_comment"}}Remove media comment{{/t}}">
+              <span class="screenreader-only">{{#t "titles.remove_media_comment"}}Remove media comment{{/t}}</span>
+            </a>
             <div class="clear"></div>
           </div>
           <input type="hidden" name="media_comment_id">
@@ -93,11 +93,26 @@
           <input type="hidden" name="mode" value="async">
           <input type="hidden" name="scope" value="{{scope}}">
           <input type="hidden" name="filter" value="{{filter}}">
-          <button type="submit"
-                  data-track-category="Compose Message"
-                  data-track-action="Edit"
-                  data-track-label="Send"
-                  class="btn btn-primary">{{#t "buttons.send_message"}}Send{{/t}}</button>
+          {{#if conversation.beta}}
+            <button type="button"
+                    data-track-category="Compose Message"
+                    data-track-action="Edit"
+                    data-track-label="ReplyAll"
+                    name="reply-type"
+                    value="all"
+                    class="btn">{{#t "buttons.reply_all"}}Reply all{{/t}}</button>
+            <button type="submit"
+                    data-track-category="Compose Message"
+                    data-track-action="Edit"
+                    data-track-label="Send"
+                    class="btn btn-primary">{{#t "buttons.reply"}}Reply{{/t}}</button>
+          {{else}}
+            <button type="submit"
+                    data-track-category="Compose Message"
+                    data-track-action="Edit"
+                    data-track-label="Send"
+                    class="btn btn-primary">{{#t "buttons.send_message"}}Send{{/t}}</button>
+          {{/if}}
         </div>
       </td>
     </tr>

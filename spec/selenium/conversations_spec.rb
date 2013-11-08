@@ -50,11 +50,11 @@ describe "conversations" do
     it "should not open the conversation when the gear menu is clicked" do
       create_conversation
       wait_for_ajaximations
-      f('.al-options').should_not be_displayed
+      f('#menu-wrapper .al-options').should be_nil
       driver.execute_script "$('.admin-link-hover-area').addClass('active')"
       f('.admin-links button').click
       wait_for_ajaximations
-      f('.al-options').should be_displayed
+      f('#menu-wrapper .al-options').should be_displayed
       f('.messages').should_not be_displayed
     end
 
@@ -139,13 +139,14 @@ describe "conversations" do
     it "should not display on my own message" do
       # Hover over own message
       driver.execute_script("$('.message.self:first .send_private_message').focus()")
-      f(".message.self .send_private_message").displayed?.should be_false
+      f(".message.self .send_private_message").should_not be_displayed
     end
 
     it "should display on messages from others" do
       # Hover over the message from the other writer to display link
+      # This spec fails locally in isolation and in this context block.
       driver.execute_script("$('.message.other .send_private_message').focus()")
-      f(".message.other .send_private_message").displayed?.should be_true
+      f(".message.other .send_private_message").should be_displayed
     end
 
     it "should start new message to the user" do
@@ -354,6 +355,32 @@ describe "conversations" do
       f('.others').click
       f('#others_popup').should be_displayed
       ff('#others_popup li').count.should == (@conversation_students.count - 2) # - 2 because the first 2 show up in the conversation summary
+    end
+  end
+
+  context "help menu" do
+    it "should switch to new conversations and redirect" do
+      site_admin_logged_in
+      @user.watched_conversations_intro
+      @user.save
+      new_conversation
+      f('#help-btn').click
+      expect_new_page_load { fj('#try-new-conversations-menu-item').click }
+      f('#inbox').should be_nil # #inbox is in the old conversations ui and not the new ui
+      driver.execute_script("$('#help-btn').click()") #selenium.clik() not working in this case...
+      expect_new_page_load {  fj('#switch-to-old-conversations-menu-item').click }
+      f('#inbox').should be_displayed
+    end
+
+    it "should show the intro" do
+      site_admin_logged_in
+      @user.watched_conversations_intro
+      @user.save
+      new_conversation
+      f('#help-btn').click
+      fj('#conversations-intro-menu-item').click
+      wait_for_ajaximations
+      ff('#conversations_intro').last.should be_displayed
     end
   end
 end

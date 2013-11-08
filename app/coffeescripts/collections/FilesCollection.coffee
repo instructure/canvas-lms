@@ -28,7 +28,7 @@ define [
       options.data = _.extend content_types: @parentFolder.contentTypes, options.data || {}
       super options
 
-    parse: (response, xhr) ->
+    parse: (response) ->
       if response
         previewUrl = @parentFolder.previewUrl()
         _.each response, (file) ->
@@ -36,4 +36,4 @@ define [
             previewUrl.replace('{{id}}', file.id.toString())
           else
             file.url
-      super response, xhr
+      super

@@ -45,7 +45,8 @@ class ConversationMessage < ActiveRecord::Base
     Shard.partition_by_shard(conversation_participants, lambda { |cp| cp.conversation_id }) do |shard_participants|
       base_conditions = "(#{shard_participants.map { |cp|
           "(conversation_id=#{cp.conversation_id} AND user_id=#{cp.user_id})" }.join(" OR ")
-        }) AND NOT generated"
+        }) AND NOT generated
+        AND (conversation_message_participants.workflow_state <> 'deleted' OR conversation_message_participants.workflow_state IS NULL)"
       base_conditions << sanitize_sql([" AND author_id = ?", author.id]) if author
 
       # limit it for non-postgres so we can reduce the amount of extra data we
@@ -64,12 +65,11 @@ class ConversationMessage < ActiveRecord::Base
       end
 
       Shackles.activate(:slave) do
-        ret = distinct_on(['conversation_id', 'user_id'],
-          :select => "conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags",
-          :joins => 'JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id',
-          :conditions => base_conditions,
-          :order => 'conversation_id DESC, user_id DESC, created_at DESC'
-        )
+        ret = where(base_conditions).
+          joins('JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id').
+          distinct_on(['conversation_id', 'user_id'],
+            :select => "conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags",
+            :order => 'conversation_id DESC, user_id DESC, created_at DESC')
         map = Hash[ret.map{ |m| [[m.conversation_id, m.user_id.to_i], m]}]
         backmap = Hash[ret.map{ |m| [m.conversation_participant_id.to_i, m]}]
         if author
@@ -95,7 +95,17 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   on_create_send_to_streams do
-    self.recipients unless submission # we still render them w/ the conversation in the stream item, we just don't cause it to jump to the top
+    self.recipients unless skip_broadcasts || submission # we still render them w/ the conversation in the stream item, we just don't cause it to jump to the top
+  end
+
+  def after_participants_created_broadcast
+    conversation_message_participants(true) # reload this association so we get latest data
+    skip_broadcasts = false
+    @re_send_message = true
+    set_broadcast_flags
+    broadcast_notifications
+    queue_create_stream_items
+    generate_user_note!
   end
 
   before_save :infer_values
@@ -132,7 +142,7 @@ class ConversationMessage < ActiveRecord::Base
 
   def delete_from_participants
     conversation.conversation_participants.each do |p|
-      p.remove_messages(self) # ensures cached stuff gets updated, etc.
+      p.delete_messages(self) # ensures cached stuff gets updated, etc.
     end
   end
 
@@ -165,7 +175,9 @@ class ConversationMessage < ActiveRecord::Base
 
   def recipients
     return [] unless conversation
-    self.subscribed_participants.reject{ |u| u.id == self.author_id }
+    subscribed = subscribed_participants.reject{ |u| u.id == self.author_id }
+    participants = conversation_message_participants.map(&:user)
+    subscribed & participants
   end
 
   def new_recipients
@@ -204,6 +216,7 @@ class ConversationMessage < ActiveRecord::Base
 
   attr_accessor :generate_user_note
   def generate_user_note!
+    return if skip_broadcasts
     return unless @generate_user_note
     return unless recipients.size == 1
     recipient = recipients.first
@@ -228,7 +241,9 @@ class ConversationMessage < ActiveRecord::Base
 
   def reply_from(opts)
     raise IncomingMail::IncomingMessageProcessor::UnknownAddressError if self.context.try(:root_account).try(:deleted?)
-    conversation.reply_from(opts.merge(:root_account_id => self.root_account_id))
+    # If this is from conversations 2, only reply to the author.
+    recipients = conversation.context ? [author] : nil
+    conversation.reply_from(opts.merge(:root_account_id => self.root_account_id, :only_users => recipients))
   end
 
   def forwarded_messages

@@ -174,9 +174,15 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
     submissions.each_with_index do |submission, i|
       update_progress(i, submissions.size)
       row = []
-      row << submission.user.name unless anonymous?
-      row << submission.user_id unless anonymous?
-      row << submission.user.sis_pseudonym_for(quiz.context.account).try(:sis_user_id) unless anonymous?
+      if submission.user
+        row << submission.user.name unless anonymous?
+        row << submission.user_id unless anonymous?
+        row << submission.user.sis_pseudonym_for(quiz.context.account).try(:sis_user_id) unless anonymous?
+      else
+        3.times do
+          row << ''
+        end
+      end
       section_name = []
       section_id = []
       section_sis_id = []
@@ -282,7 +288,7 @@ class QuizStatistics::StudentAnalysis < QuizStatistics::Report
         [qs.latest_submitted_version].compact
     }.flatten.
       select{ |s| s && s.completed? && s.submission_data.is_a?(Array) }.
-      sort { |a,b| b.updated_at <=> a.updated_at }
+      sort_by(&:updated_at).reverse
   end
 
   def strip_html_answers(question)

@@ -52,7 +52,7 @@ module Canvas::Oauth
       @access_token
     end
 
-    def to_json
+    def as_json(options={})
       {
         'access_token' => access_token.full_token,
         'user' => user.as_json(:only => [:id, :name], :include_root => false),

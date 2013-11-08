@@ -26,7 +26,11 @@ define [
             section: 'MWF'
           }
         ])])
-      roles =  [{label: 'Teacher', name: 'TeacherEnrollment', manageable_by_user: true}, {label: 'Student', name: 'StudentEnrollment', manageable_by_user: true}, {label: 'Fake', name: 'Fake', manageable_by_user: false}]
+      roles = [
+        {label: 'Teacher', name: 'TeacherEnrollment', manageable_by_user: true},
+        {label: 'Student', name: 'StudentEnrollment', manageable_by_user: true},
+        {label: 'Fake', name: 'Fake', manageable_by_user: false}
+      ]
       view = new CreateUsersView
         trigger: false
         title: 'test'

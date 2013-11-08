@@ -154,10 +154,20 @@ class DiscussionTopicsController < ApplicationController
   #
   # Returns the paginated list of discussion topics for this course or group.
   #
-  # @argument order_by Determines the order of the discussion topic list. May be one of "position", or "recent_activity". Defaults to "position".
-  # @argument scope [Optional, "locked"|"unlocked"] Only return discussion topics in the given state. Defaults to including locked and unlocked topics. Filtering is done after pagination, so pages may be smaller than requested if topics are filtered
-  # @argument only_announcements [Optional] Boolean, return announcements instead of discussion topics. Defaults to false
-  # @argument search_term (optional) The partial title of the discussion topics to match and return.
+  # @argument order_by [String, "position"|"recent_activity"]
+  #   Determines the order of the discussion topic list. Defaults to "position".
+  #
+  # @argument scope [Optional, String, "locked"|"unlocked"|"pinned"|"unpinned"]
+  #   Only return discussion topics in the given state(s). Defaults to including
+  #   all topics. Filtering is done after pagination, so pages
+  #   may be smaller than requested if topics are filtered.
+  #   Can pass multiple states as comma separated string.
+  #
+  # @argument only_announcements [Optional, Boolean]
+  #   Return announcements instead of discussion topics. Defaults to false
+  #
+  # @argument search_term [Optional, String]
+  #   The partial title of the discussion topics to match and return.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
@@ -178,9 +188,27 @@ class DiscussionTopicsController < ApplicationController
 
     scope = DiscussionTopic.search_by_attribute(scope, :title, params[:search_term])
 
+    states = params[:scope].split(',').map{|s| s.strip} if params[:scope]
+    if states.present?
+      if (states.include?('pinned') && states.include?('unpinned')) ||
+          (states.include?('locked') && states.include?('unlocked'))
+        render json: {errors: {scope: "scope is contradictory"}}, :status => :bad_request
+        return
+      end
+
+      if states.include?('pinned')
+        scope = scope.where(:pinned => true)
+      elsif states.include?('unpinned')
+        scope = scope.where("discussion_topics.pinned IS NOT TRUE")
+      end
+    end
+
     @topics = Api.paginate(scope, self, topic_pagination_url)
-    @topics.reject! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'unlocked'
-    @topics.select! { |t| t.locked? || t.locked_for?(@current_user) } if params[:scope] == 'locked'
+
+    if states.present?
+      @topics.reject! { |t| t.locked? || t.locked_for?(@current_user) } if states.include?('unlocked')
+      @topics.select! { |t| t.locked? || t.locked_for?(@current_user) } if states.include?('locked')
+    end
     @topics.each { |topic| topic.current_user = @current_user }
 
     respond_to do |format|
@@ -346,6 +374,12 @@ class DiscussionTopicsController < ApplicationController
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?
             }
+            if @sequence_asset
+              env_hash[:SEQUENCE] = {
+                :ASSET_ID => @sequence_asset.id,
+                :COURSE_ID => @sequence_asset.context.id,
+              }
+            end
             if @topic.for_assignment? &&
                @topic.assignment.grants_right?(@current_user, session, :grade) && @presenter.allows_speed_grader?
               env_hash[:SPEEDGRADER_URL_TEMPLATE] = named_context_url(@topic.assignment.context,
@@ -369,25 +403,51 @@ class DiscussionTopicsController < ApplicationController
   #
   # Create an new discussion topic for the course or group.
   #
-  # @argument title
-  # @argument message
-  # @argument discussion_type
+  # @argument title [String]
+  # @argument message [String]
+  # @argument discussion_type [String]
   #
-  # @argument published [optional] [boolean] whether this topic is published (true) or draft state (false). Only teachers and TAs have the ability to create draft state topics.
+  # @argument published [Optional, Boolean]
+  #   Whether this topic is published (true) or draft state (false). Only
+  #   teachers and TAs have the ability to create draft state topics.
   #
-  # @argument delayed_post_at If a timestamp is given, the topic will not be published until that time.
-  # @argument lock_at If a timestamp is given, the topic will be scheduled to lock at the provided timestamp. If the timestamp is in the past, the topic will be locked.
+  # @argument delayed_post_at [Optional, DateTime]
+  #   If a timestamp is given, the topic will not be published until that time.
   #
-  # @argument podcast_enabled If true, the topic will have an associated podcast feed.
-  # @argument podcast_has_student_posts If true, the podcast will include posts from students as well. Implies podcast_enabled.
+  # @argument lock_at [Optional, DateTime]
+  #   If a timestamp is given, the topic will be scheduled to lock at the
+  #   provided timestamp. If the timestamp is in the past, the topic will be
+  #   locked.
   #
-  # @argument require_initial_post If true then a user may not respond to other replies until that user has made an initial reply. Defaults to false.
+  # @argument podcast_enabled [Boolean]
+  #   If true, the topic will have an associated podcast feed.
   #
-  # @argument assignment To create an assignment discussion, pass the assignment parameters as a sub-object. See the {api:AssignmentsApiController#create Create an Assignment API} for the available parameters. The name parameter will be ignored, as it's taken from the discussion title. If you want to make a discussion that was an assignment NOT an assignment, pass set_assignment = false as part of the assignment object
+  # @argument podcast_has_student_posts [Boolean]
+  #   If true, the podcast will include posts from students as well. Implies
+  #   podcast_enabled.
   #
-  # @argument is_announcement If true, this topic is an announcement. It will appear in the announcements section rather than the discussions section. This requires announcment-posting permissions.
+  # @argument require_initial_post [Boolean]
+  #   If true then a user may not respond to other replies until that user has
+  #   made an initial reply. Defaults to false.
   #
-  # @argument position_after By default, discussions are sorted chronologically by creation date, you can pass the id of another topic to have this one show up after the other when they are listed.
+  # @argument assignment [Assignment]
+  #   To create an assignment discussion, pass the assignment parameters as a
+  #   sub-object. See the {api:AssignmentsApiController#create Create an Assignment API}
+  #   for the available parameters. The name parameter will be ignored, as it's
+  #   taken from the discussion title. If you want to make a discussion that was
+  #   an assignment NOT an assignment, pass set_assignment = false as part of
+  #   the assignment object
+  #
+  # @argument is_announcement [Boolean]
+  #   If true, this topic is an announcement. It will appear in the
+  #   announcement's section rather than the discussions section. This requires
+  #   announcment-posting permissions.
+  #
+  # @argument position_after [String]
+  #   By default, discussions are sorted chronologically by creation date, you
+  #   can pass the id of another topic to have this one show up after the other
+  #   when they are listed.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
   #         -F title='my topic' \ 
@@ -437,7 +497,7 @@ class DiscussionTopicsController < ApplicationController
           flash[:notice] = t :topic_deleted_notice, "%{topic_title} deleted successfully", :topic_title => @topic.title
           redirect_to named_context_url(@context, :context_discussion_topics_url)
         }
-        format.json  { render :json => @topic.to_json(:include => {:user => {:only => :name} } ), :status => :ok }
+        format.json  { render :json => @topic.as_json(:include => {:user => {:only => :name} } ), :status => :ok }
       end
     end
   end
@@ -523,7 +583,7 @@ class DiscussionTopicsController < ApplicationController
 
       render :json => discussion_topic_api_json(@topic, @context, @current_user, session)
     else
-      render :json => @topic.errors.to_json, :status => :bad_request
+      render :json => @topic.errors, :status => :bad_request
     end
   end
 
@@ -617,7 +677,12 @@ class DiscussionTopicsController < ApplicationController
                 quota_exceeded(named_context_url(@context, :context_discussion_topics_url))
 
       if (params.has_key?(:remove_attachment) || attachment) && @topic.attachment
-        @topic.attachment.destroy!
+        @topic.transaction do
+          att = @topic.attachment
+          @topic.attachment = nil
+          @topic.save! if !@topic.new_record?
+          att.destroy
+        end
       end
 
       if attachment

@@ -44,7 +44,17 @@ module Canvas
               :base=>nil
       }.with_indifferent_access
     end
-    
+
+
+    # custom serialization, since the meta can containt procs
+    def _dump(depth)
+      self.id.to_s
+    end
+
+    def self._load(str)
+      find(str)
+    end
+
     def default_settings
       settings = @meta[:settings]
       settings = settings.call if settings.respond_to?(:call)
@@ -56,13 +66,11 @@ module Canvas
     end
     
     def settings
-      # TODO: once we have distributed memcache we can
-      # cache this properly across all web servers
       saved_settings
     end
 
     def enabled?
-      ps = PluginSetting.find_by_name(self.id.to_s)
+      ps = PluginSetting.cached_plugin_setting(self.id)
       return false unless ps
       ps.valid_settings? && ps.enabled?
     end
@@ -131,7 +139,7 @@ module Canvas
         if validator_module && validator_module.respond_to?(:validate)
           res = validator_module.validate(settings, plugin_setting)
           if res.is_a?(Hash)
-            plugin_setting.settings = (self.default_settings || {}).with_indifferent_access.merge(res || {})
+            plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(res || {})
           else
             false
           end
@@ -140,7 +148,7 @@ module Canvas
           false
         end
       else
-        plugin_setting.settings = (self.default_settings || {}).with_indifferent_access.merge(settings || {})
+        plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(settings || {})
       end
     end
 
@@ -152,11 +160,11 @@ module Canvas
     end
     
     def self.all
-      @registered_plugins.values.sort{|p,p2| p.name <=> p2.name}
+      @registered_plugins.values.sort_by(&:name)
     end
 
     def self.all_for_tag(tag)
-      @registered_plugins.values.select{|p|p.tag == tag.to_s}.sort{|p,p2| p.name <=> p2.name}
+      @registered_plugins.values.select{|p|p.tag == tag.to_s}.sort_by(&:name)
     end
 
     def self.find(id)

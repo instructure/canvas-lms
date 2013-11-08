@@ -5,7 +5,7 @@ namespace :i18n do
   def infer_scope(filename)
     case filename
       when /app\/views\/.*\.handlebars\z/
-        filename.gsub(/.*app\/views\/jst\/_?|\.handlebars\z/, '').underscore.gsub(/\/_?/, '.')
+        filename.gsub(/.*app\/views\/jst\/_?|\.handlebars\z/, '').gsub(/plugins\/([^\/]*)\//, '').underscore.gsub(/\/_?/, '.')
       when /app\/controllers\//
         scope = filename.gsub(/.*app\/controllers\/|controller.rb/, '').gsub(/\/_?|_\z/, '.')
         scope == 'application.' ? '' : scope
@@ -85,7 +85,7 @@ namespace :i18n do
     rb_extractor = I18nExtraction::RubyExtractor.new(:translations => @translations)
     process_files(files) do |file|
       source = File.read(file)
-      source = Erubis::Eruby.new(source).src if file =~ /\.erb\z/
+      source = RailsXss::Erubis.new(source).src if file =~ /\.erb\z/
 
       # add a magic comment since that's the best way to convince RubyParser
       # 3.x it should treat the source as utf-8 (it ignores the source string encoding)
@@ -99,8 +99,8 @@ namespace :i18n do
 
 
     # JavaScript
-    files = (Dir.glob('./public/javascripts/**/*.js') + Dir.glob('./app/views/**/*.erb')).
-      reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18nObj.js|i18n.js|jst\/|translations\/|compiled\/handlebars_helpers.js|tinymce\/jscripts\/tiny_mce(.*\/langs|\/tiny_mce\w*\.js))/ }
+    files = (Dir.glob('./public/javascripts/{,**/*/**/}*.js') + Dir.glob('./app/views/**/*.erb')).
+      reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18nObj.js|i18n.js|.*jst\/|translations\/|compiled\/handlebars_helpers.js|tinymce\/jscripts\/tiny_mce(.*\/langs|\/tiny_mce\w*\.js))/ }
     files &= only if only
     js_extractor = I18nExtraction::JsExtractor.new(:translations => @translations)
     process_files(files) do |file|
@@ -113,7 +113,7 @@ namespace :i18n do
 
 
     # Handlebars
-    files = Dir.glob('./app/views/jst/**/*.handlebars')
+    files = Dir.glob('./app/views/jst/{,**/*/**/}*.handlebars')
     files &= only if only
     handlebars_extractor = I18nExtraction::HandlebarsExtractor.new(:translations => @translations)
     process_files(files) do |file|
@@ -207,19 +207,19 @@ namespace :i18n do
     end
 
     # JavaScript
-    files = Dir.glob('./public/javascripts/**/*.js').
-      reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18nObj.js|i18n.js|jst\/|translations\/|compiled\/handlebars_helpers.js|tinymce\/jscripts\/tiny_mce(.*\/langs|\/tiny_mce\w*\.js))/ }
+    files = Dir.glob('./public/javascripts/{,**/*/**/}*.js').
+      reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18nObj.js|i18n.js|.*jst\/|translations\/|compiled\/handlebars_helpers.js|tinymce\/jscripts\/tiny_mce(.*\/langs|\/tiny_mce\w*\.js))/ }
     js_extractor = I18nExtraction::JsExtractor.new
     process_files.call(js_extractor, files, lambda{ |file| [{:filename => file}] } )
 
     # Handlebars
-    files = Dir.glob('./app/views/jst/**/*.handlebars')
+    files = Dir.glob('./app/views/jst/{,**/*/**/}*.handlebars')
     handlebars_extractor = I18nExtraction::HandlebarsExtractor.new
     process_files.call(handlebars_extractor, files, lambda{ |file| [infer_scope(file)] } )
 
     dump_translations = lambda do |translation_name, translations|
       file = "public/javascripts/translations/#{translation_name}.js"
-      content = I18n::Utils.dump_js(translations)
+      content = I18n::Utils.dump_js(translations, locales)
       if !File.exist?(file) || File.read(file) != content
         File.open(file, "w"){ |f| f.write content }
       end
@@ -237,6 +237,59 @@ namespace :i18n do
     }
     dump_translations.call('_core_en', {'en' => core_translations.delete('en')})
     dump_translations.call('_core', core_translations)
+  end
+
+  desc 'Generate the pseudo-translation file lolz'
+  task :generate_lolz => [:generate, :environment] do
+    strings_processed = 0
+    process_lolz = Proc.new do |val|
+      if val.is_a?(Hash)
+        processed = strings_processed
+
+        hash = Hash.new
+        val.keys.each { |key| hash[key] = process_lolz.call(val[key]) }
+
+        print '.' if strings_processed > processed
+        hash
+      elsif val.is_a?(Array)
+        val.each.map { |v| process_lolz.call(v) }
+      elsif val.is_a?(String)
+        strings_processed += 1
+        I18n.let_there_be_lols(val)
+      else
+        val
+      end
+    end
+
+    t = Time.now
+    translations = YAML.safe_load(open('config/locales/generated/en.yml'))
+
+    I18n.send :extend, I18n::Lolcalize
+    lolz_translations = Hash.new
+    lolz_translations['lolz'] = process_lolz.call(translations['en'])
+    puts
+
+    require 'ya2yaml'
+    File.open('config/locales/lolz.yml', 'w') do |f|
+      f.write(lolz_translations.ya2yaml(:syck_compatible => true))
+    end
+    print "\nFinished generating LOLZ from #{strings_processed} strings in #{Time.now - t} seconds\n"
+
+    # add lolz to the locales.yml file
+    locales = YAML.safe_load(open('config/locales/locales.yml'))
+    if locales['lolz'].nil?
+      locales['lolz'] = {
+        'locales' => {
+          'lolz' => 'LOLZ (crowd-sourced)'
+        },
+        'crowdsourced' => true
+      }
+
+      File.open('config/locales/locales.yml', 'w') do |f|
+        f.write(locales.ya2yaml(:syck_compatible => true))
+      end
+      print "Added LOLZ to locales\n"
+    end
   end
 
   desc "Exports new/changed English strings to be translated"
@@ -446,9 +499,10 @@ namespace :i18n do
     userpass = "#{user}:#{password}"
     for lang in languages
       puts "Downloading tmp/#{lang}.yml"
-      json = `curl --user #{userpass} #{translation_url}/#{lang}/`
+      json = `curl --user #{userpass} #{translation_url}/#{lang.sub('-', '_')}/`
+      parsed = YAML.load(JSON.parse(json)['content'])
       File.open("tmp/#{lang}.yml", "w") do |file|
-        file.write JSON.parse(json)['content']
+        file.write({ lang => parsed[lang.sub('-', '_')] }.to_yaml)
       end
     end
   end

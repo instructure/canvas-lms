@@ -40,10 +40,47 @@ describe DueDateCacher do
       DueDateCacher.recompute(@assignment)
     end
 
-    it "should queue a delayed job on an assignment-specific singleton strand in production" do
+    it "should queue a delayed job on a context-specific strand in production" do
       @instance.expects(:send_later_if_production_enqueue_args).
-        with(:recompute, :singleton => "cached_due_date:calculator:#{@assignment.global_id}")
+        with(:recompute, :strand => "cached_due_date:calculator:Course:#{@course.global_id}")
       DueDateCacher.recompute(@assignment)
+    end
+  end
+
+  describe ".recompute_course" do
+    before do
+      @assignments = [@assignment]
+      @assignments << assignment_model(:course => @course)
+      @instance = stub('instance', :recompute => nil)
+      @new_expectation = DueDateCacher.expects(:new).returns(@instance)
+    end
+
+    it "should pass along the whole array" do
+      @new_expectation.with(@assignments)
+      DueDateCacher.recompute_course(@course, @assignments)
+    end
+
+    it "should default to all assignments in the context" do
+      @new_expectation.with { |assignment_ids| assignment_ids.sort == @assignments.map(&:id).sort }
+      DueDateCacher.recompute_course(@course)
+    end
+
+    it "should delegate to an instance" do
+      @instance.expects(:recompute)
+      DueDateCacher.recompute_course(@course, @assignments)
+    end
+
+    it "should queue a delayed job on a context-specific strand in production" do
+      @instance.expects(:send_later_if_production_enqueue_args).
+          with(:recompute, :strand => "cached_due_date:calculator:Course:#{@course.global_id}")
+      DueDateCacher.recompute_course(@course, @assignments)
+    end
+
+    it "should operate on a course id" do
+      @instance.expects(:send_later_if_production_enqueue_args).
+          with(:recompute, :strand => "cached_due_date:calculator:Course:#{@course.global_id}")
+      @new_expectation.with { |assignment_ids| assignment_ids.sort == @assignments.map(&:id).sort }
+      DueDateCacher.recompute_course(@course.id)
     end
   end
 
