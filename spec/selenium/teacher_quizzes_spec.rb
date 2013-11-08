@@ -412,7 +412,6 @@ describe "quizzes" do
         wait_for_ajaximations
 
         driver.find_element(:link, 'Quizzes').click
-        debugger
         wait_for_ajaximations
 
         driver.switch_to.alert.accept
