@@ -520,7 +520,7 @@ describe "API Authentication", type: :request do
       assert_status(401)
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       json = JSON.parse(response.body)
-      json['message'].should == "Invalid access token."
+      json['errors'].first['message'].should == "Invalid access token."
     end
 
     it "should error if no access token is given and authorization is required" do
@@ -528,7 +528,7 @@ describe "API Authentication", type: :request do
       assert_status(401)
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       json = json_parse
-      json["errors"]["message"].should == "user authorization required"
+      json["errors"].first["message"].should == "user authorization required"
     end
 
     it "should be able to log out" do

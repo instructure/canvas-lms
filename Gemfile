@@ -58,6 +58,11 @@ else
   gem 'authlogic', '3.2.0'
 end
 
+if CANVAS_RAILS2
+  gem 'instructure-active_model-better_errors', '1.6.5.rails2.2', :require => 'active_model/better_errors'
+else
+  gem 'active_model-better_errors', '1.6.7', :require => 'active_model/better_errors'
+end
 gem "aws-sdk", '1.21.0'
   gem 'uuidtools', '2.1.4'
 gem 'barby', '0.5.0'

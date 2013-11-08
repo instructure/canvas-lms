@@ -25,9 +25,9 @@ describe "API Error Handling", type: :request do
   end
 
   describe "ActiveRecord Error JSON override" do
-    it "should not return the base object in ActiveRecord::Error.to_json" do
-      err = ActiveRecord::Error.new(@user, :name, :invalid, :message => 'invalid name')
-      JSON.parse(err.to_json).should == { 'attribute' => 'name', 'type' => 'invalid', 'message' => 'invalid name' }
+    it "should not return the base object in ErrorMessage.to_json" do
+      err = ActiveModel::BetterErrors::ErrorMessage.new(@user, :name, :invalid, "invalid name")
+      JSON.parse(err.to_json).should == { 'attribute' => 'name', 'type' => 'invalid', 'message' => 'invalid name', 'options' => {} }
     end
 
     it "should not return the base object in ActiveRecord::Errors.to_json" do
@@ -44,7 +44,7 @@ describe "API Error Handling", type: :request do
   it "should respond not_found for 404 errors" do
     get "/api/v1/courses/54321", nil, { 'Authorization' => "Bearer #{@token.full_token}" }
     response.response_code.should == 404
-    JSON.parse(response.body).should == { 'status' => 'not_found', 'message' => 'The specified resource does not exist.' }
+    JSON.parse(response.body).should == { 'errors' => [{'message' => 'The specified resource does not exist.'}] }
   end
 end
 

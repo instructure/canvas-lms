@@ -1076,7 +1076,7 @@ describe EnrollmentsApiController, type: :request do
 
           response.code.should eql '401'
           JSON.parse(response.body).should == {
-            'errors' => { 'message' => 'user not authorized to perform that action' },
+            'errors' => [{ 'message' => 'user not authorized to perform that action' }],
             'status'  => 'unauthorized'
           }
         end

@@ -666,7 +666,7 @@ class DiscussionTopicsController < ApplicationController
       else
         errors = @topic.errors.as_json[:errors]
         errors.merge!(@topic.root_topic.errors.as_json[:errors]) if @topic.root_topic
-        errors['published'] = errors.delete('workflow_state') if errors.has_key?('workflow_state')
+        errors['published'] = errors.delete(:workflow_state) if errors.has_key?(:workflow_state)
         render :json => {errors: errors}, :status => :bad_request
       end
     end

@@ -679,7 +679,7 @@ class AssignmentsApiController < ApplicationController
       render :json => assignment_json(@assignment, @current_user, session), :status => 201
     else
       errors = @assignment.errors.as_json[:errors]
-      errors['published'] = errors.delete('workflow_state') if errors.has_key?('workflow_state')
+      errors['published'] = errors.delete(:workflow_state) if errors.has_key?(:workflow_state)
       render :json => {errors: errors}, status: :bad_request
     end
   end

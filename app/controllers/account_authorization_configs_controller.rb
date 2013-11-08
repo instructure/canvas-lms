@@ -359,23 +359,13 @@ class AccountAuthorizationConfigsController < ApplicationController
     if params[:account_authorization_config] && params[:account_authorization_config].has_key?("0")
       if params.has_key?(:auth_type) || (params[:account_authorization_config] && params[:account_authorization_config].has_key?(:auth_type))
         # it has deprecated configs, and non-deprecated
-        render :json => {:message => t('deprecated_fail', "Can't use both deprecated and current version of create at the same time.")}, :status => 400
+        api_raise(:deprecated_request_syntax)
       else
         update_all
       end
-    elsif params.has_key?(:auth_type) || (params[:account_authorization_config] && params[:account_authorization_config].has_key?(:auth_type))
+    else
       aac_data = params.has_key?(:account_authorization_config) ? params[:account_authorization_config] : params
       data = filter_data(aac_data)
-
-      if @account.account_authorization_config
-        if @account.account_authorization_config.auth_type != data[:auth_type]
-          render :json => {:message => t('no_auth_mixing', 'Can not mix authentication types')}, :status => 400
-          return
-        elsif @account.account_authorization_config.auth_type == 'cas'
-          render :json => {:message => t('only_one_cas', "Can not create multiple CAS configurations")}, :status => 400
-          return
-        end
-      end
 
       position = data.delete :position
       account_config = @account.account_authorization_configs.create!(data)
@@ -386,8 +376,6 @@ class AccountAuthorizationConfigsController < ApplicationController
       end
 
       render :json => aac_json(account_config)
-    else
-      render :json => {:message => t('no_config_sent', "Must specify auth_type")}, :status => 400
     end
   end
 
@@ -462,20 +450,16 @@ class AccountAuthorizationConfigsController < ApplicationController
       data = filter_data(data)
       next if data.empty?
 
-      result = if id.to_i == 0
+      if id.to_i == 0
         account_config = @account.account_authorization_configs.build(data)
-        account_config.save
+        account_config.save!
       else
         account_config = @account.account_authorization_configs.find(id)
         account_configs_to_delete.delete(account_config)
-        account_config.update_attributes(data)
+        account_config.update_attributes!(data)
       end
 
-      if result
-        account_configs << account_config
-      else
-        return render :json => account_config.errors
-      end
+      account_configs << account_config
     end
 
     account_configs_to_delete.map(&:destroy)
@@ -555,7 +539,7 @@ class AccountAuthorizationConfigsController < ApplicationController
         :account_authorization_config_id => config.id,
         :ldap_connection_test => config.test_ldap_connection
       }
-      results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
+      results << h.merge({:errors => config.errors.map {|attr,err| {attr => err.message}}})
     end
     render :json => results
   end
@@ -567,7 +551,7 @@ class AccountAuthorizationConfigsController < ApplicationController
         :account_authorization_config_id => config.id,
         :ldap_bind_test => config.test_ldap_bind
       }
-      results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
+      results << h.merge({:errors => config.errors.map {|attr,err| {attr => err.message}}})
     end
     render :json => results
   end
@@ -580,7 +564,7 @@ class AccountAuthorizationConfigsController < ApplicationController
         :account_authorization_config_id => config.id,
         :ldap_search_test => res
       }
-      results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
+      results << h.merge({:errors => config.errors.map {|attr,err| {attr => err.message}}})
     end
     render :json => results
   end

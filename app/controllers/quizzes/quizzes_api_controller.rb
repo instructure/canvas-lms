@@ -422,7 +422,7 @@ class Quizzes::QuizzesApiController < ApplicationController
         render_json
       else
         errors = @quiz.errors.as_json[:errors]
-        errors['published'] = errors.delete('workflow_state') if errors.has_key?('workflow_state')
+        errors['published'] = errors.delete(:workflow_state) if errors.has_key?(:workflow_state)
         render :json => {:errors => errors}, :status => 400
       end
     end

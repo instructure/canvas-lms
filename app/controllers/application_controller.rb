@@ -950,23 +950,30 @@ class ApplicationController < ActionController::Base
   end
 
   def api_error_json(exception, status_code)
-    if status_code.is_a?(Symbol)
-      status_code_string = status_code.to_s
-    else
-      # we want to return a status string of the form "not_found", so take the rails-style "Not Found" and tweak it
-      status_code_string = interpret_status(status_code).sub(/\d\d\d /, '').gsub(' ', '').underscore
-    end
-
-    data = { :status => status_code_string }
-    # inject exception-specific data into the response
     case exception
-      when ActiveRecord::RecordNotFound
-        data[:message] = 'The specified resource does not exist.'
-      when AuthenticationMethods::AccessTokenError
-        add_www_authenticate_header
-        data[:message] = 'Invalid access token.'
+    when ActiveRecord::RecordInvalid
+      errors = exception.record.errors
+      errors.set_reporter(:hash, Api::Errors::Reporter)
+      data = errors.to_hash
+    when Api::Error
+      errors = ActiveModel::BetterErrors::Errors.new(nil)
+      errors.error_collection.add(:base, exception.error_id, message: exception.message)
+      errors.set_reporter(:hash, Api::Errors::Reporter)
+      data = errors.to_hash
+    when ActiveRecord::RecordNotFound
+      data = { errors: [{message: 'The specified resource does not exist.'}] }
+    when AuthenticationMethods::AccessTokenError
+      add_www_authenticate_header
+      data = { errors: [{message: 'Invalid access token.'}] }
+    else
+      if status_code.is_a?(Symbol)
+        status_code_string = status_code.to_s
+      else
+        # we want to return a status string of the form "not_found", so take the rails-style "Not Found" and tweak it
+        status_code_string = interpret_status(status_code).sub(/\d\d\d /, '').gsub(' ', '').underscore
+      end
+      data = { errors: [{message: "An error occurred.", error_code: status_code_string}] }
     end
-    data[:message] ||= "An error occurred."
     data
   end
 
