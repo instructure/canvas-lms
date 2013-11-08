@@ -227,14 +227,13 @@ describe "Standard Common Cartridge importing" do
     
     it "should point to new attachment from module" do
       @course.context_modules.count.should == 3
-      
+
       mod1 = @course.context_modules.find_by_migration_id("I_00000")
       mod1.content_tags.active.count.should == (Qti.qti_enabled? ? 5 : 4)
       mod1.name.should == "Your Mom, Research, & You"
       tag = mod1.content_tags.active[0]
       tag.content_type.should == 'Attachment'
       tag.content_id.should == @course.attachments.active.find_by_migration_id("I_00001_R").id
-      puts mod1.content_tags.active.count
     end
   end
 

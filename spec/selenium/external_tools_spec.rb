@@ -561,7 +561,7 @@ describe "external tools" do
 
         Delayed::Job.last.invoke_job
         a = Attachment.last
-        keep_trying_until { puts a.file_state; a.file_state == 'available' }
+        keep_trying_until { a.file_state == 'available' }
         keep_trying_until { !f("#submit_assignment").displayed? }
         submission = @assignment.find_or_create_submission(@user)
         submission.submission_type.should == 'online_upload'

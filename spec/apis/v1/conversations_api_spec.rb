@@ -861,7 +861,6 @@ describe ConversationsController, :type => :integration do
                 { :controller => 'conversations', :action => 'create', :format => 'json' },
                 { :recipients => [@bob.id, @joe.id], :body => "test",
                   :group_conversation => "true", :bulk_message => "true" })
-        puts json.inspect
         json.size.should eql 2
       end
 
