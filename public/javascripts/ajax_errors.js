@@ -47,7 +47,7 @@ define([
     params.url = params.url || location.href;
     params.platform = params.platform || navigator.platform;
     params.action = params.action || location.href;
-    params.user_name = username;
+    params.user_name = encodeURIComponent(username);
     params.user_agent = navigator.userAgent;
     params.parentPage = window.location;
     for(var idx in params) {
