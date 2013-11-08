@@ -550,6 +550,12 @@ TEXT
     <% end %>
   </div>
 </div>
+
+<h3><%= t(:feature_options, 'Feature options') %></h3>
+<div class="feature-flag-wrapper">
+  <!-- this is populated by FeatureFlagAdminView -->
+</div>
+
 <div id="profile_pic_dialog" style="display: none;">
   <a href="<%= profile_pics_url %>" class="profile_pics_url" style="display: none;">&nbsp;</a>
   <%= t(:profile_pictures, "Select the image you'd like to use as your profile pic, or upload a new image:") %>

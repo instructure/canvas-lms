@@ -32,6 +32,9 @@
     <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
       <li id="alerts_tab"><a href="#tab-alerts" id="tab-alerts-link"><%= t('tabs.alerts', %{Alerts}) %></a></li>
     <% end %>
+    <% if can_do @context, @current_user, :manage_feature_flags %>
+      <li id="feature_flags_tab"><a href="#tab-features" id="tab-features-link"><%= t('tabs.feature_options', %{Feature options}) %></a></li>
+    <% end %>
   </ul>
   <div id="tab-details">
     <h2><%= t('headings.details', %{Course Details}) %></h2>
@@ -475,6 +478,10 @@ Unpublished content may not be available if Draft State is disabled.
       <h2><%= t(:alerts_title, "Alerts") %></h2>
       <%= render :partial => 'alerts/alerts' %>
     </div>
+  <% end %>
+
+  <% if can_do @context, @current_user, :manage_feature_flags %>
+    <div id="tab-features"></div>
   <% end %>
 </div><!-- end course details tab -->
 

@@ -9,7 +9,8 @@
       'id' => @context.id,
       'default_storage_quota_mb' => @context.default_storage_quota_mb,
       'default_user_storage_quota_mb' => @context.default_user_storage_quota_mb,
-      'default_group_storage_quota_mb' => @context.default_group_storage_quota_mb
+      'default_group_storage_quota_mb' => @context.default_group_storage_quota_mb,
+      'site_admin' => @account.site_admin?
     }
   end
 %>
@@ -54,6 +55,9 @@
     <% end %>
     <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
       <li><a href="#tab-alerts" id="tab-alerts-link"><%= t(:tab_alerts, "Alerts") %></a></li>
+    <% end %>
+    <% if can_do(@context, @current_user, :manage_feature_flags) %>
+      <li><a href="#tab-features" id="tab-features-link"><%= t(:feature_options, "Feature options") %></a></li>
     <% end %>
   </ul>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
@@ -831,5 +835,8 @@ Allowing Draft State here will allow teachers to enable it in their individual c
         <h2><%= t(:alerts_title, "Alerts") %></h2>
         <%= render :partial => 'alerts/alerts' %>
       </div>
+  <% end %>
+  <% if can_do(@context, @current_user, :manage_feature_flags) %>
+    <div id="tab-features"></div>
   <% end %>
 </div>
