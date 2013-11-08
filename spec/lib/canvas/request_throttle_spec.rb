@@ -107,13 +107,17 @@ describe 'Canvas::RequestThrottle' do
     end
 
     it "should skip without redis enabled" do
-      Canvas.stubs(:redis_enabled?).returns(false)
-      Redis::Scripting::Module.any_instance.expects(:run).never
+      if Canvas.redis_enabled?
+        Canvas.stubs(:redis_enabled?).returns(false)
+        Redis::Scripting::Module.any_instance.expects(:run).never
+      end
       throttler.call(request_user_1).should == response
     end
 
     it "should skip if no client_identifier found" do
-      Redis::Scripting::Module.any_instance.expects(:run).never
+      if Canvas.redis_enabled?
+        Redis::Scripting::Module.any_instance.expects(:run).never
+      end
       throttler.call(request_no_session).should == response
     end
 
