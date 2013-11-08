@@ -270,7 +270,7 @@ class FilesController < ApplicationController
         # submission.
         @submission = Submission.find(params[:submission_id]) if params[:submission_id]
         # verify that the requested attachment belongs to the submission
-        return render_unauthorized_action(@attachment) if @submission && !@submission.attachments.where(:id => params[:id]).any?
+        return render_unauthorized_action if @submission && !@submission.attachments.where(:id => params[:id]).any?
         if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
           render :json  => { :public_url => @attachment.authenticated_s3_url(:secure => request.ssl?) }
         end

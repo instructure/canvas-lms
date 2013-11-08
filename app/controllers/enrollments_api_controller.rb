@@ -242,7 +242,7 @@ class EnrollmentsApiController < ApplicationController
 
     params[:enrollment][:no_notify] = true unless value_to_boolean(params[:enrollment][:notify])
     unless @current_user.can_create_enrollment_for?(@context, session, type)
-      render_unauthorized_action(@context) && return
+      render_unauthorized_action && return
     end
     params[:enrollment][:course_section_id] = @section.id if @section.present?
     if params[:enrollment][:course_section_id].present?
@@ -286,7 +286,7 @@ class EnrollmentsApiController < ApplicationController
     task = %w{conclude delete}.include?(params[:task]) ? params[:task] : 'conclude'
 
     unless @enrollment.send("can_be_#{task}d_by", @current_user, @context, session)
-      return render_unauthorized_action(@context)
+      return render_unauthorized_action
     end
 
     task = 'destroy' if task == 'delete'
@@ -339,7 +339,7 @@ class EnrollmentsApiController < ApplicationController
 
       # if there aren't any ids in approved_accounts, then the user doesn't have
       # permissions.
-      render_unauthorized_action(@user) and return false if approved_accounts.empty?
+      render_unauthorized_action and return false if approved_accounts.empty?
 
       enrollments = user.enrollments.where(enrollment_index_conditions).
         where(root_account_id: approved_accounts)

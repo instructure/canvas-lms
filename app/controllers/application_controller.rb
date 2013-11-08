@@ -277,7 +277,7 @@ class ApplicationController < ActionController::Base
   # end
   def authorized_action(object, *opts)
     can_do = is_authorized_action?(object, *opts)
-    render_unauthorized_action(object) unless can_do
+    render_unauthorized_action unless can_do
     can_do
   end
 
@@ -302,9 +302,7 @@ class ApplicationController < ActionController::Base
     can_do
   end
 
-  def render_unauthorized_action(object=nil)
-    object ||= User.new
-    object.errors.add_to_base(t "#application.errors.unauthorized.generic", "You are not authorized to perform this action")
+  def render_unauthorized_action
     respond_to do |format|
       @show_left_side = false
       clear_crumbs
@@ -1479,7 +1477,7 @@ class ApplicationController < ActionController::Base
   def reject_student_view_student
     return unless @current_user && @current_user.fake_student?
     @unauthorized_message ||= t('#application.errors.student_view_unauthorized', "You cannot access this functionality in student view.")
-    render_unauthorized_action(@current_user)
+    render_unauthorized_action
   end
 
   def set_site_admin_context

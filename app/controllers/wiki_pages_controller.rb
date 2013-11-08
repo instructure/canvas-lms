@@ -69,7 +69,7 @@ class WikiPagesController < ApplicationController
         format.json {render :json => @page }
       end
     else
-      render_unauthorized_action(@page)
+      render_unauthorized_action
     end
   end
 

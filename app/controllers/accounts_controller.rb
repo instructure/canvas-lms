@@ -399,7 +399,7 @@ class AccountsController < ApplicationController
   # = Restoring Content
   def admin_tools
     if !@account.can_see_admin_tools_tab?(@current_user)
-      return render_unauthorized_action(@account)
+      return render_unauthorized_action
     end
 
     js_env :ACCOUNT_ID => @account.id

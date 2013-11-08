@@ -374,7 +374,7 @@ class AssignmentsApiController < ApplicationController
 
       if @context.draft_state_enabled? && !@assignment.grants_right?(@current_user, session, :read)
         # user should not see unpublished assignments
-        render_unauthorized_action @assignment
+        render_unauthorized_action
         return
       end
 
