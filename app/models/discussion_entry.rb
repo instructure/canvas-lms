@@ -116,7 +116,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   def validate_depth
     if !self.depth || self.depth > self.class.max_depth
-      errors.add_to_base("Maximum entry depth reached")
+      errors.add(:base, "Maximum entry depth reached")
     end
   end
 

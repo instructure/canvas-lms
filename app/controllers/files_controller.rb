@@ -712,17 +712,17 @@ class FilesController < ApplicationController
         end
         if params[:attachment][:uploaded_data]
           success = @attachment.update_attributes(params[:attachment])
-          @attachment.errors.add_to_base(t('errors.server_error', "Upload failed, server error, please try again.")) unless success
+          @attachment.errors.add(:base, t('errors.server_error', "Upload failed, server error, please try again.")) unless success
         else
-          @attachment.errors.add_to_base(t('errors.missing_field', "Upload failed, expected form field missing"))
+          @attachment.errors.add(:base, t('errors.missing_field', "Upload failed, expected form field missing"))
         end
         deleted_attachments = @attachment.handle_duplicates(duplicate_handling)
         unless @attachment.downloadable?
           success = false
           if (params[:attachment][:uploaded_data].size == 0 rescue false)
-            @attachment.errors.add_to_base(t('errors.empty_file', "That file is empty.  Please upload a different file."))
+            @attachment.errors.add(:base, t('errors.empty_file', "That file is empty.  Please upload a different file."))
           else
-            @attachment.errors.add_to_base(t('errors.upload_failed', "Upload failed, please try again."))
+            @attachment.errors.add(:base, t('errors.upload_failed', "Upload failed, please try again."))
           end
           unless @attachment.new_record?
             @attachment.destroy rescue @attachment.delete
