@@ -2175,6 +2175,15 @@ describe Assignment do
           s["id"]
         }.sort.should == turnitin_submissions.map(&:id).sort
       end
+
+      it 'prefers people with submissions' do
+        g1, _ = @groups
+        @assignment.grade_student(g1.users.first, score: 10)
+        g1rep = g1.users.shuffle.first
+        s = @assignment.submission_for_student(g1rep)
+        s.update_attribute :submission_type, 'online_upload'
+        @assignment.representatives(@teacher).should include g1rep
+      end
     end
 
     it "works for quizzes without quiz_submissions" do
