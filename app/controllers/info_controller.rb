@@ -75,7 +75,7 @@ class InfoController < ApplicationController
 
   def record_js_error
     error = params[:error]
-    error[:user_name] = URI.unescape((error[:user_name]))
+    error[:user_name] = URI.unescape(error[:user_name])
     error[:backtrace] = error[:url]
     ErrorReport.log_error('javascript', error)
     # Render a 0x0 gif
