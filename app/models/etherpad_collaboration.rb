@@ -35,7 +35,7 @@ class EtherpadCollaboration < Collaboration
   # /ep/pad/view/PAD_ID/latest  read-only view (still reveals pad id)
 
   def initialize_document
-    self.url = "http://#{EtherpadCollaboration.config[:domain]}/i-#{self.uuid}"
+    self.url ||= "http://#{EtherpadCollaboration.config[:domain]}/i-#{self.uuid}"
   end
 
   def user_can_access_document_type?(user)
