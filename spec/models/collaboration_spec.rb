@@ -98,4 +98,13 @@ describe Collaboration do
       @collaboration.collaborators.reload.map(&:user_id).should_not include @users.last.id
     end
   end
+
+  describe EtherpadCollaboration do
+    it "should not re-initialize the url" do
+      collab = EtherpadCollaboration.new
+      collab.url = "http://example.com/legacy-uri"
+      collab.initialize_document
+      collab.url.should == "http://example.com/legacy-uri"
+    end
+  end
 end
