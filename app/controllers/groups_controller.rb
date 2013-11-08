@@ -229,6 +229,8 @@ class GroupsController < ApplicationController
             js_env group_categories: @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) },
                    group_user_type: @group_user_type,
                    allow_self_signup: @allow_self_signup
+            # since there are generally lots of users in an account, always do large roster view
+            @js_env[:IS_LARGE_ROSTER] ||= @context.is_a?(Account)
           end
           render :action => 'context_manage_groups'
         else
