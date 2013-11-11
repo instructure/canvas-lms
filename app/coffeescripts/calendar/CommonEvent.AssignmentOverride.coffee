@@ -57,6 +57,9 @@ define [
       time_string = "#{$.dateString(date)} at #{$.timeString(date)}"
       "Due: <time datetime='#{date.toISOString()}'>#{time_string}</time>"
 
+    readableType: () ->
+      @readableTypes[@assignmentType()]
+
     updateAssignmentTitle: (title) ->
       @assignment.title = title
       titleContext = @title.match(/\(.+\)$/)[0]

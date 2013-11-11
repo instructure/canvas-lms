@@ -11,6 +11,7 @@
                 <li class="agenda-event" data-event-id="{{id}}">
                   <div class="ig-row" tabindex="0" role="button">
                     <span class="ig-title group_{{contextCode}}">
+                      <span class="screenreader-only">{{readableType}},</span>
                       {{#if assignment}}
                         <i class="icon-{{assignmentType}}"></i>
                       {{else}}
@@ -18,13 +19,14 @@
                       {{/if}}
                       {{#truncate title 60}}{{/truncate}}
                     </span>
-
+                    <span class="screenreader-only">,{{contextInfo.name}},</span>
                     <div class="ig-details">
                       {{#if assignment}}
-                        <b>{{#t "due"}}due{{/t}}</b>
+                        <b>{{#t "due"}}due{{/t}}</b><span class="screenreader-only">,</span>
                         {{strftime start "%l:%M%P"}}
                       {{else}}
                         {{#unless all_day}}
+                          <span class="screenreader-only">{{#t "starts_at"}}Starts at{{/t}},</span>
                           {{strftime start "%l:%M%P"}}
                         {{/unless}}
                       {{/if}}
