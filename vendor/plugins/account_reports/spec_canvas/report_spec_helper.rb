@@ -25,6 +25,49 @@ module ReportSpecHelper
     end
   end
 
+  def read_report(type = @type, options = {})
+    account_report = run_report(type, options)
+    parse_report(account_report, options)
+  end
+
+  def run_report(type = @type, options = {})
+    account = options[:account] || @account
+    parameters = options[:params] || {}
+    account_report = AccountReport.new(:user => @admin || user,
+                                       :account => account,
+                                       :report_type => type)
+    account_report.parameters = {}
+    account_report.parameters = parameters
+    account_report.save
+    Canvas::AccountReports.for_account(account)[type][:proc].call(account_report)
+    account_report
+  end
+
+  def parse_report(report, options = {})
+    a = report.attachment
+    if a.content_type == 'application/zip'
+      parsed = {}
+      Zip::ZipInputStream::open(a.open) do |io|
+        while (entry = io.get_next_entry)
+          parsed[entry.name] = parse_csv(io.read, options)
+        end
+      end
+    else
+      parsed = parse_csv(a.open,options)
+    end
+    parsed
+  end
+
+  def parse_csv(csv, options = {})
+    col_sep = options[:col_sep] || ','
+    order = Array(options[:order]).presence || [0, 1]
+    all_parsed = CSV.parse(csv, {:col_sep => col_sep}).to_a
+    header = all_parsed[0]
+    all_parsed = all_parsed[1..-1].sort_by { |r| r.values_at(*order).join }
+    all_parsed.unshift(header) if options[:header]
+    all_parsed
+  end
+
   def report(type = @type, options = {})
     account = options[:account] || @account
     parameters = options[:params] || {}
@@ -34,28 +77,8 @@ module ReportSpecHelper
     account_report.parameters = {}
     account_report.parameters = parameters
     account_report.save
-    csv_report = Canvas::AccountReports.for_account(account)[type][:proc].call(account_report)
-    csv_report = account_report.attachment.open unless csv_report.is_a? Hash
-    parse_report(csv_report, options)
-  end
-
-  def parse_report(csv_report, options)
-    order = Array(options[:order]) || [0, 1]
-    if csv_report.is_a? Hash
-      csv_report.inject({}) do |result, (key, csv)|
-        all_parsed = CSV.parse(csv).to_a
-        header = all_parsed[0]
-        all_parsed = all_parsed[1..-1].sort_by { |r| r.values_at(*order).join }
-        all_parsed.unshift(header) if options[:header]
-        result[key] = all_parsed
-        result
-      end
-    else
-      all_parsed = CSV.parse(csv_report).to_a
-      header = all_parsed[0]
-      all_parsed = all_parsed[1..-1].sort_by { |r| r.values_at(*order).join }
-      all_parsed.unshift(header) if options[:header]
-    end
+    Canvas::AccountReports.for_account(account)[type][:proc].call(account_report)
+    parse_report(account_report, options)
   end
 
   def self.run_report(account, report_type, parameters = {}, sort_column_or_columns = [0, 1], headers = false, col_sep = ',')
