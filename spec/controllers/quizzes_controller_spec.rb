@@ -488,7 +488,11 @@ describe QuizzesController do
       q1.position.should eql(1)
       q2.position.should eql(2)
       q3.position.should eql(3)
-      post 'reorder', :course_id => @course.id, :quiz_id => @quiz.id, :order => "question_#{q3.id},question_#{q1.id},question_#{q2.id}"
+
+      order = [{"type" => "question", "id" => q3.id},
+               {"type" => "question", "id" => q1.id},
+               {"type" => "question", "id" => q2.id}]
+      post 'reorder', :course_id => @course.id, :quiz_id => @quiz.id, :order => order
       assigns[:quiz].should eql(@quiz)
       q1.reload
       q2.reload
@@ -509,7 +513,11 @@ describe QuizzesController do
       q1.position.should eql(1)
       q2.position.should eql(2)
       g3.position.should eql(3)
-      post 'reorder', :course_id => @course.id, :quiz_id => @quiz.id, :order => "group_#{g3.id},question_#{q1.id},question_#{q2.id}"
+
+      order = [{"type" => "group",    "id" => g3.id},
+               {"type" => "question", "id" => q1.id},
+               {"type" => "question", "id" => q2.id}]
+      post 'reorder', :course_id => @course.id, :quiz_id => @quiz.id, :order => order
       assigns[:quiz].should eql(@quiz)
       q1.reload
       q2.reload

@@ -135,6 +135,20 @@ class QuizQuestion < ActiveRecord::Base
     res.with_indifferent_access
   end
 
+  # All questions will be assigned to the given quiz_group, and will be
+  # assigned as part of the root quiz if no group is given
+  def self.update_all_positions!(questions, quiz_group=nil)
+    return unless questions.size > 0
+
+    group_id = quiz_group ? quiz_group.id : 'NULL'
+    updates  = questions.map do |q|
+      "WHEN id=#{q.id.to_i} THEN #{q.position.to_i}"
+    end
+
+    set = "quiz_group_id=#{group_id}, position=CASE #{updates.join(" ")} ELSE id END"
+    where(:id => questions).update_all(set)
+  end
+
   def self.import_from_migration(hash, context, quiz=nil, quiz_group=nil)
     unless hash[:prepped_for_import]
       AssessmentQuestion.prep_for_import(hash, context)

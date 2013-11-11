@@ -489,35 +489,9 @@ class QuizzesController < ApplicationController
 
   def reorder
     if authorized_action(@quiz, @current_user, :update)
-      items = []
-      groups = @quiz.quiz_groups
-      questions = @quiz.quiz_questions.active
-      order = params[:order].split(",")
-      order.each_index do |idx|
-        name = order[idx]
-        obj = nil
-        id = name.gsub(/\A(question|group)_/, "").to_i
-        obj = questions.detect{|q| q.id == id.to_i} if id != 0 && name.match(/\Aquestion/)
-        obj.quiz_group_id = nil if obj.respond_to?("quiz_group_id=")
-        obj = groups.detect{|g| g.id == id.to_i} if id != 0 && name.match(/\Agroup/)
-        items << obj if obj
-      end
-      root_questions = @quiz.quiz_questions.active.where("quiz_group_id IS NULL").all
-      items += root_questions
-      items.uniq!
-      question_updates = []
-      group_updates = []
-      items.each_with_index do |item, idx|
-        if item.is_a?(QuizQuestion)
-          question_updates << "WHEN id=#{item.id} THEN #{idx + 1}"
-        else
-          group_updates << "WHEN id=#{item.id} THEN #{idx + 1}"
-        end
-      end
-      QuizQuestion.where(:id => items.select{|i| i.is_a?(QuizQuestion)}).update_all("quiz_group_id=NULL,position=CASE #{question_updates.join(" ")} ELSE NULL END") unless question_updates.empty?
-      QuizGroup.where(:id => items.select{|i| i.is_a?(QuizGroup)}).update_all("position=CASE #{group_updates.join(" ")} ELSE NULL END") unless group_updates.empty?
-      Quiz.mark_quiz_edited(@quiz.id)
-      render :json => {:reorder => true}
+      QuizSortables.new(:quiz => @quiz, :order => params[:order]).reorder!
+
+      head :no_content
     end
   end
 

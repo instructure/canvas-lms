@@ -1209,6 +1209,10 @@ class Quiz < ActiveRecord::Base
     where(:id =>id).update_all(:last_edited_at => Time.now.utc)
   end
 
+  def mark_edited!
+    self.class.mark_quiz_edited(self.id)
+  end
+
   def anonymous_survey?
     survey? && anonymous_submissions
   end

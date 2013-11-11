@@ -324,9 +324,11 @@ routes.draw do
       match 'statistics' => 'quizzes#statistics', :as => :statistics
       match 'read_only' => 'quizzes#read_only', :as => :read_only
       match 'filters' => 'quizzes#filters', :as => :filters
+
       collection do
         get :fabulous_quizzes
       end
+
       resources :quiz_submissions, :path => :submissions do
         collection do
           put :backup
@@ -340,7 +342,9 @@ routes.draw do
       match 'extensions/:user_id' => 'quiz_submissions#extensions', :as => :extensions, :via => :post
       resources :quiz_questions, :path => :questions, :only => ["create", "update", "destroy", "show"]
       resources :quiz_groups, :path => :groups, :only => ["create", "update", "destroy"] do
-        match 'reorder' => 'quiz_groups#reorder', :as => :reorder
+        member do
+          post :reorder
+        end
       end
 
       match 'take' => 'quizzes#show', :as => :take, :take => '1'
@@ -1299,6 +1303,7 @@ routes.draw do
       post "courses/:course_id/quizzes/:quiz_id/groups", :action => :create, :path_name => 'course_quiz_group_create'
       put "courses/:course_id/quizzes/:quiz_id/groups/:id", :action => :update, :path_name => 'course_quiz_group_update'
       delete "courses/:course_id/quizzes/:quiz_id/groups/:id", :action => :destroy, :path_name => 'course_quiz_group_destroy'
+      post "courses/:course_id/quizzes/:quiz_id/groups/:id/reorder", :action => :reorder, :path_name => 'course_quiz_group_reorder'
     end
 
     scope(:controller => :quiz_reports) do

@@ -36,6 +36,18 @@ describe Quiz do
     end
   end
 
+  describe "#mark_edited!" do
+    it "should mark a quiz as having unpublished changes" do
+      quiz = @course.quizzes.create! :title => "hello"
+      quiz.published_at = Time.now
+      quiz.publish!
+      quiz.unpublished_changes?.should be_false
+
+      quiz.mark_edited!
+      quiz.reload.unpublished_changes?.should be_true
+    end
+  end
+
   describe "#publish!" do
     it "sets the workflow state to available and save!s the quiz" do
       quiz = Quiz.new(:title => "hello")

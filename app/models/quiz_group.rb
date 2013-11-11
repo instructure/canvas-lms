@@ -19,34 +19,30 @@
 class QuizGroup < ActiveRecord::Base
   attr_accessible :name, :pick_count, :question_points, :assessment_question_bank_id
   attr_readonly :quiz_id
+
   belongs_to :quiz
   belongs_to :assessment_question_bank
   has_many :quiz_questions, :dependent => :destroy
-  before_save :infer_position
+
   validates_presence_of :quiz_id
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
-  before_destroy :update_quiz
+
+  before_save :infer_position
   after_save :update_quiz
-  
-  def infer_position
-    if !self.position && self.quiz
-      self.position = self.quiz.root_entries_max_position + 1
-    end
-  end
-  protected :infer_position
-  
+  before_destroy :update_quiz
+
   def actual_pick_count
-    if self.assessment_question_bank
+    count = if self.assessment_question_bank
       # don't do a valid question check because we don't want to instantiate all the bank's questions
-      count = self.assessment_question_bank.assessment_question_count
+      self.assessment_question_bank.assessment_question_count
     else
-      count = self.quiz_questions.active.count
+      self.quiz_questions.active.count
     end
-    
+
     [self.pick_count.to_i, count].min
   end
 
-  # QuizGroup.data is used when creating and editing a quiz, but 
+  # QuizGroup.data is used when creating and editing a quiz, but
   # once the quiz is "saved" then the "rendered" version of the
   # quiz is stored in Quiz.quiz_data.  Hence, the teacher can
   # be futzing with questions and groups and not affect
@@ -61,7 +57,17 @@ class QuizGroup < ActiveRecord::Base
       "assessment_question_bank_id" => self.assessment_question_bank_id
     }.with_indifferent_access
   end
-  
+
+  def self.update_all_positions!(groups)
+    return unless groups.size > 0
+
+    updates = groups.map do |group|
+      "WHEN id=#{group.id.to_i} THEN #{group.position.to_i}"
+    end
+    set = "position=CASE #{updates.join(" ")} ELSE NULL END"
+    where(:id => groups).update_all(set)
+  end
+
   def self.import_from_migration(hash, context, quiz, question_data, position = nil, migration = nil)
     hash = hash.with_indifferent_access
     item ||= QuizGroup.find_by_quiz_id_and_migration_id(quiz.id, hash[:migration_id].nil? ? nil : hash[:migration_id].to_s)
@@ -122,11 +128,19 @@ class QuizGroup < ActiveRecord::Base
         QuizQuestion.import_from_migration(aq, context, quiz, item)
       end
     end
-    
+
     item
   end
 
+  private
+
   def update_quiz
     Quiz.mark_quiz_edited(self.quiz_id)
+  end
+
+  def infer_position
+    if !self.position && self.quiz
+      self.position = self.quiz.root_entries_max_position + 1
+    end
   end
 end

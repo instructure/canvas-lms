@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe QuizQuestion do
-  
+
   it "should deserialize its json data" do
     answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
     qd = {'name' => 'test question', 'question_type' => 'multiple_choice_question', 'answers' => answers}
@@ -67,6 +67,62 @@ describe QuizQuestion do
       question_regrade = QuizQuestionRegrade.first
       question_regrade.should be
       question_regrade.regrade_option.should == 'full_credit'
+    end
+  end
+
+  describe ".update_all_positions" do
+    def question_positions(object)
+      object.quiz_questions.active.sort_by{|q| q.position }.map {|q| q.id }
+    end
+
+    before do
+      course
+      @quiz = @course.quizzes.create!(:title => "some quiz")
+      @question1 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 1', 'answers' => [{'id' => 1}, {'id' => 2}]})
+      @question2 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
+      @question3 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 3', 'answers' => [{'id' => 5}, {'id' => 6}]})
+    end
+
+    it "should noop if list of items is empty" do
+      group = @quiz.quiz_groups.create(:name => "question group")
+      group.quiz_questions = [@question1, @question2, @question3]
+      before = question_positions(group)
+
+      QuizQuestion.update_all_positions!([], group)
+      before.should == question_positions(group)
+    end
+
+    it "should update positions for quiz questions within a group" do
+      group = @quiz.quiz_groups.create(:name => "question group")
+      group.quiz_questions = [@question1, @question2, @question3]
+
+      @question3.position = 1
+      @question1.position = 2
+      @question2.position = 3
+
+      QuizQuestion.update_all_positions!([@question3, @question1, @question2], group)
+      question_positions(group).should == [@question3.id, @question1.id, @question2.id]
+    end
+
+    it "should update positions for quiz questions outside a group" do
+      group = @quiz.quiz_groups.create(:name => "question group")
+      group.quiz_questions = [@question1, @question2]
+
+      @question3.position = 1
+      @question1.position = 2
+      @question2.position = 3
+
+      QuizQuestion.update_all_positions!([@question3, @question1, @question2], group)
+      question_positions(group).should == [@question3.id, @question1.id, @question2.id]
+    end
+
+    it "should update positions for quiz without a group" do
+      @question3.position = 1
+      @question1.position = 2
+      @question2.position = 3
+
+      QuizQuestion.update_all_positions!([@question3, @question1, @question2])
+      question_positions(@quiz).should == [@question3.id, @question1.id, @question2.id]
     end
   end
 

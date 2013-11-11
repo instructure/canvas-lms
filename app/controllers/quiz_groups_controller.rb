@@ -40,9 +40,8 @@
 #         },
 #         "name": {
 #           "description": "The name of the question group.",
-#           "example": 2,
-#           "type": "integer",
-#           "format": "int64"
+#           "example": "Fraction questions",
+#           "type": "string"
 #         },
 #         "pick_count": {
 #           "description": "The number of questions to pick from the group to display to the student.",
@@ -166,35 +165,24 @@ class QuizGroupsController < ApplicationController
     end
   end
 
+  # @API Reorder question groups
+  # @beta
+  #
+  # Change the order of the quiz questions within the group
+  #
+  # @argument order[][id] [Required, Integer]
+  #   The associated item's unique identifier
+  #
+  # @argument order[][type] ["question"]
+  #   The type of item is always 'question' for a group
+  #
+  # <b>204 No Content<b> response code is returned if the reorder was successful.
   def reorder
     if authorized_action(@quiz, @current_user, :update)
-      @group = @quiz.quiz_groups.find(params[:quiz_group_id])
-      items = []
-      group_questions = @group.quiz_questions.active
-      questions = @quiz.quiz_questions.active
-      order = params[:order].split(",")
-      order.each do |name|
-        id = name.gsub(/\Aquestion_/, "").to_i
-        obj = questions.detect{|q| q.id == id.to_i }
-        obj.quiz_group_id = @group.id
-        if obj
-          items << obj
-          obj.position = items.length
-        end
-      end
-      group_questions.each do |q|
-        if !items.include? q
-          items << q
-          q.position = items.length
-        end
-      end
-      updates = []
-      items.each_with_index do |item, idx|
-        updates << "WHEN id=#{item.id} THEN #{idx + 1}"
-      end
-      QuizQuestion.where(:id => items).update_all("quiz_group_id=#{@group.id}, position=CASE #{updates.join(" ")} ELSE id END")
-      Quiz.mark_quiz_edited(@quiz.id)
-      render :json => {:reorder => true}
+      @group = @quiz.quiz_groups.find(params[:id])
+      QuizSortables.new(:group => @group, :order => params[:order]).reorder!
+
+      head :no_content
     end
   end
 

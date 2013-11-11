@@ -116,11 +116,35 @@ describe QuizGroupsController, :type => :integration do
     end
 
     it "deletes a quiz group" do
-      api_call(:delete, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{@group.id}",
-              {:controller=>"quiz_groups", :action => "destroy", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}"}, 
-              {}, {'Accept' => 'application/vnd.api+json'})
+      raw_api_call(:delete, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{@group.id}",
+                  {:controller=>"quiz_groups", :action => "destroy", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}"},
+                  {}, {'Accept' => 'application/vnd.api+json'})
       Group.exists?(@group.id).should be_false
     end
   end
 
+  describe "POST /courses/:course_id/quizzes/:quiz_id/groups/:id/reorder" do
+    before do
+      teacher_in_course(:active_all => true)
+      @quiz  = @course.quizzes.create! :title => 'title'
+      @question1 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 1', 'answers' => [{'id' => 1}, {'id' => 2}], :position => 1})
+      @question2 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}], :position => 2})
+      @question3 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 3', 'answers' => [{'id' => 5}, {'id' => 6}], :position => 3})
+
+      @group = @quiz.quiz_groups.create :name => 'Test Group'
+      @group.quiz_questions = [@question1, @question2, @question3]
+    end
+
+    it "reorders a quiz group's questions" do
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{@group.id}/reorder",
+                  {:controller=>"quiz_groups", :action => "reorder", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}"},
+                  {:order => [{"type" => "question", "id" => @question3.id},
+                              {"type" => "question", "id" => @question1.id},
+                              {"type" => "question", "id" => @question2.id}] },
+                  {'Accept' => 'application/vnd.api+json'})
+
+      order = @group.reload.quiz_questions.active.sort_by{|q| q.position }.map {|q| q.id }
+      order.should == [@question3.id, @question1.id, @question2.id]
+    end
+  end
 end

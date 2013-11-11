@@ -58,7 +58,7 @@
   </div>
   <div style="display: none;">
     <a href="<%= context_url(@context, :context_quiz_quiz_group_url, @quiz.id, hash_get(group, :id, "{{ id }}")) %>" class="update_group_url">&nbsp;</a>
-    <a href="<%= context_url(@context, :context_quiz_quiz_group_reorder_url, @quiz.id, hash_get(group, :id, "{{ id }}")) %>" class="reorder_group_questions_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :reorder_context_quiz_quiz_group_url, @quiz.id, hash_get(group, :id, "{{ id }}")) %>" class="reorder_group_questions_url">&nbsp;</a>
   </div>
   <% end %>
 </div>

@@ -2863,25 +2863,25 @@ define([
         }
         $container.loadingImage();
         var list = [];
-        var for_question_bank = $("#questions.question_bank").length > 0;
+
         $.each(items, function(i, $obj) {
-          if (for_question_bank) {
-            var id = $obj.find(".assessment_question_id").text();
-            list.push(id);
-          } else if($obj.hasClass('question_holder')) {
+          var object;
+          if ($obj.hasClass('question_holder')) {
             var $question = $obj.find('.question');
             var attrID = $question.attr('id');
             var id = attrID ? attrID.substring(9) : $question.find(".id").text();
-            list.push('question_' + id);
+            object = {'type': 'question', 'id': id};
+
           } else {
-            var id = 'group_' + $obj.attr('id').substring(10);
-            list.push(id);
+            var id = $obj.attr('id').substring(10);
+            object = {'type': 'group', 'id': id};
           }
+          list.push(object)
         });
-        var data = { order: list.join(",") };
-        $.ajaxJSON(url, 'POST', data, function(data) {
+
+        $.ajaxJSON(url, 'POST', JSON.stringify({order: list}), function(data) {
           $container.loadingImage('remove');
-        });
+        }, {}, {contentType: "application/json"});
       }
     });
 
