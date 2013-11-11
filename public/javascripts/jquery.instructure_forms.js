@@ -1006,13 +1006,19 @@ define([
                           "<img src='/images/error_bottom.png' class='error_bottom'/>" +
                         "</div>").appendTo("body");
       }
-      var $box = $template.clone(true).attr('id', '').css('zIndex', $obj.zIndex() + 1).appendTo("body");
-      $box.find(".error_text").html(message);
       // it'd be more semantic to make the error_box have a role=alert but that doesn't work everywhere
       // http://blog.paciellogroup.com/2012/06/html5-accessibility-chops-aria-rolealert-browser-support/
       // we also have to add aria_alerts to the layout itself, since creating
       // it dynamically means VoiceOver won't read it
-      $('#aria_alerts').append($('<div/>').html(message));
+
+      // if there is no container for ARIA alerts, add the role to the template, so it at least works for some users.
+      if ($('#aria_alerts').length === 0) {
+        $template.find(".error_text").attr('role', 'alert');
+      } else {
+        $('#aria_alerts').append($('<div/>').html(message));
+      }
+      var $box = $template.clone(true).attr('id', '').css('zIndex', $obj.zIndex() + 1).appendTo("body");
+      $box.find(".error_text").html(message);
 
       var offset = $obj.offset();
       var height = $box.outerHeight();
