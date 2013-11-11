@@ -72,6 +72,9 @@ gem 'nokogiri', '1.5.6'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.9', :require => 'oauth'
 gem 'rack', CANVAS_RAILS2 ? '1.1.3' : '1.4.5'
+if CANVAS_RAILS2
+  gem 'rails_xss', '0.5.1'
+end
 gem 'rake', '10.1.0'
 gem 'rdoc', '3.12'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
