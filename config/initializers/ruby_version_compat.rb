@@ -1,5 +1,8 @@
 # ruby 1.9 compatibility fixes for Rails 2.3
 
+# TODO RAILS3: are those not already wrapped in a CANVAS_RAILS2 branch still
+# needed
+
 if RUBY_VERSION < '2.0'
   # see https://bugs.ruby-lang.org/issues/7547
   # the fix was only applied in 2.0
@@ -33,39 +36,38 @@ if RUBY_VERSION < '2.0'
   end
 end
 
-# See http://developer.uservoice.com/entries/how-to-upgrade-a-rails-2.3.14-app-to-ruby-1.9.3/
-# TZInfo needs to be patched.  In particular, you'll need to re-implement the datetime_new! method:
-require 'tzinfo'
+if CANVAS_RAILS2
+  # See http://developer.uservoice.com/entries/how-to-upgrade-a-rails-2.3.14-app-to-ruby-1.9.3/
+  # TZInfo needs to be patched.  In particular, you'll need to re-implement the datetime_new! method:
+  require 'tzinfo'
 
-module TZInfo
-  # Methods to support different versions of Ruby.
-  module RubyCoreSupport #:nodoc:
-    HALF_DAYS_IN_DAY = rational_new!(1, 2)
+  module TZInfo
+    # Methods to support different versions of Ruby.
+    module RubyCoreSupport #:nodoc:
+      HALF_DAYS_IN_DAY = rational_new!(1, 2)
 
-    # Rails 2.3 defines datetime_new! in terms of methods that don't exist in
-    # Ruby 1.9.3, so we have to redefine it here
-    def self.datetime_new!(ajd = 0, of = 0, sg = Date::ITALY)
-      # Convert from an Astronomical Julian Day number to a civil Julian Day number.
-      jd = ajd + of + HALF_DAYS_IN_DAY
+      # Rails 2.3 defines datetime_new! in terms of methods that don't exist in
+      # Ruby 1.9.3, so we have to redefine it here
+      def self.datetime_new!(ajd = 0, of = 0, sg = Date::ITALY)
+        # Convert from an Astronomical Julian Day number to a civil Julian Day number.
+        jd = ajd + of + HALF_DAYS_IN_DAY
 
-      # Ruby trunk revision 31862 changed the behaviour of DateTime.jd so that it will no
-      # longer accept a fractional civil Julian Day number if further arguments are specified.
-      # Calculate the hours, minutes and seconds to pass to jd.
+        # Ruby trunk revision 31862 changed the behaviour of DateTime.jd so that it will no
+        # longer accept a fractional civil Julian Day number if further arguments are specified.
+        # Calculate the hours, minutes and seconds to pass to jd.
 
-      jd_i = jd.to_i
-      jd_i -= 1 if jd < 0
-      hours = (jd - jd_i) * 24
-      hours_i = hours.to_i
-      minutes = (hours - hours_i) * 60
-      minutes_i = minutes.to_i
-      seconds = (minutes - minutes_i) * 60
+        jd_i = jd.to_i
+        jd_i -= 1 if jd < 0
+        hours = (jd - jd_i) * 24
+        hours_i = hours.to_i
+        minutes = (hours - hours_i) * 60
+        minutes_i = minutes.to_i
+        seconds = (minutes - minutes_i) * 60
 
-      DateTime.jd(jd_i, hours_i, minutes_i, seconds, of, sg)
+        DateTime.jd(jd_i, hours_i, minutes_i, seconds, of, sg)
+      end
     end
   end
-end
-
-if CANVAS_RAILS2
 
   require "active_support/core_ext/string/output_safety"
   class ERB
