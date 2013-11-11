@@ -99,8 +99,8 @@ class Mailer < ActionMailer::Base
     params[:bcc] = m.bcc if m.bcc
 
     mail(params) do |format|
-      format.html{ render text: m.html_body } if m.html_body
       format.text{ render text: m.body }
+      format.html{ render text: m.html_body } if m.html_body
     end
   end
 end
