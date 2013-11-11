@@ -193,10 +193,13 @@ $(document).ready(function() {
     %>
 
     <% if @current_user.preferences[:enable_speedgrader_grade_by_question] %>
-      <i
-        class="icon-question"
-        data-tooltip='{"tooltipClass":"popover", "position":"bottom", "tooltipClass":"center bottom vertical"}'
-        title="<%= fudge_text %>"></i>
+      <span class="non-screenreader" aria-hidden=true>
+        <i
+          class="icon-question"
+          data-tooltip='{"tooltipClass":"popover", "position":"bottom", "tooltipClass":"center bottom vertical"}'
+          title="<%= fudge_text %>"></i>
+      </span>
+      <span class="screenreader-only"><%= fudge_text %></span>
     <% else %>
       <div><small><%= fudge_text %></small></div>
     <% end %>
