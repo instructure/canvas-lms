@@ -951,7 +951,7 @@ class UsersController < ApplicationController
       # unless the user is registered/pre_registered (if the latter, he still
       # needs to confirm his email and set a password, otherwise he can't get
       # back in once his session expires)
-      if @user.registered? || @user.pre_registered? # automagically logged in
+      if !@current_user # automagically logged in
         PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
       else
         @pseudonym.send(:skip_session_maintenance=, true)
