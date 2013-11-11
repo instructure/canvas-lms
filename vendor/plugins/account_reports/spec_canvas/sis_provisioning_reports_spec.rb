@@ -19,6 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/report_spec_helper')
 
 describe "Default Account Reports" do
+  include ReportSpecHelper
 
   def create_some_users_with_pseudonyms()
     @user1 = user_with_pseudonym(:active_all => true,:account => @account,:name => "John St. Clair",
@@ -254,7 +255,7 @@ describe "Default Account Reports" do
         #term does not impact user report
         parameters["include_deleted"] = true
         parameters["users"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
+        parsed = read_report("sis_export_csv",{params: parameters})
         parsed.length.should == 5
 
         parsed[0].should == ["user_sis_id_01","john@stclair.com",nil,"John St.","Clair",
@@ -272,7 +273,7 @@ describe "Default Account Reports" do
       it "should run sis report" do
         parameters = {}
         parameters["users"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
+        parsed = read_report("sis_export_csv",{params: parameters})
         parsed.length.should == 4
 
         parsed[0].should == ["user_sis_id_01","john@stclair.com",nil,"John St.","Clair",
@@ -295,7 +296,7 @@ describe "Default Account Reports" do
 
         parameters = {}
         parameters["users"] = true
-        parsed = ReportSpecHelper.run_report(@sub_account,"sis_export_csv",parameters)
+        parsed = read_report("sis_export_csv",{params: parameters, account: @sub_account})
         parsed.length.should == 1
 
         parsed[0].should == ["user_sis_id_01","john@stclair.com",nil,"John St.","Clair",
@@ -305,7 +306,8 @@ describe "Default Account Reports" do
       it "should run provisioning report" do
         parameters = {}
         parameters["users"] = true
-        parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,[1,2])
+        parsed = read_report("provisioning_csv",{params: parameters, order: [1,2]})
+
         parsed.length.should == 6
 
         parsed[0].should == [@user6.id.to_s,nil,"john@smith.com","John","Smith","john@smith.com",
@@ -328,7 +330,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["users"] = true
         parameters["include_deleted"] = true
-        parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,[1,2])
+        parsed = read_report("provisioning_csv",{params: parameters, order: [1,2]})
         parsed.length.should == 7
 
         parsed[0].should == [@user6.id.to_s,nil,"john@smith.com","John","Smith","john@smith.com",
@@ -357,7 +359,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term"] = @default_term.id
         parameters["accounts"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
+        parsed = read_report("sis_export_csv",{params: parameters})
 
         parsed.length.should == 3
         parsed[0].should == ["sub1",nil,"English","active"]
@@ -368,7 +370,7 @@ describe "Default Account Reports" do
       it "should run the SIS report on a sub account" do
         parameters = {}
         parameters["accounts"] = true
-        parsed = ReportSpecHelper.run_report(@sub_account,"sis_export_csv",parameters)
+        parsed = read_report("sis_export_csv",{params: parameters, account: @sub_account})
 
         parsed.length.should == 1
         parsed[0].should == ["subsub1","sub1","sESL","active"]
@@ -378,7 +380,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["accounts"] = true
         parameters["include_deleted"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
+        parsed = read_report("sis_export_csv",{params: parameters})
 
         parsed.length.should == 4
         parsed[0].should == ["sub1",nil,"English","active"]
@@ -392,7 +394,7 @@ describe "Default Account Reports" do
         parameters["accounts"] = true
         parameters["enrollment_term"] = ''
         parameters["include_deleted"] = true
-        parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,4)
+        parsed = read_report("provisioning_csv",{params: parameters, order: 4})
 
         parsed.length.should == 5
         parsed[0].should == [@sub_account.id.to_s,"sub1",@account.id.to_s,nil,"English","active"]
@@ -415,7 +417,7 @@ describe "Default Account Reports" do
         parameters["enrollment_term"] = @term3.id
         parameters["include_deleted"] = true
         parameters["terms"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
+        parsed = read_report("sis_export_csv",{params: parameters})
 
         parsed.length.should == 2
         parsed[0].should == ["fall12","Fall","active",@term1.start_at.iso8601,
@@ -427,7 +429,7 @@ describe "Default Account Reports" do
       it "should run the provisioning report" do
         parameters = {}
         parameters["terms"] = true
-        parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,2)
+        parsed = read_report("provisioning_csv",{params: parameters, order: 2})
 
         parsed.length.should == 3
         parsed[0].should == [@default_term.id.to_s,nil,"Default Term","active",nil,nil]
@@ -441,7 +443,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["terms"] = true
         parameters["include_deleted"] = true
-        parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,2)
+        parsed = read_report("provisioning_csv",{params: parameters, order: 2})
 
         parsed.length.should == 4
         parsed[0].should == [@default_term.id.to_s,nil,"Default Term","active",nil,nil]
@@ -463,7 +465,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term"] = ''
         parameters["courses"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
+        parsed = read_report("sis_export_csv",{params: parameters})
 
         parsed.length.should == 3
         parsed[0].should == [@course1.sis_source_id,@course1.course_code,@course1.name,
@@ -479,7 +481,7 @@ describe "Default Account Reports" do
         parameters["enrollment_term_id"] = "sis_term_id:fall12"
         parameters["include_deleted"] = true
         parameters["courses"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
+        parsed = read_report("sis_export_csv",{params: parameters})
 
         parsed.length.should == 2
         parsed[0].should == [@course1.sis_source_id,@course1.course_code,@course1.name,
@@ -493,7 +495,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["include_deleted"] = true
         parameters["courses"] = true
-        parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,3)
+        parsed = read_report("provisioning_csv",{params: parameters, order: 3})
 
         parsed[0].should == [@course1.id.to_s,@course1.sis_source_id,@course1.course_code,
                              @course1.name,@sub_account.id.to_s,@sub_account.sis_source_id,
@@ -518,13 +520,13 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["courses"] = true
         # all I care about is that it didn't throw a database error due to ambiguous columns
-        parsed = ReportSpecHelper.run_report(@sub_account,"sis_export_csv",parameters,3)
+        parsed = read_report("sis_export_csv",{params: parameters, account: @sub_account})
       end
 
       it "should run the provisioning report on a sub account" do
         parameters = {}
         parameters["courses"] = true
-        parsed = ReportSpecHelper.run_report(@sub_account,"provisioning_csv",parameters,3)
+        parsed = read_report("provisioning_csv",{params: parameters, account: @sub_account, order: 3})
 
         parsed.length.should == 1
         parsed[0].should == [@course1.id.to_s,@course1.sis_source_id,@course1.course_code,
@@ -537,7 +539,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["courses"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
+        parsed = read_report("sis_export_csv",{params: parameters})
 
         parsed.length.should == 2
         parsed[0].should == ["SIS_COURSE_ID_2","MAT101","Math 101",nil,
@@ -555,7 +557,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["sections"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
+        parsed = read_report("sis_export_csv",{params: parameters})
 
         parsed.length.should == 1
         parsed[0].should == [@section3.sis_source_id,@course2.sis_source_id,@section3.name,
@@ -565,7 +567,7 @@ describe "Default Account Reports" do
       it "should run the sis export report" do
         parameters = {}
         parameters["sections"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
+        parsed = read_report("sis_export_csv",{params: parameters})
 
         parsed.length.should == 3
         parsed[0].should ==[@section1.sis_source_id,@course1.sis_source_id,@section1.name,"active",
@@ -580,7 +582,7 @@ describe "Default Account Reports" do
         @section1.crosslist_to_course(@course2)
         parameters = {}
         parameters["sections"] = true
-        parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,4)
+        parsed = read_report("provisioning_csv",{params: parameters, order: 4})
         parsed.length.should == 4
         parsed[0].should ==[@section1.id.to_s,@section1.sis_source_id,@course1.id.to_s,
                             @course1.sis_source_id,@section1.name,"active",
@@ -601,7 +603,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["sections"] = true
         parameters["include_deleted"] = true
-        parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,4)
+        parsed = read_report("provisioning_csv",{params: parameters, order: 4})
         parsed.length.should == 4
         parsed[0].should ==[@section1.id.to_s,@section1.sis_source_id,@course1.id.to_s,
                             @course1.sis_source_id,@section1.name,"deleted",
@@ -623,7 +625,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["sections"] = true
         parameters["include_deleted"] = true
-        parsed = ReportSpecHelper.run_report(@sub_account,"provisioning_csv",parameters,4)
+        parsed = read_report("provisioning_csv",{params: parameters, account: @sub_account, order: 4})
         parsed.length.should == 2
 
         parsed[0].should ==[@section1.id.to_s,@section1.sis_source_id,@course1.id.to_s,
@@ -644,7 +646,7 @@ describe "Default Account Reports" do
       it "should run the SIS report" do
         parameters = {}
         parameters["enrollments"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters,[1,0])
+        parsed = read_report("sis_export_csv",{params: parameters, order: [1,0]})
         parsed.length.should == 8
 
         parsed[0].should == ["SIS_COURSE_ID_1","user_sis_id_01","observer",nil,"active",nil]
@@ -663,7 +665,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["enrollments"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters,[1,0])
+        parsed = read_report("sis_export_csv",{params: parameters, order: [1,0]})
         parsed.length.should == 4
 
         parsed[0].should == ["SIS_COURSE_ID_2","user_sis_id_01","observer",
@@ -679,7 +681,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollments"] = true
         parameters["include_deleted"] = true
-        parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,[3,1,7])
+        parsed = read_report("provisioning_csv",{params: parameters, order: [3,1,7]})
 
         parsed[0].should == [@course1.id.to_s ,"SIS_COURSE_ID_1",@user6.id.to_s,nil,"teacher",
                              @enrollment10.course_section_id.to_s,nil,"concluded",nil,nil]
@@ -717,7 +719,7 @@ describe "Default Account Reports" do
         parameters["enrollments"] = true
         parameters["include_deleted"] = true
         parameters["enrollment_term_id"] = @term1.id
-        parsed = ReportSpecHelper.run_report(@sub_account,"provisioning_csv",parameters,[3,1,5])
+        parsed = read_report("provisioning_csv",{params: parameters, order: [3,1,7]})
 
         parsed.length.should == 6
 
@@ -746,7 +748,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["groups"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters,2)
+        parsed = read_report("sis_export_csv",{params: parameters, order: 2})
         parsed.length.should == 2
         parsed[0].should == ["group1sis",nil,"group1name","available"]
         parsed[1].should == ["group2sis","sub1","group2name","available"]
@@ -756,7 +758,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["include_deleted"] = true
         parameters["groups"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters,2)
+        parsed = read_report("sis_export_csv",{params: parameters, order: 2})
         parsed.length.should == 3
         parsed[0].should == ["group1sis",nil,"group1name","available"]
         parsed[1].should == ["group2sis","sub1","group2name","available"]
@@ -766,7 +768,7 @@ describe "Default Account Reports" do
       it "should run the provisioning report" do
         parameters = {}
         parameters["groups"] = true
-        parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,4)
+        parsed = read_report("provisioning_csv",{params: parameters, order: 4})
         parsed.length.should == 3
         parsed[0].should == [@group1.id.to_s,"group1sis",@account.id.to_s,
                              nil,"group1name","available"]
@@ -779,7 +781,7 @@ describe "Default Account Reports" do
       it "should run the provisioning report on a sub account" do
         parameters = {}
         parameters["groups"] = true
-        parsed = ReportSpecHelper.run_report(@sub_account,"provisioning_csv",parameters,4)
+        parsed = read_report("provisioning_csv",{params: parameters, account: @sub_account, order: 4})
         parsed.length.should == 2
         parsed[0].should == [@group2.id.to_s,"group2sis",@sub_account.id.to_s,
                              "sub1","group2name","available"]
@@ -797,7 +799,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["group_membership"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
+        parsed = read_report("sis_export_csv",{params: parameters})
         parsed.length.should == 2
         parsed[0].should == [@group1.sis_source_id,"user_sis_id_01","accepted"]
         parsed[1].should == [@group2.sis_source_id,"user_sis_id_02","accepted"]
@@ -807,7 +809,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["group_membership"] = true
         parameters["include_deleted"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
+        parsed = read_report("sis_export_csv",{params: parameters})
         parsed.length.should == 3
         parsed[0].should == [@group1.sis_source_id,"user_sis_id_01","accepted"]
         parsed[1].should == [@group2.sis_source_id,"user_sis_id_02","accepted"]
@@ -817,7 +819,7 @@ describe "Default Account Reports" do
       it "should run the provisioning report" do
         parameters = {}
         parameters["group_membership"] = true
-        parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,[1,3])
+        parsed = read_report("provisioning_csv",{params: parameters, order: [1,3]})
         parsed.length.should == 3
         parsed[0].should == [@group1.id.to_s,@group1.sis_source_id,
                              @user1.id.to_s,"user_sis_id_01","accepted"]
@@ -830,7 +832,7 @@ describe "Default Account Reports" do
       it "should run the provisioning report" do
         parameters = {}
         parameters["group_membership"] = true
-        parsed = ReportSpecHelper.run_report(@sub_account,"provisioning_csv",parameters,[1,3])
+        parsed = read_report("provisioning_csv",{params: parameters, account: @sub_account, order: [1,3]})
         parsed.length.should == 2
         parsed[0].should == [@group2.id.to_s,@group2.sis_source_id,
                              @user2.id.to_s,"user_sis_id_02","accepted"]
@@ -851,9 +853,9 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["xlist"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
-        parsed.length.should == 1
+        parsed = read_report("sis_export_csv",{params: parameters})
         parsed[0].should == ["SIS_COURSE_ID_2","english_section_1","active"]
+        parsed.length.should == 1
       end
 
       it "should run sis report with deleted sections" do
@@ -861,10 +863,10 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["xlist"] = true
         parameters["include_deleted"] = true
-        parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
-        parsed.length.should == 2
+        parsed = read_report("sis_export_csv",{params: parameters})
         parsed[0].should == ["SIS_COURSE_ID_1","english_section_3","deleted"]
         parsed[1].should == ["SIS_COURSE_ID_2","english_section_1","active"]
+        parsed.length.should == 2
       end
 
       it "should run sis report with deleted sections on a sub account" do
@@ -872,32 +874,32 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["xlist"] = true
         parameters["include_deleted"] = true
-        parsed = ReportSpecHelper.run_report(@sub_account,"sis_export_csv",parameters)
-        parsed.length.should == 1
+        parsed = read_report("sis_export_csv",{params: parameters, account: @sub_account})
         parsed[0].should == ["SIS_COURSE_ID_1","english_section_3","deleted"]
+        parsed.length.should == 1
       end
 
       it "should run the provisioning report" do
         parameters = {}
         parameters["xlist"] = true
-        parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,1)
-        parsed.length.should == 2
+        parsed = read_report("provisioning_csv",{params: parameters, order: 1})
         parsed[0].should == [@course1.id.to_s,"SIS_COURSE_ID_1",
                              @section3.id.to_s,"english_section_3","active"]
         parsed[1].should == [@course2.id.to_s,"SIS_COURSE_ID_2",
                              @section1.id.to_s,"english_section_1","active"]
+        parsed.length.should == 2
       end
 
       it "should run the provisioning report with deleted sections" do
         parameters = {}
         parameters["include_deleted"] = true
         parameters["xlist"] = true
-        parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,1)
-        parsed.length.should == 2
+        parsed = read_report("provisioning_csv",{params: parameters, order: 1})
         parsed[0].should == [@course1.id.to_s,"SIS_COURSE_ID_1",
                              @section3.id.to_s,"english_section_3","active"]
         parsed[1].should == [@course2.id.to_s,"SIS_COURSE_ID_2",
                              @section1.id.to_s,"english_section_1","active"]
+        parsed.length.should == 2
       end
     end
 
@@ -910,14 +912,14 @@ describe "Default Account Reports" do
       parameters["accounts"] = true
       parameters["users"] = true
       parameters["courses"] = true
-      parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
+      parsed = read_report("sis_export_csv",{params: parameters, header: true})
 
-      accounts_report = parsed["accounts"][1..-1].sort_by { |r| r[0] }
+      accounts_report = parsed["accounts.csv"][1..-1].sort_by { |r| r[0] }
       accounts_report[0].should == ["sub1",nil,"English","active"]
       accounts_report[1].should == ["sub3",nil,"math","active"]
       accounts_report[2].should == ["subsub1","sub1","sESL","active"]
 
-      users_report = parsed["users"][1..-1].sort_by { |r| r[0] }
+      users_report = parsed["users.csv"][1..-1].sort_by { |r| r[0] }
       users_report[0].should == ["user_sis_id_01","john@stclair.com",nil,"John St.",
                                  "Clair","john@stclair.com","active"]
       users_report[1].should == ["user_sis_id_02","micheal@michaelbolton.com",nil,"Michael",
@@ -939,21 +941,21 @@ describe "Default Account Reports" do
       parameters["groups"] = true
       parameters["group_membership"] = true
       parameters["xlist"] = true
-      parsed = ReportSpecHelper.run_report(@account,"sis_export_csv",parameters)
+      parsed = read_report("sis_export_csv",{params: parameters, header: true})
 
-      parsed["accounts"].should == [["account_id","parent_account_id","name","status"]]
-      parsed["terms"].should == [["term_id","name","status","start_date","end_date"]]
-      parsed["users"].should == [["user_id","login_id","password","first_name",
+      parsed["accounts.csv"].should == [["account_id","parent_account_id","name","status"]]
+      parsed["terms.csv"].should == [["term_id","name","status","start_date","end_date"]]
+      parsed["users.csv"].should == [["user_id","login_id","password","first_name",
                                   "last_name","email","status"]]
-      parsed["courses"].should == [["course_id","short_name","long_name","account_id",
+      parsed["courses.csv"].should == [["course_id","short_name","long_name","account_id",
                                     "term_id","status","start_date","end_date"]]
-      parsed["sections"].should == [["section_id","course_id","name","status",
+      parsed["sections.csv"].should == [["section_id","course_id","name","status",
                                      "start_date","end_date"]]
-      parsed["enrollments"].should == [["course_id","user_id","role","section_id",
+      parsed["enrollments.csv"].should == [["course_id","user_id","role","section_id",
                                         "status","associated_user_id"]]
-      parsed["groups"].should == [["group_id","account_id","name","status"]]
-      parsed["group_membership"].should == [["group_id","user_id","status"]]
-      parsed["xlist"].should == [["xlist_course_id","section_id","status"]]
+      parsed["groups.csv"].should == [["group_id","account_id","name","status"]]
+      parsed["group_membership.csv"].should == [["group_id","user_id","status"]]
+      parsed["xlist.csv"].should == [["xlist_course_id","section_id","status"]]
     end
   end
 end
