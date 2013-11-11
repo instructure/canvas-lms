@@ -19,7 +19,7 @@ if CANVAS_RAILS2
   gem 'authlogic', '2.1.3'
 else
   # just to be clear, Canvas is NOT READY to run under Rails 3 in production
-  gem 'rails', '3.2.14'
+  gem 'rails', '3.2.15'
   gem 'authlogic', '3.2.0'
 end
 
