@@ -1352,8 +1352,6 @@ ru:
     imported_assignments_group: "Импортированные задания"
     labels: 
       due: До
-    messages: 
-      assignment_created: "Задание\"%{assignment}\" создано"
     name_is_required: "Необходимо указать имя!"
     points_possible: "Для процентной оценки возможные баллы должны быть больше 0"
     select_external_tool_dialog_title: "Настройка внешних инструментов"
@@ -1369,9 +1367,6 @@ ru:
       a_website_url: "url веб-сайта"
     titles: 
       grading_scheme_info: "Просмотр/редактирование схемы оценок"
-    warnings: 
-      group_assignment: "Задание \"%{assignment}\" было групповым заданием. Вам нужно переустановить настройки группы для этого нового контекста"
-      peer_assignment: "Задание \"%{assignment}\" было заданием для рассмотрения коллегами. Вам нужно переустановить настройки рассмотрения коллегами для этого нового контекста"
   assignment_details_dialog: 
     average_score: "Средний балл:"
     count_of_submissions: "%{cnt} отправок"
@@ -1487,8 +1482,18 @@ ru:
       move: "Переместить в&hellip;"
       move_assignment_title: "Переместить задание"
       multiple_modules: "Несколько модулей"
+      no_points_possible: "Нет возможных баллов"
       points_possible: "%{pointsPossible} баллов"
+      points_possible_screen_reader: "%{pointsPossible} возможных баллов"
       settings: Настройки
+    assignment_list_item_score: 
+      assignment_not_yet_graded_screenreader: "Задание еще не оценено. %{pointsPossible} возможных баллов."
+      no_submission: "Нет отправки"
+      no_submission_for_assignment_screenreader: "По данному заданию ничего не отправлено. %{pointsPossible} возможных баллов."
+      no_submission_with_points_possible: "-/%{pointsPossible} баллов"
+      not_yet_graded_with_points_possible: "*Еще не оценено*/%{pointsPossible} баллов"
+      score_with_points_possible: "%{grade}/%{pointsPossible} баллов"
+      score_with_points_possible_screenreader: "Оценка: %{grade} из %{pointsPossible} баллов"
     assignment_locked: 
       assignment_locked: "Это задание заблокировано с *%{lock_at}*"
       assignment_unlocked_from: "Это задание заблокировано до *%{unlock_at}*"
@@ -1545,6 +1550,7 @@ ru:
       delete_group: "Удалить группу"
       submit_assignment: "Отправить задание"
     cannot_delete_group: "У вас должна быть, как минимум, одна группа заданий"
+    cant_unpublish_when_students_submit: "Невозможно отменить публикацию, если есть отправленные студентами задания"
     confirm: 
       delete_assignment: "Вы действительно хотите удалить это задание?"
       delete_group: "Удалить группу?"
@@ -2251,6 +2257,10 @@ ru:
     last_formula_row: "последний ряд формулы будет использоваться для вычисления окончательного ответа"
     sample_final_answer: "Это значение — пример окончательного ответа для вопросов этого типа"
   calendar: 
+    agenda_view: 
+      delete: Удалить
+      due: срок
+      edit: Редактировать
     appointment_group_deletion_details: "Удаление также приведет к удалению встреч, на которые подписались студенты."
     appointment_group_list: 
       location: "Местоположение:"
@@ -2271,13 +2281,16 @@ ru:
       create_event: "Создать новое событие"
       done_go_back_to_list: "Готово, вернуться к списку"
       links: 
+        calendar_agenda: Программа
         calendar_month: Месяц
         calendar_scheduler: Планировщик
         calendar_week: Неделя
+      loading: Загрузка
       my_appointment_groups: "Мои групповые встречи"
       refresh: Обновить
       use_old_calendar: "Старый календарь"
     calendar_navigator: 
+      enter_jump_date: "Введите дату и нажмите ввод для перехода к этой дате."
       next: Далее
       previous: Назад
       today: Сегодня
@@ -2371,6 +2384,7 @@ ru:
       slots_available: "Свободные временные интервалы"
     event_event_title: "Заголовок события:"
     event_on_this_day: "В этот день есть событие"
+    invalid_date: "Недопустимая дата"
     labels: 
       due: окончание
     message_participants: 
@@ -3367,6 +3381,7 @@ ru:
         modules: 
           before_students_view: "Перед тем как студенты смогут просматривать этот модуль"
         new_tab: "Загрузить этот инструмент в новой вкладке"
+        publish_final_grade: "опубликовать итоговые оценки студентов после завершения данного модуля"
         require_sequential_progress: "студенты должны выполнить предварительные условия в этом модуле последовательно"
         sort_by: "Упорядочить по"
         title: Заголовок
@@ -3831,6 +3846,7 @@ ru:
       slide7: "Слайд 7"
       slide8: "Слайд 8"
       slide9: "Слайд 9"
+  correct_answer: "Это правильный ответ."
   course: 
     access_denied: "В доступе отказано"
     batch_update_message: 
@@ -4187,6 +4203,7 @@ ru:
       headings: 
         future_enrollments: "Будущие регистрации"
         my_courses: "Мои курсы"
+        my_groups: "Мои группы"
         past_enrollments: "Прошлые регистрации"
       start_new_course: "Начать новый курс"
       titles: 
@@ -4435,41 +4452,35 @@ ru:
     show: 
       acting_as: "В настоящий момент вы просматриваете этот курс с ролью: %{enrollment_type}. Разрешения и доступ будут доступны только пользователям этой роли."
       buttons: 
-        update_layout: "Обновить структуру"
+        update_layout: Сохранить
       details: 
-        assignments: "В этом представлении отображается **список заданий** для этого курса, предстоящие и недавние задания показаны сверху."
         confirm_unenroll: "Действительно хотите отменить регистрацию на этот курс? Вы больше не сможете просматривать список курсов или связываться непосредственно с учителями, и вы больше не будете видеть события курса в потоке и как уведомления."
-        custom_page: "Можно **создать собственную домашнюю страницу курса** и включить любые ссылки, изображения и мультимедийные объекты."
-        modules: |-
-            Можно систематизировать курс по **модулям или разделам**, где каждый раздел содержит связанный набор файлов, заданий, страниц и т.д.  При необходимости можно также расположить модули последовательно, определив критерии и предварительные условия, которые должны быть выполнены для разблокирования каждого модуля.
-            
-            Эта структура лучше всего подходит для курсов, не основанных на определенном расписании, таком как период или семестр.
-        recent_activity_dashboard: "**Информационная панель недавней активности** позволяет участникам просматривать самые последние разговоры, объявления, обсуждения и взаимодействия для данного курса. Это очень похоже на информационную панель страницы пользователей, когда они впервые входят в систему, но отображается только содержимое этого конкретного курса."
-        syllabus: "**Представление программы обучения** позволяет создавать описания ожиданий курсов или представлять курс с ссылками, изображениями и другими объектами, а затем также отображать календарь со всеми заданиями и событиями курса."
       empty_body: "Нет содержимого"
       headings: 
         confirm_unenroll: "Подтвердить отмену регистрации"
+        edit_homepage_title: "Редактировать домашнюю страницу"
         importing: "Данный курс импортируется"
         set_layout: "Установить структуру домашней страницы"
         unpublished: "Этот курс не опубликован"
       importing: "Копирование / перенос курса в процессе. Это означает, что некоторые файлы могут быть временно недоступны."
       labels: 
-        set_layout: "При посещении пользователями страницы курса показать им"
+        set_layout: "Выберите то, что вы бы хотели отобразить на домашней странице."
       license_notice: "Содержание этого курса предоставляется по лицензии %{license_type}. Содержание в этом курсе предоставляется по этой лицензии, если не указано иное."
       links: 
         change_layout: "Изменить структуру домашней страницы"
         course_setup: "Контрольный список настройки курса"
-        course_stream: "См. поток курса"
         drop_course: "Переместить этот курс"
+        edit_homepage: "Редактировать домашнюю страницу"
         join_course: "Присоединиться к этому курсу"
         new_announcement: "Новое объявление"
         restore_role: "Восстановить роль и разрешения"
+        view_course_stream: "Просмотреть поток курса"
       options: 
         assignments: "Список заданий"
-        custom_page: "Собственная созданная страница"
-        modules: "Модули/разделы курса"
+        custom_page: "Страницы титульной страницы"
+        modules: "Модули курса"
         recent_activity_dashboard: "Информационная панель недавней активности"
-        syllabus: "Задания с программой обучения"
+        syllabus: "Программа обучения"
       period_name: "последние 2 недели"
       re_sending: "Повторная отправка..."
       send_done: "Готово. Сообщение может занять несколько минут."
@@ -4733,6 +4744,7 @@ ru:
       short: "%b %e"
       short_month: "%b"
       short_weekday: "%a"
+      short_with_weekday: "%a, %b %-d"
       weekday: "%A"
     month_names: 
       - ~
@@ -4901,7 +4913,6 @@ ru:
   discussion_entry: 
     atom_no_author: "Автор отсутствует"
     default_user_name: "Имя пользователя"
-    file_added_warning: "Добавлен файл \"%{file_path}\", необходимый для записи в теме \"%{discussion_topic_title}\""
   discussion_topic: 
     atom_no_author: "Автор отсутствует"
     default_title: "Без названия"
@@ -4991,8 +5002,6 @@ ru:
     error_draft_state_announcement: "Данной теме не может быть присвоен статус черновой версии, поскольку она является объявлением."
     error_draft_state_unauthorized: "У вас отсутствует разрешение для присваивания данной теме статус черновой версии."
     error_draft_state_with_posts: "Данной теме не может быть присвоен статус черновой версии, поскольку она содержит ответы."
-    errors: 
-      bad_scope: "противоречивая область"
     group_assignment_discussion_entry: 
       posts: 
         few: " %{count} сообщения"
@@ -5598,10 +5607,9 @@ ru:
       education_levels: "Уровень (-и) образования"
       extensions: Расширения
       help_link: "Ссылка для вызова справки"
-      privacy_level: "Уровень конфиденциальности"
       rate_tool: "Оценить этот инструмент"
     app_review_view: 
-      posted_by_on: "Опубликовано пользователем *%{user_name}* *%{created}*"
+      posted_by_on: "Опубликовано пользователем *%{user.name}* *%{created_at}*"
     app_saved_message: "%{app} успешно сохранено!"
     borderless_launch: 
       load_tool_button: "Загрузить %{tool} вручную"
@@ -6023,9 +6031,13 @@ ru:
     students_who: 
       havent_been_graded: "Не были оценены"
       havent_submitted_yet: "Еще не отправлено"
+      no_grade_for: "Для %{assignment} оценка отсутствует"
+      no_submission_for: "Для %{assignment} ничего не отправлено"
       not_submitted_yet: "Еще не отправлено"
       scored_less_than: "Оценено меньше"
+      scored_less_than_on: "Набрано меньше чем %{cutoff} в %{assignment}"
       scored_more_than: "Оценено больше"
+      scored_more_than_on: "Набрано больше чем %{cutoff} в %{assignment}"
     submission_information: "Информация об отправке"
     teacher_muted_title: "Звук задания отключен"
     titles: 
@@ -6114,8 +6126,13 @@ ru:
     students_who: 
       havent_been_graded: "Оценка не была поставлена"
       havent_submitted_yet: "Еще не отправлено"
+      no_grade_for: "Для %{assignment} оценка отсутствует"
+      no_submission_for: "Для %{assignment} ничего не отправлено"
+      not_submitted_yet: "Еще не отправлено"
       scored_less_than: "Оценено меньше"
+      scored_less_than_on: "Набрано меньше чем %{cutoff} в %{assignment}"
       scored_more_than: "Оценено больше"
+      scored_more_than_on: "Набрано больше чем %{cutoff} в %{assignment}"
     submitted_late: "Отправлено поздно"
     title: 
       quiz: "Отправка контрольной работы"
@@ -6462,6 +6479,7 @@ ru:
         add_comment: "Добавление комментария"
         average: Сред.
         grade: Оценить
+        grade_by_question_beta: "Оценка по вопросу (бета-версия)"
         group_comment: "Отправить комментарий всей группе"
         hide_names: "Скрыть имена студентов в SpeedGrader"
         show_assessment_by: "Показать проверки знаний по"
@@ -6585,6 +6603,8 @@ ru:
   group: 
     default_collection_name: "Коллекция группы %{group_name}"
     memeber: Участник
+    name_required: "Необходимо указать имя"
+    name_too_long: "Введите более короткое имя группы"
     tabs: 
       chat: Чат
       discussions: Обсуждения
@@ -6717,7 +6737,7 @@ ru:
       page_title: "Группы курса"
       page_title_accounts: "Группы учетных записей"
     create_group_set: "Создать набор групп"
-    delete_confirm: "Вы уверены, что хотите удалить эту категорию группы?"
+    delete_confirm: "Вы уверены, что хотите удалить этот набор групп?"
     edit: 
       buttons: 
         update: "Обновить группу"
@@ -6745,8 +6765,8 @@ ru:
       update_failed: "Сбой обновления, повторите попытку"
     feed_title: "%{course_or_account_name} Канал"
     flash: 
-      removeError: "Невозможно удалить категорию группы. Повторите попытку позже."
-      removed: "Категория группы успешно удалена."
+      removeError: "Невозможно удалить набор групп. Повторите попытку позже."
+      removed: "Набор групп успешно удален."
     group: 
       actions: 
         ask_to_join_group: "отправить запрос на вступление в данную группу"
@@ -6762,11 +6782,8 @@ ru:
       no_members: "Нет членов"
       one: "1 группа"
       other: "%{count} групп"
-    group_count: 
-      few: "%{count} группы"
-      one: "1 группа"
-      other: "%{count} групп"
     group_name: "Имя группы"
+    groups_count: "Группы (%{count})"
     index: 
       heading_current_groups: "Текущие группы"
       no_groups: "Нет групп"
@@ -6783,7 +6800,10 @@ ru:
         too_short: "Введите критерии поиска, содержащие не менее 3 символов"
       assign_to_group_menu: 
         add_to_group: "Добавить к группе"
+        all_groups_full: "Все группы набраны."
+        all_groups_full_suggestion: "Измените ограничения группы или добавьте больше групп."
         assign_user_to_group: "Назначить пользователя в данную группу"
+        no_groups_created: "Прежде чем добавлять пользователей, необходимо создать группы."
       group: 
         add_user_to_group: "Назначить пользователя в группу"
         group_delete: Удалить
@@ -6791,11 +6811,18 @@ ru:
         group_settings: Настройки
         show_group_details: "Показать сведения о группе"
       group_categories: 
-        group_set_create: "Добавить набор групп"
+        account_group_explanation: "Группы студентов уровня учетной записи — хороший способ группирования студентов без привязки к определенному курсу. Каждая группа студентов получает собственный календарь, доску обсуждений и инструменты совместной работы, чтобы они могли самостоятельно объединяться в группы и более эффективно работать совместно."
+        add_group_set: "Добавить набор групп"
+        course_group_explanation: "Группы студентов — полезный способ объединения студентов для групповых проектов или документации. Каждая группа студентов получает собственный календарь, доску обсуждений и инструменты совместной работы, чтобы они могли самостоятельно объединяться в группы и более эффективно работать совместно."
+        group_assignment_instructions: "Можно случайным образом распределять студентов по группам определенного размера или создать и организовать группы вручную. После создания групп можно назначить задания как \"групповые отправки\". Это означает, что каждая группа будет иметь одну отправку для всех пользователей этой группы."
+        group_set: "Набор групп"
+        headings: 
+          account_groups: "Группы студентов уровня учетной записи"
+          course_groups: "Группы студентов"
       group_category: 
         randomly_assigning_students: "Назначение студентов случайным образом"
-        unassigned_students: "Неназначенные студенты"
-        unassigned_users: "Неназначенные пользователи"
+        search: Поиск
+        search_groups: "Поиск групп"
       group_category_create: 
         allow_self_signup: "Разрешить самостоятельную регистрацию"
         cancel: Отменить
@@ -6817,16 +6844,14 @@ ru:
         category_settings: Настройки
         delete_category_option: Удалить
         edit_category_option: Редактировать
-        group_limit_blurb: "Группы ограничены до *%{count}* участников"
+        group: Группа
+        group_limit_blurb: "Группы ограничены до *%{group_limit}* участников."
         message_all_unassigned_option: "Оповестить всех неназначенных студентов"
         randomly_assign_students_option: "Назначить студентов случайным образом"
         restricted_self_signup_blurb: "Все студенты в группе должны находиться в одном разделе."
-        search: поиск
         self_organized_warning: "Эти группы самостоятельно систематизируются студентами. В отличие от групп других типов, студенты могут одновременно принадлежать к нескольким этим группам, поэтому эти группы могут быть не лучшим решением для заданий с оценками."
         self_signup_blurb: "Для этих групп включена самостоятельная регистрация."
-        self_signup_help_tooltip: "Что такое группы с самостоятельной регистрацией?"
-        student_group_instructions: "(перетащите студентов, чтобы назначить)"
-        user_group_instructions: "(перетащите пользователей, чтобы назначить)"
+        settings: Настройки
       group_category_edit: 
         allow_self_signup: "Разрешить самостоятельную регистрацию"
         cancel: Отменить
@@ -6836,8 +6861,6 @@ ru:
         require_same_section: "Члены группы должны находиться в одном разделе"
         save: Сохранить
         saving: Сохранение...
-        self_signup_description: "Вы можете создавать наборы групп, где студенты могут регистрироваться самостоятельно. Студенты по-прежнему ограничены возможностью находиться только в одной группе из набора, однако, таким образом, студенты могут сами объединяться в группы, снимая с преподавателя необходимость делать это. Учтите, что до тех пор, пока активна эта опция, студенты могут переводить себя из одной группы в другую."
-        what_is_this: "Что это такое?"
       group_edit: 
         cancel: Отменить
         group_name: "Имя группы"
@@ -6850,14 +6873,15 @@ ru:
         no_students: "Студенты отсутствуют"
         no_users: "Пользователи отсутствуют"
       groups: 
-        groups: Группы
         no_groups: "Группы отсутствуют."
-        search: Поиск
-        search_groups: "Поиск группы"
+        no_matching_groups: "Соответствующие группы отсутствуют."
       randomly_assign_members: 
         add_more_users: Отменить
         close: ОК
         randomly_assign_students_dialog: "Они будут автоматически назначать всех неназначенных студентов среди существующих групп студентов как можно более равномерно."
+      self_signup_help: 
+        about_self_signup_groups: "О группах с самостоятельной регистрацией"
+        self_signup_description: "Вы можете создавать наборы групп, где студенты могут регистрироваться самостоятельно. Студенты по-прежнему ограничены возможностью находиться только в одной группе из набора, однако, таким образом, студенты могут сами объединяться в группы, снимая с преподавателя необходимость делать это. Учтите, что до тех пор, пока активна эта опция, студенты могут переводить себя из одной группы в другую."
     member: 
       few: "%{count} члена(ов)"
       one: "1 член"
@@ -6896,6 +6920,8 @@ ru:
     titles: 
       add_group_category: "Добавить набор групп"
       self_signup_help: "Группы с самостоятельной регистрацией"
+    unassigned_students: "Неназначенные студенты (%{count})"
+    unassigned_users: "Неназначенные пользователи (%{count})"
   help_dialog: 
     Back: Назад
     Help: Помощь
@@ -7036,6 +7062,7 @@ ru:
       id: идентификатор
       priority: приоритет
       run_at: "работает на"
+      runtime: "время выполнения"
       strand: конфликт
       tag: тег
       worker: сотрудник
@@ -9316,6 +9343,7 @@ ru:
     submission_comments: "Комментарии отправки"
     sure_you_want_to_mute: "Действительно хотите отключить звук этого задания? Пока звук этого задания отключен, студенты не будут получать новые уведомления и не смогут просматривать:"
   name: "Импортер Academic Benchmark"
+  new_facebook_message: "У вас есть новое сообщение от Canvas"
   not_applicable: Недоступно
   notification: 
     added_to_conversation_description: "Вы добавлены к разговору"
@@ -9758,9 +9786,6 @@ ru:
       description: "Данный подключаемый модуль интегрируется с Crocodoc, что позволяет предварительно просматривать документы HTML5, благодаря чему преподаватели и студенты могут составлять по ним аннотации."
       labels: 
         api_key: "Ключ API Crocodoc"
-    dim_dim: 
-      description: "Поддержка веб-конференций DimDim"
-      name: DimDim
     dim_dim_settings: 
       description: "Потребуется доступ к экземпляру Dim Dim."
       labels: 
@@ -9945,6 +9970,10 @@ ru:
       labels: 
         download_url: "URL для скачивания браузера LockDown"
         plugin_enabled: Включено
+    med_cornell_export: 
+      labels: 
+        password: "Пароль для аутентификации"
+        username: "Имя пользователя для аутентификации"
     notices: 
       settings_updated: "Настройки подключаемого модуля успешно обновлены."
     qti_converter_settings: 
@@ -9969,6 +9998,7 @@ ru:
           "Настройки-> API" в вашем профиле после создания.
       labels: 
         api_key: "Ключ API"
+        enable_html5_viewer: "Включить средство просмотра документов HTML5"
         secret_key: "Секретный ключ API"
     sessions: 
       description: "Управление тайм-аутами сессии"
@@ -10493,6 +10523,7 @@ ru:
   qti_display: QTI
   qti_file_description: "ZIP-файл QTI"
   qti_name: "Конвертер QTI"
+  question_answered: "Получен ответ"
   question_bank: 
     align_outcomes: "Согласовать результаты"
     remove_outcome_from_bank: "Действительно хотите удалить данный результат из банка?"
@@ -10585,6 +10616,7 @@ ru:
       show_details: "Показать сведения о вопросе"
       title: 
         move_copy_questions: "Переместить/копировать вопросы"
+  question_unanswered: "Еще не отвечено"
   quick_start_bar: 
     announcement: 
       saving: Сохранение...
@@ -10696,14 +10728,12 @@ ru:
     default_response_to_file_upload: "Ответ для показа студенту после отправки им ответа"
     default_title: "Новая контрольная работа"
     display_answer: 
-      correct_answer: "Это правильный ответ."
       labels: 
         answer_with_margin: "с большинством"
         your_answer: "Ваш ответ"
       margin_of_error: " допустимая погрешность"
       plus_or_minus: +/-
       range_answer: "От %{lower_bound} до %{upper_bound}"
-      selected_answer: "Вы выбрали этот ответ."
       you_left_this_blank: "Вы оставили это пустым"
     display_question: 
       default_question_answer: "[ Выбрать ]"
@@ -10965,7 +10995,6 @@ ru:
       anonymous_username: Студент
       buttons: 
         allow_extra_attempt: "разрешить этому студенту выполнить дополнительную попытку"
-        update_scores: "Обновить оценки"
       count_attempts_left: 
         few: "У %{user} осталось %{count} попытки"
         one: "У %{user} осталась 1 попытка"
@@ -11255,8 +11284,6 @@ ru:
     question_list_right_side: 
       headers: 
         questions: Вопросы
-      question_answered: "Получен ответ"
-      question_unanswered: "Еще не отвечено"
     question_statistic: 
       attempts: 
         few: "%{count} попытки(ок)"
@@ -11363,12 +11390,14 @@ ru:
       view_responses: "Просмотр ответов"
     quiz_submission: 
       attempt_duration: "Эта попытка длилась %{duration}."
+      buttons: 
+        update_scores: "Обновить оценки"
       labels: 
         final_score: "Итоговая оценка"
         fudge_points: "Экстренные баллы"
-        fudge_points_changed_points_quiz: "Поскольку %{user} прошел эту контрольную работу, возможные баллы для контрольной работы изменены на %{difference}. Можно отрегулировать это изменение и вручную добавить положительные или отрицательные баллы, используя это поле:"
-        fudge_points_changed_points_survey: "Поскольку %{user} прошел этот опрос, возможные баллы для опроса изменены на %{difference}. Можно отрегулировать это изменение и вручную добавить положительные или отрицательные баллы, используя это поле:"
-        fudge_points_generic_explanation: "Можно вручную изменить оценку, добавив положительные или отрицательные баллы в это поле:"
+        fudge_points_changed_points_quiz: "Поскольку %{user} взял эту контрольную работу, количество возможных баллов изменилось на %{difference}. Можно отрегулировать это изменение и вручную добавить положительные или отрицательные баллы, используя это поле."
+        fudge_points_changed_points_survey: "Поскольку %{user} взял этот опрос, количество возможных баллов изменилось на %{difference}. Можно отрегулировать это изменение и вручную добавить положительные или отрицательные баллы, используя это поле."
+        fudge_points_generic_explanation: "Можно вручную отрегулировать оценку, добавив положительные или отрицательные баллы в это поле."
         questions_need_review: "Следующие вопросы ожидают рассмотрения"
         quiz_score: "Оценка контрольной работы"
         score_for_attempt: "Оценка для этой попытки"
@@ -11617,9 +11646,7 @@ ru:
         other: "%{count} секунд(ы)"
       show_time_link: Показать
       titles: 
-        answered: "Получен ответ"
         come_back_later: "Вы отметили этот вопрос, чтобы вернуться к нему позднее"
-        not_answered: "Еще не отвечено"
         times_up: "Время истекло!"
       years_count: 
         few: "%{count} года(лет)"
@@ -11988,6 +12015,7 @@ ru:
     titles: 
       add_item_to_module: "Добавить элемент в модуль"
       find_links_using_service: "Поиск ссылок с помощью %{service}"
+  selected_answer: "Вы выбрали этот ответ."
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "Вы уже зарегистрированы на **%{course}**."
@@ -12327,6 +12355,7 @@ ru:
       for_title: "для %{title}"
       labels: 
         body: Сообщение
+        subject: Тема
       message_students_who: "Отправить сообщения студентам, которые..."
       out_of_points: "из %{points_possible}"
     mute_dialog: 
@@ -12443,12 +12472,14 @@ ru:
           other: "Имейте в виду, что %{count} студентов уже были оценены при помощи этой рубрики. Изменение рубрики повлияет на оценку. "
         rubric_in_use2: "Вы уже оценили студентов с помощью этой рубрики. Серьезные изменения могут повлиять на результаты оценки."
       out_of: "%{points} *из %{total}*"
+      rubric: Рубрика
       rubric_title: Заголовок
       titles: 
         find_existing_rubric: "Найти существующую рубрику"
     rubric_criterion: 
       defaults: 
         description: "Описание критерия"
+      delete_criterion_link: "Удалить ссылку на критерий"
       description: 
         custom_comments_area: "Эта область будет использоваться экспертом для создания комментариев, относящихся к этому критерию."
       full_marks: "Метки заполнения"
@@ -12465,7 +12496,8 @@ ru:
       options: 
         select: "[ Выбрать ]"
       points: "%{points} pts"
-      points_abbreviation: "*Баллы* pts"
+      points_label: Баллы
+      points_out_of2: "%{points} / %{total} балла (-ов)"
       titles: 
         linked_to_learning_outcome: "Этот критерий связан с результатом обучения"
     rubric_criterion_dialog: 
@@ -12496,6 +12528,7 @@ ru:
       labels: 
         total_points: "Общее число баллов"
       points_out_of: "*%{points}* из **%{total}**"
+      rubric: Рубрика
     rubric_summary_criterion: 
       defaults: 
         description: "Описание критерия"
@@ -12856,6 +12889,7 @@ ru:
         save_comment: "Сохранить комментарий"
       crumbs: 
         assignments: Задания
+      hide_rubric_button: "Скрыть кнопку рубрики"
       labels: 
         add_a_comment: "Добавление комментария"
         grade: Оценить
@@ -13050,6 +13084,7 @@ ru:
     announcement: Объявление
     announcements: Объявления
     assignments: Задания
+    come_back_later: "Вы отметили этот вопрос, чтобы вернуться к нему позднее"
     delete_quiz: "Удалить контрольную работу"
     delete_survey: "Удалить опрос"
     discussion: Обсуждение
@@ -13502,8 +13537,12 @@ ru:
     is_required: "Необходимо это поле"
   warnings: 
     test_install: 
-      message: "Эта версия Canvas предназначена только для тестирования, и будет перезапускаться каждую неделю."
+      periodic_message: "Эта версия Canvas предназначена только для тестирования, и будет периодически перезапускаться."
       title: "Тестовая версия Canvas"
+      weekly_message: 
+        few: "Эта версия Canvas предназначена только для тестирования, и будет перезапускаться каждые %{count} недели."
+        one: "Эта версия Canvas предназначена только для тестирования, и будет перезапускаться каждую неделю"
+        other: "Эта версия Canvas предназначена только для тестирования, и будет перезапускаться каждые %{count} недель."
   web_conference: 
     default_name_for_courses: "Веб-конференция курса"
     default_name_for_groups: "Веб-конференция группы"
@@ -13613,9 +13652,6 @@ ru:
       blank_title: "Заголовок не может быть пустым"
       title_characters: "Заголовок должен содержать ходя бы одну букву или цифру"
       title_too_long: "Заголовок не может превышать %{max_characters} символов"
-    missing_name: "Страница без названия"
-    notices: 
-      wiki_page_created: "Вики-страница \"%{title}\" создана"
     title_for_topics_category: "Темы %{category}"
     unknown_user_name: Неизвестно
     warnings: 
