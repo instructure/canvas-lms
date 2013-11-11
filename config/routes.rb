@@ -317,6 +317,9 @@ FakeRails3Routes.draw do
       match 'statistics' => 'quizzes#statistics', :as => :statistics
       match 'read_only' => 'quizzes#read_only', :as => :read_only
       match 'filters' => 'quizzes#filters', :as => :filters
+      collection do
+        get :fabulous_quizzes
+      end
       resources :quiz_submissions, :path => :submissions do
         collection do
           put :backup

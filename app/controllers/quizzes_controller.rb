@@ -33,6 +33,9 @@ class QuizzesController < ApplicationController
 
   def index
     if authorized_action(@context, @current_user, :read)
+      if @context.root_account.enable_fabulous_quizzes?
+        redirect_to fabulous_quizzes_course_quizzes_path
+      end
       return unless tab_enabled?(@context.class::TAB_QUIZZES)
       @quizzes = @context.quizzes.active.include_assignment.sort_by{|q| [(q.assignment ? q.assignment.due_at : q.lock_at) || SortLast, Canvas::ICU.collation_key(q.title || SortFirst)]}
 
@@ -79,6 +82,12 @@ class QuizzesController < ApplicationController
         @submissions_hash[s.quiz_id] = s
       end
       log_asset_access("quizzes:#{@context.asset_string}", "quizzes", 'other')
+    end
+  end
+
+  def fabulous_quizzes
+    if !@context.root_account.enable_fabulous_quizzes? || !authorized_action(@context, @current_user, :read)
+      redirect_to course_quizzes_path
     end
   end
 

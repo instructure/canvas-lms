@@ -129,6 +129,66 @@ describe QuizzesController do
     end
   end
 
+  describe "GET 'index' without fabulous quizzes enabled" do
+    before :each do
+      a = Account.default
+      a.disable_fabulous_quizzes!
+      a.save!
+    end
+
+    after :each do
+      a = Account.default
+      a.enable_fabulous_quizzes!
+      a.save!
+    end
+
+    it "should not redirect" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz(active = true)
+      a = Account.default
+      a.enable_fabulous_quizzes?.should eql false
+      get 'index', :course_id => @course.id
+      assert_response(:success)
+    end
+  end
+
+  describe "GET 'index' with fabulous quizzes enabled" do
+    before :each do
+      a = Account.default
+      a.enable_fabulous_quizzes!
+      a.save!
+    end
+
+    after :each do
+      a = Account.default
+      a.disable_fabulous_quizzes!
+      a.save!
+    end
+
+    it "should redirect to fabulous quizzes app" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz(active = true)
+      a = Account.default
+      a.enable_fabulous_quizzes?.should eql true
+      get 'index', :course_id => @course.id
+      assert_redirected_to(:controller => "quizzes", :action => "fabulous_quizzes")
+    end
+  end
+
+  describe "GET 'fabulous_quizzes' without fabulous quizzes enabled" do
+    it "should redirect to index" do
+      a = Account.default
+      a.disable_fabulous_quizzes!
+      a.save!
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz(active = true)
+      a = Account.default
+      a.enable_fabulous_quizzes?.should eql false
+      get 'fabulous_quizzes', :course_id => @course.id
+      assert_redirected_to(:controller => "quizzes", :action => "index")
+    end
+  end
+
   describe "GET 'new'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
