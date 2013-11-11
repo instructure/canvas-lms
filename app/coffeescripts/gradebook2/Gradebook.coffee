@@ -288,7 +288,7 @@ define [
       @rows.sort (a, b) ->
         a.sortable_name.localeCompare(b.sortable_name,
           window.I18n.locale,
-          { sensitivity: 'accent', ignorePunctuation: true, numeric: true})
+          {sensitivity: 'accent', numeric: true})
 
       if @studentViewStudent && @rowFilter(@studentViewStudent)
         @rows.push(@studentViewStudent)

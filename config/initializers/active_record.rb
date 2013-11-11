@@ -353,7 +353,7 @@ class ActiveRecord::Base
       if @collkey == 0
         "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
       else
-        "collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', true, 2, true)"
+        "collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 0, true)"
       end
     else
       # Not yet optimized for other dbs (MySQL's default collation is case insensitive;
