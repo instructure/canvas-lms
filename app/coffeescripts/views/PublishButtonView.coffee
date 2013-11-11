@@ -20,7 +20,6 @@ define [
     els:
       'i':             '$icon'
       '.publish-text': '$text'
-      '.desc':         '$desc'
 
     initialize: ->
       super
@@ -50,6 +49,9 @@ define [
         @publish()
       else if @isUnpublish() or @isPublished()
         @unpublish()
+
+    addAriaLabel: (label) ->
+      @$el.attr 'aria-label', label
 
     # calling publish/unpublish on the model expects a deferred object
 
@@ -90,7 +92,6 @@ define [
 
     disable: ->
       @$el.addClass @disabledClass
-      #@$el.attr('data-tooltip', '')
 
     enable: ->
       @$el.removeClass @disabledClass
@@ -98,16 +99,16 @@ define [
     reset: ->
       @$el.removeClass "#{@publishClass} #{@publishedClass} #{@unpublishClass}"
       @$icon.removeClass 'icon-publish icon-unpublish icon-unpublished'
+      @$el.removeAttr 'aria-label'
 
     # render
 
     render: ->
       @$el.attr 'role', 'button'
-      @$el.html '<i></i><span class="publish-text"></span><span class="desc"></span>'
+      @$el.html '<i></i><span class="publish-text"></span>'
       @cacheEls()
 
       # don't read text of button with screenreader
-      @$text.attr 'role', 'presentation'
       @$text.attr 'tabindex', '-1'
 
       if @model.get('published')
@@ -119,14 +120,14 @@ define [
     renderPublish: ->
       @renderState
         text:        I18n.t 'buttons.publish', 'Publish'
-        description: I18n.t 'buttons.publish_desc', 'Unpublished. Click to publish'
+        label:       I18n.t 'buttons.publish_desc', 'Unpublished. Click to publish.'
         buttonClass: @publishClass
         iconClass:   'icon-unpublished'
 
     renderPublished: ->
       @renderState
         text:        I18n.t 'buttons.published', 'Published'
-        description: I18n.t 'buttons.published_desc', 'Published. Click to unpublish'
+        label:       I18n.t 'buttons.published_desc', 'Published. Click to unpublish.'
         buttonClass: @publishedClass
         iconClass:   'icon-publish'
 
@@ -157,29 +158,21 @@ define [
       @reset()
       @$el.addClass options.buttonClass
       @$el.attr 'aria-pressed', options.buttonClass is @publishedClass
-
       @$icon.addClass options.iconClass
-      @$text.html "&nbsp;#{options.text}"
 
-      descId = "button-desc-#{@model.id}"
-      @$desc.attr 'id', descId
-      @$desc.addClass 'screenreader-only'
-      @$el.attr 'aria-describedby', descId
+      @$text.html "&nbsp;#{options.text}"
 
       # unpublishable
       if !@model.get('unpublishable')? or @model.get('unpublishable')
         @enable()
         @$el.attr 'title', options.text
 
-        # description for screen readers
-        if options.description
-          @$desc.html options.description
-        else
-          @$el.removeAttr 'aria-describedby'
+        # label for screen readers
+        if options.label
+          @addAriaLabel(options.label)
 
       # disabled
       else
         @disable()
         @$el.attr 'aria-disabled', true
-        @$el.attr 'title', @model.disabledMessage()
-        @$desc.html  @model.disabledMessage()
+        @addAriaLabel(@model.disabledMessage())

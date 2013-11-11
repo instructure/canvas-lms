@@ -726,7 +726,7 @@ describe "assignments" do
           wait_for_ajaximations
 
           @assignment.reload.should be_published
-          f("#assignment_#{@assignment.id} .publish-icon").text.should match "Published"
+          f("#assignment_#{@assignment.id} .publish-icon").attribute('aria-label').should include_text("Published")
         end
 
         it "shows submission scores for students on index page" do
