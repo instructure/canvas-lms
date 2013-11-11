@@ -20,6 +20,15 @@ define [
   'jqueryui/tooltip'
 ], (_, $) ->
 
+  # create a custom widget that inherits from the default jQuery UI
+  # tooltip but extends the open method with a setTimeout wrapper so
+  # that our browser can scroll to the tabbed focus element before
+  # positioning the tooltip relative to window.
+  do ($) ->
+    $.widget "custom.timeoutTooltip", $.ui.tooltip,
+      _open: ( event, target, content ) ->
+        setTimeout @_superApply.bind(this, arguments), 20
+
   # you can provide a 'using' option to jqueryUI position (which gets called by jqueryui Tooltip to
   # position it on the screen), it will be passed the position cordinates and a feedback object which,
   # among other things, tells you where it positioned it relative to the target. we use it to add some
@@ -67,7 +76,7 @@ define [
     if opts.position of positions
       opts.position = positions[opts.position]
 
-  $('body').on 'mouseenter', '[data-tooltip]', (event) ->
+  $('body').on 'mouseenter focusin', '[data-tooltip]', (event) ->
     $this = $(this)
     opts = $this.data('tooltip')
 
@@ -89,6 +98,6 @@ define [
 
     $this
       .removeAttr('data-tooltip')
-      .tooltip(opts)
-      .tooltip('open')
-      .click -> $this.tooltip('close')
+      .timeoutTooltip(opts)
+      .timeoutTooltip('open')
+      .click -> $this.timeoutTooltip('close')
