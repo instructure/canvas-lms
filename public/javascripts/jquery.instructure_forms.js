@@ -446,30 +446,30 @@ define([
           options.error.call(this, "aborted by the user", xhr, event);
         }
       }, false);
-      xhr.onreadystatechange = function(event) {
-        if(xhr.readyState == 4) {
-          var json = null;
-          try {
-            json = $.parseJSON(xhr.responseText);
-          } catch(e) { }
-          if($.httpSuccess(xhr)) {
-            if(json && !json.errors) {
-              if(options.success && $.isFunction(options.success)) {
-                options.success.call(this, json, xhr, event);
-              }
-            } else {
-              if(options.error && $.isFunction(options.error)) {
-                options.error.call(this, json || xhr.responseText, xhr, event);
-              }
+    }
+    xhr.onreadystatechange = function(event) {
+      if(xhr.readyState == 4) {
+        var json = null;
+        try {
+          json = $.parseJSON(xhr.responseText);
+        } catch(e) { }
+        if($.httpSuccess(xhr)) {
+          if(json && !json.errors) {
+            if(options.success && $.isFunction(options.success)) {
+              options.success.call(this, json, xhr, event);
             }
           } else {
             if(options.error && $.isFunction(options.error)) {
               options.error.call(this, json || xhr.responseText, xhr, event);
             }
           }
+        } else {
+          if(options.error && $.isFunction(options.error)) {
+            options.error.call(this, json || xhr.responseText, xhr, event);
+          }
         }
-      };
-    }
+      }
+    };
     xhr.open(method, url);
     xhr.setRequestHeader('Accept', 'application/json, text/javascript, */*');
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
