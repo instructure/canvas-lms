@@ -21,14 +21,6 @@ class ActiveRecord::Base
     "#{self.class.reflection_type_name}_#{id.to_s}"
   end
 
-  def opaque_identifier(column)
-    self.shard.activate do
-      str = send(column).to_s
-      raise "Empty value" if str.blank?
-      Canvas::Security.hmac_sha1(str, self.shard.settings[:encryption_key])
-    end
-  end
-
   def self.all_models
     return @all_models if @all_models.present?
     @all_models = (ActiveRecord::Base.send(:subclasses) +

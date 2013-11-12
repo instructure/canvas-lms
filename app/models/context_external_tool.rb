@@ -49,7 +49,7 @@ class ContextExternalTool < ActiveRecord::Base
                              :tool => self,
                              :user => user,
                              :context => context,
-                             :link_code => context.opaque_identifier(:asset_string),
+                             :link_code => opaque_identifier_for(context),
                              :return_url => return_url,
                              :resource_type => selection_type)
   end
@@ -579,6 +579,18 @@ class ContextExternalTool < ActiveRecord::Base
     item.save!
     context.imported_migration_items << item if context.respond_to?(:imported_migration_items) && context.imported_migration_items && item.new_record?
     item
+  end
+
+  def opaque_identifier_for(asset)
+    ContextExternalTool.opaque_identifier_for(asset, self.shard)
+  end
+
+  def self.opaque_identifier_for(asset, shard)
+    shard.activate do
+      str = asset.asset_string.to_s
+      raise "Empty value" if str.blank?
+      Canvas::Security.hmac_sha1(str, shard.settings[:encryption_key])
+    end
   end
 
   private

@@ -1064,7 +1064,6 @@ class ApplicationController < ActionController::Base
         @resource_title = @tag.title
       end
       @resource_url = @tag.url
-      @opaque_id = @tag.opaque_identifier(:asset_string)
       @tool = ContextExternalTool.find_external_tool(tag.url, context, tag.content_id)
       @target = '_blank' if tag.new_tab
       tag.context_module_action(@current_user, :read)
@@ -1074,6 +1073,7 @@ class ApplicationController < ActionController::Base
       else
         return unless require_user
         @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
+        @opaque_id = @tool.opaque_identifier_for(@tag)
         @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url)
         if @assignment
           @launch.for_assignment!(@tag.context, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))

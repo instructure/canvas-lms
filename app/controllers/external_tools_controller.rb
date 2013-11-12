@@ -105,7 +105,7 @@ class ExternalToolsController < ApplicationController
       end
       @resource_title = @tool.name
       @resource_url = params[:url]
-      @opaque_id = @context.opaque_identifier(:asset_string)
+      @opaque_id = @tool.opaque_identifier_for(@context)
       add_crumb(@context.name, named_context_url(@context, :context_url))
       @return_url = url_for(@context)
       @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)

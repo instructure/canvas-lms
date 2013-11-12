@@ -74,7 +74,7 @@ class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_
       hash['lti_version'] = 'LTI-1p0'
       hash['resource_link_id'] = link_code
       hash['resource_link_title'] = tool.name
-      hash['user_id'] = user.opaque_identifier(:asset_string)
+      hash['user_id'] = tool.opaque_identifier_for(user)
       hash['user_image'] = user.avatar_url
       self.user_data = BasicLTI.user_lti_data(user, context)
       hash['roles'] = self.user_data['role_types'].join(',') # AccountAdmin, Student, Faculty or Observer
@@ -110,7 +110,7 @@ class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_
       # for the launch_presentation_locale.
       I18n.set_locale_with_localizer
 
-      hash['context_id'] = context.opaque_identifier(:asset_string)
+      hash['context_id'] = tool.opaque_identifier_for(context)
       hash['context_title'] = context.name
       hash['context_label'] = context.course_code if context.respond_to?(:course_code)
       hash['launch_presentation_locale'] = I18n.locale || I18n.default_locale.to_s

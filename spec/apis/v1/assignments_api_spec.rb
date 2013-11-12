@@ -1361,7 +1361,7 @@ describe AssignmentsApiController, :type => :integration do
           @json['external_tool_tag_attributes'].should == {
             'url' => 'http://www.example.com',
             'new_tab' => false,
-            'resource_link_id' => @tool_tag.opaque_identifier(:asset_string)
+            'resource_link_id' => ContextExternalTool.opaque_identifier_for(@tool_tag, @tool_tag.context.shard)
           }
         end
 
