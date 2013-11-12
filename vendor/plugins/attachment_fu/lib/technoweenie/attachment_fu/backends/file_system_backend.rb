@@ -47,7 +47,6 @@ module Technoweenie # :nodoc:
 
 
         def authenticated_s3_url(*args)
-          return root_attachment.authenticated_s3_url(*args) if self.respond_to?(:root_attachment) && root_attachment
           if args[0].is_a?(Hash) && !args[0][:secure].nil?
             protocol = args[0][:secure] ? 'https://' : 'http://'
           end
