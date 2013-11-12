@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Wiki do
   before :each do
@@ -132,6 +132,16 @@ describe Wiki do
 
       it 'should give update_page_content rights to students' do
         @course.wiki.grants_right?(@user, :update_page_content).should be_true
+      end
+    end
+  end
+
+  context "sharding" do
+    specs_require_sharding
+
+    it "should find the wiki's context from another shard" do
+      @shard1.activate do
+        @wiki.context.should == @course
       end
     end
   end

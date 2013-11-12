@@ -123,7 +123,9 @@ class Wiki < ActiveRecord::Base
   end
 
   def context
-    @context ||= Course.find_by_wiki_id(self.id) || Group.find_by_wiki_id(self.id)
+    shard.activate do
+      @context ||= Course.find_by_wiki_id(self.id) || Group.find_by_wiki_id(self.id)
+    end
   end
 
   def context_type
