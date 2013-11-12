@@ -31,7 +31,7 @@ define [
 
     urls:
       generic:          -> "#{@baseUrl()}/modules/#{@get('module_id')}/items/#{@get('id')}"
-      attachment:       -> "/api/v1/files/#{@get('id')}"
+      #attachment:       -> "/api/v1/files/#{@get('id')}"
       wiki_page:        -> "#{@baseUrl()}/pages/#{@get('id')}"
       assignment:       -> "#{@baseUrl()}/assignments/#{@get('id')}"
       discussion_topic: -> "#{@baseUrl()}/discussion_topics/#{@get('id')}"
@@ -42,7 +42,7 @@ define [
 
     toJSONs:
       generic: ->          module_item: @attributes
-      attachment: ->       hidden: !@get('published')
+      #attachment: ->       hidden: !@get('published')
       wiki_page: ->        wiki_page: @attributes
       assignment: ->       assignment: @attributes
       discussion_topic: -> @attributes

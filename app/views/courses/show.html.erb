@@ -324,7 +324,7 @@ $(document).ready(function() {
       <%= render :partial => "wiki_pages/content", :locals => {:course_home => true } %>
     <% end %>
   <% elsif @course_home_view == 'modules' %>
-    <% if @domain_root_account.enable_draft? %>
+    <% if @context.draft_state_enabled? %>
       <%= render :partial => 'context_modules/content_next', :locals => {:course_home => true} %>
     <% else %>
       <%= render :partial => 'context_modules/content', :locals => {:course_home => true} %>
