@@ -328,7 +328,9 @@ class WikiPage < ActiveRecord::Base
   end
 
   def context(user=nil)
-    @context ||= Course.find_by_wiki_id(self.wiki_id) || Group.find_by_wiki_id(self.wiki_id)
+    shard.activate do
+      @context ||= Course.find_by_wiki_id(self.wiki_id) || Group.find_by_wiki_id(self.wiki_id)
+    end
   end
 
   def participants
