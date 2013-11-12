@@ -249,7 +249,7 @@ TEXT
           </div>
         </div>
       </li>
-      <li id="unregistered_service_skype" class="service" style="<%= hidden if services.include?("skype") %>">
+      <li id="unregistered_service_skype" class="service" style="<%= hidden if services.include?("skype") || !service_enabled?(:skype) %>">
         <a href="#" class="btn btn-small"><%= image_tag "skype_icon.png" %> <%= t('links.skype', "Skype") %></a>
         <div style="display: none; text-align: left;" class="content" title="<%= t('titles.register_skype', "Register Skype") %>" id="unregistered_service_skype_dialog">
           <div>
@@ -346,7 +346,7 @@ TEXT
           </div>
         </div>
       </li>
-      <li id="unregistered_service_delicious" class="service" style="<%= hidden if services.include?("delicious") %>">
+      <li id="unregistered_service_delicious" class="service" style="<%= hidden if services.include?("delicious") || !service_enabled?(:delicious) %>">
         <a href="#" class="btn btn-small"><%= image_tag "delicious_icon.png" %> <%= t('links.delicious', "Delicious") %></a>
         <div style="display: none; text-align: left;" class="content" title="<%= t('titles.delicious_login', "Delicious Login") %>" id="unregistered_service_delicious_dialog">
           <div>
@@ -380,7 +380,7 @@ TEXT
           </div>
         </div>
       </li>
-      <li id="unregistered_service_diigo" class="service" style="<%= hidden if services.include?("diigo") %>">
+      <li id="unregistered_service_diigo" class="service" style="<%= hidden if services.include?("diigo") || !service_enabled?(:diigo) %>">
         <a href="#" class="btn btn-small"><%= image_tag "diigo_icon.png" %> <%= t('links.diigo', "Diigo") %></a>
         <div style="display: none; text-align: left;" class="content" title="<%= t('titles.diigo_login', "Diigo Login") %>" id="unregistered_service_diigo_dialog">
           <div>
