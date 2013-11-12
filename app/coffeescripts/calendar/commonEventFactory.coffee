@@ -78,4 +78,8 @@ define [
     if type == 'assignment'
       obj.can_edit = true
 
+    # frozen assignments can't be deleted
+    if obj.assignment?.frozen
+      obj.can_delete = false
+
     obj

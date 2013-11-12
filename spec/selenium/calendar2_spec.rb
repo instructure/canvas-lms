@@ -310,6 +310,23 @@ describe "calendar2" do
         fj('.fc-event-inner').should be_nil
       end
 
+      it "should not have a delete link for a frozen assignment" do
+        PluginSetting.stubs(:settings_for_plugin).returns({"assignment_group_id" => "true"})
+        frozen_assignment = @course.assignments.build(
+          name: "frozen assignment",
+          due_at: Time.zone.now,
+          freeze_on_copy: true,
+        )
+        frozen_assignment.copied = true
+        frozen_assignment.save!
+
+        get("/calendar2")
+        wait_for_ajaximations
+        fj('.fc-event:visible').click
+        wait_for_ajaximations
+        f('.delete_event_link').should be_nil
+      end
+
       it "should let me message students who have signed up for an appointment" do
         date = Date.today.to_s
         create_appointment_group :new_appointments => [
