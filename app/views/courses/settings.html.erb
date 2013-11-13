@@ -240,19 +240,34 @@ TEXT
         <td></td>
         <td colspan="3">
           <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment %>">
-            <%= t 'course_open_enrollment', <<-TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :url2 => register_url, :code => @context.self_enrollment_code || '{{ self_enrollment_code }}', :wrapper => '<b>\1</b>'
-                  This course has enabled open enrollment. Students can
-                  self-enroll in the course once you share with them this URL:
-                  *%{url}*. Alternatively, they can sign up at *%{url2}* and
-                  use the following join code: *%{code}*
-                TEXT
-            %>
+            <% if @context.root_account.self_registration? %>
+              <%= t 'course_open_enrollment', <<-TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :url2 => register_url, :code => @context.self_enrollment_code || '{{ self_enrollment_code }}', :wrapper => '<b>\1</b>'
+                    This course has enabled open enrollment. Students can
+                    self-enroll in the course once you share with them this URL:
+                    *%{url}*. Alternatively, they can sign up at *%{url2}* and
+                    use the following join code: *%{code}*
+                  TEXT
+              %>
+            <% else %>
+              <%= t 'course_open_enrollment_without_code', <<-TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :wrapper => '<b>\1</b>'
+                    This course has enabled open enrollment. Students can
+                    self-enroll in the course once you share with them this URL:
+                    *%{url}*
+                  TEXT
+              %>
+            <% end %>
           </span>
           <a href="#" class="course_form course_form_more_options_link" style="padding-left: 20px;"><%= t('links.more_options', %{more options}) %></a>
           <div class="course_form_more_options" style="display: none; padding-left: 20px;">
             <% if @context.self_enrollment_allowed? %>
               <%= f.check_box :self_enrollment, :class => 'self_enrollment_checkbox' %>
-              <%= f.label :self_enrollment, :en => "Let students self-enroll by sharing with them a secret URL or code" %><br/>
+              <label for="course_self_enrollment">
+                <% if @context.root_account.self_registration? %>
+                  <%= t :self_enrollment, "Let students self-enroll by sharing with them a secret URL or code" %>
+                <% else %>
+                  <%= t :self_enrollment_without_code, "Let students self-enroll by sharing with them a secret URL" %>
+                <% end %>
+              </label><br/>
               <div class="open_enrollment_holder" style="display: none;">
               <%= f.check_box :open_enrollment %>
               <%= f.label :open_enrollment, :en => "Add a \"Join this Course\" link to the course home page" %><br/>
