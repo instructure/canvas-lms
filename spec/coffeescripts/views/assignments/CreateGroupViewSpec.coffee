@@ -12,6 +12,7 @@ define [
 
   group = ->
     new AssignmentGroup
+      name: 'something cool'
       assignments: [new Assignment, new Assignment]
 
   assignmentGroups = ->
@@ -22,7 +23,7 @@ define [
       assignmentGroups: assignmentGroups()
       assignmentGroup: @groups.first() if hasAssignmentGroup
 
-    view = new CreateGroupView(args)
+    new CreateGroupView(args)
 
   module 'CreateGroupView'
 
@@ -36,6 +37,49 @@ define [
     errors = view.validateFormData(data)
     ok _.isEmpty(errors)
 
+  test 'it should create a new assignment group', ->
+    close_stub = sinon.stub(CreateGroupView.prototype, 'close', -> )
+
+    view = createView(false)
+    view.render()
+    view.onSaveSuccess()
+    equal view.assignmentGroups.size(), 3
+
+    close_stub.restore()
+
+  test 'it should edit an existing assignment group', ->
+    view = createView()
+    save_spy = sinon.spy(view.model, "save")
+    view.render()
+    view.open()
+    #the selector uses 'new' for id because this model hasn't been saved yet
+    view.$("#ag_new_name").val("IchangedIt")
+    view.$("#ag_new_drop_lowest").val("1")
+    view.$("#ag_new_drop_highest").val("1")
+    view.$(".create_group").click()
+
+    formData = view.getFormData()
+    equal formData["name"], "IchangedIt"
+    equal formData["rules"]["drop_lowest"], 1
+    equal formData["rules"]["drop_highest"], 1
+    ok save_spy.called
+    save_spy.restore()
+
+  test 'it should not save drop rules when none are given', ->
+    view = createView()
+    save_spy = sinon.spy(view.model, "save")
+    view.render()
+    view.open()
+    view.$("#ag_new_drop_lowest").val("")
+    equal view.$("#ag_new_drop_highest").val(), "0"
+    view.$("#ag_new_name").val("IchangedIt")
+    view.$(".create_group").click()
+
+    formData = view.getFormData()
+    equal formData["name"], "IchangedIt"
+    equal _.keys(formData["rules"]).length, 0
+    ok save_spy.called
+    save_spy.restore()
 
   test 'it should only allow positive numbers for drop rules', ->
     view = createView()
