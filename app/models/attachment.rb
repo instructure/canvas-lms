@@ -1675,13 +1675,15 @@ class Attachment < ActiveRecord::Base
 
   class OverQuotaError < StandardError; end
 
-  def clone_url(url, duplicate_handling, check_quota)
+  def clone_url(url, duplicate_handling, check_quota, opts={})
     begin
       Canvas::HTTP.clone_url_as_attachment(url, :attachment => self)
 
       if check_quota
         self.save! # save to calculate attachment size, otherwise self.size is nil
-        raise(OverQuotaError) if Attachment.over_quota?(self.context, self.size)
+        if Attachment.over_quota?(opts[:quota_context] || self.context, self.size)
+          raise OverQuotaError, t(:over_quota, 'The downloaded file exceeds the quota.')
+        end
       end
 
       self.file_state = 'available'
@@ -1689,6 +1691,7 @@ class Attachment < ActiveRecord::Base
       handle_duplicates(duplicate_handling || 'overwrite')
     rescue Exception, Timeout::Error => e
       self.file_state = 'errored'
+      self.workflow_state = 'errored'
       case e
       when Canvas::HTTP::TooManyRedirectsError
         self.upload_error_message = t :upload_error_too_many_redirects, "Too many redirects"
@@ -1704,7 +1707,7 @@ class Attachment < ActiveRecord::Base
       when OverQuotaError
         self.upload_error_message = t :upload_error_over_quota, "file size exceeds quota limits: %{bytes} bytes", :bytes => self.size
       else
-        self.upload_error_message = t :upload_error_unexpected, "An unknown error occured downloading from %{url}", :url => url
+        self.upload_error_message = t :upload_error_unexpected, "An unknown error occurred downloading from %{url}", :url => url
       end
       self.save!
     end

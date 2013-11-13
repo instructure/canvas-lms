@@ -72,6 +72,7 @@ module Canvas::HTTP
         http_response.read_body(tmpfile)
         tmpfile.rewind
         attachment = opts[:attachment] || Attachment.new(:filename => File.basename(uri.path))
+        attachment.filename ||= File.basename(uri.path)
         attachment.uploaded_data = tmpfile
         if attachment.content_type.blank? || attachment.content_type == "unknown/unknown"
           attachment.content_type = http_response.content_type

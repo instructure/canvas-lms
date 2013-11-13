@@ -2170,4 +2170,20 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
   end
 
+  it "should use url for migration file" do
+    course_with_teacher
+    cm = ContentMigration.new(:context => @course, :user => @user,)
+    cm.migration_type = 'zip_file_importer'
+    cm.migration_settings[:folder_id] = Folder.root_folders(@course).first.id
+    # the mock below should prevent it from actually hitting the url
+    cm.migration_settings[:file_url] = "http://localhost:3000/file.zip"
+    cm.save!
+
+    Attachment.any_instance.expects(:clone_url).with(cm.migration_settings[:file_url], false, true, :quota_context => cm.context)
+
+    cm.queue_migration
+    worker = Canvas::Migration::Worker::CCWorker.new
+    worker.perform(cm)
+  end
+
 end
