@@ -36,7 +36,7 @@ describe "context_modules" do
     end
 
     def open_admin_module_menu
-      fj('#context_modules .admin-links .al-trigger').click
+      fj('#context_modules .admin-links.al-trigger').click
       wait_for_ajaximations
       sleep 1
     end
@@ -47,14 +47,14 @@ describe "context_modules" do
     end
 
     def publish_module
-      fj('#context_modules .admin-links .al-trigger').click
+      fj('#context_modules .admin-links.al-trigger').click
       keep_trying_until { f("#ui-id-2").should have_class('ui-state-open') }
       fj('#context_modules .change-workflow-state-link').click
       wait_for_ajaximations
     end
 
     def unpublish_module
-      fj('#context_modules .admin-links .al-trigger').click
+      fj('#context_modules .admin-links.al-trigger').click
       keep_trying_until { f("#ui-id-1").should have_class('ui-state-open') }
       fj('#context_modules .change-workflow-state-link').click
       wait_for_ajaximations
@@ -134,7 +134,7 @@ describe "context_modules" do
       @course.context_modules.first.workflow_state.should == "unpublished"
 
       keep_trying_until do
-        f('.admin-links .al-trigger').click
+        f('.admin-links.al-trigger').click
         hover_and_click('#context_modules .change-workflow-state-link')
         wait_for_ajax_requests
         f('.context_module').should have_class('published_module')
@@ -335,7 +335,7 @@ describe "context_modules" do
       refresh_page
 
       keep_trying_until do
-        f('.admin-links .al-trigger').click
+        f('.admin-links.al-trigger').click
         hover_and_click('#context_modules .edit_module_link')
         wait_for_ajax_requests
         f('#add_context_module_form').should be_displayed
@@ -378,7 +378,7 @@ describe "context_modules" do
 
       add_module('Delete Module')
       driver.execute_script("$('.context_module').addClass('context_module_hover')")
-      f('.admin-links .al-trigger').click
+      f('.admin-links.al-trigger').click
       wait_for_ajaximations
       f('.delete_module_link').click
       driver.switch_to.alert.should_not be_nil
@@ -395,7 +395,7 @@ describe "context_modules" do
       add_module('Edit Module')
       context_module = f('.context_module')
       driver.action.move_to(context_module).perform
-      f('.admin-links .al-trigger').click
+      f('.admin-links.al-trigger').click
       f('.edit_module_link').click
       f('.ui-dialog').should be_displayed
       edit_form = f('#add_context_module_form')
@@ -414,7 +414,7 @@ describe "context_modules" do
       # add completion criterion
       context_module = f('.context_module')
       driver.action.move_to(context_module).perform
-      f('.admin-links .al-trigger').click
+      f('.admin-links.al-trigger').click
       wait_for_ajaximations
       f('.edit_module_link').click
       wait_for_ajaximations
@@ -437,7 +437,7 @@ describe "context_modules" do
 
       # delete the criterion, then cancel the form
       driver.action.move_to(context_module).perform
-      f('.admin-links .al-trigger').click
+      f('.admin-links.al-trigger').click
       wait_for_ajaximations
       f('.edit_module_link').click
       wait_for_ajaximations
@@ -451,7 +451,7 @@ describe "context_modules" do
       # now delete the criterion frd
       # (if the previous step did even though it shouldn't have, this will error)
       driver.action.move_to(context_module).perform
-      f('.admin-links .al-trigger').click
+      f('.admin-links.al-trigger').click
       wait_for_ajaximations
       f('.edit_module_link').click
       wait_for_ajaximations
@@ -468,7 +468,7 @@ describe "context_modules" do
 
       # and also make sure the form remembers that it's gone (#8329)
       driver.action.move_to(context_module).perform
-      f('.admin-links .al-trigger').click
+      f('.admin-links.al-trigger').click
       f('.edit_module_link').click
       f('.ui-dialog').should be_displayed
       edit_form = f('#add_context_module_form')
@@ -561,7 +561,7 @@ describe "context_modules" do
       add_module('TestModule')
 
       # add a text header
-      f('.admin-links .al-trigger').click
+      f('.admin-links.al-trigger').click
       f('.add_module_item_link').click
       select_module_item('#add_module_item_select', 'Text Header')
       wait_for_ajaximations
@@ -572,7 +572,7 @@ describe "context_modules" do
       tag1 = ContentTag.last
 
       # and another one
-      f('.admin-links .al-trigger').click
+      f('.admin-links.al-trigger').click
       f('.add_module_item_link').click
       select_module_item('#add_module_item_select', 'Text Header')
       wait_for_ajaximations
@@ -626,7 +626,7 @@ describe "context_modules" do
 
       header_text = 'new header text'
       add_module('Text Header Module')
-      f('.admin-links .al-trigger').click
+      f('.admin-links.al-trigger').click
       f('.add_module_item_link').click
       select_module_item('#add_module_item_select', 'Text Header')
       keep_trying_until do
@@ -656,7 +656,7 @@ describe "context_modules" do
       get "/courses/#{@course.id}/modules"
 
       add_module 'Test module'
-      f('.admin-links .al-trigger').click
+      f('.admin-links.al-trigger').click
       wait_for_ajaximations
       f('.add_module_item_link').click
       wait_for_ajaximations
@@ -695,7 +695,7 @@ describe "context_modules" do
       db_module = ContextModule.last
       context_module = f("#context_module_#{db_module.id}")
       driver.action.move_to(context_module).perform
-      f("#context_module_#{db_module.id} .admin-links .al-trigger").click
+      f("#context_module_#{db_module.id} .admin-links.al-trigger").click
       f("#context_module_#{db_module.id} .edit_module_link").click
       f('.ui-dialog').should be_displayed
       wait_for_ajaximations
@@ -890,7 +890,7 @@ describe "context_modules" do
       # add completion criterion
       context_module = f('.context_module')
       driver.action.move_to(context_module).perform
-      f('.admin-links .al-trigger').click
+      f('.admin-links.al-trigger').click
       f('.edit_module_link').click
       edit_form = f('#add_context_module_form')
       f('.add_completion_criterion_link', edit_form).click
