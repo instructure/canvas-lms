@@ -199,6 +199,19 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
     assertGrade result, 'current', 209.45, 200
     assertDropped result.group_sums[0].current.submissions, [101.9,100]
 
+    # works with string ids
+    @assignment_id = 0
+    @submissions = []
+    @setup_grades @group, [[100,100], [42,91], [14,55], [3,38], [null,1000]]
+    @group.rules = drop_lowest: 1, never_drop: ["3"] # 3/38
+    @group.assignments.map (a) -> a.id = a.id.toString()
+    @submissions.map (s) -> s.assignment_id = s.assignment_id.toString()
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'current', 145, 229
+    assertDropped result.group_sums[0].current.submissions, [14, 55]
+    assertGrade result, 'final', 159, 284
+    assertDropped result.group_sums[0]['final'].submissions, [0, 1000]
+
   test "grade dropping in ridiculous circumstances", ->
     @setup_grades @group, [[null, 20], [3, 10], [null, 10],
       [null, 100000000000000007629769841091887003294964970946560],
