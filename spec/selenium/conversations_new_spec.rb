@@ -409,7 +409,7 @@ describe "conversations new" do
                  else
                    :control
                  end
-      modifier = :control
+
       driver.action.key_down(modifier).perform
       ff('.messages li').each do |message|
         message.click
