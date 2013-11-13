@@ -1124,13 +1124,19 @@ class Quiz < ActiveRecord::Base
     given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? }
     can :submit
     
-    given { |user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
+    given do |user, session|
+      (draft_state_enabled? ? published? : true) &&
+        cached_context_grants_right?(user, session, :read)
+    end
     can :read
 
     given { |user, session| self.cached_context_grants_right?(user, session, :view_all_grades) }
     can :read_statistics and can :review_grades
 
-    given { |user, session| self.available? && self.cached_context_grants_right?(user, session, :participate_as_student) }#students.include?(user) }
+    given do |user, session|
+      available? &&
+        cached_context_grants_right?(user, session, :participate_as_student)
+    end
     can :read and can :submit
   end
   scope :include_assignment, includes(:assignment)
@@ -1267,4 +1273,11 @@ class Quiz < ActiveRecord::Base
     end
     question_regrades.count
   end
+
+  # override for draft state
+  def available?
+    draft_state_enabled? ? published? : workflow_state == 'available'
+  end
+
+  delegate :draft_state_enabled?, to: :context
 end

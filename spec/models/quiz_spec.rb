@@ -1334,4 +1334,89 @@ describe Quiz do
       quiz.hide_correct_answers_at.should be_nil
     end
   end
+  context "permissions" do
+
+    before do
+      @course.workflow_state = 'available'
+      @course.save!
+      course_quiz(course: @course)
+      student_in_course(course: @course, active_all: true)
+      teacher_in_course(course: @course, active_all: true)
+    end
+
+    describe "read" do
+
+      context "draft state enabled" do
+
+        before do
+          @course.account.enable_draft!
+        end
+
+        it "doesn't let student read/submit quizzes that are unpublished" do
+          @quiz.unpublish!.reload
+          @quiz.grants_right?(@student, nil, :read).should == false
+          @quiz.grants_right?(@student, nil, :submit).should == false
+          @quiz.grants_right?(@teacher, nil, :read).should == true
+        end
+
+        it "does let students read/submit quizzes that are published" do
+          @quiz.publish!
+          @quiz.grants_right?(@student, nil, :read).should == true
+          @quiz.grants_right?(@student, nil, :submit).should == true
+          @quiz.grants_right?(@teacher, nil, :read).should == true
+        end
+
+      end
+
+      context "draft state not enabled" do
+
+        it "always lets students view the quiz, even if not available" do
+          @quiz.workflow_state = 'edited'
+          @quiz.save!
+          @quiz.grants_right?(@student, nil, :read).should == true
+          @quiz.workflow_state = 'available'
+          @quiz.save!
+          @quiz.grants_right?(@student, nil, :read).should == true
+        end
+
+        it "only allows submitting for available assignments" do
+          @quiz.workflow_state = 'edited'
+          @quiz.save!
+          @quiz.grants_right?(@student, nil, :submit).should == false
+          @quiz.workflow_state = 'available'
+          @quiz.save!
+          @quiz.grants_right?(@student, nil, :submit).should == true
+        end
+      end
+    end
+  end
+
+  describe "#available?" do
+
+    before do
+      @quiz = @course.quizzes.create!(title: 'Test Quiz')
+    end
+
+    context "draft state enabled" do
+      before do
+        @course.account.enable_draft!
+      end
+
+      it "returns true if quiz is published" do
+        @quiz.publish!
+        @quiz.should be_available
+        @quiz.unpublish!
+        @quiz.should_not be_available
+      end
+    end
+
+    context "draft state disabled" do
+      it "returns true when workflow_state is 'available'" do
+        @quiz.workflow_state = 'available'
+        @quiz.should be_available
+        @quiz.workflow_state = 'deleted'
+        @quiz.should_not be_available
+      end
+    end
+  end
 end

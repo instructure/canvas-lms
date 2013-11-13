@@ -51,13 +51,13 @@ describe "/quizzes/show" do
     true
   end
 
-  it "should warn students if quiz is unpublished" do
+  it "doesn't warn students if quiz is unpublished" do
     course_with_student_logged_in(:active_all => true)
     quiz = @course.quizzes.create!
     assigns[:quiz] = quiz
     view_context
     render "quizzes/show"
-    response.should have_tag ".unpublished_warning"
+    response.should_not have_tag ".unpublished_warning"
   end
 
   it "should show header bar and publish button if draft state enabled" do
@@ -74,17 +74,5 @@ describe "/quizzes/show" do
     response.should have_tag "#quiz-publish-link"
   end
 
-  it "should warn student if quiz is unpublished and draft state enabled" do
-    Account.default.settings[:enable_draft] = true
-    Account.default.save!
-
-    course_with_student_logged_in(:active_all => true)
-    assigns[:quiz] = @course.quizzes.create!
-
-    view_context
-    render "quizzes/show"
-
-    response.should have_tag ".unpublished_warning"
-  end
 end
 

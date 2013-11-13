@@ -342,6 +342,15 @@ describe QuizzesController do
       path = "courses/#{@course.id}/quizzes/#{@quiz.id}/submission_versions"
       assigns[:js_env][:SUBMISSION_VERSIONS_URL].should include(path)
     end
+
+    it "doesn't show unpublished quizzes to students with draft state" do
+      course_with_student_logged_in(active_all: true)
+      course_quiz(active=true)
+      Account.default.enable_draft!
+      @quiz.unpublish!
+      get 'show', course_id: @course.id, id: @quiz.id
+      response.should_not be_success
+    end
   end
 
   describe "GET 'managed_quiz_data'" do
