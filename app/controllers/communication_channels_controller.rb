@@ -359,14 +359,19 @@ class CommunicationChannelsController < ApplicationController
   # @returns CommunicationChannel
   def destroy
     @user = api_request? ? api_find(User, params[:user_id]) : @current_user
-    @cc   = @user.communication_channels.find(params[:id]) if params[:id]
+    if params[:type] && params[:address]
+      @cc = @user.communication_channels.unretired.of_type(params[:type]).by_path(params[:address]).first
+      raise ActiveRecord::RecordNotFound unless @cc
+    else
+      @cc = @user.communication_channels.unretired.find(params[:id])
+    end
 
     return render_unauthorized_action unless has_api_permissions?
     if @cc.imported? && !@domain_root_account.edit_institution_email?
       return render_unauthorized_action
     end
 
-    if @cc.nil? || @cc.destroy
+    if @cc.destroy
       @user.touch
       if api_request?
         render :json => communication_channel_json(@cc, @current_user, session)

@@ -199,12 +199,38 @@ describe 'CommunicationChannels API', :type => :integration do
         }
       end
 
+      it "should 404 if already deleted" do
+        api_call(:delete, @path, @path_options)
+        raw_api_call(:delete, @path, @path_options)
+        response.code.should == '404'
+      end
+
       it "should not be able to delete others' channels" do
         @channel = @admin.communication_channel
         raw_api_call(:delete, "/api/v1/users/#{@admin.id}/communication_channels/#{@channel.id}",
           @path_options.merge(:user_id => @admin.to_param, :id => @channel.to_param))
 
         response.code.should eql '401'
+      end
+
+      it "should be able to delete by path, instead of id" do
+        api_call(:delete, "/api/v1/users/#{@someone.id}/communication_channels/#{@channel.path_type}/#{URI.escape(@channel.path)}",
+                 :controller => 'communication_channels',
+                 :action => 'destroy', :user_id => @someone.to_param, :format => 'json',
+                 :type => @channel.path_type, :address => @channel.path)
+        @channel.reload.should be_retired
+      end
+
+      it "should 404 if already deleted by path" do
+        api_call(:delete, "/api/v1/users/#{@someone.id}/communication_channels/#{@channel.path_type}/#{URI.escape(@channel.path)}",
+                 :controller => 'communication_channels',
+                 :action => 'destroy', :user_id => @someone.to_param, :format => 'json',
+                 :type => @channel.path_type, :address => @channel.path)
+        raw_api_call(:delete, "/api/v1/users/#{@someone.id}/communication_channels/#{@channel.path_type}/#{URI.escape(@channel.path)}",
+                     :controller => 'communication_channels',
+                     :action => 'destroy', :user_id => @someone.to_param, :format => 'json',
+                     :type => @channel.path_type, :address => @channel.path)
+        response.code.should == '404'
       end
     end
   end

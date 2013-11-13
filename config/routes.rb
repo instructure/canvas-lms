@@ -1121,6 +1121,7 @@ routes.draw do
       get 'users/:user_id/communication_channels', :action => :index, :path_name => 'communication_channels'
       post 'users/:user_id/communication_channels', :action => :create
       delete 'users/:user_id/communication_channels/:id', :action => :destroy
+      delete 'users/:user_id/communication_channels/:type/:address', :action => :destroy, :constraints => { :address => %r{[^/?]+} }
     end
 
     scope(:controller => :comm_messages_api) do
