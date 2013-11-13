@@ -57,7 +57,7 @@ define [
 
     addGroup: (e) ->
       e.preventDefault()
-      @createView ?= new GroupEditView({editing: false, focusReturnsTo: => @$el.find('.add-group')})
+      @createView ?= new GroupEditView({groupCategory: @model, editing: false, focusReturnsTo: => @$el.find('.add-group')})
       new_group = new Group(group_category_id: @model.id)
       new_group.on 'sync', _.once =>
         @collection.add(new_group)

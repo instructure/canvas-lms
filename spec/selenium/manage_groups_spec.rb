@@ -67,7 +67,7 @@ describe "manage groups" do
       # click the first visible "Add Group" button
       fj(".add-group:visible:first").click
       wait_for_animations
-      f("#group_category_name").send_keys("New Test Group A")
+      f("#group_name").send_keys("New Test Group A")
       f("form.group-edit-dialog").submit
       wait_for_ajaximations
 

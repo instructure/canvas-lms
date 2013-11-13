@@ -74,26 +74,3 @@ define [
 
     server.restore()
     confirmStub.restore()
-
-  test 'editing group should change name', ->
-    url = "/api/v1/groups/#{view.model.get('id')}"
-    new_name = 'Newly changed name'
-    server = sinon.fakeServer.create()
-    server.respondWith url, [
-      200
-      'Content-Type': 'application/json'
-      JSON.stringify {
-        id: 42
-        name: new_name}
-    ]
-
-    # when
-    view.$('.edit-group').click()
-    # verify it opens with the current group name displayed
-    equal $('#group_category_name').val(), group.get('name')
-    # set a new name
-    $('#group_category_name').val(new_name)
-    $(".group-edit-dialog button[type=submit]").click()
-    server.respond()
-
-    equal group.get('name'), new_name

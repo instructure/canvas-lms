@@ -8,6 +8,8 @@ define [
 
   class GroupEditView extends DialogFormView
 
+    @optionProperty 'groupCategory'
+
     defaults:
       width: 550
       title: I18n.t "edit_group", "Edit Group"
@@ -51,3 +53,11 @@ define [
 
     checkEsc: (e) =>
       @close() if e.keyCode is 27 # escape
+
+    toJSON: ->
+      json = super
+      if groupCategory = @model.collection?.category
+        json.role = groupCategory.get('role')
+      else
+        json.role = @groupCategory.get('role')
+      json
