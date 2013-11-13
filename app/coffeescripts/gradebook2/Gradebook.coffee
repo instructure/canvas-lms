@@ -149,6 +149,7 @@ define [
           student.computed_current_score ||= 0
           student.computed_final_score ||= 0
           student.secondary_identifier = student.sis_login_id || student.login_id
+          student.sis_id = student.sis_user_id || '-'
 
           if @sections_enabled
             mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
@@ -713,7 +714,7 @@ define [
       @userFilterRemovedRows = []
 
       if term != ''
-        propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name']
+        propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name', 'sis_user_id']
         index = @multiGrid.data.length
         while index--
           student = @multiGrid.data[index]
@@ -772,6 +773,16 @@ define [
         id: 'secondary_identifier'
         name: I18n.t 'secondary_id', 'Secondary ID'
         field: 'secondary_identifier'
+        width: 100
+        cssClass: "meta-cell secondary_identifier_cell"
+        resizable: false
+        sortable: true
+        formatter: @htmlContentFormatter
+      },
+      {
+        id: 'sis_id'
+        name: I18n.t 'sis_id', 'SIS ID'
+        field: 'sis_id'
         width: 100
         cssClass: "meta-cell secondary_identifier_cell"
         resizable: false
@@ -912,7 +923,7 @@ define [
           bScore = -99999999999 if not bScore and bScore != 0
           if data.sortAsc then bScore - aScore else aScore - bScore
       @multiGrid.grids[0].onSort.subscribe (event, data) =>
-        propertyToSortBy = {display_name: 'sortable_name', secondary_identifier: 'secondary_identifier'}[data.sortCol.field]
+        propertyToSortBy = {display_name: 'sortable_name', secondary_identifier: 'secondary_identifier', sis_id: 'sis_id'}[data.sortCol.field]
         sortRowsBy (a, b) ->
           res = if a[propertyToSortBy] < b[propertyToSortBy] then -1
           else if a[propertyToSortBy] > b[propertyToSortBy] then 1
