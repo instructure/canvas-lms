@@ -111,6 +111,21 @@ describe ConversationsController, :type => :integration do
       ]
     end
 
+    it "should stringify audience ids if requested" do
+      @c1 = conversation(@bob, :workflow_state => 'read')
+      @c2 = conversation(@bob, @billy, :workflow_state => 'unread', :subscribed => false)
+
+      json = api_call(:get, "/api/v1/conversations",
+              { :controller => 'conversations', :action => 'index', :format => 'json' },
+              {},
+              {'Accept' => 'application/json+canvas-string-ids'})
+      audiences = json.map { |j| j['audience'] }
+      audiences.should == [
+        [@billy.id.to_s, @bob.id.to_s],
+        [@bob.id.to_s],
+      ]
+    end
+
     it "should paginate and return proper pagination headers" do
       7.times{ conversation(student_in_course) }
       @user.conversations.size.should eql 7
