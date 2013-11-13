@@ -149,6 +149,13 @@ body {
         color: #627382;
     }
 
+    .fc-agenda-slots td div {
+      /* this value needs to match the calculated value of .fc-agenda-axis
+       * below, or event height will be wrong will dragging to resize in
+       * week view */
+      height: 27px;
+    }
+
     .fc-agenda-axis {
       border-color: #DADADA;
       padding: 3px 6px;
