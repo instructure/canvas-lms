@@ -63,14 +63,19 @@ define [
 
   return sidebar = (contexts, selectedContexts, dataSource) ->
 
-    $holder = $('#context-list-holder')
+    $holder   = $('#context-list-holder')
+    $skipLink = $('.skip-to-calendar')
 
     $holder.html contextListTemplate(contexts: contexts)
 
     visibleContexts = new VisibleContextManager(contexts, selectedContexts, $holder)
 
-    $holder.delegate '.context_list_context', 'click keydown', (event) ->
+    $holder.on 'click keydown', '.context_list_context', (event) ->
       return if event.type is 'keydown' and event.keyCode != 13 and event.keyCode != 32
       visibleContexts.toggle $(this).data('context')
       userSettings.set('checked_calendar_codes',
         map($(this).parent().children('.checked'), (c) -> $(c).data('context')))
+
+    $skipLink.on 'click', (e) ->
+      e.preventDefault()
+      $('#content').attr('tabindex', -1).focus()
