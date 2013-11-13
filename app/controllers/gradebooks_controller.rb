@@ -182,7 +182,6 @@ class GradebooksController < ApplicationController
             if @context.draft_state_enabled?
               @assignments = @assignments.select(&:published?)
             end
-            @gradebook_upload = @context.build_gradebook_upload
             @submissions = @context.submissions
             @new_submissions = @submissions
             if params[:updated]
