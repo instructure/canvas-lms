@@ -110,7 +110,7 @@ define [
 
       if neverDropIds.length > 0
         [cantDrop, submissions] = partition(submissions, (s) ->
-          _.indexOf(neverDropIds, parseInt s.submission.assignment_id) >= 0)
+          _.indexOf(neverDropIds, s.submission.assignment_id) >= 0)
       else
         cantDrop = []
 
