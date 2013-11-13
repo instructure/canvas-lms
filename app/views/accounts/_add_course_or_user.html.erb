@@ -47,7 +47,7 @@
         </tr>
       <% end %>
       <tr>
-        <td><%= blabel :pseudonym, :unique_id, @root_account.login_handle_name %></td>
+        <td><label for="pseudonym_unique_id"><%= t(:unique_id_label, "%{label}:*", :label => @root_account.login_handle_name) %></label></td>
         <td><%= text_field :pseudonym, :unique_id %></td>
       </tr>
       <% if @root_account.allow_sis_import && can_do(@root_account, @current_user, :manage_sis) %>
