@@ -1,12 +1,12 @@
 define [
-  'jquery'
+  'i18n!calendar'
   'jst/calendar/undatedEvents'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/ShowEventDetailsDialog'
   'jqueryui/draggable'
   'jquery.disableWhileLoading'
   'vendor/jquery.ba-tinypubsub'
-], ($, undatedEventsTemplate, EventDataSource, ShowEventDetailsDialog) ->
+], (I18n, undatedEventsTemplate, EventDataSource, ShowEventDetailsDialog) ->
 
   class UndatedEventsList
     constructor: (selector, @dataSource, @calendar) ->
@@ -40,6 +40,7 @@ define [
         opacity: 1,
         lines: 8, length: 2, width: 2, radius: 3
       })
+      $.screenReaderFlashMessage(I18n.t('loading_undated_events', 'Loading undated events'))
 
       @dataSource.getEvents null, null, @visibleContextList, (events) =>
         loadingDfd.resolve()
@@ -64,6 +65,7 @@ define [
             # Only show the element after the drag stops if it doesn't have a start date now
             # (meaning it wasn't dropped on the calendar)
             $(this).show() unless $(this).data('calendarEvent').start
+        @div.find('.undated_event:first').attr('tabindex', -1).focus()
 
     show: (event) =>
       event.preventDefault()
