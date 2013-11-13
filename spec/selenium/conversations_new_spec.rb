@@ -447,7 +447,7 @@ describe "conversations new" do
       get_conversations
       select_all_conversations
       click_unread_toggle_menu_item
-      ffj('.read-state[aria-checked=false]').count.should == 2
+      keep_trying_until { ffj('.read-state[aria-checked=false]').count.should == 2 }
     end
 
     it "should star multiple conversations" do
@@ -456,7 +456,7 @@ describe "conversations new" do
       select_all_conversations
       click_star_toggle_menu_item
       run_progress_job
-      ff('.star-btn.active').count.should == 2
+      keep_trying_until { ff('.star-btn.active').count.should == 2 }
       @conversations.each { |c| c.reload.should be_starred }
     end
   end
