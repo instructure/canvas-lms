@@ -7,7 +7,7 @@ $cell_height: 33px
   position: absolute
   bottom: 4px
   left: 0px
-#gradebook_grid
+.container_1
   .slick-cell
     border: 0
     padding: 0
@@ -15,6 +15,9 @@ $cell_height: 33px
     &.editable
       background: transparent
       border: none
+#gradebook_grid .slick-cell.meta-cell
+  padding: 0
+  border-width: 0 1px
 // ******* END overrides of the default slick.grid.css styles ********
 
 .gradebook2 #content
@@ -24,45 +27,36 @@ $cell_height: 33px
 #gradebook-grid-wrapper
   position: relative
 
-#gradebook_students_grid
+.student-name
+  color: #1b7eda
+  text-shadow: #fbf8f8 0 0 1px
+.avatar
   float: left
-  width: 250px
+  width: 34px
+  img
+    max-width: 30px
+    height: 30px
+.student-placeholder
+  display: none
+.student-section
+  position: relative
+  top: -7px
+  font-size: 10px
+  color: #aaa
+.secondary_identifier_cell
+  color: #333
+  font-size: 10px
+  text-align: center
+  line-height: 35px
 
-  // put some space at the bottom of the student names slickgrid to compensate
-  // for the lack of a scrollbar like the main grade grid so when you scroll
-  // to the bottom it can match the same scrollTop as the main grid.
-  .grid-canvas
-    padding-bottom: 50px
-  .student-name
-    color: #1b7eda
-    text-shadow: #fbf8f8 0 0 1px
-  .avatar
-    float: left
-    width: 34px
-    img
-      max-width: 30px
-      height: 30px
-  .student-placeholder
+// show and hide student names using a parent css class.
+.hide-students
+  .student-name, .avatar
     display: none
-  .student-section
-    position: relative
-    top: -7px
-    font-size: 10px
-    color: #aaa
+  .student-placeholder
+    display: block
   .secondary_identifier_cell
-    color: #333
-    font-size: 10px
-    text-align: center
-    line-height: 35px
-
-  // show and hide student names using a parent css class.
-  .hide-students
-    .student-name, .avatar
-      display: none
-    .student-placeholder
-      display: block
-    .secondary_identifier_cell
-      text-indent: -9999em
+    text-indent: -9999em
 
 // override the default jquery ui top border
 .slick-header.ui-state-default
@@ -77,7 +71,9 @@ $cell_height: 33px
   // override jqueryUI style
   &.ui-state-default
     height: 30px
-  &.hovered-column
+  &.hovered-column,
+  &.slick-header-column-active,
+  &.ui-state-hover
     +vertical-gradient(#e0ecf9, #bdd2e3)
 
   .slick-column-name

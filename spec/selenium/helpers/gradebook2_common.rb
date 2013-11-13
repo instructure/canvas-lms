@@ -22,7 +22,7 @@ def toggle_muting(assignment)
 end
 
 def open_assignment_options(cell_index)
-  assignment_cell = ffj('#gradebook_grid .slick-header-column')[cell_index]
+  assignment_cell = ffj('#gradebook_grid .container_1 .slick-header-column')[cell_index]
   driver.action.move_to(assignment_cell).perform
   trigger = assignment_cell.find_element(:css, '.gradebook-header-drop')
   trigger.click
@@ -66,7 +66,7 @@ end
 
 def open_comment_dialog(x=0, y=0)
   #move_to occasionally breaks in the hudson build
-  cell = driver.execute_script "return $('#gradebook_grid .slick-row:nth-child(#{y+1}) .slick-cell:nth-child(#{x+1})').addClass('hover')[0]"
+  cell = driver.execute_script "return $('#gradebook_grid .container_1 .slick-row:nth-child(#{y+1}) .slick-cell:nth-child(#{x+1})').addClass('hover')[0]"
   cell.find_element(:css, '.gradebook-cell-comment').click
   # the dialog fetches the comments async after it displays and then innerHTMLs the whole
   # thing again once it has fetched them from the server, completely replacing it
@@ -75,7 +75,7 @@ def open_comment_dialog(x=0, y=0)
 end
 
 def final_score_for_row(row)
-  grade_grid = f('#gradebook_grid')
+  grade_grid = f('#gradebook_grid .container_1')
   cells = find_slick_cells(row, grade_grid)
   cells[4].find_element(:css, '.percentage').text
 end

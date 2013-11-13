@@ -33,12 +33,12 @@ describe "gradebook2" do
       assignment.unpublish
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
-      f('#gradebook_grid .slick-header').should_not include_text(assignment.title)
+      f('#gradebook_grid .container_1 .slick-header').should_not include_text(assignment.title)
 
       @first_assignment.publish
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
-      f('#gradebook_grid .slick-header').should include_text(@first_assignment.title)
+      f('#gradebook_grid .container_1 .slick-header').should include_text(@first_assignment.title)
     end
 
     it "should not show 'not-graded' assignments" do
@@ -161,8 +161,8 @@ describe "gradebook2" do
     it "should allow showing only a certain section" do
       get "/courses/#{@course.id}/gradebook2"
       # grade the first assignment
-      edit_grade('#gradebook_grid .slick-row:nth-child(1) .l0', 0)
-      edit_grade('#gradebook_grid .slick-row:nth-child(2) .l0', 1)
+      edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
+      edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', 1)
 
       button = f('#section_to_show')
       choose_section = lambda do |name|
@@ -178,13 +178,13 @@ describe "gradebook2" do
       choose_section.call @other_section.name
       button.should include_text(@other_section.name)
 
-      validate_cell_text(f('#gradebook_grid .slick-row:nth-child(1) .l0'), '1')
+      validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'), '1')
 
       # verify that it remembers the section to show across page loads
       get "/courses/#{@course.id}/gradebook2"
       button = fj('#section_to_show')
       button.should include_text @other_section.name
-      validate_cell_text(f('#gradebook_grid .slick-row:nth-child(1) .l0'), '1')
+      validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'), '1')
 
       # now verify that you can set it back
 
@@ -195,8 +195,8 @@ describe "gradebook2" do
       keep_trying_until { button.should include_text "All Sections" }
 
       # validate all grades (i.e. submissions) were loaded
-      validate_cell_text(f('#gradebook_grid .slick-row:nth-child(1) .l0'), '0')
-      validate_cell_text(f('#gradebook_grid .slick-row:nth-child(2) .l0'), '1')
+      validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'), '0')
+      validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2'), '1')
     end
 
 
@@ -204,17 +204,17 @@ describe "gradebook2" do
       get "/courses/#{@course.id}/gradebook2"
 
       toggle_muting(@second_assignment)
-      fj(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
+      fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
       @second_assignment.reload.should be_muted
 
       # reload the page and make sure it remembered the setting
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
-      fj(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
+      fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
 
       # make sure you can un-mute
       toggle_muting(@second_assignment)
-      fj(".slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_nil
+      fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_nil
       @second_assignment.reload.should_not be_muted
     end
 
@@ -225,7 +225,7 @@ describe "gradebook2" do
       end
 
       it "should not allow editing grades" do
-        cell = f('#gradebook_grid .slick-row:nth-child(1) .l0')
+        cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
         cell.text.should == '10'
         cell.click
         ff('.grade', cell).should be_blank
@@ -391,7 +391,8 @@ describe "gradebook2" do
 
         get "/courses/#{@course.id}/gradebook2"
         # set grade for first student, 3rd assignment
-        edit_grade('#gradebook_grid .slick-row:nth-child(1) .l2', 0)
+        # l4 because the the first two columns are part of the same grid
+        edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l4', 0)
         open_assignment_options(2)
 
         # expect dialog to show 1 more student with the "Haven't been graded" option
@@ -513,8 +514,8 @@ describe "gradebook2" do
 
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
-      f('#gradebook_grid .slick-row:nth-child(1) .assignment-group-cell .percentage').should include_text('100%') # otherwise 108%
-      f('#gradebook_grid .slick-row:nth-child(1) .total-cell .percentage').should include_text('100%') # otherwise 108%
+      f('#gradebook_grid .container_1 .slick-row:nth-child(1) .assignment-group-cell .percentage').should include_text('100%') # otherwise 108%
+      f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .percentage').should include_text('100%') # otherwise 108%
     end
 
     it "should hide and show student names" do
