@@ -259,4 +259,6 @@ define [
       @form.find(".group_select").html(genericSelectTemplate(groupsInfo))
 
     toggleContextsMenu: (jsEvent) =>
-      $('.ag_contexts_menu').toggleClass('hidden')
+      $menu = $('.ag_contexts_menu').toggleClass('hidden')
+      # For accessibility: put the user back where they started.
+      $('.ag_contexts_selector').focus() if $menu.hasClass 'hidden'
