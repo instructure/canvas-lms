@@ -1,13 +1,19 @@
-# Even on Rails 2.3, we're using Rails 3 style routes.
-#
-# You should have plenty of examples in here for anything you're trying to do,
-# but if you want a full primer this is a good one:
-# http://blog.engineyard.com/2010/the-lowdown-on-routes-in-rails-3
-#
-# Don't try anything too fancy, FakeRails3Routes doesn't support some of the
-# more advanced Rails 3 routing features, since in the background it's just
-# calling into the Rails 2 routing system.
-FakeRails3Routes.draw do
+if CANVAS_RAILS2
+  # Even on Rails 2.3, we're using Rails 3 style routes.
+  #
+  # You should have plenty of examples in here for anything you're trying to do,
+  # but if you want a full primer this is a good one:
+  # http://blog.engineyard.com/2010/the-lowdown-on-routes-in-rails-3
+  #
+  # Don't try anything too fancy, FakeRails3Routes doesn't support some of the
+  # more advanced Rails 3 routing features, since in the background it's just
+  # calling into the Rails 2 routing system.
+  routes = FakeRails3Routes
+else
+  routes = CanvasRails::Application.routes
+end
+
+routes.draw do
   resources :submission_comments, :only => :destroy
 
   match 'inbox' => 'context#mark_inbox_as_read', :as => :mark_inbox_as_read, :via => :delete
@@ -1372,6 +1378,5 @@ FakeRails3Routes.draw do
     post "tools/:tool_id/ext_grade_passback", :controller => :lti_api, :action => :legacy_grade_passback, :path_name => "blti_legacy_grade_passback_api"
   end
 
-  # in rails 2 this was Jammit::Routes.draw(map)
   match '/assets/:package.:extension' => 'jammit#package', :as => :jammit if defined?(Jammit)
 end

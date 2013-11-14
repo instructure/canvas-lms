@@ -20,7 +20,9 @@ require 'lib/api_route_set'
 require 'bundler'
 Bundler.setup
 require 'action_controller'
-require 'fake_rails3_routes'
+if CANVAS_RAILS2
+  require 'fake_rails3_routes'
+end
 
 # load routing files, including those in plugins
 require 'config/routes'

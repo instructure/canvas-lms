@@ -39,8 +39,8 @@ end
 gem 'erubis', '2.7.0'
 if CANVAS_RAILS2
   gem 'fake_arel', '1.0.0'
+  gem 'fake_rails3_routes', '1.0.4'
 end
-gem 'fake_rails3_routes', '1.0.4'
 gem 'ffi', '1.1.5'
 gem 'hairtrigger', '0.2.3'
 gem 'sass', '3.2.3'
