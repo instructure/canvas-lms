@@ -253,8 +253,7 @@ describe AssignmentsApiController, :type => :integration do
       end
 
       it "should include published flag for accounts that do have enabled_draft" do
-        Account.default.settings[:enable_draft] = true
-        Account.default.save!
+        Account.default.enable_feature!(:draft_state)
 
         @json = api_get_assignment_in_course(@assignment, @course)
 
@@ -333,8 +332,7 @@ describe AssignmentsApiController, :type => :integration do
     describe "draft state" do
 
       before do
-        Account.default.settings[:enable_draft] = true
-        Account.default.save!
+        Account.default.enable_feature!(:draft_state)
         @domain_root_account = Account.default
 
         course_with_student_logged_in(:active_all => true)
@@ -638,8 +636,7 @@ describe AssignmentsApiController, :type => :integration do
   describe "PUT /courses/:course_id/assignments/:id (#update)" do
 
     it "should update published/unpublished" do
-      Account.default.settings[:enable_draft] = true
-      Account.default.save!
+      Account.default.enable_feature!(:draft_state)
       @domain_root_account = Account.default
 
       course_with_teacher(:active_all => true)
@@ -1380,7 +1377,7 @@ describe AssignmentsApiController, :type => :integration do
     context "draft state" do
 
       before do
-        Account.default.enable_draft!
+        Account.default.enable_feature!(:draft_state)
         @domain_root_account = Account.default
 
         course_with_student_logged_in(:active_all => true)

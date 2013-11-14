@@ -282,12 +282,8 @@ Spec::Runner.configure do |config|
         @teacher = u
       end
       if opts[:draft_state]
-        account.settings[:allow_draft] = true
-        account.save!
-        @course.enable_draft = true
-        @course.save!
-        # to reload the @course.root_account
-        @course.reload
+        account.allow_feature!(:draft_state)
+        @course.enable_feature!(:draft_state)
       end
     end
     @course
@@ -473,10 +469,8 @@ Spec::Runner.configure do |config|
     course = opts[:course] || @course
     account = opts[:account] || course.account
 
-    account.settings[:allow_draft] = true
-    account.save! unless opts[:no_save]
-    course.enable_draft = enabled
-    course.save! unless opts[:no_save]
+    account.allow_feature!(:draft_state)
+    course.set_feature_flag!(:draft_state, enabled ? 'on' : 'off')
 
     enabled
   end

@@ -73,15 +73,17 @@ class WikiPage < ActiveRecord::Base
   def sync_hidden_and_unpublished
     return if (context rescue nil).nil?
 
-    if context.draft_state_enabled?
-      if self.hide_from_students # hide_from_students overrides published
-        self.hide_from_students = false
-        self.workflow_state = 'unpublished'
-      end
-    else
-      if self.workflow_state.to_s == 'unpublished' # unpublished overrides hide_from_students
-        self.workflow_state = 'active'
-        self.hide_from_students = true
+    WikiPage.skip_callback(:after_find) do
+      if context.feature_enabled?(:draft_state)
+        if self.hide_from_students # hide_from_students overrides published
+          self.hide_from_students = false
+          self.workflow_state = 'unpublished'
+        end
+      else
+        if self.workflow_state.to_s == 'unpublished' # unpublished overrides hide_from_students
+          self.workflow_state = 'active'
+          self.hide_from_students = true
+        end
       end
     end
   end
@@ -236,7 +238,7 @@ class WikiPage < ActiveRecord::Base
 
   def is_front_page?
     return false if self.deleted?
-    self.url == self.wiki.get_front_page_url # wiki.get_front_page_url checks has_front_page? and context.draft_state_enabled?
+    self.url == self.wiki.get_front_page_url # wiki.get_front_page_url checks has_front_page? and context.feature_enabled?(:draft_state)
   end
 
   def set_as_front_page!
@@ -564,12 +566,12 @@ class WikiPage < ActiveRecord::Base
   end
 
   def initialize_wiki_page(user)
-    unless context.draft_state_enabled?
+    unless context.feature_enabled?(:draft_state)
       set_as_front_page! if !wiki.has_front_page? and url == Wiki::DEFAULT_FRONT_PAGE_URL
     end
 
     is_privileged_user = wiki.grants_right?(user, :manage)
-    if is_privileged_user && context.draft_state_enabled? && !context.is_a?(Group)
+    if is_privileged_user && context.feature_enabled?(:draft_state) && !context.is_a?(Group)
       self.workflow_state = 'unpublished'
     else
       self.workflow_state = 'active'

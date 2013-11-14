@@ -162,7 +162,7 @@ describe "quizzes" do
     end
 
     it "should republish on save" do
-      Account.default.enable_draft!
+      Account.default.enable_feature!(:draft_state)
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f(".new-quiz-link").click }
       quiz = Quiz.last
@@ -691,8 +691,7 @@ describe "quizzes" do
 
     context "with draft state" do
       before(:each) do
-        Account.default.settings[:enable_draft] = true
-        Account.default.save!
+        Account.default.enable_feature!(:draft_state)
       end
 
       it "should click the publish button to publish a quiz" do

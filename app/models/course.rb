@@ -35,7 +35,6 @@ class Course < ActiveRecord::Base
                   :syllabus_body,
                   :public_description,
                   :allow_student_forum_attachments,
-                  :enable_draft,
                   :allow_student_discussion_topics,
                   :allow_student_discussion_editing,
                   :default_wiki_editing_roles,
@@ -1939,7 +1938,7 @@ class Course < ActiveRecord::Base
     end
 
     # be very explicit about draft state courses, but be liberal toward legacy courses
-    if self.draft_state_enabled?
+    if self.feature_enabled?(:draft_state)
       if migration.for_course_copy? && (source = migration.source_course || Course.find_by_id(migration.migration_settings[:source_course_id]))
         self.wiki.has_no_front_page = !!source.wiki.has_no_front_page
         self.wiki.front_page_url = source.wiki.front_page_url
@@ -1947,7 +1946,7 @@ class Course < ActiveRecord::Base
       end
     end
     front_page = self.wiki.front_page
-    self.wiki.unset_front_page! if front_page.nil? || (self.draft_state_enabled? && front_page.new_record?)
+    self.wiki.unset_front_page! if front_page.nil? || (self.feature_enabled?(:draft_state) && front_page.new_record?)
 
     syllabus_should_be_added = everything_selected || migration.copy_options[:syllabus_body] || migration.copy_options[:all_syllabus_body]
     if syllabus_should_be_added
@@ -2167,7 +2166,7 @@ class Course < ActiveRecord::Base
       :storage_quota, :tab_configuration, :allow_wiki_comments,
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
-      :allow_student_discussion_topics, :lock_all_announcements, :enable_draft ]
+      :allow_student_discussion_topics, :lock_all_announcements ]
   end
 
   def assert_assignment_group
@@ -2672,7 +2671,6 @@ class Course < ActiveRecord::Base
   add_setting :lock_all_announcements, :boolean => true, :default => false
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
   add_setting :public_syllabus, :boolean => true, :default => false
-  add_setting :enable_draft, boolean: true, default: false
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?
@@ -2877,13 +2875,6 @@ class Course < ActiveRecord::Base
     self.enrollments.invited.except(:includes).includes(:user => :communication_channels).find_each do |e|
       e.re_send_confirmation! if e.invited?
     end
-  end
-
-  # Public: Determine if draft state is enabled for this course.
-  #
-  # Returns a boolean (default: false).
-  def draft_state_enabled?
-    (root_account.allow_draft? && enable_draft?) || root_account.enable_draft?
   end
 
   def serialize_permissions(permissions_hash, user, session)

@@ -23,7 +23,7 @@ class WikiPageRevisionsController < ApplicationController
   before_filter { |c| c.active_tab = "pages" }
   
   def index
-    if @context.draft_state_enabled?
+    if @context.feature_enabled?(:draft_state)
       redirect_to polymorphic_url([@context, :named_page_revisions], :wiki_page_id => @page)
       return
     end
@@ -59,7 +59,7 @@ class WikiPageRevisionsController < ApplicationController
   end
   
   def show
-    if @context.draft_state_enabled?
+    if @context.feature_enabled?(:draft_state)
       redirect_to polymorphic_url([@context, :named_page_revisions], :wiki_page_id => @page)
       return
     end

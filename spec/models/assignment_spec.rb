@@ -73,7 +73,7 @@ describe Assignment do
 
   it "does not allow itself to be unpublished if it has student submissions" do
     setup_assignment_with_students
-    @assignment.context.root_account.enable_draft!
+    @assignment.context.root_account.enable_feature!(:draft_state)
     @assignment.unpublish
     @assignment.should_not be_valid
     @assignment.errors['workflow_state'].should == "Can't unpublish if there are student submissions"
@@ -1135,7 +1135,7 @@ describe Assignment do
 
     it "updates the draft state of its associated quiz" do
       assignment_model(:course => @course, :submission_types => "online_quiz")
-      Account.default.enable_draft!
+      Account.default.enable_feature!(:draft_state)
       @a.reload
       @a.publish
       @a.save!

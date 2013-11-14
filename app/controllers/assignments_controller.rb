@@ -32,7 +32,7 @@ class AssignmentsController < ApplicationController
   before_filter :normalize_title_param, :only => [:new, :edit]
 
   def index
-    return old_index if @context == @current_user || !@context.draft_state_enabled?
+    return old_index if @context == @current_user || !@context.feature_enabled?(:draft_state)
 
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
@@ -109,7 +109,7 @@ class AssignmentsController < ApplicationController
       @assignment.ensure_assignment_group
       js_env({
         :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
-        :DRAFT_STATE => @context.draft_state_enabled?,
+        :DRAFT_STATE => @context.feature_enabled?(:draft_state),
         :COURSE_ID => @context.id,
         :ASSIGNMENT_ID => @assignment.id
       })
@@ -325,7 +325,7 @@ class AssignmentsController < ApplicationController
 
   def new
     @assignment ||= @context.assignments.new
-    @assignment.workflow_state = 'unpublished' if @context.draft_state_enabled?
+    @assignment.workflow_state = 'unpublished' if @context.feature_enabled?(:draft_state)
     add_crumb t :create_new_crumb, "Create new"
 
     if params[:submission_types] == 'online_quiz'

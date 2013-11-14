@@ -1,5 +1,5 @@
 <% content_for :page_title, @context.name %>
-<% if @context.draft_state_enabled? %>
+<% if @context.feature_enabled?(:draft_state) %>
   <% jammit_css :course_show %>
 <% end %>
 <% @active_tab ||= "home" %>
@@ -16,7 +16,7 @@
   <div id="course_show_secondary">
     <% if can_do(@context, @current_user, :manage_content) %>
 
-      <% if @context.draft_state_enabled? %>
+      <% if @context.feature_enabled?(:draft_state) %>
         <div class="course-options" role>
           <a class="button-sidebar-wide element_toggler" aria-controls="edit_course_home_content_form" href="<%= context_url(@context, :context_details_url) %>">
             <i class="icon-edit"></i>
@@ -70,7 +70,7 @@
     <%= nbsp unless @current_user %>
   </div>
   <% if @course_home_view == 'wiki' %>
-    <% unless @context.draft_state_enabled? %>
+    <% unless @context.feature_enabled?(:draft_state) %>
       <% js_bundle :wiki %>
       <%= render :partial => "wiki_pages/wiki_right_side", :locals => {:course_home => true} %>
     <% end %>
@@ -182,7 +182,7 @@ $(document).ready(function() {
       });
     }
   });
-  <% unless @context.draft_state_enabled? %>
+  <% unless @context.feature_enabled?(:draft_state) %>
     $("#edit_course_home_content_select").change(function() {
       $(this).parents("form")
       .find(".options_details").hide().end()
@@ -233,7 +233,7 @@ $(document).ready(function() {
   <%= render :partial => 'shared/dashboard_invitation', :object => @pending_enrollment %>
 <% end %>
 
-<% if @context.draft_state_enabled? %>
+<% if @context.feature_enabled?(:draft_state) %>
 <div id="edit_course_home_content" style="display: none;">
   <h2><%= t('draft_state.headings.set_layout', %{Set Home Page Layout}) %></h2>
   <%= form_for :course, :url => context_url(@context, :context_url), :html => {:tabindex=>"0", :'data-turn-into-dialog'=>'{"height": 300, "width":500,"modal":true}', :title=>t('headings.edit_homepage_title', %{Edit Homepage}), :style => "display:none", :id => "edit_course_home_content_form", :method => :put} do |f| %>
@@ -292,13 +292,13 @@ $(document).ready(function() {
     </div>
   <% end %>
 <% end %>
-<% unless @context.draft_state_enabled? %>
+<% unless @context.feature_enabled?(:draft_state) %>
   <div class="clear"></div>
 <% end %>
 </div>
 
 <div id="course_home_content">
-  <% unless @context.draft_state_enabled? %>
+  <% unless @context.feature_enabled?(:draft_state) %>
     <div style="float: right; text-align: left;" class="floating_links clearfix">
       <% if can_do(@context, @current_user, :manage_content) || @course_home_view != 'feed' %>
         <div style="font-size: 0.9em;">
@@ -317,14 +317,14 @@ $(document).ready(function() {
   <% end %>
 
   <% if @course_home_view == 'wiki' %>
-    <% if @context.draft_state_enabled?
+    <% if @context.feature_enabled?(:draft_state)
          js_bundle :wiki_page_show %>
       <div id="wiki_page_show"></div>
     <% else %>
       <%= render :partial => "wiki_pages/content", :locals => {:course_home => true } %>
     <% end %>
   <% elsif @course_home_view == 'modules' %>
-    <% if @context.draft_state_enabled? %>
+    <% if @context.feature_enabled?(:draft_state) %>
       <%= render :partial => 'context_modules/content_next', :locals => {:course_home => true} %>
     <% else %>
       <%= render :partial => 'context_modules/content', :locals => {:course_home => true} %>

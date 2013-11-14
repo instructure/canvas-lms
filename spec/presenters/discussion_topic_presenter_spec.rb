@@ -175,7 +175,7 @@ describe DiscussionTopicPresenter do
 
       before do
         course = topic.context = Course.create!(name: 'Canvas')
-        course.root_account.enable_draft!
+        course.root_account.enable_feature!(:draft_state)
         assignment.context = course
         assignment.save!
         topic.assignment = assignment
@@ -191,7 +191,7 @@ describe DiscussionTopicPresenter do
       end
 
       it "returns true when draft state disabled" do
-        topic.context.root_account.disable_draft!
+        topic.context.root_account.disable_feature!(:draft_state)
         presenter.allows_speed_grader?.should == true
       end
     end

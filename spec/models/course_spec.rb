@@ -3691,46 +3691,6 @@ describe Course do
     end
   end
 
-  describe "#draft_state_enabled?" do
-    before(:each) do
-      @account = Account.create!
-      @account.settings[:allow_draft] = true
-      @account.save!
-      course(active_all: true)
-      @course.root_account = @account
-      @course.save!
-    end
-
-    context "a course with enable_draft enabled" do
-      it "should check its own enable_draft setting" do
-        @course.enable_draft = true
-        @course.save!
-
-        @course.should be_draft_state_enabled
-      end
-    end
-
-    context "a course with an enable_draft account" do
-      it "should check its root_account's enable_draft setting" do
-        @course.root_account.settings[:enable_draft] = true
-        @course.root_account.save!
-
-        @course.should be_draft_state_enabled
-      end
-    end
-
-    context "a course with an account that doesn't allow draft state" do
-      it "shouldn't be able to enable draft state" do
-        @account.settings[:allow_draft] = false
-        @account.save!
-
-        @course.enable_draft = true
-        @course.save!
-
-        @course.should_not be_draft_state_enabled
-      end
-    end
-  end
 end
 
 describe Course, "multiple_sections?" do

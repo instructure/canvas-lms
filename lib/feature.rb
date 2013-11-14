@@ -76,7 +76,23 @@ class Feature
 
   # TODO: register built-in features here
   # (plugins may register additional features during application initialization)
-  register({})
+  register({
+   'draft_state' =>
+    {
+      display_name: lambda { I18n.t('features.draft_state', 'Draft State') },
+      description: lambda { I18n.t('draft_state_description', <<DRAFT) },
+Draft state is a *beta* feature that allows course content to be published and unpublished.
+Unpublished content won't be visible to students and won't affect grades.
+It also includes a redesign of some course areas to make them more consistent in look and functionality.
+
+Unpublished content may not be available if Draft State is disabled.
+DRAFT
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true,
+      development: true
+    }
+  })
 
   def self.definitions
     @features ||= {}

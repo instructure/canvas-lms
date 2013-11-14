@@ -359,7 +359,7 @@ describe AssignmentOverrideApplicator do
           it "quiz should always have an assignment for overrides" do
             # with draft states quizzes always have an assignment.
             student_in_course
-            course.root_account.enable_draft!
+            course.root_account.enable_feature!(:draft_state)
             expected_time = Time.zone.now
             quiz = @course.quizzes.create! :title => "VDD Quiz", :quiz_type => 'assignment'
             section = @course.course_sections.create! :name => "title"
@@ -385,7 +385,7 @@ describe AssignmentOverrideApplicator do
               overrides = AssignmentOverrideApplicator.
                 overrides_for_assignment_and_user(quiz.assignment, @student)
             end.to_not raise_error
-            course.root_account.disable_draft!
+            course.root_account.disable_feature!(:draft_state)
           end
         end
       end

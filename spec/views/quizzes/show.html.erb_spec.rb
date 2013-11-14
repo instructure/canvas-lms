@@ -61,8 +61,7 @@ describe "/quizzes/show" do
   end
 
   it "should show header bar and publish button if draft state enabled" do
-    Account.default.settings[:enable_draft] = true
-    Account.default.save!
+    Account.default.enable_feature!(:draft_state)
 
     course_with_teacher_logged_in(:active_all => true)
     assigns[:quiz] = @course.quizzes.create!

@@ -282,7 +282,7 @@ describe ContentMigration do
 
     context "unpublished items" do
       before :each do
-        Course.any_instance.stubs(:draft_state_enabled?).returns(true)
+        Account.default.enable_feature!(:draft_state)
       end
 
       it "should copy unpublished modules" do
@@ -360,8 +360,7 @@ describe ContentMigration do
       end
 
       it "should copy wiki has_no_front_page setting if draft state is enabled" do
-        @copy_from.root_account.settings[:enable_draft] = true
-        @copy_from.root_account.save!
+        @copy_from.root_account.enable_feature!(:draft_state)
 
         @copy_from.wiki.front_page.save!
         @copy_from.wiki.unset_front_page!
@@ -383,8 +382,7 @@ describe ContentMigration do
       end
 
       it "should set default view to feed if wiki front page is missing and draft state is enabled" do
-        @copy_from.root_account.settings[:enable_draft] = true
-        @copy_from.root_account.save!
+        @copy_from.root_account.enable_feature!(:draft_state)
 
         @copy_from.default_view = 'wiki'
         @copy_from.save!

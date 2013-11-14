@@ -175,7 +175,7 @@ describe ContentTag do
   end
 
   it "should publish/unpublish the tag if the linked wiki page is published/unpublished" do
-    Course.any_instance.stubs(:draft_state_enabled?).returns(true)
+    Account.default.enable_feature!(:draft_state)
 
     course
     @page = @course.wiki.wiki_pages.create!(:title => "some page")
@@ -199,7 +199,7 @@ describe ContentTag do
   end
 
   it "should publish/unpublish the linked wiki page (and its tags) if the tag is published/unpublished" do
-    Course.any_instance.stubs(:draft_state_enabled?).returns(true)
+    Account.default.enable_feature!(:draft_state)
 
     course
     @page = @course.wiki.wiki_pages.create!(:title => "some page")

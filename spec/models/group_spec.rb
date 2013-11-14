@@ -568,38 +568,30 @@ describe Group do
     end
   end
 
-  describe "#draft_state_enabled?" do
+  describe "#feature_enabled?" do
     before(:each) do
       course_with_teacher(active_all: true)
-      @teacher = @user
-      @course.root_account = Account.create!
-      @course.root_account.settings[:allow_draft] = true
-      @course.root_account.save!
-      @course.save!
+      @course.root_account.allow_feature!(:draft_state)
     end
 
-    context "a course with draft_state_enabled" do
+    context "a course with :draft_state enabled" do
       it "should pass its setting on to its groups" do
-        @course.enable_draft = true
-        @course.save!
-
-        group(group_context: @course).should be_draft_state_enabled
+        @course.enable_feature!(:draft_state)
+        group(group_context: @course).should be_feature_enabled(:draft_state)
       end
     end
 
-    context "an account with draft_state_enabled" do
-      it "should pass its setting on to course groups" do
-        @course.root_account.settings[:enable_draft] = true
-        @course.root_account.save!
+    context "an account with :draft_state enabled" do
+      before do
+        @course.root_account.enable_feature!(:draft_state)
+      end
 
-        group(group_context: @course).should be_draft_state_enabled
+      it "should pass its setting on to course groups" do
+        group(group_context: @course).should be_feature_enabled(:draft_state)
       end
 
       it "should pass its setting on to account groups" do
-        @course.root_account.settings[:enable_draft] = true
-        @course.root_account.save!
-
-        group(group_context: @course.root_account).should be_draft_state_enabled
+        group(group_context: @course.root_account).should be_feature_enabled(:draft_state)
       end
     end
   end

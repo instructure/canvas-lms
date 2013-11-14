@@ -148,14 +148,14 @@ class Quiz < ActiveRecord::Base
   end
 
   def build_assignment
-    if (context.draft_state_enabled? || self.available?) &&
+    if (context.feature_enabled?(:draft_state) || self.available?) &&
         !self.assignment_id && self.graded? && @saved_by != :assignment &&
         @saved_by != :clone
       assignment = self.assignment
       assignment ||= self.context.assignments.build(:title => self.title, :due_at => self.due_at, :submission_types => 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
       assignment.saved_by = :quiz
-      if context.draft_state_enabled? && !deleted?
+      if context.feature_enabled?(:draft_state) && !deleted?
         assignment.workflow_state = self.published? ? 'published' : 'unpublished'
       end
       assignment.save
@@ -334,7 +334,7 @@ class Quiz < ActiveRecord::Base
         a.assignment_group_id = self.assignment_group_id
         a.saved_by = :quiz
         a.workflow_state = 'published' if a.deleted?
-        if context.draft_state_enabled? && !deleted?
+        if context.feature_enabled?(:draft_state) && !deleted?
           a.workflow_state = self.published? ? 'published' : 'unpublished'
         end
         a.notify_of_update = @notify_of_update
@@ -1125,7 +1125,7 @@ class Quiz < ActiveRecord::Base
     can :submit
     
     given do |user, session|
-      (draft_state_enabled? ? published? : true) &&
+      (feature_enabled?(:draft_state) ? published? : true) &&
         cached_context_grants_right?(user, session, :read)
     end
     can :read
@@ -1276,10 +1276,10 @@ class Quiz < ActiveRecord::Base
 
   # override for draft state
   def available?
-    draft_state_enabled? ? published? : workflow_state == 'available'
+    feature_enabled?(:draft_state) ? published? : workflow_state == 'available'
   end
 
-  delegate :draft_state_enabled?, to: :context
+  delegate :feature_enabled?, to: :context
 
   # The IP filters available for this Quiz, which is an aggregate of the Quiz's
   # active IP filter and all the IP filters defined in its account hierarchy.

@@ -551,7 +551,7 @@ describe "assignments" do
 
     context "draft state" do
       before do
-        @course.root_account.enable_draft!
+        @course.root_account.enable_feature!(:draft_state)
         @course.require_assignment_group
       end
 

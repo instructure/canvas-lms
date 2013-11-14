@@ -61,8 +61,7 @@ describe "/quizzes/new" do
 
   context "draft state" do
     before :each do
-      Account.default.settings[:enable_draft] = true
-      Account.default.save!
+      Account.default.enable_feature!(:draft_state)
 
       course_with_teacher_logged_in(:active_all => true)
       @quiz = course_quiz

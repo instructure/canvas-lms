@@ -40,7 +40,7 @@ class QuizzesController < ApplicationController
       @quizzes = @context.quizzes.active.include_assignment.sort_by{|q| [(q.assignment ? q.assignment.due_at : q.lock_at) || SortLast, Canvas::ICU.collation_key(q.title || SortFirst)]}
 
       # draft state - only filter by available? for students
-      if @context.draft_state_enabled?
+      if @context.feature_enabled?(:draft_state)
         unless is_authorized_action?(@context, @current_user, :manage_assignments)
           @quizzes = @quizzes.select{|q| q.available? }
         end
@@ -288,7 +288,7 @@ class QuizzesController < ApplicationController
       respond_to do |format|
         @quiz.transaction do
           overrides = delete_override_params
-          if !@context.draft_state_enabled? && params[:activate]
+          if !@context.feature_enabled?(:draft_state) && params[:activate]
             @quiz.with_versioning(true) { @quiz.publish! }
           end
           notify_of_update = value_to_boolean(params[:quiz][:notify_of_update])
@@ -300,7 +300,7 @@ class QuizzesController < ApplicationController
             old_assignment.id = @quiz.assignment.id
           end
 
-          auto_publish = @context.draft_state_enabled? && @quiz.published?
+          auto_publish = @context.feature_enabled?(:draft_state) && @quiz.published?
           @quiz.with_versioning(auto_publish) do
             # using attributes= here so we don't need to make an extra
             # database call to get the times right after save!

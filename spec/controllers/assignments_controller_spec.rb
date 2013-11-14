@@ -81,7 +81,7 @@ describe AssignmentsController do
     context "draft state" do
       before do
         course_with_student(:active_all => true)
-        @course.root_account.tap{ |a| a.settings[:enable_draft] = true }.save!
+        @course.root_account.enable_feature!(:draft_state)
       end
 
       it "should create a default group if none exist" do
@@ -256,7 +256,7 @@ describe AssignmentsController do
 
     it "should default to unpublished for draft state" do
       course_with_student(:active_all => true)
-      @course.root_account.tap{ |a| a.settings[:enable_draft] = true }.save!
+      @course.root_account.enable_feature!(:draft_state)
       @course.require_assignment_group
 
       get 'new', :course_id => @course.id

@@ -500,7 +500,7 @@ describe GradebooksController do
       it "redirects if draft state is enabled and the assignment is unpublished" do
 
         # Unpublished assignment and draft state enabled
-        @course.account.enable_draft!
+        @course.account.enable_feature!(:draft_state)
 
         get 'speed_grader', course_id: @course, assignment_id: @assign.id
         response.should be_redirect

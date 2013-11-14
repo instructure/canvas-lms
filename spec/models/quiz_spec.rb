@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe Quiz do
   before(:each) do
     course
-    @course.root_account.disable_draft!
+    @course.root_account.disable_feature!(:draft_state)
   end
 
   describe ".mark_quiz_edited" do
@@ -288,7 +288,7 @@ describe Quiz do
   end
 
   it "should not create the assignment if unpublished and draft_states are not enabled" do
-    @course.root_account.disable_draft!
+    @course.root_account.disable_feature!(:draft_state)
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
     q.save!
@@ -299,11 +299,11 @@ describe Quiz do
 
   context "when draft_states are enabled" do
     before :each do
-      @course.root_account.enable_draft!
+      @course.root_account.enable_feature!(:draft_state)
     end
 
     after :each do
-      @course.root_account.disable_draft!
+      @course.root_account.reset_feature!(:draft_state)
     end
 
     it "should always have an assignment" do
@@ -340,7 +340,7 @@ describe Quiz do
   end
 
   it "should create the assignment if published after being created when draft_state not enabled" do
-    @course.root_account.disable_draft!
+    @course.root_account.disable_feature!(:draft_state)
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
     q.save!
@@ -1204,7 +1204,7 @@ describe Quiz do
   describe "#destroy" do
     it "should logical delete published quiz" do
       quiz = @course.quizzes.create(title: 'test quiz')
-      quiz.context.root_account.enable_draft!
+      quiz.context.root_account.enable_feature!(:draft_state)
       quiz.stubs(:has_student_submissions? => true)
       quiz.publish!
       quiz.assignment.stubs(:has_student_submissions? => true)
@@ -1215,7 +1215,7 @@ describe Quiz do
 
     it "should logical delete the published quiz's associated assignment" do
       quiz = @course.quizzes.create(title: 'test quiz')
-      quiz.context.root_account.enable_draft!
+      quiz.context.root_account.enable_feature!(:draft_state)
       quiz.stubs(:has_student_submissions?).returns true
       quiz.publish!
       assignment = quiz.assignment
@@ -1230,7 +1230,7 @@ describe Quiz do
 
     it "updates the assignment's workflow state" do
       @quiz = @course.quizzes.create!(title: 'Test Quiz')
-      @quiz.context.root_account.enable_draft!
+      @quiz.context.root_account.enable_feature!(:draft_state)
       @quiz.publish!
       @quiz.unpublish!
       @quiz.assignment.should_not be_published
@@ -1349,7 +1349,7 @@ describe Quiz do
       context "draft state enabled" do
 
         before do
-          @course.account.enable_draft!
+          @course.account.enable_feature!(:draft_state)
         end
 
         it "doesn't let student read/submit quizzes that are unpublished" do
@@ -1399,7 +1399,7 @@ describe Quiz do
 
     context "draft state enabled" do
       before do
-        @course.account.enable_draft!
+        @course.account.enable_feature!(:draft_state)
       end
 
       it "returns true if quiz is published" do

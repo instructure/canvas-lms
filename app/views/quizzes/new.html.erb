@@ -25,7 +25,7 @@
   </ul>
 <% end %>
 
-<% if @context.draft_state_enabled? %>
+<% if @context.feature_enabled?(:draft_state) %>
 <div class="header-bar" id="quiz_edit_header">
   <div class="header-bar-right">
     <div class="header-group-left">
@@ -94,7 +94,7 @@
     </div>
   <% end %>
 
-  <% if @context.draft_state_enabled? %>
+  <% if @context.feature_enabled?(:draft_state) %>
   <div class="title">
     <label for="quiz_title" class="screenreader-only"><%= t('quiz_title', 'Quiz Title') %></label>
     <%= text_field :quiz, :title, :placeholder => "Quiz Title", :maxlength => "254" %>
@@ -417,7 +417,7 @@
 
   </div>
 
-  <% if @context.draft_state_enabled? %>
+  <% if @context.feature_enabled?(:draft_state) %>
   <div class="form-actions" id="quiz_edit_actions">
     <div class="row-fluid">
       <div class="span6 notify">

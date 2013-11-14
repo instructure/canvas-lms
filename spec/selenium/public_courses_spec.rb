@@ -10,7 +10,7 @@ describe "public courses" do
   end
 
   def validate_selector_displayed(selector1, selector2)
-    if public_course.draft_state_enabled?
+    if public_course.feature_enabled?(:draft_state)
       f(selector1).should be_displayed
     else
       f(selector2).should be_displayed

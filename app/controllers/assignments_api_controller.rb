@@ -324,7 +324,7 @@ class AssignmentsApiController < ApplicationController
       fake = @context.assignments.new
       fake.workflow_state = 'unpublished'
 
-      if @context.draft_state_enabled? && !fake.grants_right?(@current_user, session, :read)
+      if @context.feature_enabled?(:draft_state) && !fake.grants_right?(@current_user, session, :read)
         # user should not see unpublished assignments
         @assignments = @assignments.published
       end
@@ -372,7 +372,7 @@ class AssignmentsApiController < ApplicationController
       @assignment = @context.active_assignments.find(params[:id],
           :include => [:assignment_group, :rubric_association, :rubric])
 
-      if @context.draft_state_enabled? && !@assignment.grants_right?(@current_user, session, :read)
+      if @context.feature_enabled?(:draft_state) && !@assignment.grants_right?(@current_user, session, :read)
         # user should not see unpublished assignments
         render_unauthorized_action
         return
@@ -517,7 +517,7 @@ class AssignmentsApiController < ApplicationController
   # @returns Assignment
   def create
     @assignment = @context.assignments.build
-    @assignment.workflow_state = 'unpublished' if @context.draft_state_enabled?
+    @assignment.workflow_state = 'unpublished' if @context.feature_enabled?(:draft_state)
 
     if authorized_action(@assignment, @current_user, :create)
       save_and_render_response

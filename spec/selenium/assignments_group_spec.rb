@@ -142,9 +142,8 @@ describe "assignment groups" do
 
   context "draft state" do
     before do
-      Account.default.settings[:enable_draft] = true
-      Account.default.save!
       @domain_root_account = Account.default
+      @domain_root_account.enable_feature!(:draft_state)
 
       course_with_teacher_logged_in(:active_all => true)
       @assignment_group = @course.assignment_groups.create!(:name => "Test Group")

@@ -228,7 +228,7 @@ class DiscussionTopicsController < ApplicationController
                     create: @context.discussion_topics.new.grants_right?(@current_user, session, :create),
                     moderate: user_can_moderate,
                     change_settings: user_can_edit_course_settings?,
-                    publish: user_can_moderate && @domain_root_account.enable_draft?
+                    publish: user_can_moderate && @domain_root_account.feature_enabled?(:draft_state)
                 }}
         append_sis_data(hash)
 

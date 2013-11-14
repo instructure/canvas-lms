@@ -152,8 +152,6 @@ class Account < ActiveRecord::Base
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
   add_setting :open_registration, :boolean => true, :root_only => true
   add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
-  add_setting :enable_draft, :boolean => true, :root_only => true, :default => false
-  add_setting :allow_draft, :boolean => true, :root_only => true, :default => false
   add_setting :calendar2_only, :boolean => true, :root_only => true, :default => false
   add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
@@ -1315,13 +1313,6 @@ class Account < ActiveRecord::Base
     false
   end
 
-  # Public: Determine if draft state is enabled for this account.
-  #
-  # Returns a boolean (default: false).
-  def draft_state_enabled?
-    root_account.settings[:enable_draft]
-  end
-
   def import_from_migration(data, params, migration)
 
     LearningOutcome.process_migration(data, migration)
@@ -1329,14 +1320,6 @@ class Account < ActiveRecord::Base
     migration.progress=100
     migration.workflow_state = :imported
     migration.save
-  end
-
-  def enable_draft!
-    change_root_account_setting!(:enable_draft, true)
-  end
-
-  def disable_draft!
-    change_root_account_setting!(:enable_draft, false)
   end
 
   def enable_fabulous_quizzes!

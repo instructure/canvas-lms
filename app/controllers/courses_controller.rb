@@ -1112,7 +1112,7 @@ class CoursesController < ApplicationController
 
 
     @context = Course.active.find(params[:id])
-    js_env :DRAFT_STATE => @context.draft_state_enabled?
+    js_env :DRAFT_STATE => @context.feature_enabled?(:draft_state)
     if request.xhr?
       if authorized_action(@context, @current_user, [:read, :read_as_admin])
         render :json => @context
@@ -1161,7 +1161,7 @@ class CoursesController < ApplicationController
       when "wiki"
         @wiki = @context.wiki
         @page = @wiki.front_page
-        if @context.draft_state_enabled?
+        if @context.feature_enabled?(:draft_state)
           set_js_rights [:wiki, :page]
           set_js_wiki_data :course_home => true
           @padless = true

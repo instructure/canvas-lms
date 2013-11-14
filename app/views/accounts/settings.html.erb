@@ -233,22 +233,6 @@ TEXT
                     <%= settings.check_box :enable_alerts, :checked => @account.settings[:enable_alerts] %>
                     <%= settings.label :enable_alerts, :en => "Alerts (beta)" %>
                   </div>
-                  <div id='allow_draft'>
-                    <%= settings.check_box :allow_draft, :checked => @account.settings[:allow_draft] %>
-                    <label for="account_settings_allow_draft"><%= t('allow_draft', 'Allow Draft State (beta)') %>
-                      <a href="#" class="allow_draft_help_link no-hover" title="<%= t(:allow_draft_help_tooltip, "What is draft state?") %>"><i class="icon-question standalone-icon"></i></a>
-                    </label>
-                  </div>
-                  <div id="allow_draft_help_dialog" style="display: none;">
-                    <%= mt(:allow_draft_help_message, <<-DRAFT )
-Draft state is a *beta* feature that allows course content to be published and unpublished.
-Unpublished content won't be visible to students and won't affect grades.
-It also includes a redesign of some course areas to make them more consistent in look and functionality.
-
-Allowing Draft State here will allow teachers to enable it in their individual courses.
-                    DRAFT
-                    %>
-                  </div>
                 <% end %>
                 <div>
                   <%= settings.check_box :global_includes, :checked => @account.settings[:global_includes] %>

@@ -101,9 +101,7 @@ describe QuizzesController do
 
   describe "GET 'index' with draft state enabled" do
     setup do
-      a = Account.default
-      a.settings[:enable_draft] = true
-      a.save!
+      Account.default.enable_feature! :draft_state
     end
 
     it "should assign variables" do
@@ -346,7 +344,7 @@ describe QuizzesController do
     it "doesn't show unpublished quizzes to students with draft state" do
       course_with_student_logged_in(active_all: true)
       course_quiz(active=true)
-      Account.default.enable_draft!
+      Account.default.enable_feature!(:draft_state)
       @quiz.unpublish!
       get 'show', course_id: @course.id, id: @quiz.id
       response.should_not be_success
@@ -959,7 +957,7 @@ describe QuizzesController do
       course_quiz
       @quiz.update_attributes(quiz_type: 'ungraded_survey')
       # make sure the assignment doesn't exist
-      @quiz.assignment = nil if @quiz.context.draft_state_enabled?
+      @quiz.assignment = nil if @quiz.context.feature_enabled?(:draft_state)
       @quiz.assignment.should_not be_present
       post 'update', course_id: @course.id, id: @quiz.id, activate: true,
         quiz: {quiz_type: 'assignment'}

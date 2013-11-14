@@ -570,13 +570,13 @@ class Group < ActiveRecord::Base
     [Shard.default]
   end
 
-  # Public: Determine if the current context has draft_state enabled.
+  # Public: Determine whether a feature is enabled, deferring to the group's context.
   #
   # Returns a boolean.
-  def draft_state_enabled?
+  def feature_enabled?(feature)
     # shouldn't matter, but most specs create anonymous (contextless) groups :(
     return false if context.nil?
-    context.draft_state_enabled?
+    context.feature_enabled?(feature)
   end
 
   def serialize_permissions(permissions_hash, user, session)

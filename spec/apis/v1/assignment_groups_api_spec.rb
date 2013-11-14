@@ -274,7 +274,7 @@ describe AssignmentGroupsController, :type => :integration do
 
   it "should not return unpublished assignments to students" do
     course_with_student(:active_all => true)
-    @course.root_account.tap{ |a| a.settings[:enable_draft] = true }.save!
+    @course.root_account.enable_feature!(:draft_state)
     @course.require_assignment_group
     assignment = @course.assignments.create! do |a|
       a.title = "test"

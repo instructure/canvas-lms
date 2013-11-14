@@ -187,10 +187,7 @@ describe WikiPage do
 
     context 'with draft state disabled' do
       before :each do
-        @course.account.settings[:allow_draft] = false
-        @course.account.save!
-        @course.enable_draft = false
-        @course.save!
+        @course.account.disable_feature!(:draft_state)
       end
 
       it 'should be performed on save' do
@@ -216,10 +213,8 @@ describe WikiPage do
 
     context 'with draft state enabled' do
       before :each do
-        @course.account.settings[:allow_draft] = true
-        @course.account.save!
-        @course.enable_draft = true
-        @course.save!
+        @course.account.allow_feature!(:draft_state)
+        @course.enable_feature!(:draft_state)
       end
 
       it 'should be performed on save' do

@@ -991,57 +991,6 @@ describe Account do
     end
   end
 
-  describe "#draft_state_enabled?" do
-    context "a root account" do
-      it "should return its own enable_draft setting" do
-        account = Account.create!
-        account.settings[:enable_draft] = true
-
-        account.should be_draft_state_enabled
-      end
-    end
-
-    context "a sub-account" do
-      it "should return its root account's enable_draft setting" do
-        root_account = Account.create!
-        sub_account  = Account.create!
-        sub_account.root_account_id          = root_account.id
-        root_account.settings[:enable_draft] = true
-        root_account.save!
-
-        sub_account.should be_draft_state_enabled
-      end
-    end
-  end
-
-  describe "enable_draft!" do
-
-    it "updates the enable_draft setting and saves the account" do
-      account = Account.create!
-      account.enable_draft!
-      account.root_account.should be_draft_state_enabled
-      account.should be_draft_state_enabled
-    end
-  end
-
-  describe "disable_draft!" do
-    it "updates the enable_draft setting and saves the account" do
-      account = Account.create!
-      account.disable_draft!
-      account.root_account.should_not be_draft_state_enabled
-      account.should_not be_draft_state_enabled
-    end
-  end
-
-  describe "#change_root_account_setting!" do
-
-    it "changes the given setting_name's value with the new_value passed" do
-      account = Account.create!
-      account.change_root_account_setting!(:enable_draft, false)
-      account.root_account.should_not be_draft_state_enabled
-    end
-  end
-
   describe ":enable_fabulous_quizzes setting" do
 
     it "is false by default" do

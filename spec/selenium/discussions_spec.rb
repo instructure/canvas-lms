@@ -442,9 +442,7 @@ describe "discussions" do
 
         context "draft state" do
           before do
-            a = Account.default
-            a.settings[:enable_draft] = true
-            a.save!
+            Account.default.enable_feature!(:draft_state)
           end
 
           def click_publish_icon(topic)
