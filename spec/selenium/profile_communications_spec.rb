@@ -95,7 +95,7 @@ describe "profile communication settings" do
     sns_channel
     get "/profile/communication"
     wait_for_ajaximations
-    cell = find_frequency_cell("Grading", sns_channel.id)
+    cell = find_frequency_cell("grading", sns_channel.id)
     buttons = ffj('.frequency', cell)
     buttons.map {|b| b.attribute(:'data-value')}.should == %w(immediately never)
   end
@@ -136,7 +136,7 @@ describe "profile communication settings" do
     policy.frequency = Notification::FREQ_DAILY
     policy.save!
     get "/profile/communication"
-    cell = find_frequency_cell(@sub_comment.category, channel.id)
+    cell = find_frequency_cell(@sub_comment.category.underscore.gsub(/\s/, '_'), channel.id)
     # validate existing text is shown correctly (text display and button state)
     cell.text.should == 'Daily'
 

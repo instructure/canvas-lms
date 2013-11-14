@@ -45,8 +45,6 @@ shared_examples_for 'Quiz Submissions API Restricted Endpoints' do
 end
 
 describe QuizSubmissionsApiController, :type => :integration do
-  it_should_behave_like 'API tests'
-
   module Helpers
     def enroll_student(opts = {})
       last_user = @teacher = @user
@@ -265,7 +263,7 @@ describe QuizSubmissionsApiController, :type => :integration do
     context 'JSON-API compliance' do
       it 'should conform to the JSON-API spec when returning the object' do
         json = qs_api_show(false)
-        assert_jsonapi_compliance!(json, 'quiz_submissions')
+        assert_jsonapi_compliance(json, 'quiz_submissions')
       end
 
       it 'should conform to the JSON-API spec when returning linked objects' do
@@ -275,7 +273,7 @@ describe QuizSubmissionsApiController, :type => :integration do
           :include => includes
         })
 
-        assert_jsonapi_compliance!(json, 'quiz_submissions', includes)
+        assert_jsonapi_compliance(json, 'quiz_submissions', includes)
       end
     end
   end

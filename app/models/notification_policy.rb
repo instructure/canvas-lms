@@ -21,13 +21,15 @@ class NotificationPolicy < ActiveRecord::Base
   belongs_to :notification
   belongs_to :communication_channel
   
-  before_save :infer_frequency
-
   attr_accessible :notification, :communication_channel, :frequency, :notification_id, :communication_channel_id
 
-  validates_presence_of :communication_channel_id
+  validates_presence_of :communication_channel_id, :frequency
   validates_inclusion_of :broadcast, in: [true, false]
-  
+  validates_inclusion_of :frequency, in: [Notification::FREQ_IMMEDIATELY,
+                                          Notification::FREQ_DAILY,
+                                          Notification::FREQ_WEEKLY,
+                                          Notification::FREQ_NEVER]
+
   # This is for choosing a policy for another context, so:
   # NotificationPolicy.for(notification) or
   # communication_channel.notification_policies.for(notification)
@@ -49,11 +51,6 @@ class NotificationPolicy < ActiveRecord::Base
 
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
 
-  def infer_frequency
-    self.frequency ||= "immediately"
-  end
-  protected :infer_frequency
-  
   def communication_preference
     return nil unless broadcast
     communication_channel || user.communication_channel
@@ -100,14 +97,8 @@ class NotificationPolicy < ActiveRecord::Base
       # User preference change not being made. Make a notification policy change.
 
       # Using the category name, fetch all Notifications for the category. Will set the desired value on them.
-      notifications = Notification.where(:category => params[:category]).pluck(:id)
-      # Look for frequency settings and only recognize a valid value.
-      frequency = case params[:frequency]
-        when Notification::FREQ_IMMEDIATELY, Notification::FREQ_DAILY, Notification::FREQ_WEEKLY, Notification::FREQ_NEVER
-          params[:frequency]
-        else
-          Notification::FREQ_NEVER
-      end
+      notifications = Notification.all.select { |n| (n.category && n.category.underscore.gsub(/\s/, '_')) == params[:category] }.map(&:id)
+      frequency = params[:frequency]
 
       # Find any existing NotificationPolicies for the category and the channel. If frequency is 'never', delete the
       # entry. If other than than, create or update the entry.
@@ -149,27 +140,66 @@ class NotificationPolicy < ActiveRecord::Base
   # A list of NotificationPolicy entries for the user. May include newly
   # created entries if defaults were needed.
   def self.setup_with_default_policies(user, full_category_list)
-    categories = {}
-    # Get the list of notification categories and its default. Like this:
-    # {"Announcement" => 'immediately'}
-    full_category_list.each {|c| categories[c.category] = c.default_frequency(user) }
-    if default_channel_id = user.communication_channel.try(:id)
-      # Load unique list of categories that the user currently has settings for.
-      user_categories = NotificationPolicy.for(user).
-          includes(:notification).
-          where("notification_id IS NOT NULL AND communication_channel_id = ?", default_channel_id).
-          map{|np| np.notification.category }.uniq
-      missing_categories = (categories.keys - user_categories)
-      missing_categories.each do |need_category|
-        # Create the settings for a completely unrepresented category. Use
-        # default communication_channel (primary email)
-        self.setup_for(user, {:category => need_category,
-                              :channel_id => default_channel_id,
-                              :frequency => categories[need_category]})
-      end
+    if user.communication_channel
+      user.communication_channel.user = user
+      find_all_for(user.communication_channel)
     end
     # Load and return user's policies after defaults may or may not have been set.
     # TODO: Don't load policies for retired channels
     NotificationPolicy.includes(:notification).for(user)
+  end
+
+  # Finds the current policy for a given communication channel, or creates it (with default)
+  # and/or updates it
+  def self.find_or_update_for(communication_channel, notification_name, frequency = nil)
+    notification_name = notification_name.titleize
+    notification = Notification.by_name(notification_name)
+    raise ActiveRecord::RecordNotFound unless notification
+    communication_channel.shard.activate do
+      unique_constraint_retry do
+        np = communication_channel.notification_policies.where(notification_id: notification).first
+        if !np
+          np = communication_channel.notification_policies.build(notification: notification)
+          frequency ||= begin
+            if communication_channel == communication_channel.user.communication_channel
+              notification.default_frequency(communication_channel.user)
+            else
+              'never'
+            end
+          end
+        end
+        if frequency
+          np.frequency = frequency
+          np.save!
+        end
+        np
+      end
+    end
+  end
+
+  def self.find_all_for(communication_channel)
+    communication_channel.shard.activate do
+      policies = communication_channel.notification_policies.all
+      Notification.all.each do |notification|
+        next if policies.find { |p| p.notification_id == notification.id }
+        Notification.transaction(requires_new: true) do
+          begin
+            np = communication_channel.notification_policies.build(notification: notification)
+            np.frequency = if communication_channel == communication_channel.user.communication_channel
+                             notification.default_frequency(communication_channel.user)
+                           else
+                             'never'
+                           end
+            np.save!
+          rescue ActiveRecord::Base::UniqueConstraintViolation
+            np = nil
+            raise ActiveRecord::Rollback
+          end
+        end
+        np ||= communication_channel.notification_policies.where(notification_id: notification).first
+        policies << np
+      end
+      policies
+    end
   end
 end

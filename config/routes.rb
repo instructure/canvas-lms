@@ -1136,6 +1136,17 @@ routes.draw do
       delete 'users/:user_id/communication_channels/:type/:address', :action => :destroy, :constraints => { :address => %r{[^/?]+} }
     end
 
+    scope(:controller => :notification_preferences) do
+      get 'users/:user_id/communication_channels/:communication_channel_id/notification_preferences', action: :index
+      get 'users/:user_id/communication_channels/:type/:address/notification_preferences', action: :index, :constraints => { :address => %r{[^/?]+} }
+      get 'users/:user_id/communication_channels/:communication_channel_id/notification_preferences/:notification', action: :show
+      get 'users/:user_id/communication_channels/:type/:address/notification_preferences/:notification', action: :show, :constraints => { :address => %r{[^/?]+} }
+      put 'users/self/communication_channels/:communication_channel_id/notification_preferences/:notification', action: :update
+      put 'users/self/communication_channels/:type/:address/notification_preferences/:notification', action: :update, :constraints => { :address => %r{[^/?]+} }
+      put 'users/self/communication_channels/:communication_channel_id/notification_preferences', action: :update_all
+      put 'users/self/communication_channels/:type/:address/notification_preferences', action: :update_all, :constraints => { :address => %r{[^/?]+} }
+    end
+
     scope(:controller => :comm_messages_api) do
       get 'comm_messages', :action => :index, :path_name => 'comm_messages'
     end
