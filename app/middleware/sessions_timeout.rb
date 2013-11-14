@@ -8,7 +8,9 @@ class SessionsTimeout
   # should be a Fixnum. This will work it's way up to encrypted_cookie_store.rb 
   # where the session's expire time is determined. EncryptedCookieStore is in a gem.
   def call(env)
-    session_option_key = ActionController::Session::CookieStore::ENV_SESSION_OPTIONS_KEY
+    session_option_key = CANVAS_RAILS2 ?
+      ActionController::Session::CookieStore::ENV_SESSION_OPTIONS_KEY :
+      Rack::Session::Abstract::ENV_SESSION_OPTIONS_KEY
     sessions_settings = Canvas::Plugin.find('sessions').settings
     sessions_timeout = 1.day # defaults to 1 day (in seconds)
 
