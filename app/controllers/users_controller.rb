@@ -1016,11 +1016,11 @@ class UsersController < ApplicationController
   def settings
     user = api_find(User, params[:id])
 
-    case request.request_method
-    when :get
+    case
+    when request.get?
       return unless authorized_action(user, @current_user, :read)
       render(json: { manual_mark_as_read: @current_user.manual_mark_as_read? })
-    when :put
+    when request.put?
       return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
       unless params[:manual_mark_as_read].nil?
         mark_as_read = value_to_boolean(params[:manual_mark_as_read])

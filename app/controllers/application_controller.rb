@@ -881,7 +881,7 @@ class ApplicationController < ActionController::Base
           :user_agent => request.headers['User-Agent'],
           :request_context_id => RequestContextGenerator.request_id,
           :account => @domain_root_account,
-          :request_method => request.method,
+          :request_method => CANVAS_RAILS2 ? request.method : request.request_method_symbol,
           :format => request.format,
         }.merge(ErrorReport.useful_http_env_stuff_from_request(request)))
       end
