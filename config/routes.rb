@@ -1048,6 +1048,7 @@ FakeRails3Routes.draw do
       put 'accounts/:id', :action => :update
       get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
       get 'accounts/:account_id/sub_accounts', :action => :sub_accounts, :path_name => 'sub_accounts'
+      post 'accounts/:account_id/sub_accounts', :action => :create_sub_account, :path_name => 'sub_accounts'
       get 'accounts/:account_id/courses/:id', :controller => :courses, :action => :show, :path_name => 'account_course_show'
     end
 
