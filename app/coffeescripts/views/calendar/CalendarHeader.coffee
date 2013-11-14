@@ -31,7 +31,6 @@ define [
         el: @$navigator
         showAgenda: @options.showAgenda
       )
-      @$calendarViewButtons.buttonset()
       @showNavigator()
       # The badge is part of the buttonset, so we can't find it beforehand with els
       @$badge = @$el.find('.counter-badge')
@@ -43,8 +42,18 @@ define [
       @navigator.on('navigateToday', => @trigger('navigateToday'))
       @navigator.on('navigateNext', => @trigger('navigateNext'))
       @navigator.on('navigateDate', (selectedDate) => @trigger('navigateDate', selectedDate))
+      @$calendarViewButtons.on('click', 'button', @toggleView)
       $.subscribe('Calendar/loadStatus', @animateLoading)
       @$schedulerDoneButton
+
+    toggleView: (e) ->
+      e.preventDefault()
+      $target = $(this)
+      $target.attr('aria-checked', true)
+             .addClass('active')
+      $target.siblings()
+             .attr('aria-checked', false)
+             .removeClass('active')
 
     showNavigator: ->
       @$navigator.show()

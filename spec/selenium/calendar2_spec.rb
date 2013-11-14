@@ -207,12 +207,12 @@ describe "calendar2" do
 
       it "should remember the selected calendar view" do
         get "/calendar2"
-        f("#month").should be_selected
-        f('label[for=agenda]').click
+        f("#month").should have_class('active')
+        f('#agenda').click
         wait_for_ajaximations
 
         get "/calendar2"
-        f('#agenda').should be_selected
+        f('#agenda').should have_class('active')
       end
 
       it "should create an event through clicking on a calendar day" do
@@ -221,7 +221,7 @@ describe "calendar2" do
 
       it "should show scheduler button if it is enabled" do
         get "/calendar2"
-        f("#scheduler").should have_class("ui-helper-hidden-accessible")
+        f("#scheduler").should_not be_nil
       end
 
       it "should not show scheduler button if it is disabled" do
@@ -444,7 +444,7 @@ describe "calendar2" do
 
       it "should change the week" do
         get "/calendar2"
-        header_buttons = ff('.ui-buttonset > label')
+        header_buttons = ff('.btn-group .btn')
         header_buttons[0].click
         wait_for_ajaximations
         old_header_title = get_header_text
@@ -609,7 +609,7 @@ describe "calendar2" do
         get "/calendar2"
         wait_for_ajaximations
 
-        f('label[for=week]').click
+        f('#week').click
         keep_trying_until do
           events = ff('.fc-event').select { |e| e.text =~ /due.*super important/ }
           # shows on monday night and tuesday morning
@@ -623,7 +623,7 @@ describe "calendar2" do
 
         get "/calendar2"
         wait_for_ajax_requests
-        f('label[for=week]').click
+        f('#week').click
 
         elt = fj('.fc-event:visible')
         elt.size.height.should >= 18
@@ -637,7 +637,7 @@ describe "calendar2" do
 
         get "/calendar2"
         wait_for_ajaximations
-        f('label[for=week]').click
+        f('#week').click
         wait_for_ajaximations
 
         elts = ffj('.fc-event:visible')
@@ -653,7 +653,7 @@ describe "calendar2" do
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
         get "/calendar2"
         wait_for_ajaximations
-        f('label[for=week]').click
+        f('#week').click
         wait_for_ajaximations
 
         elt = fj('.fc-event:visible')
@@ -669,7 +669,7 @@ describe "calendar2" do
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
         get "/calendar2"
         wait_for_ajaximations
-        f('label[for=week]').click
+        f('#week').click
         wait_for_ajaximations
 
         resize_handle = fj('.fc-event:visible .ui-resizable-handle')
@@ -685,7 +685,7 @@ describe "calendar2" do
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
         get "/calendar2"
         wait_for_ajaximations
-        f('label[for=week]').click
+        f('#week').click
         wait_for_ajaximations
 
         elt = fj('.fc-event:visible')
@@ -707,7 +707,7 @@ describe "calendar2" do
       it "should display agenda events" do
         get '/calendar2'
         wait_for_ajaximations
-        f('label[for=agenda]').click
+        f('#agenda').click
         wait_for_ajaximations
         fj('.agenda-wrapper:visible').should be_present
       end
@@ -718,7 +718,7 @@ describe "calendar2" do
           start_at: start_date, end_at: start_date + 1.hour)
         get '/calendar2'
         wait_for_ajaximations
-        f('label[for=agenda]').click
+        f('#agenda').click
         wait_for_ajaximations
         f('.navigation_title').text.should match(/[A-Z][a-z]{2}\s\d{1,2},\s\d{4}/)
       end
@@ -729,7 +729,7 @@ describe "calendar2" do
           start_at: start_date, end_at: start_date + 1.hour)
         get '/calendar2'
         wait_for_ajaximations
-        f('label[for=agenda]').click
+        f('#agenda').click
         wait_for_ajaximations
         ffj('.ig-row').length.should == 1
         fj('.context-list-toggle-box:last').click
@@ -742,7 +742,7 @@ describe "calendar2" do
         event = make_event(start: yesterday)
         get "/calendar2"
         wait_for_ajaximations
-        f('label[for=agenda]').click
+        f('#agenda').click
         wait_for_ajaximations
         ffj('.ig-row').length.should == 0
         quick_jump_to_date(yesterday.strftime("%b %-d %Y"))
@@ -755,7 +755,7 @@ describe "calendar2" do
         event = make_event(start: yesterday)
         get "/calendar2"
         wait_for_ajaximations
-        f('label[for=agenda]').click
+        f('#agenda').click
         wait_for_ajaximations
         ffj('.ig-row').length.should == 0
         f('.fc-button-prev').click
@@ -767,7 +767,7 @@ describe "calendar2" do
       it "should persist the start date across reloads" do
         get "/calendar2"
         wait_for_ajaximations
-        f('label[for=agenda]').click
+        f('#agenda').click
         next_year = 1.year.from_now.strftime("%Y")
         quick_jump_to_date(next_year)
         refresh_page
@@ -779,11 +779,11 @@ describe "calendar2" do
         get "/calendar2"
         wait_for_ajaximations
         f('.navigate_next').click()
-        f('label[for=agenda]').click
+        f('#agenda').click
         f('.navigation_title').should include_text(1.month.from_now.strftime("%b"))
         next_year = 1.year.from_now.strftime("%Y")
         quick_jump_to_date(next_year)
-        f('label[for=month]').click
+        f('#month').click
         f('.navigation_title').should include_text(next_year)
       end
 
@@ -792,7 +792,7 @@ describe "calendar2" do
         event = make_event(start: tomorrow)
         get "/calendar2"
         wait_for_ajaximations
-        f('label[for=agenda]').click
+        f('#agenda').click
         wait_for_ajaximations
         f('.navigation_title').should include_text(Time.now.utc.strftime("%b %-d, %Y"))
         f('.navigation_title').should include_text(tomorrow.utc.strftime("%b %-d, %Y"))
@@ -801,7 +801,7 @@ describe "calendar2" do
       it "should not display a date range if no events are found" do
         get "/calendar2"
         wait_for_ajaximations
-        f('label[for=agenda]').click
+        f('#agenda').click
         wait_for_ajaximations
         f('.navigation_title').should_not include_text('Invalid')
       end
@@ -811,7 +811,7 @@ describe "calendar2" do
         event = make_event(start: tomorrow)
         get "/calendar2"
         wait_for_ajaximations
-        f('label[for=agenda]').click
+        f('#agenda').click
         wait_for_ajaximations
         f('.ig-row').click()
         f('.event-details .delete_event_link').click()
@@ -855,7 +855,7 @@ describe "calendar2" do
         expect_new_page_load { driver.execute_script("$('#popover-0 .view_event_link').hover().click()") }
 
 
-        is_checked('#scheduler').should be_true
+        f('#scheduler').should have_class('active')
         f('#appointment-group-list').should include_text(ag.title)
       end
 

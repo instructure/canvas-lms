@@ -12,12 +12,22 @@
             data-tooltip>
         <span class="screenreader-only">{{#t "loading"}}Loading{{/t}}</span>
       </span>
-      <span class="calendar_view_buttons">
-        <input type="radio" id="week"      name="calendar_view" /><label for="week">{{#t "links.calendar_week"}}Week{{/t}}</label>
-        <input type="radio" id="month"     name="calendar_view" checked="checked" /><label for="month">{{#t "links.calendar_month"}}Month{{/t}}</label>
-        <input type="radio" id="agenda"    name="calendar_view" /><label for="agenda">{{#t "links.calendar_agenda"}}Agenda{{/t}}</label>
+      <span class="calendar_view_buttons btn-group" role="radiogroup">
+        <button type="button" id="week" class="btn" role="radio" aria-checked="false">
+          {{#t "links.calendar_week"}}Week{{/t}}
+          <span class="screenreader-only">{{#t "links.accessibility_warning"}}Warning: This view is not accessible to users with screenreaders{{/t}}</span>
+        </button>
+        <button type="button" id="month" class="btn" role="radio" aria-checked="false">
+          {{#t "links.calendar_month"}}Month{{/t}}
+          <span class="screenreader-only">{{#t "links.accessibility_warning"}}Warning: This view is not accessible to users with screenreaders{{/t}}</span>
+        </button>
+        <button type="button" id="agenda" class="btn" role="radio" aria-checked="false">
+          {{#t "links.calendar_agenda"}}Agenda{{/t}}
+        </button>
         {{#if showScheduler}}
-        <input type="radio" id="scheduler" name="calendar_view" /><label for="scheduler">{{#t "links.calendar_scheduler"}}Scheduler{{/t}} <span stye="display: none" class="counter-badge"></span></label>
+          <button type="button" id="scheduler" class="btn" role="radio" aria-checked="false">
+            {{#t "links.calendar_scheduler"}}Scheduler{{/t}}
+          </button>
         {{/if}}
       </span>
       <a href="#" id="create_new_event_link" class="btn" title="{{#t "create_event"}}Create New Event{{/t}}" data-tooltip>
@@ -26,11 +36,19 @@
       </a>
     </div>
     {{else}}
-    <div class="calendar_view_buttons header-table-cell header-table-middle">
-      <input type="radio" id="week"      name="calendar_view" /><label for="week">{{#t "links.calendar_week"}}Week{{/t}}</label>
-      <input type="radio" id="month"     name="calendar_view" checked="checked" /><label for="month">{{#t "links.calendar_month"}}Month{{/t}}</label>
+    <div class="calendar_view_buttons header-table-cell header-table-middle btn-group" role="radiogroup">
+      <button type="button" id="week" class="btn" role="radio" aria-checked="false">
+        {{#t "links.calendar_week"}}Week{{/t}}
+        <span class="screenreader-only">{{#t "links.accessibility_warning"}}Warning: This view is not accessible to users with screenreaders{{/t}}</span>
+      </button>
+      <button type="button" id="month" class="btn" role="radio" aria-checked="false">
+        {{#t "links.calendar_month"}}Month{{/t}}
+        <span class="screenreader-only">{{#t "links.accessibility_warning"}}Warning: This view is not accessible to users with screenreaders{{/t}}</span>
+      </button>
       {{#if showScheduler}}
-      <input type="radio" id="scheduler" name="calendar_view" /><label for="scheduler">{{#t "links.calendar_scheduler"}}Scheduler{{/t}} <span stye="display: none" class="counter-badge"></span></label>
+        <button type="button" id="scheduler" class="btn" role="radio" aria-checked="false">
+          {{#t "links.calendar_scheduler"}}Scheduler{{/t}}
+        </button>
       {{/if}}
     </div>
     <div class="calendar_action_buttons header-table-cell header-table-right">
