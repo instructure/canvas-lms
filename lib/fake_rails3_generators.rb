@@ -1,3 +1,5 @@
+if CANVAS_RAILS2
+
 module FakeRails3Generators
   # XXX: Rails 2 Compatibility
   require 'rails_generator/base'
@@ -29,4 +31,6 @@ module FakeRails3Generators
       create_migration_file
     end
   end
+end
+
 end
