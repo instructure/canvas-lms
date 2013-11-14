@@ -145,7 +145,7 @@ Mocha::Mock.class_eval do
   alias_method_chain :respond_to?, :marshalling
 end
 
-[ActiveSupport::Cache::MemoryStore, NilStore].each do |store|
+[ActiveSupport::Cache::MemoryStore, (CANVAS_RAILS2 ? NilStore : ActiveSupport::Cache::NullStore)].each do |store|
   store.class_eval do
     def write_with_serialization_check(name, value, options = nil)
       Marshal.dump(value)
@@ -156,7 +156,7 @@ end
 end
 
 unless CANVAS_RAILS2
-  NilStore.class_eval do
+  ActiveSupport::Cache::NullStore.class_eval do
     def fetch_with_serialization_check(name, options = {}, &block)
       result = fetch_without_serialization_check(name, options, &block)
       Marshal.dump(result) if result
