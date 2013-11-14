@@ -808,10 +808,10 @@ class ActiveRecord::Base
   end
 
   if Rails.version < '4'
-    if CANVAS_RAILS3
-      scope :none, lambda { where("?", false) }
-    else
+    if CANVAS_RAILS2
       named_scope :none, lambda { where("?", false) }
+    else
+      scope :none, lambda { where("?", false) }
     end
   end
 end

@@ -497,8 +497,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def user_ids_who_have_posted_and_admins
-    # TODO: In Rails 3, you can use uniq and pluck together
-    ids = DiscussionEntry.active.select(:user_id).uniq.where(:discussion_topic_id => self).map(&:user_id)
+    scope = DiscussionEntry.active.select(:user_id).uniq.where(:discussion_topic_id => self)
+    ids = CANVAS_RAILS2 ? scope.map(&:user_id) : scope.pluck(:user_id)
     ids += self.context.admin_enrollments.active.pluck(:user_id) if self.context.respond_to?(:admin_enrollments)
     ids
   end

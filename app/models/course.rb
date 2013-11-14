@@ -536,9 +536,12 @@ class Course < ActiveRecord::Base
   end
 
   def instructors_in_charge_of(user_id)
-    section_ids = current_enrollments.
-        where(:course_id => self, :user_id => user_id).
-        where("course_section_id IS NOT NULL").pluck(:course_section_id).uniq # TODO: with real Rails 3, this uniq can become part of the scope
+    scope = current_enrollments.
+      where(:course_id => self, :user_id => user_id).
+      where("course_section_id IS NOT NULL")
+    section_ids = CANVAS_RAILS2 ?
+      scope.pluck(:course_section_id).uniq :
+      scope.uniq.pluck(:course_section_id)
     participating_instructors.restrict_to_sections(section_ids)
   end
 
@@ -1609,9 +1612,13 @@ class Course < ActiveRecord::Base
   end
 
   def resubmission_for(asset)
-    # without the scoped, Rails 2 will try to do an update_all instead (due to
-    # the association)
-    asset.ignores.where(:purpose => 'grading', :permanent => false).scoped.delete_all
+    if CANVAS_RAILS2
+      # without the scoped, Rails 2 will try to do an update_all instead (due
+      # to the association)
+      asset.ignores.where(:purpose => 'grading', :permanent => false).scoped.delete_all
+    else
+      asset.ignores.where(:purpose => 'grading', :permanent => false).delete_all
+    end
     instructors.each(&:touch)
   end
 
