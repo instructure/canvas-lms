@@ -258,7 +258,7 @@ class UsersController < ApplicationController
           else
             @enrollment_terms = []
             if @root_account == @context
-              @enrollment_terms = @context.enrollment_terms.active
+              @enrollment_terms = @context.enrollment_terms.active.order(EnrollmentTerm.nulls(:first, :start_at))
             end
             format.html
           end
