@@ -68,7 +68,7 @@ define [
     appendEvents: (events) =>
       @nextPageDate = events.nextPageDate
       @collection.push.apply(@collection, events)
-      @collection = _.sortBy(@collection, 'start')
+      @collection = _.sortBy(@collection, 'originalStart')
       @render()
 
     loadMore: (e) ->
@@ -100,7 +100,7 @@ define [
 
       lastEvent = _.last(@collection)
       return if !lastEvent
-      @trigger('agendaDateRange', @startDate, lastEvent.start)
+      @trigger('agendaDateRange', @startDate, lastEvent.originalStart)
 
     # Internal: Change a flat array of objects into a sturctured array of
     # objects based on the given iterator function. Similar to _.groupBy,
@@ -132,7 +132,7 @@ define [
     #
     # Returns the formatted String
     formattedDayString: (event) =>
-      I18n.l('#date.formats.short_with_weekday', event.start)
+      I18n.l('#date.formats.short_with_weekday', event.originalStart)
 
     # Internal: change a box of events into an output hash for toJSON
     #
@@ -142,7 +142,7 @@ define [
     eventBoxToHash: (events) =>
       now = $.fudgeDateForProfileTimezone(new Date)
       event = _.first(events)
-      start = event.start
+      start = event.originalStart
       isToday =
         now.getDate() == start.getDate() &&
         now.getMonth() == start.getMonth() &&

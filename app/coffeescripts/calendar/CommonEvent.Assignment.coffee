@@ -25,26 +25,22 @@ define [
       @description = data.description
       @start = @parseStartDate()
       @end = null # in case it got set by midnight fudging
-      @originalStartDate = new Date(@start) if @start
 
       super
 
     fullDetailsURL: () ->
       @assignment.html_url
 
-    startDate: () -> @originalStartDate
-
     parseStartDate: () ->
       if @assignment.due_at then $.parseFromISO(@assignment.due_at, 'due_date').time else null
 
     displayTimeString: () ->
-      if !@assignment.due_at
+      unless date = @originalStart
         return "No Date" # TODO: i18n
 
-      date = $.parseFromISO @assignment.due_at, 'due_date'
       # TODO: i18n
-      time_string = "#{date.date_formatted} at #{date.time_string}"
-      "Due: <time datetime='#{date.time.toISOString()}'>#{time_string}</time>"
+      time_string = "#{$.dateString(date)} at #{$.timeString(date)}"
+      "Due: <time datetime='#{date.toISOString()}'>#{time_string}</time>"
 
     readableType: () ->
       @readableTypes[@assignmentType()]

@@ -287,12 +287,16 @@ define [
     eventAfterRender: (event, element, view) =>
       if event.isDueAtMidnight()
         # show the actual time instead of the midnight fudged time
-        element.find('.fc-event-time').html @calendar.fullCalendar('formatDate', event.startDate(), 'h(:mm)t')
+        time = element.find('.fc-event-time')
+        html = time.html()
+        # the time element also contains the title for calendar events
+        html = html.replace(/^\d+:\d+/, @calendar.fullCalendar('formatDate', event.startDate(), 'h(:mm)t'))
+        time.html(html)
       if event.eventType.match(/assignment/) && view.name == "agendaWeek"
         element.height('') # this fixes it so it can wrap and not be forced onto 1 line
           .find('.ui-resizable-handle').remove()
       if ENV.CALENDAR.SHOW_AGENDA
-        if event.eventType.match(/assignment/) && event.isDueAtMidnight()
+        if event.eventType.match(/assignment/) && event.isDueAtMidnight() && view.name == "month"
           element.find('.fc-event-time').empty()
       else
         if event.eventType.match(/assignment/)

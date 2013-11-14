@@ -819,6 +819,26 @@ describe "calendar2" do
         wait_for_ajaximations
         ffj('.ig-row').length.should == 0
       end
+
+      it "should display midnight assignments at 11:59" do
+        assignment_model(:course => @course,
+                         :title => "super important",
+                         :due_at => Time.zone.now.beginning_of_day + 1.day - 1.minute)
+        calendar_events = @teacher.calendar_events_for_calendar.last
+
+        calendar_events.title.should == "super important"
+        @assignment.due_date.should == (Time.zone.now.beginning_of_day + 1.day - 1.minute).to_date
+
+        get "/calendar2"
+        wait_for_ajaximations
+
+        f('#agenda').click
+        wait_for_ajaximations
+
+        f('.ig-details').should include_text('11:59')
+        f('.ig-row').click()
+        fj('.event-details:visible time').should include_text('11:59')
+      end
     end
   end
 
