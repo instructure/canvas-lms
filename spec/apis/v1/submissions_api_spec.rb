@@ -1068,16 +1068,11 @@ describe 'Submissions API', :type => :integration do
       @student3 = student_in_course(:active_all => true).user
       @assignment1 = @course.assignments.create! :title => 'assignment1', :grading_type => 'points', :points_possible => 15
       @assignment2 = @course.assignments.create! :title => 'assignment2', :grading_type => 'points', :points_possible => 25
-      submit_homework @assignment1, @student1
-      submit_homework @assignment2, @student1
-      submit_homework @assignment1, @student2
-      submit_homework @assignment2, @student2
-      submit_homework @assignment1, @student3
-      @assignment1.grade_student @student1, :grade => 15
-      @assignment1.grade_student @student2, :grade => 10
-      @assignment2.grade_student @student1, :grade => 25
-      @assignment2.grade_student @student2, :grade => 20
-      @assignment1.grade_student @student3, :grade => 20
+      bare_submission_model @assignment1, @student1, grade: 15, score: 15
+      bare_submission_model @assignment2, @student1, grade: 25, score: 25
+      bare_submission_model @assignment1, @student2, grade: 10, score: 10
+      bare_submission_model @assignment2, @student2, grade: 20, score: 20
+      bare_submission_model @assignment1, @student3, grade: 20, score: 20
     end
 
     context "teacher" do

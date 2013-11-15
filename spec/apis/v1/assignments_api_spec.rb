@@ -39,17 +39,17 @@ describe AssignmentsApiController, :type => :integration do
   end
 
   def create_submitted_assignment_with_user(user=@user)
-      now = Time.zone.now
-      assignment = @course.assignments.create!(
-        :title => "dawg you gotta submit this",
-        :submission_types => "online_url")
-      submission = assignment.submit_homework(user)
-      submission.score = '99'
-      submission.grade = '99'
-      submission.submitted_at = now
-      submission.grade_matches_current_submission = true
-      submission.save!
-      return assignment,submission
+    now = Time.zone.now
+    assignment = @course.assignments.create!(
+      :title => "dawg you gotta submit this",
+      :submission_types => "online_url")
+    submission = bare_submission_model assignment,
+                                       user,
+                                       score: '99',
+                                       grade: '99',
+                                       submitted_at: now,
+                                       grade_matches_current_submission: true
+    return assignment,submission
   end
 
   def create_override_for_assignment(assignment=@assignment)

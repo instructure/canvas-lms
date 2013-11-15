@@ -162,7 +162,7 @@ describe User do
       course_with_teacher(:active_all => true)
       course_with_student(:active_all => true, :course => @course)
       assignment = @course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
-      sub = assignment.submit_homework @student, :submission_type => "online_text_entry", :body => "submission"
+      sub = bare_submission_model assignment, @student, :submission_type => "online_text_entry", :body => "submission"
       sub.add_comment :author => @teacher, :comment => "lol"
       item = StreamItem.last
       item.asset.should == sub
@@ -2010,13 +2010,12 @@ describe User do
       [@course1, @course2].each do |course|
         assignment = course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
         [@studentA, @studentB].each do |student|
-          assignment.submit_homework student, :submission_type => "online_text_entry", :body => "submission for #{student.name}"
+          bare_submission_model assignment, student, :submission_type => "online_text_entry", :body => "submission for #{student.name}"
         end
       end
     end
 
     it "should count assignments with ungraded submissions across multiple courses" do
-      @teacher.assignments_needing_grading_total_count.should eql(2)
       @teacher.assignments_needing_grading.size.should eql(2)
       @teacher.assignments_needing_grading.should be_include(@course1.assignments.first)
       @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)
@@ -2024,7 +2023,6 @@ describe User do
       # grade one submission for one assignment; these numbers don't change
       @course1.assignments.first.grade_student(@studentA, :grade => "1")
       @teacher = User.find(@teacher.id) # use a new instance, since these are memoized
-      @teacher.assignments_needing_grading_total_count.should eql(2)
       @teacher.assignments_needing_grading.size.should eql(2)
       @teacher.assignments_needing_grading.should be_include(@course1.assignments.first)
       @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)
@@ -2032,13 +2030,11 @@ describe User do
       # grade the other submission; now course1's assignment no longer needs grading
       @course1.assignments.first.grade_student(@studentB, :grade => "1")
       @teacher = User.find(@teacher.id)
-      @teacher.assignments_needing_grading_total_count.should eql(1)
       @teacher.assignments_needing_grading.size.should eql(1)
       @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)
     end
 
     it "should only count submissions in accessible course sections" do
-      @ta.assignments_needing_grading_total_count.should eql(2)
       @ta.assignments_needing_grading.size.should eql(2)
       @ta.assignments_needing_grading.should be_include(@course1.assignments.first)
       @ta.assignments_needing_grading.should be_include(@course2.assignments.first)
@@ -2048,7 +2044,6 @@ describe User do
       @course1.assignments.first.grade_student(@studentA, :grade => "1")
       @course2.assignments.first.grade_student(@studentA, :grade => "1")
       @ta = User.find(@ta.id)
-      @ta.assignments_needing_grading_total_count.should eql(1)
       @ta.assignments_needing_grading.size.should eql(1)
       @ta.assignments_needing_grading.should be_include(@course2.assignments.first)
 
@@ -2056,7 +2051,6 @@ describe User do
       @course1.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section1b,
                           :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
       @ta = User.find(@ta.id)
-      @ta.assignments_needing_grading_total_count.should eql(2)
       @ta.assignments_needing_grading.size.should eql(2)
       @ta.assignments_needing_grading.should be_include(@course1.assignments.first)
       @ta.assignments_needing_grading.should be_include(@course2.assignments.first)
@@ -2065,15 +2059,9 @@ describe User do
     it "should limit the number of returned assignments" do
       20.times do |x|
         assignment = @course1.assignments.create!(:title => "excess assignment #{x}", :submission_types => ['online_text_entry'])
-        assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "o hai"
-        assignment = @course2.assignments.create!(:title => "excess assignment #{x}", :submission_types => ['online_text_entry'])
-        assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "kthxbye"
+        bare_submission_model assignment, @studentB
       end
-      @teacher.assignments_needing_grading_total_count.should eql(42)
-      @teacher.assignments_needing_grading.size.should < 42
-
-      @ta.assignments_needing_grading_total_count.should eql(22)
-      @ta.assignments_needing_grading.size.should < 22
+      @teacher.assignments_needing_grading.size.should < 22
     end
 
     context "sharding" do
@@ -2088,19 +2076,17 @@ describe User do
           @course3.enroll_student(@studentA).accept!
           @course3.enroll_student(@studentB).accept!
           @assignment3 = @course3.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
-          @assignment3.submit_homework @studentA, :submission_type => "online_text_entry", :body => "submission for A"
+          bare_submission_model @assignment3, @studentA, :submission_type => "online_text_entry", :body => "submission for A"
         end
       end
 
       it "should find assignments from all shards" do
-        @teacher.assignments_needing_grading_total_count.should == 3
         @teacher.assignments_needing_grading.sort_by(&:id).should ==
             [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
       end
 
       it "should honor ignores for a separate shard" do
         @teacher.ignore_item!(@assignment3, 'grading')
-        @teacher.assignments_needing_grading_total_count.should == 2
         @teacher.assignments_needing_grading.sort_by(&:id).should ==
             [@course1.assignments.first, @course2.assignments.first].sort_by(&:id)
 
@@ -2108,7 +2094,7 @@ describe User do
           @assignment3.submit_homework @studentB, :submission_type => "online_text_entry", :body => "submission for B"
         end
         @teacher = User.find(@teacher)
-        @teacher.assignments_needing_grading_total_count.should == 3
+        @teacher.assignments_needing_grading.size.should == 3
       end
 
       it "should apply a global limit" do

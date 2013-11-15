@@ -1437,6 +1437,9 @@ class User < ActiveRecord::Base
   end
   memoize :assignments_needing_submitting
 
+  # every couple years i try to remove this since it appears to be unused.
+  # turns out we do actually use it in a view via User#send w/ string
+  # interpolation ಠ_ಠ
   def assignments_needing_submitting_total_count(opts={})
     assignments_needing_submitting(opts.merge(:limit => nil)).size
   end
@@ -1469,6 +1472,7 @@ class User < ActiveRecord::Base
   end
   memoize :assignments_needing_grading
 
+  # see assignments_needing_submitting_total_count
   def assignments_needing_grading_total_count(opts={})
     assignments_needing_grading(opts.merge(:limit => nil)).size
   end
