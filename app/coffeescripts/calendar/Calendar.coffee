@@ -618,10 +618,14 @@ define [
 
     renderDateRange: (start, end) =>
       @setDateTitle(I18n.l('#date.formats.medium', start)+' &ndash; '+I18n.l('#date.formats.medium', end))
-      $.screenReaderPoliteMessage I18n.t('agenda_view_displaying_start_end', "Now displaying %{start} through %{end}",
-        start: I18n.l('#date.formats.long', start)
-        end:   I18n.l('#date.formats.long', end)
-      )
+      # for "load more" with voiceover, we want the alert to happen later so
+      # the focus change doesn't interrupt it.
+      window.setTimeout =>
+        $.screenReaderFlashMessage I18n.t('agenda_view_displaying_start_end', "Now displaying %{start} through %{end}",
+          start: I18n.l('#date.formats.long', start)
+          end:   I18n.l('#date.formats.long', end)
+        )
+      , 500
 
     showSchedulerSingle: ->
       @calendar.show()
