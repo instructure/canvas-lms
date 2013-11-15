@@ -18,6 +18,9 @@ define [
       PaginatedCollectionView::els
       '.no-results': '$noResults'
 
+    attach: ->
+      @collection.on 'change', @reorder
+
     afterRender: ->
       @$filter = @$externalFilter
       super
@@ -29,4 +32,5 @@ define [
     createItemView: (model) ->
       groupUsersView = new GroupUsersView {group: model, collection: model.users()}
       groupDetailView = new GroupDetailView {group: model, users: model.users()}
-      new GroupView {model, groupUsersView, groupDetailView, addUnassignedMenu: @options.addUnassignedMenu}
+      groupView = new GroupView {model, groupUsersView, groupDetailView, addUnassignedMenu: @options.addUnassignedMenu}
+      model.itemView = groupView

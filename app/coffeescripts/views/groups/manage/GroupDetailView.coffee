@@ -15,7 +15,7 @@ define [
       '.group-summary': '$summary'
 
     attach: ->
-      @group.on 'change:members_count', @updateSummary
+      @group.on 'change', @render
 
     summary: ->
       count = @group.usersCount()
@@ -23,9 +23,6 @@ define [
         I18n.t "student_count", "student", count: count
       else
         I18n.t "user_count", "user", count: count
-
-    updateSummary: =>
-      @$summary.text @summary()
 
     toJSON: ->
       json = @group.toJSON()
