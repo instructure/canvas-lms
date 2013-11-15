@@ -24,9 +24,9 @@ def fill_migration_form(opts={})
 end
 
 def submit
-  submit_btn = f('#submitMigration')
+  submit_btn = fj('#submitMigration')
   submit_btn.click
-  keep_trying_until { f('#migrationFileUpload').blank? }
+  keep_trying_until { fj('#migrationFileUpload').blank? }
 end
 
 def run_migration(cm=nil)
