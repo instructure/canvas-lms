@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Accounts
 class SubAccountsController < ApplicationController
   include Api::V1::Account
 
