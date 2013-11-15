@@ -63,6 +63,8 @@ define [
         max = as.size() if as?
       errors = {}
       _.each data.rules, (value, name) =>
+        # don't want to validate the never_drop field
+        return if name is 'never_drop'
         val = parseInt(value)
         field = "rules[#{name}]"
         if isNaN(val)

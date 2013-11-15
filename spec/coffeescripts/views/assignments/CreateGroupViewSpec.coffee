@@ -24,12 +24,24 @@ define [
 
   module 'CreateGroupView'
 
+  test 'it should not add errors when never_drop rules are added', ->
+    view = createView()
+    data =
+      name: "Assignments"
+      rules:
+        never_drop: ["1854", "352", "234563"]
+
+    errors = view.validateFormData(data)
+    ok _.isEmpty(errors)
+
+
   test 'it should only allow positive numbers for drop rules', ->
     view = createView()
     data =
       rules:
         drop_lowest: "tree"
         drop_highest: -1
+        never_drop: ['1', '2', '3']
 
     errors = view.validateFormData(data)
     ok errors
