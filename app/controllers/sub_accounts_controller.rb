@@ -17,6 +17,8 @@
 #
 
 class SubAccountsController < ApplicationController
+  include Api::V1::Account
+
   # these actions assume that if we're authorized to act on @account , we're
   # authorized to act on all its sub-accounts too.
 
@@ -88,12 +90,32 @@ class SubAccountsController < ApplicationController
     render :json => @sub_account.as_json(:include => [:sub_accounts, :courses], :methods => [:course_count, :sub_account_count])
   end
   
+  # @API Create a new sub-account
+  # Add a new sub-account to a given account.
+  #
+  # @argument account[parent_account_id] [Integer]
+  #   The identifier of the account to which the new sub-account will be added
+  #
+  # @argument account[name] [String]
+  #   The name of the new sub-account.
+  #
+  # @argument account[default_storage_quota_mb] [Optional, Integer]
+  #   The default course storage quota to be used, if not otherwise specified.
+  #
+  # @argument account[default_user_storage_quota_mb] [Optional, Integer]
+  #   The default user storage quota to be used, if not otherwise specified.
+  #
+  # @argument account[default_group_storage_quota_mb] [Optional, Integer]
+  #   The default group storage quota to be used, if not otherwise specified.
+  #
+  # @returns [Account]
   def create
     @parent_account = subaccount_or_self(params[:account].delete(:parent_account_id))
+    return unless authorized_action(@parent_account, @current_user, :manage_account_settings)
     @sub_account = @parent_account.sub_accounts.build(params[:account])
     @sub_account.root_account = @context.root_account
     if @sub_account.save
-      render :json => @sub_account
+      render :json => account_json(@sub_account, @current_user, session, [])
     else
       render :json => @sub_account.errors
     end

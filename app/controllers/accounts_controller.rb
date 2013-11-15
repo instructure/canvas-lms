@@ -100,37 +100,6 @@ class AccountsController < ApplicationController
     render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
   end
 
-  # @API Create a new sub-account
-  # Add a new sub-account to this account.
-  #
-  # @argument account[name] [String]
-  #   The name of the new sub-account.
-  #
-  # @argument account[default_time_zone] [Optional, String]
-  #   The default time zone of the account. Allowed time zones are
-  #   {http://www.iana.org/time-zones IANA time zones} or friendlier
-  #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
-  #
-  # @argument account[default_storage_quota_mb] [Optional, Integer]
-  #   The default course storage quota to be used, if not otherwise specified.
-  #
-  # @argument account[default_user_storage_quota_mb] [Optional, Integer]
-  #   The default user storage quota to be used, if not otherwise specified.
-  #
-  # @argument account[default_group_storage_quota_mb] [Optional, Integer]
-  #   The default group storage quota to be used, if not otherwise specified.
-  #
-  # @returns [Account]
-  def create_sub_account
-    return unless authorized_action(@account, @current_user, :manage_account_settings)
-    sub_account = @account.sub_accounts.build(params[:account])
-    if sub_account.save
-      render :json => sub_account
-    else
-      render :json => sub_account.errors
-    end
-  end
-
   include Api::V1::Course
 
   # @API List active courses in an account
