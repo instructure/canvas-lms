@@ -82,10 +82,8 @@ define [
 
     $allElementsControllingRegion.each updateTextToState( if showRegion then 'Shown' else 'Hidden' )
 
-  $(document).on 'click change keydown', '.element_toggler[aria-controls]', (event) ->
+  $(document).on 'click change keyclick', '.element_toggler[aria-controls]', (event) ->
     $this = $(this)
-
-    return if event.type is 'keydown' and event.keyCode != 13 and event.keyCode != 32
 
     if $this.is('input[type="checkbox"]')
       return if event.type is 'click'

@@ -21,7 +21,7 @@ define [
     events:
       'click .agenda-load-btn': 'loadMore'
       'click .ig-row': 'manageEvent'
-      'keydown .ig-row': 'manageEvent'
+      'keyclick .ig-row': 'manageEvent'
 
     messages:
       loading_more_items: I18n.t('loading_more_items', "Loading more items.")
@@ -89,7 +89,6 @@ define [
       $firstEventDayDate[0].focus() if $firstEventDayDate.length
 
     manageEvent: (e) ->
-      return if e.type == 'keydown' && e.keyCode != 13 && e.keyCode != 32
       eventId = $(e.target).closest('.agenda-event').data('event-id')
       event = @dataSource.eventWithId(eventId)
       new ShowEventDetailsDialog(event, @dataSource).show e

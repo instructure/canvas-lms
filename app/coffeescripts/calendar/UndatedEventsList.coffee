@@ -21,17 +21,16 @@ define [
         "CommonEvent/eventSaved" : @eventSaved
         "Calendar/visibleContextListChanged" : @visibleContextListChanged
 
-      @div.on('click', '.event', @clickEvent)
+      @div.on('click keyclick', '.event', @clickEvent)
           .on('click', '.undated_event_title', @clickEvent)
           .on('click', '.undated-events-link', @show)
-      @div.on('keydown', '.event', @keyDownEvent)
       if toggler = @div.prev('.element_toggler')
-        toggler.on('click', @show)
+        toggler.on('click keyclick', @toggle)
         @div.find('.undated-events-link').hide()
 
       @showAgenda = !!ENV.CALENDAR.SHOW_AGENDA
 
-    load: =>
+    load: (setFocus = false) =>
       return if @hidden
 
       loadingDfd = new $.Deferred()
@@ -40,9 +39,13 @@ define [
         opacity: 1,
         lines: 8, length: 2, width: 2, radius: 3
       })
-      $.screenReaderFlashMessage(I18n.t('loading_undated_events', 'Loading undated events'))
+
+      loadingTimer = setTimeout ->
+        $.screenReaderFlashMessage(I18n.t('loading_undated_events', 'Loading undated events'))
+      , 0
 
       @dataSource.getEvents null, null, @visibleContextList, (events) =>
+        clearTimeout(loadingTimer)
         loadingDfd.resolve()
         for e in events
           e.details_url = e.fullDetailsURL()
@@ -65,12 +68,19 @@ define [
             # Only show the element after the drag stops if it doesn't have a start date now
             # (meaning it wasn't dropped on the calendar)
             $(this).show() unless $(this).data('calendarEvent').start
-        @div.find('.undated_event:first').attr('tabindex', -1).focus()
+        @div.find('.undated_event_title:first').focus() if setFocus
 
     show: (event) =>
       event.preventDefault()
       @hidden = false
-      @load()
+      @load(setFocus = true)
+
+    toggle: (e) =>
+      # defer this until after the section toggles
+      setTimeout =>
+        @hidden = !@div.is(':visible')
+        @load(setFocus = true)
+      , 0
 
     clickEvent: (jsEvent) =>
       jsEvent.preventDefault()
@@ -80,10 +90,6 @@ define [
       event = @dataSource.eventWithId(eventId)
       if event
         new ShowEventDetailsDialog(event, @dataSource).show jsEvent
-
-    keyDownEvent: (jsEvent) =>
-      return if jsEvent.keyCode != 13 && jsEvent.keyCode != 32
-      @clickEvent(jsEvent)
 
     visibleContextListChanged: (list) =>
       @visibleContextList = list
