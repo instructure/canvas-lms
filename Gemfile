@@ -38,10 +38,8 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
 # enforce the version of bundler itself, to avoid any surprises
 gem 'bundler', '1.3.5'
-if CANVAS_RAILS2
-  gem 'canvas_connect', '0.2'
-  gem 'canvas_webex', '0.7'
-end
+gem 'canvas_connect', '0.3'
+gem 'canvas_webex', '0.7'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
 if CANVAS_RAILS2
