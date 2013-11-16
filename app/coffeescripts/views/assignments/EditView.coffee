@@ -276,6 +276,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
       unless ENV?.IS_LARGE_ROSTER
         errors = @groupCategorySelector.validateBeforeSave(data, errors)
+      errors = @_validatePointsPossible(data, errors)
       errors = @_validatePercentagePoints(data, errors)
       errors = @_validateAdvancedOptions(data, errors)
       data2 =
@@ -307,12 +308,21 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
         ]
       errors
 
+    _validatePointsPossible: (data, errors) =>
+      frozenPoints = _.contains(@model.frozenAttributes(), "points_possible")
+
+      if !frozenPoints and data.points_possible and isNaN(parseFloat(data.points_possible))
+        errors["points_possible"] = [
+          message: I18n.t 'points_possible_number', 'Points possible must be a number'
+        ]
+      errors
+
     # Require points possible > 0
     # if grading type === percent
     _validatePercentagePoints: (data, errors) =>
       if data.grading_type == 'percent' and (data.points_possible == "0" or isNaN(parseFloat(data.points_possible)))
         errors["points_possible"] = [
-          message: I18n.t 'points_possible', 'Points possible must be more than 0 for percentage grading'
+          message: I18n.t 'percentage_points_possible', 'Points possible must be more than 0 for percentage grading'
         ]
       errors
 
@@ -320,8 +330,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     _validateAdvancedOptions: (data, errors) =>
       ariaExpanded = @$advancedAssignmentOptions.attr('aria-expanded')
       expanded = ariaExpanded == 'true' or ariaExpanded == true
-      error_keys = _.keys(errors)
-      if error_keys.length > 0 and !_.contains(error_keys, "name") and !expanded
+      error_keys = _.without(_.keys(errors), "name", "points_possible")
+      if error_keys.length > 0 and !expanded
         errors["assignmentToggleAdvancedOptions"] = [
           message: I18n.t 'advanced_options_errors', 'There were errors on one or more advanced options'
         ]
