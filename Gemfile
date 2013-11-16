@@ -67,6 +67,7 @@ gem 'mime-types', '1.17.2', :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
 # with mini_magick 3.1
 gem 'mini_magick', '1.3.2'
+gem 'multi_json', '1.8.2'
 gem 'netaddr', '1.5.0'
 gem 'nokogiri', '1.5.6'
 # oauth gem, with rails3 fixes rolled in
