@@ -7,7 +7,7 @@
    show_grading = !@assignment || @assignment.submission_types != 'online_quiz' 
    rubric_association = assessment.rubric_association if assessment
 %>
-<% cache(['rubric_render2',
+<% cache(['rubric_render3',
          (rubric.try(:cache_key) || 'no_rubric'),
          (rubric.try(:cache_key) || context.asset_string),
          (rubric_association.try(:cache_key) || 'no_association'),
