@@ -90,5 +90,16 @@ describe GradeSummaryPresenter do
       p = GradeSummaryPresenter.new(@course, @teacher, @student)
       p.submissions.map(&:assignment_id).should == [a1.id]
     end
+
+    it "doesn't error on submissions for assignments not in the pre-loaded assignment list" do
+      teacher_in_course
+      student_in_course
+      assign = @course.assignments.create! points_possible: 10
+      assign.grade_student @student, grade: 10
+      assign.update_attribute(:submission_types, "not_graded")
+
+      p = GradeSummaryPresenter.new(@course, @teacher, @student)
+      p.submissions.map(&:assignment_id).should == [assign.id]
+    end
   end
 end
