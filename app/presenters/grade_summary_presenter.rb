@@ -117,7 +117,8 @@ class GradeSummaryPresenter
 
       # preload submission comment stuff
       comments = ss.map { |s|
-        s.assignment = assignments_index[s.assignment_id]
+        assign = assignments_index[s.assignment_id]
+        s.assignment = assign if assign.present?
 
         s.visible_submission_comments.map { |c|
           c.submission = s
