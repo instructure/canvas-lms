@@ -1,4 +1,4 @@
-if Rails.version < '3'
+if CANVAS_RAILS2
 
 ActiveRecord::Base.class_eval do
   class << self
@@ -131,6 +131,39 @@ ActiveRecord::Base.class_eval do
       end
     end
     alias_method_chain :scope, :named_scope
+
+    # allow validate to recognize the Rails 3 style on: action modifiers,
+    # translating those calls into validate_on_action calls.
+    def validate_with_rails3_compatibility(*methods, &block)
+      options = methods.extract_options! || {}
+      callback =
+        case validation_method(options[:on])
+        when :validate_on_create then :validate_on_create
+        when :validate_on_update then :validate_on_update
+        else :validate_without_rails3_compatibility
+        end
+      methods << block if block_given?
+      methods << options unless options.empty?
+      send(callback, *methods)
+    end
+    alias_method_chain :validate, :rails3_compatibility
+
+    # allow before_validation to recognize the Rails 3 style on: action
+    # modifiers, translating those calls into before_validation_on_action
+    # calls.
+    def before_validation_with_rails3_compatibility(*methods, &block)
+      options = methods.extract_options! || {}
+      callback =
+        case validation_method(options[:on])
+        when :validate_on_create then :before_validation_on_create
+        when :validate_on_update then :before_validation_on_update
+        else :before_validation_without_rails3_compatibility
+        end
+      methods << block if block_given?
+      methods << options unless options.empty?
+      send(callback, *methods)
+    end
+    alias_method_chain :before_validation, :rails3_compatibility
   end
 
   # support 0 arguments
@@ -192,9 +225,39 @@ ActiveRecord::Associations::AssociationCollection.class_eval do
   end
 end
 
+class ActiveRecord::Generators
+  include FakeRails3Generators
+end
+
+ActionView::Base.class_eval do
+  [:content_tag, :content_tag_for, :field_set_tag,
+   :fields_for, :form_for, :form_tag, :javascript_tag].each do |block_helper|
+    define_method("#{block_helper}_with_nil_return") do |*args, &block|
+      if block
+        self.send("#{block_helper}_without_nil_return", *args, &block)
+        nil
+      else
+        self.send("#{block_helper}_without_nil_return", *args)
+      end
+    end
+    alias_method_chain block_helper, :nil_return
+  end
+end
+
+ActiveSupport::SafeBuffer.class_eval do
+  alias :append= :<<
+end
+
 class Class
   def self.class_attribute(*attrs)
     class_inheritable_accessor(*attrs)
+  end
+end
+
+# let Rails.env= work like it does in rails3
+Rails.module_eval do
+  def self.env=(environment)
+    @_env = ActiveSupport::StringInquirer.new(environment)
   end
 end
 

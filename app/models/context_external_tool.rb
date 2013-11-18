@@ -4,7 +4,6 @@ class ContextExternalTool < ActiveRecord::Base
 
   has_many :content_tags, :as => :content
   belongs_to :context, :polymorphic => true
-  belongs_to :cloned_item
   attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, 
                   :name, :description, :custom_fields, :custom_fields_string,
                   :course_navigation, :account_navigation, :user_navigation,
@@ -539,26 +538,6 @@ class ContextExternalTool < ActiveRecord::Base
         end
       end
     end
-  end
-
-  def clone_for(context, dup=nil, options={})
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item = ClonedItem.create(:original_item => self)
-      self.save!
-    end
-    existing = ContextExternalTool.active.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, self.id)
-    existing ||= ContextExternalTool.active.find_by_context_type_and_context_id_and_cloned_item_id(context.class.to_s, context.id, self.cloned_item_id)
-    return existing if existing && !options[:overwrite]
-    new_tool = existing
-    new_tool ||= ContextExternalTool.new
-    new_tool.context = context
-    new_tool.settings = self.settings.clone
-    [:name, :shared_secret, :url, :domain, :consumer_key, :workflow_state, :description].each do |att|
-      new_tool.write_attribute(att, self.read_attribute(att))
-    end
-    new_tool.cloned_item_id = self.cloned_item_id
-    
-    new_tool
   end
 
   def resource_selection_settings

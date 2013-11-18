@@ -19,16 +19,14 @@
 class ContextModule < ActiveRecord::Base
   include Workflow
   include SearchTermHelper
-  attr_accessible :context, :name, :unlock_at, :require_sequential_progress, :completion_requirements, :prerequisites
+  attr_accessible :context, :name, :unlock_at, :require_sequential_progress, :completion_requirements, :prerequisites, :publish_final_grade
   belongs_to :context, :polymorphic => true
-  belongs_to :cloned_item
   has_many :context_module_progressions, :dependent => :destroy
   has_many :content_tags, :dependent => :destroy, :order => 'content_tags.position, content_tags.title'
   acts_as_list :scope => 'context_modules.context_type = #{connection.quote(context_type)} AND context_modules.context_id = #{context_id} AND context_modules.workflow_state <> \'deleted\''
   
   serialize :prerequisites
   serialize :completion_requirements
-  serialize :downstream_modules
   before_save :infer_position
   before_save :validate_prerequisites
   before_save :confirm_valid_requirements
@@ -185,18 +183,16 @@ class ContextModule < ActiveRecord::Base
     end
   end
 
-  def prerequisites=(val)
-    if val.is_a?(Array)
-      val = val.map {|item|
-        if item[:type] == 'context_module'
-          "module_#{item[:id]}"
-        end
-      }.compact.join(',') rescue nil
-    end
-    if val.is_a?(String)
+  def prerequisites=(prereqs)
+    if prereqs.is_a?(Array)
+      # validate format, skipping invalid ones
+      prereqs = prereqs.select do |pre|
+        pre.has_key?(:id) && pre.has_key?(:name) && pre[:type] == 'context_module'
+      end
+    elsif prereqs.is_a?(String)
       res = []
       module_names = ContextModule.module_names(self.context)
-      pres = val.split(",")
+      pres = prereqs.split(",")
       pre_regex = /module_(\d+)/
       pres.each do |pre|
         next unless match = pre_regex.match(pre)
@@ -205,11 +201,11 @@ class ContextModule < ActiveRecord::Base
           res << {:id => id, :type => 'context_module', :name => module_names[id]}
         end
       end
-      val = res
+      prereqs = res
     else
-      val = nil
+      prereqs = nil
     end
-    write_attribute(:prerequisites, val)
+    write_attribute(:prerequisites, prereqs)
   end
   
   def completion_requirements=(val)
@@ -343,6 +339,7 @@ class ContextModule < ActiveRecord::Base
     return nil unless self.context.users.include?(user)
     return nil unless self.prerequisites_satisfied?(user)
     progression = self.find_or_create_progression(user)
+    return unless progression
     progression.requirements_met ||= []
     requirement = self.completion_requirements.to_a.find{|p| p[:id] == tag.local_id}
     return if !requirement || progression.requirements_met.include?(requirement)
@@ -468,21 +465,27 @@ class ContextModule < ActiveRecord::Base
   
   def find_or_create_progression(user)
     return nil unless user
-    ContextModule.find_or_create_progression(self.id, user.id)
+    progression = nil
+    self.shard.activate do
+      Shackles.activate(:master) do
+        self.class.unique_constraint_retry do
+          progression = context_module_progressions.where(user_id: user).first
+          if !progression
+            # check if we should even be creating a progression for this user
+            return nil unless context.enrollments.except(:includes).where(user_id: user).exists?
+            progression = context_module_progressions.create!(user: user)
+          end
+        end
+      end
+    end
+    progression.context_module = self
+    progression
   end
   
   def find_or_create_progression_with_multiple_lookups(user)
     user.module_progression_for(self.id) || self.find_or_create_progression(user)
   end
   
-  def self.find_or_create_progression(module_id, user_id)
-    Shackles.activate(:master) do
-      unique_constraint_retry do
-        ContextModuleProgression.find_or_create_by_context_module_id_and_user_id(module_id, user_id)
-      end
-    end
-  end
-
   def content_tags_hash
     return @tags_hash if @tags_hash
     @tags_hash = {}
@@ -498,6 +501,7 @@ class ContextModule < ActiveRecord::Base
     end
     return nil unless user
     progression ||= self.find_or_create_progression_with_multiple_lookups(user)
+    return unless progression
     if self.unpublished?
       progression.workflow_state = 'locked'
       Shackles.activate(:master) do
@@ -601,65 +605,6 @@ class ContextModule < ActiveRecord::Base
 
   def to_be_unlocked
     self.unlock_at && self.unlock_at > Time.now
-  end
-  
-  attr_accessor :clone_updated
-  def clone_for(context, dup=nil, options={})
-    options[:migrate] = true if options[:migrate] == nil
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save! 
-    end
-    existing = context.context_modules.active.find_by_id(self.id)
-    existing ||= context.context_modules.active.find_by_cloned_item_id(self.cloned_item_id || 0)
-    return existing if existing && !options[:overwrite]
-    dup ||= ContextModule.new
-    dup = existing if existing && options[:overwrite]
-
-    dup.context = context
-    self.attributes.delete_if{|k,v| [:id, :context_id, :context_type, :downstream_modules].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-
-    dup.save!
-    tag_changes = {}
-    self.content_tags.not_deleted.each do |tag|
-      new_tag = tag.clone_for(context, nil, :context_module_id => dup.id)
-      if new_tag
-        new_tag.context_module_id = dup.id
-        new_tag.save
-        context.map_merge(tag, new_tag)
-        tag_changes[tag.id] = new_tag.id
-      end
-    end
-    pres = []
-    (self.prerequisites || []).each do |req|
-      new_req = req.dup
-      if req[:type] == 'context_module'
-        id = context.merge_mapped_id("context_module_#{req[:id]}")
-        if !id
-          cm = self.context.context_modules.find_by_id(req[:id]) if req[:id].present?
-          clone_id = cm.cloned_item_id if cm
-          obj = ContextModule.find_by_cloned_item_id_and_context_id_and_context_type(clone_id, context.id, context.class.to_s) if clone_id
-          id = obj.id if obj
-        end
-        new_req[:id] = id
-        new_req = nil unless id
-      end
-      pres << new_req if new_req
-    end
-    dup.prerequisites = pres
-    reqs = []
-    (self.completion_requirements || []).each do |req|
-      new_req = req.dup
-      new_req[:id] = tag_changes[req[:id]]
-      reqs << new_req
-    end
-    dup.completion_requirements = reqs
-    context.log_merge_result("Module \"#{self.name}\" created")
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
   end
 
   def self.process_migration(data, migration)
@@ -863,5 +808,40 @@ class ContextModule < ActiveRecord::Base
       end
     end
     item
+  end
+
+  VALID_COMPLETION_EVENTS = [:publish_final_grade].freeze
+
+  def completion_events
+    (read_attribute(:completion_events) || '').split(',').map(&:to_sym)
+  end
+
+  def completion_events=(value)
+    return write_attribute(:completion_events, nil) unless value
+    write_attribute(:completion_events, (value.map(&:to_sym) & VALID_COMPLETION_EVENTS).join(','))
+  end
+
+  VALID_COMPLETION_EVENTS.each do |event|
+    self.class_eval <<-CODE
+      def #{event}=(value)
+        if Canvas::Plugin.value_to_boolean(value)
+          self.completion_events |= [:#{event}]
+        else
+          self.completion_events -= [:#{event}]
+        end
+      end
+
+      def #{event}?
+        completion_events.include?(:#{event})
+      end
+    CODE
+  end
+
+  def completion_event_callbacks
+    callbacks = []
+    if publish_final_grade?
+      callbacks << lambda { |user| context.publish_final_grades(user, user.id) }
+    end
+    callbacks
   end
 end

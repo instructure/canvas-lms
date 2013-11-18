@@ -71,6 +71,14 @@ describe Assignment do
     @submission.versions.length.should eql(1)
   end
 
+  it "does not allow itself to be unpublished if it has student submissions" do
+    setup_assignment_with_students
+    @assignment.context.root_account.enable_draft!
+    @assignment.unpublish
+    @assignment.should_not be_valid
+    @assignment.errors['workflow_state'].should == "Can't unpublish if there are student submissions"
+  end
+
   describe '#grade_student' do
     before { setup_assignment_without_submission }
 
@@ -1612,19 +1620,6 @@ describe Assignment do
     end
   end
 
-  context "clone_for" do
-    it "should clone for another course" do
-      course_with_teacher
-      @assignment = @course.assignments.create!(:title => "some assignment")
-      @assignment.update_attribute(:needs_grading_count, 5)
-      course
-      @new_assignment = @assignment.clone_for(@course)
-      @new_assignment.context.should_not eql(@assignment.context)
-      @new_assignment.title.should eql(@assignment.title)
-      @new_assignment.needs_grading_count.should == 0
-    end
-  end
-
   context "modules" do
     it "should be locked when part of a locked module" do
       course :active_all => true
@@ -2175,6 +2170,18 @@ describe Assignment do
       json[:submissions].all? { |s|
         s.has_key? 'submission_history'
       }.should be_true
+    end
+
+    it "doesn't include quiz_submissions when there are too many attempts" do
+      course_with_teacher :active_all => true
+      student_in_course
+      quiz_with_graded_submission [], :course => @course, :user => @student
+      Setting.set('too_many_quiz_submission_versions', 3)
+      3.times {
+        @quiz_submission.versions.create!
+      }
+      json = @quiz.assignment.speed_grader_json(@teacher)
+      json[:submissions].all? { |s| s["submission_history"].size.should == 1 }
     end
 
     it "returns quiz lateness correctly" do

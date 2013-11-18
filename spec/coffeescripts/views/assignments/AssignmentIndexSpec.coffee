@@ -1,14 +1,14 @@
 define [
   'Backbone'
   'compiled/models/AssignmentGroup'
-  'compiled/models/Assignment'
   'compiled/models/Course'
   'compiled/collections/AssignmentGroupCollection'
   'compiled/views/assignments/AssignmentGroupListView'
   'compiled/views/assignments/IndexView'
   'jquery'
   'helpers/jquery.simulate'
-], (Backbone, AssignmentGroup, Assignment, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, $) ->
+  'helpers/fakeENV'
+], (Backbone, AssignmentGroup, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, $) ->
 
 
   fixtures = $('#fixtures')
@@ -42,20 +42,15 @@ define [
 
     app.render()
 
-  oldENV = null
-
   module 'assignmentIndex',
     setup: ->
-      oldENV = window.ENV
-      window.ENV =
-        MODULES: {}
-        PERMISSIONS:
-          manage: true
+      ENV.PERMISSIONS = {manage: true}
       @enable_spy = sinon.spy(IndexView.prototype, 'enableSearch')
 
     teardown: ->
-      window.ENV = oldENV
+      ENV.PERMISSIONS = {}
       assignmentGroups = null
+      $('#fixtures').empty()
       @enable_spy.restore()
 
   test 'should filter by search term', ->
@@ -63,17 +58,17 @@ define [
     view = assignmentIndex()
     $('#search_term').val('foo')
     view.filterResults()
-    equal view.$el.find('.assignment:visible').length, 1
+    equal view.$el.find('.assignment').not('.hidden').length, 1
 
     view = assignmentIndex()
     $('#search_term').val('BooBerry')
     view.filterResults()
-    equal view.$el.find('.assignment:visible').length, 0
+    equal view.$el.find('.assignment').not('.hidden').length, 0
 
     view = assignmentIndex()
     $('#search_term').val('name')
     view.filterResults()
-    equal view.$el.find('.assignment:visible').length, 2
+    equal view.$el.find('.assignment').not('.hidden').length, 2
 
 
   test 'should have search disabled on render', ->
@@ -94,3 +89,13 @@ define [
     assignmentGroups.reset()
     ok @enable_spy.calledOnce
 
+  test 'should show modules column', ->
+    view = assignmentIndex()
+
+    [a1, a2] = assignmentGroups.assignments()
+    a1.set 'modules', ['One', 'Two']
+    a2.set 'modules', ['Three']
+
+    ok view.$("#assignment_1 .modules .tooltip_link").text().match(/Multiple Modules/)
+    ok view.$("#assignment_1 .modules").text().match(/One\s+Two/)
+    ok view.$("#assignment_2 .modules").text().match(/Three Module/)

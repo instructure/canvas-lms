@@ -27,7 +27,7 @@ class NilStore < ActiveSupport::Cache::Store
 
   def read_multi(*names); {}; end
 
-  if CANVAS_RAILS3
+  unless CANVAS_RAILS2
     def fetch(name, options = nil)
       if block_given?
         yield

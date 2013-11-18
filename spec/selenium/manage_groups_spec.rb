@@ -36,7 +36,7 @@ describe "manage groups" do
 
         groups = nil
         keep_trying_until {
-          groups = ff('.collectionViewItems.groups .group')
+          groups = ff('.collectionViewItems > .group')
           groups.present?
         }
         groups.size.should == 2

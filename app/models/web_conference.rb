@@ -340,16 +340,6 @@ class WebConference < ActiveRecord::Base
     has_advanced_settings? ? 1 : 0
   end
 
-  def clone_for(context, dup=nil, options={})
-    dup ||= WebConference.new
-    self.attributes.delete_if{|k,v| [:id, :conference_key, :user_id, :added_user_id, :started_at, :uuid, :invited_user_ids].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.context = context
-    context.log_merge_result("Web Conference \"#{dup.title}\" created")
-    dup
-  end
-  
   scope :after, lambda { |date| where("web_conferences.start_at IS NULL OR web_conferences.start_at>?", date) }
 
   set_policy do

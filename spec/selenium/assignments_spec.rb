@@ -225,10 +225,8 @@ describe "assignments" do
           should == I18n.t("#assignments.multiple_due_dates", "Multiple Due Dates")
       assignment_title = f("#assignment_title")
       assignment_points_possible = f("#assignment_points_possible")
-      assignment_title.clear
-      assignment_title.send_keys("VDD Test Assignment Updated")
-      assignment_points_possible.clear
-      assignment_points_possible.send_keys("100")
+      replace_content(assignment_title, "VDD Test Assignment Updated")
+      replace_content(assignment_points_possible, "100")
       f("#add_assignment_form").submit
       wait_for_ajaximations
       @assignment.reload.points_possible.should == 100
@@ -729,6 +727,17 @@ describe "assignments" do
 
           @assignment.reload.should be_published
           f("#assignment_#{@assignment.id} .publish-icon").text.should match "Published"
+        end
+
+        it "shows submission scores for students on index page" do
+          @assignment.update_attributes(points_possible: 15)
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student,grade: 14)
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+          f("#assignment_#{@assignment.id} .js-score .non-screenreader").
+            text.should match "14/15 pts"
         end
 
         it "should allow publishing from the show page" do

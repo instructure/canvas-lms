@@ -19,7 +19,7 @@ define [
   module "NeverDropCollectionView",
     setup: ->
       @clock = sinon.useFakeTimers()
-      @assignments = new Assignments((id: i, name: "Assignment #{i}") for i in [1..3])
+      @assignments = new Assignments((id: "#{i}", name: "Assignment #{i}") for i in [1..3])
       @never_drops = new NeverDropCollection [],
         assignments: @assignments
         ag_id: 'new'
@@ -81,7 +81,7 @@ define [
   test "changing a <select> will remove all <option>s with that value from other selects", ->
     addNeverDrop.call @
     addNeverDrop.call @
-    target_id = 1
+    target_id = "1"
 
     @clock.tick(101)
     ok $('#fixtures').find('option[value='+target_id+']').length, 2
@@ -98,8 +98,8 @@ define [
   test "changing a <select> will add all <option>s with the previous value to other selects", ->
     addNeverDrop.call @
     addNeverDrop.call @
-    change_id = 1
-    target_id = 3
+    change_id = "1"
+    target_id = "3"
 
     @clock.tick(101)
     #should just have the selected one
@@ -115,7 +115,7 @@ define [
     ok @never_drops.availableValues.find (nd) -> nd.id == target_id
 
   test "resetting NeverDrops with a chosen assignment renders a <span>", ->
-    target_id = 1
+    target_id = "1"
     @never_drops.reset [
       id: @never_drops.length
       label_id: 'new'

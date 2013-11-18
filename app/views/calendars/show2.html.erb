@@ -7,10 +7,12 @@
     :ACTIVE_EVENT => @active_event_id,
     :VIEW_START => @view_start,
     :CAL2_ONLY => @domain_root_account.calendar2_only?,
-    :SHOW_SCHEDULER => @domain_root_account.show_scheduler?
+    :SHOW_SCHEDULER => @domain_root_account.show_scheduler?,
+    :SHOW_AGENDA => @domain_root_account.agenda_view?
   }
   js_bundle :calendar2
   jammit_css :calendar2
+  jammit_css(:agenda_view) if @domain_root_account.agenda_view?
   crumbs.clear
   @body_classes << "full-width no-page-block hide-content-while-scripts-not-loaded"
 %>
@@ -21,7 +23,7 @@
 
 <% content_for :right_side do %>
   <div class="rs-section">
-    <div id="minical"></div>
+    <div id="minical" aria-hidden="true"></div>
   </div>
   <div class="rs-section" id="context-list-holder"></div>
   <div class="rs-section" id="undated-events"></div>

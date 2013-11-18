@@ -348,19 +348,6 @@ describe DiscussionTopic do
     end
   end
 
-  context "clone_for" do
-    it "should clone to another context" do
-      course_model
-      topic = @course.discussion_topics.create!(:message => "<a href='#' onclick='alert(12);'>only this should stay</a>", :title => "some topic")
-      course
-      new_topic = topic.clone_for(@course)
-      new_topic.context.should eql(@course)
-      new_topic.context.should_not eql(topic.context)
-      new_topic.message.should eql(topic.message)
-      new_topic.title.should eql(topic.title)
-    end
-  end
-
   context "sub-topics" do
     it "should default subtopics_refreshed_at on save if a group assignment" do
       course_with_student(:active_all => true)
@@ -1124,6 +1111,8 @@ describe DiscussionTopic do
   context "materialized view" do
     before do
       topic_with_nested_replies
+      # materialized view jobs are now delayed
+      Timecop.travel(Time.now + 20.seconds)
     end
 
     it "should return nil if the view has not been built yet, and schedule a job" do

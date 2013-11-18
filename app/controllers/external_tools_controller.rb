@@ -464,7 +464,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would create a tool on this course with two custom fields and a course navigation tab
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/external_tools' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools' \
   #        -H "Authorization: Bearer <token>" \ 
   #        -F 'name=LTI Example' \ 
   #        -F 'consumer_key=asdfg' \ 
@@ -480,7 +480,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would create a tool on the account with navigation for the user profile page
-  #   curl 'http://<canvas>/api/v1/accounts/<account_id>/external_tools' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/external_tools' \
   #        -H "Authorization: Bearer <token>" \ 
   #        -F 'name=LTI Example' \ 
   #        -F 'consumer_key=asdfg' \ 
@@ -494,7 +494,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would create a tool on the account with configuration pulled from an external URL
-  #   curl 'http://<canvas>/api/v1/accounts/<account_id>/external_tools' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/external_tools' \
   #        -H "Authorization: Bearer <token>" \ 
   #        -F 'name=LTI Example' \ 
   #        -F 'consumer_key=asdfg' \ 
@@ -525,7 +525,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would update the specified keys on this external tool
-  #   curl -X PUT 'http://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \ 
+  #   curl -X PUT 'https://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \
   #        -H "Authorization: Bearer <token>" \ 
   #        -F 'name=Public Example' \ 
   #        -F 'privacy_level=public'
@@ -553,7 +553,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would delete the specified external tool
-  #   curl -X DELETE 'http://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \ 
+  #   curl -X DELETE 'https://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \
   #        -H "Authorization: Bearer <token>"
   def destroy
     @tool = @context.context_external_tools.active.find(params[:id] || params[:external_tool_id])

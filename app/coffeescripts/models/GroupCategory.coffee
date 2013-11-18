@@ -14,20 +14,38 @@ define [
 
     groups: ->
       @_groups = new GroupCollection(null)
+      @_groups.category = this
       @_groups.url = "/api/v1/group_categories/#{@id}/groups?per_page=50"
       @_groups.loadAll = true
-      @_groups.fetch() unless @get('groupCount') is 0
+      if @get('groups_count') is 0
+        @_groups.loadedAll = true
+      else
+        @_groups.fetch()
+      @_groups.on 'fetched:last', => @set('groups_count', @_groups.length)
       @groups = -> @_groups
       @_groups
 
     groupsCount: ->
-      @_groups?.length ? @get('groupCount')
+      if @_groups?.loadedAll
+        @_groups.length
+      else
+        @get('groups_count')
 
     unassignedUsers: ->
       @_unassignedUsers = new GroupUserCollection(null, groupId: null)
+      @_unassignedUsers.category = this
       @_unassignedUsers.url = "/api/v1/group_categories/#{@id}/users?unassigned=true&per_page=50"
+      @_unassignedUsers.on 'fetched:last', => @set('unassigned_users_count', @_unassignedUsers.length)
       @unassignedUsers = -> @_unassignedUsers
       @_unassignedUsers
+
+    unassignedUsersCount: ->
+      @get('unassigned_users_count')
+
+    canAssignUnassignedMembers: ->
+      @groupsCount() > 0 and
+        @get('role') isnt 'student_organized' and
+        @get('self_signup') isnt 'restricted'
 
     assignUnassignedMembers: ->
       $.ajaxJSON "/api/v1/group_categories/#{@id}/assign_unassigned_members", 'POST', {}, @setUpProgress

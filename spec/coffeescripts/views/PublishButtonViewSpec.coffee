@@ -14,18 +14,22 @@ define [
 
         publish: ->
           @set("published", true)
-          $.Deferred().resolve()
+          dfrd = $.Deferred()
+          dfrd.resolve()
+          dfrd
 
         unpublish: ->
           @set("published", false)
-          $.Deferred().resolve()
+          dfrd = $.Deferred()
+          dfrd.resolve()
+          dfrd
 
         disabledMessage: ->
           "can't unpublish"
 
-      @publish   = new Publishable(published: false, publishable: true)
-      @published = new Publishable(published: true,  publishable: true)
-      @disabled  = new Publishable(published: true,  publishable: false)
+      @publish   = new Publishable(published: false, unpublishable: true)
+      @published = new Publishable(published: true,  unpublishable: true)
+      @disabled  = new Publishable(published: true,  unpublishable: false)
 
   # initialize
   test 'initialize publish', ->
@@ -193,7 +197,16 @@ define [
     # setup rejection
     @publishable.prototype.unpublish = ->
       @set("published", true)
-      $.Deferred().reject()
+      response =
+        responseText: JSON.stringify(
+          errors:
+            published: [
+              message: "Can't unpublish if there are already student submissions"
+            ]
+        )
+      dfrd = $.Deferred()
+      dfrd.reject(response)
+      dfrd
 
     btnView = new PublishButtonView(model: @published).render()
     ok btnView.isPublished()

@@ -7,7 +7,7 @@ define [
 
   module "DueDateView",
     setup: ->
-      $('#fixtures').append("<div id='time_zone_offset'>420</div>")
+      $('#fixtures').append("<div id='time_zone_offset'>540</div>")
       @date = new Date "March 13 1992"
       @override = new AssignmentOverride
         course_section_id: 1

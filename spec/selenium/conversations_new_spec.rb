@@ -120,7 +120,7 @@ describe "conversations new" do
       get_conversations
       compose course: @course, to: [@s1], subject: 'single recipient', body: 'hallo!'
       c = @s1.conversations.last.conversation
-      c.subject.should eql('single recipient')
+      c.subject.should ==('single recipient')
       c.private?.should be_false
     end
 
@@ -128,9 +128,9 @@ describe "conversations new" do
       get_conversations
       compose course: @course, to: [@s1, @s2], subject: 'multiple recipients', body: 'hallo!'
       c = @s1.conversations.last.conversation
-      c.subject.should eql('multiple recipients')
+      c.subject.should ==('multiple recipients')
       c.private?.should be_false
-      c.conversation_participants.collect(&:user_id).sort.should eql([@teacher, @s1, @s2].collect(&:id).sort)
+      c.conversation_participants.collect(&:user_id).sort.should ==([@teacher, @s1, @s2].collect(&:id).sort)
     end
 
     it "should allow admins to send a message without picking a context" do
@@ -141,7 +141,7 @@ describe "conversations new" do
       get_conversations
       compose to: [@s1], subject: 'context-free', body: 'hallo!'
       c = @s1.conversations.last.conversation
-      c.subject.should eql('context-free')
+      c.subject.should ==('context-free')
     end
 
     it "should not allow non-admins to send a message without picking a context" do
@@ -228,38 +228,38 @@ describe "conversations new" do
 
     it "should default to inbox view" do
       get_conversations
-      selected = get_bootstrap_select_value(get_view_filter).should eql 'inbox'
-      conversation_elements.size.should eql 2
+      selected = get_bootstrap_select_value(get_view_filter).should == 'inbox'
+      conversation_elements.size.should == 2
     end
 
     it "should have an unread view" do
       get_conversations
       select_view('unread')
-      conversation_elements.size.should eql 1
+      conversation_elements.size.should == 1
     end
 
     it "should have an starred view" do
       get_conversations
       select_view('starred')
-      conversation_elements.size.should eql 2
+      conversation_elements.size.should == 2
     end
 
     it "should have an sent view" do
       get_conversations
       select_view('sent')
-      conversation_elements.size.should eql 3
+      conversation_elements.size.should == 3
     end
 
     it "should have an archived view" do
       get_conversations
       select_view('archived')
-      conversation_elements.size.should eql 1
+      conversation_elements.size.should == 1
     end
 
     it "should default to all courses view" do
       get_conversations
-      selected = get_bootstrap_select_value(get_course_filter).should eql ''
-      conversation_elements.size.should eql 2
+      selected = get_bootstrap_select_value(get_course_filter).should == ''
+      conversation_elements.size.should == 2
     end
 
     it "should truncate long course names" do
@@ -268,35 +268,35 @@ describe "conversations new" do
       get_conversations
       select_course(@course.id)
       button_text = f('.filter-option', get_course_filter).text
-      button_text.should_not eql @course.name
-      button_text[0...5].should eql @course.name[0...5]
-      button_text[-5..-1].should eql @course.name[-5..-1]
+      button_text.should_not == @course.name
+      button_text[0...5].should == @course.name[0...5]
+      button_text[-5..-1].should == @course.name[-5..-1]
     end
 
     it "should filter by course" do
       get_conversations
       select_course(@course.id)
-      conversation_elements.size.should eql 2
+      conversation_elements.size.should == 2
     end
 
     it "should filter by course plus view" do
       get_conversations
       select_course(@course.id)
       select_view('unread')
-      conversation_elements.size.should eql 1
+      conversation_elements.size.should == 1
     end
 
     it "should hide the spinner after deleting the last conversation" do
       get_conversations
       select_view('archived')
-      conversation_elements.size.should eql 1
+      conversation_elements.size.should == 1
       conversation_elements[0].click
       wait_for_ajaximations
       fj('#delete-btn').click
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      conversation_elements.size.should eql 0
-      ffj('.message-list .paginatedLoadingIndicator:visible').length.should eql 0
+      conversation_elements.size.should == 0
+      ffj('.message-list .paginatedLoadingIndicator:visible').length.should == 0
     end
   end
 

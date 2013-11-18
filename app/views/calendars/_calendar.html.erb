@@ -156,7 +156,7 @@
       <li><a href="#edit_calendar_event_form" class="edit_calendar_event_option"><%= t 'tabs.event', "Event" %></a></li>
       <li><a href="#edit_assignment_form" class="edit_assignment_option"><%= t 'tabs.assignment', "Assignment" %></a></li>
     </ul>
-    <% form_for(:calendar_event, :url => context_url(@context, :context_calendar_events_url), :html => {:id => 'edit_calendar_event_form', :style => 'padding: 5px;'}) do |f| %>
+    <%= form_for(:calendar_event, :url => context_url(@context, :context_calendar_events_url), :html => {:id => 'edit_calendar_event_form', :style => 'padding: 5px;'}) do |f| %>
     <table class="formtable" style="width: 100%;">
       <tr>
         <td style="vertical-align: top;"><%= before_label :title, "Title" %></td>
@@ -196,7 +196,7 @@
       </tr>
     </table>
     <% end %>
-    <% form_for(:assignment, :url => ".", :html => {:id => 'edit_assignment_form', :style => 'padding: 5px;'}) do |f| %>
+    <%= form_for(:assignment, :url => ".", :html => {:id => 'edit_assignment_form', :style => 'padding: 5px;'}) do |f| %>
     <table class="formtable" style="width: 100%;">
       <tr>
         <td><%= before_label :title, "Title" %></td>

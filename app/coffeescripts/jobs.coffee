@@ -26,15 +26,39 @@ define [
       if @options.refresh_rate
         setTimeout (=> @refresh(@setTimer)), @options.refresh_rate
 
+    saveSelection: =>
+      if @type_name == 'running'
+        @oldSelected = {}
+        for row in @grid.getSelectedRows()
+          @oldSelected[@data[row]['id']] = true
+
+    restoreSelection: =>
+      if @type_name == 'running'
+        index = 0
+        newSelected = []
+        for item in @data
+          newSelected.push index if @oldSelected[item['id']]
+          index += 1
+        @restoringSelection = true
+        @grid.setSelectedRows(newSelected)
+        @restoringSelection = false
+
     refresh: (cb) =>
       @$element.queue () =>
         $.ajaxJSON @options.url, "GET", { flavor: @options.flavor, q: @query }, (data) =>
+          @saveSelection()
           @data.length = 0
           @loading = {}
           @data.push item for item in data[@type_name]
           if data.total && data.total > @data.length
             @data.push({}) for i in [@data.length ... data.total]
-          @grid.invalidate()
+
+          if (@sortData)
+            @sort(null, @sortData)
+          else
+            @grid.invalidate()
+            @restoreSelection()
+
           cb?()
           @updated?()
           @$element.dequeue()
@@ -116,7 +140,7 @@ define [
         id: 'id'
         name: I18n.t('columns.id', 'id')
         field: 'id'
-        width: 75
+        width: 100
         formatter: @id_formatter
       ,
         id: 'tag'
@@ -127,13 +151,13 @@ define [
         id: 'attempts'
         name: I18n.t('columns.attempt', 'attempt')
         field: 'attempts'
-        width: 60
+        width: 65
         formatter: @attempts_formatter
       ,
         id: 'priority'
         name: I18n.t('columns.priority', 'priority')
         field: 'priority'
-        width: 70
+        width: 60
       ,
         id: 'strand'
         name: I18n.t('columns.strand', 'strand')
@@ -150,6 +174,7 @@ define [
       super()
       @grid.setSelectionModel(new Slick.RowSelectionModel())
       @grid.onSelectedRowsChanged.subscribe =>
+        return if @restoringSelection
         rows = @grid.getSelectedRows()
         row = if rows?.length == 1 then rows[0] else -1
         selected_job = @data[rows[0]] || {}
@@ -208,17 +233,71 @@ define [
     constructor: (options) ->
       super(options, 'running', '#running-grid')
 
+    runtime_formatter: (r,c,d) =>
+      runtime = (new Date() - Date.parse(d)) / 1000
+      if runtime >= @options.super_slow_threshold
+        klass = 'super-slow'
+      else if runtime > @options.slow_threshold
+        klass = 'slow'
+      else
+        klass = ''
+      format = 'HH:mm:ss'
+      format = 'd\\dHH:mm:ss' if runtime > 86400
+      runtime_string = new Date(null, null, null, null, null, runtime).toString(format)
+      runtime_string = 'FOREVA' if runtime > 86400 * 28
+      "<span class='#{klass}'>#{runtime_string}</span>"
+
     build_columns: () ->
       cols = [
         id: 'worker'
         name: I18n.t('columns.worker', 'worker')
         field: 'locked_by'
-        width: 175
+        width: 90
       ].concat(super())
       cols.pop()
+      cols.push(
+        id: 'runtime',
+        name: I18n.t('columns.runtime', 'runtime')
+        field: 'locked_at'
+        width: 85
+        formatter: @runtime_formatter
+      )
+      for col in cols
+        col.sortable = true
       cols
 
     updated: () ->
+
+    init: () ->
+      super()
+      @sort = (event, data) =>
+        @sortData = data
+        @saveSelection() if event
+        field = data.sortCol.field
+
+        @data.sort (a, b) =>
+          aField = a[field] || ''
+          bField = b[field] || ''
+          if aField > bField
+            result = 1
+          else if aField < bField
+            result = -1
+          else
+            result = 0
+
+          result = -result unless data.sortAsc
+          result = -result if field == 'locked_at'
+          result
+
+        @grid.invalidate()
+        @restoreSelection()
+      @grid.onSort.subscribe(@sort)
+      @grid.setSortColumn('runtime', false)
+      @sortData = {
+        sortCol:
+          field: 'locked_at'
+        sortAsc: false
+      }
 
   class Tags extends FlavorGrid
     constructor: (options) ->

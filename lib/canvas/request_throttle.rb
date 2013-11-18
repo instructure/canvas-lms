@@ -85,7 +85,7 @@ class RequestThrottle
     else
       if bucket.full?
         Canvas::Statsd.increment("request_throttling.throttled")
-        if Setting.get_cached("request_throttle.enabled", "true") == "true"
+        if Setting.get("request_throttle.enabled", "true") == "true"
           Rails.logger.info("blocking request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
           return false
         else
@@ -212,7 +212,7 @@ class RequestThrottle
 
     SETTING_DEFAULTS.each do |(setting, default)|
       define_method(setting) do
-        Setting.get_cached("request_throttle.#{setting}", default).to_f
+        Setting.get("request_throttle.#{setting}", default).to_f
       end
     end
 

@@ -98,7 +98,7 @@ Which is you?", :count => @merge_opportunities.length %>
   <% end %>
 
   <% if @pseudonym %>
-    <% form_for :pseudonym, :url => registration_confirmation_url(@nonce, request.query_parameters), :html => {:id => "registration_confirmation_form", :class => 'form-horizontal bootstrap-form', :style => ((!@merge_opportunities.empty? || @enrollment) && !params[:register]) ? hidden : '' } do |form| %>
+    <%= form_for :pseudonym, :url => registration_confirmation_url(@nonce, request.query_parameters), :html => {:id => "registration_confirmation_form", :class => 'form-horizontal bootstrap-form', :style => ((!@merge_opportunities.empty? || @enrollment) && !params[:register]) ? hidden : '' } do |form| %>
       <p class="instructions"><%= if @enrollment
           mt 'details.register_with_course', "In order to finish signing you up for the course **%{course}**, we'll need a little more information.", :course => @course.name
         else

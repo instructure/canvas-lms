@@ -5,7 +5,7 @@
 <% content_for :right_side do %>
   <% if @current_user && @current_user.unread_inbox_items_count && @current_user.unread_inbox_items_count > 0 %>
     <div class="rs-margin-lr rs-margin-all">
-      <% form_tag mark_inbox_as_read_path, {:method => :delete, :id => "mark_inbox_as_read_form"} do %>
+      <%= form_tag mark_inbox_as_read_path, {:method => :delete, :id => "mark_inbox_as_read_form"} do %>
         <button class="btn button-sidebar-wide" type="submit"><%= image_tag "pass.png" %> <span class="msg"><%= t('buttons.mark_all_as_read', %{Mark All Messages as Read}) %></span></button>
       <% end %>
     </div>

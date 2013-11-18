@@ -17,7 +17,7 @@
 <div style="display: none;">
   <div id="current_enrollment_term_id"><%= @term && @term.id %></div>
   <div id="add_user_dialog">
-    <% form_for :user, :url => account_add_user_url(@account), :html => {:id => "add_user_form"} do |f| %>
+    <%= form_for :user, :url => account_add_user_url(@account), :html => {:id => "add_user_form"} do |f| %>
     <table class="formtable">
       <tr>
         <td><%= f.blabel :name, :full_name, :en => "Full Name" %></td>
@@ -74,7 +74,7 @@
     <% end %>
   </div>
   <div id="add_course_dialog">
-    <% form_for :course, :url => courses_url, :html => {:id => "add_course_form"} do |f| %>
+    <%= form_for :course, :url => courses_url, :html => {:id => "add_course_form"} do |f| %>
     <input type="hidden" name="account_id" value="<%= @account.id %>"/>
     <table class="formtable">
       <tr>

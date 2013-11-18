@@ -153,7 +153,6 @@ class Course < ActiveRecord::Base
   has_one :gradebook_upload, :as => :context, :dependent => :destroy
   has_many :web_conferences, :as => :context, :order => 'created_at DESC', :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
-  has_one :scribd_account, :as => :scribdable
   has_many :context_modules, :as => :context, :order => :position, :dependent => :destroy
   has_many :active_context_modules, :as => :context, :class_name => 'ContextModule', :conditions => {:workflow_state => 'active'}
   has_many :context_module_tags, :class_name => 'ContentTag', :as => 'context', :order => :position, :conditions => ['tag_type = ?', 'context_module'], :dependent => :destroy
@@ -522,7 +521,7 @@ class Course < ActiveRecord::Base
         FROM users
        INNER JOIN enrollments e ON e.user_id = users.id
        WHERE e.course_id = ? AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND e.type = 'StudentEnrollment'
-       #{Group.not_in_group_sql_fragment(groups)}
+       #{Group.not_in_group_sql_fragment(groups.map(&:id))}
        #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}
        #{"#{opts[:order_by_dir]}" if opts[:order_by_dir]}", self.id]
   end
@@ -773,8 +772,8 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def recompute_student_scores
-    Enrollment.recompute_final_score(student_ids, self.id)
+  def recompute_student_scores(student_ids = nil)
+    Enrollment.recompute_final_score(student_ids || self.student_ids, self.id)
   end
   handle_asynchronously_if_production :recompute_student_scores,
     :singleton => proc { |c| "recompute_student_scores:#{ c.global_id }" }
@@ -936,7 +935,7 @@ class Course < ActiveRecord::Base
   def storage_quota
     return read_attribute(:storage_quota) ||
       (self.account.default_storage_quota rescue nil) ||
-      Setting.get_cached('course_default_quota', 500.megabytes.to_s).to_i
+      Setting.get('course_default_quota', 500.megabytes.to_s).to_i
   end
 
   def storage_quota=(val)
@@ -1101,7 +1100,7 @@ class Course < ActiveRecord::Base
   def old_gradebook_visible?
     !(large_roster? || (
       student_count = Rails.cache.fetch(['student_count', self].cache_key) { students.count }
-      student_count > Setting.get_cached('gb1_max', '250').to_i)
+      student_count > Setting.get('gb1_max', '250').to_i)
     )
   end
 
@@ -1139,11 +1138,13 @@ class Course < ActiveRecord::Base
     conclude_at && conclude_at < Time.now.utc && conclude_at > 1.month.ago
   end
 
-  # Public: Return true if the end date for a course or its term has passed.
+  # Public: Return true if the end date for a course (or its term, if the course doesn't have one) has passed.
   #
   # Returns boolean or nil.
   def soft_concluded?
-    end_at.try(:<, Time.now) || enrollment_term.end_at.try(:<, Time.now)
+    now = Time.now
+    return end_at < now if end_at
+    enrollment_term.end_at && enrollment_term.end_at < now
   end
 
   def soft_conclude!
@@ -1307,7 +1308,7 @@ class Course < ActiveRecord::Base
     return true
   end
 
-  def publish_final_grades(publishing_user)
+  def publish_final_grades(publishing_user, user_ids_to_publish = nil)
     # we want to set all the publishing statuses to 'pending' immediately,
     # and then as a delayed job, actually go publish them.
 
@@ -1315,20 +1316,23 @@ class Course < ActiveRecord::Base
     settings = Canvas::Plugin.find!('grade_export').settings
 
     last_publish_attempt_at = Time.now.utc
-    self.student_enrollments.not_fake.update_all(:grade_publishing_status => "pending",
+    scope = self.student_enrollments.not_fake
+    scope = scope.where(user_id: user_ids_to_publish) if user_ids_to_publish
+    scope.update_all(:grade_publishing_status => "pending",
                                         :grade_publishing_message => nil,
                                         :last_publish_attempt_at => last_publish_attempt_at)
 
-    send_later_if_production(:send_final_grades_to_endpoint, publishing_user)
+    send_later_if_production(:send_final_grades_to_endpoint, publishing_user, user_ids_to_publish)
     send_at(last_publish_attempt_at + settings[:success_timeout].to_i.seconds, :expire_pending_grade_publishing_statuses, last_publish_attempt_at) if should_kick_off_grade_publishing_timeout?
   end
 
-  def send_final_grades_to_endpoint(publishing_user)
+  def send_final_grades_to_endpoint(publishing_user, user_ids_to_publish = nil)
     # actual grade publishing logic is here, but you probably want
     # 'publish_final_grades'
 
-    self.recompute_student_scores_without_send_later
+    self.recompute_student_scores_without_send_later(user_ids_to_publish)
     enrollments = self.student_enrollments.not_fake.includes(:user, :course_section).order_by_sortable_name
+    enrollments = enrollments.where(user_id: user_ids_to_publish) if user_ids_to_publish
 
     errors = []
     posts_to_make = []
@@ -1356,10 +1360,12 @@ class Course < ActiveRecord::Base
       raise e
     end
 
-    posts_to_make.each do |enrollment_ids, res, mime_type|
+    posts_to_make.each do |enrollment_ids, res, mime_type, headers={}|
       begin
         posted_enrollment_ids += enrollment_ids
-        SSLCommon.post_data(settings[:publish_endpoint], res, mime_type)
+        if res
+          SSLCommon.post_data(settings[:publish_endpoint], res, mime_type, headers )
+        end
         Enrollment.where(:id => enrollment_ids).update_all(:grade_publishing_status => (should_kick_off_grade_publishing_timeout? ? "publishing" : "published"), :grade_publishing_message => nil)
       rescue => e
         errors << e
@@ -1710,15 +1716,8 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def merge_in(course, options = {}, import = nil)
-    return [] if course == self
-    res = merge_into_course(course, options, import)
-    course.course_sections.active.each do |section|
-      if options[:all_sections] || options[section.asset_string.to_sym]
-        section.move_to_course(self)
-      end
-    end
-    res
+  def file_structure_for(user)
+    User.file_structure_for(self, user)
   end
 
   def self.copy_authorized_content(html, to_context, user)
@@ -1768,19 +1767,6 @@ class Course < ActiveRecord::Base
     !!self.turnitin_settings
   end
 
-  def self.find_or_create_for_new_context(obj_class, new_context, old_context, old_id)
-    association_name = obj_class.table_name
-    old_item = old_context.send(association_name).find_by_id(old_id)
-    res = new_context.send(association_name).where(:cloned_item_id => old_item.cloned_item_id).order('id desc').first if old_item
-    if !res && old_item
-      # make sure it's active by re-finding it with the active scope ... active
-      old_item = old_context.send(association_name).active.find_by_id(old_item.id)
-      res = old_item.clone_for(new_context) if old_item
-      res.save if res
-    end
-    res
-  end
-
   def self.migrate_content_links(html, from_context, to_context, supported_types=nil, user_to_check_for_permission=nil)
     return html unless html.present? && to_context
 
@@ -1798,10 +1784,6 @@ class Course < ActiveRecord::Base
       if match.obj_id
         new_id = @merge_mappings["#{match.obj_class.name.underscore}_#{match.obj_id}"]
         next(new_url) unless rewriter.user_can_view_content? { match.obj_class.find_by_id(match.obj_id) }
-        if !new_id && to_context != from_context
-          new_obj = self.find_or_create_for_new_context(match.obj_class, to_context, from_context, match.obj_id)
-          new_id = new_obj.id if new_obj
-        end
         if !limit_migrations_to_listed_types || new_id
           new_url = new_url.gsub("#{match.type}/#{match.obj_id}", new_id ? "#{match.type}/#{new_id}" : "#{match.type}")
         end
@@ -2089,11 +2071,6 @@ class Course < ActiveRecord::Base
     res
   end
 
-  def may_have_links_to_migrate(item)
-    @to_migrate_links ||= []
-    @to_migrate_links << item
-  end
-
   def map_merge(old_item, new_item)
     @merge_mappings ||= {}
     @merge_mappings[old_item.asset_string] = new_item && new_item.id
@@ -2181,249 +2158,6 @@ class Course < ActiveRecord::Base
     end
   end
 
-  attr_accessor :merge_mappings
-  COPY_OPTIONS = [:all_course_settings, :all_assignments, :all_external_tools, :all_files, :all_topics,
-                  :all_calendar_events, :all_quizzes, :all_wiki_pages, :all_modules, :all_outcomes]
-  def merge_into_course(course, options, course_import = nil)
-    @merge_mappings = {}
-    @merge_results = []
-    to_shift_dates = []
-    @to_migrate_links = []
-    added_items = []
-    delete_placeholder = nil
-
-    if bool_res(options[:course_settings]) || bool_res(options[:all_course_settings])
-      #Copy the course settings too
-      course.attributes.slice(*Course.clonable_attributes.map(&:to_s)).keys.each do |attr|
-        self.send("#{attr}=", course.send(attr))
-      end
-      may_have_links_to_migrate(self)
-      self.save
-    end
-    if self.assignment_groups.length == 1 && self.assignment_groups.first.name == t('#assignment_group.default_name', "Assignments") && self.assignment_groups.first.assignments.empty?
-      delete_placeholder = self.assignment_groups.first
-      self.group_weighting_scheme = course.group_weighting_scheme
-    elsif self.assignment_groups.length == 0
-      self.group_weighting_scheme = course.group_weighting_scheme
-    end
-    # There are groups to migrate
-    course.assignment_groups.active.each do |group|
-      if bool_res(options[:everything]) || bool_res(options[:all_assignments]) || bool_res(options[group.asset_string.to_sym])
-        new_group = group.clone_for(self)
-        added_items << new_group
-        new_group.save_without_broadcasting!
-        map_merge(group, new_group)
-      end
-    end
-    course.context_external_tools.active.each do |old_tool|
-      course_import.tick(82) if course_import
-      if bool_res(options[:everything]) || bool_res(options[:all_external_tools]) || bool_res(options[old_tool.asset_string.to_sym])
-        new_tool = old_tool.clone_for(self)
-        new_tool.save
-        added_items << new_tool
-      end
-    end
-    course.assignments.no_graded_quizzes_or_topics.active.where("assignment_group_id IS NOT NULL").each do |assignment|
-      course_import.tick(15) if course_import
-      if bool_res(options[:everything]) || bool_res(options[:all_assignments]) || bool_res(options[assignment.asset_string.to_sym])
-        new_assignment = assignment.clone_for(self, nil, :migrate => false)
-        to_shift_dates << new_assignment if new_assignment.clone_updated || same_dates?(assignment, new_assignment, [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at])
-        added_items << new_assignment
-        new_assignment.save_without_broadcasting!
-        map_merge(assignment, new_assignment)
-      end
-    end
-    # next, attachments
-    map_merge(Folder.root_folders(course).first, Folder.root_folders(self).first)
-    course.attachments.where("file_state <> 'deleted'").each do |file|
-      course_import.tick(30) if course_import
-      if bool_res(options[:everything] ) || bool_res(options[:all_files] ) || bool_res(options[file.asset_string.to_sym] )
-        new_file = file.clone_for(self)
-        added_items << new_file
-        new_folder_id = merge_mapped_id(file.folder)
-        # make sure the file has somewhere to go
-        if !new_folder_id
-          # gather mapping of needed folders from old course to new course
-          old_folders = []
-          old_folders << file.folder
-          new_folders = []
-          new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
-          while old_folders.last.parent_folder && old_folders.last.parent_folder.parent_folder_id && !merge_mapped_id(old_folders.last.parent_folder)
-            old_folders << old_folders.last.parent_folder
-            new_folders << old_folders.last.clone_for(self, nil, options.merge({:include_subcontent => false}))
-          end
-          added_items += new_folders
-          old_folders.reverse!
-          new_folders.reverse!
-          # try to use folders that already match if possible
-          final_new_folders = []
-          parent_folder = Folder.root_folders(self).first
-          old_folders.each_with_index do |folder, idx|
-            if f = parent_folder.active_sub_folders.find_by_name(folder.name)
-              final_new_folders << f
-            else
-              final_new_folders << new_folders[idx]
-            end
-            parent_folder = final_new_folders.last
-          end
-          # add or update the folder structure needed for the file
-          final_new_folders.first.parent_folder_id ||=
-            merge_mapped_id(old_folders.first.parent_folder) ||
-            Folder.root_folders(self).first.id
-          old_folders.each_with_index do |folder, idx|
-            final_new_folders[idx].save!
-            map_merge(folder, final_new_folders[idx])
-            final_new_folders[idx + 1].parent_folder_id ||= final_new_folders[idx].id if final_new_folders[idx + 1]
-          end
-          new_folder_id = merge_mapped_id(file.folder)
-        end
-        new_file.folder_id = new_folder_id
-        new_file.save!
-        map_merge(file, new_file)
-      end
-    end
-    course.discussion_topics.active.each do |topic|
-      course_import.tick(40) if course_import
-      if bool_res(options[:everything] ) || bool_res(options[:all_topics] ) || bool_res(options[topic.asset_string.to_sym] ) || (topic.assignment_id && bool_res(options["assignment_#{topic.assignment_id}"]))
-        include_entries = options["discussion_topic_#{topic.id}_entries"] == "1"
-        new_topic = topic.clone_for(self, nil, :migrate => bool_res(options["#{topic.asset_string}_entries".to_sym] ), :include_entries => include_entries)
-        to_shift_dates << new_topic if new_topic.delayed_post_at && (new_topic.clone_updated || same_dates?(topic, new_topic, [:delayed_post_at]))
-        to_shift_dates << new_topic.assignment if new_topic.assignment && (new_topic.assignment_clone_updated || same_dates?(topic.assignment, new_topic.assignment, [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at]))
-        added_items << new_topic
-        added_items << new_topic.assignment if new_topic.assignment
-        new_topic.save_without_broadcasting!
-        map_merge(topic, new_topic)
-      end
-    end
-    course.calendar_events.active.each do |event|
-      course_import.tick(50) if course_import
-      if bool_res(options[:everything] ) || bool_res(options[:all_calendar_events] ) || bool_res(options[event.asset_string.to_sym] )
-        new_event = event.clone_for(self, nil, :migrate => false)
-        to_shift_dates << new_event if new_event.clone_updated || same_dates?(event, new_event, [:start_at, :end_at])
-        added_items << new_event
-        new_event.save_without_broadcasting!
-        map_merge(event, new_event)
-      end
-    end
-    course.quizzes.active.each do |quiz|
-      course_import.tick(60) if course_import
-      if bool_res(options[:everything] ) || bool_res(options[:all_quizzes] ) || bool_res(options[quiz.asset_string.to_sym] ) || (quiz.assignment_id && bool_res(options["assignment_#{quiz.assignment_id}"]))
-        new_quiz = quiz.clone_for(self)
-        to_shift_dates << new_quiz if new_quiz.clone_updated || same_dates?(quiz, new_quiz, [:due_at, :lock_at, :unlock_at])
-        added_items << new_quiz
-        added_items << new_quiz.assignment if new_quiz.assignment
-        new_quiz.save!
-        map_merge(quiz, new_quiz)
-      end
-    end
-    course.wiki.wiki_pages.each do |page|
-      course_import.tick(70) if course_import
-      if bool_res(options[:everything] ) || bool_res(options[:all_wiki_pages] ) || bool_res(options[page.asset_string.to_sym] )
-        if page.title.blank?
-          next if page.body.blank?
-          page.title = t('#wiki_page.missing_name', "Unnamed Page")
-        end
-        new_page = page.clone_for(self, nil, :migrate => false, :old_context => course)
-        added_items << new_page
-        new_page.wiki_id = self.wiki.id
-        new_page.ensure_unique_title
-        log_merge_result("Wiki Page \"#{page.title}\" renamed to \"#{new_page.title}\"") if new_page.title != page.title
-        new_page.save_without_broadcasting!
-        map_merge(page, new_page)
-      end
-    end
-    course.context_modules.active.each do |mod|
-      course_import.tick(80) if course_import
-      if bool_res(options[:everything] ) || bool_res(options[:all_modules] ) || bool_res(options[mod.asset_string.to_sym] )
-        new_mod = mod.clone_for(self)
-        to_shift_dates << new_mod if new_mod.clone_updated || same_dates?(mod, new_mod, [:unlock_at, :start_at, :end_at])
-        new_mod.save!
-        added_items << new_mod
-        map_merge(mod, new_mod)
-      end
-    end
-
-    course.root_outcome_group.child_outcome_groups.each do |group|
-      course_import.tick(85) if course_import
-      use_outcome = lambda {|lo| bool_res(options[:everything] ) || bool_res(options[:all_outcomes] ) || bool_res(options[lo.asset_string.to_sym] ) }
-      f = group.clone_for(self, root_outcome_group, use_outcome)
-      added_items << f if f
-    end
-
-    course.root_outcome_group.child_outcome_links.each do |link|
-      course_import.tick(85) if course_import
-      if bool_res(options[:everything]) || bool_res(options[:all_outcomes]) || bool_res(options[link.content.asset_string.to_sym])
-        lo = link.content.clone_for(self, root_outcome_group)
-        added_items << lo
-      end
-    end
-
-    # Groups could be created by objects with attached assignments as well. (like quizzes/topics)
-    # So don't delete the placeholder until everything has been cloned
-    delete_placeholder.destroy if delete_placeholder && self.assignment_groups.length > 1
-
-    @to_migrate_links.uniq.each do |obj|
-      course_import.tick(90) if course_import
-      if obj.is_a?(Assignment)
-        obj.description = migrate_content_links(obj.description, course)
-      elsif obj.is_a?(CalendarEvent)
-        obj.description = migrate_content_links(obj.description, course)
-      elsif obj.is_a?(DiscussionTopic)
-        obj.message = migrate_content_links(obj.message, course)
-        obj.discussion_entries.each do |entry|
-          entry.message = migrate_content_links(obj.message, course)
-          entry.save_without_broadcasting!
-        end
-      elsif obj.is_a?(WikiPage)
-        obj.body = migrate_content_links(obj.body, course)
-      elsif obj.is_a?(Quiz)
-        obj.description = migrate_content_links(obj.description, course)
-      elsif obj.is_a?(Course)
-        obj.syllabus_body = migrate_content_links(obj.syllabus_body, course)
-      end
-      obj.save_without_broadcasting! rescue obj.save!
-    end
-    if !to_shift_dates.empty? && bool_res(options[:shift_dates])
-      log_merge_result("Moving events to new dates")
-      shift_options = (bool_res(options[:shift_dates]) rescue false) ? options : {}
-      shift_options = shift_date_options(course, shift_options)
-      to_shift_dates.uniq.each do |event|
-        course_import.tick(100) if course_import
-        if event.is_a?(Assignment)
-          event.due_at = shift_date(event.due_at, shift_options)
-          event.lock_at = shift_date(event.lock_at, shift_options)
-          event.unlock_at = shift_date(event.unlock_at, shift_options)
-          event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
-        elsif event.is_a?(DiscussionTopic)
-          event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
-          log_merge_result("The Topic \"#{event.title}\" won't be posted until #{event.delayed_post_at.to_s}")
-        elsif event.is_a?(CalendarEvent)
-          event.start_at = shift_date(event.start_at, shift_options)
-          event.end_at = shift_date(event.end_at, shift_options)
-        elsif event.is_a?(Quiz)
-          event.due_at = shift_date(event.due_at, shift_options)
-          event.lock_at = shift_date(event.lock_at, shift_options)
-          event.unlock_at = shift_date(event.unlock_at, shift_options)
-        elsif event.is_a?(ContextModule)
-          event.unlock_at = shift_date(event.unlock_at, shift_options)
-          event.start_at = shift_date(event.start_at, shift_options)
-          event.end_at = shift_date(event.end_at, shift_options)
-        end
-        event.respond_to?(:save_without_broadcasting!) ? event.save_without_broadcasting! : event.save!
-      end
-      self.set_course_dates_if_blank(shift_options)
-    end
-
-    self.save
-
-    if course_import
-      course_import.added_item_codes = added_items.map{|i| i.asset_string }
-      course_import.log = merge_results
-      course_import.save!
-    end
-    added_items.map{|i| i.asset_string }
-  end
-
   def self.clonable_attributes
     [ :group_weighting_scheme, :grading_standard_id, :is_public,
       :allow_student_wiki_edits, :show_public_context_messages,
@@ -2434,26 +2168,6 @@ class Course < ActiveRecord::Base
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
       :allow_student_discussion_topics, :lock_all_announcements, :enable_draft ]
-  end
-
-  # TODO: remove me? looks like only a single spec exercises this code (incidentally, no less)
-  def clone_for(account, opts={})
-    new_course = Course.new
-    root_account = account.root_account
-    self.attributes.delete_if{|k,v| [:id, :section, :account_id, :workflow_state, :created_at, :updated_at, :root_account_id, :enrollment_term_id, :sis_source_id, :sis_batch_id].include?(k.to_sym) }.each do |key, val|
-      new_course.write_attribute(key, val)
-    end
-    new_course.workflow_state = 'created'
-    new_course.name = opts[:name] if opts[:name]
-    new_course.account_id = account.id
-    new_course.root_account_id = root_account.id
-    new_course.enrollment_term_id = opts[:enrollment_term_id]
-    new_course.abstract_course_id = self.abstract_course_id
-    new_course.save!
-    if opts[:copy_content]
-      new_course.send_later(:merge_into_course, self, :everything => true)
-    end
-    new_course
   end
 
   def assert_assignment_group
@@ -2679,6 +2393,16 @@ class Course < ActiveRecord::Base
       :limited
     else
       :full
+    end
+  end
+
+  def invited_count_visible_to(user)
+    scope = users_visible_to(user).
+      where("enrollments.workflow_state = 'invited' AND enrollments.type != 'StudentViewEnrollment'")
+    if CANVAS_RAILS2
+      scope.count(:distinct => true, :select => 'users.id')
+    else
+      scope.select('users.id').uniq.count
     end
   end
 
@@ -3071,15 +2795,18 @@ class Course < ActiveRecord::Base
   # sections of the course, so that a section limited teacher can grade them.
   def sync_enrollments(fake_student)
     self.default_section
-    self.course_sections.active.each do |section|
-      # enroll fake_student will only create the enrollment if it doesn't already exist
-      self.enroll_user(fake_student, 'StudentViewEnrollment',
-                       :allow_multiple_enrollments => true,
-                       :section => section,
-                       :enrollment_state => 'active',
-                       :no_notify => true,
-                       :skip_touch_user => true)
+    Enrollment.skip_callback(:update_cached_due_dates) do
+      self.course_sections.active.each do |section|
+        # enroll fake_student will only create the enrollment if it doesn't already exist
+        self.enroll_user(fake_student, 'StudentViewEnrollment',
+                         :allow_multiple_enrollments => true,
+                         :section => section,
+                         :enrollment_state => 'active',
+                         :no_notify => true,
+                         :skip_touch_user => true)
+      end
     end
+    DueDateCacher.recompute_course(self)
     fake_student
   end
   private :sync_enrollments

@@ -18,7 +18,7 @@
 
 require 'action_controller'
 # XXX: Rails3 doesn't have ActionController::TestUploadedFile, time to fix this
-require 'action_controller/test_process.rb' if Rails.version < "3.0"
+require 'action_controller/test_process.rb' if CANVAS_RAILS2
 
 module Canvas::Migration::Worker
   def self.get_converter(settings)

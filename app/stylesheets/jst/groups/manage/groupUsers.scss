@@ -3,6 +3,7 @@
   background: #fff;
   margin-bottom: 3px;
   padding: 0 15px;
+  line-height: 30px;
   border-radius: 3px;
   position: relative;
 }
@@ -11,10 +12,15 @@
 .assign-to-group {
   position: absolute;
   right: 3px;
-  top: 0px;
+  top: 1px;
+  i:before {
+    color: #aaa;
+    font-size: 0.8em;
+  }
 }
 
 .group .group-users {
+  margin: 1.5em 0 0;
   overflow: hidden;
   .collectionViewItems {
     width: 103%;
@@ -24,7 +30,11 @@
 .group .group-user {
   float: left;
   width: 31%;
-  margin: 0 2% 10px 0;
+  margin: 0 2% 3px 0;
+  .group-category-contents-condensed & {
+    width: 23.5%;
+    margin: 0 1% 3px 0;
+  }
   box-sizing: border-box;
   .group-user-name {
     margin-right: 0;
@@ -35,6 +45,9 @@
   overflow: hidden;
   white-space: nowrap;
   margin-right: 10px;
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #777;
 }
 
 .group-users .paginatedLoadingIndicator {

@@ -8,12 +8,16 @@ require [
 
   $(document.body).addClass 'context_modules2'
 
-  students = new UserCollection null,
-    per_page: 50
-    params:
-      enrollment_type: 'student'
+  if ENV.RESTRICTED_LIST
+    students = new UserCollection ENV.VISIBLE_STUDENTS
+    students.urls = null
+  else
+    students = new UserCollection null,
+      per_page: 50
+      params:
+        enrollment_type: 'student'
 
-  students.fetch()
+    students.fetch()
 
   indexView = new PaginatedCollectionView
     collection: students
@@ -22,4 +26,6 @@ require [
     modules_url: ENV.MODULES_URL
 
   indexView.render()
+  if ENV.RESTRICTED_LIST && ENV.VISIBLE_STUDENTS.length == 1
+    indexView.$el.find('#progression_students').hide()
   indexView.$el.appendTo($('#content'))

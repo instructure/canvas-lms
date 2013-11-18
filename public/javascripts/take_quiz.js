@@ -450,11 +450,18 @@ define([
       })
       .delegate(".numerical_question_input", {
         keyup: function(event) {
-          var val = $(this).val();
-          if (val === '' || !isNaN(parseFloat(val))) {
-            $(this).triggerHandler('focus'); // makes the errorBox go away
-          } else{
-            $(this).errorBox(I18n.t('errors.only_numerical_values', "only numerical values are accepted"));
+          var $this = $(this);
+          var val = $this.val();
+          var $errorBox = $this.data('associated_error_box');
+
+          if (val.match(/^$|^-$/) || !isNaN(parseFloat(val))) {
+            if ($errorBox) {
+              $this.triggerHandler('click');
+            }
+          } else {
+            if (!$errorBox) {
+              $this.errorBox(I18n.t('errors.only_numerical_values', "only numerical values are accepted"));
+            }
           }
         }
       })

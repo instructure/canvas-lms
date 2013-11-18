@@ -49,7 +49,7 @@ module AuthenticationMethods
   end
 
   def self.access_token(request, params_method = :params)
-    auth_header = CANVAS_RAILS3 ? request.authorization : ActionController::HttpAuthentication::Basic.authorization(request)
+    auth_header = CANVAS_RAILS2 ? ActionController::HttpAuthentication::Basic.authorization(request) : request.authorization
     if auth_header.present? && (header_parts = auth_header.split(' ', 2)) && header_parts[0] == 'Bearer'
       header_parts[1]
     else

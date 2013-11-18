@@ -75,14 +75,20 @@ define([
       // make handlebars comparisons easy
       _.each(ENV.conference_type_details, function(conferenceInfo){
         _.each(conferenceInfo.settings, function(optionObj){
-          optionObj['isBoolean'] = (optionObj['type'] == 'boolean');
-          if (optionObj.isBoolean) {
-            var currentVal = conferenceData.user_settings[optionObj.field];
-            // if no value currently set, use the default.
-            if (currentVal === undefined) {
-              currentVal = optionObj['default'];
-            }
+          var currentVal = conferenceData.user_settings[optionObj.field];
+          // if no value currently set, use the default.
+          if (currentVal === undefined) {
+            currentVal = optionObj['default'];
+          }
+          switch(optionObj['type'])
+          {
+          case 'boolean':
+            optionObj['isBoolean'] = true;
             optionObj['checked'] = currentVal;
+            break;
+          case 'text':
+            optionObj['isText'] = true;
+            optionObj['value'] = currentVal;
           }
         });
       });
@@ -94,8 +100,25 @@ define([
       if (selected.length > 0){
         selected = selected[0];
       }
+      var members = []
+      var userSettings = []
+      if(selected.settings != undefined ) {
+        $.each( selected.settings, function( i, val ) {
+          if (val['location'] == 'members'){
+            members.push(val);
+          }
+          else{
+            userSettings.push(val);
+          }
+        });
+      }
       $('.web_conference_user_settings').html(userSettingOptionsTemplate({
-        settings: selected.settings,
+        settings: userSettings,
+        conference: conferenceData,
+        conference_started: !!conferenceData['started_at']
+      }));
+      $('.web_conference_member_user_settings').html(userSettingOptionsTemplate({
+        settings: members,
         conference: conferenceData,
         conference_started: !!conferenceData['started_at']
       }));

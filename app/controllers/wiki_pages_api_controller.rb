@@ -187,6 +187,11 @@ class WikiPagesApiController < ApplicationController
   # @argument search_term [Optional, String]
   #   The partial title of the pages to match and return.
   #
+  # @argument published [Optional, Boolean]
+  #   If true, include only published paqes. If false, exclude published
+  #   pages. If not present, do not filter on published status.
+  #
+  #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
   #          https://<canvas>/api/v1/courses/123/pages?sort=title&order=asc
@@ -197,7 +202,13 @@ class WikiPagesApiController < ApplicationController
       pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
       # omit body from selection, since it's not included in index results
       scope = @context.wiki.wiki_pages.select(WikiPage.column_names - ['body']).includes(:user)
-      scope = @context.grants_right?(@current_user, session, :view_unpublished_items) ? scope.not_deleted : scope.active
+      if params.has_key?(:published)
+        scope = value_to_boolean(params[:published]) ? scope.active.not_hidden : scope.unpublished
+      else
+        scope = scope.not_deleted
+      end
+      # published parameter notwithstanding, hide unpublished items if the user doesn't have permission to see them
+      scope = scope.active unless @context.grants_right?(@current_user, session, :view_unpublished_items)
       scope = scope.not_hidden unless @context.grants_right?(@current_user, session, :view_hidden_items)
 
       scope = WikiPage.search_by_attribute(scope, :title, params[:search_term])

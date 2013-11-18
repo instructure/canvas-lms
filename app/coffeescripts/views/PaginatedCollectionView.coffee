@@ -135,7 +135,7 @@ define [
 
     afterRender: ->
       super
-      @hideLoadingIndicator()
+      @hideLoadingIndicator() unless @collection.fetchingPage
 
     ##
     # Hides the loading indicator

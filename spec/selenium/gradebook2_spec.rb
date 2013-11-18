@@ -29,10 +29,11 @@ describe "gradebook2" do
 
     it "hides unpublished/shows published assignments" do
       @course.root_account.enable_draft!
-      @first_assignment.unpublish
+      assignment = @course.assignments.create! title: 'unpublished'
+      assignment.unpublish
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
-      f('#gradebook_grid .slick-header').should_not include_text(@first_assignment.title)
+      f('#gradebook_grid .slick-header').should_not include_text(assignment.title)
 
       @first_assignment.publish
       get "/courses/#{@course.id}/gradebook2"
@@ -403,6 +404,21 @@ describe "gradebook2" do
         visible_students.size.should == 2
         visible_students[0].text.strip.should == STUDENT_NAME_2
         visible_students[1].text.strip.should == STUDENT_NAME_3
+      end
+
+      it "should create separate conversations" do
+        message_text = "This is a message"
+
+        get "/courses/#{@course.id}/gradebook2"
+
+        open_assignment_options(2)
+        f('[data-action="messageStudentsWho"]').click
+        expect {
+          message_form = f('#message_assignment_recipients')
+          message_form.find_element(:css, '#body').send_keys(message_text)
+          submit_form(message_form)
+          wait_for_ajax_requests
+        }.to change(Conversation, :count).by_at_least(2)
       end
     end
 

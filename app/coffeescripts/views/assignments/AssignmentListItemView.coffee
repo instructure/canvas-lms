@@ -9,7 +9,11 @@ define [
   'compiled/views/MoveDialogView'
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentListItem'
-], (I18n, Backbone, _, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, MoveDialogView, preventDefault, template) ->
+  'jst/assignments/_assignmentListItemScore'
+  'compiled/util/round'
+  'jqueryui/tooltip'
+  'compiled/behaviors/tooltip'
+], (I18n, Backbone, _, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, MoveDialogView, preventDefault, template, scoreTemplate, round) ->
 
   class AssignmentListItemView extends Backbone.View
     tagName: "li"
@@ -41,18 +45,20 @@ define [
       # we need the following line in order to access this view later
       @model.assignmentView = @
 
+      @model.on('change:hidden', @toggleHidden)
+
       if @canManage()
         @model.on('change:published', @updatePublishState)
 
         # re-render for attributes we are showing
-        attrs = ["name", "points_possible", "due_at", "lock_at", "unlock_at"]
+        attrs = ["name", "points_possible", "due_at", "lock_at", "unlock_at", "modules"]
         observe = _.map(attrs, (attr) -> "change:#{attr}").join(" ")
         @model.on(observe, @render)
+      @model.on 'change:submission', @updateScore
 
     initializeChildViews: ->
       @publishIconView    = false
       @editAssignmentView = false
-      @vddDueColumnView   = false
       @dateAvailableColumnView = false
       @moveAssignmentView = false
 
@@ -76,6 +82,7 @@ define [
 
     # call remove on children so that they can clean up old dialogs.
     render: ->
+      @toggleHidden(@model, @model.get('hidden'))
       @publishIconView.remove()         if @publishIconView
       @editAssignmentView.remove()      if @editAssignmentView
       @dateDueColumnView.remove()       if @dateDueColumnView
@@ -83,9 +90,6 @@ define [
       @moveAssignmentView.remove() if @moveAssignmentView
 
       super
-      # reset the model's view property; it got overwritten by child views
-      @model.view = this if @model
-
       # reset the model's view property; it got overwritten by child views
       @model.view = this if @model
 
@@ -100,6 +104,11 @@ define [
         @moveAssignmentView.hide()
         @moveAssignmentView.setTrigger @$moveAssignmentButton
 
+      @updateScore() unless @canManage()
+
+    toggleHidden: (model, hidden) =>
+      @$el.toggleClass('hidden', hidden)
+      @$el.toggleClass('search_show', !hidden)
 
     createModuleToolTip: =>
       link = @$el.find('.tooltip_link')
@@ -116,11 +125,20 @@ define [
     toJSON: ->
       data = @model.toView()
       data.canManage = @canManage()
+      data = @_setJSONForGrade(data) unless data.canManage
+
       # can move items if there's more than one parent
       # collection OR more than one in the model's collection
       data.canMove = @model.collection.view?.parentCollection?.length > 1 or @model.collection.length > 1
 
-      if modules = @modules(data.id)
+      if data.canManage
+        data.spanWidth      = 'span3'
+        data.alignTextClass = ''
+      else
+        data.spanWidth      = 'span4'
+        data.alignTextClass = 'align-right'
+
+      if modules = @model.get('modules')
         moduleName = modules[0]
         has_modules = modules.length > 0
         joinedNames = modules.join(",")
@@ -142,19 +160,26 @@ define [
       @model.destroy()
       @$el.remove()
 
-    modules: (id) ->
-      ENV.MODULES[id]
-
     canManage: ->
       ENV.PERMISSIONS.manage
 
-    search: (regex) ->
-      if @model.get('name').match(regex)
-        @show()
-        return true
-      else
-        @hide()
-        return false
+    _setJSONForGrade: (json) ->
+      if submission = @model.get('submission')
+        submissionJSON = submission.toJSON()
+        grade = submission.get('grade')
+        if typeof grade is 'number' && !isNaN(grade)
+          submissionJSON.grade = round grade, round.DEFAULT
+        json.submission = submissionJSON
+      pointsPossible = json.pointsPossible
 
-    endSearch: (regex) ->
-      @show()
+      if typeof pointsPossible is 'number' && !isNaN(pointsPossible)
+        json.pointsPossible = round pointsPossible, round.DEFAULT
+        json.submission.pointsPossible = json.pointsPossible if json.submission?
+
+      json
+
+    updateScore: =>
+      json = @model.toView()
+      json = @_setJSONForGrade(json) unless @canManage()
+
+      @$('.js-score').html scoreTemplate(json)

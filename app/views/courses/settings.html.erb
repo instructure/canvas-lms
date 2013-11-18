@@ -35,7 +35,7 @@
   </ul>
   <div id="tab-details">
     <h2><%= t('headings.details', %{Course Details}) %></h2>
-    <% form_for @context, :html => {:id => "course_form"} do |f| %>
+    <%= form_for @context, :html => {:id => "course_form"} do |f| %>
     <table class="coursesettings">
       <tr>
         <td class="form-label"><%= f.blabel :name, :course_name, :en => "Name" %></td>
@@ -369,7 +369,7 @@ Unpublished content may not be available if Draft State is disabled.
       </li>
       <% if can_do(@context.course_sections.new, @current_user, :create) %>
         <li>
-          <% form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
+          <%= form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
             <h3><%= f.blabel :name, :course_section_name, :en => "Add a New Section" %></h3>
             <%= f.text_field :name %>
             <button class="btn btn-primary" type="submit"><i class="icon-add"></i> <%= t('buttons.add_section', %{Add Section}) %></button>
@@ -377,7 +377,7 @@ Unpublished content may not be available if Draft State is disabled.
         </li>
       <% end %>
     </ul>
-    <% form_for :course_section, :url => "", :html => {:id => "edit_section_form", :method => :put, :style => "display: none;"} do |f| %>
+    <%= form_for :course_section, :url => "", :html => {:id => "edit_section_form", :method => :put, :style => "display: none;"} do |f| %>
       <%= f.text_field :name %>
     <% end %>
   </div>
@@ -404,7 +404,7 @@ Unpublished content may not be available if Draft State is disabled.
          {:key => t('keycodes.toggle_navigation_dragging', 'Space'), :description => t('keycode_descriptions.toggle_navigation_dragging', 'Select link to begin dragging, or drop previously selected link')}
      ]) %>
 
-    <% form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
+    <%= form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
       <input type="hidden" name="tabs_json" id="tabs_json" value="[]" />
       <% tabs = sortable_tabs %>
       <p style="margin-bottom: 4px; padding-top: 10px">
@@ -449,7 +449,7 @@ Unpublished content may not be available if Draft State is disabled.
   <% if publishing_enabled %>
     <div id="tab-grade-publishing">
       <h2><%= t('headings.grade_publishing', %{Grade Publishing}) %></h2>
-      <% form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %><% end %>
+      <%= form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %><% end %>
       <a href="#" id="publish_grades_link" class="btn disabled">...</a>
       <ul id="publish_grades_messages"></ul>
     </div>
@@ -467,7 +467,7 @@ Unpublished content may not be available if Draft State is disabled.
   <div id="move_course_dialog" style="display: none;">
     <h2><%= t('headings.move_course', %{Move the course to another root account}) %></h2>
     <%= t('deatils.move_course', %{Select a new root account for this course.  After you move the course you'll want to specify a new department for the course as well.}) %>
-    <% form_for :course, :url => course_url(@context), :html => {:method => :put} do |f| %>
+    <%= form_for :course, :url => course_url(@context), :html => {:method => :put} do |f| %>
       <table class="formtable">
         <tr>
           <td>

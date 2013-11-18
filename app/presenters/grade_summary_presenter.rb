@@ -83,44 +83,74 @@ class GradeSummaryPresenter
   end
 
   def groups
-    @groups ||= @context.assignment_groups.active.all
+    @groups ||= @context.assignment_groups.
+      active.includes(:active_assignments => :assignment_overrides).all
   end
 
   def assignments
     @assignments ||= begin
-      scope = @context.assignments.active.gradeable
-      array = scope.includes(:assignment_overrides).collect{|a| a.overridden_for(student)}.sort
-      # pre-cache the assignment group for each assignment object
       group_index = groups.index_by(&:id)
-      array.each{ |a| a.assignment_group = group_index[a.assignment_group_id] }
-      array
+
+      groups.flat_map(&:active_assignments).select { |a|
+        a.submission_types != 'not_graded'
+      }.map { |a|
+        # prevent extra loads
+        a.context = @context
+        a.assignment_group = group_index[a.assignment_group_id]
+
+        a.overridden_for(student)
+      }.sort
     end
   end
 
   def submissions
-    @submissions ||= @context.submissions.
-      except(:includes).
-      includes(:submission_comments, :rubric_assessments, :assignment).
-      find_all_by_user_id(student)
+    @submissions ||= begin
+      ss = @context.submissions
+      .except(:includes)
+      .includes(:visible_submission_comments,
+                {:rubric_assessments => [:rubric, :rubric_association]},
+                :content_participations)
+      .where("assignments.workflow_state != 'deleted'")
+      .find_all_by_user_id(student)
+
+      assignments_index = assignments.index_by(&:id)
+
+      # preload submission comment stuff
+      comments = ss.map { |s|
+        assign = assignments_index[s.assignment_id]
+        s.assignment = assign if assign.present?
+
+        s.visible_submission_comments.map { |c|
+          c.submission = s
+          c
+        }
+      }.flatten
+      SubmissionComment.preload_attachments comments
+
+      ss
+    end
   end
 
-  def submissions_by_assignment
-    @submissions_by_assignment ||=
-      if allow_loading_all_submissions?
-        # Yes, fetch *all* submissions for this course; otherwise the view will end up doing a query for each
-        # assignment in order to calculate grade distributions
-        @context.submissions.
-          select([:assignment_id, :score, :grade, :quiz_submission_id]).
-          except(:includes).
-          group_by(&:assignment_id)
-      else
-        {}
-      end
+  def submission_counts
+    @submission_counts ||= @context.assignments.active
+      .joins(:submissions)
+      .group("assignments.id")
+      .count("submissions.id")
+  end
+
+  def assignment_stats
+    @stats ||= @context.active_assignments
+    .joins(:submissions)
+    .group("assignments.id")
+    .select("assignments.id, max(score), min(score), avg(score)")
+    .index_by(&:id)
   end
 
   def assignment_presenters
     submission_index = submissions.index_by(&:assignment_id)
-    assignments.map{|a| GradeSummaryAssignmentPresenter.new(self, @current_user, a, submission_index[a.id]) }
+    assignments.map{ |a|
+      GradeSummaryAssignmentPresenter.new(self, @current_user, a, submission_index[a.id])
+    }
   end
 
   def has_muted_assignments?
@@ -167,12 +197,5 @@ class GradeSummaryPresenter
   def groups_assignments=(value)
     @groups_assignments = value
     assignments.concat(value)
-  end
-
-  protected
-
-  def allow_loading_all_submissions?
-    threshold = Setting.get_cached('grade_distributions_submission_count_threshold', '0').to_i
-    @context.allows_gradebook_uploads? && (threshold == 0 || @context.submissions.count < threshold)
   end
 end

@@ -40,6 +40,7 @@ class AssignmentGroupsApiController < ApplicationController
       includes = Array(params[:include])
       override_dates = value_to_boolean(params[:override_assignment_dates] || true)
       render :json => assignment_group_json(@assignment_group, @current_user, session, includes, {
+        stringify_json_ids: stringify_json_ids?,
         override_dates: override_dates
       })
     end
@@ -110,7 +111,7 @@ class AssignmentGroupsApiController < ApplicationController
       end
 
       @assignment_group.destroy
-      render :json => assignment_group_json(@assignment_group, @current_user, session)
+      render :json => assignment_group_json(@assignment_group, @current_user, session, [], { stringify_json_ids: stringify_json_ids? })
     end
   end
 
@@ -120,7 +121,7 @@ class AssignmentGroupsApiController < ApplicationController
 
   def process_assignment_group
     if update_assignment_group @assignment_group, params
-      render :json => assignment_group_json(@assignment_group, @current_user, session)
+      render :json => assignment_group_json(@assignment_group, @current_user, session, [], { stringify_json_ids: stringify_json_ids? })
     else
       render :json => @assignment_group.errors, :status => :bad_request
     end

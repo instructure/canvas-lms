@@ -82,26 +82,24 @@ module Api::V1
 
       # populate previous_* and new_* keys and convert hash to array of objects
       versions_hash.inject([]) do |memo, (submission_id, versions)|
-        prior = {}
-        filtered_versions = versions.sort_by{|v| v[:updated_at] }.each_with_object([]) do |version, new_array|
+        prior = HashWithIndifferentAccess.new
+        filtered_versions = versions.sort_by{|v| v[:graded_at].to_i || 0 }.each_with_object([]) do |version, new_array|
           if version[:score]
-            if prior[:submission_id].nil? || prior[:score] != version[:score]
-              if prior[:submission_id].nil?
+            if prior[:id].nil? || prior[:score] != version[:score]
+              if prior[:id].nil? || prior[:graded_at].nil? || version[:graded_at].nil?
                 PREVIOUS_VERSION_ATTRS.each { |attr| version["previous_#{attr}".to_sym] = nil }
               elsif prior[:score] != version[:score]
-                new_array.pop if prior[:graded_at].try(:to_date) == version[:graded_at].try(:to_date) && prior[:grader] == version[:grader]
                 PREVIOUS_VERSION_ATTRS.each { |attr| version["previous_#{attr}".to_sym] = prior[attr] }
               end
               NEW_ATTRS.each { |attr| version["new_#{attr}".to_sym] = version[attr] }
               new_array << version
             end
           end
-          prior.merge!(version.slice(:grade, :score, :graded_at, :grader, :submission_id))
-        end
+          prior.merge!(version.slice(:grade, :score, :graded_at, :grader, :id))
+        end.reverse
 
         memo << { :submission_id => submission_id, :versions => filtered_versions }
       end
-
     end
 
     def day_string_for(submission)

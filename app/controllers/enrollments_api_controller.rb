@@ -147,15 +147,14 @@ class EnrollmentsApiController < ApplicationController
   #   ]
   def index
     endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
-    scope_arguments = {
-      :conditions => enrollment_index_conditions,
-      :order => "enrollments.type, #{User.sortable_name_order_by_clause("users")}",
-      :include => [:user, :course, :course_section]
-    }
 
     return unless enrollments = @context.is_a?(Course) ?
-      course_index_enrollments(scope_arguments) :
-      user_index_enrollments(scope_arguments)
+      course_index_enrollments :
+      user_index_enrollments
+
+    enrollments = enrollments.
+      includes(:user, :course, :course_section).
+      order("enrollments.type, #{User.sortable_name_order_by_clause("users")}")
 
     enrollments = Api.paginate(
       enrollments,
@@ -302,13 +301,10 @@ class EnrollmentsApiController < ApplicationController
   # Internal: Collect course enrollments that @current_user has permissions to
   # read.
   #
-  # scope_arguments - A hash to be passed as :conditions to an AR scope.
-  #                   Allowed keys are any keys allowed in :conditions.
-  #
   # Returns an ActiveRecord scope of enrollments on success, false on failure.
-  def course_index_enrollments(scope_arguments)
+  def course_index_enrollments
     if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
-      scope = @context.enrollments_visible_to(@current_user, :type => :all, :include_priors => true).scoped(scope_arguments)
+      scope = @context.enrollments_visible_to(@current_user, :type => :all, :include_priors => true).where(enrollment_index_conditions)
       unless params[:state].present?
         scope = scope.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')")
       end
@@ -321,45 +317,40 @@ class EnrollmentsApiController < ApplicationController
   # Internal: Collect user enrollments that @current_user has permissions to
   # read.
   #
-  # scope_arguments - A hash to be passed as :conditions to an AR scope.
-  #                   Allowed keys are any keys allowed in :conditions.
-  #
   # Returns an ActiveRecord scope of enrollments on success, false on failure.
-  def user_index_enrollments(scope_arguments)
+  def user_index_enrollments
     user = api_find(User, params[:user_id])
 
-    # if user is requesting for themselves, just return all of their
-    # enrollments without any extra checking.
     if user == @current_user
-      enrollments = if params[:state].present?
-                      user.enrollments.scoped(scope_arguments.merge(
-                        :conditions => enrollment_index_conditions(true)))
-                    else
-                      user.current_and_invited_enrollments.scoped(scope_arguments)
-                    end
+      # if user is requesting for themselves, just return all of their
+      # enrollments without any extra checking.
+      if params[:state].present?
+        enrollments = user.enrollments.where(enrollment_index_conditions(true))
+      else
+        enrollments = user.current_and_invited_enrollments.where(enrollment_index_conditions)
+      end
+    else
+      # otherwise check for read_roster rights on all of the requested
+      # user's accounts
+      approved_accounts = user.associated_root_accounts.inject([]) do |accounts, ra|
+        accounts << ra.id if ra.grants_right?(@current_user, session, :read_roster)
+        accounts
+      end
 
-      return enrollments
+      # if there aren't any ids in approved_accounts, then the user doesn't have
+      # permissions.
+      render_unauthorized_action(@user) and return false if approved_accounts.empty?
+
+      enrollments = user.enrollments.where(enrollment_index_conditions).
+        where(root_account_id: approved_accounts)
+
+      # by default, return active and invited courses. don't use the existing
+      # current_and_invited_enrollments scope because it won't return enrollments
+      # on unpublished courses.
+      enrollments = enrollments.where(workflow_state: %w{active invited}) unless params[:state].present?
     end
 
-    # otherwise check for read_roster rights on all of the requested
-    # user's accounts
-    approved_accounts = user.associated_root_accounts.inject([]) do |accounts, ra|
-      accounts << ra.id if ra.grants_right?(@current_user, session, :read_roster)
-      accounts
-    end
-
-    # if there aren't any ids in approved_accounts, then the user doesn't have
-    # permissions.
-    render_unauthorized_action(@user) and return false if approved_accounts.empty?
-
-    additional_conditions = { 'enrollments.root_account_id' => approved_accounts }
-
-    # by default, return active and invited courses. don't use the existing
-    # current_and_invited_enrollments scope because it won't return enrollments
-    # on unpublished courses.
-    additional_conditions.merge!({:workflow_state => %w{active invited}}) unless params[:state].present?
-
-    user.enrollments.scoped(scope_arguments).where(additional_conditions)
+    enrollments
   end
 
   # Internal: Collect type, section, state, and role info from params and format them

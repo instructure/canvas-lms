@@ -331,7 +331,7 @@ class ContextController < ApplicationController
           :concluded => completed || soft_concluded,
           :teacherless => @context.teacherless?,
           :available => @context.available?,
-          :pendingInvitationsCount => @context.users_visible_to(@current_user).count(:distinct => true, :select => 'users.id', :conditions => ["enrollments.workflow_state = 'invited' AND enrollments.type != 'StudentViewEnrollment'"])
+          :pendingInvitationsCount => @context.invited_count_visible_to(@current_user)
         }
       })
     elsif @context.is_a?(Group)

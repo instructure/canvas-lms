@@ -48,7 +48,7 @@ define [
         student_link: "<a href='#{studentUrl}'>#{@model.get('name')}</a>"
 
       @progressions.render()
-      @progressions.$el.appendTo($('#progression_modules'))
+      @progressions.$el.appendTo(@$modules)
 
     showProgressions: ->
       @$modules.attr('aria-busy', 'true')

@@ -6,6 +6,7 @@ define [
   'compiled/collections/GroupUserCollection'
   'compiled/models/Group'
   'helpers/fakeENV'
+  'helpers/jquery.simulate'
 ], ($, UnassignedUsersView, AssignToGroupMenu, GroupCollection, GroupUserCollection, Group) ->
 
   clock = null
@@ -15,6 +16,7 @@ define [
 
   module 'UnassignedUsersView',
     setup: ->
+      $('#fixtures').html('<div id="content"></div>')
       clock = sinon.useFakeTimers()
       groups = new GroupCollection [
         new Group name: "a group"
@@ -31,25 +33,17 @@ define [
         groupsCollection: groups
         assignToGroupMenu: menu
       view.render()
-      view.$el.appendTo($(document.body))
+      $('#fixtures').append( view.$el )
+                    .append( $('<div />', id: 'content') )
 
     teardown: ->
+      $('#fixtures').empty()
       clock.restore()
       view.remove()
-      $('.assign-to-group-menu').remove()
-
-  test 'toggles group class if canAssignToGroup', ->
-    groups.pop() # no change yet, because not empty
-    ok view.$el.attr('class').indexOf('group-category-empty') == -1
-
-    group = groups.pop()
-    ok view.$el.attr('class').indexOf('group-category-empty') >= 0
-
-    groups.push(group)
-    ok view.$el.attr('class').indexOf('group-category-empty') == -1
+      $('#fixtures').empty()
 
   test 'opens the assignToGroupMenu', ->
-    view.$('.assign-to-group').eq(0).click()
+    view.$('.assign-to-group').eq(0).simulate('click')
     clock.tick(100)
     $menu = $('.assign-to-group-menu').filter(':visible')
     equal $menu.length, 1

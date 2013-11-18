@@ -46,6 +46,13 @@ describe "calendar2" do
     wait_for_ajax_requests
   end
 
+  def quick_jump_to_date(text)
+    f('.navigation_title').click
+    dateInput = keep_trying_until { f('.date_field') }
+    dateInput.send_keys(text + "\n")
+    wait_for_ajaximations
+  end
+
   def add_date(middle_number)
     fj('.ui-datepicker-trigger:visible').click
     datepicker_current(middle_number)
@@ -195,6 +202,16 @@ describe "calendar2" do
       def create_middle_day_assignment(name = 'new assignment')
         get "/calendar2"
         create_assignment_event(name)
+      end
+
+      it "should remember the selected calendar view" do
+        get "/calendar2"
+        f("#month").should be_selected
+        f('label[for=agenda]').click
+        wait_for_ajaximations
+
+        get "/calendar2"
+        f('#agenda').should be_selected
       end
 
       it "should create an event through clicking on a calendar day" do
@@ -426,6 +443,19 @@ describe "calendar2" do
         get_header_text.should == (current_month + ' ' + Time.now.year.to_s)
       end
 
+      it "should navigate with jump-to-date control" do
+        Account.default.change_root_account_setting!(:agenda_view, true)
+        make_event(start: 1.month.from_now)
+
+        get "/calendar2"
+        wait_for_ajaximations
+        f('.fc-event').should be_nil
+        next_month_num = (Time.now.month % 12) + 1
+        next_month = Date::MONTHNAMES[next_month_num]
+        quick_jump_to_date(next_month)
+        f('.fc-event').should_not be_nil
+      end
+
       it "should show section-level events, but not the parent event" do
         @course.default_section.update_attribute(:name, "default section!")
         s2 = @course.course_sections.create!(:name => "other section!")
@@ -632,6 +662,7 @@ describe "calendar2" do
       end
 
       it "should change duration of a short event when dragging resize handle" do
+        pending("dragging events doesn't seem to work")
         noon = Time.zone.now.at_beginning_of_day + 12.hours
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
         get "/calendar2"
@@ -661,6 +692,116 @@ describe "calendar2" do
 
       it "should update the event as all day if dragged to all day row" do
         pending("dragging events doesn't seem to work")
+      end
+    end
+
+    context "agenda view" do
+      before(:each) do
+        account = Account.default
+        account.settings[:agenda_view] = true
+        account.save!
+      end
+
+      it "should display agenda events" do
+        get '/calendar2'
+        wait_for_ajaximations
+        f('label[for=agenda]').click
+        wait_for_ajaximations
+        fj('.agenda-wrapper:visible').should be_present
+      end
+
+      it "should set the header in the format 'Oct 11, 2013'" do
+        start_date = Time.now.beginning_of_day + 12.hours
+        event = @course.calendar_events.create!(title: "ohai",
+          start_at: start_date, end_at: start_date + 1.hour)
+        get '/calendar2'
+        wait_for_ajaximations
+        f('label[for=agenda]').click
+        wait_for_ajaximations
+        f('.navigation_title').text.should match(/[A-Z][a-z]{2}\s\d{2},\s\d{4}/)
+      end
+
+      it "should respect context filters" do
+        start_date = Time.now.utc.beginning_of_day + 12.hours
+        event = @course.calendar_events.create!(title: "ohai",
+          start_at: start_date, end_at: start_date + 1.hour)
+        get '/calendar2'
+        wait_for_ajaximations
+        f('label[for=agenda]').click
+        wait_for_ajaximations
+        ffj('.ig-row').length.should == 1
+        fj('.context-list-toggle-box:last').click
+        wait_for_ajaximations
+        ffj('.ig-row').length.should == 0
+      end
+
+      it "should be navigable via the jump-to-date control" do
+        yesterday = 1.day.ago
+        event = make_event(start: yesterday)
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=agenda]').click
+        wait_for_ajaximations
+        ffj('.ig-row').length.should == 0
+        quick_jump_to_date(yesterday.strftime("%b %-d %Y"))
+        wait_for_ajaximations
+        ffj('.ig-row').length.should == 1
+      end
+
+      it "should be navigable via the minical" do
+        yesterday = 1.day.ago
+        event = make_event(start: yesterday)
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=agenda]').click
+        wait_for_ajaximations
+        ffj('.ig-row').length.should == 0
+        f('.fc-button-prev').click
+        f('.fc-day-number').click
+        wait_for_ajaximations
+        ffj('.ig-row').length.should == 1
+      end
+
+      it "should persist the start date across reloads" do
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=agenda]').click
+        next_year = 1.year.from_now.strftime("%Y")
+        quick_jump_to_date(next_year)
+        refresh_page
+        wait_for_ajaximations
+        f('.navigation_title').should include_text(next_year)
+      end
+
+      it "should transfer the start date when switching views" do
+        get "/calendar2"
+        wait_for_ajaximations
+        f('.navigate_next').click()
+        f('label[for=agenda]').click
+        f('.navigation_title').should include_text(1.month.from_now.strftime("%b"))
+        next_year = 1.year.from_now.strftime("%Y")
+        quick_jump_to_date(next_year)
+        f('label[for=month]').click
+        f('.navigation_title').should include_text(next_year)
+      end
+
+      it "should display the displayed date range in the header" do
+        tomorrow = 1.day.from_now
+        event = make_event(start: tomorrow)
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=agenda]').click
+        wait_for_ajaximations
+        f('.navigation_title').should include_text(Time.now.utc.strftime("%b %-d, %Y"))
+        f('.navigation_title').should include_text(tomorrow.utc.strftime("%b %-d, %Y"))
+      end
+
+      it "should not display a date range if no events are found" do
+        get "/calendar2"
+        wait_for_ajaximations
+        f('label[for=agenda]').click
+        wait_for_ajaximations
+        f('.navigation_title').should_not include_text('Invalid')
       end
     end
   end

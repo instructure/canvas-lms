@@ -1227,7 +1227,7 @@ define([
       });
       if (!$dialog.hasClass('loaded')) {
         $dialog.find(".searching_message").text(I18n.t('retrieving_filters', "Retrieving Filters..."));
-        var url = ENV.QUIZZES_URL;
+        var url = ENV.QUIZ_FILTERS_URL;
         $.ajaxJSON(url, 'GET', {}, function(data) {
           $dialog.addClass('loaded');
           if (data.length) {
@@ -2522,7 +2522,7 @@ define([
       success: function(data) {
         var $form = $(this);
         var $group = $form.parents(".group_top");
-        var group = data.quiz_group;
+        var group = data;
         $form.loadingImage('remove');
         $group.removeClass('editing');
         $group.fillTemplateData({

@@ -196,4 +196,21 @@ describe QuizzesHelper do
       score_affected_by_regrade?(submission).should be_false
     end
   end
+
+  describe "#answer_title" do
+    it "builds title if answer is selected" do
+      title = answer_title(true, false, false)
+      title.should == "title=\"You selected this answer.\""
+    end
+
+    it "builds title if answer is correct" do
+      title = answer_title(false, true, true)
+      title.should == "title=\"This was the correct answer.\""
+    end
+
+    it "returns nil if not selected or correct" do
+      title = answer_title(false, false, false)
+      title.should be_nil
+    end
+  end
 end

@@ -73,7 +73,7 @@
         <td class="indent"><%= @context.quizzes.before(@range_end).map{|q| (q.quiz_data || []).length}.sum %></td>
       </tr><tr>
         <td class="indent"><%= t('quiz_submissions', %{Quiz Submissions}) %></td>
-        <td class="indent"><%= QuizSubmission.scoped(:conditions => {:quiz_id => @context.quizzes.before(@range_end).map(&:id)}).count %></td>
+        <td class="indent"><%= QuizSubmission.where(quiz_id: @context.quizzes.before(@range_end)).count %></td>
       </tr>
     </table>
   </div>

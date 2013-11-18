@@ -749,6 +749,7 @@ describe ContentMigration do
           :description => "Outcome row 2",
           :id => 2,
           :ratings => [{:points => 3,:description => "lame'",:criterion_id => 2,:id => 3}],
+          :ignore_for_scoring => true,
           :learning_outcome_id => lo2.id
         }
       ]
@@ -765,6 +766,7 @@ describe ContentMigration do
       to_assign = @copy_to.assignments.first
       
       to_rub.data[1]["learning_outcome_id"].should == new_lo2.id
+      to_rub.data[1]["ignore_for_scoring"].should == true
       to_rub.data[0]["learning_outcome_id"].should == lo.id
       to_rub.learning_outcome_alignments.map(&:learning_outcome_id).sort.should == [lo.id, new_lo2.id].sort
       to_assign.learning_outcome_alignments.map(&:learning_outcome_id).sort.should == [lo.id, new_lo2.id].sort
@@ -1389,6 +1391,23 @@ describe ContentMigration do
       @copy_to.context_external_tools.find_by_migration_id(mig_id(tool2)).should be_nil
       @copy_to.discussion_topics.find_by_migration_id(mig_id(topic2)).should be_nil
       @copy_to.quizzes.find_by_migration_id(mig_id(quiz2)).should be_nil
+    end
+
+    it "should copy module prerequisites" do
+      enable_cache do
+        mod = @copy_from.context_modules.create!(:name => "first module")
+        mod2 = @copy_from.context_modules.create(:name => "next module")
+        mod2.position = 2
+        mod2.prerequisites = "module_#{mod.id}"
+        mod2.save!
+
+        run_course_copy
+
+        to_mod = @copy_to.context_modules.find_by_migration_id(mig_id(mod))
+        to_mod2 = @copy_to.context_modules.find_by_migration_id(mig_id(mod2))
+        to_mod2.prerequisites.should_not == []
+        to_mod2.prerequisites[0][:id].should eql(to_mod.id)
+      end
     end
 
     it "should preserve links to re-uploaded attachments" do

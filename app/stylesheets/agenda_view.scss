@@ -1,0 +1,187 @@
+@import 'agenda_view_minical';
+
+.agenda-wrapper {
+  display: none;
+
+  &.active {
+    display: block;
+  }
+}
+
+.agenda-day {
+  border-bottom: 1px dashed #bac0c6;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+
+  &:after {
+    clear: both;
+    content: "";
+    display: table;
+  }
+
+  .item-group-condensed {
+    padding: 0 15px 0 0;
+  }
+}
+
+.agenda-date {
+  float: left;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 52px;
+  margin: 0;
+  max-width: 125px;
+  width: 10%;
+}
+
+.agenda-events {
+  float: left;
+  width: 90%;
+}
+
+.agenda-event {
+  &:first-child .color-tag {
+    border-top-left-radius: 2px;
+  }
+
+  &:last-child .color-tag {
+    border-bottom-left-radius: 2px;
+  }
+}
+
+.color-tag {
+  display: inline-block;
+  height: 100%;
+  width: 4px;
+}
+
+.agenda-actions {
+  margin-left: 10%;
+}
+
+#calendar_header {
+  .navigation_buttons {
+    bottom: 0;
+    margin-left: 6px;
+    .ui-button {
+      padding: 4px 6px;
+      i:before {
+        font-size: 10px;
+      }
+    }
+  }
+
+  .ui-buttonset .ui-button {
+    vertical-align: middle;
+  }
+
+  .navigation_title, .appointment_group_title {
+    vertical-align: middle;
+    padding-left: 12px;
+  }
+
+  #refresh_calendar_link {
+    display: none;
+    float: none;
+    margin-right: 8px;
+    &.loading {
+      display: inline-block;
+      cursor: default;
+    }
+  }
+}
+
+#calendar-app {
+  .fc-content {
+    background: none;
+  }
+
+  .fc-view-agendaWeek {
+    .fc-widget-header {
+        background: none;
+        border-left: none;
+        color: #627382;
+    }
+
+    .fc-agenda-axis {
+      border-color: #DADADA;
+      padding: 3px 6px;
+    }
+
+    .fc-agenda-days {
+      thead .fc-first {
+        height: 32px;
+      }
+
+      .fc-widget-header {
+        border-right: none;
+        text-transform: uppercase;
+
+        &.fc-first {
+          border-bottom: none;
+        }
+      }
+
+      .fc-widget-content {
+        background-color: white;
+      }
+
+      .fc-widget-content.fc-state-highlight {
+        background-color: #FEF6E8;
+      }
+    }
+
+    .calendar-nowline {
+      background-color: #FACE90;
+      position: absolute;
+      right: 0;
+      height: 2px;
+    }
+  }
+
+  .fc-view-month {
+    .fc-widget-header {
+      background: none;
+      text-transform: uppercase;
+      border-left: none;
+      border-right: none;
+    }
+
+    tbody {
+      background-color: white;
+    }
+  }
+
+  .fc-other-month {
+    background: none;
+  }
+
+  .fc-state-highlight {
+    background-color: #fef6e8;
+    box-shadow: none;
+  }
+
+  .fc-event {
+    background-color: white;
+    font-weight: bold;
+  }
+
+  .fc-grid .fc-day-number {
+    padding: 1px 4px;
+  }
+
+  .loading-spinner {
+    display: inline-block;
+    background-image: url("/images/ajax-loader-black-on-white.gif");
+    background-position: 50% 50%;
+    height: 16px;
+    margin-left: 3px;
+    position: relative;
+    top: 8px;
+    width: 16px;
+  }
+}
+
+#context-list label {
+  display: inline;
+}

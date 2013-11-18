@@ -31,7 +31,8 @@
 /public/optimized/
 /public/stylesheets/compiled/
 /RAILS3
-/spec/javascripts/
+/spec/javascripts/runner.html
+/spec/javascripts/compiled/
 /tmp/
 /vendor/plugins/rails_upgrade
 
@@ -39,7 +40,7 @@
 /app/coffeescripts/plugins/
 /app/stylesheets/plugins/
 /app/views/jst/plugins/
-/doc/plugins/
 /public/javascripts/plugins/
 /public/plugins/
 /spec/coffeescripts/plugins/
+/spec/plugins/

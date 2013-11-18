@@ -1,4 +1,59 @@
+@import 'environment';
+
 .group-expanded .group-collapsed-item,
 .group-collapsed .group-expanded-item {
   display: none;
+}
+
+.toggle-group > i {
+  padding-right: 0.5em;
+  &:before {
+    font-size: 1.25em;
+  }
+}
+
+.group-summary {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.action-darkgray {
+  color: #666;
+  &:hover {
+    color: #333;
+  }
+}
+
+.groups-list {
+  padding-bottom: 80px; // ensure menus at the bottom have enough height
+}
+
+.group {
+  padding: 1.5em 0;
+  border-top: 1px dashed #c2c8d0;
+  &:first-child {
+    border-top-style: solid;
+  }
+
+  .row-fluid [class*=span] {
+    min-height: 0;
+  }
+
+  .group-actions {
+    text-align: right;
+    > a {
+      margin-left: 5%;
+    }
+    > * {
+      text-align: left;
+    }
+  }
+  .row-fluid {
+    padding-bottom: 1px; // fix weird margin-collapse/jumping bug when toggling cog menu in chrome
+  }
+}
+
+
+.group-category-contents-condensed .group {
+  padding: 0.7em 1em;
 }

@@ -100,10 +100,8 @@ $.widget("ui.dialog", {
 			uiDialog = ( this.uiDialog = $( "<div>" ) )
 				.addClass( uiDialogClasses + options.dialogClass )
 				.attr({
-					role: "alertdialog",
-					"aria-live": "assertive",
+					role: "dialog",
 					"aria-hidden": true,
-					"aria-atomic": true
 				})
 				.css({
 					display: "none",
@@ -128,7 +126,6 @@ $.widget("ui.dialog", {
 				.show()
 				.removeAttr( "title" )
 				.addClass( "ui-dialog-content ui-widget-content" )
-				.attr("role", "alert")
 				.appendTo( uiDialog ),
 
 			uiDialogTitlebar = ( this.uiDialogTitlebar = $( "<div>" ) )

@@ -5,7 +5,7 @@
   <%= t :subject, "Course Enrollment" %>
 <% end %>
 <% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
-<% course = "<a href=\"#{content :link}\">#{asset.course.name}</a>" %>
+<% course = "<a href=\"#{content :link}\">#{h asset.course.name}</a>".html_safe %>
 <p>
 <%=
     case asset.type

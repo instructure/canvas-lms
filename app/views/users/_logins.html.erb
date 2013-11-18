@@ -71,7 +71,7 @@
       <% end %>
     </table>
   </fieldset>
-  <% form_for :pseudonym, :url => user_pseudonyms_url(@user.id), :html => {:id => 'edit_pseudonym_form', :style => 'display: none;'} do |f| %>
+  <%= form_for :pseudonym, :url => user_pseudonyms_url(@user.id), :html => {:id => 'edit_pseudonym_form', :style => 'display: none;'} do |f| %>
     <table class="formtable" style="margin-top: 20px;">
       <tr>
         <td><%= f.blabel :unique_id, :en => "Login" %></td>

@@ -58,6 +58,7 @@
 
     <div class="clear"></div>
     <div style="display: none;">
+      <span class="publish_final_grade"><%= context_module.try_rescue(:publish_final_grade?) || nbsp %></span>
       <span class="require_sequential_progress"><%= context_module.try_rescue(:require_sequential_progress) || nbsp %></span>
       <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/reorder" rel="nofollow" class="reorder_items_url" style="display: none;">&nbsp;</a>
     </div>

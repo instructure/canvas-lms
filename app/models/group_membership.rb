@@ -141,11 +141,8 @@ class GroupMembership < ActiveRecord::Base
   end
 
   def update_cached_due_dates
-    if workflow_state_changed? && group.group_category_id && group.context_type != 'Account'
-      Assignment.where(context_type: group.context_type, context_id: group.context_id, group_category_id: group.group_category_id).
-          pluck(:id).each do |assignment|
-        DueDateCacher.recompute(assignment)
-      end
+    if workflow_state_changed? && group.group_category_id && group.context_type == 'Course'
+      DueDateCacher.recompute_course(group.context_id, Assignment.where(context_type: group.context_type, context_id: group.context_id, group_category_id: group.group_category_id).pluck(:id))
     end
   end
   

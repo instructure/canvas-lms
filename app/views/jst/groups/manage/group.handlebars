@@ -1,28 +1,26 @@
 <div class="row-fluid">
   <div class="span8 ellipsis">
-    <a href="#" class="toggle-group" aria-label="{{#t "show_group_details"}}Show group details{{/t}}" title="{{name}}">
-      <i class="group-collapsed-item icon-mini-arrow-up"></i>
+    <a href="#" class="toggle-group group-heading" aria-label="{{#t "show_group_details"}}Show group details{{/t}}" title="{{name}}">
+      <i class="group-collapsed-item icon-mini-arrow-right"></i>
       <i class="group-expanded-item icon-mini-arrow-down"></i>
-      <strong class="group-name">{{name}}</strong>
+      <span class="group-name">{{name}}</span>
     </a>
   </div>
   <div class="span2">
     <span class="toggle-group group-summary">{{summary}}</span>
   </div>
-  <div class="span2">
+  <div class="span2 group-actions">
     {{#if ENV.IS_LARGE_ROSTER}}
-      <a href="#" class="add-user" aria-label="{{#t "add_user_to_group"}}Assign user to group{{/t}}" title="{{#t "add_user_to_group"}}Assign user to group{{/t}}"><i class="icon-add"></i></a>
+      <a href="#" class="add-user action-darkgray" data-tooltip aria-label="{{#t "add_user_to_group"}}Assign user to group{{/t}}" title="{{#t "add_user_to_group"}}Assign user to group{{/t}}"><i class="icon-add"></i></a>
     {{/if}}
-    <span class='pull-right'>
-      <a class="al-trigger" href="#">
-        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-        <span class="screenreader-only">{{#t "group_settings"}}Settings{{/t}}</span>
-      </a>
-      <ul class="al-options">
-        <li><a href="#" class="icon-edit edit-group">{{#t "group_edit"}}Edit{{/t}}</a></li>
-        <li><a href="#" class="icon-trash delete-group">{{#t "group_delete"}}Delete{{/t}}</a></li>
-      </ul>
-    </span>
+    <a class="al-trigger action-darkgray" href="#">
+      <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+      <span class="screenreader-only">{{#t "group_settings"}}Settings{{/t}}</span>
+    </a>
+    <ul class="al-options">
+      <li><a href="#" class="icon-edit edit-group">{{#t "group_edit"}}Edit{{/t}}</a></li>
+      <li><a href="#" class="icon-trash delete-group">{{#t "group_delete"}}Delete{{/t}}</a></li>
+    </ul>
   </div>
 </div>
 

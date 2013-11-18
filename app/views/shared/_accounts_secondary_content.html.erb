@@ -1,5 +1,5 @@
 <% content_for :secondary_content do %>
-  <% form_for :user, :url => account_users_path(@account), :html => {:id => "new_user", :method => :get} do |f| -%>
+  <%= form_for :user, :url => account_users_path(@account), :html => {:id => "new_user", :method => :get} do |f| -%>
   <fieldset class="textfield-inline-with-button">
     <legend><%= t 'titles.find_user', "Find A User" %></legend>
     <%= f.text_field :name %>

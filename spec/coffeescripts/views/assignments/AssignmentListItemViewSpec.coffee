@@ -4,7 +4,10 @@ define [
   'compiled/views/assignments/AssignmentListItemView'
   'jquery'
   'helpers/jquery.simulate'
+  'helpers/fakeENV'
 ], (Backbone, Assignment, AssignmentListItemView, $) ->
+  screenreaderText = null
+  nonScreenreaderText = null
 
   fixtures = $('#fixtures')
 
@@ -70,26 +73,36 @@ define [
   createView = (model, options) ->
     options = $.extend {canManage: true}, options
 
-    sinon.stub( AssignmentListItemView.prototype, "canManage", -> options.canManage )
-    sinon.stub( AssignmentListItemView.prototype, "modules", -> )
+    ENV.PERMISSIONS = { manage: options.canManage }
 
     view = new AssignmentListItemView(model: model)
     view.$el.appendTo $('#fixtures')
     view.render()
 
-    AssignmentListItemView.prototype.canManage.restore()
-    AssignmentListItemView.prototype.modules.restore()
-
     view
 
   module 'AssignmentListItemViewSpec',
     setup: ->
+      ENV.PERMISSIONS = {manage: false}
+
       @model = assignment1()
+      @submission = new Backbone.Model
+      @view = createView(@model, canManage: false)
+      screenreaderText = =>
+        $.trim @view.$('.js-score .screenreader-only').text()
+      nonScreenreaderText = =>
+        $.trim @view.$('.js-score .non-screenreader').text()
+
+    teardown: ->
+      ENV.PERMISSIONS = {}
+      $('#fixtures').empty()
 
   test "initializes child views if can manage", ->
     view = createView(@model, canManage: true)
     ok view.publishIconView
-    ok view.vddDueTooltipView
+    ok view.dateDueColumnView
+    ok view.dateAvailableColumnView
+    ok view.moveAssignmentView
     ok view.editAssignmentView
 
   test "initializes no child views if can't manage", ->
@@ -99,22 +112,16 @@ define [
     ok !view.editAssignmentView
 
   test "upatePublishState toggles ig-published", ->
-    view = createView(@model)
-
-    sinon.stub( AssignmentListItemView.prototype, "canManage", -> true )
-    sinon.stub( AssignmentListItemView.prototype, "modules", -> )
+    view = createView(@model, canManage: true)
 
     ok view.$('.ig-row').hasClass('ig-published')
     @model.set('published', false)
-    @model.save
+    @model.save()
     ok !view.$('.ig-row').hasClass('ig-published')
 
-    AssignmentListItemView.prototype.canManage.restore()
-    AssignmentListItemView.prototype.modules.restore()
-
-
   test "delete destroys model", ->
-    window.ENV = {context_asset_string: "course_1"}
+    old_asset_string = ENV.context_asset_string
+    ENV.context_asset_string = "course_1"
 
     view = createView(@model)
     sinon.spy view.model, "destroy"
@@ -122,3 +129,35 @@ define [
     view.delete()
     ok view.model.destroy.called
     view.model.destroy.restore()
+
+    ENV.context_asset_string = old_asset_string
+
+  test "updating grades from model change", ->
+    @submission.set 'grade', 1.5555
+    @model.set 'submission', @submission
+    @model.trigger 'change:submission'
+
+    equal screenreaderText(), 'Score: 1.56 out of 2 points', 'sets screenreader text'
+    equal nonScreenreaderText(), '1.56/2 pts', 'sets non-screenreader text'
+
+    @model.set 'submission', null
+    equal screenreaderText(), 'No submission for this assignment. 2 points possible.',
+      'sets screenreader text for null points'
+    equal nonScreenreaderText(), '-/2 pts',
+      'sets non-screenreader text for null points'
+
+    @submission.set 'grade', 0
+    @model.set 'submission', @submission
+
+    equal screenreaderText(), 'Score: 0 out of 2 points',
+      'sets screenreader text for 0 points'
+    equal nonScreenreaderText(), '0/2 pts',
+      'sets non-screenreader text for 0 points'
+
+    @submission.set 'notYetGraded', true
+    @model.set 'submission', @submission
+    @model.trigger 'change:submission'
+    equal screenreaderText(), 'Assignment not yet graded. 2 points possible.',
+      'sets correct screenreader text for not yet graded'
+    equal nonScreenreaderText(), 'Not Yet Graded/2 pts',
+      'sets correct non-screenreader text for not yet graded'

@@ -18,7 +18,7 @@
         <div id="meta-data-<%= message.id %>">
             <table class="table table-condensed grid">
                 <tbody>
-                <% unless Rails.env =~ /prod/ %>
+                <% unless Rails.env.production? %>
                 <tr>
                     <td class="td-label"><div>ID</div></td>
                     <td><%= message.id %></td>

@@ -14,7 +14,7 @@
   </a>
   <div class="ig-details row-fluid">
     {{#if canManage}}
-      <div class="span3 ellipses modules">
+      <div class="{{spanWidth}} ellipses modules">
         {{#if has_modules}}
           {{#ifEqual module_count 1}}
             {{module_name}} {{#t "module"}}Module{{/t}}
@@ -35,12 +35,22 @@
       </div>
     {{/if}}
 
-    <div class="span3 ellipses" data-view="date-available"></div>
-    <div class="span3 ellipses" data-view="date-due"></div>
+    <div class="{{spanWidth}} ellipses" data-view="date-available"></div>
+    <div class="{{spanWidth}} ellipses" data-view="date-due"></div>
 
-    <div class="span3 ellipses">
-      {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}
+    <div class="{{spanWidth}} ellipses js-score {{alignTextClass}}">
+      <span class="screenreader-only">
+        {{#if pointsPossible}}
+          {{#t "points_possible_screen_reader"}}{{pointsPossible}} Points Possible{{/t}}
+        {{else}}
+          {{#t "no_points_possible"}}No Points Possible{{/t}}
+        {{/if}}
+      </span>
+      <span class="non-screenreader" aria-hidden="true">
+        {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}
+      </span>
     </div>
+
   </div>
 
   {{#if canManage}}

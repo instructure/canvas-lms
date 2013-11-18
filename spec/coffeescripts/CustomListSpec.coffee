@@ -1,8 +1,8 @@
 define [
   'jquery'
   'compiled/widget/CustomList'
-  'helpers/simulateClick'
-], ($,CustomList, simulateClick)->
+  'helpers/jquery.simulate'
+], ($,CustomList)->
   module 'CustomList',
     setup: ->
       @el = $("""<div>
@@ -146,19 +146,19 @@ define [
 
   test 'should remove and add the first item', ->
     # store original length to compare to later
-    originalLength = @list.targetList.children().length
+    originalLength = @list.pinned.length
 
     # click an element to remove it from the list
-    simulateClick( @lis[0] )
+    $(@lis[0]).simulate('click')
 
     # this next click should get ignored because the previous element is animating
-    simulateClick( @lis[1] )
+    $(@lis[1]).simulate('click')
 
     @clock.tick 300
     expectedLength = originalLength - 1
     equal @list.pinned.length, expectedLength, 'only one item should have been removed'
 
-    simulateClick( @lis[0] )
+    $(@lis[0]).simulate('click')
     @clock.tick 300
     equal @list.pinned.length, originalLength, 'item should be restored'
 
@@ -176,19 +176,19 @@ define [
     equal @list.requests.add[16], undefined, 'delete "add" request'
 
   test 'should cancel pending remove request on add', ->
-    el = jQuery @lis[1]
-    item = @list.pinned.findBy('id', 1)
+    el = jQuery @lis[0]
+    item = @list.pinned.findBy('id', 0)
     @list.remove(item, el)
     @clock.tick 300
-    ok @list.requests.remove[1], 'create a "remove" request'
+    ok @list.requests.remove[0], 'create a "remove" request'
 
-    @list.add 1, el
+    @list.add 0, el
     @clock.tick 300
-    equal @list.requests.remove[1], undefined, 'delete "remove" request'
+    equal @list.requests.remove[0], undefined, 'delete "remove" request'
 
   test 'should reset', ->
     originalLength = @list.targetList.children().length
-    simulateClick @lis[0]
+    $(@lis[0]).simulate('click')
     @clock.tick 300
     ok originalLength isnt @list.targetList.children().length, 'length should be different'
 

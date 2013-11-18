@@ -15,6 +15,8 @@ css_compressor: 'sass'
 javascripts:
 
 stylesheets:
+  course_show: 
+    - public/stylesheets/compiled/course_show.css
   content_migrations: 
     - public/stylesheets/compiled/content_migrations.css
   vendor:
@@ -75,6 +77,8 @@ stylesheets:
     - public/stylesheets/compiled/calendar/sidebar.css
     - public/stylesheets/compiled/calendar/scheduler.css
     - public/stylesheets/compiled/calendar/calendarHeader.css
+  agenda_view:
+    - public/stylesheets/compiled/agenda_view.css
   course_settings:
     - public/stylesheets/compiled/course_settings.css
     - public/stylesheets/compiled/external_tools.css

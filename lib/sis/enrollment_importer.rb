@@ -45,12 +45,8 @@ module SIS
         Course.where(:id => batch).update_all(:updated_at => Time.now.utc)
       end
       i.courses_to_recache_due_dates.to_a.in_groups_of(1000, false) do |batch|
-        # do a transaction so the find_each will use a cursor, and avoid the sorting
-        # by id
-        Assignment.transaction do
-          Assignment.where(context_id: batch, context_type: 'Course').select(:id).find_each do |a|
-            DueDateCacher.recompute(a)
-          end
+        batch.each do |course_id|
+          DueDateCacher.recompute_course(course_id)
         end
       end
       # We batch these up at the end because normally a user would get several enrollments, and there's no reason

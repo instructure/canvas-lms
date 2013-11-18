@@ -47,7 +47,7 @@ class ErrorsController < ApplicationController
   end
 
   def error_search_enabled?
-    Setting.get_cached("error_search_enabled", "true") == "true"
+    Setting.get("error_search_enabled", "true") == "true"
   end
   helper_method :error_search_enabled?
 end

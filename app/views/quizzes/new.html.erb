@@ -156,7 +156,7 @@
     </ul>
 
     <div id="options_tab">
-      <% form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :id => "quiz_options_form", :class => 'form-horizontal bootstrap-form'} do %>
+      <%= form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :id => "quiz_options_form", :class => 'form-horizontal bootstrap-form'} do %>
         <div style="position: relative;">
           <div style="margin: 15px 0 25px;">
             <%= before_label(:quiz_instructions, "Quiz Instructions") %>

@@ -49,6 +49,7 @@ module Api::V1::Conversation
         conversation.messages.human.where(:asset_id => nil).count
     end
     result[:audience] = audience.map(&:id)
+    result[:audience].map!(&:to_s) if stringify_json_ids?
     result[:audience_contexts] = contexts_for(audience, conversation.local_context_tags)
     result[:avatar_url] = avatar_url_for(conversation, explicit_participants)
     result[:participants] = conversation_users_json(participants, current_user, session, options)

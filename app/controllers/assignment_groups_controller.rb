@@ -73,6 +73,11 @@ class AssignmentGroupsController < ApplicationController
         assignment_includes = [:rubric, :quiz, :external_tool_tag]
         assignment_includes.concat(params[:include] & [:discussion_topic])
         assignment_includes.concat(params[:include] & [:all_dates])
+        if params[:include].include? "module_ids"
+          assignment_includes.concat [{:discussion_topic => :context_module_tags},
+                                      {:quiz => :context_module_tags},
+                                      :context_module_tags]
+        end
         @groups = @groups.includes(:active_assignments => assignment_includes)
 
         assignment_descriptions = @groups
@@ -100,6 +105,7 @@ class AssignmentGroupsController < ApplicationController
           json = @groups.map { |g|
             g.context = @context
             assignment_group_json(g, @current_user, session, params[:include],
+                                  stringify_json_ids: stringify_json_ids?,
                                   override_assignment_dates: override_dates,
                                   preloaded_user_content_attachments: user_content_attachments)
           }

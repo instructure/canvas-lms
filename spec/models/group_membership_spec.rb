@@ -300,27 +300,31 @@ describe GroupMembership do
       @assignments.last.save!
     end
 
-    it "triggers when membership is created" do
-      DueDateCacher.expects(:recompute).with(@assignments[0].id).once
-      DueDateCacher.expects(:recompute).with(@assignments[1].id).once
-      DueDateCacher.expects(:recompute).with(@assignments[2].id).never
+    it "triggers a batch when membership is created" do
+      DueDateCacher.expects(:recompute).never
+      DueDateCacher.expects(:recompute_course).with { |course_id, assignment_ids|
+        course_id == @course.id && assignment_ids.sort == [@assignments[0].id, @assignments[1].id].sort
+      }.once
       @group.group_memberships.create(:user => user)
     end
 
-    it "triggers when membership is deleted" do
-      DueDateCacher.expects(:recompute).with(@assignments[0].id).once
-      DueDateCacher.expects(:recompute).with(@assignments[1].id).once
-      DueDateCacher.expects(:recompute).with(@assignments[2].id).never
+    it "triggers a batch when membership is deleted" do
+      DueDateCacher.expects(:recompute).never
+      DueDateCacher.expects(:recompute_course).with { |course_id, assignment_ids|
+        course_id == @course.id && assignment_ids.sort == [@assignments[0].id, @assignments[1].id].sort
+      }.once
       @membership.destroy
     end
 
     it "does not trigger when nothing changed" do
       DueDateCacher.expects(:recompute).never
+      DueDateCacher.expects(:recompute_course).never
       @membership.save
     end
 
     it "does not trigger when it's an account group" do
       DueDateCacher.expects(:recompute).never
+      DueDateCacher.expects(:recompute_course).never
       @group = Account.default.groups.create!(:name => 'Group!')
       @group.group_memberships.create!(:user => user)
     end

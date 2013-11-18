@@ -72,15 +72,6 @@ Canvas::Plugin.register('kaltura', nil, {
   :settings_partial => 'plugins/kaltura_settings',
   :validator => 'KalturaValidator'
 })
-Canvas::Plugin.register('dim_dim', :web_conferencing, {
-  :name => lambda{ t :name, "DimDim" },
-  :description => lambda{ t :description, "DimDim web conferencing support" },
-  :website => 'http://www.dimdim.com',
-  :author => 'Instructure',
-  :author_website => 'http://www.instructure.com',
-  :version => '1.0.0',
-  :settings_partial => 'plugins/dim_dim_settings'
-})
 Canvas::Plugin.register('wimba', :web_conferencing, {
   :name => lambda{ t :name, "Wimba" },
   :description => lambda{ t :description, "Wimba web conferencing support" },

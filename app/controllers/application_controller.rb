@@ -172,7 +172,7 @@ class ApplicationController < ActionController::Base
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
-    if !files_domain? && Setting.get_cached('block_html_frames', 'true') == 'true' && !@embeddable
+    if !files_domain? && Setting.get('block_html_frames', 'true') == 'true' && !@embeddable
       headers['X-Frame-Options'] = 'SAMEORIGIN'
     end
     true
@@ -889,7 +889,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  if Rails.version < "3.0"
+  if CANVAS_RAILS2
     rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
   else
     ActionDispatch::ShowExceptions.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
@@ -1209,6 +1209,8 @@ class ApplicationController < ActionController::Base
         !!Tinychat.config
       elsif feature == :scribd
         !!ScribdAPI.config
+      elsif feature == :scribd_html5
+        ScribdAPI.config && ScribdAPI.config[:enable_html5_viewer]
       elsif feature == :crocodoc
         !!Canvas::Crocodoc.config
       elsif feature == :lockdown_browser
@@ -1544,7 +1546,7 @@ class ApplicationController < ActionController::Base
     data
   end
 
-  unless CANVAS_RAILS3
+  if CANVAS_RAILS2
     filter_parameter_logging *LoggingFilter.filtered_parameters
   end
 
@@ -1596,7 +1598,7 @@ class ApplicationController < ActionController::Base
 
     if @page
       hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session)
-      hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? current_version.number : nil
+      hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? Api.stringify_json_id(current_version.number) : nil
       hash[:WIKI_PAGE_SHOW_PATH] = polymorphic_path([@context, :named_page], :wiki_page_id => @page)
       hash[:WIKI_PAGE_EDIT_PATH] = polymorphic_path([@context, :edit_named_page], :wiki_page_id => @page)
       hash[:WIKI_PAGE_HISTORY_PATH] = polymorphic_path([@context, @page, :wiki_page_revisions])

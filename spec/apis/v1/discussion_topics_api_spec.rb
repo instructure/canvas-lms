@@ -995,6 +995,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :message => @message, :attachment => data })
       @entry = DiscussionEntry.find_by_id(json['id'])
       @entry.attachment.should_not be_nil
+      @entry.attachment.context.should eql @user
     end
 
     it "should include attachments on replies to top-level entries" do
@@ -1009,6 +1010,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :message => @message, :attachment => data })
       @entry = DiscussionEntry.find_by_id(json['id'])
       @entry.attachment.should_not be_nil
+      @entry.attachment.context.should eql @user
     end
 
     it "should include attachment info in the json response" do
@@ -1022,6 +1024,7 @@ describe DiscussionTopicsController, :type => :integration do
         { :message => @message, :attachment => data })
       json['attachment'].should_not be_nil
       json['attachment'].should_not be_empty
+      json['attachment']['url'].should be_include 'verifier='
     end
 
     it "should create a submission from an entry on a graded topic" do
@@ -1837,6 +1840,8 @@ describe DiscussionTopicsController, :type => :integration do
 
       @all_entries.each &:reload
 
+      # materialized view jobs are now delayed
+      Timecop.travel(Time.now + 20.seconds)
       run_jobs
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
@@ -1933,6 +1938,8 @@ describe DiscussionTopicsController, :type => :integration do
       @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')
       @root1 = @topic.reply_from(:user => @student, :html => "root1")
 
+      # materialized view jobs are now delayed
+      Timecop.travel(Time.now + 20.seconds)
       run_jobs
 
       # make everything slightly in the past to test updating

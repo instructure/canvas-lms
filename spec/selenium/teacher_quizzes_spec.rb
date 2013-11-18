@@ -189,9 +189,9 @@ describe "quizzes" do
           click_save_settings_button
           wait_for_ajax_requests
         end
-        quiz.reload
-        quiz.versions.length.should == 3
       }
+      quiz.reload
+      quiz.versions.length.should == 3
 
       # Shows speedgrader when published
       f('.icon-speed-grader').should_not be_nil

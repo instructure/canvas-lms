@@ -1090,7 +1090,7 @@ describe "context_modules" do
 
       @students = []
       4.times do |i|
-        student = User.create!(:name => "student #{i}")
+        student = User.create!(:name => "hello student #{i}")
         @course.enroll_student(student).accept!
         @students << student
       end
@@ -1104,12 +1104,10 @@ describe "context_modules" do
       # unlocked for student 3
     end
 
-    it "should show student progressions" do
+    it "should show student progressions to teachers" do
       get "/courses/#{@course.id}/modules/progressions"
       wait_for_ajaximations
 
-      f("#progression_student_#{@students[0].id}").click
-      wait_for_ajaximations
       f("#progression_student_#{@students[0].id}_module_#{@module1.id} .status").text.should include("Complete")
       f("#progression_student_#{@students[0].id}_module_#{@module2.id} .status").text.should include("Locked")
       f("#progression_student_#{@students[0].id}_module_#{@module3.id}").should be_nil
@@ -1132,6 +1130,46 @@ describe "context_modules" do
       wait_for_ajaximations
       f("#progression_student_#{@students[3].id}_module_#{@module1.id} .status").text.should include("Unlocked")
       f("#progression_student_#{@students[3].id}_module_#{@module2.id} .status").text.should include("Locked")
+    end
+
+    it "should show progression to individual students" do
+      user_session(@students[1])
+      get "/courses/#{@course.id}/modules/progressions"
+
+      wait_for_ajaximations
+      f("#progression_students").should_not be_displayed
+      f("#progression_student_#{@students[1].id}_module_#{@module1.id} .status").text.should include("In Progress")
+      f("#progression_student_#{@students[1].id}_module_#{@module1.id} .items").text.should_not include(@assignment_tag.title)
+      f("#progression_student_#{@students[1].id}_module_#{@module1.id} .items").text.should include(@external_url_tag.title)
+      f("#progression_student_#{@students[1].id}_module_#{@module2.id} .status").text.should include("Locked")
+    end
+
+    it "should show multiple student progressions to observers" do
+      @observer = user
+      @course.enroll_user(@observer, 'ObserverEnrollment', {:allow_multiple_enrollments => true,
+                                                            :associated_user_id => @students[0].id})
+      @course.enroll_user(@observer, 'ObserverEnrollment', {:allow_multiple_enrollments => true,
+                                                            :associated_user_id => @students[2].id})
+
+      user_session(@observer)
+
+      get "/courses/#{@course.id}/modules/progressions"
+      wait_for_ajaximations
+
+      f("#progression_student_#{@students[1].id}").should be_nil
+      f("#progression_student_#{@students[3].id}").should be_nil
+
+      wait_for_ajaximations
+      f("#progression_student_#{@students[0].id}_module_#{@module1.id} .status").text.should include("Complete")
+      f("#progression_student_#{@students[0].id}_module_#{@module2.id} .status").text.should include("Locked")
+      f("#progression_student_#{@students[0].id}_module_#{@module3.id}").should be_nil
+
+      f("#progression_student_#{@students[2].id}").click
+      wait_for_ajaximations
+      f("#progression_student_#{@students[2].id}_module_#{@module1.id} .status").text.should include("In Progress")
+      f("#progression_student_#{@students[2].id}_module_#{@module1.id} .items").text.should include(@assignment_tag.title)
+      f("#progression_student_#{@students[2].id}_module_#{@module1.id} .items").text.should_not include(@external_url_tag.title)
+      f("#progression_student_#{@students[2].id}_module_#{@module2.id} .status").text.should include("Locked")
     end
   end
 end

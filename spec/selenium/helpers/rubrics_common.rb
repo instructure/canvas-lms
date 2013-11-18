@@ -46,7 +46,7 @@ def should_edit_a_rubric
   rubric = Rubric.last
   f('.edit_rubric_link').click
   replace_content(ff("#rubric_#{rubric.id} .rubric_title input")[1], edit_title)
-  submit_form(ff("#rubric_#{rubric.id} #edit_rubric_form")[2])
+  submit_form(ff("#rubric_#{rubric.id} #edit_rubric_form")[1])
   wait_for_ajaximations
   keep_trying_until do
     rubric.reload

@@ -1382,8 +1382,6 @@ ar:
     imported_assignments_group: "المهام التي تم استيرادها"
     labels: 
       due: "موعد الاستحقاق"
-    messages: 
-      assignment_created: "تم إنشاء المهمة \"%{assignment}\""
     name_is_required: "الاسم مطلوب !"
     points_possible: "يجب أن تكون النقاط الممكنة أكثر من 0 لتصنيف النسبة المئوية"
     select_external_tool_dialog_title: "تهيئة الأداة الخارجية"
@@ -1399,9 +1397,6 @@ ar:
       a_website_url: "عنوان URL لموقع ويب"
     titles: 
       grading_scheme_info: "عرض/تحرير نظام تقييم الدرجات"
-    warnings: 
-      group_assignment: "المهمة \"%{assignment}\" هي مهمة المجموعة، وستحتاج إلى إعادة ضبط إعدادات المجموعة من أجل هذا السياق الجديد"
-      peer_assignment: "المهمة \"%{assignment}\" هي مهمة مراجعة نظيرة، وستحتاج إلى إعادة ضبط إعدادات المراجعة النظيرة من أجل هذا السياق الجديد"
   assignment_details_dialog: 
     average_score: "متوسط مجموع النقاط:"
     count_of_submissions: "%{cnt} إرسالاً/إرسالات"
@@ -1524,8 +1519,18 @@ ar:
       move: "انتقال إلى&hellip;"
       move_assignment_title: "نقل المهمة"
       multiple_modules: "وحدات متعددة"
+      no_points_possible: "لا توجد نقاط ممكنة"
       points_possible: "%{pointsPossible} نقاط"
+      points_possible_screen_reader: "%{pointsPossible} نقطة/نقاط ممكنة"
       settings: إعدادات
+    assignment_list_item_score: 
+      assignment_not_yet_graded_screenreader: "لم يتم تقييم المهمة حتى الآن. %{pointsPossible} نقطة/نقاط ممكنة."
+      no_submission: "لا يوجد إرسال"
+      no_submission_for_assignment_screenreader: "لا يوجد إرسال لهذه المهمة. %{pointsPossible} نقطة/نقاط ممكنة."
+      no_submission_with_points_possible: "-/%{pointsPossible} نقطة/نقاط"
+      not_yet_graded_with_points_possible: "*لم يتم التقييم بعد*/%{pointsPossible} نقطة/نقاط"
+      score_with_points_possible: "%{grade}/%{pointsPossible} نقطة/نقاط"
+      score_with_points_possible_screenreader: "النقاط: %{grade} من %{pointsPossible} نقطة/نقاط"
     assignment_locked: 
       assignment_locked: "تم تأمين هذه المهمة مثل *%{lock_at}*"
       assignment_unlocked_from: "تم تأمين هذه المهمة حتى *%{unlock_at}*"
@@ -1582,6 +1587,7 @@ ar:
       delete_group: "حذف المجموعة"
       submit_assignment: "إرسال المهمة"
     cannot_delete_group: "يجب أن يكون لديك مجموعة مهام واحدة على الأقل"
+    cant_unpublish_when_students_submit: "لا يمكن إلغاء النشر في حالة وجود عمليات إرسال لطالب"
     confirm: 
       delete_assignment: "هل ترغب بالتأكيد في حذف هذه المهمة؟"
       delete_group: "هل ترغب بالتأكيد في حذف هذه المجموعة؟"
@@ -2301,6 +2307,10 @@ ar:
     last_formula_row: "سيتم استخدام صف الصيغة الأخيرة لحساب النتيجة النهائية"
     sample_final_answer: "وهذه القيمة تعد مثالاً على النتيجة النهائية لنوع السؤال هذا"
   calendar: 
+    agenda_view: 
+      delete: حذف
+      due: "موعد الاستحقاق"
+      edit: تحرير
     appointment_group_deletion_details: "سيؤدي حذفه إلى حذف أي مواعيد قام الطلاب بالاشتراك فيها"
     appointment_group_list: 
       location: "الموقع:"
@@ -2322,13 +2332,16 @@ ar:
       create_event: "إنشاء حدث جديد"
       done_go_back_to_list: "تم. يرجى العودة إلى القائمة"
       links: 
+        calendar_agenda: "جدول الأعمال"
         calendar_month: الشهر
         calendar_scheduler: المجدوِّل
         calendar_week: الأسبوع
+      loading: تحميل
       my_appointment_groups: "مجموعات المواعيد الخاصة بي"
       refresh: تحديث
       use_old_calendar: "التقويم القديم"
     calendar_navigator: 
+      enter_jump_date: "أدخل تاريخًا ثم اضغط على enter للانتقال إلى ذلك التاريخ."
       next: التالي
       previous: السابق
       today: اليوم
@@ -2425,6 +2438,7 @@ ar:
       slots_available: "الأجزء الزمنية المتاحة"
     event_event_title: "عنوان الحدث:"
     event_on_this_day: "يوجد حدث في هذا اليوم"
+    invalid_date: "تاريخ غير صالح"
     labels: 
       due: "موعد الاستحقاق"
     message_participants: 
@@ -3421,6 +3435,7 @@ ar:
         modules: 
           before_students_view: "قبل أن يتمكن الطلاب من عرض هذه الوحدة"
         new_tab: "تحميل هذه الأداة في علامة تبويب جديدة"
+        publish_final_grade: "نشر التقييم النهائي للطالب عند إكمال هذه الوحدة"
         require_sequential_progress: "يجب أن ينتقل الطلاب عبر المتطلبات الضرورية في هذه الوحدة بترتيب تسلسلي"
         sort_by: "فرز حسب"
         title: العنوان
@@ -3900,6 +3915,7 @@ ar:
       slide7: "الشريحة 7"
       slide8: "الشريحة 8"
       slide9: "الشريحة 9"
+  correct_answer: "كانت هذه الإجابة الصحيحة."
   course: 
     access_denied: "تم رفض الوصول"
     batch_update_message: 
@@ -4261,6 +4277,7 @@ ar:
       headings: 
         future_enrollments: "عمليات الالتحاق المستقبلية"
         my_courses: "المساقات الخاصة بي"
+        my_groups: مجموعاتي
         past_enrollments: "التسجيلات الماضية"
       start_new_course: "بدء مساق جديد"
       titles: 
@@ -4512,41 +4529,35 @@ ar:
     show: 
       acting_as: "إنك تقوم حاليًا بعرض هذا المساق بدور: %{enrollment_type}. سيتوفر لك فقط أذونات والوصول إلى مستخدمي هذا الدور."
       buttons: 
-        update_layout: "تحديث التخطيط"
+        update_layout: حفظ
       details: 
-        assignments: "يوضح هذا العرض **قائمة مهام** هذا المساق، بالمهام القادمة والحديثة بأعلى."
         confirm_unenroll: "هل ترغب بالتأكيد في إلغاء التسجيل في هذا المساق؟ لن يعود بإمكانك مشاهدة كشف المساق أو الاتصال مباشرة بالمعلمين، ولن تعود قادرًا على مشاهدة أحداث المساق في التدفق وكإعلامات."
-        custom_page: "يمكنك **تصميم الصفحة الرئيسية للمساق** وتضمين أي ارتباطات أو صور أو وسائط تريدها."
-        modules: |-
-            يمكنك تنظيم المساق في **وحدات أو أقسام**، حيث يحتوي كل قسم على مجموعة ملفات ومهام وصفحات ذات صلة.  عند الرغبة، يمكنك أيضًا ترتيب الوحدات عن طريق تعريف المعايير والمتطلبات الأساسية التي تحتاج للاستكمال قبل إلغاء تأمين كل وحدة.
-            
-            ولعل هذا المخطط هو الأفضل للمساقات التي لا تعتمد على جدول زمني معين مثل فصل دراسي أو نصف سنة دراسية.
-        recent_activity_dashboard: "تسمح **لوحة معلومات النشاط الحديثة **  للمشاركين بالاطلاع على أحدث المحادثات، والإعلانات والمناقشات والتفاعلات لهذه الدورة. إنها تشبه إلى حد بعيد صفحة لوحة المعلومات التي يشاهدها المستخدمون عند تسجيل الدخول لأول مرة، لكنها تعرض فقط محتوى هذه الدورة التدريبية المحددة.\n"
-        syllabus: "ويتيح لك **عرض المناهج** كتابة وصف توقعات المساق أو تقديم المساق مع الارتباطات والصور، ثم يعرض أيضًا عرض تقويم بكل المهام وأحداث المساق."
       empty_body: "لا يوجد محتوى"
       headings: 
         confirm_unenroll: "تأكيد إلغاء التسجيل"
+        edit_homepage_title: "تحرير الصفحة الرئيسية"
         importing: "يجري استيراد هذا المساق"
         set_layout: "ضبط تخطيط الصفحة الرئيسية"
         unpublished: "هذا المساق غير منشور"
       importing: "نسخ المساق/الترحيل قيد التقدم. يعني هذا أن بعض المحتوى قد لا يتاح مؤقتًا."
       labels: 
-        set_layout: "عندما يزور الأشخاص صفحة المساق، اعرض لهم"
+        set_layout: "حدد ما ترغب في عرضه على الصفحة الرئيسية."
       license_notice: "يتوفر محتوى هذا المساق بموجب ترخيص %{license_type}. يمكن تطبيق هذا الترخيص على المحتوى الوارد في هذا المساق ما لم يذكر خلاف ذلك."
       links: 
         change_layout: "تغيير تخطيط الصفحة الرئيسية"
         course_setup: "قائمة اختيار إعداد المساق"
-        course_stream: "مشاهدة تدفق المساق"
         drop_course: "إسقاط هذا المساق"
+        edit_homepage: "تحرير الصفحة الرئيسية"
         join_course: "الانضمام لهذا المساق"
         new_announcement: "إعلان جديد"
         restore_role: "استعادة الدور والأذونات"
+        view_course_stream: "عرض تدفق المساق"
       options: 
         assignments: "قائمة المهام"
-        custom_page: "الصفحة التي سأصممها بنفسي"
-        modules: "أقسام/وحدات المساق"
-        recent_activity_dashboard: "لوحة معلومات النشاط الحديثة"
-        syllabus: "المهام مع المناهج"
+        custom_page: "الصفحة الأمامية للصفحات"
+        modules: "وحدات المساق"
+        recent_activity_dashboard: "لوحة تحكم النشاط الأخير"
+        syllabus: المناهج
       period_name: "الأسبوعان الأخيران"
       re_sending: "جارٍ إعادة الإرسال..."
       send_done: "تم! قد تستغرق الرسالة بضع دقائق."
@@ -4837,6 +4848,7 @@ ar:
       short: "%b %e"
       short_month: "%b"
       short_weekday: "%a"
+      short_with_weekday: "%a، %b %-d"
       weekday: "%A"
     month_names: 
       - ~
@@ -5038,7 +5050,6 @@ ar:
   discussion_entry: 
     atom_no_author: "بلا مؤلف"
     default_user_name: "اسم المستخدم"
-    file_added_warning: "تمت إضافة الملف \"%{file_path}\" الذي يعد ضروريًا للإدخال في الموضوع \"%{discussion_topic_title}\""
   discussion_topic: 
     atom_no_author: "بلا مؤلف"
     default_title: "بلا عنوان"
@@ -5140,8 +5151,6 @@ ar:
     error_draft_state_announcement: "لا يمكن تعيين هذا الموضوع على حالة المسودة. إنه إعلان."
     error_draft_state_unauthorized: "ليس لديك إذن لتعيين هذا الموضوع على حالة المسودة."
     error_draft_state_with_posts: "لا يمكن تعيين هذا الموضوع على حالة المسودة لأنه يحتوي على منشورات."
-    errors: 
-      bad_scope: "النطاق متناقض"
     group_assignment_discussion_entry: 
       posts: 
         few: "%{count} من النشرات"
@@ -5760,10 +5769,9 @@ ar:
       education_levels: "مستوى/مستويات التعليم"
       extensions: الامتدادات
       help_link: "ارتباط التعليمات"
-      privacy_level: "مستوى الخصوصية"
       rate_tool: "تقييم هذه الأداة"
     app_review_view: 
-      posted_by_on: "تم النشر من قبل *%{user_name}* في *%{created}*"
+      posted_by_on: "تم الإرسال بواسطة *%{user.name}* في *%{created_at}*"
     app_saved_message: "تم حفظ %{app} بنجاح"
     borderless_launch: 
       load_tool_button: "تحميل %{tool} يدويًا"
@@ -6195,9 +6203,13 @@ ar:
     students_who: 
       havent_been_graded: "لم يتم تصحيحها"
       havent_submitted_yet: "لم يتم الإرسال بعد"
+      no_grade_for: "لا توجد درجات لـ %{assignment}"
+      no_submission_for: "لا يوجد إرسال لـ %{assignment}"
       not_submitted_yet: "لم يتم الإرسال بعد"
       scored_less_than: "تم إحراز نقاط أقل من"
+      scored_less_than_on: "تم إحراز درجات أقل من %{cutoff} في %{assignment}"
       scored_more_than: "تم إحراز نقاط أكثر من"
+      scored_more_than_on: "تم إحراز درجات أكثر من %{cutoff} في %{assignment}"
     submission_information: "معلومات الإرسال"
     teacher_muted_title: "تم حجب المهمة"
     titles: 
@@ -6292,8 +6304,13 @@ ar:
     students_who: 
       havent_been_graded: "لم يتم تصحيحها"
       havent_submitted_yet: "لم يتم الإرسال بعد"
+      no_grade_for: "لا توجد درجات لـ %{assignment}"
+      no_submission_for: "لا يوجد إرسال لـ %{assignment}"
+      not_submitted_yet: "لم يتم الإرسال بعد"
       scored_less_than: "تم إحراز نقاط أقل من"
+      scored_less_than_on: "تم إحراز درجات أقل من %{cutoff} في %{assignment}"
       scored_more_than: "تم إحراز نقاط أكثر من"
+      scored_more_than_on: "تم إحراز درجات أكثر من %{cutoff} في %{assignment}"
     submitted_late: "تم إرساله متأخرًا"
     title: 
       quiz: "إرسال الاختبار"
@@ -6655,6 +6672,7 @@ ar:
         add_comment: "إضافة تعليق"
         average: المتوسط
         grade: الدرجة
+        grade_by_question_beta: "الدرجات حسب السؤال (بيتا)"
         group_comment: "إرسال تعليق إلى المجموعة بالكامل"
         hide_names: "إخفاء أسماء الطلاب في SpeedGrader"
         show_assessment_by: "عرض تقييم بواسطة"
@@ -6784,6 +6802,8 @@ ar:
   group: 
     default_collection_name: "مجموعة %{group_name}"
     memeber: العضو
+    name_required: "الاسم مطلوب"
+    name_too_long: "أدخل اسمًا أقل طولاً للمجموعة"
     tabs: 
       chat: الدردشة
       discussions: المناقشات
@@ -6919,7 +6939,7 @@ ar:
       page_title: "مجموعات المساق"
       page_title_accounts: "مجموعات الحسابات"
     create_group_set: "إنشاء مجموعة مجموعات"
-    delete_confirm: "هل ترغب بالتأكيد في إزالة فئة المجموعة هذه؟"
+    delete_confirm: "هل ترغب بالتأكيد في إزالة مجموعة المجموعات هذه؟"
     edit: 
       buttons: 
         update: "تحديث المجموعة"
@@ -6947,8 +6967,8 @@ ar:
       update_failed: "فشل التحديث، حاول مرة أخرى"
     feed_title: "موجز %{course_or_account_name}"
     flash: 
-      removeError: "يتعذر حذف فئة المجموعة. الرجاء المحاولة مرة أخرى لاحقًا."
-      removed: "تمت إزالة فئة المجموعة بنجاح."
+      removeError: "تتعذر إزالة مجموعة المجموعات. الرجاء المحاولة مرة أخرى لاحقًا."
+      removed: "تمت إزالة مجموعة المجموعات بنجاح."
     group: 
       actions: 
         ask_to_join_group: "طلب الانضمام إلى هذه المجموعة"
@@ -6967,14 +6987,8 @@ ar:
       no_members: "لا يوجد أعضاء"
       one: "مجموعة واحدة"
       other: "%{count} مجموعة (مجموعات)"
-    group_count: 
-      few: "%{count} من المجموعات"
-      many: "%{count} من المجموعات"
-      one: "%{count} من المجموعات"
-      other: "%{count} من المجموعات"
-      two: "%{count} من المجموعات"
-      zero: "%{count} من المجموعات"
     group_name: "اسم المجموعة"
+    groups_count: "المجموعات (%{count})"
     index: 
       heading_current_groups: "المجموعات الحالية"
       no_groups: "لا توجد مجموعات"
@@ -6991,7 +7005,10 @@ ar:
         too_short: "يرجى إدخال مصطلح بحث يتكون من 3 أحرف أو أكثر"
       assign_to_group_menu: 
         add_to_group: "إضافة إلى المجموعة"
+        all_groups_full: "كل المجموعات ممتلئة."
+        all_groups_full_suggestion: "يجب إما تغيير حدود المجموعة أو إضافة مزيد من المجموعات."
         assign_user_to_group: "تعيين المستخدم إلى هذه المجموعة"
+        no_groups_created: "يجب إنشاء المجموعات قبل إضافة المستخدمين."
       group: 
         add_user_to_group: "تعين المستخدم إلى المجموعة"
         group_delete: حذف
@@ -6999,11 +7016,18 @@ ar:
         group_settings: إعدادات
         show_group_details: "إظهار تفاصيل المجموعة"
       group_categories: 
-        group_set_create: "إضافة تعيين المجموعة"
+        account_group_explanation: "تعد مجموعات الطلاب على مستوى الحساب طريقة جيدة لتجميع الطلاب دون ربطهم بمساق خاص. بحيث تحصل كل مجموعة طلاب على تقويم ولوحة مناقشة وأدوات تعاون حتى يستطيعوا تنظيم أنفسهم والعمل معًا بفعالية أكبر."
+        add_group_set: "إضافة مجموعة مجموعات"
+        course_group_explanation: "تعد مجموعات الطلاب طريقة مفيدة لتنظيم الطلاب لإنجاز المشروعات أو أوراق المجموعات. بحيث تحصل كل مجموعة طلاب على تقويم ولوحة مناقشة وأدوات تعاون حتى يستطيعوا تنظيم أنفسهم والعمل معًا بفعالية أكبر."
+        group_assignment_instructions: "يمكنك عشوائيًا تعيين الطلاب إلى مجموعات من حجم خاص، أو إنشاء المجموعات وتنظيمها يدويًا.  وبمجرد أن يتم إنشاء مجموعاتك، يمكنك ضبط مهام بحيث تصبح مهام \"إرسال المجموعة\"، مما يعني أن كل مجموعة ستحتوي على كل إرسال واحد لجميع مستخدمي تلك المجموعة. "
+        group_set: "مجموعة المجموعات"
+        headings: 
+          account_groups: "مجموعات الطلاب على مستوى الحساب"
+          course_groups: "مجموعات الطلاب"
       group_category: 
         randomly_assigning_students: "تعيين الطلاب عشوائيًا"
-        unassigned_students: "الطلاب غير المعينين"
-        unassigned_users: "المستخدمون غير المعينين"
+        search: بحث
+        search_groups: "بحث عن مجموعات"
       group_category_create: 
         allow_self_signup: "السماح بالتسجيل الذاتي"
         cancel: إلغاء
@@ -7025,16 +7049,14 @@ ar:
         category_settings: إعدادات
         delete_category_option: حذف
         edit_category_option: تحرير
-        group_limit_blurb: "تقتصر المجموعات على *%{count}* من الأعضاء"
+        group: المجموعة
+        group_limit_blurb: "تقتصر المجموعات على *%{group_limit}* عضو/أعضاء."
         message_all_unassigned_option: "إرسال رسائل إلى كل الطلاب غير المعينين"
         randomly_assign_students_option: "تعيين الطلاب عشوائيًا"
         restricted_self_signup_blurb: "يلزم وجود كافة الطلاب الموجودين في المجموعة في نفس القسم."
-        search: بحث
         self_organized_warning: "يتم تنظيم هذه المجموعات ذاتيًا بواسطة الطلاب. وعلى عكس أنواع المجموعات الأخرى، يستطيع الطلاب أن ينضموا إلى أكثر من مجموعة واحدة من هذه المجموعات في كل مرة، لذلك فربما لا تكون هذه المجموعات هي الحل الأفضل للمهام التي تم تقييم درجاتها."
         self_signup_blurb: "تم تمكين التسجيل الذاتي لهذه المجموعات."
-        self_signup_help_tooltip: "ما مجموعات التسجيل الذاتي؟"
-        student_group_instructions: "(سحب الطلاب لتعيينهم)"
-        user_group_instructions: "(سحب المستخدمين لتعيينهم)"
+        settings: إعدادات
       group_category_edit: 
         allow_self_signup: "السماح بالتسجيل الذاتي"
         cancel: إلغاء
@@ -7044,8 +7066,6 @@ ar:
         require_same_section: "يلزم وجود أفراد المجموعة في نفس القسم"
         save: حفظ
         saving: "جارٍ الحفظ..."
-        self_signup_description: "يمكنك إنشاء مجموعات من المجموعات ويمكن للطلاب التسجيل في مجموعات يمتلكونها. ولا يزال يقتصر على الطلاب التسجيل بمجموعة واحدة بكل مجموعة مجموعات، ولكن بهذه الطريقة يمكن للطلاب تنظيم أنفسهم في مجموعات بدلاً من الحاجة إلى قيام المدرس بالعمل. لاحظ أنه ما دام هذا الخيار ممكنًا، يمكن للطلاب نقل أنفسهم من مجموعة إلى أخرى."
-        what_is_this: "ما هذا؟"
       group_edit: 
         cancel: إلغاء
         group_name: "اسم المجموعة"
@@ -7058,14 +7078,15 @@ ar:
         no_students: "لا يوجد طلاب"
         no_users: "لا يوجد مستخدمون"
       groups: 
-        groups: المجموعات
         no_groups: "لا توجد مجموعات."
-        search: بحث
-        search_groups: "بحث عن مجموعات"
+        no_matching_groups: "لا توجد مجموعات مطابقة."
       randomly_assign_members: 
         add_more_users: إلغاء
         close: موافق
         randomly_assign_students_dialog: "سيقوم هذا الإجراء تلقائيًا بتعيين جميع الطلاب غير المعينين بالتساوي بقدر الإمكان بين مجموعات الطلاب الموجودة."
+      self_signup_help: 
+        about_self_signup_groups: "حول مجموعات التسجيل الذاتي"
+        self_signup_description: "يمكنك إنشاء مجموعات من المجموعات ويمكن للطلاب التسجيل في مجموعات يمتلكونها. ولا يزال يقتصر على الطلاب التسجيل بمجموعة واحدة بكل مجموعة من المجموعات، ولكن بهذه الطريقة يمكن للطلاب تنظيم أنفسهم في مجموعات بدلاً من الحاجة إلى قيام المدرس بالعمل. لاحظ أنه ما دام هذا الخيار ممكنًا، يمكن للطلاب نقل أنفسهم من مجموعة إلى أخرى."
     member: 
       few: "%{count} من الأعضاء"
       many: "%{count} من الأعضاء"
@@ -7107,6 +7128,8 @@ ar:
     titles: 
       add_group_category: "إضافة طقم المجموعات"
       self_signup_help: "مجموعات التسجيل الذاتي"
+    unassigned_students: "الطلاب غير المعينين (%{count})"
+    unassigned_users: "المستخدمون غير المعينين (%{count})"
   help_dialog: 
     Back: عودة
     Help: تعليمات
@@ -7259,6 +7282,7 @@ ar:
       id: المعرف
       priority: الأولوية
       run_at: "يعمل عند"
+      runtime: "وقت التشغيل"
       strand: جزء
       tag: العلامة
       worker: العامل
@@ -9582,6 +9606,7 @@ ar:
     submission_comments: "تعليقات الإرسال"
     sure_you_want_to_mute: "هل ترغب بالتأكيد في حجب هذه المهمة؟ بينما تم حجب هذه المهمة، لن يتلقى الطلاب إعلامات جديدة حولها أو لن يقدروا على رؤيتها:"
   name: "مستورد القياس الأكاديمي"
+  new_facebook_message: "لديك رسالة جديدة من Canvas"
   not_applicable: "لا يوجد"
   notification: 
     added_to_conversation_description: "تمت إضافتك إلى المحادثة"
@@ -10031,9 +10056,6 @@ ar:
       description: "يتكامل هذا المكون الإضافي مع Crocodoc لتوفير عارض مستندات HTML5 يمنح للمعلمين والطلاب القدرة على وضع تعليقات توضيحية للمستندات."
       labels: 
         api_key: "مفتاح واجهة برمجة تطبيق Crocodoc"
-    dim_dim: 
-      description: "دعم عقد مؤتمرات DimDim عبر الويب"
-      name: DimDim
     dim_dim_settings: 
       description: "سيلزم الوصول إلى مثيل Dim Dim."
       labels: 
@@ -10215,6 +10237,10 @@ ar:
       labels: 
         download_url: "عنوان URL لتنزيل مستعرض LockDown"
         plugin_enabled: ممكَّن
+    med_cornell_export: 
+      labels: 
+        password: "كلمة مرور المصادقة"
+        username: "اسم مستخدم المصادقة"
     notices: 
       settings_updated: "تم تحديث إعدادات المكون الإضافي بنجاح."
     qti_converter_settings: 
@@ -10238,6 +10264,7 @@ ar:
           قم بتدوين ملاحظة عن مفتاح واجهة برمجة التطبيقات (API) ومفتاح كلمة السر لـ API.  وهي متوفرة من          "إعدادات -> API" في ملف التعريف بعد الإنشاء.
       labels: 
         api_key: "مفتاح API"
+        enable_html5_viewer: "تمكين عارض مستندات HTML5"
         secret_key: "كلمة سر API"
     sessions: 
       description: "إدارة مهلات الجلسة"
@@ -10744,6 +10771,7 @@ ar:
   qti_display: QTI
   qti_file_description: "ملف QTI مضغوط"
   qti_name: "محول QTI"
+  question_answered: "تمت الإجابة"
   question_bank: 
     align_outcomes: "محاذاة النتائج"
     remove_outcome_from_bank: "هل ترغب بالتأكيد في إزالة هذا الناتج من بنك الأسئلة؟"
@@ -10851,6 +10879,7 @@ ar:
       show_details: "إظهار تفاصيل السؤال"
       title: 
         move_copy_questions: "نقل/نسخ الأسئلة"
+  question_unanswered: "لم تتم الإجابة بعد"
   quick_start_bar: 
     announcement: 
       saving: "جارٍ الحفظ..."
@@ -10968,14 +10997,12 @@ ar:
     default_response_to_file_upload: "الاستجابة لعرض الطالب بعد أن يرسل إجابة"
     default_title: "الاختبار الجديد"
     display_answer: 
-      correct_answer: "كانت هذه هي الإجابة الصحيحة."
       labels: 
         answer_with_margin: "مع الهامش"
         your_answer: إجابتك
       margin_of_error: "هامش الخطأ"
       plus_or_minus: +/-
       range_answer: "بين%{lower_bound} و%{upper_bound}"
-      selected_answer: "لقد حددت هذه الإجابة."
       you_left_this_blank: "لقد تركت هذا فارغًا"
     display_question: 
       default_question_answer: "[ اختيار ]"
@@ -11232,7 +11259,6 @@ ar:
       anonymous_username: الطالب
       buttons: 
         allow_extra_attempt: "السماح لهذا الطالب بمحاولة إضافية"
-        update_scores: "تحديث النقاط"
       count_attempts_left: 
         few: "%{user} يتبقى لديه %{count} من المحاولات"
         many: "%{user} يتبقى لديه %{count} من المحاولات"
@@ -11537,8 +11563,6 @@ ar:
     question_list_right_side: 
       headers: 
         questions: الأسئلة
-      question_answered: المجابة
-      question_unanswered: "لم تتم الإجابة بعد"
     question_statistic: 
       attempts: 
         few: "%{count} من المحاولات"
@@ -11664,12 +11688,14 @@ ar:
       view_responses: "عرض الاستجابات"
     quiz_submission: 
       attempt_duration: "هذه المحاولة استغرقت %{duration}."
+      buttons: 
+        update_scores: "تحديث النقاط"
       labels: 
         final_score: "الدرجة النهائية"
         fudge_points: "نقاط قابلة للتصحيح"
-        fudge_points_changed_points_quiz: "منذ أن قام %{user} بحل هذا الاختبار، تغيرت النقاط الممكنة للاختبار بواسطة %{difference}. ويمكنك إجراء تعديل لهذا التغيير وإضافة النقاط الموجبة أو السالبة يدويًا باستخدام هذا المربع:"
-        fudge_points_changed_points_survey: "منذ أن قام %{user} باجتياز هذا الاستطلاع، تغيرت النقاط الممكنة للاستطلاع بواسطة %{difference}. ويمكنك إجراء تعديل لهذا التغيير وإضافة النقاط الموجبة أو السالبة يدويًا باستخدام هذا المربع:"
-        fudge_points_generic_explanation: "يمكنك يدويًا إجراء تعديل للدرجة عن طريق إضافة النقاط الموجبة أو السالبة إلى هذا المربع:"
+        fudge_points_changed_points_quiz: "منذ أن خاض %{user} هذا الاختبار، تم تغيير عدد النقاط الممكنة بمعدل %{difference}. يمكنك التعديل وفقًا لهذا التغيير وإضافة نقاط موجبة أو سالبة يدويًا باستخدام هذا المربع."
+        fudge_points_changed_points_survey: "منذ أن خاض %{user} هذا الاستبيان، تم تغيير عدد النقاط الممكنة بمعدل %{difference}. يمكنك التعديل وفقًا لهذا التغيير وإضافة نقاط موجبة أو سالبة يدويًا باستخدام هذا المربع."
+        fudge_points_generic_explanation: "يمكنك تعديل الدرجات يدويًا عن طريق إضافة نقاط موجبة أو سالبة إلى هذا المربع."
         questions_need_review: "يلزم مراجعة الأسئلة التالية"
         quiz_score: "درجة الاختبار"
         score_for_attempt: "الدرجة لهذه المحاولة"
@@ -11963,9 +11989,7 @@ ar:
         zero: "%{count} ثوانٍ"
       show_time_link: إظهار
       titles: 
-        answered: المجابة
         come_back_later: "قمت بوضع علامة على هذا السؤال للرجوع إليه لاحقًا"
-        not_answered: "لم تتم الإجابة بعد"
         times_up: "انتهى الوقت!"
       years_count: 
         few: "%{count} من السنوات"
@@ -12361,6 +12385,7 @@ ar:
     titles: 
       add_item_to_module: "إضافة العنصر إلى الوحدة"
       find_links_using_service: "بحث عن ارتبطات باستخدام %{service}"
+  selected_answer: "لقد حددت هذه الإجابة."
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "أنت مسجل مسبقًا في **%{course}**."
@@ -12706,6 +12731,7 @@ ar:
       for_title: "لـ %{title}"
       labels: 
         body: الرسالة
+        subject: الموضوع
       message_students_who: "إرسال رسائل للطلاب الذين..."
       out_of_points: "من %{points_possible}"
     mute_dialog: 
@@ -12827,12 +12853,14 @@ ar:
           two: "ضع في الاعتبار أن %{count} من الطلاب قد تم تقييمهم باستخدام نموذج التقييم هذا. سيؤدي تغييره إلى التأثير على تقييمهم. "
           zero: "ضع في الاعتبار أن %{count} من الطلاب قد تم تقييمهم باستخدام نموذج التقييم هذا. سيؤدي تغييره إلى التأثير على تقييمهم."
         rubric_in_use2: "لقد قمت بتصنيف الطلاب بالفعل باستخدام هذا العنوان. وقد تؤثر أي تغييرات رئيسية على نتائج التقييم."
+      rubric: العنوان
       rubric_title: العنوان
       titles: 
         find_existing_rubric: "بحث عن العنوان الحالي"
     rubric_criterion: 
       defaults: 
         description: "وصف المعيار"
+      delete_criterion_link: "حذف ارتباط المعيار"
       description: 
         custom_comments_area: "سيتم استخدام هذه المنطقة بواسطة المقيّم لترك التعليقات ذات الصلة بهذا المعيار."
       full_marks: "العلامات النهائية"
@@ -12849,7 +12877,8 @@ ar:
       options: 
         select: "[ تحديد ]"
       points: "%{points} نقطة (نقاط)"
-      points_abbreviation: "*نقاط* نقطة (نقاط)"
+      points_label: النقاط
+      points_out_of2: "%{points} / %{total} نقطة (نقاط)"
       titles: 
         linked_to_learning_outcome: "يتم ربط هذا المعيار بناتج تعلم"
     rubric_criterion_dialog: 
@@ -12880,6 +12909,7 @@ ar:
       labels: 
         total_points: "إجمالي النقاط"
       points_out_of: "*%{points}* من **%{total}**"
+      rubric: العنوان
     rubric_summary_criterion: 
       defaults: 
         description: "وصف المعيار"
@@ -13252,6 +13282,7 @@ ar:
         save_comment: "حفظ التعليق"
       crumbs: 
         assignments: المهام
+      hide_rubric_button: "إخفاء زر العنوان"
       labels: 
         add_a_comment: "إضافة تعليق"
         grade: الدرجة
@@ -13458,6 +13489,7 @@ ar:
     announcement: الإعلان
     announcements: الإعلانات
     assignments: المهام
+    come_back_later: "قمت بوضع علامة على هذا السؤال للرجوع إليه لاحقًا"
     delete_quiz: "حذف الاختبار"
     delete_survey: "حذف الاستطلاع"
     discussion: المناقشة
@@ -13934,8 +13966,15 @@ ar:
     is_required: "هذا الحقل مطلوب"
   warnings: 
     test_install: 
-      message: "تثبيت Canvas هذا للاختبار فقط، وستتم إعادة تعيينه كل أسبوع."
+      periodic_message: "تثبيت Canvas هذا للاختبار فقط وستتم إعادة تعيينه بشكل دوري."
       title: "تثبيت Canvas الاختباري"
+      weekly_message: 
+        few: "تثبيت Canvas هذا للاختبار فقط، وستتم إعادة تعيينه كل %{count} أسبوع/أسابيع."
+        many: "تثبيت Canvas هذا للاختبار فقط، وستتم إعادة تعيينه كل %{count} أسبوع/أسابيع."
+        one: "تثبيت Canvas هذا للاختبار فقط، وستتم إعادة تعيينه كل %{count} أسبوع."
+        other: "تثبيت Canvas هذا للاختبار فقط، وستتم إعادة تعيينه كل %{count} أسبوع/أسابيع."
+        two: "تثبيت Canvas هذا للاختبار فقط، وستتم إعادة تعيينه كل %{count} أسبوع."
+        zero: "تثبيت Canvas هذا للاختبار فقط، وستتم إعادة تعيينه كل %{count} أسبوع."
   web_conference: 
     default_name_for_courses: "مؤتمر ويب للمساق"
     default_name_for_groups: "مؤتمر ويب جماعي"
@@ -14045,9 +14084,6 @@ ar:
       blank_title: "لا يمكن أن يكون العنوان فارغًا"
       title_characters: "يجب أن يحتوي العنوان على حرف أو رقم واحد على الأقل"
       title_too_long: "لا يمكن أن يتجاوز العنوان %{max_characters} حرفًا (أحرف)"
-    missing_name: "صفحة غير مسماة"
-    notices: 
-      wiki_page_created: "تم إنشاء \"%{title}\" صفحة Wiki"
     title_for_topics_category: "موضوعات %{category}"
     unknown_user_name: "غير معروف"
     warnings: 

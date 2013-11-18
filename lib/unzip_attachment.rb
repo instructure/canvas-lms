@@ -257,7 +257,7 @@ class ZipFileStats
   end
 
   def validate_against(context)
-    max = Setting.get_cached('max_zip_file_count', '100000').to_i
+    max = Setting.get('max_zip_file_count', '100000').to_i
     if file_count > max
       raise ArgumentError, "Zip File cannot have more than #{max} entries"
     end

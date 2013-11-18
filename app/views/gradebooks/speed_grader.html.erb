@@ -17,7 +17,7 @@
   <%= t(:loading, "loading...") %>
 </h4>
 <div id="gradebook_header" style="display:none;">
-  <% form_tag({ :controller => :gradebooks, :course_id => @context.id, :action => :update_submission }) do %>
+  <%= form_tag({ :controller => :gradebooks, :course_id => @context.id, :action => :update_submission }) do %>
     <div class="left">
       <% if service_enabled?(:avatars) %>
          <div id="avatar">
@@ -36,7 +36,7 @@
       </div>
     </div>
     <div class="right">
-      <a data-muted="<%= @assignment.muted? ? "true" : "false" %>" id="mute_link" href="#"><span class="ui-icon ui-icon-volume-<%= @assignment.muted? ? "on" : "off" %>"></span><span><%= @assignment.muted? ? t("gradebook.unmute_assignment", "Unmute Assignment") : t("gradebook.mute_assignment", "Mute Assignment") %></span></a>
+      <a data-muted="<%= @assignment.muted? ? "true" : "false" %>" id="mute_link" href="#"><span class="ui-icon ui-icon-volume-<%= @assignment.muted? ? "on" : "off" %>"></span><span class=mute_label><%= @assignment.muted? ? t("gradebook.unmute_assignment", "Unmute Assignment") : t("gradebook.mute_assignment", "Mute Assignment") %></span></a>
       <a id="settings_link" href="#"><span class="ui-icon ui-icon-wrench"></span><%= t('links.settings', "Settings") %></a>
       <% if help_link %>
         | <%= help_link %>
@@ -158,7 +158,7 @@
           <% end %>
           <% if @assignment.rubric_association %>
           <div id="rubric_summary_holder">
-            <div id="rubric_assessments_list_and_edit_button_holder"  class="content_box">
+            <div id="rubric_assessments_list_and_edit_button_holder" class="content_box">
               <span id="rubric_assessments_list">
                 <%= before_label(:show_assessment_by, "Show Assessment By") %>
                 <select id="rubric_assessments_select">
@@ -273,6 +273,13 @@
   <p<% if @assignment.quiz && @assignment.quiz.survey? && @assignment.quiz.anonymous_submissions %> style="display: none;"<% end %>>
     <input type="checkbox" id="hide_student_names" name="hide_student_names"/>
     <label for="hide_student_names"><%= t('labels.hide_names', "Hide student names in the SpeedGrader") %></label>
+  </p>
+
+  <p <% unless @assignment.quiz %>class=hidden<% end %>>
+    <%= check_box_tag :enable_speedgrader_grade_by_question, "1",
+      @current_user.preferences[:enable_speedgrader_grade_by_question] %>
+    <%= label_tag :enable_speedgrader_grade_by_question,
+      t('labels.grade_by_question_beta', 'Grade by question (beta)') %>
   </p>
 
   <div class="button-container">

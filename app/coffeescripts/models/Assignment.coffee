@@ -7,7 +7,8 @@ define [
   'compiled/models/DateGroup'
   'compiled/collections/AssignmentOverrideCollection'
   'compiled/collections/DateGroupCollection'
-], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection) ->
+  'i18n!assignments'
+], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection, I18n) ->
 
   class Assignment extends Model
     @mixin DefaultUrlMixin
@@ -17,6 +18,8 @@ define [
 
     defaults:
       "publishable": true
+      "hidden": false
+      "unpublishable": true
 
     initialize: ->
       if (overrides = @get('assignment_overrides'))?
@@ -98,6 +101,25 @@ define [
       else if _.include submissionTypes, 'on_paper' then 'on_paper'
       else if _.include submissionTypes, 'external_tool' then 'external_tool'
       else 'online'
+
+    expectsSubmission: =>
+      submissionTypes = @_submissionTypes()
+      submissionTypes.length > 0 && !_.include(submissionTypes, "") && !_.include(submissionTypes, 'none') && !_.include(submissionTypes, 'not_graded') && !_.include(submissionTypes, 'on_paper') && !_.include(submissionTypes, 'external_tool')
+
+    allowedToSubmit: =>
+      submissionTypes = @_submissionTypes()
+      @expectsSubmission() && !@get('locked_for_user') && !_.include(submissionTypes, 'online_quiz') && !_.include(submissionTypes, 'attendance')
+
+    isGraded: =>
+      submission = @get('submission') || new Backbone.Model {}
+      !submission.get('notYetGraded')?
+
+    hasSubmission: =>
+      submission = @get('submission') || new Backbone.Model {}
+      !!submission.get('submission_type')
+
+    withoutGradedSubmission: =>
+      !@get('submission')? || (!@hasSubmission() && !@isGraded())
 
     acceptsOnlineUpload: =>
       !! _.include @_submissionTypes(), 'online_upload'
@@ -253,6 +275,17 @@ define [
       data = @_filterFrozenAttributes(data)
       if @alreadyScoped then data else { assignment: data }
 
+    search: (regex) ->
+      if @get('name').match(regex)
+        @set 'hidden', false
+        return true
+      else
+        @set 'hidden', true
+        return false
+
+    endSearch: ->
+      @set 'hidden', false
+
     parse: (data) ->
       data = super data
       if (overrides = data.assignment_overrides)?
@@ -310,3 +343,6 @@ define [
 
     publish: -> @save("published", true)
     unpublish: -> @save("published", false)
+
+    disabledMessage: ->
+      I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")

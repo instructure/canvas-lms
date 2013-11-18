@@ -148,8 +148,8 @@ define [
 
 
     onSaveSuccess: (data) =>
-      # assume collID is an int
-      collID = parseInt @parentListView?.value(), 10
+      # collID must be a string
+      collID = @parentListView?.value()
       newCollection = @parentCollection?.get(collID).get(@childKey)
 
       # there is a currentCollection, but it doesn't match the model's collection

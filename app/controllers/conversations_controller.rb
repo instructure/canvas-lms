@@ -171,14 +171,6 @@ class ConversationsController < ApplicationController
     end
   end
 
-  # New Conversations UI. When finished, move back to index action.
-  def index_new
-    js_env(:CONVERSATIONS => {
-             :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id
-           })
-    return unless authorized_action(Account.site_admin, @current_user, :become_user)
-  end
-
   def toggle_new_conversations
     @current_user.preferences[:use_new_conversations] = value_to_boolean(params[:use_new_conversations])
     @current_user.save!
@@ -271,7 +263,7 @@ class ConversationsController < ApplicationController
       conversations = ConversationParticipant.where(:id => batch.conversations).includes(:conversation).order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
       Conversation.preload_participants(conversations.map(&:conversation))
       ConversationParticipant.preload_latest_messages(conversations, @current_user)
-      visibility_map = infer_visibility(*conversations) 
+      visibility_map = infer_visibility(conversations)
       render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
     else
       @conversation = @current_user.initiate_conversation(@recipients, !value_to_boolean(params[:group_conversation]), :subject => params[:subject], :context_type => context_type, :context_id => context_id)
@@ -660,13 +652,9 @@ class ConversationsController < ApplicationController
     get_conversation(true)
     if params[:body].present?
 
-      # if this is from old conversations or an admin message, allow people to respond to anyone who
-      # is already a participant. We might want to allow this in general. this will probably change
-      # when we make the account the context of an admin conversation.
-      if @conversation.conversation.context.blank?
-        params[:from_conversation_id] = @conversation.conversation_id
-      end
-      # not a before_filter because the above check needs to delay this until now
+      # allow responses to be sent to anyone who is already a conversation participant.
+      params[:from_conversation_id] = @conversation.conversation_id
+      # not a before_filter because we need to set the above parameter.
       normalize_recipients
 
       message = build_message
@@ -875,13 +863,15 @@ class ConversationsController < ApplicationController
     @set_visibility = true
   end
 
-  def infer_visibility(*conversations)
+  def infer_visibility(conversations)
+    multiple = conversations.is_a? Enumerable
+    conversations = [conversations] unless multiple
     result = Hash.new(false)
     visible_conversations = @current_user.shard.activate do
         @conversations_scope.select(:conversation_id).where(:conversation_id => conversations.map(&:conversation_id)).all
       end
     visible_conversations.each { |c| result[c.conversation_id] = true }
-    if conversations.size == 1
+    if !multiple
       result[conversations.first.conversation_id]
     else
       result

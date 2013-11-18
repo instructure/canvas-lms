@@ -178,6 +178,11 @@
 #       // whether the assignment is published
 #       "published": true,
 #
+#       // (Only visible if 'enable draft' account setting is on)
+#       // Whether the assignment's "published" state can be changed to false.
+#       // Will be false if there are student submissions for the assignment.
+#       "unpublishable": true,
+#
 #       // Whether or not this is locked for the user.
 #       "locked_for_user": false,
 #
@@ -544,9 +549,9 @@ class AssignmentsApiController < ApplicationController
     if update_api_assignment(@assignment, params[:assignment])
       render :json => assignment_json(@assignment, @current_user, session), :status => 201
     else
-      # TODO: we don't really have a strategy in the API yet for returning
-      # errors.
-      render :json => "error".to_json, :status => 400
+      errors = @assignment.errors.as_json[:errors]
+      errors['published'] = errors.delete('workflow_state') if errors.has_key?('workflow_state')
+      render :json => {errors: errors}, status: :bad_request
     end
   end
 end

@@ -68,7 +68,11 @@
 #       // the date the calling user completed the module
 #       // (Optional; present only if the caller is a student
 #       // or if the optional parameter 'student_id' is included)
-#       "completed_at": null
+#       "completed_at": null,
+#
+#       // if the student's final grade for the course should be published
+#       // to the SIS upon completion of this module
+#       "publish_final_grade": false
 #     }
 class ContextModulesApiController < ApplicationController
   before_filter :require_context
@@ -238,6 +242,10 @@ class ContextModulesApiController < ApplicationController
   #   Prerequisite modules must precede this module (i.e. have a lower position
   #   value), otherwise they will be ignored
   #
+  # @argument module[publish_final_grade] [Optional, Boolean]
+  #   Whether to publish the student's final grade for the course upon
+  #   completion of this module.
+  #
   # @example_request
   #
   #     curl https://<canvas>/api/v1/courses/<course_id>/modules \
@@ -254,7 +262,7 @@ class ContextModulesApiController < ApplicationController
       return render :json => {:message => "missing module parameter"}, :status => :bad_request unless params[:module]
       return render :json => {:message => "missing module name"}, :status => :bad_request unless params[:module][:name].present?
 
-      module_parameters = params[:module].slice(:name, :unlock_at, :require_sequential_progress)
+      module_parameters = params[:module].slice(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
 
       @module = @context.context_modules.build(module_parameters)
 
@@ -296,6 +304,10 @@ class ContextModulesApiController < ApplicationController
   #   Prerequisite modules must precede this module (i.e. have a lower position
   #   value), otherwise they will be ignored
   #
+  # @argument module[publish_final_grade] [Optional, Boolean]
+  #   Whether to publish the student's final grade for the course upon
+  #   completion of this module.
+  #
   # @argument module[published] [Optional, Boolean]
   #   Whether the module is published and visible to students
   #
@@ -314,7 +326,7 @@ class ContextModulesApiController < ApplicationController
     @module = @context.context_modules.not_deleted.find(params[:id])
     if authorized_action(@module, @current_user, :update)
       return render :json => {:message => "missing module parameter"}, :status => :bad_request unless params[:module]
-      module_parameters = params[:module].slice(:name, :unlock_at, :require_sequential_progress)
+      module_parameters = params[:module].slice(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
 
       if ids = params[:module][:prerequisite_module_ids]
         if ids.blank?

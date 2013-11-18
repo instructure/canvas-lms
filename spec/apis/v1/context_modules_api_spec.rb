@@ -75,7 +75,8 @@ describe "Modules API", :type => :integration do
                "id" => @module1.id,
                "published" => true,
                "items_count" => 5,
-               "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items"
+               "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+               "publish_final_grade" => false,
             },
             {
                "name" => @module2.name,
@@ -86,7 +87,8 @@ describe "Modules API", :type => :integration do
                "id" => @module2.id,
                "published" => true,
                "items_count" => 2,
-               "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items"
+               "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items",
+               "publish_final_grade" => false,
             },
             {
                "name" => @module3.name,
@@ -97,7 +99,8 @@ describe "Modules API", :type => :integration do
                "id" => @module3.id,
                "published" => false,
                "items_count" => 0,
-               "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module3.id}/items"
+               "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module3.id}/items",
+               "publish_final_grade" => false,
             }
         ]
       end
@@ -200,7 +203,8 @@ describe "Modules API", :type => :integration do
           "id" => @module2.id,
           "published" => true,
           "items_count" => 2,
-          "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items"
+          "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items",
+          "publish_final_grade" => false,
         }
       end
 
@@ -225,7 +229,8 @@ describe "Modules API", :type => :integration do
           "id" => @module3.id,
           "published" => false,
           "items_count" => 0,
-          "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module3.id}/items"
+          "items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/modules/#{@module3.id}/items",
+          "publish_final_grade" => false,
         }
       end
 

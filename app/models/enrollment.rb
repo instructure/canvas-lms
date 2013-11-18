@@ -352,9 +352,7 @@ class Enrollment < ActiveRecord::Base
 
   def update_cached_due_dates
     if workflow_state_changed? && course
-      course.assignments.except(:order).select(:id).find_each do |assignment|
-        DueDateCacher.recompute(assignment)
-      end
+      DueDateCacher.recompute_course(course)
     end
   end
 
@@ -570,8 +568,8 @@ class Enrollment < ActiveRecord::Base
     return state unless global_start_at = ranges.map(&:compact).map(&:min).compact.min
     if global_start_at < now
       :completed
-    # Allow student view students to use the course before the term starts
-    elsif self.fake_student? || (state == :invited && !self.root_account.settings[:restrict_student_future_view])
+    # Allow admins and student view students to use the course before the term starts
+    elsif self.admin? || self.fake_student? || (state == :invited && !self.root_account.settings[:restrict_student_future_view])
       state
     else
       :inactive
@@ -779,7 +777,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def self.recompute_final_score_if_stale(course, user=nil)
-    Rails.cache.fetch(['recompute_final_scores', course.id, user].cache_key, :expires_in => Setting.get_cached('recompute_grades_window', 600).to_i.seconds) do
+    Rails.cache.fetch(['recompute_final_scores', course.id, user].cache_key, :expires_in => Setting.get('recompute_grades_window', 600).to_i.seconds) do
       recompute_final_score user ? user.id : course.student_enrollments.map(&:user_id), course.id
       yield if block_given?
       true
@@ -881,7 +879,7 @@ class Enrollment < ActiveRecord::Base
   scope :currently_online, joins(:pseudonyms).where("pseudonyms.last_request_at>?", 5.minutes.ago)
   # this returns enrollments for creation_pending users; should always be used in conjunction with the invited scope
   scope :for_email, lambda { |email|
-    if Rails.version < '3.0'
+    if CANVAS_RAILS2
       {
         :joins => { :user => :communication_channels },
         :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=LOWER(?)", email],
@@ -1060,7 +1058,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def record_recent_activity_threshold
-    Setting.get_cached('enrollment_last_activity_at_threshold', 10.minutes).to_i
+    Setting.get('enrollment_last_activity_at_threshold', 10.minutes).to_i
   end
 
   def record_recent_activity_worthwhile?(as_of, threshold)

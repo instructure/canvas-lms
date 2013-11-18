@@ -274,7 +274,7 @@ class AssignmentOverride < ActiveRecord::Base
     # union the visible override subselects and join against them
     subselect = scopes.map{ |scope| scope.to_sql }.join(' UNION ')
     join_clause = "INNER JOIN (#{subselect}) AS visible_overrides ON visible_overrides.id=assignment_overrides.id"
-    if Rails.version < '3'
+    if CANVAS_RAILS2
       { :joins => join_clause, :readonly => false }
     else
       joins(join_clause).readonly(false)

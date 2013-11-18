@@ -98,25 +98,29 @@ class PluginSetting < ActiveRecord::Base
     read_attribute(:disabled) != true
   end
 
-  def self.settings_for_plugin(name, plugin=nil)
-    res = Rails.cache.fetch(settings_cache_key(name)) do
-      if (plugin_setting = PluginSetting.find_by_name(name.to_s)) && plugin_setting.valid_settings? && plugin_setting.enabled?
-        plugin_setting.plugin = plugin
-        settings = plugin_setting.settings
-      else
-        plugin ||= Canvas::Plugin.find(name.to_s)
-        raise Canvas::NoPluginError unless plugin
-        settings = plugin.default_settings
-      end
-
-      settings || :nil
+  def self.cached_plugin_setting(name)
+    plugin_setting = Rails.cache.fetch(settings_cache_key(name)) do
+      PluginSetting.find_by_name(name.to_s) || :nil
     end
-    res = nil if res == :nil
-    res
+    plugin_setting = nil if plugin_setting == :nil
+    plugin_setting
+  end
+
+  def self.settings_for_plugin(name, plugin=nil)
+    if (plugin_setting = cached_plugin_setting(name)) && plugin_setting.valid_settings? && plugin_setting.enabled?
+      plugin_setting.plugin = plugin
+      settings = plugin_setting.settings
+    else
+      plugin ||= Canvas::Plugin.find(name.to_s)
+      raise Canvas::NoPluginError unless plugin
+      settings = plugin.default_settings
+    end
+
+    settings
   end
 
   def self.settings_cache_key(name)
-    ["settings_for_plugin", name].cache_key
+    ["settings_for_plugin2", name].cache_key
   end
 
   def clear_cache

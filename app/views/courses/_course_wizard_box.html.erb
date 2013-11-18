@@ -112,7 +112,7 @@ $(document).ready(function() {
             <%= mt 'details.publish.form', %{All finished?  Time to publish your course!  Click the button below to make it official!
 
 Publishing will allow the users to begin participating in the course.} %>
-            <% form_for @context, :url => course_path(@context), :html => {:method => :put} do |f| %>
+            <%= form_for @context, :url => course_path(@context), :html => {:method => :put} do |f| %>
               <input type="hidden" name="course[event]" value="offer"/>
               <div class="button-container" style="text-align: center;">
                 <button type="submit" class="btn btn-large"><%= t('buttons.publish', %{Publish Course}) %></button>

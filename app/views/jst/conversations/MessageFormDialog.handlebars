@@ -100,21 +100,23 @@
         </div>
       </div>
 
-      <div class="message-header-row">
-        <div class="message-header-label"></div>
-        <div class="message-header-input">
-          <input type="hidden" name="bulk_message" value="0" />
-          <label class="checkbox">
-            <input type="checkbox" name="bulk_message" value="1" />
-            {{#t "bulk_message"}}Bulk message{{/t}}
+      {{#unless conversation}}
+        <div class="message-header-row">
+          <div class="message-header-label"></div>
+          <div class="message-header-input">
+            <input type="hidden" name="bulk_message" value="0" />
+            <label class="checkbox">
+              <input type="checkbox" name="bulk_message" value="1" />
+              {{#t "bulk_message"}}Bulk message{{/t}}
 
-            <i class="icon-question"
-               data-tooltip
-               title="{{#t "bulk_explanation"}}This option creates individual messages to all recipients in the To: field.{{/t}}"></i>
-          </label>
+              <i class="icon-question"
+                 data-tooltip
+                 title="{{#t "bulk_explanation"}}This option creates individual messages to all recipients in the To: field.{{/t}}"></i>
+            </label>
 
+          </div>
         </div>
-      </div>
+      {{/unless}}
 
       <div class="message-header-row">
         <div class='message-header-label'></div>

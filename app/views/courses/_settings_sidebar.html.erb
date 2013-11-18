@@ -22,7 +22,7 @@
 
   <% if can_do(@context, @current_user, :change_course_state) %>
     <% if @context.completed? %>
-      <% form_tag context_url(@context, :context_unconclude_url) do %>
+      <%= form_tag context_url(@context, :context_unconclude_url) do %>
         <button class="btn button-sidebar-wide" type="submit">
           <i class="icon-add"></i>
           <%= t('buttons.unconclude', 'Un-Conclude Course') %>
@@ -73,7 +73,7 @@
     <div <%= hidden(true) %> id="reset_course_content_dialog">
       <p><%= mt('help.reset_course_content', 'Resetting course content will permanently delete all associated assignments, discussions, quizzes, modules, rubrics, pages, files, learning outcomes, question banks, collaborations, conferences, or any other content. This action is irreversible, and the data *cannot* be recovered. Are you sure you wish to continue?') %></p>
 
-      <% form_for @context, :url => context_url(@context, :course_reset_url), :html => { :method => :post } do %>
+      <%= form_for @context, :url => context_url(@context, :course_reset_url), :html => { :method => :post } do %>
         <div class="button-container">
           <button type="button" class="btn cancel_button">
             <%= t('#buttons.cancel', 'Cancel') %>

@@ -12,6 +12,10 @@ describe "Sessions Timeout" do
 
       it "requires session expiration to be at least 20 minutes" do 
         get "/plugins/sessions"
+        if !f("#plugin_setting_disabled").displayed?
+          f("#accounts_select option:nth-child(2)").click
+          keep_trying_until { f("#plugin_setting_disabled").displayed? }
+        end
         f("#plugin_setting_disabled").click
         f('#settings_session_timeout').send_keys('19')
         expect_new_page_load{ f('.save_button').click }

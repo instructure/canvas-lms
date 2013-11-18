@@ -21,7 +21,6 @@ FakeRails3Routes.draw do
   match 'conversations/sent' => 'conversations#index', :as => :conversations_sent, :redirect_scope => 'sent'
   match 'conversations/archived' => 'conversations#index', :as => :conversations_archived, :redirect_scope => 'archived'
   match 'conversations/find_recipients' => 'search#recipients'
-  match '/conversations/beta' => 'conversations#index_new'
 
   match 'search/recipients' => 'search#recipients', :as => :search_recipients
   match 'conversations/mark_all_as_read' => 'conversations#mark_all_as_read', :as => :conversations_mark_all_as_read, :via => :post
@@ -1278,6 +1277,11 @@ FakeRails3Routes.draw do
       get "courses/:course_id/quizzes/:id", :action => :show, :path_name => 'course_quiz'
       put "courses/:course_id/quizzes/:id", :action => :update, :path_name => 'course_quiz_update'
       delete "courses/:course_id/quizzes/:id", action: :destroy, path_name: 'course_quiz_destroy'
+    end
+
+    scope(:controller => :quiz_groups) do
+      post "courses/:course_id/quizzes/:quiz_id/groups", :action => :create, :path_name => 'course_quiz_group_create'
+      put "courses/:course_id/quizzes/:quiz_id/groups/:id", :action => :update, :path_name => 'course_quiz_group_update'
     end
 
     scope(:controller => :quiz_reports) do

@@ -8,6 +8,10 @@ class AddCassandraPageViewTables < ActiveRecord::Migration
   end
 
   def self.up
+    compression_params = cassandra.db.use_cql3? ?
+        "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }" :
+        "WITH compression_parameters:sstable_compression='DeflateCompressor'"
+
     cassandra.execute %{
       CREATE TABLE page_views (
         request_id            text PRIMARY KEY,
@@ -33,9 +37,7 @@ class AddCassandraPageViewTables < ActiveRecord::Migration
         summarized            boolean,
         account_id            bigint,
         real_user_id          bigint
-      ) WITH
-        compression_parameters:sstable_compression='DeflateCompressor';
-    }
+      ) #{compression_params}}
 
     cassandra.execute %{
       CREATE TABLE page_views_history_by_context (
@@ -43,9 +45,7 @@ class AddCassandraPageViewTables < ActiveRecord::Migration
         ordered_id text,
         request_id text,
         PRIMARY KEY (context_and_time_bucket, ordered_id)
-      ) WITH
-        compression_parameters:sstable_compression='DeflateCompressor';
-    }
+      ) #{compression_params}}
   end
 
   def self.down

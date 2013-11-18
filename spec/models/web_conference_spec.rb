@@ -21,8 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe WebConference do
   before do
     WebConference.stubs(:plugins).returns(
-        [web_conference_plugin_mock("dim_dim", {:domain => "dimdim.instructure.com"}),
-         web_conference_plugin_mock("big_blue_button", {:domain => "bbb.instructure.com", :secret_dec => "secret"}),
+        [web_conference_plugin_mock("big_blue_button", {:domain => "bbb.instructure.com", :secret_dec => "secret"}),
          web_conference_plugin_mock("wimba", {:domain => "wimba.test"}),
          web_conference_plugin_mock("broken_plugin", {:foor => :bar})]
     )
@@ -48,7 +47,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :user_settings => {:foo => :bar}, :context => course)
+      conference = WimbaConference.create!(:title => "my conference", :user => @user, :user_settings => {:foo => :bar}, :context => course)
       conference.user_settings.should be_empty
     end
 
@@ -70,7 +69,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
+      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.start_at.should be_nil
       conference.end_at.should be_nil
       conference.started_at.should be_nil
@@ -81,7 +80,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
+      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.start_at.should_not be_nil
       conference.end_at.should eql(conference.start_at + conference.duration_in_seconds)
@@ -93,7 +92,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
+      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:active)
       conference.ended_at.should be_nil
@@ -105,7 +104,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
+      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:closed)
       conference.ended_at.should be_nil
@@ -117,7 +116,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
+      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:closed)
       conference.start_at = 30.minutes.ago
@@ -133,7 +132,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
+      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:active)
       conference.ended_at.should be_nil
@@ -150,7 +149,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
+      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.stubs(:conference_status).returns(:active)
       conference.should_not be_finished
@@ -161,7 +160,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
+      conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
       conference.add_attendee(@user)
       conference.start_at = 30.minutes.ago
       conference.end_at = 20.minutes.ago
@@ -175,7 +174,7 @@ describe WebConference do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :context => course)
+      conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course)
       conference.add_attendee(@user)
       conference.start_at = 30.minutes.ago
       conference.close
@@ -193,7 +192,7 @@ describe WebConference do
     end
 
     it "should send notifications" do
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :context => @course)
+      conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => @course)
       conference.add_attendee(@student)
       conference.save!
       conference.messages_sent['Web Conference Invitation'].should_not be_empty
@@ -204,7 +203,7 @@ describe WebConference do
       @course.start_at = 2.days.from_now
       @course.conclude_at = 4.days.from_now
       @course.save!
-      conference = DimDimConference.create!(:title => "my conference", :user => @user, :context => @course)
+      conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => @course)
       conference.add_attendee(@student)
       conference.save!
       conference.messages_sent['Web Conference Invitation'].should be_blank

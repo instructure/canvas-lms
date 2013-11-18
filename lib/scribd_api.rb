@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -30,26 +30,26 @@ class ScribdAPI
     def instance
       @@inst ||= new
     end
-    
+
     # Create a shorthand for everything, so ScribdAPI.get_status, etc.
     def method_missing(sym, *args, &block)
       self.instance.send(sym, *args, &block)
     end
   end
-  
+
   def initialize
     self.authenticate if ScribdAPI.config
   end
-  
+
   def api
-     Scribd::API.instance
+    Scribd::API.instance
   end
-  
+
   # Takes the doc, which is stored in Attachment.scribd_doc
   def get_status(doc)
     doc.conversion_status
   end
-  
+
   # This uploads the file and returns the doc_id.
   # This should not need to use any other API options, as long as the file
   # has its extension in tact. 
@@ -64,14 +64,13 @@ class ScribdAPI
       })
     end
   end
-  
+
   # This is actually setting up a 'phantom' user, or a unique user for
   # accessing these documents. 
-  def set_user(uuid)
-    uuid = uuid.uuid if uuid.is_a?(ScribdAccount)
-    self.api.user = uuid
+  def set_user(user)
+    self.api.user = user
   end
-  
+
   def self.config_check(settings)
     scribd = ScribdAPI.new
     scribd.api.key = settings['api_key']
@@ -91,11 +90,11 @@ class ScribdAPI
   def self.enabled?
     !!config
   end
-  
+
   protected
-    def authenticate
-      self.api.key = ScribdAPI.config['api_key']
-      self.api.secret = ScribdAPI.config['secret_key']
-    end
-  
+  def authenticate
+    self.api.key = ScribdAPI.config['api_key']
+    self.api.secret = ScribdAPI.config['secret_key']
+  end
+
 end

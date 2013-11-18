@@ -130,11 +130,6 @@ class LearningOutcomeGroup < ActiveRecord::Base
     ancestor_ids.member?(id)
   end
 
-  # use_outcome should be a lambda that takes an outcome and returns a boolean
-  def clone_for(context, parent, opts={})
-    parent.add_outcome_group(self, opts)
-  end
-
   # adds a new link to an outcome to this group. does nothing if a link already
   # exists (an outcome can be linked into a context multiple times by multiple
   # groups, but only once per group).

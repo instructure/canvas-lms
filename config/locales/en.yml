@@ -6,6 +6,7 @@ en:
       medium_with_weekday: "%a %b %-d, %Y"
       medium: "%b %-d, %Y"
       short: "%b %-d"
+      short_with_weekday: "%a, %b %-d"
       short_month: "%b"
       medium_month: "%b %Y"
       date_at_time: "%b %-d at %l:%M%P"

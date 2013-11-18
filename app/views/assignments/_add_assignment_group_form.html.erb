@@ -1,5 +1,5 @@
 <div id="add_group" style="display: none;">
-  <% form_for :assignment_group, :url => context_url(@context, :context_assignment_groups_url), :html => {:id => 'add_group_form', :style => 'display: none;'} do |form| %>
+  <%= form_for :assignment_group, :url => context_url(@context, :context_assignment_groups_url), :html => {:id => 'add_group_form', :style => 'display: none;'} do |form| %>
 
     <div class="form-inline pad-box-micro">
       <% group_name = t('labels.group_name', "Group Name") %>

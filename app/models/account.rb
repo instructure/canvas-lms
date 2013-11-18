@@ -175,6 +175,8 @@ class Account < ActiveRecord::Base
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
   add_setting :enable_quiz_regrade, :boolean => true, :root_only => true, :default => false
+  add_setting :agenda_view, boolean: true, root_only: true, default: false
+  add_setting :enable_fabulous_quizzes, :boolean => true, :root_only => true, :default => false
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -235,15 +237,15 @@ class Account < ActiveRecord::Base
   end
 
   def terms_of_use_url
-    Setting.get_cached('terms_of_use_url', 'http://www.instructure.com/policies/terms-of-use')
+    Setting.get('terms_of_use_url', 'http://www.instructure.com/policies/terms-of-use')
   end
 
   def privacy_policy_url
-    Setting.get_cached('privacy_policy_url', 'http://www.instructure.com/policies/privacy-policy-instructure')
+    Setting.get('privacy_policy_url', 'http://www.instructure.com/policies/privacy-policy-instructure')
   end
 
   def terms_required?
-    Setting.get_cached('terms_required', 'true') == 'true'
+    Setting.get('terms_required', 'true') == 'true'
   end
 
   def require_acceptance_of_terms?(user)
@@ -401,7 +403,7 @@ class Account < ActiveRecord::Base
         FROM users
        INNER JOIN user_account_associations uaa on uaa.user_id = users.id
        WHERE uaa.account_id = ? AND users.workflow_state != 'deleted'
-       #{Group.not_in_group_sql_fragment(groups)}
+       #{Group.not_in_group_sql_fragment(groups.map(&:id))}
        #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}", self.id]
   end
 
@@ -444,14 +446,14 @@ class Account < ActiveRecord::Base
     Rails.cache.fetch(['current_quota', self].cache_key) do
       read_attribute(:storage_quota) ||
         (self.parent_account.default_storage_quota rescue nil) ||
-        Setting.get_cached('account_default_quota', 500.megabytes.to_s).to_i
+        Setting.get('account_default_quota', 500.megabytes.to_s).to_i
     end
   end
   
   def default_storage_quota
     read_attribute(:default_storage_quota) || 
       (self.parent_account.default_storage_quota rescue nil) ||
-      Setting.get_cached('account_default_quota', 500.megabytes.to_s).to_i
+      Setting.get('account_default_quota', 500.megabytes.to_s).to_i
   end
   
   def default_storage_quota_mb
@@ -667,7 +669,7 @@ class Account < ActiveRecord::Base
     return [] unless user
     @account_users_cache ||= {}
     if self == Account.site_admin
-      @account_users_cache[user] ||= Rails.cache.fetch('all_site_admin_account_users', :expires_in => 30.minutes) do
+      @account_users_cache[user] ||= Rails.cache.fetch('all_site_admin_account_users') do
         self.account_users.all
       end.select { |au| au.user_id == user.id }.each { |au| au.account = self }
     else
@@ -856,7 +858,7 @@ class Account < ActiveRecord::Base
   end
 
   def self.find_cached(id)
-    account = Rails.cache.fetch(account_lookup_cache_key(id), :expires_in => 1.hour) do
+    account = Rails.cache.fetch(account_lookup_cache_key(id)) do
       account = Account.find_by_id(id)
       account.precache if account
       account || :nil
@@ -1351,6 +1353,14 @@ class Account < ActiveRecord::Base
 
   def disable_quiz_regrade!
     change_root_account_setting!(:enable_quiz_regrade, false)
+  end
+
+  def enable_fabulous_quizzes!
+    change_root_account_setting!(:enable_fabulous_quizzes, true)
+  end
+
+  def disable_fabulous_quizzes!
+    change_root_account_setting!(:enable_fabulous_quizzes, false)
   end
 
   def change_root_account_setting!(setting_name, new_value)

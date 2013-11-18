@@ -642,7 +642,10 @@ describe AssignmentsApiController, :type => :integration do
       @domain_root_account = Account.default
 
       course_with_teacher(:active_all => true)
-      @assignment = @course.assignments.create({:name => "some assignment"})
+      @assignment = @course.assignments.create({
+        :name => "some assignment",
+        :points_possible => 15
+      })
       @assignment.workflow_state = 'unpublished'
       @assignment.save!
 
@@ -655,6 +658,27 @@ describe AssignmentsApiController, :type => :integration do
       api_update_assignment_call(@course, @assignment, {'published' => false})
       @assignment.reload
       @assignment.workflow_state.should == 'unpublished'
+
+      course_with_student(:active_all => true, :course => @course)
+      @assignment.grade_student(@student, grade: 15)
+      @assignment.publish
+      @user = @teacher
+      raw_api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+        {
+          :controller => 'assignments_api',
+          :action => 'update',
+          :format => 'json',
+          :course_id => @course.id.to_s,
+          :id => @assignment.id.to_s
+        },
+        { :assignment => { :published => false } }
+      )
+      response.should_not be_success
+      json = JSON.parse response.body
+      json['errors']['published'].first['message'].
+        should == "Can't unpublish if there are student submissions"
     end
 
     context "without overrides or frozen attributes" do
@@ -1353,13 +1377,15 @@ describe AssignmentsApiController, :type => :integration do
     context "draft state" do
 
       before do
-        Account.default.settings[:enable_draft] = true
-        Account.default.save!
+        Account.default.enable_draft!
         @domain_root_account = Account.default
 
         course_with_student_logged_in(:active_all => true)
 
-        @assignment = @course.assignments.create!({:name => "unpublished assignment"})
+        @assignment = @course.assignments.create!({
+          :name => "unpublished assignment",
+          :points_possible => 15
+        })
         @assignment.workflow_state = 'unpublished'
         @assignment.save!
       end
@@ -1383,14 +1409,20 @@ describe AssignmentsApiController, :type => :integration do
       end
 
       it "shows an unpublished assignment to teachers" do
-        user
-        @enrollment = @course.enroll_user(@user, 'TeacherEnrollment')
-        @enrollment.course = @course # set the reverse association
-        user_session(@user, :active_all => true)
+        course_with_teacher_logged_in(:course => @course, :active_all => true)
 
         json = api_get_assignment_in_course(@assignment, @course)
         response.should be_success
         json['id'].should == @assignment.id
+        json['unpublishable'].should == true
+
+        # Returns "unpublishable => false" when student submissions
+        student_in_course(:active_all => true, :course => @course)
+        @assignment.grade_student(@student, grade: 15)
+        @user = @teacher
+        json = api_get_assignment_in_course(@assignment, @course)
+        response.should be_success
+        json['unpublishable'].should == false
       end
     end
   end

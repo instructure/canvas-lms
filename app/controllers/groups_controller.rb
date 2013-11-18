@@ -226,7 +226,7 @@ class GroupsController < ApplicationController
       format.html do
         if @context.grants_right?(@current_user, session, :manage_groups)
           if @domain_root_account.enable_manage_groups2?
-            js_env group_categories: @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url"]) },
+            js_env group_categories: @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) },
                    group_user_type: @group_user_type,
                    allow_self_signup: @allow_self_signup
           end

@@ -109,6 +109,21 @@ describe ConversationsController, :type => :integration do
       ]
     end
 
+    it "should stringify audience ids if requested" do
+      @c1 = conversation(@bob, :workflow_state => 'read')
+      @c2 = conversation(@bob, @billy, :workflow_state => 'unread', :subscribed => false)
+
+      json = api_call(:get, "/api/v1/conversations",
+              { :controller => 'conversations', :action => 'index', :format => 'json' },
+              {},
+              {'Accept' => 'application/json+canvas-string-ids'})
+      audiences = json.map { |j| j['audience'] }
+      audiences.should == [
+        [@billy.id.to_s, @bob.id.to_s],
+        [@bob.id.to_s],
+      ]
+    end
+
     it "should paginate and return proper pagination headers" do
       7.times{ conversation(student_in_course) }
       @user.conversations.size.should eql 7
@@ -779,6 +794,23 @@ describe ConversationsController, :type => :integration do
         json["errors"].should_not be_nil
         json["errors"]["subject"].should_not be_nil
       end
+
+      it "should send bulk group messages" do
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id, @joe.id], :body => "test",
+                  :group_conversation => "true", :bulk_message => "true" })
+        puts json.inspect
+        json.size.should eql 2
+      end
+
+      it "should send bulk group messages with a single recipient" do
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id], :body => "test",
+                  :group_conversation => "true", :bulk_message => "true" })
+        json.size.should eql 1
+      end
     end
   end
 
@@ -1270,6 +1302,22 @@ describe ConversationsController, :type => :integration do
       new_message = real_conversation.conversation_messages.first
       #debugger
       new_message.conversation_message_participants.size.should == 2
+    end
+
+    it "should allow users to respond to anyone who is already a participant" do
+      cp = conversation(@bob, @billy, @jane, @joe, sender: @bob)
+      real_conversation = cp.conversation
+      real_conversation.context = @course
+      real_conversation.save!
+
+      @joe.enrollments.each { |e| e.destroy }
+      @user = @billy
+      json = api_call(:post, "/api/v1/conversations/#{real_conversation.id}/add_message",
+        { :controller => 'conversations', :action => 'add_message', :id => real_conversation.id.to_s, :format => 'json' },
+        { :body => "ok", :recipients => [@bob, @billy, @jane, @joe].map(&:id).map(&:to_s) })
+      real_conversation.reload
+      new_message = real_conversation.conversation_messages.first
+      new_message.conversation_message_participants.size.should == 4
     end
 
     it "should create a media object if it doesn't exist" do

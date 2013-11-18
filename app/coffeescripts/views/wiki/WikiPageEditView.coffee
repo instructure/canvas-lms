@@ -69,6 +69,12 @@ define [
         COURSE_ROLES: json.contextName == "courses"
       json
 
+    onUnload: (ev) =>
+      if this && @checkUnsavedOnLeave && @hasUnsavedChanges()
+        warning = @unsavedWarning()
+        (ev || window.event).returnValue = warning
+        return warning
+
     # After the page loads, ensure the that wiki sidebar gets initialized
     # correctly.
     # @api custom backbone override
@@ -79,11 +85,7 @@ define [
 
       @checkUnsavedOnLeave = true
       view = this
-      window.addEventListener 'beforeunload', (ev) ->
-        if view && view.checkUnsavedOnLeave && view.hasUnsavedChanges()
-          warning = view.unsavedWarning()
-          (ev || window.event).returnValue = warning
-          return warning
+      window.addEventListener 'beforeunload', @onUnload
 
       unless @firstRender
         @firstRender = true

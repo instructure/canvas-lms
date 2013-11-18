@@ -28,8 +28,16 @@ module Api::V1::GroupCategory
   def group_category_json(group_category, user, session, options = {})
     hash = api_json(group_category, user, session, API_GROUP_CATEGORY_JSON_OPTS)
     hash.merge!(context_data(group_category))
-    if options[:include] && options[:include].include?('progress_url') && group_category.current_progress && group_category.current_progress.pending?
-      hash['progress'] = progress_json(group_category.current_progress, user, session)
+    if includes = options[:include]
+      if includes.include?('progress_url') && group_category.current_progress && group_category.current_progress.pending?
+        hash['progress'] = progress_json(group_category.current_progress, user, session)
+      end
+      if includes.include?('groups_count')
+        hash['groups_count'] = group_category.groups.active.size
+      end
+      if includes.include?('unassigned_users_count')
+        hash['unassigned_users_count'] = group_category.unassigned_users.count
+      end
     end
     hash
   end

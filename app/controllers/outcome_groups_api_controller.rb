@@ -175,7 +175,7 @@ class OutcomeGroupsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/2.json' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/2.json' \
   #        -X PUT \ 
   #        -F 'title=Outcome Group Title' \ 
   #        -F 'description=Outcome group description' \
@@ -185,7 +185,7 @@ class OutcomeGroupsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/2.json' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/2.json' \
   #        -X PUT \ 
   #        --data-binary '{
   #              "title": "Outcome Group Title",
@@ -233,7 +233,7 @@ class OutcomeGroupsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/2.json' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/2.json' \
   #        -X DELETE \ 
   #        -H "Authorization: Bearer <token>"
   #
@@ -361,13 +361,13 @@ class OutcomeGroupsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes/1.json' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes/1.json' \
   #        -X PUT \ 
   #        -H "Authorization: Bearer <token>"
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes.json' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes.json' \
   #        -X POST \ 
   #        -F 'title=Outcome Title' \ 
   #        -F 'description=Outcome description' \
@@ -383,7 +383,7 @@ class OutcomeGroupsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes.json' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes.json' \
   #        -X POST \ 
   #        --data-binary '{
   #              "title": "Outcome Title",
@@ -431,7 +431,7 @@ class OutcomeGroupsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes/1.json' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes/1.json' \
   #        -X DELETE \ 
   #        -H "Authorization: Bearer <token>"
   #
@@ -493,7 +493,7 @@ class OutcomeGroupsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/1/subgroups.json' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/1/subgroups.json' \
   #        -X POST \ 
   #        -F 'title=Outcome Group Title' \ 
   #        -F 'description=Outcome group description' \
@@ -502,7 +502,7 @@ class OutcomeGroupsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/accounts/1/outcome_groups/1/subgroups.json' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/1/subgroups.json' \
   #        -X POST \ 
   #        --data-binary '{
   #              "title": "Outcome Group Title",
@@ -546,7 +546,7 @@ class OutcomeGroupsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/accounts/2/outcome_groups/3/import.json' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/2/outcome_groups/3/import.json' \
   #        -X POST \ 
   #        -F 'source_outcome_group_id=2' \ 
   #        -H "Authorization: Bearer <token>"

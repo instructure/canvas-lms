@@ -348,7 +348,7 @@ body.with_item_groups #main {
     margin-top: 5px;
   }
 
-  .ig-list li:first-child .ig-row {
+  .ig-list li:first-child .ig-row, .first_visible .ig-row {
     border-top: 1px solid #c1c7cf;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
@@ -358,7 +358,7 @@ body.with_item_groups #main {
     }
   }
 
-  .ig-list li:last-child .ig-row {
+  .ig-list li:last-child .ig-row, .last_visible .ig-row {
     border-bottom: 1px solid #c1c7cf;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;

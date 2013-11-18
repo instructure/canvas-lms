@@ -3,6 +3,7 @@
 $backgroundColor: #dfe9f0
 $borderColor: #AAA
 $questionHeaderBackground: #F5F5F5
+$selectedBorderColor: #31b5ff
 
 #wrapper-container
   min-width: 1100px
@@ -13,9 +14,6 @@ $questionHeaderBackground: #F5F5F5
 .quizzes-speedgrader #wrapper-container
   min-width: 1000px
 
-  .update-scores
-    display: block
-    margin: 0 auto
 
 // quiz index
 li.quiz
@@ -249,10 +247,6 @@ div#content
           :background-image none
         .answer.hide_right_arrow,.answer.selected_answer.hide_right_arrow
           :background-image none
-    &.correct
-      :border-color inherit
-    &.incorrect
-      :border-color inherit
   &.suppress_correct_answers, &.survey_results
     .question .answers .answer.wrong_answer
       border: none
@@ -274,6 +268,9 @@ div#content
         :border-width 2px
       .move
         :display none
+    .complete
+      background-color: #eeeeee
+      color: #999999
 
 
 #questions.assessing
@@ -422,7 +419,10 @@ div#content
   :_height 10px
 
   &.modified_but_not_saved
-    border-width: 3px
+    border-width: 2px
+  &.selected_single_question
+    border-color: $selectedBorderColor
+    border-width: 2px
   .move
     background: none !important
     float: left
@@ -1333,6 +1333,7 @@ ul#quiz_versions
 
 // quiz history-specific styles
 #update_history_form
+  margin: 0px
   .assessment_results
     clear: none
 
@@ -1500,7 +1501,9 @@ ul#quiz_versions
       line-height: 32px
     &.active a
       @include box-shadow(#31b5ff 0px 2px 1px)
-      border: 1px solid #31b5ff
+      background: white
+      border: 1px solid $selectedBorderColor
+      color: #0088cc
       font-weight: bold
     &.complete a
       background-color: #eeeeee
@@ -1588,3 +1591,27 @@ ul#quiz_versions
     border-top: 1px solid #C4AE90
     background-color: $warningBackground
 
+#speed_update_scores_container
+  background: #e8e8e8
+  border-top: 1px solid #ccc
+  width: 100%
+  padding: 20px 0 20px 20px
+  position: fixed
+  bottom: 0px
+  left: 0px
+  .update_scores_fudge
+    padding-right: 200px
+  .button-container
+    position: fixed
+    bottom: 30px
+    right: 10px
+
+#update_scores
+  position: relative
+  .update_scores_fudge
+    padding-right: 200px
+  .button-container
+    position: absolute
+    right: 0px
+    bottom: 0px
+    padding-bottom: 0px

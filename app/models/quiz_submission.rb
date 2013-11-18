@@ -680,7 +680,7 @@ class QuizSubmission < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     # evizitei: These broadcast policies use templates designed for
-    # submissions, not quiz submissions.  The necessary delegations 
+    # submissions, not quiz submissions.  The necessary delegations
     # are at the bottom of this class.
     p.dispatch :submission_graded
     p.to { user }
@@ -719,6 +719,41 @@ class QuizSubmission < ActiveRecord::Base
   # TODO: this could probably be put in as a convenience method in simply_versioned
   def save_with_versioning!
     self.with_versioning(true) { self.save! }
+  end
+
+  # Schedules the submission for grading when it becomes overdue.
+  #
+  # Only applicable if the submission is set to become overdue, per the `end_at`
+  # field.
+  #
+  # @throw ArgumentError If the submission does not have an end_at timestamp set.
+  def grade_when_overdue
+    unless self.end_at.present?
+      raise ArgumentError,
+        'QuizSubmission is not applicable for overdue enforced grading!'
+    end
+
+    self.send_later_enqueue_args(:grade_if_untaken, {
+      # 6 seconds because DJ polls at 5 second intervals, and we need at least
+      # 1 second for the submission to become overdue
+      :run_at => self.end_at + 6.seconds,
+      :priority => Delayed::LOW_PRIORITY,
+      :max_attempts => 1
+    })
+  end
+
+  # don't use this directly, see #grade_when_overdue
+  def grade_if_untaken
+    # We can skip the needs_grading? test because we know that the submission
+    # is overdue since the job will be processed after submission.end_at ...
+    # so we simply test its workflow state.
+    #
+    # Also, we can't use QuizSubmission#overdue? because as of 10/2013 it adds
+    # a graceful period of 1 minute after the true end date of the submission,
+    # which doesn't work for us here.
+    if self.untaken?
+      self.grade_submission(:finished_at => self.end_at)
+    end
   end
 
   # evizitei: these 3 delegations allow quiz submissions to be used in

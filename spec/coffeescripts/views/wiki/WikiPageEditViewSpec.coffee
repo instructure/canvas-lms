@@ -113,11 +113,11 @@ define [
   test 'warn on leaving if unsaved changes', ->
     setupUnsavedChangesTest(this, title: 'nooo', body: 'blargh')
 
-    strictEqual $(window).triggerHandler('beforeunload'), undefined, "No warning if not changed"
+    strictEqual @view.onUnload({}), undefined, "No warning if not changed"
 
     @titleInput.val('mwhaha')
 
-    ok $(window).triggerHandler('beforeunload') != undefined, "Returns warning if changed"
+    ok @view.onUnload({}) isnt undefined, "Returns warning if changed"
 
 
   module 'WikiPageEditView:Validate'

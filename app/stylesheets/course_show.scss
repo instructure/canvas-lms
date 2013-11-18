@@ -1,0 +1,24 @@
+$highlight-color: #06a9ee;
+
+.course-options {
+  font-size: 14px;
+  background: rgba(0, 0, 0, .1);
+  margin: -13px -13px 25px -13px;
+  padding: 15px;
+  .button-sidebar-wide {
+    color: black;
+    padding: 5px;
+    i {
+      margin-right: 5px;
+    }
+
+    &:link, &:visited, &:active {
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    &:hover, &:hover i[class^=icon-]:before {
+      color: $highlight-color !important;
+    }
+  }
+}

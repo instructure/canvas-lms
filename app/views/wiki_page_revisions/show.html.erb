@@ -9,7 +9,7 @@
     <ul class="unstyled_list wide_spacing">
       <% if can_do(@page, @current_user, :update) %>
         <li>
-          <% form_for(@revision, :url => context_url(@context, :context_wiki_page_wiki_page_revision_url, @page, @revision)) do |f| %>
+          <%= form_for(@revision, :url => context_url(@context, :context_wiki_page_wiki_page_revision_url, @page, @revision)) do |f| %>
           <div class="button-container">
             <button type="submit" class="btn"><%= image_tag "reply.png", :alt => "Rollback" %> <%= t 'buttons.roll_back_version', 'Roll-back to this Version' %></button><br /><br />
           </div>
