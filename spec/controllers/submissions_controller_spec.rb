@@ -171,6 +171,25 @@ describe SubmissionsController do
         subs.all.sum{ |s| s.submission_comments.size }.should eql 2
       end
     end
+
+    context "google doc" do
+      before(:each) do
+        course_with_student_logged_in(active_all: true)
+        @student.stubs(:gmail).returns('student@does-not-match.com')
+        @assignment = @course.assignments.create!(title: 'some assignment', submission_types: 'online_upload')
+        account = Account.default
+        account.settings[:google_docs_domain] = 'example.com'
+        account.save!
+      end
+
+      it "should not save if domain restriction prevents it" do
+        SubmissionsController.any_instance.stubs(:google_docs_download).returns([Net::HTTPOK.new(200, {}, ''), 'title', 'pdf'])
+        post(:create, course_id: @course.id, assignment_id: @assignment.id,
+             submission: { submission_type: 'google_doc' },
+             google_doc: { document_id: '12345' })
+        response.should be_redirect
+      end
+    end
   end
   
   describe "PUT update" do

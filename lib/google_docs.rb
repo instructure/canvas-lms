@@ -345,9 +345,18 @@ module GoogleDocs
     access_token.post(url, xml, {'Content-Type' => 'application/atom+xml'})
   end
 
-  def google_docs_acl_add(document_id, users)
+  # Public: Add users to a Google Doc ACL list.
+  #
+  # document_id - The id of the Google Doc to add users to.
+  # users - An array of user objects.
+  # domain - The string domain to restrict additions to (e.g. "example.com").
+  #   Accounts not on this domain will be ignored.
+  #
+  # Returns nothing.
+  def google_docs_acl_add(document_id, users, domain = nil)
     access_token = google_docs_retrieve_access_token
     url          = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
+    domain_regex = domain ? %r{@#{domain}$} : /./
 
     request_feed = Feed.new do |feed|
       feed.categories << Atom::Category.new do |category|
@@ -355,26 +364,39 @@ module GoogleDocs
         category.term   = "http://schemas.google.com/acl/2007#accessRule"
       end
 
-      users.select { |u| u.google_docs_address || u.gmail }.each do |user|
-        feed.entries << Entry.new do |entry|
-          entry.batch_id        = user.id
-          entry.batch_operation = Google::Batch::Operation.new
-          entry.gAcl_role       = Google::GAcl::Role.new
-          entry.gAcl_scope      = Google::GAcl::Scope.new(user.google_docs_address || user.gmail)
-        end
+      allowed_users = users.select do |user|
+        address = user.google_docs_address || user.gmail
+        address.try(:match, domain_regex)
+      end
+
+      allowed_users.each do |user|
+        feed.entries << user_feed_entry(user)
       end
     end
 
-    response = access_token.post(url, request_feed.to_xml, {'Content-Type' => 'application/atom+xml'})
-    feed     = Atom::Feed.load_feed(response.body)
-    res      = []
-
-    feed.entries.each do |entry|
-      user = users.to_a.find{|u| u.id == entry['http://schemas.google.com/gdata/batch', 'id'][0].to_i}
-      res << user if user
+    feed = send_feed(access_token, url, request_feed)
+    feed.entries.inject([]) do |response, entry|
+      user = allowed_users.find do |u|
+        u.id == entry['http://schemas.google.com/gdata/batch', 'id'][0].to_i
+      end
+      response << user if user
+      response
     end
+  end
 
-    res
+  def user_feed_entry(user)
+    Entry.new do |entry|
+      entry.batch_id        = user.id
+      entry.batch_operation = Google::Batch::Operation.new
+      entry.gAcl_role       = Google::GAcl::Role.new
+      entry.gAcl_scope      = Google::GAcl::Scope.new(user.google_docs_address || user.gmail)
+    end
+  end
+
+  def send_feed(token, url, feed)
+    response = access_token.post(url, feed.to_xml,
+      {'Content-Type' => 'application/atom+xml' })
+    Atom::Feed.load_feed(response.body)
   end
 
   def google_docs_verify_access_token

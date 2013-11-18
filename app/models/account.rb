@@ -178,6 +178,7 @@ class Account < ActiveRecord::Base
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
   add_setting :agenda_view, boolean: true, root_only: true, default: false
   add_setting :enable_fabulous_quizzes, :boolean => true, :root_only => true, :default => false
+  add_setting :google_docs_domain, root_only: true
 
   def settings=(hash)
     if hash.is_a?(Hash)

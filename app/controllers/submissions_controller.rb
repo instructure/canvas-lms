@@ -94,6 +94,9 @@
 #       "late": false
 #     }
 #
+
+require 'action_controller_test_process'
+
 class SubmissionsController < ApplicationController
   include GoogleDocs
   include KalturaHelper
@@ -353,27 +356,12 @@ class SubmissionsController < ApplicationController
         end
       elsif !api_request? && params[:google_doc] && params[:google_doc][:document_id] && params[:submission][:submission_type] == "google_doc"
         params[:submission][:submission_type] = 'online_upload'
-        doc_response, display_name, file_extension = google_docs_download(params[:google_doc][:document_id])
-        unless doc_response && doc_response.is_a?(Net::HTTPOK)
-          # couldn't get document
-          flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
-          redirect_to course_assignment_url(@context, @assignment)
+        attachment = submit_google_doc(params[:google_doc][:document_id])
+        if attachment
+          params[:submission][:attachments] << attachment
+        else
           return
         end
-        filename = "google_doc_#{Time.now.strftime("%Y%m%d%H%M%S")}#{@current_user.id}.#{file_extension}"
-        path = File.join("tmp", filename)
-        f = File.new(path, 'wb')
-        f.write doc_response.body
-        f.close
-
-        require 'action_controller_test_process'
-        @attachment = @assignment.attachments.new(
-          :uploaded_data => ActionController::TestUploadedFile.new(path, doc_response.content_type, true), 
-          :display_name => "#{display_name}",
-          :user => @current_user
-        )
-        @attachment.save!
-        params[:submission][:attachments] << @attachment
       elsif !api_request? && params[:submission][:submission_type] == 'media_recording' && params[:submission][:media_comment_id].blank?
         flash[:error] = t('errors.media_file_attached', "There was no media recording in the submission")
         return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
@@ -421,6 +409,42 @@ class SubmissionsController < ApplicationController
       end
     end
   end
+
+  # Internal: Submit a Google Doc.
+  def submit_google_doc(document_id)
+    # fetch document from google
+    document_response, display_name, file_extension = google_docs_download(document_id)
+
+    # error handling
+    unless document_response.try(:is_a?, Net::HTTPOK)
+      flash[:error] = t('errors.assignment_submit_fail', 'Assignment failed to submit')
+    end
+
+    restricted_google_docs_domain = @domain_root_account.settings[:google_docs_domain]
+    if restricted_google_docs_domain && !@current_user.gmail.match(%r{@#{restricted_google_docs_domain}$})
+      flash[:error] = t('errors.invalid_google_docs_domain', 'You cannot submit assignments from this google_docs domain')
+    end
+
+    if flash[:error]
+      redirect_to(course_assignment_url(@context, @assignment))
+      return false
+    end
+
+    # process the file and create an attachment
+    filename = "google_doc_#{Time.now.strftime("%Y%m%d%H%M%S")}#{@current_user.id}.#{file_extension}"
+    path     = File.join("tmp", filename)
+    File.open(path, 'wb') do |f|
+      f.write(document_response.body)
+    end
+
+    @attachment = @assignment.attachments.new(
+      uploaded_data: ActionController::TestUploadedFile.new(path, document_response.content_type, true),
+      display_name: display_name, user: @current_user
+    )
+    @attachment.save!
+    @attachment
+  end
+  protected :submit_google_doc
 
   def turnitin_report
     return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)

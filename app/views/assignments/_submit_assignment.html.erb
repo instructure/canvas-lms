@@ -1,5 +1,8 @@
 <%
-  show_google_docs = @assignment.allow_google_docs_submission? && @real_current_user.blank? && @domain_root_account && feature_and_service_enabled?(:google_docs)
+    show_google_docs = @assignment.allow_google_docs_submission? &&
+                       @real_current_user.blank? &&
+                       @domain_root_account &&
+                       feature_and_service_enabled?(:google_docs)
 -%>
 <%
   js_bundle :submit_assignment
@@ -192,47 +195,67 @@
     </style>
     <% if show_google_docs %>
       <% if @google_docs_token %>
-        <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_google_doc_form", :class => "submit_assignment_form"}) do %>
-          <%= hidden_field :submission, :submission_type, :value => "google_doc" %>
-          <%= hidden_field :google_doc, :document_id, :value => "", :class => "google_doc_id" %>
-          <table class="formtable" style="width: 100%;">
-            <tr>
-              <td style="padding-bottom: 10px;" colspan="2">
-                <%= t 'instructions.google_docs', "Select the file from the list below." %>
-                <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
-                </td>
-            </tr><tr>
-              <td colspan="2">
-                <div id="google_docs_container" style="height: 200px; overflow: auto;">
-                  <div style="text-align: center; margin: 10px;">
-                    <%= image_tag "ajax-loader-bar.gif" %>
-                  </div>
-                </div>
-              </td>
-            </tr><tr>
-              <td colspan="2" style="text-align: center;">
-                <div style="text-align: left;">
-                  <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
-                </div>
-              </td>
-            </tr>
-            <%= render :partial => "group_comment" %>
-            <% if @assignment.turnitin_enabled? %>
-              <%= render :partial => "turnitin" %>
-            <% end %>
-            <tr>
-              <td colspan="2" class='button-container'>
-                <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
-                <button type="submit" class="btn btn-primary"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
-              </td>
-            </tr>
-          </table>
-          <div id="uploading_google_doc_message" style="display: none;">
-            <%= t 'messages.uploading', "Retrieving a copy of your Google Doc to submit for this assignment.  This may take a little while, depending on the size of the file..." %>
-            <div style="text-align: center; margin: 10px;">
-              <%= image_tag "ajax-loader-bar.gif" %>
+        <% if @domain_root_account.settings[:google_docs_domain] &&
+             !@current_user.gmail.match(%r{@#{@domain_root_account.settings[:google_docs_domain]}$}) %>
+          <div id="submit_google_doc_form">
+            <p class="alert alert-error">
+              <i class="icon-warning"></i>
+              <%= t(:invalid_google_docs_domain, 'Invalid domain') %>
+            </p>
+
+           <p>
+            <%= t(:gmail_restriction_description, <<-END, domain: @domain_root_account.settings[:google_docs_domain])
+              Your account has restricted Google Doc submissions to Google accounts
+              on the %{domain} domain. To submit this assignment with a Google Doc,
+              you will need to reconfigure the Google Docs integration on your
+              user settings page.
+            END
+            %>
+           </p>
             </div>
-          </div>
+         <% else %>
+          <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_google_doc_form", :class => "submit_assignment_form"}) do %>
+            <%= hidden_field :submission, :submission_type, :value => "google_doc" %>
+            <%= hidden_field :google_doc, :document_id, :value => "", :class => "google_doc_id" %>
+            <table class="formtable" style="width: 100%;">
+              <tr>
+                <td style="padding-bottom: 10px;" colspan="2">
+                  <%= t 'instructions.google_docs', "Select the file from the list below." %>
+                  <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
+                  </td>
+              </tr><tr>
+                <td colspan="2">
+                  <div id="google_docs_container" style="height: 200px; overflow: auto;">
+                    <div style="text-align: center; margin: 10px;">
+                      <%= image_tag "ajax-loader-bar.gif" %>
+                    </div>
+                  </div>
+                </td>
+              </tr><tr>
+                <td colspan="2" style="text-align: center;">
+                  <div style="text-align: left;">
+                    <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
+                  </div>
+                </td>
+              </tr>
+              <%= render :partial => "group_comment" %>
+              <% if @assignment.turnitin_enabled? %>
+                <%= render :partial => "turnitin" %>
+              <% end %>
+              <tr>
+                <td colspan="2" class='button-container'>
+                  <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
+                  <button type="submit" class="btn btn-primary"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+                </td>
+              </tr>
+            </table>
+            <div id="uploading_google_doc_message" style="display: none;">
+              <%= t 'messages.uploading', "Retrieving a copy of your Google Doc to submit for this assignment.  This may take a little while, depending on the size of the file..." %>
+              <div style="text-align: center; margin: 10px;">
+                <%= image_tag "ajax-loader-bar.gif" %>
+              </div>
+            </div>
+          <% end %>
         <% end %>
       <% else %>
         <div id="submit_google_doc_form">
