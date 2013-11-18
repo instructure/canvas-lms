@@ -473,6 +473,41 @@ describe "dashboard" do
         course_menu.should include_text('View all courses')
         course_menu.find_element(:css, '.customListWrapper').should be_displayed
       end
+
+      it "should perform customization actions" do
+        def favoriteElsSize
+          ff('#menu_enrollments > .menu-item-drop-column-list li.customListItem').size
+        end
+
+        def checkedEls
+          ffj('#menu_enrollments .customListContent li.customListItem.on')
+        end
+
+        @courses = []
+        20.times { @courses << course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}).course }
+
+        @user.favorites.by('Course').destroy_all
+        @courses[0...10].each do |course|
+          @user.favorites.build(:context => course)
+        end
+        @user.save
+
+        get "/"
+        driver.execute_script(%{$("#menu li.menu-item:first").trigger('mouseenter')})
+        sleep 0.4 # there's a fixed 300ms delay before the menu will display
+        wait_for_ajaximations
+        favoriteElsSize.should == 10
+        driver.execute_script("$('#menu .customListOpen:first').click()")
+        wait_for_ajaximations
+
+        checkedEls.size.should == 10
+        checkedEls[0].click
+        wait_for_ajaximations
+        checkedEls.size.should == 9
+        favoriteElsSize.should == 9
+        @user.reload
+        @user.favorites.size.should == 9
+      end
     end
   end
 end

@@ -127,7 +127,6 @@ define([
     function unhoverMenuItem(){
       $menu_items.filter(".hover-pending").removeClass('hover-pending');
       menuItemHoverTimeoutId = window.setTimeout(clearMenuHovers, 400);
-      return false;
     }
 
     function hoverMenuItem(event){
@@ -142,7 +141,6 @@ define([
         }
       }, 300);
       $.publish('menu/hovered', $elem);
-      return false;
     }
 
     $menu
