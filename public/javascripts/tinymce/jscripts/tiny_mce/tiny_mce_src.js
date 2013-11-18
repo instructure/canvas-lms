@@ -12507,7 +12507,13 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 			e.style.visibility = t.orgVisibility;
 
 			DOM.get(t.id).style.display = 'none';
-			DOM.setAttrib(t.id, 'aria-hidden', true);
+      // INSTRUCTURE
+      // Commenting this out so that when the "simple" view is enabled,
+      // the text box isn't hidden to the screen reader.
+      // The text box is has the style of "display: none;" by default,
+      // so it's not visible to screen readers when the "advanced" version
+      // is visible.
+			// DOM.setAttrib(t.id, 'aria-hidden', true);
 
 			if (!tinymce.relaxedDomain || !u)
 				t.initContentBody();
