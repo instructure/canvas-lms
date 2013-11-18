@@ -242,11 +242,12 @@ class AssessmentItemConverter
         attrs.each do |attr|
           if subnode[attr]
             val = URI.unescape(subnode[attr])
-            if val.start_with?( WEBCT_REL_REGEX)
+            if val.start_with?(WEBCT_REL_REGEX)
               # It's from a webct package so the references may not be correct
               # Take a path like: /webct/RelativeResourceManager/Template/Imported_Resources/qti web/f11g3_r.jpg
               # Reduce to: Imported_Resources/qti web/f11g3_r.jpg
-              val.gsub!(WEBCT_REL_REGEX)
+              val.gsub!(WEBCT_REL_REGEX, '')
+              val.gsub!("RelativeResourceManager/Template/", "")
 
               # Sometimes that path exists, sometimes the desired file is just in the top-level with the .xml files
               # So check for the file starting with the full relative path, going down to just the file name
