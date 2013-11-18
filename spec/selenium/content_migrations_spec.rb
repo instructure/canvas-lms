@@ -1,6 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 def visit_page
+  @course.reload
   get "/courses/#{@course.id}/content_migrations"
   wait_for_ajaximations
 end
@@ -19,14 +20,20 @@ def select_migration_file(opts={})
 end
 
 def fill_migration_form(opts={})
+  select_migration_type('none') unless opts[:type] == 'none'
   select_migration_type(opts[:type])
   select_migration_file(opts)
 end
 
 def submit
-  submit_btn = fj('#submitMigration')
-  submit_btn.click
-  keep_trying_until { fj('#migrationFileUpload').blank? }
+  @course.reload
+  count = @course.content_migrations.count
+
+  driver.execute_script("$('#migrationConverterContainer').submit()")
+  keep_trying_until do
+    @course.content_migrations.count.should == count + 1
+  end
+  wait_for_ajaximations
 end
 
 def run_migration(cm=nil)
@@ -99,7 +106,7 @@ def test_selective_content(source_course=nil)
   all_link.click
 
   # click on select none for folder
-  none_link = f(".selectContentDialog label[title=\"#{folder_name}\"] + .showHide a:nth-child(2)")
+  none_link = ff('.selectContentDialog .showHide a:last-child').last
   none_link.text.should == "Select None"
   none_link.click
 
@@ -179,6 +186,7 @@ describe "content migrations" do
       fill_migration_form(:filename => 'cc_ark_test.zip')
       submit
 
+      visit_page
       @course.content_migrations.count.should == 2
 
       progress_items = ff('.migrationProgressItem')
@@ -247,12 +255,12 @@ describe "content migrations" do
 
       # Overwrite original
       visit_page
-      fill_migration_form(:type => "qti_converter")
+      fill_migration_form(:type => "qti_converter", :filename => 'cc_full_test.zip')
       f('#overwriteAssessmentContent').click
       submit
       cm = @course.content_migrations.last
       cm.migration_settings["overwrite_quizzes"].should == true
-      run_migration
+      run_migration(cm)
       @course.quizzes.reload.count.should == 2
       @course.quizzes.map(&:title).should == ["Pretest", "Pretest"]
     end
