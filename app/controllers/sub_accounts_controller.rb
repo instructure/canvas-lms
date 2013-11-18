@@ -126,7 +126,7 @@ class SubAccountsController < ApplicationController
     @sub_account = subaccount_or_self(params[:id])
     params[:account].delete(:parent_account_id)
     if @sub_account.update_attributes(params[:account])
-      render :json => @sub_account
+      render :json => account_json(@sub_account, @current_user, session, [])
     else
       render :json => @sub_account.errors
     end
