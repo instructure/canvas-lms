@@ -905,7 +905,17 @@ define([
       //this runs after the request to get the jsonData comes back
       
       mergeStudentsAndSubmission();
-      if (!jsonData.studentsWithSubmissions.length) {
+      if (jsonData.GROUP_GRADING_MODE && !jsonData.studentsWithSubmissions.length) {
+        if (window.history.length === 1) {
+          alert(I18n.t('alerts.no_students_in_groups_close', "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to close this window."))
+          window.close();
+        }
+        else {
+          alert(I18n.t('alerts.no_students_in_groups_back', "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to go back."))
+          window.history.back();
+        }
+      }
+      else if (!jsonData.studentsWithSubmissions.length) {
         alert(I18n.t('alerts.no_active_students', "Sorry, there are either no active students in the course or none are gradable by you."))
         window.history.back();
       } else {
