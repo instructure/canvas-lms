@@ -41,13 +41,16 @@ define [
 
     onSaveSuccess: ->
       super
-      if @assignmentGroup # meaning we are editing
-        @model.collection.view.render()
+      # meaning we are editing
+      if @assignmentGroup
+        # trigger instead of calling render directly
+        @model.collection.trigger 'render', @model.collection
       else
         @assignmentGroups.add(@model)
         @model = new AssignmentGroup(assignments: [])
 
-      @render()
+        @render()
+
 
     getFormData: ->
       data = super

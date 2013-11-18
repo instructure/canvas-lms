@@ -17,10 +17,12 @@ define [
   assignmentGroups = ->
     @groups = new AssignmentGroupCollection([group(), group()])
 
-  createView = ->
-    view = new CreateGroupView
+  createView = (hasAssignmentGroup=true)->
+    args =
       assignmentGroups: assignmentGroups()
-      assignmentGroup: @groups.first()
+      assignmentGroup: @groups.first() if hasAssignmentGroup
+
+    view = new CreateGroupView(args)
 
   module 'CreateGroupView'
 
@@ -59,3 +61,18 @@ define [
     errors = view.validateFormData(data)
     ok errors
     equal _.keys(errors).length, 1
+
+
+  test 'it should trigger a render event on save success when editing', ->
+    triggerSpy = sinon.spy(AssignmentGroupCollection::, 'trigger')
+    view = createView()
+    view.onSaveSuccess()
+    ok triggerSpy.calledWith 'render'
+    triggerSpy.restore()
+
+  test 'it should call render on save success if adding an assignmentGroup', ->
+    view = createView(false)
+    renderStub = sinon.stub(view, 'render')
+    calls = renderStub.callCount
+    view.onSaveSuccess()
+    equal renderStub.callCount, calls + 1
