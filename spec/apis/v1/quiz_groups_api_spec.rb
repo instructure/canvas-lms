@@ -58,10 +58,29 @@ describe QuizGroupsController, :type => :integration do
       new_quiz_group.migration_id.should be_nil
     end
 
-    it "renders an error when the name is too long" do
+    it "renders a validation error when the name is too long" do
       name = 'a' * ActiveRecord::Base.maximum_string_length + '!'
-      json = api_create_quiz_group({'name' => name}, :expected_status => 400)
+      json = api_create_quiz_group({'name' => name}, :expected_status => 422)
       json.should have_key 'errors'
+      json["errors"].should have_key "name"
+      new_quiz_group.should be_nil
+    end
+
+    it "renders a validation error when pick_count isn't a number" do
+      name = 'A Group'
+      pick_count = 'NaN'
+      json = api_create_quiz_group({name: name, pick_count: pick_count}, expected_status: 422)
+      json.should have_key 'errors'
+      json["errors"].should have_key "pick_count"
+      new_quiz_group.should be_nil
+    end
+
+    it "renders a validation error when question_points isn't a number" do
+      name = 'A Group'
+      question_points = 'NaN'
+      json = api_create_quiz_group({name: name, question_points: question_points}, expected_status: 422)
+      json.should have_key 'errors'
+      json["errors"].should have_key "question_points"
       new_quiz_group.should be_nil
     end
   end
@@ -99,13 +118,26 @@ describe QuizGroupsController, :type => :integration do
       @group.reload.migration_id.should be_nil
     end
 
-    it "renders an error when the name is too long" do
+    it "renders a validation error when the name is too long" do
       name = 'a' * ActiveRecord::Base.maximum_string_length + '!'
-      json = api_update_quiz_group({'name' => name}, :expected_status => 400)
+      json = api_update_quiz_group({'name' => name}, :expected_status => 422)
       json.should have_key 'errors'
       @group.reload.name.should == 'Test Group'
     end
 
+    it "renders a validation error when pick_count isn't a number" do
+      pick_count = "NaN"
+      json = api_update_quiz_group({pick_count: pick_count}, expected_status: 422)
+      json.should have_key 'errors'
+      json["errors"].should have_key "pick_count"
+    end
+
+    it "renders a validation error when question_points isn't a number" do
+      question_points = "NaN"
+      json = api_update_quiz_group({question_points: question_points}, expected_status: 422)
+      json.should have_key 'errors'
+      json["errors"].should have_key "question_points"
+    end
   end
 
   describe "DELETE /courses/:course_id/quizzes/:quiz_id/groups/:id (destroy)" do

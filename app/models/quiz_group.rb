@@ -25,11 +25,12 @@ class QuizGroup < ActiveRecord::Base
   has_many :quiz_questions, :dependent => :destroy
 
   validates_presence_of :quiz_id
-  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
+  validates_length_of :name, maximum: maximum_string_length, allow_nil: true
+  validates_numericality_of :pick_count, :question_points, allow_nil: true
 
   before_save :infer_position
-  after_save :update_quiz
   before_destroy :update_quiz
+  after_save :update_quiz
 
   def actual_pick_count
     count = if self.assessment_question_bank
