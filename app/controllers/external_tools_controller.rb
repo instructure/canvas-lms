@@ -307,7 +307,7 @@ class ExternalToolsController < ApplicationController
 
     @return_url    = external_content_success_url('external_tool')
     @headers       = false
-    @self_target   = true
+    @tool_launch_type = 'self'
 
     find_tool(params[:external_tool_id], selection_type)
     render_tool(selection_type)

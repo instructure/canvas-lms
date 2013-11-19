@@ -16,9 +16,22 @@
 </script>
 <% end %>
 
+
+<% if @resource_url.start_with?('http://') %>
+<div class="alert alert-error" id="insecure_content_msg">
+  <p>You are trying to launch insecure content from within a
+  secure site (canvas).  Some internet browsers may prevent this content from loading.</p>
+
+  <p id="load_failure" class="hide">It looks like your content might not load.  You can use
+  this button to try launching it in a new tab.</p>
+</div>
+<% end %>
+
 <form action="<%= @resource_url %>"
-      method="POST" <%= raw("target='#{@target || 'tool_content'}'") unless @self_target %>
-      id="tool_form" class="<%= 'new_tab' if @tag.try(:new_tab) %>"
+      class="hide"
+      method="POST" target=tool_content
+      id="tool_form"
+      data-tool-launch-type="<%= @tool_launch_type %>"
       data-tool-id="<%= @tool_id %>"
       data-tool-path="<%= @tool_path %>">
   <% @tool_settings.each do |key, value| %>
@@ -40,9 +53,7 @@
     <button class="btn" type="submit"><%= t :load_tool_button, "Load %{tool}", :tool => @tool.name %></button>
   <% end %>
 </form>
-<% if !@tag.try(:new_tab) && !@self_target %>
-  <%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :width => '100%', :height => '400') %>
-<% end %>
+<%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :width => '100%', :height => '400') %>
 <% if @tag %>
   <% if @tag.context.is_a?(Assignment) && (can_do(@tag.context, @current_user, :grade) || can_do(@tag.context.context, @current_user, :manage_assignments)) %>
     <% content_for :right_side do %>

@@ -1063,7 +1063,6 @@ class ApplicationController < ActionController::Base
       end
       @resource_url = @tag.url
       @tool = ContextExternalTool.find_external_tool(tag.url, context, tag.content_id)
-      @target = '_blank' if tag.new_tab
       tag.context_module_action(@current_user, :read)
       if !@tool
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
@@ -1076,6 +1075,7 @@ class ApplicationController < ActionController::Base
         if @assignment
           @launch.for_assignment!(@tag.context, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
         end
+        @tool_launch_type = 'window' if tag.new_tab
         @tool_settings = @launch.generate
         render :template => 'external_tools/tool_show'
       end
