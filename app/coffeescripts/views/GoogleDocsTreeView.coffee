@@ -4,8 +4,6 @@ define ['i18n!titles', 'jquery', 'Backbone', 'jst/googleDocsTreeView'], (I18n, $
 
     template: template
 
-    initialize: (options)->
-
     events:
       "click li.file": "activateFile",
       "click li.folder": "activateFolder",

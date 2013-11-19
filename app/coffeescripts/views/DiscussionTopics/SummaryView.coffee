@@ -19,6 +19,7 @@ define [
       'click' : 'openOnClick'
 
     initialize: ->
+      super
       @model.on 'change reset', @render, this
       @model.on 'destroy', @remove, this
 

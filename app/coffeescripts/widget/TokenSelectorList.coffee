@@ -49,6 +49,7 @@ define [
       91: 'Command'
 
     initialize: (options) ->
+      super
       @selector = @options.selector
       @parent = @options.parent
       @ancestors = @options.ancestors
@@ -65,7 +66,6 @@ define [
 
       @collection.on 'beforeFetch', @showPaginationLoader, this
       @collection.on 'fetch', @render
-      super
 
     render: =>
       activeIndex = @paginationScrollContainer.children('.active').index()

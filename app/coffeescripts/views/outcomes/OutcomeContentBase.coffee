@@ -76,7 +76,7 @@ define [
         @$el.disableWhileLoading @model.fetch success: =>
           @state = opts.state
           @render()
-      super()
+      super
 
     _cleanUpTiny: => @$el.find('[name="description"]').editorBox 'destroy'
 

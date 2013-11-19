@@ -26,6 +26,7 @@ define [
       'click #refresh_calendar_link': '_triggerRefreshCalendar'
 
     initialize: ->
+      super
       @render()
       @navigator = new CalendarNavigator(
         el: @$navigator

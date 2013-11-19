@@ -41,6 +41,7 @@ define [
       '.topic-unsubscribe-button': '$unsubscribeButton'
 
     initialize: ->
+      super
       @model.set 'id', ENV.DISCUSSION.TOPIC.ID
       # overwrite cid so Reply::getModelAttributes gets the right "go to parent" link
       @model.cid = 'main'

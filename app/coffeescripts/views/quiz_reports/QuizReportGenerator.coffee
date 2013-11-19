@@ -9,6 +9,7 @@ define [
     template: quizReportGenerator
 
     initialize: ->
+      super
       if progress = @model.get('progress')
         @model.progressModel.set progress
       @model.progressModel.on 'change', @render

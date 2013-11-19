@@ -21,6 +21,7 @@ define [
       'click #expandAll': 'expandAll'
 
     initialize: ->
+      super
       @model.on 'change', @clearInputs
 
     afterRender: ->

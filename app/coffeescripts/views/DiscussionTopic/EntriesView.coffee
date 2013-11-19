@@ -18,6 +18,7 @@ define [
     $window: $ window
 
     initialize: ->
+      super
       @collection.on 'add', @addEntry
       @model.on 'change', @hideIfFiltering
 

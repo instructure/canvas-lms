@@ -19,6 +19,7 @@ define [
       'click': 'showProgressions'
 
     initialize: ->
+      super
       @$index = @model.collection.view.$el
       @$students = @$index.find('#progression_students')
       @$modules = @$index.find('#progression_modules')

@@ -32,6 +32,7 @@ define [
     #   hide       - set to true if this navigator should start hidden
     #   showAgenda - set to true to activate agenda view features
     initialize: ->
+      super
       @render()
 
       # use debounce to make the aria-live updates nicer
