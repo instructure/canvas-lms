@@ -41,6 +41,7 @@ define [
       '.toggle-group': '$toggleGroup'
 
     dropOptions:
+      accept: '.group-user'
       activeClass: 'droppable'
       hoverClass: 'droppable-hover'
       tolerance: 'pointer'
