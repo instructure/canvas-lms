@@ -538,6 +538,7 @@ routes.draw do
 
     resources :terms
     resources :sub_accounts
+
     match 'avatars' => 'accounts#avatars', :as => :avatars
     match 'sis_import' => 'accounts#sis_import', :as => :sis_import, :via => :get
     resources :sis_imports, :only => [:create, :show], :controller => :sis_imports_api
@@ -1056,6 +1057,10 @@ routes.draw do
       get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
       get 'accounts/:account_id/sub_accounts', :action => :sub_accounts, :path_name => 'sub_accounts'
       get 'accounts/:account_id/courses/:id', :controller => :courses, :action => :show, :path_name => 'account_course_show'
+    end
+
+    scope(:controller => :sub_accounts) do
+      post 'accounts/:account_id/sub_accounts', :action => :create
     end
 
     scope(:controller => :role_overrides) do
