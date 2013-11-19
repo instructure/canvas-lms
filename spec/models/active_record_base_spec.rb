@@ -104,6 +104,20 @@ describe ActiveRecord::Base do
         end
       end
     end
+
+    it "should not use a cursor when start is passed" do
+      pending "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
+      Account.transaction do
+        Account.expects(:find_in_batches_with_cursor).never
+        Account.where(:id => Account.default).includes(:courses).find_each(start: 0) do |a|
+          a.courses.loaded?.should be_true
+        end
+      end
+    end
+
+    it "should raise an error when start is used with group" do
+      lambda { Account.group(:id).find_each(start: 0) }.should raise_error(ArgumentError)
+    end
   end
 
   describe "#remove_dropped_columns" do
