@@ -251,7 +251,7 @@ class CommunicationChannel < ActiveRecord::Base
     twitter_service = user.user_services.for_service(CommunicationChannel::TYPE_TWITTER).first
     twitter_service.assert_communication_channel if twitter_service
 
-    rank_order = [TYPE_EMAIL, TYPE_SMS]
+    rank_order = [TYPE_EMAIL, TYPE_SMS, TYPE_PUSH]
     # Add facebook and twitter (in that order) if the user's account is setup for them.
     rank_order << TYPE_FACEBOOK unless user.user_services.for_service(CommunicationChannel::TYPE_FACEBOOK).empty?
     rank_order << TYPE_TWITTER if twitter_service
