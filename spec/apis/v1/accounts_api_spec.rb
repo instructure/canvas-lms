@@ -89,8 +89,9 @@ describe "Accounts API", :type => :integration do
         "/api/v1/accounts/#{@a1.id}/sub_accounts",
          {:controller=>'sub_accounts', :action=>'create',
           :account_id => @a1.id.to_s, :format => 'json'},
-         {:account => { 'parent_account_id' => @a1.id.to_s, 'name' => 'New sub-account',
-                        'default_storage_quota_mb' => 123, 'default_user_storage_quota_mb' => 456,
+         {:account => { 'name' => 'New sub-account',
+                        'default_storage_quota_mb' => 123,
+                        'default_user_storage_quota_mb' => 456,
                         'default_group_storage_quota_mb' => 147 }})
       @a1.sub_accounts.size.should == previous_sub_count + 1
       sub = @a1.sub_accounts.detect{|a| a.name == "New sub-account"}

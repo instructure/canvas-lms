@@ -94,9 +94,6 @@ class SubAccountsController < ApplicationController
   # @API Create a new sub-account
   # Add a new sub-account to a given account.
   #
-  # @argument account[parent_account_id] [Integer]
-  #   The identifier of the account to which the new sub-account will be added
-  #
   # @argument account[name] [String]
   #   The name of the new sub-account.
   #
@@ -111,7 +108,12 @@ class SubAccountsController < ApplicationController
   #
   # @returns [Account]
   def create
-    @parent_account = subaccount_or_self(params[:account].delete(:parent_account_id))
+    if params[:account][:parent_account_id]
+      parent_id = params[:account].delete(:parent_account_id)
+    else
+      parent_id = params[:account_id]
+    end
+    @parent_account = subaccount_or_self(parent_id)
     return unless authorized_action(@parent_account, @current_user, :manage_account_settings)
     @sub_account = @parent_account.sub_accounts.build(params[:account])
     @sub_account.root_account = @context.root_account
