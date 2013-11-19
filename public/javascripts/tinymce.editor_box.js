@@ -477,6 +477,10 @@ define([
     var id = this.attr('id');
     this._setContentCode(this._getContentCode());
     tinyMCE.execCommand('mceToggleEditor', false, id);
+    // Ensure that keyboard focus doesn't get trapped in the ether.
+    this.removeAttr('aria-hidden')
+      .filter('textarea:visible')
+      .focus();
   };
 
   $.fn._removeEditor = function() {
