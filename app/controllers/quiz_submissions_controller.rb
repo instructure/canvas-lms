@@ -18,12 +18,14 @@
 
 class QuizSubmissionsController < ApplicationController
   include Api::V1::QuizSubmission
+  include Api::V1::Helpers::QuizzesApiHelper
+
   protect_from_forgery :except => [:create, :backup, :record_answer]
   before_filter :require_context
+  before_filter :require_quiz, :only => [ :index, :create, :extensions, :show, :update ]
   batch_jobs_in_actions :only => [:update, :create], :batch => { :priority => Delayed::LOW_PRIORITY }
 
   def index
-    @quiz = @context.quizzes.find(params[:quiz_id])
     if params[:zip] && authorized_action(@quiz, @current_user, :grade)
       generate_submission_zip(@quiz, @context)
     else
@@ -33,7 +35,6 @@ class QuizSubmissionsController < ApplicationController
 
   # submits the quiz as final
   def create
-    @quiz = @context.quizzes.find(params[:quiz_id])
     if @quiz.access_code.present?
       session.delete(@quiz.access_code_key_for_user(@current_user))
     end
@@ -129,7 +130,6 @@ class QuizSubmissionsController < ApplicationController
   end
 
   def extensions
-    @quiz = @context.quizzes.find(params[:quiz_id])
     @student = @context.students.find(params[:user_id])
     @submission = @quiz.find_or_create_submission(@student || @current_user, nil, 'settings_only')
     if authorized_action(@submission, @current_user, :add_attempts)
@@ -153,7 +153,6 @@ class QuizSubmissionsController < ApplicationController
   end
 
   def update
-    @quiz = @context.quizzes.find(params[:quiz_id])
     @submission = @quiz.quiz_submissions.find(params[:id])
     if authorized_action(@submission, @current_user, :update_scores)
       @submission.update_scores(params)
@@ -166,7 +165,6 @@ class QuizSubmissionsController < ApplicationController
   end
 
   def show
-    @quiz = @context.quizzes.find(params[:quiz_id])
     @submission = @quiz.quiz_submissions.find(params[:id])
     if authorized_action(@submission, @current_user, :read)
       redirect_to named_context_url(@context, :context_quiz_history_url, @quiz.id, :user_id => @submission.user_id)

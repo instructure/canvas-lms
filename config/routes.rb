@@ -323,7 +323,6 @@ routes.draw do
       match 'history' => 'quizzes#history', :as => :history
       match 'statistics' => 'quizzes#statistics', :as => :statistics
       match 'read_only' => 'quizzes#read_only', :as => :read_only
-      match 'filters' => 'quizzes#filters', :as => :filters
 
       collection do
         get :fabulous_quizzes
@@ -1332,6 +1331,10 @@ routes.draw do
 
     scope(:controller => :quiz_submissions_api) do
       get 'courses/:course_id/quizzes/:quiz_id/quiz_submissions', :action => :index, :path_name => 'course_quiz_submissions'
+    end
+
+    scope(:controller => :quiz_ip_filters) do
+      get 'courses/:course_id/quizzes/:quiz_id/ip_filters', :action => :index, :path_name => 'course_quiz_ip_filters'
     end
 
     scope(:controller => :outcome_groups_api) do

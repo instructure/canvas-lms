@@ -1393,13 +1393,17 @@ define([
       });
       if (!$dialog.hasClass('loaded')) {
         $dialog.find(".searching_message").text(I18n.t('retrieving_filters', "Retrieving Filters..."));
-        var url = ENV.QUIZ_FILTERS_URL;
+        var url = ENV.QUIZ_IP_FILTERS_URL;
         $.ajaxJSON(url, 'GET', {}, function(data) {
+          var ip_filters = data.quiz_ip_filters;
+          var idx, filter, $filter;
+
           $dialog.addClass('loaded');
-          if (data.length) {
-            for(var idx in data) {
-              var filter = data[idx];
-              var $filter = $dialog.find(".ip_filter.blank:first").clone(true).removeClass('blank');
+
+          if (ip_filters.length) {
+            for (idx = 0; idx < ip_filters.length; ++idx) {
+              filter = ip_filters[idx];
+              $filter = $dialog.find(".ip_filter.blank:first").clone(true).removeClass('blank');
               $filter.fillTemplateData({data: filter});
               $dialog.find(".filters tbody").append($filter.show());
             }

@@ -25,7 +25,7 @@ class QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data, :submission_versions]
+  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :read_only, :managed_quiz_data, :submission_versions]
   before_filter :set_download_submission_dialog_title , only: [:show,:statistics]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
@@ -215,7 +215,7 @@ class QuizzesController < ApplicationController
              :QUIZ => quiz_json(@quiz, @context, @current_user, session),
              :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
              :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
-             :QUIZ_FILTERS_URL => polymorphic_url([@context, @quiz, :filters]),
+             :QUIZ_IP_FILTERS_URL => polymorphic_url([:api, :v1, @context, @quiz, :ip_filters]),
              :CONTEXT_ACTION_SOURCE => :quizzes,
              :REGRADE_OPTIONS => regrade_options }
       append_sis_data(hash)
@@ -460,31 +460,6 @@ class QuizzesController < ApplicationController
       @lockdown_browser_download_url = plugin.settings[:download_url]
     end
     render
-  end
-
-  def filters
-    if authorized_action(@quiz, @current_user, :update)
-      @filters = []
-      @account = @quiz.context.account
-      if @quiz.ip_filter
-        @filters << {
-          :name => t(:current_filter, 'Current Filter'),
-          :account => @quiz.title,
-          :filter => @quiz.ip_filter
-        }
-      end
-      while @account
-        (@account.settings[:ip_filters] || {}).sort_by(&:first).each do |key, filter|
-          @filters << {
-            :name => key,
-            :account => @account.name,
-            :filter => filter
-          }
-        end
-        @account = @account.parent_account
-      end
-      render :json => @filters
-    end
   end
 
   def reorder

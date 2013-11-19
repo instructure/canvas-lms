@@ -126,6 +126,7 @@
 #
 class QuizSubmissionsApiController < ApplicationController
   include Api::V1::QuizSubmission
+  include Api::V1::Helpers::QuizzesApiHelper
 
   before_filter :require_user, :require_context, :require_quiz
 
@@ -201,12 +202,6 @@ class QuizSubmissionsApiController < ApplicationController
   end
 
   private
-
-  def require_quiz
-    unless @quiz = @context.quizzes.find(params[:quiz_id])
-      raise ActiveRecord::RecordNotFound
-    end
-  end
 
   def visible_user_ids(opts = {})
     scope = @context.enrollments_visible_to(@current_user, opts)

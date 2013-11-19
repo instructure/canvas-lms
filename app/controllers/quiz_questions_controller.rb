@@ -172,8 +172,9 @@
 #
 class QuizQuestionsController < ApplicationController
   include Api::V1::QuizQuestion
+  include Api::V1::Helpers::QuizzesApiHelper
 
-  before_filter :require_context, :get_quiz
+  before_filter :require_context, :require_quiz
   before_filter :require_question, :only => [:show]
 
   @@errors = {
@@ -371,10 +372,6 @@ class QuizQuestionsController < ApplicationController
     unless @question = @quiz.quiz_questions.active.find_by_id(params[:id])
       render :json => {:message => @@errors[:question_not_found]}, :status => :not_found
     end
-  end
-
-  def get_quiz
-    @quiz = @context.quizzes.find(params[:quiz_id])
   end
 
 end

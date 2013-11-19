@@ -72,8 +72,9 @@
 #
 class QuizGroupsController < ApplicationController
   include Api::V1::QuizGroup
+  include Api::V1::Helpers::QuizzesApiHelper
 
-  before_filter :require_context, :get_quiz
+  before_filter :require_context, :require_quiz
 
   # @API Create a question group
   # @beta
@@ -186,11 +187,5 @@ class QuizGroupsController < ApplicationController
 
       head :no_content
     end
-  end
-
-  private
-
-  def get_quiz
-    @quiz = @context.quizzes.find(params[:quiz_id])
   end
 end

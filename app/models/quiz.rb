@@ -1280,4 +1280,40 @@ class Quiz < ActiveRecord::Base
   end
 
   delegate :draft_state_enabled?, to: :context
+
+  # The IP filters available for this Quiz, which is an aggregate of the Quiz's
+  # active IP filter and all the IP filters defined in its account hierarchy.
+  #
+  # @return [Array<Hash>]
+  #   The set of IP filters, with three accessible String attributes:
+  #
+  #     - :name => a unique name for the filter
+  #     - :account => name of the scope the filter is defined in (Quiz or Account)
+  #     - :filter => the actual filter value (IP address or a range of)
+  #
+  def available_ip_filters
+    filters = []
+    accounts = self.context.account.account_chain.uniq
+
+    if self.ip_filter.present?
+      filters << {
+        name: t(:current_filter, 'Current Filter'),
+        account: self.title,
+        filter: self.ip_filter
+      }
+    end
+
+    accounts.each do |account|
+      account_filters = account.settings[:ip_filters] || {}
+      account_filters.sort_by(&:first).each do |key, filter|
+        filters << {
+          name: key,
+          account: account.name,
+          filter: filter
+        }
+      end
+    end
+
+    filters
+  end
 end
