@@ -40,7 +40,7 @@ class CourseFormController < ApplicationController
     end
 
     begin
-      course_csv, section_csv, enrollment_csv = SFU::CourseForm::CSVBuilder.build(req_user, selected_courses.compact.uniq, account_id, teacher_username, teacher2_username, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role, cross_list)
+      course_csv, section_csv, enrollment_csv = SFU::CourseForm::CSVBuilder.build(req_user, selected_courses.compact.uniq, account_id, teacher_username, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role, cross_list)
 
       logger.info "[SFU Course Form] course_csv: #{course_csv.inspect}"
       SFU::Canvas.sis_import course_csv
