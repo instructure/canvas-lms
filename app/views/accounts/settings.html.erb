@@ -149,7 +149,21 @@ TEXT
             <% end %>
           </table>
         </fieldset>
+
         <%= render :partial => 'additional_settings' %>
+
+        <% if !@account.site_admin? &&
+               @account.root_account? &&
+               @account.grants_right?(@current_user, :manage_site_settings) %>
+          <fieldset id="google-docs-domain">
+            <legend><%= t(:google_docs_domain, 'Allowed Google Docs Domain') %></legend>
+
+            <%= f.fields_for :settings do |settings| %>
+              <%= settings.label      :google_docs_domain, t('labels.domain', 'Domain:') %>
+              <%= settings.text_field :google_docs_domain, placeholder: 'gmail.com', value: @account.settings[:google_docs_domain] %>
+            <% end %>
+          </fieldset>
+        <% end %>
 
         <% unless @account.site_admin? %>
           <fieldset>

@@ -317,6 +317,11 @@ class AccountsController < ApplicationController
             params[:account][:settings][:outgoing_email_default_name] = '' if params[:account][:settings][:outgoing_email_default_name_option] == 'default'
           end
 
+          google_docs_domain = params[:account][:settings].try(:delete, :google_docs_domain)
+          if @account.root_account? && !@account.site_admin?
+            @account.settings[:google_docs_domain] = google_docs_domain.present? ? google_docs_domain : nil
+          end
+
           @account.enable_user_notes = enable_user_notes if enable_user_notes
           @account.allow_sis_import = allow_sis_import if allow_sis_import && @account.root_account?
           if @account.site_admin? && params[:account][:settings]
@@ -334,6 +339,7 @@ class AccountsController < ApplicationController
             :enable_scheduler,
             :show_scheduler,
             :global_includes,
+            :gmail_domain
           ].each do |key|
             params[:account][:settings].try(:delete, key)
           end
@@ -365,7 +371,7 @@ class AccountsController < ApplicationController
       end
     end
   end
-  
+
   def settings
     if authorized_action(@account, @current_user, :read)
       @available_reports = AccountReport.available_reports(@account) if @account.grants_right?(@current_user, @session, :read_reports)
