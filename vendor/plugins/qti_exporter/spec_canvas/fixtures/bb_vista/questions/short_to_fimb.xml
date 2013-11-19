@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop xmlns="http://www.imsglobal.org/xsd/ims_qtiasiv1p2">
+  <item title="Short Answer to Fill-in-Multiple-Blanks" ident="5759070398061:fj3IqLO.lO3lH6_wctopcode">
+    <itemmetadata>
+      <qtimetadata>
+        <vocabulary uri="imsqtiv1p2_metadata.txt" vocab_type="text/plain" />
+        <qtimetadatafield>
+          <fieldlabel>qmd_questiontype</fieldlabel>
+          <fieldentry>FIB-string</fieldentry>
+        </qtimetadatafield>
+      </qtimetadata>
+      <qtimetadata>
+        <vocabulary uri="webct_imsqti_metadatav1p0.txt" vocab_type="text/plain" />
+        <qtimetadatafield>
+          <fieldlabel>wct_answer_text1</fieldlabel>
+          <fieldentry>John Lennon</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_allowedInBox2</fieldlabel>
+          <fieldentry>0</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_allowedInBox1</fieldlabel>
+          <fieldentry>0</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_answer_text2</fieldlabel>
+          <fieldentry>Paul McCartney</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_value2</fieldlabel>
+          <fieldentry>50.0</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_sa_answerBoxWidth</fieldlabel>
+          <fieldentry>30</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_authorFullName</fieldlabel>
+          <fieldentry>Steve Watts</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_sa_caseSensitive</fieldlabel>
+          <fieldentry>No</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_comparison_type1</fieldlabel>
+          <fieldentry>EQUALS</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_value1</fieldlabel>
+          <fieldentry>50.0</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_questiontype</fieldlabel>
+          <fieldentry>WCT_ShortAnswer</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_comparison_type2</fieldlabel>
+          <fieldentry>EQUALS</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_questioncategory</fieldlabel>
+          <fieldentry>defaultWebctCategory</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_sa_answerBoxNumber</fieldlabel>
+          <fieldentry>2</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_usedbyassessment</fieldlabel>
+          <fieldentry>WebCT to Canvas Import Quiz</fieldentry>
+        </qtimetadatafield>
+        <qtimetadatafield>
+          <fieldlabel>wct_authorWebctGlid</fieldlabel>
+          <fieldentry>5482052147051</fieldentry>
+        </qtimetadatafield>
+      </qtimetadata>
+    </itemmetadata>
+    <presentation>
+      <flow>
+        <material>
+          <mattext xml:space="preserve" label="wct_question_label_1" texttype="TEXT/PLAIN" charset="US-ASCII">Who were the two songwriters in the Beatles?</mattext>
+          <matbreak />
+        </material>
+        <response_str ident="SA01" rtiming="No" rcardinality="Single">
+          <material>
+            <mattext xml:space="preserve" texttype="TEXT/PLAIN" charset="US-ASCII">1. </mattext>
+          </material>
+          <render_fib charset="US-ASCII" encoding="UTF-8" fibtype="String" prompt="Box" rows="1" columns="30" maxchars="200" maxnumber="1" minnumber="1">
+            <response_label ident="A1" rshuffle="No">
+              <material>
+                <matbreak />
+              </material>
+            </response_label>
+          </render_fib>
+        </response_str>
+        <response_str ident="SA02" rtiming="No" rcardinality="Single">
+          <material>
+            <mattext xml:space="preserve" texttype="TEXT/PLAIN" charset="US-ASCII">2. </mattext>
+          </material>
+          <render_fib charset="US-ASCII" encoding="UTF-8" fibtype="String" prompt="Box" rows="1" columns="30" maxchars="200" maxnumber="1" minnumber="1">
+            <response_label ident="A2" rshuffle="No">
+              <material>
+                <matbreak />
+              </material>
+            </response_label>
+          </render_fib>
+        </response_str>
+      </flow>
+    </presentation>
+    <resprocessing>
+      <outcomes>
+        <decvar vartype="Decimal" varname="SCORE" defaultval="0.0" />
+      </outcomes>
+      <respcondition continue="Yes">
+        <conditionvar>
+          <or>
+            <varequal respident="SA01" case="No">John Lennon</varequal>
+            <varequal respident="SA02" case="No">John Lennon</varequal>
+          </or>
+        </conditionvar>
+        <conditionvar>
+          <or>
+            <varequal respident="SA01" case="No">John Lennon</varequal>
+            <varequal respident="SA02" case="No">John Lennon</varequal>
+          </or>
+        </conditionvar>
+        <setvar varname="SCORE" action="Add">50.0</setvar>
+      </respcondition>
+      <respcondition continue="Yes">
+        <conditionvar>
+          <or>
+            <varequal respident="SA01" case="No">Paul McCartney</varequal>
+            <varequal respident="SA02" case="No">Paul McCartney</varequal>
+          </or>
+        </conditionvar>
+        <conditionvar>
+          <or>
+            <varequal respident="SA01" case="No">Paul McCartney</varequal>
+            <varequal respident="SA02" case="No">Paul McCartney</varequal>
+          </or>
+        </conditionvar>
+        <setvar varname="SCORE" action="Add">50.0</setvar>
+      </respcondition>
+    </resprocessing>
+  </item>
+</questestinterop>
+
