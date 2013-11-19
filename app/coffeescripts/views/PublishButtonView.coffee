@@ -176,4 +176,5 @@ define [
       else
         @disable()
         @$el.attr 'aria-disabled', true
+        @$el.attr 'title', @model.disabledMessage()
         @addAriaLabel(@model.disabledMessage())
