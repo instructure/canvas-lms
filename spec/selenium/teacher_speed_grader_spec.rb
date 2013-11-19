@@ -183,8 +183,9 @@ describe "speed grader" do
         create!(:user => student, :message => first_message)
     entry.update_topic
     entry.context_module_action
+    attachment_thing = attachment_model(:context => student_2, :filename => 'horse.js')
     entry_2 = discussion_topic.discussion_entries.
-        create!(:user => student_2, :message => second_message)
+        create!(:user => student_2, :message => second_message, :attachment => attachment_thing)
     entry_2.update_topic
     entry_2.context_module_action
 
@@ -201,6 +202,9 @@ describe "speed grader" do
     in_frame 'speedgrader_iframe' do
       f('#main').should_not include_text(first_message)
       f('#main').should include_text(second_message)
+      url = f('#main div.attachment_data a')['href']
+      url.should be_include "/files/#{attachment_thing.id}/download?verifier=#{attachment_thing.uuid}"
+      url.should_not be_include "/courses/#{@course}"
     end
   end
 
