@@ -591,6 +591,7 @@ describe AssignmentsApiController, :type => :integration do
       course_with_teacher(:active_all => true)
       student_in_course(:course => @course, :active_enrollment => true)
       course_with_ta(:course => @course, :active_enrollment => true)
+      @course.course_sections.create!
 
       notification = Notification.create! :name => "Assignment Created"
 
@@ -620,7 +621,7 @@ describe AssignmentsApiController, :type => :integration do
                    'name' => 'some assignment',
                    'assignment_overrides' => {
                        '0' => {
-                         'course_section_id' => @course.default_section.id,
+                         'course_section_id' => @course.active_course_sections.second.id,
                          'due_at' => @override_due_at.iso8601
                        }
                    }

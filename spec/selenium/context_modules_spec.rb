@@ -1017,10 +1017,14 @@ describe "context_modules" do
     end
 
     it "should indicate multiple due dates for multiple observed students" do
-      student2 = user(:active_all => true, :active_state => 'active')
-      @course.enroll_user(student2, 'StudentEnrollment', :enrollment_state => 'active')
-      override_for_student(student2, @due_at + 1.day)
+      section2 = @course.course_sections.create!
+      override = assignment_override_model(:assignment => @assignment)
+      override.set = section2
+      override.override_due_at(@due_at + 1.day)
+      override.save!
 
+      student2 = user(:active_all => true, :active_state => 'active', :section => section2)
+      @course.enroll_user(student2, 'StudentEnrollment', :enrollment_state => 'active')
       @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
       @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :allow_multiple_enrollments => true, :associated_user_id => student2.id)
 

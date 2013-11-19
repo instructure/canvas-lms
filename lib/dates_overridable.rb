@@ -150,9 +150,13 @@ module DatesOverridable
   end
 
   def multiple_due_dates_apply_to?(user)
-    as_instructor = self.due_dates_for(user).second
-    as_instructor && as_instructor.map{ |hash|
-      self.class.due_date_compare_value(hash[:due_at]) }.uniq.size > 1
+    if !context.multiple_sections?
+      return false
+    else
+      as_instructor = self.due_dates_for(user).second
+      as_instructor && as_instructor.map{ |hash|
+        self.class.due_date_compare_value(hash[:due_at]) }.uniq.size > 1
+    end
   end
 
   # deprecated alias method - can be removed once all plugins are updated

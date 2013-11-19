@@ -2901,4 +2901,8 @@ class Course < ActiveRecord::Base
       create_discussion_topic: DiscussionTopic.context_allows_user_to_create?(self, user, session)
     )
   end
+
+  def multiple_sections?
+    self.active_course_sections.count > 1
+  end
 end

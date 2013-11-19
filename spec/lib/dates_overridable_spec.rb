@@ -539,7 +539,8 @@ shared_examples_for "an object whose dates are overridable" do
   describe "multiple_due_dates?" do
     before do
       course_with_student(:course => course)
-      override.set = course.default_section
+      course.course_sections.create!
+      override.set = course.active_course_sections.second
       override.override_due_at(2.days.ago)
       override.save!
     end

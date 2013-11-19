@@ -3736,3 +3736,18 @@ describe Course do
     end
   end
 end
+
+describe Course, "multiple_sections?" do
+  before(:each) do
+    course_with_teacher(:active_all => true)
+  end
+
+  it "should return false for a class with one section" do
+    @course.multiple_sections?.should be_false
+  end
+
+  it "should return true for a class with more than one active section" do
+    @course.course_sections.create!
+    @course.multiple_sections?.should be_true
+  end
+end
