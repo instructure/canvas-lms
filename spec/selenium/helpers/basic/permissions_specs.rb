@@ -5,44 +5,35 @@ shared_examples_for "permission tests" do
     course_with_admin_logged_in
   end
 
-  def select_enable(permission_name, role_name)
-    permission_button = fj("[data-permission_name='#{permission_name}'].[data-role_name='#{role_name}']")
-    permission_button.find_element(:css, "a").click
+  def select_permission_option(permission_name, role_name, index)
+    driver.execute_script("$('td[data-permission_name=\"#{permission_name}\"].[data-role_name=\"#{role_name}\"] a').click()")
     wait_for_ajaximations
-    options = permission_button.find_elements(:css, ".dropdown-menu label")
-    options[0].click # 0 is Enable
-
+    driver.execute_script("$('td[data-permission_name=\"#{permission_name}\"].[data-role_name=\"#{role_name}\"] label')[#{index}].click()")
     wait_for_ajaximations #Every select needs to wait for for the request to finish
   end
 
-  def select_enable_and_lock(permission_name, role_name)
-    permission_button = fj("[data-permission_name='#{permission_name}'].[data-role_name='#{role_name}']")
-    permission_button.find_element(:css, "a").click
-    wait_for_ajaximations
-    options = permission_button.find_elements(:css, ".dropdown-menu label")
-    options[1].click # 1 is enabled and locked
+  def select_enable(permission_name, role_name)
+    select_permission_option(permission_name, role_name, 0) # 0 is Enable
+  end
 
-    wait_for_ajaximations
+  def select_enable_and_lock(permission_name, role_name)
+    select_permission_option(permission_name, role_name, 1) # 1 is enabled and locked
   end
 
   def select_disable(permission_name, role_name)
-    permission_button = fj("[data-permission_name='#{permission_name}'].[data-role_name='#{role_name}']")
-    permission_button.find_element(:css, "a").click
-    wait_for_ajaximations
-    options = permission_button.find_elements(:css, ".dropdown-menu label")
-    options[2].click # 2 is Disabled
-
-    wait_for_ajaximations
+    select_permission_option(permission_name, role_name, 2) # 2 is Disabled
   end
 
   def select_disable_and_lock(permission_name, role_name)
-    permission_button = fj("[data-permission_name='#{permission_name}'].[data-role_name='#{role_name}']")
-    permission_button.find_element(:css, "a").click
-    wait_for_ajaximations
-    options = permission_button.find_elements(:css, ".dropdown-menu label")
-    options[3].click # 3 is Disabled and locked
+    select_permission_option(permission_name, role_name, 3) # 3 is Disabled and locked
+  end
 
-    wait_for_ajaximations
+  def select_default(permission_name, role_name)
+    select_permission_option(permission_name, role_name, 4) # 3 is Disabled and locked
+  end
+
+  def select_default_and_lock(permission_name, role_name)
+    select_permission_option(permission_name, role_name, 5) # 3 is Disabled and locked
   end
 
   def add_new_account_role(role_name)
@@ -178,8 +169,31 @@ shared_examples_for "permission tests" do
         end
       end
 
-      it "sets a permission to default"
-      it "sets a permission to default and locked"
+      it "sets a permission to default" do
+        select_disable(permission_name, role_name)
+
+        keep_trying_until do
+          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override.nil?.should be_false
+        end
+
+        select_default(permission_name, role_name)
+
+        keep_trying_until do
+          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override.nil?.should be_true
+        end
+      end
+
+      it "sets a permission to default and locked" do
+        select_default_and_lock(permission_name, role_name)
+
+        keep_trying_until do
+          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override.enabled.nil?.should be_true
+          role_override.locked.should be_true
+        end
+      end
     end
 
     context "when managing course roles" do
@@ -224,7 +238,6 @@ shared_examples_for "permission tests" do
       end
 
       it "locks and disables a permission" do
-        pending('broken')
         select_disable_and_lock(permission_name, role_name)
 
         keep_trying_until do
@@ -234,8 +247,31 @@ shared_examples_for "permission tests" do
         end
       end
 
-      it "sets a permission to default"
-      it "sets a permission to default and locked"
+      it "sets a permission to default" do
+        select_disable(permission_name, role_name)
+
+        keep_trying_until do
+          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override.nil?.should be_false
+        end
+
+        select_default(permission_name, role_name)
+
+        keep_trying_until do
+          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override.nil?.should be_true
+        end
+      end
+
+      it "sets a permission to default and locked" do
+        select_default_and_lock(permission_name, role_name)
+
+        keep_trying_until do
+          role_override = RoleOverride.find_by_enrollment_type(role.name)
+          role_override.enabled.nil?.should be_true
+          role_override.locked.should be_true
+        end
+      end
     end
   end
 end
