@@ -53,7 +53,7 @@ module SFU
           course_array.push "#{course_id},#{short_name},#{long_name},#{account_id},#{term},active,#{selected_term.start_at},#{selected_term.end_at}"
 
           # create section csv
-          section_array.push section_csv(term, sections, course_id, true)
+          sections.each { |section| section_array.push section_csv(term, section, course_id) }
 
           # create enrollment csv to default section
           enrollment_array.push "#{course_id},#{teacher_sis_user_id},teacher,,active\n"
@@ -133,13 +133,13 @@ module SFU
         course["enrollment_csv_1"] = "#{course["course_id"]},#{teacher1},teacher,#{course["default_section_id"]},active"
         course["enrollment_csv_2"] = "#{course["course_id"]},#{teacher2},#{teacher2_role},#{course["default_section_id"]},active" unless teacher2.nil?
 
-        sections.push "#{course["main_section_id"]}:_:#{course["name"].upcase}#{course["number"]} #{course["section_name"].upcase}"
+        sections.push [course["main_section_id"], "#{course["name"].upcase}#{course["number"]} #{course["section_name"].upcase}"]
 
         # add child sections csv
         unless course["child_sections"].nil?
           course["child_sections"].split(",").compact.uniq.each do |tutorial_name|
             section_id = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{tutorial_name.downcase}:::#{time_stamp}"
-            sections.push "#{section_id}:_:#{course["name"].upcase}#{course["number"]} #{tutorial_name.upcase}"
+            sections.push [section_id, "#{course["name"].upcase}#{course["number"]} #{tutorial_name.upcase}"]
           end
         end
 
@@ -148,28 +148,15 @@ module SFU
         course
       end
 
-      def section_csv(term, sections, course_id, cross_list=nil)
-        section_array = []
-        num_of_sections = sections.compact.uniq.count
-        unless cross_list
-          sections.compact.uniq.each do  |section|
-            section_info = section.split(":_:")
-            if term.to_i != 1137 && !section_info[1].to_s.end_with?("00") && num_of_sections > 1
-              # Create only child sections
-              section_array.push "#{section_info[0]},#{course_id},#{section_info[1]},active,,,"
-            elsif term.to_i != 1137 && num_of_sections == 1
-              # No child sections
-              section_array.push "#{section_info[0]},#{course_id},#{section_info[1]},active,,,"
-            elsif term.to_i == 1137
-              section_array.push "#{section_info[0]},#{course_id},#{section_info[1]},active,,,"
-            end
-          end
-        else
-          sections.compact.uniq.each do  |section|
-            section_array.push (section_csv(term, section, course_id))
-          end
+      def section_csv(term, sections, course_id)
+        sections = sections.compact.uniq
+        sections.map! do |section_info|
+          # Skip Dx00 section if there are other child sections (except in Fall 2013)
+          next if term.to_i != 1137 && sections.count > 1 && section_info[1].to_s.end_with?('00')
+
+          "#{section_info[0]},#{course_id},#{section_info[1]},active,,,"
         end
-        section_array
+        sections.compact
       end
 
       # e.g. course_line = sandbox-kipling-71113273
