@@ -28,10 +28,14 @@ define [
       @$detailToggle.toggleClass('icon-mini-arrow-right')
       @$detailToggle.toggleClass('icon-mini-arrow-down')
 
+    shouldDelete: (action) ->
+      ENV.ACCOUNT.site_admin && @model.get('hidden') && action == 'off'
+
     toggleValue: ($target) ->
       $target.siblings().removeClass('active').attr('aria-checked', false)
       $target.addClass('active').attr('aria-checked', true)
-      @updateFlag($target.data('action'))
+      action = $target.data('action')
+      if @shouldDelete(action) then @deleteFlag() else @updateFlag(action)
 
     deleteFlag: ->
       @model.destroy(silent: true)
