@@ -34,11 +34,11 @@ describe "course people" do
       wait_for_ajaximations
 
       keep_trying_until { driver.execute_script("return $('##{input_id}').data('token_input').selector.list.query.search") == text }
-      wait_for_ajaximations
+      wait_for_js
       elements = ffj(".autocomplete_menu:visible .list:last ul:last li").map { |e|
         [e, (e.find_element(:tag_name, :b).text rescue e.text)]
       }
-      wait_for_ajaximations
+      wait_for_js
       element = elements.detect { |e| e.last == text }
       element.should_not be_nil
       element.first.click
