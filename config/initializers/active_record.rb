@@ -26,7 +26,9 @@ class ActiveRecord::Base
     @all_models = (ActiveRecord::Base.send(:subclasses) +
                    ActiveRecord::Base.models_from_files +
                    [Version]).compact.uniq.reject { |model|
-      model.superclass != ActiveRecord::Base || (model.respond_to?(:tableless?) && model.tableless?)
+      !(model.superclass == ActiveRecord::Base || model.superclass.abstract_class?) ||
+      (model.respond_to?(:tableless?) && model.tableless?) ||
+      model.abstract_class?
     }
   end
 
