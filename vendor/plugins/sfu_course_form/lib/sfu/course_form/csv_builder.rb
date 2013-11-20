@@ -25,18 +25,18 @@ module SFU
           course_ids = []
           short_names = []
           long_names = []
-          term = ""
+          term = ''
           sections = []
 
           selected_courses.each do |course|
             course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
 
-            course_ids.push course_info["course_id"]
-            short_names.push course_info["short_name"]
-            long_names.push course_info["long_name"]
-            term = course_info["term"]
+            course_ids.push course_info[:course_id]
+            short_names.push course_info[:short_name]
+            long_names.push course_info[:long_name]
+            term = course_info[:term]
 
-            sections.push course_info["sections"]
+            sections.push course_info[:sections]
           end
 
           course_id = course_ids.join(':')
@@ -64,22 +64,22 @@ module SFU
         else
 
           selected_courses.each do |course|
-            if course.starts_with? "sandbox"
+            if course.starts_with? 'sandbox'
               Rails.logger.info "[SFU Course Form] Creating sandbox for #{teacher_username} requested by #{req_user}"
               sandbox = sandbox_info(course, teacher_username, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
 
               course_array.push sandbox[:course]
               enrollment_array.concat sandbox[:enrollments]
 
-              course_name_too_long = true if sandbox["short_long_name"].length > CANVAS_COURSE_NAME_MAX
-            elsif course.starts_with? "ncc"
+              course_name_too_long = true if sandbox[:short_long_name].length > CANVAS_COURSE_NAME_MAX
+            elsif course.starts_with? 'ncc'
               Rails.logger.info "[SFU Course Form] Creating ncc course for #{teacher_username} requested by #{req_user}"
               ncc_course = ncc_info(course, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
 
               course_array.push ncc_course[:course]
               enrollment_array.concat ncc_course[:enrollments]
 
-              course_name_too_long = true if ncc_course["short_long_name"].length > CANVAS_COURSE_NAME_MAX
+              course_name_too_long = true if ncc_course[:short_long_name].length > CANVAS_COURSE_NAME_MAX
             else
               Rails.logger.info "[SFU Course Form] Creating single course container : #{course} requested by #{req_user}"
               course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
@@ -88,11 +88,11 @@ module SFU
               course_array.push course_info[:course]
 
               # create section csv
-              section_array.concat section_csv(course_info["term"], course_info["sections"], course_info["course_id"])
+              section_array.concat section_csv(course_info[:term], course_info[:sections], course_info[:course_id])
 
               enrollment_array.concat course_info[:enrollments]
 
-              course_name_too_long = true if course_info["long_name"].length > CANVAS_COURSE_NAME_MAX
+              course_name_too_long = true if course_info[:long_name].length > CANVAS_COURSE_NAME_MAX
             end
           end
 
@@ -110,37 +110,35 @@ module SFU
       def course_info(course_line, account_id, teacher1, teacher2 = nil, teacher2_role = 'teacher')
         # Example; course_line = 1131:::ensc:::351:::d100:::Real Time and Embedded Systems
         course = { :enrollments => [] }
-        sections = []
-        course_arr = course_line.split(":::")
-        course["term"] = course_arr[0]
-        course["name"] = course_arr[1].to_s
-        course["number"] = course_arr[2]
-        course["section_name"] = course_arr[3].to_s
-        course["title"] = course_arr[4].to_s
-        course["child_sections"] = course_arr[5]
+        course[:sections] = []
+        course_arr = course_line.split(':::')
+        course[:term] = course_arr[0]
+        name = course_arr[1].to_s
+        number = course_arr[2]
+        section_name = course_arr[3].to_s
+        title = course_arr[4].to_s
+        child_sections = course_arr[5]
 
-        selected_term = term(course["term"])
+        selected_term = term(course[:term])
 
-        course["course_id"] = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{course["section_name"]}"
-        course["main_section_id"] = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{course["section_name"]}:::#{time_stamp}"
-        course["short_name"] = "#{course["name"].upcase}#{course["number"]} #{course["section_name"].upcase}"
-        course["long_name"] =  "#{course["short_name"]} #{course["title"]}"
-        course["default_section_id"] = default_section_id(course["term"], course["main_section_id"], course["section_name"], course["child_sections"])
-        course[:course] = [course["course_id"], course["short_name"], course["long_name"], account_id, course["term"], 'active', selected_term.start_at, selected_term.end_at]
-        course[:enrollments] << [course["course_id"], teacher1, 'teacher', course["default_section_id"], 'active']
-        course[:enrollments] << [course["course_id"], teacher2, teacher2_role, course["default_section_id"], 'active'] unless teacher2.nil?
+        course[:course_id] = "#{course[:term]}-#{name}-#{number}-#{section_name}"
+        course[:main_section_id] = "#{course[:course_id]}:::#{time_stamp}"
+        course[:short_name] = "#{name}#{number} #{section_name}".upcase
+        course[:long_name] =  "#{course[:short_name]} #{title}"
+        course[:default_section_id] = default_section_id(course[:term], course[:main_section_id], section_name, child_sections)
+        course[:course] = [course[:course_id], course[:short_name], course[:long_name], account_id, course[:term], 'active', selected_term.start_at, selected_term.end_at]
+        course[:enrollments] << [course[:course_id], teacher1, 'teacher', course[:default_section_id], 'active']
+        course[:enrollments] << [course[:course_id], teacher2, teacher2_role, course[:default_section_id], 'active'] unless teacher2.nil?
 
-        sections.push [course["main_section_id"], "#{course["name"].upcase}#{course["number"]} #{course["section_name"].upcase}"]
+        course[:sections].push [course[:main_section_id], course[:short_name]]
 
         # add child sections csv
-        unless course["child_sections"].nil?
-          course["child_sections"].split(",").compact.uniq.each do |tutorial_name|
-            section_id = "#{course["term"]}-#{course["name"]}-#{course["number"]}-#{tutorial_name.downcase}:::#{time_stamp}"
-            sections.push [section_id, "#{course["name"].upcase}#{course["number"]} #{tutorial_name.upcase}"]
+        unless child_sections.nil?
+          child_sections.split(',').compact.uniq.each do |tutorial_name|
+            section_id = "#{course[:term]}-#{name}-#{number}-#{tutorial_name.downcase}:::#{time_stamp}"
+            course[:sections].push [section_id, "#{name}#{number} #{tutorial_name}".upcase]
           end
         end
-
-        course["sections"] = sections
 
         course
       end
@@ -158,30 +156,30 @@ module SFU
 
       # e.g. course_line = sandbox-kipling-71113273
       def sandbox_info(course_line, username, teacher1, teacher2 = nil, teacher2_role = 'teacher')
-        account_sis_id = "sfu:::sandbox:::instructors"
-        course_arr = course_line.split("-")
+        account_sis_id = 'sfu:::sandbox:::instructors'
+        course_arr = course_line.split('-')
         sandbox = { :enrollments => [] }
-        sandbox["course_id"] = course_line
-        sandbox["short_long_name"] = "Sandbox - #{username} - #{course_arr.last}"
+        course_id = course_line
+        sandbox[:short_long_name] = "Sandbox - #{username} - #{course_arr.last}"
 
-        sandbox[:course] = [sandbox["course_id"], sandbox["short_long_name"], sandbox["short_long_name"], account_sis_id, nil, 'active']
-        sandbox[:enrollments] << [sandbox["course_id"], teacher1, 'teacher', nil, 'active']
-        sandbox[:enrollments] << [sandbox["course_id"], teacher2, teacher2_role, nil, 'active'] unless teacher2.nil?
+        sandbox[:course] = [course_id, sandbox[:short_long_name], sandbox[:short_long_name], account_sis_id, nil, 'active']
+        sandbox[:enrollments] << [course_id, teacher1, 'teacher', nil, 'active']
+        sandbox[:enrollments] << [course_id, teacher2, teacher2_role, nil, 'active'] unless teacher2.nil?
         sandbox
       end
 
       # e.g. course_line = ncc-kipling-71113273-1134-My special course
       def ncc_info(course_line, teacher1, teacher2 = nil, teacher2_role = 'teacher')
-        account_sis_id = "sfu:::ncc"
-        course_arr = course_line.split("-")
+        account_sis_id = 'sfu:::ncc'
+        course_arr = course_line.split('-')
         ncc = { :enrollments => [] }
-        ncc["course_id"] = "#{course_arr.first(3).join("-")}"
-        ncc["term"] = course_arr[3] # Can be empty!
-        ncc["short_long_name"] = course_arr.last
+        course_id = course_arr.first(3).join('-')
+        term = course_arr[3] # Can be empty!
+        ncc[:short_long_name] = course_arr.last
 
-        ncc[:course] = [ncc["course_id"], ncc["short_long_name"], ncc["short_long_name"], account_sis_id, ncc["term"], 'active']
-        ncc[:enrollments] << [ncc["course_id"], teacher1, 'teacher', nil, 'active']
-        ncc[:enrollments] << [ncc["course_id"], teacher2, teacher2_role, nil, 'active'] unless teacher2.nil?
+        ncc[:course] = [course_id, ncc[:short_long_name], ncc[:short_long_name], account_sis_id, term, 'active']
+        ncc[:enrollments] << [course_id, teacher1, 'teacher', nil, 'active']
+        ncc[:enrollments] << [course_id, teacher2, teacher2_role, nil, 'active'] unless teacher2.nil?
         ncc
       end
 
