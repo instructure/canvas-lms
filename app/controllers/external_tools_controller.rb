@@ -111,11 +111,8 @@ class ExternalToolsController < ApplicationController
       @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
       @tool_settings = @launch.generate
 
-      if params[:borderless]
-        render :partial => 'external_tools/borderless_launch'
-      else
-        render :template => 'external_tools/tool_show'
-      end
+      @tool_launch_type = 'self'
+      render :template => 'external_tools/tool_show'
     end
   end
 
@@ -238,7 +235,8 @@ class ExternalToolsController < ApplicationController
     @resource_title = launch_settings['tool_name']
     @tool_settings = launch_settings['tool_settings']
 
-    render :partial => 'external_tools/borderless_launch'
+    @tool_launch_type = 'self'
+    render :template => 'external_tools/tool_show'
   end
 
   # @API Get a single external tool

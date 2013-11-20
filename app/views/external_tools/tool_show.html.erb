@@ -50,7 +50,7 @@
       </div>
     </div>
   <% else %>
-    <button class="btn" type="submit"><%= t :load_tool_button, "Load %{tool}", :tool => @tool.name %></button>
+    <button class="btn" type="submit"><%= t :load_tool_button, "Load %{tool}", :tool => @resource_title %></button>
   <% end %>
 </form>
 <%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :width => '100%', :height => '400') %>
