@@ -267,6 +267,19 @@ describe Attachment do
         @attachment.should be_processed
       end
 
+      it "should not queue for non-root attachments" do
+        expects_job_with_tag('Attachment#submit_to_scribd!', 1) do
+          @attachment1 = scribdable_attachment_model
+          @attachment1.after_attachment_saved
+          @attachment2 = scribdable_attachment_model
+          # normally done by uploaded_data= in attachment_fu
+          @attachment2.root_attachment = @attachment1
+          @attachment2.after_attachment_saved
+        end
+        @attachment1.should be_pending_upload
+        @attachment2.should be_processed
+      end
+
       describe "scribd submit filtering" do
         it "should still submit if the attachment is tagged" do
           Attachment.stubs(:filtering_scribd_submits?).returns(true)
@@ -389,64 +402,20 @@ describe Attachment do
       end
     end
 
-    describe "scribd_doc_shared?" do
-      it "should be trivially false if there is no scribd_doc" do
-        attachment_model
-        @attachment.should_not be_scribd_doc_shared
-      end
-
-      it "should be false if there are no related attachments" do
-        attachment_with_scribd_doc.should_not be_scribd_doc_shared
-      end
-
-      it "should be false if related attachments have no scribd_docs" do
-        @root = attachment_model
-        @child1 = attachment_with_scribd_doc(fake_scribd_doc, :root_attachment => @root)
-        @child2 = attachment_with_scribd_doc(nil, :root_attachment => @root)
-        @child1.should_not be_scribd_doc_shared
-      end
-
-      it "should be false if related attachments have different scribd_docs" do
-        @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
-        @child1 = attachment_with_scribd_doc(fake_scribd_doc('one'), :root_attachment => @root)
-        @child2 = attachment_with_scribd_doc(fake_scribd_doc('two'), :root_attachment => @root)
-        @root.should_not be_scribd_doc_shared
-        @child1.should_not be_scribd_doc_shared
-      end
-
-      it "should be true if related attachment implicitly uses our doc_id" do
-        @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
-        @child1 = attachment_with_scribd_doc(nil, :root_attachment => @root)
-        @child2 = attachment_with_scribd_doc(nil, :root_attachment => @root)
-        @root.should be_scribd_doc_shared
-        @child1.should be_scribd_doc_shared
-      end
-
-      it "should be true if related attachment explicitly uses our doc_id" do
-        @root = attachment_model
-        @child1 = attachment_with_scribd_doc(fake_scribd_doc('what'), :root_attachment => @root)
-        @child2 = attachment_with_scribd_doc(fake_scribd_doc('what'), :root_attachment => @root)
-        @child1.should be_scribd_doc_shared
-      end
-    end
-
     describe "delete_scribd_doc" do
-      it "should skip deletion if the scribd_doc is shared" do
-        @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
-        @child = attachment_with_scribd_doc(fake_scribd_doc('zero'), :root_attachment => @root)
-        @child.scribd_doc.expects(:destroy).never
-        @child.destroy
-        @child.reload.workflow_state.should eql 'deleted'
-        @child.read_attribute(:scribd_doc).should be_nil
+      it "should delete the scribd doc" do
+        @att = attachment_with_scribd_doc(fake_scribd_doc('zero'))
+        @att.scribd_doc.expects(:destroy).once.returns(true)
+        @att.destroy
+        @att.reload.workflow_state.should eql 'deleted'
+        @att.read_attribute(:scribd_doc).should be_nil
       end
 
-      it "should delete the scribd doc" do
+      it "should do nothing for non-root attachments" do
         @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
         @child = attachment_with_scribd_doc(fake_scribd_doc('one'), :root_attachment => @root)
-        @child.scribd_doc.expects(:destroy).once.returns(true)
-        @child.destroy
-        @child.reload.workflow_state.should eql 'deleted'
-        @child.read_attribute(:scribd_doc).should be_nil
+        @child.scribd_doc.expects(:destroy).never
+        @child.delete_scribd_doc
       end
     end
 

@@ -164,7 +164,7 @@ class Attachment < ActiveRecord::Base
       @after_attachment_saved_workflow_state = nil
     end
 
-    if scribdable? && !Attachment.skip_3rd_party_submits?
+    if !root_attachment_id && scribdable? && !Attachment.skip_3rd_party_submits?
       send_later_enqueue_args(:submit_to_scribd!,
                               {:n_strand => 'scribd', :max_attempts => 1})
     elsif %w(pending_upload processing).include?(workflow_state)
@@ -324,46 +324,24 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  # It seems like there are at least three possibilities here:
-  # 1. the root attachment's record has a scribd_doc; the child attachmenent's
-  #    doesn't, and uses the root's implicitly (iow, Attachment#scribd_doc
-  #    loads the parent's if the child doesn't have one).
-  #    -> I cannot find any examples of this; in my experience, the child's
-  #       record always has a scribd_doc explicitly set...
-  #    --> if we trusted this case never to happen, then we could add
-  #        "where scribd_doc is not null" to the condition below
-  # 2. the root attachment and the child attachment each have an explicit
-  #    scribd_doc, specifying the same doc_id
-  #    -> I see plenty of examples of this in the db, but I have
-  #       not seen it happen...
-  # 3. the root attachment and the child attachment each have an explicit
-  #    scribd_doc, specifying different doc_ids (i.e., not sharing)
-  #    -> This is what happens when I upload two copies of the same file.
-  def scribd_doc_shared?
-    return false unless scribd_doc
-    related_attachments.not_deleted.any? do |att|
-      att.scribd_doc && att.scribd_doc.doc_id == scribd_doc.doc_id
-    end
-  end
-
   # disassociate the scribd_doc from this Attachment
   # and also delete it from scribd if no other Attachments are using it
   def delete_scribd_doc
+    # we no longer do scribd docs on child attachments, but the migration
+    # moving them up to root attachments might still be running
+    return true if root_attachment_id
     return true unless ScribdAPI.enabled? && scribd_doc
-    shared = scribd_doc_shared?
 
     scribd_doc = self.scribd_doc
     Scribd::API.instance.user = scribd_user
     self.scribd_doc = nil
     self.scribd_attempts = 0
     self.workflow_state = 'deleted'  # not file_state :P
-    unless shared
-      begin
-        return false unless scribd_doc.destroy
-      rescue Scribd::ResponseError => e
-        # does not exist
-        return false unless e.code == '612'
-      end
+    begin
+      return false unless scribd_doc.destroy
+    rescue Scribd::ResponseError => e
+      # does not exist
+      return false unless e.code == '612'
     end
     save
   end
@@ -1722,7 +1700,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def record_inline_view
-    update_attribute(:last_inline_view, Time.now)
+    (root_attachment || self).update_attribute(:last_inline_view, Time.now)
     check_rerender_scribd_doc unless self.scribd_doc
   end
 
@@ -1740,10 +1718,11 @@ class Attachment < ActiveRecord::Base
 
   def check_rerender_scribd_doc
     if scribd_doc_missing?
-      self.scribd_attempts = 0
-      self.workflow_state = 'pending_upload'
-      self.save!
-      send_later :submit_to_scribd!
+      attachment = root_attachment || self
+      attachment.scribd_attempts = 0
+      attachment.workflow_state = 'pending_upload'
+      attachment.save!
+      attachment.send_later :submit_to_scribd!
       return true
     end
     false
