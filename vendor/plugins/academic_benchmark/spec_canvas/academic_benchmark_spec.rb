@@ -7,7 +7,7 @@ describe AcademicBenchmark::Converter do
   before(:each) do
     @root_account = Account.site_admin
     account_admin_user(:account => @root_account, :active_all => true)
-    @cm = ContentMigration.create(:context => @root_account)
+    @cm = ContentMigration.new(:context => @root_account)
     @plugin = Canvas::Plugin.find('academic_benchmark_importer')
     @cm.converter_class = @plugin.settings['converter_class']
     @cm.migration_settings[:migration_type] = 'academic_benchmark_importer'
