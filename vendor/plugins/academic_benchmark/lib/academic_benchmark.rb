@@ -35,7 +35,7 @@ module AcademicBenchmark
       raise Canvas::Migration::Error.new(I18n.t('academic_benchmark.no_permissions', "User isn't allowed to edit global outcomes"))
     end
 
-    cm = ContentMigration.create(:context => Account.site_admin)
+    cm = ContentMigration.new(:context => Account.site_admin)
     cm.converter_class = self.config['converter_class']
     cm.migration_settings[:migration_type] = 'academic_benchmark_importer'
     cm.migration_settings[:import_immediately] = true
