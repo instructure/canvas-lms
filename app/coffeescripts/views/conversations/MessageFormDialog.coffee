@@ -63,9 +63,9 @@ define [
     dialogOptions: ->
       id: 'compose-new-message'
       autoOpen: false
-      minWidth: 300
+      minWidth: 550
       width: 700
-      minHeight: 300
+      minHeight: 500
       height: 550
       resizable: true
       # Event handler for catching when the dialog is closed.
@@ -75,6 +75,7 @@ define [
         @afterClose()
       resize: =>
         @resizeBody()
+        @_limitContentSize()
       buttons: [
         text: I18n.t '#buttons.cancel', 'Cancel'
         click: @cancel
@@ -98,6 +99,11 @@ define [
       super
       @initializeForm()
       @resizeBody()
+
+    # this method handles a layout bug with jqueryUI that occurs when you
+    # attempt to resize the modal beyond the viewport.
+    _limitContentSize: ->
+      @$el.width('100%') if @$el.width() > @$fullDialog.width()
 
     ##
     # detach events that were dynamically added when the dialog is closed.
@@ -161,6 +167,7 @@ define [
         el: @$recipients
         disabled: @model?.get('private')
       ).render()
+      @recipientView.on('changeToken', @resizeBody)
 
       @$messageCourse.prop('disabled', !!@model)
       @courseView = new CourseSelectionView(
@@ -297,7 +304,7 @@ define [
         @toggleOptions(user_note: @canAddNotesFor(recipientIds[0]), group_conversation: off)
       @resizeBody()
 
-    resizeBody: ->
+    resizeBody: =>
       @updateAttachmentOverflow()
       # Compute desired height of body
       @$messageBody.height( (@$el.offset().top + @$el.height()) - @$messageBody.offset().top - @$attachmentsPane.height())
