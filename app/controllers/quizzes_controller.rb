@@ -727,7 +727,6 @@ class QuizzesController < ApplicationController
     @show_embedded_chat = false
     log_asset_access(@quiz, "quizzes", "quizzes", 'participate')
     flash[:notice] = t('notices.less_than_allotted_time', "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz.") if @submission.less_than_allotted_time?
-
     if params[:question_id] && !valid_question?(@submission, params[:question_id])
       redirect_to course_quiz_url(@context, @quiz) and return
     end

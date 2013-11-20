@@ -30,7 +30,7 @@ class QuizSubmissionsController < ApplicationController
       redirect_to named_context_url(@context, :context_quiz_url, @quiz.id)
     end
   end
-  
+
   # submits the quiz as final
   def create
     @quiz = @context.quizzes.find(params[:quiz_id])
@@ -41,7 +41,7 @@ class QuizSubmissionsController < ApplicationController
       flash[:error] = t('errors.protected_quiz', "This quiz is protected and is only available from certain locations.  The computer you are currently using does not appear to be at a valid location for taking this quiz.")
     elsif @quiz.grants_right?(@current_user, :submit)
       # If the submission is a preview, we don't add it to the user's submission history,
-      # and it actually gets keyed by the temporary_user_code column instead of 
+      # and it actually gets keyed by the temporary_user_code column instead of
       if @current_user.nil? || is_previewing?
         @submission = @quiz.quiz_submissions.find_by_temporary_user_code(temporary_user_code(false))
         @submission ||= @quiz.generate_submission(temporary_user_code(false) || @current_user, is_previewing?)
@@ -71,7 +71,7 @@ class QuizSubmissionsController < ApplicationController
     end
     redirect_to course_quiz_url(@context, @quiz, previewing_params)
   end
-  
+
   def backup
     @quiz = @context.quizzes.find(params[:quiz_id])
     if authorized_action(@quiz, @current_user, :submit)
@@ -151,7 +151,7 @@ class QuizSubmissionsController < ApplicationController
       end
     end
   end
-  
+
   def update
     @quiz = @context.quizzes.find(params[:quiz_id])
     @submission = @quiz.quiz_submissions.find(params[:id])
@@ -164,7 +164,7 @@ class QuizSubmissionsController < ApplicationController
       end
     end
   end
-  
+
   def show
     @quiz = @context.quizzes.find(params[:quiz_id])
     @submission = @quiz.quiz_submissions.find(params[:id])
