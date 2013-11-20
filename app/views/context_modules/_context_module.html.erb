@@ -10,21 +10,21 @@
   <div class="header context-module-header clearfix">
 
     <div class="context-module-left-toolbar">
-      <span class="reorder_module_link" title="<%= t('reorder_modules', %{Drag to reorder modules}) %>" style="cursor: move; <%= hidden unless @modules.length > 1 && editable %>"><%= image_tag "move.png", :alt => t('reorder_modules', 'Drag to reorder modules') %></span>
+      <span class="reorder_module_link" aria-hidden="true" title="<%= t('reorder_modules', %{Drag to reorder modules}) %>" style="cursor: move; <%= hidden unless @modules.length > 1 && editable %>"><%= image_tag "move.png", :alt => t('reorder_modules', 'Drag to reorder modules') %></span>
       <span class="completion_status" style="<%= "visibility: hidden;" if !context_module || (context_module.completion_requirements || []).empty? %>">
         <%= image_tag "pass.png", :alt => t('images.alt.complete', "done"), :title => t('images.title.complete', "Module Completed"), :class => "complete_icon" %>
         <%= image_tag "blank.png", :alt => t('images.alt.incomplete', "incomplete"), :title => t('images.title.incomplete', "Module Incomplete"), :class => "incomplete_icon" %>
         <%= image_tag "lock.png", :alt => t('images.alt.locked', "locked"), :title => t('images.title.locked', "Module Locked"), :class => "locked_icon" %>
       </span>
-      <span class="name"> <%= context_module.try_rescue(:name) || nbsp %></span>
+      <span class="name" role="heading" aria-level="3"> <%= context_module.try_rescue(:name) || nbsp %></span>
       <!--<span class="draft-text <%= 'hide' if workflow_state == "active" %>"><%= t("context_module.draft", "(Draft)") %></span>-->
     </div><!-- context-module-left-toolbar -->
 
-    <ul class="context-module-toolbar">
+    <ul class="context-module-toolbar" aria-label='<%= t("module_toolbar.aria.module_options.label", "Module Options") %>'>
       <% if editable %>
         <li class="context-module-toolbar-item">
-          <a class="al-trigger admin-links" style="padding: 1px" href="#" aria-haspopup="true" title="<%= t('admin_links.module_options_title','Module Options') %>" aria-describedby='<%= t("admin_links.module_options_label","Module Options")%>'>
-            <span class="screenreader-only"><%= t('manage', 'Module Options') %></span>
+          <a class="al-trigger admin-links" style="padding: 1px" href="#" aria-haspopup="true" title="<%= t('admin_links.module_options_title','Manage Module') %>" aria-describedby='<%= t("admin_links.module_options_label","Manage Module")%>'>
+            <span class="screenreader-only"><%= t('manage', 'Manage Module') %></span>
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
           </a>
           <ul class="al-options" role="menubar" aria-hidden="true">
@@ -41,7 +41,7 @@
         </li>
       <% end %>
 
-      <li class="context-module-toolbar-item adjust-top">
+      <li class="context-module-toolbar-item adjust-top" aria-atomic="true" aria-live="assertive">
         <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse" class="expand_module_link icon icon-expand" title="<%= t('links.show_contents', %{Show module contents}) %>">
           <span class="screenreader-only"><%= t('links.show_contents', %{Show module contents}) %></span>
         </a>
