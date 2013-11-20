@@ -484,7 +484,7 @@ class ContextExternalTool < ActiveRecord::Base
     nil
   end
   
-  scope :having_setting, lambda { |setting| where("has_#{setting.to_s}" => true) }
+  scope :having_setting, lambda { |setting| setting ? where("has_#{setting.to_s}" => true) : scoped }
 
   def self.find_for(id, context, type)
     tool = context.context_external_tools.having_setting(type).find_by_id(id)
