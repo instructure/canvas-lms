@@ -263,7 +263,8 @@ $cell_height: 33px
   .slick-cell.with-comments &
     visibility: visible
   #gradebook_grid.editable .slick-cell.focus &,
-  #gradebook_grid.editable .slick-cell.hover &
+  #gradebook_grid.editable .slick-cell.hover &,
+  #gradebook_grid.editable .slick-cell.active &
     visibility: visible
     background-position: 100% -41px
     width: 25px
@@ -277,10 +278,21 @@ $cell_height: 33px
   height: $cell_height - 1px -8px
   padding-top: 8px
   margin: 0
-  border: 0
   border: 1px solid #35a5e5
   background-color: #fff
   box-shadow: 0 0 5px rgba(81, 203, 238, 1)
+
+#gradebook_grid .slick-cell
+  &.active
+    background-color: inherit
+    z-index: 5
+    border: 1px solid #35a5e5
+    top: -1px
+    &.editable
+      top: 0
+      border: 0
+
+
 .gradebook-cell
   .grade
     border: none

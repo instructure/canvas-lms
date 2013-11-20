@@ -17,6 +17,7 @@
  */
 
 define([
+  'compiled/views/KeyboardNavDialog',
   'INST' /* INST */,
   'i18n!instructure',
   'jquery' /* $ */,
@@ -52,7 +53,7 @@ define([
   'compiled/badge_counts',
   'vendor/scribd.view' /* scribd */,
   'vendor/jquery.placeholder'
-], function(INST, I18n, $, _, userSettings, htmlEscape, wikiSidebar) {
+], function(KeyboardNavDialog, INST, I18n, $, _, userSettings, htmlEscape, wikiSidebar) {
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
@@ -208,33 +209,7 @@ define([
       }
     });
 
-    var activeElement;
-    $(document).keypress(function(e) {
-      var commaOrQuestionMark = e.which == '44' || e.which == '63';
-
-      if(commaOrQuestionMark && !$(e.target).is(":input")) {
-        if($("#keyboard_navigation").is(":visible")) {
-          $("#keyboard_navigation").dialog("close");
-          if(activeElement) { $(activeElement).focus(); }
-        }
-        else {
-          activeElement = document.activeElement;
-
-          $("#keyboard_navigation").dialog({
-            title: I18n.t('titles.keyboard_shortcuts', "Keyboard Shortcuts"),
-            width: 400,
-            height: "auto",
-            open: function() {
-              $(".navigation_list:first").focus();
-            },
-            close: function() {
-              $("li", this).attr("tabindex", ""); // prevents chrome bsod
-              if(activeElement) { $(activeElement).focus(); }
-            }
-          });
-        }        
-      }
-    });
+    KeyboardNavDialog.prototype.bindOpenKeys.call({$el: $('#keyboard_navigation')});
 
     $("#switched_role_type").ifExists(function(){
       var context_class = $(this).attr('class');

@@ -33,7 +33,15 @@ define [
             action()
             false
         )
-        .bind('popupopen popupclose', (event) => @$trigger.toggleClass 'ui-menu-trigger-menu-is-open', event.type == 'popupopen')
+        .bind('popupopen popupclose', (event) =>
+          @$trigger.toggleClass 'ui-menu-trigger-menu-is-open', event.type == 'popupopen'
+
+          if event.type == 'popupclose' and event.originalEvent? and event.originalEvent.type != 'focusout'
+            #defer because there seems to make sure this occurs after all of the jquery ui events
+            setTimeout((=>
+              @gradebook.grid.editActiveCell()
+            ), 0)
+        )
         .bind('popupopen',  =>
           @$menu.find("[data-action=#{action}]").showIf(condition) for action, condition of {
             showAssignmentDetails: @gradebook.allSubmissionsLoaded

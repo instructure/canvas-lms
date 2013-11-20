@@ -1,5 +1,7 @@
 # This class both creates the slickgrid instance, and acts as the data source for that instance.
 define [
+  'compiled/views/KeyboardNavDialog'
+  'jst/gradebook2/KeyboardNavDialog'
   'vendor/slickgrid'
   'compiled/gradebook2/TotalColumnHeaderView'
   'compiled/util/round'
@@ -33,7 +35,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
+], (KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
 
   class Gradebook
     columnWidths =
@@ -610,7 +612,83 @@ define [
           else if columnDef.minimized
             @unminimizeColumn($columnHeader)
 
+      @$grid.on('keydown', @handleKeys)
+
+      @kbDialog = new KeyboardNavDialog().render(keyboardNavTemplate({@keyBindings}))
+      # when we close a dialog we want to return focus to the grid
+      $(document).on('dialogclose', (e) =>
+        setTimeout(( =>
+          @grid.editActiveCell()
+        ), 0)
+      )
       $(document).trigger('gridready')
+
+    keyBindings:
+      #   keyCode:
+      #   handler: function
+      #   key: the string representation of the key pressed - for use in the help dialog
+      #   desc: string describing what the shortcut does - for use in the help dialog
+      [
+        {
+        keyCode: 83
+        handler: 'sortOnHeader'
+        key: I18n.t 'keycodes.sort', 's'
+        desc: I18n.t 'keyboard_sort_desc', 'Sort the grid on the current active column'
+        }
+        {
+        keyCode: 77
+        handler: 'showAssignmentMenu'
+        key: I18n.t 'keycodes.menu', 'm'
+        desc: I18n.t 'keyboard_menu_desc', 'Open the menu for active column\'s assignment'
+        }
+         # this one is just for display in the dialog, the menu will take care of itself
+        {
+        keyCode: null
+        key: I18n.t 'keycodes.close_menu', 'esc'
+        desc: I18n.t 'keyboard_close_menu', 'Close the currently active assignment menu'
+        }
+
+        {
+        keyCode: 71
+        handler: 'gotoAssignment'
+        key: I18n.t 'keycodes.goto_assignment', 'g'
+        desc: I18n.t 'keyboard_assignment_desc', 'Go to the current assignment\'s detail page'
+        }
+        {
+        keyCode: 67
+        handler: 'showCommentDialog'
+        key: I18n.t 'keycodes.comment', 'c'
+        desc: I18n.t 'keyboard_comment_desc', 'Comment on the active submission'
+        }
+      ]
+
+    getHeaderFromActiveCell: =>
+      coords = @grid.getActiveCell()
+      @$grid.find('.slick-header-column').eq(coords.cell)
+
+    showAssignmentMenu: =>
+      @getHeaderFromActiveCell().find('.gradebook-header-drop').click()
+      $('.gradebook-header-menu:visible').focus()
+
+    sortOnHeader: =>
+      @getHeaderFromActiveCell().click()
+
+    gotoAssignment: =>
+      url = @getHeaderFromActiveCell().find('.assignment-name').attr('href')
+      window.location = url
+
+    showCommentDialog: =>
+      $(@grid.getActiveCellNode()).find('.gradebook-cell-comment').click()
+
+    handleKeys: (e) =>
+      # makes sure the focus sink elements are currently active
+      return unless $(document.activeElement).is('[hidefocus]')
+      modifiers = ['shiftKey', 'altKey', 'ctrlKey']
+      return if _.any(e[mod] for mod in modifiers)
+      b = _.find(@keyBindings, (binding) ->
+        binding.keyCode == e.keyCode
+      )
+      b?.handler and @[b.handler]?(e)
 
     initHeader: =>
       if @sections_enabled
