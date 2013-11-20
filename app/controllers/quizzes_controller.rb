@@ -88,6 +88,7 @@ class QuizzesController < ApplicationController
     if !@context.root_account.enable_fabulous_quizzes? || !authorized_action(@context, @current_user, :read)
       redirect_to course_quizzes_path
     end
+    @body_classes << 'with_item_groups'
   end
 
   def show

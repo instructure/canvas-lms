@@ -4,3 +4,44 @@ $backgroundColor: #dfe9f0;
 $borderColor: #AAA;
 $questionHeaderBackground: #F5F5F5;
 $selectedBorderColor: #31b5ff;
+
+div#content {
+  overflow: visible;
+  padding: 0;
+}
+
+.item-group-container {
+  .ig-list {
+    .quiz:first-of-type {
+      margin-top: 5px;
+      .ig-row {
+        border-top: 1px solid #C1C7CF;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+      }
+    }
+    .quiz:last-of-type {
+      .ig-row {
+        border-bottom: 1px solid #C1C7CF;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+      }
+    }
+  }
+  .item-group-condensed {
+    .ig-header-title {
+      cursor: pointer;
+    }
+    &:last-of-type {
+      border-bottom: 0;
+    }
+  }
+}
+
+li.quiz {
+  cursor: pointer;
+  .ig-details {
+    right: 110px;
+    width: 415px;
+  }
+}

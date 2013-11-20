@@ -1,4 +1,4 @@
 define ->
   route = ->
-    @resource "quizzes", path: '/'
+    @resource 'quizzes', path: '/', ->
 

@@ -1,11 +1,16 @@
-define ['./app', 'ember'], (App, Ember) ->
+define [
+  './start_app',
+  'ember',
+  'ic-ajax'
+], (startApp, Ember, ajax) ->
 
-  module 'quizzes', ->
+  App = null
+
+  module 'Ember sanity test',
     setup: ->
-      App.reset()
-      Ember.run(App, App.advanceReadiness)
+      App = startApp()
+    teardown: ->
+      Ember.run App, 'destroy'
 
-  test 'says hello', ->
-    visit('/').then ->
-      equal(find('h1').html().trim(), 'Fabulous Ember Quizzes')
-
+  test 'Ember is up and running', ->
+    ok(true)
