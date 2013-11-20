@@ -62,7 +62,9 @@ module Canvas
           :common => 'compiled/bundles/common',
           :jqueryui => 'vendor/jqueryui',
           :use => 'vendor/use',
-          :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min'
+          :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min',
+          'ic-menu' => 'vendor/ic-menu/dist/main.amd',
+          'ic-dialog' => 'vendor/ic-dialog/dist/main.amd.js',
         }.update(cache_busting ? cache_busting_paths : {}).update(plugin_paths).update(Canvas::RequireJs::PluginExtension.paths).to_json.gsub(/([,{])/, "\\1\n    ")
       end
   
