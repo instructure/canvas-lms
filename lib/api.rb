@@ -201,28 +201,23 @@ module Api
   # The collection needs to be a will_paginate collection (or act like one)
   # a new, paginated collection will be returned
   def self.paginate(collection, controller, base_url, pagination_args = {})
+    pagination_args[:total_entries] = nil if pagination_args[:without_count]
+
     pagination_args.reverse_merge!(
       page: controller.params[:page],
       per_page: per_page_for(controller,
         default: pagination_args.delete(:default_per_page),
         max: pagination_args.delete(:max_per_page)))
     collection = collection.paginate(pagination_args)
-    return unless collection.respond_to?(:next_page)
-
-    first_page = collection.respond_to?(:first_page) && collection.first_page
-    first_page ||= 1
-
-    last_page = (pagination_args[:without_count] ? nil : collection.total_pages)
-    last_page = nil if last_page.to_i <= 1
 
     links = build_links(base_url, {
       :query_parameters => controller.request.query_parameters,
       :per_page => collection.per_page,
-      :current => collection.current_page || first_page,
+      :current => collection.current_page,
       :next => collection.next_page,
       :prev => collection.previous_page,
-      :first => first_page,
-      :last => last_page,
+      :first => collection.first_page,
+      :last => collection.last_page,
     })
     controller.response.headers["Link"] = links.join(',') if links.length > 0
     collection

@@ -90,6 +90,9 @@ define [
           return
         lastPage = lastLink[0].match(/page=(\d+)/)[1]
         lastPage = parseInt lastPage, 10
+        if lastPage == 1
+          @gotAllStudents()
+          return
 
         fetchEnrollments = (page) =>
           $.ajaxJSON @options[enrollmentsUrl], "GET", {page}
