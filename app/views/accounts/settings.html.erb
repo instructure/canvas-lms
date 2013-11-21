@@ -788,7 +788,9 @@ TEXT
                 <% if extra_text %>
                   (<%= extra_text %>)
                 <% end %>
-                <%= link_to "<i class='icon-download'></i>".html_safe, context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id) %>
+                <% if last_complete.workflow_state == 'complete' %>
+                  <%= link_to "<i class='icon-download'></i>".html_safe, context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id) %>
+                <% end %>
               <% else %>
                 <%= t 'report_last_run_never', 'Never' %>
               <% end %>

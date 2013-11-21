@@ -46,8 +46,8 @@ module Canvas::AccountReports
       REPORTS[account_report.report_type][:proc].call(account_report)
     rescue => e
       account_report.logger.error e
-      er = ErrorReport.log_exception(:default, e, :user => account_report.user)
-      self.message_recipient(account_report, "Generating the report, #{account_report.report_type.to_s.titleize}, failed.  Please report the following error code to your system administrator: ErrorReport:#{er.id}")
+      @er = ErrorReport.log_exception(:default, e, :user => account_report.user)
+      self.message_recipient(account_report, "Generating the report, #{account_report.report_type.to_s.titleize}, failed.  Please report the following error code to your system administrator: ErrorReport:#{@er.id}")
     end
   end
 
@@ -118,6 +118,10 @@ module Canvas::AccountReports
     notification = Notification.by_name("Report Generation Failed") if !csv
     attachment = report_attachment(account_report, csv) if csv
     account_report.message = message
+    account_report.parameters ||= {}
+    account_report.parameters["extra_text"] = (I18n.t('account_reports.default.error_text',
+      "Failed, please report the following error code to your system administrator: ErrorReport:%{error};",
+      :error => @er.id)) if !csv
     account_report.attachment = attachment
     account_report.workflow_state = csv ? 'complete' : 'error'
     account_report.update_attribute(:progress, 100)
