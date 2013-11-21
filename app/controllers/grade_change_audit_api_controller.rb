@@ -92,7 +92,7 @@ class GradeChangeAuditApiController < ApplicationController
       events = Auditors::GradeChange.for_assignment(@assignment, query_options)
       render_events(events, polymorphic_url([:api_v1, :audit_grade_change, @assignment]))
     else
-      render_unauthorized_action(@assignment)
+      render_unauthorized_action
     end
   end
 
@@ -114,7 +114,7 @@ class GradeChangeAuditApiController < ApplicationController
       events = Auditors::GradeChange.for_course(@course, query_options)
       render_events(events, polymorphic_url([:api_v1, :audit_grade_change, @course]))
     else
-      render_unauthorized_action(@course)
+      render_unauthorized_action
     end
   end
 
@@ -136,7 +136,7 @@ class GradeChangeAuditApiController < ApplicationController
       events = Auditors::GradeChange.for_root_account_student(@domain_root_account, @student, query_options)
       render_events(events, api_v1_audit_grade_change_student_url(@student))
     else
-      render_unauthorized_action(@student)
+      render_unauthorized_action
     end
   end
 
@@ -158,7 +158,7 @@ class GradeChangeAuditApiController < ApplicationController
       events = Auditors::GradeChange.for_root_account_grader(@domain_root_account, @grader, query_options)
       render_events(events, api_v1_audit_grade_change_grader_url(@grader))
     else
-      render_unauthorized_action(@grader)
+      render_unauthorized_action
     end
   end
 
