@@ -882,9 +882,13 @@ class Submission < ActiveRecord::Base
       options[:update_participants] = true
       options[:update_for_skips] = false
       options[:skip_users] = overrides[:skip_users] || [conversation_message_data[:author]] # don't mark-as-unread for the author
+      options[:skip_users] << user if user.preferences[:use_new_conversations]
       participating_instructors.each do |t|
         # Check their settings and add to :skip_users if set to suppress.
-        options[:skip_users] << t if t.preferences[:no_submission_comments_inbox] == true
+        if t.preferences[:no_submission_comments_inbox] == true ||
+          t.preferences[:use_new_conversations]
+          options[:skip_users] << t
+        end
       end
     when :destroy
       options[:delete_all] = visible_submission_comments.empty?
