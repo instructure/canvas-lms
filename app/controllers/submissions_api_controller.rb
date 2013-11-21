@@ -124,19 +124,19 @@ class SubmissionsApiController < ApplicationController
     elsif can_view_all
       inaccessible_students = student_ids - visible_user_ids(:include_priors => true)
       if !inaccessible_students.empty?
-        return render_unauthorized_action(@course)
+        return render_unauthorized_action
       end
     else
       # can view observees
       allowed_student_ids = @context.observer_enrollments.where(:user_id => @current_user.id, :workflow_state => 'active').where("associated_user_id IS NOT NULL").pluck(:associated_user_id)
       # can view self, if a student
       allowed_student_ids << @current_user.id if is_authorized_action?(@context, @current_user, :participate_as_student)
-      return render_unauthorized_action(@course) if allowed_student_ids.empty?
+      return render_unauthorized_action if allowed_student_ids.empty?
       if all
         student_ids = allowed_student_ids
       else
         inaccessible_students = student_ids - allowed_student_ids
-        return render_unauthorized_action(@course) if !inaccessible_students.empty?
+        return render_unauthorized_action if !inaccessible_students.empty?
       end
     end
 
