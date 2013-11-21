@@ -23,6 +23,12 @@
     background-color: #f6f7f9;
     line-height: 35px;
   }
+  .fc-view-agendaWeek thead .fc-widget-header {
+    color: #617582;
+    font-weight: bold;
+    padding: 10px 0;
+    text-transform: uppercase;
+  }
   .fc-widget-header, .fc-widget-content {
     border-color: #dadada;
   }
@@ -61,32 +67,6 @@
     }
     .scheduler-full {
       background-color: #eeeeee !important;
-    }
-  }
-  .agenda-col-wrapper {
-    overflow: hidden;
-    display: inline-block;
-    color: #617582;
-    font-size: 9px;
-    font-weight: bold;
-    padding: 10px 0;
-    text-transform: uppercase;
-    text-align: left;
-    .day-num {
-      font-size: 24px;
-      float: left;
-      padding-right: 5px;
-      line-height: 23px;
-      text-shadow: -1px -1px 1px white;
-    }
-    .day-name {
-      float: left;
-      line-height: 13px;
-    }
-    .month-name {
-      line-height: 10px;
-      float: left;
-      color: #9da5ab;
     }
   }
 }
@@ -244,4 +224,8 @@
 
 .event_button {
   margin-left: 3px;
+}
+
+.fc-grid .fc-day-number {
+  float: left;
 }

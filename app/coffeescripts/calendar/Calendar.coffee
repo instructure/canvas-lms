@@ -131,22 +131,12 @@ define [
       @agenda.on('agendaDateRange', @renderDateRange)
 
     initializeFullCalendarParams: ->
-      weekColumnFormatter = """
-        '<span class="agenda-col-wrapper">
-          <span class="day-num">'d'</span>
-          <span class="day-and-month">
-            <span class="day-name">'dddd'</span><br />
-            <span class="month-name">'MMM'</span>
-          </span>
-        </span>'
-      """
-
       _.defaults(
         header: false
         editable: true
         columnFormat:
           month: if ENV.CALENDAR.SHOW_AGENDA then 'ddd' else 'dddd'
-          week: if ENV.CALENDAR.SHOW_AGENDA then 'ddd M/d' else weekColumnFormatter
+          week: 'ddd M/d'
         buttonText:
           today: I18n.t 'today', 'Today'
         defaultEventMinutes: 60
@@ -290,7 +280,7 @@ define [
         time = element.find('.fc-event-time')
         html = time.html()
         # the time element also contains the title for calendar events
-        html = html.replace(/^\d+:\d+/, @calendar.fullCalendar('formatDate', event.startDate(), 'h(:mm)t'))
+        html = html.replace(/^\d+:\d+\w?/, @calendar.fullCalendar('formatDate', event.startDate(), 'h(:mm)t'))
         time.html(html)
       if event.eventType.match(/assignment/) && view.name == "agendaWeek"
         element.height('') # this fixes it so it can wrap and not be forced onto 1 line

@@ -28,7 +28,7 @@ describe "calendar2" do
   end
 
   def find_middle_day
-    f('.calendar .fc-week1 .fc-wed')
+    f('.calendar .fc-week:nth-child(1) .fc-wed')
   end
 
   def change_calendar(direction = :next)
@@ -236,9 +236,9 @@ describe "calendar2" do
       it "should drag and drop an event" do
         pending('drag and drop not working correctly')
         create_middle_day_event
-        driver.action.drag_and_drop(f('.calendar .fc-event'), f('.calendar .fc-week2 .fc-last')).perform
+        driver.action.drag_and_drop(f('.calendar .fc-event'), f('.calendar .fc-week:nth-child(2) .fc-last')).perform
         wait_for_ajaximations
-        CalendarEvent.last.start_at.strftime('%d').should == f('.calendar .fc-week2 .fc-last .fc-day-number').text
+        CalendarEvent.last.start_at.strftime('%d').should == f('.calendar .fc-week:nth-child(2) .fc-last .fc-day-number').text
       end
 
       it "should create an assignment by clicking on a calendar day" do
