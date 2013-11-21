@@ -121,6 +121,9 @@ end
 # is switched to Syck (which DelayedJob needs for now). Otherwise we
 # won't have access to (safe|unsafe)_load.
 require 'yaml'
+if RUBY_VERSION >= '2.0.0'
+  require 'syck'
+end
 YAML::ENGINE.yamler = 'syck' if defined?(YAML::ENGINE)
 require 'safe_yaml'
 YAML.enable_symbol_parsing!

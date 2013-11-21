@@ -1,7 +1,11 @@
 source 'http://rubygems.org/'
 
-if ENV['RAILS_ENV'] != 'test' && (RUBY_VERSION < "1.9.3" || RUBY_VERSION >= "2.0")
+if ENV['RAILS_ENV'] != 'test' && (RUBY_VERSION < "1.9.3")
   raise "Canvas requires Ruby 1.9.3"
+end
+
+if RUBY_VERSION >= "2.0.0"
+  warn "Ruby 2.0 support is untested"
 end
 
 require File.expand_path("../config/canvas_rails3", __FILE__)
@@ -53,6 +57,7 @@ if CANVAS_RAILS2
   gem 'i18nema', '0.0.7'
 end
 gem 'icalendar', '1.1.5'
+gem 'iconv', '1.0.3'
 gem 'jammit', '0.6.6'
 gem 'json', '1.8.0'
 gem 'oj', '2.1.7'
@@ -94,6 +99,9 @@ gem 'zip-zip', '0.2' # needed until plugins use the new namespace
 gem 'safe_yaml-instructure', '0.8.0', :require => false
 gem 'sanitize', '2.0.3'
 gem 'shackles', '1.0.2'
+if RUBY_VERSION >= '2.0.0'
+  gem 'syck', '1.0.1'
+end
 gem 'tzinfo', '0.3.35'
 gem 'useragent', '0.4.16'
 gem 'uuid', '2.3.2'
@@ -162,7 +170,11 @@ group :development do
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
-    gem 'debugger', '1.5.0'
+    if RUBY_VERSION >= '2.0.0'
+      gem 'byebug', '2.3.1'
+    else
+      gem 'debugger', '1.5.0'
+    end
   end
 end
 
