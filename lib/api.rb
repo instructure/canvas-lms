@@ -201,8 +201,6 @@ module Api
   # The collection needs to be a will_paginate collection (or act like one)
   # a new, paginated collection will be returned
   def self.paginate(collection, controller, base_url, pagination_args = {})
-    pagination_args[:total_entries] = nil if pagination_args[:without_count]
-
     pagination_args.reverse_merge!(
       page: controller.params[:page],
       per_page: per_page_for(controller,

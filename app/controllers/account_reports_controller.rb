@@ -147,8 +147,7 @@ class AccountReportsController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read_reports)
 
-      reports = Api.paginate(type_scope, self, url_for({:action => :index, :controller => :account_reports}),
-                             :order => 'start_at DESC')
+      reports = Api.paginate(type_scope.order('start_at DESC'), self, url_for({:action => :index, :controller => :account_reports}))
 
       render :json => account_reports_json(reports, @current_user, session)
     end
