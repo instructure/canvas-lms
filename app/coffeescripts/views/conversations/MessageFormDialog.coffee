@@ -298,17 +298,27 @@ define [
       @resizeBody()
 
     resizeBody: ->
-      # place the attachment pane at the bottom of the form
-      @$attachmentsPane.css('top', @$attachmentsPane.height())
+      @updateAttachmentOverflow()
       # Compute desired height of body
       @$messageBody.height( (@$el.offset().top + @$el.height()) - @$messageBody.offset().top - @$attachmentsPane.height())
+
+    attachmentsShouldOverflow: ->
+      $attachments = @$attachments.children()
+      ($attachments.length * $attachments.outerWidth()) > @$attachmentsPane.width()
 
     addAttachment: ->
       $attachment = $(addAttachmentTemplate())
       @$attachments.append($attachment)
       $attachment.hide()
       $attachment.find('input').click()
+      @updateAttachmentOverflow()
       @focusAddAttachment()
+
+    setAttachmentClip: ($attachment) ->
+      $name = $attachment.find( $('.attachment-name') )
+      $clip = $attachment.find( $('.attachment-name-clip') )
+      $clip.height( $name.height() )
+      $clip.addClass('hidden') if $name.height() < 35
 
     imageTypes: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg']
 
@@ -335,6 +345,7 @@ define [
       file = input.files[0]
       name = file.name
       $attachment.find('.attachment-name').text(name)
+      @setAttachmentClip($attachment)
       remove = $attachment.find('.remove_link')
       remove.attr('aria-label', remove.attr('title')+': '+name)
       extension = name.split('.').pop().toLowerCase()
@@ -381,7 +392,7 @@ define [
       $attachment.slideUp "fast", =>
         $attachment.remove()
         @updateAttachmentPane()
-        
+
     focusPrevAttachment: ($attachment) =>
       $newTarget = $attachment.prevAll(':visible').first()
       if !$newTarget.length then return false
@@ -395,11 +406,6 @@ define [
     focusAddAttachment: () ->
       @$fullDialog.find('.attach-file').focus()
 
-#    addToken: (userData) ->
-#      input = @$el.find('.recipients').data('token_input')
-#      input.addToken(userData) if input
-#      @resizeBody()
-#
     addMediaComment: ->
       @$mediaComment.mediaComment 'create', 'any', (id, type) =>
         @$mediaCommentId.val(id)
@@ -413,28 +419,9 @@ define [
       @$mediaComment.hide()
       @$addMediaComment.show()
 
+    updateAttachmentOverflow: ->
+      @$attachmentsPane.toggleClass('overflowed', @attachmentsShouldOverflow())
+
     updateAttachmentPane: ->
       @$attachmentsPane[if @$attachmentsPane.find('input:not([value=])').length then 'addClass' else 'removeClass']('has-items')
       @resizeBody()
-
-#    messageData: (data) ->
-#      numRecipients = if @options.conversation
-#        Math.max(@options.conversation.get('audience').length, 1)
-#      else
-#        # note: this number may be high, if users appear in multiple of the
-#        # specified recipient contexts. there's no way of knowing without going
-#        # to the server first, which is what we're trying to avoid.
-#        _.reduce @tokenInput.$tokens.find('input[name="recipients[]"]'),
-#          (memo, node) -> memo + ($(node).closest('li').data('user_count') ? 1),
-#          0
-#      {recipient_count: numRecipients, message: {body: data.body}}
-#
-#    resetForParticipant: (user) ->
-#      @toggleOptions(user_note: on) if @canAddNotesFor(user)
-#
-#    toggleOptions: (options) ->
-#      for key, enabled of options
-#        $node = @$form.find(".#{key}_info")
-#        $node.showIf(enabled)
-#        $node.find("input[type=checkbox][name=#{key}]").prop('checked', false) unless enabled
-#

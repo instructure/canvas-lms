@@ -96,12 +96,17 @@ $subtleBorderColor: #e5e5e5;
   .attachments-pane {
     border: none;
     height: 0;
-    overflow-x: auto;
+    overflow: hidden;
 
     &.has-items {
       border-top: 1px solid $subtleBorderColor;
-      min-height: 120px;
+      min-height: 100px;
       margin: 0;
+    }
+
+    &.overflowed {
+      min-height: 120px;
+      overflow-x: auto;
     }
   }
 
@@ -113,11 +118,12 @@ $subtleBorderColor: #e5e5e5;
   .attachment {
     display: inline-block;
     vertical-align: top;
-    height: 85px;
+    height: 90px;
     width: 80px;
-    padding: 8px 10px;
+    padding: 5px 10px;
     position: relative;
     outline: none;
+    overflow: hidden;
   }
 
   .attachment .file_input {
@@ -176,11 +182,32 @@ $subtleBorderColor: #e5e5e5;
     border-radius: 10px;
     max-height: 38px;
     overflow: hidden;
+    padding: 0 4px;
   }
 
   .attachment:focus .attachment-name {
     background-color: #08c;
     color: #fff;
+  }
+
+  .attachment-name-clip {
+    background: -ms-linear-gradient(top, transparent 60%, #fff 90%);
+    background: -moz-linear-gradient(top, rgba(255,255,255,0) 60%, rgba(255,255,255,1) 90%);
+    background: -o-linear-gradient(top, transparent 60%, #fff 90%);
+    background: -webkit-linear-gradient(top, transparent 60%, #fff 90%);
+    background: linear-gradient(top, transparent 60%, #fff 90%);
+    position: absolute;
+    top: 55px;
+    width: 80px;
+  }
+
+  .attachment:focus .attachment-name-clip {
+    background: -ms-linear-gradient(top, transparent 95%, #08c 99%);
+    background: -moz-linear-gradient(top, transparent 95%, #08c 99%);
+    background: -o-linear-gradient(top, transparent 95%, #08c 99%);
+    background: -webkit-linear-gradient(top, transparent 95%, #08c 99%);
+    background: linear-gradient(top, transparent 95%, #08c 99%);
+    border-radius: 10px;
   }
 
   .message-body {
