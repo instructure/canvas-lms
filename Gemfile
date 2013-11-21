@@ -40,7 +40,7 @@ gem 'builder', '3.0.0'
 gem 'bundler', '1.3.5'
 if CANVAS_RAILS2
   gem 'canvas_connect', '0.2'
-  gem 'canvas_webex', '0.6'
+  gem 'canvas_webex', '0.7'
 end
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
