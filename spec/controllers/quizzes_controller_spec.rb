@@ -349,6 +349,18 @@ describe QuizzesController do
       get 'show', course_id: @course.id, id: @quiz.id
       response.should_not be_success
     end
+
+    it 'logs a single asset access entry with an action level of "view"' do
+      Setting.set('enable_page_views', 'db')
+
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz
+      get 'show', :course_id => @course.id, :id => @quiz.id
+      assigns[:access].should_not be_nil
+      assigns[:accessed_asset].should_not be_nil
+      assigns[:accessed_asset][:level].should == 'view'
+      assigns[:access].view_score.should == 1
+    end
   end
 
   describe "GET 'managed_quiz_data'" do
@@ -484,6 +496,40 @@ describe QuizzesController do
       course_quiz(true)
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
       response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+    end
+
+    context 'asset access logging' do
+      before :each do
+        Setting.set('enable_page_views', 'db')
+
+        course_with_teacher_logged_in(:active_all => true)
+        course_quiz
+      end
+
+      it 'should log a single entry with an action level of "participate"' do
+        post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+        assigns[:access].should_not be_nil
+        assigns[:accessed_asset].should_not be_nil
+        assigns[:accessed_asset][:level].should == 'participate'
+        assigns[:access].participate_score.should == 1
+      end
+
+      it 'should not log entries when resuming the quiz' do
+        post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+        assigns[:access].should_not be_nil
+        assigns[:accessed_asset].should_not be_nil
+        assigns[:accessed_asset][:level].should == 'participate'
+        assigns[:access].participate_score.should == 1
+
+        # Since the second request we will make is handled by the same controller
+        # instance, @accessed_asset must be reset otherwise
+        # ApplicationController#log_page_view will use it to log another entry.
+        controller.instance_variable_set('@accessed_asset', nil)
+        controller.js_env.clear
+
+        post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+        assigns[:access].participate_score.should == 1
+      end
     end
 
     context 'verification' do

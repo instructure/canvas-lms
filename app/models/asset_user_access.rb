@@ -183,6 +183,18 @@ class AssetUserAccess < ActiveRecord::Base
     asset
   end
 
+  # For Quizzes, we want the view score not to include the participation score
+  # so it reflects the number of times a student really just browsed the quiz.
+  def corrected_view_score
+    deductible_points = 0
+
+    if %w[ quizzes ].include?(self.asset_group_code || '')
+      deductible_points = self.participate_score || 0
+    end
+
+    self.view_score -= deductible_points
+  end
+
   private
 
   def increment(attribute)

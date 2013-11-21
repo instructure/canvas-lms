@@ -146,7 +146,6 @@ class QuizzesController < ApplicationController
       submission_counts if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
-      log_asset_access(@quiz, "quizzes", "quizzes")
       hash = { :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
              :IS_SURVEY => @quiz.survey?,
              :QUIZ => quiz_json(@quiz,@context,@current_user,session),
@@ -163,6 +162,8 @@ class QuizzesController < ApplicationController
         else
           take_quiz
         end
+      else
+        log_asset_access(@quiz, "quizzes", "quizzes")
       end
       @padless = true
     end
@@ -674,6 +675,7 @@ class QuizzesController < ApplicationController
       user_code = nil if preview
       user_code ||= temporary_user_code
       @submission = @quiz.generate_submission(user_code, !!preview)
+      log_asset_access(@quiz, 'quizzes', 'quizzes', 'participate')
     end
     if quiz_submission_active?
       if request.get?
@@ -692,7 +694,6 @@ class QuizzesController < ApplicationController
   def take_quiz
     return unless quiz_submission_active?
     @show_embedded_chat = false
-    log_asset_access(@quiz, "quizzes", "quizzes", 'participate')
     flash[:notice] = t('notices.less_than_allotted_time', "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz.") if @submission.less_than_allotted_time?
     if params[:question_id] && !valid_question?(@submission, params[:question_id])
       redirect_to course_quiz_url(@context, @quiz) and return
