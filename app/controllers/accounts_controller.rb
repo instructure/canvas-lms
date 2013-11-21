@@ -95,7 +95,7 @@ class AccountsController < ApplicationController
     end
 
     @accounts = Api.paginate(@accounts, self, api_v1_sub_accounts_url,
-                             :without_count => recursive)
+                             :total_entries => recursive ? nil : @accounts.count)
 
     render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
   end
