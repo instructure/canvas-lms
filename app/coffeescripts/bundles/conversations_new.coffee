@@ -256,6 +256,9 @@ require [
       @list.collection.reset()
       @searchTokens = if tokens.length then tokens else null
       @list.collection.setParam('filter', @_currentFilter())
+      delete @detail.model
+      @list.selectedMessages = []
+      @detail.render()
       @list.collection.fetch()
 
     _initListView: ->
