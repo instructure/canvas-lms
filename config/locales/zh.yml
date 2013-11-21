@@ -8,17 +8,18 @@ zh:
     bad_per_slot: 您必须允许一个时段至少有一个约会
     context_required: 您需要选择一个日程表
     select_calendars: 选择日程表
-  GroupView: 
-    delete_confirm: 是否确定要删除此组?
-    flash: 
-      removeError: 无法删除该组。请稍后重试。
-      removed: 组已成功删除。
+  GrouDetailpView: 
     student_count: 
       one: "%{count} 个学生"
       other: "%{count} 个学生"
     user_count: 
       one: "%{count} 个用户"
       other: "%{count} 个用户"
+  GroupView: 
+    delete_confirm: 是否确定要删除此组?
+    flash: 
+      removeError: 无法删除该组。请稍后重试。
+      removed: 组已成功删除。
   academic_benchmark: 
     api_error: "无法更新授权 %{auth} 的标准。"
     bad_ab_file: 提供的学术基准文件有错误。
@@ -317,6 +318,7 @@ zh:
         sis_user_id: "SIS ID"
         sortable_name: 可分类的名称
       sortable_name_help: 此名称出现在分类的列表中。
+      unique_id_label: "%{label}:*"
     add_user_button: 添加用户
     add_user_dialog_title: 新增用户
     adding_course_message: 正在添加课程...
@@ -1448,14 +1450,14 @@ zh:
       no_assignment_groups: 未找到作业组
     assignment_group_list_item: 
       add_assignment_to: "将作业添加到 %{name}"
+      assignment_group_delete: 删除作业组
+      assignment_group_edit: 编辑作业组
+      assignment_group_move: 移动作业组
       delete: 删除
       edit: 编辑
       group_weight: "总数的 %{groupWeight}%"
       manage: 管理
       move: 移动到...
-      title_delete: 是否删除作业组？
-      title_edit: 编辑作业组
-      title_move: 移动作业组
     assignment_group_selector: 
       assignment_group: 作业组
       assignment_group_options: 
@@ -1464,26 +1466,27 @@ zh:
       one: "%{count} 个组"
       other: "%{count} 个组"
     assignment_list_item: 
+      assignment_delete: 删除作业
+      assignment_edit: 编辑作业
+      assignment_move: 移动作业
       delete: 删除
-      delete_asssignment_title: 删除此作业
       edit: 编辑
-      edit_assignment_title: 编辑作业
       module: 单元
       move: 移动到...
-      move_assignment_title: 移动作业
       multiple_modules: 多个单元
       no_points_possible: 无最高分
       points_possible: "%{pointsPossible} 分"
       points_possible_screen_reader: "%{pointsPossible} 最高分"
       settings: 设置
     assignment_list_item_score: 
+      assignment_grading_type_is_not_graded: 此作业将不评分。
       assignment_not_yet_graded_screenreader: "作业尚未评分。%{pointsPossible} 最高分。"
+      empty_points_possible: "-/%{pointsPossible} 分"
       no_submission: 无提交
       no_submission_for_assignment_screenreader: "此作业无提交。%{pointsPossible} 最高分。"
-      no_submission_with_points_possible: "-/%{pointsPossible} 分"
-      not_yet_graded_with_points_possible: "*尚未评分*/%{pointsPossible} 分"
-      score_with_points_possible: "%{grade}/%{pointsPossible} 分"
-      score_with_points_possible_screenreader: "分数: %{grade} 超出 %{pointsPossible} 分"
+      not_yet_graded: "*尚未评分*"
+      score_with_points_possible: "*%{score}*/%{pointsPossible} 分"
+      score_with_points_possible_screenreader: "分数: %{score} 超出 %{pointsPossible} 分。"
     assignment_locked: 
       assignment_locked: "此作业锁定于 *%{lock_at}*"
       assignment_unlocked_from: "此作业锁定至 *%{unlock_at}*"
@@ -1541,6 +1544,7 @@ zh:
       submit_assignment: 提交作业
     cannot_delete_group: 您必须至少有一个作业组
     cant_unpublish_when_students_submit: 如有学生提交文件，则无法取消发布
+    complete: 完成
     confirm: 
       delete_assignment: 是否确定要删除此作业?
       delete_group: 是否确定要删除此组?
@@ -1667,6 +1671,10 @@ zh:
           *确保不要更改提交文件的名称，以便我们组织。*
       titles: 
         related_items: 相关项目
+    grade_letter_grade_screenreader: "评分: %{grade}"
+    grade_pass_fail_screenreader: "评分: %{grade}"
+    grade_percent: "%{grade}%"
+    grade_percent_screenreader: "分数: %{grade}%"
     graded: 此作业已评分
     grading_type_selector: 
       grading_type: 评分类型
@@ -1694,6 +1702,8 @@ zh:
         assignment_group: 作业组
         group_weight: 权重
         total: 总计
+    higher_than_max: 您不能使用大于作业数的数字。
+    incomplete: 未完成
     index: 
       assignment_locked: 此作业当前锁定。更多信息请访问作业详细信息页面。
       assignment_locked_tooltip: 已锁定
@@ -1739,6 +1749,7 @@ zh:
       submit_failed: 提交失败，请重试
       submitting: 正在提交...
     multiple_due_dates: 多个到期日
+    name_is_required: 需要名称
     needs_grading_count: "此作业的 %{needs_grading_count} 个提交文件仍需评分"
     never_drop: 
       remove_rule: 删除规则
@@ -1755,6 +1766,7 @@ zh:
       assignments: 作业
       no_assignments_found: 未找到作业
     no_tools_found: 找不到工具
+    non_number: 您必须使用数字
     notices: 
       assignment_delete: 此作业已删除
       created: 作业已成功创建。
@@ -1804,6 +1816,7 @@ zh:
       peer_reviews_assign_at_explanation: 必须在到期日期之后。如果为空，则使用到期日期。
       reviews_per_user: 每位用户的审阅次数
     percent_of_final_grade: "最终评分的 %{percent}"
+    positive_number: 您必须使用正数
     redirect_page: 
       redirect_message: |-
           此提交为 url，我们立即带您前往 url 链接。  
@@ -2030,6 +2043,7 @@ zh:
       not_found: 找不到文件数据
     feed_title: "文件: %{title}"
     feed_title_with_context: "文件 %{course_or_group}: %{title}"
+    over_quota: 下载的文件超出配额。
     title: 
       migration_list: 关联的文件
     upload_error_invalid_response_code: "无效的响应代码，预计 200 获得 %{code}"
@@ -2243,9 +2257,11 @@ zh:
     sample_final_answer: 此值是该问题类型的典型最终答案
   calendar: 
     agenda_view: 
-      delete: 删除
       due: 到期日期
-      edit: 编辑
+      loading: 正在加载
+      no_events: 此日期后无事件。
+      starts_at: 开始时间
+    agenda_view_displaying_start_end: "现在显示从 %{start} 到 %{end}"
     appointment_group_deletion_details: 删除它也会删除学生已注册的任何约会。
     appointment_group_list: 
       location: "位置:"
@@ -2266,6 +2282,7 @@ zh:
       create_event: 创建新事件
       done_go_back_to_list: 完成，返回列表
       links: 
+        accessibility_warning: "警告: 用户无法通过屏幕阅读器访问此视图"
         calendar_agenda: 议程
         calendar_month: 月
         calendar_scheduler: 计划程序
@@ -2275,7 +2292,7 @@ zh:
       refresh: 刷新
       use_old_calendar: 旧日历
     calendar_navigator: 
-      enter_jump_date: "输入一个日期，然后按 Enter 跳到该日期。"
+      enter_navigation_date: 输入您要导航到的日期。
       next: 下一个
       previous: 上一个
       today: 今天
@@ -2368,9 +2385,16 @@ zh:
       slots_available: 可用时段
     event_event_title: 事件标题：
     event_on_this_day: 在这一天有一个事件
-    invalid_date: 数据无效
+    event_type: 
+      assignment: 作业
+      discussion: 讨论
+      event: 事件
+      quiz: 测验
+    input_is_invalid_date: 输入的内容不是有效日期。
     labels: 
       due: 到期日期
+    loading_more_items: 正在加载更多项目。
+    loading_undated_events: 正在加载无日期的事件
     message_participants: 
       all_groups: 所有组
       all_users: 所有用户
@@ -2410,15 +2434,17 @@ zh:
     save_changes: 保存更改
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: 创建一个约会组
+    screenreader_date_suggestion: "%{date}。按 Enter 接受。"
     time_block_errors: 在您的时间段选择方面有错误。
     titles: 
       edit_appointment_group: 编辑约会组
       edit_event: 编辑事件
     today: 今天
     undated_events: 
-      loading_undated_events: 正在加载无日期的事件...
-      show_undated_events: 显示无日期的事件
-      undated_events: 无日期的事件
+      loading_undated_events: 正在加载无日期的项目...
+      no_undated_events: 无更新的项目。
+      show_undated_events: 显示更新的项目
+      undated_items: 更新的项目
   calendar_event: 
     errors: 
       duplicate_child_event_contexts: 复制子事件上下文
@@ -2563,10 +2589,15 @@ zh:
     show2: 
       calendar_feed: 日历馈送
       calendar_feed_instructions: "复制以下链接并将其粘贴到提取 iCal 馈送的任何日历应用程序（Google Calendar、iCal、Outlook 等）"
+      calendars: 日历
       feed_dialog_title: 日历馈送
       feed_title: "课程日历 Atom 馈送"
       links: 
         feed: 单击此处查看馈送
+      skip_to_calendar: 跳到日历
+      toggle_calendars: 切换日历
+      toggle_undated_items: 切换更新的项目
+      undated_items: 更新的项目
     titles: 
       add_new_assignment: 添加新作业
       add_new_event: 添加新事件
@@ -2982,7 +3013,7 @@ zh:
       import_migration: 导入
     moodle_zip: 
       options: 选项
-    must_upload_file: 需要上传文件
+    must_upload_file: "需要上传文件或 url"
     no_content_selected: 您尚未选择任何要导入的内容。
     progressing_content_migration: 
       issues_text: 问题
@@ -3397,7 +3428,120 @@ zh:
         state: 状态
       titles: 
         student_progression: 学生学习单元的进度
+    content_next: 
+      add_prerequisite: "添加先修课程到 *%{module}*"
+      assignment_points_possible: "超出 %{points_possible}"
+      buttons: 
+        add_module: 添加单元
+        add_prerequisite: 添加先修课程
+      criterion_for_assignment: "对于 %{assignment} 用户，必须 %{select_criterion}"
+      headings: 
+        add_prerequisite: "添加先修课程到 %{name}"
+        course_modules: 课程单元
+        student_progress: 学生学习单元的进度
+        student_progress_for_module: "%{module} 的学生学习进度"
+        students_completed: 已完成单元的学生
+        students_in_progress: 正在学习单元的学生
+        students_locked: 未解锁单元的学生
+        students_unlocked: 已解锁（但未启动）单元的学生
+      help: 
+        create: |-
+            课程单元可让您将作业、页面、文件等组织为更小的章节或单元。单元可围绕主题组织，集中于具体的课题，或只是按时间顺序组织。
+            
+            您也可以定义每个单元的标准和先修课程，以此安排单元的顺序。学生在其解锁所有先修课程之前无法访问单元。这样可以防止学生在评审测验中获得一定分数（例如 75%）之前访问特定内容或文件。
+            
+            要开始将课程组织为单元，请单击右边的 "%{button}" 按钮。
+        no_modules: 没有为此课程定义单元。
+      images: 
+        alt: 
+          min_score: 最低分数
+          must_contribute: 必须参与
+          must_submit: 必须提交
+          must_view: 必须查看
+        title: 
+          min_score: "在单元被视为完成之前，学生必须在此项目上获得 %{min_score} "
+          must_contribute: 在单元被视为完成之前，学生必须参与此项目
+          must_submit: 在单元被视为完成之前，学生必须提交此作业
+          must_view: 在单元被视为完成之前，学生必须查看此项目
+      indent: 
+        ? "n"
+        : 
+          one: "缩进 1 级"
+          other: "缩进 %{count} 级"
+          zero: 不缩进
+      key: 
+        description: 
+          delete: 删除当前单元/项目
+          edit: 编辑单元/项目
+          indent: 缩进当前项目
+          new: 新单元
+          next: 下一个单元/项目
+          outdent: 减少缩进当前项目
+          previous: 上一个单元/项目
+      keycode_descriptions: 
+        next_module_item: 选择下一个单元或单元项目
+        previous_module_item: 选择上一个单元或单元项目
+        toggle_module_dragging: 选择项目开始拖动，或放下之前选定的项目
+      keycodes: 
+        delete: d
+        edit: e
+        indent: i
+        new: "n"
+        next: j
+        next_module_item: 向上键
+        outdent: o
+        previous: k
+        previous_module_item: 向下键
+        toggle_module_dragging: 空格键
+      labels: 
+        indent: 缩进
+        module_complete_when: 此单元完成的条件
+        modules: 
+          before_students_view: 在学生可以查看此单元之前
+        new_tab: 在新选项卡中加载此工具
+        require_sequential_progress: 学生必须按顺序浏览此单元中的要求
+        sort_by: 排序方式
+        title: 标题
+        unlock_at: 解锁时间
+        url: URL
+      links: 
+        add_prerequisite: 添加先修课程
+        add_requirement: 添加要求
+        reload_student: 重新加载学生的进度
+        sort_by_name: 名称
+        sort_by_progress: 进度
+        student_progress: 查看进度
+        title: 
+          remove_prerequisite: 删除此先修课程
+      module: 单元
+      module_details: "单元按顺序显示，因此只有显示在 %{name} 上方的单元可以设置为先修课程。"
+      module_name: 模块名称
+      modules_keyboard_hint: "要更改课程单元和单元项目的顺序，先关闭屏幕读取器上的光标。在 JAWS 中按 Insert-z。按 Tab 选择第一个单元，按向上键和向下键选择一个单元或单元项目。按空格键选择一个单元或单元项目开始拖动，然后按向上键和向下键选择一个目标，再次按空格键在目标后放下所选项。"
+      must_complete_prerequisites: 他们必须完成
+      no_preprequisites: 未定义先修课程
+      no_requirements: 未定义要求
+      prerequisites: 
+        another_module: 其他单元
+      prerequisites_need_item: 必须添加项目，然后才可指定用户完成此单元的方式
+      requirements: 
+        must_contribute: 参与页面
+        must_score_at_least: 至少得分
+        must_submit: 提交作业
+        must_view: 查看项目
+      select_module: 
+        instructions: 选择单元
+        name: "单元 %{module}"
+      select_prerequisite: 选择先修课程的类型。学生在所有先修课程完成之前无法查看单元。
+      student_name: 学生姓名
+      table_headings: 
+        module: 单元
+        state: 状态
+      titles: 
+        student_progression: 学生学习单元的进度
     context_module: 
+      admin_links: 
+        module_options_label: 单元选项
+        module_options_title: 单元选项
       context_module: 
         draft: (草稿)
       images: 
@@ -3421,12 +3565,34 @@ zh:
           delete_module: 删除此单元
           edit_module: 编辑
           student_progress: 查看学生学习此单元的进度
-      manage: 管理
+      manage: 单元选项
       module_will_unlock_at: "解锁日期 *%{unlock_date}*"
       progression_complete_count: "*%{count}* 完成"
       progression_started_count: "*%{count}* 进行中"
       reorder_modules: 拖动以重新排序单元
       unpublish: 取消发布
+    context_module_next: 
+      images: 
+        alt: 
+          incomplete: 未完成
+        title: 
+          complete: 单元已完成
+          incomplete: 单元未完成
+          locked: 单元已锁定
+      links: 
+        add_item: 添加内容
+        text: 
+          delete_module: 删除
+          edit_module: 编辑
+        title: 
+          delete_module: 删除此单元
+          edit_module: 编辑
+          student_progress: 查看学生学习此单元的进度
+      manager_module: 管理单元
+      module_will_unlock_at: "解锁日期 *%{unlock_date}*"
+      progression_complete_count: "*%{count}* 完成"
+      progression_started_count: "*%{count}* 进行中"
+      reorder_modules: 拖动以重新排序单元
     context_modules: 
       publish: 发布
     errors: 
@@ -3479,6 +3645,46 @@ zh:
       must_view: 
         fulfilled: 已查看页面
         unfulfilled: 必须查看页面
+    module_item_next: 
+      drag_to_reorder: 拖动可重新排序或移动项目至其他单元
+      images: 
+        alt: 
+          max_score: 最高分数
+          min_score: 最低分数
+          must_contribute: 必须参与
+          must_submit: 必须提交
+          must_view: 必须查看
+        title: 
+          max_score: 在单元被视为完成之前，学生不得超过此项目的最高分数
+          min_score: 在单元被视为完成之前，学生必须达到此项目的最低分数
+          must_contribute: 在单元被视为完成之前，学生必须参与此项目
+          must_submit: 在单元被视为完成之前，学生必须提交此作业
+          must_view: 在单元被视为完成之前，学生必须查看此项目
+      links: 
+        edit_item: 编辑
+        edit_item_details: 编辑项目详细信息
+        indent: 缩进
+        indent_item: 缩进项目
+        outdent: 减少缩进
+        outdent_item: 减少缩进项目
+        remove_item: 删除
+        remove_item_from_module: 从单元删除此项目
+      max_score: 
+        fulfilled: "得分不超过 %{score}"
+        unfulfilled: "得分不得超过 %{score}"
+      min_score: 
+        fulfilled: "得分至少为 %{score}"
+        unfulfilled: "得分至少为 %{score}"
+      must_contribute: 
+        fulfilled: 已参与页面的内容
+        unfulfilled: 必须参与页面的内容
+      must_submit: 
+        fulfilled: 已提交作业
+        unfulfilled: 必须提交作业
+      must_view: 
+        fulfilled: 已查看页面
+        unfulfilled: 必须查看页面
+      settings: 设置
     module_locked: 已锁定
     module_started: 正在进行
     module_unlocked: 解锁
@@ -3517,6 +3723,7 @@ zh:
     errors: 
       field_is_required: 此字段为必填字段
     message_sent: 消息已发送！
+    no_course: 无课程
     select_course: 选择课程
   conversation_message: 
     subject: "私人消息 %{timestamp}"
@@ -3647,7 +3854,6 @@ zh:
       compose_new_message: 编写一条新消息
       delete: 删除
       delete_conversation: 删除会话
-      enter_name_group_or_course: 输入名称、组或课程
       filter_messages_by_course: 按课程过滤消息
       filter_messages_by_type: 按类型过滤消息
       forward: 转发
@@ -3657,6 +3863,7 @@ zh:
       more_options: 更多选项
       reply: 回复
       reply_all: 全部回复
+      search_by_user: 按用户搜索
       search_for_recipients: 搜索收件人
       search_names_groups_courses: 搜索名称、组和课程
       sending: 正在发送
@@ -3706,12 +3913,11 @@ zh:
         remove_media_comment: 移除媒体评论
     message_form_dialog: 
       body: 正文
-      bulk_explanation: 此选项创建发送给“收件人”字段中所有收件人的各个消息。
-      bulk_message: 批量消息
       headings: 
         new_message: 新消息
       inbox_actions: 
         add_people: 添加人员
+      individual_message_explanation: 此时将一条消息发送给每个收件人
       labels: 
         add_to_faculty_journal: 添加为教师日志条目
         attachments: 附件
@@ -3722,8 +3928,10 @@ zh:
       links: 
         media_comment: 记录
       media_comment: 媒体评论
+      no_course: 无课程
       no_subject: 无主题
       search_names_groups_courses: 搜索名称、组和课程
+      send_individual_messages: 发送各个消息
       titles: 
         media_comment: 已记录媒体评论
         record_media_comment: 记录音频或视频评论
@@ -3743,6 +3951,7 @@ zh:
       sending_message: "正在发送 *%{message_preview}* 至 *%{num_people}*"
     more_participants: "+%{total} 更多"
     no_message: 
+      batch_selected: 选择多个会话
       beta_description: "您使用的是测试版的 Canvas 收件箱"
       beta_version: 测试版
       no_conversations_selected: 未选择会话
@@ -4290,6 +4499,7 @@ zh:
         add_section: 添加章节
         move_course: 移动课程
         update_course: 更新课程详细信息
+      course_open_enrollment_without_code: "此课程已启用开放注册。您与学生分享此 url *%{url}* 后，他们可自行注册课程"
       course_overrides_term: 这将覆盖任何学期可用性设置
       date_restricted: 用户只能参与这些日期之间的课程
       deatils: 
@@ -4355,7 +4565,6 @@ zh:
         public_syllabus: 使该课程的提纲公开可见
         restrict_enrollments_to_course_dates: 用户只能参与这些日期之间的课程
         root_account_id: 根帐户
-        self_enrollment: "与学生分享私密的 URL，允许他们自行注册"
         sis_source_id: "SIS ID"
         start_at: 开始
         storage_quota: 文件存储
@@ -4370,7 +4579,7 @@ zh:
           delete_section: 删除章节
           edit_section: 编辑章节
       megabytes: MB
-      navigation_keyboard_hint: "要更改课程导航链接的顺序，先关闭屏幕读取器上的光标。在 JAWS 中按 Insert-z。按 Tab 选择第一个链接，按“向上”和“向下”选择一个链接。按“空格”选择一个链接开始拖动。然后按“向上”和“向下”选择一个目标。再次按“空格”在目标后放下链接。"
+      navigation_keyboard_hint: "如果使用的是屏幕阅读器，要更改课程导航链接的顺序，先关闭屏幕读取器上的光标 (在 JAWS 中按 Insert-z)。按 control-home 跳到页面顶部，然后按 Tab 键选择第一个课程导航链接。按“向上”和“向下”箭头选择您要移动到的链接，然后按“空格”选择它。之后按“向上”和“向下”选择一个新位置。最后，再次按“空格”将您直接移动的链接放在当前链接后面。完成后，重新启用虚拟缓冲/光标。"
       no_date: 未设置日期
       no_language_preference: "未设置（用户可配置，默认使用 %{language}）"
       none: 无
@@ -4379,6 +4588,8 @@ zh:
       private_course: 私人
       public_course: 公共
       section_sis_id: "SIS ID: %{section_sis}"
+      self_enrollment: "与学生分享私密的 URL，允许他们自行注册"
+      self_enrollment_without_code: "与学生分享私密的 URL，允许他们自行注册"
       set_grading_scheme: 设置评分方案
       sis_source_id: "SIS ID"
       tab_cant_disable: 此页面无法禁用，只能隐藏
@@ -4419,9 +4630,27 @@ zh:
     show: 
       acting_as: "您正在使用此角色查看本课程:%{enrollment_type}。您只有适用于此角色用户的权限。"
       buttons: 
-        update_layout: 保存
+        update_layout: 更新布局
       details: 
+        assignments: 此视图显示本课程的**作业列表**，即将到来和近期的作业显示在顶部。
         confirm_unenroll: 是否确定要取消注册此课程?您将不再能够看到课程清单或与教师直接沟通，并且在您的通信流和通知中不再看到课程事件。
+        custom_page: 您可以**设计自己的课程主页**，在其中包含您喜欢的任何链接、图像或富媒体。
+        recent_activity_dashboard: "**最近活动仪表板**让参加者能看到此课程最近的谈话、公告、讨论和互动。它很类似于用户在第一次登录时看到的仪表板，但只显示此特定课程的内容。"
+        syllabus: "**提纲视图**允许您编写有关课程期望的说明或通过链接、图像方式等介绍课程。还显示涵盖所有作业和课程事件的日历视图。"
+      draft_state: 
+        buttons: 
+          cancel: 取消
+          update_layout: 保存
+        headings: 
+          set_layout: 设置主页布局
+        labels: 
+          select_content: 选择您要在主页上显示的内容。
+        options: 
+          assignments: 作业列表
+          custom_page: 页面首页
+          modules: 课程单元
+          recent_activity_dashboard: 最近活动仪表板
+          syllabus: 提纲
       empty_body: 无内容
       headings: 
         confirm_unenroll: 确认取消注册
@@ -4431,11 +4660,12 @@ zh:
         unpublished: 此课程未发布
       importing: 课程复制/迁移进行中。这意味着某些内容可能暂时不可用。
       labels: 
-        set_layout: 选择您要在主页上显示的内容。
+        select_content: 当用户访问课程页面时，显示它们
       license_notice: "此课程的内容根据 %{license_type} 许可证提供。本课程的内容可用性取决于此许可证，除非另有说明。"
       links: 
         change_layout: 更改主页布局
         course_setup: 课程设置清单
+        course_stream: 查看课程流
         drop_course: 放弃此课程
         edit_homepage: 编辑主页
         join_course: 参与此课程
@@ -4444,10 +4674,10 @@ zh:
         view_course_stream: 查看课程流
       options: 
         assignments: 作业列表
-        custom_page: 页面首页
-        modules: 课程单元
+        custom_page: 自定义页面
+        modules: 课程单元/章节
         recent_activity_dashboard: 最近活动仪表板
-        syllabus: 提纲
+        syllabus: 含有提纲的作业
       period_name: 最近两周
       re_sending: 正在重新发送...
       send_done: 完成！收到消息可能需要几分钟。
@@ -6689,6 +6919,7 @@ zh:
       group_limit: "组限制必须为空或大于 1"
       unknown: 发生意外错误。
       update_failed: 更新失败，请重试
+    everyone: "每个人 (%{count})"
     feed_title: "%{course_or_account_name} 馈送"
     flash: 
       removeError: 无法删除该组设置。请稍后重试。
@@ -6719,7 +6950,8 @@ zh:
         add_unassigned_user: 添加未分配的用户
         search_people: 搜索人员
       add_unassigned_user: 
-        assign_to_group: 分配到组
+        add_to_group: 将用户添加到组
+        add_user_to_group: "将用户 %{name} 添加到此组"
       add_unassigned_users: 
         no_users_found: 未找到用户
         too_short: 请输入具有三个或更多字符的搜索条件
@@ -6728,13 +6960,8 @@ zh:
         all_groups_full: 所有组已满。
         all_groups_full_suggestion: 更改组限制或添加更多组。
         assign_user_to_group: 将用户分配到此组
+        assign_user_to_group_name: "将用户分配到组 %{name}"
         no_groups_created: 在用户添加组之前需要创建组。
-      group: 
-        add_user_to_group: 将用户分配到组
-        group_delete: 删除
-        group_edit: 编辑
-        group_settings: 设置
-        show_group_details: 显示组详细信息
       group_categories: 
         account_group_explanation: 帐户级学生组是一种不依附特定课程而组织学生团体的良好方式。每个学生组有自己的日历、讨论板和协作工具，从而能够更加有效地组织和合作。
         add_group_set: 添加组集
@@ -6746,7 +6973,6 @@ zh:
           course_groups: 学生组
       group_category: 
         randomly_assigning_students: 随机分配学生
-        search: 搜索
         search_groups: 搜索组
       group_category_create: 
         allow_self_signup: 允许自行注册
@@ -6786,6 +7012,14 @@ zh:
         require_same_section: 要求组成员在相同的章节中
         save: 保存
         saving: 正在保存...
+      group_detail: 
+        add_user_to_group: 将用户分配到组
+        group_delete: 删除
+        group_edit: 编辑
+        group_full: 完全
+        group_settings: 设置
+        show_group_details: "显示组 %{name} 的详细信息"
+        visit_group_homepage: 访问组主页
       group_edit: 
         cancel: 取消
         group_name: 组名称
@@ -6793,7 +7027,9 @@ zh:
         saving: 正在保存...
       group_user: 
         assign_to_group: 分配到组
+        assign_user_to_group: "将用户 %{name} 分配到组"
         remove_from_group: 从组中删除
+        remove_user_from_group: "从此组删除用户 %{name}"
       group_users: 
         no_students: 无学生
         no_users: 无用户
@@ -6801,8 +7037,8 @@ zh:
         no_groups: 无组。
         no_matching_groups: 无匹配组。
       randomly_assign_members: 
-        add_more_users: 取消
-        close: 确定
+        cancel: 取消
+        okay: 确定
         randomly_assign_students_dialog: 这会将所有未分配的学生尽可能均匀地自动分配到现有的学生组。
       self_signup_help: 
         about_self_signup_groups: 关于自行注册组
@@ -9241,6 +9477,7 @@ zh:
     sure_you_want_to_mute: "是否确定要静音此作业?此作业静音时，学生将不会收到关于以下内容的新通知或无法看到:"
   name: 学术基准导入器
   new_facebook_message: "您有来自 Canvas 的新消息"
+  no_migration_file: 内容迁移需要文件
   not_applicable: 不适用
   notification: 
     added_to_conversation_description: 已将您添加到会话
@@ -9611,6 +9848,7 @@ zh:
       page_deleted: "页面\"%{title}\"已删除。"
     reload_editing_page: 自从您开始编辑后，此页已发生更改。如果*重新加载*，将丢失所有更改。
     reload_viewing_page: 自从您开始查看后，此页面已发生更改。*重新加载*
+    restore_failed: 无法恢复页面版本
     save_button: 保存
     saving_button: 正在保存...
     warnings: 
@@ -10103,6 +10341,7 @@ zh:
         change_password: 更改密码
         confirm_password: 确认密码
         default_email: 默认电子邮件
+        enabled_theme: 已启用主题
         expires_at: 过期
         headers: 
           approved_integrations: 批准的集成
@@ -10400,14 +10639,16 @@ zh:
   publish_btn_module: 
     buttons: 
       publish: 发布
-      publish_desc: 未发布。单击可进行发布
+      publish_desc: 未发布。单击可进行发布。
       published: 已发布
-      published_desc: 已发布。单击可取消发布
+      published_desc: 已发布。单击可取消发布。
       publishing: 正在发布...
       unpublish: 取消发布
       unpublishing: 正在取消发布...
   publishable: 
     cant_unpublish: 无法取消发布
+  publishableModuleItem: 
+    disabled: 此项目已禁用发布
   purchases: 
     new: 
       payment_info: 付款信息
@@ -10645,7 +10886,7 @@ zh:
       regraded_score: 重新评分后的分数：
       show_ansers_for_variable: "显示 %{variable} 的答案"
       skip_question_text: 跳至问题文本。
-      submission_was_regraded: "此问题已重新评分; 您的分数受到影响。"
+      submission_was_regraded: 此问题已重新评分。
       titles: 
         question_correct_comment: 如果学生回答问题正确，他们将看到此评论
         question_incorrect_comment: 如果学生回答问题错误，他们将看到此评论
@@ -10678,21 +10919,7 @@ zh:
           其中没有预定义的变量，因此所有学生对同一
           问题得出相同的答案。有关变量的更多信息，请参阅
           "变量"选项卡。
-      equation_variables: |-
-          您还可以使用括号定义问题文本中的变量 
-          （"[a] + [b] 等于多少?"）。对于每个变量，您将看到一个基于
-          变量设置的"示例值"。您可以这样检查您的数学并
-          确保公式有效。
-          
-          例如，如果您的问题是"[a] + 5 等于多少?"，则要求您
-          定义变量"a"。如果"a"的示例值 
-          为 5.2，您可以写入:
-          
-          %{example}
-          
-          通过此公式，您可以生成任何数量的解集，每个集合 
-          中的"a"值不同。一名学生可能看到的问题是
-          "5.2 + 5 等于多少?"，而另一名学生可能看到的是"9 + 5 等于多少?"。
+      equation_variables2: "您还可以使用括号定义问题文本中的变量 （\"[a] + [b] 等于多少?\"）。对于每个变量，您将看到一个基于 变量设置的\"示例值\"。您可以这样检查您的数学并 确保公式有效。 例如，如果您的问题是\"[a] + 5 等于多少?\"，则要求您 定义变量\"a\"。如果\"a\"的示例值 为 5.2，您可以写入: %{example} 通过此公式，您可以生成任何数量的解集，每个集合 中的\"a\"值不同。一名学生可能看到的问题是 \"5.2 + 5 等于多少?\"，而另一名学生可能看到的是\"9 + 5 等于多少?\"。"
       links: 
         functions: 函数
         intro: 简介
@@ -10885,6 +11112,7 @@ zh:
         other: "%{user} 有 %{count} 次剩余尝试机会"
       default_quiz_name: "测验 %{course_name}"
       default_survey_name: "调查 %{course_name}"
+      grade_by_question_warning: 按问题特性的评分受组中混淆的问题的影响。
       headers: 
         quiz_submissions: 测验提交
         survey_submissions: 调查提交
@@ -12966,6 +13194,7 @@ zh:
   unknown: 未知
   unknown_question_bank: 未知题库
   unknown_quiz: 未知测验
+  unsupported_package: 不受支持的内容包
   user: 
     default_collection_name: "%{user_name} 的集合"
     default_user_name: 用户
@@ -13434,6 +13663,11 @@ zh:
       toolbar_menu: 
         settings: 设置
       view_page_history_wiki: 查看页面历史记录
+    wiki_page_content: 
+      page_locked: 此页面已锁定
+      page_locked_by_modules: "此页面将在您完成这些单元后可用:"
+      page_locked_by_modules_until: "此页面将在 %{lock_info.unlock_at} 可用，如果您已经完成这些单元:"
+      page_locked_until: "此页面将在 %{lock_info.unlock_at} 可用"
     wiki_page_edit: 
       buttons: 
         cancel: 取消
@@ -13473,6 +13707,13 @@ zh:
         edit: 编辑
         settings: 设置
         use_front_page: 用作首页
+    wiki_page_revision: 
+      latest_revision: 最新修订版
+      restore_revision: 恢复此修订版
+      revision_summary: "*%{updated_at}* 由 %{edited_by} 编辑"
+      same_as_latest: "与 *最新版* 相同"
+    wiki_page_revisions: 
+      revision_history: 修订历史记录
   wiki_page: 
     atom_author: 维基页面
     atom_entry_title: "维基页面 %{course_or_group_name}: %{page_title}"
@@ -13549,12 +13790,15 @@ zh:
     front_page: 首页
     notices: 
       cannot_edit: "不允许您编辑页面“%{title}”。"
+      cannot_read_revisions: "不允许您审阅 “%{title}” 的历史修订版。"
       create_non_existent_page: "页面 \"%{title}\" 不存在，但您可以在下面创建"
       page_deleted: "页面\"%{title}\"已删除。"
       page_does_not_exist: "页面 \"%{title}\" 不存在。"
       page_updated: 页面已成功更新。
     page_link: 
       link_hidden_from_students_warning: 学生不会看到此链接
+    page_revisions: 
+      page_revisions_title: "%{title} 修订版: %{context_name}"
     pages_index: 
       titles: 
         pages: 页面
