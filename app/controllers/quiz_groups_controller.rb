@@ -82,16 +82,16 @@ class QuizGroupsController < ApplicationController
   #
   # <b>201 Created</b> response code is returned if the creation was successful.
   #
-  # @argument quiz_group[name] [Optional, String]
+  # @argument quiz_groups[][name] [Optional, String]
   #   The name of the question group.
   #
-  # @argument quiz_group[pick_count] [Optional, Integer]
+  # @argument quiz_groups[][pick_count] [Optional, Integer]
   #   The number of questions to randomly select for this group.
   #
-  # @argument quiz_group[question_points] [Optional, Integer]
+  # @argument quiz_groups[][question_points] [Optional, Integer]
   #   The number of points to assign to each question in the group.
   #
-  # @argument quiz_group[assessment_question_bank_id] [Optional, Integer]
+  # @argument quiz_groups[][assessment_question_bank_id] [Optional, Integer]
   #   The id of the assessment question bank to pull questions from.
   #
   # @example_response
@@ -102,12 +102,13 @@ class QuizGroupsController < ApplicationController
     if authorized_action(@quiz, @current_user, :update)
       @quiz.did_edit if @quiz.created?
 
-      bank_id = params[:quiz_group].delete(:assessment_question_bank_id)
+      quiz_group_params = params[:quiz_groups][0]
+      bank_id = quiz_group_params.delete(:assessment_question_bank_id)
       bank = find_bank(bank_id) if bank_id.present?
-      params[:quiz_group][:assessment_question_bank_id] = bank_id if bank
+      quiz_group_params[:assessment_question_bank_id] = bank_id if bank
 
       @group = @quiz.quiz_groups.build
-      if update_api_quiz_group(@group, params[:quiz_group])
+      if update_api_quiz_group(@group, quiz_group_params)
         render :json   => quiz_groups_compound_json([@group], @context, @current_user, session),
                :status => :created
       else
@@ -121,13 +122,13 @@ class QuizGroupsController < ApplicationController
   #
   # Update a question group
   #
-  # @argument quiz_group[name] [Optional, String]
+  # @argument quiz_groups[][name] [Optional, String]
   #   The name of the question group.
   #
-  # @argument quiz_group[pick_count] [Optional, Integer]
+  # @argument quiz_groups[][pick_count] [Optional, Integer]
   #   The number of questions to randomly select for this group.
   #
-  # @argument quiz_group[question_points] [Optional, Integer]
+  # @argument quiz_groups[][question_points] [Optional, Integer]
   #   The number of points to assign to each question in the group.
   #
   # @example_response
@@ -139,10 +140,11 @@ class QuizGroupsController < ApplicationController
       @group = @quiz.quiz_groups.find(params[:id])
       @quiz.did_edit if @quiz.created?
 
-      params[:quiz_group].delete(:assessment_question_bank_id)
-      params[:quiz_group].delete(:position) # position is taken care of in reorder
+      quiz_group_params = params[:quiz_groups][0]
+      quiz_group_params.delete(:assessment_question_bank_id)
+      quiz_group_params.delete(:position) # position is taken care of in reorder
 
-      if update_api_quiz_group(@group, params[:quiz_group])
+      if update_api_quiz_group(@group, quiz_group_params)
         render :json => quiz_groups_compound_json([@group], @context, @current_user, session)
       else
         render :json => @group.errors, :status => :bad_request

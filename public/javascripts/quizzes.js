@@ -2688,6 +2688,15 @@ define([
 
     $(".quiz_group_form").formSubmit({
       object_name: 'quiz_group',
+
+      // rewrite the data so that it fits the jsonapi format
+      processData: function(data) {
+        var newData = {};
+        _.each(data, function(val, key) {
+          newData[key.replace('quiz_group[', 'quiz_groups[][')] = val;
+        });
+        return newData;
+      },
       beforeSubmit: function(formData) {
         var $form = $(this);
         var $group = $form.parents(".group_top");

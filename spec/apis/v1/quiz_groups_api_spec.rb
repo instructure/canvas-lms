@@ -26,7 +26,7 @@ describe QuizGroupsController, :type => :integration do
     def api_create_quiz_group(quiz_group_params, opts={})
       api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups",
               {:controller=>"quiz_groups", :action => "create", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}"},
-              {:quiz_group => quiz_group_params},
+              {:quiz_groups => [quiz_group_params]},
               {'Accept' => 'application/vnd.api+json'}, opts)
     end
 
@@ -72,7 +72,7 @@ describe QuizGroupsController, :type => :integration do
 
       api_call(:put, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{@group.id}",
               {:controller=>"quiz_groups", :action => "update", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}"},
-              {:quiz_group => quiz_group_params},
+              {:quiz_groups => [quiz_group_params]},
               {'Accept' => 'application/vnd.api+json'}, opts)
     end
 
