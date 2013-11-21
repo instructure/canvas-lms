@@ -518,23 +518,13 @@ class Course < ActiveRecord::Base
     t('default_name', "My Course")
   end
 
-  def users_not_in_groups_sql(groups, opts={})
-    ["SELECT DISTINCT users.id, users.name#{", #{opts[:order_by]}" if opts[:order_by].present?}
-        FROM users
-       INNER JOIN enrollments e ON e.user_id = users.id
-       WHERE e.course_id = ? AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND e.type = 'StudentEnrollment'
-       #{Group.not_in_group_sql_fragment(groups.map(&:id))}
-       #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}
-       #{"#{opts[:order_by_dir]}" if opts[:order_by_dir]}", self.id]
-  end
-
-  def users_not_in_groups(groups)
-    User.find_by_sql(users_not_in_groups_sql(groups))
-  end
-
-  def paginate_users_not_in_groups(groups, page, per_page = 15)
-    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('users')}", :order_by_dir => "ASC"),
-                         :page => page, :per_page => per_page)
+  def users_not_in_groups(groups, opts={})
+    scope = User.joins(:not_ended_enrollments).
+      where(enrollments: {course_id: self, type: 'StudentEnrollment'}).
+      where(Group.not_in_group_sql_fragment(groups.map(&:id))).
+      select("users.id, users.name").uniq
+    scope = scope.select(opts[:order]).order(opts[:order]) if opts[:order]
+    scope
   end
 
   def instructors_in_charge_of(user_id)

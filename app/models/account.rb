@@ -400,22 +400,13 @@ class Account < ActiveRecord::Base
     @cached_fast_all_users[limit] ||= self.all_users(limit).active.select("users.id, users.name, users.sortable_name").order_by_sortable_name
   end
 
-  def users_not_in_groups_sql(groups, opts={})
-    ["SELECT users.id, users.name
-        FROM users
-       INNER JOIN user_account_associations uaa on uaa.user_id = users.id
-       WHERE uaa.account_id = ? AND users.workflow_state != 'deleted'
-       #{Group.not_in_group_sql_fragment(groups.map(&:id))}
-       #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}", self.id]
-  end
-
-  def users_not_in_groups(groups)
-    User.find_by_sql(users_not_in_groups_sql(groups))
-  end
-  
-  def paginate_users_not_in_groups(groups, page, per_page = 15)
-    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('users')} ASC"),
-                         :page => page, :per_page => per_page)
+  def users_not_in_groups(groups, opts={})
+    scope = User.active.joins(:user_account_associations).
+      where(user_account_associations: {account_id: self}).
+      where(Group.not_in_group_sql_fragment(groups.map(&:id))).
+      select("users.id, users.name")
+    scope = scope.select(opts[:order]).order(opts[:order]) if opts[:order]
+    scope
   end
 
   def courses_name_like(query="", opts={})

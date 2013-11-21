@@ -162,12 +162,14 @@ class Group < ActiveRecord::Base
     Group.find(ids)
   end
 
-  def self.not_in_group_sql_fragment(group_ids, prepend_and = true)
-    "#{"AND" if prepend_and} NOT EXISTS (SELECT * FROM group_memberships gm
-                      WHERE gm.user_id = users.id AND
-                      gm.workflow_state != 'deleted' AND
-                      gm.group_id IN (#{group_ids.map(&:to_i).join ','}))" unless group_ids.empty?
-
+  def self.not_in_group_sql_fragment(groups)
+    return nil if groups.empty?
+    sanitize_sql([<<-SQL, groups])
+      NOT EXISTS (SELECT * FROM group_memberships gm
+      WHERE gm.user_id = users.id AND
+      gm.workflow_state != 'deleted' AND
+      gm.group_id IN (?))
+    SQL
   end
 
   workflow do
