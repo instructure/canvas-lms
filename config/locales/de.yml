@@ -4609,17 +4609,17 @@ de:
         confirm_unenroll: "Möchten Sie die Einschreibung für diesen Kurs widerrufen? Sie werden dann nicht länger die Kursübersicht aufrufen, mit Dozenten direkt kommunizieren und die Kursevents im Kommunikationsstream und als Benachrichtigungen aufrufen können."
         custom_page: "Sie können Ihre **eigene Kursstartseite gestalten** und beliebige Links, Bilder oder Multimediainhalte einfügen."
         modules: |-
-            Sie können Ihren Kurs in **Module oder Abschnitte** untergliedern, wobei jeder Abschnitt bestimmte Dateien, Aufgaben, Seiten usw. enthält. Ferner haben Sie die Möglichkeit, eine Reihenfolge für die Module festzulegen, indem Sie Kriterien und Vorraussetzungen für die einzelnen Module festlegen, die erfüllt werden müssen, bevor das entsprechende Modul freigegeben wird.
+            Sie können Ihren Kurs in **Module oder Abschnitte** untergliedern, wobei jeder Abschnitt bestimmte Dateien, Aufgaben, Seiten usw. enthält. Ferner haben Sie die Möglichkeit, eine Reihenfolge für die Module festzulegen, indem Sie Kriterien und Voraussetzungen für die einzelnen Module festlegen, die erfüllt werden müssen, bevor die Sperre für das jeweilige Modul aufgehoben wird.
             
-            -Dieses Layout eignet sich in der Regel am besten für Kurse ohne einen bestimmten Zeitplan, die auf einer Kursperiode oder einem Semester basieren.
+            -Dieses Layout eignet sich am besten für Kurse ohne einen bestimmten Zeitplan, die auf einer Kursperiode oder einem Semester basieren.
         recent_activity_dashboard: "Im **Dashboard \"Aktuelle Aktivitäten\"** können Teilnehmer die letzten Konversationen, Ankündigungen, Diskussionen und Interaktionen für diesen Kurs anzeigen. Es ist der Dashboard-Seite sehr ähnlich, die Benutzern bei der ersten Anmeldung angezeigt wird, zeigt jedoch nur Inhalte für diesen speziellen Kurs."
-        syllabus: "In der **Syllabusansicht** können Sie die Erwartungen und Leistungsziele des Kurses beschreiben, den Kurs mit Links oder Bildern vorstellen und einen Kalender mit einer Übersicht aller Aufgaben und Kursevents einfügen."
+        syllabus: "In der **Syllabusansicht** können Sie die Erwartungen und Leistungsziele des Kurses beschreiben, den Kurs mit Links, Bildern usw. vorstellen und einen Kalender mit einer Übersicht aller Aufgaben und Events des Kurses einfügen."
       draft_state: 
         buttons: 
           cancel: Abbrechen
           update_layout: Speichern
         headings: 
-          set_layout: "Layout der Startseite auswählen"
+          set_layout: "Layout der Startseite festlegen"
         labels: 
           select_content: "Wählen Sie die auf der Startseite anzuzeigenden Elemente aus."
         options: 
@@ -4637,12 +4637,12 @@ de:
         unpublished: "Dieser Kurs ist nicht veröffentlicht"
       importing: "Kopie/Migration des Kurses ist in Arbeit. Dadurch können einige Inhalte temporär nicht verfügbar sein."
       labels: 
-        select_content: "Besucher der Kursseite sehen"
+        select_content: "Besuchern der Kursseite Folgendes anzeigen"
       license_notice: "Diese Kursinhalte werden unter der Lizenzart %{license_type} angeboten. Sofern nicht anders angegeben, können die Inhalte dieses Kurses im Rahmen dieser Lizenz genutzt werden."
       links: 
         change_layout: "Layout der Startseite ändern"
         course_setup: "Checkliste für Kurseinstellungen"
-        course_stream: "Siehe Kursstream"
+        course_stream: "Kurs-Stream anzeigen"
         drop_course: "Diesen Kurs verwerfen"
         edit_homepage: "Startseite bearbeiten"
         join_course: "Für diesen Kurs einschreiben"
@@ -6921,7 +6921,7 @@ de:
         add_unassigned_user: "Nicht zugewiesenen Benutzer hinzufügen"
         search_people: "Personen durchsuchen"
       add_unassigned_user: 
-        add_to_group: "Benutzer zu Gruppe hinzufügen"
+        add_to_group: "Benutzer zur Gruppe hinzufügen"
         add_user_to_group: "Benutzer %{name} zu dieser Gruppe hinzufügen"
       add_unassigned_users: 
         no_users_found: "Keine Benutzer gefunden"
@@ -6984,7 +6984,7 @@ de:
         save: Speichern
         saving: "Wird gespeichert..."
       group_detail: 
-        add_user_to_group: "Benutzer Gruppe zuweisen"
+        add_user_to_group: "Benutzer der Gruppe zuweisen"
         group_delete: Löschen
         group_edit: Bearbeiten
         group_full: Voll
@@ -10564,7 +10564,7 @@ de:
       publish: Veröffentlichen
       publish_desc: "Nicht veröffentlicht. Zum Veröffentlichen klicken."
       published: Veröffentlicht
-      published_desc: "Veröffentlichen. Zum Rückgängigmachen der Veröffentlichung klicken"
+      published_desc: "Veröffentlicht. Zum Rückgängigmachen der Veröffentlichung klicken"
       publishing: "Wird veröffentlicht..."
       unpublish: "Veröffentlichung rückgängig machen"
       unpublishing: "Veröffentlichung wird rückgängig gemacht..."
@@ -13697,7 +13697,7 @@ de:
     front_page: Startseite
     notices: 
       cannot_edit: "Sie dürfen die Seite \"%{title}\" nicht bearbeiten."
-      cannot_read_revisions: "Die dürfen die Revisionsverläufe von \"%{title}\" nicht überprüfen."
+      cannot_read_revisions: "Sie dürfen die Revisionsverläufe von \"%{title}\" nicht überprüfen."
       create_non_existent_page: "Die Seite \"%{title}\" existiert nicht. Sie können sie jedoch unten erstellen."
       page_deleted: "Die Seite \"%{title}\" wurde gelöscht."
       page_does_not_exist: "Die Seite \"%{title}\" existiert nicht."
