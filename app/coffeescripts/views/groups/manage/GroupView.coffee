@@ -38,7 +38,6 @@ define [
     els:
       '.group-summary': '$summary'
       '.al-trigger': '$groupActions'
-      '.toggle-group': '$toggleGroup'
 
     dropOptions:
       accept: '.group-user'
@@ -69,7 +68,7 @@ define [
     afterRender: ->
       @$el.toggleClass 'group-expanded', @expanded
       @$el.toggleClass 'group-collapsed', !@expanded
-      @$toggleGroup.attr 'aria-expanded', '' + @expanded
+      @groupDetailView.$toggleGroup.attr 'aria-expanded', '' + @expanded
       @updateFullState()
 
     updateFullState: ->

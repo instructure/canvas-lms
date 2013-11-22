@@ -13,6 +13,7 @@ define [
 
     els:
       '.group-summary': '$summary'
+      '.toggle-group': '$toggleGroup'
 
     attach: ->
       @group.on 'change', @render
