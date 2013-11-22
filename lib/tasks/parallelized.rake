@@ -1,9 +1,9 @@
 # Don't load rspec if running "rake gems:*"
 unless ARGV.any? { |a| a =~ /\Agems/ }
-  begin; require 'spec/selenium/parallelized_specs/lib/parallelized_specs/tasks'; rescue LoadError; end
 
   namespace :parallel do
     task :nonseleniumparallel, :count do |t, args|
+      require "parallelized_specs"
       require File.expand_path(File.dirname(__FILE__) + '/parallel_exclude')
       count = args[:count]
       single_thread_files = ParallelExclude::FILES
@@ -26,6 +26,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     end
 
     task :selenium, :count, :build_section do |t, args|
+      require "parallelized_specs"
       #used to split selenium builds when :build_section is set split it in two.
       test_files = FileList['spec/selenium/**/*_spec.rb'] + FileList['vendor/plugins/*/spec_canvas/selenium/*_spec.rb']
       test_files = test_files.to_a.sort_by! { |file| File.size(file) }
@@ -65,6 +66,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     end
 
     task :pattern, :count, :file_pattern do |t, args|
+      require "parallelized_specs"
       count = args[:count]
       file_pattern = args[:file_pattern]
       if count.nil? || file_pattern.nil?
