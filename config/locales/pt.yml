@@ -8,17 +8,18 @@ pt:
     bad_per_slot: "Tem de permitir pelo menos um compromisso por horário"
     context_required: "Deve escolher um calendário"
     select_calendars: "Selecionar calendários"
-  GroupView: 
-    delete_confirm: "Tem a certeza de que pretende remover este grupo?"
-    flash: 
-      removeError: "Não foi possível remover o grupo. Tente novamente mais tarde."
-      removed: "Grupo removido com sucesso."
+  GrouDetailpView: 
     student_count: 
       one: "1 aluno"
       other: "%{count} alunos"
     user_count: 
       one: "1 utilizador"
       other: "%{count} utilizadores"
+  GroupView: 
+    delete_confirm: "Tem a certeza de que pretende remover este grupo?"
+    flash: 
+      removeError: "Não foi possível remover o grupo. Tente novamente mais tarde."
+      removed: "Grupo removido com sucesso."
   academic_benchmark: 
     api_error: "Não foi possível atualizar as normas para a autoridade %{auth}."
     bad_ab_file: "O ficheiro de referências académicas fornecido tem um erro."
@@ -315,6 +316,7 @@ pt:
         sis_user_id: "ID do SIS"
         sortable_name: "Nome ordenável"
       sortable_name_help: "Este nome aparece em listas ordenadas."
+      unique_id_label: "%{label}:*"
     add_user_button: "Adicionar utilizador"
     add_user_dialog_title: "Adicionar um novo utilizador"
     adding_course_message: "A adicionar disciplina..."
@@ -1444,14 +1446,14 @@ pt:
       no_assignment_groups: "Não foram encontrados grupos de tarefa"
     assignment_group_list_item: 
       add_assignment_to: "Adicionar tarefa a %{name}"
+      assignment_group_delete: "Eliminar grupo de tarefa"
+      assignment_group_edit: "Editar grupo de tarefa"
+      assignment_group_move: "Mover grupo de tarefa"
       delete: Eliminar
       edit: Editar
       group_weight: "%{groupWeight}% do total"
       manage: Gerir
       move: "Mover para&hellip;"
-      title_delete: "Eliminar grupo de tarefa?"
-      title_edit: "Editar grupo de tarefa"
-      title_move: "Mover grupo de tarefa"
     assignment_group_selector: 
       assignment_group: "Grupo de tarefa"
       assignment_group_options: 
@@ -1460,26 +1462,27 @@ pt:
       one: "1 grupo"
       other: "%{count} grupos"
     assignment_list_item: 
+      assignment_delete: "Eliminar tarefa"
+      assignment_edit: "Editar tarefa"
+      assignment_move: "Mover tarefa"
       delete: Eliminar
-      delete_asssignment_title: "Eliminar esta tarefa"
       edit: Editar
-      edit_assignment_title: "Editar tarefa"
       module: Módulo
       move: "Mover para&hellip;"
-      move_assignment_title: "Mover tarefa"
       multiple_modules: "Vários módulos"
       no_points_possible: "Nenhum ponto possível"
       points_possible: "%{pointsPossible} pts"
       points_possible_screen_reader: "%{pointsPossible} pontos possíveis"
       settings: Definições
     assignment_list_item_score: 
+      assignment_grading_type_is_not_graded: "Não será atribuída uma nota a esta tarefa."
       assignment_not_yet_graded_screenreader: "Tarefa ainda não avaliada. %{pointsPossible} pontos possíveis."
+      empty_points_possible: "-/%{pointsPossible} pts"
       no_submission: "Nenhum envio"
       no_submission_for_assignment_screenreader: "Nenhum envio para esta tarefa. %{pointsPossible} pontos possíveis."
-      no_submission_with_points_possible: "-/%{pointsPossible} pts"
-      not_yet_graded_with_points_possible: "*Ainda não avaliada*/%{pointsPossible} pts"
-      score_with_points_possible: "%{grade}/%{pointsPossible} pts"
-      score_with_points_possible_screenreader: "Pontuação: %{grade} em %{pointsPossible} pontos"
+      not_yet_graded: "*Ainda sem nota*"
+      score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
+      score_with_points_possible_screenreader: "Pontuação: %{score} em %{pointsPossible} pontos."
     assignment_locked: 
       assignment_locked: "Esta tarefa está travada a partir de *%{lock_at}*"
       assignment_unlocked_from: "Esta tarefa está travada até *%{unlock_at}*"
@@ -1537,6 +1540,7 @@ pt:
       submit_assignment: "Enviar tarefa"
     cannot_delete_group: "Tem de ter pelo menos um grupo de tarefa"
     cant_unpublish_when_students_submit: "Não é possível anular a publicação se existirem envios de alunos"
+    complete: Completo
     confirm: 
       delete_assignment: "Tem certeza de que deseja excluir esta tarefa?"
       delete_group: "Tem certeza de que deseja excluir este grupo?"
@@ -1663,6 +1667,10 @@ pt:
           *Certifique-se de que não muda os nomes dos ficheiros enviados, para que possamos reconhecê-los.*
       titles: 
         related_items: "Itens relacionados"
+    grade_letter_grade_screenreader: "Nota: %{grade}"
+    grade_pass_fail_screenreader: "Nota: %{grade}"
+    grade_percent: "%{grade}%"
+    grade_percent_screenreader: "Nota: %{grade}%"
     graded: "Esta tarefa foi avaliada"
     grading_type_selector: 
       grading_type: "Tipo de avaliação"
@@ -1690,6 +1698,8 @@ pt:
         assignment_group: "Grupo de tarefa"
         group_weight: Peso
         total: Total
+    higher_than_max: "Não é possível utilizar um número superior ao número de tarefas"
+    incomplete: Incompleto
     index: 
       assignment_locked: "Esta tarefa está bloqueada de momento. Visite a página de detalhes da tarefa para obter mais informações."
       assignment_locked_tooltip: bloqueado
@@ -1735,6 +1745,7 @@ pt:
       submit_failed: "Falha no envio, tente novamente"
       submitting: Enviando...
     multiple_due_dates: "Várias datas de entrega"
+    name_is_required: "É necessário o nome!"
     needs_grading_count: "%{needs_grading_count} envios desta tarefa ainda precisam ser avaliados"
     never_drop: 
       remove_rule: "Remover regra"
@@ -1751,6 +1762,7 @@ pt:
       assignments: Tarefas
       no_assignments_found: "Não foram encontradas tarefas"
     no_tools_found: "Não foram encontradas ferramentas"
+    non_number: "É necessário utilizar um número"
     notices: 
       assignment_delete: "Esta tarefa foi excluída"
       created: "Tarefa criada com sucesso."
@@ -1800,6 +1812,7 @@ pt:
       peer_reviews_assign_at_explanation: "Deve vir após a data de entrega. Se estiver em branco, usará a data de entrega."
       reviews_per_user: "Revisões por utilizador"
     percent_of_final_grade: "%{percent} da nota final"
+    positive_number: "É necessário utilizar um número positivo"
     redirect_page: 
       redirect_message: "Este envio era um URL, agora estamos a encaminhá-lo para a ligação do URL. [Clique aqui para ir para o envio](%{url})"
     rules_text: 
@@ -2024,6 +2037,7 @@ pt:
       not_found: "Dados do arquivo não encontrados"
     feed_title: "Arquivo: %{title}"
     feed_title_with_context: "Arquivo, %{course_or_group}: %{title}"
+    over_quota: "O ficheiro transferido excede a quota."
     title: 
       migration_list: "Arquivos associados"
     upload_error_invalid_response_code: "Código de resposta inválido, valor previsto 200 obteve %{code}"
@@ -2237,9 +2251,11 @@ pt:
     sample_final_answer: "Este valor é um exemplo de resposta final para este tipo de pergunta"
   calendar: 
     agenda_view: 
-      delete: Eliminar
       due: prazo
-      edit: Editar
+      loading: "A carregar"
+      no_events: "Nenhum evento após esta data."
+      starts_at: "Início em"
+    agenda_view_displaying_start_end: "A visualizar %{start} até %{end}"
     appointment_group_deletion_details: "Eliminar isto também irá eliminar compromissos para os quais os alunos se tenham inscrito."
     appointment_group_list: 
       location: "Localização:"
@@ -2260,6 +2276,7 @@ pt:
       create_event: "Criar novo evento"
       done_go_back_to_list: "Concluído, voltar à lista"
       links: 
+        accessibility_warning: "Aviso: esta vista não é acessível a utilizadores com leitores de ecrã"
         calendar_agenda: Agenda
         calendar_month: Mês
         calendar_scheduler: Agenda
@@ -2269,7 +2286,7 @@ pt:
       refresh: Atualizar
       use_old_calendar: "Calendário antigo"
     calendar_navigator: 
-      enter_jump_date: "Introduza uma data e prima Enter para saltar para essa data."
+      enter_navigation_date: "Introduza a data para a qual pretende navegar."
       next: Seguinte
       previous: Anterior
       today: Hoje
@@ -2362,9 +2379,16 @@ pt:
       slots_available: "Entradas disponíveis"
     event_event_title: "Título do evento:"
     event_on_this_day: "Há um evento neste dia"
-    invalid_date: "Data inválida"
+    event_type: 
+      assignment: Tarefa
+      discussion: Discussão
+      event: Evento
+      quiz: Teste
+    input_is_invalid_date: "A data introduzida não é válida."
     labels: 
       due: prazo
+    loading_more_items: "A carregar mais itens."
+    loading_undated_events: "A carregar eventos sem data"
     message_participants: 
       all_groups: "Todos os grupos"
       all_users: "Todos os utilizadores"
@@ -2404,15 +2428,17 @@ pt:
     save_changes: "Guardar alterações"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "Criar um grupo de compromissos"
+    screenreader_date_suggestion: "%{date}. Prima Enter para aceitar."
     time_block_errors: "Existem erros nas suas escolhas de blocos de tempo."
     titles: 
       edit_appointment_group: "Editar grupo de compromissos"
       edit_event: "Editar evento"
     today: Hoje
     undated_events: 
-      loading_undated_events: "A carregar eventos sem data..."
-      show_undated_events: "Mostrar eventos sem data"
-      undated_events: "Eventos sem data"
+      loading_undated_events: "A carregar itens sem data..."
+      no_undated_events: "Nenhum item sem data."
+      show_undated_events: "Mostrar itens sem data"
+      undated_items: "Itens sem data"
   calendar_event: 
     errors: 
       duplicate_child_event_contexts: "Duplicar contextos de eventos subordinados"
@@ -2557,10 +2583,15 @@ pt:
     show2: 
       calendar_feed: "Feed do calendário"
       calendar_feed_instructions: "Copie a ligação abaixo e cole-a em qualquer aplicação de calendário que utilize feeds iCal (Google Calendar, iCal, Outlook, etc.)"
+      calendars: Calendários
       feed_dialog_title: "Feed do calendário"
       feed_title: "Feed Atom do calendário da disciplina"
       links: 
         feed: "clique aqui para exibir o feed"
+      skip_to_calendar: "Saltar para calendário"
+      toggle_calendars: "Alternar calendários"
+      toggle_undated_items: "Alternar itens sem data"
+      undated_items: "Itens sem data"
     titles: 
       add_new_assignment: "Adicionar nova tarefa"
       add_new_event: "Adicionar novo evento"
@@ -2982,7 +3013,7 @@ pt:
       import_migration: Importar
     moodle_zip: 
       options: Opções
-    must_upload_file: "É necessário carregar um ficheiro"
+    must_upload_file: "É necessário um url ou carregar um ficheiro"
     no_content_selected: "Não selecionou conteúdo para importar."
     progressing_content_migration: 
       issues_text: problemas
@@ -3397,7 +3428,120 @@ pt:
         state: Estado
       titles: 
         student_progression: "Progressão de módulo por estudante"
+    content_next: 
+      add_prerequisite: "Adicionar pré-requisito a *%{module}*"
+      assignment_points_possible: "em %{points_possible}"
+      buttons: 
+        add_module: "Adicionar módulo"
+        add_prerequisite: "Adicionar pré-requisito"
+      criterion_for_assignment: "Para %{assignment}, os utilizadores têm de %{select_criterion}"
+      headings: 
+        add_prerequisite: "Adicionar pré-requisito a %{name}"
+        course_modules: "Módulos da disciplina"
+        student_progress: "Progresso do módulo por aluno"
+        student_progress_for_module: "Progresso do aluno para %{module}"
+        students_completed: "Alunos que completaram o módulo"
+        students_in_progress: "Alunos que estão a trabalhar no módulo"
+        students_locked: "Alunos que não desbloquearam o módulo"
+        students_unlocked: "Alunos que desbloquearam (mas não iniciaram) o módulo"
+      help: 
+        create: |-
+            Os módulos da disciplina permitem organizar as suas tarefas, páginas, ficheiros, etc. em secções ou unidades mais pequenas. Os módulos podem ser construídos à volta de um tema, focar um tópico específico ou mesmo ser agrupados cronologicamente.
+            
+            Também é possível sequenciar os módulos definindo critérios e pré-requisitos para cada um deles. Os alunos não poderão aceder a módulos até desbloquearem todos os seus pré-requisitos. Dessa forma, é possível evitar que os alunos acedam a determinados conteúdos ou ficheiros até obterem, por exemplo, um mínimo de 75% num teste de revisão.
+            
+            Para começar a organizar a sua disciplina em módulos, clique no botão "%{button}", à direita.
+        no_modules: "Nenhum módulo foi definido para esta disciplina."
+      images: 
+        alt: 
+          min_score: "pontuação mínima"
+          must_contribute: "têm de contribuir"
+          must_submit: "têm de enviar"
+          must_view: "têm de visualizar"
+        title: 
+          min_score: "Os alunos têm de obter pelo menos %{min_score} neste item para o módulo ser considerado concluído"
+          must_contribute: "Os alunos têm de contribuir para este item para o módulo ser considerado concluído"
+          must_submit: "Os alunos têm de enviar esta tarefa para o módulo ser considerado concluído"
+          must_view: "Os alunos têm de visualizar este item para o módulo ser considerado concluído"
+      indent: 
+        ? "n"
+        : 
+          one: "Avançar 1 nível"
+          other: "Avançar %{count} níveis"
+          zero: "Não avançar"
+      key: 
+        description: 
+          delete: "Eliminar módulo/item atual"
+          edit: "Editar módulo/item"
+          indent: "Avançar item atual"
+          new: "Novo módulo"
+          next: "Módulo/item seguinte"
+          outdent: "Recuar item atual"
+          previous: "Módulo/item anterior"
+      keycode_descriptions: 
+        next_module_item: "Selecionar o módulo ou item de módulo seguinte"
+        previous_module_item: "Selecionar o módulo ou item de módulo anterior"
+        toggle_module_dragging: "Selecionar o item para começar a arrastar ou largar o item selecionado anteriormente"
+      keycodes: 
+        delete: d
+        edit: e
+        indent: i
+        new: "n"
+        next: j
+        next_module_item: "Para cima"
+        outdent: o
+        previous: k
+        previous_module_item: "Para baixo"
+        toggle_module_dragging: Espaço
+      labels: 
+        indent: Avançar
+        module_complete_when: "Este módulo está concluído quando"
+        modules: 
+          before_students_view: "Antes que os alunos possam ver este módulo"
+        new_tab: "Carregar esta ferramenta num novo separador"
+        require_sequential_progress: "os alunos têm de passar pelos requisitos neste módulo por ordem sequencial"
+        sort_by: "Ordenar por"
+        title: Título
+        unlock_at: "Desbloquear em"
+        url: URL
+      links: 
+        add_prerequisite: "Adicionar pré-requisito"
+        add_requirement: "Adicionar requisito"
+        reload_student: "Recarregar progresso do aluno"
+        sort_by_name: Nome
+        sort_by_progress: Progresso
+        student_progress: "Ver progresso"
+        title: 
+          remove_prerequisite: "Remover este pré-requisito"
+      module: módulo
+      module_details: "Os módulos são mostrados por ordem sequencial; assim, apenas os módulos acima de %{name} podem ser definidos como pré-requisitos."
+      module_name: "Nome do módulo"
+      modules_keyboard_hint: "Para mudar a ordem dos módulos e itens de módulo, desative primeiro o cursor no seu leitor de ecrã. Insert-z em JAWS. Prima Tab para selecionar o primeiro módulo. Prima para cima e para baixo para selecionar um módulo ou item de módulo. Prima espaço para selecionar o módulo ou item de módulo para começar a arrastar. Em seguida, prima para cima e para baixo para selecionar um destino. Prima espaço novamente para largar a seleção depois do destino."
+      must_complete_prerequisites: "Eles têm de concluir"
+      no_preprequisites: "Nenhum pré-requisito definido"
+      no_requirements: "Nenhum requisito definido"
+      prerequisites: 
+        another_module: "Outro módulo"
+      prerequisites_need_item: "Será necessário adicionar itens antes de poder especificar como um utilizador concluirá este módulo"
+      requirements: 
+        must_contribute: "contribuir para a página"
+        must_score_at_least: "pontuar pelo menos"
+        must_submit: "enviar a tarefa"
+        must_view: "ver o item"
+      select_module: 
+        instructions: "Selecionar módulo"
+        name: "o módulo, %{module}"
+      select_prerequisite: "Selecione o tipo de pré-requisito. Os alunos não podem ver um módulo até serem cumpridos todos os pré-requisitos."
+      student_name: "Nome do aluno"
+      table_headings: 
+        module: Módulo
+        state: Estado
+      titles: 
+        student_progression: "Progressão de módulo por aluno"
     context_module: 
+      admin_links: 
+        module_options_label: "Opções de módulo"
+        module_options_title: "Opções de módulo"
       context_module: 
         draft: (Rascunho)
       images: 
@@ -3421,12 +3565,34 @@ pt:
           delete_module: "Excluir este módulo"
           edit_module: Editar
           student_progress: "Ver o progresso do aluno neste módulo"
-      manage: Gerir
+      manage: "Opções de módulo"
       module_will_unlock_at: "destravará em *%{unlock_date}*"
       progression_complete_count: "*%{count}* concluído"
       progression_started_count: "*%{count}* em andamento"
       reorder_modules: "Arrastar para reordenar os módulos"
       unpublish: "Anular publicação"
+    context_module_next: 
+      images: 
+        alt: 
+          incomplete: incompleto
+        title: 
+          complete: "Módulo concluído"
+          incomplete: "Módulo incompleto"
+          locked: "Módulo bloqueado"
+      links: 
+        add_item: "Adicionar conteúdo"
+        text: 
+          delete_module: Eliminar
+          edit_module: Editar
+        title: 
+          delete_module: "Eliminar este módulo"
+          edit_module: Editar
+          student_progress: "Ver o progresso do aluno neste módulo"
+      manager_module: "Gerir módulo"
+      module_will_unlock_at: "desbloqueará em *%{unlock_date}*"
+      progression_complete_count: "*%{count}* concluído"
+      progression_started_count: "*%{count}* em curso"
+      reorder_modules: "Arrastar para reordenar os módulos"
     context_modules: 
       publish: Publicar
     errors: 
@@ -3479,6 +3645,46 @@ pt:
       must_view: 
         fulfilled: "visualizou a página"
         unfulfilled: "deve visualizar a página"
+    module_item_next: 
+      drag_to_reorder: "Arrastar para reordenar ou mover o item para outro módulo"
+      images: 
+        alt: 
+          max_score: "pontuação máxima"
+          min_score: "pontuação mínima"
+          must_contribute: "têm de contribuir"
+          must_submit: "têm de enviar"
+          must_view: "têm de visualizar"
+        title: 
+          max_score: "Os alunos não devem ultrapassar a pontuação máxima neste item para o módulo ser considerado concluído"
+          min_score: "Os alunos têm de atingir a pontuação mínima neste item para o módulo ser considerado concluído"
+          must_contribute: "Os alunos têm de contribuir para este item para o módulo ser considerado concluído"
+          must_submit: "Os alunos têm de enviar esta tarefa para o módulo ser considerado concluído"
+          must_view: "Os alunos têm de visualizar este item para o módulo ser considerado concluído"
+      links: 
+        edit_item: Editar
+        edit_item_details: "Editar detalhes do item"
+        indent: Avançar
+        indent_item: "Avançar item"
+        outdent: Recuar
+        outdent_item: "Recuar item"
+        remove_item: Remover
+        remove_item_from_module: "Remover este item do módulo"
+      max_score: 
+        fulfilled: "pontuou não mais que %{score}"
+        unfulfilled: "têm de pontuar não mais que %{score}"
+      min_score: 
+        fulfilled: "pontuou pelo menos %{score}"
+        unfulfilled: "têm de pontuar pelo menos %{score}"
+      must_contribute: 
+        fulfilled: "contribuiu para o conteúdo da página"
+        unfulfilled: "tem de contribuir para o conteúdo da página"
+      must_submit: 
+        fulfilled: "enviou a tarefa"
+        unfulfilled: "tem de enviar a tarefa"
+      must_view: 
+        fulfilled: "visualizou a página"
+        unfulfilled: "tem de visualizar a página"
+      settings: Definições
     module_locked: Bloqueado
     module_started: "Em curso"
     module_unlocked: Desbloqueado
@@ -3517,6 +3723,7 @@ pt:
     errors: 
       field_is_required: "Este campo é obrigatório"
     message_sent: "Mensagem enviada!"
+    no_course: "Nenhuma disciplina"
     select_course: "Selecionar disciplina"
   conversation_message: 
     subject: "Mensagem privada, %{timestamp}"
@@ -3647,7 +3854,6 @@ pt:
       compose_new_message: "Compor uma nova mensagem"
       delete: Eliminar
       delete_conversation: "Eliminar conversa"
-      enter_name_group_or_course: "Introduzir um nome, grupo ou disciplina"
       filter_messages_by_course: "Filtrar mensagens por disciplina"
       filter_messages_by_type: "Filtrar mensagens por tipo"
       forward: Reencaminhar
@@ -3657,6 +3863,7 @@ pt:
       more_options: "Mais opções"
       reply: Responder
       reply_all: "Responder a todos"
+      search_by_user: "Procurar por utilizador"
       search_for_recipients: "Procurar destinatários"
       search_names_groups_courses: "Procurar nomes, grupos e disciplinas"
       sending: "a enviar"
@@ -3706,12 +3913,11 @@ pt:
         remove_media_comment: "Remover comentário multimédia"
     message_form_dialog: 
       body: Corpo
-      bulk_explanation: "Esta opção cria mensagens individuais para todos os destinatários no campo Para:."
-      bulk_message: "Mensagem em massa"
       headings: 
         new_message: "Nova mensagem"
       inbox_actions: 
         add_people: "Adicionar pessoas"
+      individual_message_explanation: "Será enviada uma mensagem individual a cada um dos destinatários"
       labels: 
         add_to_faculty_journal: "Adicionar como uma entrada do Diário da Faculdade"
         attachments: Anexos
@@ -3722,8 +3928,10 @@ pt:
       links: 
         media_comment: Gravar
       media_comment: "Comentário multimédia"
+      no_course: "Nenhuma disciplina"
       no_subject: "Sem assunto"
       search_names_groups_courses: "Procurar nomes, grupos e disciplinas"
+      send_individual_messages: "Enviar mensagens individuais"
       titles: 
         media_comment: "Comentário multimédia gravado"
         record_media_comment: "Gravar comentário áudio ou vídeo"
@@ -3743,6 +3951,7 @@ pt:
       sending_message: "A enviar *%{message_preview}* para *%{num_people}*"
     more_participants: "+ outros %{total}"
     no_message: 
+      batch_selected: "Várias conversas selecionadas"
       beta_description: "Está a utilizar uma versão beta da caixa de entrada Canvas"
       beta_version: "Versão Beta"
       no_conversations_selected: "Não existem conversas selecionadas"
@@ -4290,6 +4499,7 @@ pt:
         add_section: "Adicionar seção"
         move_course: "Mover disciplina"
         update_course: "Atualizar detalhes da disciplina"
+      course_open_enrollment_without_code: "Esta disciplina tem inscrições abertas. Os alunos podem inscrever-se na disciplina assim que partilhar com eles este URL: *%{url}*"
       course_overrides_term: "Isto substituirá qualquer configuração de disponibilidade de período."
       date_restricted: "Os utilizadores só podem participar na disciplina entre estas datas"
       deatils: 
@@ -4355,7 +4565,6 @@ pt:
         public_syllabus: "Tornar o programa desta disciplina visível publicamente"
         restrict_enrollments_to_course_dates: "Os utilizadores só podem participar na disciplina entre estas datas"
         root_account_id: "Conta raiz"
-        self_enrollment: "Permitir que os alunos se inscrevam, compartilhando com eles o URL secreto"
         sis_source_id: "ID do SIS"
         start_at: "Inicia em"
         storage_quota: "Armazenamento de arquivos"
@@ -4370,7 +4579,7 @@ pt:
           delete_section: "Excluir seção"
           edit_section: "Editar seção"
       megabytes: megabytes
-      navigation_keyboard_hint: "Para mudar a ordem das ligações de navegação da disciplina, desative primeiro o cursor no seu leitor de ecrã. Insira z em JAWS. Prima Tab para selecionar a primeira ligação. Prima para cima e para baixo para selecionar uma ligação. Prima espaço para selecionar uma ligação e começar a arrastar. Em seguida, prima para cima e para baixo para selecionar um destino. Prima espaço novamente para largar a ligação depois do destino."
+      navigation_keyboard_hint: "No caso de utilizar um leitor de ecrã, para mudar a ordem das ligações de navegação da disciplina, desative o cursor virtual/memória intermédia virtual do leitor de ecrã (prima Insert-z em JAWS). Prima Control-Home para saltar para o topo da página e, em seguida, prima a tecla Tab até chegar à primeira ligação de navegação da disciplina. Prima as setas para cima e para baixo até ouvir a ligação que pretende mover e prima espaço para selecionar a ligação. Em seguida, prima as setas para cima e para baixo até localizar a nova posição. Por último, prima novamente espaço para colocar a ligação que está a mover diretamente após a ligação atual. Quando terminar, reative o cursor/a memória intermédia virtual."
       no_date: "Nenhuma data definida"
       no_language_preference: "Não definido (configurado pelo utilizador, predefinição em %{language})"
       none: Nenhum
@@ -4379,6 +4588,8 @@ pt:
       private_course: Privado
       public_course: Público
       section_sis_id: "ID do SIS: %{section_sis}"
+      self_enrollment: "Permitir que os alunos se inscrevam partilhando com eles um URL ou código secreto"
+      self_enrollment_without_code: "Permitir que os alunos se inscrevam partilhando com eles um URL secreto"
       set_grading_scheme: "definir esquema de avaliação"
       sis_source_id: "ID do SIS"
       tab_cant_disable: "Esta página não pode ser desativada, apenas oculta"
@@ -4419,9 +4630,27 @@ pt:
     show: 
       acting_as: "Está a visualizar esta disciplina com a função de: %{enrollment_type}. Só terá permissões e acesso disponíveis aos utilizadores desta função."
       buttons: 
-        update_layout: Guardar
+        update_layout: "Atualizar layout"
       details: 
+        assignments: "Esta vista mostra a **lista de tarefas** da disciplina, com as tarefas futuras e recentes na parte superior."
         confirm_unenroll: "Tem a certeza de que pretende cancelar a inscrição na disciplina? Deixará de poder ver o rol da disciplina ou comunicar diretamente com os professores e não poderá ver os eventos da disciplina no seu mural e como notificações."
+        custom_page: "Pode **elaborar a sua própria página inicial da disciplina** e incluir quaisquer ligações, imagens ou rich media que desejar."
+        recent_activity_dashboard: "O **painel de atividades recentes** permite aos participantes verem as conversas, os anúncios, as discussões e as interações mais recentes referentes a esta disciplina. É muito semelhante à página de painel que os utilizadores veem quando iniciam sessão pela primeira vez, mas mostra apenas conteúdo relativo a esta disciplina específica."
+        syllabus: "A **vista de programa** permite escrever uma descrição das expetativas da disciplina ou apresentar a disciplina com ligações, imagens, etc., e mostra também uma vista de calendário com todas as tarefas e eventos da disciplina."
+      draft_state: 
+        buttons: 
+          cancel: Cancelar
+          update_layout: Guardar
+        headings: 
+          set_layout: "Definir o layout da página inicial"
+        labels: 
+          select_content: "Selecione o que pretende visualizar na página inicial."
+        options: 
+          assignments: "Lista de tarefas"
+          custom_page: "Páginas na primeira página"
+          modules: "Módulos da disciplina"
+          recent_activity_dashboard: "Painel de atividades recentes"
+          syllabus: Programa
       empty_body: "Sem conteúdo"
       headings: 
         confirm_unenroll: "Confirmar cancelamento de inscrição"
@@ -4431,11 +4660,12 @@ pt:
         unpublished: "Esta disciplina não foi publicada"
       importing: "Cópia/migração de disciplina em curso. Algum conteúdo pode ficar temporariamente indisponível."
       labels: 
-        set_layout: "Selecione o que pretende visualizar na página inicial."
+        select_content: "Quando as pessoas visitarem a página da disciplina, mostrar"
       license_notice: "O conteúdo desta disciplina é disponibilizado sob uma licença %{license_type}. O conteúdo desta disciplina pode ser considerado sob esta licença, salvo indicação em contrário."
       links: 
         change_layout: "Alterar o layout da página inicial"
         course_setup: "Lista de verificação da configuração da disciplina"
+        course_stream: "Ver mural da disciplina"
         drop_course: "Desistir desta disciplina"
         edit_homepage: "Editar página inicial"
         join_course: "Aderir a esta disciplina"
@@ -4443,11 +4673,11 @@ pt:
         restore_role: "Restaurar função e permissões"
         view_course_stream: "Ver fluxo da disciplina"
       options: 
-        assignments: "Lista de tarefas"
-        custom_page: "Páginas na primeira página"
-        modules: "Módulos da disciplina"
-        recent_activity_dashboard: "Painel de atividades recentes"
-        syllabus: Programa
+        assignments: "a lista de tarefas"
+        custom_page: "uma página elaborada por mim"
+        modules: "os módulos/secções da disciplina"
+        recent_activity_dashboard: "o painel de atividades recentes"
+        syllabus: "as tarefas com o programa da disciplina"
       period_name: "as últimas 2 semanas"
       re_sending: Reenviando...
       send_done: "Concluído! A mensagem pode levar alguns minutos."
@@ -6687,6 +6917,7 @@ pt:
       group_limit: "O limite do grupo tem de ficar em branco ou ser superior a 1"
       unknown: "Ocorreu um erro inesperado."
       update_failed: "Falha na atualização, tente novamente"
+    everyone: "Todos (%{count})"
     feed_title: "%{course_or_account_name} Feed"
     flash: 
       removeError: "Não é possível remover o conjunto de grupos. Tente novamente mais tarde."
@@ -6717,7 +6948,8 @@ pt:
         add_unassigned_user: "Adicionar utilizador não atribuído"
         search_people: "Procurar pessoas"
       add_unassigned_user: 
-        assign_to_group: "Atribuir a grupo"
+        add_to_group: "Adicionar utilizador a grupo"
+        add_user_to_group: "Adicionar utilizador %{name} a este grupo"
       add_unassigned_users: 
         no_users_found: "Não foram encontrados utilizadores"
         too_short: "Introduza um termo de pesquisa com 3 ou mais caracteres"
@@ -6726,13 +6958,8 @@ pt:
         all_groups_full: "Todos os grupos estão cheios."
         all_groups_full_suggestion: "Altere os limites dos grupos ou adicione mais grupos."
         assign_user_to_group: "Atribuir utilizador a este grupo"
+        assign_user_to_group_name: "Atribuir utilizador ao grupo %{name}"
         no_groups_created: "É necessário criar grupos para ser possível adicionar utilizadores."
-      group: 
-        add_user_to_group: "Atribuir utilizador a grupo"
-        group_delete: Eliminar
-        group_edit: Editar
-        group_settings: Definições
-        show_group_details: "Mostrar detalhes do grupo"
       group_categories: 
         account_group_explanation: "Os grupos de alunos no nível da conta são uma boa maneira de agrupar alunos sem estar preso a uma disciplina específica. Todos os grupos de alunos obtêm o seu próprio calendário, quadro de discussão e ferramentas de colaboração, para que se possam organizar sozinhos e trabalhar em grupo mais eficientemente."
         add_group_set: "Adicionar conjunto de grupos"
@@ -6744,7 +6971,6 @@ pt:
           course_groups: "Grupos de alunos"
       group_category: 
         randomly_assigning_students: "Atribuir alunos aleatoriamente"
-        search: Procurar
         search_groups: "Procurar grupos"
       group_category_create: 
         allow_self_signup: "Permitir auto-inscrição"
@@ -6784,6 +7010,14 @@ pt:
         require_same_section: "Os membros do grupo devem estar na mesma secção"
         save: Guardar
         saving: "A guardar..."
+      group_detail: 
+        add_user_to_group: "Atribuir utilizador a grupo"
+        group_delete: Eliminar
+        group_edit: Editar
+        group_full: Cheio
+        group_settings: Definições
+        show_group_details: "Mostrar detalhes do grupo %{name}"
+        visit_group_homepage: "Visitar página inicial do grupo"
       group_edit: 
         cancel: Cancelar
         group_name: "Nome do grupo"
@@ -6791,7 +7025,9 @@ pt:
         saving: "A guardar..."
       group_user: 
         assign_to_group: "Atribuir a grupo"
+        assign_user_to_group: "Atribuir utilizador %{name} a um grupo"
         remove_from_group: "Remover do grupo"
+        remove_user_from_group: "Remover utilizador %{name} deste grupo"
       group_users: 
         no_students: "Não existem alunos"
         no_users: "Não existem utilizadores"
@@ -6799,8 +7035,8 @@ pt:
         no_groups: "Não existem grupos."
         no_matching_groups: "Nenhum grupo correspondente."
       randomly_assign_members: 
-        add_more_users: Cancelar
-        close: Okay
+        cancel: Cancelar
+        okay: OK
         randomly_assign_students_dialog: "Esta ação atribuirá automaticamente todos os alunos não atribuídos da forma mais uniforme possível entre os grupos de alunos existentes."
       self_signup_help: 
         about_self_signup_groups: "Sobre grupos de auto-inscrição"
@@ -8825,9 +9061,9 @@ pt:
     quiz_locked_until: "Este teste está bloqueado até %{date}."
     quiz_regrade_finished: 
       email: 
-        body: "Foi concluída uma reavaliação do teste %{quiz}"
+        body: "Foi concluída uma nova avaliação para o teste %{quiz}"
         html: 
-          body: "Foi concluída uma reavaliação do teste %{quiz}"
+          body: "Foi concluída uma nova avaliação para o teste %{quiz}"
           link_message: "Pode ver o teste aqui:"
           subject: "Reavaliação de teste concluída: %{quiz}, %{context}"
         link_message: "Pode ver o teste aqui:"
@@ -9238,6 +9474,7 @@ pt:
     sure_you_want_to_mute: "Tem certeza que deseja silenciar esta tarefa? Enquanto esta tarefa estiver silenciada, os alunos não receberão novas notificações sobre ela, nem poderão ver:"
   name: "Importador de referências académicas"
   new_facebook_message: "Tem uma nova mensagem do Canvas."
+  no_migration_file: "Ficheiro necessário para migração de conteúdo."
   not_applicable: ND
   notification: 
     added_to_conversation_description: "Foi adicionado a uma conversa"
@@ -9609,6 +9846,7 @@ pt:
       page_deleted: "A página \"%{title}\" foi eliminada."
     reload_editing_page: "Esta página foi alterada desde que começou a editá-la. Se *recarregar* a página, perderá todas as alterações feitas."
     reload_viewing_page: "Esta página foi alterada desde que começou a vê-la. *Recarregar*"
+    restore_failed: "Não foi possível restaurar a revisão de página"
     save_button: Guardar
     saving_button: "A guardar..."
     warnings: 
@@ -10100,6 +10338,7 @@ pt:
         change_password: "Alterar senha"
         confirm_password: "Confirmar senha"
         default_email: "Email padrão"
+        enabled_theme: "Tema ativado"
         expires_at: "Expira em"
         headers: 
           approved_integrations: "Integrações aprovadas"
@@ -10398,14 +10637,16 @@ pt:
   publish_btn_module: 
     buttons: 
       publish: Publicar
-      publish_desc: "Não publicado. Clique para publicar"
+      publish_desc: "Não publicado. Clique para publicar."
       published: Publicado
-      published_desc: "Publicado. Clique para anular a publicação"
+      published_desc: "Publicado. Clique para anular a publicação."
       publishing: "A publicar..."
       unpublish: "Anular publicação"
       unpublishing: "A anular a publicação..."
   publishable: 
     cant_unpublish: "Não é possível anular a publicação"
+  publishableModuleItem: 
+    disabled: "Publicação desativada para este item"
   purchases: 
     new: 
       payment_info: "Informação de pagamento"
@@ -10643,7 +10884,7 @@ pt:
       regraded_score: "Pontuação reavaliada:"
       show_ansers_for_variable: "Exibir respostas de %{variable}"
       skip_question_text: "Pular para texto da pergunta."
-      submission_was_regraded: "Esta pergunta foi reavaliada; a sua pontuação foi afetada."
+      submission_was_regraded: "Esta pergunta foi reavaliada."
       titles: 
         question_correct_comment: "Os alunos verão este comentário se responderem corretamente a pergunta"
         question_incorrect_comment: "Os alunos verão este comentário se responderem incorretamente a pergunta"
@@ -10670,16 +10911,7 @@ pt:
           %{example} 
           
           Para este conjunto de fórmulas, a resposta final é 71. No entanto, não há variáveis predefinidas, por isso todos os alunos teriam a mesma pergunta com a mesma resposta. Consulte o separador "variáveis" para obter mais informações sobre variáveis.
-      equation_variables: |-
-          Também pode definir variáveis no texto da pergunta utilizando colchetes 
-          ("Quanto é [a] + [b]?"). Para cada variável, verá um "exemplo de valor"
-          baseado nas definições da variável. Isso permite verificar os seus cálculos e garantir que as suas fórmulas funcionam.
-          
-          Por exemplo, se a sua pergunta foi "Quanto é [a] + 5?" então ser-lhe-á pedido que defina a variável "a". Se o exemplo de valor de "a" for 5,2, poderia escrever:
-          
-          %{example}
-          
-          Com esta fórmula é possível gerar qualquer número de conjuntos de soluções, com um valor diferente de "a" em cada conjunto. Um aluno pode ver a pergunta "Quanto é 5,2 + 5?" e outro pode ver "Quanto é 9 + 5?".
+      equation_variables2: "Também pode definir variáveis no texto da pergunta utilizando parênteses retos (\"Quanto é [a] + [b]?\"). Para cada variável, verá um \"exemplo de valor\" baseado nas definições da variável. Isso permite-lhe verificar os seus cálculos e certificar-se de que as fórmulas funcionam. Por exemplo, se a pergunta for \"Quanto é [a] + 5?\", ser-lhe-á solicitado que defina a variável \"a\". Se o exemplo de valor de \"a\" for 5,2, poderia escrever: %{example} Com esta fórmula é possível gerar qualquer número de conjuntos de soluções, com um valor diferente de \"a\" em cada conjunto. Um aluno pode ver a pergunta \"Quanto é 5,2 + 5?\" e outro pode ver \"Quanto é 9 + 5?\"."
       links: 
         functions: Funções
         intro: Introdução
@@ -10872,6 +11104,7 @@ pt:
         other: "%{user} tem %{count} tentativas restantes"
       default_quiz_name: "Teste %{course_name}"
       default_survey_name: "Questionário %{course_name}"
+      grade_by_question_warning: "A funcionalidade de nota por pergunta é afetada por perguntas que são misturadas num grupo."
       headers: 
         quiz_submissions: "Teste enviados"
         survey_submissions: "Questionários enviados"
@@ -12950,6 +13183,7 @@ pt:
   unknown: Desconhecido
   unknown_question_bank: "Banco de perguntas desconhecido"
   unknown_quiz: "Teste desconhecido"
+  unsupported_package: "Pacote de conteúdos não suportado"
   user: 
     default_collection_name: "Coleção de %{user_name}"
     default_user_name: Utilizador
@@ -13422,6 +13656,11 @@ pt:
       toolbar_menu: 
         settings: Definições
       view_page_history_wiki: "Ver histórico da página"
+    wiki_page_content: 
+      page_locked: "Esta página está bloqueada"
+      page_locked_by_modules: "Esta página ficará disponível depois de concluir estes módulos:"
+      page_locked_by_modules_until: "Esta página ficará disponível em %{lock_info.unlock_at} se tiver concluído estes módulos:"
+      page_locked_until: "Esta página ficará disponível em %{lock_info.unlock_at}"
     wiki_page_edit: 
       buttons: 
         cancel: Cancelar
@@ -13461,6 +13700,13 @@ pt:
         edit: Editar
         settings: Definições
         use_front_page: "Utilizar como primeira página"
+    wiki_page_revision: 
+      latest_revision: "Revisão mais recente"
+      restore_revision: "Restaurar esta revisão"
+      revision_summary: "*%{updated_at}* por %{edited_by}"
+      same_as_latest: "Igual a *Mais recente*"
+    wiki_page_revisions: 
+      revision_history: "Histórico de revisão"
   wiki_page: 
     atom_author: "Página Wiki"
     atom_entry_title: "Página do wiki, %{course_or_group_name}: %{page_title}"
@@ -13537,12 +13783,15 @@ pt:
     front_page: "Primeira página"
     notices: 
       cannot_edit: "Não tem permissão para editar a página \"%{title}\"."
+      cannot_read_revisions: "Não tem permissão para rever as revisões existentes de \"%{title}\"."
       create_non_existent_page: "A página \"%{title}\" não existe, mas pode criá-la abaixo"
       page_deleted: "A página \"%{title}\" foi excluída."
       page_does_not_exist: "A página \"%{title}\" não existe."
       page_updated: "A página foi atualizada com sucesso."
     page_link: 
       link_hidden_from_students_warning: "Os alunos não verão este link"
+    page_revisions: 
+      page_revisions_title: "Revisões de %{title}: %{context_name}"
     pages_index: 
       titles: 
         pages: Páginas
