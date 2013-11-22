@@ -46,5 +46,11 @@ define [
 
     filter: (model, term) =>
       return true unless term
-      regex = new RegExp(term, 'ig')
-      model.get('title').match(regex)
+
+      title = model.get('title').toLowerCase()
+      numMatches = 0
+      keys = term.toLowerCase().split(' ')
+      for part in keys
+        #not using match to avoid javascript string to regex oddness
+        numMatches++ if title.indexOf(part) != -1
+      numMatches == keys.length
