@@ -108,14 +108,12 @@ describe "assignment groups" do
   end
 
   it "should not allow all assignment groups to be deleted" do
-    pending("bug 7480 - User should not be permitted to delete all assignment groups") do
       get "/courses/#{@course.id}/assignments"
       assignment_groups = get_assignment_groups
       assignment_groups.count.should == 1
       assignment_groups[0].find_element(:css, '.delete_group_link').should_not be_displayed
       refresh_page #refresh page to make sure the trashcan doesn't come back
       get_assignment_groups[0].find_element(:css, '.delete_group_link').should_not be_displayed
-    end
   end
 
   it "should add multiple assignment groups and not allow the last one to be deleted" do
@@ -356,7 +354,7 @@ describe "assignment groups" do
       wait_for_ajaximations
       refresh_page
       wait_for_ajaximations
-      f(selector).should have_attribute('aria-expanded', 'false')
+      keep_trying_until { f(selector).should have_attribute('aria-expanded', 'false') }
     end
 
     #QUnit

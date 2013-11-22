@@ -275,6 +275,7 @@ describe "manage groups students" do
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       ff(".left_side .group").should be_empty
+      wait_for_ajaximations
       @course.group_categories.all.count.should == 0
     end
 

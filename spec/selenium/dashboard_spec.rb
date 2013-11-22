@@ -199,7 +199,7 @@ describe "dashboard" do
       #verify assignment is in drop down
       assignment_menu = f('#assignments_menu_item')
       driver.action.move_to(assignment_menu).perform
-      assignment_menu.should include_text("To Turn In")
+      keep_trying_until { assignment_menu.should include_text("To Turn In") }
       assignment_menu.should include_text(assignment.title)
     end
 
@@ -228,7 +228,7 @@ describe "dashboard" do
       course_menu = f('#courses_menu_item')
 
       driver.action.move_to(course_menu).perform
-      course_menu.should include_text('Current Groups')
+      keep_trying_until { course_menu.should include_text('Current Groups') }
       course_menu.should include_text(group.name)
     end
 
@@ -329,7 +329,7 @@ describe "dashboard" do
 
       driver.action.move_to(f('#courses_menu_item')).perform
       course_menu = f('#menu_enrollments')
-      course_menu.should be_displayed
+      keep_trying_until { course_menu.should be_displayed }
       course_menu.should_not include_text(c1.name)
     end
 
@@ -383,7 +383,7 @@ describe "dashboard" do
       #verify assignment is in drop down
       assignment_menu = f('#assignments_menu_item')
       driver.action.move_to(assignment_menu).perform
-      assignment_menu.should include_text("To Grade")
+      keep_trying_until { assignment_menu.should include_text("To Grade") }
       assignment_menu.should include_text(assignment.title)
     end
 

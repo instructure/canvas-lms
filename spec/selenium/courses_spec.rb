@@ -120,7 +120,6 @@ describe "courses" do
       select.click
       wait_for_ajaximations
       find_with_jquery('#course_url option:not([selected])').click
-
       driver.current_url.should match %r{/courses/#{course2.id}/grades}
     end
 
