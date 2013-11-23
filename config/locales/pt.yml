@@ -3440,7 +3440,7 @@ pt:
         course_modules: "Módulos da disciplina"
         student_progress: "Progresso do módulo por aluno"
         student_progress_for_module: "Progresso do aluno para %{module}"
-        students_completed: "Alunos que completaram o módulo"
+        students_completed: "Alunos que concluíram o módulo"
         students_in_progress: "Alunos que estão a trabalhar no módulo"
         students_locked: "Alunos que não desbloquearam o módulo"
         students_unlocked: "Alunos que desbloquearam (mas não iniciaram) o módulo"
@@ -3677,13 +3677,13 @@ pt:
         unfulfilled: "têm de pontuar pelo menos %{score}"
       must_contribute: 
         fulfilled: "contribuiu para o conteúdo da página"
-        unfulfilled: "tem de contribuir para o conteúdo da página"
+        unfulfilled: "têm de contribuir para o conteúdo da página"
       must_submit: 
         fulfilled: "enviou a tarefa"
-        unfulfilled: "tem de enviar a tarefa"
+        unfulfilled: "têm de enviar a tarefa"
       must_view: 
         fulfilled: "visualizou a página"
-        unfulfilled: "tem de visualizar a página"
+        unfulfilled: "têm de visualizar a página"
       settings: Definições
     module_locked: Bloqueado
     module_started: "Em curso"
@@ -4665,7 +4665,7 @@ pt:
       links: 
         change_layout: "Alterar o layout da página inicial"
         course_setup: "Lista de verificação da configuração da disciplina"
-        course_stream: "Ver mural da disciplina"
+        course_stream: "Ver fluxo da disciplina"
         drop_course: "Desistir desta disciplina"
         edit_homepage: "Editar página inicial"
         join_course: "Aderir a esta disciplina"
