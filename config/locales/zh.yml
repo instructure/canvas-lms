@@ -26,9 +26,9 @@ zh:
     bad_response_all: 无法更新标准。
     no_api_key: "需要 API 键才能使用学术基准"
     no_authority: 无法找到进行更新的授权
-    no_file: 未提供结果文件或授权
-    no_permissions: 不允许用户编辑全局结果
-    no_perms: 不允许用户编辑全局结果
+    no_file: 未提供成果文件或授权
+    no_permissions: 不允许用户编辑全局成果
+    no_perms: 不允许用户编辑全局成果
   accont: 
     feedback_pricing_sub: 为您的机构获取号码
   account: 
@@ -54,7 +54,7 @@ zh:
     tab_faculty_journal: 教师日志
     tab_grading_standards: 评分方案
     tab_jobs: 任务
-    tab_outcomes: 结果
+    tab_outcomes: 成果
     tab_permissions: 权限
     tab_plugins: 插件
     tab_question_banks: 题库
@@ -65,7 +65,7 @@ zh:
     tab_sub_accounts: 子帐户
     tab_terms: 学期
     tab_users: 用户
-    turnitin_pledge: 此作业是我原创的
+    turnitin_pledge: 此课外作业是我原创的
   account_authorization_config: 
     debug: 
       wait_for_login: 正等待执行登录尝试
@@ -530,7 +530,7 @@ zh:
           course: 
             text: 课程_ID：
           outcome: 
-            text: 结果_ID：
+            text: 成果_ID：
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -611,7 +611,7 @@ zh:
           order: 
             label: 顺序
           outcome: 
-            radio: 结果
+            radio: 成果
           user: 
             radio: 用户
     provisioning_csv_description: 
@@ -652,7 +652,7 @@ zh:
           description: 
             header: 例如
           student_activity: 
-            text: 此报告显示一个或多个指定作业组和指定日期范围中的所有作业以及与这些作业相关的信息。此报告提供用于计划安全练习的数据，同时对主要的课堂评估干扰最小。
+            text: 此报告显示一个或多个指定作业组和指定日期范围中的所有作业以及与这些作业相关的信息。此报告提供用于计划安全练习的数据，同时对主要的课堂测验干扰最小。
     safety_drill_csv_parameters: 
       account_reports: 
         newark: 
@@ -863,7 +863,7 @@ zh:
       tab_reports: 报告
       tab_settings: 设置
       transifex_message: "加入 [Canvas 翻译社区](%{transifex_url})"
-      turnitin_comments_help: "这些评论在提交 Turnitin 启用的任务时显示给学生"
+      turnitin_comments_help: "这些评论在提交 Turnitin 启用的课外作业时显示给学生"
       turnitin_pledge_help: 学生必须勾选相关框以确认他们同意此保证
       turnitin_settings_title: "Turnitin 设置"
       update_settings_button: 更新设置
@@ -1004,7 +1004,7 @@ zh:
         student_assignment_map: 
           description: 
             header: 例如
-            text: "此报告显示所有学生的学习成绩。在生成的 csv 文件中，每对“用户/成绩”将具有一行，并将显示包括相关联的作业在内的成绩详情。此报告仅显示作业成绩，而不包括与题库相关的结果。"
+            text: "此报告显示所有学生的学习成绩。在生成的 csv 文件中，每对“用户/成绩”将具有一行，并将显示包括相关联的作业在内的成绩详情。此报告仅显示作业成绩，而不包括与题库相关的成果。"
     student_ip_csv_description: 
       account_reports: 
         dubspot: 
@@ -1336,15 +1336,15 @@ zh:
     errors: 
       cannot_save_att: "您没有权限编辑已锁定的 %{att_name} 属性"
       import: 
-        external_tool_url: "外部工具分配 \"%{assignment_name}\" 的 URL 无效。"
+        external_tool_url: "外部工具课外作业 \"%{assignment_name}\" 的 URL 无效。"
       upload_as_zip: "请以 .zip 格式上传文件"
-    feed_entry_title: "分配: %{assignment}"
-    feed_entry_title_with_course: "分配 %{course}: %{assignment}"
+    feed_entry_title: "课外作业: %{assignment}"
+    feed_entry_title_with_course: "课外作业 %{course}: %{assignment}"
     group_assignment_must_have_group_set: 请为此作业选择学习小组集合
     hide_advanced_options: 隐藏高级选项
-    imported_assignments_group: 导入的分配
+    imported_assignments_group: 导入的课外作业
     labels: 
-      due: 到期日期
+      due: 截止日期
     name_is_required: 需要姓名
     points_possible: "对于百分制，最高分必须大于 0"
     select_external_tool_dialog_title: 配置外部工具
@@ -1372,37 +1372,37 @@ zh:
     scores_lower_than_the_average: "低于平均分 %{average} 的分数"
     total_submitted: "提交总数:"
   assignment_group: 
-    default_name: 作业
-    default_title: 作业
+    default_name: 课外作业
+    default_title: 课外作业
   assignment_group_weights_dialog: 
     buttons: 
       save: 保存
     titles: 
-      assignment_group_weights: 管理作业组加权
+      assignment_group_weights: 管理课外作业组加权
       total: 总计
     weight_final: 根据学习小组加权最终评分
   assignment_groups: 
     errors: 
-      cannot_delete_group: 您不能删除一个带有已锁定作业的学习小组。
+      cannot_delete_group: 您不能删除一个带有已锁定课外作业的学习小组。
     notices: 
-      created: 作业组已成功创建。
+      created: 课外作业组已成功创建。
       deleted: 此学习小组已删除
-      updated: 作业组已成功更新。
+      updated: 课外作业组已成功更新。
   assignment_groups_api: 
     errors: 
       frozen_assignments_error: 您无法删除一个含有已锁定作业的组。
   assignment_muter: 
-    mute_assignment: 屏蔽作业
-    muting_assignment: 正在屏蔽作业...
-    unmute_assignment: 取消屏蔽作业
-    unmute_button: 取消屏蔽作业
-    unmute_dialog: 此作业当前被屏蔽。这意味着学生无法看到其评分和反馈。是否要立即取消屏蔽?
-    unmuting_assignment: 正在取消屏蔽作业...
+    mute_assignment: 屏蔽课外作业
+    muting_assignment: 正在屏蔽课外作业...
+    unmute_assignment: 取消屏蔽课外作业
+    unmute_button: 取消屏蔽课外作业
+    unmute_dialog: 此课外作业当前被屏蔽。这意味着学生无法看到其评分和反馈。是否要立即取消屏蔽?
+    unmuting_assignment: 正在取消屏蔽课外作业...
   assignments: 
     add_assignment_form: 
-      assignment_name: 作业名称
+      assignment_name: 课外作业名称
       labels: 
-        due: "到期日期:"
+        due: "截止日期:"
         points: 分数
         quiz_points: "退出 pts."
         type: 类型
@@ -1410,18 +1410,18 @@ zh:
         full_edit: 完全编辑
         more_options: 更多选项
       options: 
-        assignment: 作业
+        assignment: 课外作业
         attendance: 参与
         discussion: 讨论
         external_tool: 外部工具
         not_graded: 未评分
         quiz: 测验
       tooltips: 
-        assignment_is_quiz: 此作业是一个测验，因此分数可能来自问题，无法手动设置。
+        assignment_is_quiz: 此课外作业是一个测验，因此分数可能来自问题，无法手动设置。
     add_assignment_group_form: 
       drop_x_scores_for_each_student: "每个学生 %{scores} 分"
       labels: 
-        assignments: 作业
+        assignments: 课外作业
         group_name: 学习小组名称
       links: 
         add_grading_rule: 添加评分规则
@@ -1431,12 +1431,12 @@ zh:
         drop_lowest: 去掉最低分
         equally_weighted: 平均
         never_drop: 不删除
-        no_assignments: "[无作业]"
+        no_assignments: "[无课外作业]"
         weighted_by_points: 按分加权
       percent_of_total_grade: "总评分的 %{percent} %"
     assignment_count: 
-      one: "%{count} 份作业"
-      other: "%{count} 份作业"
+      one: "%{count} 份课外作业"
+      other: "%{count} 份课外作业"
     assignment_group_create_dialog: 
       assignment_group: 
         labels: 
@@ -1488,9 +1488,9 @@ zh:
       score_with_points_possible: "*%{score}*/%{pointsPossible} 分"
       score_with_points_possible_screenreader: "分数: %{score}，满分 %{pointsPossible} 分。"
     assignment_locked: 
-      assignment_locked: "此作业锁定于 *%{lock_at}*"
-      assignment_unlocked_from: "此作业锁定至 *%{unlock_at}*"
-      assignment_unlocked_from_to: "此作业仅在从 *%{unlock_at}* 至 *%{lock_at}* 解锁"
+      assignment_locked: "此课外作业锁定于 *%{lock_at}*"
+      assignment_unlocked_from: "此课外作业锁定至 *%{unlock_at}*"
+      assignment_unlocked_from_to: "此课外作业仅在从 *%{unlock_at}* 至 *%{lock_at}* 解锁"
     assignment_settings: 
       cancel: 取消
       save: 保存
@@ -1498,29 +1498,29 @@ zh:
       weight_groups: 根据作业组加权最终评分
     assignment_sidebar: 
       links: 
-        submit: 提交作业
+        submit: 提交课外作业
     assignments_content: 
       buttons: 
         delete_group: 删除学习小组
       labels: 
-        class_weighting_policy: 根据作业组加权最终评分
-        delete_assignments_in_group: 删除此学习小组中的作业
-        move_assignments_to: 将作业从此学习小组移至
+        class_weighting_policy: 根据各项课外作业所占比率计算总成绩
+        delete_assignments_in_group: 删除此学习小组中的课外作业
+        move_assignments_to: 将课外作业从此学习小组移至
       options: 
         select_group: "[选择学习小组]"
       titles: 
-        delete_assignment_group: 是否删除作业组?
+        delete_assignment_group: 是否删除课外作业组?
       tooltips: 
-        target_group: 选择此作业要移入的组
+        target_group: 选择此课外作业要移入的组
       warnings: 
-        delete_assignment_group: "作业组 %{group} 中有 %{assignment_count} 个作业。可以删除这些作业或将其移至另一个组。"
+        delete_assignment_group: "课外作业组 %{group} 中有 %{assignment_count} 个课外作业。可以删除这些课外作业或将其移至另一个组。"
     assignments_list_content: 
-      no_assignments: 没有为此课程创建作业。
+      no_assignments: 没有为此课程创建课外作业。
       titles: 
-        assignments: 作业
-        course_assignments: 课程作业
-        overdue_assignments: 逾期作业
-        past_assignments: 以前的作业
+        assignments: 课外作业
+        course_assignments: 课程课外作业
+        overdue_assignments: 逾期课外作业
+        past_assignments: 以前的课外作业
         undated_assignments: 更新的作业
         ungraded_assignments: 未评分的作业
         upcoming_assignments: 即将到来的作业
@@ -1553,7 +1553,7 @@ zh:
       delete_assignment: 是否确定要删除此作业?
     create_assignment: 
       assignment: 作业
-      assignment_due_at: 到期日期：
+      assignment_due_at: 截止日期：
       assignment_name: 姓名：
       assignment_points: 分数：
       assignment_type: 类型：
@@ -1561,7 +1561,7 @@ zh:
       discussion_type: 讨论
       external_tool_type: 外部工具
       more: 更多选项
-      multiple_due_dates: 多个到期日期
+      multiple_due_dates: 多个截止日期
       not_graded_type: 未评分
       quiz_type: 测验
       save: 保存
@@ -1585,8 +1585,8 @@ zh:
       multiple_dates: 多个日期
       not_available_until: 可供使用的起始日期
     date_due_column_view: 
-      due: 到期日期
-      due_date: 到期日期
+      due: 截止日期
+      due_date: 截止日期
       multiple_dates: 多个日期
     delete_group: 
       cancel: 取消
@@ -1613,7 +1613,7 @@ zh:
     due_date_override: 
       overrides: 
         available_from: "可供使用的日期:"
-        due_date: 到期日期
+        due_date: 截止日期
         for: 对于
       until: 直到
     due_date_view: 
@@ -1634,7 +1634,7 @@ zh:
       buttons: 
         update: 更新作业
       description: 说明
-      due_date: 到期日期
+      due_date: 截止日期
       freeze_properties: 复制时锁定作业属性
       notify_content_change: 通知用户此内容已更改
       points_possible: 分数
@@ -1748,7 +1748,7 @@ zh:
       record_before_submitting: 在提交前记录
       submit_failed: 提交失败，请重试
       submitting: 正在提交...
-    multiple_due_dates: 多个到期日
+    multiple_due_dates: 多个截止日期
     name_is_required: 需要名称
     needs_grading_count: "此作业的 %{needs_grading_count} 个提交文件仍需评分"
     never_drop: 
@@ -1813,7 +1813,7 @@ zh:
         manually_assign_peer_reviews: 手动分配同伴审阅
         require_peer_reviews: 需要同伴审阅
       locked_until: 分配审阅
-      peer_reviews_assign_at_explanation: 必须在到期日期之后。如果为空，则使用到期日期。
+      peer_reviews_assign_at_explanation: 必须在截止日期之后。如果为空，则使用截止日期。
       reviews_per_user: 每位用户的审阅次数
     percent_of_final_grade: "最终评分的 %{percent}"
     positive_number: 您必须使用正数
@@ -1831,8 +1831,8 @@ zh:
       date_time_by: "%{date}，%{time} 之前"
       defaults: 
         no_content: 无内容
-      due: 到期日期
-      due_at: 到期日期
+      due: 截止日期
+      due_at: 截止日期
       for: 对于
       links: 
         add_rubric: 添加题目
@@ -1841,7 +1841,7 @@ zh:
       messages: 
         locked: 此作业当前为锁定状态。
       new_assignment: 新作业
-      no_due_date: 无到期日期
+      no_due_date: 无截止日期
       no_points: 无
       no_submission: 无任何内容
       points: 分数
@@ -2004,7 +2004,7 @@ zh:
           journal_check: 杂志、期刊和出版物
           student_paper_check: 其它学生论文
         originality_report_visibility: 学生可查看原始报告
-        originality_report_visible_after_due_date: 在到期日期之后
+        originality_report_visible_after_due_date: 在截止日期之后
         originality_report_visible_after_grading: 在作业评分之后
         originality_report_visible_immediately: 立即
         settings_exclude_fewer_than_count: "少于 %h{wordsInput} 个字"
@@ -2019,13 +2019,13 @@ zh:
         no_assignment_group: 噢。您需要先添加作业组。单击"创建作业组"以查看方法。
       instructions: 
         wizard: 
-          details: "在到期日期和获得所需分数之前，还有许多作业要分配。如果要键入作业说明、允许文件上传、更改评分类型或多项其它设置，请单击作业名称或单击 %{edit_icon} 图标，然后单击\"更多选项\"。"
+          details: "在截止日期和获得所需分数之前，还有许多作业要分配。如果要键入作业说明、允许文件上传、更改评分类型或多项其它设置，请单击作业名称或单击 %{edit_icon} 图标，然后单击\"更多选项\"。"
           group: 
-            step1: 作业组用于组织作业。可为每个组提供名称。如果选择根据组加权最终评分（*位置?*），则亦可为每个组设置比例分数。单击"添加作业组"创建组。
+            step1: 作业组用于组织作业。可为每个组提供名称。如果选择根据各项作业所占比率计算总成绩（*位置?*），则亦可为每个组设置比例分数。单击"添加作业组"创建组。
           overview: 此页面用于在高级别设置课程。可以添加作业、组织作业，然后加权这些组。方法是先组织，然后再研究细节。即使这样，在这里也可以执行许多操作。
           quizzes: 测验是特殊类型的作业。可以单击左侧栏中的"测验"链接来创建或导入测验。
           step1: "作业始终要分配到组中，因此要添加作业，必须先知道要将其加入哪个组。选择该组，然后单击\"添加作业到\"或单击 %{add_icon} 图标，开始为组分配新作业。"
-          step2: 很好！现在输入详细信息。可以输入作业的标题、到期日期以及最高分数。如果还要执行其它操作，只有等到作业创建后。
+          step2: 很好！现在输入详细信息。可以输入作业的标题、截止日期以及最高分数。如果还要执行其它操作，只有等到作业创建后。
           step3: "完成！作业已添加到组中！如果将鼠标放在作业上，将会看到许多选项。其含义如下:"
       links: 
         create_assignment: 创建新作业
@@ -2145,7 +2145,7 @@ zh:
     add_item: 添加项目
     apply: 应用
     authorize_google_docs: "授权 Google Docs 访问"
-    back_to_outcomes: 返回结果
+    back_to_outcomes: 返回成果
     cancel: 取消
     choose_a_file: 选择文件
     delete: 删除
@@ -2154,7 +2154,7 @@ zh:
     hide_all_artifacts: 隐藏所有产物
     import: 导入
     login: 登录
-    manage_rubrics: 管理题目
+    manage_rubrics: 管理评分标准
     masquerade: 仿冒此用户
     ok: 确定
     refresh: 刷新
@@ -2257,7 +2257,7 @@ zh:
     sample_final_answer: 此值是该问题类型的典型最终答案
   calendar: 
     agenda_view: 
-      due: 到期日期
+      due: 截止日期
       loading: 正在加载
       no_events: 此日期后无事件。
       starts_at: 开始时间
@@ -2312,8 +2312,8 @@ zh:
       event_deleted: "%{event_title} 已成功删除"
       event_saved: 事件已成功保存
       missingDueDate: 
-        one: "%{sections} 没有指定的到期日期。"
-        other: "%{sections} 没有指定的到期日期。"
+        one: "%{sections} 没有指定的截止日期。"
+        other: "%{sections} 没有指定的截止日期。"
       titles: 
         warning: 警告
     edit_appointment_group: 
@@ -2334,14 +2334,14 @@ zh:
       users: 用户。
     edit_assignment: 
       calendar: "日历:"
-      due: "到期日期:"
+      due: "截止日期:"
       group: "学习小组:"
       links: 
         more_options: 更多选项
       title: "标题:"
     edit_assignment_override: 
       calendar: "日历:"
-      due: "到期日期:"
+      due: "截止日期:"
       links: 
         more_options: 更多选项
     edit_calendar_event: 
@@ -2392,7 +2392,7 @@ zh:
       quiz: 测验
     input_is_invalid_date: 输入的内容不是有效日期。
     labels: 
-      due: 到期日期
+      due: 截止日期
     loading_more_items: 正在加载更多项目。
     loading_undated_events: 正在加载无日期的事件
     message_participants: 
@@ -2410,9 +2410,9 @@ zh:
     missing_due_date_dialog: 
       buttons: 
         goBack: 返回
-        noDueDate: 无到期日
+        noDueDate: 无截止日期
       modal: 
-        chooseDueDate: 是否要返回并选择到期日期?
+        chooseDueDate: 是否要返回并选择截止日期?
     no_groups: 未发现学习小组
     no_users: 未发现用户
     ok: 确定
@@ -2510,7 +2510,7 @@ zh:
         calendar: 日历
         date: 日期
         details: 详细信息
-        due: 到期日期
+        due: 截止日期
         from: 从
         group: 学习小组
         title: 标题
@@ -2535,8 +2535,8 @@ zh:
       timespan: "%{start_time} *到* %{end_time}"
     default_title: 事件
     event: 
-      due: 到期日期
-      event_title: "到期日期: %{event_title}"
+      due: 截止日期
+      event_title: "截止日期: %{event_title}"
     event_details: 事件详细信息
     feed_dialog_title: 日历馈送
     keycodes: 
@@ -2610,13 +2610,13 @@ zh:
         assignment_done: 完成！作业现已创建！可以单击它查看详细信息、编辑和删除事件，或者拖放至新的一天以更改其日期。
         change_date: 非常简单。只需将事件拖至新日期即可。也可以单击事件，然后单击"编辑"获取更具体的信息。
         create: 要开始创建日历事件，只需单击日历中您要安排该事件的日期。
-        create_assignment: 就像日历事件一样，单击要添加作业至其中的日期。或者单击"无日期的事件"框（*位置?*）以创建没有到期日期的作业。
+        create_assignment: 就像日历事件一样，单击要添加作业至其中的日期。或者单击"无日期的事件"框（*位置?*）以创建没有截止日期的作业。
         delete: 单击日历中您要删除的事件或作业。
         delete2: 现在单击"删除"（*位置?*），您的事件将被删除。
         delete_done: 完成。您刚才展示了一些重要的删除技巧。
         done: 完成！事件现已创建！可以单击它查看详细信息、编辑和删除事件，或者拖放至新的一天以更改其日期。
         edit: 很好！现在只需输入事件的名称（*位置?*）。可以为事件指定所需的开始和结束时间。或者只指定开始时间，还可以不指定时间。单击"提交"完成。
-        edit_assignment: 现在只需输入作业名称（*位置?*）及其所属的作业组。如果需要，也可以指定到期日期。单击"提交"完成。
+        edit_assignment: 现在只需输入作业名称（*位置?*）及其所属的作业组。如果需要，也可以指定截止日期。单击"提交"完成。
       labels: 
         i_would_like_to: 我要
       links: 
@@ -3044,7 +3044,7 @@ zh:
         add_day_sub_title: 添加日替换
         beginning_change_to: 更改为
         beginning_date: 开始日期
-        checkbox_label: 调整事件和到期日期
+        checkbox_label: 调整事件和截止日期
         ending_change_to: 更改为
         ending_date: 结束日期
         new_end_date_label: 将结束日期更改为
@@ -3192,7 +3192,7 @@ zh:
         user_account_details: 用户帐户详细信息
         user_grades: "%{user} 的评分"
         user_only_view_section: 将此用户限于只能查看班级同伴用户
-        user_outcomes: "%{user} 的结果"
+        user_outcomes: "%{user} 的成果"
         user_view_all_sections: 让此用户查看所有课程用户
       user_only_view_section: 此用户只能在其被分配的课程班级中查看学生
       user_view_all_sections: 此用户可在任何课程班级查看学生
@@ -4096,7 +4096,7 @@ zh:
       file_meta: 无法导出文件元数据
       files: 无法导出某些文件
       grading_standards: 无法导出评分标准
-      learning_outcomes: 无法导出学习结果
+      learning_outcomes: 无法导出学习成果
       lti_links: "无法导出某些 Web 链接"
       media_file: 媒体文件无法导出
       media_files: 无法导出某些媒体文件
@@ -4292,7 +4292,7 @@ zh:
               发布课程时会向所有课程用户发送电子邮件邀请，以便他们能够注册并开始学习该课程。
           not_registered: "本课程已被领受并准备就绪，但需要完成注册过程后才能发布。您应该收到了来自 Canvas 的电子邮件，其中包含完成该过程的链接。确保检查您的垃圾邮件箱。"
         students: 您肯定对学生感兴趣。试想，没有学生参与的课程有什么趣味呢?
-        tas: 您可能要指定一些助教帮助您教授课程。助教可以帮助您批改学生作业、引导讨论以及更新到期日期和作业详细信息。
+        tas: 您可能要指定一些助教帮助您教授课程。助教可以帮助您批改学生作业、引导讨论以及更新截止日期和作业详细信息。
       headings: 
         next_steps: 后续步骤
       links: 
@@ -4415,7 +4415,7 @@ zh:
       updated: 课程已成功更新。
     recent_event: 
       all_graded: 所有已评分
-      due: 到期日期
+      due: 截止日期
       needs_grading: 需要评分
       no_new_submissions: 无新作业
       no_submissions: 新作业
@@ -4616,7 +4616,7 @@ zh:
       headings: 
         current_users: 当前用户
       help: 
-        reset_course_content: 重置课程内容将永久性删除所有相关的作业、讨论、测验、单元、题目、页面、文件、学习结果、题库、协作、会议或任何其它内容。此操作不可逆，删除的数据将*无法*恢复。是否确定要继续?
+        reset_course_content: 重置课程内容将永久性删除所有相关的作业、讨论、测验、单元、题目、页面、文件、学习成果、题库、协作、会议或任何其它内容。此操作不可逆，删除的数据将*无法*恢复。是否确定要继续?
       links: 
         calendar: 课程日历
         conclude: 结束此课程
@@ -4695,7 +4695,7 @@ zh:
       labels: 
         assignments_weighting: 按组加权作业
       no_groups: 未设置学习小组
-      not_weighted: 未加权课程作业。
+      not_weighted: 课外作业所占比率未确定。
     statistics: 
       active_students: 活动学生
       all_rubrics: 所有题目
@@ -4779,7 +4779,7 @@ zh:
     media: 媒体
     messages: 消息
     modules: 单元
-    outcomes: 结果
+    outcomes: 成果
     people: 人员
     plugins: 插件
     prior_users: 以往的用户
@@ -4923,7 +4923,7 @@ zh:
       tomorrow: 明天
       yesterday: 昨天
     formats: 
-      date_at_time: "%b %-d 位于 %l:%M%P"
+      date_at_time: "%b %-d 于 %H:%M"
       default: "%Y-%m-%d"
       long: "%B %d, %Y"
       medium: "%b %e, %Y"
@@ -5097,14 +5097,14 @@ zh:
   discussion_topics: 
     assignment_details: 
       available_from: 可来自
-      due: 到期日期
-      due_date: "到期 %{date}"
+      due: 截止日期
+      due_date: "截止日期 %{date}"
       for: 对于
       graded_discussion_and_points: 
         one: "这是已评分的讨论：*可能为 %{count} 分*"
         other: "这是已评分的讨论：*可能为 %{count} 分*"
       separated_conversation_notice: "由于这是一个学习小组作业，每个学习小组都有关于此主题的会话。以下是您可以访问的内容:"
-      show_due_dates: 显示到期日期
+      show_due_dates: 显示截止日期
       until: 直到
     confirm_delete_announcement: 
       one: "是否确定要删除这 %{count} 个通告?"
@@ -5118,10 +5118,10 @@ zh:
     discussion: 
       close_for_comments: 关闭评论
       delete: 删除
-      due: 到期日期
+      due: 截止日期
       graded_discussion: 评分的讨论
       manage: 管理
-      no_due_date: 无到期日期
+      no_due_date: 无截止日期
       open_to_comments: 开放评论
       pin: 固定
       unpin: 取消固定
@@ -5129,7 +5129,7 @@ zh:
       user_unsubscribed: 您未订阅此主题。单击可订阅。
     discussion_feed_title: "%{title} 讨论馈送"
     discussion_list: 
-      no_pinned_discussions: 您目前没有已固定的讨论
+      no_pinned_discussions: 您目前没有固定讨论题目
       pinned_instructions: 将讨论拖到此处，将其固定至学生讨论页面的顶部
       there_are_no_discussions_show: 没有可显示的讨论。
     discussions_settings_view: 
@@ -5300,7 +5300,7 @@ zh:
       write_a_reply: 回复
     entry_stats: 
       show_more: 显示更多
-    hide_due_dates: 隐藏到期日期
+    hide_due_dates: 隐藏截止日期
     initial_post_required_to_subscribe: 您必须在订阅前发布回复
     lock: 锁定
     mark_as_read: 标记为已读
@@ -5316,7 +5316,7 @@ zh:
     participant: 
       anonymous_user: 匿名
     pin: 固定
-    pinned_discussions: 已固定的讨论
+    pinned_discussions: 固定讨论题目
     reply: 
       error_saving_reply: "*发生错误*，请稍后再填写回复。"
       saving_reply: 正在保存答复...
@@ -5335,7 +5335,7 @@ zh:
     show_all_n_replies: 
       one: "显示所有 %{count} 个回复"
       other: "显示所有 %{count} 个回复"
-    show_due_dates: 显示到期日期
+    show_due_dates: 显示截止日期
     subscribe: 订阅此主题
     subscribed: 已订阅
     subscribed_hint: 您已订阅此主题。单击可取消订阅。
@@ -5349,9 +5349,9 @@ zh:
     unsubscribed: 取消订阅
     unsubscribed_hint: 您未订阅此主题。单击可订阅。
   due_dates: 
-    due_at: "到期日期: %{assignment_due_date_time}"
-    multiple_due_dates: "到期日期: 多个到期日期"
-    no_due_date: "到期日期: 无到期日期"
+    due_at: "截止日期: %{assignment_due_date_time}"
+    multiple_due_dates: "截止日期: 多个截止日期"
+    no_due_date: "截止日期: 无截止日期"
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege 转换器"
   edit_rubric: 
@@ -5877,7 +5877,7 @@ zh:
       learn_more: "更多信息请参阅 instructure.com"
       more_information: "更多信息请参阅 %{domain_list}"
       no_messages_notice: "当课程中发生事情时，您将在此处看到通知，从而知道您的 Canvas 帐户中发生的事情。"
-      notification_about: "Canvas Facebook 应用程序旨在方便您访问课程中的互动信息。您可以设置为当您的作业被评分、当期日期更改等事件时向您发送通知。您的私人数据在 Canvas 中仍然保持私密性。"
+      notification_about: "Canvas Facebook 应用程序旨在方便您访问课程中的互动信息。您可以设置为当您的作业被评分、截止日期更改等事件时向您发送通知。您的私人数据在 Canvas 中仍然保持私密性。"
       notification_settings: 通知设置
       notifications_notice: "下面您可以看到来自 Canvas 的最近通知列表。您可以从 Facebook 主页查看 Canvas 新通知的数量（如果您制作了此应用程序的书签）。"
       welcome: "欢迎回来，%{name}！"
@@ -6082,14 +6082,14 @@ zh:
     search: 搜索
   find_outcome: 
     errors: 
-      outcome_retrieval_failed: 结果检索意外失败。请重试。
+      outcome_retrieval_failed: 成果检索意外失败。请重试。
     messages: 
-      loading_outcomes: 正在加载结果...
-      no_outcomes_found: 找不到结果
-      no_rubric_outcomes_found: 找不到题目配置的结果
+      loading_outcomes: 正在加载成果...
+      no_outcomes_found: 找不到成果
+      no_rubric_outcomes_found: 找不到评分标准配置的成果
     titles: 
-      find_outcome: 查找结果
-      find_outcome_criterion: 查找结果标准
+      find_outcome: 查找评分标准
+      find_outcome_criterion: 查找成果标准
   folder: 
     course_content_folder_name: 课程内容
     default_folder_name: 文件夹
@@ -6269,7 +6269,7 @@ zh:
       choose_a_section_to_show: 选择要显示的班级
     show: 
       all_sections: 所有班级
-      arrange_columns_by_due_date: 按到期日期排列列
+      arrange_columns_by_due_date: 按截止日期排列列
       arrange_columns_by_group: 按作业组排列列
       download_scores: "下载分数 (.csv)"
       filter_by_student: 以学生姓名或第二类身份证明筛选
@@ -6432,7 +6432,7 @@ zh:
       for_course: 课程
       headers: 
         details: 详细信息
-        due: 到期日期
+        due: 截止日期
         grades: "%{student} 的评分"
         name: 姓名
         out_of: 满分
@@ -6477,7 +6477,7 @@ zh:
       all_sections: 全部
       assignment_submitted_late: （延迟）
       buttons: 
-        by_due_date: 根据到期日期
+        by_due_date: 根据截止日期
         by_email: 根据电子邮件/ID
         by_group: 根据作业组
         by_name: 根据学生姓名
@@ -7314,11 +7314,11 @@ zh:
       log_in_to_canvas: "登录到 Canvas"
   learning_outcome: 
     no_comment: 无评论
-    no_context_found: "无法找到“%{title}”的外部学习结果，创建一个副本。"
+    no_context_found: "无法找到“%{title}”的外部学习成果，创建一个副本。"
     no_description: 无说明
-    no_global_permission: "您不可以管理全局结果，无法添加“%{title}”"
+    no_global_permission: "您不可以管理全局成果，无法添加“%{title}”"
   learning_outcome_group: 
-    no_global_permission: "您不可以管理全局结果，无法添加“%{title}”"
+    no_global_permission: "您不可以管理全局成果，无法添加“%{title}”"
   lib: 
     angel: 
       failed_import_link: 导入链接失败
@@ -7341,7 +7341,7 @@ zh:
       no_points_comment: "外部工具尝试将此作业评分为 %{grade}，但无法做到，⏎因为该作业没有分数。"
       no_points_possible: 作业没有分数。
       no_score: 未打分
-      no_submission_created: 此结果请求未能创建新的家作提交项。
+      no_submission_created: 此成果请求未能创建新的家作提交项。
     canvas: 
       migration: 
         announcements: 通告
@@ -7354,7 +7354,7 @@ zh:
         discussion_topics: 讨论主题
         external_tools: 外部工具
         groups: 学习小组
-        learning_outcomes: 学习结果
+        learning_outcomes: 学习成果
         quizzes: 测验
         rubrics: 题目
         syllabus_body: 大纲主体
@@ -7934,94 +7934,94 @@ zh:
     assignment_created: 
       email: 
         assignment_created: "作业已创建 - %{assignment_name}，%{course_name}"
-        due_at: "到期日期: %{assignment_due_date_time}"
+        due_at: "截止日期: %{assignment_due_date_time}"
         html: 
           assignment_created: "作业已创建 - %{assignment_name}，%{course_name}"
-          due_at: "到期日期：%{assignment_due_date_time}"
+          due_at: "截止日期：%{assignment_due_date_time}"
           link_text: 查看作业
-          multiple_due_dates: 到期日期：多个日期
+          multiple_due_dates: 截止日期：多个日期
           new_assignment: "已创建针对您的课程 %{course_name} 的新作业"
-          no_due_date: 无到期日期
+          no_due_date: 无截止日期
         labels: 
           click_to_see_assignment: 单击此处查看作业
-        multiple_due_dates: "到期日期: 多个日期"
+        multiple_due_dates: "截止日期: 多个日期"
         new_assignment: "已创建针对您的课程 %{course_name} 的新作业"
-        no_due_date: "到期日期:无到期日期"
+        no_due_date: "截止日期:无截止日期"
       facebook: 
-        due_at: "到期日期: %{assignment_due_date_time}"
-        multiple_due_dates: "到期日期: 多个日期"
+        due_at: "截止日期: %{assignment_due_date_time}"
+        multiple_due_dates: "截止日期: 多个日期"
         new_assignment: "已创建针对 %{course_name} 的新作业"
-        no_due_date: "到期日期:无到期日期"
+        no_due_date: "截止日期:无截止日期"
       sms: 
-        due_at: "到期日期: %{assignment_due_date_time}"
+        due_at: "截止日期: %{assignment_due_date_time}"
         more_info: "更多信息请访问 %{course_name}"
-        multiple_due_dates: "到期日期: 多个日期"
+        multiple_due_dates: "截止日期: 多个日期"
         new_assignment: "%{course_name} 的新作业"
-        no_due_date: "到期日期:无到期日期"
+        no_due_date: "截止日期:无截止日期"
       summary: 
         assignment_created: "作业已创建 - %{assignment_name}，%{course_name}"
-        due_at: "到期日期: %{assignment_due_date_time}"
-        multiple_due_dates: "到期日期: 多个日期"
-        no_due_date: "到期日期:无到期日期"
+        due_at: "截止日期: %{assignment_due_date_time}"
+        multiple_due_dates: "截止日期: 多个日期"
+        no_due_date: "截止日期:无截止日期"
       twitter: 
         assignment_change: "Canvas 警报 - 更改:%{assignment_name}，%{course_name}"
-        due_at: "到期日期: %{assignment_due_date_time}"
-        multiple_due_dates: "到期日期: 多个日期"
-        no_due_date: "到期日期:无到期日期"
+        due_at: "截止日期: %{assignment_due_date_time}"
+        multiple_due_dates: "截止日期: 多个日期"
+        no_due_date: "截止日期:无截止日期"
     assignment_due_date_changed: 
       email: 
-        assignment_due_date_changed: "作业到期日期更改:%{assignment_name}，%{course_name}"
-        assignment_due_date_changed_sentence: "课程 %{course_name} 的作业 %{assignment_name} 的到期日期已更改为:"
+        assignment_due_date_changed: "作业截止日期更改:%{assignment_name}，%{course_name}"
+        assignment_due_date_changed_sentence: "课程 %{course_name} 的作业 %{assignment_name} 的截止日期已更改为:"
         html: 
-          assignment_due_date_changed: "作业到期日期更改:%{assignment_name}，%{course_name}"
-          assignment_due_date_changed_sentence: "课程 %{course_name} 的作业 %{assignment_name} 的到期日期已更改为:"
+          assignment_due_date_changed: "作业截止日期更改:%{assignment_name}，%{course_name}"
+          assignment_due_date_changed_sentence: "课程 %{course_name} 的作业 %{assignment_name} 的截止日期已更改为:"
           link_text: 查看作业
-          no_due_date: 无到期日期
+          no_due_date: 无截止日期
         labels: 
           click_to_see_assignment: 单击此处查看作业
-        no_due_date: 无到期日期
+        no_due_date: 无截止日期
       facebook: 
-        assignment_due_date_changed_sentence: "课程 %{course_name} 的作业 *%{assignment_name}* 的到期日期已更改为:"
-        no_due_date: 无到期日期
+        assignment_due_date_changed_sentence: "课程 %{course_name} 的作业 *%{assignment_name}* 的截止日期已更改为:"
+        no_due_date: 无截止日期
       sms: 
-        assignment_due_date_changed: "%{assignment_name}，%{course_name} 现在的到期日期为:"
+        assignment_due_date_changed: "%{assignment_name}，%{course_name} 现在的截止日期为:"
         more_info_at_url: "更多信息请访问 %{web_address}"
-        no_due_date: 无到期日期
+        no_due_date: 无截止日期
       summary: 
-        assignment_due_date_changed: "作业到期日期更改:%{assignment_name}，%{course_name}"
-        due_at: "到期日期: %{assignment_due_date_time}"
-        no_due_date: "到期日期:无到期日期"
+        assignment_due_date_changed: "作业截止日期更改:%{assignment_name}，%{course_name}"
+        due_at: "截止日期: %{assignment_due_date_time}"
+        no_due_date: "截止日期:无截止日期"
       twitter: 
         assignment_change: "Canvas 警报 - 日期更改:%{assignment_name}，%{course_name}"
-        due_at: "到期日期: %{assignment_due_date_time}"
-        no_due_date: "到期日期:无到期日期"
+        due_at: "截止日期: %{assignment_due_date_time}"
+        no_due_date: "截止日期:无截止日期"
     assignment_due_date_override_changed: 
       email: 
-        assignment_due_date_changed: "作业到期日已更改: %{assignment_name}，%{course_name} (%{override})"
-        assignment_due_date_changed_sentence: "课程 %{course_name} (%{override}) 的作业 %{assignment_name} 的到期日已更改为:"
+        assignment_due_date_changed: "作业截止日已更改: %{assignment_name}，%{course_name} (%{override})"
+        assignment_due_date_changed_sentence: "课程 %{course_name} (%{override}) 的作业 %{assignment_name} 的截止日期已更改为:"
         html: 
-          assignment_due_date_changed: "作业到期日期已更改：%{assignment_name}，%{course_name} (%{override})"
-          assignment_due_date_changed_sentence: "课程 %{course_name} (%{override}) 的作业 %{assignment_name} 的到期日期已更改为："
+          assignment_due_date_changed: "作业截止日期已更改：%{assignment_name}，%{course_name} (%{override})"
+          assignment_due_date_changed_sentence: "课程 %{course_name} (%{override}) 的作业 %{assignment_name} 的截止日期已更改为："
           link_text: 查看作业
-          no_due_date: 无到期日期
+          no_due_date: 无截止日期
         labels: 
           click_to_see_assignment: 单击此处查看作业
-        no_due_date: 无到期日
+        no_due_date: 无截止日期
       facebook: 
-        assignment_due_date_changed_sentence: "%{course_name} (%{override}) 的作业 *%{assignment_name}* 的到期日已更改为:"
-        no_due_date: 无到期日
+        assignment_due_date_changed_sentence: "%{course_name} (%{override}) 的作业 *%{assignment_name}* 的截止日期已更改为:"
+        no_due_date: 无截止日期
       sms: 
-        assignment_due_date_changed: "%{assignment_name}，%{course_name} (%{override}) 现在已到期:"
+        assignment_due_date_changed: "%{assignment_name}，%{course_name} (%{override}) 现在已截止:"
         more_info_at_url: "更多信息请访问 %{web_address}"
-        no_due_date: 无到期日
+        no_due_date: 无截止日期
       summary: 
-        assignment_due_date_changed: "作业到期日已更改: %{assignment_name}，%{course_name} (%{override})"
-        due_at: "到期日期: %{assignment_due_date_time}"
-        no_due_date: "到期日期: 无到期日期"
+        assignment_due_date_changed: "作业截止日期已更改: %{assignment_name}，%{course_name} (%{override})"
+        due_at: "截止日期: %{assignment_due_date_time}"
+        no_due_date: "截止日期: 无截止日期"
       twitter: 
         assignment_change: "Canvas 警报 - 日期更改: %{assignment_name}，%{course_name} (%{override})"
-        due_at: "到期日期: %{assignment_due_date_time}"
-        no_due_date: "到期日期: 无到期日期"
+        due_at: "截止日期: %{assignment_due_date_time}"
+        no_due_date: "截止日期: 无截止日期"
     assignment_graded: 
       email: 
         assignment_graded: "作业已评分:%{assignment_name}，%{course_name}"
@@ -9397,7 +9397,7 @@ zh:
     file_type: 文件
     grading_standard_type: 评分标准
     group_type: 学习小组
-    learning_outcome_type: 学习结果
+    learning_outcome_type: 学习成果
     module_type: 单元
     quiz_question_type: 测验题
     quiz_type: 测验
@@ -9438,7 +9438,7 @@ zh:
       manage: 管理
       module_item: 
         available: 可用
-        due: 到期日期
+        due: 截止日期
         points_abbreviated: 分
     module_view: 
       module: 
@@ -9502,7 +9502,7 @@ zh:
       course_content: 课程内容
       discussion: 讨论
       discussion_entry: 讨论输入
-      due_date: 到期日期
+      due_date: 截止日期
       files: 文件
       grading: 评分
       grading_policies: 评分政策
@@ -9523,8 +9523,8 @@ zh:
     discussion_display: 讨论
     discussion_post_description: 您订阅的主题中的新讨论帖
     discussion_post_display: 讨论帖
-    due_date_description: 作业到期日期更改
-    due_date_display: 到期日期
+    due_date_description: 作业截止日期更改
+    due_date_display: 截止日期
     files_description: 添加到课程的新文件
     files_display: 文件
     grading_display: 评分
@@ -9555,8 +9555,8 @@ zh:
       appointment_reserved_for_user: 约会预订操作针对的用户
       assignment_changed: 作业已更改
       assignment_created: 作业已创建
-      assignment_due_date_changed: 作业到期日期更改
-      assignment_due_date_override_changed: 覆盖的作业到期日已更改
+      assignment_due_date_changed: 作业截止期日期更改
+      assignment_due_date_override_changed: 覆盖的作业截止日期已更改
       assignment_graded: 作业已评分
       assignment_resubmitted: 作业已重新提交
       assignment_submitted: 作业已提交
@@ -9681,9 +9681,9 @@ zh:
     ? "yes"
     : 是
   outcome_groups: 
-    invalid_file: 无效的结果组文件
+    invalid_file: 无效的成果组文件
   outcome_groups_api: 
-    account_group_description: 帐户级别结果组。
+    account_group_description: 帐户级别成果组。
   outcomes: 
     account_standards: 帐户标准
     account_standards_description: 在左侧，您将看到您的学校为您创建的标准，以便在您的课程中使用。
@@ -9693,13 +9693,13 @@ zh:
         back: 返回
         find: 查找
         new_group: 新学习小组
-        new_outcome: 新结果
+        new_outcome: 新成果
     common_core: 共同核心标准
-    common_core_description: 左侧是您熟悉的共同核心标准的每个分组的结果文件夹结构。这样您就可以毫不费力地在您的课程中使用任何共同核心标准进行评分。
+    common_core_description: 左侧是您熟悉的共同核心标准的每个分组的成果文件夹结构。这样您就可以毫不费力地在您的课程中使用任何共同核心标准进行评分。
     confirm: 
       delete: 是否确定要删除?
       import_group: "将学习小组“%{group}”导入学习小组“%{target}”吗?"
-      import_outcome: "将结果”%{outcome}“导入组”%{target}“吗?"
+      import_outcome: "将成果”%{outcome}“导入组”%{target}“吗?"
     criteria: 
       does_not_meet_expectations: 没有达到预期
       exceeds_expectations: 超出预期
@@ -9715,13 +9715,13 @@ zh:
       pts: 分
       rating_description: 标准评级说明
     dont_import: 此学习小组不能导入。
-    failed_outcome_creation: 结果创建失败
-    failed_outcome_update: 结果更新失败
+    failed_outcome_creation: 成果创建失败
+    failed_outcome_update: 成果更新失败
     find_instructions: 
       instructions: 
         find: 
-          description: "*可以在此处访问您所在学校或州创建的结果。就像在您的课程中一样，左侧的面板将允许您在现有结果之间导航。您找到想使用的结果或结果组之后，单击下面的导入按钮，即可将其添加到您的课程。*"
-          title: 查找结果
+          description: "*可以在此处访问您所在学校或州创建的成果。就像在您的课程中一样，左侧的面板将允许您在现有成果之间导航。您找到想使用的成果或成果组之后，单击下面的导入按钮，即可将其添加到您的课程。*"
+          title: 查找成果
     flash: 
       addSuccess: 创建成功
       deleteError: 有问题。此时无法删除。
@@ -9736,16 +9736,16 @@ zh:
       instructions: 
         main: 
           manage: 
-            description: "*结果是在此处创建的，以跟踪课程的掌握程度。要开始创建，请查看顶部的菜单栏。单击”新建“按钮，创建一个新的结果，或单击”新建组“按钮创建一个新的组，将您的结果放在其中。”查找“按钮将允许您使用您所在的州或学校创建的结果。在您创建和使用结果时，您将可以使用左侧的面板在结果中导航。您可以在不同的级别之间拖放结果以创建结构。* *更重要的是，Canvas 允许您将结果添加到您的评分准则，这样您就可以在对作业评分时评估自己的掌握程度。在您设置结果后，单击”管理准则“开始使用结果继续评分。*"
-            title: 设置结果
+            description: "*成果是在此处创建的，以跟踪课程的掌握程度。要开始创建，请查看顶部的菜单栏。单击”新建“按钮，创建一个新的成果，或单击”新建组“按钮创建一个新的组，将您的成果放在其中。”查找“按钮将允许您使用您所在的州或学校创建的成果。在您创建和使用成果时，您将可以使用左侧的面板在成果中导航。您可以在不同的级别之间拖放成果以创建结构。* *更重要的是，Canvas 允许您将成果添加到您的评分准则，这样您就可以在对作业评分时评估自己的掌握程度。在您设置成果后，单击”管理评分标准“开始使用成果继续评分。*"
+            title: 设置成果
     mastery_error: "必须大于或等于 0"
-    missing_outcome: 无法找到该学习结果
-    new_outcome: 新建结果
-    new_outcome_group: 新建结果组
+    missing_outcome: 无法找到该学习成果
+    new_outcome: 新建成果
+    new_outcome_group: 新建成果组
     outcome: 
       links: 
-        delete_outcome: 删除结果
-        edit_outcome: 编辑结果
+        delete_outcome: 删除成果
+        edit_outcome: 编辑成果
       mastery_at_label: "为等于或高于此值的任何分数设置掌握程度:"
       point_mastery: "掌握程度为 %{mastery_points} 分"
       points: 
@@ -9755,25 +9755,25 @@ zh:
       use_for_scoring: 使用此标准打分
     outcome_alignment: 
       delete_title: 无法删除基于题目关联的作业。要删除这些关联，您需要从评估的题目中删除该行
-    outcome_criterion: 学习结果标准
+    outcome_criterion: 学习成果标准
     outcome_form: 
       criterion: 标准评分
-      criterion_dialog: 学习结果可包括在作业题目中作为评估是否掌握所分配特定作业结果的简单方式。当您定义学习结果时，还应定义构建作业题目时可使用的标准。根据需要定义尽可能多的题目列，并指定将用于定义是否掌握此结果的分数阈值。
+      criterion_dialog: 学习成果可包括在作业题目中作为评估是否掌握所分配特定作业成果的简单方式。当您定义学习成果时，还应定义构建作业题目时可使用的标准。根据需要定义尽可能多的题目列，并指定将用于定义是否掌握此成果的分数阈值。
       criterion_info_link: 单击以了解标准评级
-      description: 说明此结果
+      description: 说明此成果
       mastery: 掌握程度为
       points: "%{points_possible} 分"
-      title: 命名此结果
+      title: 命名此成果
       total_points: 总分
     outcome_group: 
       links: 
-        delete_outcome_group: 删除结果组
-        edit_outcome_group: 编辑结果组
+        delete_outcome_group: 删除成果组
+        edit_outcome_group: 编辑成果组
     outcome_group_form: 
       group_description: 说明此学习小组
       title: 命名此学习小组
     outcome_result: 
-      all_outcomes: 此学生的所有结果
+      all_outcomes: 此学生的所有成果
       attempt_info: "尝试 #%{attempt_number}，%{attempt_date}"
       outcome_mastered: 已掌握
       scoring: "%{points}，满分 %{possible_points}"
@@ -9782,12 +9782,12 @@ zh:
       no_artifacts: 没有任何产物
     state_standards: 州标准
     state_standards_description: 在左侧，您将看到每个州的文件夹，其中包含了更新的州标准。您可以毫不费力地使用州标准对课程进行评分。
-    successful_outcome_creation: 结果已成功创建！
-    successful_outcome_delete: 结果已成功删除
-    successful_outcome_removal: 结果已成功删除
-    successful_outcome_update: 结果已成功更新！
+    successful_outcome_creation: 成果已成功创建！
+    successful_outcome_delete: 成果已成功删除
+    successful_outcome_removal: 成果已成功删除
+    successful_outcome_update: 成果已成功更新！
     titles: 
-      find_outcomes: 查找结果
+      find_outcomes: 查找成果
     top_level: "%{context} 最高级"
     user_outcome_results: 
       artifacts: 
@@ -9801,12 +9801,12 @@ zh:
         see_results: "查看 %{user_name} 的结果"
       mastery: 掌握最新尝试
       no_mastery: 未掌握最新尝试
-      outcomes_for: "%{user_name} 的结果"
+      outcomes_for: "%{user_name} 的成果"
       short_title: 
         attempts: 尝试次数
         average_percent: 平均百分比
         latest_score: 最新分数
-        outcome: 结果
+        outcome: 成果
   overrides: 
     everyone: 每个人
     everyone_else: 其他人
@@ -10137,7 +10137,7 @@ zh:
       name: 会话
     sessions_timeout: 
       labels: 
-        session_timeout: "会话到期前的时间（以分钟为单位，最少为 20 分钟）"
+        session_timeout: "会话到期前的时间 (以分钟为单位，最少为 20 分钟)"
     settings_header: 
       prompt_change_for_all_line1: 这将针对所有帐户更改设置!
       prompt_change_for_all_line2: 是否完全确定要执行此操作?
@@ -10657,10 +10657,10 @@ zh:
   qti_name: "QTI 转换器"
   question_answered: 已回答
   question_bank: 
-    align_outcomes: 调整结果
-    remove_outcome_from_bank: 是否确定要从库中删除此结果?
-    update_outcomes_fail: 更新结果失败
-    updating_outcomes: 正在更新结果...
+    align_outcomes: 调整成果
+    remove_outcome_from_bank: 是否确定要从库中删除此成果?
+    update_outcomes_fail: 更新成果失败
+    updating_outcomes: 正在更新成果...
   question_banks: 
     bank_fail: 无法创建题库。
     bank_success: 题库已成功创建！
@@ -10722,14 +10722,14 @@ zh:
       edit_warning: 请记住，更改问题模板不会自动更新已使用这些问题的测验。
       error_loading_banks: 加载库时出错
       headings: 
-        aligned_outcomes: 调整结果
+        aligned_outcomes: 调整成果
       labels: 
         keep_copy: 同时在此题库中保留副本
         new_bank_name: 新库名称
         new_question_bank: 新题库
         title: 库名称
       links: 
-        align_outcome: 调整结果
+        align_outcome: 调整成果
         more_questions: 更多问题
       load_questions: 正在加载问题...
       loading_banks: 正在加载库...
@@ -11354,7 +11354,7 @@ zh:
     notices: 
       cant_view_submission_while_muted: 您不能在测验静音时查看测验历史记录。
       has_submissions_already: 请记住，某些学生已经进行或开始进行此测验
-      less_than_allotted_time: 您开始此测验时测验已接近到期，因此您没有足够的时间量进行测验。
+      less_than_allotted_time: 您开始此测验时测验已接近截止，因此您没有足够的时间量进行测验。
       message_sent: 消息已发送！
       no_submission_for_user: 没有可用于该用户的提交文件
       quiz_updated: 测验已成功更新
@@ -11416,12 +11416,12 @@ zh:
       allowed_attempts: 允许的尝试次数
       headers: 
         available: 可用
-        due: 到期日期
+        due: 截止日期
         points: 分数
         questions: 问题
         time_limit: 时间限制
-      multiple_due_dates: 多个到期日
-      no_due_date: 无到期日期
+      multiple_due_dates: 多个截止日期
+      no_due_date: 无截止日期
       none: 无
       quiz_availabile_through: "%{start_time} 至 %{end_time}"
       quiz_available_after: "%{start_time} 之后"
@@ -11439,7 +11439,7 @@ zh:
         delete: 删除
         edit: 编辑
       quiz_available: 可用
-      quiz_due: 到期日期
+      quiz_due: 截止日期
       settings: 设置
       title_delete: 删除测验
       title_edit: 编辑测验
@@ -11470,7 +11470,7 @@ zh:
       available_from: "可供使用的日期:"
       cant_go_back: 回答后锁定问题
       code: 访问代码
-      due: 到期日期
+      due: 截止日期
       filter: "IP 过滤"
       for: 对于
       group: 作业组
@@ -11535,7 +11535,7 @@ zh:
         attempts_so_far: 目前尝试次数
         latest_submission: 最新提交文件
         quiz_details: 测验详细信息
-        quiz_due: 到期日期
+        quiz_due: 截止日期
         quiz_time_limit: 时间限制
         survey_details: 调查详细信息
       no_details: 无详细信息
@@ -11746,7 +11746,7 @@ zh:
         return_to_quiz_page: "[单击此处](%{url}) 以返回测验页面。"
     take_quiz_right_side: 
       labels: 
-        attempt_due: 尝试到期
+        attempt_due: 尝试截止
         score: 分数
         time_running: 运行时间
       links: 
@@ -11856,12 +11856,12 @@ zh:
       manage_developer_keys: 管理开发人员密钥
       manage_files: 管理（添加/编辑/删除）课程文件
       manage_frozen_assignment: 管理（编辑/删除）冻结的作业
-      manage_global_outcomes: 管理全局学习结果
+      manage_global_outcomes: 管理全局学习成果
       manage_grades: 编辑评分
       manage_groups: 管理（创建/编辑/删除）学习小组
       manage_interaction_alerts: 管理警报
       manage_links: 管理身份和信任链接
-      manage_outcomes: 管理学习结果
+      manage_outcomes: 管理学习成果
       manage_role_overrides: 管理权限
       manage_rubrics: 创建和编辑评估题目
       manage_sections: 管理（创建/编辑/删除）课程班级
@@ -12179,7 +12179,7 @@ zh:
         add_assignment: 添加作业
       labels: 
         assignment_group_id: 学习小组
-        due_at: 到期日期
+        due_at: 截止日期
         points_possible: 分数
         title: 姓名
       options: 
@@ -12318,7 +12318,7 @@ zh:
         events: 事件
     find_outcome: 
       buttons: 
-        add_outcome: 添加结果
+        add_outcome: 添加成果
       labels: 
         criterion_ratings: 标准评分
         master_level: 设置任何分数或之上为掌握
@@ -12418,7 +12418,7 @@ zh:
       register_for_canvas: "*需要 Canvas 帐户?* **单击此处免费获取!**"
     menu_assignment: 
       labels: 
-        due: 到期日期
+        due: 截止日期
       needs_grading_count: 
         one: "%{count} 个需要评分"
         other: "%{count} 个需要评分"
@@ -12538,7 +12538,7 @@ zh:
         edit: 编辑题目
         find_a_rubric: 查找题目
         find_another_rubric: 查找其它题目
-        find_outcome_criterion: 查找结果标准
+        find_outcome_criterion: 查找成果标准
         find_rubric: 查找题目
       messages: 
         locked: 一旦开始使用后，就无法更改题目。
@@ -12574,7 +12574,7 @@ zh:
       points_label: 分数
       points_out_of2: "%{points} / %{total} 分"
       titles: 
-        linked_to_learning_outcome: 此标准已链接至学习结果
+        linked_to_learning_outcome: 此标准已链接至学习成果
     rubric_criterion_dialog: 
       buttons: 
         update_comments: 更新评论
@@ -12586,7 +12586,7 @@ zh:
         use_this_rubric: 使用此题目
       criterion_count: "%{count} 标准"
       links: 
-        manage_rubrics: 管理题目
+        manage_rubrics: 管理评分标准
       points_possible: "%{points} 最高分"
       titles: 
         find_a_rubric: 查找题目
@@ -12614,7 +12614,7 @@ zh:
       out_of_points: "%{points}/%{total} 分"
       titles: 
         full_comments: 单击以查看完整评论
-        linked_to_learning_outcome: 此标准已链接至学习结果
+        linked_to_learning_outcome: 此标准已链接至学习成果
     select_content_dialog: 
       add_to_module: "添加 %{item} 到*单元*"
       assignment_item: 作业
@@ -13047,7 +13047,7 @@ zh:
     grades: 评分
     home: 主页
     modules: 单元
-    outcomes: 结果
+    outcomes: 成果
     pages: 页面
     people: 人员
     profile: 个人资料
@@ -13124,7 +13124,7 @@ zh:
       default: "%a, %d %b %Y %H:%M:%S %z"
       long: "%B %d, %Y %H:%M"
       short: "%d %b %H:%M"
-      tiny: "%l:%M%P"
+      tiny: "%H:%M"
       tiny_on_the_hour: "%l%P"
     less_than_a_minute_ago: 不到一分钟前
     pm: 下午
@@ -13161,9 +13161,9 @@ zh:
     edit_quiz: 编辑测验
     edit_survey: 编辑调查
     error_reports: 错误报告
-    learning_outcomes: 学习结果
+    learning_outcomes: 学习成果
     messages: 消息
-    outcome_artifacts: 结果产物
+    outcome_artifacts: 成果产物
     people: 人员
     view_in_separate_window: 在单独的窗口中查看
   tooltips: 
@@ -13555,7 +13555,7 @@ zh:
         message_user: "消息 %{user}"
       none_yet: 还没有。
       page_views: 页面视图
-      see_outcomes: "查看 %{user} 的结果"
+      see_outcomes: "查看 %{user} 的成果"
     teacher_activity: 
       crumbs: 
         interaction_report: 学生互动报告
