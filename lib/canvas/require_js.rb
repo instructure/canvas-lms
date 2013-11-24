@@ -64,7 +64,8 @@ module Canvas
           :use => 'vendor/use',
           :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min',
           'ic-menu' => 'vendor/ic-menu/dist/main.amd',
-          'ic-dialog' => 'vendor/ic-dialog/dist/main.amd.js',
+          'ic-dialog' => 'vendor/ic-dialog/dist/main.amd',
+          'ic-ajax' => 'vendor/ic-ajax/main',
         }.update(cache_busting ? cache_busting_paths : {}).update(plugin_paths).update(Canvas::RequireJs::PluginExtension.paths).to_json.gsub(/([,{])/, "\\1\n    ")
       end
   
