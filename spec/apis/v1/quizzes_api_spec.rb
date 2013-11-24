@@ -259,6 +259,20 @@ describe QuizzesApiController, :type => :integration do
           new_quiz.cant_go_back.should_not be_true
         end
       end
+
+      context 'time_limit' do
+        it 'should discard negative values' do
+          api_create_quiz({'time_limit' => -25})
+          new_quiz.time_limit.should be_nil
+        end
+      end
+
+      context 'allowed_attempts' do
+        it 'should discard values less than -1' do
+          api_create_quiz({'allowed_attempts' => -25})
+          new_quiz.allowed_attempts.should == 1
+        end
+      end
     end
   end
 
@@ -384,6 +398,20 @@ describe QuizzesApiController, :type => :integration do
         it "should not set cant_go_back if one_question_at_a_time is not true" do
           api_update_quiz({'one_question_at_a_time' => false}, {'cant_go_back' => true})
           updated_quiz.cant_go_back.should_not be_true
+        end
+      end
+
+      context 'time_limit' do
+        it 'should discard negative values' do
+          api_update_quiz({'time_limit' => 10}, {'time_limit' => -25})
+          updated_quiz.time_limit.should == 10
+        end
+      end
+
+      context 'allowed_attempts' do
+        it 'should discard values less than -1' do
+          api_update_quiz({'allowed_attempts' => -1}, {'allowed_attempts' => -25})
+          updated_quiz.allowed_attempts.should == -1
         end
       end
     end

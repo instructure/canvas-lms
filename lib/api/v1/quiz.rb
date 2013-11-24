@@ -106,6 +106,17 @@ module Api::V1::Quiz
       update_params["assignment_group_id"] = ag.try(:id)
     end
 
+    # make sure allowed_attempts isn't set with a silly negative value
+    # (note that -1 is ok and it means unlimited attempts)
+    if update_params.has_key?('allowed_attempts')
+      allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts)
+      allowed_attempts = -1 if allowed_attempts.nil?
+
+      if allowed_attempts.to_i < -1
+        update_params.delete 'allowed_attempts'
+      end
+    end
+
     # hide_results="until_after_last_attempt" is valid if allowed_attempts > 1
     if update_params['hide_results'] == "until_after_last_attempt"
       allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts)
@@ -143,6 +154,15 @@ module Api::V1::Quiz
       one_question_at_a_time = update_params.fetch('one_question_at_a_time', quiz.one_question_at_a_time)
       unless one_question_at_a_time
         update_params.delete 'one_question_at_a_time'
+      end
+    end
+
+    # discard time limit if it's a negative value
+    if update_params.has_key?('time_limit')
+      time_limit = update_params.fetch('time_limit', quiz.time_limit)
+
+      if time_limit && time_limit.to_i < 0
+        update_params.delete 'time_limit'
       end
     end
 
