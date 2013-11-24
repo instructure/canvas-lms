@@ -129,6 +129,7 @@ class QuizSubmissionsApiController < ApplicationController
   include Api::V1::Helpers::QuizzesApiHelper
 
   before_filter :require_user, :require_context, :require_quiz
+  before_filter :require_quiz_submission, :only => [ :show ]
 
   # @API Get all quiz submissions.
   # @beta
@@ -142,50 +143,7 @@ class QuizSubmissionsApiController < ApplicationController
   #
   # @example_response
   #  {
-  #      "quiz_submissions": [
-  #          {
-  #              "attempt": 6,
-  #              "end_at": null,
-  #              "extra_attempts": null,
-  #              "extra_time": null,
-  #              "finished_at": "2013-11-07T13:16:18Z",
-  #              "fudge_points": null,
-  #              "id": 8,
-  #              "kept_score": 4,
-  #              "quiz_id": 8,
-  #              "quiz_points_possible": 6,
-  #              "quiz_version": 13,
-  #              "score": 0,
-  #              "score_before_regrade": null,
-  #              "started_at": "2013-10-24T05:21:22Z",
-  #              "submission_id": 6,
-  #              "user_id": 2,
-  #              "workflow_state": "pending_review",
-  #              "time_spent": 1238095,
-  #              "html_url": "http://example.com/courses/1/quizzes/8/submissions/8"
-  #          },
-  #          {
-  #              "attempt": 1,
-  #              "end_at": "2013-10-31T05:59:59Z",
-  #              "extra_attempts": null,
-  #              "extra_time": null,
-  #              "finished_at": "2013-10-29T05:04:42Z",
-  #              "fudge_points": 0,
-  #              "id": 9,
-  #              "kept_score": 5,
-  #              "quiz_id": 8,
-  #              "quiz_points_possible": 6,
-  #              "quiz_version": 13,
-  #              "score": 5,
-  #              "score_before_regrade": null,
-  #              "started_at": "2013-10-29T05:04:32Z",
-  #              "submission_id": 7,
-  #              "user_id": 5,
-  #              "workflow_state": "complete",
-  #              "time_spent": 10,
-  #              "html_url": "http://example.com/courses/1/quizzes/8/submissions/9"
-  #          }
-  #      ]
+  #    "quiz_submissions": [QuizSubmission]
   #  }
   def index
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
@@ -201,7 +159,38 @@ class QuizSubmissionsApiController < ApplicationController
     end
   end
 
+  # @API Get a single quiz submission.
+  # @beta
+  #
+  # Get a single quiz submission.
+  #
+  # @argument include[] [String, "submission"|"quiz"|"user"]
+  #   Associations to include with the quiz submission.
+  #
+  # <b>200 OK</b> response code is returned if the request was successful.
+  #
+  # @example_response
+  #  {
+  #    "quiz_submissions": [QuizSubmission]
+  #  }
+  def show
+    if authorized_action(@quiz_submission, @current_user, :read)
+      render :json => quiz_submissions_json([ @quiz_submission ],
+        @quiz,
+        @current_user,
+        session,
+        @context,
+        Array(params[:include]))
+    end
+  end
+
   private
+
+  def require_quiz_submission
+    unless @quiz_submission = @quiz.quiz_submissions.find(params[:id])
+      raise ActiveRecord::RecordNotFound
+    end
+  end
 
   def visible_user_ids(opts = {})
     scope = @context.enrollments_visible_to(@current_user, opts)

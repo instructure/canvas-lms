@@ -1326,11 +1326,12 @@ routes.draw do
     end
 
     scope(:controller => :quiz_submission_files) do
-      post 'courses/:course_id/quizzes/:quiz_id/quiz_submissions/self/files', :action => :create, :path_name => 'quiz_submission_files'
+      post 'courses/:course_id/quizzes/:quiz_id/submissions/self/files', :action => :create, :path_name => 'quiz_submission_files'
     end
 
     scope(:controller => :quiz_submissions_api) do
-      get 'courses/:course_id/quizzes/:quiz_id/quiz_submissions', :action => :index, :path_name => 'course_quiz_submissions'
+      get 'courses/:course_id/quizzes/:quiz_id/submissions', :action => :index, :path_name => 'course_quiz_submissions'
+      get 'courses/:course_id/quizzes/:quiz_id/submissions/:id', :action => :show, :path_name => 'course_quiz_submission'
     end
 
     scope(:controller => :quiz_ip_filters) do
