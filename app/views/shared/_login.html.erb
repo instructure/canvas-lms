@@ -1,20 +1,26 @@
 <% jammit_css :login %>
 <% @body_classes << "modal" if @body_classes %>
-<% hide_fft ||= false %>
+<% hide_self_reg_banner ||= false %>
+<% extend Api::V1::Account %>
 <% js_block do %>
 <script>
 require([
   'i18nObj' /* I18n.t */,
   'jquery' /* $ */,
   'str/htmlEscape',
+  'compiled/registration/signupDialog',
   'jquery.fancyplaceholder' /* fancyPlaceholder */,
   'jquery.google-analytics' /* trackPage, trackPageview */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
   'jquery.loadingImg' /* loadingImage */,
   'compiled/jquery.rails_flash_notifications',
-], function(I18n, $, htmlEscape) {
+], function(I18n, $, htmlEscape, signupDialog) {
 
 $(document).ready(function() {
+  $("#coenrollment_link").click(function(event) {
+    event.preventDefault();
+    signupDialog('parentDialog', <%= jt("#pseudonyms.login.parent_signup", "Parent Signup") %>);
+  });
   $("#register_link").click(function(){
     $.trackPageview("/clicked_register_on_login_form");
   });
@@ -90,7 +96,15 @@ $(document).ready(function() {
       </div>
     <% else %>
       <%= form_for :pseudonym_session, :url => login_path(:nonldap => (@domain_root_account && !@domain_root_account.ldap_authentication?).presence), :html => {:id => "login_form"} do |f| %>
-        <%= link_to t("register_for_canvas", "*Need a Canvas Account?* **Click Here, It's Free!**", :wrapper => {'*' => '<i>\1</i>', '**' => '<b>\1</b>'}),  Setting.get("registration_link", "/register_from_website"), :id => 'register_link', :class => 'not_external' if @domain_root_account.self_registration? && !hide_fft %>
+        <% if @domain_root_account && @domain_root_account.self_registration? && !hide_self_reg_banner %>
+            <% if @domain_root_account.self_registration_type == 'observer' %>
+              <% js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings']),
+                        :PASSWORD_POLICY => @domain_root_account.password_policy %>
+              <%= link_to t("coenrollment_banner", "*Parent of a Canvas User?* **Click Here For an Account**", :wrapper => {'*' => '<i>\1</i>', '**' => '<b>\1</b>'}), '#', :id => 'coenrollment_link', :class => 'register_banner' %>
+            <% else %>
+              <%= link_to t("register_for_canvas", "*Need a Canvas Account?* **Click Here, It's Free!**", :wrapper => {'*' => '<i>\1</i>', '**' => '<b>\1</b>'}),  Setting.get("registration_link", "/register_from_website"), :id => 'register_link', :class => 'not_external register_banner' %>
+            <% end %>
+        <% end %>
         <h2 class="ui-helper-hidden-accessible"><%= t('log_in', 'Log In') %></h2>
         <% login_inner_dialog = yield :login_inner_dialog %>
         <%= login_inner_dialog if login_inner_dialog && !login_inner_dialog.strip.empty? %>

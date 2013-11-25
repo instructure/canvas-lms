@@ -1,4 +1,5 @@
 @import 'environment';
+@import 'registration_dialog';
 
 body {
   background: #333;
@@ -9,28 +10,6 @@ a {
   &:hover {
     color: #1873c8;
   }
-}
-
-.registration-dialog {
-  margin: 2em 0;
-  font-size: 1.1em;
-  .registration-dialog .spinner {
-    width: 100px;
-  }
-}
-
-.help-block-small {
-  display: block;
-  font-size: $baseFontSize - 2;
-  margin-bottom: -5px;
-}
-
-.extra-info {
-  font-size: 0.9em;
-  text-align: center;
-  border-top: 1px solid #ccc;
-  margin: 1em 2em;
-  color: #aaa;
 }
 
 .registration-content {
