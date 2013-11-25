@@ -389,6 +389,9 @@ class Assignment < ActiveRecord::Base
       topic.saved_by = :assignment
       topic.updated_at = Time.now
       topic.workflow_state = 'active' if topic.deleted?
+      if self.context.feature_enabled?(:draft_state)
+        topic.workflow_state = published? ? 'active' : 'unpublished'
+      end
       topic.save
       self.discussion_topic = topic
     end

@@ -21,6 +21,7 @@ define [
       user_can_see_posts: true
       subscription_hold: null
       publishable: true
+      unpublishable: true
 
     dateAttributes: [
       'last_reply_at'
@@ -43,6 +44,7 @@ define [
       assign.alreadyScoped = true
       @set 'assignment', assign
       @set 'publishable',  @get('can_unpublish')
+      @set 'unpublishable', @get('can_unpublish')
 
     # always include assignment in view presentation
     present: =>

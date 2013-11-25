@@ -37,7 +37,7 @@
   <div class="headerBar">
     <div class="row-fluid form-inline" style="overflow: visible;">
       <div class="pull-right">
-        <% if @context.feature_enabled?(:draft_state) %>
+        <% if @context.feature_enabled?(:draft_state) && can_do(@context, @current_user, :moderate_forum) %>
           <button
             id="topic_publish_button"
             data-id='<%= @topic.id %>'
@@ -153,27 +153,52 @@
       <div class="discussion-section message_wrapper">
         <div data-bind="message" class="message user_content"><%= user_content(@topic.message) %></div>
 
-        <% if @topic.post_delayed? %>
-          <div class="discussion-fyi">
-            <% if @topic.is_a? Announcement %>
-              <%= t 'announcement_locked', 'This announcement will not be visible to users until *%{date}*', :date => datetime_string(@topic.delayed_post_at) %>
-            <% elsif @topic.delayed_post_at %>
-              <%= t 'topic_locked', 'This topic will not be visible to users until *%{date}*', :date => datetime_string(@topic.delayed_post_at) %>
-            <% else %>
-              <%= t 'topic_not_visible', 'This topic is not visible to users' %>
-            <% end %>
-          </div>
+        <% if @topic.draft_state_enabled? %>
+          <% if @unlock_at && @unlock_at > Time.now %>
+            <div class="discussion-fyi">
+              <% if @topic.is_a? Announcement %>
+                <%= t 'announcement_will_open_on', 'This announcement will open for comment on *%{date}*', :date => datetime_string(@unlock_at) %>
+              <% else %>
+                <%= t 'topic_will_open_on', 'This topic will open for comment on *%{date}*', :date => datetime_string(@unlock_at) %>
+              <% end %>
+            </div>
+          <% elsif @locked %>
+            <div class="discussion-fyi">
+              <% if @topic.is_a? Announcement %>
+                <%= t 'announcement_closed', 'This announcement is closed for comments' %>
+              <% else %>
+                <%= t 'locked', 'This topic is closed for comments' %>
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <% if @topic.post_delayed? %>
+            <div class="discussion-fyi">
+              <% if @topic.is_a? Announcement %>
+                <% if @topic.delayed_post_at %>
+                  <%= t 'announcement_locked', 'This announcement will not be visible to users until *%{date}*', :date => datetime_string(@topic.delayed_post_at) %>
+                <% else %>
+                  <%= t 'announcement_not_visible', 'This announcement is not visible to users' %>
+                <% end %>
+              <% else %>
+                <% if @topic.delayed_post_at %>
+                  <%= t 'topic_locked', 'This topic will not be visible to users until *%{date}*', :date => datetime_string(@topic.delayed_post_at) %>
+                <% else %>
+                  <%= t 'topic_not_visible', 'This topic is not visible to users' %>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+          <% if @locked %>
+            <div class="discussion-fyi">
+              <%= t 'locked', 'This topic is closed for comments' %>
+            </div>
+          <% end %>
         <% end %>
 
         <% if @topic.editor_id && @topic.user_id && @topic.editor_id != @topic.user_id %>
           <div class="discussion-fyi">
             <%= t 'edited_by', 'This topic was edited by %{user}', :user => link_to(context_user_name(@topic.context, @topic.editor_id), context_url(@topic.context, :context_user_url, @topic.editor_id)) %>
-          </div>
-        <% end %>
-
-        <% if @locked %>
-          <div class="discussion-fyi">
-            <%= t 'locked', 'This topic is closed for comments' %>
           </div>
         <% end %>
 

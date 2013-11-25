@@ -206,8 +206,8 @@ class DiscussionTopicsController < ApplicationController
     @topics = Api.paginate(scope, self, topic_pagination_url)
 
     if states.present?
-      @topics.reject! { |t| t.locked? || t.locked_for?(@current_user) } if states.include?('unlocked')
-      @topics.select! { |t| t.locked? || t.locked_for?(@current_user) } if states.include?('locked')
+      @topics.reject! { |t| t.locked? || t.closed_for_comment_for?(@current_user) } if states.include?('unlocked')
+      @topics.select! { |t| t.locked? || t.closed_for_comment_for?(@current_user) } if states.include?('locked')
     end
     @topics.each { |topic| topic.current_user = @current_user }
 
@@ -218,7 +218,7 @@ class DiscussionTopicsController < ApplicationController
                   named_context_url(@context, :context_discussion_topics_url))
 
         locked_topics, open_topics = @topics.partition do |topic|
-          topic.locked? || topic.locked_for?(@current_user)
+          topic.locked? || topic.closed_for_comment_for?(@current_user)
         end
         hash = {USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
                 openTopics: open_topics,
@@ -233,7 +233,7 @@ class DiscussionTopicsController < ApplicationController
         append_sis_data(hash)
 
         js_env(hash)
-
+        js_env(DRAFT_STATE: @context.feature_enabled?(:draft_state))
         if user_can_edit_course_settings?
           js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
         end
@@ -322,6 +322,7 @@ class DiscussionTopicsController < ApplicationController
     if authorized_action(@topic, @current_user, :read)
       @headers = !params[:headless]
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true) || @topic.locked?
+      @unlock_at = @topic.available_from_for(@current_user)
       @topic.change_read_state('read', @current_user)
       if @topic.for_group_assignment?
         @groups = @topic.assignment.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :read) }
@@ -358,7 +359,7 @@ class DiscussionTopicsController < ApplicationController
 
               },
               :PERMISSIONS => {
-                :CAN_REPLY      => @locked ? false : !(@topic.for_group_assignment? || @topic.locked?),     # Can reply
+                :CAN_REPLY      => @locked ? false : !(@topic.for_group_assignment? || @topic.locked_for?(@current_user)),     # Can reply
                 :CAN_ATTACH     => @locked ? false : @topic.grants_right?(@current_user, session, :attach), # Can attach files on replies
                 :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user),           # Can moderate their own topics
                 :MODERATE       => user_can_moderate                                                        # Can moderate any topic
@@ -516,7 +517,7 @@ class DiscussionTopicsController < ApplicationController
       f.id = polymorphic_url([@context, :discussion_topics])
     end
     @entries = []
-    @entries.concat @context.discussion_topics.reject{|a| a.locked_for?(@current_user, :check_policies => true) }
+    @entries.concat @context.discussion_topics.reject{|a| a.closed_for_comment_for?(@current_user, :check_policies => true) }
     @entries.concat @context.discussion_entries.active
     @entries = @entries.sort_by{|e| e.updated_at}
     @entries.each do |entry|
@@ -573,22 +574,30 @@ class DiscussionTopicsController < ApplicationController
 
     unless process_future_date_parameters(discussion_topic_hash)
       process_lock_parameters(discussion_topic_hash)
-      process_published_parameters(discussion_topic_hash)
     end
+    process_published_parameters(discussion_topic_hash)
 
     if @errors.present?
       render :json => {errors: @errors}, :status => :bad_request
-    elsif @topic.update_attributes(discussion_topic_hash)
-      log_asset_access(@topic, 'topics', 'topics', 'participate')
-      generate_new_page_view
-
-      apply_positioning_parameters
-      apply_attachment_parameters
-      apply_assignment_parameters
-
-      render :json => discussion_topic_api_json(@topic, @context, @current_user, session)
     else
-      render :json => @topic.errors, :status => :bad_request
+      DiscussionTopic.transaction do
+        @topic.update_attributes(discussion_topic_hash)
+        @topic.root_topic.try(:save)
+      end
+      if !@topic.errors.any? && !@topic.root_topic.try(:errors).try(:any?)
+        log_asset_access(@topic, 'topics', 'topics', 'participate')
+        generate_new_page_view
+
+        apply_positioning_parameters
+        apply_attachment_parameters
+        apply_assignment_parameters
+        render :json => discussion_topic_api_json(@topic.reload, @context, @current_user, session)
+      else
+        errors = @topic.errors.as_json[:errors]
+        errors.merge!(@topic.root_topic.errors.as_json[:errors]) if @topic.root_topic
+        errors['published'] = errors.delete('workflow_state') if errors.has_key?('workflow_state')
+        render :json => {errors: errors}, :status => :bad_request
+      end
     end
   end
 
@@ -645,20 +654,17 @@ class DiscussionTopicsController < ApplicationController
       should_publish = value_to_boolean(params[:published])
       if should_publish != @topic.published?
         if should_publish
-          @topic.workflow_state = 'active'
-        elsif @topic.is_announcement
-          @errors[:published] = t(:error_draft_state_announcement, "This topic cannot be set to draft state because it is an announcement.")
-        elsif @topic.discussion_subentry_count > 0
-          @errors[:published] = t(:error_draft_state_with_posts, "This topic cannot be set to draft state because it contains posts.")
-        elsif @topic.assignment_id
-          @errors[:published] = t(:error_draft_state_graded, "This topic cannot be set to draft state because it is an assignment")
+          @topic.publish
+          @topic.root_topic.try(:publish)
         elsif user_can_moderate
-          discussion_topic_hash[:delayed_post_at] = nil
-          @topic.workflow_state = 'post_delayed'
+          @topic.unpublish
+          @topic.root_topic.try(:unpublish)
         else
           @errors[:published] = t(:error_draft_state_unauthorized, "You do not have permission to set this topic to draft state.")
         end
       end
+    elsif @topic.new_record? && !@topic.is_announcement && @topic.draft_state_enabled? && user_can_moderate
+      @topic.unpublish
     end
   end
 
