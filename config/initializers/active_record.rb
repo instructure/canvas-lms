@@ -505,7 +505,10 @@ class ActiveRecord::Base
     transaction do
       begin
         cursor = "#{table_name}_in_batches_cursor"
-        connection.execute("DECLARE #{cursor} CURSOR FOR #{scoped.to_sql}")
+        scope = scope(:find)
+        scope = scope ? scope.dup : {}
+        scope.delete(:include)
+        with_exclusive_scope(find: scope) { connection.execute("DECLARE #{cursor} CURSOR FOR #{scoped.to_sql}") }
         includes = scope(:find, :include)
         with_exclusive_scope do
           batch = connection.uncached { find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
@@ -526,7 +529,10 @@ class ActiveRecord::Base
   def self.find_in_batches_with_temp_table(options = {})
     batch_size = options[:batch_size] || 1000
     table = "#{table_name}_find_in_batches_temporary_table"
-    connection.execute "CREATE TEMPORARY TABLE #{table} AS #{scoped.to_sql}"
+    scope = scope(:find)
+    scope = scope ? scope.dup : {}
+    scope.delete(:include)
+    with_exclusive_scope(find: scope) { connection.execute "CREATE TEMPORARY TABLE #{table} AS #{scoped.to_sql}" }
     begin
       index = "temp_primary_key"
       case connection.adapter_name

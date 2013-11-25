@@ -51,7 +51,7 @@ else
 end
 gem 'erubis', '2.7.0'
 if CANVAS_RAILS2
-  gem 'fake_arel', '1.0.0'
+  gem 'fake_arel', '1.4.0'
   gem 'fake_rails3_routes', '1.0.4'
 end
 gem 'ffi', '1.1.5'
