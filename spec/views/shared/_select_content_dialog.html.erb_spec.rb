@@ -33,5 +33,21 @@ describe "/shared/_select_content_dialog" do
     options[0].text.should == "a"
     options[1].text.should == "b"
   end
+
+  it "should include unpublished wiki pages" do
+    Account.default.enable_feature!(:draft_state)
+    course_with_teacher
+    published_page = @course.wiki.wiki_pages.build title: 'published_page'
+    published_page.workflow_state = 'active'
+    published_page.save!
+    unpublished_page = @course.wiki.wiki_pages.build title: 'unpublished_page'
+    unpublished_page.workflow_state = 'unpublished'
+    unpublished_page.save!
+    view_context
+    render partial: 'shared/select_content_dialog'
+    page = Nokogiri(response.body)
+    options = page.css("#wiki_pages_select .module_item_select option")
+    (%w(unpublished_page published_page) - options.map(&:text)).should be_empty
+  end
 end
 

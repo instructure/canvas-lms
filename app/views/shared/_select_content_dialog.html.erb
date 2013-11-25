@@ -121,8 +121,8 @@
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
           <%# cache on the context.wiki instead of just the context because even though it will require a db query, we will get a much better cache hit rate %>
-          <% cache([@context.wiki, 'active_wiki_pages']) do  %>
-            <% @context.wiki.wiki_pages.active.select([:id, :title]).each do |page| %>
+          <% cache([@context.wiki, 'non_deleted_wiki_pages']) do  %>
+            <% @context.wiki.wiki_pages.not_deleted.select([:id, :title]).each do |page| %>
               <% if page && !page.new_record? %>
                 <option value="<%= page.id %>"><%= page.title %></option>
               <% end %>
