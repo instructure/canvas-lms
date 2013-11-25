@@ -917,6 +917,17 @@ module MySQLAdapterExtensions
     klass.alias_method_chain :release_savepoint, :callbacks if Rails.env.test?
   end
 
+  def rename_index(table_name, old_name, new_name)
+    if version[0] >= 5 && version[1] >= 7
+      return execute "ALTER TABLE #{quote_table_name(table_name)} RENAME INDEX #{quote_column_name(old_name)} TO #{quote_table_name(new_name)}";
+    else
+      old_index_def = indexes(table_name).detect { |i| i.name == old_name }
+      return unless old_index_def
+      add_index(table_name, old_index_def.columns, :name => new_name, :unique => old_index_def.unique)
+      remove_index(table_name, :name => old_name)
+    end
+  end
+
   def bulk_insert(table_name, records)
     keys = records.first.keys
     quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
@@ -999,6 +1010,10 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       execute("ALTER TABLE #{quote_table_name(from_table)} VALIDATE CONSTRAINT #{quote_column_name(foreign_key_name)}") if options[:delay_validation]
     end
     alias_method_chain :add_foreign_key, :delayed_validation
+
+    def rename_index(table_name, old_name, new_name)
+      return execute "ALTER INDEX #{quote_column_name(old_name)} RENAME TO #{quote_table_name(new_name)}";
+    end
 
     # have to replace the entire method to support concurrent
     def add_index(table_name, column_name, options = {})
