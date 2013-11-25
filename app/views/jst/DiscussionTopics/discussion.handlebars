@@ -29,8 +29,7 @@
     </div>
 
     <div class="discussion-status">
-      <span id="publish-icon" class="publish-icon" data-view="publishIcon"></span>
-
+      <span id="publish-icon" class="publish-icon" {{#if ENV.DRAFT_STATE}} data-view="publishIcon" {{/if}}></span>
       <a href="#" data-view="toggleableSubscriptionIcon" class="subscription-toggler">
         <span class="screenreader-only">
           {{#if subscribed}}

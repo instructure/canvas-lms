@@ -35,6 +35,11 @@ class Announcement < DiscussionTopic
                          context_type = '#{context_type}' AND
                          type = 'Announcement'}
 
+  def validate_draft_state_change
+    old_draft_state, new_draft_state = self.changes['workflow_state']
+    self.errors.add :workflow_state, I18n.t('#announcements.error_draft_state', "This topic cannot be set to draft state because it is an announcement.") if new_draft_state == 'unpublished'
+  end
+
   def infer_content
     self.title ||= t(:no_title, "No Title")
   end
@@ -52,7 +57,7 @@ class Announcement < DiscussionTopic
     to { active_participants(true) - [user] }
     whenever { |record|
       record.context.available? and
-      ((record.just_created and not record.post_delayed?) || record.changed_state(:active, :post_delayed))
+      ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
     }
   end
 
@@ -85,5 +90,13 @@ class Announcement < DiscussionTopic
 
   def subscription_hold(user, context_enrollment, session)
     :topic_is_announcement
+  end
+
+  def can_unpublish?
+    false
+  end
+
+  def published?
+    true
   end
 end

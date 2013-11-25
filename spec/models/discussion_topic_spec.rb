@@ -102,11 +102,34 @@ describe DiscussionTopic do
     (@entry.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
   end
 
-  describe "visiblity" do
+  describe "visibility" do
     before(:each) do
-      course_with_teacher(:active_all => 1)
+      course_with_teacher(:active_all => 1, :draft_state => draft_state)
       student_in_course(:active_all => 1)
       @topic = @course.discussion_topics.create!(:user => @teacher)
+    end
+
+    let(:draft_state) {false} # this does not disable draft state is it is switched on at the account level
+
+    context "with draft state enabled" do
+      let(:draft_state) {true}
+
+      it "should be visible to author when unpublished" do
+        @topic.unpublish!
+        @topic.visible_for?(@teacher).should be_true
+      end
+
+      it "should be visible when published even when for delayed posting" do
+        @topic.delayed_post_at = 5.days.from_now
+        @topic.workflow_state = 'post_delayed'
+        @topic.save!
+        @topic.visible_for?(@student).should be_true
+      end
+    end
+
+    it "should not be visible when unpublished even when it is active" do
+      @topic.unpublish!
+      @topic.visible_for?(@student).should be_false
     end
 
     it "should be visible to students when topic is not locked" do
@@ -116,13 +139,13 @@ describe DiscussionTopic do
     it "should not be visible to students when topic delayed_post_at is in the future" do
       @topic.delayed_post_at = 5.days.from_now
       @topic.save!
-      @topic.visible_for?(@student).should be_false
+      @topic.visible_for?(@student).should @topic.draft_state_enabled? ? be_true : be_false
     end
 
-    it "should not be visible to students when topic is draft state" do
+    it "should not be visible to students when topic is for delayed posting" do
       @topic.workflow_state = 'post_delayed'
       @topic.save!
-      @topic.visible_for?(@student).should be_false
+      @topic.visible_for?(@student).should @topic.draft_state_enabled? ? be_true : be_false
     end
 
     it "should be visible to students when topic delayed_post_at is in the past" do
@@ -140,16 +163,16 @@ describe DiscussionTopic do
     it "should not be visible when no delayed_post but assignment unlock date in future" do
       @topic.delayed_post_at = nil
       group_category = @course.group_categories.create(:name => "category")
-      @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic', 
-        :title => @topic.title, 
+      @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic',
+        :title => @topic.title,
         :group_category => group_category,
         :unlock_at => 10.days.from_now,
         :lock_at => 30.days.from_now)
       @topic.assignment.infer_times
       @topic.assignment.saved_by = :discussion_topic
       @topic.save
-      
-      @topic.visible_for?(@student).should be_false
+
+      @topic.visible_for?(@student).should @topic.draft_state_enabled? ? be_true : be_false
     end
 
     it "should be visible to all teachers in the course" do
@@ -249,7 +272,7 @@ describe DiscussionTopic do
       topic.stream_item.should_not be_nil
     end
 
-     describe "#update_based_on_date" do
+    describe "#update_based_on_date" do
       before do
         course_with_student(:active_all => true)
         @user.register

@@ -79,7 +79,7 @@ describe DiscussionTopicsController, :type => :integration do
     let(:item_type) { 'discussion_topic' }
 
     let(:locked_item) do
-      @course.discussion_topics.create!(:message => 'Locked Discussion')
+      @course.discussion_topics.create!(:user => @user, :message => 'Locked Discussion')
     end
 
     def api_get_json
@@ -169,7 +169,7 @@ describe DiscussionTopicsController, :type => :integration do
       @topic.message.should == "test <b>message</b>"
       @topic.threaded?.should == true
       @topic.post_delayed?.should == true
-      @topic.published?.should be_false
+      @topic.published?.should @topic.draft_state_enabled? ? be_true : be_false
       @topic.delayed_post_at.to_i.should == post_at.to_i
       @topic.lock_at.to_i.should == lock_at.to_i
       @topic.podcast_enabled?.should == true
@@ -552,7 +552,7 @@ describe DiscussionTopicsController, :type => :integration do
 
       context "publishing" do
         it "should publish a draft state topic" do
-          @topic.workflow_state = 'post_delayed'
+          @topic.workflow_state = 'unpublished'
           @topic.save!
           @topic.should_not be_published
           api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",

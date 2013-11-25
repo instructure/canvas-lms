@@ -353,6 +353,12 @@ describe DiscussionTopicsController do
       @topic.lock_at.should be_nil
     end
 
+    it "should set workflow to post_delayed when delayed_post_at and lock_at are in the future" do
+      put(:update, course_id: @course.id, topic_id: @topic.id,
+          title: 'Updated topic', format: 'json', delayed_post_at: Time.zone.now + 5.days)
+      @topic.reload.should be_post_delayed
+    end
+
     it "should not clear lock_at if lock state hasn't changed" do
       put('update', course_id: @course.id, topic_id: @topic.id,
           title: 'Updated Topic', format: 'json', lock_at: @topic.lock_at,
@@ -368,12 +374,14 @@ describe DiscussionTopicsController do
           published: false)
 
       @topic.reload.should_not be_published
-      @topic.delayed_post_at.should be_nil
     end
 
     it "should delete attachments" do
       attachment = @topic.attachment = attachment_model(context: @course)
+      @topic.lock_at = Time.now + 1.week
+      @topic.unlock_at = Time.now - 1.week
       @topic.save!
+      @topic.unlock!
       put('update', course_id: @course.id, topic_id: @topic.id,
           format: 'json', remove_attachment: '1')
       response.should be_success

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2011 - 2013 Instructure, Inc.
 #
@@ -57,6 +58,7 @@ class DiscussionTopic < ActiveRecord::Base
   validates_inclusion_of :discussion_type, :in => DiscussionTypes::TYPES
   validates_length_of :message, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
+  validate :validate_draft_state_change, :if => :workflow_state_changed?
 
   sanitize_field :message, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:message) { [self.context, nil] }
@@ -85,6 +87,15 @@ class DiscussionTopic < ActiveRecord::Base
 
   def discussion_type
     read_attribute(:discussion_type) || DiscussionTypes::SIDE_COMMENT
+  end
+
+  def validate_draft_state_change
+    old_draft_state, new_draft_state = self.changes['workflow_state']
+    return if old_draft_state == new_draft_state
+    if new_draft_state == 'unpublished' && !can_unpublish?
+      self.errors.add :workflow_state, I18n.t('#discussion_topics.error_draft_state_with_posts',
+                                              "This topic cannot be set to draft state because it contains posts.")
+    end
   end
 
   def default_values
@@ -141,6 +152,7 @@ class DiscussionTopic < ActiveRecord::Base
           topic.assignment_id = self.assignment_id
           topic.user_id = self.user_id
           topic.discussion_type = self.discussion_type
+          topic.workflow_state = self.workflow_state
           topic.save if topic.changed?
           topic
         end
@@ -148,6 +160,10 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  def draft_state_enabled?
+    context = self.context.is_a?(CollectionItem) ? self.context.collection.context : self.context
+    context && context.respond_to?(:feature_enabled?) && context.feature_enabled?(:draft_state)
+  end
   attr_accessor :saved_by
   def update_assignment
     return if self.deleted?
@@ -163,6 +179,9 @@ class DiscussionTopic < ActiveRecord::Base
       self.assignment.submission_types = "discussion_topic"
       self.assignment.saved_by = :discussion_topic
       self.assignment.workflow_state = 'published' if self.assignment.deleted?
+      if self.draft_state_enabled?
+        self.assignment.workflow_state = published? ? 'published' : 'unpublished'
+      end
       self.assignment.save
     end
 
@@ -250,7 +269,7 @@ class DiscussionTopic < ActiveRecord::Base
     current_user ||= self.current_user
     return nil unless current_user
     self.context_module_action(current_user, :read) if new_state == 'read'
-    
+
     return true if new_state == self.read_state(current_user)
 
     StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
@@ -402,9 +421,6 @@ class DiscussionTopic < ActiveRecord::Base
   scope :recent, lambda { where("discussion_topics.last_reply_at>?", 2.weeks.ago).order("discussion_topics.last_reply_at DESC") }
   scope :only_discussion_topics, where(:type => nil)
   scope :for_subtopic_refreshing, where("discussion_topics.subtopics_refreshed_at IS NOT NULL AND discussion_topics.subtopics_refreshed_at<discussion_topics.updated_at").order("discussion_topics.subtopics_refreshed_at")
-  scope :for_delayed_posting, lambda {
-    where("discussion_topics.workflow_state='post_delayed' AND discussion_topics.delayed_post_at<?", Time.now.utc).order("discussion_topics.delayed_post_at")
-  }
   scope :active, where("discussion_topics.workflow_state<>'deleted'")
   scope :for_context_codes, lambda {|codes| where(:context_code => codes) }
 
@@ -413,13 +429,23 @@ class DiscussionTopic < ActiveRecord::Base
   scope :by_position, order("discussion_topics.position DESC, discussion_topics.created_at DESC")
   scope :by_last_reply_at, order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC")
 
+  alias_attribute :available_from, :delayed_post_at
+  alias_attribute :unlock_at, :delayed_post_at
+  alias_attribute :available_until, :lock_at
+
   def should_lock_yet
-    self.lock_at && self.lock_at < Time.now
+    # not assignment or vdd aware! only use this to check the topic's own field!
+    # you should be checking other lock statuses in addition to this one
+    self.lock_at && self.lock_at < Time.now.utc
   end
+  alias_method :not_available_anymore?, :should_lock_yet
 
   def should_not_post_yet
-    self.delayed_post_at && self.delayed_post_at > Time.now
+    # not assignment or vdd aware! only use this to check the topic's own field!
+    # you should be checking other lock statuses in addition to this one
+    self.delayed_post_at && self.delayed_post_at > Time.now.utc
   end
+  alias_method :not_available_yet?, :should_not_post_yet
 
   # There may be delayed jobs that expect to call this to update the topic, so be sure to alias
   # the old method name if you change it
@@ -435,13 +461,40 @@ class DiscussionTopic < ActiveRecord::Base
 
   workflow do
     state :active
+    state :unpublished
     state :post_delayed do
       event :delayed_post, :transitions_to => :active do
         self.last_reply_at = Time.now
         self.posted_at = Time.now
       end
+      # with draft state, this means published. without, unpublished. so we really do support both events
     end
     state :deleted
+  end
+
+  def active?
+    # using state instead of workflow_state so this works with new records
+    self.state == :active || (self.draft_state_enabled? && self.state == :post_delayed)
+  end
+
+  def publish
+    self.workflow_state = 'active'
+    self.last_reply_at = Time.now
+    self.posted_at = Time.now
+  end
+
+  def publish!
+    publish
+    save!
+  end
+
+  def unpublish
+    self.workflow_state = 'unpublished'
+  end
+
+  def unpublish!
+    unpublish
+    save!
   end
 
   def lock(opts = {})
@@ -458,35 +511,34 @@ class DiscussionTopic < ActiveRecord::Base
   end
   alias_method :unlock!, :unlock
 
+  # deprecated with draft state: use publish+available_[from|until] machinery instead
+  # you probably want available?
   def locked?
-    return workflow_state == 'locked' if locked.nil?
-    locked
+    locked.nil? ? workflow_state == 'locked' : locked
   end
 
   def published?
+    return false if workflow_state == 'unpublished'
+    return false if workflow_state == 'post_delayed' && !draft_state_enabled?
+    true
+  end
+
+  def can_unpublish?
     if self.assignment
-      self.assignment.published?
+      !self.assignment.has_student_submissions?
     else
-      workflow_state != 'post_delayed'
+      self.discussion_subentry_count == 0
     end
   end
 
-  def can_unpublish?
-    !self.assignment && self.discussion_subentry_count == 0
-  end
-
-  def can_unpublish?
-    !self.assignment && self.discussion_subentry_count == 0
-  end
-
   def should_send_to_stream
-    if self.delayed_post_at && self.delayed_post_at > Time.now
+    if self.not_available_yet?
       false
     elsif self.cloned_item_id
       false
     elsif self.assignment && self.root_topic_id && self.assignment.has_group_category?
       false
-    elsif self.assignment && self.assignment.submission_types == 'discussion_topic' && (!self.assignment.due_at || self.assignment.due_at > 1.week.from_now)
+    elsif self.assignment && self.assignment.submission_types == 'discussion_topic' && (!self.assignment.due_at || self.assignment.due_at > 1.week.from_now) # TODO: vdd
       false
     elsif self.context.is_a?(CollectionItem)
       # we'll only send notifications of entries to the streams, not creations of topics
@@ -503,7 +555,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   on_update_send_to_streams do
-    if should_send_to_stream && (@content_changed || changed_state(:active, :post_delayed))
+    if should_send_to_stream && (@content_changed || changed_state(:active, draft_state_enabled? ? :unpublished : :post_delayed))
       self.active_participants
     end
   end
@@ -601,27 +653,27 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def initialize_last_reply_at
-    self.posted_at ||= Time.now
-    self.last_reply_at ||= Time.now
+    self.posted_at ||= Time.now.utc
+    self.last_reply_at ||= Time.now.utc
   end
 
   set_policy do
     given { |user| self.user && self.user == user }
     can :read
 
-    given { |user| self.user && self.user == user && !self.locked? }
+    given { |user| self.user && self.user == user && self.available_for?(user) }
     can :reply
 
-    given { |user| self.user && self.user == user && !self.locked? && context.user_can_manage_own_discussion_posts?(user) }
+    given { |user| self.user && self.user == user && self.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) }
     can :update
 
-    given { |user| self.user && self.user == user and self.discussion_entries.active.empty? && !self.locked? && !self.root_topic_id && context.user_can_manage_own_discussion_posts?(user) }
+    given { |user| self.user && self.user == user and self.discussion_entries.active.empty? && self.available_for?(user) && !self.root_topic_id && context.user_can_manage_own_discussion_posts?(user) }
     can :delete
 
     given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :read_forum) }#
     can :read
 
-    given { |user, session| self.active? && !self.locked? && self.cached_context_grants_right?(user, session, :post_to_forum) }#students.include?(user) }
+    given { |user, session| self.active? && self.available_for?(user) && self.cached_context_grants_right?(user, session, :post_to_forum) }#students.include?(user) }
     can :reply and can :read
 
     given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :post_to_forum) }#students.include?(user) }
@@ -637,10 +689,10 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && cached_context_grants_right?(user, session, :post_to_forum) }
     can :attach
 
-    given { |user, session| !self.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && !self.locked? }
+    given { |user, session| !self.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && self.available_for?(user) }
     can :update and can :delete and can :create and can :read and can :attach
 
-    # Moderators can still modify content even in locked topics (*especially* unlocking them), but can't create new content
+    # Moderators can still modify content even in unavailable topics (*especially* unlocking them), but can't create new content
     given { |user, session| !self.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
 
@@ -649,6 +701,9 @@ class DiscussionTopic < ActiveRecord::Base
 
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :delete) }
     can :delete
+
+    given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :read) }
+    can :read
 
     given { |user, session| self.context.respond_to?(:collection) && self.context.collection.grants_right?(user, session, :read) }
     can :read
@@ -720,7 +775,7 @@ class DiscussionTopic < ActiveRecord::Base
     p.to { active_participants - [user] }
     p.whenever { |record|
       record.context.available? and
-      ((record.just_created and not record.post_delayed?) || record.changed_state(:active, :post_delayed))
+      ((record.just_created && record.active?) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
     }
   end
 
@@ -750,7 +805,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def subscribers
-    # this duplicates some logic from #subscribed? so we don't have to call 
+    # this duplicates some logic from #subscribed? so we don't have to call
     # #posters for each legacy subscriber.
     sub_ids = discussion_topic_participants.where(:subscribed => true).pluck(:user_id)
     legacy_sub_ids = discussion_topic_participants.where(:subscribed => nil).pluck(:user_id)
@@ -769,6 +824,20 @@ class DiscussionTopic < ActiveRecord::Base
     self.user ? self.user.name : nil
   end
 
+  def available_from_for(user)
+    if self.assignment
+      self.assignment.overridden_for(user).unlock_at
+    else
+      self.available_from
+    end
+  end
+
+  def available_for?(user, opts = {})
+    return false if !published?
+    return false if !draft_state_enabled? && locked?
+    !locked_for?(user, opts)
+  end
+
   # Public: Determine if the given user can view this discussion topic.
   #
   # user - The user attempting to view the topic (default: nil).
@@ -782,19 +851,26 @@ class DiscussionTopic < ActiveRecord::Base
     # user is an admin in the context (teacher/ta/designer)
     return true if context.grants_right?(user, :manage, nil)
 
-    # unlock date exists and has passed
-    if unlock_at = locked_for?(user, options).try_rescue(:[], :unlock_at)
-      unlock_at < Time.now
     # topic is not published
-    elsif !published?
+    if !published?
       false
+    elsif !draft_state_enabled? && unlock_at = available_from_for(user)
+    # unlock date exists and has passed
+      unlock_at < Time.now.utc
     # everything else
     else
       true
     end
   end
 
-  # Public: Determine if the discussion topic is locked for a specific user. The topic is locked when the 
+  def closed_for_comment_for?(user, opts={})
+    lock = self.locked_for?(user, opts)
+    return false unless lock
+    return false if self.draft_state_enabled? && lock.include?(:unlock_at)
+    lock
+  end
+
+  # Public: Determine if the discussion topic is locked for a specific user. The topic is locked when the
   #         delayed_post_at is in the future or the group assignment is locked. This does not determine
   #         the visibility of the topic to the user, only that they are unable to reply.
   def locked_for?(user, opts={})

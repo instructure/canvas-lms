@@ -452,7 +452,7 @@ describe "discussions" do
 
           it "should allow publishing a discussion" do
             topic = @course.discussion_topics.create!(title: 'Publish me', user: @user)
-            topic.workflow_state = 'post_delayed'
+            topic.workflow_state = 'unpublished'
             topic.save!
             topic.published?.should be_false
             get(url)
@@ -480,8 +480,12 @@ describe "discussions" do
             topic.published?.should be_true
           end
 
-          it "should not allow unpublishing a graded discussion" do
+          it "should not allow unpublishing a graded discussion with a submission" do
             group_discussion_assignment
+            @student = student_in_course(active_all: true).user
+            child_topic = @topic.child_topics.first
+            child_topic.context.add_user(@student)
+            child_topic.reply_from(:user => @student, :text => "post")
             @topic.published?.should be_true
             get(url)
             click_publish_icon @topic
@@ -491,7 +495,7 @@ describe "discussions" do
 
           it "should allow publishing and unpublishing from a topic's page" do
             topic = @course.discussion_topics.create!(title: 'Publish me', user: @user)
-            topic.workflow_state = 'post_delayed'
+            topic.workflow_state = 'unpublished'
             topic.save!
             topic.published?.should be_false
             get url + "#{topic.id}"
@@ -815,28 +819,6 @@ describe "discussions" do
           @topic.delayed_post_at.strftime(date_format).should == delayed_post_at.strftime(date_format)
           @topic.lock_at.strftime(date_format).should == lock_at.strftime(date_format)
           @topic.locked?.should be_true
-        end
-
-        it "should set workflow to post_delayed when delayed_post_at and lock_at are in the future" do
-          @topic.delayed_post_at = nil
-          @topic.lock_at         = nil
-          @topic.workflow_state  = 'active'
-          @topic.save!
-
-          get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
-          wait_for_ajaximations
-
-          delayed_post_at = Time.zone.now + 5.days
-          date_format = '%b %-d, %Y'
-
-          f('input[type=text][name="delayed_post_at"]').send_keys(delayed_post_at.strftime(date_format))
-
-          expect_new_page_load { f('.form-actions button[type=submit]').click }
-          wait_for_ajaximations
-
-          @topic.reload
-          @topic.delayed_post_at.strftime(date_format).should == delayed_post_at.strftime(date_format)
-          @topic.post_delayed?.should be_true
         end
 
         it "should set workflow to active when delayed_post_at in past and lock_at in future" do
