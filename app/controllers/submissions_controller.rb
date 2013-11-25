@@ -420,8 +420,9 @@ class SubmissionsController < ApplicationController
       flash[:error] = t('errors.assignment_submit_fail', 'Assignment failed to submit')
     end
 
+    restriction_enabled           = @domain_root_account.feature_enabled?(:google_docs_domain_restriction)
     restricted_google_docs_domain = @domain_root_account.settings[:google_docs_domain]
-    if restricted_google_docs_domain && !@current_user.gmail.match(%r{@#{restricted_google_docs_domain}$})
+    if restriction_enabled && !@current_user.gmail.match(%r{@#{restricted_google_docs_domain}$})
       flash[:error] = t('errors.invalid_google_docs_domain', 'You cannot submit assignments from this google_docs domain')
     end
 

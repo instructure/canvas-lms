@@ -68,7 +68,11 @@ class GoogleDocsCollaboration < Collaboration
   end
 
   def add_users_to_document(new_users)
-    domain = context.root_account.settings[:google_docs_domain]
+    domain = if context.root_account.feature_enabled?(:google_docs_domain_restriction)
+              context.root_account.settings[:google_docs_domain]
+             else
+               nil
+             end
     if document_id
       google_docs_acl_add(self.document_id, new_users, domain)
     end

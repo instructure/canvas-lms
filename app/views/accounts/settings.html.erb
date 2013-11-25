@@ -154,6 +154,7 @@ TEXT
 
         <% if !@account.site_admin? &&
                @account.root_account? &&
+               @account.feature_enabled?(:google_docs_domain_restriction) &&
                @account.grants_right?(@current_user, :manage_site_settings) %>
           <fieldset id="google-docs-domain">
             <legend><%= t(:google_docs_domain, 'Allowed Google Docs Domain') %></legend>

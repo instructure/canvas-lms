@@ -318,7 +318,9 @@ class AccountsController < ApplicationController
           end
 
           google_docs_domain = params[:account][:settings].try(:delete, :google_docs_domain)
-          if @account.root_account? && !@account.site_admin?
+          if @account.feature_enabled?(:google_docs_domain_restriction) &&
+             @account.root_account? &&
+             !@account.site_admin?
             @account.settings[:google_docs_domain] = google_docs_domain.present? ? google_docs_domain : nil
           end
 

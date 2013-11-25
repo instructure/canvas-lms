@@ -76,7 +76,7 @@ class Feature
 
   # TODO: register built-in features here
   # (plugins may register additional features during application initialization)
-  register({
+  register(
    'draft_state' =>
     {
       display_name: lambda { I18n.t('features.draft_state', 'Draft State') },
@@ -91,8 +91,21 @@ DRAFT
       state: 'hidden',
       root_opt_in: true,
       development: true
+    },
+    'google_docs_domain_restriction' =>
+    {
+      display_name: -> { I18n.t('features.google_docs_domain_restriction', 'Google Docs Domain Restriction') },
+      description: -> { I18n.t('google_docs_domain_restriction_description', <<END) },
+Google Docs Domain Restriction allows Google Docs submissions and collaborations
+to be restricted to a single domain. Students attempting to submit assignments or
+join collaborations on an unapproved domain will receive an error message notifying them
+that they will need to update their Google Docs integration.
+END
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true
     }
-  })
+  )
 
   def self.definitions
     @features ||= {}

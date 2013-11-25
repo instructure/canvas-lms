@@ -195,7 +195,8 @@
     </style>
     <% if show_google_docs %>
       <% if @google_docs_token %>
-        <% if @domain_root_account.settings[:google_docs_domain] &&
+        <% if @domain_root_account.feature_enabled?(:google_docs_domain_restriction) &&
+              @domain_root_account.settings[:google_docs_domain] &&
              !@current_user.gmail.match(%r{@#{@domain_root_account.settings[:google_docs_domain]}$}) %>
           <div id="submit_google_doc_form">
             <p class="alert alert-error">

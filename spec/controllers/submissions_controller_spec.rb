@@ -178,8 +178,13 @@ describe SubmissionsController do
         @student.stubs(:gmail).returns('student@does-not-match.com')
         @assignment = @course.assignments.create!(title: 'some assignment', submission_types: 'online_upload')
         account = Account.default
+        flag    = FeatureFlag.new
         account.settings[:google_docs_domain] = 'example.com'
         account.save!
+        flag.context = account
+        flag.feature = 'google_docs_domain_restriction'
+        flag.state = 'on'
+        flag.save!
       end
 
       it "should not save if domain restriction prevents it" do
