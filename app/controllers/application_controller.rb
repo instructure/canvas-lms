@@ -843,7 +843,7 @@ class ApplicationController < ActionController::Base
       status_code = interpret_status(response_code)
       status = status_code
       status = 'AUT' if exception.is_a?(ActionController::InvalidAuthenticityToken)
-      type = 'default'
+      type = nil
       type = '404' if status == '404 Not Found'
 
       unless exception.respond_to?(:skip_error_report?) && exception.skip_error_report?
