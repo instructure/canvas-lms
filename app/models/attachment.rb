@@ -369,7 +369,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def scribd_user
-    self.scribd_doc.try(:owner) || "canvas-#{Rails.env}"
+    self.scribd_doc.try(:owner) || (Rails.env.production? ? "canvas-#{context.global_asset_string}" : "canvas-#{Rails.env}")
   end
 
   # This method retrieves a URL to the thumbnail of a document, in a given size, and for any page in that document. Note that docs.getSettings and docs.getList also retrieve thumbnail URLs in default size - this method is really for resizing those. IMPORTANT - it is possible that at some time in the future, Scribd will redesign its image system, invalidating these URLs. So if you cache them, please have an update strategy in place so that you can update them if necessary.
