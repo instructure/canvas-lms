@@ -23,7 +23,7 @@ class ContextModule < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   has_many :context_module_progressions, :dependent => :destroy
   has_many :content_tags, :dependent => :destroy, :order => 'content_tags.position, content_tags.title'
-  acts_as_list :scope => 'context_modules.context_type = #{connection.quote(context_type)} AND context_modules.context_id = #{context_id} AND context_modules.workflow_state <> \'deleted\''
+  acts_as_list scope: { context: self, workflow_state: ['active', 'unpublished'] }
   
   serialize :prerequisites
   serialize :completion_requirements

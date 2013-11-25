@@ -21,243 +21,276 @@ module ActiveRecord
       #   end
       #
       #   todo_list.first.move_to_bottom
-      #   todo_list.last.move_higher
+      #   todo_list.last.insert_at(2)
       module ClassMethods
         # Configuration options are:
         #
         # * +column+ - specifies the column name to use for keeping the position integer (default: +position+)
-        # * +scope+ - restricts what is to be considered a list. Given a symbol, it'll attach <tt>_id</tt> 
-        #   (if it hasn't already been added) and use that as the foreign key restriction. It's also possible 
-        #   to give it an entire string that is interpolated if you need a tighter scope than just a foreign key.
-        #   Example: <tt>acts_as_list :scope => 'todo_list_id = #{todo_list_id} AND completed = 0'</tt>
+        # * +scope+ - restricts what is to be considered a list. Acceptable values are symbols, array of symbols,
+        #   or a hash of symbols to values. Pass self as the value to mean it must match the current record.
+        #   symbols that match associations are expanded to match the foreign key (polymorphic associations
+        #   are supported)
         def acts_as_list(options = {})
-          configuration = { :column => "position", :scope => "1 = 1" }
+          configuration = { :column => "position" }
           configuration.update(options) if options.is_a?(Hash)
 
-          configuration[:scope] = "#{configuration[:scope]}_id".intern if configuration[:scope].is_a?(Symbol) && configuration[:scope].to_s !~ /_id$/
-
-          if configuration[:scope].is_a?(Symbol)
-            scope_condition_method = %(
-              def scope_condition
-                if #{configuration[:scope].to_s}.nil?
-                  "#{configuration[:scope].to_s} IS NULL"
-                else
-                  "#{configuration[:scope].to_s} = \#{#{configuration[:scope].to_s}}"
-                end
-              end
-              def in_scope?
-                 !#{configuration[:scope].to_s}.nil?
-              end
-            )
-          else
-            scope_condition_method = "def scope_condition() \"#{configuration[:scope]}\" end; def in_scope?; true; end"
-          end
-
-          class_eval <<-EOV
-            include ActiveRecord::Acts::List::InstanceMethods
-
-            def acts_as_list_class
-              ::#{self.name}
+          if !configuration[:scope]
+            scope_condition_method = <<-RUBY
+            def scope_condition
+              nil
             end
 
-            def position_column
+            def in_scope?
+              true
+            end
+
+            def list_scope_base
+              self.class.scoped
+            end
+            RUBY
+          else
+            scope = configuration[:scope]
+            # translate symbols and arrays to hash format
+            scope = case scope
+                    when Symbol
+                      { scope => self }
+                    when Array
+                      Hash[scope.map { |symbol| [symbol, self]}]
+                    when Hash
+                      scope
+                    else
+                      raise InvalidArgument.new("scope must be nil, a symbol, an array, or a hash")
+                    end
+            # expand assocations to their foreign keys
+            new_scope = {}
+            scope.each do |k, v|
+              if reflection = reflections[k]
+                new_scope[reflection.primary_key_name] = v
+                if reflection.options[:polymorphic]
+                  new_scope[reflection.options[:foreign_type]] = v
+                end
+              else
+                new_scope[k] = v
+              end
+            end
+            scope = new_scope
+
+            # build the conditions hash, using literal values or the attribute if it's self
+            conditions = Hash[scope.map { |k, v| [k, v == self ? k : v.inspect]}]
+            conditions = conditions.map { |c, v| "#{c}: #{v}" }.join(', ')
+            # build the in_scope method, matching literals or requiring a foreign keys
+            # to be non-nil
+            in_scope_conditions = []
+            variable_conditions, constant_conditions = scope.partition { |k, v| v == self }
+            in_scope_conditions.concat(variable_conditions.map { |c, v| "!#{c}.nil?" })
+            in_scope_conditions.concat(constant_conditions.map do |c, v|
+              if v.is_a?(Array)
+                "#{v.inspect}.include?(#{c})"
+              else
+                "#{c} == #{v.inspect}"
+              end
+            end)
+
+            scope_condition_method = <<-RUBY
+              def scope_condition
+                { #{conditions} }
+              end
+
+              def in_scope?
+                #{in_scope_conditions.join(' && ')}
+              end
+
+              def list_scope_base
+                self.class.where(scope_condition)
+              end
+            RUBY
+          end
+
+          class_eval <<-RUBY
+            include ActiveRecord::Acts::List::InstanceMethods
+
+            def self.position_column
               '#{configuration[:column]}'
             end
 
             #{scope_condition_method}
 
+            def list_scope
+              list_scope_base.order(self.class.nulls(:last, self.class.position_column), self.class.primary_key)
+            end
+
             before_destroy :remove_from_list
             before_create  :add_to_list_bottom
-          EOV
+          RUBY
+
+          if position_column != 'position'
+            class_eval do
+              alias_method :position, self.class.position_column.to_sym
+            end
+          end
         end
       end
 
       # All the methods available to a record that has had <tt>acts_as_list</tt> specified. Each method works
-      # by assuming the object to be the item in the list, so <tt>chapter.move_lower</tt> would move that chapter
-      # lower in the list of all chapters. Likewise, <tt>chapter.first?</tt> would return +true+ if that chapter is
-      # the first in the list of all chapters.
+      # by assuming the object to be the item in the list, so <tt>chapter.first?</tt> would return +true+ if
+      # that chapter is the first in the list of all chapters.
       module InstanceMethods
-        # Insert the item at the given position (defaults to the top position of 1).
-        def insert_at(position = 1)
+        # Test if this record is in a list
+        def in_list?
+          !position.nil? && in_scope?
+        end
+
+        # Insert the item at the given position (defaults to the top position).
+        def insert_at(position = :top)
           return unless in_scope?
-          insert_at_position(position)
-        end
-
-        # Swap positions with the next lower item, if one exists.
-        def move_lower
-          return unless lower_item
-
-          acts_as_list_class.transaction do
-            lower_item.decrement_position
-            increment_position
-          end
-        end
-
-        # Swap positions with the next higher item, if one exists.
-        def move_higher
-          return unless higher_item
-
-          acts_as_list_class.transaction do
-            higher_item.increment_position
-            decrement_position
+          return move_to_top if position == :top
+          current_position = self.position
+          return if in_list? && position == current_position
+          transaction do
+            if in_list?
+              if position < current_position
+                list_scope.where(self.class.position_column => position..(current_position - 1)).
+                    update_all("#{self.class.position_column} = (#{self.class.position_column} + 1)")
+              else
+                list_scope.where(self.class.position_column => (current_position + 1)..position).
+                    update_all("#{self.class.position_column} = (#{self.class.position_column} - 1)")
+              end
+            else
+              list_scope.where("#{self.class.position_column}>=?", position).
+                  update_all("#{self.class.position_column} = (#{self.class.position_column} + 1)")
+            end
+            self.update_attribute(self.class.position_column, position)
           end
         end
 
         # Move to the bottom of the list. If the item is already in the list, the items below it have their
         # position adjusted accordingly.
         def move_to_bottom
-          return unless in_list?
-          acts_as_list_class.transaction do
-            decrement_positions_on_lower_items
-            assume_bottom_position
+          return unless in_scope?
+          transaction do
+            bottom = bottom_position
+            if in_list?
+              insert_at(bottom)
+            else
+              update_attribute(self.class.position_column, bottom + 1)
+            end
           end
         end
 
         # Move to the top of the list. If the item is already in the list, the items above it have their
         # position adjusted accordingly.
         def move_to_top
-          return unless in_list?
-          acts_as_list_class.transaction do
-            increment_positions_on_higher_items
-            assume_top_position
+          return unless in_scope?
+          transaction do
+            top = top_position
+            insert_at(top)
           end
         end
 
         # Removes the item from the list.
         def remove_from_list
           if in_list?
-            decrement_positions_on_lower_items
-            update_attribute position_column, nil
+            transaction do
+              list_scope.where("#{self.class.position_column}>?", position).
+                  update_all("#{self.class.position_column} = (#{self.class.position_column} - 1)")
+              update_attribute self.class.position_column, nil
+            end
           end
-        end
-
-        # Increase the position of this item without adjusting the rest of the list.
-        def increment_position
-          return unless in_list?
-          update_attribute position_column, self.send(position_column).to_i + 1
-        end
-
-        # Decrease the position of this item without adjusting the rest of the list.
-        def decrement_position
-          return unless in_list?
-          update_attribute position_column, self.send(position_column).to_i - 1
         end
 
         # Return +true+ if this object is the first in the list.
         def first?
           return false unless in_list?
-          self.send(position_column) == 1
+          position == top_position
         end
 
         # Return +true+ if this object is the last in the list.
         def last?
           return false unless in_list?
-          self.send(position_column) == bottom_position_in_list
+          position == bottom_position
         end
 
-        # Return the next higher item in the list.
-        def higher_item
-          return nil unless in_list?
-          list_scope.where("#{position_column}>?", send(position_column)).first
+        # Returns the bottom position number in the list.
+        #   bottom_position    # => 2
+        def bottom_position
+          return nil unless in_scope?
+          list_scope.maximum(self.class.position_column)
         end
 
-        # Return the next lower item in the list.
-        def lower_item
-          return nil unless in_list?
-          list_scope.where(position_column => send(position_column) + 1).first
+        # Returns the bottom item
+        def bottom_item
+          return nil unless in_scope?
+          list_scope.last
         end
 
-        # Test if this record is in a list
-        def in_list?
-          !send(position_column).nil? && in_scope?
+        # Returns the top position number in the list.
+        #   top_position    # => 1
+        def top_position
+          return nil unless in_scope?
+          list_scope.minimum(self.class.position_column)
         end
+
+        # Returns the top item
+        def top_item
+          return nil unless in_scope?
+          list_scope.first
+        end
+
+        # takes the given ids, and moves them to the beginning of the list. all other elements in the list
+        # are moved downwards
+        def update_order(ids)
+          updates = []
+          done_ids = Set.new
+          id_column = connection.quote_column_name(self.class.primary_key)
+          ids.each do |id|
+            id = id.to_i
+            next unless id > 0
+            next if done_ids.include?(id)
+            done_ids << id.to_i
+            updates << "WHEN #{id_column}=#{id} THEN #{done_ids.length}"
+          end
+          return if updates.empty?
+          transaction do
+            done_ids = done_ids.to_a
+            moving_positions = list_scope.where(self.class.primary_key => done_ids).pluck(self.class.position_column.to_sym)
+            moving_positions.each_with_index do |position, index|
+              # the last block is covered by the else in the CASE statement below; it generates
+              # slightly shorter SQL
+              next if index == moving_positions.length - 1
+              updates << "WHEN #{self.class.position_column}<=#{position} THEN #{self.class.position_column}+#{moving_positions.length - index}"
+            end
+            list_scope.where("#{self.class.position_column}<=?", moving_positions.last).
+                update_all("#{self.class.position_column}=CASE #{updates.join(" ")} ELSE position+1 END")
+          end
+        end
+
+        # fix conflicts in the list by reassigning all positions to be contiguous
+        # the new order will preserve the current ordering based on (position, id)
+        def fix_position_conflicts
+          transaction do
+            offset = 1
+            list_scope.select(self.class.primary_key).find_in_batches do |batch|
+              updates = []
+              batch.each_with_index do |obj, index|
+                updates << "WHEN #{obj.id} THEN #{index+offset}"
+              end
+              offset += batch.length
+              list_scope.where(self.class.primary_key => batch).
+                  update_all("#{self.class.position_column}=CASE #{self.class.connection.quote_column_name(self.class.primary_key)} #{updates.join(" ")} END")
+            end
+          end
+        end
+        # reassign positions to be contiguous, and begin at 1
+        alias_method :compact_list, :fix_position_conflicts
 
         private
-          def add_to_list_top
-            return unless in_scope?
-            increment_positions_on_all_items
-          end
-
+          # before_create callback
           def add_to_list_bottom
             return unless in_scope?
             return if in_list?
-            self[position_column] = bottom_position_in_list.to_i + 1
+            self[self.class.position_column] = bottom_position.to_i + 1
           end
-
-          # Overwrite this method to define the scope of the list changes
-          def scope_condition() "1" end
-
-          # Returns the bottom position number in the list.
-          #   bottom_position_in_list    # => 2
-          def bottom_position_in_list(except = nil)
-            item = bottom_item(except)
-            item ? item.send(position_column) : 0
-          end
-
-          # Returns the bottom item
-          def bottom_item(except = nil)
-            scope = list_scope
-            scope = scope.where("#{self.class.primary_key}<>?", except) if except
-            scope.order(position_column).last
-          end
-
-          # Forces item to assume the bottom position in the list.
-          def assume_bottom_position
-            update_attribute(position_column, bottom_position_in_list(self).to_i + 1)
-          end
-
-          # Forces item to assume the top position in the list.
-          def assume_top_position
-            update_attribute(position_column, 1)
-          end
-
-          def list_scope
-            acts_as_list_class.where(scope_condition)
-          end
-
-          # This has the effect of moving all the higher items up one.
-          def decrement_positions_on_higher_items(position)
-            list_scope.where("#{position_column}<=?", position).update_all(
-              "#{position_column} = (#{position_column} - 1)"
-            )
-          end
-
-          # This has the effect of moving all the lower items up one.
-          def decrement_positions_on_lower_items
-            return unless in_list?
-            list_scope.where("#{position_column}>?", send(position_column)).update_all(
-              "#{position_column} = (#{position_column} - 1)"
-            )
-          end
-
-          # This has the effect of moving all the higher items down one.
-          def increment_positions_on_higher_items
-            return unless in_list?
-            list_scope.where("#{position_column}<?", send(position_column)).update_all(
-              "#{position_column} = (#{position_column} + 1)"
-            )
-          end
-
-          # This has the effect of moving all the lower items down one.
-          def increment_positions_on_lower_items(position)
-            list_scope.where("#{position_column}>=?", position).update_all(
-              "#{position_column} = (#{position_column} + 1)"
-           )
-          end
-
-          # Increments position (<tt>position_column</tt>) of all items in the list.
-          def increment_positions_on_all_items
-            list_scope.update_all(
-              "#{position_column} = (#{position_column} + 1)"
-            )
-          end
-
-          def insert_at_position(position)
-            remove_from_list
-            increment_positions_on_lower_items(position)
-            self.update_attribute(position_column, position)
-          end
-      end 
+      end
     end
   end
 end

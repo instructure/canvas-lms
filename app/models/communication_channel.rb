@@ -39,7 +39,7 @@ class CommunicationChannel < ActiveRecord::Base
   validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
   validates_presence_of :access_token_id, if: lambda { |cc| cc.path_type == TYPE_PUSH }
 
-  acts_as_list :scope => :user_id
+  acts_as_list :scope => :user
 
   has_a_broadcast_policy
 

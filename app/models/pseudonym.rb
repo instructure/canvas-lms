@@ -67,7 +67,7 @@ class Pseudonym < ActiveRecord::Base
     password_changed? || (send(crypted_password_field).blank? && sis_ssha.blank?) || @require_password
   end
 
-  acts_as_list :scope => :user_id
+  acts_as_list :scope => :user
 
   set_broadcast_policy do |p|
     p.dispatch :confirm_registration

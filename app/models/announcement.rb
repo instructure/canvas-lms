@@ -31,9 +31,7 @@ class Announcement < DiscussionTopic
   validates_presence_of :context_type
   validates_presence_of :message
 
-  acts_as_list scope: %q{context_id = '#{context_id}' AND
-                         context_type = '#{context_type}' AND
-                         type = 'Announcement'}
+  acts_as_list scope: { context: self, type: 'Announcement' }
 
   def validate_draft_state_change
     old_draft_state, new_draft_state = self.changes['workflow_state']

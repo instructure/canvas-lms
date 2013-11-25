@@ -345,7 +345,8 @@ describe "Module Items API", :type => :integration do
         tag.position.should == 3
 
         tags.each{|t| t.reload}
-        tags.map(&:position).should == [1, 2, 4, 5]
+        # 2 is deleted; 3 is the new one, that displaced the others to 4-6
+        tags.map(&:position).should == [1, 4, 5, 6]
       end
 
       it "should set completion requirement" do

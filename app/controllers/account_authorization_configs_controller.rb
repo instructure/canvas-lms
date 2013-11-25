@@ -320,7 +320,7 @@ class AccountAuthorizationConfigsController < ApplicationController
       account_config = @account.account_authorization_configs.create!(data)
 
       if position.present?
-        account_config.insert_at(position)
+        account_config.insert_at(position.to_i)
         account_config.save!
       end
 
@@ -356,7 +356,7 @@ class AccountAuthorizationConfigsController < ApplicationController
     aac.update_attributes(data)
 
     if position.present?
-      aac.insert_at(position)
+      aac.insert_at(position.to_i)
       aac.save!
     end
 

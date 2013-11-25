@@ -25,14 +25,15 @@ describe "acts_as_list" do
       a2 = attachment_model
       a3 = attachment_model
       a4 = attachment_model
-      Attachment.expects(:update_all).with("position=CASE WHEN id=#{a2.id} THEN 1 WHEN id=#{a3.id} THEN 2 WHEN id=#{a1.id} THEN 3 WHEN id=#{a4.id} THEN 4 ELSE 0 END", anything)
-      Attachment.expects(:update_all).with("position=CASE WHEN id=#{a3.id} THEN 1 WHEN id=#{a1.id} THEN 2 WHEN id=#{a2.id} THEN 3 WHEN id=#{a4.id} THEN 4 ELSE 0 END", anything)
+      list = a1.list_scope
       a1.update_order([a2.id, a3.id, a1.id])
+      list.pluck(:id).should == [a2.id, a3.id, a1.id, a4.id]
       a1.update_order(["SELECT now()", a3.id, "evil stuff"])
+      list.pluck(:id).should == [a3.id, a2.id, a1.id, a4.id]
     end
   end
 
-  describe "#insert_at_position" do
+  describe "#insert_at" do
     before :each do
       course
       @module_1 = @course.context_modules.create!(:name => "another module")
@@ -45,33 +46,19 @@ describe "acts_as_list" do
     it "should insert in the position correctly" do
       @modules.map(&:position).should == [1, 2, 3]
 
-      @module_1.insert_at_position(3).should == true
+      @module_1.insert_at(3).should == true
       @modules.each{|m| m.reload}
       @modules.map(&:position).should == [3, 1, 2]
 
-      @module_2.insert_at_position(2).should == true
+      @module_2.insert_at(2).should == true
       @modules.each{|m| m.reload}
       @modules.map(&:position).should == [3, 2, 1]
 
-      @module_3.insert_at_position(3).should == true
+      @module_3.insert_at(3).should == true
       @modules.each{|m| m.reload}
       @modules.map(&:position).should == [2, 1, 3]
 
-      @module_1.insert_at_position(1).should == true
-      @modules.each{|m| m.reload}
-      @modules.map(&:position).should == [1, 2, 3]
-    end
-
-    it "should handle positions outside range" do
-      @module_2.insert_at_position(-10).should == false # do nothing
-      @modules.each{|m| m.reload}
-      @modules.map(&:position).should == [1, 2, 3]
-
-      @module_3.insert_at_position(0).should == false # do nothing
-      @modules.each{|m| m.reload}
-      @modules.map(&:position).should == [1, 2, 3]
-
-      @module_1.insert_at_position(4).should == false # do nothing
+      @module_1.insert_at(1).should == true
       @modules.each{|m| m.reload}
       @modules.map(&:position).should == [1, 2, 3]
     end
@@ -81,8 +68,7 @@ describe "acts_as_list" do
     it "should order null positions last" do
       course
       module_1 = @course.context_modules.create :name => 'one'
-      module_1.position = nil
-      module_1.save!
+      ContextModule.where(id: module_1).update_all(position: nil)
       module_2 = @course.context_modules.create :name => 'two'
       module_2.position = 1
       module_2.save!
@@ -102,7 +88,7 @@ describe "acts_as_list" do
       @course.context_modules.map{|m| [m.id, m.position]}.should eql [[module_1.id, 1], [module_2.id, 2]]
     end
 
-    it "should leave gaps alone" do
+    it "should consolidate gaps" do
       course
       module_1 = @course.context_modules.create :name => 'one'
       module_1.position = 1
@@ -111,7 +97,7 @@ describe "acts_as_list" do
       module_2.position = 3
       module_2.save!
       module_1.fix_position_conflicts
-      @course.context_modules.map{|m| [m.id, m.position]}.should eql [[module_1.id, 1], [module_2.id, 3]]
+      @course.context_modules.map{|m| [m.id, m.position]}.should eql [[module_1.id, 1], [module_2.id, 2]]
     end
   end
 end

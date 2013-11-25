@@ -124,7 +124,7 @@ class Assignment < ActiveRecord::Base
   validates_length_of :allowed_extensions, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
 
-  acts_as_list :scope => :assignment_group_id
+  acts_as_list :scope => :assignment_group
   simply_versioned :keep => 5
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links( :description) { [self.context, nil] }
