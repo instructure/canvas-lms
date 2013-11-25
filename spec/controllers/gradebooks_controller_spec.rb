@@ -197,6 +197,23 @@ describe GradebooksController do
       assigns[:js_env][:assignment_groups].first[:assignments].first["discussion_topic"].should be_nil
     end
 
+    it "doesn't leak muted scores" do
+      course_with_student_logged_in
+      a1, a2 = 2.times.map { |i|
+        @course.assignments.create! name: "blah#{i}", points_possible: 10
+      }
+      a1.mute!
+      a1.grade_student(@student, grade: 10)
+      a2.grade_student(@student, grade: 5)
+      get 'grade_summary', course_id: @course.id, id: @student.id
+      assigns[:js_env][:submissions].sort_by { |s|
+        s[:assignment_id]
+      }.should == [
+        {score: nil, assignment_id: a1.id},
+        {score: 5, assignment_id: a2.id}
+      ]
+    end
+
     it "should sort assignments by due date (null last), then title" do
       course_with_teacher_logged_in(:active_all => true)
       student_in_course(:active_all => true)
