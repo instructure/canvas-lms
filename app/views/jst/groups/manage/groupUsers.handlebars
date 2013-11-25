@@ -2,11 +2,11 @@
   <ul class="collectionViewItems unstyled"></ul>
   <div class="paginatedLoadingIndicator"></div>
 {{else}}
-  <p>
+  <div class="no-results">
     {{#ifEqual ENV.group_user_type "student"}}
-      {{#t "no_students"}}No students{{/t}}
+      {{#t "no_students"}}There are currently no students in this group. Add a student to get started.{{/t}}
     {{else}}
-      {{#t "no_users"}}No users{{/t}}
+      {{#t "no_users"}}There are currently no users in this group. Add a user to get started.{{/t}}
     {{/ifEqual}}
-  </p>
+  </div>
 {{/ifAny}}

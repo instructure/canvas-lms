@@ -54,9 +54,7 @@
   }
 
   &.droppable-hover {
-    > * {
-      opacity: 0.5;
-    }
+    background-color: $droppableBackground;
   }
 
   .show-group-full { display: none; }
@@ -69,3 +67,16 @@
   padding: 0.7em 1em;
 }
 
+.no-results {
+  background: #fff;
+  border: {
+    color: #c1c7cf;
+    radius: 3px;
+    style: dashed;
+    width: 1px;
+  }
+  color: #878d92;
+  margin: 5px;
+  padding: 8px;
+  text-align: center;
+}

@@ -9,6 +9,7 @@
   cursor: pointer;
   &.ui-draggable-dragging {
     cursor: move;
+    z-index: 9999;
   }
   &.group-user-highlight {
     animation: highlight-shadow-fade ease-in 1s;

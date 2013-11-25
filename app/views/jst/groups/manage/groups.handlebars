@@ -2,10 +2,10 @@
   <ul class="collectionViewItems unstyled groups-list"></ul>
   <div class="paginatedLoadingIndicator"></div>
 {{else}}
-  <p>
-    {{#t "no_groups"}}No groups.{{/t}}
-  </p>
+  <div class="no-results">
+    {{#t "no_groups"}}There are currently no groups in this group set. Add a group to get started.{{/t}}
+  </div>
 {{/ifAny}}
-<p class="no-results hidden">
-  {{#t "no_matching_groups"}}No matching groups.{{/t}}
-</p>
+<div class="no-results hidden">
+  {{#t "no_matching_groups"}}There are no groups that match your current search term.{{/t}}
+</div>

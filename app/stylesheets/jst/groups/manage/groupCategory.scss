@@ -60,6 +60,8 @@
 }
 
 .group-heading {
+  padding: 10px 8px;
+  line-height: 1.5;
   font-weight: bold;
   font-size: 1.1em;
   color: #555;
@@ -72,10 +74,10 @@ a.group-heading:hover {
 }
 
 .unassigned-students {
-  padding-left: 8px;
+  ul {
+    padding: 0 8px;
+  }
   &.droppable-hover {
-    > * {
-      opacity: 0.5;
-    }
+    background-color: $droppableBackground;
   }
 }
