@@ -410,6 +410,14 @@ class AccountsController < ApplicationController
       return render_unauthorized_action
     end
 
+    authentication_logging = @account.grants_rights?(@current_user, :view_statistics, :manage_user_logins).values.any?
+    if authentication_logging
+      logging = {
+        authentication: authentication_logging
+      }
+    end
+    logging ||= false
+
     js_env :ACCOUNT_ID => @account.id
     js_env :PERMISSIONS => {
        restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
@@ -418,7 +426,7 @@ class AccountsController < ApplicationController
        view_messages: (@account.settings[:admins_can_view_notifications] &&
                        @account.grants_right?(@current_user, session, :view_notifications)) ||
                       Account.site_admin.grants_right?(@current_user, :read_messages),
-       auth_logging: @account.grants_rights?(@current_user, :view_statistics, :manage_user_logins).values.any?,
+       logging: logging
       }
   end
 
