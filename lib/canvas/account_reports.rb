@@ -46,7 +46,7 @@ module Canvas::AccountReports
       REPORTS[account_report.report_type][:proc].call(account_report)
     rescue => e
       account_report.logger.error e
-      @er = ErrorReport.log_exception(:default, e, :user => account_report.user)
+      @er = ErrorReport.log_exception(nil, e, :user => account_report.user)
       self.message_recipient(account_report, "Generating the report, #{account_report.report_type.to_s.titleize}, failed.  Please report the following error code to your system administrator: ErrorReport:#{@er.id}")
     end
   end
