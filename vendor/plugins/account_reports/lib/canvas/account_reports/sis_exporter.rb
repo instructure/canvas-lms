@@ -281,9 +281,11 @@ module Canvas::AccountReports
                                      OR
                                      (course_sections.sis_source_id IS NOT NULL
                                       AND (nxc.sis_source_id IS NOT NULL
-                                      OR rc.sis_source_id IS NOT NULL))")
+                                           OR rc.sis_source_id IS NOT NULL))")
         else
-          sections = sections.where("course_sections.workflow_state<>'deleted'")
+          sections = sections.where("course_sections.workflow_state<>'deleted'
+                                     AND (nxc.workflow_state<>'deleted'
+                                          OR rc.workflow_state<>'deleted')")
         end
 
         if @sis_format

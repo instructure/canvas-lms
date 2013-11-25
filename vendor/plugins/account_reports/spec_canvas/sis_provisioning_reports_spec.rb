@@ -564,18 +564,17 @@ describe "Default Account Reports" do
                              "active",nil,@course2.conclude_at.iso8601]
       end
 
-      it "should run the sis export report" do
+      it "should not include sections from deleted courses" do
+        @course2.destroy
         parameters = {}
         parameters["sections"] = true
         parsed = read_report("sis_export_csv",{params: parameters})
 
-        parsed.length.should == 3
+        parsed.length.should == 2
         parsed[0].should ==[@section1.sis_source_id,@course1.sis_source_id,@section1.name,"active",
                             @course1.start_at.iso8601,@course1.conclude_at.iso8601]
         parsed[1].should == [@section2.sis_source_id,@course1.sis_source_id,@section2.name,"active",
                              nil,@course1.conclude_at.iso8601]
-        parsed[2].should == ["english_section_3","SIS_COURSE_ID_2","Math_01","active",nil,
-                             @course2.conclude_at.iso8601]
       end
 
       it "should run the provisioning report" do
