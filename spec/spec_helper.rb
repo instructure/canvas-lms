@@ -16,7 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+<<<<<<< HEAD
 
+=======
+begin; require File.expand_path(File.dirname(__FILE__) + "/../parallelized_specs/lib/parallelized_specs.rb"); rescue LoadError; end
+>>>>>>> spec: parallelized_specs rspect handling
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
   require 'simplecov'
