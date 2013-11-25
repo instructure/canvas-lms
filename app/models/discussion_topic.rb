@@ -114,6 +114,11 @@ class DiscussionTopic < ActiveRecord::Base
   def schedule_delayed_transitions
     self.send_at(self.delayed_post_at, :update_based_on_date) if @should_schedule_delayed_post
     self.send_at(self.lock_at, :update_based_on_date) if @should_schedule_lock_at
+    # need to clear these in case we do a save whilst saving (e.g.
+    # Announcement#respect_context_lock_rules), so as to avoid the dreaded
+    # double delayed job ಠ_ಠ
+    @should_schedule_delayed_post = nil
+    @should_schedule_lock_at = nil
   end
 
   def update_subtopics
@@ -419,8 +424,11 @@ class DiscussionTopic < ActiveRecord::Base
   # There may be delayed jobs that expect to call this to update the topic, so be sure to alias
   # the old method name if you change it
   def update_based_on_date
-    lock if should_lock_yet
-    delayed_post unless should_not_post_yet
+    transaction do
+      reload lock: true # would call lock!, except, oops, workflow overwrote it :P
+      lock if should_lock_yet
+      delayed_post unless should_not_post_yet
+    end
   end
   alias_method :try_posting_delayed, :update_based_on_date
   alias_method :auto_update_workflow, :update_based_on_date
