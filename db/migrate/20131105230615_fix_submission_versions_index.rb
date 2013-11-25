@@ -16,7 +16,7 @@ class FixSubmissionVersionsIndex < ActiveRecord::Migration
                 :unique => true,
                 :algorithm => :concurrently
       connection.execute("DROP INDEX IF EXISTS index_submission_versions")
-      connection.execute("ALTER INDEX index_submission_versions2 RENAME TO index_submission_versions")
+      rename_index :submission_versions, 'index_submissions_version2', 'index_submission_versions'
     end
   end
 end
