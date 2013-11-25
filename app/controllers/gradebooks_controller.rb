@@ -57,7 +57,10 @@ class GradebooksController < ApplicationController
           end
 
           submissions_json = @presenter.submissions.map { |s|
-            { assignment_id: s.assignment_id, score: s.score }
+            {
+              assignment_id: s.assignment_id,
+              score: s.grants_right?(@current_user, :read_grade)? s.score  : nil
+            }
           }
           ags_json = light_weight_ags_json(@presenter.groups)
           js_env submissions: submissions_json,
