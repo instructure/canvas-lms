@@ -27,7 +27,37 @@ define [
   do ($) ->
     $.widget "custom.timeoutTooltip", $.ui.tooltip,
       _open: ( event, target, content ) ->
-        setTimeout @_superApply.bind(this, arguments), 20
+        # if you move very fast, it's possible that
+        # @timeout will be defined
+        return if @timeout
+        apply = @_superApply.bind(@, arguments)
+        @timeout = setTimeout (=>
+          # make sure close will be called
+          delete @timeout
+          # remove extra handlers we added, super will add them back
+          @_off(target, "mouseleave focusout keyup")
+          apply.call(@)
+        ), 20
+        # this is from the jquery ui tooltip _open
+        # we need to bind events to trigger close so that the
+        # timeout is cleared when we mouseout / or leave focus
+        @_on( target, {
+          mouseleave: "close"
+          focusout: "close"
+          keyup: ( event ) ->
+            if ( event.keyCode == $.ui.keyCode.ESCAPE )
+              fakeEvent = $.Event(event)
+              fakeEvent.currentTarget = target[0]
+              this.close( fakeEvent, true )
+          }
+        )
+
+      close: (event) ->
+        if @timeout
+          clearTimeout(@timeout)
+          delete @timeout
+          return
+        @_superApply(arguments)
 
   # you can provide a 'using' option to jqueryUI position (which gets called by jqueryui Tooltip to
   # position it on the screen), it will be passed the position cordinates and a feedback object which,
