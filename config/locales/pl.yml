@@ -3450,7 +3450,7 @@ pl:
       buttons: 
         add_module: "Dodaj moduł"
         add_prerequisite: "Dodaj warunek"
-      criterion_for_assignment: "Do zadania %{assignment} użytkownicy %{select_criterion}"
+      criterion_for_assignment: "Do zadania %{assignment} użytkownicy powinni %{select_criterion}"
       headings: 
         add_prerequisite: "Dodaj warunek do %{name}"
         course_modules: "Moduły kursowe"
@@ -3607,7 +3607,7 @@ pl:
       manager_module: "Zarządzaj modułem"
       module_will_unlock_at: "zostanie odblokowany *%{unlock_date}*"
       progression_complete_count: "*Zakończono %{count}*"
-      progression_started_count: "*Ukończono %{count}*"
+      progression_started_count: "*%{count}* w toku"
       reorder_modules: "Przeciągnij, aby zmienić kolejność modułów"
     context_modules: 
       publish: Publikuj
@@ -3935,7 +3935,7 @@ pl:
         new_message: "Nowa wiadomość"
       inbox_actions: 
         add_people: "Dodaj ludzi"
-      individual_message_explanation: "Dzięki tej opcji poszczególna wiadomość zostanie wysłana do każdego z odbiorców"
+      individual_message_explanation: "Dzięki tej opcji do każdego z odbiorców zostanie wysłana osobna wiadomość"
       labels: 
         add_to_faculty_journal: "Dodaj jako wpis do dziennika wydziałowego"
         attachments: Załączniki
@@ -3949,7 +3949,7 @@ pl:
       no_course: "Brak kursu"
       no_subject: "Brak tematu"
       search_names_groups_courses: "Wyszukaj nazwy, grupy i kursy"
-      send_individual_messages: "Wyślij poszczególne wiadomości"
+      send_individual_messages: "Wyślij osobne wiadomości"
       titles: 
         media_comment: "Nagrany komentarz multimedialny"
         record_media_comment: "Nagraj komentarz audio lub wideo"
@@ -13871,7 +13871,7 @@ pl:
     wiki_page_revision: 
       latest_revision: "Ostatnia powtórka"
       restore_revision: "Przywróć tę powtórkę"
-      revision_summary: "Ostatnia aktualizacja*%{updated_at}* dokonana przez użytkownika %{edited_by}"
+      revision_summary: "Aktualizacja*%{updated_at}* dokonana przez użytkownika %{edited_by}"
       same_as_latest: "Tak samo jak *Ostatnie*"
     wiki_page_revisions: 
       revision_history: "Historia powtórek"
@@ -13951,7 +13951,7 @@ pl:
     front_page: "Pierwsza strona"
     notices: 
       cannot_edit: "Brak uprawnień, aby edytować stronę zatytułowaną \"%{title}\"."
-      cannot_read_revisions: "Brak uprawnień, aby przeglądać powtórki w historii dla tytułu\"%{title}\"."
+      cannot_read_revisions: "Brak uprawnień, aby przeglądać historię korekt dla tytułu\"%{title}\"."
       create_non_existent_page: "Strona zatytułowana \"%{title}\" nie istnieje, ale można ją utworzyć poniżej"
       page_deleted: "Strona zatytułowana \"%{title}\" została usunięta."
       page_does_not_exist: "Strona zatytułowana \"%{title}\" nie istnieje."
