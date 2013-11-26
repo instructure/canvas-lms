@@ -319,7 +319,6 @@ routes.draw do
     resources :quizzes do
       match 'managed_quiz_data' => 'quizzes#managed_quiz_data', :as => :managed_quiz_data
       match 'submission_versions' => 'quizzes#submission_versions', :as => :submission_versions
-      match 'reorder' => 'quizzes#reorder', :as => :reorder
       match 'history' => 'quizzes#history', :as => :history
       match 'statistics' => 'quizzes#statistics', :as => :statistics
       match 'read_only' => 'quizzes#read_only', :as => :read_only
@@ -1302,7 +1301,8 @@ routes.draw do
       post "courses/:course_id/quizzes", :action => :create, :path_name => 'course_quiz_create'
       get "courses/:course_id/quizzes/:id", :action => :show, :path_name => 'course_quiz'
       put "courses/:course_id/quizzes/:id", :action => :update, :path_name => 'course_quiz_update'
-      delete "courses/:course_id/quizzes/:id", action: :destroy, path_name: 'course_quiz_destroy'
+      delete "courses/:course_id/quizzes/:id", :action => :destroy, :path_name => 'course_quiz_destroy'
+      post "courses/:course_id/quizzes/:id/reorder", :action => :reorder, :path_name => 'course_quiz_reorder'
     end
 
     scope(:controller => :quiz_groups) do

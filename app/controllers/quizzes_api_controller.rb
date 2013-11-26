@@ -138,7 +138,7 @@ class QuizzesApiController < ApplicationController
   include Api::V1::Quiz
 
   before_filter :require_context
-  before_filter :require_quiz, :only => [:show, :update, :destroy]
+  before_filter :require_quiz, :only => [:show, :update, :destroy, :reorder]
 
   @@errors = {
     :quiz_not_found => "Quiz not found"
@@ -324,6 +324,26 @@ class QuizzesApiController < ApplicationController
     if authorized_action(@quiz, @current_user, :delete)
       @quiz.destroy
       render json: quiz_json(@quiz, @context, @current_user, session)
+    end
+  end
+
+  # @API Reorder quiz items
+  # @beta
+  #
+  # Change order of the quiz questions or groups within the quiz
+  #
+  # @argument order[][id] [Required, Integer]
+  #   The associated item's unique identifier
+  #
+  # @argument order[][type] ["question"|"group"]
+  #   The type of item is either 'question' or 'group'
+  #
+  # <b>204 No Content<b> response code is returned if the reorder was successful.
+  def reorder
+    if authorized_action(@quiz, @current_user, :update)
+      QuizSortables.new(:quiz => @quiz, :order => params[:order]).reorder!
+
+      head :no_content
     end
   end
 

@@ -416,4 +416,73 @@ describe QuizzesApiController, :type => :integration do
       end
     end
   end
+
+  describe "POST /courses/:course_id/quizzes/:id/reorder (reorder)" do
+    before do
+      teacher_in_course(:active_all => true)
+      @quiz  = @course.quizzes.create! :title => 'title'
+      @question1 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 1', 'answers' => [{'id' => 1}, {'id' => 2}], :position => 1})
+      @question2 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}], :position => 2})
+      @question3 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 3', 'answers' => [{'id' => 5}, {'id' => 6}], :position => 3})
+    end
+
+    it "should require authorization" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz
+
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reorder",
+                  {:controller=>"quizzes_api", :action => "reorder", :format => "json", :course_id => "#{@course.id}", :id => "#{@quiz.id}"},
+                  {:order => [] },
+                  {'Accept' => 'application/vnd.api+json'})
+
+      # should be authorization error
+      response.code.should == '401'
+    end
+
+    it "should reorder a quiz's questions" do
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reorder",
+                  {:controller=>"quizzes_api", :action => "reorder", :format => "json", :course_id => "#{@course.id}", :id => "#{@quiz.id}"},
+                  {:order => [{"type" => "question", "id" => @question3.id},
+                              {"type" => "question", "id" => @question1.id},
+                              {"type" => "question", "id" => @question2.id}] },
+                  {'Accept' => 'application/vnd.api+json'})
+
+      # should reorder the quiz questions
+      order = @quiz.reload.quiz_questions.active.sort_by{|q| q.position }.map {|q| q.id }
+      order.should == [@question3.id, @question1.id, @question2.id]
+    end
+
+    it "should reorder a quiz's questions and groups" do
+      @group = @quiz.quiz_groups.create :name => 'Test Group'
+
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reorder",
+                  {:controller=>"quizzes_api", :action => "reorder", :format => "json", :course_id => "#{@course.id}", :id => "#{@quiz.id}"},
+                  {:order => [{"type" => "question", "id" => @question3.id},
+                              {"type" => "group",    "id" => @group.id},
+                              {"type" => "question", "id" => @question1.id},
+                              {"type" => "question", "id" => @question2.id}] },
+                  {'Accept' => 'application/vnd.api+json'})
+
+      # should reorder group
+      @question3.reload.position.should == 1
+      @group.reload.position.should     == 2
+      @question1.reload.position.should == 3
+      @question2.reload.position.should == 4
+    end
+
+    it "should pull questions out of a group to the root quiz" do
+      @group = @quiz.quiz_groups.create :name => 'Test Group'
+      @group.quiz_questions = [@question1, @question2]
+
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reorder",
+                  {:controller=>"quizzes_api", :action => "reorder", :format => "json", :course_id => "#{@course.id}", :id => "#{@quiz.id}"},
+                  {:order => [{"type" => "question", "id" => @question3.id},
+                              {"type" => "question", "id" => @question2.id}] },
+                  {'Accept' => 'application/vnd.api+json'})
+
+      # should remove items from the group
+      order = @group.reload.quiz_questions.active.sort_by{|q| q.position }.map {|q| q.id }
+      order.should == [@question1.id]
+    end
+  end
 end
