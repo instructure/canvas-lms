@@ -69,10 +69,9 @@ describe "assignments" do
           :unlock_at => due_date - 1.day
       )
 
-      get "/courses/#{@course.id}/assignments"
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      wait_for_ajaximations
 
-      expect_new_page_load { f("#assignment_#{@assignment.id} .title").click }
-      edit_assignment
       f('#assignment_toggle_advanced_options').click
       f('#assignment_group_id').should be_displayed
       click_option('#assignment_group_id', second_group.name)
@@ -183,9 +182,10 @@ describe "assignments" do
     end
 
     it "should submit a due date successfully" do
+      assignment = @course.assignments.create
+      get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       middle_number = '15'
       expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
-      manually_create_assignment
       f('#assignment_due_date_controls .ui-datepicker-trigger').click
       wait_for_ajaximations
       f('.ui-datepicker-prev').click
@@ -196,10 +196,7 @@ describe "assignments" do
       wait_for_ajaximations
       expect_new_page_load { submit_form('#edit_assignment_form') }
       wait_for_ajaximations
-      expect_new_page_load { f(".edit_assignment_link").click }
-      wait_for_ajaximations
-      f('#assignment_due_date').attribute(:value).should include_text(expected_date)
-      Assignment.find_by_title('new assignment').due_at.strftime('%b %d').should == expected_date
+      assignment.reload.due_at.strftime('%b %d').should == expected_date
     end
 
     it "only allows an assignment editor to edit points and title if assignment " +
@@ -270,115 +267,12 @@ describe "assignments" do
       f('#self_signup_help_dialog').should be_displayed
     end
 
-    it "should remove student group option" do
-      assignment_name = 'first test assignment'
-      due_date = Time.now.utc + 2.days
-      group = @course.assignment_groups.create!(:name => "default")
-      @course.assignments.create!(
-          :name => assignment_name,
-          :due_at => due_date,
-          :assignment_group => group,
-          :unlock_at => due_date - 1.day
-      )
-      @assignment = @course.assignments.last
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      f('#assignment_toggle_advanced_options').click
-      wait_for_ajaximations
-      f('#assignment_has_group_category').click
-      wait_for_ajaximations
-      submit_dialog('#add_category_form')
-      wait_for_ajaximations
-      submit_assignment_form
-      @assignment.reload
-      @assignment.group_category_id.should_not be_nil
-      @assignment.group_category.should_not be_nil
-
-      edit_assignment
-      f('#assignment_has_group_category').click
-      wait_for_ajaximations
-      submit_assignment_form
-      @assignment.reload
-      @assignment.group_category_id.should be_nil
-      @assignment.group_category.should be_nil
-    end
-
-    it "should edit an assignment" do
-      pending('broken')
-      assignment_name = 'first test assignment'
-      due_date = Time.now.utc + 2.days
-      group = @course.assignment_groups.create!(:name => "default")
-      second_group = @course.assignment_groups.create!(:name => "second default")
-      @assignment = @course.assignments.create!(
-          :name => assignment_name,
-          :due_at => due_date,
-          :assignment_group => group,
-          :unlock_at => due_date - 1.day
-      )
-
-      get "/courses/#{@course.id}/assignments"
-
-      expect_new_page_load { f("#assignment_#{@assignment.id} .title").click }
-      edit_assignment
-      f('#assignment_toggle_advanced_options').click
-      f('#assignment_group_id').should be_displayed
-      click_option('#assignment_group_id', second_group.name)
-      click_option('#assignment_grading_type', 'Letter Grade')
-
-      #check grading levels dialog
-      f('.edit_letter_grades_link').click
-      wait_for_ajaximations
-      f('#edit_letter_grades_form').should be_displayed
-      close_visible_dialog
-
-      #check peer reviews option
-      form = f("#edit_assignment_form")
-      form.find_element(:css, '#assignment_peer_reviews').click
-      wait_for_ajaximations
-      form.find_element(:css, '#assignment_automatic_peer_reviews').click
-      wait_for_ajaximations
-      f('#assignment_peer_review_count').send_keys('2')
-      driver.execute_script "$('#assignment_peer_reviews_assign_at + .ui-datepicker-trigger').click()"
-      wait_for_ajaximations
-      datepicker = datepicker_next
-      datepicker.find_element(:css, '.ui-datepicker-ok').click
-      wait_for_ajaximations
-      f('#assignment_name').send_keys(' edit')
-
-      #save changes
-      submit_assignment_form
-      wait_for_ajaximations
-      driver.execute_script("return document.title").should include_text(assignment_name + ' edit')
-    end
-
-    it "should not allow group assignment or peer review for mooc course assignment" do
-      assignment_name = 'mooc test assignment'
-      due_date = Time.now.utc + 2.days
-      @course.update_attribute(:large_roster, true)
-      group = @course.assignment_groups.create!(:name => "default")
-      second_group = @course.assignment_groups.create!(:name => "second default")
-      @assignment = @course.assignments.create!(
-          :name => assignment_name,
-          :due_at => due_date,
-          :assignment_group => group,
-          :unlock_at => due_date - 1.day
-      )
-      get "/courses/#{@course.id}/assignments"
-
-      expect_new_page_load { f("#assignment_#{@assignment.id} .title").click }
-      edit_assignment
-
-      #ensure group assignment and peer reviews options are disabled
-      f('#assignment_toggle_advanced_options').click
-      ff("fieldset#group_category_selector div").should == []
-      ff("fieldset#assignment_peer_reviews_fields div").should == []
-    end
-
     it "should show a more errors errorBox if any invalid fields are hidden" do
       assignment_name = 'first test assignment'
       @assignment = @course.assignments.create({
-                                                   :name => assignment_name,
-                                                   :assignment_group => @course.assignment_groups.create!(:name => "default")
-                                               })
+         :name => assignment_name,
+         :assignment_group => @course.assignment_groups.create!(:name => "default")
+      })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
       f('#assignment_toggle_advanced_options').click # show advanced options
@@ -403,9 +297,9 @@ describe "assignments" do
     it "should validate that a group category is selected" do
       assignment_name = 'first test assignment'
       @assignment = @course.assignments.create({
-                                                   :name => assignment_name,
-                                                   :assignment_group => @course.assignment_groups.create!(:name => "default")
-                                               })
+         :name => assignment_name,
+         :assignment_group => @course.assignment_groups.create!(:name => "default")
+      })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
       f('#assignment_toggle_advanced_options').click # show advanced options

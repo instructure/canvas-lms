@@ -70,3 +70,35 @@ define [
     data = points_possible: 'a'
     errors = view.validateBeforeSave(data, [])
     equal errors['points_possible'][0]['message'], 'Points possible must be a number'
+
+  test 'does not allow group assignment for large rosters', ->
+    ENV.IS_LARGE_ROSTER = true
+    view = editView()
+    equal view.$("#group_category_selector").length, 0
+
+    ENV.IS_LARGE_ROSTER = null
+
+  test 'does not allow peer review for large rosters', ->
+    ENV.IS_LARGE_ROSTER = true
+    view = editView()
+    equal view.$("#assignment_peer_reviews_fields").length, 0
+
+    ENV.IS_LARGE_ROSTER = null
+
+  test 'adds and removes student group', ->
+    ENV.GROUP_CATEGORIES = [{id: 1, name: "fun group"}]
+    ENV.ASSIGNMENT_GROUPS = [{id: 1, name: "assignment group 1"}]
+    view = editView()
+    equal view.assignment.toView()['groupCategoryId'], null
+
+    #adds student group
+    view.$('#assignment_has_group_category').click()
+    view.$('#assignment_group_category_id option:eq(0)').attr("selected", "selected")
+    equal view.getFormData()['group_category_id'], "1"
+
+    #removes student group
+    view.$('#assignment_has_group_category').click()
+    equal view.getFormData()['groupCategoryId'], null
+
+    ENV.GROUP_CATEGORIES = null
+    ENV.ASSIGNMENT_GROUPS = null
