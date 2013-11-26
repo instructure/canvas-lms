@@ -113,23 +113,22 @@ class Account < ActiveRecord::Base
 
   cattr_accessor :account_settings_options
   self.account_settings_options = {}
-  
-  # I figure we're probably going to be adding more account-level
-  # settings in the future (and moving some of the column attributes
-  # to the settings hash), so it makes sense to have a general way
-  # of defining what settings are allowed when.  Somebody please tell
-  # me if I'm overarchitecting...
+
   def self.add_setting(setting, opts=nil)
     self.account_settings_options[setting.to_sym] = opts || {}
     if (opts && opts[:boolean] && opts.has_key?(:default))
       if opts[:default]
+        # if the default is true, we want a nil result to evaluate to true.
+        # this prevents us from having to backfill true values into a
+        # serialized column, which would be expensive.
         self.class_eval "def #{setting}?; settings[:#{setting}] != false; end"
       else
+        # if the default is not true, we can fall back to a straight boolean.
         self.class_eval "def #{setting}?; !!settings[:#{setting}]; end"
       end
     end
   end
-  
+
   # these settings either are or could be easily added to
   # the account settings page
   add_setting :global_includes, :root_only => true, :boolean => true, :default => false
