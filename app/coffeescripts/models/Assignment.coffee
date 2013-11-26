@@ -242,6 +242,13 @@ define [
       models = (groups and groups.models) or []
       result = _.map models, (group) -> group.toJSON()
 
+    singleSectionDueDate: =>
+      if !@multipleDueDates()
+        allDates = @allDates()
+        for section in allDates
+          if section.dueAt
+            return section.dueAt.toISOString()
+
     toView: =>
       fields = [
         'name', 'dueAt','description','pointsPossible', 'lockAt', 'unlockAt',
@@ -256,7 +263,7 @@ define [
         'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
         'gradingStandardId', 'isLetterGraded', 'assignmentGroupId', 'iconType',
         'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position',
-        'multipleDueDates', 'allDates', 'isQuiz'
+        'multipleDueDates', 'allDates', 'isQuiz', 'singleSectionDueDate'
       ]
       hash = id: @get 'id'
       for field in fields

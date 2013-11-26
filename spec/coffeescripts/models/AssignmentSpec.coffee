@@ -385,6 +385,19 @@ define [
     assignment = new Assignment
     deepEqual assignment.allDates(), []
 
+  module "Assignment#singleSectionDueDate"
+
+  test "gets the due date for section instead of null", ->
+    dueAt = new Date("2013-11-27 11:01:00")
+    assignment = new Assignment all_dates: [
+      {due_at: null, title: "Everyone"},
+      {due_at: dueAt, title: "Summer"}
+    ]
+    false_stub = sinon.stub assignment, "multipleDueDates"
+    false_stub.returns false
+    deepEqual assignment.singleSectionDueDate(), dueAt.toISOString()
+    false_stub.restore()
+
   module "Assignment#toView"
 
   test "returns the assignment's name", ->
@@ -511,6 +524,18 @@ define [
     assignment = new Assignment all_dates: [{title: "Summer"}, {title: "Winter"}]
     json = assignment.toView()
     equal json.allDates.length, 2
+
+  test "includes singleSectionDueDate", ->
+    dueAt = new Date("2013-11-27 11:01:00")
+    assignment = new Assignment all_dates: [
+      {due_at: null, title: "Everyone"},
+      {due_at: dueAt, title: "Summer"}
+    ]
+    false_stub = sinon.stub assignment, "multipleDueDates"
+    false_stub.returns false
+    json = assignment.toView()
+    equal json.singleSectionDueDate, dueAt.toISOString()
+    false_stub.restore()
 
   test "includes isQuiz", ->
     assignment = new Assignment("submission_types":["online_quiz"])
