@@ -8,17 +8,18 @@ ja:
     bad_per_slot: "時間スロットごとに少なくとも 1 つの予定を許可する必要があります"
     context_required: カレンダーを選択する必要があります
     select_calendars: カレンダーの選択
-  GroupView: 
-    delete_confirm: このグループを削除してもよろしいですか?
-    flash: 
-      removeError: グループを削除できません。後でもう一度試してください。
-      removed: グループは正常に削除されました。
+  GrouDetailpView: 
     student_count: 
       one: "%{count} 人の受講生"
       other: "%{count} 人の受講生"
     user_count: 
       one: "%{count} 人のユーザ"
       other: "%{count} 人のユーザ"
+  GroupView: 
+    delete_confirm: このグループを削除してもよろしいですか?
+    flash: 
+      removeError: グループを削除できません。後でもう一度試してください。
+      removed: グループは正常に削除されました。
   academic_benchmark: 
     api_error: "受講生を権限 %{auth} に更新できませんでした。"
     bad_ab_file: "提供された Academic Benchmark ファイルにはエラーがあります。"
@@ -318,6 +319,7 @@ ja:
         sis_user_id: "SIS ID"
         sortable_name: 並べ替え可能な名前
       sortable_name_help: 並べ替え後のリストには、この名前が表示されます。
+      unique_id_label: "%{label}:*"
     add_user_button: ユーザの追加
     add_user_dialog_title: 新しいユーザの追加
     adding_course_message: コースを追加しています...
@@ -1446,14 +1448,14 @@ ja:
       no_assignment_groups: 課題グループが見つかりません
     assignment_group_list_item: 
       add_assignment_to: "課題を %{name} に追加"
+      assignment_group_delete: 課題グループの削除
+      assignment_group_edit: 課題グループの編集
+      assignment_group_move: 課題グループの移動
       delete: 削除
       edit: 編集
       group_weight: "合計の %{groupWeight}%"
       manage: 管理
       move: 移動先&hellip;
-      title_delete: 課題グループを削除しますか?
-      title_edit: 課題グループの編集
-      title_move: 課題グループの移動
     assignment_group_selector: 
       assignment_group: 課題グループ
       assignment_group_options: 
@@ -1462,26 +1464,27 @@ ja:
       one: "%{count} 個のグループ"
       other: "%{count} 個のグループ"
     assignment_list_item: 
+      assignment_delete: 課題の削除
+      assignment_edit: 課題の編集
+      assignment_move: 課題の移動
       delete: 削除
-      delete_asssignment_title: この課題を削除
       edit: 編集
-      edit_assignment_title: 課題の編集
       module: モジュール
       move: 移動先&hellip;
-      move_assignment_title: 課題の移動
       multiple_modules: 複数のモジュール
       no_points_possible: 配点なし
       points_possible: "%{pointsPossible} 点"
       points_possible_screen_reader: "配点 %{pointsPossible}"
       settings: 設定
     assignment_list_item_score: 
+      assignment_grading_type_is_not_graded: この課題には成績は割り当てられません。
       assignment_not_yet_graded_screenreader: "課題はまだ採点されていません。配点は %{pointsPossible} です。"
+      empty_points_possible: "-/%{pointsPossible} 点"
       no_submission: 提出なし
       no_submission_for_assignment_screenreader: "この課題は提出されていません。配点は %{pointsPossible} です。"
-      no_submission_with_points_possible: "-/%{pointsPossible} 点"
-      not_yet_graded_with_points_possible: "*未採点*/%{pointsPossible} 点"
-      score_with_points_possible: "%{grade}/%{pointsPossible} 点"
-      score_with_points_possible_screenreader: "スコア: %{grade}/%{pointsPossible} 点"
+      not_yet_graded: "*まだ採点されていません*"
+      score_with_points_possible: "*%{score}*/%{pointsPossible} 点"
+      score_with_points_possible_screenreader: "スコア: %{score}/%{pointsPossible} 点。"
     assignment_locked: 
       assignment_locked: "*%{lock_at}* 現在、この課題はロックされています"
       assignment_unlocked_from: "*%{unlock_at}* まで、この課題はロックされています"
@@ -1539,6 +1542,7 @@ ja:
       submit_assignment: 課題の提出
     cannot_delete_group: "少なくとも 1 つの課題グループが必要です"
     cant_unpublish_when_students_submit: 受講生の提出物がある場合は、未公開にできません
+    complete: 完了
     confirm: 
       delete_assignment: この課題を削除してもよろしいですか?
       delete_group: このグループを削除してもよろしいですか?
@@ -1665,6 +1669,10 @@ ja:
           *ファイル名で区別しますので、提出ファイルのファイル名は変更しないでください。*
       titles: 
         related_items: 関連アイテム
+    grade_letter_grade_screenreader: "成績: %{grade}"
+    grade_pass_fail_screenreader: "成績: %{grade}"
+    grade_percent: "%{grade}%"
+    grade_percent_screenreader: "成績: %{grade}%"
     graded: この課題は既に採点されています
     grading_type_selector: 
       grading_type: 採点タイプ
@@ -1692,6 +1700,8 @@ ja:
         assignment_group: 課題グループ
         group_weight: 重み
         total: 合計
+    higher_than_max: 課題数よりも大きい数字は使用できません
+    incomplete: 未完了
     index: 
       assignment_locked: この課題は現在ロックされています。詳しくは、この課題の詳細情報のページをご覧ください。
       assignment_locked_tooltip: ロックされています
@@ -1737,6 +1747,7 @@ ja:
       submit_failed: 提出に失敗しました。もう一度やり直してください
       submitting: 提出しています...
     multiple_due_dates: 複数の期日
+    name_is_required: 名前は必須項目です
     needs_grading_count: "この課題には、採点が必要な提出物がまだ %{needs_grading_count} 件あります。"
     never_drop: 
       remove_rule: ルールの削除
@@ -1753,6 +1764,7 @@ ja:
       assignments: 課題
       no_assignments_found: 課題が見つかりません
     no_tools_found: ツールが見つかりませんでした
+    non_number: 数字を使用する必要があります
     notices: 
       assignment_delete: この課題は削除されました
       created: 課題は正常に作成されました。
@@ -1802,6 +1814,7 @@ ja:
       peer_reviews_assign_at_explanation: 期日以降の日付を指定してください。空白の場合は、期日を使用します。
       reviews_per_user: ユーザごとのレビュー
     percent_of_final_grade: "最終的な成績の %{percent} "
+    positive_number: 正の数字を使用する必要があります
     redirect_page: 
       redirect_message: |-
           この提出物は URL でした。今からその URL リンクにお連れします。  
@@ -2028,6 +2041,7 @@ ja:
       not_found: "ファイル データが見つかりませんでした"
     feed_title: "ファイル: %{title}"
     feed_title_with_context: "ファイル、%{course_or_group}: %{title}"
+    over_quota: ダウンロードしたファイルがクォータを超えています。
     title: 
       migration_list: 関連ファイル
     upload_error_invalid_response_code: "無効な応答コードです。予期される値は 200 ですが、実際の値は %{code} でした"
@@ -2241,9 +2255,11 @@ ja:
     sample_final_answer: この値は、このタイプの問題の最終的な解答の一例です
   calendar: 
     agenda_view: 
-      delete: 削除
       due: 期限
-      edit: 編集
+      loading: 読み込み中
+      no_events: この日付の後にはイベントはありません。
+      starts_at: 開始日
+    agenda_view_displaying_start_end: "%{start} から %{end} までを表示しています"
     appointment_group_deletion_details: これを削除すると、受講生がサインアップしたすべての予定も削除されます。
     appointment_group_list: 
       location: "場所:"
@@ -2265,6 +2281,7 @@ ja:
       create_event: 新しいイベントの作成
       done_go_back_to_list: 完了し、リストに戻る
       links: 
+        accessibility_warning: "警告: スクリーン リーダーを使用しているユーザは、このビューにアクセスできません"
         calendar_agenda: アジェンダ
         calendar_month: 月
         calendar_scheduler: スケジューラ
@@ -2274,7 +2291,7 @@ ja:
       refresh: 更新
       use_old_calendar: 古いカレンダー
     calendar_navigator: 
-      enter_jump_date: "日付にジャンプするには、日付を入力して Enter キーを押します。"
+      enter_navigation_date: 移動する先の日付を入力してください。
       next: 次へ
       previous: 前へ
       today: 本日
@@ -2367,9 +2384,16 @@ ja:
       slots_available: 使用できるスロット
     event_event_title: "イベント タイトル:"
     event_on_this_day: この日にはイベントがあります
-    invalid_date: 日付が無効です
+    event_type: 
+      assignment: 課題
+      discussion: ディスカッション
+      event: イベント
+      quiz: クイズ
+    input_is_invalid_date: 入力された日付が無効です。
     labels: 
       due: 期限
+    loading_more_items: その他のアイテムを読み込んでいます。
+    loading_undated_events: 日付のないイベントを読み込んでいます
     message_participants: 
       all_groups: すべてのグループ
       all_users: すべてのユーザ
@@ -2409,15 +2433,17 @@ ja:
     save_changes: 変更内容の保存
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: 予定グループを作成する
+    screenreader_date_suggestion: "%{date}。受け入れるには、Enter キーを押してください。"
     time_block_errors: 時間ブロックの選択にエラーがあります。
     titles: 
       edit_appointment_group: 予定グループの編集
       edit_event: イベントの編集
     today: 本日
     undated_events: 
-      loading_undated_events: 日付のないイベントを読み込んでいます...
-      show_undated_events: 日付のないイベントを表示
-      undated_events: 日付のないイベント
+      loading_undated_events: 日付のないアイテムを読み込んでいます...
+      no_undated_events: 日付のないアイテムはありません。
+      show_undated_events: 日付のないアイテムを表示
+      undated_items: 日付のないアイテム
   calendar_event: 
     errors: 
       duplicate_child_event_contexts: "子イベント コンテキストが重複しています"
@@ -2562,10 +2588,15 @@ ja:
     show2: 
       calendar_feed: "カレンダー フィード"
       calendar_feed_instructions: "下のリンクをコピーして、iCal フィードを取得する任意のカレンダー アプリ (Google カレンダー、iCal、Outlook) に貼り付けます。"
+      calendars: カレンダー
       feed_dialog_title: "カレンダー フィード"
       feed_title: "コース カレンダーの Atom フィード"
       links: 
         feed: フィードを表示するにはここをクリック
+      skip_to_calendar: カレンダーにスキップ
+      toggle_calendars: カレンダーの切り替え
+      toggle_undated_items: 日付のないアイテムの切り替え
+      undated_items: 日付のないアイテム
     titles: 
       add_new_assignment: 新しい課題の追加
       add_new_event: 新しいイベントの追加
@@ -2982,7 +3013,7 @@ ja:
       import_migration: インポート
     moodle_zip: 
       options: オプション
-    must_upload_file: ファイルのアップロードが必要です
+    must_upload_file: "ファイルのアップロードまたは URL が必要です"
     no_content_selected: インポートするコンテンツが選択されていません。
     progressing_content_migration: 
       issues_text: 問題
@@ -3396,7 +3427,120 @@ ja:
         state: 状態
       titles: 
         student_progression: "モジュールの進捗 (受講生別)"
+    content_next: 
+      add_prerequisite: "*%{module}* に前提条件を追加"
+      assignment_points_possible: "配点: %{points_possible}"
+      buttons: 
+        add_module: モジュールの追加
+        add_prerequisite: 前提条件の追加
+      criterion_for_assignment: "%{assignment} の場合、ユーザは次のことを行う必要がある:"
+      headings: 
+        add_prerequisite: "%{name} への前提条件の追加"
+        course_modules: "コース モジュール"
+        student_progress: "モジュールの進捗 (受講生別)"
+        student_progress_for_module: "%{module} に対する受講生の進捗"
+        students_completed: モジュールを完了した受講生
+        students_in_progress: モジュールで作業中の受講生
+        students_locked: モジュールをロック解除していない受講生
+        students_unlocked: "モジュールをロック解除した (が開始していない) 受講生"
+      help: 
+        create: |-
+            コース モジュールを利用すると、課題、ページ、ファイルなどを、より小さなセクションまたは単元に編成することができます。モジュールは、テーマを軸として展開することも、特定のトピックに焦点を合わせることも、あるいは単に時間軸に沿ってグループ分けすることもできます。
+            
+            また、それぞれのモジュールに基準や前提条件を定義して、モジュールを連続ものにすることもできます。受講生は、すべての前提条件のロックを解除するまで、モジュールにアクセスできません。そうすれば、たとえば受講生が評価クイズで少なくとも 75% 獲得するまでは、特定のコンテンツやファイルにアクセスできないようにすることができます。
+            
+            コースをモジュールに編成するには、まず最初に右側の "%{button}" ボタンをクリックします。
+        no_modules: このコースには、まだモジュールが定義されていません。
+      images: 
+        alt: 
+          min_score: 最低スコア
+          must_contribute: 次のものに対する貢献が必要
+          must_submit: 次のものを提出することが必要
+          must_view: 次のものを閲覧することが必要
+        title: 
+          min_score: "受講生は、このアイテムについて少なくとも %{min_score} を獲得するまで、このモジュールを完了したと見なされません"
+          must_contribute: 受講生は、このアイテムに貢献するまで、このモジュールを完了したと見なされません
+          must_submit: 受講生は、この課題を提出するまで、このモジュールを完了したと見なされません
+          must_view: 受講生は、このアイテムを閲覧するまで、このモジュールを完了したと見なされません
+      indent: 
+        ? "n"
+        : 
+          one: "1 段階インデント"
+          other: "%{count} 段階インデント"
+          zero: インデントしない
+      key: 
+        description: 
+          delete: 現在のモジュール/アイテムを削除
+          edit: モジュール/アイテムを編集
+          indent: 現在のアイテムをインデント
+          new: 新しいモジュール
+          next: 次のモジュール/アイテム
+          outdent: 現在のアイテムのインデントを戻す
+          previous: 前のモジュール/アイテム
+      keycode_descriptions: 
+        next_module_item: "次のモジュールまたはモジュール アイテムを選択してください"
+        previous_module_item: "前のモジュールまたはモジュール アイテムを選択してください"
+        toggle_module_dragging: アイテムを選択してドラッグを開始するか、または前に選択したアイテムをドロップします
+      keycodes: 
+        delete: d
+        edit: e
+        indent: i
+        new: "n"
+        next: j
+        next_module_item: 上
+        outdent: o
+        previous: k
+        previous_module_item: 下
+        toggle_module_dragging: スペース
+      labels: 
+        indent: インデント
+        module_complete_when: "このモジュールは次の時点で完了:"
+        modules: 
+          before_students_view: 受講生がこのモジュールを表示するためには
+        new_tab: このツールを新しいタブに読み込む
+        require_sequential_progress: 受講生はこのモジュールの要件を順番に通過する必要があります
+        sort_by: 並べ替え
+        title: タイトル
+        unlock_at: ロック解除の日時
+        url: URL
+      links: 
+        add_prerequisite: 前提条件を追加
+        add_requirement: 要件を追加
+        reload_student: 受講生の進捗を再読み込み
+        sort_by_name: 名前
+        sort_by_progress: 進捗
+        student_progress: 進捗を表示
+        title: 
+          remove_prerequisite: この前提条件を削除
+      module: モジュール
+      module_details: "モジュールは順番に表示されるので、%{name} の上にあるモジュールのみを前提条件として設定できます。"
+      module_name: モジュール名
+      modules_keyboard_hint: "コース モジュールおよびモジュール アイテムの順序を変更するには、最初にスクリーン リーダーでカーソルをオフにします。JAWS で Insert + z を押します。タブ キーを押して最初のモジュールを選択します。上下矢印を押してモジュールまたはモジュール アイテムを選択します。スペース キーを押して、ドラッグを開始するモジュールまたはモジュール アイテムを選択します。次に、上下矢印キーを押して移動先を選択します。スペース キーを再び押して、選択したモジュールまたはモジュール アイテムを移動先の後ろにドロップします。"
+      must_complete_prerequisites: "次のことを完了する必要があります:"
+      no_preprequisites: 前提条件が定義されていません
+      no_requirements: 要件が定義されていません
+      prerequisites: 
+        another_module: 別のモジュール
+      prerequisites_need_item: ユーザがこのモジュールを完了する方法を指定するためには、その前にアイテムを追加する必要があります
+      requirements: 
+        must_contribute: ページへの貢献
+        must_score_at_least: "最低限のスコア:"
+        must_submit: 課題を提出
+        must_view: アイテムの閲覧
+      select_module: 
+        instructions: モジュールの選択
+        name: "モジュール「%{module}」"
+      select_prerequisite: 前提条件のタイプを選択します。受講生は、すべての前提条件が満たされるまで、モジュールを表示できません。
+      student_name: 受講生名
+      table_headings: 
+        module: モジュール
+        state: 状態
+      titles: 
+        student_progression: "モジュールの進捗 (受講生別)"
     context_module: 
+      admin_links: 
+        module_options_label: "モジュール オプション"
+        module_options_title: "モジュール オプション"
       context_module: 
         draft: (ドラフト)
       images: 
@@ -3420,12 +3564,34 @@ ja:
           delete_module: このモジュールを削除
           edit_module: 編集
           student_progress: このモジュールに対する受講生の進捗の確認
-      manage: 管理
+      manage: "モジュール オプション"
       module_will_unlock_at: "は *%{unlock_date}* にロック解除されます"
       progression_complete_count: "*%{count}* 件が完了"
       progression_started_count: "*%{count}* 件が進行中"
       reorder_modules: ドラッグでモジュールを並べ替え
       unpublish: 未公開
+    context_module_next: 
+      images: 
+        alt: 
+          incomplete: 未完了
+        title: 
+          complete: モジュール完了
+          incomplete: モジュール未完了
+          locked: モジュールはロックされています
+      links: 
+        add_item: コンテンツの追加
+        text: 
+          delete_module: 削除
+          edit_module: 編集
+        title: 
+          delete_module: このモジュールを削除
+          edit_module: 編集
+          student_progress: このモジュールに対する受講生の進捗の確認
+      manager_module: モジュールの管理
+      module_will_unlock_at: "は *%{unlock_date}* にロック解除されます"
+      progression_complete_count: "*%{count}* 件が完了"
+      progression_started_count: "*%{count}* 件が進行中"
+      reorder_modules: ドラッグでモジュールを並べ替え
     context_modules: 
       publish: 公開
     errors: 
@@ -3478,6 +3644,46 @@ ja:
       must_view: 
         fulfilled: ページを閲覧
         unfulfilled: ページを閲覧することが必要
+    module_item_next: 
+      drag_to_reorder: ドラッグして、並べ替え、またはアイテムを別のモジュールに移動
+      images: 
+        alt: 
+          max_score: 最高スコア
+          min_score: 最低スコア
+          must_contribute: 次のものに対する貢献が必要
+          must_submit: 次のものを提出することが必要
+          must_view: 次のものを閲覧することが必要
+        title: 
+          max_score: 受講生は、このモジュールを完了したと見なされる前に、このアイテムの最高スコアを超えてはなりません。
+          min_score: 受講生は、最低スコアに達するまで、このモジュールを完了したと見なされません。
+          must_contribute: 受講生は、このアイテムに貢献するまで、このモジュールを完了したと見なされません
+          must_submit: 受講生は、この課題を提出するまで、このモジュールを完了したと見なされません
+          must_view: 受講生は、このアイテムを閲覧するまで、このモジュールを完了したと見なされません
+      links: 
+        edit_item: 編集
+        edit_item_details: アイテムの詳細情報を編集
+        indent: インデント
+        indent_item: アイテムをインデント
+        outdent: 逆インデント
+        outdent_item: アイテムを逆インデント
+        remove_item: 削除
+        remove_item_from_module: このアイテムをモジュールから削除
+      max_score: 
+        fulfilled: "スコアは %{score} 以下"
+        unfulfilled: "スコアは %{score} 以下でなければならない"
+      min_score: 
+        fulfilled: "スコアは最低 %{score}"
+        unfulfilled: "スコアは最低 %{score} でなければならない"
+      must_contribute: 
+        fulfilled: ページのコンテンツに貢献
+        unfulfilled: ページのコンテンツに貢献することが必要
+      must_submit: 
+        fulfilled: 課題を提出
+        unfulfilled: 課題を提出することが必要
+      must_view: 
+        fulfilled: ページを閲覧
+        unfulfilled: ページを閲覧することが必要
+      settings: 設定
     module_locked: ロックされています
     module_started: 進行中
     module_unlocked: ロック解除済み
@@ -3516,6 +3722,7 @@ ja:
     errors: 
       field_is_required: このフィールドは必須項目です
     message_sent: メッセージが送信されました!
+    no_course: コースなし
     select_course: コースの選択
   conversation_message: 
     subject: "非公開メッセージ、%{timestamp}"
@@ -3646,7 +3853,6 @@ ja:
       compose_new_message: 新しいメッセージの作成
       delete: 削除
       delete_conversation: 会話の削除
-      enter_name_group_or_course: 名前、グループ、またはコースを入力してください
       filter_messages_by_course: コースでメッセージをフィルタ
       filter_messages_by_type: タイプでメッセージをフィルタ
       forward: 早送り
@@ -3656,6 +3862,7 @@ ja:
       more_options: その他のオプション
       reply: 返信
       reply_all: すべてに返信
+      search_by_user: ユーザで検索
       search_for_recipients: 受信者の検索
       search_names_groups_courses: 名前、グループ、およびコースの検索
       sending: 送信中
@@ -3705,12 +3912,11 @@ ja:
         remove_media_comment: "メディア コメントを削除する"
     message_form_dialog: 
       body: 本文
-      bulk_explanation: このオプションでは、宛先フィールドのすべての受信者に対して個別にメッセージが作成されます。
-      bulk_message: 一括メッセージ
       headings: 
         new_message: 新しいメッセージ
       inbox_actions: 
         add_people: メンバーの追加
+      individual_message_explanation: 各受信者に対して個別のメッセージが送信されます
       labels: 
         add_to_faculty_journal: 講師日誌へのエントリとして追加
         attachments: 添付ファイル
@@ -3721,8 +3927,10 @@ ja:
       links: 
         media_comment: 記録
       media_comment: "メディア コメント"
+      no_course: コースなし
       no_subject: 件名なし
       search_names_groups_courses: 名前、グループ、およびコースの検索
+      send_individual_messages: 個別のメッセージを送信
       titles: 
         media_comment: "記録されたメディア コメント"
         record_media_comment: "オーディオまたはビデオ コメントを記録する"
@@ -3742,6 +3950,7 @@ ja:
       sending_message: "*%{message_preview}* を *%{num_people}* 人に送信しています"
     more_participants: "+%{total} 分、表示を増やす"
     no_message: 
+      batch_selected: 複数の会話が選択されています
       beta_description: "Canvas 受信箱のベータ バージョンを使用しています"
       beta_version: "ベータ バージョン"
       no_conversations_selected: 会話が選択されていません
@@ -4289,6 +4498,7 @@ ja:
         add_section: セクションの追加
         move_course: コースの移動
         update_course: コースの詳細情報を更新
+      course_open_enrollment_without_code: "このコースはオープン エンロールメントを有効にしました。この URL を共有すれば、受講生は自分でコースに登録できます: *%{url}*"
       course_overrides_term: この設定は、どの利用可能期間設定よりも優先されます。
       date_restricted: ユーザは次の期間のコースにのみ参加できる
       deatils: 
@@ -4354,7 +4564,6 @@ ja:
         public_syllabus: このコースのシラバスを一般公開する
         restrict_enrollments_to_course_dates: ユーザは次の期間のコースにのみ参加できる
         root_account_id: "ルート アカウント"
-        self_enrollment: "シークレット URL を共有して、受講生が自分で登録できるようにする"
         sis_source_id: "SIS ID"
         start_at: 開始日時
         storage_quota: "ファイル ストレージ"
@@ -4369,7 +4578,7 @@ ja:
           delete_section: セクションの削除
           edit_section: セクションの編集
       megabytes: メガバイト
-      navigation_keyboard_hint: "コース ナビゲーション リンクの順序を変更するには、最初にスクリーン リーダーでカーソルをオフにします。JAWS で Insert + z を押します。タブ キーを押して最初のリンクを選択します。上下矢印を押してリンクを選択します。スペース キーを押して、ドラッグを開始するリンクを選択します。次に、上下矢印キーを押して移動先を選択します。スペース キーを再び押して、移動先の後ろにリンクをドロップします。"
+      navigation_keyboard_hint: "スクリーン リーダーを使用している場合、コース ナビゲーション リンクの順序を変更するには、スクリーン リーダーで仮想カーソルまたは仮想バッファをオフにします (JAWS では Ins + z キーを押します)。Ctrl + Home キーを押してページの上部に移動し、最初のコース ナビゲーション リンクの場所に達するまで Tab キーを押します。移動したいリンクが読み上げられるまで上下の方向キーを押し、目的のリンクで Space キーを押して、そのリンクを選択します。その後、上下の方向キーを押して移動先を選択します。最後に、Space キーを再び押して、移動しているリンクを現在のリンクの直後に配置します。終了したら、仮想バッファ/カーソルを再度有効化します。"
       no_date: 日付が設定されていません
       no_language_preference: "設定なし (ユーザが設定可能、デフォルトは %{language})"
       none: なし
@@ -4378,6 +4587,8 @@ ja:
       private_course: 非公開
       public_course: 公開
       section_sis_id: "SIS ID: %{section_sis}"
+      self_enrollment: "シークレット URL を共有して、受講生が自分で登録できるようにする"
+      self_enrollment_without_code: "シークレット URL を共有して、受講生が自分で登録できるようにする"
       set_grading_scheme: 採点スキームを設定する
       sis_source_id: "SIS ID"
       tab_cant_disable: このページは無効にできません。非表示のみです
@@ -4418,9 +4629,31 @@ ja:
     show: 
       acting_as: "現在、次の役割をもって、このコースを表示しています:%{enrollment_type}。この役割のユーザが持つ権限の範囲でのみ、アクセスが許可されます。"
       buttons: 
-        update_layout: 保存
+        update_layout: レイアウトの更新
       details: 
+        assignments: "このビューには、このコースの **課題のリスト** が表示されます。これから予定されている課題、および最近の課題が一番上に表示されます。"
         confirm_unenroll: "このコースへの登録を解除してもよろしいですか?コース名簿の表示や、講師との直接の通信はできなくなります。また、コース イベントをストリームに表示したり、お知らせを受け取ったりすることもできなくなります。"
+        custom_page: "**ご自身のコースのホーム ページを設計** して、リンク、画像、リッチ メディアなど、好きなものを何でも含めることができます。"
+        modules: |-
+            ご自分のコースは **モジュールまたはセクション** に編成できます。それぞれのセクションには、関連するファイル、課題、ページなどをセットにして含めます。必要であれば、それぞれのモジュールをロック解除するにあたって満たさなければならない基準や前提条件を定義して、モジュールを連続ものに仕立てることもできます。
+            
+            -このレイアウトはおそらく、期間や学期などの特定のスケジュールに基づいていないコースに最適です。
+        recent_activity_dashboard: "**最近のアクティビティ ダッシュボード** には、このコースでの最近の会話、アナウンス、ディスカッション、交流などが表示されます。ユーザが最初にログインしたときに表示されるダッシュボード ページと非常によく似ていますが、ここで表示されるのはこのコースのコンテンツのみです。"
+        syllabus: "**要綱ビュー** には、コースへの期待を詳述できます。または、リンクや画像などを使用してコースに導き、続いて、課題やコース イベントを網羅したカレンダー ビューを表示することなどもできます。"
+      draft_state: 
+        buttons: 
+          cancel: キャンセル
+          update_layout: 保存
+        headings: 
+          set_layout: "ホーム ページのレイアウトの設定"
+        labels: 
+          select_content: "ホーム ページに表示する内容を選択します。"
+        options: 
+          assignments: 課題リスト
+          custom_page: "ページ/トップ ページ"
+          modules: "コース モジュール"
+          recent_activity_dashboard: "最近のアクティビティ ダッシュボード"
+          syllabus: 要綱
       empty_body: コンテンツなし
       headings: 
         confirm_unenroll: 登録解除の確認
@@ -4430,11 +4663,12 @@ ja:
         unpublished: このコースは未公開です
       importing: コースのコピー/移行が進行中です。一部のコンテンツが一時的に使用できない場合があります。
       labels: 
-        set_layout: "ホーム ページに表示する内容を選択します。"
+        select_content: このコースのページを訪れた人に表示します
       license_notice: "このコースのコンテンツは %{license_type} 使用許諾の下で提供されています。このコースのコンテンツは、特に断りのない限り、この使用許諾の下にあるものと見なされます。"
       links: 
         change_layout: "ホーム ページのレイアウトの変更"
         course_setup: コース設定のためのチェックリスト
+        course_stream: "コース ストリームを参照"
         drop_course: このコースを中断
         edit_homepage: "ホーム ページの編集"
         join_course: このコースに参加
@@ -4443,10 +4677,10 @@ ja:
         view_course_stream: "コース ストリームを表示"
       options: 
         assignments: 課題リスト
-        custom_page: "ページ/トップ ページ"
-        modules: "コース モジュール"
+        custom_page: 自分で設計するページ
+        modules: コースのモジュール/セクション
         recent_activity_dashboard: "最近のアクティビティ ダッシュボード"
-        syllabus: 要綱
+        syllabus: 課題と要綱
       period_name: "過去 2 週間"
       re_sending: 再送信しています...
       send_done: 完了です!メッセージが送信されるまで数分かかる場合があります。
@@ -6689,6 +6923,7 @@ ja:
       group_limit: "グループの制限は空白または 1 以上でなければなりません"
       unknown: 予期せぬエラーが発生しました。
       update_failed: 更新に失敗しました。もう一度、試してください
+    everyone: "全員 (%{count} 人)"
     feed_title: "%{course_or_account_name} のフィード"
     flash: 
       removeError: "グループ セットを除できません。後でもう一度試してください。"
@@ -6719,7 +6954,8 @@ ja:
         add_unassigned_user: 未割り当てのユーザの追加
         search_people: メンバーの検索
       add_unassigned_user: 
-        assign_to_group: グループに割り当て
+        add_to_group: ユーザをグループに追加
+        add_user_to_group: "ユーザ %{name} をこのグループに追加"
       add_unassigned_users: 
         no_users_found: ユーザが見つかりません
         too_short: "検索語を 3 文字以上で入力してください"
@@ -6728,13 +6964,8 @@ ja:
         all_groups_full: いずれのグループにも空きがありません。
         all_groups_full_suggestion: グループの定員を変更するか、グループを追加してください。
         assign_user_to_group: このグループにユーザを割り当て
+        assign_user_to_group_name: "ユーザをグループ %{name} に割り当て"
         no_groups_created: ユーザを追加する前に、グループを作成する必要があります。
-      group: 
-        add_user_to_group: グループにユーザを割り当て
-        group_delete: 削除
-        group_edit: 編集
-        group_settings: 設定
-        show_group_details: グループの詳細情報の表示
       group_categories: 
         account_group_explanation: "アカウント レベルの受講生グループは、受講生を特定のコースに関連付けずにグループ化するための便利な方法です。すべての受講生グループにグループ専用のカレンダー、掲示板、および共同作用ツールが提供されるため、受講生が自らグループを管理でき、より効率的に共同作業を行うことができます。"
         add_group_set: "グループ セットの追加"
@@ -6746,7 +6977,6 @@ ja:
           course_groups: 受講生グループ
       group_category: 
         randomly_assigning_students: 受講生を無作為に割り当て
-        search: 検索
         search_groups: グループの検索
       group_category_create: 
         allow_self_signup: "セルフ サインアップを許可"
@@ -6786,6 +7016,14 @@ ja:
         require_same_section: "グループ メンバーに、同じセクションに入ることを要求する"
         save: 保存
         saving: 保存しています...
+      group_detail: 
+        add_user_to_group: グループにユーザを割り当て
+        group_delete: 削除
+        group_edit: 編集
+        group_full: 満員
+        group_settings: 設定
+        show_group_details: "グループ %{name} の詳細を表示"
+        visit_group_homepage: "グループのホーム ページにアクセス"
       group_edit: 
         cancel: キャンセル
         group_name: グループ名
@@ -6793,7 +7031,9 @@ ja:
         saving: 保存しています...
       group_user: 
         assign_to_group: グループに割り当て
+        assign_user_to_group: "ユーザ %{name} をグループに割り当て"
         remove_from_group: グループから削除
+        remove_user_from_group: "ユーザ %{name} をこのグループから削除"
       group_users: 
         no_students: 受講生なし
         no_users: ユーザなし
@@ -6801,8 +7041,8 @@ ja:
         no_groups: グループなし。
         no_matching_groups: 一致するグループがありません。
       randomly_assign_members: 
-        add_more_users: キャンセル
-        close: OK
+        cancel: キャンセル
+        okay: OK
         randomly_assign_students_dialog: 未割り当ての全受講生を、自動的に、できるだけ均等に、既存の受講生グループに割り当てます。
       self_signup_help: 
         about_self_signup_groups: "セルフ サインアップ グループについて"
@@ -9227,6 +9467,7 @@ ja:
     sure_you_want_to_mute: "この課題をミュートにしてもよろしいですか?この課題がミュートになっている間、受講生は以下について表示できず、新しいお知らせも受信しません:"
   name: "Academic Benchmark インポーター"
   new_facebook_message: "Canvas からの新しいメッセージがあります"
+  no_migration_file: コンテンツ移行にはファイルが必要です。
   not_applicable: N/A
   notification: 
     added_to_conversation_description: 会話に追加されました
@@ -9597,6 +9838,7 @@ ja:
       page_deleted: "ページ \"%{title}\" は削除されました。"
     reload_editing_page: "このページは、編集開始後に変更されています。*再読み込み* を行うと、変更内容がすべて失われます。"
     reload_viewing_page: このページは表示後に変更されています。*再読み込みしてください*。
+    restore_failed: "ページ リビジョンを復元できませんでした"
     save_button: 保存
     saving_button: 保存しています...
     warnings: 
@@ -10084,6 +10326,7 @@ ja:
         change_password: パスワードの変更
         confirm_password: パスワードの確認
         default_email: デフォルトの電子メール
+        enabled_theme: 使用可能になっているテーマ
         expires_at: 有効期限
         headers: 
           approved_integrations: 承認済みの統合
@@ -10379,14 +10622,16 @@ ja:
   publish_btn_module: 
     buttons: 
       publish: 公開
-      publish_desc: 未公開です。クリックすると公開します
+      publish_desc: 未公開です。クリックすると公開します。
       published: 公開済み
-      published_desc: 公開されています。クリックすると未公開にします
+      published_desc: 公開されています。クリックすると未公開にします。
       publishing: 公開しています...
       unpublish: 未公開
       unpublishing: 公開を中止しています...
   publishable: 
     cant_unpublish: 未公開にできません
+  publishableModuleItem: 
+    disabled: このアイテムでは公開は無効になっています
   purchases: 
     new: 
       payment_info: 支払情報
@@ -10624,7 +10869,7 @@ ja:
       regraded_score: "再評価スコア:"
       show_ansers_for_variable: "%{variable} の解答を表示"
       skip_question_text: 問題文までスキップします。
-      submission_was_regraded: この問題が再評価されたため、スコアが変更されました。
+      submission_was_regraded: この問題は再評価されました。
       titles: 
         question_correct_comment: 受講生の解答が正解だった場合に、このコメントを表示
         question_incorrect_comment: 受講生の解答が不正解だった場合に、このコメントを表示
@@ -10657,21 +10902,7 @@ ja:
           事前定義された変数がないので、すべての受講生に対する問題が
           同じになり、答えも同じになります。変数の詳細については "変数" タブ
           を参照してください。
-      equation_variables: |-
-          問題文の中で括弧を使用して、変数を定義することもできます 
-          (" [a] + [b] は何ですか?")。どの変数にも表示されるのが "値の例"
-          で、これは変数設定に基づきます。これで、演算を確認し、
-          数式が機能することを確認できます。
-          
-          例えば、問題が "[a] + 5 は何ですか?" だったとします。 
-          ここで変数 "a" を定義するよう求められます。"a" の値の例が 
-          5.2 であれば、次のように書きます:
-          
-          %{example}
-          
-          この数式を使用すれば、解のセットをいくらでも生成し、 
-          セットごとに "a" の値を変えることができます。ある受講生に表示される問題は
-          "5.2 + 5 は何ですか?" となり、別の受講生には "9 + 5 は何ですか?"\ となります。
+      equation_variables2: "問題文の中で括弧を使用して、変数を定義することもできます (\" [a] + [b] は何ですか?\")。どの変数にも表示されるのが \"値の例\" で、これは変数設定に基づきます。これで、演算を確認し、数式が機能することを確認できます。例えば、問題が \"[a] + 5 は何ですか?\" の場合、変数 \"a\" を定義するよう求められます。\"a\" の値の例が 5.2 であれば、次のようになります: %{example}。この数式を使用すれば、解のセットをいくらでも生成し、セットごとに \"a\" の値を変えることができます。ある受講生に表示される問題は \"5.2 + 5 は何ですか?\" となり、別の受講生には \"9 + 5 は何ですか?\" となります。"
       links: 
         functions: 関数
         intro: はじめに
@@ -10864,6 +11095,7 @@ ja:
         other: "%{user} はあと %{count} 回試行できます"
       default_quiz_name: "クイズ %{course_name}"
       default_survey_name: "サーベイ %{course_name}"
+      grade_by_question_warning: グループ内で問題をシャッフルした場合は、問題ごとの成績機能に影響があります。
       headers: 
         quiz_submissions: クイズへの提出物
         survey_submissions: サーベイへの提出物
@@ -12944,6 +13176,7 @@ ja:
   unknown: 不明
   unknown_question_bank: 不明な問題バンクです
   unknown_quiz: 不明なクイズです
+  unsupported_package: "サポートされていないコンテンツ パッケージ"
   user: 
     default_collection_name: "%{user_name} のコレクション"
     default_user_name: ユーザ
@@ -13412,6 +13645,11 @@ ja:
       toolbar_menu: 
         settings: 設定
       view_page_history_wiki: ページ履歴の表示
+    wiki_page_content: 
+      page_locked: このページはロックされています
+      page_locked_by_modules: "このページは、次のモジュールを完了した後に利用できます:"
+      page_locked_by_modules_until: "このページは、次のモジュールの完了後、%{lock_info.unlock_at} に利用可能になります:"
+      page_locked_until: "このページは、%{lock_info.unlock_at} に利用可能になります"
     wiki_page_edit: 
       buttons: 
         cancel: キャンセル
@@ -13451,6 +13689,13 @@ ja:
         edit: 編集
         settings: 設定
         use_front_page: "トップ ページとして使用"
+    wiki_page_revision: 
+      latest_revision: 最新のリビジョン
+      restore_revision: このリビジョンを復元
+      revision_summary: "*%{updated_at}* (編集者: %{edited_by})"
+      same_as_latest: "*最新* と同じ"
+    wiki_page_revisions: 
+      revision_history: リビジョン履歴
   wiki_page: 
     atom_author: "Wiki ページ"
     atom_entry_title: "Wiki ページ、%{course_or_group_name}: %{page_title}"
@@ -13527,12 +13772,15 @@ ja:
     front_page: "トップ ページ"
     notices: 
       cannot_edit: "ページ \"%{title}\" の編集は許可されていません。"
+      cannot_read_revisions: "\"%{title}\" の過去のリビジョンのレビューは許可されていません。"
       create_non_existent_page: "ページ \"%{title}\" は存在しませんが、以下で作成できます"
       page_deleted: "ページ \"%{title}\" は削除されました。"
       page_does_not_exist: "ページ \"%{title}\" は存在しません。"
       page_updated: ページは正常に更新されました。
     page_link: 
       link_hidden_from_students_warning: 受講生にはこのリンクは表示されません
+    page_revisions: 
+      page_revisions_title: "%{title} のリビジョン: %{context_name}"
     pages_index: 
       titles: 
         pages: ページ
