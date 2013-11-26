@@ -1,4 +1,4 @@
-source 'https://rubygems.org/'
+source 'http://rubygems.org/'
 
 if ENV['RAILS_ENV'] != 'test' && (RUBY_VERSION < "1.9.3" || RUBY_VERSION >= "2.0")
   raise "Canvas requires Ruby 1.9.3"
@@ -129,7 +129,9 @@ group :sqlite do
 end
 
 group :test do
-  gem 'simplecov', '0.7.1' if ENV['COVERAGE'] != nil && ENV['COVERAGE'] == "1" # for coverage reporting
+
+  gem 'simplecov', :require => false
+  gem 'simplecov-rcov', :require => false
   gem 'bluecloth', '2.0.10' # for generating api docs
   gem 'mocha', :git => 'git://github.com/ccutrer/mocha.git', :require => false
   gem 'parallelized_specs', '0.4.84'
@@ -184,7 +186,7 @@ group :redis do
 end
 
 group :cassandra do
-  gem 'cassandra-cql', '1.2.1', git: 'https://github.com/kreynolds/cassandra-cql',ref: 'd100be075b04153cf4116da7512892a1e8c0a7e4'
+  gem 'cassandra-cql', '1.2.1', git: 'https://github.com/kreynolds/cassandra-cql', ref: 'd100be075b04153cf4116da7512892a1e8c0a7e4'
 end
 
 group :embedly do
