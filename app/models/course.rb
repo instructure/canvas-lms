@@ -1402,7 +1402,7 @@ class Course < ActiveRecord::Base
         update_all(:grade_publishing_status => 'error', :grade_publishing_message => "Timed out.")
   end
 
-  def gradebook_to_csv(options = {})
+  def enrollments_for_csv(options={})
     # user: used for name in csv output
     # course_section: used for display_name in csv output
     # user > pseudonyms: used for sis_user_id/unique_id if options[:include_sis_id]
@@ -1412,6 +1412,12 @@ class Course < ActiveRecord::Base
     scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
     student_enrollments = scope.includes(includes).order_by_sortable_name # remove duplicate enrollments for students enrolled in multiple sections
     student_enrollments = student_enrollments.all.uniq_by(&:user_id)
+    student_enrollments.partition{|enrollment| enrollment.type != "StudentViewEnrollment"}.flatten
+  end
+  private :enrollments_for_csv
+
+  def gradebook_to_csv(options = {})
+    student_enrollments = enrollments_for_csv(options)
 
     calc = GradeCalculator.new(student_enrollments.map(&:user_id), self,
                                :ignore_muted => false)
