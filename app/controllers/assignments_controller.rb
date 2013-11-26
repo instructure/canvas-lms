@@ -303,7 +303,7 @@ class AssignmentsController < ApplicationController
     params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
     group = get_assignment_group(params[:assignment])
     @assignment ||= @context.assignments.build(params[:assignment])
-    @assignment.workflow_state = "published"
+    @assignment.workflow_state ||= @context.feature_enabled?(:draft_state) ? "unpublished" : "published"
     @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
     @assignment.assignment_group = group if group

@@ -298,6 +298,20 @@ describe AssignmentsController do
       a.discussion_topic.should_not be_nil
       a.discussion_topic.user_id.should eql(@teacher.id)
     end
+
+    it "should default to published if draft state is disabled" do
+      Account.default.disable_feature!(:draft_state)
+      course(:active_all => true)
+      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
+      assigns[:assignment].should be_published
+    end
+
+    it "should default to unpublished if draft state is enabled" do
+      Account.default.enable_feature!(:draft_state)
+      course(:active_all => true)
+      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
+      assigns[:assignment].should be_unpublished
+    end
   end
   
   describe "GET 'edit'" do
