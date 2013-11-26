@@ -458,18 +458,18 @@ class Assignment < ActiveRecord::Base
 
     p.dispatch :assignment_created
     p.to { participants }
-    p.whenever { |record|
-      record.context.available? &&
-      record.just_created
+    p.whenever { |assignment|
+      policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
+      policy.should_dispatch_assignment_created?
     }
-    p.filter_asset_by_recipient { |record, user|
-      record.overridden_for(user)
+    p.filter_asset_by_recipient { |assignment, user|
+      assignment.overridden_for(user)
     }
 
     p.dispatch :assignment_unmuted
     p.to { participants }
-    p.whenever { |record|
-      record.recently_unmuted
+    p.whenever { |assignment|
+      assignment.recently_unmuted
     }
 
   end

@@ -1429,6 +1429,7 @@ describe AssignmentsApiController, :type => :integration do
         @course.account.update_attributes! turnitin_account_id: 1234,
                                                 turnitin_shared_secret: 'foo',
                                                 turnitin_host: 'example.com'
+        @assignment.reload
       }
 
       it "contains a turnitin_enabled key" do
