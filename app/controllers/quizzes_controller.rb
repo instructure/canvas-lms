@@ -55,13 +55,12 @@ class QuizzesController < ApplicationController
 
         @quiz_options = @quizzes.each_with_object({}) do |q, hash|
           hash[q.id] = {
-            :can_update         => is_authorized_action?(q, @current_user, :update),
-            :can_unpublish      => q.can_unpublish?,
-            :multiple_due_dates => q.multiple_due_dates_apply_to?(@current_user),
-            :due_at             => q.overridden_for(@current_user).due_at,
-            :due_dates          => OverrideTooltipPresenter.new(q, @current_user).due_date_summary,
-            :unlock_at          => q.all_dates_visible_to(@current_user).first[:unlock_at]
+            :can_update    => is_authorized_action?(q, @current_user, :update),
+            :can_unpublish => q.can_unpublish?
           }
+          hash[q.id][:all_dates] = if is_authorized_action?(q, @current_user, :update)
+            q.dates_hash_visible_to(@current_user)
+          end
         end
 
       # legacy

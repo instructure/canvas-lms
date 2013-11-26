@@ -737,14 +737,23 @@ describe "quizzes" do
       it "should show a summary of due dates if there are multiple" do
         create_quiz_with_default_due_dates
         get "/courses/#{@course.id}/quizzes"
-        f('.ig-details .description').should_not include_text "Multiple Dates"
+        f('.ig-details .date-due').should_not include_text "Multiple Dates"
+        f('.ig-details .date-available').should_not include_text "Multiple Dates"
+
         add_due_date_override(@quiz)
 
         get "/courses/#{@course.id}/quizzes"
-        f('.ig-details .description').should include_text "Multiple Dates"
-        driver.mouse.move_to f('.ig-details .description a')
+        f('.ig-details .date-due').should include_text "Multiple Dates"
+        driver.mouse.move_to f('.ig-details .date-due a')
         wait_for_ajaximations
-        tooltip = fj('.vdd_tooltip_content:visible')
+        tooltip = fj('.ui-tooltip:visible')
+        tooltip.should include_text 'New Section'
+        tooltip.should include_text 'Everyone else'
+
+        f('.ig-details .date-available').should include_text "Multiple Dates"
+        driver.mouse.move_to f('.ig-details .date-available a')
+        wait_for_ajaximations
+        tooltip = fj('.ui-tooltip:visible')
         tooltip.should include_text 'New Section'
         tooltip.should include_text 'Everyone else'
       end
