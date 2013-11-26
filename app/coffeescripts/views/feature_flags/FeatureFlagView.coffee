@@ -29,7 +29,7 @@ define [
       @$detailToggle.toggleClass('icon-mini-arrow-down')
 
     shouldDelete: (action) ->
-      ENV.ACCOUNT.site_admin && @model.get('hidden') && action == 'off'
+      ENV.ACCOUNT?.site_admin && @model.get('hidden') && action == 'off'
 
     toggleValue: ($target) ->
       $target.siblings().removeClass('active').attr('aria-checked', false)
