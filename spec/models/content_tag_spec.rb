@@ -21,6 +21,23 @@ require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
 
 describe ContentTag do
   
+  describe "#sync_workflow_state_to_asset?" do
+    it "true when content_type is Quiz" do
+      content_tag = ContentTag.new(:content_type => "Quiz")
+      content_tag.sync_workflow_state_to_asset?.should be_true
+    end
+
+    it "true when content_type is Assignment" do
+      content_tag = ContentTag.new(:content_type => "Assignment")
+      content_tag.sync_workflow_state_to_asset?.should be_true
+    end
+
+    it "true when content_type is WikiPage" do
+      content_tag = ContentTag.new(:content_type => "WikiPage")
+      content_tag.sync_workflow_state_to_asset?.should be_true
+    end
+  end
+
   it "should allow setting a valid content_asset_string" do
     tag = ContentTag.new
     tag.content_asset_string = 'discussion_topic_5'
@@ -159,6 +176,44 @@ describe ContentTag do
     @tag.title.should == 'some assignment (renamed)'
     @assignment.reload
     @assignment.title.should == 'some assignment (renamed)'
+  end
+
+  describe ".update_for with draft state enabled" do
+    before do
+      Course.any_instance.stubs(:draft_state_enabled?).returns(true)
+    end
+
+    context "when updating a quiz" do
+      before do
+        course
+        @quiz = course.quizzes.create!
+        @module = @course.context_modules.create!(:name => "module")
+        @tag = @module.add_item({
+          :type => 'quiz',
+          :title => 'some quiz',
+          :id => @quiz.id
+        })
+        @tag.reload
+      end
+
+      it "syncs workflow_state transitions publishing/unpublishing" do
+        @quiz.unpublish!
+        @quiz.reload
+
+        ContentTag.update_for @quiz
+
+        @tag.reload
+        @tag.workflow_state.should == "unpublished"
+
+        @quiz.publish!
+        @quiz.reload
+        
+        ContentTag.update_for @quiz
+
+        @tag.reload
+        @tag.workflow_state.should == "active"
+      end
+    end
   end
 
   it "should not attempt to update asset name attribute if it's over the db limit" do

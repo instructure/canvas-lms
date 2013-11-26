@@ -305,7 +305,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def sync_workflow_state_to_asset?
-    ['Assignment', 'WikiPage'].include?(self.content_type)
+    ['Quiz', 'Assignment', 'WikiPage'].include?(self.content_type)
   end
   
   def context_module_action(user, action, points=nil)
