@@ -145,9 +145,19 @@ describe QuizStatistics::StudentAnalysis do
       stats.last[0].should == "nobody@example.com"
       stats.last[1].should == @student.id.to_s
       stats.last[2].should == "user_sis_id_01"
-      stats.last[3].should == "section2, Unnamed Course"
-      stats.last[4].should == "#{section2.id}, #{section1.id}"
-      stats.last[5].should == "SISSection02, SISSection01"
+
+      splitter = lambda { |str| str.split(",").map(&:strip) }
+      sections = splitter.call(stats.last[3])
+      sections.should include("section2")
+      sections.should include("Unnamed Course")
+
+      section_ids = splitter.call(stats.last[4])
+      section_ids.should include(section2.id.to_s)
+      section_ids.should include(section1.id.to_s)
+
+      section_sis_ids = splitter.call(stats.last[5])
+      section_sis_ids.should include("SISSection02")
+      section_sis_ids.should include("SISSection01")
     end
 
     it 'should deal with incomplete fill-in-multiple-blanks questions' do
