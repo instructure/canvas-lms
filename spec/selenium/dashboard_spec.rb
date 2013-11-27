@@ -11,9 +11,9 @@ describe "dashboard" do
 
     def create_announcement
       factory_with_protected_attributes(Announcement, {
-        :context => @course,
-        :title => "hey all read this k",
-        :message => "announcement"
+          :context => @course,
+          :title => "hey all read this k",
+          :message => "announcement"
       })
     end
 
@@ -212,7 +212,7 @@ describe "dashboard" do
       course_menu = f('#courses_menu_item')
 
       driver.action.move_to(course_menu).perform
-      course_menu.should include_text('My Courses')
+      keep_trying_until { course_menu.should include_text('My Courses') }
       course_menu.should include_text(@course.name)
     end
 
@@ -263,10 +263,10 @@ describe "dashboard" do
 
     it "should display calendar events in the coming up list" do
       calendar_event_model({
-                             :title => "super fun party",
-                             :description => 'celebrating stuff',
-                             :start_at => 5.minutes.from_now,
-                             :end_at => 10.minutes.from_now
+                               :title => "super fun party",
+                               :description => 'celebrating stuff',
+                               :start_at => 5.minutes.from_now,
+                               :end_at => 10.minutes.from_now
                            })
       get "/"
       f('.events_list .event a').should include_text(@event.title)
@@ -280,8 +280,8 @@ describe "dashboard" do
                                                       :points_possible => 10}],
                                   {:user => @student, :course => @course}) do
         {
-          "question_31" => "<p>abeawebawebae</p>",
-          "question_text" => "qq1"
+            "question_31" => "<p>abeawebawebae</p>",
+            "question_text" => "qq1"
         }
       end
 
@@ -416,11 +416,11 @@ describe "dashboard" do
 
         course_menu = f('#courses_menu_item')
         driver.action.move_to(course_menu).perform
-        keep_trying_until {
-        course_menu.should include_text('My Courses')
-        course_menu.should include_text('Customize')
-        course_menu.should include_text('View all courses')
-        }
+        keep_trying_until do
+          course_menu.should include_text('My Courses')
+          course_menu.should include_text('Customize')
+          course_menu.should include_text('View all courses')
+        end
       end
 
       it "should allow customization if there are sufficient course invitations" do
@@ -430,11 +430,11 @@ describe "dashboard" do
 
         course_menu = f('#courses_menu_item')
         driver.action.move_to(course_menu).perform
-        keep_trying_until {
-        course_menu.should include_text('My Courses')
-        course_menu.should include_text('Customize')
-        course_menu.should include_text('View all courses')
-        }
+        keep_trying_until do
+          course_menu.should include_text('My Courses')
+          course_menu.should include_text('Customize')
+          course_menu.should include_text('View all courses')
+        end
       end
 
       it "should allow customization if all courses are already favorited" do
@@ -448,10 +448,10 @@ describe "dashboard" do
 
         course_menu = f('#courses_menu_item')
         driver.action.move_to(course_menu).perform
-        keep_trying_until {
-        course_menu.should include_text('My Courses')
-        course_menu.should include_text('Customize')
-        }
+        keep_trying_until do
+          course_menu.should include_text('My Courses')
+          course_menu.should include_text('Customize')
+        end
       end
 
       it "should allow customization even before the course ajax request comes back" do
@@ -517,4 +517,3 @@ describe "dashboard" do
     end
   end
 end
-

@@ -233,7 +233,7 @@ describe "eportfolios" do
       it "should add a course submission" do
         f(".add_submission_link").click
         wait_for_ajaximations
-        f(".submission_list").should include_text(@assignment.title)
+        keep_trying_until { f(".submission_list").should include_text(@assignment.title) }
         f(".select_submission_button").click
         submit_form(".form_content")
       end
