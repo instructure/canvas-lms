@@ -44,12 +44,12 @@ class AssignmentOverride < ActiveRecord::Base
   validates_uniqueness_of :set_id, :scope => [:quiz_id, :set_type, :workflow_state],
     :if => lambda{ |override| override.quiz? && override.active? && concrete_set.call(override) }
   validate :if => concrete_set do |record|
-    if record.set && record.assignment
+    if record.set && record.assignment && record.active?
       case record.set
       when CourseSection
         record.errors.add :set, "not from assignment's course" unless record.set.course_id == record.assignment.context_id
       when Group
-        record.errors.add :set, "not from assignment's group category" unless record.deleted? || record.set.group_category_id == record.assignment.group_category_id
+        record.errors.add :set, "not from assignment's group category" unless record.set.group_category_id == record.assignment.group_category_id
       end
     end
   end
