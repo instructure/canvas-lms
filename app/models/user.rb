@@ -373,6 +373,14 @@ class User < ActiveRecord::Base
     end
   end
 
+  def enrollments_for_account_and_sub_accounts(account)
+    # enrollments are always on the course's shard
+    # and courses are always on the root account's shard
+    account.shard.activate do
+      Enrollment.where(user_id: self).active.joins(:course).where("courses.account_id=? OR courses.root_account_id=?",account,account) 
+    end 
+  end
+
   def self.add_to_account_chain_cache(account_id, account_chain_cache)
     if account_id.is_a? Account
       account = account_id

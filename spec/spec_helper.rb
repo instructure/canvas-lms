@@ -489,6 +489,16 @@ end
     session[:become_user_id].should == @fake_student.id.to_s
   end
 
+  def account_notification(opts={})
+    req_service = opts[:required_account_service] || nil
+    roles = opts[:roles] || []
+    message = opts[:message] || "hi there"
+    @account = opts[:account] || Account.default
+    @announcement = @account.announcements.create!(message: message, required_account_service: req_service)
+    @announcement.account_notification_roles.build(roles.map{ |r| { account_notification_id: @announcement.id, role_type: r} }) unless roles.empty?
+    @announcement.save!
+  end
+
   VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
 
   def group(opts={})

@@ -691,6 +691,26 @@ TEXT
                 <%= Account.allowable_services[announcement.required_account_service.to_sym].try(:[], :name) %>
               </div>
             <% end %>
+            <% unless announcement.account_notification_roles.empty? %>
+              <div>
+                <%= t :announcement_sent_to_roles, "Send only to the following types of users:" %>
+                <ul>
+                  <% announcement.account_notification_roles.each do |r| %>
+                    <% @enrollment_types.select {|rt| rt[:name] == r.role_type }.each do |rt| %>
+                      <li><%= rt[:plural_label][] %></li>
+                    <% end %>
+                    <% # NilEnrollment is a special case %>
+                    <% if r.role_type == "NilEnrollment" %>
+                      <li><%= t :no_enrollment_roles, "Unenrolled users" %></li>
+                    <% end %>
+                    <% @role_types.select {|rt| rt[:name] == r.role_type }.each do |rt| %>
+                      <% # no plural_label :( %>
+                      <li><%= rt[:label]  %></li>
+                    <% end %>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
             <% if announcement.months_in_display_cycle %>
               <div>
                 <%= t :announcement_sent_to_subset, "Sent to 1 / %{denominator} users each month", denominator: announcement.months_in_display_cycle %>
@@ -741,7 +761,52 @@ TEXT
               </tr>
             <% end %>
             <tr>
-              <td><%= f.blabel :message, :en => "Message" %></td>
+              <td colspan=2>
+                <%= t :announcement_sent_to_roles, "Send only to the following types of users:" %>&nbsp;
+                <%= t :announcement_blank_to_all, "(If none are selected, send to everyone)" %>
+              </td>
+            </tr>
+            <tr id="restrict_to_roles">
+              <td id="restrict_to_enrollment_roles">
+                <% unless @enrollment_types.nil? %>
+                  <%= t :course_roles, "Course roles:" %>
+                  <ul>
+                    <% @enrollment_types.each do |r| %>
+                      <li id="account_notification_role_<%= r[:name]%>">
+                        <label>
+                          <%= check_box_tag "account_notification_roles[]", r[:name], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:name]}_cbx" } %>
+                          <%= r[:plural_label][] %>
+                        </label>
+                      </li>
+                    <% end %>  
+                    <% # NilEnrollment is a special case, because it's not actually a role, just a status reflecting that the user is not part of any course %>
+                    <li id="account_notification_role_NilEnrollment">
+                      <label>
+                        <%= check_box_tag "account_notification_roles[]", "NilEnrollment", false, { :class => "account_notification_role_cbx", :id => "account_notification_role_NilEnrollment_cbx" } %>
+                        <%= t :no_enrollment_roles, "Unenrolled users" %>
+                      </label>
+                    </li>
+                  </ul>
+                <% end %>
+              </td>
+              <td id="restrict_to_membership_roles">
+                <% unless @role_types.nil? %>
+                  <%= t :account_roles, "Account roles:" %>
+                  <ul>
+                    <% @role_types.each do |r| %>
+                      <li id="account_notification_role_<%= r[:name]%>">
+                        <label>
+                          <%= check_box_tag "account_notification_roles[]", r[:name], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:name]}_cbx" } %>
+                          <%= r[:label] %>
+                        </label>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% end %>
+              </td>
+            </tr>
+            <tr>
+              <td colspan=2><%= f.blabel :message, :en => "Message" %></td>
             </tr>
           </table>
           <div>
