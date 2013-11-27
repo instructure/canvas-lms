@@ -15,7 +15,7 @@ class FixSubmissionVersionsIndex < ActiveRecord::Migration
                 :where => { :context_type => 'Course' },
                 :unique => true
       connection.execute("DROP INDEX IF EXISTS index_submission_versions")
-      rename_index :submission_versions, 'index_submissions_version2', 'index_submission_versions'
+      rename_index :submission_versions, 'index_submission_versions2', 'index_submission_versions'
     end
   end
 end
