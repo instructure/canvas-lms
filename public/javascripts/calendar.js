@@ -485,10 +485,30 @@ define([
       }
     }
   }
+
   var calendar_event_url = $("#event_details").find('.calendar_event_url').attr('href');
   var assignment_url = $("#event_details").find('.assignment_url').attr('href');
   var $event_blank = $("#event_blank");
   var $undated_count = $(".show_undated_link .undated_count");
+
+  // Internal: Pad a number with zeroes until it is max length.
+  //
+  // n - The number to pad.
+  // max - The desired length.
+  //
+  // Returns a zero-padded string.
+  function pad(n, max) {
+    var result = n.toString();
+
+    if (n < 0) throw new Error('n cannot be negative');
+
+    while (result.length < max) {
+      result = '0' + result;
+    }
+
+    return result;
+  }
+
   function updateEvent(data, $event, batch) {
     var event = $.extend({}, data.assignment);
     var id = null;
@@ -497,6 +517,7 @@ define([
       event = $.extend({}, data.calendar_event);
       var start_date_data = $.parseFromISO(event.start_at);
       var end_date_data = $.parseFromISO(event.end_at);
+      event.datetime = (start_date_data && start_date_data.datetime);
       event.start_time_string = start_date_data.time_string;
       event.end_time_string = end_date_data.time_string;
       event.start_time_formatted = start_date_data.time_formatted;
@@ -516,6 +537,7 @@ define([
       details_url = updateEvent.details_urls[key];
     } else {
       var date_data = $.parseFromISO(event.due_at, 'due_date');
+      event.datetime = (date_data && date_data.datetime);
       event.start_time_string = date_data.time_string;
       event.end_time_string = date_data.time_string;
       event.start_time_formatted = date_data.time_formatted;
@@ -609,8 +631,12 @@ define([
     $event.find('.calendar-name-text').text($('.' + groupId).find('label').text());
     $event.addClass('event_' + id);
     var $day = $(".calendar_undated");
-    if(event.start_at != null) {
-      $day = $("#day_" + event.start_at.substring(0, 10).replace(/-/g, '_'));
+    if(event.datetime) {
+      var dayID = ['#day'];
+      dayID.push(event.datetime.getFullYear());
+      dayID.push(pad(event.datetime.getMonth() + 1, 2));
+      dayID.push(pad(event.datetime.getDate(), 2));
+      $day = $(dayID.join('_'));
     }
     if(!$event.hasClass('event_pending')) {
       addEventToDay($event, $day, batch);
