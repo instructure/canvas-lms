@@ -416,9 +416,11 @@ describe "dashboard" do
 
         course_menu = f('#courses_menu_item')
         driver.action.move_to(course_menu).perform
+        keep_trying_until {
         course_menu.should include_text('My Courses')
         course_menu.should include_text('Customize')
         course_menu.should include_text('View all courses')
+        }
       end
 
       it "should allow customization if there are sufficient course invitations" do
@@ -428,9 +430,11 @@ describe "dashboard" do
 
         course_menu = f('#courses_menu_item')
         driver.action.move_to(course_menu).perform
+        keep_trying_until {
         course_menu.should include_text('My Courses')
         course_menu.should include_text('Customize')
         course_menu.should include_text('View all courses')
+        }
       end
 
       it "should allow customization if all courses are already favorited" do
@@ -444,8 +448,10 @@ describe "dashboard" do
 
         course_menu = f('#courses_menu_item')
         driver.action.move_to(course_menu).perform
+        keep_trying_until {
         course_menu.should include_text('My Courses')
         course_menu.should include_text('Customize')
+        }
       end
 
       it "should allow customization even before the course ajax request comes back" do
