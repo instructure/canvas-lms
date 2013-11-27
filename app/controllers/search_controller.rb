@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -23,7 +23,7 @@ class SearchController < ApplicationController
   include Api::V1::Conversation
 
   before_filter :require_user
-  before_filter :get_context
+  before_filter :get_context, except: :recipients
 
   def rubrics
     contexts = @current_user.management_contexts rescue []
@@ -105,6 +105,11 @@ class SearchController < ApplicationController
       # admins may not be able to see the course listed at the top level (since
       # they aren't enrolled in it), but if they search within it, we want
       # things to work, so we set everything up here
+
+      if params[:user_id]
+        params[:user_id] = api_find(User, params[:user_id]).id
+      end
+
       load_all_contexts :context => get_admin_search_context(params[:context]),
                         :permissions => params[:permissions]
 
