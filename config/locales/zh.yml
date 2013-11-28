@@ -398,12 +398,12 @@ zh:
           description: 
             header: 示例
           student_activity: 
-            text: 此报告显示一个或多个指定作业组和指定日期范围中的所有作业以及与这些作业相关的信息。此报告提供用于安排作业以及管理学生作业负担的数据，报告仅显示对于某个学生在同一日期有两个或更多冲突作业的学生和作业。
+            text: 此报告显示一个或多个指定作业小组和指定日期范围中的所有作业以及与这些作业相关的信息。此报告提供用于安排作业以及管理学生作业负担的数据，报告仅显示对于某个学生在同一日期有两个或更多冲突作业的学生和作业。
     assignment_scheduling_csv_parameters: 
       account_reports: 
         newark: 
           assignment_groups: 
-            label: 要包括的作业组：
+            label: 要包括的作业小组：
           major: 
             check_box: 主要
           papers: 
@@ -652,12 +652,12 @@ zh:
           description: 
             header: 例如
           student_activity: 
-            text: 此报告显示一个或多个指定作业组和指定日期范围中的所有作业以及与这些作业相关的信息。此报告提供用于计划安全练习的数据，同时对主要的课堂测验干扰最小。
+            text: 此报告显示一个或多个指定作业小组和指定日期范围中的所有作业以及与这些作业相关的信息。此报告提供用于计划安全练习的数据，同时对主要的课堂测验干扰最小。
     safety_drill_csv_parameters: 
       account_reports: 
         newark: 
           assignment_groups: 
-            label: 要包括的作业组：
+            label: 要包括的作业小组：
           major: 
             check_box: 主要
           papers: 
@@ -1324,7 +1324,7 @@ zh:
     default_unfiled_title: 未归档的问题
   assignment: 
     advanced_options_errors: 一个或多个高级选项中存在错误
-    assignment_group_must_have_group: 请为此作业选择作业组
+    assignment_group_must_have_group: 请为此作业选择作业小组
     at_least_one_file_type: 请指定至少一个允许使用的文件类型
     at_least_one_submission_type: 请选择至少一种提交类型
     atom_no_author: 无作者
@@ -1378,19 +1378,19 @@ zh:
     buttons: 
       save: 保存
     titles: 
-      assignment_group_weights: 管理作业组加权
+      assignment_group_weights: 管理作业小组加权
       total: 总计
     weight_final: 根据学习小组加权最终评分
   assignment_groups: 
     errors: 
-      cannot_delete_group: 您不能删除一个带有已锁定作业的学习小组。
+      cannot_delete_group: 您不能删除一个带有已锁定作业的小组。
     notices: 
-      created: 作业组已成功创建。
+      created: 作业小组已成功创建。
       deleted: 此学习小组已删除
-      updated: 作业组已成功更新。
+      updated: 作业小组已成功更新。
   assignment_groups_api: 
     errors: 
-      frozen_assignments_error: 您无法删除一个含有已锁定作业的组。
+      frozen_assignments_error: 您无法删除一个含有已锁定作业的小组。
   assignment_muter: 
     mute_assignment: 屏蔽作业
     muting_assignment: 正在屏蔽作业...
@@ -1445,21 +1445,21 @@ zh:
         add_group: 添加学习小组
         cancel: 取消
       links: 
-        add_assignment_group: 添加作业组"
+        add_assignment_group: 添加作业小组"
     assignment_group_list: 
-      no_assignment_groups: 未找到作业组
+      no_assignment_groups: 未找到作业小组
     assignment_group_list_item: 
       add_assignment_to: "将作业添加到 %{name}"
-      assignment_group_delete: 删除作业组
-      assignment_group_edit: 编辑作业组
-      assignment_group_move: 移动作业组
+      assignment_group_delete: 删除作业小组
+      assignment_group_edit: 编辑作业小组
+      assignment_group_move: 移动作业小组
       delete: 删除
       edit: 编辑
       group_weight: "总数的 %{groupWeight}%"
       manage: 管理
       move: 移动到...
     assignment_group_selector: 
-      assignment_group: 作业组
+      assignment_group: 作业小组
       assignment_group_options: 
         new_group: 新学习小组
     assignment_groups_count: 
@@ -1495,7 +1495,7 @@ zh:
       cancel: 取消
       save: 保存
       validating: 正在保存...
-      weight_groups: 根据作业组加权最终评分
+      weight_groups: 根据作业小组加权最终评分
     assignment_sidebar: 
       links: 
         submit: 提交作业
@@ -1504,8 +1504,8 @@ zh:
         delete_group: 删除学习小组
       labels: 
         class_weighting_policy: 根据各项作业所占比率计算总成绩
-        delete_assignments_in_group: 删除此学习小组中的作业
-        move_assignments_to: 将作业从此学习小组移至
+        delete_assignments_in_group: 删除此小组中的作业
+        move_assignments_to: 将作业从此小组移至
       options: 
         select_group: "[选择学习小组]"
       titles: 
@@ -1534,21 +1534,21 @@ zh:
         show_only_assignments_from: 只显示下列来源的作业
         upcoming_assignments: 即将到来的作业
     assignments_right_side: 
-      add_assignment_to_group: "*添加作业*到 %{group}"
+      add_assignment_to_group: "*将作业添加*至 %{group}"
       assignment_groups_wrapper: "（%{number_of_groups} 中）"
       links: 
-        add_assignment_group: 添加作业组
+        add_assignment_group: 添加作业小组
     buttons: 
       add_group: 添加学习小组
       delete_group: 删除学习小组
       submit_assignment: 提交作业
-    cannot_delete_group: 您必须至少有一个作业组
+    cannot_delete_group: 您必须至少有一个作业小组
     cant_unpublish_when_students_submit: 如有学生提交文件，则无法取消发布
     complete: 完成
     confirm: 
       delete_assignment: 是否确定要删除此作业?
       delete_group: 是否确定要删除此学习小组?
-    confirm_delete_group: 是否确定要删除此作业组？
+    confirm_delete_group: 是否确定要删除此作业小组？
     confirms: 
       delete_assignment: 是否确定要删除此作业?
     create_assignment: 
@@ -1598,7 +1598,7 @@ zh:
       options: 
         select_group: 选择学习小组
       tooltips: 
-        target_group: 选择此作业要移入的学习小组
+        target_group: 选择此作业要移入的小组
       warnings: 
         delete_assignment_group: "您即将删除 *%{name}*，其中包含 **%{assignment_count}** 项作业。"
       would_you_like: 您是否要：
@@ -1689,7 +1689,7 @@ zh:
       grade_group_students_individually: 分别为每位学生指定评分
       group_category_options: 新建学习小组类别
       group_set: 学习小组集
-      is_group_assignment: 这是一个学习小组作业
+      is_group_assignment: 这是一个小组作业
     group_comment: 
       labels: 
         group_comment: 发送评论到全学习小组
@@ -1699,7 +1699,7 @@ zh:
         group_submission: "请注意，此提交文件将作用于 %{group_type} 学习小组中的每个人。"
     group_weights: 
       headers: 
-        assignment_group: 作业组
+        assignment_group: 作业小组
         group_weight: 权重
         total: 总计
     higher_than_max: 您不能使用大于作业数的数字。
@@ -1709,11 +1709,11 @@ zh:
       assignment_locked_tooltip: 已锁定
       keycode_descriptions: 
         add_assignment_or_group: 将作业添加至当前小组
-        delete_assignment_or_group: 删除当前作业/组
-        edit_assignment_or_group: 编辑当前作业/组
+        delete_assignment_or_group: 删除当前作业/小组
+        edit_assignment_or_group: 编辑当前作业/小组
         full_preview: 完全预览/编辑作业
-        next_assignment_or_group: 下一个作业/组
-        previous_assignment_or_group: 上一个作业/组
+        next_assignment_or_group: 下一个作业/小组
+        previous_assignment_or_group: 上一个作业/小组
       keycodes: 
         add_assignment_or_group: a
         delete_assignment_or_group: d
@@ -1732,11 +1732,11 @@ zh:
       assignments_settings_screenreader: 作业设置
       search_for_assignment: 搜索作业
       title_add_assignment: 添加作业
-      title_add_group: 添加作业组
+      title_add_group: 添加作业小组
     invalid_file_retrieval: 检索通过此工具发送的文件时出现问题。
     invalid_tool_return: 已启动的工具对此次作业返回了无效资源
     labels: 
-      assignment_group_move_label: 作业组
+      assignment_group_move_label: 作业小组
       label_place_before: 放在前面
     loading_tools_failed: 加载工具失败
     messages: 
@@ -1760,7 +1760,7 @@ zh:
     never_drop_scores: "不删除 %{assignment_name}"
     no_assignments: "[无作业]"
     no_assignments_list_item: 
-      no_assignments_in_this_group: 此学习小组中无作业
+      no_assignments_in_this_group: 此小组中无作业
     no_assignments_search: 
       aria_assignments: 作业
       assignments: 作业
@@ -1980,7 +1980,7 @@ zh:
       links: 
         edit_syllabus_description: 编辑大纲说明
     titles: 
-      add_assignment_group: 添加作业组
+      add_assignment_group: 添加作业小组
       uploading: 正在上传提交文件
     toggle_message: 切换作业可见性
     toggle_show_by: 
@@ -2013,23 +2013,23 @@ zh:
       descriptions: 
         delete_icon: "%{icon}: 删除作业"
         edit_icon: "%{icon}: 再次编辑基本选项"
-        move_icon: "%{icon}: 将作业移至其它组"
+        move_icon: "%{icon}: 将作业移至其它小组"
         preview_icon: "%{icon}: 预览作业并全面编辑"
       errors: 
-        no_assignment_group: 噢。您需要先添加作业组。单击"创建作业组"以查看方法。
+        no_assignment_group: 噢。您需要先添加作业小组。单击"创建作业小组"以查看方法。
       instructions: 
         wizard: 
           details: "在截止时间和获得所需得分之前，还有许多作业要分配。如果要键入作业说明、允许文件上传、更改评分类型或多项其它设置，请单击作业名称或单击 %{edit_icon} 图标，然后单击\"更多选项\"。"
           group: 
-            step1: 作业组用于组织作业。可为每个组提供名称。如果选择根据各项作业所占比率计算总成绩（*位置?*），则亦可为每个组设置比例分数。单击"添加作业组"创建组。
-          overview: 此页面用于在高级别设置课程。可以添加作业、组织作业，然后加权这些组。方法是先组织，然后再研究细节。即使这样，在这里也可以执行许多操作。
+            step1: 作业小组用于组织作业。可为每个小组提供名称。如果选择根据各项作业所占比率计算总成绩（*位置?*），则亦可为每个小组设置比例分数。单击"添加作业小组"创建小组。
+          overview: 此页面用于在高级别设置课程。可以添加作业、组织作业，然后加权这些小组。方法是先组织，然后再研究细节。即使这样，在这里也可以执行许多操作。
           quizzes: 测验是特殊类型的作业。可以单击左侧栏中的"测验"链接来创建或导入测验。
-          step1: "作业始终要分配到组中，因此要添加作业，必须先知道要将其加入哪个组。选择该组，然后单击\"将作业添加至\"或单击 %{add_icon} 图标，开始为组分配新作业。"
+          step1: "作业始终要分配到小组中，因此要添加作业，必须先知道要将其加入哪个小组。选择该小组，然后单击\"将作业添加至\"或单击 %{add_icon} 图标，开始为小组分配新作业。"
           step2: 很好！现在输入详细信息。可以输入作业的标题、截止时间以及最高得分。如果还要执行其它操作，只有等到作业创建后。
-          step3: "完成！作业已添加到组中！如果将鼠标放在作业上，将会看到许多选项。其含义如下:"
+          step3: "完成！作业已添加到小组中！如果将鼠标放在作业上，将会看到许多选项。其含义如下:"
       links: 
         create_assignment: 创建新作业
-        create_assignment_group: 创建作业组
+        create_assignment_group: 创建作业小组
         create_or_import_quiz: 创建/导入测验
         edit_assignment_in_detail: 编辑作业详细信息
         show_me_where: 显示我的位置
@@ -2616,7 +2616,7 @@ zh:
         delete_done: 完成。您刚才展示了一些重要的删除技巧。
         done: 完成！事件现已创建！可以单击它查看详细信息、编辑和删除事件，或者拖放至新的一天以更改其日期。
         edit: 很好！现在只需输入事件的名称（*位置?*）。可以为事件指定所需的开始和结束时间。或者只指定开始时间，还可以不指定时间。单击"提交"完成。
-        edit_assignment: 现在只需输入作业名称（*位置?*）及其所属的作业组。如果需要，也可以指定截止时间。单击"提交"完成。
+        edit_assignment: 现在只需输入作业名称（*位置?*）及其所属的作业小组。如果需要，也可以指定截止时间。单击"提交"完成。
       labels: 
         i_would_like_to: 我要
       links: 
@@ -4083,7 +4083,7 @@ zh:
   course_exports: 
     errors: 
       assignment: "作业 \"%{title}\" 无法导出"
-      assignment_groups: 无法导出作业组
+      assignment_groups: 无法导出作业小组
       assignment_is_locked: "由于作业 \"%{title}\" 已经被锁定，所以无法复制。"
       assignments: 无法导出某些作业
       canvas_meta: "无法导出 Canvas 特定元数据"
@@ -4258,7 +4258,7 @@ zh:
       buttons: 
         publish: 发布课程
       details: 
-        assignments: "添加作业。您可以只添加一个较长的作业列表，或对作业进行分组 – 还可以指定每个作业组的权重。"
+        assignments: "添加作业。您可以只添加一个较长的作业列表，或对作业进行分组 – 还可以指定每个作业小组的权重。"
         available: 现在，您的课程已经设置就绪，您可能不再需要这份清单。但我们会保存它，以便您在今后想尝试一些新作业或对课程内容进行更改时，能够为您提供帮助。
         calendar: 日历功能对于了解日历以及向课程添加任何非作业事件都大有裨益。不用担心，我们会帮助您使用它。
         claimed: 
@@ -4699,7 +4699,7 @@ zh:
       active_students: 活动学生
       all_rubrics: 所有题目
       any: 任何
-      assignment_groups: 作业组
+      assignment_groups: 作业小组
       assignments: 作业
       course_rubrics: 课程题目
       discussion_posts: 讨论贴
@@ -5102,7 +5102,7 @@ zh:
       graded_discussion_and_points: 
         one: "这是已评分的讨论：*可能为 %{count} 分*"
         other: "这是已评分的讨论：*可能为 %{count} 分*"
-      separated_conversation_notice: "由于这是一个学习小组作业，每个学习小组都有关于此主题的会话。以下是您可以访问的内容:"
+      separated_conversation_notice: "由于这是一个小组作业，每个小组都有关于此主题的会话。以下是您可以访问的内容:"
       show_due_dates: 显示截止时间
       until: 直到
     confirm_delete_announcement: 
@@ -6204,7 +6204,7 @@ zh:
     submission_information: 提交文件信息
     teacher_muted_title: 作业被屏蔽
     titles: 
-      assignment_groups: 作业组
+      assignment_groups: 作业小组
       click_to_record: 单击麦克风录制您的评论
       dropped_assignment_no_total: 此作业将不会列入总分计算
       hypothetical_score: 这是假设分数
@@ -6237,7 +6237,7 @@ zh:
       assignment_options: 作业选项
       points_out_of: "满分 %{assignment.points_possible} 分"
       this_assignment_is_muted: 作业已屏蔽
-      zero_point_assignment: 此学习小组中的作业没有可能的得分，不能包括在评分计算中
+      zero_point_assignment: 此小组中的作业没有可能的得分，不能包括在评分计算中
     concluded_course_error_message: 这是个结业的课程，因此只提供结业登记。
     dropped_for_grading: 因评分目的删去
     error: 
@@ -6269,7 +6269,7 @@ zh:
     show: 
       all_sections: 所有班级
       arrange_columns_by_due_date: 按截止时间排列列
-      arrange_columns_by_group: 按作业组排列列
+      arrange_columns_by_group: 按作业小组排列列
       download_scores: "下载分数 (.csv)"
       filter_by_student: 以学生姓名或第二类身份证明筛选
       go_back_to_the_old_gradebook: 返回到旧评分册
@@ -6377,7 +6377,7 @@ zh:
       points_possible_of_grade: "*评分的* %{points_possible}"
       teacher_muted_title: 作业被屏蔽
       unmute_dialog: 此作业当前被屏蔽。这意味着学生无法看到其评分和反馈。是否要立即取消屏蔽?
-      zero_point_assignment: 此学习小组中的作业没有可能的得分，不能包括在评分计算中
+      zero_point_assignment: 此小组中的作业没有可能的得分，不能包括在评分计算中
     assignments: 
       options: 选项
       refresh_grades: 刷新评分
@@ -6478,7 +6478,7 @@ zh:
       buttons: 
         by_due_date: 根据截止时间
         by_email: 根据电子邮件/ID
-        by_group: 根据作业组
+        by_group: 根据作业小组
         by_name: 根据学生姓名
         by_section: 根据班级名称
         by_total_asc: 根据总分（升序）
@@ -6514,7 +6514,7 @@ zh:
         add_assignments: 向课程添加作业
         add_students: 向课程添加学生
         attach_file: 附加文件
-        manage: 管理作业组
+        manage: 管理作业小组
       loading_submission: 正在加载提交文件详细信息...
       no_assignments: 尚未创建此课程的作业。
       no_comments: 无评论
@@ -6611,7 +6611,7 @@ zh:
         assessment: 评估
         discussion: 讨论
         grading: 评分
-        no_group_submission: 该学习小组没有提交此作业的文件
+        no_group_submission: 该小组没有提交此作业的文件
         no_submission: 该学生没有提交此作业的文件。
         submission: 此学生已经提交了作业
       icons: 
@@ -6965,7 +6965,7 @@ zh:
         account_group_explanation: 帐户级学习小组是一种不依附特定课程而组织学生团体的良好方式。每个学习小组有自己的日历、讨论板和协作工具，从而能够更加有效地组织和合作。
         add_group_set: 添加学习小组集
         course_group_explanation: 学习小组是组织学生开展团体项目或论文等工作的良好方式。每个学习小组有自己的日历、讨论板和协作工具，从而能够更加有效地组织和合作。
-        group_assignment_instructions: "您可以随机分配学生到指定规模的学习小组，或手动创建并组织学习小组。创建学习小组之后，您可以设置作业为 \"小组作业\" ，这意味着每个学习小组的所有学生只需提交一份共同的作业。"
+        group_assignment_instructions: "您可以随机分配学生到指定规模的小组，或手动创建并组织小组。创建小组之后，您可以设置作业为 \"小组作业\" ，这意味着每个小组的所有学生只需提交一份共同的作业。"
         group_set: 学习小组集
         headings: 
           account_groups: 帐户级学习小组
@@ -6999,7 +6999,7 @@ zh:
         message_all_unassigned_option: 向所有未分配的学生发送消息
         randomly_assign_students_option: 随机分配学生
         restricted_self_signup_blurb: 学习小组内所有学生需要在相同的班级中
-        self_organized_warning: 这些学习小组是学生自发组织的。与其它类型的组不同，在这些学习小组中，学生可以同时属于多个学习小组，因此这些学习小组未必是评分作业的最佳解决方案。
+        self_organized_warning: 这些小组是学生自发组织的。与其它类型的组不同，在这些小组中，学生可以同时属于多个小组，因此这些小组未必是评分作业的最佳解决方案。
         self_signup_blurb: 对这些学习小组启用自行注册。
         settings: 设置
       group_category_edit: 
@@ -8592,18 +8592,18 @@ zh:
           grade_changed: "课程 %{course_name} 的评分政策已更改。"
           grading_based_on_points: 评分基于所有作业的总得分。
           labels: 
-            grades_based_on_percent: 评分基于每个作业组的加权总计
+            grades_based_on_percent: 评分基于每个作业小组的加权总计
             now_see_here: 您可在此处查看详细信息
             subject: 评分加权已更改
         labels: 
-          grades_based_on_percent: 评分基于每个作业组的加权总计
+          grades_based_on_percent: 评分基于每个作业小组的加权总计
           now_see_here: 您可在此处查看详细信息
           subject: 评分加权已更改
       facebook: 
         grading_based_on_points: 评分基于所有作业的总得分。
         grading_policy_changed: "**[%{course_name}](%{course_url})** 的评分政策已更改。"
         labels: 
-          grades_based_on_percent: 评分基于每个作业组的加权总计
+          grades_based_on_percent: 评分基于每个作业小组的加权总计
       sms: 
         grade_changed: "课程 %{course_name} 的评分政策已更改。"
         more_info_at: "更多信息请访问 %{course_url}"
@@ -8611,7 +8611,7 @@ zh:
         grade_changed: "课程 %{course_name} 的评分政策已更改。"
         grading_based_on_points: 评分基于所有作业的总得分。
         labels: 
-          grades_based_on_percent: 评分基于每个作业组的加权总计
+          grades_based_on_percent: 评分基于每个作业小组的加权总计
           subject: 评分加权已更改
       twitter: 
         grade_changed: "Canvas 警报 - 评分政策已更改: %{course_name}"
@@ -8619,12 +8619,12 @@ zh:
       email: 
         body: "学习小组 %{group_name} 刚刚提交课程 %{course_name} 中 %{assignment_name} 的最近提交的作业。"
         html: 
-          body: "学习小组 %{group_name} 刚刚提交课程 %{course_name} 中 %{assignment_name} 的最近作业。"
-          subject: "最近作业:%{group_name}，%{assignment_name}"
+          body: "小组 %{group_name} 刚刚提交课程 %{course_name} 中 %{assignment_name} 的最近作业。"
+          subject: "最近作业: %{group_name}，%{assignment_name}"
           view_submission_here: 您可在此处查看提交文件
         labels: 
           view_submission_here: 您可在此处查看提交文件
-        subject: "最近作业:%{group_name}，%{assignment_name}"
+        subject: "最近作业: %{group_name}，%{assignment_name}"
       facebook: 
         body: "学习小组 %{group_name} 刚刚提交课程 %{course_name} 中 **[%{assignment_name}](%{assignment_url})** 的最近提交的作业。"
       sms: 
@@ -8632,9 +8632,9 @@ zh:
         subject: "%{group_name} 刚刚提交其作业（最近） %{assignment_name}"
       summary: 
         body: "学习小组 %{group_name} 已提交课程 %{course_name} 中 %{assignment_name} 的最近提交的作业。"
-        subject: "最近作业:%{group_name}，%{assignment_name}"
+        subject: "最近作业: %{group_name}，%{assignment_name}"
       twitter: 
-        subject: "Canvas 警报 - 最近小组作业:%{group_name}，%{assignment_name}"
+        subject: "Canvas 警报 - 最近小组提交作业:%{group_name}，%{assignment_name}"
     group_membership_accepted: 
       email: 
         account_group: "帐户 %{account_name} 加入学习小组 %{group_name} 的请求已被接受。"
@@ -9386,7 +9386,7 @@ zh:
         tweet: "Canvas 警报 - 邀请:参加 %{title}，%{name}"
   migration: 
     announcement_type: 通告
-    assignment_group_type: 作业组
+    assignment_group_type: 作业小组
     assignment_type: 作业
     calendar_event_type: 日历事件
     discussion_topic_type: 讨论主题
@@ -9574,7 +9574,7 @@ zh:
       event_date_changed: 活动日期更改
       forgot_password: 忘记密码
       grade_weight_changed: 评分加权已更改
-      group_assignment_submitted_late: 最近提交的学习小组作业
+      group_assignment_submitted_late: 最近提交的小组作业
       group_membership_accepted: 学习小组成员资格已接受
       group_membership_rejected: 学习小组成员资格已拒绝
       merge_email_communication_channel: 合并电子邮件通信渠道
@@ -11296,7 +11296,7 @@ zh:
       code: 访问代码
       default_page_title: 新测验
       filter: "IP 过滤"
-      group: 作业组
+      group: 作业小组
       headers: 
         ip_filters: "什么是测验 IP 过滤器?"
       hints: 
@@ -11472,7 +11472,7 @@ zh:
       due: 截止时间
       filter: "IP 过滤"
       for: 对于
-      group: 作业组
+      group: 作业小组
       label: 
         time_limit: 时间限制
       multiple_attempts: 多次尝试
@@ -12205,11 +12205,11 @@ zh:
       submitted_and_graded_count: "%{submitted_count} 个已提交，%{graded_count} 个已评分"
       submitted_count: "%{submitted_count} 个已提交"
       tiles: 
-        sort_or_move: 排序作业或移动到其它学习小组
+        sort_or_move: 排序作业或移动到其它小组
     assignment_group: 
       alts: 
         add_assignment: 添加作业
-        delete_assignment_group: 删除作业组
+        delete_assignment_group: 删除作业小组
         edit_group_details: 编辑
         move: 移动
       defaults: 
@@ -12993,8 +12993,8 @@ zh:
       external_url_submission: "此提交是指向外部页面的一个 URL。"
       file_uploads_for_user: "**%{user}** 的文件上传"
       group_discussion_submission_description: |-
-          此作业的提交文件在该学习小组的作业讨论中发布。下面是 %{user} 的讨论帖
-          ，或者您可以*查看完整的学习小组讨论*。
+          此作业的提交文件在该小组的作业讨论中发布。下面是 %{user} 的讨论帖
+          ，或者您可以*查看完整的小组讨论*。
       media_comment_link: 此提交是一个媒体记录。*单击此处查看。*
       no_files: 没有此提交上传的文件
       no_preview_available: 无可用预览
