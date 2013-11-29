@@ -1,4 +1,3 @@
-<% cache(['submission_sidebar_render', @current_user_submission, Time.zone.utc_offset].cache_key) do %>
 <div class="details">
   <h3 style="margin: 0;"><%= t 'titles.submission', "Submission" %></h3>
   <% if @assignment.expects_submission? %>
@@ -84,7 +83,6 @@
     </div>
   </div>
 </div>
-<% end %>
 <% if @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) %>
   <ul class="page-action-list">
     <li>
