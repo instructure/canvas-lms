@@ -1,14 +1,20 @@
 source 'http://rubygems.org/'
 
-if ENV['RAILS_ENV'] != 'test' && (RUBY_VERSION < "1.9.3")
-  raise "Canvas requires Ruby 1.9.3"
+ruby_version = '1.9.3'
+if RUBY_VERSION == "2.0.0"
+  warn "Ruby 2.0 support is untested"
+  ruby_version = RUBY_VERSION
 end
 
-if RUBY_VERSION >= "2.0.0"
-  warn "Ruby 2.0 support is untested"
-end
+# this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
+ruby ruby_version, :engine => 'ruby', :engine_version => ruby_version
 
 require File.expand_path("../config/canvas_rails3", __FILE__)
+
+platforms :ruby_20 do
+  gem 'syck', '1.0.1'
+  gem 'iconv', '1.0.3'
+end
 
 if CANVAS_RAILS2
   # If you have a license to rails lts, you can create a vendor/plugins/*/RAILS_LTS yaml file
@@ -18,7 +24,7 @@ if CANVAS_RAILS2
   if lts_file
     eval(File.read(lts_file))
   else
-    gem 'rails', :git => 'https://github.com/makandra/rails.git', :branch => '2-3-lts', :ref => 'e86daf8ff727d5efc0040c876ba00c9444a5d915'
+    gem 'rails', :github => 'makandra/rails', :branch => '2-3-lts', :ref => 'e86daf8ff727d5efc0040c876ba00c9444a5d915'
   end
   gem 'authlogic', '2.1.3'
 else
@@ -59,7 +65,6 @@ if CANVAS_RAILS2
   gem 'i18nema', '0.0.7'
 end
 gem 'icalendar', '1.1.5'
-gem 'iconv', '1.0.3'
 gem 'jammit', '0.6.6'
 gem 'json', '1.8.1'
 gem 'oj', '2.1.7'
@@ -70,8 +75,7 @@ end
 gem 'libxml-ruby', '2.6.0', :require => 'xml/libxml'
 gem 'macaddr', '1.0.0' # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
 gem 'mail', '2.5.4'
-# using this forked gem until https://github.com/37signals/marginalia/pull/15 is in the source gem
-gem 'instructure-marginalia', '1.1.3', :require => false
+gem 'marginalia', '1.1.3', :require => false
 gem 'mime-types', '1.17.2', :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
 # with mini_magick 3.1
@@ -101,17 +105,14 @@ gem 'zip-zip', '0.2' # needed until plugins use the new namespace
 gem 'safe_yaml-instructure', '0.8.0', :require => false
 gem 'sanitize', '2.0.3'
 gem 'shackles', '1.0.2'
-if RUBY_VERSION >= '2.0.0'
-  gem 'syck', '1.0.1'
-end
 gem 'tzinfo', '0.3.35'
 gem 'useragent', '0.4.16'
 gem 'uuid', '2.3.2'
 if CANVAS_RAILS2
-  gem 'folio-pagination-legacy', git: "https://github.com/instructure/folio.git", ref: "5f7d23fbab78ee263d9a7799e6fd2eaf4868b862"
+  gem 'folio-pagination-legacy', github: "instructure/folio", ref: "5f7d23fbab78ee263d9a7799e6fd2eaf4868b862"
   gem 'will_paginate', '2.3.15', require: false
 else
-  gem 'folio-pagination', git: "https://github.com/instructure/folio.git", ref: "b530e4b56a69c234fb0dd48fd69fa801cb109257"
+  gem 'folio-pagination', github: "instructure/folio", ref: "b530e4b56a69c234fb0dd48fd69fa801cb109257"
   gem 'will_paginate', '3.0.4', require: false
 end
 gem 'xml-simple', '1.0.12', :require => 'xmlsimple'
@@ -119,7 +120,7 @@ gem 'foreigner', '0.9.2'
 gem 'crocodoc-ruby', '0.0.1', :require => 'crocodoc'
 # needs https://github.com/regru/premailer/commit/8d3ae698eff135011b19e1587a68c399ec97b185
 # we can go back to the gem once 1.7.8 is released
-gem 'regru-premailer', :require => 'premailer', :git => "https://github.com/regru/premailer.git", :ref => "08a73c70701f5d81bc4a5cf6c959a45ad94db88e"
+gem 'regru-premailer', :require => 'premailer', :github => "regru/premailer", :ref => "08a73c70701f5d81bc4a5cf6c959a45ad94db88e"
 
 group :assets do
   gem 'compass-rails', '1.0.3'
@@ -143,7 +144,7 @@ group :test do
   gem 'simplecov', :require => false
   gem 'simplecov-rcov', :require => false
   gem 'bluecloth', '2.0.10' # for generating api docs
-  gem 'mocha', :git => 'git://github.com/ccutrer/mocha.git', :require => false
+  gem 'mocha', :github => 'ccutrer/mocha', :require => false
   gem 'thin', '1.5.1'
   if CANVAS_RAILS2
     gem 'rspec', '1.3.2'
@@ -171,11 +172,8 @@ group :development do
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
-    if RUBY_VERSION >= '2.0.0'
-      gem 'byebug', github: 'deivid-rodriguez/byebug'
-    else
-      gem 'debugger', '1.5.0'
-    end
+    gem 'byebug', github: 'deivid-rodriguez/byebug', platforms: :ruby_20
+    gem 'debugger', '1.5.0', platforms: :ruby_19
   end
 end
 
@@ -199,7 +197,7 @@ group :redis do
 end
 
 group :cassandra do
-  gem 'cassandra-cql', '1.2.1', git: 'https://github.com/kreynolds/cassandra-cql', ref: 'd100be075b04153cf4116da7512892a1e8c0a7e4'
+  gem 'cassandra-cql', '1.2.1', github: 'kreynolds/cassandra-cql', ref: 'd100be075b04153cf4116da7512892a1e8c0a7e4'
 end
 
 group :embedly do
