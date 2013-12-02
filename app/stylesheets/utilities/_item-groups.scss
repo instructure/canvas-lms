@@ -230,6 +230,10 @@ is for items that are not draggable.
     background-color: #eef7ff;
   }
 
+  &:focus {
+    background-color: #eef7ff;
+  }
+
   &:before {
     position: relative;
     top: -2px;

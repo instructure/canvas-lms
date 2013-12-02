@@ -10,10 +10,11 @@ define [
   'compiled/views/MoveDialogView'
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentGroupListItem'
-], (I18n, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,
-  CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template) ->
+  'compiled/views/assignments/AssignmentKeyBindingsMixin'
+], (I18n, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template, AssignmentKeyBindingsMixin) ->
 
   class AssignmentGroupListItemView extends DraggableCollectionView
+    @mixin AssignmentKeyBindingsMixin
     @optionProperty 'course'
 
     tagName: "li"
@@ -36,6 +37,7 @@ define [
     events:
       'click .element_toggler': 'toggleArrow'
       'click .tooltip_link': preventDefault ->
+      'keydown .assignment_group': 'handleKeys'
 
     messages:
       toggleMessage: I18n.t('toggle_message', "toggle assignment visibility")
@@ -281,3 +283,73 @@ define [
 
     currentUserId: ->
       ENV.current_user_id
+
+    isVisible: =>
+      $("#assignment_group_#{@model.id}").is(":visible")
+
+    goToNextItem: =>
+      if @hasVisibleAssignments()
+        @focusOnAssignment(@firstAssignment())
+      else if @nextGroup()?
+        @focusOnGroup(@nextGroup())
+      else
+        @focusOnFirstGroup()
+
+    goToPrevItem: =>
+      if @previousGroup()?
+        if @previousGroup().view.hasVisibleAssignments()
+          @focusOnAssignment(@previousGroup().view.lastAssignment())
+        else
+          @focusOnGroup(@previousGroup())
+      else
+        if @lastVisibleGroup().view.hasVisibleAssignments()
+          @focusOnAssignment(@lastVisibleGroup().view.lastAssignment())
+        else
+          @focusOnGroup(@lastVisibleGroup())
+
+    addItem: =>
+      $(".add_assignment", "#assignment_group_#{@model.id}").click()
+
+    editItem: =>
+      $(".edit_group[data-focus-returns-to='ag_#{@model.id}_manage_link']").click()
+
+    deleteItem: =>
+      $(".delete_group[data-focus-returns-to='ag_#{@model.id}_manage_link']").click()
+
+    visibleAssignments: =>
+      @collection.filter (assign) ->
+        assign.attributes.hidden != true
+
+    hasVisibleAssignments: =>
+      @currentlyExpanded() and @visibleAssignments().length
+
+    firstAssignment: =>
+      @visibleAssignments()[0]
+
+    lastAssignment: =>
+      @visibleAssignments()[@visibleAssignments().length - 1]
+
+    visibleGroupsInCollection: =>
+      @model.collection.filter (group) ->
+        group.view.isVisible()
+
+    nextGroup: =>
+      place_in_groups_collection = @visibleGroupsInCollection().indexOf(@model)
+      @visibleGroupsInCollection()[place_in_groups_collection + 1]
+
+    previousGroup: =>
+      place_in_groups_collection = @visibleGroupsInCollection().indexOf(@model)
+      @visibleGroupsInCollection()[place_in_groups_collection - 1]
+
+    focusOnGroup: (group) =>
+      $("#assignment_group_#{group.attributes.id}").attr("tabindex",-1).focus()
+
+    focusOnAssignment: (assignment) =>
+      $("#assignment_#{assignment.id}").attr("tabindex",-1).focus()
+
+    focusOnFirstGroup: =>
+      $(".assignment_group").filter(":visible").first().attr("tabindex",-1).focus()
+
+    lastVisibleGroup: =>
+      last_group_index = @visibleGroupsInCollection().length - 1
+      @visibleGroupsInCollection()[last_group_index]

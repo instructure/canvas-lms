@@ -1,7 +1,7 @@
 # This class both creates the slickgrid instance, and acts as the data source for that instance.
 define [
   'compiled/views/KeyboardNavDialog'
-  'jst/gradebook2/KeyboardNavDialog'
+  'jst/KeyboardNavDialog'
   'vendor/slickgrid'
   'compiled/gradebook2/TotalColumnHeaderView'
   'compiled/util/round'

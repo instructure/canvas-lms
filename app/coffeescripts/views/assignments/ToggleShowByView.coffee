@@ -90,12 +90,21 @@ define [
 
     setAssignmentGroups: =>
       groups = if @showByDate() then @groupedByDate else @groupedByAG
+      @setAssignmentGroupAssociations(groups)
       groups = _.select groups, (group) =>
         hasWeight = @course.get('apply_assignment_group_weights') and
           group.get('group_weight')? and
           group.get('group_weight') > 0
         group.get('assignments').length > 0 or hasWeight
       @assignmentGroups.reset(groups)
+
+    setAssignmentGroupAssociations: (groups) ->
+      for assignment_group in groups
+        if assignment_group.get("assignments").models.length
+          for assignment in assignment_group.get("assignments").models
+            # we are keeping this change on the frontend only (for keyboard nav), will not persist in the db
+            assignment.collection = assignment_group
+            assignment.set('assignment_group_id', assignment_group.id)
 
     showByDate: ->
       return true unless @initialized
