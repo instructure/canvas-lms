@@ -17,6 +17,13 @@ describe "admin_tools" do
     fj("#{form_sel} .roster tbody tr:nth(#{click_row}) td").click
   end
 
+  def perform_autocomplete_search(field_sel, search_term, click_row = 0)
+    set_value f(field_sel), search_term
+    sleep 0.5
+    wait_for_ajaximations
+    fj(".ui-autocomplete.ui-menu > .ui-menu-item:nth(#{click_row}) > a").click
+  end
+
   def setup_users
     # Setup a student (@student)
     course_with_student(:active_all => true, :account => @account, :user => user_with_pseudonym(:name => 'Student TestUser'))
@@ -168,12 +175,10 @@ describe "admin_tools" do
   context "Logging" do
     it_should_behave_like "cassandra audit logs"
 
-    before do
+    it "should change log types with dropdown" do
       load_admin_tools_page
       click_view_tab "logging"
-    end
 
-    it "should change log types with dropdown" do
       select = fj('#loggingType')
       select.should_not be_nil
       select.should be_displayed
@@ -183,6 +188,89 @@ describe "admin_tools" do
       loggingTypeView = fj('#loggingAuthentication')
       loggingTypeView.should_not be_nil
       loggingTypeView.should be_displayed
+    end
+
+    context "permissions" do
+      it "should not see tab" do
+        setup_account_admin(
+          view_statistics: false,
+          manage_user_logins: false,
+          view_grade_changes: false
+        )
+        load_admin_tools_page
+        wait_for_ajaximations
+        tab = fj('#adminToolsTabs .logging > a')
+        tab.should be_nil
+      end
+
+      it "should see tab for view_statistics permission" do
+        setup_account_admin(
+          view_statistics: true,
+          manage_user_logins: false,
+          view_grade_changes: false
+        )
+        load_admin_tools_page
+        wait_for_ajaximations
+        tab = fj('#adminToolsTabs .logging > a')
+        tab.text.should == "Logging"
+
+        click_view_tab "logging"
+
+        select = fj('#loggingType')
+        select.should_not be_nil
+        select.should be_displayed
+
+        options = ffj("#loggingType > option")
+        options.size.should eql(2)
+        options[0].text.should == "Select a Log type"
+        options[1].text.should == "Login / Logout Activity"
+      end
+
+      it "should see tab for manage_user_logins permission" do
+        setup_account_admin(
+          view_statistics: false,
+          manage_user_logins: true,
+          view_grade_changes: false
+        )
+        load_admin_tools_page
+        wait_for_ajaximations
+        tab = fj('#adminToolsTabs .logging > a')
+        tab.text.should == "Logging"
+
+        click_view_tab "logging"
+
+        select = fj('#loggingType')
+        select.should_not be_nil
+        select.should be_displayed
+
+        options = ffj("#loggingType > option")
+        options.size.should eql(2)
+        options[0].text.should == "Select a Log type"
+        options[1].text.should == "Login / Logout Activity"
+      end
+
+      it "should see tab for view_grade_changes permission" do
+        setup_account_admin(
+          view_statistics: false,
+          manage_user_logins: false,
+          view_grade_changes: true
+        )
+        load_admin_tools_page
+        wait_for_ajaximations
+        tab = fj('#adminToolsTabs .logging > a')
+        tab.text.should == "Logging"
+
+        click_view_tab "logging"
+
+        select = fj('#loggingType')
+        select.should_not be_nil
+        select.should be_displayed
+
+        options = ffj("#loggingType > option")
+        options.size.should eql(2)
+        options[0].text.should == "Select a Log type"
+        options[1].text.should == "Grade Change Activity"
+      end
     end
   end
 
@@ -212,6 +300,61 @@ describe "admin_tools" do
       f('#authLoggingSearchForm .userDateRangeSearchBtn').click
       wait_for_ajaximations
       ff('#authLoggingSearchResults table tbody tr').length.should == 2
+    end
+  end
+
+  context "Grade Change Logging" do
+    it_should_behave_like "cassandra audit logs"
+
+    before do
+      course_with_teacher(course: @course, :user => user_with_pseudonym(:name => 'Teacher TestUser'))
+
+      @assignment = @course.assignments.create!(:title => 'Assignment', :points_possible => 10)
+      @submission = @assignment.grade_student(@student, grade: 7, grader: @teacher).first
+      @submission = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
+      @submission = @assignment.grade_student(@student, grade: 9, grader: @teacher).first
+
+      load_admin_tools_page
+      click_view_tab "logging"
+      change_log_type("GradeChange")
+    end
+
+    it "should search by grader name and show history" do
+      perform_autocomplete_search("#grader_id-autocompleteField", @teacher.name)
+      f('#loggingGradeChange button[name=gradeChange_submit]').click
+      wait_for_ajaximations
+      ff('#gradeChangeLoggingSearchResults table tbody tr').length.should == 3
+
+      cols = ffj('#gradeChangeLoggingSearchResults table tbody tr:last td')
+      cols.size.should == 8
+
+      cols[2].text.should == "-"
+      cols[3].text.should == "7"
+      cols[4].text.should == @teacher.name
+      cols[5].text.should == @student.name
+      cols[6].text.should == @course.name
+      cols[7].text.should == @assignment.title
+    end
+
+    it "should search by student name" do
+      perform_autocomplete_search("#student_id-autocompleteField", @student.name)
+      f('#loggingGradeChange button[name=gradeChange_submit]').click
+      wait_for_ajaximations
+      ff('#gradeChangeLoggingSearchResults table tbody tr').length.should == 3
+    end
+
+    it "should search by course id" do
+      set_value f("#gradeChangeCourseSearch"), @course.id
+      f('#loggingGradeChange button[name=gradeChange_submit]').click
+      wait_for_ajaximations
+      ff('#gradeChangeLoggingSearchResults table tbody tr').length.should == 3
+    end
+
+    it "should search by assignment id" do
+      set_value f("#gradeChangeAssignmentSearch"), @assignment.id
+      f('#loggingGradeChange button[name=gradeChange_submit]').click
+      wait_for_ajaximations
+      ff('#gradeChangeLoggingSearchResults table tbody tr').length.should == 3
     end
   end
 end

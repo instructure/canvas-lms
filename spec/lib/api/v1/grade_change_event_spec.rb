@@ -21,12 +21,24 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 describe Api::V1::GradeChangeEvent do
   include Api::V1::GradeChangeEvent
 
+  def url_root
+    'http://www.example.com'
+  end
+
   def feeds_calendar_url(feed_code)
     "feed_calendar_url(#{feed_code.inspect})"
   end
 
   def course_assignment_url(course, assignment)
-    'http://www.example.com'
+    url_root
+  end
+
+  def api_v1_course_url(course)
+    URI.encode("#{url_root}/api/v1/courses/#{course}")
+  end
+
+  def api_v1_course_assignment_url(course, assignment)
+    URI.encode("#{url_root}/api/v1/courses/#{course}/assignments/#{assignment}")
   end
 
   def service_enabled?(type)
@@ -78,7 +90,6 @@ describe Api::V1::GradeChangeEvent do
     event[:grade_before].should == @previous_grade
     event[:grade_after].should == @submission.grade
     event[:version_number].should == @submission.version_number
-    event[:request_id].should == @event.request_id
     event[:links][:assignment].should == Shard.relative_id_for(@assignment)
     event[:links][:course].should == Shard.relative_id_for(@course)
     event[:links][:student].should == Shard.relative_id_for(@student)
@@ -93,22 +104,38 @@ describe Api::V1::GradeChangeEvent do
   it "should be formatted as an array of compound grade change event hashes" do
     json_hash = grade_change_events_compound_json(@events, @user, @session)
 
-    json_hash[:meta][:primaryCollection].should == 'events'
+    json_hash.keys.sort.should == [:events, :linked, :links]
+
+    json_hash[:links].should == {
+      "events.assignment" => "#{url_root}/api/v1/courses/{events.course}/assignments/{events.assignment}",
+      "events.course" => "#{url_root}/api/v1/courses/{events.course}",
+      "events.student" => { href: nil, type: 'user' },
+      "events.grader" => { href: nil, type: 'user' },
+      "events.page_view" => nil
+    }
+
     json_hash[:events].should == grade_change_events_json(@events, @user, @session)
-    json_hash[:assignments].size.should eql(1)
-    json_hash[:courses].size.should eql(1)
-    json_hash[:users].size.should eql(2)
-    json_hash[:page_views].size.should eql(1)
+
+    json_hash[:linked].keys.sort.should == [:assignments, :courses, :page_views, :users]
+    linked = json_hash[:linked]
+    linked[:assignments].size.should eql(1)
+    linked[:courses].size.should eql(1)
+    linked[:users].size.should eql(2)
+    linked[:page_views].size.should eql(1)
   end
 
   it "should handle an empty result set" do
     json_hash = grade_change_events_compound_json([], @user, @session)
 
-    json_hash[:meta][:primaryCollection].should == 'events'
+    json_hash.keys.sort.should == [:events, :linked, :links]
+
     json_hash[:events].should == grade_change_events_json([], @user, @session)
-    json_hash[:assignments].size.should be_zero
-    json_hash[:courses].size.should be_zero
-    json_hash[:users].size.should be_zero
-    json_hash[:page_views].size.should be_zero
+
+    json_hash[:linked].keys.sort.should == [:assignments, :courses, :page_views, :users]
+    linked = json_hash[:linked]
+    linked[:assignments].size.should be_zero
+    linked[:courses].size.should be_zero
+    linked[:users].size.should be_zero
+    linked[:page_views].size.should be_zero
   end
 end

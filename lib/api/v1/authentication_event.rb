@@ -52,19 +52,12 @@ module Api::V1::AuthenticationEvent
 
   private
 
-  # This is sorta hacky sometime figure out a better way to get this without
-  # the url helpers escaping the values for the url templates.
-  def urlTemplate(url)
-    url.sub('%7B%7B', '{').sub('%7D%7D', '}')
-  end
-
   def links_json
     # This should include logins, users, and page_views.  There is no end point
     # for returning single json objects for those models.
-    account = api_v1_account_url("{{events.account}}")
     {
       "events.login" => nil,
-      "events.account" => urlTemplate(account),
+      "events.account" => templated_url(:api_v1_account_url, "{events.account}"),
       "events.user" => nil,
       "events.page_view" => nil
     }

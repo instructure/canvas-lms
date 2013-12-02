@@ -46,9 +46,6 @@
 #       // Version Number of the grade change submission.
 #       "version_number": "1",
 #
-#       // The unique request id of the request during the grade change.
-#       "request_id": "e2b76430-27a5-0131-3ca1-48e0eb13f29b",
-#
 #       "links": {
 #          // ID of the assignment associated with the event.
 #          "assignment": 2319,

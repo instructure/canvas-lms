@@ -126,6 +126,18 @@ describe Submission do
     @submission = @assignment.submit_homework(se.user, :media_comment_id => "fake", :media_comment_type => "audio")
   end
 
+  it "should log submissions with grade changes" do
+    submission_spec_model
+
+    Auditors::GradeChange.expects(:record).once
+
+    @submission.score = 5
+    @submission.save!
+
+    @submission.grader_id = @user.id
+    @submission.save!
+  end
+
   context "Discussion Topic" do
     it "should use correct date for its submitted_at value" do
       course_with_student_logged_in(:active_all => true)

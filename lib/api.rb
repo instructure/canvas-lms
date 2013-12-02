@@ -656,4 +656,24 @@ module Api
   def reject!(status, cause)
     raise Api::V1::ApiError.new(status, cause)
   end
+
+  # Return a template url that follows the root links key for the jsonapi.org
+  # standard.
+  #
+  def templated_url(method, *args)
+    format = /^\{.*\}$/
+    placeholder = "PLACEHOLDER"
+
+    placeholders = args.each_with_index.map do |arg, index|
+      arg =~ format ? "#{placeholder}#{index}" : arg
+    end
+
+    url = send(method, *placeholders)
+
+    args.each_with_index do |arg, index|
+      url.sub!("#{placeholder}#{index}", arg) if arg =~ format
+    end
+
+    url
+  end
 end

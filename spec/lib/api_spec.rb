@@ -24,6 +24,14 @@ class TestApiInstance
     @domain_root_account = root_account
     @current_user = current_user
   end
+
+  def account_url(account)
+    URI.encode("http://www.example.com/accounts/#{account}")
+  end
+
+  def course_assignment_url(course, assignment)
+    URI.encode("http://www.example.com/courses/#{course}/assignments/#{assignment}")
+  end
 end
 
 describe Api do
@@ -731,6 +739,32 @@ describe Api do
 
     it "does nothing to arrays" do
       Api.value_to_array(['1', '2', '3']).should == ['1', '2', '3']
+    end
+  end
+
+  describe "#templated_url" do
+    before do
+      @api = TestApiInstance.new Account.default, nil
+    end
+
+    it "should return url with a single item" do
+      url = @api.templated_url(:account_url, "{courses.account}")
+      url.should == "http://www.example.com/accounts/{courses.account}"
+    end
+
+    it "should return url with multiple items" do
+      url = @api.templated_url(:course_assignment_url, "{courses.id}", "{courses.assignment}")
+      url.should == "http://www.example.com/courses/{courses.id}/assignments/{courses.assignment}"
+    end
+
+    it "should return url with no template items" do
+      url = @api.templated_url(:account_url, "1}")
+      url.should == "http://www.example.com/accounts/1%7D"
+    end
+
+    it "should return url with a combination of items" do
+      url = @api.templated_url(:course_assignment_url, "{courses.id}", "1}")
+      url.should == "http://www.example.com/courses/{courses.id}/assignments/1%7D"
     end
   end
 end

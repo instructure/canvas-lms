@@ -109,7 +109,6 @@ class Submission < ActiveRecord::Base
   after_save :check_for_media_object
   after_save :update_quiz_submission
   after_save :update_participation
-  after_save :grade_change_audit
 
   def autograded?
     # AutoGrader == (quiz_id * -1)
@@ -152,6 +151,10 @@ class Submission < ActiveRecord::Base
     :when => lambda{ |model| model.new_version_needed? },
     :on_create => lambda{ |model,version| SubmissionVersion.index_version(version) },
     :on_load => lambda{ |model,version| model.cached_due_date = version.versionable.cached_due_date }
+
+  # This needs to be after simply_versioned because the grade change audit uses 
+  # versioning to grab the previous grade.
+  after_save :grade_change_audit
 
   def new_version_needed?
     turnitin_data_changed? || (changes.keys - [
@@ -717,7 +720,7 @@ class Submission < ActiveRecord::Base
   private :validate_single_submission
 
   def grade_change_audit
-    Auditors::GradeChange.record(self) if @score_changed
+    Auditors::GradeChange.record(self) if self.grade_changed?
   end
 
   include Workflow
