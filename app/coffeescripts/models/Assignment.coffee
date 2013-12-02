@@ -243,11 +243,13 @@ define [
       result = _.map models, (group) -> group.toJSON()
 
     singleSectionDueDate: =>
-      if !@multipleDueDates()
+      if !@multipleDueDates() && !@dueAt()
         allDates = @allDates()
         for section in allDates
           if section.dueAt
             return section.dueAt.toISOString()
+      else
+        return @dueAt()
 
     toView: =>
       fields = [

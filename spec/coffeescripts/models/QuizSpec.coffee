@@ -143,6 +143,25 @@ define [
     deepEqual quiz.allDates(), []
 
 
+  # single section due date
+
+  test "gets the due date for section instead of null", ->
+    dueAt = new Date("2013-11-27 11:01:00")
+    quiz = new Quiz all_dates: [
+      {due_at: null, title: "Everyone"},
+      {due_at: dueAt, title: "Summer"}
+    ]
+    false_stub = sinon.stub quiz, "multipleDueDates"
+    false_stub.returns false
+    deepEqual quiz.singleSectionDueDate(), dueAt.toISOString()
+    false_stub.restore()
+
+  test "returns due_at when only one date/section are present", ->
+    date = Date.now()
+    quiz = new Quiz name: 'Taco party!'
+    quiz.set 'due_at', date
+    deepEqual quiz.singleSectionDueDate(), quiz.dueAt()
+
   # toView
 
   module "Quiz#toView"
@@ -182,3 +201,16 @@ define [
     quiz = new Quiz all_dates: [{title: "Summer"}, {title: "Winter"}]
     json = quiz.toView()
     equal json.allDates.length, 2
+
+  test "includes singleSectionDueDate", ->
+    dueAt = new Date("2013-11-27 11:01:00")
+    quiz = new Quiz all_dates: [
+      {due_at: null, title: "Everyone"},
+      {due_at: dueAt, title: "Summer"}
+    ]
+    false_stub = sinon.stub quiz, "multipleDueDates"
+    false_stub.returns false
+    json = quiz.toView()
+    equal json.singleSectionDueDate, dueAt.toISOString()
+    false_stub.restore()
+

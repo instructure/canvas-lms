@@ -117,9 +117,18 @@ define [
       models = (groups and groups.models) or []
       result = _.map models, (group) -> group.toJSON()
 
+    singleSectionDueDate: =>
+      if !@multipleDueDates() && !@dueAt()
+        allDates = @allDates()
+        for section in allDates
+          if section.dueAt
+            return section.dueAt.toISOString()
+      else
+        return @dueAt()
+
     toView: =>
       fields = [
-        'htmlUrl', 'multipleDueDates', 'allDates', 'dueAt', 'lockAt', 'unlockAt'
+        'htmlUrl', 'multipleDueDates', 'allDates', 'dueAt', 'lockAt', 'unlockAt', 'singleSectionDueDate'
       ]
       hash = id: @get 'id'
       for field in fields

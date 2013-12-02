@@ -2,6 +2,7 @@ define [
   'compiled/models/Assignment'
   'compiled/models/Submission'
   'compiled/models/DateGroup'
+  'helpers/fakeENV'
 ], (Assignment, Submission, DateGroup) ->
 
   module "Assignment"
@@ -397,6 +398,17 @@ define [
     false_stub.returns false
     deepEqual assignment.singleSectionDueDate(), dueAt.toISOString()
     false_stub.restore()
+
+  test "returns due_at when only one date/section are present", ->
+    date = Date.now()
+    assignment = new Assignment name: 'Taco party!'
+    assignment.set 'due_at', date
+    deepEqual assignment.singleSectionDueDate(), assignment.dueAt()
+
+    # For students
+    ENV.PERMISSIONS = { manage: false }
+    deepEqual assignment.singleSectionDueDate(), assignment.dueAt()
+    ENV.PERMISSIONS = {}
 
   module "Assignment#toView"
 
