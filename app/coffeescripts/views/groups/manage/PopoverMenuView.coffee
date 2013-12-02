@@ -5,6 +5,9 @@ define [
 
   class PopoverMenuView extends View
 
+    defaults:
+      zIndex: 1
+
     events:
       'click': 'cancelHide'
       'focusin': 'cancelHide'
@@ -16,10 +19,10 @@ define [
       @cancelHide()
       setTimeout => # IE needs this to happen async frd
         @render()
-        @$el.insertAfter($target)
+        @attachElement($target)
         @$el.show()
         @setElement @$el
-        @$el.zIndex(1)
+        @$el.zIndex(@options.zIndex)
         @setWidth?()
         @$el.position
           my: @my or 'left+6 top-47'
@@ -51,3 +54,6 @@ define [
 
     checkEsc: (e) ->
       @hide() if e.keyCode is 27 # escape
+
+    attachElement: ($target) ->
+      @$el.insertAfter($target)

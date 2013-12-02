@@ -31,6 +31,13 @@
       <div class="row-fluid">
         <div class="span3 unassigned-students">
           <h3 class="unassigned-users-heading group-heading"></h3>
+          <input
+            type="text"
+            class="filterable-unassigned-users search-query"
+            placeholder="{{#t "search_users"}}Search users{{/t}}"
+            aria-label="{{#t "search_users"}}Search users{{/t}}"
+            role="search"
+          >
           <div data-view="unassignedUsers"></div>
         </div>
         <div class="span9 groups">

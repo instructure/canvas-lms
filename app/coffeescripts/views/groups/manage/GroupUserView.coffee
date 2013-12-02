@@ -15,6 +15,12 @@ define [
 
     template: template
 
+    els:
+      '.al-trigger': '$userActions'
+
+    closeMenu: ->
+      @$userActions.data('kyleMenu')?.$menu.popup 'close'
+
     attach: ->
       @model.on 'change', @render, this
 

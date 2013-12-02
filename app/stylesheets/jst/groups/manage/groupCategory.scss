@@ -36,6 +36,9 @@
   > .collectionViewItems {
     margin: -1px 0 0;
   }
+  > h2 {
+    border-bottom: 1px solid #c2c8d0;
+  }
   > p {
     margin: 1em 0;
   }
@@ -60,6 +63,10 @@
   font-size: 1.1em;
   color: #555;
   margin: 0;
+
+  &.unassigned-users-heading {
+    padding: 10px 0;
+  }
 }
 
 a.group-heading:hover {
@@ -68,10 +75,24 @@ a.group-heading:hover {
 }
 
 .unassigned-students {
-  ul {
-    padding: 0 8px;
-  }
   &.droppable-hover {
     background-color: $droppableBackground;
+  }
+
+  input[type=text] {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    height: $baseLineHeight + 8; // adjust default for box-sizing
+    width: 100%;
+    margin: 8px 0;
+  }
+
+  .no-results {
+    background: transparent;
+    border: 0;
+    margin: 8px;
+    padding: 0;
+    width: 80;
   }
 }

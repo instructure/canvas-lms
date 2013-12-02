@@ -76,6 +76,10 @@ define [
     hideAddUser: (e) ->
       @addUnassignedMenu.hide()
 
+    closeMenus: ->
+      @groupDetailView.closeMenu()
+      @groupUsersView.closeMenus()
+
     ##
     # handle drop events on a GroupView
     # e - Event object.

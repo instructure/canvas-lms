@@ -32,7 +32,7 @@
   padding: 1.5em 0;
   border-top: 1px dashed #c2c8d0;
   &:first-child {
-    border-top-style: solid;
+    border-top-style: none;
   }
 
   .row-fluid [class*=span] {
