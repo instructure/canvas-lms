@@ -47,13 +47,15 @@ describe AssignmentOverrideApplicator do
     end
 
     it "should distinguish cache by assignment version" do
-      @assignment.due_at = 7.days.from_now
-      @assignment.save!
-      @assignment.versions.count.should == 2
-      enable_cache do
-        overrides1 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment.versions.first.model, @student)
-        overrides2 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment.versions.current.model, @student)
-        overrides1.object_id.should_not == overrides2.object_id
+      Timecop.travel Time.now + 1.hour do
+        @assignment.due_at = 7.days.from_now
+        @assignment.save!
+        @assignment.versions.count.should == 2
+        enable_cache do
+          overrides1 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment.versions.first.model, @student)
+          overrides2 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment.versions.current.model, @student)
+          overrides1.object_id.should_not == overrides2.object_id
+        end
       end
     end
 
@@ -477,7 +479,7 @@ describe AssignmentOverrideApplicator do
       end
     end
 
-    it "should distinguish cache by assignment version" do
+    it "should distinguish cache by assignment updated_at" do
       @assignment = assignment_model
       @assignment.due_at = 5.days.from_now
       @assignment.save!
@@ -486,6 +488,7 @@ describe AssignmentOverrideApplicator do
       enable_cache do
         overrides1 = AssignmentOverrideApplicator.collapsed_overrides(@assignment.versions.first.model, [@override])
         overrides2 = AssignmentOverrideApplicator.collapsed_overrides(@assignment.versions.current.model, [@override])
+        @assignment.versions.first.updated_at.should_not == @assignment.versions.current.model
         overrides1.object_id.should_not == overrides2.object_id
       end
     end

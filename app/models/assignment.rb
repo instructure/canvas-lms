@@ -1891,4 +1891,14 @@ class Assignment < ActiveRecord::Base
     self.save
   end
 
+  # simply versioned models are always marked new_record, but for our purposes
+  # they are not new. this ensures that assignment override caching works as
+  # intended for versioned assignments
+  def cache_key
+    new_record = @new_record
+    @new_record = false if @simply_versioned_version_model
+    super
+  ensure
+    @new_record = new_record if @simply_versioned_version_model
+  end
 end
