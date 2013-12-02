@@ -465,14 +465,15 @@ describe "calendar2" do
 
       it "should navigate with jump-to-date control" do
         Account.default.change_root_account_setting!(:agenda_view, true)
-        make_event(start: 1.month.from_now)
+        # needs to be 2 months out so it doesn't appear at the start of the next month
+        eventStart = 2.months.from_now
+        make_event(start: eventStart)
 
         get "/calendar2"
         wait_for_ajaximations
         f('.fc-event').should be_nil
-        next_month_num = (Time.now.month % 12) + 1
-        next_month = Date::MONTHNAMES[next_month_num]
-        quick_jump_to_date(next_month)
+        eventStartText = eventStart.strftime("%Y %m %d")
+        quick_jump_to_date(eventStartText)
         f('.fc-event').should_not be_nil
       end
 
