@@ -20,14 +20,21 @@ module Api::V1::AuthenticationEvent
   include Api::V1::Pseudonym
   include Api::V1::Account
   include Api::V1::User
+  include Api::V1::PageView
 
   def authentication_event_json(event, user, session)
+    links = {
+      :login => Shard.relative_id_for(event.pseudonym_id),
+      :account => Shard.relative_id_for(event.account_id),
+      :user => Shard.relative_id_for(event.user_id),
+      :page_view => event.page_view.nil? ? nil : event.request_id
+    }
+
     {
+      :id => event.id,
       :created_at => event.created_at.in_time_zone,
       :event_type => event.event_type,
-      :pseudonym_id => Shard.relative_id_for(event.pseudonym_id),
-      :account_id => Shard.relative_id_for(event.account_id),
-      :user_id => Shard.relative_id_for(event.user_id)
+      :links => links
     }
   end
 
@@ -36,6 +43,34 @@ module Api::V1::AuthenticationEvent
   end
 
   def authentication_events_compound_json(events, user, session)
+    {
+      links: links_json,
+      events: authentication_events_json(events, user, session),
+      linked: linked_json(events, user, session)
+    }
+  end
+
+  private
+
+  # This is sorta hacky sometime figure out a better way to get this without
+  # the url helpers escaping the values for the url templates.
+  def urlTemplate(url)
+    url.sub('%7B%7B', '{').sub('%7D%7D', '}')
+  end
+
+  def links_json
+    # This should include logins, users, and page_views.  There is no end point
+    # for returning single json objects for those models.
+    account = api_v1_account_url("{{events.account}}")
+    {
+      "events.login" => nil,
+      "events.account" => urlTemplate(account),
+      "events.user" => nil,
+      "events.page_view" => nil
+    }
+  end
+
+  def linked_json(events, user, session)
     pseudonyms = []
     accounts = []
     pseudonym_ids = events.map{ |event| event.pseudonym_id }.uniq
@@ -51,12 +86,15 @@ module Api::V1::AuthenticationEvent
       User.where(:id => shard_user_ids).all
     end
 
+    page_view_ids = events.map{ |event| event.request_id }
+    page_views = PageView.find_all_by_id(page_view_ids) if page_view_ids.length > 0
+    page_views ||= []
+
     {
-      meta: {primaryCollection: 'events'},
-      events: authentication_events_json(events, user, session),
-      pseudonyms: pseudonyms_json(pseudonyms, user, session),
+      logins: pseudonyms_json(pseudonyms, user, session),
       accounts: accounts_json(accounts, user, session, []),
-      users: users_json(users, user, session, [], @domain_root_account)
+      users: users_json(users, user, session, [], @domain_root_account),
+      page_views: page_views_json(page_views, user, session)
     }
   end
 end

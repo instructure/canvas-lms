@@ -106,23 +106,23 @@ define [
     equal collection.parse(document), document,
       'passes through without meta key'
 
-    document = 
-      meta: {primaryCollection: 'posts'}
+    document =
+      meta: {}
       posts: [
-        {id: 1, author_id: 1},
-        {id: 2, author_id: 1}
+        {id: 1, links: { author: 1 }},
+        {id: 2, links: { author: 1 }}
       ]
     equal collection.parse(document), document.posts,
       'extracts primary collection'
 
     john = id: 1, name: "John Doe"
     document =
-      meta: {primaryCollection: 'posts'}
       posts: [
-        {id: 1, author_id: 1},
-        {id: 2, author_id: 1}
+        {id: 1, links: { author: 1 }},
+        {id: 2, links: { author: 1 }}
       ]
-      authors: [john]
+      linked:
+        authors: [john]
     expected = [
       {id: 1, author: john},
       {id: 2, author: john}
@@ -134,12 +134,12 @@ define [
     SideLoader::sideLoad = author: 'users'
 
     document =
-      meta: {primaryCollection: 'posts'}
       posts: [
-        {id: 1, author_id: 1},
-        {id: 2, author_id: 1}
+        {id: 1, links: { author: 1 }},
+        {id: 2, links: { author: 1 }}
       ]
-      users: [john]
+      linked:
+        users: [john]
     deepEqual collection.parse(document), expected,
       'recognizes string side load as collection name'
 
@@ -149,12 +149,12 @@ define [
         foreignKey: 'user_id'
 
     document =
-      meta: {primaryCollection: 'posts'}
       posts: [
-        {id: 1, user_id: 1},
-        {id: 2, user_id: 1}
+        {id: 1, links: { user_id: 1 }},
+        {id: 2, links: { user_id: 1 }}
       ]
-      users: [john]
+      linked:
+        users: [john]
     deepEqual collection.parse(document), expected,
       'recognizes complex side load declaration'
 
@@ -165,15 +165,133 @@ define [
 
     jane = id: 2, name: "Jane Doe"
     document =
-      meta: {primaryCollection: 'posts'}
       posts: [
-        {id: 1, author_id: 1, editor_id: 2},
-        {id: 2, author_id: 2, editor_id: 1}
+        {id: 1, links: { author: 1, editor: 2 }},
+        {id: 2, links: { author: 2, editor: 1 }}
       ]
-      users: [john, jane]
+      linked:
+        users: [john, jane]
     expected = [
       {id: 1, author: john, editor: jane},
       {id: 2, author: jane, editor: john}
     ]
     deepEqual collection.parse(document), expected,
       'recognizes multiple side load declarations'
+
+    # keeps links attributes that are not found or not defined
+    SideLoader::sideLoad = author: 'users'
+
+    jane = id: 2, name: "Jane Doe"
+    document =
+      posts: [
+        {id: 1, links: { author: 1, editor: 2 }},
+        {id: 2, links: { author: 2, editor: 1 }},
+        {id: 3, links: { author: 5, editor: 1 }}
+      ]
+      linked:
+        users: [john, jane]
+    expected = [
+      {id: 1, author: john, links: { editor: 2 }},
+      {id: 2, author: jane, links: { editor: 1 }},
+      {id: 3, links: { author: 5, editor: 1 }}
+    ]
+    deepEqual collection.parse(document), expected,
+      'retains links when sideload relation is not found'
+
+    # to_many simple
+    SideLoader::sideLoad = authors: true
+
+    document =
+      posts: [
+        { id: 1, links: { authors: [ '1', '2' ] }},
+        { id: 2, links: { authors: [ '1' ] }}
+      ]
+      linked:
+        authors: [ john, jane ]
+
+    expected = [
+      { id: 1, authors: [ john, jane ] },
+      { id: 2, authors: [ john ] }
+    ]
+
+    deepEqual collection.parse(document), expected,
+      'extracts links with simple to_many relationships'
+
+    # to_many string
+    SideLoader::sideLoad = authors: "users"
+
+    document =
+      posts: [
+        { id: 1, links: { authors: [ '1', '2' ] }},
+        { id: 2, links: { authors: [ '1' ] }}
+      ]
+      linked:
+        users: [ john, jane ]
+
+    expected = [
+      { id: 1, authors: [ john, jane ] },
+      { id: 2, authors: [ john ] }
+    ]
+
+    deepEqual collection.parse(document), expected,
+      'extracts links with string to_many relationships'
+
+    # to_many complex
+    SideLoader::sideLoad = authors:
+      collection: 'users'
+      foreignKey: 'author_ids'
+
+    document =
+      posts: [
+        { id: 1, links: { author_ids: [ '1', '2' ] }},
+        { id: 2, links: { author_ids: [ '1' ] }}
+      ]
+      linked:
+        users: [ john, jane ]
+
+    expected = [
+      { id: 1, authors: [ john, jane ] },
+      { id: 2, authors: [ john ] }
+    ]
+
+    deepEqual collection.parse(document), expected,
+      'extracts links with complex to_many relationships'
+
+    # to_many complex
+    SideLoader::sideLoad = authors:
+      collection: 'authors'
+      foreignKey: 'author_ids'
+
+    document =
+      posts: [
+        { id: 1, links: { author_ids: [ '1', '2' ] }},
+        { id: 2, links: { author_ids: [ '1' ] }}
+      ]
+      linked:
+        users: [ john, jane ]
+
+    expected = "Could not find linked collection for 'authors' using 'author_ids'."
+
+    throws (-> collection.parse(document)), expected,
+      'should throw error when a to_many relationship is not found'
+
+    SideLoader::sideLoad = authors: true
+
+    # Links attribute
+    document =
+      links:
+        "posts.author": "http://example.com/authors/{posts.author}"
+      posts: [
+        { id: 1, links: { authors: [ '1', '2' ] }},
+        { id: 2, links: { authors: [ '1' ] }}
+      ]
+      linked:
+        authors: [ john, jane ]
+
+    expected = [
+      { id: 1, authors: [ john, jane ] },
+      { id: 2, authors: [ john ] }
+    ]
+
+    deepEqual collection.parse(document), expected,
+      'extracts links with links root'

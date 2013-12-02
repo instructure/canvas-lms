@@ -888,7 +888,7 @@ routes.draw do
     end
 
     scope(:controller => :authentication_audit_api) do
-      get 'audit/authentication/pseudonyms/:pseudonym_id', :action => :for_pseudonym, :path_name => 'audit_authentication_pseudonym'
+      get 'audit/authentication/logins/:login_id', :action => :for_login, :path_name => 'audit_authentication_login'
       get 'audit/authentication/accounts/:account_id', :action => :for_account, :path_name => 'audit_authentication_account'
       get 'audit/authentication/users/:user_id', :action => :for_user, :path_name => 'audit_authentication_user'
     end
@@ -1069,7 +1069,7 @@ routes.draw do
 
     scope(:controller => :accounts) do
       get 'accounts', :action => :index, :path_name => :accounts
-      get 'accounts/:id', :action => :show
+      get 'accounts/:id', :action => :show, :path_name => :account
       put 'accounts/:id', :action => :update
       get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
       get 'accounts/:account_id/sub_accounts', :action => :sub_accounts, :path_name => 'sub_accounts'
