@@ -313,7 +313,9 @@ describe "profile" do
 
       wait_for_ajaximations
 
-      f('#profile_pic_dialog').should_not be_nil
+      keep_trying_until do
+        ff('.ui-dialog').length.should == 1
+      end
     end
   end
 

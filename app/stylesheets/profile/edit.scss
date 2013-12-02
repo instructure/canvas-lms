@@ -135,3 +135,29 @@
     }
   }
 }
+
+.avatar-nav {
+  text-align: center;
+
+  .nav-pills {
+    display: inline-block;
+  }
+
+  .nav-pills a:focus {
+    background: #eee;
+    outline: none;
+    text-decoration: none;
+  }
+
+  .nav-pills .active a:focus {
+    background: #0088cc;
+  }
+}
+
+.avatar-content > div {
+  display: none;
+}
+
+.avatar-content .active {
+  display: block;
+}
