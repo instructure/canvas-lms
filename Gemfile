@@ -31,6 +31,8 @@ gem "aws-sdk", '1.21.0'
 gem 'barby', '0.5.0'
 gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
+# enforce the version of bundler itself, to avoid any surprises
+gem 'bundler', '1.3.5'
 if CANVAS_RAILS2
   gem 'canvas_connect', '0.2'
   gem 'canvas_webex', '0.6'
