@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -120,6 +120,8 @@ class AccountReportsController < ApplicationController
 #
   def create
     if authorized_action(@context, @current_user, :read_reports)
+      available_reports = AccountReport.available_reports(@account).keys
+      raise ActiveRecord::RecordNotFound unless available_reports.include? params[:report]
       report = @account.account_reports.build(:user=>@current_user, :report_type=>params[:report], :parameters=>params[:parameters])
       report.workflow_state = :running
       report.progress = 0
