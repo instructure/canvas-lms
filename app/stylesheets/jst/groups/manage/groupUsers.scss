@@ -9,6 +9,7 @@
   cursor: pointer;
   &.ui-draggable-dragging {
     cursor: move;
+    list-style: none;
     z-index: 9999;
   }
   &.group-user-highlight {
@@ -44,8 +45,8 @@
 }
 
 .group .group-users {
-  margin: 1.25em -8px -8px;
-  padding: 8px;
+  margin: 1.25em 0 -8px;
+  padding: 8px 0;
   overflow: hidden;
   .collectionViewItems {
     width: 103%;

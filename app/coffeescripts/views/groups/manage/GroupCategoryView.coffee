@@ -20,6 +20,7 @@ define [
 
     els:
       '.filterable': '$filter'
+      '.filterable-unassigned-users': '$filterUnassignedUsers'
       '.unassigned-users-heading': '$unassignedUsersHeading'
       '.groups-with-count': '$groupsHeading'
 
@@ -72,6 +73,7 @@ define [
 
     afterRender: ->
       @groupsView.$externalFilter = @$filter
+      @unassignedUsersView.$externalFilter = @$filterUnassignedUsers
       @setUnassignedHeading()
       @setGroupsHeading()
 

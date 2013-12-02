@@ -8,6 +8,10 @@ define [
 
   class AssignToGroupMenu extends PopoverMenuView
 
+    defaults: _.extend {},
+      PopoverMenuView::defaults,
+      zIndex: 10
+
     events: _.extend {},
       PopoverMenuView::events,
       'click .set-group': 'setGroup'
@@ -35,3 +39,6 @@ define [
         noGroups: !hasGroups
         allFull: hasGroups and @collection.models.every (g) -> g.isFull()
       }
+
+    attachElement: ->
+      $('body').append(@$el)

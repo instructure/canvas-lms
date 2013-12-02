@@ -19,8 +19,10 @@ define [
         canEditGroupAssignment: true
 
     dragOptions:
+      appendTo: 'body'
       helper: 'clone'
       opacity: 0.75
+      refreshPositions: true
       revert: 'invalid'
       revertDuration: 150
       start: (event, ui) ->
@@ -28,8 +30,6 @@ define [
         $(event.currentTarget).find('.assign-to-group-menu').hide()
         $(ui.helper).find('.assign-to-group-menu').hide()
         $(ui.helper).width($(event.currentTarget).width())
-        # hide all ui-menu popups
-        $('.ui-popup').hide()
 
     initialize: ->
       super
@@ -43,6 +43,10 @@ define [
 
     highlightUser: (user) ->
       user.itemView.highlight()
+
+    closeMenus: ->
+      for model in @collection.models
+        model.itemView.closeMenu()
 
     events:
       'click .remove-from-group': 'removeUserFromGroup'
@@ -79,6 +83,8 @@ define [
     # enable draggable on the child GroupUserView (view)
     _initDrag: (view) =>
       view.$el.draggable(_.extend({}, @dragOptions))
+      view.$el.on 'dragstart', (event, ui) ->
+        ui.helper.css 'maxWidth', view.$el.width()
 
     removeItem: (model) =>
       model.view.remove()

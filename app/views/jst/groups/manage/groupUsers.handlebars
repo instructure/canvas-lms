@@ -1,5 +1,14 @@
 {{#ifAny count loading}}
   <ul class="collectionViewItems unstyled"></ul>
+  <div class="no-results-wrapper">
+    <div class="no-results hidden">
+      {{#ifEqual ENV.group_user_type "student"}}
+        {{#t "no_matching_students"}}No matching students.{{/t}}
+      {{else}}
+        {{#t "no_matching_users"}}No matching users.{{/t}}
+      {{/ifEqual}}
+    </div>
+  </div>
   <div class="paginatedLoadingIndicator"></div>
 {{else}}
   <div class="no-results">

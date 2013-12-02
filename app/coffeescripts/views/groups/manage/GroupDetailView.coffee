@@ -46,6 +46,9 @@ define [
         success: -> $.flashMessage I18n.t('flash.removed', 'Group successfully removed.')
         error: -> $.flashError I18n.t('flash.removeError', 'Unable to remove the group. Please try again later.')
 
+    closeMenu: ->
+      @$groupActions.data('kyleMenu')?.$menu.popup 'close'
+
     toJSON: ->
       json = @model.toJSON()
       json.summary = @summary()

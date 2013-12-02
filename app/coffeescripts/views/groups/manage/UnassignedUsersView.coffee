@@ -2,8 +2,10 @@ define [
   'underscore'
   'compiled/views/groups/manage/GroupUsersView'
   'compiled/views/groups/manage/AssignToGroupMenu'
+  'compiled/views/groups/manage/Scrollable'
+  'compiled/views/Filterable'
   'jst/groups/manage/groupUsers'
-], (_, GroupUsersView, AssignToGroupMenu, template) ->
+], (_, GroupUsersView, AssignToGroupMenu, Scrollable, Filterable, template) ->
 
   class UnassignedUsersView extends GroupUsersView
 
@@ -17,6 +19,13 @@ define [
         canAssignToGroup: true
         canEditGroupAssignment: false
 
+    els: _.extend {},
+      GroupUsersView::els,
+      '.no-results-wrapper': '$noResultsWrapper'
+      '.no-results': '$noResults'
+
+    @mixin Filterable, Scrollable
+
     dropOptions:
       accept: '.group-user'
       activeClass: 'droppable'
@@ -26,12 +35,19 @@ define [
     attach: ->
       @collection.on 'reset', @render
       @collection.on 'moved', @highlightUser
+      @collection.on 'filterOut', _(=> @checkScroll()).debounce(50)
+
+      @collection.once 'fetch', => @$noResultsWrapper.hide()
+      @collection.on 'fetched:last', => @$noResultsWrapper.show()
 
     afterRender: ->
+      @$filter = @$externalFilter
       super
       @collection.load('first')
       @$el.parent().droppable(_.extend({}, @dropOptions))
                    .on('drop', @_onDrop)
+      @scrollContainer = @heightContainer = @$el
+      @$scrollableElement = @$el.find("ul")
 
     toJSON: ->
       loading: !@collection.loadedAll
@@ -44,7 +60,8 @@ define [
     events:
       'click .assign-to-group': 'showAssignToGroup'
       'focus .assign-to-group': 'showAssignToGroup'
-      'blur .assign-to-group': 'hideAssignToGroup'
+      'blur .assign-to-group':  'hideAssignToGroup'
+      'scroll':                 'hideAssignToGroup'
 
     showAssignToGroup: (e) ->
       e.preventDefault()
@@ -55,7 +72,7 @@ define [
       @assignToGroupMenu.showBy $target
 
     hideAssignToGroup: ->
-      @assignToGroupMenu.hide()
+      @assignToGroupMenu?.hide()
 
     canAssignToGroup: ->
       @options.canAssignToGroup and @groupsCollection.length
