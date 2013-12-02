@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011-2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -68,6 +68,8 @@ class EnrollmentsApiController < ApplicationController
   # @response_field root_account_id The unique id of the user's account.
   # @response_field type The type of the enrollment.
   # @response_field role The enrollment role, for course-level permissions.
+  # @response_field updated_at The updated time of the enrollment, in ISO8601 format.
+  # @response_field last_activity_at The last activity time of the user for the enrollment, in ISO8601 format.
   # @response_field user_id The unique id of the user.
   # @response_field html_url The URL to the Canvas web UI page for this course enrollment.
   # @response_field grades[html_url] The URL to the Canvas web UI page for the user's grades, if this is a student enrollment.
@@ -90,6 +92,8 @@ class EnrollmentsApiController < ApplicationController
   #       "root_account_id": 1,
   #       "type": "StudentEnrollment",
   #       "user_id": 1,
+  #       "updated_at": "2012-04-18T23:08:51Z"
+  #       "last_activity_at": "2012-04-24T08:08:12Z"
   #       "html_url": "https://...",
   #       "grades": {
   #         "html_url": "https://...",
@@ -111,6 +115,8 @@ class EnrollmentsApiController < ApplicationController
   #       "root_account_id": 1,
   #       "type": "TeacherEnrollment",
   #       "user_id": 2,
+  #       "updated_at": "2012-04-18T23:08:51Z"
+  #       "last_activity_at": "2012-04-21T08:54:14Z"
   #       "html_url": "https://...",
   #       "grades": {
   #         "html_url": "https://...",
@@ -132,6 +138,8 @@ class EnrollmentsApiController < ApplicationController
   #       "root_account_id": 1,
   #       "type": "StudentEnrollment",
   #       "user_id": 2,
+  #       "updated_at": "2012-04-18T23:08:51Z"
+  #       "last_activity_at": "2012-05-30T08:15:45Z"
   #       "html_url": "https://...",
   #       "grades": {
   #         "html_url": "https://...",
@@ -280,6 +288,7 @@ class EnrollmentsApiController < ApplicationController
   #     "grades": { "html_url": "http://www.example.com/courses/12/grades/4" },
   #     "associated_user_id": null,
   #     "updated_at": "2012-04-18T23:08:51Z"
+  #     "last_activity_at": "2012-04-24T08:08:12Z"
   #   }
   def destroy
     @enrollment = Enrollment.find(params[:id])
