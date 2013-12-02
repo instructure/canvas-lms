@@ -1876,7 +1876,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def has_student_submissions?
-    self.submissions.any? { |s| context.includes_student?(s.user) }
+    self.submissions.having_submission.where("user_id IS NOT NULL").exists?
   end
 
   # override so validations are called

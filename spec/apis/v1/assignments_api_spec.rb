@@ -658,7 +658,7 @@ describe AssignmentsApiController, :type => :integration do
       @assignment.workflow_state.should == 'unpublished'
 
       course_with_student(:active_all => true, :course => @course)
-      @assignment.grade_student(@student, grade: 15)
+      @assignment.submit_homework(@student, :submission_type => "online_text_entry")
       @assignment.publish
       @user = @teacher
       raw_api_call(
@@ -1418,7 +1418,7 @@ describe AssignmentsApiController, :type => :integration do
 
         # Returns "unpublishable => false" when student submissions
         student_in_course(:active_all => true, :course => @course)
-        @assignment.grade_student(@student, grade: 15)
+        @assignment.submit_homework(@student, :submission_type => "online_text_entry")
         @user = @teacher
         json = api_get_assignment_in_course(@assignment, @course)
         response.should be_success

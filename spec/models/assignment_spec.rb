@@ -71,12 +71,24 @@ describe Assignment do
     @submission.versions.length.should eql(1)
   end
 
-  it "does not allow itself to be unpublished if it has student submissions" do
-    setup_assignment_with_students
-    @assignment.context.root_account.enable_feature!(:draft_state)
-    @assignment.unpublish
-    @assignment.should_not be_valid
-    @assignment.errors['workflow_state'].should == "Can't unpublish if there are student submissions"
+  describe "#has_student_submissions?" do
+    before do
+      setup_assignment_with_students
+      @assignment.context.root_account.enable_feature!(:draft_state)
+    end
+
+    it "does not allow itself to be unpublished if it has student submissions" do
+      @assignment.submit_homework @stu1, :submission_type => "online_text_entry"
+      @assignment.unpublish
+      @assignment.should_not be_valid
+      @assignment.errors['workflow_state'].should == "Can't unpublish if there are student submissions"
+    end
+
+    it "does allow itself to be unpiblished if it has nil submissions" do
+      @assignment.submit_homework @stu1, :submission_type => nil
+      @assignment.unpublish
+      @assignment.workflow_state.should == "unpublished"
+    end
   end
 
   describe '#grade_student' do
