@@ -1,13 +1,12 @@
 source 'http://rubygems.org/'
 
-ruby_version = '1.9.3'
+# this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
 if RUBY_VERSION == "2.0.0"
   warn "Ruby 2.0 support is untested"
-  ruby_version = RUBY_VERSION
+  ruby '2.0.0', :engine => 'ruby', :engine_version => '2.0.0'
+else
+  ruby '1.9.3', :engine => 'ruby', :engine_version => '1.9.3'
 end
-
-# this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
-ruby ruby_version, :engine => 'ruby', :engine_version => ruby_version
 
 require File.expand_path("../config/canvas_rails3", __FILE__)
 
