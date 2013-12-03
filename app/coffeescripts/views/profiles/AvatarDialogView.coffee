@@ -23,9 +23,10 @@ define [
   'compiled/views/DialogBaseView'
   'compiled/views/profiles/UploadFileView'
   'compiled/views/profiles/TakePictureView'
+  'compiled/views/profiles/GravatarView'
   'jst/profiles/avatarDialog'
   'jst/profiles/avatar'
-], (I18n, $, _, DialogBaseView, UploadFileView, TakePictureView, template, avatarTemplate) ->
+], (I18n, $, _, DialogBaseView, UploadFileView, TakePictureView, GravatarView, template, avatarTemplate) ->
 
   class AvatarDialogView extends DialogBaseView
 
@@ -37,6 +38,7 @@ define [
 
     @child 'uploadFileView',  '#upload-picture'
     @child 'takePictureView', '#take-picture'
+    @child 'gravatarView', '#from-gravatar'
 
     dialogOptions: ->
       buttons: [
@@ -63,12 +65,13 @@ define [
     initialize: () ->
       @uploadFileView = new UploadFileView(avatarSize: @AVATAR_SIZE)
       @takePictureView = new TakePictureView(avatarSize: @AVATAR_SIZE)
+      @gravatarView   = new GravatarView(avatarSize: @AVATAR_SIZE)
       super
 
     show: ->
       @render()
-      @togglePane(@$('.nav-pills a')[0])
       _.each(@children, (child) => @listenTo(child, 'ready', @onReady))
+      @togglePane(@$('.nav-pills a')[0])
       super
 
     cancel: ->
@@ -87,7 +90,20 @@ define [
       (@currentView || @$('.avatar-content > div:first-child').data('view')).getImage()
 
     updateAvatar: =>
+      @disableSelectButton()
+      if @currentView?.updateAvatar
+        @viewUpdateAvatar()
+      else
+        @imageUpdateAvatar()
+
+    disableSelectButton: ->
       $('.select_button').prop('disabled', true).text(@messages.selectingImage)
+
+    viewUpdateAvatar: ->
+      @currentView.updateAvatar().then((response) =>
+        @updateDomAvatar(response.avatar_url))
+
+    imageUpdateAvatar: ->
       $.when(@getImage(), @preflightRequest()).then(@onPreflight)
 
     preflightRequest: ->
@@ -174,10 +190,10 @@ define [
       $target.siblings().removeClass('active')
       $target.addClass('active')
       @teardown()
+      $('.select_button').prop('disabled', true)
       @$('.avatar-content div').removeClass('active')
       $content.addClass('active').data('view')?.setup()
       @currentView = $content.data('view')
-      $('.select_button').prop('disabled', true)
 
     onReady: (ready = true) ->
       $('.select_button').prop('disabled', !ready)
