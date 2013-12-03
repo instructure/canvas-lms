@@ -29,6 +29,9 @@ class Attachment < ActiveRecord::Base
 
   attr_accessor :podcast_associated_asset, :submission_attachment
 
+  # this is a gross hack to work around freaking SubmissionComment#attachments=
+  attr_accessor :ok_for_submission_comment
+
   MAX_SCRIBD_ATTEMPTS = 3
   MAX_CROCODOC_ATTEMPTS = 2
   # This value is used as a flag for when we are skipping the submit to scribd for this attachment
@@ -1180,6 +1183,12 @@ class Attachment < ActiveRecord::Base
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
     can :download
+
+    given { |user, session|
+      owner = self.user
+      context_type == 'Assignment' && user == owner
+    }
+    can :attach_to_submission_comment
   end
 
   # checking if an attachment is locked is expensive and pointless for

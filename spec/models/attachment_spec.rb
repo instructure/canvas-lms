@@ -1567,6 +1567,21 @@ describe Attachment do
       @attachment.scribd_doc.should_not be_nil
     end
   end
+
+  context 'permissions' do
+    describe ':attach_to_submission_comment' do
+      it 'works for assignments if you own the attachment' do
+        @s1, @s2 = n_students_in_course(2)
+        @assignment = @course.assignments.create! name: 'blah'
+        @attachment = Attachment.create! context: @assignment,
+          filename: "foo.txt",
+          uploaded_data: StringIO.new("bar"),
+          user: @s1
+        @attachment.grants_right?(@s1, :attach_to_submission_comment).should be_true
+        @attachment.grants_right?(@s2, :attach_to_submission_comment).should be_false
+      end
+    end
+  end
 end
 
 def processing_model

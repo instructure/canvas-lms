@@ -824,8 +824,12 @@ class Submission < ActiveRecord::Base
       opts[:group_comment_id] ||= AutoHandle.generate_securish_uuid
     end
     self.save! if self.new_record?
-    valid_keys = [:comment, :author, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request, :attachments, :anonymous, :hidden]
-    comment = self.submission_comments.create(opts.slice(*valid_keys)) if !opts[:comment].empty?
+    valid_keys = [:comment, :author, :media_comment_id, :media_comment_type,
+                  :group_comment_id, :assessment_request, :attachments,
+                  :anonymous, :hidden]
+    if opts[:comment].present?
+      comment = submission_comments.create!(opts.slice(*valid_keys))
+    end
     opts[:assessment_request].comment_added(comment) if opts[:assessment_request] && comment
     comment
   end

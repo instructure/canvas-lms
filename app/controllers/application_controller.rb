@@ -280,6 +280,7 @@ class ApplicationController < ActionController::Base
     render_unauthorized_action unless can_do
     can_do
   end
+  alias :authorized_action? :authorized_action
 
   def is_authorized_action?(object, *opts)
     user = opts.shift

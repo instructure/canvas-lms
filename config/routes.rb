@@ -927,6 +927,9 @@ routes.draw do
       submissions_api("section", "course_section")
     end
 
+    post '/courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/files',
+      :action => :create_file, :controller => :submission_comments_api
+
     scope(:controller => :gradebook_history_api) do
       get "courses/:course_id/gradebook_history/days", :action => :days, :path_name => 'gradebook_history'
       get "courses/:course_id/gradebook_history/feed", :action => :feed, :path_name => 'gradebook_history_feed'
