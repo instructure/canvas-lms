@@ -852,9 +852,8 @@ class Submission < ActiveRecord::Base
   end
 
   def commenting_instructors
-    comment_authors & context.instructors
+    @commenting_instructors ||= comment_authors & context.instructors
   end
-  memoize :commenting_instructors
 
   def participating_instructors
     commenting_instructors.present? ? commenting_instructors : context.participating_instructors.uniq

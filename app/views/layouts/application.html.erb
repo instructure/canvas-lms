@@ -74,26 +74,26 @@
       <%-
         max_to_show = 8
         assignment_sets = {
-          :needing_submitting => t('menu.assignments_needing_submitting', "To Turn In"),
-          :needing_grading    => t('menu.assignments_needing_grading', "To Grade"),
-          :recently_graded    => t('menu.assignments_recently_graded', "Recently Graded")
+          :assignments_needing_submitting => t('menu.assignments_needing_submitting', "To Turn In"),
+          :assignments_needing_grading    => t('menu.assignments_needing_grading', "To Grade"),
+          :assignments_recently_graded    => t('menu.assignments_recently_graded', "Recently Graded")
         }
         total_shown = 0
-        if assignment_sets.any?{ |k, v| @current_user.send("assignments_#{k}").length > 0 }
+        if assignment_sets.any?{ |k, v| @current_user.send(k).length > 0 }
       -%>
         <a href="/assignments" class="menu-item-title"><%= t('menu.assignments', 'Assignments') %><span class="menu-item-title-icon"></span> <i class="icon-mini-arrow-down"></i></a>
         <div class="menu-item-drop">
           <table cellspacing="0">
             <tr>
               <% assignment_sets.each do |k,v|
-                  if (set = @current_user.send("assignments_#{k}")).length > 0
+                  if (set = @current_user.send(k)).length > 0
                     set = set[0,(max_to_show - total_shown)]
                     total_shown += set.length
                    %><%= render(:partial => "shared/menu_section", :locals => {
                                 :max_to_show => max_to_show,
                                 :more_link_for_over_max => assignments_path,
                                 :collection => set,
-                                :collection_size => total_shown >= max_to_show ? @current_user.send("assignments_#{k}_total_count"): set.length,
+                                :collection_size => total_shown >= max_to_show ? @current_user.send(k, limit: nil).size : set.length,
                                 :partial => "shared/menu_assignment",
                                 :key => k,
                                 :title => v })  %>

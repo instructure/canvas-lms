@@ -536,22 +536,22 @@ describe Account do
 
     u = User.create!
     a.add_user(u)
-    a.all_users.count.should == a.user_count(:reload)
+    a.all_users.count.should == a.user_count
     a.user_count.should == 1
 
     course_with_teacher
     @teacher.update_account_associations
-    a.all_users.count.should == a.user_count(:reload)
+    a.all_users.count.should == a.user_count
     a.user_count.should == 2
 
     a2 = a.sub_accounts.create!
     course_with_teacher(:account => a2)
     @teacher.update_account_associations
-    a.all_users.count.should == a.user_count(:reload)
+    a.all_users.count.should == a.user_count
     a.user_count.should == 3
 
     user_with_pseudonym
-    a.all_users.count.should == a.user_count(:reload)
+    a.all_users.count.should == a.user_count
     a.user_count.should == 4
 
   end

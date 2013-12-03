@@ -153,7 +153,6 @@ describe User do
     google_docs_collaboration_model(:user_id => @user.id)
     @user.recent_stream_items.size.should == 1
     StreamItem.delete_all
-    @user.unmemoize_all
     @user.recent_stream_items.size.should == 0
   end
 
@@ -2022,7 +2021,6 @@ describe User do
 
       # grade one submission for one assignment; these numbers don't change
       @course1.assignments.first.grade_student(@studentA, :grade => "1")
-      @teacher = User.find(@teacher.id) # use a new instance, since these are memoized
       @teacher.assignments_needing_grading.size.should eql(2)
       @teacher.assignments_needing_grading.should be_include(@course1.assignments.first)
       @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)

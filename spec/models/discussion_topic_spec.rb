@@ -614,7 +614,7 @@ describe DiscussionTopic do
       ct.context.add_user(@student)
       ct.user_can_see_posts?(@student).should be_false
       ct.reply_from(user: @student, text: 'ohai')
-      ct.user_ids_who_have_posted_and_admins(true) # clear the memoization
+      ct.user_ids_who_have_posted_and_admins
       ct.user_can_see_posts?(@student).should be_true
     end
   end

@@ -54,10 +54,7 @@ class DeveloperKey < ActiveRecord::Base
       @special_keys ||= {}
 
       if Rails.env.test?
-        # TODO: we have to do this because tests run in transactions. maybe it'd
-        # be good to create some sort of of memoize_if_safe method, that only
-        # memoizes when we're caching classes and not in test mode? I dunno. But
-        # this stinks.
+        # TODO: we have to do this because tests run in transactions
         return @special_keys[default_key_name] = DeveloperKey.find_or_create_by_name(default_key_name)
       end
 

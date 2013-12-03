@@ -518,7 +518,6 @@ class DiscussionTopic < ActiveRecord::Base
     ids += self.context.admin_enrollments.active.pluck(:user_id) if self.context.respond_to?(:admin_enrollments)
     ids
   end
-  memoize :user_ids_who_have_posted_and_admins
 
   def user_can_see_posts?(user, session=nil)
     return false unless user

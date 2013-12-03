@@ -513,29 +513,32 @@ class Account < ActiveRecord::Base
   end
 
   def account_chain(opts = {})
-    res = [self]
-
-    if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
-      self.shard.activate do
-        res.concat Account.find_by_sql(<<-SQL) if self.parent_account_id
-            WITH RECURSIVE t AS (
-              SELECT * FROM accounts WHERE id=#{self.parent_account_id}
-              UNION
-              SELECT accounts.* FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
-            )
-            SELECT * FROM t
-          SQL
+    unless @account_chain
+      res = [self]
+      if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
+        self.shard.activate do
+          res.concat Account.find_by_sql(<<-SQL) if self.parent_account_id
+              WITH RECURSIVE t AS (
+                SELECT * FROM accounts WHERE id=#{self.parent_account_id}
+                UNION
+                SELECT accounts.* FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
+              )
+              SELECT * FROM t
+            SQL
+        end
+      else
+        account = self
+        while account.parent_account
+          account = account.parent_account
+          res << account
+        end
       end
-    else
-      account = self
-      while account.parent_account
-        account = account.parent_account
-        res << account
-      end
+      res << self.root_account unless res.map(&:id).include?(self.root_account_id)
+      @account_chain = res.compact
     end
-    res << self.root_account unless res.map(&:id).include?(self.root_account_id)
-    res << Account.site_admin if opts[:include_site_admin] && !self.site_admin?
-    res.compact
+    results = @account_chain.dup
+    results << Account.site_admin if opts[:include_site_admin] && !self.site_admin?
+    results
   end
 
   def account_chain_loop
@@ -583,7 +586,6 @@ class Account < ActiveRecord::Base
   def account_chain_ids(opts={})
     account_chain(opts).map(&:id)
   end
-  memoize :account_chain_ids
 
   def membership_for_user(user)
     self.account_users.find_by_user_id(user && user.id)
@@ -951,17 +953,14 @@ class Account < ActiveRecord::Base
   def course_count
     self.child_courses.not_deleted.count('DISTINCT course_id')
   end
-  memoize :course_count
-  
+
   def sub_account_count
     self.sub_accounts.active.count
   end
-  memoize :sub_account_count
 
   def user_count
     self.user_account_associations.count
   end
-  memoize :user_count
 
   def current_sis_batch
     if (current_sis_batch_id = self.read_attribute(:current_sis_batch_id)) && current_sis_batch_id.present?
@@ -970,10 +969,11 @@ class Account < ActiveRecord::Base
   end
   
   def turnitin_settings
+    return @turnitin_settings if defined?(@turnitin_settings)
     if self.turnitin_account_id.present? && self.turnitin_shared_secret.present?
-      [self.turnitin_account_id, self.turnitin_shared_secret, self.turnitin_host]
+      @turnitin_settings = [self.turnitin_account_id, self.turnitin_shared_secret, self.turnitin_host]
     else
-      self.parent_account.try(:turnitin_settings)
+      @turnitin_settings = self.parent_account.try(:turnitin_settings)
     end
   end
   

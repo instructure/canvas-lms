@@ -542,7 +542,6 @@ class Course < ActiveRecord::Base
       user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_instructor? }
     end
   end
-  memoize :user_is_instructor?
 
   def user_is_student?(user, opts = {})
     return unless user
@@ -552,7 +551,6 @@ class Course < ActiveRecord::Base
       }
     end
   end
-  memoize :user_is_student?
 
   def user_has_been_instructor?(user)
     return unless user
@@ -561,7 +559,6 @@ class Course < ActiveRecord::Base
       self.instructor_enrollments.active.find_by_user_id(user.id).present?
     end
   end
-  memoize :user_has_been_instructor?
 
   def user_has_been_admin?(user)
     return unless user
@@ -570,7 +567,6 @@ class Course < ActiveRecord::Base
       self.admin_enrollments.active.find_by_user_id(user.id).present?
     end
   end
-  memoize :user_has_been_admin?
 
   def user_has_been_observer?(user)
     return unless user
@@ -579,7 +575,6 @@ class Course < ActiveRecord::Base
       self.observer_enrollments.active.find_by_user_id(user.id).present?
     end
   end
-  memoize :user_has_been_observer?
 
   def user_has_been_student?(user)
     return unless user
@@ -587,7 +582,6 @@ class Course < ActiveRecord::Base
       self.all_student_enrollments.find_by_user_id(user.id).present?
     end
   end
-  memoize :user_has_been_student?
 
   def user_has_no_enrollments?(user)
     return unless user
@@ -595,7 +589,6 @@ class Course < ActiveRecord::Base
       enrollments.find_by_user_id(user.id).nil?
     end
   end
-  memoize :user_has_no_enrollments?
 
 
   # Public: Determine if a group weighting scheme should be applied.
@@ -751,9 +744,8 @@ class Course < ActiveRecord::Base
   end
 
   def long_self_enrollment_code
-    Digest::MD5.hexdigest("#{uuid}_for_#{id}")
+    @long_self_enrollment_code ||= Digest::MD5.hexdigest("#{uuid}_for_#{id}")
   end
-  memoize :long_self_enrollment_code
 
   # still include the old longer format, since links may be out there
   def self_enrollment_codes
@@ -1173,13 +1165,11 @@ class Course < ActiveRecord::Base
   def account_chain_ids
     account_chain.map(&:id)
   end
-  memoize :account_chain_ids
 
   def institution_name
     return self.root_account.name if self.root_account_id != Account.default.id
     return (self.account || self.root_account).name
   end
-  memoize :institution_name
 
   def account_users_for(user)
     return [] unless user
@@ -1260,7 +1250,6 @@ class Course < ActiveRecord::Base
     end
     message
   end
-  memoize :grade_publishing_status_translation
 
   def grade_publishing_statuses
     found_statuses = [].to_set
@@ -1750,7 +1739,6 @@ class Course < ActiveRecord::Base
     # has valid settings
     account.turnitin_settings
   end
-  memoize :turnitin_settings
 
   def turnitin_pledge
     self.account.closest_turnitin_pledge
@@ -2290,7 +2278,6 @@ class Course < ActiveRecord::Base
       end
     end
   end
-  memoize :section_visibilities_for
 
   def visibility_limited_to_course_sections?(user, visibilities = section_visibilities_for(user))
     visibilities.all?{|s| s[:limit_privileges_to_course_section] }
@@ -2482,9 +2469,15 @@ class Course < ActiveRecord::Base
   end
 
   def tabs_available(user=nil, opts={})
+    opts.reverse_merge!(:include_external => true)
+    cache_key = [user, opts].cache_key
+    @tabs_available ||= {}
+    @tabs_available[cache_key] ||= uncached_tabs_available(user, opts)
+  end
+
+  def uncached_tabs_available(user, opts)
     # make sure t() is called before we switch to the slave, in case we update the user's selected locale in the process
     default_tabs = Course.default_tabs
-    opts.reverse_merge!(:include_external => true)
 
     Shackles.activate(:slave) do
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
@@ -2586,7 +2579,6 @@ class Course < ActiveRecord::Base
       tabs
     end
   end
-  memoize :tabs_available
 
   def allow_wiki_comments
     read_attribute(:allow_wiki_comments)

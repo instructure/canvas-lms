@@ -150,7 +150,6 @@ class AssetUserAccess < ActiveRecord::Base
     asset = Context.find_asset_by_asset_string(asset_code, context)
     asset
   end
-  memoize :asset
 
   def asset_class_name
     self.asset.class.name.underscore if self.asset

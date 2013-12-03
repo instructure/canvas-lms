@@ -119,11 +119,6 @@ class CommunicationChannel < ActiveRecord::Base
     p.context { @root_account }
   end
 
-  def active_pseudonyms
-    self.user.pseudonyms.active
-  end
-  memoize :active_pseudonyms
-
   def uniqueness_of_path
     return if path.nil?
     return if retired?

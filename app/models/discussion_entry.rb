@@ -228,7 +228,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def update_topic_subscription
-    discussion_topic.user_ids_who_have_posted_and_admins(true) # pesky memoization
+    discussion_topic.user_ids_who_have_posted_and_admins
     unless discussion_topic.user_can_see_posts?(user)
       discussion_topic.unsubscribe(user)
     end

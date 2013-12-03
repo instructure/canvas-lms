@@ -365,31 +365,25 @@ class Attachment < ActiveRecord::Base
   # or just some_attachment.scribd_thumbnail  #will give you the default tumbnail for the document.
   def scribd_thumbnail(options={})
     return unless self.scribd_doc && ScribdAPI.enabled?
-    if options.empty? && self.cached_scribd_thumbnail
+    if options.empty?
+      # we cache the 'default' version in the DB
+      unless self.cached_scribd_thumbnail
+        self.cached_scribd_thumbnail = self.request_scribd_thumbnail(options)
+        Attachment.where(:id => self).update_all(:cached_scribd_thumbnail => self.cached_scribd_thumbnail)
+      end
       self.cached_scribd_thumbnail
     else
-      begin
-      # if we aren't requesting special demensions, fetch and save it to the db.
-      if options.empty?
-        Scribd::API.instance.user = scribd_user
-        self.cached_scribd_thumbnail = self.scribd_doc.thumbnail(options)
-        # just update the cached_scribd_thumbnail column of this attachment without running callbacks
-        Attachment.where(:id => self).update_all(:cached_scribd_thumbnail => self.cached_scribd_thumbnail)
-        self.cached_scribd_thumbnail
-      else
-        Rails.cache.fetch(['scribd_thumb', self, options].cache_key) do
-          Scribd::API.instance.user = scribd_user
-          self.scribd_doc.thumbnail(options)
-        end
-      end
-      rescue Scribd::NotReadyError
-        nil
-      rescue => e
-        nil
+      # we cache other versions in the rails cache
+      Rails.cache.fetch(['scribd_thumb', self, options].cache_key) do
+        self.request_scribd_thumbnail(options)
       end
     end
   end
-  memoize :scribd_thumbnail
+
+  def request_scribd_thumbnail(options)
+    Scribd::API.instance.user = scribd_user
+    self.scribd_doc.thumbnail(options)
+  end
 
   def turnitinable?
     self.content_type && [
@@ -860,7 +854,6 @@ class Attachment < ActiveRecord::Base
       # "still need to handle things that are not images with thumbnails, scribd_docs, or kaltura docs"
     end
   end
-  memoize :thumbnail_url
 
   def thumbnail_for_size(geometry)
     if self.class.allows_thumbnails_of_size?(geometry)
@@ -1214,9 +1207,9 @@ class Attachment < ActiveRecord::Base
   end
 
   def hidden?
-    self.file_state == 'hidden' || (self.folder && self.folder.hidden?)
+    return @hidden if defined?(@hidden)
+    @hidden = self.file_state == 'hidden' || (self.folder && self.folder.hidden?)
   end
-  memoize :hidden?
 
   def published?; !locked?; end
 
@@ -1227,7 +1220,6 @@ class Attachment < ActiveRecord::Base
   def public?
     self.file_state == 'public'
   end
-  memoize :public?
 
   def currently_locked
     self.locked || (self.lock_at && Time.now > self.lock_at) || (self.unlock_at && Time.now < self.unlock_at) || self.file_state == 'hidden'

@@ -109,7 +109,7 @@ def conclude_and_unconclude_course
   #conclude course
   @course.complete!
   @user.reload
-  @user.cached_current_enrollments(:reload)
+  @user.cached_current_enrollments
   @enrollment.reload
 
   #un-conclude course
