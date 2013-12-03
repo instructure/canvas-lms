@@ -253,6 +253,23 @@ class AssignmentsController < ApplicationController
       @students = @context.students_visible_to(@current_user).order_by_sortable_name
       @submissions = @assignment.submissions.include_assessment_requests
     end
+    respond_to do |format|
+      format.html
+      format.csv {
+        cancel_cache_buster
+        Shackles.activate(:slave) do
+          send_data(
+            @assignment.peer_reviews_to_csv, 
+              :type => "text/csv",
+              :filename => (@assignment.title.parameterize + ".csv"),
+              :disposition => "attachment"
+          )
+        end
+      }
+    end
+    # TODO: Add format.csv here
+    
+    # --
   end
 
   def syllabus

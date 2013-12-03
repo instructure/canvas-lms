@@ -1399,6 +1399,47 @@ class Assignment < ActiveRecord::Base
   def has_peer_reviews?
     self.peer_reviews
   end
+  
+  # Generate peer reviews csv for a given assignment
+  def peer_reviews_to_csv
+    # Don't generate it if the assignment has no peer reviews
+    return unless self.has_peer_reviews?
+    peer_reviews = self.rubric_association.rubric_assessments.includes(:user).order("user_id ASC")
+    
+    # Get the max number of reviews for a student to create proper headers
+    max_reviews = peer_reviews.group(:user_id).count.values.max
+    
+    res = CSV.generate do |csv|
+      # Header
+      row = ["Student", "Student ID", "Submission ID"]
+      for i in 1..max_reviews
+        row << "Grade #{i}"
+        row << "Peer ID"
+      end
+      csv << row
+      
+      user_id = 0
+      row = []
+      reviews_number = peer_reviews.length
+      
+      peer_reviews.each_with_index do |peer_review, index|
+        # Group score and assessor id by student id
+        if peer_review.user_id != user_id
+          csv << row unless row.empty?
+          user_id = peer_review.user_id
+          student = peer_review.user
+          submission_id = peer_review.artifact_id
+          row = [student.last_name_first.gsub(",", ""), user_id, submission_id]
+        end
+        row << peer_review.assessor_id
+        row << peer_review.score
+        # Grap the last line
+        if index == reviews_number - 1
+          csv << row
+        end
+      end
+    end
+  end
 
   def self.percent_considered_graded
     0.5

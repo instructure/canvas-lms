@@ -15,6 +15,11 @@
         <button type="submit" class="btn btn-large"><%= t 'buttons.assign_peer_reviews', "Assign Peer Reviews" %></button>
       </div>
     <% end %>
+    <div class="button-container button-container-right-aligned">
+		<a class="btn" href="<%= course_assignment_peer_reviews_url(@context, @assignment, :format => "csv") %>" target="_blank">
+			<%= t 'buttons.download_csv', "Download CSV" %>
+		</a>
+	</div>
   <% end %>
   </div>
 <% end %>
@@ -156,6 +161,7 @@ require([
     <%= t :overview, "Student peer reviews will be considered complete when students have commented
       at least once on the page." %>
   <% end %>
+
 <ul class="unstyled_list" style="margin-left: 20px;">
   <li style="<%= hidden unless @students.empty? %>" class="no_students_message"><%= t 'messages.no_students_found', "No Students Found" %></li>
   <% @students.each do |student| %>
