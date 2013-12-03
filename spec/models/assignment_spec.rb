@@ -414,6 +414,10 @@ describe Assignment do
     it "should allow grading an assignment with nil points_possible as percent" do
       Assignment.interpret_grade("100%", nil).should == 0
     end
+
+    it "should not round scores" do
+      Assignment.interpret_grade("88.75%", 15).should == 13.3125
+    end
   end
 
   it "should create a new version for each submission" do

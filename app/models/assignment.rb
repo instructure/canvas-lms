@@ -623,10 +623,10 @@ class Assignment < ActiveRecord::Base
     when %r{%$}
       # interpret as a percentage
       percentage = grade.to_f / 100.0
-      (points_possible.to_f * percentage * 100.0).round / 100.0
+      points_possible.to_f * percentage
     when %r{[\d\.]+}
       # interpret as a numerical score
-      (grade.to_f * 100.0).round / 100.0
+      grade.to_f
     when "pass", "complete"
       points_possible.to_f
     when "fail", "incomplete"
@@ -634,7 +634,7 @@ class Assignment < ActiveRecord::Base
     else
       # try to treat it as a letter grade
       if grading_scheme && standard_based_score = GradingStandard.grade_to_score(grading_scheme, grade)
-        ((points_possible || 0.0) * standard_based_score).round / 100.0
+        (points_possible || 0.0) * standard_based_score / 100.0
       else
         nil
       end

@@ -42,9 +42,9 @@
           <% end %>
           <br/>
         <% if can_do(@assignment, @current_user, :grade) %>
-          <span class="published_score" style="<%= hidden if @assignment.grading_type == 'points' %>"><%= @submission.published_score %></span>
+               <span class="published_score" style="<%= hidden if @assignment.grading_type == 'points' %>"><% if @submission.published_score? %><%= @submission.published_score.round(2)%><% end %></span>
         <% elsif can_do(@submission, @current_user, :read_grade) %>
-          <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>"><%= @submission.score %></span>
+          <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>"><% if @submission.score? %><%=@submission.score.round(2) %><% end %></span>
         <% end %>
         <% if @submission.assignment.points_possible %>
           <%= t('out_of_points', 'out of %{points_possible}', :points_possible => @submission.assignment.points_possible) %>
