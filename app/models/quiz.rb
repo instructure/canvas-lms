@@ -955,7 +955,7 @@ class Quiz < ActiveRecord::Base
   end
 
   def has_student_submissions?
-    self.quiz_submissions.any?{|s| !s.settings_only? && context.includes_student?(s.user) }
+    self.quiz_submissions.not_settings_only.where("user_id > 0").any?
   end
 
   # clear out all questions so that the quiz can be replaced. this is currently
