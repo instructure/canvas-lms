@@ -834,11 +834,6 @@ describe Quiz do
       @quiz.has_student_submissions?.should be_false
     end
 
-    it 'is false if the user is not part of this course' do
-      @user.student_enrollments.scoped.delete_all
-      @quiz.has_student_submissions?.should be_false
-    end
-
     it 'is false if there are no submissions' do
       @quiz.quiz_submissions.scoped.delete_all
       @quiz.has_student_submissions?.should be_false
