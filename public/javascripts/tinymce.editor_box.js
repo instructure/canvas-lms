@@ -180,8 +180,29 @@ define([
           $(document).triggerHandler('editor_box_focus', $editor);
           $.publish('editorBox/focus', $editor);
         };
+        
+        // Make shift+tab take the user to the previous focusable element in the DOM.
+        var focusPrevious = function (ed, event) {
+          if (event.keyCode == 9 && event.shiftKey) {
+            var $cur = $(ed.getContainer());
+            while (true) {
+              // When jQuery is upgraded to 1.8+, use .addBack instead.
+              if ($cur.prevAll().find(':tabbable').andSelf().filter(':tabbable').last().focus().length) {
+                return false;
+              }
+              $cur = $cur.parent();
+              if (!$cur || !$cur.length || $cur.is(document)) {
+                return false;
+              }
+            }
+          } else {
+            return true;
+          }
+        };
+        
         ed.onClick.add(focus);
         ed.onKeyPress.add(focus);
+        ed.onKeyUp.add(focusPrevious);
         ed.onActivate.add(focus);
         ed.onEvent.add(function() {
           if(enableBookmarking && ed.selection) {
