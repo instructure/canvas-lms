@@ -921,7 +921,7 @@ class Quiz < ActiveRecord::Base
   end
 
   def has_student_submissions?
-    self.quiz_submissions.not_settings_only.where("user_id IS NOT NULL").any?
+    self.quiz_submissions.not_settings_only.where("user_id IS NOT NULL").exists?
   end
 
   # clear out all questions so that the quiz can be replaced. this is currently
