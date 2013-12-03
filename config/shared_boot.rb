@@ -60,18 +60,19 @@ config.autoload_paths += %W(#{Rails.root}/app/middleware
                             #{Rails.root}/app/presenters)
 
 if CANVAS_RAILS2
-  config.middleware.insert_after(ActionController::Base.session_store, 'SessionsTimeout')
+  config.middleware.insert_before(ActionController::Base.session_store, 'LoadAccount')
+  config.middleware.insert_before(ActionController::Base.session_store, 'SessionsTimeout')
 else
   # we don't know what middleware to make SessionsTimeout follow until after
   # we've loaded config/initializers/session_store.rb
   initializer("extend_middleware_stack", after: "load_config_initializers") do |app|
-    app.config.middleware.insert_after(config.session_store, 'SessionsTimeout')
+    app.config.middleware.insert_before(config.session_store, 'LoadAccount')
+    app.config.middleware.insert_before(config.session_store, 'SessionsTimeout')
   end
 end
 
 params_parser = CANVAS_RAILS2 ? 'ActionController::ParamsParser' : 'ActionDispatch::ParamsParser'
 config.middleware.insert_before(params_parser, "RequestContextGenerator")
-config.middleware.insert_before(params_parser, 'LoadAccount')
 config.middleware.insert_before(params_parser, 'StatsTiming')
 config.middleware.insert_before(params_parser, 'Canvas::RequestThrottle')
 config.middleware.insert_before(params_parser, 'PreventNonMultipartParse')
