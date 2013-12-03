@@ -187,15 +187,17 @@ class ContentTag < ActiveRecord::Base
 
   def update_asset_name!
     return unless self.sync_title_to_asset_title?
-    correct_context = self.content && self.content.respond_to?(:context) && self.content.context == self.context
+    correct_context = content && content.respond_to?(:context) && content.context == context
     if correct_context
-      if self.content.respond_to?("name=") && self.content.respond_to?("name") && self.content.name != self.title
-        self.content.update_attribute(:name, asset_safe_title('name'))
-      elsif self.content.respond_to?("title=") && self.content.title != self.title
-        self.content.update_attribute(:title, asset_safe_title('title'))
-      elsif self.content.respond_to?("display_name=") && self.content.display_name != self.title
-        self.content.update_attribute(:display_name, asset_safe_title('display_name'))
+      # Assignment proxies name= and name to title= and title, which breaks the asset_safe_title logic
+      if content.respond_to?("name=") && content.respond_to?("name") && !content.is_a?(Assignment)
+        content.name = asset_safe_title('name')
+      elsif content.respond_to?("title=")
+        content.title = asset_safe_title('title')
+      elsif content.respond_to?("display_name=")
+        content.display_name = asset_safe_title('display_name')
       end
+      content.save if content.changed?
     end
   end
 

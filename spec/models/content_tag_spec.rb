@@ -219,7 +219,6 @@ describe ContentTag do
   it "should not attempt to update asset name attribute if it's over the db limit" do
     course
     @page = @course.wiki.wiki_pages.create!(:title => "some page")
-    @page.save!
     @module = @course.context_modules.create!(:name => "module")
     @tag = @module.add_item({:type => 'WikiPage', :title => 'oh noes!' * 35, :id => @page.id})
 
@@ -227,6 +226,18 @@ describe ContentTag do
 
     @page.reload
     @tag.title[0, 250].should == @page.title[0, 250]
+  end
+
+  it "should properly trim asset name for assignments" do
+    course
+    @assign = @course.assignments.create!(:title => "some assignment")
+    @module = @course.context_modules.create!(:name => "module")
+    @tag = @module.add_item({:type => 'Assignment', :title => 'oh noes!' * 35, :id => @assign.id})
+
+    @tag.update_asset_name!
+
+    @assign.reload
+    @tag.title[0, 250].should == @assign.title[0, 250]
   end
 
   it "should publish/unpublish the tag if the linked wiki page is published/unpublished" do
