@@ -10,6 +10,8 @@ if CANVAS_RAILS2
   I18n.backend.init_translations
 end
 
+I18n.enforce_available_locales = true
+
 I18n.send :extend, I18n::Lolcalize if ENV['LOLCALIZE']
 
 module I18nUtilities
