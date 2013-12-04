@@ -1404,7 +1404,10 @@ class Assignment < ActiveRecord::Base
   def peer_reviews_to_csv
     # Don't generate it if the assignment has no peer reviews
     return unless self.has_peer_reviews?
-    peer_reviews = self.rubric_association.rubric_assessments.includes(:user).order("user_id ASC")
+    peer_reviews = self.rubric_association.rubric_assessments.includes(:user).order("users.sortable_name ASC")
+    # TODO: it would be better to eager load the artifact, but it can't seem possible to eager load a polymorphic association.
+    # So I used the same method as the one used in the peer_reviews.html.erb view to prevent a N+1 request.
+    submissions  = self.submissions.select([:id, :user_id, :score]).to_a
     
     # Get the max number of reviews for a student to create proper headers
     max_reviews = peer_reviews.group(:user_id).count.values.max
@@ -1416,6 +1419,7 @@ class Assignment < ActiveRecord::Base
         row << "Grade #{i}"
         row << "Peer ID"
       end
+      row << "Current grade"
       csv << row
       
       user_id = 0
@@ -1425,16 +1429,25 @@ class Assignment < ActiveRecord::Base
       peer_reviews.each_with_index do |peer_review, index|
         # Group score and assessor id by student id
         if peer_review.user_id != user_id
-          csv << row unless row.empty?
+          # Get some records
           user_id = peer_review.user_id
           student = peer_review.user
-          submission_id = peer_review.artifact_id
+          submission = submissions.find{|s| s.user_id == user_id}
+          submission_id = submission.id
+          current_score = submission.score || 0
+          # Put the previous row in the csv by skipping the empty ones
+          unless row.empty?
+            row << current_score
+            csv << row
+          end
+          # Create the new row
           row = [student.last_name_first.gsub(",", ""), user_id, submission_id]
         end
         row << peer_review.score
         row << peer_review.assessor_id
         # Grap the last line
         if index == reviews_number - 1
+          row << current_score
           csv << row
         end
       end
