@@ -855,7 +855,7 @@ pt:
       tab_admins: Administradores
       tab_alerts: Alertas
       tab_announcements: Anúncios
-      tab_external_tools: Aplicações
+      tab_external_tools: Aplicativos
       tab_notifications: Notificações
       tab_quotas: Quotas
       tab_reports: Relatórios
@@ -4601,7 +4601,7 @@ pt:
         grade_publishing: "Publicação de notas"
         navigation: Navegação
         sections: Seções
-        tools: Aplicações
+        tools: Aplicativos
       titles: 
         edit_navigation: "Editar navegação da disciplina"
       transifex_message: "Aderir à [Comunidade de Tradução do Canvas](%{transifex_url})"
@@ -5766,7 +5766,7 @@ pt:
       add_tool: "Adicionar ferramenta"
       app_already_installed: "Esta aplicação já foi instalada"
       average_rating: "Classificação média"
-      back_to_app_center: "Voltar ao Centro de Aplicações"
+      back_to_app_center: "Voltar ao Centro de Aplicativos"
       education_levels: "Nível(eis) de ensino"
       extensions: Extensões
       help_link: "Ligação de ajuda"
@@ -5835,13 +5835,13 @@ pt:
     index_view: 
       add_new_tool: "Adicionar nova aplicação"
       all: Todos
-      app_headder: "Aplicações externas"
-      external_tools_note: "As aplicações são uma forma fácil de adicionar novas funcionalidades ao Canvas. Podem ser adicionadas a disciplinas individuais ou a todas as disciplinas incluídas numa conta. Depois de configuradas, pode fazer ligações às aplicações através de módulos de disciplinas e criar tarefas para ferramentas de avaliação."
+      app_headder: "Aplicativos externas"
+      external_tools_note: "As aplicativos são uma forma fácil de adicionar novas funcionalidades ao Canvas. Podem ser adicionadas a disciplinas individuais ou a todas as disciplinas incluídas numa conta. Depois de configuradas, pode fazer ligações às aplicativos através de módulos de disciplinas e criar tarefas para ferramentas de avaliação."
       external_tools_references: "Clique *aqui* para ver algumas ferramentas LTI que funcionam muito bem com o Canvas. Também pode consultar os tópicos da Comunidade Canvas relacionados com ferramentas LTI **aqui**"
       installed: Instalado
       not_installed: "Não instalado"
       search_filter: "Filtrar por nome"
-      view_app_center: "Ver Centro de Aplicações"
+      view_app_center: "Ver Centro de Aplicativos"
       view_installed_tools: "Ver configurações de aplicação"
     missing_stars: "Tem de selecionar uma classificação em estrelas"
     rate_tool_view: 
@@ -9204,14 +9204,14 @@ pt:
         body: "A nota da sua tarefa, %{assignment_title}, foi alterada."
         html: 
           body: "A nota da sua tarefa, %{assignment_title}, foi alterada."
-          link_message: "Pode rever a tarefa aqui"
+          link_message: "Reveja a sua tarefa aqui:"
           no_date_set: "Nenhuma data definida"
           not_applicable: ND
           regraded_date: "reavaliação de nota: %{date}"
           score: "pontuação: %{score} em %{total}"
           score_pending: "pontuação a aguardar revisão do professor"
           subject: "Nota alterada: %{assignment}, %{context}"
-        link_message: "Pode rever a tarefa aqui:"
+        link_message: "Reveja a sua tarefa aqui:"
         no_date_set: "Nenhuma data definida"
         not_applicable: ND
         regraded_date: "reavaliação de nota: %{date}"
@@ -9253,13 +9253,13 @@ pt:
         html: 
           body: "A sua tarefa, %{assignment}, foi avaliada."
           graded_date: "avaliado: %{date}"
-          link_message: "Pode rever a tarefa aqui"
+          link_message: "Reveja a sua tarefa aqui:"
           no_date_set: "Nenhuma data definida"
           not_applicable: ND
           score: "pontuação: %{score} em %{total}"
           score_pending_review: "pontuação a aguardar revisão do professor"
           subject: "Tarefa avaliada: %{assignment}, %{context}"
-        link_message: "Pode rever a tarefa aqui:"
+        link_message: "Reveja a sua tarefa aqui:"
         no_date_set: "Nenhuma data definida"
         not_applicable: ND
         score: "pontuação:  %{score} de %{total}"
@@ -9876,13 +9876,13 @@ pt:
       description: "Selecionar relatórios da conta"
       name: "Relatórios da conta"
     app_center: 
-      description: "Centro de Aplicações para procurar/instalar ferramentas externas no Canvas"
-      name: "Centro de Aplicações"
+      description: "Centro de Aplicativos para procurar/instalar ferramentas externas no Canvas"
+      name: "Centro de Aplicativos"
     app_center_settings: 
-      description: "O Centro de Aplicações irá aparecer no separador \"Aplicações\" na página de definições de uma disciplina ou de uma conta. O URL disponibilizado abaixo deverá apontar para um terminal de Centro de Aplicações válido (por exemplo, https://lti-examples.heroku.com -- certifique-se de que não coloca uma barra final)"
+      description: "O Centro de Aplicativos irá aparecer no separador \"Aplicativos\" na página de definições de uma disciplina ou de uma conta. O URL disponibilizado abaixo deverá apontar para um terminal de Centro de Aplicativos válido (por exemplo, https://lti-examples.heroku.com -- certifique-se de que não coloca uma barra final)"
       labels: 
         app_reviews_endpoint: "Terminal de visualização de aplicação"
-        apps_index_endpoint: "Terminal de índice de aplicações"
+        apps_index_endpoint: "Terminal de índice de aplicativos"
         base_url: "URL base"
         token: "Token de acesso"
     assignment_freezer: 
