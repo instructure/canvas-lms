@@ -218,7 +218,7 @@ class ContextModule < ActiveRecord::Base
     end
     if val.is_a?(Hash)
       res = []
-      tag_ids = self.content_tags.active.map{|t| t.id}
+      tag_ids = self.content_tags.active.pluck(:id)
       val.each do |id, opts|
         if tag_ids.include?(id.to_i)
           res << {:id => id.to_i, :type => opts[:type], :min_score => opts[:min_score], :max_score => opts[:max_score]} #id => id.to_i, :type => type
@@ -249,7 +249,7 @@ class ContextModule < ActiveRecord::Base
 
   def add_item(params, added_item=nil, opts={})
     params[:type] = params[:type].underscore if params[:type]
-    position = opts[:position] || (self.content_tags.active.map(&:position).compact.max || 0) + 1
+    position = opts[:position] || (self.content_tags.active.maximum(:position) || 0) + 1
     if params[:type] == "wiki_page" || params[:type] == "page"
       item = opts[:wiki_page] || self.context.wiki.wiki_pages.find_by_id(params[:id])
     elsif params[:type] == "attachment" || params[:type] == "file"
