@@ -1431,8 +1431,8 @@ class Assignment < ActiveRecord::Base
           submission_id = peer_review.artifact_id
           row = [student.last_name_first.gsub(",", ""), user_id, submission_id]
         end
-        row << peer_review.assessor_id
         row << peer_review.score
+        row << peer_review.assessor_id
         # Grap the last line
         if index == reviews_number - 1
           csv << row

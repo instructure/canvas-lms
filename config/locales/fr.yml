@@ -1768,6 +1768,7 @@ fr:
       buttons: 
         add: Ajouter
         assign_peer_reviews: "Attribuer des révisions aux pairs"
+        download_csv: "Télécharger le CSV"
       descriptions: 
         automatically_assign_reviews: "Vous pouvez attribuer des tâches à réviser aux autres utilisateurs qui en ont déjà envoyées à réviser, mais qui n’ont pas encore reçu de révisions, en cliquant sur le bouton ci-dessous."
       details: "À gauche, vous pouvez apercevoir la liste des étudiants pour cette tâche, mais également les envois d’étudiants qu’ils ont reçus à réviser."
