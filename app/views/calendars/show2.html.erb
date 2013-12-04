@@ -46,9 +46,15 @@
     <div id="undated-events"></div>
   </div>
   <div class="rs-section" id="calendar-feed">
-    <a class="dialog_opener small-calendar" aria-controls="calendar_feed_box" data-dialog-opts='{"resizable":false, "width": 400}' role="button" href="<%= @feed_url%>.ics">
-      <%= t :calendar_feed, "Calendar Feed" %>
-    </a>
+    <% if @domain_root_account.agenda_view? %>
+      <a class="dialog_opener" aria-controls="calendar_feed_box" data-dialog-opts='{"resizable":false, "width": 400}' role="button" href="<%= @feed_url%>.ics">
+        <i class="icon-calendar-days"></i> <%= t :calendar_feed, "Calendar Feed" %>
+      </a>
+    <% else %>
+      <a class="dialog_opener small-calendar" aria-controls="calendar_feed_box" data-dialog-opts='{"resizable":false, "width": 400}' role="button" href="<%= @feed_url%>.ics">
+        <%= t :calendar_feed, "Calendar Feed" %>
+      </a>
+    <% end %>
   </div>
 <% end %>
 <div style="display: none" id="calendar_feed_box" title="<%= t('feed_dialog_title', 'Calendar Feed') %>">
