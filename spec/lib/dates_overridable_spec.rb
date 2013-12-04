@@ -90,22 +90,59 @@ shared_examples_for "an object whose dates are overridable" do
   end
 
   describe "#all_dates_visible_to" do
-    let(:user) { stub }
-    it "only returns active overrides" do
-      override.delete
-      # include the default override
-      overridable.all_dates_visible_to(user).size.should == 1
+
+    before do
+      @section2 = course.course_sections.create!(:name => "Summer session")
+      override2 = assignment_override_model(overridable_type => overridable)
+      override2.set = @section2
+      override2.override_due_at(18.days.from_now)
+      override2.save!
+    end
+
+    context "as a teacher" do
+      it "only returns active overrides" do
+        override.delete
+        overridable.all_dates_visible_to(@teacher).size.should == 2
+      end
+    end
+
+    context "as a student" do
+      it "only returns active overrides" do
+        course_with_student({:course => course, :active_all => true})
+        override.delete
+        overridable.all_dates_visible_to(@student).size.should == 1
+      end
+    end
+
+    context "as an observer" do
+      before do
+        course_with_student({:course => course, :active_all => true})
+        course_with_observer({:course => course, :active_all => true})
+        course.enroll_user(@observer, "ObserverEnrollment", {:associated_user_id => @student.id})
+      end
+
+      it "only returns active overrides for a single student" do
+        override.delete
+        overridable.all_dates_visible_to(@observer).size.should == 1
+      end
+
+      it "returns all active overrides for 2+ students" do
+        student2 = student_in_section(@section2, {:active_all => true})
+        course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => student2.id})
+        override.delete
+        overridable.all_dates_visible_to(@observer).size.should == 2
+      end
     end
 
     it "returns each override represented using its as_hash method" do
-      all_dates = overridable.all_dates_visible_to(user)
+      all_dates = overridable.all_dates_visible_to(@user)
       overridable.active_assignment_overrides.map(&:as_hash).each do |o|
-        all_dates.should contain o
+        all_dates.should include o
       end
     end
 
     it "includes the overridable as a hash" do
-      all_dates = overridable.all_dates_visible_to(user)
+      all_dates = overridable.all_dates_visible_to(@user)
       last_hash = all_dates.last
       overridable_hash =
         overridable.without_overrides.due_date_hash.merge(:base => true)

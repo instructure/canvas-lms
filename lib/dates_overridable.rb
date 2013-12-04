@@ -90,9 +90,13 @@ module DatesOverridable
   end
 
   def all_dates_visible_to(user)
-    all_dates = overrides_visible_to(user).active
-    all_dates = all_dates.map(&:as_hash)
-    all_dates << without_overrides.due_date_hash.merge(:base => true)
+    if context.user_has_been_observer?(user)
+      observed_student_due_dates(user).uniq
+    else
+      all_dates = overrides_visible_to(user).active
+      all_dates = all_dates.map(&:as_hash)
+      all_dates << without_overrides.due_date_hash.merge(:base => true)
+    end
   end
 
   def due_dates_visible_to(user)
