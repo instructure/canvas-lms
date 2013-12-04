@@ -283,6 +283,7 @@ class DiscussionTopicsController < ApplicationController
       if @topic.assignment.present?
         hash[:ATTRIBUTES][:assignment][:assignment_overrides] =
           (assignment_overrides_json(@topic.assignment.overrides_visible_to(@current_user)))
+        hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
       end
 
       categories = @context.respond_to?(:group_categories) ? @context.group_categories : []

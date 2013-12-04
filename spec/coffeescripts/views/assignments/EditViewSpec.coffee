@@ -1,5 +1,6 @@
 define [
   'jquery'
+  'underscore'
   'compiled/collections/SectionCollection'
   'compiled/models/Assignment'
   'compiled/models/DueDateList'
@@ -13,19 +14,22 @@ define [
   'compiled/views/assignments/PeerReviewsSelector'
   'helpers/jquery.simulate'
   'helpers/fakeENV'
-], ($, SectionCollection, Assignment, DueDateList, Section,
+], ($, _, SectionCollection, Assignment, DueDateList, Section,
   AssignmentGroupSelector, DueDateListView, DueDateOverrideView, EditView,
   GradingTypeSelector, GroupCategorySelector, PeerReviewsSelector) ->
 
 
   fixtures = $('#fixtures')
 
-  editView = ->
+  defaultAssignmentOpts =
+    name: 'Test Assignment'
+    assignment_overrides: []
+
+  editView = (assignmentOpts = {}) ->
     $('<form id="content"></form>').appendTo fixtures
 
-    assignment = new Assignment
-      name: 'Test Assignment'
-      assignment_overrides: []
+    assignmentOpts = _.extend {}, assignmentOpts, defaultAssignmentOpts
+    assignment = new Assignment assignmentOpts
 
     sectionList = new SectionCollection [Section.defaultDueDateSection()]
     dueDateList = new DueDateList assignment.get('assignment_overrides'), sectionList, assignment
@@ -102,3 +106,27 @@ define [
 
     ENV.GROUP_CATEGORIES = null
     ENV.ASSIGNMENT_GROUPS = null
+
+  test 'shows a warning when dangerously changing group status', ->
+    # bleh
+    window.addGroupCategory = ->
+
+    checkWarning = (view, showsWarning) ->
+      $("#assignment_toggle_advanced_options").click()
+      equal $(".group_submission_warning").is(":visible"), false
+      $("#assignment_has_group_category").click()
+      equal $(".group_submission_warning").is(":visible"), showsWarning
+      $("#assignment_has_group_category").click()
+      equal $(".group_submission_warning").is(":visible"), false
+
+    # should warn here
+    view = editView has_submitted_submissions: true
+    checkWarning view, true
+
+    # don't show the warning if you start out with a group
+    view = editView has_submitted_submissions: true, group_category_id: 1
+    checkWarning view, false
+
+    # don't show the warning if there are no submitted submissions
+    view = editView
+    checkWarning view, false
