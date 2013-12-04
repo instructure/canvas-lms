@@ -118,7 +118,7 @@
 #         "type": "string"
 #       },
 #       "answer_match_left": {
-#         "description": "Used in matching questions.  The static value of the answer that will be displayed on the right for students to match for.",
+#         "description": "Used in matching questions.  The static value of the answer that will be displayed on the left for students to match for.",
 #         "example": "Salt Lake City",
 #         "type": "string"
 #       },

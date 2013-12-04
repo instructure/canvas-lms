@@ -8,7 +8,7 @@ module QuizQuestion::AnswerParsers
           id: fields.fetch(:id, nil),
           text: fields.fetch_with_enforced_length(:answer_text),
           comments: fields.fetch_with_enforced_length(:answer_comments),
-          weight: answer.fetch(:answer_weight).to_f,
+          weight: answer.fetch(:answer_weight).to_f
         }
 
         a[:html] = fields.sanitize(fields.fetch(:answer_html)) if fields.fetch(:answer_html).present?

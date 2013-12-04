@@ -19,7 +19,7 @@ module QuizQuestion::AnswerParsers
 
         answer = QuizQuestion::AnswerGroup::Answer.new(a)
 
-        answer_group.taken_ids << answer.set_match_id(answer_group.taken_ids)
+        answer_group.taken_ids << answer.set_id(answer_group.taken_ids, :match_id)
         answer_group.taken_ids << answer.set_id(answer_group.taken_ids)
 
         question[:matches] << {match_id: a[:match_id], text: a[:right] }

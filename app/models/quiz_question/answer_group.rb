@@ -27,13 +27,6 @@ class QuizQuestion::AnswerGroup
     @answers.detect(&:correct?)
   end
 
-
-  def assign_ids
-    @taken_ids = @answers.map do |a|
-      a.set_id(@taken_ids)
-    end
-  end
-
   def to_a
     @answers.map(&:to_hash)
   end
@@ -69,22 +62,15 @@ class QuizQuestion::AnswerGroup
       @data[:weight].to_i == 100
     end
 
-    def set_id(taken_ids)
-      @data[:id] = @data["id"] if @data["id"]
-      @data[:id] = nil if (@data[:id] && @data[:id].to_i.zero?) || taken_ids.include?(@data[:id])
-      @data[:id] ||= unique_local_id(taken_ids)
-      @data[:id]
-    end
+    def set_id(taken_ids, key=:id)
 
-    def set_match_id(taken_ids)
-      @data[:match_id] = @data["match_id"] if @data["match_id"]
-      @data[:match_id] = nil if (@data[:match_id] && @data[:match_id].to_i.zero?) || taken_ids.include?(@data[:match_id])
-      @data[:match_id] ||= unique_local_id(taken_ids)
-      @data[:match_id]
+      @data[key] = @data[key.to_s] if @data[key.to_s]
+      @data[key] = nil if (@data[key] && @data[key].to_i.zero?) || taken_ids.include?(@data[key])
+      @data[key] ||= unique_local_id(taken_ids)
+      @data[key]
     end
 
     private
-
     def unique_local_id(taken_ids = [], suggested_id=nil)
       if suggested_id && suggested_id > 0 && !taken_ids.include?(suggested_id)
         return suggested_id
