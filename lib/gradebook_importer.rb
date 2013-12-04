@@ -144,7 +144,7 @@ class GradebookImporter
       assignment = @all_assignments[id.to_i] if id.present?
       assignment ||= @all_assignments.detect { |id, a| a.title == name_and_id }.try(:last) #backward compat
       assignment ||= Assignment.new(:title => title || name_and_id)
-      assignment.original_id = assignment.id
+      assignment.previous_id = assignment.id
       assignment.id ||= NegativeId.generate
       @missing_assignment ||= assignment.new_record?
       assignment
@@ -167,7 +167,7 @@ class GradebookImporter
     end
     student ||= @all_students.detect { |id, s| s.name == row[0] || s.sortable_name == row[0] }.try(:last) if row[0].present?
     student ||= User.new(:name => row[0])
-    student.original_id = student.id
+    student.previous_id = student.id
     student.id ||= NegativeId.generate
     @missing_student ||= student.new_record?
     student
@@ -178,7 +178,7 @@ class GradebookImporter
     @assignments.each_with_index do |assignment, idx|
       l << {
         'grade' => row[idx + @student_columns],
-        'assignment_id' => assignment.new_record? ? assignment.id : assignment.original_id
+        'assignment_id' => assignment.new_record? ? assignment.id : assignment.previous_id
       }
     end
     student.write_attribute(:submissions, l)
@@ -214,7 +214,7 @@ class GradebookImporter
       {
         :last_name_first => user.last_name_first,
         :name => user.name,
-        :original_id => user.original_id,
+        :previous_id => user.previous_id,
         :id => user.id,
         :submissions => user.read_attribute(:submissions)
       }
@@ -223,7 +223,7 @@ class GradebookImporter
     def assignment_to_hash(assignment)
       {
         :id => assignment.id,
-        :original_id => assignment.original_id,
+        :previous_id => assignment.previous_id,
         :title => assignment.title,
         :points_possible => assignment.points_possible,
         :grading_type => assignment.grading_type

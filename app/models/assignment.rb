@@ -39,7 +39,7 @@ class Assignment < ActiveRecord::Base
     :context, :position, :allowed_extensions, :external_tool_tag_attributes,
     :freeze_on_copy, :assignment_group_id
 
-  attr_accessor :original_id, :updating_user, :copying
+  attr_accessor :previous_id, :updating_user, :copying
 
   attr_reader :assignment_changed
 

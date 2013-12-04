@@ -156,7 +156,7 @@ describe GradebookUploadsController do
       uploaded_json = <<-JSON
       {
         "students": [{
-          "original_id": #{@student.id},
+          "previous_id": #{@student.id},
           "name": "#{@student.name}",
           "submissions": [{
             "grade": "40%",
@@ -166,7 +166,7 @@ describe GradebookUploadsController do
           "last_name_first": "#{@student.last_name_first}"
         }],
         "assignments": [{
-          "original_id": #{@assignment.id},
+          "previous_id": #{@assignment.id},
           "title": "#{@assignment.title}",
           "id": #{@assignment.id},
           "points_possible": #{@assignment.points_possible},
