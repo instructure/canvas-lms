@@ -303,4 +303,20 @@ ActiveRecord::Associations::HasManyThroughAssociation.class_eval do
   alias_method_chain :construct_scope, :has_many_fix
 end
 
+# in ruby 2.0, respond_to? returns false for protected methods; Rails 2 doesn't know this,
+# so replace this method with that knowledge
+ActiveRecord::Callbacks.class_eval do
+  def callback(method)
+    result = run_callbacks(method) { |result, object| false == result }
+
+    if result != false && respond_to_without_attributes?(method, true)
+      result = send(method)
+    end
+
+    notify(method)
+
+    return result
+  end
+end
+
 end
