@@ -6,15 +6,15 @@ describe QuizQuestion::AnswerParsers::Calculated do
     let(:raw_answers) do
       [
         {
-          variables: [{name: "x", value: "9"}],
+          variables: {"variable_0" => {name: "x", value: "9"} },
           answer_text: 14
         },
         {
-          variables: [{name: "x", value: "6"}],
+          variables: {"variable_0" => {name: "x", value: "6"}},
           answer_text: 11
         },
         {
-          variables: [{name: "x", value: "7"}],
+          variables: {"variable_0" => {name: "x", value: "7"}},
           answer_text: 12
         }
       ]
@@ -33,7 +33,20 @@ describe QuizQuestion::AnswerParsers::Calculated do
       }
     end
 
-    it "formats formulas for the question"
-    it "formats variables for the question"
+    before(:each) do
+      @question = parser_class.new(QuizQuestion::AnswerGroup.new(raw_answers)).parse(QuizQuestion::QuestionData.new(question_params))
+    end
+
+    it "formats formulas for the question" do
+      @question[:formulas].each do |formula|
+        formula.should be_kind_of(Hash)
+      end
+    end
+
+    it "formats variables for the question" do
+      @question.answers.each do |answer|
+        answer[:variables].should be_kind_of(Array)
+      end
+    end
   end
 end

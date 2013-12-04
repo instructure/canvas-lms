@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe QuizQuestion::AnswerGroup do
   let(:question_data_params) do
-    { 
+    {
       answers: [
         {
           answer_text: "A",
@@ -64,5 +64,69 @@ describe QuizQuestion::AnswerGroup do
       question_data.answers.correct_answer[:text].should == "A"
     end
 
+  end
+end
+
+describe QuizQuestion::AnswerGroup::Answer do
+  let(:params) do
+    {
+      weight: 100,
+      text: "Answer 1",
+      comments: "Some comments to Answer 1"
+    }
+  end
+
+  before(:each) do
+    @answer = QuizQuestion::AnswerGroup::Answer.new(params)
+  end
+
+  describe "#to_hash" do
+    it "returns the internal hash" do
+      @answer.to_hash.should be_instance_of(Hash)
+      @answer.to_hash[:text].should == "Answer 1"
+    end
+  end
+
+  describe "#correct?" do
+    context "when weight is 100" do
+      it "returns true" do
+        @answer.correct?.should be_true
+      end
+    end
+
+    context "when weight isn't 100" do
+      it "returns false" do
+        @answer[:weight] = 0
+        @answer.correct?.should be_false
+        @answer[:weight] = nil
+        @answer.correct?.should be_false
+        @answer[:weight] = ""
+        @answer.correct?.should be_false
+        @answer[:weight] = 5
+        @answer.correct?.should be_false
+      end
+    end
+  end
+
+  describe "#set_id" do
+    it "assigns a randomly generated id to the answer" do
+      @answer.set_id([])
+      @answer[:id].should be_kind_of(Fixnum)
+      @answer[:id].should be > 0
+    end
+
+    it "takes taken ids into account and prevents collisions" do
+      range = [1..1000]
+      @answer.set_id(range)
+      range.should_not include(@answer[:id])
+    end
+
+    it "doesn't reassign a new id if one has already been set" do
+      id = @answer.set_id([])
+      @answer.set_id([])
+      @answer.set_id([])
+
+      @answer[:id].should eql(id)
+    end
   end
 end
