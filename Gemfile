@@ -25,10 +25,16 @@ if CANVAS_RAILS2
   else
     gem 'rails', :github => 'makandra/rails', :branch => '2-3-lts', :ref => 'e86daf8ff727d5efc0040c876ba00c9444a5d915'
   end
+  # AMS needs to be loaded BEFORE authlogic because it defines the constant
+  # "ActiveModel", and aliases ActiveRecord::Errors to ActiveModel::Errors
+  # so Authlogic will use the right thing when it detects that ActiveModel
+  # is defined.
+  gem 'active_model_serializers_rails_2.3', '0.9.0pre2', require: 'active_model_serializers'
   gem 'authlogic', '2.1.3'
 else
   # just to be clear, Canvas is NOT READY to run under Rails 3 in production
   gem 'rails', '3.2.15'
+  gem 'active_model_serializers', '0.9.0pre'
   gem 'authlogic', '3.2.0'
 end
 

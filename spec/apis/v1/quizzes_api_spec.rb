@@ -20,6 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
 describe QuizzesApiController, :type => :integration do
+
   context 'locked api item' do
     let(:item_type) { 'quiz' }
 
@@ -73,56 +74,25 @@ describe QuizzesApiController, :type => :integration do
                    :course_id => "#{@course.id}")
       response.status.to_i.should == 404
     end
+
+    context "jsonapi style" do
+
+      it "renders a jsonapi style response" do
+        quizzes = (0..3).map{ |i| @course.quizzes.create! :title => "quiz_#{i}" }
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes",
+                        {:controller=>"quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}"},
+                        {},
+                        'Accept' => 'application/vnd.api+json')
+        json = json['quizzes']
+        quiz_ids = json.collect { |quiz| quiz['id'] }
+        quiz_ids.should == quizzes.map(&:id).map(&:to_s)
+      end
+    end
   end
 
   describe "GET /courses/:course_id/quizzes/:id (show)" do
     before { course_with_teacher_logged_in(:active_all => true, :course => @course) }
-
-    context "as a student" do
-
-      it "doesn't show access codes" do
-        course_with_student_logged_in(active_all: true)
-        quiz = @course.quizzes.create!(
-          title: "Access code Test",
-          access_code: "hello!"
-        )
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{quiz.id}",
-                        :controller=>"quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "#{quiz.id}")
-
-        json.should_not have_key('access_code')
-      end
-    end
-
-    context "valid quiz" do
-      before do
-        @quiz = @course.quizzes.create! :title => 'title'
-        @json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
-                        :controller=>"quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "#{@quiz.id}")
-      end
-
-      it "includes the allowed quiz output fields" do
-        Api::V1::Quiz::API_ALLOWED_QUIZ_OUTPUT_FIELDS[:only].each do |field|
-          @json.should have_key field.to_s
-          @json[field.to_s].should == @quiz.send(field)
-        end
-      end
-
-      it "includes html_url" do
-        @json['html_url'].should == polymorphic_url([@course, @quiz])
-      end
-
-      it "includes mobile_url" do
-        @json['mobile_url'].should == polymorphic_url([@course, @quiz], :persist_headless => 1, :force_user => 1)
-      end
-
-      it "includes published" do
-        @json['published'].should == false
-      end
-
-      it "includes question count" do
-        @json['question_count'].should == 0
-      end
-    end
 
     context "unpublished quiz" do
       before do
@@ -136,6 +106,21 @@ describe QuizzesApiController, :type => :integration do
 
       it "includes unpublished questions in question count" do
         @json['question_count'].should == 1
+      end
+    end
+
+    context "jsonapi style request" do
+
+      it "renders in a jsonapi style" do
+        @quiz = @course.quizzes.create! title: 'Test Quiz'
+        @json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
+                         { :controller=>"quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "#{@quiz.id}"}, {},
+                        'Accept' => 'application/vnd.api+json')
+        @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
+        @json.should =~ [
+          QuizSerializer.new(@quiz, scope: @user, controller: controller, session: session).
+          as_json[:quiz].with_indifferent_access
+        ]
       end
     end
 
@@ -162,6 +147,22 @@ describe QuizzesApiController, :type => :integration do
     before { teacher_in_course(:active_all => true) }
 
     let (:new_quiz) { @course.quizzes.first }
+
+    context "jsonapi style request" do
+
+      it "renders in a jsonapi style" do
+        @json = api_call(:post, "/api/v1/courses/#{@course.id}/quizzes",
+                         { :controller=>"quizzes_api", :action=>"create", :format=>"json", :course_id=>"#{@course.id}" },
+                         { quizzes: [{ 'title' => 'blah blah', 'published' => true }] },
+                        'Accept' => 'application/vnd.api+json')
+        @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
+        @quiz = Quiz.first
+        @json.should =~ [
+          QuizSerializer.new(@quiz, scope: @user, controller: controller, session: session).
+          as_json[:quiz].with_indifferent_access
+        ]
+      end
+    end
 
     it "creates a quiz for the course" do
       api_create_quiz({ 'title' => 'testing' })
@@ -304,6 +305,21 @@ describe QuizzesApiController, :type => :integration do
     it "updates quiz attributes" do
       api_update_quiz({'title' => 'old title'}, {'title' => 'new title'})
       updated_quiz.title.should == 'new title'
+    end
+    context "jsonapi style request" do
+
+      it "renders in a jsonapi style" do
+        @quiz = @course.quizzes.create! title: 'Test Quiz'
+        @json = api_call(:put, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
+                         { :controller=>"quizzes_api", :action=>"update", :format=>"json", :course_id=>"#{@course.id}", :id => "#{@quiz.id}"},
+                         { quizzes: [{ 'id' => @quiz.id, 'title' => 'blah blah' }] },
+                        'Accept' => 'application/vnd.api+json')
+        @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
+        @json.should =~ [
+          QuizSerializer.new(@quiz.reload, scope: @user, controller: controller, session: session).
+          as_json[:quiz].with_indifferent_access
+        ]
+      end
     end
 
     it "doesn't allow setting fields not in the whitelist" do

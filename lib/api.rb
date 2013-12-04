@@ -202,12 +202,43 @@ module Api
   # The collection needs to be a will_paginate collection (or act like one)
   # a new, paginated collection will be returned
   def self.paginate(collection, controller, base_url, pagination_args = {})
-    pagination_args.reverse_merge!(
-      page: controller.params[:page],
-      per_page: per_page_for(controller,
-        default: pagination_args.delete(:default_per_page),
-        max: pagination_args.delete(:max_per_page)))
+    collection = paginate_collection!(collection, controller, pagination_args)
+    links = build_links(base_url, meta_for_pagination(controller, collection))
+    controller.response.headers["Link"] = links.join(',') if links.length > 0
+    collection
+  end
 
+  # Returns collection as the first return value, and the meta information hash
+  # as the second return value
+  def self.jsonapi_paginate(collection, controller, base_url, pagination_args={})
+    collection = paginate_collection!(collection, controller, pagination_args)
+    meta = jsonapi_meta(collection, controller, base_url)
+
+    return collection, meta
+  end
+
+  def self.jsonapi_meta(collection, controller, base_url)
+    pagination = meta_for_pagination(controller, collection)
+
+    meta = {
+      per_page: collection.per_page
+    }
+
+    meta.merge!(build_links_hash(base_url, pagination))
+
+    if collection.ordinal_pages?
+      meta[:page] = pagination[:current]
+      meta[:template] = meta[:current].sub(/page=\d+/, "page={page}")
+    end
+
+    meta[:count] = collection.total_entries if collection.total_entries
+    meta[:page_count] = collection.total_pages if collection.total_pages
+
+    { pagination: meta }
+  end
+
+  def self.paginate_collection!(collection, controller, pagination_args)
+    wrap_pagination_args!(pagination_args, controller)
     begin
       paginated = collection.paginate(pagination_args)
     rescue Folio::InvalidPage
@@ -222,34 +253,50 @@ module Api
         raise
       end
     end
-    collection = paginated
-
-    links = build_links(base_url, {
-      :query_parameters => controller.request.query_parameters,
-      :per_page => collection.per_page,
-      :current => collection.current_page,
-      :next => collection.next_page,
-      :prev => collection.previous_page,
-      :first => collection.first_page,
-      :last => collection.last_page,
-    })
-    controller.response.headers["Link"] = links.join(',') if links.length > 0
-    collection
+    paginated
   end
 
+  def self.wrap_pagination_args!(pagination_args, controller)
+    pagination_args.reverse_merge!(
+      page: controller.params[:page],
+      per_page: per_page_for(controller,
+        default: pagination_args.delete(:default_per_page),
+        max: pagination_args.delete(:max_per_page)))
+  end
+
+  def self.meta_for_pagination(controller, collection)
+    {
+      query_parameters: controller.request.query_parameters,
+      per_page: collection.per_page,
+      current: collection.current_page,
+      next: collection.next_page,
+      prev: collection.previous_page,
+      first: collection.first_page,
+      last: collection.last_page,
+    }
+  end
+
+  PAGINATION_PARAMS = [:current, :next, :prev, :first, :last]
   EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key)
   def self.build_links(base_url, opts={})
-    links = []
+    links = build_links_hash(base_url, opts)
+    # iterate in order, but only using the keys present from build_links_hash
+    (PAGINATION_PARAMS & links.keys).map do |k|
+      v = links[k]
+      "<#{v}>; rel=\"#{k}\""
+    end
+  end
+
+  def self.build_links_hash(base_url, opts={})
     base_url += (base_url =~ /\?/ ? '&': '?')
     qp = opts[:query_parameters] || {}
     qp = qp.with_indifferent_access.except(*EXCLUDE_IN_PAGINATION_LINKS)
     base_url += "#{qp.to_query}&" if qp.present?
-    [:current, :next, :prev, :first, :last].each do |k|
-      if opts[k].present?
-        links << "<#{base_url}page=#{opts[k]}&per_page=#{opts[:per_page]}>; rel=\"#{k}\""
+    PAGINATION_PARAMS.each_with_object({}) do |param, obj|
+      if opts[param].present?
+        obj[param] = "#{base_url}page=#{opts[param]}&per_page=#{opts[:per_page]}"
       end
     end
-    links
   end
 
   def self.parse_pagination_links(link_header)

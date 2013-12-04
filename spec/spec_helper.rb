@@ -32,6 +32,7 @@ require 'webrat'
 require 'mocha/api'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
+require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 

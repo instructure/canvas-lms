@@ -1227,6 +1227,8 @@ class Quiz < ActiveRecord::Base
     !has_student_submissions? &&
       (!assignment || !assignment.has_student_submissions?)
   end
+  alias_method :unpublishable?, :can_unpublish?
+  alias_method :unpublishable, :can_unpublish?
 
   # marks a quiz as having unpublished changes
   def self.mark_quiz_edited(id)
@@ -1256,6 +1258,7 @@ class Quiz < ActiveRecord::Base
     draft_state == 'active'
   end
   alias_method :published?, :active?
+  alias_method :published, :active?
 
   def unpublished?; !published?; end
 

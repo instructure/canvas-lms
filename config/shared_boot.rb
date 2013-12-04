@@ -58,7 +58,9 @@ config.active_record.observers = [:cacher, :stream_item_cache]
 config.autoload_paths += %W(#{Rails.root}/app/middleware
                             #{Rails.root}/app/observers
                             #{Rails.root}/app/presenters
-                            #{Rails.root}/app/services)
+                            #{Rails.root}/app/services
+                            #{Rails.root}/app/serializers
+                            #{Rails.root}/app/presenters)
 
 if CANVAS_RAILS2
   config.middleware.insert_before(ActionController::Base.session_store, 'LoadAccount')

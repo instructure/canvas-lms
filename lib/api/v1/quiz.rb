@@ -19,33 +19,6 @@
 module Api::V1::Quiz
   include Api::V1::Json
   include Api::V1::AssignmentOverride
-  include Api::V1::Locked
-
-  API_ALLOWED_QUIZ_OUTPUT_FIELDS = {
-    :only => %w(
-      id
-      title
-      description
-      quiz_type
-      assignment_group_id
-      time_limit
-      shuffle_answers
-      hide_results
-      show_correct_answers
-      show_correct_answers_at
-      hide_correct_answers_at
-      scoring_policy
-      allowed_attempts
-      one_question_at_a_time
-      points_possible
-      cant_go_back
-      access_code
-      ip_filter
-      due_at
-      lock_at
-      unlock_at
-      )
-  }
 
   API_ALLOWED_QUIZ_INPUT_FIELDS = {
     :only => %w(
@@ -79,25 +52,31 @@ module Api::V1::Quiz
   end
 
   def quiz_json(quiz, context, user, session)
-    hash = api_json(quiz, user, session, API_ALLOWED_QUIZ_OUTPUT_FIELDS).merge(
-      :html_url => polymorphic_url([context, quiz]),
-      :mobile_url => polymorphic_url([context, quiz], :persist_headless => 1, :force_user => 1),
-      :question_count => quiz.available_question_count,
-      :published => quiz.published?
-    )
-    hash.delete(:access_code) unless quiz.grants_right?(user, session, :grade)
-    if context.grants_right?(user, session, :manage_assignments)
-      hash[:unpublishable] = quiz.can_unpublish?
-    end
-    locked_json(hash, quiz, user, 'quiz', :context => context)
-    hash
+    QuizSerializer.new(quiz,
+                       scope: user,
+                       session: session,
+                       root: false,
+                       controller: self).as_json
+  end
+
+  def jsonapi_quizzes_json(options)
+    scope = options.fetch(:scope)
+    api_route = options.fetch(:api_route)
+    @quizzes, meta = Api.jsonapi_paginate(scope, self, api_route)
+    meta[:primaryCollection] = 'quizzes'
+    ActiveModel::ArraySerializer.new(@quizzes,
+                          scope: @current_user,
+                          controller: self,
+                          root: :quizzes,
+                          meta: meta).as_json
   end
 
   def filter_params(quiz_params)
     quiz_params.slice(*API_ALLOWED_QUIZ_INPUT_FIELDS[:only])
   end
 
-  def update_api_quiz(quiz, quiz_params, save = true)
+  def update_api_quiz(quiz, params, save = true)
+    quiz_params = accepts_jsonapi? ? Array(params[:quizzes]).first : params[:quiz]
     return nil unless quiz.is_a?(Quiz) && quiz_params.is_a?(Hash)
     update_params = filter_params(quiz_params)
 

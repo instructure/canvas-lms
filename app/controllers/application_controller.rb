@@ -30,6 +30,7 @@ class ApplicationController < ActionController::Base
   end
 
   attr_accessor :active_tab
+  attr_reader :context
 
   include Api
   include LocaleSelection
@@ -1634,4 +1635,5 @@ class ApplicationController < ActionController::Base
 
     js_env hash
   end
+
 end
