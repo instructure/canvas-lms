@@ -267,9 +267,6 @@ class AssignmentsController < ApplicationController
         end
       }
     end
-    # TODO: Add format.csv here
-    
-    # --
   end
 
   def syllabus
