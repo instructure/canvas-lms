@@ -146,7 +146,6 @@ class AssetUserAccess < ActiveRecord::Base
 
   def asset
     asset_code, general = self.asset_code.split(":").reverse
-    code_split = asset_code.split("_")
     asset = Context.find_asset_by_asset_string(asset_code, context)
     asset
   end
@@ -177,7 +176,6 @@ class AssetUserAccess < ActiveRecord::Base
 
   def self.infer_asset(code)
     asset_code, general = code.split(":").reverse
-    code_split = asset_code.split("_")
     asset = Context.find_asset_by_asset_string(asset_code)
     asset
   end
