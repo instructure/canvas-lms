@@ -1799,7 +1799,8 @@ describe Assignment do
         :exclude_biblio => '1',
         :exclude_quoted => '0',
         :exclude_type => '0',
-        :exclude_value => ''
+        :exclude_value => '',
+        :s_view_report => '1'
       })
     end
 

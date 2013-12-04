@@ -944,7 +944,8 @@ describe AssignmentsApiController, :type => :integration do
           'exclude_biblio' => '1',
           'exclude_quoted' => '0',
           'exclude_type' => '2',
-          'exclude_value' => '50'
+          'exclude_value' => '50',
+          's_view_report' => '1'
         }
       end
 
