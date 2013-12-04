@@ -4,11 +4,10 @@ skip_locale_loading = (Rails.env.development? || Rails.env.test? || $0 == 'irb')
 if skip_locale_loading
   I18n.load_path = I18n.load_path.grep(%r{/(locales|en)\.yml\z})
 end
-if CANVAS_RAILS2
-  I18n.backend = I18nema::Backend.new
-  I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
-  I18n.backend.init_translations
-end
+
+I18n.backend = I18nema::Backend.new
+I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
+I18n.backend.init_translations
 
 I18n.enforce_available_locales = true
 
