@@ -274,7 +274,7 @@ describe AssignmentsApiController, :type => :integration do
              )
       assign = json.first
       assign['submission'].should ==
-        json_parse(@controller.submission_json(submission,assignment,@user,session).to_json)
+        json_parse(controller.submission_json(submission,assignment,@user,session).to_json)
     end
     it "returns due dates as they apply to the user" do
         course_with_student(:active_all => true)
@@ -1238,7 +1238,7 @@ describe AssignmentsApiController, :type => :integration do
           :id => assignment.id.to_s},
           {:include => ['submission']})
         json['submission'].should ==
-          json_parse(@controller.submission_json(submission,assignment,@user,session).to_json)
+          json_parse(controller.submission_json(submission,assignment,@user,session).to_json)
       end
 
       context "AssignmentFreezer plugin disabled" do

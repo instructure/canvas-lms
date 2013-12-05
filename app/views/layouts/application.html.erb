@@ -23,7 +23,7 @@
     @body_classes << "padless-content" if @padless
     @body_classes << "with-embedded-chat" if @show_embedded_chat
     @body_classes << 'with-fixed-bottom' if @show_fixed_bottom
-    @body_classes << 'pages' if @controller.js_env[:WIKI_PAGE].present?
+    @body_classes << 'pages' if controller.js_env[:WIKI_PAGE].present?
     @body_classes << @active_tab
   end
 
