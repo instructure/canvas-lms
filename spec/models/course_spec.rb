@@ -3105,6 +3105,15 @@ describe Course, "student_view_student" do
     student_view_course.enrollments.map(&:user_id).should be_include(student_view_student.id)
   end
 
+  it "should not create a section if a section already exists" do
+    student_view_course = Course.create!
+    not_default_section = student_view_course.course_sections.create! name: 'not default section'
+    not_default_section.should_not be_default_section
+    student_view_student = student_view_course.student_view_student
+    student_view_course.reload.course_sections.active.count.should eql 1
+    not_default_section.enrollments.map(&:user_id).should be_include(student_view_student.id)
+  end
+
   it "should create and return the student view student for a course" do
     expect { @course.student_view_student }.to change(User, :count).by(1)
   end
