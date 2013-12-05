@@ -1,8 +1,14 @@
-define ['underscore'], ({extend}) ->
+define ['underscore'], ({extend, flatten}) ->
 
   ##
   # Merges mixins into target, being mindful of certain properties (like
   # events) that need to be merged also.
+  
+  magicMethods = ['attach', 'afterRender', 'initialize']
+  magicMethodRegex = /// ^ (?:
+    __(#{magicMethods.join('|')})__ # cached value with __ prefix/postfix
+    | (#{magicMethods.join('|')})   # "raw" uncached method pre-mixin
+  ) $ ///
 
   mixin = (target, mixins...) ->
     target = target.prototype if 'function' is typeof target
@@ -14,9 +20,12 @@ define ['underscore'], ({extend}) ->
           parentClassKey = target.constructor?.prototype[key]
           target[key] = extend({}, parentClassKey, target[key], prop)
         # crazy magic multiple inheritence
-        else if key in ['attach', 'afterRender', 'initialize']
-          (target["__#{key}__"] ||= []).push prop
+        else if match = key.match magicMethodRegex
+          [alreadyMixedIn, notMixedInYet] = match[1..]
+          (target["__#{alreadyMixedIn or notMixedInYet}__"] ||= []).push prop
         else
           target[key] = prop
+    for key in ("__#{method}__" for method in magicMethods)
+      target[key] = flatten target[key], true if target[key]
     target
 
