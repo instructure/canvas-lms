@@ -248,6 +248,54 @@ class Group < ActiveRecord::Base
     return member
   end
 
+  def bulk_add_users_to_group(users, options = {})
+    return if users.empty?
+    user_ids = users.map(&:id)
+    old_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids).all
+    bulk_insert_group_memberships(users, options)
+    bulk_insert_group_user_follows(users, options)
+    all_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids)
+    new_group_memberships = all_group_memberships - old_group_memberships
+    new_group_memberships.sort_by!(&:user_id)
+    users.sort_by!(&:id)
+    notification_name = options[:notification_name] || "New Context Group Membership"
+    notification = Notification.by_name(notification_name)
+    users.each {|user| Rails.cache.delete(permission_cache_key_for(user))}
+
+    users.each_with_index do |user, index|
+      Instructure::BroadcastPolicy::NotificationPolicy.send_later_enqueue_args(:send_notification,
+                                                                               {:priority => Delayed::LOW_PRIORITY},
+                                                                               new_group_memberships[index],
+                                                                               notification_name.parameterize.underscore.to_sym,
+                                                                               notification,
+                                                                               [user])
+    end
+    new_group_memberships
+  end
+
+  def bulk_insert_group_memberships(users, options = {})
+    current_time = Time.now
+    options = {
+        :group_id => self.id,
+        :workflow_state => 'accepted',
+        :moderator => false,
+        :created_at => current_time,
+        :updated_at => current_time
+    }.merge(options)
+    GroupMembership.bulk_insert(users.map{ |user|
+      options.merge({:user_id => user.id, :uuid => AutoHandle.generate_securish_uuid})
+    })
+  end
+
+  def bulk_insert_group_user_follows(users, options = {})
+    options = {
+        :followed_item_id => self.id
+    }.merge(options)
+    UserFollow.bulk_insert(users.map{ |user|
+      options.merge({:following_user_id => user.id})
+    })
+  end
+
   def invite_user(user)
     self.add_user(user, 'invited')
   end

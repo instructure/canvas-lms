@@ -1141,6 +1141,7 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
       raw_connection.put_copy_data records.inject(''){ |result, record|
         result << keys.map{ |k| quote_text(record[k]) }.join("\t") << "\n"
       }
+      ActiveRecord::Base.connection.clear_query_cache
       raw_connection.put_copy_end
     end
 

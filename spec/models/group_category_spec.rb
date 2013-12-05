@@ -351,50 +351,88 @@ describe GroupCategory do
   end
 
   context "#assign_unassigned_members" do
-    it "should not assign users to inactive groups" do
+    before(:each) do
       course_with_teacher_logged_in(:active_all => true)
-      category = @course.group_categories.create(:name => "Group Category")
-      group1 = category.groups.create(:name => "Group 1", :context => @course)
-      group2 = category.groups.create(:name => "Group 2", :context => @course)
+      @category = @course.group_categories.create(:name => "Group Category")
+    end
+
+    it "should not assign users to inactive groups" do
+      group1 = @category.groups.create(:name => "Group 1", :context => @course)
+      group2 = @category.groups.create(:name => "Group 2", :context => @course)
       student1 = @course.enroll_student(user_model).user
       student2 = @course.enroll_student(user_model).user
       group2.add_user(student1)
       group1.destroy
 
+
       # group1 now has fewer students, and would be favored if it weren't
       # destroyed. make sure the unassigned student (student2) is assigned to
       # group2 instead of group1
-      memberships = category.assign_unassigned_members
+      memberships = @category.assign_unassigned_members
       memberships.size.should == 1
       memberships.first.group_id.should == group2.id
     end
 
-    it "should not assign users already in group in the category" do
-      course_with_teacher_logged_in(:active_all => true)
-      category = @course.group_categories.create(:name => "Group Category")
-      group1 = category.groups.create(:name => "Group 1", :context => @course)
-      group2 = category.groups.create(:name => "Group 2", :context => @course)
+    it "should not assign users already in group in the @category" do
+      group1 = @category.groups.create(:name => "Group 1", :context => @course)
+      group2 = @category.groups.create(:name => "Group 2", :context => @course)
       student1 = @course.enroll_student(user_model).user
       student2 = @course.enroll_student(user_model).user
       group2.add_user(student1)
 
       # student1 shouldn't get assigned, already being in a group
-      memberships = category.assign_unassigned_members
+      memberships = @category.assign_unassigned_members
       memberships.map { |m| m.user }.should_not include(student1)
     end
 
-    it "should otherwise assign ungrouped users to groups in the category" do
-      course_with_teacher_logged_in(:active_all => true)
-      category = @course.group_categories.create(:name => "Group Category")
-      group1 = category.groups.create(:name => "Group 1", :context => @course)
-      group2 = category.groups.create(:name => "Group 2", :context => @course)
+    it "should otherwise assign ungrouped users to groups in the @category" do
+      group1 = @category.groups.create(:name => "Group 1", :context => @course)
+      group2 = @category.groups.create(:name => "Group 2", :context => @course)
       student1 = @course.enroll_student(user_model).user
       student2 = @course.enroll_student(user_model).user
       group2.add_user(student1)
 
       # student2 should get assigned, not being in a group
-      memberships = category.assign_unassigned_members
+      memberships = @category.assign_unassigned_members
       memberships.map { |m| m.user }.should include(student2)
+    end
+
+    it "should assign unassigned users while respecting group limits in the category" do
+      initial_spread = [0, 0, 0]
+      result_spread = [1, 1, 1]
+      opts = {group_limit: 1,
+              expected_leftover_count: 1}
+      assert_random_group_assignment(@category, @course, initial_spread, result_spread, opts)
+    end
+
+    it "should assign unassigned users correctly to empty groups in the category" do
+      initial_spread = [0, 0, 0]
+      result_spread = [3, 3, 3]
+      assert_random_group_assignment(@category, @course, initial_spread, result_spread)
+    end
+
+    it "should assign unassigned users correctly to evenly sized groups in the category" do
+      initial_spread = [2, 2, 2]
+      result_spread = [5, 5, 5]
+      assert_random_group_assignment(@category, @course, initial_spread, result_spread)
+    end
+
+    it "should assign unassigned users correctly to unevenly sized groups where member_count > delta_required in the category" do
+      initial_spread = [1, 2, 3]
+      result_spread = [5, 5, 6]
+      assert_random_group_assignment(@category, @course, initial_spread, result_spread)
+    end
+
+    it "should assign unassigned users correctly to unevenly sized groups where member_count = delta_required in the category" do
+      initial_spread = [0, 1, 5]
+      result_spread = [5, 5, 5]
+      assert_random_group_assignment(@category, @course, initial_spread, result_spread)
+    end
+
+    it "should assign unassigned users correctly to unevenly sized groups where member_count < delta_required in the category" do
+      initial_spread = [0, 1, 7]
+      result_spread = [4, 5, 7]
+      assert_random_group_assignment(@category, @course, initial_spread, result_spread)
     end
   end
 
@@ -412,5 +450,41 @@ describe GroupCategory do
       category.send :start_progress
       category.progresses.count.should == 2
     end
+  end
+end
+
+def assert_random_group_assignment(category, course, initial_spread, result_spread, opts={})
+  if group_limit = opts[:group_limit]
+    category.group_limit = group_limit
+    category.save
+  end
+
+  expected_leftover_count = opts[:expected_leftover_count] || 0
+
+  # set up course groups
+  group_count = result_spread.size
+  group_count.times { |i| category.groups.create(:name => "Group #{i}", :context => course) }
+
+  # set up course users
+  course_users = []
+  user_count = result_spread.inject(:+) + expected_leftover_count
+  user_count.times { course_users << course_with_student({:course => course, :active_all => true}).user }
+
+  # set up initial spread
+  initial_memberships = []
+  category.groups.each_with_index do |group, group_index|
+    initial_spread[group_index].times { initial_memberships << group.add_user(course_users.pop, 'accepted') }
+  end
+
+  # perform random assignment
+  memberships = category.assign_unassigned_members
+
+  # verify that the results == result_spread
+  category.groups.map { |group| group.users.size }.sort.should == result_spread.sort
+
+  if group_limit && expected_leftover_count > 0
+    (course.students.size - memberships.size).should == expected_leftover_count
+  else
+    memberships.concat(initial_memberships).map(&:user_id).sort.should == course.students.order(:id).pluck(:id)
   end
 end
