@@ -1434,7 +1434,7 @@ class Assignment < ActiveRecord::Base
           student = peer_review.user
           submission = submissions.find{|s| s.user_id == user_id}
           submission_id = submission.id
-          current_score = submission.score || 0
+          current_score = submission.score || "-"
           # Put the previous row in the csv by skipping the empty ones
           unless row.empty?
             row << current_score
