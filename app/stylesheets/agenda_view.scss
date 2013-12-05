@@ -81,21 +81,27 @@ body {
 
 #calendar-app .agenda-event {
   margin: 0;
+  outline: none;
+
   .ig-row {
     border: none;
     box-shadow: none;
     height: 30px;
     background: none;
     border-radius: 3px;
+
     &:hover, &:focus {
       background-color: #F2F4F6;
+      outline: none;
     }
   }
+
   .ig-title {
     background: none;
     font-weight: normal;
     top: 4px;
   }
+
   .ig-details {
     top: 4px;
   }

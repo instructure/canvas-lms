@@ -81,6 +81,11 @@
 .event-details {
   h3, .h3 {
     margin-bottom: 0;
+
+    a:focus {
+      outline: 0;
+      text-decoration: underline;
+    }
   }
   &.carat-bottom .ui-menu-carat span {
     border-color: white transparent;
