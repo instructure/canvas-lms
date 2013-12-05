@@ -34,3 +34,7 @@ define [
       groupDetailView = new GroupDetailView {group: model, users: model.users()}
       groupView = new GroupView {model, groupUsersView, groupDetailView, addUnassignedMenu: @options.addUnassignedMenu}
       model.itemView = groupView
+
+    updateDetails: ->
+      for model in @collection.models
+        model.itemView.updateFullState()

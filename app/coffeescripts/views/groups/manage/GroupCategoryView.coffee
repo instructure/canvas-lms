@@ -59,6 +59,7 @@ define [
 
     attach: ->
       @model.on 'destroy', @remove, this
+      @model.on 'change', => @groupsView.updateDetails()
 
       @model.on 'change:unassigned_users_count', @setUnassignedHeading, this
       @groups.on 'add remove reset', @setGroupsHeading, this
