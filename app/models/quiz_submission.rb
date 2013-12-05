@@ -294,8 +294,35 @@ class QuizSubmission < ActiveRecord::Base
     params
   end
 
-  def snapshot!(params)
-    QuizSubmissionSnapshot.create(:quiz_submission => self, :attempt => self.attempt, :data => params)
+  # Generate a snapshot of the QS representing its current state and answer data.
+  #
+  # Multiple snapshots can be taken for a single QS, and they're further scoped
+  # to the QuizSubmission#attempt index.
+  #
+  # @param [Hash] submission_data
+  #   Answer data the snapshot should represent.
+  #
+  # @param [Boolean] full_snapshot
+  #   Set to true to indicate that the snapshot should represent both the QS's
+  #   current answer data along with the passed in answer data (patched).
+  #   This is useful for supporting incremental snapshots where you're only
+  #   passing in the part of the answer data that has changed.
+  #
+  # @return [QuizSubmissionSnapshot]
+  #   The latest, newly-created snapshot.
+  def snapshot!(submission_data={}, full_snapshot=false)
+    snapshot_data = submission_data || {}
+
+    if full_snapshot
+      snapshot_data = self.sanitize_params(snapshot_data).stringify_keys
+      snapshot_data.merge!(self.submission_data || {})
+    end
+
+    QuizSubmissionSnapshot.create({
+      quiz_submission: self,
+      attempt: self.attempt,
+      data: snapshot_data
+    })
   end
 
   def questions_as_object
@@ -531,6 +558,24 @@ class QuizSubmission < ActiveRecord::Base
       submissions: [self]
     }
     QuizRegrader.regrade!(options)
+  end
+
+  # Complete (e.g, turn-in) the quiz submission by doing the following:
+  #
+  #  - generating a (full) snapshot of the current state along with any
+  #  additional answer data that you pass in
+  #  - marking the QS as complete (see #workflow_state)
+  #  - grading the QS (see #grade_submission)
+  #
+  # @param [Hash] submission_data
+  #   Additional answer data to attach to the QS before completing it.
+  #
+  # @return [QuizSubmission] self
+  def complete!(submission_data={})
+    self.snapshot!(submission_data, true)
+    self.mark_completed
+    self.grade_submission
+    self
   end
 
   # Updates a simply_versioned version instance in-place.  We want
@@ -781,4 +826,24 @@ class QuizSubmission < ActiveRecord::Base
   delegate :assignment_id, :assignment, :to => :quiz
   delegate :graded_at, :to => :submission
   delegate :context, :to => :quiz
+
+  # Determine whether the QS can be retried (ie, re-generated).
+  #
+  # A QS is determined to be retriable if:
+  #
+  #   - it's a settings_only? one
+  #   - it's a preview? one
+  #   - it's complete and still has attempts left to spare
+  #   - it's complete and the quiz allows for unlimited attempts
+  #
+  # @return [Boolean]
+  #   Whether the QS is retriable.
+  def retriable?
+    return true if self.preview?
+    return true if self.settings_only?
+
+    attempts_left = self.attempts_left || 0
+
+    self.completed? && (attempts_left > 0 || self.quiz.unlimited_attempts?)
+  end
 end

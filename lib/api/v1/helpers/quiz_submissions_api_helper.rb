@@ -16,12 +16,27 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Api::V1::Helpers::QuizzesApiHelper
+module Api::V1::Helpers::QuizSubmissionsApiHelper
   protected
 
-  def require_quiz
-    unless @quiz = @context.quizzes.find(params[:quiz_id])
-      raise ActiveRecord::RecordNotFound.new('Quiz not found')
+  def require_overridden_quiz
+    @quiz = @quiz.overridden_for(@current_user)
+  end
+
+  def require_quiz_submission
+    collection = @quiz ? @quiz.quiz_submissions : QuizSubmission
+
+    unless @quiz_submission = collection.find(params[:id])
+      raise ActiveRecord::RecordNotFound
     end
+  end
+
+  def prepare_service
+    participant = QuizParticipant.new(@current_user, temporary_user_code)
+    participant.access_code = params[:access_code]
+    participant.ip_address = request.remote_ip
+    participant.validation_token = params[:validation_token]
+
+    @service = QuizSubmissionService.new(participant)
   end
 end

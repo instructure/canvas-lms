@@ -1432,4 +1432,23 @@ describe Quiz do
       @quiz.reload.should be_unpublished
     end
   end
+
+  describe '#generate_submission_for_participant' do
+    let :participant do
+      QuizParticipant.new(User.new, 'foobar')
+    end
+
+    it 'should link the generated QS to a user' do
+      subject.expects(:generate_submission).with(participant.user, false)
+
+      subject.generate_submission_for_participant(participant)
+    end
+
+    it 'should link the generated QS to a temporary user code' do
+      subject.expects(:generate_submission).with(participant.user_code, false)
+
+      participant.stubs(:anonymous?).returns true
+      subject.generate_submission_for_participant(participant)
+    end
+  end
 end

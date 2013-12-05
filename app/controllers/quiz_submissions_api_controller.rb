@@ -127,9 +127,12 @@
 class QuizSubmissionsApiController < ApplicationController
   include Api::V1::QuizSubmission
   include Api::V1::Helpers::QuizzesApiHelper
+  include Api::V1::Helpers::QuizSubmissionsApiHelper
 
   before_filter :require_user, :require_context, :require_quiz
-  before_filter :require_quiz_submission, :only => [ :show ]
+  before_filter :require_overridden_quiz, :except => [ :index ]
+  before_filter :require_quiz_submission, :except => [ :index, :create ]
+  before_filter :prepare_service, :only => [ :create, :complete ]
 
   # @API Get all quiz submissions.
   # @beta
@@ -175,25 +178,110 @@ class QuizSubmissionsApiController < ApplicationController
   #  }
   def show
     if authorized_action(@quiz_submission, @current_user, :read)
-      render :json => quiz_submissions_json([ @quiz_submission ],
-        @quiz,
-        @current_user,
-        session,
-        @context,
-        Array(params[:include]))
+      render_quiz_submission(@quiz_submission)
     end
+  end
+
+  # @API Create the quiz submission (start a quiz-taking session)
+  # @beta
+  #
+  # Start taking a Quiz by creating a QuizSubmission which you can use to answer
+  # questions and submit your answers.
+  #
+  # @argument validation_token [String]
+  #   The unique validation token you received when this Quiz Submission was
+  #   created.
+  #
+  # @argument access_code [Optional, String]
+  #   Access code for the Quiz, if any.
+  #
+  # @argument preview [Optional, Boolean]
+  #   Whether this should be a preview QuizSubmission and not count towards
+  #   the user's course record. Teachers only.
+  #
+  # <b>Responses</b>
+  #
+  # * <b>200 OK</b> if the request was successful
+  # * <b>400 Bad Request</b> if the quiz is locked
+  # * <b>403 Forbidden</b> if an invalid access code is specified
+  # * <b>403 Forbidden</b> if the Quiz's IP filter restriction does not pass
+  # * <b>409 Conflict</b> if a QuizSubmission already exists for this user and quiz
+  #
+  # @example_response
+  #  {
+  #    "quiz_submissions": [QuizSubmission]
+  #  }
+  def create
+    quiz_submission = if previewing?
+      @service.create_preview(@quiz, session)
+    else
+      @service.create(@quiz)
+    end
+
+    log_asset_access(@quiz, 'quizzes', 'quizzes', 'participate')
+
+    render_quiz_submission(quiz_submission)
+  end
+
+  def update
+  end
+
+  # @API Complete the quiz submission (turn it in).
+  # @beta
+  #
+  # Complete the quiz submission by marking it as complete and grading it. When
+  # the quiz submission has been marked as complete, no further modifications
+  # will be allowed.
+  #
+  # @argument attempt [Integer]
+  #   The attempt number of the quiz submission that should be completed. Note
+  #   that this must be the latest attempt index, as earlier attempts can not
+  #   be modified.
+  #
+  # @argument validation_token [String]
+  #   The unique validation token you received when this Quiz Submission was
+  #   created.
+  #
+  # @argument access_code [Optional, String]
+  #   Access code for the Quiz, if any.
+  #
+  # <b>Responses</b>
+  #
+  # * <b>200 OK</b> if the request was successful
+  # * <b>403 Forbidden</b> if an invalid access code is specified
+  # * <b>403 Forbidden</b> if the Quiz's IP filter restriction does not pass
+  # * <b>403 Forbidden</b> if an invalid token is specified
+  # * <b>400 Bad Request</b> if the QS is already complete
+  # * <b>400 Bad Request</b> if the attempt parameter is missing
+  # * <b>400 Bad Request</b> if the attempt parameter is not the latest attempt
+  #
+  # @example_response
+  #  {
+  #    "quiz_submissions": [QuizSubmission]
+  #  }
+  def complete
+    @service.complete @quiz_submission, params[:attempt]
+
+    render_quiz_submission(@quiz_submission)
   end
 
   private
 
-  def require_quiz_submission
-    unless @quiz_submission = @quiz.quiz_submissions.find(params[:id])
-      raise ActiveRecord::RecordNotFound
-    end
+  def previewing?
+    !!params[:preview]
   end
 
   def visible_user_ids(opts = {})
     scope = @context.enrollments_visible_to(@current_user, opts)
     scope.pluck(:user_id)
+  end
+
+  def render_quiz_submission(qs)
+    render :json => quiz_submissions_json([ qs ],
+      @quiz,
+      @current_user,
+      session,
+      @context,
+      Array(params[:include]))
   end
 end

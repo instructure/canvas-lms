@@ -650,6 +650,16 @@ class Quiz < ActiveRecord::Base
     submission
   end
 
+  def generate_submission_for_participant(quiz_participant)
+    identity = if quiz_participant.anonymous?
+      :user_code
+    else
+      :user
+    end
+
+    generate_submission quiz_participant.send(identity), false
+  end
+
   def prepare_answers(question)
     if answers = question[:answers]
       if shuffle_answers && Quiz.shuffleable_question_type?(question[:question_type])

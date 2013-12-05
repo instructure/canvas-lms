@@ -578,4 +578,15 @@ module Api
   def accepts_jsonapi?
     !!(/application\/vnd\.api\+json/ =~ request.headers['Accept'].to_s)
   end
+
+  # Reject the API request by halting the execution of the current handler
+  # and returning a helpful error message (and HTTP status code).
+  #
+  # @param [Fixnum] status
+  #   HTTP status code.
+  # @param [String] cause
+  #   The reason the request is rejected for.
+  def reject!(status, cause)
+    raise Api::V1::ApiError.new(status, cause)
+  end
 end

@@ -1330,6 +1330,9 @@ routes.draw do
     scope(:controller => :quiz_submissions_api) do
       get 'courses/:course_id/quizzes/:quiz_id/submissions', :action => :index, :path_name => 'course_quiz_submissions'
       get 'courses/:course_id/quizzes/:quiz_id/submissions/:id', :action => :show, :path_name => 'course_quiz_submission'
+      post 'courses/:course_id/quizzes/:quiz_id/submissions', :action => :create, :path_name => 'course_quiz_submission_create'
+      put 'courses/:course_id/quizzes/:quiz_id/submissions/:id', :action => :update, :path_name => 'course_quiz_submission_update'
+      post 'courses/:course_id/quizzes/:quiz_id/submissions/:id/complete', :action => :complete, :path_name => 'course_quiz_submission_complete'
     end
 
     scope(:controller => :quiz_ip_filters) do
