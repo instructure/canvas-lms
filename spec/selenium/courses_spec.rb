@@ -106,10 +106,13 @@ describe "courses" do
     it "should redirect to the gradebook when switching courses when viewing a students grades" do
       teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
       student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
-      course1 = course_with_teacher_logged_in(:user => teacher, :active_all => 1).course
-      student_in_course :user => student, :active_all => 1
-      course2 = course_with_teacher(:user => teacher, :active_all => 1).course
-      student_in_course :user => student, :active_all => 1
+
+      course1 = course_with_teacher_logged_in(:user => teacher, :active_all => 1, :course_name => 'course1').course
+      student_in_course(:user => student, :active_all => 1)
+
+      course2 = course_with_teacher(:user => teacher, :active_all => 1, :course_name => 'course2').course
+      student_in_course(:user => student, :active_all => 1)
+
       create_session(student.pseudonyms.first, false)
 
       get "/courses/#{course1.id}/grades/#{student.id}"
@@ -119,8 +122,9 @@ describe "courses" do
       options.length.should == 2
       select.click
       wait_for_ajaximations
-      find_with_jquery('#course_url option:not([selected])').click
-      driver.current_url.should match %r{/courses/#{course2.id}/grades}
+      fj('#course_url option:not([selected])').click
+      refresh_page
+      f('#section-tabs-header').text.should match "course2"
     end
 
     it "should load the users page using ajax" do
