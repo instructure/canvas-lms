@@ -30,10 +30,7 @@ define [
     initialize: ->
       super
       @render()
-      @navigator = new CalendarNavigator(
-        el: @$navigator
-        showAgenda: @options.showAgenda
-      )
+      @navigator = new CalendarNavigator(el: @$navigator)
       @showNavigator()
       # The badge is part of the buttonset, so we can't find it beforehand with els
       @$badge = @$el.find('.counter-badge')

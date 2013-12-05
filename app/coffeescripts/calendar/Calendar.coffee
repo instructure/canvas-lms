@@ -44,7 +44,7 @@ define [
 
       @el = $(selector).html calendarAppTemplate()
 
-      @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'), showAgenda: @options.showAgenda)
+      @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'))
       @schedulerNavigator.hide()
 
       @agenda = new AgendaView(el: $('.agenda-wrapper'), dataSource: @dataSource)
@@ -135,7 +135,7 @@ define [
         header: false
         editable: true
         columnFormat:
-          month: if ENV.CALENDAR.SHOW_AGENDA then 'ddd' else 'dddd'
+          month: 'ddd'
           week: 'ddd M/d'
         buttonText:
           today: I18n.t 'today', 'Today'
@@ -269,9 +269,7 @@ define [
       $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-event-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}"))
       $element.find('.fc-event-inner').prepend($("<span class='screenreader-only'>#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}</span>"));
       $element.find('.fc-event-title').prepend($("<span class='screenreader-only'>#{screenReaderTitleHint}</span>"))
-
-      if ENV.CALENDAR.SHOW_AGENDA && event.eventType.match(/assignment/)
-        element.find('.fc-event-inner').prepend($('<i />', {'class': "icon-#{event.assignmentType()}"}))
+      element.find('.fc-event-inner').prepend($('<i />', {'class': "icon-#{event.assignmentType()}"}))
       true
 
     eventAfterRender: (event, element, view) =>
@@ -285,12 +283,8 @@ define [
       if event.eventType.match(/assignment/) && view.name == "agendaWeek"
         element.height('') # this fixes it so it can wrap and not be forced onto 1 line
           .find('.ui-resizable-handle').remove()
-      if ENV.CALENDAR.SHOW_AGENDA
-        if event.eventType.match(/assignment/) && event.isDueAtMidnight() && view.name == "month"
-          element.find('.fc-event-time').empty()
-      else
-        if event.eventType.match(/assignment/)
-          element.find('.fc-event-time').html I18n.t('labels.due', 'due')
+      if event.eventType.match(/assignment/) && event.isDueAtMidnight() && view.name == "month"
+        element.find('.fc-event-time').empty()
       if event.eventType == 'calendar_event' && @options?.activateEvent && event.id == "calendar_event_#{@options?.activateEvent}"
         @options.activateEvent = null
         @eventClick event,
@@ -387,7 +381,7 @@ define [
       weekStart <= date2 <= weekEnd
 
     drawNowLine: =>
-      return unless @currentView == 'week' && ENV.CALENDAR.SHOW_AGENDA
+      return unless @currentView == 'week'
 
       if !@nowLine
         @nowLine = $('<div />', {'class': 'calendar-nowline'})
@@ -561,14 +555,14 @@ define [
     setCurrentView: (view) ->
       @updateFragment view_name: view
       @currentView = view
-      userSettings.set('calendar_view', view) if @options.showAgenda
+      userSettings.set('calendar_view', view)
 
     getCurrentView: ->
       if @currentView
         @currentView
       else if (data = @dataFromDocumentHash()) && data.view_name
         data.view_name
-      else if userSettings.get('calendar_view') && @options.showAgenda
+      else if userSettings.get('calendar_view')
         userSettings.get('calendar_view')
       else
         'month'
@@ -649,27 +643,14 @@ define [
       "rgb(#{rgbArray.join ' ,'})"
 
     colorizeContexts: =>
-      if ENV.CALENDAR.SHOW_AGENDA
-        colors = colorSlicer.getColors(@contextCodes.length)
-        html = for contextCode, index in @contextCodes
-          color = colors[index]
-          ".group_#{contextCode}{
-             color: #{color};
-             border-color: #{color};
-             background-color: #{color};
-          }"
-      else
-        [bgSaturation, bgBrightness]         = [30, 96]
-        [textSaturation, textBrightness]     = [60, 40]
-        [strokeSaturation, strokeBrightness] = [70, 70]
-
-        html = for contextCode, index in @contextCodes
-          hue = hues[index % hues.length]
-          ".group_#{contextCode}{
-            color: #{cssColor hue, textSaturation, textBrightness};
-            border-color: #{cssColor hue, strokeSaturation, strokeBrightness};
-            background-color: #{cssColor hue, bgSaturation, bgBrightness};
-          }"
+      colors = colorSlicer.getColors(@contextCodes.length)
+      html = for contextCode, index in @contextCodes
+        color = colors[index]
+        ".group_#{contextCode}{
+           color: #{color};
+           border-color: #{color};
+           background-color: #{color};
+        }"
 
       $styleContainer.html "<style>#{html.join('')}</style>"
 

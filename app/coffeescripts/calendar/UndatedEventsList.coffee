@@ -28,8 +28,6 @@ define [
         toggler.on('click keyclick', @toggle)
         @div.find('.undated-events-link').hide()
 
-      @showAgenda = !!ENV.CALENDAR.SHOW_AGENDA
-
     load: (setFocus = false) =>
       return if @hidden
 
@@ -50,9 +48,8 @@ define [
         for e in events
           e.details_url = e.fullDetailsURL()
           e.icon = if e.calendarEvent then 'calendar-day' else 'assignment'
-          if @showAgenda
-            e.icon = if e.calendarEvent then 'calendar-month' else e.assignmentType()
-        @div.html undatedEventsTemplate({ events: events, showAgenda: @showAgenda })
+          e.icon = if e.calendarEvent then 'calendar-month' else e.assignmentType()
+        @div.html undatedEventsTemplate(events: events)
 
         for e in events
           @div.find(".#{e.id}").data 'calendarEvent', e

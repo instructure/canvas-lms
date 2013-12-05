@@ -1,8 +1,6 @@
 <div class="calendar_header header-table">
   <div class="recommend_agenda screenreader-only">
-    {{#if showAgenda}}
     <button id="use_agenda">{{#t "links.screenreader_recommend_agenda"}}Screenreader users: Use the Agenda to view events{{/t}}</button>
-    {{/if}}
   </div>
   <div class="header-table-row">
     <div class="header-table-cell header-table-left">
@@ -10,7 +8,6 @@
       <h2 class="appointment_group_title">{{#t "my_appointment_groups"}}My Appointment Groups{{/t}}</h2>
       <button class="btn scheduler_done_button">{{#t "done_go_back_to_list"}}Done, Go Back To List{{/t}}</button>
     </div>
-    {{#if showAgenda}}
     <div class="calendar_action_buttons header-table-cell header-table-right">
       <span id="refresh_calendar_link"
             title="{{#t "loading"}}Loading{{/t}}"
@@ -40,34 +37,5 @@
         <span class="screenreader-only">{{#t "create_event"}}Create New Event{{/t}}</span>
       </a>
     </div>
-    {{else}}
-    <div class="calendar_view_buttons header-table-cell header-table-middle btn-group" role="radiogroup">
-      <button type="button" id="week" class="btn" role="radio" aria-checked="false">
-        {{#t "links.calendar_week"}}Week{{/t}}
-        <span class="screenreader-only">{{#t "links.accessibility_warning"}}Warning: This view is not accessible to users with screenreaders{{/t}}</span>
-      </button>
-      <button type="button" id="month" class="btn" role="radio" aria-checked="false">
-        {{#t "links.calendar_month"}}Month{{/t}}
-        <span class="screenreader-only">{{#t "links.accessibility_warning"}}Warning: This view is not accessible to users with screenreaders{{/t}}</span>
-      </button>
-      {{#if showScheduler}}
-        <button type="button" id="scheduler" class="btn" role="radio" aria-checked="false">
-          {{#t "links.calendar_scheduler"}}Scheduler{{/t}}
-        </button>
-      {{/if}}
-    </div>
-    <div class="calendar_action_buttons header-table-cell header-table-right">
-      <a href="http://guides.instructure.com/s/2204/m/4152/l/59600-how-is-the-new-calendar-different-from-the-old-calendar" class="whats-new ">What's new?</a>
-      {{#unless calendar2Only}}
-      <a id="change-calendar-version" href="/switch_calendar/1" data-method="post" rel="nofollow" class="btn ">{{#t "use_old_calendar"}}Old Calendar{{/t}}</a>
-      {{/unless}}
-      <a href="#" id="create_new_event_link" class="icon-add " title="{{#t "create_event"}}Create New Event{{/t}}" data-tooltip>
-        <span class="screenreader-only">{{#t "create_event"}}Create New Event{{/t}}</span>
-      </a>
-      <a href="#" id="refresh_calendar_link" class="" title="{{#t "refresh"}}Refresh{{/t}}" data-tooltip>
-        <span class="screenreader-only">{{#t "refresh"}}Refresh{{/t}}</span>
-      </a>
-    </div>
-    {{/if}}
   </div>
 </div>

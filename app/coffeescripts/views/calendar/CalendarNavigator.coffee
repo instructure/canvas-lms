@@ -27,10 +27,8 @@ define [
         I18n.t 'screenreader_date_suggestion', '%{date}. Press enter to accept.',
           date: dateText
 
-
     # options:
     #   hide       - set to true if this navigator should start hidden
-    #   showAgenda - set to true to activate agenda view features
     initialize: ->
       super
       @render()
@@ -87,7 +85,7 @@ define [
       @$dateField.val('')
 
     _titleActivated: ->
-      @showPicker() if @options.showAgenda
+      @showPicker()
 
     _dateFieldSelect: (selectedDateText) ->
       if @_enterKeyPressed
