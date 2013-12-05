@@ -271,17 +271,24 @@ describe "quizzes" do
       @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
       @context = @course
       q = quiz_model
+      q.time_limit = 20
       q.generate_quiz_data
       q.save!
 
       get "/courses/#{@course.id}/quizzes/#{q.id}/moderate"
-
       f('.moderate_student_link').click
+
+      # validates data
+      f('#extension_extra_attempts').send_keys('asdf')
+      submit_form('#moderate_student_form')
+      f('.attempts_left').text.should == '1'
+
+      # valid values
+      f('#extension_extra_attempts').clear()
       f('#extension_extra_attempts').send_keys('2')
       submit_form('#moderate_student_form')
       wait_for_ajax_requests
       f('.attempts_left').text.should == '3'
-
     end
 
     it "should flag a quiz question while taking a quiz as a teacher" do

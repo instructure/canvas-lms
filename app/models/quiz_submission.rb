@@ -21,7 +21,12 @@ class QuizSubmission < ActiveRecord::Base
   attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade
   attr_readonly :quiz_id, :user_id
   validates_presence_of :quiz_id
-
+  validates_numericality_of :extra_time, greater_than_or_equal_to: 0,
+                                         less_than_or_equal_to: 10080, # one week
+                                         allow_nil: true
+  validates_numericality_of :extra_attempts, greater_than_or_equal_to: 0,
+                                             less_than_or_equal_to: 1000,
+                                             allow_nil: true
   belongs_to :quiz
   belongs_to :user
   belongs_to :submission, :touch => true
@@ -655,7 +660,7 @@ class QuizSubmission < ActiveRecord::Base
     # the teacher gets the added burden of going back and manually assigning
     # scores for these questions per student.
     qq = QuizQuestion::Base.from_question_data(q)
-    
+
     user_answer = qq.score_question(params)
     result = {
       :correct => user_answer.correctness,

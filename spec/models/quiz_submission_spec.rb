@@ -25,6 +25,37 @@ describe QuizSubmission do
     @quiz = @course.quizzes.create!
   end
 
+  context "saving a quiz submission" do
+    it "should validate numericality of extra time" do
+      qs = QuizSubmission.new
+      qs.extra_time = 'asdf'
+      qs.valid?.should == false
+      qs.errors.on(:extra_time).should == "is not a number"
+    end
+
+    it "should validate extra time is not too long" do
+      qs = QuizSubmission.new
+      qs.extra_time = 10081
+      qs.valid?.should == false
+      qs.errors.on(:extra_time).should == "must be less than or equal to 10080"
+    end
+
+    it "should validate numericality of extra attempts" do
+      qs = QuizSubmission.new
+      qs.extra_attempts = 'asdf'
+      qs.valid?.should == false
+      qs.errors.on(:extra_attempts).should == "is not a number"
+    end
+
+    it "should validate extra attempts is not too long" do
+      qs = QuizSubmission.new
+      qs.extra_attempts = 1001
+      qs.valid?.should == false
+      qs.errors.on(:extra_attempts).should == "must be less than or equal to 1000"
+    end
+
+  end
+
   it "should copy the quiz's points_possible whenever it's saved" do
     Quiz.where(:id => @quiz).update_all(:points_possible => 1.1)
     q = @quiz.quiz_submissions.create!
