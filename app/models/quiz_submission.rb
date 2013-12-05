@@ -27,6 +27,10 @@ class QuizSubmission < ActiveRecord::Base
   validates_numericality_of :extra_attempts, greater_than_or_equal_to: 0,
                                              less_than_or_equal_to: 1000,
                                              allow_nil: true
+  validates_numericality_of :quiz_points_possible, less_than_or_equal_to: 2000000000,
+                                                   allow_nil: true
+
+  before_validation :update_quiz_points_possible
   belongs_to :quiz
   belongs_to :user
   belongs_to :submission, :touch => true
@@ -298,8 +302,11 @@ class QuizSubmission < ActiveRecord::Base
     self.quiz_data || {}
   end
 
-  def update_kept_score
+  def update_quiz_points_possible
     self.quiz_points_possible = self.quiz && self.quiz.points_possible
+  end
+
+  def update_kept_score
     return if self.manually_scored || @skip_after_save_score_updates
 
     if self.completed?

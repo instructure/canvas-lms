@@ -54,6 +54,12 @@ describe QuizSubmission do
       qs.errors.on(:extra_attempts).should == "must be less than or equal to 1000"
     end
 
+    it "should validate quiz points possible is not too long" do
+      qs = QuizSubmission.new
+      qs.quiz = Quiz.new(:points_possible => 2000000001)
+      qs.valid?.should == false
+      qs.errors.on(:quiz_points_possible).should == "must be less than or equal to 2000000000"
+    end
   end
 
   it "should copy the quiz's points_possible whenever it's saved" do

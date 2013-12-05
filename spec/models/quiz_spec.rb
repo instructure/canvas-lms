@@ -962,6 +962,14 @@ describe Quiz do
   end
 
   context "custom validations" do
+    context "changinging quiz points" do
+      it "should not allow quiz points higher than allowable by postgres" do
+        q = Quiz.new(:points_possible => 2000000001)
+        q.valid?.should == false
+        q.errors.on(:points_possible).should == "must be less than or equal to 2000000000"
+      end
+    end
+
     context "quiz_type" do
       it "should not save an invalid quiz_type" do
         quiz = @course.quizzes.create! :title => "test quiz"

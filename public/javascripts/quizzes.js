@@ -54,7 +54,8 @@ define([
             DueDateList,SectionList,
             MissingDateDialog,MultipleChoiceToggle,TextHelper){
 
-  var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility;
+  var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
+      scoreValidation;
 
   function adjustOverridesForFormParams(overrides){
     var idx = 0;
@@ -833,6 +834,54 @@ define([
     }
   };
 
+  scoreValidation = {
+    init: function() {
+      this.initValidators.apply(this);
+
+      $('#quiz_options_form').on('xhrError', this.onFormError);
+    },
+
+    initValidators: function() {
+      $('input#quiz_points_possible')
+        .on('invalid:not_a_number', function(e) {
+          $(this).errorBox(I18n.t('errors.quiz_score_not_a_number', 'Score must be a number between 0 and 2,000,000,000.'));
+        })
+        .on('invalid:greater_than', function(e) {
+          $(this).errorBox(I18n.t('errors.quiz_score_too_short', 'Score must be greater than 0.'));
+        })
+        .on('invalid:less_than', function(e) {
+          $(this).errorBox(I18n.t('errors.quiz_score_too_long', 'Score must be less than 2,000,000,000.'));
+        });
+      $("input#quiz_points_possible").change(this.validatePoints);
+    },
+
+    validatePoints: function() {
+      var value  = $("input#quiz_points_possible").val();
+      var numVal = parseInt(value);
+
+      if (value && isNaN(numVal)) {
+        $("input#quiz_points_possible").trigger("invalid:not_a_number");
+        valid = false;
+      } else if (numVal > 2000000000) {
+        $("input#quiz_points_possible").trigger("invalid:less_than");
+        valid = false;
+      } else if (numVal < 0) {
+        $("input#quiz_points_possible").trigger("invalid:greater_than");
+        valid = false;
+      }
+    },
+
+    // Delegate the handling of "points_possible" errors
+    onFormError: function(e, resp) {
+      if (resp && resp.points_possible) {
+        $("input#quiz_points_possible").triggerHandler("invalid:not_a_number");
+
+        // Prevent $.fn.formErrors from giving error box with cryptic message.
+        delete resp.points_possible;
+      }
+    }
+  }
+
   correctAnswerVisibility = {
     $toggler: $(),
     $options: $(),
@@ -1271,6 +1320,7 @@ define([
   $(document).ready(function() {
     quiz.init().updateDisplayComments();
     correctAnswerVisibility.init();
+    scoreValidation.init();
 
     $('#quiz_tabs').tabs();
     $('#editor_tabs').show();
