@@ -572,7 +572,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def restore
-    self.workflow_state = 'active'
+    self.workflow_state = self.context.feature_enabled?(:draft_state) ? 'post_delayed' : 'active'
     self.save
 
     if self.for_assignment? && self.root_topic_id.blank?

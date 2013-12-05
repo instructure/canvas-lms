@@ -83,7 +83,7 @@ class ContextModule < ActiveRecord::Base
   end
   
   def restore
-    self.workflow_state = 'active'
+    self.workflow_state = context.feature_enabled?(:draft_state) ? 'unpublished' : 'active'
     self.save
   end
   

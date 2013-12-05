@@ -2512,6 +2512,16 @@ describe Assignment do
       }.should == [[s1, s2]]
     end
   end
+
+  describe "restore" do
+    it "should restore to unpublished state if draft_state is enabled" do
+      course(draft_state: true)
+      assignment_model course: @course
+      @a.destroy
+      @a.restore
+      @a.reload.should be_unpublished
+    end
+  end
 end
 
 def setup_assignment_with_group

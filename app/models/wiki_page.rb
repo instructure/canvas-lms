@@ -176,7 +176,7 @@ class WikiPage < ActiveRecord::Base
   alias_method :published?, :active?
 
   def restore
-    self.workflow_state = 'active'
+    self.workflow_state = context.feature_enabled?(:draft_state) ? 'unpublished' : 'active'
     self.save
   end
 

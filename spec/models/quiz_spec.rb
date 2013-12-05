@@ -1414,4 +1414,14 @@ describe Quiz do
       end
     end
   end
+
+  describe "restore" do
+    it "should restore to unpublished state if draft_state is enabled" do
+      course(draft_state: true)
+      @quiz = @course.quizzes.create!(title: 'Test Quiz')
+      @quiz.destroy
+      @quiz.restore
+      @quiz.reload.should be_unpublished
+    end
+  end
 end

@@ -227,7 +227,7 @@ class Quiz < ActiveRecord::Base
   end
   
   def restore
-    self.workflow_state = 'edited'
+    self.workflow_state = self.context.feature_enabled?(:draft_state) ? 'unpublished' : 'edited'
     self.save
     self.assignment.restore(:quiz)
   end

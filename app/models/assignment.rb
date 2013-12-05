@@ -515,7 +515,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def restore(from=nil)
-    self.workflow_state = 'published'
+    self.workflow_state = self.context.feature_enabled?(:draft_state) ? 'unpublished' : 'published'
     @grades_affected = true
     self.save
     self.discussion_topic.restore if self.discussion_topic && from != :discussion_topic

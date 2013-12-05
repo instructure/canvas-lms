@@ -1179,6 +1179,17 @@ describe DiscussionTopic do
       @topic.reload.should be_active
       @topic.child_topics.each { |ct| ct.reload.should be_active }
     end
+
+    it "should restore to unpublished state if draft mode is enabled" do
+      group_discussion_assignment
+      @course.root_account.enable_feature!(:draft_state)
+      @topic.destroy
+
+      @topic.reload.assignment.expects(:restore).with(:discussion_topic).once
+      @topic.restore
+      @topic.reload.should be_post_delayed
+      @topic.child_topics.each { |ct| ct.reload.should be_post_delayed }
+    end
   end
 
   describe "reply_from" do

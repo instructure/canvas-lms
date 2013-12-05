@@ -449,4 +449,14 @@ describe WikiPage do
       end
     end
   end
+
+  describe "restore" do
+    it "should restore to unpublished state if draft_state is enabled" do
+      course(draft_state: true)
+      @page = @course.wiki.wiki_pages.create! title: 'dot dot dot'
+      @page.update_attribute(:workflow_state, 'deleted')
+      @page.restore
+      @page.reload.should be_unpublished
+    end
+  end
 end
