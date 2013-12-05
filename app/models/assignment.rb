@@ -1447,7 +1447,8 @@ class Assignment < ActiveRecord::Base
         row << peer_review.assessor_id
         # Grap the last line
         if index == reviews_number - 1
-          row << current_score
+          submission = submissions.find{|s| s.user_id == user_id}
+          row << submission.score || "-"
           csv << row
         end
       end
