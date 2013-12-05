@@ -15,6 +15,11 @@
         <button type="submit" class="btn btn-large"><%= t 'buttons.assign_peer_reviews', "Assign Peer Reviews" %></button>
       </div>
     <% end %>
+    <div class="button-container button-container-right-aligned">
+      <a id="global_reminder_button" class="btn" href="<%= context_url(@context, :context_assignment_remind_all_peer_reviews_url, @assignment.id) %>">
+        <%= t 'buttons.global_reminder', "Remind All Peer Reviews" %>
+      </a>
+    </div>
   <% end %>
   </div>
 <% end %>
@@ -117,6 +122,14 @@ require([
     $(".remind_peer_reviews_link").click(function(event) {
       event.preventDefault();
       $(".peer_review.assigned .remind_peer_review_link").click();
+    });
+    $("#global_reminder_button").click(function(event){
+      event.preventDefault();
+      var $link = $(this);
+      $link.closest(".button-container").loadingImage({image_size: 'small'});
+      $.ajaxJSON($link.attr('href'), 'POST', {global: true}, function(data) {
+        $link.closest(".button-container").loadingImage('remove');
+      });
     });
   });
 });

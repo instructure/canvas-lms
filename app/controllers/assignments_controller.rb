@@ -210,15 +210,25 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-
+  
   def remind_peer_review
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
-      @request = AssessmentRequest.find_by_id(params[:id]) if params[:id].present?
+      if params[:id].present?
+        @request = AssessmentRequest.find_by_id(params[:id])
+      elsif params[:global] == "true"
+        global = true
+        # Get uncompleted requests for this specific assignment
+        @requests = AssessmentRequest.includes(:submission).where("submissions.assignment_id = ? AND assessment_requests.workflow_state = ?", @assignment.id, "assigned")
+      end 
       respond_to do |format|
-        if @request.asset.assignment == @assignment && @request.send_reminder!
+        if @request && @request.asset.assignment == @assignment && @request.send_reminder!
           format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
           format.json { render :json => @request }
+        elsif global && @requests.send_all_reminders!
+          flash[:notice] = t("notices.global_reminder", "%{count} notifications sent", :count => @requests.count)
+          format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url)}
+          format.json { render :json => @requests }
         else
           format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
           format.json { render :json => {:errors => {:base => t('errors.reminder_failed', "Reminder failed")}}, :status => :bad_request }

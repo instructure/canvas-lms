@@ -1754,6 +1754,7 @@ fr:
       assignment_delete: "Cette tâche a été supprimée"
       created: "La tâche a été créée."
       updated: "La tâche a été mise à jour."
+      global_reminder: "%{count} notifications ont été renvoyées"
     number_of_assignments: 
       one: 1 devoir
       other: "%{count} tâches"
@@ -1768,6 +1769,7 @@ fr:
       buttons: 
         add: Ajouter
         assign_peer_reviews: "Attribuer des révisions aux pairs"
+        global_reminder: "Renvoyer un rappel global"
       descriptions: 
         automatically_assign_reviews: "Vous pouvez attribuer des tâches à réviser aux autres utilisateurs qui en ont déjà envoyées à réviser, mais qui n’ont pas encore reçu de révisions, en cliquant sur le bouton ci-dessous."
       details: "À gauche, vous pouvez apercevoir la liste des étudiants pour cette tâche, mais également les envois d’étudiants qu’ils ont reçus à réviser."

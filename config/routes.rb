@@ -272,6 +272,7 @@ routes.draw do
       match 'peer_reviews' => 'assignments#peer_reviews', :as => :peer_reviews, :via => :get
       match 'assign_peer_reviews' => 'assignments#assign_peer_reviews', :as => :assign_peer_reviews, :via => :post
       match 'peer_reviews/:id' => 'assignments#delete_peer_review', :as => :delete_peer_review, :via => :delete
+      match 'peer_reviews/all' => 'assignments#remind_peer_review', :as => :remind_all_peer_reviews, :via => :post
       match 'peer_reviews/:id' => 'assignments#remind_peer_review', :as => :remind_peer_review, :via => :post
       match 'peer_reviews/users/:reviewer_id' => 'assignments#assign_peer_review', :as => :assign_peer_review, :via => :post
       match 'mute' => 'assignments#toggle_mute', :as => :mute, :via => :put
