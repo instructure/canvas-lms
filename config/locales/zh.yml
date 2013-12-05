@@ -52,7 +52,7 @@ zh:
     tab_courses: 课程
     tab_developer_keys: 开发人员密钥
     tab_faculty_journal: 教师日志
-    tab_grading_standards: 评分方案
+    tab_grading_standards: 计分方案
     tab_jobs: 任务
     tab_outcomes: 成果
     tab_permissions: 权限
@@ -305,7 +305,7 @@ zh:
       add_user_button: 添加用户
       add_user_link: 新增用户
       display_name_help: 人们会在讨论、消息和评论中看到此姓名。
-      full_name_description: 教师将使用此姓名来评分。
+      full_name_description: 教师将使用此姓名来计分。
       labels: 
         account_id: 院系
         course_code: 参考代码
@@ -464,7 +464,7 @@ zh:
               header: 例如
             text: "此报告显示学生参加其课程的情况。在生成的 csv 文件中，每项注册将具有一行，并且将显示学生学号、学生姓名、电话号码、电子邮件地址、课程名称、上次提交、上次提交以来的天数 (LDA)、当前评分百分比以及他们的学期开始日期。"
     confirm_delete_user: 
-      confirm_delete: "是否确定要从帐户 %{account} 删除此用户?这将从所有课程和小组删除该用户的数据(包括评分)。此过程无法撤消。"
+      confirm_delete: "是否确定要从帐户 %{account} 删除此用户?这将从所有课程和小组删除该用户的数据(包括计分)。此过程无法撤消。"
       delete_button: "删除 %{user}"
       page_title: 确认删除
       title: "确认从 %{account} 删除 %{user}"
@@ -489,7 +489,7 @@ zh:
       account_reports: 
         auburn: 
           course_status: 
-            text: "此报告显示某个给定学期的所有课程的状态。在生成的 csv 文件中，每个课程班级将具有一行，并且将在该班级中显示课程、课程状态、学期、有效的开始日期和结束日期以及记录教师。"
+            text: "此报告显示某个给定学期的所有课程的状态。在生成的 csv 文件中，每个课程班级将具有一行，并且将在该班级中显示课程、课程状态、学期、有效的开始日期和结束日期以及录制教师。"
           description: 
             header: 例如
     course_type: 课程
@@ -791,7 +791,7 @@ zh:
         teachers_can_create_courses: 教师
         turnitin: Turnitin
         turnitin_account_id: "Turnitin 帐户 ID"
-        turnitin_comments: "Turnitin 提交评论"
+        turnitin_comments: 作业评论
         turnitin_host: "Turnitin 主机"
         turnitin_pledge: "Turnitin 保证"
         turnitin_shared_secret: "Turnitin 共享密钥"
@@ -1182,12 +1182,12 @@ zh:
       the_student: 学生
       the_teacher: 教师
       title: 上次教师与学生交互后的天数
-      ungraded_count_description: "超过 %{count} 个提交文件尚未评分"
-      ungraded_count_option: 未评分的提交文件（计数）
-      ungraded_count_title: 尚未评分的提交文件数
-      ungraded_timespan_description: "提交文件已 %{count} 天未评分"
-      ungraded_timespan_option: 未评分的提交文件（时间）
-      ungraded_timespan_title: 提交文件未评分的天数
+      ungraded_count_description: "超过 %{count} 个作业尚未计分"
+      ungraded_count_option: 未计分的作业（计数）
+      ungraded_count_title: 尚未计分的作业数
+      ungraded_timespan_description: "作业已 %{count} 天未计分"
+      ungraded_timespan_option: 未计分的作业（时间）
+      ungraded_timespan_title: 作业未计分的天数
       usernote_description: "已经 %{count} 天未添加教师日志项"
       usernote_option: 无教师日志项
       usernote_title: 上次添加教师日志后的天数
@@ -1238,8 +1238,8 @@ zh:
     index: 
       feed_title_course: "课程通告 Atom 馈送"
       feed_title_group: "小组通告 Atom 馈送"
-      podcast_title_course: 课程通告播客馈送
-      podcast_title_group: 小组通告播客馈送
+      podcast_title_course: 课程通告播客动态消息
+      podcast_title_group: 小组通告播客动态消息
     index_view: 
       delete: 删除
       loading: 正在加载...
@@ -1257,7 +1257,7 @@ zh:
       your_search_did_not_match_any_announcements: 没有符合您搜索条件的通告。
     podcast_feed_description_course: "任何与课程 \"%{course}\" 中的通告链接或内嵌于其中的媒体文件都会出现在此馈送中。"
     podcast_feed_description_group: "任何与小组 \"%{group}\" 中的通告链接或内嵌于其中的媒体文件都会出现在此馈送中。"
-    podcast_feed_name: "%{course} 通告播客馈送"
+    podcast_feed_name: "%{course} 通告播客动态消息"
   application: 
     errors: 
       feed_not_found: 找不到馈送。
@@ -1362,7 +1362,7 @@ zh:
       grading_scheme_info: 查看/编辑评分方案
   assignment_details_dialog: 
     average_score: "平均分数:"
-    count_of_submissions: "%{cnt} 个提交文件"
+    count_of_submissions: "%{cnt} 个作业"
     grading_statistics_for_assignment: "下列评分统计: %{assignment.name}"
     high_score: "高分:"
     low_score: "低分:"
@@ -1380,7 +1380,7 @@ zh:
     titles: 
       assignment_group_weights: 管理作业小组加权
       total: 总计
-    weight_final: 根据小组加权最终评分
+    weight_final: 根据小组加权最终计分
   assignment_groups: 
     errors: 
       cannot_delete_group: 您不能删除一个带有已锁定作业的小组。
@@ -1396,7 +1396,7 @@ zh:
     muting_assignment: 正在屏蔽作业...
     unmute_assignment: 取消屏蔽作业
     unmute_button: 取消屏蔽作业
-    unmute_dialog: 此作业当前被屏蔽。这意味着学生无法看到其评分和反馈。是否要立即取消屏蔽?
+    unmute_dialog: 此作业当前被屏蔽。这意味着学生无法看到其计分和反馈。是否要立即取消屏蔽?
     unmuting_assignment: 正在取消屏蔽作业...
   assignments: 
     add_assignment_form: 
@@ -1414,7 +1414,7 @@ zh:
         attendance: 参与
         discussion: 讨论
         external_tool: 外部工具
-        not_graded: 未评分
+        not_graded: 未计分
         quiz: 测验
       tooltips: 
         assignment_is_quiz: 此作业是一个测验，因此得分可能来自问题，无法手动设置。
@@ -1424,7 +1424,7 @@ zh:
         assignments: 作业
         group_name: 小组名称
       links: 
-        add_grading_rule: 添加评分规则
+        add_grading_rule: 添加计分规则
         delete_assignment: 删除
       options: 
         drop_highest: 去掉最高分
@@ -1433,7 +1433,7 @@ zh:
         never_drop: 不删除
         no_assignments: "[无作业]"
         weighted_by_points: 按得分加权
-      percent_of_total_grade: "总评分的 %{percent} %"
+      percent_of_total_grade: "总计分的 %{percent} %"
     assignment_count: 
       one: "%{count} 份作业"
       other: "%{count} 份作业"
@@ -1480,11 +1480,11 @@ zh:
       settings: 设置
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: 此作业将不评分。
-      assignment_not_yet_graded_screenreader: "作业尚未评分。%{pointsPossible} 最高得分。"
+      assignment_not_yet_graded_screenreader: "作业尚未计分。%{pointsPossible} 最高得分。"
       empty_points_possible: "-/%{pointsPossible} 分"
       no_submission: 无提交
       no_submission_for_assignment_screenreader: "此作业无提交。%{pointsPossible} 最高得分。"
-      not_yet_graded: "*尚未评分*"
+      not_yet_graded: "*尚未计分*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} 分"
       score_with_points_possible_screenreader: "分数: %{score}，满分 %{pointsPossible} 分。"
     assignment_locked: 
@@ -1522,14 +1522,14 @@ zh:
         overdue_assignments: 逾期作业
         past_assignments: 以前的作业
         undated_assignments: 更新的作业
-        ungraded_assignments: 未评分的作业
+        ungraded_assignments: 未计分的作业
         upcoming_assignments: 即将到来的作业
     assignments_list_right_side: 
       links: 
         group_assignments_by_type: 按类型对作业分组
         just_show_assignment_list: 只显示作业列表
         manage_assignments: 管理作业
-        see_current_grades: 查看我目前的评分
+        see_current_grades: 查看我目前的计分
       titles: 
         show_only_assignments_from: 只显示下列来源的作业
         upcoming_assignments: 即将到来的作业
@@ -1562,7 +1562,7 @@ zh:
       external_tool_type: 外部工具
       more: 更多可选功能
       multiple_due_dates: 多个截止时间
-      not_graded_type: 未评分
+      not_graded_type: 未计分
       quiz_type: 测验
       save: 保存
       saving: 正在保存...
@@ -1655,18 +1655,18 @@ zh:
     grade_assignment: 
       buttons: 
         upload_files: 上传文件
-      graded_count: "%{graded_count}*（共* %{total}）个提交文件已评分"
+      graded_count: "%{graded_count}*（共* %{total}）个作业已计分"
       links: 
-        download_submissions: 下载提交文件
+        download_submissions: 下载作业
         peer_reviews: 同伴审阅
-        reupload_submissions: 重新上传提交文件
+        reupload_submissions: 重新上传作业
       resubmission_count: 
-        one: "%{count} 个未评分的重新提交文件"
-        other: "%{count} 个未评分的重新提交文件"
+        one: "%{count} 个未计分的重新提交作业"
+        other: "%{count} 个未计分的重新提交作业"
       reupload_instructions: |-
           如果在
-          之前更改了下载的学生提交文件，只需将其压缩备份，然后使用下表上传压缩包。
-          学生将在其提交评论中看到修改的文件。
+          之前更改了下载的学生提交作业，只需将其压缩备份，然后使用下表上传压缩包。
+          学生将在其作业评论中看到修改的文件。
           
           *确保不要更改提交文件的名称，以便我们组织。*
       titles: 
@@ -1675,12 +1675,12 @@ zh:
     grade_pass_fail_screenreader: "评分: %{grade}"
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "分数: %{grade}%"
-    graded: 此作业已评分
+    graded: 此作业已计分
     grading_type_selector: 
       grading_type: 评分类型
       grading_type_options: 
         letter_grade: 书面评分
-        not_graded: 未评分
+        not_graded: 未计分
         pass_fail: 完成/未完成
         percent: 百分比
         points: 得分
@@ -1696,7 +1696,7 @@ zh:
     group_name: 小组名称
     group_submission_reminder: 
       warnings: 
-        group_submission: "请注意，此提交文件将作用于 %{group_type} 小组中的所有人。"
+        group_submission: "请注意，此作业将作用于 %{group_type} 小组中的所有人。"
     group_weights: 
       headers: 
         assignment_group: 作业小组
@@ -1743,14 +1743,14 @@ zh:
       adding_group: 正在添加小组...
       agree_to_pledge: 必须同意提交保证才可提交此作业。
       not_submitted_yet: 尚未完成作业提交。必须单击"提交"完成提交。是否仍要离开此页面?
-      now_overdue: 此作业现已逾期。任何新提交将被标记为延迟。是否仍要继续?
+      now_overdue: 此作业现已逾期。任何新提交作业将被标记为延迟。是否仍要继续?
       overdue: 此作业已逾期。是否仍要提交?
-      record_before_submitting: 在提交前记录
+      record_before_submitting: 在提交前录制
       submit_failed: 提交失败，请重试
       submitting: 正在提交...
     multiple_due_dates: 多个截止时间
     name_is_required: 需要名称
-    needs_grading_count: "此作业的 %{needs_grading_count} 个提交文件仍需评分"
+    needs_grading_count: "此作业的 %{needs_grading_count} 个提交作业仍需评分"
     never_drop: 
       remove_rule: 删除规则
     never_drop_collection: 
@@ -1778,8 +1778,8 @@ zh:
     overdue: 此作业已逾期
     peer_review_assignment: 
       titles: 
-        remind_reviewer: "向 %{user} 用户提醒评估"
-        remind_reviewier_with_last_notification: "向 %{user} 提醒评估，上次通知时间为 %{at}"
+        remind_reviewer: "向 %{user} 用户提醒测验"
+        remind_reviewier_with_last_notification: "向 %{user} 提醒测验，上次通知时间为 %{at}"
         user_default: 用户
     peer_reviews: 
       buttons: 
@@ -1787,9 +1787,9 @@ zh:
         assign_peer_reviews: 分配同伴审阅
       descriptions: 
         automatically_assign_reviews: 可以单击下面的按钮，将同伴审阅分配给已提交作业但尚无审阅任务的用户。
-      details: 左边会显示分配到此任务的学生列表，以及已分配进行审阅的学生提交文件（如果有）。
+      details: 左边会显示分配到此任务的学生列表，以及已分配进行审阅的学生提交作业（如果有）。
       links: 
-        assign_peer_review: "向 %{student} 指定另一个要评估的提交文件"
+        assign_peer_review: "向 %{student} 指定另一个要评估的提交作业"
         back_to_assignment: 返回作业
       messages: 
         cancel_peer_review: 是否取消此同伴审阅?
@@ -1806,7 +1806,7 @@ zh:
       title: "%{assignment} 同伴审阅"
       titles: 
         automatically_assign_reviews: 自动分配审阅
-        remind: "向 %{assessor} 提醒评估，上次通知时间为 %{time}"
+        remind: "向 %{assessor} 提醒测验，上次通知时间为 %{time}"
     peer_reviews_selector: 
       labels: 
         automatically_assign_peer_reviews: 自动分配同伴审阅
@@ -1820,7 +1820,7 @@ zh:
     redirect_page: 
       redirect_message: |-
           此提交为 url，我们立即带您前往 url 链接。  
-          [单击此处转到提交文件](%{url})
+          [单击此处转到提交作业](%{url})
     rules_text: 
       one: "%{count} 个规则"
       other: "%{count} 个规则"
@@ -1869,7 +1869,7 @@ zh:
       links: 
         resubmit: 重新提交作业
         submission: 
-          details: 提交详细信息
+          details: 提交作业详细信息
           download_attachment: "下载 %{attachment_display_name}"
           view_original_entry: 查看原始条目
           view_original_page: 查看原始页面
@@ -1916,7 +1916,7 @@ zh:
     submit_assignment: 
       additional_comments: 其它评论
       buttons: 
-        record_media: 记录/上传媒体
+        record_media: 录制/上传媒体
         submit_assignment: 提交作业
       comments_placeholder: 评论...
       errors: 
@@ -1952,7 +1952,7 @@ zh:
       no_submission: 未选择提交项
       submission_url: 提交项：
       titles: 
-        media_recordings_disabled: "没有为此 Canvas 网站启用媒体记录"
+        media_recordings_disabled: "没有为此 Canvas 网站启用媒体录制"
       upload_or_choose_file: 上传文件，或选择您已上传的文件。
     syllabus: 
       page_title: "%{course} 的大纲"
@@ -1981,7 +1981,7 @@ zh:
         edit_syllabus_description: 编辑大纲说明
     titles: 
       add_assignment_group: 添加作业小组
-      uploading: 正在上传提交文件
+      uploading: 正在上传提交作业
     toggle_message: 切换作业可见性
     toggle_show_by: 
       date: 日期
@@ -2005,7 +2005,7 @@ zh:
           student_paper_check: 其它学生论文
         originality_report_visibility: 学生可查看原始报告
         originality_report_visible_after_due_date: 在截止时间之后
-        originality_report_visible_after_grading: 在作业评分之后
+        originality_report_visible_after_grading: 在作业计分之后
         originality_report_visible_immediately: 立即
         settings_exclude_fewer_than_count: "少于 %h{wordsInput} 个字"
         settings_exclude_less_than_percent: "少于文档的 %h{percentInput}"
@@ -2075,8 +2075,8 @@ zh:
   bb_file_description: "Blackboard 6/7/8/9 export .zip 文件"
   bb_name: "Blackboard 转换器"
   big_blue_button_conference: 
-    recording_setting: 记录
-    recording_setting_description: 记录此会议
+    recording_setting: 录制
+    recording_setting_description: 录制此会议
   blackboard: 
     no_manifest: "该 Blackboard .zip 在根目录下没有 imsmanifest.xml 文件。"
   bookmark_service: 
@@ -2293,8 +2293,8 @@ zh:
       use_old_calendar: 旧日历
     calendar_navigator: 
       enter_navigation_date: 输入您要导航到的日期。
-      next: 下一个
-      previous: 上一个
+      next: 下一页
+      previous: 上一页
       today: 今天
     calendar_title: "日历:"
     cancel_appointment: "是否确定要取消您和 %{name} 的约会?"
@@ -2498,8 +2498,8 @@ zh:
     assignment_details: 作业详细信息
     calendar: 
       alts: 
-        next: 下一个
-        previous: 上一个
+        next: 下一页
+        previous: 上一页
       calendars_count: 
         one: "%{count} 个日程表，%{open_count} 已打开"
         other: "%{count} 个日程表，%{open_count} 已打开"
@@ -2819,10 +2819,10 @@ zh:
   conferences: 
     concluded_conference: 
       delete: 删除
-      no_recording: 无记录
+      no_recording: 无录音
       preparing_video: 正在准备视频
-      recording: "1 条记录"
-      recordings: "%{recordingCount} 条记录"
+      recording: "1 个录音"
+      recordings: "%{recordingCount} 个录音"
       setings: 设置
       view: 查看
     confirm: 
@@ -2865,8 +2865,8 @@ zh:
       end_it_now: 结束
       in_progress: 正在进行
       join: 加入
-      recording: "1 条记录"
-      recordings: "%{recordingCount} 条记录"
+      recording: "1 个录音"
+      recordings: "%{recordingCount} 个录音"
       setings: 设置
       start: 开始
       view: 查看
@@ -3068,11 +3068,11 @@ zh:
         default_select_folder: 选择文件夹
         upload_to: 上传至
       overwrite_assessment_content: 
-        assessment_help_label: 覆盖评估帮助图标
-        assessment_help_text: "有些系统对每个新导出循环使用其 ID。因此，如果您导出两个不同的题库，它们将具有相同的 ID。为防止丢失考试数据，尽管这些对象的 ID 相同，但我们将其视为不同的对象。选择此选项将会禁用此安全功能，允许考试数据覆盖具有相同 ID 的现有数据。"
-        assessment_help_title: “覆盖考试帮助”
-        assessment_help_title_icon: 覆盖评估帮助图标
-        overwrite_assessment_content: "覆盖具有匹配 ID 的考试内容"
+        assessment_help_label: 覆盖测验帮助图标
+        assessment_help_text: "有些系统对每个新导出循环使用其 ID。因此，如果您导出两个不同的题库，它们将具有相同的 ID。为防止丢失测验数据，尽管这些对象的 ID 相同，但我们将其视为不同的对象。选择此选项将会禁用此安全功能，允许考试数据覆盖具有相同 ID 的现有数据。"
+        assessment_help_title: “覆盖测验帮助”
+        assessment_help_title_icon: 覆盖测验帮助图标
+        overwrite_assessment_content: "覆盖具有匹配 ID 的测验内容"
       question_bank: 
         aria_new_label: 创建新题库
         create_new_question: "-- 创建新题库 --"
@@ -3758,7 +3758,7 @@ zh:
     compose_button_bar: 
       titles: 
         add_attachment: 添加附件
-        record_media_comment: 记录音频或视频评论
+        record_media_comment: 录制音频或视频评论
     compose_title_bar: 
       buttons: 
         close: 关闭
@@ -3841,9 +3841,9 @@ zh:
         play_media_comment: 播放媒体评论
         rss: 
           conversations: "会话  Atom 消息源"
-        submission_author: 提交文件作者
-        submission_score: 提交文件得分
-        view_submission: 在新窗口中打开提交文件。
+        submission_author: 提交作业作者
+        submission_score: 提交作业得分
+        view_submission: 在新窗口中打开提交作业。
       try_new_conversations: 尝试新会话
     index_new: 
       archive: 存档
@@ -3902,13 +3902,13 @@ zh:
         message: "消息:"
         to: "发送至:"
       links: 
-        add_attachment: 附加
-        media_comment: 记录
+        add_attachment: 附件
+        media_comment: 录制
       media_comment: 媒体评论
       titles: 
         add_attachment: 添加附件
-        media_comment: 已记录媒体评论
-        record_media_comment: 记录音频或视频评论
+        media_comment: 已录制媒体评论
+        record_media_comment: 录制音频或视频评论
         remove_media_comment: 移除媒体评论
     message_form_dialog: 
       body: 正文
@@ -3925,15 +3925,15 @@ zh:
         subject: 主题
         to: 至
       links: 
-        media_comment: 记录
+        media_comment: 录制
       media_comment: 媒体评论
       no_course: 无课程
       no_subject: 无主题
       search_names_groups_courses: 搜索姓名、小组和课程
       send_individual_messages: 发送各个消息
       titles: 
-        media_comment: 已记录媒体评论
-        record_media_comment: 记录音频或视频评论
+        media_comment: 已录制媒体评论
+        record_media_comment: 录制音频或视频评论
         remove_media_comment: 删除媒体评论
     message_item: 
       delete: 删除
@@ -3979,7 +3979,7 @@ zh:
     titles: 
       expand_inline: 显示更多的评论
       rss_feed: 会话消息源
-      view_submission: 在新窗口中打开提交文件。
+      view_submission: 在新窗口中打开提交作业。
     unarchive: 取消存档
     unarchive_conversation: 取消存档会话
     unknown_user: 未知用户
@@ -4413,7 +4413,7 @@ zh:
       unconcluded: 课程未结束
       updated: 课程已成功更新。
     recent_event: 
-      all_graded: 所有已评分
+      all_graded: 所有已计分
       due: 截止时间
       needs_grading: 需要评分
       no_new_submissions: 无新作业
@@ -4422,7 +4422,7 @@ zh:
       submission_score: "%{score} *满分 %{points_possible} 分*"
     recent_feedback: 
       comments: "评论: %{count}"
-      not_graded: 未评分
+      not_graded: 未计分
       submission_points: 
         with_score: "分数:%{score} *满分 %{points_possible} 分*"
         without_score: "满分 %{points_possible} 分"
@@ -4441,7 +4441,7 @@ zh:
         go_back: 重新开始
         have_been_enrolled: 以下用户已注册
         name: 姓名
-        next: 下一个
+        next: 下一页
         section: 班级
         user_role: 身份：
         validating: 正在验证...
@@ -4723,7 +4723,7 @@ zh:
       new_discussion_entries: 新建讨论条目
       new_discussions: 新建讨论
       num_assignments: "# 作业"
-      num_submissions: "# 提交文件"
+      num_submissions: "# 提交作业"
       page_title: 课程统计信息
       quiz: 测验
       quiz_questions: 测验题
@@ -5083,7 +5083,7 @@ zh:
     deleted_entry_notice: 该条目已删除
     disabled_podcasts_notice: 尚未对此主题启用播客
     podcast_description: "任何与主题 \"%{title}\" 中的条目相链接或内嵌于其中的媒体文件都会出现在此馈送中。"
-    podcast_feed_title: "%{title} 贴子播客馈送"
+    podcast_feed_title: "%{title} 帖子播客动态消息"
     posts_feed_title: "%{title} 贴子馈送"
     updated_entry_notice: 条目已成功更新。
   discussion_entry: 
@@ -5100,8 +5100,8 @@ zh:
       due_date: "截止时间 %{date}"
       for: 适用人群
       graded_discussion_and_points: 
-        one: "这是已评分的讨论：*可能为 %{count} 分*"
-        other: "这是已评分的讨论：*可能为 %{count} 分*"
+        one: "此讨论为计分作业：*满分 %{count} 分*"
+        other: "此讨论为计分作业：*满分 %{count} 分*"
       separated_conversation_notice: "由于这是一个小组作业，每个小组都有关于此主题的会话。以下是您可以访问的内容:"
       show_due_dates: 显示截止时间
       until: 结束时间
@@ -5118,7 +5118,7 @@ zh:
       close_for_comments: 关闭评论
       delete: 删除
       due: 截止时间
-      graded_discussion: 评分的讨论
+      graded_discussion: 计分的讨论
       manage: 管理
       no_due_date: 无截止时间
       open_to_comments: 开放评论
@@ -5144,12 +5144,12 @@ zh:
       new_quiz: 新测验
     edit_crumb: 编辑
     edit_view: 
-      allow_threaded_replies: 允许按话题组织的回复
+      allow_threaded_replies: 允许将回复信息按话题组织
       attachment: 附件
       available_from: 开始时间
       delay_posting: 延迟发布
-      enable_podcast_feed: 启用播客源
-      include_replies_in_podcast_feed: 在播客源中包括回复
+      enable_podcast_feed: 启用播客动态消息
+      include_replies_in_podcast_feed: 在播客动态消息中包括回复
       options: 可选功能
       points_possible: 最高得分
       post_at: 发布时间
@@ -5157,15 +5157,15 @@ zh:
       saving: 正在保存...
       topic_title: 主题标题
       until: 结束时间
-      use_for_grading: 已评分
-      users_must_post_before_seeing_replies: 用户必须在看回复前发布
+      use_for_grading: 已计分
+      users_must_post_before_seeing_replies: 用户必须先发布本人信息才能阅读他人回复
     entry: 
       authors_name: 作者姓名
       delete_message: 删除此消息
       edit_message: 编辑此消息
       edited_comment: "此评论被 %{user} 编辑。"
       labels: 
-        attached_file: 附加的文件
+        attached_file: 附件文件
       make_side_comment: 编写侧评论...
       reply_to_message: 编写侧评论
       show_more_entries: 
@@ -5226,7 +5226,7 @@ zh:
       delete: 删除
       delete_current_message: 删除当前消息
       discussion_atom_feed_title: "讨论 Atom 馈送"
-      discussion_podcast_feed_title: 讨论播客馈送
+      discussion_podcast_feed_title: 讨论播客动态消息
       edit: 编辑
       edit_current_message: 编辑当前消息
       edited_by: "此主题由 %{user} 进行编辑"
@@ -5251,7 +5251,7 @@ zh:
       show_rubric: 显示评分标准说明
       speed_grader: 快速评分器
       topic: 主题
-      topic_podcast_feed_link: 主题播客馈送
+      topic_podcast_feed_link: 主题播客动态消息
       topic_subscribe: 订阅
       topic_subscribe_tooltip: 您已取消订阅，将不再收到新评论的通知
       topic_subscribed_tooltip: 您已订阅，将收到新评论的通知
@@ -5266,7 +5266,7 @@ zh:
       drag_up_or_down_to_reorder: 向上或向下拖动以重新排序
       locked: 此主题已关闭评论
       this_topic_is_used_for_grading: 此主题用于评分
-      topic_podcast_feed: 主题播客馈送
+      topic_podcast_feed: 主题播客动态消息
     topic_deleted_notice: "成功删除 %{topic_title}"
     unread_count_tooltip: 
       one: "1 条未读的回复"
@@ -5322,7 +5322,7 @@ zh:
     reply_attachment: 
       remove_attachment: 删除
     reply_form: 
-      attach_file: 附加
+      attach_file: 附件
       cancel: 取消
       post_reply: 帖子回复
       switch_views: 切换视图
@@ -5840,7 +5840,7 @@ zh:
       add_new_tool: 添加新应用程序
       all: 全部
       app_headder: 外部应用程序
-      external_tools_note: "应用程序是向 Canvas 添加新功能的简单方式。这些功能可添加到帐户中的各个课程或所有课程。配置完毕后，您可以通过课程模块与其链接，并为评估工具创建作业。"
+      external_tools_note: "应用程序是向 Canvas 添加新功能的简单方式。这些功能可添加到帐户中的各个课程或所有课程。配置完毕后，您可以通过课程模块与其链接，并为测验工具创建作业。"
       external_tools_references: "单击*此处*查看适用于 Canvas 的某些 LTI 工具。您还可以在**此处**查看有关 LTI 工具的 Canvas 社区主题"
       installed: 已安装
       not_installed: 未安装
@@ -5876,7 +5876,7 @@ zh:
       learn_more: "更多信息请参阅 instructure.com"
       more_information: "更多信息请参阅 %{domain_list}"
       no_messages_notice: "当课程中发生事情时，您将在此处看到通知，从而知道您的 Canvas 帐户中发生的事情。"
-      notification_about: "Canvas Facebook 应用程序旨在方便您访问课程中的互动信息。您可以设置为当您的作业被评分、截止时间更改等事件时向您发送通知。您的私人数据在 Canvas 中仍然保持私密性。"
+      notification_about: "Canvas Facebook 应用程序旨在方便您访问课程中的互动信息。您可以设置为当您的作业被计分、截止时间更改等事件时向您发送通知。您的私人数据在 Canvas 中仍然保持私密性。"
       notification_settings: 通知设置
       notifications_notice: "下面您可以看到来自 Canvas 的最近通知列表。您可以从 Facebook 主页查看 Canvas 新通知的数量（如果您制作了此应用程序的书签）。"
       welcome: "欢迎回来，%{name}！"
@@ -6152,15 +6152,15 @@ zh:
       select_an_option: 请选择选项
       upload_as_zip: "请以 .zip 形式上传文件"
     grade: "评分: %{grade}"
-    graded_by_me: "我评分的时间 %{graded_time}"
-    graded_then_resubmitted: "评分后重新提交的时间 (%{when})"
+    graded_by_me: "我计分的时间 %{graded_time}"
+    graded_then_resubmitted: "计分后重新提交的时间 (%{when})"
     gradee_index_of_total: "%{gradee} %{x} / %{y}"
     group: 小组
     hide_all_things: "隐藏所有 %{things}"
     hide_column: 隐藏列
     hide_student_name: 隐藏学生姓名
-    ignore_ungraded: 忽略未评分的作业
-    include_ungraded: 包括未评分的作业
+    ignore_ungraded: 忽略未计分的作业
+    include_ungraded: 包括未计分的作业
     labels: 
       details: 详细信息
     links: 
@@ -6173,10 +6173,10 @@ zh:
     loud_late: 延迟
     message_students_who: 给相关学生发送信息
     mute_assignment: 屏蔽作业
-    new_assessment: "[新评估]"
+    new_assessment: "[新测验]"
     no_submission_time: 无提交时间
     nth_student: "学生 %{n}"
-    portion_graded: "%{x} / %{y} 已评分"
+    portion_graded: "%{x} / %{y} 已计分"
     publish_to_sis: "发布评分到 SIS"
     reupload_submission_files: 重新上传提交文件
     reupload_submissions: 重新上传提交文件
@@ -6192,7 +6192,7 @@ zh:
     student_mute_notification: 教师正在进行评分
     student_name: 学生姓名
     students_who: 
-      havent_been_graded: 还未打分
+      havent_been_graded: 尚未计分
       havent_submitted_yet: 尚未提交
       no_grade_for: "%{assignment} 无评分"
       no_submission_for: "%{assignment} 无提交"
@@ -6260,7 +6260,7 @@ zh:
     no_assignments_have_points_warning: 无法计算得分，直到作业有最高得分
     percent_of_grade: "%{percentage} 的评分 "
     points_out_of: "满分 %{points_possible} 分"
-    resubmitted: 自上次评分后已重新提交
+    resubmitted: 自上次计分后已重新提交
     row_student_name: 
       student_placeholder: 学生
     secondary_id: 第二类身份证明
@@ -6274,7 +6274,7 @@ zh:
       filter_by_student: 以学生姓名或第二类身份证明筛选
       go_back_to_the_old_gradebook: 返回到旧评分册
       hide_student_names: 隐藏学生姓名
-      include_ungraded: 包括未评分的作业
+      include_ungraded: 包括未计分的作业
       publish_to_sis: "发布评分到 SIS"
       set_group_weights: 设置组权重
       show_attendance_columns: 显示参与列
@@ -6285,7 +6285,7 @@ zh:
     show_student_names: 显示学生姓名
     student_name: 学生姓名
     students_who: 
-      havent_been_graded: 尚未评分
+      havent_been_graded: 尚未计分
       havent_submitted_yet: 尚未提交
       no_grade_for: "%{assignment} 无评分"
       no_submission_for: "%{assignment} 无提交"
@@ -6447,7 +6447,7 @@ zh:
         low_score: 低
         mean: 平均
         mean_score: 平均
-        only_graded: 只根据已评分的作业计算
+        only_graded: 只根据已计分的作业计算
         total: 总计
         your_score: 您的分数
       links: 
@@ -6551,7 +6551,7 @@ zh:
       incomplete: 未完成
     grades_filename: 评分
     history: 
-      graded_on_submission: 为提交内容打分
+      graded_on_submission: 为提交内容计分
       grades_for_date: 日期的评分
       headers: 
         after: 之后
@@ -6565,7 +6565,7 @@ zh:
         other: "%{count} 处更改"
       temporary_disabled: 对于此等大小的课程，成绩册历史页面当前不可用。
       titles: 
-        submission_graded: "%{graded_date} 评分者 %{grader}"
+        submission_graded: "%{graded_date} 计分者 %{grader}"
     invalid_assignment_groups_warning: 
       one: "分数不包括 %{groups}，因为没有最高得分"
       other: "分数不包括 %{groups}，因为没有最高得分"
@@ -6598,7 +6598,7 @@ zh:
       page_title: 评分册
     speed_grader: 
       all_sections: 所有班级
-      attach: 附加
+      attach: 附件
       buttons: 
         save: 保存
         save_settings: 保存设置
@@ -6608,7 +6608,7 @@ zh:
         unmute_assignment: 取消屏蔽作业
       headers: 
         anonymous_submission: 由于作业是匿名安排的，所以隐藏了此学生的回答。
-        assessment: 评估
+        assessment: 测验
         discussion: 讨论
         grading: 评分
         no_group_submission: 该小组没有提交此作业的文件
@@ -6638,7 +6638,7 @@ zh:
         grade_by_question_beta: "按问题评分 (beta)"
         group_comment: 发送评论到全小组
         hide_names: 在快速评分器中隐藏学生姓名
-        show_assessment_by: 显示评估依据
+        show_assessment_by: 显示测验依据
         showing: 正在显示
         sort_by: 排序学生列表
         submission_to_view: 要查看的提交文件
@@ -6649,14 +6649,14 @@ zh:
         course_home: 课程主页
         download_file: 下载文件
         gradebook: 评分册
-        next: 下一个
-        previous: 上一个
+        next: 下一页
+        previous: 上一页
         remove_attachment: 删除附件
         settings: 设置
         show_all_sections: 显示所有班级
         submit_same_score: 对重新提交的文件使用此相同评分
       loading: 正在加载...
-      new_assessment_option: "[新评估]"
+      new_assessment_option: "[新测验]"
       no_annotation: 本文档的注释不可用
       not_newest_notice: "注:这不是最近的提交文件"
       page_title: "%{assignment_name}, 快速评分器, %{course_name}"
@@ -6847,7 +6847,7 @@ zh:
         one: "%{count} 个学生"
         other: "%{count} 个学生"
       warnings: 
-        studend_groups: 这些学习小组是学生自发组织的。与其它类型的组不同，在这些学习小组中，学生可以同时属于多个学习小组，因此，这些学习小组未必是评分作业的最佳解决方案。
+        studend_groups: 这些学习小组是学生自发组织的。与其它类型的组不同，在这些学习小组中，学生可以同时属于多个学习小组，因此，这些学习小组未必是计分作业的最佳解决方案。
     confirm: 
       assign_students: 这会将所有未分配的学生尽可能均匀地随机分配到现有的学习小组
       delete_group: 是否确定要删除此小组?
@@ -6999,7 +6999,7 @@ zh:
         message_all_unassigned_option: 向所有未分配的学生发送消息
         randomly_assign_students_option: 随机分配学生
         restricted_self_signup_blurb: 学习小组内所有学生需要在相同的班级中
-        self_organized_warning: 这些小组是学生自发组织的。与其它类型的组不同，在这些小组中，学生可以同时属于多个小组，因此这些小组未必是评分作业的最佳解决方案。
+        self_organized_warning: 这些小组是学生自发组织的。与其它类型的组不同，在这些小组中，学生可以同时属于多个小组，因此这些小组未必是计分作业的最佳解决方案。
         self_signup_blurb: 对这些小组启用自行注册。
         settings: 设置
       group_category_edit: 
@@ -7268,8 +7268,8 @@ zh:
       last_error: 上次的错误
   jquery: 
     module_sequence_footer: 
-      next: 下一个
-      previous: 上一个
+      next: 下一页
+      previous: 上一页
   labels: 
     lock_module_until: 锁定单元至指定日期
   layouts: 
@@ -7286,7 +7286,7 @@ zh:
         assignments: 作业
         assignments_needing_grading: 待评分
         assignments_needing_submitting: 待提交
-        assignments_recently_graded: 最近评分
+        assignments_recently_graded: 最近计分
         calendar: 日历
         grades: 评分
       navigation: 
@@ -7360,7 +7360,7 @@ zh:
         wikis: 维基页面
     cc: 
       standard: 
-        failed_to_convert_qti: "无法导入评估 %{file_identifier}"
+        failed_to_convert_qti: "无法导入测验 %{file_identifier}"
     google_docs: 
       default_document_name: "Instructure Doc"
     incoming_message_processor: 
@@ -7449,8 +7449,8 @@ zh:
       file_too_large: "*此文件太大。*最大大小为 %{size}MB。"
       load_failed: 媒体评论应用程序无法加载。请重试。
       media_comment_installation_broken: 媒体评论上传尚未正确设置。请联系您的管理员。
-      must_be_logged_in: 您必须登录才能记录媒体。
-      persistent_problem: 如果一直出现此问题，您可能会想要尝试在本地记录媒体然后上传保存的文件代替。
+      must_be_logged_in: 您必须登录才能录制媒体。
+      persistent_problem: 如果一直出现此问题，您可能会想要尝试在本地录制媒体然后上传保存的文件代替。
       save_failed: 保存似乎失败。请关闭此弹出窗口以重试。
       save_failed_try_again: 条目无法保存。请重试。
       upload_failed: "上传失败，错误:"
@@ -7460,7 +7460,7 @@ zh:
     media_still_converting: 目前正在转换媒体，请稍后重试。
     messages: 
       file_failed_to_load: 此媒体文件无法加载
-      flash_required_record_audio: "需要 Flash 才能记录音频。"
+      flash_required_record_audio: "需要 Flash 才能录制音频。"
       flash_required_upload_audio: "需要 Flash 才能上传音频。"
       flash_required_upload_video: "需要 Flash 才能上传视频。"
       loading: 正在加载...
@@ -7469,7 +7469,7 @@ zh:
     titles: 
       media_contribution: 媒体参与
       play_comment: 播放媒体评论
-      record_upload_media_comment: 记录/上传媒体评论
+      record_upload_media_comment: 录制/上传媒体评论
     track_uploaded_successfully: 轨道已成功上载，刷新即可看到。
     upload: 上传
     uploading: 正在上传...
@@ -7563,14 +7563,14 @@ zh:
             other: 已为您触发了警报，因为满足了以下条件：
           interaction_description: "没有学生/教师交互已 %{count} 天"
           subject: "警报: %{user_name}"
-          ungraded_count_description: "%{count} 个或多个提交文件尚未评分"
-          ungraded_timespan_description: "提交文件已 %{count} 天未评分"
+          ungraded_count_description: "%{count} 个或多个提交文件尚未计分"
+          ungraded_timespan_description: "提交文件已 %{count} 天未计分"
           usernote_description: "没有教师日志条目已 %{count} 天"
           view_here: 您可在此处进行查看
         interaction_description: "没有学生/教师交互已 %{count} 天"
         subject: "警报: %{user_name}"
-        ungraded_count_description: "%{count} 个或多个提交文件尚未评分"
-        ungraded_timespan_description: "提交文件已 %{count} 天未评分"
+        ungraded_count_description: "%{count} 个或多个提交文件尚未计分"
+        ungraded_timespan_description: "提交文件已 %{count} 天未计分"
         usernote_description: "没有教师日志条目已 %{count} 天"
       facebook: 
         body: 
@@ -7583,11 +7583,11 @@ zh:
           one: "没有学生/教师交互已 %{count} 天或更久"
           other: "没有学生/教师交互已 %{count} 天或更久"
         ungraded_count_description: 
-          one: "%{count} 份或更多作业尚未评分"
-          other: "%{count} 份或更多作业尚未评分"
+          one: "%{count} 份或更多作业尚未计分"
+          other: "%{count} 份或更多作业尚未计分"
         ungraded_timespan_description: 
-          one: "1 个或多个提交文件已 %{count} 天或更久未评分"
-          other: "1 个或多个提交文件已 %{count} 天或更久未评分"
+          one: "1 个或多个提交文件已 %{count} 天或更久未计分"
+          other: "1 个或多个提交文件已 %{count} 天或更久未计分"
         usernote_description: 
           one: "没有教师日志条目已 %{count} 天或更久"
           other: "没有教师日志条目已 %{count} 天或更久"
@@ -7607,11 +7607,11 @@ zh:
           other: "没有学生/教师交互已 %{count} 天或更久"
         subject: "警报: %{user_name}"
         ungraded_count_description: 
-          one: "%{count} 份或更多作业尚未评分"
-          other: "%{count} 份或更多作业尚未评分"
+          one: "%{count} 份或更多作业尚未计分"
+          other: "%{count} 份或更多作业尚未计分"
         ungraded_timespan_description: 
-          one: "1 个或多个提交文件已 %{count} 天或更久未评分"
-          other: "1 个或多个提交文件已 %{count} 天或更久未评分"
+          one: "1 个或多个提交文件已 %{count} 天或更久未计分"
+          other: "1 个或多个提交文件已 %{count} 天或更久未计分"
         usernote_description: 
           one: "没有教师日志条目已 %{count} 天或更久"
           other: "没有教师日志条目已 %{count} 天或更久"
@@ -8023,24 +8023,24 @@ zh:
         no_due_date: "截止时间: 无截止时间"
     assignment_graded: 
       email: 
-        assignment_graded: "作业已评分:%{assignment_name}，%{course_name}"
+        assignment_graded: "作业已计分: %{assignment_name}，%{course_name}"
         html: 
-          assignment_graded: "作业已评分:%{assignment_name}，%{course_name}"
+          assignment_graded: "作业已计分:%{assignment_name}，%{course_name}"
           link_text: 查看作业
-          the_assignment_is_graded: "作业 %{assignment_name} 已评分。"
+          the_assignment_is_graded: "作业 %{assignment_name} 已计分。"
         labels: 
           view_here: 您可在此处进行查看
-        the_assignment_is_graded: "作业 %{assignment_name} 已评分。"
+        the_assignment_is_graded: "作业 %{assignment_name} 已计分。"
       facebook: 
-        the_assignment_is_graded: "作业 %{assignment_name} 已评分。"
+        the_assignment_is_graded: "作业 %{assignment_name} 已计分。"
       sms: 
-        assignment_is_graded: "%{assignment_name}，%{course_name} 已评分。"
+        assignment_is_graded: "%{assignment_name}，%{course_name} 已计分。"
         more_info_at: "更多信息请访问 %{web_address}"
       summary: 
-        assignment_graded: "作业已评分:%{assignment_name}，%{course_name}"
-        the_assignment_is_graded: "作业 %{assignment_name} 已评分。"
+        assignment_graded: "作业已计分:%{assignment_name}，%{course_name}"
+        the_assignment_is_graded: "作业 %{assignment_name} 已计分。"
       twitter: 
-        assignment_graded: "Canvas 警报 - 已评分:%{assignment_name}，%{course_name}"
+        assignment_graded: "Canvas 警报 - 已计分:%{assignment_name}，%{course_name}"
     assignment_locked: 此作业当前锁定。
     assignment_locked_at: "此作业锁定于 %{at}。"
     assignment_locked_module: "此作业是单元 *%{module}* 的一部分，尚未解锁。"
@@ -8228,11 +8228,11 @@ zh:
     content_unpublished_module: 此内容是未发布单元的一部分，尚未可用。
     conversation_message: 
       email: 
-        attached_files: "附加的文件:"
+        attached_files: "附件文件:"
         audio_comment: "此邮件包括媒体评论。要收听或回复，单击下面的链接:"
         body: "%{user_name} 刚刚在 Canvas 中向您发送了一封邮件:"
         html: 
-          attached_files: "附加的文件:"
+          attached_files: "附件文件:"
           audio_comment: "此邮件包括媒体评论。要收听或回复，单击下面的链接:"
           body: "%{user_name} 刚刚在 Canvas 中向您发送了一封邮件:"
           download: 下载
@@ -8634,7 +8634,7 @@ zh:
         body: "小组 %{group_name} 已提交课程 %{course_name} 中 %{assignment_name} 的最近提交的作业。"
         subject: "最近作业: %{group_name}，%{assignment_name}"
       twitter: 
-        subject: "Canvas 警报 - 最近小组提交作业:%{group_name}，%{assignment_name}"
+        subject: "Canvas 警报 - 最近小组作业:%{group_name}，%{assignment_name}"
     group_membership_accepted: 
       email: 
         account_group: "帐户 %{account_name} 加入小组 %{group_name} 的请求已被接受。"
@@ -8756,7 +8756,7 @@ zh:
     new_announcement: 
       email: 
         html: 
-          attached_file: 附加的文件
+          attached_file: 附件文件
           download: 下载
           link: 查看通告
         labels: 
@@ -8877,7 +8877,7 @@ zh:
         body: "您可能会感兴趣的一个新讨论已经开始:"
         details: "此处加入会话:"
         html: 
-          attached_file: 附加的文件
+          attached_file: 附件文件
           body: "您可能会感兴趣的一个新讨论已经开始:"
           details: 在此加入会话
           download: 下载
@@ -9077,9 +9077,9 @@ zh:
         more_info: "更多信息请访问 %{url}"
       summary: 
         body: "已为您的测验 %{title} 完成了重新评分。"
-        subject: "测验已重新评分：%{quiz}，%{context}"
+        subject: "测验已重新计分：%{quiz}，%{context}"
       twitter: 
-        body: "Canvas 警报 - 测验已重新评分：%{quiz}"
+        body: "Canvas 警报 - 测验已重新计分：%{quiz}"
     quiz_unpublished_module: 此测验是未发布单元的一部分，尚未可用。
     report_generated: 
       email: 
@@ -9098,9 +9098,9 @@ zh:
         body: "系统已提醒您评估: %{rubric}，%{context}:"
         html: 
           body: "系统已提醒您评估 %{rubric}，%{context}："
-          link_message: 单击此处审阅评估并提交您的条目
+          link_message: 单击此处审阅测验并提交您的条目
           subject: "评估提醒:%{rubric}，%{context}"
-        link_message: "您可在此处审阅评估并提交您的输入:"
+        link_message: "您可在此处审阅测验并提交您的输入:"
         subject: "评估提醒: %{rubric}，%{context}"
       facebook: 
         body: "系统已提醒您评估:*%{title}* (%{context})。"
@@ -9114,23 +9114,23 @@ zh:
         tweet: "Canvas 警报 - 提醒:评估 %{rubric}，%{context}"
     rubric_association_created: 
       email: 
-        body: "已创建针对 %{context} 的新评估:"
+        body: "已创建针对 %{context} 的新测验:"
         html: 
-          body: "已创建针对 %{context} 的新评估:"
-          link_message: 单击此处审阅评估并提交您的条目
-          subject: "新评估:%{title}，%{context}"
-        link_message: "您可在此处审阅评估并提交您的输入:"
-        subject: "新评估:%{title}，%{context}"
+          body: "已创建针对 %{context} 的新测验:"
+          link_message: 单击此处审阅测验并提交您的条目
+          subject: "新测验:%{title}，%{context}"
+        link_message: "您可在此处审阅测验并提交您的输入:"
+        subject: "新测验:%{title}，%{context}"
       facebook: 
-        body: "已创建针对 %{context} 的新评估:"
+        body: "已创建针对 %{context} 的新测验:"
       sms: 
-        body: "已创建针对 %{context} 的新评估。"
+        body: "已创建针对 %{context} 的新测验。"
         more_info: "更多信息请访问 %{url}"
       summary: 
-        body: "已创建针对 %{context} 的新评估:"
-        subject: "新评估:%{title}，%{context}"
+        body: "已创建针对 %{context} 的新测验:"
+        subject: "新测验:%{title}，%{context}"
       twitter: 
-        tweet: "Canvas 警报 - 新评估:%{title}，%{context}。"
+        tweet: "Canvas 警报 - 新测验:%{title}，%{context}。"
     self_enrollment_registration: 
       email: 
         body: |-
@@ -9209,14 +9209,14 @@ zh:
           link_message: 您可以在此处审阅作业
           no_date_set: 未设置日期
           not_applicable: 不适用
-          regraded_date: "重新评分日期: %{date}"
+          regraded_date: "重新计分日期: %{date}"
           score: "分数:%{score}，满分 %{total} 分"
           score_pending: 教师待审阅的分数
           subject: "分数已更改:%{assignment}，%{context}"
         link_message: "您可在此处审阅作业:"
         no_date_set: 未设置日期
         not_applicable: 不适用
-        regraded_date: "重新评分日期: %{date}"
+        regraded_date: "重新计分日期: %{date}"
         score: "分数:%{score}，满分 %{total} 分"
         score_pending: 教师待审阅的分数
         subject: "分数已更改:%{assignment}，%{context}"
@@ -9224,7 +9224,7 @@ zh:
         body: "您的作业 *%{title}* 的评分已更改。"
         no_date_set: 未设置日期
         not_applicable: 不适用
-        regraded_date: "重新评分日期: %{date}"
+        regraded_date: "重新计分日期: %{date}"
         score: "分数:%{score}，满分 %{total} 分"
         score_pending: 教师待审阅的分数
       sms: 
@@ -9232,13 +9232,13 @@ zh:
         more_info: "更多信息请访问 %{url}"
         no_date_set: 未设置日期
         not_applicable: 不适用
-        regraded_date: "重新评分日期: %{date}"
+        regraded_date: "重新计分日期: %{date}"
         score: "分数:%{score}，满分 %{total} 分"
         score_pending: 教师待审阅的分数
       summary: 
         no_date_set: 未设置日期
         not_applicable: 不适用
-        regraded_date: "重新评分日期: %{date}"
+        regraded_date: "重新计分日期: %{date}"
         score: "分数:%{score}，满分 %{total} 分"
         score_pending: 教师待审阅的分数
         subject: "分数已更改:%{title}，%{context}"
@@ -9250,51 +9250,51 @@ zh:
         tweet: "Canvas 警报 - 评分更改: %{date}"
     submission_graded: 
       email: 
-        body: "您的作业 %{assignment} 已评分。"
-        graded_date: "评分日期: %{date}"
+        body: "您的作业 %{assignment} 已计分。"
+        graded_date: "计分日期: %{date}"
         html: 
-          body: "您的作业 %{assignment} 已评分。"
-          graded_date: "评分日期: %{date}"
+          body: "您的作业 %{assignment} 已计分。"
+          graded_date: "计分日期: %{date}"
           link_message: 您可以在此处审阅作业
           no_date_set: 未设置日期
           not_applicable: 不适用
           score: "分数:%{score}，满分 %{total} 分"
           score_pending_review: 教师待审阅的分数
-          subject: "作业已评分:%{assignment}，%{context}"
+          subject: "作业已计分:%{assignment}，%{context}"
         link_message: "您可在此处审阅作业:"
         no_date_set: 未设置日期
         not_applicable: 不适用
         score: "分数:%{score}，满分 %{total} 分"
         score_pending_review: 教师待审阅的分数
-        subject: "作业已评分:%{assignment}，%{context}"
+        subject: "作业已计分:%{assignment}，%{context}"
       facebook: 
-        body: "您的作业 *%{title}* 已评分。"
-        graded_date: "评分日期: %{date}"
+        body: "您的作业 *%{title}* 已计分。"
+        graded_date: "计分日期: %{date}"
         no_date_set: 未设置日期
         not_applicable: 不适用
         score: "分数:%{score}，满分 %{total} 分"
         score_pending_review: 教师待审阅的分数
       sms: 
-        graded_date: "评分日期: %{date}"
+        graded_date: "计分日期: %{date}"
         more_info: "更多信息请访问 %{url}"
         no_date_set: 未设置日期
         not_applicable: 不适用
         score: "分数:%{score}，满分 %{total} 分"
         score_pending_review: 教师待审阅的分数
-        sms_body: "%{assignment}，%{context} 已评分。"
+        sms_body: "%{assignment}，%{context} 已计分。"
       summary: 
-        graded_date: "评分日期: %{date}"
+        graded_date: "计分日期: %{date}"
         no_date_set: 未设置日期
         not_applicable: 不适用
         score: "分数:%{score}，满分 %{total} 分"
         score_pending_review: 教师待审阅的分数
-        subject: "作业已评分:%{assignment}，%{context}"
+        subject: "作业已计分:%{assignment}，%{context}"
       twitter: 
         no_date_set: 未设置日期
         not_applicable: 不适用
         score: "分数:%{score}，满分 %{total} 分"
         score_pending_review: （待审阅）
-        tweet: "Canvas 警报 - 已评分:%{assignment}，%{context}"
+        tweet: "Canvas 警报 - 已计分:%{assignment}，%{context}"
     submission_needs_grading: 
       email: 
         body: "%{user_name} 已完成测验 %{quiz_title}，该测验需要手动评分。"
@@ -9314,7 +9314,7 @@ zh:
         more_info: "更多信息请访问 %{url}"
         no_date_set: 未设置日期
         not_applicable: 不适用
-        regraded_date: "重新评分日期: %{date}"
+        regraded_date: "重新计分日期: %{date}"
         score: "分数: %{score}，满分 %{total} 分"
         score_pending: 教师待审阅的分数
       summary: 
@@ -9556,7 +9556,7 @@ zh:
       assignment_created: 作业已创建
       assignment_due_date_changed: 作业截止期日期更改
       assignment_due_date_override_changed: 覆盖的作业截止时间已更改
-      assignment_graded: 作业已评分
+      assignment_graded: 作业已计分
       assignment_resubmitted: 作业已重新提交
       assignment_submitted: 作业已提交
       assignment_submitted_late: 最近提交的作业
@@ -9597,13 +9597,13 @@ zh:
       pseudonym_registration: 匿名注册
       report_generated: 生成的报告
       report_generation_failed: 报告生成失败
-      rubric_assessment_invitation: 评分标准评估邀请
-      rubric_assessment_submission_reminder: 评分标准评估提交文件提醒
+      rubric_assessment_invitation: 评分标准测验邀请
+      rubric_assessment_submission_reminder: 评分标准测验提交提醒
       rubric_association_created: 创建的评分标准关联
       submission_comment: 提交评论
       submission_comment_for_teacher: 教师提交评论
       submission_grade_changed: 提交文件评分已更改
-      submission_graded: 提交文件已评分
+      submission_graded: 提交文件已计分
       submission_needs_grading: 提交文件需要评分
       summaries: 总结
       updated_wiki_page: 更新的维基页面
@@ -9904,7 +9904,7 @@ zh:
       domain_description: "BigBlueButton 安装的**主机名**或 **ip 地址**（例如，bigbluebutton.mycompany.com）"
       labels: 
         domain: 域
-        recording_enabled: 允许记录会议。
+        recording_enabled: 允许录制会议。
         secret: 加密
       secret_description: "这是 %{parameter_name} 参数，可在 %{filename} 配置文件中找到。"
     buttons: 
@@ -10037,7 +10037,7 @@ zh:
       version: 版本
       website: 网站
     kaltura: 
-      description: "Kaltura 视频/音频记录和播放"
+      description: "Kaltura 视频/音频录制和播放"
       name: Kaltura
     kaltura_settings: 
       account_settings: "这些值可在 Kaltura 管理控制台中\"设置 -> 集成设置\"下找到"
@@ -10797,7 +10797,7 @@ zh:
   quiz_submissions: 
     errors: 
       invalid_submissions: 此测验提交无法验证属于您。请重试。
-      late_quiz: 您提交此测验时已晚，您的答案可能没有记录。
+      late_quiz: 您提交此测验时已晚，您的答案可能没有录制。
       protected_quiz: 此测验受到保护并且仅从特定位置可用。您当前使用的计算机似乎并非进行此测验的有效位置。
     show: 
       score_out_of: "您的得分为 %{score}，满分 %{points_possible} 分"
@@ -10879,13 +10879,13 @@ zh:
         delete_question: 删除此问题
         edit_question: 编辑此问题
         move_copy_question: 将问题移动/复制到另一个库
-      not_yet_graded: 仍未评分
+      not_yet_graded: 仍未计分
       original_score: 原始分数：
       points_possible: "%{points_possible} 分"
-      regraded_score: 重新评分后的分数：
+      regraded_score: 重新计分后的分数：
       show_ansers_for_variable: "显示 %{variable} 的答案"
       skip_question_text: 跳至问题文本。
-      submission_was_regraded: 此问题已重新评分。
+      submission_was_regraded: 此问题已重新计分。
       titles: 
         question_correct_comment: 如果学生回答问题正确，他们将看到此评论
         question_incorrect_comment: 如果学生回答问题错误，他们将看到此评论
@@ -11074,8 +11074,8 @@ zh:
         click_to_enter_general_answer_comments: 单击以输入一般评论
         click_to_enter_wrong_answer_comments: 单击以输入错误答案的评论
       wrong_answer_comments: 错误答案评论
-    graded_quiz: 评分测验
-    graded_survey: 评分调查
+    graded_quiz: 计分测验
+    graded_survey: 计分调查
     headers: 
       assignment_quizzes: 测验
       practice_quizzes: 练习测验
@@ -11459,7 +11459,7 @@ zh:
         preview_quiz_again: 再次预览测验
         preview_survey_again: 再次预览调查
       no_more_attempts: 没有更多可用尝试次数
-      questions_not_graded: 有些问题尚未评分
+      questions_not_graded: 有些问题尚未计分
       score_set_manually: 教师已设定此分数
       unlimited_attempts: 无限尝试次数
       view_previous_attempts: 查看上次尝试
@@ -11508,7 +11508,7 @@ zh:
         survey_score: 调查分数
       links: 
         click_to_view_results: 单击此处查看结果。
-      questions_not_graded: 有些问题尚未评分
+      questions_not_graded: 有些问题尚未计分
       quiz_fudged_negative: "此测验分数已手动调整 %{fudge} 分。"
       quiz_fudged_positive: "此测验分数已手动调整 +%{fudge} 分。"
       quiz_not_yet_taken: 测验尚未进行。
@@ -11610,11 +11610,11 @@ zh:
         show_student_survey_results: 显示学生调查结果
         survey_statistics: 调查统计
       manage: 管理
-      only_registered_users: 只有注册的登记用户才能进行评分测验
+      only_registered_users: 只有注册的登记用户才能进行计分测验
       quiz_regraded_your_score_affected: 
-        one: "此测验已重新评分; 您的新分数反映受到影响的 %{count} 个问题。"
-        other: "此测验已重新评分; 您的新分数反映受到影响的 %{count} 个问题。"
-      quiz_regraded_your_score_not_affected: "此测验已重新评分; 您的分数未受影响。"
+        one: "此测验已重新计分; 您的新分数反映受到影响的 %{count} 个问题。"
+        other: "此测验已重新计分; 您的新分数反映受到影响的 %{count} 个问题。"
+      quiz_regraded_your_score_not_affected: "此测验已重新计分; 您的分数未受影响。"
       speed_grader: 快速评分器™
       students_submitted_so_far: 
         one: "目前 %{count} 个学生已提交"
@@ -11671,14 +11671,14 @@ zh:
       attempt: 已尝试次数
       attempt_history: 尝试历史记录
       quiz_attempt_history_description: 显示您的测验尝试历史记录的表。每次尝试都列在左侧。尝试、时间和分数列在顶部。
-      regraded: 已重新评分
+      regraded: 已重新计分
       score: 分数
       time: 时间
     take_quiz: 
       buttons: 
-        next: 下一个
+        next: 下一页
         out_of_time_submit: 好的
-        previous: 上一个
+        previous: 上一页
         submit_quiz: 提交测验
       confirms: 
         cant_go_back_blank: 您单击”下一个“后，就不能返回此问题。是否确定要留空?
@@ -11770,7 +11770,7 @@ zh:
     toggle_message: 切换测验可见性
     ? "true"
     : "True"
-    ungraded_survey: 非评分调查
+    ungraded_survey: 非计分调查
     warnings: 
       unpublished_changes: "*您已对此测验进行未发布的更改。* 这些更改将不会对学生显示，直到您发布或重新发布测验。"
       unpublished_quiz: "*此测验未发布* 在发布之前，只有教师才能查看此课程。"
@@ -12101,7 +12101,7 @@ zh:
     authenticate: 
       buttons: 
         enroll_in_course: " 登记课程"
-        next: 下一个
+        next: 下一页
       getting_started: "您正在登记 **%{course}**。"
       labels: 
         email: 电子邮件
@@ -12110,7 +12110,7 @@ zh:
     authenticate_or_register: 
       buttons: 
         enroll_in_course: 注册课程
-        next: 下一个
+        next: 下一页
       enter_email: "请输入您的电子邮件地址:"
       existing_user: "我已经拥有 %{institution_name} 登录名"
       getting_started: "您正在登记 **%{course}**。"
@@ -12122,7 +12122,7 @@ zh:
     confirm_enrollments: 
       buttons: 
         enroll_in_course: 登记课程
-        next: 下一个
+        next: 下一页
       getting_started: "您正在登记 **%{course}**"
       switch_users: "您当前是用 *%{user}* 身份登录的。**请使用另一个用户身份登录**。"
     course_full: 
@@ -12194,7 +12194,7 @@ zh:
       percent_of_grade: "评分的 %{percent} %"
     assignment: 
       due_at: "%{date} %{time}"
-      graded_count: "%{graded_count} 个已评分"
+      graded_count: "%{graded_count} 个已计分"
       links: 
         delete_assignment: 删除
         edit_assignment: 编辑
@@ -12202,7 +12202,7 @@ zh:
         view_rubric_evaluation: 查看评分标准评估
       points_out_of: "%{points}，满分 %{possible} 分"
       student_mute_notification: 教师正在进行评分
-      submitted_and_graded_count: "%{submitted_count} 个已提交，%{graded_count} 个已评分"
+      submitted_and_graded_count: "%{submitted_count} 个已提交，%{graded_count} 个已计分"
       submitted_count: "%{submitted_count} 个已提交"
       tiles: 
         sort_or_move: 排序作业或移动到其它小组
@@ -12340,7 +12340,7 @@ zh:
       buttons: 
         install_video_plugin: 安装视频插件
       dont_have_a_webcam: 没有网络摄像机?
-      you_need_a_webcam: "要创建视频或音频记录，您的计算机需要启用网络摄像机。如果您的计算机上没有网络摄像机，通过首先安装 Google Video Chat 插件，您仍然可以记录仅音频消息。"
+      you_need_a_webcam: "要创建视频或音频录制，您的计算机需要启用网络摄像机。如果您的计算机上没有网络摄像机，通过首先安装 Google Video Chat 插件，您仍然可以录制仅音频消息。"
     grading_standard: 
       buttons: 
         done: 完成
@@ -12530,7 +12530,7 @@ zh:
         grading_rubric: 使用此评分标准进行作业评分
         title: 标题
         total_points: 总得分
-        totallying_rubric: 隐藏评估结果的总分
+        totallying_rubric: 隐藏测验结果的总分
       links: 
         add_criterion: 添加标准
         delete: 删除评分标准说明
@@ -12544,7 +12544,7 @@ zh:
         rubric_in_use: 
           one: "请记住，已使用此评分标准评估了 1 个学生。若更改将会影响对他/她的评价。 请记住，已使用此评分标准评估了 %{count} 个学生。若更改将会影响对他们的评价。"
           other: "请记住，已使用此评分标准评估了 1 个学生。若更改将会影响对他/她的评价。 请记住，已使用此评分标准评估了 %{count} 个学生。若更改将会影响对他们的评价。"
-        rubric_in_use2: 您已使用此评分标准评估学生。任何重大更改都可能会影响其评估结果。
+        rubric_in_use2: 您已使用此评分标准测验学生。任何重大更改都可能会影响其测验结果。
       out_of: "%{points}*，满分 %{total} 分*"
       rubric: 评分标准说明
       rubric_title: 标题
@@ -12593,11 +12593,11 @@ zh:
       points: "%{points} 分"
     rubric_summary: 
       buttons: 
-        edit_assessment: 编辑评估
+        edit_assessment: 编辑测验
       defaults: 
         title: 标题
       headers: 
-        assessment: 评估
+        assessment: 测验
         criteria: 标准
       labels: 
         total_points: 总得分
@@ -12659,8 +12659,8 @@ zh:
       wiki_page_notice: 选择您要与此*单元*关联的维基页面，或通过选择"新页面"添加一个新页面。
     sequence_footer: 
       full_course_sequence: 查看完整课程序列
-      next: 下一个
-      previous: 上一个
+      next: 下一页
+      previous: 上一页
     submission_comment: 
       assignment: 作业
       grading_alt: 评分
@@ -12905,10 +12905,10 @@ zh:
   subject_reply_to: "回复: %{subject}"
   submission: 
     atom_no_author: 无作者
-    attached_files_comment: 查看附加的文件。
+    attached_files_comment: 查看附件文件。
     media_comment: 这是一个媒体评论。
     state: 
-      graded: 已评分
+      graded: 已计分
       submitted: 已提交
       unsubmitted: 未提交
   submission_comment: 
@@ -12931,7 +12931,7 @@ zh:
     post_comment: 发表评论
     submitted: 已提交
     this_was_submitted_multiple_times_choose_a_submission_to_view: "已提交多次，选择要查看哪个提交:"
-    view_rubric_assessment_in_the_speedgrader: 在快速评分器中查看评分标准评估
+    view_rubric_assessment_in_the_speedgrader: 在快速评分器中查看评分标准测验
   submissions: 
     assignment_submit_success: 作业已成功提交。
     assignment_submitted: 作业已提交。
@@ -12963,17 +12963,17 @@ zh:
       labels: 
         add_a_comment: 添加评论
         grade: 评分
-        show_assessment_by: 显示评估依据
+        show_assessment_by: 显示测验依据
       late_submission: （延迟）
       links: 
         resubmit: 重新提交作业
         submit: 提交作业
       media_comment: 媒体评论
       media_comment_link: 这是一个媒体评论，*单击此处查看*。
-      only_see_your_own_comments_muted: 您可能无法立即查看所有评论，原因是作业当前正在评分
+      only_see_your_own_comments_muted: 您可能无法立即查看所有评论，原因是作业当前正在计分
       only_see_your_own_comments_peer: 作为同伴审阅学生，您只能查看您写的评论。
       options: 
-        new_assessment: "[新评估]"
+        new_assessment: "[新测验]"
       out_of_points: "满分 %{points_possible} 分"
       peer_review: 同伴审阅
       peer_review_not_done: "**此同伴审阅尚未完成。**要使其被视为已完成，您需要至少留下一个评论。"
@@ -12995,7 +12995,7 @@ zh:
       group_discussion_submission_description: |-
           此作业的提交文件在该小组的作业讨论中发布。下面是 %{user} 的讨论帖
           ，或者您可以*查看完整的小组讨论*。
-      media_comment_link: 此提交是一个媒体记录。*单击此处查看。*
+      media_comment_link: 此提交是一个媒体录音。*单击此处查看。*
       no_files: 没有此提交上传的文件
       no_preview_available: 无可用预览
       no_submission: 无提交
@@ -13024,8 +13024,8 @@ zh:
       community_support_forums: 社区支持论坛
       contact_support: 联系支持
       contact_support_sub_text: 针对时间敏感的问题获得帮助。
-      curriculum_assessment_errata: 课程/评估勘误
-      curriculum_assessment_errata_description: 查看已经报告的评估和课程错误。搜索“勘误”。
+      curriculum_assessment_errata: 课程/测验勘误
+      curriculum_assessment_errata_description: 查看已经报告的测验和课程错误。搜索“勘误”。
       networking_academy_description: "查看 Cisco 对最常见问题的答案。"
       networking_academy_faqs: "Networking Academy 常见问题解答"
     select: 
@@ -13565,7 +13565,7 @@ zh:
         last_journal_entry: 上一教师日志条目
         student_name: 学生
         teacher_activity: "%{teacher} 的教师活动报告"
-        ungraded: 未评分的作业
+        ungraded: 未计分的作业
       last_time: 
         one: "1 天前"
         other: "%{count} 天前"
