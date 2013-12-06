@@ -40,7 +40,7 @@ class AssessmentRequest < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :rubric_assessment_submission_reminder
-    p.to { self.user }
+    p.to { self.assessor }
     p.whenever { |record|
       record.assigned? && @send_reminder
     }
