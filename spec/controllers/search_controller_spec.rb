@@ -53,6 +53,19 @@ describe SearchController do
       response.body.should include('billy')
     end
 
+    it "should allow filtering out non-messageable courses" do
+      course_with_student_logged_in(:active_all => true)
+      @course.update_attribute(:name, "course1")
+      @course2 = course(:active_all => 1)
+      @course2.enroll_student(@user).accept
+      @course2.update_attribute(:name, "course2")
+      term = @course2.root_account.enrollment_terms.create! :name => "Fall", :end_at => 1.day.ago
+      @course2.update_attributes! :enrollment_term => term
+      get 'recipients', {search: 'course', :messageable_only => true}
+      response.body.should include('course1')
+      response.body.should_not include('course2')
+    end
+
     context "with admin_context" do
       it "should return nothing if the user doesn't have rights" do
         user_session(user)
@@ -91,6 +104,42 @@ describe SearchController do
         }
         response.body.should include(@teacher.name)
         response.body.should include(@student.name)
+      end
+    end
+
+    context "with section privilege limitations" do
+      before do
+        course_with_teacher_logged_in(:active_all => true)
+        @section = @course.course_sections.create!(:name => 'Section1')
+        @section2 = @course.course_sections.create!(:name => 'Section2')
+        @enrollment.update_attribute(:course_section, @section)
+        @enrollment.update_attribute(:limit_privileges_to_course_section, true)
+        @student1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
+        @section.enroll_user(@student1, 'StudentEnrollment', 'active')
+        @student2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
+        @section2.enroll_user(@student2, 'StudentEnrollment', 'active')
+      end
+
+      it "should exclude non-messageable contexts" do
+        get 'recipients', {
+          :context => "course_#{@course.id}",
+          :synthetic_contexts => true
+        }
+        response.body.should include('"name":"Course Sections"')
+        get 'recipients', {
+          :context => "course_#{@course.id}_sections",
+          :synthetic_contexts => true
+        }
+        response.body.should include('Section1')
+        response.body.should_not include('Section2')
+      end
+
+      it "should exclude non-messageable users" do
+        get 'recipients', {
+          :context => "course_#{@course.id}_students"
+        }
+        response.body.should include('Student1')
+        response.body.should_not include('Student2')
       end
     end
   end

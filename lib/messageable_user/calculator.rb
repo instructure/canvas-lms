@@ -416,14 +416,10 @@ class MessageableUser
           :include_concluded_students => false,
           :course_workflow_state => course.workflow_state))
         scope =
-          if options[:admin_context]
-            scope.where(full_visibility_clause([course]))
-          else
-            case course_visibility(course)
-            when :full then scope.where(full_visibility_clause([course]))
-            when :sections then scope.where(section_visibility_clause([course]))
-            when :restricted then scope.where(restricted_visibility_clause([course]))
-            end
+          case course_visibility(course)
+          when :full then scope.where(full_visibility_clause([course]))
+          when :sections then scope.where(section_visibility_clause([course]))
+          when :restricted then scope.where(restricted_visibility_clause([course]))
           end
         scope = scope.where(observer_restriction_clause) if student_courses.present?
         scope = scope.where('enrollments.type' => enrollment_types) if enrollment_types

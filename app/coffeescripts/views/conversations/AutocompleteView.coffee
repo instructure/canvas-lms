@@ -42,15 +42,17 @@ define [
     # Internal: Currently selected results.
     tokens: []
 
-    # Internal: A cache of per-course permissions.
+    # Internal: A cache of per-context permissions.
     permissions: {}
+
+    # Internal: A cache of URL results.
+    cache: {}
 
     # Internal: Construct the search URL for the given term.
     url: (term) ->
       baseURL = '/api/v1/search/recipients?'
-      params = { search: term, per_page: 20, 'permissions[]': 'send_messages_all' }
+      params = { search: term, per_page: 20, 'permissions[]': 'send_messages_all', synthetic_contexts: true }
       params.context = @currentContext.id if @currentContext
-      params.synthetic_contexts = true unless term
 
       baseURL + _.reduce(params, (queryString, v, k) ->
         queryString.push("#{k}=#{v}")
@@ -249,6 +251,7 @@ define [
     #
     # Returns nothing.
     _onSearchResultLoad: =>
+      @cache[@currentUrl] = @resultCollection.toJSON()
       _.extend(@permissions, @_getPermissions())
       @_addEveryoneResult(@resultCollection) unless @excludeAll or !@_canSendToAll()
       shouldDrawResults = @resultCollection.length
@@ -264,7 +267,8 @@ define [
     # Returns a boolean.
     _canSendToAll: ->
       return false unless @currentContext
-      @permissions[@_currentCourseOrGroup().id]
+      key = @currentContext.id.replace(/_(students|teachers)$/, '')
+      @permissions[key]
 
     # Internal: Return permissions hashes from the current results.
     #
@@ -276,14 +280,6 @@ define [
         map[key] = !!result.get('permissions').send_messages_all
         map
       , {}
-
-    # Internal: Return the current course context.
-    #
-    # Returns a context object.
-    _currentCourseOrGroup: ->
-      return @currentContext if @currentContext.id.match(/^(course|group)_\d+$/)
-      for context in @parentContexts
-        return context if context.id.match(/^(course|group)_\d+$/)
 
     # Internal: Add, if appropriate, an "All in %{context}" result to the
     #           search results.
@@ -335,10 +331,17 @@ define [
     __fetchResults: (fetchIfEmpty = false) ->
       return unless @$input.val() or fetchIfEmpty
       @currentRequest?.abort()
-      @currentRequest = @resultCollection.fetch
-        url: @url(@$input.val())
-        success: @_onSearchResultLoad
-      @toggleResultList(true)
+      url = @url(@$input.val())
+      @currentUrl = url
+      if @cache[url]
+        @resultCollection.reset(@cache[url])
+        @toggleResultList(true)
+        @_onSearchResultLoad()
+      else
+        @currentRequest = @resultCollection.fetch
+          url: @url(@$input.val())
+          success: @_onSearchResultLoad
+        @toggleResultList(true)
 
     # Internal: Delete the last token.
     #
@@ -370,7 +373,7 @@ define [
         @currentContext = @parentContexts.pop()
         @__fetchResults(true)
       else if @selectedModel.get('isContext')
-        @parentContexts.push(@currentContext)
+        @parentContexts.push(@currentContext) if @currentContext
         @$input.val('')
         @currentContext =
           id: @selectedModel.id
@@ -430,7 +433,7 @@ define [
         @currentContext = @parentContexts.pop()
         @__fetchResults(true)
       else if $target.hasClass('context')
-        @parentContexts.push(@currentContext)
+        @parentContexts.push(@currentContext) if @currentContext
         @$input.val('')
         @currentContext =
           id: $target.data('id')

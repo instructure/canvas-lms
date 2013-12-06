@@ -4,6 +4,7 @@ define [
   'Backbone'
   'compiled/views/conversations/SearchableSubmenuView'
   'jst/conversations/courseOptions'
+  'jquery.instructure_date_and_time'
   'use!vendor/bootstrap/bootstrap-dropdown'
   'use!vendor/bootstrap-select/bootstrap-select'
 ], (I18n, _, {View, Collection}, SearchableSubmenuView, template) ->
@@ -27,9 +28,13 @@ define [
       super()
       more = []
       concluded = []
+      now = $.fudgeDateForProfileTimezone(new Date)
       @options.courses.all.each((course) =>
         if @options.courses.favorites.get(course.id) then return
-        collection = if course.get('workflow_state') == 'completed' then concluded else more
+        is_complete = course.get('workflow_state') == 'completed' ||
+          (course.get('end_at') && new Date(course.get('end_at')) < now) ||
+          (course.get('term').end_at && new Date(course.get('term').end_at) < now)
+        collection = if is_complete then concluded else more
         collection.push(course.toJSON())
       )
       data =
