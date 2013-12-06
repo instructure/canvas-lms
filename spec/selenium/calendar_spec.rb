@@ -52,8 +52,11 @@ describe "calendar" do
       end
 
       wait_for_ajaximations
-      f("##{Time.now.strftime("day_%Y_%m_%d")} .calendar_day").should_not include_text(event_title)
-      CalendarEvent.find_by_title(event_title).workflow_state.should == 'deleted'
+
+      keep_trying_until do
+        f("##{Time.now.strftime("day_%Y_%m_%d")} .calendar_day").should_not include_text(event_title)
+        CalendarEvent.find_by_title(event_title).workflow_state.should == 'deleted'
+      end
     end
 
     it "should view the full details of an event" do
