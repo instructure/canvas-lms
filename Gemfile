@@ -105,10 +105,10 @@ gem 'tzinfo', '0.3.35'
 gem 'useragent', '0.4.16'
 gem 'uuid', '2.3.2'
 if CANVAS_RAILS2
-  gem 'folio-pagination-legacy', :github => "instructure/folio", :ref => "5f7d23fbab78ee263d9a7799e6fd2eaf4868b862"
+  gem 'folio-pagination-legacy', '0.0.2'
   gem 'will_paginate', '2.3.15', :require => false
 else
-  gem 'folio-pagination', :github => "instructure/folio", :ref => "b530e4b56a69c234fb0dd48fd69fa801cb109257"
+  gem 'folio-pagination', '0.0.2'
   gem 'will_paginate', '3.0.4', :require => false
 end
 gem 'xml-simple', '1.0.12', :require => 'xmlsimple'
