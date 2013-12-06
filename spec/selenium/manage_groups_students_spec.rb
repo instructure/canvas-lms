@@ -6,6 +6,8 @@ describe "manage groups students" do
 
   before (:each) do
     course_with_teacher_logged_in
+    Account.default.settings[:enable_manage_groups2] = false
+    Account.default.save!
   end
 
   context "misc" do
