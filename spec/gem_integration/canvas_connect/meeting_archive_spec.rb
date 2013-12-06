@@ -27,19 +27,25 @@ describe CanvasConnect::MeetingArchive do
             <status code="ok"/>
             <scos>
               <sco sco-id="38230" source-sco-id="" folder-id="38223" type="content" icon="archive" display-seq="0" duration="0" is-folder="0">
-              <name>Test Recording</name>
-              <url-path>/p3u8rj0rvuj/</url-path>
-              <date-begin>2013-09-05T12:13:03.387-06:00</date-begin>
-              <date-end>2013-09-05T12:13:28.970-06:00</date-end>
-              <date-created>2013-09-05T12:13:03.387-06:00</date-created>
-              <date-modified>2013-09-05T12:13:29.727-06:00</date-modified>
-            </sco>
-          </scos>
-        </results>')
+                <name>Test Recording</name>
+                <url-path>/p3u8rj0rvuj/</url-path>
+                <date-begin>2013-09-05T12:13:03.387-06:00</date-begin>
+                <date-end>2013-09-05T12:13:28.970-06:00</date-end>
+                <date-created>2013-09-05T12:13:03.387-06:00</date-created>
+                <date-modified>2013-09-05T12:13:29.727-06:00</date-modified>
+              </sco>
+              <sco>
+              </sco>
+            </scos>
+          </results>')
     end
   end
 
   subject { CanvasConnect::MeetingArchive.retrieve(38230, MockClient.new).first }
+
+  it "returns the correct number" do
+    CanvasConnect::MeetingArchive.retrieve(38230, MockClient.new).count.should == 2
+  end
 
   it "returns the name" do
     subject.name.should == 'Test Recording'
