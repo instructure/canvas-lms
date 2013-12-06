@@ -1073,9 +1073,11 @@ describe "context_modules" do
 
       @module1 = @course.context_modules.create!(:name => "module1")
       @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 42)
+      @assignment.publish
       @assignment_tag = @module1.add_item(:id => @assignment.id, :type => 'assignment')
       @external_url_tag = @module1.add_item(:type => 'external_url', :url => 'http://example.com/lolcats',
                                             :title => 'pls view', :indent => 1)
+      @external_url_tag.publish
       @module1.completion_requirements = {
           @assignment_tag.id => { :type => 'must_submit' },
           @external_url_tag.id => { :type => 'must_view' } }
