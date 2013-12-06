@@ -128,6 +128,9 @@ define [
       # handle a student locking their own discussion (they should lose permissions).
       if @model.get('locked') and !_.intersection(ENV.current_user_roles, ['teacher', 'ta', 'admin']).length
         base.permissions.delete = false
+      base.display_last_reply_at = I18n.l "#date.formats.medium", base.last_reply_at
+      if base.assignment?.due_at?
+        base.assignment.display_due_at = I18n.l "#date.formats.medium", base.assignment.due_at
       base
 
     # Internal: Add event handlers to the model.

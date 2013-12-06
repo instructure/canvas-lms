@@ -15,13 +15,13 @@
 
     <div class="discussion-title">
       <a href="{{html_url}}" class="title">{{title}}</a>
-      <small>Last post {{tDateToString last_reply_at "medium"}}</small>
+      <small>{{#t "last_post_date"}}Last post {{display_last_reply_at}}{{/t}}</small>
     </div>
 
     <div class="discussion-due-date">
       {{#if assignment}}
         {{#if assignment.due_at}}
-          <span class="discussion-date-type">{{#t "due"}}Due{{/t}}</span> {{tDateToString assignment.due_at "medium"}}
+          {{#t "due_at"}}<span class="discussion-date-type">Due</span> {{assignment.display_due_at}}{{/t}}
         {{else}}
           {{#t "no_due_date"}}No Due Date{{/t}}
         {{/if}}
