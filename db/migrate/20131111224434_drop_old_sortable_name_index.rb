@@ -5,7 +5,7 @@ class DropOldSortableNameIndex < ActiveRecord::Migration
 
   def self.up
     remove_index "users", :name => "index_users_on_sortable_name_old"
-    remove_index "users", :name => "index_attachments_on_folder_id_and_file_state_and_display_name_old"
+    remove_index "users", :name => "index_attachments_on_folder_id_and_file_state_and_display_name2"
   end
 
   def self.down
@@ -14,7 +14,7 @@ class DropOldSortableNameIndex < ActiveRecord::Migration
       ON USERS (collkey(sortable_name, 'root', true, 2, true));
 
       CREATE INDEX CONCURRENTLY
-      index_attachments_on_folder_id_and_file_state_and_display_name_old
+      index_attachments_on_folder_id_and_file_state_and_display_name2
       ON attachments (folder_id, file_state,
                       collkey(display_name, 'root', true, 2, true))
       WHERE folder_id IS NOT NULL")
