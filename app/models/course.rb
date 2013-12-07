@@ -106,6 +106,7 @@ class Course < ActiveRecord::Base
   has_many :student_view_students, :through => :student_view_enrollments, :source => :user
   has_many :student_view_enrollments, :class_name => 'StudentViewEnrollment', :conditions => ['enrollments.workflow_state != ?', 'deleted'], :include => :user
   has_many :participating_typical_users, :through => :typical_current_enrollments, :source => :user
+  has_many :custom_gradebook_columns, :dependent => :destroy, :order => 'custom_gradebook_columns.position, custom_gradebook_columns.title'
 
   include LearningOutcomeContext
   include RubricContext
