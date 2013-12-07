@@ -1510,7 +1510,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def readable_submission_types
-    return nil unless self.expects_submission?
+    return nil unless expects_submission? || expects_external_submission?
     res = (self.submission_types || "").split(",").map{|s| readable_submission_type(s) }.compact
     res.to_sentence(:or)
   end
@@ -1529,6 +1529,10 @@ class Assignment < ActiveRecord::Base
       t 'submission_types.a_discussion_post', "a discussion post"
     when 'media_recording'
       t 'submission_types.a_media_recording', "a media recording"
+    when 'on_paper'
+      t 'submission_types.on_paper', "on paper"
+    when 'external_tool'
+      t 'submission_types.external_tool', "an external tool"
     else
       nil
     end

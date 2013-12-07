@@ -2522,6 +2522,13 @@ describe Assignment do
       @a.reload.should be_unpublished
     end
   end
+
+  describe '#readable_submission_type' do
+    it "should work for on paper assignments" do
+      assignment_model(:submission_types => 'on_paper')
+      @assignment.readable_submission_types.should == 'on paper'
+    end
+  end
 end
 
 def setup_assignment_with_group
