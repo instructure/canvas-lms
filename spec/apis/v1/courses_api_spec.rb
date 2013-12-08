@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -517,6 +517,16 @@ describe CoursesController, :type => :integration do
         json.should == { 'delete' => true }
         @course.reload
         @course.workflow_state.should eql 'deleted'
+      end
+
+      it "should not clear sis_id for course" do
+        @course.sis_source_id = 'sis_course_3'
+        @course.save
+        json = api_call(:delete, @path, @params, { :event => 'delete' })
+        json.should == { 'delete' => true }
+        @course.reload
+        @course.workflow_state.should == 'deleted'
+        @course.sis_source_id.should == 'sis_course_3'
       end
 
       it "should conclude when completing a course" do
