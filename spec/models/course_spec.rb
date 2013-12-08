@@ -125,6 +125,13 @@ describe Course do
     @course.should eql(@course2)
   end
 
+  it "should throw error for long sis id" do
+    #should throw rails validation error instead of db invalid statement error
+    @course = Course.create_unique
+    @course.sis_source_id = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
+    (lambda {@course.save!}).should raise_error("Validation failed: Sis source is too long (maximum is 255 characters)")
+  end
+
   it "should always have a uuid, if it was created" do
     @course.save!
     @course.uuid.should_not be_nil
