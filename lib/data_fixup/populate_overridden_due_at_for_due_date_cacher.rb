@@ -18,14 +18,18 @@
 
 module DataFixup::PopulateOverriddenDueAtForDueDateCacher
   def self.run
-    overrides = AssignmentOverride.active
-                                  .overriding_due_at
-                                  .select("DISTINCT assignment_id")
-                                  .order(:assignment_id)
+    Shackles.activate(:slave) do
+      overrides = AssignmentOverride.active
+                                    .overriding_due_at
+                                    .select("DISTINCT assignment_id")
+                                    .order(:assignment_id)
 
-    overrides.find_in_batches do |batch|
-      assignment_ids = batch.map(&:assignment_id)
-      DueDateCacher.recompute_batch(assignment_ids)
+      overrides.find_in_batches do |batch|
+        assignment_ids = batch.map(&:assignment_id)
+        Shackles.activate(:master) do
+          DueDateCacher.recompute_batch(assignment_ids)
+        end
+      end
     end
   end
 end
