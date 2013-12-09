@@ -559,7 +559,7 @@ class WikiPage < ActiveRecord::Base
     unless self.new_record?
       self.with_versioning(false) do |p|
         context ||= p.context
-        p.connection.execute("UPDATE wiki_pages SET view_count=COALESCE(view_count, 0) + 1 WHERE id=#{p.id}")
+        WikiPage.where(id: p).update_all("view_count=COALESCE(view_count, 0) + 1")
         p.context_module_action(user, context, :read)
       end
     end
