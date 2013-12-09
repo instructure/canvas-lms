@@ -58,6 +58,7 @@ define [
     constructor: (@options) ->
       @chunk_start = 0
       @students = {}
+      @studentViewStudents = {}
       @rows = []
       @assignmentsToHide = userSettings.contextGet('hidden_columns') || []
       @sectionToShow = userSettings.contextGet 'grading_show_only_section'
@@ -144,7 +145,7 @@ define [
         student.enrollment = studentEnrollment
 
         if student.enrollment.role == "StudentViewEnrollment"
-          @studentViewStudent ||= htmlEscape(student)
+          @studentViewStudents[student.id] ||= htmlEscape(student)
         else
           @students[student.id] ||= htmlEscape(student)
         @student(student.id).sections ||= []
@@ -299,9 +300,12 @@ define [
           window.I18n.locale,
           {sensitivity: 'accent', numeric: true})
 
-      if @studentViewStudent && @rowFilter(@studentViewStudent)
-        @rows.push(@studentViewStudent)
-        @calculateStudentGrade(@studentViewStudent)
+      for id, student of @studentViewStudents
+        student.row = -1
+        if @rowFilter(student)
+          @rows.push(student)
+          @calculateStudentGrade(student)
+
 
       student.row = i for student, i in @rows
       @grid.invalidate()
@@ -330,22 +334,19 @@ define [
       @grid.render()
 
     student: (id) =>
-      @students[id] ||
-        (@studentViewStudent &&
-         id == @studentViewStudent.id &&
-         @studentViewStudent)
+      @students[id] || @studentViewStudents[id]
 
     # @students contains all *real* students (e.g., not the student view student)
     # when you do need to operate on *all* students (like for rendering the grid), use
     # function
     withAllStudents: (f) =>
-      if @studentViewStudent
-        @students[@studentViewStudent.id] = @studentViewStudent
+      for id, s of @studentViewStudents
+        @students[id] = s
 
       f(@students)
 
-      if @studentViewStudent
-        delete @students[@studentViewStudent.id]
+      for id, s of @studentViewStudents
+        delete @students[id]
 
     updateSubmission: (submission) =>
       student = @student(submission.user_id)
@@ -968,12 +969,11 @@ define [
       # this is a faux blur event for SlickGrid.
       $('body').on('click', @onGridBlur)
       respectorOfPersonsSort = (sortFn) =>
-        if @studentViewStudent
+        if _(@studentViewStudents).size()
           (a, b) =>
-            studentViewStudentId = @studentViewStudent.id.toString()
-            if a.id == studentViewStudentId
+            if @studentViewStudents[a.id]
               return 1
-            else if b.id == studentViewStudentId
+            else if @studentViewStudents[b.id]
               return -1
             else
               sortFn(a, b)

@@ -472,16 +472,20 @@ describe "gradebook2" do
     end
 
     it "should include student view student for grading" do
-      @fake_student = @course.student_view_student
-      @fake_submission = @first_assignment.submit_homework(@fake_student, :body => 'fake student submission')
+      @fake_student1 = @course.student_view_student
+      @fake_student1.update_attribute :workflow_state, "deleted"
+      @fake_student2 = @course.student_view_student
+      @fake_student1.update_attribute :workflow_state, "registered"
+      @fake_submission = @first_assignment.submit_homework(@fake_student1, :body => 'fake student submission')
 
       get "/courses/#{@course.id}/gradebook2"
 
-      ff('.student-name').last.text.should match @fake_student.name
+      fakes = [@fake_student1.name, @fake_student2.name]
+      ff('.student-name').last(2).map(&:text).should == fakes
 
-      # test student should always be last
+      # test students should always be last
       f('.slick-header-column').click
-      ff('.student-name').last.text.should match @fake_student.name
+      ff('.student-name').last(2).map(&:text).should == fakes
     end
 
     it "should not include non-graded group assignment in group total" do
