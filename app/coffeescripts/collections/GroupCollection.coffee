@@ -26,22 +26,11 @@ define [
     model: Group
     comparator: (group) -> group.get('name').toLowerCase()
 
-    initialize: ->
-      super
-      @on 'remove', @removed
+    @optionProperty 'category'
+    @optionProperty 'loadAll'
 
-    removed: (group) ->
-      # update/reset the unassigned users collection (if it's around)
-      unassignedUsers = @category?._unassignedUsers
-      return unless unassignedUsers
-      users = group.users()
-      return unless group.usersCount()
-
-      if users.loadedAll
-        models = users.models.slice()
-        user.set 'groupId', null for user in models
+    url: ->
+      if @category?
+        @url = "/api/v1/group_categories/#{@category.id}/groups?per_page=50"
       else
-        unassignedUsers.increment group.usersCount()
-
-      if not users.loadedAll or not unassignedUsers.loadedAll
-        unassignedUsers.fetch()
+        @url = super

@@ -2,21 +2,21 @@ define [
   'jquery'
   'compiled/models/GroupCategory'
   'compiled/models/Group'
-  'compiled/views/groups/manage/GroupEditView'
-], ($, GroupCategory, Group, GroupEditView) ->
+  'compiled/views/groups/manage/GroupCreateView'
+], ($, GroupCategory, Group, GroupCreateView) ->
 
   view = null
   groupCategory = null
   group = null
 
-  module 'GroupEditView',
+  module 'GroupCreateView',
     setup: ->
       group = new Group
         id: 42
         name: 'Foo Group'
         members_count: 7
       groupCategory = new GroupCategory()
-      view = new GroupEditView({groupCategory: groupCategory, editing: false, model: group})
+      view = new GroupCreateView({groupCategory: groupCategory, model: group})
       view.render()
       view.$el.appendTo($(document.body))
 

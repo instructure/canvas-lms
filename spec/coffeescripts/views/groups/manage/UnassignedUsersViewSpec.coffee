@@ -3,11 +3,12 @@ define [
   'compiled/views/groups/manage/UnassignedUsersView'
   'compiled/views/groups/manage/AssignToGroupMenu'
   'compiled/collections/GroupCollection'
-  'compiled/collections/GroupUserCollection'
+  'compiled/collections/UnassignedGroupUserCollection'
   'compiled/models/Group'
+  'compiled/models/GroupCategory'
   'helpers/fakeENV'
   'helpers/jquery.simulate'
-], ($, UnassignedUsersView, AssignToGroupMenu, GroupCollection, GroupUserCollection, Group) ->
+], ($, UnassignedUsersView, AssignToGroupMenu, GroupCollection, UnassignedGroupUserCollection, Group, GroupCategory) ->
 
   clock = null
   view = null
@@ -22,10 +23,10 @@ define [
         new Group name: "a group"
         new Group name: "another group"
       ]
-      users = new GroupUserCollection [
+      users = new UnassignedGroupUserCollection [
         {id: 1, name: "bob", sortable_name: "bob"}
         {id: 2, name: "joe", sortable_name: "joe"}
-      ]
+      ], {category: new GroupCategory}
       menu = new AssignToGroupMenu
         collection: groups
       view = new UnassignedUsersView

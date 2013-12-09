@@ -8,7 +8,6 @@ define [
 
   class GroupDetailView extends View
 
-    @optionProperty 'group'
     @optionProperty 'users'
 
     template: template
@@ -23,10 +22,10 @@ define [
       '.edit-group': '$editGroupLink'
 
     attach: ->
-      @group.on 'change', @render
+      @model.on 'change', @render
 
     summary: ->
-      count = @group.usersCount()
+      count = @model.usersCount()
       if ENV.group_user_type is 'student'
         I18n.t "student_count", "student", count: count
       else
@@ -34,8 +33,7 @@ define [
 
     editGroup: (e) =>
       e.preventDefault()
-      @editView ?= new GroupEditView
-        model: @group
+      @editView ?= new GroupEditView({@model, groupCategory: @model.collection.category})
       @editView.setTrigger @$editGroupLink
       @editView.open()
 
@@ -44,11 +42,11 @@ define [
       unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this group?')
         @$groupActions.focus()
         return
-      @group.destroy
+      @model.destroy
         success: -> $.flashMessage I18n.t('flash.removed', 'Group successfully removed.')
-        failure: -> $.flashError I18n.t('flash.removeError', 'Unable to remove the group. Please try again later.')
+        error: -> $.flashError I18n.t('flash.removeError', 'Unable to remove the group. Please try again later.')
 
     toJSON: ->
-      json = @group.toJSON()
+      json = @model.toJSON()
       json.summary = @summary()
       json

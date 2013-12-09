@@ -65,5 +65,5 @@ define [
     # ui.draggable: the user being dragged
     _onDrop: (e, ui) =>
       user = ui.draggable.data('model')
-      setTimeout ->
-        user.moveTo null
+      setTimeout =>
+        @category.reassignUser(user, null)
