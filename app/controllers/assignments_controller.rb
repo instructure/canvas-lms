@@ -133,7 +133,9 @@ class AssignmentsController < ApplicationController
 
       begin
         @google_docs_token = google_docs_retrieve_access_token
-      rescue RuntimeError => ex; end
+      rescue NoTokenError
+        #do nothing
+      end
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
       log_asset_access(@assignment, "assignments", @assignment.assignment_group)
@@ -159,8 +161,11 @@ class AssignmentsController < ApplicationController
     assignment ||= @context.assignments.find(params[:id])
     # prevent masquerading users from accessing google docs
     if assignment.allow_google_docs_submission? && @real_current_user.blank?
+      docs = {}
       begin
         docs = google_docs_list_with_extension_filter(assignment.allowed_extensions)
+      rescue NoTokenError
+        #do nothing
       rescue => e
         ErrorReport.log_exception(:oauth, e)
         raise e

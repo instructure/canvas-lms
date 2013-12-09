@@ -718,7 +718,10 @@ class UsersController < ApplicationController
   end
 
   def delete_user_service
-    @current_user.user_services.find(params[:id]).destroy
+    deleted = @current_user.user_services.find(params[:id]).destroy
+    if deleted.service == "google_docs"
+      Rails.cache.delete(['google_docs_tokens', @current_user].cache_key)
+    end
     render :json => {:deleted => true}
   end
 
