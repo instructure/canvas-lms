@@ -85,5 +85,5 @@ define [
     _onDrop: (e, ui) =>
       user = ui.draggable.data('model')
       newGroupId = $(e.currentTarget).data('id')
-      setTimeout ->
-        user.moveTo newGroupId
+      setTimeout =>
+        @model.collection.category.reassignUser(user, newGroupId)

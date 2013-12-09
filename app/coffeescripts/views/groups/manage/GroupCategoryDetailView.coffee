@@ -4,11 +4,11 @@ define [
   'Backbone'
   'compiled/views/MessageStudentsDialog',
   'compiled/views/groups/manage/RandomlyAssignMembersView'
-  'compiled/views/groups/manage/GroupEditView'
+  'compiled/views/groups/manage/GroupCreateView'
   'compiled/views/groups/manage/GroupCategoryEditView'
   'compiled/models/Group'
   'jst/groups/manage/groupCategoryDetail'
-], (I18n, _, {View}, MessageStudentsDialog, RandomlyAssignMembersView, GroupEditView, GroupCategoryEditView, Group, template) ->
+], (I18n, _, {View}, MessageStudentsDialog, RandomlyAssignMembersView, GroupCreateView, GroupCategoryEditView, Group, template) ->
 
   class GroupCategoryDetailView extends View
 
@@ -60,12 +60,11 @@ define [
 
     addGroup: (e) ->
       e.preventDefault()
-      @createView ?= new GroupEditView
+      @createView ?= new GroupCreateView
         groupCategory: @model
-        editing: false
         trigger: @$addGroupButton
-      newGroup = new Group(group_category_id: @model.id)
-      newGroup.on 'sync', _.once =>
+      newGroup = new Group({group_category_id: @model.id}, {newAndEmpty: true})
+      newGroup.once 'sync', =>
         @collection.add(newGroup)
       @createView.model = newGroup
       @createView.open()

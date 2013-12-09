@@ -25,7 +25,7 @@ define [
       e.preventDefault()
       e.stopPropagation()
       newGroupId = $(e.currentTarget).data('group-id')
-      @model.moveTo newGroupId
+      @collection.category.reassignUser(@model, newGroupId)
       @hide()
 
     toJSON: ->

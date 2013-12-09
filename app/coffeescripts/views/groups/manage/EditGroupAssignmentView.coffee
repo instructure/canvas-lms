@@ -40,13 +40,13 @@ define [
       e.preventDefault()
       e.stopPropagation()
       targetGroup = @$('option:selected').val()
-      if targetGroup then @model.moveTo targetGroup
+      if targetGroup then @group.collection.category.reassignUser(@model, targetGroup)
       @close()
       # focus override to the user's new group heading if they're moved
       $("[data-id='#{targetGroup}'] .group-heading")?.focus()
 
     getFilteredGroups: ->
-      new GroupCollection @collection.filter (g) => g isnt @group
+      new GroupCollection @group.collection.filter (g) => g isnt @group
 
     toJSON: ->
       groupCollection = @getFilteredGroups()

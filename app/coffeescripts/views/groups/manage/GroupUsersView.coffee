@@ -1,16 +1,15 @@
 define [
   'underscore'
+  'compiled/collections/GroupCollection'
   'compiled/views/PaginatedCollectionView'
   'compiled/views/groups/manage/GroupUserView'
   'compiled/views/groups/manage/EditGroupAssignmentView'
   'jst/groups/manage/groupUsers'
   'jqueryui/draggable'
   'jqueryui/droppable'
-], (_, PaginatedCollectionView, GroupUserView, EditGroupAssignmentView, template) ->
+], (_, GroupCollection, PaginatedCollectionView, GroupUserView, EditGroupAssignmentView, template) ->
 
   class GroupUsersView extends PaginatedCollectionView
-
-    @optionProperty 'group'
 
     defaults: _.extend {},
       PaginatedCollectionView::defaults,
@@ -39,7 +38,7 @@ define [
     template: template
 
     attach: ->
-      @group.on 'change:members_count', @render
+      @model.on 'change:members_count', @render
       @collection.on 'moved', @highlightUser
 
     highlightUser: (user) ->
@@ -60,18 +59,17 @@ define [
       e.stopPropagation()
       # configure the dialog view with our group data
       @editGroupAssignmentView ?= new EditGroupAssignmentView
-        collection: @group.collection
-        group: @group
+        group: @model
       # configure the dialog view with user specific model data
       $target = $(e.currentTarget)
-      model = @collection.get($target.data('user-id'))
-      @editGroupAssignmentView.model = model
-      selector = "[data-focus-returns-to='group-#{@group.id}-user-#{model.id}-actions']"
+      user = @collection.get($target.data('user-id'))
+      @editGroupAssignmentView.model = user
+      selector = "[data-focus-returns-to='group-#{@model.id}-user-#{user.id}-actions']"
       @editGroupAssignmentView.setTrigger selector
       @editGroupAssignmentView.open()
 
     toJSON: ->
-      count: @group.usersCount()
+      count: @model.usersCount()
 
     renderItem: (model) =>
       super

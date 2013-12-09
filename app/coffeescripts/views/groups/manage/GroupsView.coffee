@@ -29,11 +29,11 @@ define [
       super
       @detachScroll() if @collection.loadAll
 
-    createItemView: (model) ->
-      groupUsersView = new GroupUsersView {group: model, collection: model.users()}
-      groupDetailView = new GroupDetailView {group: model, users: model.users()}
-      groupView = new GroupView {model, groupUsersView, groupDetailView, addUnassignedMenu: @options.addUnassignedMenu}
-      model.itemView = groupView
+    createItemView: (group) ->
+      groupUsersView = new GroupUsersView {model: group, collection: group.users()}
+      groupDetailView = new GroupDetailView {model: group, users: group.users()}
+      groupView = new GroupView {model: group, groupUsersView, groupDetailView, addUnassignedMenu: @options.addUnassignedMenu}
+      group.itemView = groupView
 
     updateDetails: ->
       for model in @collection.models

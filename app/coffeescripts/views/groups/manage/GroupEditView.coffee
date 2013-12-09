@@ -13,8 +13,6 @@ define [
     defaults:
       width: 550
       title: I18n.t "edit_group", "Edit Group"
-      # Default to edit mode. Set to "false" for adding mode.
-      editing: true
 
     template: template
 
@@ -29,10 +27,6 @@ define [
     translations:
       too_long: I18n.t "name_too_long", "Name is too long"
 
-    initialize: (options) ->
-      super
-      @options.title = I18n.t "add_group", "Add Group" if !@options.editing
-
     openAgain: ->
       super
       # reset the form contents
@@ -41,9 +35,5 @@ define [
       @$('input:first').focus()
 
     toJSON: ->
-      json = super
-      if groupCategory = @model.collection?.category
-        json.role = groupCategory.get('role')
-      else
-        json.role = @groupCategory.get('role')
-      json
+      _.extend super,
+        role: @groupCategory.get('role')

@@ -1,12 +1,14 @@
 define [
   'Backbone'
   'compiled/models/GroupUser'
+  'compiled/models/GroupCategory'
   'jquery'
-], (Backbone, GroupUser, $) ->
+], (Backbone, GroupUser, GroupCategory, $) ->
 
   module 'GroupUser',
     setup: ->
-      @groupUser = new GroupUser()
+      @groupUser = new GroupUser
+        category: new GroupCategory
       @leaveGroupStub = sinon.stub @groupUser, 'leaveGroup'
       @joinGroupStub = sinon.stub @groupUser, 'joinGroup'
     teardown: ->

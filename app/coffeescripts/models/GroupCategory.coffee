@@ -3,9 +3,10 @@ define [
   'Backbone'
   'compiled/collections/GroupCollection'
   'compiled/collections/GroupUserCollection'
+  'compiled/collections/UnassignedGroupUserCollection'
   'compiled/models/progressable'
   'compiled/backbone-ext/DefaultUrlMixin'
-], (_, Backbone, GroupCollection, GroupUserCollection, progressable, DefaultUrlMixin) ->
+], (_, Backbone, GroupCollection, GroupUserCollection, UnassignedGroupUserCollection, progressable, DefaultUrlMixin) ->
 
   class GroupCategory extends Backbone.Model
 
@@ -13,17 +14,43 @@ define [
     @mixin progressable
 
     groups: ->
-      @_groups = new GroupCollection(null)
-      @_groups.category = this
-      @_groups.url = "/api/v1/group_categories/#{@id}/groups?per_page=50"
-      @_groups.loadAll = true
+      @_groups = new GroupCollection null,
+        category: this
+        loadAll: true
       if @get('groups_count') is 0
         @_groups.loadedAll = true
       else
         @_groups.fetch()
       @_groups.on 'fetched:last', => @set('groups_count', @_groups.length)
+      @_groups.on 'remove', @groupRemoved
       @groups = -> @_groups
       @_groups
+
+    groupRemoved: (group) =>
+      # update/reset the unassigned users collection (if it's around)
+      return unless @_unassignedUsers or group.usersCount()
+
+      users = group.users()
+      if users.loadedAll
+        models = users.models.slice()
+        user.set 'groupId', null for user in models
+      else
+        @_unassignedUsers.increment group.usersCount()
+
+      if not users.loadedAll or not @_unassignedUsers.loadedAll
+        @_unassignedUsers.fetch()
+
+    reassignUser: (user, newGroupId) ->
+      oldGroupId = user.get('groupId')
+      return if oldGroupId is newGroupId
+
+      # if user is in _unassignedUsers and we allow multiple memberships,
+      # don't actually move the user, move a copy instead
+      if not oldGroupId? and @get('allows_multiple_memberships')
+        user = user.clone()
+        user.once 'change:groupId', => @groupUsersFor(newGroupId).addUser user
+
+      user.save groupId: newGroupId
 
     groupsCount: ->
       if @_groups?.loadedAll
@@ -38,11 +65,8 @@ define [
         @_unassignedUsers
 
     unassignedUsers: ->
-      @_unassignedUsers = new GroupUserCollection(null, groupId: null)
-      @_unassignedUsers.category = this
-      url = "/api/v1/group_categories/#{@id}/users?per_page=50"
-      url += "&unassigned=true" unless @get('allows_multiple_memberships')
-      @_unassignedUsers.url = url
+      @_unassignedUsers = new UnassignedGroupUserCollection null,
+        category: this
       @_unassignedUsers.on 'fetched:last', => @set('unassigned_users_count', @_unassignedUsers.length)
       @unassignedUsers = -> @_unassignedUsers
       @_unassignedUsers
