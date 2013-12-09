@@ -194,26 +194,29 @@ describe "grades" do
       f('.score_value').text.should == ''
     end
 
-    it "should display teacher comment and assignment statistics" do
-      # get up to a point where statistics can be shown
+    it "should display assignment statistics" do
       5.times do
         s = student_in_course(:active_all => true).user
         @first_assignment.grade_student(s, :grade => 4)
       end
 
       get "/courses/#{@course.id}/grades"
+      f('.toggle_score_details_link').click
+
+      score_row = f('#grades_summary tr.grade_details')
+
+      score_row.should include_text('Mean:')
+      score_row.should include_text('High: 4')
+      score_row.should include_text('Low: 3')
+    end
+
+    it "should display teacher comments" do
+      get "/courses/#{@course.id}/grades"
 
       #check comment
       f('.toggle_comments_link').click
-      comment_row = f('#grades_summary tr.comments')
+      comment_row = f('#grades_summary tr.comments_thread')
       comment_row.should include_text('submission comment')
-
-      #check tooltip text statistics
-      driver.execute_script('$("#grades_summary tr.comments .tooltip_text").css("visibility", "visible");')
-      statistics_text = comment_row.find_element(:css, '.tooltip_text').text
-      statistics_text.include?("Mean:").should be_true
-      statistics_text.include?('High: 4').should be_true
-      statistics_text.include?('Low: 3').should be_true
     end
 
     it "should not show assignment statistics on assignments with less than 5 submissions" do

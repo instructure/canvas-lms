@@ -104,17 +104,31 @@ define([
         $(this).attr('title', '');
       }
     });
-    $(".toggle_comments_link").click(function(event) {
+
+    // manages toggling and screenreader focus for comments, scoring, and rubric details
+    $(".toggle_comments_link, .toggle_score_details_link, .toggle_rubric_assessments_link").click(function(event) {
       event.preventDefault();
       var $row = $( '#' + $(this).attr('aria-controls') );
+      var originEl = this;
 
+      $(originEl).attr("aria-expanded", $row.css('display') == 'none');
       $row.toggle();
-      $row.attr('aria-expanded', $row.is(':visible'));
+
+      if ($row.css('display') != 'none') {
+        $row.find(".screenreader-toggle").focus();
+      }
     });
-    $(".toggle_rubric_assessments_link").click(function(event) {
+
+    $(".screenreader-toggle").click(function(event) {
       event.preventDefault();
-      $(this).parents("tr.student_assignment").next("tr.comments").next("tr.rubric_assessments").toggle();
+      ariaControl = $(this).data('aria');
+      originEl = $("a[aria-controls='" + ariaControl + "']");
+
+      $(originEl).attr('aria-expanded', false);
+      $(originEl).focus();
+      $(this).closest('.rubric_assessments, .comments').hide();
     });
+
     $('.student_assignment.editable .assignment_score').click(function(event) {
       if ($('#grades_summary.editable').length === 0 || $(this).find('#grade_entry').length > 0 || $(event.target).closest('.revert_score_link').length > 0) {
         return;
@@ -261,8 +275,8 @@ define([
     }).triggerHandler('change');
     $("#show_all_details_link").click(function(event) {
       event.preventDefault();
-      $("tr.comments").show();
-      $("tr.rubric_assessments").show();
+      $("tr.rubric_assessments").toggle();
+      $("tr.comments").toggle();
     });
     $.scrollSidebar();
     $("#observer_user_url").change(function() {
