@@ -49,5 +49,18 @@ describe "/shared/_select_content_dialog" do
     options = page.css("#wiki_pages_select .module_item_select option")
     (%w(unpublished_page published_page) - options.map(&:text)).should be_empty
   end
+
+  it "should not offer to create assigments or quizzes if the user doesn't have permission" do
+    @account = Account.default
+    course_with_ta account: @account, active_all: true
+    existing_quiz = @course.quizzes.create! title: 'existing quiz'
+    @account.role_overrides.create! enrollment_type: 'TaEnrollment', permission: 'manage_assignments', enabled: false
+    view_context
+    render partial: 'shared/select_content_dialog'
+    page = Nokogiri(response.body)
+    page.css(%Q{#quizs_select .module_item_select option[value="#{existing_quiz.id}"]}).should_not be_empty
+    page.css(%Q{#quizs_select .module_item_select option[value="new"]}).should be_empty
+    page.css(%Q{#assignments_select .module_item_select option[value="new"]}).should be_empty
+  end
 end
 

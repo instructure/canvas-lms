@@ -42,7 +42,7 @@ class AssignmentsController < ApplicationController
       @context.require_assignment_group
 
       permissions = @context.grants_rights?(@current_user, :manage_assignments, :manage_grades)
-      permissions[:manage] = permissions[:manage_assignments] || permissions[:manage_grades]
+      permissions[:manage] = permissions[:manage_assignments]
       js_env({
         :URLS => {
           :new_assignment_url => new_polymorphic_url([@context, :assignment]),

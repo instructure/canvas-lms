@@ -792,7 +792,7 @@ class Assignment < ActiveRecord::Base
     can :submit and can :attach_submission_comment_files
 
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }
-    can :update and can :grade and can :delete and can :create and can :read and can :attach_submission_comment_files
+    can :grade and can :read and can :attach_submission_comment_files
 
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }
     can :update and can :delete and can :create and can :read and can :attach_submission_comment_files

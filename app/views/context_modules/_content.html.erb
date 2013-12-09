@@ -1,6 +1,6 @@
 <% course_home ||= false %>
 <% js_env :COLLAPSED_MODULES => @collapsed_modules %>
-<% js_env :CAN_MANAGE_MODULES  => can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content) %>
+<% js_env :CAN_MANAGE_MODULES => can_do(@context, @current_user, :manage_content) %>
 <% js_env :COURSE_ID => @context.id %>
 <% js_env :NO_MODULE_PROGRESSIONS => @context.large_roster %>
 <% js_bundle :context_modules %>
@@ -55,7 +55,7 @@ TEXT
 ]) %>
 <div id="context_modules_sortable_container">
   <div id="context_modules" tabindex="0" aria-label="<%= t('headings.course_modules', %{Course Modules}) %>" class="<%= 'editable' if can_do(@context, @current_user, :manage_content) %>">
-    <% editable = can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content) %>
+    <% editable = can_do(@context, @current_user, :manage_content) %>
     <% cache([@context.cache_key, editable, 'all_context_modules', collection_cache_key(@modules)].join('/')) do %>
       <% ContextModule.send(:preload_associations, @modules, :content_tags => :content) %>
       <% @modules.each do |m| %>

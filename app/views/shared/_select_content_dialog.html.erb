@@ -190,7 +190,9 @@
           <% @context.quizzes.active.limit(400).each do |quiz| %>
             <option value="<%= quiz.id %>"><%= quiz.title %></option>
           <% end %>
-          <option value="new"><%= t :new_quiz_option, "[ New Quiz ]" %></option>
+          <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
+            <option value="new"><%= t :new_quiz_option, "[ New Quiz ]" %></option>
+          <% end %>
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
@@ -234,7 +236,9 @@
             <% end %>
             </optgroup>
           <% end %>
-          <option value="new"><%= t :new_assignment_option, "[ New Assignment ]" %></option>
+          <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
+            <option value="new"><%= t :new_assignment_option, "[ New Assignment ]" %></option>
+          <% end %>
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
