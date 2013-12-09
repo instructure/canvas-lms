@@ -82,7 +82,7 @@ define [
 
   test "#initialize sets possible points count with 0 points", ->
     @quiz = new Quiz(points_possible: 0)
-    equal @quiz.get('possible_points_label'), '0 pts'
+    equal @quiz.get('possible_points_label'), ''
 
   test "#initialize sets possible points count with 1 points", ->
     @quiz = new Quiz(points_possible: 1)
