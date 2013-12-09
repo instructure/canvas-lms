@@ -1,4 +1,3 @@
-<% cache(['submission_sidebar_render', @current_user_submission, Time.zone.utc_offset].cache_key) do %>
 <div class="details">
   <h3 style="margin: 0;"><%= t 'titles.submission', "Submission" %></h3>
   <% if @assignment.expects_submission? %>
@@ -47,9 +46,19 @@
       <ul class="unstyled_list" style="margin: 5px 10px 10px;">
         <li style="<%= hidden unless @current_user_submission.assigned_assessments.empty? %>"><%= t 'labels.none_assigned', "None Assigned" %></li>
         <% @current_user_submission.assigned_assessments.each do |assessment| %>
-          <li><a <%= assessment.completed? ? "class='pass' title='#{t 'tooltips.finished', "finished"}'" : "class='warning' title='#{t 'tooltips.incomplete', "incomplete"}'" %> href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, assessment.asset.user_id) %> ">
-            <%= assessment.asset_user_name %>
-          </a></li>
+          <li>
+          	<% if assessment.completed? %>
+          		<% link_attributes = "class='pass' title='#{t 'tooltips.finished', 'finished'}'" %>
+          		<% image = image_tag("icons/tick.png", :alt => "v") %>
+          	<% else %>
+          		<% link_attributes = "class='warning' title='#{t 'tooltips.incomplete', 'incomplete'}'" %>
+          		<% image = image_tag("icons/cross.png", :alt => "x") %>
+          	<% end %>
+          	<a <%= link_attributes %> href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, assessment.asset.user_id) %> ">
+            	<%= image %>
+            	<%= assessment.asset_user_name %>
+          	</a>
+          </li>
         <% end %>
       </ul>
     <% end %>
@@ -74,7 +83,6 @@
     </div>
   </div>
 </div>
-<% end %>
 <% if @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) %>
   <ul class="page-action-list">
     <li>
