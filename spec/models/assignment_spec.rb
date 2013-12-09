@@ -2131,29 +2131,59 @@ describe Assignment do
       attachment_json['view_inline_ping_url'].should match %r{/users/#{@student.id}/files/#{attachment.id}/inline_view\z}
     end
 
-    it "should not be in group mode for non-group assignments" do
-      setup_assignment_with_homework
-      json = @assignment.speed_grader_json(@teacher)
-      json["GROUP_GRADING_MODE"].should_not be_true
-    end
-
-    it 'returns "groups" instead of students for group assignments' do
-      course_with_teacher active_all: true
-      gc = @course.group_categories.create! name: "Assignment Groups"
-      groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
-      students = 4.times.map { student_in_course(active_all: true); @student }
-      students.each_with_index { |s, i| groups[i % groups.length].add_user(s) }
-      assignment = @course.assignments.create!(
-        group_category_id: gc.id,
-        grade_group_students_individually: false,
-        submission_types: %w(text_entry)
-      )
-      json = assignment.speed_grader_json(@teacher)
-      groups.each do |group|
-        j = json["context"]["students"].find { |g| g["name"] == group.name }
-        group.users.map(&:id).should include j["id"]
+    context "group assignments" do
+      before do
+        course_with_teacher active_all: true
+        gc = @course.group_categories.create! name: "Assignment Groups"
+        @groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
+        students = 4.times.map { student_in_course(active_all: true); @student }
+        students.each_with_index { |s, i| @groups[i % @groups.size].add_user(s) }
+        @assignment = @course.assignments.create!(
+          group_category_id: gc.id,
+          grade_group_students_individually: false,
+          submission_types: %w(text_entry)
+        )
       end
-      json["GROUP_GRADING_MODE"].should be_true
+
+      it "should not be in group mode for non-group assignments" do
+        setup_assignment_with_homework
+        json = @assignment.speed_grader_json(@teacher)
+        json["GROUP_GRADING_MODE"].should_not be_true
+      end
+
+      it 'returns "groups" instead of students' do
+        json = @assignment.speed_grader_json(@teacher)
+        @groups.each do |group|
+          j = json["context"]["students"].find { |g| g["name"] == group.name }
+          group.users.map(&:id).should include j["id"]
+        end
+        json["GROUP_GRADING_MODE"].should be_true
+      end
+
+      it 'chooses the student with turnitin data to represent' do
+        turnitin_submissions = @groups.map do |group|
+          rep = group.users.shuffle.first
+          turnitin_submission, *others = @assignment.grade_student(rep, grade: 10)
+          turnitin_submission.update_attribute :turnitin_data, {blah: 1}
+          turnitin_submission
+        end
+
+        @assignment.update_attribute :turnitin_enabled, true
+        json = @assignment.speed_grader_json(@teacher)
+
+        json["submissions"].map { |s|
+          s["id"]
+        }.sort.should == turnitin_submissions.map(&:id).sort
+      end
+
+      it 'prefers people with submissions' do
+        g1, _ = @groups
+        @assignment.grade_student(g1.users.first, score: 10)
+        g1rep = g1.users.shuffle.first
+        s = @assignment.submission_for_student(g1rep)
+        s.update_attribute :submission_type, 'online_upload'
+        @assignment.representatives(@teacher).should include g1rep
+      end
     end
 
     it "works for quizzes without quiz_submissions" do

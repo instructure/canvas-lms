@@ -99,6 +99,8 @@ define([
             async: false        // NOTE: Not asynchronous. Otherwise Firefox will cancel the request as navigating away from the page.
             // NOTE: No callbacks. Don't care about response. Just making effort to save the quiz
           });
+          // since this is sync, a callback never fires to reset this
+          quizSubmission.currentlyBackingUp = false;
         }
         else {
           (function(submissionData) {

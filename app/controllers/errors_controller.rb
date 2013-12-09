@@ -38,7 +38,11 @@ class ErrorsController < ApplicationController
       @reports = @reports.where(:category => params[:category])
     end
 
-    @reports = @reports.paginate(:per_page => PER_PAGE, :page => params[:page], :order => 'id DESC', :without_count => true)
+    # temporary handling of having total_entries nil, since the will_paginate
+    # view helper doesn't handle it yet (it's making its way through gerrit)
+    @reports = @reports.order('id DESC').paginate(:per_page => PER_PAGE, :page => params[:page] + 1, :total_entries => nil)
+    @reports.total_entries = @reports.offset + @reports.size
+    @reports.pop if @reports.size > params[:page]
   end
 
   def show

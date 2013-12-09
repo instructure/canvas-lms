@@ -100,3 +100,5 @@ define [
       if currentlyByDate != showByDate
         @cache.set(key, showByDate)
         @trigger 'changed:showBy'
+
+      @assignmentGroups.trigger 'cancelSearch'

@@ -429,43 +429,35 @@ class QuizSubmission < ActiveRecord::Base
 
   protected :update_assignment_submission
 
-  # Returned in order oldest to newest
-  def submitted_versions
-    found_attempts = {}
-    res = []
-
-    found_attempts[self.attempt] = true if self.completed?
-    self.versions.sort_by(&:created_at).each do |version|
-      model = version.model
-      if !found_attempts[model.attempt]
-        model.readonly!
-        if model.completed?
-          res << model
-          found_attempts[model.attempt] = true
-        end
-      end
-    end
-    res << self if self.completed?
-    res
+  def submitted_attempts
+    attempts.version_models
   end
 
-  def latest_submitted_version
+  def latest_submitted_attempt
     if completed?
       self
     else
-      submitted_versions.last
+      submitted_attempts.last
     end
   end
 
-  def attempt_versions
-    versions = self.versions.order("number desc").each_with_object({}) do |ver, hash|
-      hash[ver.model.attempt] ||= ver
-    end
-    versions.sort.map {|attempt, version| version }
+  def attempts
+    QuizSubmissionHistory.new(self)
   end
 
-  def submitted_attempts
-    attempt_versions.map {|ver| ver.model }
+  def questions_regraded_since_last_attempt
+    return unless last_attempt = attempts.last
+
+    version = attempts.last.versions.first
+    quiz.questions_regraded_since(version.created_at)
+  end
+
+  def has_regrade?
+    score_before_regrade.present?
+  end
+
+  def score_affected_by_regrade?
+    score_before_regrade != kept_score
   end
 
   def attempts_left
@@ -728,6 +720,9 @@ class QuizSubmission < ActiveRecord::Base
   #
   # @throw ArgumentError If the submission does not have an end_at timestamp set.
   def grade_when_overdue
+    # disable grading in background until we figure out potential race condition issues
+    return
+
     unless self.end_at.present?
       raise ArgumentError,
         'QuizSubmission is not applicable for overdue enforced grading!'
@@ -744,6 +739,9 @@ class QuizSubmission < ActiveRecord::Base
 
   # don't use this directly, see #grade_when_overdue
   def grade_if_untaken
+    # disable grading in background until we figure out potential race condition issues
+    return
+
     # We can skip the needs_grading? test because we know that the submission
     # is overdue since the job will be processed after submission.end_at ...
     # so we simply test its workflow state.

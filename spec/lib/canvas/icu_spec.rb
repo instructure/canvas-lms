@@ -70,6 +70,10 @@ describe Canvas::ICU do
         results[0..1].sort.should == ["a", "A"].sort
         results[2..3].sort.should == ["b", "B"].sort
       end
+
+      it "should not ignore punctuation" do
+        Canvas::ICU.collate(["ab, cd", "a, bcd"]).should == ["a, bcd", "ab, cd"]
+      end
     end
   end
 

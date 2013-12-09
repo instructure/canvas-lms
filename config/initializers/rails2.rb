@@ -164,6 +164,24 @@ ActiveRecord::Base.class_eval do
       send(callback, *methods)
     end
     alias_method_chain :before_validation, :rails3_compatibility
+
+    def quote_bound_value_with_relations(value)
+      if ActiveRecord::Associations::AssociationCollection === value
+        with_exclusive_scope do
+          value = value.scoped
+        end
+      end
+      if ActiveRecord::NamedScope::Scope === value
+        with_exclusive_scope do
+          unless value.scope(:find, :select)
+            value = value.select("#{value.quoted_table_name}.#{value.primary_key}")
+          end
+          return value.to_sql
+        end
+      end
+      quote_bound_value_without_relations(value)
+    end
+    alias_method_chain :quote_bound_value, :relations
   end
 
   # support 0 arguments
@@ -197,8 +215,15 @@ ActiveRecord::NamedScope::Scope.class_eval do
   # Instead, just take the easy way out and let with_scope do all
   # the hard work
   def unspin
-    with_exclusive_scope { self.scope(:find) }
+    scope = proxy_scope
+    scope = scope.proxy_scope while (ActiveRecord::NamedScope::Scope === scope)
+    scope.send(:with_exclusive_scope) { self.scope(:find) }
  end
+
+  def is_a?(klass)
+    # no, it's not a freaking Hash, and don't instantiate a gazillion things to find that out
+    super || klass >= Array
+  end
 end
 
 ActiveRecord::Associations::AssociationCollection.class_eval do
@@ -259,6 +284,39 @@ Rails.module_eval do
   def self.env=(environment)
     @_env = ActiveSupport::StringInquirer.new(environment)
   end
+end
+
+class ActiveRecord::Base
+  class DynamicFinderTypeError < Exception; end
+  class << self
+    def construct_attributes_from_arguments_with_type_cast(attribute_names, arguments)
+      log_dynamic_finder_nil_arguments(attribute_names) if current_scoped_methods.nil? && arguments.flatten.compact.empty?
+      construct_attributes_from_arguments_without_type_cast(attribute_names, arguments)
+    end
+    alias_method_chain :construct_attributes_from_arguments, :type_cast
+
+    def log_dynamic_finder_nil_arguments(attribute_names)
+      error = "No non-nil arguments passed to #{self.base_class}.find_by_#{attribute_names.join('_and_')}"
+      raise DynamicFinderTypeError, error if Canvas.dynamic_finder_nil_arguments_error == :raise
+      logger.debug "WARNING: " + error
+    end
+  end
+end
+
+# patch adapted from https://rails.lighthouseapp.com/projects/8994/tickets/4887-has_many-through-belongs_to-association-bug
+# this isn't getting fixed in rails 2.3.x, and we need it. otherwise the following sorts of things
+# will generate sql errors:
+#  Course.new.default_wiki_wiki_pages.scoped(:limit => 10)
+#  Group.new.active_default_wiki_wiki_pages.size
+ActiveRecord::Associations::HasManyThroughAssociation.class_eval do
+  def construct_scope_with_has_many_fix
+    if target_reflection_has_associated_record?
+      construct_scope_without_has_many_fix
+    else
+      {:find => {:conditions => "1 != 1"}}
+    end
+  end
+  alias_method_chain :construct_scope, :has_many_fix
 end
 
 end

@@ -1,6 +1,6 @@
 class AddForeignKeys8 < ActiveRecord::Migration
   tag :postdeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     add_foreign_key_if_not_exists :account_notifications, :users, delay_validation: true

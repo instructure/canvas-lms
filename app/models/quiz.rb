@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -141,11 +141,16 @@ class Quiz < ActiveRecord::Base
   end
 
   def build_assignment
-    if self.available? && !self.assignment_id && self.graded? && @saved_by != :assignment && @saved_by != :clone
+    if (context.draft_state_enabled? || self.available?) &&
+        !self.assignment_id && self.graded? && @saved_by != :assignment &&
+        @saved_by != :clone
       assignment = self.assignment
       assignment ||= self.context.assignments.build(:title => self.title, :due_at => self.due_at, :submission_types => 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
       assignment.saved_by = :quiz
+      if context.draft_state_enabled? && !deleted?
+        assignment.workflow_state = self.published? ? 'published' : 'unpublished'
+      end
       assignment.save
       self.assignment_id = assignment.id
     end
@@ -206,7 +211,7 @@ class Quiz < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    # self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     res = self.save
     if self.for_assignment?
       self.assignment.destroy unless self.assignment.deleted?
@@ -583,9 +588,10 @@ class Quiz < ActiveRecord::Base
             end
           end
         else
+          questions = q[:questions].shuffle
           q[:pick_count].times do |i|
-            if q[:questions][i]
-              question = q[:questions][i]
+            if questions[i]
+              question = questions[i]
               question[:points_possible] = q[:question_points]
               user_questions << generate_submission_question(question)
             end
@@ -886,7 +892,7 @@ class Quiz < ActiveRecord::Base
   end
 
   def has_student_submissions?
-    self.quiz_submissions.any?{|s| !s.settings_only? && context.includes_student?(s.user) }
+    self.quiz_submissions.not_settings_only.where("user_id IS NOT NULL").exists?
   end
 
   # clear out all questions so that the quiz can be replaced. this is currently
@@ -1197,20 +1203,17 @@ class Quiz < ActiveRecord::Base
                 includes(:quiz_question_regrades => :quiz_question).first
   end
 
-  # this is needed because of the context #current_regrade is used in -
-  # the callbacks it's performed in can become confused by version number.The latest
-  # quiz's version may not point to the latest quiz regrade.
-  # #last_regrade_performed will always point to the last regrade, regardless of
-  # version number
-  def last_regrade_performed
-    QuizRegrade.where(quiz_id: id)
-               .includes(quiz_question_regrades: :quiz_question)
-               .limit(1)
-               .last
-  end
-
   def current_quiz_question_regrades
     current_regrade ? current_regrade.quiz_question_regrades : []
   end
 
+  def questions_regraded_since(created_at)
+    question_regrades = Set.new
+    quiz_regrades.where("created_at > ?", created_at)
+                 .includes(:quiz_question_regrades).each do |regrade|
+      ids = regrade.quiz_question_regrades.map {|qqr| qqr.quiz_question_id }
+      question_regrades.merge(ids)
+    end
+    question_regrades.count
+  end
 end

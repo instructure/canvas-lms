@@ -283,6 +283,18 @@ describe "Module Items API", :type => :integration do
                         {}, {:expected_status => 400})
       end
 
+      it "should require a non-deleted page_url" do
+        page = @course.wiki.wiki_pages.create(:title => 'Deleted Page')
+        page.workflow_state = 'deleted'
+        page.save!
+
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                        {:controller => "context_module_items_api", :action => "create", :format => "json",
+                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
+                        {:module_item => {:title => 'Deleted Page', :type => 'Page', :page_url => page.url}},
+                        {}, {:expected_status => 400})
+      end
+
       it "should create with new_tab for external tool items" do
         tool = @course.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
 
@@ -666,7 +678,7 @@ describe "Module Items API", :type => :integration do
         json['modules'].map {|mod| mod['id']}.sort.should == [@module1.id, @module2.id].sort
       end
 
-      it "should find find a wiki page by url" do
+      it "should find a (non-deleted) wiki page by url" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Page&asset_id=#{@wiki_page.url}",
                         :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
                         :course_id => @course.to_param, :asset_type => 'Page', :asset_id => @wiki_page.to_param)
@@ -675,6 +687,15 @@ describe "Module Items API", :type => :integration do
         json['items'][0]['current']['id'].should == @wiki_page_tag.id
         json['items'][0]['next']['id'].should == @attachment_tag.id
         json['modules'].map {|mod| mod['id']}.sort.should == [@module1.id, @module2.id].sort
+
+        @wiki_page.workflow_state = 'deleted'
+        @wiki_page.save!
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Page&asset_id=#{@wiki_page.url}",
+                        :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                        :course_id => @course.to_param, :asset_type => 'Page', :asset_id => @wiki_page.to_param)
+        json['items'].size.should eql 0
+        json['modules'].size.should eql 0
       end
 
       it "should skip a deleted module" do

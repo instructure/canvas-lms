@@ -187,16 +187,25 @@ module Api
     return find_params
   end
 
-  def self.per_page_for(controller)
-    [(controller.params[:per_page] || Setting.get('api_per_page', '10')).to_i, Setting.get('api_max_per_page', '50').to_i].min
+  def self.max_per_page
+    Setting.get('api_max_per_page', '50').to_i
+  end
+
+  def self.per_page_for(controller, options={})
+    per_page = controller.params[:per_page] || options[:default] || Setting.get('api_per_page', '10')
+    max = options[:max] || max_per_page
+    [[per_page.to_i, 1].max, max.to_i].min
   end
 
   # Add [link HTTP Headers](http://www.w3.org/Protocols/9707-link-header.html) for pagination
   # The collection needs to be a will_paginate collection (or act like one)
   # a new, paginated collection will be returned
   def self.paginate(collection, controller, base_url, pagination_args = {})
-    per_page = per_page_for(controller)
-    pagination_args.reverse_merge!({ :page => controller.params[:page], :per_page => per_page })
+    pagination_args.reverse_merge!(
+      page: controller.params[:page],
+      per_page: per_page_for(controller,
+        default: pagination_args.delete(:default_per_page),
+        max: pagination_args.delete(:max_per_page)))
     collection = collection.paginate(pagination_args)
     return unless collection.respond_to?(:next_page)
 
@@ -543,6 +552,17 @@ module Api
       return { 'data-api-endpoint' => self.send(helper, args), 'data-api-returntype' => return_type }
     end
     {}
+  end
+
+  def self.recursively_stringify_json_ids(value)
+    case value
+    when Hash
+      stringify_json_ids(value)
+      value.each_value { |v| recursively_stringify_json_ids(v) if v.is_a?(Hash) || v.is_a?(Array) }
+    when Array
+      value.each { |v| recursively_stringify_json_ids(v) if v.is_a?(Hash) || v.is_a?(Array) }
+    end
+    value
   end
 
   def self.stringify_json_ids(value)

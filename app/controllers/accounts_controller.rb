@@ -31,11 +31,16 @@ class AccountsController < ApplicationController
   # students and even teachers will get an empty list in response, only
   # account admins can view the accounts that they are in.
   def index
-    @accounts = @current_user.accounts rescue []
     respond_to do |format|
-      format.html
+      format.html do
+        @accounts = @current_user ? @current_user.all_accounts : []
+      end
       format.json do
-        @accounts = Api.paginate(@accounts, self, api_v1_accounts_url)
+        if @current_user
+          @accounts = Api.paginate(@current_user.all_paginatable_accounts, self, api_v1_accounts_url)
+        else
+          @accounts = []
+        end
         render :json => @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || []) }
       end
     end
@@ -90,7 +95,7 @@ class AccountsController < ApplicationController
     end
 
     @accounts = Api.paginate(@accounts, self, api_v1_sub_accounts_url,
-                             :without_count => recursive)
+                             :total_entries => recursive ? nil : @accounts.count)
 
     render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
   end
@@ -172,7 +177,7 @@ class AccountsController < ApplicationController
       @courses = @courses.for_term(term)
     end
 
-    @courses = Api.paginate(@courses, self, api_v1_account_courses_url, :order => :id)
+    @courses = Api.paginate(@courses.order(:id), self, api_v1_account_courses_url)
 
     render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }
   end

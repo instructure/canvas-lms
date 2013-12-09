@@ -204,6 +204,11 @@ Spec::Runner.configure do |config|
     Notification.after_create { Notification.reset_cache! }
   end
 
+  def delete_fixtures!
+    # noop for now, needed for plugin spec tweaks. implementation coming
+    # in g/24755
+  end
+
   config.before :each do
     I18n.locale = :en
     Time.zone = 'UTC'
@@ -281,6 +286,8 @@ Spec::Runner.configure do |config|
         account.save!
         @course.enable_draft = true
         @course.save!
+        # to reload the @course.root_account
+        @course.reload
       end
     end
     @course
@@ -794,8 +801,7 @@ Spec::Runner.configure do |config|
   end
 
   def default_uploaded_data
-    require 'action_controller'
-    require 'action_controller/test_process.rb'
+    require 'action_controller_test_process'
     ActionController::TestUploadedFile.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/scribd_docs/doc.doc'), 'application/msword', true)
   end
 
@@ -1169,6 +1175,14 @@ Spec::Runner.configure do |config|
   def n_students_in_course(n, opts={})
     opts.reverse_merge active_all: true
     n.times.map { student_in_course(opts); @student }
+  end
+
+  def consider_all_requests_local(value)
+    if CANVAS_RAILS2
+      ActionController::Base.consider_all_requests_local = value
+    else
+      Rails.application.config.consider_all_requests_local = value
+    end
   end
 end
 

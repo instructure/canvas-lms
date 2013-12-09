@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -558,6 +558,12 @@ describe User do
     @user.workflow_state.should == "deleted"
     @user.reload
     @user.workflow_state.should == "deleted"
+  end
+
+  it "should record deleted_at" do
+    user = User.create
+    user.destroy
+    user.deleted_at.should_not be_nil
   end
 
   describe "can_masquerade?" do
@@ -2129,7 +2135,7 @@ describe User do
     end
   end
 
-  describe "accounts" do
+  describe "all_accounts" do
     specs_require_sharding
 
     it "should include accounts from multiple shards" do
@@ -2140,7 +2146,7 @@ describe User do
         @account2.add_user(@user)
       end
 
-      @user.accounts.map(&:id).sort.should == [Account.site_admin, @account2].map(&:id).sort
+      @user.all_accounts.map(&:id).sort.should == [Account.site_admin, @account2].map(&:id).sort
     end
   end
 

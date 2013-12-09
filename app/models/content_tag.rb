@@ -66,6 +66,8 @@ class ContentTag < ActiveRecord::Base
     state :deleted
   end
 
+  alias_method :published?, :active?
+
   scope :active, where(:workflow_state => 'active')
   scope :not_deleted, where("content_tags.workflow_state<>'deleted'")
 

@@ -20,6 +20,7 @@ define [
       '#course-filter'   : '$courseFilter'
       '#admin-btn'       : '$adminBtn'
       '#mark-unread-btn' : '$markUnreadBtn'
+      '#forward-btn'     : '$forwardBtn'
       '#star-toggle-btn' : '$starToggleBtn'
       '#admin-menu'      : '$adminMenu'
       '#sending-message' : '$sendingMessage'
@@ -108,6 +109,7 @@ define [
         newModel.on('change:starred', @onStarStateChange, this)
 
     onReadStateChange: (msg) ->
+      @hideForwardBtn(!msg)
       @hideMarkUnreadBtn(!msg || msg.unread())
 
     onStarStateChange: (msg) ->
@@ -152,6 +154,12 @@ define [
     toggleAdminBtn:    (value) -> @_toggleBtn(@$adminBtn, value)
 
     hideMarkUnreadBtn: (hide) -> if hide then @$markUnreadBtn.parent().detach() else @$adminMenu.prepend(@$markUnreadBtn.parent())
+
+    hideForwardBtn:    (hide) -> if hide then @$forwardBtn.parent().detach() else @$adminMenu.prepend(@$forwardBtn.parent())
+
+    updateAdminMenu: (messages) ->
+      @hideMarkUnreadBtn(!messages.length)
+      @hideForwardBtn(messages.length > 1)
 
     focusCompose: ->
       @$composeBtn.focus()

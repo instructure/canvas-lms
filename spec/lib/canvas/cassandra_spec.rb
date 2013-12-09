@@ -20,9 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper.
 
 describe "Canvas::Redis::Cassandra" do
   let(:db) do
-    @cql_db = mock()
-    CassandraCQL::Database.stubs(:new).returns(@cql_db)
-    Canvas::Cassandra::Database.new("test", "test", [], {}, {})
+    Canvas::Cassandra::Database.allocate.tap do |db|
+      db.send(:instance_variable_set, :@db, mock())
+      db.stubs(:sanitize).returns("")
+    end
   end
 
   describe "#batch" do
@@ -30,7 +31,7 @@ describe "Canvas::Redis::Cassandra" do
       db.expects(:execute).never
       db.in_batch?.should == false
       db.batch do
-      db.in_batch?.should == true
+        db.in_batch?.should == true
       end
       db.in_batch?.should == false
     end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -84,7 +84,7 @@ class Folder < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.active_file_attachments.each{|a| a.destroy }
     self.active_sub_folders.each{|s| s.destroy }
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     self.save
   end
   

@@ -247,7 +247,6 @@ describe Attachment do
 
   context "submit_to_scribd!" do
     before do
-      ScribdAPI.stubs(:set_user).returns(true)
       ScribdAPI.stubs(:upload).returns(UUIDSingleton.instance.generate)
     end
 
@@ -303,14 +302,14 @@ describe Attachment do
     it "should bypass non-scridbable attachments" do
       attachment_model
       @attachment.should_not be_scribdable
-      ScribdAPI.expects(:set_user).never
+      Scribd::API.instance.expects(:user=).never
       ScribdAPI.expects(:upload).never
       @attachment.submit_to_scribd!.should be_true
       @attachment.state.should eql(:processed)
     end
 
     it "should not mess with attachments outside the pending_upload state" do
-      ScribdAPI.expects(:set_user).never
+      Scribd::API.instance.expects(:user=).never
       ScribdAPI.expects(:upload).never
       attachment_model(:workflow_state => 'processing')
       @attachment.submit_to_scribd!.should be_false
@@ -515,9 +514,10 @@ describe Attachment do
 
   context "conversion_status" do
     before(:each) do
-      ScribdAPI.stubs(:get_status).returns(:status_from_scribd)
-      ScribdAPI.stubs(:set_user).returns(true)
-      ScribdAPI.stubs(:upload).returns(Scribd::Document.new)
+      @document = Scribd::Document.new
+      @document.stubs(:conversion_status).returns(:status_from_scribd)
+      Scribd::API.instance.stubs(:user=).returns(true)
+      ScribdAPI.stubs(:upload).returns(@document)
       ScribdAPI.stubs(:enabled?).returns(true)
     end
 
@@ -527,9 +527,9 @@ describe Attachment do
     end
 
     it "should ask Scribd for the status" do
-      ScribdAPI.expects(:get_status).returns(:status_from_scribd)
       scribdable_attachment_model
       @doc_obj = Scribd::Document.new
+      @doc_obj.expects(:conversion_status).returns(:status_from_scribd)
       ScribdAPI.expects(:upload).returns(@doc_obj)
       @doc_obj.stubs(:thumbnail).returns("the url to the scribd doc thumbnail")
       @attachment.submit_to_scribd!
@@ -537,9 +537,9 @@ describe Attachment do
     end
 
     it "should not ask Scribd for the status" do
-      ScribdAPI.expects(:get_status).never
       scribdable_attachment_model
       @doc_obj = Scribd::Document.new
+      @doc_obj.expects(:conversion_status).never
       ScribdAPI.expects(:upload).returns(@doc_obj)
       @doc_obj.stubs(:thumbnail).returns("the url to the scribd doc thumbnail")
       @attachment.submit_to_scribd!
@@ -550,7 +550,7 @@ describe Attachment do
 
   context "download_url" do
     before do
-      ScribdAPI.stubs(:set_user).returns(true)
+      Scribd::API.instance.stubs(:user=).returns(true)
       @doc = mock('Scribd Document', :download_url => 'some url')
       Scribd::Document.stubs(:find).returns(@doc)
     end
@@ -1556,12 +1556,55 @@ describe Attachment do
       end
     end
   end
+
+  describe ".delete_stale_scribd_docs" do
+    before do
+      attachment_model
+      @attachment.scribd_doc = Scribd::Document.new
+      ScribdAPI.stubs(:enabled?).returns(true)
+    end
+
+    it "should delete old views ones" do
+      Scribd::Document.any_instance.expects(:destroy).returns(true).once
+      @attachment.update_attribute(:last_inline_view, 1.year.ago)
+      Attachment.delete_stale_scribd_docs
+      @attachment.reload
+      @attachment.scribd_doc.should be_nil
+      @attachment.workflow_state.should == 'deleted'
+    end
+
+    it "should delete old ones that were never viewed" do
+      Scribd::Document.any_instance.expects(:destroy).returns(true).once
+      @attachment.update_attribute(:created_at, 1.year.ago)
+      Attachment.delete_stale_scribd_docs
+      @attachment.reload
+      @attachment.scribd_doc.should be_nil
+      @attachment.workflow_state.should == 'deleted'
+    end
+
+    it "should not delete new ones that were never viewed" do
+      Scribd::Document.any_instance.expects(:destroy).never
+      @attachment.save!
+      Attachment.delete_stale_scribd_docs
+      @attachment.reload
+      @attachment.scribd_doc.should_not be_nil
+    end
+
+    it "should not delete recently viewed ones" do
+      Scribd::Document.any_instance.expects(:destroy).never
+      @attachment.update_attribute(:last_inline_view, 1.hour.ago)
+      Attachment.delete_stale_scribd_docs
+      @attachment.reload
+      @attachment.scribd_doc.should_not be_nil
+    end
+  end
 end
 
 def processing_model
-  ScribdAPI.stubs(:get_status).returns(:status_from_scribd)
-  ScribdAPI.stubs(:set_user).returns(true)
-  ScribdAPI.stubs(:upload).returns(Scribd::Document.new)
+  document = Scribd::Document.new
+  Scribd::API.instance.stubs(:user=).returns(true)
+  document.stubs(:conversion_status).returns(:status_from_scribd)
+  ScribdAPI.stubs(:upload).returns(document)
   scribdable_attachment_model
   @attachment.submit_to_scribd!
 end

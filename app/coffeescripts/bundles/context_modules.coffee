@@ -4,4 +4,4 @@ require [
 ], ($) ->
 
   if ENV.NO_MODULE_PROGRESSIONS
-    $('.module_progressions_link').remove();
+    $('.module_progressions_link').remove()

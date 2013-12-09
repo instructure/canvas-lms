@@ -35,11 +35,12 @@ TEXT
       <% })) %>
     </div>
     <div id="variables">
-      <% concat(t(:equation_variables, <<-TEXT,
-You can also define variables in you question text using brackets 
+
+      <% concat(t(:equation_variables2, <<-TEXT,
+You can also define variables in your question text using brackets 
 ("What is [a] + [b]?").  For every variable, you'll see an "Example Value"
-based on the variable settings.  This is so you can check your math and
-make sure your formulas work.
+based on the variable settings.  This allows you to check your math and
+make sure the formulas work.
 
 For example, if your question was "What is [a] + 5?" then you'd
 be asked to define the variable "a".  If the example value for "a" 

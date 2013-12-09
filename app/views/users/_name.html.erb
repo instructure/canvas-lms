@@ -69,7 +69,8 @@
   </fieldset>
 <div title="<%= t 'titles.edit_user_details', 'Edit User Details' %>" id="edit_student_dialog" style="display: none;">
   <p><%= t('update_instructions', "You can update some of this user's information, but they can change it back if they choose.") %></p>
-  <%= form_for @user, :url => user_url(@user), :html => {:id => "edit_student_form"} do |f| %>
+  <%= form_for @user, :url => user_url(@user),
+               :html => {:id => "edit_student_form", :class => 'form-dialog form-horizontal'} do |f| %>
     <table class="formtable">
       <tr>
         <td><%= f.blabel :name, :en => "Full Name" %></td>
@@ -87,13 +88,10 @@
           <td><%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, :default => ((@domain_root_account && @domain_root_account.default_time_zone) || "Mountain Time (US & Canada)") %></td>
         </tr>
       <% end %>
-      <tr>
-        <td colspan="2">
-          <div class="button-container">
-            <button class="btn cancel_button" type="button"><%= t('#buttons.cancel', 'Cancel') %></button>
-            <button class="btn btn-primary submit_button" type="submit"><%= t('buttons.update_details', 'Update Details') %></button>
-          </div>
-        </td>
     </table>
+    <div class='form-controls'>
+      <button class="btn cancel_button"><%= t('#buttons.cancel', 'Cancel') %></button>
+      <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.update_details', 'Update Details') %></button>
+    </div>
   <% end %>
 </div>

@@ -37,6 +37,10 @@ class AssignmentsController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
 
+      # It'd be nice to do this as an after_create, but it's not that simple
+      # because of course import/copy.
+      @context.require_assignment_group
+
       permissions = @context.grants_rights?(@current_user, :manage_assignments, :manage_grades)
       permissions[:manage] = permissions[:manage_assignments] || permissions[:manage_grades]
       js_env({

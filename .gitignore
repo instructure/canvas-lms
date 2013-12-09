@@ -12,6 +12,7 @@
 
 /.bundle/
 /.yardoc/
+/app/coffeescripts/ember/*/main.coffee
 /app/views/info/styleguide.html.erb
 /config/*.yml
 /config/build.js

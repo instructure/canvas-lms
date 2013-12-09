@@ -256,6 +256,16 @@ describe BasicLTI do
       hash = BasicLTI.generate(:url => 'http://www.yahoo.com', :tool => @tool, :user => user, :context => @course, :link_code => '123456', :return_url => 'http://www.google.com')
       hash['custom_canvas_user_login_id'].should == user.pseudonyms.first.unique_id
     end
+    
+    it "should include text if set" do
+      course_with_teacher(:active_all => true)
+      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'public', :name => 'tool')
+      @launch = BasicLTI::ToolLaunch.new(:url => "http://www.yahoo.com", :tool => @tool, :user => @user, :context => @course, :link_code => '123456', :return_url => 'http://www.yahoo.com')
+      html = "<p>this has <a href='#'>a link</a></p>"
+      @launch.has_selection_html!(html)
+      hash = @launch.generate
+      hash['text'].should == CGI::escape(html)
+    end
   end
 
   context "outcome launch" do

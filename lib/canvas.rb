@@ -99,9 +99,13 @@ module Canvas
   else
     # generic unix solution
     def self.sample_memory
-      # hmm this is actually resident set size, doesn't include swapped-to-disk
-      # memory.
-      `ps -o rss= -p #{Process.pid}`.to_i
+      if Rails.env.test?
+        0
+      else
+        # hmm this is actually resident set size, doesn't include swapped-to-disk
+        # memory.
+        `ps -o rss= -p #{Process.pid}`.to_i
+      end
     end
   end
 

@@ -19,7 +19,7 @@ if CANVAS_RAILS2
   gem 'authlogic', '2.1.3'
 else
   # just to be clear, Canvas is NOT READY to run under Rails 3 in production
-  gem 'rails', '3.2.14'
+  gem 'rails', '3.2.15'
   gem 'authlogic', '3.2.0'
 end
 
@@ -29,7 +29,7 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
 if CANVAS_RAILS2
   gem 'canvas_connect', '0.2'
-  gem 'canvas_webex', '0.4'
+  gem 'canvas_webex', '0.7'
 end
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
@@ -39,20 +39,24 @@ end
 gem 'erubis', '2.7.0'
 if CANVAS_RAILS2
   gem 'fake_arel', '1.0.0'
+  gem 'fake_rails3_routes', '1.0.4'
 end
-gem 'fake_rails3_routes', '1.0.4'
 gem 'ffi', '1.1.5'
 gem 'hairtrigger', '0.2.3'
 gem 'sass', '3.2.3'
 gem 'hashery', '1.3.0', :require => 'hashery/dictionary'
 gem 'highline', '1.6.1'
-gem 'i18n', '0.6.4'
+gem 'i18n', '0.6.8'
 if CANVAS_RAILS2
   gem 'i18nema', '0.0.7'
 end
 gem 'icalendar', '1.1.5'
 gem 'jammit', '0.6.6'
 gem 'json', '1.8.0'
+gem 'oj', '2.1.7'
+unless CANVAS_RAILS2
+  gem 'rails-patch-json-encode', '0.0.1'
+end
 # native xml parsing, diigo
 gem 'libxml-ruby', '2.6.0', :require => 'xml/libxml'
 gem 'macaddr', '1.0.0' # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
@@ -63,6 +67,7 @@ gem 'mime-types', '1.17.2', :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
 # with mini_magick 3.1
 gem 'mini_magick', '1.3.2'
+gem 'multi_json', '1.8.2'
 gem 'netaddr', '1.5.0'
 gem 'nokogiri', '1.5.6'
 # oauth gem, with rails3 fixes rolled in
@@ -89,7 +94,13 @@ gem 'shackles', '1.0.1'
 gem 'tzinfo', '0.3.35'
 gem 'useragent', '0.4.16'
 gem 'uuid', '2.3.2'
-gem 'will_paginate', '2.3.15'
+if CANVAS_RAILS2
+  gem 'folio-pagination-legacy', git: "https://github.com/instructure/folio.git", ref: "5f7d23fbab78ee263d9a7799e6fd2eaf4868b862"
+  gem 'will_paginate', '2.3.15', require: false
+else
+  gem 'folio-pagination', git: "https://github.com/instructure/folio.git", ref: "b530e4b56a69c234fb0dd48fd69fa801cb109257"
+  gem 'will_paginate', '3.0.4', require: false
+end
 gem 'xml-simple', '1.0.12', :require => 'xmlsimple'
 gem 'foreigner', '0.9.2'
 gem 'crocodoc-ruby', '0.0.1', :require => 'crocodoc'
@@ -170,7 +181,7 @@ group :redis do
 end
 
 group :cassandra do
-  gem 'cassandra-cql', '1.1.5'
+  gem 'cassandra-cql', '1.2.1', git: 'https://github.com/kreynolds/cassandra-cql',ref: 'd100be075b04153cf4116da7512892a1e8c0a7e4'
 end
 
 group :embedly do

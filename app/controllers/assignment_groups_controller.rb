@@ -118,17 +118,10 @@ class AssignmentGroupsController < ApplicationController
   def reorder
     if authorized_action(@context.assignment_groups.new, @current_user, :update)
       order = params[:order].split(',')
-      ids = []
-      order.each_index do |idx|
-        id = order[idx]
-        group = @context.assignment_groups.active.find_by_id(id) if id.present?
-        if group
-          group.move_to_bottom
-          ids << group.id
-        end
-      end
+      @context.assignment_groups.first.update_order(order)
       respond_to do |format|
-        format.json { render :json => {:reorder => true, :order => ids}, :status => :ok }
+        new_order = @context.assignment_groups.pluck(:id)
+        format.json { render :json => {:reorder => true, :order => new_order}, :status => :ok }
       end
     end
   end

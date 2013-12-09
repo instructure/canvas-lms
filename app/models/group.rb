@@ -148,8 +148,9 @@ class Group < ActiveRecord::Base
     self.shard.activate { self.participating_group_memberships.moderators.find_by_user_id(user.id) }
   end
 
-  def should_add_creator?
-    self.group_category && (self.group_category.communities? || self.group_category.student_organized?)
+  def should_add_creator?(creator)
+    self.group_category &&
+      (self.group_category.communities? || (self.group_category.student_organized? && self.context.user_is_student?(creator)))
   end
 
   def short_name
@@ -192,7 +193,7 @@ class Group < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     self.save
   end
 
@@ -396,7 +397,7 @@ class Group < ActiveRecord::Base
   end
 
   def users_visible_to(user)
-    grants_rights?(user, :read) ? users : users.where("?", false)
+    grants_rights?(user, :read) ? users : users.none
   end
 
   # Helper needed by several permissions, use grants_right?(user, :participate)

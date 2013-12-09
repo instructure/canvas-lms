@@ -26,7 +26,7 @@ module SimpleTags
           wildcard(quoted_table_name + '.tags', tag, :delimiter => ',')
         }
       conditions.empty? ?
-          where("?", false) :
+          none :
           where(conditions.join(options[:mode] == :or ? " OR " : " AND "))
     end
 

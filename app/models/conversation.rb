@@ -448,6 +448,14 @@ class Conversation < ActiveRecord::Base
     name ||= Context.find_by_asset_string(context_tags.first).try(:name) if context_tags.first
   end
 
+  def context_code
+    if context_type && context_id
+      "#{context_type.underscore}_#{context_id}"
+    else
+      nil
+    end
+  end
+
   def context_tags
     tags.grep(/\A(course|group)_\d+\z/)
   end

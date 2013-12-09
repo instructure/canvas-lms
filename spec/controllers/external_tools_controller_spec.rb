@@ -110,6 +110,16 @@ describe ExternalToolsController do
       assigns[:tool_settings]['custom_canvas_enrollment_state'].should == 'active'
     end
 
+    it "should set html selection if specified" do
+      course_with_teacher_logged_in(:active_all => true)
+      tool = new_valid_tool(@course)
+      html = "<img src='/blank.png'/>"
+      get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id, :editor_button => '1', :selection => html
+      response.should be_success
+      assigns[:tool].should == tool
+      assigns[:tool_settings]['text'].should == CGI::escape(html)
+    end
+
     it "should find account-level tools" do
       @user = account_admin_user
       user_session(@user)

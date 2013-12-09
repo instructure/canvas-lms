@@ -4,9 +4,10 @@ define [
   'compiled/views/DialogFormView'
   'jst/assignments/CreateAssignment'
   'jst/EmptyDialogFormWrapper'
+  'i18n!assignments'
   'jquery'
   'jquery.instructure_date_and_time'
-], (_, Assignment, DialogFormView, template, wrapper, $) ->
+], (_, Assignment, DialogFormView, template, wrapper, I18n, $) ->
 
   class CreateAssignmentView extends DialogFormView
     defaults:
@@ -88,3 +89,16 @@ define [
 
     newAssignmentUrl: ->
       ENV.URLS.new_assignment_url
+
+    validateBeforeSave: (data, errors) ->
+      errors = @_validateTitle data, errors
+      errors
+
+    _validateTitle: (data, errors) ->
+      frozenTitle = _.contains(@model.frozenAttributes(), "title")
+
+      if !frozenTitle and (!data.name or $.trim(data.name.toString()).length == 0)
+        errors["name"] = [
+          message: I18n.t 'name_is_required', 'Name is required!'
+        ]
+      errors

@@ -37,7 +37,12 @@
 #
 #       // Whether or not the user is a moderator of the group (the must also
 #       // be an active member of the group to moderate)
-#       "moderator": true
+#       "moderator": true,
+#
+#       // optional: whether or not the record was just created on a
+#       // create call (POST), i.e. was the user just added to the group,
+#       // or was the user already a member
+#       "just_created": true
 #     }
 #
 class GroupMembershipsController < ApplicationController
@@ -98,7 +103,7 @@ class GroupMembershipsController < ApplicationController
     if authorized_action(GroupMembership.new(:group => @group, :user => @user), @current_user, :create)
       @membership = @group.add_user(@user)
       if @membership.valid?
-        render :json => group_membership_json(@membership, @current_user, session)
+        render :json => group_membership_json(@membership, @current_user, session, include: ['just_created'])
       else
         render :json => @membership.errors, :status => :bad_request
       end

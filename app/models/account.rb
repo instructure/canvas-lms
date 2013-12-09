@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -174,7 +174,6 @@ class Account < ActiveRecord::Base
   add_setting :self_registration, :boolean => true, :root_only => true, :default => false
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
-  add_setting :enable_quiz_regrade, :boolean => true, :root_only => true, :default => false
   add_setting :agenda_view, boolean: true, root_only: true, default: false
   add_setting :enable_fabulous_quizzes, :boolean => true, :root_only => true, :default => false
 
@@ -362,7 +361,7 @@ class Account < ActiveRecord::Base
   end
 
   def users_visible_to(user)
-    self.grants_right?(user, nil, :read) ? self.all_users : self.all_users.where("?", false)
+    self.grants_right?(user, nil, :read) ? self.all_users : self.all_users.none
   end
 
   def users_name_like(query="")
@@ -743,7 +742,7 @@ class Account < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     save!
   end
 
@@ -1347,14 +1346,6 @@ class Account < ActiveRecord::Base
     change_root_account_setting!(:enable_draft, false)
   end
 
-  def enable_quiz_regrade!
-    change_root_account_setting!(:enable_quiz_regrade, true)
-  end
-
-  def disable_quiz_regrade!
-    change_root_account_setting!(:enable_quiz_regrade, false)
-  end
-
   def enable_fabulous_quizzes!
     change_root_account_setting!(:enable_fabulous_quizzes, true)
   end
@@ -1368,4 +1359,5 @@ class Account < ActiveRecord::Base
     root_account.save!
   end
 
+  Bookmarker = BookmarkedCollection::SimpleBookmarker.new(Account, :name, :id)
 end

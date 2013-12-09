@@ -1,5 +1,5 @@
 <div class="event-details carat-bottom">
-  <a href="#" class="popover_close x-close-link close">×</a>
+  <a href="#" class="popover_close x-close-link close" role="button">×</a>
   <div class='event-details-header'>
     <h3 class="details_title title">
       {{#if showEventLink}}
@@ -74,12 +74,14 @@
     {{/if}}
   </div>
   <div class="popover-links-holder event-details-footer">
-    {{#if can_edit }}
-      <a href="#" class="event_button edit_event_link btn btn-primary btn-small pull-right">{{#t "links.edit"}}Edit{{/t}}</a>
-    {{/if}}
-    {{#if can_delete }}
-      <a href="#" class="event_button btn button-secondary btn-small delete_event_link pull-right">{{#t "links.delete"}}Delete{{/t}}</a>
-    {{/if}}
+    <div class="pull-right">
+      {{#if can_delete }}
+        <a href="#" class="event_button btn button-secondary btn-small delete_event_link">{{#t "links.delete"}}Delete{{/t}}</a>
+      {{/if}}
+      {{#if can_edit }}
+        <a href="#" class="event_button edit_event_link btn btn-primary btn-small">{{#t "links.edit"}}Edit{{/t}}</a>
+      {{/if}}
+    </div>
     <div class="event-details-links">
       {{#if can_reserve }}
         <a href="#" class="reserve_event_link"><strong>{{#t "links.reserve"}}Reserve{{/t}}</strong></a>

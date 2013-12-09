@@ -135,37 +135,42 @@ define [
       for studentEnrollment in studentEnrollments
         student = studentEnrollment.user
         student.enrollment = studentEnrollment
-        @students[student.id] ||= htmlEscape(student)
-        @students[student.id].sections ||= []
-        @students[student.id].sections.push(studentEnrollment.course_section_id)
+
+        if student.enrollment.role == "StudentViewEnrollment"
+          @studentViewStudent ||= htmlEscape(student)
+        else
+          @students[student.id] ||= htmlEscape(student)
+        @student(student.id).sections ||= []
+        @student(student.id).sections.push(studentEnrollment.course_section_id)
 
     gotAllStudents: ->
-      for id, student of @students
-        student.computed_current_score ||= 0
-        student.computed_final_score ||= 0
-        student.secondary_identifier = student.sis_login_id || student.login_id
+      @withAllStudents (students) =>
+        for id, student of students
+          student.computed_current_score ||= 0
+          student.computed_final_score ||= 0
+          student.secondary_identifier = student.sis_login_id || student.login_id
 
-        if @sections_enabled
-          mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
-          sectionNames = $.toSentence(mySections.sort())
-        student.display_name = rowStudentNameTemplate
-          avatar_image_url: student.avatar_url
-          display_name: student.name
-          url: student.enrollment.grades.html_url
-          sectionNames: sectionNames
+          if @sections_enabled
+            mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
+            sectionNames = $.toSentence(mySections.sort())
+          student.display_name = rowStudentNameTemplate
+            avatar_image_url: student.avatar_url
+            display_name: student.name
+            url: student.enrollment.grades.html_url
+            sectionNames: sectionNames
 
-        # fill in dummy submissions, so there's something there even if the
-        # student didn't submit anything for that assignment
-        for id, assignment of @assignments
-          student["assignment_#{id}"] ||= { assignment_id: id, user_id: student.id }
-        @rows.push(student)
-      @initGrid()
-      @buildRows()
-      @getSubmissionsChunks()
-      @initHeader()
+          # fill in dummy submissions, so there's something there even if the
+          # student didn't submit anything for that assignment
+          for id, assignment of @assignments
+            student["assignment_#{id}"] ||= { assignment_id: id, user_id: student.id }
+
+          @rows.push(student)
+        @initGrid()
+        @buildRows()
+        @getSubmissionsChunks()
+        @initHeader()
 
     defaultSortType: 'assignment_group'
-      
 
     getStoredSortOrder: =>
       userSettings.contextGet('sort_grade_columns_by') || { sortType: @defaultSortType }
@@ -283,35 +288,58 @@ define [
       @rows.sort (a, b) ->
         a.sortable_name.localeCompare(b.sortable_name,
           window.I18n.locale,
-          { sensitivity: 'accent', ignorePunctuation: true, numeric: true})
+          {sensitivity: 'accent', numeric: true})
+
+      if @studentViewStudent && @rowFilter(@studentViewStudent)
+        @rows.push(@studentViewStudent)
+        @calculateStudentGrade(@studentViewStudent)
 
       student.row = i for student, i in @rows
       @multiGrid.invalidate()
 
     getSubmissionsChunks: =>
-      allStudents = (s for k, s of @students)
-      loop
-        students = allStudents[@chunk_start...(@chunk_start+@options.chunk_size)]
-        unless students.length
-          @allSubmissionsLoaded = true
-          break
-        params =
-          student_ids: (student.id for student in students)
-          response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late']
-        $.ajaxJSON(@options.submissions_url, "GET", params, @gotSubmissionsChunk)
-        @chunk_start += @options.chunk_size
+      @withAllStudents (allStudentsObj) =>
+        allStudents = (s for k, s of allStudentsObj)
+        loop
+          students = allStudents[@chunk_start...(@chunk_start+@options.chunk_size)]
+          unless students.length
+            @allSubmissionsLoaded = true
+            break
+          params =
+            student_ids: (student.id for student in students)
+            response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late']
+          $.ajaxJSON(@options.submissions_url, "GET", params, @gotSubmissionsChunk)
+          @chunk_start += @options.chunk_size
 
     gotSubmissionsChunk: (student_submissions) =>
       for data in student_submissions
-        student = @students[data.user_id]
+        student = @student(data.user_id)
         @updateSubmission(submission) for submission in data.submissions
         student.loaded = true
         @multiGrid.invalidateRow(student.row)
         @calculateStudentGrade(student)
       @multiGrid.render()
 
+    student: (id) =>
+      @students[id] ||
+        (@studentViewStudent &&
+         id == @studentViewStudent.id &&
+         @studentViewStudent)
+
+    # @students contains all *real* students (e.g., not the student view student)
+    # when you do need to operate on *all* students (like for rendering the grid), use
+    # function
+    withAllStudents: (f) =>
+      if @studentViewStudent
+        @students[@studentViewStudent.id] = @studentViewStudent
+
+      f(@students)
+
+      if @studentViewStudent
+        delete @students[@studentViewStudent.id]
+
     updateSubmission: (submission) =>
-      student = @students[submission.user_id]
+      student = @student(submission.user_id)
       submission.submitted_at = $.parseFromISO(submission.submitted_at) if submission.submitted_at
       student["assignment_#{submission.assignment_id}"] = submission
 
@@ -325,7 +353,7 @@ define [
       editing = $(@gradeGrid.getActiveCellNode()).hasClass('editable')
       columns = @gradeGrid.getColumns()
       for submission in submissions
-        student = @students[submission.user_id]
+        student = @student(submission.user_id)
         idToMatch = "assignment_#{submission.assignment_id}"
         cell = index for column, index in columns when column.id is idToMatch
         thisCellIsActive = activeCell? and
@@ -381,6 +409,10 @@ define [
         templateOpts.showPointsNotPercent = @showPointTotals
 
       groupTotalCellTemplate templateOpts
+
+    htmlContentFormatter: (row, col, val, columnDef, student) =>
+      return '' unless val?
+      val
 
     calculateStudentGrade: (student) =>
       if student.loaded
@@ -526,11 +558,11 @@ define [
       if e.target.className.match(/cell|slick/) or !@gradeGrid.getActiveCell
         return
 
-      if e.target.className is 'grade' and @gradeGrid.getCellEditor() instanceof SubmissionCell.out_of 
+      if e.target.className is 'grade' and @gradeGrid.getCellEditor() instanceof SubmissionCell.out_of
         # We can assume that a user clicked the up or down arrows on the
         # number input, we want to allow them to keep doing that.
         return
-      
+
       @gradeGrid.getEditorLock().commitCurrentEdit()
 
     onGridInit: () ->
@@ -552,7 +584,7 @@ define [
         .delegate '.gradebook-cell-comment', 'click.gradebook', (event) =>
           event.preventDefault()
           data = $(event.currentTarget).data()
-          SubmissionDetailsDialog.open @assignments[data.assignmentId], @students[data.userId], @options
+          SubmissionDetailsDialog.open @assignments[data.assignmentId], @student(data.userId.toString()), @options
         .delegate '.minimized',
           'mouseenter' : @hoverMinimizedCell,
           'mouseleave' : @unhoverMinimizedCell
@@ -734,6 +766,7 @@ define [
         cssClass: "meta-cell"
         resizable: false
         sortable: true
+        formatter: @htmlContentFormatter
       },
       {
         id: 'secondary_identifier'
@@ -743,6 +776,7 @@ define [
         cssClass: "meta-cell secondary_identifier_cell"
         resizable: false
         sortable: true
+        formatter: @htmlContentFormatter
       }]
 
       @allAssignmentColumns = for id, assignment of @assignments
@@ -851,8 +885,21 @@ define [
         @gradeGrid.invalidate()
       # this is a faux blur event for SlickGrid.
       $('body').on('click', @onGridBlur)
+      respectorOfPersonsSort = (sortFn) =>
+        if @studentViewStudent
+          (a, b) =>
+            studentViewStudentId = @studentViewStudent.id.toString()
+            if a.id == studentViewStudentId
+              return 1
+            else if b.id == studentViewStudentId
+              return -1
+            else
+              sortFn(a, b)
+        else
+          sortFn
+
       sortRowsBy = (sortFn) =>
-        @rows.sort(sortFn)
+        @rows.sort(respectorOfPersonsSort(sortFn))
         for student, i in @rows
           student.row = i
           @addDroppedClass(student)

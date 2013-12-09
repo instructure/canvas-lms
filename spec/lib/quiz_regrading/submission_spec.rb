@@ -65,7 +65,7 @@ describe QuizRegrader::Submission do
       submission.expects(:score_before_regrade).returns nil
       submission.expects(:score_before_regrade=).with(0)
       submission.expects(:quiz_data=).with(question_regrades.map { |id, q| q.question_data })
-      submission.expects(:attempt_versions).returns []
+      submission.expects(:attempts => stub(:last_versions => []))
 
       wrapper.regrade!
     end

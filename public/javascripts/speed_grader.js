@@ -981,13 +981,13 @@ define([
 
       // choose the first ungraded student if the requested one doesn't exist
       if (!jsonData.studentMap[studentId]) {
-        studentId = jsonData.studentsWithSubmissions[0].id;
-        for (var i = 0, max = jsonData.studentsWithSubmissions.length; i < max; i++){
-          if (typeof jsonData.studentsWithSubmissions[i].submission !== 'undefined' && jsonData.studentsWithSubmissions[i].submission.workflow_state !== 'graded'){
-            studentId = jsonData.studentsWithSubmissions[i].id;
-            break;
-          }
-        }
+        var ungradedStudent = _(jsonData.studentsWithSubmissions)
+        .find(function(s) {
+          return s.submission &&
+                 s.submission.workflow_state != 'graded' &&
+                 s.submission.submission_type;
+        });
+        studentId = (ungradedStudent || jsonData.studentsWithSubmissions[0]).id;
       }
 
       EG.goToStudent(studentId);

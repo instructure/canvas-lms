@@ -155,6 +155,7 @@ class WikiPage < ActiveRecord::Base
   }
   after_save :remove_changed_flag
 
+
   workflow do
     state :active do
       event :unpublish, :transitions_to => :unpublished
@@ -169,6 +170,8 @@ class WikiPage < ActiveRecord::Base
     state :deleted
 
   end
+
+  alias_method :published?, :active?
 
   def restore
     self.workflow_state = 'active'

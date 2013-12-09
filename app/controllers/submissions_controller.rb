@@ -366,8 +366,7 @@ class SubmissionsController < ApplicationController
         f.write doc_response.body
         f.close
 
-        require 'action_controller'
-        require 'action_controller/test_process.rb'
+        require 'action_controller_test_process'
         @attachment = @assignment.attachments.new(
           :uploaded_data => ActionController::TestUploadedFile.new(path, doc_response.content_type, true), 
           :display_name => "#{display_name}",

@@ -117,7 +117,7 @@ ActiveRecord::Base.class_eval do
 end
 
 module ActiveRecord::Associations
-  AssociationProxy.class_eval do
+  (CANVAS_RAILS2 ? AssociationProxy : Association).class_eval do
     def shard
       Shard.default
     end

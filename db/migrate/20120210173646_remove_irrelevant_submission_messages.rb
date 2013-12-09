@@ -1,5 +1,5 @@
 class RemoveIrrelevantSubmissionMessages < ActiveRecord::Migration
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     # destroy any submission messages where none of the commenters are

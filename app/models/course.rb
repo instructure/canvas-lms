@@ -466,10 +466,10 @@ class Course < ActiveRecord::Base
   scope :not_deleted, where("workflow_state<>'deleted'")
 
   scope :with_enrollments, lambda {
-    where("EXISTS (#{Enrollment.active.select("1").where("enrollments.course_id=courses.id").to_sql})")
+    where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
   }
   scope :without_enrollments, lambda {
-    where("NOT EXISTS (#{Enrollment.active.select("1").where("enrollments.course_id=courses.id").to_sql})")
+    where("NOT EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
   }
   scope :completed, lambda {
     joins(:enrollment_term).
@@ -483,13 +483,13 @@ class Course < ActiveRecord::Base
   }
   scope :by_teachers, lambda { |teacher_ids|
     teacher_ids.empty? ?
-      where("?", false) :
-      where("EXISTS (#{Enrollment.active.select("1").where("enrollments.course_id=courses.id AND enrollments.type='TeacherEnrollment' AND enrollments.user_id IN (?)", teacher_ids).to_sql})")
+      none :
+      where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id AND enrollments.type='TeacherEnrollment' AND enrollments.user_id IN (?)", teacher_ids))
   }
   scope :by_associated_accounts, lambda{ |account_ids|
     account_ids.empty? ?
-      where("?", false) :
-      where("EXISTS (#{CourseAccountAssociation.select("1").where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids).to_sql})")
+      none :
+      where("EXISTS (?)", CourseAccountAssociation.where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids))
   }
 
   scope :deleted, where(:workflow_state => 'deleted')
@@ -893,8 +893,7 @@ class Course < ActiveRecord::Base
 
   def require_assignment_group
     shard.activate do
-      has_group = Rails.cache.read(['has_assignment_group', self].cache_key)
-      return if has_group && Rails.env.production?
+      return if Rails.cache.read(['has_assignment_group', self].cache_key)
       if self.assignment_groups.active.empty?
         self.assignment_groups.create(:name => t('#assignment_group.default_name', "Assignments"))
       end
@@ -2332,7 +2331,7 @@ class Course < ActiveRecord::Base
       when :full, :limited then scope
       when :sections then scope.where("enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))", visibilities.map{|s| s[:course_section_id]}, false)
       when :restricted then scope.where(:enrollments => { :user_id  => visibilities.map{|s| s[:associated_user_id]}.compact + [user] })
-      else scope.where("?", false)
+      else scope.none
     end
   end
 
@@ -2345,7 +2344,7 @@ class Course < ActiveRecord::Base
       when :sections then scope.where(:enrollments => { :course_section_id => visibilities.map {|s| s[:course_section_id] } })
       when :restricted then scope.where(:enrollments => { :user_id => (visibilities.map { |s| s[:associated_user_id] }.compact + [user]) })
       when :limited then scope.where("enrollments.type IN ('StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'StudentViewEnrollment')")
-      else scope.where("?", false)
+      else scope.none
     end
   end
 
@@ -2363,7 +2362,7 @@ class Course < ActiveRecord::Base
       sections.where(:id => section_ids)
     else
       # return an empty set, but keep it as a scope for downstream consistency
-      sections.where("?", false)
+      sections.none
     end
   end
 

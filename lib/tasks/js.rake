@@ -2,7 +2,16 @@ require 'timeout'
 
 namespace :js do
 
+  desc 'run testem as you develop, can use `rake js:dev <ember app name>`'
   task :dev do
+    app = ARGV[1]
+    if app
+      ENV['JS_SPEC_MATCHER'] = "**/#{app}/**/*.spec.js"
+      unless File.exists?("app/coffeescripts/ember/#{app}")
+        puts "no app found at app/coffeescripts/ember/#{app}"
+        exit
+      end
+    end
     Rake::Task['js:generate_runner'].invoke
     exec('testem -f config/testem.yml')
   end
@@ -45,7 +54,7 @@ namespace :js do
           # running a subset of tests in isolation, don't be paranoid about
           # some unrun tests getting lost
           result = 0
-        elsif phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i < 900
+        elsif phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i < 2000
           # ran all tests but didn't see enough? do be paranoid about some
           # unrun tests getting lost
           puts 'all run specs passed, but not all specs were run'

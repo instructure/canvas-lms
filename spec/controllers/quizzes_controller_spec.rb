@@ -129,6 +129,66 @@ describe QuizzesController do
     end
   end
 
+  describe "GET 'index' without fabulous quizzes enabled" do
+    before :each do
+      a = Account.default
+      a.disable_fabulous_quizzes!
+      a.save!
+    end
+
+    after :each do
+      a = Account.default
+      a.enable_fabulous_quizzes!
+      a.save!
+    end
+
+    it "should not redirect" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz(active = true)
+      a = Account.default
+      a.enable_fabulous_quizzes?.should eql false
+      get 'index', :course_id => @course.id
+      assert_response(:success)
+    end
+  end
+
+  describe "GET 'index' with fabulous quizzes enabled" do
+    before :each do
+      a = Account.default
+      a.enable_fabulous_quizzes!
+      a.save!
+    end
+
+    after :each do
+      a = Account.default
+      a.disable_fabulous_quizzes!
+      a.save!
+    end
+
+    it "should redirect to fabulous quizzes app" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz(active = true)
+      a = Account.default
+      a.enable_fabulous_quizzes?.should eql true
+      get 'index', :course_id => @course.id
+      assert_redirected_to(:controller => "quizzes", :action => "fabulous_quizzes")
+    end
+  end
+
+  describe "GET 'fabulous_quizzes' without fabulous quizzes enabled" do
+    it "should redirect to index" do
+      a = Account.default
+      a.disable_fabulous_quizzes!
+      a.save!
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz(active = true)
+      a = Account.default
+      a.enable_fabulous_quizzes?.should eql false
+      get 'fabulous_quizzes', :course_id => @course.id
+      assert_redirected_to(:controller => "quizzes", :action => "index")
+    end
+  end
+
   describe "GET 'new'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -258,8 +318,7 @@ describe QuizzesController do
     end
 
     it "assigns js_env for attachments if submission is present" do
-      require 'action_controller'
-      require 'action_controller/test_process.rb'
+      require 'action_controller_test_process'
       course_with_student_logged_in :active_all => true
       course_quiz !!:active
       submission = @quiz.generate_submission @user
@@ -273,8 +332,7 @@ describe QuizzesController do
     end
 
     it "assigns js_env for versions if submission is present" do
-      require 'action_controller'
-      require 'action_controller/test_process.rb'
+      require 'action_controller_test_process'
       course_with_student_logged_in :active_all => true
       course_quiz !!:active
       submission = @quiz.generate_submission @user
@@ -884,6 +942,7 @@ describe QuizzesController do
       course_quiz
       @quiz.update_attributes(quiz_type: 'ungraded_survey')
       # make sure the assignment doesn't exist
+      @quiz.assignment = nil if @quiz.context.draft_state_enabled?
       @quiz.assignment.should_not be_present
       post 'update', course_id: @course.id, id: @quiz.id, activate: true,
         quiz: {quiz_type: 'assignment'}

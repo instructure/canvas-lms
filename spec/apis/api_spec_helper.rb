@@ -46,9 +46,15 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
     Api.parse_pagination_links(response.headers['Link'])
   end
 
+  if jsonapi_call?(headers) && method == :delete
+    response.status.should == '204 No Content'
+    return
+  end
+
   case params[:format]
   when 'json'
     response.header['content-type'].should == 'application/json; charset=utf-8'
+
     body = response.body
     if body.respond_to?(:call)
       StringIO.new.tap { |sio| body.call(nil, sio); body = sio.string }
@@ -63,6 +69,10 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   else
     raise("Don't know how to handle response format #{params[:format]}")
   end
+end
+
+def jsonapi_call?(headers)
+  headers['Accept'] == 'application/vnd.api+json'
 end
 
 # like api_call, but performed by the specified user instead of @user

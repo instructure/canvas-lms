@@ -234,9 +234,9 @@ describe "assignment column headers" do
   end
 
   it "show letter grade in total column" do
-    f('#gradebook_grid [row="0"] .total-cell .letter-grade-points').should include_text("A")
-    edit_grade(f('#gradebook_grid [row="1"] .l2'), '50')
+    f('#gradebook_grid .slick-row:nth-child(1) .total-cell .letter-grade-points').should include_text("A")
+    edit_grade('#gradebook_grid .slick-row:nth-child(2) .l2', '50')
     wait_for_ajax_requests
-    f('#gradebook_grid [row="1"] .total-cell .letter-grade-points').should include_text("A")
+    f('#gradebook_grid .slick-row:nth-child(2) .total-cell .letter-grade-points').should include_text("A")
   end
 end

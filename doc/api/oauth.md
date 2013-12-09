@@ -154,6 +154,14 @@ that domain.
       the current canvas user's identity
     </div>
   </li>
+  <li>
+    <span class="name">purpose</span>
+    <div class="inline">
+      optional. This can be used to help the user identify which instance
+      of an application this token is for. For example, a mobile device
+      application could provide the name of the device.
+    </div>
+  </li>
 </ul>
 
 </div>
@@ -274,6 +282,24 @@ currently supported value is <code>code</code>.
       required. For native applications, currently the only supported value is
 <code>urn:ietf:wg:oauth:2.0:oob</code>, signifying that the credentials will be
 retrieved out-of-band using an embedded browser or other functionality.
+    </div>
+  </li>
+  <li>
+    <span class="name">scopes</span>
+    <div class="inline">
+      optional. This can be used to specify what information the access token
+      will provide access to.  By default an access token will have access to
+      all api calls that a user can make.  The only other accepted value
+      for this at present is '/auth/userinfo', which can be used to obtain
+      the current canvas user's identity
+    </div>
+  </li>
+  <li>
+    <span class="name">purpose</span>
+    <div class="inline">
+      optional. This can be used to help the user identify which instance
+      of an application this token is for. For example, a mobile device
+      application could provide the name of the device.
     </div>
   </li>
 </ul>

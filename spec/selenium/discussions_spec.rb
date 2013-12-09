@@ -1150,9 +1150,10 @@ describe "discussions" do
         entry = @topic.discussion_entries.create!(:user => @student, :message => "new side comment from student", :parent_entry => @entry)
         @topic.discussion_entries.last.message.should == text
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        sleep 5
-        validate_entry_text(entry, text)
-        edit_entry(entry, edit_text)
+        keep_trying_until do
+          validate_entry_text(entry, text)
+        end
+          edit_entry(entry, edit_text)
       end
 
       it "should put order by date, descending"

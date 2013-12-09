@@ -319,6 +319,11 @@ define [
     grid_options: () ->
       $.extend(super(), { enableCellNavigation: false })
 
+    init: () ->
+      super()
+      @grid.setSelectionModel(new Slick.RowSelectionModel())
+      this
+
   $.extend(window,
     Jobs: Jobs
     Workers: Workers

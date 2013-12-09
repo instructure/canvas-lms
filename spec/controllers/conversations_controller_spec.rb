@@ -466,6 +466,14 @@ describe ConversationsController do
       response.should be_success
       @conversation.messages.size.should == 1
     end
+
+    it "should null a conversation_participant's last_message_at if all message_participants have been destroyed" do
+      course_with_student_logged_in(active_all: true)
+      message = conversation.conversation.conversation_messages.first
+
+      post 'remove_messages', conversation_id: @conversation.conversation_id, :remove => [message.id.to_s]
+      @conversation.reload.last_message_at.should be_nil
+    end
   end
 
   describe "DELETE 'destroy'" do

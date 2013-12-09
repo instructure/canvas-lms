@@ -208,6 +208,7 @@ class User < ActiveRecord::Base
   has_many :web_conference_participants
   has_many :web_conferences, :through => :web_conference_participants
   has_many :account_users
+  has_many :accounts, :through => :account_users
   has_many :media_objects, :as => :context
   has_many :user_generated_media_objects, :class_name => 'MediaObject'
   has_many :user_notes
@@ -245,7 +246,7 @@ class User < ActiveRecord::Base
     PageView.for_user(self, options)
   end
 
-  scope :of_account, lambda { |account| where("EXISTS (#{account.user_account_associations.select("1").where("user_account_associations.user_id=users.id").to_sql})") }
+  scope :of_account, lambda { |account| where("EXISTS (?)", account.user_account_associations.where("user_account_associations.user_id=users.id")) }
   scope :recently_logged_in, lambda {
     includes(:pseudonyms).
         where("pseudonyms.current_login_at>?", 1.month.ago).
@@ -261,7 +262,7 @@ class User < ActiveRecord::Base
     end
   }
   scope :name_like, lambda { |name|
-    where("#{wildcard('users.name', 'users.short_name', name)} OR EXISTS (#{Pseudonym.select("1").where(wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name)).where("pseudonyms.user_id=users.id").active.to_sql})")
+    where("#{wildcard('users.name', 'users.short_name', name)} OR EXISTS (?)", Pseudonym.where(wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name)).where("pseudonyms.user_id=users.id").active)
   }
   scope :active, where("users.workflow_state<>'deleted'")
 
@@ -864,6 +865,7 @@ class User < ActiveRecord::Base
   def destroy(even_if_managed_passwords=false)
     ActiveRecord::Base.transaction do
       self.workflow_state = 'deleted'
+      self.deleted_at = Time.now.utc
       self.save
       self.pseudonyms.each{|p| p.destroy(even_if_managed_passwords) }
       self.communication_channels.each{|cc| cc.destroy }
@@ -1038,7 +1040,7 @@ class User < ActiveRecord::Base
         # or, if the user we are given is an admin in one of this user's accounts
         Account.site_admin.grants_right?(user, :manage_user_logins) ||
         (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins) } &&
-         self.accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) } )
+         self.all_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) } )
       )
     end
     can :manage_user_details and can :manage_logins and can :rename
@@ -1351,6 +1353,14 @@ class User < ActiveRecord::Base
 
   def preferences
     read_attribute(:preferences) || write_attribute(:preferences, {})
+  end
+
+  def enabled_theme
+    preferences[:enabled_theme] ||= "default"
+  end
+
+  def enabled_theme=(value)
+    preferences[:enabled_theme] = value
   end
 
   def watched_conversations_intro?
@@ -2111,7 +2121,7 @@ class User < ActiveRecord::Base
   TAB_HOME = 4
 
   def highest_role
-    return 'admin' unless self.accounts.empty?
+    return 'admin' unless self.all_accounts.empty?
     return 'teacher' if self.cached_current_enrollments.any?(&:admin?)
     return 'student' if self.cached_current_enrollments.any?(&:student?)
     return 'user'
@@ -2122,7 +2132,7 @@ class User < ActiveRecord::Base
     res = ['user']
     res << 'student' if self.cached_current_enrollments.any?(&:student?)
     res << 'teacher' if self.cached_current_enrollments.any?(&:admin?)
-    res << 'admin' unless self.accounts.empty?
+    res << 'admin' unless self.all_accounts.empty?
     res
   end
   memoize :roles
@@ -2268,8 +2278,8 @@ class User < ActiveRecord::Base
     @menu_data = {
       :group_memberships => coalesced_group_memberships,
       :group_memberships_count => cached_group_memberships.length,
-      :accounts => self.accounts,
-      :accounts_count => self.accounts.length,
+      :accounts => self.all_accounts,
+      :accounts_count => self.all_accounts.length,
     }
   end
 
@@ -2544,10 +2554,14 @@ class User < ActiveRecord::Base
     [Shard.default]
   end
 
-  def accounts
-    self.account_users.with_each_shard { |scope| scope.includes(:account) }.map(&:account).uniq
+  def all_accounts
+    self.accounts.with_each_shard
   end
-  memoize :accounts
+  memoize :all_accounts
+
+  def all_paginatable_accounts
+    BookmarkedCollection.with_each_shard(Account::Bookmarker, self.accounts)
+  end
 
   def all_pseudonyms
     self.pseudonyms.with_each_shard

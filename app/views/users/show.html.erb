@@ -53,11 +53,11 @@
         </ul>
       </div>
     </div>
-    <% if @user.accounts && !@user.accounts.empty? %>
-      <h3><%= t('accounts', 'Accounts') %> <%= count_if_any(@user.accounts.count) %></h3>
+    <% if @user.all_accounts && !@user.all_accounts.empty? %>
+      <h3><%= t('accounts', 'Accounts') %> <%= count_if_any(@user.all_accounts.count) %></h3>
       <div class="accounts" style="font-size: 1.2em">
         <ul class="unstyled_list context_list" style="margin-left: 5px; font-size: 0.9em; margin-bottom: 10px; max-height: 200px; overflow: auto;">
-          <% @user.accounts.each do |account| %>
+          <% @user.all_accounts.each do |account| %>
             <% num_enrollments += 1 %>
             <li>
               <a href="<%= url_for(account) %>">

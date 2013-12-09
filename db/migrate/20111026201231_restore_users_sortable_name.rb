@@ -1,5 +1,5 @@
 class RestoreUsersSortableName < ActiveRecord::Migration
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     User.find_in_batches do |batch|

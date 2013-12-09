@@ -1,9 +1,16 @@
-<div class="alert alert-info beta-notice">
-  <b>{{#t "beta_version"}}Beta Version{{/t}}</b>
-  {{#t "beta_description"}}You are using a beta version of the Canvas inbox{{/t}}
-</div>
+{{#unless batch}}
+  <div class="alert alert-info beta-notice">
+    <b>{{#t "beta_version"}}Beta Version{{/t}}</b>
+    {{#t "beta_description"}}You are using a beta version of the Canvas inbox{{/t}}
+  </div>
+{{/unless}}
 
 <div class="no-messages">
   <i class="icon-email"></i>
-  {{#t "no_conversations_selected"}}No Conversations Selected{{/t}}
+
+  {{#if batch}}
+    {{#t "batch_selected"}}Multiple Conversations Selected{{/t}}
+  {{else}}
+    {{#t "no_conversations_selected"}}No Conversations Selected{{/t}}
+  {{/if}}
 </div>

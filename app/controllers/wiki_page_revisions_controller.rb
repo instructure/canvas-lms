@@ -23,6 +23,11 @@ class WikiPageRevisionsController < ApplicationController
   before_filter { |c| c.active_tab = "pages" }
   
   def index
+    if @context.draft_state_enabled?
+      redirect_to polymorphic_url([@context, :named_page_revisions], :wiki_page_id => @page)
+      return
+    end
+
     if authorized_action(@page, @current_user, :update_content)
       respond_to do |format|
         format.html {
@@ -54,6 +59,11 @@ class WikiPageRevisionsController < ApplicationController
   end
   
   def show
+    if @context.draft_state_enabled?
+      redirect_to polymorphic_url([@context, :named_page_revisions], :wiki_page_id => @page)
+      return
+    end
+
     if authorized_action(@page, @current_user, :update_content)
       if params[:id] == "latest"
         @revision = @page.versions[0]

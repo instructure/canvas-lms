@@ -25,7 +25,8 @@ describe "external tool assignments" do
     f('#assignment_external_tool_tag_attributes_url').click
     keep_trying_until do
       fj('#context_external_tools_select td .tools .tool:first-child:visible').click
-      sleep 2 # wait for javascript to execute
+      wait_for_ajaximations
+      #sleep 2 # wait for javascript to execute
       f('#context_external_tools_select input#external_tool_create_url').should have_attribute('value', @t1.url)
     end
     keep_trying_until do

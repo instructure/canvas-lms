@@ -43,7 +43,6 @@ describe QuizQuestion do
   describe "#question_data=" do
     before do
       course_with_teacher
-      course.root_account.enable_quiz_regrade!
 
       @quiz = @course.quizzes.create
 

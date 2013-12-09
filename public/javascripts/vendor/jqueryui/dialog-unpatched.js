@@ -264,6 +264,11 @@ $.widget("ui.dialog", {
 				}
 			});
 			$.ui.dialog.maxZ = maxZ;
+
+			// INSTRUCTURE
+			if ( this.oldFocus && $(this.oldFocus).is( ':visible' ) ) {
+				this.oldFocus.focus();
+			}
 		}
 
 		return this;
@@ -325,6 +330,11 @@ $.widget("ui.dialog", {
 
 		// prevent tabbing out of modal dialogs
 		if ( options.modal ) {
+			// INSTRUCTURE
+			// Ensure that an element is focused after opening and closing.
+			this.oldFocus = document.activeElement;
+			$( ":tabbable:first", this.uiDialog ).focus();
+
 			this._on( uiDialog, { keydown: function( event ) {
 				if ( event.keyCode !== $.ui.keyCode.TAB ) {
 					return;

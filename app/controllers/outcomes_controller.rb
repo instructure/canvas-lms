@@ -88,8 +88,8 @@ class OutcomesController < ApplicationController
           codes = @context.all_courses.select(:id).map(&:asset_string)
         end
       end
-      @results = @outcome.learning_outcome_results.for_context_codes(codes).custom_ordering(params[:sort]).paginate(:page => params[:page], :per_page => 10)
-      render :json => @results
+      @results = @outcome.learning_outcome_results.for_context_codes(codes).custom_ordering(params[:sort])
+      render :json => Api.paginate(@results, self, polymorphic_url([@context, :outcome_results]))
     end
   end
   
@@ -190,7 +190,7 @@ class OutcomesController < ApplicationController
           if @submission.attempt <= @result.attempt
             @submission_version = @submission
           else
-            @submission_version = @submission.submitted_versions.detect{|s| s.attempt >= @result.attempt }
+            @submission_version = @submission.submitted_attempts.detect{|s| s.attempt >= @result.attempt }
           end
           question = @submission.quiz_data.detect{|q| q['assessment_question_id'] == @question.data[:id] }
           question_id = (question && question['id']) || @question.data[:id]

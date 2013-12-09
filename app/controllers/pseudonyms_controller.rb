@@ -52,8 +52,9 @@ class PseudonymsController < ApplicationController
         scope,
         self, api_v1_account_pseudonyms_url)
     else
-      scope = @user.all_active_pseudonyms
-      @pseudonyms = Api.paginate(scope, self, api_v1_user_pseudonyms_url)
+      bookmark = BookmarkedCollection::SimpleBookmarker.new(Pseudonym, :id)
+      @pseudonyms = BookmarkedCollection.with_each_shard(bookmark, @user.pseudonyms) { |scope| scope.active }
+      @pseudonyms = Api.paginate(@pseudonyms, self, api_v1_user_pseudonyms_url)
     end
 
     render :json => @pseudonyms.map { |p| pseudonym_json(p, @current_user, session) }

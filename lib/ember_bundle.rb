@@ -3,7 +3,7 @@ require 'active_support/inflector'
 class EmberBundle
   attr_accessor :app_name, :paths, :objects, :assigns
 
-  ASSIGNABLE = %w(components controllers models routes views)
+  ASSIGNABLE = %w(components controllers models routes views adapters serializers)
 
   def initialize(app_name, opts={})
     @app_name = app_name

@@ -468,6 +468,7 @@ define [
     #
     # Returns nothing.
     _onSearch: (e) ->
+      return if @$searchBtn.attr('disabled')
       @_fetchResults(true)
       @$input.focus()
 

@@ -1,5 +1,5 @@
 class RemoveDuplicateEnrollmentsFromSections < ActiveRecord::Migration
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     count = Enrollment.remove_duplicate_enrollments_from_sections

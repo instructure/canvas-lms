@@ -1207,13 +1207,28 @@ class Assignment < ActiveRecord::Base
       user ?
         context.students_visible_to(user) :
         context.participating_students
-    ).order_by_sortable_name.uniq
+    ).order_by_sortable_name.uniq.to_a
 
     if grade_as_group?
+      submissions = self.submissions.includes(:user)
+      users_with_submissions = submissions
+                               .select(&:has_submission?)
+                               .map(&:user)
+      users_with_turnitin_data = if turnitin_enabled?
+                                   submissions
+                                   .where("turnitin_data IS NOT NULL")
+                                   .map(&:user)
+                                 else
+                                   []
+                                 end
       group_category.groups.includes(:group_memberships => :user).map { |g|
         [g.name, g.users]
       }.map { |group_name, group_students|
-        representative, *others = (group_students & visible_students)
+        visible_group_students = group_students & visible_students
+        representative   = (visible_group_students & users_with_turnitin_data).first
+        representative ||= (visible_group_students & users_with_submissions).first
+        representative ||= visible_group_students.first
+        others = visible_group_students - [representative]
         next unless representative
 
         representative.readonly!

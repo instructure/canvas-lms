@@ -66,7 +66,7 @@
           <% if current_user_is_account_admin %>
             <li><a href="<%= message_user_path(@user) %>" class="social message" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_user_canvas, 'Message %{user} in Canvas', :user => @user_data[:short_name] %></a></li>
           <% end %>
-          <% if @user_data[:user_services].present? %>
+          <% if @user_data[:user_services].present? && @user.show_user_services %>
             <% @user_data[:user_services].select{|s| s[:visible] }.each do |s| %>
               <% service_name = s[:service_name] || s[:service].to_s.titleize %>
               <li><a href="<%= s[:service_user_link] %>" class="social <%= s[:service] %>" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></a></li>

@@ -17,32 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
 describe QuizSubmissionsApiController, :type => :integration do
-
-  context "quiz submissions file uploads" do
-    before do
-      course_with_student_logged_in :active_all => true
-      @quiz = Quiz.create!(:title => 'quiz', :context => @course)
-      @quiz.did_edit!
-      @quiz.offer!
-
-      s = @quiz.generate_submission(@student)
-    end
-
-    it_should_behave_like "file uploads api"
-
-    def preflight(preflight_params)
-      api_call :post,
-        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/quiz_submissions/self/files",
-        {:controller => "quiz_submissions_api", :action => "create_file", :format => "json", :course_id => @course.to_param, :quiz_id => @quiz.to_param},
-        preflight_params
-    end
-
-    def has_query_exemption?
-      false
-    end
-  end
 
 end

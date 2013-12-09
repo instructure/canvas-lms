@@ -182,7 +182,7 @@ class GroupCategory < ActiveRecord::Base
     # destroy. also, the group destroy happens to be "soft" as well, and I
     # double checked groups.destroy_all does the right thing. :)
     groups.destroy_all
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     self.save
   end
 
@@ -254,7 +254,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def unassigned_users
-    context.users_not_in_groups(groups.active)
+    context.users_not_in_groups(allows_multiple_memberships? ? [] : groups.active)
   end
 
   def assign_unassigned_members

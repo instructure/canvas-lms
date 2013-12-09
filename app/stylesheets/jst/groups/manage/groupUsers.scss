@@ -2,15 +2,27 @@
   border: 1px solid #ccc;
   background: #fff;
   margin-bottom: 3px;
-  padding: 0 15px;
+  padding: 0 15px 0 0;
   line-height: 30px;
   border-radius: 3px;
   position: relative;
+  cursor: pointer;
+
+  &.ui-draggable-dragging {
+    cursor: move;
+  }
+
+  &.group-user-highlight {
+    animation: highlight-shadow-fade ease-in 1s;
+    -webkit-animation: highlight-shadow-fade ease-in 1s;
+    -moz-animation: highlight-shadow-fade ease-in 1s;
+  }
 }
 
 .remove-from-group,
 .assign-to-group {
   position: absolute;
+  top: 0px;
   right: 3px;
   top: 1px;
   i:before {
@@ -19,8 +31,15 @@
   }
 }
 
+.assign-to-group {
+  position: absolute;
+  top: 0px;
+  right: 1px;
+}
+
 .group .group-users {
-  margin: 1.5em 0 0;
+  margin: 1.25em -8px -8px;
+  padding: 8px;
   overflow: hidden;
   .collectionViewItems {
     width: 103%;

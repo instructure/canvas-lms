@@ -42,7 +42,7 @@ module Api::V1::AssignmentGroup
       # fake assignment used for checking if the @current_user can read unpublished assignments
       fake = group.context.assignments.new
       fake.workflow_state = 'unpublished'
-      if @domain_root_account.enable_draft? && !fake.grants_right?(user, session, :read)
+      if group.context.draft_state_enabled? && !fake.grants_right?(user, session, :read)
         # user should not see unpublished assignments
         assignment_scope = assignment_scope.published
       end

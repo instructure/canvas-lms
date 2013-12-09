@@ -65,24 +65,31 @@ describe BigBlueButtonConference do
       BigBlueButtonConference.new(:conference_type => "BigBlueButton").should be_valid_config
     end
 
-    it "should recreate the conference if it's been empty for too long" do
+    it "should recreate the conference" do
       user_model
       email = "email@email.com"
       @user.stubs(:email).returns(email)
       conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => Account.default)
-      conference.expects(:send_request).with(:isMeetingRunning, anything).at_least(1).returns({:running => 'false'}, {:running => 'true'}, {:running => 'false'})
-      conference.expects(:send_request).with(:create, anything).twice.returns(true)
+      conference.expects(:send_request).with(:create, anything).returns(true)
 
       conference.craft_url(@user).should match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
-      # second one doesn't trigger another create call
-      conference.craft_url(@user).should match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
 
-      WebConference.where(:id => conference).update_all(:updated_at => 1.day.ago)
-      conference.reload
-
+      # load a new instance to clear out @conference_active
+      conference = WebConference.find(conference.id)
+      conference.expects(:send_request).with(:create, anything).returns(true)
       conference.craft_url(@user).should match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
     end
 
+    it "should not recreate the conference if it is active" do
+      user_model
+      email = "email@email.com"
+      @user.stubs(:email).returns(email)
+      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => Account.default)
+      conference.expects(:send_request).once.with(:create, anything).returns(true)
+      conference.initiate_conference
+      conference.active?.should be_true
+      conference.craft_url(@user).should match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
+    end
   end
 
   describe 'plugin setting recording_enabled is enabled' do

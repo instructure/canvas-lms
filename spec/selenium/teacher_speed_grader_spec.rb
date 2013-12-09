@@ -183,8 +183,9 @@ describe "speed grader" do
         create!(:user => student, :message => first_message)
     entry.update_topic
     entry.context_module_action
+    attachment_thing = attachment_model(:context => student_2, :filename => 'horse.js')
     entry_2 = discussion_topic.discussion_entries.
-        create!(:user => student_2, :message => second_message)
+        create!(:user => student_2, :message => second_message, :attachment => attachment_thing)
     entry_2.update_topic
     entry_2.context_module_action
 
@@ -201,6 +202,9 @@ describe "speed grader" do
     in_frame 'speedgrader_iframe' do
       f('#main').should_not include_text(first_message)
       f('#main').should include_text(second_message)
+      url = f('#main div.attachment_data a')['href']
+      url.should be_include "/files/#{attachment_thing.id}/download?verifier=#{attachment_thing.uuid}"
+      url.should_not be_include "/courses/#{@course}"
     end
   end
 
@@ -524,6 +528,24 @@ describe "speed grader" do
       wait_for_ajaximations
       f("#students_selectmenu-button").should have_class("graded")
     end
+  end
+
+  it "shows the first ungraded student with a submission" do
+    s1, s2, s3 = n_students_in_course(3)
+    s1.update_attribute :name, "A"
+    s2.update_attribute :name, "B"
+    s3.update_attribute :name, "C"
+
+    @assignment.grade_student s1, score: 10
+    @assignment.find_or_create_submission(s2).tap { |submission|
+      submission.student_entered_score = 5
+    }.save!
+    @assignment.submit_homework(s3, body: "Homework!?")
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
+
+    fj("#students_selectmenu option[value=#{s3.id}]")[:selected].should be_true
   end
 
   context "grading display" do

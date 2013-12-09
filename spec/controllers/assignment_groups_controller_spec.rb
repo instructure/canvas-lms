@@ -70,16 +70,13 @@ describe AssignmentGroupsController do
 
     it "should reorder assignment groups" do
       course_with_teacher_logged_in(:active_all => true)
-      g1 = course_group
-      g2 = course_group
-      g1.position.should eql(1)
-      g2.position.should eql(2)
+      groups = 3.times.map { course_group }
+      groups.map(&:position).should == [1, 2, 3]
+      g1, g2, _ = groups
       post 'reorder', :course_id => @course.id, :order => "#{g2.id},#{g1.id}"
       response.should be_success
-      g1.reload
-      g2.reload
-      g1.position.should eql(2)
-      g2.position.should eql(1)
+      groups.each &:reload
+      groups.map(&:position).should == [2, 1, 3]
     end
 
   end

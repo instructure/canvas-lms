@@ -66,7 +66,8 @@ Example Response:
 
 At this point, the file object has been created in Canvas in a "pending"
 state, with no content. It will not appear in any listings in the UI until
-the next two steps are completed.
+the next two steps are completed. The returned Signature is valid for 30
+minutes.
 
 ### Step 2: Upload the file data to the URL given in the previous response
 

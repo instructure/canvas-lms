@@ -37,7 +37,7 @@ when "syslog"
 else
   log_path = CANVAS_RAILS2 ?
     config.log_path :
-    config.paths.log.first
+    config.paths['log'].first
   config.logger = CanvasLogger.new(log_path, log_level, opts)
 end
 

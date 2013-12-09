@@ -22,7 +22,7 @@ describe 'Student reports' do
   before do
     Notification.find_or_create_by_name('Report Generated')
     Notification.find_or_create_by_name('Report Generation Failed')
-    @account = Account.default
+    @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
     @course1 = course(:course_name => 'English 101', :account => @account,
                       :active_course => true)
     @course1.sis_source_id = 'SIS_COURSE_ID_1'

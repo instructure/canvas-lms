@@ -53,7 +53,12 @@ module Api::V1::Group
     hash
   end
 
-  def group_membership_json(membership, user, session)
-    api_json(membership, user, session, API_GROUP_MEMBERSHIP_JSON_OPTS)
+  def group_membership_json(membership, user, session, options = {})
+    includes = options[:include] || []
+    hash = api_json(membership, user, session, API_GROUP_MEMBERSHIP_JSON_OPTS)
+    if includes.include?('just_created')
+      hash['just_created'] = membership.just_created || false
+    end
+    hash
   end
 end

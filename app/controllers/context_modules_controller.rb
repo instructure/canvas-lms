@@ -322,10 +322,14 @@ class ContextModulesController < ApplicationController
     end
   end
 
+  include ContextModulesHelper
   def add_item
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
       @tag = @module.add_item(params[:item])
+      @tag[:publishable] = module_item_publishable?(@tag)
+      @tag[:published] = module_item_published?(@tag)
+      @tag[:publishable_id] = module_item_publishable_id(@tag)
       render :json => @tag
     end
   end

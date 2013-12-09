@@ -72,7 +72,8 @@ class SubmissionsApiController < ApplicationController
   #   List of student ids to return submissions for. If this argument is
   #   omitted, return submissions for the calling user. Students may only list
   #   their own submissions. Observers may only list those of associated
-  #   students.
+  #   students. The special id "all" will return submissions for all students
+  #   in the course/section as appropriate.
   #
   # @argument assignment_ids[] [String]
   #   List of assignments to return submissions for. If none are given,
@@ -105,89 +106,113 @@ class SubmissionsApiController < ApplicationController
   #       }
   #     ]
   def for_students
-    student_ids = map_user_ids(params[:student_ids] || []).map(&:to_i)
-    student_ids << @current_user.id if student_ids.empty?
-    if student_ids == [@current_user.id] ||
-        is_authorized_action?(@context, @current_user, [:manage_grades, :view_all_grades]) ||
-        (student_ids - @context.observer_enrollments.where(:user_id => @current_user.id, :workflow_state => 'active').pluck(:associated_user_id)).empty?
-      student_ids &= visible_user_ids(:include_priors => true)
-      return render(:json => []) if student_ids.blank?
-
-      max_students = Setting.get('api_max_per_page', '50').to_i
-      student_ids = student_ids.first(max_students)
-
-      includes = Array(params[:include])
-
-      assignment_scope = @context.assignments.active
-      requested_assignment_ids = Array(params[:assignment_ids]).map(&:to_i)
-      if requested_assignment_ids.present?
-        assignment_scope = assignment_scope.where(:id => requested_assignment_ids)
-      end
-      assignments = assignment_scope.all
-      # preload with stuff already in memory
-      assignments.each { |a| a.context = @context }
-      assignments_hash = assignments.index_by(&:id)
-
-      if params[:grouped].present?
-        scope = (@section || @context).all_student_enrollments.
-            includes(:user).
-            where('users.id' => student_ids)
-
-        submissions = if requested_assignment_ids.present?
-                        Submission.where(
-                          :user_id => student_ids,
-                          :assignment_id => assignments
-                        ).all
-                      else
-                        Submission.joins(:assignment).where(
-                          :user_id => student_ids,
-                          "assignments.context_type" => @context.class.name,
-                          "assignments.context_id" => @context.id
-                        ).where(
-                          "assignments.workflow_state != 'deleted'"
-                        ).all
-                      end
-        Submission.bulk_load_versioned_attachments(submissions)
-        submissions_for_user = submissions.group_by(&:user_id)
-
-        seen_users = Set.new
-        result = []
-        scope.each do |enrollment|
-          student = enrollment.user
-          next if seen_users.include?(student.id)
-          seen_users << student.id
-          hash = { :user_id => student.id, :submissions => [] }
-          student_submissions = submissions_for_user[student.id] || []
-          student_submissions.each do |submission|
-            # we've already got all the assignments loaded, so bypass AR loading
-            # here and just give the submission its assignment
-            submission.assignment = assignments_hash[submission.assignment_id]
-            submission.user = student
-
-            hash[:submissions] << submission_json(submission, submission.assignment, @current_user, session, @context, includes)
-          end unless assignments.empty?
-          if includes.include?('total_scores') && params[:grouped].present?
-            hash.merge!(
-              :computed_final_score => enrollment.computed_final_score,
-              :computed_current_score => enrollment.computed_current_score)
-          end
-          result << hash
-        end
-      else
-        submissions = @context.submissions.except(:includes, :order).where(:user_id => student_ids).includes(:user).order(:id)
-        submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
-        submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
-        Submission.bulk_load_versioned_attachments(submissions)
-        result = submissions.map do |s|
-          s.assignment = assignments_hash[s.assignment_id]
-          submission_json(s, s.assignment, @current_user, session, @context, includes)
-        end
-      end
-
-      render :json => result
+    if params[:student_ids].try(:include?, 'all')
+      all = true
     else
-      render_unauthorized_action(@course)
+      student_ids = map_user_ids(params[:student_ids] || []).map(&:to_i)
+      student_ids << @current_user.id if student_ids.empty?
     end
+
+    can_view_all = is_authorized_action?(@context, @current_user, [:manage_grades, :view_all_grades])
+    if all && can_view_all
+      opts = { include_priors: true }
+      if @section
+        opts[:section_ids] = [@section.id]
+      end
+      # this is a scope, and will generate subqueries
+      student_ids = @context.enrollments_visible_to(@current_user, opts).select(:user_id)
+    elsif can_view_all
+      inaccessible_students = student_ids - visible_user_ids(:include_priors => true)
+      if !inaccessible_students.empty?
+        return render_unauthorized_action(@course)
+      end
+    else
+      # can view observees
+      allowed_student_ids = @context.observer_enrollments.where(:user_id => @current_user.id, :workflow_state => 'active').where("associated_user_id IS NOT NULL").pluck(:associated_user_id)
+      # can view self, if a student
+      allowed_student_ids << @current_user.id if is_authorized_action?(@context, @current_user, :participate_as_student)
+      return render_unauthorized_action(@course) if allowed_student_ids.empty?
+      if all
+        student_ids = allowed_student_ids
+      else
+        inaccessible_students = student_ids - allowed_student_ids
+        return render_unauthorized_action(@course) if !inaccessible_students.empty?
+      end
+    end
+
+    if Array === student_ids
+      return render json: { error: 'too many students' }, status: 400 if student_ids.length > Api.max_per_page
+    end
+
+    includes = Array(params[:include])
+
+    assignment_scope = @context.assignments.active
+    requested_assignment_ids = Array(params[:assignment_ids]).map(&:to_i)
+    if requested_assignment_ids.present?
+      assignment_scope = assignment_scope.where(:id => requested_assignment_ids)
+    end
+    assignments = assignment_scope.all
+    # preload with stuff already in memory
+    assignments.each { |a| a.context = @context }
+    assignments_hash = assignments.index_by(&:id)
+
+    if params[:grouped].present?
+      scope = (@section || @context).all_student_enrollments.
+          includes(:user).
+          where('users.id' => student_ids)
+
+      submissions = if requested_assignment_ids.present?
+                      Submission.where(
+                        :user_id => student_ids,
+                        :assignment_id => assignments
+                      ).all
+                    else
+                      Submission.joins(:assignment).where(
+                        :user_id => student_ids,
+                        "assignments.context_type" => @context.class.name,
+                        "assignments.context_id" => @context.id
+                      ).where(
+                        "assignments.workflow_state != 'deleted'"
+                      ).all
+                    end
+      Submission.bulk_load_versioned_attachments(submissions)
+      submissions_for_user = submissions.group_by(&:user_id)
+
+      seen_users = Set.new
+      result = []
+      scope.each do |enrollment|
+        student = enrollment.user
+        next if seen_users.include?(student.id)
+        seen_users << student.id
+        hash = { :user_id => student.id, :submissions => [] }
+        student_submissions = submissions_for_user[student.id] || []
+        student_submissions.each do |submission|
+          # we've already got all the assignments loaded, so bypass AR loading
+          # here and just give the submission its assignment
+          submission.assignment = assignments_hash[submission.assignment_id]
+          submission.user = student
+
+          hash[:submissions] << submission_json(submission, submission.assignment, @current_user, session, @context, includes)
+        end unless assignments.empty?
+        if includes.include?('total_scores') && params[:grouped].present?
+          hash.merge!(
+            :computed_final_score => enrollment.computed_final_score,
+            :computed_current_score => enrollment.computed_current_score)
+        end
+        result << hash
+      end
+    else
+      submissions = @context.submissions.except(:includes, :order).where(:user_id => student_ids).includes(:user).order(:id)
+      submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
+      submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
+      Submission.bulk_load_versioned_attachments(submissions)
+      result = submissions.map do |s|
+        s.assignment = assignments_hash[s.assignment_id]
+        submission_json(s, s.assignment, @current_user, session, @context, includes)
+      end
+    end
+
+    render :json => result
   end
 
   # @API Get a single submission

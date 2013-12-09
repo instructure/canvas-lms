@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -114,6 +114,11 @@ class DiscussionTopic < ActiveRecord::Base
   def schedule_delayed_transitions
     self.send_at(self.delayed_post_at, :update_based_on_date) if @should_schedule_delayed_post
     self.send_at(self.lock_at, :update_based_on_date) if @should_schedule_lock_at
+    # need to clear these in case we do a save whilst saving (e.g.
+    # Announcement#respect_context_lock_rules), so as to avoid the dreaded
+    # double delayed job ಠ_ಠ
+    @should_schedule_delayed_post = nil
+    @should_schedule_lock_at = nil
   end
 
   def update_subtopics
@@ -419,8 +424,11 @@ class DiscussionTopic < ActiveRecord::Base
   # There may be delayed jobs that expect to call this to update the topic, so be sure to alias
   # the old method name if you change it
   def update_based_on_date
-    lock if should_lock_yet
-    delayed_post unless should_not_post_yet
+    transaction do
+      reload lock: true # would call lock!, except, oops, workflow overwrote it :P
+      lock if should_lock_yet
+      delayed_post unless should_not_post_yet
+    end
   end
   alias_method :try_posting_delayed, :update_based_on_date
   alias_method :auto_update_workflow, :update_based_on_date
@@ -457,6 +465,10 @@ class DiscussionTopic < ActiveRecord::Base
 
   def published?
     workflow_state != 'post_delayed'
+  end
+
+  def can_unpublish?
+    !self.assignment && self.discussion_subentry_count == 0
   end
 
   def should_send_to_stream
@@ -540,7 +552,7 @@ class DiscussionTopic < ActiveRecord::Base
   def destroy
     ContentTag.delete_for(self)
     self.workflow_state = 'deleted'
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     self.save
 
     if self.for_assignment? && self.root_topic_id.blank?

@@ -782,7 +782,7 @@ module ApplicationHelper
     @current_user.set_menu_data(session[:enrollment_uuid])
     [
       @current_user.menu_courses(session[:enrollment_uuid]),
-      @current_user.accounts,
+      @current_user.all_accounts,
       @current_user.cached_current_group_memberships,
       @current_user.enrollments.ended
     ].any?{ |e| e.respond_to?(:count) && e.count > 0 }
@@ -822,7 +822,11 @@ module ApplicationHelper
 
   def get_global_includes
     return @global_includes if defined?(@global_includes)
-    @global_includes = [Account.site_admin.global_includes_hash]
+    @global_includes = []
+    if @current_user && @current_user.enabled_theme != "default"
+      @global_includes << {:css => "compiled/#{@current_user.enabled_theme}"}
+    end
+    @global_includes << Account.site_admin.global_includes_hash
     @global_includes << @domain_root_account.global_includes_hash if @domain_root_account.present?
     if @domain_root_account.try(:sub_account_includes?)
       # get the deepest account to start looking for branding

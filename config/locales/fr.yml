@@ -8,17 +8,18 @@ fr:
     bad_per_slot: "Vous devez autoriser au moins un rendez-vous par créneau horaire."
     context_required: "Vous devez choisir un calendrier."
     select_calendars: "Choisir des calendriers"
+  GrouDetailpView: 
+    student_count: 
+      one: "1 étudiant"
+      other: "%{count} étudiants"
+    user_count: 
+      one: "1 utilisateur"
+      other: " %{count} utilisateurs"
   GroupView: 
     delete_confirm: "Voulez-vous vraiment supprimer ce groupe ?"
     flash: 
       removeError: "Impossible de supprimer le groupe. Veuillez réessayer ultérieurement."
       removed: "Le groupe a bien été supprimé."
-    student_count: 
-      one: "1 étudiant"
-      other: "%{count} étudiants"
-    user_count: 
-      one: "1 utilisateur"
-      other: " %{count} utilisateurs"
   academic_benchmark: 
     api_error: "Impossible de mettre à jour les critères pour l’autorité %{auth}."
     bad_ab_file: "Le fichier Academic Benchmark fourni contient une erreur."
@@ -317,6 +318,7 @@ fr:
         sis_user_id: "ID SIS"
         sortable_name: "Nom répertorié"
       sortable_name_help: "Ce nom apparaît dans des listes de tri."
+      unique_id_label: "%{label} :*"
     add_user_button: "Ajouter un utilisateur"
     add_user_dialog_title: "Ajouter un nouvel utilisateur"
     adding_course_message: "Ajout d’un cours..."
@@ -1445,14 +1447,14 @@ fr:
       no_assignment_groups: "Aucun groupe de tâches trouvé"
     assignment_group_list_item: 
       add_assignment_to: "Ajouter une tâche pour %{name}"
+      assignment_group_delete: "Supprimer un groupe de travaux"
+      assignment_group_edit: "Modifier le groupe de travaux"
+      assignment_group_move: "Déplacer le groupe de travaux"
       delete: Supprimer
       edit: Modifier
       group_weight: "%{groupWeight}% du total"
       manage: Gérer
       move: "Déplacer vers&hellip;"
-      title_delete: "Supprimer le groupe de travaux ?"
-      title_edit: "Modifier le groupe de tâches"
-      title_move: "Déplacer le groupe de tâches"
     assignment_group_selector: 
       assignment_group: "Groupe de tâches"
       assignment_group_options: 
@@ -1461,26 +1463,27 @@ fr:
       one: 1 groupe
       other: "%{count} groupes"
     assignment_list_item: 
+      assignment_delete: "Supprimer le travail"
+      assignment_edit: "Modifier le travail"
+      assignment_move: "Déplacer le travail"
       delete: Supprimer
-      delete_asssignment_title: "Supprimer ce travail"
       edit: Modifier
-      edit_assignment_title: "Modifier la tâche"
       module: Module
       move: "Déplacer vers&hellip;"
-      move_assignment_title: "Déplacer le travail"
       multiple_modules: "Plusieurs modules"
       no_points_possible: "Aucun point possible"
       points_possible: "%{pointsPossible} points"
       points_possible_screen_reader: "%{pointsPossible} points possibles"
       settings: Paramètres
     assignment_list_item_score: 
+      assignment_grading_type_is_not_graded: "Ce travail ne sera pas noté."
       assignment_not_yet_graded_screenreader: "Travail pas encore noté. %{pointsPossible} points possibles."
+      empty_points_possible: "-/%{pointsPossible} pts"
       no_submission: "Aucun envoi"
       no_submission_for_assignment_screenreader: "Pas d’envoi pour ce travail. %{pointsPossible} points possibles."
-      no_submission_with_points_possible: "-/%{pointsPossible} pts"
-      not_yet_graded_with_points_possible: "*Pas encore noté*/%{pointsPossible} pts"
-      score_with_points_possible: "%{grade}/%{pointsPossible} pts"
-      score_with_points_possible_screenreader: "Note : %{grade} sur %{pointsPossible} points"
+      not_yet_graded: "*Pas encore noté*"
+      score_with_points_possible: "*%{score}*/%{pointsPossible} points"
+      score_with_points_possible_screenreader: "Résultat : %{score} sur %{pointsPossible} points."
     assignment_locked: 
       assignment_locked: "Cette tâche est verrouillée à partir du *%{lock_at}*"
       assignment_unlocked_from: "Cette tâche est verrouillée jusqu’au *%{unlock_at}*"
@@ -1537,6 +1540,7 @@ fr:
       submit_assignment: "Envoyer une tâche"
     cannot_delete_group: "Vous devez avoir au moins un groupe de tâches"
     cant_unpublish_when_students_submit: "Impossible de retirer la publication s’il y a des envois d’étudiants"
+    complete: Terminé
     confirm: 
       delete_assignment: "Voulez-vous vraiment supprimer cette tâche?"
       delete_group: "Voulez-vous vraiment supprimer ce groupe ?"
@@ -1662,6 +1666,10 @@ fr:
           *Assurez-vous de ne pas modifier les noms des fichiers d’envoi afin que nous puissions les reconnaître.*
       titles: 
         related_items: "Éléments apparentés"
+    grade_letter_grade_screenreader: "Note : %{grade}"
+    grade_pass_fail_screenreader: "Note : %{grade}"
+    grade_percent: "%{grade}%"
+    grade_percent_screenreader: "Note : %{grade}%"
     graded: "Cette tâche a été notée"
     grading_type_selector: 
       grading_type: "Type de notation"
@@ -1689,6 +1697,8 @@ fr:
         assignment_group: "Groupe de tâches"
         group_weight: Pondération
         total: Total
+    higher_than_max: "Vous ne pouvez pas utiliser une valeur supérieure au nombre de travaux"
+    incomplete: "Non terminé"
     index: 
       assignment_locked: "Cette tâche est actuellement verrouillée. Pour plus d’informations, consultez sa page d’informations."
       assignment_locked_tooltip: verrouillé
@@ -1734,6 +1744,7 @@ fr:
       submit_failed: "Échec de l’envoi, veuillez réessayer"
       submitting: "Envoi en cours…"
     multiple_due_dates: "Plusieurs dates d’échéance"
+    name_is_required: "Le nom doit être spécifié."
     needs_grading_count: "%{needs_grading_count} envois pour cette tâche restent à noter"
     never_drop: 
       remove_rule: "Supprimer la règle"
@@ -1750,6 +1761,7 @@ fr:
       assignments: Travaux
       no_assignments_found: "Aucun travail trouvé"
     no_tools_found: "Aucun outil trouvé"
+    non_number: "Vous devez utiliser un nombre"
     notices: 
       assignment_delete: "Cette tâche a été supprimée"
       created: "La tâche a été créée."
@@ -1799,6 +1811,7 @@ fr:
       peer_reviews_assign_at_explanation: "Doit être ultérieure à la date d’échéance. Si ce paramètre est omis, la date d’échéance est utilisée."
       reviews_per_user: "Révisions par utilisateur"
     percent_of_final_grade: "%{percent} de la note finale"
+    positive_number: "Vous devez utiliser un nombre positif"
     redirect_page: 
       redirect_message: |-
           Cet envoi était une URL ; nous vous dirigeons maintenant vers le lien de l’URL.  
@@ -2024,6 +2037,7 @@ fr:
       not_found: "Impossible de trouver les données du fichier"
     feed_title: "Fichier : %{title}"
     feed_title_with_context: "Fichier, %{course_or_group} : %{title}"
+    over_quota: "Le fichier téléchargé dépasse le quota."
     title: 
       migration_list: "Fichiers associés"
     upload_error_invalid_response_code: "Code de réponse erroné. %{code} au lieu de 200."
@@ -2237,9 +2251,11 @@ fr:
     sample_final_answer: "Cette valeur est un exemple de résultat final pour ce type de question"
   calendar: 
     agenda_view: 
-      delete: Supprimer
       due: échéance
-      edit: Modifier
+      loading: Chargement
+      no_events: "Aucun événement après cette date."
+      starts_at: "Commence à"
+    agenda_view_displaying_start_end: "Vue actuelle : de %{start} à %{end}"
     appointment_group_deletion_details: "La suppression de cet élément entraînera la suppression de tous les rendez-vous pris par les étudiants."
     appointment_group_list: 
       location: "Lieu :"
@@ -2262,6 +2278,7 @@ fr:
       create_event: "Créer un événement"
       done_go_back_to_list: "Terminé, revenir à la liste"
       links: 
+        accessibility_warning: "Avertissement : les lecteurs d’écran ne permettent pas à leurs utilisateurs d’accéder à cette vue."
         calendar_agenda: "À faire"
         calendar_month: Mois
         calendar_scheduler: Planificateur
@@ -2271,7 +2288,7 @@ fr:
       refresh: Actualiser
       use_old_calendar: "Ancien calendrier"
     calendar_navigator: 
-      enter_jump_date: "Spécifiez une date et appuyez sur Entrée pour afficher ce jour."
+      enter_navigation_date: "Indiquez la date que vous voulez atteindre."
       next: Suivant
       previous: Précédent
       today: Aujourd’hui
@@ -2364,9 +2381,16 @@ fr:
       slots_available: "Créneaux horaires disponibles"
     event_event_title: "Intitulé de l’événement :"
     event_on_this_day: "Un événement est prévu à cette date."
-    invalid_date: "Date non valide"
+    event_type: 
+      assignment: Travail
+      discussion: Discussion
+      event: Événement
+      quiz: Questionnaire
+    input_is_invalid_date: "La saisie ne correspond pas à une date valide."
     labels: 
       due: échéance
+    loading_more_items: "Chargement d’éléments supplémentaires"
+    loading_undated_events: "Chargement des événements non datés"
     message_participants: 
       all_groups: "Tous les groupes"
       all_users: "Tous les utilisateurs"
@@ -2406,15 +2430,17 @@ fr:
     save_changes: "Enregistrer les modifications"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "Créer un groupe de rendez-vous"
+    screenreader_date_suggestion: "%{date}. Appuyez sur Entrée pour valider."
     time_block_errors: "Il y a des erreurs dans vos sélections de plages horaires."
     titles: 
       edit_appointment_group: "Modifier un groupe de rendez-vous"
       edit_event: "Modifier l’événement"
     today: Aujourd’hui
     undated_events: 
-      loading_undated_events: "Chargement des événements non datés..."
-      show_undated_events: "Afficher les événements non datés"
-      undated_events: "Événements non datés"
+      loading_undated_events: "Chargement des éléments non datés..."
+      no_undated_events: "Aucun élément non daté."
+      show_undated_events: "Afficher les éléments non datés"
+      undated_items: "Éléments non datés"
   calendar_event: 
     errors: 
       duplicate_child_event_contexts: "Dupliquer les contextes d’événements enfants"
@@ -2559,10 +2585,15 @@ fr:
     show2: 
       calendar_feed: "Flux de calendrier"
       calendar_feed_instructions: "Copiez le lien ci-dessous et collez-le dans une application de calendrier qui accepte les flux iCal (Google Agenda, iCal, Outlook, etc.)"
+      calendars: Calendriers
       feed_dialog_title: "Flux de calendrier"
       feed_title: "Flux Atom du calendrier de cours"
       links: 
         feed: "cliquez ici pour afficher le flux"
+      skip_to_calendar: "Passer au calendrier"
+      toggle_calendars: "Alterner entre les calendriers"
+      toggle_undated_items: "Alterner entre les éléments non datés"
+      undated_items: "Éléments non datés"
     titles: 
       add_new_assignment: "Ajouter une nouvelle tâche"
       add_new_event: "Ajouter un nouvel événement"
@@ -2982,7 +3013,7 @@ fr:
       import_migration: Importer
     moodle_zip: 
       options: Options
-    must_upload_file: "Le chargement du fichier est requis."
+    must_upload_file: "Le chargement du fichier ou l’URL est requis."
     no_content_selected: "Vous n’avez sélectionné aucun contenu à importer."
     progressing_content_migration: 
       issues_text: incidents
@@ -3398,7 +3429,120 @@ fr:
         state: État
       titles: 
         student_progression: "Progression du module par Étudiant"
+    content_next: 
+      add_prerequisite: "Ajouter des prérequis à *%{module}*"
+      assignment_points_possible: "sur %{points_possible}"
+      buttons: 
+        add_module: "Ajouter un module"
+        add_prerequisite: "Ajouter des prérequis"
+      criterion_for_assignment: "Pour %{assignment}, les utilisateurs doivent %{select_criterion}"
+      headings: 
+        add_prerequisite: "Ajouter des prérequis pour %{name}"
+        course_modules: "Modules du cours"
+        student_progress: "Progression dans le module par étudiant "
+        student_progress_for_module: "Progression des étudiants pour %{module}"
+        students_completed: "Étudiants ayant terminé le module"
+        students_in_progress: "Étudiants qui travaillent sur le module"
+        students_locked: "Étudiants qui n’ont pas déverrouillé le module"
+        students_unlocked: "Étudiants qui ont déverrouillé (mais pas commencé) le module"
+      help: 
+        create: |-
+            Les modules de cours permettent d’organiser les travaux personnels, les pages, les fichiers, etc. en sections ou blocs plus petits. Ils peuvent être axés sur un thème, ciblés en fonction d’un sujet spécifique ou simplement groupés chronologiquement.
+            
+              Vous pouvez aussi classer les modules en définissant des critères ou des prérequis pour chacun d’eux. Les étudiants ne pourront pas accéder aux modules avant d’en avoir terminé avec tous les prérequis. Cette mesure permet de les empêcher d’accéder à certains contenus ou fichiers avant d’avoir, par exemple, obtenu 75 % à un questionnaire de révision.
+            
+              Pour commencer à organiser votre cours en différents modules, cliquez sur le bouton %{button} à droite.
+        no_modules: "Aucun module n’a été défini pour ce cours."
+      images: 
+        alt: 
+          min_score: "résultat minimum"
+          must_contribute: "doivent participer"
+          must_submit: "doivent envoyer"
+          must_view: "doivent consulter"
+        title: 
+          min_score: "Les étudiants doivent obtenir au moins %{min_score} à cet élément avant que le module ne soit considéré comme terminé"
+          must_contribute: "Les étudiants doivent participer à cet élément avant que ce module soit considéré comme terminé"
+          must_submit: "Les étudiants doivent envoyer ce travail avant que ce module soit considéré comme terminé"
+          must_view: "Les étudiants doivent consulter cet élément avant que ce module soit considéré comme terminé"
+      indent: 
+        ? "n"
+        : 
+          one: "Retrait 1 niveau"
+          other: "Retrait %{count} niveaux"
+          zero: "Pas de retrait"
+      key: 
+        description: 
+          delete: "Supprimer le module/élément actuel"
+          edit: "Modifier le module/élément"
+          indent: "Mettre en retrait l’élément actuel"
+          new: "Nouveau module"
+          next: "Module/élément suivant"
+          outdent: "Appliquer un retrait négatif à l’élément actuel"
+          previous: "Module/élément précédent"
+      keycode_descriptions: 
+        next_module_item: "Sélectionner le module ou l’élément de module suivant"
+        previous_module_item: "Sélectionner le module ou l’élément de module précédent"
+        toggle_module_dragging: "Sélectionner l’élément pour le déplacer ou lâcher l’élément déjà sélectionné "
+      keycodes: 
+        delete: d
+        edit: e
+        indent: i
+        new: "n"
+        next: j
+        next_module_item: Haut
+        outdent: o
+        previous: k
+        previous_module_item: Bas
+        toggle_module_dragging: Espace
+      labels: 
+        indent: Retrait
+        module_complete_when: "Ce module est terminé lorsque"
+        modules: 
+          before_students_view: "Avant que les étudiants ne voient ce module"
+        new_tab: "Télécharger cet outil dans un nouvel onglet"
+        require_sequential_progress: "les étudiants doivent suivre les étapes obligatoires de ce module dans l’ordre séquentiel"
+        sort_by: "Trier par"
+        title: Titre
+        unlock_at: "Déverrouiller dans"
+        url: URL
+      links: 
+        add_prerequisite: "Ajouter des prérequis"
+        add_requirement: "Ajouter des conditions requises"
+        reload_student: "Recharger la progression de l’étudiant"
+        sort_by_name: Nom
+        sort_by_progress: Progression
+        student_progress: "Afficher la progression"
+        title: 
+          remove_prerequisite: "Supprimer ce prérequis"
+      module: module
+      module_details: "Les modules sont affichés dans l’ordre séquentiel, par conséquent seuls ceux placés au-dessus de %{name} peuvent être définis comme prérequis."
+      module_name: "Nom du module"
+      modules_keyboard_hint: "Pour changer l’ordre des modules du cours et leurs éléments, commencez par désactiver le curseur dans votre lecteur d’écran. Appuyez sur Ins -Z dans JAWS. Appuyez sur Tab pour sélectionner le premier module. Appuyez sur Haut et Bas pour sélectionner un module ou un élément de module. Appuyez sur Espace pour sélectionner un module ou un élément et le faire glisser. Ensuite, appuyez sur Haut et Bas pour sélectionner une destination. Appuyez à nouveau sur Espace pour lâcher le module ou l’élément une fois la destination atteinte."
+      must_complete_prerequisites: "Ils doivent terminer"
+      no_preprequisites: "Aucun prérequis défini"
+      no_requirements: "Aucune condition requise définie"
+      prerequisites: 
+        another_module: "Autre module"
+      prerequisites_need_item: "Vous devrez ajouter des éléments avant de spécifier comment l’utilisateur terminera ce module"
+      requirements: 
+        must_contribute: "contribuer à la page"
+        must_score_at_least: "obtenir au moins"
+        must_submit: "envoyer le travail personnel"
+        must_view: "afficher l’élément"
+      select_module: 
+        instructions: "Sélectionner le module"
+        name: "le module %{module}"
+      select_prerequisite: "Sélectionnez le type de prérequis. Les étudiants ne peuvent pas voir un module tant qu’ils n’ont pas satisfait aux prérequis."
+      student_name: "Nom de l’étudiant"
+      table_headings: 
+        module: Module
+        state: État
+      titles: 
+        student_progression: "Progression dans le module par étudiant"
     context_module: 
+      admin_links: 
+        module_options_label: "Options de module"
+        module_options_title: "Options de module"
       context_module: 
         draft: (Brouillon)
       images: 
@@ -3422,12 +3566,34 @@ fr:
           delete_module: "Supprimer ce module"
           edit_module: Modifier
           student_progress: "Afficher la progression de l’étudiant pour ce module"
-      manage: Gérer
+      manage: "Options de module"
       module_will_unlock_at: "se déverrouillera le *%{unlock_date}*"
       progression_complete_count: "*%{count}* terminés"
       progression_started_count: "*%{count}* en cours"
       reorder_modules: "Faire glisser les modules pour les classer"
       unpublish: "Annuler la publication"
+    context_module_next: 
+      images: 
+        alt: 
+          incomplete: incomplet
+        title: 
+          complete: "Module terminé"
+          incomplete: "Module non terminé"
+          locked: "Module verrouillé"
+      links: 
+        add_item: "Ajouter un contenu"
+        text: 
+          delete_module: Supprimer
+          edit_module: Modifier
+        title: 
+          delete_module: "Supprimer ce module"
+          edit_module: Modifier
+          student_progress: "Afficher la progression de l’étudiant pour ce module"
+      manager_module: "Gérer le module"
+      module_will_unlock_at: "se déverrouillera le *%{unlock_date}*"
+      progression_complete_count: "*%{count}* terminés"
+      progression_started_count: "*%{count}* en cours"
+      reorder_modules: "Faire glisser les modules pour les réorganiser"
     context_modules: 
       publish: Publier
     errors: 
@@ -3480,6 +3646,46 @@ fr:
       must_view: 
         fulfilled: "a consulté la page"
         unfulfilled: "doit consulter la page"
+    module_item_next: 
+      drag_to_reorder: "Faire glisser l’élément pour le classer ou le déplacer dans un autre module"
+      images: 
+        alt: 
+          max_score: "résultat maximum"
+          min_score: "résultat minimum"
+          must_contribute: "doivent participer"
+          must_submit: "doivent envoyer"
+          must_view: "doivent consulter"
+        title: 
+          max_score: "Les étudiants ne doivent pas dépasser le résultat maximum pour cet élément avant que ce module soit considéré comme terminé."
+          min_score: "Les étudiants doivent obtenir le résultat minimum pour cet élément avant que le module soit considéré comme terminé."
+          must_contribute: "Les étudiants doivent participer à cet élément avant que le module soit considéré comme terminé."
+          must_submit: "Les étudiants doivent envoyer ce travail avant que le module soit considéré comme terminé."
+          must_view: "Les étudiants doivent consulter cet élément avant que le module soit considéré comme terminé."
+      links: 
+        edit_item: Modifier
+        edit_item_details: "Modifier les détails de l’élément"
+        indent: Retrait
+        indent_item: "Mettre l’élément en retrait"
+        outdent: "Diminuer le retrait"
+        outdent_item: "Diminuer le retrait de l’élément"
+        remove_item: Supprimer
+        remove_item_from_module: "Supprimer cet élément du module"
+      max_score: 
+        fulfilled: "a un résultat qui ne dépasse pas %{score}"
+        unfulfilled: "ne doit pas avoir un résultat supérieur à %{score}"
+      min_score: 
+        fulfilled: "a un résultat au moins égal à %{score}"
+        unfulfilled: "doit avoir un résultat au moins égal à %{score}"
+      must_contribute: 
+        fulfilled: "a participé au contenu de la page"
+        unfulfilled: "doit participer au contenu de la page"
+      must_submit: 
+        fulfilled: "a envoyé le travail"
+        unfulfilled: "doit envoyer le travail"
+      must_view: 
+        fulfilled: "a consulté la page"
+        unfulfilled: "doit consulter la page"
+      settings: Paramètres
     module_locked: Verrouillé
     module_started: "En cours"
     module_unlocked: Déverrouillé
@@ -3518,6 +3724,7 @@ fr:
     errors: 
       field_is_required: "Ce champ est obligatoire."
     message_sent: "Message envoyé !"
+    no_course: "Pas de cours"
     select_course: "Sélectionner un cours"
   conversation_message: 
     subject: "Message confidentiel %{timestamp}"
@@ -3648,7 +3855,6 @@ fr:
       compose_new_message: "Composer un nouveau message"
       delete: Supprimer
       delete_conversation: "Supprimer la conversation"
-      enter_name_group_or_course: "Saisissez un nom, un groupe ou un cours"
       filter_messages_by_course: "Filtrer les messages par cours"
       filter_messages_by_type: "Filtrer les messages par type"
       forward: Transférer
@@ -3658,6 +3864,7 @@ fr:
       more_options: "Plus d’options"
       reply: Répondre
       reply_all: "Répondre à tous"
+      search_by_user: "Rechercher par utilisateur"
       search_for_recipients: "Rechercher les destinataires"
       search_names_groups_courses: "Rechercher des noms, groupes et cours"
       sending: "envoi en cours"
@@ -3707,12 +3914,11 @@ fr:
         remove_media_comment: "Supprimer le commentaire multimédia"
     message_form_dialog: 
       body: "Corps du texte"
-      bulk_explanation: "Cette option crée des messages individuels pour tous les destinataires indiqués dans le champ À :."
-      bulk_message: "Envoi en nombre"
       headings: 
         new_message: "Nouveau message"
       inbox_actions: 
         add_people: "Ajouter des personnes"
+      individual_message_explanation: "Cela enverra des messages individuels à chacun des destinataires."
       labels: 
         add_to_faculty_journal: "Ajouter comme entrée du journal des enseignants"
         attachments: "Pièces jointes"
@@ -3723,8 +3929,10 @@ fr:
       links: 
         media_comment: Enregistrer
       media_comment: "Commentaire multimédia"
+      no_course: "Pas de cours"
       no_subject: "Aucun sujet"
       search_names_groups_courses: "Rechercher des noms, groupes et cours"
+      send_individual_messages: "Envoyer des messages individuels"
       titles: 
         media_comment: "Commentaire multimédia enregistré"
         record_media_comment: "Enregistrer un commentaire audio ou vidéo"
@@ -3744,6 +3952,7 @@ fr:
       sending_message: "Envoi de *%{message_preview}* à *%{num_people}*"
     more_participants: "+%{total} en plus"
     no_message: 
+      batch_selected: "Plusieurs conversations sélectionnées"
       beta_description: "Vous utilisez actuellement une version bêta de la boîte de réception Canvas"
       beta_version: "Version bêta"
       no_conversations_selected: "Aucune conversation sélectionnée"
@@ -4291,6 +4500,7 @@ fr:
         add_section: "Ajouter une section"
         move_course: "Déplacer le cours"
         update_course: "Mettre à jour les informations du cours"
+      course_open_enrollment_without_code: "L’inscription libre est possible pour ce cours. Les étudiants pourront s’y inscrire dès que vous leur aurez communiqué cette URL : *%{url}*"
       course_overrides_term: "Cette action remplacera les paramètres de disponibilité du trimestre."
       date_restricted: "Les utilisateurs peuvent participer à ce cours uniquement entre ces dates."
       deatils: 
@@ -4356,7 +4566,6 @@ fr:
         public_syllabus: "Rendre public le programme de ce cours"
         restrict_enrollments_to_course_dates: "Les utilisateurs peuvent participer à ce cours uniquement entre ces dates"
         root_account_id: "Compte racine"
-        self_enrollment: "Laisser les étudiants s’inscrire librement en partageant avec eux une URL secrète"
         sis_source_id: "ID SIS"
         start_at: "Débute à"
         storage_quota: "Stockage de fichier"
@@ -4371,7 +4580,9 @@ fr:
           delete_section: "Supprimer la section"
           edit_section: "Modifier la section"
       megabytes: mégaoctets
-      navigation_keyboard_hint: "Pour changer l’ordre des liens de navigation du cours, commencez par désactiver le curseur dans votre écran. Insérez -z dans JAWS. Appuyez sur Tab pour sélectionner le premier lien. Appuyez sur Haut et Bas pour sélectionner un lien. Appuyez sur Espace pour sélectionner un lien et commencer à le faire glisser. Ensuite, appuyez sur Haut et Bas pour sélectionner une destination. Appuyez à nouveau sur Espace pour lâcher le lien une fois la destination atteinte. "
+      navigation_keyboard_hint: |-
+          Si vous utilisez un lecteur d’écran, désactivez le curseur virtuel ou le tampon virtuel sur votre appareil pour changer l’ordre des liens de navigation dans le cours (pour cela, appuyez sur Ins-Z pour JAWS). Appuyez sur CTRL-Origine pour passer directement en haut de la page, puis sur Tab jusqu’à ce que vous arriviez sur le premier lien de navigation. Appuyez sur les flèches Haut et Bas jusqu’à ce que vous entendiez le lien que vous voulez déplacer, puis appuyez sur Espace pour le sélectionner. Ensuite, appuyez sur les flèches Haut et Bas jusqu’à ce que vous trouviez le nouvel emplacement. Enfin, appuyez à nouveau sur Espace pour placer le lien que vous déplacez juste après le lien actuel. Lorsque vous avez terminé, réactivez le curseur/tampon virtuel.
+          ..
       no_date: "Aucune date définie"
       no_language_preference: "Non définie (paramétrable par l’utilisateur, %{language} par défaut)"
       none: Aucun
@@ -4380,6 +4591,8 @@ fr:
       private_course: Privé
       public_course: Public
       section_sis_id: "ID SIS : %{section_sis}"
+      self_enrollment: "Permettre aux étudiants de s’inscrire librement en leur communiquant un code secret ou une URL secrète"
+      self_enrollment_without_code: "Permettre aux étudiants de s’inscrire librement en leur communiquant une URL secrète"
       set_grading_scheme: "définir le système de notation"
       sis_source_id: "ID SIS"
       tab_cant_disable: "Cette page ne peut pas être désactivée mais simplement masquée"
@@ -4420,9 +4633,31 @@ fr:
     show: 
       acting_as: "Vous pouvez actuellement afficher ce cours avec le rôle : %{enrollment_type}. Vous disposez uniquement des autorisations et de l’accès accordés aux utilisateurs possédant ce rôle."
       buttons: 
-        update_layout: Enregistrer
+        update_layout: "Actualiser la disposition"
       details: 
+        assignments: "Cette vue montre la **liste des travaux personnels** pour ce cours, les plus récents et ceux à venir en premier."
         confirm_unenroll: "Voulez-vous vraiment vous désinscrire de ce cours ? Vous ne pourrez plus afficher la liste des cours ou communiquer directement avec les enseignants, et vous ne pourrez plus afficher les événements du cours dans le flux ou sous forme de notifications."
+        custom_page: "Vous pouvez **créer votre propre page d’accueil de cours** et inclure les liens, images ou éléments multimédias de votre choix."
+        modules: |-
+            Vous pouvez organiser votre cours en **modules ou sections**, où chaque section contient par exemple un ensemble de fichiers, des travaux ou des pages associés. Si vous le souhaitez, vous pouvez également classer les modules en définissant des critères et des prérequis à satisfaire avant que chaque module ne soit déverrouillé.
+            
+            -Cette disposition est probablement la mieux adaptée aux cours qui ne sont pas basés sur un agenda spécifique, comme un trimestre ou un semestre.
+        recent_activity_dashboard: "Le **tableau des dernières activités** permet aux participants de voir les dernières conversations, annonces, discussions et interactions relatives à ce cours. Ce tableau ressemble à ce que les utilisateurs voient la première fois qu’ils se connectent, mais son contenu concerne uniquement ce cours."
+        syllabus: "La **vue du programme** permet de rédiger une description des attentes pour le cours, ou de le présenter en ajoutant des liens, des images, etc., et d’afficher également un calendrier de tous les travaux et événements du cours."
+      draft_state: 
+        buttons: 
+          cancel: Annuler
+          update_layout: Enregistrer
+        headings: 
+          set_layout: "Définir la présentation de la page d’accueil"
+        labels: 
+          select_content: "Sélectionnez le contenu à afficher dans la page d’accueil."
+        options: 
+          assignments: "Liste des travaux personnels"
+          custom_page: "Première page"
+          modules: "Modules du cours"
+          recent_activity_dashboard: "Tableau des dernières activités"
+          syllabus: Programme
       empty_body: "Pas de contenu"
       headings: 
         confirm_unenroll: "Confirmer la désinscription"
@@ -4432,11 +4667,12 @@ fr:
         unpublished: "La publication de ce cours a été annulée"
       importing: "Copie/migration en cours. Une partie du contenu du cours peut être temporairement indisponible."
       labels: 
-        set_layout: "Sélectionnez le contenu à afficher dans la page d’accueil."
+        select_content: "Lorsque les utilisateurs consultent la page de cours, afficher"
       license_notice: "Ce contenu de cours est proposé sous licence %{license_type}. Sauf indication contraire, le contenu de ce cours est protégé par cette licence."
       links: 
         change_layout: "Modifier la présentation de la page d’accueil du cours"
         course_setup: "Liste de vérification de la configuration du cours"
+        course_stream: "Voir Flux du cours"
         drop_course: "Abandonner ce cours"
         edit_homepage: "Modifier la page d’accueil"
         join_course: "Rejoindre ce cours"
@@ -4444,11 +4680,11 @@ fr:
         restore_role: "Rétablir le rôle et les autorisations"
         view_course_stream: "Afficher le flux du cours"
       options: 
-        assignments: "Liste des travaux"
-        custom_page: "Première page"
-        modules: "Modules du cours"
-        recent_activity_dashboard: "Tableau des dernières activités"
-        syllabus: Programme
+        assignments: "la liste des travaux personnels"
+        custom_page: "une page conçue par moi-même"
+        modules: "les modules/sections du cours"
+        recent_activity_dashboard: "le tableau des dernières activités"
+        syllabus: "les travaux personnels avec le programme"
       period_name: "les deux dernières semaines"
       re_sending: "Renvoi en cours..."
       send_done: "Terminé. Le message peut prendre quelques minutes à arriver."
@@ -6694,6 +6930,7 @@ fr:
       group_limit: "La limite du groupe doit être vide ou supérieure à 1"
       unknown: "Une erreur inattendue s’est produite."
       update_failed: "Échec de la mise à jour, veuillez réessayer"
+    everyone: "Tout le monde (%{count})"
     feed_title: "Flux de %{course_or_account_name}"
     flash: 
       removeError: "Impossible de supprimer l’ensemble de groupes. Veuillez réessayer ultérieurement."
@@ -6724,7 +6961,8 @@ fr:
         add_unassigned_user: "Ajouter un utilisateur non attribué"
         search_people: "Rechercher des personnes"
       add_unassigned_user: 
-        assign_to_group: "Attribuer au groupe"
+        add_to_group: "Ajouter l’utilisateur au groupe"
+        add_user_to_group: "Ajouter l’utilisateur %{name} à ce groupe"
       add_unassigned_users: 
         no_users_found: "Aucun utilisateur trouvé"
         too_short: "Veuillez saisir un terme de recherche contenant au moins 3 caractères"
@@ -6733,13 +6971,8 @@ fr:
         all_groups_full: "Tous les groupes sont complets."
         all_groups_full_suggestion: "Changez les limites pour les groupes ou ajoutez d’autres groupes."
         assign_user_to_group: "Attribuer l’utilisateur à ce groupe"
+        assign_user_to_group_name: "Attribuer l’utilisateur au groupe %{name}"
         no_groups_created: "Il faut créer les groupes avant de pouvoir ajouter des utilisateurs."
-      group: 
-        add_user_to_group: "Attribuer l’utilisateur au groupe"
-        group_delete: Supprimer
-        group_edit: Modifier
-        group_settings: Paramètres
-        show_group_details: "Afficher les détails du groupe"
       group_categories: 
         account_group_explanation: "Les groupes d’étudiants créés au niveau du compte représentent un bon moyen de créer des groupes sans être lié à un cours donné. Chaque groupe d’étudiants reçoit son calendrier, son tableau de discussion et ses outils de collaboration afin de s’organiser et de travailler ensemble plus efficacement."
         add_group_set: "Ajouter un ensemble de groupes"
@@ -6751,7 +6984,6 @@ fr:
           course_groups: "Groupes d’étudiants"
       group_category: 
         randomly_assigning_students: "Attribution aléatoire des étudiants"
-        search: Rechercher
         search_groups: "Rechercher des groupes"
       group_category_create: 
         allow_self_signup: "Autoriser l’inscription libre"
@@ -6791,6 +7023,14 @@ fr:
         require_same_section: "Nécessite le groupement des membres dans la même section"
         save: Enregistrer
         saving: Enregistrement...
+      group_detail: 
+        add_user_to_group: "Attribuer l’utilisateur au groupe"
+        group_delete: Supprimer
+        group_edit: Modifier
+        group_full: Complet
+        group_settings: Paramètres
+        show_group_details: "Afficher les détails du groupe %{name}"
+        visit_group_homepage: "Visiter la page d’accueil"
       group_edit: 
         cancel: Annuler
         group_name: "Nom du groupe"
@@ -6798,7 +7038,9 @@ fr:
         saving: Enregistrement...
       group_user: 
         assign_to_group: "Attribuer au groupe"
+        assign_user_to_group: "Attribuer l’utilisateur %{name} à un groupe"
         remove_from_group: "Supprimer du groupe"
+        remove_user_from_group: "Retirer l’utilisateur %{name} de ce groupe"
       group_users: 
         no_students: "Aucun étudiant"
         no_users: "Aucun utilisateur"
@@ -6806,8 +7048,8 @@ fr:
         no_groups: "Aucun groupe."
         no_matching_groups: "Aucun groupe ne correspond."
       randomly_assign_members: 
-        add_more_users: Annuler
-        close: OK
+        cancel: Annuler
+        okay: OK
         randomly_assign_students_dialog: "Tous les étudiants non attribués seront répartis aussi équitablement que possible dans les groupes d’étudiants existants."
       self_signup_help: 
         about_self_signup_groups: "À propos des groupes d’inscription libre"
@@ -8831,9 +9073,9 @@ fr:
     quiz_locked_until: "Ce questionnaire est verrouillé jusqu’au %{date}."
     quiz_regrade_finished: 
       email: 
-        body: "Recalcul de la note terminé pour le questionnaire %{quiz}"
+        body: "Reclassement terminé pour le questionnaire %{quiz}"
         html: 
-          body: "Recalcul de la note terminé pour le questionnaire %{quiz}"
+          body: "Reclassement terminé pour le questionnaire %{quiz}"
           link_message: "Vous pouvez consulter le questionnaire ici :"
           subject: "Recalcul de la note du questionnaire terminé : %{quiz}, %{context}"
         link_message: "Vous pouvez consulter le questionnaire ici :"
@@ -9244,6 +9486,7 @@ fr:
     sure_you_want_to_mute: "Voulez-vous vraiment mettre cette tâche en mode silencieux ? Tant qu’elle sera en mode silencieux, les étudiants ne reçoivent pas de nouvelles notifications ni ne peuvent afficher :"
   name: "Outil d’importation Academic Benchmarks"
   new_facebook_message: "Vous avez un nouveau message de Canvas"
+  no_migration_file: "Fichier requis pour la migration de ce contenu."
   not_applicable: NA
   notification: 
     added_to_conversation_description: "Vous êtes ajouté à une conversation"
@@ -9615,6 +9858,7 @@ fr:
       page_deleted: "La page « %{title} » a été supprimée."
     reload_editing_page: "Cette page a changé depuis que vous avez commencé à la modifier. Le *rechargement* aura pour conséquence la perte de toutes vos modifications."
     reload_viewing_page: "Cette page a changé depuis que vous avez commencé à la lire. *Recharger*"
+    restore_failed: "Impossible de restaurer la révision de la page"
     save_button: Enregistrer
     saving_button: Enregistrement...
     warnings: 
@@ -10109,6 +10353,7 @@ fr:
         change_password: "Modifier le mot de passe"
         confirm_password: "Confirmer le mot de passe"
         default_email: "E-mail par défaut"
+        enabled_theme: "Thème activé"
         expires_at: Expiration
         headers: 
           approved_integrations: "Intégrations approuvées"
@@ -10416,6 +10661,8 @@ fr:
       unpublishing: "Annulation de la publication..."
   publishable: 
     cant_unpublish: "Impossible d’annuler la publication"
+  publishableModuleItem: 
+    disabled: "La publication est désactivée pour cet élément"
   purchases: 
     new: 
       payment_info: "Informations sur le paiement"
@@ -10653,7 +10900,7 @@ fr:
       regraded_score: "Note recalculée :"
       show_ansers_for_variable: "Afficher les réponses pour %{variable}"
       skip_question_text: "Passer au texte de la question."
-      submission_was_regraded: "La note de cette question a été recalculée. Votre résultat a changé."
+      submission_was_regraded: "La note de cette question a été recalculée. "
       titles: 
         question_correct_comment: "Les étudiants verront ce commentaire si leur réponse est correcte"
         question_incorrect_comment: "Les étudiants verront ce commentaire si leur réponse est incorrecte"
@@ -10684,21 +10931,7 @@ fr:
           Pour cet ensemble de formules, la réponse finale est 71. Toutefois,
           il n’y a pas de variables prédéfinies, par conséquent tous les étudiants auront la
           même question avec la même réponse. Pour plus d’informations sur les variables, voir l’onglet « variables ».
-      equation_variables: |-
-          Vous pouvez également définir des variables dans le texte de votre question à l’aide de crochets 
-          (« Combien font [a] + [b] ? »).  Pour chaque variable, vous verrez une « valeur exemple »
-          basée sur les paramètres de variables. Ceci afin de vous permettre de vérifier la formule mathématique
-          et de vous assurer qu’elle fonctionne.
-          
-          Par exemple, si votre question était « Combien font [a] + 5 ? », alors vous devez définir
-          la variable « a ». Si la valeur exemple pour « a » 
-          était 5,2, vous pourriez écrire :
-          
-          %{example}
-          
-          Avec cette formule vous pouvez générer un nombre quelconque de jeux de solutions, avec une 
-          valeur « a » différente dans chaque jeu. Un étudiant pourra voir la question
-          « Combien font 5,2 + 5 ? » quand l’autre verra « Combien font 9 + 5 ? ».
+      equation_variables2: "Vous pouvez également définir des variables dans le texte de votre question à l’aide de crochets (« Combien font [a] + [b] ? »). Pour chaque variable, vous verrez une « valeur exemple » basée sur les paramètres de variables. Cela vous permet de vérifier la formule mathématique et de vous assurer qu’elle fonctionne. Par exemple, si votre question est « Combien font [a] + 5 ? », alors vous devez définir la variable « a ». Si la valeur exemple de « a » est 5,2, vous pourriez écrire : %{example}. Avec cette formule, vous pouvez générer autant de jeux de solutions que vous voulez, avec une valeur « a » différente à chaque fois. Un étudiant pourrait voir la question « Combien font 5,2 + 5 ? » quand l’autre verrait « Combien font 9 + 5 ? »."
       links: 
         functions: Fonctions
         intro: Intro
@@ -10891,6 +11124,7 @@ fr:
         other: "%{user} bénéficie encore de %{count} tentatives"
       default_quiz_name: "Questionnaire %{course_name}"
       default_survey_name: "Enquête %{course_name}"
+      grade_by_question_warning: "La fonction Note par question est affectée par la nature aléatoire des questions dans un groupe."
       headers: 
         quiz_submissions: "Envois de questionnaire"
         survey_submissions: "Envois d’enquête"
@@ -12971,6 +13205,7 @@ fr:
   unknown: Inconnu
   unknown_question_bank: "Banque de questions inconnue"
   unknown_quiz: "Questionnaire inconnu"
+  unsupported_package: "Package de contenu non pris en charge"
   user: 
     default_collection_name: "Collection de %{user_name}"
     default_user_name: Utilisateur
@@ -13442,6 +13677,11 @@ fr:
       toolbar_menu: 
         settings: Paramètres
       view_page_history_wiki: "Afficher l’historique de la page"
+    wiki_page_content: 
+      page_locked: "Cette page est verrouillée."
+      page_locked_by_modules: "Cette page sera disponible lorsque vous aurez terminé ces modules :"
+      page_locked_by_modules_until: "Cette page sera disponible le %{lock_info.unlock_at} si vous avez terminé ces modules :"
+      page_locked_until: "Cette page sera disponible le %{lock_info.unlock_at}"
     wiki_page_edit: 
       buttons: 
         cancel: Annuler
@@ -13481,6 +13721,13 @@ fr:
         edit: Modifier
         settings: Paramètres
         use_front_page: "Utiliser comme première page"
+    wiki_page_revision: 
+      latest_revision: "Dernière révision"
+      restore_revision: "Restaurer cette révision"
+      revision_summary: "*%{updated_at}* par %{edited_by}"
+      same_as_latest: "Identique à *La dernière*"
+    wiki_page_revisions: 
+      revision_history: "Historique des révisions"
   wiki_page: 
     atom_author: "Page Wiki"
     atom_entry_title: "Page Wiki %{course_or_group_name} : %{page_title}"
@@ -13555,12 +13802,15 @@ fr:
     front_page: "Première page"
     notices: 
       cannot_edit: "Vous n’avez pas le droit de modifier la page « %{title} »."
+      cannot_read_revisions: "Vous n’êtes pas autorisé à réviser les anciennes révisions de « %{title} »."
       create_non_existent_page: "La page « %{title} » n’existe pas, mais vous pouvez la créer ci-dessous."
       page_deleted: "La page \"%{title}\" a été supprimée."
       page_does_not_exist: "La page « %{title} » n’existe pas."
       page_updated: "La page a été mise à jour."
     page_link: 
       link_hidden_from_students_warning: "Les étudiants ne verront pas ce lien"
+    page_revisions: 
+      page_revisions_title: "Révisions %{title} : %{context_name}"
     pages_index: 
       titles: 
         pages: Pages

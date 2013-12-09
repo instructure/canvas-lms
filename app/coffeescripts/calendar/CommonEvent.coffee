@@ -1,10 +1,17 @@
 define [
+  'i18n!calendar'
   'jquery'
   'jquery.ajaxJSON'
   'vendor/jquery.ba-tinypubsub'
-], ($) ->
+], (I18n, $) ->
 
   class
+    readableTypes:
+      assignment: I18n.t('event_type.assignment', 'Assignment')
+      discussion: I18n.t('event_type.discussion', 'Discussion')
+      event: I18n.t('event_type.event', 'Event')
+      quiz: I18n.t('event_type.quiz', 'Quiz')
+
     constructor: (data, contextInfo, actualContextInfo) ->
       @eventType = 'generic'
       @contextInfo = contextInfo
@@ -89,3 +96,13 @@ define [
       if @start && @end && (@end.getTime() - @start.getTime()) < minimumDuration
         # new date so we don't mutate the original
         @end = new Date(@start.getTime() + minimumDuration)
+
+    assignmentType: () ->
+      return if !@assignment
+      if @assignment.submission_types?.length
+        type = @assignment.submission_types[0]
+        if type == 'online_quiz'
+          return 'quiz'
+        if type == 'discussion_topic'
+          return 'discussion'
+      return 'assignment'

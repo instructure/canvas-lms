@@ -140,21 +140,6 @@ describe "assignment groups" do
     end
   end
 
-  context "draft state with no assignments or assignment groups" do
-    before do
-      Account.default.settings[:enable_draft] = true
-      Account.default.save!
-      @domain_root_account = Account.default
-      course_with_teacher_logged_in(:active_all => true)
-    end
-
-    it "should display no assignment groups" do
-      get "/courses/#{@course.id}/assignments"
-      wait_for_ajaximations
-      fj(".ig-empty-msg").should include_text("No Assignment Groups found")
-    end
-  end
-
   context "draft state" do
     before do
       Account.default.settings[:enable_draft] = true
@@ -163,6 +148,7 @@ describe "assignment groups" do
 
       course_with_teacher_logged_in(:active_all => true)
       @assignment_group = @course.assignment_groups.create!(:name => "Test Group")
+      @course.assignments.create(:name => "test", :assignment_group => @assignment_group)
 
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
@@ -192,34 +178,6 @@ describe "assignment groups" do
         wait_for_ajaximations
       end
 
-      it "should check the box on open" do
-        reset_flag_to_true
-        is_checked('#apply_assignment_group_weights')
-      end
-
-      it "should change a course's apply_assignment_group_weights flag" do
-        flag_before = @course.apply_group_weights?
-
-        f('#apply_assignment_group_weights').click
-        f('#update-assignment-settings').click
-        wait_for_ajaximations
-
-        @course.reload
-        flag_after = @course.apply_group_weights?
-        flag_after.should_not == flag_before
-      end
-
-      it "should hide the weights table" do
-        reset_flag_to_true
-        f('#apply_assignment_group_weights').click
-        f('#assignment_groups_weights').should_not be_displayed
-      end
-
-      it "should show the weights table" do
-        f('#apply_assignment_group_weights').click
-        f('#assignment_groups_weights').should be_displayed
-      end
-
       it "should save an assignment group's weight" do
         f('#apply_assignment_group_weights').click
         val_before = @assignment_group.group_weight
@@ -232,6 +190,7 @@ describe "assignment groups" do
       end
     end
 
+    #QUnit
     it "should create a new assignment group" do
       count = @course.assignment_groups.count
       f('#content #addGroup').click
@@ -246,6 +205,7 @@ describe "assignment groups" do
       f("#assignment_group_#{new_ag.id} .ig-header").text.should match "Assignment Group 1"
     end
 
+    #QUnit
     it "should edit an existing assignment group" do
       ag = @course.assignment_groups.first
       f("#assignment_group_#{ag.id} .al-trigger").click
@@ -260,17 +220,18 @@ describe "assignment groups" do
       f("#assignment_group_#{ag.id} .ig-header").text.should match "Modified Group"
     end
 
+    # QUnit POSSIBILITY
     it "should not remove new assignments when editing a group" do
       ag = @course.assignment_groups.first
 
       f("#assignment_group_#{ag.id} .add_assignment").click
-      wait_for_ajaximations
+      wait_for_animations
 
       replace_content(f("#ag_#{ag.id}_assignment_name"), "Disappear")
       fj('.create_assignment:visible').click
       wait_for_ajaximations
 
-      f("#assignment_group_#{ag.id} .ig-title").text.should match "Disappear"
+      fj("#assignment_group_#{ag.id} .assignment:eq(1) .ig-title").text.should match "Disappear"
 
       f("#assignment_group_#{ag.id} .al-trigger").click
       f("#assignment_group_#{ag.id} .edit_group").click
@@ -280,9 +241,10 @@ describe "assignment groups" do
       fj('.create_group:visible').click
       wait_for_ajaximations
 
-      f("#assignment_group_#{ag.id} .ig-title").text.should match "Disappear"
+      fj("#assignment_group_#{ag.id} .assignment:eq(1) .ig-title").text.should match "Disappear"
     end
 
+    #QUnit
     it "should save drop rules" do
       ag = @course.assignment_groups.first
       f("#assignment_group_#{ag.id} .al-trigger").click
@@ -300,6 +262,7 @@ describe "assignment groups" do
       f("#assignment_group_#{ag.id} .ig-header").text.should match "2 Rules"
     end
 
+    #QUnit
     it "should not save drop rules when non are given" do
       ag = @course.assignment_groups.first
       f("#assignment_group_#{ag.id} .al-trigger").click
@@ -314,6 +277,7 @@ describe "assignment groups" do
       f("#assignment_group_#{ag.id} .ig-header").text.should_not match "Rule"
     end
 
+    #QUnit
     it "should delete an assignment group with assignments" do
       @ag2 = @course.assignment_groups.create!(:name => "2nd Group")
       @course.assignments.create(:name => "Test assignment", :assignment_group => @ag2)
@@ -331,6 +295,7 @@ describe "assignment groups" do
       @ag2.workflow_state.should == 'deleted'
     end
 
+    #QUnit
     it "should delete an assignment group without assignments" do
       @ag2 = @course.assignment_groups.create!(:name => "2nd Group")
       refresh_page
@@ -347,6 +312,7 @@ describe "assignment groups" do
       @ag2.workflow_state.should == 'deleted'
     end
 
+    #QUnit
     it "should not delete the last assignment group" do
 
       f("#assignment_group_#{@assignment_group.id} .al-trigger").click
@@ -359,6 +325,7 @@ describe "assignment groups" do
       @assignment_group.should_not be nil
     end
 
+    # POSSIBILITY
     it "should move assignments to another assignment group" do
       before_count = @assignment_group.assignments.count
       @ag2 = @course.assignment_groups.create!(:name => "2nd Group")
@@ -383,6 +350,7 @@ describe "assignment groups" do
       @assignment.assignment_group.should == @assignment_group
     end
 
+    #QUnit
     it "should persist collapsed assignment groups" do
       selector = "#assignment_group_#{@assignment_group.id} .element_toggler"
       f(selector).click
@@ -392,6 +360,7 @@ describe "assignment groups" do
       f(selector).should have_attribute('aria-expanded', 'false')
     end
 
+    #QUnit
     it "should update delete dialog properly" do
       @ag2 = @course.assignment_groups.create!(:name => "2nd Group")
       @course.assignments.create(:name => "Test assignment", :assignment_group => @ag2)
@@ -454,6 +423,7 @@ describe "assignment groups" do
       ags.collect(&:position).should == [1,3,2,4,5]
     end
 
+    #QUnit
     it "should correctly display rules tooltip" do
       @assignment_group.rules_hash = {
         'drop_lowest' => '1',
@@ -476,12 +446,14 @@ describe "assignment groups" do
         @module.add_item :type => 'assignment', :id => @assignment.id
       end
 
+      #QUnit
       it "should show a single module's name" do
         refresh_page
         wait_for_ajaximations
-        f("#assignment_group_#{@assignment_group.id} .ig-row .ig-details .modules").text.should == "#{@module.name} Module"
+        fj("#assignment_group_#{@assignment_group.id} .assignment:eq(1) .ig-row .ig-details .modules").text.should == "#{@module.name} Module"
       end
 
+      #QUnit
       it "should correctly display multiple modules" do
         @a2 = @course.assignments.create!(:name => 'assignment 2', :assignment_group => @assignment_group)
         @m2 = @course.context_modules.create!(:name => "module 2")

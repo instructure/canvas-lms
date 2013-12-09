@@ -59,4 +59,4 @@ require [
     embedTinychat(tinychat) unless typeof tinychat is 'undefined'
     $.screenReaderFlashMessage(I18n.t('notifications.tinychat_inaccessible',
       'Warning: This page uses  Tinychat, a third party plugin that is not
-      accessible to screen readers.'), 20000)
+      accessible to screen readers.'))

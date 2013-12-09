@@ -215,7 +215,7 @@ describe ContentMigrationsController, :type => :integration do
       it "should error if upload file required but not provided" do
         @post_params.delete :pre_attachment
         json = api_call(:post, @migration_url, @params, @post_params, {}, :expected_status => 400)
-        json.should == {"message"=>"File upload is required"}
+        json.should == {"message"=>"File upload or url is required"}
       end
 
       it "should queue the migration when file finishes uploading" do
@@ -252,6 +252,17 @@ describe ContentMigrationsController, :type => :integration do
         migration = ContentMigration.find json['id']
         migration.workflow_state = 'pre_process_error'
       end
+    end
+
+    context "by url" do
+      it "should queue migration with url sent" do
+        post_params = {migration_type: 'common_cartridge_importer', settings:{file_url: 'http://example.com/oi.imscc'}}
+        json = api_call(:post, @migration_url, @params, post_params)
+        migration = ContentMigration.find json['id']
+        migration.attachment.should be_nil
+        migration.migration_settings[:file_url].should == post_params[:settings][:file_url]
+      end
+      
     end
 
   end

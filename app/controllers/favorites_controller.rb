@@ -47,8 +47,7 @@ class FavoritesController < ApplicationController
   #
   def list_favorite_courses
     includes = Set.new(Array(params[:include]))
-    courses = Api.paginate(@current_user.menu_courses, self, api_v1_list_favorite_courses_url)
-    render :json => courses.map { |course|
+    render :json => @current_user.menu_courses.map { |course|
       enrollments = course.current_enrollments.where(:user_id => @current_user).all
       course_json(course, @current_user, session, includes, enrollments)
     }

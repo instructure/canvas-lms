@@ -22,7 +22,7 @@ describe "Default Account Reports" do
   before(:each) do
     Notification.find_or_create_by_name("Report Generated")
     Notification.find_or_create_by_name("Report Generation Failed")
-    @account = Account.default
+    @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
     @default_term = @account.enrollment_terms.active.find_or_create_by_name(EnrollmentTerm::DEFAULT_TERM_NAME)
   end
 

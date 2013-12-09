@@ -53,11 +53,6 @@ module Canvas::Cassandra
 
     def initialize(cluster_name, environment, servers, opts, thrift_opts)
       Bundler.require 'cassandra'
-      CassandraCQL::Database.class_eval do
-        def use_cql3?
-          false
-        end
-      end
       @db = CassandraCQL::Database.new(servers, opts, thrift_opts)
       @cluster_name = cluster_name
       @environment = environment
@@ -78,8 +73,12 @@ module Canvas::Cassandra
       ms = Benchmark.ms do
         result = @db.execute(query, *args)
       end
-      Rails.logger.debug("  #{"CQL (%.2fms)" % [ms]}  #{::CassandraCQL::Statement.sanitize(query, args)} [#{fingerprint}]")
+      Rails.logger.debug("  #{"CQL (%.2fms)" % [ms]}  #{sanitize(query, args)} [#{fingerprint}]")
       result
+    end
+
+    def sanitize(query, args)
+      ::CassandraCQL::Statement.sanitize(query, args)
     end
 
     # private Struct used to store batch information

@@ -1,3 +1,8 @@
 <% jammit_css :context_modules2 %>
 <% content_for :page_title, join_title(t('titles.course_modules', "Course Modules"), @context.name) %>
-<%= render :partial => "context_modules/content" %>
+<% if @context.draft_state_enabled? %>
+  <%= render :partial => "context_modules/content_next" %>
+<% else %>
+  <%= render :partial => "context_modules/content" %>
+<% end %>
+

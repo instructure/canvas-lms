@@ -258,16 +258,14 @@ class UsersController < ApplicationController
           else
             @enrollment_terms = []
             if @root_account == @context
-              @enrollment_terms = @context.enrollment_terms.active
+              @enrollment_terms = @context.enrollment_terms.active.order(EnrollmentTerm.nulls(:first, :start_at))
             end
             format.html
           end
           format.json {
             cancel_cache_buster
             expires_in 30.minutes
-            api_request? ?
-              render(:json => @users.map { |u| user_json(u, @current_user, session) }) :
-              render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
+            render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
           }
         end
       end
@@ -953,7 +951,7 @@ class UsersController < ApplicationController
       # unless the user is registered/pre_registered (if the latter, he still
       # needs to confirm his email and set a password, otherwise he can't get
       # back in once his session expires)
-      if @user.registered? || @user.pre_registered? # automagically logged in
+      if !@current_user # automagically logged in
         PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
       else
         @pseudonym.send(:skip_session_maintenance=, true)

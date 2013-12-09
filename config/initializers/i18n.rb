@@ -164,22 +164,34 @@ I18n.class_eval do
   end
 end
 
-ActionView::Base.class_eval do
-  if CANVAS_RAILS2
+if CANVAS_RAILS2
+  ActionView::Base.class_eval do
     def i18n_scope
       "#{template.base_path}.#{template.name.sub(/\A_/, '')}"
     end
-  else
-    def _render_template_with_assign(template, *a)
-      @current_template = template
-      _render_template_without_assign(template, *a)
-    end
-    alias_method_chain :_render_template, :assign
-    def i18n_scope
-      @current_template.virtual_path.sub(/\/_/, '/').gsub('/', '.')
-    end
+  end
+else
+  ActionView::LookupContext.class_eval do
+    attr_accessor :i18n_scope
   end
 
+  ActionView::TemplateRenderer.class_eval do
+    def render_template_with_assign(template, *a)
+      old_i18n_scope = @lookup_context.i18n_scope
+      @lookup_context.i18n_scope = @current_template.virtual_path.sub(/\/_/, '/').gsub('/', '.')
+      _render_template_without_assign(template, *a)
+    ensure
+      @lookup_context.i18n_scope = old_i18n_scope
+    end
+    alias_method_chain :render_template, :assign
+  end
+
+  ActionView::Base.class_eval do
+    delegate :i18n_scope, :to => :lookup_context
+  end
+end
+
+ActionView::Base.class_eval do
   def translate(key, default, options = {})
     key = key.to_s
     key = "#{i18n_scope}.#{key}" unless key.sub!(/\A#/, '')

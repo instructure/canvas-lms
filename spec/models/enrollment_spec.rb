@@ -31,7 +31,7 @@ describe Enrollment do
 
   it "should have an interesting state machine" do
     enrollment_model
-    @user.stubs(:dashboard_messages).returns(Message.where("?", false))
+    @user.stubs(:dashboard_messages).returns(Message.none)
     @enrollment.state.should eql(:invited)
     @enrollment.accept
     @enrollment.state.should eql(:active)

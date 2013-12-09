@@ -1,11 +1,13 @@
 define [
   'i18n!calendar'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/collections/CalendarEventCollection'
+  'compiled/calendar/ShowEventDetailsDialog'
   'jst/calendar/agendaView'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, _, Backbone, CalendarEventCollection, template) ->
+], (I18n, $, _, Backbone, CalendarEventCollection, ShowEventDetailsDialog, template) ->
 
   class AgendaView extends Backbone.View
 
@@ -18,12 +20,21 @@ define [
 
     events:
       'click .agenda-load-btn': 'loadMore'
+      'click .ig-row': 'manageEvent'
+      'keydown .ig-row': 'manageEvent'
+
+    messages:
+      loading_more_items: I18n.t('loading_more_items', "Loading more items.")
 
     @optionProperty 'calendar'
 
     constructor: ->
       super
       @dataSource = @options.dataSource
+
+      $.subscribe
+        "CommonEvent/eventDeleted" : @refetch
+        "CommonEvent/eventSaved" : @refetch
 
     fetch: (contexts, start = new Date) ->
       @$el.empty()
@@ -44,6 +55,11 @@ define [
       @lastRequestID = $.guid++
       @dataSource.getEvents start, end, @contexts, callback, {singlePage: true, requestID: @lastRequestID}
 
+    refetch: =>
+      return unless @startDate
+      @collection = []
+      @_fetch(@startDate, @handleEvents)
+
     handleEvents: (events) =>
       return if events.requestID != @lastRequestID
       @collection = []
@@ -58,14 +74,32 @@ define [
     loadMore: (e) ->
       e.preventDefault()
       @$spinner.show()
-      @_fetch(@nextPageDate, @appendEvents)
+      @_fetch(@nextPageDate, @loadMoreFinished)
+      $.screenReaderFlashMessage(@messages.loading_more_items)
+
+    loadMoreFinished: (events) =>
+      @appendEvents(events)
+      @focusFirstNewDate(events)
+
+    focusFirstNewDate: (events) ->
+      firstNewEvent = _.min(events, (e) -> e.start)
+      $firstEvent = @$("li[data-event-id='#{firstNewEvent.id}']")
+      $firstEventDay = $firstEvent.closest('.agenda-day')
+      $firstEventDayDate = $firstEventDay.find('.agenda-date')
+      $firstEventDayDate[0].focus() if $firstEventDayDate.length
+
+    manageEvent: (e) ->
+      return if e.type == 'keydown' && e.keyCode != 13 && e.keyCode != 32
+      eventId = $(e.target).closest('.agenda-event').data('event-id')
+      event = @dataSource.eventWithId(eventId)
+      new ShowEventDetailsDialog(event, @dataSource).show e
 
     render: =>
       super
       @$spinner.hide()
       $.publish('Calendar/colorizeContexts')
 
-      lastEvent = @collection.slice(-1)[0]
+      lastEvent = _.last(@collection)
       return if !lastEvent
       @trigger('agendaDateRange', @startDate, lastEvent.start)
 
@@ -107,7 +141,15 @@ define [
     #
     # Returns an Object with 'date' and 'events' keys.
     eventBoxToHash: (events) =>
-      date: @formattedDayString(_.first(events))
+      now = $.fudgeDateForProfileTimezone(new Date)
+      event = _.first(events)
+      start = event.start
+      isToday =
+        now.getDate() == start.getDate() &&
+        now.getMonth() == start.getMonth() &&
+        now.getFullYear() == start.getFullYear()
+      date: @formattedDayString(event)
+      isToday: isToday
       events: events
 
     # Internal: Format a hash of event data to an object ready to be sent to the template.

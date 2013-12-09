@@ -463,7 +463,7 @@ class Submission < ActiveRecord::Base
     self.quiz_submission.reload if self.quiz_submission
     self.workflow_state = 'unsubmitted' if self.submitted? && !self.has_submission?
     self.workflow_state = 'graded' if self.grade && self.score && self.grade_matches_current_submission
-    self.workflow_state = 'pending_review' if self.submission_type == 'online_quiz' && self.quiz_submission.try(:latest_submitted_version).try(:pending_review?)
+    self.workflow_state = 'pending_review' if self.submission_type == 'online_quiz' && self.quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
     if self.workflow_state_changed? && self.graded?
       self.graded_at = Time.now
     end

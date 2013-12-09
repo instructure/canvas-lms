@@ -23,11 +23,27 @@ define [
       @load = ->
 
     updateGroupId: (model, groupId) =>
-      @remove model
-      @increment -1
+      @removeUser model
       if other = @groupUsersFor(groupId)
-        other.add model if other?.loaded
-        other.increment 1
+        other.addUser model
+
+    # don't add/remove people in the everyone collection if the category
+    # supports multiple memberships
+    membershipsLocked: ->
+      not @groupId? and @category?.get('allows_multiple_memberships')
+
+    addUser: (user) ->
+      if existingUser = @get(user)
+        user = existingUser
+      else if not @membershipsLocked()
+        @increment 1
+        @add user if @loaded
+      user.moved() if @loaded # e.g. so view can highlight it
+
+    removeUser: (user) ->
+      return if @membershipsLocked()
+      @increment -1
+      @remove user if @loaded
 
     increment: (amount) ->
       if @group
@@ -42,8 +58,5 @@ define [
         @category
 
     groupUsersFor: (id) ->
-      category = @getCategory()
-      if id?
-        category?._groups?.get(id)?._users
-      else
-        category?._unassignedUsers
+      @getCategory()?.groupUsersFor(id)
+

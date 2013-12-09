@@ -41,9 +41,10 @@ define [
       @recipients = @recipientGroups[0].recipients
       @model or= new Conversation
 
-    events: _.extend({}, ValidatedFormView::events,
+    events: _.extend {},
+      ValidatedFormView::events
       'change [name=recipientGroupName]': 'updateListOfRecipients'
-      'click .dialog_closer': 'close')
+      'click .dialog_closer': 'close'
 
     toJSON: =>
       json = {}
@@ -76,8 +77,18 @@ define [
 
     open: ->
       @render()
-      @$el.dialog(autoOpen: false, height: 500, width: 500, title: @title).dialog('open')
+      # attach a custom handler because the bound element is outside this view's scope
+      $(document).on 'keyup', @checkEsc
+      # configure the jQueryUI dialog
+      @$el.dialog(closeOnEscape: false, autoOpen: false, height: 500, width: 500, title: @title).dialog('open')
+
+    checkEsc: (e) =>
+      @close() if e.keyCode is 27 # escape
 
     close: ->
       @$el.dialog('close')
       @remove()
+      # detach our custom handler from the bound element
+      $(document).off 'keyup', @checkEsc
+      # return focus using the closure from our parent view
+      @options.focusReturnsTo?().focus()

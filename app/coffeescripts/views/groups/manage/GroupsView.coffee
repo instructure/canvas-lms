@@ -3,9 +3,10 @@ define [
   'compiled/views/PaginatedCollectionView'
   'compiled/views/groups/manage/GroupView'
   'compiled/views/groups/manage/GroupUsersView'
+  'compiled/views/groups/manage/GroupDetailView'
   'compiled/views/Filterable'
   'jst/groups/manage/groups'
-], (_, PaginatedCollectionView, GroupView, GroupUsersView, Filterable, template) ->
+], (_, PaginatedCollectionView, GroupView, GroupUsersView, GroupDetailView, Filterable, template) ->
 
   class GroupsView extends PaginatedCollectionView
 
@@ -17,9 +18,6 @@ define [
       PaginatedCollectionView::els
       '.no-results': '$noResults'
 
-    render: ->
-      super
-
     afterRender: ->
       @$filter = @$externalFilter
       super
@@ -30,4 +28,5 @@ define [
 
     createItemView: (model) ->
       groupUsersView = new GroupUsersView {group: model, collection: model.users()}
-      new GroupView {model, groupUsersView, addUnassignedMenu: @options.addUnassignedMenu}
+      groupDetailView = new GroupDetailView {group: model, users: model.users()}
+      new GroupView {model, groupUsersView, groupDetailView, addUnassignedMenu: @options.addUnassignedMenu}

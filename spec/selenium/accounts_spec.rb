@@ -117,7 +117,7 @@ describe "account" do
       get "/accounts/#{Account.default.id}/users"
       f(".add_user_link").click
       dialog = f("#add_user_dialog")
-      dialog.find_element(:css, 'label[for="pseudonym_unique_id"]').text.should == "CAS Username:"
+      dialog.find_element(:css, 'label[for="pseudonym_unique_id"]').text.should == "CAS Username:*"
     end
 
     it "should be able to create a new course" do

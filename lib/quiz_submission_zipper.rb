@@ -73,7 +73,7 @@ class QuizSubmissionZipper < ContentZipper
       visible_student_ids = quiz.context.enrollments_visible_to(zip_attachment.user).pluck(:user_id)
       submissions = submissions.where(:user_id => visible_student_ids)
     end
-    @submissions = submissions.map(&:latest_submitted_version).compact
+    @submissions = submissions.map(&:latest_submitted_attempt).compact
   end
 
   def quiz_zip_filename(quiz)

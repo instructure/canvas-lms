@@ -1532,7 +1532,7 @@ describe QuizSubmission do
 
   end
 
-  describe "submitted_versions" do
+  describe "submitted_attempts" do
     let(:submission) { @quiz.quiz_submissions.build }
 
     before do
@@ -1540,11 +1540,11 @@ describe QuizSubmission do
     end
 
     it "should find regrade versions for a submission" do
-      submission.submitted_versions.length.should == 1
+      submission.submitted_attempts.length.should == 1
     end
   end
 
-  describe "attempt_versions" do
+  describe "attempts" do
     let(:quiz)       { @course.quizzes.create! }
     let(:submission) { quiz.quiz_submissions.new }
 
@@ -1569,42 +1569,63 @@ describe QuizSubmission do
       submission.with_versioning(true, &:save!)
       submission.version_number.should eql(3)
 
-      attempt_versions = submission.attempt_versions
-      attempt_versions.length.should == 2
-      attempt_versions.first.should be_a(Version)
+      attempts = submission.attempts
+      attempts.should be_a(QuizSubmissionHistory)
+      attempts.length.should == 2
+
+      first_attempt = attempts.first
+      first_attempt.should be_a(QuizSubmissionAttempt)
+
+      attempts.last_versions.map {|version| version.number }.should == [2, 3]
     end
   end
 
-  describe "submitted_attempts" do
-    let(:quiz)       { @course.quizzes.create! }
-    let(:submission) { quiz.quiz_submissions.new }
+  describe "#has_regrade?" do
+    it "should be true if score before regrade is present" do
+      QuizSubmission.new(:score_before_regrade => 10).has_regrade?.should be_true
+    end
 
-    it "should find attempt versions for a submission" do
-      submission.workflow_state = "complete"
-      submission.score = 5.0
-      submission.attempt = 1
-      submission.with_versioning(true, &:save!)
-      submission.version_number.should eql(1)
-      submission.score.should eql(5.0)
-
-      # regrade
-      submission.score_before_regrade = 5.0
-      submission.score = 4.0
-      submission.attempt = 1
-      submission.with_versioning(true, &:save!)
-      submission.version_number.should eql(2)
-
-      # new attempt
-      submission.score = 3.0
-      submission.attempt = 2
-      submission.with_versioning(true, &:save!)
-      submission.version_number.should eql(3)
-
-      submitted_attempts = submission.submitted_attempts
-      submitted_attempts.length.should == 2
-      submitted_attempts.first.should be_a(QuizSubmission)
+    it "should be false if score before regrade is absent" do
+      QuizSubmission.new.has_regrade?.should be_false
     end
   end
+
+  describe "#score_affected_by_regrade?" do
+    it "should be true if score before regrade differs from current score" do
+      submission = QuizSubmission.new(:score_before_regrade => 10)
+      submission.kept_score = 5
+      submission.score_affected_by_regrade?.should be_true
+    end
+
+    it "should be false if score before regrade is the same as current score" do
+      submission = QuizSubmission.new(:score_before_regrade => 10)
+      submission.kept_score = 10
+      submission.score_affected_by_regrade?.should be_false
+    end
+  end
+
+  describe "#questions_regraded_since_last_attempt" do
+    before do
+      @quiz = @course.quizzes.create! title: 'Test Quiz'
+      course_with_teacher_logged_in(active_all: true, course: @course)
+
+      @submission = @quiz.quiz_submissions.build
+      @submission.workflow_state = "complete"
+      @submission.score = 5.0
+      @submission.attempt = 1
+      @submission.with_versioning(true, &:save!)
+      @submission.version_number.should eql(1)
+      @submission.score.should eql(5.0)
+      @submission.save
+    end
+
+    it "should pass the date from the first version of the most recent attempt to quiz#questions_regraded_since" do
+      @submission.quiz.expects(:questions_regraded_since)
+      @submission.questions_regraded_since_last_attempt
+    end
+
+  end
+
 
   describe 'broadcast policy' do
     before do

@@ -72,7 +72,7 @@ describe "courses" do
 
       # first try setting the quota explicitly
       get "/courses/#{@course.id}/details"
-      driver.find_element(:link, 'Course Details').click
+      f("#ui-id-1").click
       form = f("#course_form")
       f("#course_form .edit_course_link").should be_displayed
       form.find_element(:css, ".edit_course_link").click

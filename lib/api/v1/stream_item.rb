@@ -111,14 +111,12 @@ module Api::V1::StreamItem
   end
 
   def api_render_stream_for_contexts(contexts, paginate_url)
-    # for backwards compatibility, since this api used to be hard-coded to return 21 items
-    params[:per_page] ||= 21
     opts = {}
     opts[:contexts] = contexts if contexts.present?
 
     items = @current_user.shard.activate do
       scope = @current_user.visible_stream_item_instances(opts).includes(:stream_item)
-      Api.paginate(scope, self, self.send(paginate_url, @context)).to_a
+      Api.paginate(scope, self, self.send(paginate_url, @context), default_per_page: 21).to_a
     end
     render :json => items.select(&:stream_item).map { |i| stream_item_json(i, i.stream_item, @current_user, session) }
   end

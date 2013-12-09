@@ -48,12 +48,24 @@
       text-align: left;
     }
   }
+
   .row-fluid {
     padding-bottom: 1px; // fix weird margin-collapse/jumping bug when toggling cog menu in chrome
   }
-}
 
+  &.droppable-hover {
+    > * {
+      opacity: 0.5;
+    }
+  }
+
+  .show-group-full { display: none; }
+  &.slots-full {
+    .show-group-full { display: inline-block; }
+  }
+}
 
 .group-category-contents-condensed .group {
   padding: 0.7em 1em;
 }
+

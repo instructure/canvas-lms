@@ -39,6 +39,8 @@ module Api::V1::GroupCategory
         hash['unassigned_users_count'] = group_category.unassigned_users.count
       end
     end
+    hash['protected'] = group_category.protected?
+    hash['allows_multiple_memberships'] = group_category.allows_multiple_memberships?
     hash
   end
 end
