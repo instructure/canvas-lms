@@ -25,7 +25,7 @@ define [
         for grid in @grids when grid != @parent_grid
           grid.multiview_grid_opts.$viewport[0].scrollTop =
             @parent_grid.multiview_grid_opts.$viewport[0].scrollTop
-          grid.multiview_grid_opts.$viewport.trigger('scroll.slickgrid')
+          grid.multiview_grid_opts.$viewport.trigger('scroll')
 
   # simple delegation
   for method in ['render', 'invalidateRow', 'updateRowCount', 'autosizeColumns', 'resizeCanvas', 'invalidate']

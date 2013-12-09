@@ -2449,8 +2449,6 @@ if (typeof Slick === "undefined") {
           clearTimeout(h_render);
         }
         
-        if (Math.abs(lastRenderedScrollTop - scrollTop) > 20 ||
-            Math.abs(lastRenderedScrollLeft - scrollLeft) > 20) {
           if (options.forceSyncScrolling || (
               Math.abs(lastRenderedScrollTop - scrollTop) < viewportH_1 &&
               Math.abs(lastRenderedScrollLeft - scrollLeft) < viewportW_1)) {
@@ -2460,7 +2458,6 @@ if (typeof Slick === "undefined") {
           }
          
          trigger(self.onViewportChanged, {});
-        }
       }
 
       trigger(self.onScroll, {scrollLeft: scrollLeft, scrollTop: scrollTop});
