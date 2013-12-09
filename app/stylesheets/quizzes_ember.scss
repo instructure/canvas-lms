@@ -1,5 +1,4 @@
 @import "environment.sass";
-
 $backgroundColor: #dfe9f0;
 $borderColor: #AAA;
 $questionHeaderBackground: #F5F5F5;
@@ -10,7 +9,12 @@ div#content {
   padding: 0;
 }
 
+
+
 .item-group-container {
+  .ig-admin {
+    top: 4px;
+  }
   .ig-list {
     .quiz:first-of-type {
       margin-top: 5px;

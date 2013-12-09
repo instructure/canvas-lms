@@ -37,9 +37,10 @@
 
   function getStyleComponentName(component) {
     var tagName = component.get('tagName');
-    if (!tagName || tagName.indexOf('-') == -1) {
-      // do not use _debugContainerKey without permission from Stefan Penner
-      tagName = component._debugContainerKey.split(':')[1];
+    // do not use _debugContainerKey without permission from Stefan Penner
+    var key = component._debugContainerKey;
+    if ((!tagName || tagName.indexOf('-') == -1) && key) {
+      tagName = key.split(':')[1];
     }
     return tagName+'-css';
   }

@@ -14,18 +14,6 @@ define [
 
     needs: ['quizzes']
 
-    uiId:( ->
-      "ui-id-#{@get('id')}-1"
-    ).property('id')
-
-    editId:( ->
-      "ui-id-#{@get('id')}-2"
-    ).property('id')
-
-    deleteId:( ->
-      "ui-id-#{@get('id')}-3"
-    ).property('id')
-
     questionCountLabel: (->
       I18n.t('questions', 'Question', count: @get('question_count'))
     ).property('question_count')
@@ -53,6 +41,9 @@ define [
     ).property('points_possible')
 
     actions:
+      edit: ->
+        window.location = @get('editUrl')
+
       delete: ->
         ok = window.confirm I18n.t('confirms.delete_quiz', 'Are you sure you want to delete this quiz?')
         quizzesController = @get('controllers.quizzes')
