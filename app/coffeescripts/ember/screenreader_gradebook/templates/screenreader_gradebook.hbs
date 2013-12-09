@@ -1,0 +1,231 @@
+<h1>Screenreader Gradebook</h1>
+
+<!-- global -->
+<!-- -------- -->
+
+<h2>Global Settings</h2>
+<!-- filter by section -->
+<div>
+  <label for="section_select">Select a section</label>
+  {{
+    fast-select 
+    id="section_select"
+    class="section_select"
+    items=sections
+    valuePath="id"
+    labelPath="name"
+    labelDefault=sectionSelectDefaultLabel
+    selected=selectedSection
+  }}
+</div>
+
+<!-- filter by name or secondary id -->
+
+<!-- don't think this makes sense for this interface -->
+
+<!-- grading history -->
+
+<a href="#history">View Grading History</a>
+
+<!-- download scores -->
+
+<a href="#download_scores">Download Scores (.csv)</a>
+
+<!-- upload scores -->
+
+<a href="#upload_scores">Upload Scores (.csv)</a>
+
+<!-- set group weights -->
+
+<a href="#set_group_weights">Set Group Weiths</a>
+
+<!-- show/hide student names -->
+
+<!-- not sure this makes sense in this interface -->
+
+<!-- arrange columns by due date -->
+
+<fieldset>
+  <legend>Arrange Assignments</legend>
+  <input type="radio" name="arrange_assignments" id="assigns_alphabetical" value="assigns_alphabetical">
+  <label for="assigns_alphabetical">Alphabetically</label><br />
+  <input type="radio" name="arrange_assignments" id="assigns_position" value="assigns_position" checked>
+  <label for="assigns_position">By Assignment Group and Position</label><br />
+  <input type="radio" name="arrange_assignments" id="assigns_due_date" value="assigns_due_date">
+  <label for="assigns_due_date">By Due Date</label>
+</fieldset>
+
+<!-- treat ungraded as 0 -->
+
+<div>
+  <label for="ungraded">Treat Ungraded as 0</label>
+  <input type="checkbox" name="ungraded" id="ungraded" value="ungraded">
+</div>
+
+<!-- show concluded enrollments -->
+
+<div>
+  <label for="concluded_enrollments">Show Concluded Enrollments</label>
+  <input type="checkbox" name="concluded_enrollments" id="concluded_enrollments" value="concluded_enrollments">
+</div>
+
+<!-- -------- -->
+
+<h2>Content Selection</h2>
+
+<div>
+  <label for="student_select">Select a student</label>
+  {{
+    fast-select id="student_select"
+    class="student_select"
+    items=students
+    valuePath="id"
+    labelPath="name"
+    labelDefault=studentSelectDefaultLabel
+    selected=selectedStudent
+  }}
+</div>
+
+<!-- not sure we need this
+<div>
+  <label for="assignment_group_select">Select an assignment group</label>
+  <select
+    id="assignment_group_select"
+    class="assignment_group_select"
+    name="assignment_group">
+    <option value="">All</option>
+    <option value="2">Test Assignment Group</option>
+  </select>
+</div>
+-->
+
+<div>
+  <label for="assignment_select">Select an assignment</label>
+   {{
+    fast-select id="assignment_select"
+    class="assignment_select"
+    items=assignments
+    valuePath="id"
+    labelPath="name"
+    labelDefault=assignmentSelectDefaultLabel
+    selected=selectedAssignment
+  }}
+</div>
+
+<div id="student_navigation">
+  <a href="#prev_student" id="prev_student">Previous Student</a> <a href="#next_student" id="next_student">Next Student</a>
+</div>
+<div id="assignment_navigation">
+  <a href="#prev_assignment" id="prev_assignment">Previous Assignment</a> <a href="#next_assignment" id="next_assignment">Next Assignment</a>
+</div>
+
+<!-- student + assignment -->
+<!-- -------------------- -->
+
+{{#if selectedSubmission}}
+
+<div id="grading">
+
+  <h2>Grading</h2>
+
+  <!-- see/change a student's grade for a specific assignment -->
+
+  <div>
+    <label for="student_and_assignment_grade">Grade</label>
+     {{
+       input
+       id="student_and_assignment_grade"
+       name=grade
+       valueBinding=selectedSubmissionGrade
+     }}
+
+  </div>
+
+  <a href="#details">Submission Details</a>
+
+</div>
+
+{{/if}}
+
+<!-- student -->
+<!-- -------- -->
+
+{{#if selectedStudent}}
+{{#with selectedStudent}}
+
+<div id="student_information">
+
+  <h2>Student Information</h2>
+
+  <div>Selected Student: {{name}}</div>
+
+  <!-- what section they are in -->
+
+  <div>Section: Section 3</div>
+
+  <!-- secondary id -->
+
+  <div>Secondary ID: {{login_id}}</div>
+
+  <!-- final score/grade -->
+
+  <div>Final Grade: {{enrollment.grades.final_grade}} ({{enrollment.grades.final_score}})</div>
+
+  <!-- sub-total grade for each assignment group (percentage + points) -->
+
+  <div>Assignment Group Grade: 30% (50% of grade)</div>
+
+</div>
+
+{{/with}}
+{{/if}}
+
+<!-- assignment -->
+<!-- ------------ -->
+
+{{#if selectedAssignment}}
+{{#with selectedAssignment}}
+
+<div id="assignment_information">
+
+  <h2>Assignment Information</h2>
+
+  <div>Selected Assignment: {{name}}</div>
+
+  <!-- how many points is the assignment worth -->
+
+  <div>Points possible: {{points_possible}}</div>
+
+  <!-- is the assignment muted -->
+
+  <div>
+    <label for="muted">Muted</label>
+    <input type="checkbox" name="muted" id="muted" value="muted"><br>
+  </div>
+
+  <!-- assignment stats: average/high/low score + submission count -->
+
+  <div>Average Score: 5</div>
+  <div>High Score: 10</div>
+  <div>Low Score: 1</div>
+
+  <!-- go to assignment in speedgrader -->
+
+  <a href="#speedgrader">See this assignment in speedgrader</a>
+
+  <!-- message students who -->
+
+  <a href="#message_student_who">Message students who...</a>
+
+  <!-- set default grades -->
+
+  <a href="#set_default_grade">Set default grade</a>
+
+  <!-- curve grades -->
+
+  <a href="#curve_grades">Curve Grades</a>
+
+</div>
+
+{{/with}}
+{{/if}}
