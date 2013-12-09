@@ -1576,7 +1576,7 @@ class ApplicationController < ActionController::Base
     # the rails "Completed in XXms" line.
     # this is fixed in Rails 3.x
     def complete_request_uri
-      uri = LoggingFilter.filter_uri(request.request_uri)
+      uri = LoggingFilter.filter_uri(request.fullpath)
       "#{request.protocol}#{request.host}#{uri}"
     end
   end

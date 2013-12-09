@@ -43,10 +43,9 @@ gem 'canvas_webex', '0.8'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
 if CANVAS_RAILS2
-  gem 'encrypted_cookie_store-instructure', '1.0.4', :require => 'encrypted_cookie_store',
-      :github => "instructure/encrypted_cookie_store", :branch => "rails2", :ref => "d078a875eb510de9b0a75baa97e9332c4480c97e"
+  gem 'encrypted_cookie_store-instructure', '1.0.5', :require => 'encrypted_cookie_store'
 else
-  gem 'encrypted_cookie_store-instructure', '1.1.0', :require => 'encrypted_cookie_store'
+  gem 'encrypted_cookie_store-instructure', '1.1.1', :require => 'encrypted_cookie_store'
 end
 gem 'erubis', '2.7.0'
 if CANVAS_RAILS2

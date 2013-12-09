@@ -45,8 +45,8 @@ class RequestThrottle
 
     request = ActionController::Request.new(env)
     # workaround a rails bug where some ActionController::Request methods blow
-    # up when using certain servers until request_uri is called once to set env['REQUEST_URI']
-    request.request_uri
+    # up when using certain servers until fullpath is called once to set env['REQUEST_URI']
+    request.fullpath
 
     result = nil
     bucket = LeakyBucket.new(client_identifier(request))
@@ -248,7 +248,7 @@ class RequestThrottle
       end
 
       current_time = current_time.to_f
-      Rails.logger.debug("request throttling increment: #{([amount, reserve_cost, current_time] + self.as_json).to_json}")
+      Rails.logger.debug("request throttling increment: #{([amount, reserve_cost, current_time] + self.as_json.to_a).to_json}")
       redis = self.redis
       count, last_touched = LeakyBucket.lua.run(:increment_bucket, [cache_key], [amount + reserve_cost, current_time, outflow, maximum], redis)
       self.count = count.to_f
