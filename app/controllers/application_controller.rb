@@ -1492,16 +1492,24 @@ class ApplicationController < ActionController::Base
       if !browser_supported? && !@embedded_view && !cookies['unsupported_browser_dismissed']
         notices << {:type => 'warning', :content => unsupported_browser, :classes => 'unsupported_browser'} 
       end
-      if error = flash.delete(:error)
+      if error = flash[:error]
+        flash.delete(:error)
         notices << {:type => 'error', :content => error, :icon => 'warning'}
       end
-      if warning = flash.delete(:warning)
+      if warning = flash[:warning]
+        flash.delete(:warning)
         notices << {:type => 'warning', :content => warning, :icon => 'warning'}
       end
-      if info = flash.delete(:info)
+      if info = flash[:info]
+        flash.delete(:info)
         notices << {:type => 'info', :content => info, :icon => 'info'}
       end
-      if notice = (flash[:html_notice] ? flash.delete(:html_notice).html_safe : flash.delete(:notice))
+      if notice = (flash[:html_notice] ? flash[:html_notice].html_safe : flash[:notice])
+        if flash[:html_notice]
+          flash.delete(:html_notice)
+        else
+          flash.delete(:notice)
+        end
         notices << {:type => 'success', :content => notice, :icon => 'check'}
       end
       notices
