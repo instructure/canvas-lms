@@ -19,30 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 shared_examples_for 'Quiz Submissions API Restricted Endpoints' do
-  it 'should require a valid access token' do
-    @quiz.access_code = 'foobar'
-    @quiz.save!
-
-    @request_proxy.call true, {
-      attempt: 1
-    }
-
-    response.status.to_i.should == 403
-    response.body.should match(/invalid access code/)
-  end
-
-  it 'should require a valid ip' do
-    @quiz.ip_filter = '10.0.0.1/24'
-    @quiz.save!
-
-    @request_proxy.call true, {
-      attempt: 1
-    }
-
-    response.status.to_i.should == 403
-    response.body.should match(/ip address denied/i)
-  end
-
   it 'should require the LDB' do
     @quiz.require_lockdown_browser = true
     @quiz.save
@@ -168,8 +144,6 @@ describe QuizSubmissionsApiController, type: :request do
     @quiz.published_at = Time.now
     @quiz.workflow_state = 'available'
     @quiz.save!
-
-    @assignment = @quiz.assignment
   end
 
   describe 'GET /courses/:course_id/quizzes/:quiz_id/submissions [INDEX]' do
@@ -339,27 +313,11 @@ describe QuizSubmissionsApiController, type: :request do
       qs_api_create
     end
 
-    context 'parameter, permission, and state validations' do
+    context 'access validations' do
       it_should_behave_like 'Quiz Submissions API Restricted Endpoints'
 
       before :each do
         @request_proxy = method(:qs_api_create)
-      end
-
-      it 'should reject creating a QS when one already exists' do
-        qs_api_create
-        qs_api_create(true)
-        response.status.to_i.should == 409
-      end
-
-      it 'should respect the number of allowed attempts' do
-        json = qs_api_create
-        qs = QuizSubmission.find(json['quiz_submissions'][0]['id'])
-        qs.mark_completed
-        qs.save!
-
-        qs_api_create(true)
-        response.status.to_i.should == 409
       end
     end
   end
@@ -382,7 +340,7 @@ describe QuizSubmissionsApiController, type: :request do
       json['quiz_submissions'][0]['workflow_state'].should == 'complete'
     end
 
-    context 'parameter, permission, and state validations' do
+    context 'access validations' do
       it_should_behave_like 'Quiz Submissions API Restricted Endpoints'
 
       before do

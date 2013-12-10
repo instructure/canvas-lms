@@ -26,8 +26,8 @@ class QuizSubmissionService
   # @param [Quiz] quiz
   #   The Quiz to take.
   #
-  # @throw ServiceError(403) if the student isn't allowed to take the quiz
-  # @throw ServiceError(403) if the user is not logged in and the Quiz isn't public
+  # @throw ApiError(403) if the student isn't allowed to take the quiz
+  # @throw ApiError(403) if the user is not logged in and the Quiz isn't public
   #
   # See #assert_takeability! for further errors that might be thrown.
   # See #assert_retriability! for further errors that might be thrown.
@@ -39,7 +39,7 @@ class QuizSubmissionService
       reject! 403, 'you are not allowed to participate in this quiz'
     end
 
-    assert_takeability! quiz, participant.access_code, participant.ip_address
+    assert_takeability! quiz
 
     # Look up an existing QS, and if one exists, make sure it is retriable.
     assert_retriability! participant.find_quiz_submission(quiz.quiz_submissions, {
@@ -59,7 +59,7 @@ class QuizSubmissionService
   # @param [Hash] session
   #   The Rails session. Used for testing access permissions.
   #
-  # @throw ServiceError(403) if the user isn't privileged to update the Quiz
+  # @throw ApiError(403) if the user isn't privileged to update the Quiz
   #
   # @return [QuizSubmission]
   #   The newly created preview QS.
@@ -82,8 +82,8 @@ class QuizSubmissionService
   #   The QuizSubmission#attempt that is requested to be completed. This must
   #   match the quiz_submission's current attempt index.
   #
-  # @throw ServiceError(403) if the participant can't take the quiz
-  # @throw ServiceError(400) if the QS is already complete
+  # @throw ApiError(403) if the participant can't take the quiz
+  # @throw ApiError(400) if the QS is already complete
   #
   # Further errors might be thrown from the following methods:
   #
@@ -102,7 +102,7 @@ class QuizSubmissionService
     end
 
     # Participant must be able to take the quiz...
-    assert_takeability! quiz, participant.access_code, participant.ip_address
+    assert_takeability! quiz
 
     # And be the owner of the quiz submission:
     validate_token! quiz_submission, participant.validation_token
@@ -197,6 +197,54 @@ class QuizSubmissionService
     end
   end
 
+  # Provide an answer to a question, or flag it, while taking a quiz. A snapshot
+  # of the QS will be made with the new answer state.
+  #
+  # @param [Hash] question_record
+  #   The "answer record" for the question in the QS's submission_data. This
+  #   can be obtained using the QuizQuestion::AnswerSerializers for a given QQ.
+  #
+  # @param [QuizSubmission] quiz_submission
+  #   The QS we're manipulating (answering/flagging.)
+  #
+  # @param [Integer] attempt
+  #   The attempt index this answer/modification applies to. This must match
+  #   the quiz_submission's current attempt index.
+  #
+  # @throw ApiError(403) if the participant can't update the QS (ie, not the owner)
+  # @throw ApiError(400) if the QS is complete or overdue
+  #
+  # Further errors might be thrown from the following methods:
+  #
+  #   - #assert_takeability!
+  #   - #assert_retriability!
+  #   - #validate_token!
+  #   - #ensure_latest_attempt!
+  #
+  # @return [Hash] the recently-adjusted submission_data set
+  def update_question(question_record, quiz_submission, attempt, snapshot=true)
+    unless quiz_submission.grants_right?(participant.user, :update)
+      reject! 403, 'you are not allowed to update questions for this quiz submission'
+    end
+
+    if quiz_submission.completed?
+      reject! 400, 'quiz submission is already complete'
+    elsif quiz_submission.overdue?
+      reject! 400, 'quiz submission is overdue'
+    end
+
+    assert_takeability! quiz_submission.quiz
+
+    validate_token! quiz_submission, participant.validation_token
+
+    ensure_latest_attempt! quiz_submission, attempt
+
+    quiz_submission.backup_submission_data question_record.merge({
+      validation_token: participant.validation_token,
+      cnt: snapshot ? 5 : 1 # force generation of snapshot
+    })
+  end
+
   protected
 
   # Abort the current service request with an error similar to an API error.
@@ -215,59 +263,47 @@ class QuizSubmissionService
   #
   # @param [Quiz] quiz
   #   The Quiz we're attempting to take.
-  # @param [String] access_code
-  #   The Access Code provided by the client.
-  # @param [String] ip_address
-  #   The IP address of the client.
   #
-  # @throw ServiceError(400) if the Quiz is locked
-  # @throw ServiceError(403) if the access code is invalid
-  # @throw ServiceError(403) if the IP address isn't covered
-  def assert_takeability!(quiz, access_code = nil, ip_address = nil)
+  # @param [QuizParticipant] participant
+  #   The person trying to take the quiz.
+  #
+  # @param [String] participant.access_code
+  #   The Access Code provided by the participant.
+  #
+  # @param [String] participant.ip_address
+  #   The IP address of the participant.
+  #
+  # @throw ApiError(400) if the Quiz is locked
+  # @throw ApiError(501) if the Quiz has the "can't go back" flag on
+  # @throw ApiError(403) if the access code is invalid
+  # @throw ApiError(403) if the IP address isn't covered
+  def assert_takeability!(quiz, participant = self.participant)
     if quiz.locked?
       reject! 400, 'quiz is locked'
     end
 
-    validate_access_code! quiz, access_code
-    validate_ip_address! quiz, ip_address
+    # [Transient:CNVS-10224] - support for CGB-OQAAT quizzes
+    if quiz.cant_go_back
+      reject! 501, 'that type of quizzes is not supported yet'
+    end
+
+    if quiz.access_code.present? && quiz.access_code != participant.access_code
+      reject! 403, 'invalid access code'
+    end
+
+    if quiz.ip_filter && !quiz.valid_ip?(participant.ip_address)
+      reject! 403, 'IP address denied'
+    end
   end
 
   # Verify the given QS is retriable.
   #
-  # @throw ServiceError(409) if the QS is not new and can not be retried
+  # @throw ApiError(409) if the QS is not new and can not be retried
   #
   # See QuizSubmission#retriable?
   def assert_retriability!(quiz_submission)
     if quiz_submission.present? && !quiz_submission.retriable?
       reject! 409, 'a quiz submission already exists'
-    end
-  end
-
-  # Verify that the given access code matches the one set by the Quiz author.
-  #
-  # @param [Quiz] quiz
-  #   The Quiz to test.
-  # @param [String] access_code
-  #   The user-supplied Access Code to validate.
-  #
-  # @throw ApiError(403) if the access code is invalid
-  def validate_access_code!(quiz, access_code)
-    if quiz.access_code.present? && quiz.access_code != access_code
-      reject! 403, 'invalid access code'
-    end
-  end
-
-  # Verify that the given IP address is allowed to access a Quiz.
-  #
-  # @param [Quiz] quiz
-  #   The Quiz to test.
-  # @param [String] ip_address
-  #   IP address of the request originated from.
-  #
-  # @throw ApiError(403) if the IP address isn't covered
-  def validate_ip_address!(quiz, ip_address)
-    if quiz.ip_filter && !quiz.valid_ip?(ip_address)
-      reject! 403, 'IP address denied'
     end
   end
 
@@ -290,8 +326,8 @@ class QuizSubmissionService
   # @param [Integer|String] attempt
   #   The attempt to validate.
   #
-  # @throw ServiceError(400) if attempt isn't a valid integer
-  # @throw ServiceError(400) if attempt is invalid (ie, isn't the latest one)
+  # @throw ApiError(400) if attempt isn't a valid integer
+  # @throw ApiError(400) if attempt is invalid (ie, isn't the latest one)
   def ensure_latest_attempt!(quiz_submission, attempt)
     attempt = Integer(attempt) rescue nil
 

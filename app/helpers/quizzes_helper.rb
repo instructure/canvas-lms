@@ -393,7 +393,7 @@ module QuizzesHelper
       if answer_list && !answer_list.empty?
 
         #  Replace the {{question_BLAH}} template text with the user's answer text.
-        match = match.sub(/\{\{question_.*?\}\}/, a).
+        match = match.sub(/\{\{question_.*?\}\}/, a.to_s).
           # Match on "/>" but only when at the end of the string and insert "readonly" if set to be readonly
           sub(/\/\>\Z/, readonly_markup)
       end
@@ -404,7 +404,7 @@ module QuizzesHelper
 
     unless answer_list && !answer_list.empty?
       answers.delete_if { |k, v| !k.match /^question_#{hash_get(question, :id)}/ }
-      answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, v }
+      answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, v.to_s }
       res.gsub! /\{\{question_[^}]+\}\}/, ""
     end
 

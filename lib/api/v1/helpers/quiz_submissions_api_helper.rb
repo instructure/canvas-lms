@@ -25,8 +25,9 @@ module Api::V1::Helpers::QuizSubmissionsApiHelper
 
   def require_quiz_submission
     collection = @quiz ? @quiz.quiz_submissions : QuizSubmission
+    id = params[:quiz_submission_id] || params[:id] || ''
 
-    unless @quiz_submission = collection.find(params[:id])
+    unless @quiz_submission = collection.find(id.to_i)
       raise ActiveRecord::RecordNotFound
     end
   end
