@@ -149,6 +149,7 @@ group :test do
     gem 'rspec', '2.13.0'
     gem 'rspec-rails', '2.13.0'
   end
+  gem 'sequel', '4.5.0', :require => false
   gem 'selenium-webdriver', '2.37.0'
   gem 'webrat', '0.7.3'
   gem 'yard', '0.8.0'
