@@ -148,8 +148,11 @@ define [
         for id, student of students
           student.computed_current_score ||= 0
           student.computed_final_score ||= 0
-          student.secondary_identifier = student.sis_login_id || student.login_id
-
+          student.secondary_identifier = student.sis_login_id || student.login_id         
+          # SFU MOD CANVAS-188 Define data for SIS ID column (use dash if not available)
+          student.sis_id = student.sis_user_id || '-'
+          # END SFU MOD
+          
           if @sections_enabled
             mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
             sectionNames = $.toSentence(mySections.sort())

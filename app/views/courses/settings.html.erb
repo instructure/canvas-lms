@@ -249,17 +249,8 @@ TEXT
             %>
             <% if @context.root_account.self_registration? %>
               <%= t 'course_self_registration', <<-TEXT, :url2 => register_url, :code => @context.self_enrollment_code || '{{ self_enrollment_code }}', :wrapper => '<b>\1</b>'
-                    This course has enabled open enrollment. Students can
-                    self-enroll in the course once you share with them this URL:
-
+                    Alternatively, they can sign up at *%{url2}* and
                     use the following join code: *%{code}*
-                  TEXT
-              %>
-            <% else %>
-              <%= t 'course_open_enrollment_without_code', <<-TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :wrapper => '<b>\1</b>'
-                    This course has enabled open enrollment. Students can
-                    self-enroll in the course once you share with them this URL:
-                    *%{url}*
                   TEXT
               %>
             <% end %>
