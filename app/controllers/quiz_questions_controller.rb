@@ -81,7 +81,7 @@
 #       "answers": {
 #         "description": "An array of available answers to display to the student.",
 #         "type": "array",
-#         "items": {}
+#         "items": { "$ref": "string" }
 #       }
 #     }
 #   }
