@@ -55,19 +55,31 @@ define [
           upcoming.push a
       )
 
-      past = _.sortBy(past, (a) -> (new Date()) - Date.parse(a.dueAt()))
-      upcoming = _.sortBy(upcoming, (a) -> Date.parse(a.dueAt()))
-      overdue = _.sortBy(overdue, (a) -> Date.parse(a.dueAt()))
+      overdue_group = new AssignmentGroup({ id: 'overdue', name: 'Overdue Assignments', assignments: overdue })
+      upcoming_group = new AssignmentGroup({ id: 'upcoming', name: 'Upcoming Assignments', assignments: upcoming })
+      undated_group = new AssignmentGroup({ id: 'undated', name: 'Undated Assignments', assignments: undated })
+      past_group = new AssignmentGroup({ id: 'past', name: 'Past Assignments', assignments: past })
+
+      sorted_groups = @_sortGroups(overdue_group, upcoming_group, undated_group, past_group)
 
       @groupedByAG = @assignmentGroups.models
-      @groupedByDate = [
-        new AssignmentGroup({ id: 'overdue', name: 'Overdue Assignments', assignments: overdue }),
-        new AssignmentGroup({ id: 'upcoming', name: 'Upcoming Assignments', assignments: upcoming }),
-        new AssignmentGroup({ id: 'undated', name: 'Undated Assignments', assignments: undated }),
-        new AssignmentGroup({ id: 'past', name: 'Past Assignments', assignments: past })
-      ]
+      @groupedByDate = sorted_groups
 
       @setAssignmentGroups()
+
+    _sortGroups: (overdue, upcoming, undated, past) ->
+      @_sortAscending overdue.get('assignments')
+      @_sortAscending upcoming.get('assignments')
+      @_sortDescending past.get('assignments')
+      [overdue, upcoming, undated, past]
+
+    _sortAscending: (assignments) ->
+      assignments.comparator = (a) -> Date.parse(a.dueAt())
+      assignments.sort()
+
+    _sortDescending: (assignments) ->
+      assignments.comparator = (a) -> new Date() - Date.parse(a.dueAt())
+      assignments.sort()
 
     toJSON: ->
       visible: @initialized
