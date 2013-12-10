@@ -7,6 +7,11 @@ $selectedBorderColor: #31b5ff;
 div#content {
   overflow: visible;
   padding: 0;
+  min-width: 763px;
+}
+
+li.quiz .ig-title {
+  right: 554px;
 }
 
 
@@ -46,6 +51,6 @@ li.quiz {
   cursor: pointer;
   .ig-details {
     right: 110px;
-    width: 415px;
+    width: 425px;
   }
 }

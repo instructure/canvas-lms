@@ -115,6 +115,7 @@ describe QuizSerializer do
       serializer.as_json[:quiz].should have_key :unpublishable
       quiz.unstub(:grants_right?)
 
+      quiz.expects(:grants_right?).with(@user, session, :update).at_least_once.returns false
       quiz.expects(:grants_right?).with(@user, session, :grade).at_least_once.returns false
       quiz.expects(:grants_right?).with(@user, session, :manage).at_least_once.returns false
       serializer.as_json[:quiz].should_not have_key :unpublishable

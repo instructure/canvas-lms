@@ -12,7 +12,7 @@ class QuizSerializer < Canvas::APISerializer
               :access_code, :ip_filter, :due_at, :lock_at, :unlock_at,
               :published, :unpublishable, :locked_for_user, :lock_info,
               :lock_explanation, :hide_results, :show_correct_answers_at,
-              :hide_correct_answers_at
+              :hide_correct_answers_at, :all_dates
 
   has_one :assignment_group, embed: :ids
 
@@ -24,10 +24,15 @@ class QuizSerializer < Canvas::APISerializer
     polymorphic_url([context, quiz], persist_headless: 1, force_user: 1)
   end
 
+  def all_dates
+    quiz.dates_hash_visible_to user
+  end
+
   def locked_for_json_type; 'quiz' end
 
   def filter(keys)
     rejected = []
+    rejected << :all_dates unless quiz.grants_right?(current_user, session, :update)
     rejected << :access_code unless quiz.grants_right?(current_user, session, :grade)
     rejected << :unpublishable unless quiz.grants_right?(current_user, session, :manage)
     super(keys) - rejected

@@ -12,4 +12,9 @@ define [
     model: (params) ->
       environment.setEnv(ENV)
       id = environment.get('courseId')
-      ajax("/api/v1/courses/#{id}/quizzes")
+      ajax.raw(
+        url: "/api/v1/courses/#{id}/quizzes",
+        headers:
+          Accept : "application/vnd.api+json"
+      ).then ({response}) ->
+        response.quizzes

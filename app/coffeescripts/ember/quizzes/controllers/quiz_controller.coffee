@@ -20,6 +20,18 @@ define [
 
     canUpdate: true
 
+    allDates: ( ->
+      if @get('all_dates')
+        @get('all_dates')
+      else
+        [{
+          base: true,
+          unlock_at: @get('unlock_at'),
+          due_at: @get('due_at'),
+          lock_at: @get('lock_at')
+        }]
+    ).property('all_dates')
+
     disabled: (->
       !@get('unpublishable')
     ).property('unpublishable')
