@@ -323,34 +323,70 @@ describe AssignmentOverrideApplicator do
       end
 
       context "overrides for an assignment for a quiz, where the overrides were created before the quiz was published" do
-        it "skips versions of the override that have nil for an assignment version" do
-          student_in_course
-          expected_time = Time.zone.now
-          quiz = @course.quizzes.create! :title => "VDD Quiz", :quiz_type => 'assignment'
-          section = @course.course_sections.create! :name => "title"
-          @course.enroll_user(@student,
-                              'StudentEnrollment',
-                              :section => section,
-                              :enrollment_state => 'active',
-                              :allow_multiple_enrollments => true)
-          override = quiz.assignment_overrides.build
-          override.quiz_id = quiz.id
-          override.quiz = quiz
-          override.set_type = 'CourseSection'
-          override.set_id = section.id
-          override.title = "Quiz Assignment override"
-          override.due_at = expected_time
-          override.save!
-          quiz.publish!
-          override = quiz.reload.assignment.assignment_overrides.first
-          override.versions.length.should == 2
-          override.versions[0].model.assignment_version.should_not be_nil
-          override.versions[1].model.assignment_version.should be_nil
-          # Assert that it won't call the "<=" method on nil
-          expect do
-            overrides = AssignmentOverrideApplicator.
-              overrides_for_assignment_and_user(quiz.assignment, @student)
-          end.to_not raise_error
+        context "without draft states" do
+          it "skips versions of the override that have nil for an assignment version" do
+            student_in_course
+            expected_time = Time.zone.now
+            quiz = @course.quizzes.create! :title => "VDD Quiz", :quiz_type => 'assignment'
+            section = @course.course_sections.create! :name => "title"
+            @course.enroll_user(@student,
+                                'StudentEnrollment',
+                                :section => section,
+                                :enrollment_state => 'active',
+                                :allow_multiple_enrollments => true)
+            override = quiz.assignment_overrides.build
+            override.quiz_id = quiz.id
+            override.quiz = quiz
+            override.set_type = 'CourseSection'
+            override.set_id = section.id
+            override.title = "Quiz Assignment override"
+            override.due_at = expected_time
+            override.save!
+            quiz.publish!
+            override = quiz.reload.assignment.assignment_overrides.first
+            override.versions.length.should == 2
+            override.versions[0].model.assignment_version.should_not be_nil
+            override.versions[1].model.assignment_version.should be_nil
+            # Assert that it won't call the "<=" method on nil
+            expect do
+              overrides = AssignmentOverrideApplicator.
+                overrides_for_assignment_and_user(quiz.assignment, @student)
+            end.to_not raise_error
+          end
+        end
+
+        context "with draft states" do
+          it "quiz should always have an assignment for overrides" do
+            # with draft states quizzes always have an assignment.
+            student_in_course
+            course.root_account.enable_draft!
+            expected_time = Time.zone.now
+            quiz = @course.quizzes.create! :title => "VDD Quiz", :quiz_type => 'assignment'
+            section = @course.course_sections.create! :name => "title"
+            @course.enroll_user(@student,
+                                'StudentEnrollment',
+                                :section => section,
+                                :enrollment_state => 'active',
+                                :allow_multiple_enrollments => true)
+            override = quiz.assignment_overrides.build
+            override.quiz_id = quiz.id
+            override.quiz = quiz
+            override.set_type = 'CourseSection'
+            override.set_id = section.id
+            override.title = "Quiz Assignment override"
+            override.due_at = expected_time
+            override.save!
+            quiz.publish!
+            override = quiz.reload.assignment.assignment_overrides.first
+            override.versions.length.should == 1
+            override.versions[0].model.assignment_version.should_not be_nil
+            # Assert that it won't call the "<=" method on nil
+            expect do
+              overrides = AssignmentOverrideApplicator.
+                overrides_for_assignment_and_user(quiz.assignment, @student)
+            end.to_not raise_error
+            course.root_account.disable_draft!
+          end
         end
       end
     end

@@ -8,17 +8,18 @@ en:
     bad_per_slot: "You must allow at least one appointment per time slot"
     context_required: "You need to select a calendar"
     select_calendars: "Select Calendars"
-  GroupView: 
-    delete_confirm: "Are you sure you want to remove this group?"
-    flash: 
-      removeError: "Unable to remove the group. Please try again later."
-      removed: "Group successfully removed."
+  GrouDetailpView: 
     student_count: 
       one: "1 student"
       other: "%{count} students"
     user_count: 
       one: "1 user"
       other: "%{count} users"
+  GroupView: 
+    delete_confirm: "Are you sure you want to remove this group?"
+    flash: 
+      removeError: "Unable to remove the group. Please try again later."
+      removed: "Group successfully removed."
   academic_benchmark: 
     api_error: "Couldn't update standards for authority %{auth}."
     bad_ab_file: "The provided Academic Benchmark file has an error."
@@ -318,6 +319,7 @@ en:
         sis_user_id: "SIS ID"
         sortable_name: "Sortable Name"
       sortable_name_help: "This name appears in sorted lists."
+      unique_id_label: "%{label}:*"
     add_user_button: "Add User"
     add_user_dialog_title: "Add a New User"
     adding_course_message: "Adding Course..."
@@ -1344,8 +1346,6 @@ en:
     imported_assignments_group: "Imported Assignments"
     labels: 
       due: Due
-    messages: 
-      assignment_created: "Assignment \"%{assignment}\" created"
     name_is_required: "Name is required!"
     points_possible: "Points possible must be more than 0 for percentage grading"
     select_external_tool_dialog_title: "Configure External Tool"
@@ -1361,9 +1361,6 @@ en:
       a_website_url: "a website url"
     titles: 
       grading_scheme_info: "View/Edit Grading Scheme"
-    warnings: 
-      group_assignment: "The Assignment \"%{assignment}\" was a group assignment, and you'll need to re-set the group settings for this new context"
-      peer_assignment: "The Assignment \"%{assignment}\" was a peer review assignment, and you'll need to re-set the peer review settings for this new context"
   assignment_details_dialog: 
     average_score: "Average Score:"
     count_of_submissions: "%{cnt} submissions"
@@ -1454,14 +1451,14 @@ en:
       no_assignment_groups: "No Assignment Groups found"
     assignment_group_list_item: 
       add_assignment_to: "Add Assignment to %{name}"
+      assignment_group_delete: "Delete Assignment Group"
+      assignment_group_edit: "Edit Assignment Group"
+      assignment_group_move: "Move Assignment Group"
       delete: Delete
       edit: Edit
       group_weight: "%{groupWeight}% of Total"
       manage: Manage
       move: "Move To&hellip;"
-      title_delete: "Delete Assignment Group?"
-      title_edit: "Edit Assignment Group"
-      title_move: "Move Assignment Group"
     assignment_group_selector: 
       assignment_group: "Assignment Group"
       assignment_group_options: 
@@ -1470,16 +1467,27 @@ en:
       one: "1 Group"
       other: "%{count} Groups"
     assignment_list_item: 
+      assignment_delete: "Delete Assignment"
+      assignment_edit: "Edit Assignment"
+      assignment_move: "Move Assignment"
       delete: Delete
-      delete_asssignment_title: "Delete this assignment"
       edit: Edit
-      edit_assignment_title: "Edit Assignment"
       module: Module
       move: "Move To&hellip;"
-      move_assignment_title: "Move Assignment"
       multiple_modules: "Multiple Modules"
+      no_points_possible: "No Points Possible"
       points_possible: "%{pointsPossible} pts"
+      points_possible_screen_reader: "%{pointsPossible} Points Possible"
       settings: Settings
+    assignment_list_item_score: 
+      assignment_grading_type_is_not_graded: "This assignment will not be assigned a grade."
+      assignment_not_yet_graded_screenreader: "Assignment not yet graded. %{pointsPossible} points possible."
+      empty_points_possible: "-/%{pointsPossible} pts"
+      no_submission: "No Submission"
+      no_submission_for_assignment_screenreader: "No submission for this assignment. %{pointsPossible} points possible."
+      not_yet_graded: "*Not Yet Graded*"
+      score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
+      score_with_points_possible_screenreader: "Score: %{score} out of %{pointsPossible} points."
     assignment_locked: 
       assignment_locked: "This assignment is locked as of *%{lock_at}*"
       assignment_unlocked_from: "This assignment is locked until *%{unlock_at}*"
@@ -1536,6 +1544,8 @@ en:
       delete_group: "Delete Group"
       submit_assignment: "Submit Assignment"
     cannot_delete_group: "You must have at least one Assignment Group"
+    cant_unpublish_when_students_submit: "Can't unpublish if there are student submissions"
+    complete: Complete
     confirm: 
       delete_assignment: "Are you sure you want to delete this assignment?"
       delete_group: "Are you sure you want to delete this group?"
@@ -1662,6 +1672,10 @@ en:
           *Make sure you don't change the names of the submission files so we can recognize them.*
       titles: 
         related_items: "Related Items"
+    grade_letter_grade_screenreader: "Grade: %{grade}"
+    grade_pass_fail_screenreader: "Grade: %{grade}"
+    grade_percent: "%{grade}%"
+    grade_percent_screenreader: "Grade: %{grade}%"
     graded: "This assignment has been graded"
     grading_type_selector: 
       grading_type: "Grading Type"
@@ -1689,6 +1703,8 @@ en:
         assignment_group: "Assignment Group"
         group_weight: Weight
         total: Total
+    higher_than_max: "You cannot use a number greater than the number of assignments"
+    incomplete: Incomplete
     index: 
       assignment_locked: "This assignment is currently locked. Visit the assignment details page for more information."
       assignment_locked_tooltip: locked
@@ -1734,6 +1750,7 @@ en:
       submit_failed: "Submit Failed, please try again"
       submitting: Submitting...
     multiple_due_dates: "Multiple Due Dates"
+    name_is_required: "Name is required!"
     needs_grading_count: "%{needs_grading_count} submissions for this assignment still need grading"
     never_drop: 
       remove_rule: "Remove Rule"
@@ -1750,6 +1767,7 @@ en:
       assignments: Assignments
       no_assignments_found: "No assignments found"
     no_tools_found: "No tools found"
+    non_number: "You must use a number"
     notices: 
       assignment_delete: "This assignment has been deleted"
       created: "Assignment was successfully created."
@@ -1799,6 +1817,7 @@ en:
       peer_reviews_assign_at_explanation: "Must come after due date. If blank, uses due date."
       reviews_per_user: "Reviews Per User"
     percent_of_final_grade: "%{percent} of final grade"
+    positive_number: "You must use a positive number"
     redirect_page: 
       redirect_message: |-
           This submission was a url, we're taking you to the url link now.  
@@ -2025,6 +2044,7 @@ en:
       not_found: "File data could not be found"
     feed_title: "File: %{title}"
     feed_title_with_context: "File, %{course_or_group}: %{title}"
+    over_quota: "The downloaded file exceeds the quota."
     title: 
       migration_list: "Associated Files"
     upload_error_invalid_response_code: "Invalid response code, expected 200 got %{code}"
@@ -2033,7 +2053,7 @@ en:
     upload_error_relative_uri: "No host provided for the URL: %{url}"
     upload_error_timeout: "The request timed out: %{url}"
     upload_error_too_many_redirects: "Too many redirects"
-    upload_error_unexpected: "An unknown error occured downloading from %{url}"
+    upload_error_unexpected: "An unknown error occurred downloading from %{url}"
   attendance: 
     default_attendance_title: "Attendance %{date}"
     errors: 
@@ -2237,6 +2257,12 @@ en:
     last_formula_row: "the last formula row will be used to compute the final answer"
     sample_final_answer: "This value is an example final answer for this question type"
   calendar: 
+    agenda_view: 
+      due: due
+      loading: Loading
+      no_events: "No events after this date."
+      starts_at: "Starts at"
+    agenda_view_displaying_start_end: "Now displaying %{start} through %{end}"
     appointment_group_deletion_details: "Deleting it will also delete any appointments that have been signed up for by students."
     appointment_group_list: 
       location: "Location:"
@@ -2260,13 +2286,17 @@ en:
       create_event: "Create New Event"
       done_go_back_to_list: "Done, Go Back To List"
       links: 
+        accessibility_warning: "Warning: This view is not accessible to users with screenreaders"
+        calendar_agenda: Agenda
         calendar_month: Month
         calendar_scheduler: Scheduler
         calendar_week: Week
+      loading: Loading
       my_appointment_groups: "My Appointment Groups"
       refresh: Refresh
       use_old_calendar: "Old Calendar"
     calendar_navigator: 
+      enter_navigation_date: "Enter the date you would like to navigate to."
       next: Next
       previous: Previous
       today: Today
@@ -2360,8 +2390,16 @@ en:
       slots_available: "Slots available"
     event_event_title: "Event Title:"
     event_on_this_day: "There is an event on this day"
+    event_type: 
+      assignment: Assignment
+      discussion: Discussion
+      event: Event
+      quiz: Quiz
+    input_is_invalid_date: "Input is not a valid date."
     labels: 
       due: due
+    loading_more_items: "Loading more items."
+    loading_undated_events: "Loading undated events"
     message_participants: 
       all_groups: "All groups"
       all_users: "All users"
@@ -2401,15 +2439,17 @@ en:
     save_changes: "Save Changes"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "Create an appointment group"
+    screenreader_date_suggestion: "%{date}. Press enter to accept."
     time_block_errors: "There are errors in your time block selections."
     titles: 
       edit_appointment_group: "Edit Appointment Group"
       edit_event: "Edit Event"
     today: Today
     undated_events: 
-      loading_undated_events: "Loading undated events..."
-      show_undated_events: "Show undated events"
-      undated_events: "Undated Events"
+      loading_undated_events: "Loading undated items..."
+      no_undated_events: "No undated items."
+      show_undated_events: "Show undated items"
+      undated_items: "Undated Items"
   calendar_event: 
     errors: 
       duplicate_child_event_contexts: "Duplicate child event contexts"
@@ -2554,10 +2594,15 @@ en:
     show2: 
       calendar_feed: "Calendar Feed"
       calendar_feed_instructions: "Copy the link below and paste it into any calendar app that takes iCal feeds (Google Calendar, iCal, Outlook, etc.)"
+      calendars: Calendars
       feed_dialog_title: "Calendar Feed"
       feed_title: "Course Calendar Atom Feed"
       links: 
         feed: "click here to view the feed"
+      skip_to_calendar: "Skip to calendar"
+      toggle_calendars: "Toggle calendars"
+      toggle_undated_items: "Toggle undated items"
+      undated_items: "Undated items"
     titles: 
       add_new_assignment: "Add New Assignment"
       add_new_event: "Add New Event"
@@ -2987,7 +3032,7 @@ en:
       import_migration: Import
     moodle_zip: 
       options: Options
-    must_upload_file: "File upload is required"
+    must_upload_file: "File upload or url is required"
     no_content_selected: "You have not selected any content to import."
     progressing_content_migration: 
       issues_text: issues
@@ -3371,6 +3416,117 @@ en:
         modules: 
           before_students_view: "Before students can view this module"
         new_tab: "Load this tool in a new tab"
+        publish_final_grade: "publish final grade for the student when this module is completed"
+        require_sequential_progress: "students must move through requirements in this module in sequential order"
+        sort_by: "Sort By"
+        title: Title
+        unlock_at: "Unlock At"
+        url: URL
+      links: 
+        add_prerequisite: "Add prerequisite"
+        add_requirement: "Add requirement"
+        reload_student: "Reload Student's Progress"
+        sort_by_name: Name
+        sort_by_progress: Progress
+        student_progress: "View Progress"
+        title: 
+          remove_prerequisite: "Remove this prerequisite"
+      module: module
+      module_details: "Modules are shown in sequential order, so only modules that are above %{name} can be set as prerequisites."
+      module_name: "Module Name"
+      modules_keyboard_hint: "To change the order of the course modules and module items, first turn the cursor off on your screen reader. Insert-z in JAWS. Press tab to select the first module. Press up and down to choose a module or module item. Press space to select the module or module item to start dragging. Then press up and down to select a destination. Then press space a second time to drop selection after destination."
+      must_complete_prerequisites: "They must complete"
+      no_preprequisites: "No prerequisites defined"
+      no_requirements: "No requirements defined"
+      prerequisites: 
+        another_module: "Another Module"
+      prerequisites_need_item: "You'll need to add items before you can specify how a user will complete this module"
+      requirements: 
+        must_contribute: "contribute to the page"
+        must_score_at_least: "score at least"
+        must_submit: "submit the assignment"
+        must_view: "view the item"
+      select_module: 
+        instructions: "Select Module"
+        name: "the module, %{module}"
+      select_prerequisite: "Select the type of prerequisite. Students cannot see a module until all prerequisites are satisfied."
+      student_name: "Student Name"
+      table_headings: 
+        module: Module
+        state: State
+      titles: 
+        student_progression: "Module Progression by Student"
+    content_next: 
+      add_prerequisite: "Add prerequisite to *%{module}*"
+      assignment_points_possible: "out of %{points_possible}"
+      buttons: 
+        add_module: "Add Module"
+        add_prerequisite: "Add Prerequisite"
+      criterion_for_assignment: "For %{assignment} users must %{select_criterion}"
+      headings: 
+        add_prerequisite: "Add Prerequisite to %{name}"
+        course_modules: "Course Modules"
+        student_progress: "Module Progress by Student"
+        student_progress_for_module: "Student Progress for %{module}"
+        students_completed: "Students who have Completed the Module"
+        students_in_progress: "Students who are Working on the Module"
+        students_locked: "Students who haven't Unlocked the Module"
+        students_unlocked: "Students who have Unlocked (but not started) the Module"
+      help: 
+        create: |-
+            Course modules let you organize your assignments, pages, files, etc. into smaller sections or units. Modules could be centered around a theme, focused on a specific topic, or even just grouped chronologically.
+            
+              You can also sequence modules by defining criteria and prerequisites for each module. Students won't be able to access modules until they have unlocked all their prerequisites. That way you can prevent students from accessing certain content or files until they have, say, gotten at least 75% on a review quiz.
+            
+              To start organizing your course into modules, click the "%{button}" button to the right.
+        no_modules: "No modules have been defined for this course."
+      images: 
+        alt: 
+          min_score: "minimum score"
+          must_contribute: "must contribute"
+          must_submit: "must submit"
+          must_view: "must view"
+        title: 
+          min_score: "Students must get at least a %{min_score} on this item before the module is considered complete"
+          must_contribute: "Students must contribute to this item before the module is considered complete"
+          must_submit: "Students must submit this assignment before the module is considered complete"
+          must_view: "Students must view this item before the module is considered complete"
+      indent: 
+        ? "n"
+        : 
+          one: "Indent 1 Level"
+          other: "Indent %{count} Levels"
+          zero: "Don't Indent"
+      key: 
+        description: 
+          delete: "Delete Current Module/Item"
+          edit: "Edit Module/Item"
+          indent: "Indent Current Item"
+          new: "New Module"
+          next: "Next Module/Item"
+          outdent: "Outdent Current Item"
+          previous: "Previous Module/Item"
+      keycode_descriptions: 
+        next_module_item: "Select next module or module item"
+        previous_module_item: "Select previous module or module item"
+        toggle_module_dragging: "Select item to begin dragging, or drop previously selected item"
+      keycodes: 
+        delete: d
+        edit: e
+        indent: i
+        new: "n"
+        next: j
+        next_module_item: Up
+        outdent: o
+        previous: k
+        previous_module_item: Down
+        toggle_module_dragging: Space
+      labels: 
+        indent: Indent
+        module_complete_when: "This module is complete when"
+        modules: 
+          before_students_view: "Before students can view this module"
+        new_tab: "Load this tool in a new tab"
         require_sequential_progress: "students must move through requirements in this module in sequential order"
         sort_by: "Sort By"
         title: Title
@@ -3411,6 +3567,9 @@ en:
       titles: 
         student_progression: "Module Progression by Student"
     context_module: 
+      admin_links: 
+        module_options_label: "Module Options"
+        module_options_title: "Module Options"
       context_module: 
         draft: (Draft)
       images: 
@@ -3434,12 +3593,34 @@ en:
           delete_module: "Delete this module"
           edit_module: Edit
           student_progress: "See Student Progress for this Module"
-      manage: Manage
+      manage: "Module Options"
       module_will_unlock_at: "will unlock *%{unlock_date}*"
       progression_complete_count: "*%{count}* Complete"
       progression_started_count: "*%{count}* In Progress"
       reorder_modules: "Drag to reorder modules"
       unpublish: Unpublish
+    context_module_next: 
+      images: 
+        alt: 
+          incomplete: incomplete
+        title: 
+          complete: "Module Completed"
+          incomplete: "Module Incomplete"
+          locked: "Module Locked"
+      links: 
+        add_item: "Add Content"
+        text: 
+          delete_module: Delete
+          edit_module: Edit
+        title: 
+          delete_module: "Delete this module"
+          edit_module: Edit
+          student_progress: "See Student Progress for this Module"
+      manager_module: "Manage module"
+      module_will_unlock_at: "will unlock *%{unlock_date}*"
+      progression_complete_count: "*%{count}* Complete"
+      progression_started_count: "*%{count}* In Progress"
+      reorder_modules: "Drag to reorder modules"
     context_modules: 
       publish: Publish
     errors: 
@@ -3492,6 +3673,46 @@ en:
       must_view: 
         fulfilled: "viewed the page"
         unfulfilled: "must view the page"
+    module_item_next: 
+      drag_to_reorder: "Drag to reorder or move item to another module"
+      images: 
+        alt: 
+          max_score: "maximum score"
+          min_score: "minimum score"
+          must_contribute: "must contribute"
+          must_submit: "must submit"
+          must_view: "must view"
+        title: 
+          max_score: "Students must not exceed the maximum score on this item before the module is considered complete"
+          min_score: "Students must reach the minimum score on this item before the module is considered complete"
+          must_contribute: "Students must contribute to this item before the module is considered complete"
+          must_submit: "Students must submit this assignment before the module is considered complete"
+          must_view: "Students must view this item before the module is considered complete"
+      links: 
+        edit_item: Edit
+        edit_item_details: "Edit item details"
+        indent: Indent
+        indent_item: "Indent item"
+        outdent: Outdent
+        outdent_item: "Outdent item"
+        remove_item: Remove
+        remove_item_from_module: "Remove this item from the module"
+      max_score: 
+        fulfilled: "scored no more than a%{score}"
+        unfulfilled: "must score no more than a %{score}"
+      min_score: 
+        fulfilled: "scored at least a %{score}"
+        unfulfilled: "must score at least a %{score}"
+      must_contribute: 
+        fulfilled: "contributed to the content of the page"
+        unfulfilled: "must contribute to the content of the page"
+      must_submit: 
+        fulfilled: "submitted the assignment"
+        unfulfilled: "must submit the assignment"
+      must_view: 
+        fulfilled: "viewed the page"
+        unfulfilled: "must view the page"
+      settings: Settings
     module_locked: Locked
     module_started: "In Progress"
     module_unlocked: Unlocked
@@ -3530,6 +3751,7 @@ en:
     errors: 
       field_is_required: "This field is required"
     message_sent: "Message sent!"
+    no_course: "No course"
     select_course: "Select course"
   conversation_message: 
     subject: "Private message, %{timestamp}"
@@ -3660,7 +3882,6 @@ en:
       compose_new_message: "Compose a new message"
       delete: Delete
       delete_conversation: "Delete conversation"
-      enter_name_group_or_course: "Enter a name, group, or course"
       filter_messages_by_course: "Filter messages by course"
       filter_messages_by_type: "Filter messages by type"
       forward: Forward
@@ -3670,6 +3891,7 @@ en:
       more_options: "More options"
       reply: Reply
       reply_all: "Reply all"
+      search_by_user: "Search by user"
       search_for_recipients: "Search for recipients"
       search_names_groups_courses: "Search names, groups, and courses"
       sending: sending
@@ -3719,12 +3941,11 @@ en:
         remove_media_comment: "Remove media comment"
     message_form_dialog: 
       body: Body
-      bulk_explanation: "This option creates individual messages to all recipients in the To: field."
-      bulk_message: "Bulk message"
       headings: 
         new_message: "New Message"
       inbox_actions: 
         add_people: "Add People"
+      individual_message_explanation: "This will send an individual message to each of the recipients"
       labels: 
         add_to_faculty_journal: "Add as a Faculty Journal entry"
         attachments: Attachments
@@ -3735,8 +3956,10 @@ en:
       links: 
         media_comment: Record
       media_comment: "Media Comment"
+      no_course: "No course"
       no_subject: "No subject"
       search_names_groups_courses: "Search names, groups, and courses"
+      send_individual_messages: "Send individual messages"
       titles: 
         media_comment: "Recorded media comment"
         record_media_comment: "Record an audio or video comment"
@@ -3756,6 +3979,7 @@ en:
       sending_message: "Sending *%{message_preview}* to *%{num_people}*"
     more_participants: "+%{total} more"
     no_message: 
+      batch_selected: "Multiple Conversations Selected"
       beta_description: "You are using a beta version of the Canvas inbox"
       beta_version: "Beta Version"
       no_conversations_selected: "No Conversations Selected"
@@ -3830,6 +4054,7 @@ en:
       slide7: "Slide 7"
       slide8: "Slide 8"
       slide9: "Slide 9"
+  correct_answer: "This was the correct answer."
   course: 
     access_denied: "Access was denied"
     batch_update_message: 
@@ -4183,6 +4408,7 @@ en:
       headings: 
         future_enrollments: "Future Enrollments"
         my_courses: "My Courses"
+        my_groups: "My Groups"
         past_enrollments: "Past Enrollments"
       start_new_course: "Start a New Course"
       titles: 
@@ -4302,6 +4528,7 @@ en:
         move_course: "Move Course"
         update_course: "Update Course Details"
       course_open_enrollment: "This course has enabled open enrollment. Students can self-enroll in the course once you share with them this URL: *%{url}*. Alternatively, they can sign up at *%{url2}* and use the following join code: *%{code}*"
+      course_open_enrollment_without_code: "This course has enabled open enrollment. Students can self-enroll in the course once you share with them this URL: *%{url}*"
       course_overrides_term: "This will override any term availability settings."
       date_restricted: "Users can only participate in the course between these dates"
       deatils: 
@@ -4367,7 +4594,6 @@ en:
         public_syllabus: "Make the syllabus for this course publicly visible"
         restrict_enrollments_to_course_dates: "Users can only participate in the course between these dates"
         root_account_id: "Root Account"
-        self_enrollment: "Let students self-enroll by sharing with them a secret URL or code"
         sis_source_id: "SIS ID"
         start_at: Starts
         storage_quota: "File Storage"
@@ -4382,7 +4608,7 @@ en:
           delete_section: "Delete Section"
           edit_section: "Edit Section"
       megabytes: megabytes
-      navigation_keyboard_hint: "To change the order of the course navigation links, first turn the cursor off on your screen reader. Insert-z in JAWS. Press tab to select first link. Press up and down to select a link. Press space to select a link to start dragging. Then press up and down to select a destination. Then press space a second time to drop link after destination."
+      navigation_keyboard_hint: "If using a screen reader, to change the order of the course navigation links, Turn off the virtual cursor or virtual buffer on your screen reader (press Insert-z for JAWS). Press control-home to jump to the top of the page, then press the tab key until you reach the first course navigation link. Press the up and down arrows until you hear the link you wish to move, and then press space to select it Then, press the up and down arrow keys until you locate the new position. Finally, press space again to place the link you are moving directly after the current link. When finished, reenable the virtual buffer/cursor."
       no_date: "No Date Set"
       no_language_preference: "Not set (user-configurable, defaults to %{language})"
       none: None
@@ -4391,6 +4617,8 @@ en:
       private_course: Private
       public_course: Public
       section_sis_id: "SIS ID: %{section_sis}"
+      self_enrollment: "Let students self-enroll by sharing with them a secret URL or code"
+      self_enrollment_without_code: "Let students self-enroll by sharing with them a secret URL"
       set_grading_scheme: "set grading scheme"
       sis_source_id: "SIS ID"
       tab_cant_disable: "This page can't be disabled, only hidden"
@@ -4439,27 +4667,44 @@ en:
         modules: |-
             You can organize your course into **modules or sections**, where each section contains a related set of files, assignments, pages, etc.  If you want, you can also sequence modules by defining criteria and prerequisites that need to be completed before each module is unlocked.
             
-            This layout is probably best for courses that aren't based on a specific schedule like a term or semester.
+            -This layout is probably best for courses that aren't based on a specific schedule like a term or semester.
         recent_activity_dashboard: "The **recent activity dashboard** lets participants see the most recent conversations, announcements, discussions, and interactions for this course.  It's very similar to the dashboard page users see when they first log in, but only shows content for this specific course."
         syllabus: "The **syllabus view** lets you write up a description of course expectations or introduce the course with links, images, etc. and then also shows a calendar view of all assignments and course events."
+      draft_state: 
+        buttons: 
+          cancel: Cancel
+          update_layout: Save
+        headings: 
+          set_layout: "Set Home Page Layout"
+        labels: 
+          select_content: "Select what you'd like to display on the homepage."
+        options: 
+          assignments: "Assignments List"
+          custom_page: "Pages Front Page"
+          modules: "Course Modules"
+          recent_activity_dashboard: "Recent Activity Dashboard"
+          syllabus: Syllabus
       empty_body: "No Content"
       headings: 
         confirm_unenroll: "Confirm Unenrollment"
+        edit_homepage_title: "Edit Homepage"
         importing: "This course is being imported"
         set_layout: "Set Home Page Layout"
         unpublished: "This Course is Unpublished"
       importing: "Course copy/migration in progress. This means some content may be temporarily unavailable."
       labels: 
-        set_layout: "When people visit the course page, show them"
+        select_content: "When people visit the course page, show them"
       license_notice: "This course content is offered under a %{license_type} license. Content in this course can be considered under this license unless otherwise noted."
       links: 
         change_layout: "Change Home Page Layout"
         course_setup: "Course Setup Checklist"
         course_stream: "See Course Stream"
         drop_course: "Drop this Course"
+        edit_homepage: "Edit Homepage"
         join_course: "Join this Course"
         new_announcement: "New Announcement"
         restore_role: "Restore Role and Permissions"
+        view_course_stream: "View Course Stream"
       options: 
         assignments: "the Assignment List"
         custom_page: "a Page I'll Design Myself"
@@ -4720,6 +4965,7 @@ en:
       short: "%b %-d"
       short_month: "%b"
       short_weekday: "%a"
+      short_with_weekday: "%a, %b %-d"
       weekday: "%A"
     month_names: 
       - ~
@@ -4880,7 +5126,6 @@ en:
   discussion_entry: 
     atom_no_author: "No Author"
     default_user_name: "User Name"
-    file_added_warning: "Added file \"%{file_path}\" which is needed for an entry in the topic \"%{discussion_topic_title}\""
   discussion_topic: 
     atom_no_author: "No Author"
     default_title: "No Title"
@@ -4966,8 +5211,6 @@ en:
     error_draft_state_announcement: "This topic cannot be set to draft state because it is an announcement."
     error_draft_state_unauthorized: "You do not have permission to set this topic to draft state."
     error_draft_state_with_posts: "This topic cannot be set to draft state because it contains posts."
-    errors: 
-      bad_scope: "scope is contradictory"
     group_assignment_discussion_entry: 
       posts: 
         one: "1 Post"
@@ -5571,10 +5814,9 @@ en:
       education_levels: "Education Level(s)"
       extensions: Extensions
       help_link: "Help Link"
-      privacy_level: "Privacy Level"
       rate_tool: "Rate this tool"
     app_review_view: 
-      posted_by_on: "Posted by *%{user_name}* on *%{created}*"
+      posted_by_on: "Posted by *%{user.name}* on *%{created_at}*"
     app_saved_message: "%{app} saved successfully!"
     borderless_launch: 
       load_tool_button: "Load %{tool} manually"
@@ -5992,9 +6234,13 @@ en:
     students_who: 
       havent_been_graded: "Haven't been graded"
       havent_submitted_yet: "Haven't submitted yet"
+      no_grade_for: "No grade for %{assignment}"
+      no_submission_for: "No submission for %{assignment}"
       not_submitted_yet: "Haven't submitted yet"
       scored_less_than: "Scored less than"
+      scored_less_than_on: "Scored less than %{cutoff} on %{assignment}"
       scored_more_than: "Scored more than"
+      scored_more_than_on: "Scored more than %{cutoff} on %{assignment}"
     submission_information: "Submission Information"
     teacher_muted_title: "Assignment is muted"
     titles: 
@@ -6081,8 +6327,13 @@ en:
     students_who: 
       havent_been_graded: "Haven't been graded"
       havent_submitted_yet: "Haven't submitted yet"
+      no_grade_for: "No grade for %{assignment}"
+      no_submission_for: "No submission for %{assignment}"
+      not_submitted_yet: "Haven't submitted yet"
       scored_less_than: "Scored less than"
+      scored_less_than_on: "Scored less than %{cutoff} on %{assignment}"
       scored_more_than: "Scored more than"
+      scored_more_than_on: "Scored more than %{cutoff} on %{assignment}"
     submitted_late: "Submitted late"
     title: 
       quiz: "Quiz Submission"
@@ -6424,6 +6675,7 @@ en:
         add_comment: "Add a Comment"
         average: Avg
         grade: Grade
+        grade_by_question_beta: "Grade by question (beta)"
         group_comment: "Send Comment to the Whole Group"
         hide_names: "Hide student names in the SpeedGrader"
         show_assessment_by: "Show Assessment By"
@@ -6545,6 +6797,8 @@ en:
   group: 
     default_collection_name: "%{group_name}'s Collection"
     memeber: Member
+    name_required: "Name is required"
+    name_too_long: "Enter a shorter group name"
     tabs: 
       chat: Chat
       discussions: Discussions
@@ -6685,7 +6939,7 @@ en:
       page_title: "Course Groups"
       page_title_accounts: "Account Groups"
     create_group_set: "Create Group Set"
-    delete_confirm: "Are you sure you want to remove this group category?"
+    delete_confirm: "Are you sure you want to remove this group set?"
     edit: 
       buttons: 
         update: "Update Group"
@@ -6711,10 +6965,11 @@ en:
       group_limit: "Group limit must be blank or greater than 1"
       unknown: "An unexpected error occurred."
       update_failed: "Update Failed, Try Again"
+    everyone: "Everyone (%{count})"
     feed_title: "%{course_or_account_name} Feed"
     flash: 
-      removeError: "Unable to remove the group category. Please try again later."
-      removed: "Group category successfully removed."
+      removeError: "Unable to remove the group set. Please try again later."
+      removed: "Group set successfully removed."
     group: 
       actions: 
         ask_to_join_group: "ask to join this group"
@@ -6729,10 +6984,8 @@ en:
       no_members: "No members"
       one: "1 Group"
       other: "%{count} Groups"
-    group_count: 
-      one: "1 group"
-      other: "%{count} groups"
     group_name: "Group Name"
+    groups_count: "Groups (%{count})"
     index: 
       heading_current_groups: "Current Groups"
       no_groups: "No Groups"
@@ -6743,25 +6996,30 @@ en:
         add_unassigned_user: "Add Unassigned User"
         search_people: "Search people"
       add_unassigned_user: 
-        assign_to_group: "Assign to Group"
+        add_to_group: "Add user to group"
+        add_user_to_group: "Add user %{name} to this group"
       add_unassigned_users: 
         no_users_found: "No users found"
         too_short: "Please enter a search term of 3 or more characters"
       assign_to_group_menu: 
         add_to_group: "Add to Group"
+        all_groups_full: "All groups are full."
+        all_groups_full_suggestion: "Either change group limits or add more groups."
         assign_user_to_group: "Assign user to this group"
-      group: 
-        add_user_to_group: "Assign user to group"
-        group_delete: Delete
-        group_edit: Edit
-        group_settings: Settings
-        show_group_details: "Show group details"
+        assign_user_to_group_name: "Assign user to group %{name}"
+        no_groups_created: "Groups need to be created before users can be added."
       group_categories: 
-        group_set_create: "Add Group Set"
+        account_group_explanation: "Account-level student groups are a good way to group students without being tied to a specific course. Every student group gets their own calendar, discussion board and collaboration tools so they can organize themselves and work together more effectively."
+        add_group_set: "Add Group Set"
+        course_group_explanation: "Student groups are a useful way to organize students for things like group projects or papers. Every student group gets their own calendar, discussion board and collaboration tools so they can organize themselves and work together more effectively."
+        group_assignment_instructions: "You can randomly assign students to groups of a specific size, or manually create and organize the groups. Once your groups are created, you can set assignments to be \"group submission\" assignments, which means each group will have one submission for all users of that group."
+        group_set: "Group Set"
+        headings: 
+          account_groups: "Account-level Student Groups"
+          course_groups: "Student Groups"
       group_category: 
         randomly_assigning_students: "Randomly Assigning Students"
-        unassigned_students: "Unassigned Students"
-        unassigned_users: "Unassigned Users"
+        search_groups: "Search groups"
       group_category_create: 
         allow_self_signup: "Allow self sign-up"
         cancel: Cancel
@@ -6783,16 +7041,14 @@ en:
         category_settings: Settings
         delete_category_option: Delete
         edit_category_option: Edit
-        group_limit_blurb: "Groups are limited to *%{count}* members"
+        group: Group
+        group_limit_blurb: "Groups are limited to *%{group_limit}* members."
         message_all_unassigned_option: "Message All Unassigned Students"
         randomly_assign_students_option: "Randomly Assign Students"
         restricted_self_signup_blurb: "All students in a group are required to be in the same section."
-        search: search
         self_organized_warning: "These groups are self-organized by students. Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups may not be the best solution for graded assignments."
         self_signup_blurb: "Self sign-up is enabled for these groups."
-        self_signup_help_tooltip: "What Are Self Sign-Up Groups?"
-        student_group_instructions: "(drag students to assign)"
-        user_group_instructions: "(drag users to assign)"
+        settings: Settings
       group_category_edit: 
         allow_self_signup: "Allow self sign-up"
         cancel: Cancel
@@ -6802,8 +7058,14 @@ en:
         require_same_section: "Require group members to be in the same section"
         save: Save
         saving: Saving...
-        self_signup_description: "You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organize themselves into groups instead of needing the teacher to do the work. Note that as long as this option is enabled, students can move themselves from one group to another."
-        what_is_this: "What is this?"
+      group_detail: 
+        add_user_to_group: "Assign user to group"
+        group_delete: Delete
+        group_edit: Edit
+        group_full: Full
+        group_settings: Settings
+        show_group_details: "Show details for group %{name}"
+        visit_group_homepage: "Visit Group Homepage"
       group_edit: 
         cancel: Cancel
         group_name: "Group Name"
@@ -6811,19 +7073,22 @@ en:
         saving: Saving...
       group_user: 
         assign_to_group: "Assign to Group"
+        assign_user_to_group: "Assign user %{name} to a group"
         remove_from_group: "Remove from Group"
+        remove_user_from_group: "Remove user %{name} from this group"
       group_users: 
         no_students: "No students"
         no_users: "No users"
       groups: 
-        groups: Groups
         no_groups: "No groups."
-        search: Search
-        search_groups: "Search groups"
+        no_matching_groups: "No matching groups."
       randomly_assign_members: 
-        add_more_users: Cancel
-        close: Okay
+        cancel: Cancel
+        okay: Okay
         randomly_assign_students_dialog: "This will automatically assign all unassigned students as evenly as possible among the existing student groups."
+      self_signup_help: 
+        about_self_signup_groups: "About Self Sign-up Groups"
+        self_signup_description: "You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organize themselves into groups instead of needing the teacher to do the work. Note that as long as this option is enabled, students can move themselves from one group to another."
     member: 
       one: "1 member"
       other: "%{count} members"
@@ -6862,6 +7127,8 @@ en:
     titles: 
       add_group_category: "Add Set of Groups"
       self_signup_help: "Self Sign-Up Groups"
+    unassigned_students: "Unassigned Students (%{count})"
+    unassigned_users: "Unassigned Users (%{count})"
   help_dialog: 
     Back: Back
     Help: Help
@@ -6998,6 +7265,7 @@ en:
       id: id
       priority: priority
       run_at: "run at"
+      runtime: runtime
       strand: strand
       tag: tag
       worker: worker
@@ -8849,9 +9117,9 @@ en:
     quiz_locked_until: "This quiz is locked until %{date}."
     quiz_regrade_finished: 
       email: 
-        body: "A regrade has finsihed for the quiz %{quiz}"
+        body: "A regrade has finished for the quiz %{quiz}"
         html: 
-          body: "A regrade has finsihed for the quiz %{quiz}"
+          body: "A regrade has finished for the quiz %{quiz}"
           link_message: "You can view the quiz here:"
           subject: "Quiz Regrade Finished: %{quiz}, %{context}"
         link_message: "You can view the quiz here:"
@@ -9261,6 +9529,8 @@ en:
     submission_comments: "Submission comments"
     sure_you_want_to_mute: "Are you sure you want to mute this assignment? While this assignment is muted, students will not receive new notifications about or be able to see:"
   name: "Academic Benchmark Importer"
+  new_facebook_message: "You have a new message from Canvas"
+  no_migration_file: "File required for content migration."
   not_applicable: N/A
   notification: 
     added_to_conversation_description: "You are added to a conversation"
@@ -9692,6 +9962,7 @@ en:
       page_deleted: "The page \"%{title}\" has been deleted."
     reload_editing_page: "This page has changed since you started editing it. *Reloading* will lose all of your changes."
     reload_viewing_page: "This page has changed since you started viewing it. *Reload*"
+    restore_failed: "Failed to restore page revision"
     save_button: Save
     saving_button: Saving...
     warnings: 
@@ -9762,9 +10033,6 @@ en:
       description: "This plugin integrates with Crocodoc to provide an HTML5 document previewer which provides teachers and students with the ability to annotate documents."
       labels: 
         api_key: "Crocodoc API Key"
-    dim_dim: 
-      description: "DimDim web conferencing support"
-      name: DimDim
     dim_dim_settings: 
       description: "You will need access to a Dim Dim instance."
       labels: 
@@ -9950,6 +10218,10 @@ en:
       labels: 
         download_url: "LockDown Browser Download URL"
         plugin_enabled: Enabled
+    med_cornell_export: 
+      labels: 
+        password: "Password for authentication"
+        username: "Username for authentication"
     notices: 
       settings_updated: "Plugin settings successfully updated."
     qti_converter_settings: 
@@ -9974,6 +10246,7 @@ en:
           "Settings -> API" in your profile after creation.
       labels: 
         api_key: "API key"
+        enable_html5_viewer: "Enable HTML5 Document Viewer"
         secret_key: "API secret"
     sessions: 
       description: "Manage session timeouts"
@@ -10184,6 +10457,7 @@ en:
         change_password: "Change Password"
         confirm_password: "Confirm Password"
         default_email: "Default Email"
+        enabled_theme: "Enabled Theme"
         expires_at: Expires
         headers: 
           approved_integrations: "Approved Integrations"
@@ -10483,20 +10757,23 @@ en:
   publish_btn_module: 
     buttons: 
       publish: Publish
-      publish_desc: "Unpublished. Click to publish"
+      publish_desc: "Unpublished. Click to publish."
       published: Published
-      published_desc: "Published. Click to unpublish"
+      published_desc: "Published. Click to unpublish."
       publishing: Publishing...
       unpublish: Unpublish
       unpublishing: Unpublishing...
   publishable: 
     cant_unpublish: "Can't unpublish"
+  publishableModuleItem: 
+    disabled: "Publishing is disabled for this item"
   purchases: 
     new: 
       payment_info: "Payment Information"
   qti_display: QTI
   qti_file_description: "QTI .zip file"
   qti_name: "QTI Converter"
+  question_answered: Answered
   question_bank: 
     align_outcomes: "Align Outcomes"
     remove_outcome_from_bank: "Are you sure you want to remove this outcome from the bank?"
@@ -10584,6 +10861,7 @@ en:
       show_details: "Show Question Details"
       title: 
         move_copy_questions: "Move/Copy Questions"
+  question_unanswered: "Haven't Answered Yet"
   quick_start_bar: 
     announcement: 
       saving: Saving...
@@ -10693,14 +10971,12 @@ en:
     default_response_to_file_upload: "Response to show student after they submit an answer"
     default_title: "New Quiz"
     display_answer: 
-      correct_answer: "This was the correct answer."
       labels: 
         answer_with_margin: "with margin"
         your_answer: "Your Answer"
       margin_of_error: "margin of error"
       plus_or_minus: +/-
       range_answer: "Between %{lower_bound} and %{upper_bound}"
-      selected_answer: "You selected this answer."
       you_left_this_blank: "(You left this blank)"
     display_question: 
       default_question_answer: "[ Choose ]"
@@ -10728,7 +11004,7 @@ en:
       regraded_score: "Regraded Score:"
       show_ansers_for_variable: "Show Answers for %{variable}"
       skip_question_text: "Skip to question text."
-      submission_was_regraded: "This question has been regraded; your score was affected."
+      submission_was_regraded: "This question has been regraded."
       titles: 
         question_correct_comment: "Students will see this comment if they get the question correct"
         question_incorrect_comment: "Students will see this comment if they get the question wrong"
@@ -10743,7 +11019,7 @@ en:
     equations_help: 
       equation_functions: "In addition to variables, there are also a collection of helper functions you can use to generate useful values. For example: %{example} To see an exaplanation of a given helper function, select it from the list below:"
       equation_intro: "Calculated questions are based on a set of one or more formulas computed in order. You can define intermediate variables in these formulas, but the numerical result of the last formula is what is used to generate the correct answer. For example: %{example} For this set of formulas, the final answer is 71. However, there are no predefined variables, so all students would have the same question with the same answer. See the \"variables\" tab for more information on variables."
-      equation_variables: "You can also define variables in you question text using brackets (\"What is [a] + [b]?\"). For every variable, you'll see an \"Example Value\" based on the variable settings. This is so you can check your math and make sure your formulas work. For example, if your question was \"What is [a] + 5?\" then you'd be asked to define the variable \"a\". If the example value for \"a\" were 5.2, you could write: %{example} With this formula you can generate any number of solution sets, with a different value of \"a\" in each set. One student might see the question, \"What is 5.2 + 5?\" and another might see \"What is 9 + 5?\"."
+      equation_variables2: "You can also define variables in your question text using brackets (\"What is [a] + [b]?\"). For every variable, you'll see an \"Example Value\" based on the variable settings. This allows you to check your math and make sure the formulas work. For example, if your question was \"What is [a] + 5?\" then you'd be asked to define the variable \"a\". If the example value for \"a\" were 5.2, you could write: %{example} With this formula you can generate any number of solution sets, with a different value of \"a\" in each set. One student might see the question, \"What is 5.2 + 5?\" and another might see \"What is 9 + 5?\"."
       links: 
         functions: Functions
         intro: Intro
@@ -10931,12 +11207,12 @@ en:
       anonymous_username: Student
       buttons: 
         allow_extra_attempt: "allow this student an extra attempt"
-        update_scores: "Update Scores"
       count_attempts_left: 
         one: "%{user} has 1 attempt left"
         other: "%{user} has %{count} attempts left"
       default_quiz_name: "Quiz %{course_name}"
       default_survey_name: "Survey %{course_name}"
+      grade_by_question_warning: "The grade by question feature is affected by questions that are shuffled in a group."
       headers: 
         quiz_submissions: "Quiz Submissions"
         survey_submissions: "Survey Submissions"
@@ -11216,8 +11492,6 @@ en:
     question_list_right_side: 
       headers: 
         questions: Questions
-      question_answered: Answered
-      question_unanswered: "Haven't Answered Yet"
     question_statistic: 
       attempts: 
         one: "1 attempt"
@@ -11319,12 +11593,14 @@ en:
       view_responses: "View Responses"
     quiz_submission: 
       attempt_duration: "This attempt took %{duration}."
+      buttons: 
+        update_scores: "Update Scores"
       labels: 
         final_score: "Final Score"
         fudge_points: "Fudge Points"
-        fudge_points_changed_points_quiz: "Since %{user} took this quiz, the points possible for the quiz has changed by %{difference}. You can adjust for this change and manually add positive or negative points using this box:"
-        fudge_points_changed_points_survey: "Since %{user} took this survey, the points possible for the survey has changed by %{difference}. You can adjust for this change and manually add positive or negative points using this box:"
-        fudge_points_generic_explanation: "You can manually adjust the score by adding positive or negative points to this box:"
+        fudge_points_changed_points_quiz: "Since %{user} took this quiz, the number of points possible has changed by %{difference}. You can adjust for this change and manually add positive or negative points using this box."
+        fudge_points_changed_points_survey: "Since %{user} took this survey, the number of points possible has changed by %{difference}. You can adjust for this change and manually add positive or negative points using this box."
+        fudge_points_generic_explanation: "You can manually adjust the score by adding positive or negative points to this box."
         questions_need_review: "The following questions need review"
         quiz_score: "Quiz Score"
         score_for_attempt: "Score for this attempt"
@@ -11559,9 +11835,7 @@ en:
         other: "%{count} Seconds"
       show_time_link: Show
       titles: 
-        answered: Answered
         come_back_later: "You marked this question to come back to later"
-        not_answered: "Haven't Answered yet"
         times_up: "Time's Up!"
       years_count: 
         one: "1 Year"
@@ -11921,6 +12195,7 @@ en:
     titles: 
       add_item_to_module: "Add Item to Module"
       find_links_using_service: "Find links using %{service}"
+  selected_answer: "You selected this answer."
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "You are already enrolled in **%{course}**."
@@ -12258,6 +12533,7 @@ en:
       for_title: "for %{title}"
       labels: 
         body: Message
+        subject: Subject
       message_students_who: "Message students who..."
       out_of_points: "out of %{points_possible}"
     mute_dialog: 
@@ -12372,12 +12648,14 @@ en:
           other: "Keep in mind that %{count} students have already been assessed using this rubric. Changing it will affect their evaluations."
         rubric_in_use2: "You've already rated students with this rubric. Any major changes could affect their assessment results."
       out_of: "%{points} *out of %{total}*"
+      rubric: Rubric
       rubric_title: Title
       titles: 
         find_existing_rubric: "Find Existing Rubric"
     rubric_criterion: 
       defaults: 
         description: "Description of criterion"
+      delete_criterion_link: "Delete Criterion Link"
       description: 
         custom_comments_area: "This area will be used by the assessor to leave comments related to this criterion."
       full_marks: "Full Marks"
@@ -12394,8 +12672,8 @@ en:
       options: 
         select: "[ Select ]"
       points: "%{points} pts"
-      points_abbreviation: "*Points* pts"
-      points_out_of: "*Points* / %{total} pts"
+      points_label: Points
+      points_out_of2: "%{points} / %{total} pts"
       titles: 
         linked_to_learning_outcome: "This criterion is linked to a Learning Outcome"
     rubric_criterion_dialog: 
@@ -12426,6 +12704,7 @@ en:
       labels: 
         total_points: "Total Points"
       points_out_of: "*%{points}* out of **%{total}**"
+      rubric: Rubric
     rubric_summary_criterion: 
       defaults: 
         description: "Description of criterion"
@@ -12782,6 +13061,7 @@ en:
         save_comment: "Save Comment"
       crumbs: 
         assignments: Assignments
+      hide_rubric_button: "Hide Rubric Button"
       labels: 
         add_a_comment: "Add a Comment"
         grade: Grade
@@ -12972,6 +13252,7 @@ en:
     announcement: Announcement
     announcements: Announcements
     assignments: Assignments
+    come_back_later: "You marked this question to come back to later"
     delete_quiz: "Delete Quiz"
     delete_survey: "Delete Survey"
     discussion: Discussion
@@ -13012,6 +13293,7 @@ en:
   unknown: Unknown
   unknown_question_bank: "Unknown question bank"
   unknown_quiz: "Unknown quiz"
+  unsupported_package: "Unsupported content package"
   user: 
     default_collection_name: "%{user_name}'s Collection"
     default_user_name: User
@@ -13423,8 +13705,11 @@ en:
     is_required: "This field is required"
   warnings: 
     test_install: 
-      message: "This Canvas installation is only for testing, and will reset every week."
+      periodic_message: "This Canvas installation is only for testing, and will reset periodically."
       title: "Canvas Test Installation"
+      weekly_message: 
+        one: "This Canvas installation is only for testing, and will reset every week."
+        other: "This Canvas installation is only for testing, and will reset every %{count} weeks."
   web_conference: 
     default_name_for_courses: "Course Web Conference"
     default_name_for_groups: "Group Web Conference"
@@ -13484,6 +13769,11 @@ en:
       toolbar_menu: 
         settings: Settings
       view_page_history_wiki: "View Page History"
+    wiki_page_content: 
+      page_locked: "This page is locked"
+      page_locked_by_modules: "This page will be available once you have completed these modules:"
+      page_locked_by_modules_until: "This page will be available on %{lock_info.unlock_at} if you have completed these modules:"
+      page_locked_until: "This page will be available on %{lock_info.unlock_at}"
     wiki_page_edit: 
       buttons: 
         cancel: Cancel
@@ -13523,6 +13813,13 @@ en:
         edit: Edit
         settings: Settings
         use_front_page: "Use as Front Page"
+    wiki_page_revision: 
+      latest_revision: "Latest Revision"
+      restore_revision: "Restore this revision"
+      revision_summary: "*%{updated_at}* by %{edited_by}"
+      same_as_latest: "Same as *Latest*"
+    wiki_page_revisions: 
+      revision_history: "Revision History"
   wiki_page: 
     atom_author: "Wiki Page"
     atom_entry_title: "Wiki Page, %{course_or_group_name}: %{page_title}"
@@ -13534,9 +13831,6 @@ en:
       blank_title: "Title can't be blank"
       title_characters: "Title must contain at least one letter or number"
       title_too_long: "Title can't exceed %{max_characters} characters"
-    missing_name: "Unnamed Page"
-    notices: 
-      wiki_page_created: "Wiki Page \"%{title}\" created"
     title_for_topics_category: "%{category} Topics"
     unknown_user_name: Unknown
     warnings: 
@@ -13602,12 +13896,15 @@ en:
     front_page: "Front Page"
     notices: 
       cannot_edit: "You are not allowed to edit the page \"%{title}\"."
+      cannot_read_revisions: "You are not allowed to review the historical revisions of \"%{title}\"."
       create_non_existent_page: "The page \"%{title}\" does not exist, but you can create it below"
       page_deleted: "The page \"%{title}\" has been deleted."
       page_does_not_exist: "The page \"%{title}\" does not exist."
       page_updated: "Page was successfully updated."
     page_link: 
       link_hidden_from_students_warning: "Students won't see this link"
+    page_revisions: 
+      page_revisions_title: "%{title} revisions : %{context_name}"
     pages_index: 
       titles: 
         pages: Pages

@@ -14,7 +14,7 @@ require [
     if $el.length > 0
       model = new Assignment
         id: $el.attr('data-id')
-        publishable: true
+        unpublishable: !$el.hasClass('disabled')
         published: $el.hasClass('published')
       model.doNotParse()
 

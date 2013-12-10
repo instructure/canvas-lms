@@ -57,11 +57,17 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def self.for_request_id(request_id)
-    if PageView.page_view_method == :db
-      find_by_request_id(request_id)
+  def self.find_for_update(request_id)
+    if PageView.updates_enabled? && (self.db? || self.cassandra?)
+      begin
+        # not using find_by_id or where(..).first because the cassandra
+        # codepath doesn't support it
+        find(request_id)
+      rescue ActiveRecord::RecordNotFound
+        nil
+      end
     else
-      new{ |p| p.request_id = request_id }
+      new { |p| p.request_id = request_id }
     end
   end
 
@@ -87,9 +93,9 @@ class PageView < ActiveRecord::Base
   end
 
   def self.page_view_method
-    enable_page_views = Setting.get_cached('enable_page_views', 'false')
+    enable_page_views = Setting.get('enable_page_views', 'false')
     return false if enable_page_views == 'false'
-    enable_page_views = 'db' if enable_page_views == 'true' # backwards compat
+    enable_page_views = 'db' if %w[true queue].include?(enable_page_views) # backwards compat
     enable_page_views.to_sym
   end
 
@@ -101,16 +107,12 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def self.redis_queue?
-    self.page_view_method == :cache || (cassandra? && cassandra_uses_redis?)
+  def self.db?
+    self.page_view_method == :db
   end
 
   def self.cassandra?
     self.page_view_method == :cassandra
-  end
-
-  def self.cassandra_uses_redis?
-    Setting.get_cached('page_view_cassandra_uses_redis', 'false') == 'true'
   end
 
   EventStream = ::EventStream.new do
@@ -161,34 +163,25 @@ class PageView < ActiveRecord::Base
     page_view
   end
 
+  def self.updates_enabled?
+    Setting.get('skip_pageview_updates', 'false') != 'true'
+  end
+
   def store
     self.created_at ||= Time.zone.now
     return false unless user
+    return false if self.is_update && !PageView.updates_enabled?
 
     result = case PageView.page_view_method
     when :log
       Rails.logger.info "PAGE VIEW: #{self.attributes.to_json}"
-    when :cache
-      self.save_to_redis
-    when :cassandra
-      if PageView.cassandra_uses_redis?
-        self.save_to_redis
-      else
-        self.save
-      end
-    when :db
+    when :db, :cassandra
       self.save
     end
 
     self.store_page_view_to_user_counts
 
     result
-  end
-
-  def save_to_redis
-    json = self.attributes.as_json
-    json['is_update'] = true if self.is_update
-    Canvas.redis.rpush(PageView.cache_queue_name, json.to_json)
   end
 
   def do_update(params = {})
@@ -249,66 +242,6 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def self.cache_queue_name
-    'page_view_queue'
-  end
-
-  def self.process_cache_queue
-    redis = Canvas.redis
-    lock_key = 'page_view_queue_processing'
-    lock_key += ":#{Shard.current.id}" unless Shard.current.default?
-    lock_time = Setting.get("page_view_queue_lock_time", 15.minutes.to_s).to_i
-
-    # lock other processors out until we're done. if more than lock_time
-    # passes, the lock will be dropped and we'll assume this processor died.
-    unless redis.setnx lock_key, 1
-      return
-    end
-    redis.expire lock_key, lock_time
-
-    begin
-      # process as many items as were in the queue when we started.
-      todo = redis.llen(self.cache_queue_name)
-      while todo > 0
-        batch_size = [Setting.get_cached('page_view_queue_batch_size', '1000').to_i, todo].min
-        redis.expire lock_key, lock_time
-        self.transaction do
-          process_cache_queue_batch(batch_size, redis)
-        end
-        todo -= batch_size
-      end
-    ensure
-      redis.del lock_key
-    end
-  end
-
-  def self.process_cache_queue_batch(batch_size, redis = Canvas.redis)
-    batch_size.times do
-      json = redis.lpop(self.cache_queue_name)
-      break unless json
-      attrs = JSON.parse(json)
-      self.process_cache_queue_item(attrs)
-    end
-  end
-
-  def self.process_cache_queue_item(attrs)
-    return if attrs['is_update'] && Setting.get_cached('skip_pageview_updates', nil) == "true"
-    self.transaction(:requires_new => true) do
-      if attrs['is_update']
-        page_view = self.find_some([attrs['request_id']], {}).first
-        return unless page_view
-        page_view.do_update(attrs)
-      else
-        page_view = self.from_attributes(attrs, true)
-      end
-      page_view.save
-    end
-  rescue ActiveRecord::StatementInvalid => e
-    logger.error "[CRIT] Failed to record page view!"
-    logger.error "#{e.class}: #{e.message}"
-    e.backtrace.each{ |line| logger.error "\tfrom #{line}" }
-  end
-
   class << self
     def transaction_with_cassandra_check(*args)
       if PageView.cassandra?
@@ -328,9 +261,9 @@ class PageView < ActiveRecord::Base
   end
 
   def store_page_view_to_user_counts
-    return unless Setting.get_cached('page_views_store_active_user_counts', 'false') == 'redis' && Canvas.redis_enabled?
+    return unless Setting.get('page_views_store_active_user_counts', 'false') == 'redis' && Canvas.redis_enabled?
     return unless self.created_at.present? && self.user.present?
-    exptime = Setting.get_cached('page_views_active_user_exptime', 1.day.to_s).to_i
+    exptime = Setting.get('page_views_active_user_exptime', 1.day.to_s).to_i
     bucket = PageView.user_count_bucket_for_time(self.created_at)
     Canvas.redis.sadd(bucket, self.user.global_id)
     Canvas.redis.expire(bucket, exptime)

@@ -78,21 +78,21 @@ define [
           $('#right-side-wrapper').hide()
       else
         $('#right-side-wrapper').show()
-        $('#right-side .rs-section').not("#undated-events, #calendar-feed").show()
+        $('#right-side .rs-section').not("#undated-events-section, #calendar-feed").show()
         # we have to .detach() because of the css that puts lines under each .rs-section except the last,
         # if we just .hide() it would still be there so the :last-child selector would apply to it,
         # not the last _visible_ element
         @rightSideAdminSection?.detach()
 
     show: =>
-      $("#undated-events, #calendar-feed").hide()
+      $("#undated-events-section, #calendar-feed").hide()
       @active = true
       @div.show()
       @loadData()
       @toggleListMode(true)
 
     hide: =>
-      $("#undated-events, #calendar-feed").show()
+      $("#undated-events-section, #calendar-feed").show()
       @active = false
       @div.hide()
       @toggleListMode(false)

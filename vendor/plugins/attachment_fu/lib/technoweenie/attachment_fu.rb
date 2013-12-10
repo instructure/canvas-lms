@@ -169,11 +169,11 @@ module Technoweenie # :nodoc:
         base.after_save :after_process_attachment
         base.after_destroy :destroy_file
         base.after_validation :process_attachment
-        if CANVAS_RAILS3
+        if CANVAS_RAILS2
+          base.define_callbacks :after_resize, :before_attachment_saved, :after_attachment_saved, :before_thumbnail_saved, :after_save_and_attachment_processing
+        else
           base.define_model_callbacks :resize, :attachment_saved, :save_and_attachment_processing, only: [:after]
           base.define_model_callbacks :attachment_saved, :thumbnail_saved, only: [:before]
-        else
-          base.define_callbacks :after_resize, :before_attachment_saved, :after_attachment_saved, :before_thumbnail_saved, :after_save_and_attachment_processing
         end
       end
 
@@ -355,7 +355,6 @@ module Technoweenie # :nodoc:
             self.root_attachment = nil
             self.root_attachment_id = nil
             self.scribd_mime_type_id = nil
-            self.scribd_user = nil
             self.submitted_to_scribd_at = nil
             self.workflow_state = nil
             self.scribd_doc = nil

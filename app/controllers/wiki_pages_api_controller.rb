@@ -87,6 +87,9 @@
 #       // the time when this revision was saved
 #       "updated_at": "2012-08-07T11:23:58-06:00",
 #
+#       // whether this is the latest revision or not
+#       "latest": true,
+#
 #       // the User who saved this revision, if applicable
 #       // (this may not be present if the page was imported from another system)
 #       "edited_by": {
@@ -187,6 +190,11 @@ class WikiPagesApiController < ApplicationController
   # @argument search_term [Optional, String]
   #   The partial title of the pages to match and return.
   #
+  # @argument published [Optional, Boolean]
+  #   If true, include only published paqes. If false, exclude published
+  #   pages. If not present, do not filter on published status.
+  #
+  #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
   #          https://<canvas>/api/v1/courses/123/pages?sort=title&order=asc
@@ -197,7 +205,13 @@ class WikiPagesApiController < ApplicationController
       pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
       # omit body from selection, since it's not included in index results
       scope = @context.wiki.wiki_pages.select(WikiPage.column_names - ['body']).includes(:user)
-      scope = @context.grants_right?(@current_user, session, :view_unpublished_items) ? scope.not_deleted : scope.active
+      if params.has_key?(:published)
+        scope = value_to_boolean(params[:published]) ? scope.active.not_hidden : scope.unpublished
+      else
+        scope = scope.not_deleted
+      end
+      # published parameter notwithstanding, hide unpublished items if the user doesn't have permission to see them
+      scope = scope.active unless @context.grants_right?(@current_user, session, :view_unpublished_items)
       scope = scope.not_hidden unless @context.grants_right?(@current_user, session, :view_hidden_items)
 
       scope = WikiPage.search_by_attribute(scope, :title, params[:search_term])
@@ -398,7 +412,7 @@ class WikiPagesApiController < ApplicationController
       route = polymorphic_url([:api_v1, @context, @page, :revisions])
       scope = @page.versions
       revisions = Api.paginate(scope, self, route)
-      render :json => wiki_page_revisions_json(revisions, @current_user, session)
+      render :json => wiki_page_revisions_json(revisions, @current_user, session, @page.current_version)
     end
   end
 
@@ -433,7 +447,7 @@ class WikiPagesApiController < ApplicationController
                         else
                           true
                         end
-      render :json => wiki_page_revision_json(revision, @current_user, session, include_content)
+      render :json => wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
     end
   end
 
@@ -460,7 +474,7 @@ class WikiPagesApiController < ApplicationController
       @page.url = @revision.url
       @page.user_id = @current_user.id if @current_user
       if @page.save
-        render :json => wiki_page_revision_json(@page.versions.current, @current_user, session, true)
+        render :json => wiki_page_revision_json(@page.versions.current, @current_user, session, true, @page.current_version)
       else
         render :json => @page.errors, :status => :bad_request
       end

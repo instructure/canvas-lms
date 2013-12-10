@@ -16,9 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'action_controller'
-# XXX: Rails3 doesn't have ActionController::TestUploadedFile, time to fix this
-require 'action_controller/test_process.rb' if Rails.version < "3.0"
+require 'action_controller_test_process'
 
 module Canvas::Migration::Worker
   def self.get_converter(settings)
@@ -81,5 +79,23 @@ module Canvas::Migration::Worker
     rescue
       Rails.logger.warn "Couldn't clear export data for content_migration #{content_migration.id}"
     end
+  end
+
+  def self.download_attachment(cm, url)
+    att = Attachment.new
+    att.context = cm
+    att.file_state = 'deleted'
+    att.workflow_state = 'unattached'
+    att.clone_url(url, false, true, :quota_context => cm.context)
+
+    if att.file_state == 'errored'
+      raise Canvas::Migration::Error, att.upload_error_message
+    end
+
+    cm.attachment = att
+    cm.save!
+    att
+  rescue Attachment::OverQuotaError
+    raise Canvas::Migration::Error, $!.message
   end
 end

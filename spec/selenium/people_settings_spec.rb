@@ -121,7 +121,7 @@ describe "course people" do
       # open dialog
       open_kyle_menu(@student)
       # when
-      link = driver.find_element(:link, 'User Details')
+      link = f("#ui-id-4")
       href = link['href']
       link.click
       wait_for_ajaximations

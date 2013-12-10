@@ -17,7 +17,7 @@ module RailsXss
 
     def add_expr_literal(src, code)
       if code =~ BLOCK_EXPR
-        src << "@output_buffer.safe_concat((" << $1 << ").to_s);"
+        src << "@output_buffer.append= " << code
       else
         src << '@output_buffer << ((' << code << ').to_s);'
       end

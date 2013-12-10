@@ -44,12 +44,12 @@ end
 ENV["RAILS_ENV"] = 'test'
 
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
-if CANVAS_RAILS3
-  require 'rspec/rails'
-else
+if CANVAS_RAILS2
   require 'spec'
   # require 'spec/autorun'
   require 'spec/rails'
+else
+  require 'rspec/rails'
 end
 require 'webrat'
 require 'mocha/api'
@@ -106,7 +106,7 @@ end
 def truncate_all_cassandra_tables
   Canvas::Cassandra::Database.config_names.each do |cass_config|
     db = Canvas::Cassandra::Database.from_config(cass_config)
-    db.keyspace_information.tables.each do |table|
+    db.tables.each do |table|
       db.execute("TRUNCATE #{table}")
     end
   end
@@ -123,6 +123,46 @@ class ActiveRecord::ConnectionAdapters::MysqlAdapter < ActiveRecord::ConnectionA
     # and then can't release it because it doesn't exist, we're not in a transaction
     execute('SAVEPOINT outside_transaction')
     !!execute('RELEASE SAVEPOINT outside_transaction') rescue true
+  end
+end
+
+
+# Be sure to actually test serializing things to non-existent caches,
+# but give Mocks a pass, since they won't exist in dev/prod
+Mocha::Mock.class_eval do
+  def marshal_dump
+    nil
+  end
+
+  def marshal_load(data)
+    raise "Mocks aren't really serializeable!"
+  end
+
+  def respond_to_with_marshalling?(symbol, include_private = false)
+    return true if [:marshal_dump, :marshal_load].include?(symbol)
+    respond_to_without_marshalling?(symbol, include_private)
+  end
+  alias_method_chain :respond_to?, :marshalling
+end
+
+[ActiveSupport::Cache::MemoryStore, NilStore].each do |store|
+  store.class_eval do
+    def write_with_serialization_check(name, value, options = nil)
+      Marshal.dump(value)
+      write_without_serialization_check(name, value, options)
+    end
+    alias_method_chain :write, :serialization_check
+  end
+end
+
+unless CANVAS_RAILS2
+  NilStore.class_eval do
+    def fetch_with_serialization_check(name, options = {}, &block)
+      result = fetch_without_serialization_check(name, options, &block)
+      Marshal.dump(result) if result
+      result
+    end
+    alias_method_chain :fetch, :serialization_check
   end
 end
 
@@ -162,6 +202,11 @@ Spec::Runner.configure do |config|
     # so before(:all)'s don't get confused
     Account.clear_special_account_cache!
     Notification.after_create { Notification.reset_cache! }
+  end
+
+  def delete_fixtures!
+    # noop for now, needed for plugin spec tweaks. implementation coming
+    # in g/24755
   end
 
   config.before :each do
@@ -241,6 +286,8 @@ Spec::Runner.configure do |config|
         account.save!
         @course.enable_draft = true
         @course.save!
+        # to reload the @course.root_account
+        @course.reload
       end
     end
     @course
@@ -317,7 +364,8 @@ Spec::Runner.configure do |config|
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
     account = opts[:account] || Account.default
-    @pseudonym = account.pseudonyms.create!(:user => user, :unique_id => username, :password => password, :password_confirmation => password)
+    @pseudonym = account.pseudonyms.build(:user => user, :unique_id => username, :password => password, :password_confirmation => password)
+    @pseudonym.save_without_session_maintenance
     @pseudonym.communication_channel = communication_channel(user, opts)
     @pseudonym
   end
@@ -753,8 +801,7 @@ Spec::Runner.configure do |config|
   end
 
   def default_uploaded_data
-    require 'action_controller'
-    require 'action_controller/test_process.rb'
+    require 'action_controller_test_process'
     ActionController::TestUploadedFile.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/scribd_docs/doc.doc'), 'application/msword', true)
   end
 
@@ -1128,6 +1175,14 @@ Spec::Runner.configure do |config|
   def n_students_in_course(n, opts={})
     opts.reverse_merge active_all: true
     n.times.map { student_in_course(opts); @student }
+  end
+
+  def consider_all_requests_local(value)
+    if CANVAS_RAILS2
+      ActionController::Base.consider_all_requests_local = value
+    else
+      Rails.application.config.consider_all_requests_local = value
+    end
   end
 end
 

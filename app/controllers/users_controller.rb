@@ -258,16 +258,14 @@ class UsersController < ApplicationController
           else
             @enrollment_terms = []
             if @root_account == @context
-              @enrollment_terms = @context.enrollment_terms.active
+              @enrollment_terms = @context.enrollment_terms.active.order(EnrollmentTerm.nulls(:first, :start_at))
             end
             format.html
           end
           format.json {
             cancel_cache_buster
             expires_in 30.minutes
-            api_request? ?
-              render(:json => @users.map { |u| user_json(u, @current_user, session) }) :
-              render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
+            render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
           }
         end
       end
@@ -864,7 +862,7 @@ class UsersController < ApplicationController
     # Look for an incomplete registration with this pseudonym
     @pseudonym = @context.pseudonyms.active.custom_find_by_unique_id(params[:pseudonym][:unique_id])
     # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
-    @pseudonym = nil if @pseudonym && !['creation_pending', 'pre_registered', 'pending_approval'].include?(@pseudonym.user.workflow_state)
+    @pseudonym = nil if @pseudonym && !['creation_pending', 'pending_approval'].include?(@pseudonym.user.workflow_state)
 
     manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
     self_enrollment = params[:self_enrollment].present?
@@ -953,7 +951,7 @@ class UsersController < ApplicationController
       # unless the user is registered/pre_registered (if the latter, he still
       # needs to confirm his email and set a password, otherwise he can't get
       # back in once his session expires)
-      if @user.registered? || @user.pre_registered? # automagically logged in
+      if !@current_user # automagically logged in
         PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
       else
         @pseudonym.send(:skip_session_maintenance=, true)
@@ -1000,7 +998,7 @@ class UsersController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/users/<user_id>/settings \ 
+  #   curl 'https://<canvas>/api/v1/users/<user_id>/settings \
   #     -X PUT \ 
   #     -F 'manual_mark_as_read=true'
   #     -H 'Authorization: Bearer <token>'
@@ -1066,7 +1064,7 @@ class UsersController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/users/133.json' \ 
+  #   curl 'https://<canvas>/api/v1/users/133.json' \
   #        -X PUT \ 
   #        -F 'user[name]=Sheldon Cooper' \ 
   #        -F 'user[short_name]=Shelly' \ 
@@ -1517,7 +1515,7 @@ class UsersController < ApplicationController
         joins('INNER JOIN conversation_participants ON conversation_participants.conversation_id=conversation_messages.conversation_id').
         where('conversation_messages.author_id = ? AND conversation_participants.user_id IN (?) AND NOT conversation_messages.generated', teacher, ids)
     # fake_arel can't pass an array in the group by through the scope
-    last_message_dates = Rails.version < '3.0' ?
+    last_message_dates = CANVAS_RAILS2 ?
         scope.maximum(:created_at, :group => ['conversation_participants.user_id', 'conversation_messages.author_id']) :
         scope.group(['conversation_participants.user_id', 'conversation_messages.author_id']).maximum(:created_at)
     last_message_dates.each do |key, date|

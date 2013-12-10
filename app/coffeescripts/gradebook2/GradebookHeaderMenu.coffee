@@ -76,6 +76,7 @@ define [
         title: @assignment.name
         points_possible: @assignment.points_possible
         students: students
+        context_code: "course_"+@assignment.course_id
         callback: (selected, cutoff, students) ->
           students = $.grep students, ($student, idx) ->
             student = $student.user_data
@@ -88,6 +89,16 @@ define [
             else if selected == I18n.t("students_who.scored_more_than", "Scored more than")
               student.score? and student.score != "" and cutoff? and student.score > cutoff
           $.map students, (student) -> student.user_data.id
+        subjectCallback: (selected, cutoff) =>
+          cutoff = cutoff || ''
+          if selected == I18n.t('students_who.not_submitted_yet', "Haven't submitted yet")
+            I18n.t('students_who.no_submission_for', 'No submission for %{assignment}', assignment: @assignment.name)
+          else if selected == I18n.t("students_who.havent_been_graded", "Haven't been graded")
+            I18n.t('students_who.no_grade_for', 'No grade for %{assignment}', assignment: @assignment.name)
+          else if selected == I18n.t('students_who.scored_less_than', "Scored less than")
+            I18n.t('students_who.scored_less_than_on', 'Scored less than %{cutoff} on %{assignment}', assignment: @assignment.name, cutoff: cutoff)
+          else if selected == I18n.t('students_who.scored_more_than', "Scored more than")
+            I18n.t('students_who.scored_more_than_on', 'Scored more than %{cutoff} on %{assignment}', assignment: @assignment.name, cutoff: cutoff)
 
     setDefaultGrade: =>
       new SetDefaultGradeDialog(@assignment, @gradebook)

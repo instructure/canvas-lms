@@ -174,6 +174,8 @@ class ContentMigrationsController < ApplicationController
   #   Other file upload properties, See {file:file_uploads.html File Upload
   #   Documentation}
   #
+  # @argument settings[file_url] [string] (optional) A URL to download the file from. Must not require authentication.
+  #
   # @argument settings[source_course_id] [Optional, String]
   #   The course to copy from for a course copy migration. (required if doing
   #   course copy)
@@ -237,8 +239,8 @@ class ContentMigrationsController < ApplicationController
     end
     settings = @plugin.settings || {}
     if settings[:requires_file_upload]
-      if !params[:pre_attachment] || params[:pre_attachment][:name].blank?
-        return render(:json => { :message => t('must_upload_file', "File upload is required") }, :status => :bad_request)
+      if !(params[:pre_attachment] && params[:pre_attachment][:name].present?) && !(params[:settings] && params[:settings][:file_url].present?)
+        return render(:json => {:message => t('must_upload_file', "File upload or url is required")}, :status => :bad_request)
       end
     end
     if validator = settings[:required_options_validator]

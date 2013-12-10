@@ -63,6 +63,9 @@ define [
         else
           semanticDateRange(@calendarEvent.start_at, @calendarEvent.end_at)
 
+    readableType: () ->
+      @readableTypes['event']
+
     saveDates: (success, error) =>
       @save {
         'calendar_event[start_at]': if @start then $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(@start)) else ''

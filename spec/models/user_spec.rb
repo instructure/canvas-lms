@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -558,6 +558,12 @@ describe User do
     @user.workflow_state.should == "deleted"
     @user.reload
     @user.workflow_state.should == "deleted"
+  end
+
+  it "should record deleted_at" do
+    user = User.create
+    user.destroy
+    user.deleted_at.should_not be_nil
   end
 
   describe "can_masquerade?" do
@@ -1239,6 +1245,51 @@ describe User do
       @course.enroll_user(@user2)
 
       @user1.menu_courses.should == [@course]
+    end
+  end
+
+  describe "favorites" do
+    before :each do
+      @user = User.create!
+
+      @courses = []
+      (1..3).each do |x|
+        course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
+        @courses << course
+        @user.favorites.build(context: course)
+      end
+
+      @user.save!
+    end
+
+    it "should default favorites to enrolled courses when favorite courses do not exist" do
+      @user.favorites.by("Course").destroy_all
+      @user.menu_courses.should == @courses
+    end
+
+    it "should only include favorite courses when set" do
+      course = @courses.shift
+      @user.favorites.where(context_type: "Course", context_id: course).first.destroy
+      @user.menu_courses.should == @courses
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      before :each do
+        (4..6).each do |x|
+          course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
+          @courses << course
+          @user.favorites.build(context: course)
+        end
+
+        @user.save!
+      end
+
+      it "should include cross shard favorite courses" do
+        @user.favorites.by("Course").where("id % 2 = 0").destroy_all
+        @user.menu_courses.size.should eql(@courses.length / 2)
+      end
     end
   end
 
@@ -2084,7 +2135,7 @@ describe User do
     end
   end
 
-  describe "accounts" do
+  describe "all_accounts" do
     specs_require_sharding
 
     it "should include accounts from multiple shards" do
@@ -2095,7 +2146,7 @@ describe User do
         @account2.add_user(@user)
       end
 
-      @user.accounts.map(&:id).sort.should == [Account.site_admin, @account2].map(&:id).sort
+      @user.all_accounts.map(&:id).sort.should == [Account.site_admin, @account2].map(&:id).sort
     end
   end
 
@@ -2318,6 +2369,22 @@ describe User do
         @shard1.activate{ @user.stamp_logout_time! }
         @user.reload.last_logged_out.should_not be_nil
       end
+    end
+  end
+
+  describe "delete_enrollments" do
+    before do
+      course
+      2.times { @course.course_sections.create! }
+      2.times { @course.assignments.create! }
+    end
+
+    it "should batch DueDateCacher jobs" do
+      DueDateCacher.expects(:recompute).never
+      DueDateCacher.expects(:recompute_course).twice # sync_enrollments and destroy_enrollments
+      test_student = @course.student_view_student
+      test_student.destroy
+      test_student.reload.enrollments.each { |e| e.should be_deleted }
     end
   end
 end

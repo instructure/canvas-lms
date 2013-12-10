@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -67,7 +67,7 @@ class Role < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     save!
   end
 
@@ -112,8 +112,15 @@ class Role < ActiveRecord::Base
   # counts for the given course to each item
   def self.custom_roles_and_counts_for_course(course, user, include_inactive=false)
     users_scope = course.users_visible_to(user)
-    base_counts = users_scope.count(:distinct => true, :group => 'enrollments.type', :select => 'users.id', :conditions => 'enrollments.role_name IS NULL')
-    role_counts = users_scope.count(:distinct => true, :group => 'enrollments.role_name', :select => 'users.id', :conditions => 'enrollments.role_name IS NOT NULL')
+    base_counts = users_scope.where(enrollments: {role_name: nil}).group('enrollments.type')
+    role_counts = users_scope.where('enrollments.role_name IS NOT NULL').group('enrollments.role_name')
+    if CANVAS_RAILS2
+      base_counts = base_counts.count(select: 'users.id', distinct: true)
+      role_counts = role_counts.count(select: 'users.id', distinct: true)
+    else
+      base_counts = base_counts.select('users.id').uniq.count
+      role_counts = role_counts.select('users.id').uniq.count
+    end
 
     @enrollment_types = Role.all_enrollment_roles_for_account(course.account, include_inactive)
     @enrollment_types.each do |base_type|

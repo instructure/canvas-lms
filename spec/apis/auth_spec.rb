@@ -25,12 +25,12 @@ describe "API Authentication", :type => :integration do
     @key = DeveloperKey.create!
     @client_id = @key.id
     @client_secret = @key.api_key
-    ActionController::Base.consider_all_requests_local = false
+    consider_all_requests_local(false)
     enable_forgery_protection
   end
 
   after do
-    ActionController::Base.consider_all_requests_local = true
+    consider_all_requests_local(true)
   end
 
   context "sharding" do
@@ -172,7 +172,7 @@ describe "API Authentication", :type => :integration do
           course_with_teacher(:user => @user)
 
           # step 1
-          get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
+          get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob', :purpose => 'fun'
           response.should redirect_to(login_url)
 
           yield
@@ -212,6 +212,7 @@ describe "API Authentication", :type => :integration do
           json.size.should == 1
           json.first['enrollments'].should == [{'type' => 'teacher', 'role' => 'TeacherEnrollment'}]
           AccessToken.authenticate(token).should == AccessToken.last
+          AccessToken.last.purpose.should == 'fun'
 
           # post requests should work with nothing but an access token
           post "/api/v1/courses/#{@course.id}/assignments.json?access_token=1234", { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }

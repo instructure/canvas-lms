@@ -105,7 +105,7 @@ describe "quizzes" do
         # setup a quiz and start taking it
         quiz_with_new_questions(!:goto_edit)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        expect_new_page_load { driver.find_element(:link_text, 'Take the Quiz').click }
+        expect_new_page_load { f("#take_quiz_link").click }
         sleep 1 # sleep because display is updated on timer, not ajax callback
 
         # answer a question, and check that it is saved
@@ -135,6 +135,56 @@ describe "quizzes" do
         # we should be back at the quiz show page
         driver.find_element(:link_text, 'Resume Quiz').should be_present
       end
+    end
+  end
+
+  context "who closes the session without submitting" do
+    it "should automatically grade the submission when it becomes overdue" do
+      pending('disabled because of regression')
+
+      job_tag = 'QuizSubmission#grade_if_untaken'
+
+      course_with_student_logged_in
+
+      quiz = quiz_model({
+        :course => @course,
+        :time_limit => 5
+      })
+
+      quiz.quiz_questions.create!(:question_data => {
+          :name => 'test 3',
+          :question_type => 'multiple_choice_question',
+          :answers => {'answer_0' => {'answer_text' => '0'}, 'answer_1' => {'answer_text' => '1'}}})
+      quiz.generate_quiz_data
+      quiz.save
+
+      Delayed::Job.find_by_tag(job_tag).should == nil
+
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
+      expect_new_page_load { f("#take_quiz_link").click }
+
+      answer_id = quiz.stored_questions[0][:answers][0][:id]
+
+      fj("input[type=radio][value=#{answer_id}]").click
+
+      wait_for_js
+
+      driver.execute_script("window.close()")
+
+      quiz_sub = @quiz.quiz_submissions.find_by_user_id(@user.id)
+      quiz_sub.should be_present
+      quiz_sub.workflow_state.should == "untaken"
+
+      job = Delayed::Job.find_by_tag(job_tag)
+      job.should be_present
+
+      # okay, we will manually "run" the job because we can't afford to wait
+      # for it to be picked up by DJ in a spec:
+      auto_grader = YAML.parse(job.handler).transform
+      auto_grader.perform
+
+      quiz_sub.reload
+      quiz_sub.workflow_state.should == "complete"
     end
   end
 end

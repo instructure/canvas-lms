@@ -1,6 +1,6 @@
 class DisableOpenRegistrationForDelegatedAuth < ActiveRecord::Migration
   def self.up
-    if Rails.version < '3'
+    if CANVAS_RAILS2
       scope = Account.root_accounts.scoped(:joins => :account_authorization_configs, :readonly => false)
     else
       scope = Account.root_accounts.joins(:account_authorization_configs).readonly(false)

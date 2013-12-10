@@ -145,7 +145,8 @@ class ConversationsController < ApplicationController
       return redirect_to conversations_path(:scope => params[:redirect_scope]) if params[:redirect_scope]
       if @current_user.use_new_conversations?
         js_env(:CONVERSATIONS => {
-                 :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id
+                 :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id,
+                 :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
                })
         return render :template => 'conversations/index_new'
       else
@@ -169,14 +170,6 @@ class ConversationsController < ApplicationController
         js_env(hash)
       end
     end
-  end
-
-  # New Conversations UI. When finished, move back to index action.
-  def index_new
-    js_env(:CONVERSATIONS => {
-             :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id
-           })
-    return unless authorized_action(Account.site_admin, @current_user, :become_user)
   end
 
   def toggle_new_conversations
@@ -246,7 +239,8 @@ class ConversationsController < ApplicationController
     context_id = nil
     if params[:context_code].present?
       context = Context.find_by_asset_string(params[:context_code])
-      return render_error('context_code', 'invalid') if context.nil?
+      return render_error('context_code', 'invalid') unless valid_context?(context)
+
       context_type = context.class.name
       context_id = context.id
     end
@@ -271,7 +265,7 @@ class ConversationsController < ApplicationController
       conversations = ConversationParticipant.where(:id => batch.conversations).includes(:conversation).order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
       Conversation.preload_participants(conversations.map(&:conversation))
       ConversationParticipant.preload_latest_messages(conversations, @current_user)
-      visibility_map = infer_visibility(*conversations) 
+      visibility_map = infer_visibility(conversations)
       render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
     else
       @conversation = @current_user.initiate_conversation(@recipients, !value_to_boolean(params[:group_conversation]), :subject => params[:subject], :context_type => context_type, :context_id => context_id)
@@ -309,10 +303,9 @@ class ConversationsController < ApplicationController
   #     }
   #   ]
   def batches
-    batches = Api.paginate(@current_user.conversation_batches.in_progress,
+    batches = Api.paginate(@current_user.conversation_batches.in_progress.order(:id),
                            self,
-                           api_v1_conversations_batches_url,
-                           :order => :id)
+                           api_v1_conversations_batches_url)
     render :json => batches.map{ |m| conversation_batch_json(m, @current_user, session) }
   end
 
@@ -660,13 +653,9 @@ class ConversationsController < ApplicationController
     get_conversation(true)
     if params[:body].present?
 
-      # if this is from old conversations or an admin message, allow people to respond to anyone who
-      # is already a participant. We might want to allow this in general. this will probably change
-      # when we make the account the context of an admin conversation.
-      if @conversation.conversation.context.blank?
-        params[:from_conversation_id] = @conversation.conversation_id
-      end
-      # not a before_filter because the above check needs to delay this until now
+      # allow responses to be sent to anyone who is already a conversation participant.
+      params[:from_conversation_id] = @conversation.conversation_id
+      # not a before_filter because we need to set the above parameter.
       normalize_recipients
 
       message = build_message
@@ -720,6 +709,9 @@ class ConversationsController < ApplicationController
   def remove_messages
     if params[:remove]
       @conversation.remove_messages(*@conversation.messages.find_all_by_id(*params[:remove]))
+      if @conversation.conversation_message_participants.where('workflow_state <> ?', 'deleted').length == 0
+        @conversation.update_attribute(:last_message_at, nil)
+      end
       render :json => conversation_json(@conversation, @current_user, session)
     end
   end
@@ -875,13 +867,15 @@ class ConversationsController < ApplicationController
     @set_visibility = true
   end
 
-  def infer_visibility(*conversations)
+  def infer_visibility(conversations)
+    multiple = conversations.is_a? Enumerable
+    conversations = [conversations] unless multiple
     result = Hash.new(false)
     visible_conversations = @current_user.shard.activate do
         @conversations_scope.select(:conversation_id).where(:conversation_id => conversations.map(&:conversation_id)).all
       end
     visible_conversations.each { |c| result[c.conversation_id] = true }
-    if conversations.size == 1
+    if !multiple
       result[conversations.first.conversation_id]
     else
       result
@@ -965,4 +959,27 @@ class ConversationsController < ApplicationController
   def param_array(key)
     Array(params[key].presence || []).compact
   end
+
+  def valid_context?(context)
+    case context
+    when nil then false
+    when Account then valid_account_context?(context)
+    # might want to add some validation for Course and Group.
+    else true
+    end
+  end
+
+  def valid_account_context?(account)
+    return false unless account.root_account?
+    return true if account.grants_right?(@current_user, session, :read_roster)
+    account.shard.activate do
+      user_sub_accounts = @current_user.associated_accounts.where(root_account_id: account).to_a
+      if user_sub_accounts.any? { |a| a.grants_right?(@current_user, session, :read_roster) }
+        return true
+      end
+    end
+
+    false
+  end
+
 end

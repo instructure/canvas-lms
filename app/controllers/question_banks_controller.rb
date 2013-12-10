@@ -42,7 +42,9 @@ class QuestionBanksController < ApplicationController
   
   def questions
     find_bank(params[:question_bank_id], params[:inherited] == '1') do
-      @questions = @bank.assessment_questions.active.paginate(:per_page => 50, :page => params[:page])
+      @questions = @bank.assessment_questions.active
+      url = polymorphic_url([@context, :question_bank_questions])
+      @questions = Api.paginate(@questions, self, url, default_per_page: 50)
       render :json => {:pages => @questions.total_pages, :questions => @questions}
     end
   end

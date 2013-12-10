@@ -169,7 +169,7 @@ define([
     });
 
     var $el = $('#quiz-publish-link');
-    var model = new Quiz($.extend(ENV.QUIZ, {publishable: !$el.hasClass("disabled")}));
+    var model = new Quiz($.extend(ENV.QUIZ, {unpublishable: !$el.hasClass("disabled")}));
     var view = new PublishButtonView({model: model, el: $el});
 
     var refresh = function() {

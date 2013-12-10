@@ -21,7 +21,11 @@
 class DiscussionTopic::MaterializedView < ActiveRecord::Base
   include Api::V1::DiscussionTopics
   include Api
-  include ActionController::UrlWriter
+  if CANVAS_RAILS2
+    include ActionController::UrlWriter
+  else
+    include Rails.application.routes.url_helpers
+  end
 
   attr_accessible :discussion_topic
 
@@ -92,7 +96,8 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   end
 
   handle_asynchronously :update_materialized_view,
-    :singleton => proc { |o| "materialized_discussion:#{ Shard.birth.activate { o.discussion_topic_id } }" }
+    :singleton => proc { |o| "materialized_discussion:#{ Shard.birth.activate { o.discussion_topic_id } }" },
+    :run_at => proc { 10.seconds.from_now } # delay for replication to slave
 
   def build_materialized_view
     entry_lookup = {}

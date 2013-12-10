@@ -71,5 +71,7 @@ define [
       @dueDateViews.push dueDateView
       @hideOrShowRemoveButtons()
       if render
-        @$el.append dueDateView.render().el
+        row = dueDateView.render().$el
+        @$el.append row
         @reRenderSections()
+        row.find(".section-list").focus()

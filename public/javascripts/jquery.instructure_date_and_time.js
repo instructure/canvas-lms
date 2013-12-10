@@ -418,14 +418,15 @@ define([
         $field.wrap('<div class="input-append" />');
         $thingToPutSuggestAfter = $field.parent('.input-append');
 
-        $field.datepicker({
+        var datepickerOptions = {
           timePicker: (!options.dateOnly),
           constrainInput: false,
           dateFormat: 'M d, yy',
           showOn: 'button',
           buttonText: '<i class="icon-calendar-month"></i>',
           buttonImageOnly: false
-        });
+        };
+        $field.datepicker($.extend(datepickerOptions, options.datepicker));
       }
 
       var $suggest = $('<div class="datetime_suggest" />').insertAfter($thingToPutSuggestAfter);

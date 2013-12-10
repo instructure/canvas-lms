@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -141,6 +141,7 @@ module Api::V1::User
       json[:role] = enrollment.role
       json[:sis_source_id] = enrollment.sis_source_id # SFU MOD - CANVAS-224
       json[:sis_batch_id] = enrollment.sis_batch_id
+      json[:last_activity_at] = enrollment.last_activity_at
       if enrollment.student?
         json[:grades] = {
           :html_url => course_student_grades_url(enrollment.course_id, enrollment.user_id),

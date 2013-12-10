@@ -319,7 +319,7 @@ describe Submission do
     context "Submission Grade Changed" do
       it "should create a message when the score is changed and the grades were already published" do
         Notification.create(:name => 'Submission Grade Changed')
-        @assignment.stubs(:score_to_grade).returns(10.0)
+        @assignment.stubs(:score_to_grade).returns("10.0")
         @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
 
@@ -334,7 +334,7 @@ describe Submission do
 
       it 'doesnt create a grade changed message when theres a quiz attached' do
         Notification.create(:name => 'Submission Grade Changed')
-        @assignment.stubs(:score_to_grade).returns(10.0)
+        @assignment.stubs(:score_to_grade).returns("10.0")
         @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
         @quiz = Quiz.create!(:context => @course)
@@ -352,7 +352,7 @@ describe Submission do
       it "should create a message when the score is changed and the grades were already published" do
         Notification.create(:name => 'Submission Grade Changed')
         Notification.create(:name => 'Submission Graded')
-        @assignment.stubs(:score_to_grade).returns(10.0)
+        @assignment.stubs(:score_to_grade).returns("10.0")
         @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
 
@@ -367,7 +367,7 @@ describe Submission do
       it "should not create a message when the score is changed and the grades were already published for a muted assignment" do
         Notification.create(:name => 'Submission Grade Changed')
         @assignment.mute!
-        @assignment.stubs(:score_to_grade).returns(10.0)
+        @assignment.stubs(:score_to_grade).returns("10.0")
         @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
 
@@ -383,7 +383,7 @@ describe Submission do
 
       it "should NOT create a message when the score is changed and the submission was recently graded" do
         Notification.create(:name => 'Submission Grade Changed')
-        @assignment.stubs(:score_to_grade).returns(10.0)
+        @assignment.stubs(:score_to_grade).returns("10.0")
         @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
 

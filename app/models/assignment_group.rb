@@ -29,7 +29,6 @@ class AssignmentGroup < ActiveRecord::Base
   has_many :active_assignments, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted'], :order => 'assignments.position, assignments.due_at, assignments.title'
 
   belongs_to :context, :polymorphic => true
-  belongs_to :cloned_item
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_length_of :rules, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :default_assignment_name, :maximum => maximum_string_length, :allow_nil => true
@@ -97,7 +96,7 @@ class AssignmentGroup < ActiveRecord::Base
     to_restore.each { |assignment| assignment.restore(:assignment_group) }
   end
 
-  def rules_hash
+  def rules_hash (options={})
     return @rules_hash if @rules_hash
     @rules_hash = {}.with_indifferent_access
     (rules || "").split("\n").each do |rule|
@@ -105,7 +104,7 @@ class AssignmentGroup < ActiveRecord::Base
       if split.length > 1
         if split[0] == 'never_drop'
           @rules_hash[split[0]] ||= []
-          @rules_hash[split[0]] << split[1].to_i
+          @rules_hash[split[0]] << (options[:stringify_json_ids] ? split[1].to_s : split[1].to_i)
         else
           @rules_hash[split[0]] = split[1].to_i
         end
@@ -161,27 +160,6 @@ class AssignmentGroup < ActiveRecord::Base
       false &&
       record.changed_in_state(:available, :fields => :group_weight)
     }
-  end
-
-  attr_accessor :clone_updated
-  def clone_for(context, dup=nil, options={})
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save
-    end
-    existing = context.assignment_groups.active.find_by_id(self.id)
-    existing ||= context.assignment_groups.active.find_by_cloned_item_id(self.cloned_item_id || 0)
-    return existing if existing && !options[:overwrite]
-    dup ||= AssignmentGroup.new
-    dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| [:id, :position].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.context = context
-    context.log_merge_result("Assignment Group \"#{self.name}\" created")
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
   end
 
   def students

@@ -79,7 +79,8 @@ describe ConversationsController, :type => :integration do
             {"id" => @billy.id, "name" => @billy.name},
             {"id" => @bob.id, "name" => @bob.name}
           ],
-          "context_name" => @c2.context_name
+          "context_name" => @c2.context_name,
+          "context_code" => @c2.conversation.context_code,
         },
         {
           "id" => @c1.conversation_id,
@@ -104,8 +105,24 @@ describe ConversationsController, :type => :integration do
             {"id" => @me.id, "name" => @me.name},
             {"id" => @bob.id, "name" => @bob.name}
           ],
-          "context_name" => @c1.context_name
+          "context_name" => @c1.context_name,
+          "context_code" => @c1.conversation.context_code,
         }
+      ]
+    end
+
+    it "should stringify audience ids if requested" do
+      @c1 = conversation(@bob, :workflow_state => 'read')
+      @c2 = conversation(@bob, @billy, :workflow_state => 'unread', :subscribed => false)
+
+      json = api_call(:get, "/api/v1/conversations",
+              { :controller => 'conversations', :action => 'index', :format => 'json' },
+              {},
+              {'Accept' => 'application/json+canvas-string-ids'})
+      audiences = json.map { |j| j['audience'] }
+      audiences.should == [
+        [@billy.id.to_s, @bob.id.to_s],
+        [@bob.id.to_s],
       ]
     end
 
@@ -168,7 +185,8 @@ describe ConversationsController, :type => :integration do
             {"id" => @billy.id, "name" => @billy.name},
             {"id" => @bob.id, "name" => @bob.name}
           ],
-          "context_name" => @c2.context_name
+          "context_name" => @c2.context_name,
+          "context_code" => @c2.conversation.context_code,
         }
       ]
     end
@@ -456,6 +474,7 @@ describe ConversationsController, :type => :integration do
             "starred" => false,
             "properties" => ["last_author"],
             "visible" => false,
+            "context_code" => conversation.conversation.context_code,
             "audience" => [@bob.id],
             "audience_contexts" => {
               "groups" => {},
@@ -477,6 +496,59 @@ describe ConversationsController, :type => :integration do
                 { :controller => 'conversations', :action => 'create', :format => 'json' },
                 { :recipients => [@bob.id], :body => "test", :context_code => "course_#{@course.id}" })
         conversation(@bob).conversation.context.should eql(@course)
+      end
+
+      describe "context is an account for admins validation" do
+        it "should allow root account context if the user is an admin on that account" do
+          account_admin_user active_all: true
+          json = api_call(:post, "/api/v1/conversations",
+                  { :controller => 'conversations', :action => 'create', :format => 'json' },
+                  { :recipients => [@bob.id], :body => "test", :context_code => "account_#{Account.default.id}" })
+          conv = Conversation.find(json.first['id'])
+          conv.context.should == Account.default
+        end
+
+        it "should not allow account context if the user is not an admin in that account" do
+          raw_api_call(:post, "/api/v1/conversations",
+                  { :controller => 'conversations', :action => 'create', :format => 'json' },
+                  { :recipients => [@bob.id], :body => "test", :context_code => "account_#{Account.default.id}" })
+          response.status.to_i.should == 400
+        end
+
+        it "should allow site admin to set any account context" do
+          site_admin_user(name: "site admin", active_all: true)
+          json = api_call(:post, "/api/v1/conversations",
+                  { :controller => 'conversations', :action => 'create', :format => 'json' },
+                  { :recipients => [@bob.id], :body => "test", :context_code => "account_#{Account.default.id}" })
+          conv = Conversation.find(json.first['id'])
+          conv.context.should == Account.default
+        end
+
+        context "sub-accounts" do
+          before do
+            @sub_account = Account.default.sub_accounts.build(name: "subby")
+            @sub_account.root_account_id = Account.default.id
+            @sub_account.save!
+            account_admin_user(account: @sub_account, name: "sub admin", active_all: true)
+          end
+
+          it "should allow root account context if the user is an admin on a sub-account" do
+            course_with_student(account: @sub_account, name: "sub student", active_all: true)
+            @user = @admin
+            json = api_call(:post, "/api/v1/conversations",
+                    { :controller => 'conversations', :action => 'create', :format => 'json' },
+                    { :recipients => [@student.id], :body => "test", :context_code => "account_#{Account.default.id}" })
+            conv = Conversation.find(json.first['id'])
+            conv.context.should == Account.default
+          end
+
+          it "should not allow non-root account context" do
+            raw_api_call(:post, "/api/v1/conversations",
+                    { :controller => 'conversations', :action => 'create', :format => 'json' },
+                    { :recipients => [@bob.id], :body => "test", :context_code => "account_#{@sub_account.id}" })
+            response.status.to_i.should == 400
+          end
+        end
       end
 
       it "should create a group conversation" do
@@ -506,6 +578,7 @@ describe ConversationsController, :type => :integration do
             "starred" => false,
             "properties" => ["last_author"],
             "visible" => false,
+            "context_code" => conversation.conversation.context_code,
             "audience" => [@billy.id, @bob.id],
             "audience_contexts" => {
               "groups" => {},
@@ -553,6 +626,7 @@ describe ConversationsController, :type => :integration do
             "starred" => false,
             "properties" => ["last_author"],
             "visible" => true,
+            "context_code" => conversation.conversation.context_code,
             "audience" => [@bob.id],
             "audience_contexts" => {
               "groups" => {},
@@ -683,6 +757,7 @@ describe ConversationsController, :type => :integration do
             "starred" => false,
             "properties" => ["last_author"],
             "visible" => false,
+            "context_code" => conversation.conversation.context_code,
             "audience" => [@billy.id],
             "audience_contexts" => {
               "groups" => {},
@@ -744,6 +819,7 @@ describe ConversationsController, :type => :integration do
             "starred" => false,
             "properties" => ["last_author"],
             "visible" => false,
+            "context_code" => conversation.conversation.context_code,
             "audience" => [@bob.id],
             "audience_contexts" => {
               "groups" => {},
@@ -778,6 +854,22 @@ describe ConversationsController, :type => :integration do
                 {expected_status: 400})
         json["errors"].should_not be_nil
         json["errors"]["subject"].should_not be_nil
+      end
+
+      it "should send bulk group messages" do
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id, @joe.id], :body => "test",
+                  :group_conversation => "true", :bulk_message => "true" })
+        json.size.should eql 2
+      end
+
+      it "should send bulk group messages with a single recipient" do
+        json = api_call(:post, "/api/v1/conversations",
+                { :controller => 'conversations', :action => 'create', :format => 'json' },
+                { :recipients => [@bob.id], :body => "test",
+                  :group_conversation => "true", :bulk_message => "true" })
+        json.size.should eql 1
       end
     end
   end
@@ -866,7 +958,8 @@ describe ConversationsController, :type => :integration do
           {"id" => conversation.messages.last.id, "created_at" => conversation.messages.last.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
         ],
         "submissions" => [],
-        "context_name" => conversation.context_name
+        "context_name" => conversation.context_name,
+        "context_code" => conversation.conversation.context_code,
       })
     end
 
@@ -919,7 +1012,8 @@ describe ConversationsController, :type => :integration do
               {"id" => @conversation.messages.last.id, "created_at" => @conversation.messages.last.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @bob.id].sort}
           ],
           "submissions" => [],
-          "context_name" => @conversation.context_name
+          "context_name" => @conversation.context_name,
+          "context_code" => @conversation.conversation.context_code,
         }
         json.should == expected
       end
@@ -1050,6 +1144,7 @@ describe ConversationsController, :type => :integration do
         "starred" => false,
         "properties" => ["last_author"],
         "visible" => true,
+        "context_code" => conversation.conversation.context_code,
         "audience" => [@bob.id],
         "audience_contexts" => {
           "groups" => {},
@@ -1092,6 +1187,7 @@ describe ConversationsController, :type => :integration do
         "starred" => false,
         "properties" => ["last_author"],
         "visible" => true,
+        "context_code" => conversation.conversation.context_code,
         "audience" => [@bob.id, @billy.id].sort,
         "audience_contexts" => {
           "groups" => {},
@@ -1136,6 +1232,7 @@ describe ConversationsController, :type => :integration do
         "starred" => false,
         "properties" => ["last_author"],
         "visible" => true,
+        "context_code" => conversation.conversation.context_code,
         "audience" => [@bob.id, @billy.id].sort,
         "audience_contexts" => {
           "groups" => {},
@@ -1182,6 +1279,7 @@ describe ConversationsController, :type => :integration do
         "starred" => false,
         "properties" => ["last_author"],
         "visible" => true,
+        "context_code" => conversation.conversation.context_code,
         "audience" => [@bob.id, @billy.id].sort,
         "audience_contexts" => {
           "groups" => {},
@@ -1236,6 +1334,7 @@ describe ConversationsController, :type => :integration do
         "starred" => false,
         "properties" => ["last_author"],
         "visible" => true,
+        "context_code" => conversation.conversation.context_code,
         "audience" => [@bob.id, @billy.id].sort,
         "audience_contexts" => {
           "groups" => {},
@@ -1261,6 +1360,8 @@ describe ConversationsController, :type => :integration do
       account_admin_user active_all: true
       cp = conversation(@other, sender: @admin, private: false)
       real_conversation = cp.conversation
+      real_conversation.context = Account.default
+      real_conversation.save!
 
       @user = @other
       json = api_call(:post, "/api/v1/conversations/#{real_conversation.id}/add_message",
@@ -1270,6 +1371,22 @@ describe ConversationsController, :type => :integration do
       new_message = real_conversation.conversation_messages.first
       #debugger
       new_message.conversation_message_participants.size.should == 2
+    end
+
+    it "should allow users to respond to anyone who is already a participant" do
+      cp = conversation(@bob, @billy, @jane, @joe, sender: @bob)
+      real_conversation = cp.conversation
+      real_conversation.context = @course
+      real_conversation.save!
+
+      @joe.enrollments.each { |e| e.destroy }
+      @user = @billy
+      json = api_call(:post, "/api/v1/conversations/#{real_conversation.id}/add_message",
+        { :controller => 'conversations', :action => 'add_message', :id => real_conversation.id.to_s, :format => 'json' },
+        { :body => "ok", :recipients => [@bob, @billy, @jane, @joe].map(&:id).map(&:to_s) })
+      real_conversation.reload
+      new_message = real_conversation.conversation_messages.first
+      new_message.conversation_message_participants.size.should == 4
     end
 
     it "should create a media object if it doesn't exist" do
@@ -1313,6 +1430,7 @@ describe ConversationsController, :type => :integration do
         "private" => false,
         "starred" => false,
         "properties" => ["last_author"],
+        "context_code" => conversation.conversation.context_code,
         "visible" => true,
         "audience" => [@billy.id, @bob.id, @jane.id, @joe.id, @tommy.id],
         "audience_contexts" => {
@@ -1358,6 +1476,7 @@ describe ConversationsController, :type => :integration do
         "starred" => false,
         "properties" => ["last_author"],
         "visible" => false, # since we archived it, and the default view is assumed
+        "context_code" => conversation.conversation.context_code,
         "audience" => [@billy.id, @bob.id],
         "audience_contexts" => {
           "groups" => {},
@@ -1424,6 +1543,7 @@ describe ConversationsController, :type => :integration do
         "starred" => false,
         "properties" => ["last_author"],
         "visible" => true,
+        "context_code" => conversation.conversation.context_code,
         "audience" => [@bob.id],
         "audience_contexts" => {
           "groups" => {},
@@ -1459,6 +1579,7 @@ describe ConversationsController, :type => :integration do
         "starred" => false,
         "properties" => [],
         "visible" => false,
+        "context_code" => conversation.conversation.context_code,
         "audience" => [@bob.id],
         "audience_contexts" => {
           "groups" => {},

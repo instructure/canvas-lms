@@ -52,14 +52,13 @@ define [
       @el.find(':tabbable').not('.popover_close').first().focus(1)
       @position()
 
-      # handle sticking the carat right above where you clicked on the button
+      # handle sticking the carat right above where you clicked on the button, bounded by the dialog
       @el.find(".ui-menu-carat").remove()
       differenceInOffset = @trigger.offset().left - @el.offset().left
       actualOffset = clickEvent.pageX - @trigger.offset().left
-      caratOffset = Math.min(
-        Math.max(20, actualOffset),
-        @trigger.width() - 20
-      ) + differenceInOffset
+      leftBound = Math.max(0, @trigger.width() / 2 - @el.width() / 2) + 20
+      rightBound = @trigger.width() - leftBound
+      caratOffset = Math.min(Math.max(leftBound, actualOffset), rightBound) + differenceInOffset
       $('<span class="ui-menu-carat"><span /></span>').css('left', caratOffset).prependTo(@el)
 
       @positionInterval = setInterval @position, 200
@@ -73,6 +72,8 @@ define [
       @el.detach()
       clearInterval @positionInterval
       $(window).unbind 'click', @outsideClickHandler
+
+      @trigger.focus() if @trigger && @trigger.is(':visible')
 
     ignoreOutsideClickSelector: '.ui-dialog'
 

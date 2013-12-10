@@ -99,7 +99,7 @@ describe "external tool buttons" do
     f(".mce_instructure_external_button_clump").click
 
     f("#instructure_dropdown_list").should be_displayed
-    ff("#instructure_dropdown_list div.option").length.should == 2
+    ff("#instructure_dropdown_list .option").length.should == 2
   end
 
   it "should load external tool if selected from the dropdown" do
@@ -122,8 +122,8 @@ describe "external tool buttons" do
     f(".mce_instructure_external_button_clump").click
 
     f("#instructure_dropdown_list").should be_displayed
-    ff("#instructure_dropdown_list div.option").length.should == 2
-    ff("#instructure_dropdown_list div.option").last.click
+    ff("#instructure_dropdown_list .option").length.should == 2
+    ff("#instructure_dropdown_list .option").last.click
 
     keep_trying_until { fj("#external_tool_button_dialog iframe:visible").should be_displayed }
 

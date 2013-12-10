@@ -20,6 +20,14 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
+  def self.promote_view_path(path)
+    if CANVAS_RAILS2
+      self.view_paths.delete path
+    else
+      self.view_paths = self.view_paths.to_ary.reject{ |p| p.to_s == path }
+    end
+    prepend_view_path(path)
+  end
 
   attr_accessor :active_tab
 
@@ -172,7 +180,7 @@ class ApplicationController < ActionController::Base
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
-    if !files_domain? && Setting.get_cached('block_html_frames', 'true') == 'true' && !@embeddable
+    if !files_domain? && Setting.get('block_html_frames', 'true') == 'true' && !@embeddable
       headers['X-Frame-Options'] = 'SAMEORIGIN'
     end
     true
@@ -771,6 +779,7 @@ class ApplicationController < ActionController::Base
   # to generate access reports per student per course.
   def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil)
     return unless @current_user && @context && asset
+    return if asset.respond_to?(:new_record?) && asset.new_record?
     @accessed_asset = {
       :code => asset.is_a?(String) ? asset : asset.asset_string,
       :group_code => asset_group.is_a?(String) ? asset_group : (asset_group.asset_string rescue 'unknown'),
@@ -784,11 +793,12 @@ class ApplicationController < ActionController::Base
     return true if !page_views_enabled?
 
     if @current_user && @log_page_views != false
-      if request.xhr? && params[:page_view_id] && !(@page_view && @page_view.generated_by_hand)
-        @page_view = PageView.for_request_id(params[:page_view_id])
+      updated_fields = params.slice(:interaction_seconds, :page_view_contributed)
+      if request.xhr? && params[:page_view_id] && !updated_fields.empty? && !(@page_view && @page_view.generated_by_hand)
+        @page_view = PageView.find_for_update(params[:page_view_id])
         if @page_view
           response.headers["X-Canvas-Page-View-Id"] = @page_view.id.to_s if @page_view.id
-          @page_view.do_update(params.slice(:interaction_seconds, :page_view_contributed))
+          @page_view.do_update(updated_fields)
           @page_view_update = true
         end
       end
@@ -889,7 +899,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  if Rails.version < "3.0"
+  if CANVAS_RAILS2
     rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
   else
     ActionDispatch::ShowExceptions.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
@@ -1209,6 +1219,8 @@ class ApplicationController < ActionController::Base
         !!Tinychat.config
       elsif feature == :scribd
         !!ScribdAPI.config
+      elsif feature == :scribd_html5
+        ScribdAPI.config && ScribdAPI.config[:enable_html5_viewer]
       elsif feature == :crocodoc
         !!Canvas::Crocodoc.config
       elsif feature == :lockdown_browser
@@ -1384,7 +1396,15 @@ class ApplicationController < ActionController::Base
     set_layout_options
     if options && options.key?(:json)
       json = options.delete(:json)
-      json = ActiveSupport::JSON.encode(json, stringify_json_ids: stringify_json_ids?) unless json.is_a?(String)
+      unless json.is_a?(String)
+        Api.recursively_stringify_json_ids(json) if stringify_json_ids?
+        if CANVAS_RAILS2
+          json = MultiJson.dump(json)
+        else
+          json = ActiveSupport::JSON.encode(json)
+        end
+      end
+
       # prepend our CSRF protection to the JSON response, unless this is an API
       # call that didn't use session auth, or a non-GET request.
       if prepend_json_csrf?
@@ -1544,7 +1564,7 @@ class ApplicationController < ActionController::Base
     data
   end
 
-  unless CANVAS_RAILS3
+  if CANVAS_RAILS2
     filter_parameter_logging *LoggingFilter.filtered_parameters
   end
 
@@ -1596,7 +1616,7 @@ class ApplicationController < ActionController::Base
 
     if @page
       hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session)
-      hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? current_version.number : nil
+      hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? Api.stringify_json_id(current_version.number) : nil
       hash[:WIKI_PAGE_SHOW_PATH] = polymorphic_path([@context, :named_page], :wiki_page_id => @page)
       hash[:WIKI_PAGE_EDIT_PATH] = polymorphic_path([@context, :edit_named_page], :wiki_page_id => @page)
       hash[:WIKI_PAGE_HISTORY_PATH] = polymorphic_path([@context, @page, :wiki_page_revisions])

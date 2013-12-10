@@ -19,6 +19,7 @@ define [
     events:
       'click #week'      : '_triggerWeek'
       'click #month'     : '_triggerMonth'
+      'click #agenda'    : '_triggerAgenda'
       'click #scheduler' : '_triggerScheduler'
       'click .scheduler_done_button': '_triggerDone'
       'click #create_new_event_link': '_triggerCreateNewEvent'
@@ -28,8 +29,8 @@ define [
       @render()
       @navigator = new CalendarNavigator(
         el: @$navigator
+        showAgenda: @options.showAgenda
       )
-      @$calendarViewButtons.buttonset()
       @showNavigator()
       # The badge is part of the buttonset, so we can't find it beforehand with els
       @$badge = @$el.find('.counter-badge')
@@ -40,7 +41,19 @@ define [
       @navigator.on('navigatePrev', => @trigger('navigatePrev'))
       @navigator.on('navigateToday', => @trigger('navigateToday'))
       @navigator.on('navigateNext', => @trigger('navigateNext'))
+      @navigator.on('navigateDate', (selectedDate) => @trigger('navigateDate', selectedDate))
+      @$calendarViewButtons.on('click', 'button', @toggleView)
+      $.subscribe('Calendar/loadStatus', @animateLoading)
       @$schedulerDoneButton
+
+    toggleView: (e) ->
+      e.preventDefault()
+      $target = $(this)
+      $target.attr('aria-checked', true)
+             .addClass('active')
+      $target.siblings()
+             .attr('aria-checked', false)
+             .removeClass('active')
 
     showNavigator: ->
       @$navigator.show()
@@ -60,17 +73,23 @@ define [
       @$appointmentGroupTitle.hide()
       @$schedulerDoneButton.show()
 
-    setHeaderText: (newText) ->
+    setHeaderText: (newText) =>
       @navigator.setTitle(newText)
 
     selectView: (viewName) ->
       $("##{viewName}").click()
 
-    animateLoading: (shouldAnimate) ->
+    animateLoading: (shouldAnimate) =>
       @$refreshCalendarLink.toggleClass('loading', shouldAnimate)
 
     setSchedulerBadgeCount: (badgeCount) ->
       @$badge.toggle(badgeCount > 0).text(badgeCount)
+
+    showPrevNext: ->
+      @navigator.showPrevNext()
+
+    hidePrevNext: ->
+      @navigator.hidePrevNext()
 
     _triggerDone: (event) ->
       @trigger('done')
@@ -80,6 +99,9 @@ define [
 
     _triggerMonth: (event) ->
       @trigger('month')
+
+    _triggerAgenda: (event) ->
+      @trigger('agenda')
 
     _triggerScheduler: (event) ->
       @trigger('scheduler')

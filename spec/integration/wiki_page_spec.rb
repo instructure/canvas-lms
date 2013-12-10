@@ -129,6 +129,18 @@ describe WikiPagesController do
         response.code.should == '302'
         response.redirected_to.should =~ %r{/pages/a-page\z}
       end
+
+      it "should forward /wiki/name/revisions to /pages/name/revisions" do
+        get @base_url + "wiki/a-page/revisions"
+        response.code.should == '302'
+        response.redirected_to.should =~ %r{/pages/a-page/revisions\z}
+      end
+
+      it "should forward /wiki/name/revisions/revision to /pages/name/revisions" do
+        get @base_url + "wiki/a-page/revisions/42"
+        response.code.should == '302'
+        response.redirected_to.should =~ %r{/pages/a-page/revisions\z}
+      end
     end
 
     context "draft state disabled" do
@@ -148,6 +160,12 @@ describe WikiPagesController do
         get @base_url + "pages/a-page/edit"
         response.code.should == '302'
         response.redirected_to.should =~ %r{/wiki/a-page#edit\z}
+      end
+
+      it "should forward /pages/name/revisions to /wiki/name/revisions" do
+        get @base_url + "pages/a-page/revisions"
+        response.code.should == '302'
+        response.redirected_to.should =~ %r{/wiki/a-page/revisions\z}
       end
     end
 

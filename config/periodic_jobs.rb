@@ -40,9 +40,17 @@ Delayed::Periodic.cron 'SummaryMessageConsolidator.process', '*/15 * * * *' do
   end
 end
 
-Delayed::Periodic.cron 'Attachment.process_scribd_conversion_statuses', '*/5 * * * *' do
-  Shard.with_each_shard do
-    Attachment.process_scribd_conversion_statuses
+if ScribdAPI.enabled?
+  Delayed::Periodic.cron 'Attachment.process_scribd_conversion_statuses', '*/5 * * * *' do
+    Shard.with_each_shard do
+      Attachment.process_scribd_conversion_statuses
+    end
+  end
+
+  Delayed::Periodic.cron 'Attachment.delete_stale_scribd_docs', '15 11 * * *' do
+    Shard.with_each_shard do
+      Attachment.delete_stale_scribd_docs
+    end
   end
 end
 
@@ -67,19 +75,6 @@ end
 if IncomingMail::IncomingMessageProcessor.run_periodically?
   Delayed::Periodic.cron 'IncomingMessageProcessor.process', '*/1 * * * *' do
     IncomingMail::IncomingMessageProcessor.process
-  end
-end
-
-if PageView.redis_queue?
-  # periodically pull new page views off the cache and insert them into the db
-  Delayed::Periodic.cron 'PageView.process_cache_queue', '*/1 * * * *' do
-    Shard.with_each_shard do
-      unless Shard.current.settings[:process_page_view_queue] == false
-        PageView.send_later_enqueue_args(:process_cache_queue,
-                                         :singleton => "PageView.process_cache_queue:#{Shard.current.id}",
-                                         :max_attempts => 1)
-      end
-    end
   end
 end
 
@@ -115,6 +110,18 @@ Delayed::Periodic.cron 'Ignore.cleanup', '45 23 * * *' do
     Ignore.send_later_enqueue_args(:cleanup, :singleton => "Ignore.cleanup:#{Shard.current.id}")
   end
 end
+
+Delayed::Periodic.cron 'MessageScrubber.scrub_all', '0 0 * * *' do
+  scrubber = MessageScrubber.new
+  scrubber.scrub_all
+end
+
+Delayed::Periodic.cron 'DelayedMessageScrubber.scrub_all', '0 1 * * *' do
+  scrubber = DelayedMessageScrubber.new
+  scrubber.scrub_all
+end
+
+
 
 Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'periodic_jobs.rb')].each do |plugin_periodic_jobs|
   require plugin_periodic_jobs

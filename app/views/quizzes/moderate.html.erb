@@ -115,7 +115,7 @@
 </div>
 <div id="moderate_student_dialog" style="display: none;">
   <h2><%= t('headers.student_extensions', "Student Extensions") %></h2>
-  <% form_for :quiz, :url => "", :html => {:id => "moderate_student_form", :method => :post} do |f| %>
+  <%= form_for :quiz, :url => "", :html => {:id => "moderate_student_form", :method => :post} do |f| %>
     <table>
       <% if @quiz.allowed_attempts > 0 %>
         <tr>

@@ -55,8 +55,8 @@ describe SubAccountsController do
 
   describe "GET 'index'" do
     it "should preload all necessary information" do
-      root_account = Account.default
-      account_admin_user(:active_all => true)
+      root_account = Account.create(name: 'new account')
+      account_admin_user(active_all: true, account: root_account)
       user_session(@user)
 
       # no sub accounts or courses

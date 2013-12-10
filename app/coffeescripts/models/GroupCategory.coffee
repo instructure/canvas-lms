@@ -14,20 +14,46 @@ define [
 
     groups: ->
       @_groups = new GroupCollection(null)
+      @_groups.category = this
       @_groups.url = "/api/v1/group_categories/#{@id}/groups?per_page=50"
       @_groups.loadAll = true
-      @_groups.fetch() unless @get('groupCount') is 0
+      if @get('groups_count') is 0
+        @_groups.loadedAll = true
+      else
+        @_groups.fetch()
+      @_groups.on 'fetched:last', => @set('groups_count', @_groups.length)
       @groups = -> @_groups
       @_groups
 
     groupsCount: ->
-      @_groups?.length ? @get('groupCount')
+      if @_groups?.loadedAll
+        @_groups.length
+      else
+        @get('groups_count')
+
+    groupUsersFor: (id) ->
+      if id?
+        @_groups?.get(id)?._users
+      else
+        @_unassignedUsers
 
     unassignedUsers: ->
       @_unassignedUsers = new GroupUserCollection(null, groupId: null)
-      @_unassignedUsers.url = "/api/v1/group_categories/#{@id}/users?unassigned=true&per_page=50"
+      @_unassignedUsers.category = this
+      url = "/api/v1/group_categories/#{@id}/users?per_page=50"
+      url += "&unassigned=true" unless @get('allows_multiple_memberships')
+      @_unassignedUsers.url = url
+      @_unassignedUsers.on 'fetched:last', => @set('unassigned_users_count', @_unassignedUsers.length)
       @unassignedUsers = -> @_unassignedUsers
       @_unassignedUsers
+
+    unassignedUsersCount: ->
+      @get('unassigned_users_count')
+
+    canAssignUnassignedMembers: ->
+      @groupsCount() > 0 and
+        not @get('allows_multiple_memberships') and
+        @get('self_signup') isnt 'restricted'
 
     assignUnassignedMembers: ->
       $.ajaxJSON "/api/v1/group_categories/#{@id}/assign_unassigned_members", 'POST', {}, @setUpProgress
@@ -64,4 +90,4 @@ define [
       if method is 'create'
         @_defaultUrl()
       else
-        "/api/v1/group_categories/#{@id}"
+        "/api/v1/group_categories/#{@id}?includes[]=unassigned_users_count&includes[]=groups_count"

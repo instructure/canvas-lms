@@ -1,6 +1,6 @@
 class AddForcedReadStateToDiscussionEntryParticipants < ActiveRecord::Migration
   tag :predeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     add_column :discussion_entry_participants, :forced_read_state, :boolean

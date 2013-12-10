@@ -1,9 +1,10 @@
 define [
   'jquery'
+  'underscore'
   'compiled/calendar/commonEventFactory'
   'jquery.ajaxJSON'
   'vendor/jquery.ba-tinypubsub'
-], ($, commonEventFactory) ->
+], ($, _, commonEventFactory) ->
 
   class
     constructor: (contexts) ->
@@ -165,7 +166,7 @@ define [
       if fetchManageable
         fetchJobs.push [ '/api/v1/appointment_groups', { scope: 'manageable', include: [ 'reserved_times', 'participant_count' ], include_past_appointments: true } ]
 
-      @startFetch fetchJobs, dataCB, doneCB, 'appointmentGroups'
+      @startFetch fetchJobs, dataCB, doneCB, {inFlightCheckKey: 'appointmentGroups'}
 
     processAppointmentData: (group) =>
       id = group.id
@@ -208,7 +209,7 @@ define [
       params = { include: [ 'reserved_times', 'participant_count', 'appointments', 'child_events' ]}
       @startFetch [[ group.url, params ]], dataCB, (() => cb @cache.appointmentGroups[group.id].appointmentEvents)
 
-    getEvents: (start, end, contexts, cb) =>
+    getEvents: (start, end, contexts, cb, options = {}) =>
       if @inFlightRequest['default']
         @pendingRequests.push([@getEvents, arguments, 'default'])
         return
@@ -221,8 +222,8 @@ define [
 
         {
           context_codes: contexts
-          start_date: $.dateToISO8601UTC(startDay)
-          end_date: $.dateToISO8601UTC(endDay)
+          start_date: $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(startDay))
+          end_date: $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(endDay))
         }
 
       paramsForUndatedEvents = (contexts) =>
@@ -241,32 +242,65 @@ define [
 
       if !params
         # Yay, this request can be satisfied by the cache
-        cb @getEventsFromCache(start, end, contexts)
+        list = @getEventsFromCache(start, end, contexts)
+        list.requestID = options.requestID
+        cb list
         @processNextRequest()
         return
 
-      for context in contexts
-        contextInfo = @cache.contexts[context]
-        if contextInfo
-          if start
-            contextInfo.fetchedRanges.push([start, end])
-          else
-            contextInfo.fetchedUndated = true
+      requestResults = {}
+      dataCB = (data, url, params) =>
+        return unless data
+        key = 'type_'+params.type
+        requestResult = requestResults[key] or {events: []}
+        requestResult.next = data.next
+        for e in data
+          event = commonEventFactory(e, @contexts)
+          if event && event.object.workflow_state != 'deleted'
+            requestResult.events.push(event)
+        requestResult.maxDate = _.max(requestResult.events, (e) -> e.start).start
+        requestResults[key] = requestResult
 
       doneCB = () =>
-        cb @getEventsFromCache(start, end, contexts)
+        # If any request had a next page, the combined results are valid
+        # only through the earliest page end date.
+        incomplete = false
+        for key, requestResult of requestResults
+          if requestResult.next
+            incomplete = true
 
-      dataCB = (data) =>
-        if data
-          for e in data
-            event = commonEventFactory(e, @contexts)
-            if event && event.object.workflow_state != 'deleted'
+        nextPageDate = end
+        if incomplete
+          for key, requestResult of requestResults
+            if requestResult.next && requestResult.maxDate < nextPageDate
+              nextPageDate = requestResult.maxDate
+        nextPageDate.setHours(0, 0, 0) if nextPageDate
+
+        lastKnownDate = start
+        for key, requestResult of requestResults
+          for event in requestResult.events
+            if !incomplete || event.start < nextPageDate
               @addEventToCache event
+              lastKnownDate = event.start if event.start > lastKnownDate
+        lastKnownDate = end if !incomplete
+
+        for context in contexts
+          contextInfo = @cache.contexts[context]
+          if contextInfo
+            if start
+              contextInfo.fetchedRanges.push([start, lastKnownDate])
+            else
+              contextInfo.fetchedUndated = true
+
+        list = @getEventsFromCache(start, lastKnownDate, contexts)
+        list.nextPageDate = if incomplete then nextPageDate else null
+        list.requestID = options.requestID
+        cb list
 
       @startFetch [
         [ '/api/v1/calendar_events', params ]
         [ '/api/v1/calendar_events', $.extend({type: 'assignment'}, params) ]
-      ], dataCB, doneCB
+      ], dataCB, doneCB, options
 
     getParticipants: (appointmentGroup, registrationStatus, cb) =>
       if @inFlightRequest['default']
@@ -297,9 +331,10 @@ define [
     # situations where you need to do paginated fetches of data from N different endpoints
     # a little simpler. dataCB(data, url, params) is called on every request with the data,
     # and completionCB is called when all fetches have completed.
-    startFetch: (urlAndParamsArray, dataCB, doneCB, inFlightCheckKey='default') =>
+    startFetch: (urlAndParamsArray, dataCB, doneCB, options = {}) =>
       numCompleted = 0
 
+      inFlightCheckKey = options.inFlightCheckKey || 'default'
       @inFlightRequest[inFlightCheckKey] = true
 
       wrapperCB = (data, isDone, url, params) =>
@@ -314,12 +349,12 @@ define [
 
       for urlAndParams in urlAndParamsArray
         do (urlAndParams) =>
-          @fetchNextBatch urlAndParams[0], urlAndParams[1], (data, isDone) -> wrapperCB(data, isDone, urlAndParams[0], urlAndParams[1])
+          @fetchNextBatch urlAndParams[0], urlAndParams[1], ((data, isDone) -> wrapperCB(data, isDone, urlAndParams[0], urlAndParams[1])), options
 
     # Will fetch the URL with the given params, and if the response includes a Link
     # header, will fetch that link too (with the same params). At the end of every
     # request it will call cb(data, isDone). isDone will be true on the last request.
-    fetchNextBatch: (url, params, cb) =>
+    fetchNextBatch: (url, params, cb, options = {}) =>
       parseLinkHeader = (header) ->
         # TODO: Write a real Link header parser. This will only work with what we output,
         # and might be fragile.
@@ -342,8 +377,9 @@ define [
 
         linkHeader = xhr.getResponseHeader?('Link')
         rels = parseLinkHeader(linkHeader)
+        data.next = rels?.next
 
-        if rels?.next
+        if rels?.next && !options.singlePage
           cb(data, false)
           @fetchNextBatch rels.next, {}, cb
           return

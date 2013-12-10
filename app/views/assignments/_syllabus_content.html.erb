@@ -22,7 +22,7 @@ To add some comments, click the "Edit Syllabus Description" link to the right.
 DOC
       %>
 </div>
-<% form_for @context.class.to_s.underscore.to_sym, :url => context_url(@context, :context_url), :html => {:id => 'edit_course_syllabus_form', :style => 'display: none; margin-bottom: 10px;', :method => :put} do |f| %>
+<%= form_for @context.class.to_s.underscore.to_sym, :url => context_url(@context, :context_url), :html => {:id => 'edit_course_syllabus_form', :style => 'display: none; margin-bottom: 10px;', :method => :put} do |f| %>
   <a href="#" class="toggle_views_link" style="float: right;"><%= t '#links.switch_views', "Switch Views" %></a>
   <%= f.blabel :syllabus_body, :en => "Syllabus Description" %>
   <div class="clear"></div>

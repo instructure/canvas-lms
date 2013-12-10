@@ -41,7 +41,7 @@ define [
 
     onSaveSuccess: ->
       super
-      @assignmentGroups.view.render()
+      @assignmentGroups.trigger 'change:groupWeights'
 
     toggleTableByModel: ->
       checked = @model.get('apply_assignment_group_weights')
@@ -53,10 +53,12 @@ define [
 
     toggleWeightsTable: (show) ->
       if show
-        @$el.find('#ag_weights_wrapper').show()
+        @$('#ag_weights_wrapper').show()
+        @$('#apply_assignment_group_weights').prop('checked', true)
         @setDimensions(null, @defaults.height)
       else
-        @$el.find('#ag_weights_wrapper').hide()
+        @$('#ag_weights_wrapper').hide()
+        @$('#apply_assignment_group_weights').prop('checked', false)
         @setDimensions(null, @defaults.collapsedHeight)
 
     addAssignmentGroups: ->

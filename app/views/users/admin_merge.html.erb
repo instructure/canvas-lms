@@ -42,7 +42,7 @@
             :target_user_name => @other_user.name, :target_user_email => @other_user.email) %>
     <%= render :partial => 'merge_results', :locals => {:user => @user, :other_user => @other_user} %>
     </p>
-    <% form_tag user_merge_path(@user, :new_user_id => @other_user.id), :method => :post do %>
+    <%= form_tag user_merge_path(@user, :new_user_id => @other_user.id), :method => :post do %>
       <div class="button-container">
         <button type="submit" class="btn"><%= t('buttons.merge_user_account', 'Merge User Accounts') %></button>
         <a href="<%= dashboard_path %>" class="btn button-secondary"><%= t('#buttons.cancel', 'Cancel') %></a>
@@ -95,7 +95,7 @@
           </td>
           <td style="vertical-align: top; padding: 10px 10px 10px 30px;">
             <h3><%= t('titles.enter_user_id', 'Or Enter a User ID') %></h3>
-            <% form_tag user_admin_merge_url(@user.id), {:method => :get} do %>
+            <%= form_tag user_admin_merge_url(@user.id), {:method => :get} do %>
               <label for="manual_user_id"><%= before_label('user_id', 'User ID') %></label>
               <input id="manual_user_id" name="pending_user_id" type="text" style="width: 50px;"/>
               <button type="submit" class="btn btn-small"><%= t('buttons.go', 'Go') %></button>

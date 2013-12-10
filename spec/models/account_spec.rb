@@ -1034,38 +1034,32 @@ describe Account do
     end
   end
 
-  describe "#enable_quiz_regrade!" do
-
-    it "updates the enable_quiz_regrade setting and saves the account" do
-      account = Account.create!
-      account.enable_quiz_regrade!
-      account.root_account.enable_quiz_regrade?.should == true
-    end
-  end
-
-  describe ":enable_quiz_regrade setting" do
-
-    it "is false by default" do
-      account = Account.create!
-      account.enable_quiz_regrade?.should == false
-    end
-  end
-
-  describe "#disable_quiz_regrade!" do
-
-    it "updates the enable_quiz_regrade setting and saves the account" do
-      account = Account.create!
-      account.disable_quiz_regrade!
-      account.root_account.enable_quiz_regrade?.should == false
-    end
-  end
-
   describe "#change_root_account_setting!" do
 
     it "changes the given setting_name's value with the new_value passed" do
       account = Account.create!
       account.change_root_account_setting!(:enable_draft, false)
       account.root_account.should_not be_draft_state_enabled
+    end
+  end
+
+  describe ":enable_fabulous_quizzes setting" do
+
+    it "is false by default" do
+      account = Account.create!
+      account.enable_fabulous_quizzes?.should == false
+    end
+  end
+
+  describe "disable/enable_fabulous_quizzes!" do
+
+    it "toggles the enable_fabulous_quizzes setting appropriately" do
+      account = Account.create!
+      account.enable_fabulous_quizzes!
+      account.enable_fabulous_quizzes?.should == true
+
+      account.disable_fabulous_quizzes!
+      account.enable_fabulous_quizzes?.should == false
     end
   end
 

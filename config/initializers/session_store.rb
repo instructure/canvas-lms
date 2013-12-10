@@ -36,7 +36,7 @@ when :redis_session_store
   config[:db] ||= config[:database]
 end
 
-if Rails.version < "3.0"
+if CANVAS_RAILS2
   ActionController::Base.session = config
   ActionController::Base.session_store = session_store
 else

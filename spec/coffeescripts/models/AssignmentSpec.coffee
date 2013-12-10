@@ -1,7 +1,8 @@
 define [
   'compiled/models/Assignment'
+  'compiled/models/Submission'
   'compiled/models/DateGroup'
-], (Assignment, DateGroup) ->
+], (Assignment, Submission, DateGroup) ->
 
   module "Assignment"
 
@@ -227,6 +228,59 @@ define [
     assignment.set 'submission_types', [ 'online_upload' ]
     deepEqual assignment.submissionType(), 'online'
 
+  module "Assignment#expectsSubmission"
+
+  test "returns false if assignment submission type is not online", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission_types': [ 'external_tool', 'on_paper' ]
+    deepEqual assignment.expectsSubmission(), false
+
+  test "returns true if an assignment submission type is online", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission_types': [ 'online' ]
+    deepEqual assignment.expectsSubmission(), true
+
+  module "Assignment#allowedToSubmit"
+
+  test "returns false if assignment is locked", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission_types': [ 'online' ]
+    assignment.set 'locked_for_user': true
+    deepEqual assignment.allowedToSubmit(), false
+
+  test "returns true if an assignment is not locked", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission_types': [ 'online' ]
+    assignment.set 'locked_for_user': false
+    deepEqual assignment.allowedToSubmit(), true
+
+  test "returns false if a submission is not expected", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission_types': [ 'external_tool', 'on_paper', 'attendance' ]
+    deepEqual assignment.allowedToSubmit(), false
+
+  module "Assignment#withoutGradedSubmission"
+
+  test "returns false if there is a submission", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission': new Submission {'submission_type': 'online'}
+    deepEqual assignment.withoutGradedSubmission(), false
+
+  test "returns true if there is no submission", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission': null
+    deepEqual assignment.withoutGradedSubmission(), true
+
+  test "returns true if there is a submission, but no grade", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission': new Submission
+    deepEqual assignment.withoutGradedSubmission(), true
+
+  test "returns false if there is a submission and a grade", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'submission': new Submission {'grade': 305}
+    deepEqual assignment.withoutGradedSubmission(), false
+
   module "Assignment#acceptsOnlineUpload"
 
   test "returns true if record submission types includes online_upload", ->
@@ -238,7 +292,7 @@ define [
     assignment = new Assignment name: 'foo'
     assignment.set 'submission_types', []
     deepEqual assignment.acceptsOnlineUpload(), false
-  
+
   module "Assignment#acceptsOnlineURL"
 
   test "returns true if assignment allows online url", ->

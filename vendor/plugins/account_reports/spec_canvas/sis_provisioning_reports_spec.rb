@@ -111,18 +111,20 @@ describe "Default Account Reports" do
     @course1.save!
 
     @course2 = Course.new(:name => 'Math 101',:course_code => 'MAT101',
-                          :conclude_at => end_at,:account => @account)
+                          :conclude_at => end_at, :account => @account)
     @course2.workflow_state = 'available'
     @course2.sis_source_id = "SIS_COURSE_ID_2"
     @course2.restrict_enrollments_to_course_dates = true
     @course2.save!
 
-    @course3 = Course.new(:name => 'Science 101',:course_code => 'SCI101',:account => @account)
+    @course3 = Course.new(:name => 'Science 101',:course_code => 'SCI101',
+                          :account => @account)
     @course3.workflow_state = 'available'
     @course3.sis_source_id = "SIS_COURSE_ID_3"
     @course3.save!
 
-    @course4 = Course.new(:name => 'self help',:course_code => 'self')
+    @course4 = Course.new(:name => 'self help',:course_code => 'self',
+                          :account => @account)
     @course4.workflow_state = 'claimed'
     @course4.save!
 
@@ -134,7 +136,8 @@ describe "Default Account Reports" do
     @course5.workflow_state = 'deleted'
     @course5.save!
 
-    @course6 = Course.new(:name => 'talking 101',:course_code => 'Tal101')
+    @course6 = Course.new(:name => 'talking 101',:course_code => 'Tal101',
+                          :account => @account)
     @course6.workflow_state = 'completed'
     @course6.save!
   end
@@ -235,12 +238,12 @@ describe "Default Account Reports" do
     before(:each) do
       Notification.find_or_create_by_name("Report Generated")
       Notification.find_or_create_by_name("Report Generation Failed")
-      @account = Account.default
+      @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
       @admin = account_admin_user(:account => @account)
       @default_term = @account.enrollment_terms.active.find_or_create_by_name(EnrollmentTerm::DEFAULT_TERM_NAME)
     end
 
-    describe "Users SIS and Provisioning reports" do
+    describe "Users" do
       before(:each) do
         create_some_users_with_pseudonyms()
       end
@@ -345,7 +348,7 @@ describe "Default Account Reports" do
       end
     end
 
-    describe "Accounts SIS and Provisioning reports" do
+    describe "Accounts" do
       before(:each) do
         create_some_accounts()
       end
@@ -402,7 +405,7 @@ describe "Default Account Reports" do
       end
     end
 
-    describe "Terms SIS and Provisioning reports" do
+    describe "Terms" do
       before(:each) do
         create_some_terms()
       end
@@ -451,7 +454,7 @@ describe "Default Account Reports" do
       end
     end
 
-    describe "Courses SIS and Provisioning reports" do
+    describe "Courses" do
       before(:each) do
         create_some_courses()
       end
@@ -486,13 +489,12 @@ describe "Default Account Reports" do
                              "fall12","deleted",nil,nil]
       end
 
-      it "should run the provisioning report report" do
+      it "should run the provisioning report" do
         parameters = {}
         parameters["include_deleted"] = true
         parameters["courses"] = true
         parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,3)
 
-        parsed.length.should == 6
         parsed[0].should == [@course1.id.to_s,@course1.sis_source_id,@course1.course_code,
                              @course1.name,@sub_account.id.to_s,@sub_account.sis_source_id,
                              @term1.id.to_s,@term1.sis_source_id,"active",
@@ -509,16 +511,17 @@ describe "Default Account Reports" do
                              @default_term.id.to_s,nil,"unpublished",nil,nil]
         parsed[5].should == [@course6.id.to_s,nil,"Tal101","talking 101",@course6.account_id.to_s,
                              nil,@default_term.id.to_s,nil,"concluded",nil,nil]
+        parsed.length.should == 6
       end
 
-      it "should run the sis report report on a sub account" do
+      it "should run the sis report on a sub account" do
         parameters = {}
         parameters["courses"] = true
         # all I care about is that it didn't throw a database error due to ambiguous columns
         parsed = ReportSpecHelper.run_report(@sub_account,"sis_export_csv",parameters,3)
       end
 
-      it "should run the provisioning report report on a sub account" do
+      it "should run the provisioning report on a sub account" do
         parameters = {}
         parameters["courses"] = true
         parsed = ReportSpecHelper.run_report(@sub_account,"provisioning_csv",parameters,3)
@@ -530,7 +533,7 @@ describe "Default Account Reports" do
                              @course1.start_at.iso8601,@course1.conclude_at.iso8601]
       end
 
-      it "should run the provisioning report report with the default term" do
+      it "should run the provisioning report with the default term" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["courses"] = true
@@ -543,7 +546,7 @@ describe "Default Account Reports" do
       end
     end
 
-    describe "Sections SIS and Provisioning reports" do
+    describe "Sections" do
       before(:each) do
         create_some_courses_and_sections()
       end
@@ -633,7 +636,7 @@ describe "Default Account Reports" do
       end
     end
 
-    describe "Enrollments SIS and Provisioning reports" do
+    describe "Enrollments" do
       before(:each) do
         create_some_enrolled_users()
       end
@@ -676,8 +679,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollments"] = true
         parameters["include_deleted"] = true
-        parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,[3,1])
-        parsed.length.should == 11
+        parsed = ReportSpecHelper.run_report(@account,"provisioning_csv",parameters,[3,1,7])
 
         parsed[0].should == [@course1.id.to_s ,"SIS_COURSE_ID_1",@user6.id.to_s,nil,"teacher",
                              @enrollment10.course_section_id.to_s,nil,"concluded",nil,nil]
@@ -704,6 +706,8 @@ describe "Default Account Reports" do
                               nil,"active",nil,nil]
         parsed[10].should == [@course4.id.to_s ,nil,@user5.id.to_s,"user_sis_id_05","teacher",
                              @enrollment8.course_section_id.to_s,nil,"active",nil,nil]
+        parsed.length.should == 11
+
       end
 
       it "should run the provisioning report on a term and sub account with deleted enrollments" do
@@ -733,7 +737,7 @@ describe "Default Account Reports" do
       end
     end
 
-    describe "Groups SIS and Provisioning reports" do
+    describe "Groups" do
       before(:each) do
         create_some_groups()
       end
@@ -784,7 +788,7 @@ describe "Default Account Reports" do
       end
     end
 
-    describe "Group Memberships SIS and Provisioning reports" do
+    describe "Group Memberships" do
       before(:each) do
         create_some_group_memberships_n_stuff()
       end
@@ -835,7 +839,7 @@ describe "Default Account Reports" do
       end
     end
 
-    describe "Cross List SIS and Provisioning reports" do
+    describe "Cross List" do
       before(:each) do
         create_some_courses_and_sections()
         @section1.crosslist_to_course(@course2)

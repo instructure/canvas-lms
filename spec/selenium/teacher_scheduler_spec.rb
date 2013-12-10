@@ -9,7 +9,8 @@ describe "scheduler" do
     before (:each) do
       Account.default.tap do |a|
         a.settings[:enable_scheduler] = true
-        a.settings[:show_scheduler] = true
+        a.settings[:show_scheduler]   = true
+        a.settings[:agenda_view]      = true
         a.save!
       end
       course_with_teacher_logged_in
@@ -276,9 +277,6 @@ describe "scheduler" do
       wait_for_ajaximations
       ff('#attendees li').size.should == 1
 
-      # make sure the user was really deleted
-      f('#refresh_calendar_link').click
-      wait_for_ajaximations
       fj('.fc-event:visible').click
 
       keep_trying_until { ff('#attendees li').size.should == 1 }
@@ -318,9 +316,6 @@ describe "scheduler" do
       wait_for_ajaximations
       ff('#attendees li').size.should == 1
 
-      # make sure the appointment was really deleted
-      f('#refresh_calendar_link').click
-      wait_for_ajaximations
       fj('.fc-event:visible').click
       ff('#attendees li').size.should == 1
       f('.scheduler_done_button').click

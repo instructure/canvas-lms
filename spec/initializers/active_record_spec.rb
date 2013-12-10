@@ -44,5 +44,17 @@ module ActiveRecord
       end
     end
 
+    describe "deconstruct_joins" do
+      describe "delete_all" do
+        it "should allow delete all on inner join with alias" do
+          User.create(name: 'dr who')
+          User.create(name: 'dr who')
+
+          expect { User.joins("INNER JOIN users u ON users.sortable_name = u.sortable_name").
+            where("u.sortable_name <> users.sortable_name").delete_all }.to_not raise_error
+        end
+      end
+    end
+
   end
 end

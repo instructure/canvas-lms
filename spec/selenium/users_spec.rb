@@ -226,7 +226,7 @@ describe "users" do
 
     it "should register a student with a join code" do
       course(:active_all => true)
-      @course.update_attribute :self_enrollment, true
+      @course.update_attribute(:self_enrollment, true)
 
       get '/register'
       f('#signup_student').click
@@ -242,7 +242,7 @@ describe "users" do
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
-      User.last.initial_enrollment_type.should eql 'student'
+      User.last.initial_enrollment_type.should == 'student'
     end
 
     it "should register a teacher" do
@@ -252,12 +252,21 @@ describe "users" do
       form = fj('.ui-dialog:visible form')
       f('#teacher_name').send_keys('teacher!')
       f('#teacher_email').send_keys('teacher@example.com')
+
+      # if instructure_misc_plugin is installed, number of registration fields increase
+      if (Dir.exists?('./vendor/plugins/instructure_misc_plugin'))
+        f('#teacher_school_position').send_keys('Dean')
+        f('#teacher_phone').send_keys('1231231234')
+        f('#teacher_school_name').send_keys('example org')
+        f('#teacher_organization_type').send_keys('Higher Ed')
+      end
+
       f('input[name="user[terms_of_use]"]', form).click
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
-      User.last.initial_enrollment_type.should eql 'teacher'
+      User.last.initial_enrollment_type.should == 'teacher'
     end
 
     it "should register an observer" do
@@ -276,7 +285,7 @@ describe "users" do
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
       f('#identity .logout').should be_present
-      User.last.initial_enrollment_type.should eql 'observer'
+      User.last.initial_enrollment_type.should == 'observer'
     end
   end
 

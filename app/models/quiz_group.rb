@@ -17,7 +17,7 @@
 #
 
 class QuizGroup < ActiveRecord::Base
-  attr_accessible :name, :pick_count, :question_points, :assessment_question_bank
+  attr_accessible :name, :pick_count, :question_points, :assessment_question_bank_id
   attr_readonly :quiz_id
   belongs_to :quiz
   belongs_to :assessment_question_bank
@@ -44,15 +44,6 @@ class QuizGroup < ActiveRecord::Base
     end
     
     [self.pick_count.to_i, count].min
-  end
-  
-  def clone_for(quiz, dup=nil, options={})
-    dup ||= QuizGroup.new
-    self.attributes.delete_if{|k,v| [:id, :quiz_id].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.quiz_id = quiz.id
-    dup
   end
 
   # QuizGroup.data is used when creating and editing a quiz, but 

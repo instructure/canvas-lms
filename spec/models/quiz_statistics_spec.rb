@@ -55,8 +55,7 @@ describe QuizStatistics do
     @quiz.generate_submission(@student)
 
     stats = CSV.parse(csv(:include_all_versions => true))
-    # format for row is row_name, '', data1, data2, ...
-    stats.first.length.should == 3
+    stats.first.length.should == 12
   end
 
   it 'should not include previous versions by default' do
@@ -67,8 +66,7 @@ describe QuizStatistics do
     qs.grade_submission
 
     stats = CSV.parse(csv)
-    # format for row is row_name, '', data1, data2, ...
-    stats.first.length.should == 3
+    stats.first.length.should == 12
   end
 
   it 'generates a new quiz_statistics if the quiz changed' do

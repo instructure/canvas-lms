@@ -238,14 +238,6 @@ class Job < ActiveRecord::Base
     end
   end
 
-  def self.unlock_expired_jobs(max_run_time = Delayed::Worker.max_run_time)
-    cutoff = db_time_now - max_run_time
-    self.find(redis.zrangebyscore(Keys::RUNNING_JOBS, 0, cutoff.utc.to_i)).each do |job|
-      # TODO: mark the job as failed one attempt
-      job.unlock!
-    end
-  end
-
   # returns a list of hashes { :tag => tag_name, :count => current_count }
   # in descending count order
   # flavor is :current or :all

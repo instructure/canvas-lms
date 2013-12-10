@@ -16,7 +16,7 @@ define [
       due_at: null
       unlock_at: null
       lock_at: null
-      publishable: true
+      unpublishable: true
       points_possible: null
 
     initialize: (attributes, options = {}) ->
@@ -25,7 +25,7 @@ define [
       @initAssignmentOverrides()
       @initUrls()
       @initTitleLabel()
-      @initPublishable()
+      @initUnpublishable()
       @initQuestionsCount()
       @initPointsCount()
 
@@ -51,8 +51,8 @@ define [
     initTitleLabel: ->
       @set 'title_label', @get('title') or @get('readable_type')
 
-    initPublishable: ->
-      @set('publishable', false) if @get('can_unpublish') == false and @get('published')
+    initUnpublishable: ->
+      @set('unpublishable', false) if @get('can_unpublish') == false and @get('published')
 
     initQuestionsCount: ->
       cnt = @get 'question_count'
@@ -67,9 +67,8 @@ define [
     # publishing
 
     publish: =>
-      if @get 'publishable'
-        @set 'published', true
-        $.ajaxJSON(@get('publish_url'), 'POST', 'quizzes': [@get 'id'])
+      @set 'published', true
+      $.ajaxJSON(@get('publish_url'), 'POST', 'quizzes': [@get 'id'])
 
     unpublish: =>
       @set 'published', false

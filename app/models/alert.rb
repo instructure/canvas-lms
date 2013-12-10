@@ -141,7 +141,7 @@ class Alert < ActiveRecord::Base
     if criterion_types.include? 'Interaction'
       scope = SubmissionComment.for_context(course).
           where(:author_id => teacher_ids, :recipient_id => student_ids)
-      last_comment_dates = Rails.version < '3.0' ?
+      last_comment_dates = CANVAS_RAILS2 ?
           scope.maximum(:created_at, :group => [:recipient_id, :author_id]) :
           scope.group(:recipient_id, :author_id).maximum(:created_at)
       last_comment_dates.each do |key, date|
@@ -151,7 +151,7 @@ class Alert < ActiveRecord::Base
       scope = ConversationMessage.
           joins('INNER JOIN conversation_participants ON conversation_participants.conversation_id=conversation_messages.conversation_id').
           where(:conversation_messages => { :author_id => teacher_ids, :generated => false }, :conversation_participants => { :user_id => student_ids })
-      last_message_dates = Rails.version < '3.0' ?
+      last_message_dates = CANVAS_RAILS2 ?
           scope.maximum(:created_at, :group => ['conversation_participants.user_id', 'conversation_messages.author_id']) :
           scope.group('conversation_participants.user_id', 'conversation_messages.author_id').maximum(:created_at)
       last_message_dates.each do |key, date|
@@ -191,7 +191,7 @@ class Alert < ActiveRecord::Base
     if criterion_types.include?('UserNote') && include_user_notes
       scope = UserNote.active.
           where(:created_by_id => teacher_ids, :user_id => student_ids)
-      note_dates = Rails.version < '3.0' ?
+      note_dates = CANVAS_RAILS2 ?
           scope.maximum(:created_at, :group => [:user_id, :created_by_id]) :
           scope.group(:user_id, :created_by_id).maximum(:created_at)
       note_dates.each do |key, date|

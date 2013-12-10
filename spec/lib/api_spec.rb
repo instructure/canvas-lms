@@ -656,4 +656,26 @@ describe Api do
       links.first.should == "<www.example.com/?page=4&per_page=10>; rel=\"next\""
     end
   end
+
+  describe "#accepts_jsonapi?" do
+    class TestApiController
+      include Api
+    end
+
+    it "returns true when application/vnd.api+json in the Accept header" do
+      controller = TestApiController.new
+      controller.stubs(:request).returns stub(headers: {
+        'Accept' => 'application/vnd.api+json'
+      })
+      controller.accepts_jsonapi?.should == true
+    end
+
+    it "returns false when application/vnd.api+json not in the Accept header" do
+      controller = TestApiController.new
+      controller.stubs(:request).returns stub(headers: {
+        'Accept' => 'application/json'
+      })
+      controller.accepts_jsonapi?.should == false
+    end
+  end
 end

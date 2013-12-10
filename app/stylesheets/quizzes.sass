@@ -3,6 +3,7 @@
 $backgroundColor: #dfe9f0
 $borderColor: #AAA
 $questionHeaderBackground: #F5F5F5
+$selectedBorderColor: #31b5ff
 
 #wrapper-container
   min-width: 1100px
@@ -13,9 +14,6 @@ $questionHeaderBackground: #F5F5F5
 .quizzes-speedgrader #wrapper-container
   min-width: 1000px
 
-  .update-scores
-    display: block
-    margin: 0 auto
 
 // quiz index
 li.quiz
@@ -150,7 +148,11 @@ div#content
     font-weight: 500
 
 .quizzes-speedgrader .quizzes-speedgrader-padding
-  height: 80px
+  height: 60px
+
+.quizzes-speedgrader .grade-by-question-warning
+  padding: 5px
+  color: red
 
 .quiz-submission, .question_editing
   background: $backgroundColor
@@ -249,10 +251,6 @@ div#content
           :background-image none
         .answer.hide_right_arrow,.answer.selected_answer.hide_right_arrow
           :background-image none
-    &.correct
-      :border-color inherit
-    &.incorrect
-      :border-color inherit
   &.suppress_correct_answers, &.survey_results
     .question .answers .answer.wrong_answer
       border: none
@@ -274,6 +272,9 @@ div#content
         :border-width 2px
       .move
         :display none
+    .complete
+      background-color: #eeeeee
+      color: #999999
 
 
 #questions.assessing
@@ -422,7 +423,10 @@ div#content
   :_height 10px
 
   &.modified_but_not_saved
-    border-width: 3px
+    border-width: 2px
+  &.selected_single_question
+    border-color: $selectedBorderColor
+    border-width: 2px
   .move
     background: none !important
     float: left
@@ -671,20 +675,19 @@ div#content
   .answer
     .answer_select .select_answer
       :display block
-    .answer_select .select_answer:focus .answer_box
-      :background-image url(/images/partial_answer.png)
     .select_answer_link
       :display inline
-    .answer_select .answer_box
+    .answer_select .answer_image
       :background-repeat no-repeat
+      :background-position 3px 5px
       :cursor pointer
 
-    &.hover
-      .answer_select .answer_box
-        :background-image url(/images/partial_answer.png)
-    &.partial_answer .answer_select .answer_box
+    &.hover .answer_select .answer_image,
+    .answer_select .select_answer_link:focus .answer_image
       :background-image url(/images/partial_answer.png)
-    &.negative_answer .answer_select .answer_box
+    &.partial_answer .answer_select .answer_image
+      :background-image url(/images/partial_answer.png)
+    &.negative_answer .answer_select .answer_image
       :background-image url(/images/negative_answer.png)
 
 // Don't display the "select answer" answer_box for "fill-in-the-blank" questions where
@@ -720,16 +723,16 @@ div#content
     .answer
       .answer_select
         visibility: hidden
-      .answer_select .select_answer:focus .answer_box
+      .answer_select .select_answer:focus .answer_image
         :background-image none
       .answer_select .answer_box
         &.hover .answer_box
           :background-image none
 
       &.hover
-        .answer_select .answer_box
+        .answer_select .answer_image
           :background-image none
-      &.correct_answer .answer_select .answer_box
+      &.correct_answer .answer_select .answer_image
         :background-image none
 
 .question
@@ -1333,6 +1336,7 @@ ul#quiz_versions
 
 // quiz history-specific styles
 #update_history_form
+  margin: 0px
   .assessment_results
     clear: none
 
@@ -1399,8 +1403,8 @@ ul#quiz_versions
       .calculated_question_answers
         position: relative
       /* Display persistent correct answer arrow when editing only. */
-      &.selectable .form_answers .answer.correct_answer .answer_select .answer_box
-        background: url(/images/correct_answer.png) no-repeat 3px 5px
+      &.selectable .form_answers .answer.correct_answer .answer_select .answer_image
+        background-image: url(/images/correct_answer.png)
     .blank_id_select
       width: auto
       min-width: 220px
@@ -1500,7 +1504,9 @@ ul#quiz_versions
       line-height: 32px
     &.active a
       @include box-shadow(#31b5ff 0px 2px 1px)
-      border: 1px solid #31b5ff
+      background: white
+      border: 1px solid $selectedBorderColor
+      color: #0088cc
       font-weight: bold
     &.complete a
       background-color: #eeeeee
@@ -1588,3 +1594,27 @@ ul#quiz_versions
     border-top: 1px solid #C4AE90
     background-color: $warningBackground
 
+#speed_update_scores_container
+  background: #e8e8e8
+  border-top: 1px solid #ccc
+  width: 100%
+  padding: 20px 0 20px 20px
+  position: fixed
+  bottom: 0px
+  left: 0px
+  .update_scores_fudge
+    padding-right: 200px
+  .button-container
+    position: fixed
+    bottom: 30px
+    right: 10px
+
+#update_scores
+  position: relative
+  .update_scores_fudge
+    padding-right: 200px
+  .button-container
+    position: absolute
+    right: 0px
+    bottom: 0px
+    padding-bottom: 0px

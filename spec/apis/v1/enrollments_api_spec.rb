@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -63,7 +63,8 @@ describe EnrollmentsApiController, :type => :integration do
             'current_grade' => nil,
           },
           'associated_user_id'                 => nil,
-          'updated_at'                         => new_enrollment.updated_at.xmlschema
+          'updated_at'                         => new_enrollment.updated_at.xmlschema,
+          'last_activity_at'                   => nil
         }
         new_enrollment.root_account_id.should eql @course.account.id
         new_enrollment.user_id.should eql @unenrolled_user.id
@@ -184,14 +185,23 @@ describe EnrollmentsApiController, :type => :integration do
         Enrollment.find(json['id']).course_section.should eql @section
       end
 
-      it "should optionally not send notifications" do
+      it "should not notify by default" do
         StudentEnrollment.any_instance.expects(:save_without_broadcasting).at_least_once
+
+        api_call(:post, @path, @path_options, {
+            :enrollment => {
+                :user_id                            => @unenrolled_user.id,
+                :enrollment_state                   => 'active'}})
+      end
+
+      it "should optionally send notifications" do
+        StudentEnrollment.any_instance.expects(:save).at_least_once
 
         api_call(:post, @path, @path_options, {
           :enrollment => {
             :user_id                            => @unenrolled_user.id,
             :enrollment_state                   => 'active',
-            :notify                             => false }})
+            :notify                             => true }})
       end
 
       it "should not allow enrollments to be added to a hard-concluded course" do
@@ -390,7 +400,8 @@ describe EnrollmentsApiController, :type => :integration do
             'current_grade' => nil,
           },
           'associated_user_id'                 => nil,
-          'updated_at'                         => new_enrollment.updated_at.xmlschema
+          'updated_at'                         => new_enrollment.updated_at.xmlschema,
+          'last_activity_at'                   => nil
         }
         new_enrollment.root_account_id.should eql @course.account.id
         new_enrollment.user_id.should eql @unenrolled_user.id
@@ -484,7 +495,46 @@ describe EnrollmentsApiController, :type => :integration do
               'current_grade' => nil,
             },
             'associated_user_id' => nil,
-            'updated_at' => e.updated_at.xmlschema
+            'updated_at' => e.updated_at.xmlschema,
+            'last_activity_at' => nil
+          }
+        }
+      end
+
+      it "should show last_activity_at for student enrollment" do
+        enrollment = @course.student_enrollments.first
+        enrollment.record_recent_activity(Time.zone.now)
+        json = api_call(:get, @user_path, @user_params)
+        enrollments = @student.current_enrollments.includes(:user).order("users.sortable_name ASC")
+        json.should == enrollments.map { |e|
+          {
+            'root_account_id' => e.root_account_id,
+            'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
+            'enrollment_state' => e.workflow_state,
+            'id' => e.id,
+            'user_id' => e.user_id,
+            'type' => e.type,
+            'role' => e.role,
+            'course_section_id' => e.course_section_id,
+            'course_id' => e.course_id,
+            'user' => {
+              'name' => e.user.name,
+              'sortable_name' => e.user.sortable_name,
+              'short_name' => e.user.short_name,
+              'id' => e.user.id,
+              'login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil
+            },
+            'html_url' => course_user_url(e.course_id, e.user_id),
+            'grades' => {
+              'html_url' => course_student_grades_url(e.course_id, e.user_id),
+              'final_score' => nil,
+              'current_score' => nil,
+              'final_grade' => nil,
+              'current_grade' => nil,
+            },
+            'associated_user_id' => nil,
+            'updated_at' => e.updated_at.xmlschema,
+            'last_activity_at' => e.last_activity_at.xmlschema
           }
         }
       end
@@ -605,7 +655,7 @@ describe EnrollmentsApiController, :type => :integration do
         @user = current_user
         json = api_call(:get, @path, @params)
         enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
-          res = res + @course.send("#{type}_enrollments").includes(:user).order("users.sortable_name ASC")
+          res = res + @course.send("#{type}_enrollments").includes(:user).order(User.sortable_name_order_by_clause("users"))
         end
         json.should == enrollments.map { |e|
           h = {
@@ -621,6 +671,7 @@ describe EnrollmentsApiController, :type => :integration do
             'html_url' => course_user_url(@course, e.user),
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
+            'last_activity_at' => nil,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -681,7 +732,8 @@ describe EnrollmentsApiController, :type => :integration do
               'current_grade' => nil,
             },
             'associated_user_id' => nil,
-            'updated_at' => e.updated_at.xmlschema
+            'updated_at' => e.updated_at.xmlschema,
+            'last_activity_at' => nil
           }
         }
       end
@@ -766,7 +818,8 @@ describe EnrollmentsApiController, :type => :integration do
             'user' => user_json,
             'html_url' => course_user_url(@course, e.user),
             'associated_user_id' => nil,
-            'updated_at' => e.updated_at.xmlschema
+            'updated_at' => e.updated_at.xmlschema,
+            'last_activity_at' => nil
           }
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
@@ -820,7 +873,8 @@ describe EnrollmentsApiController, :type => :integration do
             },
             'html_url' => course_user_url(@course, e.user),
             'associated_user_id' => nil,
-            'updated_at' => e.updated_at.xmlschema
+            'updated_at' => e.updated_at.xmlschema,
+            'last_activity_at' => nil
           }
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
@@ -889,7 +943,8 @@ describe EnrollmentsApiController, :type => :integration do
               'current_grade' => nil,
             },
             'associated_user_id'                 => @enrollment.associated_user_id,
-            'updated_at'                         => @enrollment.updated_at.xmlschema
+            'updated_at'                         => @enrollment.updated_at.xmlschema,
+            'last_activity_at'                   => nil
           }
         end
 
@@ -915,7 +970,8 @@ describe EnrollmentsApiController, :type => :integration do
               'current_grade' => nil,
             },
             'associated_user_id'                 => @enrollment.associated_user_id,
-            'updated_at'                         => @enrollment.updated_at.xmlschema
+            'updated_at'                         => @enrollment.updated_at.xmlschema,
+            'last_activity_at'                   => nil
           }
         end
 
@@ -971,6 +1027,7 @@ describe EnrollmentsApiController, :type => :integration do
             },
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
+            'last_activity_at' => nil,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -1003,6 +1060,7 @@ describe EnrollmentsApiController, :type => :integration do
             'html_url' => course_user_url(@course, e.user),
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
+            'last_activity_at' => nil,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,

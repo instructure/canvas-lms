@@ -17,6 +17,7 @@
 #
 
 require 'set'
+require 'canvas/draft_state_validations'
 
 class Assignment < ActiveRecord::Base
   include Workflow
@@ -27,6 +28,7 @@ class Assignment < ActiveRecord::Base
   include ContextModuleItem
   include DatesOverridable
   include SearchTermHelper
+  include Canvas::DraftStateValidations
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :min_score, :max_score, :mastery_score, :grading_type, :submission_types,
@@ -52,12 +54,12 @@ class Assignment < ActiveRecord::Base
   has_one :teacher_enrollment, :class_name => 'TeacherEnrollment', :foreign_key => 'course_id', :primary_key => 'context_id', :include => :user, :conditions => ["enrollments.workflow_state = 'active' AND enrollments.type = 'TeacherEnrollment'"]
   has_many :ignores, :as => :asset
   belongs_to :context, :polymorphic => true
-  belongs_to :cloned_item
   belongs_to :grading_standard
   belongs_to :group_category
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
+  validate :validate_draft_state_change, :if => :workflow_state_changed?
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
     # only accept the url and new_tab params, the other accessible
@@ -119,6 +121,7 @@ class Assignment < ActiveRecord::Base
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :allowed_extensions, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
 
   acts_as_list :scope => :assignment_group_id
@@ -790,21 +793,6 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def grade_distribution(submissions = nil)
-    submissions ||= self.submissions
-    tally = 0
-    cnt = 0
-    scores = submissions.map{|s| s.score}.compact
-    scores.each do |score|
-      tally += score
-      cnt += 1
-    end
-    high = scores.max
-    low = scores.min
-    mean = tally.to_f / cnt.to_f
-    [high, low, mean]
-  end
-
   # Everyone, students, TAs, teachers
   def participants
     context.participants
@@ -1134,7 +1122,26 @@ class Assignment < ActiveRecord::Base
     res[:context][:enrollments] = context.enrollments_visible_to(user).
         map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
-    res[:submissions] = submissions.where(:user_id => students).map do |sub|
+
+
+    submissions = self.submissions.where(:user_id => students)
+                  .includes(:submission_comments,
+                            :attachments,
+                            :versions,
+                            {:quiz_submission => :versions})
+
+    # quiz submission versions are too expensive to de-serialize so we have to
+    # cap the number we will do
+    qs_threshold = Setting.get("too_many_quiz_submission_versions", "150").to_i
+    too_many_qs_versions = qs_threshold <= submissions.inject(0) { |sum,s|
+      if s.quiz_submission
+        sum + s.quiz_submission.versions.size
+      else
+        sum
+      end
+    }
+
+    res[:submissions] = submissions.map do |sub|
       json = sub.as_json(:include_root => false,
         :include => {
           :submission_comments => {
@@ -1148,7 +1155,7 @@ class Assignment < ActiveRecord::Base
         :methods => [:scribdable?, :scribd_doc, :submission_history, :late],
         :only => submission_fields
       )
-      json['submission_history'] = if json['submission_history'] && quiz.nil?
+      json['submission_history'] = if json['submission_history'] && (quiz.nil? || too_many_qs_versions)
                                      json['submission_history'].map do |version|
                                        version.as_json(
                                          :include => {
@@ -1200,13 +1207,28 @@ class Assignment < ActiveRecord::Base
       user ?
         context.students_visible_to(user) :
         context.participating_students
-    ).order_by_sortable_name.uniq
+    ).order_by_sortable_name.uniq.to_a
 
     if grade_as_group?
+      submissions = self.submissions.includes(:user)
+      users_with_submissions = submissions
+                               .select(&:has_submission?)
+                               .map(&:user)
+      users_with_turnitin_data = if turnitin_enabled?
+                                   submissions
+                                   .where("turnitin_data IS NOT NULL")
+                                   .map(&:user)
+                                 else
+                                   []
+                                 end
       group_category.groups.includes(:group_memberships => :user).map { |g|
         [g.name, g.users]
       }.map { |group_name, group_students|
-        representative, *others = (group_students & visible_students)
+        visible_group_students = group_students & visible_students
+        representative   = (visible_group_students & users_with_turnitin_data).first
+        representative ||= (visible_group_students & users_with_submissions).first
+        representative ||= visible_group_students.first
+        others = visible_group_students - [representative]
         next unless representative
 
         representative.readonly!
@@ -1500,77 +1522,6 @@ class Assignment < ActiveRecord::Base
     end
   end
   protected :readable_submission_type
-
-  CLONE_FOR_EXCLUDE_ATTRIBUTES = [:id, :assignment_group_id, :group_category, :peer_review_count, :peer_reviews_assigned, :needs_grading_count]
-
-  attr_accessor :clone_updated
-  def clone_for(context, dup=nil, options={}) #migrate=true)
-    options[:migrate] = true if options[:migrate] == nil
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save!
-    end
-    existing = context.assignments.active.find_by_id(self.id)
-    existing ||= context.assignments.active.find_by_cloned_item_id(self.cloned_item_id || 0)
-    return existing if existing && !options[:overwrite]
-    dup ||= Assignment.new
-    dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| CLONE_FOR_EXCLUDE_ATTRIBUTES.include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-
-    context.log_merge_result(t('warnings.group_assignment', "The Assignment \"%{assignment}\" was a group assignment, and you'll need to re-set the group settings for this new context", :assignment => self.title)) if self.has_group_category?
-    context.log_merge_result(t('warnings.peer_assignment', "The Assignment \"%{assignment}\" was a peer review assignment, and you'll need to re-set the peer review settings for this new context", :assignment => self.title)) if self.peer_review_count && self.peer_review_count > 0
-
-    dup.context = context
-    dup.description = context.migrate_content_links(self.description, self.context) if options[:migrate]
-    dup.saved_by = :quiz if options[:cloning_for_quiz]
-    dup.saved_by = :discussion_topic if options[:cloning_for_topic]
-    dup.save_without_broadcasting!
-    if self.rubric_association
-      old_association = self.rubric_association
-      new_association = RubricAssociation.new(
-        :rubric => old_association.rubric,
-        :association => dup,
-        :use_for_grading => old_association.use_for_grading,
-        :title => old_association.title,
-        :description => old_association.description,
-        :summary_data => old_association.summary_data,
-        :purpose => old_association.purpose,
-        :url => old_association.url,
-        :context => dup.context
-      )
-      new_association.save_without_broadcasting!
-    end
-    if self.submission_types == 'online_quiz' && self.quiz && !options[:cloning_for_quiz]
-      new_quiz = Quiz.find_by_assignment_id(dup.id)
-      new_quiz = self.quiz.clone_for(context, new_quiz, :cloning_for_assignment=>true)
-      new_quiz.assignment_id = dup.id
-      new_quiz.save! #_without_broadcasting!
-    elsif self.submission_types == 'discussion_topic' && self.discussion_topic && !options[:cloning_for_topic]
-      new_topic = DiscussionTopic.find_by_assignment_id(dup.id)
-      new_topic = self.discussion_topic.clone_for(context, new_topic, :cloning_for_assignment=>true)
-      new_topic.assignment_id = dup.id
-      dup.submission_types = 'discussion_topic'
-      new_topic.save!
-    elsif self.submission_types == 'external_tool' && self.external_tool_tag
-      tag = dup.build_external_tool_tag(:url => external_tool_tag.url, :new_tab => external_tool_tag.new_tab)
-      tag.content_type = 'ContextExternalTool'
-      tag.save
-    end
-    dup.assignment_group_id = context.merge_mapped_id(self.assignment_group) rescue nil
-    if dup.assignment_group_id.nil? && self.assignment_group
-      new_group = self.assignment_group.clone_for(context)
-      new_group.save_without_broadcasting!
-      dup.assignment_group = new_group
-      context.map_merge(self.assignment_group, new_group)
-    end
-    context.log_merge_result(t('messages.assignment_created', "Assignment \"%{assignment}\" created", :assignment => self.title))
-    context.may_have_links_to_migrate(dup)
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
-  end
 
   def self.process_migration(data, migration)
     assignments = data['assignments'] ? data['assignments']: []
@@ -1914,4 +1865,21 @@ class Assignment < ActiveRecord::Base
       raise "Assignment#available? is deprecated. Use #published?"
     end
   end
+
+  def has_student_submissions?
+    self.submissions.any? { |s| context.includes_student?(s.user) }
+  end
+
+  # override so validations are called
+  def publish
+    self.workflow_state = 'published'
+    self.save
+  end
+
+  # override so validations are called
+  def unpublish
+    self.workflow_state = 'unpublished'
+    self.save
+  end
+
 end

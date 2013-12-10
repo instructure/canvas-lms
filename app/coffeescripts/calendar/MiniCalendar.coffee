@@ -22,6 +22,7 @@ define [
         $.subscribe
           "Calendar/visibleContextListChanged" : @visibleContextListChanged
           "Calendar/refetchEvents" : @refetchEvents
+          "Calendar/currentDate" : @gotoDate
       )
 
     getEvents: (start, end, cb) =>
@@ -35,6 +36,9 @@ define [
 
     dayClick: (date) =>
       @mainCalendar.gotoDate(date)
+
+    gotoDate: (date) =>
+      @calendar.fullCalendar("gotoDate", date)
 
     eventRender: (event, element, view) =>
       cell = view.dateCell(event.start)

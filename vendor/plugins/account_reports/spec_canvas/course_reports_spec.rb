@@ -23,7 +23,7 @@ describe "Course Account Reports" do
 
     Notification.find_or_create_by_name("Report Generated")
     Notification.find_or_create_by_name("Report Generation Failed")
-    @account = Account.default
+    @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
     @admin = account_admin_user(:account => @account)
     @default_term = @account.enrollment_terms.active.find_or_create_by_name(
       EnrollmentTerm::DEFAULT_TERM_NAME
@@ -60,10 +60,12 @@ describe "Course Account Reports" do
     @course3.sis_source_id = "SIS_COURSE_ID_3"
     @course3.save!
 
-    @course4 = Course.create(:name => 'self help', :course_code => 'self')
+    @course4 = Course.create(:name => 'self help', :course_code => 'self',
+                             :account => @account)
     @course4.offer
 
-    @course5 = Course.create(:name => 'talking 101', :course_code => 'Tal101')
+    @course5 = Course.create(:name => 'talking 101', :course_code => 'Tal101',
+                             :account => @account)
     @course5.workflow_state = 'completed'
     @course5.save!
   end
@@ -76,7 +78,7 @@ describe "Course Account Reports" do
     it "should run unpublished courses report on a term" do
       parameters = {}
       parameters["enrollment_term_id"] = @default_term.id
-      parsed = ReportSpecHelper.run_report(@account, @report, parameters)
+      parsed = ReportSpecHelper.run_report(@account, @report, parameters, 1)
 
       parsed.should == [[@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
                          "Science 101", nil, nil]]
@@ -85,7 +87,7 @@ describe "Course Account Reports" do
     end
 
     it "should run unpublished courses report on sub account" do
-      parsed = ReportSpecHelper.run_report(@sub_account, @report)
+      parsed = ReportSpecHelper.run_report(@sub_account, @report, {}, 1)
 
       parsed.should == [[@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
                          "English 101", @course1.start_at.iso8601,
@@ -94,7 +96,7 @@ describe "Course Account Reports" do
     end
 
     it "should run unpublished courses report" do
-      parsed = ReportSpecHelper.run_report(@account, @report)
+      parsed = ReportSpecHelper.run_report(@account, @report, {}, 1)
       parsed.should == [[@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
                          "English 101", @course1.start_at.iso8601,
                          @course1.conclude_at.iso8601],
@@ -113,27 +115,26 @@ describe "Course Account Reports" do
       @course1.destroy
       parameters = {}
       parameters["enrollment_term_id"] = @default_term.id
-      parsed = ReportSpecHelper.run_report(@account, @report, parameters)
-
-      parsed.length.should == 1
+      parsed = ReportSpecHelper.run_report(@account, @report, parameters, 1)
 
       parsed[0].should == [@course2.id.to_s, "SIS_COURSE_ID_2", "MAT101",
                            "Math 101", nil, nil]
+      parsed.length.should == 1
     end
 
     it "should run recently deleted courses report on sub account" do
       @course1.destroy
-      parsed = ReportSpecHelper.run_report(@sub_account, @report)
-      parsed.length.should == 1
+      parsed = ReportSpecHelper.run_report(@sub_account, @report, {}, 1)
 
       parsed[0].should == [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
                            "English 101", @course1.start_at.iso8601,
                            @course1.conclude_at.iso8601]
+      parsed.length.should == 1
     end
 
     it "should run recently deleted courses report" do
       @course1.destroy
-      parsed = ReportSpecHelper.run_report(@account, @report)
+      parsed = ReportSpecHelper.run_report(@account, @report, {}, 1)
       parsed.length.should == 2
 
       parsed[0].should == [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",

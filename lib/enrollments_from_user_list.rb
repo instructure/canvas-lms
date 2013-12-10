@@ -45,9 +45,7 @@ class EnrollmentsFromUserList
         list.users.each { |user| enroll_user(user) }
       end
       if !@enrollments.empty?
-        @course.assignments.select(:id).except(:order).find_each do |assignment|
-          DueDateCacher.recompute(assignment)
-        end
+        DueDateCacher.recompute_course(@course)
       end
     end
     @enrollments

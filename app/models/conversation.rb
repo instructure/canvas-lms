@@ -82,7 +82,7 @@ class Conversation < ActiveRecord::Base
       if private
         conversation = users.first.all_conversations.find_by_private_hash(private_hash).try(:conversation)
         # for compatibility during migration, before ConversationParticipant has finished populating
-        if Setting.get_cached('populate_conversation_participants_private_hash_complete', '0') == '0'
+        if Setting.get('populate_conversation_participants_private_hash_complete', '0') == '0'
           conversation ||= Conversation.find_by_private_hash(private_hash)
         end
       end
@@ -310,7 +310,7 @@ class Conversation < ActiveRecord::Base
 
       # so we can take advantage of other preloaded associations
       ConversationMessage.send :add_preloaded_record_to_collection, [message], :conversation, self
-      message.save!
+      message.save_without_broadcasting!
 
       add_message_to_participants(message, options.merge(
           :tags => new_tags,
@@ -322,6 +322,8 @@ class Conversation < ActiveRecord::Base
       if options[:update_participants]
         update_participants(message, options)
       end
+      # now that the message participants are all saved, we can properly broadcast to recipients
+      message.after_participants_created_broadcast
       message
     end
   end
@@ -444,6 +446,14 @@ class Conversation < ActiveRecord::Base
   def context_name
     name = context.try(:name)
     name ||= Context.find_by_asset_string(context_tags.first).try(:name) if context_tags.first
+  end
+
+  def context_code
+    if context_type && context_id
+      "#{context_type.underscore}_#{context_id}"
+    else
+      nil
+    end
   end
 
   def context_tags

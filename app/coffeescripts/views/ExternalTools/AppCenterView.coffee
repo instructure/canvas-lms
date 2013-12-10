@@ -15,6 +15,8 @@ define [
     renderItem: (model) =>
       filter = new RegExp(@filterText, "i")
       isInstalled = model.get('is_installed') || false
+      name = model.get('name') || ''
+      categories = model.get('categories') || []
 
       show = true
       if @targetInstalledState == 'not_installed' && isInstalled
@@ -22,5 +24,5 @@ define [
       else if @targetInstalledState == 'installed' && !isInstalled
         show = false
 
-      if show && (model.get('name').match(filter) || model.get('categories').join().match(filter))
+      if show && (name.match(filter) || categories.join().match(filter))
         super

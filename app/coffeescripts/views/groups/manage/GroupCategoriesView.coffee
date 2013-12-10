@@ -18,9 +18,10 @@ define [
     className: 'group_categories_area'
 
     els: _.extend {},
-      CollectionView::els,
+      CollectionView::els
       '#group_categories_tabs': '$tabs'
       '#add-group-set': '$addGroupSetButton'
+      '.empty-groupset-instructions': '$emptyInstructions'
 
     events:
       'click #add-group-set': 'addGroupSet'
@@ -30,15 +31,20 @@ define [
       tagName: 'li'
       template: tabTemplate
 
-    setupTabs: ->
-      if !@$tabs.data("tabs")
-        @$tabs.tabs({cookie: {}}).show()
-
     refreshTabs: ->
+      # setup the tabs
       if @$tabs.data("tabs")
         @$tabs.tabs("refresh").show()
       else
-        @setupTabs()
+        @$tabs.tabs({cookie: {}}).show()
+
+      # hide/show the instruction text
+      if @collection.length > 0
+        @$emptyInstructions.hide()
+      else
+        @$emptyInstructions.show()
+        # hide the emtpy tab set which may have borders that would otherwise show
+        @$tabs.hide()
 
     createItemView: (model) ->
       # create and add tab panel
@@ -70,7 +76,7 @@ define [
 
     addGroupSet: (e) ->
       e.preventDefault()
-      @createView ?= new GroupCategoryCreateView({@collection})
+      @createView ?= new GroupCategoryCreateView({@collection, focusReturnsTo: => @$el.find('#add-group-set')})
       cat = new GroupCategory
       cat.once 'sync', =>
         @collection.add(cat)

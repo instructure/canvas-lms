@@ -429,43 +429,35 @@ class QuizSubmission < ActiveRecord::Base
 
   protected :update_assignment_submission
 
-  # Returned in order oldest to newest
-  def submitted_versions
-    found_attempts = {}
-    res = []
-
-    found_attempts[self.attempt] = true if self.completed?
-    self.versions.sort_by(&:created_at).each do |version|
-      model = version.model
-      if !found_attempts[model.attempt]
-        model.readonly!
-        if model.completed?
-          res << model
-          found_attempts[model.attempt] = true
-        end
-      end
-    end
-    res << self if self.completed?
-    res
+  def submitted_attempts
+    attempts.version_models
   end
 
-  def latest_submitted_version
+  def latest_submitted_attempt
     if completed?
       self
     else
-      submitted_versions.last
+      submitted_attempts.last
     end
   end
 
-  def attempt_versions
-    versions = self.versions.order("number desc").each_with_object({}) do |ver, hash|
-      hash[ver.model.attempt] ||= ver
-    end
-    versions.sort.map {|attempt, version| version }
+  def attempts
+    QuizSubmissionHistory.new(self)
   end
 
-  def submitted_attempts
-    attempt_versions.map {|ver| ver.model }
+  def questions_regraded_since_last_attempt
+    return unless last_attempt = attempts.last
+
+    version = attempts.last.versions.first
+    quiz.questions_regraded_since(version.created_at)
+  end
+
+  def has_regrade?
+    score_before_regrade.present?
+  end
+
+  def score_affected_by_regrade?
+    score_before_regrade != kept_score
   end
 
   def attempts_left
@@ -680,7 +672,7 @@ class QuizSubmission < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     # evizitei: These broadcast policies use templates designed for
-    # submissions, not quiz submissions.  The necessary delegations 
+    # submissions, not quiz submissions.  The necessary delegations
     # are at the bottom of this class.
     p.dispatch :submission_graded
     p.to { user }
@@ -719,6 +711,47 @@ class QuizSubmission < ActiveRecord::Base
   # TODO: this could probably be put in as a convenience method in simply_versioned
   def save_with_versioning!
     self.with_versioning(true) { self.save! }
+  end
+
+  # Schedules the submission for grading when it becomes overdue.
+  #
+  # Only applicable if the submission is set to become overdue, per the `end_at`
+  # field.
+  #
+  # @throw ArgumentError If the submission does not have an end_at timestamp set.
+  def grade_when_overdue
+    # disable grading in background until we figure out potential race condition issues
+    return
+
+    unless self.end_at.present?
+      raise ArgumentError,
+        'QuizSubmission is not applicable for overdue enforced grading!'
+    end
+
+    self.send_later_enqueue_args(:grade_if_untaken, {
+      # 6 seconds because DJ polls at 5 second intervals, and we need at least
+      # 1 second for the submission to become overdue
+      :run_at => self.end_at + 6.seconds,
+      :priority => Delayed::LOW_PRIORITY,
+      :max_attempts => 1
+    })
+  end
+
+  # don't use this directly, see #grade_when_overdue
+  def grade_if_untaken
+    # disable grading in background until we figure out potential race condition issues
+    return
+
+    # We can skip the needs_grading? test because we know that the submission
+    # is overdue since the job will be processed after submission.end_at ...
+    # so we simply test its workflow state.
+    #
+    # Also, we can't use QuizSubmission#overdue? because as of 10/2013 it adds
+    # a graceful period of 1 minute after the true end date of the submission,
+    # which doesn't work for us here.
+    if self.untaken?
+      self.grade_submission(:finished_at => self.end_at)
+    end
   end
 
   # evizitei: these 3 delegations allow quiz submissions to be used in

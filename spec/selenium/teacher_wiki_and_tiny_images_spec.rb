@@ -39,24 +39,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       keep_trying_until { @image_list.find_elements(:css, '.img').length }.should == 2
     end
 
-
-    it "should properly clone images, including thumbnails, and display" do
-      wiki_page_tools_file_tree_setup
-      old_course = @course
-      new_course = old_course.clone_for(old_course.account)
-      new_course.merge_into_course(old_course, :everything => true)
-      new_course.enroll_teacher(@user)
-
-      get "/courses/#{new_course.id}/wiki"
-      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
-      keep_trying_until do
-        images = ffj('#editor_tabs_4 .image_list .img')
-        images.length.should == 2
-        images.each { |i| i.should have_attribute('complete', 'true') } # - commented out because it is breaking with
-                                                                     #webdriver 2.22 and firefox 12
-      end
-    end
-
     it "should infini-scroll images" do
       wiki_page_tools_file_tree_setup
       90.times do |i|
@@ -148,7 +130,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       f('.edit_link').click
       add_url_image(driver, 'http://example.com/image.png', 'alt text')
       submit_form("#edit_wiki_page_#{@blank_page.id}")
-      keep_trying_until { f('#wiki_body').displayed? }
+      keep_trying_until { f('#wiki_body').should be_displayed }
       check_element_attrs(f('#wiki_body img'), :src => 'http://example.com/image.png', :alt => 'alt text')
     end
     
@@ -166,14 +148,14 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       it "should add a course image" do
         add_canvas_image(driver, 'Course files', 'course.jpg')
         submit_form("#edit_wiki_page_#{@blank_page.id}")
-        keep_trying_until { f('#wiki_body').displayed? }
+        keep_trying_until { f('#wiki_body').should be_displayed }
         check_element_attrs(f('#wiki_body img'), :src => /\/files\/#{@course_attachment.id}/, :alt => 'course.jpg')
       end
       
       it "should add a user image" do
         add_canvas_image(driver, 'My files', 'teacher.jpg')
         submit_form("#edit_wiki_page_#{@blank_page.id}")
-        keep_trying_until { f('#wiki_body').displayed? }
+        keep_trying_until { f('#wiki_body').should be_displayed }
         check_element_attrs(f('#wiki_body img'), :src => /\/files\/#{@teacher_attachment.id}/, :alt => 'teacher.jpg')
       end
     end
@@ -185,7 +167,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       get "/courses/#{@course.id}/quizzes"
       wait_for_ajaximations
       f(".new-quiz-link").click
-      keep_trying_until { f(".mce_instructure_image").displayed? }
+      keep_trying_until { f(".mce_instructure_image").should be_displayed }
       add_canvas_image(driver, 'Course files', 'course2.jpg')
 
       click_questions_tab

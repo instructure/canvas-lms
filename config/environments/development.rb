@@ -10,12 +10,11 @@ environment_configuration(defined?(config) && config) do |config|
   config.whiny_nils = true
 
   # Show full error reports and disable caching
-  if Rails.version < "3.0"
+  if CANVAS_RAILS2
     config.action_controller.consider_all_requests_local = true
   else
     config.consider_all_requests_local = true
   end
-  config.action_view.debug_rjs             = true
   config.action_controller.perform_caching = false
 
   # run rake js:build to build the optimized JS if set to true
@@ -44,7 +43,7 @@ environment_configuration(defined?(config) && config) do |config|
     require "debugger"
   end
 
-  if Rails.version < "3.0"
+  if CANVAS_RAILS2
     config.to_prepare do
       # Raise an exception on bad mass assignment. Helps us catch these bugs before
       # they hit.

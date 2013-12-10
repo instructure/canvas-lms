@@ -36,33 +36,8 @@ describe "Favorites API", :type => :integration do
       json[0]['course_code'].should eql @courses[0].course_code
       json[0]['enrollments'][0]['type'].should eql 'student'
       json.collect {|row| row["id"]}.sort.should eql(@user.menu_courses.collect{|c| c[:id]}.sort)
-    end
 
-    it "should add a course to favorites" do
       @user.favorites.size.should be_zero
-
-      # add a new course, and fave it
-      course6 = course_with_student(:course_name => "Course 6", :user => @user, :active_all => true).course
-      json = api_call(:post, "/api/v1/users/self/favorites/courses/#{course6.id}",
-                      {:controller=>"favorites", :action=>"add_favorite_course", :format=>"json", :id=>"#{course6.id}"})
-      json["context_id"].should eql(course6.id)
-
-      # now favorites should include the implicit courses from before, plus the one we added
-      @user.reload
-      @user.favorites.size.should eql(7)
-    end
-
-    it "should remove a course from favorites" do
-      @user.favorites.size.should be_zero
-
-      # remove a course from favorites
-      json = api_call(:delete, "/api/v1/users/self/favorites/courses/#{@courses[0].id}",
-                      {:controller=>"favorites", :action=>"remove_favorite_course", :format=>"json", :id=>"#{@courses[0].id}"})
-      json["context_id"].should eql(@courses[0].id)
-
-      # now favorites should include the implicit courses from before, minus the one we removed
-      @user.reload
-      @user.favorites.size.should eql(5)
     end
   end
 
@@ -85,7 +60,7 @@ describe "Favorites API", :type => :integration do
     end
 
     it "should add a course to favorites" do
-      @user.favorites.size.should eql(3)
+      @user.favorites.by("Course").destroy_all
 
       # add some new courses, and fave one
       course6 = course_with_student(:course_name => "Course 6", :user => @user, :active_all => true).course
@@ -96,7 +71,20 @@ describe "Favorites API", :type => :integration do
 
       # now favorites should include the implicit courses from before, plus the one we faved
       @user.reload
-      @user.favorites.size.should eql(4)
+      @user.favorites.size.should eql(1)
+    end
+
+    it "should create favorites from implicit favorites when removing a course" do
+      @user.favorites.by("Course").destroy_all
+
+      # remove a course from favorites
+      json = api_call(:delete, "/api/v1/users/self/favorites/courses/#{@courses[0].id}",
+                      {:controller=>"favorites", :action=>"remove_favorite_course", :format=>"json", :id=>"#{@courses[0].id}"})
+      json["context_id"].should eql(@courses[0].id)
+
+      # now favorites should include the implicit courses from before, minus the one we removed
+      @user.reload
+      @user.favorites.size.should eql(5)
     end
 
     it "should remove a course from favorites" do

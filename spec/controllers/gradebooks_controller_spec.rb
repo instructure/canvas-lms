@@ -178,31 +178,6 @@ describe GradebooksController do
       assigns[:courses_with_grades].should be_nil
     end
 
-    it "should assign submissions_by_assignment" do
-      course_with_teacher_logged_in(:active_all => true)
-      student_in_course(:active_all => true)
-      assignment1 = @course.assignments.create(:title => "Assignment 1")
-      submission1 = assignment1.submit_homework(@student)
-      assignment2 = @course.assignments.create(:title => "Assignment 2")
-      submission2 = assignment2.submit_homework(@student)
-
-      get 'grade_summary', :course_id => @course.id, :id => @student.id
-      assigns[:presenter].submissions_by_assignment.values.map(&:count).should == [1,1]
-    end
-
-    it "should assign an empty submissions_by_assignment for MOOCs" do
-      course_with_teacher_logged_in(:active_all => true)
-      @course.settings = { :large_roster => true }
-      student_in_course(:active_all => true)
-      assignment1 = @course.assignments.create(:title => "Assignment 1")
-      submission1 = assignment1.submit_homework(@student)
-      assignment2 = @course.assignments.create(:title => "Assignment 2")
-      submission2 = assignment2.submit_homework(@student)
-
-      get 'grade_summary', :course_id => @course.id, :id => @student.id
-      assigns[:presenter].submissions_by_assignment.should == {}
-    end
-    
     it "should assign values for grade calculator to ENV" do
       course_with_teacher_logged_in(:active_all => true)
       student_in_course(:active_all => true)
@@ -219,7 +194,24 @@ describe GradebooksController do
       assignment1.save!
 
       get 'grade_summary', :course_id => @course.id, :id => @student.id
-      assigns[:js_env][:assignment_groups].first["assignments"].first["discussion_topic"].should be_nil
+      assigns[:js_env][:assignment_groups].first[:assignments].first["discussion_topic"].should be_nil
+    end
+
+    it "doesn't leak muted scores" do
+      course_with_student_logged_in
+      a1, a2 = 2.times.map { |i|
+        @course.assignments.create! name: "blah#{i}", points_possible: 10
+      }
+      a1.mute!
+      a1.grade_student(@student, grade: 10)
+      a2.grade_student(@student, grade: 5)
+      get 'grade_summary', course_id: @course.id, id: @student.id
+      assigns[:js_env][:submissions].sort_by { |s|
+        s[:assignment_id]
+      }.should == [
+        {score: nil, assignment_id: a1.id},
+        {score: 5, assignment_id: a2.id}
+      ]
     end
 
     it "should sort assignments by due date (null last), then title" do
@@ -284,7 +276,7 @@ describe GradebooksController do
         session[:become_user_id] = @fake_student.id
 
         get 'grade_summary', :course_id => @course.id, :id => @fake_student.id
-        assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at.should == @due_at
+        assigns[:presenter].assignments.find{|a| a.class == Assignment}.due_at.to_i.should == @due_at.to_i
       end
 
       it "should reflect group overrides when student is a member" do
@@ -443,8 +435,7 @@ describe GradebooksController do
       course_with_teacher_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment")
       @student = @course.enroll_user(User.create!(:name => "some user"))
-      require 'action_controller'
-      require 'action_controller/test_process.rb'
+      require 'action_controller_test_process'
       data = ActionController::TestUploadedFile.new(File.join(File.dirname(__FILE__), "/../fixtures/scribd_docs/doc.doc"), "application/msword", true)
       post 'update_submission', :course_id => @course.id, :attachments => {"0" => {:uploaded_data => data}}, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => @student.user_id}
       response.should be_redirect
@@ -543,6 +534,30 @@ describe GradebooksController do
       post 'speed_grader_settings', course_id: @course.id,
         enable_speedgrader_grade_by_question: "0"
       @teacher.reload.preferences[:enable_speedgrader_grade_by_question].should_not be_true
+    end
+  end
+
+  describe '#light_weight_ags_json' do
+    it 'should return the necessary JSON for GradeCalculator' do
+      course_with_student
+      ag = @course.assignment_groups.create! group_weight: 100
+      a  = ag.assignments.create! :submission_types => 'online_upload',
+                                  :points_possible  => 10,
+                                  :context  => @course
+      @controller.light_weight_ags_json([ag]).should == [
+        {
+          id: ag.id,
+          rules: {},
+          group_weight: 100,
+          assignments: [
+            {
+              id: a.id,
+              points_possible: 10,
+              submission_types: ['online_upload'],
+            }
+          ],
+        },
+      ]
     end
   end
 end

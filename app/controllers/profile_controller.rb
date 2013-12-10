@@ -149,7 +149,7 @@ class ProfileController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/users/1/avatars.json' \ 
+  #   curl 'https://<canvas>/api/v1/users/1/avatars.json' \
   #        -H "Authorization: Bearer <token>"
   #
   # @example_response
@@ -187,6 +187,10 @@ class ProfileController < ApplicationController
   
   def update
     @user = @current_user
+
+    if params[:user] && params[:user][:enabled_theme]
+      @user.enabled_theme = params[:user].delete(:enabled_theme)
+    end
 
     if params[:privacy_notice].present?
       @user.preferences[:read_notification_privacy_info] = Time.now.utc.to_s

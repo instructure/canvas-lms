@@ -20,9 +20,8 @@ define [
       '.admin-signup-controls': '$adminSignupControls'
       '#split_groups': '$splitGroups'
 
-    events:
-      _.extend {},
-      GroupCategoryEditView::events,
+    events: _.extend {},
+      GroupCategoryEditView::events
       'click [name=split_group_count]': 'clickSplitGroupCount'
 
     toggleSelfSignup: ->

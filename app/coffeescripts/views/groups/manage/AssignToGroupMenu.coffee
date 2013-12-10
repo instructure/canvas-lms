@@ -1,9 +1,10 @@
 define [
   'compiled/views/groups/manage/PopoverMenuView'
+  'compiled/models/GroupUser'
   'jst/groups/manage/assignToGroupMenu'
   'underscore'
   'compiled/jquery/outerclick'
-], (PopoverMenuView, template, _) ->
+], (PopoverMenuView, GroupUser, template, _) ->
 
   class AssignToGroupMenu extends PopoverMenuView
 
@@ -13,7 +14,6 @@ define [
 
     attach: ->
       @collection.on 'change add remove reset', @render
-      @render()
 
     tagName: 'div'
 
@@ -24,8 +24,17 @@ define [
     setGroup: (e) ->
       e.preventDefault()
       e.stopPropagation()
-      @model.save 'groupId', $(e.currentTarget).data('group-id')
+      newGroupId = $(e.currentTarget).data('group-id')
+      @model.moveTo newGroupId
       @hide()
 
     toJSON: ->
-      groups: @collection.toJSON()
+      hasGroups = @collection.length > 0
+      {
+        groups: @collection.toJSON()
+        noGroups: !hasGroups
+        allFull: =>
+          hasGroups && @collection.models.filter (g)->
+            !g.isFull()
+          .length == 0
+      }

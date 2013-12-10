@@ -3,12 +3,13 @@ module Canvas::Oauth
     OAUTH2_OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
 
 
-    attr_reader :client_id, :redirect_uri, :scopes
+    attr_reader :client_id, :redirect_uri, :scopes, :purpose
 
-    def initialize(client_id, redirect_uri = "", scopes = [])
+    def initialize(client_id, redirect_uri = "", scopes = [], purpose = nil)
       @client_id = client_id
       @redirect_uri = redirect_uri
       @scopes = scopes
+      @purpose = purpose
     end
 
     def has_valid_key?
@@ -47,7 +48,7 @@ module Canvas::Oauth
       token = nil
 
       if !self.class.is_oob?(redirect_uri)
-        token = Token.find_userinfo_access_token(user, key, scopes)
+        token = Token.find_userinfo_access_token(user, key, scopes, purpose)
         return !token.nil? && token.remember_access?
       end
 
@@ -67,7 +68,7 @@ module Canvas::Oauth
     end
 
     def session_hash
-      { :client_id => key.id, :redirect_uri => redirect_uri, :scopes => scopes }
+      { :client_id => key.id, :redirect_uri => redirect_uri, :scopes => scopes, :purpose => purpose }
     end
 
     def self.is_oob?(uri)

@@ -396,7 +396,7 @@ describe "Groups API", :type => :integration do
       })
       @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
       @membership.workflow_state.should == "requested"
-      json.should == membership_json(@membership)
+      json.should == membership_json(@membership).merge("just_created" => true)
     end
 
     it "should allow someone to join a group" do
@@ -408,7 +408,7 @@ describe "Groups API", :type => :integration do
       })
       @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
       @membership.workflow_state.should == "accepted"
-      json.should == membership_json(@membership)
+      json.should == membership_json(@membership).merge("just_created" => true)
     end
 
     it "should not allow a moderator to add someone directly to the group" do
@@ -641,7 +641,7 @@ describe "Groups API", :type => :integration do
 
       @membership = GroupMembership.where(:user_id => @to_add, :group_id => @group).first
       @membership.workflow_state.should == "accepted"
-      json.should == membership_json(@membership)
+      json.should == membership_json(@membership).merge("just_created" => true)
     end
   end
 

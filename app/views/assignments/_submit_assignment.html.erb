@@ -32,7 +32,7 @@
       <li style='display: none;'><a href="#submit_from_external_tool_form" class="submit_from_external_tool_option"><%= t 'links.submit.external_tool', "More" %></a></li>
     </ul>
     <% if @assignment.submission_types && @assignment.submission_types.match(/online_upload/) %>
-    <% form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_upload_form", :class => "submit_assignment_form", :multipart => true }) do %>
+    <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_upload_form", :class => "submit_assignment_form", :multipart => true }) do %>
     <%= hidden_field :submission, :submission_type, :value => "online_upload" %>
     <%= hidden_field :submission, :attachment_ids, :value => "", :id => "submission_attachment_ids" %>
     <table class="formtable" style="width: 100%;">
@@ -94,7 +94,7 @@
     <% end %>
 
     <% if @assignment.submission_types && @assignment.submission_types.match(/online_text_entry/) %>
-    <% form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_text_entry_form", :class => "submit_assignment_form"}) do %>
+    <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_text_entry_form", :class => "submit_assignment_form"}) do %>
     <%= hidden_field :submission, :submission_type, :value => "online_text_entry" %>
     <table class="formtable" style="width: 100%;">
       <tr>
@@ -129,7 +129,7 @@
     <% end %>
     
     <% if @assignment.submission_types && @assignment.submission_types.match(/online_url/) %>    
-    <% form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_url_form", :class => "submit_assignment_form"}) do %>
+    <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_url_form", :class => "submit_assignment_form"}) do %>
     <%= hidden_field :submission, :submission_type, :value => "online_url" %>
     <table class="formtable" style="width: 100%;">
       <tr>
@@ -192,7 +192,7 @@
     </style>
     <% if show_google_docs %>
       <% if @google_docs_token %>
-        <% form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_google_doc_form", :class => "submit_assignment_form"}) do %>
+        <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_google_doc_form", :class => "submit_assignment_form"}) do %>
           <%= hidden_field :submission, :submission_type, :value => "google_doc" %>
           <%= hidden_field :google_doc, :document_id, :value => "", :class => "google_doc_id" %>
           <table class="formtable" style="width: 100%;">
@@ -250,7 +250,7 @@
           <p><%= t 'messages.media_recordings_disabled', "Media recordings are not enabled for this Canvas site, and you will not be able to submit these types of assignments.  Please contact your instructor about changing the settings for this assignment, or your system administrator about enabling media recordings." %></p>
         </div>
       <% else %>
-        <% form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_media_recording_form", :class => "submit_assignment_form", :multipart => true }) do %>
+        <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_media_recording_form", :class => "submit_assignment_form", :multipart => true }) do %>
         <%= hidden_field :submission, :submission_type, :value => "media_recording" %>
         <%= hidden_field :submission, :media_comment_id, :value => "", :class => "media_comment_id" %>
         <%= hidden_field :submission, :media_comment_type, :value => "video" %>
@@ -299,7 +299,7 @@
       <% end %>
     <% end %>
     
-    <% form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_from_external_tool_form", :class => "submit_assignment_form" }) do %>
+    <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_from_external_tool_form", :class => "submit_assignment_form" }) do %>
     <%= hidden_field :submission, :submission_type, :value => "online_url", :id => 'external_tool_submission_type' %>
     <%= hidden_field :submission, :filename, :id => 'external_tool_filename' %>
     <%= hidden_field :submission, :attachment_ids, :id => 'external_tool_file_id' %>

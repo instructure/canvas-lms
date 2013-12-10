@@ -4,7 +4,7 @@
   data-item-id="{{labelId}}"
 >
   <a href="{{htmlUrl}}" class="ig-title ellipses">
-    {{#if ENV.PERMISSIONS.manage}}
+    {{#if canManage}}
       <span class="draggable-handle">
         <i class="icon-drag-handle"></i>
       </span>
@@ -14,7 +14,7 @@
   </a>
   <div class="ig-details row-fluid">
     {{#if canManage}}
-      <div class="span3 ellipses modules">
+      <div class="{{spanWidth}} ellipses modules">
         {{#if has_modules}}
           {{#ifEqual module_count 1}}
             {{module_name}} {{#t "module"}}Module{{/t}}
@@ -35,12 +35,22 @@
       </div>
     {{/if}}
 
-    <div class="span3 ellipses" data-view="date-available"></div>
-    <div class="span3 ellipses" data-view="date-due"></div>
+    <div class="{{spanWidth}} ellipses" data-view="date-available"></div>
+    <div class="{{spanWidth}} ellipses" data-view="date-due"></div>
 
-    <div class="span3 ellipses">
-      {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}
+    <div class="{{spanWidth}} ellipses js-score {{alignTextClass}}">
+      <span class="screenreader-only">
+        {{#if pointsPossible}}
+          {{#t "points_possible_screen_reader"}}{{pointsPossible}} Points Possible{{/t}}
+        {{else}}
+          {{#t "no_points_possible"}}No Points Possible{{/t}}
+        {{/if}}
+      </span>
+      <span class="non-screenreader" aria-hidden="true">
+        {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}
+      </span>
     </div>
+
   </div>
 
   {{#if canManage}}
@@ -49,13 +59,14 @@
 
       <a
         class="al-trigger al-trigger-gray"
+        id="assign_{{id}}_manage_link"
         role="button"
         aria-haspopup="true"
         aria-owns="assignment_{{id}}_settings_list"
         tabindex="-1"
       >
-        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
         <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
+        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
       </a>
 
       <ul
@@ -74,7 +85,7 @@
             id="assignment_{{id}}_settings_edit_item"
             tabindex="-1"
             role="menuitem"
-            title='{{#t "edit_assignment_title"}}Edit Assignment{{/t}}'
+            aria-label="{{#t 'assignment_edit'}}Edit Assignment{{/t}}"
             data-focus-returns-to="assign_{{id}}_manage_link"
           >{{#t "edit"}}Edit{{/t}}</a>
         </li>
@@ -86,7 +97,7 @@
             id="assignment_{{id}}_settings_delete_item"
             tabindex="-1"
             role="menuitem"
-            title="{{#t "delete_asssignment_title"}}Delete this assignment{{/t}}"
+            aria-label="{{#t 'assignment_delete'}}Delete Assignment{{/t}}"
           >{{#t "delete"}}Delete{{/t}}</a>
         </li>
         {{/unless}}
@@ -96,7 +107,7 @@
             href="#"
             class="move_assignment icon-updown"
             id="assignment_{{id}}_settings_move_item"
-            title='{{#t "move_assignment_title"}}Move Assignment{{/t}}'
+            aria-label='{{#t 'assignment_move'}}Move Assignment{{/t}}'
             data-focus-returns-to="assign_{{id}}_manage_link"
           >{{#t "move"}}Move To&hellip;{{/t}}</a>
         </li>

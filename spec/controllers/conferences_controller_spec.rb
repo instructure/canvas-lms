@@ -21,8 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe ConferencesController do
   before do
     # these specs need an enabled web conference plugin
-    @plugin = PluginSetting.find_or_create_by_name('dim_dim')
-    @plugin.update_attribute(:settings, { :domain => 'dimdim.test' })
+    @plugin = PluginSetting.find_or_create_by_name('wimba')
+    @plugin.update_attribute(:settings, { :domain => 'wimba.test' })
   end
 
   describe "GET 'index'" do
@@ -77,13 +77,13 @@ describe ConferencesController do
   describe "POST 'create'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
-      post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'DimDim'}
+      post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'Wimba'}
       assert_unauthorized
     end
     
     it "should create a conference" do
       course_with_teacher_logged_in(:active_all => true)
-      post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'DimDim'}, :format => 'json'
+      post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'Wimba'}, :format => 'json'
       response.should be_success
     end
   end
@@ -91,13 +91,13 @@ describe ConferencesController do
   describe "POST 'update'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
-      post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'DimDim'}
+      post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'Wimba'}
       assert_unauthorized
     end
     
     it "should update a conference" do
       course_with_teacher_logged_in(:active_all => true)
-      @conference = @course.web_conferences.create!(:conference_type => 'DimDim', :user => @teacher)
+      @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :user => @teacher)
       post 'update', :course_id => @course.id, :id => @conference, :web_conference => {:title => "Something else"}, :format => 'json'
       response.should be_success
     end
@@ -106,50 +106,56 @@ describe ConferencesController do
   describe "POST 'join'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
-      @conference = @course.web_conferences.create!(:conference_type => 'DimDim', :duration => 60, :user => @teacher)
+      @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :duration => 60, :user => @teacher)
       post 'join', :course_id => @course.id, :conference_id => @conference.id
       assert_unauthorized
     end
 
     it "should let admins join a conference" do
+      WimbaConference.any_instance.stubs(:send_request).returns('')
+      WimbaConference.any_instance.stubs(:get_auth_token).returns('abc123')
       course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym(:active_all => true))
-      @conference = @course.web_conferences.create!(:conference_type => 'DimDim', :duration => 60, :user => @teacher)
+      @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :duration => 60, :user => @teacher)
       post 'join', :course_id => @course.id, :conference_id => @conference.id
       response.should be_redirect
-      response['Location'].should =~ /dimdim\.test/
+      response['Location'].should =~ /wimba\.test/
     end
 
     it "should let students join an inactive long running conference" do
+      WimbaConference.any_instance.stubs(:send_request).returns('')
+      WimbaConference.any_instance.stubs(:get_auth_token).returns('abc123')
       course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym(:active_all => true))
-      @conference = @course.web_conferences.create!(:conference_type => 'DimDim', :user => @teacher)
+      @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :user => @teacher)
       @conference.update_attribute :start_at, 1.month.ago
       @conference.users << @user
-      DimDimConference.any_instance.stubs(:conference_status).returns(:closed)
+      WimbaConference.any_instance.stubs(:conference_status).returns(:closed)
       post 'join', :course_id => @course.id, :conference_id => @conference.id
       response.should be_redirect
-      response['Location'].should =~ /dimdim\.test/
+      response['Location'].should =~ /wimba\.test/
     end
 
     describe 'when student is part of the conference' do
 
       before do
         course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym(:active_all => true))
-        @conference = @course.web_conferences.create!(:conference_type => 'DimDim', :duration => 60, :user => @teacher)
+        @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :duration => 60, :user => @teacher)
         @conference.users << @user
       end
 
       it "should not let students join an inactive conference" do
-        DimDimConference.any_instance.expects(:active?).returns(false)
+        WimbaConference.any_instance.expects(:active?).returns(false)
         post 'join', :course_id => @course.id, :conference_id => @conference.id
         response.should be_redirect
-        response['Location'].should_not =~ /dimdim\.test/
+        response['Location'].should_not =~ /wimba\.test/
         flash[:notice].should match(/That conference is not currently active/)
       end
 
       describe 'when the conference is active' do
         before do
           Setting.set('enable_page_views', 'db')
-          DimDimConference.any_instance.expects(:active?).returns(true)
+          WimbaConference.any_instance.stubs(:send_request).returns('')
+          WimbaConference.any_instance.stubs(:get_auth_token).returns('abc123')
+          WimbaConference.any_instance.expects(:active?).returns(true)
           post 'join', :course_id => @course.id, :conference_id => @conference.id
         end
 
@@ -157,7 +163,7 @@ describe ConferencesController do
 
         it "should let students join an active conference" do
           response.should be_redirect
-          response['Location'].should =~ /dimdim\.test/
+          response['Location'].should =~ /wimba\.test/
         end
 
         it 'logs an asset access record for the discussion topic' do

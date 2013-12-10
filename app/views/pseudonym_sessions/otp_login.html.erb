@@ -31,12 +31,12 @@ secret key **%{secret_key}**.
           <% ccs = @current_user.communication_channels.sms.unretired.map { |cc| [ cc.path, cc.id ] } %>
           <% unless ccs.empty? %>
             <% ccs << [ "<< #{t('select.new_number', "a new phone")} >>", '{{id}}' ] %>
-            <% form_for :otp_login, :url => otp_login_path, :html => {:id => 'select_phone_form'} do |f| %>
+            <%= form_for :otp_login, :url => otp_login_path, :html => {:id => 'select_phone_form'} do |f| %>
               <%= t('details.send_to_sms', "Send text messages to %{phone_number}", :phone_number => f.select('otp_communication_channel_id', ccs, :selected => @cc.try(:id))) %>
               <button type="submit" class="btn btn-primary"><%= t('buttons.send', "Send") %></button>
             <% end %>
           <% end %>
-          <% form_for :otp_login, :url => otp_login_path, :html => { :id => 'new_phone_form', :style => (hidden(false) unless ccs.empty?), :class => 'bootstrap-form form-horizontal' } do |f| %>
+          <%= form_for :otp_login, :url => otp_login_path, :html => { :id => 'new_phone_form', :style => (hidden(false) unless ccs.empty?), :class => 'bootstrap-form form-horizontal' } do |f| %>
             <div class="control-group">
               <%= f.blabel :phone_number, :en => 'Phone Number', :class => 'control-label' %>
               <div class="controls"><%= f.text_field :phone_number, :class => 'input-medium' %></div>
@@ -71,7 +71,7 @@ secret key **%{secret_key}**.
   <% else %>
     <div><p><%= t('details.otp_on_device', "Please enter the verification code shown by your token.") %></p></div>
   <% end %>
-  <% form_for :otp_login, :url => otp_login_path, :html => {:id => "login_form", :class => "inline-form"} do |f| %>
+  <%= form_for :otp_login, :url => otp_login_path, :html => {:id => "login_form", :class => "inline-form"} do |f| %>
     <div>
       <%= f.blabel :verification_code, :en => "Verification Code", :class => 'control-label' %>
       <%= f.text_field :verification_code, :class => "text", :autocomplete => 'off' %>

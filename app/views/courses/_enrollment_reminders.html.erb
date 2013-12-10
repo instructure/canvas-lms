@@ -18,7 +18,7 @@
     %>
     <%= t('invitiation.look_around', %{Feel free to wander around and look over the course.  When you're ready, you can either accept or reject the invitation.}) %>
     <div class="button-container">
-      <% form_tag course_enrollment_invitation_path(@context) do %>
+      <%= form_tag course_enrollment_invitation_path(@context) do %>
         <button type="submit" name="accept" class="btn btn-small positive btn-primary"><%= t('buttons.accept', %{Accept Invitation}) %></button>
         <button type="submit" name="reject" class="btn btn-small reject_button"><%= t('buttons.reject', %{Reject Invitation}) %></button>
       <% end %>

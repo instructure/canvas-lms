@@ -322,10 +322,14 @@ class ContextModulesController < ApplicationController
     end
   end
 
+  include ContextModulesHelper
   def add_item
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
       @tag = @module.add_item(params[:item])
+      @tag[:publishable] = module_item_publishable?(@tag)
+      @tag[:published] = module_item_published?(@tag)
+      @tag[:publishable_id] = module_item_publishable_id(@tag)
       render :json => @tag
     end
   end
@@ -354,8 +358,8 @@ class ContextModulesController < ApplicationController
 
   def progressions
     if authorized_action(@context, @current_user, :read)
-      if @context.context_modules.new.grants_right?(@current_user, session, :update)
-        if request.format == :json
+      if request.format == :json
+        if @context.context_modules.new.grants_right?(@current_user, session, :update)
           if params[:user_id] && @user = @context.students.find(params[:user_id])
             @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@user, true, true) }
           else
@@ -367,12 +371,18 @@ class ContextModulesController < ApplicationController
             end
           end
           render :json => @progressions
-        elsif !@context.draft_state_enabled?
-          redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "student_progressions")
+        else
+          @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@current_user, true) }
+          render :json => @progressions
         end
-      else
-        @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@current_user, true) }
-        render :json => @progressions
+      elsif !@context.draft_state_enabled?
+        redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "student_progressions")
+      elsif !@context.grants_right?(@current_user, session, :manage_students)
+        @restrict_student_list = true
+        student_ids = @context.observer_enrollments.for_user(@current_user).map(&:associated_user_id)
+        student_ids << @current_user.id if @context.user_is_student?(@current_user)
+        students = UserSearch.scope_for(@context, @current_user, {:enrollment_type => 'student'}).where(:id => student_ids)
+        @visible_students = students.map { |u| user_json(u, @current_user, session) }
       end
     end
   end

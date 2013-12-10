@@ -84,7 +84,7 @@ ul.quiz_list li.quiz div.description {
     <%= render :partial => "quiz_summary", :collection => @unpublished_quizzes, :locals => {:unpublished => true} %>
   </ul>
   <div title="<%= t('headers.publish_multiple_quizzes', "Publish Multiple Quizzes") %>" id="publish_multiple_quizzes_dialog" style="display: none;">
-    <% form_tag context_url(@context, :context_quizzes_publish_url), :id => "publish_quizzes_form" do %>
+    <%= form_tag context_url(@context, :context_quizzes_publish_url), :id => "publish_quizzes_form" do %>
       <%= before_label(:publish_multiple_quizzes, "Select the quizzes you would like to publish at this time") %>
       <ul class="quiz_list unstyled_list">
         <li class="quiz_item blank" style="display: none;">

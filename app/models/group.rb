@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -55,7 +55,6 @@ class Group < ActiveRecord::Base
   belongs_to :wiki
   has_many :web_conferences, :as => :context, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
-  has_one :scribd_account, :as => :scribdable
   has_many :media_objects, :as => :context
   has_many :zip_file_imports, :as => :context
   has_many :collections, :as => :context
@@ -70,7 +69,13 @@ class Group < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :name
 
-  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+  validates_each :name do |record, attr, value|
+    if value.blank?
+      record.errors.add attr, t(:name_required, "Name is required")
+    elsif value.length > maximum_string_length
+      record.errors.add attr, t(:name_too_long, "Enter a shorter group name")
+    end
+  end
 
   alias_method :participating_users_association, :participating_users
 
@@ -143,8 +148,9 @@ class Group < ActiveRecord::Base
     self.shard.activate { self.participating_group_memberships.moderators.find_by_user_id(user.id) }
   end
 
-  def should_add_creator?
-    self.group_category && (self.group_category.communities? || self.group_category.student_organized?)
+  def should_add_creator?(creator)
+    self.group_category &&
+      (self.group_category.communities? || (self.group_category.student_organized? && self.context.user_is_student?(creator)))
   end
 
   def short_name
@@ -156,11 +162,11 @@ class Group < ActiveRecord::Base
     Group.find(ids)
   end
 
-  def self.not_in_group_sql_fragment(groups, prepend_and = true)
+  def self.not_in_group_sql_fragment(group_ids, prepend_and = true)
     "#{"AND" if prepend_and} NOT EXISTS (SELECT * FROM group_memberships gm
                       WHERE gm.user_id = users.id AND
                       gm.workflow_state != 'deleted' AND
-                      gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?
+                      gm.group_id IN (#{group_ids.map(&:to_i).join ','}))" unless group_ids.empty?
 
   end
 
@@ -187,7 +193,7 @@ class Group < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     self.save
   end
 
@@ -391,7 +397,7 @@ class Group < ActiveRecord::Base
   end
 
   def users_visible_to(user)
-    grants_rights?(user, :read) ? users : users.where("?", false)
+    grants_rights?(user, :read) ? users : users.none
   end
 
   # Helper needed by several permissions, use grants_right?(user, :participate)
@@ -438,7 +444,7 @@ class Group < ActiveRecord::Base
   end
 
   def self.default_storage_quota
-    Setting.get_cached('group_default_quota', 50.megabytes.to_s).to_i
+    Setting.get('group_default_quota', 50.megabytes.to_s).to_i
   end
 
   def storage_quota_mb

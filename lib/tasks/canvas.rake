@@ -212,7 +212,7 @@ namespace :db do
       drop_database(config) rescue nil
       Canvas::Cassandra::Database.config_names.each do |cass_config|
         db = Canvas::Cassandra::Database.from_config(cass_config)
-        db.keyspace_information.tables.each do |table|
+        db.tables.each do |table|
           db.execute("DROP TABLE #{table}")
         end
       end

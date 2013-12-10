@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -25,7 +25,7 @@ class CalendarEvent < ActiveRecord::Base
       :location_address, :time_zone_edited, :cancel_reason,
       :participants_per_appointment, :child_event_data,
       :remove_child_events, :all_day
-  attr_accessor :cancel_reason
+  attr_accessor :cancel_reason, :imported
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:description) { [self.effective_context, nil] }
 
@@ -34,7 +34,6 @@ class CalendarEvent < ActiveRecord::Base
 
   belongs_to :context, :polymorphic => true
   belongs_to :user
-  belongs_to :cloned_item
   belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id
   has_many :child_events, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :conditions => "calendar_events.workflow_state <> 'deleted'"
   validates_presence_of :context, :workflow_state
@@ -177,7 +176,7 @@ class CalendarEvent < ActiveRecord::Base
     self.title ||= (self.context_type.to_s + " Event") rescue "Event"
 
     populate_missing_dates
-    populate_all_day_flag
+    populate_all_day_flag unless self.imported
 
     if parent_event
       populate_with_parent_event
@@ -501,31 +500,6 @@ class CalendarEvent < ActiveRecord::Base
     return CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar)
   end
 
-  attr_accessor :clone_updated
-  def clone_for(context, dup=nil, options={})
-    options[:migrate] = true if options[:migrate] == nil
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save!
-    end
-    existing = context.calendar_events.active.find_by_id(self.id)
-    existing ||= context.calendar_events.active.find_by_cloned_item_id(self.cloned_item_id || 0)
-    return existing if existing && !options[:overwrite]
-    dup ||= CalendarEvent.new
-    dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| %w(id participants_per_appointment).include?(k) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.context = context
-    dup.description = context.migrate_content_links(self.description, self.context) if options[:migrate]
-    dup.write_attribute :participants_per_appointment, read_attribute(:participants_per_appointment)
-    context.log_merge_result("Calendar Event \"#{self.title}\" created")
-    context.may_have_links_to_migrate(dup)
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
-  end
-
   def self.process_migration(data, migration)
     events = data['calendar_events'] ? data['calendar_events']: []
     events.each do |event|
@@ -581,6 +555,9 @@ class CalendarEvent < ActiveRecord::Base
     item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at]) unless hash[:start_at].nil?
     item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) unless hash[:end_at].nil?
 
+    item.all_day_date = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:all_day_date]).to_date if hash[:all_day_date].present?
+    item.imported = true
+
     item.save_without_broadcasting!
     if context.respond_to?(:content_migration) && context.content_migration
       context.content_migration.add_missing_content_links(:class => item.class.to_s,
@@ -632,7 +609,11 @@ class CalendarEvent < ActiveRecord::Base
 
   class IcalEvent
     include Api
-    include ActionController::UrlWriter
+    if CANVAS_RAILS2
+      include ActionController::UrlWriter
+    else
+      include Rails.application.routes.url_helpers
+    end
     include TextHelper
 
     def initialize(event)

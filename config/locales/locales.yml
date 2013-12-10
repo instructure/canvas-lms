@@ -4,12 +4,18 @@ en:
 es:
   locales:
     es: Español
+de:
+  locales:
+    de: Deutsch
 ru:
   locales:
     ru: pу́сский
 fr:
   locales:
     fr: Français
+pl:
+  locales:
+    pl: Polski
 zh:
   locales:
     zh: 中文

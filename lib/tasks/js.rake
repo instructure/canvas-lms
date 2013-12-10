@@ -2,7 +2,16 @@ require 'timeout'
 
 namespace :js do
 
+  desc 'run testem as you develop, can use `rake js:dev <ember app name>`'
   task :dev do
+    app = ARGV[1]
+    if app
+      ENV['JS_SPEC_MATCHER'] = "**/#{app}/**/*.spec.js"
+      unless File.exists?("app/coffeescripts/ember/#{app}")
+        puts "no app found at app/coffeescripts/ember/#{app}"
+        exit
+      end
+    end
     Rake::Task['js:generate_runner'].invoke
     exec('testem -f config/testem.yml')
   end
@@ -19,7 +28,7 @@ namespace :js do
 
   desc 'test javascript specs with PhantomJS'
   task :test do
-    if test_js_with_timeout(300) != 0
+    if test_js_with_timeout(300) != 0 && !ENV['JS_SPEC_MATCHER']
       puts "--> PhantomJS tests failed. retrying PhantomJS..."
       raise "PhantomJS tests failed on second attempt." if test_js_with_timeout(400) != 0
     end
@@ -41,11 +50,18 @@ namespace :js do
         if $?.exitstatus != 0
           puts 'some specs failed'
           result = 1
-        elsif $?.exitstatus != 0 && phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i < 900
-          puts "some specs didn't get run and some specs failed"
+        elsif ENV['JS_SPEC_MATCHER']
+          # running a subset of tests in isolation, don't be paranoid about
+          # some unrun tests getting lost
+          result = 0
+        elsif phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i < 2000
+          # ran all tests but didn't see enough? do be paranoid about some
+          # unrun tests getting lost
+          puts 'all run specs passed, but not all specs were run'
           result = 1
-        elsif $?.exitstatus == 0 && phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i > 900
-          puts 'all specs were run and passed'
+        else
+          # good exit status, and it seems enough specs ran to assuage our
+          # paranoia
           result = 0
         end
         return result
@@ -57,7 +73,7 @@ namespace :js do
 
   def coffee_destination(dir_or_file)
     dir_or_file.sub('app/coffeescripts', 'public/javascripts/compiled').
-        sub('spec/coffeescripts', 'spec/javascripts').
+        sub('spec/coffeescripts', 'spec/javascripts/compiled').
         sub(%r{/javascripts/compiled/plugins/([^/]+)(/|$)}, '/plugins/\\1/javascripts/compiled\\2')
   end
 
@@ -87,10 +103,11 @@ namespace :js do
     # clear out all the files in case there are any old compiled versions of
     # files that don't map to any source file anymore
     paths_to_remove = [
-        'public/javascripts/compiled',
-        'public/javascripts/jst',
-        'public/plugins/*/javascripts/{compiled,javascripts/jst}'
-    ] + Dir.glob('spec/javascripts/**/*Spec.js')
+      'public/javascripts/{compiled,jst}',
+      'public/plugins/*/javascripts/{compiled,jst}',
+      'spec/javascripts/compiled',
+      'spec/plugins/*/javascripts/compiled'
+    ]
     FileUtils.rm_rf(paths_to_remove)
 
     threads = []

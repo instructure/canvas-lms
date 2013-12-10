@@ -120,7 +120,7 @@ class OutcomesApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/outcomes/1.json' \ 
+  #   curl 'https://<canvas>/api/v1/outcomes/1.json' \
   #        -X PUT \ 
   #        -F 'title=Outcome Title' \ 
   #        -F 'description=Outcome description' \
@@ -136,7 +136,7 @@ class OutcomesApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/outcomes/1.json' \ 
+  #   curl 'https://<canvas>/api/v1/outcomes/1.json' \
   #        -X PUT \ 
   #        --data-binary '{
   #              "title": "Outcome Title",

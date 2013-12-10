@@ -156,20 +156,6 @@ describe WikiPage do
     end
   end
 
-
-  context "clone_for" do
-    it "should clone for another context" do
-      course_with_teacher(:active_all => true)
-      p = @course.wiki.wiki_pages.create(:title => "some page")
-      p.save!
-      course
-      new_p = p.clone_for(@course)
-      new_p.title.should eql(p.title)
-      new_p.should_not eql(p)
-      new_p.wiki.should_not eql(p.wiki)
-    end
-  end
-
   describe '#can_edit_page?' do
     it 'is true if the editing roles include teachers and the user is a teacher' do
       course_with_teacher(:active_all => true)

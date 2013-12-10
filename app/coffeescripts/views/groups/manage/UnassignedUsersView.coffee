@@ -7,8 +7,8 @@ define [
 
   class UnassignedUsersView extends GroupUsersView
 
-    @optionProperty 'assignToGroupMenu'
     @optionProperty 'groupsCollection'
+    @optionProperty 'category'
 
     defaults: _.extend {},
       GroupUsersView::defaults,
@@ -17,20 +17,27 @@ define [
         canAssignToGroup: true
         canRemoveFromGroup: false
 
+    dropOptions:
+      activeClass: 'droppable'
+      hoverClass: 'droppable-hover'
+      tolerance: 'pointer'
+
     attach: ->
-      @groupsCollection.on 'add', @groupAdded
-      @groupsCollection.on 'remove', @groupRemoved
+      @collection.on 'reset', @render
+      @collection.on 'moved', @highlightUser
 
     afterRender: ->
       super
       @collection.load('first')
+      @$el.parent().droppable(_.extend({}, @dropOptions))
+                   .on('drop', @_onDrop)
 
     toJSON: ->
       loading: !@collection.loadedAll
       count: @collection.length
 
     remove: ->
-      @assignToGroupMenu.remove()
+      @assignToGroupMenu?.remove()
       super
 
     events:
@@ -42,6 +49,7 @@ define [
       e.preventDefault()
       e.stopPropagation()
       $target = $(e.currentTarget)
+      @assignToGroupMenu ?= new AssignToGroupMenu collection: @groupsCollection
       @assignToGroupMenu.model = @collection.get($target.data('user-id'))
       @assignToGroupMenu.showBy $target
 
@@ -51,15 +59,10 @@ define [
     canAssignToGroup: ->
       @options.canAssignToGroup and @groupsCollection.length
 
-    groupAdded: =>
-      @$el.removeClass 'group-category-empty'
-
-    groupRemoved: (group) =>
-      users = group.users()
-      if users.loadedAll
-        users = users.models.slice()
-        user.set 'groupId', null for user in users
-      else
-        @collection.fetch()
-      @$el.addClass 'group-category-empty' if @groupsCollection.length is 0
-
+    ##
+    # handle drop events on '.unassigned-students'
+    # ui.draggable: the user being dragged
+    _onDrop: (e, ui) =>
+      user = ui.draggable.data('model')
+      setTimeout ->
+        user.moveTo null

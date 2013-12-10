@@ -8,17 +8,18 @@ pt:
     bad_per_slot: "Tem de permitir pelo menos um compromisso por horário"
     context_required: "Deve escolher um calendário"
     select_calendars: "Selecionar calendários"
-  GroupView: 
-    delete_confirm: "Tem a certeza de que pretende remover este grupo?"
-    flash: 
-      removeError: "Não foi possível remover o grupo. Tente novamente mais tarde."
-      removed: "Grupo removido com sucesso."
+  GrouDetailpView: 
     student_count: 
       one: "1 aluno"
       other: "%{count} alunos"
     user_count: 
       one: "1 utilizador"
       other: "%{count} utilizadores"
+  GroupView: 
+    delete_confirm: "Tem a certeza de que pretende remover este grupo?"
+    flash: 
+      removeError: "Não foi possível remover o grupo. Tente novamente mais tarde."
+      removed: "Grupo removido com sucesso."
   academic_benchmark: 
     api_error: "Não foi possível atualizar as normas para a autoridade %{auth}."
     bad_ab_file: "O ficheiro de referências académicas fornecido tem um erro."
@@ -164,7 +165,7 @@ pt:
       test_ldap_search_label: "Testando a pesquisa LDAP..."
     ldap_timeout_error: 
       last_ldap_timeout_failure: "Último timeout falhou"
-      ldap_timeout_failure_help: "Se o Canvas ficar inativo durante a comunicação com o servidor LDAP, irá impedir que tentativas adicionais de início de sessão utilizem o servidor LDAP durante %{time}."
+      ldap_timeout_failure_help2: "Se o Canvas ficar inativo demasiadas vezes durante a comunicação com o servidor LDAP, irá impedir que tentativas adicionais de início de sessão utilizem o servidor LDAP durante %{time}."
     login_required: "deve ser fornecido"
     no_auth_mixing: "Não pode misturar tipos de autenticação"
     no_changing_auth_types: "Não pode alterar a configuração de tipo de autenticação, elimine e crie uma nova configuração."
@@ -249,8 +250,13 @@ pt:
       start_at: "Começar em: %{start_at};"
     default: 
       all_terms: "Todos os períodos"
+      course_text: "Para a disciplina: %{course};"
+      end_text: "Terminar em: %{end_at};"
       extra_text_term: "Período: %{term_name};"
       message: "Relatório %{type} gerado com sucesso com as seguintes definições. Conta: %{account}; %{options}"
+      section_text: "Para a secção: %{section};"
+      start_text: "Começar em: %{start_at};"
+      term_text: "Período: %{term_name};"
     grades: 
       deleted: "Incluir objetos eliminados: verdadeiro;"
     mississippi: 
@@ -310,6 +316,7 @@ pt:
         sis_user_id: "ID do SIS"
         sortable_name: "Nome ordenável"
       sortable_name_help: "Este nome aparece em listas ordenadas."
+      unique_id_label: "%{label}:*"
     add_user_button: "Adicionar utilizador"
     add_user_dialog_title: "Adicionar um novo utilizador"
     adding_course_message: "A adicionar disciplina..."
@@ -383,6 +390,30 @@ pt:
         message_date_to: "Até à data"
         search: Pesquisar
         search_people: "Procurar pessoas"
+    assignment_scheduling_csv_description: 
+      account_reports: 
+        newark: 
+          description: 
+            header: Exemplo
+          student_activity: 
+            text: "Este relatório mostra todas as tarefas e informações respeitantes a essas tarefas incluídas no grupo ou grupos de tarefas especificados e no intervalo de datas especificado. Este relatório apresenta dados relativos ao agendamento de tarefas e à gestão das tarefas dos alunos, mostrando apenas alunos e tarefas nos quais existam 2 ou mais tarefas em conflito com um prazo de entrega na mesma data para um aluno."
+    assignment_scheduling_csv_parameters: 
+      account_reports: 
+        newark: 
+          assignment_groups: 
+            label: "Grupos de tarefa a incluir:"
+          major: 
+            check_box: Grande
+          papers: 
+            check_box: Trabalhos
+          projects: 
+            check_box: Projetos
+          reports: 
+            check_box: Relatórios
+          section_id: 
+            field: "ID de secção:"
+          tests: 
+            check_box: Testes
     avatars: 
       all_link: 
         one: "Todos %{count}"
@@ -824,7 +855,7 @@ pt:
       tab_admins: Administradores
       tab_alerts: Alertas
       tab_announcements: Anúncios
-      tab_external_tools: Aplicações
+      tab_external_tools: Aplicativos
       tab_notifications: Notificações
       tab_quotas: Quotas
       tab_reports: Relatórios
@@ -1005,12 +1036,27 @@ pt:
           students_with_no_submissions: 
             description: 
               header: Exemplo
-            text: "Este é um relatório de todos os alunos inscritos numa disciplina num determinado período que não submeteram uma tarefa dentro do intervalo de datas indicado numa disciplina. Este relatório contém uma linha por inscrição de aluno que cumpre os critérios."
+            text: "Este é um relatório de todos os alunos inscritos numa disciplina num determinado período que não submeteram uma tarefa dentro do intervalo de datas indicado numa disciplina. Este relatório contém uma linha por inscrição de aluno que cumpre os critérios. O intervalo de datas não pode ser superior a duas semanas."
     submission_data_csv_description: 
       account_reports: 
         submission_data: 
           description: 
             text: "Este relatório contém datas de submissões para a ferramenta de presenças."
+    tempe_grade_export_csv_description: 
+      account_reports: 
+        tempe: 
+          description: 
+            header: Exemplo
+          grade_export: 
+            text: "Este relatório mostra os resultados das notas finais de todos os alunos num determinado período. O ficheiro delimitado por tabulações resultante apresenta uma linha por inscrição e mostra a nota final e vários campos de informação da disciplina que serão utilizados para carregar dados de notas no Synergy SIS."
+    tempe_grade_export_csv_parameters: 
+      account_reports: 
+        tempe: 
+          course: 
+            text: "ID da disciplina"
+          parameters: 
+            note1: "O ID da disciplina pode ficar em branco para executar o relatório de todas as disciplinas no período."
+            note2: "Disciplinas com inscrições silenciadas podem não refletir corretamente os resultados neste relatório."
     terms_parameters: 
       account_reports: 
         default: 
@@ -1296,8 +1342,6 @@ pt:
     imported_assignments_group: "Tarefas importadas"
     labels: 
       due: Prazo
-    messages: 
-      assignment_created: "Tarefa \"%{assignment}\" criada"
     name_is_required: "É necessário o nome!"
     points_possible: "Os pontos possíveis têm de ser superiores a 0 para avaliação por percentagem"
     select_external_tool_dialog_title: "Configurar ferramenta externa"
@@ -1313,9 +1357,6 @@ pt:
       a_website_url: "um endereço de site"
     titles: 
       grading_scheme_info: "Ver/Editar esquema de avaliação"
-    warnings: 
-      group_assignment: "A tarefa \"%{assignment}\" era uma tarefa de grupo e terá de redefinir as definições do grupo para este novo contexto"
-      peer_assignment: "A tarefa \"%{assignment}\" era uma tarefa de revisão por colegas e terá de redefinir as definições de revisão por colegas para este novo contexto"
   assignment_details_dialog: 
     average_score: "Pontuação média:"
     count_of_submissions: "%{cnt} envios"
@@ -1402,15 +1443,17 @@ pt:
       links: 
         add_assignment_group: "Adicionar grupo de tarefa"
     assignment_group_list: 
-      no_assignment_groups: "Nenhum grupo de tarefa"
+      no_assignment_groups: "Não foram encontrados grupos de tarefa"
     assignment_group_list_item: 
       add_assignment_to: "Adicionar tarefa a %{name}"
+      assignment_group_delete: "Eliminar grupo de tarefa"
+      assignment_group_edit: "Editar grupo de tarefa"
+      assignment_group_move: "Mover grupo de tarefa"
       delete: Eliminar
       edit: Editar
       group_weight: "%{groupWeight}% do total"
       manage: Gerir
-      title_delete: "Eliminar grupo de tarefa?"
-      title_edit: "Editar grupo de tarefa"
+      move: "Mover para&hellip;"
     assignment_group_selector: 
       assignment_group: "Grupo de tarefa"
       assignment_group_options: 
@@ -1419,16 +1462,27 @@ pt:
       one: "1 grupo"
       other: "%{count} grupos"
     assignment_list_item: 
+      assignment_delete: "Eliminar tarefa"
+      assignment_edit: "Editar tarefa"
+      assignment_move: "Mover tarefa"
       delete: Eliminar
-      delete_asssignment_title: "Eliminar esta tarefa"
-      due_date: Prazo
       edit: Editar
-      edit_assignment_title: "Editar tarefa"
       module: Módulo
+      move: "Mover para&hellip;"
       multiple_modules: "Vários módulos"
+      no_points_possible: "Nenhum ponto possível"
       points_possible: "%{pointsPossible} pts"
-      quiz_due: Prazo
+      points_possible_screen_reader: "%{pointsPossible} pontos possíveis"
       settings: Definições
+    assignment_list_item_score: 
+      assignment_grading_type_is_not_graded: "Não será atribuída uma nota a esta tarefa."
+      assignment_not_yet_graded_screenreader: "Tarefa ainda não avaliada. %{pointsPossible} pontos possíveis."
+      empty_points_possible: "-/%{pointsPossible} pts"
+      no_submission: "Nenhum envio"
+      no_submission_for_assignment_screenreader: "Nenhum envio para esta tarefa. %{pointsPossible} pontos possíveis."
+      not_yet_graded: "*Ainda sem nota*"
+      score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
+      score_with_points_possible_screenreader: "Pontuação: %{score} em %{pointsPossible} pontos."
     assignment_locked: 
       assignment_locked: "Esta tarefa está travada a partir de *%{lock_at}*"
       assignment_unlocked_from: "Esta tarefa está travada até *%{unlock_at}*"
@@ -1485,6 +1539,8 @@ pt:
       delete_group: "Excluir grupo"
       submit_assignment: "Enviar tarefa"
     cannot_delete_group: "Tem de ter pelo menos um grupo de tarefa"
+    cant_unpublish_when_students_submit: "Não é possível anular a publicação se existirem envios de alunos"
+    complete: Completo
     confirm: 
       delete_assignment: "Tem certeza de que deseja excluir esta tarefa?"
       delete_group: "Tem certeza de que deseja excluir este grupo?"
@@ -1517,6 +1573,17 @@ pt:
       save: Guardar
       saving: "A guardar..."
     create_new_crumb: "Criar novo"
+    date_available_column_view: 
+      available: Disponível
+      available_on: "Disponível em"
+      available_until: "Disponível até"
+      closed: Fechado
+      multiple_dates: "Várias datas"
+      not_available_until: "Não disponível até"
+    date_due_column_view: 
+      due: Prazo
+      due_date: Prazo
+      multiple_dates: "Várias datas"
     delete_group: 
       cancel: Cancelar
       delete: "Eliminar grupo"
@@ -1600,6 +1667,10 @@ pt:
           *Certifique-se de que não muda os nomes dos ficheiros enviados, para que possamos reconhecê-los.*
       titles: 
         related_items: "Itens relacionados"
+    grade_letter_grade_screenreader: "Nota: %{grade}"
+    grade_pass_fail_screenreader: "Nota: %{grade}"
+    grade_percent: "%{grade}%"
+    grade_percent_screenreader: "Nota: %{grade}%"
     graded: "Esta tarefa foi avaliada"
     grading_type_selector: 
       grading_type: "Tipo de avaliação"
@@ -1627,6 +1698,8 @@ pt:
         assignment_group: "Grupo de tarefa"
         group_weight: Peso
         total: Total
+    higher_than_max: "Não é possível utilizar um número superior ao número de tarefas"
+    incomplete: Incompleto
     index: 
       assignment_locked: "Esta tarefa está bloqueada de momento. Visite a página de detalhes da tarefa para obter mais informações."
       assignment_locked_tooltip: bloqueado
@@ -1658,6 +1731,9 @@ pt:
       title_add_group: "Adicionar grupo de tarefa"
     invalid_file_retrieval: "Ocorreu um problema ao obter o ficheiro enviado a partir desta ferramenta."
     invalid_tool_return: "A ferramenta iniciada devolveu um recurso inválido para esta tarefa."
+    labels: 
+      assignment_group_move_label: "Grupo de tarefa"
+      label_place_before: "Colocar antes"
     loading_tools_failed: "Falha ao carregar as ferramentas"
     messages: 
       adding_group: "A adicionar grupo..."
@@ -1669,6 +1745,7 @@ pt:
       submit_failed: "Falha no envio, tente novamente"
       submitting: Enviando...
     multiple_due_dates: "Várias datas de entrega"
+    name_is_required: "É necessário o nome!"
     needs_grading_count: "%{needs_grading_count} envios desta tarefa ainda precisam ser avaliados"
     never_drop: 
       remove_rule: "Remover regra"
@@ -1680,7 +1757,12 @@ pt:
     no_assignments: "[Nenhuma tarefa]"
     no_assignments_list_item: 
       no_assignments_in_this_group: "Não existem tarefas neste grupo"
+    no_assignments_search: 
+      aria_assignments: Tarefas
+      assignments: Tarefas
+      no_assignments_found: "Não foram encontradas tarefas"
     no_tools_found: "Não foram encontradas ferramentas"
+    non_number: "É necessário utilizar um número"
     notices: 
       assignment_delete: "Esta tarefa foi excluída"
       created: "Tarefa criada com sucesso."
@@ -1730,6 +1812,7 @@ pt:
       peer_reviews_assign_at_explanation: "Deve vir após a data de entrega. Se estiver em branco, usará a data de entrega."
       reviews_per_user: "Revisões por utilizador"
     percent_of_final_grade: "%{percent} da nota final"
+    positive_number: "É necessário utilizar um número positivo"
     redirect_page: 
       redirect_message: "Este envio era um URL, agora estamos a encaminhá-lo para a ligação do URL. [Clique aqui para ir para o envio](%{url})"
     rules_text: 
@@ -1954,6 +2037,7 @@ pt:
       not_found: "Dados do arquivo não encontrados"
     feed_title: "Arquivo: %{title}"
     feed_title_with_context: "Arquivo, %{course_or_group}: %{title}"
+    over_quota: "O ficheiro transferido excede a quota."
     title: 
       migration_list: "Arquivos associados"
     upload_error_invalid_response_code: "Código de resposta inválido, valor previsto 200 obteve %{code}"
@@ -2166,6 +2250,12 @@ pt:
     last_formula_row: "a última linha da fórmula será usada para calcular a resposta final"
     sample_final_answer: "Este valor é um exemplo de resposta final para este tipo de pergunta"
   calendar: 
+    agenda_view: 
+      due: prazo
+      loading: "A carregar"
+      no_events: "Nenhum evento após esta data."
+      starts_at: "Início em"
+    agenda_view_displaying_start_end: "A visualizar %{start} até %{end}"
     appointment_group_deletion_details: "Eliminar isto também irá eliminar compromissos para os quais os alunos se tenham inscrito."
     appointment_group_list: 
       location: "Localização:"
@@ -2186,13 +2276,17 @@ pt:
       create_event: "Criar novo evento"
       done_go_back_to_list: "Concluído, voltar à lista"
       links: 
+        accessibility_warning: "Aviso: esta vista não é acessível a utilizadores com leitores de ecrã"
+        calendar_agenda: Agenda
         calendar_month: Mês
         calendar_scheduler: Agenda
         calendar_week: Semana
+      loading: "A carregar"
       my_appointment_groups: "Os meus grupos de compromisso"
       refresh: Atualizar
       use_old_calendar: "Calendário antigo"
     calendar_navigator: 
+      enter_navigation_date: "Introduza a data para a qual pretende navegar."
       next: Seguinte
       previous: Anterior
       today: Hoje
@@ -2285,8 +2379,16 @@ pt:
       slots_available: "Entradas disponíveis"
     event_event_title: "Título do evento:"
     event_on_this_day: "Há um evento neste dia"
+    event_type: 
+      assignment: Tarefa
+      discussion: Discussão
+      event: Evento
+      quiz: Teste
+    input_is_invalid_date: "A data introduzida não é válida."
     labels: 
       due: prazo
+    loading_more_items: "A carregar mais itens."
+    loading_undated_events: "A carregar eventos sem data"
     message_participants: 
       all_groups: "Todos os grupos"
       all_users: "Todos os utilizadores"
@@ -2326,15 +2428,17 @@ pt:
     save_changes: "Guardar alterações"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "Criar um grupo de compromissos"
+    screenreader_date_suggestion: "%{date}. Prima Enter para aceitar."
     time_block_errors: "Existem erros nas suas escolhas de blocos de tempo."
     titles: 
       edit_appointment_group: "Editar grupo de compromissos"
       edit_event: "Editar evento"
     today: Hoje
     undated_events: 
-      loading_undated_events: "A carregar eventos sem data..."
-      show_undated_events: "Mostrar eventos sem data"
-      undated_events: "Eventos sem data"
+      loading_undated_events: "A carregar itens sem data..."
+      no_undated_events: "Nenhum item sem data."
+      show_undated_events: "Mostrar itens sem data"
+      undated_items: "Itens sem data"
   calendar_event: 
     errors: 
       duplicate_child_event_contexts: "Duplicar contextos de eventos subordinados"
@@ -2479,10 +2583,15 @@ pt:
     show2: 
       calendar_feed: "Feed do calendário"
       calendar_feed_instructions: "Copie a ligação abaixo e cole-a em qualquer aplicação de calendário que utilize feeds iCal (Google Calendar, iCal, Outlook, etc.)"
+      calendars: Calendários
       feed_dialog_title: "Feed do calendário"
       feed_title: "Feed Atom do calendário da disciplina"
       links: 
         feed: "clique aqui para exibir o feed"
+      skip_to_calendar: "Saltar para calendário"
+      toggle_calendars: "Alternar calendários"
+      toggle_undated_items: "Alternar itens sem data"
+      undated_items: "Itens sem data"
     titles: 
       add_new_assignment: "Adicionar nova tarefa"
       add_new_event: "Adicionar novo evento"
@@ -2526,6 +2635,7 @@ pt:
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Pacote de exportação da disciplina do Canvas"
   canvas_cartridge_name: "Importador Canvas Cartridge"
+  canvas_revision_unknown: Desconhecido
   cc: 
     by: "Atribuição CC"
     by_nc: "Atribuição CC uso não comercial"
@@ -2712,6 +2822,9 @@ pt:
       delete: Eliminar
       no_recording: "Nenhuma gravação"
       preparing_video: "Preparar vídeo"
+      recording: "1 gravação"
+      recordings: "%{recordingCount} gravações"
+      setings: definições
       view: Ver
     confirm: 
       close: |-
@@ -2753,7 +2866,11 @@ pt:
       end_it_now: Fim
       in_progress: "Em curso"
       join: Aderir
+      recording: "1 gravação"
+      recordings: "%{recordingCount} gravações"
+      setings: definições
       start: Início
+      view: Ver
     new_conference_title: "Nova conferência"
     no_settings_error: "Essa conferência não tem uma página de configurações avançadas"
     no_urls_error: "Desculpe, parece que ainda não existe nenhuma página %{type} para esta conferência."
@@ -2861,7 +2978,11 @@ pt:
     unknown: Desconhecido
     upload_timeout_error: "Foi excedido o tempo limite de carregamento de ficheiros."
   content_migrations: 
+    angel_exporter: 
+      options: Opções
     bad_migration_type: "Tipo de migração inválido"
+    blackboard_export: 
+      options: Opções
     canvas_export: 
       options: Opções
     common_cartridge: 
@@ -2873,6 +2994,9 @@ pt:
     content_migration_issue: 
       error_report: "Relatório de erros"
     copy_course: 
+      options: Opções
+    course_list_error: "Não foi possível obter as disciplinas. Está ligado à Internet?"
+    d2_l_export: 
       options: Opções
     file_required: "Tem de selecionar um ficheiro para importação de conteúdo"
     file_too_large: "A migração não pode exceder %{file_size}"
@@ -2889,7 +3013,8 @@ pt:
       import_migration: Importar
     moodle_zip: 
       options: Opções
-    must_upload_file: "É necessário carregar um ficheiro"
+    must_upload_file: "É necessário um url ou carregar um ficheiro"
+    no_content_selected: "Não selecionou conteúdo para importar."
     progressing_content_migration: 
       issues_text: problemas
       select_content: "Selecionar conteúdo"
@@ -2901,13 +3026,16 @@ pt:
       loading: "A carregar"
     qti_zip: 
       options: Opções
+    school_required: "Tem de selecionar uma escola."
     select_content: 
       select_content_btn: "Selecionar conteúdo"
+    select_course: "Selecionar disciplina"
     show_issues: "Mostrar problemas"
     subviews: 
       choose_migration_file: 
         migration_text: Origem
       course_find_select: 
+        course_name: "Nome da disciplina"
         include_completed_courses: "Incluir disciplinas concluídas"
         or: ou
         search_label: "Procurar uma disciplina"
@@ -2958,11 +3086,19 @@ pt:
         select_migration_label: "Selecionar conteúdo de migração"
     upload_warning: "A saída desta página irá cancelar o processo de carregamento."
     uploading: "A carregar..."
+    web_ct: 
+      cancel: Cancelar
+      get_courses: "Obter disciplinas"
+      password: Palavra-passe
+      select_school: "Selecionar escola"
+      username: "Nome de utilizador"
     web_ct_course_list: 
+      course_list: Disciplina(s)
       no_files_help_label: "Mais informações sobre a opção 'Não transferir ficheiros'"
       no_files_help_text: "A transferência de ficheiros de disciplinas WebCT pode demorar algum tempo e pode causar um erro no processo de migração. Em alternativa, pode copiar os ficheiros manualmente e, em seguida, selecionar esta opção para migrar o resto do conteúdo."
       no_files_help_title: "\"Mais informações sobre a opção 'Não transferir ficheiros'\""
       no_files_help_title_icon: "Mais informações sobre a opção 'Não transferir ficheiros'"
+      options: Opções
       skip_all_files: "Não transferir ficheiros da disciplina"
   content_tag: 
     no_title: "Sem título"
@@ -3252,6 +3388,7 @@ pt:
         modules: 
           before_students_view: "Antes que os alunos possam ver este módulo"
         new_tab: "Carregar esta ferramenta em uma nova guia"
+        publish_final_grade: "publicar nota final do aluno quando este módulo estiver concluído"
         require_sequential_progress: "os alunos devem passar pelos requisitos neste módulos em ordem sequencial"
         sort_by: "Ordenar por"
         title: Título
@@ -3291,7 +3428,120 @@ pt:
         state: Estado
       titles: 
         student_progression: "Progressão de módulo por estudante"
+    content_next: 
+      add_prerequisite: "Adicionar pré-requisito a *%{module}*"
+      assignment_points_possible: "em %{points_possible}"
+      buttons: 
+        add_module: "Adicionar módulo"
+        add_prerequisite: "Adicionar pré-requisito"
+      criterion_for_assignment: "Para %{assignment}, os utilizadores têm de %{select_criterion}"
+      headings: 
+        add_prerequisite: "Adicionar pré-requisito a %{name}"
+        course_modules: "Módulos da disciplina"
+        student_progress: "Progresso do módulo por aluno"
+        student_progress_for_module: "Progresso do aluno para %{module}"
+        students_completed: "Alunos que concluíram o módulo"
+        students_in_progress: "Alunos que estão a trabalhar no módulo"
+        students_locked: "Alunos que não desbloquearam o módulo"
+        students_unlocked: "Alunos que desbloquearam (mas não iniciaram) o módulo"
+      help: 
+        create: |-
+            Os módulos da disciplina permitem organizar as suas tarefas, páginas, ficheiros, etc. em secções ou unidades mais pequenas. Os módulos podem ser construídos à volta de um tema, focar um tópico específico ou mesmo ser agrupados cronologicamente.
+            
+            Também é possível sequenciar os módulos definindo critérios e pré-requisitos para cada um deles. Os alunos não poderão aceder a módulos até desbloquearem todos os seus pré-requisitos. Dessa forma, é possível evitar que os alunos acedam a determinados conteúdos ou ficheiros até obterem, por exemplo, um mínimo de 75% num teste de revisão.
+            
+            Para começar a organizar a sua disciplina em módulos, clique no botão "%{button}", à direita.
+        no_modules: "Nenhum módulo foi definido para esta disciplina."
+      images: 
+        alt: 
+          min_score: "pontuação mínima"
+          must_contribute: "têm de contribuir"
+          must_submit: "têm de enviar"
+          must_view: "têm de visualizar"
+        title: 
+          min_score: "Os alunos têm de obter pelo menos %{min_score} neste item para o módulo ser considerado concluído"
+          must_contribute: "Os alunos têm de contribuir para este item para o módulo ser considerado concluído"
+          must_submit: "Os alunos têm de enviar esta tarefa para o módulo ser considerado concluído"
+          must_view: "Os alunos têm de visualizar este item para o módulo ser considerado concluído"
+      indent: 
+        ? "n"
+        : 
+          one: "Avançar 1 nível"
+          other: "Avançar %{count} níveis"
+          zero: "Não avançar"
+      key: 
+        description: 
+          delete: "Eliminar módulo/item atual"
+          edit: "Editar módulo/item"
+          indent: "Avançar item atual"
+          new: "Novo módulo"
+          next: "Módulo/item seguinte"
+          outdent: "Recuar item atual"
+          previous: "Módulo/item anterior"
+      keycode_descriptions: 
+        next_module_item: "Selecionar o módulo ou item de módulo seguinte"
+        previous_module_item: "Selecionar o módulo ou item de módulo anterior"
+        toggle_module_dragging: "Selecionar o item para começar a arrastar ou largar o item selecionado anteriormente"
+      keycodes: 
+        delete: d
+        edit: e
+        indent: i
+        new: "n"
+        next: j
+        next_module_item: "Para cima"
+        outdent: o
+        previous: k
+        previous_module_item: "Para baixo"
+        toggle_module_dragging: Espaço
+      labels: 
+        indent: Avançar
+        module_complete_when: "Este módulo está concluído quando"
+        modules: 
+          before_students_view: "Antes que os alunos possam ver este módulo"
+        new_tab: "Carregar esta ferramenta num novo separador"
+        require_sequential_progress: "os alunos têm de passar pelos requisitos neste módulo por ordem sequencial"
+        sort_by: "Ordenar por"
+        title: Título
+        unlock_at: "Desbloquear em"
+        url: URL
+      links: 
+        add_prerequisite: "Adicionar pré-requisito"
+        add_requirement: "Adicionar requisito"
+        reload_student: "Recarregar progresso do aluno"
+        sort_by_name: Nome
+        sort_by_progress: Progresso
+        student_progress: "Ver progresso"
+        title: 
+          remove_prerequisite: "Remover este pré-requisito"
+      module: módulo
+      module_details: "Os módulos são mostrados por ordem sequencial; assim, apenas os módulos acima de %{name} podem ser definidos como pré-requisitos."
+      module_name: "Nome do módulo"
+      modules_keyboard_hint: "Para mudar a ordem dos módulos e itens de módulo, desative primeiro o cursor no seu leitor de ecrã. Insert-z em JAWS. Prima Tab para selecionar o primeiro módulo. Prima para cima e para baixo para selecionar um módulo ou item de módulo. Prima espaço para selecionar o módulo ou item de módulo para começar a arrastar. Em seguida, prima para cima e para baixo para selecionar um destino. Prima espaço novamente para largar a seleção depois do destino."
+      must_complete_prerequisites: "Eles têm de concluir"
+      no_preprequisites: "Nenhum pré-requisito definido"
+      no_requirements: "Nenhum requisito definido"
+      prerequisites: 
+        another_module: "Outro módulo"
+      prerequisites_need_item: "Será necessário adicionar itens antes de poder especificar como um utilizador concluirá este módulo"
+      requirements: 
+        must_contribute: "contribuir para a página"
+        must_score_at_least: "pontuar pelo menos"
+        must_submit: "enviar a tarefa"
+        must_view: "ver o item"
+      select_module: 
+        instructions: "Selecionar módulo"
+        name: "o módulo, %{module}"
+      select_prerequisite: "Selecione o tipo de pré-requisito. Os alunos não podem ver um módulo até serem cumpridos todos os pré-requisitos."
+      student_name: "Nome do aluno"
+      table_headings: 
+        module: Módulo
+        state: Estado
+      titles: 
+        student_progression: "Progressão de módulo por aluno"
     context_module: 
+      admin_links: 
+        module_options_label: "Opções de módulo"
+        module_options_title: "Opções de módulo"
       context_module: 
         draft: (Rascunho)
       images: 
@@ -3315,12 +3565,34 @@ pt:
           delete_module: "Excluir este módulo"
           edit_module: Editar
           student_progress: "Ver o progresso do aluno neste módulo"
-      manage: Gerir
+      manage: "Opções de módulo"
       module_will_unlock_at: "destravará em *%{unlock_date}*"
       progression_complete_count: "*%{count}* concluído"
       progression_started_count: "*%{count}* em andamento"
       reorder_modules: "Arrastar para reordenar os módulos"
       unpublish: "Anular publicação"
+    context_module_next: 
+      images: 
+        alt: 
+          incomplete: incompleto
+        title: 
+          complete: "Módulo concluído"
+          incomplete: "Módulo incompleto"
+          locked: "Módulo bloqueado"
+      links: 
+        add_item: "Adicionar conteúdo"
+        text: 
+          delete_module: Eliminar
+          edit_module: Editar
+        title: 
+          delete_module: "Eliminar este módulo"
+          edit_module: Editar
+          student_progress: "Ver o progresso do aluno neste módulo"
+      manager_module: "Gerir módulo"
+      module_will_unlock_at: "desbloqueará em *%{unlock_date}*"
+      progression_complete_count: "*%{count}* concluído"
+      progression_started_count: "*%{count}* em curso"
+      reorder_modules: "Arrastar para reordenar os módulos"
     context_modules: 
       publish: Publicar
     errors: 
@@ -3373,6 +3645,46 @@ pt:
       must_view: 
         fulfilled: "visualizou a página"
         unfulfilled: "deve visualizar a página"
+    module_item_next: 
+      drag_to_reorder: "Arrastar para reordenar ou mover o item para outro módulo"
+      images: 
+        alt: 
+          max_score: "pontuação máxima"
+          min_score: "pontuação mínima"
+          must_contribute: "têm de contribuir"
+          must_submit: "têm de enviar"
+          must_view: "têm de visualizar"
+        title: 
+          max_score: "Os alunos não devem ultrapassar a pontuação máxima neste item para o módulo ser considerado concluído"
+          min_score: "Os alunos têm de atingir a pontuação mínima neste item para o módulo ser considerado concluído"
+          must_contribute: "Os alunos têm de contribuir para este item para o módulo ser considerado concluído"
+          must_submit: "Os alunos têm de enviar esta tarefa para o módulo ser considerado concluído"
+          must_view: "Os alunos têm de visualizar este item para o módulo ser considerado concluído"
+      links: 
+        edit_item: Editar
+        edit_item_details: "Editar detalhes do item"
+        indent: Avançar
+        indent_item: "Avançar item"
+        outdent: Recuar
+        outdent_item: "Recuar item"
+        remove_item: Remover
+        remove_item_from_module: "Remover este item do módulo"
+      max_score: 
+        fulfilled: "pontuou não mais que %{score}"
+        unfulfilled: "têm de pontuar não mais que %{score}"
+      min_score: 
+        fulfilled: "pontuou pelo menos %{score}"
+        unfulfilled: "têm de pontuar pelo menos %{score}"
+      must_contribute: 
+        fulfilled: "contribuiu para o conteúdo da página"
+        unfulfilled: "têm de contribuir para o conteúdo da página"
+      must_submit: 
+        fulfilled: "enviou a tarefa"
+        unfulfilled: "têm de enviar a tarefa"
+      must_view: 
+        fulfilled: "visualizou a página"
+        unfulfilled: "têm de visualizar a página"
+      settings: Definições
     module_locked: Bloqueado
     module_started: "Em curso"
     module_unlocked: Desbloqueado
@@ -3411,6 +3723,7 @@ pt:
     errors: 
       field_is_required: "Este campo é obrigatório"
     message_sent: "Mensagem enviada!"
+    no_course: "Nenhuma disciplina"
     select_course: "Selecionar disciplina"
   conversation_message: 
     subject: "Mensagem privada, %{timestamp}"
@@ -3429,6 +3742,8 @@ pt:
         remove_attachment: "Remover anexo"
     all_courses: "Todas as disciplinas"
     all_in_context: "Tudo em %{context}"
+    archive: Arquivar
+    archive_conversation: "Arquivar conversa"
     attachment_error: "Falha ao carregar o anexo, tente novamente."
     autocomplete_result: 
       group_people: "Pessoas: %{people}"
@@ -3483,6 +3798,7 @@ pt:
     conversations_pane: 
       confirm: 
         delete_conversation: "Tem a certeza de que pretende eliminar a sua cópia desta conversa? Esta ação não pode ser anulada."
+    course_name: "Nome da disciplina"
     course_options: 
       course_options: 
         concluded: Concluído
@@ -3531,12 +3847,13 @@ pt:
         view_submission: "Abrir envio em uma nova janela"
       try_new_conversations: "Experimentar novas conversas"
     index_new: 
+      archive: Arquivar
+      archive_conversation: "Arquivar conversa"
       archived: Arquivado
       clear_search: "Limpar resultados de pesquisa"
       compose_new_message: "Compor uma nova mensagem"
       delete: Eliminar
       delete_conversation: "Eliminar conversa"
-      enter_name_group_or_course: "Introduzir um nome, grupo ou disciplina"
       filter_messages_by_course: "Filtrar mensagens por disciplina"
       filter_messages_by_type: "Filtrar mensagens por tipo"
       forward: Reencaminhar
@@ -3546,6 +3863,7 @@ pt:
       more_options: "Mais opções"
       reply: Responder
       reply_all: "Responder a todos"
+      search_by_user: "Procurar por utilizador"
       search_for_recipients: "Procurar destinatários"
       search_names_groups_courses: "Procurar nomes, grupos e disciplinas"
       sending: "a enviar"
@@ -3572,6 +3890,8 @@ pt:
       no_subject: "Sem assunto"
     message_form: 
       buttons: 
+        reply: Responder
+        reply_all: "Responder a todos"
         send_message: Enviar
       headings: 
         new_message: "Nova mensagem"
@@ -3592,10 +3912,12 @@ pt:
         record_media_comment: "Gravar comentário áudio ou vídeo"
         remove_media_comment: "Remover comentário multimédia"
     message_form_dialog: 
+      body: Corpo
       headings: 
         new_message: "Nova mensagem"
       inbox_actions: 
         add_people: "Adicionar pessoas"
+      individual_message_explanation: "Será enviada uma mensagem individual a cada um dos destinatários"
       labels: 
         add_to_faculty_journal: "Adicionar como uma entrada do Diário da Faculdade"
         attachments: Anexos
@@ -3606,8 +3928,10 @@ pt:
       links: 
         media_comment: Gravar
       media_comment: "Comentário multimédia"
+      no_course: "Nenhuma disciplina"
       no_subject: "Sem assunto"
       search_names_groups_courses: "Procurar nomes, grupos e disciplinas"
+      send_individual_messages: "Enviar mensagens individuais"
       titles: 
         media_comment: "Comentário multimédia gravado"
         record_media_comment: "Gravar comentário áudio ou vídeo"
@@ -3627,6 +3951,7 @@ pt:
       sending_message: "A enviar *%{message_preview}* para *%{num_people}*"
     more_participants: "+ outros %{total}"
     no_message: 
+      batch_selected: "Várias conversas selecionadas"
       beta_description: "Está a utilizar uma versão beta da caixa de entrada Canvas"
       beta_version: "Versão Beta"
       no_conversations_selected: "Não existem conversas selecionadas"
@@ -3645,6 +3970,7 @@ pt:
       one: "1 pessoa"
       other: "%{count} pessoas"
     recipient_error: "A disciplina ou o grupo que selecionou não tem destinatários válidos"
+    search_category: "Procurar %{category}"
     select_all: "Selecionar tudo"
     star: Marcar
     star_conversation: "Marcar conversa"
@@ -3655,6 +3981,8 @@ pt:
       expand_inline: "Mostrar mais comentários"
       rss_feed: "Feed de Conversas"
       view_submission: "Abrir envio em uma nova janela"
+    unarchive: Desarquivar
+    unarchive_conversation: "Desarquivar conversa"
     unknown_user: "Utilizador desconhecido"
     unspecified_error: "Ocorreu um erro inesperado, tente novamente"
     unstar: Desmarcar
@@ -3698,6 +4026,7 @@ pt:
       slide7: "Slide 7"
       slide8: "Slide 8"
       slide9: "Slide 9"
+  correct_answer: "Essa era a resposta correta."
   course: 
     access_denied: "O acesso foi recusado"
     batch_update_message: 
@@ -3855,19 +4184,6 @@ pt:
       section_enrollments: "Inscrições na secção"
   course_statistics: 
     unknown: desconhecido
-  course_subscriptions: 
-    already_subscribed: 
-      already_subscribed_message: "Olá, *%{subscriber_name}*, já subscreveu *%{course_name}*"
-    logged_in_confirm_form: 
-      logged_in_confirm_message: "Olá, *%{user_name}*, obrigado pelo seu interesse em *%{course_name}*. Clique em Subscrever em baixo para receber atualizações sobre esta disciplina."
-    new: 
-      subscribe: Subscrever
-    show: 
-      thanks: "Obrigado, está agora inscrito em *%{course_name}*."
-    subscribe_form: 
-      email: "Endereço de e-mail"
-      subscribe_form_text: "Obrigado pelo seu interesse em *%{course_name}*. Para receber atualizações sobre esta disciplina, indique o seu nome completo e endereço de e-mail em baixo. "
-      your_name: "O seu nome"
   course_users: 
     greater_than_three: "Introduza um termo de pesquisa com três ou mais caracteres"
     unknown_error: "Algo correu mal durante a pesquisa, tente novamente."
@@ -4064,6 +4380,7 @@ pt:
       headings: 
         future_enrollments: "Inscrições futuras"
         my_courses: "As minhas disciplinas"
+        my_groups: "Os meus grupos"
         past_enrollments: "Inscrições anteriores"
       start_new_course: "Iniciar nova disciplina"
       titles: 
@@ -4182,6 +4499,7 @@ pt:
         add_section: "Adicionar seção"
         move_course: "Mover disciplina"
         update_course: "Atualizar detalhes da disciplina"
+      course_open_enrollment_without_code: "Esta disciplina tem inscrições abertas. Os alunos podem inscrever-se na disciplina assim que partilhar com eles este URL: *%{url}*"
       course_overrides_term: "Isto substituirá qualquer configuração de disponibilidade de período."
       date_restricted: "Os utilizadores só podem participar na disciplina entre estas datas"
       deatils: 
@@ -4247,7 +4565,6 @@ pt:
         public_syllabus: "Tornar o programa desta disciplina visível publicamente"
         restrict_enrollments_to_course_dates: "Os utilizadores só podem participar na disciplina entre estas datas"
         root_account_id: "Conta raiz"
-        self_enrollment: "Permitir que os alunos se inscrevam, compartilhando com eles o URL secreto"
         sis_source_id: "ID do SIS"
         start_at: "Inicia em"
         storage_quota: "Armazenamento de arquivos"
@@ -4262,7 +4579,7 @@ pt:
           delete_section: "Excluir seção"
           edit_section: "Editar seção"
       megabytes: megabytes
-      navigation_keyboard_hint: "Para mudar a ordem das ligações de navegação da disciplina, desative primeiro o cursor no seu leitor de ecrã. Insira z em JAWS. Prima Tab para selecionar a primeira ligação. Prima para cima e para baixo para selecionar uma ligação. Prima espaço para selecionar uma ligação e começar a arrastar. Em seguida, prima para cima e para baixo para selecionar um destino. Prima espaço novamente para largar a ligação depois do destino."
+      navigation_keyboard_hint: "No caso de utilizar um leitor de ecrã, para mudar a ordem das ligações de navegação da disciplina, desative o cursor virtual/memória intermédia virtual do leitor de ecrã (prima Insert-z em JAWS). Prima Control-Home para saltar para o topo da página e, em seguida, prima a tecla Tab até chegar à primeira ligação de navegação da disciplina. Prima as setas para cima e para baixo até ouvir a ligação que pretende mover e prima espaço para selecionar a ligação. Em seguida, prima as setas para cima e para baixo até localizar a nova posição. Por último, prima novamente espaço para colocar a ligação que está a mover diretamente após a ligação atual. Quando terminar, reative o cursor/a memória intermédia virtual."
       no_date: "Nenhuma data definida"
       no_language_preference: "Não definido (configurado pelo utilizador, predefinição em %{language})"
       none: Nenhum
@@ -4271,6 +4588,8 @@ pt:
       private_course: Privado
       public_course: Público
       section_sis_id: "ID do SIS: %{section_sis}"
+      self_enrollment: "Permitir que os alunos se inscrevam partilhando com eles um URL ou código secreto"
+      self_enrollment_without_code: "Permitir que os alunos se inscrevam partilhando com eles um URL secreto"
       set_grading_scheme: "definir esquema de avaliação"
       sis_source_id: "ID do SIS"
       tab_cant_disable: "Esta página não pode ser desativada, apenas oculta"
@@ -4282,7 +4601,7 @@ pt:
         grade_publishing: "Publicação de notas"
         navigation: Navegação
         sections: Seções
-        tools: Aplicações
+        tools: Aplicativos
       titles: 
         edit_navigation: "Editar navegação da disciplina"
       transifex_message: "Aderir à [Comunidade de Tradução do Canvas](%{transifex_url})"
@@ -4316,35 +4635,48 @@ pt:
         assignments: "Esta vista mostra a **lista de tarefas** da disciplina, com as tarefas futuras e recentes na parte superior."
         confirm_unenroll: "Tem a certeza de que pretende cancelar a inscrição na disciplina? Deixará de poder ver o rol da disciplina ou comunicar diretamente com os professores e não poderá ver os eventos da disciplina no seu mural e como notificações."
         custom_page: "Pode **elaborar a sua própria página inicial da disciplina** e incluir quaisquer ligações, imagens ou rich media que desejar."
-        modules: |-
-            A disciplina pode ser organizada em **módulos ou secções**, sendo que cada secção contém um conjunto relacionado de ficheiros, tarefas, páginas, etc. Se desejar, pode também sequenciar os módulos definindo critérios e pré-requisitos que devem ser concluídos antes de cada módulo ser desbloqueado.
-            
-            Este layout é provavelmente melhor para disciplinas que não sejam baseadas num calendário específico, como um período ou semestre.
         recent_activity_dashboard: "O **painel de atividades recentes** permite aos participantes verem as conversas, os anúncios, as discussões e as interações mais recentes referentes a esta disciplina. É muito semelhante à página de painel que os utilizadores veem quando iniciam sessão pela primeira vez, mas mostra apenas conteúdo relativo a esta disciplina específica."
         syllabus: "A **vista de programa** permite escrever uma descrição das expetativas da disciplina ou apresentar a disciplina com ligações, imagens, etc., e mostra também uma vista de calendário com todas as tarefas e eventos da disciplina."
+      draft_state: 
+        buttons: 
+          cancel: Cancelar
+          update_layout: Guardar
+        headings: 
+          set_layout: "Definir o layout da página inicial"
+        labels: 
+          select_content: "Selecione o que pretende visualizar na página inicial."
+        options: 
+          assignments: "Lista de tarefas"
+          custom_page: "Páginas na primeira página"
+          modules: "Módulos da disciplina"
+          recent_activity_dashboard: "Painel de atividades recentes"
+          syllabus: Programa
       empty_body: "Sem conteúdo"
       headings: 
         confirm_unenroll: "Confirmar cancelamento de inscrição"
+        edit_homepage_title: "Editar página inicial"
         importing: "Disciplina em importação"
         set_layout: "Definir o layout a página inicial"
         unpublished: "Esta disciplina não foi publicada"
       importing: "Cópia/migração de disciplina em curso. Algum conteúdo pode ficar temporariamente indisponível."
       labels: 
-        set_layout: "Quando as pessoas visitarem a página da disciplina, mostrar"
+        select_content: "Quando as pessoas visitarem a página da disciplina, mostrar"
       license_notice: "O conteúdo desta disciplina é disponibilizado sob uma licença %{license_type}. O conteúdo desta disciplina pode ser considerado sob esta licença, salvo indicação em contrário."
       links: 
         change_layout: "Alterar o layout da página inicial"
         course_setup: "Lista de verificação da configuração da disciplina"
-        course_stream: "Ver mural da disciplina"
+        course_stream: "Ver fluxo da disciplina"
         drop_course: "Desistir desta disciplina"
+        edit_homepage: "Editar página inicial"
         join_course: "Aderir a esta disciplina"
         new_announcement: "Novo anúncio"
         restore_role: "Restaurar função e permissões"
+        view_course_stream: "Ver fluxo da disciplina"
       options: 
         assignments: "a lista de tarefas"
         custom_page: "uma página elaborada por mim"
         modules: "os módulos/secções da disciplina"
-        recent_activity_dashboard: "o Painel de atividades recentes"
+        recent_activity_dashboard: "o painel de atividades recentes"
         syllabus: "as tarefas com o programa da disciplina"
       period_name: "as últimas 2 semanas"
       re_sending: Reenviando...
@@ -4598,6 +4930,7 @@ pt:
       short: "%b %e"
       short_month: "%b"
       short_weekday: "%a"
+      short_with_weekday: "%a, %b %-d"
       weekday: "%A"
     month_names: 
       - ~
@@ -4755,7 +5088,6 @@ pt:
   discussion_entry: 
     atom_no_author: "Sem autor"
     default_user_name: "Nome do utilizador"
-    file_added_warning: "Adicionado o arquivo \"%{file_path}\", que é necessário para uma entrada no tópico \"%{discussion_topic_title}\""
   discussion_topic: 
     atom_no_author: "Sem autor"
     default_title: "Sem título"
@@ -4914,7 +5246,6 @@ pt:
       reply_to_message: "Responder à mensagem atual"
       reply_to_topic: "Responder ao tópico"
       retrieved_from_feed: "Recuperado de %{feed}"
-      search_entries: "Procurar entradas ou autores"
       search_entries_placeholder: "Procurar entradas ou autor"
       show_rubric: "Exibir protocolo"
       speed_grader: SpeedGrader
@@ -5433,10 +5764,15 @@ pt:
     account_navigation_configured: "Navegação da conta configurada"
     app_full_view: 
       add_tool: "Adicionar ferramenta"
-      back_to_app_center: "Voltar ao Centro de Aplicações"
+      app_already_installed: "Esta aplicação já foi instalada"
+      average_rating: "Classificação média"
+      back_to_app_center: "Voltar ao Centro de Aplicativos"
+      education_levels: "Nível(eis) de ensino"
+      extensions: Extensões
+      help_link: "Ligação de ajuda"
       rate_tool: "Classificar esta ferramenta"
     app_review_view: 
-      posted_by_on: "Publicado por *%{user_name}* em *%{created}*"
+      posted_by_on: "Publicado por *%{user.name}* em *%{created_at}*"
     app_saved_message: "%{app} guardado com sucesso!"
     borderless_launch: 
       load_tool_button: "Carregar %{tool} manualmente"
@@ -5498,12 +5834,15 @@ pt:
     homework_submission_configured: "Envio de trabalho de casa configurado"
     index_view: 
       add_new_tool: "Adicionar nova aplicação"
-      app_headder: "Aplicações externas"
-      external_tools_note: "As aplicações são uma forma fácil de adicionar novas funcionalidades ao Canvas. Podem ser adicionadas a disciplinas individuais ou a todas as disciplinas incluídas numa conta. Depois de configuradas, pode fazer ligações às aplicações através de módulos de disciplinas e criar tarefas para ferramentas de avaliação."
+      all: Todos
+      app_headder: "Aplicativos externas"
+      external_tools_note: "As aplicativos são uma forma fácil de adicionar novas funcionalidades ao Canvas. Podem ser adicionadas a disciplinas individuais ou a todas as disciplinas incluídas numa conta. Depois de configuradas, pode fazer ligações às aplicativos através de módulos de disciplinas e criar tarefas para ferramentas de avaliação."
       external_tools_references: "Clique *aqui* para ver algumas ferramentas LTI que funcionam muito bem com o Canvas. Também pode consultar os tópicos da Comunidade Canvas relacionados com ferramentas LTI **aqui**"
+      installed: Instalado
+      not_installed: "Não instalado"
       search_filter: "Filtrar por nome"
-      view_app_center: "Ver Centro de Aplicações"
-      view_installed_tools: "Ver aplicações instaladas"
+      view_app_center: "Ver Centro de Aplicativos"
+      view_installed_tools: "Ver configurações de aplicação"
     missing_stars: "Tem de selecionar uma classificação em estrelas"
     rate_tool_view: 
       rate_tool: "Como classifica esta ferramenta?"
@@ -5851,9 +6190,13 @@ pt:
     students_who: 
       havent_been_graded: "Não foram avaliados"
       havent_submitted_yet: "Ainda não enviou"
+      no_grade_for: "Nenhuma nota para %{assignment}"
+      no_submission_for: "Nenhum envio para %{assignment}"
       not_submitted_yet: "Ainda não enviou"
       scored_less_than: "Pontuou menos que"
+      scored_less_than_on: "Teve pontuação inferior a %{cutoff} em %{assignment}"
       scored_more_than: "Pontuou mais que"
+      scored_more_than_on: "Teve pontuação superior a %{cutoff} em %{assignment}"
     submission_information: "Informações de envio"
     teacher_muted_title: "A tarefa está silenciada"
     titles: 
@@ -5940,8 +6283,13 @@ pt:
     students_who: 
       havent_been_graded: "Não foram avaliados"
       havent_submitted_yet: "Ainda não enviou"
+      no_grade_for: "Nenhuma nota para %{assignment}"
+      no_submission_for: "Nenhum envio para %{assignment}"
+      not_submitted_yet: "Ainda não enviou"
       scored_less_than: "Pontuou menos que"
+      scored_less_than_on: "Teve pontuação inferior a %{cutoff} em %{assignment}"
       scored_more_than: "Pontuou mais que"
+      scored_more_than_on: "Teve pontuação superior a %{cutoff} em %{assignment}"
     submitted_late: "Enviou tarde"
     title: 
       quiz: "Envio do teste"
@@ -6282,8 +6630,8 @@ pt:
       labels: 
         add_comment: "Adicionar um comentário"
         average: Média
-        beta_grade_by_question: "Nota beta por pergunta"
         grade: Nota
+        grade_by_question_beta: "Nota por pergunta (beta)"
         group_comment: "Enviar comentário para todo o grupo"
         hide_names: "Ocultar nomes de alunos no SpeedGrader"
         show_assessment_by: "Exibir avaliação por"
@@ -6405,6 +6753,8 @@ pt:
   group: 
     default_collection_name: "Coleção de %{group_name}"
     memeber: Membro
+    name_required: "É necessário o nome"
+    name_too_long: "Introduza um nome de grupo mais curto"
     tabs: 
       chat: Bate-papo
       discussions: Discussões
@@ -6539,7 +6889,9 @@ pt:
       messages: 
         no_students: "Nenhum aluno foi adicionado a esta disciplina"
       page_title: "Grupos da disciplina"
-    delete_confirm: "Tem a certeza de que pretende remover esta categoria de grupo?"
+      page_title_accounts: "Grupos de conta"
+    create_group_set: "Criar conjunto de grupos"
+    delete_confirm: "Tem a certeza de que pretende remover este conjunto de grupos?"
     edit: 
       buttons: 
         update: "Atualizar grupo"
@@ -6556,6 +6908,7 @@ pt:
       group_structure_group_limit: "*Limitar grupos a* %{group_limit} membros"
       restricted_self_signup: "Os membros do grupo devem estar na mesma seção"
       self_signup_help_tooltip: "O que são grupos auto-inscritos?"
+    edit_group_set: "Editar conjunto de grupos"
     errors: 
       category_in_use: "\"%{category_name}\" já está sendo usado"
       creating_category_failed: "Falha na criação da categoria, tente novamente"
@@ -6564,10 +6917,11 @@ pt:
       group_limit: "O limite do grupo tem de ficar em branco ou ser superior a 1"
       unknown: "Ocorreu um erro inesperado."
       update_failed: "Falha na atualização, tente novamente"
+    everyone: "Todos (%{count})"
     feed_title: "%{course_or_account_name} Feed"
     flash: 
-      removeError: "Não foi possível remover a categoria de grupo. Tente novamente mais tarde."
-      removed: "Categoria de grupo removida com sucesso."
+      removeError: "Não é possível remover o conjunto de grupos. Tente novamente mais tarde."
+      removed: "Conjunto de grupos removido com sucesso."
     group: 
       actions: 
         ask_to_join_group: "peça para participar deste grupo"
@@ -6582,10 +6936,8 @@ pt:
       no_members: "Nenhum membro"
       one: "1 grupo"
       other: "%{count} grupos"
-    group_count: 
-      one: "1 grupo"
-      other: "%{count} grupos"
     group_name: "Nome de grupo"
+    groups_count: "Grupos (%{count})"
     index: 
       heading_current_groups: "Grupos atuais"
       no_groups: "Nenhum grupo"
@@ -6596,59 +6948,99 @@ pt:
         add_unassigned_user: "Adicionar utilizador não atribuído"
         search_people: "Procurar pessoas"
       add_unassigned_user: 
-        assign_to_group: "Atribuir a grupo"
+        add_to_group: "Adicionar utilizador a grupo"
+        add_user_to_group: "Adicionar utilizador %{name} a este grupo"
       add_unassigned_users: 
         no_users_found: "Não foram encontrados utilizadores"
         too_short: "Introduza um termo de pesquisa com 3 ou mais caracteres"
       assign_to_group_menu: 
         add_to_group: "Adicionar a grupo"
+        all_groups_full: "Todos os grupos estão cheios."
+        all_groups_full_suggestion: "Altere os limites dos grupos ou adicione mais grupos."
         assign_user_to_group: "Atribuir utilizador a este grupo"
-      group: 
-        add_user_to_group: "Atribuir utilizador a grupo"
-        group_delete: Eliminar
-        group_edit: Editar
-        group_settings: Definições
-        show_group_details: "Mostrar detalhes do grupo"
+        assign_user_to_group_name: "Atribuir utilizador ao grupo %{name}"
+        no_groups_created: "É necessário criar grupos para ser possível adicionar utilizadores."
       group_categories: 
-        group_set_create: "Adicionar conjunto de grupos"
+        account_group_explanation: "Os grupos de alunos no nível da conta são uma boa maneira de agrupar alunos sem estar preso a uma disciplina específica. Todos os grupos de alunos obtêm o seu próprio calendário, quadro de discussão e ferramentas de colaboração, para que se possam organizar sozinhos e trabalhar em grupo mais eficientemente."
+        add_group_set: "Adicionar conjunto de grupos"
+        course_group_explanation: "Os grupos de alunos são uma forma útil de organizar alunos para projetos em grupo ou artigos. Todos os grupos de alunos obtêm o seu próprio calendário, quadro de discussão e ferramentas de colaboração, para que se possam organizar sozinhos e trabalhar em grupo mais eficientemente."
+        group_assignment_instructions: "Pode atribuir aleatoriamente os alunos a grupos de um tamanho específico ou criar e organizar manualmente os grupos. Após a criação dos grupos, pode definir tarefas para serem \"tarefas de envio em grupo\", o que significa que cada grupo terá uma tarefa enviada em nome de todos os utilizadores do grupo."
+        group_set: "Conjunto de grupos"
+        headings: 
+          account_groups: "Grupos de alunos no nível da conta"
+          course_groups: "Grupos de alunos"
       group_category: 
         randomly_assigning_students: "Atribuir alunos aleatoriamente"
-        unassigned_students: "Alunos não atribuídos"
-        unassigned_users: "Utilizadores não atribuídos"
+        search_groups: "Procurar grupos"
+      group_category_create: 
+        allow_self_signup: "Permitir auto-inscrição"
+        cancel: Cancelar
+        create_groups: "Criar %h{num_groups} grupos agora"
+        create_groups_manually: "Eu vou criar os grupos manualmente"
+        group_set_name: "Nome do conjunto de grupos"
+        group_structure: "Estrutura do grupo"
+        leave_group_limit_blank: "Deixar em branco para não ter limite"
+        limit_group_size: "Limitar grupos a %h{group_limit} membros"
+        require_same_section: "Os membros do grupo devem estar na mesma secção"
+        save: Guardar
+        saving: "A guardar..."
+        self_signup: Auto-inscrição
+        self_signup_description: "Pode criar conjuntos de grupos, nos quais os alunos podem inscrever-se sozinhos. Os alunos continuam limitados a pertencer apenas a um grupo do conjunto, mas dessa forma os alunos podem organizar-se em grupos em vez de precisarem que o professor faça esse trabalho. Tenha em atenção que os alunos podem mover-se de um grupo para outro enquanto esta opção estiver ativada."
+        split_into_groups: "Dividir alunos em %h{split_num} grupos iguais"
+        what_is_this: "O que é isto?"
       group_category_detail: 
         add_group: "Adicionar grupo"
         category_settings: Definições
         delete_category_option: Eliminar
         edit_category_option: Editar
-        group_limit_blurb: "Os grupos estão limitados a *%{count}* membros"
+        group: Grupo
+        group_limit_blurb: "Os grupos estão limitados a *%{group_limit}* membros."
+        message_all_unassigned_option: "Enviar mensagem a todos os alunos não atribuídos"
         randomly_assign_students_option: "Atribuir alunos aleatoriamente"
         restricted_self_signup_blurb: "Todos os alunos num grupo têm de estar na mesma secção."
-        search: procurar
         self_organized_warning: "Estes grupos são auto-organizados pelos alunos. Ao contrário de outros tipos de grupos, os alunos podem pertencer a mais de um destes grupos ao mesmo tempo, o que significa que estes grupos podem não ser a melhor solução para tarefas avaliadas."
         self_signup_blurb: "A auto-inscrição está ativada para estes grupos."
-        self_signup_help_tooltip: "O que são grupos de auto-inscrição?"
-        student_group_instructions: "(arrastar alunos para atribuir)"
-        user_group_instructions: "(arrastar utilizadores para atribuir)"
-      group_edit: 
-        group_name: "Nome do grupo"
-      group_edit_dialog_wrapper: 
+        settings: Definições
+      group_category_edit: 
+        allow_self_signup: "Permitir auto-inscrição"
         cancel: Cancelar
+        group_set_name: "Nome do conjunto de grupos"
+        leave_group_limit_blank: "Deixar em branco para não ter limite"
+        limit_group_size: "Limitar grupos a %h{group_limit} membros"
+        require_same_section: "Os membros do grupo devem estar na mesma secção"
+        save: Guardar
+        saving: "A guardar..."
+      group_detail: 
+        add_user_to_group: "Atribuir utilizador a grupo"
+        group_delete: Eliminar
+        group_edit: Editar
+        group_full: Cheio
+        group_settings: Definições
+        show_group_details: "Mostrar detalhes do grupo %{name}"
+        visit_group_homepage: "Visitar página inicial do grupo"
+      group_edit: 
+        cancel: Cancelar
+        group_name: "Nome do grupo"
         save: Guardar
         saving: "A guardar..."
       group_user: 
         assign_to_group: "Atribuir a grupo"
+        assign_user_to_group: "Atribuir utilizador %{name} a um grupo"
+        remove_from_group: "Remover do grupo"
+        remove_user_from_group: "Remover utilizador %{name} deste grupo"
       group_users: 
         no_students: "Não existem alunos"
         no_users: "Não existem utilizadores"
       groups: 
-        groups: Grupos
         no_groups: "Não existem grupos."
-        search: Procurar
-        search_groups: "Procurar grupos"
+        no_matching_groups: "Nenhum grupo correspondente."
       randomly_assign_members: 
-        add_more_users: Cancelar
-        close: Okay
+        cancel: Cancelar
+        okay: OK
         randomly_assign_students_dialog: "Esta ação atribuirá automaticamente todos os alunos não atribuídos da forma mais uniforme possível entre os grupos de alunos existentes."
+      self_signup_help: 
+        about_self_signup_groups: "Sobre grupos de auto-inscrição"
+        self_signup_description: "Pode criar conjuntos de grupos, nos quais os alunos podem inscrever-se sozinhos. Os alunos continuam limitados a pertencer apenas a um grupo do conjunto, mas dessa forma os alunos podem organizar-se em grupos em vez de precisarem que o professor faça esse trabalho. Tenha em atenção que os alunos podem mover-se de um grupo para outro enquanto esta opção estiver ativada."
     member: 
       one: "1 membro"
       other: "%{count} membros"
@@ -6686,6 +7078,8 @@ pt:
     titles: 
       add_group_category: "Adicionar conjunto de grupos"
       self_signup_help: "Grupos de auto-inscrição"
+    unassigned_students: "Alunos não atribuídos (%{count})"
+    unassigned_users: "Utilizadores não atribuídos (%{count})"
   help_dialog: 
     Back: Voltar
     Help: Ajuda
@@ -6777,6 +7171,7 @@ pt:
       invalid_number: "Este valor deve ser um número."
       not_a_date: "Isto não é uma data!"
       posting_message_failed: "Falha na publicação, tente novamente"
+      required: "Campo de preenchimento obrigatório"
       search_failed: "Falha na pesquisa, tente novamente."
     ignore_forever: "Ignorar para sempre"
     ignore_until_new_submission: "Ignorar até novo envio"
@@ -6821,6 +7216,7 @@ pt:
       id: id
       priority: prioridade
       run_at: "executar em"
+      runtime: "tempo de execução"
       strand: parte
       tag: tag
       worker: trabalhador
@@ -6945,6 +7341,7 @@ pt:
           porque a tarefa não tem pontos possíveis.
       no_points_possible: "A tarefa não tem pontos possíveis."
       no_score: "Nenhuma pontuação atribuída"
+      no_submission_created: "Este pedido de resultado não conseguiu criar um novo envio de trabalho de casa."
     canvas: 
       migration: 
         announcements: Anúncios
@@ -7857,14 +8254,16 @@ pt:
     course_already_started: 
       email: 
         body: |-
-            Olá %{user},⏎
-            ⏎
-            %{course}, a sua disciplina na Rede Canvas, teve início há alguns dias e reparámos que ainda não iniciou sessão na disciplina. Estamos a enviar este último lembrete para o caso de se ter esquecido.⏎
-            ⏎
-            Para iniciar sessão, vá a %{site} e introduza o seu nome de utilizador e a palavra-passe. Se ainda não definiu uma palavra-passe, pode fazê-lo aqui: %{password_url}. Se simplesmente não puder participar nesta disciplina específica, esteja à vontade para pesquisar o nosso catálogo de disciplinas em %{site} para encontrar outra disciplina que o inspire. Estão sempre a ser adicionadas novas disciplinas!⏎
-            ⏎
-            Esperamos vê-lo brevemente,⏎
-            ⏎
+            Olá %{user},
+            
+            %{course}, a sua disciplina na Rede Canvas, começou há alguns dias e reparámos que ainda não iniciou sessão. Enviamos-lhe este último lembrete para o caso de se ter esquecido.
+            
+            Para iniciar sessão, vá a %{site} e introduza o seu nome de utilizador e palavra-passe. Se ainda não tiver definido uma palavra-passe, pode definir uma aqui: %{password_url}
+            
+            Se simplesmente não puder fazer esta disciplina específica, explore o nosso catálogo em %{site} para encontrar outra disciplina que o inspire. Estamos sempre a adicionar novas disciplinas!
+            
+            Esperamos vê-lo brevemente,
+            
             Rede Canvas
         course_already_started: "A sua disciplina já começou"
     course_required_materials: 
@@ -8662,9 +9061,9 @@ pt:
     quiz_locked_until: "Este teste está bloqueado até %{date}."
     quiz_regrade_finished: 
       email: 
-        body: "Foi concluída uma reavaliação do teste %{quiz}"
+        body: "Foi concluída uma nova avaliação para o teste %{quiz}"
         html: 
-          body: "Foi concluída uma reavaliação do teste %{quiz}"
+          body: "Foi concluída uma nova avaliação para o teste %{quiz}"
           link_message: "Pode ver o teste aqui:"
           subject: "Reavaliação de teste concluída: %{quiz}, %{context}"
         link_message: "Pode ver o teste aqui:"
@@ -8805,14 +9204,14 @@ pt:
         body: "A nota da sua tarefa, %{assignment_title}, foi alterada."
         html: 
           body: "A nota da sua tarefa, %{assignment_title}, foi alterada."
-          link_message: "Pode rever a tarefa aqui"
+          link_message: "Reveja a sua tarefa aqui:"
           no_date_set: "Nenhuma data definida"
           not_applicable: ND
           regraded_date: "reavaliação de nota: %{date}"
           score: "pontuação: %{score} em %{total}"
           score_pending: "pontuação a aguardar revisão do professor"
           subject: "Nota alterada: %{assignment}, %{context}"
-        link_message: "Pode rever a tarefa aqui:"
+        link_message: "Reveja a sua tarefa aqui:"
         no_date_set: "Nenhuma data definida"
         not_applicable: ND
         regraded_date: "reavaliação de nota: %{date}"
@@ -8854,13 +9253,13 @@ pt:
         html: 
           body: "A sua tarefa, %{assignment}, foi avaliada."
           graded_date: "avaliado: %{date}"
-          link_message: "Pode rever a tarefa aqui"
+          link_message: "Reveja a sua tarefa aqui:"
           no_date_set: "Nenhuma data definida"
           not_applicable: ND
           score: "pontuação: %{score} em %{total}"
           score_pending_review: "pontuação a aguardar revisão do professor"
           subject: "Tarefa avaliada: %{assignment}, %{context}"
-        link_message: "Pode rever a tarefa aqui:"
+        link_message: "Reveja a sua tarefa aqui:"
         no_date_set: "Nenhuma data definida"
         not_applicable: ND
         score: "pontuação:  %{score} de %{total}"
@@ -9056,6 +9455,13 @@ pt:
       no_students_found: "Não foram encontrados alunos"
       student_progress: "Progresso do aluno"
   moodle_dropdown_warning_title: "Pergunta de várias listas pendentes pode ter sido importada incorretamente"
+  move_dialog: 
+    cancel: Cancelar
+    save: Guardar
+    saving: "A guardar..."
+    where_to_move: "Para onde pretende mover *%{name}*?"
+  move_dialog_select: 
+    move_to_end: "-- Na parte inferior --"
   mute_dialog: 
     curving_assignments: "Relativizando as tarefas"
     grade_change_notifications: "Notificações de alteração de nota"
@@ -9067,6 +9473,8 @@ pt:
     submission_comments: "Comentários do envio"
     sure_you_want_to_mute: "Tem certeza que deseja silenciar esta tarefa? Enquanto esta tarefa estiver silenciada, os alunos não receberão novas notificações sobre ela, nem poderão ver:"
   name: "Importador de referências académicas"
+  new_facebook_message: "Tem uma nova mensagem do Canvas."
+  no_migration_file: "Ficheiro necessário para migração de conteúdo."
   not_applicable: ND
   notification: 
     added_to_conversation_description: "Foi adicionado a uma conversa"
@@ -9438,6 +9846,7 @@ pt:
       page_deleted: "A página \"%{title}\" foi eliminada."
     reload_editing_page: "Esta página foi alterada desde que começou a editá-la. Se *recarregar* a página, perderá todas as alterações feitas."
     reload_viewing_page: "Esta página foi alterada desde que começou a vê-la. *Recarregar*"
+    restore_failed: "Não foi possível restaurar a revisão de página"
     save_button: Guardar
     saving_button: "A guardar..."
     warnings: 
@@ -9467,13 +9876,13 @@ pt:
       description: "Selecionar relatórios da conta"
       name: "Relatórios da conta"
     app_center: 
-      description: "Centro de Aplicações para procurar/instalar ferramentas externas no Canvas"
-      name: "Centro de Aplicações"
+      description: "Centro de Aplicativos para procurar/instalar ferramentas externas no Canvas"
+      name: "Centro de Aplicativos"
     app_center_settings: 
-      description: "O Centro de Aplicações irá aparecer no separador \"Aplicações\" na página de definições de uma disciplina ou de uma conta. O URL disponibilizado abaixo deverá apontar para um terminal de Centro de Aplicações válido (por exemplo, https://lti-examples.heroku.com -- certifique-se de que não coloca uma barra final)"
+      description: "O Centro de Aplicativos irá aparecer no separador \"Aplicativos\" na página de definições de uma disciplina ou de uma conta. O URL disponibilizado abaixo deverá apontar para um terminal de Centro de Aplicativos válido (por exemplo, https://lti-examples.heroku.com -- certifique-se de que não coloca uma barra final)"
       labels: 
         app_reviews_endpoint: "Terminal de visualização de aplicação"
-        apps_index_endpoint: "Terminal de índice de aplicações"
+        apps_index_endpoint: "Terminal de índice de aplicativos"
         base_url: "URL base"
         token: "Token de acesso"
     assignment_freezer: 
@@ -9508,16 +9917,10 @@ pt:
       description: "Este plug-in é integrado no Crocodoc para disponibilizar uma ferramenta de pré-visualização de documentos HTML5, que proporciona aos professores e alunos a capacidade de fazer anotações em documentos."
       labels: 
         api_key: "Chave de API Crocodoc"
-    dim_dim: 
-      description: "Suporte à webconferência do DimDim"
-      name: DimDim
     dim_dim_settings: 
       description: "Será necessário acessar uma instância do Dim Dim."
       labels: 
         domain: Domínio
-    embedded_chat: 
-      description: "Widget de chat na página para utilização com a aplicação Instructure Chat LTI"
-      name: "Chat incorporado"
     embedly: 
       description: "Obter informação Embedly para coleções"
       name: "Integração Embedly"
@@ -9627,7 +10030,6 @@ pt:
         term_start_days_adjustment: "Ajustamento dos dias de início do período"
     index: 
       author: Autor
-      canvas_revision_unknown: Desconhecido
       description: Descrição
       name: Nome
       no_plugins: "Não há plugins do Canvas instalados"
@@ -9699,6 +10101,10 @@ pt:
       labels: 
         download_url: "URL de descarregamento LockDown Browser"
         plugin_enabled: Ativado
+    med_cornell_export: 
+      labels: 
+        password: "Palavra-passe para autenticação"
+        username: "Nome de utilizador para autenticação"
     notices: 
       settings_updated: "Atualização das configurações de plugin bem sucedida."
     qti_converter_settings: 
@@ -9723,6 +10129,7 @@ pt:
           "Definições -> API" no seu perfil, após a criação.
       labels: 
         api_key: "Chave API"
+        enable_html5_viewer: "Ativar visualizador de documentos HTML5"
         secret_key: "Segredo API"
     sessions: 
       description: "Gerir limites de tempo de sessões"
@@ -9931,6 +10338,7 @@ pt:
         change_password: "Alterar senha"
         confirm_password: "Confirmar senha"
         default_email: "Email padrão"
+        enabled_theme: "Tema ativado"
         expires_at: "Expira em"
         headers: 
           approved_integrations: "Integrações aprovadas"
@@ -10229,20 +10637,23 @@ pt:
   publish_btn_module: 
     buttons: 
       publish: Publicar
-      publish_desc: "Não publicado. Clique para publicar"
+      publish_desc: "Não publicado. Clique para publicar."
       published: Publicado
-      published_desc: "Publicado. Clique para anular a publicação"
+      published_desc: "Publicado. Clique para anular a publicação."
       publishing: "A publicar..."
       unpublish: "Anular publicação"
       unpublishing: "A anular a publicação..."
   publishable: 
     cant_unpublish: "Não é possível anular a publicação"
+  publishableModuleItem: 
+    disabled: "Publicação desativada para este item"
   purchases: 
     new: 
       payment_info: "Informação de pagamento"
   qti_display: QTI
   qti_file_description: "Ficheiro .zip QTI"
   qti_name: "Conversor QTI"
+  question_answered: Respondida
   question_bank: 
     align_outcomes: "Alinhar resultados"
     remove_outcome_from_bank: "Tem certeza de que deseja remover este resultado do banco?"
@@ -10330,6 +10741,7 @@ pt:
       show_details: "Exibir detalhes da pergunta"
       title: 
         move_copy_questions: "Mover/Copiar perguntas"
+  question_unanswered: "Ainda não respondida"
   quick_start_bar: 
     announcement: 
       saving: "A guardar..."
@@ -10439,16 +10851,16 @@ pt:
     default_response_to_file_upload: "Resposta a mostrar aos alunos após o envio de uma resposta"
     default_title: "Novo teste"
     display_answer: 
-      correct_answer: "Essa era a resposta correta."
       labels: 
         answer_with_margin: "com margem"
         your_answer: "Sua resposta"
+      margin_of_error: "margem de erro"
       plus_or_minus: +/-
       range_answer: "Entre %{lower_bound} e %{upper_bound}"
-      selected_answer: "Escolheu esta resposta."
       you_left_this_blank: "(Deixou isto em branco)"
     display_question: 
       default_question_answer: "[ Escolher ]"
+      flag_this_question: "Sinalizar esta pergunta"
       headers: 
         formulas: Fórmulas
         possible_solutions: "Soluções possíveis"
@@ -10472,7 +10884,7 @@ pt:
       regraded_score: "Pontuação reavaliada:"
       show_ansers_for_variable: "Exibir respostas de %{variable}"
       skip_question_text: "Pular para texto da pergunta."
-      submission_was_regraded: "Esta pergunta foi reavaliada. A sua pontuação foi atualizada."
+      submission_was_regraded: "Esta pergunta foi reavaliada."
       titles: 
         question_correct_comment: "Os alunos verão este comentário se responderem corretamente a pergunta"
         question_incorrect_comment: "Os alunos verão este comentário se responderem incorretamente a pergunta"
@@ -10499,16 +10911,7 @@ pt:
           %{example} 
           
           Para este conjunto de fórmulas, a resposta final é 71. No entanto, não há variáveis predefinidas, por isso todos os alunos teriam a mesma pergunta com a mesma resposta. Consulte o separador "variáveis" para obter mais informações sobre variáveis.
-      equation_variables: |-
-          Também pode definir variáveis no texto da pergunta utilizando colchetes 
-          ("Quanto é [a] + [b]?"). Para cada variável, verá um "exemplo de valor"
-          baseado nas definições da variável. Isso permite verificar os seus cálculos e garantir que as suas fórmulas funcionam.
-          
-          Por exemplo, se a sua pergunta foi "Quanto é [a] + 5?" então ser-lhe-á pedido que defina a variável "a". Se o exemplo de valor de "a" for 5,2, poderia escrever:
-          
-          %{example}
-          
-          Com esta fórmula é possível gerar qualquer número de conjuntos de soluções, com um valor diferente de "a" em cada conjunto. Um aluno pode ver a pergunta "Quanto é 5,2 + 5?" e outro pode ver "Quanto é 9 + 5?".
+      equation_variables2: "Também pode definir variáveis no texto da pergunta utilizando parênteses retos (\"Quanto é [a] + [b]?\"). Para cada variável, verá um \"exemplo de valor\" baseado nas definições da variável. Isso permite-lhe verificar os seus cálculos e certificar-se de que as fórmulas funcionam. Por exemplo, se a pergunta for \"Quanto é [a] + 5?\", ser-lhe-á solicitado que defina a variável \"a\". Se o exemplo de valor de \"a\" for 5,2, poderia escrever: %{example} Com esta fórmula é possível gerar qualquer número de conjuntos de soluções, com um valor diferente de \"a\" em cada conjunto. Um aluno pode ver a pergunta \"Quanto é 5,2 + 5?\" e outro pode ver \"Quanto é 9 + 5?\"."
       links: 
         functions: Funções
         intro: Introdução
@@ -10696,12 +11099,12 @@ pt:
       anonymous_username: Aluno
       buttons: 
         allow_extra_attempt: "permitir que este aluno faça mais uma tentativa"
-        update_scores: "Atualizar pontuações"
       count_attempts_left: 
         one: "%{user} tem 1 tentativa restante"
         other: "%{user} tem %{count} tentativas restantes"
       default_quiz_name: "Teste %{course_name}"
       default_survey_name: "Questionário %{course_name}"
+      grade_by_question_warning: "A funcionalidade de nota por pergunta é afetada por perguntas que são misturadas num grupo."
       headers: 
         quiz_submissions: "Teste enviados"
         survey_submissions: "Questionários enviados"
@@ -10934,7 +11337,7 @@ pt:
         delete: Eliminar
         find_ip_address_filter: "Localizar filtro de endereços IP"
       warnings: 
-        has_student_submissions: "Os alunos já realizaram ou iniciaram este teste, por isso deve ter cuidado ao editá-lo. Se alterar qualquer pergunta do teste de forma significativa, deve considerar reavaliar os alunos que realizaram a versão antiga do teste."
+        has_student_submissions: "Os alunos já fizeram ou já iniciaram este teste, por isso tenha cuidado ao editá-lo. Se alterar qualquer pergunta do teste de forma significativa, considere reavaliar os alunos que fizeram a versão antiga do teste."
     no_filters_found: "Nenhum filtro encontrado"
     no_quizzes_view: 
       headers: 
@@ -10981,8 +11384,6 @@ pt:
     question_list_right_side: 
       headers: 
         questions: Perguntas
-      question_answered: Respondida
-      question_unanswered: "Ainda não responderam"
     question_statistic: 
       attempts: 
         one: "1 tentativa"
@@ -11084,12 +11485,14 @@ pt:
       view_responses: "Ver respostas"
     quiz_submission: 
       attempt_duration: "Esta tentativa levou %{duration}."
+      buttons: 
+        update_scores: "Atualizar pontuações"
       labels: 
         final_score: "Pontuação final"
         fudge_points: "Pontos onde ainda é possível corrigir o exame"
-        fudge_points_changed_points_quiz: "Desde que %{user} realizou este teste, os pontos possíveis para o teste foram alterados em %{difference}. É possível ajustar esta alteração e adicionar pontos positivos ou negativos manualmente, usando esta caixa:"
-        fudge_points_changed_points_survey: "Desde que %{user} realizou este questionário, os pontos possíveis para o questionário foram alterados em %{difference}. É possível ajustar esta alteração e adicionar pontos positivos ou negativos manualmente, usando esta caixa:"
-        fudge_points_generic_explanation: "É possível ajustar manualmente a pontuação adicionando pontos positivos ou negativos a esta caixa:"
+        fudge_points_changed_points_quiz: "Desde que %{user} realizou este teste, o número de pontos possíveis foi alterado em %{difference}. É possível fazer ajustes tendo em conta essa alteração e adicionar pontos positivos ou negativos manualmente, utilizando esta caixa."
+        fudge_points_changed_points_survey: "Desde que %{user} realizou este questionário, o número de pontos possíveis foi alterado em %{difference}. É possível fazer ajustes tendo em conta essa alteração e adicionar pontos positivos ou negativos manualmente, utilizando esta caixa."
+        fudge_points_generic_explanation: "É possível ajustar manualmente a pontuação adicionando pontos positivos ou negativos a esta caixa."
         questions_need_review: "As seguintes perguntas precisam ser revisadas"
         quiz_score: "Pontuação do teste"
         score_for_attempt: "Pontuação desta tentativa"
@@ -11171,7 +11574,7 @@ pt:
         lock_survey: "Travar este questionário agora"
         publish: Publicar
         publishing: "A publicar..."
-        republish: "Publicar outra vez"
+        republish: "Publicar novamente"
         unlock_quiz: "Permitir que os alunos façam este teste agora"
         unlock_survey: "Permitir que os alunos façam este questionário agora"
       confirms: 
@@ -11201,8 +11604,10 @@ pt:
         survey_statistics: "Estatísticas do questionário"
       manage: Gerir
       only_registered_users: "Apenas utilizadores registados e inscritos podem realizar os testes avaliados"
-      quiz_regraded_your_score_affected: "Este teste foi reavaliado, a sua pontuação foi afetada."
-      quiz_regraded_your_score_not_affected: "Este teste foi reavaliado, a sua pontuação não foi afetada."
+      quiz_regraded_your_score_affected: 
+        one: "Este teste foi reavaliado; a sua pontuação foi afetada."
+        other: "Este teste foi reavaliado; a sua nova pontuação reflete %{count} perguntas que foram afetadas."
+      quiz_regraded_your_score_not_affected: "Este teste foi reavaliado; a sua pontuação não foi afetada."
       speed_grader: SpeedGrader™
       students_submitted_so_far: 
         one: "1 aluno enviou até o momento"
@@ -11315,15 +11720,13 @@ pt:
       quiz_instructions: "Instruções do teste"
       saved_at: "Teste guardado em %{t}"
       saving: "A guardar..."
-      saving_not_needed: "Não existem dados novos para guardar."
+      saving_not_needed: "Não existem dados novos para guardar. Última verificação: %{t}"
       seconds_count: 
         one: "1 segundo"
         other: "%{count} segundos"
       show_time_link: Exibir
       titles: 
-        answered: Respondida
         come_back_later: "Marcou esta pergunta para voltar mais tarde"
-        not_answered: "Ainda não respondida"
         times_up: "O tempo acabou!"
       years_count: 
         one: "1 ano"
@@ -11683,6 +12086,7 @@ pt:
     titles: 
       add_item_to_module: "Adicionar item ao módulo"
       find_links_using_service: "Localizar link usando %{service}"
+  selected_answer: "Escolheu esta resposta."
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "Já está inscrito em **%{course}**."
@@ -11730,10 +12134,12 @@ pt:
         go_to_dashboard: "Ir para o seu painel"
       not_available_yet: "Enviar-lhe-emos um e-mail pouco antes de a disciplina começar."
   sequence_footer: 
-    next_colon: ":"
-    next_module: "Próximo módulo"
-    prev_colon: ":"
-    prev_module: "Módulo anterior"
+    next_module: "Módulo seguinte:"
+    next_module_desc: "Módulo seguinte: *module*"
+    next_module_item_desc: "Seguinte: *item*"
+    prev_module: "Módulo anterior:"
+    prev_module_desc: "Módulo anterior: *module*"
+    prev_module_item_desc: "Anterior: *item*"
   services_api: 
     must_be_logged_in: "Tem de ter sessão iniciada para utilizar o Kaltura"
   set_default_grade_dialog: 
@@ -12017,6 +12423,7 @@ pt:
       for_title: "para %{title}"
       labels: 
         body: Mensagem
+        subject: Assunto
       message_students_who: "Enviar mensagem aos alunos que..."
       out_of_points: "de %{points_possible}"
     mute_dialog: 
@@ -12131,12 +12538,14 @@ pt:
           other: "Saiba que %{count} alunos já foram avaliados usando este protocolo. Alterá-lo afetará suas avaliações."
         rubric_in_use2: "Já avaliou alunos com este protocolo. Qualquer grande alteração poderá afetar os resultados da avaliação."
       out_of: "%{points} *de %{total}*"
+      rubric: Protocolo
       rubric_title: Título
       titles: 
         find_existing_rubric: "Localizar protocolo existente"
     rubric_criterion: 
       defaults: 
         description: "Descrição do critério"
+      delete_criterion_link: "Eliminar ligação de critério"
       description: 
         custom_comments_area: "Esta área será usada pelo assessor para deixar comentários relacionados a este critério."
       full_marks: "Pontos máximos"
@@ -12153,7 +12562,8 @@ pt:
       options: 
         select: "[ Selecionar ]"
       points: "%{points} pts"
-      points_abbreviation: "*Points* pts"
+      points_label: Pontos
+      points_out_of2: "%{points} / %{total} pts"
       titles: 
         linked_to_learning_outcome: "Este critério está vinculado ao resultado de aprendizado"
     rubric_criterion_dialog: 
@@ -12184,6 +12594,7 @@ pt:
       labels: 
         total_points: "Total de pontos"
       points_out_of: "*%{points}* de **%{total}**"
+      rubric: Protocolo
     rubric_summary_criterion: 
       defaults: 
         description: "Descrição do critério"
@@ -12540,6 +12951,7 @@ pt:
         save_comment: "Guardar comentário"
       crumbs: 
         assignments: Tarefas
+      hide_rubric_button: "Ocultar botão de protocolo"
       labels: 
         add_a_comment: "Adicionar um comentário"
         grade: Nota
@@ -12730,6 +13142,7 @@ pt:
     announcement: Anúncio
     announcements: Anúncios
     assignments: Tarefas
+    come_back_later: "Marcou esta pergunta para voltar mais tarde"
     delete_quiz: "Eliminar teste"
     delete_survey: "Eliminar questionário"
     discussion: Discussão
@@ -12745,6 +13158,13 @@ pt:
   tooltips: 
     vdd: 
       more_message: "e mais %{count}..."
+  tours: 
+    quiz_regrade: 
+      first_bullet: "Depois de alterar uma resposta, terá de escolher uma opção antes de atualizar a pergunta."
+      got_it: "Ok, já percebi"
+      second_bullet: "Certifique-se de que escolhe a opção mais apropriada, uma vez que as pontuações dos alunos PODEM ser afetadas."
+      third_bullet: "O Canvas irá reavaliar todos os seus envios depois de guardar o teste; esta operação pode demorar alguns minutos."
+      try_later: "Pode agora definir opções de reavaliação para alunos que já fizeram o teste."
   turnitin: 
     error_1007: "O ficheiro carregado é demasiado grande."
     error_1009: "Tipo de ficheiro inválido. (Os tipos de ficheiro válidos são os seguintes: MS Word, Acrobat PDF, Postscript, Texto, HTML, WordPerfect (WPD) e Rich Text Format.)"
@@ -12763,6 +13183,7 @@ pt:
   unknown: Desconhecido
   unknown_question_bank: "Banco de perguntas desconhecido"
   unknown_quiz: "Teste desconhecido"
+  unsupported_package: "Pacote de conteúdos não suportado"
   user: 
     default_collection_name: "Coleção de %{user_name}"
     default_user_name: Utilizador
@@ -13169,12 +13590,13 @@ pt:
       welcome_to_happiness: "Bem-vindo ao Canvas!"
   validate: 
     is_required: "Este campo é obrigatório"
-  vdd_tooltip_view: 
-    multiple_dates: "Várias datas"
   warnings: 
     test_install: 
-      message: "Esta instalação Canvas é somente para teste e será reiniciada todas as semanas."
+      periodic_message: "Esta instalação Canvas é somente para teste e será reiniciada periodicamente."
       title: "Instalação de teste Canvas"
+      weekly_message: 
+        one: "Esta instalação Canvas é somente para teste e será reiniciada todas as semanas."
+        other: "Esta instalação Canvas é somente para teste e será reiniciada a cada %{count} semanas."
   web_conference: 
     default_name_for_courses: "Conferência Web da disciplina"
     default_name_for_groups: "Webconferência do grupo"
@@ -13227,9 +13649,18 @@ pt:
       delete_wiki: Eliminar
       labels: 
         front_page: "Primeira página"
+      page_locked: "Esta página está bloqueada"
+      page_locked_by_modules: "Esta página ficará disponível depois de concluir estes módulos:"
+      page_locked_by_modules_until: "Esta página ficará disponível em %{lock_info.unlock_at} se tiver concluído estes módulos:"
+      page_locked_until: "Esta página ficará disponível em %{lock_info.unlock_at}"
       toolbar_menu: 
         settings: Definições
       view_page_history_wiki: "Ver histórico da página"
+    wiki_page_content: 
+      page_locked: "Esta página está bloqueada"
+      page_locked_by_modules: "Esta página ficará disponível depois de concluir estes módulos:"
+      page_locked_by_modules_until: "Esta página ficará disponível em %{lock_info.unlock_at} se tiver concluído estes módulos:"
+      page_locked_until: "Esta página ficará disponível em %{lock_info.unlock_at}"
     wiki_page_edit: 
       buttons: 
         cancel: Cancelar
@@ -13269,6 +13700,13 @@ pt:
         edit: Editar
         settings: Definições
         use_front_page: "Utilizar como primeira página"
+    wiki_page_revision: 
+      latest_revision: "Revisão mais recente"
+      restore_revision: "Restaurar esta revisão"
+      revision_summary: "*%{updated_at}* por %{edited_by}"
+      same_as_latest: "Igual a *Mais recente*"
+    wiki_page_revisions: 
+      revision_history: "Histórico de revisão"
   wiki_page: 
     atom_author: "Página Wiki"
     atom_entry_title: "Página do wiki, %{course_or_group_name}: %{page_title}"
@@ -13280,9 +13718,6 @@ pt:
       blank_title: "O título não pode ficar em branco"
       title_characters: "O título deve conter pelo menos uma letra ou número"
       title_too_long: "O título não pode exceder %{max_characters} caracteres"
-    missing_name: "Página sem nome"
-    notices: 
-      wiki_page_created: "Página do wiki \"%{title}\" criada"
     title_for_topics_category: "%{category} Tópicos"
     unknown_user_name: Desconhecido
     warnings: 
@@ -13348,10 +13783,15 @@ pt:
     front_page: "Primeira página"
     notices: 
       cannot_edit: "Não tem permissão para editar a página \"%{title}\"."
+      cannot_read_revisions: "Não tem permissão para rever as revisões existentes de \"%{title}\"."
+      create_non_existent_page: "A página \"%{title}\" não existe, mas pode criá-la abaixo"
       page_deleted: "A página \"%{title}\" foi excluída."
+      page_does_not_exist: "A página \"%{title}\" não existe."
       page_updated: "A página foi atualizada com sucesso."
     page_link: 
       link_hidden_from_students_warning: "Os alunos não verão este link"
+    page_revisions: 
+      page_revisions_title: "Revisões de %{title}: %{context_name}"
     pages_index: 
       titles: 
         pages: Páginas
@@ -13386,7 +13826,6 @@ pt:
     cannot_update_published: "Não tem permissão para atualizar o estado de publicação desta página wiki"
     cannot_update_title: "Não tem permissão para atualizar o título desta página wiki"
     invalid_editing_roles: "As funções de edição disponibilizadas não são válidas"
-    no_wiki_front_page: "Não foi definida uma primeira página"
   wimba_conference: 
     external_urls: 
       archive: Arquivar

@@ -12,7 +12,7 @@ define [
 
     tagName: 'div'
 
-    render: ->
+    render: (options = {})->
       super
       if @model
         context   = @model.toJSON().conversation
@@ -25,7 +25,7 @@ define [
           @listenTo(childView, 'reply-all', => @trigger('reply-all', message))
           @listenTo(childView, 'forward',   => @trigger('forward', message))
       else
-        $template = noMessage()
+        $template = noMessage(options)
       @$el.html($template)
       @$el.find('.subject').focus()
       this

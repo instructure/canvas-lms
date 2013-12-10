@@ -64,10 +64,22 @@ describe "conversations new" do
     wait_for_ajaximations
   end
 
-  def click_star_toggle_menu_item()
-    f('#admin-btn').click
-    f("#star-toggle-btn").click
-    wait_for_ajaximations
+  def click_star_toggle_menu_item
+    keep_trying_until do
+      driver.execute_script(%q{$('#admin-btn').hover().click()})
+      sleep 1
+      driver.execute_script(%q{$('#star-toggle-btn').hover().click()})
+      wait_for_ajaximations
+    end
+  end
+
+  def click_unread_toggle_menu_item
+    keep_trying_until do
+      driver.execute_script(%q{$('#admin-btn').hover().click()})
+      sleep 1
+      driver.execute_script(%q{$('#mark-unread-btn').hover().click()})
+      wait_for_ajaximations
+    end
   end
 
   def select_message_course(new_course)
@@ -105,6 +117,12 @@ describe "conversations new" do
     click_send if options[:send].nil? || options[:send]
   end
 
+  def run_progress_job
+    return unless progress = Progress.where(tag: 'conversation_batch_update').first
+    job = Delayed::Job.find(progress.delayed_job_id)
+    job.invoke_job
+  end
+
   before do
     conversation_setup
     @teacher.preferences[:use_new_conversations] = true
@@ -120,7 +138,7 @@ describe "conversations new" do
       get_conversations
       compose course: @course, to: [@s1], subject: 'single recipient', body: 'hallo!'
       c = @s1.conversations.last.conversation
-      c.subject.should eql('single recipient')
+      c.subject.should ==('single recipient')
       c.private?.should be_false
     end
 
@@ -128,9 +146,9 @@ describe "conversations new" do
       get_conversations
       compose course: @course, to: [@s1, @s2], subject: 'multiple recipients', body: 'hallo!'
       c = @s1.conversations.last.conversation
-      c.subject.should eql('multiple recipients')
+      c.subject.should ==('multiple recipients')
       c.private?.should be_false
-      c.conversation_participants.collect(&:user_id).sort.should eql([@teacher, @s1, @s2].collect(&:id).sort)
+      c.conversation_participants.collect(&:user_id).sort.should ==([@teacher, @s1, @s2].collect(&:id).sort)
     end
 
     it "should allow admins to send a message without picking a context" do
@@ -141,7 +159,8 @@ describe "conversations new" do
       get_conversations
       compose to: [@s1], subject: 'context-free', body: 'hallo!'
       c = @s1.conversations.last.conversation
-      c.subject.should eql('context-free')
+      c.subject.should == 'context-free'
+      c.context.should == Account.default
     end
 
     it "should not allow non-admins to send a message without picking a context" do
@@ -183,7 +202,10 @@ describe "conversations new" do
       fj('#compose-message-course').should have_attribute(:disabled, 'true')
       fj('#compose-message-course').should have_value(@course.id.to_s)
       fj('#compose-message-subject').should have_attribute(:disabled, 'true')
+      fj('#compose-message-subject').should_not be_displayed
       fj('#compose-message-subject').should have_value(@convo.subject)
+      fj('.message_subject_ro').should be_displayed
+      fj('.message_subject_ro').text.should == @convo.subject
     end
 
     it "should address replies to the most recent author by default" do
@@ -228,38 +250,38 @@ describe "conversations new" do
 
     it "should default to inbox view" do
       get_conversations
-      selected = get_bootstrap_select_value(get_view_filter).should eql 'inbox'
-      conversation_elements.size.should eql 2
+      selected = get_bootstrap_select_value(get_view_filter).should == 'inbox'
+      conversation_elements.size.should == 2
     end
 
     it "should have an unread view" do
       get_conversations
       select_view('unread')
-      conversation_elements.size.should eql 1
+      conversation_elements.size.should == 1
     end
 
     it "should have an starred view" do
       get_conversations
       select_view('starred')
-      conversation_elements.size.should eql 2
+      conversation_elements.size.should == 2
     end
 
     it "should have an sent view" do
       get_conversations
       select_view('sent')
-      conversation_elements.size.should eql 3
+      conversation_elements.size.should == 3
     end
 
     it "should have an archived view" do
       get_conversations
       select_view('archived')
-      conversation_elements.size.should eql 1
+      conversation_elements.size.should == 1
     end
 
     it "should default to all courses view" do
       get_conversations
-      selected = get_bootstrap_select_value(get_course_filter).should eql ''
-      conversation_elements.size.should eql 2
+      selected = get_bootstrap_select_value(get_course_filter).should == ''
+      conversation_elements.size.should == 2
     end
 
     it "should truncate long course names" do
@@ -268,35 +290,35 @@ describe "conversations new" do
       get_conversations
       select_course(@course.id)
       button_text = f('.filter-option', get_course_filter).text
-      button_text.should_not eql @course.name
-      button_text[0...5].should eql @course.name[0...5]
-      button_text[-5..-1].should eql @course.name[-5..-1]
+      button_text.should_not == @course.name
+      button_text[0...5].should == @course.name[0...5]
+      button_text[-5..-1].should == @course.name[-5..-1]
     end
 
     it "should filter by course" do
       get_conversations
       select_course(@course.id)
-      conversation_elements.size.should eql 2
+      conversation_elements.size.should == 2
     end
 
     it "should filter by course plus view" do
       get_conversations
       select_course(@course.id)
       select_view('unread')
-      conversation_elements.size.should eql 1
+      conversation_elements.size.should == 1
     end
 
     it "should hide the spinner after deleting the last conversation" do
       get_conversations
       select_view('archived')
-      conversation_elements.size.should eql 1
+      conversation_elements.size.should == 1
       conversation_elements[0].click
       wait_for_ajaximations
       fj('#delete-btn').click
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      conversation_elements.size.should eql 0
-      ffj('.message-list .paginatedLoadingIndicator:visible').length.should eql 0
+      conversation_elements.size.should == 0
+      ffj('.message-list .paginatedLoadingIndicator:visible').length.should == 0
     end
   end
 
@@ -344,6 +366,7 @@ describe "conversations new" do
       wait_for_ajaximations
       click_star_toggle_menu_item
       f('.active', unstarred_elt).should be_present
+      run_progress_job
       @conv_unstarred.reload.starred.should be_true
     end
 
@@ -354,8 +377,87 @@ describe "conversations new" do
       wait_for_ajaximations
       click_star_toggle_menu_item
       f('.active', starred_elt).should be_nil
+      run_progress_job
       @conv_starred.reload.starred.should be_false
     end
   end
 
+  describe "search" do
+    before do
+      @conv1 = conversation(@teacher, @s1)
+      @conv2 = conversation(@teacher, @s2)
+    end
+
+    it "should allow finding messages by recipient" do
+      get_conversations
+      name = @s2.name
+      f('[role=main] header [role=search] input').send_keys(name)
+      keep_trying_until { fj(".ac-result:contains('#{name}')") }.click
+      conversation_elements.length.should == 1
+    end
+  end
+
+  describe "multi-select" do
+    before(:each) do
+      @conversations = [conversation(@teacher, @s1, @s2, workflow_state: 'read'),
+                        conversation(@teacher, @s1, @s2, workflow_state: 'read')]
+    end
+
+    def select_all_conversations
+      modifier = if driver.execute_script('return !!window.navigator.userAgent.match(/Macintosh/)')
+                   :meta
+                 else
+                   :control
+                 end
+
+      driver.action.key_down(modifier).perform
+      ff('.messages li').each do |message|
+        message.click
+      end
+      driver.action.key_up(modifier).perform
+    end
+
+    it "should select multiple conversations" do
+      get_conversations
+      select_all_conversations
+      ff('.messages li.active').count.should == 2
+    end
+
+    it "should archive multiple conversations" do
+      get_conversations
+      select_all_conversations
+      f('#archive-btn').click
+      wait_for_ajaximations
+      conversation_elements.count.should == 0
+      run_progress_job
+      @conversations.each { |c| c.reload.should be_archived }
+    end
+
+    it "should delete multiple conversations" do
+      get_conversations
+      select_all_conversations
+      f('#delete-btn').click
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      conversation_elements.count.should == 0
+    end
+
+    it "should mark multiple conversations as unread" do
+      pending('breaks b/c jenkins is weird')
+      get_conversations
+      select_all_conversations
+      click_unread_toggle_menu_item
+      keep_trying_until { ffj('.read-state[aria-checked=false]').count.should == 2 }
+    end
+
+    it "should star multiple conversations" do
+      pending('breaks b/c jenkins is weird')
+      get_conversations
+      select_all_conversations
+      click_star_toggle_menu_item
+      run_progress_job
+      keep_trying_until { ff('.star-btn.active').count.should == 2 }
+      @conversations.each { |c| c.reload.should be_starred }
+    end
+  end
 end

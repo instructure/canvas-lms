@@ -1,14 +1,15 @@
 define [
   'Backbone'
   'compiled/models/AssignmentGroup'
-  'compiled/models/Assignment'
   'compiled/models/Course'
   'compiled/collections/AssignmentGroupCollection'
   'compiled/views/assignments/AssignmentGroupListView'
   'compiled/views/assignments/IndexView'
+  'compiled/views/assignments/ToggleShowByView'
   'jquery'
   'helpers/jquery.simulate'
-], (Backbone, AssignmentGroup, Assignment, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, $) ->
+  'helpers/fakeENV'
+], (Backbone, AssignmentGroup, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, ToggleShowByView, $) ->
 
 
   fixtures = $('#fixtures')
@@ -33,29 +34,30 @@ define [
       collection: assignmentGroups
       course: course
 
+    showByView = false
+    if !ENV.PERMISSIONS.manage
+      showByView = new ToggleShowByView
+        course: course
+        assignmentGroups: assignmentGroups
+
     app = new IndexView
       assignmentGroupsView: assignmentGroupsView
       collection: assignmentGroups
       createGroupView: false
       assignmentSettingsView: false
-      showByView: false
+      showByView: showByView
 
     app.render()
 
-  oldENV = null
-
   module 'assignmentIndex',
     setup: ->
-      oldENV = window.ENV
-      window.ENV =
-        MODULES: {}
-        PERMISSIONS:
-          manage: true
+      ENV.PERMISSIONS = {manage: true}
       @enable_spy = sinon.spy(IndexView.prototype, 'enableSearch')
 
     teardown: ->
-      window.ENV = oldENV
+      ENV.PERMISSIONS = {}
       assignmentGroups = null
+      $('#fixtures').empty()
       @enable_spy.restore()
 
   test 'should filter by search term', ->
@@ -63,23 +65,19 @@ define [
     view = assignmentIndex()
     $('#search_term').val('foo')
     view.filterResults()
-    equal view.$el.find('.assignment:visible').length, 1
+    equal view.$el.find('.assignment').not('.hidden').length, 1
 
-    view = assignmentIndex()
     $('#search_term').val('BooBerry')
     view.filterResults()
-    equal view.$el.find('.assignment:visible').length, 0
+    equal view.$el.find('.assignment').not('.hidden').length, 0
 
-    view = assignmentIndex()
     $('#search_term').val('name')
     view.filterResults()
-    equal view.$el.find('.assignment:visible').length, 2
-
+    equal view.$el.find('.assignment').not('.hidden').length, 2
 
   test 'should have search disabled on render', ->
     view = assignmentIndex()
     ok view.$('#search_term').is(':disabled')
-
 
   test 'should enable search on assignmentGroup reset', ->
     view = assignmentIndex()
@@ -94,3 +92,32 @@ define [
     assignmentGroups.reset()
     ok @enable_spy.calledOnce
 
+  test 'should show modules column', ->
+    view = assignmentIndex()
+
+    [a1, a2] = assignmentGroups.assignments()
+    a1.set 'modules', ['One', 'Two']
+    a2.set 'modules', ['Three']
+
+    ok view.$("#assignment_1 .modules .tooltip_link").text().match(/Multiple Modules/)
+    ok view.$("#assignment_1 .modules").text().match(/One\s+Two/)
+    ok view.$("#assignment_2 .modules").text().match(/Three Module/)
+
+
+  module 'student index view',
+    setup: ->
+      ENV.PERMISSIONS = {manage: false}
+
+    teardown: ->
+      ENV.PERMISSIONS = {}
+      assignmentGroups = null
+      $('#fixtures').empty()
+
+  test 'should clear search on toggle', ->
+    clear_spy = sinon.spy(IndexView.prototype, 'clearSearch')
+    view = assignmentIndex()
+    view.$('#search_term').val('something')
+    view.showByView.toggleShowBy({preventDefault: -> })
+    equal view.$('#search_term').val(), ""
+    ok clear_spy.called
+    clear_spy.restore()

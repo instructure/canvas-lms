@@ -17,7 +17,7 @@
 <div style="display: none;">
   <div id="current_enrollment_term_id"><%= @term && @term.id %></div>
   <div id="add_user_dialog">
-    <% form_for :user, :url => account_add_user_url(@account), :html => {:id => "add_user_form"} do |f| %>
+    <%= form_for :user, :url => account_add_user_url(@account), :html => {:id => "add_user_form"} do |f| %>
     <table class="formtable">
       <tr>
         <td><%= f.blabel :name, :full_name, :en => "Full Name" %></td>
@@ -47,7 +47,7 @@
         </tr>
       <% end %>
       <tr>
-        <td><%= blabel :pseudonym, :unique_id, @root_account.login_handle_name %></td>
+        <td><label for="pseudonym_unique_id"><%= t(:unique_id_label, "%{label}:*", :label => @root_account.login_handle_name) %></label></td>
         <td><%= text_field :pseudonym, :unique_id %></td>
       </tr>
       <% if @root_account.allow_sis_import && can_do(@root_account, @current_user, :manage_sis) %>
@@ -74,7 +74,7 @@
     <% end %>
   </div>
   <div id="add_course_dialog">
-    <% form_for :course, :url => courses_url, :html => {:id => "add_course_form"} do |f| %>
+    <%= form_for :course, :url => courses_url, :html => {:id => "add_course_form"} do |f| %>
     <input type="hidden" name="account_id" value="<%= @account.id %>"/>
     <table class="formtable">
       <tr>
@@ -88,7 +88,7 @@
         <td><%= f.select :account_id, @account.sub_accounts_as_options, :selected => @term && @term.id %></td>
       </tr><tr>
         <td><%= f.label :enrollment_term_id, :en => "Enrollment Term" %></td>
-        <td><%= f.select :enrollment_term_id, @root_account.enrollment_terms.active.map{|t| [t.name, t.id] }, :selected => @term && @term.id %></td>
+        <td><%= f.select :enrollment_term_id, @root_account.enrollment_terms.active.order(EnrollmentTerm.nulls(:first, :start_at)).map{|t| [t.name, t.id] }, :selected => @term && @term.id %></td>
       </tr><tr>
         <td colspan="2">
           <div class="button-container">

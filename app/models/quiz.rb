@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,6 +18,7 @@
 
 require 'quiz_question_link_migrator'
 require 'quiz_regrading'
+require 'canvas/draft_state_validations'
 
 class Quiz < ActiveRecord::Base
   include Workflow
@@ -28,6 +29,7 @@ class Quiz < ActiveRecord::Base
   include ContextModuleItem
   include DatesOverridable
   include SearchTermHelper
+  include Canvas::DraftStateValidations
 
   attr_accessible :title, :description, :points_possible, :assignment_id, :shuffle_answers,
     :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
@@ -47,7 +49,6 @@ class Quiz < ActiveRecord::Base
   has_many :quiz_regrades
   belongs_to :context, :polymorphic => true
   belongs_to :assignment
-  belongs_to :cloned_item
   belongs_to :assignment_group
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
@@ -140,11 +141,16 @@ class Quiz < ActiveRecord::Base
   end
 
   def build_assignment
-    if self.available? && !self.assignment_id && self.graded? && @saved_by != :assignment && @saved_by != :clone
+    if (context.draft_state_enabled? || self.available?) &&
+        !self.assignment_id && self.graded? && @saved_by != :assignment &&
+        @saved_by != :clone
       assignment = self.assignment
       assignment ||= self.context.assignments.build(:title => self.title, :due_at => self.due_at, :submission_types => 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
       assignment.saved_by = :quiz
+      if context.draft_state_enabled? && !deleted?
+        assignment.workflow_state = self.published? ? 'published' : 'unpublished'
+      end
       assignment.save
       self.assignment_id = assignment.id
     end
@@ -205,7 +211,7 @@ class Quiz < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    # self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     res = self.save
     if self.for_assignment?
       self.assignment.destroy unless self.assignment.deleted?
@@ -309,7 +315,7 @@ class Quiz < ActiveRecord::Base
         a.assignment_group_id = self.assignment_group_id
         a.saved_by = :quiz
         a.workflow_state = 'published' if a.deleted?
-        if context.draft_state_enabled?
+        if context.draft_state_enabled? && !deleted?
           a.workflow_state = self.published? ? 'published' : 'unpublished'
         end
         a.notify_of_update = @notify_of_update
@@ -368,7 +374,7 @@ class Quiz < ActiveRecord::Base
   end
 
   def root_entries_max_position
-    question_max = self.active_quiz_questions.maximum(:position, :conditions => 'quiz_group_id is null')
+    question_max = self.active_quiz_questions.where(quiz_group_id: nil).maximum(:position)
     group_max = self.quiz_groups.maximum(:position)
     [question_max, group_max, 0].compact.max
   end
@@ -582,9 +588,10 @@ class Quiz < ActiveRecord::Base
             end
           end
         else
+          questions = q[:questions].shuffle
           q[:pick_count].times do |i|
-            if q[:questions][i]
-              question = q[:questions][i]
+            if questions[i]
+              question = questions[i]
               question[:points_possible] = q[:question_points]
               user_questions << generate_submission_question(question)
             end
@@ -617,6 +624,9 @@ class Quiz < ActiveRecord::Base
     else
       submission.with_versioning(true, &:save!)
     end
+
+    # Make sure the submission gets graded when it becomes overdue (if applicable)
+    submission.grade_when_overdue unless preview || !submission.end_at
     submission
   end
 
@@ -825,79 +835,6 @@ class Quiz < ActiveRecord::Base
   def valid_hide_results_values
     %w[always until_after_last_attempt]
   end
-  
-  attr_accessor :clone_updated
-  def clone_for(context, original_dup=nil, options={}, retrying = false)
-    dup = original_dup
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save!
-    end
-    existing = context.quizzes.active.find_by_id(self.id)
-    existing ||= context.quizzes.active.find_by_cloned_item_id(self.cloned_item_id || 0)
-    return existing if existing && !options[:overwrite]
-    if (context.merge_mapped_id(self.assignment))
-      dup ||= Quiz.find_by_assignment_id(context.merge_mapped_id(self.assignment))
-    end
-    dup ||= Quiz.new
-    dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| [:id, :assignment_id, :assignment_group_id].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    # We need to save the quiz now so that the migrate_question_hash call will find
-    # the duplicated quiz and not try to make it itself.
-    dup.context = context
-    dup.saved_by = :clone
-    dup.save!
-    data = self.quiz_data
-    if data
-      data.each_with_index do |obj, idx|
-        if obj[:answers]
-          data[idx] = QuizQuestion.migrate_question_hash(data[idx], :old_context => self.context, :new_context => context)
-        elsif obj[:questions]
-          questions = []
-          obj[:questions].each do |question|
-            questions << QuizQuestion.migrate_question_hash(question, :old_context => self.context, :new_context => context)
-          end
-          obj[:questions] = questions
-          data[idx] = obj
-        end
-      end
-    end
-    dup.quiz_data = data
-    dup.assignment_id = context.merge_mapped_id(self.assignment) rescue nil
-    if !dup.assignment_id && self.assignment_id && self.assignment && !options[:cloning_for_assignment]
-      new_assignment = self.assignment.clone_for(context, nil, :cloning_for_quiz => true)
-      new_assignment.saved_by = :quiz
-      new_assignment.save_without_broadcasting!
-      context.map_merge(self.assignment, new_assignment)
-      dup.assignment_id = new_assignment.id
-    end
-    begin
-      dup.saved_by = :assignment if options[:cloning_for_assignment]
-      dup.save!
-    rescue => e
-      logger.warn "Couldn't save quiz copy: #{e.to_s}"
-      raise e if retrying
-      return self.clone_for(context, original_dup, options, true)
-    end
-    entities = self.quiz_groups + self.active_quiz_questions
-    entities.each do |entity|
-      entity_dup = entity.clone_for(dup, nil, :old_context => self.context, :new_context => context)
-      entity_dup.quiz_id = dup.id
-      if entity_dup.respond_to?(:quiz_group_id=)
-        entity_dup.quiz_group_id = context.merge_mapped_id(entity.quiz_group)
-      end
-      entity_dup.save!
-      context.map_merge(entity, entity_dup)
-    end
-    dup.reload
-    context.log_merge_result("Quiz \"#{self.title}\" created")
-    context.may_have_links_to_migrate(dup)
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
-  end
 
   def strip_html_answers(question)
     return if !question || !question[:answers] || !(%w(multiple_choice_question multiple_answers_question).include? question[:question_type])
@@ -955,7 +892,7 @@ class Quiz < ActiveRecord::Base
   end
 
   def has_student_submissions?
-    self.quiz_submissions.any?{|s| !s.settings_only? && context.includes_student?(s.user) }
+    self.quiz_submissions.not_settings_only.where("user_id IS NOT NULL").exists?
   end
 
   # clear out all questions so that the quiz can be replaced. this is currently
@@ -1217,7 +1154,8 @@ class Quiz < ActiveRecord::Base
   end
 
   def can_unpublish?
-    !has_student_submissions?
+    !has_student_submissions? &&
+      (!assignment || !assignment.has_student_submissions?)
   end
 
   # marks a quiz as having unpublished changes
@@ -1247,15 +1185,6 @@ class Quiz < ActiveRecord::Base
 
   def unpublished?; !published?; end
 
-  def validate_draft_state_change
-    old_draft_state, new_draft_state = self.changes['workflow_state']
-    return if old_draft_state == new_draft_state
-    if new_draft_state == 'unpublished' && has_student_submissions?
-      self.errors.add :workflow_state, I18n.t('#quizzes.cant_unpublish_when_students_submit',
-                                              "Can't unpublish if there are student submissions")
-    end
-  end
-
   def regrade_if_published
     unless unpublished_changes?
       options = {
@@ -1274,20 +1203,17 @@ class Quiz < ActiveRecord::Base
                 includes(:quiz_question_regrades => :quiz_question).first
   end
 
-  # this is needed because of the context #current_regrade is used in -
-  # the callbacks it's performed in can become confused by version number.The latest
-  # quiz's version may not point to the latest quiz regrade.
-  # #last_regrade_performed will always point to the last regrade, regardless of
-  # version number
-  def last_regrade_performed
-    QuizRegrade.where(quiz_id: id)
-               .includes(quiz_question_regrades: :quiz_question)
-               .limit(1)
-               .last
-  end
-
   def current_quiz_question_regrades
     current_regrade ? current_regrade.quiz_question_regrades : []
   end
 
+  def questions_regraded_since(created_at)
+    question_regrades = Set.new
+    quiz_regrades.where("created_at > ?", created_at)
+                 .includes(:quiz_question_regrades).each do |regrade|
+      ids = regrade.quiz_question_regrades.map {|qqr| qqr.quiz_question_id }
+      question_regrades.merge(ids)
+    end
+    question_regrades.count
+  end
 end

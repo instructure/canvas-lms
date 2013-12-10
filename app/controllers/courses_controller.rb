@@ -42,11 +42,14 @@ require 'set'
 #       // the account associated with the course
 #       "account_id": 81259,
 #
+#       // the root account associated with the course
+#       "root_account_id": 81259,
+#
 #       // the start date for the course, if applicable
 #       "start_at": "2012-06-01T00:00:00-06:00",
 #
 #       // the end date for the course, if applicable
-#       "end_at": null,
+#       "end_at": "2012-09-01T00:00:00-06:00",
 #
 #       // A list of enrollments linking the current user to the course.
 #       // for student enrollments, grading information may be included
@@ -100,7 +103,31 @@ require 'set'
 #       // returned only for a single course and include[]=permissions
 #       "permissions": {
 #          "create_discussion_topic": true
-#        }
+#       },
+#
+#       "is_public": true,
+#
+#       "public_syllabus": true,
+#
+#       "public_description": "Come one, come all to InstructureCon 2012!",
+#
+#       "storage_quota_mb": 5,
+#
+#       "hide_final_grades": false,
+#
+#       "license": "Creative Commons",
+#
+#       "allow_student_assignment_edits": false,
+#
+#       "allow_wiki_comments": false,
+#
+#       "allow_student_forum_attachments": false,
+#
+#       "open_enrollment": true,
+#
+#       "self_enrollment": false,
+#
+#       "restrict_enrollments_to_course_dates": false
 #   }
 class CoursesController < ApplicationController
   include SearchHelper
@@ -710,8 +737,7 @@ class CoursesController < ApplicationController
 
       @all_roles = Role.custom_roles_and_counts_for_course(@context, @current_user, true)
 
-      users_scope = @context.users_visible_to(@current_user)
-      @invited_count = users_scope.count(:distinct => true, :select => 'users.id', :conditions => ["enrollments.workflow_state = 'invited' AND enrollments.type != 'StudentViewEnrollment'"])
+      @invited_count = @context.invited_count_visible_to(@current_user)
 
       js_env(:COURSE_ID => @context.id,
              :USERS_URL => "/api/v1/courses/#{ @context.id }/users",
@@ -1066,7 +1092,7 @@ class CoursesController < ApplicationController
 
       if params[:account_id]
         @account = api_find(Account.active, params[:account_id])
-        scope = @account.all_courses
+        scope = @account.root_account? ? @account.all_courses : @account.associated_courses
       else
         scope = Course
       end
@@ -1084,7 +1110,9 @@ class CoursesController < ApplicationController
       return
     end
 
+
     @context = Course.active.find(params[:id])
+    js_env :DRAFT_STATE => @context.draft_state_enabled?
     if request.xhr?
       if authorized_action(@context, @current_user, [:read, :read_as_admin])
         render :json => @context

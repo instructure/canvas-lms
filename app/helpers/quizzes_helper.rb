@@ -463,16 +463,25 @@ module QuizzesHelper
     end
   end
 
-  def has_regraded_version?(versions)
-    versions.detect {|v| v.score_before_regrade.present? }
-  end
-
   def submission_has_regrade?(submission)
     submission && submission.score_before_regrade.present?
   end
 
   def score_affected_by_regrade?(submission)
     submission && submission.score_before_regrade != submission.kept_score
+  end
+
+  def answer_title(selected_answer, correct_answer, show_correct_answers)
+    titles = []
+    if selected_answer
+      titles << I18n.t(:selected_answer, "You selected this answer.")
+    end
+
+    if correct_answer && show_correct_answers
+      titles << I18n.t(:correct_answer, "This was the correct answer.")
+    end
+
+    title = "title=\"#{titles.join(' ')}\"" if titles.length > 0
   end
 
 end

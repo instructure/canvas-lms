@@ -1,13 +1,19 @@
-# Even on Rails 2.3, we're using Rails 3 style routes.
-#
-# You should have plenty of examples in here for anything you're trying to do,
-# but if you want a full primer this is a good one:
-# http://blog.engineyard.com/2010/the-lowdown-on-routes-in-rails-3
-#
-# Don't try anything too fancy, FakeRails3Routes doesn't support some of the
-# more advanced Rails 3 routing features, since in the background it's just
-# calling into the Rails 2 routing system.
-FakeRails3Routes.draw do
+if CANVAS_RAILS2
+  # Even on Rails 2.3, we're using Rails 3 style routes.
+  #
+  # You should have plenty of examples in here for anything you're trying to do,
+  # but if you want a full primer this is a good one:
+  # http://blog.engineyard.com/2010/the-lowdown-on-routes-in-rails-3
+  #
+  # Don't try anything too fancy, FakeRails3Routes doesn't support some of the
+  # more advanced Rails 3 routing features, since in the background it's just
+  # calling into the Rails 2 routing system.
+  routes = FakeRails3Routes
+else
+  routes = CanvasRails::Application.routes
+end
+
+routes.draw do
   resources :submission_comments, :only => :destroy
 
   match 'inbox' => 'context#mark_inbox_as_read', :as => :mark_inbox_as_read, :via => :delete
@@ -21,7 +27,6 @@ FakeRails3Routes.draw do
   match 'conversations/sent' => 'conversations#index', :as => :conversations_sent, :redirect_scope => 'sent'
   match 'conversations/archived' => 'conversations#index', :as => :conversations_archived, :redirect_scope => 'archived'
   match 'conversations/find_recipients' => 'search#recipients'
-  match '/conversations/beta' => 'conversations#index_new'
 
   match 'search/recipients' => 'search#recipients', :as => :search_recipients
   match 'conversations/mark_all_as_read' => 'conversations#mark_all_as_read', :as => :conversations_mark_all_as_read, :via => :post
@@ -156,6 +161,7 @@ FakeRails3Routes.draw do
     get 'pages' => 'wiki_pages#pages_index'
     get 'pages/:wiki_page_id' => 'wiki_pages#show_page', :wiki_page_id => /[^\/]+/, :as => :named_page
     get 'pages/:wiki_page_id/edit' => 'wiki_pages#edit_page', :wiki_page_id => /[^\/]+/, :as => :edit_named_page
+    get 'pages/:wiki_page_id/revisions' => 'wiki_pages#page_revisions', :wiki_page_id => /[^\/]+/, :as => :named_page_revisions
 
     resources :wiki_pages, :path => :wiki do
       match 'revisions/latest' => 'wiki_page_revisions#latest_version_number', :as => :latest_version_number
@@ -318,6 +324,9 @@ FakeRails3Routes.draw do
       match 'statistics' => 'quizzes#statistics', :as => :statistics
       match 'read_only' => 'quizzes#read_only', :as => :read_only
       match 'filters' => 'quizzes#filters', :as => :filters
+      collection do
+        get :fabulous_quizzes
+      end
       resources :quiz_submissions, :path => :submissions do
         collection do
           put :backup
@@ -1112,6 +1121,7 @@ FakeRails3Routes.draw do
       get 'users/:user_id/communication_channels', :action => :index, :path_name => 'communication_channels'
       post 'users/:user_id/communication_channels', :action => :create
       delete 'users/:user_id/communication_channels/:id', :action => :destroy
+      delete 'users/:user_id/communication_channels/:type/:address', :action => :destroy, :constraints => { :address => %r{[^/?]+} }
     end
 
     scope(:controller => :comm_messages_api) do
@@ -1280,13 +1290,19 @@ FakeRails3Routes.draw do
       delete "courses/:course_id/quizzes/:id", action: :destroy, path_name: 'course_quiz_destroy'
     end
 
+    scope(:controller => :quiz_groups) do
+      post "courses/:course_id/quizzes/:quiz_id/groups", :action => :create, :path_name => 'course_quiz_group_create'
+      put "courses/:course_id/quizzes/:quiz_id/groups/:id", :action => :update, :path_name => 'course_quiz_group_update'
+      delete "courses/:course_id/quizzes/:quiz_id/groups/:id", :action => :destroy, :path_name => 'course_quiz_group_destroy'
+    end
+
     scope(:controller => :quiz_reports) do
       post "courses/:course_id/quizzes/:quiz_id/reports", :action => :create, :path_name => 'course_quiz_reports_create'
       get "courses/:course_id/quizzes/:quiz_id/reports/:id", :action => :show, :path_name => 'course_quiz_report'
     end
 
-    scope(:controller => :quiz_submissions_api) do
-      post 'courses/:course_id/quizzes/:quiz_id/quiz_submissions/self/files', :action => :create_file, :path_name => 'quiz_submission_create_file'
+    scope(:controller => :quiz_submission_files) do
+      post 'courses/:course_id/quizzes/:quiz_id/quiz_submissions/self/files', :action => :create, :path_name => 'quiz_submission_files'
     end
 
     scope(:controller => :outcome_groups_api) do
@@ -1363,6 +1379,5 @@ FakeRails3Routes.draw do
     post "tools/:tool_id/ext_grade_passback", :controller => :lti_api, :action => :legacy_grade_passback, :path_name => "blti_legacy_grade_passback_api"
   end
 
-  # in rails 2 this was Jammit::Routes.draw(map)
   match '/assets/:package.:extension' => 'jammit#package', :as => :jammit if defined?(Jammit)
 end

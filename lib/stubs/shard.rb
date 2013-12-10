@@ -90,7 +90,7 @@ class Shard
 end
 
 ActiveRecord::Base.class_eval do
-  if Rails.version < "3.0"
+  if CANVAS_RAILS2
     class << self
       VALID_FIND_OPTIONS << :shard
     end
@@ -117,7 +117,7 @@ ActiveRecord::Base.class_eval do
 end
 
 module ActiveRecord::Associations
-  AssociationProxy.class_eval do
+  (CANVAS_RAILS2 ? AssociationProxy : Association).class_eval do
     def shard
       Shard.default
     end

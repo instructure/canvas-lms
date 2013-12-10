@@ -19,10 +19,10 @@
     <li>
       <div id='quiz-nav-inner-wrapper'>
         <ul>
-          <% @quiz.active_quiz_questions.each_with_index do |question, i| %>
+          <% @submission.questions_as_object.each_with_index do |question, i| %>
             <% index = i + 1 %>
-            <li id='quiz_nav_<%= question.id %>' class="q<%= index %> quiz-nav-li" data-id='<%= question.id %>' data-index='<%=i%>'>
-              <a class='question_<%= question.id %> question-nav-link' data-id='<%= question.id %>' href="#question_<%= question.id %>">
+            <li id='quiz_nav_<%= question['id'] %>' class="q<%= index %> quiz-nav-li" data-id='<%= question['id'] %>' data-index='<%=i%>'>
+              <a class='question_<%= question['id'] %> question-nav-link' data-id='<%= question['id'] %>' href="#question_<%= question['id'] %>">
                 <%= index %>
               </a>
             </li>
@@ -36,6 +36,11 @@
   </ul>
 </div>
 <div class=quizzes-speedgrader-padding></div>
+<% if @quiz.quiz_groups.exists? %>
+<div class="grade-by-question-warning">
+  <%= t(:grade_by_question_warning, "The grade by question feature is affected by questions that are shuffled in a group.") %>
+</div>
+<% end %>
 <% end %>
 
 <% unless params[:headless] %>
@@ -86,7 +91,7 @@
               <%= t(:count_attempts_left, {:one => "%{user} has 1 attempt left", :other => "%{user} has %{count} attempts left"}, :user => user_name, :count => @current_submission.attempts_left) %>
             <% end %>
             <% if can_do(@submission, @current_user, :add_attempts) %>
-              <% form_for :quiz_submission, :url => context_url(@context, :context_quiz_extensions_url, @quiz.id, @submission.user_id), :html => {:method => :post} do |f| %>
+              <%= form_for :quiz_submission, :url => context_url(@context, :context_quiz_extensions_url, @quiz.id, @submission.user_id), :html => {:method => :post} do |f| %>
                 <input type="hidden" name="extra_attempts" value="<%= (@submission.extra_attempts || 0) + 1 %>"/>
                 <button type="submit" class="btn"><%= t('buttons.allow_extra_attempt', "allow this student an extra attempt") %></button>
               <% end %>
@@ -131,18 +136,13 @@
     <%= t(:quiz_not_yet_taken_or_in_progress, "Quiz hasn't been taken yet or is currently in progress") %>
   <% end %>
 <% else %>
-  <% form_tag context_url(@context, :context_quiz_quiz_submission_url, @quiz.id, @submission.id), {:method => :put, :id => "update_history_form"} do %>
+  <%= form_tag context_url(@context, :context_quiz_quiz_submission_url, @quiz.id, @submission.id), {:method => :put, :id => "update_history_form"} do %>
     <input type="hidden" name="override_scores" value="true"/>
     <% if params[:headless] %>
       <input type="hidden" name="headless" value="1"/>
     <% end %>
     <input type="hidden" name="submission_version_number" value="<%= @submission.version_number %>"/>
     <%= render :partial => "quizzes/quiz_submission", :locals => {:editable => can_do(@quiz, @current_user, :grade)} %>
-    <% if can_do(@quiz, @current_user, :grade) %>
-      <div class="button-container">
-        <button type="submit" class="btn btn-primary update-scores"><%= t('buttons.update_scores', "Update Scores") %></button>
-      </div>
-    <% end %>
   <% end %>
 <% end %>
 

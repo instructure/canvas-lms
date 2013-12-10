@@ -20,7 +20,7 @@ Rails.configuration.to_prepare do
   # I guess we just gotta hope that no middlewares after that one have any
   # useful-to-this-plugin functionality. At least we still get the AR query
   # cache.
-  if Rails.version < "3.0"
+  if CANVAS_RAILS2
     Rails.configuration.middleware.insert_before 'ActionController::ParamsParser', 'RespondusAPIMiddleware'
   else
     Rails.configuration.middleware.insert_before 'ActionDispatch::ParamsParser', 'RespondusAPIMiddleware'

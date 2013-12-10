@@ -6,7 +6,7 @@ define [
   class GroupCategoryCollection extends PaginatedCollection
     model: GroupCategory
     comparator: (category) ->
-      (if category.get('role') is 'student_organized' then '1_' else '0_') +
+      (if category.get('protected') then '0_' else '1_') +
         category.get('name').toLowerCase()
 
     _defaultUrl: -> "/api/v1/group_categories"

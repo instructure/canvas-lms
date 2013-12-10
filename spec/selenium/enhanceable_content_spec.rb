@@ -99,7 +99,7 @@ describe "enhanceable_content" do
     divs[0].should be_displayed
     divs[1].should_not be_displayed
     headers[1].click
-    sleep 1
+    wait_for_ajaximations
     headers[0].should have_class('ui-state-default')
     headers[1].should have_class('ui-state-active')
     divs[0].should_not be_displayed

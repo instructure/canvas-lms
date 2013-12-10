@@ -31,7 +31,7 @@ describe "self enrollment" do
       expect_new_page_load {
         submit_form("#enroll_form")
       }
-      f('.btn-primary').text.should eql primary_action
+      f('.btn-primary').text.should == primary_action
       get "/"
       assert_valid_dashboard
     end
@@ -45,7 +45,7 @@ describe "self enrollment" do
       expect_new_page_load {
         submit_form("#enroll_form")
       }
-      f('.btn-primary').text.should eql primary_action
+      f('.btn-primary').text.should == primary_action
       get "/"
       assert_valid_dashboard
     end
@@ -58,7 +58,7 @@ describe "self enrollment" do
       expect_new_page_load {
         submit_form("#enroll_form")
       }
-      f('.btn-primary').text.should eql primary_action
+      f('.btn-primary').text.should == primary_action
       get "/"
       assert_valid_dashboard
     end
@@ -85,7 +85,7 @@ describe "self enrollment" do
       expect_new_page_load {
         submit_form("#enroll_form")
       }
-      f('.btn-primary').text.should eql primary_action
+      f('.btn-primary').text.should == primary_action
       get "/"
       assert_valid_dashboard
     end
@@ -98,7 +98,7 @@ describe "self enrollment" do
       expect_new_page_load {
         submit_form("#enroll_form")
       }
-      f('.btn-primary').text.should eql primary_action
+      f('.btn-primary').text.should == primary_action
       get "/"
       assert_valid_dashboard
     end

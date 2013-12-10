@@ -1,14 +1,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def io
-    require 'action_controller'
-    require 'action_controller/test_process.rb'
+    require 'action_controller_test_process'
     ActionController::TestUploadedFile.new(File.expand_path(File.dirname(__FILE__) + '/../fixtures/scribd_docs/txt.txt'), 'text/plain', true)
   end
 
   def add_existing_module_item(item_select_selector, module_name, item_name)
     add_module(module_name + 'Module')
-    f('.admin-links .al-trigger').click
+    f('.admin-links.al-trigger').click
     wait_for_ajaximations
     f('.add_module_item_link').click
     wait_for_ajaximations
@@ -48,7 +47,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def add_new_module_item(item_select_selector, module_name, new_item_text, item_title_text)
     add_module(module_name + 'Module')
-    f('.admin-links .al-trigger').click
+    f('.admin-links.al-trigger').click
     f('.add_module_item_link').click
     select_module_item('#add_module_item_select', module_name)
     select_module_item(item_select_selector + ' .module_item_select', new_item_text)
@@ -68,7 +67,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def add_new_external_item(module_name, url_text, page_name_text)
     add_module(module_name + 'Module')
-    f('.admin-links .al-trigger').click
+    f('.admin-links.al-trigger').click
     wait_for_ajaximations
     f('.add_module_item_link').click
     wait_for_ajaximations

@@ -42,7 +42,7 @@ class UserFollow < ActiveRecord::Base
     end
   end
 
-  validate_on_create :validate_following_logic
+  validate :validate_following_logic, on: :create
 
   def validate_following_logic
     case followed_item

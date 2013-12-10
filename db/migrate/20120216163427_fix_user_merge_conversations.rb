@@ -2,7 +2,7 @@ class FixUserMergeConversations < ActiveRecord::Migration
   tag :postdeploy
 
   def self.up
-    self.transactional = false
+    disable_ddl_transaction!
 
     # remove any duplicate CP's, possibly fixing private conversation hashes
     # (which may merge it with another conversation)

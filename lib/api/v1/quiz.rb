@@ -82,6 +82,9 @@ module Api::V1::Quiz
       :published => quiz.published?
     )
     hash.delete(:access_code) unless quiz.grants_right?(user, session, :grade)
+    if context.grants_right?(user, session, :manage_assignments)
+      hash[:unpublishable] = quiz.can_unpublish?
+    end
     locked_json(hash, quiz, user, 'quiz', :context => context)
     hash
   end

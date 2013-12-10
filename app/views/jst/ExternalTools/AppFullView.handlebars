@@ -2,7 +2,7 @@
   <tbody>
     <tr>
       <td class="individual-app-left" valign="top">
-        <img class="img-polaroid" src="{{model.attributes.banner_url}}" />
+        <img class="img-polaroid" src="{{model.attributes.banner_image_url}}" />
         {{#if model.attributes.is_installed}}
           <div class="gray-box-centered">{{#t "app_already_installed"}}This app has already been installed{{/t}}</div>
         {{/if}}
@@ -16,7 +16,7 @@
         <table class="star-table">
           <tbody>
             <td><div class="app-star"></div></td>
-            <td><small>({{model.attributes.ratings_count}})</small></td>
+            <td><small>({{model.attributes.total_ratings}})</small></td>
           </tbody>
         </table>
         <p>{{{model.attributes.description}}}</p>
@@ -35,11 +35,7 @@
             </tr>
             <tr class="data-row">
               <td valign="top" class="data-label">{{#t "average_rating"}}Average Rating{{/t}}</td>
-              <td valign="top" class="data-value">{{toPrecision model.attributes.avg_rating 2}}</td>
-            </tr>
-            <tr class="data-row">
-              <td valign="top" class="data-label">{{#t "privacy_level"}}Privacy Level{{/t}}</td>
-              <td valign="top" class="data-value">{{titleize model.attributes.privacy_level}}</td>
+              <td valign="top" class="data-value">{{toPrecision model.attributes.average_rating 2}}</td>
             </tr>
             <tr class="data-row">
               <td valign="top" class="data-label">{{#t "education_levels"}}Education Level(s){{/t}}</td>

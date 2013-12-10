@@ -146,7 +146,7 @@ class CutyCapt
   end
 
   def self.snapshot_attachment_for_url(url)
-    require 'action_controller/test_process.rb'
+    require 'action_controller_test_process'
 
     attachment = nil
     self.snapshot_url(url, "png") do |file_path|

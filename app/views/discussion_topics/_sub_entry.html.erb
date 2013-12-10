@@ -18,7 +18,7 @@
     <div class="message user_content" style="<%= hidden unless entry %>"><%= user_content(entry.try_rescue(:message)) || nbsp %></div>
     <textarea class="message_html" style="display: none;"><%= h(entry.try_rescue(:message)) %></textarea>
     <% if !entry %>
-     <% form_for :discussion_entry, :url => context_url(entry_context, :context_discussion_entries_url), :html => {:class => "add_sub_message_form"} do |f| %>
+     <%= form_for :discussion_entry, :url => context_url(entry_context, :context_discussion_entries_url), :html => {:class => "add_sub_message_form"} do |f| %>
         <%= f.hidden_field :discussion_topic_id, :value => parent_entry.discussion_topic_id %>
         <%= f.hidden_field :parent_id, :value => parent_entry.id, :class => "parent_id" %>
         <%= f.text_area :message, :style => "height: 200px;", :class => "rich_text" %>

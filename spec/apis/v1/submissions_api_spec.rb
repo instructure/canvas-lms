@@ -105,12 +105,12 @@ describe 'Submissions API', :type => :integration do
       json.size.should == 1
       json.first['user_id'].should == @student1.id
 
-      json = api_call(:get,
+      api_call(:get,
             "/api/v1/sections/#{@default_section.id}/students/submissions",
             { :controller => 'submissions_api', :action => 'for_students',
               :format => 'json', :section_id => @default_section.id.to_s },
-              :student_ids => [@student1.id])
-      json.size.should == 0
+            { :student_ids => [@student1.id] },
+            {}, expected_status: 401)
 
       json = api_call(:get,
             "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
@@ -1065,16 +1065,37 @@ describe 'Submissions API', :type => :integration do
       course_with_student :active_all => true
       @student1 = @student
       @student2 = student_in_course(:active_all => true).user
+      @student3 = student_in_course(:active_all => true).user
       @assignment1 = @course.assignments.create! :title => 'assignment1', :grading_type => 'points', :points_possible => 15
       @assignment2 = @course.assignments.create! :title => 'assignment2', :grading_type => 'points', :points_possible => 25
       submit_homework @assignment1, @student1
       submit_homework @assignment2, @student1
       submit_homework @assignment1, @student2
       submit_homework @assignment2, @student2
+      submit_homework @assignment1, @student3
       @assignment1.grade_student @student1, :grade => 15
       @assignment1.grade_student @student2, :grade => 10
       @assignment2.grade_student @student1, :grade => 25
       @assignment2.grade_student @student2, :grade => 20
+      @assignment1.grade_student @student3, :grade => 20
+    end
+
+    context "teacher" do
+      it "should show all submissions" do
+        @user = @teacher
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/students/submissions",
+                        { :controller => 'submissions_api', :action => 'for_students',
+                          :format => 'json', :course_id => @course.to_param },
+                        { :student_ids => ['all'] })
+        json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }.sort_by { |entry| [entry['user_id'], entry['assignment_id']] }.should == [
+            { 'user_id' => @student1.id, 'assignment_id' => @assignment1.id, 'score' => 15 },
+            { 'user_id' => @student1.id, 'assignment_id' => @assignment2.id, 'score' => 25 },
+            { 'user_id' => @student2.id, 'assignment_id' => @assignment1.id, 'score' => 10 },
+            { 'user_id' => @student2.id, 'assignment_id' => @assignment2.id, 'score' => 20 },
+            { 'user_id' => @student3.id, 'assignment_id' => @assignment1.id, 'score' => 20 },
+        ]
+      end
     end
 
     context "students" do
@@ -1096,6 +1117,18 @@ describe 'Submissions API', :type => :integration do
                         "/api/v1/courses/#{@course.id}/students/submissions.json",
                         { :controller => 'submissions_api', :action => 'for_students',
                           :format => 'json', :course_id => @course.to_param } )
+        json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }.sort_by { |entry| entry['assignment_id'] }.should == [
+            { 'user_id' => @student2.id, 'assignment_id' => @assignment1.id, 'score' => 10 },
+            { 'user_id' => @student2.id, 'assignment_id' => @assignment2.id, 'score' => 20 } ]
+      end
+
+      it "should show all possible if student_ids is ['all']" do
+        @user = @student2
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/students/submissions.json",
+                        { :controller => 'submissions_api', :action => 'for_students',
+                          :format => 'json', :course_id => @course.to_param },
+                        { :student_ids => ['all'] })
         json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }.sort_by { |entry| entry['assignment_id'] }.should == [
             { 'user_id' => @student2.id, 'assignment_id' => @assignment1.id, 'score' => 10 },
             { 'user_id' => @student2.id, 'assignment_id' => @assignment2.id, 'score' => 20 } ]
@@ -1123,6 +1156,16 @@ describe 'Submissions API', :type => :integration do
                    :student_ids => [@student1.to_param, @student2.to_param] },
                  {}, {}, :expected_status => 401)
       end
+
+      it "should error if too many students requested" do
+        Api.stubs(:max_per_page).returns(0)
+        @user = @student1
+        api_call(:get,
+                 "/api/v1/courses/#{@course.id}/students/submissions.json",
+                 { :controller => 'submissions_api', :action => 'for_students',
+                   :format => 'json', :course_id => @course.to_param },
+                 { :student_ids => [@student1.to_param] }, {}, expected_status: 400)
+      end
     end
 
     context "observers" do
@@ -1145,6 +1188,59 @@ describe 'Submissions API', :type => :integration do
             { 'user_id' => @student2.id, 'assignment_id' => @assignment1.id, 'score' => 10 },
             { 'user_id' => @student2.id, 'assignment_id' => @assignment2.id, 'score' => 20 }
         ]
+      end
+
+      it "should allow an observer to view all observed students' submissions via student_ids[]=all" do
+        @user = @observer
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/students/submissions",
+                        { :controller => 'submissions_api', :action => 'for_students',
+                          :format => 'json', :course_id => @course.to_param },
+                        { :student_ids => ['all'] })
+        json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }.sort_by { |entry| [entry['user_id'], entry['assignment_id']] }.should == [
+            { 'user_id' => @student1.id, 'assignment_id' => @assignment1.id, 'score' => 15 },
+            { 'user_id' => @student1.id, 'assignment_id' => @assignment2.id, 'score' => 25 },
+            { 'user_id' => @student2.id, 'assignment_id' => @assignment1.id, 'score' => 10 },
+            { 'user_id' => @student2.id, 'assignment_id' => @assignment2.id, 'score' => 20 }
+        ]
+      end
+
+      context "observer that is a student" do
+        before do
+          @course.enroll_student(@observer, :allow_multiple_enrollments => true).accept!
+          submit_homework(@assignment1, @observer)
+          @assignment1.grade_student(@observer, grade: 5)
+        end
+
+        it "should allow an observer that is a student to view his own and his observees submissions" do
+          @user = @observer
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/students/submissions",
+                          { :controller => 'submissions_api', :action => 'for_students',
+                            :format => 'json', :course_id => @course.to_param },
+                          { :student_ids => [@student1.id, @observer.id] })
+          json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }.sort_by { |entry| [entry['user_id'], entry['assignment_id']] }.should == [
+              { 'user_id' => @student1.id, 'assignment_id' => @assignment1.id, 'score' => 15 },
+              { 'user_id' => @student1.id, 'assignment_id' => @assignment2.id, 'score' => 25 },
+              { 'user_id' => @observer.id, 'assignment_id' => @assignment1.id, 'score' => 5 }
+          ]
+        end
+
+        it "should allow an observer that is a student to view his own and his observees submissions via student_ids[]=all" do
+          @user = @observer
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/students/submissions",
+                          { :controller => 'submissions_api', :action => 'for_students',
+                            :format => 'json', :course_id => @course.to_param },
+                          { :student_ids => ['all'] })
+          json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }.sort_by { |entry| [entry['user_id'], entry['assignment_id']] }.should == [
+              { 'user_id' => @student1.id, 'assignment_id' => @assignment1.id, 'score' => 15 },
+              { 'user_id' => @student1.id, 'assignment_id' => @assignment2.id, 'score' => 25 },
+              { 'user_id' => @student2.id, 'assignment_id' => @assignment1.id, 'score' => 10 },
+              { 'user_id' => @student2.id, 'assignment_id' => @assignment2.id, 'score' => 20 },
+              { 'user_id' => @observer.id, 'assignment_id' => @assignment1.id, 'score' => 5 }
+          ]
+        end
       end
 
       it "should allow an observer to view observed students' submissions (grouped)" do
@@ -1725,16 +1821,16 @@ describe 'Submissions API', :type => :integration do
           "/api/v1/courses/#{@course.id}/students/submissions",
           { :controller => 'submissions_api', :action => 'for_students',
             :format => 'json', :course_id => @course.id.to_s },
-          { :student_ids => [s1.user_id, s2.user_id], :grouped => 1 })
-    json.map { |u| u['user_id'] }.should == [s1.user_id]
+          { :student_ids => [s1.user_id, s2.user_id], :grouped => 1 },
+          {}, expected_status: 401)
 
     # try querying the other section directly
     json = api_call(:get,
           "/api/v1/sections/#{section2.id}/students/submissions",
           { :controller => 'submissions_api', :action => 'for_students',
             :format => 'json', :section_id => section2.id.to_s },
-          { :student_ids => [s1.user_id, s2.user_id], :grouped => 1 })
-    json.size.should == 0
+          { :student_ids => [s1.user_id, s2.user_id], :grouped => 1 },
+          {}, expected_status: 401)
 
     # grade the s1 submission, succeeds because the section is the same
     json = api_call(:put,

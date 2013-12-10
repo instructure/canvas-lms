@@ -23,8 +23,7 @@ describe FilesController do
     @folder = @course.folders.create!(:name => "a folder", :workflow_state => "visible")
   end
   def io
-    require 'action_controller'
-    require 'action_controller/test_process.rb'
+    require 'action_controller_test_process'
     ActionController::TestUploadedFile.new(File.expand_path(File.dirname(__FILE__) + '/../fixtures/scribd_docs/doc.doc'), 'application/msword', true)
   end
   def course_file
@@ -550,6 +549,7 @@ describe FilesController do
       response.should be_success
       assigns[:attachment].should_not be_nil
       assigns[:attachment].id.should_not be_nil
+      assigns[:attachment][:user_id].should_not be_nil
       json = json_parse
       json.should_not be_nil
       json['id'].should eql(assigns[:attachment].id)
@@ -568,6 +568,7 @@ describe FilesController do
       response.should be_success
       assigns[:attachment].should_not be_nil
       assigns[:attachment].id.should_not be_nil
+      assigns[:attachment][:user_id].should_not be_nil
       json = json_parse
       json.should_not be_nil
       json['id'].should eql(assigns[:attachment].id)

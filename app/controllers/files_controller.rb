@@ -442,7 +442,7 @@ class FilesController < ApplicationController
       # request to get the data.
       # Protect ourselves against reading huge files into memory -- if the
       # attachment is too big, don't return it.
-      if @attachment.size > Setting.get_cached('attachment_json_response_max_size', 1.megabyte.to_s).to_i
+      if @attachment.size > Setting.get('attachment_json_response_max_size', 1.megabyte.to_s).to_i
         render :json => { :error => t('errors.too_large', "The file is too large to edit") }
         return
       end
@@ -574,6 +574,7 @@ class FilesController < ApplicationController
     end
 
     @attachment.context = @context
+    @attachment.user = @current_user
     if authorized_action(permission_object, @current_user, permission)
       if @context.respond_to?(:is_a_context?) && @check_quota
         get_quota

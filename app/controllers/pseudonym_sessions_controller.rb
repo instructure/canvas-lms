@@ -120,7 +120,7 @@ class PseudonymSessionsController < ApplicationController
       @login_handle_name = @domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name
       @login_handle_is_email = @login_handle_name == AccountAuthorizationConfig.default_login_handle_name
       js_env(
-        :GOOGLE_ANALYTICS_KEY => Setting.get_cached('google_analytics_key', nil),
+        :GOOGLE_ANALYTICS_KEY => Setting.get('google_analytics_key', nil),
         :RESET_SENT =>  t("password_confirmation_sent", "Password confirmation sent. Make sure you check your spam box."),
         :RESET_ERROR =>  t("password_confirmation_error", "Error sending request.")
       )
@@ -613,7 +613,7 @@ class PseudonymSessionsController < ApplicationController
     scopes =  params[:scopes].split(',') if params.key? :scopes
     scopes ||= []
 
-    provider = Canvas::Oauth::Provider.new(params[:client_id], params[:redirect_uri], scopes)
+    provider = Canvas::Oauth::Provider.new(params[:client_id], params[:redirect_uri], scopes, params[:purpose])
 
     return render(:status => 400, :json => { :message => "invalid client_id" }) unless provider.has_valid_key?
     return render(:status => 400, :json => { :message => "invalid redirect_uri" }) unless provider.has_valid_redirect?
@@ -632,10 +632,10 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def oauth2_confirm
-    @provider = Canvas::Oauth::Provider.new(session[:oauth2][:client_id], session[:oauth2][:redirect_uri], session[:oauth2][:scopes])
+    @provider = Canvas::Oauth::Provider.new(session[:oauth2][:client_id], session[:oauth2][:redirect_uri], session[:oauth2][:scopes], session[:oauth2][:purpose])
 
     if mobile_device?
-      js_env :GOOGLE_ANALYTICS_KEY => Setting.get_cached('google_analytics_key', nil)
+      js_env :GOOGLE_ANALYTICS_KEY => Setting.get('google_analytics_key', nil)
       render :layout => 'mobile_auth', :action => 'oauth2_confirm_mobile'
     end
   end
@@ -675,7 +675,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def final_oauth2_redirect_params(options = {})
-    options = {:scopes => session[:oauth2][:scopes], :remember_access => options[:remember_access]}
+    options = {:scopes => session[:oauth2][:scopes], :remember_access => options[:remember_access], :purpose => session[:oauth2][:purpose]}
     code = Canvas::Oauth::Token.generate_code_for(@current_user.global_id, session[:oauth2][:client_id], options)
     redirect_params = { :code => code }
   end

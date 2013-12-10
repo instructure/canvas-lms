@@ -21,6 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe Quiz do
   before(:each) do
     course
+    @course.root_account.disable_draft!
   end
 
   describe ".mark_quiz_edited" do
@@ -274,13 +275,45 @@ describe Quiz do
     q.assignment_id.should be_nil
   end
 
-  it "should not create the assignment if unpublished" do
+  it "should not create the assignment if unpublished and draft_states are not enabled" do
+    @course.root_account.disable_draft!
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
     q.save!
     q.should_not be_available
     q.assignment_id.should be_nil
     q.assignment_group_id.should eql(g.id)
+  end
+
+  context "when draft_states are enabled" do
+    before :each do
+      @course.root_account.enable_draft!
+    end
+
+    after :each do
+      @course.root_account.disable_draft!
+    end
+
+    it "should always have an assignment" do
+      g = @course.assignment_groups.create!(:name => "new group")
+      q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
+      q.save!
+      q.should_not be_available
+      q.assignment_id.should_not be_nil
+      q.assignment_group_id.should eql(g.id)
+    end
+
+    it "should update assignment published?" do
+      g = @course.assignment_groups.create!(:name => "new group")
+      q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
+      q.save!
+      q.should_not be_available
+      q.assignment_id.should_not be_nil
+      q.assignment.published?.should be false
+      q.assignment_group_id.should eql(g.id)
+      q.publish!
+      q.assignment.published?.should be true
+    end
   end
 
   it "should create the assignment if created in published state" do
@@ -294,7 +327,8 @@ describe Quiz do
     q.assignment.assignment_group_id.should eql(g.id)
   end
 
-  it "should create the assignment if published after being created" do
+  it "should create the assignment if published after being created when draft_state not enabled" do
+    @course.root_account.disable_draft!
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
     q.save!
@@ -478,8 +512,7 @@ describe Quiz do
     data[2][:answers].should_not be_nil
   end
 
-  context "#generate_submission" do
-
+  describe "#generate_submission" do
     it "should generate a valid submission for a given user" do
       u = User.create!(:name => "some user")
       q = @course.quizzes.create!(:title => "some quiz")
@@ -532,6 +565,42 @@ describe Quiz do
       sub.save!
       sub2 = q.generate_submission(u)
       sub2.end_at.should be_nil
+    end
+
+    it "should shuffle submission questions" do
+      u1 = User.create!(:name => "user 1")
+      u2 = User.create!(:name => "user 2")
+      u3 = User.create!(:name => "user 3")
+
+      quiz = @course.quizzes.create!(:title => "some quiz")
+
+      # create a bunch of questions to make it more likely that they'll shuffle randomly
+      group = quiz.quiz_groups.create!(:name => "group 1", :pick_count => 4, :question_points => 2)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 1" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 2" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 3" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 4" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 5" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 6" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 7" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 8" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 9" }, :quiz_group => group)
+      quiz.quiz_questions.create!(:question_data => { :question_text => "test 10" }, :quiz_group => group)
+      quiz.quiz_data.should be_nil
+      quiz.generate_quiz_data
+      quiz.save
+
+      original = quiz.quiz_questions.map {|q| q.question_data["question_text"] }
+
+      selected1 = quiz.generate_submission(u1).questions.map {|q| q["question_text"] }
+      selected2 = quiz.generate_submission(u2).questions.map {|q| q["question_text"] }
+
+      # make sure at least one is shuffled
+      is_shuffled1 = (original != selected1)
+      is_shuffled2 = (original != selected2)
+
+      # it's possible but unlikely that shuffled version is same as original
+      (is_shuffled1 || is_shuffled2).should be_true
     end
   end
 
@@ -590,78 +659,6 @@ describe Quiz do
     q.quiz_submissions.size.should == 1
     q.quiz_submissions.first.submission.should_not be_nil
     q.quiz_submissions.first.submission.assignment.should == q.assignment
-  end
-
-  context "clone_for" do
-    it "should clone for other contexts" do
-      u = User.create!(:name => "some user")
-      q = @course.quizzes.create!(:title => "some quiz")
-      q = @course.quizzes.create!(:title => "new quiz")
-      g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
-      q.quiz_questions.create!(:question_data => { :name => "test 1", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 2", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 3", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 4", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 5", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 6", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 7", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 8", }, :quiz_group => g)
-      q.quiz_questions.create!(:question_data => { :name => "test 9", })
-      q.quiz_questions.create!(:question_data => { :name => "test 10", })
-      q.quiz_data.should be_nil
-      q.generate_quiz_data
-      q.save
-      course
-      new_q = q.clone_for(@course)
-      new_q.context.should eql(@course)
-      new_q.context.should_not eql(q.context)
-      new_q.title.should eql(q.title)
-      new_q.quiz_groups.length.should eql(q.quiz_groups.length)
-
-      new_q_questions = new_q.active_quiz_questions
-
-      new_q_questions.size.should eql(q.quiz_questions.active.length)
-      new_q_questions.first.question_data[:id].should be_nil
-      new_q_questions.first.data[:id].should == new_q.quiz_questions.active.first.id
-    end
-
-    it "should set the related assignment's group correctly" do
-      ag = @course.assignment_groups.create!(:name => 'group')
-      a = @course.assignments.create!(:title => "some assignment", :points_possible => 5, :assignment_group => ag)
-      a.points_possible.should eql(5.0)
-      a.submission_types.should_not eql("online_quiz")
-      q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10)
-      q.workflow_state = 'available'
-      q.save
-
-      course
-      new_q = q.clone_for(@course)
-      new_q.context.should eql(@course)
-      new_q.context.should_not eql(q.context)
-      new_q.assignment.assignment_group.should_not eql(ag)
-      new_q.assignment.assignment_group.context.should eql(@course)
-    end
-
-    it "should not blow up when a quiz question has a link to the quiz it's in" do
-      q = @course.quizzes.create!(:title => "some quiz")
-      question_text = "<a href='/courses/#{@course.id}/quizzes/#{q.id}/edit'>hi</a>"
-      q.quiz_questions.create!(:question_data => { :name => "test 1", :question_text => question_text })
-      q.generate_quiz_data
-      q.save
-      course
-      new_q = q.clone_for(@course)
-      new_q.active_quiz_questions.first.question_data[:question_text].should match /\/courses\/#{@course.id}\/quizzes\/#{new_q.id}\/edit/
-    end
-
-    it "should only create one associated assignment for a graded quiz" do
-      q = @course.quizzes.create!(:title => "graded quiz", :quiz_type => 'assignment')
-      q.workflow_state = 'available'
-      q.save
-      course
-      expect {
-        new_q = q.clone_for(@course)
-      }.to change(@course.assignments, :count).by(1)
-    end
   end
 
   describe "Quiz with QuestionGroup pointing to QuestionBank" do
@@ -822,11 +819,6 @@ describe Quiz do
 
     it 'is false if the submission is settings_only' do
       @submission.update_attribute(:workflow_state, 'settings_only')
-      @quiz.has_student_submissions?.should be_false
-    end
-
-    it 'is false if the user is not part of this course' do
-      @user.student_enrollments.scoped.delete_all
       @quiz.has_student_submissions?.should be_false
     end
 
@@ -1061,7 +1053,8 @@ describe Quiz do
       quiz.has_file_upload_question?.should be_false
     end
   end
-  context "#unpublished?" do
+
+  describe "#unpublished?" do
     before do
       @quiz = @course.quizzes.build title: 'Test Quiz'
     end
@@ -1077,7 +1070,7 @@ describe Quiz do
     end
   end
 
-  context "#active?" do
+  describe "#active?" do
     before do
       @quiz = @course.quizzes.build title: 'Test Quiz'
     end
@@ -1096,7 +1089,7 @@ describe Quiz do
 
   end
 
-  context "#published?" do
+  describe "#published?" do
     before do
       @quiz = @course.quizzes.build title: 'Test Quiz'
     end
@@ -1111,7 +1104,7 @@ describe Quiz do
     end
   end
 
-  context "#current_regrade" do
+  describe "#current_regrade" do
 
     before { @quiz = @course.quizzes.create! title: 'Test Quiz' }
 
@@ -1122,7 +1115,7 @@ describe Quiz do
     end
   end
 
-  context "#current_regrade_question_ids" do
+  describe "#current_regrade_question_ids" do
 
     before { @quiz = @course.quizzes.create! title: 'Test Quiz' }
 
@@ -1135,19 +1128,7 @@ describe Quiz do
     end
   end
 
-  context "#last_regrade_performed" do
-    before { @quiz = @course.quizzes.create! title: 'Test Quiz' }
-
-    it "returns the last regrade for the quiz, regardless of version" do
-      course_with_teacher_logged_in(active_all: true, course: @course)
-      versioned_regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) { |qr| qr.user_id = @teacher.id }
-      last_regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number-1) { |qr| qr.user_id = @teacher.id }
-
-      @quiz.last_regrade_performed.should == last_regrade
-    end
-  end
-
-  context "#regrade_if_published" do
+  describe "#regrade_if_published" do
 
     it "queues a job to regrade if there are current question regrades" do
       course_with_teacher_logged_in(course: @course, active_all: true)
@@ -1167,6 +1148,64 @@ describe Quiz do
       QuizRegrader.expects(:send_later).never
       quiz = @course.quizzes.create!
       quiz.save!
+    end
+  end
+
+  describe "#questions_regraded_since" do
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      @quiz = @course.quizzes.create!
+    end
+
+    it "should count how many questions have been regraded since the given date" do
+      first_regrade_time = 1.hour.ago
+      Timecop.freeze(first_regrade_time) do
+        # regrade once
+        regrade1 = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) do |qr|
+          qr.user_id = @teacher.id
+        end
+        regrade1.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
+      end
+
+      # regrade twice
+      regrade2 = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number-1) do |qr|
+        qr.user_id = @teacher.id
+      end
+      regrade2.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
+      regrade2.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
+
+      # find all
+      count = @quiz.questions_regraded_since(first_regrade_time - 10.minutes)
+      count.should == 3
+
+      # onlye find those after the first regrade
+      count = @quiz.questions_regraded_since(first_regrade_time)
+      count.should == 2
+    end
+  end
+
+  describe "#destroy" do
+    it "should logical delete published quiz" do
+      quiz = @course.quizzes.create(title: 'test quiz')
+      quiz.context.root_account.enable_draft!
+      quiz.stubs(:has_student_submissions? => true)
+      quiz.publish!
+      quiz.assignment.stubs(:has_student_submissions? => true)
+
+      quiz.destroy
+      quiz.deleted?.should be_true
+    end
+
+    it "should logical delete the published quiz's associated assignment" do
+      quiz = @course.quizzes.create(title: 'test quiz')
+      quiz.context.root_account.enable_draft!
+      quiz.stubs(:has_student_submissions?).returns true
+      quiz.publish!
+      assignment = quiz.assignment
+      assignment.stubs(:has_student_submissions?).returns true
+
+      quiz.destroy
+      assignment.deleted?.should be_true
     end
   end
 

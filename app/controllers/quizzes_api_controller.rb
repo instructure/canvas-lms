@@ -97,6 +97,10 @@
 #       // whether the quiz has a published or unpublished draft state.
 #       "published": true,
 #
+#       // Whether the assignment's "published" state can be changed to false.
+#       // Will be false if there are student submissions for the quiz.
+#       "unpublishable": true,
+#
 #       // Whether or not this is locked for the user.
 #       "locked_for_user": false,
 #

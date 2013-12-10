@@ -8,6 +8,7 @@ define [
   'jquery'
   'helpers/jquery.simulate'
   'compiled/behaviors/elementToggler'
+  'helpers/fakeENV'
 ], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, AssignmentGroupListItemView, AssignmentListItemView, $) ->
 
   fixtures = $('#fixtures')
@@ -92,10 +93,8 @@ define [
 
   createView = (model, options) ->
     options = $.extend {canManage: true}, options
-    sinon.stub( AssignmentGroupListItemView.prototype, "canManage", -> options.canManage )
+    ENV.PERMISSIONS = { manage: options.canManage }
     sinon.stub( AssignmentGroupListItemView.prototype, "currentUserId", -> 1)
-    sinon.stub( AssignmentListItemView.prototype, "canManage", -> options.canManage )
-    sinon.stub( AssignmentListItemView.prototype, "modules", -> )
 
     view = new AssignmentGroupListItemView
       model: model
@@ -110,10 +109,9 @@ define [
       @model = createAssignmentGroup()
 
     teardown: ->
-      AssignmentGroupListItemView.prototype.canManage.restore()
-      AssignmentListItemView.prototype.canManage.restore()
-      AssignmentListItemView.prototype.modules.restore()
+      ENV.PERMISSIONS = {}
       AssignmentGroupListItemView.prototype.currentUserId.restore()
+      $('#fixtures').empty()
 
   test "initializes collection", ->
     view = createView(@model)
@@ -195,3 +193,9 @@ define [
   test "cacheKey builds unique key", ->
     view = createView(@model)
     deepEqual view.cacheKey(), ["course", 1, "user", 1, "ag", 1, "expanded"]
+
+  test "not allow group to be deleted with frozen assignments", ->
+    assignments = @model.get('assignments')
+    assignments.first().set('frozen', true)
+    view = createView(@model)
+    ok !view.$("#assignment_group_#{@model.id} a.delete_group").length

@@ -37,6 +37,10 @@ class AssignmentsController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
 
+      # It'd be nice to do this as an after_create, but it's not that simple
+      # because of course import/copy.
+      @context.require_assignment_group
+
       permissions = @context.grants_rights?(@current_user, :manage_assignments, :manage_grades)
       permissions[:manage] = permissions[:manage_assignments] || permissions[:manage_grades]
       js_env({
@@ -44,10 +48,11 @@ class AssignmentsController < ApplicationController
           :new_assignment_url => new_polymorphic_url([@context, :assignment]),
           :course_url => api_v1_course_url(@context),
           :sort_url => reorder_course_assignment_groups_url,
-          :assignment_sort_base_url => course_assignment_groups_url
+          :assignment_sort_base_url => course_assignment_groups_url,
+          :context_modules_url => api_v1_course_context_modules_path(@context),
+          :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
         },
         :PERMISSIONS => permissions,
-        :MODULES => get_module_names
       })
 
       respond_to do |format|
@@ -192,7 +197,7 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-  
+
   def assign_peer_review
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @student = @context.students_visible_to(@current_user).find params[:reviewer_id]
@@ -205,7 +210,7 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-  
+
   def remind_peer_review
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
@@ -221,7 +226,7 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-  
+
   def delete_peer_review
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
@@ -237,7 +242,7 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-  
+
   def peer_reviews
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
@@ -249,7 +254,7 @@ class AssignmentsController < ApplicationController
       @submissions = @assignment.submissions.include_assessment_requests
     end
   end
-  
+
   def syllabus
     add_crumb t '#crumbs.syllabus', "Syllabus"
     active_tab = "Syllabus"
@@ -317,7 +322,7 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-  
+
   def new
     @assignment ||= @context.assignments.new
     @assignment.workflow_state = 'unpublished' if @context.draft_state_enabled?
@@ -354,7 +359,7 @@ class AssignmentsController < ApplicationController
         map { |c| { :id => c.id, :name => c.name } }
 
       hash = {
-        :ASSIGNMENT_GROUPS => assignment_groups.map{|g| assignment_group_json(g, @current_user, session) },
+        :ASSIGNMENT_GROUPS => assignment_groups.map{|g| assignment_group_json(g, @current_user, session, [], {stringify_json_ids: stringify_json_ids?}) },
         :GROUP_CATEGORIES => group_categories,
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
         :SECTION_LIST => (@context.course_sections.active.map { |section|
@@ -442,7 +447,7 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-  
+
   protected
 
   def get_assignment_group(assignment_params)
@@ -460,23 +465,6 @@ class AssignmentsController < ApplicationController
 
   def index_edit_params
     params.slice(*[:title, :due_at, :points_possible, :assignment_group_id])
-  end
-
-  def get_module_names
-    return {} if @context.context_modules.count == 0
-    @context.assignments.active.each_with_object({}) do |a, hash|
-      tags = nil
-      if a.submission_types == "online_quiz"
-        tags = a.quiz.try(:context_module_tags)
-      elsif a.submission_types == "discussion_topic"
-        tags = a.discussion_topic.try(:context_module_tags)
-      else
-        tags = a.context_module_tags
-      end
-
-      modules = ContextModule.where(:id => tags.map(&:context_module_id)).pluck(:name)
-      hash[a.id] = modules
-    end
   end
 
 end

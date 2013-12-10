@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -50,7 +50,7 @@ class Folder < ActiveRecord::Base
   before_save :infer_hidden_state
   validates_presence_of :context_id, :context_type
   validates_length_of :name, :maximum => maximum_string_length
-  validate_on_update :reject_recursive_folder_structures
+  validate :reject_recursive_folder_structures, on: :update
 
   def reject_recursive_folder_structures
     return true if !self.parent_folder_id_changed?
@@ -84,7 +84,7 @@ class Folder < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.active_file_attachments.each{|a| a.destroy }
     self.active_sub_folders.each{|s| s.destroy }
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     self.save
   end
   

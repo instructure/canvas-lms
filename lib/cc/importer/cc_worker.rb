@@ -16,16 +16,25 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class Canvas::Migration::Worker::CCWorker < Struct.new(:migration_id)
-  def perform
-    cm = ContentMigration.find_by_id migration_id
+  def perform(cm=nil)
+    cm ||= ContentMigration.find_by_id migration_id
     cm.job_progress.start unless cm.skip_job_progress
     begin
       cm.update_conversion_progress(1)
       settings = cm.migration_settings.clone
       settings[:content_migration_id] = migration_id
       settings[:user_id] = cm.user_id
-      settings[:attachment_id] = cm.attachment.id rescue nil
       settings[:content_migration] = cm
+
+      if cm.attachment
+        settings[:attachment_id] = cm.attachment.id
+      elsif settings[:file_url]
+        # create attachment and download file
+        att = Canvas::Migration::Worker.download_attachment(cm, settings[:file_url])
+        settings[:attachment_id] = att.id
+      elsif !settings[:no_archive_file]
+        raise Canvas::Migration::Error, I18n.t(:no_migration_file, "File required for content migration.")
+      end
 
       converter_class = settings[:converter_class] || Canvas::Migration::Worker::get_converter(settings)
       converter = converter_class.new(settings)
@@ -77,4 +86,5 @@ class Canvas::Migration::Worker::CCWorker < Struct.new(:migration_id)
                          :max_attempts => 1,
                          :strand => content_migration.strand)
   end
+
 end

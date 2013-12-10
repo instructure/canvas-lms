@@ -1,5 +1,5 @@
 class AddUserObservers < ActiveRecord::Migration
-  self.transactional = false
+  disable_ddl_transaction!
   tag :predeploy
 
   def self.up
@@ -11,7 +11,7 @@ class AddUserObservers < ActiveRecord::Migration
     add_index :user_observers, :observer_id
 
     # User#move_to_user already needed this, and now we do a second query there
-    add_index :enrollments, [:associated_user_id], :concurrently => true, :conditions => "associated_user_id IS NOT NULL"
+    add_index :enrollments, [:associated_user_id], :algorithm => :concurrently, :where => "associated_user_id IS NOT NULL"
   end
 
   def self.down

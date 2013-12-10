@@ -96,6 +96,6 @@ class Canvas::Embedly < Struct.new(:title, :description, :images, :object_html, 
   end
 
   def embedly_timeout
-    Setting.get_cached('embedly_request_timeout', 15.seconds.to_s).to_f
+    Setting.get('embedly_request_timeout', 15.seconds.to_s).to_f
   end
 end

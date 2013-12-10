@@ -43,7 +43,7 @@ generator.template = function(env) {
 };
 
 function appendable(generatorName) {
-  var types = ['component', 'controller', 'route', 'view'];
+  var types = ['component', 'controller', 'route', 'view', 'adapter', 'serializer'];
   return types.indexOf(generatorName) > -1;
 }
 

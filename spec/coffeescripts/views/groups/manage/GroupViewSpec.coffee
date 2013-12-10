@@ -2,11 +2,12 @@ define [
   'jquery'
   'compiled/views/groups/manage/GroupView'
   'compiled/views/groups/manage/GroupUsersView'
+  'compiled/views/groups/manage/GroupDetailView'
   'compiled/collections/GroupCollection'
   'compiled/collections/GroupUserCollection'
   'compiled/models/Group'
   'helpers/fakeENV'
-], ($, GroupView, GroupUsersView, GroupCollection, GroupUserCollection, Group) ->
+], ($, GroupView, GroupUsersView, GroupDetailView, GroupCollection, GroupUserCollection, Group) ->
 
   view = null
   group = null
@@ -26,7 +27,8 @@ define [
       users.loadedAll = true
       group.users = -> users
       groupUsersView = new GroupUsersView {group, collection: users}
-      view = new GroupView {groupUsersView, model: group}
+      groupDetailView = new GroupDetailView {group, users}
+      view = new GroupView {groupUsersView, groupDetailView, model: group}
       view.render()
       view.$el.appendTo($(document.body))
 

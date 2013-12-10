@@ -282,11 +282,17 @@ class ContextController < ApplicationController
   def discussion_replies
     add_crumb(t('#crumb.conversations', "Conversations"), conversations_url)
     add_crumb(t('#crumb.discussion_replies', "Discussion Replies"), discussion_replies_url)
-    @messages = @current_user.inbox_items.active.paginate(:page => params[:page], :per_page => 15)
+    @messages = @current_user.inbox_items.active
     log_asset_access("inbox:#{@current_user.asset_string}", "inbox", 'other')
     respond_to do |format|
-      format.html { render :action => :inbox }
-      format.json { render :json => @messages.map{ |m| m.as_json(methods: [:sender_name]) } }
+      format.html do
+        @messages = @messages.paginate(page: params[:page], per_page: 15)
+        render :action => :inbox
+      end
+      format.json do
+        @messages = Api.paginate(@messages, self, discussion_replies_url, default_per_page: 15)
+        render :json => @messages.map{ |m| m.as_json(methods: [:sender_name]) }
+      end
     end
   end
   
@@ -331,7 +337,7 @@ class ContextController < ApplicationController
           :concluded => completed || soft_concluded,
           :teacherless => @context.teacherless?,
           :available => @context.available?,
-          :pendingInvitationsCount => @context.users_visible_to(@current_user).count(:distinct => true, :select => 'users.id', :conditions => ["enrollments.workflow_state = 'invited' AND enrollments.type != 'StudentViewEnrollment'"])
+          :pendingInvitationsCount => @context.invited_count_visible_to(@current_user)
         }
       })
     elsif @context.is_a?(Group)
@@ -366,13 +372,13 @@ class ContextController < ApplicationController
 
   def roster_user_services
     if authorized_action(@context, @current_user, :read_roster)
-      @users = @context.users.order_by_sortable_name
+      @users = @context.users.where(show_user_services: true).order_by_sortable_name
       @users_hash = {}
       @users_order_hash = {}
       @users.each_with_index{|u, i| @users_hash[u.id] = u; @users_order_hash[u.id] = i }
       @current_user_services = {}
       @current_user.user_services.each{|s| @current_user_services[s.service] = s }
-      @services = UserService.for_user(@users).sort_by{|s| @users_order_hash[s.user_id] || SortLast}
+      @services = UserService.for_user(@users.except(:select, :order)).sort_by{|s| @users_order_hash[s.user_id] || SortLast}
       @services = @services.select{|service|
         !UserService.configured_service?(service.service) || feature_and_service_enabled?(service.service.to_sym)
       }
@@ -383,10 +389,15 @@ class ContextController < ApplicationController
   def roster_user_usage
     if authorized_action(@context, @current_user, :read_reports)
       @user = @context.users.find(params[:user_id])
-      @accesses = AssetUserAccess.for_user(@user).for_context(@context).most_recent.paginate(:page => params[:page], :per_page => 50)
+      @accesses = AssetUserAccess.for_user(@user).for_context(@context).most_recent
       respond_to do |format|
-        format.html
-        format.json { render :json => @accesses.map{ |a| a.as_json(methods: [:readable_name, :asset_class_name]) } }
+        format.html do
+          @accesses = @accesses.paginate(page: params[:page], per_page: 50)
+        end
+        format.json do
+          @accesses = Api.paginate(@accesses, self, polymorphic_url([@context, :user_usage], user_id: @user), default_per_page: 50)
+          render :json => @accesses.map{ |a| a.as_json(methods: [:readable_name, :asset_class_name]) }
+        end
       end
     end
   end

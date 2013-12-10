@@ -195,22 +195,36 @@ define [
       results
 
     search: (regex) ->
+      @resetBorders()
+
       atleastone = false
       @collection.each (as) =>
-        atleastone = true if as.assignmentView.search(regex)
+        atleastone = true if as.search(regex)
       if atleastone
         @show()
         @expand(false)
+        @borderFix()
       else
         @hide()
       atleastone
 
     endSearch: ->
+      @resetBorders()
+
       @show()
       @collapseIfNeeded()
       @resetNoToggleCache()
       @collection.each (as) =>
-        as.assignmentView.endSearch()
+        as.endSearch()
+
+    resetBorders: ->
+      @$('.first_visible').removeClass('first_visible')
+      @$('.last_visible').removeClass('last_visible')
+
+    borderFix: ->
+      @$('.search_show').first().addClass("first_visible")
+      @$('.search_show').last().addClass("last_visible")
+
 
     shouldBeExpanded: ->
       @cache.get(@cacheKey())

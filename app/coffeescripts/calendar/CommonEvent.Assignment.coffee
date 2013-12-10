@@ -46,6 +46,9 @@ define [
       time_string = "#{date.date_formatted} at #{date.time_string}"
       "Due: <time datetime='#{date.time.toISOString()}'>#{time_string}</time>"
 
+    readableType: () ->
+      @readableTypes[@assignmentType()]
+
     saveDates: (success, error) =>
       @save { 'assignment[due_at]': $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(@start)) }, success, error
 

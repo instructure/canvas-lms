@@ -38,8 +38,11 @@ end
 
 def edit_grade(cell, grade)
   grade_input = keep_trying_until do
-    cell.click
-    cell.find_element(:css, '.grade')
+    driver.execute_script("$('#{cell}').hover().click()")
+    sleep 1
+    input = fj("#{cell} .grade")
+    input.should_not be_nil
+    input
   end
   set_value(grade_input, grade)
   grade_input.send_keys(:return)
@@ -57,7 +60,7 @@ def open_gradebook_settings(element_to_click = nil)
     ff('#gradebook-toolbar ul.ui-kyle-menu').last.should be_displayed
     true
   end
-  yield(driver.find_element(:css, '#gradebook_settings')) if block_given?
+  yield(f('#gradebook_settings')) if block_given?
   element_to_click.click if element_to_click != nil
 end
 

@@ -31,9 +31,9 @@
   %>
   <div style="display: none;"><input type="checkbox" id="hide_students_option"/><label for="hide_students_option"><%= t(:hide_names, "Hide Student Names") %></label></div>
   <div class="clear"></div>
-  <% form_tag context_url(@context, :update_submission_context_gradebook_url), { :id => "update_submission_form", :style => "display: none;" } do %>
+  <%= form_tag context_url(@context, :update_submission_context_gradebook_url), { :id => "update_submission_form", :style => "display: none;" } do %>
   <% end %>
-  <% form_tag context_url(@context, :context_details_url, :fragment => "publish_grades"), { :id => "publish_to_sis_form", :style => "display: none;" } do %>
+  <%= form_tag context_url(@context, :context_details_url, :fragment => "publish_grades"), { :id => "publish_to_sis_form", :style => "display: none;" } do %>
   <% end %>
 
   <div id="loading_gradebook_message" style="margin-top: 10px; margin-left: 10px;">
@@ -104,7 +104,7 @@
     </tr>
   </table>
   </div>
-  <% form_for :assignment, :url => ".", :html => {:id => "default_grade_form", :style => "position: relative; display: none;"} do |f| %>
+  <%= form_for :assignment, :url => ".", :html => {:id => "default_grade_form", :style => "position: relative; display: none;"} do |f| %>
     <input type="hidden" name="assignment_id" class="assignment_id"/>
     <div><%= t(:default_grades, "Give all currently visible students the same grade for %{class} by entering and submitting a grade value below:", :class => raw('<span class="assignment_title" style="font-weight: bold;">&nbsp;</span>')) %></div>
     <div style="text-align: center; margin: 10px 10px 0;" class="grading_box_holder">
@@ -123,7 +123,7 @@
     </div>
     <a href="<%= context_url(@context, :context_assignment_url, "{{ id }}") %>" style="display: none;" class="default_grade_url">&nbsp;</a>
   <% end %>
-  <% form_tag ".", {:id => "re_upload_submissions_form", :multipart => true, :style => "display: none;"} do %>
+  <%= form_tag ".", {:id => "re_upload_submissions_form", :multipart => true, :style => "display: none;"} do %>
     <a href="<%= context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}") %>" class="re_upload_submissions_url" style="display: none;">&nbsp;</a>
     <p style="font-size: 0.8em;"><%= t(:upload_info, <<-DETAILS)
       If you made changes to the student submission files you downloaded

@@ -317,6 +317,18 @@ describe GroupCategory do
       grouped_memberships[group1.id].size.should == 1
       grouped_memberships[group2.id].size.should == 3
     end
+
+    it "should update cached due dates for affected assignments" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = @course.group_categories.create(:name => "Group Category")
+      assignment1 = @course.assignments.create!
+      assignment2 = @course.assignments.create! group_category: category
+      group = category.groups.create(:name => "Group 1", :context => @course)
+      student = @course.enroll_student(user_model).user
+
+      DueDateCacher.expects(:recompute_course).with(@course.id, [assignment2.id])
+      category.distribute_members_among_groups([student], [group])
+    end
   end
 
   context "#assign_unassigned_members_in_background" do

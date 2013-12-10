@@ -88,11 +88,11 @@ module UserSearch
   end
 
   def self.gist_search_enabled?
-    Setting.get_cached('user_search_with_gist', 'true') == 'true'
+    Setting.get('user_search_with_gist', 'true') == 'true'
   end
 
   def self.complex_search_enabled?
-    Setting.get_cached('user_search_with_full_complexity', 'true') == 'true'
+    Setting.get('user_search_with_full_complexity', 'true') == 'true'
   end
 
   def self.like_condition(value)

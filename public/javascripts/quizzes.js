@@ -1227,7 +1227,7 @@ define([
       });
       if (!$dialog.hasClass('loaded')) {
         $dialog.find(".searching_message").text(I18n.t('retrieving_filters', "Retrieving Filters..."));
-        var url = ENV.QUIZZES_URL;
+        var url = ENV.QUIZ_FILTERS_URL;
         $.ajaxJSON(url, 'GET', {}, function(data) {
           $dialog.addClass('loaded');
           if (data.length) {
@@ -1663,6 +1663,8 @@ define([
       var $question = $(this).parents(".question");
       var questionID = $(this).closest('.question_holder').find('.display_question').attr('id');
       if (!$question.hasClass('selectable')) { return; }
+      var $answer = $(this).parents('.answer');
+
       if (!REGRADE_DATA[questionID]){
         REGRADE_DATA[questionID] = correctAnswerIDs($question)
       }
@@ -1672,11 +1674,11 @@ define([
           .find('img').attr('alt', clickSetCorrect);
         $(this)
           .attr('title', isSetCorrect)
-          .find('img').attr('alt', isSetCorrect)
-          .closest(".answer").addClass('correct_answer');
+          .find('img').attr('alt', isSetCorrect);
+        $answer.addClass('correct_answer');
       } else {
-        $(this).parents(".answer").toggleClass('correct_answer');
-        if ($(this).parents(".answer").hasClass('correct_answer')) {
+        $answer.toggleClass('correct_answer');
+        if ($answer.hasClass('correct_answer')) {
           $(this)
             .attr('title', clickUnsetCorrect)
             .find('img').attr('alt', clickUnsetCorrect);
@@ -1687,6 +1689,7 @@ define([
         }
       }
 
+      $answer.addClass('hover').siblings().removeClass('hover');
       showRegradeOptions($question,questionID);
     });
 
@@ -1695,7 +1698,7 @@ define([
         return;
       }
 
-      if ($("#student_submissions_warning").length == 0 || !ENV.ENABLE_QUIZ_REGRADE) {
+      if ($("#student_submissions_warning").length == 0) {
         return;
       }
 
@@ -2522,7 +2525,8 @@ define([
       success: function(data) {
         var $form = $(this);
         var $group = $form.parents(".group_top");
-        var group = data.quiz_group;
+        var groups = data.quiz_groups;
+        var group = groups[0];
         $form.loadingImage('remove');
         $group.removeClass('editing');
         $group.fillTemplateData({

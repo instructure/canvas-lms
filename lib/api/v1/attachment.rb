@@ -147,7 +147,12 @@ module Api::V1::Attachment
       render :json => json
     end
   end
-  
+
+  def api_attachment_preflight_json(context, request, opts={})
+    opts[:return_json] = true
+    {:attachments => [api_attachment_preflight(context, request, opts)]}
+  end
+
   def check_quota_after_attachment(request)
     exempt = request.params[:quota_exemption] == @attachment.quota_exemption_key
     if !exempt && Attachment.over_quota?(@attachment.context, @attachment.size)

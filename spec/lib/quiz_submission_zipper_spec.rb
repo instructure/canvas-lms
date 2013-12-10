@@ -24,7 +24,7 @@ describe QuizSubmissionZipper do
   end
 
   let(:submission_stubs) do
-    submissions.map { |sub| stub(:latest_submitted_version => sub) }
+    submissions.map { |sub| stub(:latest_submitted_attempt => sub) }
   end
   let(:zip_attachment) { stub(:id => 1, :user => nil) }
 

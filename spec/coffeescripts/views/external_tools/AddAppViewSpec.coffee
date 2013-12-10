@@ -103,6 +103,7 @@ define [
           "ratings_count": 4,
           "comments_count": 4,
           "avg_rating": 4.5,
+          "requires_secret": true
           "banner_url": "https://www.edu-apps.org/tools/redirect/banner.png",
           "logo_url": "https://www.edu-apps.org/tools/redirect/logo.png",
           "icon_url": "https://www.edu-apps.org/tools/redirect/icon.png",
@@ -119,7 +120,7 @@ define [
       view.remove()
 
   test 'AddAppView: render', ->
-    equal $.trim($('.ui-dialog-title').text()), "Add App",
+    equal $.trim($('.ui-dialog-title:visible').text()), "Add App",
       '"Add App" appears as dialog title'
 
     equal $('#canvas_app_name').val(), app.get('name'),

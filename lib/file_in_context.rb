@@ -16,8 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'action_controller'
-require 'action_controller/test_process.rb'
+require 'action_controller_test_process'
 
 # Attaches a file generally to another file, using the attachment_fu gateway.
 class FileInContext

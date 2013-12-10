@@ -18,7 +18,11 @@
 
 class Message < ActiveRecord::Base
   # Included modules
-  include ActionController::UrlWriter
+  if CANVAS_RAILS2
+    include ActionController::UrlWriter
+  else
+    include Rails.application.routes.url_helpers
+  end
   include ERB::Util
   include SendToStream
   include TextHelper
@@ -603,7 +607,7 @@ class Message < ActiveRecord::Base
     logger.info "Delivering mail: #{self.inspect}"
 
     begin
-      res = Mailer.deliver_message(self)
+      res = Mailer.message(self).deliver
     rescue Net::SMTPServerBusy => e
       @exception = e
       logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"

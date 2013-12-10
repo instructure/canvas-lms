@@ -112,8 +112,8 @@ class AssessmentQuestionBank < ActiveRecord::Base
   
   def select_for_submission(count, exclude_ids=[])
     ids = self.assessment_questions.active.pluck(:id)
-    ids = (ids - exclude_ids).sort_by{rand}[0...count]
-    ids.empty? ? [] : AssessmentQuestion.find_all_by_id(ids)
+    ids = (ids - exclude_ids).shuffle[0...count]
+    ids.empty? ? [] : AssessmentQuestion.find_all_by_id(ids).shuffle
   end
   
   alias_method :destroy!, :destroy

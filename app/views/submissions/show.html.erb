@@ -100,7 +100,10 @@
   <% if @assignment.rubric_association %>
     <% @visible_rubric_assessments ||= [] %>
   <div id="rubric_holder" style="position: absolute; right: 0px; padding: 5px; background-color: #fff; border: 1px solid #aaa; border-right-width: 0; display: none;">
-    <button type="button" class="btn button-secondary hide_rubric_link" style="float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
+    <a class="hide_rubric_link" style="float: right; margin-right:0 !important;" role="button">
+      <i class="icon-x standalone-icon"></i>
+      <div class="screenreader-only"><%= t('hide_rubric_button', "Hide Rubric Button") %></div>
+    </a>
     <div id="rubric_assessments_list" style="text-align: right; margin-bottom: 5px; <%= hidden if @visible_rubric_assessments.empty? %>">
       <%= before_label('show_assessment_by', 'Show Assessment By') %>
       <select id="rubric_assessments_select">

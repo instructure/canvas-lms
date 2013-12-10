@@ -32,6 +32,9 @@ define [
       dfrd
 
     saveFrd: (data, dfrd, el, options) =>
+      # account for attachments wrapped in array per JSON API format
+      if data.attachments && data.attachments[0]
+        data = data.attachments[0]
       @uploadParams = data.upload_params
       @set @uploadParams
       el.name = data.file_param

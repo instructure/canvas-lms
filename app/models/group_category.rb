@@ -182,7 +182,7 @@ class GroupCategory < ActiveRecord::Base
     # destroy. also, the group destroy happens to be "soft" as well, and I
     # double checked groups.destroy_all does the right thing. :)
     groups.destroy_all
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     self.save
   end
 
@@ -224,10 +224,8 @@ class GroupCategory < ActiveRecord::Base
     end
     if !touched_groups.empty?
       Group.where(:id => touched_groups.to_a).update_all(:updated_at => Time.now.utc)
-      if context_type != 'Account'
-        Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id).each do |assignment|
-          DueDateCacher.recompute(assignment)
-        end
+      if context_type == 'Course'
+        DueDateCacher.recompute_course(context_id, Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id))
       end
     end
     complete_progress
@@ -236,7 +234,7 @@ class GroupCategory < ActiveRecord::Base
 
   def create_group_count=(num)
     @create_group_count = num && num > 0 ?
-      [num, Setting.get_cached('max_groups_in_new_category', '200').to_i].min :
+      [num, Setting.get('max_groups_in_new_category', '200').to_i].min :
       nil
   end
 
@@ -255,9 +253,12 @@ class GroupCategory < ActiveRecord::Base
     end
   end
 
+  def unassigned_users
+    context.users_not_in_groups(allows_multiple_memberships? ? [] : groups.active)
+  end
+
   def assign_unassigned_members
-    potential_members = context.users_not_in_groups(groups.active)
-    distribute_members_among_groups(potential_members, groups.active)
+    distribute_members_among_groups(unassigned_users, groups.active)
   end
 
   def assign_unassigned_members_in_background

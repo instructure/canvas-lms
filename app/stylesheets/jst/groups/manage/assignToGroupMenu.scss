@@ -10,5 +10,14 @@
   .form-search {
    padding-right: 16px;
   }
+
+  p {
+    line-height: 20px;
+
+    &.separated {
+      margin-bottom: 10px;
+    }
+  }
+
 }
 

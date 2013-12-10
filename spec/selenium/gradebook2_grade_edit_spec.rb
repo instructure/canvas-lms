@@ -28,13 +28,12 @@ describe "edititing grades" do
   it "should change grades and validate course total is correct" do
     expected_edited_total = "33.3%"
     get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
 
     #editing grade for first row, first cell
-    edit_grade(f('#gradebook_grid [row="0"] .l0'), 0)
+    edit_grade('#gradebook_grid .slick-row:nth-child(1) .l0', 0)
 
     #editing grade for second row, first cell
-    edit_grade(f('#gradebook_grid [row="1"] .l0'), 0)
+    edit_grade('#gradebook_grid .slick-row:nth-child(2) .l0', 0)
 
     #refresh page and make sure the grade sticks
     get "/courses/#{@course.id}/gradebook2"
@@ -59,7 +58,7 @@ describe "edititing grades" do
 
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
-    edit_grade(f('#gradebook_grid [row="0"] .l3'), points.to_s)
+    edit_grade('#gradebook_grid .slick-row:nth-child(1) .l3', points.to_s)
 
     get "/courses/#{@course.id}/quizzes/#{q.id}/history?quiz_submission_id=#{qs.id}"
     f('.score_value').text.should == points.to_s
@@ -109,9 +108,9 @@ describe "edititing grades" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
-    edit_grade(f('#gradebook_grid [row="0"] .l3'), 'A-')
+    edit_grade('#gradebook_grid .slick-row:nth-child(1) .l3', 'A-')
     wait_for_ajax_requests
-    f('#gradebook_grid [row="0"] .l3').should include_text('A-')
+    f('#gradebook_grid .slick-row:nth-child(1) .l3').should include_text('A-')
     @assignment.reload.submissions.size.should == 1
     sub = @assignment.submissions.first
     sub.grade.should == 'A-'
@@ -135,7 +134,7 @@ describe "edititing grades" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
-    first_cell = f('#gradebook_grid [row="0"] .l0')
+    first_cell = f('#gradebook_grid .slick-row:nth-child(1) .l0')
     grade_input = keep_trying_until do
       first_cell.click
       first_cell.find_element(:css, '.grade')
@@ -143,7 +142,7 @@ describe "edititing grades" do
     set_value(grade_input, 3)
     grade_input.send_keys(:tab)
     wait_for_ajax_requests
-    f('#gradebook_grid [row="0"] .l1').should have_class('editable')
+    f('#gradebook_grid .slick-row:nth-child(1) .l1').should have_class('editable')
   end
 
   it "should display dropped grades correctly after editing a grade" do
@@ -151,8 +150,8 @@ describe "edititing grades" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
-    assignment_1_sel = '#gradebook_grid [row="0"] .l1'
-    assignment_2_sel= '#gradebook_grid [row="0"] .l2'
+    assignment_1_sel = '#gradebook_grid .slick-row:nth-child(1) .l1'
+    assignment_2_sel= '#gradebook_grid .slick-row:nth-child(1) .l2'
     a1 = f(assignment_1_sel)
     a2 = f(assignment_2_sel)
     a1['class'].should include 'dropped'
@@ -173,7 +172,7 @@ describe "edititing grades" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
-    first_cell = f('#gradebook_grid [row="0"] .l0')
+    first_cell = f('#gradebook_grid .slick-row:nth-child(1) .l0')
     grade_input = keep_trying_until do
       first_cell.click
       first_cell.find_element(:css, '.grade')
@@ -209,7 +208,7 @@ describe "edititing grades" do
 
     wait_for_ajaximations
 
-    edit_grade(f('#gradebook_grid [row="1"] .l0'), '')
+    edit_grade('#gradebook_grid .slick-row:nth-child(2) .l0', '')
 
     open_assignment_options(0)
     f('[data-action="curveGrades"]').click
@@ -237,7 +236,7 @@ describe "edititing grades" do
       end
 
       expected_grade = "45"
-      gradebook_row_1 = '#gradebook_grid [row="1"]'
+      gradebook_row_1 = '#gradebook_grid .slick-row:nth-child(2)'
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
 
@@ -276,7 +275,7 @@ describe "edititing grades" do
     SubmissionsApiController.any_instance.expects(:update).returns('bad response')
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
-    edit_grade(f('#gradebook_grid [row="0"] .l0'), 0)
+    edit_grade('#gradebook_grid .slick-row:nth-child(1) .l0', 0)
     keep_trying_until do
       flash_message_present?(:error, /refresh/).should be_true
     end

@@ -107,8 +107,13 @@ class WebConference < ActiveRecord::Base
     user_setting_fields[name] = options
   end
 
-  def self.user_setting_fields
-    read_inheritable_attribute(:user_setting_fields) || write_inheritable_attribute(:user_setting_fields, {})
+  if CANVAS_RAILS2
+    def self.user_setting_fields
+      read_inheritable_attribute(:user_setting_fields) || write_inheritable_attribute(:user_setting_fields, {})
+    end
+  else
+    class_attribute :user_setting_fields
+    self.user_setting_fields = {}
   end
 
   def self.user_setting_field_name(key)
@@ -133,8 +138,13 @@ class WebConference < ActiveRecord::Base
     send("#{key}_external_url", user, url_id) || []
   end
 
-  def self.external_urls
-    read_inheritable_attribute(:external_urls) || write_inheritable_attribute(:external_urls, {})
+  if CANVAS_RAILS2
+    def self.external_urls
+      read_inheritable_attribute(:external_urls) || write_inheritable_attribute(:external_urls, {})
+    end
+  else
+    class_attribute :external_urls
+    self.external_urls = {}
   end
 
   def self.external_url(name, options)
@@ -326,7 +336,7 @@ class WebConference < ActiveRecord::Base
   def craft_url(user=nil,session=nil,return_to="http://www.instructure.com")
     user ||= self.user
     initiate_conference and touch or return nil
-    if (user == self.user || self.grants_right?(user,session,:initiate)) && !active?(true)
+    if user == self.user || self.grants_right?(user, session, :initiate)
       admin_join_url(user, return_to)
     else
       participant_join_url(user, return_to)
@@ -340,16 +350,6 @@ class WebConference < ActiveRecord::Base
     has_advanced_settings? ? 1 : 0
   end
 
-  def clone_for(context, dup=nil, options={})
-    dup ||= WebConference.new
-    self.attributes.delete_if{|k,v| [:id, :conference_key, :user_id, :added_user_id, :started_at, :uuid, :invited_user_ids].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.context = context
-    context.log_merge_result("Web Conference \"#{dup.title}\" created")
-    dup
-  end
-  
   scope :after, lambda { |date| where("web_conferences.start_at IS NULL OR web_conferences.start_at>?", date) }
 
   set_policy do

@@ -177,17 +177,6 @@ describe DiscussionEntry do
     end
   end
 
-  context "clone_for" do
-    it "should clone to another context" do
-      course
-      topic = @course.discussion_topics.create!
-      entry = topic.discussion_entries.create!(:message => "some random message")
-      course
-      new_entry = entry.clone_for(@course)
-      new_entry.message.should eql(entry.message)
-    end
-  end
-
   context "sub-topics" do
     it "should not allow students to edit sub-topic entries of other students" do
       course_with_student(:active_all => true)

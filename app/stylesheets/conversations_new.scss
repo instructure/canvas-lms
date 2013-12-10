@@ -138,6 +138,7 @@
   .btn {
     border-radius: 0 16px 16px 0;
     float: left;
+    height: 32px;
   }
 }
 
@@ -154,6 +155,7 @@
 }
 
 .message-list {
+  height: 100%;
 
   .list-header {
     background: #f3f3f3;
@@ -479,7 +481,8 @@ input.dropdown-search {
 }
 
 .message-header-row .ac-input-box {
-  width: 93%;
+  max-height: 130px;
+  overflow-y: auto;
 }
 
 .beta-notice {

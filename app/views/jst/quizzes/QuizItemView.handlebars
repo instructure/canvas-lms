@@ -1,6 +1,14 @@
-<div id="summary_quiz_{{id}}" class="ig-row {{#if publishable}}ig-publishable{{/if}}
-                                            {{#if published}}ig-published{{/if}}
-                                            {{#if can_update}}ig-editable{{/if}}">
+<div id="summary_quiz_{{id}}"
+  {{#if can_update}}
+    class="
+    ig-row
+    {{#if publishable}}ig-publishable{{/if}}
+    {{#if published}}ig-published{{/if}}
+    ig-editable"
+  {{else}}
+    class="ig-row"
+  {{/if}}
+>
   <a href="{{url}}" class="ig-title ellipses">
     <i class="icon-quiz"></i> {{title_label}}
   </a>

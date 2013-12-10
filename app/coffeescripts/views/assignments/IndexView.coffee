@@ -25,6 +25,7 @@ define [
     initialize: ->
       super
       @collection.once 'reset', @enableSearch, @
+      @collection.on 'cancelSearch', @clearSearch, @
 
     afterRender: ->
       # need to hide child views and set trigger manually
@@ -39,6 +40,10 @@ define [
 
     enableSearch: ->
       @$('#search_term').prop 'disabled', false
+
+    clearSearch: ->
+      @$('#search_term').val('')
+      @filterResults()
 
     search: _.debounce ->
       @filterResults()

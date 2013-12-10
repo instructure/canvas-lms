@@ -1,11 +1,12 @@
 define [
   'underscore'
   'Backbone'
+  'i18n!pages'
   'compiled/backbone-ext/DefaultUrlMixin'
   'compiled/str/splitAssetString'
-], (_, Backbone, DefaultUrlMixin, splitAssetString) ->
+], (_, Backbone, I18n, DefaultUrlMixin, splitAssetString) ->
 
-  pageRevisionOptions = ['contextAssetString', 'pageUrl', 'latest', 'summary']
+  pageRevisionOptions = ['contextAssetString', 'page', 'pageUrl', 'latest', 'summary']
 
   class WikiPageRevision extends Backbone.Model
     @mixin DefaultUrlMixin
@@ -13,7 +14,9 @@ define [
     initialize: (attributes, options) ->
       super
       _.extend(this, _.pick(options || {}, pageRevisionOptions))
-      @set(id: attributes.url) if attributes?.url
+
+      # the CollectionView managing the revisions "accidentally" passes in a url, so we have to nuke it here...
+      delete @url if _.has(@, 'url')
 
     urlRoot: ->
       "/api/v1/#{@_contextPath()}/pages/#{@pageUrl}/revisions"
@@ -21,7 +24,7 @@ define [
     url: ->
       base = @urlRoot()
       return "#{base}/latest" if @latest
-      return "#{base}/#{@get('id')}" if @get('id')
+      return "#{base}/#{@get('revision_id')}" if @get('revision_id')
       return base
 
     fetch: (options={}) ->
@@ -51,3 +54,9 @@ define [
 
     toJSON: ->
       _.omit super, 'id'
+
+    restore: ->
+      d = $.ajaxJSON(@url(), 'POST').fail ->
+        $.flashError I18n.t 'restore_failed', 'Failed to restore page revision'
+      $('#wiki_page_revisions').disableWhileLoading($.Deferred())
+      d

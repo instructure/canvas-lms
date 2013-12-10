@@ -33,7 +33,7 @@
 
 <% js_bundle :take_quiz %>
 
-<% form_tag @quiz_presenter.form_action(session, @current_user), :id => "submit_quiz_form", :class => @quiz_presenter.form_class, :method => "post" do %>
+<%= form_tag @quiz_presenter.form_action(session, @current_user), :id => "submit_quiz_form", :class => @quiz_presenter.form_class, :method => "post" do %>
 
 <div id="questions" class="assessing">
   <input type="hidden" name="attempt" value="<%= @submission.attempt %>"/>

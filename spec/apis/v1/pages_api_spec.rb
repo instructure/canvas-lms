@@ -342,16 +342,19 @@ describe "Pages API", :type => :integration do
         json.should == [
           {
             'revision_id' => 3,
+            'latest' => true,
             'updated_at' => @timestamps[2].as_json,
             'edited_by' => user_display_json(@ta, @course).stringify_keys!,
           },
           {
             'revision_id' => 2,
+            'latest' => false,
             'updated_at' => @timestamps[1].as_json,
             'edited_by' => user_display_json(@teacher, @course).stringify_keys!,
           },
           {
             'revision_id' => 1,
+            'latest' => false,
             'updated_at' => @timestamps[0].as_json,
           }
         ]
@@ -363,6 +366,7 @@ describe "Pages API", :type => :integration do
                         :course_id => @course.to_param, :url => @vpage.url, :summary => 'true')
         json.should == {
             'revision_id' => 3,
+            'latest' => true,
             'updated_at' => @timestamps[2].as_json,
             'edited_by' => user_display_json(@ta, @course).stringify_keys!,
         }
@@ -387,7 +391,8 @@ describe "Pages API", :type => :integration do
             'title' => 'version test page',
             'url' => @vpage.url,
             'updated_at' => @timestamps[0].as_json,
-            'revision_id' => 1
+            'revision_id' => 1,
+            'latest' => false
         }
       end
 
@@ -400,6 +405,7 @@ describe "Pages API", :type => :integration do
             'url' => @vpage.url,
             'updated_at' => @timestamps[2].as_json,
             'revision_id' => 3,
+            'latest' => true,
             'edited_by' => user_display_json(@ta, @course).stringify_keys!
         }
       end
@@ -813,6 +819,12 @@ describe "Pages API", :type => :integration do
 
     context "unpublished pages" do
       before do
+        @deleted_page = @wiki.wiki_pages.create! :title => "Deleted page", :hide_from_students => true
+        @deleted_page.destroy
+        @course.account.settings[:allow_draft] = true
+        @course.account.save!
+        @course.enable_draft = true
+        @course.save!
         @unpublished_page = @wiki.wiki_pages.create(:title => "Draft Page", :body => "Don't text and drive.")
         @unpublished_page.workflow_state = :unpublished
         @unpublished_page.save!
@@ -821,8 +833,33 @@ describe "Pages API", :type => :integration do
       it "should be in index" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages",
                       :controller=>"wiki_pages_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}")
-        json.select{|w|w[:title] == @unpublished_page.title}.should_not be_nil
+        json.select{|w| w['title'] == @unpublished_page.title}.should_not be_empty
+        json.select{|w| w['title'] == @hidden_page.title}.should_not be_empty
+        json.select{|w| w['title'] == @deleted_page.title}.should be_empty
+        json.select{|w| w['published'] == true}.should_not be_empty
+        json.select{|w| w['published'] == false}.should_not be_empty
       end
+
+      it "should not be in index if ?published=true" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?published=true",
+                        :controller=>"wiki_pages_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}", :published => 'true')
+        json.select{|w| w['title'] == @unpublished_page.title}.should be_empty
+        json.select{|w| w['title'] == @hidden_page.title}.should be_empty
+        json.select{|w| w['title'] == @deleted_page.title}.should be_empty
+        json.select{|w| w['published'] == true}.should_not be_empty
+        json.select{|w| w['published'] == false}.should be_empty
+      end
+
+      it "should be in index exclusively if ?published=false" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?published=false",
+                        :controller=>"wiki_pages_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}", :published => 'false')
+        json.select{|w| w['title'] == @unpublished_page.title}.should_not be_empty
+        json.select{|w| w['title'] == @hidden_page.title}.should_not be_empty
+        json.select{|w| w['title'] == @deleted_page.title}.should be_empty
+        json.select{|w| w['published'] == true}.should be_empty
+        json.select{|w| w['published'] == false}.should_not be_empty
+      end
+
       it "should show" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
                       :controller=>"wiki_pages_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :url=>@unpublished_page.url)
@@ -930,7 +967,7 @@ describe "Pages API", :type => :integration do
                { :publish => false, :wiki_page => { :body => '!!!!' }}, {}, {:expected_status => 401})
       @front_page.reload.body.should_not == '!!!!'
     end
-    
+
     describe "with students in editing_roles" do
       before do
         @editable_page = @course.wiki.wiki_pages.create! :title => 'Editable Page', :editing_roles => 'students'
@@ -1039,6 +1076,10 @@ describe "Pages API", :type => :integration do
 
     context "unpublished pages" do
       before do
+        @course.account.settings[:allow_draft] = true
+        @course.account.save!
+        @course.enable_draft = true
+        @course.save!
         @unpublished_page = @wiki.wiki_pages.create(:title => "Draft Page", :body => "Don't text and drive.")
         @unpublished_page.workflow_state = :unpublished
         @unpublished_page.save!
@@ -1047,7 +1088,14 @@ describe "Pages API", :type => :integration do
       it "should not be in index" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages",
                         :controller => "wiki_pages_api", :action => "index", :format => "json", :course_id => "#{@course.id}")
-        json.select { |w| w[:title] == @unpublished_page.title }.should == []
+        json.select { |w| w['title'] == @unpublished_page.title }.should == []
+        json.select { |w| w['title'] == @hidden_page.title }.should == []
+      end
+
+      it "should not be in index even with ?published=false" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?published=0",
+                        :controller => "wiki_pages_api", :action => "index", :format => "json", :course_id => "#{@course.id}", :published => '0')
+        json.should be_empty
       end
 
       it "should not show" do

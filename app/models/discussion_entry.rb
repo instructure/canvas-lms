@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -44,8 +44,8 @@ class DiscussionEntry < ActiveRecord::Base
   after_create :create_participants
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :discussion_topic_id
-  before_validation_on_create :set_depth
-  validate_on_create :validate_depth
+  before_validation(on: :create, &:set_depth)
+  validate :validate_depth, on: :create
 
   sanitize_field :message, Instructure::SanitizeField::SANITIZE
 
@@ -107,7 +107,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   # The maximum discussion entry threading depth that is allowed
   def self.max_depth
-    Setting.get_cached('discussion_entry_max_depth', '50').to_i
+    Setting.get('discussion_entry_max_depth', '50').to_i
   end
 
   def set_depth
@@ -175,7 +175,7 @@ class DiscussionEntry < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     save!
     update_topic_submission
     decrement_unread_counts_for_this_entry
@@ -326,26 +326,6 @@ class DiscussionEntry < ActiveRecord::Base
                                     :href => "http://#{HostUrl.context_host(self.discussion_topic.context)}/#{self.discussion_topic.context_prefix}/discussion_topics/#{self.discussion_topic_id}")
       entry.content   = Atom::Content::Html.new(self.message)
     end
-  end
-
-  def clone_for(context, dup=nil, options={})
-    options[:migrate] = true if options[:migrate] == nil
-    dup ||= DiscussionEntry.new
-    self.attributes.delete_if{|k,v| [:id, :discussion_topic_id, :attachment_id].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.parent_id = context.merge_mapped_id("discussion_entry_#{self.parent_id}")
-    dup.attachment_id = context.merge_mapped_id(self.attachment)
-    if !dup.attachment_id && self.attachment
-      attachment = self.attachment.clone_for(context)
-      attachment.folder_id = nil
-      attachment.save_without_broadcasting!
-      context.map_merge(self.attachment, attachment)
-      context.warn_merge_result(t :file_added_warning, "Added file \"%{file_path}\" which is needed for an entry in the topic \"%{discussion_topic_title}\"", :file_path => "%{attachment.folder.full_name}/#{attachment.display_name}", :discussion_topic_title => self.discussion_topic.title)
-      dup.attachment_id = attachment.id
-    end
-    dup.message = context.migrate_content_links(self.message, self.context) if options[:migrate]
-    dup
   end
 
   def context

@@ -35,7 +35,7 @@
   </ul>
   <div id="tab-details">
     <h2><%= t('headings.details', %{Course Details}) %></h2>
-    <% form_for @context, :html => {:id => "course_form"} do |f| %>
+    <%= form_for @context, :html => {:id => "course_form"} do |f| %>
     <table class="coursesettings">
       <tr>
         <td class="form-label"><%= f.blabel :name, :course_name, :en => "Name" %></td>
@@ -249,8 +249,17 @@ TEXT
             %>
             <% if @context.root_account.self_registration? %>
               <%= t 'course_self_registration', <<-TEXT, :url2 => register_url, :code => @context.self_enrollment_code || '{{ self_enrollment_code }}', :wrapper => '<b>\1</b>'
-                    Alternatively, they can sign up at *%{url2}* and
+                    This course has enabled open enrollment. Students can
+                    self-enroll in the course once you share with them this URL:
+
                     use the following join code: *%{code}*
+                  TEXT
+              %>
+            <% else %>
+              <%= t 'course_open_enrollment_without_code', <<-TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :wrapper => '<b>\1</b>'
+                    This course has enabled open enrollment. Students can
+                    self-enroll in the course once you share with them this URL:
+                    *%{url}*
                   TEXT
               %>
             <% end %>
@@ -383,7 +392,7 @@ Unpublished content may not be available if Draft State is disabled.
       </li>
       <% if can_do(@context.course_sections.new, @current_user, :create) %>
         <li>
-          <% form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
+          <%= form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
             <h3><%= f.blabel :name, :course_section_name, :en => "Add a New Section" %></h3>
             <%= f.text_field :name %>
             <button class="btn btn-primary" type="submit"><i class="icon-add"></i> <%= t('buttons.add_section', %{Add Section}) %></button>
@@ -391,7 +400,7 @@ Unpublished content may not be available if Draft State is disabled.
         </li>
       <% end %>
     </ul>
-    <% form_for :course_section, :url => "", :html => {:id => "edit_section_form", :method => :put, :style => "display: none;"} do |f| %>
+    <%= form_for :course_section, :url => "", :html => {:id => "edit_section_form", :method => :put, :style => "display: none;"} do |f| %>
       <%= f.text_field :name %>
     <% end %>
   </div>
@@ -403,13 +412,13 @@ Unpublished content may not be available if Draft State is disabled.
 
       
       <%= t('navigation_keyboard_hint',
-        'To change the order of the course navigation links,
-        first turn the cursor off on your screen reader. Insert-z in JAWS.
-        Press tab to select first link.
-        Press up and down to select a link.
-        Press space to select a link to start dragging.
-        Then press up and down to select a destination.
-        Then press space a second time to drop link after destination.') %>
+        'If using a screen reader, to change the order of the course navigation links,
+        Turn off the virtual cursor or virtual buffer on your screen reader (press Insert-z for JAWS).
+        Press control-home to jump to the top of the page, then press the tab key until you reach the first course navigation link.
+        Press the up and down arrows until you hear the link you wish to move, and then press space to select it
+        Then, press the up and down arrow keys until you locate the new position.
+        Finally, press space again to place the link you are moving directly after the current link.
+        When finished, reenable the virtual buffer/cursor.') %>
     </div>
 
     <% keyboard_navigation([
@@ -418,7 +427,7 @@ Unpublished content may not be available if Draft State is disabled.
          {:key => t('keycodes.toggle_navigation_dragging', 'Space'), :description => t('keycode_descriptions.toggle_navigation_dragging', 'Select link to begin dragging, or drop previously selected link')}
      ]) %>
 
-    <% form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
+    <%= form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
       <input type="hidden" name="tabs_json" id="tabs_json" value="[]" />
       <% tabs = sortable_tabs %>
       <p style="margin-bottom: 4px; padding-top: 10px">
@@ -463,7 +472,7 @@ Unpublished content may not be available if Draft State is disabled.
   <% if publishing_enabled %>
     <div id="tab-grade-publishing">
       <h2><%= t('headings.grade_publishing', %{Grade Publishing}) %></h2>
-      <% form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %><% end %>
+      <%= form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %><% end %>
       <a href="#" id="publish_grades_link" class="btn disabled">...</a>
       <ul id="publish_grades_messages"></ul>
     </div>
@@ -481,7 +490,7 @@ Unpublished content may not be available if Draft State is disabled.
   <div id="move_course_dialog" style="display: none;">
     <h2><%= t('headings.move_course', %{Move the course to another root account}) %></h2>
     <%= t('deatils.move_course', %{Select a new root account for this course.  After you move the course you'll want to specify a new department for the course as well.}) %>
-    <% form_for :course, :url => course_url(@context), :html => {:method => :put} do |f| %>
+    <%= form_for :course, :url => course_url(@context), :html => {:method => :put} do |f| %>
       <table class="formtable">
         <tr>
           <td>

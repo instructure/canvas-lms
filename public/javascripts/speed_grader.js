@@ -338,7 +338,7 @@ define([
     elements: {
       mute: {
         icon: $('#mute_link .ui-icon'),
-        label: $('#mute_link .label'),
+        label: $('#mute_link .mute_label'),
         link: $('#mute_link'),
         modal: $('#mute_dialog')
       },
@@ -445,7 +445,7 @@ define([
 
     toggleMute: function(){
       this.muted = !this.muted;
-      var label = this.muted ? I18n.t('unmute_assignment', 'Unmute Assignment') : I18n.t('mute_assignment', 'Mute Assignment');
+      var label = this.muted ? I18n.t('unmute_assignment', 'Unmute Assignment') : I18n.t('mute_assignment', 'Mute Assignment'),
           action = this.muted ? 'mute' : 'unmute',
           actions = {
         /* Mute action */
@@ -938,20 +938,22 @@ define([
     },
 
     toggleFullRubric: function(force){
-      //if there is no rubric associated with this assignment, then the edit rubric thing should never be shown.
-      //the view should make sure that the edit rubric html is not even there but we also want to
-      //make sure that pressing "r" wont make it appear either
+      // if there is no rubric associated with this assignment, then the edit
+      // rubric thing should never be shown.  the view should make sure that
+      // the edit rubric html is not even there but we also want to make sure
+      // that pressing "r" wont make it appear either
       if (!jsonData.rubric_association){ return false; }
 
       if ($rubric_full.filter(":visible").length || force === "close") {
         $("#grading").height("auto").children().show();
         $rubric_full.fadeOut();
         this.resizeFullHeight();
-      }
-      else {
+        $(".toggle_full_rubric").focus()
+      } else {
         $rubric_full.fadeIn();
         $("#grading").children().hide();
         this.refreshFullRubric();
+        $rubric_full.find('.rubric_title .title').focus()
       }
     },
 
@@ -979,13 +981,13 @@ define([
 
       // choose the first ungraded student if the requested one doesn't exist
       if (!jsonData.studentMap[studentId]) {
-        studentId = jsonData.studentsWithSubmissions[0].id;
-        for (var i = 0, max = jsonData.studentsWithSubmissions.length; i < max; i++){
-          if (typeof jsonData.studentsWithSubmissions[i].submission !== 'undefined' && jsonData.studentsWithSubmissions[i].submission.workflow_state !== 'graded'){
-            studentId = jsonData.studentsWithSubmissions[i].id;
-            break;
-          }
-        }
+        var ungradedStudent = _(jsonData.studentsWithSubmissions)
+        .find(function(s) {
+          return s.submission &&
+                 s.submission.workflow_state != 'graded' &&
+                 s.submission.submission_type;
+        });
+        studentId = (ungradedStudent || jsonData.studentsWithSubmissions[0]).id;
       }
 
       EG.goToStudent(studentId);
