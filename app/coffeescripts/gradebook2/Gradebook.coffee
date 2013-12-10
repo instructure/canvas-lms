@@ -289,26 +289,14 @@ define [
         column.cssClass = if @show_attendance then '' else 'completely-hidden'
         @$grid.find("##{@uid}#{column.id}").showIf(@show_attendance)
 
-      for id, student of @students
-        student.row = -1
-        if @rowFilter(student)
-          @rows.push(student)
-          @calculateStudentGrade(student)
+      @withAllStudents (students) =>
+        for id, student of @students
+          student.row = -1
+          if @rowFilter(student)
+            @rows.push(student)
+            @calculateStudentGrade(student)
 
-      @rows.sort (a, b) ->
-        a.sortable_name.localeCompare(b.sortable_name,
-          window.I18n.locale,
-          {sensitivity: 'accent', numeric: true})
-
-      for id, student of @studentViewStudents
-        student.row = -1
-        if @rowFilter(student)
-          @rows.push(student)
-          @calculateStudentGrade(student)
-
-
-      student.row = i for student, i in @rows
-      @grid.invalidate()
+      @sortRowsBy (a, b) => @localeSort(a.sortable_name, b.sortable_name)
 
     getSubmissionsChunks: =>
       @withAllStudents (allStudentsObj) =>
@@ -961,6 +949,7 @@ define [
       }, @options)
 
       @grid = new Slick.Grid('#gradebook_grid', @rows, @getVisibleGradeGridColumns(), options)
+      @grid.setSortColumn("student")
       # this is the magic that actually updates group and final grades when you edit a cell
 
       @grid.onCellChange.subscribe (event, data) =>
@@ -968,7 +957,35 @@ define [
         @grid.invalidate()
       # this is a faux blur event for SlickGrid.
       $('body').on('click', @onGridBlur)
-      respectorOfPersonsSort = (sortFn) =>
+
+      @grid.onSort.subscribe (event, data) =>
+        if data.sortCol.field == "display_name" || data.sortCol.field == "secondary_identifier"
+          sortProp = if data.sortCol.field == "display_name"
+            "sortable_name"
+          else
+            "secondary_identifier"
+          @sortRowsBy (a, b) =>
+            [b, a] = [a, b] if not data.sortAsc
+            @localeSort(a[sortProp], b[sortProp])
+        else
+          @sortRowsBy (a, b) ->
+            aScore = a[data.sortCol.field]?.score
+            bScore = b[data.sortCol.field]?.score
+            aScore = -99999999999 if not aScore and aScore != 0
+            bScore = -99999999999 if not bScore and bScore != 0
+            if data.sortAsc then aScore - bScore else bScore - aScore
+
+      @grid.onKeyDown.subscribe ->
+        # TODO: start editing automatically when a number or letter is typed
+        false
+
+      @grid.onColumnsReordered.subscribe @storeCustomColumnOrder
+
+      @onGridInit()
+
+
+    sortRowsBy: (sortFn) ->
+      respectorOfPersonsSort = =>
         if _(@studentViewStudents).size()
           (a, b) =>
             if @studentViewStudents[a.id]
@@ -980,34 +997,16 @@ define [
         else
           sortFn
 
-      sortRowsBy = (sortFn) =>
-        @rows.sort(respectorOfPersonsSort(sortFn))
-        for student, i in @rows
-          student.row = i
-          @addDroppedClass(student)
-        @grid.invalidate()
-      @grid.onSort.subscribe (event, data) =>
-        sortRowsBy (a, b) ->
-          aScore = a[data.sortCol.field]?.score
-          bScore = b[data.sortCol.field]?.score
-          aScore = -99999999999 if not aScore and aScore != 0
-          bScore = -99999999999 if not bScore and bScore != 0
-          if data.sortAsc then bScore - aScore else aScore - bScore
-      @grid.onSort.subscribe (event, data) =>
-        propertyToSortBy = {display_name: 'sortable_name', secondary_identifier: 'secondary_identifier'}[data.sortCol.field]
-        sortRowsBy (a, b) ->
-          res = if a[propertyToSortBy] < b[propertyToSortBy] then -1
-          else if a[propertyToSortBy] > b[propertyToSortBy] then 1
-          else 0
-          if data.sortAsc then res else 0 - res
+      @rows.sort respectorOfPersonsSort()
+      for student, i in @rows
+        student.row = i
+        @addDroppedClass(student)
+      @grid.invalidate()
 
-      @grid.onKeyDown.subscribe ->
-        # TODO: start editing automatically when a number or letter is typed
-        false
-
-      @grid.onColumnsReordered.subscribe @storeCustomColumnOrder
-
-      @onGridInit()
+    localeSort: (a, b) =>
+      a.localeCompare b,
+        window.I18n.locale,
+        sensitivity: 'accent', numeric: true
 
     # show warnings for bad grading setups
     setAssignmentWarnings: =>
