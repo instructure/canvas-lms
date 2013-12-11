@@ -120,11 +120,9 @@ describe "courses" do
       select = f('#course_url')
       options = select.find_elements(:css, 'option')
       options.length.should == 2
-      select.click
       wait_for_ajaximations
-      fj('#course_url option:not([selected])').click
-      refresh_page
-      f('#section-tabs-header').text.should match "course2"
+      expect_new_page_load{ click_option('#course_url', course2.name) }
+      f('#section-tabs-header').text.should match course2.name
     end
 
     it "should load the users page using ajax" do
