@@ -98,20 +98,6 @@
 <script type="text/javascript">
   <% maps = {}; @students.each_with_index{|u, i| maps["row_#{i + 1}"] = u.id }; @assignments.each_with_index{|a, i| maps["column_#{i + 1}"] = a.id; maps["hard_coded_#{i + 1}"] = a.respond_to?(:hard_coded) && a.hard_coded } %>
   var id_maps = <%= raw maps.to_json %>;
-  <% if (@submissions.length + @assignments.length + @students.length) > 100 %>
-  var object_data = null;//
-  <% else %>
-  var object_data = {pre_initialized: true};
-  <% @submissions.each do |submission| %>
-    object_data['submission_<%= submission.user_id %>_<%= submission.assignment_id %>'] = (<%= raw submission.to_json(:include => [:attachments,:quiz_submission,:submission_comments]) %>);
-  <% end %>
-  <% @assignments.each do |assignment| %>
-    object_data['assignment_<%= assignment.id %>'] = (<%= raw assignment.to_json %>);
-  <% end %>
-  <% @students.each do |student| %>
-    object_data['student_<%= student.id %>'] = (<%= raw student.to_json(:except => [:unread_inbox_items_count]) %>);
-  <% end %>
-  <% end %>
 </script>
 <% js_block do %>
   <script type="text/javascript">

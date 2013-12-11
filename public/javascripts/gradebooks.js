@@ -48,6 +48,7 @@ define([
   var readOnlyGradebook = window.readOnlyGradebook;
   var gradebook = window.gradebook;
   var speedGraderEnabled = ENV.speed_grader_enabled;
+  var object_data = null;
 
   var $loading_gradebook_progressbar = $("#loading_gradebook_progressbar"),
       $default_grade_form = $("#default_grade_form"),
@@ -1656,9 +1657,9 @@ define([
         url = $.replaceTags(url, "user_id", submission.user_id);
         $type.append(" <a href='" + url + "' target='_new' class='view_submission_link'>" + I18n.t('links.view_submission', "View Submission") + "</a>");
       }
-    } else if(submission.quiz_submission) {
+    } else if(submission.quiz_submission_id) {
       var url = $("#gradebook_urls .view_quiz_url").attr('href');
-      url = $.replaceTags(url, "quiz_id", submission.quiz_submission.quiz_id);
+      url = $.replaceTags(url, "quiz_id", assignment.quiz_id);
       url = $.replaceTags(url, "user_id", submission.user_id);
       if(submission.workflow_state == "pending_review") {
         $type.append($("#submission_pending_review_image").clone().removeAttr('id'));
