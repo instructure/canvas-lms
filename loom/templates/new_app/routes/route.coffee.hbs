@@ -1,6 +1,6 @@
 define ['ember', 'ic-ajax'], (Ember, ajax) ->
 
-  FakeRoute = Ember.Route.extend
+  {{routeName}} = Ember.Route.extend
 
     model: ->
       ajax('/api/v1/users/self/activity_stream').then ({response}) ->
