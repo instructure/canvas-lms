@@ -177,14 +177,18 @@ class GradebooksController < ApplicationController
             @groups = @context.assignment_groups.active
             @groups_order = {}
             @groups.each_with_index{|group, idx| @groups_order[group.id] = idx }
-            @just_assignments = @context.assignments.active.gradeable.order(:due_at, Assignment.best_unicode_collation_key('title')).select{|a| @groups_order[a.assignment_group_id] }
+            @just_assignments = @context.assignments.active.gradeable.
+              order(:due_at, Assignment.best_unicode_collation_key('title')).
+              select{|a| @groups_order[a.assignment_group_id] }
 
             newest = Time.parse("Jan 1 2010")
-            @just_assignments = @just_assignments.sort_by{|a| [a.due_at || newest, @groups_order[a.assignment_group_id] || 0, a.position || 0] }
-            @assignments = @just_assignments.dup + groups_as_assignments(@groups)
-            if @context.feature_enabled?(:draft_state)
-              @assignments = @assignments.select(&:published?)
+            @just_assignments = @just_assignments.sort_by do |a|
+              [a.due_at || newest, @groups_order[a.assignment_group_id] || 0, a.position || 0]
             end
+            if @context.feature_enabled?(:draft_state)
+              @just_assignments = @just_assignments.select(&:published?)
+            end
+            @assignments = @just_assignments.dup + groups_as_assignments(@groups)
             @enrollments_hash = Hash.new{ |hash,key| hash[key] = [] }
             @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{ |e| @enrollments_hash[e.user_id] << e }
             @students = @context.students_visible_to(@current_user).order_by_sortable_name.uniq.all

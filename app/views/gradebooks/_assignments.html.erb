@@ -96,7 +96,14 @@
   <div class="tooltip_tail"></div>
 </div>
 <script type="text/javascript">
-  <% maps = {}; @students.each_with_index{|u, i| maps["row_#{i + 1}"] = u.id }; @assignments.each_with_index{|a, i| maps["column_#{i + 1}"] = a.id; maps["hard_coded_#{i + 1}"] = a.respond_to?(:hard_coded) && a.hard_coded } %>
+<%
+  maps = {}
+  @students.each_with_index{|u, i| maps["row_#{i + 1}"] = u.id }
+  @assignments.each_with_index do |a, i|
+    maps["column_#{i + 1}"] = a.id
+    maps["hard_coded_#{i + 1}"] = a.respond_to?(:hard_coded) && a.hard_coded
+  end
+%>
   var id_maps = <%= raw maps.to_json %>;
 </script>
 <% js_block do %>
