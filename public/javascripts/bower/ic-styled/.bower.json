@@ -30,6 +30,6 @@
     "commit": "ab42a6228fa04e5330af5066f75809467b8459dd"
   },
   "_source": "git://github.com/instructure/ic-styled.git",
-  "_target": "~1.1.0",
+  "_target": "~1.1.3",
   "_originalSource": "ic-styled"
 }

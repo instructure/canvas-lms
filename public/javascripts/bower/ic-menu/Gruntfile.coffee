@@ -40,6 +40,26 @@ module.exports = (grunt) ->
     clean:
       build: ['build']
 
-  grunt.registerTask 'build', ['clean:build', 'emberTemplates', 'concat']
+  grunt.registerTask 'build', ['clean:build', 'emberTemplates', 'wrapTemplates', 'concat']
   grunt.registerTask 'default', ['build', 'watch']
+
+  grunt.registerTask 'wrapTemplates', ->
+    templatePath = './lib/templates.js'
+    templatesSource = fs.readFileSync(templatePath).toString()
+    src = """
++function(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define(['ember'], function(Ember) { return factory(Ember); });
+  } else if (typeof exports === 'object') {
+    factory(require('ember'));
+  } else {
+    factory(Ember);
+  }
+}(this, function(Ember) {
+
+#{templatesSource}
+
+});
+    """
+    fs.writeFileSync templatePath, src
 

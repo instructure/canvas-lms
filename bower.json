@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "ic-ajax": "~0.2.0",
-    "ic-menu": "~0.1.0"
+    "ic-menu": "~0.1.0",
+    "ic-styled": "~1.1.3"
   }
 }

@@ -19,7 +19,8 @@
       'ariaOwns:aria-owns',
       'ariaHaspopup:aria-haspopup',
       'role',
-      'tabindex'
+      'tabindex',
+      'title'
     ],
 
     tabindex: 0,
