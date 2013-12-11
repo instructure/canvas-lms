@@ -1,0 +1,24 @@
+{
+  "name": "ic-menu",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "testem ci"
+  },
+  "author": "Ryan Florence <rpflorence@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "ember": "1.2.0",
+    "ic-styled": "~1.1.0"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-ember-templates": "~0.4.17",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "testem": "~0.5.12",
+    "matchdep": "~0.3.0"
+  }
+}

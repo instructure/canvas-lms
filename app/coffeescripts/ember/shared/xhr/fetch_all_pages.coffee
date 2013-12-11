@@ -6,7 +6,7 @@ define [
 
   fetch = (url, records, data) ->
     opts = $.extend({dataType: "json"}, {data: data})
-    ajax(url, opts).then (result) ->
+    ajax.raw(url, opts).then (result) ->
       records.pushObjects result.response
       meta = parseLinkHeader result.jqXHR
       if meta.next

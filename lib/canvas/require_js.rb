@@ -63,12 +63,18 @@ module Canvas
           :jqueryui => 'vendor/jqueryui',
           :use => 'vendor/use',
           :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min',
-          'ic-menu' => 'vendor/ic-menu/dist/main.amd',
           'ic-dialog' => 'vendor/ic-dialog/dist/main.amd',
-          'ic-ajax' => 'vendor/ic-ajax/main',
         }.update(cache_busting ? cache_busting_paths : {}).update(plugin_paths).update(Canvas::RequireJs::PluginExtension.paths).to_json.gsub(/([,{])/, "\\1\n    ")
       end
-  
+
+      def packages
+        @packages ||= [
+          {'name' => 'ic-ajax', 'location' => 'bower/ic-ajax'},
+          {'name' => 'ic-styled', 'location' => 'bower/ic-styled'},
+          {'name' => 'ic-menu', 'location' => 'bower/ic-menu'},
+        ].to_json
+      end
+
       def plugin_paths
         @plugin_paths ||= begin
           Dir['public/javascripts/plugins/*'].inject({}) { |hash, plugin|

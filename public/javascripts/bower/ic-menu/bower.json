@@ -1,0 +1,22 @@
+{
+  "name": "ic-menu",
+  "version": "0.1.0",
+  "authors": [
+    "Ryan Florence <rpflorence@gmail.com>"
+  ],
+  "dependencies": {
+    "ember": "1.2.0",
+    "ic-styled": "~1.1.0"
+  },
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "ember-template-compiler": "http://builds.emberjs.com/release/ember-template-compiler.js"
+  }
+}
