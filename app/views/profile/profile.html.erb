@@ -389,6 +389,41 @@ TEXT
           </div>
         </div>
       </li>
+      <li id="unregistered_service_diigo" class="service" style="<%= hidden if services.include?("diigo") || !service_enabled?(:diigo) %>">
+        <a href="#" class="btn btn-small"><%= image_tag "diigo_icon.png" %> <%= t('links.diigo', "Diigo") %></a>
+        <div style="display: none; text-align: left;" class="content" title="<%= t('titles.diigo_login', "Diigo Login") %>" id="unregistered_service_diigo_dialog">
+          <div>
+            <%= image_tag "diigo.png", :style => "float: left; padding-right: 5px;" %>
+            <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.diigo_login', "Diigo Login") %></div>
+            <%= t(:diigo_description, <<-TEXT)
+            Diigo is a social bookmarking tool tailored specifically to research and
+            education.  
+            Canvas's rich content editor will let you search your Diigo tags
+            to easily link from within Canvas to other resources you find useful.
+            TEXT
+            %>
+            <div class="clear"></div>
+          </div>
+          <div style="font-size: 1.0em; margin-top: 10px;">
+            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
+            <%= f.hidden_field :service, :value => "diigo" %>
+            <table class="formtable">
+              <tr>
+                <td><%= f.blabel :user_name, :en => "User Name" %></td>
+                <td><%= f.text_field :user_name, :style => "width: 150px;" %></td>
+              </tr><tr>
+                <td><%= f.blabel :password, :en => "Password" %></td>
+                <td><%= f.password_field :password, :style => "width: 150px;" %></td>
+              </tr><tr>
+                <td colspan="2">
+                  <button type="submit" class="btn btn-primary"><%= t('buttons.save_login', "Save Login") %></button>
+                </td>
+              </tr>
+            </table>
+            <% end %>
+          </div>
+        </div>
+      </li>
     </ul>
     </div>
   </td>
