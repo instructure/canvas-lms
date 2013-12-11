@@ -18,7 +18,7 @@ define [
   'compiled/gradebook2/SubmissionCell'
   'compiled/gradebook2/GradebookHeaderMenu'
   'str/htmlEscape'
-  'jst/gradebook_uploads_form'
+  'compiled/gradebook2/UploadDialog'
   'jst/gradebook2/section_to_show_menu'
   'jst/gradebook2/column_header'
   'jst/gradebook2/group_total_cell'
@@ -35,7 +35,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
+], (KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, UploadDialog, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
 
   class Gradebook
     columnWidths =
@@ -730,23 +730,9 @@ define [
 
       $('#gradebook_settings').show().kyleMenu()
 
-      $upload_modal = null
       $settingsMenu.find('.gradebook_upload_link').click (event) =>
         event.preventDefault()
-        unless $upload_modal
-          locals =
-            download_gradebook_csv_url: "#{@options.context_url}/gradebook.csv"
-            action: "#{@options.context_url}/gradebook_uploads"
-            authenticityToken: ENV.AUTHENTICITY_TOKEN
-          $upload_modal = $(gradebook_uploads_form(locals))
-            .dialog
-              bgiframe: true
-              autoOpen: false
-              modal: true
-              width: 720
-              resizable: false
-            .fixDialogButtons()
-        $upload_modal.dialog('open')
+        new UploadDialog(@options.context_url)
 
       $settingsMenu.find('.student_names_toggle').click (e) ->
         $wrapper = $('.grid-canvas')

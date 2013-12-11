@@ -1,4 +1,4 @@
-define ['ember'], (Ember) ->
+define ['ember', 'compiled/handlebars_helpers'], (Ember, Handlebars) ->
 
   Ember.Application.extend
 

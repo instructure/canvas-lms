@@ -57,6 +57,12 @@ define [
         select.removeChild(options[i])
         i--
 
+    updateSelection: (->
+      selected = get this, 'selected'
+      select = @$("[value=#{get(selected, @valuePath)}]")
+      select?[0]?.selected = true
+    ).observes('selected')
+
     arrayDidChange: (items, start, removeCount, addCount) ->
       select = get(this, 'element')
       i = start

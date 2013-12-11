@@ -17,14 +17,14 @@ define [
 ], (I18n, $, setDefaultGradeDialogTemplate, _) ->
 
   class SetDefaultGradeDialog
-    constructor: (@assignment, @gradebook) ->
+    constructor: ({@assignment, @students, @context_id, @selected_section}) ->
       @initDialog()
 
     initDialog: =>
       templateLocals =
         assignment: @assignment
         showPointsPossible: @assignment.points_possible || @assignment.points_possible == '0'
-        url: "/courses/#{@gradebook.options.context_id}/gradebook/update_submission"
+        url: "/courses/#{@context_id}/gradebook/update_submission"
       templateLocals["assignment_grading_type_is_#{@assignment.grading_type}"] = true
       @$dialog = $(setDefaultGradeDialogTemplate(templateLocals))
       @$dialog.dialog(
@@ -37,10 +37,10 @@ define [
         disableWhileLoading: true
         processData: (data) =>
           studentsAffected = 0
-          hasNoScore = (student) => !student["assignment_#{@assignment.id}"].score?
+          hasNoScore = (student) => !student["assignment_#{@assignment.id}"]?.score?
           canOverwrite = data.overwrite_existing_grades
-          inSection = (student) => if @gradebook.sectionToShow
-            _.include(student.sections, @gradebook.sectionToShow)
+          inSection = (student) => if @selected_section
+            _.include(student.sections, @selected_section)
           else
             true
           updateData = (idx, student) =>
@@ -49,7 +49,7 @@ define [
             data["submissions[submission_#{idx}][user_id]"] = student.id
             data["submissions[submission_#{idx}][grade]"] = data.default_grade
 
-          updateData(idx, student) for idx, student of @gradebook.students when (hasNoScore(student) or canOverwrite) and inSection(student)
+          updateData(idx, student) for idx, student of @students when (hasNoScore(student) or canOverwrite) and inSection(student)
 
           if studentsAffected is 0
             alert I18n.t('alerts.none_to_update', "None to Update")

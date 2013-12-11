@@ -278,8 +278,8 @@ define [
           inputProps[prop] = prop
         else
           delete inputProps[prop]
-      
-      if inputProps.uniqid and inputProps.id  
+
+      if inputProps.uniqid and inputProps.id
         inputProps.id += "-#{Handlebars.helpers.uniqid.call this}"
       delete inputProps.uniqid
 
@@ -381,7 +381,7 @@ define [
       words = str.split(/[ _]+/)
       titleizedWords = _(words).map (w) -> w[0].toUpperCase() + w.slice(1)
       titleizedWords.join(' ')
-    
+
     uniqid: (context) ->
       context = @ if arguments.length <= 1
       unless context._uniqid_

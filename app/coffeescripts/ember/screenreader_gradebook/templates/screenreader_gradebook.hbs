@@ -8,7 +8,7 @@
 <div>
   <label for="section_select">Select a section</label>
   {{
-    fast-select 
+    fast-select
     id="section_select"
     class="section_select"
     items=sections
@@ -25,19 +25,19 @@
 
 <!-- grading history -->
 
-<a href="#history">View Grading History</a>
+<a href="{{ unbound gradingHistoryUrl }}">View Grading History</a>
 
 <!-- download scores -->
 
-<a href="#download_scores">Download Scores (.csv)</a>
+<a href="{{ unbound downloadUrl }}">Download Scores (.csv)</a>
 
 <!-- upload scores -->
 
-<a href="#upload_scores">Upload Scores (.csv)</a>
+<button id="upload" {{ action 'openDialog' 'upload' target=view }}>Upload Scores (.csv)</button>
 
 <!-- set group weights -->
 
-<a href="#set_group_weights">Set Group Weiths</a>
+<button id="ag_weights" {{ action 'openDialog' 'ag_weights' target=view }} {{ bind-attr disabled=assignment_groups.isLoading }}>Set Group Weights</button>
 
 <!-- show/hide student names -->
 
@@ -85,6 +85,10 @@
     selected=selectedStudent
   }}
 </div>
+<div id="student_navigation">
+  <a href="#prev_student" id="prev_student">Previous Student</a>
+  <a href="#next_student" id="next_student">Next Student</a>
+</div>
 
 <!-- not sure we need this
 <div>
@@ -112,11 +116,9 @@
   }}
 </div>
 
-<div id="student_navigation">
-  <a href="#prev_student" id="prev_student">Previous Student</a> <a href="#next_student" id="next_student">Next Student</a>
-</div>
 <div id="assignment_navigation">
-  <a href="#prev_assignment" id="prev_assignment">Previous Assignment</a> <a href="#next_assignment" id="next_assignment">Next Assignment</a>
+  <a href="#prev_assignment" id="prev_assignment">Previous Assignment</a> 
+  <a href="#next_assignment" id="next_assignment">Next Assignment</a>
 </div>
 
 <!-- student + assignment -->
@@ -136,7 +138,7 @@
        input
        id="student_and_assignment_grade"
        name=grade
-       valueBinding=selectedSubmissionGrade
+       value=selectedSubmissionGrade
      }}
 
   </div>
@@ -164,16 +166,19 @@
   <div>Section: Section 3</div>
 
   <!-- secondary id -->
-
+  {{#unless isLoaded}}
   <div>Secondary ID: {{login_id}}</div>
 
   <!-- final score/grade -->
 
-  <div>Final Grade: {{enrollment.grades.final_grade}} ({{enrollment.grades.final_score}})</div>
+  <div>Final Grade: {{../studentGrades.final_grade}} ({{../studentGrades.final_score}})</div>
 
   <!-- sub-total grade for each assignment group (percentage + points) -->
 
   <div>Assignment Group Grade: 30% (50% of grade)</div>
+  {{else}}
+  <p>Submissions for this student are still loading...</p>
+  {{/unless}}
 
 </div>
 
@@ -187,15 +192,11 @@
 {{#with selectedAssignment}}
 
 <div id="assignment_information">
-
   <h2>Assignment Information</h2>
-
-  <div>Selected Assignment: {{name}}</div>
-
+  <div>Selected Assignment: <a {{bind-attr href="html_url"}}>{{name}}</a></div>
   <!-- how many points is the assignment worth -->
 
   <div>Points possible: {{points_possible}}</div>
-
   <!-- is the assignment muted -->
 
   <div>
@@ -203,29 +204,29 @@
     <input type="checkbox" name="muted" id="muted" value="muted"><br>
   </div>
 
+{{/with}}
   <!-- assignment stats: average/high/low score + submission count -->
-
-  <div>Average Score: 5</div>
-  <div>High Score: 10</div>
-  <div>Low Score: 1</div>
-
+  {{#if assignmentDetails}}
+  {{#with assignmentDetails }}
+  {{#if cnt}} 
+  <div>Average Score: {{average}}</div>
+  <div>High Score: {{max}}</div>
+  <div>Low Score: {{min}}</div>
+  {{/if}}
+  <div>{{cnt}} Submissions</div>
+  {{/with}}
+  {{/if}}
   <!-- go to assignment in speedgrader -->
 
   <a href="#speedgrader">See this assignment in speedgrader</a>
 
   <!-- message students who -->
-
-  <a href="#message_student_who">Message students who...</a>
-
+  <button id="message_students" {{ action 'openDialog' 'message_students' target=view }}>Message students who...</button>
   <!-- set default grades -->
-
-  <a href="#set_default_grade">Set default grade</a>
-
+  <button id="set_default_grade" {{ action 'openDialog' 'set_default_grade' target=view }}>Set default grade</button>
   <!-- curve grades -->
-
-  <a href="#curve_grades">Curve Grades</a>
+  <button id="curve_grades" {{ action 'openDialog' 'curve_grades' target=view }}>Curve Grades</button>
 
 </div>
 
-{{/with}}
 {{/if}}

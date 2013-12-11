@@ -11,8 +11,12 @@ define [
       meta = parseLinkHeader result.jqXHR
       if meta.next
         fetch meta.next, records, data
+      else
+        records.set('isLoaded', true)
+        records.set('isLoading', false)
 
   fetchAllPages = (url, data) ->
     records = ArrayProxy.create({content: []})
+    records.set('isLoading', true)
     fetch url, records, data
     records
