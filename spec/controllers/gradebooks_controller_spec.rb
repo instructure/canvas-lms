@@ -363,6 +363,23 @@ describe GradebooksController do
         response.body.should match(/\AStudent,/)
       end
     end
+
+    describe "draft state" do
+      it "should properly filter unpublished assignments" do
+        course_with_teacher_logged_in(:active_all => true)
+        @course.account.enable_feature!(:draft_state)
+        assignment1 = @course.assignments.build(:title => "Assignment 1")
+        assignment1.unpublish
+        assignment2 = @course.assignments.create!(:title => "Assignment 2")
+
+        get 'show', :course_id => @course.id
+        assign_ids = assigns[:assignments].map(&:id)
+        assign_ids.include?(assignment1.id).should be_false
+        assign_ids.include?(assignment2.id).should be_true
+        assign_ids.include?("group-#{assignment2.assignment_group.id}").should be_true
+        assign_ids.include?("final-grade").should be_true
+      end
+    end
   end
 
   describe "GET 'change_gradebook_version'" do
