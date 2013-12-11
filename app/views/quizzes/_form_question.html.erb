@@ -10,6 +10,7 @@
 <div class="question">
   <div class="header" style="background-color: transparent;">
     <input type="text" style="width: 120px;" name="question_name" aria-label="<%= t "label.question.name", "Question name" %>"/>
+    <input type="hidden" name="regrade_disabled" value="" />
     <select class="question_type" name="question_type" aria-label="<%= t "label.question.type", "Question type" %>">
       <option value="multiple_choice_question"><%= t('question_type.multiple_choice', "Multiple Choice") %></option>
       <option value="true_false_question"><%= t('question_type.true_false', "True/False") %></option>

@@ -1621,16 +1621,16 @@ define([
         $("#quiz_assignment_id").val(data.quiz.quiz_type || "practice_quiz").change();
         location.href = $(this).attr('action');
         quiz.updateDisplayComments();
-    },
-    error: function(data) {
-      $("#quiz_edit_wrapper")
-        .find(".btn.save_quiz_button")
-        .attr('disabled', false)
-        .text(I18n.t('buttons.save', "Save"));
+      },
+      error: function(data) {
+        $("#quiz_edit_wrapper")
+          .find(".btn.save_quiz_button")
+          .attr('disabled', false)
+          .text(I18n.t('buttons.save', "Save"));
 
-      $(this).trigger('xhrError', data);
-      $(this).formErrors(data);
-      $quiz_edit_wrapper.find(".btn.save_quiz_button").attr('disabled', false);
+        $(this).trigger('xhrError', data);
+        $(this).formErrors(data);
+        $quiz_edit_wrapper.find(".btn.save_quiz_button").attr('disabled', false);
       }
     });
 
@@ -1720,7 +1720,9 @@ define([
       var $question = $(this).parents(".question");
       var questionID = $(this).closest('.question_holder').find('.display_question').attr('id');
       var question = $question.getTemplateData({
-        textValues: ['question_type', 'correct_comments', 'incorrect_comments', 'neutral_comments', 'question_name', 'question_points', 'answer_selection_type', 'blank_id', 'matching_answer_incorrect_matches'],
+        textValues: ['question_type', 'correct_comments', 'incorrect_comments', 'neutral_comments',
+                     'question_name', 'question_points', 'answer_selection_type', 'blank_id',
+                     'matching_answer_incorrect_matches', 'regrade_option', 'regrade_disabled'],
         htmlValues: ['question_text', 'correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html']
       });
       question.question_text = $question.find("textarea[name='question_text']").val();
@@ -1850,6 +1852,7 @@ define([
     $("#question_form_template .cancel_link").click(function(event) {
       event.preventDefault();
       var $displayQuestion = $(this).parents("form").prev();
+
       var isNew = $displayQuestion.attr('id') == 'question_new';
       if (!isNew) {
         $(this).parents("form").remove();
@@ -1940,11 +1943,17 @@ define([
         var regradeOption = REGRADE_OPTIONS[questionID[1]];
         var questionType = $el.find(".question_type").val();
 
+        // regrade disabled if they remove an answer after submissions made
+        var holder = $el.parents('.question_holder');
+        var disabled = holder.find('input[name="regrade_disabled"]').val() == '1';
+
         $el.find('.button-container').before(regradeTemplate({
           regradeOption: regradeOption,
+          regradeDisabled: disabled,
           multipleAnswer: questionType === "multiple_answers_question"
         }));
-        clickRegradeOptions();
+
+        clickRegradeOptions(null, disabled);
       }
     }
 
@@ -1959,8 +1968,9 @@ define([
 
     $(document).delegate(".regrade-options", 'click', clickRegradeOptions);
 
-    function clickRegradeOptions(event) {
-      if ($('input[name="regrade_option"]:checked').length === 0) {
+    function clickRegradeOptions(event, disabled) {
+      var checked = $('input[name="regrade_option"]:checked').length > 0;
+      if (!checked && !disabled) {
         disableQuestionForm();
       } else {
         enableQuestionForm();
@@ -2023,6 +2033,27 @@ define([
 
     $(".delete_answer_link").click(function(event) {
       event.preventDefault();
+
+      var holder = $(this).parents('.question_holder');
+      var regradeOpt = holder.find('span.regrade_option');
+
+      // warn they can't regrade if there are submissions
+      var disabled = regradeOpt.text() == 'disabled';
+      if ($("#student_submissions_warning").length > 0 && !disabled) {
+        var msg = I18n.t('confirms.delete_answer',
+          "Are you sure? Deleting answers from a question with submissions " +
+          "disables the option to regrade this question.")
+        if (!confirm(msg)) { return; }
+
+        // disabled regrade if they've chosen already
+        holder.find('.regrade_enabled').hide();
+        holder.find('.regrade_disabled').show();
+        holder.find('input[name="regrade_option"]').attr('disabled', true);
+        holder.find('input[name="regrade_option"]').attr('checked', false);
+        holder.find('input[name="regrade_disabled"]').val('1');
+        enableQuestionForm();
+      }
+
       var $ans = $(this).parents(".answer");
       var $ansHeader = $ans.closest('.question').find('.answers_header');
       $ans.remove();
@@ -2503,7 +2534,7 @@ define([
       var questionData = $question.getFormData({
         textValues: ['question_type', 'question_name', 'question_points', 'correct_comments', 'incorrect_comments', 'neutral_comments',
           'question_text', 'answer_selection_type', 'text_after_answers', 'matching_answer_incorrect_matches',
-          'regrade_option']
+          'regrade_option', 'regrade_disabled']
       });
 
       // save any open html answers
@@ -2627,7 +2658,11 @@ define([
       var questionData = quizData($displayQuestion);
       var formData = generateFormQuiz(questionData);
       var questionData = generateFormQuizQuestion(formData);
-      questionData['question[regrade_option]'] = oldQuestionData.regrade_option;
+
+      var disabled = oldQuestionData.regrade_disabled == '1';
+      var regradeOpt = disabled ? 'disabled' : oldQuestionData.regrade_option;
+      questionData['question[regrade_option]'] = regradeOpt;
+
       if ($displayQuestion.parent(".question_holder").hasClass('group')) {
         var $group = quiz.findContainerGroup($displayQuestion.parent(".question_holder"));
         if ($group) {
