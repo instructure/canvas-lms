@@ -48,14 +48,8 @@
   .group-category-actions {
     margin-left: 1em;
   }
-  .group-category-detail {
-    overflow: hidden; // to play nice w/ action buttons
-    .alert, p {
-      margin-bottom: 0;
-    }
-    .student-organized-groups {
-      overflow: hidden; // so it doesn't overlap with the button/cog
-    }
+  .student-organized-groups {
+    overflow: hidden; // so it doesn't overlap with the button/cog
   }
 }
 

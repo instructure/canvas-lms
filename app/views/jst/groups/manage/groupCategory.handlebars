@@ -1,4 +1,6 @@
 <div class="group-category-summary">
+  <div data-view="groupCategoryDetail"></div>
+
   {{#if ENV.IS_LARGE_ROSTER}}
     <p>
       <input
@@ -10,8 +12,6 @@
       >
     </p>
   {{/if}}
-
-  <div data-view="groupCategoryDetail" class="group-category-detail"></div>
 </div>
 
 <div class="group-category-contents {{#if ENV.IS_LARGE_ROSTER}}group-category-contents-condensed{{/if}}">
