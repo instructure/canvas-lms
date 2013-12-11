@@ -276,7 +276,11 @@ define([
     var submission = _.find(ENV.submissions, function(s) {
       return s.assignment_id == assignmentId;
     });
-    if (submission) { submission.score = score; }
+    if (submission) {
+      submission.score = score;
+    } else {
+      ENV.submissions.push({assignment_id: assignmentId, score: score});
+    }
   }
 });
 

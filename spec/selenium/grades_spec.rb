@@ -119,26 +119,37 @@ describe "grades" do
     it "should allow student to test modifying grades" do
       get "/courses/#{@course.id}/grades"
 
-      # just one ajax request
-      Assignment.expects(:find_or_create_submission).once.returns(@submission)
+      Assignment.expects(:find_or_create_submission).twice.returns(@submission)
 
       #check initial total
       f('#submission_final-grade .assignment_score .grade').text.should == '33.3'
 
-      #test changing existing scores
-      first_row_grade = f("#submission_#{@submission.assignment_id} .assignment_score .grade")
-      first_row_grade.click
-      set_value(first_row_grade.find_element(:css, 'input'), '4')
+      edit_grade = lambda do |field, score|
+        field.click
+        set_value field.find_element(:css, 'input'), score.to_s
+        driver.execute_script '$("#grade_entry").blur()'
+      end
 
-      driver.execute_script(%Q{
-        $("#grade_entry").blur();
-      })
+      assert_grade = lambda do |grade|
+        keep_trying_until do
+          wait_for_ajaximations
+          fj('#submission_final-grade .grade').text.should == grade.to_s
+        end
+      end
+
+      # test changing existing scores
+      first_row_grade = f("#submission_#{@submission.assignment_id} .assignment_score .grade")
+      edit_grade.(first_row_grade, 4)
+      assert_grade.(40)
 
       #using find with jquery to avoid caching issues
-      keep_trying_until do
-        wait_for_ajaximations
-        fj('#submission_final-grade .assignment_score .grade').text.should == '40'
-      end
+
+      # test changing unsubmitted scores
+      third_grade = f("#submission_#{@third_assignment.id} .assignment_score .grade")
+      edit_grade.(third_grade, 10)
+      assert_grade.(97)
+
+      driver.execute_script '$("#grade_entry").blur()'
     end
 
     it "should display rubric on assignment" do
