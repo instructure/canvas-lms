@@ -39,7 +39,7 @@ gem 'builder', '3.0.0'
 # enforce the version of bundler itself, to avoid any surprises
 gem 'bundler', '1.3.5'
 gem 'canvas_connect', '0.3.1'
-gem 'canvas_webex', '0.7'
+gem 'canvas_webex', '0.8'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
 if CANVAS_RAILS2

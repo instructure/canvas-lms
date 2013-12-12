@@ -272,6 +272,16 @@ class WebConference < ActiveRecord::Base
     self.ended_at = nil
     self.save
   end
+
+  # Default implementation since most implementations don't support scheduling yet
+  def scheduled?
+    self.started_at.nil? && scheduled_date && scheduled_date > Time.now
+  end
+
+  # Default implementation since most implementations don't support scheduling yet
+  def scheduled_date
+    nil
+  end
   
   def active?(force_check=false)
     if !force_check
