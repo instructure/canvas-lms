@@ -34,10 +34,10 @@ define [
       if users.loadedAll
         models = users.models.slice()
         user.set 'groupId', null for user in models
-      else
+      else if not @get('allows_multiple_memberships')
         @_unassignedUsers.increment group.usersCount()
 
-      if not users.loadedAll or not @_unassignedUsers.loadedAll
+      if not @get('allows_multiple_memberships') and (not users.loadedAll or not @_unassignedUsers.loadedAll)
         @_unassignedUsers.fetch()
 
     reassignUser: (user, newGroupId) ->
