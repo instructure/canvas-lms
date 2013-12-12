@@ -23,21 +23,23 @@
     <ul class="context-module-toolbar" aria-label='<%= t("module_toolbar.aria.module_options.label", "Module Options") %>'>
       <% if editable %>
         <li class="context-module-toolbar-item">
-          <a class="al-trigger admin-links" style="padding: 1px" href="#" aria-haspopup="true" title="<%= t('admin_links.module_options_title','Manage Module') %>" aria-describedby='<%= t("admin_links.module_options_label","Manage Module")%>'>
-            <span class="screenreader-only"><%= t('manage', 'Manage Module') %></span>
-            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-          </a>
-          <ul class="al-options" role="menubar" aria-hidden="true">
-            <li role="menuitem">
-              <a href="#" rel="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items" class="add_module_item_link icon-plus"><%= t('links.add_item', %{Add Content}) %></a>
-            </li>
-            <li role="menuitem">
-              <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>" class="icon-edit edit_module_link" title="<%= t('links.title.edit_module', %{Edit}) %>"><%= t('links.text.edit_module', %{Edit}) %></a>
-            </li>
-            <li role="menuitem">
-              <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>" class="delete_module_link icon-trash" title="<%= t('links.title.delete_module', %{Delete this module}) %>"><%= t('links.text.delete_module', %{Delete}) %></a>
-            </li>
-          </ul>
+          <div class="inline-block" role="application">
+            <a class="al-trigger admin-links" role="button" style="padding: 1px" href="#" aria-haspopup="true" title="<%= t('admin_links.module_options_title','Manage Module') %>" aria-describedby='<%= t("admin_links.module_options_label","Manage Module")%>'>
+              <span class="screenreader-only"><%= t('manage', 'Manage Module') %></span>
+              <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+            </a>
+            <ul class="al-options" role="menubar" aria-hidden="true">
+              <li role="menuitem">
+                <a href="#" rel="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items" class="add_module_item_link icon-plus"><%= t('links.add_item', %{Add Content}) %></a>
+              </li>
+              <li role="menuitem">
+                <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>" class="icon-edit edit_module_link" title="<%= t('links.title.edit_module', %{Edit}) %>"><%= t('links.text.edit_module', %{Edit}) %></a>
+              </li>
+              <li role="menuitem">
+                <a href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>" class="delete_module_link icon-trash" title="<%= t('links.title.delete_module', %{Delete this module}) %>"><%= t('links.text.delete_module', %{Delete}) %></a>
+              </li>
+            </ul>
+          </div>
         </li>
       <% end %>
 

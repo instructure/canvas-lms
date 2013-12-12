@@ -12,10 +12,11 @@ Cogs, *AKA admin links*, are generally floated to the right, make sure it's the 
 ### Toolbar Cog (button + cog)
 
 ```html
-<div>
-  <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" aria-label="Settings" href="#">
+<div role="application">
+  <a class="al-trigger btn" role="button" href="#">
     <i class="icon-settings"></i>
     <i class="icon-mini-arrow-down"></i>
+    <span class="screenreader-only">Settings</span>
   </a>
   <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
     <li role="presentation">
@@ -34,10 +35,11 @@ Cogs, *AKA admin links*, are generally floated to the right, make sure it's the 
 ### Content cog
 
 ```html
-<div>
-  <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" aria-label="Settings" href="#">
+<div role="application">
+  <a class="al-trigger al-trigger-gray" role="button" href="#">
     <i class="icon-settings"></i>
     <i class="icon-mini-arrow-down"></i>
+    <span class="screenreader-only">Settings</span>
   </a>
 
   <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">

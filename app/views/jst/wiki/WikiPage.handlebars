@@ -36,18 +36,20 @@
           <a href="{{wiki_page_edit_path}}" class="btn edit-wiki"><i class="icon-edit"></i> {{#t 'buttons.edit'}}Edit{{/t}}</a>
         {{/if}}
         {{#if CAN.ACCESS_GEAR_MENU}}
-          <a class="btn al-trigger" tabindex="0" role="button">
-            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-            <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>
-          </a>
-          <ul class="al-options">
-          {{#if CAN.DELETE}}
-            <li><a href="#" class="icon-trash delete_page{{#unless deletable}} disabled{{/unless}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>{{#t "delete_wiki"}}Delete{{/t}}</a></li>
-          {{/if}}
-          {{#if CAN.READ_REVISIONS}}
-            <li><a href="{{wiki_page_history_path}}" class="icon-clock view_page_history">{{#t "view_page_history_wiki"}}View Page History{{/t}}</a></li>
-          {{/if}}
-          </ul>
+          <div class="inline-block" role="application">
+            <a class="btn al-trigger" tabindex="0" role="button" href="#">
+              <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+              <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>
+            </a>
+            <ul class="al-options">
+            {{#if CAN.DELETE}}
+              <li><a href="#" class="icon-trash delete_page{{#unless deletable}} disabled{{/unless}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>{{#t "delete_wiki"}}Delete{{/t}}</a></li>
+            {{/if}}
+            {{#if CAN.READ_REVISIONS}}
+              <li><a href="{{wiki_page_history_path}}" class="icon-clock view_page_history">{{#t "view_page_history_wiki"}}View Page History{{/t}}</a></li>
+            {{/if}}
+            </ul>
+          </div>
         {{/if}}
       </div>
     </div>

@@ -30,11 +30,12 @@
       </div>
     {{/if}}
   </div>
-  <div class="ig-admin">
+  <div class="ig-admin" role="application">
     {{#if permissions.delete}}
-      <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="{{id}}-content-1" aria-label="{{#t "setings"}}settings{{/t}}" href="#">
+      <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="{{id}}-content-1" href="#">
         <i class="icon-settings"></i>
         <i class="icon-mini-arrow-down"></i>
+        <span class="screenreader-only">{{#t "settings"}}settings{{/t}}</span>
       </a>
       <ul id="{{id}}-content-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false" aria-activedescendant="{{id}}-content-2">
         <li role="presentation">

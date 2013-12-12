@@ -123,17 +123,19 @@
           <i class="icon-<%= published_status %>"></i>
         </span>
 
-        <a role="button" class="al-trigger al-trigger-gray" tabindex="0">
-          <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-          <span class="screenreader-only"><%= t('settings', 'Settings') %></span>
-        </a>
+        <div class="inline-block" role=application">
+          <a class="al-trigger al-trigger-gray" role="button" tabindex="0" href="#">
+            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+            <span class="screenreader-only"><%= t('settings', 'Settings') %></span>
+          </a>
 
-        <ul class="al-options">
-          <li><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('links.outdent_item', %{Decrease indent}) %>"><%= @module_item_image_tags['outdent'] %> <%= t('links.outdent', %{Decrease indent}) %></a></li>
-          <li><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('links.indent_item', %{Increase indent}) %>"><%= @module_item_image_tags['indent'] %> <%= t('links.indent', %{Increase indent}) %></a></li>
-          <li><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="edit_item_link edit_link" title="<%= t('links.edit_item_details', %{Edit item details}) %>"><%= @module_item_image_tags['edit'] %> <%= t('links.edit_item', %{Edit}) %></a></li>
-          <li><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('links.remove_item_from_module', %{Remove this item from the module}) %>"><%= @module_item_image_tags['delete'] %> <%= t('links.remove_item', %{Remove}) %></a></li>
-        </ul>
+          <ul class="al-options">
+            <li><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('links.outdent_item', %{Decrease indent}) %>"><%= @module_item_image_tags['outdent'] %> <%= t('links.outdent', %{Decrease indent}) %></a></li>
+            <li><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('links.indent_item', %{Increase indent}) %>"><%= @module_item_image_tags['indent'] %> <%= t('links.indent', %{Increase indent}) %></a></li>
+            <li><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="edit_item_link edit_link" title="<%= t('links.edit_item_details', %{Edit item details}) %>"><%= @module_item_image_tags['edit'] %> <%= t('links.edit_item', %{Edit}) %></a></li>
+            <li><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('links.remove_item_from_module', %{Remove this item from the module}) %>"><%= @module_item_image_tags['delete'] %> <%= t('links.remove_item', %{Remove}) %></a></li>
+          </ul>
+        </div>
       </div>
     <% end %>
   </div>

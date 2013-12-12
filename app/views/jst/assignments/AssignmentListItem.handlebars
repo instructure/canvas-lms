@@ -57,62 +57,65 @@
     <div class="ig-admin">
       <span class="publish-icon" data-view="publish-icon"></span>
 
-      <a
-        class="al-trigger al-trigger-gray"
-        id="assign_{{id}}_manage_link"
-        role="button"
-        aria-haspopup="true"
-        aria-owns="assignment_{{id}}_settings_list"
-        tabindex="0"
-      >
-        <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
-        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-      </a>
+      <div class="inline-block" role="application">
+        <a
+          class="al-trigger al-trigger-gray"
+          id="assign_{{id}}_manage_link"
+          role="button"
+          aria-haspopup="true"
+          aria-owns="assignment_{{id}}_settings_list"
+          tabindex="0"
+          href="#"
+        >
+          <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
+          <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+        </a>
 
-      <ul
-        id="assignment_{{id}}_settings_list"
-        class="al-options"
-        role="menu"
-        tabindex="0"
-        aria-hidden="true"
-        aria-expanded="false"
-        aria-activedescendant="assignment_{{id}}_settings_delete_item"
-      >
-        <li role="presentation">
-          <a
-            href="#"
-            class="edit_assignment icon-edit"
-            id="assignment_{{id}}_settings_edit_item"
-            tabindex="-1"
-            role="menuitem"
-            aria-label="{{#t 'assignment_edit'}}Edit Assignment{{/t}}"
-            data-focus-returns-to="assign_{{id}}_manage_link"
-          >{{#t "edit"}}Edit{{/t}}</a>
-        </li>
-        {{#unless frozen }}
-        <li role="presentation">
-          <a
-            href="#"
-            class="delete_assignment icon-trash"
-            id="assignment_{{id}}_settings_delete_item"
-            tabindex="-1"
-            role="menuitem"
-            aria-label="{{#t 'assignment_delete'}}Delete Assignment{{/t}}"
-          >{{#t "delete"}}Delete{{/t}}</a>
-        </li>
-        {{/unless}}
-        {{#if canMove}}
-        <li role="presentation">
-          <a
-            href="#"
-            class="move_assignment icon-updown"
-            id="assignment_{{id}}_settings_move_item"
-            aria-label='{{#t 'assignment_move'}}Move Assignment{{/t}}'
-            data-focus-returns-to="assign_{{id}}_manage_link"
-          >{{#t "move"}}Move To…{{/t}}</a>
-        </li>
-        {{/if}}
-      </ul>
+        <ul
+          id="assignment_{{id}}_settings_list"
+          class="al-options"
+          role="menu"
+          tabindex="0"
+          aria-hidden="true"
+          aria-expanded="false"
+          aria-activedescendant="assignment_{{id}}_settings_delete_item"
+        >
+          <li role="presentation">
+            <a
+              href="#"
+              class="edit_assignment icon-edit"
+              id="assignment_{{id}}_settings_edit_item"
+              tabindex="-1"
+              role="menuitem"
+              aria-label="{{#t 'assignment_edit'}}Edit Assignment{{/t}}"
+              data-focus-returns-to="assign_{{id}}_manage_link"
+            >{{#t "edit"}}Edit{{/t}}</a>
+          </li>
+          {{#unless frozen }}
+          <li role="presentation">
+            <a
+              href="#"
+              class="delete_assignment icon-trash"
+              id="assignment_{{id}}_settings_delete_item"
+              tabindex="-1"
+              role="menuitem"
+              aria-label="{{#t 'assignment_delete'}}Delete Assignment{{/t}}"
+            >{{#t "delete"}}Delete{{/t}}</a>
+          </li>
+          {{/unless}}
+          {{#if canMove}}
+          <li role="presentation">
+            <a
+              href="#"
+              class="move_assignment icon-updown"
+              id="assignment_{{id}}_settings_move_item"
+              aria-label='{{#t 'assignment_move'}}Move Assignment{{/t}}'
+              data-focus-returns-to="assign_{{id}}_manage_link"
+            >{{#t "move"}}Move To…{{/t}}</a>
+          </li>
+          {{/if}}
+        </ul>
+      </div>
     </div>
 
     <form data-view="edit-assignment" class="form-dialog"></form>

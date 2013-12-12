@@ -62,21 +62,23 @@
         </button>
       </div>
 
-      <button class="al-trigger btn"
-              id="admin-btn"
-              title="<%= t(:more_options, "More options") %>"
-              data-tooltip
-              disabled>
-        <span class="screenreader-only"><%= t(:settings, "Settings") %></span>
-        <i class="icon-settings"></i>
-        <i class="icon-mini-arrow-down"></i>
-      </button>
-      <ul class="al-options" id="admin-menu">
-        <li><a href="#" id="mark-unread-btn"><%= t(:mark_as_unread, "Mark as unread") %></a></li>
-        <li><a href="#" id="mark-read-btn"><%= t(:mark_as_read, "Mark as read") %></a></li>
-        <li><a href="#" id="forward-btn"><%= t(:forward, "Forward") %></a></li>
-        <li><a href="#" id="star-toggle-btn"><%# text set by view %></a></li>
-      </ul>
+      <div class="inline-block" role="application">
+        <button class="al-trigger btn"
+                id="admin-btn"
+                title="<%= t(:more_options, "More options") %>"
+                data-tooltip
+                disabled>
+          <span class="screenreader-only"><%= t(:settings, "Settings") %></span>
+          <i class="icon-settings"></i>
+          <i class="icon-mini-arrow-down"></i>
+        </button>
+        <ul class="al-options" id="admin-menu">
+          <li><a href="#" id="mark-unread-btn"><%= t(:mark_as_unread, "Mark as unread") %></a></li>
+          <li><a href="#" id="mark-read-btn"><%= t(:mark_as_read, "Mark as read") %></a></li>
+          <li><a href="#" id="forward-btn"><%= t(:forward, "Forward") %></a></li>
+          <li><a href="#" id="star-toggle-btn"><%# text set by view %></a></li>
+        </ul>
+      </div>
     </div>
 
     <div id="sending-message" class="badge badge-info" aria-live="polite">
@@ -84,7 +86,7 @@
       <div id="sending-spinner"></div>
     </div>
 
-    <div class="admin-link pull-right">
+    <div class="admin-link pull-right" role="application">
       <a id="help-btn"
          class="al-trigger help-btn"
          href="#"

@@ -24,20 +24,22 @@
   <div class="ig-admin">
     <span data-view="publish-icon" class="publish-icon"></span>
 
-    <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="ui-id-{{id}}-1" href="#">
-      <i class="icon-settings"></i>
-      <i class="icon-mini-arrow-down"></i>
-      <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
-    </a>
+    <div class="inline-block" role="application">
+      <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="ui-id-{{id}}-1" href="#">
+        <i class="icon-settings"></i>
+        <i class="icon-mini-arrow-down"></i>
+        <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
+      </a>
 
-    <ul id="ui-id-{{id}}-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="ui-id-{{id}}-2">
-      <li role="presentation">
-        <a href="{{edit_url}}" id="ui-id-{{id}}-2" class="icon-edit" tabindex="-1" role="menuitem" title='{{#t "title_edit"}}Edit Quiz{{/t}}'>{{#t "links.edit"}}Edit{{/t}}</a>
-      </li>
-      <li role="presentation">
-        <a href="{{url}}" id="ui-id-{{id}}-3" class="delete-item icon-trash" tabindex="-1" role="menuitem" title='{{#t "title_delete"}}Delete Quiz{{/t}}'>{{#t "links.delete"}}Delete{{/t}}</a>
-      </li>
-    </ul>
+      <ul id="ui-id-{{id}}-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="ui-id-{{id}}-2">
+        <li role="presentation">
+          <a href="{{edit_url}}" id="ui-id-{{id}}-2" class="icon-edit" tabindex="-1" role="menuitem" title='{{#t "title_edit"}}Edit Quiz{{/t}}'>{{#t "links.edit"}}Edit{{/t}}</a>
+        </li>
+        <li role="presentation">
+          <a href="{{url}}" id="ui-id-{{id}}-3" class="delete-item icon-trash" tabindex="-1" role="menuitem" title='{{#t "title_delete"}}Delete Quiz{{/t}}'>{{#t "links.delete"}}Delete{{/t}}</a>
+        </li>
+      </ul>
+    </div>
   </div>
   {{/if}}
 </div>
