@@ -27,6 +27,7 @@ class AssignmentGroup < ActiveRecord::Base
 
   has_many :assignments, :order => 'position, due_at, title', :dependent => :destroy
   has_many :active_assignments, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted'], :order => 'assignments.position, assignments.due_at, assignments.title'
+  has_many :published_assignments, :class_name => 'Assignment', :conditions => "assignments.workflow_state = 'published'", :order => 'assignments.position, assignments.due_at, assignments.title'
 
   belongs_to :context, :polymorphic => true
   validates_presence_of :context_id, :context_type, :workflow_state

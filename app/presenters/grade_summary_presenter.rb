@@ -84,14 +84,14 @@ class GradeSummaryPresenter
 
   def groups
     @groups ||= @context.assignment_groups.
-      active.includes(:active_assignments => :assignment_overrides).all
+      active.includes(relevant_assignments_scope => :assignment_overrides).all
   end
 
   def assignments
     @assignments ||= begin
       group_index = groups.index_by(&:id)
 
-      groups.flat_map(&:active_assignments).select { |a|
+      groups.flat_map(&relevant_assignments_scope).select { |a|
         a.submission_types != 'not_graded'
       }.map { |a|
         # prevent extra loads
@@ -101,6 +101,10 @@ class GradeSummaryPresenter
         a.overridden_for(student)
       }.sort
     end
+  end
+
+  def relevant_assignments_scope
+   @context.feature_enabled?(:draft_state) ? :published_assignments : :active_assignments
   end
 
   def submissions
