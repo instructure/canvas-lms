@@ -107,7 +107,8 @@ def truncate_all_tables
   models_by_connection = ActiveRecord::Base.all_models.group_by { |m| m.connection }
   models_by_connection.each do |connection, models|
     if connection.adapter_name == "PostgreSQL"
-      connection.execute("TRUNCATE TABLE #{models.map(&:table_name).map { |t| connection.quote_table_name(t) }.join(',')}")
+      table_names = connection.tables & models.map(&:table_name)
+      connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
     else
       models.each { |model| truncate_table(model) }
     end
