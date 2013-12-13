@@ -48,6 +48,7 @@ define [
     toJSON: ->
       json = @model.present()
       _.extend {},
+        ENV,
         json,
         enable_self_signup: json.self_signup
         restrict_self_signup: json.self_signup is 'restricted'

@@ -58,7 +58,6 @@ module Canvas
 
       def paths(cache_busting = false)
         @paths ||= {
-          :ember => 'vendor/ember/ember',
           :common => 'compiled/bundles/common',
           :jqueryui => 'vendor/jqueryui',
           :use => 'vendor/use',
@@ -92,13 +91,19 @@ module Canvas
       def shims
         <<-JS.gsub(%r{\A +|^ {8}}, '')
           {
+            'bower/ember/ember': {
+              deps: ['jquery', 'handlebars'],
+              attach: 'Ember'
+            },
+            'bower/handlebars/handlebars.runtime': {
+              attach: 'Handlebars'
+            },
             'vendor/backbone': {
               deps: ['underscore', 'jquery'],
               attach: function(_, $){
                 return Backbone;
               }
             },
-        
             // slick grid shim
             'vendor/slickgrid/lib/jquery.event.drag-2.2': {
               deps: ['jquery'],

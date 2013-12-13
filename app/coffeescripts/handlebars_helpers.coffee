@@ -1,6 +1,6 @@
 define [
   'compiled/util/enrollmentName'
-  'vendor/handlebars.vm'
+  'handlebars'
   'i18nObj'
   'jquery'
   'underscore'
@@ -390,6 +390,4 @@ define [
       return context._uniqid_
   }
 
-  # not a function helper, just a way to make ENV available in any scope
-  Handlebars.helpers.ENV = @ENV
   return Handlebars

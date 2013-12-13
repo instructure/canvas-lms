@@ -219,6 +219,7 @@ define [
       else
         @options
       json.cid = @cid
+      json.ENV = window.ENV if window.ENV?
       json
 
     ##

@@ -41,4 +41,5 @@ define [
         super,
         num_groups: '<input name="create_group_count" type="number" min="0" class="input-micro" value="0">'
         split_num: '<input name="split_group_count" type="number" min="0" class="input-micro">'
+        ENV: ENV
 

@@ -72,6 +72,7 @@ define [
 
     toJSON: ->
       count: @model.usersCount()
+      ENV: ENV
 
     renderItem: (model) =>
       super

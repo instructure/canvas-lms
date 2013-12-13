@@ -131,6 +131,7 @@ define [
       base.display_last_reply_at = I18n.l "#date.formats.medium", base.last_reply_at
       if base.assignment?.due_at?
         base.assignment.display_due_at = I18n.l "#date.formats.medium", base.assignment.due_at
+      base.ENV = ENV
       base
 
     # Internal: Add event handlers to the model.

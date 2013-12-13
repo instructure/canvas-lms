@@ -94,5 +94,6 @@ define [
 
     toJSON: ->
       json = @model.present()
+      json.ENV = ENV
       json
 

@@ -76,7 +76,7 @@ class Handlebars
       dependencies << "i18n!#{scope}" if prepared[:keys].size > 0
 
       # take care of `require`ing partials
-      partials = context.call("findPartialDeps", prepared[:content]).uniq
+      partials = find_partial_deps(prepared[:content])
       partials.each do |partial|
         split = partial.split /\//
         split[-1] = "_#{split[-1]}"
@@ -126,36 +126,15 @@ JS
       @context ||= self.set_context
     end
 
+    def find_partial_deps(template)
+      # finds partials like: {{>foo bar}} and {{>[foo/bar] baz}}
+      template.scan(/\{\{>\s?\[?(.+?)\]?( .*?)?}}/).map {|m| m[0].strip }.uniq
+    end
+
     # Compiles and caches the handlebars JavaScript
     def set_context
-      handlebars_source = File.read(File.dirname(__FILE__) + '/vendor/handlebars.js')
-      find_partial_deps_fn = """
-        function findPartialDeps( source ) {
-          var nodes = Handlebars.parse(source);
-
-          function recursiveNodeSearch( statements, res ) {
-            statements.forEach(function ( statement ) {
-              if ( statement && statement.type === 'partial' ) {
-                  res.push(statement.id.string);
-              }
-              if ( statement && statement.program && statement.program.statements ) {
-                recursiveNodeSearch( statement.program.statements, res );
-              }
-              if ( statement && statement.program && statement.program.inverse && statement.program.inverse.statements ) {
-                recursiveNodeSearch( statement.program.inverse.statements, res );
-              }
-            });
-            return res;
-          }
-
-          var res   = [];
-          if ( nodes && nodes.statements ) {
-            res = recursiveNodeSearch( nodes.statements, [] );
-          }
-          return res;
-        }
-      """
-      @context = ExecJS.compile handlebars_source + find_partial_deps_fn
+      handlebars_source = File.read(Rails.root.join('public/javascripts/bower/handlebars/handlebars.js'))
+      @context = ExecJS.compile handlebars_source
     end
   end
 end
