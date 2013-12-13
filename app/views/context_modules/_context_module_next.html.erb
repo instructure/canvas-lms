@@ -57,9 +57,6 @@
         <i class="icon-lock locked_icon"><span class="screenreader-only"><%= t('images.title.locked', "Module Locked") %></span></i>
       </span>
 
-      <span class="unlock_at">
-        <span class="unlock_at_text"><%= datetime_string(context_module.try_rescue(:unlock_at)) || nbsp %></span>
-      </span>
       <% if editable %>
         <span
           data-module-type="module"
