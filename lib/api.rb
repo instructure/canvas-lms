@@ -310,12 +310,12 @@ module Api
 
       if ["Course", "Group", "Account", "User"].include?(obj.context_type)
         if match.rest.start_with?("/preview")
-          url = self.send("#{obj.context_type.downcase}_file_preview_url", obj.context_id, obj.id, :verifier => obj.uuid, :host => host, :protocol => protocol)
+          url = self.send("#{obj.context_type.downcase}_file_preview_url", obj.context_id, obj.id, :verifier => obj.uuid, :only_path => true)
         else
-          url = self.send("#{obj.context_type.downcase}_file_download_url", obj.context_id, obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
+          url = self.send("#{obj.context_type.downcase}_file_download_url", obj.context_id, obj.id, :verifier => obj.uuid, :download => '1', :only_path => true)
         end
       else
-        url = file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
+        url = file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :only_path => true)
       end
       url
     end
