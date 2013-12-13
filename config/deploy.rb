@@ -1,7 +1,6 @@
 # encoding: utf-8
 require "bundler/capistrano"
 set :stages,        %w(production staging testing vm cuttingedge)
-set :default_stage, "testing"
 require "capistrano/ext/multistage"
 
 set :application,   "canvas"
