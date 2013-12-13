@@ -209,6 +209,36 @@ describe "manage groups" do
       fj(".group-summary:visible:first").text.should == "1 student"
       fj(".group-summary:visible:last").text.should == "0 students"
     end
+
+    it "should give a teacher the option to assign unassigned students to groups" do
+      group_category, _ = create_categories(@course, 1)
+      group, _ = add_groups_in_category(group_category, 1)
+      student_in_course
+      get "/courses/#{@course.id}/groups"
+      wait_for_ajaximations
+
+      actions_button = "#group-category-#{group_category.id}-actions"
+      message_users = ".al-options .message-all-unassigned"
+      randomly_assign_users = ".al-options .randomly-assign-members"
+
+      # category menu should show unassigned-member options
+      fj(actions_button).click
+      wait_for_ajaximations
+      fj([actions_button, message_users].join(" + ")).should be
+      fj([actions_button, randomly_assign_users].join(" + ")).should be
+
+      # assign the last unassigned member
+      draggable_user = fj(".unassigned-students .group-user:first")
+      droppable_group = fj(".group[data-id=\"#{group.id}\"]")
+      drag_and_drop_element draggable_user, droppable_group
+      wait_for_ajaximations
+
+      # now the menu should not show unassigned-member options
+      fj(actions_button).click
+      wait_for_ajaximations
+      fj([actions_button, message_users].join(" + ")).should be_nil
+      fj([actions_button, randomly_assign_users].join(" + ")).should be_nil
+    end
   end
 
   # TODO: Remove this whole section after new UI becomes default

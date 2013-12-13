@@ -77,7 +77,11 @@ define [
     canAssignUnassignedMembers: ->
       @groupsCount() > 0 and
         not @get('allows_multiple_memberships') and
-        @get('self_signup') isnt 'restricted'
+        @get('self_signup') isnt 'restricted' and
+        @unassignedUsersCount() > 0
+
+    canMessageUnassignedMembers: ->
+      @unassignedUsersCount() > 0 and not ENV.IS_LARGE_ROSTER
 
     assignUnassignedMembers: ->
       $.ajaxJSON "/api/v1/group_categories/#{@id}/assign_unassigned_members", 'POST', {}, @setUpProgress
