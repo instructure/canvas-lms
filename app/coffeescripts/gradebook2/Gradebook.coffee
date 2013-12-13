@@ -782,6 +782,7 @@ define [
         resizable: false
         sortable: true
         formatter: @htmlContentFormatter
+      },
       # SFU MOD CANVAS-188 Add SIS ID column
       {
         id: 'sis_id'
