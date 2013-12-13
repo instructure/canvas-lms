@@ -1634,10 +1634,22 @@ describe User do
         # user instead of failing.
         expect do
           events = @user.upcoming_events(:end_at => 1.week.from_now)
-        end.to_not raise_error 
+        end.to_not raise_error
 
         events.first.should == assignment2
         events.second.should == assignment
+      end
+
+      it "doesn't show unpublished assignments if draft_state is enabled" do
+        course_with_teacher_logged_in(:active_all => true)
+        @course.enable_feature!(:draft_state)
+        assignment = @course.assignments.create!(:title => "not published", :due_at => 1.days.from_now)
+        assignment.unpublish
+        assignment2 = @course.assignments.create!(:title => "published", :due_at => 1.days.from_now)
+        assignment2.publish
+        events = []
+        events = @user.upcoming_events(:end_at => 1.week.from_now)
+        events.first.should == assignment2
       end
 
     end
@@ -1742,6 +1754,24 @@ describe User do
         @quiz.save!
         @student.assignments_needing_submitting(:contexts => [@course]).count.should == 0
       end
+    end
+
+    it "should not include unpublished assignments when draft_state is enabled" do
+      course_with_student_logged_in(:active_all => true)
+      @course.enable_feature!(:draft_state)
+      assignment_quiz([], :course => @course, :user => @user)
+      @assignment.unpublish
+      @quiz.unlock_at = 1.hour.ago
+      @quiz.lock_at = nil
+      @quiz.due_at = 2.days.from_now
+      @quiz.save!
+      assignment_quiz([], :course => @course, :user => @user)
+      @quiz.unlock_at = 1.hour.ago
+      @quiz.lock_at = nil
+      @quiz.due_at = 2.days.from_now
+      @quiz.save!
+
+      @student.assignments_needing_submitting(:contexts => [@course]).count.should == 1
     end
   end
 
