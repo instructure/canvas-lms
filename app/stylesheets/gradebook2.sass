@@ -168,7 +168,7 @@ $cell_height: 33px
   color: #fff
   +border-radius(3px)
   padding: 5px 10px
-  z-index: 5
+  z-index: 7
   position: absolute
   font-size: 0.8em
   left: 0
@@ -182,17 +182,17 @@ $cell_height: 33px
     width: 0
     left: 15px
     content: ""
-
-  // make the tooltips for the top row pop-under so they fit in the grid
-  .slick-row[row="0"] &
-    bottom: -30px
-    top: auto
-    &:after
-      border-width: 0 5px 5px
-      bottom: auto
-      top: -5px
   .slick-cell.hover &, .gradebook-cell.focus &, .slick-cell.selected &
     display: block
+  &.first-row
+    top: 30px
+    &:after
+      border-top-color: transparent
+      border-left-color: transparent
+      border-right-color: transparent
+      border-bottom: 5px solid #444
+      bottom: 30px
+
 .slick-cell.completely-hidden
   display: none
 
@@ -283,6 +283,7 @@ $cell_height: 33px
   box-shadow: 0 0 5px rgba(81, 203, 238, 1)
 
 #gradebook_grid .slick-cell
+  z-index: auto
   &.active
     background-color: inherit
     z-index: 5

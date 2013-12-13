@@ -578,8 +578,12 @@ define [
           'mouseleave.gradebook focusout.gradebook' : @unhighlightColumns
           'mouseenter focusin' : (event) ->
             grid.find('.hover, .focus').removeClass('hover focus')
+            if $(this).parent().css('top') == '0px'
+              $(this).find('div.gradebook-tooltip').addClass('first-row')
             $(this).addClass (if event.type == 'mouseenter' then 'hover' else 'focus')
-          'mouseleave focusout' : -> $(this).removeClass('hover focus')
+          'mouseleave focusout' : (event) ->
+            $(this).removeClass('hover focus')
+            $(this).find('div.gradebook-tooltip').removeClass('first-row')
         .delegate '.gradebook-cell-comment', 'click.gradebook', (event) =>
           event.preventDefault()
           data = $(event.currentTarget).data()
