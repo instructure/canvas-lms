@@ -1422,7 +1422,7 @@ class User < ActiveRecord::Base
 
           result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
             Assignment.for_course(shard_course_ids).
-              active.
+              published.
               due_between_with_overrides(due_after,1.week.from_now).
               not_ignored_by(self, 'submitting').
               expecting_submission.
@@ -1877,7 +1877,7 @@ class User < ActiveRecord::Base
 
     events = CalendarEvent.active.for_user_and_context_codes(self, context_codes).between(now, opts[:end_at]).limit(opts[:limit]).reject(&:hidden?)
     events += select_upcoming_assignments(Assignment.
-        active.
+        published.
         for_context_codes(context_codes).
         due_between_with_overrides(now, opts[:end_at]).
         include_submitted_count.
