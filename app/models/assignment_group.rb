@@ -43,7 +43,9 @@ class AssignmentGroup < ActiveRecord::Base
   after_save :update_student_grades
 
   def generate_default_values
-    self.name ||= t 'default_title', "Assignments"
+    if self.name == "" || self.name.nil?
+      self.name = t 'default_title', "Assignments"
+    end
     if !self.group_weight
       self.group_weight = 0
     end

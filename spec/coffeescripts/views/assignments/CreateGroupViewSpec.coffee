@@ -93,7 +93,6 @@ define [
     ok errors
     equal _.keys(errors).length, 2
 
-
   test 'it should only allow less than the number of assignments for drop rules', ->
     view = createView()
     assignments = view.assignmentGroup.get('assignments')
@@ -101,6 +100,17 @@ define [
     data =
       rules:
         drop_highest: 5
+
+    errors = view.validateFormData(data)
+    ok errors
+    equal _.keys(errors).length, 1
+
+  test 'it should not allow assignment groups with no name', ->
+    view = createView()
+    assignments = view.assignmentGroup.get('assignments')
+
+    data =
+      name: ""
 
     errors = view.validateFormData(data)
     ok errors
