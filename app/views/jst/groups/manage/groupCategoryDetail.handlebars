@@ -8,13 +8,13 @@
         <span class="screenreader-only">{{#t "category_settings"}}Settings{{/t}}</span>
       </a>
       <ul class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
-        {{#unless ENV.IS_LARGE_ROSTER}}
+        {{#if canMessageMembers}}
            <li>
              <a href="#" class="icon-email message-all-unassigned" data-focus-returns-to="group-category-{{id}}-actions">
                {{#t "message_all_unassigned_option"}}Message All Unassigned Students{{/t}}
              </a>
            </li>
-        {{/unless}}
+        {{/if}}
         {{#if canAssignMembers}}
           <li>
             <a href="#" class="icon-user randomly-assign-members" data-focus-returns-to="group-category-{{id}}-actions">

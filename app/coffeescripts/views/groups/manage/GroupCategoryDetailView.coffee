@@ -46,6 +46,7 @@ define [
 
     toJSON: ->
       json = super
+      json.canMessageMembers = @model.canMessageUnassignedMembers()
       json.canAssignMembers = @model.canAssignUnassignedMembers()
       json
 
