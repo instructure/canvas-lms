@@ -27,9 +27,7 @@ define [
       revertDuration: 150
       start: (event, ui) ->
         # hide AssignToGroupMenu (original and helper)
-        $(event.currentTarget).find('.assign-to-group-menu').hide()
-        $(ui.helper).find('.assign-to-group-menu').hide()
-        $(ui.helper).width($(event.currentTarget).width())
+        $('.assign-to-group-menu').hide()
 
     initialize: ->
       super
@@ -84,7 +82,18 @@ define [
     _initDrag: (view) =>
       view.$el.draggable(_.extend({}, @dragOptions))
       view.$el.on 'dragstart', (event, ui) ->
-        ui.helper.css 'maxWidth', view.$el.width()
+        ui.helper.css 'width', view.$el.width()
+
+        containment = [
+          0                                                # left
+          0                                                # top
+          $(window).width() - ui.helper.outerWidth(true)   # right
+          $(window).height() - ui.helper.outerHeight(true) # bottom
+        ]
+        # Setting :containment to 'document' doesn't work; it seems to be 
+        # thrown off by the dynamically set width of ui.helper.
+        $(event.target).draggable 'option', 'containment', containment
+        $(event.target).data('draggable')._setContainment()
 
     removeItem: (model) =>
       model.view.remove()
