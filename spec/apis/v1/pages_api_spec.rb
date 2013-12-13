@@ -658,6 +658,18 @@ describe "Pages API", :type => :integration do
             @test_page.hide_from_students.should be_true
           end
 
+          it 'should not set hide_from_students to nil' do
+            json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@test_page.url}",
+                            { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param, :url => @test_page.url },
+                            { :wiki_page => {'hide_from_students' => nil} })
+            json['published'].should be_true
+            json['hide_from_students'].should be_false
+
+            @test_page.reload
+            @test_page.should be_active
+            @test_page.hide_from_students.should be_false
+          end
+
           it 'should ignore published' do
             json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@test_page.url}",
                      { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param, :url => @test_page.url },
