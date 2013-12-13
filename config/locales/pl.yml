@@ -6201,7 +6201,7 @@ pl:
       do pojedynczej domeny. Uczestnicy podejmujący próbę przesłania
       zadań lub
       dołączenia do projektu w niezatwierdzonej domenie otrzymają komunikat o błędzie informujący ich
-      o konieczności aktualizacji swojej integracji Google Docs.
+      o konieczności odnowienia swojej integracji Google Docs.
   gradebook: 
     alerts: 
       no_active_students: "Niestety nie ma żadnych aktywnych uczestników dla tego kursu lub nie oceniasz żadnego z uczestników."
@@ -6358,7 +6358,7 @@ pl:
     keyboard_close_menu: "Zamknij aktywne menu zadania"
     keyboard_comment_desc: "Skomentuj aktywne przesłane zadanie"
     keyboard_menu_desc: "Otwórz menu dla aktywnego zadania w kolumnie"
-    keyboard_sort_desc: "Sortuj sieć w bieżącej, aktywnej kolumnie"
+    keyboard_sort_desc: "Sortuj siatkę w bieżącej, aktywnej kolumnie"
     keycodes: 
       close_menu: esc
       comment: c
@@ -11003,7 +11003,7 @@ pl:
       few: "Liczba punktów: %{count}"
       one: "Liczba punktów: %{count}"
       other: "Liczba punktów: %{count}"
-    assignments_label: "Zadania w formie testu, przełącz widoczność testu"
+    assignments_label: "Zadania w formie testu, przełącz wyświetlanie testu"
     buttons: 
       add_selected_questions: "Dodaj zaznaczone pytania"
       adding_questions: "Trwa dodawanie pytań..."
@@ -11569,7 +11569,7 @@ pl:
         one: "Pomyślnie cofnięto publikację następującej liczby testów: %{count} "
         other: "Pomyślnie cofnięto publikację następującej liczby testów: %{count} "
     practice_quiz: "Test próbny"
-    practices_label: "Testy próbne, przełącz widoczność testu"
+    practices_label: "Testy próbne, przełącz wyświetlanie testu"
     question_colon: "Pytanie:"
     question_count: 
       few: "Liczba pytań: %{count}"
@@ -11900,7 +11900,7 @@ pl:
       regraded: "Ponownie oceniony"
       score: "Wynik punktowy"
       time: Godzina
-    surveys_label: "Ankiety, przełącz widoczność testu"
+    surveys_label: "Ankiety, przełącz wyświetlanie testu"
     take_quiz: 
       buttons: 
         next: Dalej
@@ -12140,7 +12140,7 @@ pl:
       view_all_grades: "Pokaż wszystkie oceny"
       view_analytics: "Zobacz strony Analityki"
       view_error_reports: "Pokaż raporty o błędach"
-      view_grade_changes: "Pokaż dzienniki ze zmienioną oceną"
+      view_grade_changes: "Pokaż dzienniki zmian ocen"
       view_group_pages: "Pokaż strony grup wszystkich grup uczestników"
       view_jobs: "Pokaż zadania wykonywane w tle"
       view_notifications: "Pokaż powiadomienia"
@@ -12815,7 +12815,7 @@ pl:
     rubric_criterion: 
       defaults: 
         description: "Opis kryterium"
-      delete_criterion_row: "Usuń rząd kryterium"
+      delete_criterion_row: "Usuń rząd z kryteriami"
       description: 
         custom_comments_area: "Obszar służy oceniającemu do umieszczania komentarzy dotyczących tego kryterium."
       full_marks: "Pełne oceny"
