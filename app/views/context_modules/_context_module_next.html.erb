@@ -5,7 +5,7 @@
   published_status = context_module && context_module.published? ? 'published' : 'unpublished'
   @modules ||= []
 %>
-<% cache_if_module(context_module, editable) do %>
+<% cache_if_module(context_module, editable, true) do %>
 
 <div
   class="item-group-condensed context_module

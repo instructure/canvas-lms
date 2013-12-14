@@ -3,7 +3,7 @@
   workflow_state = context_module && context_module.workflow_state
   @modules ||= []
 %>
-<% cache_if_module(context_module, editable) do %>
+<% cache_if_module(context_module, editable, false) do %>
 
   <div class="context_module bordered <%= 'unpublished_module' if workflow_state == "unpublished" %> <%= 'editable_context_module' if editable %>" tabindex="0" aria-label="<%= context_module ? context_module.name : "" %>" data-workflow-state="<%= context_module ? context_module.workflow_state : "{{ workflow_state }}"%>" data-module-url="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>" data-module-id="<%= context_module ? context_module.id : "{{ id }}" %>" id="context_module_<%= context_module ? context_module.id : "blank" %>" style="<%= hidden unless context_module %>">
   <a name="module_<%= context_module.id if context_module %>"></a>
