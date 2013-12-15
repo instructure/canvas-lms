@@ -34,9 +34,6 @@ define [
       options.unassignedUsersView ?= @unassignedUsersView(options)
       if progress = @model.get('progress')
         @model.progressModel.set progress
-        @randomlyAssignStudentsInProgress = true
-      else if @model.get('progress_url') or @model.progressStarting
-        @randomlyAssignStudentsInProgress = true
       super
 
     groupsView: (options) ->
@@ -66,13 +63,11 @@ define [
 
       @model.progressModel.on 'change:url', =>
         @model.progressModel.set({'completion': 0})
-        @randomlyAssignStudentsInProgress = true
       @model.progressModel.on 'change', @render
       @model.on 'progressResolved', =>
         @model.fetch success: =>
           @model.groups().fetch()
           @model.unassignedUsers().fetch()
-          @randomlyAssignStudentsInProgress = false
           @render()
 
     afterRender: ->
@@ -97,6 +92,5 @@ define [
 
     toJSON: ->
       json = @model.present()
-      json.randomlyAssignStudentsInProgress = @randomlyAssignStudentsInProgress
       json
 

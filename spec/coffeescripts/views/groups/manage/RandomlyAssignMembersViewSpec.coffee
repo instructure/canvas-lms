@@ -3,6 +3,7 @@ define [
   'compiled/views/groups/manage/GroupCategoryView'
   'compiled/views/groups/manage/RandomlyAssignMembersView'
   'compiled/models/GroupCategory'
+  'helpers/fakeENV'
 ], (_, GroupCategoryView, RandomlyAssignMembersView, GroupCategory) ->
 
   server = null
