@@ -10,6 +10,9 @@ define [
     template: template
     className: "form-dialog group-category-create"
 
+    messages:
+      positive_group_count: I18n.t('positive_group_count', 'Must enter a positive group count')
+
     defaults:
       width: 600
       height: if ENV.allow_self_signup then 460 else 310
@@ -22,7 +25,7 @@ define [
 
     events: _.extend {},
       GroupCategoryEditView::events
-      'click [name=split_group_count]': 'clickSplitGroupCount'
+      'click .admin-signup-controls [name=create_group_count]': 'clickSplitGroups'
 
     toggleSelfSignup: ->
       enabled = @$selfSignupToggle.prop('checked')
@@ -31,7 +34,7 @@ define [
       @$selfSignupControls.find(':input').prop 'disabled', !enabled
       @$adminSignupControls.find(':input').prop 'disabled', enabled
 
-    clickSplitGroupCount: (e) ->
+    clickSplitGroups: (e) ->
       # firefox doesn't like multiple inputs in the same label, so a little js to the rescue
       e.preventDefault()
       @$splitGroups.click()
@@ -40,6 +43,14 @@ define [
       _.extend {},
         super,
         num_groups: '<input name="create_group_count" type="number" min="0" class="input-micro" value="0">'
-        split_num: '<input name="split_group_count" type="number" min="0" class="input-micro">'
         ENV: ENV
 
+    ##
+    # client side validation
+    validateFormData: (data) ->
+      errors = {}
+      if data.split_groups is '1'
+        create_group_count = parseInt(data.create_group_count)
+        unless create_group_count > 0
+          errors["create_group_count"] = [{type: 'positive_group_count', message: @messages.positive_group_count}]
+      errors

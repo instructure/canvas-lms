@@ -443,27 +443,22 @@ class GroupCategoriesController < ApplicationController
   end
 
   def populate_group_category_from_params
-    if api_request?
-      args = params
-    else
-      args = params[:category]
-    end
+    args = api_request? ? params : params[:category]
     name = args[:name] || @group_category.name
     enable_self_signup = value_to_boolean args[:enable_self_signup]
     restrict_self_signup = value_to_boolean args[:restrict_self_signup]
     @group_category.name = name
     @group_category.configure_self_signup(enable_self_signup, restrict_self_signup)
     if @context.is_a?(Course)
-      @group_category.create_group_count = args[:create_group_count].to_i
-      # TODO: kill this in a subsequent API version
-      split_group_count = args[:split_groups] != '0' ? args[:split_group_count].to_i : 0
-      if split_group_count > 0 && !@group_category.self_signup
-        @group_category.create_group_count = split_group_count
-        @group_category.assign_unassigned_members = true
+      if @group_category.self_signup
+        @group_category.create_group_count = args[:create_group_count].to_i
+      elsif args[:split_groups] != '0'
+        @group_category.create_group_count = args[:split_group_count] ? args[:split_group_count].to_i : args[:create_group_count].to_i
+        @group_category.assign_unassigned_members = true if @group_category.create_group_count
       end
     end
     @group_category.group_limit = args[:group_limit]
-    if !@group_category.save
+    unless @group_category.save
       render :json => @group_category.errors, :status => :bad_request
       return false
     end
