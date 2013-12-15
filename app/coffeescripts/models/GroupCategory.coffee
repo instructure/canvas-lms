@@ -106,9 +106,7 @@ define [
       data
 
     toJSON: ->
-      data = _.omit(super, 'self_signup', 'split_group_count')
-      data.create_group_count ?= @get('split_group_count') if @get('split_groups')
-      data
+      _.omit(super, 'self_signup')
 
     @mixin DefaultUrlMixin
 

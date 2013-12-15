@@ -192,7 +192,11 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def distribute_members_among_groups(members, groups)
-    return [] if groups.empty? || members.empty?
+    if groups.empty? || members.empty?
+      complete_progress
+      return []
+    end
+
     ##
     # new memberships to be returned
     new_memberships = []
@@ -346,8 +350,8 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def auto_create_groups
-    create_groups(@create_group_count) if @create_group_count && @create_group_count > 0
-    assign_unassigned_members if @assign_unassigned_members
+    create_groups(@create_group_count) if @create_group_count
+    assign_unassigned_members if @assign_unassigned_members && @create_group_count
     @create_group_count = @assign_unassigned_members = nil
   end
 
