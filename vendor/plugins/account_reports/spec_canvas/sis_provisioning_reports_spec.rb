@@ -477,6 +477,7 @@ describe "Default Account Reports" do
       end
 
       it "should run the SIS report with sis term and deleted courses" do
+        @course1.complete
         parameters = {}
         parameters["enrollment_term_id"] = "sis_term_id:fall12"
         parameters["include_deleted"] = true
@@ -485,7 +486,7 @@ describe "Default Account Reports" do
 
         parsed.length.should == 2
         parsed[0].should == [@course1.sis_source_id,@course1.course_code,@course1.name,
-                             @sub_account.sis_source_id,@term1.sis_source_id,"active",
+                             @sub_account.sis_source_id,@term1.sis_source_id,"completed",
                              @course1.start_at.iso8601,@course1.conclude_at.iso8601]
         parsed[1].should == ["SIS_COURSE_ID_5","ENG101","Sd Math 100","sub1",
                              "fall12","deleted",nil,nil]
