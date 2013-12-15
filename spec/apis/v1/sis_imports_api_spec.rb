@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -438,4 +438,44 @@ describe SisImportsApiController, :type => :integration do
     SisBatch.count.should == 0
   end
 
+  it "should list sis imports for an account" do
+    @user = user_with_pseudonym :active_all => true
+    user_session @user
+    @account = Account.create(name: 'sis account')
+    @account.allow_sis_import = true
+    @account.save!
+    @account.add_user(@user, 'AccountAdmin')
+    batch = post_csv(
+      "account_id,parent_account_id,name,status",
+      "A001,,TestAccount,active"
+    )
+
+    run_jobs
+    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { :controller => 'sis_imports_api', :action => 'index',
+                      :format => 'json', :account_id => @account.id.to_s })
+
+    json["sis_imports"].first.delete("created_at")
+    json["sis_imports"].first.delete("updated_at")
+    json["sis_imports"].first.delete("ended_at")
+
+    json.should ==  {"sis_imports"=>[{
+                      "data" => { "import_type" => "instructure_csv",
+                                  "supplied_batches" => ["account"],
+                                  "counts" => { "abstract_courses" => 0,
+                                                "courses" => 0,
+                                                "sections" => 0,
+                                                "accounts" => 1,
+                                                "enrollments" => 0,
+                                                "grade_publishing_results" => 0,
+                                                "users" => 0,
+                                                "xlists" => 0,
+                                                "groups" => 0,
+                                                "group_memberships" => 0,
+                                                "terms" => 0, }},
+                      "progress" => 100,
+                      "id" => batch.id,
+                      "workflow_state"=>"imported" }]
+    }
+  end
 end

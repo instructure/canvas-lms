@@ -547,7 +547,7 @@ routes.draw do
 
     match 'avatars' => 'accounts#avatars', :as => :avatars
     match 'sis_import' => 'accounts#sis_import', :as => :sis_import, :via => :get
-    resources :sis_imports, :only => [:create, :show], :controller => :sis_imports_api
+    resources :sis_imports, :only => [:create, :show, :index], :controller => :sis_imports_api
     match 'users' => 'users#create', :as => :add_user, :via => :post
     match 'users/:user_id/delete' => 'accounts#confirm_delete_user', :as => :confirm_delete_user
     match 'users/:user_id' => 'accounts#remove_user', :as => :delete_user, :via => :delete
@@ -1028,6 +1028,7 @@ routes.draw do
     scope(:controller => :sis_imports_api) do
       post 'accounts/:account_id/sis_imports', :action => :create
       get 'accounts/:account_id/sis_imports/:id', :action => :show
+      get 'accounts/:account_id/sis_imports', :action => :index
     end
 
     scope(:controller => :users) do
