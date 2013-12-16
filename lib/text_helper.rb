@@ -477,7 +477,7 @@ def self.date_component(start_date, style=:normal)
     result = RDiscount.new(string).to_html.strip
     # Strip wrapping <p></p> if inlinify == :auto && they completely wrap the result && there are not multiple <p>'s
     result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>.*<\/p>\z/m && !(result =~ /.*<p>.*<p>.*/m)
-    result.html_safe.strip
+    result.strip.html_safe
   end
 
   # This doesn't make any attempt to convert other encodings to utf-8, it just
