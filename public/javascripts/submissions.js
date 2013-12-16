@@ -186,6 +186,9 @@ define([
           }
         }
         if(!found) {
+          if (!data.rubric_assessment) {
+            data = { rubric_assessment: data };
+          }
           rubricAssessments.push(data);
           var $option = $(document.createElement('option'));
           $option.val(assessment.id).text(assessment.assessor_name).attr('id', 'rubric_assessment_option_' + assessment.id);
