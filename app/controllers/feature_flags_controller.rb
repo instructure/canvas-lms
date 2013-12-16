@@ -197,7 +197,7 @@ class FeatureFlagsController < ApplicationController
       end
 
       # create or update flag
-      new_flag = current_flag if current_flag && !current_flag.default? && current_flag.context_type == @context.class.name && current_flag.context_id = @context.id
+      new_flag = current_flag if current_flag && !current_flag.default? && current_flag.context_type == @context.class.name && current_flag.context_id == @context.id
       new_flag ||= @context.feature_flags.build
 
       new_flag.feature = params[:feature]
