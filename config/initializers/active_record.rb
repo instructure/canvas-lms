@@ -976,6 +976,14 @@ unless CANVAS_RAILS2
     end
     alias_method_chain :delete_all, :limit
   end
+
+  def with_each_shard
+    if block_given?
+      Array(yield(self))
+    else
+      self.to_a
+    end
+  end
 end
 
 ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
