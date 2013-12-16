@@ -56,7 +56,7 @@ define [
     unpublish: ->
       @updateOneAttribute('published', false)
 
-    disabledMessage: -> I18n.t 'cannot_unpublish', "Can't unpublish"
+    disabledMessage: -> I18n.t 'cannot_unpublish_with_replies', "Can't unpublish if there are replies"
 
     topicSubscribe: ->
       baseUrl = _.result this, 'url'
