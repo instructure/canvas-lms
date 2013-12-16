@@ -568,6 +568,7 @@ define [
         'month'
 
     loadView: (view) =>
+      return if view == @currentView
       @setCurrentView(view)
 
       $('.agenda-wrapper').removeClass('active')
