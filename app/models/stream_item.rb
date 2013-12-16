@@ -44,7 +44,11 @@ class StreamItem < ActiveRecord::Base
     when 'DiscussionTopic', 'Announcement'
       root_discussion_entries = data.delete(:root_discussion_entries)
       root_discussion_entries = root_discussion_entries.map { |entry| reconstitute_ar_object('DiscussionEntry', entry) }
-      res.root_discussion_entries.target = root_discussion_entries
+      if CANVAS_RAILS2
+        res.root_discussion_entries.target = root_discussion_entries
+      else
+        res.association(:root_discussion_entries).target = root_discussion_entries
+      end
       res.attachment = reconstitute_ar_object('Attachment', data.delete(:attachment))
     when 'Submission'
       data['body'] = nil
@@ -52,7 +56,11 @@ class StreamItem < ActiveRecord::Base
     if data.has_key?('users')
       users = data.delete('users')
       users = users.map { |user| reconstitute_ar_object('User', user) }
-      res.users.target = users
+      if CANVAS_RAILS2
+        res.users.target = users
+      else
+        res.association(:users).target = users
+      end
     end
     if data.has_key?('participants')
       users = data.delete('participants')
