@@ -837,6 +837,43 @@ class ApplicationController < ActionController::Base
     true
   end
 
+  unless CANVAS_RAILS2
+    rescue_from Exception, :with => :rescue_exception
+
+    # analogous to rescue_action_without_handler from ActionPack 2.3
+    def rescue_exception(exception)
+      ActiveSupport::Deprecation.silence do
+        message = "\n#{exception.class} (#{exception.message}):\n"
+        message << exception.annoted_source_code.to_s if exception.respond_to?(:annoted_source_code)
+        message << "  " << exception.backtrace.join("\n  ")
+        logger.fatal("#{message}\n\n")
+      end
+
+      if config.consider_all_requests_local || local_request?
+        rescue_action_locally(exception)
+      else
+        rescue_action_in_public(exception)
+      end
+    end
+
+    def interpret_status(code)
+      Rack::Utils::HTTP_STATUS_CODES[Rack::Utils.status_code(code)] || Rack::Utils::HTTP_STATUS_CODES[500]
+    end
+
+    def response_code_for_rescue(exception)
+      ActionDispatch::ExceptionWrapper.status_code_for_exception(exception.class.name)
+    end
+
+    def render_optional_error_file(status)
+      path = "#{Rails.public_path}/#{status.to_s[0,3]}.html"
+      if File.exist?(path)
+        render :file => path, :status => status, :content_type => Mime::HTML, :layout => false
+      else
+        head status
+      end
+    end
+  end
+
   # Custom error catching and message rendering.
   def rescue_action_in_public(exception)
     response_code = response_code_for_rescue(exception)
