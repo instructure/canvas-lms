@@ -1415,6 +1415,14 @@ routes.draw do
         delete "#{prefix}/flags/:feature", :action => :delete
       end
     end
+
+    scope(:controller => :conferences) do
+      %w(course group).each do |context|
+        prefix = "#{context}s/:#{context}_id/conferences"
+        get prefix, :action => :index, :path_name => "#{context}_conferences"
+      end
+    end
+
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
