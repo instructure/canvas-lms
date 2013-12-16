@@ -193,6 +193,10 @@ body {
       }
     }
 
+    .fc-event {
+      white-space: nowrap;
+    }
+
     .calendar-nowline {
       background-color: #FACE90;
       position: absolute;
@@ -225,6 +229,9 @@ body {
 
   .fc-event {
     background-color: white;
+    i {
+      margin-right: 2px;
+    }
   }
 
   .fc-grid .fc-day-number {

@@ -107,3 +107,6 @@ define [
         if type == 'discussion_topic'
           return 'discussion'
       return 'assignment'
+
+    iconType: ->
+      if type = @assignmentType() then type else 'calendar-month'

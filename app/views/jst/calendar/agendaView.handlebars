@@ -15,11 +15,7 @@
                   <div class="ig-row" tabindex="0" role="button">
                     <span class="ig-title group_{{contextCode}}">
                       <span class="screenreader-only">{{readableType}},</span>
-                      {{#if assignment}}
-                        <i class="icon-{{assignmentType}}"></i>
-                      {{else}}
-                        <i class="icon-calendar-month"></i>
-                      {{/if}}
+                      <i class="icon-{{iconType}}"></i>
                       {{#truncate title 60}}{{/truncate}}
                     </span>
                     <span class="screenreader-only">,{{contextInfo.name}},</span>

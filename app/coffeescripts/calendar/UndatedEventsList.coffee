@@ -47,8 +47,7 @@ define [
         loadingDfd.resolve()
         for e in events
           e.details_url = e.fullDetailsURL()
-          e.icon = if e.calendarEvent then 'calendar-day' else 'assignment'
-          e.icon = if e.calendarEvent then 'calendar-month' else e.assignmentType()
+          e.icon = e.iconType()
         @div.html undatedEventsTemplate(events: events)
 
         for e in events
