@@ -51,6 +51,9 @@ define [
 
     disabledMessages:
       generic:          -> I18n.t('disabled', 'Publishing is disabled for this item')
+      assignment:       -> I18n.t('disabled_assignment', "Can't unpublish if there are student submissions")
+      quiz:             -> I18n.t('disabled_quiz', "Can't unpublish if there are student submissions")
+      discussion_topic: -> I18n.t('disabled_discussion_topic', "Can't unpublish if there are student submissions")
 
     publish: ->
       @save 'published', yes
