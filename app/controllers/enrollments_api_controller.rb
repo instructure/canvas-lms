@@ -160,13 +160,20 @@ class EnrollmentsApiController < ApplicationController
       course_index_enrollments :
       user_index_enrollments
 
-    enrollments = enrollments.
-      includes(:user, :course, :course_section).
+    enrollments = enrollments.joins(:user).select("enrollments.*").
       order("enrollments.type, #{User.sortable_name_order_by_clause("users")}")
+    if CANVAS_RAILS2
+      has_courses = enrollments.scope(:find, :conditions) =~ /courses\./
+    else
+      has_courses = enrollments.where_values.any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
+    end
+    enrollments = enrollments.joins(:course) if has_courses
 
     enrollments = Api.paginate(
       enrollments,
       self, send("api_v1_#{endpoint_scope}_enrollments_url"))
+
+    Enrollment.send(:preload_associations, enrollments, [:user, :course, :course_section])
     includes = [:user] + Array(params[:include])
 
     user_json_preloads(enrollments.map(&:user))
