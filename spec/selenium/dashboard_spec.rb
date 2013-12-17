@@ -107,6 +107,24 @@ describe "dashboard" do
       ff('#conversation-details tbody tr').size.should == 1
     end
 
+    it "should show account notifications on the dashboard" do
+      a1 = @course.account.announcements.create!(:message => "hey there")
+      a2 = @course.account.announcements.create!(:message => "another announcement")
+
+      get "/"
+      messages =  ffj("#dashboard .global-message .message.user_content")
+      messages.size.should == 2
+      messages[0].text.should == a2.message
+      messages[1].text.should == a1.message
+    end
+
+    it "should interpolate the user's domain in global notifications" do
+      announcement = @course.account.announcements.create!(:message => "blah blah http://random-survey-startup.ly/?some_GET_parameter_by_which_to_differentiate_results={{ACCOUNT_DOMAIN}}")
+
+      get "/"
+      fj("#dashboard .global-message .message.user_content").text.should == announcement.message.gsub("{{ACCOUNT_DOMAIN}}",@course.account.domain)
+    end
+
     it "should show appointment stream items on the dashboard" do
       pending "we need to add this stuff back in"
       Notification.create(:name => 'Appointment Group Published', :category => "Appointment Availability")

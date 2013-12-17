@@ -811,6 +811,11 @@ TEXT
           </table>
           <div>
             <%= f.text_area :message, :class => 'alert_message', :style => "height: 100px;" %>
+            <% if @account.site_admin? %>
+              <span >
+                *<%= t(:interpolate_account_domain, "Note: enter \"{{ACCOUNT_DOMAIN}}\" to substitute the user's root account domain")  %>
+              </span>
+            <% end %>
           </div>
           <div class="button-container">
             <button type="submit" class="btn"><%= image_tag "add.png" %> <%= t(:add_announcement_button, "Add Announcement") %></button>
