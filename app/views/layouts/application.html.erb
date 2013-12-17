@@ -1,11 +1,11 @@
 <%-
   @body_classes ||= []
-  keyboard_navigation = yield :keyboard_navigation
+  keyboard_navigation = (yield :keyboard_navigation).presence
   left_side = nil
   left_side_custom = nil
-  right_side = yield :right_side
-  wizard = yield :wizard_box
-  top_nav = yield :top_nav
+  right_side = (yield :right_side).presence
+  wizard = (yield :wizard_box).presence
+  top_nav = (yield :top_nav).presence
 
   content_for :pre_html do
     @body_class_no_headers = @headers == false
@@ -13,8 +13,8 @@
     @show_fixed_bottom = (@fixed_warnings.present? || (@real_current_user && @real_current_user != @current_user)) && (!@body_class_no_headers || @outer_frame)
     @body_classes << "no-headers" if @body_class_no_headers
     unless (@body_classes.include? "no-headers") || (@show_left_side == false)
-      left_side = yield :left_side
-      left_side_custom = yield :left_side_custom
+      left_side = (yield :left_side).presence
+      left_side_custom = (yield :left_side_custom).presence
       @show_left_side ||= (section_tabs.length > 0 || left_side_custom.try(:length))
     end
     @body_classes << "with-left-side" if @show_left_side
@@ -43,7 +43,7 @@
     <a id="header-logo" href="<%= root_url %>"><%= t 'links.dashboard', "My Dashboard" %></a>
     <b id="header-logo-secondary"></b>
     <div id="topbar">
-      <% if (identity = yield :identity) %>
+      <% if (identity = (yield :identity).presence) %>
         <%= identity %>
       <% else %>
         <%- cache_if(!@real_current_user, [@current_user || 'nobody', 'identity-15m'], :expires_in => 15.minutes) do -%>
