@@ -296,6 +296,26 @@ define([
       $dialog.find(".all_users_checkbox").trigger('change');
       $dialog.dialog('open');
     });
+    $('body').on('click', '.start-button', function(event) {
+      var w = window.open(this.href, '_blank');
+      if (!w) {return;}
+      event.preventDefault();
+
+      w.onload = function() {
+        window.location.reload(true);
+      };
+
+      // cross-domain
+      var i = setInterval(function() {
+        if (!w) {return;}
+        try {
+          var href = w.location.href;
+        } catch (e) {
+          clearInterval(i);
+          window.location.reload(true);
+        }
+      }, 100);
+    });
     $('body').on('click', '.delete_conference_link', function(event) {
       event.preventDefault();
       $(this).parents(".conference").confirmDelete({
