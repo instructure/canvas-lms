@@ -262,18 +262,7 @@ class Pseudonym < ActiveRecord::Base
     user.save!
     user.email
   end
-  
-  def chat
-    user.chat if user
-  end
-  
-  def chat=(c)
-    return false unless user
-    self.user.chat=(c)
-    user.save!
-    user.chat
-  end
-  
+
   def sms
     user.sms if user
   end

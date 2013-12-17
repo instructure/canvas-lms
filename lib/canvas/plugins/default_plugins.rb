@@ -104,16 +104,6 @@ Canvas::Plugin.register('big_blue_button', :web_conferencing, {
   :validator => 'BigBlueButtonValidator',
   :encrypted_settings => [:secret]
 })
-Canvas::Plugin.register('tinychat', nil, {
-  :name => lambda{ t :name, 'Tinychat' },
-  :description => lambda{ t :description, 'Tinychat chat room'},
-  :website => 'http://www.tinychat.com',
-  :author => 'Instructure',
-  :author_website => 'http://www.instructure.com',
-  :version => '1.0.0',
-  :settings_partial => 'plugins/tinychat_settings',
-  :validator => 'TinychatValidator'
-})
 require_dependency 'cc/importer/cc_worker'
 Canvas::Plugin.register 'canvas_cartridge_importer', :export_system, {
   :name => lambda{ I18n.t 'canvas_cartridge_name', 'Canvas Cartridge Importer' },

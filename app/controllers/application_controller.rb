@@ -1214,8 +1214,6 @@ class ApplicationController < ActionController::Base
         !!Kaltura::ClientV3.config
       elsif feature == :web_conferences
         !!WebConference.config
-      elsif feature == :tinychat
-        !!Tinychat.config
       elsif feature == :scribd
         !!ScribdAPI.config
       elsif feature == :scribd_html5

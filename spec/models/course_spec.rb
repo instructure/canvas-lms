@@ -963,16 +963,18 @@ describe Course, "tabs_available" do
     tab_ids.should eql(Course.default_tabs.map{|t| t[:id] })
     tab_ids.length.should eql(length)
   end
-  
+
   it "should overwrite the order of tabs if configured" do
-    course_with_teacher(:active_all => true)
-    length = Course.default_tabs.length
-    @course.tab_configuration = [{'id' => Course::TAB_COLLABORATIONS}, {'id' => Course::TAB_CHAT}]
-    tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-    tab_ids.should eql(([Course::TAB_COLLABORATIONS, Course::TAB_CHAT] + Course.default_tabs.map{|t| t[:id] }).uniq)
-    tab_ids.length.should eql(length)
+    course_with_teacher(active_all: true)
+    @course.tab_configuration = [{ id: Course::TAB_COLLABORATIONS }]
+    available_tabs = @course.tabs_available(@user).map { |tab| tab[:id] }
+    default_tabs   = Course.default_tabs.map           { |tab| tab[:id] }
+    custom_tabs    = @course.tab_configuration.map     { |tab| tab[:id] }
+
+    available_tabs.should        == (custom_tabs + default_tabs).uniq
+    available_tabs.length.should == default_tabs.length
   end
-  
+
   it "should remove ids for tabs not in the default list" do
     course_with_teacher(:active_all => true)
     @course.tab_configuration = [{'id' => 912}]

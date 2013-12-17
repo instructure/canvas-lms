@@ -429,9 +429,7 @@ module ApplicationHelper
         tabs = Rails.cache.fetch([@context, @current_user, @domain_root_account, "section_tabs_hash", I18n.locale].cache_key) do
           if @context.respond_to?(:tabs_available) && !(tabs = @context.tabs_available(@current_user, :session => session, :root_account => @domain_root_account)).empty?
             tabs.select do |tab|
-              if (tab[:id] == @context.class::TAB_CHAT rescue false)
-                tab[:href] && tab[:label] && feature_enabled?(:tinychat)
-              elsif (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
+              if (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
                 tab[:href] && tab[:label] && Collaboration.any_collaborations_configured?
               elsif (tab[:id] == @context.class::TAB_CONFERENCES rescue false)
                 tab[:href] && tab[:label] && feature_enabled?(:web_conferences)
@@ -469,9 +467,7 @@ module ApplicationHelper
   def sortable_tabs
     tabs = @context.tabs_available(@current_user, :for_reordering => true, :root_account => @domain_root_account)
     tabs.select do |tab|
-      if (tab[:id] == @context.class::TAB_CHAT rescue false)
-        feature_enabled?(:tinychat)
-      elsif (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
+      if (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
         Collaboration.any_collaborations_configured?
       elsif (tab[:id] == @context.class::TAB_CONFERENCES rescue false)
         feature_enabled?(:web_conferences)

@@ -118,13 +118,6 @@ routes.draw do
     match 'users/:id' => 'context#roster_user', :as => :user, :via => :get
   end
 
-  concern :chats do
-    resources :chats
-    match 'chat' => 'context#chat', :as => :chat
-    match 'tinychat.html' => 'context#chat_iframe', :as => :tinychat
-    match 'chat.:format' => 'context#chat', :as => :formatted_chat
-  end
-
   concern :announcements do
     resources :announcements
     match 'announcements/external_feeds' => 'announcements#create_external_feed', :as => :announcements_external_feeds, :via => :post
@@ -259,7 +252,6 @@ routes.draw do
     match 'grading_rubrics' => 'gradebooks#grading_rubrics', :as => :grading_rubrics
     match 'grades/:id' => 'gradebooks#grade_summary', :as => :student_grades
     concerns :announcements
-    concerns :chats
     match 'calendar' => 'calendars#show', :as => :old_calendar
     match 'locks' => 'courses#locks', :as => :locks
     concerns :discussions
@@ -500,7 +492,6 @@ routes.draw do
     concerns :announcements
     concerns :discussions
     resources :calendar_events
-    concerns :chats
     concerns :files, :file_images, :relative_files, :folders
     concerns :zip_file_imports
 
@@ -572,7 +563,6 @@ routes.draw do
       match 'resource_selection' => 'external_tools#resource_selection', :as => :resource_selection
     end
 
-    concerns :chats
     match 'outcomes/users/:user_id' => 'outcomes#user_outcome_results', :as => :user_outcomes_results
     resources :outcomes do
       match 'results' => 'outcomes#outcome_results', :as => :results

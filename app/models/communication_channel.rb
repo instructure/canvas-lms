@@ -49,7 +49,6 @@ class CommunicationChannel < ActiveRecord::Base
   # Constants for the different supported communication channels
   TYPE_EMAIL    = 'email'
   TYPE_SMS      = 'sms'
-  TYPE_CHAT     = 'chat'
   TYPE_TWITTER  = 'twitter'
   TYPE_FACEBOOK = 'facebook'
   TYPE_PUSH     = 'push'
@@ -325,8 +324,8 @@ class CommunicationChannel < ActiveRecord::Base
 
   # This is setup as a default in the database, but this overcomes misspellings.
   def assert_path_type
-    pt = self.path_type
-    self.path_type = TYPE_EMAIL unless pt == TYPE_EMAIL or pt == TYPE_SMS or pt == TYPE_CHAT or pt == TYPE_FACEBOOK or pt == TYPE_TWITTER or pt == TYPE_PUSH
+    valid_types = [TYPE_EMAIL, TYPE_SMS, TYPE_FACEBOOK, TYPE_TWITTER, TYPE_PUSH]
+    self.path_type = TYPE_EMAIL unless valid_types.include?(path_type)
     true
   end
   protected :assert_path_type
