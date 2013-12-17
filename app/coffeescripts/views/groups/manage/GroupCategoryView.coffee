@@ -95,5 +95,7 @@ define [
     toJSON: ->
       json = @model.present()
       json.ENV = ENV
+      json.groupsAreSearchable = ENV.IS_LARGE_ROSTER and
+                                 not json.randomlyAssignStudentsInProgress
       json
 
