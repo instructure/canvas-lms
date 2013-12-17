@@ -895,6 +895,31 @@ describe Account do
         sa.account_users_for(@user).should == []
       end
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should be cache coherent for site admin" do
+        enable_cache do
+          user
+          sa = Account.site_admin
+          @shard1.activate do
+            sa.account_users_for(@user).should == []
+
+            au = sa.add_user(@user)
+            # out-of-proc cache should clear, but we have to manually clear
+            # the in-proc cache
+            sa = Account.find(sa)
+            sa.account_users_for(@user).should == [au]
+
+            au.destroy
+            #ditto
+            sa = Account.find(sa)
+            sa.account_users_for(@user).should == []
+          end
+        end
+      end
+    end
   end
 
   describe "available_course_roles_by_name" do
