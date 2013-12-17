@@ -826,13 +826,22 @@ Spec::Runner.configure do |config|
   def enable_cache(new_cache = ActiveSupport::Cache::MemoryStore.new)
     old_cache = RAILS_CACHE
     ActionController::Base.cache_store = new_cache
-    silence_warnings { Object.const_set(:RAILS_CACHE, new_cache) }
     old_perform_caching = ActionController::Base.perform_caching
+    if CANVAS_RAILS2
+      ActionController::Base.cache_store = new_cache
+      silence_warnings { Object.const_set(:RAILS_CACHE, new_cache) }
+    else
+      Switchman::DatabaseServer.all.each {|s| s.stubs(:cache_store).returns(new_cache)}
+    end
     ActionController::Base.perform_caching = true
     yield
   ensure
-    silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
-    ActionController::Base.cache_store = old_cache
+    if CANVAS_RAILS2
+      ActionController::Base.cache_store = old_cache
+      silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
+    else
+      Switchman::DatabaseServer.all.each {|s| s.unstub(:cache_store)}
+    end
     ActionController::Base.perform_caching = old_perform_caching
   end
 

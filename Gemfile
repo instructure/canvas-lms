@@ -101,6 +101,9 @@ gem 'zip-zip', '0.2' # needed until plugins use the new namespace
 gem 'safe_yaml-instructure', '0.8.0', :require => false
 gem 'sanitize', '2.0.3'
 gem 'shackles', '1.0.2'
+unless CANVAS_RAILS2
+  gem 'switchman', '0.0.1'
+end
 gem 'tzinfo', '0.3.35'
 gem 'useragent', '0.4.16'
 gem 'uuid', '2.3.2'
