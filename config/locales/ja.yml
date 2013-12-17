@@ -1927,7 +1927,7 @@ ja:
       comments_placeholder: コメント...
       errors: 
         unacceptable_file_type: "このファイル タイプは使用できません。使用できるファイル タイプは次のとおりです: %{allowed_extensions_list}"
-      gmail_restriction_description: "アカウントでの Google ドキュメントの提出は、%{domain} ドメインの Google アカウントのみに制限されています。この課題を Google ドキュメントとともに提出するには、ユーザ設定ページで Google ドキュメント統合を再設定する必要があります。"
+      gmail_restriction_description: "このアカウントでは、Google ドキュメントの提出操作が %{domain} ドメインの Google アカウントのみに制限されています。この課題を Google ドキュメントとともに提出するには、ユーザ設定ページで Google ドキュメント統合を再設定する必要があります。"
       instructions: 
         from_external_tool: そのツールから提供されるリソースを読み込みまたは提出するには、下記のリストからツールを選択してください。
         google_docs: 下のリストからファイルを選択します。
@@ -7023,7 +7023,7 @@ ja:
         assign_user_to_group_name: "ユーザをグループ %{name} に割り当て"
         no_groups_created: ユーザを追加する前に、グループを作成する必要があります。
       edit_group_assignment: 
-        all_available_groups_full: 利用できるいずれのグループにも空きがありません。
+        all_available_groups_full: 利用可能などのグループにも空きがありません。
         all_groups_full_suggestion: グループの定員を変更するか、グループを追加してください。
         move_to_group_label: グループに移動
         saving: 保存しています...
@@ -7101,10 +7101,10 @@ ja:
         remove: 削除
         remove_from_group: "%{name} をグループから削除"
       group_users: 
-        no_students: 現在、このグループには受講生がいません。最初に受講生を追加します。
-        no_users: 現在、このグループにはユーザがいません。最初にユーザを追加します。
+        no_students: 現在、このグループには受講生がいません。最初に受講生を追加してください。
+        no_users: 現在、このグループにはユーザがいません。最初にユーザを追加してください。
       groups: 
-        no_groups: "現在、このグループ セットにはグループがありません。最初にグループを追加します。"
+        no_groups: "現在、このグループ セットにはグループがありません。最初にグループを追加してください。"
         no_matching_groups: 現在の検索語に一致するグループはありません。
       randomly_assign_members: 
         cancel: キャンセル
@@ -10899,10 +10899,10 @@ ja:
       delete_quiz: このクイズを削除してもよろしいですか?
       scrap_and_restart: このクイズを破棄して、最初から開始しますか?
     correct_answers_no_longer_available: 正解はもう利用できません。
-    correct_answers_protected: 正解は非表示です。
-    correct_answers_shown_after: "正解は %{date} に利用できます。"
-    correct_answers_shown_between: "正解は %{from} ～ %{to} に利用できます。"
-    correct_answers_shown_until: "正解は %{date} まで利用できます。"
+    correct_answers_protected: 正解は非表示になっています。
+    correct_answers_shown_after: "正解は %{date} に利用可能になります。"
+    correct_answers_shown_between: "正解は %{from} ～ %{to} に利用可能になります。"
+    correct_answers_shown_until: "正解は %{date} まで利用可能です。"
     default_answer_comments: 受講生がこの解答を選択した場合の応答
     default_answer_comments_on_match: 受講生の解答がこの解答と一致した場合の応答
     default_comments_on_wrong_match: ユーザの解答が一致しなかった場合の応答
@@ -11311,11 +11311,11 @@ ja:
       end_quiz_when: "%{reference_time} から %{n} 分でクイズを終了します。"
       errors: 
         quiz_submission_extra_attempts_not_a_number: 追加の試行回数は数字で指定してください。
-        quiz_submission_extra_attempts_too_long: "追加の試行回数は 1000 未満を指定してください。"
-        quiz_submission_extra_attempts_too_short: "追加の試行回数は 1 以上を指定してください。"
+        quiz_submission_extra_attempts_too_long: "追加の試行回数は 1000 未満で指定してください。"
+        quiz_submission_extra_attempts_too_short: "追加の試行回数は 0 より大きい数字で指定してください。"
         quiz_submission_extra_time_not_a_number: 延長時間は数字で指定してください。
-        quiz_submission_extra_time_too_long: "延長時間は 10080 未満を指定してください。"
-        quiz_submission_extra_time_too_short: "延長時間は 1 以上を指定してください。"
+        quiz_submission_extra_time_too_long: "延長時間は 10080 未満で指定してください。"
+        quiz_submission_extra_time_too_short: "延長時間は 0 より大きい数字で指定してください。"
         server_communication_failed: "サーバとの通信で問題が発生しました。5 分後に再試行されます。またはページを再読み込みしてください"
       extended_quiz_time_explanation: この受講生に対して、現在行われているクイズの制限時間を延長することができます。どのくらい延長しますか?
       extensions_for_student: "%{student} に対する延長時間"
