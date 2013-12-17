@@ -105,6 +105,8 @@ class UsersController < ApplicationController
   include LinkedIn
   include DeliciousDiigo
   include SearchHelper
+  include I18nUtilities
+
   before_filter :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
     :user_dashboard, :toggle_dashboard, :masquerade, :external_tool,
@@ -1373,7 +1375,7 @@ class UsersController < ApplicationController
 
   def all_menu_courses
     render :json => Rails.cache.fetch(['menu_courses', @current_user].cache_key) {
-      @template.map_courses_for_menu(@current_user.courses_with_primary_enrollment)
+      map_courses_for_menu(@current_user.courses_with_primary_enrollment)
     }
   end
 
