@@ -67,8 +67,13 @@ module Api::V1::ContextModule
     unless content_tag.content_type == 'ContextModuleSubHeader'
       hash['html_url'] = case content_tag.content_type
         when 'ExternalUrl'
-          # API prefers to redirect to the external page, rather than host in an iframe
-          api_v1_course_context_module_item_redirect_url(:id => content_tag.id)
+          if value_to_boolean(request.params[:frame_external_urls])
+            # canvas UI wants external links hosted in iframe
+            course_context_modules_item_redirect_url(:id => content_tag.id)
+          else
+            # API prefers to redirect to the external page, rather than host in an iframe
+            api_v1_course_context_module_item_redirect_url(:id => content_tag.id)
+          end
         else
           # otherwise we'll link to the same thing the web UI does
           course_context_modules_item_redirect_url(:id => content_tag.id)
