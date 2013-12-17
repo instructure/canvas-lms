@@ -18,42 +18,6 @@
 
 begin; require File.expand_path(File.dirname(__FILE__) + "/../parallelized_specs/lib/parallelized_specs.rb"); rescue LoadError; end
 
-if ENV['COVERAGE'] == "1"
-  puts "Code Coverage enabled"
-  require 'simplecov'
-  require 'simplecov-rcov'
-  SimpleCov.start do
-    class SimpleCov::Formatter::MergedFormatter
-      def format(result)
-        SimpleCov::Formatter::HTMLFormatter.new.format(result)
-        SimpleCov::Formatter::RcovFormatter.new.format(result)
-      end
-    end
-    SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
-    add_filter '/spec/'
-    add_filter '/config/'
-    add_filter 'spec_canvas'
-
-    add_group 'Controllers', 'app/controllers'
-    add_group 'Models', 'app/models'
-    add_group 'App', '/app/'
-    add_group 'Helpers', 'app/helpers'
-    add_group 'Libraries', '/lib/'
-    add_group 'Plugins', 'vendor/plugins'
-    add_group "Long files" do |src_file|
-      src_file.lines.count > 500
-    end
-    SimpleCov.at_exit do
-      SimpleCov.result.format!
-    end
-  end
-else
-  puts "Code coverage not enabled"
-end
-
-
-ENV["RAILS_ENV"] = 'test'
-
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
 if CANVAS_RAILS2
   require 'spec'
