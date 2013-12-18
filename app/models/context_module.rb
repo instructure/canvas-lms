@@ -762,12 +762,19 @@ class ContextModule < ActiveRecord::Base
       end
     elsif hash[:linked_resource_type] =~ /contextexternaltool/i
       # external tool
+      external_tool_id = nil
+      if hash[:linked_resource_global_id]
+        external_tool_id = hash[:linked_resource_global_id]
+      elsif hash[:linked_resource_id] && et = self.context.context_external_tools.active.find_by_migration_id(hash[:linked_resource_id])
+        external_tool_id = et.id
+      end
       if hash['url']
         item = self.add_item({
           :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
           :type => 'context_external_tool',
           :indent => hash[:indent].to_i,
-          :url => hash['url']
+          :url => hash['url'],
+          :id => external_tool_id
         }, existing_item, :position => migration_position)
       end
     elsif hash[:linked_resource_type] =~ /assessment|quiz/i

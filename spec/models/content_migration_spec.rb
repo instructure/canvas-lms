@@ -1995,7 +1995,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
     context "external tools" do
       append_before do
-        @tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
+        @tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :custom_fields => {'a' => '1', 'b' => '2'}, :url => "http://www.example.com")
         @tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
         @tool_from.save!
       end
@@ -2080,6 +2080,32 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
         tool.account_navigation.should == @tool_from.account_navigation
         tool.user_navigation.should_not be_nil
         tool.user_navigation.should == @tool_from.user_navigation
+      end
+
+      it "should keep reference to ContextExternalTool by id for courses" do
+        mod1 = @copy_from.context_modules.create!(:name => "some module")
+        tag = mod1.add_item :type => 'context_external_tool', :id => @tool_from.id,
+                      :url => "https://www.example.com/launch"
+        run_course_copy
+
+        tool_copy = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(@tool_from))
+        tag = @copy_to.context_modules.first.content_tags.first
+        tag.content_type.should == 'ContextExternalTool'
+        tag.content_id.should == tool_copy.id
+      end
+
+      it "should keep reference to ContextExternalTool by id for accounts" do
+        account = @copy_from.root_account
+        @tool_from.context = account
+        @tool_from.save!
+        mod1 = @copy_from.context_modules.create!(:name => "some module")
+        mod1.add_item :type => 'context_external_tool', :id => @tool_from.id, :url => "https://www.example.com/launch"
+
+        run_course_copy
+
+        tag = @copy_to.context_modules.first.content_tags.first
+        tag.content_type.should == 'ContextExternalTool'
+        tag.content_id.should == @tool_from.id
       end
     end
   end
