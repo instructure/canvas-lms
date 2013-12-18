@@ -206,7 +206,22 @@ module Api
       per_page: per_page_for(controller,
         default: pagination_args.delete(:default_per_page),
         max: pagination_args.delete(:max_per_page)))
-    collection = collection.paginate(pagination_args)
+
+    begin
+      paginated = collection.paginate(pagination_args)
+    rescue Folio::InvalidPage
+      if pagination_args[:page].to_s =~ /\d+/ && pagination_args[:page].to_i > 0 && collection.build_page.ordinal_pages?
+        # for backwards compatibility we currently require returning [] for
+        # pages beyond the end of an ordinal collection, rather than a 404.
+        paginated = Folio::Ordinal::Page.create
+        paginated.current_page = pagination_args[:page].to_i
+      else
+        # we're not dealing with a simple out-of-bounds on an ordinal
+        # collection, let the exception propagate (and turn into a 404)
+        raise
+      end
+    end
+    collection = paginated
 
     links = build_links(base_url, {
       :query_parameters => controller.request.query_parameters,
