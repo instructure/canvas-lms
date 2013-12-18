@@ -36,10 +36,10 @@ class EmberHbs
 
     def compile_template(name, template_string)
       require "execjs"
-      handlebars_source = File.read(Rails.root.join('public/javascripts/bower/handlebars/handlebars.js'))
+      handlebars_source = File.read('./public/javascripts/bower/handlebars/handlebars.js')
       # execjs has no "exports" and global "var foo" does not land on "this.foo"
       shims = "; this.Handlebars = Handlebars; exports = {};"
-      precompiler_source = File.read(Rails.root.join('public/javascripts/bower/ember/ember-template-compiler.js'))
+      precompiler_source = File.read('./public/javascripts/bower/ember/ember-template-compiler.js')
       context = ExecJS.compile(handlebars_source + shims + precompiler_source)
       precompiled = context.eval "exports.precompile(#{template_string.inspect}).toString()", template_string
       template_module = <<-END

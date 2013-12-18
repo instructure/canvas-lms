@@ -133,7 +133,7 @@ JS
 
     # Compiles and caches the handlebars JavaScript
     def set_context
-      handlebars_source = File.read(Rails.root.join('public/javascripts/bower/handlebars/handlebars.js'))
+      handlebars_source = File.read('public/javascripts/bower/handlebars/handlebars.js')
       @context = ExecJS.compile handlebars_source
     end
   end
