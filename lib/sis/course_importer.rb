@@ -58,7 +58,7 @@ module SIS
         @success_count = 0
       end
 
-      def add_course(course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name)
+      def add_course(course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name, integration_id)
 
         @logger.debug("Processing Course #{[course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name].inspect}")
 
@@ -84,6 +84,7 @@ module SIS
 
         update_account_associations = course.account_id_changed? || course.root_account_id_changed?
 
+        course.integration_id = integration_id
         course.sis_source_id = course_id
         if !course.stuck_sis_fields.include?(:workflow_state)
           if status =~ /active/i
