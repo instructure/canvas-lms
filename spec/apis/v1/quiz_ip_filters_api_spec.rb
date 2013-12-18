@@ -89,8 +89,13 @@ describe QuizIpFiltersController, :type => :integration do
         page1['quiz_ip_filters'].size.should == 15
       end
 
+      it 'should return an empty array with a cursor past the end' do
+        page = get_index false, { page: 2 }
+        page['quiz_ip_filters'].should == []
+      end
+
       it 'should bail out on an invalid cursor' do
-        get_index true, { page: 2 }
+        get_index true, { page: 'invalid' }
         response.status.to_i.should == 404
       end
     end
