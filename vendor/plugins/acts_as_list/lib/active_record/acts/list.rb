@@ -65,9 +65,11 @@ module ActiveRecord
             new_scope = {}
             scope.each do |k, v|
               if reflection = reflections[k]
-                new_scope[reflection.primary_key_name] = v
+                key = CANVAS_RAILS2 ? reflection.primary_key_name : reflection.foreign_key
+                new_scope[key] = v
                 if reflection.options[:polymorphic]
-                  new_scope[reflection.options[:foreign_type]] = v
+                  key = CANVAS_RAILS2 ? reflection.options[:foreign_type] : reflection.foreign_type
+                  new_scope[key] = v
                 end
               else
                 new_scope[k] = v
