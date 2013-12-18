@@ -18,6 +18,8 @@
 
 begin; require File.expand_path(File.dirname(__FILE__) + "/../parallelized_specs/lib/parallelized_specs.rb"); rescue LoadError; end
 
+ENV["RAILS_ENV"] = 'test'
+
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
 if CANVAS_RAILS2
   require 'spec'
