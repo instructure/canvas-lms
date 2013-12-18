@@ -1383,6 +1383,10 @@ routes.draw do
       delete "outcomes/:id", :action => :destroy
     end
 
+    scope(:controller => :outcome_results) do
+      get 'courses/:course_id/outcome_rollups', :action => :rollups, :path_name => 'course_outcome_rollups'
+    end
+
     scope(:controller => :group_categories) do
       resources :group_categories, :except => [:index, :create]
       get 'accounts/:account_id/group_categories', :action => :index, :path_name => 'account_group_categories'
