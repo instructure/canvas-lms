@@ -383,27 +383,43 @@ class ContextExternalTool < ActiveRecord::Base
       26
     end
   end
-  
-  def matches_url?(url, match_queries_exactly=true)
+
+  def standard_url
     if !defined?(@standard_url)
       @standard_url = !self.url.blank? && ContextExternalTool.standardize_url(self.url)
     end
+    @standard_url
+  end
+  
+  def matches_url?(url, match_queries_exactly=true)
     if match_queries_exactly
       url = ContextExternalTool.standardize_url(url)
-      return true if url == @standard_url
-    elsif @standard_url.present?
+      return true if url == standard_url
+    elsif standard_url.present?
       if !defined?(@url_params)
-        res = URI.parse(@standard_url)
+        res = URI.parse(standard_url)
         @url_params = res.query.present? ? res.query.split(/&/) : []
       end
       res = URI.parse(url).normalize
       res.query = res.query.split(/&/).select{|p| @url_params.include?(p)}.sort.join('&') if res.query.present?
       res.query = nil if res.query.blank?
       res.normalize!
-      return true if res.to_s == @standard_url
+      return true if res.to_s == standard_url
     end
     host = URI.parse(url).host rescue nil
     !!(host && ('.' + host).match(/\.#{domain}\z/))
+  end
+
+  def matches_domain?(url)
+    url = ContextExternalTool.standardize_url(url)
+    host = URI.parse(url).host
+    if domain
+      domain == host
+    elsif standard_url
+      URI.parse(standard_url).host == host
+    else
+      false
+    end
   end
   
   def self.all_tools_for(context, options={})
@@ -462,12 +478,10 @@ class ContextExternalTool < ActiveRecord::Base
       end
     end
 
-    # Always use the preferred tool if it's valid and has a resource_selection configuration.
-    # If it didn't have resource_selection then a change in the URL would have been done manually,
-    # and there's no reason to assume a different URL was intended. With a resource_selection 
-    # insertion, there's a stronger chance that a different URL was intended.
     preferred_tool = ContextExternalTool.active.find_by_id(preferred_tool_id)
-    return preferred_tool if preferred_tool && preferred_tool.resource_selection
+    if preferred_tool && contexts.member?(preferred_tool.context) && preferred_tool.matches_domain?(url)
+      return preferred_tool
+    end
 
     sorted_external_tools = contexts.collect{|context| context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? SortFirst : SortLast] }}.flatten(1)
 
