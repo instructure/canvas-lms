@@ -5,6 +5,7 @@ define [
   'Backbone'
   'compiled/views/DiscussionTopic/EntryCollectionView'
   'compiled/jquery/scrollIntoView'
+  'underscore.flattenObjects'
 ], (_, $, pageNavTemplate, Backbone, EntryCollectionView) ->
 
   class EntriesView extends Backbone.View
@@ -16,6 +17,9 @@ define [
       children: 3
 
     $window: $ window
+
+    events:
+      'keydown': 'handleKeyDown'
 
     initialize: ->
       super
@@ -99,7 +103,7 @@ define [
       @$window.scrollTo $el, 200,
         offset: -150
         onAfter: =>
-          $el.find('.author').first().focus()
+          $el.find('.discussion-title a').first().focus()
           # pretty blinking
           setTimeout (-> $el.addClass 'highlight' ), 200
           setTimeout (-> $el.removeClass 'highlight' ), 400
@@ -154,3 +158,25 @@ define [
       html = pageNavTemplate locals
       @$el.prepend(html).append(html)
 
+    handleKeyDown: (e) =>
+      nodeName = e.target.nodeName.toLowerCase()
+      return if nodeName == 'input' || nodeName == 'textarea'
+      return if e.which != 74 && e.which != 75 # j, k
+      entry = $(e.target).closest('.entry')
+      @traverse(entry, reverse = e.which == 75)
+      e.preventDefault()
+      e.stopPropagation()
+
+    traverse: (el, reverse) ->
+      id = el.attr('id').replace('entry-', '')
+      id = parseInt id, 10
+
+      json = @collection.toJSON()
+      # sub-collections are displayed in reverse when flat, in imitation of Facebook
+      list = _.flattenObjects(json, 'replies', backward = !@options.threaded)
+      entry = _.find(list, (x) -> x.id+'' is id+'')
+      pos = _.indexOf(list, entry)
+      pos += if reverse then -1 else 1
+      pos = Math.min(Math.max(0, pos), list.length - 1)
+      next = list[pos]
+      @goToEntry(next.id)
