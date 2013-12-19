@@ -267,24 +267,15 @@ class StreamItem < ActiveRecord::Base
       # Old stream items are deleted in a periodic job.
       StreamItemInstance.where("user_id in (?) AND stream_item_id = ? AND id <= ?",
             user_ids_subset, stream_item_id, greatest_existing_id).delete_all
-    end
 
-
-    # Here is where we used to go through and update the stream item for anybody
-    # not in user_ids who had the item in their stream, so that the item would
-    # be up-to-date, but not jump to the top of their stream. Now that
-    # we're updating StreamItems in-place and just linking to them through
-    # StreamItemInstances, this happens automatically.
-    # If a teacher leaves a comment for a student, for example
-    # we don't want that to jump to the top of the *teacher's* stream, but
-    # if it's still visible on the teacher's stream then it had better show
-    # the teacher's comment even if it is farther down.
-
-    # touch all the users to invalidate the cache
-    if CANVAS_RAILS2
-      User.update_all({:updated_at => Time.now.utc}, {:id => user_ids})
-    else
-      User.where(:id => user_ids).update_all(:updated_at => Time.now.utc)
+      # touch all the users to invalidate the cache
+      User.transaction do
+        lock_type = true
+        lock_type = 'FOR NO KEY UPDATE' if User.connection.adapter_name == 'PostgreSQL' && User.connection.send(:postgresql_version) >= 90300
+        # lock the rows in a predefined order to prevent deadlocks
+        User.where(id: user_ids).lock(lock_type).order(:id).pluck(:id)
+        User.where(id: user_ids).update_all(updated_at: Time.now.utc)
+      end
     end
 
     return [res]
