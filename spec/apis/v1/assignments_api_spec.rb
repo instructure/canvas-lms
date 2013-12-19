@@ -624,6 +624,29 @@ describe AssignmentsApiController, :type => :integration do
       @ta.messages.detect{|m| m.notification_id == notification.id}.body.
         should be_include 'Multiple Dates'
     end
+
+    it "should not allow an assignment_group_id that is not a number" do
+      course_with_teacher(:active_all => true)
+      student_in_course(:course => @course, :active_enrollment => true)
+      @user = @teacher
+
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/assignments",
+        { :controller => 'assignments_api',
+          :action => 'create',
+          :format => 'json',
+          :course_id => @course.id.to_s },
+        { :assignment => {
+            'name' => 'some assignment',
+            'assignment_group_id' => 'foo'
+          }
+        })
+
+      response.should_not be_success
+      json = JSON.parse response.body
+      json['errors']['assignment[assignment_group_id]'].first['message'].
+        should == "must be a positive number"
+    end
+
   end
 
 
