@@ -17,6 +17,7 @@ define [
 
     events:
       'keyup #searchTerm': 'keyUpSearch'
+      'mouseup #searchTerm': 'keyUpSearch' #ie10 x-close workaround
 
     initialize: ->
       super
