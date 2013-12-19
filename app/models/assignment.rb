@@ -31,7 +31,7 @@ class Assignment < ActiveRecord::Base
   include Canvas::DraftStateValidations
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
-    :min_score, :max_score, :mastery_score, :grading_type, :submission_types,
+    :grading_type, :submission_types,
     :assignment_group, :unlock_at, :lock_at, :group_category, :group_category_id,
     :peer_review_count, :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
@@ -304,7 +304,6 @@ class Assignment < ActiveRecord::Base
     if !self.assignment_group || (self.assignment_group.deleted? && !self.deleted?)
       ensure_assignment_group(false)
     end
-    self.mastery_score = [self.mastery_score, self.points_possible].min if self.mastery_score && self.points_possible
     self.submission_types ||= "none"
     self.peer_reviews_assign_at = [self.due_at, self.peer_reviews_assign_at].compact.max
     @workflow_state_was = self.workflow_state_was
@@ -1680,8 +1679,8 @@ class Assignment < ActiveRecord::Base
 
     [:turnitin_enabled, :peer_reviews_assigned, :peer_reviews,
      :automatic_peer_reviews, :anonymous_peer_reviews,
-     :grade_group_students_individually, :allowed_extensions, :min_score,
-     :max_score, :mastery_score, :position, :peer_review_count
+     :grade_group_students_individually, :allowed_extensions,
+     :position, :peer_review_count
     ].each do |prop|
       item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
     end

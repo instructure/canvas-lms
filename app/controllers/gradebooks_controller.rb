@@ -237,8 +237,7 @@ class GradebooksController < ApplicationController
         # (in this case, the worst part was the assignment 'description' which could be a massive wikipage)
 
         assignment_fields = ["id", "title", "due_at", "unlock_at", "lock_at",
-          "points_possible", "min_score", "max_score",
-          "mastery_score", "grading_type", "submission_types",
+          "points_possible", "grading_type", "submission_types",
           "assignment_group_id", "grading_scheme_id",
           "grading_standard_id", "grade_group_students_individually"].map do |field|
             "assignments.#{field}"

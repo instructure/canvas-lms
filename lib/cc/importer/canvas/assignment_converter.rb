@@ -74,7 +74,7 @@ module CC::Importer::Canvas
         val = get_time_val(meta_doc, date_type)
         assignment[date_type] = val unless val.nil?
       end
-      ['points_possible', 'min_score', 'max_score', 'mastery_score'].each do |f_type|
+      ['points_possible'].each do |f_type|
         val = get_float_val(meta_doc, f_type)
         assignment[f_type] = val unless val.nil?
       end

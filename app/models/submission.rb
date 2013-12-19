@@ -462,8 +462,6 @@ class Submission < ActiveRecord::Base
 
   def infer_values
     if assignment
-      self.score = self.assignment.max_score if self.assignment.max_score && self.score && self.score > self.assignment.max_score
-      self.score = self.assignment.min_score if self.assignment.min_score && self.score && self.score < self.assignment.min_score
       self.context_code = assignment.context_code
     end
     self.submitted_at ||= Time.now if self.has_submission? || (self.submission_type && !self.submission_type.empty?)
