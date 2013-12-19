@@ -1613,6 +1613,18 @@ describe User do
         events.size.should eql 1
         events.first.title.should eql 'test appointment'
       end
+
+      it "should not include unpublished assignments when draft_state is enabled" do
+        course_with_student(:active_all => true)
+        @course.enable_feature!(:draft_state)
+        as = @course.assignments.create!({:title => "Published", :due_at => 2.days.from_now})
+        as.publish
+        as2 = @course.assignments.create!({:title => "Unpublished", :due_at => 2.days.from_now})
+        as2.unpublish
+        events = @user.calendar_events_for_calendar(:contexts => [@course])
+        events.size.should eql 1
+        events.first.title.should eql 'Published'
+      end
     end
 
     describe "upcoming_events" do
