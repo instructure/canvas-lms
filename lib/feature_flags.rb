@@ -58,7 +58,7 @@ module FeatureFlags
   end
 
   def feature_flag_cache_key(feature)
-    ['feature_flag', self, feature.to_s].cache_key
+    ['feature_flag', self.class.name, self.global_id, feature.to_s].cache_key
   end
 
   # return the feature flag for the given feature that is defined on this object, if any.
@@ -73,14 +73,14 @@ module FeatureFlags
 
   # each account that needs to be searched for a feature flag, in priority order,
   # starting with site admin
-  def feature_flag_accounts
-    Rails.cache.fetch(['feature_flag_accounts', self].cache_key) do
+  def feature_flag_account_ids
+    Rails.cache.fetch(['feature_flag_account_ids', self].cache_key) do
       parent = if self.is_a?(Course)
                  self.account
                elsif self.is_a?(Account)
                  self.parent_account
                end
-      parent ? parent.account_chain(include_site_admin: true).reverse : [Account.site_admin]
+      (parent ? parent.account_chain(include_site_admin: true).reverse : [Account.site_admin]).map(&:global_id)
     end
   end
 
@@ -101,7 +101,9 @@ module FeatureFlags
 
     # find the highest flag that doesn't allow override,
     # or the most specific flag otherwise
-    (feature_flag_accounts + [self]).each do |context|
+    account_ids = feature_flag_account_ids
+    accounts = Account.find_all_by_id(account_ids, :select => :id).sort_by{|a| account_ids.index(a.global_id)}
+    (accounts + [self]).each do |context|
       flag = context.feature_flag(feature)
       next unless flag
       retval = flag
