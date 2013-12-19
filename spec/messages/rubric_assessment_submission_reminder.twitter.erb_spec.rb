@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'rubric_assessment_submission_reminder.facebook' do
+describe 'rubric_assessment_submission_reminder.twitter' do
   it "should render" do
     user_model
     rubric_assessment_model(:user => @user)
@@ -29,6 +29,6 @@ describe 'rubric_assessment_submission_reminder.facebook' do
     @object.rubric_association.context.should_not be_nil
     @object.user.should_not be_nil
     @object.submission.should_not be_nil
-    generate_message(:rubric_assessment_submission_reminder, :facebook, @object, :user => @user)
+    generate_message(:rubric_assessment_submission_reminder, :twitter, @object, :user => @user)
   end
 end
