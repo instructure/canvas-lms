@@ -466,7 +466,11 @@ class User < ActiveRecord::Base
     shards = [Shard.current]
     if !precalculated_associations
       if !users_or_user_ids.first.is_a?(User)
-        users = users_or_user_ids = User.select([:id, :preferences, :workflow_state]).where(:id =>user_ids).all
+        if CANVAS_RAILS2
+          users = users_or_user_ids = Shard.partition_by_shard(user_ids) { |ids| User.select([:id, :preferences, :workflow_state]).find(ids) }
+        else
+          users = users_or_user_ids = User.select([:id, :preferences, :workflow_state]).find(ids)
+        end
       else
         users = users_or_user_ids
       end
@@ -575,7 +579,7 @@ class User < ActiveRecord::Base
           else
             # for incremental, only update the old association if it is deeper than the new one
             # for non-incremental, update it if it changed
-            if incremental && association[1] > depth || !incremental && association[1] != depth
+            if (incremental && association[1] > depth) || (!incremental && association[1] != depth)
               if CANVAS_RAILS2
                 UserAccountAssociation.update_all({ :depth => depth }, :id => association[0])
               else
