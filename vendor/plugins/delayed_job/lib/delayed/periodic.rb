@@ -27,10 +27,12 @@ class Periodic
   def self.load_periodic_jobs_config
     require Rails.root+'config/periodic_jobs'
 
+    # SFU MOD
     ## schedule the built-in unlocking job
     #self.cron('Unlock Expired Jobs', '*/5 * * * *') do
     #  Delayed::Job.unlock_expired_jobs
     #end
+    # END SFU MOD
   end
 
   STRAND = 'periodic scheduling'
