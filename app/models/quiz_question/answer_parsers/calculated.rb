@@ -22,7 +22,7 @@ module QuizQuestion::AnswerParsers
       question[:formulas] = format_formulas(question[:formulas])
       question[:variables] = format_variables(question[:variables])
 
-      @answers.map! do |answer_group, answer|
+      @answers.map_with_group! do |answer_group, answer|
         answer_params = {:weight => 100, :variables => []}
         answer_params[:answer] = answer[:answer_text].to_f
 

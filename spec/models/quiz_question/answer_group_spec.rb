@@ -126,6 +126,20 @@ describe QuizQuestion::AnswerGroup::Answer do
     end
   end
 
+  describe "#any_value_of" do
+    it "returns the value of the first key that exists" do
+      @answer.any_value_of([:answer_weight, :weight]).should == 100
+    end
+
+    it "ignores any keys supplied that don't exist" do
+      @answer.any_value_of([:blah, :weight, :answer_weight, :foo]).should == 100
+    end
+
+    it "returns the supplied default if none of the keys are found" do
+      @answer.any_value_of([:foo], "default").should == "default"
+    end
+  end
+
   describe "#set_id" do
     it "assigns a randomly generated id to the answer" do
       @answer.set_id([])

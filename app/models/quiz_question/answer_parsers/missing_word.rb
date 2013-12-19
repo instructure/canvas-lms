@@ -19,7 +19,7 @@
 module QuizQuestion::AnswerParsers
   class MissingWord < AnswerParser
     def parse(question)
-      @answers.map! do |answer_group, answer|
+      @answers.map_with_group! do |answer_group, answer|
         fields = QuizQuestion::RawFields.new(answer)
         a = {
           text: fields.fetch_with_enforced_length(:answer_text),

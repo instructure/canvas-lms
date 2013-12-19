@@ -19,7 +19,7 @@
 module QuizQuestion::AnswerParsers
   class Numerical < AnswerParser
     def parse(question)
-      @answers.map! do |answer_group, answer|
+      @answers.map_with_group! do |answer_group, answer|
         fields = QuizQuestion::RawFields.new(answer)
 
         a = {

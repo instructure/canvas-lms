@@ -19,7 +19,8 @@
 module QuizQuestion::AnswerParsers
   class Essay < AnswerParser
     def parse(question)
-      comment = @answers[0][:answer_comments] rescue ""
+      comment = @answers.empty? ? "" : QuizQuestion::AnswerGroup::Answer.new(@answers.first).any_value_of([:answer_comments, :comments])
+
       answer = QuizQuestion::RawFields.new({comments:comment})
       question[:comments] = answer.fetch_with_enforced_length(:comments, max_size: 5.kilobyte)
 

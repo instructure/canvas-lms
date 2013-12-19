@@ -21,7 +21,8 @@ class QuizQuestion::AnswerGroup
   attr_accessor :answers, :taken_ids
 
   extend Forwardable
-  def_delegators :@answers, :each, :<<, :[], :[]=, :each_with_index
+  def_delegators :@answers, :each, :<<, :[], :[]=, :each_with_index, :empty?, :first
+  include Enumerable
 
 
   def initialize(answers = [])
@@ -31,10 +32,12 @@ class QuizQuestion::AnswerGroup
 
   def set_correct_if_none
     return if @answers.empty?
-    @answers[0][:weight] = 100.to_f unless correct_answer
+    @answers.first[:weight] = 100.to_f unless correct_answer
   end
 
-  def map!
+  # This method supplies the group alongside each answer
+  # in an iterator, and modifies in place.
+  def map_with_group!
     mapped = @answers.map do |a|
       yield self, a
     end
@@ -75,6 +78,11 @@ class QuizQuestion::AnswerGroup
 
     def to_hash
       @data
+    end
+
+    def any_value_of(keys, default="")
+      key = keys.find { |key| @data.key?(key) }
+      @data[key] || default
     end
 
     def correct?

@@ -21,7 +21,7 @@ module QuizQuestion::AnswerParsers
     def parse(question)
       question[:matches] = []
 
-      @answers.map! do |answer_group, answer|
+      @answers.map_with_group! do |answer_group, answer|
         fields = QuizQuestion::RawFields.new(answer)
         a = {
           id: fields.fetch(:id, nil),
