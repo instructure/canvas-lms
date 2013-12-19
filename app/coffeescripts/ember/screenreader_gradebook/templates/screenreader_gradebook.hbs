@@ -151,23 +151,20 @@
 
 <!-- student -->
 <!-- -------- -->
-
 {{#if selectedStudent}}
-{{#with selectedStudent}}
 
 <div id="student_information">
 
   <h2>Student Information</h2>
 
-  <div>Selected Student: {{name}}</div>
+  <div>Selected Student: {{selectedStudent.name}}</div>
 
   <!-- what section they are in -->
 
   <div>Section: Section 3</div>
-
   <!-- secondary id -->
-  {{#unless isLoaded}}
-  <div>Secondary ID: {{login_id}}</div>
+  {{#if selectedStudent.isLoaded}}
+  <div>Secondary ID: {{selectedStudent.login_id}}</div>
 
   <!-- final score/grade -->
 
@@ -178,11 +175,10 @@
   <div>Assignment Group Grade: 30% (50% of grade)</div>
   {{else}}
   <p>Submissions for this student are still loading...</p>
-  {{/unless}}
+  {{/if}}
 
 </div>
 
-{{/with}}
 {{/if}}
 
 <!-- assignment -->

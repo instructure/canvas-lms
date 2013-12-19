@@ -29,7 +29,7 @@ define [
     server.respond 'POST', url, [
       200
       'Content-Type': 'application/json'
-      JSON.stringify response
+      JSON.stringify Ember.copy response, true
     ]
 
   module 'screenreader_gradebook: dialogs open and close',
@@ -39,10 +39,12 @@ define [
       Ember.run App, 'destroy'
 
   test 'upload scores dialog displays properly', ->
-    visit('/').then -> openAndCloseDialog('#upload', 'Choose a CSV to Upload')
+    visit('/')
+    openAndCloseDialog('#upload', 'Choose a CSV to Upload')
 
   test 'set group weights dialog displays propery', ->
-    visit('/').then -> openAndCloseDialog('#ag_weights', 'Manage assignment group weighting')
+    visit('/')
+    openAndCloseDialog('#ag_weights', 'Manage assignment group weighting')
 
 
   module 'screenreader_gradebook: assignment dialogs open and close',
@@ -62,12 +64,12 @@ define [
       #openAndCloseDialog('#message_students', "Message students for #{@selected.name}")
 
   test 'default grade dialog displays properly', ->
-    visit('/').then =>
-      openAndCloseDialog('#set_default_grade', "Default grade for #{@selected.name}")
+    visit('/')
+    openAndCloseDialog('#set_default_grade', "Default grade for #{@selected.name}")
 
   test 'curve grades dialog displays properly', ->
-    visit('/').then =>
-      openAndCloseDialog('#curve_grades', "Curve Grades for #{@selected.name}")
+    visit('/')
+    openAndCloseDialog('#curve_grades', "Curve Grades for #{@selected.name}")
 
 
   module 'screenreader_gradebook: assignment dialogs saving',
@@ -79,6 +81,7 @@ define [
       @server = sinon.fakeServer.create()
       @alert = sinon.stub(window, 'alert')
       Ember.run =>
+        controller.set('submissions', Em.copy fixtures.submissions, true)
         controller.set('selectedAssignment', @selAssignment)
         controller.set('selectedStudent', @selStudent)
 
@@ -94,14 +97,15 @@ define [
   test 'default grade dialog updates the current students grade', ->
     $dialog = null
     server = @server
-    visit('/').then ->
-      openDialog('#set_default_grade').then ->
+    visit('/').then =>
+      openDialog('#set_default_grade').then =>
         $dialog = find('.ui-dialog:visible', 'body')
-        fillIn(find('[name=default_grade]', $dialog), 100).then ->
-          click(find('[name=overwrite_existing_grades]', $dialog)).then ->
+        fillIn(find('[name=default_grade]', $dialog), 100).then =>
+          click(find('[name=overwrite_existing_grades]', $dialog)).then =>
             click('.button_type_submit', $dialog)
-            sendSuccess(server, "/courses/#{ENV.GRADEBOOK_OPTIONS.context_id}/gradebook/update_submission", fixtures.set_default_grade_response)
+            sendSuccess(@server, "/courses/#{ENV.GRADEBOOK_OPTIONS.context_id}/gradebook/update_submission", fixtures.set_default_grade_response)
+
 
     andThen ->
-      Ember.run.next ->
-        equal parseInt(find('#student_and_assignment_grade').val(), 10), 100
+      equal parseInt(find('#student_and_assignment_grade').val(), 10), 100
+

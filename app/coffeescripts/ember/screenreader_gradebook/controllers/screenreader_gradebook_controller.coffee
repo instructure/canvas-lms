@@ -1,12 +1,13 @@
 define [
+  '../../shared/xhr/fetch_all_pages'
   'i18n!sr_gradebook'
   'ember'
   'underscore'
   'compiled/AssignmentDetailsDialog'
   'compiled/AssignmentMuter'
-  ], (I18n, Ember, _,  AssignmentDetailsDialog, AssignmentMuter ) ->
+  ], (fetchAllPages, I18n, Ember, _,  AssignmentDetailsDialog, AssignmentMuter ) ->
 
-  {get} = Ember
+  {get, set} = Ember
 
   # http://emberjs.com/guides/controllers/
   # http://emberjs.com/api/classes/Ember.Controller.html
@@ -55,12 +56,11 @@ define [
       subs_proxy = @get('submissions')
       selected = @get('selectedSubmission')
       submissions.forEach (submission) =>
-        submissionsForStudent = subs_proxy.findBy('user_id', submission.user_id).submissions
-        oldSubmission = submissionsForStudent.find (sub) ->
-          submission.assignment_id == sub.assignment_id
+        submissionsForStudent = subs_proxy.findBy('user_id', submission.user_id)
+        oldSubmission = submissionsForStudent.submissions.findBy('assignment_id', submission.assignment_id)
 
-        submissionsForStudent.removeObject oldSubmission
-        submissionsForStudent.addObject submission
+        submissionsForStudent.submissions.removeObject oldSubmission
+        submissionsForStudent.submissions.addObject submission
         @updateSubmission submission, students.findBy('id', submission.user_id)
         if selected and selected.assignment_id == submission.assignment_id and selected.user_id == submission.user_id
           @set('selectedSubmission', submission)
@@ -83,28 +83,40 @@ define [
     #selectedAssignment
 
     studentGrades: (->
-      selected = @get('selectedStudent').enrollment.grades
+      selected = @get('selectedStudent')
+      return null if not selected
+      #will always find the first one, but this should be OK
+      enrollment = @get('enrollments').findBy('user_id', selected.id)
+      enrollment.grades
     ).property('selectedStudent')
+
+    fetchStudentSubmissions: (->
+      Ember.run.once =>
+        notYetLoaded = @get('students').filter (student) ->
+          return false if get(student, 'isLoaded') or get(student, 'isLoading')
+          set(student, 'isLoading', true)
+          student
+
+        return unless notYetLoaded.length
+        student_ids = notYetLoaded.mapBy('id')
+        fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, student_ids: student_ids,  @get('submissions'))
+    ).observes('students.@each').on('init')
 
     submissionsLoaded: (->
       submissions = @get('submissions')
       submissions.forEach ((submission) ->
         student = @get('students').findBy('id', submission.user_id)
-        Ember.set(student, 'isLoaded', true)
+        submission.submissions.forEach ((s) ->
+          @updateSubmission(s, student)
+        ), this
+        set(student, 'isLoading', false)
+        set(student, 'isLoaded', true)
       ), this
     ).observes('submissions.@each')
 
     updateSubmission: (submission, student) ->
       submission.submitted_at = $.parseFromISO(submission.submitted_at) if submission.submitted_at
-      student["assignment_#{submission.assignment_id}"] = submission
-
-    studentLoadedObserver: (->
-      @get('students').filterBy('isLoaded', true).forEach (student) =>
-        @get('submissions').findBy('user_id', student.id).submissions?.forEach ((submission) ->
-          return if student["assignment_#{submission.assignment_id}"]
-          @updateSubmission(submission, student)
-        ), this
-    ).observes('students.@each.isLoaded')
+      set(student, "assignment_#{submission.assignment_id}", submission)
 
     assignments: (->
       _.flatten(@get('assignment_groups').map (ag) -> ag.assignments)
@@ -119,12 +131,11 @@ define [
     selectedSubmission: (->
       return null unless @get('selectedStudent')? and @get('selectedAssignment')?
       student = @get 'selectedStudent'
-      sub = @get('submissions').findBy('user_id', student.id).submissions?.find (submission) =>
-        submission.user_id == @get('selectedStudent').id and
-          submission.assignment_id == @get('selectedAssignment').id
+      assignment = @get 'selectedAssignment'
+      sub = get student, "assignment_#{assignment.id}"
       sub or {
-        user_id: @get('selectedStudent').id
-        assignment_id: @get('selectedAssignment').id
+        user_id: student.id
+        assignment_id: assignment.id
       }
     ).property('selectedStudent', 'selectedAssignment')
 

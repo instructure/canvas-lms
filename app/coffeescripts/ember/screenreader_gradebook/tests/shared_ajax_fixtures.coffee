@@ -170,10 +170,12 @@ define [
         {
           user: { id: '1', name: 'Bob' }
           course_section_id: '1'
+          user_id: '1'
         }
         {
           user: { id: '2', name: 'Fred' }
           course_section_id: '1'
+          user_id: '2'
         }
       ]
 

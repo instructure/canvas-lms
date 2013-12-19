@@ -1,16 +1,14 @@
 define [
   'ember',
   'ic-ajax',
-  '../../shared/xhr/fetch_all_pages',
-  'underscore'
+  '../../shared/xhr/fetch_all_pages'
 ]
-, (Ember, ajax, fetchAllPages, _) ->
+, (Ember, ajax, fetchAllPages) ->
 
   ScreenreaderGradebookRoute = Ember.Route.extend
 
     model: ->
-      #TODO figure out why submissions isn't paginating
       enrollments: fetchAllPages(ENV.GRADEBOOK_OPTIONS.students_url)
       assignment_groups: fetchAllPages(ENV.GRADEBOOK_OPTIONS.assignment_groups_url)
-      submissions: fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, student_ids: 'all')
+      submissions: Em.ArrayProxy.create(content: [])
       sections: fetchAllPages(ENV.GRADEBOOK_OPTIONS.sections_url)
