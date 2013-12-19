@@ -382,6 +382,10 @@ $revision-button-hover-color: #2590cf
     .revision-content
       :margin-left 1px
       :padding 7px 8px
+      .revision-details
+        :white-space nowrap
+        :overflow hidden
+        :text-overflow ellipsis
     &:not(.selected):hover .revision-content
       :background-color $revision-sidebar-hover-color
       :cursor pointer
