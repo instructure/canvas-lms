@@ -31,13 +31,13 @@ class Assignment < ActiveRecord::Base
   include Canvas::DraftStateValidations
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
-    :grading_type, :submission_types,
-    :assignment_group, :unlock_at, :lock_at, :group_category, :group_category_id,
-    :peer_review_count, :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
+    :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
+    :group_category, :group_category_id, :peer_review_count,
+    :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
-    :notify_of_update, :time_zone_edited, :turnitin_enabled, :turnitin_settings,
-    :context, :position, :allowed_extensions, :external_tool_tag_attributes,
-    :freeze_on_copy, :assignment_group_id
+    :notify_of_update, :time_zone_edited, :turnitin_enabled,
+    :turnitin_settings, :context, :position, :allowed_extensions,
+    :external_tool_tag_attributes, :freeze_on_copy, :assignment_group_id
 
   attr_accessor :previous_id, :updating_user, :copying
 
@@ -933,14 +933,6 @@ class Assignment < ActiveRecord::Base
     end
 
     submissions
-  end
-
-  def hide_max_scores_for_assignments
-    false
-  end
-
-  def hide_min_scores_for_assignments
-    false
   end
 
   def self.find_or_create_submission(assignment_id, user_id)

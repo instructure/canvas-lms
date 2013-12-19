@@ -238,8 +238,8 @@ class GradebooksController < ApplicationController
 
         assignment_fields = ["id", "title", "due_at", "unlock_at", "lock_at",
           "points_possible", "grading_type", "submission_types",
-          "assignment_group_id", "grading_scheme_id",
-          "grading_standard_id", "grade_group_students_individually"].map do |field|
+          "assignment_group_id", "grading_scheme_id", "grading_standard_id",
+          "grade_group_students_individually"].map do |field|
             "assignments.#{field}"
         end
         render :json => @context.assignments.active.gradeable.
