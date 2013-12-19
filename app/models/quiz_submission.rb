@@ -222,6 +222,8 @@ class QuizSubmission < ActiveRecord::Base
 
   def results_visible?
     return true unless quiz
+    return false if quiz.restrict_answers_for_concluded_course?
+
     if quiz.hide_results == 'always'
       false
     elsif quiz.hide_results == 'until_after_last_attempt'

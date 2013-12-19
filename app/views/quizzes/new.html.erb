@@ -249,6 +249,16 @@
                 </div>
 
                 <!-- Response/CA Visibility -->
+                <% if @quiz.restrict_answers_for_concluded_course? %>
+                <div class="option-group disabled">
+                  <label class="checkbox" for="never_hide_results">
+                    <span data-tooltip title="<%= t('students_cannot_view_responses_after_course_concludes', 'Students cannot view quiz responses after course concludes') %>">
+                      <input id="never_hide_results" type="checkbox" disabled="disable" />
+                      <%= t('labels.never_hide_results', "Let Students See Their Quiz Responses") %>
+                    </span>
+                  </label>
+                </div>
+                <% else %>
                 <div class="option-group">
                   <label class="checkbox" for="never_hide_results">
                     <input type="hidden" name="quiz[hide_results][never]" value="0"/>
@@ -299,6 +309,7 @@
                     </div>
                   </div>
                 </div>
+                <% end %>
 
                 <!-- OQAAT -->
                 <div class="option-group">

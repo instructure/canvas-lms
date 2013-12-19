@@ -141,6 +141,7 @@ class Account < ActiveRecord::Base
   add_setting :restrict_student_future_view, :boolean => true, :root_only => true, :default => false
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
+  add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
   add_setting :support_url, :root_only => true

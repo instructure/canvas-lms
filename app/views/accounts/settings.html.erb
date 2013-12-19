@@ -144,6 +144,11 @@ TEXT
                       <%= settings.label :restrict_student_future_view, :en => "Restrict students from viewing courses before start date" %>
                     </td>
                   </tr>
+                  <tr>
+                    <td colspan="2"><%= settings.check_box :restrict_quiz_questions, :checked => @account.settings[:restrict_quiz_questions] %>
+                      <%= settings.label :restrict_quiz_questions, :en => "Restrict students from viewing quiz questions after course end date" %>
+                    </td>
+                  </tr>
                 <% end %>
               <% end %>
             <% end %>

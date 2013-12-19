@@ -1243,6 +1243,41 @@ describe Quiz do
 
   end
 
+  describe "#restrict_answers_for_concluded_course?" do
+    it "returns true if course has concluded and account setting is true" do
+      acct = Account.new
+      acct.settings[:restrict_quiz_questions] = true
+
+      context = Course.new(:conclude_at => 10.minutes.ago)
+      context.stubs(:root_account => acct)
+
+      quiz = Quiz.new(:context => context)
+      quiz.restrict_answers_for_concluded_course?.should be_true
+    end
+
+    it "returns false if course has not concluded" do
+      acct = Account.new
+      acct.settings[:restrict_quiz_questions] = true
+
+      context = Course.new(:conclude_at => 10.minutes.from_now)
+      context.stubs(:root_account => acct)
+
+      quiz = Quiz.new(:context => context)
+      quiz.restrict_answers_for_concluded_course?.should be_false
+    end
+
+    it "returns false if account setting is false" do
+      acct = Account.new
+      acct.settings[:restrict_quiz_questions] = false
+
+      context = Course.new(:conclude_at => 10.minutes.ago)
+      context.stubs(:root_account => acct)
+
+      quiz = Quiz.new(:context => context)
+      quiz.restrict_answers_for_concluded_course?.should be_false
+    end
+  end
+
   context "show_correct_answers" do
     it "totally hides the correct answers" do
       quiz = @course.quizzes.create!({

@@ -1380,7 +1380,7 @@ describe QuizSubmission do
     end
   end
 
-  describe "question" do
+  describe "#question" do
     let(:submission) { @quiz.quiz_submissions.build }
     let(:question1) { {:id => 1} }
     let(:question2) { {:id => 2} }
@@ -1413,7 +1413,7 @@ describe QuizSubmission do
     end
   end
 
-  describe "question_answered?" do
+  describe "#question_answered?" do
     let(:submission) { @quiz.quiz_submissions.build }
 
     before do
@@ -1511,7 +1511,30 @@ describe QuizSubmission do
     end
   end
 
-  describe "update_submission_version" do
+  describe "#results_visible?" do
+    it "return true if no quiz" do
+      qs = QuizSubmission.new
+      qs.results_visible?.should be_true
+    end
+
+    it "returns false if quiz restricts answers for concluded courses" do
+      quiz = Quiz.new
+      quiz.stubs(:restrict_answers_for_concluded_course? => true)
+
+      qs = QuizSubmission.new(:quiz => quiz)
+      qs.results_visible?.should be_false
+    end
+
+    it "returns true if quiz doesn't restrict answers for concluded courses" do
+      quiz = Quiz.new
+      quiz.stubs(:restrict_answers_for_concluded_course? => false)
+
+      qs = QuizSubmission.new(:quiz => quiz)
+      qs.results_visible?.should be_true
+    end
+  end
+
+  describe "#update_submission_version" do
     let(:submission) { @quiz.quiz_submissions.create! }
 
     before do
@@ -1555,7 +1578,7 @@ describe QuizSubmission do
 
   end
 
-  describe "submitted_attempts" do
+  describe "#submitted_attempts" do
     let(:submission) { @quiz.quiz_submissions.build }
 
     before do
@@ -1567,7 +1590,7 @@ describe QuizSubmission do
     end
   end
 
-  describe "attempts" do
+  describe "#attempts" do
     let(:quiz)       { @course.quizzes.create! }
     let(:submission) { quiz.quiz_submissions.new }
 

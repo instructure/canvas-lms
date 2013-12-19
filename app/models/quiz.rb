@@ -295,6 +295,12 @@ class Quiz < ActiveRecord::Base
     show_at.present? ? Time.now > show_at : true
   end
 
+  def restrict_answers_for_concluded_course?
+    course    = self.context
+    concluded = course.conclude_at && course.conclude_at < Time.now
+    concluded && course.root_account.settings[:restrict_quiz_questions]
+  end
+
   def update_existing_submissions
     # If the quiz suddenly changes from non-graded to graded,
     # then this will update the existing submissions to reflect quiz
