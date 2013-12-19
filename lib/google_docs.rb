@@ -360,9 +360,10 @@ module GoogleDocs
   #
   # Returns nothing.
   def google_docs_acl_add(document_id, users, domain = nil)
-    access_token = google_docs_retrieve_access_token
-    url          = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
-    domain_regex = domain ? %r{@#{domain}$} : /./
+    access_token  = google_docs_retrieve_access_token
+    url           = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
+    domain_regex  = domain ? %r{@#{domain}$} : /./
+    allowed_users = []
 
     request_feed = Feed.new do |feed|
       feed.categories << Atom::Category.new do |category|
@@ -399,7 +400,7 @@ module GoogleDocs
     end
   end
 
-  def send_feed(token, url, feed)
+  def send_feed(access_token, url, feed)
     response = access_token.post(url, feed.to_xml,
       {'Content-Type' => 'application/atom+xml' })
     Atom::Feed.load_feed(response.body)
