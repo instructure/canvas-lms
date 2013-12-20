@@ -33,6 +33,8 @@ module MigratorHelper
   attr_reader :overview
 
   def self.get_utc_time_from_timestamp(timestamp)
+    return nil if timestamp.nil?
+
     # timestamp can be either a time string in the format "2011-04-30T00:00:00-06:00",
     # or an integer epoch * 1000
     if timestamp.to_s.match(/^-?[0-9.]+$/)

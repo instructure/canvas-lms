@@ -922,67 +922,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def self.import_from_migration(hash, context, item=nil)
-    hash = hash.with_indifferent_access
-    return nil if hash[:migration_id] && hash[:topics_to_import] && !hash[:topics_to_import][hash[:migration_id]]
-    hash[:skip_replies] = true if hash[:migration_id] && hash[:topic_entries_to_import] && !hash[:topic_entries_to_import][hash[:migration_id]]
-    item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
-    item ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
-    if hash[:type] =~ /announcement/i
-      item ||= context.announcements.new
-    else
-      item ||= context.discussion_topics.new
-    end
-    item.migration_id = hash[:migration_id]
-    item.title = hash[:title]
-    item.discussion_type = hash[:discussion_type]
-    item.pinned = !!hash[:pinned] if hash[:pinned]
-    item.require_initial_post = !!hash[:require_initial_post] if hash[:require_initial_post]
-    hash[:missing_links] = []
-    item.message = ImportedHtmlConverter.convert(hash[:description] || hash[:text], context, {:missing_links => (hash[:missing_links])})
-    item.message = t('#discussion_topic.empty_message', "No message") if item.message.blank?
-    item.posted_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:posted_at]) if hash[:posted_at]
-    item.last_reply_at = item.posted_at if item.new_record? && item.posted_at
-    item.delayed_post_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:delayed_post_at]) if hash[:delayed_post_at]
-    item.delayed_post_at ||= Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_date]) if hash[:start_date]
-    item.position = hash[:position] if hash[:position]
-    item.workflow_state = 'active' if item.deleted?
-    item.workflow_state = 'post_delayed' if item.should_not_post_yet
-    if hash[:attachment_migration_id]
-      item.attachment = context.attachments.find_by_migration_id(hash[:attachment_migration_id])
-    end
-    if hash[:external_feed_migration_id]
-      item.external_feed = context.external_feeds.find_by_migration_id(hash[:external_feed_migration_id])
-    end
-    if hash[:attachment_ids] && !hash[:attachment_ids].empty?
-      item.message += Attachment.attachment_list_from_migration(context, hash[:attachment_ids])
-    end
-
-    if hash[:assignment]
-      assignment = Assignment.import_from_migration(hash[:assignment], context)
-      item.assignment = assignment
-    elsif grading = hash[:grading]
-      assignment = Assignment.import_from_migration({
-        :grading => grading,
-        :migration_id => hash[:migration_id],
-        :submission_format => "discussion_topic",
-        :due_date=>hash[:due_date] || hash[:grading][:due_date],
-        :title => grading[:title]
-      }, context)
-      item.assignment = assignment
-    end
-    item.save_without_broadcasting!
-    context.migration_results << "" if hash[:peer_rating_type] && hash[:peer_rating_types] != "none" if context.respond_to?(:migration_results)
-    context.migration_results << "" if hash[:peer_rating_type] && hash[:peer_rating_types] != "none" if context.respond_to?(:migration_results)
-    hash[:messages] ||= hash[:posts]
-    context.imported_migration_items << item if context.respond_to?(:imported_migration_items) && context.imported_migration_items
-
-    if context.respond_to?(:content_migration) && context.content_migration
-      context.content_migration.add_missing_content_links(:class => item.class.to_s,
-        :id => item.id, :missing_links => hash[:missing_links],
-        :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.underscore.pluralize}/#{item.id}")
-    end
-
-    item
+    importer = MigrationImport::DiscussionTopic.new(hash, context, item)
+    importer.run
   end
 
   def self.podcast_elements(messages, context)
