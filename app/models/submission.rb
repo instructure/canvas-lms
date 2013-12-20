@@ -439,14 +439,23 @@ class Submission < ActiveRecord::Base
     return if unassociated_ids.empty?
     attachments = Attachment.find_all_by_id(unassociated_ids)
     attachments.each do |a|
-      if((a.context_type == 'User' && a.context_id == user_id) ||
-          (a.context_type == 'Group' && a.context_id == group_id) ||
-          (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?))
+      if (a.context_type == 'User' && a.context_id == user_id) ||
+         (a.context_type == 'Group' && a.context_id == group_id) ||
+         (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?) ||
+         attachment_fake_belongs_to_group(a)
         aa = self.attachment_associations.find_by_attachment_id(a.id)
         aa ||= self.attachment_associations.create(:attachment => a)
       end
     end
   end
+
+  def attachment_fake_belongs_to_group(attachment)
+    return false unless attachment.context_type == "User" &&
+      assignment.has_group_category?
+    gc = assignment.group_category
+    gc.group_for(user) == gc.group_for(attachment.context)
+  end
+  private :attachment_fake_belongs_to_group
 
   def submit_attachments_to_crocodoc
     if attachment_ids_changed?

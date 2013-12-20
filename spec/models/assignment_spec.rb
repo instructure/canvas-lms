@@ -1532,6 +1532,7 @@ describe Assignment do
       subs.map(&:submission_type).uniq.should eql(['online_text_entry'])
       subs.map(&:body).uniq.should eql(['Some text for you'])
     end
+
     it "should submit the homework for all students in the group if grading them individually" do
       setup_assignment_with_group
       @a.update_attribute(:grade_group_students_individually, true)
@@ -1543,6 +1544,7 @@ describe Assignment do
       submissions.map(&:submission_type).uniq.should eql ["online_text_entry"]
       submissions.map(&:body).uniq.should eql ["Test submission"]
     end
+
     it "should update submission for all students in the same group" do
       setup_assignment_with_group
       res = @a.grade_student(@u1, :grade => "10")
@@ -1552,6 +1554,7 @@ describe Assignment do
       res.map{|s| s.user}.should be_include(@u1)
       res.map{|s| s.user}.should be_include(@u2)
     end
+
     it "should create an initial submission comment for only the submitter by default" do
       setup_assignment_with_group
       sub = @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Some text for you", :comment => "hey teacher, i hate my group. i did this entire project by myself :(")
@@ -1561,6 +1564,7 @@ describe Assignment do
       other_sub = (@a.submissions - [sub])[0]
       other_sub.submission_comments.size.should eql 0
     end
+
     it "should add a submission comment for only the specified user by default" do
       setup_assignment_with_group
       res = @a.grade_student(@u1, :comment => "woot")
@@ -1570,6 +1574,7 @@ describe Assignment do
       res.find{|s| s.user == @u1}.submission_comments.should_not be_empty
       res.find{|s| s.user == @u2}.should be_nil #.submission_comments.should be_empty
     end
+
     it "should update submission for only the individual student if set thay way" do
       setup_assignment_with_group
       @a.update_attribute(:grade_group_students_individually, true)
@@ -1579,6 +1584,7 @@ describe Assignment do
       res.length.should eql(1)
       res[0].user.should eql(@u1)
     end
+
     it "should create an initial submission comment for all group members if specified" do
       setup_assignment_with_group
       sub = @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Some text for you", :comment => "ohai teacher, we had so much fun working together", :group_comment => "1")
@@ -1588,6 +1594,7 @@ describe Assignment do
       other_sub = (@a.submissions - [sub])[0]
       other_sub.submission_comments.size.should eql 1
     end
+
     it "should add a submission comment for all group members if specified" do
       setup_assignment_with_group
       res = @a.grade_student(@u1, :comment => "woot", :group_comment => "1")
@@ -1603,6 +1610,7 @@ describe Assignment do
       group_comment_id.should be_present
       comments.all? { |c| c.group_comment_id == group_comment_id }.should be_true
     end
+
     it "return the single submission if the user is not in a group" do
       setup_assignment_with_group
       res = @a.grade_student(@u3, :comment => "woot", :group_comment => "1")
@@ -1612,6 +1620,18 @@ describe Assignment do
       comments = res.find{|s| s.user == @u3}.submission_comments
       comments.size.should == 1
       comments[0].group_comment_id.should be_nil
+    end
+
+    it "associates attachments with all submissions" do
+      setup_assignment_with_group
+      @a.update_attribute :submission_types, "online_upload"
+      f = @u1.attachments.create! uploaded_data: StringIO.new('blah'),
+        context: @u1,
+        filename: 'blah.txt'
+      @a.submit_homework(@u1, attachments: [f])
+      @a.submissions.each { |s|
+        s.attachments.should == [f]
+      }
     end
   end
 

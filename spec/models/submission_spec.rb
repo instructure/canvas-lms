@@ -930,6 +930,21 @@ describe Submission do
     end
   end
 
+  describe "update_attachment_associations" do
+    begin
+      course_with_student active_all: true
+      @assignment = @course.assignments.create!
+    end
+
+    it "doesn't include random attachment ids" do
+      f = Attachment.create! uploaded_data: StringIO.new('blah'),
+        context: @course,
+        filename: 'blah.txt'
+      sub = @assignment.submit_homework(@user, attachments: [f])
+      sub.attachments.should == []
+    end
+  end
+
   describe "versioned_attachments" do
     it "should include user attachments" do
       student_in_course(active_all: true)
