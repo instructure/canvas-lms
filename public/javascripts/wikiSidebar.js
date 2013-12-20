@@ -240,7 +240,15 @@ define([
       $editor_tabs.find(".upload_new_image_link").click(function(event) {
         event.preventDefault();
         wikiSidebar.loadFolders();
-        $sidebar_upload_image_form.slideToggle('fast');
+        $sidebar_upload_image_form.slideToggle('fast', function(){
+          var $imageForm = $('#sidebar_upload_image_form');
+          if($imageForm.is(":visible")){
+            $imageForm.find('select').first().focus();
+            $(event.currentTarget).attr('aria-label', I18n.t('image_form.expanded', 'Click to toggle the new image form (expanded)'));
+          }else{
+            $(event.currentTarget).attr('aria-label', I18n.t('image_form.collapsed', 'Click to toggle the new image form (collapsed)'));
+          }
+        });
       });
       $editor_tabs.find(".find_new_image_link").click(function(event) {
         event.preventDefault();

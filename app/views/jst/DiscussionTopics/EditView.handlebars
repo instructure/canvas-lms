@@ -42,7 +42,7 @@
 <fieldset>
 
   <div class="control-group">
-    <label class="control-label" for="attachment_uploaded_data">{{#t "attachment"}}Attachment{{/t}}</label>
+    <label class="control-label" for="discussion_attachment_uploaded_data">{{#t "attachment"}}Attachment{{/t}}</label>
     <div class="controls">
       {{#each attachments}}
         <div class="attachmentRow">
@@ -53,7 +53,7 @@
       <input type="file"
              name="attachment"
              {{#if attachments}}style="display:none"{{/if}}
-             id="attachment_uploaded_data" >
+             id="discussion_attachment_uploaded_data" >
     </div>
   </div>
 

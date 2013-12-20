@@ -39,6 +39,31 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       keep_trying_until { @image_list.find_elements(:css, '.img').length }.should == 2
     end
 
+    it "adds a tabindex to flickr search results" do
+      wiki_page_tools_file_tree_setup
+      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      f('.find_new_image_link').click
+      f('#image_search_form input[type=text]').send_keys('dog')
+      f('#image_search_form button[type=submit]').click
+      wait_for_animations
+      results = f('.results .image_link[tabindex="0"]')
+      results.should_not be_nil
+    end
+
+    it "inserts a flickr image when you hit enter" do
+      wiki_page_tools_file_tree_setup
+      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      f('.find_new_image_link').click
+      f('#image_search_form input[type=text]').send_keys('dog')
+      f('#image_search_form button[type=submit]').click
+      wait_for_animations
+      results = fj('.results .image_link[tabindex="0"]:first')
+      results.send_keys(:return)
+      in_frame "wiki_page_body_ifr" do
+        f('#tinymce img').should be_displayed
+      end
+    end
+
     it "should infini-scroll images" do
       wiki_page_tools_file_tree_setup
       90.times do |i|

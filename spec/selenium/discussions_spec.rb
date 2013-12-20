@@ -1327,13 +1327,13 @@ describe "discussions" do
       it "should not show file attachment if allow_student_forum_attachments is not true" do
         # given
         get url
-        f('#attachment_uploaded_data').should be_nil
+        f('#disussion_attachment_uploaded_data').should be_nil
         # when
         course.allow_student_forum_attachments = true
         course.save!
         # expect
         get url
-        f('#attachment_uploaded_data').should_not be_nil
+        f('#discussion_attachment_uploaded_data').should_not be_nil
       end
 
       context "in a group" do
@@ -1342,13 +1342,13 @@ describe "discussions" do
         it "should not show file attachment if allow_student_forum_attachments is not true" do
           # given
           get url
-          f('label[for=attachment_uploaded_data]').should be_nil
+          f('label[for=discussion_attachment_uploaded_data]').should be_nil
           # when
           course.allow_student_forum_attachments = true
           course.save!
           # expect
           get url
-          f('label[for=attachment_uploaded_data]').should be_displayed
+          f('label[for=discussion_attachment_uploaded_data]').should be_displayed
         end
       end
     end
