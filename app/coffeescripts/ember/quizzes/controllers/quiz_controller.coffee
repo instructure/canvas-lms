@@ -20,9 +20,19 @@ define [
 
     canUpdate: true
 
-    publishable: (->
+    disabled: (->
       !@get('unpublishable')
     ).property('unpublishable')
+
+    disabledMessage: I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
+
+    pubUrl: ( ->
+      "/courses/#{environment.get('courseId')}/quizzes/publish"
+    ).property('environment.courseId')
+
+    unPubUrl: ( ->
+      "/courses/#{environment.get('courseId')}/quizzes/unpublish"
+    ).property('environment.courseId')
 
     editTitle: I18n.t('edit_quiz', 'Edit Quiz')
     deleteTitle: I18n.t('delete_quiz', 'Delete Quiz')
@@ -40,7 +50,23 @@ define [
       I18n.t('points', 'pt', count: @get('points_possible'))
     ).property('points_possible')
 
+    updatePublished: (url, publishing) ->
+      ajax(url,
+        type: 'POST',
+        data: {quizzes: [@get('id')]},
+        dataType: 'json'
+      ).then =>
+        @set('published', publishing)
+      .fail =>
+        @set('published', !publishing)
+
     actions:
+      publish: ->
+        @updatePublished(@get('pubUrl'), true)
+
+      unpublish: ->
+        @updatePublished(@get('unPubUrl'), false)
+
       edit: ->
         window.location = @get('editUrl')
 

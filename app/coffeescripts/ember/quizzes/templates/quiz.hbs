@@ -27,7 +27,14 @@
     {{#if canUpdate}}
       <div class="ig-admin">
 
-        {{render 'publish' this}}
+        {{ic-publish-icon
+          disabled=disabled
+          disabled-message=disabledMessage
+          is-published=published
+          on-publish='publish'
+          on-unpublish='unpublish'
+        }}
+
         {{#ic-actions title='settings'}}
           {{#ic-menu-item on-select='edit'}}
             <i class='icon-edit'></i>

@@ -98,9 +98,9 @@ define [
       if @get('disabled')
         @get('disabled-message')
       else if @get('is-published')
-        I18n.t('unpublish', 'unpublish')
+        I18n.t('unpublish', 'Unpublish')
       else
-        I18n.t('publish', 'publish')
+        I18n.t('publish', 'Publish')
     ).property('is-published')
 
     'aria-disabled': (->
