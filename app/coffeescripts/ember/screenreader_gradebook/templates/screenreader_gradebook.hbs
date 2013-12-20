@@ -47,7 +47,7 @@
 
 <fieldset>
   <label for="arrange_assignments">Arrange assignments</label>
-  {{ 
+  {{
     fast-select
     name="arrange_assignments"
     id="arrange_assignments"
@@ -76,7 +76,9 @@
 <h2>Content Selection</h2>
 
 <div>
-  <label for="student_select">Select a student</label>
+  <label for="student_select">
+    {{#t 'select_student'}}Select a student{{/t}}
+  </label>
   {{
     fast-select id="student_select"
     class="student_select"
@@ -88,8 +90,23 @@
   }}
 </div>
 <div id="student_navigation">
-  <a href="#prev_student" id="prev_student">Previous Student</a>
-  <a href="#next_student" id="next_student">Next Student</a>
+  <button
+    id="prev_student"
+    {{action 'selectItem' 'selectedStudent' 'previous'}}
+    {{bind-attr aria-disabled='ariaDisabledPrevStudent'}}
+    {{bind-attr disabled='disablePrevStudentButton'}}
+  >
+    {{#t 'previous_student'}}Previous Student{{/t}}
+  </button>
+
+  <button
+    id="next_student"
+    {{action 'selectItem' 'selectedStudent' 'next'}}
+    {{bind-attr aria-disabled='ariaDisabledNextStudent'}}
+    {{bind-attr disabled='disableNextStudentButton'}}
+  >
+    {{#t 'next_student'}}Next Student{{/t}}
+  </button>
 </div>
 
 <!-- not sure we need this
@@ -106,7 +123,9 @@
 -->
 
 <div>
-  <label for="assignment_select">Select an assignment</label>
+  <label for="assignment_select">
+    {{#t 'select_assignment'}}Select an assignment{{/t}}
+  </label>
    {{
     fast-select id="assignment_select"
     class="assignment_select"
@@ -119,8 +138,23 @@
 </div>
 
 <div id="assignment_navigation">
-  <a href="#prev_assignment" id="prev_assignment">Previous Assignment</a> 
-  <a href="#next_assignment" id="next_assignment">Next Assignment</a>
+  <button
+    id="prev_assignment"
+    {{action 'selectItem' 'selectedAssignment' 'previous'}}
+    {{bind-attr aria-disabled='ariaDisabledPrevAssignment'}}
+    {{bind-attr disabled='disablePrevAssignmentButton'}}
+  >
+    {{#t 'previous_assignment'}}Previous Assignment{{/t}}
+  </button>
+
+  <button
+    id="next_assignment"
+    {{action 'selectItem' 'selectedAssignment' 'next'}}
+    {{bind-attr aria-disabled='ariaDisabledNextAssignment'}}
+    {{bind-attr disabled='disableNextAssignmentButton'}}
+  >
+    {{#t 'next_assignment'}}Next Assignment{{/t}}
+  </button>
 </div>
 
 <!-- student + assignment -->
@@ -206,7 +240,7 @@
   <!-- assignment stats: average/high/low score + submission count -->
   {{#if assignmentDetails}}
   {{#with assignmentDetails }}
-  {{#if cnt}} 
+  {{#if cnt}}
   <div>Average Score: {{average}}</div>
   <div>High Score: {{max}}</div>
   <div>Low Score: {{min}}</div>

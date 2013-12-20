@@ -33,5 +33,5 @@ define [
   test 'fetches sections', ->
     visit('/').then ->
       controller = App.__container__.lookup('controller:screenreader_gradebook')
-      equal controller.get('sections').objectAt(0).name, 'Section 1'
-      equal controller.get('sections').objectAt(1).name, 'Section 2'
+      equal controller.get('sections').objectAt(0).name, 'Vampires and Demons'
+      equal controller.get('sections').objectAt(1).name, 'Slayers and Scoobies'

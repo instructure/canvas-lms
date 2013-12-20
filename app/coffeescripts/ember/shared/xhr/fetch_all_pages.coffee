@@ -10,7 +10,7 @@ define [
       records.pushObjects result.response
       meta = parseLinkHeader result.jqXHR
       if meta.next
-        fetch meta.next, records, data
+        fetch meta.next, data, records
       else
         records.set('isLoaded', true)
         records.set('isLoading', false)

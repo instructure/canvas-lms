@@ -163,8 +163,86 @@ define [
         "submission_comments": [],
         "attachments": []
       }
+  },
+  {
+    "submission": {
+        "assignment_id": "1",
+        "attachment_id": null,
+        "attachment_ids": null,
+        "attempt": null,
+        "body": null,
+        "cached_due_date": "2013-12-19T06:59:59Z",
+        "context_code": "course_2",
+        "created_at": "2013-12-12T22:57:34Z",
+        "grade": "100",
+        "grade_matches_current_submission": true,
+        "graded_at": "2013-12-16T21:25:44Z",
+        "grader_id": "1",
+        "group_id": null,
+        "has_admin_comment": false,
+        "has_rubric_assessment": null,
+        "id": "34291",
+        "media_comment_id": null,
+        "media_comment_type": null,
+        "media_object_id": null,
+        "process_attempts": 0,
+        "processed": null,
+        "published_grade": "150",
+        "published_score": 100.0,
+        "quiz_submission_id": null,
+        "score": 100.0,
+        "student_entered_score": null,
+        "submission_comments_count": null,
+        "submission_type": null,
+        "submitted_at": null,
+        "turnitin_data": null,
+        "updated_at": "2013-12-16T21:25:45Z",
+        "url": null,
+        "user_id": "3",
+        "workflow_state": "graded",
+        "submission_history": [{
+            "submission": {
+                "assignment_id": 1,
+                "attachment_id": null,
+                "attachment_ids": null,
+                "attempt": null,
+                "body": null,
+                "cached_due_date": "2013-12-19T06:59:59Z",
+                "context_code": "course_2",
+                "created_at": "2013-12-12T22:57:34Z",
+                "grade": "100",
+                "grade_matches_current_submission": true,
+                "graded_at": "2013-12-16T21:25:44Z",
+                "grader_id": 1,
+                "group_id": null,
+                "has_admin_comment": false,
+                "has_rubric_assessment": null,
+                "id": 34291,
+                "media_comment_id": null,
+                "media_comment_type": null,
+                "media_object_id": null,
+                "process_attempts": 0,
+                "processed": null,
+                "published_grade": "150",
+                "published_score": 100.0,
+                "quiz_submission_id": null,
+                "score": 100.0,
+                "student_entered_score": null,
+                "submission_comments_count": null,
+                "submission_type": null,
+                "submitted_at": null,
+                "turnitin_data": null,
+                "updated_at": "2013-12-16T21:25:45Z",
+                "url": null,
+                "user_id": 3,
+                "workflow_state": "graded",
+                "versioned_attachments": []
+            }
+        }],
+        "submission_comments": [],
+        "attachments": []
     }
-  ]
+  }]
 
   students = [
         {
@@ -178,11 +256,55 @@ define [
           course_section_id: '1'
         }
         {
-          user_id: '1'
-          user: { id: '1', name: 'Bob' }
+          user_id: '3'
+          user: { id: '3', name: 'Suzy' }
+          course_section_id: '1'
+        }
+        {
+          user_id: '4'
+          user: { id: '4', name: 'Buffy' }
           course_section_id: '2'
         }
-
+        {
+          user_id: '5'
+          user: { id: '5', name: 'Willow' }
+          course_section_id: '2'
+        }
+        {
+          user_id: '5'
+          user: { id: '5', name: 'Willow' }
+          course_section_id: '1'
+        }
+        {
+          user_id: '6'
+          user: { id: '6', name: 'Giles' }
+          course_section_id: '2'
+        }
+        {
+          user_id: '7'
+          user: { id: '7', name: 'Xander' }
+          course_section_id: '2'
+        }
+        {
+          user_id: '8'
+          user: { id: '8', name: 'Cordelia' }
+          course_section_id: '2'
+        }
+        {
+          user_id: '9'
+          user: { id: '9', name: 'Drusilla' }
+          course_section_id: '1'
+        }
+        {
+          user_id: '10'
+          user: { id: '10', name: 'Spike' }
+          course_section_id: '2'
+        }
+        {
+          user_id: '10'
+          user: { id: '10', name: 'Spike' }
+          course_section_id: '1'
+        }
       ]
 
   assignmentGroups = [
@@ -220,7 +342,6 @@ define [
               position: 12
               assignment_group_id:'1'
             }
-
           ]
         }
         {
@@ -248,7 +369,6 @@ define [
               position: 6
               assignment_group_id:'2'
             }
-
           ]
         }
       ]
@@ -268,11 +388,46 @@ define [
             { id: '4', user_id: '2', assignment_id: '2', grade: null }
           ]
         }
+        {
+          user_id: '3'
+          submissions: [
+            { id: '5', user_id: '3', assignment_id: '1', grade: '10' }
+            { id: '6', user_id: '3', assignment_id: '2', grade: null }
+          ]
+        }
+        {
+          user_id: '4'
+          submissions: []
+        }
+        {
+          user_id: '5'
+          submissions: []
+        }
+        {
+          user_id: '6'
+          submissions: []
+        }
+        {
+          user_id: '7'
+          submissions: []
+        }
+        {
+          user_id: '8'
+          submissions: []
+        }
+        {
+          user_id: '9'
+          submissions: []
+        }
+        {
+          user_id: '10'
+          submissions: []
+        }
       ]
 
   sections = [
-        { id: '1', name: 'Section 1' }
-        { id: '2', name: 'Section 2' }
+        { id: '1', name: 'Vampires and Demons' }
+        { id: '2', name: 'Slayers and Scoobies' }
       ]
 
   set_default_grade_response: default_grade_response

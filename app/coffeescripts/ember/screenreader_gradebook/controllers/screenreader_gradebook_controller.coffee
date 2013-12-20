@@ -42,6 +42,14 @@ define [
     downloadUrl: "#{get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')}/gradebook.csv"
     gradingHistoryUrl:  "#{get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')}/history"
 
+    actions:
+      selectItem: (property, goTo) ->
+        list = @getListFor(property)
+        currentIndex = list.indexOf(@get(property))
+        item = list.objectAt(currentIndex - 1) if goTo == 'previous'
+        item = list.objectAt(currentIndex + 1) if goTo == 'next'
+        @set(property, item)
+
     setupSubmissionCallback: (->
       $.subscribe 'submissions_updated', _.bind(@updateSubmissionsFromExternal, this)
     ).on('init')
@@ -204,3 +212,47 @@ define [
       locals
     ).property('selectedAssignment')
 
+    # Next/Previous Student/Assignment
+
+    getListFor: (property) ->
+      return @get('studentsInSelectedSection') if property == 'selectedStudent'
+      return @get('assignments') if property == 'selectedAssignment'
+
+    assignmentIndex: (->
+      selected = @get('selectedAssignment')
+      if selected then @get('assignments').indexOf(selected) else -1
+    ).property('selectedAssignment', 'assignmentSort')
+
+    studentIndex: (->
+      selected = @get('selectedStudent')
+      if selected then @get('studentsInSelectedSection').indexOf(selected) else -1
+    ).property('selectedStudent', 'selectedSection')
+
+    disablePrevAssignmentButton: Ember.computed.lte('assignmentIndex', 0)
+    disablePrevStudentButton: Ember.computed.lte('studentIndex', 0)
+
+    disableNextAssignmentButton: (->
+      next = @get('assignments').objectAt(@get('assignmentIndex') + 1)
+      !(@get('assignments.length') and next)
+    ).property('selectedAssignment', 'assignments.@each')
+
+    disableNextStudentButton: (->
+      next = @get('studentsInSelectedSection').objectAt(@get('studentIndex') + 1)
+      !(@get('studentsInSelectedSection.length') and next)
+    ).property('selectedStudent', 'studentsInSelectedSection', 'selectedSection')
+
+    ariaDisabledPrevAssignment: (->
+      new Boolean(@get('disablePrevAssignmentButton'))?.toString()
+    ).property('disablePrevAssignmentButton')
+
+    ariaDisabledPrevStudent: (->
+      new Boolean(@get('disablePrevStudentButton'))?.toString()
+    ).property('disablePrevStudentButton')
+
+    ariaDisabledNextAssignment: (->
+      new Boolean(@get('disableNextAssignmentButton'))?.toString()
+    ).property('disableNextAssignmentButton')
+
+    ariaDisabledNextStudent: (->
+      new Boolean(@get('disableNextStudentButton'))?.toString()
+    ).property('disableNextStudentButton')
