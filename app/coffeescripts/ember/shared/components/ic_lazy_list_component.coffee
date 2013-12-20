@@ -1,13 +1,16 @@
 define [
+  '../register'
   'ember'
   '../../shared/xhr/parse_link_header'
   'underscore'
-  '../templates/components/ic-lazily-paginated-records'
-], (Ember, parseLinkHeader, {throttle}) ->
+  '../templates/components/ic-lazy-list'
+], (register, Ember, parseLinkHeader, {throttle}) ->
 
   $window = $ window
 
-  IcPaginatedRecordsComponent = Ember.Component.extend
+  IcLazyList = Ember.Component.extend
+
+    tagName: 'ic-lazy-list'
 
     registerWithConstructor: (->
       @constructor.register this if @get 'meta.next'
@@ -42,20 +45,20 @@ define [
     extractMeta: (res, status, xhr) ->
       parseLinkHeader xhr
 
-  IcPaginatedRecordsComponent.reopenClass
+  IcLazyList.reopenClass
 
     views: []
 
     register: (view) ->
       @views.addObject view
       if @views.length is 1
-        $window.on 'scroll.ic-lazily-paginated-records', throttle(@checkViews.bind(this), 100)
+        $window.on 'scroll.ic-lazy-list', throttle(@checkViews.bind(this), 100)
       Ember.run.scheduleOnce 'afterRender', this, 'checkViews'
 
     unregister: (view) ->
       @views.removeObject(view)
       if @views.length is 0
-        $window.off 'scroll.ic-lazily-paginated-records'
+        $window.off 'scroll.ic-lazy-list'
 
     checkViews: ->
       for view in @views
@@ -64,4 +67,6 @@ define [
         if bottom <= window.innerHeight
           view.loadNextRecords()
       null
+
+   register 'component', 'ic-lazy-list', IcLazyList
 
