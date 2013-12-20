@@ -898,7 +898,7 @@ define [
 
       @aggregateColumns = for id, group of @assignmentGroups
         html = "#{group.name}"
-        if group.group_weight?
+        if group.group_weight? and @weightedGroups()
           percentage =  I18n.toPercentage(group.group_weight, precision: 2)
           html += """
             <div class='assignment-points-possible'>
