@@ -9,7 +9,7 @@ de:
     context_required: "Sie müssen einen Kalender auswählen"
     select_calendars: "Kalender auswählen"
   EditGroupAssignmentView: 
-    move_to: "Verschieben nach"
+    move_to: "Verschieben in"
   GroupDetailView: 
     delete_confirm: "Möchten Sie diese Gruppe wirklich entfernen?"
     flash: 
@@ -734,7 +734,7 @@ de:
       global_announcements_title: "Globale Ankündigungen"
       global_js_and_css_includes_description: "Diese Dateien werden bei allen Seitenaufrufen für Ihr Konto angezeigt"
       global_js_and_css_includes_title: "Globale JavaScript- und CSS-Includes"
-      google_docs_domain: "Zulässige Google Docs-Domäne"
+      google_docs_domain: "Zulässige Google Docs-Domain"
       headers: 
         report_last_run: "Letzte Ausführung"
         report_name: Name
@@ -755,7 +755,7 @@ de:
         canvas_authentication: Canvas-authentifizierung
         default_language: Standardsprache
         default_time_zone: Standardzeitzone
-        domain: "Domäne:"
+        domain: "Domain:"
         edit_institution_email: "Benutzer können ihre von der Institution zugewiesene E-Mail-Adresse löschen"
         enable_alerts: Benachrichtigungen
         enable_eportfolios: ePortfolios
@@ -1340,8 +1340,8 @@ de:
     labels: 
       due: Abgabetermin
     name_is_required: "Name erforderlich!"
-    percentage_points_possible: "Die möglichen Punkte müssen für die prozentuale Benotung über 0 liegen"
-    points_possible_number: "Die möglichen Punkte müssen einen Zahl sein"
+    percentage_points_possible: "Für die prozentuale Benotung muss die mögliche Punktzahl über 0 liegen"
+    points_possible_number: "Der Wert für die möglichen Punkte muss eine Zahl sein"
     select_external_tool_dialog_title: "Externes Tool konfigurieren"
     show_advanced_options: "Erweiterte Optionen anzeigen"
     submission_action_take_quiz: "Akzeptieren %{title}"
@@ -1681,7 +1681,7 @@ de:
       group_category_options: "Neue Gruppenkategorie"
       group_set: Gruppensatz
       is_group_assignment: "Dies ist eine Gruppenaufgabe"
-      students_already_submitted_warning: "Vorherige einzelne Einreichungen werden nicht als Gruppeneinreichungen gezählt und werden in SpeedGrader falsche angezeigt."
+      students_already_submitted_warning: "Vorherige individuelle Einreichungen werden nicht als Gruppeneinreichungen gezählt und werden in SpeedGrader falsch angezeigt."
     group_comment: 
       labels: 
         group_comment: "Kommentar an die gesamte Gruppe verschicken"
@@ -1808,7 +1808,7 @@ de:
       peer_reviews_assign_at_explanation: "Muss nach dem Abgabetermin liegen. Bei leerem Feld gilt der Abgabetermin."
       reviews_per_user: "Überprüfungen pro Benutzer"
     percent_of_final_grade: "%{percent} der Gesamtnote"
-    points_possible_number: "Die möglichen Punkte müssen einen Zahl sein"
+    points_possible_number: "Der Wert für die möglichen Punkte muss eine Zahl sein"
     positive_number: "Sie müssen eine positive Zahl verwenden"
     redirect_page: 
       redirect_message: |-
@@ -1914,14 +1914,14 @@ de:
       comments_placeholder: Kommentare...
       errors: 
         unacceptable_file_type: "Dieser Dateityp ist nicht erlaubt. Zulässige Dateitypen sind: %{allowed_extensions_list}"
-      gmail_restriction_description: "Die Anzahl der für Ihr Konto eingereichten Google Docs bei den Google-Konten der %{domain}-Domäne ist beschränkt. Um diese Aufgabe über ein Google-Dokument einzureichen, müssen Sie die Google Docs-Integration auf der Seite mit Ihren Benutzereinstellungen neu konfigurieren."
+      gmail_restriction_description: "Die Anzahl der Einreichungen über Google Docs für Ihr Google-Konto bei der %{domain}-Domain ist beschränkt. Um diese Aufgabe als Google Docs-Dokument einzureichen, müssen Sie die Google Docs-Integration auf der Seite mit Ihren Benutzereinstellungen neu konfigurieren."
       instructions: 
         from_external_tool: "Wählen Sie ein zu ladendes Tools aus der Liste unten aus, und senden Sie eine vom Tool bereitgestellte Ressource ein."
         google_docs: "Wählen Sie die Datei aus der Liste unten aus."
         media_recording: "Verwenden Sie den unten stehenden Link, um Ihre Einsendung aufzuzeichnen. Wenn Sie fertig sind und Ihre Einsendung starten möchten, klicken Sie auf \"Speichern\"."
         online_text_entry: "Verwenden Sie Kopieren und Einfügen oder Ihre Tastatur, um Ihre Einsendung hier einzufügen."
         online_url: "Kopieren und fügen Sie den Link zur Webseite ein, die Sie einsenden möchten."
-      invalid_google_docs_domain: "Ungültige Domäne"
+      invalid_google_docs_domain: "Ungültige Domain"
       labels: 
         uploaded_data: Datei
         url: Webseiten-URL
@@ -2279,7 +2279,7 @@ de:
         calendar_month: Monat
         calendar_scheduler: Planer
         calendar_week: Woche
-        screenreader_recommend_agenda: "Benutzer von Sprachausgabeprogrammen: Agenda zum Anzeigen von Events verwenden"
+        screenreader_recommend_agenda: "Benutzer von Sprachausgabeprogrammen: Verwenden Sie die Agenda zum Anzeigen von Events"
       loading: "Wird geladen"
       my_appointment_groups: "Meine Termingruppen"
     calendar_navigator: 
@@ -2353,7 +2353,7 @@ de:
       end_time: Endzeit
       event_description: Eventbeschreibung
       event_title: Eventtitel
-      new_calendar_event_header: "Neuer Kalenderevent"
+      new_calendar_event_header: "Neues Kalenderevent"
       start_time: Anfangszeit
     edit_event: 
       tabs: 
@@ -5163,7 +5163,7 @@ de:
         one: "1 weiteren Eintrag zeigen"
         other: "%{count} weitere Einträge zeigen"
     error_draft_state_announcement: "Der Status dieses Themas kann nicht auf Entwurf gesetzt werden, da es sich um eine Ankündigung handelt."
-    error_draft_state_graded: "Der Status dieses Themas kann nicht in Entwurf geändert werden, da es sich um eine Aufgabe handelt"
+    error_draft_state_graded: "Der Status dieses Themas kann nicht in \"Entwurf\" geändert werden, da es sich um eine Aufgabe handelt"
     error_draft_state_unauthorized: "Sie sind nicht berechtigt, den Status dieses Themas auf Entwurf zu setzen."
     error_draft_state_with_posts: "Der Status dieses Themas darf nicht auf Entwurf gesetzt werden, da Beiträge vorhanden sind."
     group_assignment_discussion_entry: 
@@ -5205,7 +5205,7 @@ de:
       current_page: Aktuell
       first_page: Erste
       last_page: Letzte
-    points_possible_number: "Die möglichen Punkte müssen einen Zahl sein"
+    points_possible_number: "Der Wert für die möglichen Punkte muss eine Zahl sein"
     reply_count_tooltip: 
       one: "1 Antwort"
       other: "%{count} Antworten"
@@ -5343,11 +5343,11 @@ de:
     unsubscribed: Abgemeldet
     unsubscribed_hint: "Sie haben sich nicht für dieses Thema angemeldet. Klicken Sie, um sich anzumelden."
   draft_state_description: |-
-      Der Entwurfsstatus ist eine *Beta*-Funktion, mit der Kursinhalte veröffentlicht werden können und deren Veröffentlichung aufgehoben werden kann.
+      Der Status "Entwurf" ist eine *Beta*-Funktion, mit der Kursinhalte veröffentlicht werden können und deren Veröffentlichung rückgängig gemacht werden kann.
       Nicht veröffentlichte Inhalte werden den Studenten nicht angezeigt und haben keinen Einfluss auf die Noten.
       Der Status umfasst außerdem ein Neudesign für eine Reihe von Kursbereichen, um deren Aussehen und Funktionen konsistenter zu machen.
       
-      Nicht veröffentlichte Inhalte sind möglicherweise nicht verfügbar, wenn der Entwurfsstatus deaktiviert ist.
+      Nicht veröffentlichte Inhalte sind möglicherweise nicht verfügbar, wenn der Status "Entwurf" deaktiviert ist.
   due_dates: 
     due_at: "fällig: %{assignment_due_date_time}"
     multiple_due_dates: "fällig: Mehrere Abgabetermine"
@@ -5911,7 +5911,7 @@ de:
       disabled: Deaktiviert
       enabled: Aktiviert
       estimated_release: "Geschätzte Freigabe:"
-      no_description: "keine Beschreibung"
+      no_description: "Keine Beschreibung"
       ? "off"
       : Aus
       ? "on"
@@ -5922,7 +5922,7 @@ de:
       feature_options: Funktionsoptionen
       no_features_available: "Derzeit sind keine Funktionen verfügbar."
   features: 
-    draft_state: Entwurfsstatus
+    draft_state: "Status \"Entwurf\""
     google_docs_domain_restriction: "Google Docs Domain-Beschränkung"
   filebrowserview: 
     course_files: Kursdateien
@@ -6126,10 +6126,10 @@ de:
     question: Frage
     warning: Warnung
   google_docs_domain_restriction_description: |-
-      Mit der Google Docs Domain-Beschränkung können Einreichungen und Arbeitsgruppen
-      über Google Docs auf eine Domain beschränkt werden. Studenten, die versuchen, Aufgaben einzureichen
-      oder Arbeitsgruppen in einer nicht genehmigten Domain beizutreten, erhalten eine Fehlermeldung,
-      dass Sie ihre Google Docs-Integration aktualisieren müssen.
+      Mit der Google Docs Domain-Beschränkung können Google Docs-Einreichungen und
+      -Arbeitsgruppen auf eine Domain beschränkt werden. Studenten, die versuchen, Aufgaben über
+      eine nicht genehmigte Domain einzureichen oder dort Arbeitsgruppen beizutreten, erhalten eine
+      Fehlermeldung, dass Sie ihre Google Docs-Integration aktualisieren müssen.
   gradebook: 
     alerts: 
       no_active_students: "Leider sind keine aktiven Studenten im Kurs eingeschrieben oder keiner der Studenten kann von Ihnen benotet werden."
@@ -6276,11 +6276,11 @@ de:
     invalid_assignment_groups_warning: 
       one: "%{groups} ist in der Punktzahl nicht enthalten, da hierfür keine Punkte vergeben werden können"
       other: "%{groups} sind in der Punktzahl nicht enthalten, da hierfür keine Punkte vergeben werden können"
-    keyboard_assignment_desc: "Zur Seite mit den Details der aktuellen Aufgabe wechseln"
+    keyboard_assignment_desc: "Zur Seite mit Details der aktuellen Aufgabe wechseln"
     keyboard_close_menu: "Derzeit aktives Aufgabenmenü schließen"
     keyboard_comment_desc: "Aktive Einreichung kommentieren"
     keyboard_menu_desc: "Menü für Aufgabe der aktiven Spalte öffnen"
-    keyboard_sort_desc: "Tabelle nach der derzeit aktiven Spalte sortieren"
+    keyboard_sort_desc: "Raster nach der derzeit aktiven Spalte sortieren"
     keycodes: 
       close_menu: ESC
       comment: c
@@ -9640,7 +9640,7 @@ de:
       facebook: 
         display: Facebook
       push: 
-        display: Push-Benachrichtigung
+        display: Pushbenachrichtigung
       sms: 
         display: Mobilnummer
       twitter: 
@@ -10841,8 +10841,8 @@ de:
     correct_answers_no_longer_available: "Die richtigen Antworten sind nicht mehr verfügbar."
     correct_answers_protected: "Die richtigen Antworten sind ausgeblendet."
     correct_answers_shown_after: "Die richtigen Antworten stehen am %{date} zu Verfügung."
-    correct_answers_shown_between: "Die richtigen Antworten stehen %{from} bis %{to} zur Verfügung."
-    correct_answers_shown_until: "Die richtigen Antworten stehen bis zum  %{date} zur Verfügung."
+    correct_answers_shown_between: "Die richtigen Antworten stehen von %{from} bis %{to} zur Verfügung."
+    correct_answers_shown_until: "Die richtigen Antworten stehen bis zum %{date} zur Verfügung."
     default_answer_comments: "Rückmeldung bei Wahl dieser Antwort durch den Studenten"
     default_answer_comments_on_match: "Rückmeldung bei Zuordnung dieser Antwort durch den Studenten"
     default_comments_on_wrong_match: "Rückmeldung beim Verfehlen dieser Antwort durch den Benutzer"
@@ -11243,12 +11243,12 @@ de:
       end_quiz_reference_time_now: jetzt
       end_quiz_when: "Beenden Sie das Quiz %{n} Minuten nach %{reference_time}."
       errors: 
-        quiz_submission_extra_attempts_not_a_number: "Der Wert für zusätzliche Versuche muss eine Zahl sein."
-        quiz_submission_extra_attempts_too_long: "Der Wert für zusätzliche Versuche muss unter 1000 liegen."
-        quiz_submission_extra_attempts_too_short: "Der Wert für zusätzlich Versuche muss größer als 0 sein."
-        quiz_submission_extra_time_not_a_number: "Der Wert für zusätzliche Zeit muss eine Zahl sein."
-        quiz_submission_extra_time_too_long: "Der Wert für zusätzliche Zeit muss unter 10080 liegen."
-        quiz_submission_extra_time_too_short: "Der Wert für zusätzliche Zeit muss über 0 liegen."
+        quiz_submission_extra_attempts_not_a_number: "Der Wert für die zusätzlichen Versuche muss eine Zahl sein."
+        quiz_submission_extra_attempts_too_long: "Der Wert für die zusätzlichen Versuche muss unter 1000 liegen."
+        quiz_submission_extra_attempts_too_short: "Der Wert für die zusätzlichen Versuche muss größer als 0 sein."
+        quiz_submission_extra_time_not_a_number: "Der Wert für die zusätzliche Zeit muss eine Zahl sein."
+        quiz_submission_extra_time_too_long: "Der Wert für die zusätzliche Zeit muss unter 10080 liegen."
+        quiz_submission_extra_time_too_short: "Der Wert für die zusätzliche Zeit muss über 0 liegen."
         server_communication_failed: "Während der Kommunikation mit dem Server ist ein Problem aufgetreten.  Warten Sie fünf Minuten für einen weiteren Versuch oder laden Sie die Seite erneut."
       extended_quiz_time_explanation: "Sie können diesem Studenten mehr Zeit für seinen aktuellen Quizversuch einräumen. Wie viel Zeit möchten Sie ihm geben?"
       extensions_for_student: "Zeitlimiterweiterung für %{student}"
@@ -11304,7 +11304,7 @@ de:
       group: Aufgabengruppe
       headers: 
         ip_filters: "Was sind Quiz-IP-filter?"
-      hide_correct_answers_at: "Richtige Antworten ausblenden bei"
+      hide_correct_answers_at: "Richtige Antworten ausblenden unter"
       hints: 
         question_detail_disabled: "ANMERKUNG: Bei über %{question_count} vorhandenen Fragen sind keine Details verfügbar."
         quiz_score: "Studenten erhalten automatisch die volle Punktzahl, sobald Sie an der Befragung teilnehmen"
@@ -11878,7 +11878,7 @@ de:
       manage_courses: "Kurse verwalten (hinzufügen / bearbeiten / löschen)"
       manage_demos: "Demos verwalten"
       manage_developer_keys: "Entwicklerschlüssel verwalten"
-      manage_feature_flags: "Funktionen auf einer Kontoebene aktivieren oder deaktivieren"
+      manage_feature_flags: "Funktionen auf Kontoebene aktivieren oder deaktivieren"
       manage_files: "Kursdateien verwalten (hinzufügen / bearbeiten / löschen)"
       manage_frozen_assignment: "temporär gesperrte Aufgaben verwalten (bearbeiten/löschen)"
       manage_global_outcomes: "Globale Lernergebnisse verwalten"
@@ -12964,7 +12964,7 @@ de:
       assignment_submit_fail: "Das Einsenden der Aufgabe ist fehlgeschlagen"
       can_not_submit_locked_assignment: "Gesperrte Aufgaben können nicht eingesandt werden"
       invalid_file_type: "Ungültiges Dateiformat"
-      invalid_google_docs_domain: "Sie können keine Aufgaben über diese Google Docs-Domain einreichen"
+      invalid_google_docs_domain: "Sie können über diese Google Docs-Domain keine Aufgaben einreichen"
       media_file_attached: "Die Einsendung beinhaltete keine Multimedia-Aufzeichnung"
       no_attached_file: "Sie müssen mindestens eine Datei an diese Aufgabe anhängen"
       no_report: "Für dieses Element der Einsendung wurde kein Bericht gefunden"
