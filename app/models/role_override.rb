@@ -495,6 +495,16 @@ class RoleOverride < ActiveRecord::Base
         ],
         :true_for => [ 'AccountAdmin' ]
       },
+      :view_course_changes => {
+        :label => lambda { t('permissions.view_course_changes', "View Course Change Logs") },
+        :admin_tool => true,
+        :account_only => true,
+        :available_to => [
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [ 'AccountAdmin' ]
+      },
       :view_notifications => {
         :label => lambda { t('permissions.view_notifications', "View notifications") },
         :admin_tool => true,

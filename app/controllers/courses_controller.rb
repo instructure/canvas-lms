@@ -349,8 +349,11 @@ class CoursesController < ApplicationController
         @course.apply_assignment_group_weights = value_to_boolean apply_assignment_group_weights
       end
 
+      changes = @course.changes
+
       respond_to do |format|
         if @course.save
+          Auditors::Course.record_created(@course, @current_user, changes)
           @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active') if params[:enroll_me].to_s == 'true'
           # offer updates the workflow state, saving the record without doing validation callbacks
           @course.offer if api_request? and params[:offer].present?
@@ -536,7 +539,7 @@ class CoursesController < ApplicationController
   # user must have the 'View usage reports' permission.
   #
   # @example_request
-  #     curl -H 'Authorization: Bearer <token>' \ 
+  #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/<course_id>/recent_users
   #
   # @returns [User]
@@ -659,6 +662,7 @@ class CoursesController < ApplicationController
 
       @context.complete
       if @context.save
+        Auditors::Course.record_concluded(@context, @current_user)
         flash[:notice] = t('notices.concluded', "Course successfully concluded")
       else
         flash[:notice] = t('notices.failed_conclude', "Course failed to conclude")
@@ -716,8 +720,8 @@ class CoursesController < ApplicationController
   # Returns some of a course's settings.
   #
   # @example_request
-  #   curl https://<canvas>/api/v1/courses/<course_id>/settings \ 
-  #     -X GET \ 
+  #   curl https://<canvas>/api/v1/courses/<course_id>/settings \
+  #     -X GET \
   #     -H 'Authorization: Bearer <token>'
   #
   # @example_response
@@ -770,9 +774,9 @@ class CoursesController < ApplicationController
   # @argument allow_student_discussion_editing [Boolean]
   #
   # @example_request
-  #   curl https://<canvas>/api/v1/courses/<course_id>/settings \ 
-  #     -X PUT \ 
-  #     -H 'Authorization: Bearer <token>' \ 
+  #   curl https://<canvas>/api/v1/courses/<course_id>/settings \
+  #     -X PUT \
+  #     -H 'Authorization: Bearer <token>' \
   #     -d 'allow_student_discussion_topics=false'
   def update_settings
     return unless api_request?
@@ -1470,10 +1474,10 @@ class CoursesController < ApplicationController
   # For possible arguments, see the Courses#create documentation (note: the enroll_me param is not allowed in the update action).
   #
   # @example_request
-  #   curl https://<canvas>/api/v1/courses/<course_id> \ 
-  #     -X PUT \ 
-  #     -H 'Authorization: Bearer <token>' \ 
-  #     -d 'course[name]=New course name' \ 
+  #   curl https://<canvas>/api/v1/courses/<course_id> \
+  #     -X PUT \
+  #     -H 'Authorization: Bearer <token>' \
+  #     -d 'course[name]=New course name' \
   #     -d 'course[start_at]=2012-05-05T00:00:00Z'
   #
   # @example_response
@@ -1550,7 +1554,12 @@ class CoursesController < ApplicationController
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
       respond_to do |format|
         @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
-        if @course.update_attributes(params[:course])
+
+        @course.attributes = params[:course]
+        changes = @course.changes
+
+        if @course.save
+          Auditors::Course.record_updated(@course, @current_user, changes)
           @current_user.touch
           if params[:update_default_pages]
             @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
@@ -1587,12 +1596,12 @@ class CoursesController < ApplicationController
   #     rather than delete a course if there is any possibility the course will be used again.) The recovered course
   #     will be unpublished. Deleted enrollments will not be recovered.
   # @example_request
-  #     curl https://<canvas>/api/v1/accounts/<account_id>/courses \ 
-  #       -X PUT \ 
-  #       -H 'Authorization: Bearer <token>' \ 
-  #       -d 'event=offer' \ 
-  #       -d 'course_ids[]=1' \ 
-  #       -d 'course_ids[]=2' 
+  #     curl https://<canvas>/api/v1/accounts/<account_id>/courses \
+  #       -X PUT \
+  #       -H 'Authorization: Bearer <token>' \
+  #       -d 'event=offer' \
+  #       -d 'course_ids[]=1' \
+  #       -d 'course_ids[]=2'
   #
   # @returns Progress
   def batch_update

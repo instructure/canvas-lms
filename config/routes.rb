@@ -889,6 +889,10 @@ routes.draw do
       get 'audit/grade_change/graders/:grader_id', :action => :for_grader, :path_name => 'audit_grade_change_grader'
     end
 
+    scope(:controller => :course_audit_api) do
+      get 'audit/course/courses/:course_id', :action => :for_course, :path_name => 'audit_course_for_course'
+    end
+
     scope(:controller => :assignments_api) do
       get 'courses/:course_id/assignments', :action => :index, :path_name => 'course_assignments'
       get 'courses/:course_id/assignments/:id', :action => :show, :path_name => 'course_assignment'

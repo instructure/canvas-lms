@@ -19,7 +19,19 @@
 class AuditorApiController < ApplicationController
   before_filter :check_configured
 
+  private
+
   def check_configured
     not_found unless Canvas::Cassandra::Database.configured?('auditors')
+  end
+
+  def query_options(account=nil)
+    start_time = TimeHelper.try_parse(params[:start_time])
+    end_time = TimeHelper.try_parse(params[:end_time])
+
+    options = {}
+    options[:oldest] = start_time if start_time
+    options[:newest] = end_time if end_time
+    options
   end
 end
