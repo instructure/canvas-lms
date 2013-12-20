@@ -166,6 +166,7 @@ define [
             display_name: student.name
             url: student.enrollment.grades.html_url
             sectionNames: sectionNames
+            alreadyEscaped: true
 
           # fill in dummy submissions, so there's something there even if the
           # student didn't submit anything for that assignment
