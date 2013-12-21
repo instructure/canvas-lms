@@ -28,5 +28,14 @@ this one really is a file
       params["file"][:filename].should eql "filename.frd"
       params["file"][:tempfile].read.should eql "this one really is a file"
     end
+
+    it "should not explode with a non-ASCII file attachment" do
+      request_file = File.open( File.expand_path('../fixtures/multipart-request', File.dirname(__FILE__)) )
+      env = { 'CONTENT_TYPE' => 'multipart/form-data; boundary=----WebKitFormBoundary2raDSu0SsqTAphBU',
+              'CONTENT_LENGTH' => request_file.size,
+              'rack.input' => request_file
+      }
+      lambda { Rack::Utils::Multipart.parse_multipart(env) }.should_not raise_error
+    end
   end
 end
