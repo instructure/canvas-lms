@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,11 +19,12 @@
 module Api
   # find id in collection, by either id or sis_*_id
   # if the collection is over the users table, `self` is replaced by @current_user.id
-  def api_find(collection, id)
-    api_find_all(collection, [id], 1).first || raise(ActiveRecord::RecordNotFound, "Couldn't find #{collection.name} with API id '#{id}'")
+  def api_find(collection, id, options = {account: nil})
+    options = options.merge limit: 1
+    api_find_all(collection, [id], options).first || raise(ActiveRecord::RecordNotFound, "Couldn't find #{collection.name} with API id '#{id}'")
   end
 
-  def api_find_all(collection, ids, limit=nil)
+  def api_find_all(collection, ids, options = { limit: nil, account: nil })
     if collection.table_name == User.table_name && @current_user
       ids = ids.map{|id| id == 'self' ? @current_user.id : id }
     end
@@ -42,9 +43,9 @@ module Api
       end
     end
 
-    find_params = Api.sis_find_params_for_collection(collection, ids, @domain_root_account)
+    find_params = Api.sis_find_params_for_collection(collection, ids, options[:account] || @domain_root_account)
     return [] if find_params == :not_found
-    find_params[:limit] = limit unless limit.nil?
+    find_params[:limit] = options[:limit] unless options[:limit].nil?
     return collection.all(find_params)
   end
 

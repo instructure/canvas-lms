@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -44,6 +44,18 @@ describe Api do
     it 'should find an existing sis_id record' do
       @user = user_with_pseudonym :username => "sis_user_1@example.com"
       @api.api_find(User, "sis_login_id:sis_user_1@example.com").should == @user
+    end
+
+    it 'should not find record from other account' do
+      account = Account.create(name: 'new')
+      @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
+      (lambda {@api.api_find(User, "sis_login_id:sis_user_2@example.com")}).should raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it 'should allow passing account param and find record' do
+      account = Account.create(name: 'new')
+      @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
+      @api.api_find(User, "sis_login_id:sis_user_1@example.com", account: account).should == @user
     end
 
     it 'should not find a missing sis_id record' do
@@ -173,12 +185,12 @@ describe Api do
       collection.expects(:all).with({:conditions => { 'id' => [1, 2, 3]}}).returns("result")
       @api.api_find_all(collection, [1,2,3]).should == "result"
       collection.expects(:all).with({:conditions => { 'id' => [1, 2, 3]}, :limit => 3}).returns("result")
-      @api.api_find_all(collection, [1,2,3], 3).should == "result"
+      @api.api_find_all(collection, [1,2,3], limit: 3).should == "result"
     end
 
     it 'should limit results if a limit is provided - unmocked' do
       users = 0.upto(9).map{|x| user}
-      result = @api.api_find_all(User, 0.upto(9).map{|i| users[i].id}, 5)
+      result = @api.api_find_all(User, 0.upto(9).map{|i| users[i].id}, limit: 5)
       result.count.should == 5
       result.each { |user| users.include?(user).should be_true }
     end
