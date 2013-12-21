@@ -1,0 +1,86 @@
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="reply_count_tooltip[other]"
+
+%{count} replies
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="reply_count_tooltip[one]"
+
+1 reply
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="reply_count_tooltip[zero]"
+
+No replies
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="unread_count_tooltip[other]"
+
+%{count} unread replies
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="unread_count_tooltip[one]"
+
+1 unread reply
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="unread_count_tooltip[zero]"
+
+No unread replies
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="summary"
+
+blah
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="threaded"
+
+0
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="attachment"; filename="test.txt"
+Content-Type: text/plain
+
+blah blah bláh <- non-ascii is important here :P
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="message"
+
+<p>blah</p>
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="title"
+
+test thing
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="set_assignment"
+
+false
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="user_can_see_posts"
+
+true
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="subscribed"
+
+false
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="require_initial_post"
+
+0
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="podcast_has_student_posts"
+
+false
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="podcast_enabled"
+
+0
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="discussion_type"
+
+side_comment
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="is_announcement"
+
+false
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="_method"
+
+POST
+------WebKitFormBoundary2raDSu0SsqTAphBU
+Content-Disposition: form-data; name="authenticity_token"
+
+11PqRxNnjVRnG6zc6m5aLh+t/ahMI9V1KSGKPprHfibFmldZQPsmhZhPK1vDoc3h1nK0F1XcqSlvRBwHDHXsxQ==
+------WebKitFormBoundary2raDSu0SsqTAphBU--
