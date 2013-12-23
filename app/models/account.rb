@@ -346,6 +346,10 @@ class Account < ActiveRecord::Base
   def domain
     HostUrl.context_host(self)
   end
+
+  def self.find_by_domain(domain)
+    self.default if HostUrl.default_host == domain
+  end
   
   def root_account?
     !self.root_account_id
