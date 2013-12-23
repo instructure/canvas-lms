@@ -168,21 +168,28 @@ define [
 
   students = [
         {
+          user_id: '1'
           user: { id: '1', name: 'Bob' }
           course_section_id: '1'
-          user_id: '1'
         }
         {
+          user_id: '2'
           user: { id: '2', name: 'Fred' }
           course_section_id: '1'
-          user_id: '2'
         }
+        {
+          user_id: '1'
+          user: { id: '1', name: 'Bob' }
+          course_section_id: '2'
+        }
+
       ]
 
   assignmentGroups = [
         {
           id: '1'
           name: 'AG1'
+          position: 1
           assignments: [
             {
               id: '1'
@@ -190,13 +197,58 @@ define [
               points_possible: 100
               grading_type: "points"
               submission_types: ["none"]
+              due_at: "2013-10-01T10:00:00Z"
+              position: 1
+              assignment_group_id:'1'
             }
             {
               id: '2'
               name: 'Drink Water'
               grading_type: "points"
               points_possible: null
+              due_at: null
+              position: 10
+              assignment_group_id:'1'
             }
+            {
+              id: '3'
+              name: 'Apples are good'
+              points_possible: 1000
+              grading_type: "points"
+              submission_types: ["none"]
+              due_at: "2013-12-01T10:00:00Z"
+              position: 12
+              assignment_group_id:'1'
+            }
+
+          ]
+        }
+        {
+          id: '2'
+          name: 'AG2'
+          position: 10
+          assignments: [
+            {
+              id: '4'
+              name: 'Big Bowl of Nachos'
+              points_possible: 20
+              grading_type: "percent"
+              submission_types: ["none"]
+              due_at: null
+              position: 5
+              assignment_group_id:'2'
+            }
+            {
+              id: '5'
+              name: 'Can You Eat Just One?'
+              points_possible: 40
+              grading_type: "percent"
+              submission_types: ["none"]
+              due_at: "2013-08-01T10:00:00Z"
+              position: 6
+              assignment_group_id:'2'
+            }
+
           ]
         }
       ]

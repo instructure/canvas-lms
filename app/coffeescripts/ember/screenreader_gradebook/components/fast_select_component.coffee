@@ -46,30 +46,40 @@ define [
       if (items)
         items.addArrayObserver(this)
         @arrayDidChange(items, 0, 0, get(items, 'length'))
-        @insertDefaultOption()
     ).observes('items').on('didInsertElement')
 
     arrayWillChange: (items, start, removeCount, addCount) ->
       select = get(this, 'element')
       options = select.childNodes
       i = start + removeCount - 1
+      if get(this, 'hasDefaultOption')
+        start = start + 1
+        i = i + 1
       while i >= start
         select.removeChild(options[i])
         i--
 
     updateSelection: (->
       selected = get this, 'selected'
-      select = @$("[value=#{get(selected, @valuePath)}]")
+      return unless selected
+      currentValue = get(selected, @valuePath)
+      select = @$("[value=#{currentValue}]")
       select?[0]?.selected = true
+      if currentValue and currentValue != @value
+        set this, 'value', currentValue
     ).observes('selected')
 
     arrayDidChange: (items, start, removeCount, addCount) ->
       select = get(this, 'element')
+      hasDefault = get(this, 'hasDefaultOption')
+      if hasDefault
+        start = start + 1
       i = start
       l = start + addCount
 
       while i < l
-        item = items.objectAt(i)
+        ind = if hasDefault then i-1 else i
+        item = items.objectAt(ind)
         value = get(item, @valuePath)
         label = get(item, @labelPath)
         option = doc.createElement("option")
@@ -83,13 +93,15 @@ define [
 
       set(this, 'value', select.value)
 
-    insertDefaultOption: ->
-      return unless @labelDefault and not @isInitialized
+    insertDefaultOption: (->
+      return unless @labelDefault and not @hasDefaultOption
       select = get(this, 'element')
       option = doc.createElement("option")
       option.textContent = @labelDefault
       option.value = @valueDefault
       select.appendChild(option)
 
-      set(@, 'isInitialized', true)
+      set(this, 'hasDefaultOption', true)
+    ).observes('items').on('didInsertElement')
+
 

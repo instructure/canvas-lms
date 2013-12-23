@@ -37,7 +37,7 @@ define [
 
   test 'calculates assignments properly', ->
     andThen =>
-      equal @srgb.get('assignments.length'), 2
+      equal @srgb.get('assignments.length'), 5
       equal @srgb.get('assignments.firstObject').name, fixtures.assignment_groups[0].assignments[0].name
 
   test 'studentsHash returns the expected hash', ->
@@ -66,6 +66,33 @@ define [
     andThen =>
       equal @srgb.get('selectedSubmissionGrade'), '-'
 
+  test 'studentsInSelectedSection is the same as students when selectedSection is null', ->
+    ok (!@srgb.get('selectedSection'))
+    deepEqual @srgb.get('students'), @srgb.get('studentsInSelectedSection')
+
+  test 'selecting a section filters students properly', ->
+    Ember.run =>
+      @srgb.set('selectedSection', @srgb.get('sections.lastObject'))
+    equal @srgb.get('studentsInSelectedSection.length'), 1
+    equal @srgb.get('studentsInSelectedSection.firstObject').name, 'Bob'
+
+  test 'sorting assignments alphabetically', ->
+    Ember.run =>
+      @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'alpha'))
+    equal @srgb.get('assignments.firstObject.name'), 'Apples are good'
+    equal @srgb.get('assignments.lastObject.name'), 'Eat Soup'
+
+  test 'sorting assignments by due date', ->
+    Ember.run =>
+      @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'due_date'))
+    equal @srgb.get('assignments.firstObject.name'), 'Can You Eat Just One?'
+    equal @srgb.get('assignments.lastObject.name'), 'Big Bowl of Nachos'
+
+  test 'sorting assignments by position', ->
+    Ember.run =>
+      @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'assignment_group'))
+    equal @srgb.get('assignments.firstObject.name'), 'Eat Soup'
+    equal @srgb.get('assignments.lastObject.name'), 'Can You Eat Just One?'
 
   module 'screenreader_gradebook_controller: with selected student',
     setup: ->

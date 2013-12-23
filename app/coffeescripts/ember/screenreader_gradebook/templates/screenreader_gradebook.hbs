@@ -46,13 +46,15 @@
 <!-- arrange columns by due date -->
 
 <fieldset>
-  <legend>Arrange Assignments</legend>
-  <input type="radio" name="arrange_assignments" id="assigns_alphabetical" value="assigns_alphabetical">
-  <label for="assigns_alphabetical">Alphabetically</label><br />
-  <input type="radio" name="arrange_assignments" id="assigns_position" value="assigns_position" checked>
-  <label for="assigns_position">By Assignment Group and Position</label><br />
-  <input type="radio" name="arrange_assignments" id="assigns_due_date" value="assigns_due_date">
-  <label for="assigns_due_date">By Due Date</label>
+  <label for="arrange_assignments">Arrange assignments</label>
+  {{ 
+    fast-select
+    name="arrange_assignments"
+    id="arrange_assignments"
+    items=assignmentSortOptions
+    selected=assignmentSort
+  }}
+
 </fieldset>
 
 <!-- treat ungraded as 0 -->
@@ -78,7 +80,7 @@
   {{
     fast-select id="student_select"
     class="student_select"
-    items=students
+    items=studentsInSelectedSection
     valuePath="id"
     labelPath="name"
     labelDefault=studentSelectDefaultLabel

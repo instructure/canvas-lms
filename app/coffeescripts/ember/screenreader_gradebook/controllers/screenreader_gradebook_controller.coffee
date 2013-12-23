@@ -19,12 +19,11 @@ define [
       initialize: (array, changeMeta, instanceMeta) ->
         instanceMeta.students = {}
       addedItem: (array, enrollment, changeMeta, iMeta) ->
-        student = enrollment.user
+        student = iMeta.students[enrollment.user_id] or enrollment.user
         student.sections ||= []
-        student.sections = Ember.A(student.sections)
         student.sections.push(enrollment.course_section_id)
         return array if iMeta.students[student.id]
-        iMeta.students[student.id] = student.id
+        iMeta.students[student.id] = student
         array.pushObject(student)
         array
       removedItem: (array, enrollment, _, instanceMeta)->
@@ -102,6 +101,14 @@ define [
         fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, student_ids: student_ids,  @get('submissions'))
     ).observes('students.@each').on('init')
 
+    studentsInSelectedSection: (->
+      students = @get('students')
+      currentSection = @get('selectedSection')
+
+      return students if not currentSection
+      students.filter (s) -> s.sections.contains(currentSection.id)
+    ).property('students.@each', 'selectedSection')
+
     submissionsLoaded: (->
       submissions = @get('submissions')
       submissions.forEach ((submission) ->
@@ -118,15 +125,60 @@ define [
       submission.submitted_at = $.parseFromISO(submission.submitted_at) if submission.submitted_at
       set(student, "assignment_#{submission.assignment_id}", submission)
 
-    assignments: (->
-      _.flatten(@get('assignment_groups').map (ag) -> ag.assignments)
-    ).property('assignment_groups.@each')
+    assignments: Ember.ArrayProxy.createWithMixins(Ember.SortableMixin,
+        content: []
+        sortProperties: ['ag_position', 'position']
+      )
+
+    populateAssignments: (->
+      assignment_groups = @get('assignment_groups')
+      assignments = _.flatten(assignment_groups.mapBy 'assignments')
+      assignment_proxy =  @get('assignments')
+      assignments.forEach (as) ->
+        return if assignment_proxy.findBy('id', as.id)
+        set as, 'sortable_name', as.name.toLowerCase()
+        set as, 'ag_position', assignment_groups.findBy('id', as.assignment_group_id).position
+        if as.due_at
+          set as, 'due_at', $.parseFromISO(as.due_at)
+          set as, 'sortable_date', as.due_at.timestamp
+        else
+          set as, 'sortable_date', Number.MAX_VALUE
+        assignment_proxy.pushObject as
+    ).observes('assignment_groups.@each')
 
     assignmentGroupsHash: ->
       ags = {}
       @get('assignment_groups').forEach (ag) ->
         ags[ag.id] = ag
       ags
+
+    assignmentSortOptions:
+      [
+        {
+          label: I18n.t "assignment_order_assignment_groups", "By Assignment Group and Position"
+          value: "assignment_group"
+        }
+        {
+          label: I18n.t "assignment_order_alpha", "Alphabetically"
+          value: "alpha"
+        }
+        {
+          label: I18n.t "assignment_order_due_date", "By Due Date"
+          value: "due_date"
+        }
+      ]
+
+    sortAssignments: (->
+      sort = @get('assignmentSort')
+      return unless sort
+      sort_props = switch sort.value
+        when 'assignment_group' then ['ag_position', 'position']
+        when 'alpha' then ['sortable_name']
+        when 'due_date' then ['sortable_date']
+
+      @get('assignments').set('sortProperties', sort_props)
+
+    ).observes('assignmentSort')
 
     selectedSubmission: (->
       return null unless @get('selectedStudent')? and @get('selectedAssignment')?
