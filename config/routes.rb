@@ -1047,6 +1047,9 @@ routes.draw do
 
       get 'users/:id/settings', controller: 'users', action: 'settings'
       put 'users/:id/settings', controller: 'users', action: 'settings', path_name: 'user_settings'
+
+      put 'users/:id/merge_into/:destination_user_id', controller: 'users', action: 'merge_into'
+      put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
     end
 
     scope(:controller => :pseudonyms) do

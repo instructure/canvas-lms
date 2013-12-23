@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1498,6 +1498,51 @@ class UsersController < ApplicationController
       user_follow = @current_user.user_follows.where(:followed_item_id => @user, :followed_item_type => 'User').first
       user_follow.try(:destroy)
       render :json => { "ok" => true }
+    end
+  end
+
+  # @API Merge user into another user
+  #
+  # Merge a user into another user.
+  # To merge users, the caller must have permissions to manage both users.
+  #
+  # When finding users by SIS ids in different accounts the
+  # destination_account_id is required.
+  #
+  # The account can also be identified by passing the domain in destination_account_id.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/<user_id>/merge_into/<destination_user_id> \
+  #          -X PUT \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/<user_id>/merge_into/accounts/<destination_account_id>/users/<destination_user_id> \
+  #          -X PUT \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns User
+  def merge_into
+    user = api_find(User, params[:id])
+    if authorized_action(user, @current_user, :manage_logins)
+
+      if (account_id = params[:destination_account_id])
+        destination_account = Account.find_by_domain(account_id)
+        destination_account ||= Account.find(account_id)
+      else
+        destination_account ||= @domain_root_account
+      end
+
+      into_user = api_find(User, params[:destination_user_id], account: destination_account)
+
+      if authorized_action(into_user, @current_user, :manage_logins)
+        UserMerge.from(user).into into_user
+        render(:json => user_json(into_user,
+                                  @current_user,
+                                  session,
+                                  %w{locale},
+                                  destination_account))
+      end
     end
   end
 
