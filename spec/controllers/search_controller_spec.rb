@@ -66,6 +66,13 @@ describe SearchController do
       response.body.should_not include('course2')
     end
 
+    it "should return an empty list when searching in a non-messageable context" do
+      course_with_student_logged_in(:active_all => true)
+      @enrollment.update_attributes(workflow_state: 'deleted')
+      get 'recipients', {search: 'foo', :context => @course.asset_string}
+      response.body.should =~ /\[\]\z/
+    end
+
     context "with admin_context" do
       it "should return nothing if the user doesn't have rights" do
         user_session(user)

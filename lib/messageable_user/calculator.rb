@@ -186,7 +186,7 @@ class MessageableUser
         # to return a bookmark-paginated collection, so we craft an empty scope
         # by default
         scope = messageable_users_in_context_scope(options.delete(:context), options)
-        scope = search_scope(scope, options[:search], global_exclude_ids)
+        scope = search_scope(scope, options[:search], global_exclude_ids) if scope
         scope ||= MessageableUser.where('?', false)
         bookmark(scope)
       else
