@@ -495,6 +495,7 @@ define [
         @$searchBtn.prop('disabled', true)
         @trigger('disabled')
       @trigger('changeToken', @tokenParams())
+      @_resetContext()
 
     # Internal: Prepares a given model's name for display.
     #
