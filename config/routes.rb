@@ -1434,14 +1434,15 @@ routes.draw do
       prefix = "courses/:course_id/custom_gradebook_columns"
       get prefix, :action => :index, :path_name => "course_custom_gradebook_columns"
       post prefix, :action => :create
-      put "#{prefix}/:id", :action => :update
+      put "#{prefix}/:id", :action => :update,
+        :path_name => "course_custom_gradebook_column"
       delete "#{prefix}/:id", :action => :destroy
     end
 
     scope(:controller => :custom_gradebook_column_data_api) do
       prefix = "courses/:course_id/custom_gradebook_columns/:id/data"
       get prefix, :action => :index, :path_name => "course_custom_gradebook_column_data"
-      put "#{prefix}/:user_id", :action => :update
+      put "#{prefix}/:user_id", :action => :update, :path_name => "course_custom_gradebook_column_datum"
     end
   end
 

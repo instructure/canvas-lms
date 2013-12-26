@@ -2,6 +2,7 @@ class Gradebook2Controller < ApplicationController
   before_filter :require_context
   add_crumb(proc { t('#crumbs.gradebook', "Gradebook")}) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
   before_filter { |c| c.active_tab = "grades" }
+  include Api::V1::CustomGradebookColumn
 
   def show
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
@@ -18,6 +19,7 @@ class Gradebook2Controller < ApplicationController
   def set_js_env
     @gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
     per_page = Setting.get('api_max_per_page', '50').to_i
+    teacher_notes = @context.custom_gradebook_columns.not_deleted.where(:teacher_notes=> true).first
     js_env  :GRADEBOOK_OPTIONS => {
       :chunk_size => Setting.get('gradebook2.submissions_chunk_size', '35').to_i,
       :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => [:assignments], :override_assignment_dates => "false"),
@@ -37,7 +39,12 @@ class Gradebook2Controller < ApplicationController
       :gradebook_is_editable => @gradebook_is_editable,
       :speed_grader_enabled => @context.allows_speed_grader?,
       :draft_state_enabled => @context.feature_enabled?(:draft_state),
-      :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook)
+      :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook),
+      :custom_columns_url => api_v1_course_custom_gradebook_columns_url(@context),
+      :custom_column_url => api_v1_course_custom_gradebook_column_url(@context, ":id"),
+      :custom_column_data_url => api_v1_course_custom_gradebook_column_data_url(@context, ":id", per_page: per_page),
+      :custom_column_datum_url => api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
+      :teacher_notes => teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
     }
   end
 end

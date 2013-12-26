@@ -1,5 +1,6 @@
 # This class both creates the slickgrid instance, and acts as the data source for that instance.
 define [
+  'slickgrid.long_text_editor'
   'compiled/views/KeyboardNavDialog'
   'jst/KeyboardNavDialog'
   'vendor/slickgrid'
@@ -35,7 +36,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, UploadDialog, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
+], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, UploadDialog, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
 
   class Gradebook
     columnWidths =
@@ -56,6 +57,7 @@ define [
     numberOfFrozenCols: 2
 
     hasSections: $.Deferred()
+    allSubmissionsLoaded: $.Deferred()
 
     constructor: (@options) ->
       @chunk_start = 0
@@ -81,6 +83,8 @@ define [
       else
         'students_url'
 
+      gotAllStudents = $.Deferred().done => @gotAllStudents()
+
       # getting all the enrollments for a course via the api in the polite way
       # is too slow, so we're going to cheat.
       $.when($.ajaxJSON(@options[enrollmentsUrl], "GET")
@@ -92,12 +96,12 @@ define [
         paginationLinks = xhr.getResponseHeader('Link')
         lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/)
         unless lastLink?
-          @gotAllStudents()
+          gotAllStudents.resolve()
           return
         lastPage = lastLink[0].match(/page=(\d+)/)[1]
         lastPage = parseInt lastPage, 10
         if lastPage == 1
-          @gotAllStudents()
+          gotAllStudents.resolve()
           return
 
         fetchEnrollments = (page) =>
@@ -108,7 +112,15 @@ define [
             @gotChunkOfStudents responses[0]
           else
             @gotChunkOfStudents(students) for [students, x, y] in responses
-          @gotAllStudents()
+          gotAllStudents.resolve()
+
+      gotCustomColumns = @getCustomColumns()
+      $.when(gotCustomColumns, gotAllStudents).done @doSlickgridStuff
+
+      @allSubmissionsLoaded.done =>
+        for c in @customColumns
+          url = @options.custom_column_data_url.replace /:id/, c.id
+          @getCustomColumnData(c.id)
 
       @spinner = new Spinner()
       $(@spinner.spin().el).css(
@@ -116,6 +128,35 @@ define [
         top: '55px'
         left: '50%'
       ).addClass('use-css-transitions-for-show-hide').appendTo('#main')
+
+      @showCustomColumnDropdownOption()
+
+    getCustomColumns: ->
+      # not going to support pagination because that would be crazy
+      $.getJSON(@options.custom_columns_url)
+      .then (columns) =>
+        @numberOfFrozenCols += columns.length
+        @customColumns = columns
+
+    getCustomColumnData: (id, url) ->
+      url ||= @options.custom_column_data_url.replace /:id/, id
+      $.getJSON(url)
+      .done (columnData, __, xhr) =>
+        nextPg = xhr.getResponseHeader("Link").match /<([^>]+)>; *rel="next"/
+        @getCustomColumnData(id, nextPg[1]) if nextPg
+
+        for datum in columnData
+          student = @student(datum.user_id)
+          student["custom_col_#{id}"] = datum.content
+          @grid.invalidateRow(student.row)
+        @grid.render()
+
+
+    doSlickgridStuff: =>
+      @initGrid()
+      @buildRows()
+      @getSubmissionsChunks()
+      @initHeader()
 
     gotAssignmentGroups: (assignmentGroups) =>
       @assignmentGroups = {}
@@ -178,10 +219,6 @@ define [
             student["assignment_#{id}"] ||= { assignment_id: id, user_id: student.id }
 
           @rows.push(student)
-        @initGrid()
-        @buildRows()
-        @getSubmissionsChunks()
-        @initHeader()
 
     defaultSortType: 'assignment_group'
 
@@ -309,7 +346,7 @@ define [
         loop
           students = allStudents[@chunk_start...(@chunk_start+@options.chunk_size)]
           unless students.length
-            @allSubmissionsLoaded = true
+            @allSubmissionsLoaded.resolve()
             break
           params =
             student_ids: (student.id for student in students)
@@ -567,6 +604,9 @@ define [
         # number input, we want to allow them to keep doing that.
         return
 
+      if e.target.className.match /dontblur/
+        return
+
       @grid.getEditorLock().commitCurrentEdit()
 
     onGridInit: () ->
@@ -806,7 +846,7 @@ define [
       @grid.invalidate()
 
     getVisibleGradeGridColumns: ->
-      res = [].concat @parentColumns
+      res = [].concat @parentColumns, @customColumnDefinitions()
       for column in @allAssignmentColumns
         submissionType = ''+ column.object.submission_types
         res.push(column) unless submissionType is "not_graded" or
@@ -819,6 +859,18 @@ define [
         href: assignment.html_url
         showPointsPossible: assignment.points_possible?
 
+    customColumnDefinitions: ->
+      @customColumns.map (c) =>
+        id: "custom_col_#{c.id}"
+        name: htmlEscape c.title
+        field: "custom_col_#{c.id}"
+        width: 100
+        cssClass: "meta-cell custom_column"
+        resizable: true
+        sortable: true
+        editor: LongTextEditor
+        autoEdit: false
+
     initGrid: =>
       #this is used to figure out how wide to make each column
       $widthTester = $('<span style="padding:10px" />').appendTo('#content')
@@ -828,9 +880,7 @@ define [
 
       @setAssignmentWarnings()
 
-      # I would like to make this width a little larger, but there's a dependency somewhere else that
-      # I can't find and if I change it, the layout gets messed up.
-      @parentColumns = [{
+      @parentColumns = [
         id: 'student'
         name: I18n.t 'student_name', 'Student Name'
         field: 'display_name'
@@ -839,8 +889,7 @@ define [
         resizable: true
         sortable: true
         formatter: @htmlContentFormatter
-      },
-      {
+      ,
         id: 'secondary_identifier'
         name: I18n.t 'secondary_id', 'Secondary ID'
         field: 'secondary_identifier'
@@ -849,7 +898,7 @@ define [
         resizable: true
         sortable: true
         formatter: @htmlContentFormatter
-      }]
+      ]
 
       @allAssignmentColumns = for id, assignment of @assignments
         outOfFormatter = assignment &&
@@ -945,18 +994,20 @@ define [
       @grid.setSortColumn("student")
       # this is the magic that actually updates group and final grades when you edit a cell
 
-      @grid.onCellChange.subscribe (event, data) =>
-        @calculateStudentGrade(data.item)
-        @grid.invalidate()
+      @grid.onCellChange.subscribe @onCellChange
+
       # this is a faux blur event for SlickGrid.
       $('body').on('click', @onGridBlur)
 
       @grid.onSort.subscribe (event, data) =>
-        if data.sortCol.field == "display_name" || data.sortCol.field == "secondary_identifier"
+        if data.sortCol.field == "display_name" ||
+           data.sortCol.field == "secondary_identifier" ||
+           data.sortCol.field.match /^custom_col/
           sortProp = if data.sortCol.field == "display_name"
             "sortable_name"
           else
-            "secondary_identifier"
+            data.sortCol.field
+
           @sortRowsBy (a, b) =>
             [b, a] = [a, b] if not data.sortAsc
             @localeSort(a[sortProp], b[sortProp])
@@ -976,6 +1027,16 @@ define [
 
       @onGridInit()
 
+    onCellChange: (event, {item, column}) =>
+      if col_id = column.field.match /^custom_col_(\d+)/
+        url = @options.custom_column_datum_url
+          .replace(/:id/, col_id[1])
+          .replace(/:user_id/, item.id)
+
+        $.ajaxJSON url, "PUT", "column_data[content]": item[column.field]
+      else
+        @calculateStudentGrade(item)
+        @grid.invalidate()
 
     sortRowsBy: (sortFn) ->
       respectorOfPersonsSort = =>
@@ -1035,3 +1096,75 @@ define [
         if pointsPossible == 0
           @totalGradeWarning = I18n.t 'no_assignments_have_points_warning'
           , "Can't compute score until an assignment has points possible"
+
+    showCustomColumnDropdownOption: ->
+      linkContainer = $("<li>").appendTo(".gradebook_drop_down")
+
+      showLabel = I18n.t("show_notes", "Show Notes Column")
+      hideLabel = I18n.t("hide_notes", "Hide Notes Column")
+      teacherNotesUrl = =>
+        @options.custom_column_url.replace(/:id/, @options.teacher_notes.id)
+      createLink = $ "<a>",
+        href: @options.custom_columns_url, "class": "create", text: showLabel
+      showLink = -> $ "<a>",
+        href: teacherNotesUrl(), "class": "show", text: showLabel
+      hideLink = -> $ "<a>",
+        href: teacherNotesUrl(), "class": "hide", text: hideLabel
+
+      handleClick = (e, method, params) ->
+        $.ajaxJSON(e.target.href, method, params)
+
+      toggleNotesColumn = (f) =>
+        columnsToReplace = @numberOfFrozenCols
+        f()
+        cols = @grid.getColumns()
+        cols.splice 0, columnsToReplace,
+          @parentColumns..., @customColumnDefinitions()...
+        @grid.setColumns(cols)
+        @grid.invalidate()
+
+      teacherNotesDataLoaded = false
+      showNotesColumn = =>
+        unless teacherNotesDataLoaded
+          @getCustomColumnData(@options.teacher_notes.id)
+
+        toggleNotesColumn =>
+          @customColumns.splice 0, 0, @options.teacher_notes
+          @grid.setNumberOfColumnsToFreeze ++@numberOfFrozenCols
+        linkContainer.html(hideLink())
+
+      hideNotesColumn = =>
+        toggleNotesColumn =>
+          for c, i in @customColumns
+            if c.teacher_notes
+              @customColumns.splice i, 1
+              @numberOfFrozenCols -= 1
+              break
+          @grid.setNumberOfColumnsToFreeze @numberOfFrozenCols
+        linkContainer.html(showLink())
+
+      linkContainer.click (e) =>
+        e.preventDefault()
+        $target = $(e.target)
+        if $target.hasClass("show")
+          handleClick(e, "PUT", "column[hidden]": false)
+          .then showNotesColumn()
+        if $target.hasClass("hide")
+          handleClick(e, "PUT", "column[hidden]": true)
+          .then hideNotesColumn()
+        if $target.hasClass("create")
+          handleClick(e, "POST",
+            "column[title]": I18n.t("notes", "Notes")
+            "column[position]": 1
+            "column[teacher_notes]": true)
+          .then (data) =>
+            @options.teacher_notes = data
+            showNotesColumn()
+
+      notes = @options.teacher_notes
+      if !notes
+        linkContainer.html(createLink)
+      else if notes.hidden
+        linkContainer.html(showLink())
+      else
+        linkContainer.html(hideLink())

@@ -682,6 +682,71 @@ describe "gradebook2" do
         should_show_percentages
       end
     end
+
+    def header_text(n)
+      f(".container_0 .slick-header-column:nth-child(#{n})").try(:text)
+    end
+
+    context "custom gradebook columns" do
+      def custom_column(opts = {})
+        opts.reverse_merge! title: "<b>SIS ID</b>"
+        @course.custom_gradebook_columns.create! opts
+      end
+
+      it "shows custom columns" do
+        hidden = custom_column title: "hidden", hidden: true
+        col = custom_column
+        col.update_order([col.id, hidden.id])
+
+        col.custom_gradebook_column_data.new.tap { |d|
+          d.user_id = @student_1.id
+          d.content = "123456"
+        }.save!
+
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+
+        header_text(3).should == col.title
+        header_text(4).should_not == hidden.title
+        ff(".slick-cell.custom_column").select { |c|
+          c.text == "123456"
+        }.size.should == 1
+      end
+
+      it "lets you show and hide the teacher notes column" do
+        get "/courses/#{@course.id}/gradebook2"
+
+        has_notes_column = lambda {
+          ff(".container_0 .slick-header-column").any? { |h|
+            h.text == "Notes"
+          }
+        }
+        has_notes_column.call.should be_false
+
+        dropdown_link = f("#gradebook_settings")
+        click_dropdown_option = lambda { |option|
+          dropdown_link.click
+          ff(".gradebook_drop_down a").find { |a|
+            a.text == option
+          }.click
+          wait_for_ajaximations
+        }
+        show_notes = lambda { click_dropdown_option.("Show Notes Column") }
+        hide_notes = lambda { click_dropdown_option.("Hide Notes Column") }
+
+        # create the column
+        show_notes.call
+        has_notes_column.call.should be_true
+
+        # hide the column
+        hide_notes.call
+        has_notes_column.call.should be_false
+
+        # un-hide the column
+        show_notes.call
+        has_notes_column.call.should be_true
+      end
+    end
   end
 
   context "as an observer" do
