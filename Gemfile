@@ -4,13 +4,32 @@ source 'http://rubygems.org/'
 if RUBY_VERSION == "2.0.0"
   warn "Ruby 2.0 support is untested"
   ruby '2.0.0', :engine => 'ruby', :engine_version => '2.0.0'
+elsif RUBY_VERSION == "2.1.0"
+  warn "Ruby 2.1 support is untested"
+  ruby '2.1.0', :engine => 'ruby', :engine_version => '2.1.0'
 else
   ruby '1.9.3', :engine => 'ruby', :engine_version => '1.9.3'
 end
 
+# enforce the version of bundler itself, to avoid any surprises
+required_bundler_version = '1.5.1'
+gem 'bundler', required_bundler_version
+
+unless Bundler::VERSION == required_bundler_version
+  if Bundler::VERSION < required_bundler_version
+    bundle_command = "gem install bundler -v #{required_bundler_version}"
+  else
+    require 'shellwords'
+    bundle_command = "bundle _#{required_bundler_version}_ #{ARGV.map { |a| Shellwords.escape(a) }.join(' ')}"
+  end
+
+  warn "Bundler version #{required_bundler_version} is required; you're currently running #{Bundler::VERSION}. Maybe try `#{bundle_command}`."
+  exit
+end
+
 require File.expand_path("../config/canvas_rails3", __FILE__)
 
-platforms :ruby_20 do
+platforms :ruby_20, :ruby_21 do
   gem 'syck', '1.0.1'
   gem 'iconv', '1.0.3'
 end
@@ -29,7 +48,7 @@ if CANVAS_RAILS2
   # "ActiveModel", and aliases ActiveRecord::Errors to ActiveModel::Errors
   # so Authlogic will use the right thing when it detects that ActiveModel
   # is defined.
-  gem 'active_model_serializers_rails_2.3', '0.9.0pre2', require: 'active_model_serializers'
+  gem 'active_model_serializers_rails_2.3', '0.9.0pre2', :require => 'active_model_serializers'
   gem 'authlogic', '2.1.3'
 else
   # just to be clear, Canvas is NOT READY to run under Rails 3 in production
@@ -43,8 +62,6 @@ gem "aws-sdk", '1.21.0'
 gem 'barby', '0.5.0'
 gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
-# enforce the version of bundler itself, to avoid any surprises
-gem 'bundler', ['>=1.3.5', '<=1.5.1', '!=1.5.0']
 gem 'canvas_connect', '0.3.2'
 gem 'canvas_webex', '0.10'
 gem 'daemons', '1.1.0'
@@ -180,7 +197,7 @@ group :development do
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
-    gem 'byebug', '2.4.1', :platforms => :ruby_20
+    gem 'byebug', '2.4.1', :platforms => [:ruby_20, :ruby_21]
     gem 'debugger', '1.5.0', :platforms => :ruby_19
   end
 end
