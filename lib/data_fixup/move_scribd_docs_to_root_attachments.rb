@@ -3,6 +3,8 @@ module DataFixup::MoveScribdDocsToRootAttachments
     Shackles.activate(:slave) do
       Attachment.where("scribd_doc IS NOT NULL AND root_attachment_id IS NOT NULL").includes(:root_attachment).find_each do |a|
         ra = a.root_attachment
+        # bad data!
+        next unless ra
         # choose the latest inline view
         ra.last_inline_view = [a.last_inline_view, ra.last_inline_view].compact.max
         # if the root doesn't have a scribd doc, move it over
