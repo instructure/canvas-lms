@@ -44,7 +44,7 @@ gem 'barby', '0.5.0'
 gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
 # enforce the version of bundler itself, to avoid any surprises
-gem 'bundler', '1.3.5'
+gem 'bundler', ['>=1.3.5', '<=1.5.1', '!=1.5.0']
 gem 'canvas_connect', '0.3.2'
 gem 'canvas_webex', '0.8'
 gem 'daemons', '1.1.0'
