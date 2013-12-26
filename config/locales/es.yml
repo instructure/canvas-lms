@@ -9,7 +9,7 @@ es:
     context_required: "Es obligatorio seleccionar un calendario"
     select_calendars: "Seleccionar Calendarios"
   EditGroupAssignmentView: 
-    move_to: "Trasladar a"
+    move_to: "Mover a"
   GroupDetailView: 
     delete_confirm: "¿Está seguro de que desea eliminar este grupo?"
     flash: 
@@ -270,7 +270,7 @@ es:
       deleted: "Incluir objetos eliminados: verdadero;"
       reports: "Informes: %{files}"
   account_settings: 
-    account: Account
+    account: Cuenta
     account_name_too_long: "El nombre de la cuenta es demasiado largo"
     confirms: 
       delete_announcement: "¿Seguro que quiere borrar este anuncio?"
@@ -1352,7 +1352,7 @@ es:
     labels: 
       due: "Fecha límite"
     name_is_required: "Es obligatorio escribir un nombre"
-    percentage_points_possible: "El número de puntos posible debe ser mayor que 0 si la calificación es porcentual"
+    percentage_points_possible: "Puntos posibles debe ser mayor que 0 si la calificación es porcentual"
     points_possible_number: "Puntos posibles debe ser un número"
     select_external_tool_dialog_title: "Configurar herramienta externa"
     show_advanced_options: "Mostrar opciones avanzadas"
@@ -1696,7 +1696,7 @@ es:
       group_category_options: "Nueva categoría de grupo"
       group_set: "Grupo establecido"
       is_group_assignment: "Esta es una tarea de grupo"
-      students_already_submitted_warning: "Los envíos individuales anteriores no se tendrán en cuenta como envíos grupales y se aparecerán de manera incorrecta en el Speedgrader"
+      students_already_submitted_warning: "Los envíos individuales realizados con anterioridad no se tendrán en cuenta como envíos grupales y no se mostrarán de manera correcta en el Speedgrader"
     group_comment: 
       labels: 
         group_comment: "Enviar Comentario a Todo el Grupo"
@@ -1929,7 +1929,7 @@ es:
       comments_placeholder: Comentarios...
       errors: 
         unacceptable_file_type: "Este tipo de archive no está. Los archivos aceptados son: %{allowed_extensions_list}"
-      gmail_restriction_description: "Su cuenta ha restringido los envíos a través de Google Docs del dominio %{domain} a las cuentas de google. Para enviar esta tarea con Google Docs deberá volver a configurar la integración de Google Docs en su página de configuración de usuario."
+      gmail_restriction_description: "Su cuenta ha limitado los envíos a través de Google Docs del dominio %{domain} a las cuentas de Google. Para enviar esta tarea con Google Docs deberá volver a configurar la integración de Google Docs en su página de configuración de usuario."
       instructions: 
         from_external_tool: "Elija una herramienta de la lista que aparece a continuación para cargar y enviar un recurso facilitado por dicha herramienta."
         google_docs: "Seleccione el archive de la lista siguiente."
@@ -2371,7 +2371,7 @@ es:
       end_time: "Tiempo de finalización"
       event_description: "Descripción del evento"
       event_title: "Título del evento"
-      new_calendar_event_header: "Nuevo Evento del Calendario"
+      new_calendar_event_header: "Nuevo evento del calendario"
       start_time: "Hora de inicio"
     edit_event: 
       tabs: 
@@ -5363,7 +5363,7 @@ es:
     unsubscribed: "No suscrito"
     unsubscribed_hint: "No está suscrito a este tema. Haga clic aquí para suscribirse."
   draft_state_description: |-
-      El estado Borrador es una función en beta que permite publicar y ocultar el contenido del curso. 
+      El estado Borrador es una función en *beta* que permite publicar y ocultar el contenido del curso. 
       El contenido oculto no estará visible para los alumnos y no afectará a las calificaciones.
       También incluye un rediseño de algunas de las áreas de los cursos para hacerlas más uniformes en lo que respecta al diseño y las funciones. 
       
@@ -5934,9 +5934,9 @@ es:
       estimated_release: "Fecha de lanzamiento prevista:"
       no_description: "no hay descripción"
       ? "off"
-      : Apagado
+      : Desactivado
       ? "on"
-      : Encendido
+      : Activado
       release_notes: "notas de la versión"
       toggle_feature_details: "Alternar detalles de la función"
     feature_flag_admin_view: 
@@ -6144,7 +6144,7 @@ es:
     invitation: invitación
     question: pregunta
     warning: alerta
-  google_docs_domain_restriction_description: "La restricción de dominios de Google Docs permite que los envíos y los colaboradores de Google Docs estén limitados a un solo dominio. Los alumnos que intenten enviar tareas o unirse a colaboradores de un dominio no aprobado recibirán un mensaje de error en el que se les notificará que tienen que integrar su integración con Google Docs."
+  google_docs_domain_restriction_description: "Gracias a la restricción de dominios de Google Docs, los envíos y las colaboraciones de Google Docs se limitan a un solo dominio. Los alumnos que intenten enviar tareas o participar en colaboraciones de un dominio no aprobado recibirán un mensaje de error en el que se les notificará que tienen que actualizar su integración con Google Docs."
   gradebook: 
     alerts: 
       no_active_students: "Perdón, no hay estudiantes activos en este curso o no pueden ser calificados por usted."
@@ -6293,10 +6293,10 @@ es:
       one: "La puntuación no incluye a %{groups} porque no se puede evaluar"
       other: "La puntuación no incluye a %{groups} porque no se pueden evaluar"
     keyboard_assignment_desc: "Ir a la página de detalles de tareas actual"
-    keyboard_close_menu: "Cerrar el menú de tareas activo en este momento"
+    keyboard_close_menu: "Cerrar el menú de tareas activo actualmente"
     keyboard_comment_desc: "Comentar el envío activo"
     keyboard_menu_desc: "Abrir el menú para la tarea de la columna activa"
-    keyboard_sort_desc: "Ordenar la cuadícula en la columna activa en este momento"
+    keyboard_sort_desc: "Ordenar la cuadrícula en la columna activa actual"
     keycodes: 
       close_menu: esc
       comment: c
@@ -7013,7 +7013,7 @@ es:
         no_groups_created: "Es necesario crear los grupos antes de que se puedan añadir usuarios."
       edit_group_assignment: 
         all_available_groups_full: "Todos los grupos disponibles están llenos."
-        all_groups_full_suggestion: "Modifique los límites del grupo o añada más grupos."
+        all_groups_full_suggestion: "Modifique los límites del grupo o agregue más grupos."
         move_to_group_label: "Mover al grupo"
         saving: Guardando...
         where_to_move: "¿Dónde desea mover a *%{userName}*?"
@@ -7087,7 +7087,7 @@ es:
         edit_user_group_assignment: "Eliminar o mover a %{name} del grupo"
         move: "Mover a..."
         move_to_new_group: "Mover a %{name} a un nuevo grupo"
-        remove: Remover
+        remove: Eliminar
         remove_from_group: "Eliminar a %{name} del grupo"
       group_users: 
         no_students: "Actualmente no hay ningún alumno en este grupo. Para comenzar, agregue alumnos."
@@ -9683,7 +9683,7 @@ es:
       facebook: 
         display: Facebook
       push: 
-        display: "Notificaciones push"
+        display: "Notificación push"
       sms: 
         display: "Número de Telefono Celular"
       twitter: 
@@ -10801,7 +10801,7 @@ es:
     quick_start_bar_view: 
       new: "Nuevo:"
   quiz: 
-    current_filter: "Filtro Actual"
+    current_filter: "Filtro actual"
     default_question_input: "[ Seleccionar ]"
     default_text_only_question_name: Espaciador
     default_title: "Evaluación sin nombre"
@@ -10866,7 +10866,7 @@ es:
     assignment_points_possible: 
       one: "1 pto"
       other: "%{count} pts"
-    assignments_label: "Evaluaciones para tareas alternar visibilidad de la evaluación"
+    assignments_label: "Las evaluaciones de tareas modifican la visibilidad de la evaluación"
     buttons: 
       add_selected_questions: "Agregar Preguntas Seleccionadas"
       adding_questions: "Agregando Preguntas..."
@@ -11289,12 +11289,12 @@ es:
       end_quiz_reference_time_now: ahora
       end_quiz_when: "Terminar la evaluación %{n} minutos desde %{reference_time}."
       errors: 
-        quiz_submission_extra_attempts_not_a_number: "Intentos extra debe ser un número."
-        quiz_submission_extra_attempts_too_long: "Intentos extra debe ser menor que 1000."
-        quiz_submission_extra_attempts_too_short: "Intentos extra debe ser mayor que 0."
-        quiz_submission_extra_time_not_a_number: "Tiempo extra debe ser un número."
-        quiz_submission_extra_time_too_long: "Tiempo extra debe ser menor que 10080."
-        quiz_submission_extra_time_too_short: "Tiempo extra debe ser mayor que 0."
+        quiz_submission_extra_attempts_not_a_number: "Intentos adicionales debe ser un número."
+        quiz_submission_extra_attempts_too_long: "Intentos adicionales debe ser menor que 1000."
+        quiz_submission_extra_attempts_too_short: "Intentos adicionales debe ser mayor que 0."
+        quiz_submission_extra_time_not_a_number: "Tiempo adicional debe ser un número."
+        quiz_submission_extra_time_too_long: "Tiempo adicional debe ser menor que 10080."
+        quiz_submission_extra_time_too_short: "Tiempo adicional debe ser mayor que 0."
         server_communication_failed: "Ocurrió un problema al comunicarse con el servidor. El sistema intentará de nuevo en cinco minutos, o puede recargar la página"
       extended_quiz_time_explanation: "Puede darle más tiempo a este estudiante en este intento. ¿Cuánto tiempo extra desea darle para completar la evaluación?"
       extensions_for_student: "Extensiones para %{student}"
@@ -11417,7 +11417,7 @@ es:
         one: "1 evaluación se ha ocultado correctamente"
         other: "%{count} evaluaciones se han ocultado correctamente"
     practice_quiz: "Cuestionario de práctica"
-    practices_label: "Evaluaciones de práctica alternar visibilidad de la evaluación"
+    practices_label: "Las evaluaciones de práctica modifican la visibilidad de la evaluación"
     question_colon: "Pregunta:"
     question_count: 
       one: "1 pregunta"
@@ -11731,7 +11731,7 @@ es:
       regraded: "Calificada de nuevo"
       score: Calificación
       time: Tiempo
-    surveys_label: "Las encuestas alternan la visibilidad de la evaluación"
+    surveys_label: "Las encuestas modifican la visibilidad de la evaluación"
     take_quiz: 
       buttons: 
         next: Siguiente
@@ -11836,11 +11836,11 @@ es:
       unpublished_quiz: "*Este cuestionario no está publicado* Solo los profesores pueden ver el cuestionario hasta que esté publicado."
   quizzes_model: 
     confirms: 
-      delete_quiz: "¿Seguro que desea eliminar este cuestionario?"
-    delete_quiz: "Borrar la Evaluación"
-    edit_quiz: "Editar la Evaluación"
+      delete_quiz: "¿Está seguro de que desea eliminar esta evaluación?"
+    delete_quiz: "Borrar la evaluación"
+    edit_quiz: "Editar la evaluación"
     points: 
-      one: "1 pt"
+      one: "1 pto"
       other: "%{count} pts"
     questions: 
       one: "1 pregunta"
