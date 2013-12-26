@@ -26,7 +26,8 @@ class CustomGradebookColumn < ActiveRecord::Base
   attr_accessible :title, :position, :teacher_notes, :hidden
 
   validates_presence_of :title
-  validates_length_of :title, :maximum => maximum_string_length
+  validates_length_of :title, :maximum => maximum_string_length,
+    :allow_nil => true
 
   workflow do
     state :active
