@@ -27,13 +27,16 @@ describe QuizQuestion::AnswerParsers::MultipleDropdowns do
           answer_text: "Answer 1",
           answer_comments: "This is answer 1",
           answer_weight: 0,
-          text_after_answers: "Text after Answer 1"
+          text_after_answers: "Text after Answer 1",
+          id: '1000'
+
         },
         {
           answer_text: "Answer 2",
           answer_comments: "This is answer 2",
           answer_weight: 100,
-          text_after_answers: "Text after Answer 2"
+          text_after_answers: "Text after Answer 2",
+          id: 1001
         },
         {
           answer_text: "Answer 3",
