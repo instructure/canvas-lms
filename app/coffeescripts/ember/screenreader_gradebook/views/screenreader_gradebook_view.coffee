@@ -43,4 +43,3 @@ define [
           @agDialog.$dialog.dialog('open')
         else
           dialogs[dialogType]?.call(this, options)
-

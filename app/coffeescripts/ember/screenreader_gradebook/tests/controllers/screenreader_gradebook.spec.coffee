@@ -37,30 +37,25 @@ define [
 
 
   test 'calculates students properly', ->
-    andThen =>
-      equal @srgb.get('students.length'), 10
-      equal @srgb.get('students.firstObject').name, fixtures.students[0].user.name
+    equal @srgb.get('students.length'), 10
+    equal @srgb.get('students.firstObject').name, fixtures.students[0].user.name
 
   test 'calculates assignments properly', ->
-    andThen =>
-      equal @srgb.get('assignments.length'), 6
-      ok !@srgb.get('assignments').findBy('name', 'Not Graded')
-      equal @srgb.get('assignments.firstObject').name, fixtures.assignment_groups[0].assignments[0].name
+    equal @srgb.get('assignments.length'), 6
+    ok !@srgb.get('assignments').findBy('name', 'Not Graded')
+    equal @srgb.get('assignments.firstObject').name, fixtures.assignment_groups[0].assignments[0].name
 
   test 'studentsHash returns the expected hash', ->
-    andThen =>
-      _.each @srgb.studentsHash(), (obj) =>
-        strictEqual @srgb.get('students').findBy('id', obj.id), obj
+    _.each @srgb.studentsHash(), (obj) =>
+      strictEqual @srgb.get('students').findBy('id', obj.id), obj
 
   test 'assignmentGroupsHash retuns the expected hash', ->
-    andThen =>
-      _.each @srgb.assignmentGroupsHash(), (obj) =>
-        strictEqual @srgb.get('assignment_groups').findBy('id', obj.id), obj
+    _.each @srgb.assignmentGroupsHash(), (obj) =>
+      strictEqual @srgb.get('assignment_groups').findBy('id', obj.id), obj
 
   test 'student objects have isLoaded flag set to true once submissions are loaded', ->
-    andThen =>
-      @srgb.get('students').forEach (s) ->
-        equal Ember.get(s, 'isLoaded'), true
+    @srgb.get('students').forEach (s) ->
+      equal Ember.get(s, 'isLoaded'), true
 
   test 'displayName is hiddenName when hideStudentNames is true', ->
     @srgb.set('hideStudentNames', true)
@@ -76,8 +71,7 @@ define [
     strictEqual student["assignment_#{submission.assignment_id}"], submission
 
   test 'selectedSubmissionGrade is - if there is no selectedSubmission', ->
-    andThen =>
-      equal @srgb.get('selectedSubmissionGrade'), '-'
+    equal @srgb.get('selectedSubmissionGrade'), '-'
 
   test 'studentsInSelectedSection is the same as students when selectedSection is null', ->
     ok (!@srgb.get('selectedSection'))
@@ -173,23 +167,20 @@ define [
       teardown.call this
 
   test 'selectedSubmissionGrade is computed properly', ->
-    andThen =>
-      equal @srgb.get('selectedSubmissionGrade'), fixtures.submissions[0].submissions[0].grade
+    equal @srgb.get('selectedSubmissionGrade'), fixtures.submissions[0].submissions[0].grade
 
   test 'assignmentDetails is computed properly', ->
-    andThen =>
-      ad = @srgb.get('assignmentDetails')
-      selectedAssignment = @srgb.get('selectedAssignment')
-      strictEqual ad.assignment, selectedAssignment
-      strictEqual ad.cnt, 0
+    ad = @srgb.get('assignmentDetails')
+    selectedAssignment = @srgb.get('selectedAssignment')
+    strictEqual ad.assignment, selectedAssignment
+    strictEqual ad.cnt, 0
 
   test 'selectedSubmission is computed properly', ->
-    andThen =>
-      selectedSubmission = @srgb.get('selectedSubmission')
-      sub = _.find(fixtures.submissions, (s) => s.user_id == @student.id)
-      submission = _.find(sub.submissions, (s) => s.assignment_id == @assignment.id)
-      _.each submission, (val, key) =>
-        equal selectedSubmission[key], val, "#{key} is the expected value on selectedSubmission"
+    selectedSubmission = @srgb.get('selectedSubmission')
+    sub = _.find(fixtures.submissions, (s) => s.user_id == @student.id)
+    submission = _.find(sub.submissions, (s) => s.assignment_id == @assignment.id)
+    _.each submission, (val, key) =>
+      equal selectedSubmission[key], val, "#{key} is the expected value on selectedSubmission"
 
   module 'screenreader_gradebook_controller: with selected assignment',
     setup: ->

@@ -116,8 +116,7 @@
   <button
     id="prev_student"
     {{action 'selectItem' 'selectedStudent' 'previous'}}
-    {{bind-attr aria-disabled='ariaDisabledPrevStudent'}}
-    {{bind-attr disabled='disablePrevStudentButton'}}
+    {{bind-attr aria-disabled=ariaDisabledPrevStudent disabled=disablePrevStudentButton}}
   >
     {{#t 'previous_student'}}Previous Student{{/t}}
   </button>
@@ -125,8 +124,7 @@
   <button
     id="next_student"
     {{action 'selectItem' 'selectedStudent' 'next'}}
-    {{bind-attr aria-disabled='ariaDisabledNextStudent'}}
-    {{bind-attr disabled='disableNextStudentButton'}}
+    {{bind-attr aria-disabled=ariaDisabledNextStudent disabled=disableNextStudentButton}}
   >
     {{#t 'next_student'}}Next Student{{/t}}
   </button>
@@ -164,8 +162,7 @@
   <button
     id="prev_assignment"
     {{action 'selectItem' 'selectedAssignment' 'previous'}}
-    {{bind-attr aria-disabled='ariaDisabledPrevAssignment'}}
-    {{bind-attr disabled='disablePrevAssignmentButton'}}
+    {{bind-attr aria-disabled=ariaDisabledPrevAssignment disabled=disablePrevAssignmentButton}}
   >
     {{#t 'previous_assignment'}}Previous Assignment{{/t}}
   </button>
@@ -173,8 +170,7 @@
   <button
     id="next_assignment"
     {{action 'selectItem' 'selectedAssignment' 'next'}}
-    {{bind-attr aria-disabled='ariaDisabledNextAssignment'}}
-    {{bind-attr disabled='disableNextAssignmentButton'}}
+    {{bind-attr aria-disabled=ariaDisabledNextAssignment disabled=disableNextAssignmentButton}}
   >
     {{#t 'next_assignment'}}Next Assignment{{/t}}
   </button>
@@ -267,14 +263,22 @@
   <!-- how many points is the assignment worth -->
 
   <div>Points possible: {{points_possible}}</div>
-  <!-- is the assignment muted -->
-
-  <div>
-    <label for="muted">Muted</label>
-    <input type="checkbox" name="muted" id="muted" value="muted"><br>
-  </div>
 
 {{/with}}
+
+  <!-- is the assignment muted -->
+  <div>
+    <label for="assignment_muted_check">
+      {{#t 'assignment_is_muted'}}Muted?{{/t}}
+      {{
+        assignment-muter
+        assignment=selectedAssignment
+        id='assignment_muted_check'
+        name='assignment_muted_check'
+      }}
+    </label>
+  </div>
+
   <!-- assignment stats: average/high/low score + submission count -->
   {{#if assignmentDetails}}
   {{#with assignmentDetails }}

@@ -323,6 +323,7 @@ define [
               position: 1
               assignment_group_id:'1'
               published: true
+              muted: false
             }
             {
               id: '2'
@@ -334,6 +335,7 @@ define [
               submission_types: ["none"]
               assignment_group_id:'1'
               published: true
+              muted: true
             }
             {
               id: '3'
@@ -345,6 +347,7 @@ define [
               position: 12
               assignment_group_id:'1'
               published: true
+              muted: false
             }
           ]
         }
@@ -363,6 +366,7 @@ define [
               position: 5
               assignment_group_id:'2'
               published: true
+              muted: false
             }
             {
               id: '5'
@@ -374,6 +378,7 @@ define [
               position: 6
               assignment_group_id:'2'
               published: true
+              muted: true
             }
           ]
         }

@@ -10,17 +10,17 @@ define [
   fixtures.create()
 
   buttonDisabled = (trigger, expectedBoolean) ->
-    equal($(trigger).prop('disabled'), expectedBoolean)
-    equal($(trigger).attr('aria-disabled'), expectedBoolean.toString())
+    equal find(trigger).prop('disabled'), expectedBoolean
+    equal find(trigger).attr('aria-disabled'), expectedBoolean.toString()
 
   checkSelection = (id, selection) ->
-    equal(id, $(selection).val())
+    equal id, find(selection).val()
 
   checkText = (text, selection) ->
-    equal(text, $(selection).find('option:selected').text())
+    equal text, find(selection).find('option:selected').text()
 
   studentSectionAssertions = (selected, currentIndex, expectedIndex) ->
-    equal(currentIndex, expectedIndex)
+    equal currentIndex, expectedIndex
     checkSelection(selected.id, '#student_select')
     checkText(selected.name, '#student_select')
 
@@ -231,31 +231,30 @@ define [
       Ember.run App, 'destroy'
 
   test 'prev/next still work', ->
-    visit('/').then =>
+    buttonDisabled('#prev_student', true)
+    buttonDisabled('#next_student', false)
+
+    # first in section
+    click('#next_student').then =>
+      first = @controller.get('selectedStudent')
+      index = @controller.get('studentIndex')
       buttonDisabled('#prev_student', true)
-      buttonDisabled('#next_student', false)
+      studentSectionAssertions(first, index, 0)
 
-      # first in section
+      # second in section
       click('#next_student').then =>
-        first = @controller.get('selectedStudent')
+        second = @controller.get('selectedStudent')
         index = @controller.get('studentIndex')
+        buttonDisabled('#prev_student', false)
+        studentSectionAssertions(second, index, 1)
+        notEqual(first, second)
+
+      click('#prev_student').then =>
         buttonDisabled('#prev_student', true)
-        studentSectionAssertions(first, index, 0)
-
-        # second in section
-        click('#next_student').then =>
-          second = @controller.get('selectedStudent')
-          index = @controller.get('studentIndex')
-          buttonDisabled('#prev_student', false)
-          studentSectionAssertions(second, index, 1)
-          notEqual(first, second)
-
-        click('#prev_student').then =>
-          buttonDisabled('#prev_student', true)
-          buttonDisabled('#next_student', false)
+        buttonDisabled('#next_student', false)
 
   test 'resets selectedStudent when student is not in both sections', ->
-    visit('/').then => click('#next_student').then =>
+    click('#next_student').then =>
       firstStudent = @controller.get('selectedStudent')
 
       Ember.run =>
