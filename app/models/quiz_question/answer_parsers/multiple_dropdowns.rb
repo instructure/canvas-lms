@@ -7,7 +7,7 @@ module QuizQuestion::AnswerParsers
         fields = QuizQuestion::RawFields.new(answer)
 
         a = {
-            id: fields.fetch(:id, nil),
+            id: fields.fetch(:id, nil).try(:to_i),
             text: fields.fetch_with_enforced_length(:answer_text),
             comments: fields.fetch_with_enforced_length(:answer_comments),
             weight: fields.fetch(:answer_weight, 0).to_f,
