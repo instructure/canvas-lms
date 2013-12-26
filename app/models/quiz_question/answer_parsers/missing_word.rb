@@ -22,12 +22,12 @@ module QuizQuestion::AnswerParsers
       @answers.map_with_group! do |answer_group, answer|
         fields = QuizQuestion::RawFields.new(answer)
         a = {
-          text: fields.fetch_with_enforced_length(:answer_text),
-          comments: fields.fetch_with_enforced_length(:answer_comments),
-          weight: fields.fetch(:answer_weight).to_f
+          text: fields.fetch_with_enforced_length([:answer_text, :text]),
+          comments: fields.fetch_with_enforced_length([:answer_comment, :comments]),
+          weight: fields.fetch_any([:answer_weight, :weight]).to_f
         }
 
-        id = fields.fetch(:id, nil)
+        id = fields.fetch_any(:id, nil)
         id = id.to_i if id
         a[:id] = id
 

@@ -21,23 +21,22 @@ module QuizQuestion::AnswerParsers
     def parse(question)
       @answers.map_with_group! do |answer_group, answer|
         fields = QuizQuestion::RawFields.new(answer)
-
         a = {
-          id: fields.fetch(:id, nil),
-          text: fields.fetch_with_enforced_length(:answer_text),
-          comments: fields.fetch_with_enforced_length(:answer_comments),
+          id: fields.fetch_any(:id, nil),
+          text: fields.fetch_with_enforced_length([:answer_text, :text]),
+          comments: fields.fetch_with_enforced_length([:answer_comment, :comments]),
           weight: 100
         }
 
-        a[:numerical_answer_type] = fields.fetch(:numerical_answer_type)
+        a[:numerical_answer_type] = fields.fetch_any(:numerical_answer_type)
 
         if a[:numerical_answer_type] == "exact_answer"
-          a[:exact] = fields.fetch(:answer_exact).to_f
-          a[:margin] = fields.fetch(:answer_error_margin).to_f
+          a[:exact] = fields.fetch_any(:answer_exact).to_f
+          a[:margin] = fields.fetch_any(:answer_error_margin).to_f
         else
           a[:numerical_answer_type] = "range_answer"
-          a[:start] = fields.fetch(:answer_range_start).to_f
-          a[:end] = fields.fetch(:answer_range_end).to_f
+          a[:start] = fields.fetch_any(:answer_range_start).to_f
+          a[:end] = fields.fetch_any(:answer_range_end).to_f
         end
 
         answer = QuizQuestion::AnswerGroup::Answer.new(a)

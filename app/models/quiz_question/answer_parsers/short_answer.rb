@@ -22,9 +22,9 @@ module QuizQuestion::AnswerParsers
       @answers.map_with_group! do |answer_group, answer|
         fields = QuizQuestion::RawFields.new(answer)
         a = {
-          id: fields.fetch(:id, nil),
-          text: fields.fetch_with_enforced_length(:answer_text),
-          comments: fields.fetch_with_enforced_length(:answer_comments),
+          id: fields.fetch_any([:id, :answer_id], nil),
+          text: fields.fetch_with_enforced_length([:answer_text, :text]),
+          comments: fields.fetch_with_enforced_length([:answer_comment, :comments]),
           weight: 100
         }
 

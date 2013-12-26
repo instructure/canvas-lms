@@ -24,14 +24,14 @@ module QuizQuestion::AnswerParsers
       @answers.map_with_group! do |answer_group, answer|
         fields = QuizQuestion::RawFields.new(answer)
         a = {
-          id: fields.fetch(:id, nil),
+          id: fields.fetch_any(:id, nil),
           text: fields.fetch_with_enforced_length(:answer_match_left),
           left: fields.fetch_with_enforced_length(:answer_match_left),
           right: fields.fetch_with_enforced_length(:answer_match_right),
-          comments: fields.fetch_with_enforced_length(:answer_comments)
+          comments: fields.fetch_with_enforced_length([:answer_comment, :comments])
         }
 
-        a[:left_html] = a[:html] = fields.sanitize(fields.fetch(:answer_match_left_html)) if answer[:answer_match_left_html].present?
+        a[:left_html] = a[:html] = fields.sanitize(fields.fetch_any(:answer_match_left_html)) if answer[:answer_match_left_html].present?
 
         a[:match_id] = answer[:match_id].to_i
 

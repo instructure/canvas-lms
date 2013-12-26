@@ -59,31 +59,31 @@ class QuizQuestion::QuestionData
   def self.generate(fields = {})
     fields = QuizQuestion::RawFields.new(fields)
     question = QuizQuestion::QuestionData.new(HashWithIndifferentAccess.new)
-    question.allows_partial_credit! if fields.fetch(:allow_partial_credit, true)
+    question.allows_partial_credit! if fields.fetch_any(:allow_partial_credit, true)
 
     # general fields
-    question[:id] = fields.fetch(:id, nil)
-    question[:regrade_option] = fields.fetch(:regrade_option, false)
-    question[:points_possible] = fields.fetch(:points_possible).to_f
+    question[:id] = fields.fetch_any([:answer_id, :id], nil)
+    question[:regrade_option] = fields.fetch_any(:regrade_option, false)
+    question[:points_possible] = fields.fetch_any(:points_possible).to_f
     question[:correct_comments] = fields.fetch_with_enforced_length(:correct_comments, max_size: 5.kilobyte)
     question[:incorrect_comments] = fields.fetch_with_enforced_length(:incorrect_comments, max_size: 5.kilobyte)
     question[:neutral_comments] = fields.fetch_with_enforced_length(:neutral_comments, max_size: 5.kilobyte)
-    question[:question_type] = fields.fetch(:question_type, "text_only_question")
-    question[:question_name] = fields.fetch(:question_name, I18n.t(:default_question_name, "Question"))
+    question[:question_type] = fields.fetch_any(:question_type, "text_only_question")
+    question[:question_name] = fields.fetch_any(:question_name, I18n.t(:default_question_name, "Question"))
     question[:question_name] = I18n.t(:default_question_name, "Question") if question[:question_name].strip.blank?
     question[:name] = question[:question_name]
     question[:question_text] = fields.sanitize(fields.fetch_with_enforced_length(:question_text, default: I18n.t(:default_question_text, "Question text")))
-    question[:answers] = fields.fetch(:answers, [])
-    question[:text_after_answers] = fields.fetch(:text_after_answers)
+    question[:answers] = fields.fetch_any(:answers, [])
+    question[:text_after_answers] = fields.fetch_any(:text_after_answers)
 
     if question.is_type?(:calculated)
-      question[:formulas] = fields.fetch(:formulas, [])
-      question[:variables] = fields.fetch(:variables, [])
-      question[:answer_tolerance] = fields.fetch(:answer_tolerance, nil)
-      question[:formula_decimal_places] = fields.fetch(:formula_decimal_places, 0).to_i
+      question[:formulas] = fields.fetch_any(:formulas, [])
+      question[:variables] = fields.fetch_any(:variables, [])
+      question[:answer_tolerance] = fields.fetch_any(:answer_tolerance, nil)
+      question[:formula_decimal_places] = fields.fetch_any(:formula_decimal_places, 0).to_i
     elsif question.is_type?(:matching)
-      question[:matching_answer_incorrect_matches] = fields.fetch(:matching_answer_incorrect_matches)
-      question[:matches] = fields.fetch(:matches, [])
+      question[:matching_answer_incorrect_matches] = fields.fetch_any(:matching_answer_incorrect_matches)
+      question[:matches] = fields.fetch_any(:matches, [])
     end
 
     QuizQuestion::AnswerGroup.generate(question)

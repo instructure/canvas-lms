@@ -25,19 +25,25 @@ describe QuizQuestion::AnswerParsers::Matching do
       [
         {
           answer_text: "Answer 1",
-          answer_comments: "This is answer 1",
+          answer_match_left: "Answer 1",
+          answer_match_right: "Match to Answer 1",
+          answer_comment: "This is answer 1",
           answer_weight: 0,
           text_after_answers: "Text after Answer 1"
         },
         {
           answer_text: "Answer 2",
-          answer_comments: "This is answer 2",
+          answer_match_left: "Answer 2",
+          answer_match_right: "Match to Answer 2",
+          answer_comment: "This is answer 2",
           answer_weight: 100,
           text_after_answers: "Text after Answer 2"
         },
         {
           answer_text: "Answer 3",
-          answer_comments: "This is answer 3",
+          answer_match_left: "Answer 3",
+          answer_match_right: "Match to Answer 3",
+          answer_comment: "This is answer 3",
           answer_weight: 0,
           text_after_answers: "Text after Answer 3"
         }

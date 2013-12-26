@@ -31,7 +31,7 @@ module QuizQuestion::AnswerParsers
           variable = QuizQuestion::RawFields.new(variable)
           answer_params[:variables] << {
             :name => variable.fetch_with_enforced_length(:name),
-            :value => variable.fetch(:value).to_f
+            :value => variable.fetch_any(:value).to_f
           }
         end
 
@@ -58,9 +58,9 @@ module QuizQuestion::AnswerParsers
         variable = QuizQuestion::RawFields.new(variable.merge({name: trim_length(variable[:name])}))
         {
           name: variable.fetch_with_enforced_length(:name),
-          min: variable.fetch(:min).to_f,
-          max: variable.fetch(:max).to_f,
-          scale: variable.fetch(:scale).to_i
+          min: variable.fetch_any(:min).to_f,
+          max: variable.fetch_any(:max).to_f,
+          scale: variable.fetch_any(:scale).to_i
         }
       end
     end
