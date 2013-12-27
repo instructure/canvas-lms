@@ -1273,6 +1273,8 @@ class ActiveRecord::Serialization::Serializer
 
 end
 
+if CANVAS_RAILS2
+
 class ActiveRecord::Errors
   def as_json(*a)
     {:errors => @errors}.as_json(*a)
@@ -1294,6 +1296,16 @@ class ActiveRecord::Error
   def as_json(*a)
     super.slice('attribute', 'type', 'message')
   end
+end
+
+else
+
+class ActiveModel::Errors
+  def as_json(*a)
+    {:errors => Hash[to_hash.map{|k,v| [k, v.map{|m| {:attribute => k, :message => m, :type => m}}]}]}.as_json(*a)
+  end
+end
+
 end
 
 if CANVAS_RAILS2
