@@ -134,6 +134,14 @@ define [
               id: "result-#{$.guid++}" # for aria-activedescendant
             attributes['aria-haspopup'] = @model.get('isContext')
             attributes
+      @_attachCollection()
+
+    # Internal: Manage events on the results collection.
+    #
+    # Returns nothing.
+    _attachCollection: ->
+      @resultCollection.off('reset',  @resultView.renderOnReset)
+      @resultCollection.off('remove', @resultView.removeItem)
 
     # Public: Toggle visibility of result list.
     #
@@ -244,6 +252,7 @@ define [
     _onSearchTermChange: (e) ->
       if !@$input.val() then @toggleResultList(false) else @_fetchResults()
       @$input.width(@$span.text(@$input.val()).width() + 15)
+      @resultView.collection.each((m) => @resultView.removeItem(m))
 
     # Internal: Display search results returned from the server.
     #
@@ -255,12 +264,14 @@ define [
       _.extend(@permissions, @_getPermissions())
       @_addEveryoneResult(@resultCollection) unless @excludeAll or !@_canSendToAll()
       shouldDrawResults = @resultCollection.length
+      isFinished        = !@nextRequest
       @_addBackResult(@resultCollection)
       @currentRequest = null
-      if shouldDrawResults
+      if shouldDrawResults and isFinished
         @_drawResults()
-      else
+      else if isFinished
         @resultCollection.push(new ConversationSearchResult({id: 'no_results', name: '', noResults: true}))
+      @_fetchResults(true) if @nextRequest
 
     # Internal: Determine if the current user can send to all users in the course.
     #
@@ -315,10 +326,10 @@ define [
 
     # Internal: Draw out search results to the DOM.
     #
-    # elements - An array of HTML snippets to append to the result list.
-    #
     # Returns nothing.
     _drawResults: ->
+      @resultView.empty = !@resultView.collection.length
+      @resultView.render()
       $el = @$resultList.find('li:first').addClass('selected')
       @selectedModel = @_getModel($el.data('id'))
       @$input.attr('aria-activedescendant', $el.attr('id'))
@@ -330,8 +341,8 @@ define [
     # Returns nothing.
     __fetchResults: (fetchIfEmpty = false) ->
       return unless @$input.val() or fetchIfEmpty
-      @currentRequest?.abort()
-      url = @url(@$input.val())
+      url = @_loadURL()
+      return unless url
       @currentUrl = url
       if @cache[url]
         @resultCollection.reset(@cache[url])
@@ -342,6 +353,20 @@ define [
           url: @url(@$input.val())
           success: @_onSearchResultLoad
         @toggleResultList(true)
+
+    # Internal: Get URL for the current request, caching it as
+    #   @nextRequest if needed.
+    #
+    # Returns a URL string (will be empty if current request is pending).
+    _loadURL: ->
+      searchURL = @url(@$input.val())
+      if @currentRequest
+        @nextRequest = searchURL
+        ''
+      else
+        previousNextRequest = @nextRequest
+        delete @nextRequest
+        previousNextRequest or searchURL
 
     # Internal: Delete the last token.
     #
@@ -371,7 +396,7 @@ define [
       e.preventDefault() && e.stopPropagation()
       if @selectedModel.get('back')
         @currentContext = @parentContexts.pop()
-        @__fetchResults(true)
+        @_fetchResults(true)
       else if @selectedModel.get('isContext')
         @parentContexts.push(@currentContext) if @currentContext
         @$input.val('')
@@ -379,7 +404,7 @@ define [
           id: @selectedModel.id
           name: @selectedModel.get('name')
           peopleCount: @selectedModel.get('user_count')
-        @__fetchResults(true)
+        @_fetchResults(true)
       else
         @_addToken(@selectedModel.attributes)
 
@@ -431,7 +456,7 @@ define [
       $target = $(e.currentTarget)
       if $target.hasClass('back')
         @currentContext = @parentContexts.pop()
-        @__fetchResults(true)
+        @_fetchResults(true)
       else if $target.hasClass('context')
         @parentContexts.push(@currentContext) if @currentContext
         @$input.val('')
@@ -439,7 +464,7 @@ define [
           id: $target.data('id')
           name: $target.text().trim()
           peopleCount: $target.data('people-count')
-        @__fetchResults(true)
+        @_fetchResults(true)
       else
         @_addToken(@_getModel($(e.currentTarget).data('id')).attributes)
 
