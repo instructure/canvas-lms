@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+<title>color-slicer example</title>
+<script src="color-slicer.js"></script>
+<script>
+var generate =  function(e) {
+  if (e) {e.preventDefault();}
+  var count = parseInt(document.getElementById('count').value, 10);
+  var start = parseInt(document.getElementById('start').value, 10);
+  var colors = colorSlicer.getColors(count, start);
+  var output = document.getElementById('output');
+  output.innerHTML = '';
+  for (var i = 0; i < colors.length; i++) {
+    var color = colors[i];
+    var node = document.createElement('p');
+    node.style.color = color;
+    node.appendChild(document.createTextNode(i+1+': '+color));
+    output.appendChild(node);
+  }
+};
+window.addEventListener('load', function() {
+  generate();
+  document.getElementById('params').addEventListener('submit', generate);
+});
+</script>
+</head>
+<body>
+<form id="params" action="#">
+  <fieldset>
+    <label>Count <input id="count" value="5" /></label> <label>Start <input id="start" value="330" /></label> <input type="submit" value="Generate" />
+  </fieldset>
+</form>
+<div id="output">
+</div>
+</body>
+</html>
