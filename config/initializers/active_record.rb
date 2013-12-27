@@ -268,7 +268,7 @@ class ActiveRecord::Base
       options[:include_root] = ActiveRecord::Base.include_root_in_json
     end
 
-    hash = Serializer.new(self, options).serializable_record
+    hash = CANVAS_RAILS2 ? Serializer.new(self, options).serializable_record : serializable_hash(options)
 
     if options[:permissions]
       obj_hash = options[:include_root] ? hash[self.class.base_ar_class.model_name.element] : hash
