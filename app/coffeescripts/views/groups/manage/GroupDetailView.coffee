@@ -51,5 +51,6 @@ define [
 
     toJSON: ->
       json = @model.toJSON()
+      json.ENV = ENV
       json.summary = @summary()
       json
