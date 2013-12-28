@@ -1,6 +1,8 @@
 {{#unless randomlyAssignStudentsInProgress}}
 <div class="pull-right group-category-actions">
-  <button class="btn add-group" title="{{#t "add_group"}}Add Group{{/t}}"><i class='icon-plus'></i> {{#t "group"}}Group{{/t}}</button>
+  {{#unless locked}}
+    <button class="btn add-group" title="{{#t "add_group"}}Add Group{{/t}}"><i class='icon-plus'></i> {{#t "group"}}Group{{/t}}</button>
+  {{/unless}}
   {{#unless protected}}
     <span>
       <a id="group-category-{{id}}-actions" class="al-trigger btn" role="button" aria-haspopup="true" aria-label="{{#t "settings"}}Settings{{/t}}" href="#">
@@ -37,6 +39,17 @@
   {{/unless}}
 </div>
 {{/unless}}
+
+{{#if locked}}
+  <div class="alert">
+    <i class="icon-warning"></i>
+    {{#t "uncategorized_groups"}}
+      These groups are not associated to any particular group set. Because
+      they were imported via SIS, they can only be updated or deleted via
+      SIS.
+    {{/t}}
+  </div>
+{{/if}}
 
 {{#if self_signup}}
   <p>

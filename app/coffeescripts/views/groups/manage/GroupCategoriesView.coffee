@@ -29,7 +29,7 @@ define [
 
     itemView: View.extend
       tagName: 'li'
-      template: tabTemplate
+      template: -> tabTemplate _.extend(@model.present(), id: @model.id ? @model.cid)
 
     refreshTabs: ->
       # setup the tabs
@@ -48,7 +48,7 @@ define [
 
     createItemView: (model) ->
       # create and add tab panel
-      panelId = "tab-#{model.id}"
+      panelId = "tab-#{model.id ? model.cid}"
       $panel = $('<div/>').addClass('tab-panel').attr('id', panelId).data('loaded', false).data('model', model)
       @$tabs.append($panel)
       # If this is the first panel, load the contents
