@@ -148,7 +148,8 @@ unless CANVAS_RAILS2
   end
 end
 
-Spec::Matchers.define :encompass do |expected|
+matchers_module = (CANVAS_RAILS2 ? Spec::Matchers : RSpec::Matchers)
+matchers_module.define :encompass do |expected|
   match do |actual|
     if expected.is_a?(Array) && actual.is_a?(Array)
       expected.size == actual.size && expected.zip(actual).all? { |e, a| a.slice(*e.keys) == e }
@@ -160,7 +161,7 @@ Spec::Matchers.define :encompass do |expected|
   end
 end
 
-Spec::Matchers.define :match_ignoring_whitespace do |expected|
+matchers_module.define :match_ignoring_whitespace do |expected|
   def whitespaceless(str)
     str.gsub(/\s+/, '')
   end
@@ -170,7 +171,7 @@ Spec::Matchers.define :match_ignoring_whitespace do |expected|
   end
 end
 
-Spec::Runner.configure do |config|
+(CANVAS_RAILS2 ? Spec::Runner : RSpec).configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
   # in your config/boot.rb
