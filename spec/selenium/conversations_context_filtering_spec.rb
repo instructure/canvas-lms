@@ -20,7 +20,6 @@ describe "conversations context filtering" do
   end
 
   it "should capture the course when sending a message to a group" do
-    pending('selupgrade')
     new_conversation
     browse_menu
 

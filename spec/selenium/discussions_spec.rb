@@ -991,7 +991,6 @@ describe "discussions" do
         end
 
         it "should delete a side comment" do
-          pending("intermittently fails")
           entry = topic.discussion_entries.create!(:user => somebody, :message => "new side comment from somebody", :parent_entry => entry)
           get url
           wait_for_ajax_requests
