@@ -270,18 +270,8 @@ class UserMerge
     # we need to delete all the conflicting context_module_progressions
     # without impacting the users module progress and without having to
     # recalculate the progressions.
-
-    # delete all matching duplicates
-    ContextModuleProgression.
-      where("context_module_progressions.user_id = ?", from_user.id).
-      where("EXISTS (SELECT *
-                     FROM context_module_progressions cmp2
-                     WHERE context_module_progressions.context_module_id=cmp2.context_module_id
-                       AND cmp2.user_id = ?
-                       AND cmp2.workflow_state = context_module_progressions.workflow_state)", target_user.id).delete_all
-
-    # find all the modules that are left and then delete the most restrictive
-    # context_module_progression
+    # find all the modules progressions and delete the most restrictive
+    # context_module_progressions
     ContextModuleProgression.
       where("context_module_progressions.user_id = ?", from_user.id).
       where("EXISTS (SELECT *
