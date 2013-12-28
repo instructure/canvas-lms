@@ -673,4 +673,13 @@ describe ActiveRecord::Base do
       User.where(id: @us).order(User.nulls(:last, :name, :desc), :id).all.should == [@u4, @u2, @u1, @u3]
     end
   end
+
+  describe "marshalling" do
+    it "should not load associations when marshalling" do
+      a = Account.default
+      a.user_account_associations.loaded?.should be_false
+      Marshal.dump(a)
+      a.user_account_associations.loaded?.should be_false
+    end
+  end
 end
