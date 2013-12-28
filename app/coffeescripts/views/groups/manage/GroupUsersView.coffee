@@ -72,11 +72,12 @@ define [
 
     toJSON: ->
       count: @model.usersCount()
+      locked: @model.isLocked()
       ENV: ENV
 
     renderItem: (model) =>
       super
-      @_initDrag(model.view)
+      @_initDrag(model.view) unless @model?.isLocked()
 
     ##
     # enable draggable on the child GroupUserView (view)
