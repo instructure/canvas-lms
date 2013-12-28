@@ -2,7 +2,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 
 describe "discussions" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   let(:course) { course_model.tap(&:offer!) }
   let(:default_section) { course.default_section }

@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
 describe "jquery" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
 
   # jquery keeps breaking attr() ... see http://bugs.jquery.com/ticket/10278

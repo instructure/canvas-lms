@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common')
 
 describe "conversations recipient finder" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def conversations_path(params={})
     hash = params.to_json.unpack('H*').first

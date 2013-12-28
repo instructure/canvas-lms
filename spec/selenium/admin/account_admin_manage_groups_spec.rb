@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/manage_groups_com
 require 'thread'
 
 describe "account admin manage groups" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def add_account_category (account, name)
     f(".add_category_link").click

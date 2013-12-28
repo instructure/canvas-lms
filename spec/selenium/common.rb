@@ -16,6 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../config/canvas_rails3')
+if CANVAS_RAILS2
+  Spec::Example::ExampleGroupMethods.module_eval do
+    def include_examples(*args)
+      it_should_behave_like(*args)
+    end
+  end
+end
+
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require "selenium-webdriver"
 require "socket"
@@ -191,9 +200,13 @@ module SeleniumTestsHelperMethods
   def self.rack_app()
     app = Rack::Builder.new do
       use Rails::Rack::Debugger unless Rails.env.test?
-      map '/' do
-        use Rails::Rack::Static
-        run ActionController::Dispatcher.new
+      if CANVAS_RAILS2
+        map '/' do
+          use Rails::Rack::Static
+          run ActionController::Dispatcher.new
+        end
+      else
+        run CanvasRails::Application
       end
     end.to_app
     return app
@@ -275,7 +288,11 @@ shared_examples_for "all selenium tests" do
   include CustomSeleniumRspecMatchers
 
   # set up so you can use rails urls helpers in your selenium tests
-  include ActionController::UrlWriter
+  if CANVAS_RAILS2
+    include ActionController::UrlWriter
+  else
+    include Rails.application.routes.url_helpers
+  end
 
   def selenium_driver;
     $selenium_driver
@@ -1058,7 +1075,7 @@ def find_css_in_string(string_of_html, css_selector)
 end
 
 shared_examples_for "in-process server selenium tests" do
-  it_should_behave_like "all selenium tests"
+  include_examples "all selenium tests"
   prepend_before (:all) do
     $in_proc_webserver_shutdown ||= SeleniumTestsHelperMethods.start_webserver(WEBSERVER)
   end
