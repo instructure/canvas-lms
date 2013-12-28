@@ -31,18 +31,26 @@ describe Canvas::APISerializer do
     end
 
     FooSerializer.new({}, options).foo.should == {}
+
+    Object.send(:remove_const, :FooSerializer)
   end
 
   describe "#serializable object" do
+    before do
+      Foo = Struct.new(:id, :name) do
+        def read_attribute_for_serialization(attr)
+          send(attr)
+        end
+      end
 
-    Foo = Struct.new(:id, :name) do
-      def read_attribute_for_serialization(attr)
-        send(attr)
+      class FooSerializer < Canvas::APISerializer
+        attributes :id, :name
       end
     end
 
-    class FooSerializer < Canvas::APISerializer
-      attributes :id, :name
+    after do
+      Object.send(:remove_const, :Foo)
+      Object.send(:remove_const, :FooSerializer)
     end
 
     it "uses ActiveModel::serializer's implementation if not jsonapi or stringied ids requested" do
