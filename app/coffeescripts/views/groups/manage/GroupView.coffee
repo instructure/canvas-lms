@@ -49,6 +49,7 @@ define [
       @updateFullState()
 
     updateFullState: ->
+      return if @model.isLocked()
       if @model.isFull()
         @$el.droppable("destroy") if @$el.data('droppable')
         @$el.addClass('slots-full')
