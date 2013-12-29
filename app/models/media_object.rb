@@ -66,7 +66,7 @@ class MediaObject < ActiveRecord::Base
     files = []
     root_account_id = attachments.map{|a| a.root_account_id }.compact.first
     attachments.select{|a| !a.media_object }.each do |attachment|
-      pseudonym = attachment.user.sis_pseudonym_for(attachment.context) if attachment.user
+      pseudonym = attachment.user.sis_pseudonym_for(attachment.context) if attachment.user && attachment.context.respond_to?(:root_account)
       sis_source_id, sis_user_id = "", ""
       if Kaltura::ClientV3.config['kaltura_sis'].present? && Kaltura::ClientV3.config['kaltura_sis'] == "1"
         sis_source_id = %Q[,"sis_source_id":"#{attachment.context.sis_source_id}"] if attachment.context.respond_to?('sis_source_id') && attachment.context.sis_source_id
