@@ -1508,9 +1508,17 @@ class Attachment < ActiveRecord::Base
     res
   end
 
+
+  def folder_path
+    if folder
+      folder.full_name
+    else
+      Folder.root_folders(self.context).first.try(:name)
+    end
+  end
+
   def full_path
-    folder = (self.folder.full_name + '/') rescue Folder.root_folders(self.context).first.name + '/'
-    folder + self.filename
+    "#{folder_path}/#{filename}"
   end
 
   def matches_full_path?(path)
@@ -1519,8 +1527,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def full_display_path
-    folder = (self.folder.full_name + '/') rescue Folder.root_folders(self.context).first.name + '/'
-    folder + self.display_name
+    "#{folder_path}/#{display_name}"
   end
 
   def matches_full_display_path?(path)

@@ -1582,6 +1582,14 @@ describe Attachment do
       end
     end
   end
+
+  describe "#full_path" do
+    it "shouldn't puke for things that don't have folders" do
+      attachment_obj_with_context(Account.default.default_enrollment_term)
+      @attachment.folder = nil
+      @attachment.full_path.should == "/#{@attachment.display_name}"
+    end
+  end
 end
 
 def processing_model

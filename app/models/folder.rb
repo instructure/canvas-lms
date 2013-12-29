@@ -257,6 +257,8 @@ class Folder < ActiveRecord::Base
     end
 
     root_folders = []
+    # something that doesn't have folders?!
+    return root_folders unless context.respond_to?(:folders)
 
     context.shard.activate do
       Folder.unique_constraint_retry do
