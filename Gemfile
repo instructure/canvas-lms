@@ -149,7 +149,7 @@ group :test do
   gem 'simplecov', :require => false
   gem 'simplecov-rcov', :require => false
   gem 'bluecloth', '2.0.10' # for generating api docs
-  gem 'mocha', :github => 'ccutrer/mocha', :require => false
+  gem 'mocha', '1.0.0.alpha', :require => false
   gem 'thin', '1.5.1'
   if CANVAS_RAILS2
     gem 'rspec', '1.3.2'
