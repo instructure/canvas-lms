@@ -107,7 +107,7 @@ class FeatureFlagsController < ApplicationController
       features = Feature.applicable_features(@context)
       features = Api.paginate(features, self, route)
       flags = features.map { |fd|
-        @context.lookup_feature_flag(fd.feature, Account.site_admin.grants_right?(@current_user, session, :manage_feature_flags))
+        @context.lookup_feature_flag(fd.feature, Account.site_admin.grants_right?(@current_user, session, :read))
       }.compact
       render json: flags.map { |flag| feature_with_flag_json(flag, @context, @current_user, session) }
     end
@@ -151,7 +151,7 @@ class FeatureFlagsController < ApplicationController
   def show
     if authorized_action(@context, @current_user, :read)
       return render json: { message: "missing feature parameter" }, status: :bad_request unless params[:feature].present?
-      flag = @context.lookup_feature_flag(params[:feature], Account.site_admin.grants_right?(@current_user, session, :manage_feature_flags))
+      flag = @context.lookup_feature_flag(params[:feature], Account.site_admin.grants_right?(@current_user, session, :read))
       raise ActiveRecord::RecordNotFound unless flag
       render json: feature_flag_json(flag, @context, @current_user, session)
     end
@@ -193,7 +193,7 @@ class FeatureFlagsController < ApplicationController
 
       # if this is a hidden feature, require site admin privileges to create (but not update) a root account flag
       if !current_flag && feature_def.hidden?
-        return render json: { message: "invalid feature" }, status: :bad_request unless @context.is_a?(Account) && @context.root_account? && Account.site_admin.grants_right?(@current_user, session, :manage_feature_flags)
+        return render json: { message: "invalid feature" }, status: :bad_request unless @context.is_a?(Account) && @context.root_account? && Account.site_admin.grants_right?(@current_user, session, :read)
       end
 
       # create or update flag
