@@ -18,7 +18,13 @@ define [
       I18n.t('questions', 'Question', count: @get('question_count'))
     ).property('question_count')
 
-    canUpdate: true
+    canUpdate: ( ->
+      @get('can_update')
+    ).property('can_update')
+
+    isPublishedStatusVisible: ( ->
+      @get('published') && @get('can_update')
+    ).property('published', 'can_update')
 
     allDates: ( ->
       if @get('all_dates')

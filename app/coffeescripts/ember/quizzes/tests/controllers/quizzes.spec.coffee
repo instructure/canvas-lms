@@ -2,15 +2,11 @@ define [
   '../start_app',
   'ember',
   'ic-ajax',
-  '../../shared/environment',
-  '../../controllers/quizzes_controller'
-], (startApp, Ember, ajax, environment, QuizzesController) ->
+  '../../controllers/quizzes_controller',
+  '../environment_setup',
+], (startApp, Ember, ajax, QuizzesController) ->
 
   App = null
-
-  window.ENV = {
-    context_asset_string: 'course_1'
-  }
 
   module 'quizzes_controller',
     setup: ->

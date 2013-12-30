@@ -12,7 +12,7 @@ class QuizSerializer < Canvas::APISerializer
               :access_code, :ip_filter, :due_at, :lock_at, :unlock_at,
               :published, :unpublishable, :locked_for_user, :lock_info,
               :lock_explanation, :hide_results, :show_correct_answers_at,
-              :hide_correct_answers_at, :all_dates
+              :hide_correct_answers_at, :all_dates, :can_unpublish, :can_update
 
   has_one :assignment_group, embed: :ids
 
@@ -36,6 +36,14 @@ class QuizSerializer < Canvas::APISerializer
     rejected << :access_code unless quiz.grants_right?(current_user, session, :grade)
     rejected << :unpublishable unless quiz.grants_right?(current_user, session, :manage)
     super(keys) - rejected
+  end
+
+  def can_unpublish
+    quiz.can_unpublish?
+  end
+
+  def can_update
+    quiz.grants_right?(current_user, session, :update)
   end
 
   def question_count

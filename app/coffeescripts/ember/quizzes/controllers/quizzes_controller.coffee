@@ -20,6 +20,10 @@ define [
     practicesLabel: I18n.t('practices_label', 'Practice Quizzes toggle quiz visibility')
     surveysLabel: I18n.t('surveys_label', 'Surveys toggle quiz visibility')
 
+    canManage: ( ->
+      environment.get('canManage')
+    ).property('environment.canManage')
+
     newQuizLink: ( ->
       "/courses/#{environment.get('courseId')}/quizzes/new?fresh=1"
     ).property('environment.courseId')
@@ -61,5 +65,9 @@ define [
       @get('model').filter ({quiz_type, title}) =>
         quiz_type in surveyTypes
     ).property('model.@each')
+
+    actions:
+      editBanks: ->
+        window.location = @get('questionBanksUrl')
 
 

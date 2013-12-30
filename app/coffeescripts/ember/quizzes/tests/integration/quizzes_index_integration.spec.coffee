@@ -3,14 +3,10 @@ define [
   'ember',
   'ic-ajax',
   '../shared_ajax_fixtures',
-  '../../shared/environment'
-], (startApp, Ember, ajax, fixtures, environment) ->
+  '../environment_setup'
+], (startApp, Ember, ajax, fixtures) ->
 
   App = null
-
-  window.ENV = {
-    context_asset_string: 'course_1'
-  }
 
   fixtures.create()
 

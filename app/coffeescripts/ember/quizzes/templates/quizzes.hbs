@@ -6,34 +6,21 @@
     {{input value=searchFilter placeholder=searchPlaceholder class='search-filter' id='searchTerm'}}
   </div>
   <div class='header-bar-right form-inline'>
-    {{! TODO: wrap in conditional based on permissions }}
+    {{#if canManage}}
+      <a {{bind-attr href='newQuizLink'}}
+        {{bind-attr title=addQuiz }}
+        {{bind-attr aria-label=addQuiz }}
+        class='btn btn-primary new-quiz-link icon-plus' role='button'>
+        {{#t 'add_quiz'}}Quiz{{/t}}
+      </a>
 
-    <a {{bind-attr href='newQuizLink'}}
-      {{bind-attr title=addQuiz }}
-      {{bind-attr aria-label=addQuiz }}
-      class='btn btn-primary new-quiz-link icon-plus' role='button'>
-      {{#t 'add_quiz'}}Quiz{{/t}}
-    </a>
-
-    <a class='al-trigger btn' role='button' aria-haspopup='true'
-       aria-owns='toolbar-1' href='#' tabindex='0'>
-      <i class='icon-settings'></i>
-      <i class='icon-mini-arrow-down'></i>
-      <span class='screenreader-only'>
-        {{#t 'quiz_settings'}}Settings{{/t}}
-      </span>
-    </a>
-
-    <ul id='toolbar-1' class='al-options' role='menu' tabindex='0'
-        aria-hidden='true' aria-expanded='false'>
-      <li role='presentation'>
-        <a {{bind-attr href='questionBanksUrl'}}
-           class='icon-question'
-           tabindex='-1' role='menuitem'>
+      {{#ic-actions title='settings'}}
+        {{#ic-menu-item on-select='editBanks'}}
+          <i class='icon-edit'></i>
           {{#t 'links.manage_question_banks'}}Manage Question Banks{{/t}}
-        </a>
-      </li>
-    </ul>
+        {{/ic-menu-item}}
+      {{/ic-actions}}
+    {{/if}}
   </div>
 </div>
 
