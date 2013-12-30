@@ -8,18 +8,19 @@ en:
     bad_per_slot: "You must allow at least one appointment per time slot"
     context_required: "You need to select a calendar"
     select_calendars: "Select Calendars"
-  GrouDetailpView: 
+  EditGroupAssignmentView: 
+    move_to: "Move To"
+  GroupDetailView: 
+    delete_confirm: "Are you sure you want to remove this group?"
+    flash: 
+      removeError: "Unable to remove the group. Please try again later."
+      removed: "Group successfully removed."
     student_count: 
       one: "1 student"
       other: "%{count} students"
     user_count: 
       one: "1 user"
       other: "%{count} users"
-  GroupView: 
-    delete_confirm: "Are you sure you want to remove this group?"
-    flash: 
-      removeError: "Unable to remove the group. Please try again later."
-      removed: "Group successfully removed."
   academic_benchmark: 
     api_error: "Couldn't update standards for authority %{auth}."
     bad_ab_file: "The provided Academic Benchmark file has an error."
@@ -255,6 +256,7 @@ en:
       all_terms: "All Terms"
       course_text: "For Course: %{course};"
       end_text: "End At: %{end_at};"
+      error_text: "Failed, please report the following error code to your system administrator: ErrorReport:%{error};"
       extra_text_term: "Term: %{term_name};"
       message: "%{type} report successfully generated with the following settings. Account: %{account}; %{options}"
       section_text: "For Section: %{section};"
@@ -270,11 +272,13 @@ en:
       deleted: "Include Deleted Objects: true;"
       reports: "Reports: %{files}"
   account_settings: 
+    account: Account
     account_name_too_long: "Account Name is too long"
     confirms: 
       delete_announcement: "Are you sure you want to delete this announcement?"
       global_announcement: "You must confirm the global announcement"
       remove_account_admin: "Are you sure you want to remove this account admin?"
+    course: Course
     custom_text_blank: "[Custom Text]"
     links: 
       turnitin: 
@@ -285,10 +289,10 @@ en:
         invalid_settings: "invalid Turnitin settings, please check your account id and shared secret from Turnitin"
         setings_confirmed: "Turnitin settings confirmed!"
     titles: 
-      allow_draft_help_title: "What is Draft State?"
       configure_report: "Configure Report"
       open_registration_delegated_warning_dialog: "An External Identity Provider is Enabled"
       what_are_quiz_ip_filters: "What are Quiz IP Filters?"
+    user: User
   account_user: 
     types: 
       account_admin: "Account Admin"
@@ -334,8 +338,8 @@ en:
         unsuspend: "Unsuspend Account"
     admin_tools: 
       admin_tools: 
-        auth_logging: Logging
         tab_labels: 
+          admin_tools_logging: Logging
           restore_course: "Restore Courses"
         view_messages: "View Notifications"
       admin_tools_cumb: "Admin tools"
@@ -384,6 +388,10 @@ en:
         successfull_restore: 
           add_enrollments: "Add Enrollments"
           subtext: "What would you like to do next?"
+      logging_content_pane: 
+        authentication: "Login / Logout Activity"
+        select_default: "Select a Log type"
+        select_label: "Select a log type to search."
       page_title: "Admin Tools for %{account}"
       user_date_range_search_form: 
         find: Find
@@ -403,8 +411,12 @@ en:
     assignment_scheduling_csv_parameters: 
       account_reports: 
         newark: 
+          assignment_count: 
+            field: "# Assignments:"
           assignment_groups: 
             label: "Assignment Groups To Include:"
+          assignments: 
+            check_box: Assignments
           major: 
             check_box: Major
           papers: 
@@ -413,8 +425,6 @@ en:
             check_box: Projects
           reports: 
             check_box: Reports
-          section_id: 
-            field: "Section ID:"
           tests: 
             check_box: Tests
     avatars: 
@@ -659,6 +669,8 @@ en:
         newark: 
           assignment_groups: 
             label: "Assignment Groups To Include:"
+          assignments: 
+            check_box: Assignments
           major: 
             check_box: Major
           papers: 
@@ -703,14 +715,6 @@ en:
       alert_icon_warning_option: warning
       alert_timespan: "from %{start_at} to %{end_at}"
       alerts_title: Alerts
-      allow_draft: "Allow Draft State (beta)"
-      allow_draft_help_message: |-
-          Draft state is a *beta* feature that allows course content to be published and unpublished.
-          Unpublished content won't be visible to students and won't affect grades.
-          It also includes a redesign of some course areas to make them more consistent in look and functionality.
-          
-          Allowing Draft State here will allow teachers to enable it in their individual courses.
-      allow_draft_help_tooltip: "What is draft state?"
       announcement_sent_to_subset: "Sent to 1 / %{denominator} users each month"
       buttons: 
         add_users: "OK Looks Good, Add These Users"
@@ -729,11 +733,13 @@ en:
       enabled_web_serices_title: "Enabled Web Services"
       equall_endpoint_help: "This is the URL to your equella service. It will probably look something like \"%{sample_url}\"."
       equella_settings_title: "Equella Settings"
+      feature_options: "Feature options"
       features_title: Features
       global_announcements_description: "Global announcements are a way for you to post sticky messages on the dashboard of all users in your account.  They will appear on each user's dashboard for the given time period or until the user clicks the \"close\"(×) link to ignore the alert. **These announcements should be used sparingly.**"
       global_announcements_title: "Global Announcements"
       global_js_and_css_includes_description: "These files will be included on all page loads for your account"
       global_js_and_css_includes_title: "Global JavaScript and CSS Includes"
+      google_docs_domain: "Allowed Google Docs Domain"
       headers: 
         report_last_run: "Last Run"
         report_name: Name
@@ -754,6 +760,7 @@ en:
         canvas_authentication: "Canvas Authentication"
         default_language: "Default Language"
         default_time_zone: "Default Time Zone"
+        domain: "Domain:"
         edit_institution_email: "Users can delete their institution-assigned email address"
         enable_alerts: "Alerts (beta)"
         enable_eportfolios: ePortfolios
@@ -1282,7 +1289,6 @@ en:
       quota_exceeded_user: "User storage quota exceeded"
       student_view_unauthorized: "You cannot access this functionality in student view."
       unauthorized: 
-        generic: "You are not authorized to perform this action"
         not_started_yet: "The course you are trying to access has not started yet.  It will start %{date}."
         unpublished: "This course has not been published by the instructor yet."
     notices: 
@@ -1318,7 +1324,6 @@ en:
     update: Update
   assessment_question: 
     default_question_name: Question
-    default_question_text: "Question text"
   assessment_question_bank: 
     default_imported_title: "Imported Questions"
     default_title: "No Name - %{course}"
@@ -1347,7 +1352,8 @@ en:
     labels: 
       due: Due
     name_is_required: "Name is required!"
-    points_possible: "Points possible must be more than 0 for percentage grading"
+    percentage_points_possible: "Points possible must be more than 0 for percentage grading"
+    points_possible_number: "Points possible must be a number"
     select_external_tool_dialog_title: "Configure External Tool"
     show_advanced_options: "Show Advanced Options"
     submission_action_take_quiz: "Take %{title}"
@@ -1691,6 +1697,7 @@ en:
       group_category_options: "New Group Category"
       group_set: "Group Set"
       is_group_assignment: "This is a Group Assignment"
+      students_already_submitted_warning: "Prior individual submissions will not be counted as group submissions and will show incorrectly in speedgrader."
     group_comment: 
       labels: 
         group_comment: "Send Comment to the Whole Group"
@@ -1817,6 +1824,7 @@ en:
       peer_reviews_assign_at_explanation: "Must come after due date. If blank, uses due date."
       reviews_per_user: "Reviews Per User"
     percent_of_final_grade: "%{percent} of final grade"
+    points_possible_number: "Points possible must be a number"
     positive_number: "You must use a positive number"
     redirect_page: 
       redirect_message: |-
@@ -1922,12 +1930,14 @@ en:
       comments_placeholder: Comments...
       errors: 
         unacceptable_file_type: "This file type is not allowed. Accepted file types are: %{allowed_extensions_list}"
+      gmail_restriction_description: "Your account has restricted Google Doc submissions to Google accounts on the %{domain} domain. To submit this assignment with a Google Doc, you will need to reconfigure the Google Docs integration on your user settings page."
       instructions: 
         from_external_tool: "Select a tool from the list below to load and submit a resource provided by that tool."
         google_docs: "Select the file from the list below."
         media_recording: "Use the link below to record your submission. Click \"Save\" when you're finished and ready to submit."
         online_text_entry: "Copy and paste or type your submission right here."
         online_url: "Copy and paste the link to the web site you'd like to submit for this assignment."
+      invalid_google_docs_domain: "Invalid domain"
       labels: 
         uploaded_data: File
         url: "Website URL"
@@ -2258,7 +2268,7 @@ en:
     sample_final_answer: "This value is an example final answer for this question type"
   calendar: 
     agenda_view: 
-      due: due
+      due: Due
       loading: Loading
       no_events: "No events after this date."
       starts_at: "Starts at"
@@ -2291,10 +2301,9 @@ en:
         calendar_month: Month
         calendar_scheduler: Scheduler
         calendar_week: Week
+        screenreader_recommend_agenda: "Screenreader users: Use the Agenda to view events"
       loading: Loading
       my_appointment_groups: "My Appointment Groups"
-      refresh: Refresh
-      use_old_calendar: "Old Calendar"
     calendar_navigator: 
       enter_navigation_date: "Enter the date you would like to navigate to."
       next: Next
@@ -2363,9 +2372,11 @@ en:
       date: Date
       delete: Delete
       different_date_for_each_section: "Use a different date for each section"
+      edit_calendar_event_header: "Edit Calendar Event"
       end_time: "End Time"
       event_description: "Event Description"
       event_title: "Event Title"
+      new_calendar_event_header: "New Calendar Event"
       start_time: "Start Time"
     edit_event: 
       tabs: 
@@ -2379,6 +2390,7 @@ en:
     event_details: 
       attendees: Attendees
       calendar: Calendar
+      close: Close
       details: Details
       links: 
         delete: Delete
@@ -2396,8 +2408,6 @@ en:
       event: Event
       quiz: Quiz
     input_is_invalid_date: "Input is not a valid date."
-    labels: 
-      due: due
     loading_more_items: "Loading more items."
     loading_undated_events: "Loading undated events"
     message_participants: 
@@ -2441,6 +2451,8 @@ en:
       create_a_new_set_of_appointments: "Create an appointment group"
     screenreader_date_suggestion: "%{date}. Press enter to accept."
     time_block_errors: "There are errors in your time block selections."
+    time_block_row: 
+      delete_link: "Delete Time Range"
     titles: 
       edit_appointment_group: "Edit Appointment Group"
       edit_event: "Edit Event"
@@ -2449,7 +2461,6 @@ en:
       loading_undated_events: "Loading undated items..."
       no_undated_events: "No undated items."
       show_undated_events: "Show undated items"
-      undated_items: "Undated Items"
   calendar_event: 
     errors: 
       duplicate_child_event_contexts: "Duplicate child event contexts"
@@ -3568,8 +3579,8 @@ en:
         student_progression: "Module Progression by Student"
     context_module: 
       admin_links: 
-        module_options_label: "Module Options"
-        module_options_title: "Module Options"
+        module_options_label: "Manage Module"
+        module_options_title: "Manage Module"
       context_module: 
         draft: (Draft)
       images: 
@@ -3593,7 +3604,11 @@ en:
           delete_module: "Delete this module"
           edit_module: Edit
           student_progress: "See Student Progress for this Module"
-      manage: "Module Options"
+      manage: "Manage Module"
+      module_toolbar: 
+        aria: 
+          module_options: 
+            label: "Module Options"
       module_will_unlock_at: "will unlock *%{unlock_date}*"
       progression_complete_count: "*%{count}* Complete"
       progression_started_count: "*%{count}* In Progress"
@@ -3664,6 +3679,8 @@ en:
       min_score: 
         fulfilled: "scored at least a %{score}"
         unfulfilled: "must score at least a %{score}"
+      module: 
+        item_aria_label: "%{item_label} Module Item"
       must_contribute: 
         fulfilled: "contributed to the content of the page"
         unfulfilled: "must contribute to the content of the page"
@@ -4533,16 +4550,8 @@ en:
       date_restricted: "Users can only participate in the course between these dates"
       deatils: 
         move_course: "Select a new root account for this course. After you move the course you'll want to specify a new department for the course as well."
-      draft_explanation: "Explanation of Draft State"
-      draft_state_description: |-
-          Draft state is a *beta* feature that allows course content to be published and unpublished.
-          Unpublished content won't be visible to students and won't affect grades.
-          It also includes a redesign of some course areas to make them more consistent in look and functionality.
-          
-          Unpublished content may not be available if Draft State is disabled.
       drag_details: "Disabling most pages will cause students who visit those pages to be redirected to the course home page."
       drag_to_hide: "Drag items here to hide them from students."
-      enable_draft: "Enable Draft State (beta)"
       enrollment_count: 
         one: "1 User"
         other: "%{count} Users"
@@ -4627,6 +4636,7 @@ en:
       tabs: 
         alerts: Alerts
         details: "Course Details"
+        feature_options: "Feature options"
         grade_publishing: "Grade Publishing"
         navigation: Navigation
         sections: Sections
@@ -5031,6 +5041,8 @@ en:
       second: Seconds
       year: Year
   default_conference_title: "%{course_name} Conference"
+  default_question_name: Question
+  default_question_text: "Question text"
   demos: 
     demos_add: 
       labels: 
@@ -5142,6 +5154,7 @@ en:
       separated_conversation_notice: "Since this is a group assignment, each group has its own conversation for this topic. Here are the ones you have access to:"
       show_due_dates: "Show Due Dates"
       until: Until
+    cannot_unpublish: "Can't unpublish"
     confirm_delete_announcement: 
       one: "Are you sure you want to delete this announcement?"
       other: "Are you sure you want to delete these %{count} announcements?"
@@ -5209,6 +5222,7 @@ en:
         one: "Show 1 More Entry"
         other: "Show %{count} More Entries"
     error_draft_state_announcement: "This topic cannot be set to draft state because it is an announcement."
+    error_draft_state_graded: "This topic cannot be set to draft state because it is an assignment"
     error_draft_state_unauthorized: "You do not have permission to set this topic to draft state."
     error_draft_state_with_posts: "This topic cannot be set to draft state because it contains posts."
     group_assignment_discussion_entry: 
@@ -5250,6 +5264,7 @@ en:
       current_page: Current
       first_page: First
       last_page: Last
+    points_possible_number: "Points possible must be a number"
     reply_count_tooltip: 
       one: "1 reply"
       other: "%{count} replies"
@@ -5289,6 +5304,7 @@ en:
       speed_grader: "Speed Grader"
       topic: Topic
       topic_locked: "This topic will not be visible to users until *%{date}*"
+      topic_not_visible: "This topic is not visible to users"
       topic_podcast_feed_link: "Topic Podcast Feed"
       topic_subscribe: Subscribe
       topic_subscribe_tooltip: "You are unsubscribed and will not be notified of new comments"
@@ -5387,6 +5403,12 @@ en:
     unsubscribe: "Unsubscribe from this topic"
     unsubscribed: Unsubscribed
     unsubscribed_hint: "You are not subscribed to this topic. Click to subscribe."
+  draft_state_description: |-
+      Draft state is a *beta* feature that allows course content to be published and unpublished.
+      Unpublished content won't be visible to students and won't affect grades.
+      It also includes a redesign of some course areas to make them more consistent in look and functionality.
+      
+      Unpublished content may not be available if Draft State is disabled.
   due_dates: 
     due_at: "due: %{assignment_due_date_time}"
     multiple_due_dates: "due: Multiple Due Dates"
@@ -5818,9 +5840,6 @@ en:
     app_review_view: 
       posted_by_on: "Posted by *%{user.name}* on *%{created_at}*"
     app_saved_message: "%{app} saved successfully!"
-    borderless_launch: 
-      load_tool_button: "Load %{tool} manually"
-      redirecting_to_lti: "Redirecting to LTI app, please wait..."
     buttons: 
       cancel: Cancel
       delete: Delete
@@ -5950,6 +5969,25 @@ en:
       notifications_config_notice: "Notifications from Canvas can automatically be sent over to your Facebook account. Below you'll see the types of notifications you can have sent. You can change your notification preferences at any time, either here or in Canvas."
       settings_title: "Canvas Notification Settings"
       updating_preferences: "Updating Preferences..."
+  feature_flags: 
+    feature_flag: 
+      allow: Allow
+      disabled: Disabled
+      enabled: Enabled
+      estimated_release: "Estimated Release:"
+      no_description: "no description"
+      ? "off"
+      : "Off"
+      ? "on"
+      : "On"
+      release_notes: "release notes"
+      toggle_feature_details: "Toggle feature details"
+    feature_flag_admin_view: 
+      feature_options: "Feature options"
+      no_features_available: "No features are currently available."
+  features: 
+    draft_state: "Draft State"
+    google_docs_domain_restriction: "Google Docs Domain Restriction"
   filebrowserview: 
     course_files: "Course files"
     group_files: "Group files"
@@ -6151,9 +6189,16 @@ en:
     invitation: invitation
     question: question
     warning: warning
+  google_docs_domain_restriction_description: |-
+      Google Docs Domain Restriction allows Google Docs submissions and collaborations
+      to be restricted to a single domain. Students attempting to submit assignments or
+      join collaborations on an unapproved domain will receive an error message notifying them
+      that they will need to update their Google Docs integration.
   gradebook: 
     alerts: 
       no_active_students: "Sorry, there are either no active students in the course or none are gradable by you."
+      no_students_in_groups_back: "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to go back."
+      no_students_in_groups_close: "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to close this window."
       no_students_in_section: "Could not find any students in that section, falling back to showing all sections."
       none_to_update: "None to Update"
       scores_updated: 
@@ -6297,6 +6342,17 @@ en:
     invalid_assignment_groups_warning: 
       one: "Score does not include %{groups} because it has                  no points possible"
       other: "Score does not include %{groups} because they have                    no points possible"
+    keyboard_assignment_desc: "Go to the current assignment's detail page"
+    keyboard_close_menu: "Close the currently active assignment menu"
+    keyboard_comment_desc: "Comment on the active submission"
+    keyboard_menu_desc: "Open the menu for active column's assignment"
+    keyboard_sort_desc: "Sort the grid on the current active column"
+    keycodes: 
+      close_menu: esc
+      comment: c
+      goto_assignment: g
+      menu: m
+      sort: s
     no_assignments_have_points_warning: "Can't compute score until an assignment has points possible"
     percent_of_grade: "%{percentage} of grade"
     points_out_of: "out of %{points_possible}"
@@ -7008,6 +7064,12 @@ en:
         assign_user_to_group: "Assign user to this group"
         assign_user_to_group_name: "Assign user to group %{name}"
         no_groups_created: "Groups need to be created before users can be added."
+      edit_group_assignment: 
+        all_available_groups_full: "All available groups are full."
+        all_groups_full_suggestion: "Either change group limits or add more groups."
+        move_to_group_label: "Move to group"
+        saving: Saving...
+        where_to_move: "Where would you like to move *%{userName}*?"
       group_categories: 
         account_group_explanation: "Account-level student groups are a good way to group students without being tied to a specific course. Every student group gets their own calendar, discussion board and collaboration tools so they can organize themselves and work together more effectively."
         add_group_set: "Add Group Set"
@@ -7033,9 +7095,7 @@ en:
         save: Save
         saving: Saving...
         self_signup: "Self Sign-Up"
-        self_signup_description: "You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organize themselves into groups instead of needing the teacher to do the work. Note that as long as this option is enabled, students can move themselves from one group to another."
         split_into_groups: "Split students into %h{split_num} equal groups"
-        what_is_this: "What is this?"
       group_category_detail: 
         add_group: "Add Group"
         category_settings: Settings
@@ -7068,20 +7128,26 @@ en:
         visit_group_homepage: "Visit Group Homepage"
       group_edit: 
         cancel: Cancel
+        group_join_level: Joining
         group_name: "Group Name"
+        invitation_only: "Invitation only"
+        open: "Members are free to join"
         save: Save
         saving: Saving...
       group_user: 
         assign_to_group: "Assign to Group"
-        assign_user_to_group: "Assign user %{name} to a group"
-        remove_from_group: "Remove from Group"
-        remove_user_from_group: "Remove user %{name} from this group"
+        assign_user_to_group: "Assign %{name} to a group"
+        edit_user_group_assignment: "Remove or move %{name} from group"
+        move: "Move To..."
+        move_to_new_group: "Move %{name} to a new group"
+        remove: Remove
+        remove_from_group: "Remove %{name} from group"
       group_users: 
-        no_students: "No students"
-        no_users: "No users"
+        no_students: "There are currently no students in this group. Add a student to get started."
+        no_users: "There are currently no users in this group. Add a user to get started."
       groups: 
-        no_groups: "No groups."
-        no_matching_groups: "No matching groups."
+        no_groups: "There are currently no groups in this group set. Add a group to get started."
+        no_matching_groups: "There are no groups that match your current search term."
       randomly_assign_members: 
         cancel: Cancel
         okay: Okay
@@ -9732,6 +9798,8 @@ en:
         saving_preferences_failed: "Oops! Something broke.  Please try again"
       facebook: 
         display: Facebook
+      push: 
+        display: "Push Notification"
       sms: 
         display: "Cell Number"
       twitter: 
@@ -9955,8 +10023,8 @@ en:
     errors: 
       require_title: "You must enter a title"
     headers: 
-      sort_ascending: "Sort ascending"
-      sort_descending: "Sort descending"
+      sort_ascending: "%{title}, Sort ascending"
+      sort_descending: "%{title}, Sort descending"
     notices: 
       delete_failed: "The page \"%{title}\" could not be deleted."
       page_deleted: "The page \"%{title}\" has been deleted."
@@ -10014,8 +10082,8 @@ en:
         canvas_source_identifier: "Name of your Canvas instance"
         sis_source_identifier: "Name of your Banner instance"
     big_blue_button: 
-      description: "Big Blue Button web conferencing support"
-      name: "Big Blue Button"
+      description: "BigBlueButton web conferencing support"
+      name: BigBlueButton
     big_blue_button_settings: 
       description: "You will need access to a [BigBlueButton](%{url}) instance."
       domain_description: "**hostname** or **ip address** of your BigBlueButton installation (e.g. bigbluebutton.mycompany.com)"
@@ -10417,6 +10485,7 @@ en:
       diigo_description: "Diigo is a social bookmarking tool tailored specifically to research and education. Canvas's rich content editor will let you search your Diigo tags to easily link from within Canvas to other resources you find useful."
       error_loading_token_details: "Error Loading Token Details"
       facebook_description: "If you have a Facebook account, you can install the Canvas app and receive course notifications on your profile. You can specify which types of notifications you want and how often you'd like them sent."
+      feature_options: "Feature options"
       full_token_warning: |-
           **Copy this token down now**. Once you leave this page you won't be able to
           retrieve the full token anymore, you'll have to regenerate it to get a new
@@ -10794,6 +10863,8 @@ en:
       user_question_banks: "User Question Banks"
     question_bank: 
       bookmark_bank: "Bookmark this Question Bank"
+      delete_bank: "Delete this Question Bank"
+      edit_bank: "Edit this Question Bank"
       last_updated: "Last Updated: *%{datetime}*"
       no_name: "No Name"
       no_questions: "No Questions"
@@ -10877,6 +10948,7 @@ en:
     quick_start_bar_view: 
       new: "New:"
   quiz: 
+    current_filter: "Current Filter"
     default_question_input: "[ Select ]"
     default_text_only_question_name: Spacer
     default_title: "Unnamed Quiz"
@@ -10941,6 +11013,7 @@ en:
     assignment_points_possible: 
       one: "1 pt"
       other: "%{count} pts"
+    assignments_label: "Assignment Quizzes toggle quiz visibility"
     buttons: 
       add_selected_questions: "Add Selected Questions"
       adding_questions: "Adding Questions..."
@@ -10949,6 +11022,7 @@ en:
       creating_group: "Creating Group..."
       generating: Generating...
       generating_combinations_progress: "Generating... (%{done}/%{total})"
+      save: Save
       saved: Saved!
       saving: Saving...
       update_group: "Update Group"
@@ -10959,7 +11033,11 @@ en:
       delete_question: "Are you sure you want to delete this question?"
       delete_quiz: "Are you sure you want to delete this quiz?"
       scrap_and_restart: "Scrap this quiz and start from scratch?"
-    current_filter: "Current Filter"
+    correct_answers_no_longer_available: "Correct answers are no longer available."
+    correct_answers_protected: "Correct answers are hidden."
+    correct_answers_shown_after: "Correct answers will be available on %{date}."
+    correct_answers_shown_between: "Correct answers will be available %{from} - %{to}."
+    correct_answers_shown_until: "Correct answers are available until %{date}."
     default_answer_comments: "Response if the student chooses this answer"
     default_answer_comments_on_match: "Response if the student matches this answer"
     default_comments_on_wrong_match: "Response if the user misses this match"
@@ -11028,10 +11106,13 @@ en:
       adding_questions_failed: "Adding Questions Failed, please try again"
       creating_group_failed: "Create Group Failed, Please Try Again"
       field_is_required: "This field is required"
+      invalid_show_correct_answers_range: "Hide date cannot be before show date."
       loading_banks_failed: "Question Banks failed to load, please try again"
       loading_more_questions_failed: "loading more questions failed"
       loading_question_failed: "Loading Question Failed..."
       loading_questions_failed: "Questions failed to load, please try again"
+      missing_access_code: "You must enter an access code"
+      missing_ip_filter: "You must enter a valid IP Address"
       no_answer: "Please add at least one answer"
       no_correct_answer: "Please choose a correct answer"
       no_more_attempts: "You have no quiz attempts left"
@@ -11039,6 +11120,8 @@ en:
       quiz_deleted: "That quiz has been deleted"
       quiz_update_failed: "Quiz failed to update"
       retrieving_filters_failed: "Retrieving Filters Failed"
+    fabulous_quizzes: 
+      page_titles: Quizzes
     ? "false"
     : "False"
     file_uploaded_or_removed: 
@@ -11266,12 +11349,13 @@ en:
       titles: 
         this_quiz_is_locked: "This quiz is currently locked. Click for more details."
     index_view: 
+      add_quiz: Quiz
       links: 
-        create_new_quiz: "New Quiz"
         manage_question_banks: "Manage Question Banks"
         publish_multiple_quizzes: "Publish Multiple Quizzes"
         settings: Settings
       search_for_quiz: "Search for Quiz"
+      title_add_quiz: "Add Quiz"
     invalid_ip: 
       quiz_protected: "This quiz is protected and is only available from certain locations. The computer you are currently using does not appear to be at a valid location for taking this quiz."
       survey_protected: "This survey is protected and is only available from certain locations. The computer you are currently using does not appear to be at a valid location for taking this survey."
@@ -11343,6 +11427,12 @@ en:
       end_quiz_reference_time_now: now
       end_quiz_when: "End the quiz %{n} minutes from %{reference_time}."
       errors: 
+        quiz_submission_extra_attempts_not_a_number: "Extra attempts must be a number."
+        quiz_submission_extra_attempts_too_long: "Extra attempts must be less than than 1000."
+        quiz_submission_extra_attempts_too_short: "Extra attempts must be greater than 0."
+        quiz_submission_extra_time_not_a_number: "Extra time must be a number."
+        quiz_submission_extra_time_too_long: "Extra time must be less than than 10080."
+        quiz_submission_extra_time_too_short: "Extra time must be greater than 0."
         server_communication_failed: "There was a problem communicating with the server.  The system will try again in five minutes, or you can reload the page"
       extended_quiz_time_explanation: "You can give this student extra time on their current quiz attempt. How much time would you like to give them?"
       extensions_for_student: "Extensions for %{student}"
@@ -11394,12 +11484,11 @@ en:
         published: Published
         save: Save
       cant_go_back: "Lock questions after answering"
-      code: "Access Code"
       default_page_title: "New Quiz"
-      filter: "IP Filter"
       group: "Assignment Group"
       headers: 
         ip_filters: "What are Quiz IP Filters?"
+      hide_correct_answers_at: "Hide Correct Answers at"
       hints: 
         question_detail_disabled: "NOTE: Question details not available when more than %{question_count}."
         quiz_score: "students will automatically receive full credit once they take the survey"
@@ -11415,7 +11504,7 @@ en:
         quiz_notify: "Notify users this quiz has changed"
         quiz_score: Score
         require_access_code: "Require an access code"
-        restrict_quiz: "Restrict this Quiz"
+        restrict_quiz: "Quiz Restrictions"
         show_question_details: "Show Question Details"
       limited_attempts: "Allowed Attempts"
       links: 
@@ -11437,7 +11526,8 @@ en:
       require_lockdown_browser_for_results: "Required to view quiz results"
       retrieving_filters: "Retrieving Filters..."
       score_to_keep: "Quiz Score to Keep"
-      show_correct_answers: "Show Which Answers Were Correct"
+      show_correct_answers: "Let Students See The Correct Answers"
+      show_correct_answers_at: "Show Correct Answers at"
       shuffle_answers: "Shuffle Answers"
       time_limit: "How many minutes?"
       titles: 
@@ -11465,6 +11555,7 @@ en:
         one: "1 quiz successfully unpublished!"
         other: "%{count} quizzes successfully unpublished!"
     practice_quiz: "Practice Quiz"
+    practices_label: "Practice Quizzes toggle quiz visibility"
     question_colon: "Question:"
     question_count: 
       one: "1 Question"
@@ -11538,8 +11629,6 @@ en:
       links: 
         delete: Delete
         edit: Edit
-      quiz_available: Available
-      quiz_due: Due
       settings: Settings
       title_delete: "Delete Quiz"
       title_edit: "Edit Quiz"
@@ -11667,6 +11756,7 @@ en:
       loading: Loading...
       titles: 
         details: "Assignment Rubric Details"
+    search_placeholder: "Search for Quiz"
     show: 
       answers: 
         correct: Correct!
@@ -11728,6 +11818,10 @@ en:
         unlock_for_how_long: "How long would you like to unlock the quiz for?"
       warnings: 
         draft_version: "This is a preview of the draft version of the quiz"
+    show_and_hide_correct_answers: "From %{from} to %{to}"
+    show_correct_answers_after: "After %{date}"
+    show_correct_answers_immediately: Immediately
+    show_correct_answers_until: "Until %{date}"
     single_answer: 
       upload: Upload
     statistics: 
@@ -11776,6 +11870,7 @@ en:
       regraded: Regraded
       score: Score
       time: Time
+    surveys_label: "Surveys toggle quiz visibility"
     take_quiz: 
       buttons: 
         next: Next
@@ -11849,6 +11944,7 @@ en:
       labels: 
         attempt_due: "Attempt due"
         score: Score
+        time_elapsed: "Time Elapsed"
         time_running: "Time Running"
       links: 
         hide_time_running: Hide
@@ -11858,6 +11954,7 @@ en:
       labels: 
         time_elapsed: "Time Elapsed"
         time_remaining: "Time Remaining"
+    title_add_quiz: "Add Quiz"
     titles: 
       add_questions_as_group: "Add Questions as a Group"
       click_to_enter_comments_on_answer: "Click to enter comments for the student if they choose this answer"
@@ -11876,6 +11973,17 @@ en:
     warnings: 
       unpublished_changes: "*You have made unpublished changes to this quiz.* These changes will not appear for students until you publish or republish the quiz."
       unpublished_quiz: "*This quiz is unpublished* Only teachers can see the quiz until it is published."
+  quizzes_model: 
+    confirms: 
+      delete_quiz: "Are you sure you want to delete this quiz?"
+    delete_quiz: "Delete Quiz"
+    edit_quiz: "Edit Quiz"
+    points: 
+      one: "1 pt"
+      other: "%{count} pts"
+    questions: 
+      one: "1 Question"
+      other: "%{count} Questions"
   re_upload_submissions_form: 
     buttons: 
       upload: "Upload Files"
@@ -11955,6 +12063,7 @@ en:
       manage_courses: "Manage ( add / edit / delete ) courses"
       manage_demos: "Manage demos"
       manage_developer_keys: "Manage developer keys"
+      manage_feature_flags: "Enable or disable features at an account level"
       manage_files: "Manage (add / edit / delete) course files"
       manage_frozen_assignment: "Manage (edit / delete) frozen assignments"
       manage_global_outcomes: "Manage global learning outcomes"
@@ -11990,6 +12099,7 @@ en:
       view_all_grades: "View all grades"
       view_analytics: "View analytics pages"
       view_error_reports: "View error reports"
+      view_grade_changes: "View Grade Change Logs"
       view_group_pages: "View the group pages of all student groups"
       view_jobs: "View background jobs"
       view_notifications: "View notifications"
@@ -12655,7 +12765,7 @@ en:
     rubric_criterion: 
       defaults: 
         description: "Description of criterion"
-      delete_criterion_link: "Delete Criterion Link"
+      delete_criterion_row: "Delete Criterion Row"
       description: 
         custom_comments_area: "This area will be used by the assessor to leave comments related to this criterion."
       full_marks: "Full Marks"
@@ -13044,6 +13154,7 @@ en:
       assignment_submit_fail: "Assignment failed to submit"
       can_not_submit_locked_assignment: "You can't submit an assignment when it is locked"
       invalid_file_type: "Invalid file type"
+      invalid_google_docs_domain: "You cannot submit assignments from this google_docs domain"
       media_file_attached: "There was no media recording in the submission"
       no_attached_file: "You must attach at least one file to this assignment"
       no_report: "Couldn't find a report for that submission item"
@@ -13798,8 +13909,6 @@ en:
         creation_date: "Creation date"
         last_edit: "Last edit"
         page_title: "Page title"
-        published: Published
-        settings: Settings
       loading: "Loading ..."
       loading_more: "Loading more ..."
       no_pages: "No pages created yet."

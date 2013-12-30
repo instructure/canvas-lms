@@ -33,6 +33,7 @@ define [
       'click .cancel_button': 'onCancel'
 
     initialize: ->
+      super
       @cacheElements()
       @picker = new CollaboratorPickerView(el: @$collaborators)
       @titleMaxLength = ENV.TITLE_MAX_LEN #255

@@ -3,17 +3,19 @@ define [
   'compiled/collections/GroupCollection'
   'compiled/models/Group'
   'compiled/models/GroupUser'
-], (AssignToGroupMenu, GroupCollection, Group, GroupUser) ->
+  'compiled/models/GroupCategory'
+], (AssignToGroupMenu, GroupCollection, Group, GroupUser, GroupCategory) ->
 
   view = null
   user = null
 
   module 'AssignToGroupMenu',
     setup: ->
-      user = new GroupUser(id: 1, name: "bob", groupId: null)
+      groupCategory = new GroupCategory
+      user = new GroupUser(id: 1, name: "bob", groupId: null, category: groupCategory)
       groups = new GroupCollection [
         new Group id: 1, name: "a group"
-      ]
+      ], {category: groupCategory}
       view = new AssignToGroupMenu
         collection: groups
         model: user

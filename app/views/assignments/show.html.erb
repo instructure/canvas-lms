@@ -24,7 +24,7 @@
         </h2>
       </div>
       <div class='edit-content'>
-        <% if @context.draft_state_enabled? %>
+        <% if @context.feature_enabled?(:draft_state) %>
           <button
             id="assignment_publish_button"
             data-id='<%= @assignment.id %>'

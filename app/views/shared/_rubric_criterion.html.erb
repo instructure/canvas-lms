@@ -113,10 +113,13 @@
     </div>
   </td>
   <td class="editing">
-    <a href="#" role="button" class="delete_criterion_link">
-      <i class="icon-end"></i>
-      <div class="screenreader-only"><%= t(:delete_criterion_link, "Delete Criterion Link") %></div>
-    </a>
+    <a
+      href="#"
+      class="delete_criterion_link"
+      title="<%= t(:delete_criterion_row, 'Delete Criterion Row') %>"
+      role="button"
+      aria-label="<%= t(:delete_criterion_row, 'Delete Criterion Row') %>"
+    ><i class="icon-end"></i></a>
   </td>
 </tr>
 

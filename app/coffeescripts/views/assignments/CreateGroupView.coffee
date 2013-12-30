@@ -32,6 +32,7 @@ define [
       non_number: I18n.t('non_number', 'You must use a number')
       positive_number: I18n.t('positive_number', 'You must use a positive number')
       max_number: I18n.t('higher_than_max', 'You cannot use a number greater than the number of assignments')
+      no_name_error: I18n.t('no_name_error', 'A name is required')
 
     initialize: ->
       super
@@ -41,13 +42,16 @@ define [
 
     onSaveSuccess: ->
       super
-      if @assignmentGroup # meaning we are editing
-        @model.collection.view.render()
+      # meaning we are editing
+      if @assignmentGroup
+        # trigger instead of calling render directly
+        @model.collection.trigger 'render', @model.collection
       else
         @assignmentGroups.add(@model)
         @model = new AssignmentGroup(assignments: [])
 
-      @render()
+        @render()
+
 
     getFormData: ->
       data = super
@@ -57,21 +61,24 @@ define [
       data
 
     validateFormData: (data) ->
-      max = null
+      max = 0
       if @assignmentGroup
         as = @assignmentGroup.get('assignments')
         max = as.size() if as?
       errors = {}
+      if data.name == ""
+        errors["name"] = [{type: 'no_name_error', message: @messages.no_name_error}]
       _.each data.rules, (value, name) =>
+        # don't want to validate the never_drop field
+        return if name is 'never_drop'
         val = parseInt(value)
         field = "rules[#{name}]"
         if isNaN(val)
           errors[field] = [{type: 'number', message: @messages.non_number}]
         if val < 0
           errors[field] = [{type: 'positive_number', message: @messages.positive_number}]
-        if max?
-          if val > max
-            errors[field] = [{type: 'maximum', message: @messages.max_number}]
+        if val > max
+          errors[field] = [{type: 'maximum', message: @messages.max_number}]
       errors
 
     showWeight: ->

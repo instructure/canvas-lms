@@ -6,6 +6,8 @@ describe "manage groups students" do
 
   before (:each) do
     course_with_teacher_logged_in
+    Account.default.settings[:enable_manage_groups2] = false
+    Account.default.save!
   end
 
   context "misc" do
@@ -275,6 +277,7 @@ describe "manage groups students" do
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       ff(".left_side .group").should be_empty
+      wait_for_ajaximations
       @course.group_categories.all.count.should == 0
     end
 

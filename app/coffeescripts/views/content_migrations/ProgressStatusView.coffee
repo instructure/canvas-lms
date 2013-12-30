@@ -5,6 +5,7 @@ define [
   class ProgressingStatusView extends Backbone.View
     template: template
     initialize: ->
+      super
       @progress = @model.progressModel
 
     render: ->

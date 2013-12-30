@@ -116,7 +116,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   def validate_depth
     if !self.depth || self.depth > self.class.max_depth
-      errors.add_to_base("Maximum entry depth reached")
+      errors.add(:base, "Maximum entry depth reached")
     end
   end
 
@@ -228,7 +228,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def update_topic_subscription
-    discussion_topic.user_ids_who_have_posted_and_admins(true) # pesky memoization
+    discussion_topic.user_ids_who_have_posted_and_admins
     unless discussion_topic.user_can_see_posts?(user)
       discussion_topic.unsubscribe(user)
     end
@@ -264,31 +264,31 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user| self.user && self.user == user }
     can :read
 
-    given { |user| self.user && self.user == user && !self.discussion_topic.locked? }
+    given { |user| self.user && self.user == user && self.discussion_topic.available_for?(user) }
     can :reply
 
-    given { |user| self.user && self.user == user && !self.discussion_topic.locked? && context.user_can_manage_own_discussion_posts?(user) }
+    given { |user| self.user && self.user == user && self.discussion_topic.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) }
     can :update and can :delete
 
     given { |user, session| self.cached_context_grants_right?(user, session, :read_forum) }
     can :read
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked? }
+    given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) && self.discussion_topic.available_for?(user) }
     can :reply and can :create and can :read
 
     given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) }
     can :read
 
-    given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && cached_context_grants_right?(user, session, :post_to_forum) && !discussion_topic.locked? }
+    given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && cached_context_grants_right?(user, session, :post_to_forum) && discussion_topic.available_for?(user) }
     can :attach
 
-    given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked? }
+    given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && self.discussion_topic.available_for?(user) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
     given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
 
-    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked? }
+    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) && self.discussion_topic.available_for?(user) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
     given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) }

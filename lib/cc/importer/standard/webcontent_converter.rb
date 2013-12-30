@@ -56,7 +56,7 @@ module CC::Importer::Standard
       zip_file = File.join(@base_export_dir, 'all_files.zip')
       make_export_dir
 
-      Zip::ZipFile.open(zip_file, 'w') do |zipfile|
+      Zip::File.open(zip_file, 'w') do |zipfile|
         file_map.each_value do |val|
           file_path = File.join(@unzipped_file_path, val[:path_name])
           if File.exists?(file_path)

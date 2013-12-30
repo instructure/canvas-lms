@@ -1,0 +1,18 @@
+<label class="control-label" for="loggingType">
+  <h4>{{#t "select_label"}}Select a log type to search.{{/t}}</h4>
+</label>
+<div class="controls">
+  <select id="loggingType">
+    <option value="default">{{#t "select_default"}}Select a Log type{{/t}}</option>
+    {{#if authentication}}
+    <option value='#loggingAuthentication'>
+      {{#t "authentication"}}Login / Logout Activity{{/t}}
+    </option>
+    {{/if}}
+  </select>
+</div>
+<hr/>
+
+{{#if authentication}}
+<div id="loggingAuthentication" class="loggingTypeContent"></div>
+{{/if}}

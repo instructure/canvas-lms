@@ -42,6 +42,7 @@ define [
       '#mathjax-message': '$mathjaxMessage'
 
     initialize: (@editor) ->
+      super
       @$editor = $("##{@editor.id}")
       @prevSelection = @editor.selection.getBookmark()
 

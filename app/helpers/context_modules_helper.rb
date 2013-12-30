@@ -45,11 +45,8 @@ module ContextModulesHelper
     return true if item.nil? || !item.content
     content_type_class = item.content_type_class
     if (content_type_class == 'attachment')
-      if (!item.content.folder)
-        true
-      else
-        !item.content.folder.hidden?
-      end
+      # don't know how to publish/unpublish attachments yet
+      false
     elsif (content_type_class == 'quiz')
       # quizzes can't be unpublished once they have been published and
       # taken by at least one person (maybe this should be abstracted

@@ -225,3 +225,10 @@ define [
     ok errors["name"]
     equal errors["name"].length, 1
     equal errors["name"][0]["message"], "Name is required!"
+
+  test 'rejects a letter for points_possible', ->
+    view = createView(@assignment3)
+    data = points_possible: 'a'
+    errors = view.validateBeforeSave(data, [])
+    ok errors["points_possible"]
+    equal errors['points_possible'][0]['message'], 'Points possible must be a number'

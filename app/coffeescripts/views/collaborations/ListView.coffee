@@ -31,11 +31,11 @@ define [
     events:
       'click a': 'selectCollaborator'
 
-    initialize: ->
-      @collection                = @createCollection(@options.type)
+    initialize: (options = {}) ->
+      @collection                = @createCollection(options.type)
       @paginationScrollContainer = @$el.parents('.list-wrapper')
       @attachEvents()
-      super(fetchOptions: @options.fetchOptions)
+      super
 
     # Internal: Create a collection of the given type.
     #

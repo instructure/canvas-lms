@@ -145,9 +145,19 @@ describe QuizStatistics::StudentAnalysis do
       stats.last[0].should == "nobody@example.com"
       stats.last[1].should == @student.id.to_s
       stats.last[2].should == "user_sis_id_01"
-      stats.last[3].should == "section2, Unnamed Course"
-      stats.last[4].should == "#{section2.id}, #{section1.id}"
-      stats.last[5].should == "SISSection02, SISSection01"
+
+      splitter = lambda { |str| str.split(",").map(&:strip) }
+      sections = splitter.call(stats.last[3])
+      sections.should include("section2")
+      sections.should include("Unnamed Course")
+
+      section_ids = splitter.call(stats.last[4])
+      section_ids.should include(section2.id.to_s)
+      section_ids.should include(section1.id.to_s)
+
+      section_sis_ids = splitter.call(stats.last[5])
+      section_sis_ids.should include("SISSection02")
+      section_sis_ids.should include("SISSection01")
     end
 
     it 'should deal with incomplete fill-in-multiple-blanks questions' do
@@ -155,13 +165,13 @@ describe QuizStatistics::StudentAnalysis do
         :question_type => 'fill_in_multiple_blanks_question',
         :question_text => "[ans0]",
         :answers =>
-          {'answer_0' => {'answer_text' => 'foo', 'blank_id' => 'ans0', 'answer_weight' => '100'}}})
+          [{'answer_text' => 'foo', 'blank_id' => 'ans0', 'answer_weight' => '100'}]})
       @quiz.quiz_questions.create!(:question_data => { :name => "test 3",
         :question_type => 'fill_in_multiple_blanks_question',
         :question_text => "[ans0] [ans1]",
         :answers =>
-           {'answer_0' => {'answer_text' => 'bar', 'blank_id' => 'ans0', 'answer_weight' => '100'},
-            'answer_1' => {'answer_text' => 'baz', 'blank_id' => 'ans1', 'answer_weight' => '100'}}})
+           [{'answer_text' => 'bar', 'blank_id' => 'ans0', 'answer_weight' => '100'},
+            {'answer_text' => 'baz', 'blank_id' => 'ans1', 'answer_weight' => '100'}]})
       @quiz.generate_quiz_data
       @quiz.save!
       @quiz.quiz_questions.size.should == 3
@@ -242,8 +252,8 @@ describe QuizStatistics::StudentAnalysis do
     student_in_course(:active_all => true)
     q = @course.quizzes.create!(:title => "new quiz")
     q.update_attribute(:published_at, Time.now)
-    q.quiz_questions.create!(:question_data => {:name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0'}}})
-    q.quiz_questions.create!(:question_data => {:name => 'q2', :points_possible => 1, 'question_type' => 'multiple_answers_question', 'answers' => {'answer_0' => {'answer_text' => '', 'answer_html' => "<a href='http://example.com/caturday.gif'>lolcats</a>", 'answer_weight' => '100'}, 'answer_1' => {'answer_text' => 'lolrus', 'answer_weight' => '100'}}})
+    q.quiz_questions.create!(:question_data => {:name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100'}, {'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0'}]})
+    q.quiz_questions.create!(:question_data => {:name => 'q2', :points_possible => 1, 'question_type' => 'multiple_answers_question', 'answers' => [{'answer_text' => '', 'answer_html' => "<a href='http://example.com/caturday.gif'>lolcats</a>", 'answer_weight' => '100'}, {'answer_text' => 'lolrus', 'answer_weight' => '100'}]})
     q.generate_quiz_data
     q.save
     qs = q.generate_submission(@student)

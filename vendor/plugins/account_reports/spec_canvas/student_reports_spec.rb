@@ -19,6 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/report_spec_helper')
 
 describe 'Student reports' do
+  include ReportSpecHelper
+
   before do
     Notification.find_or_create_by_name('Report Generated')
     Notification.find_or_create_by_name('Report Generation Failed')
@@ -87,7 +89,7 @@ describe 'Student reports' do
     it 'should find users that have not submitted anything after a date' do
       parameters = {}
       parameters['start_at'] = @start_at2
-      parsed = ReportSpecHelper.run_report(@account,@type,parameters,[1,8])
+      parsed = read_report(@type, {params: parameters, order: [1,8]})
       parsed.length.should == 4
 
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
@@ -112,7 +114,7 @@ describe 'Student reports' do
       parameters = {}
       parameters['start_at'] = 45.days.ago
       parameters['end_at'] = 35.days.ago
-      parsed = ReportSpecHelper.run_report(@account,@type,parameters,[1,8])
+      parsed = read_report(@type, {params: parameters, order: 1})
       parsed.length.should == 2
 
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
@@ -126,7 +128,7 @@ describe 'Student reports' do
     end
 
     it 'should find users that have not submitted anything in the past 2 weeks' do
-      parsed = ReportSpecHelper.run_report(@account,@type,{},[1,8])
+      parsed = read_report(@type, {order: [1,8]})
 
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section1.id.to_s,
@@ -157,7 +159,7 @@ describe 'Student reports' do
       parameters['start_at'] = @start_at.to_s
       parameters['end_at'] = @end_at.to_s(:db)
       parameters['enrollment_term'] = @term1.id
-      parsed = ReportSpecHelper.run_report(@account,@type,parameters,[1,8])
+      parsed = read_report(@type, {params: parameters, order: 1})
 
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section1.id.to_s,
@@ -171,11 +173,11 @@ describe 'Student reports' do
     end
 
     it 'should find users that have not submitted under a sub account' do
-      @sub_account = Account.create(:parent_account => @account,
+      sub_account = Account.create(:parent_account => @account,
                                     :name => 'English')
-      @course2.account = @sub_account
+      @course2.account = sub_account
       @course2.save
-      parsed = ReportSpecHelper.run_report(@sub_account,@type,{},[1,5])
+      parsed = read_report(@type, {account: sub_account, order: 1})
 
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section2.id.to_s,
@@ -192,7 +194,7 @@ describe 'Student reports' do
     it 'should find users that have not submitted for one course' do
       parameters = {}
       parameters['course'] = @course2.id
-      parsed = ReportSpecHelper.run_report(@account,@type,parameters,[1,5])
+      parsed = read_report(@type, {params: parameters, order: 1})
 
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section2.id.to_s,
@@ -235,7 +237,7 @@ describe 'Student reports' do
     it 'should run the zero activity report for course' do
       param = {}
       param['course'] = @course1.id
-      parsed = ReportSpecHelper.run_report(@account,@type,param,[1,5])
+      parsed = read_report(@type, {params: param, order: 1})
       parsed.length.should == 2
       parsed[0].should == [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section1.id.to_s,
@@ -256,7 +258,7 @@ describe 'Student reports' do
       @course1.save
       param = {}
       param['enrollment_term'] = 'sis_term_id:fall12'
-      parsed = ReportSpecHelper.run_report(@account,@type,param,[1,5])
+      parsed = read_report(@type, {params: param, order: 1})
       parsed.length.should == 2
       parsed[0].should == [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section1.id.to_s,
@@ -269,7 +271,7 @@ describe 'Student reports' do
     end
 
     it 'should run the zero activity report with no params' do
-      parsed = ReportSpecHelper.run_report(@account,@type,{},[1,5])
+      parsed = read_report(@type, {order: 1})
       parsed.length.should == 3
 
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
@@ -291,7 +293,7 @@ describe 'Student reports' do
       @course2.account = sub_account
       @course2.save!
 
-      parsed = ReportSpecHelper.run_report(sub_account,@type,{},[1,5])
+      parsed = read_report(@type, {account: sub_account})
       parsed.length.should == 1
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section2.id.to_s,
@@ -304,7 +306,7 @@ describe 'Student reports' do
         update_all(:updated_at => 6.days.ago)
       parameter = {}
       parameter['start_at'] = 3.days.ago
-      parsed = ReportSpecHelper.run_report(@account,@type,parameter,[1,5])
+      parsed = read_report(@type, {params: parameter, order: [1,5]})
 
       parsed.length.should == 4
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
@@ -346,7 +348,7 @@ describe 'Student reports' do
     end
 
     it 'should run the last user access report' do
-      parsed = ReportSpecHelper.run_report(@account,@type)
+      parsed = read_report(@type, {order: 1})
       parsed.length.should == 3
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
       parsed[1].should == [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
@@ -361,7 +363,7 @@ describe 'Student reports' do
       @course1.save
       param = {}
       param['enrollment_term'] = @term1.id
-      parsed = ReportSpecHelper.run_report(@account,@type,param)
+      parsed = read_report(@type, {params: param, order: 1})
       parsed.length.should == 2
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
       parsed[1].should == [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
@@ -370,7 +372,7 @@ describe 'Student reports' do
     it 'should run the last user access report for a course' do
       param = {}
       param['course'] = @course.id
-      parsed = ReportSpecHelper.run_report(@account,@type,param)
+      parsed = read_report(@type, {params: param, order: 1})
       parsed.length.should == 2
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
       parsed[1].should == [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]

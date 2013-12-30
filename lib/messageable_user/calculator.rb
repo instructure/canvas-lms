@@ -572,6 +572,7 @@ class MessageableUser
         :common_role_column => 'enrollments.type'
       }.merge(options)
       scope = base_scope(options)
+      scope = scope.joins("INNER JOIN enrollments ON enrollments.user_id=users.id") unless CANVAS_RAILS2 # see below
 
       enrollment_conditions = self.class.enrollment_conditions(options)
       if enrollment_conditions
@@ -581,12 +582,16 @@ class MessageableUser
         scope = scope.where('?', false)
       end
 
-      # this comes after the conditional join on courses that needs
-      # enrollments, because AREL is going to swap the order for some reason.
-      # if this came first (e.g. immediately after base_scope), then the join
-      # on courses would show up first in the SQL, which could make the
-      # database sad.
-      scope.joins("INNER JOIN enrollments ON enrollments.user_id=users.id")
+      if CANVAS_RAILS2
+        # this comes after the conditional join on courses that needs
+        # enrollments, because fake_arel is going to swap the order for some
+        # reason. if this came first (e.g. immediately after base_scope), then
+        # the join on courses would show up first in the SQL, which could make
+        # the database sad.
+        scope = scope.joins("INNER JOIN enrollments ON enrollments.user_id=users.id")
+      end
+
+      scope
     end
 
     # further restricts the enrollment scope to users whose enrollment is

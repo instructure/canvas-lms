@@ -502,18 +502,14 @@ describe Course do
       users.should be_include(@user2)
       users.should be_include(@user3)
     end
-  end
 
-  it "should order results of paginate_users_not_in_groups by user's sortable name" do
-    @course = course(:active_all => true)
-    @user1 = user_model; @user1.sortable_name = 'jonny'; @user1.save
-    @user2 = user_model; @user2.sortable_name = 'bob'; @user2.save
-    @user3 = user_model; @user3.sortable_name = 'richard'; @user3.save
-    @course.enroll_user(@user1)
-    @course.enroll_user(@user2)
-    @course.enroll_user(@user3)
-    users = @course.paginate_users_not_in_groups([], 1)
-    users.map{ |u| u.id }.should == [@user2.id, @user1.id, @user3.id]
+    it "should allow ordering by user's sortable name" do
+      @user1.sortable_name = 'jonny'; @user1.save
+      @user2.sortable_name = 'bob'; @user2.save
+      @user3.sortable_name = 'richard'; @user3.save
+      users = @course.users_not_in_groups([], order: User.sortable_name_order_by_clause('users'))
+      users.map{ |u| u.id }.should == [@user2.id, @user1.id, @user3.id]
+    end
   end
 
   context "events_for" do
@@ -743,6 +739,21 @@ describe Course, "gradebook_to_csv" do
       assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment/
     end
     assignments.should == ["Assignment 02", "Assignment 03", "Assignment 01", "Assignment 05",  "Assignment 04", "Assignment 06", "Assignment 07", "Assignment 09", "Assignment 11", "Assignment 12", "Assignment 13", "Assignment 14", "Assignment 08", "Assignment 10"]
+  end
+
+  it "should alphabetize by sortable name with the test student at the end" do
+    course
+    ["Ned Ned", "Zed Zed", "Aardvark Aardvark"].each{|name| student_in_course(:name => name)}
+    test_student_enrollment = student_in_course(:name => "Test Student")
+    test_student_enrollment.type = "StudentViewEnrollment"
+    test_student_enrollment.save!
+
+    csv = @course.gradebook_to_csv
+    rows = CSV.parse(csv)
+    [rows[2][0],
+     rows[3][0],
+     rows[4][0],
+     rows[5][0]].should == ["Aardvark, Aardvark", "Ned, Ned", "Zed, Zed", "Student, Test"]
   end
 
   it "should generate csv with final grade if enabled" do
@@ -2697,7 +2708,7 @@ describe Course, "conclusions" do
     enrollment.save!
     @course.reload
     @user.reload
-    @user.cached_current_enrollments(:reload)
+    @user.cached_current_enrollments
 
     enrollment.reload.state.should == :active
     enrollment.state_based_on_date.should == :completed
@@ -2711,7 +2722,7 @@ describe Course, "conclusions" do
     enrollment.save!
     @course.reload
     @user.reload
-    @user.cached_current_enrollments(:reload)
+    @user.cached_current_enrollments
     enrollment.state.should == :completed
     enrollment.state_based_on_date.should == :completed
 
@@ -2723,7 +2734,7 @@ describe Course, "conclusions" do
     @course.reload
     @course.complete!
     @user.reload
-    @user.cached_current_enrollments(:reload)
+    @user.cached_current_enrollments
     enrollment.reload
     enrollment.state.should == :completed
     enrollment.state_based_on_date.should == :completed
@@ -3092,6 +3103,15 @@ describe Course, "student_view_student" do
     student_view_student = student_view_course.student_view_student
 
     student_view_course.enrollments.map(&:user_id).should be_include(student_view_student.id)
+  end
+
+  it "should not create a section if a section already exists" do
+    student_view_course = Course.create!
+    not_default_section = student_view_course.course_sections.create! name: 'not default section'
+    not_default_section.should_not be_default_section
+    student_view_student = student_view_course.student_view_student
+    student_view_course.reload.course_sections.active.count.should eql 1
+    not_default_section.enrollments.map(&:user_id).should be_include(student_view_student.id)
   end
 
   it "should create and return the student view student for a course" do
@@ -3695,44 +3715,19 @@ describe Course do
     end
   end
 
-  describe "#draft_state_enabled?" do
-    before(:each) do
-      @account = Account.create!
-      @account.settings[:allow_draft] = true
-      @account.save!
-      course(active_all: true)
-      @course.root_account = @account
-      @course.save!
-    end
+end
 
-    context "a course with enable_draft enabled" do
-      it "should check its own enable_draft setting" do
-        @course.enable_draft = true
-        @course.save!
+describe Course, "multiple_sections?" do
+  before(:each) do
+    course_with_teacher(:active_all => true)
+  end
 
-        @course.should be_draft_state_enabled
-      end
-    end
+  it "should return false for a class with one section" do
+    @course.multiple_sections?.should be_false
+  end
 
-    context "a course with an enable_draft account" do
-      it "should check its root_account's enable_draft setting" do
-        @course.root_account.settings[:enable_draft] = true
-        @course.root_account.save!
-
-        @course.should be_draft_state_enabled
-      end
-    end
-
-    context "a course with an account that doesn't allow draft state" do
-      it "shouldn't be able to enable draft state" do
-        @account.settings[:allow_draft] = false
-        @account.save!
-
-        @course.enable_draft = true
-        @course.save!
-
-        @course.should_not be_draft_state_enabled
-      end
-    end
+  it "should return true for a class with more than one active section" do
+    @course.course_sections.create!
+    @course.multiple_sections?.should be_true
   end
 end

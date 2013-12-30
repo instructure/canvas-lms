@@ -3,10 +3,12 @@
 # Add new mime types for use in respond_to blocks:
 # Mime::Type.register "text/richtext", :rtf
 # Mime::Type.register_alias "text/html", :iphone
-Mime::Type.register "application/zip", :zip
+if CANVAS_RAILS2
+  Mime::Type.register "application/zip", :zip
+  Mime::Type.register "application/pdf", :pdf
+end
 Mime::Type.register "application/msword", :doc
 Mime::Type.register "application/vnd.ms-powerpoint", :ppt
-Mime::Type.register "application/pdf", :pdf
 Mime::Type.register "application/vnd.ms-excel", :xls
 Mime::Type.register "application/postscript", :ps
 Mime::Type.register "application/rtf", :rtf

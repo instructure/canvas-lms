@@ -23,7 +23,7 @@ define [
 
         jQuery.getJSON '/all_menu_courses', (enrollments) ->
           courseList = new CustomList '#menu_enrollments', enrollments,
-            appendTarget: '#menu_enrollments'
+            appendTarget: '#menu_enrollments .menu-item-customize'
             autoOpen: autoOpen
             wrapper: wrapper
             content: content

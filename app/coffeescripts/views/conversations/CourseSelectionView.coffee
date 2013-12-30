@@ -13,7 +13,7 @@ define [
       'change': 'onChange'
 
     initialize: () ->
-      super()
+      super
       if !@options.defaultOption then @options.defaultOption = I18n.t('all_courses', 'All Courses')
       @$el.addClass('show-tick')
       @$el.selectpicker(useSubmenus: true).next()

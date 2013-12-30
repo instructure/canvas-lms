@@ -417,7 +417,7 @@ describe ApplicationHelper do
 
   describe "jt" do
     after do
-      I18n.locale = nil
+      I18n.locale = I18n.default_locale
     end
 
     it "should output the translated default" do

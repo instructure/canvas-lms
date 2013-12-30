@@ -31,11 +31,11 @@ class AssessmentQuestion < ActiveRecord::Base
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :workflow_state, :assessment_question_bank_id
 
-  ALL_QUESTION_TYPES = ["multiple_answers_question", "fill_in_multiple_blanks_question", 
-                        "matching_question", "missing_word_question", 
-                        "multiple_choice_question", "numerical_question", 
-                        "text_only_question", "short_answer_question", 
-                        "multiple_dropdowns_question", "calculated_question", 
+  ALL_QUESTION_TYPES = ["multiple_answers_question", "fill_in_multiple_blanks_question",
+                        "matching_question", "missing_word_question",
+                        "multiple_choice_question", "numerical_question",
+                        "text_only_question", "short_answer_question",
+                        "multiple_dropdowns_question", "calculated_question",
                         "essay_question", "true_false_question", "file_upload_question"]
 
   serialize :question_data
@@ -44,7 +44,7 @@ class AssessmentQuestion < ActiveRecord::Base
     given{|user, session| cached_context_grants_right?(user, session, :manage_assignments) }
     can :read and can :create and can :update and can :delete
   end
-  
+
   def infer_defaults
     self.question_data ||= HashWithIndifferentAccess.new
     if self.question_data.is_a?(Hash)
@@ -56,14 +56,14 @@ class AssessmentQuestion < ActiveRecord::Base
     self.name = self.question_data[:question_name] || self.name
     self.assessment_question_bank ||= AssessmentQuestionBank.unfiled_for_context(self.initial_context)
   end
-  
+
   def translate_links_if_changed
     # this has to be in an after_save, because translate_links may create attachments
     # with this question as the context, and if this question does not exist yet,
     # creating that attachment will fail.
     translate_links if self.question_data_changed? && !@skip_translate_links
   end
-  
+
   def self.translate_links(ids)
     ids.each do |aqid|
       if aq = AssessmentQuestion.find(aqid)
@@ -71,16 +71,16 @@ class AssessmentQuestion < ActiveRecord::Base
       end
     end
   end
-  
+
   def translate_links
     # we can't translate links unless this question has a context (through a bank)
     return unless assessment_question_bank && assessment_question_bank.context
-    
+
     # This either matches the id from a url like: /courses/15395/files/11454/download
     # or gets the relative path at the end of one like: /courses/15395/file_contents/course%20files/unfiled/test.jpg
     regex = Regexp.new(%{/#{context_type.downcase.pluralize}/#{context_id}/(?:files/(\\d+)/(?:download|preview)|file_contents/(course%20files/[^'"?]*))(?:\\?([^'"]*))?})
     file_substitutions = {}
-    
+
     deep_translate = lambda do |obj|
       if obj.is_a?(Hash)
         obj.inject(HashWithIndifferentAccess.new) {|h,(k,v)| h[k] = deep_translate.call(v); h}
@@ -117,15 +117,15 @@ class AssessmentQuestion < ActiveRecord::Base
         obj
       end
     end
-    
+
     hash = deep_translate.call(self.question_data)
     self.question_data = hash
-    
+
     @skip_translate_links = true
     self.save!
     @skip_translate_links = false
   end
-  
+
   def data
     res = self.question_data || HashWithIndifferentAccess.new
     res[:assessment_question_id] = self.id
@@ -138,17 +138,17 @@ class AssessmentQuestion < ActiveRecord::Base
     res[:id] = self.id
     res
   end
-  
+
   workflow do
     state :active
     state :independently_edited
     state :deleted
   end
-  
+
   def form_question_data=(data)
     self.question_data = AssessmentQuestion.parse_question(data, self)
   end
-  
+
   def question_data=(data)
     if data.is_a?(String)
       data = ActiveSupport::JSON.decode(data) rescue nil
@@ -158,23 +158,23 @@ class AssessmentQuestion < ActiveRecord::Base
     end
     # force AR to think this attribute has changed
     self.question_data_will_change!
-    write_attribute(:question_data, data)
+    write_attribute(:question_data, data.to_hash.with_indifferent_access)
   end
-  
+
   def question_data
     if data = read_attribute(:question_data)
       if data.class == Hash
         data = write_attribute(:question_data, data.with_indifferent_access)
       end
     end
-    
+
     data
   end
-  
+
   def edited_independent_of_quiz_question
     self.workflow_state = 'independently_edited'
   end
-  
+
   def editable_by?(question)
     if self.independently_edited?
       false
@@ -192,232 +192,60 @@ class AssessmentQuestion < ActiveRecord::Base
       false
     end
   end
-  
+
   def create_quiz_question
     qq = quiz_questions.new
     qq.migration_id = self.migration_id
     qq.write_attribute(:question_data, question_data)
     qq
   end
-  
+
   def self.scrub(text)
     if text && text[-1] == 191 && text[-2] == 187 && text[-3] == 239
       text = text[0..-4]
     end
     text
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.save
   end
-  
-  def self.sanitize(html)
-    Sanitize.clean(html || "", Instructure::SanitizeField::SANITIZE)
-  end
-  
-  def self.check_length(html, type, max=16.kilobytes)
-    if html && html.length > max
-      raise "The text for #{type} is too long, max length is #{max}"
-    end
-    html
-  end
-  
+
+
   def self.parse_question(qdata, assessment_question=nil)
-    question = HashWithIndifferentAccess.new
-    qdata = qdata.with_indifferent_access
+    qdata = qdata.to_hash.with_indifferent_access
     previous_data = assessment_question.question_data rescue {}
-    question[:regrade_option] = qdata[:regrade_option] if qdata[:regrade_option].present?
-    question[:points_possible] = (qdata[:points_possible] || previous_data[:points_possible] || 0.0).to_f
-    question[:correct_comments] = check_length(qdata[:correct_comments] || previous_data[:correct_comments] || "", 'correct comments', 5.kilobyte)
-    question[:incorrect_comments] = check_length(qdata[:incorrect_comments] || previous_data[:incorrect_comments] || "", 'incorrect comments', 5.kilobyte)
-    question[:neutral_comments] = check_length(qdata[:neutral_comments], 'neutral comments', 5.kilobyte)
-    question[:question_type] = qdata[:question_type] || previous_data[:question_type] || "text_only_question"
-    question[:question_name] = qdata[:question_name] || qdata[:name] || previous_data[:question_name] || t(:default_question_name, "Question")
-    question[:question_name] = t(:default_question_name, "Question") if question[:question_name].strip.blank?
-    question[:name] = question[:question_name]
-    question[:question_text] = sanitize(check_length(qdata[:question_text] || previous_data[:question_text] || t(:default_question_text, "Question text"), 'question text'))
-    min_size = 1.kilobyte
-    question[:answers] = []
-    reset_local_ids
-    qdata[:answers] ||= previous_data[:answers] rescue []
-    answers = qdata[:answers].to_a.sort_by{|a| (a[0] || "").gsub(/answer_/, "").to_i}
-    if question[:question_type] == "multiple_choice_question"
-      found_correct = false
-      answers.each do |key, answer|
-        found_correct = true if answer[:answer_weight].to_i == 100
-        a = {:text => check_length(answer[:answer_text], 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :id => unique_local_id(answer[:id].to_i)}
-        a[:html] = sanitize(answer[:answer_html]) if answer[:answer_html].present?
-        question[:answers] << a
-      end
-      question[:answers][0][:weight] = 100 unless found_correct
-    elsif question[:question_type] == "true_false_question"
-      correct_answer = true
-      true_comments = ""
-      true_id = nil
-      false_comments = ""
-      false_id = nil
-      answers.each do |key, answer|
-        if key != answers[0][0]
-          false_comments = check_length(answer[:answer_comments], 'answer comments', min_size)
-          false_id = unique_local_id(answer[:id].to_i)
-        else
-          true_comments = check_length(answer[:answer_comments], 'answer comments', min_size)
-          true_id = unique_local_id(answer[:id].to_i)
-        end
-        if key != answers[0][0] && answer[:answer_weight].to_i == 100
-          correct_answer = false
-        end
-      end
-      t = {:text => "True", :comments => true_comments, :weight => (correct_answer ? 100 : 0), :id => true_id}
-      f = {:text => "False", :comments => false_comments, :weight => (!correct_answer ? 100 : 0), :id => false_id}
-      question[:answers] << t
-      question[:answers] << f
-    elsif question[:question_type] == "short_answer_question"
-      answers.each do |key, answer|
-        a = {:text => check_length(scrub(answer[:answer_text]), 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => 100, :id => unique_local_id(answer[:id].to_i)}
-        question[:answers] << a
-      end
-    elsif question[:question_type] == "essay_question"
-      question[:comments] = check_length((qdata[:answers][0][:answer_comments] rescue ""), 'essay comments', 5.kilobyte)
-    elsif question[:question_type] == "matching_question"
-      answers.each do |key, answer|
-        a = {:text => check_length(answer[:answer_match_left], 'answer match', min_size), :left => check_length(answer[:answer_match_left], 'answer match', min_size), :right => check_length(answer[:answer_match_right], 'answer match', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size)}
-        a[:left_html] = a[:html] = sanitize(answer[:answer_match_left_html]) if answer[:answer_match_left_html].present?
-        a[:match_id] = unique_local_id(answer[:match_id].to_i)
-        a[:id] = unique_local_id(answer[:id].to_i)
-        question[:answers] << a
-        question[:matches] ||= []
-        question[:matches] << {:match_id => a[:match_id], :text => check_length(answer[:answer_match_right], 'answer match', min_size) }
-      end
-      (qdata[:matching_answer_incorrect_matches] || "").split("\n").each do |other|
-        m = {:text => check_length(other[0..255], 'distractor', min_size) }
-        m[:match_id] = previous_data[:answers].detect{|a| a[:text] == m[:text] }[:id] rescue nil
-        m[:match_id] = unique_local_id(m[:match_id])
-        question[:matches] << m
-      end
-    elsif question[:question_type] == "missing_word_question"
-      found_correct = false
-      answers.each do |key, answer|
-        found_correct = true if answer[:answer_weight].to_i == 100
-        a = {:text => check_length(answer[:answer_text], 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :id => unique_local_id(answer[:id].to_i)}
-        question[:answers] << a
-      end
-      question[:answers][0][:weight] = 100 unless found_correct
-      question[:text_after_answers] = sanitize(check_length(qdata[:text_after_answers] || previous_data[:text_after_answers] || "", 'text after answers', 16.kilobytes))
-    elsif question[:question_type] == "multiple_dropdowns_question"
-      variables = HashWithIndifferentAccess.new
-      answers.each_with_index do |arr, idx| 
-        key, answer = arr
-        answers[idx][1][:blank_id] = check_length(answers[idx][1][:blank_id], 'blank id', min_size)
-      end
-      answers.each do |key, answer| 
-        variables[answer[:blank_id]] ||= false
-        variables[answer[:blank_id]] = true if answer[:answer_weight].to_i == 100
-        a = {:text => check_length(answer[:answer_text], 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :blank_id => answer[:blank_id], :id => unique_local_id(answer[:id].to_i)}
-        question[:answers] << a
-      end
-      variables.each do |variable, found_correct|
-        if !found_correct
-          question[:answers].each_with_index do |answer, idx|
-            if answer[:blank_id] == variable && !found_correct
-              question[:answers][idx][:weight] = 100
-              found_correct = true
-            end
-          end
-        end
-      end
-    elsif question[:question_type] == "fill_in_multiple_blanks_question"
-      answers.each do |key, answer|
-        a = {:text => check_length(scrub(answer[:answer_text]), 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :blank_id => check_length(answer[:blank_id], 'blank id', min_size), :id => unique_local_id(answer[:id].to_i)}
-        question[:answers] << a
-      end
-    elsif question[:question_type] == "numerical_question"
-      answers.each do |key, answer|
-        a = {:text => check_length(answer[:answer_text], 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => 100, :id => unique_local_id(answer[:id].to_i)}
-        a[:numerical_answer_type] = answer[:numerical_answer_type]
-        if answer[:numerical_answer_type] == "exact_answer"
-          a[:exact] = answer[:answer_exact].to_f
-          a[:margin] = answer[:answer_error_margin].to_f
-        else
-          a[:numerical_answer_type] = "range_answer"
-          a[:start] = answer[:answer_range_start].to_f
-          a[:end] = answer[:answer_range_end].to_f
-        end
-        question[:answers] << a
-      end
-    elsif question[:question_type] == "calculated_question"
-      question[:formulas] = []
-      (qdata[:formulas] || []).sort_by(&:first).each do |key, formula|
-        question[:formulas] << {
-          :formula => check_length(formula[0..1024], 'formula', min_size)
-        }
-      end
-      question[:variables] = []
-      qdata[:variables].sort_by{|k, v| k[9..-1].to_i}.each do |key, variable|
-        question[:variables] << {
-          :name => check_length(variable[:name][0..1024], 'variable', min_size),
-          :min => variable[:min].to_f,
-          :max => variable[:max].to_f,
-          :scale => variable[:scale].to_i
-        }
-      end
-      question[:answer_tolerance] = qdata[:answer_tolerance]
-      question[:formula_decimal_places] = qdata[:formula_decimal_places].to_i
-      answers.each do |key, answer|
-        obj = {:weight => 100, :variables => []}
-        obj[:answer] = answer[:answer_text].to_f
-        answer[:variables].sort_by{|k, v| k[9..-1].to_i}.each do |key2, variable|
-          obj[:variables] << {
-            :name => check_length(variable[:name], 'variable', min_size),
-            :value => variable[:value].to_f
-          }
-        end
-        question[:answers] << obj
-      end
-    elsif question[:question_type] == "multiple_answers_question"
-      found_correct = false
-      answers.each do |key, answer|
-        found_correct = true if answer[:answer_weight].to_i == 100
-        a = {:text => check_length(answer[:answer_text], 'answer text', min_size), :comments => check_length(answer[:answer_comments], 'answer comments', min_size), :weight => answer[:answer_weight].to_f, :id => unique_local_id(answer[:id].to_i)}
-        a[:html] = sanitize(answer[:answer_html]) if answer[:answer_html].present?
-        question[:answers] << a
-      end
-      question[:answers][0][:weight] = 100 unless found_correct
-    elsif question[:question_type] == "text_only_question"
-      question[:points_possible] = 0
-    else
-    end
-    question[:answers].each_index do |idx|
-      question[:answers][idx][:id] ||= unique_local_id
-    end
+    previous_data ||= {}
+
+    question = QuizQuestion::QuestionData.generate(
+      id: qdata[:id] || previous_data[:id],
+      regrade_option: qdata[:regrade_option] || previous_data[:regrade_option],
+      points_possible: qdata[:points_possible] || previous_data[:points_possible],
+      correct_comments: qdata[:correct_comments] || previous_data[:correct_comments],
+      incorrect_comments: qdata[:incorrect_comments] || previous_data[:incorrect_comments],
+      neutral_comments: qdata[:neutral_comments] || previous_data[:neutral_comments],
+      question_type: qdata[:question_type] || previous_data[:question_type],
+      question_name: qdata[:question_name] || qdata[:name] || previous_data[:question_name],
+      question_text: qdata[:question_text] || previous_data[:question_text],
+      answers: qdata[:answers] || previous_data[:answers],
+      formulas: qdata[:formulas] || previous_data[:formulas],
+      variables: qdata[:variables] || previous_data[:variables],
+      answer_tolerance: qdata[:answer_tolerance] || previous_data[:answer_tolerance],
+      formula_decimal_places: qdata[:formula_decimal_places] || previous_data[:formula_decimal_places],
+      matching_answer_incorrect_matches: qdata[:matching_answer_incorrect_matches] || previous_data[:matching_answer_incorrect_matches],
+      matches: qdata[:matches] || previous_data[:matches]
+    )
+
     question[:assessment_question_id] = assessment_question.id rescue nil
-    return question
+    question
   end
-  
+
   def self.variable_id(variable)
     Digest::MD5.hexdigest(["dropdown", variable, "instructure-key"].join(","))
   end
-  
-  def self.unique_local_id(suggested_id=nil)
-    @@ids ||= {}
-    if suggested_id && suggested_id > 0 && !@@ids[suggested_id]
-      @@ids[suggested_id] = true
-      return suggested_id
-    end
-    id = rand(10000)
-    while @@ids[id]
-      id = rand(10000)
-    end
-    @@ids[id] = true
-    id
-  end
-  
-  def self.reset_local_ids
-    @@ids = {}
-  end
-  
+
   def clone_for(question_bank, dup=nil, options={})
     dup ||= AssessmentQuestion.new
     self.attributes.delete_if{|k,v| [:id, :question_data].include?(k.to_sym) }.each do |key, val|
@@ -504,7 +332,7 @@ class AssessmentQuestion < ActiveRecord::Base
           end
           question_bank = banks[hash_id]
         end
-        
+
         begin
           question = AssessmentQuestion.import_from_migration(question, migration.context, question_bank)
 
@@ -516,7 +344,7 @@ class AssessmentQuestion < ActiveRecord::Base
           if question.to_s =~ %r{/files/\d+/(download|preview)}
             AssessmentQuestion.find(question[:assessment_question_id]).translate_links
           end
-          
+
           question_data[:aq_data][question['migration_id']] = question
         rescue
           migration.add_import_warning(t('#migration.quiz_question_type', "Quiz Question"), question[:question_name], $!)
@@ -579,7 +407,7 @@ class AssessmentQuestion < ActiveRecord::Base
     hash.delete(:missing_links)
     hash
   end
-  
+
   def self.prep_for_import(hash, context)
     hash[:missing_links] = {}
     [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
@@ -604,6 +432,6 @@ class AssessmentQuestion < ActiveRecord::Base
     hash[:prepped_for_import] = true
     hash
   end
-  
+
   scope :active, where("assessment_questions.workflow_state<>'deleted'")
 end

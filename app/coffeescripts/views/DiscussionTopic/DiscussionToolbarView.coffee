@@ -19,10 +19,9 @@ define [
       'change #onlyUnread': 'toggleUnread'
       'click #collapseAll': 'collapseAll'
       'click #expandAll': 'expandAll'
-      'click .mark_all_as_read': 'markAllAsRead'
-      'click .mark_all_as_unread': 'markAllAsUnread'
 
     initialize: ->
+      super
       @model.on 'change', @clearInputs
 
     afterRender: ->
@@ -60,14 +59,6 @@ define [
     expandAll: ->
       @model.set 'collapsed', false
       @trigger 'expandAll'
-
-    markAllAsRead: (event) ->
-      event.preventDefault()
-      @trigger 'markAllAsRead'
-
-    markAllAsUnread: (event) ->
-      event.preventDefault()
-      @trigger 'markAllAsUnread'
 
     maybeDisableFields: ->
       @$disableWhileFiltering.attr 'disabled', @model.hasFilter()

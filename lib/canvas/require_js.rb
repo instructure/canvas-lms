@@ -2,6 +2,7 @@ require 'lib/canvas/require_js/plugin_extension'
 module Canvas
   module RequireJs
     class << self
+      @@matcher = nil
       def get_binding
         binding
       end
@@ -9,8 +10,12 @@ module Canvas
       PATH_REGEX = %r{.*?/javascripts/(plugins/)?(.*)\.js\z}
       JS_ROOT = "#{Rails.root}/public/javascripts"
 
+      def matcher=(value)
+        @@matcher = value
+      end
+
       def matcher
-        ENV['JS_SPEC_MATCHER'] || '**/*{Spec,.spec}.js'
+        @@matcher || ENV['JS_SPEC_MATCHER'] || '**/*Spec.js'
       end
 
       # get all regular canvas (and plugin) bundles
@@ -57,7 +62,10 @@ module Canvas
           :common => 'compiled/bundles/common',
           :jqueryui => 'vendor/jqueryui',
           :use => 'vendor/use',
-          :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min'
+          :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min',
+          'ic-menu' => 'vendor/ic-menu/dist/main.amd',
+          'ic-dialog' => 'vendor/ic-dialog/dist/main.amd',
+          'ic-ajax' => 'vendor/ic-ajax/main',
         }.update(cache_busting ? cache_busting_paths : {}).update(plugin_paths).update(Canvas::RequireJs::PluginExtension.paths).to_json.gsub(/([,{])/, "\\1\n    ")
       end
   

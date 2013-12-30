@@ -83,8 +83,14 @@ class CommunicationChannelsController < ApplicationController
   # @argument communication_channel[address] [String]
   #   An email address or SMS number.
   #
-  # @argument communication_channel[type] [String, "email"|"sms"]
+  # @argument communication_channel[type] [String, "email"|"sms"|"push"]
   #   The type of communication channel.
+  #
+  #   In order to enable push notification support, the server must be
+  #   properly configured (via sns.yml) to communicate with Amazon
+  #   Simple Notification Services, and the developer key used to create
+  #   the access token from this request must have an SNS ARN configured on
+  #   it.
   #
   # @argument skip_confirmation [Optional, Boolean]
   #   Only valid for site admins making requests; If true, the channel is
@@ -122,13 +128,24 @@ class CommunicationChannelsController < ApplicationController
       end
     end
 
+    if params[:communication_channel][:type] == CommunicationChannel::TYPE_PUSH
+      if !@access_token
+        return render :json => { errors: { type: 'Push is only supported when using an access token'}}, status: :bad_request
+      end
+      if !@access_token.developer_key.try(:sns_arn)
+        return render :json => { errors: { type: 'SNS is not configured for this developer key'}}, status: :bad_request
+      end
+      skip_confirmation = true
+      @cc = @user.communication_channels.create_push(@access_token, params[:communication_channel][:address])
+    end
+
     # Find or create the communication channel.
-    @cc = @user.communication_channels.by_path(params[:communication_channel][:address]).
+    @cc ||= @user.communication_channels.by_path(params[:communication_channel][:address]).
       find_by_path_type(params[:communication_channel][:type])
     @cc ||= @user.communication_channels.build(:path => params[:communication_channel][:address],
       :path_type => params[:communication_channel][:type])
 
-    if (!@cc.new_record? && !@cc.retired?)
+    if (!@cc.new_record? && !@cc.retired? && @cc.path_type != CommunicationChannel::TYPE_PUSH)
       @cc.errors.add(:path, 'unique!')
       return render :json => @cc.errors.as_json, :status => :bad_request
     end

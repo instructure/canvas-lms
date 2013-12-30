@@ -162,12 +162,14 @@ class Group < ActiveRecord::Base
     Group.find(ids)
   end
 
-  def self.not_in_group_sql_fragment(group_ids, prepend_and = true)
-    "#{"AND" if prepend_and} NOT EXISTS (SELECT * FROM group_memberships gm
-                      WHERE gm.user_id = users.id AND
-                      gm.workflow_state != 'deleted' AND
-                      gm.group_id IN (#{group_ids.map(&:to_i).join ','}))" unless group_ids.empty?
-
+  def self.not_in_group_sql_fragment(groups)
+    return nil if groups.empty?
+    sanitize_sql([<<-SQL, groups])
+      NOT EXISTS (SELECT * FROM group_memberships gm
+      WHERE gm.user_id = users.id AND
+      gm.workflow_state != 'deleted' AND
+      gm.group_id IN (?))
+    SQL
   end
 
   workflow do
@@ -568,13 +570,13 @@ class Group < ActiveRecord::Base
     [Shard.default]
   end
 
-  # Public: Determine if the current context has draft_state enabled.
+  # Public: Determine whether a feature is enabled, deferring to the group's context.
   #
   # Returns a boolean.
-  def draft_state_enabled?
+  def feature_enabled?(feature)
     # shouldn't matter, but most specs create anonymous (contextless) groups :(
     return false if context.nil?
-    context.draft_state_enabled?
+    context.feature_enabled?(feature)
   end
 
   def serialize_permissions(permissions_hash, user, session)

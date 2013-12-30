@@ -31,10 +31,44 @@ class DueDateCacher
     Submission.where(:assignment_id => @assignments)
   end
 
+  def create_overridden_submissions
+    # Get the students that have an overridden due date
+    overridden_students = Assignment.participants_with_overridden_due_at(@assignments)
+    return if overridden_students.length < 1
+
+    # Get default submission values.
+    default_submission = Submission.new
+    default_submission.infer_values
+
+    # Create insert scope
+    insert_scope = Course
+      .select("DISTINCT assignments.id, enrollments.user_id, '#{default_submission.workflow_state}', {{now}}, assignments.context_code, 0")
+      .joins("LEFT OUTER JOIN submissions ON submissions.user_id = enrollments.user_id AND submissions.assignment_id = assignments.id")
+      .joins("INNER JOIN assignments ON assignments.context_id = courses.id AND assignments.context_type = 'Course'")
+      .joins(:current_enrollments)
+      .where("enrollments.user_id IN (?) AND assignments.id IN (?) AND submissions.id IS NULL", overridden_students, @assignments)
+
+    #Set timestamp syntax depending on the connection adapter
+    insert_sql = case ActiveRecord::Base.connection.adapter_name
+                 when 'PostgreSQL'
+                   insert_scope.to_sql.gsub("{{now}}", "now() AT TIME ZONE 'UTC'")
+                 when 'MySQL', 'Mysql2'
+                   insert_scope.to_sql.gsub("{{now}}", "utc_timestamp()")
+                 when /sqlite/
+                   insert_scope.to_sql.gsub("{{now}}", "datetime('now')")
+                 end
+
+    # Create submissions that do not exist yet to calculate due dates for non submitted assignments.
+    Assignment.connection.update("INSERT INTO submissions (assignment_id, user_id, workflow_state, created_at, context_code, process_attempts) #{insert_sql}")
+  end
+
   def recompute
     # in a transaction on the correct shard:
     shard.activate do
       Assignment.transaction do
+        # Create overridden due date submissions
+        create_overridden_submissions
+
         # create temporary table
         cast = Submission.connection.adapter_name == 'Mysql2' ? 'UNSIGNED INTEGER' : 'BOOL'
         Assignment.connection.execute("CREATE TEMPORARY TABLE calculated_due_ats AS (#{submissions.select([

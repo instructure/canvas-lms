@@ -76,7 +76,9 @@ define [
 
     addGroupSet: (e) ->
       e.preventDefault()
-      @createView ?= new GroupCategoryCreateView({@collection, focusReturnsTo: => @$el.find('#add-group-set')})
+      @createView ?= new GroupCategoryCreateView
+        collection: @collection
+        trigger: @$addGroupSetButton
       cat = new GroupCategory
       cat.once 'sync', =>
         @collection.add(cat)

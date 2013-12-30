@@ -18,7 +18,7 @@
 
 class QuizQuestion::CalculatedQuestion < QuizQuestion::NumericalQuestion
   def answers
-    answer = @question_data[:answers].first
+    answer = @question_data.answers.first
     return [] unless answer
     return [{ :id => answer[:id], :numerical_answer_type => "exact_answer", :exact => answer[:answer], :margin => @question_data[:answer_tolerance] }]
   end
@@ -49,7 +49,7 @@ class QuizQuestion::CalculatedQuestion < QuizQuestion::NumericalQuestion
       #  :text=>"6.0000",
       #  :user_id=>3}
     responses.each do |r|
-      answer = @question_data[:answers].detect { |a| r[:answer_id] == a[:id] }
+      answer = @question_data.answers.detect { |a| r[:answer_id] == a[:id] }
       next unless answer
 
       answer[:responses] += 1

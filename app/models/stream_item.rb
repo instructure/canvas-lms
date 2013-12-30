@@ -408,7 +408,14 @@ class StreamItem < ActiveRecord::Base
 
   public
   def destroy_stream_item_instances
-    # bare scoped call avoid Rails 2 HasManyAssociation loading all objects
-    self.stream_item_instances.with_each_shard { |scope| scope.scoped.delete_all; nil }
+    self.stream_item_instances.with_each_shard do |scope|
+      if CANVAS_RAILS2
+        # bare scoped call avoid Rails 2 HasManyAssociation loading all objects
+        scope.scoped.delete_all
+      else
+        scope.delete_all
+      end
+      nil
+    end
   end
 end

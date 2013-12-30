@@ -31,7 +31,7 @@ describe SisBatch do
     # it'll try to delete the file later during finalization, which is
     # not a convenient time for us.
     tempfile.close!
-    Zip::ZipFile.open(path, Zip::ZipFile::CREATE) do |z|
+    Zip::File.open(path, Zip::File::CREATE) do |z|
       data.each do |dat|
         z.get_output_stream("csv_#{i}.csv") { |f| f.puts(dat) }
         i += 1

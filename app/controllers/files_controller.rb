@@ -270,7 +270,7 @@ class FilesController < ApplicationController
         # submission.
         @submission = Submission.find(params[:submission_id]) if params[:submission_id]
         # verify that the requested attachment belongs to the submission
-        return render_unauthorized_action(@attachment) if @submission && !@submission.attachments.where(:id => params[:id]).any?
+        return render_unauthorized_action if @submission && !@submission.attachments.where(:id => params[:id]).any?
         if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
           render :json  => { :public_url => @attachment.authenticated_s3_url(:secure => request.ssl?) }
         end
@@ -314,6 +314,7 @@ class FilesController < ApplicationController
     params[:download] ||= params[:preview]
     add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url)) unless @skip_crumb
     if @attachment.deleted?
+      return render_unauthorized_action unless @attachment.user_id == @current_user.id
       flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", :display_name => @attachment.display_name
       if params[:preview] && @attachment.mime_class == 'image'
         redirect_to '/images/blank.png'
@@ -712,17 +713,17 @@ class FilesController < ApplicationController
         end
         if params[:attachment][:uploaded_data]
           success = @attachment.update_attributes(params[:attachment])
-          @attachment.errors.add_to_base(t('errors.server_error', "Upload failed, server error, please try again.")) unless success
+          @attachment.errors.add(:base, t('errors.server_error', "Upload failed, server error, please try again.")) unless success
         else
-          @attachment.errors.add_to_base(t('errors.missing_field', "Upload failed, expected form field missing"))
+          @attachment.errors.add(:base, t('errors.missing_field', "Upload failed, expected form field missing"))
         end
         deleted_attachments = @attachment.handle_duplicates(duplicate_handling)
         unless @attachment.downloadable?
           success = false
           if (params[:attachment][:uploaded_data].size == 0 rescue false)
-            @attachment.errors.add_to_base(t('errors.empty_file', "That file is empty.  Please upload a different file."))
+            @attachment.errors.add(:base, t('errors.empty_file', "That file is empty.  Please upload a different file."))
           else
-            @attachment.errors.add_to_base(t('errors.upload_failed', "Upload failed, please try again."))
+            @attachment.errors.add(:base, t('errors.upload_failed', "Upload failed, please try again."))
           end
           unless @attachment.new_record?
             @attachment.destroy rescue @attachment.delete

@@ -82,9 +82,9 @@ define [
         sortOrder = if sortOrders[sortField] == 'asc' then 'up' else 'down'
 
         if sortOrder == 'up'
-          $sortHeader.attr('aria-label', I18n.t('headers.sort_ascending', 'Sort ascending'))
+          $sortHeader.attr('aria-label', I18n.t('headers.sort_ascending', '%{title}, Sort ascending', {title: $sortHeader.text()}))
         else
-          $sortHeader.attr('aria-label', I18n.t('headers.sort_descending', 'Sort descending'))
+          $sortHeader.attr('aria-label', I18n.t('headers.sort_descending', '%{title}, Sort descending', {title: $sortHeader.text()}))
 
         $sortHeader.toggleClass 'sort-field-active', sortField == @currentSortField
         $i.removeClass('icon-mini-arrow-up icon-mini-arrow-down')

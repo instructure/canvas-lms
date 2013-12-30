@@ -82,6 +82,23 @@ describe UserContent, :type => :integration do
     doc.at_css('img')['src'].should == "http://www.example.com/courses/#{@course.id}/files/#{attachment2.id}/download?verifier=#{attachment2.uuid}"
   end
 
+  it "should not corrupt absolute links" do
+    course_with_teacher_logged_in
+    attachment_model(:context => @course)
+    @topic = @course.discussion_topics.create!(:title => "course topic", :user => @teacher, :message => <<-HTML)
+    <p>
+      Hello, students.<br>
+      This will explain everything: <img src="http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download" alt="important">
+    </p>
+    HTML
+    json = api_call(:get,
+      "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+      { :controller => 'discussion_topics_api', :action => 'show',
+        :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+    doc = Nokogiri::HTML::DocumentFragment.parse(json['message'])
+    doc.at_css('img')['src'].should == "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
+  end
+
   it "should translate file preview links to directly-downloadable preview urls" do
     course_with_teacher_logged_in(:active_all => true)
     attachment_model

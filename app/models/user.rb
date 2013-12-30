@@ -237,6 +237,8 @@ class User < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name
 
+  include FeatureFlags
+
   def conversations
     # i.e. exclude any where the user has deleted all the messages
     all_conversations.visible.order("last_message_at DESC, conversation_id DESC")
@@ -954,9 +956,8 @@ class User < ActiveRecord::Base
   end
 
   def courses_with_grades
-    self.available_courses.with_each_shard.select{|c| c.grants_right?(self, nil, :participate_as_student)}
+    @courses_with_grades ||= self.available_courses.with_each_shard.select{|c| c.grants_right?(self, nil, :participate_as_student)}
   end
-  memoize :courses_with_grades
 
   def sis_pseudonym_for(context)
     root_account = context.root_account
@@ -974,7 +975,7 @@ class User < ActiveRecord::Base
 
   set_policy do
     given { |user| user == self }
-    can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar
+    can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar and can :manage_feature_flags
 
     given { |user| user.present? && self.public? }
     can :follow
@@ -1025,7 +1026,7 @@ class User < ActiveRecord::Base
         self.associated_accounts.any? {|a| a.grants_right?(user, nil, :manage_students) }
       )
     end
-    can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :view_statistics and can :read and can :read_reports
+    can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :view_statistics and can :read and can :read_reports and can :manage_feature_flags
 
     given do |user|
       user && (
@@ -1344,12 +1345,6 @@ class User < ActiveRecord::Base
     opts = { :start_at => 1.week.ago, :limit => 10 }.merge(opts)
     Submission.recently_graded_assignments(id, opts[:start_at], opts[:limit])
   end
-  memoize :assignments_recently_graded
-
-  def assignments_recently_graded_total_count(opts={})
-    assignments_recently_graded(opts.merge({:limit => nil})).size
-  end
-  memoize :assignments_recently_graded_total_count
 
   def preferences
     read_attribute(:preferences) || write_attribute(:preferences, {})
@@ -1408,69 +1403,71 @@ class User < ActiveRecord::Base
   end
 
   def assignments_needing_submitting(opts={})
-    Shackles.activate(:slave) do
-      course_ids = if opts[:contexts]
+    course_ids = Shackles.activate(:slave) do
+      if opts[:contexts]
         (Array(opts[:contexts]).map(&:id) &
          current_student_enrollment_course_ids)
       else
         current_student_enrollment_course_ids
       end
-
-      # allow explicitly passing a nil limit
-      limit = opts[:limit]
-      limit = 15 unless opts.key?(:limit)
-      due_after = opts[:due_after] || 4.weeks.ago
-
-      result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
-        Assignment.for_course(shard_course_ids).
-          active.
-          due_between_with_overrides(due_after,1.week.from_now).
-          not_ignored_by(self, 'submitting').
-          expecting_submission.
-          need_submitting_info(id, limit).
-          not_locked
-      end
-      # outer limit, since there could be limit * n_shards results
-      result = result[0..(limit - 1)] if limit
-      result
     end
-  end
-  memoize :assignments_needing_submitting
 
-  def assignments_needing_submitting_total_count(opts={})
-    assignments_needing_submitting(opts.merge(:limit => nil)).size
+    opts = {limit: 15}.merge(opts.slice(:due_after, :limit))
+
+    shard.activate do
+      Rails.cache.fetch([self, 'assignments_needing_submitting', course_ids, opts].cache_key, expires_in: 15.minutes) do
+        Shackles.activate(:slave) do
+          limit = opts[:limit]
+          due_after = opts[:due_after] || 4.weeks.ago
+
+          result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
+            Assignment.for_course(shard_course_ids).
+              published.
+              due_between_with_overrides(due_after,1.week.from_now).
+              not_ignored_by(self, 'submitting').
+              expecting_submission.
+              need_submitting_info(id, limit).
+              not_locked
+          end
+          # outer limit, since there could be limit * n_shards results
+          result = result[0...limit] if limit
+          result
+        end
+      end
+    end
   end
 
   def assignments_needing_grading(opts={})
-    Shackles.activate(:slave) do
-      course_ids = if opts[:contexts]
+    course_ids = Shackles.activate(:slave) do
+      if opts[:contexts]
         (Array(opts[:contexts]).map(&:id) &
         current_admin_enrollment_course_ids)
       else
         current_admin_enrollment_course_ids
       end
-
-      # allow explicitly passing a nil limit
-      limit = opts[:limit]
-      limit = 15 unless opts.key?(:limit)
-
-      result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
-        as = Assignment.for_course(shard_course_ids).active.
-          expecting_submission.
-          not_ignored_by(self, 'grading').
-          need_grading_info(limit)
-        Assignment.send :preload_associations, as, :context
-        as.reject{|a| a.needs_grading_count_for_user(self) == 0}
-      end
-      # outer limit, since there could be limit * n_shards results
-      result = result[0..(limit - 1)] if limit
-      result
     end
-  end
-  memoize :assignments_needing_grading
 
-  def assignments_needing_grading_total_count(opts={})
-    assignments_needing_grading(opts.merge(:limit => nil)).size
+    opts = {limit: 15}.merge(opts.slice(:limit))
+
+    shard.activate do
+      Rails.cache.fetch([self, 'assignments_needing_grading', course_ids, opts].cache_key, expires_in: 15.minutes) do
+        Shackles.activate(:slave) do
+          limit = opts[:limit]
+
+          result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
+            as = Assignment.for_course(shard_course_ids).active.
+              expecting_submission.
+              not_ignored_by(self, 'grading').
+              need_grading_info(limit)
+            Assignment.send :preload_associations, as, :context
+            as.reject{|a| a.needs_grading_count_for_user(self) == 0}
+          end
+          # outer limit, since there could be limit * n_shards results
+          result = result[0...limit] if limit
+          result
+        end
+      end
+    end
   end
 
   def generate_access_verifier(ts)
@@ -1601,59 +1598,63 @@ class User < ActiveRecord::Base
   end
 
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil, options = {})
-    res = self.shard.activate do
-      Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options].cache_key, :expires_in => 15.minutes) do
+    cache_key = [association, enrollment_uuid, options].cache_key
+    @courses_with_primary_enrollment ||= {}
+    @courses_with_primary_enrollment.fetch(cache_key) do
+      res = self.shard.activate do
+        Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options].cache_key, :expires_in => 15.minutes) do
 
-        # Set the actual association based on if its asking for favorite courses or not.
-        actual_association = association == :favorite_courses ? :current_and_invited_courses : association
+          # Set the actual association based on if its asking for favorite courses or not.
+          actual_association = association == :favorite_courses ? :current_and_invited_courses : association
 
-        send(actual_association).with_each_shard do |scope|
+          send(actual_association).with_each_shard do |scope|
 
-          # Limit favorite courses based on current shard.
-          if association == :favorite_courses
-            local_ids = self.favorite_context_ids("Course")
-            next if local_ids.length < 1
-            scope = scope.where(:id => local_ids)
+            # Limit favorite courses based on current shard.
+            if association == :favorite_courses
+              local_ids = self.favorite_context_ids("Course")
+              next if local_ids.length < 1
+              scope = scope.where(:id => local_ids)
+            end
+
+            courses = scope.distinct_on(["courses.id"],
+              :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
+              :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
+
+            unless options[:include_completed_courses]
+              enrollments = Enrollment.where(:id => courses.map(&:primary_enrollment_id)).all
+              courses_hash = courses.index_by(&:id)
+              # prepopulate the reverse association
+              enrollments.each { |e| e.course = courses_hash[e.course_id] }
+              Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+              date_restricted_ids = enrollments.select{ |e| e.completed? || e.inactive? }.map(&:id)
+              courses.reject! { |course| date_restricted_ids.include?(course.primary_enrollment_id.to_i) }
+            end
+
+            courses
           end
+        end.dup
+      end
 
-          courses = scope.distinct_on(["courses.id"],
-            :select => "courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state",
-            :order => "courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")
-
-          unless options[:include_completed_courses]
-            enrollments = Enrollment.where(:id => courses.map(&:primary_enrollment_id)).all
-            courses_hash = courses.index_by(&:id)
-            # prepopulate the reverse association
-            enrollments.each { |e| e.course = courses_hash[e.course_id] }
-            Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
-            date_restricted_ids = enrollments.select{ |e| e.completed? || e.inactive? }.map(&:id)
-            courses.reject! { |course| date_restricted_ids.include?(course.primary_enrollment_id.to_i) }
-          end
-
-          courses
+      if association == :current_and_invited_courses
+        if enrollment_uuid && pending_course = Course.
+          select("courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state").
+          joins(:enrollments).
+          where(:enrollments => { :uuid => enrollment_uuid, :workflow_state => 'invited' }).first
+          res << pending_course
+          res.uniq!
         end
-      end.dup
-    end
-
-    if association == :current_and_invited_courses
-      if enrollment_uuid && pending_course = Course.
-        select("courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state").
-        joins(:enrollments).
-        where(:enrollments => { :uuid => enrollment_uuid, :workflow_state => 'invited' }).first
-        res << pending_course
-        res.uniq!
+        pending_enrollments = temporary_invitations
+        unless pending_enrollments.empty?
+          Enrollment.send(:preload_associations, pending_enrollments, :course)
+          res.concat(pending_enrollments.map { |e| c = e.course; c.write_attribute(:primary_enrollment, e.type); c.write_attribute(:primary_enrollment_rank, e.rank_sortable.to_s); c.write_attribute(:primary_enrollment_state, e.workflow_state); c.write_attribute(:invitation, e.uuid); c })
+          res.uniq!
+        end
       end
-      pending_enrollments = temporary_invitations
-      unless pending_enrollments.empty?
-        Enrollment.send(:preload_associations, pending_enrollments, :course)
-        res.concat(pending_enrollments.map { |e| c = e.course; c.write_attribute(:primary_enrollment, e.type); c.write_attribute(:primary_enrollment_rank, e.rank_sortable.to_s); c.write_attribute(:primary_enrollment_state, e.workflow_state); c.write_attribute(:invitation, e.uuid); c })
-        res.uniq!
-      end
-    end
 
-    res.sort_by{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
+      @courses_with_primary_enrollment[cache_key] =
+        res.sort_by{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
+    end
   end
-  memoize :courses_with_primary_enrollment
 
   def cached_active_emails
     self.shard.activate do
@@ -1667,7 +1668,6 @@ class User < ActiveRecord::Base
     cached_active_emails.map { |email| Enrollment.cached_temporary_invitations(email).dup.reject { |e| e.user_id == self.id } }.flatten
   end
 
-   # activesupport/lib/active_support/memoizable.rb from rails and
    # http://github.com/seamusabshere/cacheable/blob/master/lib/cacheable.rb from the cacheable gem
    # to get a head start
 
@@ -1684,7 +1684,6 @@ class User < ActiveRecord::Base
       end
     end + temporary_invitations
   end
-  memoize :cached_current_enrollments
 
   def cached_not_ended_enrollments
     self.shard.activate do
@@ -1730,45 +1729,52 @@ class User < ActiveRecord::Base
   end
 
   def submissions_for_context_codes(context_codes, opts={})
-    return [] if (!context_codes || context_codes.empty?)
-    opts[:start_at] ||= 2.weeks.ago
-    opts[:limit] ||= 20
+    return [] unless context_codes.present?
 
-    Shackles.activate(:slave) do
-      submissions = []
-      submissions += self.submissions.after(opts[:start_at]).for_context_codes(context_codes).
-        where("submissions.score IS NOT NULL AND assignments.workflow_state<>? AND assignments.muted=?", 'deleted', false).
-        order('submissions.created_at DESC').
-        limit(opts[:limit]).all
+    opts = {limit: 20}.merge(opts.slice(:start_at, :limit))
+    shard.activate do
+      Rails.cache.fetch([self, 'submissions_for_context_codes', context_codes, opts].cache_key, expires_in: 15.minutes) do
+        opts[:start_at] ||= 2.weeks.ago
 
-      # THIS IS SLOW, it takes ~230ms for mike
-      submissions += Submission.for_context_codes(context_codes).
-        select(["submissions.*, last_updated_at_from_db"]).
-        joins(self.class.send(:sanitize_sql_array, [<<-SQL, opts[:start_at], self.id, self.id])).
-          INNER JOIN (
-            SELECT MAX(submission_comments.created_at) AS last_updated_at_from_db, submission_id
-            FROM submission_comments, submission_comment_participants
-            WHERE submission_comments.id = submission_comment_id
-              AND (submission_comments.created_at > ?)
-              AND (submission_comment_participants.user_id = ?)
-              AND (submission_comments.author_id <> ?)
-            GROUP BY submission_id
-          ) AS relevant_submission_comments ON submissions.id = submission_id
-          INNER JOIN assignments ON assignments.id = submissions.assignment_id AND assignments.workflow_state <> 'deleted'
-        SQL
-        where(assignments: {muted: false}).
-        order('last_updated_at_from_db DESC').
-        limit(opts[:limit]).all
+        Shackles.activate(:slave) do
+          submissions = []
+          submissions += self.submissions.after(opts[:start_at]).for_context_codes(context_codes).
+            where("submissions.score IS NOT NULL AND assignments.workflow_state<>? AND assignments.muted=?", 'deleted', false).
+            order('submissions.created_at DESC').
+            limit(opts[:limit]).all
 
-      submissions = submissions.sort_by{|t| (t.last_updated_at_from_db.to_datetime.in_time_zone rescue nil) || t.created_at}.reverse
-      submissions = submissions.uniq
-      submissions.first(opts[:limit])
+          # THIS IS SLOW, it takes ~230ms for mike
+          submissions += Submission.for_context_codes(context_codes).
+            select(["submissions.*, last_updated_at_from_db"]).
+            joins(self.class.send(:sanitize_sql_array, [<<-SQL, opts[:start_at], self.id, self.id])).
+              INNER JOIN (
+                SELECT MAX(submission_comments.created_at) AS last_updated_at_from_db, submission_id
+                FROM submission_comments, submission_comment_participants
+                WHERE submission_comments.id = submission_comment_id
+                  AND (submission_comments.created_at > ?)
+                  AND (submission_comment_participants.user_id = ?)
+                  AND (submission_comments.author_id <> ?)
+                GROUP BY submission_id
+              ) AS relevant_submission_comments ON submissions.id = submission_id
+              INNER JOIN assignments ON assignments.id = submissions.assignment_id AND assignments.workflow_state <> 'deleted'
+            SQL
+            where(assignments: {muted: false}).
+            order('last_updated_at_from_db DESC').
+            limit(opts[:limit]).all
 
-      Submission.send(:preload_associations, submissions, [:assignment, :user, :submission_comments])
-      submissions
+          submissions = submissions.sort_by{|t| (t.last_updated_at_from_db.to_datetime.in_time_zone rescue nil) || t.created_at}.reverse
+          submissions = submissions.uniq
+          submissions.first(opts[:limit])
+
+          Submission.send(:preload_associations, submissions, [:assignment, :user, :submission_comments])
+          submissions
+        end
+      end
     end
   end
-  memoize :submissions_for_context_codes
+
+  def uncached_submissions_for_context_codes(context_codes, opts)
+  end
 
   # This is only feedback for student contexts (unless specific contexts are passed in)
   def recent_feedback(opts={})
@@ -1780,7 +1786,6 @@ class User < ActiveRecord::Base
       end
     submissions_for_context_codes(context_codes, opts)
   end
-  memoize :recent_feedback
 
   def visible_stream_item_instances(opts={})
     instances = stream_item_instances.where(:hidden => false).order('stream_item_instances.id desc')
@@ -1872,7 +1877,7 @@ class User < ActiveRecord::Base
 
     events = CalendarEvent.active.for_user_and_context_codes(self, context_codes).between(now, opts[:end_at]).limit(opts[:limit]).reject(&:hidden?)
     events += select_upcoming_assignments(Assignment.
-        active.
+        published.
         for_context_codes(context_codes).
         due_between_with_overrides(now, opts[:end_at]).
         include_submitted_count.
@@ -1909,7 +1914,6 @@ class User < ActiveRecord::Base
     # TODO: All the event methods use this and it's really slow.
     Array(contexts || cached_contexts).map(&:asset_string)
   end
-  memoize :setup_context_lookups
 
   def setup_context_association_lookups(column, contexts=nil, opts = {})
     contexts = Array(contexts || cached_contexts)
@@ -1953,6 +1957,7 @@ class User < ActiveRecord::Base
   # context codes of things that might have a schedulable appointment for the
   # given user, i.e. courses and sections
   def appointment_context_codes
+    return @appointment_context_codes if @appointment_context_codes
     ret = {:primary => [], :secondary => []}
     cached_current_enrollments.each do |e|
       next unless e.student? && e.active?
@@ -1960,11 +1965,11 @@ class User < ActiveRecord::Base
       ret[:secondary] << "course_section_#{e.course_section_id}"
     end
     ret[:secondary].concat groups.map{ |g| "group_category_#{g.group_category_id}" }
-    ret
+    @appointment_context_codes = ret
   end
-  memoize :appointment_context_codes
 
   def manageable_appointment_context_codes
+    return @manageable_appointment_context_codes if @manageable_appointment_context_codes
     ret = {:full => [], :limited => [], :secondary => []}
     cached_current_enrollments.each do |e|
       next unless e.course.grants_right?(self, nil, :manage_calendar)
@@ -1975,9 +1980,8 @@ class User < ActiveRecord::Base
         ret[:full] << "course_#{e.course_id}"
       end
     end
-    ret
+    @manageable_appointment_context_codes = ret
   end
-  memoize :manageable_appointment_context_codes
 
   # Public: Return an array of context codes this user belongs to.
   #
@@ -1998,7 +2002,6 @@ class User < ActiveRecord::Base
       end
     end
   end
-  memoize :conversation_context_codes
 
   def self.preload_conversation_context_codes(users)
     users = users.reject { |u| u.instance_variable_get(:@conversation_context_codes) }
@@ -2121,21 +2124,17 @@ class User < ActiveRecord::Base
   TAB_HOME = 4
 
   def highest_role
-    return 'admin' unless self.all_accounts.empty?
-    return 'teacher' if self.cached_current_enrollments.any?(&:admin?)
-    return 'student' if self.cached_current_enrollments.any?(&:student?)
-    return 'user'
+    roles.last
   end
-  memoize :highest_role
 
   def roles
+    return @roles if @roles
     res = ['user']
     res << 'student' if self.cached_current_enrollments.any?(&:student?)
     res << 'teacher' if self.cached_current_enrollments.any?(&:admin?)
     res << 'admin' unless self.all_accounts.empty?
-    res
+    @roles = res
   end
-  memoize :roles
 
   def eportfolios_enabled?
     accounts = associated_root_accounts.reject(&:site_admin?)
@@ -2555,23 +2554,21 @@ class User < ActiveRecord::Base
   end
 
   def all_accounts
-    self.accounts.with_each_shard
+    @all_accounts ||= self.accounts.with_each_shard
   end
-  memoize :all_accounts
 
   def all_paginatable_accounts
     BookmarkedCollection.with_each_shard(Account::Bookmarker, self.accounts)
   end
 
   def all_pseudonyms
-    self.pseudonyms.with_each_shard
+    @all_pseudonyms ||= self.pseudonyms.with_each_shard
   end
-  memoize :all_pseudonyms
 
-  def all_active_pseudonyms
-    self.pseudonyms.with_each_shard { |scope| scope.active }
+  def all_active_pseudonyms(reload=false)
+    @all_active_pseudonyms = nil if reload
+    @all_active_pseudonyms ||= self.pseudonyms.with_each_shard { |scope| scope.active }
   end
-  memoize :all_active_pseudonyms
 
   def prefers_gradebook2?
     preferences[:use_gradebook2] != false

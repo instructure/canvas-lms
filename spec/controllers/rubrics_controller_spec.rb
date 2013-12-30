@@ -508,4 +508,29 @@ describe RubricsController do
       @rubric.deleted?.should be_false
     end
   end
+
+  describe "GET 'show'" do
+    before { course_with_teacher_logged_in(active_all: true) }
+
+    it "doesn't load nonsense" do
+      lambda {
+        get 'show', id: "cats", course_id: @course.id
+      }.should raise_error ActiveRecord::RecordNotFound
+    end
+
+    it "returns 404 if record doesn't exist" do
+      lambda {
+        get 'show', id: "1", course_id: @course.id
+      }.should raise_error ActiveRecord::RecordNotFound
+    end
+
+
+    it "works" do
+      r = Rubric.create! user: @teacher, context: Account.default
+      ra = RubricAssociation.create! rubric: r, context: @course,
+        purpose: :bookmark, association: @course
+      get 'show', id: r.id, course_id: @course.id
+      response.should be_success
+    end
+  end
 end

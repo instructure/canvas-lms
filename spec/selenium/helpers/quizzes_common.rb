@@ -93,7 +93,7 @@ shared_examples_for "quizzes selenium tests" do
     @q = quiz_model
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
-    answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}, 'answer_2' => {'id' => 3}}
+    answers = [{'id' => 1}, {'id' => 2}, {'id' => 3}]
     @quest1 = @q.quiz_questions.create!(:question_data => {:name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
     @quest2 = @q.quiz_questions.create!(:question_data => {:name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
     yield bank, @q if block_given?
@@ -183,6 +183,24 @@ shared_examples_for "quizzes selenium tests" do
     #This step is to prevent selenium from freezing when the dialog appears when leaving the page
     driver.find_element(:link, 'Quizzes').click
     driver.switch_to.alert.accept
+  end
+
+  def take_and_answer_quiz(submit=true)
+    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
+    expect_new_page_load { driver.find_element(:link_text, 'Take the Quiz').click }
+
+    answer = @quiz.stored_questions[0][:answers][0][:id]
+
+    fj("input[type=radio][value=#{answer}]").click
+    wait_for_js
+
+    if submit
+      driver.execute_script("$('#submit_quiz_form .btn-primary').click()")
+
+      keep_trying_until do
+        f('.quiz-submission .quiz_score .score_value').should be_displayed
+      end
+    end
   end
 
   def set_answer_comment(answer_num, text)

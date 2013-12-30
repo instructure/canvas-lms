@@ -3,9 +3,9 @@
 # Tag the string as UTF-8 if it's valid UTF-8 so we can search
 # for files with non-ASCII names inside archives.
 
-require 'zip/zip'
+require 'zip'
 
-Zip::ZipEntry::class_eval do
+Zip::Entry::class_eval do
   def fix_name_encoding
     @name.force_encoding('UTF-8')
     @name.force_encoding('ASCII-8BIT') unless @name.valid_encoding?

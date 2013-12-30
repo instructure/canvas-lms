@@ -116,7 +116,7 @@ define [
 
       events = []
       for id, event of contextInfo.events
-        if !event.start && !start || event.start >= start && event.start <= end
+        if !event.originalStart && !start || event.originalStart >= start && event.originalStart <= end
           events.push event
 
       events
@@ -258,7 +258,7 @@ define [
           event = commonEventFactory(e, @contexts)
           if event && event.object.workflow_state != 'deleted'
             requestResult.events.push(event)
-        requestResult.maxDate = _.max(requestResult.events, (e) -> e.start).start
+        requestResult.maxDate = _.max(requestResult.events, (e) -> e.originalStart).originalStart
         requestResults[key] = requestResult
 
       doneCB = () =>
@@ -279,9 +279,9 @@ define [
         lastKnownDate = start
         for key, requestResult of requestResults
           for event in requestResult.events
-            if !incomplete || event.start < nextPageDate
+            if !incomplete || event.originalStart < nextPageDate
               @addEventToCache event
-              lastKnownDate = event.start if event.start > lastKnownDate
+              lastKnownDate = event.originalStart if event.originalStart > lastKnownDate
         lastKnownDate = end if !incomplete
 
         for context in contexts

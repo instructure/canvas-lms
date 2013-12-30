@@ -162,7 +162,7 @@ describe "quizzes" do
     end
 
     it "should republish on save" do
-      Account.default.enable_draft!
+      Account.default.enable_feature!(:draft_state)
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f(".new-quiz-link").click }
       quiz = Quiz.last
@@ -271,17 +271,24 @@ describe "quizzes" do
       @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
       @context = @course
       q = quiz_model
+      q.time_limit = 20
       q.generate_quiz_data
       q.save!
 
       get "/courses/#{@course.id}/quizzes/#{q.id}/moderate"
-
       f('.moderate_student_link').click
+
+      # validates data
+      f('#extension_extra_attempts').send_keys('asdf')
+      submit_form('#moderate_student_form')
+      f('.attempts_left').text.should == '1'
+
+      # valid values
+      f('#extension_extra_attempts').clear()
       f('#extension_extra_attempts').send_keys('2')
       submit_form('#moderate_student_form')
       wait_for_ajax_requests
       f('.attempts_left').text.should == '3'
-
     end
 
     it "should flag a quiz question while taking a quiz as a teacher" do
@@ -437,7 +444,7 @@ describe "quizzes" do
       q = quiz_model
       a = bank.assessment_questions.create!
       b = bank.assessment_questions.create!
-      answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
+      answers = [{id: 1, answer_text: 'A', weight: 100}, {id: 2, answer_text: 'B', weight: 0}]
       question = q.quiz_questions.create!(:question_data => {
           :name => "first question",
           'question_type' => 'multiple_choice_question',
@@ -463,15 +470,12 @@ describe "quizzes" do
       # QuizSubmissions#extensions when a moderator extends a student's
       # quiz time.
 
-
       quiz_original_end_time = QuizSubmission.last.end_at
-
       keep_trying_until do
         submission = QuizSubmission.last
         submission.end_at = Time.now + 20.minutes
         submission.save!
         quiz_original_end_time < QuizSubmission.last.end_at
-        assert_flash_notice_message /You have been given extra time on this attempt/
         f('.time_running').text.should match /19 Minutes/
       end
     end
@@ -694,8 +698,7 @@ describe "quizzes" do
 
     context "with draft state" do
       before(:each) do
-        Account.default.settings[:enable_draft] = true
-        Account.default.save!
+        Account.default.enable_feature!(:draft_state)
       end
 
       it "should click the publish button to publish a quiz" do
@@ -741,14 +744,23 @@ describe "quizzes" do
       it "should show a summary of due dates if there are multiple" do
         create_quiz_with_default_due_dates
         get "/courses/#{@course.id}/quizzes"
-        f('.ig-details .description').should_not include_text "Multiple Dates"
+        f('.ig-details .date-due').should_not include_text "Multiple Dates"
+        f('.ig-details .date-available').should_not include_text "Multiple Dates"
+
         add_due_date_override(@quiz)
 
         get "/courses/#{@course.id}/quizzes"
-        f('.ig-details .description').should include_text "Multiple Dates"
-        driver.mouse.move_to f('.ig-details .description a')
+        f('.ig-details .date-due').should include_text "Multiple Dates"
+        driver.mouse.move_to f('.ig-details .date-due a')
         wait_for_ajaximations
-        tooltip = fj('.vdd_tooltip_content:visible')
+        tooltip = fj('.ui-tooltip:visible')
+        tooltip.should include_text 'New Section'
+        tooltip.should include_text 'Everyone else'
+
+        f('.ig-details .date-available').should include_text "Multiple Dates"
+        driver.mouse.move_to f('.ig-details .date-available a')
+        wait_for_ajaximations
+        tooltip = fj('.ui-tooltip:visible')
         tooltip.should include_text 'New Section'
         tooltip.should include_text 'Everyone else'
       end

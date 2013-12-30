@@ -18,7 +18,11 @@
 
 module QuizzesHelper
   def needs_unpublished_warning?(quiz=@quiz)
-    return false if quiz.available? && !can_publish(quiz)
+    if quiz.feature_enabled?(:draft_state)
+      return false unless quiz.grants_right?(@current_user, session, :read)
+    else
+      return false unless quiz.grants_right?(@current_user, session, :manage)
+    end
 
     !quiz.available? || quiz.unpublished_changes?
   end
@@ -69,6 +73,74 @@ module QuizzesHelper
       I18n.t('#quizzes.keep_highest', 'Highest')
     when "keep_latest"
       I18n.t('#quizzes.keep_latest', 'Latest')
+    end
+  end
+
+  def render_show_correct_answers(quiz)
+    if !quiz.show_correct_answers
+      return I18n.t('#options.no', 'No')
+    end
+
+    show_at = quiz.show_correct_answers_at
+    hide_at = quiz.hide_correct_answers_at
+
+    if show_at && hide_at
+      I18n.t('#quizzes.show_and_hide_correct_answers', 'From %{from} to %{to}', {
+        from: datetime_string(quiz.show_correct_answers_at),
+        to: datetime_string(quiz.hide_correct_answers_at)
+      })
+    elsif show_at
+      I18n.t('#quizzes.show_correct_answers_after', 'After %{date}', {
+        date: datetime_string(quiz.show_correct_answers_at)
+      })
+    elsif hide_at
+      I18n.t('#quizzes.show_correct_answers_until', 'Until %{date}', {
+        date: datetime_string(quiz.hide_correct_answers_at)
+      })
+    else
+      I18n.t('#quizzes.show_correct_answers_immediately', 'Immediately')
+    end
+  end
+
+  def render_correct_answer_protection(quiz)
+    show_at = quiz.show_correct_answers_at
+    hide_at = quiz.hide_correct_answers_at
+    now = Time.now
+
+    # Some labels will be used in more than one case, so we'll pre-define them.
+    labels = {}
+    if hide_at
+      labels[:available_until] = I18n.t('#quizzes.correct_answers_shown_until',
+        'Correct answers are available until %{date}.', {
+        date: datetime_string(quiz.hide_correct_answers_at)
+      })
+    end
+
+    if !quiz.show_correct_answers
+      I18n.t('#quizzes.correct_answers_protected',
+        'Correct answers are hidden.')
+    elsif hide_at.present? && hide_at < now
+      I18n.t('#quizzes.correct_answers_no_longer_available',
+        'Correct answers are no longer available.')
+    elsif show_at.present? && hide_at.present?
+      # If the answers are currently visible, there's no need to show the range
+      # of availability.
+      if now > show_at
+        labels[:available_until]
+      else
+        I18n.t('#quizzes.correct_answers_shown_between',
+          'Correct answers will be available %{from} - %{to}.', {
+            from: datetime_string(show_at),
+            to: datetime_string(hide_at)
+          })
+      end
+    elsif show_at.present?
+      I18n.t('#quizzes.correct_answers_shown_after',
+        'Correct answers will be available on %{date}.', {
+          date: datetime_string(show_at)
+        })
+    elsif hide_at.present?
+      labels[:available_until]
     end
   end
 
@@ -482,6 +554,30 @@ module QuizzesHelper
     end
 
     title = "title=\"#{titles.join(' ')}\"" if titles.length > 0
+  end
+
+  def show_correct_answers?(quiz=@quiz, user=@current_user, submission=@submission)
+    @quiz && @quiz.try_rescue(:show_correct_answers?, @current_user, @submission)
+  end
+
+  def correct_answers_protected?(quiz=@quiz, user=@current_user, submission=@submission)
+    if !quiz
+      false
+    elsif !show_correct_answers?(quiz, user, submission)
+      true
+    elsif quiz.hide_correct_answers_at.present?
+      !quiz.grants_right?(user, nil, :grade)
+    end
+  end
+
+  def point_value_for_input(user_answer, question)
+    return user_answer[:points] unless user_answer[:correct] == 'undefined'
+
+    if ["assignment", "practice_quiz"].include?(@quiz.quiz_type)
+      "--"
+    else
+      question[:points_possible] || 0
+    end
   end
 
 end

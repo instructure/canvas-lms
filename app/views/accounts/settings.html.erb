@@ -9,7 +9,8 @@
       'id' => @context.id,
       'default_storage_quota_mb' => @context.default_storage_quota_mb,
       'default_user_storage_quota_mb' => @context.default_user_storage_quota_mb,
-      'default_group_storage_quota_mb' => @context.default_group_storage_quota_mb
+      'default_group_storage_quota_mb' => @context.default_group_storage_quota_mb,
+      'site_admin' => @account.site_admin?
     }
   end
 %>
@@ -54,6 +55,9 @@
     <% end %>
     <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
       <li><a href="#tab-alerts" id="tab-alerts-link"><%= t(:tab_alerts, "Alerts") %></a></li>
+    <% end %>
+    <% if can_do(@context, @current_user, :manage_feature_flags) %>
+      <li><a href="#tab-features" id="tab-features-link"><%= t(:feature_options, "Feature options") %></a></li>
     <% end %>
   </ul>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
@@ -145,7 +149,22 @@ TEXT
             <% end %>
           </table>
         </fieldset>
+
         <%= render :partial => 'additional_settings' %>
+
+        <% if !@account.site_admin? &&
+               @account.root_account? &&
+               @account.feature_enabled?(:google_docs_domain_restriction) &&
+               @account.grants_right?(@current_user, :manage_site_settings) %>
+          <fieldset id="google-docs-domain">
+            <legend><%= t(:google_docs_domain, 'Allowed Google Docs Domain') %></legend>
+
+            <%= f.fields_for :settings do |settings| %>
+              <%= settings.label      :google_docs_domain, t('labels.domain', 'Domain:') %>
+              <%= settings.text_field :google_docs_domain, placeholder: 'gmail.com', value: @account.settings[:google_docs_domain] %>
+            <% end %>
+          </fieldset>
+        <% end %>
 
         <% unless @account.site_admin? %>
           <fieldset>
@@ -214,22 +233,6 @@ TEXT
                   <div>
                     <%= settings.check_box :enable_alerts, :checked => @account.settings[:enable_alerts] %>
                     <%= settings.label :enable_alerts, :en => "Alerts (beta)" %>
-                  </div>
-                  <div id='allow_draft'>
-                    <%= settings.check_box :allow_draft, :checked => @account.settings[:allow_draft] %>
-                    <label for="account_settings_allow_draft"><%= t('allow_draft', 'Allow Draft State (beta)') %>
-                      <a href="#" class="allow_draft_help_link no-hover" title="<%= t(:allow_draft_help_tooltip, "What is draft state?") %>"><i class="icon-question standalone-icon"></i></a>
-                    </label>
-                  </div>
-                  <div id="allow_draft_help_dialog" style="display: none;">
-                    <%= mt(:allow_draft_help_message, <<-DRAFT )
-Draft state is a *beta* feature that allows course content to be published and unpublished.
-Unpublished content won't be visible to students and won't affect grades.
-It also includes a redesign of some course areas to make them more consistent in look and functionality.
-
-Allowing Draft State here will allow teachers to enable it in their individual courses.
-                    DRAFT
-                    %>
                   </div>
                 <% end %>
                 <div>
@@ -785,7 +788,9 @@ Allowing Draft State here will allow teachers to enable it in their individual c
                 <% if extra_text %>
                   (<%= extra_text %>)
                 <% end %>
-                <%= link_to "<i class='icon-download'></i>".html_safe, context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id) %>
+                <% if last_complete.workflow_state == 'complete' %>
+                  <%= link_to "<i class='icon-download'></i>".html_safe, context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id) %>
+                <% end %>
               <% else %>
                 <%= t 'report_last_run_never', 'Never' %>
               <% end %>
@@ -831,5 +836,8 @@ Allowing Draft State here will allow teachers to enable it in their individual c
         <h2><%= t(:alerts_title, "Alerts") %></h2>
         <%= render :partial => 'alerts/alerts' %>
       </div>
+  <% end %>
+  <% if can_do(@context, @current_user, :manage_feature_flags) %>
+    <div id="tab-features"></div>
   <% end %>
 </div>

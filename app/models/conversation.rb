@@ -668,9 +668,13 @@ class Conversation < ActiveRecord::Base
           ConversationMessageParticipant.joins(:conversation_message).
               where(:conversation_messages => { :conversation_id => self.id }).
               delete_all
-          # bare scoped call avoids HasManyAssociation's delete_all, which loads
-          # all records in Rails 2
-          self.conversation_messages.scoped.delete_all
+          if CANVAS_RAILS2
+            # bare scoped call avoids HasManyAssociation's delete_all, which loads
+            # all records in Rails 2
+            self.conversation_messages.scoped.delete_all
+          else
+            self.conversation_messages.delete_all
+          end
         end
       end
 
@@ -760,8 +764,14 @@ class Conversation < ActiveRecord::Base
 
   def delete_for_all
     stream_item.try(:destroy_stream_item_instances)
-    # bare scoped call avoid Rails 2 HasManyAssociation loading all objects
-    shard.activate { conversation_message_participants.scoped.delete_all }
+    shard.activate do
+      if CANVAS_RAILS2
+        # bare scoped call avoid Rails 2 HasManyAssociation loading all objects
+        conversation_message_participants.scoped.delete_all
+      else
+        conversation_message_participants.delete_all
+      end
+    end
     conversation_participants.with_each_shard { |scope| scope.scoped.delete_all; nil }
   end
 

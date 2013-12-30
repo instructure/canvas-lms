@@ -25,10 +25,15 @@ define [
     modelType: 'group'
     resourceName: 'groups'
 
+    initialize: (attrs, options) ->
+      super
+      @newAndEmpty = options?.newAndEmpty
+
     users: ->
-      @_users = new GroupUserCollection(null, groupId: @id)
-      @_users.group = this
-      @_users.url = "/api/v1/groups/#{@id}/users?per_page=50"
+      initialUsers = if @newAndEmpty then [] else null
+      @_users = new GroupUserCollection initialUsers,
+        group: this
+        category: @collection?.category
       @_users.on 'fetched:last', => @set('members_count', @_users.length)
       @users = -> @_users
       @_users

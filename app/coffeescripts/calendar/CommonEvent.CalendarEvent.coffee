@@ -21,7 +21,6 @@ define [
       @id = "calendar_event_#{data.id}" if data.id
       @title = data.title || "Untitled"
       @start = @parseStartDate()
-      @originalStartDate = new Date(@start) if @start
       @end = @parseEndDate()
       @originalEndDate = new Date(@end) if @end
       @allDay = data.all_day
@@ -41,7 +40,6 @@ define [
 
       super
 
-    startDate: () -> @originalStartDate
     endDate: () -> @originalEndDate
 
     parseStartDate: () ->

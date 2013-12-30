@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Pseudonym do
 
@@ -341,6 +341,28 @@ describe Pseudonym do
 
       @pseudonym.stubs(:valid_ldap_credentials?).returns(true)
       @pseudonym.valid_arbitrary_credentials?('anything').should be_true
+    end
+  end
+
+  describe "authenticate" do
+    context "sharding" do
+      specs_require_sharding
+
+      it "should only query pertinent shards" do
+        account2 = @shard1.activate { Account.create! }
+        Pseudonym.expects(:associated_shards).with('abc').returns([@shard1])
+        Pseudonym.expects(:active).once.returns(Pseudonym.none)
+        GlobalLookups.stubs(:enabled?).returns(true)
+        Pseudonym.authenticate({ unique_id: 'abc', password: 'def' }, [Account.default.id, account2])
+      end
+
+      it "should only query pertinent shards" do
+        account2 = @shard1.activate { Account.create! }
+        Pseudonym.expects(:associated_shards).with('abc').returns([Shard.default, @shard1])
+        Pseudonym.expects(:active).twice.returns(Pseudonym.none)
+        GlobalLookups.stubs(:enabled?).returns(true)
+        Pseudonym.authenticate({ unique_id: 'abc', password: 'def' }, [Account.default.id, account2])
+      end
     end
   end
 

@@ -32,6 +32,7 @@ define [
       'click #logout_link': 'logOutAndRefresh'
 
     initialize: (@options = {}) ->
+      super
       @enrollUrl = @$el.attr('action')
       @action = @initialAction = @$el.find('input[type=hidden][name=initial_action]').val()
       @$el.formSubmit {@beforeSubmit, @success, @errorFormatter, disableWhileLoading: 'spin_on_success'}

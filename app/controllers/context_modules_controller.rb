@@ -87,7 +87,7 @@ class ContextModulesController < ApplicationController
   def create
     if authorized_action(@context.context_modules.new, @current_user, :create)
       @module = @context.context_modules.build
-      if @context.draft_state_enabled?
+      if @context.feature_enabled?(:draft_state)
         @module.workflow_state = 'unpublished'
       else
         @module.workflow_state = 'active'
@@ -375,7 +375,7 @@ class ContextModulesController < ApplicationController
           @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@current_user, true) }
           render :json => @progressions
         end
-      elsif !@context.draft_state_enabled?
+      elsif !@context.feature_enabled?(:draft_state)
         redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "student_progressions")
       elsif !@context.grants_right?(@current_user, session, :manage_students)
         @restrict_student_list = true

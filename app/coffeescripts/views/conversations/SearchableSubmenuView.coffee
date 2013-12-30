@@ -5,6 +5,7 @@ define [
 ], (I18n, _, {View}, CourseSelectionView, SearchView) ->
   class SearchableSubmenuView extends View
     initialize: ->
+      super
       @$field = $('<input />')
         .attr(
           'class': 'dropdown-search'

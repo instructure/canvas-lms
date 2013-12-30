@@ -1,9 +1,9 @@
 module QuizQuestionDataFixer
-  # AssessmentQuestions updated after a certain commit lost all numerical values, 
+  # AssessmentQuestions updated after a certain commit lost all numerical values,
   # this tries to fix the bad data with data from quiz questions which weren't affected by this bug
   def self.fix_quiz_questions_with_bad_data
     seen_quizzes = {}
-    # the commit that caused bad AssessmentQuestion data wasn't out until dec 22, 2011, so only try to fix AQs after that. 
+    # the commit that caused bad AssessmentQuestion data wasn't out until dec 22, 2011, so only try to fix AQs after that.
     AssessmentQuestion.where("updated_at > ? AND ((migration_id IS NULL) OR (migration_id IS NOT NULL AND question_data LIKE ?))",
                                                  Time.zone.parse("Dec 22, 2011"),
                                                  "%/files/%").find_each do |question|
@@ -12,7 +12,7 @@ module QuizQuestionDataFixer
         if data && data[:points_possible].nil? && data[:question_type] != "text_only_question"
           if good_data = find_good_data(question)
             good_data[:assessment_question_id] = question.id
-            question.write_attribute(:question_data, good_data)
+            question.write_attribute(:question_data, good_data.to_hash)
             question.with_versioning(&:save)
 
             question.quiz_questions.active.each do |qq|
@@ -22,9 +22,9 @@ module QuizQuestionDataFixer
                   seen_quizzes[qq.quiz_id] = true
                 end
                 if pp = qq.question_data[:points_possible]
-                  qq.write_attribute(:question_data, good_data.merge({:points_possible => pp}))
+                  qq.write_attribute(:question_data, good_data.merge({:points_possible => pp}).to_hash)
                 else
-                  qq.write_attribute(:question_data, good_data)
+                  qq.write_attribute(:question_data, good_data.to_hash)
                 end
                 qq.save
               end
@@ -64,5 +64,5 @@ module QuizQuestionDataFixer
 
     nil
   end
-  
+
 end

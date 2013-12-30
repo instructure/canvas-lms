@@ -73,6 +73,13 @@ define [
       "position":2
       "rules": {"drop_lowest":1, "drop_highest":2, "never_drop":[3,4]} # intentionally include an invalid assignment id
 
+  group3 = ->
+      buildGroup
+        "id":3
+        "name":"Even more Assignments"
+        "position":3
+        "rules": {"drop_lowest":1, "drop_highest":1}
+
   buildGroup = (options) ->
     options ?= {}
 
@@ -158,15 +165,29 @@ define [
     json = view.toJSON()
     equal json.groupWeight, 1
 
-  test "shouldBeExpanded returnes cache state", ->
+  test "shouldBeExpanded returns cache state", ->
+    view = createView(@model)
+    #make sure the cache starts at true
+    view.toggleCache() unless view.shouldBeExpanded()
+    key = view.cache.toKey view.cacheKey()
+
+    ok view.shouldBeExpanded()
+    equal localStorage[key], 'true'
+
+    view.toggleCache()
+    ok !view.shouldBeExpanded()
+    equal localStorage[key], 'false'
+
+  test "toggleCache correctly toggles cache state", ->
     view = createView(@model)
     #make sure the cache starts at true
     view.toggleCache() unless view.shouldBeExpanded()
 
-    ok view.shouldBeExpanded()
-
     view.toggleCache()
+
     ok !view.shouldBeExpanded()
+    view.toggleCache()
+    ok view.shouldBeExpanded()
 
   test "currentlyExpanded returns expanded state", ->
     view = createView(@model)
@@ -199,3 +220,10 @@ define [
     assignments.first().set('frozen', true)
     view = createView(@model)
     ok !view.$("#assignment_group_#{@model.id} a.delete_group").length
+
+  test "correctly displays rules tooltip", ->
+    model = createAssignmentGroup(group3())
+    view = createView(model)
+    anchor = view.$("#assignment_group_3 .ag-header-controls .tooltip_link")
+    equal anchor.text(), "2 Rules"
+    equal anchor.attr("title"), "Drop the lowest score and Drop the highest score"

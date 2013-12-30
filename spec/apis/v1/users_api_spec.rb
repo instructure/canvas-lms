@@ -251,7 +251,7 @@ describe "Users API", :type => :integration do
         json.size.should == 1
         json.each { |j| j['url'].should == "http://www.example.com/courses/1" }
         response.headers['Link'].should_not match /next/
-        response.headers['Link'].should_not match /last/
+        response.headers['Link'].should match /last/
       end
 
       it "should recognize start_time parameter" do

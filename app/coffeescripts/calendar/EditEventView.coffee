@@ -26,6 +26,7 @@ define [
       'click .switch_event_description_view': 'toggleHtmlView'
 
     initialize: ->
+      super
       @model.fetch().done =>
         if ENV.NEW_CALENDAR_EVENT_ATTRIBUTES
           attrs = @model.parse(ENV.NEW_CALENDAR_EVENT_ATTRIBUTES)

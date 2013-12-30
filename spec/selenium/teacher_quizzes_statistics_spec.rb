@@ -21,11 +21,11 @@ describe "quiz statistics" do
     end
 
     def quiz_question(name, question, id)
-      answers = {
-        :a => {:weight=>100, :answer_text=>"A", :answer_comments=>"", :id=>1490},
-        :b => {:weight=>0, :answer_text=>"B", :answer_comments=>"", :id=>1020},
-        :c => {:weight=>0, :answer_text=>"C", :answer_comments=>"", :id=>7051}
-      }
+      answers = [
+        {:weight=>100, :answer_text=>"A", :answer_comments=>"", :id=>1490},
+        {:weight=>0, :answer_text=>"B", :answer_comments=>"", :id=>1020},
+        {:weight=>0, :answer_text=>"C", :answer_comments=>"", :id=>7051}
+      ]
       data = { :question_name=>name, :points_possible=>1, :question_text=>question,
         :answers=>answers, :question_type=>"multiple_choice_question"
       }
@@ -121,13 +121,10 @@ describe "quiz statistics" do
       it "should validate question graph tooltip" do
         update_quiz_submission_scores
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/statistics"
-        (0..2).each do |i|
-          driver.execute_script("$('.tooltip_text:eq(#{i})').css('visibility', 'visible')")
-          if i == 0 || i == 1
-            fj(".tooltip_text:eq(#{i})").should include_text '0%'
-          else
-            fj(".tooltip_text:eq(#{i})").should include_text '100%'
-          end
+
+        @quiz.quiz_questions.each_with_index do |question, index|
+          driver.execute_script("$('.tooltip_text:eq(#{index})').css('visibility', 'visible')")
+          fj(".tooltip_text:eq(#{index})").should include_text '100%'
         end
       end
 

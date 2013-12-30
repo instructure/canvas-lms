@@ -22,7 +22,7 @@ class QuizQuestion::FillInMultipleBlanksQuestion < QuizQuestion::Base
   end
 
   def variables
-    @variables ||= @question_data[:answers].map{|a| a[:blank_id] }.uniq
+    @variables ||= @question_data.answers.map{|a| a[:blank_id] }.uniq
   end
 
   def matching_answer?(answer, variable, downcased_response)
@@ -32,7 +32,7 @@ class QuizQuestion::FillInMultipleBlanksQuestion < QuizQuestion::Base
   def find_chosen_answer(variable, response)
     response ||= ""
     downcased_response = response.strip.downcase
-    matching_answer = @question_data[:answers].detect{|answer| matching_answer?(answer, variable, downcased_response) }
+    matching_answer = @question_data.answers.detect{|answer| matching_answer?(answer, variable, downcased_response) }
     if matching_answer
       matching_answer.merge(text: response)
     else
@@ -73,7 +73,7 @@ class QuizQuestion::FillInMultipleBlanksQuestion < QuizQuestion::Base
 
     answer_keys = {}
     answers = []
-    @question_data[:answers].each do |answer|
+    @question_data.answers.each do |answer|
       unless answer_keys[answer[:blank_id]]
         answers << {
           :id => answer[:blank_id],
@@ -87,7 +87,7 @@ class QuizQuestion::FillInMultipleBlanksQuestion < QuizQuestion::Base
       end
     end
     answers.each do |found_answer|
-      @question_data[:answers].select { |a|
+      @question_data.answers.select { |a|
         a[:blank_id] == found_answer[:blank_id]
       }.each do |sub_answer|
         correct = sub_answer[:weight] == 100
@@ -95,7 +95,7 @@ class QuizQuestion::FillInMultipleBlanksQuestion < QuizQuestion::Base
           :responses => 0,
           :text => sub_answer[:text],
           :user_ids => [],
-          :id => @question_data[:question_type] == 'fill_in_multiple_blanks_question' ? found_answer[:blank_id] : sub_answer[:id],
+          :id => @question_data.is_type?(:fill_in_multiple_blanks) ? found_answer[:blank_id] : sub_answer[:id],
           :correct => correct
         }
         found_answer[:answer_matches] << match
@@ -103,7 +103,7 @@ class QuizQuestion::FillInMultipleBlanksQuestion < QuizQuestion::Base
     end
     stats[:answer_sets] = answers
 
-    if @question_data[:question_type] == 'fill_in_multiple_blanks_question'
+    if @question_data.is_type?(:fill_in_multiple_blanks)
       responses.each do |response|
         answers.each do |answer|
           found = false

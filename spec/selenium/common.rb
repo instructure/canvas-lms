@@ -68,7 +68,7 @@ module SeleniumTestsHelperMethods
         if SELENIUM_CONFIG[:firefox_profile].present?
           profile = Selenium::WebDriver::Firefox::Profile.from_name(SELENIUM_CONFIG[:firefox_profile])
         end
-        profile.native_events = native
+        profile.native_events = true
         options[:profile] = profile
       end
       if path = SELENIUM_CONFIG[:paths].try(:[], browser)

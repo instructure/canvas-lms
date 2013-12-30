@@ -60,6 +60,7 @@ define [
     attachCollection: ->
       super
       @itemViewOptions = course: @course
+      @collection.on 'render', @render
       @collection.on 'add', @render
       @collection.on 'remove', @render
       @collection.on 'change:groupWeights', @render

@@ -31,6 +31,7 @@ define [
       'click .cancel_button': 'onCloseForm'
 
     initialize: ->
+      super
       @id = @$el.data('id')
 
     # Internal: Create collaboration edit form HTML.

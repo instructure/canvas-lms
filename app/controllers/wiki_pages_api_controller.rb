@@ -531,11 +531,12 @@ class WikiPagesApiController < ApplicationController
   def get_update_params(allowed_fields=Set[])
     # normalize parameters
     page_params = params[:wiki_page] || {}
-    if @context.draft_state_enabled?
+    if @context.feature_enabled?(:draft_state)
       page_params.slice!(*%w(title body notify_of_update published front_page editing_roles))
     else
       page_params.slice!(*%w(title body hide_from_students notify_of_update front_page editing_roles))
     end
+    page_params[:hide_from_students] = value_to_boolean(page_params[:hide_from_students]) if page_params.has_key?(:hide_from_students)
 
     if page_params.has_key?(:published)
       workflow_state = value_to_boolean(page_params.delete(:published)) ? 'active' : 'unpublished'

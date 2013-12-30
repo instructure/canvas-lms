@@ -1,17 +1,17 @@
 <% key ||= nil %>
 <li>
-  <% if key == :needing_grading %>
+  <% if key == :assignments_needing_grading %>
     <a href="<%= speed_grader_course_gradebook_path( menu_assignment.context_id, :assignment_id => menu_assignment.id) %>" data-track-category="assignment dropdown" data-track-label="needs grading">
   <% else %>
       <a href="<%= course_assignment_path( menu_assignment.context_id, menu_assignment.id ) %>" data-track-category="assignment dropdown" data-track-label="needs submitting">
   <% end %>
     <span class="name-right-wrapper">
       <span class="secondary-right">
-        <% if key == :needing_submitting %>
+        <% if key == :assignments_needing_submitting %>
           <%= before_label :due, "due" %> <%= datetime_string(menu_assignment.due_at, :due_date, nil, true) %>
-        <% elsif key == :needing_grading %>
+        <% elsif key == :assignments_needing_grading %>
           <%= t :needs_grading_count, { :one => "1 needs grading", :other => "%{count} need grading"}, :count => menu_assignment.needs_grading_count_for_user(@current_user) %>
-        <% elsif key == :recently_graded %>
+        <% elsif key == :assignments_recently_graded %>
           <% if menu_assignment.grading_type == 'points' %>
               <%= "#{menu_assignment.score}/#{menu_assignment.points_possible}" %>
           <% else %>
