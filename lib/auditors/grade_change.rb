@@ -139,7 +139,9 @@ class Auditors::GradeChange
 
     add_index :root_account_grader do
       table :grade_changes_by_root_account_grader
-      entry_proc lambda{ |record| [record.root_account, record.grader] }
+      # We don't want to index events for nil graders and currently we are not
+      # indexing events for auto grader in cassandra.
+      entry_proc lambda{ |record| [record.root_account, record.grader] if record.grader && !record.submission.autograded? }
       key_proc lambda{ |root_account, grader| [root_account.global_id, grader.global_id] }
     end
 

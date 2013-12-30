@@ -384,6 +384,12 @@ describe EventStream do
       end
 
       shared_examples_for "recording failures" do
+        before do
+          # By default the log! method raises exceptions in test env.  Override this
+          # to log the event and not raise it for these tests.
+          Rails.env.stubs(:test?).returns(false)
+        end
+
         it "should record failed inserts" do
           EventStream::Failure.expects(:log!).once.with(:insert, @stream, @record, @exception)
           @stream.insert(@record)

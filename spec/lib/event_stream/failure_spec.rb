@@ -33,6 +33,10 @@ describe EventStream::Failure do
       @exception = Exception.new
       @exception.stubs(:message).returns(stub('exception_message', :to_s => 'exception_message_string'))
       @exception.stubs(:backtrace).returns([stub('exception_backtrace')])
+
+      # By default the log! method raises exceptions in test env.  Override this
+      # to log the event and not raise it for these tests.
+      Rails.env.stubs(:test?).returns(false)
     end
 
     it "should create a new db record" do
