@@ -88,6 +88,7 @@ describe "BookmarkedCollection::MergeProxy" do
         @created_scope = Course.where(:workflow_state => 'created')
         @deleted_scope = Course.where(:workflow_state => 'deleted')
 
+        CourseAccountAssociation.delete_all
         Course.delete_all
         @courses = [
           @created_scope.create!,
@@ -162,6 +163,7 @@ describe "BookmarkedCollection::MergeProxy" do
         #set @domain_root_account
         @domain_root_account = Account.default
 
+        CourseAccountAssociation.delete_all
         Course.delete_all
         @courses = 6.times.map{ Course.create! }
         @scope1 = Course.select("id, 1 as scope").where("id<?", @courses[4].id)
