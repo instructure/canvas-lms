@@ -2704,7 +2704,7 @@ define([
       if (!question_data) {
         $teaser.find(".teaser.question_text").text(I18n.t('loading_question', "Loading Question..."));
         $.ajaxJSON($teaser.find(".update_question_url").attr('href'), 'GET', {}, function(question) {
-          showQuestion(question.quiz_question);
+          showQuestion(question);
         }, function() {
           $teaser.find(".teaser.question_text").text(I18n.t('errors.loading_question_failed', "Loading Question Failed..."));
         });
