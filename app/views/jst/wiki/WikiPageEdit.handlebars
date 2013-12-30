@@ -6,7 +6,14 @@
     {{else}}
       <h2>{{title}}</h2>
     {{/if}}
-    <a href="#" class="switch_views">{{#t "#editor.switch_views"}}Switch Views{{/t}}</a>
+    <div>
+      <a href="#" class="switch_views">
+        {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+      </a>
+      <a href="#" class="switch_views" style="display:none;">
+        {{#t "#editor.switch_editor_visual"}}Visual Editor{{/t}}
+      </a>
+    </div>
   </div>
 
   <textarea rows="20" cols="40" name="body" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{body}}</textarea>

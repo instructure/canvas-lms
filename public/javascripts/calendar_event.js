@@ -98,6 +98,8 @@ $(function($) {
   });
   $(".switch_full_calendar_event_view").click(function() {
     $("#calendar_event_description").editorBox('toggle');
+    //  todo: replace .andSelf with .addBack when JQuery is upgraded.
+    $(this).siblings(".switch_full_calendar_event_view").andSelf().toggle();
     return false;
   });
   $(".edit_calendar_event_link").click(function() {

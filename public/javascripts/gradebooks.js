@@ -266,6 +266,7 @@ define([
                 height = grid.cell.height(),
                 assignment_id = submission.assignment_id,
                 $box = $("#student_grading_" + assignment_id).clone(true),
+                //  todo: replace .andSelf with .addBack when JQuery is upgraded.
                 $input = $box.children().andSelf().filter(".grading_value");
             $grade.hide().after($box);
             $box.css('display', 'block');

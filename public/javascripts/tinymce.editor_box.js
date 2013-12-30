@@ -187,7 +187,7 @@ define([
           if (event.keyCode == 9 && event.shiftKey) {
             var $cur = $(ed.getContainer());
             while (true) {
-              // When jQuery is upgraded to 1.8+, use .addBack instead.
+              // When jQuery is upgraded to 1.8+, use .addBack(':tabbable') instead of andSelf().filter(...)
               if ($cur.prevAll().find(':tabbable').andSelf().filter(':tabbable').last().focus().length) {
                 return false;
               }

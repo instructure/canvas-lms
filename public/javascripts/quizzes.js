@@ -3044,16 +3044,22 @@ define([
     $(".toggle_description_views_link").click(function(event) {
       event.preventDefault();
       $("#quiz_description").editorBox('toggle');
+      //  todo: replace .andSelf with .addBack when JQuery is upgraded.
+      $(this).siblings(".toggle_description_views_link").andSelf().toggle();
     });
 
     $(".toggle_question_content_views_link").click(function(event) {
       event.preventDefault();
       $(this).parents(".question_form").find(".question_content").editorBox('toggle');
+      //  todo: replace .andSelf with .addBack when JQuery is upgraded.
+      $(this).siblings(".toggle_question_content_views_link").andSelf().toggle();
     });
 
     $(".toggle_text_after_answers_link").click(function(event) {
       event.preventDefault();
       $(this).parents(".question_form").find(".text_after_answers").editorBox('toggle');
+      //  todo: replace .andSelf with .addBack when JQuery is upgraded.
+      $(this).siblings(".toggle_text_after_answers_link").andSelf().toggle();
     });
 
     $(document).bind('editor_box_focus', function(event, $editor) {

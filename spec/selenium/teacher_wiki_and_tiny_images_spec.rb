@@ -104,7 +104,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
       wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
       f('.upload_new_file_link').click
-      f('.wiki_switch_views_link').click
+      fj('.wiki_switch_views_link:visible').click
       wiki_page_body = clear_wiki_rce
 
       @image_list.find_elements(:css, '.img').length.should == 2
@@ -119,9 +119,9 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     it "should show uploaded images in image list and add the image to the rce" do
       wiki_page_tools_file_tree_setup
       wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
-      f('.wiki_switch_views_link').click
+      fj('.wiki_switch_views_link:visible').click
       clear_wiki_rce
-      f('.wiki_switch_views_link').click
+      fj('.wiki_switch_views_link:visible').click
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajax_requests
 

@@ -179,7 +179,11 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
 
     _attachEditorToDescription: =>
       @$description.editorBox()
-      $('.rte_switch_views_link').click preventDefault => @$description.editorBox('toggle')
+      $('.rte_switch_views_link').click (e) =>
+        e.preventDefault()
+        @$description.editorBox 'toggle'
+        # hide the clicked link, and show the other toggle link.
+        $(e.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
 
     _attachDatepickerToDateFields: =>
       if @assignment.isSimple()

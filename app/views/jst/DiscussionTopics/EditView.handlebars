@@ -29,7 +29,12 @@
   </div>
   <div class="control-group">
       <div style="float: right;">
-        <a href="#" class="rte_switch_views_link">{{#t "#editor.switch_views"}}Switch Views{{/t}}</a>
+        <a href="#" class="rte_switch_views_link">
+          {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+        </a>
+        <a href="#" class="rte_switch_views_link" style="display:none;">
+          {{#t "#editor.switch_editor_visual"}}Visual Editor{{/t}}
+        </a>
       </div>
       <div style="clear:both;"></div>
       <textarea name="message"

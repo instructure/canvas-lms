@@ -33,6 +33,7 @@ define([
   $.fn.fillTemplateData = function(options) {
     if(this.length && options) {
       if (options.iterator) {
+        //  todo: replace .andSelf with .addBack when JQuery is upgraded.
         this.find("*").andSelf().each(function(){
           var $el = $(this);
           $.each(["name", "id", "class"], function(i, attr){

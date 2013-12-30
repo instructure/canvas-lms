@@ -41,9 +41,9 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       @assignment = @course.assignments.create(:name => assignment_name)
       get "/courses/#{@course.id}/wiki"
 
-      f('.wiki_switch_views_link').click
+      fj('.wiki_switch_views_link:visible').click
       clear_wiki_rce
-      f('.wiki_switch_views_link').click
+      fj('.wiki_switch_views_link:visible').click
       #check assignment accordion
       accordion = f('#pages_accordion')
       accordion.find_element(:link, I18n.t('links_to.assignments', 'Assignments')).click

@@ -153,9 +153,11 @@ define([
       checkForHomeworkSubmissionTools();
     });
 
-    $("#switch_text_entry_submission_views").click(function(event) {
+    $(".switch_text_entry_submission_views").click(function(event) {
       event.preventDefault();
       $("#submit_online_text_entry_form textarea:first").editorBox('toggle');
+      //  todo: replace .andSelf with .addBack when JQuery is upgraded.
+      $(this).siblings(".switch_text_entry_submission_views").andSelf().toggle();
     });
 
     $(".submit_assignment_form .cancel_button").click(function() {

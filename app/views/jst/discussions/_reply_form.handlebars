@@ -10,7 +10,12 @@
 <div class='discussion-entry-reply-area hide-if-collapsed show-if-replying'>
   <form class="discussion-reply-form">
     <div class="toggle-wrapper">
-      <a href="#">{{#t "switch_views"}}Switch Views{{/t}}</a>
+      <a href="#">
+        {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+      </a>
+      <a href="#" style="display:none;">
+        {{#t "#editor.switch_editor_visual"}}Visual Editor{{/t}}
+      </a>
     </div>
 
     <textarea class="reply-textarea"

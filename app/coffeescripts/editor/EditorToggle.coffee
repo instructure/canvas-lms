@@ -17,7 +17,7 @@ define [
       doneText: I18n.t 'done_as_in_finished', 'Done'
       # whether or not a "Switch Views" link should be provided to edit the
       # raw html
-      switchViews: false
+      switchViews: true
 
     ##
     # @param {jQueryEl} @el - the element containing html to edit
@@ -110,12 +110,21 @@ define [
         .click preventDefault => @display()
 
     ##
-    # create the switch views link to go between rich text and a textarea
+    # create the switch views links to go between rich text and a textarea
     # @api private
     createSwitchViews: ->
-      $('<a/>', style: "float: right", href: "#")
-        .text(I18n.t('switch_views', 'Switch Views'))
-        .click preventDefault => @textArea.editorBox('toggle')
+      $switchToHtmlLink = $('<a/>', href: "#")
+      $switchToVisualLink = $switchToHtmlLink.clone()
+      $switchToHtmlLink.text(I18n.t('switch_editor_html', 'HTML Editor'))
+      $switchToVisualLink.hide().text(I18n.t('switch_editor_visual', 'Visual Editor'))
+      $switchViewsContainer = $('<div/>', style: "float: right")
+      $switchViewsContainer.append($switchToHtmlLink, $switchToVisualLink)
+      $switchViewsContainer.find('a').click preventDefault (e) =>
+        @textArea.editorBox('toggle')
+        # hide the clicked link, and show the other toggle link.
+        # todo: replace .andSelf with .addBack when JQuery is upgraded.
+        $(e.currentTarget).siblings('a').andSelf().toggle()
+      return $switchViewsContainer
 
 
   _.extend(EditorToggle.prototype, Backbone.Events)
