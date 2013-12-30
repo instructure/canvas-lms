@@ -44,6 +44,29 @@ describe GradeChangeAuditApiController do
       Auditors::GradeChange.for_root_account_student(@account, @student).paginate(:per_page => 5).should include(@event)
       Auditors::GradeChange.for_root_account_grader(@account, @teacher).paginate(:per_page => 5).should include(@event)
     end
+
+    it "should include event for nil grader" do
+      # We don't want to index events for nil graders.
+
+      @submission = @assignment.grade_student(@student, grade: 6).first
+      @event = Auditors::GradeChange.record(@submission)
+
+      Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5).should include(@event)
+      Auditors::GradeChange.for_course(@course).paginate(:per_page => 5).should include(@event)
+      Auditors::GradeChange.for_root_account_student(@account, @student).paginate(:per_page => 5).should include(@event)
+    end
+
+    it "should include event for auto grader" do
+      # Currently we are not indexing events for auto grader in cassandra.
+
+      @submission.score = 5
+      @submission.grader_id = -1
+      @event = Auditors::GradeChange.record(@submission)
+
+      Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5).should include(@event)
+      Auditors::GradeChange.for_course(@course).paginate(:per_page => 5).should include(@event)
+      Auditors::GradeChange.for_root_account_student(@account, @student).paginate(:per_page => 5).should include(@event)
+    end
   end
 
   describe "options forwarding" do
