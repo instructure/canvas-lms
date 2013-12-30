@@ -25,6 +25,7 @@ class EventStream::Failure < ActiveRecord::Base
   serialize :backtrace, Array
 
   def self.log!(operation, stream, record, exception)
+    raise exception if Rails.env.test?
     log_to_statsd!(stream, exception)
     create!(:operation => operation.to_s,
             :event_stream => stream.identifier,
