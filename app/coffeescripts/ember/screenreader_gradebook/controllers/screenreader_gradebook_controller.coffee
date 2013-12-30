@@ -134,7 +134,7 @@ define [
 
     assignmentDetails: (->
       return null unless @get('selectedAssignment')?
-      {locals} = AssignmentDetailsDialog::compute.call null, {
+      {locals} = AssignmentDetailsDialog::compute.call AssignmentDetailsDialog::, {
         students: @studentsHash()
         assignment: @get('selectedAssignment')
       }
