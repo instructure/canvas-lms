@@ -18,6 +18,13 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-def specs_require_sharding
-  include Shard::RSpec
+if CANVAS_RAILS2
+  def specs_require_sharding
+    include Shard::RSpec
+  end
+else
+  def specs_require_sharding
+    require_dependency 'switchman/r_spec_helper'
+    include Switchman::RSpecHelper
+  end
 end
