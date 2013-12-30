@@ -1,4 +1,10 @@
-<ul id="section-to-show-menu">
+<button type="button" class="section-select-button">
+  {{#t "showing_sections"}}
+    Showing <span class="selected-section">{{currentSection}}</span>
+  {{/t}}
+</button>
+
+<ul class="section-select-menu">
   <li>{{#t "choose_a_section_to_show"}}Choose a section to show{{/t}}</li>
   {{#each sections}}
     <li>

@@ -164,35 +164,33 @@ describe "gradebook2" do
       edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
       edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', 1)
 
-      button = f('#section_to_show')
-      choose_section = lambda do |name|
-        button.click
+      choose_section = ->(name) do
+        fj('.section-select-button:visible').click
         wait_for_js
-        ff('#section-to-show-menu a').find { |a| a.text.include? name }.click
+        ffj('.section-select-menu:visible a').find { |a| a.text.include? name }.click
         wait_for_js
       end
 
       choose_section.call "All Sections"
-      button.should include_text("All Sections")
+      fj('.section-select-button:visible').should include_text("All Sections")
 
       choose_section.call @other_section.name
-      button.should include_text(@other_section.name)
+      fj('.section-select-button:visible').should include_text(@other_section.name)
 
       validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'), '1')
 
       # verify that it remembers the section to show across page loads
       get "/courses/#{@course.id}/gradebook2"
-      button = fj('#section_to_show')
-      button.should include_text @other_section.name
+      fj('.section-select-button:visible').should include_text @other_section.name
       validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'), '1')
 
       # now verify that you can set it back
 
-      button.click
+      fj('.section-select-button:visible').click
       wait_for_ajaximations
-      keep_trying_until { fj('#section-to-show-menu').should be_displayed }
+      keep_trying_until { fj('.section-select-menu:visible').should be_displayed }
       fj("label[for='section_option_#{''}']").click
-      keep_trying_until { button.should include_text "All Sections" }
+      keep_trying_until { fj('.section-select-button:visible').should include_text "All Sections" }
 
       # validate all grades (i.e. submissions) were loaded
       validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'), '0')
@@ -697,6 +695,25 @@ describe "gradebook2" do
       f("#only_consider_graded_assignments").click
       wait_for_ajax_requests
       f(".final_grade .grade").should include_text("12.5")
+    end
+  end
+
+  describe "outcome gradebook" do
+    before(:each) { data_setup }
+
+    it "should not be visible by default" do
+      get "/courses/#{@course.id}/gradebook2"
+      ff('.gradebook-navigation').length.should == 0
+    end
+
+    it "should be visible when enabled" do
+      Account.default.set_feature_flag!('outcome_gradebook', 'on')
+      get "/courses/#{@course.id}/gradebook2"
+      ff('.gradebook-navigation').length.should == 1
+
+      f('a[data-id=outcome-gradebook]').click
+      wait_for_ajaximations
+      f('.outcome-gradebook-container').should_not be_nil
     end
   end
 end

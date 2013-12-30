@@ -19,10 +19,10 @@ define [
   'compiled/gradebook2/GradebookHeaderMenu'
   'str/htmlEscape'
   'compiled/gradebook2/UploadDialog'
-  'jst/gradebook2/section_to_show_menu'
   'jst/gradebook2/column_header'
   'jst/gradebook2/group_total_cell'
   'jst/gradebook2/row_student_name'
+  'compiled/views/gradebook/SectionMenuView'
   'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
@@ -35,7 +35,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, UploadDialog, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
+], (KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, UploadDialog, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
 
   class Gradebook
     columnWidths =
@@ -55,6 +55,8 @@ define [
 
     numberOfFrozenCols: 2
 
+    hasSections: $.Deferred()
+
     constructor: (@options) ->
       @chunk_start = 0
       @students = {}
@@ -70,8 +72,9 @@ define [
       @show_concluded_enrollments = true if @options.course_is_concluded
 
       $.subscribe 'assignment_group_weights_changed', @buildRows
-      $.subscribe 'assignment_muting_toggled', @handleAssignmentMutingChange
-      $.subscribe 'submissions_updated', @updateSubmissionsFromExternal
+      $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
+      $.subscribe 'submissions_updated',              @updateSubmissionsFromExternal
+      $.subscribe 'currentSection/change',            @updateCurrentSection
 
       enrollmentsUrl = if @show_concluded_enrollments
         'students_url_with_concluded_enrollments'
@@ -138,6 +141,7 @@ define [
         htmlEscape(section)
         @sections[section.id] = section
       @sections_enabled = sections.length > 1
+      @hasSections.resolve()
 
     gotChunkOfStudents: (studentEnrollments) =>
       for studentEnrollment in studentEnrollments
@@ -684,26 +688,24 @@ define [
       )
       b?.handler and @[b.handler]?(e)
 
-    initHeader: =>
-      if @sections_enabled
-        allSectionsText = I18n.t('all_sections', 'All Sections')
-        sections = [{ name: allSectionsText, checked: !@sectionToShow}]
-        for id, s of @sections
-          sections.push
-            name: s.name
-            id: id
-            checked: @sectionToShow is id
+    sectionList: ->
+      _.map @sections, (section, id) =>
+        { name: section.name, id: id, checked: @sectionToShow == id }
 
-        $sectionToShowMenu = $(sectionToShowMenuTemplate(sections: sections))
-        (updateSectionBeingShownText = =>
-          $('#section_being_shown').html(if @sectionToShow then @sections[@sectionToShow].name else allSectionsText)
-        )()
-        $('#section_to_show').after($sectionToShowMenu).show().kyleMenu()
-        $sectionToShowMenu.bind 'menuselect', (event, ui) =>
-          @sectionToShow = $sectionToShowMenu.find('[aria-checked="true"] input[name="section_to_show_radio"]').val()
-          userSettings[ if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
-          updateSectionBeingShownText()
-          @buildRows()
+    drawSectionSelectButton: () ->
+      @sectionMenu = new SectionMenuView(
+        el: $('.section-button-placeholder'),
+        sections: @sectionList(),
+        currentSection: @sectionToShow)
+      @sectionMenu.render()
+
+    updateCurrentSection: (section, author) =>
+      @sectionToShow = section
+      userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
+      @buildRows()
+
+    initHeader: =>
+      @drawSectionSelectButton() if @sections_enabled
 
       $settingsMenu = $('#gradebook_settings').next()
       $.each ['show_attendance', 'include_ungraded_assignments', 'show_concluded_enrollments'], (i, setting) =>

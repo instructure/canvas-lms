@@ -1,0 +1,180 @@
+/* bootstrap overrides */
+.nav-pills {
+  a {
+    color: #585e63;
+  }
+
+  /* including the li here to beat another style */
+  .active a, li a:hover, li a:focus, .active a:hover, .active a:focus {
+    background: #585e63;
+    color: #fff;
+  }
+}
+
+/* checkbox view */
+.checkbox-view {
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: block;
+  font-size: 16px;
+  padding: 8px;
+
+  &:hover, &:focus {
+    border-color: #d3d9d9;
+  }
+}
+
+.checkbox-view .checkbox {
+  border-radius: 3px;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
+  height: 20px;
+  float: left;
+  margin-right: 24px;
+  padding: 0;
+  width: 20px;
+}
+
+.checkbox[aria-checked=false] {
+  border: 1px solid #999;
+}
+
+/* sidebar */
+.outcome-gradebook-section-select {
+  margin-bottom: 24px;
+}
+
+/* layout */
+
+.outcome-gradebook-container {
+  background: #f3f5f7;
+  border-top: 1px solid #bbb;
+}
+
+.outcome-gradebook-wrapper, .outcome-gradebook-sidebar {
+  height: 450px;
+  padding-top: 20px;
+}
+
+.outcome-gradebook-sidebar {
+  border-left: 1px solid #d3d9d9;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+/* slickgrid */
+
+/* slickgrid overrides */
+.outcome-gradebook-wrapper {
+  .ui-state-default {
+    background: none;
+    border: none;
+    box-shadow: none;
+    text-shadow: none;
+  }
+
+  .slick-header-column.ui-state-hover {
+    background: none;
+  }
+
+  .ui-widget-content {
+    background: none;
+  }
+
+  .even, .odd {
+    .slick-cell {
+      background: none;
+      border: none;
+    }
+  }
+}
+
+/* slickgrid styles */
+.outcome-gradebook-wrapper {
+  .grid-canvas {
+    background: #fff;
+  }
+
+  .slick-header-column {
+    font-size: 14px;
+
+    .slick-column-name {
+      color: #627382;
+      font-weight: 500;
+    }
+
+    &.ui-state-default {
+      height: 50px;
+      line-height: 50px;
+    }
+  }
+
+  .slick-headerrow {
+    border: 1px solid transparent;
+    border-left-color: #d3d9d9;
+  }
+
+  .slick-headerrow-column {
+    background: #fff;
+    border: 1px solid transparent;
+    border-right-color: #d3d9d9;
+    border-bottom-color: #d3d9d9;
+    border-top-color: #d3d9d9;
+    line-height: 37px;
+    min-height: 37px;
+
+    &.ui-state-default {
+      padding: 1px 2px 2px 1px;
+    }
+
+    &.r1 {
+      border-left-color: #d3d9d9;
+    }
+  }
+
+  .slick-row:first-child {
+    border-top: 1px solid #d3d9d9;
+  }
+
+  .even, .odd {
+    .slick-cell {
+      border: 1px solid transparent;
+      border-bottom-color: #d3d9d9;
+      border-right-color: #d3d9d9;
+      line-height: 37px;
+    }
+  }
+
+  .outcome-student-header-cell {
+    text-align: right;
+  }
+
+  .avatar-placeholder {
+    border: 1px solid #d3d9d9;
+    border-radius: 25px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    float: left;
+    height: 25px;
+    margin: 5px 8px 0 4px;
+    width: 25px;
+  }
+}
+
+.outcome-cell-wrapper {
+  text-align: right;
+}
+
+.outcome-result {
+  border-radius: 3px;
+  display: block;
+  float: right;
+  height: 20px;
+  margin: 8px 20px 0 8px;
+  width: 20px;
+
+  &.mastery      { background: #8bab58; }
+  &.near-mastery { background: #e0d670; }
+  &.remedial     { background: #dd5c5c; }
+}

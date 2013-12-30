@@ -36,7 +36,8 @@ class Gradebook2Controller < ApplicationController
       :course_is_concluded => @context.completed?,
       :gradebook_is_editable => @gradebook_is_editable,
       :speed_grader_enabled => @context.allows_speed_grader?,
-      :draft_state_enabled => @context.feature_enabled?(:draft_state)
+      :draft_state_enabled => @context.feature_enabled?(:draft_state),
+      :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook)
     }
   end
 end

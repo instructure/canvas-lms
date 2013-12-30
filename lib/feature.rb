@@ -104,6 +104,20 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       root_opt_in: true
+    },
+    'outcome_gradebook' =>
+    {
+      display_name: -> { I18n.t('features.outcome_gradebook', 'Outcome Gradebook') },
+      description:  -> { I18n.t('outcome_gradebook_description', <<-END) },
+Outcome Gradebook provides a way for teachers to quickly view student and course
+progress on course learning outcomes. Outcomes are presented in a Gradebook-like
+format and student progress is displayed both as a numerical score and as mastered/
+near mastery/remedial.
+END
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true,
+      development: true
     }
   )
 
