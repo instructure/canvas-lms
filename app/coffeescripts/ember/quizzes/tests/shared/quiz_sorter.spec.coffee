@@ -7,14 +7,14 @@ define [
   module 'quiz_sorter',
     setup: ->
       @quizzes = Ember.A [
-        {due_at: null, title: 'null due_at no override' },
-        {due_at: null, title: 'single_override', all_dates: [{}] },
-        {due_at: null, title: 'multi_overrides', all_dates: [{},{}] },
-        {due_at: dateString(3), title: '3 days from now' },
-        {due_at: dateString(2), title: '2 days from now' },
-        {due_at: dateString(0), title: 'today' },
-        {due_at: dateString(-1), title: '1 day ago' }
-      ]
+          {due_at: null, title: 'null due_at no override' },
+          {due_at: null, title: 'single_override', all_dates: [{}] },
+          {due_at: null, title: 'multi_overrides', all_dates: [{},{}] },
+          {due_at: dateString(3), title: '3 days from now' },
+          {due_at: dateString(2), title: '2 days from now' },
+          {due_at: dateString(0), title: 'today' },
+          {due_at: dateString(-1), title: '1 day ago' }
+        ]
 
   test 'sorts due_at first', ->
     sortedQuizzes = quizSorter(@quizzes)

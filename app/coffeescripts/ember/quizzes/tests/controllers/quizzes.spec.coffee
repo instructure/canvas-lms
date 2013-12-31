@@ -16,13 +16,14 @@ define [
     setup: ->
       App = startApp()
       @qc = new QuizzesController()
-      @qc.set('model', [
-        {quiz_type: 'survey', title: 'Test Quiz'},
-        {quiz_type: 'graded_survey', title: 'Test survey'},
-        {quiz_type: 'practice_quiz', title: 'Test practice quiz'},
-        {quiz_type: 'practice_quiz', title: 'Other practice'},
-        {quiz_type: 'assignment', title: 'Assignment test'}
-      ])
+      quizzes = Em.A [
+          {quiz_type: 'survey', title: 'Test Quiz'},
+          {quiz_type: 'graded_survey', title: 'Test survey'},
+          {quiz_type: 'practice_quiz', title: 'Test practice quiz'},
+          {quiz_type: 'practice_quiz', title: 'Other practice'},
+          {quiz_type: 'assignment', title: 'Assignment test'}
+        ]
+      @qc.set('model', quizzes)
 
     teardown: ->
       Ember.run App, 'destroy'
