@@ -1707,3 +1707,16 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   end
 
 end
+
+if Rails.version >= '3' && Rails.version < '4'
+  ActiveRecord::Sanitization::ClassMethods.module_eval do
+    def quote_bound_value_with_relations(value, c = connection)
+      if ActiveRecord::Relation === value
+        value.to_sql
+      else
+        quote_bound_value_without_relations(value, c)
+      end
+    end
+    alias_method_chain :quote_bound_value, :relations
+  end
+end
