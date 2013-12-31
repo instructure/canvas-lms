@@ -39,6 +39,7 @@ define [
         if student.sections.length is 0
           delete instanceMeta.students[student.id]
           array.removeObject(student)
+          hiddenNameCounter -= 1
         array
     args.push options
     Ember.arrayComputed.apply(null, args)
@@ -48,6 +49,7 @@ define [
     downloadUrl: "#{get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')}/gradebook.csv"
     gradingHistoryUrl: "#{get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')}/history"
     hideStudentNames: false
+    showConcludedEnrollments: false
 
     actions:
       selectItem: (property, goTo) ->
@@ -128,11 +130,12 @@ define [
       submissions = @get('submissions')
       submissions.forEach ((submission) ->
         student = @get('students').findBy('id', submission.user_id)
-        submission.submissions.forEach ((s) ->
-          @updateSubmission(s, student)
-        ), this
-        set(student, 'isLoading', false)
-        set(student, 'isLoaded', true)
+        if student?
+          submission.submissions.forEach ((s) ->
+            @updateSubmission(s, student)
+          ), this
+          set(student, 'isLoading', false)
+          set(student, 'isLoaded', true)
       ), this
     ).observes('submissions.@each')
 
@@ -290,3 +293,14 @@ define [
       else
         "name"
     ).property('hideStudentNames')
+
+    fetchCorrectEnrollments: (->
+      if @get('showConcludedEnrollments')
+        url = ENV.GRADEBOOK_OPTIONS.students_url_with_concluded_enrollments
+      else
+        url = ENV.GRADEBOOK_OPTIONS.students_url
+
+      enrollments = @get('enrollments')
+      enrollments.clear()
+      fetchAllPages(url, null, enrollments)
+    ).observes('showConcludedEnrollments')

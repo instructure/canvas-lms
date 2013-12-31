@@ -307,6 +307,16 @@ define [
         }
       ]
 
+  concludedStudents = [
+        {
+          user: { id: '105', name: 'Lyra' }
+          course_section_id: '1'
+          user_id: '105'
+          workflow_state: 'completed'
+          completed_at: "2013-10-01T10:00:00Z"
+        }
+      ]
+
   assignmentGroups = [
         {
           id: '1'
@@ -411,7 +421,6 @@ define [
             }
           ]
         }
-
       ]
 
   submissions = [
@@ -473,6 +482,7 @@ define [
 
   set_default_grade_response: default_grade_response
   students: students
+  concluded_enrollments: concludedStudents
   assignment_groups: assignmentGroups
   submissions: submissions
   sections: sections
@@ -484,6 +494,7 @@ define [
         context_asset_string: 'course_1'
         GRADEBOOK_OPTIONS: {
           students_url: '/api/v1/enrollments'
+          students_url_with_concluded_enrollments: '/api/v1/concluded_enrollments'
           assignment_groups_url: '/api/v1/assignment_groups'
           submissions_url: '/api/v1/submissions'
           sections_url: '/api/v1/sections'
@@ -496,6 +507,11 @@ define [
 
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.students_url,
       response: clone students
+      jqXHR: { getResponseHeader: -> {} }
+      textStatus: ''
+
+    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.students_url_with_concluded_enrollments,
+      response: clone concludedStudents
       jqXHR: { getResponseHeader: -> {} }
       textStatus: ''
 

@@ -90,8 +90,17 @@
 <!-- show concluded enrollments -->
 
 <div>
-  <label for="concluded_enrollments">Show Concluded Enrollments</label>
-  <input type="checkbox" name="concluded_enrollments" id="concluded_enrollments" value="concluded_enrollments">
+  <label>
+  {{
+    input
+    type="checkbox"
+    id="concluded_enrollments"
+    name="concluded_enrollments"
+    checked=showConcludedEnrollments
+    disabled=enrollments.isLoading
+  }}
+  {{#t 'show_concluded_enrollments_label'}}Show Concluded Enrollments{{/t}}
+  </label>
 </div>
 
 <!-- -------- -->
@@ -233,7 +242,7 @@
 
   <div>Secondary ID: <span id="secondary_id">
     {{#if hideStudentNames}}
-      <em>hidden</em>
+      <em>{{#t "hidden_secondary_id"}}hidden{{/t}}</em>
     {{else}}
       {{selectedStudent.login_id}}
     {{/if}}

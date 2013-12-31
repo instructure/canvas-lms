@@ -1,16 +1,17 @@
 define [
   '../start_app'
+  'underscore'
   'ember'
   '../shared_ajax_fixtures'
   'jquery'
   'vendor/jquery.ba-tinypubsub'
-], (startApp, Ember, fixtures, $) ->
+], (startApp, _, Ember, fixtures, $) ->
 
   App = null
 
   fixtures.create()
 
-  module 'hide student names',
+  module 'global settings',
     setup: ->
       App = startApp()
       visit('/').then =>
@@ -35,4 +36,22 @@ define [
     click("#hide_names_checkbox").then =>
       reg = /hidden/
       ok reg.test $("#secondary_id").text()
+
+  test 'view concluded enrollments', ->
+    enrollments = @controller.get('enrollments')
+    ok enrollments.content.length > 1
+    _.each enrollments.content, (enrollment) ->
+      ok enrollment.workflow_state == undefined
+
+    click("#concluded_enrollments").then =>
+      enrollments = @controller.get('enrollments')
+      equal enrollments.content.length, 1
+      en = enrollments.objectAt(0)
+      ok en.workflow_state == "completed"
+      completed_at = new Date(en.completed_at)
+      ok completed_at.getTime() < new Date().getTime()
+
+      click("#concluded_enrollments").then =>
+        enrollments = @controller.get('enrollments')
+        ok enrollments.content.length > 1
 
