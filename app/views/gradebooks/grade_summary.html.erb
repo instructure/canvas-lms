@@ -157,10 +157,13 @@
                 </span>
               <% end %>
             </span>
-            <span class="grade">
+            <span class="grade" tabindex="0">
               <% if assignment.muted? %>
                 <%= image_tag "sound_mute.png", :alt => t("#gradebooks.grade.muted", "Muted"), :class => "muted_icon" %>
               <% else %>
+                <span class="screenreader-only" role="link">
+                  <%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>
+                </span>
                 <%= render :partial => 'submission_score', :object => submission, :locals => {:student_score => !can_do(@context, @current_user, :manage_grades)} %>
               <% end %>
             </span>
@@ -352,7 +355,7 @@
 <% end %>
 <div id="total_groups_weight" style="display: none;"><%= @presenter.total_weight %></div>
 <%= render :partial => "shared/rubric_criterion_dialog" %>
-<input type="text" style="width: 40px; display: none;" id="grade_entry"/>
+<input type="text" style="width: 40px; display: none;" id="grade_entry" title="<%= t('titles.enter_score', "Enter a score to test") %>"/>
 <a href="#" id="revert_score_template" class="revert_score_link" title="<%= t('titles.revert_score', "Revert to original score") %>"><%= image_tag "back.png", :alt => "" %></a>
 <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", @presenter.student_id) %>" class="update_submission_url" style="display: none;">&nbsp;</a>
 <% if @context.grading_standard_enabled? %>

@@ -128,7 +128,6 @@ define([
       $(originEl).focus();
       $(this).closest('.rubric_assessments, .comments').hide();
     });
-
     $('.student_assignment.editable .assignment_score').click(function(event) {
       if ($('#grades_summary.editable').length === 0 || $(this).find('#grade_entry').length > 0 || $(event.target).closest('.revert_score_link').length > 0) {
         return;
@@ -136,6 +135,8 @@ define([
       if (!$(this).find('.grade').data('originalValue')){
         $(this).find('.grade').data('originalValue', $(this).find('.grade').html());
       }
+      var screenreader_link_clone = $(this).find('.screenreader-only').clone(true);
+      $(this).find('.grade').data("screenreader_link", screenreader_link_clone);
       $(this).find('.grade').empty().append($("#grade_entry"));
       $(this).find('.score_value').hide();
       var val = $(this).parents('.student_assignment').find('.score').text();
@@ -187,6 +188,7 @@ define([
           .find(".score_teaser").text(I18n.t('titles.hypothetical_score', "This is a What-If score")).end()
           .find(".score_holder").append($("#revert_score_template").clone(true).attr('id', '').show())
           .find(".grade").addClass('changed');
+        setTimeout(function() { $assignment.find(".revert_score_link").focus();}, 0)
       } else {
         var tooltip = $assignment.data('muted') ?
           I18n.t('student_mute_notification', 'Instructor is working on grades') :
@@ -199,6 +201,10 @@ define([
       if (val === 0) { val = '0.0'; }
       if (val === originalVal) { val = originalScore; }
       $assignment.find('.grade').html(val || $assignment.find('.grade').data('originalValue'));
+      if (!isChanged) {
+        var screenreader_link_clone = $assignment.find('.grade').data("screenreader_link");
+        $assignment.find('.grade').prepend(screenreader_link_clone);
+      }
 
       updateScoreForAssignment(assignment_id, val);
       updateStudentGrades();
@@ -230,6 +236,9 @@ define([
       if(!skipEval) {
         updateStudentGrades();
       }
+      var screenreader_link_clone = $assignment.find('.grade').data("screenreader_link");
+      $assignment.find('.grade').prepend(screenreader_link_clone);
+      setTimeout(function() { $assignment.find(".grade").focus();}, 0);
     });
     $("#grades_summary:not(.editable) .assignment_score").css('cursor', 'default');
     $("#grades_summary tr").hover(function() {
