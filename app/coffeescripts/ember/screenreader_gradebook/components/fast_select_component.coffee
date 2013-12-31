@@ -69,6 +69,11 @@ define [
         set this, 'value', currentValue
     ).observes('selected')
 
+    updateOptions: (->
+      @arrayWillChange(@items, 0, get(@items, 'length'), 0)
+      @arrayDidChange(@items, 0, 0, get(@items, 'length'))
+    ).observes('labelPath')
+
     arrayDidChange: (items, start, removeCount, addCount) ->
       select = get(this, 'element')
       hasDefault = get(this, 'hasDefaultOption')

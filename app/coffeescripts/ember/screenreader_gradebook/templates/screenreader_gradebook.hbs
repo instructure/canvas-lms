@@ -4,6 +4,7 @@
 <!-- -------- -->
 
 <h2>Global Settings</h2>
+
 <!-- filter by section -->
 <div>
   <label for="section_select">Select a section</label>
@@ -40,6 +41,20 @@
 <button id="ag_weights" {{ action 'openDialog' 'ag_weights' target=view }} {{ bind-attr disabled=assignment_groups.isLoading }}>Set Group Weights</button>
 
 <!-- show/hide student names -->
+
+<div>
+  <label>
+  {{
+    input
+    type="checkbox"
+    id="hide_names_checkbox"
+    name="hide_names_checkbox"
+    checked=hideStudentNames
+  }}
+  {{#t "hide_student_names_label"}}Hide Student Names{{/t}}
+  </label>
+</div>
+
 
 <!-- not sure this makes sense in this interface -->
 
@@ -92,7 +107,7 @@
     class="student_select"
     items=studentsInSelectedSection
     valuePath="id"
-    labelPath="name"
+    labelPath=displayName
     labelDefault=studentSelectDefaultLabel
     selected=selectedStudent
   }}
@@ -201,14 +216,29 @@
 
   <h2>Student Information</h2>
 
-  <div>Selected Student: {{selectedStudent.name}}</div>
+  <div>Selected Student:
+  {{#if hideStudentNames}}
+    {{selectedStudent.hiddenName}}
+  {{else}}
+    {{selectedStudent.name}}
+  {{/if}}
+  </div>
 
   <!-- what section they are in -->
 
   <div>Section: Section 3</div>
   <!-- secondary id -->
   {{#if selectedStudent.isLoaded}}
-  <div>Secondary ID: {{selectedStudent.login_id}}</div>
+
+  <div>Secondary ID: <span id="secondary_id">
+    {{#if hideStudentNames}}
+      <em>hidden</em>
+    {{else}}
+      {{selectedStudent.login_id}}
+    {{/if}}
+    </span>
+  </div>
+
 
   <!-- final score/grade -->
 

@@ -15,12 +15,17 @@ define [
   # http://emberjs.com/api/classes/Ember.ArrayController.html
   # http://emberjs.com/api/classes/Ember.ObjectController.html
 
+
   studentsUniqByEnrollments = (args...)->
+    hiddenNameCounter = 1
     options =
       initialize: (array, changeMeta, instanceMeta) ->
         instanceMeta.students = {}
       addedItem: (array, enrollment, changeMeta, iMeta) ->
         student = iMeta.students[enrollment.user_id] or enrollment.user
+        if !student.hiddenName?
+          student.hiddenName = I18n.t("student_hidden_name", "Student %{position}", {position: hiddenNameCounter})
+          hiddenNameCounter += 1
         student.sections ||= []
         student.sections.push(enrollment.course_section_id)
         return array if iMeta.students[student.id]
@@ -41,8 +46,8 @@ define [
   ScreenreaderGradebookController = Ember.ObjectController.extend
 
     downloadUrl: "#{get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')}/gradebook.csv"
-
     gradingHistoryUrl: "#{get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')}/history"
+    hideStudentNames: false
 
     actions:
       selectItem: (property, goTo) ->
@@ -278,3 +283,10 @@ define [
     ariaDisabledNextStudent: (->
       new Boolean(@get('disableNextStudentButton'))?.toString()
     ).property('disableNextStudentButton')
+
+    displayName: (->
+      if @get('hideStudentNames')
+        "hiddenName"
+      else
+        "name"
+    ).property('hideStudentNames')

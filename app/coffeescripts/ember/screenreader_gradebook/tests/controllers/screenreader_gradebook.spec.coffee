@@ -62,6 +62,12 @@ define [
       @srgb.get('students').forEach (s) ->
         equal Ember.get(s, 'isLoaded'), true
 
+  test 'displayName is hiddenName when hideStudentNames is true', ->
+    @srgb.set('hideStudentNames', true)
+    equal @srgb.get('displayName'), "hiddenName"
+    @srgb.set('hideStudentNames', false)
+    equal @srgb.get('displayName'), "name"
+
   test 'updateSubmission attaches the submission to the student', ->
     student = clone fixtures.students[0].user
     submission = clone fixtures.submissions[student.id].submissions[0]
