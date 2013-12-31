@@ -215,13 +215,14 @@ $context_module_bg_color: #f2f3f4
     .incomplete_item_icon
       display: none
   &.after_current_position
-    +opacity(0.5)
-    .title 
-      display: none
-    .locked_title 
-      display: inline-block
-    .completion_requirement
-      color: #aaa
+    .item_name
+      +opacity(0.5)
+      .title
+        display: none
+      .locked_title
+        display: inline-block
+      .completion_requirement
+        color: #aaa
   .module_item_icons
     vertical-align: top
     padding-top: 2px
