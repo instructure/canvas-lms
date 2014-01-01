@@ -23,14 +23,15 @@
 #
 # @object OutcomeRollupScore
 #     {
-#
-#       // The id of the related outcome
-#       "outcome_id": 42,
-#
 #       // The rollup score for the outcome, based on the student assessment
 #       // scores related to the outcome. This could be null if the student has
 #       // no related scores.
-#       "score": 3
+#       "score": 3,
+#
+#       "links": {
+#         // The id of the related outcome
+#         "outcome": 42
+#       }
 #     }
 #
 # @object OutcomeRollup
@@ -42,7 +43,12 @@
 #       "id": 42,
 #
 #       // The name of the resource for this rollup. For example, the user name.
-#       "name": "John Doe"
+#       "name": "John Doe",
+#
+#       "links": {
+#         // (Optional) The id of the section this resource is in
+#         "section": 57
+#       }
 #     }
 #
 
@@ -69,12 +75,12 @@ class OutcomeResultsController < ApplicationController
   #    }
   def rollups
     @outcomes = @context.linked_learning_outcomes
-    @users = users_for_outcome_context
     # TODO: will this work if users are spread across shards?
-    @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
+    @users = Api.paginate(users_for_outcome_context, self, api_v1_course_outcome_rollups_url(@context))
     @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes)
-    rollups = rollup_results(@results)
+    rollups = rollup_results(@results, @users)
     json = outcome_results_rollup_json(rollups, @outcomes)
+    json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
     render :json => json
   end
 

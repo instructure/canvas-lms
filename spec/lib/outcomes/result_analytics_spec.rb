@@ -68,9 +68,11 @@ describe Outcomes::ResultAnalytics do
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 40],
         MockOutcomeResult[MockUser[20, 'b'], MockOutcome[80], 50],
       ]
-      ra.rollup_results(results).should == [
+      users = [MockUser[10, 'a'], MockUser[30, 'c']]
+      ra.rollup_results(results, users).should == [
         { user: MockUser[10, 'a'], scores: [{outcome: MockOutcome[80], score: 40}] },
         { user: MockUser[20, 'b'], scores: [{outcome: MockOutcome[80], score: 50}] },
+        { user: MockUser[30, 'c'], scores: [] },
       ]
     end
   end

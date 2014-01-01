@@ -57,21 +57,27 @@ module Outcomes
     # results - An Enumeration of properly sorted LearningOutcomeResult objects.
     #           The results should be sorted by user id and then by outcome id.
     #
-    # Returns a hash of the results:
-    #   {
+    # users - (Optional) Ensure rollups are included for users in this list.
+    #         A listed user with no results will have an empty score array.
+    #
+    # Returns a list of users and their score rollups:
+    #   [{
     #      user: the associated user object,
     #      scores: [{
     #        outcome: the outcome object
     #        score: the rollup score for all the user's results for the outcome.
     #      }, ..., repeated for each outcome, ...]
-    #   }
-    def rollup_results(results)
-      results.chunk(&:user_id).map do |_, user_results|
+    #   }, ...]
+    def rollup_results(results, users=[])
+      rollups = results.chunk(&:user_id).map do |_, user_results|
         {
           user: user_results.first.user,
           scores: rollup_user_results(user_results),
         }
       end
+
+      missing_users = users - rollups.map {|r| r[:user]}
+      rollups + missing_users.map {|u| {user: u, scores: []}}
     end
 
     # Internal: Generates a rollup of the outcome results, Assuming all the

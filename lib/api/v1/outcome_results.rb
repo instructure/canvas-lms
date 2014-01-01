@@ -35,20 +35,32 @@ module Api::V1::OutcomeResults
 
   # Internal: Returns a suitable output hash for the rollups
   def sanitize_rollups(rollups)
-    rollups.map do |rollup|
-      {
+    # this is uglier than it should be to inject section ids. they really should
+    # be in a 'links' section or something.
+    # ideally, we would have some seperate mapping from users to course sections
+    # it will also need to change is context is ever not a course
+    # we're mostly assuming that there is one section enrollment per user. if a user
+    # is in multiple sections, they will have multiple rollup results. pagination is
+    # still by user, so the counts won't match up. again, this is a very rare thing
+    results = []
+    rollups.each do |rollup|
+      row = {
         id: rollup[:user].id,
         name: rollup[:user].name,
         scores: rollup[:scores].map { |score| sanitize_rollup_score(score) },
       }
+      rollup[:user].sections_for_course(@context).each do |section|
+        results << row.merge(links: {section: section.id})
+      end
     end
+    results
   end
 
   # Internal: Returns a suitable output hash for the rollup score
   def sanitize_rollup_score(score)
     {
-      outcome_id: score[:outcome].id,
       score: score[:score],
+      links: {outcome: score[:outcome].id},
     }
   end
 
