@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'action_controller_test_process'
+
 # @API Submissions
 #
 # @object Submission
@@ -94,9 +96,6 @@
 #       "late": false
 #     }
 #
-
-require 'action_controller_test_process'
-
 class SubmissionsController < ApplicationController
   include GoogleDocs
   include KalturaHelper
