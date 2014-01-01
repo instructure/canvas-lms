@@ -49,6 +49,7 @@ define [
       91: 'Command'
 
     initialize: (options) ->
+      @paginationScrollContainer = $('<ul />', role: 'menu')
       super
       @selector = @options.selector
       @parent = @options.parent
@@ -56,7 +57,6 @@ define [
       @query = @options.query
 
       @$heading                  = $('<ul />', class: 'heading').appendTo(@$el)
-      @paginationScrollContainer = $('<ul />', role: 'menu')
       @$body                     = @paginationScrollContainer.appendTo(@$el)
 
       @$el.find('ul')
