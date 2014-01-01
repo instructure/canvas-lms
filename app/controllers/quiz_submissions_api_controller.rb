@@ -133,6 +133,7 @@ class QuizSubmissionsApiController < ApplicationController
   before_filter :require_overridden_quiz, :except => [ :index ]
   before_filter :require_quiz_submission, :except => [ :index, :create ]
   before_filter :prepare_service, :only => [ :create, :complete ]
+  before_filter :validate_ldb_status!, :only => [ :create, :complete ]
 
   # @API Get all quiz submissions.
   # @beta
@@ -283,5 +284,17 @@ class QuizSubmissionsApiController < ApplicationController
       session,
       @context,
       Array(params[:include]))
+  end
+
+  def validate_ldb_status!(quiz = @quiz)
+    if quiz.require_lockdown_browser?
+      unless ldb_plugin.authorized?(self)
+        reject! 403, 'this quiz requires the lockdown browser'
+      end
+    end
+  end
+
+  def ldb_plugin
+    Canvas::LockdownBrowser.plugin.base
   end
 end

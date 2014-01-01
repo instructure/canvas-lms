@@ -42,6 +42,26 @@ shared_examples_for 'Quiz Submissions API Restricted Endpoints' do
     response.status.to_i.should == 403
     response.body.should match(/ip address denied/i)
   end
+
+  it 'should require the LDB' do
+    @quiz.require_lockdown_browser = true
+    @quiz.save
+
+    Quiz.stubs(:lockdown_browser_plugin_enabled?).returns true
+
+    subject.stubs(:ldb_plugin).returns {
+      fake_plugin = Object.new
+      fake_plugin.stubs(:authorized?).returns false
+      fake_plugin
+    }
+
+    @request_proxy.call true, {
+      attempt: 1
+    }
+
+    response.status.to_i.should == 403
+    response.body.should match(/requires the lockdown browser/i)
+  end
 end
 
 describe QuizSubmissionsApiController, :type => :integration do
