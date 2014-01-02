@@ -336,7 +336,7 @@ describe GradeCalculator do
 
     it "should treat muted assignments as if there is no submission" do
       # should have same scores as previous spec despite having a grade
-      nil_graded_assignment()
+      nil_graded_assignment
 
       @assignment_1.mute!
       @assignment_1.grade_student(@user, :grade => 500)
@@ -351,6 +351,29 @@ describe GradeCalculator do
       @user.reload
       @user.enrollments.first.computed_current_score.should eql(58.3)
       @user.enrollments.first.computed_final_score.should eql(48.4)
+    end
+
+    context "draft state" do
+      it "should not include unpublished assignments when draft state is enabled" do
+        two_graded_assignments
+
+        @course.account.enable_feature!(:draft_state)
+        @assignment2.unpublish
+
+        @user.reload
+        @user.enrollments.first.computed_current_score.should eql(40.0)
+        @user.enrollments.first.computed_final_score.should eql(40.0)
+      end
+
+      it "should include unpublished assignments when draft state is disabled" do
+        two_graded_assignments
+
+        @assignment2.unpublish
+
+        @user.reload
+        @user.enrollments.first.computed_current_score.should eql(60.0)
+        @user.enrollments.first.computed_final_score.should eql(60.0)
+      end
     end
   end
 

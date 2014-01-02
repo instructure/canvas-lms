@@ -236,7 +236,10 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_grades_if_details_changed
-    if @points_possible_was != self.points_possible || @grades_affected || @muted_was != self.muted
+    if @points_possible_was != self.points_possible ||
+        @grades_affected ||
+        @muted_was != self.muted ||
+        workflow_state_changed?
       connection.after_transaction_commit { self.context.recompute_student_scores }
     end
     true

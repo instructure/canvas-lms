@@ -272,4 +272,11 @@ class AssignmentGroup < ActiveRecord::Base
     self.reload
   end
 
+  def self.assignment_scope_for_grading(context)
+    if context.feature_enabled?(:draft_state)
+      :published_assignments
+    else
+      :active_assignments
+    end
+  end
 end
