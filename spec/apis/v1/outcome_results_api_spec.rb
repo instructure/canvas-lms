@@ -60,17 +60,24 @@ describe "Outcome Results API", :type => :integration do
   end
 
   let(:outcome_submission) do
-    student_in_course(active_all: true) unless @student
-    outcome_assignment.find_or_create_submission(@student)
+    create_outcome_submission
   end
 
   let(:outcome_assessment) do
+    create_outcome_assessment
+  end
+
+  def create_outcome_submission(student = outcome_student)
+    outcome_assignment.find_or_create_submission(student)
+  end
+
+  def create_outcome_assessment(student = outcome_student)
     outcome_criterion = outcome_rubric.criteria.find {|c| !c[:learning_outcome_id].nil? }
     outcome_rating = outcome_criterion[:ratings].first
     outcome_rubric_association.assess(
-      user: outcome_student,
+      user: student,
       assessor: outcome_teacher,
-      artifact: outcome_submission,
+      artifact: create_outcome_submission(student),
       assessment: {
         assessment_type: 'grading',
         "criterion_#{outcome_criterion[:id]}".to_sym => {
@@ -127,6 +134,30 @@ describe "Outcome Results API", :type => :integration do
         end
         json['linked'].keys.should == %w(outcomes)
         json['linked']['outcomes'].size.should == 1
+      end
+    end
+  end
+
+  describe "sharding" do
+    specs_require_sharding
+
+    it "returns results for users on multiple shards" do
+      student = outcome_student
+      outcome_assessment
+      student2 = @shard2.activate { User.create!(name: 'outofshard') }
+      enrollment = @course.enroll_student(student2, enrollment_state: 'active')
+      create_outcome_assessment(student2)
+      course_with_teacher_logged_in(course: @course, active_all: true)
+
+      api_call(:get, outcome_rollups_url(outcome_course),
+        controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
+      json = JSON.parse(response.body)
+      json.keys.sort.should == %w(linked rollups)
+      json['rollups'].size.should == 2
+      json['rollups'].collect{|x| x['id']}.sort.should == [student.id, student2.id].sort
+      json['rollups'].each do |rollup|
+        rollup.keys.sort.should == %w(id name scores)
+        rollup['scores'].size.should == 1
       end
     end
   end
