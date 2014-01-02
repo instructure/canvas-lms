@@ -38,6 +38,7 @@ module SFU
         # Used to match against sections starting with e.g. 'd1' for 'd100'
         main_section = section_code[0..1].downcase 
         sections = []
+        has_no_child_sections = true
 
         if details != "[]" && section_code.end_with?("00")
           details.each do |info|
@@ -45,9 +46,14 @@ module SFU
             section = info["course"]["section"].downcase
             if code.downcase == course_code.downcase && section.start_with?(main_section) && section.downcase != section_code.downcase
               sections << info["course"]["section"]
+              has_no_child_sections = false
             end
           end
         end
+
+        # Return main section e.g. d100 only for courses with no tutorial/lab sections
+        sections << section_code.upcase if has_no_child_sections
+
         sections
       end
 
