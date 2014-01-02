@@ -1,4 +1,5 @@
 define [
+  'compiled/util/round'
   'compiled/userSettings'
   '../../shared/xhr/fetch_all_pages'
   'i18n!sr_gradebook'
@@ -6,9 +7,10 @@ define [
   'underscore'
   'compiled/AssignmentDetailsDialog'
   'compiled/AssignmentMuter'
-  ], (userSettings, fetchAllPages, I18n, Ember, _,  AssignmentDetailsDialog, AssignmentMuter ) ->
+  'compiled/grade_calculator'
+  ], (round, userSettings, fetchAllPages, I18n, Ember, _,  AssignmentDetailsDialog, AssignmentMuter, GradeCalculator ) ->
 
-  {get, set} = Ember
+  {get, set, setProperties} = Ember
 
   # http://emberjs.com/guides/controllers/
   # http://emberjs.com/api/classes/Ember.Controller.html
@@ -51,7 +53,19 @@ define [
     hideStudentNames: false
     showConcludedEnrollments: false
 
+    selectedStudent: null
+
+    selectedSection: null
+
+    selectedAssignment: null
+
+    weightingScheme: null
+
     actions:
+
+      gradeUpdated: (submissions) ->
+        @updateSubmissionsFromExternal submissions
+
       selectItem: (property, goTo) ->
         list = @getListFor(property)
         currentIndex = list.indexOf(@get(property))
@@ -63,11 +77,24 @@ define [
       $.subscribe 'submissions_updated', _.bind(@updateSubmissionsFromExternal, this)
     ).on('init')
 
+    setupAssignmentGroupsChange: (->
+      $.subscribe 'assignment_group_weights_changed', _.bind(@checkWeightingScheme, this)
+      @set 'weightingScheme', ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
+    ).on('init')
+
     willDestroy: ->
       $.unsubscribe 'submissions_updated'
+      $.unsubscribe 'assignment_group_weights_changed'
       @_super()
 
-    updateSubmissionsFromExternal: (submissions)->
+    checkWeightingScheme: ({assignmentGroups})->
+      ags = @get('assignment_groups')
+      ags.clear()
+      ags.pushObjects assignmentGroups
+
+      @set 'weightingScheme', ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
+
+    updateSubmissionsFromExternal: (submissions) ->
       students = @get('students')
       subs_proxy = @get('submissions')
       selected = @get('selectedSubmission')
@@ -77,9 +104,35 @@ define [
 
         submissionsForStudent.submissions.removeObject oldSubmission
         submissionsForStudent.submissions.addObject submission
-        @updateSubmission submission, students.findBy('id', submission.user_id)
+        student = students.findBy('id', submission.user_id)
+        @updateSubmission submission, student
+        @calculateStudentGrade student
         if selected and selected.assignment_id == submission.assignment_id and selected.user_id == submission.user_id
-          @set('selectedSubmission', submission)
+          set(this, 'selectedSubmission', submission)
+
+    calculate: (submissionsArray) ->
+      GradeCalculator.calculate submissionsArray, @assignmentGroupsHash(), @get('weightingScheme')
+
+    calculateStudentGrade: (student) ->
+      if student.isLoaded
+        finalOrCurrent = if @get('includeUngradedAssignments') then 'final' else 'current'
+        submissionsAsArray = (value for key, value of student when key.match /^assignment_(?!group)/)
+        result = @calculate(submissionsAsArray)
+        for group in result.group_sums
+          set(student, "assignment_group_#{group.group.id}", group[finalOrCurrent])
+          for submissionData in group[finalOrCurrent].submissions
+            set(submissionData.submission, 'drop', submissionData.drop)
+        result = result[finalOrCurrent]
+
+        percent = round (result.score / result.possible * 100), 1
+        percent = 0 if isNaN(percent)
+        setProperties student,
+          total_grade: result
+          total_percent: percent
+
+    calculateAllGrades: (->
+      @get('students').forEach (student) => @calculateStudentGrade student
+    ).observes('includeUngradedAssignments')
 
     sectionSelectDefaultLabel: I18n.t "all_sections", "All Sections"
     studentSelectDefaultLabel: I18n.t "no_student", "No Student Selected"
@@ -92,19 +145,6 @@ define [
       @get('students').forEach (s) ->
         students[s.id] = s
       students
-
-    # properties that get set by fast select on the controller
-    #selectedStudent
-    #selectedSection
-    #selectedAssignment
-
-    studentGrades: (->
-      selected = @get('selectedStudent')
-      return null if not selected
-      #will always find the first one, but this should be OK
-      enrollment = @get('enrollments').findBy('user_id', selected.id)
-      enrollment.grades
-    ).property('selectedStudent')
 
     fetchStudentSubmissions: (->
       Ember.run.once =>
@@ -136,6 +176,7 @@ define [
           ), this
           set(student, 'isLoading', false)
           set(student, 'isLoaded', true)
+          @calculateStudentGrade student
       ), this
     ).observes('submissions.@each')
 
@@ -151,23 +192,30 @@ define [
     isDraftState: ->
       ENV.GRADEBOOK_OPTIONS.draft_state_enabled
 
-    populateAssignments: (->
-      assignment_groups = @get('assignment_groups')
-      assignments = _.flatten(assignment_groups.mapBy 'assignments')
-      assignment_proxy =  @get('assignments')
-      assignments.forEach (as) =>
-        return if assignment_proxy.findBy('id', as.id)
-        set as, 'sortable_name', as.name.toLowerCase()
-        set as, 'ag_position', assignment_groups.findBy('id', as.assignment_group_id).position
-        if as.due_at
-          set as, 'due_at', $.parseFromISO(as.due_at)
-          set as, 'sortable_date', as.due_at.timestamp
-        else
-          set as, 'sortable_date', Number.MAX_VALUE
+    processAssignment: (as, assignmentGroups) ->
+      set as, 'sortable_name', as.name.toLowerCase()
+      set as, 'ag_position', assignmentGroups.findBy('id', as.assignment_group_id).position
+      if as.due_at
+        set as, 'due_at', $.parseFromISO(as.due_at)
+        set as, 'sortable_date', as.due_at.timestamp
+      else
+        set as, 'sortable_date', Number.MAX_VALUE
 
-        assignment_proxy.pushObject as unless (@isDraftState() and as.published is false) or
-                                              as.submission_types.contains 'not_graded' or
-                                              as.submission_types.contains 'attendance' and !@get('showAttendance')
+    populateAssignments: (->
+      assignmentGroups = @get('assignment_groups')
+      assignments = _.flatten(assignmentGroups.mapBy 'assignments')
+      assignmentsProxy =  @get('assignments')
+      assignments.forEach (as) =>
+        return if assignmentsProxy.findBy('id', as.id)
+        @processAssignment(as, assignmentGroups)
+
+        shouldRemoveAssignment = (@isDraftState() and as.published is false) or
+          as.submission_types.contains 'not_graded' or
+          as.submission_types.contains 'attendance' and !@get('showAttendance')
+        if shouldRemoveAssignment
+          assignmentGroups.findBy('id', as.assignment_group_id).assignments.removeObject as
+        else
+          assignmentsProxy.pushObject as
     ).observes('assignment_groups.@each')
 
     includeUngradedAssignments: (->
@@ -212,26 +260,35 @@ define [
       sort_props = switch sort.value
         when 'assignment_group' then ['ag_position', 'position']
         when 'alpha' then ['sortable_name']
-        when 'due_date' then ['sortable_date']
+        when 'due_date' then ['sortable_date', 'sortable_name']
 
       @get('assignments').set('sortProperties', sort_props)
 
     ).observes('assignmentSort')
 
-    selectedSubmission: (->
-      return null unless @get('selectedStudent')? and @get('selectedAssignment')?
-      student = @get 'selectedStudent'
-      assignment = @get 'selectedAssignment'
-      sub = get student, "assignment_#{assignment.id}"
-      sub or {
-        user_id: student.id
-        assignment_id: assignment.id
-      }
+    selectedSubmission: ((key, selectedSubmission) ->
+      if arguments.length > 1
+        @set 'selectedStudent', @get('students').findBy('id', selectedSubmission.user_id)
+        @set 'selectedAssignment', @get('assignments').findBy('id', selectedSubmission.assignment_id)
+        selectedSubmission
+      else
+        return null unless @get('selectedStudent')? and @get('selectedAssignment')?
+        student = @get 'selectedStudent'
+        assignment = @get 'selectedAssignment'
+        sub = get student, "assignment_#{assignment.id}"
+        sub or {
+          user_id: student.id
+          assignment_id: assignment.id
+        }
     ).property('selectedStudent', 'selectedAssignment')
 
-    selectedSubmissionGrade: (->
-      @get('selectedSubmission')?.grade or '-'
-    ).property('selectedSubmission')
+    selectedStudentSections: (->
+      student = @get('selectedStudent')
+      sections = @get('sections')
+      return null unless sections.isLoaded and student?
+      sectionNames = student.sections.map (id) -> sections.findBy('id', id).name
+      sectionNames.join(', ')
+    ).property('selectedStudent', 'sections.isLoaded')
 
     assignmentDetails: (->
       return null unless @get('selectedAssignment')?
@@ -240,7 +297,7 @@ define [
         assignment: @get('selectedAssignment')
       }
       locals
-    ).property('selectedAssignment')
+    ).property('selectedAssignment', 'students.@each.total_grade')
 
     # Next/Previous Student/Assignment
 

@@ -1,13 +1,16 @@
 define [
+  'jquery'
   'underscore'
   '../start_app'
   'ember'
   '../shared_ajax_fixtures'
   '../../controllers/screenreader_gradebook_controller'
-], (_, startApp, Ember, fixtures, SRGBController) ->
+  'vendor/jquery.ba-tinypubsub'
+], ($, _, startApp, Ember, fixtures, SRGBController) ->
 
   App = null
   originalIsDraft = null
+  originalWeightingScheme = null
 
   fixtures.create()
   clone = (obj) ->
@@ -15,6 +18,7 @@ define [
 
   setup = (isDraftState=false) ->
     window.ENV.GRADEBOOK_OPTIONS.draft_state_enabled = isDraftState
+    originalWeightingScheme =  window.ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
     App = startApp()
     Ember.run =>
       @srgb = SRGBController.create()
@@ -27,6 +31,7 @@ define [
 
   teardown = ->
     window.ENV.GRADEBOOK_OPTIONS.draft_state_enabled = false
+    window.ENV.GRADEBOOK_OPTIONS.group_weighting_scheme = originalWeightingScheme
     Ember.run App, 'destroy'
 
   module 'screenreader_gradebook_controller',
@@ -41,7 +46,7 @@ define [
     equal @srgb.get('students.firstObject').name, fixtures.students[0].user.name
 
   test 'calculates assignments properly', ->
-    equal @srgb.get('assignments.length'), 6
+    equal @srgb.get('assignments.length'), 7
     ok !@srgb.get('assignments').findBy('name', 'Not Graded')
     equal @srgb.get('assignments.firstObject').name, fixtures.assignment_groups[0].assignments[0].name
 
@@ -70,9 +75,6 @@ define [
     @srgb.updateSubmission submission, student
     strictEqual student["assignment_#{submission.assignment_id}"], submission
 
-  test 'selectedSubmissionGrade is - if there is no selectedSubmission', ->
-    equal @srgb.get('selectedSubmissionGrade'), '-'
-
   test 'studentsInSelectedSection is the same as students when selectedSection is null', ->
     ok (!@srgb.get('selectedSection'))
     deepEqual @srgb.get('students'), @srgb.get('studentsInSelectedSection')
@@ -93,13 +95,13 @@ define [
     Ember.run =>
       @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'due_date'))
     equal @srgb.get('assignments.firstObject.name'), 'Can You Eat Just One?'
-    equal @srgb.get('assignments.lastObject.name'), 'Big Bowl of Nachos'
+    equal @srgb.get('assignments.lastObject.name'), 'Drink Water'
 
   test 'sorting assignments by position', ->
     Ember.run =>
       @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'assignment_group'))
     equal @srgb.get('assignments.firstObject.name'), 'Z Eats Soup'
-    equal @srgb.get('assignments.lastObject.name'), 'Can You Eat Just One?'
+    equal @srgb.get('assignments.lastObject.name'), 'Da Fish and Chips!'
 
   test 'correctly determines if prev/next student exists on load', ->
     equal @srgb.get('studentIndex'), -1
@@ -114,6 +116,14 @@ define [
     equal @srgb.get('ariaDisabledPrevAssignment'), 'true'
     equal @srgb.get('disableNextAssignmentButton'), false
     equal @srgb.get('ariaDisabledNextAssignment'), 'false'
+
+  test 'updates assignment groups and weightingScheme when event is triggered', ->
+    window.ENV.GRADEBOOK_OPTIONS.group_weighting_scheme = 'whoa'
+    Ember.run =>
+      $.publish('assignment_group_weights_changed', assignmentGroups: Ember.copy(fixtures.assignment_groups, true).slice(0,1))
+
+    equal @srgb.get('weightingScheme'), 'whoa', 'weightingScheme was updated'
+    equal @srgb.get('assignment_groups.length'), 1, 'assignment_groups was updated'
 
   module 'screenreader_gradebook_controller: with selected student',
     setup: ->
@@ -166,9 +176,6 @@ define [
     teardown: ->
       teardown.call this
 
-  test 'selectedSubmissionGrade is computed properly', ->
-    equal @srgb.get('selectedSubmissionGrade'), fixtures.submissions[0].submissions[0].grade
-
   test 'assignmentDetails is computed properly', ->
     ad = @srgb.get('assignmentDetails')
     selectedAssignment = @srgb.get('selectedAssignment')
@@ -213,7 +220,7 @@ define [
     Ember.run =>
       assignment = @srgb.get('assignments.lastObject')
       @srgb.set('selectedAssignment', assignment)
-    equal @srgb.get('assignmentIndex'), 5
+    equal @srgb.get('assignmentIndex'), 6
     equal @srgb.get('disablePrevAssignmentButton'), false
     equal @srgb.get('ariaDisabledPrevAssignment'), 'false'
     equal @srgb.get('disableNextAssignmentButton'), true
@@ -245,6 +252,90 @@ define [
       teardown.call this
 
   test 'calculates assignments properly', ->
-    equal @srgb.get('assignments.length'), 6
+    equal @srgb.get('assignments.length'), 7
     ok !@srgb.get('assignments').findBy('name', 'Unpublished Assignment')
 
+
+  calc_stub = {
+    group_sums: [
+      {
+        final:
+          possible: 100
+          score: 50
+          submission_count: 10
+          weight: 50
+          submissions: []
+        current:
+          possible: 100
+          score: 20
+          submission_count: 5
+          weight: 50
+          submissions:[]
+        group:
+          id: "1"
+      }
+    ]
+    final:
+      possible: 100
+      score: 90
+    current:
+      possible: 88
+      score: 70
+  }
+
+
+  calc_stub_with_0_possible = {
+    group_sums: [
+      {
+        final:
+          possible: 0
+          score: 50
+          submission_count: 10
+          weight: 50
+          submissions: []
+        current:
+          possible: 0
+          score: 20
+          submission_count: 5
+          weight: 50
+          submissions:[]
+        group:
+          id: "1"
+      }
+    ]
+    final:
+      possible: 0
+      score: 0
+    current:
+      possible: 0
+      score: 0
+  }
+
+  calculationSetup = (calculationStub = calc_stub) ->
+    App = startApp()
+    Ember.run =>
+      @srgb = SRGBController.create()
+      @srgb.reopen
+        calculate: ->
+          calculationStub
+
+      @srgb.set('model', {
+        enrollments: Ember.ArrayProxy.create(content: clone fixtures.students)
+        assignment_groups: Ember.ArrayProxy.create(content: clone fixtures.assignment_groups)
+        submissions: Ember.ArrayProxy.create(content: [])
+        sections: Ember.ArrayProxy.create(content: clone fixtures.sections)
+      })
+
+  module 'grade calc',
+    setup: ->
+      calculationSetup.call this
+
+  test 'calculates final grade', ->
+    equal @srgb.get('students.firstObject.total_percent'), 79.5
+
+  module 'grade calc with 0s',
+    setup: ->
+      calculationSetup.call this, calc_stub_with_0_possible
+
+  test 'calculates final grade', ->
+    equal @srgb.get('students.firstObject.total_percent'), 0

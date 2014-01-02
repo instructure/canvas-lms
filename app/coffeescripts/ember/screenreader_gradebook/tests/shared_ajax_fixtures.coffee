@@ -390,6 +390,16 @@ define [
               published: true
               muted: true
             }
+            {
+              id: '6'
+              name: 'Da Fish and Chips!'
+              points_possible: 40
+              grading_type: "pass_fail"
+              submission_types: ["none"]
+              due_at: "2013-09-01T10:00:00Z"
+              position: 9
+              assignment_group_id:'2'
+            }
           ]
         }
         {
@@ -429,6 +439,7 @@ define [
           submissions: [
             { id: '1', user_id: '1', assignment_id: '1', grade: '3' }
             { id: '2', user_id: '1', assignment_id: '2', grade: null }
+            { id: '5', user_id: '1', assignment_id: '6', grade: 'incomplete' }
           ]
         }
         {
