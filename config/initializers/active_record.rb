@@ -1245,10 +1245,12 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
 
 end
 
-ActiveRecord::Associations::AssociationProxy.class_eval do
-  def respond_to?(*args)
-    return proxy_respond_to?(*args) if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(args.first)
-    proxy_respond_to?(*args) || (load_target && @target.respond_to?(*args))
+if CANVAS_RAILS2
+  ActiveRecord::Associations::AssociationProxy.class_eval do
+    def respond_to?(*args)
+      return proxy_respond_to?(*args) if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(args.first)
+      proxy_respond_to?(*args) || (load_target && @target.respond_to?(*args))
+    end
   end
 end
 
