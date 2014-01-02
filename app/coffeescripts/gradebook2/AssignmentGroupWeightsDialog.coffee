@@ -86,4 +86,3 @@ define [
     @$dialog.dialog('close')
     @render()
     $.publish('assignment_group_weights_changed', @options)
-
