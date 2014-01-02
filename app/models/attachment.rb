@@ -352,7 +352,11 @@ class Attachment < ActiveRecord::Base
   def scribd_user
     self.scribd_doc.try(:owner) ||
       if Rails.env.production?
-        context.global_asset_string
+        if CANVAS_RAILS2
+          "#{self.context_type.downcase.first}#{self.context.shard.id.to_s(36)}-#{self.context.local_id.to_s(36)}"
+        else
+          "#{self.context_type.downcase.first}#{self.context.shard.id.to_s(36)}-#{self.local_context_id.to_s(36)}"
+        end
       else
         "canvas-#{Rails.env}"
       end
