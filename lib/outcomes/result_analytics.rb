@@ -19,6 +19,8 @@
 module Outcomes
   module ResultAnalytics
 
+    Rollup = Struct.new(:context, :scores)
+    RollupScore = Struct.new(:outcome, :score)
 
     # Public: Queries learning_outcome_results for rollup.
     #
@@ -34,7 +36,6 @@ module Outcomes
       required_opts.each { |p| raise "#{p} option is required" unless opts[p] }
       users, context, outcomes = opts.values_at(*required_opts)
 
-      # TODO: need to worry about user sharding
       order_results_for_rollup LearningOutcomeResult.where(
         context_code:        context.asset_string,
         user_id:             users.map(&:id),
@@ -60,24 +61,31 @@ module Outcomes
     # users - (Optional) Ensure rollups are included for users in this list.
     #         A listed user with no results will have an empty score array.
     #
-    # Returns a list of users and their score rollups:
-    #   [{
-    #      user: the associated user object,
-    #      scores: [{
-    #        outcome: the outcome object
-    #        score: the rollup score for all the user's results for the outcome.
-    #      }, ..., repeated for each outcome, ...]
-    #   }, ...]
-    def rollup_results(results, users=[])
+    # Returns an Array of Rollup objects.
+    def outcome_results_rollups(results, users=[])
       rollups = results.chunk(&:user_id).map do |_, user_results|
-        {
-          user: user_results.first.user,
-          scores: rollup_user_results(user_results),
-        }
+        Rollup.new(user_results.first.user, rollup_user_results(user_results))
       end
+      add_missing_user_rollups(rollups, users)
+    end
 
-      missing_users = users - rollups.map {|r| r[:user]}
-      rollups + missing_users.map {|u| {user: u, scores: []}}
+
+    # Public: Calculates an average rollup for the specified results
+    #
+    # results - An Enumeration of properly sorted LearningOutcomeResult objects.
+    # context - The context to use for the resulting rollup.
+    #
+    # Returns a Rollup.
+    def aggregate_outcome_results_rollup(results, context)
+      rollups = outcome_results_rollups(results)
+      rollup_scores = rollups.map(&:scores).flatten
+      outcome_scores = rollup_scores.group_by(&:outcome)
+
+      aggregate_scores = outcome_scores.map do |outcome, scores|
+        aggregate_score = scores.map(&:score).sum.to_f / scores.size
+        RollupScore.new(outcome, aggregate_score)
+      end
+      Rollup.new(context, aggregate_scores)
     end
 
     # Internal: Generates a rollup of the outcome results, Assuming all the
@@ -86,18 +94,24 @@ module Outcomes
     # user_results - An Enumeration of LearningOutcomeResult objects for a user
     #                sorted by outcome id.
     #
-    # Returns a hash of the rollup:
-    #   {
-    #     outcome: the outcome object
-    #     score: the rolled up score for all the results.
-    #   }
+    # Returns an Array of RollupScore objects
     def rollup_user_results(user_results)
       outcome_scores = user_results.chunk(&:learning_outcome_id).map do |_, outcome_results|
-        {
-          outcome: outcome_results.first.learning_outcome,
-          score: outcome_results.map(&:score).max
-        }
+        user_rollup_score = outcome_results.map(&:score).max
+        RollupScore.new(outcome_results.first.learning_outcome, user_rollup_score)
       end
+    end
+
+    # Internal: Adds rollups rows for users that did not have any results
+    #
+    # rollups - The list of rollup objects based on existing results.
+    # users   - The list of User objects that should have results.
+    #
+    # Returns the modified rollups list. Users without rollups will have a
+    #   rollup row with an empty scores array.
+    def add_missing_user_rollups(rollups, users)
+      missing_users = users - rollups.map(&:context)
+      rollups + missing_users.map { |u| Rollup.new(u, []) }
     end
 
     class << self

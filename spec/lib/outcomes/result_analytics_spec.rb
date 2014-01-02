@@ -20,7 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Outcomes::ResultAnalytics do
 
+  # import some stuff so we don't have to spell it out all the time
   let(:ra) { Outcomes::ResultAnalytics }
+  Rollup = Outcomes::ResultAnalytics::Rollup
+  RollupScore = Outcomes::ResultAnalytics::RollupScore
 
   # ResultAnalytics only uses a few fields, so use some mock stuff to avoid all
   # the surrounding database logic
@@ -37,14 +40,14 @@ describe Outcomes::ResultAnalytics do
   end
 
   describe '#rollup_user_results' do
-    it 'returns a hash for each distinct outcome_id' do
+    it 'returns a rollup score for each distinct outcome_id' do
       results = [
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 20],
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81], 30],
       ]
       ra.rollup_user_results(results).should == [
-        { outcome: MockOutcome[80], score: 20 },
-        { outcome: MockOutcome[81], score: 30 },
+        RollupScore.new(MockOutcome[80], 20),
+        RollupScore.new(MockOutcome[81], 30),
       ]
     end
 
@@ -56,24 +59,48 @@ describe Outcomes::ResultAnalytics do
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81], 50],
       ]
       ra.rollup_user_results(results).should == [
-        { outcome: MockOutcome[80], score: 30 },
-        { outcome: MockOutcome[81], score: 50 },
+        RollupScore.new(MockOutcome[80], 30),
+        RollupScore.new(MockOutcome[81], 50),
       ]
     end
   end
 
-  describe '#rollup_results' do
-    it 'returns a hash for each distinct user_id' do
+  describe '#outcome_results_rollups' do
+    it 'returns a rollup for each distinct user_id' do
       results = [
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 40],
         MockOutcomeResult[MockUser[20, 'b'], MockOutcome[80], 50],
       ]
       users = [MockUser[10, 'a'], MockUser[30, 'c']]
-      ra.rollup_results(results, users).should == [
-        { user: MockUser[10, 'a'], scores: [{outcome: MockOutcome[80], score: 40}] },
-        { user: MockUser[20, 'b'], scores: [{outcome: MockOutcome[80], score: 50}] },
-        { user: MockUser[30, 'c'], scores: [] },
+      ra.outcome_results_rollups(results, users).should == [
+        Rollup.new(MockUser[10, 'a'], [ RollupScore.new(MockOutcome[80], 40) ]),
+        Rollup.new(MockUser[20, 'b'], [ RollupScore.new(MockOutcome[80], 50) ]),
+        Rollup.new(MockUser[30, 'c'], []),
       ]
+    end
+  end
+
+  describe '#aggregate_outcome_results_rollup' do
+    it 'returns one rollup with the rollup averages' do
+      fake_context = MockUser.new(42, 'fake')
+      results = [
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 0.0],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 1.0],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81], 5.0],
+        MockOutcomeResult[MockUser[20, 'b'], MockOutcome[80], 2.0],
+        MockOutcomeResult[MockUser[20, 'b'], MockOutcome[81], 6.0],
+        MockOutcomeResult[MockUser[30, 'c'], MockOutcome[80], 3.0],
+        MockOutcomeResult[MockUser[40, 'd'], MockOutcome[80], 4.0],
+        MockOutcomeResult[MockUser[40, 'd'], MockOutcome[81], 7.0],
+      ]
+      aggregate_result = ra.aggregate_outcome_results_rollup(results, fake_context)
+      aggregate_result.should == Rollup.new(
+        fake_context,
+        [
+          RollupScore.new(MockOutcome[80], 2.5),
+          RollupScore.new(MockOutcome[81], 6.0),
+        ]
+      )
     end
   end
 

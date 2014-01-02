@@ -42,7 +42,7 @@ describe "Outcome Results API", :type => :integration do
     @rubric
   end
 
-  let(:outcome_outcome) do
+  let(:outcome_object) do
     outcome_rubric unless @outcome
     @outcome
   end
@@ -63,6 +63,14 @@ describe "Outcome Results API", :type => :integration do
     create_outcome_submission
   end
 
+  let(:outcome_criterion) do
+    outcome_rubric.criteria.find {|c| !c[:learning_outcome_id].nil? }
+  end
+
+  let(:first_outcome_rating) do
+    outcome_criterion[:ratings].first
+  end
+
   let(:outcome_assessment) do
     create_outcome_assessment
   end
@@ -72,8 +80,6 @@ describe "Outcome Results API", :type => :integration do
   end
 
   def create_outcome_assessment(student = outcome_student)
-    outcome_criterion = outcome_rubric.criteria.find {|c| !c[:learning_outcome_id].nil? }
-    outcome_rating = outcome_criterion[:ratings].first
     outcome_rubric_association.assess(
       user: student,
       assessor: outcome_teacher,
@@ -81,7 +87,7 @@ describe "Outcome Results API", :type => :integration do
       assessment: {
         assessment_type: 'grading',
         "criterion_#{outcome_criterion[:id]}".to_sym => {
-          points: outcome_rating[:points]
+          points: first_outcome_rating[:points]
         }
       }
     )
@@ -89,11 +95,11 @@ describe "Outcome Results API", :type => :integration do
 
   let(:outcome_result) do
     outcome_assessment
-    outcome_outcome.reload.learning_outcome_results.first
+    outcome_object.reload.learning_outcome_results.first
   end
 
-  def outcome_rollups_url(context)
-    api_v1_course_outcome_rollups_url(context)
+  def outcome_rollups_url(context, params = {})
+    api_v1_course_outcome_rollups_url(context, params)
   end
 
   describe "outcome rollups" do
@@ -113,6 +119,15 @@ describe "Outcome Results API", :type => :integration do
           controller: 'outcome_results', action: 'rollups', format: 'json', course_id: bogus_course.id.to_s)
         response.status.to_i.should == 404
       end
+
+      it "verifies the aggregate parameter" do
+        outcome_course
+        course_with_teacher_logged_in(course: @course, active_all: true)
+        raw_api_call(:get, outcome_rollups_url(@course, aggregate: 'invalid'),
+          controller: 'outcome_results', action: 'rollups', format: 'json',
+          course_id: @course.id.to_s, aggregate: 'invalid')
+        response.status.to_i.should == 400
+      end
     end
 
     describe "basic response" do
@@ -128,9 +143,39 @@ describe "Outcome Results API", :type => :integration do
         json['rollups'].each do |rollup|
           rollup.keys.sort.should == %w(id links name scores)
           rollup['links'].keys.should == %w(section)
+          rollup['links']['section'].should == @course.course_sections.first.id
           rollup['scores'].size.should == 1
           rollup['scores'].each do |score|
             score.keys.sort.should == %w(links score)
+            score['score'].should == first_outcome_rating[:points]
+            score['links'].keys.should == %w(outcome)
+            score['links']['outcome'].should == outcome_object.id
+          end
+        end
+        json['linked'].keys.should == %w(outcomes)
+        json['linked']['outcomes'].size.should == 1
+      end
+    end
+
+    describe "aggregate response" do
+      it "returns an aggregate json api structure" do
+        outcome_student
+        course_with_teacher_logged_in(course: @course, active_all: true)
+        result = outcome_result
+        api_call(:get, outcome_rollups_url(outcome_course, aggregate: 'course'),
+          controller: 'outcome_results', action: 'rollups', format: 'json',
+          course_id: outcome_course.id.to_s, aggregate: 'course')
+        json = JSON.parse(response.body)
+        json.keys.sort.should == %w(linked rollups)
+        json['rollups'].size.should == 1
+        json['rollups'].each do |rollup|
+          rollup.keys.sort.should == %w(id name scores)
+          rollup['id'].should == @course.id
+          rollup['name'].should == @course.name
+          rollup['scores'].size.should == 1
+          rollup['scores'].each do |score|
+            score.keys.sort.should == %w(links score)
+            score['score'].should == first_outcome_rating[:points]
             score['links'].keys.should == %w(outcome)
           end
         end
@@ -162,5 +207,6 @@ describe "Outcome Results API", :type => :integration do
         rollup['scores'].size.should == 1
       end
     end
+
   end
 end

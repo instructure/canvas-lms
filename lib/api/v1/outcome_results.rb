@@ -24,44 +24,83 @@ module Api::V1::OutcomeResults
   # rollups - The rollups from Outcomes::ResultAnalytics to seralize
   #
   # Returns a hash that can be converted into json.
-  def outcome_results_rollup_json(rollups, outcomes)
+  def outcome_results_rollups_json(rollups, outcomes)
     {
-      rollups: sanitize_rollups(rollups),
-      linked: {
-        outcomes: outcomes.map { |o| outcome_json(o, @current_user, session) },
-      },
+      rollups: serialize_user_rollups(rollups),
+      linked: serialize_linked_outcomes(outcomes),
     }
   end
 
-  # Internal: Returns a suitable output hash for the rollups
-  def sanitize_rollups(rollups)
+  # Public: Serializes the aggregate rollup. Uses the specified context for the
+  # id and name fields.
+  def aggregate_outcome_results_rollups_json(rollups, outcomes)
+    {
+      rollups: serialize_rollups(rollups),
+      linked: serialize_linked_outcomes(outcomes),
+    }
+  end
+
+  # Internal: Returns a hash for linked of serialized outcomes
+  def serialize_linked_outcomes(outcomes)
+    {
+      outcomes: outcomes.map { |o| outcome_json(o, @current_user, session) },
+    }
+  end
+
+  # Internal: Returns an Array of serialized rollups.
+  def serialize_rollups(rollups)
+    rollups.map { |rollup| serialize_rollup(rollup) }
+  end
+
+  # Internal: Returns a suitable output hash for the rollup.
+  def serialize_rollup(rollup)
+    # both Course and User have a name method, so this works for both.
+    {
+      id: rollup.context.id,
+      name: rollup.context.name,
+      scores: serialize_rollup_scores(rollup.scores),
+    }
+  end
+
+  # Internal: Returns a suitable output hash for the user rollups, including
+  # section information.
+  def serialize_user_rollups(rollups)
+    serialized_rollup_pairs = rollups.map do |rollup|
+      [rollup, serialize_rollup(rollup)]
+    end
+
+    serialized_rollups_with_section_duplicates = serialized_rollup_pairs.map do |rollup, serialized_rollup|
+      duplicate_rollup_row_for_sections(rollup, serialized_rollup)
+    end
+
+    serialized_rollups_with_section_duplicates.flatten(1)
+  end
+
+  # Internal: generates an array of duplicate serialized_rollups with distinct
+  # section links for each section of the user's course.
+  def duplicate_rollup_row_for_sections(rollup, serialized_rollup)
     # this is uglier than it should be to inject section ids. they really should
     # be in a 'links' section or something.
     # ideally, we would have some seperate mapping from users to course sections
-    # it will also need to change is context is ever not a course
+    # it will also need to change if context is ever not a course
     # we're mostly assuming that there is one section enrollment per user. if a user
     # is in multiple sections, they will have multiple rollup results. pagination is
     # still by user, so the counts won't match up. again, this is a very rare thing
-    results = []
-    rollups.each do |rollup|
-      row = {
-        id: rollup[:user].id,
-        name: rollup[:user].name,
-        scores: rollup[:scores].map { |score| sanitize_rollup_score(score) },
-      }
-      rollup[:user].sections_for_course(@context).each do |section|
-        results << row.merge(links: {section: section.id})
-      end
+    rollup.context.sections_for_course(@context).map do |section|
+      serialized_rollup.merge(links: {section: section.id})
     end
-    results
+  end
+
+  # Internal: Returns an Array of serialized rollup scores
+  def serialize_rollup_scores(scores)
+    scores.map { |score| serialize_rollup_score(score) }
   end
 
   # Internal: Returns a suitable output hash for the rollup score
-  def sanitize_rollup_score(score)
+  def serialize_rollup_score(score)
     {
-      score: score[:score],
-      links: {outcome: score[:outcome].id},
+      score: score.score,
+      links: {outcome: score.outcome.id},
     }
   end
-
 end
