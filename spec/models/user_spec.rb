@@ -443,6 +443,12 @@ describe User do
     @user.recent_feedback(:contexts => [@course]).should_not be_empty
   end
 
+  it "should not include recent feedback for unpublished assignments" do
+    create_course_with_student_and_assignment
+    @assignment.grade_student @user, :grade => 9
+    @assignment.unpublish
+    @user.recent_feedback(:contexts => [@course]).should be_empty
+  end
 
   describe '#courses_with_primary_enrollment' do
 

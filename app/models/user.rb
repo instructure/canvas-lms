@@ -1739,7 +1739,7 @@ class User < ActiveRecord::Base
         Shackles.activate(:slave) do
           submissions = []
           submissions += self.submissions.after(opts[:start_at]).for_context_codes(context_codes).
-            where("submissions.score IS NOT NULL AND assignments.workflow_state<>? AND assignments.muted=?", 'deleted', false).
+            where("submissions.score IS NOT NULL AND assignments.workflow_state=? AND assignments.muted=?", 'published', false).
             order('submissions.created_at DESC').
             limit(opts[:limit]).all
 
@@ -1756,9 +1756,9 @@ class User < ActiveRecord::Base
                   AND (submission_comments.author_id <> ?)
                 GROUP BY submission_id
               ) AS relevant_submission_comments ON submissions.id = submission_id
-              INNER JOIN assignments ON assignments.id = submissions.assignment_id AND assignments.workflow_state <> 'deleted'
+              INNER JOIN assignments ON assignments.id = submissions.assignment_id
             SQL
-            where(assignments: {muted: false}).
+            where(assignments: {muted: false, workflow_state: 'published'}).
             order('last_updated_at_from_db DESC').
             limit(opts[:limit]).all
 
