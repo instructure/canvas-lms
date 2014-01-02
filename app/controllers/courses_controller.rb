@@ -1621,9 +1621,11 @@ class CoursesController < ApplicationController
       f.id = course_url(@context)
     end
     @entries = []
-    @entries.concat @context.assignments.active
+    @entries.concat @context.assignments.published
     @entries.concat @context.calendar_events.active
-    @entries.concat @context.discussion_topics.active.reject{|a| a.locked_for?(@current_user, :check_policies => true) }
+    @entries.concat(@context.discussion_topics.active.select{ |dt|
+      dt.published? && !dt.locked_for?(@current_user, :check_policies => true)
+    })
     @entries.concat @context.wiki.wiki_pages
     @entries = @entries.sort_by{|e| e.updated_at}
     @entries.each do |entry|
