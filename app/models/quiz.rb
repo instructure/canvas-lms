@@ -1160,6 +1160,7 @@ class Quiz < ActiveRecord::Base
   scope :before, lambda { |date| where("quizzes.created_at<?", date) }
   scope :active, where("quizzes.workflow_state<>'deleted'")
   scope :not_for_assignment, where(:assignment_id => nil)
+  scope :available, where("quizzes.workflow_state = 'available'")
 
   def teachers
     context.teacher_enrollments.map(&:user)

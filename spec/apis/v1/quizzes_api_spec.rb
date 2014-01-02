@@ -47,7 +47,7 @@ describe QuizzesApiController, :type => :integration do
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes",
                       :controller=>"quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}")
-      
+
       quiz_ids = json.collect { |quiz| quiz['id'] }
       quiz_ids.should == quizzes.map(&:id)
     end
@@ -87,6 +87,22 @@ describe QuizzesApiController, :type => :integration do
         json = json['quizzes']
         quiz_ids = json.collect { |quiz| quiz['id'] }
         quiz_ids.should == quizzes.map(&:id).map(&:to_s)
+      end
+
+      it "limits student requests to available quizzes" do
+        student_in_course(:active_all => true)
+        quizzes = (0..3).map{ |i| @course.quizzes.create! :title => "quiz_#{i}" }
+        available_quiz = quizzes.first
+        available_quiz.workflow_state = 'available'
+        available_quiz.save!
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes",
+                        {:controller=>"quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}"},
+                        {},
+                        'Accept' => 'application/vnd.api+json')
+        json = json['quizzes']
+        quiz_ids = json.collect { |quiz| quiz['id'] }
+        quiz_ids.should == [ available_quiz.id.to_s ]
       end
     end
   end
