@@ -533,11 +533,22 @@ class ApplicationController < ActionController::Base
     @context = @courses.first
 
     if @just_viewing_one_course
-      @groups = @context.assignment_groups.active.includes(:active_assignments)
-      @assignments = @groups.map(&:active_assignments).flatten
+
+      # fake assignment used for checking if the @current_user can read unpublished assignments
+      fake = @context.assignments.new
+      fake.workflow_state = 'unpublished'
+
+      assignment_scope = :active_assignments
+      if @context.feature_enabled?(:draft_state) && !fake.grants_right?(@current_user, session, :read)
+        # user should not see unpublished assignments
+        assignment_scope = :published_assignments
+      end
+
+      @groups = @context.assignment_groups.active.includes(assignment_scope)
+      @assignments = @groups.flat_map(&assignment_scope)
     else
       assignments_and_groups = Shard.partition_by_shard(@courses) do |courses|
-        [[Assignment.active.for_course(courses).all,
+        [[Assignment.published.for_course(courses).all,
          AssignmentGroup.active.for_course(courses).order(:position).all]]
       end
       @assignments = assignments_and_groups.map(&:first).flatten
