@@ -23,7 +23,7 @@ class CustomGradebookColumn < ActiveRecord::Base
   belongs_to :course
   has_many :custom_gradebook_column_data
 
-  attr_accessible :title, :position
+  attr_accessible :title, :position, :hidden
 
   validates_presence_of :title
   validates_length_of :title, :maximum => maximum_string_length
@@ -34,13 +34,20 @@ class CustomGradebookColumn < ActiveRecord::Base
     state :deleted
   end
 
-  scope :active, where("workflow_state != 'deleted'")
+  scope :active, where(workflow_state: "active")
+  scope :not_deleted, where("workflow_state != 'deleted'")
 
   set_policy do
     given { |user, session|
       cached_context_grants_right? user, session, :view_all_grades
     }
     can :read, :manage
+  end
+
+  def hidden=(hidden)
+    self.workflow_state = Canvas::Plugin::value_to_boolean(hidden) ?
+                            "hidden" :
+                            "active"
   end
 
   alias_method :destroy!, :destroy

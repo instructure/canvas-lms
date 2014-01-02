@@ -27,7 +27,10 @@
 #      "title": "Stuff",
 #
 #      // column order
-#      "position": 1
+#      "position": 1,
+#
+#      // won't be displayed if hidden is true
+#      "hidden": false
 #    }
 class CustomGradebookColumnsApiController < ApplicationController
   before_filter :require_context, :require_user
@@ -38,11 +41,17 @@ class CustomGradebookColumnsApiController < ApplicationController
   #
   # List all custom gradebook columns for a course
   #
+  # @param include_hidden [Boolean]
+  #   Include hidden parameters (defaults to false)
+  #
   # @returns [Custom Column]
   def index
     if authorized_action? @context.custom_gradebook_columns.build,
                           @current_user, :read
-      columns = Api.paginate(@context.custom_gradebook_columns.active, self,
+      scope = value_to_boolean(params[:include_hidden]) ?
+        @context.custom_gradebook_columns.not_deleted :
+        @context.custom_gradebook_columns.active
+      columns = Api.paginate(scope, self,
                              api_v1_course_custom_gradebook_columns_url(@context))
 
       render :json => columns.map { |c|
@@ -58,6 +67,8 @@ class CustomGradebookColumnsApiController < ApplicationController
   # @argument column[title] [String]
   # @argument column[position] [Int]
   #   The position of the column relative to other custom columns
+  # @argument column[hidden] [Optional, Boolean]
+  #   Hidden columns are not displayed in the gradebook
   #
   # @returns Custom Column
   def create
@@ -71,7 +82,7 @@ class CustomGradebookColumnsApiController < ApplicationController
   #
   # @returns Custom Column
   def update
-    column = @context.custom_gradebook_columns.active.find(params[:id])
+    column = @context.custom_gradebook_columns.not_deleted.find(params[:id])
     column.attributes = params[:column]
     update_column(column)
   end
@@ -82,7 +93,7 @@ class CustomGradebookColumnsApiController < ApplicationController
   #
   # @returns Custom Column
   def destroy
-    column = @context.custom_gradebook_columns.active.find(params[:id])
+    column = @context.custom_gradebook_columns.not_deleted.find(params[:id])
     if authorized_action? column, @current_user, :manage
       column.destroy
       render :json => custom_gradebook_column_json(column,

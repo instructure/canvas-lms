@@ -36,6 +36,9 @@ describe CustomGradebookColumnsApiController, :type => :integration do
       }
       c = @course.custom_gradebook_columns.create! title: "deleted col",
                                                    position: 1
+      @hidden = @course.custom_gradebook_columns.create! title: "hidden col",
+                                                         position: 5,
+                                                         hidden: true
       c.destroy
       @user = @teacher
     end
@@ -65,6 +68,16 @@ describe CustomGradebookColumnsApiController, :type => :integration do
         course_id: @course.to_param, per_page: "1", action: "index",
         controller: "custom_gradebook_columns_api", format: "json"
       json.should == [custom_gradebook_column_json(@cols.first, @user, session)]
+    end
+
+    it 'returns hidden columns if requested' do
+      json = api_call :get,
+        "/api/v1/courses/#{@course.id}/custom_gradebook_columns?include_hidden=1",
+        course_id: @course.to_param, include_hidden: "1", action: "index",
+          controller: "custom_gradebook_columns_api", format: "json"
+      json.should == [*@cols, @hidden].map { |c|
+        custom_gradebook_column_json(c, @user, session)
+      }
     end
   end
 
@@ -136,6 +149,24 @@ describe CustomGradebookColumnsApiController, :type => :integration do
         controller: "custom_gradebook_columns_api", format: "json"
       response.should be_success
       @col.reload.should be_deleted
+    end
+
+    it 'lets you toggle the hidden state' do
+      json = api_call :put,
+        "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}",
+        {course_id: @course.to_param, id: @col.to_param, action: "update",
+         controller: "custom_gradebook_columns_api", format: "json"},
+        "column[hidden]" => "yes"
+      response.should be_success
+      @col.reload.should be_hidden
+
+      json = api_call :put,
+        "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}",
+        {course_id: @course.to_param, id: @col.to_param, action: "update",
+         controller: "custom_gradebook_columns_api", format: "json"},
+        "column[hidden]" => "no"
+      response.should be_success
+      @col.reload.should_not be_hidden
     end
   end
 end
