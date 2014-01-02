@@ -15,6 +15,8 @@ if ENV['COVERAGE'] == "1"
     SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
     add_filter '/spec/'
     add_filter '/config/'
+    add_filter '/parallelized_specs/'
+    add_filter '/db_imports/'
     add_filter 'spec_canvas'
 
     add_group 'Controllers', 'app/controllers'
