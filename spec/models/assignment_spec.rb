@@ -2550,6 +2550,37 @@ describe Assignment do
       @assignment.readable_submission_types.should == 'on paper'
     end
   end
+
+  describe '#update_grades_if_details_changed' do
+    before do
+      assignment_model
+    end
+
+    it "should update grades if points_possible changes" do
+      @assignment.context.expects(:recompute_student_scores).once
+      @assignment.points_possible = 3
+      @assignment.save!
+    end
+
+    it "should update grades if muted changes" do
+      @assignment.context.expects(:recompute_student_scores).once
+      @assignment.muted = true
+      @assignment.save!
+    end
+
+    it "should update grades if workflow_state changes" do
+      @assignment.context.expects(:recompute_student_scores).once
+      @assignment.unpublish
+    end
+
+    it "should not update grades otherwise" do
+      @assignment.context.expects(:recompute_student_scores).never
+      @assignment.title = 'hi'
+      @assignment.due_at = 1.hour.ago
+      @assignment.description = 'blah'
+      @assignment.save!
+    end
+  end
 end
 
 def setup_assignment_with_group

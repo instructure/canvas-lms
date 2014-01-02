@@ -104,7 +104,7 @@ class GradeSummaryPresenter
   end
 
   def relevant_assignments_scope
-   @context.feature_enabled?(:draft_state) ? :published_assignments : :active_assignments
+    AssignmentGroup.assignment_scope_for_grading(@context)
   end
 
   def submissions
