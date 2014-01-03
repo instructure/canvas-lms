@@ -41,7 +41,8 @@ define([
       $course_show_secondary,
       $sidebar_upload_image_form,
       $sidebar_upload_file_form,
-      $wiki_sidebar_select_folder_dialog;
+      $wiki_sidebar_select_folder_dialog,
+      treeItemCount=0;
 
   // unlikely, but there's a chance this domready call will happen after other
   // scripts try to call methods on wikiSidebar, need to re-architect this a bit
@@ -56,6 +57,13 @@ define([
   });
 
   var wikiSidebar = {
+    // Generate a new tree item id. Type can be either 'file' or 'folder'
+    generateTreeItemID: function(type) {
+      var id = type + "_" + treeItemCount;
+      treeItemCount++;
+
+      return id;
+    },
     itemSelected: function(item) {
       switch(item.item_type) {
         case 'image':
@@ -68,8 +76,13 @@ define([
     },
     fileSelected: function(node) {
       var $span = node.find('span.text'),
-          url = $span.attr('rel'),
-          title = $span.text();
+          url = $span.attr('rel');
+
+      // Remove the screenreader only from the text
+      var title = $span.clone();
+      title.find('.screenreader-only').remove()
+      title = title.text();
+
       wikiSidebar.editor.editorBox('create_link', {title: title , url: url, file: true, image: node.hasClass('image'), scribdable: node.hasClass('scribdable'), kaltura_entry_id: node.attr('data-media-entry-id'), kaltura_media_type: node.hasClass('video_playback') ? 'video' : 'audio'});
     },
     imageSelected: function($img) {
@@ -92,11 +105,15 @@ define([
       }
       if(children.length || fileCallback) {
         var file = attachment;
+        var displayName = "<span class='screenreader-only'>" + htmlEscape(file.display_name) + " " + I18n.t('aria_tree.file', 'file') + "</span>" + htmlEscape(file.display_name);
+
         $file = $tree1.find(".file_blank").clone(true);
         $file
           .attr('class', 'file')
           .attr('title', file.display_name)
           .attr('data-tooltip', '')
+          .attr('aria-level', children.data('level'))
+          .attr('id', this.generateTreeItemID('file'))
           .addClass(file.mime_class)
           .toggleClass('scribdable', file['scribdable?']);
         if(file.media_entry_id) {
@@ -105,10 +122,11 @@ define([
             .attr('data-media-entry-id', file.media_entry_id)
             .addClass(file.content_type && file.content_type.match(/video/) ? 'video_playback' : 'audio_playback');
         }
-        file.name = file.display_name;
+        file.name = displayName;
         $file.fillTemplateData({
           data: file,
-          hrefValues: ['id']
+          hrefValues: ['id'],
+          htmlValues: ['name']
         });
         if (children) {
           children.append($file);
@@ -160,11 +178,16 @@ define([
       $.ajaxJSON(url, 'GET', {}, function(data) {
         $loading.remove();
         var children = node.find('ul');
+        // Update folder level for accessiblity
+        children.data('level', children.parents('ul:first').data('level') + 1);
+
         for(var idx in data.sub_folders) {
           var folder = data.sub_folders[idx].folder;
           var $folder = $tree1.find(".folder_blank").clone(true);
           $folder.attr('class', 'folder').data('id', folder.id).addClass('folder_' + folder.id);
-          $folder.find('.name').text(folder.name);
+          $folder.find('.name').html(" <span class='screenreader-only'>" + htmlEscape(folder.name) + " " + I18n.t('aria_tree.folder', 'folder') + "</span>" + htmlEscape(folder.name) );
+          $folder.attr('aria-level', children.data('level'))
+                 .attr('id', wikiSidebar.generateTreeItemID('folder'));
           children.append($folder);
           $folder.show();
         }
@@ -279,8 +302,21 @@ define([
               } else if (node.hasClass('node')) {
                 node.children('.sign').click();
               }
+            },
+            onEnter: function (event, node){
+              if (node.hasClass('leaf') || node.hasClass('file')) {
+                wikiSidebar.fileSelected(node);
+              } else if (node.hasClass('node')) {
+                node.children('.sign').click();
+              }
             }
           });
+
+          $node = $tree1.find('.folder').first();
+          $tree1.attr('aria-activedescendant', $node.attr('id'));
+          $tree1.find('[aria-selected="true"]').attr('aria-selected', 'false');
+          $node.attr('aria-selected', 'true');
+
         }
         // defer setting up the <img>es until we click the "images" tab
         if (ui.panel.id === 'editor_tabs_4' && !$image_list.hasClass('initialized')) {

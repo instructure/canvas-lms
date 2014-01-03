@@ -183,21 +183,22 @@
     </div>
     <div class="file_list_holder <%= 'file_drop' if can_do(@context, @current_user, :manage_files) %>">
       <div class="dragging_message"><%= t('drop_files', %{Drop Files Here to upload}) %></div>
-      <div class="file_list" style="max-height: 300px; overflow: auto;">
+      <div id="file_list_container" class="file_list" style="max-height: 300px; overflow: auto;">
         <a id="folder_url" href="<%= context_url(@context, :context_folder_url, '{{ id }}').html_safe %>" style="display: none;">&nbsp;</a>
-        <ul id="tree1">
+        <ul id="tree1" role="tree" data-level="0" tabindex="0" aria-label="<%= t('aria_labels.files', 'Files, Use the up and down arrow keys to navigate through the tree. Press right to expand folders, left to collapse ') %>">
           <% @wiki_sidebar_data[:root_folders].each do |folder| %>
-            <li data-id="<%= folder.id %>" class="folder folder_<%= folder.id %>">
-              <span class='name'><%= folder.name %></span>
-              <ul></ul>
+            <li aria-level="0" aria-selected="false" role="treeitem" data-id="<%= folder.id %>" class="folder folder_<%= folder.id %>" id="root_folder_<%= folder.id %>">
+            <span class="screenreader-only"><%= folder.name %> <%= t('aria_only.folder', 'folder') %></span>
+            <span class='name'><%= folder.name %> </span>
+              <ul role="group"></ul>
             </li>
           <% end %>
-          <li class="file file_blank" style="display: none;">
+          <li aria-selected="false" role="treeitem" class="file file_blank" style="display: none;">
             <span class='name' rel="<%= context_url(@context, :context_url) %>/files/{{ id }}/download?wrap=1"></span>
           </li>
-          <li class="folder_blank" style="display: none;">
+          <li aria-selected="false" role="treeitem" class="folder_blank" style="display: none;">
             <span class='name'></span>
-            <ul></ul>
+            <ul role="group"></ul>
           </li>
           <li class="loading" style="display: none;">
             <%= t 'messages.loading', "Loading..." %>

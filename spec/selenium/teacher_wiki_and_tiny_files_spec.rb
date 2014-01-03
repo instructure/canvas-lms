@@ -51,31 +51,113 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       end
     end
 
+    describe "keyboard navigation and accessiblity" do
+      context "when on the Files tab" do
+        before do
+          wiki_page_tools_file_tree_setup
+          f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
+          driver.execute_script('$("#editor_tabs .ui-tabs-nav li:nth-child(2) a").focus()')
+        end
+
+        it "sets the first root folder with aria-selected=true when initialized" do
+          root_folder = @tree1.find_elements(:css, '[role="treeitem"]').first
+          root_folder.attribute('aria-selected').should == "true"
+        end
+
+        it "expands a folder when you press the right allow key" do
+          root_folder = @tree1.find_elements(:css, '[role="treeitem"]').first
+          @tree1.send_keys :arrow_right
+          wait_for_ajaximations
+          root_folder.attribute('aria-expanded').should == "true"
+        end
+
+        it "goes to the first child when pressing the right arrow on an expanded folder" do
+          root_folder = @tree1.find_elements(:css, '[role="treeitem"]').first
+          @tree1.send_keys :arrow_right
+          wait_for_ajaximations
+          @tree1.send_keys :arrow_right
+          wait_for_ajaximations
+          selected = @tree1.find_elements(:css, '[aria-selected="true"]').first
+          selected.attribute('id').should == root_folder.find_elements(:css, '[role="treeitem"]').first.attribute('id')
+        end
+
+        it "collapes folders when pressing the left arrow" do
+          root_folder = @tree1.find_elements(:css, '[role="treeitem"]').first
+          @tree1.send_keys :arrow_right
+          wait_for_ajaximations
+          root_folder.attribute('aria-expanded').should == "true"
+
+          @tree1.send_keys :arrow_left
+          wait_for_ajaximations
+          root_folder.attribute('aria-expanded').should == "false"
+        end
+
+        it "goes to the next file avalible when pressing down" do 
+          root_folder = @tree1.find_elements(:css, '[role="treeitem"]').first
+          @tree1.send_keys :arrow_right
+          wait_for_ajaximations
+          @tree1.send_keys :arrow_down
+          wait_for_ajaximations
+          selected = @tree1.find_elements(:css, '[aria-selected="true"]').first
+          selected.attribute('id').should == root_folder.find_elements(:css, '[role="treeitem"]').first.attribute('id')
+        end
+
+        it "goes to the prevous file avalible when pressing up" do 
+          root_folder = @tree1.find_elements(:css, '[role="treeitem"]').first
+          @tree1.send_keys :arrow_right
+          wait_for_ajaximations
+          @tree1.send_keys :arrow_down
+          wait_for_ajaximations
+          @tree1.send_keys :arrow_up
+          wait_for_ajaximations
+
+          selected = @tree1.find_elements(:css, '[aria-selected="true"]').first
+          selected.attribute('id').should == root_folder.attribute('id')
+
+        end
+
+        it "doesn't change aria-selected when pressing enter" do
+          root_folder = @tree1.find_elements(:css, '[role="treeitem"]').first
+          @tree1.send_keys :arrow_right
+          wait_for_ajaximations
+          @tree1.send_keys :arrow_down
+          wait_for_ajaximations
+          @tree1.send_keys :arrow_down
+          wait_for_ajaximations
+          @tree1.send_keys :arrow_down
+          wait_for_ajaximations
+          @tree1.send_keys(:return)
+          selected = @tree1.find_elements(:css, '[aria-selected="true"]').first
+          selected.attribute('id').should == root_folder.find_elements(:css, '[role="treeitem"]')[2].attribute('id')
+        end
+      end
+
+    end
     it "should lazy load files" do
       wiki_page_tools_file_tree_setup
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
 
       root_folders = @tree1.find_elements(:css, 'li.folder')
       root_folders.length.should == 1
-      root_folders.first.find_element(:css, '.name').text.should == 'course files'
+      root_folders.first.find_element(:css, '.name').text.should include_text('course files')
 
       root_folders.first.find_element(:css, '.sign.plus').click
       wait_for_ajaximations
 
       sub_folders = root_folders.first.find_elements(:css, 'li.folder')
       sub_folders.length.should == 1
-      sub_folders.first.find_element(:css, '.name').text.should == 'subfolder'
+      sub_folders.first.find_element(:css, '.name').text.should include_text('subfolder')
 
       text_file = root_folders.first.find_elements(:css, 'li.file.text')
       text_file.length.should == 1
-      text_file.first.find_element(:css, '.name').text.should == 'text_file.txt'
+      text_file.first.find_element(:css, '.name').text.should include_text('text_file.txt')
 
       sub_folders.first.find_element(:css, '.sign.plus').click
       wait_for_ajaximations
 
       sub_sub_folders = sub_folders.first.find_elements(:css, 'li.folder')
       sub_sub_folders.length.should == 1
-      sub_sub_folders.first.find_element(:css, '.name').text.should == 'subsubfolder'
+      sub_sub_folders.first.find_element(:css, '.name').text.should include_text('subsubfolder')
 
     end
 
@@ -240,7 +322,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       f('li.folder span').click
       wait_for_ajaximations
       ff('li.folder li.folder').count.should == 2
-      f('li.folder li.folder .name').text.should == "visible subfolder"
+      f('li.folder li.folder .name').text.should include_text("visible subfolder")
     end
 
     it "should show sub-folder in the sidebar if it is hidden" do

@@ -94,7 +94,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       f('li.folder span').click
       wait_for_ajaximations
       ff('li.folder li.folder').count.should == 1
-      f('li.folder li.folder .name').text.should == "visible subfolder"
+      f('li.folder li.folder .name').text.should include_text("visible subfolder")
     end
 
     it "should not show sub-folder in the sidebar if it is hidden" do
@@ -106,7 +106,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       f('li.folder span').click
       wait_for_ajaximations
       ff('li.folder li.folder').count.should == 1
-      f('li.folder li.folder .name').text.should == "visible subfolder"
+      f('li.folder li.folder .name').text.should include_text("visible subfolder")
     end
 
     it "should not show file in the sidebar if it is hidden" do
@@ -121,7 +121,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       f('li.folder span').click
       wait_for_ajaximations
       ff('li.folder li.file').count.should == 1
-      f('li.folder li.file .name').text.should == "foo.txt"
+      f('li.folder li.file .name').text.should include_text("foo.txt")
     end
 
     it "should not show file in the sidebar if it is locked" do
@@ -138,7 +138,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
         wait_for_ajaximations
         ff('li.folder li.file').count.should == 1
       end
-      f('li.folder li.file .name').text.should == "foo.txt"
+      f('li.folder li.file .name').text.should include_text("foo.txt")
     end
   end
 
