@@ -16,7 +16,11 @@ require [
   $('#content').append(wikiPageEditView.$el)
 
   wikiPageEditView.on 'cancel', ->
+    created_at = wikiPage.get('created_at')
     html_url = wikiPage.get('html_url')
-    window.location.href = html_url if html_url
+    if !created_at || !html_url
+      window.location.href = ENV.WIKI_PAGES_PATH if ENV.WIKI_PAGES_PATH
+    else
+      window.location.href = html_url
 
   wikiPageEditView.render()

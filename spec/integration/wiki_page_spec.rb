@@ -115,6 +115,7 @@ describe WikiPagesController do
       end
 
       it "should forward /wiki to /pages/front-page" do
+        @front.save!
         @front.set_as_front_page!
         get @base_url + "wiki"
         response.code.should == '302'

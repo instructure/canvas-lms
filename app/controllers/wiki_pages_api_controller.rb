@@ -650,6 +650,11 @@ class WikiPagesApiController < ApplicationController
         return @page.set_as_front_page!
       end
     end
+
+    if !@context.feature_enabled?(:draft_state)
+      @page.set_as_front_page! if !@wiki.has_front_page? && @page.is_front_page? && !@page.deleted?
+    end
+
     return true
   end
 end

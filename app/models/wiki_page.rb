@@ -571,10 +571,6 @@ class WikiPage < ActiveRecord::Base
   end
 
   def initialize_wiki_page(user)
-    unless context.feature_enabled?(:draft_state)
-      set_as_front_page! if !wiki.has_front_page? and url == Wiki::DEFAULT_FRONT_PAGE_URL
-    end
-
     is_privileged_user = wiki.grants_right?(user, :manage)
     if is_privileged_user && context.feature_enabled?(:draft_state) && !context.is_a?(Group)
       self.workflow_state = 'unpublished'
@@ -587,6 +583,7 @@ class WikiPage < ActiveRecord::Base
     if is_front_page?
       self.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if context.is_a?(Course)
       self.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if context.is_a?(Group)
+      self.workflow_state = 'active'
     end
   end
 end

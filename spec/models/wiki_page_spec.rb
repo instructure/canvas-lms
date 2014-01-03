@@ -269,20 +269,43 @@ describe WikiPage do
   end
 
   context 'initialize_wiki_page' do
-    it 'should set the course front page body' do
-      course_with_teacher_logged_in
-      front_page = @course.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
-      front_page.body.should be_nil
-      front_page.initialize_wiki_page(@teacher)
-      front_page.body.should_not be_empty
+    context 'on a course' do
+      before do
+        course_with_teacher_logged_in
+      end
+
+      it 'should set the front page body' do
+        front_page = @course.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
+        front_page.body.should be_nil
+        front_page.initialize_wiki_page(@teacher)
+        front_page.body.should_not be_empty
+      end
+
+      context 'with draft state' do
+        before do
+          @course.account.allow_feature!(:draft_state)
+          @course.enable_feature!(:draft_state)
+        end
+
+        it 'should publish the front page' do
+          front_page = @course.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
+          front_page.initialize_wiki_page(@teacher)
+          front_page.should be_published
+        end
+      end
     end
 
-    it 'should set the group front page body' do
-      group_with_user_logged_in
-      front_page = @group.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
-      front_page.body.should be_nil
-      front_page.initialize_wiki_page(@user)
-      front_page.body.should_not be_empty
+    context 'on a group' do
+      before do
+        group_with_user_logged_in
+      end
+
+      it 'should set the front page body' do
+        front_page = @group.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
+        front_page.body.should be_nil
+        front_page.initialize_wiki_page(@user)
+        front_page.body.should_not be_empty
+      end
     end
   end
 
