@@ -24,7 +24,7 @@ describe "web conference" do
       wait_for_ajaximations
       keep_trying_until do
         replace_content(f('#web_conference_title'), conference_title)
-        f('#add_conference_form .btn-primary').click
+        f('.ui-dialog .btn-primary').click
         wait_for_ajaximations
         fj("#new-conference-list .ig-title").should be_displayed
       end
@@ -37,7 +37,7 @@ describe "web conference" do
       wait_for_ajaximations
       keep_trying_until do
         replace_content(f('#web_conference_title'), conference_title)
-        f('#add_conference_form button.cancel_button').click
+        f('.ui-dialog button.cancel_button').click
         wait_for_ajaximations
       end
       f('#add_conference_form').should_not be_displayed

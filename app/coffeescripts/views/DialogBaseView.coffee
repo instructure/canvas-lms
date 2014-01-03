@@ -45,6 +45,7 @@ define [
       resizable: false
       buttons: [
         text: I18n.t '#buttons.cancel', 'Cancel'
+        'class' : 'cancel_button'
         click: @cancel
       ,
         text: I18n.t '#buttons.update', 'Update'
