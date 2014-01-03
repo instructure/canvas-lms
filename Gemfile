@@ -166,6 +166,7 @@ group :test do
   gem 'yard-appendix', '>=0.1.8'
   gem 'timecop', '0.6.3'
   gem 'test-unit', '1.2.3'
+  gem 'bullet', '4.5.0', :require => false
 end
 
 group :development do
