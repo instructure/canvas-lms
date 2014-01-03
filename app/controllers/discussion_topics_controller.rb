@@ -714,6 +714,7 @@ class DiscussionTopicsController < ApplicationController
           assignment = @topic.assignment
           @topic.assignment = nil
           @topic.save!
+          assignment.discussion_topic = nil
           assignment.destroy
         end
 
