@@ -161,6 +161,7 @@ group :test do
   gem 'sequel', '4.5.0', :require => false
   gem 'selenium-webdriver', '2.37.0'
   gem 'webrat', '0.7.3'
+  gem 'webmock', '1.16.1', :require => false
   gem 'yard', '0.8.0'
   gem 'yard-appendix', '>=0.1.8'
   gem 'timecop', '0.6.3'

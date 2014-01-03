@@ -40,7 +40,7 @@ class ContextController < ApplicationController
       render :json => @media_object
     end
   end
-  
+
   def media_object_inline
     @show_embedded_chat = false
     @show_left_side = false
@@ -48,13 +48,13 @@ class ContextController < ApplicationController
     @media_object = MediaObject.by_media_id(params[:id]).first
     render
   end
-  
+
   def media_object_redirect
     mo = MediaObject.by_media_id(params[:id]).first
     mo.viewed! if mo
     config = Kaltura::ClientV3.config
     if config
-      redirect_to Kaltura::ClientV3.new.assetSwfUrl(params[:id], request.ssl? ? "https" : "http")
+      redirect_to Kaltura::ClientV3.new.assetSwfUrl(params[:id])
     else
       render :text => t(:media_objects_not_configured, "Media Objects not configured")
     end
@@ -75,8 +75,7 @@ class ContextController < ApplicationController
       redirect_to Kaltura::ClientV3.new.thumbnail_url(mo.try(:media_id) || media_id,
                                                       :width => width,
                                                       :height => height,
-                                                      :type => type,
-                                                      :protocol => (request.ssl? ? "https" : "http")),
+                                                      :type => type),
                   :status => 301
     else
       render :text => t(:media_objects_not_configured, "Media Objects not configured")
@@ -238,7 +237,7 @@ class ContextController < ApplicationController
       end
     end
   end
-  
+
   def mark_inbox_as_read
     flash[:notice] = t(:all_marked_read, "Inbox messages all marked as read")
     if @current_user

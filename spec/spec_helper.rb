@@ -36,6 +36,18 @@ require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
+def require_webmock
+  # pull in webmock for selected tests, but leave it disabled by default.
+  # funky require order is to skip typhoeus because of an incompatibility
+  # see: https://github.com/typhoeus/typhoeus/issues/196
+  require 'webmock/util/version_checker'
+  require 'webmock/http_lib_adapters/http_lib_adapter_registry'
+  require 'webmock/http_lib_adapters/http_lib_adapter'
+  require 'webmock/http_lib_adapters/typhoeus_hydra_adapter'
+  WebMock::HttpLibAdapterRegistry.instance.http_lib_adapters.delete :typhoeus
+  require 'webmock/rspec'
+end
+
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
 # so we remove rspec's definition. This does not prevent 'context' from being
@@ -1209,5 +1221,3 @@ end
 Dir[Rails.root+'vendor/plugins/*/spec_canvas/spec_helper.rb'].each do |f|
   require f
 end
-
-
