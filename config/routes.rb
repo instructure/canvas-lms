@@ -852,6 +852,7 @@ routes.draw do
     scope(:controller => :tabs) do
       get "courses/:course_id/tabs", :action => :index, :path_name => 'course_tabs'
       get "groups/:group_id/tabs", :action => :index, :path_name => 'group_tabs'
+      put "courses/:course_id/tabs/:tab_id", :action => :update
     end
 
     scope(:controller => :sections) do
