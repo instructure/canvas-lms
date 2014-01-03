@@ -69,6 +69,9 @@ class CustomGradebookColumnsApiController < ApplicationController
   #   The position of the column relative to other custom columns
   # @argument column[hidden] [Optional, Boolean]
   #   Hidden columns are not displayed in the gradebook
+  # @argument column[teacher_notes] [Optional, Boolean]
+  #   Set this if the column is created by a teacher.  The gradebook only
+  #   supports one teacher_notes column.
   #
   # @returns Custom Column
   def create

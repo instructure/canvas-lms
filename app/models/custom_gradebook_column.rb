@@ -23,7 +23,7 @@ class CustomGradebookColumn < ActiveRecord::Base
   belongs_to :course
   has_many :custom_gradebook_column_data
 
-  attr_accessible :title, :position, :hidden
+  attr_accessible :title, :position, :teacher_notes, :hidden
 
   validates_presence_of :title
   validates_length_of :title, :maximum => maximum_string_length

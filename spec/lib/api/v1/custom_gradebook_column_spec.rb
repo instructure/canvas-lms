@@ -14,7 +14,7 @@ describe "Api::V1::CustomGradebookColumn" do
 
   describe "custom_gradebook_column_json" do
     it "works" do
-      json = @col.attributes.slice(*%w(id title position))
+      json = @col.attributes.slice(*%w(id title position teacher_notes))
       json["hidden"] = false
       controller.custom_gradebook_column_json(@col, @teacher, nil).should == json
     end
