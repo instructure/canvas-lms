@@ -146,7 +146,7 @@ class GradeSummaryPresenter
     @stats ||= @context.active_assignments
     .joins(:submissions)
     .group("assignments.id")
-    .select("assignments.id, max(score), min(score), avg(score)")
+    .select("assignments.id, max(score) max, min(score) min, avg(score) avg")
     .index_by(&:id)
   end
 
