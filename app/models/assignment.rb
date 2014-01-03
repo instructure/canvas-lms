@@ -1880,6 +1880,10 @@ class Assignment < ActiveRecord::Base
     self.submissions.having_submission.where("user_id IS NOT NULL").exists?
   end
 
+  def can_unpublish?
+    !has_student_submissions?
+  end
+
   # override so validations are called
   def publish
     self.workflow_state = 'published'

@@ -566,6 +566,10 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
+  def can_unpublish?
+    !is_front_page?
+  end
+
   def initialize_wiki_page(user)
     unless context.feature_enabled?(:draft_state)
       set_as_front_page! if !wiki.has_front_page? and url == Wiki::DEFAULT_FRONT_PAGE_URL

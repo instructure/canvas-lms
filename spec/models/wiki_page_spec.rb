@@ -74,6 +74,15 @@ describe WikiPage do
     new_front_page.valid?.should_not be_true
   end
 
+  it "shouldn't allow the front page to be unpublished" do
+    course_with_teacher(active_all: true, draft_state: true)
+    front_page = @course.wiki.front_page
+    front_page.should_not be_can_unpublish
+    # the data model doesn't actually disallow this (yet)
+    # front_page.workflow_state = 'unpublished'
+    # front_page.should_not be_valid
+  end
+
   it "should transliterate unicode characters in the title for the url" do
     course_with_teacher(:active_all => true)
     page = @course.wiki.wiki_pages.create!(:title => "æ vęrÿ ßpéçïâł なまえ ¼‽")

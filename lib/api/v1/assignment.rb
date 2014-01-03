@@ -173,7 +173,7 @@ module Api::V1::Assignment
 
     if assignment.context.feature_enabled?(:draft_state)
       hash['published'] = ! assignment.unpublished?
-      hash['unpublishable'] = !assignment.has_student_submissions?
+      hash['unpublishable'] = assignment.can_unpublish?
     end
 
     if submission = opts[:submission]

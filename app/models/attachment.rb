@@ -1737,4 +1737,8 @@ class Attachment < ActiveRecord::Base
     end
     false
   end
+
+  def can_unpublish?
+    false
+  end
 end
