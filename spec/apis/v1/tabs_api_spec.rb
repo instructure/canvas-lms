@@ -39,78 +39,111 @@ describe TabsController, type: :request do
         {
           "id" => "home",
           "html_url" => "/courses/#{@course.id}",
-          "type" => "internal",
-          "label" => "Home"
+          "position" => 1,
+          "visibility" => "public",
+          "label" => "Home",
+          "type" => "internal"
         },
         {
           "id" => "announcements",
-          "label" => "Announcements",
           "html_url" => "/courses/#{@course.id}/announcements",
+          "position" => 2,
+          "unused" => true,
+          "visibility" => "admins",
+          "label" => "Announcements",
           "type" => "internal"
         },
         {
           "id" => "assignments",
           "html_url" => "/courses/#{@course.id}/assignments",
+          "position" => 3,
+          "unused" => true,
+          "visibility" => "admins",
           "label" => "Assignments",
           "type" => "internal"
         },
         {
           "id" => "discussions",
           "html_url" => "/courses/#{@course.id}/discussion_topics",
+          "position" => 4,
+          "visibility" => "public",
           "label" => "Discussions",
           "type" => "internal"
         },
         {
           "id" => "grades",
           "html_url" => "/courses/#{@course.id}/grades",
+          "position" => 5,
+          "visibility" => "public",
           "label" => "Grades",
           "type" => "internal"
         },
         {
           "id" => "people",
           "html_url" => "/courses/#{@course.id}/users",
+          "position" => 6,
+          "visibility" => "public",
           "label" => "People",
           "type" => "internal"
         },
         {
           "id" => "pages",
           "html_url" => "/courses/#{@course.id}/wiki",
+          "position" => 7,
+          "unused" => true,
+          "visibility" => "admins",
           "label" => "Pages",
           "type" => "internal"
         },
         {
           "id" => "files",
           "html_url" => "/courses/#{@course.id}/files",
+          "position" => 8,
+          "unused" => true,
+          "visibility" => "admins",
           "label" => "Files",
           "type" => "internal"
         },
         {
           "id" => "syllabus",
           "html_url" => "/courses/#{@course.id}/assignments/syllabus",
+          "position" => 9,
+          "visibility" => "public",
           "label" => "Syllabus",
           "type" => "internal"
         },
         {
           "id" => "outcomes",
           "html_url" => "/courses/#{@course.id}/outcomes",
+          "position" => 10,
+          "unused" => true,
+          "visibility" => "admins",
           "label" => "Outcomes",
           "type" => "internal"
         },
         {
           "id" => "quizzes",
           "html_url" => "/courses/#{@course.id}/quizzes",
+          "position" => 11,
+          "unused" => true,
+          "visibility" => "admins",
           "label" => "Quizzes",
           "type" => "internal"
         },
         {
           "id" => "modules",
           "html_url" => "/courses/#{@course.id}/modules",
+          "position" => 12,
+          "unused" => true,
+          "visibility" => "admins",
           "label" => "Modules",
           "type" => "internal"
         },
         {
           "id" => "settings",
           "html_url" => "/courses/#{@course.id}/settings",
+          "position" => 13,
+          "visibility" => "admins",
           "label" => "Settings",
           "type" => "internal"
         }
@@ -156,39 +189,216 @@ describe TabsController, type: :request do
           "id" => "home",
           "html_url" => "/groups/#{@group.id}",
           "type" => "internal",
-          "label" => "Home"
+          "label" => "Home",
+          "position"=>1,
+          "visibility"=>"public"
         },
         {
           "id" => "announcements",
           "label" => "Announcements",
           "html_url" => "/groups/#{@group.id}/announcements",
+          "position"=>2,
+          "visibility"=>"public",
           "type" => "internal"
         },
         {
           "id" => "pages",
           "html_url" => "/groups/#{@group.id}/wiki",
           "label" => "Pages",
+          "position"=>3,
+          "visibility"=>"public",
           "type" => "internal"
         },
         {
           "id" => "people",
           "html_url" => "/groups/#{@group.id}/users",
           "label" => "People",
+          "position"=>4,
+          "visibility"=>"public",
           "type" => "internal"
         },
         {
           "id" => "discussions",
           "html_url" => "/groups/#{@group.id}/discussion_topics",
           "label" => "Discussions",
+          "position"=>5,
+          "visibility"=>"public",
           "type" => "internal"
         },
         {
           "id" => "files",
           "html_url" => "/groups/#{@group.id}/files",
           "label" => "Files",
+          "position"=>6,
+          "visibility"=>"public",
           "type" => "internal"
         }
       ]
     end
+
+    it "doesn't include hidden tabs for student" do
+      course_with_student(active_all: true)
+      tab_ids = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 4, 10, 13]
+      hidden_tabs = [3, 8, 5]
+      @course.tab_configuration = tab_ids.map do |n|
+        hash = {'id' => n}
+        hash['hidden'] = true if hidden_tabs.include?(n)
+        hash
+      end
+      @course.save
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", { :controller => 'tabs', :action => 'index',
+                                                                    :course_id => @course.to_param, :format => 'json'})
+      json.count.should == 3
+      json.each {|t| %w{home syllabus people}.should include(t['id'])}
+    end
+
+    describe "teacher in a course" do
+      before :each do
+        course_with_teacher(active_all: true)
+        @tab_ids = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 4, 10, 13]
+        @tab_lookup = {}.with_indifferent_access
+        @course.tabs_available(@teacher, :api => true).each do |t|
+          t = t.with_indifferent_access
+          @tab_lookup[t['css_class']] = t['id']
+        end
+      end
+
+
+      it 'should have the correct position' do
+        tab_order = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 4, 10, 13]
+        @course.tab_configuration = tab_order.map { |n| {'id' => n} }
+        @course.save
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", {:controller => 'tabs', :action => 'index',
+                                                                     :course_id => @course.to_param, :format => 'json'})
+        json.each { |t| t['position'].should == tab_order.find_index(@tab_lookup[t['id']]) + 1 }
+      end
+
+      it 'should correctly label navigation items as unused' do
+        unused_tabs = %w{announcements assignments pages files outcomes quizzes modules}
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", {:controller => 'tabs', :action => 'index',
+                                                                     :course_id => @course.to_param, :format => 'json'})
+        json.each do |t|
+          if unused_tabs.include? t['id']
+            t['unused'].should be_true
+          else
+            t['unused'].should be_false
+          end
+        end
+      end
+
+      it 'should label hidden items correctly' do
+        hidden_tabs = [3, 8, 5]
+        @course.tab_configuration = @tab_ids.map do |n|
+          hash = {'id' => n}
+          hash['hidden'] = true if hidden_tabs.include?(n)
+          hash
+        end
+        @course.save
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", {:controller => 'tabs', :action => 'index',
+                                                                     :course_id => @course.to_param, :format => 'json'})
+        json.each do |t|
+          if hidden_tabs.include? @tab_lookup[t['id']]
+            t['hidden'].should be_true
+          else
+            t['hidden'].should be_false
+          end
+        end
+      end
+
+      it 'correctly sets visibility' do
+        hidden_tabs = [3, 8, 5]
+        public_visibility = %w{home people syllabus}
+        admins_visibility = %w{announcements assignments pages files outcomes quizzes modules settings discussions grades}
+        @course.tab_configuration = @tab_ids.map do |n|
+          hash = {'id' => n}
+          hash['hidden'] = true if hidden_tabs.include?(n)
+          hash
+        end
+        @course.save
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", {:controller => 'tabs', :action => 'index',
+                                                                     :course_id => @course.to_param, :format => 'json'})
+        json.each do |t|
+          if t['visibility'] == 'public'
+            public_visibility.should include(t['id'])
+          elsif t['visibility'] == 'admins'
+            admins_visibility.should include(t['id'])
+          else
+            true.should be_false
+          end
+        end
+      end
+
+      it 'sorts tabs correctly' do
+        course_with_teacher(active_all: true)
+        tab_order = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 4, 10, 13]
+        @course.tab_configuration = tab_order.map { |n| {'id' => n} }
+        @course.save
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", {:controller => 'tabs', :action => 'index',
+                                                                     :course_id => @course.to_param, :format => 'json'})
+        json.each_with_index { |t, i| t['position'].should == i+1 }
+      end
+
+    end
+
   end
+
+  describe 'update' do
+    it 'sets the people tab to hidden' do
+      tab_id = 'people'
+      course_with_teacher(active_all: true)
+      json = api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
+                                                                   :course_id => @course.to_param, :tab_id => tab_id,
+                                                                   :format => 'json', :hidden => true})
+      json['hidden'].should == true
+      @course.reload.tab_configuration[json['position'] - 1]['hidden'].should == true
+    end
+
+    it 'changes the position of the people tab to 2' do
+      tab_id = 'people'
+      course_with_teacher(active_all: true)
+      json = api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
+                                                                             :course_id => @course.to_param, :tab_id => tab_id,
+                                                                             :format => 'json', :position => 2})
+      json['position'].should == 2
+      @course.reload.tab_configuration[1]['id'].should == @course.class::TAB_PEOPLE
+    end
+
+    it "won't allow you to hide the home tab" do
+      tab_id = 'home'
+      course_with_teacher(active_all: true)
+      result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
+                                                                             :course_id => @course.to_param, :tab_id => tab_id,
+                                                                             :format => 'json', :hidden => true})
+      result.should == 400
+    end
+
+    it "won't allow you to move a tab to the first position" do
+      tab_id = 'people'
+      course_with_teacher(active_all: true)
+      result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
+                                                                             :course_id => @course.to_param, :tab_id => tab_id,
+                                                                             :format => 'json', :position => 1})
+      result.should == 400
+    end
+
+    it "won't allow you to move a tab to an invalid position" do
+      tab_id = 'people'
+      course_with_teacher(active_all: true)
+      result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
+                                                                                   :course_id => @course.to_param, :tab_id => tab_id,
+                                                                                   :format => 'json', :position => 400})
+      result.should == 400
+    end
+
+    it "doesn't allow a student to modify a tab" do
+      course_with_student(active_all: true)
+      tab_id = 'people'
+      result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
+                                                                                   :course_id => @course.to_param, :tab_id => tab_id,
+                                                                                   :format => 'json', :position => 4})
+      result.should == 401
+    end
+
+  end
+
 end

@@ -2586,7 +2586,7 @@ class Course < ActiveRecord::Base
           tabs.detect { |t| t[:id] == TAB_SYLLABUS }[:manageable] = true
           tabs.detect { |t| t[:id] == TAB_QUIZZES }[:manageable] = true
         end
-        tabs.delete_if { |t| t[:hidden] && t[:external] }
+        tabs.delete_if { |t| t[:hidden] && t[:external] } unless opts[:api] && self.grants_rights?(user, nil, :manage_content)
         tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_rights?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades).values.any?
         tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if self.grants_rights?(user, opts[:session], :view_all_grades, :manage_grades).values.any?
         tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_rights?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users).values.any?
