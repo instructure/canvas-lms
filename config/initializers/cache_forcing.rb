@@ -32,46 +32,22 @@ class << Rails
     @forced_cache_stack ||= []
   end
 
-  # forces RAILS_CACHE to be the given cache store. if the argument
-  # is a config, will instantiate that config into a store
+  # forces Rails.cache to always return the given cache store. if the argument
+  # is a config, will instantiate that config into a store so that repeated
+  # calls to Rails.cache (before it is unforced) will return the same store.
   def force_cache!(new_cache=:memory_store)
-    # normalize new_cache into an instantiated cache store
     new_cache ||= :null_store
     if CANVAS_RAILS2 && new_cache == :null_store
       require 'nil_store'
       new_cache = NilStore.new
     end
     new_cache = ActiveSupport::Cache.lookup_store(new_cache)
-
-    # save off old cache state
-    forced_cache_stack.push([RAILS_CACHE, ActionController::Base.perform_caching])
-
-    # set new cache state
-    if CANVAS_RAILS2
-      ActionController::Base.cache_store = new_cache
-      silence_warnings { Object.const_set(:RAILS_CACHE, new_cache) }
-    else
-      Switchman::DatabaseServer.all.each{ |s| s.stubs(:cache_store).returns(new_cache) }
-    end
-    ActionController::Base.perform_caching = true
+    forced_cache_stack.push(new_cache)
   end
 
   # stops forcing Rails.cache, letting it revert to its previous behavior.
   def unforce_cache!
-    # no-op if caching is not currently forced
-    return unless cache_forced?
-
-    # pop state to restore from stack
-    old_cache, old_perform_caching = forced_cache_stack.pop
-
-    # set back to saved state
-    if CANVAS_RAILS2
-      ActionController::Base.cache_store = old_cache
-      silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
-    else
-      Switchman::DatabaseServer.all.each {|s| s.unstub(:cache_store) }
-    end
-    ActionController::Base.perform_caching = old_perform_caching
+    forced_cache_stack.pop
   end
 
   # as force_cache!, but only for the duration of the given block.
@@ -87,6 +63,11 @@ class << Rails
     forced_cache_stack.present?
   end
 
+  def cache_with_forcing
+    cache_forced? ? forced_cache_stack.last : cache_without_forcing
+  end
+  alias_method_chain :cache, :forcing
+
   # specific case of force_cache! with a :null_store as the forcing target,
   # effectively disabling the cache.
   def disable_cache!
@@ -97,4 +78,30 @@ class << Rails
   def disable_cache
     force_cache(:null_store) { yield }
   end
+end
+
+class << ActionController::Base
+  # while Rails.cache is being forced, this is forced true.
+  def perform_caching_with_forcing
+    Rails.cache_forced? || perform_caching_without_forcing
+  end
+  alias_method_chain :perform_caching, :forcing
+
+  def cache_store_with_forcing
+    Rails.cache_forced? ? Rails.cache : cache_store_without_forcing
+  end
+  alias_method_chain :cache_store, :forcing
+end
+
+# ditto for instances
+class ActionController::Base
+  def perform_caching_with_forcing
+    Rails.cache_forced? || perform_caching_without_forcing
+  end
+  alias_method_chain :perform_caching, :forcing
+
+  def cache_store_with_forcing
+    Rails.cache_forced? ? Rails.cache : cache_store_without_forcing
+  end
+  alias_method_chain :cache_store, :forcing
 end
