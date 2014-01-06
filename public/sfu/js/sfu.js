@@ -37,9 +37,25 @@
 
 
     // header rainbow
-
     $('#header').append('<div id="header-rainbow">');
-    $('#topbar .logout').before('<li><a href="http://www.sfu.ca/canvas" target=_blank>Help</a></li>')
+
+    // help links
+    var helpHtml = [
+        '<li>',
+        '<select class="sfu_help_links">',
+        '<option value="">Help</option>',
+        '<option value="https://canvas.sfu.ca/courses/14504">Help for Students</option>',
+        '<option value="https://canvas.sfu.ca/courses/14504">Help for Instructors</option>',
+        '</li>'
+    ].join('');
+    $('#topbar .logout').before(helpHtml);
+    $('#topbar .sfu_help_links').on('change', function(ev) {
+        if (this.value) {
+            window.location = this.value;
+        }
+    });
+
+    // sfu logo in footer
     $('footer').html('<a href="http://www.sfu.ca/canvas"><img alt="SFU Canvas" src="/sfu/images/sfu-logo.png" width="250" height="38"></a>').show();
 
     // handle no-user case
