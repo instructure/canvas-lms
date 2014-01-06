@@ -40,7 +40,8 @@ class CustomGradebookColumn < ActiveRecord::Base
 
   set_policy do
     given { |user, session|
-      cached_context_grants_right? user, session, :view_all_grades
+      cached_context_grants_right? user, session,
+        [:view_all_grades, :manage_grades]
     }
     can :read, :manage
   end
