@@ -60,8 +60,16 @@
 <!-- treat ungraded as 0 -->
 
 <div>
-  <label for="ungraded">Treat Ungraded as 0</label>
-  <input type="checkbox" name="ungraded" id="ungraded" value="ungraded">
+  <label for="ungraded">
+  {{
+    input
+    type="checkbox"
+    id="ungraded"
+    name="ungraded"
+    checked=includeUngradedAssignments
+  }}
+  {{#t "include_ungraded_assignments"}}Treat Ungraded as 0{{/t}}
+  </label>
 </div>
 
 <!-- show concluded enrollments -->

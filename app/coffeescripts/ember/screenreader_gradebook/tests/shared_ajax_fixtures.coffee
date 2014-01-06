@@ -437,15 +437,20 @@ define [
   sections: sections
   create: (overrides) ->
 
-    window.ENV.GRADEBOOK_OPTIONS = {
-      students_url: '/api/v1/enrollments'
-      assignment_groups_url: '/api/v1/assignment_groups'
-      submissions_url: '/api/v1/submissions'
-      sections_url: '/api/v1/sections'
-      context_url: '/courses/1'
-      context_id: 1
-      group_weighting_scheme: "equal"
-    }
+    window.ENV =
+      {
+        current_user_id: 1
+        context_asset_string: 'course_1'
+        GRADEBOOK_OPTIONS: {
+          students_url: '/api/v1/enrollments'
+          assignment_groups_url: '/api/v1/assignment_groups'
+          submissions_url: '/api/v1/submissions'
+          sections_url: '/api/v1/sections'
+          context_url: '/courses/1'
+          context_id: 1
+          group_weighting_scheme: "equal"
+        }
+      }
 
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.students_url,
       response: clone students

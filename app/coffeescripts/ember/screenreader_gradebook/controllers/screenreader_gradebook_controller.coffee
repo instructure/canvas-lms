@@ -1,11 +1,12 @@
 define [
+  'compiled/userSettings'
   '../../shared/xhr/fetch_all_pages'
   'i18n!sr_gradebook'
   'ember'
   'underscore'
   'compiled/AssignmentDetailsDialog'
   'compiled/AssignmentMuter'
-  ], (fetchAllPages, I18n, Ember, _,  AssignmentDetailsDialog, AssignmentMuter ) ->
+  ], (userSettings, fetchAllPages, I18n, Ember, _,  AssignmentDetailsDialog, AssignmentMuter ) ->
 
   {get, set} = Ember
 
@@ -40,7 +41,8 @@ define [
   ScreenreaderGradebookController = Ember.ObjectController.extend
 
     downloadUrl: "#{get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')}/gradebook.csv"
-    gradingHistoryUrl:  "#{get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')}/history"
+
+    gradingHistoryUrl: "#{get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')}/history"
 
     actions:
       selectItem: (property, goTo) ->
@@ -153,6 +155,16 @@ define [
           set as, 'sortable_date', Number.MAX_VALUE
         assignment_proxy.pushObject as
     ).observes('assignment_groups.@each')
+
+    includeUngradedAssignments: (->
+      userSettings.contextGet('include_ungraded_assignments') or false
+    ).property().volatile()
+
+    updateUngradedAssignmentUserSetting: ( ->
+      isChecked = @get('includeUngradedAssignments')
+      if isChecked?
+        userSettings.contextSet 'include_ungraded_assignments', isChecked
+    ).observes('includeUngradedAssignments')
 
     assignmentGroupsHash: ->
       ags = {}

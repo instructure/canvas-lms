@@ -50,10 +50,11 @@ define [
   module 'screenreader_gradebook: assignment dialogs open and close',
     setup: ->
       App = startApp()
-      controller = App.__container__.lookup('controller:screenreader_gradebook')
-      @selected = controller.get('assignments').objectAt(0)
-      Ember.run =>
-        controller.set('selectedAssignment', @selected)
+      visit('/').then =>
+        @controller = App.__container__.lookup('controller:screenreader_gradebook')
+        @selected = @controller.get('assignments').objectAt(0)
+        Ember.run =>
+          @controller.set('selectedAssignment', @selected)
 
     teardown: ->
       Ember.run App, 'destroy'
@@ -64,26 +65,25 @@ define [
       #openAndCloseDialog('#message_students', "Message students for #{@selected.name}")
 
   test 'default grade dialog displays properly', ->
-    visit('/')
     openAndCloseDialog('#set_default_grade', "Default grade for #{@selected.name}")
 
   test 'curve grades dialog displays properly', ->
-    visit('/')
     openAndCloseDialog('#curve_grades', "Curve Grades for #{@selected.name}")
 
 
   module 'screenreader_gradebook: assignment dialogs saving',
     setup: ->
       App = startApp()
-      controller = App.__container__.lookup('controller:screenreader_gradebook')
-      @selAssignment = controller.get('assignments').objectAt(0)
-      @selStudent = controller.get('students').objectAt(0)
-      @server = sinon.fakeServer.create()
-      @alert = sinon.stub(window, 'alert')
-      Ember.run =>
-        controller.set('submissions', Em.copy fixtures.submissions, true)
-        controller.set('selectedAssignment', @selAssignment)
-        controller.set('selectedStudent', @selStudent)
+      visit('/').then =>
+        @controller = App.__container__.lookup('controller:screenreader_gradebook')
+        @selAssignment = @controller.get('assignments').objectAt(0)
+        @selStudent = @controller.get('students').objectAt(0)
+        @server = sinon.fakeServer.create()
+        @alert = sinon.stub(window, 'alert')
+        Ember.run =>
+          @controller.set('submissions', Em.copy fixtures.submissions, true)
+          @controller.set('selectedAssignment', @selAssignment)
+          @controller.set('selectedStudent', @selStudent)
 
     teardown: ->
       # cleanup if test failed

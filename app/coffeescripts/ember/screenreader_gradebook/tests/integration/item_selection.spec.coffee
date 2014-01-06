@@ -223,9 +223,10 @@ define [
   module 'screenreader_gradebook student navigation: section selection',
     setup: ->
       App = startApp()
-      @controller = App.__container__.lookup('controller:screenreader_gradebook')
-      Ember.run =>
-        @controller.set('selectedSection', @controller.get('sections.lastObject'))
+      visit('/').then =>
+        @controller = App.__container__.lookup('controller:screenreader_gradebook')
+        Ember.run =>
+          @controller.set('selectedSection', @controller.get('sections.lastObject'))
     teardown: ->
       Ember.run App, 'destroy'
 
