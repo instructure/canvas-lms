@@ -1,7 +1,7 @@
 require File.expand_path("../canvas_rails3", __FILE__)
 
 if CANVAS_RAILS2
-  if RUBY_VERSION >= "2.0.0"
+  unless Gem.respond_to?(:source_index)
     module Gem
       def self.source_index
         sources
