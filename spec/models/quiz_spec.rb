@@ -1232,8 +1232,8 @@ describe Quiz do
   context "draft_state" do
 
     it "updates the assignment's workflow state" do
+      @course.root_account.enable_feature!(:draft_state)
       @quiz = @course.quizzes.create!(title: 'Test Quiz')
-      @quiz.context.root_account.enable_feature!(:draft_state)
       @quiz.publish!
       @quiz.unpublish!
       @quiz.assignment.should_not be_published

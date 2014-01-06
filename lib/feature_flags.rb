@@ -65,9 +65,11 @@ module FeatureFlags
   # (helper method.  use lookup_feature_flag to test policy.)
   def feature_flag(feature)
     self.shard.activate do
-      Rails.cache.fetch(feature_flag_cache_key(feature)) do
-        self.feature_flags.where(feature: feature.to_s).first
+      result = Rails.cache.fetch(feature_flag_cache_key(feature)) do
+        self.feature_flags.where(feature: feature.to_s).first || :nil
       end
+      result = nil if result == :nil
+      result
     end
   end
 
@@ -99,6 +101,9 @@ module FeatureFlags
     # inherit the feature definition as a default unless it's a hidden feature
     retval = feature_def unless feature_def.hidden? && !is_site_admin && !(is_root_account && override_hidden)
 
+    @feature_flag_cache ||= {}
+    return @feature_flag_cache[feature] if @feature_flag_cache.key?(feature)
+
     # find the highest flag that doesn't allow override,
     # or the most specific flag otherwise
     account_ids = feature_flag_account_ids
@@ -119,11 +124,11 @@ module FeatureFlags
         retval = self.feature_flags.build feature: feature, state: 'off'
       else
         # the feature doesn't exist beneath the root account until the root account opts in
-        return nil
+        return @feature_flag_cache[feature] = nil
       end
     end
 
-    retval
+    @feature_flag_cache[feature] = retval
   end
 
 end
