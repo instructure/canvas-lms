@@ -21,7 +21,7 @@
 # API for adding additional columns to the gradebook.  Custom gradebook
 # columns will be displayed with the other frozen gradebook columns.
 #
-# @object Custom Column
+# @object CustomColumn
 #    {
 #      // header text
 #      "title": "Stuff",
@@ -44,7 +44,7 @@ class CustomGradebookColumnsApiController < ApplicationController
   # @param include_hidden [Boolean]
   #   Include hidden parameters (defaults to false)
   #
-  # @returns [Custom Column]
+  # @returns [CustomColumn]
   def index
     if authorized_action? @context.custom_gradebook_columns.build,
                           @current_user, :read
@@ -73,7 +73,7 @@ class CustomGradebookColumnsApiController < ApplicationController
   #   Set this if the column is created by a teacher.  The gradebook only
   #   supports one teacher_notes column.
   #
-  # @returns Custom Column
+  # @returns CustomColumn
   def create
     column = @context.custom_gradebook_columns.build(params[:column])
     update_column(column)
@@ -83,7 +83,7 @@ class CustomGradebookColumnsApiController < ApplicationController
   #
   # Accepts the same parameters as custom gradebook column creation
   #
-  # @returns Custom Column
+  # @returns CustomColumn
   def update
     column = @context.custom_gradebook_columns.not_deleted.find(params[:id])
     column.attributes = params[:column]
@@ -94,7 +94,7 @@ class CustomGradebookColumnsApiController < ApplicationController
   #
   # Permanently deletes a custom column and its associated data
   #
-  # @returns Custom Column
+  # @returns CustomColumn
   def destroy
     column = @context.custom_gradebook_columns.not_deleted.find(params[:id])
     if authorized_action? column, @current_user, :manage
