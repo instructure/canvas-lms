@@ -21,7 +21,8 @@
     <div class="discussion-due-date">
       {{#if assignment}}
         {{#if assignment.due_at}}
-          {{#t "due_at"}}<span class="discussion-date-type">Due</span> {{assignment.display_due_at}}{{/t}}
+        <span class="discussion-date-type">{{#t "due"}}Due{{/t}}</span>
+        {{datetimeFormatted assignment.due_at}}
         {{else}}
           {{#t "no_due_date"}}No Due Date{{/t}}
         {{/if}}
