@@ -263,11 +263,11 @@ class DiscussionTopicsController < ApplicationController
     @topic ||= @context.all_discussion_topics.find(params[:id])
     if authorized_action(@topic, @current_user, (@topic.new_record? ? :create : :update))
       hash =  {
-        :URL_ROOT => named_context_url(@context, :api_v1_context_discussion_topics_url),
-        :PERMISSIONS => {
-          :CAN_CREATE_ASSIGNMENT => @context.respond_to?(:assignments) && @context.assignments.new.grants_right?(@current_user, session, :create),
-          :CAN_ATTACH => @topic.grants_right?(@current_user, session, :attach),
-          :CAN_MODERATE => user_can_moderate
+        URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
+        PERMISSIONS: {
+          CAN_CREATE_ASSIGNMENT: @context.respond_to?(:assignments) && @context.assignments.new.grants_right?(@current_user, session, :create),
+          CAN_ATTACH: @topic.grants_right?(@current_user, session, :attach),
+          CAN_MODERATE: user_can_moderate
         }
       }
 
@@ -288,13 +288,14 @@ class DiscussionTopicsController < ApplicationController
 
       categories = @context.respond_to?(:group_categories) ? @context.group_categories : []
       sections = @context.respond_to?(:course_sections) ? @context.course_sections.active : []
-      js_hash = {:DISCUSSION_TOPIC => hash,
-                 :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
-                 :GROUP_CATEGORIES => categories.
+      js_hash = {DISCUSSION_TOPIC: hash,
+                 SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
+                 GROUP_CATEGORIES: categories.
                      reject { |category| category.student_organized? }.
-                     map { |category| { :id => category.id, :name => category.name } },
-                 :CONTEXT_ID => @context.id,
-                 :CONTEXT_ACTION_SOURCE => :discussion_topic}
+                     map { |category| { id: category.id, name: category.name } },
+                 CONTEXT_ID: @context.id,
+                 CONTEXT_ACTION_SOURCE: :discussion_topic,
+                 DRAFT_STATE: @context.feature_enabled?(:draft_state)}
       append_sis_data(js_hash)
       js_env(js_hash)
       render :action => "edit"
