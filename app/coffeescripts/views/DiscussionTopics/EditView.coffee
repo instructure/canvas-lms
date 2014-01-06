@@ -66,6 +66,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         canModerate: @permissions.CAN_MODERATE
         isLargeRoster: ENV?.IS_LARGE_ROSTER || false
         threaded: data.discussion_type is "threaded"
+        draftStateEnabled: ENV.DRAFT_STATE
       json.assignment = json.assignment.toView()
       json
 
