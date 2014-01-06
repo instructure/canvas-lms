@@ -48,6 +48,7 @@ define [
       json = super
       json.canMessageMembers = @model.canMessageUnassignedMembers()
       json.canAssignMembers = @model.canAssignUnassignedMembers()
+      json.locked = @model.isLocked()
       json
 
     deleteCategory: (e) =>

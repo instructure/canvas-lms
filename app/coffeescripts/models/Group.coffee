@@ -55,6 +55,9 @@ define [
       limit = @collection?.category?.get 'group_limit'
       limit and @get('members_count') >= limit
 
+    isLocked: ->
+      @collection?.category?.isLocked()
+
     toJSON: ->
       json = super
       json.isFull = @isFull()

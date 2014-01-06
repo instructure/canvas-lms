@@ -326,6 +326,30 @@ describe "Feature Flags API", :type => :integration do
         t_root_account.feature_flags.where(feature: 'hidden_feature').count.should eql 1
       end
 
+      context "AccountManager" do
+        before do
+          t_site_admin.role_overrides.create!(permission: 'manage_feature_flags',
+                                              enrollment_type: 'AccountManager',
+                                              enabled: true,
+                                              applies_to_self: false,
+                                              applies_to_descendants: true)
+          @site_admin_member = site_admin_user(membership_type: 'AccountManager')
+        end
+
+        it "should not create a site admin feature flag" do
+          api_call_as_user(@site_admin_member, :put, "/api/v1/accounts/#{t_site_admin.id}/features/flags/hidden_feature",
+                           { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_site_admin.to_param, feature: 'hidden_feature' },
+                           {}, {}, { expected_status: 401 })
+          t_site_admin.feature_flags.where(feature: 'hidden_feature').should_not be_any
+        end
+
+        it "should create a root account feature flag" do
+          api_call_as_user(@site_admin_member, :put, "/api/v1/accounts/#{t_root_account.id}/features/flags/hidden_feature",
+                           { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_root_account.to_param, feature: 'hidden_feature' })
+          t_root_account.feature_flags.where(feature: 'hidden_feature').count.should eql 1
+        end
+      end
+
       it "should not create a root account feature flag with root admin privileges" do
         api_call_as_user(t_root_admin, :put, "/api/v1/accounts/#{t_root_account.id}/features/flags/hidden_feature",
                  { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_root_account.to_param, feature: 'hidden_feature' },
