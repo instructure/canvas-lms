@@ -7,6 +7,7 @@ define [
   'compiled/views/gradebook/CheckboxView'
   'compiled/views/gradebook/SectionMenuView'
   'jst/gradebook2/outcome_gradebook'
+  'vendor/jquery.ba-tinypubsub'
 ], (I18n, _, {View}, Slick, Grid, CheckboxView, SectionMenuView, template, cellTemplate) ->
 
   Dictionary =
@@ -41,7 +42,6 @@ define [
     constructor: (options) ->
       super
       @_validateOptions(options)
-      @_attachEvents()
 
     # Internal: Validate options passed to constructor.
     #
@@ -56,6 +56,7 @@ define [
     # Returns nothing.
     _attachEvents: ->
       view.on('togglestate', @_createFilter(name)) for name, view of @checkboxes
+      $.subscribe('currentSection/change', Grid.Events.sectionChangeFunction(@grid))
 
     # Public: Create object to be passed to the view.
     #
@@ -80,7 +81,7 @@ define [
     # Returns nothing.
     renderGrid: (response) =>
       Grid.Util.saveOutcomes(response.linked.outcomes)
-      [columns, rows] = Grid.Util.toGrid(response, column: formatter: Grid.View.cell)
+      [columns, rows] = Grid.Util.toGrid(response, column: { formatter: Grid.View.cell }, row: { section: @menu.currentSection })
       @grid = new Slick.Grid(
         '.outcome-gradebook-wrapper',
         rows,
@@ -89,6 +90,7 @@ define [
       @grid.onHeaderRowCellRendered.subscribe(Grid.Events.headerRowCellRendered)
       @grid.init()
       Grid.Events.init(@grid)
+      @_attachEvents()
 
     # Public: Pass outcomes from outcome rollup API to the view.
     #
