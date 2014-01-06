@@ -522,6 +522,10 @@ module Api
     Canvas::Plugin.value_to_boolean(value)
   end
 
+  def self.value_to_array(value)
+    value.is_a?(String) ? value.split(',') : value
+  end
+
   # regex for shard-aware ID
   ID = '(?:\d+~)?\d+'
 

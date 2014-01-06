@@ -723,4 +723,14 @@ describe Api do
       controller.accepts_jsonapi?.should == false
     end
   end
+
+  describe ".value_to_array" do
+    it "splits comma delimited strings" do
+      Api.value_to_array('1,2,3').should == ['1', '2', '3']
+    end
+
+    it "does nothing to arrays" do
+      Api.value_to_array(['1', '2', '3']).should == ['1', '2', '3']
+    end
+  end
 end

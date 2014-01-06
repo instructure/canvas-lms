@@ -59,7 +59,10 @@ class OutcomeResultsController < ApplicationController
   before_filter :require_user
   before_filter :require_context
   before_filter :require_outcome_context
-
+  before_filter :verify_aggregate_parameter
+  before_filter :require_outcomes
+  before_filter :require_users
+  
   # @API Get outcome result rollups
   # @beta
   #
@@ -71,6 +74,11 @@ class OutcomeResultsController < ApplicationController
   #   rollups will be combined into one rollup for the course that will contain
   #   the average rollup score for each outcome.
   #
+  # @argument user_ids[] [Optional, Integer]
+  #   If specified, only the users whose ids are given will be included in the
+  #   results or used in an aggregate result. it is an error to specify an id
+  #   for a user who is not a student in the context
+  #
   # @example_response
   #    {
   #      "rollups": [OutcomeRollup],
@@ -79,8 +87,6 @@ class OutcomeResultsController < ApplicationController
   #      }
   #    }
   def rollups
-    return unless verify_aggregate_parameter
-    @outcomes = @context.linked_learning_outcomes
     if params[:aggregate] == 'course'
       aggregate_rollups
     else
@@ -92,7 +98,7 @@ class OutcomeResultsController < ApplicationController
   #
   # Returns nothing.
   def user_rollups
-    @users = Api.paginate(users_for_outcome_context, self, api_v1_course_outcome_rollups_url(@context))
+    @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
     @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes)
     rollups = outcome_results_rollups(@results, @users)
     json = outcome_results_rollups_json(rollups, @outcomes)
@@ -106,7 +112,6 @@ class OutcomeResultsController < ApplicationController
   def aggregate_rollups
     # calculating averages for all users in the context and only returning one
     # rollup, so don't paginate users in ths method.
-    @users = users_for_outcome_context
     @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes)
     aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context)]
     json = aggregate_outcome_results_rollups_json(aggregate_rollups, @outcomes)
@@ -124,7 +129,7 @@ class OutcomeResultsController < ApplicationController
       return render json: {message: "invalid context type"}, status: :bad_request
     end
 
-    return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+    authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
   end
 
   # Internal: Verifies the aggregate parameter.
@@ -139,6 +144,31 @@ class OutcomeResultsController < ApplicationController
     else
       true
     end
+  end
+
+  # Internal: Finds context outcomes
+  #
+  # Return an outcome scope
+  def require_outcomes
+    @outcomes = @context.linked_learning_outcomes
+  end
+  
+  # Internal: Filter context users by user_ids param (if provided), ensuring
+  #  that user_ids does not include users not in the context.
+  #
+  # Returns false and renders an error if user_ids includes a user outside the
+  #  context. Returns a user scope otherwise.
+  def require_users
+    @users = users_for_outcome_context
+    if params[:user_ids]
+      user_ids = Api.value_to_array(params[:user_ids]).map(&:to_i).uniq
+      @users = @users.where(id: user_ids)
+      if @users.count != user_ids.count
+        render json: {message: "can only include id's of users in the outcome context"}, status: :bad_request
+        return false
+      end
+    end
+    @users
   end
 
   # Internal: Gets a list of users that should have results returned based on
