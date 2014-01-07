@@ -4,7 +4,8 @@ define [
   'Backbone'
   'compiled/collections/NeverDropCollection'
   'compiled/views/assignments/NeverDropCollectionView'
-], ($, _, Backbone, NeverDropCollection, NeverDropCollectionView) ->
+  'helpers/util'
+], ($, _, Backbone, NeverDropCollection, NeverDropCollectionView, util) ->
 
   class AssignmentStub extends Backbone.Model
     name: -> @get('name')
@@ -19,6 +20,7 @@ define [
   module "NeverDropCollectionView",
     setup: ->
       @clock = sinon.useFakeTimers()
+      util.useOldDebounce()
       @assignments = new Assignments((id: "#{i}", name: "Assignment #{i}") for i in [1..3])
       @never_drops = new NeverDropCollection [],
         assignments: @assignments
@@ -30,6 +32,7 @@ define [
 
     teardown: ->
       @clock.restore()
+      util.useNormalDebounce()
 
 
   addNeverDrop= ->
