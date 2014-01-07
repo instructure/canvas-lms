@@ -154,11 +154,11 @@ describe "Outcome Results API", :type => :integration do
       api_call(:get, outcome_rollups_url(outcome_course),
         controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
       json = JSON.parse(response.body)
-      json.keys.sort.should == %w(linked rollups)
+      json.keys.sort.should == %w(linked meta rollups)
       json['rollups'].size.should == 2
       json['rollups'].collect{|x| x['id']}.sort.should == [student.id, student2.id].sort
       json['rollups'].each do |rollup|
-        rollup.keys.sort.should == %w(id name scores)
+        rollup.keys.sort.should == %w(id links name scores)
         rollup['scores'].size.should == 1
       end
     end
