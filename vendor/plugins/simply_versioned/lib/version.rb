@@ -14,7 +14,9 @@
 #
 class Version < ActiveRecord::Base #:nodoc:
   belongs_to :versionable, :polymorphic => true
-  
+
+  before_create :initialize_number
+
   # Return an instance of the versioned ActiveRecord model with the attribute
   # values of this version.
   def model
@@ -59,7 +61,7 @@ class Version < ActiveRecord::Base #:nodoc:
   end
 
   protected
-  def before_create
+  def initialize_number
     return false unless versionable
     self.number = (versionable.versions.maximum( :number ) || 0) + 1
   end
