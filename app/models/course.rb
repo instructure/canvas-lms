@@ -556,9 +556,12 @@ class Course < ActiveRecord::Base
 
   def user_has_been_instructor?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_has_been_instructor"].cache_key) do
-      # active here is !deleted; it still includes concluded, etc.
-      self.instructor_enrollments.active.find_by_user_id(user.id).present?
+    # enrollments should be on the course's shard
+    self.shard.activate do
+      Rails.cache.fetch([self, user, "course_user_has_been_instructor"].cache_key) do
+        # active here is !deleted; it still includes concluded, etc.
+        self.instructor_enrollments.active.find_by_user_id(user.id).present?
+      end
     end
   end
 
