@@ -43,8 +43,8 @@ class DueDateCacher
     # Create insert scope
     insert_scope = Course
       .select("DISTINCT assignments.id, enrollments.user_id, '#{default_submission.workflow_state}', {{now}}, assignments.context_code, 0")
-      .joins("LEFT OUTER JOIN submissions ON submissions.user_id = enrollments.user_id AND submissions.assignment_id = assignments.id")
-      .joins("INNER JOIN assignments ON assignments.context_id = courses.id AND assignments.context_type = 'Course'")
+      .joins("INNER JOIN assignments ON assignments.context_id = courses.id AND assignments.context_type = 'Course'
+        LEFT OUTER JOIN submissions ON submissions.user_id = enrollments.user_id AND submissions.assignment_id = assignments.id")
       .joins(:current_enrollments)
       .where("enrollments.user_id IN (?) AND assignments.id IN (?) AND submissions.id IS NULL", overridden_students, @assignments)
 

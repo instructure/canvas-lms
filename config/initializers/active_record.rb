@@ -929,6 +929,41 @@ unless CANVAS_RAILS2
       end
     end
 
+    def update_all_with_joins(updates, conditions = nil, options = {})
+      if joins_values.any?
+        if conditions
+          where(conditions).update_all
+        else
+          case connection.adapter_name
+          when 'PostgreSQL'
+            stmt = Arel::UpdateManager.new(arel.engine)
+
+            stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
+            stmt.table(table)
+            stmt.key = table[primary_key]
+
+            sql = stmt.to_sql
+
+            tables, join_conditions = deconstruct_joins(arel.join_sql.to_s)
+
+            unless tables.empty?
+              sql.concat(' FROM ')
+              sql.concat(tables.join(', '))
+              sql.concat(' ')
+            end
+
+            sql.concat(where(join_conditions).arel.where_sql.to_s)
+            connection.update(sql, "#{name} Update")
+          else
+            update_all_without_joins(updates, conditions, options)
+          end
+        end
+      else
+        update_all_without_joins(updates, conditions, options)
+      end
+    end
+    alias_method_chain :update_all, :joins
+
     def delete_all_with_joins(conditions = nil)
       if joins_values.any?
         if conditions
