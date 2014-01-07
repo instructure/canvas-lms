@@ -185,14 +185,24 @@ shared_examples_for "quizzes selenium tests" do
     driver.switch_to.alert.accept
   end
 
-  def take_and_answer_quiz(submit=true)
+  # @argument answer_chooser [#call]
+  #   You can pass a block to specify which answer to choose, the block will
+  #   receive the set of possible answers. If you don't, the first (and correct)
+  #   answer will be chosen.
+  def take_and_answer_quiz(submit=true, &answer_chooser)
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
     expect_new_page_load { driver.find_element(:link_text, 'Take the Quiz').click }
 
-    answer = @quiz.stored_questions[0][:answers][0][:id]
+    answer = if block_given?
+      yield(@quiz.stored_questions[0][:answers])
+    else
+      @quiz.stored_questions[0][:answers][0][:id]
+    end
 
-    fj("input[type=radio][value=#{answer}]").click
-    wait_for_js
+    if answer
+      fj("input[type=radio][value=#{answer}]").click
+      wait_for_js
+    end
 
     if submit
       driver.execute_script("$('#submit_quiz_form .btn-primary').click()")
