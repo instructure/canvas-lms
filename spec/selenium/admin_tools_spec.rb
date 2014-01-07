@@ -191,27 +191,13 @@ describe "admin_tools" do
     end
 
     context "permissions" do
-      it "should not see tab" do
-        setup_account_admin(
-          view_statistics: false,
-          manage_user_logins: false,
-          view_grade_changes: false
-        )
+      it "should includ options activity with permissions" do
+        setup_account_admin
         load_admin_tools_page
         wait_for_ajaximations
-        tab = fj('#adminToolsTabs .logging > a')
-        tab.should be_nil
-      end
 
-      it "should see tab for view_statistics permission" do
-        setup_account_admin(
-          view_statistics: true,
-          manage_user_logins: false,
-          view_grade_changes: false
-        )
-        load_admin_tools_page
-        wait_for_ajaximations
         tab = fj('#adminToolsTabs .logging > a')
+        tab.should_not be_nil
         tab.text.should == "Logging"
 
         click_view_tab "logging"
@@ -221,55 +207,62 @@ describe "admin_tools" do
         select.should be_displayed
 
         options = ffj("#loggingType > option")
-        options.size.should eql(2)
-        options[0].text.should == "Select a Log type"
-        options[1].text.should == "Login / Logout Activity"
+        options.map!{ |o| o.text }
+        options.should include("Select a Log type")
+        options.should include("Login / Logout Activity")
+        options.should include("Grade Change Activity")
+        options.should include("Course Activity")
       end
 
-      it "should see tab for manage_user_logins permission" do
-        setup_account_admin(
-          view_statistics: false,
-          manage_user_logins: true,
-          view_grade_changes: false
-        )
-        load_admin_tools_page
-        wait_for_ajaximations
-        tab = fj('#adminToolsTabs .logging > a')
-        tab.text.should == "Logging"
+      context "without permissions" do
+        it "should not see tab" do
+          setup_account_admin(
+            view_statistics: false,
+            manage_user_logins: false,
+            view_grade_changes: false,
+            view_course_changes: false
+          )
+          load_admin_tools_page
+          wait_for_ajaximations
+          tab = fj('#adminToolsTabs .logging > a')
+          tab.should be_nil
+        end
 
-        click_view_tab "logging"
+        it "should not include login activity option for revoked permission" do
+          setup_account_admin(view_statistics: false, manage_user_logins: false)
+          load_admin_tools_page
+          wait_for_ajaximations
 
-        select = fj('#loggingType')
-        select.should_not be_nil
-        select.should be_displayed
+          click_view_tab "logging"
 
-        options = ffj("#loggingType > option")
-        options.size.should eql(2)
-        options[0].text.should == "Select a Log type"
-        options[1].text.should == "Login / Logout Activity"
-      end
+          options = ffj("#loggingType > option")
+          options.map!{ |o| o.text }
+          options.should_not include("Login / Logout Activity")
+        end
 
-      it "should see tab for view_grade_changes permission" do
-        setup_account_admin(
-          view_statistics: false,
-          manage_user_logins: false,
-          view_grade_changes: true
-        )
-        load_admin_tools_page
-        wait_for_ajaximations
-        tab = fj('#adminToolsTabs .logging > a')
-        tab.text.should == "Logging"
+        it "should not include grade change activity option for revoked permission" do
+          setup_account_admin(view_grade_changes: false)
+          load_admin_tools_page
+          wait_for_ajaximations
 
-        click_view_tab "logging"
+          click_view_tab "logging"
 
-        select = fj('#loggingType')
-        select.should_not be_nil
-        select.should be_displayed
+          options = ffj("#loggingType > option")
+          options.map!{ |o| o.text }
+          options.should_not include("Grade Change Activity")
+        end
 
-        options = ffj("#loggingType > option")
-        options.size.should eql(2)
-        options[0].text.should == "Select a Log type"
-        options[1].text.should == "Grade Change Activity"
+        it "should not include course change activity option for revoked permission" do
+          setup_account_admin(view_course_changes: false)
+          load_admin_tools_page
+          wait_for_ajaximations
+
+          click_view_tab "logging"
+
+          options = ffj("#loggingType > option")
+          options.map!{ |o| o.text }
+          options.should_not include("Course Activity")
+        end
       end
     end
   end
@@ -355,6 +348,90 @@ describe "admin_tools" do
       f('#loggingGradeChange button[name=gradeChange_submit]').click
       wait_for_ajaximations
       ff('#gradeChangeLoggingSearchResults table tbody tr').length.should == 3
+    end
+  end
+
+  context "Course Logging" do
+    it_should_behave_like "cassandra audit logs"
+
+    before do
+      course_with_teacher(course: @course, :user => user_with_pseudonym(:name => 'Teacher TestUser'))
+
+      load_admin_tools_page
+      click_view_tab "logging"
+      change_log_type("Course")
+    end
+
+    it "should search by course name and show history" do
+      @events = []
+      (1..5).each do |index|
+        @course.name = "Course #{index}"
+        @course.start_at = Date.today + index.days
+        @course.conclude_at = @course.start_at + 7.days
+
+        @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
+        @events << @event
+      end
+      @course.save
+
+      perform_autocomplete_search("#course_id-autocompleteField", @course.name)
+      f('#loggingCourse button[name=course_submit]').click
+      wait_for_ajaximations
+
+      ff('#courseLoggingSearchResults table tbody tr').length.should == @events.length
+      cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
+      cols.size.should == 5
+
+      cols[2].text.should == @teacher.name
+      cols[3].text.should == "Updated"
+      cols[4].text.should == "View Details"
+    end
+
+    it "should show created event details" do
+      # Simulate a new course
+      course = Course.new
+      course.name = @course.name
+      @event = Auditors::Course.record_created(@course, @teacher, course.changes)
+
+      perform_autocomplete_search("#course_id-autocompleteField", @course.name)
+      f('#loggingCourse button[name=course_submit]').click
+      wait_for_ajaximations
+      fj('#courseLoggingSearchResults table tbody tr:last td:last a').click
+
+      fj('.ui-dialog dl dd:first').text.should == @event.id
+      cols = ffj('.ui-dialog table:first tbody tr:first td')
+      cols.size.should == 2
+      cols[0].text.should == "Name"
+      cols[1].text.should == @course.name
+    end
+
+    it "should show updated event details" do
+      old_name = @course.name
+      @course.name = "Course Updated"
+      @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
+
+      perform_autocomplete_search("#course_id-autocompleteField", old_name)
+      f('#loggingCourse button[name=course_submit]').click
+      wait_for_ajaximations
+      fj('#courseLoggingSearchResults table tbody tr:last td:last a').click
+
+      fj('.ui-dialog dl dd:first').text.should == @event.id
+      cols = ffj('.ui-dialog table:first tbody tr:first td')
+      cols.size.should == 3
+      cols[0].text.should == "Name"
+      cols[1].text.should == old_name
+      cols[2].text.should == @course.name
+    end
+
+    it "should show concluded event details" do
+      @event = Auditors::Course.record_concluded(@course, @teacher)
+
+      perform_autocomplete_search("#course_id-autocompleteField", @course.name)
+      f('#loggingCourse button[name=course_submit]').click
+      wait_for_ajaximations
+      fj('#courseLoggingSearchResults table tbody tr:last td:last a').click
+
+      fj('.ui-dialog dl dd:first').text.should == @event.id
     end
   end
 end

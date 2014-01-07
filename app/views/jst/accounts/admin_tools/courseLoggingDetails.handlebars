@@ -1,0 +1,54 @@
+<dl class="dl-horizontal">
+  <dt>{{#t "event_id"}}Event Id{{/t}}:</dt>
+  <dd>{{id}}</dd>
+  <dt>{{#t "date"}}Date{{/t}}:</dt>
+  <dd>{{tDateToString created_at "medium"}}</dd>
+  <dt>{{#t "time"}}Time{{/t}}:</dt>
+  <dd>{{tTimeToString created_at "tiny"}}</dd>
+  <dt>{{#t "user"}}User{{/t}}:</dt>
+  <dd>{{user.name}}</dd>
+  <dt>{{#t "event_type_label"}}Type{{/t}}:</dt>
+  <dd>{{event_type_present}}</dd>
+</dl>
+
+{{#ifEqual event_type 'created'}}
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>{{#t "Field"}}Field{{/t}}</th>
+        <th>{{#t "Value"}}Value{{/t}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#eachProp event_data}}
+        <tr>
+          <td>{{property}}</td>
+          <td>{{value}}</td>
+        </tr>
+      {{/eachProp}}
+    </tbody>
+  </table>
+{{/ifEqual}}
+
+{{#ifEqual event_type 'updated'}}
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>{{#t "Field"}}Field{{/t}}</th>
+        <th>{{#t "From"}}From{{/t}}</th>
+        <th>{{#t "To"}}To{{/t}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#eachProp event_data}}
+        <tr>
+          <td>{{property}}</td>
+          {{#with value}}
+            <td>{{from}}</td>
+            <td>{{to}}</td>
+          {{/with}}
+        </tr>
+      {{/eachProp}}
+    </tbody>
+  </table>
+{{/ifEqual}}
