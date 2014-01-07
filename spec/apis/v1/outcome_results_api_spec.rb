@@ -37,8 +37,7 @@ describe "Outcome Results API", :type => :integration do
   end
 
   let(:outcome_rubric) do
-    outcome_course
-    outcome_with_rubric unless @rubric
+    create_outcome_rubric unless @rubric
     @rubric
   end
 
@@ -48,6 +47,66 @@ describe "Outcome Results API", :type => :integration do
   end
 
   let(:outcome_assignment) do
+    create_outcome_assignment
+  end
+
+  let(:outcome_rubric_association) do
+    create_outcome_rubric_association
+  end
+
+  let(:outcome_submission) do
+    find_or_create_outcome_submission
+  end
+
+  let(:outcome_criterion) do
+    find_outcome_criterion
+  end
+
+  let(:first_outcome_rating) do # 3 points
+    find_first_rating
+  end
+
+  let(:outcome_assessment) do
+    create_outcome_assessment
+  end
+
+  def find_or_create_outcome_submission(opts = {})
+    student = opts[:student] || outcome_student
+    assignment = opts[:assignment] ||
+      (opts[:association].assignment if opts[:association]) ||
+      (create_outcome_assignment if opts[:new]) ||
+      outcome_assignment
+    assignment.find_or_create_submission(student)
+  end
+
+  def create_outcome_assessment(opts = {})
+    association = opts[:association] ||
+      (create_outcome_rubric_association(opts) if opts[:new]) ||
+      outcome_rubric_association
+    criterion = find_outcome_criterion(association.rubric)
+    submission = opts[:submission] || find_or_create_outcome_submission(opts)
+    student = submission.student
+    points = opts[:points] ||
+      find_first_rating(criterion)[:points]
+    association.assess(
+      user: student,
+      assessor: outcome_teacher,
+      artifact: submission,
+      assessment: {
+        assessment_type: 'grading',
+        "criterion_#{criterion[:id]}".to_sym => {
+          points: points
+        }
+      }
+    )
+  end
+
+  def create_outcome_rubric
+    outcome_course
+    outcome_with_rubric
+  end
+
+  def create_outcome_assignment
     outcome_course.assignments.create!(
       title: "outcome assignment",
       description: "this is an outcome assignment",
@@ -55,42 +114,22 @@ describe "Outcome Results API", :type => :integration do
     )
   end
 
-  let(:outcome_rubric_association) do
-    outcome_rubric.associate_with(outcome_assignment, outcome_course, purpose: 'grading', use_for_grading: true)
+  def create_outcome_rubric_association(opts = {})
+    rubric = opts[:rubric] ||
+      (create_outcome_rubric if opts[:new]) ||
+      outcome_rubric
+    assignment = opts[:assignment] ||
+      (create_outcome_assignment if opts[:new]) ||
+      outcome_assignment
+    rubric.associate_with(assignment, outcome_course, purpose: 'grading', use_for_grading: true)
   end
 
-  let(:outcome_submission) do
-    create_outcome_submission
+  def find_outcome_criterion(rubric = outcome_rubric)
+    rubric.criteria.find {|c| !c[:learning_outcome_id].nil? }
   end
 
-  let(:outcome_criterion) do
-    outcome_rubric.criteria.find {|c| !c[:learning_outcome_id].nil? }
-  end
-
-  let(:first_outcome_rating) do # 3 points
-    outcome_criterion[:ratings].first
-  end
-
-  let(:outcome_assessment) do
-    create_outcome_assessment
-  end
-
-  def create_outcome_submission(student = outcome_student)
-    outcome_assignment.find_or_create_submission(student)
-  end
-
-  def create_outcome_assessment(student = outcome_student, points = first_outcome_rating[:points])
-    outcome_rubric_association.assess(
-      user: student,
-      assessor: outcome_teacher,
-      artifact: create_outcome_submission(student),
-      assessment: {
-        assessment_type: 'grading',
-        "criterion_#{outcome_criterion[:id]}".to_sym => {
-          points: points
-        }
-      }
-    )
+  def find_first_rating(criterion = outcome_criterion)
+    criterion[:ratings].first
   end
 
   let(:outcome_result) do
@@ -101,7 +140,7 @@ describe "Outcome Results API", :type => :integration do
   let(:outcome_students) do
     students = 0.upto(3).map do |i|
       student = student_in_course(active_all: true).user
-      create_outcome_assessment(student, i)
+      create_outcome_assessment(student: student, points: i)
       student
     end
   end
@@ -113,7 +152,7 @@ describe "Outcome Results API", :type => :integration do
   let(:sectioned_outcome_students) do
     0.upto(3).map do |i|
       student = student_in_section(outcome_course_sections[i % 2])
-      create_outcome_assessment(student, i)
+      create_outcome_assessment(student: student, points: i)
       student
     end
   end
@@ -249,6 +288,53 @@ describe "Outcome Results API", :type => :integration do
       end
     end
 
+    describe "outcomes" do
+      before do
+        @outcomes = 0.upto(3).map do |i|
+          create_outcome_assessment(new: true)
+          @outcome
+        end
+        @outcome_group = @course.learning_outcome_groups.create!(:title => 'groupage')
+        @outcomes += 0.upto(2).map do |i|
+          create_outcome_assessment(new: true)
+          @outcome
+        end
+        course_with_teacher_logged_in(course: @course, active_all: true)
+      end
+
+      it "supports multiple outcomes" do
+        api_call(:get, outcome_rollups_url(outcome_course),
+          controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
+        json = JSON.parse(response.body)
+        json['linked']['outcomes'].size.should == 7
+        json['rollups'].size.should == 1
+        rollup = json['rollups'][0]
+        rollup['scores'].size.should == 7
+      end
+
+      it "filters by outcome id" do
+        outcome_ids = @outcomes[3..4].map(&:id).map(&:to_s).sort
+        api_call(:get, outcome_rollups_url(outcome_course, outcome_ids: outcome_ids.join(',')),
+          controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, outcome_ids: outcome_ids.join(','))
+        json = JSON.parse(response.body)
+        json['linked']['outcomes'].size.should == outcome_ids.length
+        json['linked']['outcomes'].map{|x| x['id']}.sort.should == outcome_ids
+        rollup = json['rollups'][0]
+        rollup['scores'].size.should == outcome_ids.length
+      end
+
+      it "filters by outcome group id" do
+        outcome_ids = @outcome_group.child_outcome_links.map(&:content).map(&:id).map(&:to_s).sort
+        api_call(:get, outcome_rollups_url(outcome_course, outcome_group_id: @outcome_group.id),
+          controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, outcome_group_id: @outcome_group.id)
+        json = JSON.parse(response.body)
+        json['linked']['outcomes'].size.should == outcome_ids.length
+        json['linked']['outcomes'].map{|x| x['id']}.sort.should == outcome_ids
+        rollup = json['rollups'][0]
+        rollup['scores'].size.should == outcome_ids.length
+      end
+    end
+
     describe "aggregate response" do
       it "returns an aggregate json api structure" do
         outcome_student
@@ -336,7 +422,7 @@ describe "Outcome Results API", :type => :integration do
       outcome_assessment
       student2 = @shard2.activate { User.create!(name: 'outofshard') }
       enrollment = @course.enroll_student(student2, enrollment_state: 'active')
-      create_outcome_assessment(student2)
+      create_outcome_assessment(student: student2)
       course_with_teacher_logged_in(course: @course, active_all: true)
 
       api_call(:get, outcome_rollups_url(outcome_course),

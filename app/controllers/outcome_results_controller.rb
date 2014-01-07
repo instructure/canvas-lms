@@ -79,6 +79,11 @@ class OutcomeResultsController < ApplicationController
   #   results or used in an aggregate result. it is an error to specify an id
   #   for a user who is not a student in the context
   #
+  # @argument outcome_ids[] [Optional, Integer]
+  #   If specified, only the outcomes whose ids are given will be included in the
+  #   results. it is an error to specify an id for an outcome which is not linked
+  #   to the context.
+  #
   # @example_response
   #    {
   #      "rollups": [OutcomeRollup],
@@ -151,6 +156,25 @@ class OutcomeResultsController < ApplicationController
   # Return an outcome scope
   def require_outcomes
     @outcomes = @context.linked_learning_outcomes
+    if params[:outcome_ids] && params[:outcome_group_id]
+      render json: {message: "can only filter by outcome_ids or by outcome_group_id"}, status: :bad_request
+      return false
+    end
+    if params[:outcome_ids]
+      outcome_ids = Api.value_to_array(params[:outcome_ids]).map(&:to_i).uniq
+      @outcomes = @outcomes.where(id: outcome_ids)
+      if @outcomes.count != outcome_ids.count
+        render json: {message: "can only include id's of outcomes in the outcome context"}, status: :bad_request
+        return false
+      end
+    elsif params[:outcome_group_id]
+      outcome_group = @context.learning_outcome_groups.where(id: params[:outcome_group_id].to_i).first
+      if !outcome_group
+        render json: {message: "can only include an outcome group id in the outcome context"}, status: :bad_request
+        return false
+      end
+      @outcomes = outcome_group.child_outcome_links.map(&:content)
+    end
   end
   
   # Internal: Filter context users by user_ids param (if provided), ensuring
