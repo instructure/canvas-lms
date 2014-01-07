@@ -76,7 +76,9 @@ describe FeatureFlags do
         t_root_account.lookup_feature_flag('course_feature').context.should eql t_root_account
         t_course.feature_enabled?('course_feature').should be_true
         t_site_admin.feature_flags.create! feature: 'course_feature', state: 'off'
+        t_root_account.instance_variable_set(:@feature_flag_cache, nil)
         t_root_account.lookup_feature_flag('course_feature').context.should eql t_site_admin
+        t_course.instance_variable_set(:@feature_flag_cache, nil)
         t_course.feature_enabled?('course_feature').should be_false
       end
     end
@@ -99,6 +101,14 @@ describe FeatureFlags do
         t_sub_account.feature_enabled?('course_feature').should be_false
         t_course.feature_enabled?('course_feature').should be_false
       end
+
+      it "should cache the lookup" do
+        t_sub_account.feature_flags.create! feature: 'course_feature', state: 'on'
+        t_root_account.feature_flags.create! feature: 'course_feature', state: 'off'
+        t_sub_account.lookup_feature_flag('course_feature').context.should eql t_root_account
+        Account.any_instance.expects(:feature_flag).never
+        t_sub_account.lookup_feature_flag('course_feature').context.should eql t_root_account
+      end
     end
 
     context "course flags" do
@@ -114,6 +124,7 @@ describe FeatureFlags do
       it "should apply settings at the site admin level" do
         t_user.lookup_feature_flag('user_feature').should be_default
         t_site_admin.feature_flags.create! feature: 'user_feature', state: 'off'
+        t_user.instance_variable_set(:@feature_flag_cache, nil)
         t_user.lookup_feature_flag('user_feature').context.should eql t_site_admin
         t_user.feature_enabled?('user_feature').should be_false
       end
@@ -132,6 +143,12 @@ describe FeatureFlags do
           t_site_admin.lookup_feature_flag('root_opt_in_feature').should be_default
           t_root_account.lookup_feature_flag('root_opt_in_feature').should be_new_record
           t_sub_account.lookup_feature_flag('root_opt_in_feature').should be_nil
+          t_course.lookup_feature_flag('root_opt_in_feature').should be_nil
+        end
+
+        it "should cache the nil of the feature beneath the root account" do
+          t_course.lookup_feature_flag('root_opt_in_feature').should be_nil
+          Account.any_instance.expects(:feature_flag).never
           t_course.lookup_feature_flag('root_opt_in_feature').should be_nil
         end
       end
@@ -266,6 +283,15 @@ describe FeatureFlags do
       enable_cache do
         t_root_account.feature_flag('course_feature')
         Rails.cache.should be_exist(t_cache_key)
+      end
+    end
+
+    it "should cache a nil result" do
+      enable_cache do
+        t_root_account.feature_flag('course_feature2')
+        Rails.cache.should be_exist(t_root_account.feature_flag_cache_key('course_feature2'))
+        t_root_account.expects(:feature_flags).never
+        t_root_account.feature_flag('course_feature2')
       end
     end
 
