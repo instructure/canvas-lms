@@ -6373,7 +6373,7 @@ fr:
     row_student_name: 
       student_placeholder: Étudiant
     screenreader: 
-      page_titles: "Relevé de notes pour lecteur d’écran"
+      page_titles: "Relevé de notes compatible avec les lecteurs d’écran"
     secondary_id: "ID secondaire"
     section_to_show_menu: 
       choose_a_section_to_show: "Choisir une section à afficher"
