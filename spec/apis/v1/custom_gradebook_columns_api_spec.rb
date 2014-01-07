@@ -169,4 +169,26 @@ describe CustomGradebookColumnsApiController, :type => :integration do
       @col.reload.should_not be_hidden
     end
   end
+
+  describe 'reorder' do
+    it 'works' do
+      names = %w(A B C)
+      c1, c2, c3 = 3.times.map { |i|
+        c = @course.custom_gradebook_columns.build(title: names.shift)
+        c.position = i
+        c.save!
+        c
+      }
+      @course.custom_gradebook_columns.should == [c1, c2, c3]
+
+      api_call :post,
+        "/api/v1/courses/#{@course.id}/custom_gradebook_columns/reorder",
+        {course_id: @course.to_param, action: "reorder",
+         controller: "custom_gradebook_columns_api", format: "json"},
+        order: [c3.id, c1.id, c2.id]
+      response.should be_success
+
+      @course.custom_gradebook_columns(true).should == [c3, c1, c2]
+    end
+  end
 end

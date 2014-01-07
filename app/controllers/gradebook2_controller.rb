@@ -44,6 +44,7 @@ class Gradebook2Controller < ApplicationController
       :custom_column_url => api_v1_course_custom_gradebook_column_url(@context, ":id"),
       :custom_column_data_url => api_v1_course_custom_gradebook_column_data_url(@context, ":id", per_page: per_page),
       :custom_column_datum_url => api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
+      :reorder_custom_columns_url => api_v1_custom_gradebook_columns_reorder_url(@context),
       :teacher_notes => teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
     }
   end

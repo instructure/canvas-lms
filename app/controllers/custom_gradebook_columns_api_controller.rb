@@ -104,6 +104,18 @@ class CustomGradebookColumnsApiController < ApplicationController
     end
   end
 
+  # @API Reorder custom columns
+  #
+  # Puts the given columns in the specified order
+  #
+  # @argument order[] [Required, Integer]
+  #
+  # <b>200 OK</b> is returned if successful
+  def reorder
+    @context.custom_gradebook_columns.build.update_order(params[:order])
+    render :status => 200, :json => {}
+  end
+
   def update_column(column)
     if authorized_action? column, @current_user, :manage
       if column.save

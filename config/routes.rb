@@ -1434,6 +1434,8 @@ routes.draw do
       prefix = "courses/:course_id/custom_gradebook_columns"
       get prefix, :action => :index, :path_name => "course_custom_gradebook_columns"
       post prefix, :action => :create
+      post "#{prefix}/reorder", :action => :reorder,
+        :path_name => "custom_gradebook_columns_reorder"
       put "#{prefix}/:id", :action => :update,
         :path_name => "course_custom_gradebook_column"
       delete "#{prefix}/:id", :action => :destroy

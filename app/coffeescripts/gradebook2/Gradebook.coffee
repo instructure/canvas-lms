@@ -231,6 +231,25 @@ define [
       else
         userSettings.contextSet('sort_grade_columns_by', newSortOrder)
 
+    onColumnsReordered: =>
+      # determine if assignment columns or custom columns were reordered
+      # (this works because frozen columns and non-frozen columns are can't be
+      # swapped)
+      columns = @grid.getColumns()
+      currentIds = _(@customColumns).map (c) -> c.id
+      reorderedIds = (m[1] for c in columns when m = c.id.match /^custom_col_(\d+)/)
+
+      if !_.isEqual(reorderedIds, currentIds)
+        @reorderCustomColumns(reorderedIds)
+        .then =>
+          colsById = _(@customColumns).indexBy (c) -> c.id
+          @customColumns = _(reorderedIds).map (id) -> colsById[id]
+      else
+        @storeCustomColumnOrder()
+
+    reorderCustomColumns: (ids) ->
+      $.ajaxJSON(@options.reorder_custom_columns_url, "POST", order: ids)
+
     storeCustomColumnOrder: =>
       newSortOrder =
         sortType: 'custom'
@@ -1023,7 +1042,7 @@ define [
         # TODO: start editing automatically when a number or letter is typed
         false
 
-      @grid.onColumnsReordered.subscribe @storeCustomColumnOrder
+      @grid.onColumnsReordered.subscribe @onColumnsReordered
 
       @onGridInit()
 
@@ -1148,7 +1167,9 @@ define [
         $target = $(e.target)
         if $target.hasClass("show")
           handleClick(e, "PUT", "column[hidden]": false)
-          .then showNotesColumn()
+          .then =>
+            showNotesColumn()
+            @reorderCustomColumns(@customColumns.map (c) -> c.id)
         if $target.hasClass("hide")
           handleClick(e, "PUT", "column[hidden]": true)
           .then hideNotesColumn()
