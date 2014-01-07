@@ -21,6 +21,9 @@ de:
     user_count: 
       one: "1 Benutzer"
       other: "%{count} Benutzer"
+  GroupUserCollection: 
+    flash: 
+      userAlreadyInGroup: "ACHTUNG: %{user} ist bereits Mitglied von %{group}"
   academic_benchmark: 
     api_error: "Die Standards für die Stelle %{auth} konnten nicht aktualisiert werden."
     bad_ab_file: "Die bereitgestellte Academic Benchmark-Datei weist einen Fehler auf."
@@ -538,6 +541,15 @@ de:
             text: "course_id:"
           outcome: 
             text: "outcome_id:"
+    cv_submission_data_csv_description: 
+      account_reports: 
+        galen: 
+          cv: 
+            attendance: 
+              text: "Dieser Bericht zeigt Einreichungen von Studenten bis zum angegebenen Datum. Diese Angaben werden für die CampusVue-Anwesenheit verwendet."
+        tmcc: 
+          description: 
+            header: Beispiel
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -589,6 +601,23 @@ de:
           last_user_access: 
             header: Beispiel
             text: "Dieser Bericht zeigt die letzte Anmeldung für aktive Benutzer."
+    learning_outcome_assignment_type_csv_description: 
+      account_reports: 
+        newark: 
+          student_activity: 
+            text: "Dieser Bericht enthält exportierte Daten, die Aufgaben Ergebnisse zuordnen."
+        samuel_merrit_university: 
+          description: 
+            header: Beispiel
+    learning_outcome_assignment_type_csv_parameters: 
+      account_reports: 
+        samuel_merrit_university: 
+          course: 
+            sis: 
+              text: "SIS-ID für Kurs"
+            text: Kurs-ID
+          parameters: 
+            note1: "Die Kurs-ID darf nicht leer sein, wenn der Bericht für alle Kurse der Kursperiode ausgeführt werden soll."
     mississippi_sis_csv_description: 
       account_reports: 
         mississisppi: 
@@ -782,6 +811,7 @@ de:
         outgoing_email_default_name_option_custom: "Benutzerdefinierter Name für \"Von\""
         outgoing_email_default_name_option_default: Canvas-Standardeinstellungen
         prevent_course_renaming_by_teachers: "Kursumbenennung durch Dozenten unterbinden"
+        restrict_quiz_questions: "Anzeige von Quizfragen für Studenten nach dem Enddatum des Kurses einschränken"
         restrict_student_future_view: "Anzeige von Kursen durch Studenten vor dem Startdatum einschränken"
         self_enrollment: "Selbsteinschreibung zulassen"
         self_registration: Selbstregistrierung
@@ -1221,6 +1251,7 @@ de:
     no_title: "Ohne Titel"
   announcements: 
     announcements_crumb: Ankündigungen
+    error_draft_state: "Der Status dieses Themas kann nicht auf Entwurf gesetzt werden, da es sich um eine Ankündigung handelt."
     external_feed: 
       alts: 
         deleted_feed: "Diesen Feed löschen"
@@ -1353,6 +1384,8 @@ de:
       a_quiz: "ein Quiz"
       a_text_entry_box: "ein Texteingabefeld"
       a_website_url: "eine Website-URL"
+      external_tool: "Ein externes Tool"
+      on_paper: "Als Papierdokument"
     titles: 
       grading_scheme_info: "Benotungssystem anzeigen/bearbeiten"
   assignment_details_dialog: 
@@ -1727,6 +1760,21 @@ de:
       title_add_group: "Aufgabengruppe hinzufügen"
     invalid_file_retrieval: "Beim Abrufen der mit diesem Tool gesendeten Datei ist ein Problem aufgetreten."
     invalid_tool_return: "Das gestartete Tool hat eine ungültige Ressource für die Aufgabe zurückgegeben"
+    keyboard_add_item: "Eine Aufgabe zur ausgewählten Gruppe hinzufügen"
+    keyboard_close_menu: "Aktives Dialogfeld schließen"
+    keyboard_del_item: "Aktuelle Aufgabe oder Gruppe löschen"
+    keyboard_edit_item: "Aktuelle Aufgabe oder Gruppe bearbeiten"
+    keyboard_next_item: "Fokus auf nächste Aufgabe oder Gruppe setzen"
+    keyboard_prev_item: "Fokus auf vorherige Aufgabe oder Gruppe setzen"
+    keyboard_show_assign: "Vollständige Vorschau der ausgewählten Aufgabe anzeigen"
+    keycodes: 
+      add_item: a
+      close_menu: ESC
+      del_item: d
+      edit_item: e
+      next: j
+      previous: k
+      show_assign: f
     labels: 
       assignment_group_move_label: Aufgabengruppe
       label_place_before: "Platzieren vor"
@@ -1757,6 +1805,7 @@ de:
       aria_assignments: Aufgaben
       assignments: Aufgaben
       no_assignments_found: "Es wurden keine Aufgaben gefunden"
+    no_name_error: "Name erforderlich"
     no_tools_found: "Keine Tools gefunden"
     non_number: "Sie müssen eine Zahl verwenden"
     notices: 
@@ -1995,6 +2044,7 @@ de:
           internet_check: Internet-Datenbank
           journal_check: "Magazine, Fachzeitschriften und Publikationen"
           student_paper_check: "Sonstige studentische Arbeiten"
+        originality_report_never: Nie
         originality_report_visibility: "Studenten können den Echtheitsbericht einsehen"
         originality_report_visible_after_due_date: "Nach dem Abgabetermin"
         originality_report_visible_after_grading: "Nach der Benotung der Aufgabe"
@@ -2067,6 +2117,7 @@ de:
   bb_file_description: "ZIP-Datei für Blackboard 6/7/8/9-Export"
   bb_name: "Blackboard Converter"
   big_blue_button_conference: 
+    conference_is_recorded: "Diese Konferenz wird aufgezeichnet."
     recording_setting: Aufzeichnung
     recording_setting_description: "Diese Konferenz aufzeichnen"
   blackboard: 
@@ -2143,6 +2194,7 @@ de:
     delete: Löschen
     done: Fertig
     filter: Filter
+    find_user: "Nach Benutzer suchen"
     hide_all_artifacts: "Alle Artefakte ausblenden"
     import: Importieren
     login: Anmeldung
@@ -2274,7 +2326,7 @@ de:
       create_event: "Neues Event erstellen"
       done_go_back_to_list: "Fertig. Zurück zur Liste"
       links: 
-        accessibility_warning: "Warnung: Benutzer mit Sprachausgabeprogrammen haben keinen Zugriff auf diese Ansicht"
+        accessibility_warning: "Achtung: Der Zugriff auf diese Ansicht mithilfe von Sprachausgabeprogrammen ist nicht möglich. Verwenden Sie stattdessen die Agenda-Ansicht."
         calendar_agenda: Agenda
         calendar_month: Monat
         calendar_scheduler: Planer
@@ -2649,11 +2701,6 @@ de:
       update_assignment_points: "Bei dieser Aufgabe sind %{assignmentPoints} Punkte erreichbar, möchten sie dies in %{rubricPoints}-punkte abändern, um sie dieser Rubrik anzupassen?"
     titles: 
       update_assignment_points: "Erreichbare Punktzahl der Rubrik anpassen?"
-  chat: 
-    notifications: 
-      tinychat_inaccessible: |-
-          Warnung: Auf dieser Seite wird Tinychat verwendet, ein Drittanbieter-Plug-in, auf das\⏎
-          Sprachausgabeprogramme keinen Zugriff haben.
   collaboration: 
     default_title: "Unbenannte Kollaboration"
   collaborations: 
@@ -3098,10 +3145,6 @@ de:
   context: 
     all_marked_read: "Alle Nachrichten im Posteingang als gelesen markieren"
     bad_message: "Diese Nachricht konnte nicht angezeigt werden"
-    chat: 
-      titles: 
-        chat: Chat
-    chat_not_enabled: "Für diese Canvas-seite wurde die Chatfunktion nicht aktiviert"
     communication: 
       headings: 
         discussions: Diskussionen
@@ -4441,6 +4484,8 @@ de:
       index: 
         add_people: "Personen hinzufügen"
         cannot_add_users: "Es können keine neuen Benutzer hinzugefügt werden, da der Kurs abgeschlossen wurde"
+        filter_field_description: "Wenn Sie Text in dieses Feld eingeben, wird die Liste der Personen automatisch gefiltert und enthält nur die Personen, deren Namen mit dem eingegebenen Text übereinstimmen."
+        filter_list_of_people: "Liste der Personen filtern"
         role_to_search: "Suche auf Rolle beschränken"
         search_people: "Personen durchsuchen"
       invitations_view: 
@@ -4749,7 +4794,6 @@ de:
     announcements: Ankündigungen
     assignments: Aufgaben
     calendar_events: Kalenderevents
-    chat: Chat
     conferences: Konferenzen
     confirmation: Bestätigung
     copy_course: "Kurs kopieren"
@@ -4912,7 +4956,8 @@ de:
     formats: 
       date_at_time: "%b %-d um %l:%M%P"
       default: "%d.%m.%Y"
-      long: "%d. %B %Y"
+      long: "%B %-d, %Y"
+      long_with_weekday: "%A, %B %-d"
       medium: "%d. %b %Y"
       medium_month: "%b %Y"
       medium_with_weekday: "%a %b %-d, %Y"
@@ -5095,7 +5140,7 @@ de:
       separated_conversation_notice: "Da es sich hier um eine Gruppenaufgabe handelt, verfügt jede Gruppe über eine Konversation für das Thema. Hier sehen Sie die Konversationen, auf die Sie Zugriff haben."
       show_due_dates: "Abgabetermine anzeigen"
       until: Bis
-    cannot_unpublish: "Veröffentlichung kann nicht rückgängig gemacht werden"
+    cannot_unpublish_with_replies: "Veröffentlichung kann nicht rückgängig gemacht werden, wenn keine Antworten vorliegen"
     confirm_delete_announcement: 
       one: "Möchten Sie diese Ankündigung wirklich löschen?"
       other: "Möchten Sie diese %{count} Ankündigungen wirklich löschen?"
@@ -5108,8 +5153,9 @@ de:
     discussion: 
       close_for_comments: "Für Kommentare schließen"
       delete: Löschen
-      due: Fällig
+      due_at: "*Fällig* %{assignment.display_due_at}"
       graded_discussion: "Benotete Diskussion"
+      last_post_date: "Letzter Beitrag %{display_last_reply_at}"
       manage: Verwalten
       no_due_date: "Kein Abgabetermin"
       open_to_comments: "Für Kommentare öffnen"
@@ -5162,8 +5208,6 @@ de:
       show_more_entries: 
         one: "1 weiteren Eintrag zeigen"
         other: "%{count} weitere Einträge zeigen"
-    error_draft_state_announcement: "Der Status dieses Themas kann nicht auf Entwurf gesetzt werden, da es sich um eine Ankündigung handelt."
-    error_draft_state_graded: "Der Status dieses Themas kann nicht in \"Entwurf\" geändert werden, da es sich um eine Aufgabe handelt"
     error_draft_state_unauthorized: "Sie sind nicht berechtigt, den Status dieses Themas auf Entwurf zu setzen."
     error_draft_state_with_posts: "Der Status dieses Themas darf nicht auf Entwurf gesetzt werden, da Beiträge vorhanden sind."
     group_assignment_discussion_entry: 
@@ -5212,7 +5256,10 @@ de:
       zero: "Keine Antworten"
     show: 
       add_rubric: "Rubrik hinzufügen"
+      announcement_closed: "Für diese Ankündigung können keine Kommentare abgegeben werden"
       announcement_locked: "Diese Ankündigung ist für Benutzer bis zum *%{date}* nicht sichtbar"
+      announcement_not_visible: "Diese Ankündigung ist für Benutzer nicht sichtbar"
+      announcement_will_open_on: "Für diese Ankündigung können am *%{date}* Kommentare abgegeben werden"
       authors_name: "Name des Autors"
       collapse_replies: "Antworten minimieren"
       confirm_delete_discussion: "Möchten Sie diese Diskussion wirklich löschen?"
@@ -5251,6 +5298,7 @@ de:
       topic_subscribe_tooltip: "Sie haben sich abgemeldet und erhalten keine Benachrichtigungen über neue Kommentare."
       topic_subscribed_tooltip: "Sie haben sich angemeldet und erhalten Benachrichtigungen über neue Kommentare."
       topic_unsubscribe: Angemeldet
+      topic_will_open_on: "Für dieses Thema können am *%{date}* Kommentare abgegeben werden"
       unlock_topic: "Für Kommentare öffnen"
       unread: Ungelesen
     sub_entry: 
@@ -6293,6 +6341,8 @@ de:
     resubmitted: "seit letzter Benotung erneut eingesandt"
     row_student_name: 
       student_placeholder: Student
+    screenreader: 
+      page_titles: "Sprachausgabeprogramm – Notenbuch"
     secondary_id: Zweit-ID
     section_to_show_menu: 
       choose_a_section_to_show: "Wählen Sie einen Kursabschnitt aus, der angezeigt werden soll"
@@ -6454,9 +6504,15 @@ de:
         show_what_if: "gespeicherte hypothetische Punktestände anzeigen"
       change_score_instructions: "Klicken Sie auf eine beliebige Punktzahl und geben Sie einen neuen Wert ein, um die Veränderung der Gesamtbewertung zu sehen."
       click_to_change: "Klicken, um andere Punktzahl zu testen"
+      close_comments: Schließen
+      close_comments_label: "Kommentare schließen"
+      close_rubric: "Rubrik schließen"
+      close_score: Schließen
+      close_score_screenreader: "Bewertungsdetails schließen"
       comment_count: 
         one: "1 Kommentar"
         other: "%{count} Kommentare"
+      comment_count_screenreader: "Kommentare lesen"
       faculty_journal: "Fakultätsjournal für %{user}"
       for_course: "Für den Kurs"
       headers: 
@@ -6491,7 +6547,9 @@ de:
       percent: Prozent
       print_grades: "Noten drucken"
       see_rubric_results: "Siehe Rubrikergebnisse"
+      see_rubric_results_screenreader: "Rubrik-Ergebnisse anzeigen"
       see_scoring_details: "Bewertungsdetails ansehen"
+      see_scoring_details_screenreader: "Bewertungsdetails anzeigen"
       see_turnitin_results: "Turnitin-ergebnisse ansehen"
       student_mute_legend: "Die Benotung wird zurzeit von Ihrem Dozenten bearbeitet. Während der Bearbeitung der Benotung können Noten und Kommentare nicht angezeigt werden."
       student_mute_notification: "Dozent arbeitet zurzeit an der Benotung"
@@ -6501,7 +6559,6 @@ de:
         turnitin_score: "Turnitin-similarity-score -- weitere Informationen"
         view_rubric_evaluation: "Rubrik-bewertung anzeigen"
         view_scoring_details: "Bewertungsdetails anzeigen"
-      view_comments: "Kommentare und Bewertungsdetails anzeigen"
     gradebook: 
       all_sections: Alle
       assignment_submitted_late: (verspätet)
@@ -6790,7 +6847,6 @@ de:
     name_required: "Name erforderlich"
     name_too_long: "Kürzeren Gruppennamen eingeben"
     tabs: 
-      chat: Chat
       discussions: Diskussionen
       files: Dateien
       home: Startseite
@@ -6875,7 +6931,7 @@ de:
         one: "1 Student"
         other: "%{count} Studenten"
       warnings: 
-        studend_groups: "Diese Gruppen werden von Studenten selbst organisiert. Im Gegensatz zu anderen Gruppenarten können Studenten mehr als einer dieser Gruppen gleichzeitig angehören, für benotete Aufgaben sind diese Gruppen daher nicht ideal."
+        studend_groups: "Diese Gruppen werden von Studenten selbst organisiert. Im Gegensatz zu anderen Gruppenarten können Studenten mehr als einer dieser Gruppen gleichzeitig angehören. Deshalb können diese Gruppen nicht für benotete Aufgaben verwendet werden."
     confirm: 
       assign_students: "Bei dieser Option werden alle noch nicht zugewiesenen Studenten so gleichmäßig wie möglich unter den vorhandenen Studentengruppen aufgeteilt."
       delete_group: "Möchten Sie diese Gruppe wirklich löschen?"
@@ -7007,6 +7063,7 @@ de:
       group_category: 
         randomly_assigning_students: "Studenten werden nach dem Zufallsprinzip zugewiesen"
         search_groups: "Gruppen durchsuchen"
+        search_users: "Benutzer durchsuchen"
       group_category_create: 
         allow_self_signup: "Selbstregistrierung zulassen"
         cancel: Abbrechen
@@ -7031,7 +7088,7 @@ de:
         message_all_unassigned_option: "Nachricht an alle nicht zugewiesenen Studenten senden"
         randomly_assign_students_option: "Studenten nach dem Zufallsprinzip zuweisen"
         restricted_self_signup_blurb: "Alle Studenten in einer Gruppe müssen zum selben Abschnitt gehören."
-        self_organized_warning: "Diese Gruppen werden von Studenten selbst organisiert. Im Gegensatz zu anderen Gruppenarten können Studenten zu mehr als einer dieser Gruppen gleichzeitig gehören. Für benotete Aufgaben sind diese Gruppen daher nicht ideal."
+        self_organized_warning: "Diese Gruppen werden von Studenten selbst organisiert. Im Gegensatz zu anderen Gruppenarten können Studenten mehr als einer dieser Gruppen gleichzeitig angehören. Deshalb können diese Gruppen nicht für benotete Aufgaben verwendet werden."
         self_signup_blurb: "Selbstregistrierung für diese Gruppen wurde aktiviert."
         settings: Einstellungen
       group_category_edit: 
@@ -7068,6 +7125,8 @@ de:
         remove: Entfernen
         remove_from_group: "%{name} aus Gruppe entfernen"
       group_users: 
+        no_matching_students: "Keine übereinstimmenden Studenten."
+        no_matching_users: "Keine übereinstimmenden Benutzer."
         no_students: "Derzeit sind keine Studenten in dieser Gruppe vorhanden. Fügen Sie einen Studenten hinzu, um zu beginnen."
         no_users: "Derzeit sind keine Benutzer in dieser Gruppe vorhanden. Fügen Sie einen Benutzer hinzu, um zu beginnen."
       groups: 
@@ -7168,6 +7227,8 @@ de:
       x_new_in_discussions: 
         one: "*1* Diskussion"
         other: "*%{count}* Diskussionen"
+  ic_actions: 
+    manage: Verwalten
   images: 
     error_checking_color: "Fehler beim Überprüfen der Bildfarbe"
     invalid_background_color: "Hintergrundfarbe muss %{color} sein"
@@ -10159,16 +10220,6 @@ de:
         minimum_rows_for_parallel: "Mindestzahl an Zeilen in einem SIS-Import vor Nutzung der parallelen Verarbeitung"
         parallelism: "Anzahl der zu nutzenden Auftragsprozessoren, um SIS-Importe parallel zu verarbeiten"
         queue_for_parallel_jobs: "Auftragswarteschlange für parallele Jobs (Standard: leer)"
-    tinychat: 
-      description: Tinychat-Chatroom
-      name: Tinychat
-    tinychat_settings: 
-      description: |-
-          Sie müssen eine [neue Applikation auf Tinychat registrieren](%{tinychat_url}).
-          Notieren Sie sich die Werte für Public Key und Secret Key.
-      labels: 
-        api_key: "Public Key"
-        secret_key: "Secret Key"
     twitter: 
       description: Twitter-benachrichtigungen
       name: Twitter
@@ -10621,6 +10672,7 @@ de:
     login: 
       invalid_login: "Ungültige Zugangskennung"
       invalid_password: "Ungültiges Passwort"
+      parent_signup: "Anmeldung des übergeordneten Benutzers"
       password_confirmation_sent: "Passwort-bestätigung verschickt an %{email_address}. Überprüfen Sie gegebenenfalls auch Ihren Spamordner."
     notices: 
       account_registered: "Benutzerkonto registriert!"
@@ -10637,10 +10689,18 @@ de:
       publishing: "Wird veröffentlicht..."
       unpublish: "Veröffentlichung rückgängig machen"
       unpublishing: "Veröffentlichung wird rückgängig gemacht..."
+  publish_icon_component: 
+    publish: Veröffentlichen
+    publish_click: "Veröffentlicht. Zum Rückgängigmachen der Veröffentlichung klicken"
+    unpublish: "Veröffentlichung rückgängig machen"
+    unpublish_click: "Veröffentlichung rückgängig gemacht. Zum Veröffentlichen klicken"
   publishable: 
     cant_unpublish: "Veröffentlichung kann nicht rückgängig gemacht werden"
   publishableModuleItem: 
     disabled: "Die Veröffentlichung ist für dieses Element deaktiviert"
+    disabled_assignment: "Veröffentlichung kann nicht rückgängig gemacht werden, wenn Einsendungen von Studenten vorhanden sind"
+    disabled_discussion_topic: "Veröffentlichung kann nicht rückgängig gemacht werden, wenn Einsendungen von Studenten vorhanden sind"
+    disabled_quiz: "Veröffentlichung kann nicht rückgängig gemacht werden, wenn Einsendungen von Studenten vorhanden sind"
   purchases: 
     new: 
       payment_info: Zahlungsinformationen
@@ -10934,6 +10994,9 @@ de:
       no_more_attempts: "Sie haben keine Quizversuche mehr übrig"
       no_possible_solution: "Bitte erstellen Sie mindestens eine mögliche Lösung"
       quiz_deleted: "Dieses Quiz wurde gelöscht"
+      quiz_score_not_a_number: "Der Punktestand muss eine Zahl zwischen 0 und 2.000.000.000. sein."
+      quiz_score_too_long: "Der Punktestand muss unter 2.000.000.000 liegen."
+      quiz_score_too_short: "Der Punktestand muss über 0 liegen."
       quiz_update_failed: "Aktualisierung des Quizzes fehlgeschlagen"
       retrieving_filters_failed: "Abrufen von Filtern fehlgeschlagen"
     fabulous_quizzes: 
@@ -11345,6 +11408,7 @@ de:
       show_correct_answers: "Studenten die richtigen Antworten anzeigen"
       show_correct_answers_at: "Richtige Antworten anzeigen unter"
       shuffle_answers: "Antworten mischen"
+      students_cannot_view_responses_after_course_concludes: "Die Studenten können Quiz-Antworten nach Abschluss des Kurses nicht mehr anzeigen"
       time_limit: "Wie viele Minuten?"
       titles: 
         click_to_select_filter: "Klicken, um diesen Filter auszuwählen"
@@ -11789,6 +11853,7 @@ de:
       unpublished_changes: "*Sie haben nicht veröffentlichte Änderungen an diesem Quiz vorgenommen.* Diese Änderungen werden den Studenten erst angezeigt, wenn Sie das Quiz veröffentlichen oder neu veröffentlichen."
       unpublished_quiz: "*Dieses Quiz wurde nicht veröffentlicht* Das Quiz ist bis zur Veröffentlichung nur für Dozenten sichtbar."
   quizzes_model: 
+    cant_unpublish_when_students_submit: "Veröffentlichung kann nicht rückgängig gemacht werden, wenn Einsendungen von Studenten vorhanden sind"
     confirms: 
       delete_quiz: "Möchten Sie dieses Quiz wirklich löschen?"
     delete_quiz: "Quiz löschen"
@@ -11959,6 +12024,9 @@ de:
   roster: 
     delete_confirm: "Möchten Sie diesen Benutzer wirklich entfernen?"
     error_sending_invitations: "Fehler beim Senden der Einladung. Versuchen Sie es erneut."
+    filter_multiple_users_found: "%{userCount} Benutzer gefunden."
+    filter_no_users_found: "Keine übereinstimmenden Benutzer gefunden."
+    filter_one_user_found: "1 Benutzer gefunden."
     flash: 
       removeError: "Der Benutzer konnte nicht entfernt werden. Versuchen Sie es später erneut."
       removed: "Benutzer wurde erfolgreich entfernt."
@@ -12432,6 +12500,7 @@ de:
       back_to_login: "Zurück zur Anmeldung"
       buttons: 
         request_password: "Passwort anfordern"
+      coenrollment_banner: "*Übergeordneter Benutzer eines Canvas-Benutzers?* **Für ein Konto hier klicken**"
       default_login_message: "Über Ihre Bildungsinstitution anmelden"
       dont_know_password: "Ich habe mein Passwort vergessen"
       labels: 
@@ -12874,11 +12943,21 @@ de:
       loading: "Ladevorgang läuft..."
     titles: 
       value_over_time: "%{value} Im Verlauf der Zeit"
+    user_search: 
+      find_user_by: "Benutzer mithilfe von Zugangskennung/E-Mail suchen"
+      find_user_by_label: Zugangskennung/E-Mail
+    users: 
+      user_search_label: Benutzersuche
+      users_matching_label: "Benutzer stimmen überein"
   slideshow: 
     titles: 
       back: Zurück
       close: Schließen
       forward: Weiterleiten
+  sr_gradebook: 
+    all_sections: "Alle Abschnitte"
+    no_assignment: "Keine Aufgabe ausgewählt"
+    no_student: "Kein Student ausgewählt"
   statistics: 
     csv_columns: 
       attempt: Versuch
@@ -12982,7 +13061,7 @@ de:
         save_comment: "Kommentar speichern"
       crumbs: 
         assignments: Aufgaben
-      hide_rubric_button: "Rubrik-Schaltfläche ausblenden"
+      hide_rubric_button: "Rubrik ausblenden"
       labels: 
         add_a_comment: "Kommentar hinzufügen"
         grade: Note
@@ -13058,7 +13137,6 @@ de:
   tabs: 
     announcements: Ankündigungen
     assignments: Aufgaben
-    chat: Chat
     collaborations: Kollaboration
     conferences: Konferenzen
     discussions: Diskussionen
@@ -13557,6 +13635,8 @@ de:
       resending: "Wird erneut verschickt..."
       sent_email_paragraph: "Wir haben eine E-mail an %{email_address} verschickt. *Klicken Sie auf den Link in dieser E-Mail, um die Registrierung abzuschließen*. Sollten Sie die E-mail nicht in Ihrem Posteingang vorfinden, klicken Sie hier, um die **E-mail erneut zu verschicken** und überprüfen Sie auch Ihren Spamordner."
       while_you_wait: "Während Sie warten..."
+    scheduled_conference: 
+      current_conference_text: "Sie wurden zur Teilnahme an %{conference} eingeladen. Die Konferenz beginnt am %{starts_at}."
     service_not_enabled: "Dieser Dienst wurde nicht aktiviert"
     show: 
       accounts: Konten
