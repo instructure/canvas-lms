@@ -520,11 +520,12 @@ class ActiveRecord::Base
     batch_size = options[:batch_size] || 1000
     transaction do
       begin
-        cursor = "#{table_name}_in_batches_cursor"
         scope = scope(:find)
         scope = scope ? scope.dup : {}
         scope.delete(:include)
-        with_exclusive_scope(find: scope) { connection.execute("DECLARE #{cursor} CURSOR FOR #{scoped.to_sql}") }
+        sql = with_exclusive_scope(find: scope) { scoped.to_sql }
+        cursor = "#{table_name}_in_batches_cursor_#{sql.hash.abs.to_s(36)}"
+        connection.execute("DECLARE #{cursor} CURSOR FOR #{sql}")
         includes = scope(:find, :include)
         with_exclusive_scope do
           batch = connection.uncached { find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
