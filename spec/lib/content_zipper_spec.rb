@@ -21,10 +21,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe ContentZipper do
   describe "zip_assignment" do
     it "sanitizes user names" do
-      s1, s2 = 2.times.map { course_with_student ; @student }
+      s1, s2, s3 = n_students_in_course(3)
       s1.update_attribute :sortable_name, 'some_999_, _1234_guy'
       s2.update_attribute :sortable_name, 'other 567, guy 8'
-      [s1, s2].each { |s|
+      s3.update_attribute :sortable_name, '45'
+      [s1, s2, s3].each { |s|
         submission_model user: s, assignment: @assignment, body: "blah"
       }
       attachment = Attachment.new(:display_name => 'my_download.zip')
@@ -36,6 +37,7 @@ describe ContentZipper do
       expected_file_patterns = [
         /other-567--guy-8/,
         /some-999----1234-guy/,
+        /-45-/,
       ]
       Zip::File.foreach(attachment.reload.full_filename) { |f|
         expect {
