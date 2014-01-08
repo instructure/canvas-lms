@@ -43,7 +43,7 @@ module Api::V1::OutcomeResults
   # Internal: Returns a hash for linked of serialized outcomes
   def serialize_linked_outcomes(outcomes)
     {
-      outcomes: outcomes.map { |o| outcome_json(o, @current_user, session) },
+      outcomes: outcomes.map { |o| Api.recursively_stringify_json_ids(outcome_json(o, @current_user, session)) },
     }
   end
 
@@ -56,7 +56,7 @@ module Api::V1::OutcomeResults
   def serialize_rollup(rollup)
     # both Course and User have a name method, so this works for both.
     {
-      id: rollup.context.id,
+      id: rollup.context.id.to_s,
       name: rollup.context.name,
       scores: serialize_rollup_scores(rollup.scores),
     }
@@ -76,10 +76,6 @@ module Api::V1::OutcomeResults
     serialized_rollups_with_section_duplicates.flatten(1)
   end
 
-  def serialize_user_rollup(rollup)
-    serialize_rollup.merge(links: {section: section.id})
-  end
-
   # Internal: generates an array of duplicate serialized_rollups with distinct
   # section links for each section of the user's course. If @section is set (as
   # it is if section_id is sent as a parameter to the rollup api endpoint), only
@@ -93,7 +89,7 @@ module Api::V1::OutcomeResults
     # is in multiple sections, they will have multiple rollup results. pagination is
     # still by user, so the counts won't match up. again, this is a very rare thing
     (@section ? [@section] : rollup.context.sections_for_course(@context)).map do |section|
-      serialized_rollup.merge(links: {section: section.id})
+      serialized_rollup.merge(links: {section: section.id.to_s})
     end
   end
 
@@ -106,7 +102,7 @@ module Api::V1::OutcomeResults
   def serialize_rollup_score(score)
     {
       score: score.score,
-      links: {outcome: score.outcome.id},
+      links: {outcome: score.outcome.id.to_s},
     }
   end
 end
