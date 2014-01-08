@@ -76,8 +76,14 @@ module Api::V1::OutcomeResults
     serialized_rollups_with_section_duplicates.flatten(1)
   end
 
+  def serialize_user_rollup(rollup)
+    serialize_rollup.merge(links: {section: section.id})
+  end
+
   # Internal: generates an array of duplicate serialized_rollups with distinct
-  # section links for each section of the user's course.
+  # section links for each section of the user's course. If @section is set (as
+  # it is if section_id is sent as a parameter to the rollup api endpoint), only
+  # that section is included
   def duplicate_rollup_row_for_sections(rollup, serialized_rollup)
     # this is uglier than it should be to inject section ids. they really should
     # be in a 'links' section or something.
@@ -86,7 +92,7 @@ module Api::V1::OutcomeResults
     # we're mostly assuming that there is one section enrollment per user. if a user
     # is in multiple sections, they will have multiple rollup results. pagination is
     # still by user, so the counts won't match up. again, this is a very rare thing
-    rollup.context.sections_for_course(@context).map do |section|
+    (@section ? [@section] : rollup.context.sections_for_course(@context)).map do |section|
       serialized_rollup.merge(links: {section: section.id})
     end
   end

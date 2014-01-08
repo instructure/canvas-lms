@@ -79,7 +79,7 @@ describe "Outcome Results API", :type => :integration do
     outcome_assignment.find_or_create_submission(student)
   end
 
-  def create_outcome_assessment(student = outcome_student)
+  def create_outcome_assessment(student = outcome_student, points = first_outcome_rating[:points])
     outcome_rubric_association.assess(
       user: student,
       assessor: outcome_teacher,
@@ -87,7 +87,7 @@ describe "Outcome Results API", :type => :integration do
       assessment: {
         assessment_type: 'grading',
         "criterion_#{outcome_criterion[:id]}".to_sym => {
-          points: first_outcome_rating[:points]
+          points: points
         }
       }
     )
@@ -101,22 +101,23 @@ describe "Outcome Results API", :type => :integration do
   let(:outcome_students) do
     students = 0.upto(3).map do |i|
       student = student_in_course(active_all: true).user
-      submission = outcome_assignment.find_or_create_submission(student)
-      outcome_rubric_association.assess(
-        user: student,
-        assessor: outcome_teacher,
-        artifact: submission,
-        assessment: {
-          assessment_type: 'grading',
-          "criterion_#{outcome_criterion[:id]}".to_sym => {
-            points: i
-          }
-        }
-      )
+      create_outcome_assessment(student, i)
       student
     end
   end
-  
+
+  let(:outcome_course_sections) do
+    [0,1].map { |i| outcome_course.course_sections.create(name: "section #{i}") }
+  end
+
+  let(:sectioned_outcome_students) do
+    0.upto(3).map do |i|
+      student = student_in_section(outcome_course_sections[i % 2])
+      create_outcome_assessment(student, i)
+      student
+    end
+  end
+
   def outcome_rollups_url(context, params = {})
     api_v1_course_outcome_rollups_url(context, params)
   end
@@ -154,6 +155,16 @@ describe "Outcome Results API", :type => :integration do
         raw_api_call(:get, outcome_rollups_url(@course, user_ids: "#{@teacher.id}"),
           controller: 'outcome_results', action: 'rollups', format: 'json',
           course_id: @course.id.to_s, user_ids: @teacher.id)
+        response.status.to_i.should == 400
+      end
+
+      it "requires section id to be a section in the context" do
+        outcome_course
+        bogus_section = course(active_course: true).course_sections.create!(name: 'bogus section')
+        course_with_teacher_logged_in(course: outcome_course, active_all: true)
+        raw_api_call(:get, outcome_rollups_url(outcome_course, section_id: bogus_section.id),
+          controller: 'outcome_results', action: 'rollups', format: 'json',
+          course_id: @course.id.to_s, section_id: bogus_section.id.to_s)
         response.status.to_i.should == 400
       end
     end
@@ -202,6 +213,32 @@ describe "Outcome Results API", :type => :integration do
             rollup['scores'].each do |score|
               score.keys.sort.should == %w(links score)
               [0,1].should be_include(score['score'])
+              score['links'].keys.should == %w(outcome)
+              score['links']['outcome'].should == outcome_object.id
+            end
+          end
+          json['linked'].keys.should == %w(outcomes)
+          json['linked']['outcomes'].size.should == 1
+        end
+      end
+
+      describe "section_id parameter" do
+        it "restricts results to the specified section" do
+          sectioned_outcome_students
+          course_with_teacher_logged_in(course: outcome_course, active_all: true)
+          api_call(:get, outcome_rollups_url(outcome_course, section_id: outcome_course_sections[0].id),
+                   controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, section_id: outcome_course_sections[0].id.to_s)
+          json = JSON.parse(response.body)
+          json.keys.sort.should == %w(linked meta rollups)
+          json['rollups'].size.should == 2
+          json['rollups'].each do |rollup|
+            rollup.keys.sort.should == %w(id links name scores)
+            rollup['links'].keys.should == %w(section)
+            rollup['links']['section'].should == outcome_course_sections[0].id
+            rollup['scores'].size.should == 1
+            rollup['scores'].each do |score|
+              score.keys.sort.should == %w(links score)
+              [0,2].should be_include(score['score'])
               score['links'].keys.should == %w(outcome)
               score['links']['outcome'].should == outcome_object.id
             end
@@ -263,9 +300,34 @@ describe "Outcome Results API", :type => :integration do
           end
         end
       end
+
+      describe "section_id parameter" do
+        it "restricts aggregate to the specified section" do
+          sectioned_outcome_students
+          course_with_teacher_logged_in(course: outcome_course, active_all: true)
+          api_call(:get, outcome_rollups_url(outcome_course, aggregate: 'course', section_id: outcome_course_sections[0].id),
+                   controller: 'outcome_results', action: 'rollups', format: 'json',
+                   course_id: outcome_course.id.to_s, aggregate: 'course',
+                   section_id: outcome_course_sections[0].id.to_s)
+          json = JSON.parse(response.body)
+          json.keys.sort.should == %w(linked rollups)
+          json['rollups'].size.should == 1
+          json['rollups'].each do |rollup|
+            rollup.keys.sort.should == %w(id name scores)
+            rollup['id'].should == outcome_course.id
+            rollup['name'].should == outcome_course.name
+            rollup['scores'].size.should == 1
+            rollup['scores'].each do |score|
+              score.keys.sort.should == %w(links score)
+              score['score'].should == 1
+              score['links'].keys.should == %w(outcome)
+            end
+          end
+        end
+      end
     end
   end
-  
+
   describe "sharding" do
     specs_require_sharding
 

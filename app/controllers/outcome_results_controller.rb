@@ -157,24 +157,35 @@ class OutcomeResultsController < ApplicationController
   #  that user_ids does not include users not in the context.
   #
   # Returns false and renders an error if user_ids includes a user outside the
-  #  context. Returns a user scope otherwise.
+  #  context. Returns a User scope otherwise.
   def require_users
-    @users = users_for_outcome_context
+    if params[:user_ids] && params[:section_id]
+      render json: {message: "cannot specify both user_ids and section_id"}, status: :bad_request
+      return false
+    end
+
     if params[:user_ids]
       user_ids = Api.value_to_array(params[:user_ids]).map(&:to_i).uniq
-      @users = @users.where(id: user_ids)
+      @users = users_for_outcome_context.where(id: user_ids)
       if @users.count != user_ids.count
         render json: {message: "can only include id's of users in the outcome context"}, status: :bad_request
         return false
       end
+    elsif params[:section_id]
+      @section = @context.course_sections.where(id: params[:section_id].to_i).first
+      unless @section
+        render json: {message: "invalid section id"}, status: :bad_request
+        return false
+      end
+      @users = @section.students
     end
-    @users
+    @users ||= users_for_outcome_context
   end
 
   # Internal: Gets a list of users that should have results returned based on
   #   @context. For courses, this will only return students.
   #
-  # Returns an Enumeration of User objects.
+  # Returns a User scope.
   def users_for_outcome_context
     # this only works for courses; when other context types are added, this will
     # need to treat them differently.
