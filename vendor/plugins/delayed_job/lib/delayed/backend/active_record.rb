@@ -18,7 +18,7 @@ module Delayed
       # Contains the work object as a YAML field.
       class Job < ::ActiveRecord::Base
         include Delayed::Backend::Base
-        set_table_name :delayed_jobs
+        self.table_name = :delayed_jobs
 
         def self.reconnect!
           connection.reconnect!
@@ -341,7 +341,7 @@ module Delayed
 
         class Failed < Job
           include Delayed::Backend::Base
-          set_table_name :failed_jobs
+          self.table_name = :failed_jobs
         end
       end
 

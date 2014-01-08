@@ -17,7 +17,7 @@
 #
 
 class PageView < ActiveRecord::Base
-  set_primary_key 'request_id'
+  self.primary_key = 'request_id'
 
   belongs_to :developer_key
   belongs_to :user

@@ -81,8 +81,8 @@ class DueDateCacher
 
         # create an ActiveRecord class around that temp table for the update_all
         scope = Class.new(ActiveRecord::Base) do
-          set_table_name :calculated_due_ats
-          set_primary_key :submission_id
+          self.table_name = :calculated_due_ats
+          self.primary_key = :submission_id
         end
 
         # for each override, narrow to the affected subset of the table, and

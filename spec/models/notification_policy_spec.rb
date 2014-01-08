@@ -79,7 +79,7 @@ describe NotificationPolicy do
                          :category => "TestImmediately"
     Message.any_instance.stubs(:get_template).returns("here's a free <%= data.favorite_soda %>")
     class DataTest < ActiveRecord::Base
-      set_table_name :courses
+      self.table_name = :courses
       attr_protected
       has_a_broadcast_policy
       set_broadcast_policy do
