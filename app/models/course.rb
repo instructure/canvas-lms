@@ -1700,7 +1700,9 @@ class Course < ActiveRecord::Base
       section.default_section = true
       section.course = self
       section.root_account_id = self.root_account_id
-      section.save unless new_record?
+      Shackles.activate(:master) do
+        section.save unless new_record?
+      end
     end
     section
   end
