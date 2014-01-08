@@ -153,7 +153,7 @@ describe Assignment do
 
     it "should not update when non-student submissions transition state" do
       assignment_model
-      s = Assignment.find_or_create_submission(@assignment.id, @teacher.id)
+      s = @assignment.find_or_create_submission(@teacher)
       s.submission_type = 'online_quiz'
       s.workflow_state = 'submitted'
       s.save!
@@ -639,32 +639,22 @@ describe Assignment do
       @course.enroll_student(@user).update_attribute(:workflow_state, 'accepted')
       @assignment.context.reload
 
-      dummy_sub = Submission.new
-      dummy_sub.assignment_id = @assignment.id
-      dummy_sub.user_id = @user.id
+      real_sub = @assignment.submissions.build(user: @user)
 
-      real_sub = Submission.new
-      real_sub.assignment_id = @assignment.id
-      real_sub.user_id = @user.id
-      real_sub.save!
-
-      Submission.expects(:find_or_initialize_by_assignment_id_and_user_id).
-        twice.
-        returns(dummy_sub).
-        returns(real_sub)
+      @assignment.submissions.expects(:where).once.returns(Submission.none)
+      @assignment.submissions.expects(:build).once.returns(real_sub)
 
       sub = nil
       lambda {
         sub = yield(@assignment, @user)
       }.should_not raise_error
       sub.should_not be_new_record
-      sub.should_not eql dummy_sub
       sub.should eql real_sub
     end
 
     it "should handle them gracefully in find_or_create_submission" do
       concurrent_inserts do |assignment, user|
-        Assignment.find_or_create_submission(assignment.id, user.id)
+        assignment.find_or_create_submission(user)
       end
     end
 

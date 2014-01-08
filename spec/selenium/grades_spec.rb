@@ -119,7 +119,7 @@ describe "grades" do
     it "should allow student to test modifying grades" do
       get "/courses/#{@course.id}/grades"
 
-      Assignment.expects(:find_or_create_submission).twice.returns(@submission)
+      Assignment.any_instance.expects(:find_or_create_submission).twice.returns(@submission)
 
       #check initial total
       f('#submission_final-grade .assignment_score .grade').text.should == '33.3'

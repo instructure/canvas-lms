@@ -43,7 +43,7 @@ class Assignment < ActiveRecord::Base
 
   attr_reader :assignment_changed
 
-  has_many :submissions, :class_name => 'Submission', :dependent => :destroy
+  has_many :submissions, :dependent => :destroy
   has_many :attachments, :as => :context, :dependent => :destroy
   has_one :quiz
   belongs_to :assignment_group
@@ -816,13 +816,9 @@ class Assignment < ActiveRecord::Base
     score = self.grade_to_score(options[:default_grade])
     grade = self.score_to_grade(score)
     submissions_to_save = []
-    self.context.students.find_each do |student|
-      submission = self.find_or_create_submission(student)
-      if !submission.score || options[:overwrite_existing_grades]
-        if submission.score != score
-          submissions_to_save << submission
-        end
-      end
+    self.context.students.find_in_batches do |students|
+      submissions = find_or_create_submissions(students)
+      submissions_to_save.concat(submissions.select  { !submissions.score || (options[:overwrite_existing_grades] && submissions.score != score) })
     end
 
     Submission.where(:id => submissions_to_save).update_all({
@@ -868,6 +864,7 @@ class Assignment < ActiveRecord::Base
         .joins("INNER JOIN enrollments ON enrollments.user_id=users.id")
         .where(:enrollments => { :course_id => self.context})
         .where(Course.reflections[:student_enrollments].options[:conditions])
+        .order("users.id") # this helps with preventing deadlock with other things that touch lots of users
         .uniq
         .all
     end
@@ -901,10 +898,9 @@ class Assignment < ActiveRecord::Base
       :media_comment_type => (opts.delete :media_comment_type),
     }
     submissions = []
-
-    students.each do |student|
+    find_or_create_submissions(students) do |submission|
       submission_updated = false
-      submission = self.find_or_create_submission(student)
+      student = submission.user
       if student == original_student || !grade_group_students_individually
         previously_graded = submission.grade.present?
         submission.attributes = opts
@@ -925,7 +921,7 @@ class Assignment < ActiveRecord::Base
           submission.grade = self.score_to_grade(submission.score, submission.grade)
         end
         submission.grade_matches_current_submission = true if did_grade
-        submission_updated = true if submission.changed?
+        submission_updated = true if !(submission.changes.keys - ['user_id', 'assignment_id']).empty?
         submission.workflow_state = "graded" if submission.score_changed? || submission.grade_matches_current_submission
         submission.group = group
         submission.graded_at = Time.zone.now if did_grade
@@ -938,28 +934,47 @@ class Assignment < ActiveRecord::Base
     submissions
   end
 
-  def self.find_or_create_submission(assignment_id, user_id)
-    s = nil
-    unique_constraint_retry do
-      s = Submission.find_or_initialize_by_assignment_id_and_user_id(assignment_id, user_id)
-      s.save_without_broadcasting if s.new_record?
-    end
-    raise "bad" if s.new_record?
-    s
-  end
-
-  def self.find_or_initialize_submission(assignment_id, user_id)
-    Submission.find_or_initialize_by_assignment_id_and_user_id(assignment_id, user_id)
-  end
-
   def find_or_create_submission(user)
-    user_id = user.is_a?(User) ? user.id : user
-    Assignment.find_or_create_submission(self.id, user_id)
+    Assignment.unique_constraint_retry do
+      s = submissions.where(user_id: user).first
+      if !s
+        s = submissions.build
+        user.is_a?(User) ? s.user = user : s.user_id = user
+        s.save!
+      end
+      s
+    end
   end
 
-  def find_or_initialize_submission(user)
-    user_id = user.is_a?(User) ? user.id : user
-    Assignment.find_or_initialize_submission(self.id, user_id)
+  def find_or_create_submissions(students)
+    submissions = self.submissions.where(user_id: students).order(:user_id).to_a
+    submissions_hash = submissions.index_by(&:user_id)
+    students.each do |student|
+      submission = submissions_hash[student.id]
+      if !submission
+        begin
+          transaction(requires_new: true) do
+            submission = self.submissions.build(user: student)
+            submission.assignment = self
+            yield submission if block_given?
+            submission.save! if submission.changed?
+            submissions << submission
+          end
+        rescue ActiveRecord::Base::UniqueConstraintViolation
+          submission = self.submissions.where(user_id: student).first
+          raise unless submission
+          submissions << submission
+          submission.assignment = self
+          submission.user = student
+          yield submission if block_given?
+        end
+      else
+        submission.assignment = self
+        submission.user = student
+        yield submission if block_given?
+      end
+    end
+    submissions
   end
 
   def find_asset_for_assessment(association, user_id)
@@ -969,10 +984,6 @@ class Assignment < ActiveRecord::Base
     else
       [self, user]
     end
-  end
-
-  def find_submission(user)
-    Submission.find_by_assignment_id_and_user_id(self.id, user.id)
   end
 
   # Update at this point is solely used for commenting on the submission
@@ -989,17 +1000,23 @@ class Assignment < ActiveRecord::Base
       opts[:assessment_request].complete unless opts[:assessment_request].rubric_association
     end
 
-    students.each do |student|
-      if (opts['comment'] && Canvas::Plugin.value_to_boolean(opts['group_comment'])) || student == original_student
-        s = self.find_or_create_submission(student)
-        s.assignment_id = self.id
-        s.user_id = student.id
+    if (opts['comment'] && Canvas::Plugin.value_to_boolean(opts['group_comment']))
+      res = find_or_create_submissions(students) do |s|
         s.group = group
         s.save! if s.changed?
         s.add_comment(opts)
+        # this is lame, SubmissionComment updates the submission directly in the db
+        # in an after_save, and of course Rails doesn't preload the reverse association
+        # on new objects so it can't set it on this object
         s.reload
-        res << s
       end
+    else
+      s = find_or_create_submission(original_student)
+      s.group = group
+      s.save! if s.changed?
+      s.add_comment(opts)
+      s.reload
+      res = [s]
     end
     res
   end
@@ -1028,33 +1045,31 @@ class Assignment < ActiveRecord::Base
                   true
                 end
     transaction do
-      students.each do |student|
-        Assignment.unique_constraint_retry do
-          homework = Submission.find_or_initialize_by_assignment_id_and_user_id(self.id, student.id)
-          homework.grade_matches_current_submission = homework.score ? false : true
-          homework.attributes = opts.merge({
-            :attachment => nil,
-            :processed => false,
-            :process_attempts => 0,
-            :workflow_state => submitted ? "submitted" : "unsubmitted",
-            :group => group
-          })
-          homework.submitted_at = Time.now
+      find_or_create_submissions(students) do |homework|
+        student = homework.user
+        homework.grade_matches_current_submission = homework.score ? false : true
+        homework.attributes = opts.merge({
+          :attachment => nil,
+          :processed => false,
+          :process_attempts => 0,
+          :workflow_state => submitted ? "submitted" : "unsubmitted",
+          :group => group
+        })
+        homework.submitted_at = Time.now
 
-          homework.with_versioning(:explicit => true) do
-            if group
-              if student == original_student
-                homework.broadcast_group_submission
-              else
-                homework.save_without_broadcasting!
-              end
+        homework.with_versioning(:explicit => true) do
+          if group
+            if student == original_student
+              homework.broadcast_group_submission
             else
-              homework.save!
+              homework.save_without_broadcasting!
             end
+          else
+            homework.save!
           end
-          homeworks << homework
-          primary_homework = homework if student == original_student
         end
+        homeworks << homework
+        primary_homework = homework if student == original_student
       end
     end
     homeworks.each do |homework|
@@ -1280,10 +1295,9 @@ class Assignment < ActiveRecord::Base
         attachments: attachments,
       }
       group, students = group_students(user)
-      students.map { |student|
-        submission = find_or_create_submission(student)
+      find_or_create_submissions(students).map do |submission|
         submission.add_comment(comment)
-      }
+      end
     end
     [comments.compact, @ignored_files]
   end
