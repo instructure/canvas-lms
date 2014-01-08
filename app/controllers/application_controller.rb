@@ -1433,7 +1433,7 @@ class ApplicationController < ActionController::Base
       unless json.is_a?(String)
         json_cast(json)
         if CANVAS_RAILS2
-          json = MultiJson.dump(json)
+          json = MultiJson.dump(json).force_encoding(Encoding::ASCII_8BIT)
         else
           json = ActiveSupport::JSON.encode(json)
         end
