@@ -565,18 +565,22 @@ class Quiz < ActiveRecord::Base
   def find_or_create_submission(user, temporary=false, state=nil)
     s = nil
     state ||= 'untaken'
-    if temporary || !user.is_a?(User)
-      user_code = "#{user.to_s}"
-      user_code = "user_#{user.id}" if user.is_a?(User)
-      s = QuizSubmission.find_by_quiz_id_and_temporary_user_code(self.id, user_code)
-      s ||= QuizSubmission.new(:quiz => self, :temporary_user_code => user_code)
-      s.workflow_state ||= state
-      s.save!
-    else
-      s = QuizSubmission.find_by_quiz_id_and_user_id(self.id, user.id)
-      s ||= QuizSubmission.new(:quiz => self, :user => user)
-      s.workflow_state ||= state
-      s.save!
+    shard.activate do
+      QuizSubmission.unique_constraint_retry do
+        if temporary || !user.is_a?(User)
+          user_code = "#{user.to_s}"
+          user_code = "user_#{user.id}" if user.is_a?(User)
+          s = quiz_submissions.where(temporary_user_code: user_code).first
+          s ||= quiz_submissions.build(temporary_user_code: user_code)
+          s.workflow_state ||= state
+          s.save! if s.changed?
+        else
+          s = quiz_submissions.where(user_id: user).first
+          s ||= quiz_submissions.build(user: user)
+          s.workflow_state ||= state
+          s.save! if s.changed?
+        end
+      end
     end
     s
   end
