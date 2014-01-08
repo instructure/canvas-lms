@@ -278,35 +278,52 @@ class DiscussionTopic < ActiveRecord::Base
     current_user ||= self.current_user
     return unless current_user
 
-    update_fields = { :workflow_state => new_state }
+    update_fields = { workflow_state: new_state }
     update_fields[:forced_read_state] = opts[:forced] if opts.has_key?(:forced)
 
     transaction do
-      self.context_module_action(current_user, :read) if new_state == 'read'
-      StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
-
-      new_count = (new_state == 'unread' ? self.default_unread_count : 0)
-      self.update_or_create_participant(:current_user => current_user, :new_state => new_state, :new_count => new_count)
-
-      entry_ids = self.discussion_entries.pluck(:id)
-      if entry_ids.present?
-        existing_entry_participants = DiscussionEntryParticipant.where(:user_id =>current_user, :discussion_entry_id => entry_ids).
-          select([:id, :discussion_entry_id]).all
-        existing_ids = existing_entry_participants.map(&:id)
-        DiscussionEntryParticipant.where(:id => existing_ids).update_all(update_fields) if existing_ids.present?
-
-        if new_state == "read"
-          new_entry_ids = entry_ids - existing_entry_participants.map(&:discussion_entry_id)
-          DiscussionEntryParticipant.bulk_insert(new_entry_ids.map { |entry_id|
-            {
-              :discussion_entry_id => entry_id,
-              :user_id => current_user.id,
-            }.merge(update_fields)
-          })
-        end
-      end
+      update_stream_item_state(current_user, new_state)
+      update_participants_read_state(current_user, new_state, update_fields)
     end
   end
+
+  def update_stream_item_state(current_user, new_state)
+    self.context_module_action(current_user, :read) if new_state == 'read'
+    StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
+  end
+  protected :update_stream_item_state
+
+  def update_participants_read_state(current_user, new_state, update_fields)
+    entry_ids = discussion_entries.pluck(:id)
+    existing_entry_participants = DiscussionEntryParticipant.existing_participants(current_user, entry_ids).all
+    update_or_create_participant(current_user: current_user,
+      new_state: new_state,
+      new_count: new_state == 'unread' ? self.default_unread_count : 0)
+
+    if entry_ids.present? && existing_entry_participants.present?
+      update_existing_participants_read_state(current_user, update_fields, existing_entry_participants)
+    end
+
+    if new_state == "read"
+      new_entry_ids = entry_ids - existing_entry_participants.map(&:discussion_entry_id)
+      bulk_insert_new_participants(new_entry_ids, current_user, update_fields)
+    end
+  end
+  protected :update_participants_read_state
+
+  def update_existing_participants_read_state(current_user, update_fields, existing_entry_participants)
+    existing_ids = existing_entry_participants.map(&:id)
+    DiscussionEntryParticipant.where(id: existing_ids).update_all(update_fields)
+  end
+  protected :update_existing_participants_read_state
+
+  def bulk_insert_new_participants(new_entry_ids, current_user, update_fields)
+    records = new_entry_ids.map do |entry_id|
+      { discussion_entry_id: entry_id, user_id: current_user.id }.merge(update_fields)
+    end
+    DiscussionEntryParticipant.bulk_insert(records)
+  end
+  protected :bulk_insert_new_participants
 
   def default_unread_count
     self.discussion_entries.active.count
