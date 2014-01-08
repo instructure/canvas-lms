@@ -9,10 +9,6 @@ describe "shared files tests" do
     return "#{path}#{file}"
   end
 
-  def fixture_file_upload(file, mimetype)
-    ActionController::TestUploadedFile.new(fixture_file_path(file), mimetype)
-  end
-
   def add_file(fixture, context, name)
     context.attachments.create! do |attachment|
       attachment.uploaded_data = fixture

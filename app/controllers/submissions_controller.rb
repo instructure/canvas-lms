@@ -438,7 +438,7 @@ class SubmissionsController < ApplicationController
     end
 
     @attachment = @assignment.attachments.new(
-      uploaded_data: ActionController::TestUploadedFile.new(path, document_response.content_type, true),
+      uploaded_data: Rack::Test::UploadedFile.new(path, document_response.content_type, true),
       display_name: display_name, user: @current_user
     )
     @attachment.save!

@@ -17,8 +17,10 @@
 #
 
 require 'zip'
+require 'action_controller_test_process'
 
 module Canvas::AccountReports
+
   REPORTS = {}
 
   # account id is ignored; use PluginSetting to enable a subset of reports
@@ -79,7 +81,6 @@ module Canvas::AccountReports
       end
       filetype = 'application/zip'
     elsif csv
-      require 'action_controller_test_process'
       ext = csv !~ /\n/ && File.extname(csv)
       case ext
         when ".csv"
@@ -103,12 +104,12 @@ module Canvas::AccountReports
     end
     if filename
       attachment = account_report.account.attachments.create!(
-        :uploaded_data => ActionController::TestUploadedFile.new(filepath, filetype, true),
+        :uploaded_data => Rack::Test::UploadedFile.new(filepath, filetype, true),
         :display_name => filename,
         :user => account_report.user
       )
     end
-    attachment.uploaded_data = ActionController::TestUploadedFile.new(filepath, filetype, true)
+    attachment.uploaded_data = Rack::Test::UploadedFile.new(filepath, filetype, true)
     attachment.save
     attachment
   end

@@ -30,6 +30,7 @@ else
 end
 require 'webrat'
 require 'mocha/api'
+require 'action_controller_test_process'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
 require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
@@ -799,9 +800,12 @@ end
     flash[:warning].should eql("You must be logged in to access this page")
   end
 
+  def fixture_file_upload(path, mime_type=nil, binary=false)
+    Rack::Test::UploadedFile.new(File.join(ActionController::TestCase.fixture_path, path), mime_type, binary)
+  end
+
   def default_uploaded_data
-    require 'action_controller_test_process'
-    ActionController::TestUploadedFile.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/scribd_docs/doc.doc'), 'application/msword', true)
+    fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
   end
 
   def valid_gradebook_csv_content
@@ -1160,10 +1164,7 @@ end
   end
 
   def dummy_io
-    ActionController::TestUploadedFile.new(
-        File.expand_path(File.dirname(__FILE__) +
-                             '/./fixtures/scribd_docs/doc.doc'),
-        'application/msword', true)
+    fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
   end
 
   def create_attachment_for_file_upload_submission!(submission, opts={})

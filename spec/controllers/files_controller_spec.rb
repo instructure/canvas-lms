@@ -17,14 +17,14 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe FilesController do
   def course_folder
     @folder = @course.folders.create!(:name => "a folder", :workflow_state => "visible")
   end
   def io
-    require 'action_controller_test_process'
-    ActionController::TestUploadedFile.new(File.expand_path(File.dirname(__FILE__) + '/../fixtures/scribd_docs/doc.doc'), 'application/msword', true)
+    fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
   end
   def course_file
     @file = factory_with_protected_attributes(@course.attachments, :uploaded_data => io)

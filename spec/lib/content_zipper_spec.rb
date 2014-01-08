@@ -312,13 +312,13 @@ describe ContentZipper do
       it "creates uploaded data for the assignment and marks it as available" do
         @attachment.expects(:save!).once
         zip_name = "submissions.zip"
+        zip_path = File.join(ActionController::TestCase.fixture_path, zip_name)
         data = "just some stub data"
-        ActionController::TestUploadedFile.expects(:new).
-          with(zip_name, 'application/zip').returns data
+        Rack::Test::UploadedFile.expects(:new).with(zip_path, 'application/zip').returns data
         @attachment.expects(:uploaded_data=).with data
         zipper = ContentZipper.new
         zipper.mark_successful!
-        zipper.complete_attachment!(@attachment,zip_name)
+        zipper.complete_attachment!(@attachment,zip_path)
         @attachment.should be_zipped
         @attachment.file_state.should == 'available'
       end

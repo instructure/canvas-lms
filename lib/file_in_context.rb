@@ -21,6 +21,7 @@ require 'action_controller_test_process'
 # Attaches a file generally to another file, using the attachment_fu gateway.
 class FileInContext
   class << self
+
     def queue_files_to_delete(queue=true)
       @queue_files_to_delete = queue
     end
@@ -43,7 +44,7 @@ class FileInContext
     
     def attach(context, filename, display_name=nil, folder=nil, explicit_filename=nil, allow_rename = false)
       display_name ||= File.split(filename).last
-      uploaded_data = ActionController::TestUploadedFile.new(filename, Attachment.mimetype(filename))
+      uploaded_data = Rack::Test::UploadedFile.new(filename, Attachment.mimetype(filename))
 
       @attachment = context.attachments.build(:uploaded_data => uploaded_data, :display_name => display_name, :folder => folder)
       @attachment.filename = explicit_filename if explicit_filename
@@ -53,8 +54,6 @@ class FileInContext
       destroy_files(@attachment.handle_duplicates(allow_rename ? :rename : :overwrite, :caller_will_destroy => true))
 
       @attachment
-    ensure
-      uploaded_data.close if uploaded_data
     end
     
   end

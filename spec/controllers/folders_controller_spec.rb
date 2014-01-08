@@ -20,8 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe FoldersController do
   def io
-    require 'action_controller_test_process'
-    ActionController::TestUploadedFile.new(File.expand_path(File.dirname(__FILE__) + '/../fixtures/scribd_docs/doc.doc'), 'application/msword', true)
+    fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
   end
   
   def course_folder

@@ -22,11 +22,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     @text_file = @root_folder.attachments.create!(:filename => 'text_file.txt', :context => @course) { |a| a.content_type = 'text/plain' }
     @image1 = @root_folder.attachments.build(:context => @course)
     path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
-    @image1.uploaded_data = ActionController::TestUploadedFile.new(path, Attachment.mimetype(path))
+    @image1.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
     @image1.save!
     @image2 = @root_folder.attachments.build(:context => @course)
     path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/graded.png')
-    @image2.uploaded_data = ActionController::TestUploadedFile.new(path, Attachment.mimetype(path))
+    @image2.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
     @image2.save!
     get "/courses/#{@course.id}/wiki"
 

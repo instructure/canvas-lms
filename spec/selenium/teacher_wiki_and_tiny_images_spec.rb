@@ -70,7 +70,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
         image = @root_folder.attachments.build(:context => @course)
         path = File.expand_path(File.dirname(__FILE__) + '/../../public/images/graded.png')
         image.display_name = "image #{i}"
-        image.uploaded_data = ActionController::TestUploadedFile.new(path, Attachment.mimetype(path))
+        image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
         image.save!
       end
       @image_list.should_not have_class('initialized')

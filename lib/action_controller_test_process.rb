@@ -1,9 +1,13 @@
 # once off RAILS2, inline the action_dispatch version and remove this file
 require 'action_controller'
+
 if CANVAS_RAILS2
   require 'action_controller/test_process'
+  module Rack
+    module Test
+      class UploadedFile < ActionController::TestUploadedFile; end
+    end
+  end
 else
-  # XXX: Rails3 doesn't have ActionController::TestUploadedFile, which is
-  # usually why this is required. time to fix this
-  require 'action_dispatch/testing/test_process'
+  require 'rack/test/uploaded_file'
 end

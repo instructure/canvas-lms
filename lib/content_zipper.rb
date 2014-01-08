@@ -344,7 +344,7 @@ class ContentZipper
   def complete_attachment!(zip_attachment, zip_name)
     if zipped_successfully?
       @logger.debug("data zipped! uploading to s3...")
-      uploaded_data = ActionController::TestUploadedFile.new(zip_name, 'application/zip')
+      uploaded_data = Rack::Test::UploadedFile.new(zip_name, 'application/zip')
       zip_attachment.uploaded_data = uploaded_data
       zip_attachment.workflow_state = 'zipped'
       zip_attachment.file_state = 'available'
