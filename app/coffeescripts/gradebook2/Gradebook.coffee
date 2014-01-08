@@ -997,7 +997,7 @@ define [
       @grid.invalidate()
 
     localeSort: (a, b) =>
-      a.localeCompare b,
+      (a || "").localeCompare b || "",
         window.I18n.locale,
         sensitivity: 'accent', numeric: true
 
