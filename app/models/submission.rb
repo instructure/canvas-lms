@@ -214,7 +214,7 @@ class Submission < ActiveRecord::Base
   end
 
   def update_final_score
-    if @score_changed
+    if score_changed?
       connection.after_transaction_commit { Enrollment.send_later_if_production(:recompute_final_score, self.user_id, self.context.id) }
       self.assignment.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score) if self.assignment
     end
@@ -504,7 +504,6 @@ class Submission < ActiveRecord::Base
     end
     @just_submitted = self.submitted? && self.submission_type && (self.new_record? || self.workflow_state_changed?)
     if score_changed?
-      @score_changed = true
       self.grade = assignment ?
         assignment.score_to_grade(score, grade) :
         score.to_s

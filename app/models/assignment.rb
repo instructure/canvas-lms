@@ -155,23 +155,22 @@ class Assignment < ActiveRecord::Base
     write_attribute(:allowed_extensions, new_value)
   end
 
-  before_save   :set_old_assignment_group_id,
-                :infer_grading_type,
-                :process_if_quiz,
-                :default_values,
-                :update_submissions_if_details_changed,
-                :maintain_group_category_attribute
+  before_save :infer_grading_type,
+              :process_if_quiz,
+              :default_values,
+              :update_submissions_if_details_changed,
+              :maintain_group_category_attribute
 
-  after_save    :update_grades_if_details_changed,
-                :touch_assignment_group,
-                :touch_context,
-                :update_grading_standard,
-                :update_quiz_or_discussion_topic,
-                :update_submissions_later,
-                :schedule_do_auto_peer_review_job_if_automatic_peer_review,
-                :delete_empty_abandoned_children,
-                :validate_assignment_overrides,
-                :update_cached_due_dates
+  after_save  :update_grades_if_details_changed,
+              :touch_assignment_group,
+              :touch_context,
+              :update_grading_standard,
+              :update_quiz_or_discussion_topic,
+              :update_submissions_later,
+              :schedule_do_auto_peer_review_job_if_automatic_peer_review,
+              :delete_empty_abandoned_children,
+              :validate_assignment_overrides,
+              :update_cached_due_dates
 
   has_a_broadcast_policy
 
@@ -236,10 +235,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_grades_if_details_changed
-    if @points_possible_was != self.points_possible ||
-        @grades_affected ||
-        @muted_was != self.muted ||
-        workflow_state_changed?
+    if points_possible_changed? || muted_changed? || workflow_state_changed?
       connection.after_transaction_commit { self.context.recompute_student_scores }
     end
     true
@@ -309,11 +305,6 @@ class Assignment < ActiveRecord::Base
     end
     self.submission_types ||= "none"
     self.peer_reviews_assign_at = [self.due_at, self.peer_reviews_assign_at].compact.max
-    @workflow_state_was = self.workflow_state_was
-    @points_possible_was = self.points_possible_was
-    @muted_was = self.muted_was
-    @submission_types_was = self.submission_types_was
-    @due_at_was = self.due_at_was
     self.points_possible = nil if self.submission_types == 'not_graded'
   end
   protected :default_values
@@ -336,7 +327,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def delete_empty_abandoned_children
-    if @submission_types_was != self.submission_types
+    if submission_types_changed?
       unless self.submission_types == 'discussion_topic'
         self.discussion_topic.unlink_from(:assignment) if self.discussion_topic
       end
@@ -347,11 +338,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_submissions_later
-    if @old_assignment_group_id != self.assignment_group_id
-      AssignmentGroup.find_by_id(@old_assignment_group_id).try(:touch) if @old_assignment_group_id.present?
+    if assignment_group_id_changed? && assignment_group_id_was.present?
+      AssignmentGroup.find_by_id(assignment_group_id_was).try(:touch)
     end
     self.assignment_group.touch if self.assignment_group
-    if @points_possible_was != self.points_possible
+    if points_possible_changed?
       send_later_if_production(:update_submissions)
     end
   end
@@ -508,7 +499,6 @@ class Assignment < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     ContentTag.delete_for(self)
-    @grades_affected = true
     self.save
 
     self.discussion_topic.destroy if self.discussion_topic && !self.discussion_topic.deleted?
@@ -521,7 +511,6 @@ class Assignment < ActiveRecord::Base
 
   def restore(from=nil)
     self.workflow_state = self.context.feature_enabled?(:draft_state) ? 'unpublished' : 'published'
-    @grades_affected = true
     self.save
     self.discussion_topic.restore if self.discussion_topic && from != :discussion_topic
     self.quiz.restore if self.quiz && from != :quiz
@@ -671,11 +660,6 @@ class Assignment < ActiveRecord::Base
     end
     score
   end
-
-  def set_old_assignment_group_id
-    @old_assignment_group_id = self.assignment_group_id_was
-  end
-  protected :set_old_assignment_group_id
 
   def infer_times
     # set the time to 11:59 pm in the creator's time zone, if none given
