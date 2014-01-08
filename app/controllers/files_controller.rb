@@ -526,7 +526,6 @@ class FilesController < ApplicationController
         }
       end
     end
-    render :json => {}
   end
 
   def create_pending
