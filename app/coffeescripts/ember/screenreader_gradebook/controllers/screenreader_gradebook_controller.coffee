@@ -140,11 +140,14 @@ define [
         sortProperties: ['ag_position', 'position']
       )
 
+    isDraftState: ->
+      ENV.GRADEBOOK_OPTIONS.draft_state_enabled
+
     populateAssignments: (->
       assignment_groups = @get('assignment_groups')
       assignments = _.flatten(assignment_groups.mapBy 'assignments')
       assignment_proxy =  @get('assignments')
-      assignments.forEach (as) ->
+      assignments.forEach (as) =>
         return if assignment_proxy.findBy('id', as.id)
         set as, 'sortable_name', as.name.toLowerCase()
         set as, 'ag_position', assignment_groups.findBy('id', as.assignment_group_id).position
@@ -153,11 +156,18 @@ define [
           set as, 'sortable_date', as.due_at.timestamp
         else
           set as, 'sortable_date', Number.MAX_VALUE
-        assignment_proxy.pushObject as
+
+        assignment_proxy.pushObject as unless (@isDraftState() and as.published is false) or
+                                              as.submission_types.contains 'not_graded' or
+                                              as.submission_types.contains 'attendance' and !@get('showAttendance')
     ).observes('assignment_groups.@each')
 
     includeUngradedAssignments: (->
       userSettings.contextGet('include_ungraded_assignments') or false
+    ).property().volatile()
+
+    showAttendance: (->
+      userSettings.contextGet 'show_attendance'
     ).property().volatile()
 
     updateUngradedAssignmentUserSetting: ( ->

@@ -4,18 +4,20 @@ define [
   'ember'
   '../shared_ajax_fixtures'
   '../../controllers/screenreader_gradebook_controller'
-], (_, startApp, Ember, fixtures, SRGController) ->
+], (_, startApp, Ember, fixtures, SRGBController) ->
 
   App = null
+  originalIsDraft = null
 
   fixtures.create()
   clone = (obj) ->
     Em.copy obj, true
 
-  setup = ->
+  setup = (isDraftState=false) ->
+    window.ENV.GRADEBOOK_OPTIONS.draft_state_enabled = isDraftState
     App = startApp()
-    Ember.run.join =>
-      @srgb = SRGController.create()
+    Ember.run =>
+      @srgb = SRGBController.create()
       @srgb.set('model', {
         enrollments: Ember.ArrayProxy.create(content: clone fixtures.students)
         assignment_groups: Ember.ArrayProxy.create(content: clone fixtures.assignment_groups)
@@ -23,12 +25,16 @@ define [
         sections: Ember.ArrayProxy.create(content: clone fixtures.sections)
       })
 
+  teardown = ->
+    window.ENV.GRADEBOOK_OPTIONS.draft_state_enabled = false
+    Ember.run App, 'destroy'
 
   module 'screenreader_gradebook_controller',
     setup: ->
       setup.call this
     teardown: ->
-      Ember.run App, 'destroy'
+      teardown.call this
+
 
   test 'calculates students properly', ->
     andThen =>
@@ -37,7 +43,8 @@ define [
 
   test 'calculates assignments properly', ->
     andThen =>
-      equal @srgb.get('assignments.length'), 5
+      equal @srgb.get('assignments.length'), 6
+      ok !@srgb.get('assignments').findBy('name', 'Not Graded')
       equal @srgb.get('assignments.firstObject').name, fixtures.assignment_groups[0].assignments[0].name
 
   test 'studentsHash returns the expected hash', ->
@@ -80,7 +87,7 @@ define [
     Ember.run =>
       @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'alpha'))
     equal @srgb.get('assignments.firstObject.name'), 'Apples are good'
-    equal @srgb.get('assignments.lastObject.name'), 'Eat Soup'
+    equal @srgb.get('assignments.lastObject.name'), 'Z Eats Soup'
 
   test 'sorting assignments by due date', ->
     Ember.run =>
@@ -91,7 +98,7 @@ define [
   test 'sorting assignments by position', ->
     Ember.run =>
       @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'assignment_group'))
-    equal @srgb.get('assignments.firstObject.name'), 'Eat Soup'
+    equal @srgb.get('assignments.firstObject.name'), 'Z Eats Soup'
     equal @srgb.get('assignments.lastObject.name'), 'Can You Eat Just One?'
 
   test 'correctly determines if prev/next student exists on load', ->
@@ -115,7 +122,7 @@ define [
         student = @srgb.get('students.firstObject')
         @srgb.set('selectedStudent', student)
     teardown: ->
-      Ember.run App, 'destroy'
+      teardown.call this
 
   test 'selectedSubmission should be null when just selectedStudent is set', ->
     strictEqual @srgb.get('selectedSubmission'), null
@@ -157,7 +164,7 @@ define [
         @srgb.set('selectedAssignment', @assignment)
 
     teardown: ->
-      Ember.run App, 'destroy'
+      teardown.call this
 
   test 'selectedSubmissionGrade is computed properly', ->
     andThen =>
@@ -177,7 +184,6 @@ define [
       submission = _.find(sub.submissions, (s) => s.assignment_id == @assignment.id)
       _.each submission, (val, key) =>
         equal selectedSubmission[key], val, "#{key} is the expected value on selectedSubmission"
-
 
   module 'screenreader_gradebook_controller: with selected assignment',
     setup: ->
@@ -210,9 +216,38 @@ define [
     Ember.run =>
       assignment = @srgb.get('assignments.lastObject')
       @srgb.set('selectedAssignment', assignment)
-    equal @srgb.get('assignmentIndex'), 4
+    equal @srgb.get('assignmentIndex'), 5
     equal @srgb.get('disablePrevAssignmentButton'), false
     equal @srgb.get('ariaDisabledPrevAssignment'), 'false'
     equal @srgb.get('disableNextAssignmentButton'), true
     equal @srgb.get('ariaDisabledNextAssignment'), 'true'
+
+  module 'screenreader_gradebook_controller:draftState',
+    setup: ->
+      setup.call this, true
+      Em.run =>
+        @srgb.get('assignment_groups').pushObject
+          id: '100'
+          name: 'Silent Assignments'
+          position: 2
+          assignments: [
+            {
+              id: '21'
+              name: 'Unpublished Assignment'
+              points_possible: 10
+              grading_type: "percent"
+              submission_types: ["none"]
+              due_at: null
+              position: 6
+              assignment_group_id:'4'
+              published: false
+            }
+          ]
+
+    teardown: ->
+      teardown.call this
+
+  test 'calculates assignments properly', ->
+    equal @srgb.get('assignments.length'), 6
+    ok !@srgb.get('assignments').findBy('name', 'Unpublished Assignment')
 

@@ -315,13 +315,14 @@ define [
           assignments: [
             {
               id: '1'
-              name: 'Eat Soup'
+              name: 'Z Eats Soup'
               points_possible: 100
               grading_type: "points"
               submission_types: ["none"]
               due_at: "2013-10-01T10:00:00Z"
               position: 1
               assignment_group_id:'1'
+              published: true
             }
             {
               id: '2'
@@ -330,7 +331,9 @@ define [
               points_possible: null
               due_at: null
               position: 10
+              submission_types: ["none"]
               assignment_group_id:'1'
+              published: true
             }
             {
               id: '3'
@@ -341,6 +344,7 @@ define [
               due_at: "2013-12-01T10:00:00Z"
               position: 12
               assignment_group_id:'1'
+              published: true
             }
           ]
         }
@@ -358,6 +362,7 @@ define [
               due_at: null
               position: 5
               assignment_group_id:'2'
+              published: true
             }
             {
               id: '5'
@@ -368,9 +373,40 @@ define [
               due_at: "2013-08-01T10:00:00Z"
               position: 6
               assignment_group_id:'2'
+              published: true
             }
           ]
         }
+        {
+          id: '4'
+          name: 'Silent Assignments'
+          position: 2
+          assignments: [
+            {
+              id: '20'
+              name: 'Published Assignment'
+              points_possible: 10
+              grading_type: "percent"
+              submission_types: ["none"]
+              due_at: "2013-09-01T10:00:00Z"
+              position: 5
+              assignment_group_id:'4'
+              published: true
+            }
+            {
+              id: '22'
+              name: 'Not Graded'
+              points_possible: 10
+              grading_type: "percent"
+              submission_types: ["not_graded"]
+              due_at: "2013-09-01T10:00:00Z"
+              position: 1
+              assignment_group_id:'4'
+              published: true
+            }
+          ]
+        }
+
       ]
 
   submissions = [
