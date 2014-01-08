@@ -1446,6 +1446,13 @@ routes.draw do
       get prefix, :action => :index, :path_name => "course_custom_gradebook_column_data"
       put "#{prefix}/:user_id", :action => :update, :path_name => "course_custom_gradebook_column_datum"
     end
+
+    scope(:controller => :content_exports_api) do
+      prefix = "courses/:course_id/content_exports"
+      get prefix, :action => :index, :path_name => "course_content_exports"
+      post prefix, :action => :create
+      get "#{prefix}/:id", :action => :show
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
