@@ -14,6 +14,8 @@ class ActiveRecord::Base
       value = super
       value.is_a?(ActiveRecord::AttributeMethods::Serialization::Attribute) ? value.value : value
     end
+
+    alias :clone :dup
   end
 
   if CANVAS_RAILS2
