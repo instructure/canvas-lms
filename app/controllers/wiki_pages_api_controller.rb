@@ -535,6 +535,7 @@ class WikiPagesApiController < ApplicationController
       page_params.slice!(*%w(title body notify_of_update published front_page editing_roles))
     else
       page_params.slice!(*%w(title body hide_from_students notify_of_update front_page editing_roles))
+      workflow_state = 'active' if @page.new_record?
     end
     page_params[:hide_from_students] = value_to_boolean(page_params[:hide_from_students]) if page_params.has_key?(:hide_from_students)
 
