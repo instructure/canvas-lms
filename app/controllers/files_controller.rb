@@ -255,7 +255,7 @@ class FilesController < ApplicationController
     @skip_crumb = true
     if @attachment.deleted?
       flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", :display_name => @attachment.display_name
-      redirect_to dashboard_url
+      return redirect_to dashboard_url
     end
     show
   end
