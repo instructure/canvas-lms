@@ -177,7 +177,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def group_for(user)
-    groups.active.to_a.find{ |g| g.users.include?(user) }
+    groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).first
   end
 
   alias_method :destroy!, :destroy
