@@ -66,6 +66,7 @@ describe QuizzesApiController, :type => :integration do
 
     it "should return unauthorized if the quiz tab is disabled" do
       @course.tab_configuration = [ { :id => Course::TAB_QUIZZES, :hidden => true } ]
+      @course.save!
       student_in_course(:active_all => true, :course => @course)
       raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes",
                    :controller => "quizzes_api",

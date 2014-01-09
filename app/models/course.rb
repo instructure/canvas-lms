@@ -1564,10 +1564,19 @@ class Course < ActiveRecord::Base
     e.role_name = role_name
     e.self_enrolled = self_enrolled
     if e.changed?
-      if opts[:no_notify]
-        e.save_without_broadcasting
-      else
-        e.save
+      transaction do
+        if connection.adapter_name == 'PostgreSQL' && connection.send(:postgresql_version) < 90300
+          # without this, inserting/updating on enrollments will share lock the course, but then
+          # it tries to touch the course, which will deadlock with another transaction doing the
+          # same thing. on 9.3, it will KEY SHARE lock, which doesn't conflict with the NO KEY
+          # UPDATE needed to touch it
+          self.lock!
+        end
+        if opts[:no_notify]
+          e.save_without_broadcasting
+        else
+          e.save
+        end
       end
     end
     e.user = user
