@@ -17,6 +17,7 @@
  */
 
 define([
+  'compiled/util/round',
   'INST' /* INST */,
   'i18n!gradebook',
   'jquery' /* $ */,
@@ -42,7 +43,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/position' /* /\.position\(/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */
-], function(INST, I18n, $, _, userSettings, datagrid, GradeCalculator, htmlEscape, Turnitin) {
+], function(round, INST, I18n, $, _, userSettings, datagrid, GradeCalculator, htmlEscape, Turnitin) {
 
   var grading_scheme = window.grading_scheme;
   var readOnlyGradebook = window.readOnlyGradebook;
@@ -765,6 +766,8 @@ define([
       }).change();
       $("#groups_data")
       .find(".group_weight").change(function(event) {
+        var val = parseFloat($(this).val(), 10);
+        $(this).val(round(val,2));
         var $group = $(this).parents(".group"),
             url = $group.find(".assignment_group_url").attr('href'),
             formData = $group.getFormData(),
@@ -1953,7 +1956,7 @@ define([
       }
       total += val;
     });
-    $("#groups_data").find(".total_weight").text(total);
+    $("#groups_data").find(".total_weight").text(round(total,2));
     if(updateGrades && gradebook.updateAllStudentGrades) {
       gradebook.updateAllStudentGrades();
     }

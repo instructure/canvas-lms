@@ -1,4 +1,5 @@
 define [
+  'compiled/util/round'
   'jquery'
   'jst/AssignmentGroupWeightsDialog'
   'jquery.ajaxJSON'
@@ -6,7 +7,7 @@ define [
   'jqueryui/dialog'
   'jquery.instructure_misc_helpers'
   'vendor/jquery.ba-tinypubsub'
-], ($, assignmentGroupWeightsDialogTemplate) -> class AssignmentGroupWeightsDialog
+], (round, $, assignmentGroupWeightsDialogTemplate) -> class AssignmentGroupWeightsDialog
 
   constructor: (options) ->
     @$dialog = $ assignmentGroupWeightsDialogTemplate()
@@ -41,15 +42,24 @@ define [
         .appendTo(@$groups_holder)
     @$dialog.find('#group_weighting_scheme').prop('checked', @options.context.group_weighting_scheme == 'percent').change()
     @calcTotal()
+    @addGroupWeightListener()
 
   update: (newOptions) =>
     @options = newOptions
     @render()
 
+  addGroupWeightListener: =>
+    $(".group_weight").on 'change', (e) ->
+      value = $(e.target).val()
+      rounded_value = round(parseFloat(value), 2)
+      unless isNaN(rounded_value)
+        $(e.target).val(rounded_value)
+
   calcTotal: =>
     total = 0
     @$dialog.find('.assignment_group_row input').each ->
       total += Number($(this).val())
+    total = round(total,2)
     @$dialog.find('.total_weight').text(total)
 
   save: =>
