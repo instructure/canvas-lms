@@ -49,12 +49,13 @@ shared_examples_for 'Quiz Submissions API Restricted Endpoints' do
 
     Quiz.stubs(:lockdown_browser_plugin_enabled?).returns true
 
-    subject.stubs(:ldb_plugin).returns {
-      fake_plugin = Object.new
-      fake_plugin.stubs(:authorized?).returns false
-      fake_plugin
-    }
+    fake_plugin = Object.new
+    fake_plugin.stubs(:authorized?).returns false
+    fake_plugin.stubs(:base).returns fake_plugin
 
+    subject.stubs(:ldb_plugin).returns fake_plugin
+    Canvas::LockdownBrowser.stubs(:plugin).returns fake_plugin
+    
     @request_proxy.call true, {
       attempt: 1
     }
