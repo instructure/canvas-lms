@@ -1,12 +1,15 @@
 define [
   'i18n!gradebook2'
   'underscore'
+  'compiled/views/gradebook/HeaderFilterView'
   'jst/gradebook2/outcome_gradebook_cell'
   'jst/gradebook2/outcome_gradebook_student_cell'
-], (I18n, _, cellTemplate, studentCellTemplate) ->
+], (I18n, _, HeaderFilterView, cellTemplate, studentCellTemplate) ->
 
   Grid =
     filter: ['mastery', 'near-mastery', 'remedial']
+
+    averageFn: 'mean'
 
     dataSource: {}
 
@@ -43,9 +46,7 @@ define [
         (currentSection) ->
           rows = Grid.Util.toRows(Grid.dataSource.rollups, section: currentSection)
           grid.setData(rows, false)
-          header = grid.getHeaderRow().childNodes
-          cols   = grid.getColumns()
-          _.each(header, (node, i) -> Grid.View.headerRowCell(node: node, column: cols[i], grid: grid))
+          Grid.View.redrawHeader(grid)
           grid.invalidate()
 
     Util:
@@ -145,6 +146,36 @@ define [
       lookupOutcome: (name) ->
         Grid.outcomes[name]
 
+    Math:
+      mean: (values, round = false) ->
+        total = _.reduce(values, ((a, b) -> a + b), 0)
+        if round
+          Math.round(total / values.length)
+        else
+          parseFloat((total / values.length).toString().slice(0, 4))
+
+      median: (values) ->
+        sortedValues = _.sortBy(values, _.identity)
+        if values.length % 2 == 0
+          i = values.length / 2
+          Grid.Math.mean(sortedValues.slice(i - 1, i + 1))
+        else
+          sortedValues[Math.floor(values.length / 2)]
+
+      mode: (values) ->
+        counts = _.chain(values)
+          .countBy(_.identity)
+          .reduce((t, v, k) ->
+            t.push([v, parseInt(k)])
+            t
+          , [])
+          .sortBy(_.first)
+          .reverse()
+          .value()
+        max = counts[0][0]
+        mode = _.reject(counts, (n) -> n[0] < max)
+        mode = Grid.Math.mean(_.map(mode, _.last), true)
+
     View:
       # Public: Render a SlickGrid cell.
       #
@@ -178,13 +209,25 @@ define [
         return 'near-mastery' if score >= nearMastery
         'remedial'
 
-      headerRowCell: ({node, column, grid}) ->
-        return $(node).empty().addClass('hidden') if column.field == 'student'
+      headerRowCell: ({node, column, grid}, fn = Grid.averageFn) ->
+        return Grid.View.studentHeaderRowCell(node, column, grid) if column.field == 'student'
 
         results = _.chain(grid.getData())
           .pluck(column.field)
-          .reject((value) -> !value)
+          .reject((value) -> _.isNull(value) or _.isUndefined(value))
           .value()
-        total = _.reduce(results, ((a, b) -> a + b), 0)
-        avg   = Math.round(total / results.length)
-        $(node).empty().append(Grid.View.cell(null, null, avg, column, null))
+        return $(node).empty() unless results.length
+        value = Grid.Math[fn].call(this, (results))
+        $(node).empty().append(Grid.View.cell(null, null, value, column, null))
+
+      redrawHeader: (grid, fn = Grid.averageFn) ->
+        header = grid.getHeaderRow().childNodes
+        cols   = grid.getColumns()
+        Grid.averageFn = fn
+        _.each(header, (node, i) -> Grid.View.headerRowCell(node: node, column: cols[i], grid: grid, fn))
+
+      studentHeaderRowCell: (node, column, grid) ->
+        $(node).addClass('average-filter')
+        view = new HeaderFilterView(grid: grid, redrawFn: Grid.View.redrawHeader)
+        view.render()
+        $(node).append(view.$el)

@@ -136,6 +136,12 @@
       padding: 1px 2px 2px 1px;
     }
 
+    &.average-filter {
+      background: transparent;
+      border: none;
+      font-weight: 500;
+    }
+
     &.r1 {
       border-left-color: #d3d9d9;
     }
