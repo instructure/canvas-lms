@@ -79,11 +79,11 @@ describe QuizSubmissionsApiController, :type => :integration do
       end
     end
 
-    def enroll_student_and_submit(opts = {})
-      enroll_student(opts)
+    def enroll_student_and_submit(submission_data = {})
+      enroll_student
 
       @quiz_submission = @quiz.generate_submission(@student)
-      @quiz_submission.submission_data = { "question_1" => "1658" }
+      @quiz_submission.submission_data = submission_data
       @quiz_submission.mark_completed
       @quiz_submission.grade_submission
       @quiz_submission.reload
@@ -144,6 +144,19 @@ describe QuizSubmissionsApiController, :type => :integration do
           :id => @quiz_submission.id.to_s
         }, data)
     end
+
+    def qs_api_update(raw = false, data = {})
+      helper = method(raw ? :raw_api_call : :api_call)
+      helper.call(:put,
+        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}",
+        { :controller => 'quiz_submissions_api',
+          :action => 'update',
+          :format => 'json',
+          :course_id => @course.id.to_s,
+          :quiz_id => @quiz.id.to_s,
+          :id => @quiz_submission.id.to_s
+        }, data)
+    end
   end
 
   include Helpers
@@ -152,8 +165,6 @@ describe QuizSubmissionsApiController, :type => :integration do
     course_with_teacher_logged_in :active_all => true
 
     @quiz = Quiz.create!(:title => 'quiz', :context => @course)
-    @quiz.quiz_data = [ multiple_choice_question_data ]
-    @quiz.generate_quiz_data
     @quiz.published_at = Time.now
     @quiz.workflow_state = 'available'
     @quiz.save!
@@ -417,9 +428,78 @@ describe QuizSubmissionsApiController, :type => :integration do
     end
   end
 
-  context 'Taking a quiz' do
-    it 'should start and complete a quiz-taking session' do
-      pending 'answering questions via the API'
+  describe 'PUT /courses/:course_id/quizzes/:quiz_id/submissions/:id [update]' do
+    before :each do
+      # We're gonna test with 2 questions to make sure there are no side effects
+      # when we modify a single question
+      @qq1 = @quiz.quiz_questions.create!({
+        question_data: multiple_choice_question_data
+      })
+
+      @qq2 = @quiz.quiz_questions.create!({
+        question_data: true_false_question_data
+      })
+
+      @quiz.quiz_data = [ @qq1.question_data, @qq2.question_data ]
+      @quiz.generate_quiz_data
+
+      enroll_student_and_submit({
+        "question_#{@qq1.id}" => "1658", # correct, nr points: 50
+        "question_#{@qq2.id}" => "8950"  # also correct, nr points: 45
+      })
+
+      @original_score = @quiz_submission.score # should be 95
+    end
+
+    it 'should fudge points' do
+      json = qs_api_update false, {
+        quiz_submissions: [{
+          attempt: @quiz_submission.attempt,
+          fudge_points: 2.5
+        }]
+      }
+
+      json.has_key?('quiz_submissions').should be_true
+      json['quiz_submissions'].length.should == 1
+      json['quiz_submissions'][0]['fudge_points'].should == 2.5
+      json['quiz_submissions'][0]['score'].should == 97.5
+    end
+
+    it 'should modify a question score' do
+      json = qs_api_update false, {
+        quiz_submissions: [{
+          attempt: @quiz_submission.attempt,
+          questions: {
+            "#{@qq1.id}" => {
+              score: 10
+            }
+          }
+        }]
+      }
+
+      json.has_key?('quiz_submissions').should be_true
+      json['quiz_submissions'].length.should == 1
+      json['quiz_submissions'][0]['score'].should == 55
+    end
+
+    it 'should set a comment' do
+      json = qs_api_update false, {
+        quiz_submissions: [{
+          attempt: @quiz_submission.attempt,
+          questions: {
+            "#{@qq2.id}" => {
+              comment: 'Aaaaaughibbrgubugbugrguburgle'
+            }
+          }
+        }]
+      }
+
+      @quiz_submission.reload
+      @quiz_submission.submission_data[1]['more_comments'].should == 'Aaaaaughibbrgubugbugrguburgle'
+
+      # make sure no score is affected
+      @quiz_submission.submission_data[1]['points'].should == 45
+      @quiz_submission.score.should == @original_score
     end
   end
 end

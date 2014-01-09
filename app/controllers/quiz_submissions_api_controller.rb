@@ -132,7 +132,7 @@ class QuizSubmissionsApiController < ApplicationController
   before_filter :require_user, :require_context, :require_quiz
   before_filter :require_overridden_quiz, :except => [ :index ]
   before_filter :require_quiz_submission, :except => [ :index, :create ]
-  before_filter :prepare_service, :only => [ :create, :complete ]
+  before_filter :prepare_service, :only => [ :create, :update, :complete ]
   before_filter :validate_ldb_status!, :only => [ :create, :complete ]
 
   # @API Get all quiz submissions.
@@ -189,10 +189,6 @@ class QuizSubmissionsApiController < ApplicationController
   # Start taking a Quiz by creating a QuizSubmission which you can use to answer
   # questions and submit your answers.
   #
-  # @argument validation_token [String]
-  #   The unique validation token you received when this Quiz Submission was
-  #   created.
-  #
   # @argument access_code [Optional, String]
   #   Access code for the Quiz, if any.
   #
@@ -224,7 +220,75 @@ class QuizSubmissionsApiController < ApplicationController
     render_quiz_submission(quiz_submission)
   end
 
+  # @API Update student question scores and comments.
+  # @beta
+  #
+  # Update the amount of points a student has scored for questions they've
+  # answered, provide comments for the student about their answer(s), or simply
+  # fudge the total score by a specific amount of points.
+  #
+  # @argument attempt [Integer]
+  #   The attempt number of the quiz submission that should be updated. This
+  #   attempt MUST be already completed.
+  #
+  # @argument fudge_points [Optional, Float]
+  #   Amount of positive or negative points to fudge the total score by.
+  #
+  # @argument questions [Optional, Hash]
+  #   A set of scores and comments for each question answered by the student.
+  #   The keys are the question IDs, and the values are hashes of `score` and
+  #   `comment` entries. See {Appendix: Manual Scoring} for more on this
+  #   parameter.
+  #
+  # <b>Responses</b>
+  #
+  # * <b>200 OK</b> if the request was successful
+  # * <b>403 Forbidden</b> if you are not a teacher in this course
+  # * <b>400 Bad Request</b> if the attempt parameter is missing or invalid
+  # * <b>400 Bad Request</b> if the specified QS attempt is not yet complete
+  #
+  # @see Appendix: Manual Scoring
+  #
+  # @example_request
+  #  {
+  #    "quiz_submissions": [{
+  #      "attempt": 1,
+  #      "fudge_points": -2.4,
+  #      "questions": {
+  #        "1": {
+  #          "score": 2.5,
+  #          "comment": "This can't be right, but I'll let it pass this one time."
+  #        },
+  #        "2": {
+  #          "score": 0,
+  #          "comment": "Good thinking. Almost!"
+  #        }
+  #      }
+  #    }]
+  #  }
+  #
+  # @example_response
+  #  {
+  #    "quiz_submissions": [QuizSubmission]
+  #  }
+  #
+  # @!appendix Manual Scoring
+  #
+  #   {include:file:doc/examples/quiz_submission_manual_scoring.md}
   def update
+    resource_params = params[:quiz_submissions]
+
+    unless resource_params.is_a?(Array)
+      reject! 400, 'missing required key :quiz_submissions'
+    end
+
+    if resource_params = resource_params[0]
+      @service.update_scores(@quiz_submission,
+        resource_params[:attempt],
+        resource_params)
+    end
+
+    render_quiz_submission(@quiz_submission)
   end
 
   # @API Complete the quiz submission (turn it in).
