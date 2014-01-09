@@ -104,7 +104,7 @@ module Api
 
   def self.sis_parse_id(id, lookups)
     # returns column_name, column_value
-    return lookups['id'], id if id.is_a?(Numeric)
+    return lookups['id'], id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
     id = id.to_s.strip
     if id =~ %r{\Ahex:(sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z}
       sis_column = $1
