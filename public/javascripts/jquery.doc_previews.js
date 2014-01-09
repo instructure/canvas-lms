@@ -172,14 +172,16 @@ define([
             embedded: true,
             url: opts.public_url
           });
-          $('<iframe src="' + googleDocPreviewUrl + '" height="' + opts.height  + '" width="100%" />')
-            .appendTo($this)
-            .load(function(){
-              tellAppIViewedThisInline('google');
-              if ($.isFunction(opts.ready)) {
-                opts.ready();
-              }
-            });
+          if (!opts.ajax_valid || opts.ajax_valid()){
+            $('<iframe src="' + googleDocPreviewUrl + '" height="' + opts.height  + '" width="100%" />')
+              .appendTo($this)
+              .load(function(){
+                tellAppIViewedThisInline('google');
+                if ($.isFunction(opts.ready)) {
+                  opts.ready();
+                }
+              });
+          }
         }
         if (opts.public_url) {
           loadGooglePreview()
