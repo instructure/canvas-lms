@@ -21,6 +21,9 @@ pt:
     user_count: 
       one: "1 utilizador"
       other: "%{count} utilizadores"
+  GroupUserCollection: 
+    flash: 
+      userAlreadyInGroup: "AVISO: %{user} já é um membro de %{group}"
   academic_benchmark: 
     api_error: "Não foi possível atualizar as normas para a autoridade %{auth}."
     bad_ab_file: "O ficheiro de referências académicas fornecido tem um erro."
@@ -539,6 +542,15 @@ pt:
             text: "id_disciplina:"
           outcome: 
             text: "id_objetivo:"
+    cv_submission_data_csv_description: 
+      account_reports: 
+        galen: 
+          cv: 
+            attendance: 
+              text: "Este relatório mostra os envios dos alunos até à data fornecida. Este item é utilizado para presença em CampusVue."
+        tmcc: 
+          description: 
+            header: Exemplo
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -590,6 +602,23 @@ pt:
           last_user_access: 
             header: Exemplo
             text: "Este relatório mostra o último início de sessão de utilizadores ativos."
+    learning_outcome_assignment_type_csv_description: 
+      account_reports: 
+        newark: 
+          student_activity: 
+            text: "Este relatório disponibiliza uma exportação de dados que estabelecem uma relação entre resultados e tarefas."
+        samuel_merrit_university: 
+          description: 
+            header: Exemplo
+    learning_outcome_assignment_type_csv_parameters: 
+      account_reports: 
+        samuel_merrit_university: 
+          course: 
+            sis: 
+              text: "ID do SIS da disciplina"
+            text: "ID da disciplina"
+          parameters: 
+            note1: "O ID da disciplina pode ficar em branco para executar o relatório de todas as disciplinas no período."
     mississippi_sis_csv_description: 
       account_reports: 
         mississisppi: 
@@ -784,6 +813,7 @@ pt:
         outgoing_email_default_name_option_custom: "Nome \"De\" personalizado"
         outgoing_email_default_name_option_default: "Predefinição do Canvas"
         prevent_course_renaming_by_teachers: "Não permitir que os professores mudem o nome das suas disciplinas"
+        restrict_quiz_questions: "Impedir os alunos de verem perguntas de testes após a data de fim da disciplina"
         restrict_student_future_view: "Impedir os alunos de verem disciplinas antes da data de início"
         self_enrollment: "Permitir auto-inscrição"
         self_registration: Auto-registo
@@ -1229,6 +1259,7 @@ pt:
     no_title: "Sem título"
   announcements: 
     announcements_crumb: Anúncios
+    error_draft_state: "Não é possível definir este tópico para estado de rascunho porque é um anúncio."
     external_feed: 
       alts: 
         deleted_feed: "Excluir este feed"
@@ -1361,6 +1392,8 @@ pt:
       a_quiz: "um teste"
       a_text_entry_box: "uma caixa de texto"
       a_website_url: "um endereço de site"
+      external_tool: "uma ferramenta externa"
+      on_paper: "no papel"
     titles: 
       grading_scheme_info: "Ver/Editar esquema de avaliação"
   assignment_details_dialog: 
@@ -1738,6 +1771,21 @@ pt:
       title_add_group: "Adicionar grupo de tarefa"
     invalid_file_retrieval: "Ocorreu um problema ao obter o ficheiro enviado a partir desta ferramenta."
     invalid_tool_return: "A ferramenta iniciada devolveu um recurso inválido para esta tarefa."
+    keyboard_add_item: "Adicionar uma tarefa ao grupo selecionado"
+    keyboard_close_menu: "Fechar a caixa de diálogo ativa"
+    keyboard_del_item: "Eliminar a tarefa ou o grupo atual"
+    keyboard_edit_item: "Editar a tarefa ou o grupo atual"
+    keyboard_next_item: "Focar na tarefa ou grupo seguinte"
+    keyboard_prev_item: "Focar na tarefa ou grupo anterior"
+    keyboard_show_assign: "Mostrar pré-visualização completa da tarefa selecionada"
+    keycodes: 
+      add_item: a
+      close_menu: esc
+      del_item: d
+      edit_item: e
+      next: j
+      previous: k
+      show_assign: f
     labels: 
       assignment_group_move_label: "Grupo de tarefa"
       label_place_before: "Colocar antes"
@@ -1768,6 +1816,7 @@ pt:
       aria_assignments: Tarefas
       assignments: Tarefas
       no_assignments_found: "Não foram encontradas tarefas"
+    no_name_error: "É necessário um nome"
     no_tools_found: "Não foram encontradas ferramentas"
     non_number: "É necessário utilizar um número"
     notices: 
@@ -2007,6 +2056,7 @@ pt:
           internet_check: "Base de dados de Internet"
           journal_check: "Revistas, periódicos e publicações"
           student_paper_check: "Outros artigos de alunos"
+        originality_report_never: Nunca
         originality_report_visibility: "Os alunos podem ver o relatório de originalidade"
         originality_report_visible_after_due_date: "Após a data de entrega"
         originality_report_visible_after_grading: "Após a avaliação da tarefa"
@@ -2079,6 +2129,7 @@ pt:
   bb_file_description: "Ficheiro de exportação .zip para Blackboard 6/7/8/9"
   bb_name: "Conversor Blackboard"
   big_blue_button_conference: 
+    conference_is_recorded: "Esta conferência está a ser gravada."
     recording_setting: Gravação
     recording_setting_description: "Gravar esta conferência"
   blackboard: 
@@ -2155,6 +2206,7 @@ pt:
     delete: Excluir
     done: Concluir
     filter: Filtro
+    find_user: "Localizar utilizador"
     hide_all_artifacts: "Ocultar todos os artefatos"
     import: Importar
     login: "Iniciar sessão"
@@ -2286,7 +2338,7 @@ pt:
       create_event: "Criar novo evento"
       done_go_back_to_list: "Concluído, voltar à lista"
       links: 
-        accessibility_warning: "Aviso: esta vista não é acessível a utilizadores com leitores de ecrã"
+        accessibility_warning: "Aviso: esta vista não é acessível a leitores de ecrã. Em alternativa, utilize a vista de Agenda."
         calendar_agenda: Agenda
         calendar_month: Mês
         calendar_scheduler: Agenda
@@ -2661,11 +2713,6 @@ pt:
       update_assignment_points: "Esta tarefa tem %{assignmentPoints} pontos possíveis. Pretende alterá-la para ter %{rubricPoints} pontos possíveis e corresponder a este protocolo?"
     titles: 
       update_assignment_points: "Mudar pontos possíveis para corresponder a protocolo?"
-  chat: 
-    notifications: 
-      tinychat_inaccessible: |-
-          Aviso: esta página utiliza  Tinychat, um plug-in de terceiros que não é\
-                acessível a leitores de ecrã.
   collaboration: 
     default_title: "Colaboração anônima"
   collaborations: 
@@ -3124,10 +3171,6 @@ pt:
   context: 
     all_marked_read: "Todas as mensagens de entrada marcadas como lidas"
     bad_message: "Esta mensagem não pode ser exibida"
-    chat: 
-      titles: 
-        chat: Bate-papo
-    chat_not_enabled: "O bate-papo não foi ativado para este site do Canvas"
     communication: 
       headings: 
         discussions: Discussões
@@ -4469,6 +4512,8 @@ pt:
       index: 
         add_people: "Adicionar pessoas"
         cannot_add_users: "Não é possível adicionar novos utilizadores porque esta disciplina está concluída"
+        filter_field_description: "À medida que escreve neste campo, a lista de pessoas será filtrada automaticamente para incluir apenas as pessoas cujos nomes correspondam ao conteúdo introduzido."
+        filter_list_of_people: "Filtrar lista de pessoas"
         role_to_search: "Limitar pesquisa a função"
         search_people: "Procurar pessoas"
       invitations_view: 
@@ -4770,7 +4815,6 @@ pt:
     announcements: Anúncios
     assignments: Tarefas
     calendar_events: "Eventos do calendário"
-    chat: Bate-papo
     conferences: Conferências
     confirmation: Confirmação
     copy_course: "Copiar disciplina"
@@ -4933,7 +4977,8 @@ pt:
     formats: 
       date_at_time: "%b %-d em %l:%M%P"
       default: "%Y-%m-%d"
-      long: "%B %d, %Y"
+      long: "%B %-d, %Y"
+      long_with_weekday: "%A, %B %-d"
       medium: "%b %e, %Y"
       medium_month: "%b %Y"
       medium_with_weekday: "%a %b %-d, %Y"
@@ -5116,7 +5161,7 @@ pt:
       separated_conversation_notice: "Uma vez que esta é uma tarefa de grupo, cada grupo tem a sua própria conversa relativa a este tópico. Abaixo estão as conversas às quais tem acesso:"
       show_due_dates: "Mostrar datas de entrega"
       until: Até
-    cannot_unpublish: "Não é possível anular a publicação"
+    cannot_unpublish_with_replies: "Não é possível anular a publicação se existirem respostas"
     confirm_delete_announcement: 
       one: "Tem a certeza de que pretende eliminar este anúncio?"
       other: "Tem a certeza de que pretende eliminar estes% {count} anúncios?"
@@ -5129,8 +5174,9 @@ pt:
     discussion: 
       close_for_comments: "Fechar para comentários"
       delete: Eliminar
-      due: Prazo
+      due_at: "*Prazo* %{assignment.display_due_at}"
       graded_discussion: "Discussão avaliada"
+      last_post_date: "Última publicação %{display_last_reply_at}"
       manage: Gerir
       no_due_date: "Sem data de entrega"
       open_to_comments: "Abrir a comentários"
@@ -5183,8 +5229,6 @@ pt:
       show_more_entries: 
         one: "Exibir mais 1 entrada"
         other: "Exibir mais %{count} entradas"
-    error_draft_state_announcement: "Não é possível definir este tópico para estado de rascunho porque é um anúncio."
-    error_draft_state_graded: "Não é possível definir este tópico para estado de rascunho porque é uma tarefa"
     error_draft_state_unauthorized: "Não tem permissão para definir este tópico para estado de rascunho."
     error_draft_state_with_posts: "Não é possível definir este tópico para estado de rascunho porque contém posts."
     group_assignment_discussion_entry: 
@@ -5233,7 +5277,10 @@ pt:
       zero: "Sem respostas"
     show: 
       add_rubric: "Adicionar protocolo"
+      announcement_closed: "Este anúncio está fechado para comentários"
       announcement_locked: "Este anúncio não estará visível para os utilizadores até *%{date}*"
+      announcement_not_visible: "Este anúncio não está visível para os utilizadores"
+      announcement_will_open_on: "Este anúncio será aberto para comentários em *%{date}*"
       authors_name: "Nome do autor"
       collapse_replies: "Ocultar respostas"
       confirm_delete_discussion: "Tem a certeza de que pretende eliminar esta discussão?"
@@ -5271,6 +5318,7 @@ pt:
       topic_subscribe_tooltip: "A inscrição foi anulada e não receberá notificações relativas a novos comentários."
       topic_subscribed_tooltip: "Está inscrito e receberá notificações relativas a novos comentários."
       topic_unsubscribe: Inscrito
+      topic_will_open_on: "Este tópico será aberto para comentários em *%{date}*"
       unlock_topic: "Abrir para comentários"
       unread: "Não lido"
     sub_entry: 
@@ -6315,6 +6363,8 @@ pt:
     resubmitted: "Reenviado desde a última avaliação"
     row_student_name: 
       student_placeholder: Aluno
+    screenreader: 
+      page_titles: "Livro de notas com leitor de ecrã"
     secondary_id: "ID secundário"
     section_to_show_menu: 
       choose_a_section_to_show: "Escolher uma seção para exibir"
@@ -6476,9 +6526,15 @@ pt:
         show_what_if: "Exibir pontuações \"e se\" salvas"
       change_score_instructions: "Clique em qualquer pontuação e insira um novo valor para verificar como isso alterará o seu total."
       click_to_change: "Clique para testar uma pontuação diferente"
+      close_comments: Fechar
+      close_comments_label: "Fechar comentários"
+      close_rubric: "Fechar protocolo"
+      close_score: Fechar
+      close_score_screenreader: "Fechar detalhes da pontuação"
       comment_count: 
         one: "1 comentário"
         other: "%{count} comentários"
+      comment_count_screenreader: "Ler comentários"
       faculty_journal: "Diário da Faculdade para %{user}"
       for_course: "Para a disciplina,"
       headers: 
@@ -6513,7 +6569,9 @@ pt:
       percent: Porcentagem
       print_grades: "Imprimir notas"
       see_rubric_results: "Consultar resultados de protocolo"
+      see_rubric_results_screenreader: "Ver resultados de protocolo"
       see_scoring_details: "Consultar detalhes da pontuação"
+      see_scoring_details_screenreader: "Ver detalhes da pontuação"
       see_turnitin_results: "Consultar resultados do Turnitin"
       student_mute_legend: "Seu instrutor está trabalhando na avaliação. Enquanto ele trabalhar na avaliação, as informações de notas e comentários estarão indisponíveis."
       student_mute_notification: "O instrutor está trabalhando na avaliação"
@@ -6523,7 +6581,6 @@ pt:
         turnitin_score: "Pontos de similaridade do Turnitin -- mais informações"
         view_rubric_evaluation: "Ver avaliação do protocolo"
         view_scoring_details: "Exibir detalhes da pontuação"
-      view_comments: "Exibir comentários e detalhes de pontuação"
     gradebook: 
       all_sections: Todos
       assignment_submitted_late: (atrasado)
@@ -6812,7 +6869,6 @@ pt:
     name_required: "É necessário o nome"
     name_too_long: "Introduza um nome de grupo mais curto"
     tabs: 
-      chat: Bate-papo
       discussions: Discussões
       files: Arquivos
       home: "Página inicial"
@@ -6902,7 +6958,7 @@ pt:
         one: "1 aluno"
         other: "%{count} alunos"
       warnings: 
-        studend_groups: "Estes grupos são auto-organizados pelos alunos. Ao contrário dos outros tipos de grupos, os alunos podem pertencer a mais de um destes grupos ao mesmo tempo, então estes grupos podem não ser a melhor solução para avaliações com nota."
+        studend_groups: "Estes grupos são auto-organizados pelos alunos. Ao contrário dos outros tipos de grupos, os alunos podem pertencer a mais de um destes grupos ao mesmo tempo, o que significa que estes grupos não podem ser utilizados para avaliações com nota."
     confirm: 
       assign_students: "Isto atribuirá automaticamente todos os alunos não atribuídos da forma mais uniforme possível entre os grupos de alunos existentes."
       delete_group: "Tem certeza de que deseja excluir este grupo?"
@@ -7034,6 +7090,7 @@ pt:
       group_category: 
         randomly_assigning_students: "Atribuir alunos aleatoriamente"
         search_groups: "Procurar grupos"
+        search_users: "Procurar utilizadores"
       group_category_create: 
         allow_self_signup: "Permitir auto-inscrição"
         cancel: Cancelar
@@ -7058,7 +7115,7 @@ pt:
         message_all_unassigned_option: "Enviar mensagem a todos os alunos não atribuídos"
         randomly_assign_students_option: "Atribuir alunos aleatoriamente"
         restricted_self_signup_blurb: "Todos os alunos num grupo têm de estar na mesma secção."
-        self_organized_warning: "Estes grupos são auto-organizados pelos alunos. Ao contrário de outros tipos de grupos, os alunos podem pertencer a mais de um destes grupos ao mesmo tempo, o que significa que estes grupos podem não ser a melhor solução para tarefas avaliadas."
+        self_organized_warning: "Estes grupos são auto-organizados pelos alunos. Ao contrário dos outros tipos de grupos, os alunos podem pertencer a mais de um destes grupos ao mesmo tempo, o que significa que estes grupos não podem ser utilizados para avaliações com nota."
         self_signup_blurb: "A auto-inscrição está ativada para estes grupos."
         settings: Definições
       group_category_edit: 
@@ -7095,6 +7152,8 @@ pt:
         remove: Remover
         remove_from_group: "Remover %{name} do grupo"
       group_users: 
+        no_matching_students: "Nenhum aluno correspondente."
+        no_matching_users: "Nenhum utilizador correspondente."
         no_students: "De momento, não existem alunos neste grupo. Adicione um aluno para começar."
         no_users: "De momento, não existem utilizadores neste grupo. Adicione um utilizador para começar."
       groups: 
@@ -7195,6 +7254,8 @@ pt:
       x_new_in_discussions: 
         one: "*1* discussão"
         other: "*%{count}* discussões"
+  ic_actions: 
+    manage: gerir
   images: 
     error_checking_color: "Erro ao verificar a cor da imagem"
     invalid_background_color: "A cor de fundo tem de ser %{color}"
@@ -10223,16 +10284,6 @@ pt:
         minimum_rows_for_parallel: "Mínimo de linhas em uma importação do SIS antes de usar processamento paralelo"
         parallelism: "Número de processadores de trabalho para utilizar no processamento de importações do SIS em paralelo"
         queue_for_parallel_jobs: "Fila de trabalhos para utilizar em trabalhos paralelos (vazio, como padrão)"
-    tinychat: 
-      description: "Sala de bate-papo Tinychat"
-      name: Tinychat
-    tinychat_settings: 
-      description: |-
-          Será necessário registrar um [novo aplicativo no Tinychat](%{tinychat_url}).
-          Anote os valores da chave pública e chave de segredo do seu aplicativo.
-      labels: 
-        api_key: "Chave pública"
-        secret_key: "Chave secreta"
     twitter: 
       description: "Notificações do Twitter"
       name: Twitter
@@ -10696,6 +10747,7 @@ pt:
     login: 
       invalid_login: "Login inválido"
       invalid_password: "Senha inválida"
+      parent_signup: "Inscrição de pais"
       password_confirmation_sent: "Confirmação de senha enviada para %{email_address}. Verifique sua caixa de spam."
     notices: 
       account_registered: "Conta registrada!"
@@ -10712,10 +10764,18 @@ pt:
       publishing: "A publicar..."
       unpublish: "Anular publicação"
       unpublishing: "A anular a publicação..."
+  publish_icon_component: 
+    publish: Publicar
+    publish_click: "publicado, clique para anular a publicação"
+    unpublish: "Anular publicação"
+    unpublish_click: "não publicado, clique para publicar"
   publishable: 
     cant_unpublish: "Não é possível anular a publicação"
   publishableModuleItem: 
     disabled: "Publicação desativada para este item"
+    disabled_assignment: "Não é possível anular a publicação se existirem envios de alunos"
+    disabled_discussion_topic: "Não é possível anular a publicação se existirem envios de alunos"
+    disabled_quiz: "Não é possível anular a publicação se existirem envios de alunos"
   purchases: 
     new: 
       payment_info: "Informação de pagamento"
@@ -11010,6 +11070,9 @@ pt:
       no_more_attempts: "Não restam mais tentativas de teste"
       no_possible_solution: "Gere ao menos uma solução possível"
       quiz_deleted: "Este teste foi excluído"
+      quiz_score_not_a_number: "A pontuação tem de ser um número entre 0 e 2.000.000.000."
+      quiz_score_too_long: "A pontuação tem de ser inferior a 2.000.000.000."
+      quiz_score_too_short: "A pontuação tem de ser superior a 0."
       quiz_update_failed: "Falha na atualização do teste"
       retrieving_filters_failed: "Falha na recuperação de filtros"
     fabulous_quizzes: 
@@ -11421,6 +11484,7 @@ pt:
       show_correct_answers: "Permitir que os alunos vejam as respostas corretas"
       show_correct_answers_at: "Mostrar respostas corretas em"
       shuffle_answers: "Embaralhar as respostas"
+      students_cannot_view_responses_after_course_concludes: "Os alunos não podem ver perguntas de testes após a conclusão da disciplina"
       time_limit: "Quantos minutos?"
       titles: 
         click_to_select_filter: "Clique para selecionar este filtro"
@@ -11865,6 +11929,7 @@ pt:
       unpublished_changes: "*Fez alterações não publicadas a este teste.* Essas alterações não aparecem para os alunos até publicar ou publicar outra vez o teste."
       unpublished_quiz: "*Este teste não está publicado* Apenas os professores podem ver o teste até ser publicado."
   quizzes_model: 
+    cant_unpublish_when_students_submit: "Não é possível anular a publicação se existirem envios de alunos"
     confirms: 
       delete_quiz: "Tem a certeza de que pretende eliminar este teste?"
     delete_quiz: "Eliminar teste"
@@ -12035,6 +12100,9 @@ pt:
   roster: 
     delete_confirm: "Tem a certeza de que pretende remover este utilizador?"
     error_sending_invitations: "Erro ao enviar o convite. Tente novamente."
+    filter_multiple_users_found: "%{userCount} utilizadores encontrados."
+    filter_no_users_found: "Não foram encontrados utilizadores correspondentes."
+    filter_one_user_found: "1 utilizador encontrado."
     flash: 
       removeError: "Não foi possível remover o utilizador. Tente novamente mais tarde."
       removed: "Utilizador removido com sucesso."
@@ -12508,6 +12576,7 @@ pt:
       back_to_login: "Voltar ao login"
       buttons: 
         request_password: "Solicitar senha"
+      coenrollment_banner: "*É pai ou mãe de um utilizador do Canvas?* **Clique aqui para obter uma conta**"
       default_login_message: "Faça login em sua instituição"
       dont_know_password: "Não sabe qual é a sua palavra-passe?"
       labels: 
@@ -12954,11 +13023,21 @@ pt:
       loading: carregando...
     titles: 
       value_over_time: "%{value} Ao longo do tempo"
+    user_search: 
+      find_user_by: "Localizar um utilizador por login/e-mail"
+      find_user_by_label: Login/e-mail
+    users: 
+      user_search_label: "Procura de utilizadores"
+      users_matching_label: "Utilizadores correspondentes"
   slideshow: 
     titles: 
       back: Voltar
       close: Fechar
       forward: Encaminhar
+  sr_gradebook: 
+    all_sections: "Todas as secções"
+    no_assignment: "Nenhuma tarefa selecionada"
+    no_student: "Nenhum aluno selecionado"
   statistics: 
     csv_columns: 
       attempt: tentativa
@@ -13062,7 +13141,7 @@ pt:
         save_comment: "Guardar comentário"
       crumbs: 
         assignments: Tarefas
-      hide_rubric_button: "Ocultar botão de protocolo"
+      hide_rubric_button: "Ocultar protocolo"
       labels: 
         add_a_comment: "Adicionar um comentário"
         grade: Nota
@@ -13138,7 +13217,6 @@ pt:
   tabs: 
     announcements: Anúncios
     assignments: Tarefas
-    chat: Bate-papo
     collaborations: Colaborações
     conferences: Conferências
     discussions: Discussões
@@ -13643,6 +13721,8 @@ pt:
       resending: Reenviando...
       sent_email_paragraph: "Enviámos um e-mail para %{email_address}. *Clique na ligação incluída no e-mail para concluir o registo*. Se não vir o e-mail, **clique para reenviar o e-mail** e verifique a caixa de spam."
       while_you_wait: "Enquanto aguarda..."
+    scheduled_conference: 
+      current_conference_text: "Foi convidado para aderir a %{conference}. Começa em %{starts_at}."
     service_not_enabled: "O serviço não foi ativado"
     show: 
       accounts: Contas
