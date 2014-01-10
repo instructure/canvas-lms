@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -203,7 +203,9 @@ describe "Outcom Reports" do
 
       param = {}
       param["include_deleted"] = true
-      parsed = read_report(@type, {params: param})
+      report = run_report(@type, {params: param})
+      report.parameters["extra_text"].should == "Term: All Terms; Include Deleted Objects: true;"
+      parsed = parse_report(report)
 
       parsed[1].should == [@user1.sortable_name, @user1.id.to_s, "user_sis_id_01",
                            @assignment.title, @assignment.id.to_s,
@@ -345,6 +347,13 @@ describe "Outcom Reports" do
       parsed[1][16].should == @course1.sis_source_id
 
       parsed.length.should == 3
+    end
+
+    it 'should include in extra text if option is set' do
+      param = {}
+      param["include_deleted"] = true
+      report = run_report(@type, {params: param})
+      report.parameters["extra_text"].should == "Term: All Terms; Include Deleted Objects: true;"
     end
   end
 end

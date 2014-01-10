@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -25,6 +25,11 @@ module Canvas::AccountReports
     def initialize(account_report)
       @account_report = account_report
       extra_text_term(@account_report)
+      if @account_report.has_parameter? "include_deleted"
+        @include_deleted = @account_report.parameters["include_deleted"]
+        @account_report.parameters["extra_text"] << I18n.t(
+          'account_reports.grades.deleted', ' Include Deleted Objects: true;')
+      end
     end
 
     # retrieve the list of students for all active courses
@@ -45,11 +50,6 @@ module Canvas::AccountReports
     # - outcome result score
     def student_assignment_outcome_map
 
-      if @account_report.has_parameter? "include_deleted"
-        @include_deleted = @account_report.parameters["include_deleted"]
-        @account_report.parameters["extra_text"] << I18n.t(
-          'account_reports.grades.deleted', ' Include Deleted Objects: true;')
-      end
       parameters = {
         :account_id => account.id,
         :root_account_id => root_account.id
