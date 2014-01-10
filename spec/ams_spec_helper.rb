@@ -44,6 +44,10 @@ module ActiveModel
   end
 end
 
+require File.expand_path(File.dirname(__FILE__)) + '/../app/serializers/canvas/api_serialization.rb'
+require File.expand_path(File.dirname(__FILE__)) + '/../app/serializers/canvas/api_serializer.rb'
+require File.expand_path(File.dirname(__FILE__)) + '/../app/serializers/canvas/api_array_serializer.rb'
+
 Dir[File.expand_path(File.dirname(__FILE__) + '/../app/serializers/*.rb')].each do |file|
   require file
 end

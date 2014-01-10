@@ -133,7 +133,7 @@ describe QuizSerializer do
           course.id = 1
           @quiz.assignment_group = assignment_group = AssignmentGroup.new
           assignment_group.id = 1
-          serializer.as_json[:quiz][:links][:assignment_group].should ==
+          serializer.as_json[:quiz]['links']['assignment_group'].should ==
             controller.send(:api_v1_course_assignment_group_url, course.id,
                             assignment_group.id)
         end

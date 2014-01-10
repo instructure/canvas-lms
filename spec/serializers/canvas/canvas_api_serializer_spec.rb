@@ -37,6 +37,7 @@ describe Canvas::APISerializer do
 
   describe "#serializable object" do
     before do
+
       Foo = Struct.new(:id, :name) do
         def read_attribute_for_serialization(attr)
           send(attr)
@@ -53,24 +54,54 @@ describe Canvas::APISerializer do
       Object.send(:remove_const, :FooSerializer)
     end
 
-    it "uses ActiveModel::serializer's implementation if not jsonapi or stringied ids requested" do
+    it "uses ActiveModel::serializer's implementation if not stringify_ids? returns false" do
       con = ActiveModel::FakeController.new(accepts_jsonapi: false, stringify_json_ids: false)
       object = Foo.new(1, 'Alice')
       serializer = FooSerializer.new(object, {root: nil, controller: con})
-      serializer.serializable_object.should == {
+      serializer.expects(:stringify_ids?).returns false
+      serializer.as_json(root: nil).should == {
         id: 1,
         name: 'Alice'
       }
     end
 
-    it "stringifies idsi fjsonapi or stringids requested" do
+    it "stringifies ids if jsonapi or stringids requested" do
       con = ActiveModel::FakeController.new(accepts_jsonapi: true, stringify_json_ids: true)
       object = Foo.new(1, 'Alice')
       serializer = FooSerializer.new(object, {root: nil, controller: con})
-      serializer.serializable_object.should == {
+      serializer.as_json(root: nil).should == {
         id: '1',
         name: 'Alice'
       }
+    end
+
+    it "uses urls for embed: :ids, include: false" do
+      con = ActiveModel::FakeController.new(accepts_jsonapi: true, stringify_json_ids: true)
+      class FooSerializer
+        has_one :bar, embed: :ids
+      end
+      object = Foo.new(1, 'Bob')
+      object.expects(:bar).returns stub()
+      url = "http://example.com/api/v1/bar/1"
+      serializer = FooSerializer.new(object, {root: nil, controller: con})
+      serializer.expects(:bar_url).returns(url)
+      serializer.as_json(root: nil)['links']['bar'].should == url
+    end
+
+    it "uses ids for embed: :ids, embed_in_root: true" do
+      con = ActiveModel::FakeController.new(accepts_jsonapi: true, stringify_json_ids: true)
+      class FooSerializer
+        has_one :bar, embed: :ids, embed_in_root: true
+      end
+      class BarSerializer < Canvas::APISerializer
+        attributes :id
+      end
+      object = Foo.new(1, 'Bob')
+      object.expects(:bar).returns Foo.new(1, 'Alice')
+      url = "http://example.com/api/v1/bar/1"
+      serializer = FooSerializer.new(object, {root: nil, controller: con})
+      serializer.as_json(root: nil)['links']['bar'].should == "1"
+      Object.send(:remove_const, :BarSerializer)
     end
   end
 

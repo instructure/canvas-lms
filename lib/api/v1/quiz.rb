@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 module Api::V1::Quiz
   include Api::V1::Json
   include Api::V1::AssignmentOverride
@@ -64,7 +63,7 @@ module Api::V1::Quiz
     api_route = options.fetch(:api_route)
     @quizzes, meta = Api.jsonapi_paginate(scope, self, api_route)
     meta[:primaryCollection] = 'quizzes'
-    ActiveModel::ArraySerializer.new(@quizzes,
+    Canvas::APIArraySerializer.new(@quizzes,
                           scope: @current_user,
                           controller: self,
                           root: :quizzes,
