@@ -163,11 +163,6 @@ module DatesOverridable
     end
   end
 
-  # deprecated alias method - can be removed once all plugins are updated
-  def multiple_due_dates_apply_to(user)
-    multiple_due_dates_apply_to?(user)
-  end
-
   def multiple_due_dates?
     if overridden
       !!multiple_due_dates_apply_to?(overridden_for_user)
