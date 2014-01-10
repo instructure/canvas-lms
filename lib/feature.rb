@@ -18,7 +18,7 @@
 
 class Feature
   ATTRS = [:feature, :display_name, :description, :applies_to, :state, :root_opt_in, :enable_at, :beta, :development, :release_notes_url]
-  attr_reader *ATTRS
+  attr_reader(*ATTRS)
 
   def initialize(opts = {})
     @state = 'allowed'
@@ -104,6 +104,17 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       root_opt_in: true
+    },
+    'screenreader_gradebook' =>
+    {
+      display_name: -> { I18n.t('features.screenreader_gradebook', 'Screenreader Gradebook') },
+      description:  -> { I18n.t('screenreader_gradebook_description', <<-END) },
+Screenreader Gradebook provides an interface to gradebook that is designed for accessibility.
+END
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true,
+      development: true
     }
   )
 
