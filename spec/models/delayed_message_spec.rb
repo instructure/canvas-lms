@@ -71,7 +71,7 @@ describe DelayedMessage do
       notification = notification_model
       cc = user.communication_channels.create!(:path => 'path@example.com')
       nps = (1..3).inject([]) do |list, e|
-        list << cc.notification_policies.create!(:notification => notification)
+        list << cc.notification_policies.create!(:notification => notification, :frequency => Notification::FREQ_IMMEDIATELY)
       end
       dms = nps.map do |np|
         DelayedMessage.create!(:notification => notification,
