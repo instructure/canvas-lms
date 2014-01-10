@@ -309,7 +309,11 @@ class Conversation < ActiveRecord::Base
       save! if new_tags.present? || root_account_ids_changed?
 
       # so we can take advantage of other preloaded associations
-      ConversationMessage.send :add_preloaded_record_to_collection, [message], :conversation, self
+      if CANVAS_RAILS2
+        ConversationMessage.send :add_preloaded_record_to_collection, [message], :conversation, self
+      else
+        message.association(:conversation).target = self
+      end
       message.save_without_broadcasting!
 
       add_message_to_participants(message, options.merge(
@@ -778,7 +782,11 @@ class Conversation < ActiveRecord::Base
   protected
 
   def maybe_update_timestamp(col, val, additional_conditions=[])
-    condition = self.class.merge_conditions(["(#{col} IS NULL OR #{col} < ?)", val], additional_conditions)
+    if CANVAS_RAILS2
+      condition = self.class.merge_conditions(["(#{col} IS NULL OR #{col} < ?)", val], additional_conditions)
+    else
+      condition = self.class.where(["(#{col} IS NULL OR #{col} < ?)", val]).where(additional_conditions).where_values.join(' AND ')
+    end
     sanitize_sql ["#{col} = CASE WHEN #{condition} THEN ? ELSE #{col} END", val]
   end
 end
