@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -376,6 +376,48 @@ describe 'Student reports' do
       parsed.length.should == 2
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip]
       parsed[1].should == [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael', @last_login_time.iso8601, @p2.current_login_ip]
+    end
+
+    it 'should not include a user multiple times for multiple enrollments' do
+      @course1.enroll_user(@user1, 'ObserverEnrollment', {enrollment_state: 'active'})
+      term1 = @account.enrollment_terms.create(name: 'Fall')
+      term1.root_account = @account
+      term1.save!
+      @course1.enrollment_term = term1
+      @course1.save!
+      param = {}
+      param['enrollment_term'] = term1.id
+
+      parsed = read_report(@type, {params: param, order: 1})
+      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.',
+                           @last_login_time2.iso8601, @p1.current_login_ip]
+      parsed[1].should == [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael',
+                           @last_login_time.iso8601, @p2.current_login_ip]
+      parsed.length.should == 2
+    end
+
+    it 'should include each pseudonym for users' do
+      @course1.enroll_user(@user1, 'ObserverEnrollment', {enrollment_state: 'active'})
+      term1 = @account.enrollment_terms.create(name: 'Fall')
+      term1.root_account = @account
+      term1.save!
+      @course1.enrollment_term = term1
+      @course1.save!
+      p1b = @user1.pseudonym.create(unique_id: 'unique@example.com')
+      p1b.account = @account
+      p1b.sis_user_id = 'secondSIS'
+      p1b.save!
+      param = {}
+      param['enrollment_term'] = term1.id
+
+      parsed = read_report(@type, {params: param, order: 1})
+      parsed[0].should == [@user1.id.to_s, 'secondSIS', 'Clair, John St.',
+                           nil, nil]
+      parsed[1].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.',
+                           @last_login_time2.iso8601, @p1.current_login_ip]
+      parsed[2].should == [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael',
+                           @last_login_time.iso8601, @p2.current_login_ip]
+      parsed.length.should == 3
     end
   end
 end
