@@ -37,6 +37,12 @@ require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
+def pend_with_bullet
+  if Bullet.enable?
+    pending ('PENDING: Bullet')
+  end
+end
+
 def require_webmock
   # pull in webmock for selected tests, but leave it disabled by default.
   # funky require order is to skip typhoeus because of an incompatibility
