@@ -176,7 +176,7 @@ group :test do
     gem 'rspec-rails', '2.13.0'
   end
   gem 'sequel', '4.5.0', :require => false
-  gem 'selenium-webdriver', '2.37.0'
+  gem 'selenium-webdriver', '2.39.0'
   gem 'webrat', '0.7.3'
   gem 'webmock', '1.16.1', :require => false
   gem 'yard', '0.8.0'
