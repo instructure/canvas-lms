@@ -56,8 +56,7 @@ describe WikiPagesController do
   it "should permit the student to view the page history if they have permissions" do
     @wiki_page = @course.wiki.wiki_pages.create :title => "Some random wiki page",
                                                 :body => "this is the content of the wikipage body asdfasdf",
-                                                :editing_roles => "teachers,students",
-                                                :hide_from_students => false
+                                                :editing_roles => "teachers,students"
     student = user()
     enrollment = @course.enroll_student(student)
     enrollment.accept!

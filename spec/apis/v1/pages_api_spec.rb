@@ -57,7 +57,8 @@ describe "Pages API", :type => :integration do
     @front_page.workflow_state = 'active'
     @front_page.save!
     @front_page.set_as_front_page!
-    @hidden_page = @wiki.wiki_pages.create!(:title => "Hidden Page", :hide_from_students => true, :body => "Body of hidden page")
+    @hidden_page = @wiki.wiki_pages.create!(:title => "Hidden Page", :body => "Body of hidden page")
+    @hidden_page.unpublish!
   end
 
   context 'versions' do
@@ -92,12 +93,6 @@ describe "Pages API", :type => :integration do
 
     example 'does not create a version when workflow_state changes' do
       @page.workflow_state = 'active'
-      @page.save!
-      @page.versions.count.should == 1
-    end
-
-    example 'does not create a version when hide_from_students changes' do
-      @page.hide_from_students = true
       @page.save!
       @page.versions.count.should == 1
     end
@@ -420,7 +415,7 @@ describe "Pages API", :type => :integration do
       end
 
       it "should revert page content only" do
-        @vpage.hide_from_students = true
+        @vpage.workflow_state = 'unpublished'
         @vpage.title = 'booga!'
         @vpage.body = 'booga booga!'
         @vpage.editing_roles = 'teachers,students,public'
@@ -654,7 +649,7 @@ describe "Pages API", :type => :integration do
             json['hide_from_students'].should be_true
 
             @test_page.reload
-            @test_page.should be_active
+            @test_page.should be_unpublished
             @test_page.hide_from_students.should be_true
           end
 
@@ -697,7 +692,7 @@ describe "Pages API", :type => :integration do
 
             @test_page.reload
             @test_page.should be_unpublished
-            @test_page.hide_from_students.should be_false
+            @test_page.hide_from_students.should be_true
           end
 
           it 'should ignore hide_from_students' do
@@ -781,8 +776,11 @@ describe "Pages API", :type => :integration do
       
       describe "notify_of_update" do
         before do
+          @notify_page = @hidden_page
+          @notify_page.publish!
+
           @front_page.update_attribute(:created_at, 1.hour.ago)
-          @hidden_page.update_attribute(:created_at, 1.hour.ago)
+          @notify_page.update_attribute(:created_at, 1.hour.ago)
           @notification = Notification.create! :name => "Updated Wiki Page"
           @teacher.communication_channels.create(:path => "teacher@instructure.com").confirm!
           @teacher.email_channel.notification_policies.
@@ -790,14 +788,14 @@ describe "Pages API", :type => :integration do
               update_attribute(:frequency, 'immediately')
         end
         
-        it "should notify iff the notify_of_update flag is sent" do
+        it "should notify iff the notify_of_update flag is set" do
           api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@front_page.url}?wiki_page[body]=updated+front+page",
                    :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
                    :url => @front_page.url, :wiki_page => { "body" => "updated front page" })
           api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}?wiki_page[body]=updated+hidden+page&wiki_page[notify_of_update]=true",
                    :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
-                   :url => @hidden_page.url, :wiki_page => { "body" => "updated hidden page", "notify_of_update" => 'true' })
-          @teacher.messages.map(&:context_id).should == [@hidden_page.id]
+                   :url => @notify_page.url, :wiki_page => { "body" => "updated hidden page", "notify_of_update" => 'true' })
+          @teacher.messages.map(&:context_id).should == [@notify_page.id]
         end
       end
     end
@@ -829,7 +827,7 @@ describe "Pages API", :type => :integration do
 
     context "unpublished pages" do
       before do
-        @deleted_page = @wiki.wiki_pages.create! :title => "Deleted page", :hide_from_students => true
+        @deleted_page = @wiki.wiki_pages.create! :title => "Deleted page"
         @deleted_page.destroy
         @course.account.allow_feature!(:draft_state)
         @course.enable_feature!(:draft_state)

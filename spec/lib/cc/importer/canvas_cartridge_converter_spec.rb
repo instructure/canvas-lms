@@ -609,9 +609,10 @@ describe "Canvas Cartridge importing" do
         <div><img src="http://www.instructure.com/images/header-logo.png"></div>
         <div><img src="http://www.instructure.com/images/header-logo.png"></div>
       </div>}
-    page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body_with_link % [ @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, mod.id, @copy_from.id, from_att.id ], :editing_roles => "teachers", :hide_from_students => true, :notify_of_update => true)
+    page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body_with_link % [ @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, mod.id, @copy_from.id, from_att.id ], :editing_roles => "teachers", :notify_of_update => true)
+    page.workflow_state = 'unpublished'
     @copy_from.save!
-    
+
     #export to html file
     migration_id = CC::CCHelper.create_key(page)
     meta_fields = {:identifier => migration_id}
@@ -635,7 +636,7 @@ describe "Canvas Cartridge importing" do
     page_2.hide_from_students.should == page.hide_from_students
     page_2.notify_of_update.should == page.notify_of_update
     page_2.body.should == (body_with_link % [ @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id ]).gsub(/png" \/>/, 'png">')
-    page_2.active?.should == true
+    page_2.unpublished?.should == true
   end
   
   it "should import migrate inline external tool URLs in wiki pages" do
