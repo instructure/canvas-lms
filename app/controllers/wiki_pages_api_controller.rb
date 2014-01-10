@@ -166,7 +166,8 @@ class WikiPagesApiController < ApplicationController
   #   Whether the page is published (true) or draft state (false).
   #
   #   *Note:* when draft state is disabled, attempts to set +published+
-  #   will be ignored and the value returned will always be true.
+  #   will be ignored and the value returned will always be the inverse of the
+  #   +hide_from_students+ value.
   #
   # @example_request
   #     curl -X PUT -H 'Authorization: Bearer <token>' \
@@ -206,13 +207,12 @@ class WikiPagesApiController < ApplicationController
       # omit body from selection, since it's not included in index results
       scope = @context.wiki.wiki_pages.select(WikiPage.column_names - ['body']).includes(:user)
       if params.has_key?(:published)
-        scope = value_to_boolean(params[:published]) ? scope.active.not_hidden : scope.unpublished
+        scope = value_to_boolean(params[:published]) ? scope.published : scope.unpublished
       else
         scope = scope.not_deleted
       end
       # published parameter notwithstanding, hide unpublished items if the user doesn't have permission to see them
-      scope = scope.active unless @context.grants_right?(@current_user, session, :view_unpublished_items)
-      scope = scope.not_hidden unless @context.grants_right?(@current_user, session, :view_hidden_items)
+      scope = scope.published unless @context.grants_right?(@current_user, session, :view_unpublished_items)
 
       scope = WikiPage.search_by_attribute(scope, :title, params[:search_term])
 
@@ -267,7 +267,8 @@ class WikiPagesApiController < ApplicationController
   #   Whether the page is published (true) or draft state (false).
   #
   #   *Note:* when draft state is disabled, attempts to set +published+
-  #   will be ignored and the value returned will always be true.
+  #   will be ignored and the value returned will always be the inverse of the
+  #   +hide_from_students+ value.
   #
   # @argument wiki_page[front_page] [Optional, Boolean]
   #   Set an unhidden page as the front page (if true)
@@ -345,7 +346,8 @@ class WikiPagesApiController < ApplicationController
   #   Whether the page is published (true) or draft state (false).
   #
   #   *Note:* when draft state is disabled, attempts to set +published+
-  #   will be ignored and the value returned will always be true.
+  #   will be ignored and the value returned will always be the inverse of the
+  #   +hide_from_students+ value.
   #
   # @argument wiki_page[front_page] [Optional, Boolean]
   #   Set an unhidden page as the front page (if true)
@@ -537,10 +539,12 @@ class WikiPagesApiController < ApplicationController
       page_params.slice!(*%w(title body hide_from_students notify_of_update front_page editing_roles))
       workflow_state = 'active' if @page.new_record?
     end
-    page_params[:hide_from_students] = value_to_boolean(page_params[:hide_from_students]) if page_params.has_key?(:hide_from_students)
 
+    hide_from_students_provided = page_params.has_key?(:hide_from_students)
     if page_params.has_key?(:published)
       workflow_state = value_to_boolean(page_params.delete(:published)) ? 'active' : 'unpublished'
+    elsif hide_from_students_provided
+      workflow_state = value_to_boolean(page_params.delete(:hide_from_students)) ? 'unpublished' : 'active'
     end
 
     if page_params.has_key?(:editing_roles)
@@ -565,7 +569,13 @@ class WikiPagesApiController < ApplicationController
     if @wiki.grants_right?(@current_user, session, :manage)
       allowed_fields.clear
     else
-      rejected_fields << :published if workflow_state && workflow_state != @page.workflow_state
+      if workflow_state && workflow_state != @page.workflow_state
+        if hide_from_students_provided
+          rejected_fields << :hide_from_students
+        else
+          rejected_fields << :published
+        end
+      end
 
       if editing_roles
         existing_editing_roles = (@page.editing_roles || '').split(',')
@@ -573,8 +583,6 @@ class WikiPagesApiController < ApplicationController
         editing_roles_changed |= editing_roles.reject{|role| existing_editing_roles.include?(role)}.length > 0
         rejected_fields << :editing_roles if editing_roles_changed
       end
-
-      rejected_fields << :hide_from_students if page_params.include?(:hide_from_students) && value_to_boolean(page_params[:hide_from_students]) != @page.hide_from_students
 
       unless @page.grants_right?(@current_user, session, :update)
         allowed_fields << :body
@@ -598,18 +606,6 @@ class WikiPagesApiController < ApplicationController
 
     # check for a valid front page
     valid_front_page = true
-
-    if change_front_page || page_params.include?(:hide_from_students)
-      new_front_page = change_front_page ? @set_as_front_page : @page.is_front_page?
-      new_hide_from_students = page_params.include?(:hide_from_students) ? value_to_boolean(page_params[:hide_from_students]) : @page.hide_from_students
-      if new_front_page && new_hide_from_students
-        valid_front_page = false
-        error_message = t(:cannot_hide_front_page, 'The front page cannot be hidden from students')
-        @page.errors.add(:front_page, error_message) if change_front_page
-        @page.errors.add(:hide_from_students, error_message) if page_params.include?(:hide_from_students)
-      end
-    end
-
     if change_front_page || workflow_state
       new_front_page = change_front_page ? @set_as_front_page : @page.is_front_page?
       new_workflow_state = workflow_state ? workflow_state : @page.workflow_state
@@ -618,7 +614,11 @@ class WikiPagesApiController < ApplicationController
         valid_front_page = false
         error_message = t(:cannot_have_unpublished_front_page, 'The front page cannot be unpublished')
         @page.errors.add(:front_page, error_message) if change_front_page
-        @page.errors.add(:published, error_message) if workflow_state
+        if hide_from_students_provided
+          @page.errors.add(:hide_from_students, t(:cannot_have_hidden_front_page, 'The front page cannot be hidden'))
+        elsif workflow_state
+          @page.errors.add(:published, error_message)
+        end
       end
     end
 

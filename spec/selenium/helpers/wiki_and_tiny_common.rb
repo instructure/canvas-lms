@@ -66,8 +66,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     end
   end
 
-  def create_wiki_page(title, hfs, edit_roles)
-    @course.wiki.wiki_pages.create(:title => title, :hide_from_students => hfs, :editing_roles => edit_roles, :notify_of_update => true)
+  def create_wiki_page(title, unpublished, edit_roles)
+    wiki_page = @course.wiki.wiki_pages.create(:title => title, :editing_roles => edit_roles, :notify_of_update => true)
+    wiki_page.unpublish! if unpublished
+    wiki_page
   end
 
   def select_all_wiki

@@ -17,8 +17,8 @@
 #
 
 class WikiPage < ActiveRecord::Base
-  attr_accessible :title, :body, :url, :user_id, :hide_from_students, :editing_roles, :notify_of_update
-  attr_readonly :wiki_id
+  attr_accessible :title, :body, :url, :user_id, :editing_roles, :notify_of_update
+  attr_readonly :wiki_id, :hide_from_students
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :wiki_id
   include Workflow
@@ -41,7 +41,7 @@ class WikiPage < ActiveRecord::Base
   SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :hide_from_students, :editing_roles, :notify_of_update]
 
   def validate_front_page_visibility
-    if self.hide_from_students && self.is_front_page?
+    if !published? && self.is_front_page?
       self.errors.add(:hide_from_students, t(:cannot_hide_page, "cannot hide front page"))
     end
   end
@@ -69,27 +69,26 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
-  # sync hide_from_students with published state
-  def sync_hidden_and_unpublished
-    return if (context rescue nil).nil?
-
-    WikiPage.skip_callback(:after_find) do
-      if context.feature_enabled?(:draft_state)
-        if self.hide_from_students # hide_from_students overrides published
-          self.hide_from_students = false
-          self.workflow_state = 'unpublished'
-        end
-      else
-        if self.workflow_state.to_s == 'unpublished' # unpublished overrides hide_from_students
-          self.workflow_state = 'active'
-          self.hide_from_students = true
-        end
-      end
+  def normalize_hide_from_students
+    workflow_state = self.read_attribute('workflow_state')
+    hide_from_students = self.read_attribute('hide_from_students')
+    if !workflow_state.nil? && !hide_from_students.nil?
+      self.workflow_state = 'unpublished' if hide_from_students && workflow_state == 'active'
+      self.write_attribute('hide_from_students', nil)
     end
   end
-  before_save :sync_hidden_and_unpublished
-  alias_method :after_find, :sync_hidden_and_unpublished
-  private :sync_hidden_and_unpublished
+  alias_method :after_find, :normalize_hide_from_students
+  private :normalize_hide_from_students
+
+  def hide_from_students
+    self.workflow_state == 'unpublished'
+  end
+
+  def hide_from_students=(v)
+    self.workflow_state = 'unpublished' if v && self.workflow_state == 'active'
+    self.workflow_state = 'active' if !v && self.workflow_state = 'unpublished'
+    hide_from_students
+  end
 
   def self.title_order_by_clause
     best_unicode_collation_key('wiki_pages.title')
@@ -168,11 +167,8 @@ class WikiPage < ActiveRecord::Base
     state :post_delayed do
       event :delayed_post, :transitions_to => :active
     end
-
     state :deleted
-
   end
-
   alias_method :published?, :active?
 
   def restore
@@ -209,14 +205,13 @@ class WikiPage < ActiveRecord::Base
 
   scope :not_deleted, where("wiki_pages.workflow_state<>'deleted'")
 
+  scope :published, where("wiki_pages.workflow_state='active' AND (wiki_pages.hide_from_students=? OR wiki_pages.hide_from_students IS NULL)", false)
   scope :unpublished, where("wiki_pages.workflow_state='unpublished' OR (wiki_pages.hide_from_students=? AND wiki_pages.workflow_state<>'deleted')", true)
 
   # needed for ensure_unique_url
   def not_deleted
     !deleted?
   end
-
-  scope :not_hidden, where('wiki_pages.hide_from_students<>?', true)
 
   scope :order_by_id, order(:id)
 
@@ -242,10 +237,16 @@ class WikiPage < ActiveRecord::Base
   end
 
   def set_as_front_page!
-    if self.hide_from_students
-      self.errors.add(:front_page, t(:cannot_set_hidden_front_page, "could not set as front page because it is hidden"))
-      return false
+    can_set_front_page = true
+    if self.unpublished?
+      self.errors.add(:front_page, t(:cannot_set_unpublished_front_page, 'could not set as front page because it is unpublished'))
+      can_set_front_page = false
     end
+    if self.hide_from_students
+      self.errors.add(:front_page, t(:cannot_set_hidden_front_page, 'could not set as front page because it is hidden'))
+      can_set_front_page = false
+    end
+    return false unless can_set_front_page
 
     self.wiki.set_front_page_url!(self.url)
   end
@@ -286,7 +287,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def can_read_page?(user, session=nil)
-    self.wiki.grants_right?(user, session, :manage) || (!hide_from_students && self.active?)
+    self.wiki.grants_right?(user, session, :manage) || (self.active?)
   end
 
   def can_edit_page?(user, session=nil)
@@ -319,15 +320,10 @@ class WikiPage < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :updated_wiki_page
     p.to { participants }
-    p.whenever { |record| 
-      record.created_at < Time.now - (30*60) &&
-        ((
-          record.active? && @wiki_page_changed && record.prior_version
-        ) || 
-        (
-          record.changed_state(:active)
-        ))
-    }
+    p.whenever do |record|
+      return false unless record.created_at < Time.now - 30.minutes
+      (record.published? && @wiki_page_changed && record.prior_version) || record.changed_state(:active)
+    end
   end
 
   def context(user=nil)
@@ -339,7 +335,7 @@ class WikiPage < ActiveRecord::Base
   def participants
     res = []
     if context && context.available?
-      if self.hide_from_students || !self.active?
+      if !self.active?
         res += context.participating_admins
       else
         res += context.participants
@@ -425,8 +421,10 @@ class WikiPage < ActiveRecord::Base
         item = front_page
       end
     end
-    if state = hash[:workflow_state]
-      if state == 'active'
+    hide_from_students = hash[:hide_from_students] if !hash[:hide_from_students].nil?
+    state = hash[:workflow_state]
+    if state || !hide_from_students.nil?
+      if state == 'active' && Canvas::Plugin.value_to_boolean(hide_from_students) == false
         item.workflow_state = 'active'
       else
         item.workflow_state = 'unpublished'
@@ -537,7 +535,6 @@ class WikiPage < ActiveRecord::Base
       hash[:missing_links][:body] = []
       item.body = ImportedHtmlConverter.convert(hash[:text] || "", context, {:missing_links => hash[:missing_links][:body]})
       item.editing_roles = hash[:editing_roles] if hash[:editing_roles].present?
-      item.hide_from_students = hash[:hide_from_students] if !hash[:hide_from_students].nil?
       item.notify_of_update = hash[:notify_of_update] if !hash[:notify_of_update].nil?
     else
       allow_save = false
