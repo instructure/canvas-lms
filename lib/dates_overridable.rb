@@ -55,6 +55,10 @@ module DatesOverridable
   # course is affected by that due date, and an 'override' key referencing the
   # override itself. for the original due date, it will instead have a 'base'
   # flag (value true).
+  #
+  # TODO: only used externally by app/controllers/calendar_events_api_controller.rb,
+  # and internally by multiple_due_dates_apply_to?.  This would be a good
+  # candidate to refactor away.
   def due_dates_for(user)
     as_student, as_admin = nil, nil
     return nil, nil if context.nil?
@@ -89,6 +93,8 @@ module DatesOverridable
     all_dates << without_overrides.due_date_hash.merge(:base => true)
   end
 
+  # TODO: only used by app/models/user.rb externally, maybe it should use
+  # dates_hash_visible_to (which also uses it internally)
   def all_dates_visible_to(user)
     if context.user_has_been_observer?(user)
       observed_student_due_dates(user).uniq
@@ -171,77 +177,8 @@ module DatesOverridable
     end
   end
 
-  def due_dates
-    if overridden
-      as_student, as_teacher = due_dates_for(overridden_for_user)
-      as_teacher || [as_student]
-    else
-      raise "#{self.class.name} has not been overridden"
-    end
-  end
-
   def overridden_for?(user)
     overridden && (overridden_for_user == user)
-  end
-
-  # like due_dates_for, but for unlock_at values instead. for consistency, each
-  # unlock_at is still represented by a hash, even though the "as a student"
-  # value will only have one key.
-  def unlock_ats_for(user)
-    as_student, as_instructor = nil, nil
-
-    if context.user_has_been_student?(user)
-      overridden = self.overridden_for(user)
-      as_student = { :unlock_at => overridden.unlock_at }
-    end
-
-    if context.user_has_been_instructor?(user)
-      overrides = self.overrides_visible_to(user).overriding_unlock_at
-
-      as_instructor = overrides.map do |override|
-        {
-          :title => override.title,
-          :unlock_at => override.unlock_at,
-          :override => override
-        }
-      end
-
-      as_instructor << {
-        :base => true,
-        :unlock_at => self.without_overrides.unlock_at
-      }
-    end
-
-    return as_student, as_instructor
-  end
-
-  # like unlock_ats_for, but for lock_at values instead.
-  def lock_ats_for(user)
-    as_student, as_instructor = nil, nil
-
-    if context.user_has_been_student?(user)
-      overridden = self.overridden_for(user)
-      as_student = { :lock_at => overridden.lock_at }
-    end
-
-    if context.user_has_been_instructor?(user)
-      overrides = self.overrides_visible_to(user).overriding_lock_at
-
-      as_instructor = overrides.map do |override|
-        {
-          :title => override.title,
-          :lock_at => override.lock_at,
-          :override => override
-        }
-      end
-
-      as_instructor << {
-        :base => true,
-        :lock_at => self.without_overrides.lock_at
-      }
-    end
-
-    return as_student, as_instructor
   end
 
   module ClassMethods
