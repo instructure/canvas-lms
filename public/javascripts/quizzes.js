@@ -2291,7 +2291,7 @@ define([
       if (!$bank.hasClass('selected_side_tab')) { return; }
       var existingIDs = {};
       $(".display_question:visible").each(function() {
-        var id = parseInt($(this).getTemplateData({textValues: ['assessment_question_id']}).assessment_question_id, 10);
+        var id = $(this).getTemplateData({textValues: ['assessment_question_id']}).assessment_question_id;
         if (id) {
           existingIDs[id] = true;
         }

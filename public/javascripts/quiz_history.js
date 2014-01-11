@@ -37,7 +37,7 @@ define([
 
   var scoringSnapshot = {
     snapshot: {
-      user_id: parseInt(data.user_id, 10) || null,
+      user_id: data.user_id || null,
       version_number: data.version_number,
       last_question_touched: null,
       question_updates: {},
@@ -134,7 +134,7 @@ define([
     },
 
     updateSnapshotFor: function($question){
-      var question_id = parseInt($question.attr('id').substring(9), 10) || null;
+      var question_id = $question.attr('id').substring(9) || null;
       if(question_id) {
         var data = {};
         if (!ENV.GRADE_BY_QUESTION) {

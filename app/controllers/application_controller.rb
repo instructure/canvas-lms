@@ -1422,12 +1422,16 @@ class ApplicationController < ActionController::Base
     request.headers['Accept'] =~ %r{application/json\+canvas-string-ids}
   end
 
+  def json_cast(obj)
+    stringify_json_ids? ? Api.recursively_stringify_json_ids(obj) : obj
+  end
+
   def render(options = nil, extra_options = {}, &block)
     set_layout_options
     if options && options.key?(:json)
       json = options.delete(:json)
       unless json.is_a?(String)
-        Api.recursively_stringify_json_ids(json) if stringify_json_ids?
+        json_cast(json)
         if CANVAS_RAILS2
           json = MultiJson.dump(json)
         else

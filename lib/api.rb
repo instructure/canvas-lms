@@ -614,32 +614,36 @@ module Api
     {}
   end
 
-  def self.recursively_stringify_json_ids(value)
+  def self.recursively_stringify_json_ids(value, opts = {})
     case value
     when Hash
-      stringify_json_ids(value)
-      value.each_value { |v| recursively_stringify_json_ids(v) if v.is_a?(Hash) || v.is_a?(Array) }
+      stringify_json_ids(value, opts)
+      value.each_value { |v| recursively_stringify_json_ids(v, opts) if v.is_a?(Hash) || v.is_a?(Array) }
     when Array
-      value.each { |v| recursively_stringify_json_ids(v) if v.is_a?(Hash) || v.is_a?(Array) }
+      value.each { |v| recursively_stringify_json_ids(v, opts) if v.is_a?(Hash) || v.is_a?(Array) }
     end
     value
   end
 
-  def self.stringify_json_ids(value)
+  def self.stringify_json_ids(value, opts = {})
     return unless value.is_a?(Hash)
     value.keys.each do |key|
       if key =~ /(^|_)id$/
         # id, foo_id, etc.
-        value[key] = stringify_json_id(value[key])
+        value[key] = stringify_json_id(value[key], opts)
       elsif key =~ /(^|_)ids$/ && value[key].is_a?(Array)
         # ids, foo_ids, etc.
-        value[key].map!{ |id| stringify_json_id(id) }
+        value[key].map!{ |id| stringify_json_id(id, opts) }
       end
     end
   end
 
-  def self.stringify_json_id(id)
-    id.is_a?(Integer) ? id.to_s : id
+  def self.stringify_json_id(id, opts = {})
+    if opts[:reverse]
+      id.is_a?(String) ? id.to_i : id
+    else
+      id.is_a?(Integer) ? id.to_s : id
+    end
   end
 
   def accepts_jsonapi?

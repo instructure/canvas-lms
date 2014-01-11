@@ -182,7 +182,7 @@ $(document).ready(function() {
   });
   $(document).fragmentChange(function(event, hash) {
     if(hash.match(/^#tag_/)) {
-      var id = parseInt(hash.substring(5), 10);
+      var id = hash.substring(5);
       if(id && id != $("#current_item_id").text() && $("#context_module_item_" + id + " a.title").length > 0) {
         $("#current_item_id").text(id);
         $("#content_preview").attr('src', $("#context_module_item_" + id + " a.title").attr('href'));

@@ -71,7 +71,7 @@ require [
 
     edit: (conference) =>
       if typeof conference == 'string'
-        conference = @currentConferences.get(parseInt conference, 10)
+        conference = @currentConferences.get(conference)
       return unless conference
       @editView.show(conference)
 

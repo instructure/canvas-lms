@@ -40,6 +40,6 @@ describe "layout" do
   end
 
   it "should have ENV available to the JavaScript from js_env" do
-    driver.execute_script("return ENV.current_user_id").should == @user.id
+    driver.execute_script("return ENV.current_user_id").should == @user.id.to_s
   end
 end

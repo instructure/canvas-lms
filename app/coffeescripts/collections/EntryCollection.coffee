@@ -55,7 +55,7 @@ define [
           levels = 0
         else if entry is null
           levels = levels + 1
-        if item.id+'' is id+''
+        if item.id+'' is id
           entry = item
       return null unless rootParent? and entry?
       rootParentIndex = @indexOf @get rootParent.id
