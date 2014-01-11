@@ -1119,42 +1119,42 @@ class Account < ActiveRecord::Base
   def self.allowable_services
     {
       :google_docs => {
-        :name => "Google Docs", 
+        :name => t("account_settings.google_docs", "Google Docs"), 
         :description => "",
         :expose_to_ui => (GoogleDocs.config ? :service : false)
       },
       :google_docs_previews => {
-        :name => "Google Docs Previews", 
+        :name => t("account_settings.google_docs_preview", "Google Docs Preview"), 
         :description => "",
         :expose_to_ui => :service
       },
       :facebook => {
-        :name => "Facebook", 
+        :name => t("account_settings.facebook", "Facebook"), 
         :description => "",
         :expose_to_ui => (Facebook.config ? :service : false)
       },
       :skype => {
-        :name => "Skype", 
+        :name => t("account_settings.skype", "Skype"), 
         :description => "",
         :expose_to_ui => :service
       },
       :linked_in => {
-        :name => "LinkedIn", 
+        :name => t("account_settings.linked_in", "LinkedIn"), 
         :description => "",
         :expose_to_ui => (LinkedIn.config ? :service : false)
       },
       :twitter => {
-        :name => "Twitter", 
+        :name => t("account_settings.twitter", "Twitter"), 
         :description => "",
         :expose_to_ui => (Twitter.config ? :service : false)
       },
       :delicious => {
-        :name => "Delicious", 
+        :name => t("account_settings.delicious", "Delicious"), 
         :description => "",
         :expose_to_ui => :service
       },
       :diigo => {
-        :name => "Diigo", 
+        :name => t("account_settings.diigo", "Diigo"), 
         :description => "",
         :expose_to_ui => :service
       },
@@ -1162,13 +1162,13 @@ class Account < ActiveRecord::Base
       # In the meantime, we leave it as a service but expose it in the
       # "Features" (settings) portion of the account admin UI
       :avatars => {
-        :name => "User Avatars",
+        :name => t("account_settings.avatars", "User Avatars"),
         :description => "",
         :default => false,
         :expose_to_ui => :setting
       },
       :account_survey_notifications => {
-        :name => "Account Surveys",
+        :name => t("account_settings.account_surveys", "Account Surveys"),
         :description => "",
         :default => false,
         :expose_to_ui => :setting,
