@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,7 +17,89 @@
 #
 
 # @API Enrollments
+#
 # API for creating and viewing course enrollments
+#
+# @object Enrollment
+#     {
+#       // The unique identifier for the enrollment.
+#       "id": 1,
+#
+#       // The unique identifier for the course.
+#       "course_id": 1,
+#
+#       // The unique identifier for the section.
+#       "course_section_id": 1,
+#
+#       // The current state of the enrollment.
+#       "enrollment_state": "active",
+#
+#       // User can only access his or her own course section.
+#       "limit_privileges_to_course_section": true,
+#
+#       // The unique identifier for the account.
+#       "root_account_id": 1,
+#
+#       // The type of the enrollment.
+#       "type": "StudentEnrollment",
+#
+#       // The enrollment role, for course-level permissions.
+#       "role": "StudentEnrollment",
+#
+#       // The unique identifier for the user.
+#       "user_id": 1,
+#
+#       // The date and time the enrollment was last updated, in ISO8601 format.
+#       "updated_at": "2012-04-18T23:08:51Z",
+#
+#       // The date and time the enrollment was created, in ISO8601 format.
+#       "created_at": "2012-04-18T23:08:51Z",
+#
+#       // The last activity date and time of the user for the enrollment, in ISO8601 format.
+#       "last_activity_at": "2012-04-24T08:08:12Z",
+#
+#       // The URL to the Canvas web UI page for this course enrollment.
+#       "html_url": "https://...",
+#
+#       // The grade information for the enrollment, if this is a student enrollment.
+#       "grades": {
+#
+#         // The URL to the Canvas web UI page for the user's grades.
+#         "html_url": "https://...",
+#
+#         // The user's current score in the course. Only included if user has permissions to view this grade.
+#         "current_score": null,
+#
+#         // The user's final score in the course. Only included if user has permissions to view this grade.
+#         "final_score": 0,
+#
+#         // The user's current grade in the course. Only included if user has permissions to view this grade.
+#         "current_grade": null,
+#
+#         // The user's final grade in the course. Only included if user has permissions to view this grade.
+#         "final_grade": null
+#       },
+#
+#         // The user object for the enrollment.
+#       "user": {
+#
+#         // The unique id of the user.
+#         "id": 1,
+#
+#         // The unique login of the user.
+#         "login_id": "bieberfever@example.com",
+#
+#         // The name of the user.
+#         "name": "Justin Bieber",
+#
+#         // The short name of the user.
+#         "short_name": "Justin B.",
+#
+#         // The sortable name of the user.
+#         "sortable_name": "Bieber, Justin"
+#       }
+#     }
+#
 class EnrollmentsApiController < ApplicationController
   before_filter :get_course_from_section, :require_context
 
@@ -60,99 +142,7 @@ class EnrollmentsApiController < ApplicationController
   #   Filter by enrollment state. If omitted, 'active' and 'invited' enrollments
   #   are returned.
   #
-  # @response_field id The unique id of the enrollment.
-  # @response_field course_id The unique id of the course.
-  # @response_field course_section_id The unique id of the user's section.
-  # @response_field enrollment_state The state of the user's enrollment in the course.
-  # @response_field limit_privileges_to_course_section User can only access his or her own course section.
-  # @response_field root_account_id The unique id of the user's account.
-  # @response_field type The type of the enrollment.
-  # @response_field role The enrollment role, for course-level permissions.
-  # @response_field updated_at The updated time of the enrollment, in ISO8601 format.
-  # @response_field last_activity_at The last activity time of the user for the enrollment, in ISO8601 format.
-  # @response_field user_id The unique id of the user.
-  # @response_field html_url The URL to the Canvas web UI page for this course enrollment.
-  # @response_field grades[html_url] The URL to the Canvas web UI page for the user's grades, if this is a student enrollment.
-  # @response_field grades[current_grade] The user's current grade in the class. Only included if user has permissions to view this grade.
-  # @response_field grades[final_grade] The user's final grade for the class. Only included if user has permissions to view this grade.
-  # @response_field user[id] The unique id of the user.
-  # @response_field user[login_id] The unique login of the user.
-  # @response_field user[name] The name of the user.
-  # @response_field user[short_name] The short name of the user.
-  # @response_field user[sortable_name] The sortable name of the user.
-  #
-  # @example_response
-  #   [
-  #     {
-  #       "id": 1,
-  #       "course_id": 1,
-  #       "course_section_id": 1,
-  #       "enrollment_state": "active",
-  #       "limit_privileges_to_course_section": true,
-  #       "root_account_id": 1,
-  #       "type": "StudentEnrollment",
-  #       "user_id": 1,
-  #       "updated_at": "2012-04-18T23:08:51Z"
-  #       "last_activity_at": "2012-04-24T08:08:12Z"
-  #       "html_url": "https://...",
-  #       "grades": {
-  #         "html_url": "https://...",
-  #       },
-  #       "user": {
-  #         "id": 1,
-  #         "login_id": "bieberfever@example.com",
-  #         "name": "Justin Bieber",
-  #         "short_name": "Justin B.",
-  #         "sortable_name": "Bieber, Justin"
-  #       }
-  #     },
-  #     {
-  #       "id": 2,
-  #       "course_id": 1,
-  #       "course_section_id": 2,
-  #       "enrollment_state": "active",
-  #       "limit_privileges_to_course_section": false,
-  #       "root_account_id": 1,
-  #       "type": "TeacherEnrollment",
-  #       "user_id": 2,
-  #       "updated_at": "2012-04-18T23:08:51Z"
-  #       "last_activity_at": "2012-04-21T08:54:14Z"
-  #       "html_url": "https://...",
-  #       "grades": {
-  #         "html_url": "https://...",
-  #       },
-  #       "user": {
-  #         "id": 2,
-  #         "login_id": "changyourmind@example.com",
-  #         "name": "Señor Chang",
-  #         "short_name": "S. Chang",
-  #         "sortable_name": "Chang, Señor"
-  #       }
-  #     },
-  #     {
-  #       "id": 3,
-  #       "course_id": 1,
-  #       "course_section_id": 2,
-  #       "enrollment_state": "active",
-  #       "limit_privileges_to_course_section": false,
-  #       "root_account_id": 1,
-  #       "type": "StudentEnrollment",
-  #       "user_id": 2,
-  #       "updated_at": "2012-04-18T23:08:51Z"
-  #       "last_activity_at": "2012-05-30T08:15:45Z"
-  #       "html_url": "https://...",
-  #       "grades": {
-  #         "html_url": "https://...",
-  #       },
-  #       "user": {
-  #         "id": 2,
-  #         "login_id": "changyourmind@example.com",
-  #         "name": "Señor Chang",
-  #         "short_name": "S. Chang",
-  #         "sortable_name": "Chang, Señor"
-  #       }
-  #     }
-  #   ]
+  # @returns [Enrollment]
   def index
     endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
 
@@ -198,6 +188,7 @@ class EnrollmentsApiController < ApplicationController
   #   If set to 'active,' student will be immediately enrolled in the course.
   #   Otherwise they will be required to accept a course invitation. Default is
   #   'invited.'
+  #
   # @argument enrollment[course_section_id] [Optional, Integer]
   #   The ID of the course section to enroll the student in. If the
   #   section-specific URL is used, this argument is redundant and will be
@@ -210,6 +201,24 @@ class EnrollmentsApiController < ApplicationController
   # @argument enrollment[notify] [Optional, Boolean]
   #   If true, a notification will be sent to the enrolled user.
   #   Notifications are not sent by default.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/:course_id/enrollments \
+  #     -X POST \
+  #     -F 'user_id=1' \
+  #     -F 'type=StudentEnrollment' \
+  #     -F 'enrollment_state=active' \
+  #     -F 'course_section_id=1' \
+  #     -F 'limit_privileges_to_course_section=true' \
+  #     -F 'notify=false'
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/:course_id/enrollments \
+  #     -X POST \
+  #     -F 'user_id=2' \
+  #     -F 'type=StudentEnrollment'
+  #
+  # @returns Enrollment
   def create
     # error handling
     errors = []
@@ -281,22 +290,7 @@ class EnrollmentsApiController < ApplicationController
   #     -X DELETE \ 
   #     -F 'task=conclude'
   #
-  # @example_response
-  #   {
-  #     "root_account_id": 15,
-  #     "id": 75,
-  #     "user_id": 4,
-  #     "course_section_id": 12,
-  #     "limit_privileges_to_course_section": false,
-  #     "enrollment_state": "completed",
-  #     "course_id": 12,
-  #     "type": "StudentEnrollment",
-  #     "html_url": "http://www.example.com/courses/12/users/4",
-  #     "grades": { "html_url": "http://www.example.com/courses/12/grades/4" },
-  #     "associated_user_id": null,
-  #     "updated_at": "2012-04-18T23:08:51Z"
-  #     "last_activity_at": "2012-04-24T08:08:12Z"
-  #   }
+  # @returns Enrollment
   def destroy
     @enrollment = Enrollment.find(params[:id])
     task = %w{conclude delete}.include?(params[:task]) ? params[:task] : 'conclude'
