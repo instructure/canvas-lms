@@ -407,7 +407,7 @@ class Message < ActiveRecord::Base
     message_body_template = get_template(filename)
 
     context, asset, user, delayed_messages, asset_context, data = [self.context,
-      self.context, @user, @delayed_messages, self.asset_context, @data]
+      self.context, self.user, @delayed_messages, self.asset_context, @data]
 
     if message_body_template.present? && path_type.present?
       populate_body(message_body_template, path_type, binding)
