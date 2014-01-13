@@ -62,7 +62,7 @@ define [
     #
     # Returns an object.
     toJSON: ->
-      _.extend({}, @checkboxes, menu: @menu, hasSections: @gradebook.sections_enabled)
+      _.extend({}, @checkboxes, menu: @menu)
 
     # Public: Render the view once all needed data is loaded.
     #

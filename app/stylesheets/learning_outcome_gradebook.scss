@@ -46,7 +46,6 @@
 }
 
 /* layout */
-
 .outcome-gradebook-container {
   background: #f3f5f7;
   border-top: 1px solid #bbb;
@@ -61,6 +60,15 @@
   border-left: 1px solid #d3d9d9;
   padding-left: 12px;
   padding-right: 12px;
+}
+
+.gradebook-header .section-button-placeholder {
+  float: right;
+  margin: 14px 14px 0 0;
+}
+
+.gradebook-navigation {
+  display: inline-block;
 }
 
 /* slickgrid */

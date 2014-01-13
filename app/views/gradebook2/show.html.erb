@@ -13,30 +13,31 @@
 <div id="gradebook_wrapper" class="use-css-transitions-for-show-hide" style="display:none;">
 
   <% if @context.feature_enabled?(:outcome_gradebook) %>
-    <nav class="gradebook-navigation">
-      <ul class="nav nav-pills gradebook-navigation-pills">
-        <li class="active">
-          <a href="#"
-             data-id="gradebook"
-             class="icon-assignment"><%= t(:gradebook, "Gradebook") %></a>
-        </li>
-        <li>
-          <a href="#"
-             data-id="outcome-gradebook"
-             class="icon-settings-2"><%= t(:learning_mastery, "Learning Mastery") %></a>
-        </li>
-      </ul>
-    </nav>
+    <div class="gradebook-header">
+      <nav class="gradebook-navigation">
+        <ul class="nav nav-pills gradebook-navigation-pills">
+          <li class="active">
+            <a href="#"
+               data-id="gradebook"
+               class="icon-assignment"><%= t(:gradebook, "Gradebook") %></a>
+          </li>
+          <li>
+            <a href="#"
+               data-id="outcome-gradebook"
+               class="icon-settings-2"><%= t(:learning_mastery, "Learning Mastery") %></a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="section-button-placeholder"></div>
+    </div>
   <% end %>
 
   <div class="gradebook-container">
     <div id="gradebook-toolbar" class="toolbar">
-      <span class="section-button-placeholder"></span>
-      <button style="display:none;" id="section_to_show">
-        <%= t :showing_sections, 'Showing: *%{section_being_shown}*',
-              :section_being_shown => t(:all_sections, "All Sections"),
-              :wrapper => '<span id="section_being_shown">\1</span>' %>
-      </button>
+      <% if !@context.feature_enabled?(:outcome_gradebook) %>
+        <span class="section-button-placeholder"></span>
+      <% end %>
       <button id="gradebook_settings"><i class="icon-settings"></i></button>
       <ul style="display: none;" class="gradebook_drop_down ui-kyle-menu">
         <li><a href="<%= context_url(@context, :context_gradebook_url) %>/history"><%= t('view_grading_history', 'View Grading History') %></a></li>
