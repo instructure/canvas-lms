@@ -63,7 +63,7 @@ gem 'barby', '0.5.0'
 gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
 gem 'canvas_connect', '0.3.2'
-gem 'canvas_webex', '0.10'
+gem 'canvas_webex', '0.11'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
 if CANVAS_RAILS2
