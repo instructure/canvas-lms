@@ -14,9 +14,9 @@ class CourseFormController < ApplicationController
     # only show current term plus next 2 terms (up to 3 non-nil terms in total)
     @term_options = @terms.compact.take(3).map { |term| [term.name, term.sis_source_id] }
     roles = SFU::User.roles @sfuid
-    @is_student = %w(undergrad grad).any? { |role| roles.include? role }
-    # deny access to undergrad-only users
-    if roles == %w(undergrad)
+    @is_student = (roles & %w(undergrad grad fic)).any?
+    # deny access unless user has any of the following roles
+    unless (roles & %w(staff faculty f_faculty grad other)).any?
       flash[:error] = "You don't have permission to access that page"
       redirect_to dashboard_url
     end
