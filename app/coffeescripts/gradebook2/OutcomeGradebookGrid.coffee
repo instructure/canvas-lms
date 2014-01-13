@@ -17,10 +17,11 @@ define [
 
     options:
       headerRowHeight        : 42
-      rowHeight              : 40
+      rowHeight              : 38
       syncColumnCellResize   : true
       showHeaderRow          : true
       explicitInitialization : true
+      fullWidthRows:           true
 
     Events:
       # Public: Draw header cell contents.
@@ -51,7 +52,7 @@ define [
 
     Util:
       COLUMN_OPTIONS:
-        width: 175
+        width: 121
 
       # Public: Translate an API response to columns and rows that can be used by SlickGrid.
       #
@@ -81,6 +82,8 @@ define [
       #
       # Returns an object.
       _studentColumn: ->
+        studentOptions = { width: 228 }
+
         _.extend({
           id: 'student',
           name: I18n.t('learning_outcome', 'Learning Outcome')
@@ -88,7 +91,7 @@ define [
           cssClass: 'outcome-student-cell'
           headerCssClass: 'outcome-student-header-cell'
           formatter: Grid.View.studentCell
-        }, Grid.Util.COLUMN_OPTIONS)
+        }, _.extend(Grid.Util.COLUMN_OPTIONS, studentOptions))
 
       # Public: Translate an array of rollup data to rows that can be passed to SlickGrid.
       #
@@ -191,7 +194,7 @@ define [
         return unless outcome and !(_.isNull(value) or _.isUndefined(value))
         className   = Grid.View.masteryClassName(value, outcome)
         return '' unless _.include(Grid.filter, className)
-        cellTemplate(score: value, className: className)
+        cellTemplate(score: value, className: className, masteryScore: outcome.mastery_points)
 
       studentCell: (row, cell, value, columnDef, dataContext) ->
         studentCellTemplate(name: value)
