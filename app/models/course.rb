@@ -197,6 +197,10 @@ class Course < ActiveRecord::Base
 
   has_a_broadcast_policy
 
+  def [](attr)
+    attr.to_s == 'asset_string' ? self.asset_string : super
+  end
+
   def events_for(user)
     if user
       CalendarEvent.
