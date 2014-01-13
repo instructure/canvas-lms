@@ -48,52 +48,58 @@ module Canvas
     end
   end
 
-  def self.cache_store_config(rails_env = :current, nil_is_nil = false)
-    # this method is called really early in the bootup process, and autoloading
-    # might not be available yet, so we need to manually require Setting
-    require_dependency "app/models/setting"
-    cache_store_config = {
-      'cache_store' => 'mem_cache_store',
-    }.merge(Setting.from_config('cache_store', rails_env) || {})
-    config = nil
-    case cache_store_config.delete('cache_store')
-    when 'mem_cache_store'
-      cache_store_config['namespace'] ||= cache_store_config['key']
-      servers = cache_store_config['servers'] || (Setting.from_config('memcache', rails_env))
-      if servers
-        config = :mem_cache_store, servers, cache_store_config
+  def self.cache_store_config(rails_env = :current, nil_is_nil = true)
+    rails_env = Rails.env if rails_env == :current
+    cache_stores[rails_env]
+  end
+
+  def self.cache_stores
+    unless @cache_stores
+      # this method is called really early in the bootup process, and
+      # autoloading might not be available yet, so we need to manually require
+      # Setting
+      require_dependency 'app/models/setting'
+      @cache_stores = {}
+      Setting.from_config('cache_store', nil).each do |env, config|
+        config = {'cache_store' => 'mem_cache_store'}.merge(config)
+        case config.delete('cache_store')
+        when 'mem_cache_store'
+          config['namespace'] ||= config['key']
+          servers = config['servers'] || (Setting.from_config('memcache', env))
+          if servers
+            @cache_stores[env] = :mem_cache_store, servers, config
+          end
+        when 'redis_store'
+          Bundler.require 'redis'
+          require_dependency 'canvas/redis'
+          Canvas::Redis.patch
+          # merge in redis.yml, but give precedence to cache_store.yml
+          #
+          # the only options currently supported in redis-cache are the list of
+          # servers, not key prefix or database names.
+          config = (Setting.from_config('redis', env) || {}).merge(config)
+          config['key_prefix'] ||= config['key']
+          servers = config['servers']
+          @cache_stores[env] = :redis_store, servers
+        when 'memory_store'
+          @cache_stores[env] = :memory_store
+        when 'nil_store'
+          if CANVAS_RAILS2
+            require 'nil_store'
+            @cache_stores[env] = NilStore.new
+          else
+            @cache_stores[env] = :null_store
+          end
+        end
       end
-    when 'redis_store'
-      Bundler.require 'redis'
-      require_dependency 'canvas/redis'
-      Canvas::Redis.patch
-      # merge in redis.yml, but give precedence to cache_store.yml
-      #
-      # the only options currently supported in redis-cache are the list of
-      # servers, not key prefix or database names.
-      cache_store_config = (Setting.from_config('redis', rails_env) || {}).merge(cache_store_config)
-      cache_store_config['key_prefix'] ||= cache_store_config['key']
-      servers = cache_store_config['servers']
-      config = :redis_store, servers
-    when 'memory_store'
-      config = :memory_store
-    when 'nil_store'
-      if CANVAS_RAILS2
+      @cache_stores[Rails.env] ||= if CANVAS_RAILS2
         require 'nil_store'
-        config = NilStore.new
+        NilStore.new
       else
-        config = :null_store
+        :null_store
       end
     end
-    if !config && !nil_is_nil
-      if CANVAS_RAILS2
-        require 'nil_store'
-        config = NilStore.new
-      else
-        config = :null_store
-      end
-    end
-    config
+    @cache_stores
   end
 
   # `sample` reports KB, not B
