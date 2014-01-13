@@ -24,7 +24,7 @@ unless Bundler::VERSION == required_bundler_version
   end
 
   warn "Bundler version #{required_bundler_version} is required; you're currently running #{Bundler::VERSION}. Maybe try `#{bundle_command}`."
-  exit
+  exit 1
 end
 
 require File.expand_path("../config/canvas_rails3", __FILE__)
