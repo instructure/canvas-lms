@@ -469,7 +469,7 @@ class User < ActiveRecord::Base
         if CANVAS_RAILS2
           users = users_or_user_ids = Shard.partition_by_shard(user_ids) { |ids| User.select([:id, :preferences, :workflow_state]).find(ids) }
         else
-          users = users_or_user_ids = User.select([:id, :preferences, :workflow_state]).find(ids)
+          users = users_or_user_ids = User.select([:id, :preferences, :workflow_state]).find(user_ids)
         end
       else
         users = users_or_user_ids
