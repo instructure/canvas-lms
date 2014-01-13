@@ -252,13 +252,17 @@ class Message < ActiveRecord::Base
   #
   # Returns an empty string.
   def define_content(name, &block)
-    old_output_buffer, @output_buffer = [@output_buffer, '']
+    old_output_buffer, @output_buffer = [@output_buffer, @output_buffer.dup.clear]
 
     yield
 
     instance_variable_set(:"@message_content_#{name}",
       @output_buffer.to_s.strip)
     @output_buffer = old_output_buffer.sub(/\n\z/, '')
+
+    if old_output_buffer.is_a?(ActiveSupport::SafeBuffer) && old_output_buffer.html_safe?
+      @output_buffer = ActiveSupport::SafeBuffer.new(@output_buffer)
+    end
 
     ''
   end
