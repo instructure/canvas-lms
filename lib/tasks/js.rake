@@ -40,13 +40,14 @@ namespace :js do
     # run test for each ember app individually
     matcher = ENV['JS_SPEC_MATCHER']
 
-#    if !matcher || matcher.to_s =~ %r{app/coffeescripts/ember}
-#      Dir.entries('app/coffeescripts/ember').reject { |d| d.match(/^\./) || d == 'shared' }.each do |ember_app|
-#        puts "--> Running tests for '#{ember_app}' ember app"
-#        Canvas::RequireJs.matcher = matcher_for_ember_app ember_app
-#        test_suite
-#      end
-#    end
+    if !matcher || matcher.to_s =~ %r{app/coffeescripts/ember}
+      ignored_embers = ['shared', 'screenreader_gradebook']
+      Dir.entries('app/coffeescripts/ember').reject { |d| d.match(/^\./) || ignored_embers.include?(d) }.each do |ember_app|
+        puts "--> Running tests for '#{ember_app}' ember app"
+        Canvas::RequireJs.matcher = matcher_for_ember_app ember_app
+        test_suite
+      end
+    end
 
     # run test for non-ember apps
     Canvas::RequireJs.matcher = nil
