@@ -356,6 +356,7 @@ class AppointmentGroup < ActiveRecord::Base
     self.start_at = appointments.map(&:start_at).min
     self.end_at = appointments.map(&:end_at).max
     clear_cached_available_slots! if participants_per_appointment_changed?
+    true
   end
 
   EVENT_ATTRIBUTES = [
