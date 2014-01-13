@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -45,6 +45,7 @@ describe "Accounts API", type: :request do
           'default_storage_quota_mb' => 123,
           'default_user_storage_quota_mb' => 45,
           'default_group_storage_quota_mb' => 42,
+          'workflow_state' => 'active',
         },
         {
           'id' => @a2.id,
@@ -56,6 +57,7 @@ describe "Accounts API", type: :request do
           'default_storage_quota_mb' => 321,
           'default_user_storage_quota_mb' => 54,
           'default_group_storage_quota_mb' => 41,
+          'workflow_state' => 'active',
         },
       ]
     end
@@ -147,6 +149,7 @@ describe "Accounts API", type: :request do
           'default_storage_quota_mb' => 123,
           'default_user_storage_quota_mb' => 45,
           'default_group_storage_quota_mb' => 42,
+          'workflow_state' => 'active',
         }
     end
   end

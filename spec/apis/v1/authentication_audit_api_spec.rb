@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -172,6 +172,7 @@ describe "AuthenticationAudit API", type: :request do
             "name" => @account.name,
             "parent_account_id" => nil,
             "root_account_id" => nil,
+            "workflow_state" => 'active',
             "default_time_zone" => @account.default_time_zone.tzinfo.name,
             "default_storage_quota_mb" => @account.default_storage_quota_mb,
             "default_user_storage_quota_mb" => @account.default_user_storage_quota_mb,

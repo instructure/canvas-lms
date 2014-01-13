@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -70,6 +70,11 @@ require 'csv'
 #         "sis_account_id": {
 #           "description": "The account's identifier in the Student Information System.",
 #           "example": "123xyz",
+#           "type": "string"
+#         },
+#         "workflow_state": {
+#           "description": "The state of the account. Can be 'active' or 'deleted'.",
+#           "example": "active",
 #           "type": "string"
 #         }
 #       }
@@ -353,17 +358,7 @@ class AccountsController < ApplicationController
   #     -d 'account[default_time_zone]=Mountain Time (US & Canada)' \
   #     -d 'account[default_storage_quota_mb]=450'
   #
-  # @example_response
-  #   {
-  #     "id": "1",
-  #     "name": "New account name",
-  #     "default_time_zone": "America/Denver",
-  #     "parent_account_id": null,
-  #     "root_account_id": null,
-  #     "default_storage_quota_mb": 500,
-  #     "default_user_storage_quota_mb": 50
-  #     "default_group_storage_quota_mb": 50
-  #   }
+  # @returns Account
   def update
     return update_api if api_request?
 
