@@ -116,6 +116,7 @@ class AppointmentGroup < ActiveRecord::Base
     # sub_contexts. currently this is done in the controller level, since
     # we validate contexts beforehand
     @new_sub_context_codes -= sub_context_codes if @new_sub_context_codes
+    new_sub_contexts = []
     if @new_sub_context_codes.present?
       if new_record? &&
           @new_contexts.size == 1 &&
@@ -143,22 +144,27 @@ class AppointmentGroup < ActiveRecord::Base
           AppointmentGroupSubContext.new(:appointment_group => self,
                                          :sub_context => cs,
                                          :sub_context_code => code)
-        }
-        self.appointment_group_sub_contexts += new_sub_contexts.compact
+        }.compact
       end
     end
 
     # contexts
     @new_contexts -= contexts if @new_contexts
     if @new_contexts.present?
-      unless appointment_group_sub_contexts.size == 1 &&
-          appointment_group_sub_contexts.first.sub_context_type == 'GroupCategory' &&
+      unless (appointment_group_sub_contexts + new_sub_contexts).size == 1 &&
+          (appointment_group_sub_contexts + new_sub_contexts).first.sub_context_type == 'GroupCategory' &&
           !new_record?
         self.appointment_group_contexts += @new_contexts.map { |c|
           AppointmentGroupContext.new :context => c, :appointment_group => self
         }
         @contexts_changed = true
       end
+    end
+
+    if new_sub_contexts.present?
+      # the sub_contexts get validated as soon as we add them in Rails 3,
+      # so we need to add them after we have updated the contexts
+      self.appointment_group_sub_contexts += new_sub_contexts
     end
   end
 
