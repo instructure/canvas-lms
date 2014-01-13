@@ -68,9 +68,14 @@ require 'csv'
 #           "type": "string"
 #         },
 #         "sis_account_id": {
-#           "description": "The account's identifier in the Student Information System.",
+#           "description": "The account's identifier in the Student Information System. Only included if the user has permission to view SIS information.",
 #           "example": "123xyz",
 #           "type": "string"
+#         },
+#         "sis_import_id": {
+#           "description": "The id of the SIS import if created through SIS. Only included if the user has permission to manage SIS information.",
+#           "example": "12",
+#           "type": "integer"
 #         },
 #         "workflow_state": {
 #           "description": "The state of the account. Can be 'active' or 'deleted'.",
