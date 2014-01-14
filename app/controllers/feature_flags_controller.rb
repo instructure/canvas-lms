@@ -244,6 +244,9 @@ class FeatureFlagsController < ApplicationController
       end
 
       if new_flag.save
+        if prior_state != new_flag.state && feature_def.after_state_change_proc.is_a?(Proc)
+          feature_def.after_state_change_proc.call(@context, prior_state, new_flag.state)
+        end
         render json: feature_flag_json(new_flag, @context, @current_user, session)
       else
         render json: new_flag.errors.to_json, status: :bad_request
