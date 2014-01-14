@@ -69,8 +69,7 @@ module SoftwareHeretics
           
           has_many :versions, :order => 'number DESC', :as => :versionable,
                    :dependent => :destroy,
-                   :inverse_of => :versionable,
-                   :extend => VersionsProxyMethods
+                   :inverse_of => :versionable, :extend => VersionsProxyMethods
           # INSTRUCTURE: Added to allow quick access to the most recent version
           # See 'current_version' below for the common use of current_version_unidirectional
           has_one :current_version_unidirectional, :class_name => 'Version', :order => 'number DESC', :as => :versionable, :dependent => :destroy, :extend => VersionsProxyMethods
@@ -251,7 +250,9 @@ module SoftwareHeretics
         end
 
         def populate_versionable(version)
-          version.versionable = proxy_owner if version && !version.frozen?
+          if version && !version.frozen?
+            version.versionable = CANVAS_RAILS2 ? proxy_owner : proxy_association.owner
+          end
           version
         end
         
@@ -263,13 +264,13 @@ module SoftwareHeretics
         
         # Get the first Version corresponding to this model.
         def first_version
-          populate_versionable reorder( 'number ASC' ).first
+          populate_versionable reorder( 'number ASC' ).limit(1).to_a.first
         end
         alias_method :first, :first_version
 
         # Get the current Version corresponding to this model.
         def current_version
-          populate_versionable reorder( 'number DESC' ).first
+          populate_versionable reorder( 'number DESC' ).limit(1).to_a.first
         end
         alias_method :current, :current_version
         
@@ -283,13 +284,13 @@ module SoftwareHeretics
         
         # Return the Version for this model with the next higher version
         def next_version( number )
-          populate_versionable reorder( 'number ASC' ).where( "number > ?", number ).first
+          populate_versionable reorder( 'number ASC' ).where( "number > ?", number ).limit(1).to_a.first
         end
         alias_method :next, :next_version
         
         # Return the Version for this model with the next lower version
         def previous_version( number )
-          populate_versionable reorder( 'number DESC' ).where( "number < ?", number ).first
+          populate_versionable reorder( 'number DESC' ).where( "number < ?", number ).limit(1).to_a.first
         end
         alias_method :previous, :previous_version
       end
