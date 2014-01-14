@@ -127,7 +127,7 @@ describe "grading standards" do
     get "/courses/#{@course.id}/grades/#{student.id}"
     grading_scheme = driver.execute_script "return grading_scheme"
     grading_scheme[2][0].should == 'B+'
-    f("#right-side .final_grade .grade").text.should == '89.9'
+    f("#right-side .final_grade .grade").text.should == '89.9%'
     f("#final_letter_grade_text").text.should == 'B+'
   end
 

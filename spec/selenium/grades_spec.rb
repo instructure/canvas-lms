@@ -122,7 +122,7 @@ describe "grades" do
       Assignment.any_instance.expects(:find_or_create_submission).twice.returns(@submission)
 
       #check initial total
-      f('#submission_final-grade .assignment_score .grade').text.should == '33.3'
+      f('#submission_final-grade .assignment_score .grade').text.should == '33.3%'
 
       edit_grade = lambda do |field, score|
         field.click
@@ -140,14 +140,14 @@ describe "grades" do
       # test changing existing scores
       first_row_grade = f("#submission_#{@submission.assignment_id} .assignment_score .grade")
       edit_grade.(first_row_grade, 4)
-      assert_grade.(40)
+      assert_grade.("40%")
 
       #using find with jquery to avoid caching issues
 
       # test changing unsubmitted scores
       third_grade = f("#submission_#{@third_assignment.id} .assignment_score .grade")
       edit_grade.(third_grade, 10)
-      assert_grade.(97)
+      assert_grade.("97%")
 
       driver.execute_script '$("#grade_entry").blur()'
     end

@@ -785,7 +785,8 @@ class CoursesController < ApplicationController
     @course.update_attributes params.slice(
       :allow_student_discussion_topics,
       :allow_student_forum_attachments,
-      :allow_student_discussion_editing
+      :allow_student_discussion_editing,
+      :show_total_grade_as_points
     )
     render :json => course_settings_json(@course)
   end

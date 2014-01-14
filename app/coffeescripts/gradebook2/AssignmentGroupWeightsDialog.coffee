@@ -70,6 +70,8 @@ define [
     if newGroupWeightingScheme != @options.context.group_weighting_scheme
       requests.push $.ajaxJSON courseUrl, 'PUT', {'course[group_weighting_scheme]' : newGroupWeightingScheme}, (data) =>
         @options.context.group_weighting_scheme = data.course.group_weighting_scheme
+        if @options.context.group_weighting_scheme == "percent"
+          @options.context.show_total_grade_as_points = false
 
     @$dialog.find('.assignment_group_row').each (i, row) =>
       group = $(row).data('assignment_group')

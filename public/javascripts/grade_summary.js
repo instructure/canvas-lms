@@ -34,10 +34,12 @@ define([
   function updateStudentGrades() {
     var ignoreUngradedSubmissions = $("#only_consider_graded_assignments").attr('checked');
     var currentOrFinal = ignoreUngradedSubmissions ? 'current' : 'final';
+    var groupWeightingScheme = ENV.group_weighting_scheme;
+    var showTotalGradeAsPoints = ENV.show_total_grade_as_points;
     var calculatedGrades = GradeCalculator.calculate(
       ENV.submissions,
       ENV.assignment_groups,
-      ENV.group_weighting_scheme
+      groupWeightingScheme
     );
 
     // mark dropped assignments
@@ -63,7 +65,7 @@ define([
       var $groupRow = $('#submission_group-' + groupSum.group.id);
       var groupGradeInfo = groupSum[currentOrFinal];
       $groupRow.find('.grade').text(
-        calculateGrade(groupGradeInfo.score, groupGradeInfo.possible)
+        calculateGrade(groupGradeInfo.score, groupGradeInfo.possible) + "%"
       );
       $groupRow.find('.score_teaser').text(
         round(groupGradeInfo.score, 2) + ' / ' + round(groupGradeInfo.possible, 2)
@@ -72,15 +74,22 @@ define([
 
     var finalScore = calculatedGrades[currentOrFinal].score;
     var finalPossible = calculatedGrades[currentOrFinal].possible;
-    var finalGrade = calculateGrade(finalScore, finalPossible);
+    var scoreAsPoints = round(finalScore, 2) + ' / ' + round(finalPossible, 2);
+    var scoreAsPercent = calculateGrade(finalScore, finalPossible);
+
+    var finalGrade = scoreAsPercent + "%";
+    var teaserText = scoreAsPoints;
+    if (showTotalGradeAsPoints && groupWeightingScheme != "percent"){
+      finalGrade = scoreAsPoints;
+      teaserText = scoreAsPercent + "%";
+    }
+
     var $finalGradeRow = $(".student_assignment.final_grade");
     $finalGradeRow.find(".grade").text(finalGrade);
-    $finalGradeRow.find(".score_teaser").text(
-      round(finalScore, 2) + ' / ' + round(finalPossible, 2)
-    );
+    $finalGradeRow.find(".score_teaser").text(teaserText);
 
     if(window.grading_scheme) {
-      $(".final_letter_grade .grade").text(GradeCalculator.letter_grade(grading_scheme, finalGrade));
+      $(".final_letter_grade .grade").text(GradeCalculator.letter_grade(grading_scheme, scoreAsPercent));
     }
 
     $(".revert_all_scores").showIf($("#grades_summary .revert_score_link").length > 0);

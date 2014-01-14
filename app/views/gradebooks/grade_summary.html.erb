@@ -17,7 +17,7 @@
       </div>
     <% else %>
       <div class="student_assignment final_grade" style="font-size: 1.2em;">
-        <%= before_label(:total, "Total") %> <%= raw(number_to_percentage(100, :precision => 0).sub(/100/, '<span class="grade"></span>')) %>
+        <%= before_label(:total, "Total") %> <span class="grade"></span>
         <% if @context.grading_standard_enabled? %>
           <span class="final_letter_grade">
             (<span class="grade" id="final_letter_grade_text">-</span>)
@@ -150,7 +150,7 @@
                   <% if assignment.muted? %>
                     <%= t(:student_mute_notification, "Instructor is working on grades") %>
                   <% elsif assignment.special_class %>
-                    <%= t(:percent, "Percent") %>
+                    <%= t(:total, "Total") %>
                   <% else %>
                     <%= t(:click_to_change, "Click to test a different score") %>
                   <% end %>
@@ -172,7 +172,6 @@
                 <%= assignment_presenter.display_score %>
               </span>
             <% end %>
-            <%= "%" if assignment.special_class %>
           </span>
           <div style="display: none;">
             <span class="original_score">

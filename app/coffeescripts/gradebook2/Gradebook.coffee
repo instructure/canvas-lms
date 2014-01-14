@@ -85,6 +85,9 @@ define [
 
       gotAllStudents = $.Deferred().done => @gotAllStudents()
 
+      # this method should be removed after a month in production
+      @alignCoursePreferencesWithLocalStorage()
+
       # getting all the enrollments for a course via the api in the polite way
       # is too slow, so we're going to cheat.
       $.when($.ajaxJSON(@options[enrollmentsUrl], "GET")
@@ -352,9 +355,9 @@ define [
 
     renderTotalHeader: () =>
       totalHeader = new TotalColumnHeaderView
-        showingPoints: => @showPointTotals
+        showingPoints: @displayPointTotals
         toggleShowingPoints: @togglePointsOrPercentTotals.bind(this)
-        weightedGroups: @weightedGroups.bind(this)
+        weightedGroups: @weightedGroups
       totalHeader.render()
 
     assignmentGroupHtml: (group_name, group_weight) =>
@@ -494,10 +497,8 @@ define [
       if columnDef.type == 'total_grade'
         templateOpts.warning = @totalGradeWarning
         templateOpts.lastColumn = true
-        templateOpts.showPointsNotPercent = if @options.group_weighting_scheme == "percent"
-                                              false
-                                            else
-                                              @showPointTotals
+        templateOpts.showPointsNotPercent = @displayPointTotals()
+
       groupTotalCellTemplate templateOpts
 
     htmlContentFormatter: (row, col, val, columnDef, student) =>
@@ -838,21 +839,20 @@ define [
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
 
-      @showPointTotals = @setPointTotals userSettings.contextGet('show_point_totals')
       @renderTotalHeader()
 
-    weightedGroups: ->
+    weightedGroups: =>
       @options.group_weighting_scheme == "percent"
 
-    setPointTotals: (showPoints) ->
-      @showPointTotals = if @weightedGroups()
+    displayPointTotals: =>
+      if @weightedGroups()
         false
       else
-        showPoints
+        @options.show_total_grade_as_points
 
     togglePointsOrPercentTotals: ->
-      @setPointTotals(not @showPointTotals)
-      userSettings.contextSet('show_point_totals', @showPointTotals)
+      @options.show_total_grade_as_points = not @options.show_total_grade_as_points
+      $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @displayPointTotals()
       @grid.invalidate()
 
     onUserFilterInput: (term) =>
@@ -1134,6 +1134,8 @@ define [
         if pointsPossible == 0
           @totalGradeWarning = I18n.t 'no_assignments_have_points_warning'
           , "Can't compute score until an assignment has points possible"
+        else
+          @totalGradeWarning = null
 
     showCustomColumnDropdownOption: ->
       linkContainer = $("<li>").appendTo(".gradebook_drop_down")
@@ -1208,3 +1210,11 @@ define [
         linkContainer.html(showLink())
       else
         linkContainer.html(hideLink())
+
+    # this method should be removed after a month in production
+    alignCoursePreferencesWithLocalStorage: () ->
+      local_storage_show_point_totals = userSettings.contextGet('show_point_totals')
+      if local_storage_show_point_totals and local_storage_show_point_totals != @options.show_total_grade_as_points
+        @options.show_total_grade_as_points = local_storage_show_point_totals
+        userSettings.contextRemove('show_point_totals')
+        $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @options.show_total_grade_as_points

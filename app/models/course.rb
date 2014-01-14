@@ -37,6 +37,7 @@ class Course < ActiveRecord::Base
                   :allow_student_forum_attachments,
                   :allow_student_discussion_topics,
                   :allow_student_discussion_editing,
+                  :show_total_grade_as_points,
                   :default_wiki_editing_roles,
                   :allow_student_organized_groups,
                   :course_code,
@@ -177,6 +178,7 @@ class Course < ActiveRecord::Base
   before_validation :assert_defaults
   before_save :set_update_account_associations_if_changed
   before_save :update_enrollments_later
+  before_save :update_show_total_grade_as_on_weighting_scheme_change
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :set_self_enrollment_code
@@ -759,6 +761,13 @@ class Course < ActiveRecord::Base
   # still include the old longer format, since links may be out there
   def self_enrollment_codes
     [self_enrollment_code, long_self_enrollment_code]
+  end
+
+  def update_show_total_grade_as_on_weighting_scheme_change
+    if group_weighting_scheme_changed? and self.group_weighting_scheme == 'percent'
+      self.show_total_grade_as_points = false
+    end
+    true
   end
 
   def update_final_scores_on_weighting_scheme_change
@@ -2198,7 +2207,7 @@ class Course < ActiveRecord::Base
       :allow_student_wiki_edits, :show_public_context_messages,
       :syllabus_body, :allow_student_forum_attachments,
       :default_wiki_editing_roles, :allow_student_organized_groups,
-      :default_view, :show_all_discussion_entries, :open_enrollment,
+      :default_view, :show_total_grade_as_points, :show_all_discussion_entries, :open_enrollment,
       :storage_quota, :tab_configuration, :allow_wiki_comments,
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
@@ -2704,6 +2713,7 @@ class Course < ActiveRecord::Base
   add_setting :hide_distribution_graphs, :boolean => true
   add_setting :allow_student_discussion_topics, :boolean => true, :default => true
   add_setting :allow_student_discussion_editing, :boolean => true, :default => true
+  add_setting :show_total_grade_as_points, :boolean => true, :default => false
   add_setting :lock_all_announcements, :boolean => true, :default => false
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
   add_setting :public_syllabus, :boolean => true, :default => false
