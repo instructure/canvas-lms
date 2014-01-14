@@ -1,4 +1,5 @@
 {{#each settings}}
+    <div class="control-group">
   {{#if isBoolean}}
     <label class="checkbox" for="web_conference_user_settings_{{field}}">
       <input name="web_conference[user_settings][{{field}}]" type="hidden" value="0">
@@ -14,8 +15,7 @@
     </label>
   {{/if}}
   {{#if isText}}
-    <label for="web_conference_user_settings_{{field}}">
-      {{description}}
+    <label for="web_conference_user_settings_{{field}}">{{name}}</label>
       <input
         name="web_conference[user_settings][{{field}}]"
         id="web_conference_user_settings_{{field}}"
@@ -25,8 +25,7 @@
         >
   {{/if}}
   {{#if isDatePicker}}
-    <label for="web_conference_user_settings_{{field}}">
-      {{description}}
+    <label for="web_conference_user_settings_{{field}}">{{name}}</label>
         <input
           class="date_entry"
           id="web_conference_user_settings_{{field}}"
@@ -37,4 +36,13 @@
           {{#if ../../conference_started}}disabled="disabled"{{/if}}
           >
   {{/if}}
+  {{#if isSelect}}
+      <label for="web_conference_user_settings_{{field}}">{{name}}</label>
+        <select id="web_conference_user_settings_{{field}}" name="web_conference[user_settings][{{field}}]">
+          {{#each options}}
+             <option value="{{value}}">{{name}}</option>
+          {{/each}}
+        </select>
+  {{/if}}
+    </div>
 {{/each}}
