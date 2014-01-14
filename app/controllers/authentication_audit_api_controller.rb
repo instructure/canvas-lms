@@ -26,7 +26,7 @@
 # For each endpoint, a compound document is returned. The primary collection of
 # event objects is paginated, ordered by date descending. Secondary collections
 # of logins, accounts, page views, and users related to the returned events
-# are also included. Refer to the Logins, Accounts, Page Views, and Users APIs 
+# are also included. Refer to the Logins, Accounts, Page Views, and Users APIs
 # for descriptions of the objects in those collections.
 #
 # @object AuthenticationEvent
@@ -39,7 +39,7 @@
 #
 #       // authentication event type ('login' or 'logout')
 #       "event_type": "login",
-# 
+#
 #       "links": {
 #          // ID of the login associated with the event
 #          "login_id": 9478,
@@ -73,7 +73,7 @@ class AuthenticationAuditApiController < AuditorApiController
   def for_login
     @pseudonym = Pseudonym.active.find(params[:login_id])
     if account_visible(@pseudonym.account) || account_visible(Account.site_admin)
-      events = Auditors::Authentication.for_pseudonym(@pseudonym, date_options)
+      events = Auditors::Authentication.for_pseudonym(@pseudonym, query_options)
       render_events(events, @pseudonym, api_v1_audit_authentication_login_url(@pseudonym))
     else
       render_unauthorized_action
@@ -93,7 +93,7 @@ class AuthenticationAuditApiController < AuditorApiController
   def for_account
     @account = api_find(Account.active, params[:account_id])
     if account_visible(@account) || account_visible(Account.site_admin)
-      events = Auditors::Authentication.for_account(@account, date_options)
+      events = Auditors::Authentication.for_account(@account, query_options)
       render_events(events, @account)
     else
       render_unauthorized_action
@@ -113,7 +113,7 @@ class AuthenticationAuditApiController < AuditorApiController
   def for_user
     @user = api_find(User.active, params[:user_id])
     if @user == @current_user || account_visible(Account.site_admin)
-      events = Auditors::Authentication.for_user(@user, date_options)
+      events = Auditors::Authentication.for_user(@user, query_options)
       render_events(events, @user)
     else
       accounts = Shard.with_each_shard(@user.associated_shards) do
@@ -124,13 +124,13 @@ class AuthenticationAuditApiController < AuditorApiController
       end
       visible_accounts = accounts.select{ |a| account_visible(a) }
       if visible_accounts == accounts
-        events = Auditors::Authentication.for_user(@user, date_options)
+        events = Auditors::Authentication.for_user(@user, query_options)
         render_events(events, @user)
       elsif visible_accounts.present?
         pseudonyms = Shard.partition_by_shard(visible_accounts) do |shard_accounts|
           Pseudonym.active.where(user_id: @user, account_id: shard_accounts).all
         end
-        events = Auditors::Authentication.for_pseudonyms(pseudonyms, date_options)
+        events = Auditors::Authentication.for_pseudonyms(pseudonyms, query_options)
         render_events(events, @user)
       else
         render_unauthorized_action
@@ -148,15 +148,5 @@ class AuthenticationAuditApiController < AuditorApiController
     route ||= polymorphic_url([:api_v1, :audit_authentication, context])
     events = Api.paginate(events, self, route)
     render :json => authentication_events_compound_json(events, @current_user, session)
-  end
-
-  def date_options
-    start_time = TimeHelper.try_parse(params[:start_time])
-    end_time = TimeHelper.try_parse(params[:end_time])
-
-    options = {}
-    options[:oldest] = start_time if start_time
-    options[:newest] = end_time if end_time
-    options
   end
 end

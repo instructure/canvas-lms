@@ -24,8 +24,7 @@ describe AuditorApiController do
       super
     end
 
-    def query_options(params={})
-      self.params = params
+    def query_options
       super
     end
   end
@@ -49,26 +48,31 @@ describe AuditorApiController do
       end_time = start_time + 2.hour
 
       # No params
-      audits_controller.query_options({}).should == {}
+      audits_controller.stubs(:params).returns({})
+      audits_controller.query_options.should == {}
 
       # Unrelated params
       params = { course_id: 42 }
-      audits_controller.query_options(params).should == {}
+      audits_controller.stubs(:params).returns(params)
+      audits_controller.query_options.should == {}
 
       # Start time
       params = { start_time: start_time.iso8601 }
-      audits_controller.query_options(params).should == { oldest: start_time }
+      audits_controller.stubs(:params).returns(params)
+      audits_controller.query_options.should == { oldest: start_time }
 
       # End time
       params = { end_time: end_time.iso8601 }
-      audits_controller.query_options(params).should == { newest: end_time }
+      audits_controller.stubs(:params).returns(params)
+      audits_controller.query_options.should == { newest: end_time }
 
       # Start and end times
       params = {
         start_time: start_time.iso8601,
         end_time: end_time.iso8601
       }
-      audits_controller.query_options(params).should == {
+      audits_controller.stubs(:params).returns(params)
+      audits_controller.query_options.should == {
         oldest: start_time,
         newest: end_time
       }

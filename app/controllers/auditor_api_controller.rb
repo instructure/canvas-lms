@@ -25,7 +25,7 @@ class AuditorApiController < ApplicationController
     not_found unless Canvas::Cassandra::DatabaseBuilder.configured?('auditors')
   end
 
-  def query_options(account=nil)
+  def query_options
     start_time = TimeHelper.try_parse(params[:start_time])
     end_time = TimeHelper.try_parse(params[:end_time])
 
