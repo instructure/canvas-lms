@@ -17,7 +17,7 @@
 #
 
 class Feature
-  ATTRS = [:feature, :display_name, :description, :applies_to, :state, :root_opt_in, :enable_at, :beta, :development, :release_notes_url]
+  ATTRS = [:feature, :display_name, :description, :applies_to, :state, :root_opt_in, :enable_at, :beta, :development, :release_notes_url, :custom_transition_proc]
   attr_reader *ATTRS
 
   def initialize(opts = {})
@@ -61,8 +61,16 @@ class Feature
                           # will be inherited in "off" state by root accounts
     enable_at: Date.new(2014, 1, 1),  # estimated release date shown in UI
     beta: false,          # 'beta' tag shown in UI
-    development: false    # 'development' tag shown in UI
-    release_notes_url: 'http://example.com/'
+    development: false,   # 'development' tag shown in UI
+    release_notes_url: 'http://example.com/',
+    # optional: you can supply a Proc to attach warning messages to and/or forbid certain transitions
+    # see lib/feature/draft_state.rb for example usage
+    custom_transition_proc: ->(user, context, from_state, transitions) do
+      if from_state == 'off' && context.is_a?(Course) && context.has_submitted_essays?
+        transitions['on']['warning'] = I18n.t('features.automatic_essay_grading.enable_warning',
+          'Enabling this feature after some students have submitted essays may yield inconsistent grades.')
+      end
+    end
   }
 =end
 
@@ -77,21 +85,6 @@ class Feature
   # TODO: register built-in features here
   # (plugins may register additional features during application initialization)
   register(
-   'draft_state' =>
-    {
-      display_name: lambda { I18n.t('features.draft_state', 'Draft State') },
-      description: lambda { I18n.t('draft_state_description', <<DRAFT) },
-Draft state is a *beta* feature that allows course content to be published and unpublished.
-Unpublished content won't be visible to students and won't affect grades.
-It also includes a redesign of some course areas to make them more consistent in look and functionality.
-
-Unpublished content may not be available if Draft State is disabled.
-DRAFT
-      applies_to: 'Course',
-      state: 'hidden',
-      root_opt_in: true,
-      development: true
-    },
     'google_docs_domain_restriction' =>
     {
       display_name: -> { I18n.t('features.google_docs_domain_restriction', 'Google Docs Domain Restriction') },
@@ -174,4 +167,25 @@ END
     definitions.values.select{ |fd| applicable_types.include?(fd.applies_to) }
   end
 
+  def self.default_transitions(context, orig_state)
+    valid_states = %w(off on)
+    valid_states << 'allowed' if context.is_a?(Account)
+    (valid_states - [orig_state]).inject({}) do |transitions, state|
+      transitions[state] = { 'locked' => false }
+      transitions
+    end
+  end
+
+  def self.transitions(feature, user, context, orig_state)
+    h = Feature.default_transitions(context, orig_state)
+    fd = definitions[feature.to_s]
+    if fd.custom_transition_proc.is_a?(Proc)
+      fd.custom_transition_proc.call(user, context, orig_state, h)
+    end
+    h
+  end
 end
+
+# load feature definitions
+Dir.glob("#{Rails.root}/lib/features/*.rb").each { |file| require file }
+
