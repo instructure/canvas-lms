@@ -19,6 +19,12 @@ class ActiveRecord::Base
   end
 
   if CANVAS_RAILS2
+    if instance_method(:transaction).arity == 0
+      def transaction(options = {}, &block)
+        self.class.transaction(options, &block)
+      end
+    end
+
     # this functionality is built into rails 3
     class ProtectedAttributeAssigned < Exception; end
     def log_protected_attribute_removal_with_raise(*attributes)
