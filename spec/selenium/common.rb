@@ -83,7 +83,16 @@ module SeleniumTestsHelperMethods
       if path = SELENIUM_CONFIG[:paths].try(:[], browser)
         Selenium::WebDriver.const_get(browser.to_s.capitalize).path = path
       end
-      driver = Selenium::WebDriver.for(browser, options)
+      begin
+        tries ||= 3
+        puts "Thread #{THIS_ENV} connecting to hub over port #{PORT_NUM}, try ##{tries}"
+        driver = nil
+        driver = Selenium::WebDriver.for(browser, options)
+      rescue Exception => e
+        puts "Thread #{THIS_ENV}\n try ##{tries}\nError attempting to start remote webdriver: #{e}"
+        sleep 2
+        retry unless (tries -= 1).zero?
+      end
     else
       caps = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
       if caps == :firefox
