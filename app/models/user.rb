@@ -466,11 +466,7 @@ class User < ActiveRecord::Base
     shards = [Shard.current]
     if !precalculated_associations
       if !users_or_user_ids.first.is_a?(User)
-        if CANVAS_RAILS2
-          users = users_or_user_ids = Shard.partition_by_shard(user_ids) { |ids| User.select([:id, :preferences, :workflow_state]).find(ids) }
-        else
-          users = users_or_user_ids = User.select([:id, :preferences, :workflow_state]).find(user_ids)
-        end
+        users = users_or_user_ids = User.select([:id, :preferences, :workflow_state]).find_all_by_id(user_ids)
       else
         users = users_or_user_ids
       end
