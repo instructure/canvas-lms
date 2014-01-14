@@ -613,7 +613,7 @@ describe AssignmentsApiController, :type => :integration do
                    'name' => 'some assignment',
                    'assignment_overrides' => {
                        '0' => {
-                         'course_section_id' => @course.active_course_sections.second.id,
+                         'course_section_id' => @student.enrollments.first.course_section.id,
                          'due_at' => @override_due_at.iso8601
                        }
                    }
