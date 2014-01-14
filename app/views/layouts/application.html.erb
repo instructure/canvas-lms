@@ -152,14 +152,14 @@
     </div>
     <% end %>
     <div id="main">
-      <div id="right-side-wrapper">
-        <aside id="right-side" role="complementary">
-          <%= right_side %>
-        </aside>
-      </div>
       <div id="not_right_side">
         <div id="content-wrapper">
           <%= render_crumbs %>
+	  <div id="right-side-wrapper">
+	    <aside id="right-side" role="complementary">
+	      <%= right_side %>
+	    </aside>
+	  </div>
           <div id="content" role="main" class="container-fluid">
             <%= yield %>
           </div>
