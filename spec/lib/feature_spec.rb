@@ -106,5 +106,25 @@ describe Feature do
       Feature.definitions['U'].locked?(t_site_admin).should be_false
     end
   end
-end
 
+  describe "default_transitions" do
+    it "should enumerate Account transitions" do
+      Feature.default_transitions(t_root_account, 'allowed').should eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
+      Feature.default_transitions(t_root_account, 'on').should eql({'allowed'=>{'locked'=>false},'off'=>{'locked'=>false}})
+      Feature.default_transitions(t_root_account, 'off').should eql({'allowed'=>{'locked'=>false},'on'=>{'locked'=>false}})
+    end
+
+    it "should enumerate Course transitions" do
+      Feature.default_transitions(t_course, 'allowed').should eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
+      Feature.default_transitions(t_course, 'on').should eql({'off'=>{'locked'=>false}})
+      Feature.default_transitions(t_course, 'off').should eql({'on'=>{'locked'=>false}})
+    end
+
+    it "should enumerate User transitions" do
+      Feature.default_transitions(t_user, 'allowed').should eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
+      Feature.default_transitions(t_user, 'on').should eql({'off'=>{'locked'=>false}})
+      Feature.default_transitions(t_user, 'off').should eql({'on'=>{'locked'=>false}})
+    end
+  end
+
+end

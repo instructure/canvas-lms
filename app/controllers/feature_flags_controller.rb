@@ -27,6 +27,9 @@
 #      // The user-visible name of the feature
 #      "display_name": "Fancy Wickets",
 #
+#      // The user-visible description of the feature
+#      "description": "This feature makes all Wickets 38% fancier",
+#
 #      // The type of object the feature applies to (RootAccount, Account, Course, or User):
 #      // * RootAccount features may only be controlled by flags on root accounts.
 #      // * Account features may be controlled by flags on accounts and their parent accounts.
@@ -42,7 +45,9 @@
 #      "feature_flag": {
 #        "feature": "fancy_wickets",
 #        "state": "allowed",
-#        "locking_account_id": null
+#        "locked": false,
+#        "locking_account_id": null,
+#        "transitions": { "on": { "locked": false }, "off": { "locked": false } }
 #      },
 #
 #      // If true, a feature that is "allowed" globally will be "off" by default in root accounts.
@@ -83,7 +88,22 @@
 #
 #      // If set, this FeatureFlag can only be modified by someone with administrative rights
 #      // in the specified account
-#      "locking_account_id": null
+#      "locking_account_id": null,
+#
+#      // Information about the available state transitions for this flag
+#      "transitions": {
+#        "off": {
+#          // If set, the calling user does not have permission to change to this state
+#          "locked": false,
+#
+#          // An optional message describing the transition to this state
+#          "message": "Disabling Fancy Wickets mid-semester may be harmful to student morale."
+#        },
+#        "on": {
+#          "locked": true,
+#          "message": "This feature may only be enabled in individual courses at this time"
+#        }
+#      }
 #    }
 #
 class FeatureFlagsController < ApplicationController
@@ -189,11 +209,15 @@ class FeatureFlagsController < ApplicationController
 
       # check whether the feature is locked
       current_flag = @context.lookup_feature_flag(params[:feature])
-      return render json: { message: "higher account disallows setting feature flag" }, status: :forbidden if current_flag && current_flag.locked?(@context, @current_user)
+      if current_flag
+        return render json: { message: "higher account disallows setting feature flag" }, status: :forbidden if current_flag.locked?(@context, @current_user)
+        prior_state = current_flag.state
+      end
 
       # if this is a hidden feature, require site admin privileges to create (but not update) a root account flag
       if !current_flag && feature_def.hidden?
         return render json: { message: "invalid feature" }, status: :bad_request unless @context.is_a?(Account) && @context.root_account? && Account.site_admin.grants_right?(@current_user, session, :read)
+        prior_state = 'hidden'
       end
 
       # create or update flag
@@ -203,6 +227,13 @@ class FeatureFlagsController < ApplicationController
       new_flag.feature = params[:feature]
       new_flag.state = params[:state] if params.has_key?(:state)
 
+      # check transition
+      transitions = Feature.transitions(new_flag.feature, @current_user, @context, prior_state)
+      if transitions[new_flag.state] && transitions[new_flag.state]['locked']
+        return render json: { message: "state change not allowed" }, status: :forbidden
+      end
+
+      # check locking account
       if params.has_key?(:locking_account_id)
         unless params[:locking_account_id].blank?
           locking_account = api_find(Account, params[:locking_account_id])
