@@ -32,6 +32,10 @@ define [
     @optionProperty 'groupCategories'
     @optionProperty 'nested'
 
+    initialize: ->
+      super
+      @startedOutAsGroupAssignment = @parentModel.get('group_category_id')?
+
     showGroupCategoryCreateDialog: =>
       if @$groupCategoryID.val() == 'new'
         # TODO: Yikes, we need to pull the javascript out of manage_groups.js
@@ -47,6 +51,13 @@ define [
 
     toggleGroupCategoryOptions: =>
       @$groupCategoryOptions.toggleAccessibly @$hasGroupCategory.prop('checked')
+
+      @$(".group_submission_warning").toggleAccessibly(
+        !@startedOutAsGroupAssignment and
+        @$hasGroupCategory.prop('checked') and
+        @parentModel.attributes.has_submitted_submissions
+      )
+
       if @$hasGroupCategory.prop('checked') and @groupCategories.length == 0
         @showGroupCategoryCreateDialog()
 

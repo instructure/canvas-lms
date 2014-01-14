@@ -73,15 +73,17 @@ class WikiPage < ActiveRecord::Base
   def sync_hidden_and_unpublished
     return if (context rescue nil).nil?
 
-    if context.draft_state_enabled?
-      if self.hide_from_students # hide_from_students overrides published
-        self.hide_from_students = false
-        self.workflow_state = 'unpublished'
-      end
-    else
-      if self.workflow_state.to_s == 'unpublished' # unpublished overrides hide_from_students
-        self.workflow_state = 'active'
-        self.hide_from_students = true
+    WikiPage.skip_callback(:after_find) do
+      if context.feature_enabled?(:draft_state)
+        if self.hide_from_students # hide_from_students overrides published
+          self.hide_from_students = false
+          self.workflow_state = 'unpublished'
+        end
+      else
+        if self.workflow_state.to_s == 'unpublished' # unpublished overrides hide_from_students
+          self.workflow_state = 'active'
+          self.hide_from_students = true
+        end
       end
     end
   end
@@ -174,7 +176,7 @@ class WikiPage < ActiveRecord::Base
   alias_method :published?, :active?
 
   def restore
-    self.workflow_state = 'active'
+    self.workflow_state = context.feature_enabled?(:draft_state) ? 'unpublished' : 'active'
     self.save
   end
 
@@ -236,7 +238,7 @@ class WikiPage < ActiveRecord::Base
 
   def is_front_page?
     return false if self.deleted?
-    self.url == self.wiki.get_front_page_url # wiki.get_front_page_url checks has_front_page? and context.draft_state_enabled?
+    self.url == self.wiki.get_front_page_url # wiki.get_front_page_url checks has_front_page? and context.feature_enabled?(:draft_state)
   end
 
   def set_as_front_page!
@@ -290,11 +292,12 @@ class WikiPage < ActiveRecord::Base
   def can_edit_page?(user, session=nil)
     context_roles = context.default_wiki_editing_roles rescue nil
     roles = (editing_roles || context_roles || default_roles).split(",")
+    roles.clear if roles == %w(teachers) # "Only teachers" option doesn't grant rights excluded by RoleOverrides
 
     # managers are always allowed to edit
     return true if wiki.grants_right?(user, session, :manage)
 
-    return true if roles.include?('teachers') && context.respond_to?(:teachers) && context.teachers.include?(user)
+    return true if roles.include?('teachers') && context.respond_to?(:admins) && context.admins.include?(user)
     # the remaining edit roles all require read access, so just check here
     return false unless can_read_page?(user, session) && !self.locked_for?(user)
     return true if roles.include?('students') && context.respond_to?(:students) && context.includes_student?(user)
@@ -557,19 +560,19 @@ class WikiPage < ActiveRecord::Base
     unless self.new_record?
       self.with_versioning(false) do |p|
         context ||= p.context
-        p.connection.execute("UPDATE wiki_pages SET view_count=COALESCE(view_count, 0) + 1 WHERE id=#{p.id}")
+        WikiPage.where(id: p).update_all("view_count=COALESCE(view_count, 0) + 1")
         p.context_module_action(user, context, :read)
       end
     end
   end
 
-  def initialize_wiki_page(user)
-    unless context.draft_state_enabled?
-      set_as_front_page! if !wiki.has_front_page? and url == Wiki::DEFAULT_FRONT_PAGE_URL
-    end
+  def can_unpublish?
+    !is_front_page?
+  end
 
+  def initialize_wiki_page(user)
     is_privileged_user = wiki.grants_right?(user, :manage)
-    if is_privileged_user && context.draft_state_enabled? && !context.is_a?(Group)
+    if is_privileged_user && context.feature_enabled?(:draft_state) && !context.is_a?(Group)
       self.workflow_state = 'unpublished'
     else
       self.workflow_state = 'active'
@@ -580,6 +583,7 @@ class WikiPage < ActiveRecord::Base
     if is_front_page?
       self.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if context.is_a?(Course)
       self.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if context.is_a?(Group)
+      self.workflow_state = 'active'
     end
   end
 end

@@ -52,7 +52,7 @@ class QuizRegrader::Submission
       id = question[:id]
       if submitted_answer_ids.include?(id)
         question.keep_if {|k, v| %w{id position published_at}.include?(k) }
-        question.merge(question_regrades[id].question_data)
+        question.merge(question_regrades[id].question_data.to_hash)
       else
         question
       end

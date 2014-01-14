@@ -147,6 +147,7 @@ describe "BookmarkedCollection" do
       before :each do
         # the name bookmarker will generate the same bookmark for both of the
         # courses.
+        CourseAccountAssociation.delete_all
         Course.delete_all
         @created_course = @created_scope.create!(:name => "Same Name")
         @deleted_course = @deleted_scope.create!(:name => "Same Name")
@@ -168,6 +169,7 @@ describe "BookmarkedCollection" do
       before :each do
         # the name bookmarker will generate the same bookmark for both of the
         # courses.
+        CourseAccountAssociation.delete_all
         Course.delete_all
         @created_course = @created_scope.create!(:name => "Same Name")
         @deleted_course = @deleted_scope.create!(:name => "Same Name")

@@ -29,7 +29,6 @@ module AvatarHelper
       default_avatar
     end
 
-
     if !url.match(%r{\Ahttps?://})
       # make sure that the url is not just a path
       url = "#{request.protocol}#{request.host_with_port}#{url}"

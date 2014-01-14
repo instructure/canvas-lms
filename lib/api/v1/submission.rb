@@ -149,5 +149,57 @@ module Api::V1::Submission
 
     hash
   end
+
+  # Create an attachment with a ZIP archive of an assignment's submissions.
+  # The attachment will be re-created if it's 1 hour old, or determined to be
+  # "stale". See the argument descriptions for testing the staleness of the attachment.
+  #
+  # @param [Assignment] assignment
+  # The assignment, or an object that implements its interface, for which the
+  # submissions will be zipped.
+  #
+  # @param [DateTime] updated_at
+  # A timestamp that marks the latest update to the assignment object which will
+  # be used to determine whether the attachment will be re-created.
+  #
+  # Note that this timestamp will be ignored if the attachment is 1 hour old.
+  #
+  # @return [Attachment] The attachment that contains the archive.
+  def submission_zip(assignment, updated_at = nil)
+    attachments = assignment.attachments.where({
+      display_name: 'submissions.zip',
+      workflow_state: %w[to_be_zipped zipping zipped errored unattached],
+      user_id: @current_user
+    }).order(:created_at).all
+
+    attachment = attachments.pop
+    attachments.each { |a| a.destroy! }
+
+    # Remove the earlier attachment and re-create it if it's "stale"
+    if attachment
+      created_at = attachment.created_at
+      updated_at ||= assignment.submissions.map { |s| s.submitted_at }.compact.max
+
+      if created_at < 1.hour.ago || (updated_at && created_at < updated_at)
+        attachment.destroy!
+        attachment = nil
+      end
+    end
+
+    if !attachment
+      attachment = assignment.attachments.build(:display_name => 'submissions.zip')
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.file_state = '0'
+      attachment.user = @current_user
+      attachment.save!
+
+      ContentZipper.send_later_enqueue_args(:process_attachment, {
+        priority: Delayed::LOW_PRIORITY,
+        max_attempts: 1
+      }, attachment)
+    end
+
+    attachment
+  end
 end
 

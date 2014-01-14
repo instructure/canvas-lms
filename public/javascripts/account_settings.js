@@ -108,13 +108,6 @@ define([
         width: 400
       });
     });
-    $(".allow_draft_help_link").click(function(event) {
-      event.preventDefault();
-      $("#allow_draft_help_dialog").dialog({
-        title: I18n.t('titles.allow_draft_help_title', "What is Draft State?"),
-        width: 400
-      });
-    });
 
     $("#account_settings_enable_scheduler").change(function() {
       var $enableCalendar2 = $("#account_settings_enable_scheduler");

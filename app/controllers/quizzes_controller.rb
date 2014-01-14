@@ -25,7 +25,7 @@ class QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :get_quiz, :only => [:statistics, :edit, :show, :reorder, :history, :update, :destroy, :moderate, :filters, :read_only, :managed_quiz_data, :submission_versions]
+  before_filter :get_quiz, :only => [:statistics, :edit, :show, :history, :update, :destroy, :moderate, :read_only, :managed_quiz_data, :submission_versions]
   before_filter :set_download_submission_dialog_title , only: [:show,:statistics]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
@@ -40,7 +40,7 @@ class QuizzesController < ApplicationController
       @quizzes = @context.quizzes.active.include_assignment.sort_by{|q| [(q.assignment ? q.assignment.due_at : q.lock_at) || SortLast, Canvas::ICU.collation_key(q.title || SortFirst)]}
 
       # draft state - only filter by available? for students
-      if @context.draft_state_enabled?
+      if @context.feature_enabled?(:draft_state)
         unless is_authorized_action?(@context, @current_user, :manage_assignments)
           @quizzes = @quizzes.select{|q| q.available? }
         end
@@ -55,13 +55,12 @@ class QuizzesController < ApplicationController
 
         @quiz_options = @quizzes.each_with_object({}) do |q, hash|
           hash[q.id] = {
-            :can_update         => is_authorized_action?(q, @current_user, :update),
-            :can_unpublish      => q.can_unpublish?,
-            :multiple_due_dates => q.multiple_due_dates_apply_to?(@current_user),
-            :due_at             => q.overridden_for(@current_user).due_at,
-            :due_dates          => OverrideTooltipPresenter.new(q, @current_user).due_date_summary,
-            :unlock_at          => q.all_dates_visible_to(@current_user).first[:unlock_at]
+            :can_update    => is_authorized_action?(q, @current_user, :update),
+            :can_unpublish => q.can_unpublish?
           }
+          hash[q.id][:all_dates] = if is_authorized_action?(q, @current_user, :update)
+            q.dates_hash_visible_to(@current_user)
+          end
         end
 
       # legacy
@@ -89,6 +88,15 @@ class QuizzesController < ApplicationController
     if !@context.root_account.enable_fabulous_quizzes? || !authorized_action(@context, @current_user, :read)
       redirect_to course_quizzes_path
     end
+    @body_classes << 'with_item_groups'
+    js_env(:PERMISSIONS => {
+      :create  => can_do(@context.quizzes.new, @current_user, :create),
+      :manage  => can_do(@context, @current_user, :manage_assignments)
+    },
+    :FLAGS => {
+      :question_banks => feature_enabled?(:question_banks),
+      :fabulous_quizzes => true
+    })
   end
 
   def show
@@ -146,7 +154,6 @@ class QuizzesController < ApplicationController
       submission_counts if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
-      log_asset_access(@quiz, "quizzes", "quizzes")
       hash = { :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
              :IS_SURVEY => @quiz.survey?,
              :QUIZ => quiz_json(@quiz,@context,@current_user,session),
@@ -163,6 +170,8 @@ class QuizzesController < ApplicationController
         else
           take_quiz
         end
+      else
+        log_asset_access(@quiz, "quizzes", "quizzes")
       end
       @padless = true
     end
@@ -215,7 +224,7 @@ class QuizzesController < ApplicationController
              :QUIZ => quiz_json(@quiz, @context, @current_user, session),
              :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
              :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
-             :QUIZ_FILTERS_URL => polymorphic_url([@context, @quiz, :filters]),
+             :QUIZ_IP_FILTERS_URL => polymorphic_url([:api, :v1, @context, @quiz, :ip_filters]),
              :CONTEXT_ACTION_SOURCE => :quizzes,
              :REGRADE_OPTIONS => regrade_options }
       append_sis_data(hash)
@@ -288,7 +297,7 @@ class QuizzesController < ApplicationController
       respond_to do |format|
         @quiz.transaction do
           overrides = delete_override_params
-          if !@context.draft_state_enabled? && params[:activate]
+          if !@context.feature_enabled?(:draft_state) && params[:activate]
             @quiz.with_versioning(true) { @quiz.publish! }
           end
           notify_of_update = value_to_boolean(params[:quiz][:notify_of_update])
@@ -300,7 +309,7 @@ class QuizzesController < ApplicationController
             old_assignment.id = @quiz.assignment.id
           end
 
-          auto_publish = @context.draft_state_enabled? && @quiz.published?
+          auto_publish = @context.feature_enabled?(:draft_state) && @quiz.published?
           @quiz.with_versioning(auto_publish) do
             # using attributes= here so we don't need to make an extra
             # database call to get the times right after save!
@@ -460,65 +469,6 @@ class QuizzesController < ApplicationController
       @lockdown_browser_download_url = plugin.settings[:download_url]
     end
     render
-  end
-
-  def filters
-    if authorized_action(@quiz, @current_user, :update)
-      @filters = []
-      @account = @quiz.context.account
-      if @quiz.ip_filter
-        @filters << {
-          :name => t(:current_filter, 'Current Filter'),
-          :account => @quiz.title,
-          :filter => @quiz.ip_filter
-        }
-      end
-      while @account
-        (@account.settings[:ip_filters] || {}).sort_by(&:first).each do |key, filter|
-          @filters << {
-            :name => key,
-            :account => @account.name,
-            :filter => filter
-          }
-        end
-        @account = @account.parent_account
-      end
-      render :json => @filters
-    end
-  end
-
-  def reorder
-    if authorized_action(@quiz, @current_user, :update)
-      items = []
-      groups = @quiz.quiz_groups
-      questions = @quiz.quiz_questions.active
-      order = params[:order].split(",")
-      order.each_index do |idx|
-        name = order[idx]
-        obj = nil
-        id = name.gsub(/\A(question|group)_/, "").to_i
-        obj = questions.detect{|q| q.id == id.to_i} if id != 0 && name.match(/\Aquestion/)
-        obj.quiz_group_id = nil if obj.respond_to?("quiz_group_id=")
-        obj = groups.detect{|g| g.id == id.to_i} if id != 0 && name.match(/\Agroup/)
-        items << obj if obj
-      end
-      root_questions = @quiz.quiz_questions.active.where("quiz_group_id IS NULL").all
-      items += root_questions
-      items.uniq!
-      question_updates = []
-      group_updates = []
-      items.each_with_index do |item, idx|
-        if item.is_a?(QuizQuestion)
-          question_updates << "WHEN id=#{item.id} THEN #{idx + 1}"
-        else
-          group_updates << "WHEN id=#{item.id} THEN #{idx + 1}"
-        end
-      end
-      QuizQuestion.where(:id => items.select{|i| i.is_a?(QuizQuestion)}).update_all("quiz_group_id=NULL,position=CASE #{question_updates.join(" ")} ELSE NULL END") unless question_updates.empty?
-      QuizGroup.where(:id => items.select{|i| i.is_a?(QuizGroup)}).update_all("position=CASE #{group_updates.join(" ")} ELSE NULL END") unless group_updates.empty?
-      Quiz.mark_quiz_edited(@quiz.id)
-      render :json => {:reorder => true}
-    end
   end
 
   def history
@@ -733,6 +683,7 @@ class QuizzesController < ApplicationController
       user_code = nil if preview
       user_code ||= temporary_user_code
       @submission = @quiz.generate_submission(user_code, !!preview)
+      log_asset_access(@quiz, 'quizzes', 'quizzes', 'participate')
     end
     if quiz_submission_active?
       if request.get?
@@ -751,9 +702,7 @@ class QuizzesController < ApplicationController
   def take_quiz
     return unless quiz_submission_active?
     @show_embedded_chat = false
-    log_asset_access(@quiz, "quizzes", "quizzes", 'participate')
     flash[:notice] = t('notices.less_than_allotted_time', "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz.") if @submission.less_than_allotted_time?
-
     if params[:question_id] && !valid_question?(@submission, params[:question_id])
       redirect_to course_quiz_url(@context, @quiz) and return
     end

@@ -1,4 +1,5 @@
 require 'active_support/inflector'
+require 'fileutils'
 
 class EmberBundle
   attr_accessor :app_name, :paths, :objects, :assigns
@@ -43,6 +44,7 @@ class EmberBundle
     main_path = "app/coffeescripts/ember/#{@app_name}/main.coffee"
     bundle_path = "public/javascripts/compiled/bundles/#{@app_name}.js"
     File.open(main_path, 'w') { |f| f.write build_output }
+    FileUtils.mkdir_p 'public/javascripts/compiled/bundles'
     File.open(bundle_path, 'w') do |f|
       f.write "require(['compiled/ember/#{@app_name}/main'], function(App) { window.App = App.create(); });"
     end

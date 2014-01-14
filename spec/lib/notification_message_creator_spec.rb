@@ -207,6 +207,7 @@ describe NotificationMessageCreator do
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
       @notification.category = 'DiscussionEntry' # default frequency of 'Daily'
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 1
+      DelayedMessage.delete_all
       NotificationPolicy.delete_all # gotta do this because create_message actually creates the default policy
       notification_policy_model(:notification => @notification,
                                 :communication_channel => @communication_channel,

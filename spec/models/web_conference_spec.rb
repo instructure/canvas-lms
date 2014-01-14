@@ -209,4 +209,28 @@ describe WebConference do
       conference.messages_sent['Web Conference Invitation'].should be_blank
     end
   end
+
+  context "scheduled conferences" do
+    before do
+      course_with_student(:active_all => 1)
+      @conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course)
+    end
+
+    it "has a start date" do
+      @conference.start_at = Time.now
+      @conference.scheduled?.should be_false
+    end
+
+    it "has a schduled date in the past" do
+      @conference.stubs(:scheduled_date).returns(Time.now - 10.days)
+      @conference.scheduled?.should be_false
+    end
+
+    it "has a schduled date in the future" do
+      @conference.stubs(:scheduled_date).returns(Time.now + 10.days)
+      @conference.scheduled?.should be_true
+    end
+
+  end
+
 end

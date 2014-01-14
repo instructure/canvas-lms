@@ -58,29 +58,31 @@ module FeatureFlags
   end
 
   def feature_flag_cache_key(feature)
-    ['feature_flag', self, feature.to_s].cache_key
+    ['feature_flag', self.class.name, self.global_id, feature.to_s].cache_key
   end
 
   # return the feature flag for the given feature that is defined on this object, if any.
   # (helper method.  use lookup_feature_flag to test policy.)
   def feature_flag(feature)
     self.shard.activate do
-      Rails.cache.fetch(feature_flag_cache_key(feature)) do
-        self.feature_flags.where(feature: feature.to_s).first
+      result = Rails.cache.fetch(feature_flag_cache_key(feature)) do
+        self.feature_flags.where(feature: feature.to_s).first || :nil
       end
+      result = nil if result == :nil
+      result
     end
   end
 
   # each account that needs to be searched for a feature flag, in priority order,
   # starting with site admin
-  def feature_flag_accounts
-    Rails.cache.fetch(['feature_flag_accounts', self].cache_key) do
+  def feature_flag_account_ids
+    Rails.cache.fetch(['feature_flag_account_ids', self].cache_key) do
       parent = if self.is_a?(Course)
                  self.account
                elsif self.is_a?(Account)
                  self.parent_account
                end
-      parent ? parent.account_chain(include_site_admin: true).reverse : [Account.site_admin]
+      (parent ? parent.account_chain(include_site_admin: true).reverse : [Account.site_admin]).map(&:global_id)
     end
   end
 
@@ -99,9 +101,14 @@ module FeatureFlags
     # inherit the feature definition as a default unless it's a hidden feature
     retval = feature_def unless feature_def.hidden? && !is_site_admin && !(is_root_account && override_hidden)
 
+    @feature_flag_cache ||= {}
+    return @feature_flag_cache[feature] if @feature_flag_cache.key?(feature)
+
     # find the highest flag that doesn't allow override,
     # or the most specific flag otherwise
-    (feature_flag_accounts + [self]).each do |context|
+    account_ids = feature_flag_account_ids
+    accounts = Account.find_all_by_id(account_ids, :select => :id).sort_by{|a| account_ids.index(a.global_id)}
+    (accounts + [self]).each do |context|
       flag = context.feature_flag(feature)
       next unless flag
       retval = flag
@@ -117,11 +124,11 @@ module FeatureFlags
         retval = self.feature_flags.build feature: feature, state: 'off'
       else
         # the feature doesn't exist beneath the root account until the root account opts in
-        return nil
+        return @feature_flag_cache[feature] = nil
       end
     end
 
-    retval
+    @feature_flag_cache[feature] = retval
   end
 
 end

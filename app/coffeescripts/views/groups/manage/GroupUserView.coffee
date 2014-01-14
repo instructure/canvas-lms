@@ -7,7 +7,7 @@ define [
   class GroupUserView extends View
 
     @optionProperty 'canAssignToGroup'
-    @optionProperty 'canRemoveFromGroup'
+    @optionProperty 'canEditGroupAssignment'
 
     tagName: 'li'
 
@@ -15,13 +15,11 @@ define [
 
     template: template
 
-    events:
-      'click .remove-from-group': 'removeUserFromGroup'
+    els:
+      '.al-trigger': '$userActions'
 
-    removeUserFromGroup: (e)->
-      e.preventDefault()
-      e.stopPropagation()
-      @model.moveTo null
+    closeMenu: ->
+      @$userActions.data('kyleMenu')?.$menu.popup 'close'
 
     attach: ->
       @model.on 'change', @render, this
@@ -37,4 +35,3 @@ define [
 
     toJSON: ->
       _.extend {}, this, super
-

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -649,9 +649,7 @@ class CoursesController < ApplicationController
     end
     if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
-      @context.workflow_state = 'deleted'
-      @context.sis_source_id = nil
-      @context.save
+      @context.destroy
       flash[:notice] = t('notices.deleted', "Course successfully deleted")
     else
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
@@ -1112,7 +1110,7 @@ class CoursesController < ApplicationController
 
 
     @context = Course.active.find(params[:id])
-    js_env :DRAFT_STATE => @context.draft_state_enabled?
+    js_env :DRAFT_STATE => @context.feature_enabled?(:draft_state)
     if request.xhr?
       if authorized_action(@context, @current_user, [:read, :read_as_admin])
         render :json => @context
@@ -1161,7 +1159,7 @@ class CoursesController < ApplicationController
       when "wiki"
         @wiki = @context.wiki
         @page = @wiki.front_page
-        if @context.draft_state_enabled?
+        if @context.feature_enabled?(:draft_state)
           set_js_rights [:wiki, :page]
           set_js_wiki_data :course_home => true
           @padless = true
@@ -1189,6 +1187,7 @@ class CoursesController < ApplicationController
           @contexts += @user_groups if @user_groups
         end
         @current_conferences = @context.web_conferences.select{|c| c.active? && c.users.include?(@current_user) }
+        @scheduled_conferences = @context.web_conferences.select{|c| c.scheduled? && c.users.include?(@current_user)}
         @stream_items = @current_user.try(:cached_recent_stream_items, { :contexts => @contexts }) || []
       end
 
@@ -1199,7 +1198,7 @@ class CoursesController < ApplicationController
       # clear notices that would have been displayed as a result of processing
       # an enrollment invitation, since we're giving an error
       flash[:notice] = nil
-      render_unauthorized_action(@context)
+      render_unauthorized_action
     end
   end
 
@@ -1622,9 +1621,11 @@ class CoursesController < ApplicationController
       f.id = course_url(@context)
     end
     @entries = []
-    @entries.concat @context.assignments.active
+    @entries.concat @context.assignments.published
     @entries.concat @context.calendar_events.active
-    @entries.concat @context.discussion_topics.active.reject{|a| a.locked_for?(@current_user, :check_policies => true) }
+    @entries.concat(@context.discussion_topics.active.select{ |dt|
+      dt.published? && !dt.locked_for?(@current_user, :check_policies => true)
+    })
     @entries.concat @context.wiki.wiki_pages
     @entries = @entries.sort_by{|e| e.updated_at}
     @entries.each do |entry|

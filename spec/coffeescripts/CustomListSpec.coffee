@@ -144,23 +144,23 @@ define [
     @clock.tick 1
     equal @list.wrapper.is(':visible'), true, 'displays on open'
 
-  test 'should remove and add the first item', ->
-    # store original length to compare to later
-    originalLength = @list.pinned.length
-
-    # click an element to remove it from the list
-    $(@lis[0]).simulate('click')
-
-    # this next click should get ignored because the previous element is animating
-    $(@lis[1]).simulate('click')
-
-    @clock.tick 300
-    expectedLength = originalLength - 1
-    equal @list.pinned.length, expectedLength, 'only one item should have been removed'
-
-    $(@lis[0]).simulate('click')
-    @clock.tick 300
-    equal @list.pinned.length, originalLength, 'item should be restored'
+#  test 'should remove and add the first item', ->
+#    # store original length to compare to later
+#    originalLength = @list.pinned.length
+#
+#    # click an element to remove it from the list
+#    $(@lis[0]).simulate('click')
+#
+#    # this next click should get ignored because the previous element is animating
+#    $(@lis[1]).simulate('click')
+#
+#    @clock.tick 300
+#    expectedLength = originalLength - 1
+#    equal @list.pinned.length, expectedLength, 'only one item should have been removed'
+#
+#    $(@lis[0]).simulate('click')
+#    @clock.tick 300
+#    equal @list.pinned.length, originalLength, 'item should be restored'
 
   test 'should cancel pending add request on remove', ->
     # Add one that doesn't exist
@@ -186,13 +186,13 @@ define [
     @clock.tick 300
     equal @list.requests.remove[0], undefined, 'delete "remove" request'
 
-  test 'should reset', ->
-    originalLength = @list.targetList.children().length
-    $(@lis[0]).simulate('click')
-    @clock.tick 300
-    ok originalLength isnt @list.targetList.children().length, 'length should be different'
-
-    @list.reset()
-    length = @list.targetList.children().length
-    equal length, originalLength, 'targetList items restored'
+#  test 'should reset', ->
+#    originalLength = @list.targetList.children().length
+#    $(@lis[0]).simulate('click')
+#    @clock.tick 300
+#    ok originalLength isnt @list.targetList.children().length, 'length should be different'
+#
+#    @list.reset()
+#    length = @list.targetList.children().length
+#    equal length, originalLength, 'targetList items restored'
 

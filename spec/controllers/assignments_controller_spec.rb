@@ -81,7 +81,7 @@ describe AssignmentsController do
     context "draft state" do
       before do
         course_with_student(:active_all => true)
-        @course.root_account.tap{ |a| a.settings[:enable_draft] = true }.save!
+        @course.root_account.enable_feature!(:draft_state)
       end
 
       it "should create a default group if none exist" do
@@ -90,6 +90,15 @@ describe AssignmentsController do
         get 'index', :course_id => @course.id
 
         @course.reload.assignment_groups.count.should == 1
+      end
+
+      it "should separate manage_assignments and manage_grades permissions" do
+        course_with_teacher_logged_in active_all: true
+        @course.account.role_overrides.create! enrollment_type: 'TeacherEnrollment', permission: 'manage_assignments', enabled: false
+        get 'index', course_id: @course.id
+        assigns[:js_env][:PERMISSIONS][:manage_grades].should be_true
+        assigns[:js_env][:PERMISSIONS][:manage_assignments].should be_false
+        assigns[:js_env][:PERMISSIONS][:manage].should be_false
       end
     end
 
@@ -256,7 +265,7 @@ describe AssignmentsController do
 
     it "should default to unpublished for draft state" do
       course_with_student(:active_all => true)
-      @course.root_account.tap{ |a| a.settings[:enable_draft] = true }.save!
+      @course.root_account.enable_feature!(:draft_state)
       @course.require_assignment_group
 
       get 'new', :course_id => @course.id
@@ -298,6 +307,20 @@ describe AssignmentsController do
       a.discussion_topic.should_not be_nil
       a.discussion_topic.user_id.should eql(@teacher.id)
     end
+
+    it "should default to published if draft state is disabled" do
+      Account.default.disable_feature!(:draft_state)
+      course(:active_all => true)
+      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
+      assigns[:assignment].should be_published
+    end
+
+    it "should default to unpublished if draft state is enabled" do
+      Account.default.enable_feature!(:draft_state)
+      course(:active_all => true)
+      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
+      assigns[:assignment].should be_unpublished
+    end
   end
   
   describe "GET 'edit'" do
@@ -321,8 +344,10 @@ describe AssignmentsController do
       course_with_teacher_logged_in(:active_all => true)
       course_assignment
       get 'edit', :course_id => @course.id, :id => @assignment.id
-      assigns[:js_env][:ASSIGNMENT].should ==
-        subject.send(:assignment_json,@assignment,assigns[:current_user],session)
+      expected_assignment_json = subject.send(:assignment_json, @assignment,
+        assigns[:current_user], session)
+      expected_assignment_json[:has_submitted_submissions] = @assignment.has_submitted_submissions?
+      assigns[:js_env][:ASSIGNMENT].should == Api.recursively_stringify_json_ids(expected_assignment_json)
       assigns[:js_env][:ASSIGNMENT_OVERRIDES].should ==
         subject.send(:assignment_overrides_json,
                      @assignment.overrides_visible_to(assigns[:current_user]))

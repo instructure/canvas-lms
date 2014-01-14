@@ -57,21 +57,25 @@ config.active_record.observers = [:cacher, :stream_item_cache]
 
 config.autoload_paths += %W(#{Rails.root}/app/middleware
                             #{Rails.root}/app/observers
+                            #{Rails.root}/app/presenters
+                            #{Rails.root}/app/services
+                            #{Rails.root}/app/serializers
                             #{Rails.root}/app/presenters)
 
 if CANVAS_RAILS2
-  config.middleware.insert_after(ActionController::Base.session_store, 'SessionsTimeout')
+  config.middleware.insert_before(ActionController::Base.session_store, 'LoadAccount')
+  config.middleware.insert_before(ActionController::Base.session_store, 'SessionsTimeout')
 else
   # we don't know what middleware to make SessionsTimeout follow until after
   # we've loaded config/initializers/session_store.rb
   initializer("extend_middleware_stack", after: "load_config_initializers") do |app|
-    app.config.middleware.insert_after(config.session_store, 'SessionsTimeout')
+    app.config.middleware.insert_before(config.session_store, 'LoadAccount')
+    app.config.middleware.insert_before(config.session_store, 'SessionsTimeout')
   end
 end
 
 params_parser = CANVAS_RAILS2 ? 'ActionController::ParamsParser' : 'ActionDispatch::ParamsParser'
 config.middleware.insert_before(params_parser, "RequestContextGenerator")
-config.middleware.insert_before(params_parser, 'LoadAccount')
 config.middleware.insert_before(params_parser, 'StatsTiming')
 config.middleware.insert_before(params_parser, 'Canvas::RequestThrottle')
 config.middleware.insert_before(params_parser, 'PreventNonMultipartParse')
@@ -121,6 +125,9 @@ end
 # is switched to Syck (which DelayedJob needs for now). Otherwise we
 # won't have access to (safe|unsafe)_load.
 require 'yaml'
+if RUBY_VERSION >= '2.0.0'
+  require 'syck'
+end
 YAML::ENGINE.yamler = 'syck' if defined?(YAML::ENGINE)
 require 'safe_yaml'
 YAML.enable_symbol_parsing!
@@ -132,6 +139,7 @@ SafeYAML::OPTIONS[:suppress_warnings] = true
 YAML.whitelist.add(*%w[
   tag:ruby.yaml.org,2002:symbol
   tag:yaml.org,2002:map:HashWithIndifferentAccess
+  tag:yaml.org,2002:map:ActiveSupport::HashWithIndifferentAccess
   tag:ruby.yaml.org,2002:object:OpenStruct
   tag:ruby.yaml.org,2002:object:Scribd::Document
   tag:ruby.yaml.org,2002:object:Mime::Type
@@ -167,3 +175,8 @@ else
     Canvas::Reloader.trap_signal
   end
 end
+
+# don't wrap fields with errors with a <div class="fieldWithErrors" />,
+# since that could leak information (e.g. valid vs invalid username on
+# login page)
+config.action_view.field_error_proc = Proc.new { |html_tag, instance| html_tag }

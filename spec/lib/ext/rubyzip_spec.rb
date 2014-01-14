@@ -14,7 +14,7 @@ describe "rubyzip encoding fix patch" do
     tmpzipfile = Tempfile.new('zipfile')
     @zip_path = tmpzipfile.path
     tmpzipfile.close!
-    Zip::ZipFile.open(@zip_path, true) do |arch|
+    Zip::File.open(@zip_path, true) do |arch|
       arch.add @utf8_name, @tmpfile.path
       arch.add @ascii_name, @tmpfile.path
     end
@@ -27,7 +27,7 @@ describe "rubyzip encoding fix patch" do
 
   context "with zip file" do
     before(:each) do
-      @arch = Zip::ZipFile.open(@zip_path, 'r')
+      @arch = Zip::File.open(@zip_path, 'r')
     end
 
     after(:each) do

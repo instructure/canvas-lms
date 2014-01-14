@@ -64,7 +64,7 @@ module UserSearch
     end
 
     if exclude_groups
-      users = users.where(Group.not_in_group_sql_fragment(exclude_groups, false))
+      users = users.where(Group.not_in_group_sql_fragment(exclude_groups))
     end
 
     users

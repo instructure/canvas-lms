@@ -38,7 +38,7 @@ class ErrorsController < ApplicationController
       @reports = @reports.where(:category => params[:category])
     end
 
-    @reports = @reports.paginate(:per_page => PER_PAGE, :page => params[:page], :order => 'id DESC', :without_count => true)
+    @reports = @reports.order('created_at DESC').paginate(:per_page => PER_PAGE, :page => params[:page], :total_entries => nil)
   end
 
   def show

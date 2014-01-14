@@ -48,8 +48,7 @@ define [
     edit: ->
       @form.addClass 'replying'
       @discussionEntry.addClass 'replying'
-      @textArea.editorBox tinyOptions: width: '100%'
-      setTimeout (=> @textArea.editorBox 'focus'), 20 if @options.focus
+      @textArea.editorBox focus: true, tinyOptions: width: '100%'
       @editing = true
       @trigger 'edit', this
 
@@ -65,6 +64,7 @@ define [
       @textArea.val @content
       @editing = false
       @trigger 'hide', this
+      @discussionEntry.find('.discussion-reply-action').focus()
 
     hideNotification: =>
       @view.model.set 'notification', ''

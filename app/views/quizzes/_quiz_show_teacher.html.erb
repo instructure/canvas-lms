@@ -112,7 +112,7 @@
         </label>
         <div class="controls">
           <span class="value">
-            <%= @quiz.show_correct_answers ? t('#options.yes', "Yes") : t('#options.no', "No") %>
+            <%= render_show_correct_answers(@quiz) %>
           </span>
         </div>
       </div>

@@ -721,9 +721,6 @@ describe "Canvas Cartridge importing" do
     asmnt_2.peer_reviews.should == asmnt.peer_reviews
     asmnt_2.anonymous_peer_reviews.should == asmnt.peer_reviews
     asmnt_2.peer_review_count.should == asmnt.peer_review_count
-    asmnt_2.mastery_score.should be_nil
-    asmnt_2.max_score.should be_nil
-    asmnt_2.min_score.should be_nil
     asmnt_2.freeze_on_copy.should == true
     asmnt_2.copied.should == true
   end

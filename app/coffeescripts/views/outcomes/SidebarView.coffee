@@ -40,6 +40,7 @@ define [
 
     # options must include rootOutcomeGroup or directoryView
     initialize: (opts) ->
+      super
       @readOnly = opts.readOnly
       @selectFirstItem = opts.selectFirstItem
       @directories = []

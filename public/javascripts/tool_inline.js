@@ -17,27 +17,69 @@
  */
 define(['jquery', 'jquery.google-analytics'], function($) {
 
-if(!$("#tool_form").hasClass('new_tab')) {
-  $("#content").addClass('padless');
-} else {
-  var $button = $("#tool_form button");
+var $toolForm = $("#tool_form")
+
+var launchToolManually = function(){
+  var $button = $toolForm.find('button');
+
+  $toolForm.show();
+
   // Firefox remembers disabled state after page reloads
   $button.attr('disabled', false);
   setTimeout(function() {
     // LTI links have a time component in the signature and will
-    // expire after a few minutes. 
+    // expire after a few minutes.
     $button.attr('disabled', true).text($button.data('expired_message'));
-  }, 60 * 2.5 * 1000)
-  $("#tool_form").submit(function() {
+  }, 60 * 2.5 * 1000);
+
+
+  $toolForm.submit(function() {
     $(this).find(".load_tab,.tab_loaded").toggle();
   });
 }
 
-var toolName = $("#tool_form").attr('data-tool-id') || "unknown";
-var toolPath = $("#tool_form").attr('data-tool-path');
+var launchToolInNewTab = function(){
+  $toolForm.attr('target', '_blank');
+  launchToolManually();
+}
+
+switch($toolForm.data('tool-launch-type')){
+  case 'window':
+    $toolForm.show();
+    launchToolInNewTab();
+    break;
+  case 'self':
+    $toolForm.removeAttr('target')
+    try {
+      $toolForm.submit();
+    } catch(e){}
+    break;
+  default:
+    //Firefox throws an error when submitting insecure content
+    try {
+      $toolForm.submit();
+    } catch(e){}
+
+    $("#tool_content").bind("load", function(){
+      $("#content").addClass('padless');
+      $('#insecure_content_msg').hide();
+      $toolForm.hide();
+    });
+    setTimeout(function(){
+      if($('#insecure_content_msg').is(":visible")){
+        $('#load_failure').show()
+        launchToolInNewTab();
+      }
+    }, 3 * 1000);
+    break;
+}
+
+//Google analytics tracking code
+var toolName = $toolForm.data('tool-id') || "unknown";
+var toolPath = $toolForm.data('tool-path');
 $.trackEvent('tool_launch', toolName, toolPath);
 
-$("#tool_form:not(.new_tab)").submit().hide();
+//Iframe resize handler
 $(document).ready(function() {
   if($("#tool_content").length) {
     $(window).resize(function() {

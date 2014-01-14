@@ -24,7 +24,7 @@ describe 'DataFixup::ResetUngradedCounts' do
     assignment_model
 
     # teacher with a submission 
-    s = Assignment.find_or_create_submission(@assignment.id, @teacher.id)
+    s = @assignment.find_or_create_submission(@teacher)
     s.submission_type = 'online_quiz'
     s.workflow_state = 'submitted'
     s.save!

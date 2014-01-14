@@ -25,6 +25,7 @@ module Guard
           EmberHbs.compile_file path
         rescue Exception => e
           ::Guard::Notifier.notify(e.to_s, :title => path, :image => :failed)
+          UI.error "Error compiling: #{path}\n#{e}"
         end
       end
     end

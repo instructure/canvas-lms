@@ -61,6 +61,8 @@ module CC::Importer::Canvas
       quiz['lock_at'] = get_time_val(doc, 'lock_at')
       quiz['unlock_at'] = get_time_val(doc, 'unlock_at')
       quiz['due_at'] = get_time_val(doc, 'due_at')
+      quiz['show_correct_answers_at'] = get_time_val(doc, 'show_correct_answers_at')
+      quiz['hide_correct_answers_at'] = get_time_val(doc, 'hide_correct_answers_at')
       quiz['time_limit'] = get_int_val(doc, 'time_limit')
       quiz['allowed_attempts'] = get_int_val(doc, 'allowed_attempts')
       ['could_be_locked','anonymous_submissions','show_correct_answers',

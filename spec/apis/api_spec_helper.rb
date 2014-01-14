@@ -18,6 +18,14 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+unless CANVAS_RAILS2
+  RSpec::configure do |c|
+    c.include RSpec::Rails::RequestExampleGroup, :type => :request, :example_group => {
+        :file_path => c.escaped_path(%w[spec apis])
+    }
+  end
+end
+
 class HashWithDupCheck < Hash
   def []=(k,v)
     if self.key?(k)
@@ -100,11 +108,12 @@ end
 def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   path = path.sub(%r{\Ahttps?://[^/]+}, '') # remove protocol+host
   enable_forgery_protection do
-    params_from_with_nesting(method, path).should == params
+    params_from_with_nesting(method, path).each{|k, v| params[k].to_s.should == v.to_s}
 
-    if !params.key?(:api_key) && !params.key?(:access_token) && !headers.key?('Authorization') && @user
+    headers['HTTP_AUTHORIZATION'] = headers['Authorization'] if headers.key?('Authorization')
+    if !params.key?(:api_key) && !params.key?(:access_token) && !headers.key?('HTTP_AUTHORIZATION') && @user
       token = access_token_for_user(@user)
-      headers['Authorization'] = "Bearer #{token}"
+      headers['HTTP_AUTHORIZATION'] = "Bearer #{token}"
       account = opts[:domain_root_account] || Account.default
       Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
       account.pseudonyms.create!(:unique_id => "#{@user.id}@example.com", :user => @user) unless @user.all_active_pseudonyms(:reload) && @user.find_pseudonym_for_account(account, true)
@@ -127,7 +136,8 @@ end
 
 def params_from_with_nesting(method, path)
   path, querystring = path.split('?')
-  params = ActionController::Routing::Routes.recognize_path(path, :method => method)
+  params = CANVAS_RAILS2 ? ActionController::Routing::Routes.recognize_path(path, :method => method) :
+    CanvasRails::Application.routes.recognize_path(path, :method => method)
   querystring.blank? ? params : params.merge(Rack::Utils.parse_nested_query(querystring).symbolize_keys!)
 end
 
@@ -177,4 +187,65 @@ def verify_json_error(error, field, code, message = nil)
   error["field"].should == field
   error["code"].should == code
   error["message"].should == message if message
+end
+
+
+# Assert the provided JSON hash complies with the JSON-API format specification.
+#
+# The following tests will be carried out:
+#
+#   - all resource entries must be wrapped inside arrays, even if the set
+#     includes only a single resource entry
+#   - when associations are present, a "meta" entry should be present and
+#     it should indicate the primary set in the "primaryCollection" key
+#
+# @param [Hash] json
+#   The JSON construct to test.
+#
+# @param [String] primary_set
+#   Name of the primary resource the construct represents, i.e, the model
+#   the API endpoint represents, like 'quiz', 'assignment', or 'submission'.
+#
+# @param [Array<String>] associations
+#   An optional set of associated resources that should be included with
+#   the primary resource (e.g, a user, an assignment, a submission, etc.).
+#
+# @example Testing a Quiz API model:
+#   test_jsonapi_compliance!(json, 'quiz')
+#
+# @example Testing a Quiz API model with its assignment included:
+#   test_jsonapi_compliance!(json, 'quiz', [ 'assignment' ])
+#
+# @example A complying construct of a Quiz Submission with its Assignment:
+#
+#     {
+#       "quiz_submissions": [{
+#         "id": 10,
+#         "assignment_id": 5
+#       }],
+#       "assignments": [{
+#         "id": 5
+#       }],
+#       "meta": {
+#         "primaryCollection": "quiz_submissions"
+#       }
+#     }
+#
+def assert_jsonapi_compliance(json, primary_set, associations = [])
+  required_keys =  [ primary_set ]
+
+  if associations.any?
+    required_keys.concat associations.map { |s| s.pluralize }
+    required_keys << 'meta'
+  end
+
+  required_keys.each do |key|
+    json.should be_has_key(key)
+    json[key].is_a?(Array).should be_true unless key == 'meta'
+  end
+  json.size.should == required_keys.size
+
+  if associations.any?
+    json['meta']['primaryCollection'].should == primary_set
+  end
 end

@@ -23,10 +23,10 @@ define [
     @optionProperty 'name'
 
     initialize: ->
+      super
       @render()
       @$el.appendTo $(document.body)
       @tour = new Usher @$el
-      super
 
     start: =>
       @tour.start()

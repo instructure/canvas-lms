@@ -49,6 +49,10 @@ module Api::V1::Assignment
     )
   }
 
+  def assignments_json(assignments, user, session, opts = {})
+    assignments.map{ |assignment| assignment_json(assignment, user, session, opts) }
+  end
+
   def assignment_json(assignment, user, session, opts = {})
     opts.reverse_merge!(
       include_discussion_topic: true,
@@ -167,9 +171,9 @@ module Api::V1::Assignment
       hash['module_ids'] = module_ids
     end
 
-    if assignment.context.draft_state_enabled?
+    if assignment.context.feature_enabled?(:draft_state)
       hash['published'] = ! assignment.unpublished?
-      hash['unpublishable'] = !assignment.has_student_submissions?
+      hash['unpublishable'] = assignment.can_unpublish?
     end
 
     if submission = opts[:submission]
@@ -246,6 +250,8 @@ module Api::V1::Assignment
     overrides = deserialize_overrides(assignment_params.delete(:assignment_overrides))
     return if overrides && !overrides.is_a?(Array)
 
+    return false unless valid_assignment_group_id?(assignment, assignment_params)
+
     assignment = update_from_params(assignment, assignment_params)
 
     if overrides
@@ -261,6 +267,17 @@ module Api::V1::Assignment
     return true
   rescue ActiveRecord::RecordInvalid
     return false
+  end
+
+  def valid_assignment_group_id?(assignment, assignment_params)
+    ag_id = assignment_params["assignment_group_id"].presence
+    # if ag_id is a non-numeric string, ag_id.to_i will == 0
+    if ag_id and ag_id.to_i <= 0
+      assignment.errors.add('assignment[assignment_group_id]', I18n.t(:not_a_number, "must be a positive number"))
+      false
+    else
+      true
+    end
   end
 
   def update_from_params(assignment, assignment_params)
@@ -323,7 +340,7 @@ module Api::V1::Assignment
       update_params["description"] = process_incoming_html_content(update_params["description"])
     end
 
-    if assignment.context.draft_state_enabled?
+    if assignment.context.feature_enabled?(:draft_state)
       if assignment_params.has_key? "published"
         published = value_to_boolean(assignment_params['published'])
         assignment.workflow_state = published ? 'published' : 'unpublished'

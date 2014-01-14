@@ -104,9 +104,16 @@ module TextHelper
         [a-z0-9.\-]+[.][a-z]{2,4}/               # looks like domain name followed by a slash
       )
 
-      [^\s()<>]+                                 # Run of non-space, non-()<>
-
-      [^\s`!()\[\]{};:'".,<>?«»“”‘’]             # End with: not a space or one of these punct chars
+      (?:
+        [^\s()<>]+                               # Run of non-space, non-()<>
+        |                                        # or
+        \([^\s()<>]*\)                           # balanced parens, single level
+      )+
+      (?:
+        \([^\s()<>]*\)                           # balanced parens, single level
+        |                                        # or
+        [^\s`!()\[\]{};:'".,<>?«»“”‘’]           # End with: not a space or one of these punct chars
+      )
     ) | (
       #{AUTO_LINKIFY_PLACEHOLDER}
     )
@@ -470,7 +477,7 @@ def self.date_component(start_date, style=:normal)
     result = RDiscount.new(string).to_html.strip
     # Strip wrapping <p></p> if inlinify == :auto && they completely wrap the result && there are not multiple <p>'s
     result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>.*<\/p>\z/m && !(result =~ /.*<p>.*<p>.*/m)
-    result.html_safe.strip
+    result.strip.html_safe
   end
 
   # This doesn't make any attempt to convert other encodings to utf-8, it just

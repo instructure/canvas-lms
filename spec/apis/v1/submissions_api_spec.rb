@@ -223,6 +223,41 @@ describe 'Submissions API', :type => :integration do
               :assignment_id => @a1.id.to_s })
       response.status.should == "404 Not Found" # rather than 401 unauthorized
     end
+
+    context 'submission comment attachments' do
+      before do
+        course_with_student_logged_in(active_all: true)
+        @assignment = @course.assignments.create! name: "blah",
+          submission_types: "online_upload"
+        @attachment = Attachment.create! context: @assignment,
+          user: @student,
+          filename: "cats.jpg",
+          uploaded_data: StringIO.new("meow?")
+      end
+
+      def put_comment_attachment
+        raw_api_call :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/",
+          {controller: 'submissions_api', action: 'update', format: 'json',
+           course_id: @course.to_param, assignment_id: @assignment.to_param,
+           user_id: @student.to_param},
+          comment: {file_ids: [@attachment.id]}
+      end
+
+      it "doesn't let you attach files you don't have permission for" do
+        course_with_student_logged_in(course: @course, active_all: true)
+        put_comment_attachment
+        response.status.should == '401 Unauthorized'
+      end
+
+      it 'works' do
+        put_comment_attachment
+        response.should be_success
+        @assignment.submission_for_student(@student)
+        .submission_comments.first
+        .attachment_ids.should == @attachment.id.to_s
+      end
+    end
   end
 
   it "should return student discussion entries for discussion_topic assignments" do

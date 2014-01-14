@@ -14,26 +14,10 @@
   </a>
 
   <div class="ig-details row-fluid">
-    <div class="span4 ellipses description">
-      {{#if multiple_due_dates}}
-        <strong>{{#t "quiz_due"}}Due{{/t}}</strong>
-        {{> vddTooltip}}
-
-      {{else}}
-        {{#if due_at}}
-        <strong>{{#t "quiz_due"}}Due{{/t}}</strong> {{tDateToString due_at "date_at_time"}}
-        {{/if}}
-      {{/if}}
-    </div>
-
-    <div class="span3 ellipses">{{question_count_label}}</div>
-
-    <div class="span3 ellipses">
-      {{#if unlock_at}}
-      <strong>{{#t "quiz_available"}}Available{{/t}}</strong> {{tDateToString unlock_at "short"}}
-      {{/if}}
-    </div>
+    <div class="span4 ellipses date-available" data-view="date-available"></div>
+    <div class="span4 ellipses date-due" data-view="date-due"></div>
     <div class="span2 ellipses">{{possible_points_label}}</div>
+    <div class="span2 ellipses">{{question_count_label}}</div>
   </div>
 
   {{#if can_update}}

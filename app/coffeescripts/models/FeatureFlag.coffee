@@ -33,7 +33,7 @@ define ['underscore', 'Backbone'], (_, Backbone) ->
       if forDisplay then cond1 or cond2 else cond1
 
     isHidden: ->
-      @get('state') == 'hidden'
+      @get('hidden')
 
     isSiteAdmin: ->
       !!ENV.ACCOUNT?.site_admin
@@ -61,7 +61,7 @@ define ['underscore', 'Backbone'], (_, Backbone) ->
       feature.flag = json.feature_flag if json.feature_flag
       feature.state = json.feature_flag.state if json.feature_flag
       feature.labels.push(FeatureFlag::LABEL.beta)   if json.beta
-      feature.labels.push(FeatureFlag::LABEL.hidden) if feature.state == 'hidden'
+      feature.labels.push(FeatureFlag::LABEL.hidden) if json.hidden
       feature.labels.push(FeatureFlag::LABEL.dev)    if json.development
       console.log(feature.labels)
       _.extend(json, feature)

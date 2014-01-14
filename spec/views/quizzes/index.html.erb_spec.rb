@@ -34,9 +34,7 @@ describe "/quizzes/index" do
   end
 
   it "with draft state enabled should render" do
-    a = Account.default
-    a.settings[:enable_draft] = true
-    a.save!
+    Account.default.enable_feature!(:draft_state)
 
     course_with_student
     view_context

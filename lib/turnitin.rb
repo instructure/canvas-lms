@@ -115,7 +115,8 @@ module Turnitin
         valid_keys << :created
         settings = settings.slice(*valid_keys)
 
-        settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date'].include?(settings[:originality_report_visibility])
+        settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date', 'never'].include?(settings[:originality_report_visibility])
+        settings[:s_view_report] =  determine_student_visibility(settings[:originality_report_visibility])
 
         [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted].each do |key|
           bool = Canvas::Plugin.value_to_boolean(settings[key])
@@ -132,7 +133,16 @@ module Turnitin
       end
       settings
     end
-    
+
+    def self.determine_student_visibility(originality_report_visibility)
+      case originality_report_visibility
+      when 'immediate', 'after_grading', 'after_due_date'
+        "1"
+      when 'never'
+        "0"
+      end
+    end
+
     def createOrUpdateAssignment(assignment, settings)
       course = assignment.context
       today = (Time.now.utc - 1.day).to_date # buffer by a day until we figure out what turnitin is doing with timezones
@@ -147,7 +157,6 @@ module Turnitin
         :dtstart => "#{today.strftime} 00:00:00", 
         :dtdue => "#{today.strftime} 00:00:00", 
         :dtpost => "#{today.strftime} 00:00:00", 
-        :s_view_report => "1", 
         :late_accept_flag => '1',
         :post => true
       }))
@@ -253,7 +262,7 @@ module Turnitin
       course = assignment.context
       sendRequest(:list_papers, 2, :assignment => assignment, :course => course, :user => course, :utp => '1', :tem => email(course))
     end
-    
+
     # From the turnitin api docs: To calculate the MD5, concatenate the data
     # values associated with the URL variables of ALL variables being sent, in
     # alphabetical order according to variable name, being sure to include at

@@ -88,7 +88,7 @@ define [
     # @api public
 
     initialize: (options) ->
-      @options = _.extend {}, @defaults, @options, options
+      @options = _.extend {}, @defaults, options
       @setOptionProperties()
       @storeChildrenViews()
       @$el.data 'view', this
@@ -219,6 +219,7 @@ define [
       else
         @options
       json.cid = @cid
+      json.ENV = window.ENV if window.ENV?
       json
 
     ##

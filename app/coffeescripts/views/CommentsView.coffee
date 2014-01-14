@@ -17,6 +17,7 @@ define [
       'click [data-delete-comment]': 'deleteComment'
 
     initialize: ->
+      super
       @render()
       @model.entries.on 'all', @render
 

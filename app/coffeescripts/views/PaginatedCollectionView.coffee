@@ -38,6 +38,7 @@ define [
       '.paginatedLoadingIndicator': '$loadingIndicator'
     )
 
+    @optionProperty 'scrollableElement'
     @optionProperty 'scrollContainer'
 
     ##
@@ -75,6 +76,10 @@ define [
     # @api private
 
     initScrollContainer: ->
+      @$scrollableElement = if @scrollableElement
+        $ @scrollableElement
+      else
+        @$el
       @scrollContainer = $ @scrollContainer
       @heightContainer = if @scrollContainer[0] is window
         # window has no position
@@ -108,8 +113,8 @@ define [
 
     checkScroll: =>
       return if @collection.fetchingPage or @collection.fetchingNextPage or not @$el.length
-      elementBottom = @$el.position().top +
-        @$el.height() -
+      elementBottom = @$scrollableElement.position().top +
+        @$scrollableElement.height() -
         @heightContainer.position().top
       distanceToBottom = elementBottom -
         @scrollContainer.scrollTop() -
@@ -152,4 +157,3 @@ define [
 
     showLoadingIndicator: =>
       @$loadingIndicator?.show()
-

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,6 +19,59 @@
 # @API SIS Imports
 #
 # API for importing data from Student Information Systems
+#
+# @object SisImport
+#     {
+#       // The unique identifier for the SIS import.
+#       "id": 1,
+#
+#       // The date the SIS import was created.
+#       "created_at": "2013-12-01T23:59:00-06:00",
+#
+#       // The date the SIS import finished.
+#       // Returns null if not finished.
+#       "ended_at": "2013-12-02T00:03:21-06:00",
+#
+#       // The date the SIS import was last updated.
+#       "updated_at": "2013-12-02T00:03:21-06:00",
+#
+#       // The current state of the SIS import.
+#       // - 'created': The SIS import has been created.
+#       // - 'imported': The SIS import is currently processing.
+#       // - 'imported': The SIS import has completed successfully.
+#       // - 'imported_with_messages': The SIS import completed with errors or warnings.
+#       // - 'failed_with_messages': The SIS import failed with errors.
+#       // - 'failed': The SIS import failed.
+#       "workflow_state": "imported",
+#
+#       // data
+#       "data": {
+#         // The type of SIS import
+#       "import_type": "instructure_csv",
+#
+#         // Which file were included in the SIS import
+#       "supplied_batches": ["term", "course", "section", "user", "enrollment"],
+#
+#         // The number of rows processed for each type of import
+#       "counts": {
+#         "accounts": 0,
+#         "terms": 3,
+#         "abstract_courses": 0,
+#         "courses": 121,
+#         "sections": 278,
+#         "xlists": 0,
+#         "users": 346,
+#         "enrollments": 1542,
+#         "groups": 0,
+#         "group_memberships": 0,
+#         "grade_publishing_results": 0
+#         }
+#       },
+#
+#       // The progress of the SIS import.
+#       "progress": "100"
+#     }
+#
 class SisImportsApiController < ApplicationController
   before_filter :get_context
   before_filter :check_account
@@ -26,6 +79,22 @@ class SisImportsApiController < ApplicationController
   def check_account
     raise "SIS imports can only be executed on root accounts" unless @account.root_account?
     raise "SIS imports can only be executed on enabled accounts" unless @account.allow_sis_import
+  end
+
+  # @API Get SIS import list
+  #
+  # Returns the list of SIS imports for an account
+  #
+  #   Examples:
+  #     curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports' \ 
+  #         -H "Authorization: Bearer <token>"
+  #
+  # @returns [SisImport]
+  def index
+    if authorized_action(@account, @current_user, :manage_sis)
+      @batches = Api.paginate(@account.sis_batches.order('created_at DESC'), self, url_for({action: :index, controller: :sis_imports_api}))
+      render :json => ({ sis_imports: @batches})
+    end
   end
 
   # @API Import SIS data
@@ -106,6 +175,8 @@ class SisImportsApiController < ApplicationController
   #   by this import. Requires that 'override_sis_stickiness' is also provided.
   #   If 'add_sis_stickiness' is also provided, 'clear_sis_stickiness' will
   #   overrule the behavior of 'add_sis_stickiness'
+  #
+  # @returns SisImport
   def create
     if authorized_action(@account, @current_user, :manage_sis)
       params[:import_type] ||= 'instructure_csv'
@@ -190,6 +261,12 @@ class SisImportsApiController < ApplicationController
   # @API Get SIS import status
   #
   # Get the status of an already created SIS import.
+  #
+  #   Examples:
+  #     curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<sis_import_id>' \ 
+  #         -H "Authorization: Bearer <token>"
+  #
+  # @returns SisImport
   def show
     if authorized_action(@account, @current_user, :manage_sis)
       @batch = SisBatch.find(params[:id])

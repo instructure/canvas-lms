@@ -186,7 +186,7 @@ class MessageableUser
         # to return a bookmark-paginated collection, so we craft an empty scope
         # by default
         scope = messageable_users_in_context_scope(options.delete(:context), options)
-        scope = search_scope(scope, options[:search], global_exclude_ids)
+        scope = search_scope(scope, options[:search], global_exclude_ids) if scope
         scope ||= MessageableUser.where('?', false)
         bookmark(scope)
       else
@@ -416,14 +416,10 @@ class MessageableUser
           :include_concluded_students => false,
           :course_workflow_state => course.workflow_state))
         scope =
-          if options[:admin_context]
-            scope.where(full_visibility_clause([course]))
-          else
-            case course_visibility(course)
-            when :full then scope.where(full_visibility_clause([course]))
-            when :sections then scope.where(section_visibility_clause([course]))
-            when :restricted then scope.where(restricted_visibility_clause([course]))
-            end
+          case course_visibility(course)
+          when :full then scope.where(full_visibility_clause([course]))
+          when :sections then scope.where(section_visibility_clause([course]))
+          when :restricted then scope.where(restricted_visibility_clause([course]))
           end
         scope = scope.where(observer_restriction_clause) if student_courses.present?
         scope = scope.where('enrollments.type' => enrollment_types) if enrollment_types

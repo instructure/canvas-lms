@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "courses" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context "as a teacher" do
 
@@ -106,10 +106,13 @@ describe "courses" do
     it "should redirect to the gradebook when switching courses when viewing a students grades" do
       teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
       student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
-      course1 = course_with_teacher_logged_in(:user => teacher, :active_all => 1).course
-      student_in_course :user => student, :active_all => 1
-      course2 = course_with_teacher(:user => teacher, :active_all => 1).course
-      student_in_course :user => student, :active_all => 1
+
+      course1 = course_with_teacher_logged_in(:user => teacher, :active_all => 1, :course_name => 'course1').course
+      student_in_course(:user => student, :active_all => 1)
+
+      course2 = course_with_teacher(:user => teacher, :active_all => 1, :course_name => 'course2').course
+      student_in_course(:user => student, :active_all => 1)
+
       create_session(student.pseudonyms.first, false)
 
       get "/courses/#{course1.id}/grades/#{student.id}"
@@ -117,11 +120,9 @@ describe "courses" do
       select = f('#course_url')
       options = select.find_elements(:css, 'option')
       options.length.should == 2
-      select.click
       wait_for_ajaximations
-      find_with_jquery('#course_url option:not([selected])').click
-
-      driver.current_url.should match %r{/courses/#{course2.id}/grades}
+      expect_new_page_load{ click_option('#course_url', course2.name) }
+      f('#section-tabs-header').text.should match course2.name
     end
 
     it "should load the users page using ajax" do

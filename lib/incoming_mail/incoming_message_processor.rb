@@ -277,6 +277,10 @@ module IncomingMail
           return [match[1], match[2].to_i]
         end
       end
+
+      # if no match is found, return false secure_id and outgoing_message_id
+      # so that self.process message stops processing.
+      [false, false]
     end
 
     def self.ndr(original_message, incoming_message, error, account)

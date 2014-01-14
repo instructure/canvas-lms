@@ -43,6 +43,7 @@ define [
 
     click: (event) ->
       event.preventDefault()
+      event.stopPropagation()
       return if @isDisabled()
       @keepState = true
       if @isPublish()
@@ -105,6 +106,7 @@ define [
 
     render: ->
       @$el.attr 'role', 'button'
+      @$el.attr 'tabindex', '0'
       @$el.html '<i></i><span class="publish-text"></span>'
       @cacheEls()
 
@@ -175,4 +177,5 @@ define [
       else
         @disable()
         @$el.attr 'aria-disabled', true
+        @$el.attr 'title', @model.disabledMessage()
         @addAriaLabel(@model.disabledMessage())

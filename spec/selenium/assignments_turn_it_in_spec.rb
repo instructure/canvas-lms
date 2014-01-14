@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "assignments turn it in" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     course_with_teacher_logged_in
@@ -49,7 +49,8 @@ describe "assignments turn it in" do
         'exclude_biblio' => '0',
         'exclude_quoted' => '0',
         'exclude_type' => '1',
-        'exclude_value' => '5'
+        'exclude_value' => '5',
+        's_view_report' => '1'
     }
   end
 

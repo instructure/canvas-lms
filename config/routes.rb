@@ -118,13 +118,6 @@ routes.draw do
     match 'users/:id' => 'context#roster_user', :as => :user, :via => :get
   end
 
-  concern :chats do
-    resources :chats
-    match 'chat' => 'context#chat', :as => :chat
-    match 'tinychat.html' => 'context#chat_iframe', :as => :tinychat
-    match 'chat.:format' => 'context#chat', :as => :formatted_chat
-  end
-
   concern :announcements do
     resources :announcements
     match 'announcements/external_feeds' => 'announcements#create_external_feed', :as => :announcements_external_feeds, :via => :post
@@ -242,7 +235,11 @@ routes.draw do
       end
     end
 
-    resource :gradebook2, :controller => :gradebook2
+    resource :gradebook2, :controller => :gradebook2 do
+      collection do
+        get :screenreader
+      end
+    end
     match 'attendance' => 'gradebooks#attendance', :as => :attendance
     match 'attendance/:user_id' => 'gradebooks#attendance', :as => :attendance_user
     concerns :zip_file_imports
@@ -255,7 +252,6 @@ routes.draw do
     match 'grading_rubrics' => 'gradebooks#grading_rubrics', :as => :grading_rubrics
     match 'grades/:id' => 'gradebooks#grade_summary', :as => :student_grades
     concerns :announcements
-    concerns :chats
     match 'calendar' => 'calendars#show', :as => :old_calendar
     match 'locks' => 'courses#locks', :as => :locks
     concerns :discussions
@@ -320,14 +316,14 @@ routes.draw do
     resources :quizzes do
       match 'managed_quiz_data' => 'quizzes#managed_quiz_data', :as => :managed_quiz_data
       match 'submission_versions' => 'quizzes#submission_versions', :as => :submission_versions
-      match 'reorder' => 'quizzes#reorder', :as => :reorder
       match 'history' => 'quizzes#history', :as => :history
       match 'statistics' => 'quizzes#statistics', :as => :statistics
       match 'read_only' => 'quizzes#read_only', :as => :read_only
-      match 'filters' => 'quizzes#filters', :as => :filters
+
       collection do
         get :fabulous_quizzes
       end
+
       resources :quiz_submissions, :path => :submissions do
         collection do
           put :backup
@@ -341,7 +337,9 @@ routes.draw do
       match 'extensions/:user_id' => 'quiz_submissions#extensions', :as => :extensions, :via => :post
       resources :quiz_questions, :path => :questions, :only => ["create", "update", "destroy", "show"]
       resources :quiz_groups, :path => :groups, :only => ["create", "update", "destroy"] do
-        match 'reorder' => 'quiz_groups#reorder', :as => :reorder
+        member do
+          post :reorder
+        end
       end
 
       match 'take' => 'quizzes#show', :as => :take, :take => '1'
@@ -495,7 +493,6 @@ routes.draw do
     concerns :announcements
     concerns :discussions
     resources :calendar_events
-    concerns :chats
     concerns :files, :file_images, :relative_files, :folders
     concerns :zip_file_imports
 
@@ -542,7 +539,7 @@ routes.draw do
 
     match 'avatars' => 'accounts#avatars', :as => :avatars
     match 'sis_import' => 'accounts#sis_import', :as => :sis_import, :via => :get
-    resources :sis_imports, :only => [:create, :show], :controller => :sis_imports_api
+    resources :sis_imports, :only => [:create, :show, :index], :controller => :sis_imports_api
     match 'users' => 'users#create', :as => :add_user, :via => :post
     match 'users/:user_id/delete' => 'accounts#confirm_delete_user', :as => :confirm_delete_user
     match 'users/:user_id' => 'accounts#remove_user', :as => :delete_user, :via => :delete
@@ -567,7 +564,6 @@ routes.draw do
       match 'resource_selection' => 'external_tools#resource_selection', :as => :resource_selection
     end
 
-    concerns :chats
     match 'outcomes/users/:user_id' => 'outcomes#user_outcome_results', :as => :user_outcomes_results
     resources :outcomes do
       match 'results' => 'outcomes#outcome_results', :as => :results
@@ -883,9 +879,16 @@ routes.draw do
     end
 
     scope(:controller => :authentication_audit_api) do
-      get 'audit/authentication/pseudonyms/:pseudonym_id', :action => :for_pseudonym, :path_name => 'audit_authentication_pseudonym'
+      get 'audit/authentication/logins/:login_id', :action => :for_login, :path_name => 'audit_authentication_login'
       get 'audit/authentication/accounts/:account_id', :action => :for_account, :path_name => 'audit_authentication_account'
       get 'audit/authentication/users/:user_id', :action => :for_user, :path_name => 'audit_authentication_user'
+    end
+
+    scope(:controller => :grade_change_audit_api) do
+      get 'audit/grade_change/assignments/:assignment_id', :action => :for_assignment, :path_name => 'audit_grade_change_assignment'
+      get 'audit/grade_change/courses/:course_id', :action => :for_course, :path_name => 'audit_grade_change_course'
+      get 'audit/grade_change/students/:student_id', :action => :for_student, :path_name => 'audit_grade_change_student'
+      get 'audit/grade_change/graders/:grader_id', :action => :for_grader, :path_name => 'audit_grade_change_grader'
     end
 
     scope(:controller => :assignments_api) do
@@ -918,6 +921,9 @@ routes.draw do
       submissions_api("course")
       submissions_api("section", "course_section")
     end
+
+    post '/courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/files',
+      :action => :create_file, :controller => :submission_comments_api
 
     scope(:controller => :gradebook_history_api) do
       get "courses/:course_id/gradebook_history/days", :action => :days, :path_name => 'gradebook_history'
@@ -1013,6 +1019,7 @@ routes.draw do
     scope(:controller => :sis_imports_api) do
       post 'accounts/:account_id/sis_imports', :action => :create
       get 'accounts/:account_id/sis_imports/:id', :action => :show
+      get 'accounts/:account_id/sis_imports', :action => :index
     end
 
     scope(:controller => :users) do
@@ -1041,6 +1048,9 @@ routes.draw do
 
       get 'users/:id/settings', controller: 'users', action: 'settings'
       put 'users/:id/settings', controller: 'users', action: 'settings', path_name: 'user_settings'
+
+      put 'users/:id/merge_into/:destination_user_id', controller: 'users', action: 'merge_into'
+      put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
     end
 
     scope(:controller => :pseudonyms) do
@@ -1053,7 +1063,7 @@ routes.draw do
 
     scope(:controller => :accounts) do
       get 'accounts', :action => :index, :path_name => :accounts
-      get 'accounts/:id', :action => :show
+      get 'accounts/:id', :action => :show, :path_name => :account
       put 'accounts/:id', :action => :update
       get 'accounts/:account_id/courses', :action => :courses_api, :path_name => 'account_courses'
       get 'accounts/:account_id/sub_accounts', :action => :sub_accounts, :path_name => 'sub_accounts'
@@ -1128,6 +1138,17 @@ routes.draw do
       post 'users/:user_id/communication_channels', :action => :create
       delete 'users/:user_id/communication_channels/:id', :action => :destroy
       delete 'users/:user_id/communication_channels/:type/:address', :action => :destroy, :constraints => { :address => %r{[^/?]+} }
+    end
+
+    scope(:controller => :notification_preferences) do
+      get 'users/:user_id/communication_channels/:communication_channel_id/notification_preferences', action: :index
+      get 'users/:user_id/communication_channels/:type/:address/notification_preferences', action: :index, :constraints => { :address => %r{[^/?]+} }
+      get 'users/:user_id/communication_channels/:communication_channel_id/notification_preferences/:notification', action: :show
+      get 'users/:user_id/communication_channels/:type/:address/notification_preferences/:notification', action: :show, :constraints => { :address => %r{[^/?]+} }
+      put 'users/self/communication_channels/:communication_channel_id/notification_preferences/:notification', action: :update
+      put 'users/self/communication_channels/:type/:address/notification_preferences/:notification', action: :update, :constraints => { :address => %r{[^/?]+} }
+      put 'users/self/communication_channels/:communication_channel_id/notification_preferences', action: :update_all
+      put 'users/self/communication_channels/:type/:address/notification_preferences', action: :update_all, :constraints => { :address => %r{[^/?]+} }
     end
 
     scope(:controller => :comm_messages_api) do
@@ -1293,13 +1314,23 @@ routes.draw do
       post "courses/:course_id/quizzes", :action => :create, :path_name => 'course_quiz_create'
       get "courses/:course_id/quizzes/:id", :action => :show, :path_name => 'course_quiz'
       put "courses/:course_id/quizzes/:id", :action => :update, :path_name => 'course_quiz_update'
-      delete "courses/:course_id/quizzes/:id", action: :destroy, path_name: 'course_quiz_destroy'
+      delete "courses/:course_id/quizzes/:id", :action => :destroy, :path_name => 'course_quiz_destroy'
+      post "courses/:course_id/quizzes/:id/reorder", :action => :reorder, :path_name => 'course_quiz_reorder'
     end
 
     scope(:controller => :quiz_groups) do
       post "courses/:course_id/quizzes/:quiz_id/groups", :action => :create, :path_name => 'course_quiz_group_create'
       put "courses/:course_id/quizzes/:quiz_id/groups/:id", :action => :update, :path_name => 'course_quiz_group_update'
       delete "courses/:course_id/quizzes/:quiz_id/groups/:id", :action => :destroy, :path_name => 'course_quiz_group_destroy'
+      post "courses/:course_id/quizzes/:quiz_id/groups/:id/reorder", :action => :reorder, :path_name => 'course_quiz_group_reorder'
+    end
+
+    scope(:controller => :quiz_questions) do
+      get "courses/:course_id/quizzes/:quiz_id/questions", :action => :index, :path_name => 'course_quiz_questions'
+      get "courses/:course_id/quizzes/:quiz_id/questions/:id", :action => :show, :path_name => 'course_quiz_question'
+      post "courses/:course_id/quizzes/:quiz_id/questions", :action => :create, :path_name => 'course_quiz_question_create'
+      put "courses/:course_id/quizzes/:quiz_id/questions/:id", :action => :update, :path_name => 'course_quiz_question_update'
+      delete "courses/:course_id/quizzes/:quiz_id/questions/:id", :action => :destroy, :path_name => 'course_quiz_question_destroy'
     end
 
     scope(:controller => :quiz_reports) do
@@ -1308,7 +1339,19 @@ routes.draw do
     end
 
     scope(:controller => :quiz_submission_files) do
-      post 'courses/:course_id/quizzes/:quiz_id/quiz_submissions/self/files', :action => :create, :path_name => 'quiz_submission_files'
+      post 'courses/:course_id/quizzes/:quiz_id/submissions/self/files', :action => :create, :path_name => 'quiz_submission_files'
+    end
+
+    scope(:controller => :quiz_submissions_api) do
+      get 'courses/:course_id/quizzes/:quiz_id/submissions', :action => :index, :path_name => 'course_quiz_submissions'
+      get 'courses/:course_id/quizzes/:quiz_id/submissions/:id', :action => :show, :path_name => 'course_quiz_submission'
+      post 'courses/:course_id/quizzes/:quiz_id/submissions', :action => :create, :path_name => 'course_quiz_submission_create'
+      put 'courses/:course_id/quizzes/:quiz_id/submissions/:id', :action => :update, :path_name => 'course_quiz_submission_update'
+      post 'courses/:course_id/quizzes/:quiz_id/submissions/:id/complete', :action => :complete, :path_name => 'course_quiz_submission_complete'
+    end
+
+    scope(:controller => :quiz_ip_filters) do
+      get 'courses/:course_id/quizzes/:quiz_id/ip_filters', :action => :index, :path_name => 'course_quiz_ip_filters'
     end
 
     scope(:controller => :outcome_groups_api) do
@@ -1339,6 +1382,10 @@ routes.draw do
       get "outcomes/:id", :action => :show, :path_name => "outcome"
       put "outcomes/:id", :action => :update
       delete "outcomes/:id", :action => :destroy
+    end
+
+    scope(:controller => :outcome_results) do
+      get 'courses/:course_id/outcome_rollups', :action => :rollups, :path_name => 'course_outcome_rollups'
     end
 
     scope(:controller => :group_categories) do
@@ -1375,6 +1422,37 @@ routes.draw do
         put "#{prefix}/flags/:feature", :action => :update
         delete "#{prefix}/flags/:feature", :action => :delete
       end
+    end
+
+    scope(:controller => :conferences) do
+      %w(course group).each do |context|
+        prefix = "#{context}s/:#{context}_id/conferences"
+        get prefix, :action => :index, :path_name => "#{context}_conferences"
+      end
+    end
+
+    scope(:controller => :custom_gradebook_columns_api) do
+      prefix = "courses/:course_id/custom_gradebook_columns"
+      get prefix, :action => :index, :path_name => "course_custom_gradebook_columns"
+      post prefix, :action => :create
+      post "#{prefix}/reorder", :action => :reorder,
+        :path_name => "custom_gradebook_columns_reorder"
+      put "#{prefix}/:id", :action => :update,
+        :path_name => "course_custom_gradebook_column"
+      delete "#{prefix}/:id", :action => :destroy
+    end
+
+    scope(:controller => :custom_gradebook_column_data_api) do
+      prefix = "courses/:course_id/custom_gradebook_columns/:id/data"
+      get prefix, :action => :index, :path_name => "course_custom_gradebook_column_data"
+      put "#{prefix}/:user_id", :action => :update, :path_name => "course_custom_gradebook_column_datum"
+    end
+
+    scope(:controller => :content_exports_api) do
+      prefix = "courses/:course_id/content_exports"
+      get prefix, :action => :index, :path_name => "course_content_exports"
+      post prefix, :action => :create
+      get "#{prefix}/:id", :action => :show
     end
   end
 

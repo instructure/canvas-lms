@@ -177,7 +177,7 @@ class RubricAssessment < ActiveRecord::Base
   end
   
   def assessor_name
-    self.assessor.name rescue t('unknown_user', "Unknown User")
+    self.assessor.short_name rescue t('unknown_user', "Unknown User")
   end
   
   def assessment_url

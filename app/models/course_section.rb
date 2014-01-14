@@ -20,7 +20,8 @@ class CourseSection < ActiveRecord::Base
   include Workflow
 
   attr_protected :sis_source_id, :sis_batch_id, :course_id,
-      :root_account_id, :enrollment_term_id
+      :root_account_id, :enrollment_term_id, :integration_id
+  
   belongs_to :course
   belongs_to :nonxlist_course, :class_name => 'Course'
   belongs_to :root_account, :class_name => 'Account'
@@ -34,9 +35,12 @@ class CourseSection < ActiveRecord::Base
   has_many :users, :through => :enrollments
   has_many :course_account_associations
   has_many :calendar_events, :as => :context
+  has_many :assignment_overrides, :as => :set, :dependent => :destroy
 
   before_validation :infer_defaults, :verify_unique_sis_source_id
   validates_presence_of :course_id, :root_account_id, :workflow_state
+  validates_length_of :sis_source_id, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => false
+  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false
 
   before_save :set_update_account_associations_if_changed
   before_save :maybe_touch_all_enrollments
@@ -128,7 +132,7 @@ class CourseSection < ActiveRecord::Base
   alias_method :parent_event_context, :course
 
   def section_code
-    self.name ||= read_attribute(:section_code)
+    self.name
   end
 
   def infer_defaults
@@ -144,10 +148,6 @@ class CourseSection < ActiveRecord::Base
     # - use the method display_name to consolidate this logic
     self.name ||= self.course.name if self.default_section
     self.name ||= "#{self.course.name} #{Time.zone.today.to_s}"
-    self.section_code ||= self.name
-    if name_had_changed
-      self.section_code = self.name
-    end
   end
 
   def defined_by_sis?
@@ -161,7 +161,7 @@ class CourseSection < ActiveRecord::Base
   # The only place this is used by itself right now is when listing
   # enrollments within a course
   def display_name
-    @section_display_name ||= self.name || self.section_code
+    @section_display_name ||= self.name
   end
 
   def move_to_course(course, *opts)
@@ -172,6 +172,7 @@ class CourseSection < ActiveRecord::Base
     self.default_section = (course.course_sections.active.size == 0)
     old_course.course_sections.reset
     course.course_sections.reset
+    assignment_overrides.active.destroy_all
     user_ids = self.enrollments.map(&:user_id).uniq
 
     old_course_is_unrelated = old_course.id != self.course_id && old_course.id != self.nonxlist_course_id

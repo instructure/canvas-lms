@@ -12,7 +12,8 @@
         >
       {{description}}
     </label>
-  {{else}} {{#if isText}}
+  {{/if}}
+  {{#if isText}}
     <label for="web_conference_user_settings_{{field}}">
       {{description}}
       <input
@@ -22,5 +23,18 @@
         value="{{value}}"
         {{#if ../../conference_started}}disabled="disabled"{{/if}}
         >
-  {{/if}}{{/if}}
+  {{/if}}
+  {{#if isDatePicker}}
+    <label for="web_conference_user_settings_{{field}}">
+      {{description}}
+        <input
+          class="date_entry"
+          id="web_conference_user_settings_{{field}}"
+          name="web_conference[user_settings][{{field}}]"
+          size="30"
+          type="text"
+          value="{{value}}"
+          {{#if ../../conference_started}}disabled="disabled"{{/if}}
+          >
+  {{/if}}
 {{/each}}

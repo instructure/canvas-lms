@@ -41,7 +41,7 @@ describe "Common Cartridge exporting" do
       @ce.export_course_without_send_later
       @ce.error_messages.should == []
       @file_handle = @ce.attachment.open :need_local_file => true
-      @zip_file = Zip::ZipFile.open(@file_handle.path)
+      @zip_file = Zip::File.open(@file_handle.path)
       @manifest_body = @zip_file.read("imsmanifest.xml")
       @manifest_doc = Nokogiri::XML.parse(@manifest_body)
     end

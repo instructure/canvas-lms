@@ -60,9 +60,10 @@
 #     }
 #
 class QuizReportsController < ApplicationController
-  before_filter :require_quiz
-
+  include Api::V1::Helpers::QuizzesApiHelper
   include Api::V1::QuizStatistics
+
+  before_filter :require_context, :require_quiz
 
   # @API Create a quiz report
   #
@@ -100,12 +101,5 @@ class QuizReportsController < ApplicationController
       @stats = @quiz.quiz_statistics.find(params[:id])
       render :json => quiz_statistics_json(@stats, @current_user, session, :include => ['file', 'progress_url'])
     end
-  end
-
-  protected
-
-  def require_quiz
-    require_context
-    @quiz = @context.quizzes.find(params[:quiz_id])
   end
 end

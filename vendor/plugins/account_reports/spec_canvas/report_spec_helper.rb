@@ -19,12 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../../spec/spec_helper')
 
 module ReportSpecHelper
-  def self.find_account_module_and_reports(account_id)
-    Canvas::AccountReports::REPORTS.each do |(report_name, details)|
-      details[:proc].should_not == nil
-    end
-  end
-
   def read_report(type = @type, options = {})
     account_report = run_report(type, options)
     parse_report(account_report, options)
@@ -68,37 +62,4 @@ module ReportSpecHelper
     all_parsed
   end
 
-  def report(type = @type, options = {})
-    account = options[:account] || @account
-    parameters = options[:params] || {}
-    account_report = AccountReport.new(:user => @admin || user,
-                                       :account => account,
-                                       :report_type => type)
-    account_report.parameters = {}
-    account_report.parameters = parameters
-    account_report.save
-    Canvas::AccountReports.for_account(account)[type][:proc].call(account_report)
-    parse_report(account_report, options)
-  end
-
-  def self.run_report(account, report_type, parameters = {}, sort_column_or_columns = [0, 1], headers = false, col_sep = ',')
-    sort_columns = Array(sort_column_or_columns)
-    account_report = AccountReport.new(:user => account_admin_user(account: account), :account => account, :report_type => report_type)
-    account_report.parameters = {}
-    account_report.parameters = parameters
-    account_report.save!
-    csv_report = Canvas::AccountReports.for_account(account)[report_type][:proc].call(account_report)
-    row_range = headers ? (0..-1) : (1..-1)
-    if csv_report.is_a? Hash
-      csv_report.inject({}) do |result, (key, csv)|
-        all_parsed = CSV.parse(csv).to_a
-        all_parsed[row_range].sort_by { |r| r.values_at(*sort_columns).join }
-        result[key] = all_parsed
-        result
-      end
-    else
-      all_parsed = CSV.parse(account_report.attachment.open, {:col_sep => col_sep}).to_a
-      all_parsed[row_range].sort_by { |r| r.values_at(*sort_columns).join }
-    end
-  end
 end

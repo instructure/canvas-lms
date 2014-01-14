@@ -16,6 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../config/canvas_rails3')
+if CANVAS_RAILS2
+  Spec::Example::ExampleGroupMethods.module_eval do
+    def include_examples(*args)
+      it_should_behave_like(*args)
+    end
+  end
+end
+
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require "selenium-webdriver"
 require "socket"
@@ -68,7 +77,7 @@ module SeleniumTestsHelperMethods
         if SELENIUM_CONFIG[:firefox_profile].present?
           profile = Selenium::WebDriver::Firefox::Profile.from_name(SELENIUM_CONFIG[:firefox_profile])
         end
-        profile.native_events = native
+        profile.native_events = true
         options[:profile] = profile
       end
       if path = SELENIUM_CONFIG[:paths].try(:[], browser)
@@ -86,25 +95,7 @@ module SeleniumTestsHelperMethods
         caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
         caps.native_events = native
       end
-
-      driver = nil
-      puts 'setting up selenium server'
-      start_selenium_server_node
-      #curbs race conditions on selenium grid nodes
-      stagger_threads
-      begin
-        tries ||= 20
-        puts "Thread #{THIS_ENV} connecting to hub over port #{PORT_NUM}, try ##{tries}"
-        driver = Selenium::WebDriver.for(
-            :remote,
-            :url => "http://127.0.0.1:#{PORT_NUM}/wd/hub",
-            :desired_capabilities => caps
-        )
-      rescue Exception => e
-        puts "Thread #{THIS_ENV}\n try ##{tries}\nError attempting to start remote webdriver: #{e}"
-        sleep 2
-        retry unless (tries -= 1).zero?
-      end
+      raise('error with how selenium is being setup')
     end
     driver.manage.timeouts.implicit_wait = 10
     driver
@@ -112,21 +103,6 @@ module SeleniumTestsHelperMethods
 
   def set_native_events(setting)
     driver.instance_variable_get(:@bridge).instance_variable_get(:@capabilities).instance_variable_set(:@native_events, setting)
-  end
-
-  def start_selenium_server_node
-    puts "stopping selenium server node: #{THIS_ENV}"
-    `selenium_procs=$(ps -ef | grep #{PORT_NUM} | awk '{print $2}') && kill -9 $selenium_procs`
-    `sudo rm -rf /tmp/.X#{THIS_ENV}-lock`
-    `xvfb_procs=$(ps -ef | grep 'Xvfb :#{THIS_ENV}' | awk '{print $2}') && kill -9 $xvfb_procs`
-    puts "restarting xvfb screen and selenium server node: #{THIS_ENV}"
-    sleep 7
-    `Xvfb :#{THIS_ENV} -ac -noreset -screen 0 1280x1024x24 &`
-    sleep 2
-    #add configs for selenium version
-    `export DISPLAY=:#{THIS_ENV} && java -Djava.io.tmpdir=/tmp/node#{THIS_ENV} -jar /usr/lib/selenium/selenium-server-standalone-#{SELENIUM_CONFIG[:version]}.jar -port #{PORT_NUM} -timeout 60000  > /var/log/selenium/selenium-output#{THIS_ENV}.log 2> /var/log/selenium/selenium-error#{THIS_ENV}.log & echo $! > /selenium/selenium#{THIS_ENV}.pid &`
-    sleep 5
-    puts "selenium server node: #{THIS_ENV} has been restarted"
   end
 
 
@@ -170,12 +146,6 @@ module SeleniumTestsHelperMethods
   def t(*a, &b)
     I18n.t(*a, &b)
   end
-
-  def stagger_threads(step_time = 6)
-    wait_time = THIS_ENV * step_time
-    sleep(wait_time)
-  end
-
 
   def app_host
     "http://#{$app_host_and_port}"
@@ -230,9 +200,13 @@ module SeleniumTestsHelperMethods
   def self.rack_app()
     app = Rack::Builder.new do
       use Rails::Rack::Debugger unless Rails.env.test?
-      map '/' do
-        use Rails::Rack::Static
-        run ActionController::Dispatcher.new
+      if CANVAS_RAILS2
+        map '/' do
+          use Rails::Rack::Static
+          run ActionController::Dispatcher.new
+        end
+      else
+        run CanvasRails::Application
       end
     end.to_app
     return app
@@ -314,7 +288,11 @@ shared_examples_for "all selenium tests" do
   include CustomSeleniumRspecMatchers
 
   # set up so you can use rails urls helpers in your selenium tests
-  include ActionController::UrlWriter
+  if CANVAS_RAILS2
+    include ActionController::UrlWriter
+  else
+    include Rails.application.routes.url_helpers
+  end
 
   def selenium_driver;
     $selenium_driver
@@ -1097,7 +1075,7 @@ def find_css_in_string(string_of_html, css_selector)
 end
 
 shared_examples_for "in-process server selenium tests" do
-  it_should_behave_like "all selenium tests"
+  include_examples "all selenium tests"
   prepend_before (:all) do
     $in_proc_webserver_shutdown ||= SeleniumTestsHelperMethods.start_webserver(WEBSERVER)
   end

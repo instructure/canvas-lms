@@ -28,6 +28,7 @@ define [
       'click .add_collaboration_link': 'addCollaboration'
 
     initialize: ->
+      super
       @cacheElements()
       @createViews()
       @attachEvents()

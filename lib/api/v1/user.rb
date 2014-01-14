@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -133,12 +133,14 @@ module Api::V1::User
                               :limit_privileges_to_course_section,
                               :workflow_state,
                               :updated_at,
+                              :created_at,
                               :type]
 
   def enrollment_json(enrollment, user, session, includes = [])
     api_json(enrollment, user, session, :only => API_ENROLLMENT_JSON_OPTS).tap do |json|
       json[:enrollment_state] = json.delete('workflow_state')
       json[:role] = enrollment.role
+      json[:last_activity_at] = enrollment.last_activity_at
       if enrollment.student?
         json[:grades] = {
           :html_url => course_student_grades_url(enrollment.course_id, enrollment.user_id),

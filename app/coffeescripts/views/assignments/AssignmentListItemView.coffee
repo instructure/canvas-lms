@@ -11,11 +11,13 @@ define [
   'jst/assignments/AssignmentListItem'
   'jst/assignments/_assignmentListItemScore'
   'compiled/util/round'
+  'compiled/views/assignments/AssignmentKeyBindingsMixin'
   'jqueryui/tooltip'
   'compiled/behaviors/tooltip'
-], (I18n, Backbone, _, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, MoveDialogView, preventDefault, template, scoreTemplate, round) ->
+], (I18n, Backbone, _, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
 
   class AssignmentListItemView extends Backbone.View
+    @mixin AssignmentKeyBindingsMixin
     tagName: "li"
     className: "assignment"
     template: template
@@ -33,6 +35,7 @@ define [
     events:
       'click .delete_assignment': 'onDelete'
       'click .tooltip_link': preventDefault ->
+      'keydown': 'handleKeys'
 
     messages:
       confirm: I18n.t('confirms.delete_assignment', 'Are you sure you want to delete this assignment?')
@@ -215,3 +218,59 @@ define [
 
     userIsStudent: ->
       _.include(ENV.current_user_roles, "student")
+
+    goToNextItem: =>
+      if @nextAssignmentInGroup()?
+        @focusOnAssignment(@nextAssignmentInGroup())
+      else if @nextVisibleGroup()?
+        @focusOnGroup(@nextVisibleGroup())
+      else
+        @focusOnFirstGroup()
+
+    goToPrevItem: =>
+      if @previousAssignmentInGroup()?
+        @focusOnAssignment(@previousAssignmentInGroup())
+      else
+        @focusOnGroupByID(@model.attributes.assignment_group_id)
+
+    editItem: =>
+      @$("#assignment_#{@model.id}_settings_edit_item").click()
+
+    deleteItem: =>
+      @$("#assignment_#{@model.id}_settings_delete_item").click()
+
+    addItem: =>
+      group_id = @model.attributes.assignment_group_id
+      $(".add_assignment", "#assignment_group_#{group_id}").click()
+
+    showAssignment: =>
+      $(".ig-title", "#assignment_#{@model.id}")[0].click()
+
+    assignmentGroupView: =>
+      @model.collection.view
+
+    visibleAssignments: =>
+      @assignmentGroupView().visibleAssignments()
+
+    nextVisibleGroup: =>
+      @assignmentGroupView().nextGroup()
+
+    nextAssignmentInGroup: =>
+      current_assignment_index = @visibleAssignments().indexOf(@model)
+      @visibleAssignments()[current_assignment_index + 1]
+
+    previousAssignmentInGroup: =>
+      current_assignment_index = @visibleAssignments().indexOf(@model)
+      @visibleAssignments()[current_assignment_index - 1]
+
+    focusOnAssignment: (assignment) =>
+      $("#assignment_#{assignment.id}").attr("tabindex",-1).focus()
+
+    focusOnGroup: (group) =>
+      $("#assignment_group_#{group.attributes.id}").attr("tabindex",-1).focus()
+
+    focusOnGroupByID: (group_id) =>
+      $("#assignment_group_#{group_id}").attr("tabindex",-1).focus()
+
+    focusOnFirstGroup: =>
+      $(".assignment_group").filter(":visible").first().attr("tabindex",-1).focus()

@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "external tool buttons" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     course_with_teacher_logged_in
@@ -41,8 +41,6 @@ describe "external tool buttons" do
   end
 
   it "should allow inserting oembed content from external tool buttons" do
-    pending('failing')
-
     load_selection_test_tool("#oembed_link")
 
     html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")

@@ -214,7 +214,7 @@ module AuthenticationMethods
 
   def store_location(uri=nil, overwrite=true)
     if overwrite || !session[:return_to]
-      uri ||= request.get? ? request.request_uri : request.referrer
+      uri ||= request.get? ? request.fullpath : request.referrer
       session[:return_to] = clean_return_to(uri)
     end
   end

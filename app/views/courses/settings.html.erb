@@ -288,24 +288,6 @@ TEXT
             <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
             <%= f.check_box :hide_distribution_graphs %>
             <%= f.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
-            <% if @context.root_account.allow_draft? && !@context.root_account.draft_state_enabled? %>
-              <%= f.check_box :enable_draft %>
-              <label for="course_enable_draft"><%= t('enable_draft', 'Enable Draft State (beta)') %>
-                <% draft_help_text = t('draft_explanation', 'Explanation of Draft State') %>
-                <a href="#" class="element_toggler" aria-controls="helpDialog" aria-label="<%= draft_help_text %>" title="<%= draft_help_text %>"><i class="icon-question"></i></a>
-                <div id="helpDialog" data-turn-into-dialog='{"width":400,"modal":true,"title":"<%= draft_help_text %>"}' style="display:none" title=<%= draft_help_text %>>
-                  <%= mt(:draft_state_description, <<-DRAFT )
-Draft state is a *beta* feature that allows course content to be published and unpublished.
-Unpublished content won't be visible to students and won't affect grades.
-It also includes a redesign of some course areas to make them more consistent in look and functionality.
-
-Unpublished content may not be available if Draft State is disabled.
-                  DRAFT
-                    %>
-                </div>
-              </label>
-              <br/>
-            <% end %>
             <%= f.check_box :lock_all_announcements %>
             <%= label_tag :course_lock_all_announcements, :en => 'Disable comments on announcements' %><br />
             <%= f.select :default_wiki_editing_roles, [

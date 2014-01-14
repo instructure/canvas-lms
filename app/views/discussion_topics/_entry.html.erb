@@ -61,10 +61,11 @@
     <div class="message user_content"><%= user_content(entry.try_rescue(:message)) || nbsp %></div>
     <textarea class="message_html" style="display: none;"><%= h(entry.try_rescue(:message)) %></textarea>
     <div class="link_box">
-      <div class="attachment_data" style="<%= hidden unless entry && entry.attachment %>; float: left;">
-        <%= before_label :attached_file, "Attached File" %> <a href="<%= context_url(entry_context, :context_file_download_url, entry && entry.attachment ? entry.attachment_id : "{{ attachment_id }}") %>" class="attachment_name"><%= entry.try_rescue(:attachment).try_rescue(:display_name) || nbsp %></a>
-        <a href="<%= context_url(entry_context, :context_file_download_url, "{{ attachment_id }}") %>" class="entry_attachment_url" style="display: none;">&nbsp;</a>
-      </div>
+      <% if entry && entry.attachment %>
+        <div class="attachment_data" style="float: left;">
+          <%= before_label :attached_file, "Attached File" %> <a href="<%= file_download_url(entry.attachment, :verifier => entry.attachment.uuid) %>" class="attachment_name"><%= entry.attachment.try_rescue(:display_name) || nbsp %></a>
+        </div>
+      <% end %>
       <div class="clear"></div>
     </div>
     <div class="subcontent" style="<%= hidden if entry && entry.new_record? %>">

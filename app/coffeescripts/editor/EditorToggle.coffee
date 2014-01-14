@@ -49,8 +49,9 @@ define [
       @el.detach()
       @switchViews.insertBefore @textArea if @options.switchViews
       @done.insertAfter @textArea
+      opts = {focus: true, tinyOptions: {}}
       if @options.editorBoxLabel
-        opts = tinyOptions: {aria_label: @options.editorBoxLabel}
+        opts.tinyOptions.aria_label = @options.editorBoxLabel
       @textArea.editorBox opts
       @editing = true
       @trigger 'edit'

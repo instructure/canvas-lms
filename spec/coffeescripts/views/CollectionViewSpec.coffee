@@ -27,7 +27,7 @@ define [
       ]
       view = new CollectionView
         collection: collection
-        emptyTemplate: -> "No Results"
+        emptyMessage: -> "No Results"
         itemView: ItemView
       view.$el.appendTo $('#fixtures')
       view.render()
@@ -50,7 +50,7 @@ define [
     ok $match.length, 'item found'
 
   assertEmptyTemplateRendered = ->
-    ok view.$el.text().match(/No items/), 'empty template rendered'
+    ok view.$el.text().match(/No Results/), 'empty template rendered'
 
   test 'renders added items', ->
     collection.reset()
@@ -72,7 +72,7 @@ define [
     collection.reset()
     assertEmptyTemplateRendered()
     collection.add {name: 'Joe', id: 110}
-    ok !view.$el.text().match(/No items/), 'empty template removed'
+    ok !view.$el.text().match(/No Results/), 'empty template removed'
     assertItemRendered 'Joe'
 
   test 'removes items and re-renders on collection reset', ->

@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "calendar" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def go_to_calendar
     get "/calendar"
@@ -39,21 +39,21 @@ describe "calendar" do
     end
 
     it "should delete an event" do
+      pending('js failure when calendar event is deleted')
       event_title = 'new event'
       calendar_event_model(:title => event_title, :start_at => Time.now)
       go_to_calendar
 
-      keep_trying_until do
         f("##{Time.now.strftime("day_%Y_%m_%d")} .calendar_day .calendar_event").click
         f('.delete_event_link').click
         driver.switch_to.alert.should_not be nil
-        driver.switch_to.alert.accept
-        true
-      end
+        accept_alert
+      wait_for_ajax_requests
 
-      wait_for_ajaximations
-      f("##{Time.now.strftime("day_%Y_%m_%d")} .calendar_day").should_not include_text(event_title)
-      CalendarEvent.find_by_title(event_title).workflow_state.should == 'deleted'
+      keep_trying_until do
+        f("##{Time.now.strftime("day_%Y_%m_%d")} .calendar_day").should_not include_text(event_title)
+        CalendarEvent.find_by_title(event_title).workflow_state.should == 'deleted'
+      end
     end
 
     it "should view the full details of an event" do

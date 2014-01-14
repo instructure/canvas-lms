@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/manage_groups_com
 require 'thread'
 
 describe "account admin manage groups" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def add_account_category (account, name)
     f(".add_category_link").click
@@ -18,6 +18,8 @@ describe "account admin manage groups" do
   before (:each) do
     course_with_admin_logged_in
     @admin_account = Account.default
+    @admin_account.settings[:enable_manage_groups2] = false
+    @admin_account.save!
   end
 
   it "should show one div.group_category per category" do

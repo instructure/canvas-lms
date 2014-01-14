@@ -200,6 +200,14 @@ describe "Module Items API", :type => :integration do
       json['content_details'].should == {'points_possible' => @assignment.points_possible}
     end
 
+    it "should frame_external_urls" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@external_url_tag.id}?frame_external_urls=true",
+                      :controller => "context_module_items_api", :action => "show", :format => "json",
+                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :frame_external_urls => 'true',
+                      :id => "#{@external_url_tag.id}")
+      json['html_url'].should eql "http://www.example.com/courses/#{@course.id}/modules/items/#{@external_url_tag.id}"
+    end
+
     it "should paginate the module item list" do
       module3 = @course.context_modules.create!(:name => "module with lots of items")
       4.times { |i| module3.add_item(:type => 'context_module_sub_header', :title => "item #{i}") }
@@ -345,7 +353,8 @@ describe "Module Items API", :type => :integration do
         tag.position.should == 3
 
         tags.each{|t| t.reload}
-        tags.map(&:position).should == [1, 2, 4, 5]
+        # 2 is deleted; 3 is the new one, that displaced the others to 4-6
+        tags.map(&:position).should == [1, 4, 5, 6]
       end
 
       it "should set completion requirement" do

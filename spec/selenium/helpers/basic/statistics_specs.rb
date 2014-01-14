@@ -1,5 +1,5 @@
 shared_examples_for "statistics basic tests" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def item_lists
     ff('.item_list')

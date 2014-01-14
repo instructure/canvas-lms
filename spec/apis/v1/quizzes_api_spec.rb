@@ -20,6 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
 describe QuizzesApiController, :type => :integration do
+
   context 'locked api item' do
     let(:item_type) { 'quiz' }
 
@@ -46,7 +47,7 @@ describe QuizzesApiController, :type => :integration do
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes",
                       :controller=>"quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}")
-      
+
       quiz_ids = json.collect { |quiz| quiz['id'] }
       quiz_ids.should == quizzes.map(&:id)
     end
@@ -73,56 +74,41 @@ describe QuizzesApiController, :type => :integration do
                    :course_id => "#{@course.id}")
       response.status.to_i.should == 404
     end
+
+    context "jsonapi style" do
+
+      it "renders a jsonapi style response" do
+        quizzes = (0..3).map{ |i| @course.quizzes.create! :title => "quiz_#{i}" }
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes",
+                        {:controller=>"quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}"},
+                        {},
+                        'Accept' => 'application/vnd.api+json')
+        json = json['quizzes']
+        quiz_ids = json.collect { |quiz| quiz['id'] }
+        quiz_ids.should == quizzes.map(&:id).map(&:to_s)
+      end
+
+      it "limits student requests to available quizzes" do
+        student_in_course(:active_all => true)
+        quizzes = (0..3).map{ |i| @course.quizzes.create! :title => "quiz_#{i}" }
+        available_quiz = quizzes.first
+        available_quiz.workflow_state = 'available'
+        available_quiz.save!
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes",
+                        {:controller=>"quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}"},
+                        {},
+                        'Accept' => 'application/vnd.api+json')
+        json = json['quizzes']
+        quiz_ids = json.collect { |quiz| quiz['id'] }
+        quiz_ids.should == [ available_quiz.id.to_s ]
+      end
+    end
   end
 
   describe "GET /courses/:course_id/quizzes/:id (show)" do
     before { course_with_teacher_logged_in(:active_all => true, :course => @course) }
-
-    context "as a student" do
-
-      it "doesn't show access codes" do
-        course_with_student_logged_in(active_all: true)
-        quiz = @course.quizzes.create!(
-          title: "Access code Test",
-          access_code: "hello!"
-        )
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{quiz.id}",
-                        :controller=>"quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "#{quiz.id}")
-
-        json.should_not have_key('access_code')
-      end
-    end
-
-    context "valid quiz" do
-      before do
-        @quiz = @course.quizzes.create! :title => 'title'
-        @json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
-                        :controller=>"quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "#{@quiz.id}")
-      end
-
-      it "includes the allowed quiz output fields" do
-        Api::V1::Quiz::API_ALLOWED_QUIZ_OUTPUT_FIELDS[:only].each do |field|
-          @json.should have_key field.to_s
-          @json[field.to_s].should == @quiz.send(field)
-        end
-      end
-
-      it "includes html_url" do
-        @json['html_url'].should == polymorphic_url([@course, @quiz])
-      end
-
-      it "includes mobile_url" do
-        @json['mobile_url'].should == polymorphic_url([@course, @quiz], :persist_headless => 1, :force_user => 1)
-      end
-
-      it "includes published" do
-        @json['published'].should == false
-      end
-
-      it "includes question count" do
-        @json['question_count'].should == 0
-      end
-    end
 
     context "unpublished quiz" do
       before do
@@ -136,6 +122,21 @@ describe QuizzesApiController, :type => :integration do
 
       it "includes unpublished questions in question count" do
         @json['question_count'].should == 1
+      end
+    end
+
+    context "jsonapi style request" do
+
+      it "renders in a jsonapi style" do
+        @quiz = @course.quizzes.create! title: 'Test Quiz'
+        @json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
+                         { :controller=>"quizzes_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :id => "#{@quiz.id}"}, {},
+                        'Accept' => 'application/vnd.api+json')
+        @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
+        @json.should =~ [
+          QuizSerializer.new(@quiz, scope: @user, controller: controller, session: session).
+          as_json[:quiz].with_indifferent_access
+        ]
       end
     end
 
@@ -162,6 +163,22 @@ describe QuizzesApiController, :type => :integration do
     before { teacher_in_course(:active_all => true) }
 
     let (:new_quiz) { @course.quizzes.first }
+
+    context "jsonapi style request" do
+
+      it "renders in a jsonapi style" do
+        @json = api_call(:post, "/api/v1/courses/#{@course.id}/quizzes",
+                         { :controller=>"quizzes_api", :action=>"create", :format=>"json", :course_id=>"#{@course.id}" },
+                         { quizzes: [{ 'title' => 'blah blah', 'published' => true }] },
+                        'Accept' => 'application/vnd.api+json')
+        @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
+        @quiz = Quiz.first
+        @json.should =~ [
+          QuizSerializer.new(@quiz, scope: @user, controller: controller, session: session).
+          as_json[:quiz].with_indifferent_access
+        ]
+      end
+    end
 
     it "creates a quiz for the course" do
       api_create_quiz({ 'title' => 'testing' })
@@ -220,12 +237,12 @@ describe QuizzesApiController, :type => :integration do
       end
 
       context "show_correct_answers" do
-        it "should save show_correct_answers if hide_results is null" do
+        it "should be set if hide_results is disabled" do
           api_create_quiz({'show_correct_answers' => false, 'hide_results' => nil})
           new_quiz.show_correct_answers.should be_false
         end
 
-        it "should not save show_correct_answers if hide_results is not null" do
+        it "should be ignored if hide_results is enabled" do
           api_create_quiz({'show_correct_answers' => false, 'hide_results' => 'always'})
           new_quiz.show_correct_answers.should be_true
         end
@@ -259,6 +276,20 @@ describe QuizzesApiController, :type => :integration do
           new_quiz.cant_go_back.should_not be_true
         end
       end
+
+      context 'time_limit' do
+        it 'should discard negative values' do
+          api_create_quiz({'time_limit' => -25})
+          new_quiz.time_limit.should be_nil
+        end
+      end
+
+      context 'allowed_attempts' do
+        it 'should discard values less than -1' do
+          api_create_quiz({'allowed_attempts' => -25})
+          new_quiz.allowed_attempts.should == 1
+        end
+      end
     end
   end
 
@@ -290,6 +321,21 @@ describe QuizzesApiController, :type => :integration do
     it "updates quiz attributes" do
       api_update_quiz({'title' => 'old title'}, {'title' => 'new title'})
       updated_quiz.title.should == 'new title'
+    end
+    context "jsonapi style request" do
+
+      it "renders in a jsonapi style" do
+        @quiz = @course.quizzes.create! title: 'Test Quiz'
+        @json = api_call(:put, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
+                         { :controller=>"quizzes_api", :action=>"update", :format=>"json", :course_id=>"#{@course.id}", :id => "#{@quiz.id}"},
+                         { quizzes: [{ 'id' => @quiz.id, 'title' => 'blah blah' }] },
+                        'Accept' => 'application/vnd.api+json')
+        @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
+        @json.should =~ [
+          QuizSerializer.new(@quiz.reload, scope: @user, controller: controller, session: session).
+          as_json[:quiz].with_indifferent_access
+        ]
+      end
     end
 
     it "doesn't allow setting fields not in the whitelist" do
@@ -386,6 +432,89 @@ describe QuizzesApiController, :type => :integration do
           updated_quiz.cant_go_back.should_not be_true
         end
       end
+
+      context 'time_limit' do
+        it 'should discard negative values' do
+          api_update_quiz({'time_limit' => 10}, {'time_limit' => -25})
+          updated_quiz.time_limit.should == 10
+        end
+      end
+
+      context 'allowed_attempts' do
+        it 'should discard values less than -1' do
+          api_update_quiz({'allowed_attempts' => -1}, {'allowed_attempts' => -25})
+          updated_quiz.allowed_attempts.should == -1
+        end
+      end
+    end
+  end
+
+  describe "POST /courses/:course_id/quizzes/:id/reorder (reorder)" do
+    before do
+      teacher_in_course(:active_all => true)
+      @quiz  = @course.quizzes.create! :title => 'title'
+      @question1 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 1', 'answers' => [{'id' => 1}, {'id' => 2}], :position => 1})
+      @question2 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}], :position => 2})
+      @question3 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 3', 'answers' => [{'id' => 5}, {'id' => 6}], :position => 3})
+    end
+
+    it "should require authorization" do
+      course_with_student_logged_in(:active_all => true)
+      course_quiz
+
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reorder",
+                  {:controller=>"quizzes_api", :action => "reorder", :format => "json", :course_id => "#{@course.id}", :id => "#{@quiz.id}"},
+                  {:order => [] },
+                  {'Accept' => 'application/vnd.api+json'})
+
+      # should be authorization error
+      response.code.should == '401'
+    end
+
+    it "should reorder a quiz's questions" do
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reorder",
+                  {:controller=>"quizzes_api", :action => "reorder", :format => "json", :course_id => "#{@course.id}", :id => "#{@quiz.id}"},
+                  {:order => [{"type" => "question", "id" => @question3.id},
+                              {"type" => "question", "id" => @question1.id},
+                              {"type" => "question", "id" => @question2.id}] },
+                  {'Accept' => 'application/vnd.api+json'})
+
+      # should reorder the quiz questions
+      order = @quiz.reload.quiz_questions.active.sort_by{|q| q.position }.map {|q| q.id }
+      order.should == [@question3.id, @question1.id, @question2.id]
+    end
+
+    it "should reorder a quiz's questions and groups" do
+      @group = @quiz.quiz_groups.create :name => 'Test Group'
+
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reorder",
+                  {:controller=>"quizzes_api", :action => "reorder", :format => "json", :course_id => "#{@course.id}", :id => "#{@quiz.id}"},
+                  {:order => [{"type" => "question", "id" => @question3.id},
+                              {"type" => "group",    "id" => @group.id},
+                              {"type" => "question", "id" => @question1.id},
+                              {"type" => "question", "id" => @question2.id}] },
+                  {'Accept' => 'application/vnd.api+json'})
+
+      # should reorder group
+      @question3.reload.position.should == 1
+      @group.reload.position.should     == 2
+      @question1.reload.position.should == 3
+      @question2.reload.position.should == 4
+    end
+
+    it "should pull questions out of a group to the root quiz" do
+      @group = @quiz.quiz_groups.create :name => 'Test Group'
+      @group.quiz_questions = [@question1, @question2]
+
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reorder",
+                  {:controller=>"quizzes_api", :action => "reorder", :format => "json", :course_id => "#{@course.id}", :id => "#{@quiz.id}"},
+                  {:order => [{"type" => "question", "id" => @question3.id},
+                              {"type" => "question", "id" => @question2.id}] },
+                  {'Accept' => 'application/vnd.api+json'})
+
+      # should remove items from the group
+      order = @group.reload.quiz_questions.active.sort_by{|q| q.position }.map {|q| q.id }
+      order.should == [@question1.id]
     end
   end
 end

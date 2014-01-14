@@ -17,7 +17,7 @@
 #
 
 class PageView < ActiveRecord::Base
-  set_primary_key 'request_id'
+  self.primary_key = 'request_id'
 
   belongs_to :developer_key
   belongs_to :user
@@ -45,15 +45,21 @@ class PageView < ActiveRecord::Base
     self.new(attributes).tap do |p|
       p.url = LoggingFilter.filter_uri(request.url)[0,255]
       p.http_method = request.method.to_s
-      p.remote_ip = request.remote_ip
       p.controller = request.path_parameters['controller']
       p.action = request.path_parameters['action']
       p.session_id = request.session_options[:id].to_s.force_encoding(Encoding::UTF_8).presence
-      p.user_agent = request.user_agent.try(:force_encoding, Encoding::UTF_8)
+      p.user_agent = request.user_agent
+      p.remote_ip = request.remote_ip
       p.interaction_seconds = 5
       p.created_at = Time.now
       p.updated_at = Time.now
       p.id = RequestContextGenerator.request_id
+      p.export_columns.each do |c|
+        v = p.send(c)
+        if !v.nil? && v.respond_to?(:force_encoding)
+          p.send("#{c}=", v.force_encoding(Encoding::UTF_8))
+        end
+      end
     end
   end
 
@@ -134,18 +140,49 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def self.find_one(id, options)
-    return super unless PageView.cassandra?
-    find_some([id], options).first || raise(ActiveRecord::RecordNotFound, "Couldn't find PageView with ID=#{id}")
+  #
+  # We don't know what shard the request_id to so its the callers
+  # responsibility to activate the correct shard.
+  #
+  def self.find_by_id(id, options={})
+    find_all_by_id([id], options).first
   end
 
-  def self.find_some(ids, options)
+  #
+  # We don't know what shard the request_id to so its the callers
+  # responsibility to activate the correct shard.
+  #
+  def self.find_one(id, options={})
+    self.find_by_id(id, options) || raise(ActiveRecord::RecordNotFound, "Couldn't find PageView with ID=#{id}")
+  end
+
+  #
+  # We don't know what shard the request_id to so its the callers
+  # responsibility to activate the correct shard.
+  #
+  def self.find_all_by_id(ids, options={})
+    raise(NotImplementedError, "options not implemented: #{options.inspect}") if options.present?
+    return PageView::EventStream.fetch(ids) if PageView.cassandra?
+    PageView.where(request_id: ids).all
+  end
+
+  #
+  # We don't know what shard the request_id to so its the callers
+  # responsibility to activate the correct shard.
+  #
+  def self.find_some(ids, options={})
     return super unless PageView.cassandra?
     raise(NotImplementedError, "options not implemented: #{options.inspect}") if options.present?
-    PageView::EventStream.fetch(ids)
+
+    result = self.find_all_by_id(ids, options)
+    if result.size == ids.length
+      result
+    else
+      raise ActiveRecord::RecordNotFound, "Couldn't find all PageViews with IDs (#{ids.join(',')}) (found #{result.size} results, but was looking for #{ids.length})"
+    end
   end
 
-  def self.find_every(options)
+  def self.find_every(options={})
     return super unless PageView.cassandra?
     raise(NotImplementedError, "find_every not implemented")
   end
@@ -273,8 +310,9 @@ class PageView < ActiveRecord::Base
   def export_columns(format = nil)
     PageView::EXPORTED_COLUMNS
   end
+
   def to_row(format = nil)
-    export_columns(format).map { |c| self.send(c) }
+    export_columns(format).map { |c| self.send(c).presence }
   end
 
   # utility class to migrate a postgresql/mysql/sqlite3 page_views table to cassandra

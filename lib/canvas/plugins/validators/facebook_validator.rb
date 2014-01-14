@@ -22,12 +22,12 @@ module Canvas::Plugins::Validators::FacebookValidator
       {}
     else
       if settings.map(&:last).any?(&:blank?)
-        plugin_setting.errors.add_to_base(I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
+        plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
         false
       else
         res = Facebook.config_check(settings)
         if res
-          plugin_setting.errors.add_to_base(res)
+          plugin_setting.errors.add(:base, res)
           false
         else
           settings[:disable_ssl] = ['1', true, 'true'].include?(settings[:disable_ssl])

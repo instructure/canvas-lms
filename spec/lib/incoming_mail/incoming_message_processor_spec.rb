@@ -174,6 +174,14 @@ describe IncomingMail::IncomingMessageProcessor do
       DiscussionTopic.incoming_replies[0][:html].should == '<h1>This is HTML</h1>'
     end
 
+    it "should not try to load messages with invalid IDs" do
+      account, message = [mock, mock]
+      account.expects(:address).returns('user@example.com')
+      message.expects(:to).returns(['user@example.com'])
+      result = IncomingMessageProcessor.find_matching_to_address(message, account)
+      result.should == [false, false]
+    end
+
     describe "when data is not found" do
       it "should not send a bounce reply sent a bogus message id" do
         expect {

@@ -76,7 +76,50 @@ class Feature
 
   # TODO: register built-in features here
   # (plugins may register additional features during application initialization)
-  register({})
+  register(
+   'draft_state' =>
+    {
+      display_name: lambda { I18n.t('features.draft_state', 'Draft State') },
+      description: lambda { I18n.t('draft_state_description', <<DRAFT) },
+Draft state is a *beta* feature that allows course content to be published and unpublished.
+Unpublished content won't be visible to students and won't affect grades.
+It also includes a redesign of some course areas to make them more consistent in look and functionality.
+
+Unpublished content may not be available if Draft State is disabled.
+DRAFT
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true,
+      development: true
+    },
+    'google_docs_domain_restriction' =>
+    {
+      display_name: -> { I18n.t('features.google_docs_domain_restriction', 'Google Docs Domain Restriction') },
+      description: -> { I18n.t('google_docs_domain_restriction_description', <<END) },
+Google Docs Domain Restriction allows Google Docs submissions and collaborations
+to be restricted to a single domain. Students attempting to submit assignments or
+join collaborations on an unapproved domain will receive an error message notifying them
+that they will need to update their Google Docs integration.
+END
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true
+    },
+    'outcome_gradebook' =>
+    {
+      display_name: -> { I18n.t('features.outcome_gradebook', 'Outcome Gradebook') },
+      description:  -> { I18n.t('outcome_gradebook_description', <<-END) },
+Outcome Gradebook provides a way for teachers to quickly view student and course
+progress on course learning outcomes. Outcomes are presented in a Gradebook-like
+format and student progress is displayed both as a numerical score and as mastered/
+near mastery/remedial.
+END
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true,
+      development: true
+    }
+  )
 
   def self.definitions
     @features ||= {}

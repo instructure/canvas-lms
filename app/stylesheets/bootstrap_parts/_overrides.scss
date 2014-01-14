@@ -224,6 +224,19 @@ The screenreaders will read all the html entities and that's just rude.
 </p>
 ```
 
+### Accessible body-only popovers
+
+Here's an accessible way to do it for popovers without a header.
+`.popover-padded` takes care of what `.popover-content` did above.
+
+```html
+<a
+  data-tooltip='{"tooltipClass":"popover popover-padded", "position":"right"}'
+  title="Lo-fi next level kale chips narwhal tattooed, tonx YOLO mixtape.">
+  Text with accessible popover
+</a>
+
+```
 */
 .ui-widget.ui-tooltip {
   word-wrap: break-word;
@@ -243,6 +256,10 @@ The screenreaders will read all the html entities and that's just rude.
   border: 1px solid rgba(0,0,0,.2);
   @include border-radius(6px);
   @include box-shadow(0 5px 10px rgba(0,0,0,.2));
+}
+
+.ui-widget.ui-tooltip.popover-padded {
+  padding: 9px 14px;
 }
 
 $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;

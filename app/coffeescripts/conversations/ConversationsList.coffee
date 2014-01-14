@@ -75,7 +75,7 @@ define [
     clicked: (e) =>
       # ignore clicks that come from the gear menu
       unless $(e.target).closest('.admin-links').length
-        @select $(e.currentTarget).data('id')
+        @select $(e.currentTarget).attr('data-id')
 
     lastMessageKey: ->
       if @scope is 'sent'

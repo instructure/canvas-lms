@@ -1,10 +1,38 @@
-source 'https://rubygems.org/'
+source 'http://rubygems.org/'
 
-if ENV['RAILS_ENV'] != 'test' && (RUBY_VERSION < "1.9.3" || RUBY_VERSION >= "2.0")
-  raise "Canvas requires Ruby 1.9.3"
+# this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
+if RUBY_VERSION == "2.0.0"
+  warn "Ruby 2.0 support is untested"
+  ruby '2.0.0', :engine => 'ruby', :engine_version => '2.0.0'
+elsif RUBY_VERSION == "2.1.0"
+  warn "Ruby 2.1 support is untested"
+  ruby '2.1.0', :engine => 'ruby', :engine_version => '2.1.0'
+else
+  ruby '1.9.3', :engine => 'ruby', :engine_version => '1.9.3'
+end
+
+# enforce the version of bundler itself, to avoid any surprises
+required_bundler_version = '1.5.1'
+gem 'bundler', required_bundler_version
+
+unless Bundler::VERSION == required_bundler_version
+  if Bundler::VERSION < required_bundler_version
+    bundle_command = "gem install bundler -v #{required_bundler_version}"
+  else
+    require 'shellwords'
+    bundle_command = "bundle _#{required_bundler_version}_ #{ARGV.map { |a| Shellwords.escape(a) }.join(' ')}"
+  end
+
+  warn "Bundler version #{required_bundler_version} is required; you're currently running #{Bundler::VERSION}. Maybe try `#{bundle_command}`."
+  exit 1
 end
 
 require File.expand_path("../config/canvas_rails3", __FILE__)
+
+platforms :ruby_20, :ruby_21 do
+  gem 'syck', '1.0.1'
+  gem 'iconv', '1.0.3'
+end
 
 if CANVAS_RAILS2
   # If you have a license to rails lts, you can create a vendor/plugins/*/RAILS_LTS yaml file
@@ -14,33 +42,38 @@ if CANVAS_RAILS2
   if lts_file
     eval(File.read(lts_file))
   else
-    gem 'rails', :git => 'https://github.com/makandra/rails.git', :branch => '2-3-lts', :ref => 'e86daf8ff727d5efc0040c876ba00c9444a5d915'
+    gem 'rails', :github => 'makandra/rails', :branch => '2-3-lts', :ref => 'e86daf8ff727d5efc0040c876ba00c9444a5d915'
   end
+  # AMS needs to be loaded BEFORE authlogic because it defines the constant
+  # "ActiveModel", and aliases ActiveRecord::Errors to ActiveModel::Errors
+  # so Authlogic will use the right thing when it detects that ActiveModel
+  # is defined.
+  gem 'active_model_serializers_rails_2.3', '0.9.0pre2', :require => 'active_model_serializers'
   gem 'authlogic', '2.1.3'
 else
   # just to be clear, Canvas is NOT READY to run under Rails 3 in production
   gem 'rails', '3.2.15'
+  gem 'active_model_serializers', '0.9.0pre',
+    :github => 'rails-api/active_model_serializers', :ref => '99fa399ae6dc071b97b15e1ef2b42f0d23c492ec'
   gem 'authlogic', '3.2.0'
 end
 
-gem "aws-sdk", '1.8.3.1'
+gem "aws-sdk", '1.21.0'
 gem 'barby', '0.5.0'
 gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
-if CANVAS_RAILS2
-  gem 'canvas_connect', '0.2'
-  gem 'canvas_webex', '0.4'
-end
+gem 'canvas_connect', '0.3.2'
+gem 'canvas_webex', '0.11'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
 if CANVAS_RAILS2
-  gem 'encrypted_cookie_store-instructure', '1.0.4', :require => 'encrypted_cookie_store'
+  gem 'encrypted_cookie_store-instructure', '1.0.5', :require => 'encrypted_cookie_store'
 else
-  gem 'encrypted_cookie_store-instructure', '1.1.0', :require => 'encrypted_cookie_store'
+  gem 'encrypted_cookie_store-instructure', '1.1.1', :require => 'encrypted_cookie_store'
 end
 gem 'erubis', '2.7.0'
 if CANVAS_RAILS2
-  gem 'fake_arel', '1.0.0'
+  gem 'fake_arel', '1.4.0'
   gem 'fake_rails3_routes', '1.0.4'
 end
 gem 'ffi', '1.1.5'
@@ -48,13 +81,11 @@ gem 'hairtrigger', '0.2.3'
 gem 'sass', '3.2.3'
 gem 'hashery', '1.3.0', :require => 'hashery/dictionary'
 gem 'highline', '1.6.1'
-gem 'i18n', '0.6.4'
-if CANVAS_RAILS2
-  gem 'i18nema', '0.0.7'
-end
+gem 'i18n', '0.6.8'
+gem 'i18nema', '0.0.7'
 gem 'icalendar', '1.1.5'
 gem 'jammit', '0.6.6'
-gem 'json', '1.8.0'
+gem 'json', '1.8.1'
 gem 'oj', '2.1.7'
 unless CANVAS_RAILS2
   gem 'rails-patch-json-encode', '0.0.1'
@@ -63,8 +94,7 @@ end
 gem 'libxml-ruby', '2.6.0', :require => 'xml/libxml'
 gem 'macaddr', '1.0.0' # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
 gem 'mail', '2.5.4'
-# using this forked gem until https://github.com/37signals/marginalia/pull/15 is in the source gem
-gem 'instructure-marginalia', '1.1.3', :require => false
+gem 'marginalia', '1.1.3', :require => false
 gem 'mime-types', '1.17.2', :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
 # with mini_magick 3.1
@@ -75,7 +105,7 @@ gem 'nokogiri', '1.5.6'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.9', :require => 'oauth'
 gem 'rack', CANVAS_RAILS2 ? '1.1.3' : '1.4.5'
-gem 'rake', '10.1.0'
+gem 'rake', '10.1.1'
 gem 'rdoc', '3.12'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
 gem 'rdiscount', '1.6.8'
@@ -89,26 +119,30 @@ gem 'rscribd', '1.2.0'
 gem 'net-ldap', '0.3.1', :require => 'net/ldap'
 gem 'ruby-saml-mod', '0.1.22'
 gem 'rubycas-client', '2.2.1'
-gem 'rubyzip', '0.9.5', :require => 'zip/zip'
+gem 'rubyzip', '1.0.0', :require => 'zip'
+gem 'zip-zip', '0.2' # needed until plugins use the new namespace
 gem 'safe_yaml-instructure', '0.8.0', :require => false
 gem 'sanitize', '2.0.3'
-gem 'shackles', '1.0.1'
+gem 'shackles', '1.0.2'
+unless CANVAS_RAILS2
+  gem 'switchman', '0.0.1'
+end
 gem 'tzinfo', '0.3.35'
 gem 'useragent', '0.4.16'
 gem 'uuid', '2.3.2'
 if CANVAS_RAILS2
-  gem 'folio-pagination-legacy', git: "https://github.com/instructure/folio.git", ref: "5f7d23fbab78ee263d9a7799e6fd2eaf4868b862"
-  gem 'will_paginate', '2.3.15', require: false
+  gem 'folio-pagination-legacy', '0.0.3', :require => 'folio/rails'
+  gem 'will_paginate', '2.3.15', :require => false
 else
-  gem 'folio-pagination', git: "https://github.com/instructure/folio.git", ref: "b530e4b56a69c234fb0dd48fd69fa801cb109257"
-  gem 'will_paginate', '3.0.4', require: false
+  gem 'folio-pagination', '0.0.3', :require => 'folio/rails'
+  gem 'will_paginate', '3.0.4', :require => false
 end
 gem 'xml-simple', '1.0.12', :require => 'xmlsimple'
 gem 'foreigner', '0.9.2'
 gem 'crocodoc-ruby', '0.0.1', :require => 'crocodoc'
 # needs https://github.com/regru/premailer/commit/8d3ae698eff135011b19e1587a68c399ec97b185
 # we can go back to the gem once 1.7.8 is released
-gem 'regru-premailer', :require => 'premailer', :git => "https://github.com/regru/premailer.git", :ref => "08a73c70701f5d81bc4a5cf6c959a45ad94db88e"
+gem 'regru-premailer', :require => 'premailer', :github => "regru/premailer", :ref => "08a73c70701f5d81bc4a5cf6c959a45ad94db88e"
 
 group :assets do
   gem 'compass-rails', '1.0.3'
@@ -128,10 +162,11 @@ group :sqlite do
 end
 
 group :test do
-  gem 'simplecov', '0.7.1' if ENV['COVERAGE'] != nil && ENV['COVERAGE'] == "1" # for coverage reporting
+
+  gem 'simplecov', :require => false
+  gem 'simplecov-rcov', :require => false
   gem 'bluecloth', '2.0.10' # for generating api docs
-  gem 'mocha', :git => 'git://github.com/ccutrer/mocha.git', :require => false
-  gem 'parallelized_specs', '0.4.64'
+  gem 'mocha', '1.0.0.alpha', :require => false
   gem 'thin', '1.5.1'
   if CANVAS_RAILS2
     gem 'rspec', '1.3.2'
@@ -140,12 +175,15 @@ group :test do
     gem 'rspec', '2.13.0'
     gem 'rspec-rails', '2.13.0'
   end
-  gem 'selenium-webdriver', '2.35.0'
+  gem 'sequel', '4.5.0', :require => false
+  gem 'selenium-webdriver', '2.37.0'
   gem 'webrat', '0.7.3'
+  gem 'webmock', '1.16.1', :require => false
   gem 'yard', '0.8.0'
   gem 'yard-appendix', '>=0.1.8'
   gem 'timecop', '0.6.3'
   gem 'test-unit', '1.2.3'
+  gem 'bullet', '4.5.0', :require => false
 end
 
 group :development do
@@ -159,7 +197,8 @@ group :development do
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
-    gem 'debugger', '1.5.0'
+    gem 'byebug', '2.4.1', :platforms => [:ruby_20, :ruby_21]
+    gem 'debugger', '1.5.0', :platforms => :ruby_19
   end
 end
 
@@ -183,7 +222,7 @@ group :redis do
 end
 
 group :cassandra do
-  gem 'cassandra-cql', '1.2.1', git: 'https://github.com/kreynolds/cassandra-cql',ref: 'd100be075b04153cf4116da7512892a1e8c0a7e4'
+  gem 'cassandra-cql', '1.2.1', :github => 'kreynolds/cassandra-cql', :ref => 'd100be075b04153cf4116da7512892a1e8c0a7e4'
 end
 
 group :embedly do

@@ -16,7 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module BasicLTI
-class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_url, :resource_type, :root_account, :hash, :user_data)
+  class ToolLaunch
+    attr_accessor :url, :tool, :user, :context, :link_code, :return_url,
+                  :resource_type, :root_account, :hash, :user_data, :assignment
 
     def initialize(options)
       self.url = options[:url]                     || raise("URL required for generating Basic LTI content")
@@ -26,6 +28,7 @@ class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_
       self.link_code = options[:link_code]         || raise("Link Code required for generating Basic LTI content")
       self.return_url = options[:return_url]       || raise("Return URL required for generating Basic LTI content")
       self.resource_type = options[:resource_type]
+      self.user_data = BasicLTI.user_lti_data(user, context)
       if self.context.respond_to? :root_account
         self.root_account = context.root_account
       elsif self.tool.context.respond_to? :root_account
@@ -36,21 +39,27 @@ class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_
       self.hash = {}
     end
 
+    def pseudonym
+      @pseudonym ||= user.find_pseudonym_for_account(root_account)
+    end
+
     def for_assignment!(assignment, outcome_service_url, legacy_outcome_service_url)
+      self.assignment = assignment
       if context.includes_student?(user)
         hash['lis_result_sourcedid'] = BasicLTI::BasicOutcomes.encode_source_id(tool, context, assignment, user)
       end
       hash['lis_outcome_service_url'] = outcome_service_url
       hash['ext_ims_lis_basic_outcome_url'] = legacy_outcome_service_url
       hash['ext_outcome_data_values_accepted'] = ['url', 'text'].join(',')
-      hash['custom_canvas_assignment_title'] = assignment.title
-      hash['custom_canvas_assignment_points_possible'] = assignment.points_possible
+      hash['custom_canvas_assignment_title'] = '$Canvas.assignment.title'
+      hash['custom_canvas_assignment_points_possible'] = '$Canvas.assignment.pointsPossible'
       if tool.public?
-        hash['custom_canvas_assignment_id'] = assignment.id
+        hash['custom_canvas_assignment_id'] = '$Canvas.assignment.id'
       end
     end
 
     def for_homework_submission!(assignment)
+      self.assignment = assignment
       self.resource_type = 'homework_submission'
 
       return_types_map = {'online_upload' => 'file', 'online_url' => 'url'}
@@ -62,7 +71,7 @@ class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_
       hash['ext_content_return_types'] = return_types.join(',') unless return_types.blank?
       hash['ext_content_file_extensions'] = assignment.allowed_extensions.join(',') unless assignment.allowed_extensions.blank?
 
-      hash['custom_canvas_assignment_id'] = assignment.id if tool.public?
+      hash['custom_canvas_assignment_id'] = '$Canvas.assignment.id'
     end
     
     def has_selection_html!(html)
@@ -76,9 +85,9 @@ class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_
       hash['resource_link_title'] = tool.name
       hash['user_id'] = tool.opaque_identifier_for(user)
       hash['user_image'] = user.avatar_url
-      self.user_data = BasicLTI.user_lti_data(user, context)
-      hash['roles'] = self.user_data['role_types'].join(',') # AccountAdmin, Student, Faculty or Observer
-      hash['custom_canvas_enrollment_state'] = self.user_data['enrollment_state'] if self.user_data['enrollment_state']
+      hash['roles'] = user_data['role_types'].join(',') # AccountAdmin, Student, Faculty or Observer
+
+      hash['custom_canvas_enrollment_state'] = '$Canvas.enrollment.enrollmentState'
 
       if tool.include_name?
         hash['lis_person_name_given'] = user.first_name
@@ -89,20 +98,19 @@ class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_
         hash['lis_person_contact_email_primary'] = user.email
       end
       if tool.public?
-        hash['custom_canvas_user_id'] = user.id
-        pseudo = user.find_pseudonym_for_account(self.root_account)
-        if pseudo
-          hash['lis_person_sourcedid'] = pseudo.sis_user_id if pseudo.sis_user_id
-          hash['custom_canvas_user_login_id'] = pseudo.unique_id
+        hash['custom_canvas_user_id'] = '$Canvas.user.id'
+        if pseudonym
+          hash['lis_person_sourcedid'] = pseudonym.sis_user_id if pseudonym.sis_user_id
+          hash['custom_canvas_user_login_id'] = '$Canvas.user.login_id'
         end
         if context.is_a?(Course)
-          hash['custom_canvas_course_id'] = context.id
+          hash['custom_canvas_course_id'] = '$Canvas.context.id'
           hash['lis_course_offering_sourcedid'] = context.sis_source_id if context.sis_source_id
         elsif context.is_a?(Account)
-          hash['custom_canvas_account_id'] = context.id
-          hash['custom_canvas_account_sis_id'] = context.sis_source_id if context.sis_source_id
+          hash['custom_canvas_account_id'] = '$Canvas.context.id'
+          hash['custom_canvas_account_sis_id'] = '$Canvas.context.sisSourceId'
         end
-        hash['custom_canvas_api_domain'] = root_account.domain
+        hash['custom_canvas_api_domain'] = '$Canvas.api.domain'
       end
 
       # need to set the locale here (instead of waiting for the first call to
@@ -143,5 +151,5 @@ class ToolLaunch < Struct.new(:url, :tool, :user, :context, :link_code, :return_
       VariableSubstitutor.new(self).substitute!
       BasicLTI.generate_params(hash, url, tool.consumer_key, tool.shared_secret)
     end
-end
+  end
 end

@@ -987,15 +987,6 @@ describe "MessageableUser::Calculator" do
             should_not include(@student.id)
         end
       end
-
-      context "with admin_context" do
-        it "should treat the course as if fully visible" do
-          student_in_course(:active_all => true, :section => @course.course_sections.create!)
-          Enrollment.limit_privileges_to_course_section!(@course, @viewing_user, true)
-          @calculator.messageable_users_in_course(@course, :admin_context => @course).map(&:id).
-            should include(@student.id)
-        end
-      end
     end
 
     describe "messageable_users_in_section" do

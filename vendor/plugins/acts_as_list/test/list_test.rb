@@ -61,12 +61,6 @@ class ListTest < Test::Unit::TestCase
   def test_reordering
     assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
 
-    ListMixin.find(2).move_lower
-    assert_equal [1, 3, 2, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
-
-    ListMixin.find(2).move_higher
-    assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
-
     ListMixin.find(1).move_to_bottom
     assert_equal [2, 3, 4, 1], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
 
@@ -86,17 +80,10 @@ class ListTest < Test::Unit::TestCase
     assert_equal [1, 2, 4, 3], ListMixin.where('parent_id = 5').order('pos').pluck(:id)
   end
 
-  def test_next_prev
-    assert_equal ListMixin.find(2), ListMixin.find(1).lower_item
-    assert_nil ListMixin.find(1).higher_item
-    assert_equal ListMixin.find(3), ListMixin.find(4).higher_item
-    assert_nil ListMixin.find(4).lower_item
-  end
-
   def test_injection
     item = ListMixin.new(:parent_id => 1)
     assert_equal "parent_id = 1", item.scope_condition
-    assert_equal "pos", item.position_column
+    assert_equal "pos", item.class.position_column
   end
 
   def test_insert
@@ -184,7 +171,7 @@ class ListTest < Test::Unit::TestCase
 
   def test_nil_scope
     new1, new2, new3 = ListMixin.create, ListMixin.create, ListMixin.create
-    new2.move_higher
+    new2.move_to_top
     assert_equal [new2, new1, new3], ListMixin.where('parent_id IS NULL').order('pos').all
   end
   
@@ -237,12 +224,6 @@ class ListSubTest < Test::Unit::TestCase
   def test_reordering
     assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
 
-    ListMixin.find(2).move_lower
-    assert_equal [1, 3, 2, 4], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
-
-    ListMixin.find(2).move_higher
-    assert_equal [1, 2, 3, 4], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
-
     ListMixin.find(1).move_to_bottom
     assert_equal [2, 3, 4, 1], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
 
@@ -262,17 +243,10 @@ class ListSubTest < Test::Unit::TestCase
     assert_equal [1, 2, 4, 3], ListMixin.where('parent_id = 5000').order('pos').pluck(:id)
   end
 
-  def test_next_prev
-    assert_equal ListMixin.find(2), ListMixin.find(1).lower_item
-    assert_nil ListMixin.find(1).higher_item
-    assert_equal ListMixin.find(3), ListMixin.find(4).higher_item
-    assert_nil ListMixin.find(4).lower_item
-  end
-
   def test_injection
     item = ListMixin.new("parent_id"=>1)
     assert_equal "parent_id = 1", item.scope_condition
-    assert_equal "pos", item.position_column
+    assert_equal "pos", item.class.position_column
   end
 
   def test_insert_at

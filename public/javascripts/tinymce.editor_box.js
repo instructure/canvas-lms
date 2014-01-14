@@ -169,6 +169,7 @@ define([
       extended_valid_elements : "iframe[src|width|height|name|align|style|class|sandbox]",
       content_css: "/stylesheets/compiled/instructure_style.css,/stylesheets/compiled/tinymce.editor_box.css",
       editor_css: editor_css,
+      auto_focus: options.focus ? id : null,
 
       onchange_callback: function(e) {
         $("#" + id).trigger('change');
@@ -180,8 +181,29 @@ define([
           $(document).triggerHandler('editor_box_focus', $editor);
           $.publish('editorBox/focus', $editor);
         };
+        
+        // Make shift+tab take the user to the previous focusable element in the DOM.
+        var focusPrevious = function (ed, event) {
+          if (event.keyCode == 9 && event.shiftKey) {
+            var $cur = $(ed.getContainer());
+            while (true) {
+              // When jQuery is upgraded to 1.8+, use .addBack instead.
+              if ($cur.prevAll().find(':tabbable').andSelf().filter(':tabbable').last().focus().length) {
+                return false;
+              }
+              $cur = $cur.parent();
+              if (!$cur || !$cur.length || $cur.is(document)) {
+                return false;
+              }
+            }
+          } else {
+            return true;
+          }
+        };
+        
         ed.onClick.add(focus);
         ed.onKeyPress.add(focus);
+        ed.onKeyUp.add(focusPrevious);
         ed.onActivate.add(focus);
         ed.onEvent.add(function() {
           if(enableBookmarking && ed.selection) {
@@ -477,6 +499,10 @@ define([
     var id = this.attr('id');
     this._setContentCode(this._getContentCode());
     tinyMCE.execCommand('mceToggleEditor', false, id);
+    // Ensure that keyboard focus doesn't get trapped in the ether.
+    this.removeAttr('aria-hidden')
+      .filter('textarea:visible')
+      .focus();
   };
 
   $.fn._removeEditor = function() {
@@ -505,15 +531,11 @@ define([
     }
   };
 
-  $.fn._editorFocus = function(keepTrying) {
+  // you probably want to just pass focus: true in your initial options
+  $.fn._editorFocus = function() {
     var $element = this,
         id = $element.attr('id'),
         editor = $instructureEditorBoxList._getEditor(id);
-    if (keepTrying && (!editor || !editor.dom.doc.hasFocus())) {
-      setTimeout(function(){
-        $element.editorBox('focus', true);
-      }, 50);
-    }
     if(!editor ) {
       return false;
     }

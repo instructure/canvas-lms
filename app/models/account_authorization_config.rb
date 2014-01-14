@@ -316,8 +316,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
   def disable_open_registration_if_delegated
     if self.delegated_authentication? && self.account.open_registration?
-      @account.settings = { :open_registration => false, :self_registration => false }
-      @account.save!
+      self.account.settings = { :open_registration => false, :self_registration => false }
+      self.account.save!
     end
   end
 

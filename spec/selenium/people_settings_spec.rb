@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "course people" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
@@ -34,11 +34,11 @@ describe "course people" do
       wait_for_ajaximations
 
       keep_trying_until { driver.execute_script("return $('##{input_id}').data('token_input').selector.list.query.search") == text }
-      wait_for_js
+      wait_for_ajaximations
       elements = ffj(".autocomplete_menu:visible .list:last ul:last li").map { |e|
         [e, (e.find_element(:tag_name, :b).text rescue e.text)]
       }
-      wait_for_js
+      wait_for_ajaximations
       element = elements.detect { |e| e.last == text }
       element.should_not be_nil
       element.first.click

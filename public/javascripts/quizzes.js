@@ -54,7 +54,8 @@ define([
             DueDateList,SectionList,
             MissingDateDialog,MultipleChoiceToggle,TextHelper){
 
-  var dueDateList, overrideView, quizModel, sectionList;
+  var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
+      scoreValidation;
 
   function adjustOverridesForFormParams(overrides){
     var idx = 0;
@@ -95,7 +96,7 @@ define([
     dueDateList = new DueDateList(quizModel.get('assignment_overrides'),
                                   sectionList, quizModel);
 
-    overrideView = new DueDateOverrideView({
+    overrideView = window.overrideView = new DueDateOverrideView({
       el: '.js-assignment-overrides',
       model: dueDateList,
       views: {
@@ -563,6 +564,7 @@ define([
             code = code + "<li>" + htmlEscape(split[cdx]) + "</li>";
           }
         }
+
         if (code) {
           $text.append(I18n.beforeLabel('other_incorrect_matches', "Other Incorrect Match Options") + "<ul class='matching_answer_incorrect_matches_list'>" + code + "</ul>");
         }
@@ -832,6 +834,220 @@ define([
     }
   };
 
+  scoreValidation = {
+    init: function() {
+      this.initValidators.apply(this);
+
+      $('#quiz_options_form').on('xhrError', this.onFormError);
+    },
+
+    initValidators: function() {
+      $('input#quiz_points_possible')
+        .on('invalid:not_a_number', function(e) {
+          $(this).errorBox(I18n.t('errors.quiz_score_not_a_number', 'Score must be a number between 0 and 2,000,000,000.'));
+        })
+        .on('invalid:greater_than', function(e) {
+          $(this).errorBox(I18n.t('errors.quiz_score_too_short', 'Score must be greater than 0.'));
+        })
+        .on('invalid:less_than', function(e) {
+          $(this).errorBox(I18n.t('errors.quiz_score_too_long', 'Score must be less than 2,000,000,000.'));
+        });
+      $("input#quiz_points_possible").change(this.validatePoints);
+    },
+
+    validatePoints: function() {
+      var value  = $("input#quiz_points_possible").val();
+      var numVal = parseInt(value);
+
+      if (value && isNaN(numVal)) {
+        $("input#quiz_points_possible").trigger("invalid:not_a_number");
+        valid = false;
+      } else if (numVal > 2000000000) {
+        $("input#quiz_points_possible").trigger("invalid:less_than");
+        valid = false;
+      } else if (numVal < 0) {
+        $("input#quiz_points_possible").trigger("invalid:greater_than");
+        valid = false;
+      }
+    },
+
+    // Delegate the handling of "points_possible" errors
+    onFormError: function(e, resp) {
+      if (resp && resp.points_possible) {
+        $("input#quiz_points_possible").triggerHandler("invalid:not_a_number");
+
+        // Prevent $.fn.formErrors from giving error box with cryptic message.
+        delete resp.points_possible;
+      }
+    }
+  }
+
+  correctAnswerVisibility = {
+    $toggler: $(),
+    $options: $(),
+    $pickers: $(),
+
+    /**
+     * Build date pickers, and install handlers for show_correct_answers stuff when:
+     *  - form is being serialized
+     *  - form errors are thrown
+     *  - related date fields change
+     */
+    init: function() {
+      var that = correctAnswerVisibility;
+      var $toggler = that.$toggler = $('#quiz_show_correct_answers');
+      var $options = that.$options = $('#quiz_show_correct_answers_options');
+      var $pickers = that.$pickers = $options.find('.date_field');
+
+      $pickers.each(function() {
+        var $field = $(this);
+        var formattedDate = Handlebars.helpers.datetimeFormatted($field.val() || '');
+
+        $field.val(formattedDate);
+        $field.datetime_field();
+      });
+
+      $('#quiz_options_form')
+        .on('xhrError', that.onFormError)
+        .on('serializing', that.serialize);
+
+      $toggler.on('change', function() {
+        $options.toggle($toggler.is(':checked'));
+      }).triggerHandler('change');
+
+      that.installValidators();
+    },
+
+    /**
+     * Install handlers for validating show_correct_answers (and related fields)
+     * values, as well as error handlers for bad values that show friendly
+     * error boxes.
+     */
+    installValidators: function() {
+      var that = correctAnswerVisibility;
+
+      that.$toggler.on('invalid:bad_range', function() {
+        $('#quiz_hide_correct_answers_at').errorBox(
+          I18n.t('errors.invalid_show_correct_answers_range',
+          'Hide date cannot be before show date.'));
+
+        return true;
+      });
+
+      that.$pickers.on('change', that.validateRange);
+    },
+
+    /**
+     * Ensure that if both show_at and hide_at dates are specified, they form
+     * a valid time range.
+     *
+     * @fires invalid:bad_range
+     * @delegate #quiz_show_correct_answers
+     */
+    validateRange: function() {
+      var that = correctAnswerVisibility;
+
+      var $hide_at = that.$options.find('#quiz_hide_correct_answers_at');
+      var $show_at = that.$options.find('#quiz_show_correct_answers_at');
+
+      // Clear any existing error boxes
+      that.$pickers.each(function() {
+        var $errorBox = $(this).data('associated_error_box');
+
+        if ($errorBox) {
+          $errorBox.remove();
+        }
+      });
+
+      if ($show_at.val().length && $hide_at.val().length) {
+        if ($show_at.data().date >= $hide_at.data().date) {
+          that.$toggler.triggerHandler('invalid:bad_range');
+        }
+      }
+    },
+
+    /**
+     * Handle remote show_correct_answers errors by triggering the corresponding
+     * events so the error handlers can pick them up.
+     *
+     * Side-effects:
+     *
+     * - `show_correct_answers` key will be deleted from the XHR response to prevent
+     *   $.fn.formErrors from handling it.
+     *
+     * @param {jQuery} e XHR event.
+     * @param {Object} resp XHR response.
+     *
+     * @fires invalid:bad_range
+     * @delegate #quiz_show_correct_answers
+     */
+    onFormError: function(e, resp) {
+      var that = correctAnswerVisibility;
+      var i, errorEntry, event;
+
+      // Delegate the handling of "show_correct_answers" errors to the handlers bound
+      // to #quiz_show_correct_answers.
+      if (resp && resp.show_correct_answers) {
+        for (i = 0; i < resp.show_correct_answers.length; ++i) {
+          errorEntry = resp.show_correct_answers[i];
+          event = 'invalid:' + errorEntry.type.toLowerCase().replace(/\s/, '_');
+
+          that.$toggler.triggerHandler(event);
+        }
+
+        // Prevent $.fn.formErrors from generating an error box with the API's
+        // cryptic error message.
+        delete resp.show_correct_answers;
+      }
+    },
+
+    /**
+     * Serialize the dates set for the visibility duration, if specified and
+     * `hide_results` is enabled. If that's not enabled, nullify the values.
+     *
+     * @param  {jQuery} e     A jQuery event
+     * @param  {Object} data  The form/XHR data.
+     */
+    serialize: function(e, data) {
+      var show;
+      var resetField = function(key, value) {
+        data['quiz[' + key + ']'] = value || '';
+      };
+      var serializeField = function(key) {
+        var $field = $('#quiz_' + key);
+        var date;
+
+        if ($field.val().length) {
+          date = $field.data().date;
+          data['quiz[' + key + ']'] = $.dateToISO8601UTC(
+            $.unfudgeDateForProfileTimezone(date)
+          );
+        } else {
+          resetField(key);
+        }
+      };
+
+      show = data['quiz[hide_results][never]'] != '0';
+      show = show && data['quiz[show_correct_answers]'] == '1';
+
+      if (show) {
+        serializeField('show_correct_answers_at');
+        serializeField('hide_correct_answers_at');
+      } else {
+        resetField('show_correct_answers', '0');
+        resetField('show_correct_answers_at');
+        resetField('hide_correct_answers_at');
+      }
+    },
+
+    disable: function() {
+      var that = correctAnswerVisibility;
+
+      that.$toggler.prop('checked', false);
+      that.$options.hide();
+    }
+  };
+
   function makeQuestion(data) {
     var idx = $(".question_holder:visible").length + 1;
     var question = $.extend({}, quiz.defaultQuestionData, {question_name: I18n.t('default_quesiton_name', "Question")}, data);
@@ -869,7 +1085,7 @@ define([
     data.answer_exact = data.exact || data.answer_exact;
     data.answer_error_margin = data.answer_error_margin || data.margin;
     data.answer_range_start = data.start || data.answer_range_start;
-    data.answer_range_end = data.end || data.answer_range_end
+    data.answer_range_end = data.end || data.answer_range_end;
 
     var answer = $.extend({}, quiz.defaultAnswerData, data);
     var $answer = $("#answer_template").clone(true).attr('id', '');
@@ -1008,76 +1224,50 @@ define([
 
   function generateFormQuizQuestion(formQuiz) {
     var data = {};
-    for(var name in formQuiz) {
-      if (name.indexOf('questions[question_0]') == 0) {
-        var n = name.replace("questions[question_0]", "question");
-        data[n] = formQuiz[name];
-      }
+    var quiz = formQuiz;
+    if(quiz.questions.length > 0) {
+      data["question"] = quiz.questions[0];
     }
+
     return data;
   }
 
   function generateFormQuiz(quiz) {
-    var data = {};
+    var data = {
+      quiz: {},
+      questions: []
+    };
+
     if (ENV.ASSIGNMENT_ID) {
-      data['quiz[assignment_id]'] = ENV.ASSIGNMENT_ID;
+      data.quiz.assignment_id = ENV.ASSIGNMENT_ID;
     }
-    data['quiz[title]'] = quiz.quiz_name;
-    for(var idx in quiz.questions) {
-      var question = quiz.questions[idx];
-      var id = "questions[question_" + idx + "]";
-      data[id + '[question_name]'] = question.question_name;
-      data[id + '[assessment_question_id]'] = question.assessment_question_id;
-      data[id + '[question_type]'] = question.question_type;
-      data[id + '[points_possible]'] = question.question_points;
-      data[id + '[correct_comments]'] = question.correct_comments;
-      data[id + '[incorrect_comments]'] = question.incorrect_comments;
-      data[id + '[neutral_comments]'] = question.neutral_comments;
-      data[id + '[question_text]'] = question.question_text;
-      data[id + '[regrade_option]'] = question.regrade_option;
-      data[id + '[position]'] = question.position;
-      data[id + '[text_after_answers]'] = question.text_after_answers;
-      data[id + '[matching_answer_incorrect_matches]'] = question.matching_answer_incorrect_matches;
-      for(var jdx in question.formulas) {
-        var jd = id + "[formulas][formula_" + jdx + "]";
-        data[jd] = question.formulas[jdx];
-      }
-      for(var jdx in question.variables) {
-        var jd = id + "[variables][variable_" + jdx + "]";
-        data[jd + '[name]'] = question.variables[jdx].name;
-        data[jd + '[min]'] = question.variables[jdx].min;
-        data[jd + '[max]'] = question.variables[jdx].max;
-        data[jd + '[scale]'] = question.variables[jdx].scale;
-      }
-      data[id + '[answer_tolerance]'] = question.answer_tolerance;
-      data[id + '[formula_decimal_places]'] = question.formula_decimal_places;
-      for(var jdx in question.answers) {
-          var answer = question.answers[jdx];
-          var jd = id + "[answers][answer_" + jdx + "]";
-          data[jd + '[answer_text]'] = answer.answer_text;
-          data[jd + '[answer_html]'] = answer.answer_html;
-          data[jd + '[answer_comments]'] = answer.answer_comment;
-          data[jd + '[answer_comments_html]'] = answer.answer_comment_html;
-          data[jd + '[answer_weight]'] = answer.answer_weight;
-          data[jd + '[answer_match_left]'] = answer.answer_match_left;
-          data[jd + '[answer_match_left_html]'] = answer.answer_match_left_html;
-          data[jd + '[answer_match_right]'] = answer.answer_match_right;
-          data[jd + '[numerical_answer_type]'] = answer.numerical_answer_type;
-          data[jd + '[answer_exact]'] = answer.answer_exact;
-          data[jd + '[answer_error_margin]'] = answer.answer_error_margin;
-          data[jd + '[answer_range_start]'] = answer.answer_range_start;
-          data[jd + '[answer_range_end]'] = answer.answer_range_end;
-          data[jd + '[blank_id]'] = answer.blank_id;
-          data[jd + '[match_id]'] = answer.match_id;
-          data[jd + '[id]'] = answer.id;
-          for(var kdx in answer.variables) {
-            var kd = jd + "[variables][variable_" + kdx + "]";
-            data[kd + '[name]'] = answer.variables[kdx].name;
-            data[kd + '[value]'] = answer.variables[kdx].value;
-          }
-      }
-    }
+
+    data.quiz.title = quiz.quiz_name;
+    quiz.questions.forEach(function(question) {
+      var q = {};
+      q.question_name = question.question_name;
+      q.assessment_question_id = question.assessment_question_id;
+      q.question_type = question.question_type;
+      q.points_possible = question.question_points;
+      q.correct_comments = question.correct_comments;
+      q.incorrect_comments = question.incorrect_comments;
+      q.neutral_comments = question.neutral_comments;
+      q.question_text = question.question_text;
+      q.regrade_option = question.regrade_option;
+      q.position = question.position;
+      q.text_after_answers = question.text_after_answers;
+      q.matching_answer_incorrect_matches = question.matching_answer_incorrect_matches;
+      q.formulas = question.formulas;
+      q.variables = question.variables;
+      q.answer_tolerance = question.answer_tolerance;
+      q.formula_decimal_places = question.formula_decimal_places;
+
+      q.answers = question.answers;
+      data.questions.push(q);
+    });
+
     return data;
+
   }
 
   function addHTMLFeedback($container, question_data, name) {
@@ -1129,6 +1319,8 @@ define([
 
   $(document).ready(function() {
     quiz.init().updateDisplayComments();
+    correctAnswerVisibility.init();
+    scoreValidation.init();
 
     $('#quiz_tabs').tabs();
     $('#editor_tabs').show();
@@ -1184,14 +1376,47 @@ define([
       }
     }).triggerHandler('change', [true]);
 
-    $("#protect_quiz").change(function() {
-      var checked = $(this).attr('checked');
-      $(".protected_options").showIf(checked).find(":checkbox").each(function() {
-        if (!checked) {
-          $(this).attr('checked', false).change();
+    $('#enable_quiz_ip_filter, #enable_quiz_access_code').on('change', function() {
+      var $checkbox = $(this);
+      var $optionGroup = $checkbox.closest('.option-group');
+      var checked = $checkbox.prop('checked');
+
+      $optionGroup.find('> .options').toggle(checked);
+
+      if (!checked) {
+        $optionGroup
+          .find('[type="text"]')
+            .val('');
+      }
+    }).each(function() {
+      $(this).triggerHandler('change');
+    });
+
+    $quiz_options_form.on('serializing', function(e, data) {
+      var erratic = false;
+
+      if ($('#enable_quiz_ip_filter').is(':checked')) {
+        if (!data['quiz[ip_filter]']) {
+          erratic = true;
+          $('#quiz_ip_filter').errorBox(
+            I18n.t('errors.missing_ip_filter', 'You must enter a valid IP Address')
+          );
         }
-      });
-    }).triggerHandler('change');
+      }
+
+      if ($('#enable_quiz_access_code').is(':checked')) {
+        if (!data['quiz[access_code]']) {
+          erratic = true;
+          $('#quiz_access_code').errorBox(
+            I18n.t('errors.missing_access_code', 'You must enter an access code')
+          );
+        }
+      }
+
+      if (erratic) {
+        e.preventDefault();
+      }
+    });
 
     $("#quiz_require_lockdown_browser").change(function() {
       $("#lockdown_browser_suboptions").showIf($(this).attr('checked'));
@@ -1199,15 +1424,6 @@ define([
     });
 
     $("#lockdown_browser_suboptions").showIf($("#quiz_require_lockdown_browser").attr('checked'));
-
-    $("#ip_filter").change(function(event, noFocus) {
-      $("#ip_filter_suboptions").showIf($(this).attr('checked'));
-      if (!$(this).attr('checked')) {
-        $("#quiz_ip_filter").val("");
-      } else if (!noFocus) {
-        $("#quiz_ip_filter").focus();
-      }
-    }).triggerHandler('change', [true]);
 
     $("#ip_filters_dialog").delegate('.ip_filter', 'click', function(event) {
       event.preventDefault();
@@ -1227,13 +1443,17 @@ define([
       });
       if (!$dialog.hasClass('loaded')) {
         $dialog.find(".searching_message").text(I18n.t('retrieving_filters', "Retrieving Filters..."));
-        var url = ENV.QUIZ_FILTERS_URL;
+        var url = ENV.QUIZ_IP_FILTERS_URL;
         $.ajaxJSON(url, 'GET', {}, function(data) {
+          var ip_filters = data.quiz_ip_filters;
+          var idx, filter, $filter;
+
           $dialog.addClass('loaded');
-          if (data.length) {
-            for(var idx in data) {
-              var filter = data[idx];
-              var $filter = $dialog.find(".ip_filter.blank:first").clone(true).removeClass('blank');
+
+          if (ip_filters.length) {
+            for (idx = 0; idx < ip_filters.length; ++idx) {
+              filter = ip_filters[idx];
+              $filter = $dialog.find(".ip_filter.blank:first").clone(true).removeClass('blank');
               $filter.fillTemplateData({data: filter});
               $dialog.find(".filters tbody").append($filter.show());
             }
@@ -1248,21 +1468,12 @@ define([
       }
     });
 
-    $("#require_access_code").change(function(event, noFocus) {
-      $("#access_code_suboptions").showIf($(this).attr('checked'));
-      if (!$(this).attr('checked')) {
-        $("#quiz_access_code").val("");
-      } else if (!noFocus) {
-        $("#quiz_access_code").focus();
-      }
-    }).triggerHandler('change', [true]);
-
     $("#never_hide_results").change(function() {
       var $this = $(this);
       $(".show_quiz_results_options").showIf($this.attr('checked'));
       if (!$this.attr('checked')) {
         $("#hide_results_only_after_last").attr('checked', false);
-        $("#quiz_show_correct_answers").attr('checked', false);
+        correctAnswerVisibility.disable();
       }
     }).triggerHandler('change');
 
@@ -1368,6 +1579,15 @@ define([
           if (overrides.length === 0) { overrides = false; }
           data['quiz[assignment_overrides]'] = overrides;
         }
+
+        var serializingEvent = $.Event('serializing');
+
+        $(this).trigger(serializingEvent, data);
+
+        if (serializingEvent.isDefaultPrevented()) {
+          return false;
+        }
+
         return data;
       },
 
@@ -1403,6 +1623,12 @@ define([
         quiz.updateDisplayComments();
     },
     error: function(data) {
+      $("#quiz_edit_wrapper")
+        .find(".btn.save_quiz_button")
+        .attr('disabled', false)
+        .text(I18n.t('buttons.save', "Save"));
+
+      $(this).trigger('xhrError', data);
       $(this).formErrors(data);
       $quiz_edit_wrapper.find(".btn.save_quiz_button").attr('disabled', false);
       }
@@ -1494,7 +1720,7 @@ define([
       var $question = $(this).parents(".question");
       var questionID = $(this).closest('.question_holder').find('.display_question').attr('id');
       var question = $question.getTemplateData({
-        textValues: ['question_type', 'correct_comments', 'incorrect_comments', 'neutral_comments', 'question_name', 'question_points', 'answer_selection_type', 'blank_id'],
+        textValues: ['question_type', 'correct_comments', 'incorrect_comments', 'neutral_comments', 'question_name', 'question_points', 'answer_selection_type', 'blank_id', 'matching_answer_incorrect_matches'],
         htmlValues: ['question_text', 'correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html']
       });
       question.question_text = $question.find("textarea[name='question_text']").val();
@@ -1502,6 +1728,7 @@ define([
       $question.find(".matching_answer_incorrect_matches_list li").each(function() {
         matches.push($(this).text());
       });
+
       question.matching_answer_incorrect_matches = matches.join("\n");
       question.question_points = parseFloat(question.question_points, 10);
       if (isNaN(question.question_points)) { question.question_points = 0; }
@@ -2150,7 +2377,7 @@ define([
           counter++;
           var question = question_results.shift();
           if (question) {
-            quiz.addExistingQuestion(question.quiz_question);
+            quiz.addExistingQuestion(question);
             if (counter > 5) {
               setTimeout(nextQuestion, 50);
             } else {
@@ -2415,8 +2642,9 @@ define([
       $.ajaxJSON(url, method, questionData, function(data) {
         $displayQuestion.loadingImage('remove');
         $displayQuestion.find('.question_name').focus();
-        var question = data.quiz_question || data.assessment_question;
-        var questionData = $.extend({}, question, question.question_data);
+
+        var questionData = data;
+
         // questionData.assessment_question_id might be null now because
         // question.question_data.assessment_quesiton_id might be null but
         // question.assessment_question_id is the right value. because $.extend
@@ -2432,7 +2660,7 @@ define([
         $displayQuestion.trigger('saved');
         $("#unpublished_changes_message").slideDown();
         if (question) {
-          REGRADE_OPTIONS[question.id] = question.question_data.regrade_option;
+          REGRADE_OPTIONS[question.id] = question.regrade_option;
           delete REGRADE_DATA['question_' + question.id];
         }
       }, function(data) {
@@ -2476,7 +2704,7 @@ define([
       if (!question_data) {
         $teaser.find(".teaser.question_text").text(I18n.t('loading_question', "Loading Question..."));
         $.ajaxJSON($teaser.find(".update_question_url").attr('href'), 'GET', {}, function(question) {
-          showQuestion(question.quiz_question);
+          showQuestion(question);
         }, function() {
           $teaser.find(".teaser.question_text").text(I18n.t('errors.loading_question_failed', "Loading Question Failed..."));
         });
@@ -2514,6 +2742,15 @@ define([
 
     $(".quiz_group_form").formSubmit({
       object_name: 'quiz_group',
+
+      // rewrite the data so that it fits the jsonapi format
+      processData: function(data) {
+        var newData = {};
+        _.each(data, function(val, key) {
+          newData[key.replace('quiz_group[', 'quiz_groups[][')] = val;
+        });
+        return newData;
+      },
       beforeSubmit: function(formData) {
         var $form = $(this);
         var $group = $form.parents(".group_top");
@@ -2666,25 +2903,25 @@ define([
         }
         $container.loadingImage();
         var list = [];
-        var for_question_bank = $("#questions.question_bank").length > 0;
+
         $.each(items, function(i, $obj) {
-          if (for_question_bank) {
-            var id = $obj.find(".assessment_question_id").text();
-            list.push(id);
-          } else if($obj.hasClass('question_holder')) {
+          var object;
+          if ($obj.hasClass('question_holder')) {
             var $question = $obj.find('.question');
             var attrID = $question.attr('id');
             var id = attrID ? attrID.substring(9) : $question.find(".id").text();
-            list.push('question_' + id);
+            object = {'type': 'question', 'id': id};
+
           } else {
-            var id = 'group_' + $obj.attr('id').substring(10);
-            list.push(id);
+            var id = $obj.attr('id').substring(10);
+            object = {'type': 'group', 'id': id};
           }
+          list.push(object)
         });
-        var data = { order: list.join(",") };
-        $.ajaxJSON(url, 'POST', data, function(data) {
+
+        $.ajaxJSON(url, 'POST', JSON.stringify({order: list}), function(data) {
           $container.loadingImage('remove');
-        });
+        }, {}, {contentType: "application/json"});
       }
     });
 
