@@ -17,7 +17,7 @@
 #
 
 class Feature
-  ATTRS = [:feature, :display_name, :description, :applies_to, :state, :root_opt_in, :enable_at, :beta, :development, :release_notes_url, :custom_transition_proc]
+  ATTRS = [:feature, :display_name, :description, :applies_to, :state, :root_opt_in, :enable_at, :beta, :development, :release_notes_url, :custom_transition_proc, :after_state_change_proc]
   attr_reader *ATTRS
 
   def initialize(opts = {})
@@ -63,6 +63,7 @@ class Feature
     beta: false,          # 'beta' tag shown in UI
     development: false,   # 'development' tag shown in UI
     release_notes_url: 'http://example.com/',
+
     # optional: you can supply a Proc to attach warning messages to and/or forbid certain transitions
     # see lib/feature/draft_state.rb for example usage
     custom_transition_proc: ->(user, context, from_state, transitions) do
@@ -70,7 +71,11 @@ class Feature
         transitions['on']['warning'] = I18n.t('features.automatic_essay_grading.enable_warning',
           'Enabling this feature after some students have submitted essays may yield inconsistent grades.')
       end
-    end
+    end,
+
+    # optional hook to be called before after a feature flag change
+    # queue a delayed_job to perform any nontrivial processing
+    after_state_change_proc:  ->(context, old_state, new_state) { ... }
   }
 =end
 
