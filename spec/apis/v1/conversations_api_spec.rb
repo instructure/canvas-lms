@@ -1369,7 +1369,6 @@ describe ConversationsController, :type => :integration do
         { :body => "ok", :recipients => [@admin.id.to_s] })
       real_conversation.reload
       new_message = real_conversation.conversation_messages.first
-      #debugger
       new_message.conversation_message_participants.size.should == 2
     end
 
