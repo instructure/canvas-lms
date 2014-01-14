@@ -17,8 +17,7 @@
 #
 
 class SelfEnrollmentsController < ApplicationController
-  before_filter :infer_signup_info, :only => [:new, :create]
-  before_filter :require_user, :only => :create
+  before_filter :infer_signup_info, :only => [:new]
 
   include Api::V1::Course
 
@@ -28,17 +27,6 @@ class SelfEnrollmentsController < ApplicationController
       store_location
       flash[:notice] = t('notices.login_required', "Please log in to join this course.")
       return redirect_to login_url
-    end
-  end
-
-  def create
-    @current_user.validation_root_account = @domain_root_account
-    @current_user.require_self_enrollment_code = true
-    @current_user.self_enrollment_code = params[:self_enrollment_code]
-    if @current_user.save
-      render :json => course_json(@current_user.self_enrollment_course, @current_user, session, [], nil)
-    else
-      render :json => {:user => @current_user.errors.as_json[:errors]}, :status => :bad_request
     end
   end
 

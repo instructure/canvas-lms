@@ -315,6 +315,7 @@ class User < ActiveRecord::Base
   attr_accessor :require_acceptance_of_terms, :require_presence_of_name,
     :require_self_enrollment_code, :self_enrollment_code,
     :self_enrollment_course, :validation_root_account
+  attr_reader :self_enrollment
 
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
   validates_length_of :short_name, :maximum => maximum_string_length, :allow_nil => true
@@ -1541,7 +1542,7 @@ class User < ActiveRecord::Base
     return unless @self_enrollment_course
     return if @self_enrolling # avoid infinite recursion when enrolling across shards (pseudonym creation + shard association stuff)
     @self_enrolling = true
-    @self_enrollment_course.self_enroll_student(self, :skip_pseudonym => @just_created, :skip_touch_user => true)
+    @self_enrollment = @self_enrollment_course.self_enroll_student(self, :skip_pseudonym => @just_created, :skip_touch_user => true)
     @self_enrolling = false
   end
 
