@@ -219,25 +219,28 @@ describe "Outcome Results API", :type => :integration do
         json.keys.sort.should == %w(linked meta rollups)
         json['rollups'].size.should == 1
         json['rollups'].each do |rollup|
-          rollup.keys.sort.should == %w(id links name scores)
-          rollup['links'].keys.should == %w(section)
+          rollup.keys.sort.should == %w(links scores)
+          rollup['links'].keys.sort.should == %w(section user)
           rollup['links']['section'].should == @course.course_sections.first.id.to_s
+          rollup['links']['user'].should == outcome_student.id.to_s
           rollup['scores'].size.should == 1
           rollup['scores'].each do |score|
             score.keys.sort.should == %w(links score)
             score['score'].should == first_outcome_rating[:points]
-            score['links'].keys.should == %w(outcome)
+            score['links'].keys.sort.should == %w(outcome)
             score['links']['outcome'].should == outcome_object.id.to_s
           end
         end
-        json['linked'].keys.should == %w(outcomes)
+        json['linked'].keys.sort.should == %w(outcomes users)
         json['linked']['outcomes'].size.should == 1
+        json['linked']['users'].size.should == 1
       end
 
       describe "user_ids parameter" do
         it "restricts results to specified users" do
           outcome_students
-          student_id_str = outcome_students[0..1].map(&:id).join(',')
+          student_ids = outcome_students[0..1].map(&:id).map(&:to_s)
+          student_id_str = student_ids.join(',')
           course_with_teacher_logged_in(course: outcome_course, active_all: true)
           api_call(:get, outcome_rollups_url(outcome_course, user_ids: student_id_str),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, user_ids: student_id_str)
@@ -245,19 +248,21 @@ describe "Outcome Results API", :type => :integration do
           json.keys.sort.should == %w(linked meta rollups)
           json['rollups'].size.should == 2
           json['rollups'].each do |rollup|
-            rollup.keys.sort.should == %w(id links name scores)
-            rollup['links'].keys.should == %w(section)
+            rollup.keys.sort.should == %w(links scores)
+            rollup['links'].keys.sort.should == %w(section user)
             rollup['links']['section'].should == @course.course_sections.first.id.to_s
+            student_ids.should be_include(rollup['links']['user'])
             rollup['scores'].size.should == 1
             rollup['scores'].each do |score|
               score.keys.sort.should == %w(links score)
               [0,1].should be_include(score['score'])
-              score['links'].keys.should == %w(outcome)
+              score['links'].keys.sort.should == %w(outcome)
               score['links']['outcome'].should == outcome_object.id.to_s
             end
           end
-          json['linked'].keys.should == %w(outcomes)
+          json['linked'].keys.sort.should == %w(outcomes users)
           json['linked']['outcomes'].size.should == 1
+          json['linked']['users'].size.should == 2
         end
       end
 
@@ -271,19 +276,21 @@ describe "Outcome Results API", :type => :integration do
           json.keys.sort.should == %w(linked meta rollups)
           json['rollups'].size.should == 2
           json['rollups'].each do |rollup|
-            rollup.keys.sort.should == %w(id links name scores)
-            rollup['links'].keys.should == %w(section)
+            rollup.keys.sort.should == %w(links scores)
+            rollup['links'].keys.sort.should == %w(section user)
             rollup['links']['section'].should == outcome_course_sections[0].id.to_s
+            outcome_course_sections[0].student_ids.map(&:to_s).should be_include(rollup['links']['user'])
             rollup['scores'].size.should == 1
             rollup['scores'].each do |score|
               score.keys.sort.should == %w(links score)
               [0,2].should be_include(score['score'])
-              score['links'].keys.should == %w(outcome)
+              score['links'].keys.sort.should == %w(outcome)
               score['links']['outcome'].should == outcome_object.id.to_s
             end
           end
-          json['linked'].keys.should == %w(outcomes)
+          json['linked'].keys.sort.should == %w(outcomes users)
           json['linked']['outcomes'].size.should == 1
+          json['linked']['users'].size.should == outcome_course_sections[0].students.count
         end
       end
     end
@@ -347,18 +354,18 @@ describe "Outcome Results API", :type => :integration do
         json.keys.sort.should == %w(linked rollups)
         json['rollups'].size.should == 1
         json['rollups'].each do |rollup|
-          rollup.keys.sort.should == %w(id name scores)
-          rollup['id'].should == @course.id.to_s
-          rollup['name'].should == @course.name
+          rollup.keys.sort.should == %w(links scores)
+          rollup['links']['course'] == @course.id.to_s
           rollup['scores'].size.should == 1
           rollup['scores'].each do |score|
             score.keys.sort.should == %w(links score)
             score['score'].should == first_outcome_rating[:points]
-            score['links'].keys.should == %w(outcome)
+            score['links'].keys.sort.should == %w(outcome)
           end
         end
-        json['linked'].keys.should == %w(outcomes)
+        json['linked'].keys.sort.should == %w(courses outcomes)
         json['linked']['outcomes'].size.should == 1
+        json['linked']['courses'].size.should == 1
       end
 
       describe "user_ids parameter" do
@@ -372,16 +379,16 @@ describe "Outcome Results API", :type => :integration do
                    user_ids: student_id_str)
           json = JSON.parse(response.body)
           json.keys.sort.should == %w(linked rollups)
+          json['linked'].keys.sort.should == %w(courses outcomes)
           json['rollups'].size.should == 1
           json['rollups'].each do |rollup|
-            rollup.keys.sort.should == %w(id name scores)
-            rollup['id'].should == @course.id.to_s
-            rollup['name'].should == @course.name
+            rollup.keys.sort.should == %w(links scores)
+            rollup['links']['course'].should == @course.id.to_s
             rollup['scores'].size.should == 1
             rollup['scores'].each do |score|
               score.keys.sort.should == %w(links score)
               score['score'].should == 0.5
-              score['links'].keys.should == %w(outcome)
+              score['links'].keys.sort.should == %w(outcome)
             end
           end
         end
@@ -399,14 +406,13 @@ describe "Outcome Results API", :type => :integration do
           json.keys.sort.should == %w(linked rollups)
           json['rollups'].size.should == 1
           json['rollups'].each do |rollup|
-            rollup.keys.sort.should == %w(id name scores)
-            rollup['id'].should == outcome_course.id.to_s
-            rollup['name'].should == outcome_course.name
+            rollup.keys.sort.should == %w(links scores)
+            rollup['links']['course'].should == outcome_course.id.to_s
             rollup['scores'].size.should == 1
             rollup['scores'].each do |score|
               score.keys.sort.should == %w(links score)
               score['score'].should == 1
-              score['links'].keys.should == %w(outcome)
+              score['links'].keys.sort.should == %w(outcome)
             end
           end
         end
@@ -430,13 +436,15 @@ describe "Outcome Results API", :type => :integration do
       json = JSON.parse(response.body)
       json.keys.sort.should == %w(linked meta rollups)
       json['rollups'].size.should == 2
-      json['rollups'].collect{|x| x['id']}.sort.should == [student.id.to_s, student2.id.to_s].sort
+      json['rollups'].collect{|x| x['links']['user']}.sort.should == [student.id.to_s, student2.id.to_s].sort
       json['rollups'].each do |rollup|
-        rollup.keys.sort.should == %w(id links name scores)
+        rollup.keys.sort.should == %w(links scores)
         rollup['scores'].size.should == 1
+        rollup['links'].keys.sort.should == %w(section user)
       end
-      json['linked'].keys.should == %w(outcomes)
+      json['linked'].keys.sort.should == %w(outcomes users)
       json['linked']['outcomes'].size.should == 1
+      json['linked']['users'].size.should == 2
     end
   end
 

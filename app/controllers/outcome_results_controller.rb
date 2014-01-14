@@ -30,7 +30,7 @@
 #
 #       "links": {
 #         // The id of the related outcome
-#         "outcome": 42
+#         "outcome": "42"
 #       }
 #     }
 #
@@ -39,15 +39,21 @@
 #       // an array of OutcomeRollupScore objects
 #       "scores": ["OutcomeRollupScore"],
 #
-#       // The id of the resource for this rollup. For example, the user id.
-#       "id": 42,
-#
 #       // The name of the resource for this rollup. For example, the user name.
 #       "name": "John Doe",
 #
 #       "links": {
-#         // (Optional) The id of the section this resource is in
-#         "section": 57
+#         // If an aggregate result was requested, the course field will be present
+#         // Otherwise, the user and section field will be present
+#
+#         // (Optional) The id of the course that this rollup applies to
+#         "course": "42",
+#
+#         // (Optional) The id of the user that this rollup applies to
+#         "user": "42",
+#
+#         // (Optional) The id of the section the user is in
+#         "section": "57"
 #       }
 #     }
 #
@@ -88,7 +94,13 @@ class OutcomeResultsController < ApplicationController
   #    {
   #      "rollups": [OutcomeRollup],
   #      "linked": {
-  #        "outcomes": [Outcome]
+  #        "outcomes": [Outcome],
+  #
+  #        // (Optional) Included if aggregate is not set
+  #        "users": [User],
+  #
+  #        // (Optional) Included if aggregate is 'course'
+  #        "courses": [Course]
   #      }
   #    }
   def rollups
@@ -106,7 +118,20 @@ class OutcomeResultsController < ApplicationController
     @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
     @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes)
     rollups = outcome_results_rollups(@results, @users)
-    json = outcome_results_rollups_json(rollups, @outcomes)
+    json = outcome_results_rollups_json(rollups)
+    json[:linked] = {
+      outcomes: Api.recursively_stringify_json_ids(outcomes_json(@outcomes, @current_user, session)),
+      users: @users.map do |u|
+        hash = {
+          id: u.id.to_s,
+          name: u.name,
+          display_name: u.short_name,
+          sortable_name: u.sortable_name
+        }
+        hash[:avatar_image_url] = avatar_url_for_user(u, blank_fallback) if service_enabled?(:avatars)
+        hash
+      end
+    }
     json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
     render json: json
   end
@@ -119,7 +144,11 @@ class OutcomeResultsController < ApplicationController
     # rollup, so don't paginate users in ths method.
     @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes)
     aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context)]
-    json = aggregate_outcome_results_rollups_json(aggregate_rollups, @outcomes)
+    json = aggregate_outcome_results_rollups_json(aggregate_rollups)
+    json[:linked] = {
+      outcomes: Api.recursively_stringify_json_ids(outcomes_json(@outcomes, @current_user, session)),
+      courses: [{id: @context.id.to_s, name: @context.name}]
+    }
     # no pagination, so no meta field
     render json: json
   end

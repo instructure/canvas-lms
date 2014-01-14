@@ -115,7 +115,7 @@ define [
       # Returns an object.
       _toRow: (rollup, section) ->
         return null unless Grid.Util.sectionFilter(section, rollup)
-        row = { student: rollup.name, section: rollup.links.section }
+        row = { student: Grid.Util.lookupStudent(rollup.links.user), section: rollup.links.section }
         _.each rollup.scores, (score) ->
           row["outcome_#{score.links.outcome}"] = score.score
         row
@@ -148,6 +148,25 @@ define [
       # Returns an outcome or null.
       lookupOutcome: (name) ->
         Grid.outcomes[name]
+
+      # Public: Parse and store a list of students from the outcome rollups API.
+      #
+      # students - An array of student objects.
+      #
+      # Returns nothing.
+      saveStudents: (students) ->
+        Grid.students = _.reduce(students, (result, student) ->
+          result[student.id] = student
+          result
+        , {})
+
+      # Public: Look up a student in the current student list.
+      #
+      # name - The id for the student to look for.
+      #
+      # Returns an student or null.
+      lookupStudent: (id) ->
+        Grid.students[id]
 
     Math:
       mean: (values, round = false) ->
@@ -197,7 +216,7 @@ define [
         cellTemplate(score: value, className: className, masteryScore: outcome.mastery_points)
 
       studentCell: (row, cell, value, columnDef, dataContext) ->
-        studentCellTemplate(name: value)
+        studentCellTemplate(value)
 
       # Public: Create a string class name for the given score.
       #

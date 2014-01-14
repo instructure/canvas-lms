@@ -81,6 +81,7 @@ define [
     # Returns nothing.
     renderGrid: (response) =>
       Grid.Util.saveOutcomes(response.linked.outcomes)
+      Grid.Util.saveStudents(response.linked.users)
       [columns, rows] = Grid.Util.toGrid(response, column: { formatter: Grid.View.cell }, row: { section: @menu.currentSection })
       @grid = new Slick.Grid(
         '.outcome-gradebook-wrapper',
