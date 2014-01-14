@@ -99,7 +99,9 @@ define [
               else
                 optionObj['value'] = currentVal
               break
-
+            when 'select'
+              optionObj['isSelect'] = true
+              break
         )
       )
 
