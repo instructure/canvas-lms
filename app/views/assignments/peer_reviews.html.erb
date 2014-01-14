@@ -125,11 +125,14 @@ require([
     });
     $("#global_reminder_button").click(function(event){
       event.preventDefault();
-      var $link = $(this);
-      $link.closest(".button-container").loadingImage({image_size: 'small'});
-      $.ajaxJSON($link.attr('href'), 'POST', {global: true}, function(data) {
-        $link.closest(".button-container").loadingImage('remove');
-      });
+      var ask = confirm(<%= jt("messages.confirm", "Remind all assessors about their assessments?") %>);
+	  if(ask){
+	  	var $link = $(this);
+	    $link.closest(".button-container").loadingImage({image_size: 'small'});
+	    $.ajaxJSON($link.attr('href'), 'POST', {global: true}, function(data) {
+	      $link.closest(".button-container").loadingImage('remove');
+	    });
+	  }
     });
   });
 });
