@@ -157,6 +157,9 @@ define [
           student.computed_current_score ||= 0
           student.computed_final_score ||= 0
           student.secondary_identifier = student.sis_login_id || student.login_id
+          # SFU MOD CANVAS-188 Define data for SIS ID column (use dash if not available)
+          student.sis_id = student.sis_user_id || '-'
+          # END SFU MOD
 
           if @sections_enabled
             mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
@@ -803,7 +806,9 @@ define [
       @userFilterRemovedRows = []
 
       if term != ''
-        propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name']
+        # SFU MOD CANVAS-188 Add SIS ID column
+        propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name', 'sis_user_id']
+        # END SFU MOD
         index = data.length
         while index--
           student = data[index]
@@ -868,7 +873,18 @@ define [
         resizable: true
         sortable: true
         formatter: @htmlContentFormatter
+      },
+      # SFU MOD CANVAS-188 Add SIS ID column
+      {
+        id: 'sis_id'
+        name: I18n.t 'sis_id', 'SIS ID'
+        field: 'sis_id'
+        width: 100
+        cssClass: "meta-cell secondary_identifier_cell"
+        resizable: false
+        sortable: true
       }]
+      # END SFU MOD
 
       @allAssignmentColumns = for id, assignment of @assignments
         outOfFormatter = assignment &&
