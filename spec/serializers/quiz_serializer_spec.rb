@@ -14,7 +14,7 @@ describe QuizSerializer do
   before do
     @context = Course.new
     @context.id = 1
-    @quiz = Quiz.new title: 'test quiz'
+    @quiz = Quizzes::Quiz.new title: 'test quiz'
     @quiz.id = 1
     @quiz.context = @context
     @user = User.new
@@ -45,14 +45,11 @@ describe QuizSerializer do
     end
 
   it "serializes mobile_url" do
-    json[:mobile_url].should ==
-      controller.polymorphic_url([context, quiz],
-                                 persist_headless: 1, force_user: 1)
+    json[:mobile_url].should == 'http://example.com/courses/1/quizzes/1?force_user=1&persist_headless=1'
   end
 
   it "serializes html_url" do
-    json[:html_url].should ==
-      controller.polymorphic_url([context, quiz])
+    json[:html_url].should == 'http://example.com/courses/1/quizzes/1'
   end
 
   it "doesn't include the access code unless the user can grade" do

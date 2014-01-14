@@ -27,6 +27,11 @@ describe ContentTag do
       content_tag.sync_workflow_state_to_asset?.should be_true
     end
 
+    it "true when content_type is Quizzes::Quiz" do
+      content_tag = ContentTag.new(:content_type => "Quizzes::Quiz")
+      content_tag.sync_workflow_state_to_asset?.should be_true
+    end
+
     it "true when content_type is Assignment" do
       content_tag = ContentTag.new(:content_type => "Assignment")
       content_tag.sync_workflow_state_to_asset?.should be_true
@@ -35,6 +40,43 @@ describe ContentTag do
     it "true when content_type is WikiPage" do
       content_tag = ContentTag.new(:content_type => "WikiPage")
       content_tag.sync_workflow_state_to_asset?.should be_true
+    end
+  end
+
+  describe "#content_type_quiz?" do
+    it "true when content_type is Quiz" do
+      content_tag = ContentTag.new(:content_type => "Quiz")
+      content_tag.content_type_quiz?.should be_true
+    end
+
+    it "true when content_type is Quizzes::Quiz" do
+      content_tag = ContentTag.new(:content_type => "Quizzes::Quiz")
+      content_tag.content_type_quiz?.should be_true
+    end
+
+    it "false when content_type is not valid" do
+      content_tag = ContentTag.new(:content_type => "Assignment")
+      content_tag.content_type_quiz?.should be_false
+    end
+  end
+
+  describe "#scoreable?" do
+    it "true when quiz" do
+      content_tag = ContentTag.new(:content_type => "Quizzes::Quiz")
+
+      content_tag.scoreable?.should be_true
+    end
+
+    it "true when gradeable" do
+      content_tag = ContentTag.new(:content_type => "Assignment")
+
+      content_tag.scoreable?.should be_true
+    end
+
+    it "false when neither quiz nor gradeable" do
+      content_tag = ContentTag.new(:content_type => "DiscussionTopic")
+
+      content_tag.scoreable?.should be_false
     end
   end
 
@@ -360,4 +402,21 @@ describe ContentTag do
     @module.reload.updated_at.to_i.should == yesterday.to_i
   end
 
+  describe '.content_type' do
+    it 'returns the correct representation of a quiz' do
+      content_tag = ContentTag.create! content: quiz_model, context: course_model
+      content_tag.content_type.should == 'Quizzes::Quiz'
+
+      content_tag.content_type = 'Quiz'
+      content_tag.send(:update_without_callbacks)
+
+      ContentTag.find(content_tag.id).content_type.should == 'Quizzes::Quiz'
+    end
+
+    it 'returns the content type attribute if not a quiz' do
+      content_tag = ContentTag.create! content: assignment_model, context: course_model
+
+      content_tag.content_type.should == 'Assignment'
+    end
+  end
 end

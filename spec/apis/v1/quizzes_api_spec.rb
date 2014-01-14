@@ -173,7 +173,7 @@ describe QuizzesApiController, type: :request do
                          { quizzes: [{ 'title' => 'blah blah', 'published' => true }] },
                         'Accept' => 'application/vnd.api+json')
         @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
-        @quiz = Quiz.first
+        @quiz = Quizzes::Quiz.first
         @json.should =~ [
           QuizSerializer.new(@quiz, scope: @user, controller: controller, session: session).
           as_json[:quiz].with_indifferent_access

@@ -77,7 +77,7 @@ describe 'Submissions API', type: :request do
       @section = factory_with_protected_attributes(@course.course_sections, :sis_source_id => 'my-section-sis-id', :name => 'section2')
       @course.enroll_user(@student1, 'StudentEnrollment', :section => @section).accept!
 
-      quiz = Quiz.create!(:title => 'quiz1', :context => @course)
+      quiz = Quizzes::Quiz.create!(:title => 'quiz1', :context => @course)
       quiz.did_edit!
       quiz.offer!
       @a1 = quiz.assignment
@@ -376,7 +376,7 @@ describe 'Submissions API', type: :request do
     @student = user(:active_all => true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(@student).accept!
-    @quiz = Quiz.create!(:title => 'quiz1', :context => @course)
+    @quiz = Quizzes::Quiz.create!(:title => 'quiz1', :context => @course)
     @quiz.did_edit!
     @quiz.offer!
     @assignment = @quiz.assignment
@@ -430,7 +430,7 @@ describe 'Submissions API', type: :request do
     student1 = user(:active_all => true)
     course_with_teacher_logged_in(:active_all => true) # need to be logged in to view the preview url below
     @course.enroll_student(student1).accept!
-    quiz = Quiz.create!(:title => 'quiz1', :context => @course)
+    quiz = Quizzes::Quiz.create!(:title => 'quiz1', :context => @course)
     quiz.did_edit!
     quiz.offer!
     a1 = quiz.assignment

@@ -127,7 +127,7 @@ describe 'simply_versioned' do
   end
 
   context "callbacks" do
-    let(:woozel) { Woozel.create!( name: 'test' ) }
+    let(:woozel) { Woozel.create!(name: 'test') }
     context "on_load" do
       let(:on_load) do
         lambda { |model, version| model.name = 'test override' }
@@ -142,4 +142,27 @@ describe 'simply_versioned' do
       end
     end
   end
+  
+  # INSTRUCTURE: shim for quizzes namespacing
+  describe '.versionable_type' do
+    it 'returns the correct representation of a quiz' do
+      quiz = quiz_model
+      quiz.with_versioning(explicit: true, &:save!)
+      version = Version.find_by_versionable_id(quiz.id)
+      version.versionable_type.should == 'Quizzes::Quiz'
+
+      version.versionable_type = 'Quiz'
+      version.send(:update_without_callbacks)
+      Version.find(version.id).versionable_type.should == 'Quizzes::Quiz'
+    end
+
+    it 'returns the versionable type attribute if not a quiz' do
+      assignment = assignment_model
+      assignment.with_versioning(explicit: true, &:save!)
+      assignment.versions.each do |version|
+        version.versionable_type.should == 'Assignment'
+      end
+    end
+  end
+
 end

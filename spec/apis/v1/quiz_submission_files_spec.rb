@@ -24,7 +24,7 @@ describe QuizSubmissionFilesController, type: :request do
   context "quiz submissions file uploads" do
     before do
       course_with_student_logged_in :active_all => true
-      @quiz = Quiz.create!(:title => 'quiz', :context => @course)
+      @quiz = Quizzes::Quiz.create!(:title => 'quiz', :context => @course)
       @quiz.did_edit!
       @quiz.offer!
 

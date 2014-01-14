@@ -158,7 +158,7 @@ describe "quizzes questions" do
 
       click_save_settings_button
       wait_for_ajax_requests
-      quiz = Quiz.last
+      quiz = Quizzes::Quiz.last
       quiz.reload
       quiz.quiz_questions.length.should == @question_count
     end
@@ -174,7 +174,7 @@ describe "quizzes questions" do
         q.save
         q.reload
 
-        get "/courses/#{@course.id}/quizzes/#{Quiz.last.id}"
+        get "/courses/#{@course.id}/quizzes/#{Quizzes::Quiz.last.id}"
         fj('.summary td:eq(2)').text.should == "99.75%"
       end
     end

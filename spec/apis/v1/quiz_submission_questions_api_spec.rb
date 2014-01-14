@@ -306,7 +306,7 @@ describe QuizSubmissionQuestionsController, :type => :integration do
       @quiz.require_lockdown_browser = true
       @quiz.save
 
-      Quiz.stubs(:lockdown_browser_plugin_enabled?).returns true
+      Quizzes::Quiz.stubs(:lockdown_browser_plugin_enabled?).returns true
 
       fake_plugin = Object.new
       fake_plugin.stubs(:authorized?).returns false

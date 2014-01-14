@@ -89,7 +89,7 @@ module AssignmentOverrideApplicator
       # get list of overrides that might apply. adhoc override is highest
       # priority, then group override, then section overrides by position. DO
       # NOT exclude deleted overrides, yet
-      key = assignment_or_quiz.is_a?(Quiz) ? :quiz_id : :assignment_id
+      key = assignment_or_quiz.is_a?(Quizzes::Quiz) ? :quiz_id : :assignment_id
       adhoc_membership = AssignmentOverrideStudent.where(key => assignment_or_quiz, :user_id => user).first
 
       overrides << adhoc_membership.assignment_override if adhoc_membership
@@ -134,7 +134,7 @@ module AssignmentOverrideApplicator
             override
           else
             override_version = override.versions.detect do |version|
-              model_version = assignment_or_quiz.is_a?(Quiz) ? version.model.quiz_version : version.model.assignment_version
+              model_version = assignment_or_quiz.is_a?(Quizzes::Quiz) ? version.model.quiz_version : version.model.assignment_version
               next if model_version.nil?
               model_version <= assignment_or_quiz.version_number
             end

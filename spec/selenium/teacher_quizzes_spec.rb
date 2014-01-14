@@ -165,7 +165,7 @@ describe "quizzes" do
       Account.default.enable_feature!(:draft_state)
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f(".new-quiz-link").click }
-      quiz = Quiz.last
+      quiz = Quizzes::Quiz.last
       expect_new_page_load do
         click_save_settings_button
         wait_for_ajax_requests
@@ -640,7 +640,7 @@ describe "quizzes" do
         click_save_settings_button
         wait_for_ajax_requests
       end
-      compare_assignment_times(Quiz.find_by_title('VDD Quiz'))
+      compare_assignment_times(Quizzes::Quiz.find_by_title('VDD Quiz'))
     end
 
     it "loads existing due date data into the form" do
@@ -718,7 +718,6 @@ describe "quizzes" do
 
         # move mouse to not be hover over the button
         driver.mouse.move_to f('#footer')
-
         f('#quiz-publish-link').should include_text("Published")
       end
 

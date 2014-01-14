@@ -56,7 +56,7 @@ module Api::V1::QuizSubmission
     })
 
     hash.merge!({
-      html_url: polymorphic_url([ context, quiz, qs ]),
+      html_url: course_quiz_quiz_submission_url(context, quiz, qs),
     })
 
     hash

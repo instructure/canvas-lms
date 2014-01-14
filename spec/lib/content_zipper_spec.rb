@@ -329,7 +329,7 @@ describe ContentZipper do
     it "delegates to a QuizSubmissionZipper" do
       course_with_teacher_logged_in(active_all: true)
       attachment = Attachment.new(:display_name => 'download.zip')
-      quiz = Quiz.new(:context => @course)
+      quiz = Quizzes::Quiz.new(:context => @course)
       zipper_stub = stub
       zipper_stub.expects(:zip!).once
       attachment.context = quiz

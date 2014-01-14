@@ -546,7 +546,7 @@ class ContextModule < ActiveRecord::Base
               res = progression.requirements_met.any?{|r| r[:id] == req[:id] && r[:type] == req[:type] } #include?(req)
               if req[:type] == 'min_score'
                 progression.requirements_met = progression.requirements_met.select{|r| r[:id] != req[:id] || r[:type] != req[:type]}
-                if tag.content_type == "Quiz"
+                if tag.content_type_quiz?
                   submission = QuizSubmission.find_by_quiz_id_and_user_id(tag.content_id, user.id)
                   score = submission.try(:kept_score)
                 elsif tag.content_type == "DiscussionTopic"

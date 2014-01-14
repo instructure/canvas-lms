@@ -534,7 +534,7 @@ module Api
                     "WikiPage" => "Page",
                     "DiscussionTopic" => "Discussion",
                     "Assignment" => "Assignment",
-                    "Quiz" => "Quiz",
+                    "Quizzes::Quiz" => "Quiz",
                     "ContextModuleSubHeader" => "SubHeader",
                     "ExternalUrl" => "ExternalUrl",
                     "ContextExternalTool" => "ExternalTool",

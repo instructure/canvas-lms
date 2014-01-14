@@ -612,7 +612,7 @@ end
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
-    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
     @quiz.generate_quiz_data
     @quiz.published_at = Time.now
@@ -637,7 +637,7 @@ end
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
-    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
     @quiz.anonymous_submissions = true
     @quiz.quiz_type = "graded_survey"
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }

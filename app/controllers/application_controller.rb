@@ -1076,7 +1076,7 @@ class ApplicationController < ActionController::Base
       redirect_to named_context_url(context, :context_wiki_page_url, tag.content.url, url_params)
     elsif tag.content_type == 'Attachment'
       redirect_to named_context_url(context, :context_file_url, tag.content_id, url_params)
-    elsif tag.content_type == 'Quiz'
+    elsif tag.content_type_quiz?
       redirect_to named_context_url(context, :context_quiz_url, tag.content_id, url_params)
     elsif tag.content_type == 'DiscussionTopic'
       redirect_to named_context_url(context, :context_discussion_topic_url, tag.content_id, url_params)

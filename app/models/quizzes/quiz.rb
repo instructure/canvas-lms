@@ -20,7 +20,9 @@ require 'quiz_question_link_migrator'
 require 'quiz_regrading'
 require 'canvas/draft_state_validations'
 
-class Quiz < ActiveRecord::Base
+class Quizzes::Quiz < ActiveRecord::Base
+  self.table_name = 'quizzes' unless CANVAS_RAILS2
+
   include Workflow
   include HasContentTags
   include CopyAuthorizedLinks
@@ -61,7 +63,7 @@ class Quiz < ActiveRecord::Base
   validate :validate_draft_state_change, :if => :workflow_state_changed?
   validate :validate_correct_answer_visibility, :if => lambda { |quiz|
     quiz.show_correct_answers_at_changed? ||
-    quiz.hide_correct_answers_at_changed?
+      quiz.hide_correct_answers_at_changed?
   }
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
@@ -117,8 +119,9 @@ class Quiz < ActiveRecord::Base
     @update_existing_submissions = true if self.for_assignment? && self.quiz_type_changed?
     @stored_questions = nil
   end
+
   protected :set_defaults
-  
+
   def new_assignment_id?
     last_assignment_id != assignment_id
   end
@@ -150,8 +153,8 @@ class Quiz < ActiveRecord::Base
 
   def build_assignment
     if (context.feature_enabled?(:draft_state) || self.available?) &&
-        !self.assignment_id && self.graded? && @saved_by != :assignment &&
-        @saved_by != :clone
+      !self.assignment_id && self.graded? && @saved_by != :assignment &&
+      @saved_by != :clone
       assignment = self.assignment
       assignment ||= self.context.assignments.build(:title => self.title, :due_at => self.due_at, :submission_types => 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
@@ -163,11 +166,11 @@ class Quiz < ActiveRecord::Base
       self.assignment_id = assignment.id
     end
   end
-  
+
   def readable_type
     self.survey? ? t('types.survey', "Survey") : t('types.quiz', "Quiz")
   end
-  
+
   def valid_ip?(ip)
     require 'ipaddr'
     ip_filter.split(/,/).any? do |filter|
@@ -190,7 +193,7 @@ class Quiz < ActiveRecord::Base
     possible = self.assignment.points_possible if entries.empty? && self.assignment
     possible
   end
-  
+
   def set_unpublished_question_count
     entries = self.root_entries(true)
     cnt = 0
@@ -203,11 +206,11 @@ class Quiz < ActiveRecord::Base
     end
 
     # TODO: this is hacky, but we don't want callbacks to run because we're in an after_save. Refactor.
-    Quiz.where(:id => self).update_all(:unpublished_question_count => cnt)
+    Quizzes::Quiz.where(:id => self).update_all(:unpublished_question_count => cnt)
     self.unpublished_question_count = cnt
   rescue
   end
-  
+
   def for_assignment?
     self.assignment_id && self.assignment && self.assignment.submission_types == 'online_quiz'
   end
@@ -217,6 +220,7 @@ class Quiz < ActiveRecord::Base
   end
 
   alias_method :destroy!, :destroy
+
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
@@ -226,24 +230,24 @@ class Quiz < ActiveRecord::Base
     end
     res
   end
-  
+
   def restore
     self.workflow_state = self.context.feature_enabled?(:draft_state) ? 'unpublished' : 'edited'
     self.save
     self.assignment.restore(:quiz)
   end
-  
+
   def unlink_from(type)
     @saved_by = type
     if self.root_entries.empty? && !self.available?
       self.assignment = nil
-      self.destroy 
+      self.destroy
     else
       self.assignment = nil
       self.save
     end
   end
-  
+
   def assignment_id=(val)
     @assignment_id_set = true
     write_attribute(:assignment_id, val)
@@ -258,19 +262,19 @@ class Quiz < ActiveRecord::Base
       super(val)
     end
   end
-  
+
   def assignment?
     self.quiz_type == 'assignment'
   end
-  
+
   def survey?
     self.quiz_type == 'survey' || self.quiz_type == 'graded_survey'
   end
-  
+
   def graded?
     self.quiz_type == 'assignment' || self.quiz_type == 'graded_survey'
   end
-  
+
   def ungraded?
     !self.graded?
   end
@@ -296,7 +300,7 @@ class Quiz < ActiveRecord::Base
   end
 
   def restrict_answers_for_concluded_course?
-    course    = self.context
+    course = self.context
     concluded = course.conclude_at && course.conclude_at < Time.now
     concluded && course.root_account.settings[:restrict_quiz_questions]
   end
@@ -305,10 +309,11 @@ class Quiz < ActiveRecord::Base
     # If the quiz suddenly changes from non-graded to graded,
     # then this will update the existing submissions to reflect quiz
     # scores in the gradebook.
-    self.quiz_submissions.each{|s| s.touch }
+    self.quiz_submissions.each { |s| s.touch }
   end
-  
+
   attr_accessor :saved_by
+
   def update_assignment
     send_later_if_production(:set_unpublished_question_count) if self.id
     if !self.assignment_id && @old_assignment_id
@@ -329,7 +334,7 @@ class Quiz < ActiveRecord::Base
     if self.assignment && (@assignment_id_set || self.for_assignment?) && @saved_by != :assignment
       if !self.graded? && @old_assignment_id
       else
-        Quiz.where("assignment_id=? AND id<>?", self.assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if self.assignment_id
+        Quizzes::Quiz.where("assignment_id=? AND id<>?", self.assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if self.assignment_id
         a = self.assignment
         a.points_possible = self.points_possible
         a.description = self.description
@@ -349,10 +354,11 @@ class Quiz < ActiveRecord::Base
           @notify_of_update ? a.save : a.save_without_broadcasting!
         end
         self.assignment_id = a.id
-        Quiz.where(:id => self).update_all(:assignment_id => a)
+        Quizzes::Quiz.where(:id => self).update_all(:assignment_id => a)
       end
     end
   end
+
   protected :update_assignment
 
   ##
@@ -379,7 +385,7 @@ class Quiz < ActiveRecord::Base
       quiz_id = ? AND
       started_at IS NOT NULL AND
       finished_at IS NULL AND
-      #{update_sql} > end_at
+    #{update_sql} > end_at
     END
 
     QuizSubmission.where(where_clause, self, new_end_at).update_all(["end_at = #{update_sql}", new_end_at])
@@ -422,14 +428,14 @@ class Quiz < ActiveRecord::Base
   end
 
   # Returns the list of all "root" entries, either questions or question
-  # groups for this quiz.  This is PRE-SAVED data.  Once the quiz has 
-  # been saved, all the data can be found in Quiz.quiz_data
+  # groups for this quiz.  This is PRE-SAVED data.  Once the quiz has
+  # been saved, all the data can be found in Quizzes::Quiz.quiz_data
   def root_entries(force_check=false)
     return @root_entries if @root_entries && !force_check
     result = []
     result.concat self.active_quiz_questions_without_group
     result.concat self.quiz_groups
-    result = result.sort_by{|e| e.position || SortLast}.map do |e|
+    result = result.sort_by { |e| e.position || SortLast }.map do |e|
       res = nil
       if e.is_a? QuizQuestion
         res = e.data
@@ -440,7 +446,7 @@ class Quiz < ActiveRecord::Base
           data[:assessment_question_bank_id] = e.assessment_question_bank_id
           data[:questions] = []
         else
-          data[:questions] = e.quiz_questions.active.sort_by{|q| q.position || SortLast}.map(&:data)
+          data[:questions] = e.quiz_questions.active.sort_by { |q| q.position || SortLast }.map(&:data)
         end
         data[:actual_pick_count] = e.actual_pick_count
         res = data
@@ -450,7 +456,7 @@ class Quiz < ActiveRecord::Base
     end
     @root_entries = result
   end
-  
+
   # Returns the number of questions a student will see on the
   # SAVED version of the quiz
   def question_count(force_check=false)
@@ -472,17 +478,17 @@ class Quiz < ActiveRecord::Base
 
   # Returns data for the SAVED version of the quiz.  That is, not
   # the version found by gathering relationships on the Quiz data models,
-  # but the version being held in Quiz.quiz_data.  Caches the result
+  # but the version being held in Quizzes::Quiz.quiz_data.  Caches the result
   # in @stored_questions.
   def stored_questions(hashes=nil)
     res = []
     return @stored_questions if @stored_questions && !hashes
     questions = hashes || self.quiz_data || []
     questions.each do |val|
-      
+
       if val[:answers]
         val[:answers] = prepare_answers(val)
-        val[:matches] = val[:matches].sort_by{|m| m[:text] || SortFirst } if val[:matches]
+        val[:matches] = val[:matches].sort_by { |m| m[:text] || SortFirst } if val[:matches]
       elsif val[:questions] # It's a QuizGroup
         if val[:assessment_question_bank_id]
           # It points to a question bank
@@ -492,11 +498,11 @@ class Quiz < ActiveRecord::Base
           val[:questions].each do |question|
             if question[:answers]
               question[:answers] = prepare_answers(question)
-              question[:matches] = question[:matches].sort_by{|m| m[:text] || SortFirst} if question[:matches]
+              question[:matches] = question[:matches].sort_by { |m| m[:text] || SortFirst } if question[:matches]
             end
             questions << question
           end
-          questions = questions.sort_by{|q| rand}
+          questions = questions.sort_by { |q| rand }
           val[:questions] = questions
         end
       end
@@ -505,15 +511,15 @@ class Quiz < ActiveRecord::Base
     @stored_questions = res
     res
   end
-  
+
   def single_attempt?
     self.allowed_attempts == 1
   end
-  
+
   def unlimited_attempts?
     self.allowed_attempts == -1
   end
-  
+
   def generate_submission_question(q)
     @idx ||= 1
     q[:name] = t :question_name_counter, "Question %{question_number}", :question_number => @idx
@@ -522,7 +528,7 @@ class Quiz < ActiveRecord::Base
       @idx -= 1
     elsif q[:question_type] == 'fill_in_multiple_blanks_question'
       text = q[:question_text]
-      variables = q[:answers].map{|a| a[:blank_id] }.uniq
+      variables = q[:answers].map { |a| a[:blank_id] }.uniq
       variables.each do |variable|
         variable_id = AssessmentQuestion.variable_id(variable)
         re = Regexp.new("\\[#{variable}\\]")
@@ -532,23 +538,23 @@ class Quiz < ActiveRecord::Base
       q[:question_text] = text
     elsif q[:question_type] == 'multiple_dropdowns_question'
       text = q[:question_text]
-      variables = q[:answers].map{|a| a[:blank_id] }.uniq
+      variables = q[:answers].map { |a| a[:blank_id] }.uniq
       variables.each do |variable|
         variable_id = AssessmentQuestion.variable_id(variable)
-        variable_answers = q[:answers].select{|a| a[:blank_id] == variable }
-        options = variable_answers.map{|a| "<option value='#{a[:id]}'>#{CGI::escapeHTML(a[:text])}</option>" }
+        variable_answers = q[:answers].select { |a| a[:blank_id] == variable }
+        options = variable_answers.map { |a| "<option value='#{a[:id]}'>#{CGI::escapeHTML(a[:text])}</option>" }
         select = "<select class='question_input' name='question_#{q[:id]}_#{variable_id}'><option value=''>#{t(:default_question_input, "[ Select ]")}</option>#{options}</select>"
         re = Regexp.new("\\[#{variable}\\]")
         text = text.sub(re, select)
       end
       q[:original_question_text] = q[:question_text]
       q[:question_text] = text
-    # on equation questions, pick one of the formulas, plug it in
-    # and you should be able to treat it like a numerical_answer
-    # question for all intents and purposes
+      # on equation questions, pick one of the formulas, plug it in
+      # and you should be able to treat it like a numerical_answer
+      # question for all intents and purposes
     elsif q[:question_type] == 'calculated_question'
       text = q[:question_text]
-      q[:answers] = [q[:answers].sort_by{|a| rand }.first].compact
+      q[:answers] = [q[:answers].sort_by { |a| rand }.first].compact
       if q[:answers].first
         q[:answers].first[:variables].each do |variable|
           re = Regexp.new("\\[#{variable[:name]}\\]")
@@ -561,7 +567,7 @@ class Quiz < ActiveRecord::Base
     @idx += 1
     q
   end
-  
+
   def find_or_create_submission(user, temporary=false, state=nil)
     s = nil
     state ||= 'untaken'
@@ -584,7 +590,7 @@ class Quiz < ActiveRecord::Base
     end
     s
   end
-  
+
   # Generates a submission for the specified user on this quiz, based
   # on the SAVED version of the quiz.  Does not consider permissions.
   def generate_submission(user, preview=false)
@@ -598,19 +604,19 @@ class Quiz < ActiveRecord::Base
     if preview
       @submission_questions = self.stored_questions(generate_quiz_data(:persist => false))
     end
-    
-    exclude_ids = @submission_questions.map{ |q| q[:assessment_question_id] }.compact
+
+    exclude_ids = @submission_questions.map { |q| q[:assessment_question_id] }.compact
     @submission_questions.each do |q|
       if q[:pick_count] #QuizGroup
         if q[:assessment_question_bank_id]
           bank = AssessmentQuestionBank.find_by_id(q[:assessment_question_bank_id]) if q[:assessment_question_bank_id].present?
           if bank
             questions = bank.select_for_submission(q[:pick_count], exclude_ids)
-            questions = questions.map{|aq| aq.data}
+            questions = questions.map { |aq| aq.data }
             questions.each do |question|
               if question[:answers]
                 question[:answers] = prepare_answers(question)
-                question[:matches] = question[:matches].sort_by{|m| m[:text] || SortFirst} if question[:matches]
+                question[:matches] = question[:matches].sort_by { |m| m[:text] || SortFirst } if question[:matches]
               end
               question[:points_possible] = q[:question_points]
               question[:published_at] = q[:published_at]
@@ -662,28 +668,28 @@ class Quiz < ActiveRecord::Base
 
   def generate_submission_for_participant(quiz_participant)
     identity = if quiz_participant.anonymous?
-      :user_code
-    else
-      :user
-    end
+                 :user_code
+               else
+                 :user
+               end
 
     generate_submission quiz_participant.send(identity), false
   end
 
   def prepare_answers(question)
     if answers = question[:answers]
-      if shuffle_answers && Quiz.shuffleable_question_type?(question[:question_type])
+      if shuffle_answers && Quizzes::Quiz.shuffleable_question_type?(question[:question_type])
         answers.sort_by { |a| rand }
       else
         answers
       end
     end
   end
-  
-  # Takes the PRE-SAVED version of the quiz and uses it to generate a 
+
+  # Takes the PRE-SAVED version of the quiz and uses it to generate a
   # SAVED version.  That is, gathers the relationship entities from
   # the database and uses them to populate a static version that will
-  # be held in Quiz.quiz_data
+  # be held in Quizzes::Quiz.quiz_data
   def generate_quiz_data(opts={})
     entries = self.root_entries(true)
     possible = 0
@@ -708,7 +714,7 @@ class Quiz < ActiveRecord::Base
     end
     data
   end
-  
+
   def add_assessment_questions(assessment_questions, group=nil)
     questions = assessment_questions.map do |assessment_question|
       question = self.quiz_questions.build
@@ -721,15 +727,16 @@ class Quiz < ActiveRecord::Base
     end
     questions.compact.uniq
   end
-  
+
   def quiz_title
     result = self.title
     result = t(:default_title, "Unnamed Quiz") if result == "undefined" || !result
     result = self.assignment.title if self.assignment
     result
   end
+
   alias_method :to_s, :quiz_title
-  
+
   def locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
@@ -759,7 +766,7 @@ class Quiz < ActiveRecord::Base
       locked
     end
   end
-  
+
   def context_module_action(user, action, points=nil)
     tags_to_update = self.context_module_tags.to_a
     if self.assignment
@@ -783,11 +790,11 @@ class Quiz < ActiveRecord::Base
 
   def locked?
     (self.unlock_at && self.unlock_at > Time.now) ||
-    (self.lock_at && self.lock_at <= Time.now)
+      (self.lock_at && self.lock_at <= Time.now)
   end
 
   def hide_results=(val)
-    if(val.is_a?(Hash))
+    if (val.is_a?(Hash))
       if val[:last_attempt] == '1'
         val = 'until_after_last_attempt'
       elsif val[:never] != '1'
@@ -798,16 +805,16 @@ class Quiz < ActiveRecord::Base
     end
     write_attribute(:hide_results, val)
   end
-  
+
   def check_if_submissions_need_review
-    self.quiz_submissions.each{|s| s.update_if_needs_review(self) }
+    self.quiz_submissions.each { |s| s.update_if_needs_review(self) }
   end
-  
+
   def changed_significantly_since?(version_number)
     @significant_version ||= {}
     return @significant_version[version_number] if @significant_version[version_number]
     old_version = self.versions.get(version_number).model
-    
+
     needs_review = false
     needs_review = true if old_version.points_possible != self.points_possible
     needs_review = true if (old_version.quiz_data || []).length != (self.quiz_data || []).length
@@ -817,10 +824,10 @@ class Quiz < ActiveRecord::Base
       new_data.each_with_index do |q, i|
         needs_review = true if (q[:id] || q['id']) != (old_data[i][:id] || old_data[i]['id'])
       end
-    end    
+    end
     @significant_version[version_number] = needs_review
   end
-  
+
   def migrate_content_links_by_hand(user)
     self.quiz_questions.active.each do |question|
       data = QuizQuestion.migrate_question_hash(question.question_data, :context => self.context, :user => user)
@@ -848,7 +855,7 @@ class Quiz < ActiveRecord::Base
   def validate_quiz_type
     return if self.quiz_type.blank?
     unless valid_quiz_type_values.include?(self.quiz_type)
-      errors.add(:invalid_quiz_type, t('errors.invalid_quiz_type', "Quiz type is not valid" ))
+      errors.add(:invalid_quiz_type, t('errors.invalid_quiz_type', "Quiz type is not valid"))
     end
   end
 
@@ -869,7 +876,7 @@ class Quiz < ActiveRecord::Base
   def validate_hide_results
     return if self.hide_results.blank?
     unless valid_hide_results_values.include?(self.hide_results)
-      errors.add(:invalid_hide_results, t('errors.invalid_hide_results', "Hide results is not valid" ))
+      errors.add(:invalid_hide_results, t('errors.invalid_hide_results', "Hide results is not valid"))
     end
   end
 
@@ -971,17 +978,17 @@ class Quiz < ActiveRecord::Base
           allow_update = true
           assessment[:id] = item_id.to_i
           if assessment[:assignment]
-            assessment[:assignment][:id] = Quiz.find(item_id.to_i).try(:assignment_id)
+            assessment[:assignment][:id] = Quizzes::Quiz.find(item_id.to_i).try(:assignment_id)
           end
         end
         if assessment['assignment_migration_id']
-          if assignment = data['assignments'].find{|a| a['migration_id'] == assessment['assignment_migration_id']}
+          if assignment = data['assignments'].find { |a| a['migration_id'] == assessment['assignment_migration_id'] }
             assignment['quiz_migration_id'] = migration_id
           end
         end
         begin
           assessment[:migration] = migration
-          Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
+          Quizzes::Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
         rescue
           migration.add_import_warning(t('#migration.quiz_type', "Quiz"), assessment[:title], $!)
         end
@@ -1042,9 +1049,11 @@ class Quiz < ActiveRecord::Base
     item.save!
 
     if context.respond_to?(:content_migration) && context.content_migration
-      context.content_migration.add_missing_content_links(:class => item.class.to_s,
+      context.content_migration.add_missing_content_links(
+        :class => item.class.to_s,
         :id => item.id, :missing_links => hash[:missing_links],
-        :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.underscore.pluralize}/#{item.id}")
+        :url => "/#{context.class.to_s.demodulize.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}"
+      )
     end
 
     if question_data
@@ -1070,37 +1079,37 @@ class Quiz < ActiveRecord::Base
 
       hash[:questions].each_with_index do |question, i|
         case question[:question_type]
-          when "question_reference"
-            if qq = question_data[:qq_data][question[:migration_id]]
-              qq[:position] = i + 1
-              if qq[:assessment_question_migration_id]
-                if aq = question_data[:aq_data][qq[:assessment_question_migration_id]]
-                  qq['assessment_question_id'] = aq['assessment_question_id']
-                  aq_hash = AssessmentQuestion.prep_for_import(qq, context)
-                  QuizQuestion.import_from_migration(aq_hash, context, item)
-                else
-                  aq_hash = AssessmentQuestion.import_from_migration(qq, context)
-                  qq['assessment_question_id'] = aq_hash['assessment_question_id']
-                  QuizQuestion.import_from_migration(aq_hash, context, item)
-                end
+        when "question_reference"
+          if qq = question_data[:qq_data][question[:migration_id]]
+            qq[:position] = i + 1
+            if qq[:assessment_question_migration_id]
+              if aq = question_data[:aq_data][qq[:assessment_question_migration_id]]
+                qq['assessment_question_id'] = aq['assessment_question_id']
+                aq_hash = AssessmentQuestion.prep_for_import(qq, context)
+                QuizQuestion.import_from_migration(aq_hash, context, item)
+              else
+                aq_hash = AssessmentQuestion.import_from_migration(qq, context)
+                qq['assessment_question_id'] = aq_hash['assessment_question_id']
+                QuizQuestion.import_from_migration(aq_hash, context, item)
               end
-            elsif aq = question_data[:aq_data][question[:migration_id]]
-              aq[:position] = i + 1
-              aq[:points_possible] = question[:points_possible] if question[:points_possible]
-              QuizQuestion.import_from_migration(aq, context, item)
             end
-          when "question_group"
-            QuizGroup.import_from_migration(question, context, item, question_data, i + 1, hash[:migration])
-          when "text_only_question"
-            qq = item.quiz_questions.new
-            qq.question_data = question
-            qq.position = i + 1
-            qq.save!
+          elsif aq = question_data[:aq_data][question[:migration_id]]
+            aq[:position] = i + 1
+            aq[:points_possible] = question[:points_possible] if question[:points_possible]
+            QuizQuestion.import_from_migration(aq, context, item)
+          end
+        when "question_group"
+          QuizGroup.import_from_migration(question, context, item, question_data, i + 1, hash[:migration])
+        when "text_only_question"
+          qq = item.quiz_questions.new
+          qq.question_data = question
+          qq.position = i + 1
+          qq.save!
         end
       end
     end
     item.reload # reload to catch question additions
-    
+
     if hash[:assignment] && hash[:available]
       if hash[:assignment][:migration_id]
         item.assignment ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:assignment][:migration_id])
@@ -1120,7 +1129,7 @@ class Quiz < ActiveRecord::Base
       item.workflow_state = 'available'
       item.published_at = Time.now
     end
-    
+
     if hash[:assignment_group_migration_id]
       if g = context.assignment_groups.find_by_migration_id(hash[:assignment_group_migration_id])
         item.assignment_group_id = g.id
@@ -1133,18 +1142,20 @@ class Quiz < ActiveRecord::Base
     item
   end
 
-  def self.serialization_excludes; [:access_code]; end
+  def self.serialization_excludes
+    [:access_code]
+  end
 
   set_policy do
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }#admins.include? user }
+    given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) } #admins.include? user }
     can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit
-    
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }#admins.include? user }
+
+    given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) } #admins.include? user }
     can :read_statistics and can :read and can :submit and can :grade
-    
+
     given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? }
     can :submit
-    
+
     given do |user, session|
       (feature_enabled?(:draft_state) ? published? : true) &&
         cached_context_grants_right?(user, session, :read)
@@ -1175,7 +1186,7 @@ class Quiz < ActiveRecord::Base
   end
 
   def self.batch_migrate_file_links(ids)
-    Quiz.where(:id => ids).each do |quiz|
+    Quizzes::Quiz.where(:id => ids).each do |quiz|
       if quiz.migrate_file_links
         quiz.save
       end
@@ -1187,13 +1198,15 @@ class Quiz < ActiveRecord::Base
   end
 
   def require_lockdown_browser
-    self[:require_lockdown_browser] && Quiz.lockdown_browser_plugin_enabled?
+    self[:require_lockdown_browser] && Quizzes::Quiz.lockdown_browser_plugin_enabled?
   end
+
   alias :require_lockdown_browser? :require_lockdown_browser
 
   def require_lockdown_browser_for_results
-    self[:require_lockdown_browser_for_results] && Quiz.lockdown_browser_plugin_enabled?
+    self[:require_lockdown_browser_for_results] && Quizzes::Quiz.lockdown_browser_plugin_enabled?
   end
+
   alias :require_lockdown_browser_for_results? :require_lockdown_browser_for_results
 
   def self.non_shuffled_questions
@@ -1232,12 +1245,13 @@ class Quiz < ActiveRecord::Base
     !has_student_submissions? &&
       (!assignment || !assignment.has_student_submissions?)
   end
+
   alias_method :unpublishable?, :can_unpublish?
   alias_method :unpublishable, :can_unpublish?
 
   # marks a quiz as having unpublished changes
   def self.mark_quiz_edited(id)
-    where(:id =>id).update_all(:last_edited_at => Time.now.utc)
+    where(:id => id).update_all(:last_edited_at => Time.now.utc)
   end
 
   def mark_edited!
@@ -1250,10 +1264,9 @@ class Quiz < ActiveRecord::Base
 
   def has_file_upload_question?
     return false unless quiz_data.present?
-    !!quiz_data.detect do |data_hash|
-      data_hash[:question_type] == 'file_upload_question'
-    end
+    !!quiz_data.detect { |data_hash| data_hash[:question_type] == 'file_upload_question' }
   end
+
   def draft_state
     state = self.workflow_state
     (state == 'available') ? 'active' : state
@@ -1262,10 +1275,13 @@ class Quiz < ActiveRecord::Base
   def active?
     draft_state == 'active'
   end
+
   alias_method :published?, :active?
   alias_method :published, :active?
 
-  def unpublished?; !published?; end
+  def unpublished?
+    !published?
+  end
 
   def regrade_if_published
     unless unpublished_changes?
@@ -1281,8 +1297,7 @@ class Quiz < ActiveRecord::Base
   end
 
   def current_regrade
-    QuizRegrade.where(quiz_id: id, quiz_version: version_number).
-                includes(:quiz_question_regrades => :quiz_question).first
+    QuizRegrade.where(quiz_id: id, quiz_version: version_number).includes(:quiz_question_regrades => :quiz_question).first
   end
 
   def current_quiz_question_regrades
@@ -1292,8 +1307,8 @@ class Quiz < ActiveRecord::Base
   def questions_regraded_since(created_at)
     question_regrades = Set.new
     quiz_regrades.where("created_at > ?", created_at)
-                 .includes(:quiz_question_regrades).each do |regrade|
-      ids = regrade.quiz_question_regrades.map {|qqr| qqr.quiz_question_id }
+    .includes(:quiz_question_regrades).each do |regrade|
+      ids = regrade.quiz_question_regrades.map { |qqr| qqr.quiz_question_id }
       question_regrades.merge(ids)
     end
     question_regrades.count
@@ -1341,4 +1356,9 @@ class Quiz < ActiveRecord::Base
 
     filters
   end
+
+  def self.class_names
+    %w(Quiz Quizzes::Quiz)
+  end
+
 end

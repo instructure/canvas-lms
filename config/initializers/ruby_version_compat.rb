@@ -140,7 +140,7 @@ class ActiveRecord::Base
     'ErrorReport'              => %w[http_env data],
     'LearningOutcome'          => %w[data],
     'Profile'                  => %w[data],
-    'Quiz'                     => %w[quiz_data],
+    'Quizzes::Quiz'            => %w[quiz_data],
     'QuizQuestion'             => %w[question_data],
     'QuizSubmission'           => %w[quiz_data submission_data],
     'QuizSubmissionSnapshot'   => %w[data],

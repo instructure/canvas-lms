@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/report_spec_helper')
 
-describe "Outcom Reports" do
+describe "Outcome Reports" do
   include ReportSpecHelper
 
   before(:each) do
@@ -347,6 +347,16 @@ describe "Outcom Reports" do
       parsed[1][16].should == @course1.sis_source_id
 
       parsed.length.should == 3
+
+      # NOTE: remove after data migration of polymorphic relationships having: Quiz
+      result = LearningOutcomeResult.where(association_type: 'Quizzes::Quiz').first
+      result.association_type = 'Quiz'
+      result.send(:update_without_callbacks)
+
+      parsed = read_report(@type, {order: [0, 13]})
+      parsed[2][5].should == 'assignment'
+      parsed[0][5].should == 'quiz'
+      parsed[1][5].should == 'quiz'
     end
 
     it 'should include in extra text if option is set' do

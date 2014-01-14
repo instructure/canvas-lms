@@ -246,7 +246,7 @@ describe Submission do
       it "should not create a message when this is a quiz submission" do
         submission_spec_model
         @cc = @user.communication_channels.create(:path => "somewhere")
-        @quiz = Quiz.create!(:context => @course)
+        @quiz = Quizzes::Quiz.create!(:context => @course)
         @submission.quiz_submission = @quiz.generate_submission(@user)
         @submission.save!
         @submission.reload
@@ -349,7 +349,7 @@ describe Submission do
         @assignment.stubs(:score_to_grade).returns("10.0")
         @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
-        @quiz = Quiz.create!(:context => @course)
+        @quiz = Quizzes::Quiz.create!(:context => @course)
         @submission.quiz_submission = @quiz.generate_submission(@user)
         @submission.save!
         @cc = @user.communication_channels.create(:path => "somewhere")

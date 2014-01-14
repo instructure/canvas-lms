@@ -64,7 +64,7 @@ describe QuizSubmissionService do
   subject { QuizSubmissionService.new participant }
 
   let :quiz do
-    quiz = Quiz.new
+    quiz = Quizzes::Quiz.new
     quiz.workflow_state = 'available'
     quiz
   end

@@ -355,7 +355,7 @@ shared_examples_for "an object whose dates are overridable" do
       due = 5.days.from_now
       due_params = {:due_at => due, :lock_at => due, :unlock_at => due}
       a = overridable.class.new(due_params)
-      if a.is_a?(Quiz)
+      if a.is_a?(Quizzes::Quiz)
         a.assignment = Assignment.new(due_params)
       end
       a.due_date_hash[:due_at].should == due
@@ -459,7 +459,7 @@ describe Assignment do
   let(:overridable_type) { :assignment }
 end
 
-describe Quiz do
+describe Quizzes::Quiz do
   it_should_behave_like "an object whose dates are overridable"
 
   let(:overridable) { quiz_model(:due_at => 5.days.ago) }

@@ -139,8 +139,8 @@ class Course < ActiveRecord::Base
   has_many :messages, :as => :context, :dependent => :destroy
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   belongs_to :wiki
-  has_many :quizzes, :as => :context, :dependent => :destroy, :order => 'lock_at, title'
-  has_many :active_quizzes, :class_name => 'Quiz', :as => :context, :include => :assignment, :conditions => ['quizzes.workflow_state != ?', 'deleted'], :order => 'created_at'
+  has_many :quizzes, :class_name => 'Quizzes::Quiz', :as => :context, :dependent => :destroy, :order => 'lock_at, title'
+  has_many :active_quizzes, :class_name => 'Quizzes::Quiz', :as => :context, :include => :assignment, :conditions => ['quizzes.workflow_state != ?', 'deleted'], :order => 'created_at'
   has_many :assessment_questions, :through => :assessment_question_banks
   has_many :assessment_question_banks, :as => :context, :include => [:assessment_questions, :assessment_question_bank_users]
   def inherited_assessment_question_banks(include_self = false)
@@ -1948,13 +1948,13 @@ class Course < ActiveRecord::Base
     ContextExternalTool.process_migration(data, migration); migration.update_import_progress(45)
 
     #These need to be ran twice because they can reference each other
-    Quiz.process_migration(data, migration, question_data); migration.update_import_progress(50)
+    Quizzes::Quiz.process_migration(data, migration, question_data); migration.update_import_progress(50)
     DiscussionTopic.process_migration(data, migration);migration.update_import_progress(55)
     WikiPage.process_migration(data, migration);migration.update_import_progress(60)
     Assignment.process_migration(data, migration);migration.update_import_progress(65)
 
     # and second time...
-    Quiz.process_migration(data, migration, question_data); migration.update_import_progress(70)
+    Quizzes::Quiz.process_migration(data, migration, question_data); migration.update_import_progress(70)
     ContextModule.process_migration(data, migration);migration.update_import_progress(72)
     DiscussionTopic.process_migration(data, migration);migration.update_import_progress(75)
     WikiPage.process_migration(data, migration);migration.update_import_progress(80)
@@ -2006,7 +2006,7 @@ class Course < ActiveRecord::Base
             event.start_at = shift_date(event.start_at, shift_options)
             event.end_at = shift_date(event.end_at, shift_options)
             event.save_without_broadcasting!
-          elsif event.is_a?(Quiz)
+          elsif event.is_a?(Quizzes::Quiz)
             event.due_at = shift_date(event.due_at, shift_options)
             event.lock_at = shift_date(event.lock_at, shift_options)
             event.unlock_at = shift_date(event.unlock_at, shift_options)

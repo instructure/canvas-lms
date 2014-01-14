@@ -564,10 +564,14 @@ describe "quizzes question creation" do
       f('#quiz_time_limit').click
       alert_present?.should be_false
       fj('#quiz_allowed_attempts').should have_attribute('value', attempts) # fj to avoid selenium caching
-      expect_new_page_load { f('.save_quiz_button').click }
-      wait_for_ajaximations
-      keep_trying_until { f('.admin-links').should be_displayed }
-      Quiz.last.allowed_attempts.should == attempts.to_i
+
+      expect_new_page_load {
+        f('.save_quiz_button').click
+        wait_for_ajaximations
+        keep_trying_until { f('.admin-links').should be_displayed }
+      }
+
+      Quizzes::Quiz.last.allowed_attempts.should == attempts.to_i
     end
   end
 

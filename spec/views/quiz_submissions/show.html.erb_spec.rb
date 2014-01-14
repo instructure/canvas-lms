@@ -26,7 +26,7 @@ describe "/quiz_submissions/show" do
     @submission = mock('QuizSubmission')
     @submission.stubs(:score).returns(10)
     @submission.stubs(:data).returns([])
-    @quiz = mock('Quiz')
+    @quiz = mock('Quizzes::Quiz')
     @quiz.stubs(:questions).returns([])
     @quiz.stubs(:points_possible).returns(10)
     @quiz.stubs(:stored_questions).returns([])

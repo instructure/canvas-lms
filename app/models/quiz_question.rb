@@ -23,7 +23,7 @@ class QuizQuestion < ActiveRecord::Base
 
   attr_accessible :quiz, :quiz_group, :assessment_question, :question_data, :assessment_question_version
   attr_readonly :quiz_id
-  belongs_to :quiz
+  belongs_to :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :assessment_question
   belongs_to :quiz_group
   before_save :infer_defaults
@@ -53,7 +53,7 @@ class QuizQuestion < ActiveRecord::Base
   protected :infer_defaults
 
   def update_quiz
-    Quiz.mark_quiz_edited(self.quiz_id)
+    Quizzes::Quiz.mark_quiz_edited(self.quiz_id)
   end
 
   def question_data=(data)
@@ -147,7 +147,7 @@ class QuizQuestion < ActiveRecord::Base
 
   # QuizQuestion.data is used when creating and editing a quiz, but 
   # once the quiz is "saved" then the "rendered" version of the
-  # quiz is stored in Quiz.quiz_data.  Hence, the teacher can
+  # quiz is stored in Quizzes::Quiz.quiz_data.  Hence, the teacher can
   # be futzing with questions and groups and not affect
   # the quiz, as students see it.
   def data

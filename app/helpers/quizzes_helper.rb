@@ -468,7 +468,7 @@ module QuizzesHelper
 
   def take_quiz_url
     user_id = @current_user && @current_user.id
-    polymorphic_path([@context, @quiz, :take], :user_id => user_id)
+    course_quiz_take_path(@context, @quiz, user_id: user_id)
   end
 
   def link_to_take_or_retake_poll(opts={})

@@ -303,7 +303,7 @@ class ContextModulesController < ApplicationController
             result[:current_item] = @tags.detect{|t| t.id == obj.id }
           elsif obj.is_a?(DiscussionTopic) && obj.assignment_id
             result[:current_item] = @tags.detect{|t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
-          elsif obj.is_a?(Quiz) && obj.assignment_id
+          elsif obj.is_a?(Quizzes::Quiz) && obj.assignment_id
             result[:current_item] = @tags.detect{|t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
           end
         end

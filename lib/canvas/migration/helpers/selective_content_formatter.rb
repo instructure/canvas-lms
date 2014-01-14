@@ -278,7 +278,7 @@ module Canvas::Migration::Helpers
           :message => I18n.t('linked_assignment_message', "linked with Assignment '%{title}'",
                               :title => item.assignment.title)
         }
-      elsif item.is_a?(Quiz) && item.assignment
+      elsif item.is_a?(Quizzes::Quiz) && item.assignment
         mig_id = CC::CCHelper.create_key(item.assignment)
         hash[:linked_resource] = {:type => 'assignments', :migration_id => mig_id,
           :message => I18n.t('linked_assignment_message', "linked with Assignment '%{title}'",

@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-describe Quiz do
+describe Quizzes::Quiz do
   before(:each) do
     course
     @course.root_account.disable_feature!(:draft_state)
@@ -34,7 +34,7 @@ describe Quiz do
         quiz.unpublished_changes?.should be_false
       end
 
-      Quiz.mark_quiz_edited(quiz.id)
+      Quizzes::Quiz.mark_quiz_edited(quiz.id)
       quiz.reload.unpublished_changes?.should be_true
     end
   end
@@ -56,7 +56,7 @@ describe Quiz do
 
   describe "#publish!" do
     it "sets the workflow state to available and save!s the quiz" do
-      quiz = Quiz.new(:title => "hello")
+      quiz = Quizzes::Quiz.new(:title => "hello")
       quiz.expects(:generate_quiz_data).once
       quiz.expects(:save!).once
       quiz.publish!
@@ -66,7 +66,7 @@ describe Quiz do
 
   describe "#unpublish!" do
     it "sets the workflow state to unpublished and save!s the quiz" do
-      quiz = Quiz.new(:title => "hello")
+      quiz = Quizzes::Quiz.new(:title => "hello")
       quiz.expects(:save!).once
       quiz.publish!
       quiz.workflow_state.should == 'available'
@@ -737,7 +737,7 @@ describe Quiz do
     Canvas::Plugin.all_for_tag(:lockdown_browser).each { |p| p.settings[:enabled] = false }
 
     # nothing should be restricted
-    Quiz.lockdown_browser_plugin_enabled?.should be_false
+    Quizzes::Quiz.lockdown_browser_plugin_enabled?.should be_false
     [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?]).
         each { |qs| qs[0].send(qs[1]).should be_false }
 
@@ -746,7 +746,7 @@ describe Quiz do
         :settings => {:enabled => false}})
 
     # nothing should change yet
-    Quiz.lockdown_browser_plugin_enabled?.should be_false
+    Quizzes::Quiz.lockdown_browser_plugin_enabled?.should be_false
     [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?]).
         each { |qs| qs[0].send(qs[1]).should be_false }
 
@@ -756,7 +756,7 @@ describe Quiz do
     setting.save!
 
     # now the restrictions should take effect
-    Quiz.lockdown_browser_plugin_enabled?.should be_true
+    Quizzes::Quiz.lockdown_browser_plugin_enabled?.should be_true
     [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?].
         each { |s| q.send(s).should be_false }
     [:require_lockdown_browser, :require_lockdown_browser?].
@@ -768,7 +768,7 @@ describe Quiz do
   end
 
   describe "non_shuffled_questions" do
-    subject { Quiz.non_shuffled_questions }
+    subject { Quizzes::Quiz.non_shuffled_questions }
 
     it { should include "true_false_question" }
     it { should include "matching_question" }
@@ -777,7 +777,7 @@ describe Quiz do
   end
 
   describe "prepare_answers" do
-    let(:quiz) { Quiz.new }
+    let(:quiz) { Quizzes::Quiz.new }
     let(:question) { { :answers => answers } }
     let(:answers) { ['a', 'b', 'c'] }
 
@@ -785,7 +785,7 @@ describe Quiz do
       before { quiz.stubs(:shuffle_answers).returns(true) }
 
       context "on a non-shuffleable question type" do
-        before { Quiz.stubs(:shuffleable_question_type?).returns(false) }
+        before { Quizzes::Quiz.stubs(:shuffleable_question_type?).returns(false) }
 
         it "doesn't shuffle" do
           quiz.prepare_answers(question).should == answers
@@ -793,7 +793,7 @@ describe Quiz do
       end
 
       context "on a shuffleable question type" do
-        before { Quiz.stubs(:shuffleable_question_type?).returns(true) }
+        before { Quizzes::Quiz.stubs(:shuffleable_question_type?).returns(true) }
 
         it "returns the same answers, not necessarily in the same order" do
           quiz.prepare_answers(question).sort.should == answers.sort
@@ -814,14 +814,14 @@ describe Quiz do
   end
 
   describe "shuffleable_question_type?" do
-    specify { Quiz.shuffleable_question_type?("true_false_question").should be_false }
-    specify { Quiz.shuffleable_question_type?("multiple_choice_question").should be_true }
+    specify { Quizzes::Quiz.shuffleable_question_type?("true_false_question").should be_false }
+    specify { Quizzes::Quiz.shuffleable_question_type?("multiple_choice_question").should be_true }
   end
 
   describe '#has_student_submissions?' do
     before do
       course = Course.create!
-      @quiz = Quiz.create!(:context => course)
+      @quiz = Quizzes::Quiz.create!(:context => course)
       @user = User.create!
       @enrollment = @user.student_enrollments.create!(:course => course)
       @enrollment.update_attribute(:workflow_state, 'active')
@@ -854,13 +854,13 @@ describe Quiz do
   describe "#group_category_id" do
 
     it "returns the assignment's group category id if it has an assignment" do
-      quiz = Quiz.new(:title => "Assignment Group Category Quiz")
+      quiz = Quizzes::Quiz.new(:title => "Assignment Group Category Quizzes::Quiz")
       quiz.expects(:assignment).returns stub(:group_category_id => 1)
       quiz.group_category_id.should == 1
     end
 
     it "returns nil if it doesn't have an assignment" do
-      quiz = Quiz.new(:title => "Quiz w/o assignment")
+      quiz = Quizzes::Quiz.new(:title => "Quizzes::Quiz w/o assignment")
       quiz.group_category_id.should be_nil
     end
 
@@ -970,7 +970,7 @@ describe Quiz do
   context "custom validations" do
     context "changinging quiz points" do
       it "should not allow quiz points higher than allowable by postgres" do
-        q = Quiz.new(:points_possible => 2000000001)
+        q = Quizzes::Quiz.new(:points_possible => 2000000001)
         q.valid?.should == false
         q.errors.on(:points_possible).should == "must be less than or equal to 2000000000"
       end
@@ -1257,7 +1257,7 @@ describe Quiz do
       context = Course.new(:conclude_at => 10.minutes.ago)
       context.stubs(:root_account => acct)
 
-      quiz = Quiz.new(:context => context)
+      quiz = Quizzes::Quiz.new(:context => context)
       quiz.restrict_answers_for_concluded_course?.should be_true
     end
 
@@ -1268,7 +1268,7 @@ describe Quiz do
       context = Course.new(:conclude_at => 10.minutes.from_now)
       context.stubs(:root_account => acct)
 
-      quiz = Quiz.new(:context => context)
+      quiz = Quizzes::Quiz.new(:context => context)
       quiz.restrict_answers_for_concluded_course?.should be_false
     end
 
@@ -1279,7 +1279,7 @@ describe Quiz do
       context = Course.new(:conclude_at => 10.minutes.ago)
       context.stubs(:root_account => acct)
 
-      quiz = Quiz.new(:context => context)
+      quiz = Quizzes::Quiz.new(:context => context)
       quiz.restrict_answers_for_concluded_course?.should be_false
     end
   end
@@ -1378,6 +1378,7 @@ describe Quiz do
       quiz.hide_correct_answers_at.should be_nil
     end
   end
+
   context "permissions" do
 
     before do
@@ -1490,6 +1491,12 @@ describe Quiz do
 
       participant.stubs(:anonymous?).returns true
       subject.generate_submission_for_participant(participant)
+    end
+  end
+
+  describe '.class_names' do
+    it 'returns an array of all acceptable class names' do
+      Quizzes::Quiz.class_names.should == ['Quiz', 'Quizzes::Quiz']
     end
   end
 end

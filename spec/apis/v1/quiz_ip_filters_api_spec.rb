@@ -22,7 +22,7 @@ describe QuizIpFiltersController, type: :request do
   before :each do
     course_with_teacher_logged_in :active_all => true
 
-    @quiz = Quiz.create!(:title => 'quiz', :context => @course)
+    @quiz = Quizzes::Quiz.create!(:title => 'quiz', :context => @course)
     @quiz.save!
   end
 

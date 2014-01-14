@@ -23,7 +23,7 @@ shared_examples_for 'Quiz Submissions API Restricted Endpoints' do
     @quiz.require_lockdown_browser = true
     @quiz.save
 
-    Quiz.stubs(:lockdown_browser_plugin_enabled?).returns true
+    Quizzes::Quiz.stubs(:lockdown_browser_plugin_enabled?).returns true
 
     fake_plugin = Object.new
     fake_plugin.stubs(:authorized?).returns false
@@ -140,7 +140,7 @@ describe QuizSubmissionsApiController, type: :request do
   before :each do
     course_with_teacher_logged_in :active_all => true
 
-    @quiz = Quiz.create!(:title => 'quiz', :context => @course)
+    @quiz = Quizzes::Quiz.create!(:title => 'quiz', :context => @course)
     @quiz.published_at = Time.now
     @quiz.workflow_state = 'available'
     @quiz.save!
@@ -217,7 +217,7 @@ describe QuizSubmissionsApiController, type: :request do
         json.has_key?('quiz_submissions').should be_true
 
         qs_json = json['quiz_submissions'][0]
-        qs_json['html_url'].should == polymorphic_url([@course, @quiz, @quiz_submission])
+        qs_json['html_url'].should == course_quiz_quiz_submission_url(@course, @quiz, @quiz_submission)
       end
     end
 

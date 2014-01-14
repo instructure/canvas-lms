@@ -57,18 +57,18 @@ describe QuizSubmission do
 
     it "should validate quiz points possible is not too long" do
       qs = QuizSubmission.new
-      qs.quiz = Quiz.new(:points_possible => 2000000001)
+      qs.quiz = Quizzes::Quiz.new(:points_possible => 2000000001)
       qs.valid?.should == false
       qs.errors.on(:quiz_points_possible).should == "must be less than or equal to 2000000000"
     end
   end
 
   it "should copy the quiz's points_possible whenever it's saved" do
-    Quiz.where(:id => @quiz).update_all(:points_possible => 1.1)
+    Quizzes::Quiz.where(:id => @quiz).update_all(:points_possible => 1.1)
     q = @quiz.quiz_submissions.create!
     q.reload.quiz_points_possible.should eql 1.1
 
-    Quiz.where(:id => @quiz).update_all(:points_possible => 1.9)
+    Quizzes::Quiz.where(:id => @quiz).update_all(:points_possible => 1.9)
     q.reload.quiz_points_possible.should eql 1.1
 
     q.save!
@@ -1518,7 +1518,7 @@ describe QuizSubmission do
     end
 
     it "returns false if quiz restricts answers for concluded courses" do
-      quiz = Quiz.new
+      quiz = Quizzes::Quiz.new
       quiz.stubs(:restrict_answers_for_concluded_course? => true)
 
       qs = QuizSubmission.new(:quiz => quiz)
@@ -1526,7 +1526,7 @@ describe QuizSubmission do
     end
 
     it "returns true if quiz doesn't restrict answers for concluded courses" do
-      quiz = Quiz.new
+      quiz = Quizzes::Quiz.new
       quiz.stubs(:restrict_answers_for_concluded_course? => false)
 
       qs = QuizSubmission.new(:quiz => quiz)
@@ -1805,7 +1805,7 @@ describe QuizSubmission do
     it 'should be retriable if it is complete and the quiz has unlimited attempts' do
       subject.workflow_state = 'complete'
       subject.stubs(:attempts_left).returns 0
-      subject.quiz = Quiz.new
+      subject.quiz = Quizzes::Quiz.new
       subject.quiz.stubs(:unlimited_attempts?).returns true
       subject.retriable?.should be_true
     end
@@ -1813,7 +1813,7 @@ describe QuizSubmission do
 
   describe '#snapshot!' do
     before :each do
-      subject.quiz = Quiz.new
+      subject.quiz = Quizzes::Quiz.new
       subject.attempt = 1
     end
 

@@ -152,7 +152,7 @@ class QuizSubmissionsApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       scope = @quiz.quiz_submissions.where(:user_id => visible_user_ids)
-      api_route = polymorphic_url([:api, :v1, @context, @quiz, :submissions])
+      api_route = api_v1_course_quiz_submissions_url(@context, @quiz)
 
       quiz_submissions = Api.paginate(scope, self, api_route)
 

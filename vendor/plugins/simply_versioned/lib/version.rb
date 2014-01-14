@@ -15,6 +15,10 @@
 class Version < ActiveRecord::Base #:nodoc:
   belongs_to :versionable, :polymorphic => true
 
+  # INSTRUCTURE: shims for quizzes namespacing
+  include PolymorphicTypeOverride
+  override_polymorphic_types [type: 'versionable', from: 'Quiz', to: 'Quizzes::Quiz']
+
   before_create :initialize_number
 
   # Return an instance of the versioned ActiveRecord model with the attribute
@@ -22,6 +26,7 @@ class Version < ActiveRecord::Base #:nodoc:
   def model
     obj = versionable_type.constantize.new
     YAML::load( self.yaml ).each do |var_name,var_value|
+
       # INSTRUCTURE:  added if... so that if a column is removed in a migration after this was versioned it doesen't die with NoMethodError: undefined method `some_column_name=' for ...
        obj.write_attribute(var_name, var_value) if obj.class.columns_hash[var_name]
     end

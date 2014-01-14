@@ -17,6 +17,10 @@
 #
 
 class LearningOutcomeResult < ActiveRecord::Base
+  include PolymorphicTypeOverride
+  override_polymorphic_types [{type: 'association', from: 'Quiz', to: 'Quizzes::Quiz'},
+                              {type: 'associated_asset', from: 'Quiz', to: 'Quizzes::Quiz'}]
+
   belongs_to :user
   belongs_to :learning_outcome
   belongs_to :alignment, :class_name => 'ContentTag', :foreign_key => :content_tag_id

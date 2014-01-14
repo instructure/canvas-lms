@@ -17,11 +17,11 @@ class QuizSerializer < Canvas::APISerializer
   has_one :assignment_group, embed: :ids, key: :assignment_group
 
   def html_url
-    polymorphic_url([context, quiz])
+    controller.send(:course_quiz_url, context, quiz)
   end
 
   def mobile_url
-    polymorphic_url([context, quiz], persist_headless: 1, force_user: 1)
+    controller.send(:course_quiz_url, context, quiz, persist_headless: 1, force_user: 1)
   end
 
   def all_dates

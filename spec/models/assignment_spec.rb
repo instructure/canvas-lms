@@ -1092,7 +1092,7 @@ describe Assignment do
       @quiz.assignment_id.should eql(@a.id)
       @a.submission_types = 'on_paper'
       @a.save!
-      @quiz = Quiz.find(@quiz.id)
+      @quiz = Quizzes::Quiz.find(@quiz.id)
       @quiz.assignment_id.should eql(nil)
       @quiz.state.should eql(:deleted)
       @a.reload
@@ -1117,7 +1117,7 @@ describe Assignment do
       @a.reload
       @a.quiz.should be_nil
       @a.state.should eql(:published)
-      @quiz = Quiz.find(@quiz.id)
+      @quiz = Quizzes::Quiz.find(@quiz.id)
       @quiz.assignment_id.should eql(nil)
       @quiz.state.should eql(:created)
     end

@@ -47,6 +47,9 @@ class ContentTag < ActiveRecord::Base
   include CustomValidations
   validates_as_url :url
 
+  include PolymorphicTypeOverride
+  override_polymorphic_types [type: 'content', from: 'Quiz', to: 'Quizzes::Quiz']
+
   acts_as_list :scope => :context_module
 
   attr_accessible :learning_outcome, :context, :tag_type, :mastery_score, :content_asset_string, :content, :title, :indent, :position, :url, :new_tab, :content_type
@@ -137,7 +140,7 @@ class ContentTag < ActiveRecord::Base
   end
   
   def scoreable?
-    self.content_type == 'Quiz' || self.graded?
+    self.content_type_quiz? || self.graded?
   end
   
   def graded?
@@ -145,7 +148,7 @@ class ContentTag < ActiveRecord::Base
     return false unless self.content_type.constantize.column_names.include?('assignment_id') #.new.respond_to?(:assignment_id)
     return !content.assignment_id.nil? rescue false
   end
-  
+
   def content_type_class
     if self.content_type == 'Assignment'
       if self.content && self.content.submission_types == 'online_quiz'
@@ -169,6 +172,7 @@ class ContentTag < ActiveRecord::Base
   
   alias_method :old_content, :content
   def content
+    #self.content_type = 'Quizzes::Quiz' if self.content_type == 'Quiz'
     klass = self.content_type.classify.constantize rescue nil
     klass.respond_to?("tableless?") && klass.tableless? ? nil : old_content
   end
@@ -307,9 +311,13 @@ class ContentTag < ActiveRecord::Base
   end
 
   def sync_workflow_state_to_asset?
-    ['Quiz', 'Assignment', 'WikiPage'].include?(self.content_type)
+    self.content_type_quiz? || ['Assignment', 'WikiPage'].include?(self.content_type)
   end
-  
+
+  def content_type_quiz?
+    Quizzes::Quiz.class_names.include?(self.content_type)
+  end
+
   def context_module_action(user, action, points=nil)
     self.context_module.update_for(user, action, self, points) if self.context_module
   end

@@ -100,7 +100,7 @@ module UserContent
       'collaborations' => Collaboration,
       'files' => Attachment,
       'conferences' => WebConference,
-      'quizzes' => Quiz,
+      'quizzes' => Quizzes::Quiz,
       'groups' => Group,
       'wiki' => WikiPage,
       'grades' => nil,

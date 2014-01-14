@@ -31,7 +31,7 @@ class QuizSubmission < ActiveRecord::Base
                                                    allow_nil: true
 
   before_validation :update_quiz_points_possible
-  belongs_to :quiz
+  belongs_to :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :user
   belongs_to :submission, :touch => true
   before_save :update_kept_score

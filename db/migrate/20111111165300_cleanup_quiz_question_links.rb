@@ -11,11 +11,11 @@ class CleanupQuizQuestionLinks < ActiveRecord::Migration
       }, batch.map(&:id))
     end
 
-    Quiz.where(
+    Quizzes::Quiz.where(
         "quizzes.context_type='Course' AND " \
         "quizzes.quiz_data LIKE '%/courses/%'").select(:id).
         find_in_batches do |batch|
-      Quiz.send_later_if_production_enqueue_args(:batch_migrate_file_links, {
+      Quizzes::Quiz.send_later_if_production_enqueue_args(:batch_migrate_file_links, {
         :priority => Delayed::LOWER_PRIORITY,
         :max_attempts => 1,
         :strand => 'cleanup_quiz_question_links'

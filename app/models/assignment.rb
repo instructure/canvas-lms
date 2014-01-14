@@ -45,7 +45,7 @@ class Assignment < ActiveRecord::Base
 
   has_many :submissions, :dependent => :destroy
   has_many :attachments, :as => :context, :dependent => :destroy
-  has_one :quiz
+  has_one :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :assignment_group
   has_one :discussion_topic, :conditions => ['discussion_topics.root_topic_id IS NULL'], :order => 'created_at'
   has_many :learning_outcome_alignments, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
@@ -359,7 +359,7 @@ class Assignment < ActiveRecord::Base
   def update_quiz_or_discussion_topic
     return true if self.deleted?
     if self.submission_types == "online_quiz" && @saved_by != :quiz
-      quiz = Quiz.find_by_assignment_id(self.id) || self.context.quizzes.build
+      quiz = Quizzes::Quiz.find_by_assignment_id(self.id) || self.context.quizzes.build
       quiz.assignment_id = self.id
       quiz.title = self.title
       quiz.description = self.description
@@ -1685,7 +1685,7 @@ class Assignment < ActiveRecord::Base
       hash[:missing_links].each do |field, missing_links|
         context.content_migration.add_missing_content_links(:class => item.class.to_s,
           :id => item.id, :field => field, :missing_links => missing_links,
-          :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.underscore.pluralize}/#{item.id}")
+          :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}")
       end
     end
 

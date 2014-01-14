@@ -1339,7 +1339,7 @@ describe AssignmentsApiController, type: :request do
         context "assignment with quiz" do
           before do
             course_with_teacher(:active_all => true)
-            @quiz = Quiz.create!(:title => 'Quiz Name', :context => @course)
+            @quiz = Quizzes::Quiz.create!(:title => 'Quiz Name', :context => @course)
             @quiz.did_edit!
             @quiz.offer!
             assignment = @quiz.assignment
