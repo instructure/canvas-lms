@@ -551,7 +551,11 @@ class ActiveRecord::Base
     scope = scope(:find)
     scope = scope ? scope.dup : {}
     scope.delete(:include)
-    with_exclusive_scope(find: scope) { connection.execute "CREATE TEMPORARY TABLE #{table} AS #{scoped.to_sql}" }
+    sql = with_exclusive_scope(find: scope) { scoped.to_sql }
+    if %w{MySQL Mysql2}.include?(connection.adapter_name)
+      table_options = " (temp_primary_key MEDIUMINT NOT NULL AUTO_INCREMENT PRIMARY KEY)"
+    end
+    connection.execute "CREATE TEMPORARY TABLE #{table}#{table_options} AS #{sql}"
     begin
       index = "temp_primary_key"
       case connection.adapter_name
@@ -564,8 +568,7 @@ class ActiveRecord::Base
           connection.raw_connection.set_notice_processor(&old_proc) if old_proc
         end
       when 'MySQL', 'Mysql2'
-        connection.execute "ALTER TABLE #{table}
-                               ADD temp_primary_key MEDIUMINT NOT NULL PRIMARY KEY AUTO_INCREMENT"
+        # created as part of the temp table
       when 'SQLite'
         # Sqlite always has an implicit primary key
         index = 'rowid'
