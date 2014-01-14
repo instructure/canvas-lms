@@ -77,7 +77,7 @@ module IncomingMail
       end
 
       begin
-        original_message = Message.where(id: message_id).first
+        original_message = Message.find_by_id(message_id)
         # This prevents us from rebouncing users that have auto-replies setup -- only bounce something
         # that was sent out because of a notification.
         raise IncomingMessageProcessor::SilentIgnoreError unless original_message && original_message.notification_id
