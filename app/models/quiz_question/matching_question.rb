@@ -18,19 +18,19 @@
 
 class QuizQuestion::MatchingQuestion < QuizQuestion::Base
   def total_answer_parts
-    @question_data[:answers].length
+    @question_data.answers.length
   end
 
   def correct_answer_parts(user_answer)
     total_answers = 0
     correct_answers = 0
 
-    @question_data[:answers].each do |answer|
+    @question_data.answers.each do |answer|
       answer_match = user_answer["answer_#{answer[:id]}"].to_s
 
       if answer_match.present?
         total_answers += 1
-        found_matched = @question_data[:answers].find {|a| a[:match_id].to_i == answer_match.to_i }
+        found_matched = @question_data.answers.find {|a| a[:match_id].to_i == answer_match.to_i }
         if found_matched == answer || (found_matched && found_matched[:right] && found_matched[:right] == answer[:right])
           correct_answers += 1
           answer_match = answer[:match_id].to_s
@@ -48,7 +48,7 @@ class QuizQuestion::MatchingQuestion < QuizQuestion::Base
   def stats(responses)
     stats = {:multiple_answers => true}
 
-    answers = @question_data[:answers]
+    answers = @question_data.answers
     matches = @question_data[:matches]
 
     answers.each_with_index do |answer, i|

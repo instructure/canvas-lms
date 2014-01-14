@@ -146,8 +146,10 @@ class UserList
   
   def resolve
     all_account_ids = [@root_account.id] + @root_account.trusted_account_ids
+    associated_shards = @addresses.map {|x| Pseudonym.associated_shards(x[:address].downcase) }.flatten.to_set
     # Search for matching pseudonyms
     Shard.partition_by_shard(all_account_ids) do |account_ids|
+      next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
       Pseudonym.active.
           select('unique_id AS address, users.name AS name, user_id, account_id, sis_user_id').
           joins(:user).
@@ -184,7 +186,9 @@ class UserList
     # Search for matching emails (only if not open registration; otherwise there's no point - we just
     # create temporary users)
     emails = @addresses.select { |a| a[:type] == :email } if @search_method != :open
+    associated_shards = @addresses.map {|x| CommunicationChannel.associated_shards(x[:address].downcase) }.flatten.to_set
     Shard.partition_by_shard(all_account_ids) do |account_ids|
+      next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
       Pseudonym.active.
           select('path AS address, users.name AS name, communication_channels.user_id AS user_id, communication_channels.workflow_state AS workflow_state').
           joins(:user => :communication_channels).
@@ -226,6 +230,7 @@ class UserList
     end
     sms_account_ids = @search_method != :closed ? [@root_account] : all_account_ids
     Shard.partition_by_shard(sms_account_ids) do |account_ids|
+      next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
       sms_scope = @search_method != :closed ? Pseudonym : Pseudonym.where(:account_id => account_ids)
       sms_scope.active.
           select('path AS address, users.name AS name, communication_channels.user_id AS user_id').

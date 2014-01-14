@@ -276,7 +276,7 @@ class UsersController < ApplicationController
   before_filter :require_password_session, :only => [:masquerade]
   def masquerade
     @user = User.find_by_id(params[:user_id])
-    return render_unauthorized_action(@user) unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
+    return render_unauthorized_action unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
     if request.post?
       if @user == @real_current_user
         session.delete(:become_user_id)
@@ -794,7 +794,7 @@ class UsersController < ApplicationController
     @tool = ContextExternalTool.find_for(params[:id], @domain_root_account, :user_navigation)
     @resource_title = @tool.label_for(:user_navigation)
     @resource_url = @tool.user_navigation(:url)
-    @opaque_id = @current_user.opaque_identifier(:asset_string)
+    @opaque_id = @tool.opaque_identifier_for(@current_user)
     @resource_type = 'user_navigation'
     @return_url = user_profile_url(@current_user, :include_host => true)
     @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @domain_root_account, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
@@ -1144,7 +1144,7 @@ class UsersController < ApplicationController
         end
       end
     else
-      render_unauthorized_action(@user)
+      render_unauthorized_action
     end
   end
 

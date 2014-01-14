@@ -83,12 +83,17 @@ class GroupCategory < ActiveRecord::Base
       role_category_for_context('communities', context)
     end
 
+    def uncategorized
+      GroupCategory.new(name: name_for_role('uncategorized'), role: 'uncategorized')
+    end
+
     protected
     def name_for_role(role)
       case role
       when 'student_organized' then t('group_categories.student_organized', "Student Groups")
       when 'imported'          then t('group_categories.imported', "Imported Groups")
       when 'communities'       then t('group_categories.communities', "Communities")
+      when 'uncategorized'     then t('group_categories.uncategorized', "Uncategorized")
       end
     end
 

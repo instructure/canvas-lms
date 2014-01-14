@@ -3,7 +3,7 @@ class AddAssociationToLearningOutcomeResultsIndex < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def self.up
-    remove_index :learning_outcome_results, name: "index_learning_outcome_results_association"
+    rename_index :learning_outcome_results, 'index_learning_outcome_results_association', 'temp_index_learning_outcome'
     LearningOutcomeResult.
       select("user_id, content_tag_id, association_id, association_type,
               associated_asset_id, associated_asset_type").
@@ -20,7 +20,12 @@ class AddAssociationToLearningOutcomeResultsIndex < ActiveRecord::Migration
       keeper = scope.order("updated_at DESC").first
       scope.where("id<>?", keeper).delete_all
     end
-    add_index :learning_outcome_results, [:user_id, :content_tag_id, :association_id, :association_type, :associated_asset_id, :associated_asset_type], unique: true, name: "index_learning_outcome_results_association", algorithm: :concurrently
+    add_index :learning_outcome_results,
+              [:user_id, :content_tag_id, :association_id, :association_type, :associated_asset_id, :associated_asset_type],
+              unique: true,
+              name: "index_learning_outcome_results_association",
+              algorithm: :concurrently
+    remove_index :learning_outcome_results, name: "temp_index_learning_outcome"
   end
 
   def self.down

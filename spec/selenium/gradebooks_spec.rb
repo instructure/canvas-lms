@@ -44,7 +44,7 @@ describe "gradebook1" do
   end
 
   it "hides/shows assignments based on their draft state" do
-    @course.root_account.enable_draft!
+    @course.root_account.enable_feature!(:draft_state)
     @assignment.unpublish
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations

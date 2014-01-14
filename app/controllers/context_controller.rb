@@ -468,7 +468,7 @@ class ContextController < ApplicationController
       id = type.pop
       type = type.join("_")
       scope = @context
-      scope = @context.wiki if type == 'wiki_pages'
+      scope = @context.wiki if type == 'wiki_page'
       type = 'all_discussion_topic' if type == 'discussion_topic'
       @item = scope.send(type.pluralize).find(id)
       @item.restore

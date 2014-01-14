@@ -25,12 +25,13 @@ class String # :nodoc:
     self.gsub(/[^\w]+/, " ").gsub(/\b('?[a-z])/){$1.capitalize}.strip
   end
 
-  # Backporting this from rails3 because I think it's nice
-  unless method_defined?(:strip_heredoc)
-    def strip_heredoc
-      indent = scan(/^[ \t]*(?=\S)/).min.try(:size) || 0
-      gsub(/^[ \t]{#{indent}}/, '')
+  if CANVAS_RAILS2
+    # Backporting this from rails3 because I think it's nice
+    unless method_defined?(:strip_heredoc)
+      def strip_heredoc
+        indent = scan(/^[ \t]*(?=\S)/).min.try(:size) || 0
+        gsub(/^[ \t]{#{indent}}/, '')
+      end
     end
   end
-
 end

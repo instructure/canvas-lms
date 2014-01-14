@@ -16,7 +16,7 @@ class QuizSubmissionZipper < ContentZipper
     mark_attachment_as_zipping!(zip_attachment)
     make_zip_tmpdir(filename) do |zip_name|
       @logger.debug("creating #{zip_name}")
-      Zip::ZipFile.open(zip_name, Zip::ZipFile::CREATE) do |zipfile|
+      Zip::File.open(zip_name, Zip::File::CREATE) do |zipfile|
         count = attachments_with_filenames.size
         attachments_with_filenames.each_with_index do |arr,idx|
           attachment,filename = arr

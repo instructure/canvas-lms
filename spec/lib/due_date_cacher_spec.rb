@@ -110,6 +110,26 @@ describe DueDateCacher do
     end
   end
 
+  describe "#submissions" do
+    it "should not create submissions for enrollments that are not overridden" do
+      cacher = DueDateCacher.new([@assignment])
+      cacher.submissions.size.should eql(0)
+    end
+
+    it "should create submissions for enrollments that are overridden" do
+      assignment_override_model(
+        :assignment => @assignment,
+        :set => @course.default_section)
+      @override.override_due_at(@assignment.due_at + 1.day)
+      @override.save!
+
+      cacher = DueDateCacher.new([@assignment])
+      cacher.submissions.size.should eql(1)
+      cacher.submissions.first.assignment.should == @assignment
+      cacher.submissions.first.user.should == @student
+    end
+  end
+
   describe "#recompute" do
     before do
       @cacher = DueDateCacher.new([@assignment])

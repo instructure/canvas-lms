@@ -15,7 +15,7 @@
         <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
           <td colspan="2" class="footnote">
             *
-            <% if can_do(@quiz, @current_user, :grade) %>
+            <% if can_do(@quiz, @current_user, :grade) && !@quiz.survey? %>
               <%= link_to t(:questions_not_graded, 'Some questions not yet graded'), context_url(@context, :context_quiz_history_url, @quiz, :version => @submission.version_number, :user_id => @submission.user_id) %>
             <% else %>
               <%= t(:questions_not_graded, 'Some questions not yet graded') %>

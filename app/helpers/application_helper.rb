@@ -482,7 +482,12 @@ module ApplicationHelper
   end
 
   def embedded_chat_quicklaunch_params
-    {user_id: @current_user.id, course_id: @context.id, canvas_url: "#{HostUrl.protocol}://#{HostUrl.default_host}"}
+    {
+      user_id: @current_user.id,
+      course_id: @context.id,
+      canvas_url: "#{HostUrl.protocol}://#{HostUrl.default_host}",
+      tool_consumer_instance_guid: @context.root_account.lti_guid
+    }
   end
 
   def embedded_chat_url

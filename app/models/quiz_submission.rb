@@ -21,7 +21,12 @@ class QuizSubmission < ActiveRecord::Base
   attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade
   attr_readonly :quiz_id, :user_id
   validates_presence_of :quiz_id
-
+  validates_numericality_of :extra_time, greater_than_or_equal_to: 0,
+                                         less_than_or_equal_to: 10080, # one week
+                                         allow_nil: true
+  validates_numericality_of :extra_attempts, greater_than_or_equal_to: 0,
+                                             less_than_or_equal_to: 1000,
+                                             allow_nil: true
   belongs_to :quiz
   belongs_to :user
   belongs_to :submission, :touch => true
@@ -487,7 +492,9 @@ class QuizSubmission < ActiveRecord::Base
     self.submission_data = @user_answers
     self.workflow_state = "complete"
     @user_answers.each do |answer|
-      self.workflow_state = "pending_review" if answer[:correct] == "undefined"
+      if answer[:correct] == "undefined" && !quiz.survey?
+        self.workflow_state = 'pending_review'
+      end
     end
     self.score_before_regrade = nil
     self.finished_at = Time.now
@@ -637,6 +644,11 @@ class QuizSubmission < ActiveRecord::Base
     (self.finished_at || self.started_at) - self.started_at rescue 0
   end
 
+  def time_spent
+    return unless finished_at.present?
+    (finished_at - started_at + (extra_time||0)).round
+  end
+
   def self.score_question(q, params)
     params = params.with_indifferent_access
     # TODO: undefined_if_blank - we need a better solution for the
@@ -648,6 +660,7 @@ class QuizSubmission < ActiveRecord::Base
     # the teacher gets the added burden of going back and manually assigning
     # scores for these questions per student.
     qq = QuizQuestion::Base.from_question_data(q)
+
     user_answer = qq.score_question(params)
     result = {
       :correct => user_answer.correctness,

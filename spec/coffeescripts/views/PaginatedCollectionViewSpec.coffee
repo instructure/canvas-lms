@@ -23,6 +23,7 @@ define [
     tagName: 'li'
     template: ({id}) -> id
     initialize: ->
+      super
       # make some scrolly happen
       @$el.css 'height', 500
 

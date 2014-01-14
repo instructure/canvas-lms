@@ -28,6 +28,27 @@ describe "API", :type => :integration do
       @course.expects(:as_json).with({ :include_root => false, :permissions => { :user => @user, :session => session, :include_permissions => false }, :only => [ :name, :sis_source_id ] })
       obj.api_json(@course, @user, session, :only => [:name, :sis_source_id])
     end
+
+    it "should accept a block to add serialized field data" do
+      # DON'T use Object here; injecting Object will have ramifications in-memory for the entire test suite.
+      class MockedAPIObject < Object; end
+      obj = MockedAPIObject.new
+      obj.class.module_eval { attr_accessor :serialized, :name }
+
+      obj.name = "Some Object"
+      obj.serialized = {:nested_key => "foo"}
+
+      obj.extend Api::V1::Json
+      course_with_teacher
+      session = mock()
+
+      json_hash = obj.api_json(@course, @user, session, :only => [:name]) do |json, object|
+        json.mapped_value = obj.serialized[:nested_key]
+      end
+
+      json_hash.should have_key(:mapped_value)
+      json_hash[:mapped_value].should == "foo"
+    end
   end
 
   describe "as_json extensions" do

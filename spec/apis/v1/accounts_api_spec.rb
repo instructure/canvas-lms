@@ -83,6 +83,24 @@ describe "Accounts API", :type => :integration do
         'Account 1', 'Account 2']
     end
 
+    it "should add sub account" do
+      previous_sub_count = @a1.sub_accounts.size
+      json = api_call(:post,
+        "/api/v1/accounts/#{@a1.id}/sub_accounts",
+         {:controller=>'sub_accounts', :action=>'create',
+          :account_id => @a1.id.to_s, :format => 'json'},
+         {:account => { 'name' => 'New sub-account',
+                        'default_storage_quota_mb' => 123,
+                        'default_user_storage_quota_mb' => 456,
+                        'default_group_storage_quota_mb' => 147 }})
+      @a1.sub_accounts.size.should == previous_sub_count + 1
+      sub = @a1.sub_accounts.detect{|a| a.name == "New sub-account"}
+      sub.should_not be_nil
+      sub.default_storage_quota_mb.should == 123
+      sub.default_user_storage_quota_mb.should == 456
+      sub.default_group_storage_quota_mb.should == 147
+    end
+
     describe "recursive" do
 
       it "returns sub accounts recursively" do

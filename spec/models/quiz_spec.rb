@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe Quiz do
   before(:each) do
     course
-    @course.root_account.disable_draft!
+    @course.root_account.disable_feature!(:draft_state)
   end
 
   describe ".mark_quiz_edited" do
@@ -32,6 +32,18 @@ describe Quiz do
       quiz.unpublished_changes?.should be_false
 
       Quiz.mark_quiz_edited(quiz.id)
+      quiz.reload.unpublished_changes?.should be_true
+    end
+  end
+
+  describe "#mark_edited!" do
+    it "should mark a quiz as having unpublished changes" do
+      quiz = @course.quizzes.create! :title => "hello"
+      quiz.published_at = Time.now
+      quiz.publish!
+      quiz.unpublished_changes?.should be_false
+
+      quiz.mark_edited!
       quiz.reload.unpublished_changes?.should be_true
     end
   end
@@ -276,7 +288,7 @@ describe Quiz do
   end
 
   it "should not create the assignment if unpublished and draft_states are not enabled" do
-    @course.root_account.disable_draft!
+    @course.root_account.disable_feature!(:draft_state)
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
     q.save!
@@ -287,11 +299,11 @@ describe Quiz do
 
   context "when draft_states are enabled" do
     before :each do
-      @course.root_account.enable_draft!
+      @course.root_account.enable_feature!(:draft_state)
     end
 
     after :each do
-      @course.root_account.disable_draft!
+      @course.root_account.reset_feature!(:draft_state)
     end
 
     it "should always have an assignment" do
@@ -328,7 +340,7 @@ describe Quiz do
   end
 
   it "should create the assignment if published after being created when draft_state not enabled" do
-    @course.root_account.disable_draft!
+    @course.root_account.disable_feature!(:draft_state)
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
     q.save!
@@ -434,7 +446,7 @@ describe Quiz do
 
   it "should shuffle answers for the questions" do
     q = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
-    q.quiz_questions.create!(:question_data => {:name => 'test 3', 'question_type' => 'multiple_choice_question', 'answers' => {'answer_0' => {'answer_text' => '1'}, 'answer_1' => {'answer_text' => '2'}, 'answer_2' => {'answer_text' => '3'},'answer_3' => {'answer_text' => '4'},'answer_4' => {'answer_text' => '5'},'answer_5' => {'answer_text' => '6'},'answer_6' => {'answer_text' => '7'},'answer_7' => {'answer_text' => '8'},'answer_8' => {'answer_text' => '9'},'answer_9' => {'answer_text' => '10'}}})
+    q.quiz_questions.create!(:question_data => {:name => 'test 3', 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '1'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}, {'answer_text' => '5'}, {'answer_text' => '6'}, {'answer_text' => '7'}, {'answer_text' => '8'}, {'answer_text' => '9'}, {'answer_text' => '10'}]})
     q.quiz_data.should be_nil
     q.generate_quiz_data
     q.save
@@ -1187,7 +1199,7 @@ describe Quiz do
   describe "#destroy" do
     it "should logical delete published quiz" do
       quiz = @course.quizzes.create(title: 'test quiz')
-      quiz.context.root_account.enable_draft!
+      quiz.context.root_account.enable_feature!(:draft_state)
       quiz.stubs(:has_student_submissions? => true)
       quiz.publish!
       quiz.assignment.stubs(:has_student_submissions? => true)
@@ -1198,7 +1210,7 @@ describe Quiz do
 
     it "should logical delete the published quiz's associated assignment" do
       quiz = @course.quizzes.create(title: 'test quiz')
-      quiz.context.root_account.enable_draft!
+      quiz.context.root_account.enable_feature!(:draft_state)
       quiz.stubs(:has_student_submissions?).returns true
       quiz.publish!
       assignment = quiz.assignment
@@ -1212,8 +1224,8 @@ describe Quiz do
   context "draft_state" do
 
     it "updates the assignment's workflow state" do
+      @course.root_account.enable_feature!(:draft_state)
       @quiz = @course.quizzes.create!(title: 'Test Quiz')
-      @quiz.context.root_account.enable_draft!
       @quiz.publish!
       @quiz.unpublish!
       @quiz.assignment.should_not be_published
@@ -1221,5 +1233,195 @@ describe Quiz do
       @quiz.assignment.should be_published
     end
 
+  end
+
+  context "show_correct_answers" do
+    it "totally hides the correct answers" do
+      quiz = @course.quizzes.create!({
+        title: 'test quiz',
+        show_correct_answers: false
+      })
+
+      quiz.publish!
+
+      submission = quiz.generate_submission(@user)
+
+      quiz.show_correct_answers?(@user, submission).should be_false
+    end
+
+    it "shows the correct answers immediately" do
+      quiz = @course.quizzes.create!({
+        title: 'test quiz',
+        show_correct_answers: true
+      })
+
+      quiz.publish!
+
+      submission = quiz.generate_submission(@user)
+
+      quiz.show_correct_answers?(@user, submission).should be_true
+    end
+
+    it "shows the correct answers after a certain date" do
+      quiz = @course.quizzes.create!({
+        title: 'test quiz',
+        show_correct_answers: true,
+        show_correct_answers_at: 10.minutes.from_now
+      })
+
+      quiz.publish!
+
+      submission = quiz.generate_submission(@user)
+
+      quiz.show_correct_answers?(@user, submission).should be_false
+
+      quiz.show_correct_answers_at = 2.minutes.ago
+      quiz.save!
+      quiz.reload
+
+      quiz.show_correct_answers?(@user, submission).should be_true
+    end
+
+    it "hides the correct answers after a certain date" do
+      quiz = @course.quizzes.create!({
+        title: 'test quiz',
+        show_correct_answers: true
+      })
+
+      quiz.publish!
+
+      submission = quiz.generate_submission(@user)
+
+      quiz.show_correct_answers?(@user, submission).should be_true
+
+      quiz.hide_correct_answers_at = 2.minutes.ago
+      quiz.save!
+      quiz.reload
+
+      quiz.show_correct_answers?(@user, submission).should be_false
+    end
+
+    it "nullifies related fields when turned off" do
+      quiz = @course.quizzes.create({
+        title: 'test quiz',
+        show_correct_answers: false,
+        show_correct_answers_at: 2.days.from_now,
+        hide_correct_answers_at: 5.days.from_now
+      })
+
+      quiz.show_correct_answers_at.should be_nil
+      quiz.hide_correct_answers_at.should be_nil
+
+      quiz.update_attributes({
+        show_correct_answers: true,
+        show_correct_answers_at: 2.days.from_now,
+        hide_correct_answers_at: 5.days.from_now
+      })
+
+      quiz.show_correct_answers_at.should_not be_nil
+      quiz.hide_correct_answers_at.should_not be_nil
+
+      quiz.update_attributes({
+        show_correct_answers: false
+      })
+
+      quiz.show_correct_answers_at.should be_nil
+      quiz.hide_correct_answers_at.should be_nil
+    end
+  end
+  context "permissions" do
+
+    before do
+      @course.workflow_state = 'available'
+      @course.save!
+      course_quiz(course: @course)
+      student_in_course(course: @course, active_all: true)
+      teacher_in_course(course: @course, active_all: true)
+    end
+
+    describe "read" do
+
+      context "draft state enabled" do
+
+        before do
+          @course.account.enable_feature!(:draft_state)
+        end
+
+        it "doesn't let student read/submit quizzes that are unpublished" do
+          @quiz.unpublish!.reload
+          @quiz.grants_right?(@student, nil, :read).should == false
+          @quiz.grants_right?(@student, nil, :submit).should == false
+          @quiz.grants_right?(@teacher, nil, :read).should == true
+        end
+
+        it "does let students read/submit quizzes that are published" do
+          @quiz.publish!
+          @quiz.grants_right?(@student, nil, :read).should == true
+          @quiz.grants_right?(@student, nil, :submit).should == true
+          @quiz.grants_right?(@teacher, nil, :read).should == true
+        end
+
+      end
+
+      context "draft state not enabled" do
+
+        it "always lets students view the quiz, even if not available" do
+          @quiz.workflow_state = 'edited'
+          @quiz.save!
+          @quiz.grants_right?(@student, nil, :read).should == true
+          @quiz.workflow_state = 'available'
+          @quiz.save!
+          @quiz.grants_right?(@student, nil, :read).should == true
+        end
+
+        it "only allows submitting for available assignments" do
+          @quiz.workflow_state = 'edited'
+          @quiz.save!
+          @quiz.grants_right?(@student, nil, :submit).should == false
+          @quiz.workflow_state = 'available'
+          @quiz.save!
+          @quiz.grants_right?(@student, nil, :submit).should == true
+        end
+      end
+    end
+  end
+
+  describe "#available?" do
+
+    before do
+      @quiz = @course.quizzes.create!(title: 'Test Quiz')
+    end
+
+    context "draft state enabled" do
+      before do
+        @course.account.enable_feature!(:draft_state)
+      end
+
+      it "returns true if quiz is published" do
+        @quiz.publish!
+        @quiz.should be_available
+        @quiz.unpublish!
+        @quiz.should_not be_available
+      end
+    end
+
+    context "draft state disabled" do
+      it "returns true when workflow_state is 'available'" do
+        @quiz.workflow_state = 'available'
+        @quiz.should be_available
+        @quiz.workflow_state = 'deleted'
+        @quiz.should_not be_available
+      end
+    end
+  end
+
+  describe "restore" do
+    it "should restore to unpublished state if draft_state is enabled" do
+      course(draft_state: true)
+      @quiz = @course.quizzes.create!(title: 'Test Quiz')
+      @quiz.destroy
+      @quiz.restore
+      @quiz.reload.should be_unpublished
+    end
   end
 end

@@ -109,6 +109,12 @@ class Submission < ActiveRecord::Base
   after_save :check_for_media_object
   after_save :update_quiz_submission
   after_save :update_participation
+  after_save :grade_change_audit
+
+  def autograded?
+    # AutoGrader == (quiz_id * -1)
+    !!(self.grader_id && self.grader_id < 0)
+  end
 
   def self.needs_grading_trigger_sql
     # every database uses a different construct for a current UTC timestamp...
@@ -702,6 +708,10 @@ class Submission < ActiveRecord::Base
   end
   private :validate_single_submission
 
+  def grade_change_audit
+    Auditors::GradeChange.record(self) if @score_changed
+  end
+
   include Workflow
 
   workflow do
@@ -814,8 +824,12 @@ class Submission < ActiveRecord::Base
       opts[:group_comment_id] ||= AutoHandle.generate_securish_uuid
     end
     self.save! if self.new_record?
-    valid_keys = [:comment, :author, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request, :attachments, :anonymous, :hidden]
-    comment = self.submission_comments.create(opts.slice(*valid_keys)) if !opts[:comment].empty?
+    valid_keys = [:comment, :author, :media_comment_id, :media_comment_type,
+                  :group_comment_id, :assessment_request, :attachments,
+                  :anonymous, :hidden]
+    if opts[:comment].present?
+      comment = submission_comments.create!(opts.slice(*valid_keys))
+    end
     opts[:assessment_request].comment_added(comment) if opts[:assessment_request] && comment
     comment
   end
@@ -838,9 +852,8 @@ class Submission < ActiveRecord::Base
   end
 
   def commenting_instructors
-    comment_authors & context.instructors
+    @commenting_instructors ||= comment_authors & context.instructors
   end
-  memoize :commenting_instructors
 
   def participating_instructors
     commenting_instructors.present? ? commenting_instructors : context.participating_instructors.uniq
@@ -872,9 +885,13 @@ class Submission < ActiveRecord::Base
       options[:update_participants] = true
       options[:update_for_skips] = false
       options[:skip_users] = overrides[:skip_users] || [conversation_message_data[:author]] # don't mark-as-unread for the author
+      options[:skip_users] << user if user.preferences[:use_new_conversations]
       participating_instructors.each do |t|
         # Check their settings and add to :skip_users if set to suppress.
-        options[:skip_users] << t if t.preferences[:no_submission_comments_inbox] == true
+        if t.preferences[:no_submission_comments_inbox] == true ||
+          t.preferences[:use_new_conversations]
+          options[:skip_users] << t
+        end
       end
     when :destroy
       options[:delete_all] = visible_submission_comments.empty?

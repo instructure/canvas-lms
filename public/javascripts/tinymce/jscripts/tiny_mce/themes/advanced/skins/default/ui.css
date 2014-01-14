@@ -4,6 +4,7 @@
 .defaultSkin table td {vertical-align:middle}
 
 /* Containers */
+.defaultSkin.mceEditor {overflow: auto}
 .defaultSkin table {direction:ltr;background:transparent}
 .defaultSkin iframe {display:block;}
 .defaultSkin .mceToolbar {height:26px}

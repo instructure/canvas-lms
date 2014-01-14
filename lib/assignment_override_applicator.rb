@@ -79,7 +79,7 @@ module AssignmentOverrideApplicator
   # returned in priority order; the first override to contain an overridden
   # value for a particular field is used for that field
   def self.overrides_for_assignment_and_user(assignment_or_quiz, user)
-    Rails.cache.fetch([user, assignment_or_quiz, assignment_or_quiz.version_number, 'overrides'].cache_key) do
+    Rails.cache.fetch([user, assignment_or_quiz, 'overrides'].cache_key) do
 
       # return an empty array to the block if there is nothing to do here
       next [] if user.nil? || !assignment_or_quiz.has_overrides?

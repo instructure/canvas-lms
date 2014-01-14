@@ -1171,7 +1171,7 @@ describe Enrollment do
         @enrollment.reject!
         # have to get the new updated_at
         @user.reload
-        @user.cached_current_enrollments(true).should == []
+        @user.cached_current_enrollments.should == []
       end
     end
 
@@ -1482,7 +1482,7 @@ describe Enrollment do
         @user.cached_current_enrollments.should == [ @enrollment ]
         @enrollment.conclude
         @user.reload
-        @user.cached_current_enrollments(true).should == []
+        @user.cached_current_enrollments.should == []
       end
     end
   end

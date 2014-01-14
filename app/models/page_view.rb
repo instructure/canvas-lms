@@ -134,18 +134,49 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def self.find_one(id, options)
-    return super unless PageView.cassandra?
-    find_some([id], options).first || raise(ActiveRecord::RecordNotFound, "Couldn't find PageView with ID=#{id}")
+  #
+  # We don't know what shard the request_id to so its the callers
+  # responsibility to activate the correct shard.
+  #
+  def self.find_by_id(id, options={})
+    find_all_by_id([id], options).first
   end
 
-  def self.find_some(ids, options)
+  #
+  # We don't know what shard the request_id to so its the callers
+  # responsibility to activate the correct shard.
+  #
+  def self.find_one(id, options={})
+    self.find_by_id(id, options) || raise(ActiveRecord::RecordNotFound, "Couldn't find PageView with ID=#{id}")
+  end
+
+  #
+  # We don't know what shard the request_id to so its the callers
+  # responsibility to activate the correct shard.
+  #
+  def self.find_all_by_id(ids, options={})
+    raise(NotImplementedError, "options not implemented: #{options.inspect}") if options.present?
+    return PageView::EventStream.fetch(ids) if PageView.cassandra?
+    PageView.where(request_id: ids).all
+  end
+
+  #
+  # We don't know what shard the request_id to so its the callers
+  # responsibility to activate the correct shard.
+  #
+  def self.find_some(ids, options={})
     return super unless PageView.cassandra?
     raise(NotImplementedError, "options not implemented: #{options.inspect}") if options.present?
-    PageView::EventStream.fetch(ids)
+
+    result = self.find_all_by_id(ids, options)
+    if result.size == ids.length
+      result
+    else
+      raise ActiveRecord::RecordNotFound, "Couldn't find all PageViews with IDs (#{ids.join(',')}) (found #{result.size} results, but was looking for #{ids.length})"
+    end
   end
 
-  def self.find_every(options)
+  def self.find_every(options={})
     return super unless PageView.cassandra?
     raise(NotImplementedError, "find_every not implemented")
   end

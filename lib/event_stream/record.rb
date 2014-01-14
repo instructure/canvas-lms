@@ -17,16 +17,45 @@
 #
 
 class EventStream::Record < Struct.new(:attributes)
-  def id
-    attributes['id']
+  def self.attributes(*attribute_names)
+    attribute_names.each do |attribute_name|
+      define_method attribute_name do
+        attributes[attribute_name.to_s]
+      end
+    end
   end
 
-  def created_at
-    attributes['created_at']
+  attributes :id,
+             :created_at,
+             :request_id,
+             :event_type
+
+ def initialize(*args)
+    super(*args)
+
+    attributes['id'] ||= UUIDSingleton.instance.generate
+    attributes['request_id'] ||= RequestContextGenerator.request_id
+
+    attributes['created_at'] ||= Time.zone.now
+    attributes['created_at'] = Time.zone.at(attributes['created_at'].to_i)
+
+    if attributes['page_view']
+      @page_view = attributes.delete('page_view')
+    end
+
+    if CANVAS_RAILS3
+      attributes['event_type'] ||= self.class.name.deconstantize.demodulize.underscore
+    else
+      attributes['event_type'] ||= self.class.name.gsub("::#{self.class.name.demodulize}", '').demodulize.underscore
+    end
   end
 
   def changes
     attributes
+  end
+
+  def page_view
+    @page_view ||= PageView.find_by_id(request_id)
   end
 
   def self.from_attributes(attributes)

@@ -35,6 +35,7 @@ describe QuizQuestionDataFixer do
                     "Image yo: <img src=\"/assessment_questions/9270/files/6163/download?verifier=Cu96fSJHUJgVPNHEfoqLomZT64gkEzNP6Rphfl0y\" align=\"bottom\" alt=\"image.png\">"}.with_indifferent_access
 
     @good = {:correct_comments=>"",
+             :regrade_option => false,
              :question_type=>"multiple_choice_question",
              :question_bank_name=>"Quiz",
              :assessment_question_id=>"9270",
@@ -64,9 +65,11 @@ describe QuizQuestionDataFixer do
                                # the QQ still has bad data, but the user had given it a points possible
     qq.write_attribute(:question_data, @bad.merge({:points_possible => 5}))
     qq.save
+
     qq2 = quiz.quiz_questions.create!(:assessment_question => aq)
     qq2.write_attribute(:question_data, @good.merge({:name => "changed"}))
     qq2.save
+
     qq3 = quiz.quiz_questions.create!(:assessment_question => aq)
     qq3.write_attribute(:question_data, @bad)
     qq3.save
@@ -78,34 +81,33 @@ describe QuizQuestionDataFixer do
     aq.reload
     aq.question_data.should == @good
     qq.reload
-    qq.question_data.should == @good.merge({:points_possible => 5})
+    qq.question_data.to_hash.should == @good.merge({points_possible: 5, id: qq.id})
     qq2.reload
     qq2.question_data[:name].should == "changed"
     qq3.reload
-    qq3.question_data.should == @good
+    qq3.question_data.to_hash.should == @good.merge({id: qq3.id})
   end
 
   it "should fix questions from quiz question" do
     course
     bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
-    aq = bank.assessment_questions.create(:question_data => @bad)
+    aq = bank.assessment_questions.create(:question_data => @bad.to_hash)
 
     quiz = @course.quizzes.create!(:title => "test quiz")
     qq = quiz.quiz_questions.create!(:assessment_question => aq)
-    qq.write_attribute(:question_data, @good)
+    qq.write_attribute(:question_data, @good.to_hash)
     qq.save
     qq2 = quiz.quiz_questions.create!(:assessment_question => aq)
-    qq2.write_attribute(:question_data, @bad)
+    qq2.write_attribute(:question_data, @bad.to_hash)
     qq2.save
 
     QuizQuestionDataFixer.fix_quiz_questions_with_bad_data
-
     @good[:assessment_question_id] = aq.id
 
     aq.reload
-    aq.question_data.should == @good
+    aq.question_data.should == @good.merge({id: qq.id})
     qq2.reload
-    qq2.question_data.should == @good
+    qq2.question_data.to_hash.should == @good.merge({id: qq2.id})
   end
 
 end

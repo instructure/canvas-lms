@@ -1017,10 +1017,14 @@ describe "context_modules" do
     end
 
     it "should indicate multiple due dates for multiple observed students" do
-      student2 = user(:active_all => true, :active_state => 'active')
-      @course.enroll_user(student2, 'StudentEnrollment', :enrollment_state => 'active')
-      override_for_student(student2, @due_at + 1.day)
+      section2 = @course.course_sections.create!
+      override = assignment_override_model(:assignment => @assignment)
+      override.set = section2
+      override.override_due_at(@due_at + 1.day)
+      override.save!
 
+      student2 = user(:active_all => true, :active_state => 'active', :section => section2)
+      @course.enroll_user(student2, 'StudentEnrollment', :enrollment_state => 'active')
       @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
       @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :allow_multiple_enrollments => true, :associated_user_id => student2.id)
 
@@ -1069,9 +1073,11 @@ describe "context_modules" do
 
       @module1 = @course.context_modules.create!(:name => "module1")
       @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 42)
+      @assignment.publish
       @assignment_tag = @module1.add_item(:id => @assignment.id, :type => 'assignment')
       @external_url_tag = @module1.add_item(:type => 'external_url', :url => 'http://example.com/lolcats',
                                             :title => 'pls view', :indent => 1)
+      @external_url_tag.publish
       @module1.completion_requirements = {
           @assignment_tag.id => { :type => 'must_submit' },
           @external_url_tag.id => { :type => 'must_view' } }

@@ -49,9 +49,9 @@ describe "BookmarkedCollection::Collection" do
   end
 
   describe "#current_page" do
-    it "should be nil if current_bookmark is nil" do
+    it "should be first_page if current_bookmark is nil" do
       @collection.current_bookmark = nil
-      @collection.current_page.should be_nil
+      @collection.current_page.should == @collection.first_page
     end
 
     it "should lead with a 'bookmark:' prefix otherwise" do
@@ -70,7 +70,7 @@ describe "BookmarkedCollection::Collection" do
       page2.should_not == page1
 
       @collection.current_bookmark = nil
-      @collection.current_page.should be_nil
+      @collection.current_page.should == @collection.first_page
     end
   end
 
@@ -156,10 +156,24 @@ describe "BookmarkedCollection::Collection" do
     end
   end
 
+  describe "last_page" do
+    it "should assume the current_page is the last_page if there's no next_page" do
+      @collection.current_bookmark = "bookmark1"
+      @collection.next_bookmark = nil
+      @collection.last_page.should == @collection.current_page
+    end
+
+    it "should assume the last_page is unknown if there's a next_page" do
+      @collection.current_bookmark = "bookmark1"
+      @collection.next_bookmark = "bookmark2"
+      @collection.last_page.should be_nil
+    end
+  end
+
   describe "remaining will_paginate support" do
     it "should support per_page" do
       value = 5
-      @collection.per_page.should be_nil
+      @collection.per_page.should == Folio.per_page
       @collection.per_page = value
       @collection.per_page.should == value
     end
@@ -175,19 +189,8 @@ describe "BookmarkedCollection::Collection" do
       @collection.previous_page.should be_nil
     end
 
-    it "should support reading empty last_page" do
-      @collection.last_page.should be_nil
-    end
-
     it "should support reading empty total_pages" do
       @collection.total_pages.should be_nil
-    end
-
-    it "should not support setting next_page, previous_page, last_page, or total_pages" do
-      @collection.should_not respond_to(:next_page=)
-      @collection.should_not respond_to(:previous_page=)
-      @collection.should_not respond_to(:last_page=)
-      @collection.should_not respond_to(:total_pages=)
     end
   end
 end

@@ -6,8 +6,7 @@ describe "Navigating to wiki pages" do
   describe "Navigation" do
     before do
       account_model
-      @account.settings[:enable_draft] = true
-      @account.save!
+      @account.enable_feature!(:draft_state)
       course_with_teacher_logged_in :account => @account
     end
 

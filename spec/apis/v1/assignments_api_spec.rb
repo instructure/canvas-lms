@@ -39,17 +39,17 @@ describe AssignmentsApiController, :type => :integration do
   end
 
   def create_submitted_assignment_with_user(user=@user)
-      now = Time.zone.now
-      assignment = @course.assignments.create!(
-        :title => "dawg you gotta submit this",
-        :submission_types => "online_url")
-      submission = assignment.submit_homework(user)
-      submission.score = '99'
-      submission.grade = '99'
-      submission.submitted_at = now
-      submission.grade_matches_current_submission = true
-      submission.save!
-      return assignment,submission
+    now = Time.zone.now
+    assignment = @course.assignments.create!(
+      :title => "dawg you gotta submit this",
+      :submission_types => "online_url")
+    submission = bare_submission_model assignment,
+                                       user,
+                                       score: '99',
+                                       grade: '99',
+                                       submitted_at: now,
+                                       grade_matches_current_submission: true
+    return assignment,submission
   end
 
   def create_override_for_assignment(assignment=@assignment)
@@ -253,8 +253,7 @@ describe AssignmentsApiController, :type => :integration do
       end
 
       it "should include published flag for accounts that do have enabled_draft" do
-        Account.default.settings[:enable_draft] = true
-        Account.default.save!
+        Account.default.enable_feature!(:draft_state)
 
         @json = api_get_assignment_in_course(@assignment, @course)
 
@@ -333,8 +332,7 @@ describe AssignmentsApiController, :type => :integration do
     describe "draft state" do
 
       before do
-        Account.default.settings[:enable_draft] = true
-        Account.default.save!
+        Account.default.enable_feature!(:draft_state)
         @domain_root_account = Account.default
 
         course_with_student_logged_in(:active_all => true)
@@ -591,6 +589,7 @@ describe AssignmentsApiController, :type => :integration do
       course_with_teacher(:active_all => true)
       student_in_course(:course => @course, :active_enrollment => true)
       course_with_ta(:course => @course, :active_enrollment => true)
+      @course.course_sections.create!
 
       notification = Notification.create! :name => "Assignment Created"
 
@@ -620,7 +619,7 @@ describe AssignmentsApiController, :type => :integration do
                    'name' => 'some assignment',
                    'assignment_overrides' => {
                        '0' => {
-                         'course_section_id' => @course.default_section.id,
+                         'course_section_id' => @course.active_course_sections.second.id,
                          'due_at' => @override_due_at.iso8601
                        }
                    }
@@ -637,8 +636,7 @@ describe AssignmentsApiController, :type => :integration do
   describe "PUT /courses/:course_id/assignments/:id (#update)" do
 
     it "should update published/unpublished" do
-      Account.default.settings[:enable_draft] = true
-      Account.default.save!
+      Account.default.enable_feature!(:draft_state)
       @domain_root_account = Account.default
 
       course_with_teacher(:active_all => true)
@@ -660,7 +658,7 @@ describe AssignmentsApiController, :type => :integration do
       @assignment.workflow_state.should == 'unpublished'
 
       course_with_student(:active_all => true, :course => @course)
-      @assignment.grade_student(@student, grade: 15)
+      @assignment.submit_homework(@student, :submission_type => "online_text_entry")
       @assignment.publish
       @user = @teacher
       raw_api_call(
@@ -1130,6 +1128,8 @@ describe AssignmentsApiController, :type => :integration do
           'unread_count' => 0,
           'user_can_see_posts' => @topic.user_can_see_posts?(@user),
           'subscribed' => @topic.subscribed?(@user),
+          'published' => @topic.published?,
+          'can_unpublish' => @topic.can_unpublish?,
           'url' =>
             "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
           'html_url' =>
@@ -1361,7 +1361,7 @@ describe AssignmentsApiController, :type => :integration do
           @json['external_tool_tag_attributes'].should == {
             'url' => 'http://www.example.com',
             'new_tab' => false,
-            'resource_link_id' => @tool_tag.opaque_identifier(:asset_string)
+            'resource_link_id' => ContextExternalTool.opaque_identifier_for(@tool_tag, @tool_tag.context.shard)
           }
         end
 
@@ -1377,7 +1377,7 @@ describe AssignmentsApiController, :type => :integration do
     context "draft state" do
 
       before do
-        Account.default.enable_draft!
+        Account.default.enable_feature!(:draft_state)
         @domain_root_account = Account.default
 
         course_with_student_logged_in(:active_all => true)
@@ -1418,7 +1418,7 @@ describe AssignmentsApiController, :type => :integration do
 
         # Returns "unpublishable => false" when student submissions
         student_in_course(:active_all => true, :course => @course)
-        @assignment.grade_student(@student, grade: 15)
+        @assignment.submit_homework(@student, :submission_type => "online_text_entry")
         @user = @teacher
         json = api_get_assignment_in_course(@assignment, @course)
         response.should be_success

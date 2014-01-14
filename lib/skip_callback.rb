@@ -47,4 +47,32 @@ class ActiveRecord::Base
     return block.call if callbacks.size == 0
     skip_callback(callbacks[0]) { skip_callbacks(*callbacks[1..-1], &block) }
   end
+
+
+  if CANVAS_RAILS2
+    def save_without_callbacks
+      send new_record? ? :create_without_callbacks : :update_without_callbacks
+    end
+  else
+    def save_without_callbacks
+      # adapted from https://github.com/dball/skip_activerecord_callbacks
+      class << self
+        alias :run_callbacks_orig :run_callbacks
+        def run_callbacks(name)
+          if name == :update || name == :create
+            class << self
+              undef :run_callbacks
+              alias :run_callbacks :run_callbacks_orig
+            end
+            yield
+          elsif name == :save
+            yield
+          else
+            run_callbacks_orig(name, &Proc.new)
+          end
+        end
+      end
+      save
+    end
+  end
 end

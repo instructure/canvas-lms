@@ -1,0 +1,70 @@
+<li class='quiz'>
+<div {{bind-attr class=':ig-row :ig-editable publishable:ig-publishable published:ig-published' }}>
+    <a {{bind-attr href='html_url'}} class='ig-title ellipses'>
+      <i class='icon-quiz'></i>
+      {{title}}
+    </a>
+    <div class='ig-details row-fluid'>
+      <div class='span4 ellipses description'>
+        {{#if due_at}}
+          <strong>{{#t 'due'}}Due{{/t}}</strong>
+          {{tDateToString due_at 'date_at_time'}}
+        {{/if}}
+      </div>
+      <div class='span3 ellipses'>
+        {{questionCountLabel}}
+      </div>
+      <div class='span3 ellipses'>
+        {{#if unlock_at}}
+          <strong>{{#t 'available'}}Available{{/t}}</strong>
+          {{tDateToString unlock_at 'short'}}
+        {{/if}}
+      </div>
+      <div class='span2 ellipses'>
+        {{pointsPossible}}
+      </div>
+    </div>
+    {{#if canUpdate}}
+      <div class="ig-admin">
+
+        {{render 'publish' this}}
+
+        <a class="al-trigger al-trigger-gray" role="button"
+          {{bind-attr aria-owns=uiId}}
+           aria-haspopup="true" href="#">
+          <i class="icon-settings"></i>
+          <i class="icon-mini-arrow-down"></i>
+          <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
+        </a>
+        <ul {{bind-attr id='uiId' }}
+            class="al-options" role="menu" tabindex="0" aria-hidden="true"
+            aria-expanded="false"
+            {{bind-attr aria-activedescendant=editId }}
+        >
+          <li role="presentation">
+            <a {{bind-attr href='editUrl' }}
+              {{bind-attr id='editLinkId'}}
+              {{bind-attr title='editTitle' }}
+              class="icon-edit" tabindex="-1" role='menuitem'
+              >
+              {{#t "links.edit"}}Edit{{/t}}
+            </a>
+
+          </li>
+          <li role="presentation">
+            <a {{bind-attr href="deleteUrl" }}
+               {{bind-attr id='deleteId'}}
+               class="delete-item icon-trash"
+               tabindex="-1" role="menuitem"
+               {{bind-attr title="deleteTitle" }}
+               {{action delete}}
+              >
+              {{#t "links.delete"}}Delete{{/t}}
+            </a>
+          </li>
+        </ul>
+      </div>
+    {{/if}}
+  </div>
+</li>
+

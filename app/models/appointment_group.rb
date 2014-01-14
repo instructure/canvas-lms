@@ -384,12 +384,12 @@ class AppointmentGroup < ActiveRecord::Base
     end
 
     if changed.present?
-      CalendarEvent.where(:parent_calendar_event_id => appointments, :workflow_state => ['active', 'locked']).update_all(changed)
+      CalendarEvent.where(:parent_calendar_event_id => appointments.except(:order), :workflow_state => ['active', 'locked']).update_all(changed)
     end
 
     if desc
       appointments.where(:description => description_was).update_all(:description => desc)
-      CalendarEvent.where(:parent_calendar_event_id => appointments, :workflow_state => ['active', 'locked'], :description => description_was).update_all(:description => desc)
+      CalendarEvent.where(:parent_calendar_event_id => appointments.except(:order), :workflow_state => ['active', 'locked'], :description => description_was).update_all(:description => desc)
     end
 
     @new_appointments.each(&:reload) if @new_appointments.present?

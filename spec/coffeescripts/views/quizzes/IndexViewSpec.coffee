@@ -131,3 +131,16 @@ define [
     ok  view.filter(model, "name")
     ok !view.filter(model, "zzz")
 
+  test 'should not use regexp to filter models', ->
+    view = indexView()
+    model = new Quiz(title: "Foo Name")
+
+    ok !view.filter(model, ".*name")
+    ok !view.filter(model, "zzz")
+
+  test 'should filter models with multiple terms', ->
+    view = indexView()
+    model = new Quiz(title: "Foo Name bar")
+
+    ok  view.filter(model, "name bar")
+    ok !view.filter(model, "zzz")

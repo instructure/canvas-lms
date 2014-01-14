@@ -67,7 +67,7 @@ describe "manage groups" do
       # click the first visible "Add Group" button
       fj(".add-group:visible:first").click
       wait_for_animations
-      f("#group_category_name").send_keys("New Test Group A")
+      f("#group_name").send_keys("New Test Group A")
       f("form.group-edit-dialog").submit
       wait_for_ajaximations
 
@@ -83,7 +83,9 @@ describe "manage groups" do
       # Remove added user from the group
       fj(".groups .group .toggle-group:first").click
       wait_for_ajaximations
-      fj(".groups .group .remove-from-group:first").click
+      fj(".groups .group .group-user-actions:first").click
+      wait_for_ajaximations
+      fj(".remove-from-group:first").click
       wait_for_ajaximations
       fj(".group-summary:visible:first").text.should == "0 students"
       # should re-appear in unassigned
@@ -160,6 +162,82 @@ describe "manage groups" do
         wait_for_ajaximations
         fj(".group-summary:visible:first").text.should == "1 student"
       end
+    end
+
+    it "should allow a teacher to reassign a student with an accessible modal dialog" do
+      students = groups_student_enrollment 2
+      group_categories = create_categories(@course, 1)
+      groups = add_groups_in_category(group_categories[0],2)
+      get "/courses/#{@course.id}/groups"
+      wait_for_ajaximations
+
+      # expand groups
+      expand_group(groups[0].id)
+      expand_group(groups[1].id)
+
+      # Add an unassigned user to the first group
+      fj(".group-summary:visible:first").text.should == "0 students"
+      ff("div[data-view='unassignedUsers'] .assign-to-group").first.click
+      wait_for_animations
+      ff(".assign-to-group-menu .set-group").first.click
+      wait_for_ajaximations
+      fj(".group-summary:visible:first").text.should == "1 student"
+      fj(".group-summary:visible:last").text.should == "0 students"
+
+
+      # Move the user from one group into the other
+      fj(".groups .group .group-user .group-user-actions").click
+      wait_for_ajaximations
+      fj(".edit-group-assignment:first").click
+      wait_for_ajaximations
+      fj(".single-select:first option:first").click
+      wait_for_ajaximations
+      fj('.set-group:first').click
+      wait_for_ajaximations
+      fj(".group-summary:visible:first").text.should == "0 students"
+      fj(".group-summary:visible:last").text.should == "1 student"
+
+      # Move the user back
+      fj(".groups .group .group-user .group-user-actions").click
+      wait_for_ajaximations
+      fj(".edit-group-assignment:last").click
+      wait_for_ajaximations
+      fj(".single-select:last option:first").click
+      wait_for_ajaximations
+      fj('.set-group:last').click
+      wait_for_ajaximations
+      fj(".group-summary:visible:first").text.should == "1 student"
+      fj(".group-summary:visible:last").text.should == "0 students"
+    end
+
+    it "should give a teacher the option to assign unassigned students to groups" do
+      group_category, _ = create_categories(@course, 1)
+      group, _ = add_groups_in_category(group_category, 1)
+      student_in_course
+      get "/courses/#{@course.id}/groups"
+      wait_for_ajaximations
+
+      actions_button = "#group-category-#{group_category.id}-actions"
+      message_users = ".al-options .message-all-unassigned"
+      randomly_assign_users = ".al-options .randomly-assign-members"
+
+      # category menu should show unassigned-member options
+      fj(actions_button).click
+      wait_for_ajaximations
+      fj([actions_button, message_users].join(" + ")).should be
+      fj([actions_button, randomly_assign_users].join(" + ")).should be
+
+      # assign the last unassigned member
+      draggable_user = fj(".unassigned-students .group-user:first")
+      droppable_group = fj(".group[data-id=\"#{group.id}\"]")
+      drag_and_drop_element draggable_user, droppable_group
+      wait_for_ajaximations
+
+      # now the menu should not show unassigned-member options
+      fj(actions_button).click
+      wait_for_ajaximations
+      fj([actions_button, message_users].join(" + ")).should be_nil
+      fj([actions_button, randomly_assign_users].join(" + ")).should be_nil
     end
   end
 

@@ -36,7 +36,7 @@ class Quiz < ActiveRecord::Base
     :lock_at, :unlock_at, :due_at, :access_code, :anonymous_submissions, :assignment_group_id,
     :hide_results, :locked, :ip_filter, :require_lockdown_browser,
     :require_lockdown_browser_for_results, :context, :notify_of_update,
-    :one_question_at_a_time, :cant_go_back
+    :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at
 
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
@@ -58,7 +58,10 @@ class Quiz < ActiveRecord::Base
   validate :validate_ip_filter, :if => :ip_filter_changed?
   validate :validate_hide_results, :if => :hide_results_changed?
   validate :validate_draft_state_change, :if => :workflow_state_changed?
-
+  validate :validate_correct_answer_visibility, :if => lambda { |quiz|
+    quiz.show_correct_answers_at_changed? ||
+    quiz.hide_correct_answers_at_changed?
+  }
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
   before_save :build_assignment
@@ -90,6 +93,10 @@ class Quiz < ActiveRecord::Base
     self.cant_go_back = false if self.cant_go_back == nil || self.one_question_at_a_time == false
     self.shuffle_answers = false if self.shuffle_answers == nil
     self.show_correct_answers = true if self.show_correct_answers == nil
+    if !self.show_correct_answers
+      self.show_correct_answers_at = nil
+      self.hide_correct_answers_at = nil
+    end
     self.allowed_attempts = 1 if self.allowed_attempts == nil
     self.scoring_policy = "keep_highest" if self.scoring_policy == nil
     self.due_at ||= self.lock_at if self.lock_at.present?
@@ -141,14 +148,14 @@ class Quiz < ActiveRecord::Base
   end
 
   def build_assignment
-    if (context.draft_state_enabled? || self.available?) &&
+    if (context.feature_enabled?(:draft_state) || self.available?) &&
         !self.assignment_id && self.graded? && @saved_by != :assignment &&
         @saved_by != :clone
       assignment = self.assignment
       assignment ||= self.context.assignments.build(:title => self.title, :due_at => self.due_at, :submission_types => 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
       assignment.saved_by = :quiz
-      if context.draft_state_enabled? && !deleted?
+      if context.feature_enabled?(:draft_state) && !deleted?
         assignment.workflow_state = self.published? ? 'published' : 'unpublished'
       end
       assignment.save
@@ -220,7 +227,7 @@ class Quiz < ActiveRecord::Base
   end
   
   def restore
-    self.workflow_state = 'edited'
+    self.workflow_state = self.context.feature_enabled?(:draft_state) ? 'unpublished' : 'edited'
     self.save
     self.assignment.restore(:quiz)
   end
@@ -267,12 +274,24 @@ class Quiz < ActiveRecord::Base
     !self.graded?
   end
 
-  # Determine if the quiz should display the correct answers.
-  # Takes into account the quiz settings, the user viewing and
-  # the submission to be viewed.
-  def display_correct_answers?(user, submission)
-    # NOTE: We don't have a submission user when the teacher is previewing the quiz and displaying the results'
-    self.show_correct_answers || (self.grants_right?(user, nil, :grade) && (submission && submission.user && submission.user != user))
+  # Determine if the quiz should display the correct answers and the score points.
+  # Takes into account the quiz settings, the user viewing and the submission to
+  # be viewed.
+  def show_correct_answers?(user, submission)
+    show_at = self.show_correct_answers_at
+    hide_at = self.hide_correct_answers_at
+
+    # NOTE: We don't have a submission user when the teacher is previewing the
+    # quiz and displaying the results'
+    return true if self.grants_right?(user, nil, :grade) &&
+      (submission && submission.user && submission.user != user)
+
+    return false if !self.show_correct_answers
+
+    # Are we past the date the correct answers should no longer be shown after?
+    return false if hide_at.present? && Time.now > hide_at
+
+    show_at.present? ? Time.now > show_at : true
   end
 
   def update_existing_submissions
@@ -315,7 +334,7 @@ class Quiz < ActiveRecord::Base
         a.assignment_group_id = self.assignment_group_id
         a.saved_by = :quiz
         a.workflow_state = 'published' if a.deleted?
-        if context.draft_state_enabled? && !deleted?
+        if context.feature_enabled?(:draft_state) && !deleted?
           a.workflow_state = self.published? ? 'published' : 'unpublished'
         end
         a.notify_of_update = @notify_of_update
@@ -659,6 +678,7 @@ class Quiz < ActiveRecord::Base
     data = entries
     if opts[:persist] != false
       self.quiz_data = data
+
       if !self.survey?
         self.points_possible = possible
       end
@@ -833,7 +853,16 @@ class Quiz < ActiveRecord::Base
   end
 
   def valid_hide_results_values
-    %w[always until_after_last_attempt]
+    %w[always until_after_last_attempt until_after_due_date until_after_available_date]
+  end
+
+  def validate_correct_answer_visibility
+    show_at = self.show_correct_answers_at
+    hide_at = self.hide_correct_answers_at
+
+    if show_at.present? && hide_at.present? && hide_at <= show_at
+      errors.add(:show_correct_answers, 'bad_range')
+    end
   end
 
   def strip_html_answers(question)
@@ -959,15 +988,33 @@ class Quiz < ActiveRecord::Base
     item.lock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:lock_at]) if hash[:lock_at]
     item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
     item.due_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:due_at]) if hash[:due_at]
+    item.show_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:show_correct_answers_at]) if hash[:show_correct_answers_at]
+    item.hide_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:hide_correct_answers_at]) if hash[:hide_correct_answers_at]
     item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]
     hash[:missing_links] = []
     item.description = ImportedHtmlConverter.convert(hash[:description], context, {:missing_links => hash[:missing_links]})
-    [:migration_id, :title, :allowed_attempts, :time_limit,
-     :shuffle_answers, :show_correct_answers, :points_possible, :hide_results,
-     :access_code, :ip_filter, :scoring_policy, :require_lockdown_browser,
-     :require_lockdown_browser_for_results, :anonymous_submissions, 
-     :could_be_locked, :quiz_type, :one_question_at_a_time,
-     :cant_go_back].each do |attr|
+
+    %w[
+      migration_id
+      title
+      allowed_attempts
+      time_limit
+      shuffle_answers
+      show_correct_answers
+      points_possible
+      hide_results
+      access_code
+      ip_filter
+      scoring_policy
+      require_lockdown_browser
+      require_lockdown_browser_for_results
+      anonymous_submissions
+      could_be_locked
+      quiz_type
+      one_question_at_a_time
+      cant_go_back
+    ].each do |attr|
+      attr = attr.to_sym
       item.send("#{attr}=", hash[attr]) if hash.key?(attr)
     end
 
@@ -1077,13 +1124,19 @@ class Quiz < ActiveRecord::Base
     given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? }
     can :submit
     
-    given { |user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
+    given do |user, session|
+      (feature_enabled?(:draft_state) ? published? : true) &&
+        cached_context_grants_right?(user, session, :read)
+    end
     can :read
 
     given { |user, session| self.cached_context_grants_right?(user, session, :view_all_grades) }
     can :read_statistics and can :review_grades
 
-    given { |user, session| self.available? && self.cached_context_grants_right?(user, session, :participate_as_student) }#students.include?(user) }
+    given do |user, session|
+      available? &&
+        cached_context_grants_right?(user, session, :participate_as_student)
+    end
     can :read and can :submit
   end
   scope :include_assignment, includes(:assignment)
@@ -1163,6 +1216,10 @@ class Quiz < ActiveRecord::Base
     where(:id =>id).update_all(:last_edited_at => Time.now.utc)
   end
 
+  def mark_edited!
+    self.class.mark_quiz_edited(self.id)
+  end
+
   def anonymous_survey?
     survey? && anonymous_submissions
   end
@@ -1215,5 +1272,48 @@ class Quiz < ActiveRecord::Base
       question_regrades.merge(ids)
     end
     question_regrades.count
+  end
+
+  # override for draft state
+  def available?
+    feature_enabled?(:draft_state) ? published? : workflow_state == 'available'
+  end
+
+  delegate :feature_enabled?, to: :context
+
+  # The IP filters available for this Quiz, which is an aggregate of the Quiz's
+  # active IP filter and all the IP filters defined in its account hierarchy.
+  #
+  # @return [Array<Hash>]
+  #   The set of IP filters, with three accessible String attributes:
+  #
+  #     - :name => a unique name for the filter
+  #     - :account => name of the scope the filter is defined in (Quiz or Account)
+  #     - :filter => the actual filter value (IP address or a range of)
+  #
+  def available_ip_filters
+    filters = []
+    accounts = self.context.account.account_chain.uniq
+
+    if self.ip_filter.present?
+      filters << {
+        name: t(:current_filter, 'Current Filter'),
+        account: self.title,
+        filter: self.ip_filter
+      }
+    end
+
+    accounts.each do |account|
+      account_filters = account.settings[:ip_filters] || {}
+      account_filters.sort_by(&:first).each do |key, filter|
+        filters << {
+          name: key,
+          account: account.name,
+          filter: filter
+        }
+      end
+    end
+
+    filters
   end
 end

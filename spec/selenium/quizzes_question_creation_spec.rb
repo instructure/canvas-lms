@@ -146,7 +146,7 @@ describe "quizzes question creation" do
     submit_form(question)
     wait_for_ajax_requests
 
-    driver.execute_script("$('#show_question_details').click();")  
+    driver.execute_script("$('#show_question_details').click();")
     quiz.reload
     finished_question = f("#question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed
@@ -168,23 +168,26 @@ describe "quizzes question creation" do
     type_in_tiny '.question:visible textarea.question_content', 'This is a matching question.'
 
     answers = question.find_elements(:css, ".form_answers > .answer")
-    answers[0] = question.find_element(:name, 'answer_match_left').send_keys('first left side')
-    answers[0] = question.find_element(:name, 'answer_match_right').send_keys('first right side')
-    answers[1] = question.find_element(:name, 'answer_match_left').send_keys('second left side')
-    answers[2] = question.find_element(:name, 'answer_match_right').send_keys('second right side')
+
+    answers = answers.each_with_index do |answer, i|
+      answer.find_element(:name, 'answer_match_left').send_keys("#{i} left side")
+      answer.find_element(:name, 'answer_match_right').send_keys("#{i} right side")
+    end
     question.find_element(:name, 'matching_answer_incorrect_matches').send_keys('first_distractor')
 
     submit_form(question)
     wait_for_ajax_requests
 
     f('#show_question_details').click
+
     quiz.reload
     finished_question = f("#question_#{quiz.quiz_questions[0].id}")
     finished_question.should be_displayed
 
-    first_answer = finished_question.find_element(:css, '.answer_match')
-    first_answer.find_element(:css, '.answer_match_left').should include_text('first left side')
-    first_answer.find_element(:css, '.answer_match_right').should include_text('first right side')
+    finished_question.find_elements(:css, '.answer_match').each_with_index do |filled_answer, i|
+      filled_answer.find_element(:css, '.answer_match_left').should include_text("#{i} left side")
+      filled_answer.find_element(:css, '.answer_match_right').should include_text("#{i} right side")
+    end
   end
 
   #### Numerical Answer
@@ -233,7 +236,6 @@ describe "quizzes question creation" do
       button.text == 'Generate'
     }
     ffj('table.combinations:visible tr').size.should == 11 # plus header row
-
     submit_form(question)
     wait_for_ajax_requests
 
@@ -525,7 +527,7 @@ describe "quizzes question creation" do
       f('#multiple_attempts_option').click
       f('#limit_attempts_option').click
       replace_content(f('#quiz_allowed_attempts'), attempts)
-      f('#protect_quiz').click
+      f('#quiz_time_limit').click
       alert = driver.switch_to.alert
       alert.text.should == alert_text
       alert.dismiss
@@ -550,7 +552,7 @@ describe "quizzes question creation" do
       f('#multiple_attempts_option').click
       f('#limit_attempts_option').click
       replace_content(f('#quiz_allowed_attempts'), attempts)
-      f('#protect_quiz').click
+      f('#quiz_time_limit').click
       alert_present?.should be_false
       fj('#quiz_allowed_attempts').should have_attribute('value', attempts) # fj to avoid selenium caching
       expect_new_page_load {

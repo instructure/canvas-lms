@@ -78,12 +78,20 @@ module Canvas
     when 'memory_store'
       config = :memory_store
     when 'nil_store'
-      require 'nil_store'
-      config = NilStore.new
+      if CANVAS_RAILS2
+        require 'nil_store'
+        config = NilStore.new
+      else
+        config = :null_store
+      end
     end
     if !config && !nil_is_nil
-      require 'nil_store'
-      config = NilStore.new
+      if CANVAS_RAILS2
+        require 'nil_store'
+        config = NilStore.new
+      else
+        config = :null_store
+      end
     end
     config
   end

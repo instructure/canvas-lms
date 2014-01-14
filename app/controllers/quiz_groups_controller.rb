@@ -40,9 +40,8 @@
 #         },
 #         "name": {
 #           "description": "The name of the question group.",
-#           "example": 2,
-#           "type": "integer",
-#           "format": "int64"
+#           "example": "Fraction questions",
+#           "type": "string"
 #         },
 #         "pick_count": {
 #           "description": "The number of questions to pick from the group to display to the student.",
@@ -73,8 +72,9 @@
 #
 class QuizGroupsController < ApplicationController
   include Api::V1::QuizGroup
+  include Api::V1::Helpers::QuizzesApiHelper
 
-  before_filter :require_context, :get_quiz
+  before_filter :require_context, :require_quiz
 
   # @API Create a question group
   # @beta
@@ -83,16 +83,16 @@ class QuizGroupsController < ApplicationController
   #
   # <b>201 Created</b> response code is returned if the creation was successful.
   #
-  # @argument quiz_group[name] [Optional, String]
+  # @argument quiz_groups[][name] [Optional, String]
   #   The name of the question group.
   #
-  # @argument quiz_group[pick_count] [Optional, Integer]
+  # @argument quiz_groups[][pick_count] [Optional, Integer]
   #   The number of questions to randomly select for this group.
   #
-  # @argument quiz_group[question_points] [Optional, Integer]
+  # @argument quiz_groups[][question_points] [Optional, Integer]
   #   The number of points to assign to each question in the group.
   #
-  # @argument quiz_group[assessment_question_bank_id] [Optional, Integer]
+  # @argument quiz_groups[][assessment_question_bank_id] [Optional, Integer]
   #   The id of the assessment question bank to pull questions from.
   #
   # @example_response
@@ -103,16 +103,17 @@ class QuizGroupsController < ApplicationController
     if authorized_action(@quiz, @current_user, :update)
       @quiz.did_edit if @quiz.created?
 
-      bank_id = params[:quiz_group].delete(:assessment_question_bank_id)
+      quiz_group_params = params[:quiz_groups][0]
+      bank_id = quiz_group_params.delete(:assessment_question_bank_id)
       bank = find_bank(bank_id) if bank_id.present?
-      params[:quiz_group][:assessment_question_bank_id] = bank_id if bank
+      quiz_group_params[:assessment_question_bank_id] = bank_id if bank
 
       @group = @quiz.quiz_groups.build
-      if update_api_quiz_group(@group, params[:quiz_group])
+      if update_api_quiz_group(@group, quiz_group_params)
         render :json   => quiz_groups_compound_json([@group], @context, @current_user, session),
                :status => :created
       else
-        render :json => @group.errors, :status => :bad_request
+        render json: format_errors(@group), status: :unprocessable_entity
       end
     end
   end
@@ -122,13 +123,13 @@ class QuizGroupsController < ApplicationController
   #
   # Update a question group
   #
-  # @argument quiz_group[name] [Optional, String]
+  # @argument quiz_groups[][name] [Optional, String]
   #   The name of the question group.
   #
-  # @argument quiz_group[pick_count] [Optional, Integer]
+  # @argument quiz_groups[][pick_count] [Optional, Integer]
   #   The number of questions to randomly select for this group.
   #
-  # @argument quiz_group[question_points] [Optional, Integer]
+  # @argument quiz_groups[][question_points] [Optional, Integer]
   #   The number of points to assign to each question in the group.
   #
   # @example_response
@@ -140,13 +141,14 @@ class QuizGroupsController < ApplicationController
       @group = @quiz.quiz_groups.find(params[:id])
       @quiz.did_edit if @quiz.created?
 
-      params[:quiz_group].delete(:assessment_question_bank_id)
-      params[:quiz_group].delete(:position) # position is taken care of in reorder
+      quiz_group_params = params[:quiz_groups][0]
+      quiz_group_params.delete(:assessment_question_bank_id)
+      quiz_group_params.delete(:position) # position is taken care of in reorder
 
-      if update_api_quiz_group(@group, params[:quiz_group])
+      if update_api_quiz_group(@group, quiz_group_params)
         render :json => quiz_groups_compound_json([@group], @context, @current_user, session)
       else
-        render :json => @group.errors, :status => :bad_request
+        render :json => format_errors(@group), :status => :unprocessable_entity
       end
     end
   end
@@ -166,41 +168,32 @@ class QuizGroupsController < ApplicationController
     end
   end
 
+  # @API Reorder question groups
+  # @beta
+  #
+  # Change the order of the quiz questions within the group
+  #
+  # @argument order[][id] [Required, Integer]
+  #   The associated item's unique identifier
+  #
+  # @argument order[][type] ["question"]
+  #   The type of item is always 'question' for a group
+  #
+  # <b>204 No Content<b> response code is returned if the reorder was successful.
   def reorder
     if authorized_action(@quiz, @current_user, :update)
-      @group = @quiz.quiz_groups.find(params[:quiz_group_id])
-      items = []
-      group_questions = @group.quiz_questions.active
-      questions = @quiz.quiz_questions.active
-      order = params[:order].split(",")
-      order.each do |name|
-        id = name.gsub(/\Aquestion_/, "").to_i
-        obj = questions.detect{|q| q.id == id.to_i }
-        obj.quiz_group_id = @group.id
-        if obj
-          items << obj
-          obj.position = items.length
-        end
-      end
-      group_questions.each do |q|
-        if !items.include? q
-          items << q
-          q.position = items.length
-        end
-      end
-      updates = []
-      items.each_with_index do |item, idx|
-        updates << "WHEN id=#{item.id} THEN #{idx + 1}"
-      end
-      QuizQuestion.where(:id => items).update_all("quiz_group_id=#{@group.id}, position=CASE #{updates.join(" ")} ELSE id END")
-      Quiz.mark_quiz_edited(@quiz.id)
-      render :json => {:reorder => true}
+      @group = @quiz.quiz_groups.find(params[:id])
+      QuizSortables.new(:group => @group, :order => params[:order]).reorder!
+
+      head :no_content
+    end
+  end
+  private
+
+  def format_errors(group)
+    group.errors.each_with_object({errors: {}}) do |e, json|
+      json[:errors][e.first] = e.last
     end
   end
 
-  private
-
-  def get_quiz
-    @quiz = @context.quizzes.find(params[:quiz_id])
-  end
 end

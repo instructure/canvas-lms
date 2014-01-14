@@ -1,4 +1,3 @@
-{{#if showAgenda}}
 <button class="navigate_today btn">{{#t "today"}}Today{{/t}}</button>
 <span class="navigation_buttons">
   <button class="navigate_prev btn">
@@ -15,17 +14,3 @@
   <input type="text" name="start date" style="width: 100px;" class="date_field"
          aria-label="{{#t "enter_navigation_date"}}Enter the date you would like to navigate to.{{/t}}" />
 </span>
-{{else}}
-<span class="navigation_buttons">
-  <button class="navigate_prev btn-small">
-    <i class="icon-arrow-left" aria-hidden="true"></i>
-    <span class="screenreader-only">{{#t "previous"}}Previous{{/t}}</span>
-  </button>
-  <button class="navigate_today btn-small">{{#t "today"}}Today{{/t}}</button>
-  <button class="navigate_next btn-small">
-    <i class="icon-arrow-right" aria-hidden="true"></i>
-    <span class="screenreader-only">{{#t "next"}}Next{{/t}}</span>
-  </button>
-</span>
-<h2 class="navigation_title"></h2>
-{{/if}}

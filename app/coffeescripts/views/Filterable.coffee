@@ -11,7 +11,7 @@ define [
   # Filterable simple hides the item views in the DOM, keeping stuff nice
   # and fast (no need to fetch from the server, no need to re-render
   # anything)
-  mixin {},
+  Filterable =
 
     els:
       '.filterable': '$filter'

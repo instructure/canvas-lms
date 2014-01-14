@@ -8,18 +8,19 @@ zh:
     bad_per_slot: 您必须允许一个时段至少有一个约会
     context_required: 您需要选择一个日程表
     select_calendars: 选择日程表
-  GrouDetailpView: 
+  EditGroupAssignmentView: 
+    move_to: 移动到
+  GroupDetailView: 
+    delete_confirm: 是否确定要删除此小组?
+    flash: 
+      removeError: 无法删除该小组。请稍后重试。
+      removed: 小组已成功删除。
     student_count: 
       one: "%{count} 个学生"
       other: "%{count} 个学生"
     user_count: 
       one: "%{count} 个用户"
       other: "%{count} 个用户"
-  GroupView: 
-    delete_confirm: 是否确定要删除此小组?
-    flash: 
-      removeError: 无法删除该小组。请稍后重试。
-      removed: 小组已成功删除。
   academic_benchmark: 
     api_error: "无法更新授权 %{auth} 的标准。"
     bad_ab_file: 提供的学术基准文件有错误。
@@ -254,6 +255,7 @@ zh:
       all_terms: 所有学期
       course_text: "课程: %{course};"
       end_text: "结束时间: %{end_at};"
+      error_text: "已失败，请向系统管理员报告以下错误代码: ErrorReport:%{error};"
       extra_text_term: "学期: %{term_name};"
       message: "通过以下设置成功生成了 %{type} 报告。帐户: %{account}; %{options}"
       section_text: "班级: %{section};"
@@ -269,11 +271,13 @@ zh:
       deleted: "包括删除的对象: true;"
       reports: "报告: %{files}"
   account_settings: 
+    account: 帐户
     account_name_too_long: 帐户名太长
     confirms: 
       delete_announcement: 是否确定要删除此通告?
       global_announcement: 您必须确认全局通告
       remove_account_admin: 是否确定要删除此帐户管理员?
+    course: 课程
     custom_text_blank: "[自定义文本]"
     links: 
       turnitin: 
@@ -284,10 +288,10 @@ zh:
         invalid_settings: "Turnitin 设置无效，请从 Turnitin 检查您的帐户 ID 和共享密钥"
         setings_confirmed: "Turnitin 设置已确认！"
     titles: 
-      allow_draft_help_title: 什么是草稿状态？
       configure_report: 配置报告
       open_registration_delegated_warning_dialog: 已启用外部身份提供程序
       what_are_quiz_ip_filters: "什么是测验 IP 过滤器?"
+    user: 用户
   account_user: 
     types: 
       account_admin: 帐户管理员
@@ -333,8 +337,8 @@ zh:
         unsuspend: 取消挂起帐户
     admin_tools: 
       admin_tools: 
-        auth_logging: 正在登录
         tab_labels: 
+          admin_tools_logging: 正在登录
           restore_course: 恢复课程
         view_messages: 查看通知
       admin_tools_cumb: 管理工具
@@ -383,6 +387,10 @@ zh:
         successfull_restore: 
           add_enrollments: 添加注册
           subtext: 接下来您要做什么？
+      logging_content_pane: 
+        authentication: 登录/登出活动
+        select_default: 选择日志类型
+        select_label: 选择要搜索的日志类型。
       page_title: "%{account} 的管理工具"
       user_date_range_search_form: 
         find: 查找
@@ -402,8 +410,12 @@ zh:
     assignment_scheduling_csv_parameters: 
       account_reports: 
         newark: 
+          assignment_count: 
+            field: "# 作业:"
           assignment_groups: 
             label: 要包括的作业小组：
+          assignments: 
+            check_box: 作业
           major: 
             check_box: 主要
           papers: 
@@ -412,8 +424,6 @@ zh:
             check_box: 项目
           reports: 
             check_box: 报告
-          section_id: 
-            field: "班级 ID:"
           tests: 
             check_box: 测试
     avatars: 
@@ -658,6 +668,8 @@ zh:
         newark: 
           assignment_groups: 
             label: 要包括的作业小组：
+          assignments: 
+            check_box: 作业
           major: 
             check_box: 主要
           papers: 
@@ -702,14 +714,6 @@ zh:
       alert_icon_warning_option: 警告
       alert_timespan: "从 %{start_at} 到 %{end_at}"
       alerts_title: 警报
-      allow_draft: "允许草稿状态 (测试版)"
-      allow_draft_help_message: |-
-          草稿状态是一项测试版功能，它允许发布和取消发布课程内容。
-          未发布的内容对学生来说是不可见的，不影响评分。
-          它还包括某些课程区域的重新设计，使其在外观和功能上更加一致。
-          
-          如果在这里允许草稿状态，教师则可以在其各个课程中启用此状态。
-      allow_draft_help_tooltip: 什么是草稿状态？
       announcement_sent_to_subset: "每月发送给 1 / %{denominator} 的用户"
       buttons: 
         add_users: 看起来不错，添加这些用户
@@ -728,11 +732,13 @@ zh:
       enabled_web_serices_title: 已启用网络服务
       equall_endpoint_help: "这是指向 equella 服务的 URL。它看起来可能像 \"%{sample_url}\"。"
       equella_settings_title: "Equella 设置"
+      feature_options: 功能选项
       features_title: 功能
       global_announcements_description: 您可以在帐户中使用全局通告在所有用户的面板上发布即时消息。这些消息将会在每个用户的面板上显示指定的时长，或者显示至用户单击"关闭"链接忽略该警报。**这些通告应尽量少用。**
       global_announcements_title: 全局通告
       global_js_and_css_includes_description: 这些文件将包含在为您的帐户加载的所有页面中
       global_js_and_css_includes_title: "全局 JavaScript 和 CSS 包含"
+      google_docs_domain: "允许的 Google Docs 域"
       headers: 
         report_last_run: 上次运行
         report_name: 姓名
@@ -753,6 +759,7 @@ zh:
         canvas_authentication: "Canvas 身份验证"
         default_language: 默认语言
         default_time_zone: 默认时区
+        domain: "域:"
         edit_institution_email: 用户可删除其学院分配的电子邮件地址
         enable_alerts: 警报
         enable_eportfolios: 学习档案
@@ -1281,7 +1288,6 @@ zh:
       quota_exceeded_user: 已超过用户存储配额
       student_view_unauthorized: 学生身份无法使用此功能。
       unauthorized: 
-        generic: 您无权执行这个操作
         not_started_yet: "您尝试访问的课程还没有开始。开始时间为 %{date}。"
         unpublished: 本课程的教师还没有发布这门课程。
     notices: 
@@ -1317,7 +1323,6 @@ zh:
     update: 更新
   assessment_question: 
     default_question_name: 问题
-    default_question_text: 问题文本
   assessment_question_bank: 
     default_imported_title: 导入的问题
     default_title: "无名称 - %{course}"
@@ -1346,7 +1351,8 @@ zh:
     labels: 
       due: 截止时间
     name_is_required: 需要姓名
-    points_possible: "对于百分制，最高分必须大于 0"
+    percentage_points_possible: "对于百分制，满分必须大于 0"
+    points_possible_number: 满分必须为数字
     select_external_tool_dialog_title: 配置外部工具
     show_advanced_options: 显示高级可选功能
     submission_action_take_quiz: "提取 %{title}"
@@ -1690,6 +1696,7 @@ zh:
       group_category_options: 新建小组类别
       group_set: 小组集
       is_group_assignment: 这是一个小组作业
+      students_already_submitted_warning: 以前提交的作业将不作为小组作业计算在内，并且将在快速评分器中错误显示。
     group_comment: 
       labels: 
         group_comment: 发送评论到全小组
@@ -1816,6 +1823,7 @@ zh:
       peer_reviews_assign_at_explanation: 必须在截止时间之后。如果为空，则使用截止时间。
       reviews_per_user: 每位用户的审阅次数
     percent_of_final_grade: "最终评分的 %{percent}"
+    points_possible_number: 满分必须为数字
     positive_number: 您必须使用正数
     redirect_page: 
       redirect_message: |-
@@ -1921,12 +1929,14 @@ zh:
       comments_placeholder: 评论...
       errors: 
         unacceptable_file_type: "不允许此文件类型。接受的文件类型为: %{allowed_extensions_list}"
+      gmail_restriction_description: "您的帐户已经将 Google Doc 作业提交限制为 %{domain} 域上的 Google 帐户。要用 Google Doc 提交此作业，需要在您的用户设置页上重新配置 Google Docs 集成。integration on your user settings page."
       instructions: 
         from_external_tool: 从下面的列表中选择一个工具来加载和提交该工具提供的资源。
         google_docs: 从下面选择文件。
         media_recording: 使用下面的链接记录您的提交。完成并且可以提交时单击"保存\。
         online_text_entry: 在此复制并粘贴或键入您的提交。
         online_url: 复制并粘贴要为此作业提交的网站链接。
+      invalid_google_docs_domain: 域无效
       labels: 
         uploaded_data: 文件
         url: "网站 URL"
@@ -2287,10 +2297,9 @@ zh:
         calendar_month: 月
         calendar_scheduler: 计划程序
         calendar_week: 周
+        screenreader_recommend_agenda: "屏幕阅读器用户: 使用议程查看事件"
       loading: 正在加载
       my_appointment_groups: 我的约会组
-      refresh: 刷新
-      use_old_calendar: 旧日历
     calendar_navigator: 
       enter_navigation_date: 输入您要导航到的日期。
       next: 下一页
@@ -2358,9 +2367,11 @@ zh:
       date: 日期
       delete: 删除
       different_date_for_each_section: 对每个班级应用不同的日期
+      edit_calendar_event_header: 编辑日历事件
       end_time: 结束时间
       event_description: 事件说明
       event_title: 事件标题
+      new_calendar_event_header: 新日历事件
       start_time: 开始时间
     edit_event: 
       tabs: 
@@ -2374,6 +2385,7 @@ zh:
     event_details: 
       attendees: 参加者
       calendar: 日历
+      close: 关闭
       details: 详细信息
       links: 
         delete: 删除
@@ -2391,8 +2403,6 @@ zh:
       event: 事件
       quiz: 测验
     input_is_invalid_date: 输入的内容不是有效日期。
-    labels: 
-      due: 截止时间
     loading_more_items: 正在加载更多项目。
     loading_undated_events: 正在加载无日期的事件
     message_participants: 
@@ -2436,6 +2446,8 @@ zh:
       create_a_new_set_of_appointments: 创建一个约会组
     screenreader_date_suggestion: "%{date}。按 Enter 接受。"
     time_block_errors: 在您的时间段选择方面有错误。
+    time_block_row: 
+      delete_link: 删除时间范围
     titles: 
       edit_appointment_group: 编辑约会组
       edit_event: 编辑事件
@@ -2444,7 +2456,6 @@ zh:
       loading_undated_events: 正在加载无日期的项目...
       no_undated_events: 无更新的项目。
       show_undated_events: 显示更新的项目
-      undated_items: 更新的项目
   calendar_event: 
     errors: 
       duplicate_child_event_contexts: 复制子事件上下文
@@ -3539,8 +3550,8 @@ zh:
         student_progression: 学生学习单元的进度
     context_module: 
       admin_links: 
-        module_options_label: 单元可选功能
-        module_options_title: 单元可选功能
+        module_options_label: 管理单元
+        module_options_title: 管理单元
       context_module: 
         draft: (草稿)
       images: 
@@ -3564,7 +3575,11 @@ zh:
           delete_module: 删除此单元
           edit_module: 编辑
           student_progress: 查看学生学习此单元的进度
-      manage: 单元可选功能
+      manage: 管理单元
+      module_toolbar: 
+        aria: 
+          module_options: 
+            label: 单元可选功能
       module_will_unlock_at: "解锁日期 *%{unlock_date}*"
       progression_complete_count: "*%{count}* 完成"
       progression_started_count: "*%{count}* 进行中"
@@ -3635,6 +3650,8 @@ zh:
       min_score: 
         fulfilled: "得分至少为 %{score}"
         unfulfilled: "得分至少为 %{score}"
+      module: 
+        item_aria_label: "%{item_label} 单元项目"
       must_contribute: 
         fulfilled: 已参与页面的内容
         unfulfilled: 必须参与页面的内容
@@ -4503,16 +4520,8 @@ zh:
       date_restricted: 用户只能参与这些日期之间的课程
       deatils: 
         move_course: 为此课程选择新的根帐户在移动课程之后，还需要为课程指定新的院系。
-      draft_explanation: 解释草稿状态
-      draft_state_description: |-
-          草稿状态是一项测试版功能，它允许发布和取消发布课程内容。
-           未发布的内容对学生来说是不可见的，不影响评分。
-          它还包括某些课程区域的重新设计，使其在外观和功能上更加一致。 
-          
-          如果禁用草稿状态，则未发布的内容不可用。
       drag_details: 禁用大部分页面会导致访问这些页面的学生被重定向至课程主页。
       drag_to_hide: 拖动项目到此处可对学生隐藏它们。
-      enable_draft: "启用草稿状态 (测试版)"
       enrollment_count: 
         one: "%{count} 个用户"
         other: "%{count} 个用户"
@@ -4597,6 +4606,7 @@ zh:
       tabs: 
         alerts: 警报
         details: 课程详细信息
+        feature_options: 功能选项
         grade_publishing: 评分发布
         navigation: 导航
         sections: 班级
@@ -4993,6 +5003,8 @@ zh:
       second: 秒
       year: 年
   default_conference_title: "%{course_name} 会议"
+  default_question_name: 问题
+  default_question_text: 问题文本
   demos: 
     demos_add: 
       labels: 
@@ -5105,6 +5117,7 @@ zh:
       separated_conversation_notice: "由于这是一个小组作业，每个小组都有关于此主题的会话。以下是您可以访问的内容:"
       show_due_dates: 显示截止时间
       until: 结束时间
+    cannot_unpublish: 无法取消发布
     confirm_delete_announcement: 
       one: "是否确定要删除这 %{count} 个通告?"
       other: "是否确定要删除这 %{count} 个通告?"
@@ -5172,6 +5185,7 @@ zh:
         one: "再显示 %{count} 个条目"
         other: "再显示 %{count} 个条目"
     error_draft_state_announcement: 此主题无法设置为草稿状态，因为这是一个通告。
+    error_draft_state_graded: 此主题无法设置为草稿状态，因为它是作业。
     error_draft_state_unauthorized: 您无权将此主题设置为草稿状态。
     error_draft_state_with_posts: 此主题无法设置为草稿状态，因为它包含帖子。
     group_assignment_discussion_entry: 
@@ -5213,6 +5227,7 @@ zh:
       current_page: 当前
       first_page: 第一个
       last_page: 最后一个
+    points_possible_number: 满分必须为数字
     reply_count_tooltip: 
       one: "1 个回复"
       other: "%{count} 个回复"
@@ -5251,6 +5266,7 @@ zh:
       show_rubric: 显示评分标准说明
       speed_grader: 快速评分器
       topic: 主题
+      topic_not_visible: 此主题对用户不可见
       topic_podcast_feed_link: 主题播客动态消息
       topic_subscribe: 订阅
       topic_subscribe_tooltip: 您已取消订阅，将不再收到新评论的通知
@@ -5347,6 +5363,12 @@ zh:
     unsubscribe: 取消订阅此主题
     unsubscribed: 取消订阅
     unsubscribed_hint: 您未订阅此主题。单击可订阅。
+  draft_state_description: |-
+      草稿状态是一项测试版功能，它允许发布和取消发布课程内容。
+      未发布的内容对学生来说是不可见的，不影响计分。
+      它还包括某些课程区域的重新设计，使其在外观和功能上更加一致。 
+      
+      如果禁用草稿状态，则未发布的内容不可用。
   due_dates: 
     due_at: "截止时间: %{assignment_due_date_time}"
     multiple_due_dates: "截止时间: 多个截止时间"
@@ -5778,9 +5800,6 @@ zh:
     app_review_view: 
       posted_by_on: "由 *%{user.name}* 于 *%{created_at}* 发布"
     app_saved_message: "%{app} 已成功保存！"
-    borderless_launch: 
-      load_tool_button: "手动加载 %{tool}"
-      redirecting_to_lti: "正在重定向至 LTI 应用程序，请稍候..."
     buttons: 
       cancel: 取消
       delete: 删除
@@ -5910,6 +5929,25 @@ zh:
       notifications_config_notice: "来自 Canvas 的通知可自动发送到您的 Facebook 帐户。下面您会看到可发送的通知类型。您可以在此处或 Canvas 中随时更改您的通知首选项。"
       settings_title: "Canvas 通知设置"
       updating_preferences: 正在更新首选项...
+  feature_flags: 
+    feature_flag: 
+      allow: 允许
+      disabled: 已禁用
+      enabled: 已启用
+      estimated_release: "预计发行版:"
+      no_description: 无说明
+      ? "off"
+      : 关
+      ? "on"
+      : 开
+      release_notes: 发行说明
+      toggle_feature_details: 切换功能详细说明
+    feature_flag_admin_view: 
+      feature_options: 功能选项
+      no_features_available: 当前没有可用的功能。
+  features: 
+    draft_state: 草稿状态
+    google_docs_domain_restriction: "Google Docs 域限制"
   filebrowserview: 
     course_files: 课程文件
     group_files: 小组文件
@@ -6111,9 +6149,16 @@ zh:
     invitation: 邀请
     question: 问题
     warning: 警告
+  google_docs_domain_restriction_description: |-
+      Google Docs 域限制允许 Google Docs 作业和协作
+      仅限于单个域。尝试在未经批准的域上提交作业或
+      加入协作的学生将收到一条错误消息，告知他们
+      需要更新其 Google Docs 集成。
   gradebook: 
     alerts: 
       no_active_students: 对不起，课程中没有活动学生或可评分的学生。
+      no_students_in_groups_back: 很抱歉，此次提交的作业无法在快速评分器中计分，因为没有分配的用户。请将用户分配到此小组集，然后重试。单击"确定"返回。
+      no_students_in_groups_close: 很抱歉，此次提交的作业无法在快速评分器中计分，因为没有分配的用户。请将用户分配到此小组集，然后重试。单击"确定"返回此窗口。
       no_students_in_section: 在该班级中找不到任何学生，请返回以显示所有班级。
       none_to_update: 无更新
       scores_updated: 
@@ -6257,6 +6302,17 @@ zh:
     invalid_assignment_groups_warning: 
       one: "分数不包括 %{groups}，因为没有最高得分"
       other: "分数不包括 %{groups}，因为没有最高得分"
+    keyboard_assignment_desc: 转到当前作业的详细信息页面
+    keyboard_close_menu: 关闭当前活动的作业菜单
+    keyboard_comment_desc: 对活动作业的评论
+    keyboard_menu_desc: 打开活动列的作业
+    keyboard_sort_desc: 对当前活动列上的网格排序
+    keycodes: 
+      close_menu: esc
+      comment: c
+      goto_assignment: g
+      menu: m
+      sort: s
     no_assignments_have_points_warning: 无法计算得分，直到作业有最高得分
     percent_of_grade: "%{percentage} 的评分 "
     points_out_of: "满分 %{points_possible} 分"
@@ -6961,6 +7017,12 @@ zh:
         assign_user_to_group: 将用户分配到此小组
         assign_user_to_group_name: "将用户分配到小组 %{name}"
         no_groups_created: 在用户添加小组之前需要创建小组。
+      edit_group_assignment: 
+        all_available_groups_full: 所有可用小组已满。
+        all_groups_full_suggestion: 更改小组限制或添加更多小组。
+        move_to_group_label: 移动到小组
+        saving: 正在保存...
+        where_to_move: "您想将 *%{userName}* 移动到哪里?"
       group_categories: 
         account_group_explanation: 帐户级学习小组是一种不依附特定课程而组织学生团体的良好方式。每个学习小组有自己的日历、讨论板和协作工具，从而能够更加有效地组织和合作。
         add_group_set: 添加小组集
@@ -6986,9 +7048,7 @@ zh:
         save: 保存
         saving: 正在保存...
         self_signup: 自行注册
-        self_signup_description: "您可以创建学生能自己注册的学习小组集。学生仍限于集中的某个学习小组， 这样他们就可将自己组织成学习小组，而不需要教师这样做。请记住，只要启用此选项，学生可以将自己从一个学习小组移至另一个学习小组。"
         split_into_groups: "将学生分为 %h{split_num} 相等的学习小组"
-        what_is_this: 这是什么?
       group_category_detail: 
         add_group: 添加小组
         category_settings: 设置
@@ -7021,20 +7081,26 @@ zh:
         visit_group_homepage: 访问小组主页
       group_edit: 
         cancel: 取消
+        group_join_level: 加入
         group_name: 小组名称
+        invitation_only: 仅限邀请
+        open: 成员可以随意加入
         save: 保存
         saving: 正在保存...
       group_user: 
         assign_to_group: 分配到小组
-        assign_user_to_group: "将用户 %{name} 分配到小组"
-        remove_from_group: 从小组中删除
-        remove_user_from_group: "从此小组删除用户 %{name}"
+        assign_user_to_group: "将 %{name} 分配到小组"
+        edit_user_group_assignment: "从小组删除或移动 %{name}"
+        move: 移动到...
+        move_to_new_group: "将 %{name} 移动到新小组"
+        remove: 删除
+        remove_from_group: "从小组中删除 %{name}"
       group_users: 
-        no_students: 无学生
-        no_users: 无用户
+        no_students: 此小组中目前没有学生。请添加学生以开始。
+        no_users: 此小组中目前没有用户。请添加用户以开始。
       groups: 
-        no_groups: 无小组。
-        no_matching_groups: 无匹配小组。
+        no_groups: 此小组集目前无小组。请添加小组以开始。
+        no_matching_groups: 没有匹配您当前的搜索术语的小组。
       randomly_assign_members: 
         cancel: 取消
         okay: 确定
@@ -9628,6 +9694,8 @@ zh:
         saving_preferences_failed: "啊噢! 有些内容已损坏。请重试"
       facebook: 
         display: Facebook
+      push: 
+        display: 推送通知
       sms: 
         display: 手机号码
       twitter: 
@@ -9840,8 +9908,8 @@ zh:
     errors: 
       require_title: 您必须输入标题
     headers: 
-      sort_ascending: 升序排序
-      sort_descending: 降序排序
+      sort_ascending: "%{title}，升序排序"
+      sort_descending: "%{title}，降序排序"
     notices: 
       delete_failed: "页面“%{title}”无法删除。"
       page_deleted: "页面\"%{title}\"已删除。"
@@ -9897,8 +9965,8 @@ zh:
         canvas_source_identifier: "您的 Canvas 实例名称"
         sis_source_identifier: "您的 Banner 实例名称"
     big_blue_button: 
-      description: 大蓝色按钮网络会议支持
-      name: 深蓝色按钮
+      description: "BigBlueButton 网络会议支持"
+      name: BigBlueButton
     big_blue_button_settings: 
       description: "您将需要访问 [BigBlueButton](%{url}) 实例。"
       domain_description: "BigBlueButton 安装的**主机名**或 **ip 地址**（例如，bigbluebutton.mycompany.com）"
@@ -10300,6 +10368,7 @@ zh:
       diigo_description: "Diigo 是专为研究和教育人士量身打造的一款社交书签工具。Canvas 的丰富内容编辑器可让您搜索 Diigo 标记，从而轻松地从 Canvas 内链接到您觉得有用的其它资源。"
       error_loading_token_details: 加载令牌详细信息时出错
       facebook_description: "如果您有 Facebook 帐户，您可以安装 Canvas 应用程序并在个人资料中接收课程通知。您可以指定要接收哪些类型的通知以及多久发送一次。"
+      feature_options: 功能选项
       full_token_warning: |-
           **立即复制此令牌**。一旦离开此页面，您将无法
           再检索完整的令牌，您将不得不重新生成令牌以获取一个新
@@ -10675,6 +10744,8 @@ zh:
       user_question_banks: 用户题库
     question_bank: 
       bookmark_bank: 将此题库添加到书签
+      delete_bank: 删除此题库
+      edit_bank: 编辑此题库
       last_updated: "上次更新: *%{datetime}*"
       no_name: 无姓名
       no_questions: 无问题
@@ -10758,6 +10829,7 @@ zh:
     quick_start_bar_view: 
       new: "新建:"
   quiz: 
+    current_filter: 当前过滤器
     default_question_input: "[选择]"
     default_text_only_question_name: 间隔
     default_title: 未命名测验
@@ -10822,6 +10894,7 @@ zh:
     assignment_points_possible: 
       one: "%{count} 分"
       other: "%{count} 分"
+    assignments_label: 作业测验切换测验可见性
     buttons: 
       add_selected_questions: 添加所选问题
       adding_questions: 正在添加问题...
@@ -10830,6 +10903,7 @@ zh:
       creating_group: 正在创建小组...
       generating: 正在生成...
       generating_combinations_progress: "正在生成... (%{done}/%{total})"
+      save: 保存
       saved: 已保存！
       saving: 正在保存...
       update_group: 更新小组
@@ -10840,7 +10914,11 @@ zh:
       delete_question: 是否确定要删除此问题?
       delete_quiz: 是否确定要删除此测验?
       scrap_and_restart: 取消此测验并从头开始?
-    current_filter: 当前过滤器
+    correct_answers_no_longer_available: 不再提供正确的答案。
+    correct_answers_protected: 正确答案隐藏。
+    correct_answers_shown_after: "正确答案将于 %{date} 提供。"
+    correct_answers_shown_between: "正确答案将于 %{from} - %{to} 提供。"
+    correct_answers_shown_until: "正确答案到 %{date} 才提供。"
     default_answer_comments: 学生选择此答案时响应
     default_answer_comments_on_match: 学生匹配此答案时响应
     default_comments_on_wrong_match: 用户遗漏此匹配时响应
@@ -10927,10 +11005,13 @@ zh:
       adding_questions_failed: 添加问题失败，请重试
       creating_group_failed: 创建小组失败，请重试
       field_is_required: 此字段为必填字段
+      invalid_show_correct_answers_range: 隐藏的日期不能早于显示的日期。
       loading_banks_failed: 无法加载题库，请重试
       loading_more_questions_failed: 加载更多问题失败
       loading_question_failed: 加载问题失败...
       loading_questions_failed: 无法加载问题，请重试
+      missing_access_code: 您必须输入访问代码
+      missing_ip_filter: "您必须输入有效的 IP 地址"
       no_answer: 请添加至少一个答案
       no_correct_answer: 请选择一个正确答案
       no_more_attempts: 您没有剩余的测验尝试
@@ -10938,6 +11019,8 @@ zh:
       quiz_deleted: 该测验已删除
       quiz_update_failed: 测验无法更新
       retrieving_filters_failed: 检索过滤器失败
+    fabulous_quizzes: 
+      page_titles: 测验
     ? "false"
     : "False"
     file_uploaded_or_removed: 
@@ -11165,12 +11248,13 @@ zh:
       titles: 
         this_quiz_is_locked: 此测验当前锁定。单击以了解更多详细信息。
     index_view: 
+      add_quiz: 测验
       links: 
-        create_new_quiz: 新测验
         manage_question_banks: 管理题库
         publish_multiple_quizzes: 发布多个测验
         settings: 设置
       search_for_quiz: 搜索测验
+      title_add_quiz: 添加测验
     invalid_ip: 
       quiz_protected: 此测验受到保护并且仅从特定位置可用。您当前使用的计算机似乎并非进行此测验的有效位置。
       survey_protected: 此调查受到保护并且仅从特定位置可用。您当前使用的计算机似乎并非进行此调查的有效位置。
@@ -11242,6 +11326,12 @@ zh:
       end_quiz_reference_time_now: 立即
       end_quiz_when: "%{reference_time} 过 %{n} 分钟结束测验。"
       errors: 
+        quiz_submission_extra_attempts_not_a_number: 额外尝试次数必须为数字。
+        quiz_submission_extra_attempts_too_long: "额外尝试次数必须小于 1000。"
+        quiz_submission_extra_attempts_too_short: "额外尝试次数必须大于 0。"
+        quiz_submission_extra_time_not_a_number: 额外时间必须为数字。
+        quiz_submission_extra_time_too_long: "额外时间必须小于 10080。"
+        quiz_submission_extra_time_too_short: "额外时间必须大于 0。"
         server_communication_failed: 与服务器通信时出现问题。系统将在五分钟内重试，或者您可以重新加载该页面
       extended_quiz_time_explanation: 您可以为此学生提供有关其当前测验尝试的额外时间。您想要为其提供多长时间?
       extensions_for_student: "%{student} 的延时"
@@ -11293,12 +11383,11 @@ zh:
         published: 已发布
         save: 保存
       cant_go_back: 回答后锁定问题
-      code: 访问代码
       default_page_title: 新测验
-      filter: "IP 过滤"
       group: 作业小组
       headers: 
         ip_filters: "什么是测验 IP 过滤器?"
+      hide_correct_answers_at: 隐藏正确答案
       hints: 
         question_detail_disabled: "注意: 超出 %{question_count} 时问题详细信息不可用。"
         quiz_score: 一旦进行调查，学生将自动获得满分
@@ -11314,7 +11403,7 @@ zh:
         quiz_notify: 通知用户此测验已更改
         quiz_score: 分数
         require_access_code: 需要访问代码
-        restrict_quiz: 对测验采取限制措施
+        restrict_quiz: 测验限制
         show_question_details: 显示问题详细信息
       limited_attempts: 允许的尝试
       links: 
@@ -11336,7 +11425,8 @@ zh:
       require_lockdown_browser_for_results: 查看测验结果时需要
       retrieving_filters: 正在检索过滤器...
       score_to_keep: 要保留的测验分数
-      show_correct_answers: 显示正确答案
+      show_correct_answers: 允许学生看到正确答案
+      show_correct_answers_at: 显示正确答案
       shuffle_answers: 置乱答案
       time_limit: 多少分钟?
       titles: 
@@ -11364,6 +11454,7 @@ zh:
         one: "%{count} 个测验已成功取消发布!"
         other: "%{count} 个测验已成功取消发布!"
     practice_quiz: 练习测验
+    practices_label: 练习测验切换测验可见性
     question_colon: 问题：
     question_count: 
       one: "%{count} 个问题"
@@ -11437,8 +11528,6 @@ zh:
       links: 
         delete: 删除
         edit: 编辑
-      quiz_available: 可用
-      quiz_due: 截止时间
       settings: 设置
       title_delete: 删除测验
       title_edit: 编辑测验
@@ -11566,6 +11655,7 @@ zh:
       loading: 正在加载...
       titles: 
         details: 作业评分标准详细说明
+    search_placeholder: 搜索测验
     show: 
       answers: 
         correct: 正确!
@@ -11627,6 +11717,10 @@ zh:
         unlock_for_how_long: 您想要解锁该测验多长时间?
       warnings: 
         draft_version: 这是测验草拟版本的预览
+    show_and_hide_correct_answers: "从 %{from} 到 %{to}"
+    show_correct_answers_after: "在 %{date} 之后"
+    show_correct_answers_immediately: 立即
+    show_correct_answers_until: "直到 %{date}"
     single_answer: 
       upload: 上传
     statistics: 
@@ -11674,6 +11768,7 @@ zh:
       regraded: 已重新计分
       score: 分数
       time: 时间
+    surveys_label: 调查切换测验可见性
     take_quiz: 
       buttons: 
         next: 下一页
@@ -11747,6 +11842,7 @@ zh:
       labels: 
         attempt_due: 尝试截止
         score: 分数
+        time_elapsed: 经过时间
         time_running: 运行时间
       links: 
         hide_time_running: 隐藏
@@ -11756,6 +11852,7 @@ zh:
       labels: 
         time_elapsed: 经过时间
         time_remaining: 剩余时间
+    title_add_quiz: 添加测验
     titles: 
       add_questions_as_group: 添加问题作为一组
       click_to_enter_comments_on_answer: 单击以输入学生选择此答案时的评论
@@ -11774,6 +11871,17 @@ zh:
     warnings: 
       unpublished_changes: "*您已对此测验进行未发布的更改。* 这些更改将不会对学生显示，直到您发布或重新发布测验。"
       unpublished_quiz: "*此测验未发布* 在发布之前，只有教师才能查看此课程。"
+  quizzes_model: 
+    confirms: 
+      delete_quiz: 是否确定要删除此测验?
+    delete_quiz: 删除测验
+    edit_quiz: 编辑测验
+    points: 
+      one: "%{count} 分"
+      other: "%{count} 分"
+    questions: 
+      one: "%{count} 个问题"
+      other: "%{count} 个问题"
   re_upload_submissions_form: 
     buttons: 
       upload: 上传文件
@@ -11853,6 +11961,7 @@ zh:
       manage_courses: 管理（添加/编辑/删除）课程
       manage_demos: 管理演示
       manage_developer_keys: 管理开发人员密钥
+      manage_feature_flags: 在帐户级启用或禁用功能
       manage_files: 管理（添加/编辑/删除）课程文件
       manage_frozen_assignment: 管理（编辑/删除）冻结的作业
       manage_global_outcomes: 管理全局学习成果
@@ -11888,6 +11997,7 @@ zh:
       view_all_grades: 查看所有评分
       view_analytics: 查看分析页面
       view_error_reports: 查看错误报告
+      view_grade_changes: "查看评分更改日志 "
       view_group_pages: 查看所有学习小组的学习小组页面
       view_jobs: 查看后台工作
       view_notifications: 查看通知
@@ -12553,7 +12663,7 @@ zh:
     rubric_criterion: 
       defaults: 
         description: 标准说明
-      delete_criterion_link: 删除标准链接
+      delete_criterion_row: 删除标准行
       description: 
         custom_comments_area: 此区域将供评估人员留下有关此标准的评论。
       full_marks: 满分
@@ -12942,6 +13052,7 @@ zh:
       assignment_submit_fail: 作业无法提交
       can_not_submit_locked_assignment: 作业锁定时无法提交
       invalid_file_type: 无效的文件类型
+      invalid_google_docs_domain: "您不能从此 google_docs 域提交作业"
       media_file_attached: 提交中没有媒体录音
       no_attached_file: 您必须至少将一个文件附加到此作业
       no_report: 无法查找该提交项目的报告
@@ -13691,8 +13802,6 @@ zh:
         creation_date: 创建日期
         last_edit: 最后编辑
         page_title: 页面标题
-        published: 已发布
-        settings: 设置
       loading: "正在加载 ..."
       loading_more: "正在加载更多 ..."
       no_pages: 尚未创建页面。

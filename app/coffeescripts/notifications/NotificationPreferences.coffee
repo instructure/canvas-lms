@@ -39,6 +39,8 @@ define [
         title: I18n.t('frequencies.title.never', 'Do not send me anything')
       ]
 
+      @limitedButtonData = [_.first(@buttonData), _.last(@buttonData)]
+
       @updateUrl  = @options.update_url
       @channels   = @options.channels || []
       @categories = @options.categories || []
@@ -49,6 +51,7 @@ define [
         c.name = switch c.type
           when 'email' then I18n.t('communication.email.display', 'Email Address')
           when 'sms' then I18n.t('communication.sms.display', 'Cell Number')
+          when 'push' then I18n.t('communication.push.display', 'Push Notification')
           when 'twitter' then I18n.t('communication.twitter.display', 'Twitter')
           when 'facebook' then I18n.t('communication.facebook.display', 'Facebook')
       # Setup the mappings
@@ -86,7 +89,7 @@ define [
           p.channel_id is c.id and p.category is category.category
         frequency = 'never'
         frequency = policy['frequency'] if policy
-        @policyCellHtml(category, c.id, frequency)
+        @policyCellHtml(category, c, frequency)
       fragments.join ''
 
     hideButtonsExceptCell: ($notCell) =>
@@ -167,17 +170,24 @@ define [
       null
 
     # Generate and return the HTML for an option cell with the with the sepecified value set/reflected.
-    policyCellHtml: (category, channelId, selectedValue = 'never') =>
+    policyCellHtml: (category, channel, selectedValue = 'never') =>
       # Reset all buttons to not be active by default. Set their ID to be unique to the data combination.
       _.each(@buttonData, (b) ->
         b['active'] = false
-        b['coordinate'] = "cat_#{category.id}_ch_#{channelId}"
+        b['coordinate'] = "cat_#{category.id}_ch_#{channel.id}"
         b['id'] = "#{b['coordinate']}_#{b['code']}"
       )
       selected = @findButtonDataForCode(selectedValue)
       selected['active'] = true
 
-      policyCellTemplate(touch: INST.browser.touch, category: category.category, channelId: channelId, selected: selected, allButtons: @buttonData)
+      cellButtonData = if channel.type == 'push' then @limitedButtonData else @buttonData
+
+      policyCellTemplate
+        touch:      INST.browser.touch
+        category:   category.category
+        channelId:  channel.id
+        selected:   selected
+        allButtons: cellButtonData
 
     # Record and display the value for the cell.
     saveNewCellValue: ($cell, value) =>

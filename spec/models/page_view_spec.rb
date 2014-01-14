@@ -143,9 +143,9 @@ describe PageView do
 
         Setting.set('enable_page_views', 'cassandra')
         migrator = PageView::CassandraMigrator.new
-        PageView.find(moved.map(&:request_id)).size.should == 0
+        PageView.find_all_by_id(moved.map(&:request_id)).size.should == 0
         migrator.run_once(2)
-        PageView.find(moved.map(&:request_id)).size.should == 2
+        PageView.find_all_by_id(moved.map(&:request_id)).size.should == 2
         # should migrate all active accounts
         PageView.find(moved_a3.request_id).request_id.should == moved_a3.request_id
         expect { PageView.find(moved_later.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
@@ -290,6 +290,136 @@ describe PageView do
       pv.update_attribute(:url, 'http://canvas.example.com/api/v1/courses/1?access_token=SUPERSECRET')
       pv.reload
       pv.url.should ==  'http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]'
+    end
+  end
+
+  describe ".find_all_by_id" do
+    context "db-backed" do
+      before do
+        Setting.set('enable_page_views', 'db')
+      end
+
+      it "should return the existing page view" do
+        page_views = (0..3).map { |index| page_view_model }
+        page_view_ids = page_views.map { |page_view| page_view.request_id }
+
+        PageView.find_all_by_id(page_view_ids).should == page_views
+      end
+
+      it "should return nothing with unknown request id" do
+        PageView.find_all_by_id(['unknown', 'unknown']).size.should eql(0)
+      end
+    end
+
+    context "cassandra-backed" do
+      it_should_behave_like "cassandra page views"
+
+      it "should return the existing page view" do
+        page_views = (0..3).map { |index| page_view_model }
+        page_view_ids = page_views.map { |page_view| page_view.request_id }
+
+        PageView.find_all_by_id(page_view_ids).should == page_views
+      end
+
+      it "should return nothing with unknown request id" do
+        PageView.find_all_by_id(['unknown', 'unknown']).size.should eql(0)
+      end
+    end
+  end
+
+  describe ".find_some" do
+    context "db-backed" do
+      before do
+        Setting.set('enable_page_views', 'db')
+      end
+
+      it "should return the existing page view" do
+        page_views = (0..3).map { |index| page_view_model }
+        page_view_ids = page_views.map { |page_view| page_view.request_id }
+
+        PageView.find_some(page_view_ids).should == page_views
+      end
+
+      it "should raise ActiveRecord::RecordNotFound with unknown request id" do
+        pv = page_view_model
+        expect { PageView.find_some([pv.request_id, 'unknown']) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    context "cassandra-backed" do
+      it_should_behave_like "cassandra page views"
+
+      it "should return the existing page view" do
+        page_views = (0..3).map { |index| page_view_model }
+        page_view_ids = page_views.map { |page_view| page_view.request_id }
+
+        PageView.find_some(page_view_ids).should == page_views
+      end
+
+      it "should raise ActiveRecord::RecordNotFound with unknown request id" do
+        pv = page_view_model
+        expect { PageView.find_some([pv.request_id, 'unknown']) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+  end
+
+  describe ".find_by_id" do
+    context "db-backed" do
+      before do
+        Setting.set('enable_page_views', 'db')
+      end
+
+      it "should return the existing page view" do
+        pv = page_view_model
+        PageView.find_by_id(pv.request_id).should == pv
+      end
+
+      it "should return nothing with unknown request id" do
+        PageView.find_by_id('unknown').should be_nil
+      end
+    end
+
+    context "cassandra-backed" do
+      it_should_behave_like "cassandra page views"
+
+      it "should return the existing page view" do
+        pv = page_view_model
+        PageView.find_by_id(pv.request_id).should == pv
+      end
+
+      it "should return nothing with unknown request id" do
+        PageView.find_by_id('unknown').should be_nil
+      end
+    end
+  end
+
+   describe ".find_one" do
+    context "db-backed" do
+      before do
+        Setting.set('enable_page_views', 'db')
+      end
+
+      it "should return the existing page view" do
+        pv = page_view_model
+        PageView.find_one(pv.request_id).should == pv
+      end
+
+      it "should raise ActiveRecord::RecordNotFound with unknown request id" do
+        expect { PageView.find_one('unknown') }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    context "cassandra-backed" do
+      it_should_behave_like "cassandra page views"
+
+      it "should return the existing page view" do
+        pv = page_view_model
+        PageView.find_one(pv.request_id).should == pv
+      end
+
+      it "should raise ActiveRecord::RecordNotFound with unknown request id" do
+        expect { PageView.find_one('unknown') }.to raise_error(ActiveRecord::RecordNotFound)
+      end
     end
   end
 

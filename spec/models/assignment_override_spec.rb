@@ -185,16 +185,24 @@ describe AssignmentOverride do
       @override.should_not be_valid
     end
 
+    # necessary to allow soft deleting overrides that belonged to a cross
+    # listed section after it is de-cross-listed
+    it "should not reject sections in different course than assignment when deleted" do
+      @other_course = course_model
+      @override.set = @other_course.default_section
+      @override.workflow_state = 'deleted'
+      @override.should be_valid
+    end
+
     it "should reject groups in different category than assignment" do
       @assignment.group_category = group_category
       @category = group_category(name: "bar")
-      @override.set = @category.groups.create
+      @override.set = @category.groups.create!(context: @assignment.context)
       @override.should_not be_valid
     end
 
-    # necessary to allow deleting but otherwise keeping assignments that were
-    # for an assignment's previous group category when the assignment's group
-    # category changes
+    # necessary to allow soft deleting overrides that were for an assignment's
+    # previous group category when the assignment's group category changes
     it "should not reject groups in different category than assignment when deleted" do
       @assignment.group_category = group_category
       @category = group_category(name: "bar")

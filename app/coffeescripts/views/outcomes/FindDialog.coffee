@@ -57,7 +57,7 @@ define [
       @shouldImport = if opts.shouldImport is false then false else true
       @disableGroupImport = opts.disableGroupImport
 
-      super()
+      super
       @render()
       # so we don't mess with other jquery dialogs
       @dialog.parent().find('.ui-dialog-buttonpane').css 'margin-top', 0

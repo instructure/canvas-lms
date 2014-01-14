@@ -1,6 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 def visit_page
+  @course.reload
   get "/courses/#{@course.id}/content_migrations"
   wait_for_ajaximations
 end
@@ -19,14 +20,20 @@ def select_migration_file(opts={})
 end
 
 def fill_migration_form(opts={})
+  select_migration_type('none') unless opts[:type] == 'none'
   select_migration_type(opts[:type])
   select_migration_file(opts)
 end
 
 def submit
-  submit_btn = fj('#submitMigration')
-  submit_btn.click
-  keep_trying_until { fj('#migrationFileUpload').blank? }
+  @course.reload
+  count = @course.content_migrations.count
+
+  driver.execute_script("$('#migrationConverterContainer').submit()")
+  keep_trying_until do
+    @course.content_migrations.count.should == count + 1
+  end
+  wait_for_ajaximations
 end
 
 def run_migration(cm=nil)
@@ -61,9 +68,9 @@ def test_selective_content(source_course=nil)
 
   if source_course
     topic_id = CC::CCHelper.create_key(source_course.discussion_topics.find_by_migration_id(topic_id))
-    att_ids = att_ids.map{|id| CC::CCHelper.create_key(source_course.attachments.find_by_migration_id(id))}
-    selected_att_ids = selected_att_ids.map{|id| CC::CCHelper.create_key(source_course.attachments.find_by_migration_id(id))}
-    tool_ids = tool_ids.map{|id| CC::CCHelper.create_key(source_course.context_external_tools.find_by_migration_id(id))}
+    att_ids = att_ids.map { |id| CC::CCHelper.create_key(source_course.attachments.find_by_migration_id(id)) }
+    selected_att_ids = selected_att_ids.map { |id| CC::CCHelper.create_key(source_course.attachments.find_by_migration_id(id)) }
+    tool_ids = tool_ids.map { |id| CC::CCHelper.create_key(source_course.context_external_tools.find_by_migration_id(id)) }
     folder_name = source_course.folders.find_by_name(folder_name).full_name
   end
 
@@ -76,7 +83,7 @@ def test_selective_content(source_course=nil)
       ["copy[discussion_topics][id_#{topic_id}]", false], # deselect
       ["copy[all_attachments]", false]
   ]
-  boxes_to_click += att_ids.map{|id| ["copy[attachments][id_#{id}]", true]}
+  boxes_to_click += att_ids.map { |id| ["copy[attachments][id_#{id}]", true] }
 
   # directly click checkboxes
   boxes_to_click.each do |name, value|
@@ -99,7 +106,7 @@ def test_selective_content(source_course=nil)
   all_link.click
 
   # click on select none for folder
-  none_link = f(".selectContentDialog label[title=\"#{folder_name}\"] + .showHide a:nth-child(2)")
+  none_link = ff('.selectContentDialog .showHide a:last-child').last
   none_link.text.should == "Select None"
   none_link.click
 
@@ -108,7 +115,7 @@ def test_selective_content(source_course=nil)
       "context_external_tools" => {tool_ids[0] => "1", tool_ids[1] => "1"},
       "attachments" => {}
   }
-  selected_att_ids.each{|id| expected_params["attachments"][id] = "1"}
+  selected_att_ids.each { |id| expected_params["attachments"][id] = "1" }
   if source_course
     expected_params.merge!({"all_course_settings" => "1", "all_syllabus_body" => "1", "all_assessment_question_banks" => "1"})
   end
@@ -151,14 +158,14 @@ describe "content migrations" do
     it "should show each form" do
       visit_page
 
-      migration_types = ff('#chooseMigrationConverter option').map{|op| op['value']} - ['none']
+      migration_types = ff('#chooseMigrationConverter option').map { |op| op['value'] } - ['none']
       migration_types.each do |type|
         select_migration_type(type)
         wait_for_ajaximations
-        ff("input[type=\"submit\"]").any?{|el| el.displayed?}.should == true
+        ff("input[type=\"submit\"]").any? { |el| el.displayed? }.should == true
 
         select_migration_type('none')
-        ff("input[type=\"submit\"]").any?{|el| el.displayed?}.should == false
+        ff("input[type=\"submit\"]").any? { |el| el.displayed? }.should == false
       end
 
       select_migration_type
@@ -179,6 +186,7 @@ describe "content migrations" do
       fill_migration_form(:filename => 'cc_ark_test.zip')
       submit
 
+      visit_page
       @course.content_migrations.count.should == 2
 
       progress_items = ff('.migrationProgressItem')
@@ -192,10 +200,10 @@ describe "content migrations" do
         source_links << item.find_element(:css, '.sourceLink a')
       end
 
-      hrefs = source_links.map{|a| a.attribute(:href)}
+      hrefs = source_links.map { |a| a.attribute(:href) }
 
       @course.content_migrations.each do |cm|
-        hrefs.find{|href| href.include?("/files/#{cm.attachment.id}/download")}.should_not be_nil
+        hrefs.find { |href| href.include?("/files/#{cm.attachment.id}/download") }.should_not be_nil
       end
     end
 
@@ -206,8 +214,10 @@ describe "content migrations" do
       submit
       run_migration
 
-      visit_page
-      f('.migrationProgressItem .progressStatus').should include_text("Completed")
+      keep_trying_until do
+        visit_page
+        f('.migrationProgressItem .progressStatus').should include_text("Completed")
+      end
 
       # From spec/lib/cc/importer/common_cartridge_converter_spec.rb
       @course.attachments.count.should == 10
@@ -247,12 +257,12 @@ describe "content migrations" do
 
       # Overwrite original
       visit_page
-      fill_migration_form(:type => "qti_converter")
+      fill_migration_form(:type => "qti_converter", :filename => 'cc_full_test.zip')
       f('#overwriteAssessmentContent').click
       submit
       cm = @course.content_migrations.last
       cm.migration_settings["overwrite_quizzes"].should == true
-      run_migration
+      run_migration(cm)
       @course.quizzes.reload.count.should == 2
       @course.quizzes.map(&:title).should == ["Pretest", "Pretest"]
     end
@@ -326,7 +336,7 @@ describe "content migrations" do
 
       cm = ContentMigration.new(:context => @copy_from, :migration_type => "common_cartridge_importer")
       cm.migration_settings = {:import_immediately => true,
-       :migration_ids_to_import => {:copy => {:everything => true}}}
+                               :migration_ids_to_import => {:copy => {:everything => true}}}
       cm.skip_job_progress = true
       cm.save!
 
@@ -495,8 +505,8 @@ describe "content migrations" do
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
       opts["day_substitutions"].should == {"1" => "2", "2" => "3"}
       expected = {
-        "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
-        "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
+          "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
+          "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
       }
       expected.each do |k, v|
         Date.parse(opts[k].to_s).should == Date.parse(v)

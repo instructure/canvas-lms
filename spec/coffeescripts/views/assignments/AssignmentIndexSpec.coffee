@@ -57,7 +57,7 @@ define [
     teardown: ->
       ENV.PERMISSIONS = {}
       assignmentGroups = null
-      $('#fixtures').empty()
+      fixtures.empty()
       @enable_spy.restore()
 
   test 'should filter by search term', ->
@@ -111,7 +111,7 @@ define [
     teardown: ->
       ENV.PERMISSIONS = {}
       assignmentGroups = null
-      $('#fixtures').empty()
+      fixtures.empty()
 
   test 'should clear search on toggle', ->
     clear_spy = sinon.spy(IndexView.prototype, 'clearSearch')

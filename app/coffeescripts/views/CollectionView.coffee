@@ -78,7 +78,7 @@ define [
     #
     # @api public
 
-    reorder: ->
+    reorder: =>
       @collection.sort()
       @$list.children().detach()
       children = (model.itemView.$el for model in @collection.models)

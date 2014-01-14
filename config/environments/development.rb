@@ -34,13 +34,17 @@ environment_configuration(defined?(config) && config) do |config|
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
 
   # allow debugging only in development environment by default
-  # ruby-debug is currently broken in 1.9.3
   #
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
-    require "debugger"
+    if RUBY_VERSION >= '2.0.0'
+      require 'byebug'
+      Kernel.send(:alias_method, :debugger, :byebug)
+    else
+      require "debugger"
+    end
   end
 
   if CANVAS_RAILS2

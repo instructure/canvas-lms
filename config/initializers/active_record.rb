@@ -21,20 +21,14 @@ class ActiveRecord::Base
     "#{self.class.reflection_type_name}_#{id.to_s}"
   end
 
-  def opaque_identifier(column)
-    self.shard.activate do
-      str = send(column).to_s
-      raise "Empty value" if str.blank?
-      Canvas::Security.hmac_sha1(str, self.shard.settings[:encryption_key])
-    end
-  end
-
   def self.all_models
     return @all_models if @all_models.present?
     @all_models = (ActiveRecord::Base.send(:subclasses) +
                    ActiveRecord::Base.models_from_files +
                    [Version]).compact.uniq.reject { |model|
-      model.superclass != ActiveRecord::Base || (model.respond_to?(:tableless?) && model.tableless?)
+      !(model.superclass == ActiveRecord::Base || model.superclass.abstract_class?) ||
+      (model.respond_to?(:tableless?) && model.tableless?) ||
+      model.abstract_class?
     }
   end
 
@@ -483,14 +477,15 @@ class ActiveRecord::Base
 
   def self.find_in_batches_with_usefulness(options = {}, &block)
     # already in a transaction (or transactions don't matter); cursor is fine
-    if connection.adapter_name == 'PostgreSQL' && (Shackles.environment == :slave || connection.open_transactions > (Rails.env.test? ? 1 : 0))
+    if (connection.adapter_name == 'PostgreSQL' && (Shackles.environment == :slave || connection.open_transactions > (Rails.env.test? ? 1 : 0))) && !options[:start]
       shard = scope(:find, :shard)
       if shard
         shard.activate(shard_category) { find_in_batches_with_cursor(options, &block) }
       else
         find_in_batches_with_cursor(options, &block)
       end
-    elsif scope(:find, :order) || scope(:find, :group)
+    elsif scope(:find, :order) || scope(:find, :group) || scope(:find, :select).to_s =~ /DISTINCT/i
+      raise ArgumentError.new("GROUP and ORDER are incompatible with :start") if options[:start]
       shard = scope(:find, :shard)
       if shard
         shard.activate(:shard_category) { find_in_batches_with_temp_table(options, &block) }
@@ -512,7 +507,10 @@ class ActiveRecord::Base
     transaction do
       begin
         cursor = "#{table_name}_in_batches_cursor"
-        connection.execute("DECLARE #{cursor} CURSOR FOR #{scoped.to_sql}")
+        scope = scope(:find)
+        scope = scope ? scope.dup : {}
+        scope.delete(:include)
+        with_exclusive_scope(find: scope) { connection.execute("DECLARE #{cursor} CURSOR FOR #{scoped.to_sql}") }
         includes = scope(:find, :include)
         with_exclusive_scope do
           batch = connection.uncached { find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
@@ -533,7 +531,10 @@ class ActiveRecord::Base
   def self.find_in_batches_with_temp_table(options = {})
     batch_size = options[:batch_size] || 1000
     table = "#{table_name}_find_in_batches_temporary_table"
-    connection.execute "CREATE TEMPORARY TABLE #{table} AS #{scoped.to_sql}"
+    scope = scope(:find)
+    scope = scope ? scope.dup : {}
+    scope.delete(:include)
+    with_exclusive_scope(find: scope) { connection.execute "CREATE TEMPORARY TABLE #{table} AS #{scoped.to_sql}" }
     begin
       index = "temp_primary_key"
       case connection.adapter_name
@@ -808,10 +809,10 @@ class ActiveRecord::Base
   end
 
   if Rails.version < '4'
-    if CANVAS_RAILS3
-      scope :none, lambda { where("?", false) }
-    else
+    if CANVAS_RAILS2
       named_scope :none, lambda { where("?", false) }
+    else
+      scope :none, lambda { where("?", false) }
     end
   end
 end
@@ -1067,6 +1068,13 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
     end
   end
 
+end
+
+ActiveRecord::Associations::AssociationProxy.class_eval do
+  def respond_to?(*args)
+    return proxy_respond_to?(*args) if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(args.first)
+    proxy_respond_to?(*args) || (load_target && @target.respond_to?(*args))
+  end
 end
 
 class ActiveRecord::Serialization::Serializer

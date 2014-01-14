@@ -36,7 +36,8 @@ describe "PaginatedCollection" do
       items.size.should == 2
       items.current_page.should == 1
       items.per_page.should == 5
-      %w(next_page previous_page first_page last_page total_entries).each { |a| items.send(a).should be_nil }
+      items.last_page.should == 1
+      %w(first_page next_page previous_page total_entries).each { |a| items.send(a).should be_nil }
     end
 
     it "should use the pager returned" do

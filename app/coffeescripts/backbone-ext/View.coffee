@@ -88,7 +88,7 @@ define [
     # @api public
 
     initialize: (options) ->
-      @options = _.extend {}, @defaults, @options, options
+      @options = _.extend {}, @defaults, options
       @setOptionProperties()
       @storeChildrenViews()
       @$el.data 'view', this

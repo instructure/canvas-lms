@@ -35,7 +35,7 @@ describe QuizSubmissionFilesController, :type => :integration do
 
     def preflight(preflight_params)
       json = api_call :post,
-        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/quiz_submissions/self/files",
+        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/self/files",
         {
           :controller => "quiz_submission_files",
           :action => "create",

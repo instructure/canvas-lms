@@ -130,16 +130,16 @@ define([
     var equella_button = INST && INST.equellaEnabled ? ",instructure_equella" : "";
     instructure_buttons = instructure_buttons + equella_button;
 
-    var buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,bullist,outdent,indent,numlist,table,instructure_links,unlink" + instructure_buttons + ",fontsizeselect,formatselect";
+    var buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,bullist,outdent,indent,sup,sub,numlist,table,instructure_links,unlink" + instructure_buttons + ",fontsizeselect,formatselect";
     var buttons2 = "";
     var buttons3 = "";
 
     if (width < 359 && width > 0) {
       buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright";
-      buttons2 = "outdent,indent,bullist,numlist,table,instructure_links,unlink" + instructure_buttons;
+      buttons2 = "outdent,indent,sup,sub,bullist,numlist,table,instructure_links,unlink" + instructure_buttons;
       buttons3 = "fontsizeselect,formatselect";
     } else if (width < 600) {
-      buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,outdent,indent,bullist,numlist";
+      buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,outdent,indent,sup,sub,bullist,numlist";
       buttons2 = "table,instructure_links,unlink" + instructure_buttons + ",fontsizeselect,formatselect";
     }
 

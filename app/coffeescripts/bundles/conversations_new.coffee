@@ -20,7 +20,7 @@ require [
 
     routes:
       '': 'index'
-      'filter?:state': 'filter'
+      'filter=:state': 'filter'
 
     messages:
       confirmDelete: I18n.t('confirm.delete_conversation', 'Are you sure you want to delete your copy of this conversation? This action cannot be undone.')
@@ -164,7 +164,7 @@ require [
         @list.collection.remove(messages)
 
     onFilter: (filters) =>
-      @navigate('filter?'+$.param(filters), {trigger: true})
+      @navigate('filter='+$.param(filters), {trigger: true})
 
     onCourse: (course) =>
       @list.updateCourse(course)
@@ -256,6 +256,9 @@ require [
       @list.collection.reset()
       @searchTokens = if tokens.length then tokens else null
       @list.collection.setParam('filter', @_currentFilter())
+      delete @detail.model
+      @list.selectedMessages = []
+      @detail.render()
       @list.collection.fetch()
 
     _initListView: ->

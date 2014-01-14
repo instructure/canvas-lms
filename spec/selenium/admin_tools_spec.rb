@@ -42,6 +42,12 @@ describe "admin_tools" do
     wait_for_ajaximations
   end
 
+  def change_log_type(log_type)
+    wait_for_ajaximations
+    click_option("#loggingType", "\#logging#{log_type}", :value)
+    wait_for_ajaximations
+  end
+
   before do
     @account = Account.default
     setup_users
@@ -159,7 +165,28 @@ describe "admin_tools" do
     end
   end
 
-  context "Auth Logging" do
+  context "Logging" do
+    it_should_behave_like "cassandra audit logs"
+
+    before do
+      load_admin_tools_page
+      click_view_tab "logging"
+    end
+
+    it "should change log types with dropdown" do
+      select = fj('#loggingType')
+      select.should_not be_nil
+      select.should be_displayed
+
+      change_log_type("Authentication")
+
+      loggingTypeView = fj('#loggingAuthentication')
+      loggingTypeView.should_not be_nil
+      loggingTypeView.should be_displayed
+    end
+  end
+
+  context "Authentication Logging" do
     it_should_behave_like "cassandra audit logs"
 
     before do
@@ -167,6 +194,7 @@ describe "admin_tools" do
       Auditors::Authentication.record(@student.pseudonyms.first, 'logout')
       load_admin_tools_page
       click_view_tab "logging"
+      change_log_type("Authentication")
     end
 
     it "should show log history" do

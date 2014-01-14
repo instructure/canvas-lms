@@ -129,7 +129,15 @@ class GroupsController < ApplicationController
     else
       groups = []
     end
-    users = @context.paginate_users_not_in_groups(groups, page, per_page)
+
+    if CANVAS_RAILS2
+      scope = @context.users_not_in_groups(groups, order: User.sortable_name_order_by_clause('users'))
+      total_entries = scope.count('users.id', distinct: true)
+      users = scope.paginate(page: page, per_page: per_page, total_entries: total_entries)
+    else
+      users = @context.users_not_in_groups(groups, order: User.sortable_name_order_by_clause('users')).
+        paginate(page: page, per_page: per_page)
+    end
 
     if authorized_action(@context, @current_user, :manage)
       respond_to do |format|
@@ -226,7 +234,15 @@ class GroupsController < ApplicationController
       format.html do
         if @context.grants_right?(@current_user, session, :manage_groups)
           if @domain_root_account.enable_manage_groups2?
-            js_env group_categories: @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) },
+            categories_json = @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) }
+            uncategorized = @context.groups.uncategorized.all
+            if uncategorized.present?
+              json = group_category_json(GroupCategory.uncategorized, @current_user, session)
+              json["groups"] = uncategorized.map{ |group| group_json(group, @current_user, session) }
+              categories_json << json
+            end
+
+            js_env group_categories: categories_json,
                    group_user_type: @group_user_type,
                    allow_self_signup: @allow_self_signup
             # since there are generally lots of users in an account, always do large roster view

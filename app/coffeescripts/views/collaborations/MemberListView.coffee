@@ -31,6 +31,7 @@ define [
       'click .remove-all': 'removeAll'
 
     initialize: ->
+      super
       @collection = @createCollection()
       @cacheElements()
       @attachEvents()

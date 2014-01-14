@@ -12,22 +12,18 @@
                   <div class="ig-row" tabindex="0" role="button">
                     <span class="ig-title group_{{contextCode}}">
                       <span class="screenreader-only">{{readableType}},</span>
-                      {{#if assignment}}
-                        <i class="icon-{{assignmentType}}"></i>
-                      {{else}}
-                        <i class="icon-calendar-month"></i>
-                      {{/if}}
+                      <i class="icon-{{iconType}}"></i>
                       {{#truncate title 60}}{{/truncate}}
                     </span>
                     <span class="screenreader-only">,{{contextInfo.name}},</span>
                     <div class="ig-details">
                       {{#if assignment}}
-                        <b>{{#t "due"}}due{{/t}}</b><span class="screenreader-only">,</span>
-                        {{strftime start "%l:%M%P"}}
+                        <b>{{#t "due"}}Due{{/t}}</b><span class="screenreader-only">,</span>
+                        {{strftime originalStart "%l:%M%P"}}
                       {{else}}
                         {{#unless all_day}}
                           <span class="screenreader-only">{{#t "starts_at"}}Starts at{{/t}},</span>
-                          {{strftime start "%l:%M%P"}}
+                          {{strftime originalStart "%l:%M%P"}}
                         {{/unless}}
                       {{/if}}
                     </div>
@@ -46,7 +42,7 @@
 
 <div class="agenda-actions">
   {{#if meta.hasMore}}
-    <a href="#" class="btn agenda-load-btn">Load more</a>
+    <a href="#" class="btn agenda-load-btn" role="button">Load more</a>
   {{/if}}
   <i class="loading-spinner"
     aria-label="{{#t "loading"}}Loading{{/t}}"

@@ -35,7 +35,6 @@ class Course < ActiveRecord::Base
                   :syllabus_body,
                   :public_description,
                   :allow_student_forum_attachments,
-                  :enable_draft,
                   :allow_student_discussion_topics,
                   :allow_student_discussion_editing,
                   :default_wiki_editing_roles,
@@ -191,6 +190,8 @@ class Course < ActiveRecord::Base
 
   include StickySisFields
   are_sis_sticky :name, :course_code, :start_at, :conclude_at, :restrict_enrollments_to_course_dates, :enrollment_term_id, :workflow_state
+
+  include FeatureFlags
 
   has_a_broadcast_policy
 
@@ -516,29 +517,22 @@ class Course < ActiveRecord::Base
     t('default_name', "My Course")
   end
 
-  def users_not_in_groups_sql(groups, opts={})
-    ["SELECT DISTINCT users.id, users.name#{", #{opts[:order_by]}" if opts[:order_by].present?}
-        FROM users
-       INNER JOIN enrollments e ON e.user_id = users.id
-       WHERE e.course_id = ? AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND e.type = 'StudentEnrollment'
-       #{Group.not_in_group_sql_fragment(groups.map(&:id))}
-       #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}
-       #{"#{opts[:order_by_dir]}" if opts[:order_by_dir]}", self.id]
-  end
-
-  def users_not_in_groups(groups)
-    User.find_by_sql(users_not_in_groups_sql(groups))
-  end
-
-  def paginate_users_not_in_groups(groups, page, per_page = 15)
-    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('users')}", :order_by_dir => "ASC"),
-                         :page => page, :per_page => per_page)
+  def users_not_in_groups(groups, opts={})
+    scope = User.joins(:not_ended_enrollments).
+      where(enrollments: {course_id: self, type: 'StudentEnrollment'}).
+      where(Group.not_in_group_sql_fragment(groups.map(&:id))).
+      select("users.id, users.name").uniq
+    scope = scope.select(opts[:order]).order(opts[:order]) if opts[:order]
+    scope
   end
 
   def instructors_in_charge_of(user_id)
-    section_ids = current_enrollments.
-        where(:course_id => self, :user_id => user_id).
-        where("course_section_id IS NOT NULL").pluck(:course_section_id).uniq # TODO: with real Rails 3, this uniq can become part of the scope
+    scope = current_enrollments.
+      where(:course_id => self, :user_id => user_id).
+      where("course_section_id IS NOT NULL")
+    section_ids = CANVAS_RAILS2 ?
+      scope.pluck(:course_section_id).uniq :
+      scope.uniq.pluck(:course_section_id)
     participating_instructors.restrict_to_sections(section_ids)
   end
 
@@ -548,7 +542,6 @@ class Course < ActiveRecord::Base
       user.cached_current_enrollments.any? { |e| e.course_id == self.id && e.participating_instructor? }
     end
   end
-  memoize :user_is_instructor?
 
   def user_is_student?(user, opts = {})
     return unless user
@@ -558,7 +551,6 @@ class Course < ActiveRecord::Base
       }
     end
   end
-  memoize :user_is_student?
 
   def user_has_been_instructor?(user)
     return unless user
@@ -567,7 +559,6 @@ class Course < ActiveRecord::Base
       self.instructor_enrollments.active.find_by_user_id(user.id).present?
     end
   end
-  memoize :user_has_been_instructor?
 
   def user_has_been_admin?(user)
     return unless user
@@ -576,7 +567,6 @@ class Course < ActiveRecord::Base
       self.admin_enrollments.active.find_by_user_id(user.id).present?
     end
   end
-  memoize :user_has_been_admin?
 
   def user_has_been_observer?(user)
     return unless user
@@ -585,7 +575,6 @@ class Course < ActiveRecord::Base
       self.observer_enrollments.active.find_by_user_id(user.id).present?
     end
   end
-  memoize :user_has_been_observer?
 
   def user_has_been_student?(user)
     return unless user
@@ -593,7 +582,6 @@ class Course < ActiveRecord::Base
       self.all_student_enrollments.find_by_user_id(user.id).present?
     end
   end
-  memoize :user_has_been_student?
 
   def user_has_no_enrollments?(user)
     return unless user
@@ -601,7 +589,6 @@ class Course < ActiveRecord::Base
       enrollments.find_by_user_id(user.id).nil?
     end
   end
-  memoize :user_has_no_enrollments?
 
 
   # Public: Determine if a group weighting scheme should be applied.
@@ -757,9 +744,8 @@ class Course < ActiveRecord::Base
   end
 
   def long_self_enrollment_code
-    Digest::MD5.hexdigest("#{uuid}_for_#{id}")
+    @long_self_enrollment_code ||= Digest::MD5.hexdigest("#{uuid}_for_#{id}")
   end
-  memoize :long_self_enrollment_code
 
   # still include the old longer format, since links may be out there
   def self_enrollment_codes
@@ -1000,7 +986,7 @@ class Course < ActiveRecord::Base
 
     # Active admins (Teacher/TA/Designer)
     given { |user, session| (self.available? || self.created? || self.claimed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
-    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_hidden_items and can :view_unpublished_items
+    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_hidden_items and can :view_unpublished_items and can :manage_feature_flags
 
     # Teachers and Designers can delete/reset, but not TAs
     given { |user, session| !self.deleted? && !self.sis_source_id && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_content_admin? } && (!session || !session["role_course_#{self.id}"]) }
@@ -1071,7 +1057,7 @@ class Course < ActiveRecord::Base
     can :read_as_admin
 
     given { |user, session| self.account_membership_allows(user, session, :manage_courses) }
-    can :read_as_admin and can :manage and can :update and can :delete and can :use_student_view and can :reset_content and can :view_hidden_items and can :view_unpublished_items
+    can :read_as_admin and can :manage and can :update and can :delete and can :use_student_view and can :reset_content and can :view_hidden_items and can :view_unpublished_items and can :manage_feature_flags
 
     given { |user, session| self.account_membership_allows(user, session, :read_course_content) }
     can :read and can :read_outcomes
@@ -1179,13 +1165,11 @@ class Course < ActiveRecord::Base
   def account_chain_ids
     account_chain.map(&:id)
   end
-  memoize :account_chain_ids
 
   def institution_name
     return self.root_account.name if self.root_account_id != Account.default.id
     return (self.account || self.root_account).name
   end
-  memoize :institution_name
 
   def account_users_for(user)
     return [] unless user
@@ -1266,7 +1250,6 @@ class Course < ActiveRecord::Base
     end
     message
   end
-  memoize :grade_publishing_status_translation
 
   def grade_publishing_statuses
     found_statuses = [].to_set
@@ -1408,7 +1391,7 @@ class Course < ActiveRecord::Base
         update_all(:grade_publishing_status => 'error', :grade_publishing_message => "Timed out.")
   end
 
-  def gradebook_to_csv(options = {})
+  def enrollments_for_csv(options={})
     # user: used for name in csv output
     # course_section: used for display_name in csv output
     # user > pseudonyms: used for sis_user_id/unique_id if options[:include_sis_id]
@@ -1418,6 +1401,12 @@ class Course < ActiveRecord::Base
     scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
     student_enrollments = scope.includes(includes).order_by_sortable_name # remove duplicate enrollments for students enrolled in multiple sections
     student_enrollments = student_enrollments.all.uniq_by(&:user_id)
+    student_enrollments.partition{|enrollment| enrollment.type != "StudentViewEnrollment"}.flatten
+  end
+  private :enrollments_for_csv
+
+  def gradebook_to_csv(options = {})
+    student_enrollments = enrollments_for_csv(options)
 
     calc = GradeCalculator.new(student_enrollments.map(&:user_id), self,
                                :ignore_muted => false)
@@ -1609,9 +1598,13 @@ class Course < ActiveRecord::Base
   end
 
   def resubmission_for(asset)
-    # without the scoped, Rails 2 will try to do an update_all instead (due to
-    # the association)
-    asset.ignores.where(:purpose => 'grading', :permanent => false).scoped.delete_all
+    if CANVAS_RAILS2
+      # without the scoped, Rails 2 will try to do an update_all instead (due
+      # to the association)
+      asset.ignores.where(:purpose => 'grading', :permanent => false).scoped.delete_all
+    else
+      asset.ignores.where(:purpose => 'grading', :permanent => false).delete_all
+    end
     instructors.each(&:touch)
   end
 
@@ -1746,7 +1739,6 @@ class Course < ActiveRecord::Base
     # has valid settings
     account.turnitin_settings
   end
-  memoize :turnitin_settings
 
   def turnitin_pledge
     self.account.closest_turnitin_pledge
@@ -1940,7 +1932,7 @@ class Course < ActiveRecord::Base
     end
 
     # be very explicit about draft state courses, but be liberal toward legacy courses
-    if self.draft_state_enabled?
+    if self.feature_enabled?(:draft_state)
       if migration.for_course_copy? && (source = migration.source_course || Course.find_by_id(migration.migration_settings[:source_course_id]))
         self.wiki.has_no_front_page = !!source.wiki.has_no_front_page
         self.wiki.front_page_url = source.wiki.front_page_url
@@ -1948,7 +1940,7 @@ class Course < ActiveRecord::Base
       end
     end
     front_page = self.wiki.front_page
-    self.wiki.unset_front_page! if front_page.nil? || (self.draft_state_enabled? && front_page.new_record?)
+    self.wiki.unset_front_page! if front_page.nil? || (self.feature_enabled?(:draft_state) && front_page.new_record?)
 
     syllabus_should_be_added = everything_selected || migration.copy_options[:syllabus_body] || migration.copy_options[:all_syllabus_body]
     if syllabus_should_be_added
@@ -1980,6 +1972,8 @@ class Course < ActiveRecord::Base
             event.due_at = shift_date(event.due_at, shift_options)
             event.lock_at = shift_date(event.lock_at, shift_options)
             event.unlock_at = shift_date(event.unlock_at, shift_options)
+            event.show_correct_answers_at = shift_date(event.show_correct_answers_at, shift_options)
+            event.hide_correct_answers_at = shift_date(event.hide_correct_answers_at, shift_options)
             event.save!
           elsif event.is_a?(ContextModule)
             event.unlock_at = shift_date(event.unlock_at, shift_options)
@@ -2166,7 +2160,7 @@ class Course < ActiveRecord::Base
       :storage_quota, :tab_configuration, :allow_wiki_comments,
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
-      :allow_student_discussion_topics, :lock_all_announcements, :enable_draft ]
+      :allow_student_discussion_topics, :lock_all_announcements ]
   end
 
   def assert_assignment_group
@@ -2284,7 +2278,6 @@ class Course < ActiveRecord::Base
       end
     end
   end
-  memoize :section_visibilities_for
 
   def visibility_limited_to_course_sections?(user, visibilities = section_visibilities_for(user))
     visibilities.all?{|s| s[:limit_privileges_to_course_section] }
@@ -2476,9 +2469,15 @@ class Course < ActiveRecord::Base
   end
 
   def tabs_available(user=nil, opts={})
+    opts.reverse_merge!(:include_external => true)
+    cache_key = [user, opts].cache_key
+    @tabs_available ||= {}
+    @tabs_available[cache_key] ||= uncached_tabs_available(user, opts)
+  end
+
+  def uncached_tabs_available(user, opts)
     # make sure t() is called before we switch to the slave, in case we update the user's selected locale in the process
     default_tabs = Course.default_tabs
-    opts.reverse_merge!(:include_external => true)
 
     Shackles.activate(:slave) do
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
@@ -2580,7 +2579,6 @@ class Course < ActiveRecord::Base
       tabs
     end
   end
-  memoize :tabs_available
 
   def allow_wiki_comments
     read_attribute(:allow_wiki_comments)
@@ -2671,7 +2669,6 @@ class Course < ActiveRecord::Base
   add_setting :lock_all_announcements, :boolean => true, :default => false
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
   add_setting :public_syllabus, :boolean => true, :default => false
-  add_setting :enable_draft, boolean: true, default: false
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?
@@ -2793,7 +2790,7 @@ class Course < ActiveRecord::Base
   # we want to make sure the student view student is always enrolled in all the
   # sections of the course, so that a section limited teacher can grade them.
   def sync_enrollments(fake_student)
-    self.default_section
+    self.default_section unless course_sections.active.any?
     Enrollment.skip_callback(:update_cached_due_dates) do
       self.course_sections.active.each do |section|
         # enroll fake_student will only create the enrollment if it doesn't already exist
@@ -2878,16 +2875,13 @@ class Course < ActiveRecord::Base
     end
   end
 
-  # Public: Determine if draft state is enabled for this course.
-  #
-  # Returns a boolean (default: false).
-  def draft_state_enabled?
-    (root_account.allow_draft? && enable_draft?) || root_account.enable_draft?
-  end
-
   def serialize_permissions(permissions_hash, user, session)
     permissions_hash.merge(
       create_discussion_topic: DiscussionTopic.context_allows_user_to_create?(self, user, session)
     )
+  end
+
+  def multiple_sections?
+    self.active_course_sections.count > 1
   end
 end

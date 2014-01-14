@@ -163,40 +163,40 @@ class Folder < ActiveRecord::Base
     res += self.active_file_attachments unless opts[:exclude_files]
     res
   end
-  
+
   def visible?
     # everything but private folders should be visible... for now...
-    (self.workflow_state == "visible") && (!self.parent_folder || self.parent_folder.visible?)
+    return @visible if defined?(@visible)
+    @visible = (self.workflow_state == "visible") && (!self.parent_folder || self.parent_folder.visible?)
   end
-  memoize :visible?
-  
+
   def hidden?
-    self.workflow_state == 'hidden' || (self.parent_folder && self.parent_folder.hidden?)
+    return @hidden if defined?(@hidden)
+    @hidden = self.workflow_state == 'hidden' || (self.parent_folder && self.parent_folder.hidden?)
   end
-  memoize :hidden?
-  
+
   def hidden
     hidden?
   end
-  
+
   def hidden=(val)
     self.workflow_state = (val == true || val == '1' || val == 'true' ? 'hidden' : 'visible')
   end
-  
+
   def just_hide
     self.workflow_state == 'hidden'
   end
-  
+
   def protected?
-    (self.workflow_state == 'protected') || (self.parent_folder && self.parent_folder.protected?)
+    return @protected if defined?(@protected)
+    @protected = (self.workflow_state == 'protected') || (self.parent_folder && self.parent_folder.protected?)
   end
-  memoize :protected?
-  
+
   def public?
-    self.workflow_state == 'public' || (self.parent_folder && self.parent_folder.public?)
+    return @public if defined?(@public)
+    @public = self.workflow_state == 'public' || (self.parent_folder && self.parent_folder.public?)
   end
-  memoize :public?
-  
+
   def mime_class
     "folder"
   end
@@ -351,17 +351,17 @@ class Folder < ActiveRecord::Base
   end
 
   def locked?
-    self.locked ||
-    (self.lock_at && Time.now > self.lock_at) ||
-    (self.unlock_at && Time.now < self.unlock_at) ||
-    (self.parent_folder && self.parent_folder.locked?)
+    return @locked if defined?(@locked)
+    @locked = self.locked ||
+      (self.lock_at && Time.now > self.lock_at) ||
+      (self.unlock_at && Time.now < self.unlock_at) ||
+      (self.parent_folder && self.parent_folder.locked?)
   end
-  memoize :locked?
 
   def currently_locked
     self.locked || (self.lock_at && Time.now > self.lock_at) || (self.unlock_at && Time.now < self.unlock_at) || self.workflow_state == 'hidden'
   end
-  
+
   set_policy do
     given { |user, session| self.visible? && self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
     can :read

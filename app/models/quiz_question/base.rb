@@ -43,7 +43,11 @@ class QuizQuestion::Base
     # currently all the attributes are synthesized from @question_data
     # since questions are stored in this format anyway, it prevents us from
     # having to do a bunch of translation to some other format
-    @question_data = question_data
+    unless question_data.is_a? QuizQuestion::QuestionData
+      @question_data = QuizQuestion::QuestionData.new(question_data)
+    else
+      @question_data = question_data
+    end
   end
 
   def question_id
@@ -58,6 +62,10 @@ class QuizQuestion::Base
     @question_data[:incorrect_dock].try(:to_f)
   end
 
+  def sorted_by_weight
+    @question_data[:answers].sort_by { |a| a[:weight] || 0 }
+  end
+ 
   #
   # Scoring Methods to override in the subclass
   #
@@ -107,13 +115,12 @@ class QuizQuestion::Base
     user_answer ||= QuizQuestion::UserAnswer.new(self.question_id, self.points_possible, answer_data)
     user_answer.total_parts = total_answer_parts
     correct_parts = correct_answer_parts(user_answer)
-
     if !correct_parts.nil?
       correct_parts = 0 if correct_parts == false
       correct_parts = user_answer.total_parts if correct_parts == true
 
       user_answer.incorrect_parts = incorrect_answer_parts(user_answer)
-      correct_parts = 0 if (correct_parts - user_answer.incorrect_parts) < user_answer.total_parts && @question_data[:allow_partial_credit] == false
+      correct_parts = 0 if ((correct_parts - user_answer.incorrect_parts) < user_answer.total_parts) && !@question_data.allows_partial_credit?
 
       user_answer.correct_parts = correct_parts
       user_answer.incorrect_dock = incorrect_dock if user_answer.incorrect_parts > 0
@@ -125,13 +132,14 @@ class QuizQuestion::Base
   end
 
   def stats(responses)
-    answers = @question_data[:answers]
+    answers = @question_data.answers
 
     responses.each do |response|
       found = nil
       if response[:text].try(:strip).present?
         answer_md5 = Digest::MD5.hexdigest(response[:text].strip)
       end
+
       answers.each do |answer|
         if answer[:id] == response[:answer_id] || answer[:id] == answer_md5
           found = true
@@ -140,9 +148,7 @@ class QuizQuestion::Base
         end
       end
 
-      if !found && answer_md5 &&
-        %w(numerical_question
-           short_answer_question).include?(@question_data[:question_type])
+      if !found && answer_md5 && (@question_data.is_type?(:numerical) || @question_data.is_type?(:short_answer))
         answers << {
           :id => answer_md5,
           :responses => 1,
@@ -152,7 +158,8 @@ class QuizQuestion::Base
       end
 
     end
-    @question_data
+    @question_data.answers = answers
+    @question_data.to_hash
   end
 end
 

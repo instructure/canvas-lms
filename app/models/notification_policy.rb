@@ -113,14 +113,17 @@ class NotificationPolicy < ActiveRecord::Base
       # entry. If other than than, create or update the entry.
       NotificationPolicy.transaction do
         notifications.each do |notification_id|
-          # can't use hash syntax for the where cause Rails 2 will try to call communication_channels= for the
-          # or_initialize portion
           if CANVAS_RAILS2
+            # can't use hash syntax for the where cause Rails 2 will try to
+            # call communication_channels= for the or_initialize portion
             p = NotificationPolicy.includes(:communication_channel).where("communication_channels.user_id=?", user).
                 find_or_initialize_by_communication_channel_id_and_notification_id(params[:channel_id], notification_id)
           else
-            p = NotificationPolicy.joins(:communication_channel).where(:communication_channels => { :user_id => user }).
-              find_or_initialize_by_communication_channel_id_and_notification_id(params[:channel_id], notification_id)
+            p = NotificationPolicy.joins(:communication_channel).where(
+              communication_channels: {user_id: user},
+              communication_channel_id: params[:channel_id],
+              notification_id: notification_id
+            ).find_or_initialize
           end
           # Set the frequency and save
           p.frequency = frequency

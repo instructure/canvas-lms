@@ -216,6 +216,7 @@ class RoleOverridesController < ApplicationController
   #     site_admin                       -- Use the Site Admin section and admin all other accounts
   #     view_error_reports               -- View error reports
   #     view_statistics                  -- View statistics
+  #     manage_feature_flags             -- Enable or disable features at an account level
   #
   #     [For both Account-Level and Course-Level roles]
   #      Note: Applicable enrollment types for course-level roles are given in brackets:

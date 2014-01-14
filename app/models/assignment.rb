@@ -377,7 +377,7 @@ class Assignment < ActiveRecord::Base
       quiz.assignment_group_id = self.assignment_group_id
       quiz.workflow_state = 'created' if quiz.deleted?
       quiz.saved_by = :assignment
-      if self.context.draft_state_enabled?
+      if self.context.feature_enabled?(:draft_state)
         quiz.workflow_state = published? ? 'available' : 'unpublished'
       end
       quiz.save if quiz.changed?
@@ -389,6 +389,9 @@ class Assignment < ActiveRecord::Base
       topic.saved_by = :assignment
       topic.updated_at = Time.now
       topic.workflow_state = 'active' if topic.deleted?
+      if self.context.feature_enabled?(:draft_state)
+        topic.workflow_state = published? ? 'active' : 'unpublished'
+      end
       topic.save
       self.discussion_topic = topic
     end
@@ -515,7 +518,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def restore(from=nil)
-    self.workflow_state = 'published'
+    self.workflow_state = self.context.feature_enabled?(:draft_state) ? 'unpublished' : 'published'
     @grades_affected = true
     self.save
     self.discussion_topic.restore if self.discussion_topic && from != :discussion_topic
@@ -527,9 +530,18 @@ class Assignment < ActiveRecord::Base
   end
 
   def participants_with_overridden_due_at
-    assignment_overrides.active.overriding_due_at.inject([]) do |overridden_users, o|
+    Assignment.participants_with_overridden_due_at([self])
+  end
+
+  def self.participants_with_overridden_due_at(assignments)
+    overridden_users = []
+
+    AssignmentOverride.active.overriding_due_at.where(assignment_id: assignments).each do |o|
       overridden_users.concat(o.applies_to_students)
     end
+
+    overridden_users.uniq!
+    overridden_users
   end
 
   attr_accessor :saved_by
@@ -614,10 +626,10 @@ class Assignment < ActiveRecord::Base
     when %r{%$}
       # interpret as a percentage
       percentage = grade.to_f / 100.0
-      (points_possible.to_f * percentage * 100.0).round / 100.0
+      points_possible.to_f * percentage
     when %r{[\d\.]+}
       # interpret as a numerical score
-      (grade.to_f * 100.0).round / 100.0
+      grade.to_f
     when "pass", "complete"
       points_possible.to_f
     when "fail", "incomplete"
@@ -625,7 +637,7 @@ class Assignment < ActiveRecord::Base
     else
       # try to treat it as a letter grade
       if grading_scheme && standard_based_score = GradingStandard.grade_to_score(grading_scheme, grade)
-        ((points_possible || 0.0) * standard_based_score).round / 100.0
+        (points_possible || 0.0) * standard_based_score / 100.0
       else
         nil
       end
@@ -1867,7 +1879,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def has_student_submissions?
-    self.submissions.any? { |s| context.includes_student?(s.user) }
+    self.submissions.having_submission.where("user_id IS NOT NULL").exists?
   end
 
   # override so validations are called
@@ -1882,4 +1894,14 @@ class Assignment < ActiveRecord::Base
     self.save
   end
 
+  # simply versioned models are always marked new_record, but for our purposes
+  # they are not new. this ensures that assignment override caching works as
+  # intended for versioned assignments
+  def cache_key
+    new_record = @new_record
+    @new_record = false if @simply_versioned_version_model
+    super
+  ensure
+    @new_record = new_record if @simply_versioned_version_model
+  end
 end

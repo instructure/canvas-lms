@@ -58,6 +58,17 @@
 #       // only valid if hide_results=null
 #       "show_correct_answers": true,
 #
+#       // when should the correct answers be visible by students?
+#       //
+#       // only valid if show_correct_answers=true
+#       "show_correct_answers_at": "2013-01-23T23:59:00-07:00",
+#
+#       // prevent the students from seeing correct answers after the specified
+#       // date has passed.
+#       //
+#       // only valid if show_correct_answers=true
+#       "hide_correct_answers_at": "2013-01-23T23:59:00-07:00",
+#
 #       // which quiz score to keep (only if allowed_attempts != 1)
 #       // possible values: "keep_highest", "keep_latest"
 #       "scoring_policy": "keep_highest",
@@ -127,7 +138,7 @@ class QuizzesApiController < ApplicationController
   include Api::V1::Quiz
 
   before_filter :require_context
-  before_filter :require_quiz, :only => [:show, :update, :destroy]
+  before_filter :require_quiz, :only => [:show, :update, :destroy, :reorder]
 
   @@errors = {
     :quiz_not_found => "Quiz not found"
@@ -202,6 +213,17 @@ class QuizzesApiController < ApplicationController
   #   Only valid if hide_results=null
   #   If false, hides correct answers from students when quiz results are viewed.
   #   Defaults to true.
+  #
+  # @argument quiz[show_correct_answers_at] [Optional, Timestamp]
+  #   Only valid if show_correct_answers=true
+  #   If set, the correct answers will be visible by students only after this
+  #   date, otherwise the correct answers are visible once the student hands in
+  #   their quiz submission.
+  #
+  # @argument quiz[hide_correct_answers_at] [Optional, Timestamp]
+  #   Only valid if show_correct_answers=true
+  #   If set, the correct answers will stop being visible once this date has
+  #   passed. Otherwise, the correct answers will be visible indefinitely.
   #
   # @argument quiz[allowed_attempts] [Optional, Integer]
   #   Number of times a student is allowed to take a quiz.
@@ -302,6 +324,26 @@ class QuizzesApiController < ApplicationController
     if authorized_action(@quiz, @current_user, :delete)
       @quiz.destroy
       render json: quiz_json(@quiz, @context, @current_user, session)
+    end
+  end
+
+  # @API Reorder quiz items
+  # @beta
+  #
+  # Change order of the quiz questions or groups within the quiz
+  #
+  # @argument order[][id] [Required, Integer]
+  #   The associated item's unique identifier
+  #
+  # @argument order[][type] ["question"|"group"]
+  #   The type of item is either 'question' or 'group'
+  #
+  # <b>204 No Content<b> response code is returned if the reorder was successful.
+  def reorder
+    if authorized_action(@quiz, @current_user, :update)
+      QuizSortables.new(:quiz => @quiz, :order => params[:order]).reorder!
+
+      head :no_content
     end
   end
 

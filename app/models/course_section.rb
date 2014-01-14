@@ -34,6 +34,7 @@ class CourseSection < ActiveRecord::Base
   has_many :users, :through => :enrollments
   has_many :course_account_associations
   has_many :calendar_events, :as => :context
+  has_many :assignment_overrides, :as => :set, :dependent => :destroy
 
   before_validation :infer_defaults, :verify_unique_sis_source_id
   validates_presence_of :course_id, :root_account_id, :workflow_state
@@ -172,6 +173,7 @@ class CourseSection < ActiveRecord::Base
     self.default_section = (course.course_sections.active.size == 0)
     old_course.course_sections.reset
     course.course_sections.reset
+    assignment_overrides.active.destroy_all
     user_ids = self.enrollments.map(&:user_id).uniq
 
     old_course_is_unrelated = old_course.id != self.course_id && old_course.id != self.nonxlist_course_id

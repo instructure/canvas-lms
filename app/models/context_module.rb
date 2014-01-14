@@ -83,7 +83,7 @@ class ContextModule < ActiveRecord::Base
   end
   
   def restore
-    self.workflow_state = 'active'
+    self.workflow_state = context.feature_enabled?(:draft_state) ? 'unpublished' : 'active'
     self.save
   end
   
@@ -277,7 +277,7 @@ class ContextModule < ActiveRecord::Base
       added_item.content_type = 'ExternalUrl'
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = workflow_state
+      added_item.workflow_state = (self.context.feature_enabled?(:draft_state) ? 'unpublished' : workflow_state)
       added_item.save
       added_item
     elsif params[:type] == 'context_external_tool' || params[:type] == 'external_tool'
@@ -299,7 +299,7 @@ class ContextModule < ActiveRecord::Base
       }
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = workflow_state
+      added_item.workflow_state = (self.context.feature_enabled?(:draft_state) ? 'unpublished' : workflow_state)
       added_item.save
       added_item
     elsif params[:type] == 'context_module_sub_header' || params[:type] == 'sub_header'
@@ -762,12 +762,19 @@ class ContextModule < ActiveRecord::Base
       end
     elsif hash[:linked_resource_type] =~ /contextexternaltool/i
       # external tool
+      external_tool_id = nil
+      if hash[:linked_resource_global_id]
+        external_tool_id = hash[:linked_resource_global_id]
+      elsif hash[:linked_resource_id] && et = self.context.context_external_tools.active.find_by_migration_id(hash[:linked_resource_id])
+        external_tool_id = et.id
+      end
       if hash['url']
         item = self.add_item({
           :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
           :type => 'context_external_tool',
           :indent => hash[:indent].to_i,
-          :url => hash['url']
+          :url => hash['url'],
+          :id => external_tool_id
         }, existing_item, :position => migration_position)
       end
     elsif hash[:linked_resource_type] =~ /assessment|quiz/i

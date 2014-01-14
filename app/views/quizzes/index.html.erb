@@ -1,6 +1,6 @@
 <% content_for :page_title, t(:page_titles, "Quizzes") %>
 
-<% if @context.draft_state_enabled? %>
+<% if @context.feature_enabled?(:draft_state) %>
 
 <% jammit_css :quizzes %>
 <% js_bundle :quizzes_index %>

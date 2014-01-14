@@ -1,10 +1,10 @@
 <% @context ||= @current_user %>
-<% cache(['wiki_sidebar_render_', @context.cache_key, @current_user].cache_key.to_s) do %>
+<% cache(['wiki_sidebar_render_2', @context.cache_key, @current_user].cache_key.to_s) do %>
 <% collections = [] #@current_user && @current_user.collections.all %>
 <% load_wiki_sidebar %>
 <div id="editor_tabs" style="display: none;">
 
-  <span class="wiki-sidebar-header"><%= t('headings.insert_content', %{Insert Content into the Page}) %></span>
+  <span class="wiki-sidebar-header" role="heading" aria-level="2"><%= t('headings.insert_content', %{Insert Content into the Page}) %></span>
   <ul>
     <% if collections.present? %>
     <li><a href="#editor_tabs_1"><%= t('tabs.collections', %{Collections}) %></a></li>

@@ -65,7 +65,7 @@ class AuthenticationAuditApiController < ApplicationController
       events = Auditors::Authentication.for_pseudonym(@pseudonym, date_options)
       render_events(events, @pseudonym)
     else
-      render_unauthorized_action(@pseudonym)
+      render_unauthorized_action
     end
   end
 
@@ -85,7 +85,7 @@ class AuthenticationAuditApiController < ApplicationController
       events = Auditors::Authentication.for_account(@account, date_options)
       render_events(events, @account)
     else
-      render_unauthorized_action(@account)
+      render_unauthorized_action
     end
   end
 
@@ -122,7 +122,7 @@ class AuthenticationAuditApiController < ApplicationController
         events = Auditors::Authentication.for_pseudonyms(pseudonyms, date_options)
         render_events(events, @user)
       else
-        render_unauthorized_action(@user)
+        render_unauthorized_action
       end
     end
   end

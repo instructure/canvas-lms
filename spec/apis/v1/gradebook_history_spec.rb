@@ -35,9 +35,7 @@ module Api::V1
     end
 
     def submit(assignment, student, day, grader)
-      submission = assignment.submit_homework(student)
-      submission.update_attributes!(:graded_at => day, :grader_id => grader.try(:id))
-      submission
+      bare_submission_model(assignment, student, :graded_at => day, :grader_id => grader.try(:id))
     end
 
     describe '#days_json' do
@@ -131,7 +129,8 @@ module Api::V1
         @grader1 = ::User.create!(:name => 'grader 1')
         @grader2 = ::User.create!(:name => 'grader 2')
         @assignment = @course.assignments.create!(:title => "some assignment")
-        @submission = submit(@assignment, student1, now, @grader1)
+        @submission = @assignment.submit_homework(student1)
+        @submission.update_attributes(graded_at: now, grader_id: @grader1.id)
         @submission.score = 90
         @submission.grade = '90'
         @submission.grader = @grader2
@@ -201,7 +200,7 @@ module Api::V1
 
       before do
         course.enroll_student(student)
-        @submission = assignment.submit_homework(student)
+        @submission = bare_submission_model(assignment, student)
       end
 
       context 'when the submission has been graded' do
@@ -213,8 +212,7 @@ module Api::V1
         def add_submission
           other_student = ::User.create!
           course.enroll_student(other_student)
-          other_submission = assignment.submit_homework(other_student)
-          other_submission.graded_at = 2.hours.ago.in_time_zone
+          other_submission = bare_submission_model(assignment, other_student, graded_at: 2.hours.ago.in_time_zone)
           other_submission.save!
         end
 

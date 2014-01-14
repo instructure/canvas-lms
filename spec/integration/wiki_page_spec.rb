@@ -103,10 +103,7 @@ describe WikiPagesController do
 
     context "draft state enabled" do
       before do
-        root = @course.root_account
-        root.settings[:enable_draft] = true
-        root.save!
-        @course.reload
+        @course.root_account.enable_feature!(:draft_state)
       end
 
       it "should forward /wiki to /pages index if no front page" do
@@ -144,6 +141,10 @@ describe WikiPagesController do
     end
 
     context "draft state disabled" do
+      before do
+        @course.root_account.disable_feature!(:draft_state)
+      end
+
       it "should forward /pages to /wiki" do
         get @base_url + "pages"
         response.code.should == '302'

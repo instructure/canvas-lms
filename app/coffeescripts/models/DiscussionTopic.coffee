@@ -20,6 +20,8 @@ define [
       subscribed: false
       user_can_see_posts: true
       subscription_hold: null
+      publishable: true
+      unpublishable: true
 
     dateAttributes: [
       'last_reply_at'
@@ -41,10 +43,20 @@ define [
       assign = new Assignment(assign_attributes)
       assign.alreadyScoped = true
       @set 'assignment', assign
+      @set 'publishable',  @get('can_unpublish')
+      @set 'unpublishable', @get('can_unpublish')
 
     # always include assignment in view presentation
     present: =>
       Backbone.Model::toJSON.call(this)
+
+    publish: ->
+      @updateOneAttribute('published', true)
+
+    unpublish: ->
+      @updateOneAttribute('published', false)
+
+    disabledMessage: -> I18n.t 'cannot_unpublish_with_replies', "Can't unpublish if there are replies"
 
     topicSubscribe: ->
       baseUrl = _.result this, 'url'

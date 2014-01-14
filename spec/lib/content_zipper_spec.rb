@@ -37,8 +37,10 @@ describe ContentZipper do
         /other-567--guy-8/,
         /some-999----1234-guy/,
       ]
-      Zip::ZipFile.foreach(attachment.reload.full_filename).each { |f|
-        f.name.should =~ expected_file_patterns.shift
+      Zip::File.foreach(attachment.reload.full_filename) { |f|
+        expect {
+          expected_file_patterns.delete_if { |expected_pattern| f.name =~ expected_pattern }
+        }.to change { expected_file_patterns.size }.by(-1)
       }
       expected_file_patterns.should be_empty
     end
@@ -55,7 +57,7 @@ describe ContentZipper do
       ContentZipper.process_attachment(attachment, @teacher)
       attachment.reload
       attachment.workflow_state.should == 'zipped'
-      Zip::ZipFile.foreach(attachment.full_filename) do |f|
+      Zip::File.foreach(attachment.full_filename) do |f|
         if f.file?
           f.name.should =~ /some-999----1234-guy/
           f.get_input_stream.read.should match(%r{This submission was a url, we&#39;re taking you to the url link now.})
@@ -75,7 +77,7 @@ describe ContentZipper do
       ContentZipper.process_attachment(attachment, @teacher)
       attachment.reload
       attachment.workflow_state.should == 'zipped'
-      Zip::ZipFile.foreach(attachment.full_filename) do |f|
+      Zip::File.foreach(attachment.full_filename) do |f|
         if f.file?
           f.get_input_stream.read.should be_include("hai this is my answer")
         end
@@ -120,11 +122,11 @@ describe ContentZipper do
       ContentZipper.process_attachment(attachment, @teacher)
       sub_count = 0
       expected_file_names = [/group-0/, /group-1/]
-      Zip::ZipFile.foreach(attachment.full_filename) do |f|
-        f.name.should =~ expected_file_names.shift
-        sub_count += 1
+      Zip::File.foreach(attachment.full_filename) do |f|
+        expect {
+          expected_file_names.delete_if { |expected_name| f.name =~ expected_name }
+        }.to change { expected_file_names.size }.by(-1)
       end
-      sub_count.should == 2
     end
   end
 
@@ -171,7 +173,7 @@ describe ContentZipper do
         ContentZipper.process_attachment(@attachment, user, :check_user => check_user)
         names = []
         @attachment.reload
-        Zip::ZipFile.foreach(@attachment.full_filename) {|f| names << f.name if f.file? }
+        Zip::File.foreach(@attachment.full_filename) {|f| names << f.name if f.file? }
         names.sort
       end
 
@@ -241,7 +243,7 @@ describe ContentZipper do
       ContentZipper.process_attachment(attachment, @user)
       attachment.reload
       names = []
-      Zip::ZipFile.foreach(attachment.full_filename) {|f| names << f.name if f.file? }
+      Zip::File.foreach(attachment.full_filename) {|f| names << f.name if f.file? }
       names.should == ['otherfile.png']
     end
   end
@@ -266,7 +268,7 @@ describe ContentZipper do
       attachment.context = eportfolio
       attachment.save!
       Dir.expects(:mktmpdir).once.yields('/tmp')
-      Zip::ZipFile.expects(:open).once.with('/tmp/etcpasswd.zip', Zip::ZipFile::CREATE)
+      Zip::File.expects(:open).once.with('/tmp/etcpasswd.zip', Zip::File::CREATE)
       ContentZipper.process_attachment(attachment, user)
     end
   end

@@ -20,6 +20,7 @@ define [
 
     els:
       '.filterable': '$filter'
+      '.filterable-unassigned-users': '$filterUnassignedUsers'
       '.unassigned-users-heading': '$unassignedUsersHeading'
       '.groups-with-count': '$groupsHeading'
 
@@ -34,9 +35,6 @@ define [
       options.unassignedUsersView ?= @unassignedUsersView(options)
       if progress = @model.get('progress')
         @model.progressModel.set progress
-        @randomlyAssignStudentsInProgress = true
-      else if @model.get('progress_url') or @model.progressStarting
-        @randomlyAssignStudentsInProgress = true
       super
 
     groupsView: (options) ->
@@ -59,23 +57,28 @@ define [
 
     attach: ->
       @model.on 'destroy', @remove, this
+      @model.on 'change', => @groupsView.updateDetails()
 
       @model.on 'change:unassigned_users_count', @setUnassignedHeading, this
       @groups.on 'add remove reset', @setGroupsHeading, this
 
       @model.progressModel.on 'change:url', =>
         @model.progressModel.set({'completion': 0})
-        @randomlyAssignStudentsInProgress = true
       @model.progressModel.on 'change', @render
       @model.on 'progressResolved', =>
         @model.fetch success: =>
           @model.groups().fetch()
           @model.unassignedUsers().fetch()
-          @randomlyAssignStudentsInProgress = false
           @render()
 
-    afterRender: ->
+    cacheEls: ->
+      super
+      # need to be set before their afterRender's run (i.e. before this
+      # view's afterRender)
       @groupsView.$externalFilter = @$filter
+      @unassignedUsersView.$externalFilter = @$filterUnassignedUsers
+
+    afterRender: ->
       @setUnassignedHeading()
       @setGroupsHeading()
 
@@ -96,6 +99,5 @@ define [
 
     toJSON: ->
       json = @model.present()
-      json.randomlyAssignStudentsInProgress = @randomlyAssignStudentsInProgress
       json
 

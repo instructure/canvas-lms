@@ -49,6 +49,10 @@ module Api::V1::Assignment
     )
   }
 
+  def assignments_json(assignments, user, session, opts = {})
+    assignments.map{ |assignment| assignment_json(assignment, user, session, opts) }
+  end
+
   def assignment_json(assignment, user, session, opts = {})
     opts.reverse_merge!(
       include_discussion_topic: true,
@@ -92,7 +96,7 @@ module Api::V1::Assignment
       hash['external_tool_tag_attributes'] = {
         'url' => external_tool_tag.url,
         'new_tab' => external_tool_tag.new_tab,
-        'resource_link_id' => external_tool_tag.opaque_identifier(:asset_string)
+        'resource_link_id' => ContextExternalTool.opaque_identifier_for(external_tool_tag, assignment.shard)
       }
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',
@@ -167,7 +171,7 @@ module Api::V1::Assignment
       hash['module_ids'] = module_ids
     end
 
-    if assignment.context.draft_state_enabled?
+    if assignment.context.feature_enabled?(:draft_state)
       hash['published'] = ! assignment.unpublished?
       hash['unpublishable'] = !assignment.has_student_submissions?
     end
@@ -323,7 +327,7 @@ module Api::V1::Assignment
       update_params["description"] = process_incoming_html_content(update_params["description"])
     end
 
-    if assignment.context.draft_state_enabled?
+    if assignment.context.feature_enabled?(:draft_state)
       if assignment_params.has_key? "published"
         published = value_to_boolean(assignment_params['published'])
         assignment.workflow_state = published ? 'published' : 'unpublished'

@@ -17,11 +17,13 @@
 # To create the page views keyspace locally for development and testing, run a `cqlsh -3` prompt and:
 #
 #   CREATE KEYSPACE page_views WITH strategy_class = 'SimpleStrategy' AND strategy_options:replication_factor = '1';
+#   CREATE KEYSPACE auditors WITH strategy_class = 'SimpleStrategy' AND strategy_options:replication_factor = '1';
+#
+#   CREATE KEYSPACE page_views WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+#   CREATE KEYSPACE auditors WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
 #
 # To create the keyspace in production you'll need to determine the appropriate
 # placement strategy and options.
-
-development:
 
 # To use Cassandra for page views:
 # 1. Create the keyspace in Cassandra.
@@ -35,7 +37,17 @@ development:
 #   rake db:migrate_pageviews_to_cassandra
 # This will migrate all page views from the last 52 weeks for non-deleted accounts.
 
+# development:
 #   page_views:
 #     servers:
 #     - 127.0.0.1:9160
 #     keyspace: pageviews
+#   auditors:
+#     servers:
+#     - 127.0.0.1:9160
+#     keyspace: auditors
+# test:
+#   auditors:
+#     servers:
+#     - 127.0.0.1:9160
+#     keyspace: auditors_test

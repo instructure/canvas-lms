@@ -107,8 +107,8 @@ define [
         perPage = parseInt(url.match(@perPageRegex)[1], 10)
         (@options.params ?= {}).per_page = perPage
 
-      if @urls.last
-        @totalPages = parseInt(@urls.last.match(@pageRegex)[1], 10)
+      if @urls.last and match = @urls.last.match(@pageRegex)
+        @totalPages = parseInt(match[1], 10)
 
       @atLeastOnePageFetched = true
 

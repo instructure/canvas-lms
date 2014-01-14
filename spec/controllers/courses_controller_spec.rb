@@ -370,10 +370,9 @@ describe CoursesController do
       end
 
       it "should work for wiki view with draft state enabled" do
-        @course1.account.settings[:allow_draft] = true
-        @course1.account.save!
+        @course1.account.allow_feature!(:draft_state)
+        @course1.enable_feature!(:draft_state)
         @course1.default_view = "wiki"
-        @course1.enable_draft = true
         @course1.save!
         @course1.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
         get 'show', :id => @course1.id

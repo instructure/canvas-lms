@@ -14,14 +14,10 @@
       <label class="checkbox">
         {{checkbox "enable_self_signup" class="self-signup-toggle"}}
         {{#t "allow_self_signup"}}Allow self sign-up{{/t}}
-        <a href="#"
-          class="about-self-signup icon-question"
-          style="padding-right:10px"
-          title="<div class='popover-content'><p>{{#t "self_signup_description"}}You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organize themselves into groups instead of needing the teacher to do the work. Note that as long as this option is enabled, students can move themselves from one group to another.{{/t}}</p></div>"
-          aria-label="{{#t "what_is_this"}}What is this?{{/t}}"
-          data-tooltip='{"tooltipClass":"popover", "position":"right"}'></a>
+        {{> [groups/manage/selfSignupHelp]}}
       </label>
     </div>
+    <input name="group_limit" type="hidden" value="">
     <div class="controls">
       <label class="checkbox self-signup-controls">
         {{checkbox "restrict_self_signup"}}
