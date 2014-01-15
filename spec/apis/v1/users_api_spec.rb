@@ -418,16 +418,60 @@ describe "Users API", :type => :integration do
       }
     end
 
-    it "should not allow non-admins to create users" do
-      @user = @student
-      raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
-        { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
-        {
-          :user      => { :name => "Test User" },
-          :pseudonym => { :unique_id => "test@example.com", :password => "password123" }
-        }
-      )
-      response.status.should eql "403 Forbidden"
+    context "as a non-administrator" do
+      before do
+        user(active_all: true)
+      end
+
+      it "should not let you create a user if self_registration is off" do
+        raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
+          { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+          {
+            :user      => { :name => "Test User" },
+            :pseudonym => { :unique_id => "test@example.com" }
+          }
+        )
+        response.status.should eql "403 Forbidden"
+      end
+
+      it "should require an email pseudonym" do
+        @admin.account.settings[:self_registration] = true
+        @admin.account.save!
+        raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
+          { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+          {
+            :user      => { :name => "Test User", :terms_of_use => "1" },
+            :pseudonym => { :unique_id => "invalid" }
+          }
+        )
+        response.status.should eql "400 Bad Request"
+      end
+
+      it "should require acceptance of the terms" do
+        @admin.account.settings[:self_registration] = true
+        @admin.account.save!
+        raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
+          { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+          {
+            :user      => { :name => "Test User" },
+            :pseudonym => { :unique_id => "test@example.com" }
+          }
+        )
+        response.status.should eql "400 Bad Request"
+      end
+
+      it "should let you create a user if you pass all the validations" do
+        @admin.account.settings[:self_registration] = true
+        @admin.account.save!
+        json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
+          { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+          {
+            :user      => { :name => "Test User", :terms_of_use => "1" },
+            :pseudonym => { :unique_id => "test@example.com" }
+          }
+        )
+        json['name'].should == 'Test User'
+      end
     end
 
     it "should send a confirmation if send_confirmation is set to 1" do
