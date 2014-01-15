@@ -1621,7 +1621,7 @@ describe Assignment do
         context: @u1,
         filename: 'blah.txt'
       @a.submit_homework(@u1, attachments: [f])
-      @a.submissions.each { |s|
+      @a.submissions.reload.each { |s|
         s.attachments.should == [f]
       }
     end
