@@ -16,6 +16,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+
+module DraftState
+  class Publisher < Struct.new(:course_id)
+    def perform
+      course = Course.find(course_id)
+      course.quizzes.where(workflow_state: 'unpublished').update_all(workflow_state: 'edited')
+      course.assignments.where(workflow_state: 'unpublished').update_all(workflow_state: 'published')
+      course.context_modules.where(workflow_state: 'unpublished').update_all(workflow_state: 'active')
+      course.context_module_tags.where(workflow_state: 'unpublished').update_all(workflow_state: 'active')
+      course.discussion_topics.where(workflow_state: 'unpublished').update_all(workflow_state: 'active')
+    end
+  end
+end
+
 Feature.register('draft_state' => {
     display_name: lambda { I18n.t('features.draft_state', 'Draft State') },
     description: lambda { I18n.t('draft_state_description', <<END) },
@@ -29,6 +43,7 @@ END
     state: 'hidden',
     root_opt_in: true,
     development: true,
+
     custom_transition_proc: ->(user, context, from_state, transitions) do
       if context.is_a?(Course) && from_state == 'on'
         transitions['off']['message'] = I18n.t('features.draft_state_course_disable_warning', <<END)
@@ -47,6 +62,12 @@ END
             transitions[target_state]['locked'] = true unless site_admin
           end
         end
+      end
+    end,
+
+    after_state_change_proc: ->(context, old_state, new_state) do
+      if context.is_a?(Course) && old_state == 'on' && new_state == 'off'
+        Delayed::Job.enqueue(DraftState::Publisher.new(context.id), max_attempts: 1)
       end
     end
   }
