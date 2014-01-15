@@ -395,7 +395,7 @@ class ContextModulesApiController < ApplicationController
     end
   end
 
-  # @undocumented API Update multiple modules
+  # @note API Update multiple modules
   #
   # Update multiple modules in an account.
   #

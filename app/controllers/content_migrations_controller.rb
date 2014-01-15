@@ -349,7 +349,7 @@ class ContentMigrationsController < ApplicationController
     render :json => json
   end
 
-  # @undocumented Leaving undocumented for now because format is expected to change
+  # @note Leaving undocumented for now because format is expected to change
   # Get list of items in the migration for selective import of content
   #
   # If no type is sent you will get a list of the top-level sections in the content
