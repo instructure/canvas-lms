@@ -139,7 +139,7 @@ end
 truncate_all_tables
 
 # Make AR not puke if MySQL auto-commits the transaction
-class ActiveRecord::ConnectionAdapters::MysqlAdapter < ActiveRecord::ConnectionAdapters::AbstractAdapter
+module MysqlOutsideTransaction
   def outside_transaction?
     # MySQL ignores creation of savepoints outside of a transaction; so if we can create one
     # and then can't release it because it doesn't exist, we're not in a transaction
@@ -148,6 +148,14 @@ class ActiveRecord::ConnectionAdapters::MysqlAdapter < ActiveRecord::ConnectionA
   end
 end
 
+module ActiveRecord::ConnectionAdapters
+  if defined?(MysqlAdapter)
+    MysqlAdapter.send(:include, MysqlOutsideTransaction)
+  end
+  if defined?(Mysql2Adapter)
+    Mysql2Adapter.send(:include, MysqlOutsideTransaction)
+  end
+end
 
 # Be sure to actually test serializing things to non-existent caches,
 # but give Mocks a pass, since they won't exist in dev/prod
