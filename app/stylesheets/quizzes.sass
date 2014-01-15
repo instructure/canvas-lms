@@ -1655,3 +1655,67 @@ ul#quiz_versions
     right: 0px
     bottom: 0px
     padding-bottom: 0px
+
+#ldb_deauthorized_dialog
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  background-color: #4b555d
+  background: url('/images/Money_Noise_tm.png'), -ms-radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%), -ms-linear-gradient(top, #59656e, #3e464c)
+  @include background(image-url("/images/Money_Noise_tm.png"), radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%), linear-gradient(top, #59656e, #3e464c))
+
+  padding: 0
+  margin: 0
+  color: #b3b3b3
+  border: none
+  label
+    display: none
+  div
+    margin: 0 20px
+  #unauthorized_message
+    margin: 0
+    width: auto
+    padding-left: 80px
+    h2
+      font-size: 1.5em
+      margin: 0 0 -10px 0
+      height: 41px
+    p
+      font-weight: normal
+      margin: 10px 0
+      padding: 0
+  h1
+    height: 107px
+    margin: 0 0 50px
+    @include bg-image(canvas, png, no-repeat, 20px, 66px, transparent, 136px, 33px)
+    text-indent: -999em
+  input[type="text"], input[type="password"]
+    background: #f6f6f6 none
+    border: 6px solid rgba(255, 255, 255, 0.25)
+    border-radius: 7px
+    padding: 12px 9px 12px 17px
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.4)
+    background-clip: padding-box
+    width: 40%
+    max-width: 45%
+    font-size: 13px
+    color: #303030
+    // margin: 0 6px 6px 0
+    outline: none
+    display: inline-block
+    height: 20px
+    line-height: 20px
+    box-sizing: content-box
+    -moz-box-sizing: content-box
+  .dialog-actions
+    position: relative
+    .btn-primary
+      position: absolute
+      right: 0
+      top: 0
+      padding: 10px 36px
+      font-size: 15px
+  span.field + span.field
+    margin-left: 0
