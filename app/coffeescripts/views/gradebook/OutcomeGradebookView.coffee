@@ -89,6 +89,7 @@ define [
         columns,
         Grid.options)
       @grid.onHeaderRowCellRendered.subscribe(Grid.Events.headerRowCellRendered)
+      @grid.onHeaderCellRendered.subscribe(Grid.Events.headerCellRendered)
       @grid.init()
       Grid.Events.init(@grid)
       @_attachEvents()

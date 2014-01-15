@@ -278,3 +278,31 @@ $page-dark: #ebeff2;
   &.near-mastery { background: $mastery-yellow; }
   &.remedial     { background: $mastery-red; }
 }
+
+.outcome-details {
+  position: absolute;
+  z-index: 1000;
+  background-color: #fff;
+  border: 1px solid #b0afaf;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+  max-width: 500px;
+  min-width: 250px;
+  padding: 18px 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  .title {
+    color: #4f5f6e;
+    font-size: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #b0afaf;
+    margin-bottom: 10px;
+  }
+  .description {
+    margin: 10px 0;
+    font-size: 11px;
+    font-weight: normal;
+  }
+  .view-more {
+    text-align: right;
+  }
+}

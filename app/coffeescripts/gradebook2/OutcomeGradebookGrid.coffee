@@ -2,9 +2,10 @@ define [
   'i18n!gradebook2'
   'underscore'
   'compiled/views/gradebook/HeaderFilterView'
+  'compiled/views/gradebook/OutcomeColumnView'
   'jst/gradebook2/outcome_gradebook_cell'
   'jst/gradebook2/outcome_gradebook_student_cell'
-], (I18n, _, HeaderFilterView, cellTemplate, studentCellTemplate) ->
+], (I18n, _, HeaderFilterView, OutcomeColumnView, cellTemplate, studentCellTemplate) ->
 
   Grid =
     filter: ['mastery', 'near-mastery', 'remedial']
@@ -31,6 +32,14 @@ define [
       # Returns nothing.
       headerRowCellRendered: (e, options) ->
         Grid.View.headerRowCell(options)
+
+      # Public: Draw column label cell contents.
+      #
+      # grid - A SlickGrid instance.
+      #
+      # Returns nothing.
+      headerCellRendered: (e, options) ->
+        Grid.View.headerCell(options)
 
       init: (grid) ->
         header       = $(grid.getHeaderRow()).parent()
@@ -75,7 +84,8 @@ define [
           _.extend(id: "outcome_#{outcome.id}",
                    name: outcome.title,
                    field: "outcome_#{outcome.id}",
-                   cssClass: 'outcome-result-cell', options)
+                   cssClass: 'outcome-result-cell',
+                   outcome: outcome, options)
         [Grid.Util._studentColumn()].concat(columns)
 
       # Internal: Create a student names column.
@@ -136,7 +146,10 @@ define [
       #
       # Returns nothing.
       saveOutcomes: (outcomes) ->
+        [type, id] = ENV.context_asset_string.split('_')
+        url = "/#{type}s/#{id}/outcomes/"
         Grid.outcomes = _.reduce(outcomes, (result, outcome) ->
+          outcome.url = url
           result["outcome_#{outcome.id}"] = outcome
           result
         , {})
@@ -253,3 +266,9 @@ define [
         view = new HeaderFilterView(grid: grid, redrawFn: Grid.View.redrawHeader)
         view.render()
         $(node).append(view.$el)
+
+      headerCell: ({node, column, grid}, fn = Grid.averageFn) ->
+        return if column.field == 'student'
+        # TODO: calculate outcome statistics when opening the popup
+        view = new OutcomeColumnView(el: node, attributes: column.outcome)
+        view.render()
