@@ -1906,7 +1906,7 @@ class User < ActiveRecord::Base
     time = opts[:time] || Time.zone.now
     assignments.select do |a|
       if a.grants_right?(self, nil, :delete)
-        a.all_dates_visible_to(self).any? do |due_hash|
+        a.dates_hash_visible_to(self).any? do |due_hash|
           due_hash[:due_at] && due_hash[:due_at] >= time && due_hash[:due_at] <= opts[:end_at]
         end
       else

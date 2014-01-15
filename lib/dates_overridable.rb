@@ -93,8 +93,6 @@ module DatesOverridable
     all_dates << without_overrides.due_date_hash.merge(:base => true)
   end
 
-  # TODO: only used by app/models/user.rb externally, maybe it should use
-  # dates_hash_visible_to (which also uses it internally)
   def all_dates_visible_to(user)
     if context.user_has_been_observer?(user)
       observed_student_due_dates(user).uniq
