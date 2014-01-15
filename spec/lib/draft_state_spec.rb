@@ -22,7 +22,7 @@ describe "Draft State Feature Flag Weirdness" do
   let(:t_account_manager) { account_admin_user account: t_site_admin, membership_type: 'AccountMembership' }
   let(:t_root_account) { account_model }
   let(:t_root_admin) { account_admin_user account: t_root_account }
-  let(:t_course) { course(account: t_root_account, active_all: true) }
+  let(:t_course) { course(account: t_root_account, draft_state: true, active_all: true) }
 
   context "Course" do
     it "should give a warning for 'off'" do
@@ -30,6 +30,46 @@ describe "Draft State Feature Flag Weirdness" do
       t.keys.should eql ['off']
       t['off']['locked'].should be_false
       t['off']['message'].should =~ /will publish/
+    end
+
+    it "should kick off a publish job in state change callback" do
+      quiz = t_course.quizzes.create! title: 'a quiz'
+      quiz.workflow_state = 'unpublished'
+      quiz.save!
+
+      page = t_course.wiki.wiki_pages.create title: 'some page'
+      page.workflow_state = 'unpublished'
+      page.save!
+
+      topic = t_course.discussion_topics.create title: 'a topic'
+      topic.workflow_state = 'unpublished'
+      topic.save!
+
+      assignment = t_course.assignments.create name: 'do this'
+      assignment.workflow_state = 'unpublished'
+      assignment.save!
+
+      mod = t_course.context_modules.create name: 'blargh'
+      mod.workflow_state = 'unpublished'
+      mod.save!
+
+      item = mod.add_item type: 'wiki_page', id: page.id
+      item.workflow_state = 'unpublished'
+      item.save!
+
+      t_course.disable_feature!(:draft_state)
+      expect {
+        Feature.definitions['draft_state'].after_state_change_proc.call(t_course, 'on', 'off')
+      }.to change(Delayed::Job, :count).by(1)
+
+      run_jobs
+
+      quiz.reload.should be_edited
+      page.reload.hide_from_students.should be_true
+      topic.reload.should be_active
+      assignment.reload.should be_published
+      mod.reload.should be_active
+      item.reload.should be_active
     end
   end
 
