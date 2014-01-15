@@ -1424,6 +1424,7 @@ class Course < ActiveRecord::Base
     submissions = {}
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
     assignments = calc.assignments
+    groups = calc.groups
 
     read_only = t('csv.read_only_field', '(read only)')
     t 'csv.student', 'Student'
@@ -1436,36 +1437,47 @@ class Course < ActiveRecord::Base
     t 'csv.final_score', 'Final Score'
     t 'csv.final_grade', 'Final Grade'
     t 'csv.points_possible', 'Points Possible'
-    res = CSV.generate do |csv|
+    CSV.generate do |csv|
       #First row
       row = ["Student", "ID"]
-      row.concat(["SIS User ID", "SIS Login ID"]) if options[:include_sis_id]
+      row << "SIS User ID" << "SIS Login ID" if options[:include_sis_id]
       row << "Section"
       row.concat assignments.map(&:title_with_id)
       include_points = !apply_group_weights?
-      row.concat(["Current Points", "Final Points"]) if include_points
-      row.concat(["Current Score", "Final Score"])
-      row.concat(["Final Grade"]) if self.grading_standard_enabled?
+      groups.each { |g|
+        if include_points
+          row << "#{g.name} Current Points" << "#{g.name} Final Points"
+        end
+        row << "#{g.name} Current Score" << "#{g.name} Final Score"
+      }
+      row << "Current Points" << "Final Points" if include_points
+      row << "Current Score" << "Final Score"
+      row << "Final Grade" if self.grading_standard_enabled?
       csv << row
+
+      group_filler_length = groups.size * (include_points ? 4 : 2)
 
       #Possible muted row
       if assignments.any?(&:muted)
         #This is is not translated since we look for this exact string when we upload to gradebook.
-        row = ['', '', '']
-        row.concat(['', '']) if options[:include_sis_id]
-        row.concat(assignments.map { |a| a.muted? ? 'Muted' : '' })
-        row.concat ['', '']
-        row.concat ['']  if self.grading_standard_enabled?
+        row = [nil, nil, nil]
+        row << nil << nil if options[:include_sis_id]
+        row.concat(assignments.map { |a| 'Muted' if a.muted? })
+        row.concat([nil] * group_filler_length)
+        row << nil << nil if include_points
+        row << nil << nil
+        row << nil if self.grading_standard_enabled?
         csv << row
       end
 
       #Second Row
-      row = ["    Points Possible", "", ""]
-      row.concat(["", ""]) if options[:include_sis_id]
+      row = ["    Points Possible", nil, nil]
+      row << nil << nil if options[:include_sis_id]
       row.concat assignments.map(&:points_possible)
-      row.concat [read_only, read_only] if include_points
-      row.concat([read_only, read_only])
-      row.concat([read_only]) if self.grading_standard_enabled?
+      row.concat([read_only] * group_filler_length)
+      row << read_only << read_only if include_points
+      row << read_only << read_only
+      row << read_only if self.grading_standard_enabled?
       csv << row
 
       student_enrollments.each do |student_enrollment|
@@ -1483,14 +1495,20 @@ class Course < ActiveRecord::Base
           pseudonym ||= student.find_pseudonym_for_account(self.root_account, true)
           row << pseudonym.try(:unique_id)
         end
+
         row << student_section
         row.concat(student_submissions)
 
-        current_info, final_info = grades.shift
-        row.concat [current_info[:total], final_info[:total]] if include_points
-        row.concat [current_info[:grade], final_info[:grade]]
+        (current_info, current_group_info),
+          (final_info, final_group_info) = grades.shift
+        groups.each do |g|
+          row << current_group_info[g.id][:score] << final_group_info[g.id][:score] if include_points
+          row << current_group_info[g.id][:grade] << final_group_info[g.id][:grade]
+        end
+        row << current_info[:total] << final_info[:total] if include_points
+        row << current_info[:grade] << final_info[:grade]
         if self.grading_standard_enabled?
-          row.concat([score_to_grade(final_info[:grade])])
+          row << score_to_grade(final_info[:grade])
         end
         csv << row
       end
