@@ -254,31 +254,23 @@ module Delayed
               yield
             end
           when 'MySQL', 'Mysql2'
-              if Rails.env.test? && connection.open_transactions > 0
-                raise "cannot get table lock inside of transaction" if connection.open_transactions > 1
-                # can't actually lock, but it's okay cause tests aren't multi-process
-                yield
-              else
-                raise "cannot get table lock inside of transaction" if connection.open_transactions > 0
-                begin
-                  # see http://dev.mysql.com/doc/refman/5.0/en/lock-tables-and-transactions.html
-                  connection.execute("SET autocommit=0")
-                  connection.execute("LOCK TABLES #{table_name} WRITE")
-                  connection.increment_open_transactions
-                  yield
-                  connection.execute("COMMIT")
-                ensure
-                  connection.decrement_open_transactions
-                  connection.execute("UNLOCK TABLES")
-                  connection.execute("SET autocommit=1")
-                end
-              end
-            self.transaction do
+            if Rails.env.test? && connection.open_transactions > 0
+              raise "cannot get table lock inside of transaction" if connection.open_transactions > 1
+              # can't actually lock, but it's okay cause tests aren't multi-process
+              yield
+            else
+              raise "cannot get table lock inside of transaction" if connection.open_transactions > 0
               begin
-
+                # see http://dev.mysql.com/doc/refman/5.0/en/lock-tables-and-transactions.html
+                connection.execute("SET autocommit=0")
+                connection.execute("LOCK TABLES #{table_name} WRITE")
+                connection.increment_open_transactions
                 yield
+                connection.execute("COMMIT")
               ensure
-
+                connection.decrement_open_transactions
+                connection.execute("UNLOCK TABLES")
+                connection.execute("SET autocommit=1")
               end
             end
           when 'SQLite'
