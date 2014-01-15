@@ -9,7 +9,8 @@ script:
 gemfile:
   - Gemfile
 env:
-  - SPEC="spec/apis/**/[a-m]*_spec.rb"
+  - SPEC="spec/apis/**/[a-g]*_spec.rb"
+  - SPEC="spec/apis/**/[h-m]*_spec.rb"
   - SPEC="spec/apis/**/[n-z]*_spec.rb"
   - SPEC="spec/controllers/**/*_spec.rb"
   - SPEC="spec/gem_integration/**/*_spec.rb"
@@ -19,7 +20,8 @@ env:
   - SPEC="spec/lib/**/*_spec.rb"
   - SPEC="spec/messages/**/*_spec.rb"
   - SPEC="spec/migrations/**/*_spec.rb"
-  - SPEC="spec/models/[a-m]*_spec.rb"
+  - SPEC="spec/models/[a-g]*_spec.rb"
+  - SPEC="spec/models/[h-m]*_spec.rb"
   - SPEC="spec/models/[n-z]*_spec.rb"
   - SPEC="spec/models/*/*_spec.rb"
   - SPEC="spec/observers/**/*_spec.rb"
