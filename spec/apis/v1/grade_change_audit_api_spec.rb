@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper'
 describe "GradeChangeAudit API", type: :request do
   context "not configured" do
     before do
-      Canvas::Cassandra::Database.stubs(:configured?).with('auditors').returns(false)
+      Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).with('auditors').returns(false)
       user_with_pseudonym(account: Account.default)
       @user.account_users.create(account: Account.default)
     end

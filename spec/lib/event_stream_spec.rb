@@ -26,8 +26,8 @@ describe EventStream do
     def @database.update_record(*args); end
     def @database.insert_record(*args); end
     def @database.update(*args); end
-    ::Canvas::Cassandra::Database.stubs(:from_config).with(@database_name.to_s).returns(@database)
-    ::Canvas::Cassandra::Database.stubs(:configured?).with(@database_name.to_s).returns(true)
+    ::Canvas::Cassandra::DatabaseBuilder.stubs(:from_config).with(@database_name.to_s).returns(@database)
+    ::Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).with(@database_name.to_s).returns(true)
   end
 
   context "setup block" do

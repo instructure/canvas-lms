@@ -116,8 +116,8 @@ def truncate_all_tables
 end
 
 def truncate_all_cassandra_tables
-  Canvas::Cassandra::Database.config_names.each do |cass_config|
-    db = Canvas::Cassandra::Database.from_config(cass_config)
+  Canvas::Cassandra::DatabaseBuilder.config_names.each do |cass_config|
+    db = Canvas::Cassandra::DatabaseBuilder.from_config(cass_config)
     db.tables.each do |table|
       db.execute("TRUNCATE #{table}")
     end

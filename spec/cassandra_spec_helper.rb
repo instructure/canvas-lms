@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 shared_examples_for "cassandra page views" do
   before do
-    if Canvas::Cassandra::Database.configured?('page_views')
+    if Canvas::Cassandra::DatabaseBuilder.configured?('page_views')
       Setting.set('enable_page_views', 'cassandra')
     else
       pending "needs cassandra page_views configuration"
@@ -30,7 +30,7 @@ end
 
 shared_examples_for "cassandra audit logs" do
   before do
-    unless Canvas::Cassandra::Database.configured?('auditors')
+    unless Canvas::Cassandra::DatabaseBuilder.configured?('auditors')
       pending "needs cassandra auditors configuration"
     end
   end

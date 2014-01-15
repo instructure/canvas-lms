@@ -222,7 +222,8 @@ group :redis do
 end
 
 group :cassandra do
-  gem 'cassandra-cql', '1.2.1', :github => 'kreynolds/cassandra-cql', :ref => 'd100be075b04153cf4116da7512892a1e8c0a7e4'
+  gem 'cassandra-cql', '1.2.1', :github => 'kreynolds/cassandra-cql', :ref => 'd100be075b04153cf4116da7512892a1e8c0a7e4' #dependency of canvas_cassandra
+  gem "canvas_cassandra", path: "gems/canvas_cassandra"
 end
 
 group :embedly do

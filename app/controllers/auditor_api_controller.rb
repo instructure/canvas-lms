@@ -22,7 +22,7 @@ class AuditorApiController < ApplicationController
   private
 
   def check_configured
-    not_found unless Canvas::Cassandra::Database.configured?('auditors')
+    not_found unless Canvas::Cassandra::DatabaseBuilder.configured?('auditors')
   end
 
   def query_options(account=nil)
