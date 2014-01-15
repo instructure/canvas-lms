@@ -936,6 +936,8 @@ describe Submission do
       override.set = @course.default_section
       override.override_due_at(Time.zone.now + 1.day)
       override.save!
+      # mysql just truncated the timestamp
+      override.reload
 
       submission = @assignment.submissions.create(:user => @user)
       submission.cached_due_date.should == override.due_at
