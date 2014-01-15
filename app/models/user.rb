@@ -274,10 +274,10 @@ class User < ActiveRecord::Base
     order_clause = clause = sortable_name_order_by_clause
     order_clause = "#{clause} DESC" if options[:direction] == :descending
     scope = self.order(order_clause)
-    if (scope.scope(:find, :select))
+    if CANVAS_RAILS2 ? (scope.scope(:find, :select)) : scope.select_values.present?
       scope = scope.select(clause)
     end
-    if scope.scope(:find, :group)
+    if CANVAS_RAILS2 ? scope.scope(:find, :group) : scope.group_values.present?
       scope = scope.group(clause)
     end
     scope
