@@ -741,8 +741,8 @@ describe ConversationsController, :type => :integration do
             m["forwarded_messages"].each {|fm| fm["participating_user_ids"].sort!}
           end
         end
-        conversation = @me.all_conversations.order("last_message_at DESC, conversation_id DESC").first
-        json.should eql [
+        conversation = @me.all_conversations.order(Conversation.nulls(:first, :last_message_at, :desc)).order("conversation_id DESC").first
+        expected = [
           {
             "id" => conversation.conversation_id,
             "subject" => nil,
@@ -790,6 +790,7 @@ describe ConversationsController, :type => :integration do
             ]
           }
         ]
+        json.should eql expected
       end
 
       it "should set subject" do
