@@ -6,4 +6,4 @@ development:
   encryption_key: 12345
      
 test:
-  encryption_key: 12345
+  encryption_key: facdd3a131ddd8988b14f6e4e01039c93cfa0160
