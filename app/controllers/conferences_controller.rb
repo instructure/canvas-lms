@@ -118,6 +118,7 @@ class ConferencesController < ApplicationController
     conferences = @context.grants_right?(@current_user, :manage_content) ?
       @context.web_conferences :
       @current_user.web_conferences.where(context_type: @context.class.to_s, context_id: @context.id)
+    conferences = conferences.order("created_at DESC, id DESC")
     api_request? ? api_index(conferences) : web_index(conferences)
   end
 
