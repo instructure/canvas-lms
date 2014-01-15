@@ -623,7 +623,7 @@ define [
         # number input, we want to allow them to keep doing that.
         return
 
-      if e.target.className.match /dontblur/
+      if $(e.target).is(".dontblur,.dontblur *")
         return
 
       @grid.getEditorLock().commitCurrentEdit()

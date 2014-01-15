@@ -12,7 +12,7 @@ define(['jquery', 'i18n!LongTextEditor'], function($, I18n) {
     this.init = function () {
       var $container = $("body");
 
-      $wrapper = $("<DIV style='z-index:10000;position:absolute;background:white;padding:5px;border:3px solid gray; -moz-border-radius:10px; border-radius:10px;'/>")
+      $wrapper = $("<DIV class=dontblur style='z-index:10000;position:absolute;background:white;padding:5px;border:3px solid gray; -moz-border-radius:10px; border-radius:10px;'/>")
           .appendTo($container);
 
       $input = $("<TEXTAREA hidefocus rows=5 style='backround:white;width:250px;height:80px;border:0;outline:0'>")
@@ -20,7 +20,7 @@ define(['jquery', 'i18n!LongTextEditor'], function($, I18n) {
 
       var saveText = I18n.t("save", "Save");
       var cancelText = I18n.t("cancel", "Cancel");
-      $("<DIV style='text-align:right'><BUTTON class=dontblur>"+saveText+"</BUTTON><BUTTON>"+cancelText+"</BUTTON></DIV>")
+      $("<DIV style='text-align:right'><BUTTON>"+saveText+"</BUTTON><BUTTON>"+cancelText+"</BUTTON></DIV>")
           .appendTo($wrapper);
 
       $wrapper.find("button:first").bind("click", this.save);
