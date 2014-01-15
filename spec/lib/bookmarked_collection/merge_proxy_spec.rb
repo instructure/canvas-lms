@@ -166,8 +166,8 @@ describe "BookmarkedCollection::MergeProxy" do
         CourseAccountAssociation.delete_all
         Course.delete_all
         @courses = 6.times.map{ Course.create! }
-        @scope1 = Course.select("id, 1 as scope").where("id<?", @courses[4].id)
-        @scope2 = Course.select("id, 2 as scope").where("id>?", @courses[1].id)
+        @scope1 = Course.select("id, '1' as scope").where("id<?", @courses[4].id)
+        @scope2 = Course.select("id, '2' as scope").where("id>?", @courses[1].id)
 
         @collection1 = BookmarkedCollection.wrap(MyBookmarker, @scope1)
         @collection2 = BookmarkedCollection.wrap(MyBookmarker, @scope2)
