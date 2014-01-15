@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -84,6 +84,10 @@ require 'set'
 #         },
 #         "sis_course_id": {
 #           "description": "the SIS identifier for the course, if defined",
+#           "type": "string"
+#         },
+#         "integration_id": {
+#           "description": "the integration identifier for the course, if defined",
 #           "type": "string"
 #         },
 #         "name": {
@@ -412,6 +416,9 @@ class CoursesController < ApplicationController
   #
   # @argument course[sis_course_id] [Optional, String]
   #   The unique SIS identifier.
+  #
+  # @argument course[integration_id] [Optional, String]
+  #   The unique Integration identifier.
   #
   # @argument course[hide_final_grades] [Optional, Boolean]
   #   If this option is set to true, the totals in student grades summary will

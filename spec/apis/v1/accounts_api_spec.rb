@@ -40,6 +40,7 @@ describe "Accounts API", type: :request do
       json.sort_by { |a| a['id'] }.should == [
         {
           'id' => @a1.id,
+          'integration_id' => nil,
           'name' => 'root',
           'root_account_id' => nil,
           'parent_account_id' => nil,
@@ -51,6 +52,7 @@ describe "Accounts API", type: :request do
         },
         {
           'id' => @a2.id,
+          'integration_id' => nil,
           'name' => 'subby',
           'root_account_id' => @a1.id,
           'parent_account_id' => @a1.id,
@@ -145,6 +147,7 @@ describe "Accounts API", type: :request do
       json.should ==
         {
           'id' => @a1.id,
+          'integration_id' => nil,
           'name' => 'root',
           'root_account_id' => nil,
           'parent_account_id' => nil,

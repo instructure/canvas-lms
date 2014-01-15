@@ -105,6 +105,9 @@ describe SectionsController, type: :request do
           'id' => @section.id,
           'name' => @section.name,
           'course_id' => @course.id,
+          'sis_course_id' => @course.sis_source_id,
+          'sis_section_id' => @section.sis_source_id,
+          'integration_id' => nil,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil
@@ -118,6 +121,9 @@ describe SectionsController, type: :request do
           'id' => @section.id,
           'name' => @section.name,
           'course_id' => @course.id,
+          'sis_course_id' => @course.sis_source_id,
+          'sis_section_id' => @section.sis_source_id,
+          'integration_id' => nil,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil
@@ -144,6 +150,9 @@ describe SectionsController, type: :request do
           'id' => @section.id,
           'name' => @section.name,
           'course_id' => @course.id,
+          'sis_course_id' => @course.sis_source_id,
+          'sis_section_id' => @section.sis_source_id,
+          'integration_id' => nil,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil
@@ -157,9 +166,28 @@ describe SectionsController, type: :request do
           'id' => @section.id,
           'name' => @section.name,
           'course_id' => @course.id,
+          'sis_course_id' => @course.sis_source_id,
+          'sis_section_id' => @section.sis_source_id,
+          'integration_id' => nil,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil
+        }
+      end
+
+      it "should be accessible without a course context via integration id" do
+        @section.update_attribute(:integration_id, 'my_section')
+        json = api_call(:get, "#{@path_prefix}/sis_integration_id:my_section", @path_params.merge({ :id => "sis_integration_id:my_section" }))
+        json.should == {
+            'id' => @section.id,
+            'name' => @section.name,
+            'course_id' => @course.id,
+            'integration_id' => 'my_section',
+            'sis_course_id' => @course.sis_source_id,
+            'nonxlist_course_id' => nil,
+            'sis_section_id' => nil,
+            'start_at' => nil,
+            'end_at' => nil
         }
       end
 

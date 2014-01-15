@@ -91,24 +91,24 @@ module Api
 
   SIS_MAPPINGS = {
     'courses' =>
-      { :lookups => { 'sis_course_id' => 'sis_source_id', 'id' => 'id' },
+      { :lookups => { 'sis_course_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id' },
         :is_not_scoped_to_account => ['id'].to_set,
         :scope => 'root_account_id' },
     'enrollment_terms' =>
-      { :lookups => { 'sis_term_id' => 'sis_source_id', 'id' => 'id' },
+      { :lookups => { 'sis_term_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id' },
         :is_not_scoped_to_account => ['id'].to_set,
         :scope => 'root_account_id' },
     'users' =>
-      { :lookups => { 'sis_user_id' => 'pseudonyms.sis_user_id', 'sis_login_id' => 'pseudonyms.unique_id', 'id' => 'users.id' },
+      { :lookups => { 'sis_user_id' => 'pseudonyms.sis_user_id', 'sis_login_id' => 'pseudonyms.unique_id', 'id' => 'users.id', 'sis_integration_id' => 'pseudonyms.integration_id' },
         :is_not_scoped_to_account => ['users.id'].to_set,
         :scope => 'pseudonyms.account_id',
         :joins => [:pseudonym] },
     'accounts' =>
-      { :lookups => { 'sis_account_id' => 'sis_source_id', 'id' => 'id' },
+      { :lookups => { 'sis_account_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id' },
         :is_not_scoped_to_account => ['id'].to_set,
         :scope => 'root_account_id' },
     'course_sections' =>
-      { :lookups => { 'sis_section_id' => 'sis_source_id', 'id' => 'id' },
+      { :lookups => { 'sis_section_id' => 'sis_source_id', 'id' => 'id' , 'sis_integration_id' => 'integration_id' },
         :is_not_scoped_to_account => ['id'].to_set,
         :scope => 'root_account_id' },
     'groups' =>

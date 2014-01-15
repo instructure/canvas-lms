@@ -61,6 +61,7 @@ class Course < ActiveRecord::Base
                   :grading_standard,
                   :grading_standard_enabled,
                   :locale,
+                  :integration_id,
                   :hide_final_grades,
                   :hide_distribution_graphs,
                   :lock_all_announcements,

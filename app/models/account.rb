@@ -22,7 +22,7 @@ class Account < ActiveRecord::Base
     :turnitin_host, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
     :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
-    :default_user_storage_quota_mb, :default_group_storage_quota_mb
+    :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id
 
   include Workflow
   belongs_to :parent_account, :class_name => 'Account'

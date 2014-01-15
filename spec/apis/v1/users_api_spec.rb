@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -69,6 +69,8 @@ describe Api::V1::User do
           'sis_import_id' => nil,
           'id' => @user.id,
           'short_name' => 'User',
+          'sis_user_id' => 'xyz',
+          'integration_id' => nil,
           'login_id' => 'xyz',
           'sis_login_id' => 'xyz'
         }
@@ -89,6 +91,8 @@ describe Api::V1::User do
           'sis_import_id' => sis_batch.id,
           'id' => @user.id,
           'short_name' => 'User',
+          'sis_user_id' => 'xyz',
+          'integration_id' => nil,
           'login_id' => 'xyz',
           'sis_login_id' => 'xyz'
         }
@@ -148,9 +152,12 @@ describe Api::V1::User do
                       "sis_user_id"=>"sis-user-id",
                       "id"=>@student.id,
                       "short_name"=>"Student",
-                      "login_id"=>"pvuser@example.com",
+                      "sis_user_id"=>"sis-user-id",
+                      "integration_id" => nil,
                       "sis_import_id"=>@student.pseudonym.sis_batch_id,
-                      "sis_login_id"=>"pvuser@example.com"}
+                      "sis_login_id"=>"pvuser@example.com",
+                      "login_id" => "pvuser@example.com"
+      }
     end
 
     it 'should support manually passing the context' do
@@ -328,8 +335,10 @@ describe "Users API", type: :request do
           'sis_import_id' => nil,
           'id' => user.id,
           'short_name' => user.short_name,
-          'login_id' => user.pseudonym.unique_id,
-          'sis_login_id' => user.pseudonym.sis_user_id
+          'sis_user_id' => user.pseudonym.sis_user_id,
+          'integration_id' => nil,
+          'sis_login_id' => user.pseudonym.sis_user_id,
+          'login_id' => user.pseudonym.unique_id
         }]
       end
     end
@@ -458,6 +467,7 @@ describe "Users API", type: :request do
           "sis_import_id" => user.pseudonym.sis_batch_id,
           "login_id"      => "test@example.com",
           "sis_login_id"  => "test@example.com",
+          "integration_id" => nil,
           "locale"        => "en"
         }
       end
@@ -624,6 +634,7 @@ describe "Users API", type: :request do
           'sis_import_id' => nil,
           'id' => user.id,
           'short_name' => 'Tobias',
+          'integration_id' => nil,
           'login_id' => 'student@example.com',
           'sis_login_id' => 'student@example.com',
           'locale' => 'en'
