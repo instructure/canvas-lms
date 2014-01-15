@@ -298,15 +298,7 @@ class CollectionsController < ApplicationController
   end
 
   def preload_groups_collections_counts(groups)
-    counts_data = Collection.connection.execute(Collection.send(:sanitize_sql_array, [<<-SQL, groups.map(&:id)])).to_a
-      SELECT context_id AS group_id, COUNT(*) AS collections_count 
-      FROM collections 
-      WHERE context_id IN (?) AND context_type='Group' AND workflow_state='active' 
-      GROUP BY context_id
-    SQL
-    @collections_counts = {}
-    counts_data.each do |cd| 
-      @collections_counts[cd['group_id'].to_i] = cd['collections_count'].to_i
-    end
+    @collections_counts = Collection.where(context_id: groups, context_type: 'Group', workflow_state: 'active').
+      group(:context_id).count
   end
 end
