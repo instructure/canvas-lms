@@ -4,6 +4,7 @@ define [
   'compiled/models/content_migrations/ContentCheckbox'
   'jquery'
   'helpers/jquery.simulate'
+  'helpers/fakeENV'
   ], (CheckboxCollection, CheckboxView, CheckboxModel, $) ->
 
   class CheckboxHelper
@@ -29,7 +30,14 @@ define [
     @$fixtures = $('#fixtures')
     @checkboxView = undefined
     @$checkbox = -> @$fixtures.find('[type=checkbox]').first()
-    @$sublevelCheckboxes = -> @checkboxView.$el.find('ul [type=checkbox]')
+    @$carrot = -> @$fixtures.find('.checkbox-carrot').first()
+    @$sublevelCheckboxes = (scope) => 
+                            $boxes = @checkboxView.$el
+                                         .find('.collectionViewItems')
+                                         .last()
+                                         .find('[type=checkbox]')
+                            $boxes = $boxes.filter(scope) if scope
+                            $boxes
     @serverResponse = -> [200, { "Content-Type": "application/json" }, JSON.stringify([
                                               {
                                                   "type": "assignment_groups",
@@ -63,7 +71,7 @@ define [
                                               }
                                           ])]
 
-  module "Toplevel Content Checkbox Behaviors",
+  module "Content Checkbox Behaviors",
     teardown: -> CheckboxHelper.teardown()
 
   test 'renders a checkbox with name set from model property', ->
@@ -72,57 +80,37 @@ define [
 
     equal nameValue, 'copy[all_assignments]', 'Adds the correct name attribute from property'
 
-  test 'toplevel checkbox is checked by default', ->
-    CheckboxHelper.renderView()
-    ok CheckboxHelper.$checkbox().is(":checked"), "Checkbox is checked"
-
-  test 'sublevel checkbox is unchecked by default', ->
-    CheckboxHelper.renderView()
-    ok !CheckboxHelper.$sublevelCheckboxes().is(":checked"), "Checkbox is unchecked"
-
-  module "Sublevel Content Checkbox Behaviors",
+  module "Sublevel Content Checkbox and Carrot Behaviors",
     setup: ->
       @url = '/api/v1/courses/42/content_migrations/5/selective_data?type=assignments'
       @clock = sinon.useFakeTimers()
       @server = sinon.fakeServer.create()
       @server.respondWith('GET', @url, CheckboxHelper.serverResponse())
+
       CheckboxHelper.renderView(sub_items_url: @url)
-      CheckboxHelper.$checkbox().simulate 'click'
+      CheckboxHelper.$carrot().trigger 'fetchCheckboxes'
+
       @server.respond()
       @clock.tick 15
+
+      CheckboxHelper.checkboxView.$el.find("[data-state='closed']").show()
+
     teardown: ->
       @server.restore()
       @clock.restore()
       CheckboxHelper.teardown()
 
   test 'renders sublevel checkboxes', ->
-    equal CheckboxHelper.checkboxView.$el.find('.collectionViewItems').last().find('[type=checkbox]').length, 3,  "Renders all sublevel checkboxes"
+    equal CheckboxHelper.$sublevelCheckboxes().length, 3,  "Renders all sublevel checkboxes"
 
   test 'checkboxes with sublevel checkboxes and no url only display labels', ->
-    equal CheckboxHelper.checkboxView.$el.find('ul').first().find('[type=checkbox]').length, 3, "Doesn't include checkbox"
-
-  test 'clicking Select All, checks all sublevel checkboxes', ->
-    CheckboxHelper.checkboxView.$el.find("a").first().simulate 'click'
-
-    $subCheckboxes = CheckboxHelper.checkboxView.$el.find('ul').first().find('[type=checkbox]')
-    equal $subCheckboxes.length, 3
-    $subCheckboxes.each ->
-      ok $(this).is(':checked'), "Checked child checkboxes"
-
-  test 'clicking Select None, unchecks all sublevel checkboxes', ->
-    $subCheckboxes = CheckboxHelper.checkboxView.$el.find('ul').first().find('[type=checkbox]')
-    equal $subCheckboxes.length, 3
-
-    CheckboxHelper.checkboxView.$el.find("a").last().simulate 'click'
-    $subCheckboxes.each ->
-      ok !$(this).is(':checked'), "Unchecked child checkboxes"
+    equal CheckboxHelper.checkboxView.$el.find('label[title=Assignments]').siblings('[type=checkbox]').length, 0, "Doesn't include checkbox"
 
   test 'clicking on a checkbox should unmark and mark linked checkbox', ->
-    $subCheckboxes = CheckboxHelper.checkboxView.$el.find('ul').first().find('[type=checkbox]')
-    equal $subCheckboxes.length, 3
-
-    $($subCheckboxes[2]).simulate 'click'
-    ok !$($subCheckboxes[1]).is(':checked'), "Unchecked linked resource"
+    $subCheckboxes = CheckboxHelper.$sublevelCheckboxes()
 
     $($subCheckboxes[2]).simulate 'click'
     ok $($subCheckboxes[1]).is(':checked'), "Checked linked resource"
+
+    $($subCheckboxes[2]).simulate 'click'
+    ok !$($subCheckboxes[1]).is(':checked'), "Unchecked linked resource"
