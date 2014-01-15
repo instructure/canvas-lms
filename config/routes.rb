@@ -1355,6 +1355,10 @@ routes.draw do
     scope(:controller => :outcome_groups_api) do
       def og_routes(context)
         prefix = (context == "global" ? context : "#{context}s/:#{context}_id")
+        unless context == "global"
+          get "#{prefix}/outcome_groups", :action => :index, :path_name => "#{context}_outcome_groups"
+          get "#{prefix}/outcome_group_links", :action => :link_index, :path_name => "#{context}_outcome_group_links"
+        end
         get "#{prefix}/root_outcome_group", :action => :redirect, :path_name => "#{context}_redirect"
         get "#{prefix}/outcome_groups/account_chain", :action => :account_chain, :path_name => "#{context}_account_chain"
         get "#{prefix}/outcome_groups/:id", :action => :show, :path_name => "#{context}_outcome_group"

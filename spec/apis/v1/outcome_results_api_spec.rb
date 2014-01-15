@@ -206,6 +206,15 @@ describe "Outcome Results API", :type => :integration do
           course_id: @course.id.to_s, section_id: bogus_section.id.to_s)
         response.status.to_i.should == 400
       end
+
+      it "verifies the include[] parameter" do
+        outcome_course
+        course_with_teacher_logged_in(course: @course, active_all: true)
+        raw_api_call(:get, outcome_rollups_url(@course, include: ['invalid']),
+          controller: 'outcome_results', action: 'rollups', format: 'json',
+          course_id: @course.id.to_s, include: ['invalid'])
+        response.status.to_i.should == 400
+      end
     end
 
     describe "basic response" do
@@ -291,6 +300,40 @@ describe "Outcome Results API", :type => :integration do
           json['linked'].keys.sort.should == %w(outcomes users)
           json['linked']['outcomes'].size.should == 1
           json['linked']['users'].size.should == outcome_course_sections[0].students.count
+        end
+      end
+
+      describe "include[] parameter" do
+        it "side loads outcome groups" do
+          outcome_object
+          root_group = outcome_course.root_outcome_group
+          child_group = root_group.child_outcome_groups.create!(title: 'child group')
+          grandchild_group = child_group.child_outcome_groups.create!(title: 'grandchild_group')
+          course_with_teacher_logged_in(course: outcome_course, active_all: true)
+          api_call(:get, outcome_rollups_url(outcome_course, include: ['outcome_groups']),
+                   controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['outcome_groups'])
+          json = JSON.parse(response.body)
+          json['linked'].should be_present
+          json['linked']['outcome_groups'].should be_present
+          group_titles = json['linked']['outcome_groups'].map { |g| g['id'] }.sort
+          expected_titles = [root_group, child_group, grandchild_group].map(&:id).map(&:to_s).sort
+          group_titles.should == expected_titles
+          json['linked']['outcomes'].should be_present
+        end
+
+        it "side loads outcome links" do
+          outcome_object
+          course_with_teacher_logged_in(course: outcome_course, active_all: true)
+          api_call(:get, outcome_rollups_url(outcome_course, include: ['outcome_links']),
+                   controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['outcome_links'])
+          json = JSON.parse(response.body)
+          json['linked'].should be_present
+          json['linked']['outcome_links'].should be_present
+          json['linked']['outcome_links'].first['outcome_group']['id'].should ==
+            outcome_course.root_outcome_group.id.to_s
+          json['linked']['outcome_links'].first['outcome']['id'].should ==
+            outcome_object.id.to_s
+          json['linked']['outcomes'].should be_present
         end
       end
     end

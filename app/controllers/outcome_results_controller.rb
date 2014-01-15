@@ -66,6 +66,7 @@ class OutcomeResultsController < ApplicationController
   before_filter :require_context
   before_filter :require_outcome_context
   before_filter :verify_aggregate_parameter
+  before_filter :verify_include_parameter
   before_filter :require_outcomes
   before_filter :require_users
   
@@ -90,6 +91,9 @@ class OutcomeResultsController < ApplicationController
   #   results. it is an error to specify an id for an outcome which is not linked
   #   to the context.
   #
+  # @argument include[] [Optional, String, "outcome_groups"|"outcome_links"]
+  #   Specify additional collections to be side loaded with the result.
+  #
   # @example_response
   #    {
   #      "rollups": [OutcomeRollup],
@@ -101,14 +105,21 @@ class OutcomeResultsController < ApplicationController
   #
   #        // (Optional) Included if aggregate is 'course'
   #        "courses": [Course]
+  #
+  #        // (Optional) Included if include[] has outcome_groups
+  #        "outcome_groups": [OutcomeGroup],
+  #
+  #        // (Optional) Included if include[] has outcome_links
+  #        "outcome_links": [OutcomeLink]
   #      }
   #    }
   def rollups
-    if params[:aggregate] == 'course'
-      aggregate_rollups
-    else
-      user_rollups
+    json = case params[:aggregate]
+      when 'course' then aggregate_rollups
+      else user_rollups
     end
+    json[:linked].merge!(linked_include_collections)
+    render json: json if json
   end
 
   # Internal: Renders rollups for each user.
@@ -119,21 +130,9 @@ class OutcomeResultsController < ApplicationController
     @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes)
     rollups = outcome_results_rollups(@results, @users)
     json = outcome_results_rollups_json(rollups)
-    json[:linked] = {
-      outcomes: Api.recursively_stringify_json_ids(outcomes_json(@outcomes, @current_user, session)),
-      users: @users.map do |u|
-        hash = {
-          id: u.id.to_s,
-          name: u.name,
-          display_name: u.short_name,
-          sortable_name: u.sortable_name
-        }
-        hash[:avatar_image_url] = avatar_url_for_user(u, blank_fallback) if service_enabled?(:avatars)
-        hash
-      end
-    }
+    json[:linked] = { users: outcome_results_linked_users_json(@users) }
     json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
-    render json: json
+    json
   end
 
   # Internal: Renders the aggregate rollups for the context.
@@ -146,11 +145,48 @@ class OutcomeResultsController < ApplicationController
     aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context)]
     json = aggregate_outcome_results_rollups_json(aggregate_rollups)
     json[:linked] = {
-      outcomes: Api.recursively_stringify_json_ids(outcomes_json(@outcomes, @current_user, session)),
-      courses: [{id: @context.id.to_s, name: @context.name}]
+      courses: outcome_results_linked_courses_json([@context])
     }
     # no pagination, so no meta field
-    render json: json
+    json
+  end
+
+  # Internal: Adds linked collections to rollup json result based on the
+  # include[] parameter
+  #
+  # json - the Hash to add a linked field to.
+  #
+  # Returns a result Hash that should be merged into the linked section.
+  def linked_include_collections
+    linked = {}
+    includes = params[:include] + ['outcomes']
+    includes.uniq.each do |include_name|
+      linked[include_name] = self.send(include_method_name(include_name))
+    end
+    linked
+  end
+
+  # Internal: Serialize @outcomes for the context.
+  #
+  # Returns an Array of serialized outcomes.
+  def include_outcomes
+    outcome_results_include_outcomes_json(@outcomes)
+  end
+
+  # Internal: Query and serialize outcome groups for the context.
+  #
+  # Returns an Array of serialized outcome groups.
+  def include_outcome_groups
+    groups = @context.learning_outcome_groups
+    outcome_results_include_outcome_groups_json(groups)
+  end
+
+  # Internal: Query and serialize outcome links for the context.
+  #
+  # Returns an Array of serialized outcome links.
+  def include_outcome_links
+    links = @context.learning_outcome_links
+    outcome_results_include_outcome_links_json(links)
   end
 
   # Internal: Makes sure the context is a valid context for outcome_results and
@@ -180,9 +216,29 @@ class OutcomeResultsController < ApplicationController
     end
   end
 
+  # Internal: Verifies the include[] parameter
+  #
+  # Returns false and renders and error if the include parameter is invalid
+  #  Returns true otherwise
+  def verify_include_parameter
+    params[:include] ||= []
+    params[:include].each do |include_name|
+      unless self.respond_to? include_method_name(include_name)
+        render json: {message: "invalid include: #{include_name}"}, status: :bad_request
+        return false
+      end
+    end
+    true
+  end
+
+  # Internal: Returns the potential method name for the include parameter value.
+  def include_method_name(include_name)
+    "include_#{include_name}"
+  end
+
   # Internal: Finds context outcomes
   #
-  # Return an outcome scope
+  # Returns an outcome scope
   def require_outcomes
     @outcomes = @context.linked_learning_outcomes
     if params[:outcome_ids] && params[:outcome_group_id]

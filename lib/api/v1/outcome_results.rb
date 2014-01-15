@@ -30,6 +30,46 @@ module Api::V1::OutcomeResults
     }
   end
 
+  # Public: Serializes outcomes in a hash that can be added to the linked hash.
+  #
+  # Returns a Hash containing serialized outcomes.
+  def outcome_results_include_outcomes_json(outcomes)
+    outcomes.map { |o| Api.recursively_stringify_json_ids(outcome_json(o, @current_user, session)) }
+  end
+
+  # Public: Serializes outcome groups in a hash that can be added to the linked hash.
+  #
+  # Returns a Hash containing serialized outcome groups.
+  def outcome_results_include_outcome_groups_json(outcome_groups)
+    outcome_groups.map { |g| Api.recursively_stringify_json_ids(outcome_group_json(g, @current_user, session)) }
+  end
+
+  # Public: Serializes outcome links in a hash that can be added to the linked hash.
+  #
+  # Returns a Hash containing serialized outcome links.
+  def outcome_results_include_outcome_links_json(outcome_links)
+    outcome_links.map { |l| Api.recursively_stringify_json_ids(outcome_link_json(l, @current_user, session)) }
+  end
+
+  # Public: Returns an Array of serialized Course objects for linked hash.
+  def outcome_results_linked_courses_json(courses)
+    courses.map { |course| {id: course.id.to_s, name: course.name} }
+  end
+
+  # Public: Returns an Array of serialized User objects for the linked hash.
+  def outcome_results_linked_users_json(users)
+    users.map do |u|
+      hash = {
+        id: u.id.to_s,
+        name: u.name,
+        display_name: u.short_name,
+        sortable_name: u.sortable_name
+      }
+      hash[:avatar_image_url] = avatar_url_for_user(u, blank_fallback) if service_enabled?(:avatars)
+      hash
+    end
+  end
+
   # Public: Serializes the aggregate rollup. Uses the specified context for the
   # id and name fields.
   def aggregate_outcome_results_rollups_json(rollups)
