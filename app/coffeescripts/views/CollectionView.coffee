@@ -67,7 +67,7 @@ define [
     ##
     # @api public
 
-    toJSON: -> @options
+    toJSON: -> _.extend(@options, {ENV})
 
     ##
     # Reorder child views according to current collection ordering.
