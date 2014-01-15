@@ -14,7 +14,6 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     end
 
     task :nonselenium, :count do |t, args|
-
       Rake::Task['spec:single'].execute #first rake task to run the files that fail in parallel in a single thread
 
       if File.zero?('tmp/parallel_log/rspec.failures')
@@ -23,6 +22,14 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
         abort(`cat tmp/parallel_log/rspec.failures`)
       end
 
+    end
+
+    task :nonseleniumallparallel, :count do |t, args|
+      require "parallelized_specs"
+      count = args[:count]
+      test_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb')
+      test_files.map! { |f| "#{Rails.root}/#{f}" }
+      Rake::Task['parallel:spec'].invoke(count, '', '', test_files.join(' '))
     end
 
     task :selenium, :count, :build_section do |t, args|
