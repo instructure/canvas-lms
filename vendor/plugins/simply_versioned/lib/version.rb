@@ -23,8 +23,9 @@ class Version < ActiveRecord::Base #:nodoc:
     obj = versionable_type.constantize.new
     YAML::load( self.yaml ).each do |var_name,var_value|
       # INSTRUCTURE:  added if... so that if a column is removed in a migration after this was versioned it doesen't die with NoMethodError: undefined method `some_column_name=' for ...
-      obj.__send__( "#{var_name}=", var_value ) if obj.respond_to?("#{var_name}=")
+       obj.write_attribute(var_name, var_value) if obj.class.columns_hash[var_name]
     end
+    obj.instance_variable_set(:@new_record, false)
     obj.simply_versioned_options[:on_load].try(:call, obj, self)
     # INSTRUCTURE: Added to allow model instances pulled out
     # of versions to still know their version number
