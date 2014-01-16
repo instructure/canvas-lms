@@ -44,11 +44,15 @@
 
 </div>
 
+
 <div class="control-group">
-  <label for="assignment_points_possible" class="control-label">
-    {{#t "points_possible"}}Points{{/t}}
-  </label>
-  <div class="controls">
+  <div class="form-column-left no-group">
+    <label for="assignment_points_possible">
+      {{#t "points_possible"}}Points{{/t}}
+    </label>
+  </div>
+
+  <div class="form-column-right">
     <input id="assignment_points_possible"
       name="points_possible"
       value="{{pointsPossible}}"
@@ -57,25 +61,29 @@
   </div>
 </div>
 
-<div id="assignment_due_date_controls" 
-  class="control-group"
-  style="{{hiddenUnless isSimple}}">
-  <label for="assignment_due_date" class="control-label">
-    {{#t "due_date"}}Due Date{{/t}}
-  </label>
-  <div class="controls">
+<div id="grading_type_selector" class="control-group"></div>
+
+<div style="{{hiddenUnless isSimple}}" id="assignment_due_date_controls">
+  <div class="form-column-left no-group">
+    <label for="assignment_due_date">
+      {{#t "due_date"}}Due Date{{/t}}
+    </label>
+  </div>
+  <div class="form-column-right">
+    <div class="control-group">
     <input id="assignment_due_date"
-      name="due_at"
-      value="{{datetimeFormatted dueAt}}"
-      type="text"
-      {{#if isSimple}}
-        class="date_field datetime_field hasDatePicker"
-      {{/if}}
-      {{disabledIfIncludes frozenAttributes "due_at"}}/>
+    name="due_at"
+    value="{{datetimeFormatted dueAt}}"
+    type="text"
+    {{#if isSimple}}
+      class="date_field datetime_field hasDatePicker"
+    {{/if}}
+    {{disabledIfIncludes frozenAttributes "due_at"}}/>
+    </div>
   </div>
 </div>
 
-<fieldset id="assignment_group_selector" class="control-group">
+<fieldset id="assignment_group_selector">
 </fieldset>
 
 {{#if isSimple}}
@@ -95,11 +103,10 @@
   class="advanced-togglable-{{isSimple}}"
   style="{{hiddenIf isSimple}}">
 
-  <div id="grading_type_selector" class="control-group"></div>
-
   <div id="graded_assignment_fields"
     aria-expanded="{{not isNotGraded}}"
-    style="{{hiddenIf isNotGraded}}">
+    style="{{hiddenIf isNotGraded}}"
+    class="content-box">
 
     {{>[assignments/submission_types_form]}}
 
@@ -120,16 +127,17 @@
   </div>
 
   {{#if canFreeze}}
-    <fieldset>
-      <div class="control-group controls">
+    <div class="form-column-left"></div>
+    <div class="form-column-right">
+      <fieldset>
         <label class="checkbox">
           {{checkbox "freezeOnCopy"
             id="assignment_freeze_on_copy"
             name="freeze_on_copy"}}
           {{#t "freeze_properties"}}Lock assignment properties when copied{{/t}}
         </label>
-      </div>
-    </fieldset>
+      </fieldset>
+    </div>
   {{/if}}
 
   <div class='js-assignment-overrides'></div>

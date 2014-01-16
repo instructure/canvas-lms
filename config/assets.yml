@@ -115,6 +115,8 @@ stylesheets:
     - public/stylesheets/compiled/assignments.css
     - public/stylesheets/compiled/grading_standards.css
     - public/stylesheets/static/embed_content.css
+  assignments_edit:
+    - public/stylesheets/compiled/assignments_edit.css
   new_assignments:
     - public/stylesheets/compiled/new_assignments.css
   grading_standards:
