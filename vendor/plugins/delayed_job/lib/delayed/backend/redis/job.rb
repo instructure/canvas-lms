@@ -124,7 +124,7 @@ class Job
       sql_type.to_s, null)
   end
 
-  attr_protected
+  attr_protected if CANVAS_RAILS2
 
   def self.tableless?
     true
