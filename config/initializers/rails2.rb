@@ -170,6 +170,14 @@ ActiveRecord::Base.class_eval do
     end
     alias_method_chain :quote_bound_value, :relations
   end
+
+  def save_with_rails3_options(options = true)
+    if options == { validate: false }
+      options = false
+    end
+    save_without_rails3_options(options)
+  end
+  alias_method_chain :save, :rails3_options
 end
 
 ActiveRecord::NamedScope::ClassMethods.module_eval do
