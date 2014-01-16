@@ -647,6 +647,12 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
       },
+      :manage_data_exports => {
+        :label => lambda { t('permissions.generate_data_exports', "Generate Data Exports") }, #TODO add this setting to Permissions pane in account/settings.html.erb
+        :account_only => true,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership)
+      },
       :manage_storage_quotas => {
           :label => lambda { t('permissions.manage_storage_quotas', "Manage storage quotas") },
           :account_only => true,
