@@ -62,7 +62,10 @@ require [
       @list.selectedMessages = [] if event == 'unstar'       && @filters.type == 'starred'
       messages
 
+    lastFetch: null
+
     onSelected: (model) =>
+      @lastFetch.abort() if @lastFetch
       @header.onModelChange(null, @model)
       @model = model
       messages = @list.selectedMessages
@@ -82,7 +85,8 @@ require [
         if model.get('messages')
           @selectConversation(model)
         else
-          @detail.$el.disableWhileLoading(model.fetch(success: @selectConversation))
+          @lastFetch = model.fetch(success: @selectConversation)
+          @detail.$el.disableWhileLoading(@lastFetch)
 
     selectConversation: (model) =>
       @header.onModelChange(model, null)
@@ -220,6 +224,7 @@ require [
       @detail.on('reply-all',   @onReplyAll)
       @detail.on('forward',     @onForward)
       $(document).ready(@onPageLoad)
+      $(window).keydown(@onKeyDown)
 
     onPageLoad: (e) ->
       # we add the top style here instead of in the css because
@@ -283,6 +288,14 @@ require [
         folderId: ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID
         account_context_code: ENV.CONVERSATIONS.ACCOUNT_CONTEXT_CODE
 
+    onKeyDown: (e) =>
+      nodeName = e.target.nodeName.toLowerCase()
+      return if nodeName == 'input' || nodeName == 'textarea'
+      ctrl = e.ctrlKey || e.metaKey
+      if e.which == 65 && ctrl # ctrl-a
+        e.preventDefault()
+        @list.selectAll()
+        return
 
   window.conversationsRouter = new ConversationsRouter
   Backbone.history.start()
