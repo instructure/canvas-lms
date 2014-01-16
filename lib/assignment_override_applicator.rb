@@ -192,8 +192,7 @@ module AssignmentOverrideApplicator
 
   def self.copy_preloaded_associations_to_clone(orig, clone)
     orig.class.reflections.keys.each do |association|
-      ivar = "@#{association}"
-      clone.instance_variable_set ivar, orig.instance_variable_get(ivar)
+      clone.send(:association_instance_set, association, orig.send(:association_instance_get, association))
     end
   end
 
