@@ -137,13 +137,15 @@ class GradeSummaryPresenter
 
   def submission_counts
     @submission_counts ||= @context.assignments.active
+      .except(:order)
       .joins(:submissions)
       .group("assignments.id")
       .count("submissions.id")
   end
 
   def assignment_stats
-    @stats ||= @context.active_assignments
+    @stats ||= @context.assignments.active
+    .except(:order)
     .joins(:submissions)
     .group("assignments.id")
     .select("assignments.id, max(score) max, min(score) min, avg(score) avg")
