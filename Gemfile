@@ -172,8 +172,8 @@ group :test do
     gem 'rspec', '1.3.2'
     gem 'rspec-rails', '1.3.4'
   else
-    gem 'rspec', '2.13.0'
-    gem 'rspec-rails', '2.13.0'
+    gem 'rspec', '2.14.1'
+    gem 'rspec-rails', '2.14.1'
   end
   gem 'sequel', '4.5.0', :require => false
   gem 'selenium-webdriver', '2.39.0'
