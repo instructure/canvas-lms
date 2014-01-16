@@ -11,7 +11,8 @@ script:
 gemfile:
   - Gemfile
 env:
-  - SPEC="spec/apis/**/[a-g]*_spec.rb"
+  - SPEC="spec/apis/**/[a-c]*_spec.rb"
+  - SPEC="spec/apis/**/[d-g]*_spec.rb"
   - SPEC="spec/apis/**/[h-m]*_spec.rb"
   - SPEC="spec/apis/**/[n-z]*_spec.rb"
   - SPEC="spec/controllers/**/*_spec.rb"
