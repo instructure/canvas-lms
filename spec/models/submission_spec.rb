@@ -994,6 +994,36 @@ describe Submission do
       }
     end
   end
+
+  describe "#assign_assessor" do
+    def peer_review_assignment
+      assignment = @course.assignments.build(title: 'Peer review',
+        due_at: Time.now - 1.day,
+        points_possible: 5,
+        submission_types: 'online_text_entry')
+      assignment.peer_reviews_assigned = true
+      assignment.peer_reviews = true
+      assignment.automatic_peer_reviews = true
+      assignment.save!
+
+      assignment
+    end
+
+    before(:each) do
+      student_in_course(active_all: true)
+      @student2 = user
+      @course.enroll_student(@student2).accept!
+      @assignment = peer_review_assignment
+      @assignment.submit_homework(@student,  body: 'Lorem ipsum dolor')
+      @assignment.submit_homework(@student2, body: 'Sit amet consectetuer')
+    end
+
+    it "should send a reminder notification" do
+      AssessmentRequest.any_instance.expects(:send_reminder!).once
+      submission1, submission2 = @assignment.submissions
+      submission1.assign_assessor(submission2)
+    end
+  end
 end
 
 def submission_spec_model(opts={})

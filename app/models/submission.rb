@@ -968,7 +968,7 @@ class Submission < ActiveRecord::Base
     res.user_id = self.user_id
     res.workflow_state = 'assigned' if res.new_record?
     just_created = res.new_record?
-    res.save
+    res.send_reminder! # this method also saves the assessment_request
     case obj
     when User
       user = obj
