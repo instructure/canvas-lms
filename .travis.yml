@@ -1,5 +1,7 @@
 rvm:
   - "1.9.3"
+services:
+  - redis-server
 before_script:
   - find ./config -depth -name "*.yml.example" -exec sh -c 'cp "$1" "${1%.yml.example}.yml"' _ {} \;
   - psql -c 'create database myapp_test;' -U postgres; cp ./config/database.yml.travis ./config/database.yml
