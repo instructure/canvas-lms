@@ -1,8 +1,9 @@
 define [
   'jquery'
+  'underscore'
   'Backbone'
   'jst/collectionView'
-], ($, Backbone, template) ->
+], ($, _, Backbone, template) ->
 
   ##
   # Renders a collection of items with an item view. Binds to a handful of
