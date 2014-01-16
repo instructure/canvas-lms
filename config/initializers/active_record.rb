@@ -1,8 +1,6 @@
 class ActiveRecord::Base
   # XXX: Rails3 There are lots of issues with these patches in Rails3 still
 
-  extend ActiveSupport::Memoizable # used for a lot of the reporting queries
-
   unless CANVAS_RAILS2
     class << self
       def preload_associations(records, associations, preload_options={})
