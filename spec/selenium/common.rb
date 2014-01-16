@@ -85,7 +85,7 @@ module SeleniumTestsHelperMethods
       end
       begin
         tries ||= 3
-        puts "Thread #{THIS_ENV} connecting to hub over port #{PORT_NUM}, try ##{tries}"
+        puts "Thread: provisioning selenium driver"
         driver = nil
         driver = Selenium::WebDriver.for(browser, options)
       rescue Exception => e
