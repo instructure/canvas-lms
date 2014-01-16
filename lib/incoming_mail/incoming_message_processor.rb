@@ -317,7 +317,7 @@ module IncomingMail
       unless outgoing_message_delivered
         # Can't use our usual mechanisms, so just try to send it once now
         begin 
-          res = Mailer.deliver_message(outgoing_message)
+          res = Mailer.create_message(outgoing_message).deliver
         rescue => e
           # TODO: put some kind of error logging here?
         end

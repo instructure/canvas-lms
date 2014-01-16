@@ -189,7 +189,7 @@ class CommunicationChannel < ActiveRecord::Base
     m = self.messages.new
     m.to = self.path
     m.body = t :body, "Your Canvas verification code is %{verification_code}", :verification_code => code
-    Mailer.message(m).deliver rescue nil # omg! just ignore delivery failures
+    Mailer.create_message(m).deliver rescue nil # omg! just ignore delivery failures
   end
 
   # If you are creating a new communication_channel, do nothing, this just

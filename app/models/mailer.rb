@@ -86,17 +86,17 @@ class Mailer < ActionMailer::Base
       end
 
       def deliver
-        Mailer.deliver_message(@message)
+        Mailer.deliver_create_message(@message)
       end
     end
 
-    def self.message(m)
+    def self.create_message(m)
       Proxy.new(m)
     end
   end
 
   # define in rails3-style
-  def message(m)
+  def create_message(m)
     # notifications have context, bounce replies don't.
     headers('Auto-Submitted' => m.context ? 'auto-generated' : 'auto-replied')
 
