@@ -1,5 +1,14 @@
 <div class="outcome-details carat-bottom">
   <div class="title">{{title}}</div>
+  {{#if ratings.result_count}}
+    <ol class="ratings">
+    {{#each ratings}}
+      <li class="rating">{{description}}: {{percent}}%</li>
+    {{/each}}
+    </ol>
+  {{else}}
+    {{#t "no_results"}}(no results){{/t}}
+  {{/if}}
   <div class="mastery">{{#t "mastery_set_at"}}Mastery set at{{/t}}: {{mastery_points}}</div>
   <div class="description">{{{description}}}</div>
   <div class="view-more"><a href="{{url}}">{{#t "view_more_details"}}view more details{{/t}}</a></div>

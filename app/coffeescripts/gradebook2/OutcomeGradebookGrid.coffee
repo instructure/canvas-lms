@@ -245,13 +245,16 @@ define [
         return 'near-mastery' if score >= nearMastery
         'remedial'
 
-      headerRowCell: ({node, column, grid}, fn = Grid.averageFn) ->
-        return Grid.View.studentHeaderRowCell(node, column, grid) if column.field == 'student'
-
-        results = _.chain(grid.getData())
+      getColumnResults: (data, column) ->
+        _.chain(data)
           .pluck(column.field)
           .reject((value) -> _.isNull(value) or _.isUndefined(value))
           .value()
+
+      headerRowCell: ({node, column, grid}, fn = Grid.averageFn) ->
+        return Grid.View.studentHeaderRowCell(node, column, grid) if column.field == 'student'
+
+        results = Grid.View.getColumnResults(grid.getData(), column)
         return $(node).empty() unless results.length
         value = Grid.Math[fn].call(this, (results))
         $(node).empty().append(Grid.View.cell(null, null, value, column, null))
@@ -270,6 +273,16 @@ define [
 
       headerCell: ({node, column, grid}, fn = Grid.averageFn) ->
         return if column.field == 'student'
-        # TODO: calculate outcome statistics when opening the popup
-        view = new OutcomeColumnView(el: node, attributes: column.outcome)
+        totalsFn = _.partial(Grid.View.calculateRatingsTotals, grid, column)
+        view = new OutcomeColumnView(el: node, attributes: column.outcome, totalsFn: totalsFn)
         view.render()
+
+      calculateRatingsTotals: (grid, column) ->
+        results = Grid.View.getColumnResults(grid.getData(), column)
+        ratings = column.outcome.ratings
+        ratings.result_count = results.length
+        points = _.pluck ratings, 'points'
+        counts = _.countBy results, (result) ->
+          _.find points, (x) -> x <= result
+        _.each ratings, (rating) ->
+          rating.percent = Math.round((counts[rating.points] || 0) / results.length * 100)
