@@ -198,7 +198,12 @@
 
   </div>
 
-  <a href="#details">Submission Details</a>
+  <button
+    id="submission_details"
+    {{action 'openDialog' 'submission' target=view}}
+  >
+   {{#t 'submission_details'}}Submission Details{{/t}}
+  </button>
 
 </div>
 

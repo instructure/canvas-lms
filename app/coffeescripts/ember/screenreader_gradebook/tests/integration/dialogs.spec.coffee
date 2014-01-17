@@ -70,6 +70,22 @@ define [
   test 'curve grades dialog displays properly', ->
     openAndCloseDialog('#curve_grades', "Curve Grades for #{@selected.name}")
 
+  module 'screenreader_gradebook: submission dialogs open and close',
+    setup: ->
+      App = startApp()
+      visit('/').then =>
+        @controller = App.__container__.lookup('controller:screenreader_gradebook')
+        @assignment = @controller.get('assignments').objectAt(0)
+        @student = @controller.get('students').objectAt(0)
+        Ember.run =>
+          @controller.setProperties
+            'selectedAssignment': @assignment
+            'selectedStudent': @student
+    teardown: ->
+      Ember.run App, 'destroy'
+
+  test 'submission details dialog', ->
+    openAndCloseDialog('#submission_details', "#{@student.name}")
 
   module 'screenreader_gradebook: assignment dialogs saving',
     setup: ->

@@ -3,10 +3,8 @@ define [
   'compiled/gradebook2/GradebookHeaderMenu'
   'compiled/gradebook2/AssignmentGroupWeightsDialog'
   'compiled/gradebook2/UploadDialog'
-], (Ember, GradebookHeaderMenu, AssignmentGroupWeightsDialog,  UploadDialog) ->
-
-  # http://emberjs.com/api/classes/Ember.View.html
-  # http://emberjs.com/guides/views/
+  'compiled/SubmissionDetailsDialog'
+], (Ember, GradebookHeaderMenu, AssignmentGroupWeightsDialog,  UploadDialog, SubmissionDetailsDialog) ->
 
   ScreenreaderGradebookView = Ember.View.extend
 
@@ -27,6 +25,8 @@ define [
           selected_section: con.get('selectedSection')?.id
           context_id: ENV.GRADEBOOK_OPTIONS.context_id
           context_url: ENV.GRADEBOOK_OPTIONS.context_url
+          speed_grader_enabled: ENV.GRADEBOOK_OPTIONS.speed_grader_enabled
+          change_grade_url: ENV.GRADEBOOK_OPTIONS.change_grade_url
 
         dialogs =
           'upload': UploadDialog::init
@@ -34,12 +34,17 @@ define [
           'message_students': GradebookHeaderMenu::messageStudentsWho
           'set_default_grade': GradebookHeaderMenu::setDefaultGrade
           'curve_grades': GradebookHeaderMenu::curveGrades
+          'submission': SubmissionDetailsDialog.open
 
-        if dialogType is 'ag_weights'
-          options =
-            context: ENV.GRADEBOOK_OPTIONS
-            assignmentGroups: con.get('assignment_groups').toArray()
-          @agDialog.update(options)
-          @agDialog.$dialog.dialog('open')
-        else
-          dialogs[dialogType]?.call(this, options)
+        switch dialogType
+          when 'ag_weights'
+            options =
+              context: ENV.GRADEBOOK_OPTIONS
+              assignmentGroups: con.get('assignment_groups').toArray()
+            @agDialog.update(options)
+            @agDialog.$dialog.dialog('open')
+          when 'submission'
+            dialogs[dialogType]?.call(this, con.get('selectedAssignment'), con.get('selectedStudent'), options)
+          else
+            dialogs[dialogType]?.call(this, options)
+

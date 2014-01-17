@@ -490,6 +490,7 @@ define [
           context_url: '/courses/1'
           context_id: 1
           group_weighting_scheme: "equal"
+          change_grade_url: 'http://localhost:3000/api/v1/courses/2/assignments/:assignment/submissions/:submission'
         }
       }
 
