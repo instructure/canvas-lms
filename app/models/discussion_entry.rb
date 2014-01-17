@@ -44,7 +44,7 @@ class DiscussionEntry < ActiveRecord::Base
   after_create :create_participants
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :discussion_topic_id
-  before_validation(on: :create, &:set_depth)
+  before_validation :set_depth, :on => :create
   validate :validate_depth, on: :create
 
   sanitize_field :message, Instructure::SanitizeField::SANITIZE
