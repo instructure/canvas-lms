@@ -501,7 +501,8 @@ end
     roles = opts[:roles] || []
     message = opts[:message] || "hi there"
     @account = opts[:account] || Account.default
-    @announcement = @account.announcements.create!(message: message, required_account_service: req_service)
+    @announcement = @account.announcements.build(message: message, required_account_service: req_service)
+    @announcement.start_at = opts[:start_at] || 5.minutes.ago.utc
     @announcement.account_notification_roles.build(roles.map{ |r| { account_notification_id: @announcement.id, role_type: r} }) unless roles.empty?
     @announcement.save!
   end
