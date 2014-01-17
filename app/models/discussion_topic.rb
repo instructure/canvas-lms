@@ -441,8 +441,8 @@ class DiscussionTopic < ActiveRecord::Base
 
   scope :before, lambda { |date| where("discussion_topics.created_at<?", date) }
 
-  scope :by_position, order("discussion_topics.position DESC, discussion_topics.created_at DESC")
-  scope :by_last_reply_at, order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC")
+  scope :by_position, order("discussion_topics.position DESC, discussion_topics.created_at DESC, discussion_topics.id DESC")
+  scope :by_last_reply_at, order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC")
 
   alias_attribute :available_from, :delayed_post_at
   alias_attribute :unlock_at, :delayed_post_at

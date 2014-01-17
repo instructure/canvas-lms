@@ -306,7 +306,7 @@ class DiscussionEntry < ActiveRecord::Base
   scope :after, lambda { |date| where("created_at>?", date) }
   scope :top_level_for_topics, lambda {|topics| where(:root_entry_id => nil, :discussion_topic_id => topics) }
   scope :all_for_topics, lambda { |topics| where(:discussion_topic_id => topics) }
-  scope :newest_first, order("discussion_entries.created_at DESC")
+  scope :newest_first, order("discussion_entries.created_at DESC, discussion_entries.id DESC")
 
   def to_atom(opts={})
     author_name = self.user.present? ? self.user.name : t('atom_no_author', "No Author")
