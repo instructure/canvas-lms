@@ -274,7 +274,14 @@ class User < ActiveRecord::Base
     order_clause = clause = sortable_name_order_by_clause
     order_clause = "#{clause} DESC" if options[:direction] == :descending
     scope = self.order(order_clause)
-    if CANVAS_RAILS2 ? (scope.scope(:find, :select)) : scope.select_values.present?
+    if CANVAS_RAILS2
+      if (scope.scope(:find, :select))
+        scope = scope.select(clause)
+      end
+    else
+      if scope.select_values.empty?
+        scope = scope.select(self.arel_table[Arel.star])
+      end
       scope = scope.select(clause)
     end
     if CANVAS_RAILS2 ? scope.scope(:find, :group) : scope.group_values.present?
