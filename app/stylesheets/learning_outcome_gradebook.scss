@@ -143,8 +143,12 @@ $page-dark: #ebeff2;
     color: $font-color;
   }
 
-  .slick-header-column.ui-state-hover {
+  .slick-header-column.ui-state-hover, .slick-header-column.slick-header-column-active {
     background: none;
+  }
+
+  .slick-header-column:hover .slick-resizable-handle {
+    background-color: $border-light;
   }
 
   .ui-widget-content {
@@ -180,8 +184,8 @@ $page-dark: #ebeff2;
     }
   }
 
-  .slick-headerrow {
-    border: 1px solid transparent;
+  .slick-headerrow, .slick-header {
+    border-left: 1px solid transparent;
   }
 
   .slick-headerrow-column {
@@ -193,6 +197,7 @@ $page-dark: #ebeff2;
     border-top-color: $border-light;
     line-height: 37px;
     min-height: 37px;
+    height: 40px;
 
     &.ui-state-default {
       padding: 0;
@@ -227,18 +232,15 @@ $page-dark: #ebeff2;
       height: 37px;
       line-height: 37px;
       padding: 0;
-      width: 120px;
     }
   }
 
   .outcome-student-header-cell {
     text-align: right;
-    width: 228px
   }
 
   .outcome-student-cell.slick-cell {
     font-size: 14px;
-    width: 228px;
   }
 
   .avatar-circle {
@@ -259,7 +261,7 @@ $page-dark: #ebeff2;
 }
 
 .outcome-cell-wrapper {
-  text-align: right;
+  text-align: center;
 }
 
 .outcome-score {
@@ -268,11 +270,11 @@ $page-dark: #ebeff2;
 
 .outcome-result {
   border-radius: 3px;
-  display: block;
-  float: right;
+  display: inline-block;
   height: 18px;
-  margin: 9px 20px 0 10px;
   width: 18px;
+  margin-left: 10px;
+  vertical-align: text-top;
 
   &.mastery      { background: $mastery-green; }
   &.near-mastery { background: $mastery-yellow; }

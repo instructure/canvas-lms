@@ -62,6 +62,7 @@ define [
     Util:
       COLUMN_OPTIONS:
         width: 121
+        minWidth: 50
 
       # Public: Translate an API response to columns and rows that can be used by SlickGrid.
       #

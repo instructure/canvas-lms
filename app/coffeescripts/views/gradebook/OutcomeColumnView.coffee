@@ -13,4 +13,5 @@ define [
       click: 'click'
 
     click: (e) ->
+      return if $(e.target).is('.slick-resizable-handle')
       @popover = new Popover(e, @popover_template(@attributes))
