@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
 
-describe "AuthenticationAudit API", type: :integration do
+describe "AuthenticationAudit API", type: :request do
   context "not configured" do
     before do
       Canvas::Cassandra::Database.stubs(:configured?).with('auditors').returns(false)

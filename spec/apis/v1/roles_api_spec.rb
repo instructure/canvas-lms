@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Roles API", :type => :integration do
+describe "Roles API", type: :request do
   before do
     @account = Account.default
     account_admin_user(:account => @account)

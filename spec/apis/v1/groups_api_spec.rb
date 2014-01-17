@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
-describe "Groups API", :type => :integration do
+describe "Groups API", type: :request do
   def group_json(group, user)
     {
       'id' => group.id,

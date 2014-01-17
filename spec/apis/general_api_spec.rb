@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 
-describe "API", :type => :integration do
+describe "API", type: :request do
   describe "Api::V1::Json" do
     it "should merge user options with the default api behavior" do
       obj = Object.new

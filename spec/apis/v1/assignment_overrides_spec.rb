@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe AssignmentOverridesController, :type => :integration do
+describe AssignmentOverridesController, type: :request do
   def validate_override_json(override, json)
     json['id'].should == override.id
     json['assignment_id'].should == override.assignment_id

@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe ContentExportsApiController, type: :integration do
+describe ContentExportsApiController, type: :request do
   let(:t_teacher) do
     user(active_all: true)
   end

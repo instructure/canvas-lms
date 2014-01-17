@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
-describe "API Authentication", :type => :integration do
+describe "API Authentication", type: :request do
 
   before do
     @key = DeveloperKey.create!

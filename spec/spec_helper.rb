@@ -25,6 +25,20 @@ if CANVAS_RAILS2
   require 'spec'
   # require 'spec/autorun'
   require 'spec/rails'
+
+  # integration specs were renamed to request specs in rspec 2
+  def describe_with_rspec2_types(*args, &block)
+    unless args.last.is_a?(Hash)
+      args << {}
+    end
+    if args.last[:type] == :request
+      args.last[:type] = :integration
+    end
+    args.last[:location] ||= caller(0)[1]
+    describe_without_rspec2_types(*args, &block)
+  end
+  alias :describe_without_rspec2_types :describe
+  alias :describe :describe_with_rspec2_types
 else
   require 'rspec/rails'
 end

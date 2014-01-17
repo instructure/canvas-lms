@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Collections API", :type => :integration do
+describe "Collections API", type: :request do
   shared_examples_for "full access to collections" do
     it "should allow retrieving a paginated collection list" do
       json = api_call(:get, @collections_path, @collections_path_options)

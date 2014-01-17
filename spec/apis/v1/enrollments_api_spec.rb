@@ -19,7 +19,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe EnrollmentsApiController, :type => :integration do
+describe EnrollmentsApiController, type: :request do
   describe "enrollment creation" do
     context "an admin user" do
       before do

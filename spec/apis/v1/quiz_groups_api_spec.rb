@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
-describe QuizGroupsController, :type => :integration do
+describe QuizGroupsController, type: :request do
 
   describe "POST /api/v1/courses/:course_id/quizzes/:quiz_id/groups (create)" do
 

@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe SectionsController, :type => :integration do
+describe SectionsController, type: :request do
   describe '#index' do
     USER_API_FIELDS = %w(id name sortable_name short_name)
 

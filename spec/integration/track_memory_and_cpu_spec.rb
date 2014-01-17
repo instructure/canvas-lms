@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec/spec_helper')
 
-describe "memory and cpu tracking", :type => :integration do
+describe "memory and cpu tracking", type: :request do
 
   it "should pass cpu info to statsd" do
     account = Account.default

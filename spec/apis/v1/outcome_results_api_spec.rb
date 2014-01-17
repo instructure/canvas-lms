@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Outcome Results API", :type => :integration do
+describe "Outcome Results API", type: :request do
 
   let(:outcome_course) do
     course(active_all: true) unless @course

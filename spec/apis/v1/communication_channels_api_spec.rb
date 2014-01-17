@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe 'CommunicationChannels API', :type => :integration do
+describe 'CommunicationChannels API', type: :request do
   describe 'index' do
     before do
       @someone = user_with_pseudonym

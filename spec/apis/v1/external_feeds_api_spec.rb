@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe 'ExternalFeedsController', :type => :integration do
+describe 'ExternalFeedsController', type: :request do
   shared_examples_for "Announcement External Feeds" do
     before do
       @url_params = { :controller => "external_feeds", :action => "index", :format => "json" }

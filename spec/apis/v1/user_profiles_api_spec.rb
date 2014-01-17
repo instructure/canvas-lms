@@ -29,7 +29,7 @@ class TestUserApi
   end
 end
 
-describe "User Profile API", :type => :integration do
+describe "User Profile API", type: :request do
   before do
     @admin = account_admin_user
     course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'pvuser@example.com'))

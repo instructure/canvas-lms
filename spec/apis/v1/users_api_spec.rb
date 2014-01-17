@@ -204,7 +204,7 @@ describe Api::V1::User do
 
 end
 
-describe "Users API", :type => :integration do
+describe "Users API", type: :request do
   def avatar_url(id)
     "http://www.example.com/images/users/#{User.avatar_key(id)}?fallback=http%3A%2F%2Fwww.example.com%2Fimages%2Fmessages%2Favatar-50.png"
   end

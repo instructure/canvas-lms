@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe SisImportsApiController, :type => :integration do
+describe SisImportsApiController, type: :request do
   before do
     @user = user_with_pseudonym :active_all => true
     user_session @user

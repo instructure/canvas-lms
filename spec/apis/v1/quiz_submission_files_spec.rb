@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
-describe QuizSubmissionFilesController, :type => :integration do
+describe QuizSubmissionFilesController, type: :request do
 
   context "quiz submissions file uploads" do
     before do

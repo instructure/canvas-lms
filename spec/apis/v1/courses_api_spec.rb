@@ -127,7 +127,7 @@ describe Api::V1::Course do
   end
 end
 
-describe CoursesController, :type => :integration do
+describe CoursesController, type: :request do
   USER_API_FIELDS = %w(id name sortable_name short_name)
 
   before do
@@ -1868,7 +1868,7 @@ def each_copy_option
    [:modules, :context_modules], [:outcomes, :created_learning_outcomes]].each{|o| yield o}
 end
 
-describe ContentImportsController, :type => :integration do
+describe ContentImportsController, type: :request do
   before(:each) do
     course_with_teacher_logged_in(:active_all => true, :name => 'origin story')
     @copy_from = @course

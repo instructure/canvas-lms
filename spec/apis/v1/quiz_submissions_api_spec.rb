@@ -65,7 +65,7 @@ shared_examples_for 'Quiz Submissions API Restricted Endpoints' do
   end
 end
 
-describe QuizSubmissionsApiController, :type => :integration do
+describe QuizSubmissionsApiController, type: :request do
   module Helpers
     def enroll_student(opts = {})
       last_user = @teacher = @user

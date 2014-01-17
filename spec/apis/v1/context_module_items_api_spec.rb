@@ -17,7 +17,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Module Items API", :type => :integration do
+describe "Module Items API", type: :request do
   before do
     course.offer!
 

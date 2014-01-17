@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe ExternalToolsController, :type => :integration do
+describe ExternalToolsController, type: :request do
   
   describe "in a course" do
     before(:each) do

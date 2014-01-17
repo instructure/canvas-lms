@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe CalendarEventsApiController, :type => :integration do
+describe CalendarEventsApiController, type: :request do
   before do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_user => true))
     @me = @user

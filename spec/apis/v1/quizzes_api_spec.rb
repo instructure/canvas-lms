@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
-describe QuizzesApiController, :type => :integration do
+describe QuizzesApiController, type: :request do
 
   context 'locked api item' do
     let(:item_type) { 'quiz' }

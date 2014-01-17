@@ -20,7 +20,7 @@ class SpecStreamHandler < SOAP::StreamHandler
   end
 end
 
-describe "Respondus SOAP API", :type => :integration do
+describe "Respondus SOAP API", type: :request do
   # args is an array of [ arg_name, value ], not just raw values
   def soap_request(method, userName, password, context, *args)
     soap = SOAP::RPC::Driver.new('test', "urn:RespondusAPI")

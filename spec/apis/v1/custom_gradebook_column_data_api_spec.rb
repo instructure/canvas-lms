@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe CustomGradebookColumnDataApiController, :type => :integration do
+describe CustomGradebookColumnDataApiController, type: :request do
   include Api
   include Api::V1::CustomGradebookColumn
 

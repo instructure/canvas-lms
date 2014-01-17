@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe AssignmentGroupsController, :type => :integration do
+describe AssignmentGroupsController, type: :request do
   include Api
   include Api::V1::Assignment
 
@@ -295,7 +295,7 @@ describe AssignmentGroupsController, :type => :integration do
 end
 
 
-describe AssignmentGroupsApiController, :type => :integration do
+describe AssignmentGroupsApiController, type: :request do
   include Api
   include Api::V1::Assignment
 

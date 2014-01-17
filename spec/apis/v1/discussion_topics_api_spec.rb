@@ -72,7 +72,7 @@ describe Api::V1::DiscussionTopics do
   end
 end
 
-describe DiscussionTopicsController, :type => :integration do
+describe DiscussionTopicsController, type: :request do
   include Api::V1::User
 
   context 'locked api item' do
