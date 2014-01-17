@@ -71,7 +71,7 @@ describe DelayedMessage do
       notification = notification_model
       cc = user.communication_channels.create!(:path => 'path@example.com')
       nps = (1..3).inject([]) do |list, e|
-        list << cc.notification_policies.create!(:notification => notification)
+        list << cc.notification_policies.create!(:notification => notification, :frequency => Notification::FREQ_IMMEDIATELY)
       end
       dms = nps.map do |np|
         DelayedMessage.create!(:notification => notification,
@@ -142,11 +142,14 @@ describe DelayedMessage do
         user.pseudonym.account.should == account
         HostUrl.expects(:context_host).with(user.pseudonym.account).at_least(1).returns("dm.dummy.test.host")
         HostUrl.stubs(:default_host).returns("test.host")
-        dm = DelayedMessage.create!(:summary => "This is a notification", :context => Account.default, :communication_channel => user.communication_channel, :notification => notification_model)
-        DelayedMessage.summarize([dm])
+        @cc = user.communication_channel
+        @dm = DelayedMessage.create!(:summary => "This is a notification", :context => account, :communication_channel => @cc, :notification => notification_model)
       end
-      @cc.messages.last.should_not be_nil
-      @cc.messages.last.shard.should == @shard1
+      @shard2.activate do
+        DelayedMessage.summarize([@dm])
+        @cc.messages.last.should_not be_nil
+        @cc.messages.last.shard.should == @shard1
+      end
     end
   end
 

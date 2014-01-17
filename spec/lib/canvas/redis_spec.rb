@@ -87,7 +87,13 @@ describe "Canvas::Redis" do
 
     it "should not fail cache.delete" do
       enable_cache(ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234'])) do
-        Rails.cache.delete('blah').should == nil
+        Rails.cache.delete('blah').should == 0
+      end
+    end
+
+    it "should not fail cache.delete for a ring" do
+      enable_cache(ActiveSupport::Cache::RedisStore.new(['redis://localhost:1234', 'redis://localhost:4567'])) do
+        Rails.cache.delete('blah').should == 0
       end
     end
 

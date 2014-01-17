@@ -33,7 +33,7 @@ define [
     # Internal: get an item's ID from the ui element
     # Assumes that the first child DOM element will have the id in the data-item-id attribute
     _getItemId: (item) ->
-      parseInt item.children(":first").data('id')
+      item.children(":first").data('id')
 
     # Internal: On a user's sort action, update the sort order on the server.
     #

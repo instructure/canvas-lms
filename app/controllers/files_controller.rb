@@ -449,7 +449,8 @@ class FilesController < ApplicationController
       end
 
       stream = @attachment.open
-      render :json => { :body => stream.read }
+      json = { :body => stream.read.force_encoding(Encoding::ASCII_8BIT) }
+      render json: json
      end
   end
 

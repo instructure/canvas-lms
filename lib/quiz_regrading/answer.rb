@@ -4,7 +4,8 @@ class QuizRegrader::Answer
     'full_credit',
     'current_and_previous_correct',
     'current_correct_only',
-    'no_regrade'
+    'no_regrade',
+    'disabled'
   ].freeze
 
   attr_accessor :answer, :question, :regrade_option
@@ -20,7 +21,8 @@ class QuizRegrader::Answer
   end
 
   def regrade!
-    return 0 if regrade_option == 'no_regrade'
+    return 0 if ['no_regrade', 'disabled'].include?(regrade_option)
+
     previous_score   = points
     previous_regrade = score_before_regrade
 

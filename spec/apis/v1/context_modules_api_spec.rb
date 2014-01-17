@@ -260,8 +260,8 @@ describe "Modules API", :type => :integration do
         @test_modules.map { |tm| tm.workflow_state }.should == %w(active active unpublished unpublished)
         @modules_to_update = [@test_modules[1], @test_modules[3]]
 
-        @wiki_page = @course.wiki.front_page
-        @wiki_page.workflow_state = 'unpublished'; @wiki_page.save!
+        @wiki_page = @course.wiki.wiki_pages.create(:title => 'Wiki Page Title')
+        @wiki_page.unpublish!
         @wiki_page_tag = @test_modules[3].add_item(:id => @wiki_page.id, :type => 'wiki_page')
 
         @ids_to_update = @modules_to_update.map(&:id)
@@ -357,8 +357,8 @@ describe "Modules API", :type => :integration do
         @module1.workflow_state = 'unpublished'
         @module1.save!
 
-        @wiki_page = @course.wiki.front_page
-        @wiki_page.workflow_state = 'unpublished'; @wiki_page.save!
+        @wiki_page = @course.wiki.wiki_pages.create(:title => 'Wiki Page Title')
+        @wiki_page.unpublish!
         @wiki_page_tag = @module1.add_item(:id => @wiki_page.id, :type => 'wiki_page')
 
         @module2 = @course.context_modules.create!(:name => "published")

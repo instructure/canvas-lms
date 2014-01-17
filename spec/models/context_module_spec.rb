@@ -816,7 +816,6 @@ describe ContextModule do
   describe "restore" do
     it "should restore to unpublished state if draft_state is enabled" do
       course(draft_state: true)
-      debugger
       @module = @course.context_modules.create!
       @module.destroy
       @module.restore

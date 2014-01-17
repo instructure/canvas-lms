@@ -303,6 +303,9 @@ class CoursesController < ApplicationController
   #   If this option is set to true, the course will be available to students
   #   immediately.
   #
+  # @argument course[syllabus_body] [Optional, String]
+  #   The syllabus body for the course
+  #
   # @returns Course
   def create
     @account = params[:account_id] ? Account.find(params[:account_id]) : @domain_root_account.manually_created_courses_account
@@ -498,7 +501,7 @@ class CoursesController < ApplicationController
       user_id = params.delete(:user_id)
       if user_id.present? && user = users.where(:users => { :id => user_id }).first
         position_scope = users.where("#{User.sortable_name_order_by_clause}<=#{User.best_unicode_collation_key('?')}", user.sortable_name)
-        position = position_scope.count(:select => "users.*", :distinct => true)
+        position = position_scope.count(:select => "users.id", :distinct => true)
         per_page = Api.per_page_for(self)
         params[:page] = (position.to_f / per_page.to_f).ceil
       end

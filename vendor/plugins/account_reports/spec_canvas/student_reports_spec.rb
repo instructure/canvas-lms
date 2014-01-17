@@ -406,13 +406,15 @@ describe 'Student reports' do
       p1b = @user1.pseudonym.create(unique_id: 'unique@example.com')
       p1b.account = @account
       p1b.sis_user_id = 'secondSIS'
+      p1b.last_login_at = @last_login_time
+      p1b.last_request_at = @last_login_time
       p1b.save!
       param = {}
       param['enrollment_term'] = term1.id
 
       parsed = read_report(@type, {params: param, order: 1})
       parsed[0].should == [@user1.id.to_s, 'secondSIS', 'Clair, John St.',
-                           nil, nil]
+                           @last_login_time.iso8601, p1b.current_login_ip]
       parsed[1].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.',
                            @last_login_time2.iso8601, @p1.current_login_ip]
       parsed[2].should == [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael',

@@ -274,10 +274,10 @@ class User < ActiveRecord::Base
     order_clause = clause = sortable_name_order_by_clause
     order_clause = "#{clause} DESC" if options[:direction] == :descending
     scope = self.order(order_clause)
-    if (scope.scope(:find, :select))
+    if CANVAS_RAILS2 ? (scope.scope(:find, :select)) : scope.select_values.present?
       scope = scope.select(clause)
     end
-    if scope.scope(:find, :group)
+    if CANVAS_RAILS2 ? scope.scope(:find, :group) : scope.group_values.present?
       scope = scope.group(clause)
     end
     scope
@@ -315,6 +315,7 @@ class User < ActiveRecord::Base
   attr_accessor :require_acceptance_of_terms, :require_presence_of_name,
     :require_self_enrollment_code, :self_enrollment_code,
     :self_enrollment_course, :validation_root_account
+  attr_reader :self_enrollment
 
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
   validates_length_of :short_name, :maximum => maximum_string_length, :allow_nil => true
@@ -466,11 +467,7 @@ class User < ActiveRecord::Base
     shards = [Shard.current]
     if !precalculated_associations
       if !users_or_user_ids.first.is_a?(User)
-        if CANVAS_RAILS2
-          users = users_or_user_ids = Shard.partition_by_shard(user_ids) { |ids| User.select([:id, :preferences, :workflow_state]).find(ids) }
-        else
-          users = users_or_user_ids = User.select([:id, :preferences, :workflow_state]).find(user_ids)
-        end
+        users = users_or_user_ids = User.select([:id, :preferences, :workflow_state]).find_all_by_id(user_ids)
       else
         users = users_or_user_ids
       end
@@ -1545,7 +1542,7 @@ class User < ActiveRecord::Base
     return unless @self_enrollment_course
     return if @self_enrolling # avoid infinite recursion when enrolling across shards (pseudonym creation + shard association stuff)
     @self_enrolling = true
-    @self_enrollment_course.self_enroll_student(self, :skip_pseudonym => @just_created, :skip_touch_user => true)
+    @self_enrollment = @self_enrollment_course.self_enroll_student(self, :skip_pseudonym => @just_created, :skip_touch_user => true)
     @self_enrolling = false
   end
 

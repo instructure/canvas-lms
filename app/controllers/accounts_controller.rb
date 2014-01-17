@@ -72,7 +72,7 @@ class AccountsController < ApplicationController
   #   direct sub-accounts of this account will be returned. Defaults to false.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/accounts/<account_id>/sub_accounts \ 
+  #     curl https://<canvas>/api/v1/accounts/<account_id>/sub_accounts \
   #          -H 'Authorization: Bearer <token>'
   def sub_accounts
     return unless authorized_action(@account, @current_user, :read)
@@ -138,6 +138,9 @@ class AccountsController < ApplicationController
   # @argument enrollment_term_id [Optional, Integer]
   #   If set, only includes courses from the specified term.
   #
+  # @argument search_term [Optional, String]
+  #   The partial course name, code, or full ID to match and return in the results list. Must be at least 3 characters.
+  #
   # @returns [Course]
   def courses_api
     return unless authorized_action(@account, @current_user, :read)
@@ -149,7 +152,7 @@ class AccountsController < ApplicationController
       params[:state] -= %w{available}
     end
 
-    @courses = @account.associated_courses.where(:workflow_state => params[:state])
+    @courses = @account.associated_courses.order(:id).where(:workflow_state => params[:state])
     if params[:hide_enrollmentless_courses] || value_to_boolean(params[:with_enrollments])
       @courses = @courses.with_enrollments
     elsif !params[:with_enrollments].nil? && !value_to_boolean(params[:with_enrollments])
@@ -177,7 +180,24 @@ class AccountsController < ApplicationController
       @courses = @courses.for_term(term)
     end
 
-    @courses = Api.paginate(@courses.order(:id), self, api_v1_account_courses_url)
+    if params[:search_term]
+      search_term = params[:search_term]
+
+      is_id = search_term.to_s =~ Api::ID_REGEX
+      if is_id && course = @courses.find_by_id(search_term)
+        @courses = [course]
+      elsif is_id && !SearchTermHelper.valid_search_term?(search_term)
+        @courses = []
+      else
+        SearchTermHelper.validate_search_term(search_term)
+
+        name = ActiveRecord::Base.wildcard('courses.name', search_term)
+        code = ActiveRecord::Base.wildcard('courses.course_code', search_term)
+        @courses = @courses.where("#{name} OR #{code}")
+      end
+    end
+
+    @courses = Api.paginate(@courses, self, api_v1_account_courses_url)
 
     render :json => @courses.map { |c| course_json(c, @current_user, session, [], nil) }
   end
@@ -261,11 +281,11 @@ class AccountsController < ApplicationController
   #   The default group storage quota to be used, if not otherwise specified.
   #
   # @example_request
-  #   curl https://<canvas>/api/v1/accounts/<account_id> \ 
-  #     -X PUT \ 
-  #     -H 'Authorization: Bearer <token>' \ 
-  #     -d 'account[name]=New account name' \ 
-  #     -d 'account[default_time_zone]=Mountain Time (US & Canada)' \ 
+  #   curl https://<canvas>/api/v1/accounts/<account_id> \
+  #     -X PUT \
+  #     -H 'Authorization: Bearer <token>' \
+  #     -d 'account[name]=New account name' \
+  #     -d 'account[default_time_zone]=Mountain Time (US & Canada)' \
   #     -d 'account[default_storage_quota_mb]=450'
   #
   # @example_response
@@ -402,7 +422,7 @@ class AccountsController < ApplicationController
     end
   end
 
-  # Admin Tools page controls 
+  # Admin Tools page controls
   # => Log Auditing
   # => Add/Change Quota
   # = Restoring Content
@@ -444,7 +464,7 @@ class AccountsController < ApplicationController
       end
     end
   end
-  
+
   def remove_user
     @root_account = @account.root_account
     if authorized_action(@root_account, @current_user, :manage_user_logins)
@@ -466,8 +486,8 @@ class AccountsController < ApplicationController
       end
     end
   end
-  
-  def turnitin_confirmation 
+
+  def turnitin_confirmation
     if authorized_action(@account, @current_user, :manage_account_settings)
       host = validated_turnitin_host(params[:turnitin_host])
       begin
@@ -482,7 +502,7 @@ class AccountsController < ApplicationController
       end
     end
   end
-  
+
   def load_course_right_side
     @root_account = @account.root_account
     @maximum_courses_im_gonna_show = 50
@@ -497,7 +517,7 @@ class AccountsController < ApplicationController
     @hide_enrollmentless_courses = params[:hide_enrollmentless_courses] == "1"
   end
   protected :load_course_right_side
-  
+
   def statistics
     if authorized_action(@account, @current_user, :view_statistics)
       add_crumb(t(:crumb_statistics, "Statistics"), statistics_account_url(@account))
@@ -514,13 +534,13 @@ class AccountsController < ApplicationController
       @counts_report = @account.report_snapshots.detailed.last.try(:data)
     end
   end
-  
+
   def statistics_graph
     if authorized_action(@account, @current_user, :view_statistics)
       @items = @account.report_snapshots.progressive.last.try(:report_value_over_time, params[:attribute])
       respond_to do |format|
         format.json { render :json => @items }
-        format.csv { 
+        format.csv {
           res = CSV.generate do |csv|
             csv << ['Timestamp', 'Value']
             @items.each do |item|
@@ -530,8 +550,8 @@ class AccountsController < ApplicationController
           cancel_cache_buster
           # TODO i18n
           send_data(
-            res, 
-            :type => "text/csv", 
+            res,
+            :type => "text/csv",
             :filename => "#{params[:attribute].titleize} Report for #{@account.name}.csv",
             :disposition => "attachment"
           )
@@ -539,7 +559,7 @@ class AccountsController < ApplicationController
       end
     end
   end
-  
+
   def avatars
     if authorized_action(@account, @current_user, :manage_admin_users)
       @users = @account.all_users
@@ -564,7 +584,7 @@ class AccountsController < ApplicationController
       @users = @users.paginate(:page => params[:page], :per_page => 100)
     end
   end
-  
+
   def sis_import
     if authorized_action(@account, @current_user, :manage_sis)
       return redirect_to account_settings_url(@account) if !@account.allow_sis_import || !@account.root_account?
@@ -577,11 +597,11 @@ class AccountsController < ApplicationController
       end
     end
   end
-  
+
   def courses_redirect
     redirect_to course_url(params[:id])
   end
-  
+
   def courses
     if authorized_action(@context, @current_user, :read)
       Shackles.activate(:slave) do
@@ -599,15 +619,15 @@ class AccountsController < ApplicationController
             build_course_stats
           end
         }
-        format.json  { 
+        format.json  {
           cancel_cache_buster
-          expires_in 30.minutes 
+          expires_in 30.minutes
           render :json => @courses.map{ |c| {:label => c.name, :id => c.id} }
         }
       end
     end
   end
-  
+
   def build_course_stats
     teachers = TeacherEnrollment.for_courses_with_user_name(@courses).admin.active
     course_to_student_counts = StudentEnrollment.student_in_claimed_or_available.where(:course_id => @courses).group(:course_id).count(:user_id, :distinct => true)
@@ -623,7 +643,7 @@ class AccountsController < ApplicationController
     end
   end
   protected :build_course_stats
-  
+
   def saml_meta_data
     # This needs to be publicly available since external SAML
     # servers need to be able to access it without being authenticated.
@@ -631,7 +651,7 @@ class AccountsController < ApplicationController
     settings = AccountAuthorizationConfig.saml_settings_for_account(@domain_root_account, request.host_with_port)
     render :xml => Onelogin::Saml::MetaData.create(settings)
   end
-  
+
   # TODO Refactor add_account_user and remove_account_user actions into
   # AdminsController. see https://redmine.instructure.com/issues/6634
   def add_account_user
@@ -655,7 +675,7 @@ class AccountsController < ApplicationController
       render :json => account_users
     end
   end
-  
+
   def remove_account_user
     if authorized_action(@context, @current_user, :manage_account_memberships)
       @account_user = AccountUser.find(params[:id])

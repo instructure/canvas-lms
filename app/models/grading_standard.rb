@@ -54,7 +54,7 @@ class GradingStandard < ActiveRecord::Base
   end
 
   scope :active, where("grading_standards.workflow_state<>'deleted'")
-  scope :sorted, lambda { order("usage_count >= 3 DESC, #{best_unicode_collation_key('title')}") }
+  scope :sorted, lambda { order("usage_count >= 3 DESC").order(nulls(:last, best_unicode_collation_key('title'))) }
 
   VERSION = 2
 

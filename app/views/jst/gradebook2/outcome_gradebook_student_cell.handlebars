@@ -1,2 +1,6 @@
-<div class="avatar-placeholder"></div>
-{{name}}
+<div class="outcome-student-cell-content">
+  {{#if avatar_image_url}}
+  <img class="avatar-circle" src="{{avatar_image_url}}" alt="{{display_name}}">
+  {{/if}}
+  {{display_name}}
+</div>

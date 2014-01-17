@@ -74,8 +74,10 @@ module Canvas::Redis
         # for instance, Rails.cache.delete_matched will error out if the 'keys' command returns nil instead of []
         last_command = commands.try(:last)
         failure_val = case (last_command.respond_to?(:first) ? last_command.first : last_command).to_s
-          when 'keys'
+          when 'keys', 'hmget'
             []
+          when 'del'
+            0
           else
             nil
         end

@@ -19,6 +19,12 @@ class ActiveRecord::Base
   end
 
   if CANVAS_RAILS2
+    if instance_method(:transaction).arity == 0
+      def transaction(options = {}, &block)
+        self.class.transaction(options, &block)
+      end
+    end
+
     # this functionality is built into rails 3
     class ProtectedAttributeAssigned < Exception; end
     def log_protected_attribute_removal_with_raise(*attributes)
@@ -551,7 +557,11 @@ class ActiveRecord::Base
     scope = scope(:find)
     scope = scope ? scope.dup : {}
     scope.delete(:include)
-    with_exclusive_scope(find: scope) { connection.execute "CREATE TEMPORARY TABLE #{table} AS #{scoped.to_sql}" }
+    sql = with_exclusive_scope(find: scope) { scoped.to_sql }
+    if %w{MySQL Mysql2}.include?(connection.adapter_name)
+      table_options = " (temp_primary_key MEDIUMINT NOT NULL AUTO_INCREMENT PRIMARY KEY)"
+    end
+    connection.execute "CREATE TEMPORARY TABLE #{table}#{table_options} AS #{sql}"
     begin
       index = "temp_primary_key"
       case connection.adapter_name
@@ -564,8 +574,7 @@ class ActiveRecord::Base
           connection.raw_connection.set_notice_processor(&old_proc) if old_proc
         end
       when 'MySQL', 'Mysql2'
-        connection.execute "ALTER TABLE #{table}
-                               ADD temp_primary_key MEDIUMINT NOT NULL PRIMARY KEY AUTO_INCREMENT"
+        # created as part of the temp table
       when 'SQLite'
         # Sqlite always has an implicit primary key
         index = 'rowid'
@@ -684,6 +693,7 @@ class ActiveRecord::Base
     subquery_scope = self.scoped.except(:select).select("#{quoted_table_name}.#{primary_key} as id").reorder(primary_key).limit(batch_size)
     ids = connection.select_rows("select min(id), max(id) from (#{subquery_scope.to_sql}) as subquery").first
     while ids.first.present?
+      ids.map!(&:to_i) if columns_hash[primary_key].type == :integer
       yield(*ids)
       last_value = ids.last
       next_subquery_scope = subquery_scope.where(["#{quoted_table_name}.#{primary_key}>?", last_value])

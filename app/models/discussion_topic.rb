@@ -1054,7 +1054,7 @@ class DiscussionTopic < ActiveRecord::Base
   # blank data on reads.
   def materialized_view(opts = {})
     if self.new_record?
-      return "[]", [], [], "[]"
+      return "[]", [], [], []
     else
       DiscussionTopic::MaterializedView.materialized_view_for(self, opts)
     end

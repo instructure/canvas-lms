@@ -445,6 +445,57 @@ describe EnrollmentsApiController, :type => :integration do
         response.code.should eql '401'
       end
     end
+
+    context "self enrollment" do
+      before do
+        course(active_all: true)
+        @course.update_attribute(:self_enrollment, true)
+        @unenrolled_user = user_with_pseudonym
+        @path = "/api/v1/courses/#{@course.id}/enrollments"
+        @path_options = {controller: 'enrollments_api', action: 'create', format: 'json', course_id: @course.id.to_s}
+      end
+
+      it "should require a logged-in user" do
+        @user = nil
+        raw_api_call :post, @path, @path_options,
+          {
+            enrollment: {
+              user_id: 'self',
+              self_enrollment_code: @course.self_enrollment_code
+            }
+          }
+        response.code.should eql '401'
+      end
+
+      it "should require a valid code and user" do
+        raw_api_call :post, @path, @path_options,
+          {
+            enrollment: {
+              user_id: 'invalid',
+              self_enrollment_code: 'invalid'
+            }
+          }
+        response.code.should eql '403'
+        json = JSON.parse(response.body)
+        json["message"].should be_include "enrollment[self_enrollment_code] is invalid"
+        json["message"].should be_include "enrollment[user_id] must be 'self' when self-enrolling"
+      end
+
+      it "should let anyone self-enroll" do
+        json = api_call :post, @path, @path_options,
+          {
+            enrollment: {
+              user_id: 'self',
+              self_enrollment_code: @course.self_enrollment_code
+            }
+          }
+        new_enrollment = Enrollment.find(json['id'])
+        new_enrollment.user_id.should == @unenrolled_user.id
+        new_enrollment.type.should == 'StudentEnrollment'
+        new_enrollment.should be_active
+        new_enrollment.should be_self_enrolled
+      end
+    end
   end
 
   describe "enrollment listing" do

@@ -366,7 +366,7 @@ class PageView < ActiveRecord::Base
           order("created_at asc").limit(batch_size).to_sql
 
       # query just the raw attributes, don't instantiate AR objects
-      rows = PageView.connection.execute(finder_sql).to_a
+      rows = PageView.connection.select_all(finder_sql).to_a
 
       return false if rows.empty?
 

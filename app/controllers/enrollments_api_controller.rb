@@ -202,6 +202,14 @@ class EnrollmentsApiController < ApplicationController
   #   If true, a notification will be sent to the enrolled user.
   #   Notifications are not sent by default.
   #
+  # @argument enrollment[self_enrollment_code] [Optional, String]
+  #   If the current user is not allowed to manage enrollments in this
+  #   course, but the course allows self-enrollment, the user can self-
+  #   enroll as a student in the default section by passing in a valid
+  #   code. When self-enrolling, the user_id must be 'self'. The
+  #   enrollment_state will be set to 'active' and all other arguments
+  #   will be ignored.
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/enrollments \
   #     -X POST \
@@ -226,6 +234,8 @@ class EnrollmentsApiController < ApplicationController
     if params[:enrollment].blank?
       errors << @@errors[:missing_parameters] if params[:enrollment].blank?
     else
+      return create_self_enrollment if params[:enrollment][:self_enrollment_code]
+
       role_name = params[:enrollment].delete(:role)
       type = params[:enrollment].delete(:type)
       if Enrollment.valid_type?(role_name)
@@ -258,9 +268,7 @@ class EnrollmentsApiController < ApplicationController
       errors << @@errors[:missing_user_id] unless params[:enrollment][:user_id].present?
     end
     errors << @@errors[:concluded_course] if @context.completed? || @context.soft_concluded?
-    unless errors.blank?
-      render(:json => { :message => errors.join(', ') }, :status => 403) && return
-    end
+    return render_create_errors(errors) if errors.present?
 
     # create enrollment
 
@@ -276,7 +284,38 @@ class EnrollmentsApiController < ApplicationController
     @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
     @enrollment.valid? ?
       render(:json => enrollment_json(@enrollment, @current_user, session)) :
-      render(:json => @enrollment.errors)
+      render(:json => @enrollment.errors, :status => :bad_request)
+  end
+
+  def render_create_errors(errors)
+    render json: {message: errors.join(', ')}, status: 403
+  end
+
+  def create_self_enrollment
+    require_user
+
+    options = params[:enrollment]
+    code = options[:self_enrollment_code]
+    # we don't just do a straight-up comparison of the code, since
+    # plugins can override Account#self_enrollment_course_for to allow
+    # for synthetic ones
+    errors = []
+    if @context != @context.root_account.self_enrollment_course_for(code)
+      errors << "enrollment[self_enrollment_code] is invalid"
+    end
+    if options[:user_id] != 'self'
+      errors << "enrollment[user_id] must be 'self' when self-enrolling"
+    end
+    return render_create_errors(errors) if errors.present?
+
+    @current_user.validation_root_account = @domain_root_account
+    @current_user.require_self_enrollment_code = true
+    @current_user.self_enrollment_code = code
+    if @current_user.save
+      render(json: enrollment_json(@current_user.self_enrollment, @current_user, session))
+    else
+      render(json: {user: @current_user.errors}, status: :bad_request)
+    end
   end
 
   # @API Conclude an enrollment

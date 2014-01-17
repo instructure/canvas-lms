@@ -11,8 +11,12 @@ class Gradebook2Controller < ApplicationController
   end
 
   def screenreader
-    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      set_js_env
+    if @context.feature_enabled?(:screenreader_gradebook)
+      if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+        set_js_env
+      end
+    else
+      redirect_to action: :show
     end
   end
 

@@ -24,41 +24,31 @@ module Api::V1::OutcomeResults
   # rollups - The rollups from Outcomes::ResultAnalytics to seralize
   #
   # Returns a hash that can be converted into json.
-  def outcome_results_rollups_json(rollups, outcomes)
+  def outcome_results_rollups_json(rollups)
     {
-      rollups: serialize_user_rollups(rollups),
-      linked: serialize_linked_outcomes(outcomes),
+      rollups: serialize_user_rollups(rollups)
     }
   end
 
   # Public: Serializes the aggregate rollup. Uses the specified context for the
   # id and name fields.
-  def aggregate_outcome_results_rollups_json(rollups, outcomes)
+  def aggregate_outcome_results_rollups_json(rollups)
     {
-      rollups: serialize_rollups(rollups),
-      linked: serialize_linked_outcomes(outcomes),
-    }
-  end
-
-  # Internal: Returns a hash for linked of serialized outcomes
-  def serialize_linked_outcomes(outcomes)
-    {
-      outcomes: outcomes.map { |o| Api.recursively_stringify_json_ids(outcome_json(o, @current_user, session)) },
+      rollups: serialize_rollups(rollups, :course)
     }
   end
 
   # Internal: Returns an Array of serialized rollups.
-  def serialize_rollups(rollups)
-    rollups.map { |rollup| serialize_rollup(rollup) }
+  def serialize_rollups(rollups, context_key)
+    rollups.map { |rollup| serialize_rollup(rollup, context_key) }
   end
 
   # Internal: Returns a suitable output hash for the rollup.
-  def serialize_rollup(rollup)
+  def serialize_rollup(rollup, context_key)
     # both Course and User have a name method, so this works for both.
     {
-      id: rollup.context.id.to_s,
-      name: rollup.context.name,
       scores: serialize_rollup_scores(rollup.scores),
+      links: {context_key => rollup.context.id.to_s}
     }
   end
 
@@ -66,7 +56,7 @@ module Api::V1::OutcomeResults
   # section information.
   def serialize_user_rollups(rollups)
     serialized_rollup_pairs = rollups.map do |rollup|
-      [rollup, serialize_rollup(rollup)]
+      [rollup, serialize_rollup(rollup, :user)]
     end
 
     serialized_rollups_with_section_duplicates = serialized_rollup_pairs.map do |rollup, serialized_rollup|
@@ -89,7 +79,7 @@ module Api::V1::OutcomeResults
     # is in multiple sections, they will have multiple rollup results. pagination is
     # still by user, so the counts won't match up. again, this is a very rare thing
     (@section ? [@section] : rollup.context.sections_for_course(@context)).map do |section|
-      serialized_rollup.merge(links: {section: section.id.to_s})
+      serialized_rollup.deep_merge(links: {section: section.id.to_s})
     end
   end
 

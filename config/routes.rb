@@ -629,7 +629,6 @@ routes.draw do
   match 'register' => 'users#new', :as => :register
   match 'register_from_website' => 'users#new', :as => :register_from_website
   match 'enroll/:self_enrollment_code' => 'self_enrollments#new', :as => :enroll, :via => :get
-  match 'enroll/:self_enrollment_code' => 'self_enrollments#create', :as => :enroll_frd, :via => :post
   match 'services' => 'users#services', :as => :services
   match 'search/bookmarks' => 'users#bookmark_search', :as => :bookmark_search
   match 'search/rubrics' => 'search#rubrics', :as => :search_rubrics

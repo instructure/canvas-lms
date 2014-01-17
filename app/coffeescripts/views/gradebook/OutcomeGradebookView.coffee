@@ -81,6 +81,7 @@ define [
     # Returns nothing.
     renderGrid: (response) =>
       Grid.Util.saveOutcomes(response.linked.outcomes)
+      Grid.Util.saveStudents(response.linked.users)
       [columns, rows] = Grid.Util.toGrid(response, column: { formatter: Grid.View.cell }, row: { section: @menu.currentSection })
       @grid = new Slick.Grid(
         '.outcome-gradebook-wrapper',
@@ -88,6 +89,7 @@ define [
         columns,
         Grid.options)
       @grid.onHeaderRowCellRendered.subscribe(Grid.Events.headerRowCellRendered)
+      @grid.onHeaderCellRendered.subscribe(Grid.Events.headerCellRendered)
       @grid.init()
       Grid.Events.init(@grid)
       @_attachEvents()

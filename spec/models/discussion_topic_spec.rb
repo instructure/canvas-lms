@@ -1148,7 +1148,7 @@ describe DiscussionTopic do
     it "should return the materialized view if it's up to date" do
       run_jobs
       view = DiscussionTopic::MaterializedView.find_by_discussion_topic_id(@topic.id)
-      @topic.materialized_view.should == [view.json_structure, view.participants_array, view.entry_ids_array, "[]"]
+      @topic.materialized_view.should == [view.json_structure, view.participants_array, view.entry_ids_array, []]
     end
 
     it "should update the materialized view on new entry" do
@@ -1169,7 +1169,7 @@ describe DiscussionTopic do
     it "should return empty data for a materialized view on a new (unsaved) topic" do
       new_topic = DiscussionTopic.new(:context => @topic.context, :discussion_type => DiscussionTopic::DiscussionTypes::SIDE_COMMENT)
       new_topic.should be_new_record
-      new_topic.materialized_view.should == [ "[]", [], [], "[]" ]
+      new_topic.materialized_view.should == [ "[]", [], [], [] ]
       Delayed::Job.strand_size("materialized_discussion:#{new_topic.id}").should == 0
     end
   end

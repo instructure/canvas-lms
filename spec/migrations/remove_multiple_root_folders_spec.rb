@@ -41,7 +41,13 @@ describe 'DataFixup::RemoveMultipleRootFolders' do
       c.folders.each do |f|
         f.attachments.delete_all
       end
-      c.folders.scoped.delete_all
+      # mysql enforces foreign keys inside of a single delete all, so do it one by one
+      subfolders = folders = Folder.root_folders(c).to_a
+      while !subfolders.empty?
+        subfolders = subfolders.map(&:sub_folders).flatten
+        folders.concat(subfolders)
+      end
+      folders.reverse.each { |f| Folder.where(id: f).delete_all }
       c.enrollment_terms.scoped.delete_all if c.is_a?(Account)
       c.course_account_associations.scoped.delete_all if c.is_a?(Course)
       c.delete

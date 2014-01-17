@@ -785,7 +785,7 @@ class ConversationsController < ApplicationController
           @conversation_contexts[conversation.conversation.id] = feed_context_content(conversation)
         end
       end
-      @entries = @entries.sort_by{|e| e.created_at}.reverse
+      @entries = @entries.sort_by{|e| [e.created_at, e.id] }.reverse
       @entries.each do |entry|
         feed.entries << entry.to_atom(:additional_content => @conversation_contexts[entry.conversation.id])
       end

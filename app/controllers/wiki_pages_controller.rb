@@ -104,6 +104,15 @@ class WikiPagesController < ApplicationController
   end
 
   def perform_update
+    if params[:wiki_page].include?(:hide_from_students)
+      hide_from_students = Canvas::Plugin::value_to_boolean(params[:wiki_page].delete(:hide_from_students))
+      if hide_from_students
+        @page.workflow_state = 'unpublished'
+      else
+        @page.workflow_state = 'published'
+      end
+    end
+
     if @page.update_attributes(params[:wiki_page].merge(:user_id => @current_user.id))
       unless @page.context.feature_enabled?(:draft_state)
         @page.set_as_front_page! if @page.is_front_page?

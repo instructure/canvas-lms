@@ -18,28 +18,28 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
-# Helpers
-def delayed_message(send_at)
-  message = DelayedMessage.new(notification: @notification, context: @context,
-          communication_channel: @recipient.communication_channel)
-  message.send_at = send_at
-  message.save!
-  message
-end
-
-def old_messages(count = 2)
-  (1..count).map do
-    delayed_message(100.days.ago)
-  end
-end
-
-def new_messages(count = 2)
-  (1..count).map do
-    delayed_message(Time.now)
-  end
-end
-
 describe DelayedMessageScrubber do
+
+  # Helpers
+  def delayed_message(send_at)
+    message = DelayedMessage.new(notification: @notification, context: @context,
+            communication_channel: @recipient.communication_channel)
+    message.send_at = send_at
+    message.save!
+    message
+  end
+
+  def old_messages(count = 2)
+    (1..count).map do
+      delayed_message(100.days.ago)
+    end
+  end
+
+  def new_messages(count = 2)
+    (1..count).map do
+      delayed_message(Time.now)
+    end
+  end
 
   describe '#scrub' do
 
