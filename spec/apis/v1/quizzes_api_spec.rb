@@ -85,9 +85,14 @@ describe QuizzesApiController, type: :request do
                         {:controller=>"quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}"},
                         {},
                         'Accept' => 'application/vnd.api+json')
+        meta = json['meta']
+        meta = json['meta']
+        meta['permissions']['quizzes']['create'].should == true
+
         json = json['quizzes']
         quiz_ids = json.collect { |quiz| quiz['id'] }
         quiz_ids.should == quizzes.map(&:id).map(&:to_s)
+
       end
 
       it "limits student requests to available quizzes" do

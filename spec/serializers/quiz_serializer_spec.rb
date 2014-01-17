@@ -23,6 +23,7 @@ describe QuizSerializer do
     @session = stub
     controller.stubs(:session).returns session
     controller.stubs(:context).returns context
+    @quiz.stubs(:grants_right?).at_least_once.returns true
     @serializer = QuizSerializer.new(@quiz,
                                      controller: controller,
                                      scope: @user,
@@ -112,13 +113,12 @@ describe QuizSerializer do
 
     it "is not present unless the user can manage the quiz's assignments" do
       quiz.expects(:grants_right?).with(@user, session, :manage).returns true
-      serializer.as_json[:quiz].should have_key :unpublishable
+      serializer.filter(serializer.class._attributes).should include :unpublishable
       quiz.unstub(:grants_right?)
-
       quiz.expects(:grants_right?).with(@user, session, :update).at_least_once.returns false
       quiz.expects(:grants_right?).with(@user, session, :grade).at_least_once.returns false
       quiz.expects(:grants_right?).with(@user, session, :manage).at_least_once.returns false
-      serializer.as_json[:quiz].should_not have_key :unpublishable
+      serializer.filter(serializer.class._attributes).should_not include :unpublishable
     end
   end
 
@@ -157,4 +157,19 @@ describe QuizSerializer do
     end
   end
 
+  describe "permissions" do
+    it "serializes permissions" do
+      serializer.as_json[:quiz][:permissions].should == {
+        read: true,
+        submit: true,
+        review_grades: true,
+        create: true,
+        update: true,
+        read_statistics: true,
+        manage: true,
+        delete: true,
+        grade: true
+      }
+    end
+  end
 end

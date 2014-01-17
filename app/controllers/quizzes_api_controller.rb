@@ -130,6 +130,22 @@
 #         "context_module": {}
 #       },
 #
+#       // Hash of permissions the user has for the quiz.
+#       // Each option will be either true or false.
+#       "permissions": {
+#         "read": true,
+#         "submit": true,
+#
+#         // permissions below are true for teachers/admins
+#         "create": true,
+#         "delete": true,
+#         "grade": true,
+#         "manage": true,
+#         "read_statistics": true,
+#         "review_grades": true,
+#         "update": true
+#       },
+#
 #       // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
 #       "lock_explanation": "This quiz is locked until September 1 at 12:00am"
 #     }
