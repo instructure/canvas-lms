@@ -73,28 +73,36 @@ describe "MessageableUser" do
   end
 
   describe ".prepped" do
+    def group_scope(scope)
+      if CANVAS_RAILS2
+        scope.scope(:find, :group)
+      else
+        scope.group_values.join(", ")
+      end
+    end
+
     it "should group by id" do
-      MessageableUser.prepped().scope(:find, :group).
+      group_scope(MessageableUser.prepped()).
         should match(MessageableUser::COLUMNS.first)
     end
 
     it "should include column-based common_course_column in group by" do
-      MessageableUser.prepped(:common_course_column => 'course_column').scope(:find, :group).
+      group_scope(MessageableUser.prepped(:common_course_column => 'course_column')).
         should match('course_column')
     end
 
     it "should include column-based common_group_column in group by" do
-      MessageableUser.prepped(:common_group_column => 'group_column').scope(:find, :group).
+      group_scope(MessageableUser.prepped(:common_group_column => 'group_column')).
         should match('group_column')
     end
 
     it "should not include literal common_course_column value in group by" do
-      MessageableUser.prepped(:common_course_column => 5).scope(:find, :group).
+      group_scope(MessageableUser.prepped(:common_course_column => 5)).
         should_not match('5')
     end
 
     it "should not include literal common_group_column value in group by" do
-      MessageableUser.prepped(:common_group_column => 5).scope(:find, :group).
+      group_scope(MessageableUser.prepped(:common_group_column => 5)).
         should_not match('5')
     end
 
