@@ -18,8 +18,12 @@ else
     class NestedInstafailFormatter < RSpec::Core::Formatters::BaseTextFormatter
       def example_failed(example)
         super
-        #dump_failure(counter, failure)
+        dump_failure(example, index)
         output.puts
+      end
+
+      def dump_summary(duration, example_count, failure_count, pending_count)
+        dump_failures
       end
     end
   end
