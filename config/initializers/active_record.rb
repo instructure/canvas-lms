@@ -1,3 +1,5 @@
+require 'active_support/callbacks/suspension'
+
 class ActiveRecord::Base
   # XXX: Rails3 There are lots of issues with these patches in Rails3 still
 
@@ -870,6 +872,17 @@ class ActiveRecord::Base
     return if records.empty?
     transaction do
       connection.bulk_insert(table_name, records)
+    end
+  end
+
+  include ActiveSupport::Callbacks::Suspension
+
+  # saves the record with all its save callbacks suspended.
+  def save_without_callbacks
+    if CANVAS_RAILS2
+      new_record? ? create_without_callbacks : update_without_callbacks
+    else
+      suspend_callbacks(kind: [:validation, :save, (new_record? ? :create : :update)]) { save }
     end
   end
 
