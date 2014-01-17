@@ -41,11 +41,15 @@ class ControllerListView < HashView
   end
 
   def apis
-    @controllers.map do |ctrl|
-      ctrl.methods.map do |method|
-        method.to_swagger
+    [].tap do |list|
+      @controllers.each do |controller|
+        controller.methods.each do |method|
+          method.routes.each do |route|
+            list << route.to_swagger
+          end
+        end
       end
-    end.flatten
+    end
   end
 
   def models

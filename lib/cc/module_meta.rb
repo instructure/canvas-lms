@@ -76,7 +76,13 @@ module CC
                   item_node.workflow_state ct.workflow_state
                   item_node.title ct.title
                   item_node.identifierref CCHelper.create_key(ct.content_or_self) unless ct.content_type == 'ContextModuleSubHeader'
-                  item_node.url ct.url if ["ContextExternalTool", 'ExternalUrl'].member? ct.content_type
+                  if ct.content_type == "ContextExternalTool"
+                    item_node.url ct.url
+                    if ct.content && ct.content.context != @course
+                      item_node.global_identifierref ct.content.id
+                    end
+                  end
+                  item_node.url ct.url if ct.content_type == 'ExternalUrl'
                   item_node.position ct.position
                   item_node.new_tab ct.new_tab
                   item_node.indent ct.indent

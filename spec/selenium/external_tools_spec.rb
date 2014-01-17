@@ -473,7 +473,6 @@ describe "external tools" do
                               })
       get "/courses/#{@course.id}/modules/items/#{@tag.id}"
 
-      ff("#tool_content").length.should == 0
       f("#tool_form").should be_displayed
       ff("#tool_form .load_tab").length.should == 1
     end

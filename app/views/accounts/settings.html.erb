@@ -144,12 +144,32 @@ TEXT
                       <%= settings.label :restrict_student_future_view, :en => "Restrict students from viewing courses before start date" %>
                     </td>
                   </tr>
+                  <tr>
+                    <td colspan="2"><%= settings.check_box :restrict_quiz_questions, :checked => @account.settings[:restrict_quiz_questions] %>
+                      <%= settings.label :restrict_quiz_questions, :en => "Restrict students from viewing quiz questions after course end date" %>
+                    </td>
+                  </tr>
                 <% end %>
               <% end %>
             <% end %>
           </table>
         </fieldset>
+
         <%= render :partial => 'additional_settings' %>
+
+        <% if !@account.site_admin? &&
+               @account.root_account? &&
+               @account.feature_enabled?(:google_docs_domain_restriction) &&
+               @account.grants_right?(@current_user, :manage_site_settings) %>
+          <fieldset id="google-docs-domain">
+            <legend><%= t(:google_docs_domain, 'Allowed Google Docs Domain') %></legend>
+
+            <%= f.fields_for :settings do |settings| %>
+              <%= settings.label      :google_docs_domain, t('labels.domain', 'Domain:') %>
+              <%= settings.text_field :google_docs_domain, placeholder: 'gmail.com', value: @account.settings[:google_docs_domain] %>
+            <% end %>
+          </fieldset>
+        <% end %>
 
         <% unless @account.site_admin? %>
           <fieldset>
@@ -218,22 +238,6 @@ TEXT
                   <div>
                     <%= settings.check_box :enable_alerts, :checked => @account.settings[:enable_alerts] %>
                     <%= settings.label :enable_alerts, :en => "Alerts (beta)" %>
-                  </div>
-                  <div id='allow_draft'>
-                    <%= settings.check_box :allow_draft, :checked => @account.settings[:allow_draft] %>
-                    <label for="account_settings_allow_draft"><%= t('allow_draft', 'Allow Draft State (beta)') %>
-                      <a href="#" class="allow_draft_help_link no-hover" title="<%= t(:allow_draft_help_tooltip, "What is draft state?") %>"><i class="icon-question standalone-icon"></i></a>
-                    </label>
-                  </div>
-                  <div id="allow_draft_help_dialog" style="display: none;">
-                    <%= mt(:allow_draft_help_message, <<-DRAFT )
-Draft state is a *beta* feature that allows course content to be published and unpublished.
-Unpublished content won't be visible to students and won't affect grades.
-It also includes a redesign of some course areas to make them more consistent in look and functionality.
-
-Allowing Draft State here will allow teachers to enable it in their individual courses.
-                    DRAFT
-                    %>
                   </div>
                 <% end %>
                 <div>
@@ -687,6 +691,26 @@ Allowing Draft State here will allow teachers to enable it in their individual c
                 <%= Account.allowable_services[announcement.required_account_service.to_sym].try(:[], :name) %>
               </div>
             <% end %>
+            <% unless announcement.account_notification_roles.empty? %>
+              <div>
+                <%= t :announcement_sent_to_roles, "Send only to the following types of users:" %>
+                <ul>
+                  <% announcement.account_notification_roles.each do |r| %>
+                    <% @enrollment_types.select {|rt| rt[:name] == r.role_type }.each do |rt| %>
+                      <li><%= rt[:plural_label][] %></li>
+                    <% end %>
+                    <% # NilEnrollment is a special case %>
+                    <% if r.role_type == "NilEnrollment" %>
+                      <li><%= t :no_enrollment_roles, "Unenrolled users" %></li>
+                    <% end %>
+                    <% @role_types.select {|rt| rt[:name] == r.role_type }.each do |rt| %>
+                      <% # no plural_label :( %>
+                      <li><%= rt[:label]  %></li>
+                    <% end %>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
             <% if announcement.months_in_display_cycle %>
               <div>
                 <%= t :announcement_sent_to_subset, "Sent to 1 / %{denominator} users each month", denominator: announcement.months_in_display_cycle %>
@@ -737,11 +761,61 @@ Allowing Draft State here will allow teachers to enable it in their individual c
               </tr>
             <% end %>
             <tr>
-              <td><%= f.blabel :message, :en => "Message" %></td>
+              <td colspan=2>
+                <%= t :announcement_sent_to_roles, "Send only to the following types of users:" %>&nbsp;
+                <%= t :announcement_blank_to_all, "(If none are selected, send to everyone)" %>
+              </td>
+            </tr>
+            <tr id="restrict_to_roles">
+              <td id="restrict_to_enrollment_roles">
+                <% unless @enrollment_types.nil? %>
+                  <%= t :course_roles, "Course roles:" %>
+                  <ul>
+                    <% @enrollment_types.each do |r| %>
+                      <li id="account_notification_role_<%= r[:name]%>">
+                        <label>
+                          <%= check_box_tag "account_notification_roles[]", r[:name], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:name]}_cbx" } %>
+                          <%= r[:plural_label][] %>
+                        </label>
+                      </li>
+                    <% end %>  
+                    <% # NilEnrollment is a special case, because it's not actually a role, just a status reflecting that the user is not part of any course %>
+                    <li id="account_notification_role_NilEnrollment">
+                      <label>
+                        <%= check_box_tag "account_notification_roles[]", "NilEnrollment", false, { :class => "account_notification_role_cbx", :id => "account_notification_role_NilEnrollment_cbx" } %>
+                        <%= t :no_enrollment_roles, "Unenrolled users" %>
+                      </label>
+                    </li>
+                  </ul>
+                <% end %>
+              </td>
+              <td id="restrict_to_membership_roles">
+                <% unless @role_types.nil? %>
+                  <%= t :account_roles, "Account roles:" %>
+                  <ul>
+                    <% @role_types.each do |r| %>
+                      <li id="account_notification_role_<%= r[:name]%>">
+                        <label>
+                          <%= check_box_tag "account_notification_roles[]", r[:name], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:name]}_cbx" } %>
+                          <%= r[:label] %>
+                        </label>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% end %>
+              </td>
+            </tr>
+            <tr>
+              <td colspan=2><%= f.blabel :message, :en => "Message" %></td>
             </tr>
           </table>
           <div>
             <%= f.text_area :message, :class => 'alert_message', :style => "height: 100px;" %>
+            <% if @account.site_admin? %>
+              <span >
+                *<%= t(:interpolate_account_domain, "Note: enter \"{{ACCOUNT_DOMAIN}}\" to substitute the user's root account domain")  %>
+              </span>
+            <% end %>
           </div>
           <div class="button-container">
             <button type="submit" class="btn"><%= image_tag "add.png" %> <%= t(:add_announcement_button, "Add Announcement") %></button>
@@ -789,7 +863,9 @@ Allowing Draft State here will allow teachers to enable it in their individual c
                 <% if extra_text %>
                   (<%= extra_text %>)
                 <% end %>
-                <%= link_to "<i class='icon-download'></i>".html_safe, context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id) %>
+                <% if last_complete.workflow_state == 'complete' %>
+                  <%= link_to "<i class='icon-download'></i>".html_safe, context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id) %>
+                <% end %>
               <% else %>
                 <%= t 'report_last_run_never', 'Never' %>
               <% end %>

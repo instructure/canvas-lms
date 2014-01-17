@@ -153,7 +153,6 @@ describe User do
     google_docs_collaboration_model(:user_id => @user.id)
     @user.recent_stream_items.size.should == 1
     StreamItem.delete_all
-    @user.unmemoize_all
     @user.recent_stream_items.size.should == 0
   end
 
@@ -419,6 +418,14 @@ describe User do
               [Account.site_admin, @account].sort_by(&:id)
           @account.reload.user_account_associations.map(&:user).should == [@user]
         end
+        UserAccountAssociation.delete_all
+
+        @shard1.activate do
+          # check sharding for when we pass user IDs into update_account_associations, rather than user objects themselves
+          User.update_account_associations([@user.id], :all_shards => true)
+          @account.reload.all_users.should == [@user]
+        end
+        @shard2.activate { @account.reload.all_users.should == [@user] }
       end
     end
   end
@@ -444,6 +451,12 @@ describe User do
     @user.recent_feedback(:contexts => [@course]).should_not be_empty
   end
 
+  it "should not include recent feedback for unpublished assignments" do
+    create_course_with_student_and_assignment
+    @assignment.grade_student @user, :grade => 9
+    @assignment.unpublish
+    @user.recent_feedback(:contexts => [@course]).should be_empty
+  end
 
   describe '#courses_with_primary_enrollment' do
 
@@ -1614,6 +1627,18 @@ describe User do
         events.size.should eql 1
         events.first.title.should eql 'test appointment'
       end
+
+      it "should not include unpublished assignments when draft_state is enabled" do
+        course_with_student(:active_all => true)
+        @course.enable_feature!(:draft_state)
+        as = @course.assignments.create!({:title => "Published", :due_at => 2.days.from_now})
+        as.publish
+        as2 = @course.assignments.create!({:title => "Unpublished", :due_at => 2.days.from_now})
+        as2.unpublish
+        events = @user.calendar_events_for_calendar(:contexts => [@course])
+        events.size.should eql 1
+        events.first.title.should eql 'Published'
+      end
     end
 
     describe "upcoming_events" do
@@ -1635,10 +1660,22 @@ describe User do
         # user instead of failing.
         expect do
           events = @user.upcoming_events(:end_at => 1.week.from_now)
-        end.to_not raise_error 
+        end.to_not raise_error
 
         events.first.should == assignment2
         events.second.should == assignment
+      end
+
+      it "doesn't show unpublished assignments if draft_state is enabled" do
+        course_with_teacher_logged_in(:active_all => true)
+        @course.enable_feature!(:draft_state)
+        assignment = @course.assignments.create!(:title => "not published", :due_at => 1.days.from_now)
+        assignment.unpublish
+        assignment2 = @course.assignments.create!(:title => "published", :due_at => 1.days.from_now)
+        assignment2.publish
+        events = []
+        events = @user.upcoming_events(:end_at => 1.week.from_now)
+        events.first.should == assignment2
       end
 
     end
@@ -1743,6 +1780,24 @@ describe User do
         @quiz.save!
         @student.assignments_needing_submitting(:contexts => [@course]).count.should == 0
       end
+    end
+
+    it "should not include unpublished assignments when draft_state is enabled" do
+      course_with_student_logged_in(:active_all => true)
+      @course.enable_feature!(:draft_state)
+      assignment_quiz([], :course => @course, :user => @user)
+      @assignment.unpublish
+      @quiz.unlock_at = 1.hour.ago
+      @quiz.lock_at = nil
+      @quiz.due_at = 2.days.from_now
+      @quiz.save!
+      assignment_quiz([], :course => @course, :user => @user)
+      @quiz.unlock_at = 1.hour.ago
+      @quiz.lock_at = nil
+      @quiz.due_at = 2.days.from_now
+      @quiz.save!
+
+      @student.assignments_needing_submitting(:contexts => [@course]).count.should == 1
     end
   end
 
@@ -2022,7 +2077,6 @@ describe User do
 
       # grade one submission for one assignment; these numbers don't change
       @course1.assignments.first.grade_student(@studentA, :grade => "1")
-      @teacher = User.find(@teacher.id) # use a new instance, since these are memoized
       @teacher.assignments_needing_grading.size.should eql(2)
       @teacher.assignments_needing_grading.should be_include(@course1.assignments.first)
       @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)

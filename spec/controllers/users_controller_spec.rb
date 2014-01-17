@@ -190,6 +190,39 @@ describe UsersController do
         a.save!
       end
 
+      context 'self registration for observers only' do
+        before :each do
+          a = Account.default
+          a.settings[:self_registration_type] = 'observer'
+          a.save!
+        end
+
+        it "should not allow teachers to self register" do
+          post 'create', :pseudonym => { :unique_id => 'jane@example.com' }, :user => { :name => 'Jane Teacher', :terms_of_use => '1', :initial_enrollment_type => 'teacher' }, :format => 'json'
+          response.status.should match /403 Forbidden/
+        end
+
+        it "should not allow students to self register" do
+          course(:active_all => true)
+          @course.update_attribute(:self_enrollment, true)
+
+          post 'create', :pseudonym => { :unique_id => 'jane@example.com', :password => 'lolwut', :password_confirmation => 'lolwut' }, :user => { :name => 'Jane Student', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1', :format => 'json'
+          response.status.should match /403 Forbidden/
+        end
+
+        it "should allow observers to self register" do
+          user_with_pseudonym(:active_all => true, :password => 'lolwut')
+
+          post 'create', :pseudonym => { :unique_id => 'jane@example.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'lolwut' }, :user => { :name => 'Jane Observer', :terms_of_use => '1', :initial_enrollment_type => 'observer' }, :format => 'json'
+          response.should be_success
+        end
+
+        it "should redirect 'new' action to root_url" do
+          get 'new'
+          response.should redirect_to root_url
+        end
+      end
+
       it "should create a pre_registered user" do
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }
         response.should be_success

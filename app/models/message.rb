@@ -252,13 +252,17 @@ class Message < ActiveRecord::Base
   #
   # Returns an empty string.
   def define_content(name, &block)
-    old_output_buffer, @output_buffer = [@output_buffer, '']
+    old_output_buffer, @output_buffer = [@output_buffer, @output_buffer.dup.clear]
 
     yield
 
     instance_variable_set(:"@message_content_#{name}",
       @output_buffer.to_s.strip)
     @output_buffer = old_output_buffer.sub(/\n\z/, '')
+
+    if old_output_buffer.is_a?(ActiveSupport::SafeBuffer) && old_output_buffer.html_safe?
+      @output_buffer = ActiveSupport::SafeBuffer.new(@output_buffer)
+    end
 
     ''
   end
@@ -403,7 +407,7 @@ class Message < ActiveRecord::Base
     message_body_template = get_template(filename)
 
     context, asset, user, delayed_messages, asset_context, data = [self.context,
-      self.context, @user, @delayed_messages, self.asset_context, @data]
+      self.context, self.user, @delayed_messages, self.asset_context, @data]
 
     if message_body_template.present? && path_type.present?
       populate_body(message_body_template, path_type, binding)
@@ -639,11 +643,6 @@ class Message < ActiveRecord::Base
 
     true
   end
-
-  # Internal: No-op included for compatibility.
-  #
-  # Returns nothing.
-  def deliver_via_chat; end
 
   # Internal: Deliver the message through Twitter.
   #

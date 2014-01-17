@@ -79,7 +79,7 @@ describe DiscussionTopicsController, :type => :integration do
     let(:item_type) { 'discussion_topic' }
 
     let(:locked_item) do
-      @course.discussion_topics.create!(:message => 'Locked Discussion')
+      @course.discussion_topics.create!(:user => @user, :message => 'Locked Discussion')
     end
 
     def api_get_json
@@ -169,7 +169,7 @@ describe DiscussionTopicsController, :type => :integration do
       @topic.message.should == "test <b>message</b>"
       @topic.threaded?.should == true
       @topic.post_delayed?.should == true
-      @topic.published?.should be_false
+      @topic.published?.should @topic.draft_state_enabled? ? be_true : be_false
       @topic.delayed_post_at.to_i.should == post_at.to_i
       @topic.lock_at.to_i.should == lock_at.to_i
       @topic.podcast_enabled?.should == true
@@ -255,6 +255,7 @@ describe DiscussionTopicsController, :type => :integration do
                   "discussion_subentry_count"=>0,
                   "assignment_id"=>nil,
                   "published"=>true,
+                  "can_unpublish"=>true,
                   "delayed_post_at"=>nil,
                   "lock_at"=>nil,
                   "id"=>@topic.id,
@@ -551,7 +552,7 @@ describe DiscussionTopicsController, :type => :integration do
 
       context "publishing" do
         it "should publish a draft state topic" do
-          @topic.workflow_state = 'post_delayed'
+          @topic.workflow_state = 'unpublished'
           @topic.save!
           @topic.should_not be_published
           api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
@@ -817,6 +818,7 @@ describe DiscussionTopicsController, :type => :integration do
       "discussion_subentry_count"=>0,
       "assignment_id"=>nil,
       "published"=>true,
+      "can_unpublish"=>true,
       "delayed_post_at"=>nil,
       "lock_at"=>nil,
       "id"=>gtopic.id,
@@ -1896,7 +1898,7 @@ describe DiscussionTopicsController, :type => :integration do
       v0_r1 = v0['replies'][1]
       v0_r1['id'].should         == @reply2.id
       v0_r1['user_id'].should    == @teacher.id
-      v0_r1['message'].should    == "<p><a href=\"http://#{Account.default.domain}/courses/#{@course.id}/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}\">This is a file link</a></p>\n    <p>This is a video:\n      <video poster=\"http://#{Account.default.domain}/media_objects/0_abcde/thumbnail?height=448&amp;type=3&amp;width=550\" data-media_comment_type=\"video\" preload=\"none\" class=\"instructure_inline_media_comment\" data-media_comment_id=\"0_abcde\" controls=\"controls\" src=\"http://#{Account.default.domain}/courses/#{@course.id}/media_download?entryId=0_abcde&amp;redirect=1&amp;type=mp4\">link</video>\n    </p>"
+      v0_r1['message'].should    == "<p><a href=\"http://#{Account.default.domain}/courses/#{@course.id}/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}\" data-api-endpoint=\"http://#{Account.default.domain}/api/v1/files/#{@reply2_attachment.id}\" data-api-returntype=\"File\">This is a file link</a></p>\n    <p>This is a video:\n      <video poster=\"http://#{Account.default.domain}/media_objects/0_abcde/thumbnail?height=448&amp;type=3&amp;width=550\" data-media_comment_type=\"video\" preload=\"none\" class=\"instructure_inline_media_comment\" data-media_comment_id=\"0_abcde\" controls=\"controls\" src=\"http://#{Account.default.domain}/courses/#{@course.id}/media_download?entryId=0_abcde&amp;redirect=1&amp;type=mp4\">link</video>\n    </p>"
       v0_r1['parent_id'].should  == @root1.id
       v0_r1['created_at'].should == @reply2.created_at.as_json
       v0_r1['updated_at'].should == @reply2.updated_at.as_json

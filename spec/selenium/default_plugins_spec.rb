@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "default plugins" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before(:each) do
     user_logged_in
@@ -144,34 +144,6 @@ describe "default plugins" do
     assert_flash_notice_message /successfully updated/
 
     settings = Canvas::Plugin.find(:scribd).try(:settings)
-    settings.should_not be_nil
-    settings[:api_key].should == 'asdf'
-    settings[:secret_key].should == 'asdf'
-  end
-
-  it "should allow configuring tinychat plugin" do
-    settings = Canvas::Plugin.find(:tinychat).try(:settings)
-    settings.should be_nil
-
-    Tinychat.stubs(:config_check).returns("Bad check")
-    get "/plugins/tinychat"
-
-    multiple_accounts_select
-    f("#plugin_setting_disabled").click
-    wait_for_ajaximations
-    f("#settings_api_key").send_keys("asdf")
-    f("#settings_secret_key").send_keys("asdf")
-    submit_form('#new_plugin_setting')
-
-    assert_flash_error_message /There was an error/
-
-    Tinychat.stubs(:config_check).returns(nil)
-    submit_form('#new_plugin_setting')
-    wait_for_ajax_requests
-
-    assert_flash_notice_message /successfully updated/
-
-    settings = Canvas::Plugin.find(:tinychat).try(:settings)
     settings.should_not be_nil
     settings[:api_key].should == 'asdf'
     settings[:secret_key].should == 'asdf'

@@ -1,13 +1,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "Navigating to wiki pages" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   describe "Navigation" do
     before do
       account_model
-      @account.settings[:enable_draft] = true
-      @account.save!
+      @account.enable_feature!(:draft_state)
       course_with_teacher_logged_in :account => @account
     end
 

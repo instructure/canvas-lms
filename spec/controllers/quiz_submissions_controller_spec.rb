@@ -132,7 +132,7 @@ describe QuizSubmissionsController do
       json = JSON.parse(response.body)
 
       json.should have_key('time_left')
-      json['time_left'].should == 60 * 60
+      json['time_left'].should be_close(60 * 60, 5.0)
     end
 
   end

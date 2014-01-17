@@ -1,0 +1,46 @@
+<li class='quiz'>
+<div {{bind-attr class=':ig-row :ig-editable publishable:ig-publishable isPublishedStatusVisible:ig-published' }}>
+    <a {{bind-attr href='html_url'}} class='ig-title ellipses'>
+      <i class='icon-quiz'></i>
+      {{title}}
+    </a>
+    <div class='ig-details row-fluid'>
+      <div class='span4 ellipses date-available'>
+        {{ic-dates-available allDates=allDates linkHref=html_url}}
+      </div>
+      <div class='span4 ellipses date-due'>
+        {{ic-dates-available allDates=allDates linkHref=html_url showDueDates=true}}
+      </div>
+      <div class='span2 ellipses'>
+        {{pointsPossible}}
+      </div>
+      <div class='span2 ellipses'>
+        {{questionCountLabel}}
+      </div>
+    </div>
+    {{#if canUpdate}}
+      <div class="ig-admin">
+
+        {{ic-publish-icon
+          disabled=disabled
+          disabled-message=disabledMessage
+          is-published=published
+          on-publish='publish'
+          on-unpublish='unpublish'
+        }}
+
+        {{#ic-actions title='settings'}}
+          {{#ic-menu-item on-select='edit'}}
+            <i class='icon-edit'></i>
+            {{#t 'edit'}}Edit{{/t}}
+          {{/ic-menu-item}}
+          {{#ic-menu-item on-select='delete'}}
+            <i class='icon-trash'></i>
+            {{#t 'delete'}}Delete{{/t}}
+          {{/ic-menu-item}}
+        {{/ic-actions}}
+
+      </div>
+    {{/if}}
+  </div>
+</li>

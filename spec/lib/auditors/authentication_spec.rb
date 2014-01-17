@@ -23,6 +23,7 @@ describe AuthenticationAuditApiController do
   it_should_behave_like "cassandra audit logs"
 
   before do
+    RequestContextGenerator.stubs( :request_id => 'xyz' )
     @account = Account.default
     user_with_pseudonym(active_all: true)
     @event = Auditors::Authentication.record(@pseudonym, 'login')

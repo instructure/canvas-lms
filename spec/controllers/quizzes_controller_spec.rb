@@ -101,9 +101,7 @@ describe QuizzesController do
 
   describe "GET 'index' with draft state enabled" do
     setup do
-      a = Account.default
-      a.settings[:enable_draft] = true
-      a.save!
+      Account.default.enable_feature! :draft_state
     end
 
     it "should assign variables" do
@@ -342,6 +340,27 @@ describe QuizzesController do
       path = "courses/#{@course.id}/quizzes/#{@quiz.id}/submission_versions"
       assigns[:js_env][:SUBMISSION_VERSIONS_URL].should include(path)
     end
+
+    it "doesn't show unpublished quizzes to students with draft state" do
+      course_with_student_logged_in(active_all: true)
+      course_quiz(active=true)
+      Account.default.enable_feature!(:draft_state)
+      @quiz.unpublish!
+      get 'show', course_id: @course.id, id: @quiz.id
+      response.should_not be_success
+    end
+
+    it 'logs a single asset access entry with an action level of "view"' do
+      Setting.set('enable_page_views', 'db')
+
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz
+      get 'show', :course_id => @course.id, :id => @quiz.id
+      assigns[:access].should_not be_nil
+      assigns[:accessed_asset].should_not be_nil
+      assigns[:accessed_asset][:level].should == 'view'
+      assigns[:access].view_score.should == 1
+    end
   end
 
   describe "GET 'managed_quiz_data'" do
@@ -464,64 +483,6 @@ describe QuizzesController do
     end
   end
 
-  describe "POST 'reorder'" do
-    it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      course_quiz
-      post 'reorder', :course_id => @course.id, :quiz_id => @quiz.id, :order => ""
-      assert_unauthorized
-    end
-
-    it "should require authorization" do
-      course_with_student_logged_in(:active_all => true)
-      course_quiz
-      post 'reorder', :course_id => @course.id, :quiz_id => @quiz.id, :order => ""
-      assert_unauthorized
-    end
-
-    it "should reorder questions" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_quiz
-      q1 = quiz_question
-      q2 = quiz_question
-      q3 = quiz_question
-      q1.position.should eql(1)
-      q2.position.should eql(2)
-      q3.position.should eql(3)
-      post 'reorder', :course_id => @course.id, :quiz_id => @quiz.id, :order => "question_#{q3.id},question_#{q1.id},question_#{q2.id}"
-      assigns[:quiz].should eql(@quiz)
-      q1.reload
-      q2.reload
-      q3.reload
-      q1.position.should eql(2)
-      q2.position.should eql(3)
-      q3.position.should eql(1)
-      response.should be_success
-    end
-
-    it "should reorder questions AND groups" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_quiz
-      q1 = quiz_question
-      q1.save!
-      q2 = quiz_question
-      g3 = quiz_group
-      q1.position.should eql(1)
-      q2.position.should eql(2)
-      g3.position.should eql(3)
-      post 'reorder', :course_id => @course.id, :quiz_id => @quiz.id, :order => "group_#{g3.id},question_#{q1.id},question_#{q2.id}"
-      assigns[:quiz].should eql(@quiz)
-      q1.reload
-      q2.reload
-      g3.reload
-      q1.position.should eql(2)
-      q1.quiz_group_id.should be_nil
-      q2.position.should eql(3)
-      g3.position.should eql(1)
-      response.should be_success
-    end
-  end
-
   describe "POST 'take'" do
     it "should require authorization" do
       course_with_student(:active_all => true)
@@ -535,6 +496,40 @@ describe QuizzesController do
       course_quiz(true)
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
       response.should redirect_to("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
+    end
+
+    context 'asset access logging' do
+      before :each do
+        Setting.set('enable_page_views', 'db')
+
+        course_with_teacher_logged_in(:active_all => true)
+        course_quiz
+      end
+
+      it 'should log a single entry with an action level of "participate"' do
+        post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+        assigns[:access].should_not be_nil
+        assigns[:accessed_asset].should_not be_nil
+        assigns[:accessed_asset][:level].should == 'participate'
+        assigns[:access].participate_score.should == 1
+      end
+
+      it 'should not log entries when resuming the quiz' do
+        post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+        assigns[:access].should_not be_nil
+        assigns[:accessed_asset].should_not be_nil
+        assigns[:accessed_asset][:level].should == 'participate'
+        assigns[:access].participate_score.should == 1
+
+        # Since the second request we will make is handled by the same controller
+        # instance, @accessed_asset must be reset otherwise
+        # ApplicationController#log_page_view will use it to log another entry.
+        controller.instance_variable_set('@accessed_asset', nil)
+        controller.js_env.clear
+
+        post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
+        assigns[:access].participate_score.should == 1
+      end
     end
 
     context 'verification' do
@@ -942,7 +937,7 @@ describe QuizzesController do
       course_quiz
       @quiz.update_attributes(quiz_type: 'ungraded_survey')
       # make sure the assignment doesn't exist
-      @quiz.assignment = nil if @quiz.context.draft_state_enabled?
+      @quiz.assignment = nil if @quiz.context.feature_enabled?(:draft_state)
       @quiz.assignment.should_not be_present
       post 'update', course_id: @course.id, id: @quiz.id, activate: true,
         quiz: {quiz_type: 'assignment'}

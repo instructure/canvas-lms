@@ -140,6 +140,11 @@ class AssessmentItemConverter
           when 'WCT_FillInTheBlank'
             @question[:question_type] = 'fill_in_multiple_blanks_question'
             @question[:is_vista_fib] = true
+          when 'WCT_ShortAnswer'
+            if @doc.css("responseDeclaration[baseType=\"string\"]").count > 1
+              @question[:question_type] = 'fill_in_multiple_blanks_question'
+              @question[:is_vista_fib] = true
+            end
           when 'Jumbled Sentence'
             @question[:question_type] = 'multiple_dropdowns_question'
           when 'Essay'

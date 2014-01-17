@@ -21,7 +21,7 @@ require 'lib/model_cache'
 describe ModelCache do
   before do
     class TestModelCacheUser < ActiveRecord::Base
-      set_table_name :users # reuse exiting tables so AR doesn't asplode
+      self.table_name = :users # reuse exiting tables so AR doesn't asplode
       include ModelCache
       cacheable_by :id, :name
 
@@ -29,7 +29,7 @@ describe ModelCache do
     end
 
     class TestModelCachePseudonym < ActiveRecord::Base
-      set_table_name :pseudonyms
+      self.table_name = :pseudonyms
       include ModelCache
 
       belongs_to :test_model_cache_user, :foreign_key => :user_id

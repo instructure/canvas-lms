@@ -144,7 +144,7 @@ module Canvas
             false
           end
         else
-          plugin_setting.errors.add_to_base("provided validator #{validator} failed to load")
+          plugin_setting.errors.add(:base, "provided validator #{validator} failed to load")
           false
         end
       else

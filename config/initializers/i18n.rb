@@ -4,11 +4,12 @@ skip_locale_loading = (Rails.env.development? || Rails.env.test? || $0 == 'irb')
 if skip_locale_loading
   I18n.load_path = I18n.load_path.grep(%r{/(locales|en)\.yml\z})
 end
-if CANVAS_RAILS2
-  I18n.backend = I18nema::Backend.new
-  I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
-  I18n.backend.init_translations
-end
+
+I18n.backend = I18nema::Backend.new
+I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
+I18n.backend.init_translations
+
+I18n.enforce_available_locales = true
 
 I18n.send :extend, I18n::Lolcalize if ENV['LOLCALIZE']
 
@@ -91,7 +92,11 @@ I18n.class_eval do
         values.each_pair{ |key, value| values[key] = ERB::Util.h(value) unless value.html_safe? }
         string = ERB::Util.h(string) unless string.html_safe?
       end
-      interpolate_hash_without_html_safety_awareness(string, values)
+      if string.is_a?(ActiveSupport::SafeBuffer) && string.html_safe?
+        ActiveSupport::SafeBuffer.new(interpolate_hash_without_html_safety_awareness(string.to_str, values))
+      else
+        interpolate_hash_without_html_safety_awareness(string, values)
+      end
     end
 
     alias_method_chain :interpolate_hash, :html_safety_awareness
@@ -178,8 +183,10 @@ else
   ActionView::TemplateRenderer.class_eval do
     def render_template_with_assign(template, *a)
       old_i18n_scope = @lookup_context.i18n_scope
-      @lookup_context.i18n_scope = @current_template.virtual_path.sub(/\/_/, '/').gsub('/', '.')
-      _render_template_without_assign(template, *a)
+      if template.respond_to?(:virtual_path) && (virtual_path = template.virtual_path)
+        @lookup_context.i18n_scope = virtual_path.sub(/\/_/, '/').gsub('/', '.')
+      end
+      render_template_without_assign(template, *a)
     ensure
       @lookup_context.i18n_scope = old_i18n_scope
     end

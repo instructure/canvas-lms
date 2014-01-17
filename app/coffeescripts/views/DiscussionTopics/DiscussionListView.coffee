@@ -94,7 +94,7 @@ define [
     #
     # Returns object.
     toJSON: ->
-      @options
+      _.extend({}, ENV, @options)
 
     # Internal: Attach events to this view's collection.
     #

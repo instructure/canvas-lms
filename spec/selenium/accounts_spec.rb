@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "account" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     course_with_admin_logged_in
@@ -133,7 +133,7 @@ describe "account" do
     end
 
     it "should be able to create a new course when no other courses exist" do
-      Account.default.courses.each { |c| c.enrollments.scoped.delete_all; c.destroy! }
+      Account.default.courses.each { |c| c.enrollments.scoped.delete_all; c.course_account_associations.scoped.delete_all; c.destroy! }
 
       get "/accounts/#{Account.default.to_param}"
       f('.add_course_link').click

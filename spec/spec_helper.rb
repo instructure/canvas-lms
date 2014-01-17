@@ -15,31 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-if ENV['COVERAGE'] == "1"
-  puts "Code Coverage enabled"
-  require 'simplecov'
-  SimpleCov.start do
-    SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
-    add_filter '/spec/'
-    add_filter '/config/'
-    add_filter 'spec_canvas'
 
-    add_group 'Controllers', 'app/controllers'
-    add_group 'Models', 'app/models'
-    add_group 'App', '/app/'
-    add_group 'Helpers', 'app/helpers'
-    add_group 'Libraries', '/lib/'
-    add_group 'Plugins', 'vendor/plugins'
-    add_group "Long files" do |src_file|
-      src_file.lines.count > 500
-    end
-    SimpleCov.at_exit do
-      SimpleCov.result.format!
-    end
-  end
-else
-  puts "Code coverage not enabled"
-end
+begin; require File.expand_path(File.dirname(__FILE__) + "/../parallelized_specs/lib/parallelized_specs.rb"); rescue LoadError; end
 
 ENV["RAILS_ENV"] = 'test'
 
@@ -55,8 +32,21 @@ require 'webrat'
 require 'mocha/api'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
+require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
+
+def require_webmock
+  # pull in webmock for selected tests, but leave it disabled by default.
+  # funky require order is to skip typhoeus because of an incompatibility
+  # see: https://github.com/typhoeus/typhoeus/issues/196
+  require 'webmock/util/version_checker'
+  require 'webmock/http_lib_adapters/http_lib_adapter_registry'
+  require 'webmock/http_lib_adapters/http_lib_adapter'
+  require 'webmock/http_lib_adapters/typhoeus_hydra_adapter'
+  WebMock::HttpLibAdapterRegistry.instance.http_lib_adapters.delete :typhoeus
+  require 'webmock/rspec'
+end
 
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
@@ -96,7 +86,8 @@ def truncate_all_tables
   models_by_connection = ActiveRecord::Base.all_models.group_by { |m| m.connection }
   models_by_connection.each do |connection, models|
     if connection.adapter_name == "PostgreSQL"
-      connection.execute("TRUNCATE TABLE #{models.map(&:table_name).map { |t| connection.quote_table_name(t) }.join(',')}")
+      table_names = connection.tables & models.map(&:table_name)
+      connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
     else
       models.each { |model| truncate_table(model) }
     end
@@ -142,6 +133,7 @@ Mocha::Mock.class_eval do
     return true if [:marshal_dump, :marshal_load].include?(symbol)
     respond_to_without_marshalling?(symbol, include_private)
   end
+
   alias_method_chain :respond_to?, :marshalling
 end
 
@@ -151,6 +143,7 @@ end
       Marshal.dump(value)
       write_without_serialization_check(name, value, options)
     end
+
     alias_method_chain :write, :serialization_check
   end
 end
@@ -162,11 +155,13 @@ unless CANVAS_RAILS2
       Marshal.dump(result) if result
       result
     end
+
     alias_method_chain :fetch, :serialization_check
   end
 end
 
-Spec::Matchers.define :encompass do |expected|
+matchers_module = (CANVAS_RAILS2 ? Spec::Matchers : RSpec::Matchers)
+matchers_module.define :encompass do |expected|
   match do |actual|
     if expected.is_a?(Array) && actual.is_a?(Array)
       expected.size == actual.size && expected.zip(actual).all? { |e, a| a.slice(*e.keys) == e }
@@ -178,7 +173,7 @@ Spec::Matchers.define :encompass do |expected|
   end
 end
 
-Spec::Matchers.define :match_ignoring_whitespace do |expected|
+matchers_module.define :match_ignoring_whitespace do |expected|
   def whitespaceless(str)
     str.gsub(/\s+/, '')
   end
@@ -188,7 +183,7 @@ Spec::Matchers.define :match_ignoring_whitespace do |expected|
   end
 end
 
-Spec::Runner.configure do |config|
+(CANVAS_RAILS2 ? Spec::Runner : RSpec).configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
   # in your config/boot.rb
@@ -282,12 +277,8 @@ Spec::Runner.configure do |config|
         @teacher = u
       end
       if opts[:draft_state]
-        account.settings[:allow_draft] = true
-        account.save!
-        @course.enable_draft = true
-        @course.save!
-        # to reload the @course.root_account
-        @course.reload
+        account.allow_feature!(:draft_state)
+        @course.enable_feature!(:draft_state)
       end
     end
     @course
@@ -473,10 +464,8 @@ Spec::Runner.configure do |config|
     course = opts[:course] || @course
     account = opts[:account] || course.account
 
-    account.settings[:allow_draft] = true
-    account.save! unless opts[:no_save]
-    course.enable_draft = enabled
-    course.save! unless opts[:no_save]
+    account.allow_feature!(:draft_state)
+    course.set_feature_flag!(:draft_state, enabled ? 'on' : 'off')
 
     enabled
   end
@@ -498,6 +487,16 @@ Spec::Runner.configure do |config|
     @fake_student = course.student_view_student
     post "/users/#{@fake_student.id}/masquerade"
     session[:become_user_id].should == @fake_student.id.to_s
+  end
+
+  def account_notification(opts={})
+    req_service = opts[:required_account_service] || nil
+    roles = opts[:roles] || []
+    message = opts[:message] || "hi there"
+    @account = opts[:account] || Account.default
+    @announcement = @account.announcements.create!(message: message, required_account_service: req_service)
+    @announcement.account_notification_roles.build(roles.map{ |r| { account_notification_id: @announcement.id, role_type: r} }) unless roles.empty?
+    @announcement.save!
   end
 
   VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
@@ -681,46 +680,46 @@ Spec::Runner.configure do |config|
     @outcome_group.save!
 
     rubric_params = {
-      :title => 'My Rubric',
-      :hide_score_total => false,
-      :criteria => {
-        "0" => {
-          :points => 3,
-          :mastery_points => 0,
-          :description => "Outcome row",
-          :long_description => @outcome.description,
-          :ratings => {
+        :title => 'My Rubric',
+        :hide_score_total => false,
+        :criteria => {
             "0" => {
-              :points => 3,
-              :description => "Rockin'",
+                :points => 3,
+                :mastery_points => 0,
+                :description => "Outcome row",
+                :long_description => @outcome.description,
+                :ratings => {
+                    "0" => {
+                        :points => 3,
+                        :description => "Rockin'",
+                    },
+                    "1" => {
+                        :points => 0,
+                        :description => "Lame",
+                    }
+                },
+                :learning_outcome_id => @outcome.id
             },
             "1" => {
-              :points => 0,
-              :description => "Lame",
+                :points => 5,
+                :description => "no outcome row",
+                :long_description => 'non outcome criterion',
+                :ratings => {
+                    "0" => {
+                        :points => 5,
+                        :description => "Amazing",
+                    },
+                    "1" => {
+                        :points => 3,
+                        :description => "not too bad",
+                    },
+                    "2" => {
+                        :points => 0,
+                        :description => "no bueno",
+                    }
+                }
             }
-          },
-          :learning_outcome_id => @outcome.id
-        },
-        "1" => {
-          :points => 5,
-          :description => "no outcome row",
-          :long_description => 'non outcome criterion',
-          :ratings => {
-            "0" => {
-              :points => 5,
-              :description => "Amazing",
-            },
-            "1" => {
-              :points => 3,
-              :description => "not too bad",
-            },
-            "2" => {
-              :points => 0,
-              :description => "no bueno",
-            }
-          }
         }
-      }
     }
 
     @rubric = @course.rubrics.build
@@ -853,25 +852,34 @@ Spec::Runner.configure do |config|
   def enable_cache(new_cache = ActiveSupport::Cache::MemoryStore.new)
     old_cache = RAILS_CACHE
     ActionController::Base.cache_store = new_cache
-    silence_warnings { Object.const_set(:RAILS_CACHE, new_cache) }
     old_perform_caching = ActionController::Base.perform_caching
+    if CANVAS_RAILS2
+      ActionController::Base.cache_store = new_cache
+      silence_warnings { Object.const_set(:RAILS_CACHE, new_cache) }
+    else
+      Switchman::DatabaseServer.all.each {|s| s.stubs(:cache_store).returns(new_cache)}
+    end
     ActionController::Base.perform_caching = true
     yield
   ensure
-    silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
-    ActionController::Base.cache_store = old_cache
+    if CANVAS_RAILS2
+      ActionController::Base.cache_store = old_cache
+      silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
+    else
+      Switchman::DatabaseServer.all.each {|s| s.unstub(:cache_store)}
+    end
     ActionController::Base.perform_caching = old_perform_caching
   end
 
   # enforce forgery protection, so we can verify usage of the authenticity token
   def enable_forgery_protection(enable = true)
     old_value = ActionController::Base.allow_forgery_protection
-    ActionController::Base.stubs(:allow_forgery_protection).including_subclasses.returns(enable)
+    ActionController::Base.stubs(:allow_forgery_protection).returns(enable)
 
     yield if block_given?
 
   ensure
-    ActionController::Base.stubs(:allow_forgery_protection).including_subclasses.returns(old_value) if block_given?
+    ActionController::Base.stubs(:allow_forgery_protection).returns(old_value) if block_given?
   end
 
   def start_test_http_server(requests=1)
@@ -1183,6 +1191,40 @@ Spec::Runner.configure do |config|
     else
       Rails.application.config.consider_all_requests_local = value
     end
+  end
+
+  def page_view_for(opts={})
+    @account = opts[:account] || Account.default
+    @context = opts[:context] || course(opts)
+
+    @request_id = opts[:request_id] || RequestContextGenerator.request_id
+    unless @request_id
+      @request_id = UUIDSingleton.instance.generate
+      RequestContextGenerator.stubs(:request_id => @request_id)
+    end
+
+    Setting.set('enable_page_views', 'db')
+
+    @page_view = PageView.new { |p|
+      p.send(:attributes=, {
+          :id => @request_id,
+          :url => "http://test.one/",
+          :session_id => "phony",
+          :context => @context,
+          :controller => opts[:controller] || 'courses',
+          :action => opts[:action] || 'show',
+          :user_request => true,
+          :render_time => 0.01,
+          :user_agent => 'None',
+          :account_id => @account.id,
+          :request_id => request_id,
+          :interaction_seconds => 5,
+          :user => @user,
+          :remote_ip => '192.168.0.42'
+      }, false)
+    }
+    @page_view.save!
+    @page_view
   end
 end
 

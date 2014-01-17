@@ -114,20 +114,19 @@ define [
     @optionProperty 'resourceName'
 
     ##
-    # Overridden to allow recognition of hybrid jsonapi.org/canvas-style
-    # compound documents.
+    # Overridden to allow recognition of jsonapi.org url style compound
+    # documents.
     #
     # These compound documents side load related objects as secondary
-    # collections alongside the primary collection, rather than embedded within
-    # the primary collection's objects. But unlike jsonapi.org, foreign keys
-    # relating the primary and secondary objects are left as properties on the
-    # primary object, rather than being encapsulated in a `links' property.
-    # Canvas indicates which collection in the response is primary through the
-    # `meta' property's `primaryCollection' subproperty.
+    # collections under the linked attribute, rather than embedded within
+    # the primary collection's objects. The primary collection is defined
+    # by following the jsonapi.org standard.  This will look for the first
+    # collection after removing reserved keys.
     #
-    # To adapt this style to Backbone, we check for this property and, if
-    # found, we extract the primary collection and pre-process any declared
-    # side loads into the embedded format that Backbone expects.
+    # To adapt this style to Backbone, we check for any jsonapi.org reserved
+    # keys and, if any are found, we extract the first primary collection and
+    # pre-process any declared side loads into the embedded format that Backbone
+    # expects.
     #
     # Declaring recognized side loads is done through the `sideLoad' property
     # on the collection class. The value of this property is an object whose
@@ -142,6 +141,9 @@ define [
     # defined, but properties to be inferred). A string value is treated as a
     # hash with a collection name, leaving the foreign key to be inferred.
     #
+    # If the value of a foreign key is an array it will be treated as a to_many
+    # relationship and load all related documents.
+    #
     # For examples, the following are all identical:
     #
     #   sideLoad:
@@ -153,7 +155,7 @@ define [
     #
     #   sideLoad:
     #     author:
-    #       foreignKey: 'author_id'
+    #       foreignKey: 'author'
     #       collection: 'authors'
     #
     # If the authors are instead contained in the `people' collection, the
@@ -165,39 +167,66 @@ define [
     #
     #   sideLoad:
     #     author:
-    #       foreignKey: 'author_id'
+    #       foreignKey: 'author'
     #       collection: 'people'
     #
     # Alternately, if the collection is `authors' and the target relation
-    # property is `author', but the foreign key is `person_id' (such a silly
+    # property is `author', but the foreign key is `person' (such a silly
     # API), you can use:
     #
     #   sideLoad:
     #     author:
-    #       foreignKey: 'person_id'
+    #       foreignKey: 'person'
     #
     parse: (response, options) ->
-      return super unless response?.meta?
+      return super unless response?
+      rootMeta = _.pick(response, 'meta', 'links', 'linked')
+      return super if _.isEmpty(rootMeta)
 
-      primaryCollection = response[response.meta.primaryCollection]
+      collections = _.omit(response, 'meta', 'links', 'linked')
+      return super if _.isEmpty(collections)
+      collectionKeys = _.keys(collections)
+
+      primaryCollectionKey = _.first(collectionKeys)
+      primaryCollection = collections[primaryCollectionKey]
+      return super unless primaryCollection?
+
+      if collectionKeys.length > 1
+        console?.warn?("Found more then one primary collection, using '#{primaryCollectionKey}'.")
+
+      index = {}
+      _.each rootMeta.linked || {}, (link, key) ->
+        index[key] = _.indexBy(link, 'id')
+      return super primaryCollection, options if _.isEmpty(index)
+
       _.each (@sideLoad || {}), (meta, relation) ->
         meta = {} if _.isBoolean(meta) && meta
         meta = {collection: meta} if _.isString(meta)
         return unless _.isObject(meta)
 
         {foreignKey, collection} = meta
-        foreignKey ?= "#{relation}_id"
+        foreignKey ?= "#{relation}"
         collection ?= "#{relation}s"
-        collection = response[collection] || []
+        collection = index[collection] || {}
 
-        index = {}
-        _.each collection, (item) ->
-          index[item.id] = item
         _.each primaryCollection, (item) ->
-          id = item[foreignKey]
-          related = index[id]
+          return unless item.links
+          related = null
+
+          id = item.links[foreignKey]
+          if _.isArray(id)
+            if _.isEmpty(collection)
+              collection = index[relation] || index[foreignKey]
+              unless collection?
+                throw "Could not find linked collection for '#{relation}' using '#{foreignKey}'."
+            related = _.map id, (pk) ->
+              collection[pk]
+          else
+            related = collection[id]
+
           if id? && related?
             item[relation] = related
-            delete item[foreignKey]
+            delete item.links[foreignKey]
+            delete item.links if _.isEmpty(item.links)
 
       super primaryCollection, options

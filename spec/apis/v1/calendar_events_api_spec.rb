@@ -842,6 +842,84 @@ describe CalendarEventsApiController, :type => :integration do
       json.first['due_at'].should be_nil
     end
 
+    context 'unpublished assignments' do
+      before do
+        @course1 = @course
+        course_with_teacher(:active_course => true, :active_enrollment => true, :user => @teacher)
+        @course2 = @course
+
+        @pub1 = @course1.assignments.create(:title => 'published assignment 1')
+        @pub2 = @course2.assignments.create(:title => 'published assignment 2')
+        [@pub1, @pub2].each { |a| a.workflow_state = 'published'; a.save! }
+
+        @unpub1 = @course1.assignments.create(:title => 'unpublished assignment 1')
+        @unpub2 = @course2.assignments.create(:title => 'unpublished assignment 2')
+        [@unpub1, @unpub2].each { |a| a.workflow_state = 'unpublished'; a.save! }
+      end
+
+      context 'for teachers' do
+        it 'should return all assignments' do
+          json = api_call_as_user(@teacher,
+            :get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course1.id}&context_codes[]=course_#{@course2.id}",
+            :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+            :type => 'assignment', :all_events => '1', :context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"]
+          )
+
+          json.map{ |a| a['title'] }.sort.should eql [
+            'published assignment 1',
+            'published assignment 2',
+            'unpublished assignment 1',
+            'unpublished assignment 2'
+          ]
+        end
+      end
+
+      context 'for teachers and students' do
+        before do
+          @teacher_student = user(:active_all => true)
+          teacher_enrollment = @course1.enroll_teacher(@teacher_student)
+          teacher_enrollment.workflow_state = 'active'
+          teacher_enrollment.save!
+          @course2.enroll_student(@teacher_student, :enrollment_state => 'active')
+        end
+
+        it 'should return published assignments and all assignments for teacher contexts' do
+          json = api_call_as_user(@teacher_student,
+            :get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course1.id}&context_codes[]=course_#{@course2.id}",
+            :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+            :type => 'assignment', :all_events => '1', :context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"]
+          )
+
+          json.map{ |a| a['title'] }.sort.should eql [
+            'published assignment 1',
+            'published assignment 2',
+            'unpublished assignment 1',
+          ]
+        end
+      end
+
+      context 'for students' do
+        before do
+          @teacher_student = user(:active_all => true)
+          @course1.enroll_student(@teacher_student, :enrollment_state => 'active')
+          @course2.enroll_student(@teacher_student, :enrollment_state => 'active')
+        end
+
+        it 'should return only published assignments' do
+          json = api_call_as_user(@teacher_student,
+            :get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course1.id}&context_codes[]=course_#{@course2.id}",
+            :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+            :type => 'assignment', :all_events => '1', :context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"]
+          )
+
+          json.map{ |a| a['title'] }.sort.should eql [
+            'published assignment 1',
+            'published assignment 2',
+          ]
+        end
+      end
+    end
+
     context 'all assignments' do
       before do
         @course.assignments.create(:title => 'undated')

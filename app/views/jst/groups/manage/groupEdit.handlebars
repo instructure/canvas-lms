@@ -1,10 +1,21 @@
 <div class="control-group">
-  <label class="control-label" for="group_category_name">{{#t "group_name"}}Group Name{{/t}}</label>
+  <label class="control-label" for="group_name">{{#t "group_name"}}Group Name{{/t}}</label>
   <div class="controls">
-    <input type="text" id="group_category_name" name='name' value="{{name}}"
+    <input type="text" id="group_name" name='name' value="{{name}}"
            placeholder="{{#t "group_name"}}Group Name{{/t}}">
   </div>
 </div>
+{{#ifEqual role "student_organized"}}
+<div class="control-group">
+  <label class="control-label" for="group_join_level">{{#t "group_join_level"}}Joining{{/t}}</label>
+  <div class="controls">
+    <select id="group_join_level" name="join_level">
+      <option value="parent_context_auto_join">{{#t "open"}}Members are free to join{{/t}}</option>
+      <option value="invitation_only" {{selectedIf join_level "invitation_only"}}>{{#t "invitation_only"}}Invitation only{{/t}}</option>
+    </select>
+  </div>
+</div>
+{{/ifEqual}}
 
 <div class="form-controls">
   <button class="btn dialog_closer" type="button"

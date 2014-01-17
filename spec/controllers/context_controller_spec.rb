@@ -83,30 +83,6 @@ describe ContextController do
     end
   end
 
-  describe "GET 'chat'" do
-    it "should redirect if no chats enabled" do
-      course_with_teacher(:active_all => true)
-      get 'chat', :course_id => @course.id, :id => @user.id
-      response.should be_redirect
-    end
-
-    it "should require authorization" do
-      PluginSetting.create!(:name => "tinychat", :settings => {})
-      course_with_teacher(:active_all => true)
-      get 'chat', :course_id => @course.id, :id => @user.id
-      assert_unauthorized
-    end
-
-    it "should redirect 'disabled', if disabled by the teacher" do
-      PluginSetting.create!(:name => "tinychat", :settings => {})
-      course_with_student_logged_in(:active_all => true)
-      @course.update_attribute(:tab_configuration, [{'id'=>9,'hidden'=>true}])
-      get 'chat', :course_id => @course.id
-      response.should be_redirect
-      flash[:notice].should match(/That page has been disabled/)
-    end
-  end
-
   describe "POST 'object_snippet'" do
     before(:each) do
       @obj = "<object data='test'></object>"

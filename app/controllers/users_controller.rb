@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -105,6 +105,8 @@ class UsersController < ApplicationController
   include LinkedIn
   include DeliciousDiigo
   include SearchHelper
+  include I18nUtilities
+
   before_filter :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
     :user_dashboard, :toggle_dashboard, :masquerade, :external_tool,
@@ -276,7 +278,7 @@ class UsersController < ApplicationController
   before_filter :require_password_session, :only => [:masquerade]
   def masquerade
     @user = User.find_by_id(params[:user_id])
-    return render_unauthorized_action(@user) unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
+    return render_unauthorized_action unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
     if request.post?
       if @user == @real_current_user
         session.delete(:become_user_id)
@@ -718,7 +720,10 @@ class UsersController < ApplicationController
   end
 
   def delete_user_service
-    @current_user.user_services.find(params[:id]).destroy
+    deleted = @current_user.user_services.find(params[:id]).destroy
+    if deleted.service == "google_docs"
+      Rails.cache.delete(['google_docs_tokens', @current_user].cache_key)
+    end
     render :json => {:deleted => true}
   end
 
@@ -1144,7 +1149,7 @@ class UsersController < ApplicationController
         end
       end
     else
-      render_unauthorized_action(@user)
+      render_unauthorized_action
     end
   end
 
@@ -1357,7 +1362,8 @@ class UsersController < ApplicationController
     get_context
     @context = @domain_root_account || Account.default unless @context.is_a?(Account)
     @context = @context.root_account
-    unless @context.grants_right?(@current_user, session, :manage_user_logins) || @context.self_registration?
+    unless @context.grants_right?(@current_user, session, :manage_user_logins) ||
+        @context.self_registration_allowed_for?(params[:user] && params[:user][:initial_enrollment_type])
       flash[:error] = t('no_self_registration', "Self registration has not been enabled for this account")
       respond_to do |format|
         format.html { redirect_to root_url }
@@ -1369,7 +1375,7 @@ class UsersController < ApplicationController
 
   def all_menu_courses
     render :json => Rails.cache.fetch(['menu_courses', @current_user].cache_key) {
-      @template.map_courses_for_menu(@current_user.courses_with_primary_enrollment)
+      map_courses_for_menu(@current_user.courses_with_primary_enrollment)
     }
   end
 
@@ -1492,6 +1498,51 @@ class UsersController < ApplicationController
       user_follow = @current_user.user_follows.where(:followed_item_id => @user, :followed_item_type => 'User').first
       user_follow.try(:destroy)
       render :json => { "ok" => true }
+    end
+  end
+
+  # @API Merge user into another user
+  #
+  # Merge a user into another user.
+  # To merge users, the caller must have permissions to manage both users.
+  #
+  # When finding users by SIS ids in different accounts the
+  # destination_account_id is required.
+  #
+  # The account can also be identified by passing the domain in destination_account_id.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/<user_id>/merge_into/<destination_user_id> \
+  #          -X PUT \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/<user_id>/merge_into/accounts/<destination_account_id>/users/<destination_user_id> \
+  #          -X PUT \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns User
+  def merge_into
+    user = api_find(User, params[:id])
+    if authorized_action(user, @current_user, :manage_logins)
+
+      if (account_id = params[:destination_account_id])
+        destination_account = Account.find_by_domain(account_id)
+        destination_account ||= Account.find(account_id)
+      else
+        destination_account ||= @domain_root_account
+      end
+
+      into_user = api_find(User, params[:destination_user_id], account: destination_account)
+
+      if authorized_action(into_user, @current_user, :manage_logins)
+        UserMerge.from(user).into into_user
+        render(:json => user_json(into_user,
+                                  @current_user,
+                                  session,
+                                  %w{locale},
+                                  destination_account))
+      end
     end
   end
 

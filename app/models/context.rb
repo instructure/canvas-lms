@@ -226,11 +226,12 @@ module Context
     true
   end
 
-  # Public: Boolean flag re: whether draft state is enabled or not. This
-  # method should be overridden in classes that include Context.
+  # Public: Boolean flag re: whether a feature is enabled
+  # provides defaults for objects that do not include FeatureFlags
+  # (note: include Context _before_ FeatureFlags)
   #
   # Returns false
-  def draft_state_enabled?
+  def feature_enabled?(feature)
     false
   end
 end

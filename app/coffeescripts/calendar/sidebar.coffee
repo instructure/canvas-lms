@@ -70,8 +70,7 @@ define [
 
     visibleContexts = new VisibleContextManager(contexts, selectedContexts, $holder)
 
-    $holder.on 'click keydown', '.context_list_context', (event) ->
-      return if event.type is 'keydown' and event.keyCode != 13 and event.keyCode != 32
+    $holder.on 'click keyclick', '.context_list_context', (event) ->
       visibleContexts.toggle $(this).data('context')
       userSettings.set('checked_calendar_codes',
         map($(this).parent().children('.checked'), (c) -> $(c).data('context')))

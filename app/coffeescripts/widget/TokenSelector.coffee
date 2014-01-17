@@ -313,6 +313,9 @@ define [
       clearTimeout @timeout
       @select(null)
       @timeout = setTimeout =>
+        if @lastFetch and !@lastFetch.isResolved()
+          @nextRequest = true
+          return
         list = @listForQuery(@preparePost())
         if list is @list
           # no change
@@ -329,7 +332,7 @@ define [
             list.appendTo(@$menu)
           @list = list
           @autoSelectFirst()
-      , 100
+      , 200
 
     preparePost: (data) ->
       postData = $.extend({}, @options.baseData ? {}, data ? {}, {search: @input.val().replace(/^\s+|\s+$/g, "")})
@@ -341,12 +344,14 @@ define [
         postData.exclude = postData.exclude.concat @input.tokenValues()
       postData
 
+    lastFetch: null
     collectionForQuery: (query) ->
+      @lastFetch?.abort()
       cacheKey = JSON.stringify(query)
       unless @cache[cacheKey]?
         collection = new RecipientCollection
         collection.url = @url
-        collection.fetch data: query
+        @lastFetch = collection.fetch data: query
         @cache[cacheKey] = collection
       @cache[cacheKey]
 
@@ -363,6 +368,8 @@ define [
       unless collection.atLeastOnePageFetched
         collection.on 'fetch', _.once =>
           @autoSelectFirst list
+          @updateSearch() if @nextRequest
+          delete @nextRequest
 
       list
 

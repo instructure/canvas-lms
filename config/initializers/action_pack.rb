@@ -22,3 +22,9 @@ ActionView::Helpers::InstanceTag.class_eval do
     zone_options.html_safe
   end
 end
+
+if CANVAS_RAILS2
+  ActionController::Request.class_eval do
+    alias_method :fullpath, :request_uri
+  end
+end

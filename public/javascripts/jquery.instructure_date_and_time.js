@@ -25,6 +25,22 @@ define([
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/widget' /* /\.widget/ */
 ], function(I18n, $, htmlEscape) {
+  // Create a function to pass to setTimeout
+var speakMessage = function ($this, message) {
+  if ($this.data('accessible-message-timeout')) {
+    // Clear any previously scheduled message from this field.
+    clearTimeout($this.data('accessible-message-timeout'));
+    $this.removeData('accessible-message-timeout');
+  }
+  if (!message) {
+    // No message? Do nothing when the timeout expires.
+    return function () {};
+  }
+  return function () {
+    $('#aria_alerts').text(message);
+    $this.removeData('accessible-message-timeout');
+  };
+};
 
   $.parseDateTime = function(date, time) {
     var date = $.datepicker.parseDate('mm/dd/yy', date);
@@ -470,7 +486,16 @@ define([
         $suggest
           .toggleClass('invalid_datetime', text == parse_error_message)
           .text(text);
-
+        if (text == parse_error_message ) {
+          $this.data(
+            'accessible-message-timeout',
+            setTimeout(speakMessage($this, text), 2000)
+          );
+        } else if ($this.data('accessible-message-timeout')) {
+          // Error resolved, cancel the alert.
+          clearTimeout($this.data('accessible-message-timeout'));
+          $this.removeData('accessible-message-timeout');
+        }
       }).triggerHandler('change');
       // TEMPORARY FIX: Hide from aria screenreader until the jQuery UI datepicker is updated for accessibility.
       $field.next().attr('aria-hidden', 'true');

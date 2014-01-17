@@ -45,7 +45,6 @@ define [
     # This takes an entry `id` and finds the entry and returns an object with
     # the entry, rootParent, page, and number of levels down
     getEntryData: (id) ->
-      # TODO: need a someWalk so this breaks when it finds the item
       entry = null
       rootParent = null
       levels = 0
@@ -56,7 +55,8 @@ define [
           levels = 0
         else if entry is null
           levels = levels + 1
-        entry = item if item.id is id
+        if item.id+'' is id+''
+          entry = item
       return null unless rootParent? and entry?
       rootParentIndex = @indexOf @get rootParent.id
       for page in [0..@totalPages()]

@@ -1,0 +1,14 @@
+@import "environment";
+
+.single-select {
+  border: {
+    color: $borderColor;
+    radius: $borderRadius;
+    style: solid;
+    width: 1px;
+  }
+  height: 125px;
+  margin: 0;
+  padding: 0;
+  width: 408px;
+}

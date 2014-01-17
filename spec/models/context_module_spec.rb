@@ -149,6 +149,36 @@ describe ContextModule do
       @tag3.should_not == @tag2
       @mod2.content_tags.should == [@tag3]
     end
+
+    context "when draft state is enabled" do
+      before do
+        Course.any_instance.stubs(:feature_enabled?).with(:draft_state).returns(true)
+      end
+
+      it "adds external tools with a default workflow_state of anonymous" do
+        course_module
+        course_with_student(:active_all => true)
+        @external_tool = @course.context_external_tools.create!(
+          :url => "http://example.com/ims/lti",
+          :consumer_key => "asdf",
+          :shared_secret => "hjkl",
+          :name => "external tool",
+          :course_navigation => {
+            :text => "blah",
+            :url =>  "http://example.com/ims/lti",
+            :default => false
+          }
+        )
+        @tag = @module.add_item(:id => @external_tool.id, :type => "external_tool")
+        @tag.unpublished?.should be_true
+      end
+
+      it "adds external_url with a default workflow_state of unpublished" do
+        course_module
+        @tag = @module.add_item(:type => 'external_url', :url => 'http://example.com/lolcats', :title => 'pls view', :indent => 1)
+        @tag.unpublished?.should be_true
+      end
+    end
   end
   
   describe "completion_requirements=" do
@@ -780,6 +810,17 @@ describe ContextModule do
       cm = course.context_modules.create!
       user = User.create!
       cm.find_or_create_progression(user).should == nil
+    end
+  end
+
+  describe "restore" do
+    it "should restore to unpublished state if draft_state is enabled" do
+      course(draft_state: true)
+      debugger
+      @module = @course.context_modules.create!
+      @module.destroy
+      @module.restore
+      @module.reload.should be_unpublished
     end
   end
 end

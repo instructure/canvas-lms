@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -25,6 +25,11 @@ module Canvas::AccountReports
     def initialize(account_report)
       @account_report = account_report
       extra_text_term(@account_report)
+      if @account_report.has_parameter? "include_deleted"
+        @include_deleted = @account_report.parameters["include_deleted"]
+        @account_report.parameters["extra_text"] << I18n.t(
+          'account_reports.grades.deleted', ' Include Deleted Objects: true;')
+      end
     end
 
     # retrieve the list of students for all active courses
@@ -45,11 +50,6 @@ module Canvas::AccountReports
     # - outcome result score
     def student_assignment_outcome_map
 
-      if @account_report.has_parameter? "include_deleted"
-        @include_deleted = @account_report.parameters["include_deleted"]
-        @account_report.parameters["extra_text"] << I18n.t(
-          'account_reports.grades.deleted', ' Include Deleted Objects: true;')
-      end
       parameters = {
         :account_id => account.id,
         :root_account_id => root_account.id
@@ -139,7 +139,7 @@ module Canvas::AccountReports
             row['submission date']=default_timezone_format(row['submission date'])
             csv << headers.map { |h| row[h] }
 
-            if i % 5 == 0
+            if i % 100 == 0
               Shackles.activate(:master) do
                 @account_report.update_attribute(:progress, (i.to_f/@total)*100)
               end
@@ -205,6 +205,7 @@ module Canvas::AccountReports
                LEFT OUTER JOIN assignments a ON a.id = ct.content_id
                  AND ct.content_type = 'Assignment'
                LEFT OUTER JOIN submissions subs ON subs.assignment_id = a.id
+                 AND subs.user_id = u.id
                LEFT OUTER JOIN quiz_submissions qs ON r.artifact_id = qs.id
                  AND r.artifact_type = 'QuizSubmission'
                LEFT OUTER JOIN assessment_questions aq ON aq.id = r.associated_asset_id
@@ -239,7 +240,7 @@ module Canvas::AccountReports
 
             csv << headers.map { |h| row[h] }
 
-            if i % 5 == 0
+            if i % 100 == 0
               Shackles.activate(:master) do
                 @account_report.update_attribute(:progress, (i.to_f/@total)*100)
               end

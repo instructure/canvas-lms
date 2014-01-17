@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../../spec/spec_helper')
-require 'zip/zipfilesystem'
+require 'zip/filesystem'
 
 if Qti.migration_executable
 
@@ -40,7 +40,7 @@ describe Qti::Converter do
   it "should publish as assignment on import if specified" do
     copy = Tempfile.new(['spec-canvas', '.zip'])
     FileUtils.cp(fname, copy.path)
-    Zip::ZipFile.open(copy.path) do |zf|
+    Zip::File.open(copy.path) do |zf|
       zf.file.open("settings.xml", 'w') do |f|
         f.write <<-XML
         <settings>
@@ -65,7 +65,7 @@ describe Qti::Converter do
   it "should re-use the same assignment on update" do
     copy = Tempfile.new(['spec-canvas', '.zip'])
     FileUtils.cp(fname, copy.path)
-    Zip::ZipFile.open(copy.path) do |zf|
+    Zip::File.open(copy.path) do |zf|
       zf.file.open("settings.xml", 'w') do |f|
         f.write <<-XML
         <settings>
@@ -162,8 +162,10 @@ describe Qti::Converter do
     when Array
       a.size.should == b.size
       a.each_with_index do |e,i|
-        match_ignoring(e, b[i], ignoring)
+        match_ignoring(e.to_hash, b[i], ignoring)
       end
+    when QuizQuestion::QuestionData
+      a.to_hash.should == b
     else
       a.should == b
     end

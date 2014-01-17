@@ -162,12 +162,14 @@ class Group < ActiveRecord::Base
     Group.find(ids)
   end
 
-  def self.not_in_group_sql_fragment(group_ids, prepend_and = true)
-    "#{"AND" if prepend_and} NOT EXISTS (SELECT * FROM group_memberships gm
-                      WHERE gm.user_id = users.id AND
-                      gm.workflow_state != 'deleted' AND
-                      gm.group_id IN (#{group_ids.map(&:to_i).join ','}))" unless group_ids.empty?
-
+  def self.not_in_group_sql_fragment(groups)
+    return nil if groups.empty?
+    sanitize_sql([<<-SQL, groups])
+      NOT EXISTS (SELECT * FROM group_memberships gm
+      WHERE gm.user_id = users.id AND
+      gm.workflow_state != 'deleted' AND
+      gm.group_id IN (?))
+    SQL
   end
 
   workflow do
@@ -207,6 +209,7 @@ class Group < ActiveRecord::Base
 
   scope :active, where("groups.workflow_state<>'deleted'")
   scope :by_name, lambda { order(Bookmarker.order_by) }
+  scope :uncategorized, where("groups.group_category_id IS NULL")
 
   def full_name
     res = before_label(self.name) + " "
@@ -244,6 +247,54 @@ class Group < ActiveRecord::Base
     # permissions for this user in the group are probably different now
     Rails.cache.delete(permission_cache_key_for(user))
     return member
+  end
+
+  def bulk_add_users_to_group(users, options = {})
+    return if users.empty?
+    user_ids = users.map(&:id)
+    old_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids).all
+    bulk_insert_group_memberships(users, options)
+    bulk_insert_group_user_follows(users, options)
+    all_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids)
+    new_group_memberships = all_group_memberships - old_group_memberships
+    new_group_memberships.sort_by!(&:user_id)
+    users.sort_by!(&:id)
+    notification_name = options[:notification_name] || "New Context Group Membership"
+    notification = Notification.by_name(notification_name)
+    users.each {|user| Rails.cache.delete(permission_cache_key_for(user))}
+
+    users.each_with_index do |user, index|
+      Instructure::BroadcastPolicy::NotificationPolicy.send_later_enqueue_args(:send_notification,
+                                                                               {:priority => Delayed::LOW_PRIORITY},
+                                                                               new_group_memberships[index],
+                                                                               notification_name.parameterize.underscore.to_sym,
+                                                                               notification,
+                                                                               [user])
+    end
+    new_group_memberships
+  end
+
+  def bulk_insert_group_memberships(users, options = {})
+    current_time = Time.now
+    options = {
+        :group_id => self.id,
+        :workflow_state => 'accepted',
+        :moderator => false,
+        :created_at => current_time,
+        :updated_at => current_time
+    }.merge(options)
+    GroupMembership.bulk_insert(users.map{ |user|
+      options.merge({:user_id => user.id, :uuid => AutoHandle.generate_securish_uuid})
+    })
+  end
+
+  def bulk_insert_group_user_follows(users, options = {})
+    options = {
+        :followed_item_id => self.id
+    }.merge(options)
+    UserFollow.bulk_insert(users.map{ |user|
+      options.merge({:following_user_id => user.id})
+    })
   end
 
   def invite_user(user)
@@ -455,7 +506,7 @@ class Group < ActiveRecord::Base
     self.storage_quota = val.try(:to_i).try(:megabytes)
   end
   
-  TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_CHAT, TAB_FILES,
+  TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_FILES,
     TAB_CONFERENCES, TAB_ANNOUNCEMENTS, TAB_PROFILE, TAB_SETTINGS, TAB_COLLABORATIONS = *1..20
   def tabs_available(user=nil, opts={})
     available_tabs = [
@@ -464,7 +515,6 @@ class Group < ActiveRecord::Base
       { :id => TAB_PAGES,         :label => t("#group.tabs.pages", "Pages"), :css_class => 'pages', :href => :group_wiki_pages_path },
       { :id => TAB_PEOPLE,        :label => t("#group.tabs.people", "People"), :css_class => 'people', :href => :group_users_path },
       { :id => TAB_DISCUSSIONS,   :label => t("#group.tabs.discussions", "Discussions"), :css_class => 'discussions', :href => :group_discussion_topics_path },
-      { :id => TAB_CHAT,          :label => t("#group.tabs.chat", "Chat"), :css_class => 'chat', :href => :group_chat_path },
       { :id => TAB_FILES,         :label => t("#group.tabs.files", "Files"), :css_class => 'files', :href => :group_files_path },
     ]
 
@@ -568,13 +618,13 @@ class Group < ActiveRecord::Base
     [Shard.default]
   end
 
-  # Public: Determine if the current context has draft_state enabled.
+  # Public: Determine whether a feature is enabled, deferring to the group's context.
   #
   # Returns a boolean.
-  def draft_state_enabled?
+  def feature_enabled?(feature)
     # shouldn't matter, but most specs create anonymous (contextless) groups :(
     return false if context.nil?
-    context.draft_state_enabled?
+    context.feature_enabled?(feature)
   end
 
   def serialize_permissions(permissions_hash, user, session)

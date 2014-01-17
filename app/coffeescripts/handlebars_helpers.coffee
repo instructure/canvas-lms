@@ -1,6 +1,6 @@
 define [
   'compiled/util/enrollmentName'
-  'vendor/handlebars.vm'
+  'handlebars'
   'i18nObj'
   'jquery'
   'underscore'
@@ -245,6 +245,10 @@ define [
     #                      checked="true"
     #                      name="likes[tacos]"
     #                      class="foo bar" >
+    # you can append a unique string to the id with uniqid:
+    #   if you pass id=someid" and uniqid=true as parameters
+    #   the result is like doing id="someid-{{uniqid}}" inside a manually
+    #   created input tag.
     checkbox: (propertyName, {hash}) ->
       splitPropertyName = propertyName.split(/\./)
       snakeCase = splitPropertyName.join('_')
@@ -274,6 +278,10 @@ define [
           inputProps[prop] = prop
         else
           delete inputProps[prop]
+
+      if inputProps.uniqid and inputProps.id
+        inputProps.id += "-#{Handlebars.helpers.uniqid.call this}"
+      delete inputProps.uniqid
 
       attributes = for key, val of inputProps when val?
         "#{htmlEscape key}=\"#{htmlEscape val}\""
@@ -373,8 +381,34 @@ define [
       words = str.split(/[ _]+/)
       titleizedWords = _(words).map (w) -> w[0].toUpperCase() + w.slice(1)
       titleizedWords.join(' ')
+
+    uniqid: (context) ->
+      context = @ if arguments.length <= 1
+      unless context._uniqid_
+        chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        context._uniqid_ = (chars.charAt(Math.floor(Math.random() * chars.length)) for [1..8]).join ''
+      return context._uniqid_
+
+    # Public: Render a child Backbone view.
+    #
+    # backboneView - A class that extends from Backbone.View.
+    #
+    # Examples
+    #   childView = Backbone.View.extend(...)
+    #
+    #   {{view childView}}
+    #
+    # Returns the child view's HTML.
+    view: (backboneView) ->
+      onNextFrame = (fn) -> (window.requestAnimationFrame or setTimeout)(fn, 0)
+      id          = "placeholder-#{$.guid++}"
+      replace     = ->
+        $span = $("##{id}")
+        if $span.length then $span.replaceWith(backboneView.$el) else onNextFrame(replace)
+
+      backboneView.render()
+      onNextFrame(replace)
+      new Handlebars.SafeString("<span id=\"#{id}\">pk</span>")
   }
 
-  # not a function helper, just a way to make ENV available in any scope
-  Handlebars.helpers.ENV = @ENV
   return Handlebars

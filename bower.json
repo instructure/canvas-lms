@@ -1,0 +1,13 @@
+{
+  "name": "canvas-lms",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "ember": "1.3.0",
+    "handlebars": "1.1.2",
+    "ic-ajax": "~0.2.0",
+    "ic-menu": "~0.1.0",
+    "ic-styled": "~1.1.3",
+    "color-slicer": "~0.4.0"
+  }
+}

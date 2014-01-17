@@ -24,7 +24,8 @@ class AppointmentGroup < ActiveRecord::Base
   # has_many :through on the same table does not alias columns in condition
   # strings, just hashes. we create this helper association to ensure
   # appointments_participants conditions have the correct table alias
-  has_many :_appointments, opts.merge(:conditions => opts[:conditions].gsub(/calendar_events\./, 'calendar_events_join.'))
+  has_many :_appointments, opts.merge(:conditions => opts[:conditions].gsub(/calendar_events\./,
+      CANVAS_RAILS2 ? 'calendar_events_join.' : '_appointments_appointments_participants_join.'))
   has_many :appointments_participants, :through => :_appointments, :source => :child_events, :conditions => "calendar_events.workflow_state <> 'deleted'", :order => :start_at
   has_many :appointment_group_contexts
   has_many :appointment_group_sub_contexts, :include => :sub_context
@@ -35,6 +36,10 @@ class AppointmentGroup < ActiveRecord::Base
 
   def contexts
     appointment_group_contexts.map &:context
+  end
+
+  def active_contexts
+    contexts.reject { |context| context.workflow_state == 'deleted' }
   end
 
   def sub_contexts
@@ -111,6 +116,7 @@ class AppointmentGroup < ActiveRecord::Base
     # sub_contexts. currently this is done in the controller level, since
     # we validate contexts beforehand
     @new_sub_context_codes -= sub_context_codes if @new_sub_context_codes
+    new_sub_contexts = []
     if @new_sub_context_codes.present?
       if new_record? &&
           @new_contexts.size == 1 &&
@@ -138,22 +144,27 @@ class AppointmentGroup < ActiveRecord::Base
           AppointmentGroupSubContext.new(:appointment_group => self,
                                          :sub_context => cs,
                                          :sub_context_code => code)
-        }
-        self.appointment_group_sub_contexts += new_sub_contexts.compact
+        }.compact
       end
     end
 
     # contexts
     @new_contexts -= contexts if @new_contexts
     if @new_contexts.present?
-      unless appointment_group_sub_contexts.size == 1 &&
-          appointment_group_sub_contexts.first.sub_context_type == 'GroupCategory' &&
+      unless (appointment_group_sub_contexts + new_sub_contexts).size == 1 &&
+          (appointment_group_sub_contexts + new_sub_contexts).first.sub_context_type == 'GroupCategory' &&
           !new_record?
         self.appointment_group_contexts += @new_contexts.map { |c|
           AppointmentGroupContext.new :context => c, :appointment_group => self
         }
         @contexts_changed = true
       end
+    end
+
+    if new_sub_contexts.present?
+      # the sub_contexts get validated as soon as we add them in Rails 3,
+      # so we need to add them after we have updated the contexts
+      self.appointment_group_sub_contexts += new_sub_contexts
     end
   end
 
@@ -215,7 +226,7 @@ class AppointmentGroup < ActiveRecord::Base
   set_policy do
     given { |user, session|
       next false if deleted?
-      next false unless contexts.all? { |c| c.grants_right? user, nil, :manage_calendar }
+      next false unless active_contexts.all? { |c| c.grants_right? user, nil, :manage_calendar }
       if appointment_group_sub_contexts.present? && appointment_group_sub_contexts.first.sub_context_type == 'CourseSection'
         sub_context_ids = appointment_group_sub_contexts.map(&:sub_context_id)
         user_visible_sections = sub_context_ids & contexts.map { |c|
@@ -351,6 +362,7 @@ class AppointmentGroup < ActiveRecord::Base
     self.start_at = appointments.map(&:start_at).min
     self.end_at = appointments.map(&:end_at).max
     clear_cached_available_slots! if participants_per_appointment_changed?
+    true
   end
 
   EVENT_ATTRIBUTES = [
@@ -384,12 +396,12 @@ class AppointmentGroup < ActiveRecord::Base
     end
 
     if changed.present?
-      CalendarEvent.where(:parent_calendar_event_id => appointments, :workflow_state => ['active', 'locked']).update_all(changed)
+      CalendarEvent.joins(:parent_event).where(workflow_state: ['active', 'locked'], parent_events_calendar_events: { context_id: self, context_type: 'AppointmentGroup' }).update_all(changed)
     end
 
     if desc
       appointments.where(:description => description_was).update_all(:description => desc)
-      CalendarEvent.where(:parent_calendar_event_id => appointments, :workflow_state => ['active', 'locked'], :description => description_was).update_all(:description => desc)
+      CalendarEvent.joins(:parent_event).where(workflow_state: ['active', 'locked'], parent_events_calendar_events: { context_id: self, context_type: 'AppointmentGroup' }, description: description_was).update_all(:description => desc)
     end
 
     @new_appointments.each(&:reload) if @new_appointments.present?

@@ -150,17 +150,9 @@ module Kaltura
         :vid_sec => 5,
         :bgcolor => "ffffff",
         :type => "2",
-        :protocol => ""
       }.merge(opts)
 
-      protocol = if [ "http", "https" ].include?(opts[:protocol])
-        opts[:protocol] + ":"
-      else
-        ""
-      end
-
-      "#{protocol}" +
-        "//#{@resource_domain}/p/#{@partnerId}/thumbnail" +
+        "https://#{@resource_domain}/p/#{@partnerId}/thumbnail" +
         "/entry_id/#{entryId.gsub(/[^a-zA-Z0-9_]/, '')}" +
         "/width/#{opts[:width].to_i}" +
         "/height/#{opts[:height].to_i}" +
@@ -172,7 +164,7 @@ module Kaltura
     def startSession(type = SessionType::USER, userId = nil)
       partnerId = @partnerId
       secret = type == SessionType::USER ? @user_secret : @secret
-      result = sendRequest(:session, :start,
+      result = getRequest(:session, :start,
                            :secret => secret,
                            :partnerId => partnerId,
                            :userId => userId,
@@ -181,7 +173,7 @@ module Kaltura
     end
 
     def mediaGet(entryId)
-      result = sendRequest(:media, :get,
+      result = getRequest(:media, :get,
                             :ks => @ks,
                             :entryId => entryId)
       item = {}
@@ -199,7 +191,7 @@ module Kaltura
       attributes.each do |key, val|
         hash["mediaEntry:#{key}"] = val
       end
-      result = sendRequest(:media, :update, hash)
+      result = getRequest(:media, :update, hash)
       item = {}
       result.children.each do |child|
         item[child.name.to_sym] = child.content
@@ -212,7 +204,7 @@ module Kaltura
         :ks => @ks,
         :entryId => entryId
       }
-      sendRequest(:media, :delete, hash)
+      getRequest(:media, :delete, hash)
     end
 
     def mediaTypeToSymbol(type)
@@ -229,7 +221,7 @@ module Kaltura
     end
 
     def bulkUploadGet(id)
-      result = sendRequest(:bulkUpload, :get,
+      result = getRequest(:bulkUpload, :get,
                            :ks => @ks,
                            :id => id
                           )
@@ -282,7 +274,7 @@ module Kaltura
     end
 
     def flavorAssetGetByEntryId(entryId)
-      result = sendRequest(:flavorAsset, :getByEntryId,
+      result = getRequest(:flavorAsset, :getByEntryId,
                            :ks => @ks,
                            :entryId => entryId)
       items = []
@@ -304,7 +296,7 @@ module Kaltura
     end
 
     def flavorAssetGetDownloadUrl(assetId)
-      result = sendRequest(:flavorAsset, :getDownloadUrl,
+      result = getRequest(:flavorAsset, :getDownloadUrl,
                            :ks => @ks,
                            :id => assetId)
       return result.content if result
@@ -316,7 +308,8 @@ module Kaltura
     # will likely download from Kaltura, and not S3 (for example).
     def flavorAssetGetPlaylistUrl(entryId, flavorId)
       playlist_url = "/p/#{@partnerId}/playManifest/entryId/#{entryId}/flavorId/#{flavorId}"
-      res = Net::HTTP.get_response(@host, playlist_url)
+
+      res = sendRequest(Net::HTTP::Get.new(playlist_url))
       return nil unless res.kind_of?(Net::HTTPSuccess)
 
       doc = Nokogiri::XML(res.body)
@@ -324,42 +317,47 @@ module Kaltura
       mediaNode ? mediaNode["url"] : nil
     end
 
-    def assetSwfUrl(assetId, protocol = "http")
+    def assetSwfUrl(assetId)
       config = Kaltura::ClientV3.config
       return nil unless config
-      "#{protocol}://#{config['domain']}/kwidget/wid/_#{config['partner_id']}/uiconf_id/#{config['player_ui_conf']}/entry_id/#{assetId}"
+      "https://#{config['domain']}/kwidget/wid/_#{config['partner_id']}/uiconf_id/#{config['player_ui_conf']}/entry_id/#{assetId}"
     end
 
     private
 
     def postRequest(service, action, params)
-      mp = Multipart::MultipartPost.new
-      query, headers = mp.prepare_query(params)
-      res = nil
-      Canvas.timeout_protection("kaltura", fallback_timeout_length: 30) do
-        Net::HTTP.start(@host) {|con|
-          req = Net::HTTP::Post.new(@endpoint + "/?service=#{service}&action=#{action}", headers)
-          res = con.request(req, query) #con.post(url.path, query, headers)
-        }
-      end
-      raise Timeout::Error if res.nil?
-      doc = Nokogiri::XML(res.body)
-      doc.css('result').first
+      requestParams = "service=#{service}&action=#{action}"
+      multipart_body, headers = Multipart::MultipartPost.new.prepare_query(params)
+      response = sendRequest(
+        Net::HTTP::Post.new("#{@endpoint}/?#{requestParams}", headers),
+        multipart_body
+      )
+      Nokogiri::XML(response.body).css('result').first
     end
 
-    def sendRequest(service, action, params)
+    def getRequest(service, action, params)
       requestParams = "service=#{service}&action=#{action}"
       params.each do |key, value|
         next if value.nil?
         requestParams += "&#{URI.escape(key.to_s)}=#{URI.escape(value.to_s)}"
       end
-      res = nil
-      Canvas.timeout_protection("kaltura",fallback_timeout_length: 30) do
-        res = Net::HTTP.get_response(@host, "#{@endpoint}/?#{requestParams}")
+      response = sendRequest(Net::HTTP::Get.new("#{@endpoint}/?#{requestParams}"))
+      Nokogiri::XML(response.body).css('result').first
+    end
+
+    # FIXME: SSL verifification should not be turned off, but since we're just
+    # turning on HTTPS everywhere for kaltura, we're being gentle about it in
+    # the first pass
+    def sendRequest(request, body=nil)
+      response = nil
+      Canvas.timeout_protection("kaltura", fallback_timeout_length: 30) do
+        http = Net::HTTP.new(@host, Net::HTTP.https_default_port)
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        response = http.request(request, body)
       end
-      raise Timeout::Error if res.nil?
-      doc = Nokogiri::XML(res.body)
-      doc.css('result').first
+      raise Timeout::Error unless response
+      response
     end
   end
 end

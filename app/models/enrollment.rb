@@ -879,19 +879,10 @@ class Enrollment < ActiveRecord::Base
   scope :currently_online, joins(:pseudonyms).where("pseudonyms.last_request_at>?", 5.minutes.ago)
   # this returns enrollments for creation_pending users; should always be used in conjunction with the invited scope
   scope :for_email, lambda { |email|
-    if CANVAS_RAILS2
-      {
-        :joins => { :user => :communication_channels },
-        :conditions => ["users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=LOWER(?)", email],
-        :select => 'enrollments.*',
-        :readonly => false
-      }
-    else
-      joins(:user => :communication_channels).
-          where("users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=LOWER(?)", email).
-          select("enrollments.*").
-          readonly(false)
-    end
+    joins(:user => :communication_channels).
+        where("users.workflow_state='creation_pending' AND communication_channels.workflow_state='unconfirmed' AND path_type='email' AND LOWER(path)=LOWER(?)", email).
+        select("enrollments.*").
+        readonly(false)
   }
   def self.cached_temporary_invitations(email)
     if Enrollment.cross_shard_invitations?

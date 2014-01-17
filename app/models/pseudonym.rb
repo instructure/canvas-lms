@@ -67,7 +67,7 @@ class Pseudonym < ActiveRecord::Base
     password_changed? || (send(crypted_password_field).blank? && sis_ssha.blank?) || @require_password
   end
 
-  acts_as_list :scope => :user_id
+  acts_as_list :scope => :user
 
   set_broadcast_policy do |p|
     p.dispatch :confirm_registration
@@ -262,18 +262,7 @@ class Pseudonym < ActiveRecord::Base
     user.save!
     user.email
   end
-  
-  def chat
-    user.chat if user
-  end
-  
-  def chat=(c)
-    return false unless user
-    self.user.chat=(c)
-    user.save!
-    user.chat
-  end
-  
+
   def sms
     user.sms if user
   end
@@ -384,11 +373,17 @@ class Pseudonym < ActiveRecord::Base
 
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
 
+  def self.associated_shards(unique_id_or_sis_user_id)
+    [Shard.default]
+  end
+
   def self.find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
     return [] if credentials[:unique_id].blank? ||
                  credentials[:password].blank?
     too_many_attempts = false
+    associated_shards = associated_shards(credentials[:unique_id])
     pseudonyms = Shard.partition_by_shard(account_ids) do |account_ids|
+      next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
       active.
         by_unique_id(credentials[:unique_id]).
         where(:account_id => account_ids).

@@ -65,6 +65,7 @@ define([
       endAt: endAt,
       startedAtText: startedAtText,
       timeLimit: parseInt($(".time_limit").text(), 10) || null,
+      hasTimeLimit: !!ENV.QUIZ.time_limit,
       timeLeft: parseInt($(".time_left").text()) * 1000,
       oneAtATime: $("#submit_quiz_form").hasClass("one_question_at_a_time"),
       cantGoBack: $("#submit_quiz_form").hasClass("cant_go_back"),
@@ -99,6 +100,8 @@ define([
             async: false        // NOTE: Not asynchronous. Otherwise Firefox will cancel the request as navigating away from the page.
             // NOTE: No callbacks. Don't care about response. Just making effort to save the quiz
           });
+          // since this is sync, a callback never fires to reset this
+          quizSubmission.currentlyBackingUp = false;
         }
         else {
           (function(submissionData) {
@@ -206,9 +209,9 @@ define([
       },
 
       updateTime: function() {
-        var timeLeft = quizSubmission.timeLeft = quizSubmission.timeLeft - quizSubmission.clockInterval;
-
-        if(!timeLeft) {
+        if(quizSubmission.hasTimeLimit) {
+          var timeLeft = quizSubmission.timeLeft = quizSubmission.timeLeft - quizSubmission.clockInterval;
+        } else {
           return quizSubmission.updateCounter();
         }
 
@@ -576,7 +579,7 @@ define([
           }
         }
         else {
-          unanswered = $("#question_list .list_question:not(.answered)").length;
+          unanswered = $("#question_list .list_question:not(.answered):not(.text_only)").length;
           if(unanswered > 0) {
             warningMessage = I18n.t('confirms.unanswered_questions',
               {'one': "You have 1 unanswered question (see the right sidebar for details).  Submit anyway?",

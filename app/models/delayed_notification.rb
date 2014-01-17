@@ -59,6 +59,7 @@ class DelayedNotification < ActiveRecord::Base
   end
   
   def to_list
+    return @to_list if @to_list
     lookups = {}
     (recipient_keys || []).each do |key|
       pieces = key.split('_')
@@ -73,10 +74,9 @@ class DelayedNotification < ActiveRecord::Base
       includes = [:user] if klass == CommunicationChannel
       res += klass.where(:id => ids).includes(includes).all rescue []
     end
-    res.uniq
+    @to_list = res.uniq
   end
-  memoize :to_list
-  
+
   scope :to_be_processed, lambda { |limit|
     where(:workflow_state => 'to_be_processed').limit(limit).order("delayed_notifications.created_at")
   }

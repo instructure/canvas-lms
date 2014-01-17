@@ -35,6 +35,7 @@ define [
         per_page: 50
 
     initialize: ->
+      super
       @cacheElements()
       @createLists()
       @attachEvents()

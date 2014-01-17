@@ -200,21 +200,30 @@ define([
       toggleRemoveAttachmentLinks();
     });
 
+    function listGoogleDocs(){
+      var url = window.location.pathname + "/list_google_docs";
+      $.get(url,{}, function(data, textStatus){
+
+        var tree = new GoogleDocsTreeView({model: data});
+        $('div#google_docs_container').html(tree.el);
+        tree.render();
+        tree.on('activate-file', function(file_id){
+          $("#submit_google_doc_form").find("input[name='google_doc[document_id]']").val(file_id);
+        });
+
+      }, 'json');
+    }
+
     $(".submit_online_url_option").click(function(event) {
       if($(this).attr("href") == '#submit_google_doc_form'){
-        var url = window.location.pathname + "/list_google_docs";
-        $.get(url,{}, function(data, textStatus){
-
-          var tree = new GoogleDocsTreeView({model: data});
-          $('div#google_docs_container').html(tree.el);
-          tree.render();
-          tree.on('activate-file', function(file_id){
-            $("#submit_google_doc_form").find("input[name='google_doc[document_id]']").val(file_id);
-          });
-
-        }, 'json');
+        listGoogleDocs();
       }
     });
+
+    //list Google Docs if Google Docs tab is active
+    if(window.location.hash == "#submit_google_doc_form"){
+      listGoogleDocs();
+    }
 
     function toggleRemoveAttachmentLinks(){
       $('#submit_online_upload_form .remove_attachment_link').showIf($('#submit_online_upload_form .submission_attachment:not(#submission_attachment_blank)').length > 1);

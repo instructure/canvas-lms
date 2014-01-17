@@ -10,7 +10,6 @@ define [
   $buffer = $("#flash_message_buffer")
   $holder = $("#flash_message_holder")
   $screenreader_holder = $("#flash_screenreader_holder")
-  $screenreader_polite_holder = $("#polite_screenreader_holder")
   $holder.on 'click', '.close_link', preventDefault
   $holder.on 'click', 'li', ->
     $this = $(this)
@@ -26,15 +25,6 @@ define [
     """)
 
     $screenreader_node.appendTo($screenreader_holder)
-    # these aren't displayed, so removing them at a specified time is not critical
-    window.setTimeout((-> $screenreader_node.remove()), 20000)
-
-  screenReaderPoliteBox = (type, content) ->
-    $screenreader_node = $("""
-      <span aria-live="polite">#{content}</span>
-    """)
-
-    $screenreader_node.appendTo($screenreader_polite_holder)
     # these aren't displayed, so removing them at a specified time is not critical
     window.setTimeout((-> $screenreader_node.remove()), 20000)
 
@@ -69,6 +59,3 @@ define [
 
   $.screenReaderFlashError = (content) ->
     screenReaderFlashBox('error', content)
-
-  $.screenReaderPoliteMessage = (content) ->
-    screenReaderPoliteBox('success', content)

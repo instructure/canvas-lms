@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "dashboard" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context "as a student" do
 
@@ -11,9 +11,9 @@ describe "dashboard" do
 
     def create_announcement
       factory_with_protected_attributes(Announcement, {
-        :context => @course,
-        :title => "hey all read this k",
-        :message => "announcement"
+          :context => @course,
+          :title => "hey all read this k",
+          :message => "announcement"
       })
     end
 
@@ -105,6 +105,24 @@ describe "dashboard" do
 
       get "/"
       ff('#conversation-details tbody tr').size.should == 1
+    end
+
+    it "should show account notifications on the dashboard" do
+      a1 = @course.account.announcements.create!(:message => "hey there")
+      a2 = @course.account.announcements.create!(:message => "another announcement")
+
+      get "/"
+      messages =  ffj("#dashboard .global-message .message.user_content")
+      messages.size.should == 2
+      messages[0].text.should == a2.message
+      messages[1].text.should == a1.message
+    end
+
+    it "should interpolate the user's domain in global notifications" do
+      announcement = @course.account.announcements.create!(:message => "blah blah http://random-survey-startup.ly/?some_GET_parameter_by_which_to_differentiate_results={{ACCOUNT_DOMAIN}}")
+
+      get "/"
+      fj("#dashboard .global-message .message.user_content").text.should == announcement.message.gsub("{{ACCOUNT_DOMAIN}}",@course.account.domain)
     end
 
     it "should show appointment stream items on the dashboard" do
@@ -199,7 +217,7 @@ describe "dashboard" do
       #verify assignment is in drop down
       assignment_menu = f('#assignments_menu_item')
       driver.action.move_to(assignment_menu).perform
-      assignment_menu.should include_text("To Turn In")
+      keep_trying_until { assignment_menu.should include_text("To Turn In") }
       assignment_menu.should include_text(assignment.title)
     end
 
@@ -212,7 +230,7 @@ describe "dashboard" do
       course_menu = f('#courses_menu_item')
 
       driver.action.move_to(course_menu).perform
-      course_menu.should include_text('My Courses')
+      keep_trying_until { course_menu.should include_text('My Courses') }
       course_menu.should include_text(@course.name)
     end
 
@@ -228,7 +246,7 @@ describe "dashboard" do
       course_menu = f('#courses_menu_item')
 
       driver.action.move_to(course_menu).perform
-      course_menu.should include_text('Current Groups')
+      keep_trying_until { course_menu.should include_text('Current Groups') }
       course_menu.should include_text(group.name)
     end
 
@@ -263,10 +281,10 @@ describe "dashboard" do
 
     it "should display calendar events in the coming up list" do
       calendar_event_model({
-                             :title => "super fun party",
-                             :description => 'celebrating stuff',
-                             :start_at => 5.minutes.from_now,
-                             :end_at => 10.minutes.from_now
+                               :title => "super fun party",
+                               :description => 'celebrating stuff',
+                               :start_at => 5.minutes.from_now,
+                               :end_at => 10.minutes.from_now
                            })
       get "/"
       f('.events_list .event a').should include_text(@event.title)
@@ -280,8 +298,8 @@ describe "dashboard" do
                                                       :points_possible => 10}],
                                   {:user => @student, :course => @course}) do
         {
-          "question_31" => "<p>abeawebawebae</p>",
-          "question_text" => "qq1"
+            "question_31" => "<p>abeawebawebae</p>",
+            "question_text" => "qq1"
         }
       end
 
@@ -329,7 +347,7 @@ describe "dashboard" do
 
       driver.action.move_to(f('#courses_menu_item')).perform
       course_menu = f('#menu_enrollments')
-      course_menu.should be_displayed
+      keep_trying_until { course_menu.should be_displayed }
       course_menu.should_not include_text(c1.name)
     end
 
@@ -383,7 +401,7 @@ describe "dashboard" do
       #verify assignment is in drop down
       assignment_menu = f('#assignments_menu_item')
       driver.action.move_to(assignment_menu).perform
-      assignment_menu.should include_text("To Grade")
+      keep_trying_until { assignment_menu.should include_text("To Grade") }
       assignment_menu.should include_text(assignment.title)
     end
 
@@ -416,9 +434,11 @@ describe "dashboard" do
 
         course_menu = f('#courses_menu_item')
         driver.action.move_to(course_menu).perform
-        course_menu.should include_text('My Courses')
-        course_menu.should include_text('Customize')
-        course_menu.should include_text('View all courses')
+        keep_trying_until do
+          course_menu.should include_text('My Courses')
+          course_menu.should include_text('Customize')
+          course_menu.should include_text('View all courses')
+        end
       end
 
       it "should allow customization if there are sufficient course invitations" do
@@ -428,9 +448,11 @@ describe "dashboard" do
 
         course_menu = f('#courses_menu_item')
         driver.action.move_to(course_menu).perform
-        course_menu.should include_text('My Courses')
-        course_menu.should include_text('Customize')
-        course_menu.should include_text('View all courses')
+        keep_trying_until do
+          course_menu.should include_text('My Courses')
+          course_menu.should include_text('Customize')
+          course_menu.should include_text('View all courses')
+        end
       end
 
       it "should allow customization if all courses are already favorited" do
@@ -444,8 +466,10 @@ describe "dashboard" do
 
         course_menu = f('#courses_menu_item')
         driver.action.move_to(course_menu).perform
-        course_menu.should include_text('My Courses')
-        course_menu.should include_text('Customize')
+        keep_trying_until do
+          course_menu.should include_text('My Courses')
+          course_menu.should include_text('Customize')
+        end
       end
 
       it "should allow customization even before the course ajax request comes back" do
@@ -473,7 +497,41 @@ describe "dashboard" do
         course_menu.should include_text('View all courses')
         course_menu.find_element(:css, '.customListWrapper').should be_displayed
       end
+
+      it "should perform customization actions" do
+        def favoriteElsSize
+          ff('#menu_enrollments > .menu-item-drop-column-list li.customListItem').size
+        end
+
+        def checkedEls
+          ffj('#menu_enrollments .customListContent li.customListItem.on')
+        end
+
+        @courses = []
+        20.times { @courses << course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}).course }
+
+        @user.favorites.by('Course').destroy_all
+        @courses[0...10].each do |course|
+          @user.favorites.build(:context => course)
+        end
+        @user.save
+
+        get "/"
+        driver.execute_script(%{$("#menu li.menu-item:first").trigger('mouseenter')})
+        sleep 0.4 # there's a fixed 300ms delay before the menu will display
+        wait_for_ajaximations
+        favoriteElsSize.should == 10
+        driver.execute_script("$('#menu .customListOpen:first').click()")
+        wait_for_ajaximations
+
+        checkedEls.size.should == 10
+        checkedEls[0].click
+        wait_for_ajaximations
+        checkedEls.size.should == 9
+        favoriteElsSize.should == 9
+        @user.reload
+        @user.favorites.size.should == 9
+      end
     end
   end
 end
-

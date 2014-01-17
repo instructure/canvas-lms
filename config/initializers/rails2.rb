@@ -2,7 +2,7 @@ if CANVAS_RAILS2
 
 ActiveRecord::Base.class_eval do
   class << self
-    # taken from fake_arel, and extended further to support combining of :select and :group
+    # taken from fake_arel, and extended further to support combining of :group
     def with_scope(method_scoping = {}, action = :merge, &block)
       method_scoping = {:find => method_scoping.proxy_options} if method_scoping.class == ActiveRecord::NamedScope::Scope
       method_scoping = method_scoping.method_scoping if method_scoping.respond_to?(:method_scoping)
@@ -34,13 +34,17 @@ ActiveRecord::Base.class_eval do
                     else
                       hash[method][key] = merge_conditions(params[key], hash[method][key])
                     end
+                  elsif key == :select && merge
+                    hash[method][key] = merge_includes(hash[method][key], params[key]).uniq.join(', ')
+                  elsif key == :readonly
+                    hash[method][key] = params[key] unless params[:readonly].nil?
                   elsif key == :include && merge
                     hash[method][key] = merge_includes(hash[method][key], params[key]).uniq
                   elsif key == :joins && merge
                     hash[method][key] = merge_joins(params[key], hash[method][key])
                     # see https://rails.lighthouseapp.com/projects/8994/tickets/2810-with_scope-should-accept-and-use-order-option
                     # it works now in reverse order to comply with ActiveRecord 3
-                  elsif [:order, :select, :group].include?(key) && merge && !default_scoping.any?{ |s| s[method].keys.include?(key) }
+                  elsif [:group, :order].include?(key) && merge && !default_scoping.any?{ |s| s[method].keys.include?(key) }
                     hash[method][key] = [hash[method][key], params[key]].select{|o| !o.blank?}.join(', ')
                   else
                     hash[method][key] = hash[method][key] || params[key]
@@ -115,23 +119,6 @@ ActiveRecord::Base.class_eval do
       with_exclusive_scope(:find => new_options) { all.map(&column) }
     end
 
-    # allow defining scopes Rails 3 style (scope, not named_scope)
-    # scope is still a Rails 2 method, so we have to call the correct method
-    # depending on the argument types
-    def scope_with_named_scope(*args, &block)
-      if args.length == 2
-        case args[1]
-        when String, Symbol
-          scope_without_named_scope(*args)
-        else
-          named_scope *args, &block
-        end
-      else
-        scope_without_named_scope(*args)
-      end
-    end
-    alias_method_chain :scope, :named_scope
-
     # allow validate to recognize the Rails 3 style on: action modifiers,
     # translating those calls into validate_on_action calls.
     def validate_with_rails3_compatibility(*methods, &block)
@@ -183,9 +170,6 @@ ActiveRecord::Base.class_eval do
     end
     alias_method_chain :quote_bound_value, :relations
   end
-
-  # support 0 arguments
-  named_scope :lock, lambda { |*lock| lock = [true] if lock.empty?; {:lock => lock.first} }
 end
 
 ActiveRecord::NamedScope::ClassMethods.module_eval do
@@ -317,6 +301,54 @@ ActiveRecord::Associations::HasManyThroughAssociation.class_eval do
     end
   end
   alias_method_chain :construct_scope, :has_many_fix
+end
+
+# in ruby 2.0, respond_to? returns false for protected methods; Rails 2 doesn't know this,
+# so replace this method with that knowledge
+ActiveRecord::Callbacks.class_eval do
+  def callback(method)
+    result = run_callbacks(method) { |result, object| false == result }
+
+    if result != false && respond_to_without_attributes?(method, true)
+      result = send(method)
+    end
+
+    notify(method)
+
+    return result
+  end
+end
+
+# ditto
+ActiveRecord::AutosaveAssociation.class_eval do
+  def save_collection_association(reflection)
+    if association = association_instance_get(reflection.name)
+      autosave = reflection.options[:autosave]
+
+      if records = associated_records_to_validate_or_save(association, @new_record_before_save, autosave)
+        records.each do |record|
+          next if record.destroyed?
+
+          if autosave && record.marked_for_destruction?
+            association.destroy(record)
+          elsif autosave != false && (@new_record_before_save || record.new_record?)
+            if autosave
+              saved = association.send(:insert_record, record, false, false)
+            else
+              association.send(:insert_record, record)
+            end
+          elsif autosave
+            saved = record.save(false)
+          end
+
+          raise ActiveRecord::Rollback if saved == false
+        end
+      end
+
+      # reconstruct the SQL queries now that we know the owner's id
+      association.__send__(:construct_sql) if association.respond_to?(:construct_sql, true)
+    end
+  end
 end
 
 end

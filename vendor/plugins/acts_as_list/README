@@ -17,7 +17,7 @@ Example
   end
 
   todo_list.first.move_to_bottom
-  todo_list.last.move_higher
+  todo_list.last.insert_at(2)
 
 
 Copyright (c) 2007 David Heinemeier Hansson, released under the MIT license

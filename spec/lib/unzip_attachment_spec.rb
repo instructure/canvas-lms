@@ -109,7 +109,7 @@ describe UnzipAttachment do
 
     it "should import files alphabetically" do
       filename = fixture_filename('alphabet_soup.zip')
-      Zip::ZipFile.open(filename) do |zip|
+      Zip::File.open(filename) do |zip|
         # make sure the files aren't read from the zip in alphabetical order (so it's not alphabetized by chance)
         fake_files = []
         fake_files << zip.get_entry('f.txt')
@@ -119,7 +119,7 @@ describe UnzipAttachment do
         fake_files << zip.get_entry('b.txt')
         fake_files << zip.get_entry('a.txt')
 
-        Zip::ZipFile.stubs(:open).returns(fake_files)
+        Zip::File.stubs(:open).returns(fake_files)
 
         ua = UnzipAttachment.new(:course => @course, :filename => 'fake')
         ua.process

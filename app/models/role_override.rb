@@ -478,11 +478,21 @@ class RoleOverride < ActiveRecord::Base
       :undelete_courses => {
         :label => lambda { t('permissions.undelete_courses', "Undelete courses") },
         :admin_tool => true,
-        :account_only => true, 
+        :account_only => true,
         :available_to => [
           'AccountAdmin',
           'AccountMembership'
-        ], 
+        ],
+        :true_for => [ 'AccountAdmin' ]
+      },
+      :view_grade_changes => {
+        :label => lambda { t('permissions.view_grade_changes', "View Grade Change Logs") },
+        :admin_tool => true,
+        :account_only => true,
+        :available_to => [
+          'AccountAdmin',
+          'AccountMembership'
+        ],
         :true_for => [ 'AccountAdmin' ]
       },
       :view_notifications => {
@@ -740,7 +750,7 @@ class RoleOverride < ActiveRecord::Base
 
   def self.css_class_for(context, permission, base_role, custom_role=nil)
     generated_permission = self.permission_for(context, permission, base_role, custom_role)
-    
+
     css = []
     if generated_permission[:readonly]
       css << "six-checkbox-disabled-#{generated_permission[:enabled] ? 'checked' : 'unchecked' }"
@@ -752,11 +762,11 @@ class RoleOverride < ActiveRecord::Base
     end
     css.join(' ')
   end
-  
+
   def self.readonly_for(context, permission, base_role, custom_role=nil)
     self.permission_for(context, permission, base_role, custom_role)[:readonly]
   end
-  
+
   def self.title_for(context, permission, base_role, custom_role=nil)
     generated_permission = self.permission_for(context, permission, base_role, custom_role)
     if generated_permission[:readonly]
@@ -765,11 +775,11 @@ class RoleOverride < ActiveRecord::Base
       t 'tooltips.toogle', "Click to toggle this permission ON or OFF"
     end
   end
-  
+
   def self.locked_for(context, permission, base_role, custom_role=nil)
     self.permission_for(context, permission, base_role, custom_role)[:locked]
   end
-  
+
   def self.hidden_value_for(context, permission, base_role, custom_role=nil)
     generated_permission = self.permission_for(context, permission, base_role, custom_role)
     if !generated_permission[:readonly] && generated_permission[:explicit]
@@ -778,16 +788,16 @@ class RoleOverride < ActiveRecord::Base
       ''
     end
   end
-  
+
   def self.teacherless_permissions
     @teacherless_permissions ||= permissions.select{|p, data| data[:available_to].include?('TeacherlessStudentEnrollment') }.map{|p, data| p }
   end
-  
+
   def self.clear_cached_contexts
     @@role_override_chain = {}
     @cached_permissions = {}
   end
-  
+
   def self.permission_for(role_context, permission, base_role, custom_role=nil)
     base_role = 'StudentEnrollment' if base_role == 'StudentViewEnrollment'
     custom_role = nil if base_role == NO_PERMISSIONS_TYPE
@@ -803,7 +813,7 @@ class RoleOverride < ActiveRecord::Base
     key = [role_context.cache_key, role_context.global_id, permission.to_s, custom_role.to_s].join
     permissionless_key = [role_context.cache_key, role_context.global_id, custom_role.to_s].join
     return @cached_permissions[key] if @cached_permissions[key]
-    
+
     if !self.known_role_types.include?(base_role)
       raise ArgumentError.new("Invalid base_role #{base_role}")
     end

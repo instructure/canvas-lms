@@ -1,6 +1,6 @@
   <% jammit_css :user_logins %>
   <% js_bundle :user_logins %>
-  <% js_env :PASSWORD_POLICY => @domain_root_account.try(:password_policy) %>
+  <% js_env :PASSWORD_POLICY => (@domain_root_account.try(:password_policy) || {}) %>
   <fieldset id="login_information">
     <legend><%= t('titles.logins', 'Login Information') %></legend>
     <table>
@@ -49,7 +49,7 @@
           </td>
           <% if !pseudonym || can_do(pseudonym.account, @current_user, :manage_user_logins) %>
             <td class='links <%= 'passwordable' if can_change_pseudonym_password %>'>
-              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="edit_pseudonym_link"><i class="icon-edit standalone-icon"></i></a>
+              <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="edit_pseudonym_link" data-account-id="<%= pseudonym.account.id if pseudonym %>"><i class="icon-edit standalone-icon"></i></a>
               <a href="#" rel="<%= user_pseudonym_url(@user.id, pseudonym ? pseudonym.id : "{{ id }}") %>" class="delete_pseudonym_link" style="<%= hidden if pseudonyms.length <= 2 || (pseudonym && pseudonym.sis_user_id && !can_do(pseudonym.account, @current_user, :manage_sis)) %>"><i class="icon-end standalone-icon"></i></a>
             </td>
           <% else %>

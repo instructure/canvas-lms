@@ -2,11 +2,13 @@ define [
   'compiled/collections/GroupUserCollection'
   'compiled/models/GroupUser'
   'compiled/models/GroupCategory'
+  'compiled/models/Group'
   'compiled/views/groups/manage/AddUnassignedMenu'
   'jquery'
 ], (GroupUserCollection,
     GroupUser,
     GroupCategory,
+    Group,
     AddUnassignedMenu,
     $) ->
 
@@ -26,10 +28,10 @@ define [
       clock = sinon.useFakeTimers()
       server = sinon.fakeServer.create()
       waldo = new GroupUser id: 4, name: "Waldo", sortable_name: "Waldo"
-      category = new GroupCategory
-      users = new GroupUserCollection
+      users = new GroupUserCollection null,
+        group: new Group
+        category: new GroupCategory
       users.setParam 'search_term', 'term'
-      users.category = category
       users.loaded = true
       view = new AddUnassignedMenu
         collection: users

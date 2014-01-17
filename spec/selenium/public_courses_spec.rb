@@ -3,14 +3,14 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
 
 describe "public courses" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def ensure_logged_out
     driver.navigate.to(app_host + '/logout')
   end
 
   def validate_selector_displayed(selector1, selector2)
-    if public_course.draft_state_enabled?
+    if public_course.feature_enabled?(:draft_state)
       f(selector1).should be_displayed
     else
       f(selector2).should be_displayed

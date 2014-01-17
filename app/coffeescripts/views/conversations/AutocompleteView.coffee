@@ -42,15 +42,17 @@ define [
     # Internal: Currently selected results.
     tokens: []
 
-    # Internal: A cache of per-course permissions.
+    # Internal: A cache of per-context permissions.
     permissions: {}
+
+    # Internal: A cache of URL results.
+    cache: {}
 
     # Internal: Construct the search URL for the given term.
     url: (term) ->
       baseURL = '/api/v1/search/recipients?'
-      params = { search: term, per_page: 20, 'permissions[]': 'send_messages_all' }
+      params = { search: term, per_page: 20, 'permissions[]': 'send_messages_all', synthetic_contexts: true }
       params.context = @currentContext.id if @currentContext
-      params.synthetic_contexts = true unless term
 
       baseURL + _.reduce(params, (queryString, v, k) ->
         queryString.push("#{k}=#{v}")
@@ -93,6 +95,7 @@ define [
       'click     .ac-clear'            : '_onClearTokens'
       'click     .ac-token-remove-btn' : '_onRemoveToken'
       'click     .ac-search-btn'       : '_onSearch'
+      'keyclick  .ac-search-btn'       : '_onSearch'
       'focus     .ac-input'            : '_onInputFocus'
       'input     .ac-input'            : '_onSearchTermChange'
       'keydown   .ac-input'            : '_onInputAction'
@@ -131,6 +134,14 @@ define [
               id: "result-#{$.guid++}" # for aria-activedescendant
             attributes['aria-haspopup'] = @model.get('isContext')
             attributes
+      @_attachCollection()
+
+    # Internal: Manage events on the results collection.
+    #
+    # Returns nothing.
+    _attachCollection: ->
+      @resultCollection.off('reset',  @resultView.renderOnReset)
+      @resultCollection.off('remove', @resultView.removeItem)
 
     # Public: Toggle visibility of result list.
     #
@@ -241,6 +252,7 @@ define [
     _onSearchTermChange: (e) ->
       if !@$input.val() then @toggleResultList(false) else @_fetchResults()
       @$input.width(@$span.text(@$input.val()).width() + 15)
+      @resultView.collection.each((m) => @resultView.removeItem(m))
 
     # Internal: Display search results returned from the server.
     #
@@ -248,22 +260,26 @@ define [
     #
     # Returns nothing.
     _onSearchResultLoad: =>
+      @cache[@currentUrl] = @resultCollection.toJSON()
       _.extend(@permissions, @_getPermissions())
       @_addEveryoneResult(@resultCollection) unless @excludeAll or !@_canSendToAll()
       shouldDrawResults = @resultCollection.length
+      isFinished        = !@nextRequest
       @_addBackResult(@resultCollection)
       @currentRequest = null
-      if shouldDrawResults
+      if shouldDrawResults and isFinished
         @_drawResults()
-      else
+      else if isFinished
         @resultCollection.push(new ConversationSearchResult({id: 'no_results', name: '', noResults: true}))
+      @_fetchResults(true) if @nextRequest
 
     # Internal: Determine if the current user can send to all users in the course.
     #
     # Returns a boolean.
     _canSendToAll: ->
       return false unless @currentContext
-      @permissions[@_currentCourseOrGroup().id]
+      key = @currentContext.id.replace(/_(students|teachers)$/, '')
+      @permissions[key]
 
     # Internal: Return permissions hashes from the current results.
     #
@@ -275,14 +291,6 @@ define [
         map[key] = !!result.get('permissions').send_messages_all
         map
       , {}
-
-    # Internal: Return the current course context.
-    #
-    # Returns a context object.
-    _currentCourseOrGroup: ->
-      return @currentContext if @currentContext.id.match(/^(course|group)_\d+$/)
-      for context in @parentContexts
-        return context if context.id.match(/^(course|group)_\d+$/)
 
     # Internal: Add, if appropriate, an "All in %{context}" result to the
     #           search results.
@@ -318,10 +326,10 @@ define [
 
     # Internal: Draw out search results to the DOM.
     #
-    # elements - An array of HTML snippets to append to the result list.
-    #
     # Returns nothing.
     _drawResults: ->
+      @resultView.empty = !@resultView.collection.length
+      @resultView.render()
       $el = @$resultList.find('li:first').addClass('selected')
       @selectedModel = @_getModel($el.data('id'))
       @$input.attr('aria-activedescendant', $el.attr('id'))
@@ -333,11 +341,32 @@ define [
     # Returns nothing.
     __fetchResults: (fetchIfEmpty = false) ->
       return unless @$input.val() or fetchIfEmpty
-      @currentRequest?.abort()
-      @currentRequest = @resultCollection.fetch
-        url: @url(@$input.val())
-        success: @_onSearchResultLoad
-      @toggleResultList(true)
+      url = @_loadURL()
+      return unless url
+      @currentUrl = url
+      if @cache[url]
+        @resultCollection.reset(@cache[url])
+        @toggleResultList(true)
+        @_onSearchResultLoad()
+      else
+        @currentRequest = @resultCollection.fetch
+          url: @url(@$input.val())
+          success: @_onSearchResultLoad
+        @toggleResultList(true)
+
+    # Internal: Get URL for the current request, caching it as
+    #   @nextRequest if needed.
+    #
+    # Returns a URL string (will be empty if current request is pending).
+    _loadURL: ->
+      searchURL = @url(@$input.val())
+      if @currentRequest
+        @nextRequest = searchURL
+        ''
+      else
+        previousNextRequest = @nextRequest
+        delete @nextRequest
+        previousNextRequest or searchURL
 
     # Internal: Delete the last token.
     #
@@ -367,15 +396,15 @@ define [
       e.preventDefault() && e.stopPropagation()
       if @selectedModel.get('back')
         @currentContext = @parentContexts.pop()
-        @__fetchResults(true)
+        @_fetchResults(true)
       else if @selectedModel.get('isContext')
-        @parentContexts.push(@currentContext)
+        @parentContexts.push(@currentContext) if @currentContext
         @$input.val('')
         @currentContext =
           id: @selectedModel.id
           name: @selectedModel.get('name')
           peopleCount: @selectedModel.get('user_count')
-        @__fetchResults(true)
+        @_fetchResults(true)
       else
         @_addToken(@selectedModel.attributes)
 
@@ -427,15 +456,15 @@ define [
       $target = $(e.currentTarget)
       if $target.hasClass('back')
         @currentContext = @parentContexts.pop()
-        @__fetchResults(true)
+        @_fetchResults(true)
       else if $target.hasClass('context')
-        @parentContexts.push(@currentContext)
+        @parentContexts.push(@currentContext) if @currentContext
         @$input.val('')
         @currentContext =
           id: $target.data('id')
           name: $target.text().trim()
           peopleCount: $target.data('people-count')
-        @__fetchResults(true)
+        @_fetchResults(true)
       else
         @_addToken(@_getModel($(e.currentTarget).data('id')).attributes)
 
@@ -491,6 +520,7 @@ define [
         @$searchBtn.prop('disabled', true)
         @trigger('disabled')
       @trigger('changeToken', @tokenParams())
+      @_resetContext()
 
     # Internal: Prepares a given model's name for display.
     #

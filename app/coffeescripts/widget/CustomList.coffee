@@ -33,19 +33,25 @@ define [
       @setItems items
       @open() if @options.autoOpen
 
-    open: ->
+    open: (e) ->
+      e.preventDefault() if e
       @wrapper.appendTo(@appendTarget).show()
       setTimeout => # css3 animation
         @element.addClass('customListEditing')
         @options.onToggle?(on)
+        document.activeElement.blur()
+        @wrapper.find('li a').first().focus()
       , 1
+      @element.find('.customListOpen').attr('aria-expanded': 'true')
 
-    close: ->
-      @wrapper.hide 0, =>
-        @teardown()
+    close: (e) ->
+      e.preventDefault() if e
+      @wrapper.hide()
       @element.removeClass('customListEditing')
       @options.onToggle?(off)
       @resetList() if @pinned.length is 0
+      document.activeElement.blur()
+      @element.find('.customListOpen').focus().attr('aria-expanded': 'false')
 
     attach: ->
       @element.delegate '.customListOpen', 'click', jQuery.proxy(this, 'open')
@@ -58,16 +64,20 @@ define [
         'click.customListTeardown',
         jQuery.proxy(this, 'sourceClickHandler')
       )
+      id = 'customListWrapper-'+jQuery.guid++
+      @wrapper.appendTo(@appendTarget).attr(id: id).hide()
+      @element.find('.customListOpen').attr(role: 'button', 'aria-expanded': 'false', 'aria-controls': id)
 
-    teardown: ->
-      @wrapper.detach()
+    setOn: (element, bool) ->
+      element.toggleClass 'on', bool
+      element.find('a').attr('aria-checked', bool.toString())
 
     add: (id, element) ->
       item          = @items.findBy('id', id)
       clone         = element.clone().hide()
       item.element  = clone
 
-      element.addClass 'on'
+      @setOn(element, true)
 
       @pinned.push item
       @pinned.sortBy('shortName')
@@ -95,7 +105,7 @@ define [
         @ghost.detach().empty()
 
     remove: (item, element) ->
-      element.removeClass 'on'
+      @setOn(element, false)
       @animating = true
       @onRemove item
       item.element.slideUp @options.animationDuration, =>
@@ -194,11 +204,11 @@ define [
         item.element = element
         @pinned.push item
 
-      @wrapper.find('ul > li').removeClass('on')
+      @setOn(@wrapper.find('ul > li'), false)
 
       for item in @pinned
         match = @wrapper.find("ul > li[data-id=#{item.id}]")
-        match.addClass 'on'
+        @setOn(match, true)
 
     sourceClickHandler: (event) ->
       @checkElement jQuery event.currentTarget

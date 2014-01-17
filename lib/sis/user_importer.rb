@@ -62,14 +62,14 @@ module SIS
         @users_to_update_account_associations = []
       end
 
-      def add_user(user_id, login_id, status, first_name, last_name, email=nil, password=nil, ssha_password=nil)
-        @logger.debug("Processing User #{[user_id, login_id, status, first_name, last_name, email, password, ssha_password].inspect}")
+      def add_user(user_id, login_id, status, first_name, last_name, email=nil, password=nil, ssha_password=nil, integration_id=nil)
+        @logger.debug("Processing User #{[user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id].inspect}")
 
         raise ImportError, "No user_id given for a user" if user_id.blank?
         raise ImportError, "No login_id given for user #{user_id}" if login_id.blank?
         raise ImportError, "Improper status for user #{user_id}" unless status =~ /\A(active|deleted)/i
 
-        @batched_users << [user_id.to_s, login_id, status, first_name, last_name, email, password, ssha_password]
+        @batched_users << [user_id.to_s, login_id, status, first_name, last_name, email, password, ssha_password, integration_id]
         process_batch if @batched_users.size >= @updates_every
       end
 
@@ -86,7 +86,7 @@ module SIS
           while !@batched_users.empty? && tx_end_time > Time.now
             user_row = @batched_users.shift
             @logger.debug("Processing User #{user_row.inspect}")
-            user_id, login_id, status, first_name, last_name, email, password, ssha_password = user_row
+            user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id = user_row
 
             pseudo = @root_account.pseudonyms.find_by_sis_user_id(user_id.to_s)
             pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(login_id).first
@@ -135,6 +135,7 @@ module SIS
             pseudo ||= Pseudonym.new
             pseudo.unique_id = login_id unless pseudo.stuck_sis_fields.include?(:unique_id)
             pseudo.sis_user_id = user_id
+            pseudo.integration_id = integration_id
             pseudo.account = @root_account
             pseudo.workflow_state = status_is_active ? 'active' : 'deleted'
             if pseudo.new_record? && status_is_active

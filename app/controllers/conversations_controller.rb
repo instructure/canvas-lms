@@ -303,10 +303,9 @@ class ConversationsController < ApplicationController
   #     }
   #   ]
   def batches
-    batches = Api.paginate(@current_user.conversation_batches.in_progress,
+    batches = Api.paginate(@current_user.conversation_batches.in_progress.order(:id),
                            self,
-                           api_v1_conversations_batches_url,
-                           :order => :id)
+                           api_v1_conversations_batches_url)
     render :json => batches.map{ |m| conversation_batch_json(m, @current_user, session) }
   end
 

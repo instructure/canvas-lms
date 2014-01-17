@@ -1,11 +1,28 @@
-define ['./app', 'ember'], (App, Ember) ->
+define [
+  './start_app'
+  'ember'
+  'ic-ajax'
+], (startApp, Ember, ajax) ->
 
-  module '{{appName}}', ->
+  App = null
+
+  ajax.defineFixture '/api/v1/users/self/activity_stream',
+    response: [
+      {title: 'foo'}
+      {title: 'bar'}
+    ]
+    jqXHR: {}
+    textStatus: ''
+
+  module '{{appName}}',
     setup: ->
-      App.reset()
-      Ember.run(App, App.advanceReadiness)
+      App = startApp()
+    teardown: ->
+      Ember.run App, 'destroy'
 
-  test 'says hello', ->
-    visit('/').then ->
-      equal(find('h1').html().trim(), 'HELLO!')
+  test 'fetches and renders stream items', ->
+    controller = App.__container__.lookup('controller:{{appName}}')
+    equal controller.objectAt(0).title, 'foo'
+    equal controller.objectAt(1).title, 'bar'
+    equal find('h1').html().trim(), 'HELLO!'
 

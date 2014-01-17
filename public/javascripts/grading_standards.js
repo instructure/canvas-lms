@@ -1,4 +1,5 @@
 define([
+  'compiled/util/round',
   'i18n!grading_standards',
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
@@ -8,7 +9,7 @@ define([
   'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(I18n, $) {
+], function(round, I18n, $) {
 
   $(document).ready(function() {
     $(".add_standard_link").click(function(event) {
@@ -225,7 +226,7 @@ define([
         var row = standard.data[idx];
         $row_instance.removeClass('to_delete').removeClass('to_add');
         $row_instance.find(".standard_name").val(row[0]).attr('name', 'grading_standard[standard_data][scheme_'+idx+'][name]').end()
-          .find(".standard_value").val(row[1] * 100).attr('name', 'grading_standard[standard_data][scheme_'+idx+'][value]');
+          .find(".standard_value").val(round((row[1] * 100),2)).attr('name', 'grading_standard[standard_data][scheme_'+idx+'][value]');
         $table.append($row_instance.show());
         $table.append($link.clone(true).show());
       }
@@ -255,7 +256,6 @@ define([
         } else if(url && url.match(/assignments$/)) {
           url = null;
         }
-  
         if(url) {
           $.ajaxJSON(url, 'PUT', put_data, function(data) {
             $("#course_form .grading_scheme_set").text((data && data.course && data.course.grading_standard_title) || I18n.t('grading_scheme_currently_set', "Currently Set"));
@@ -314,7 +314,7 @@ define([
       var $link = $standard.find(".insert_grading_standard:first").clone(true);
       var temp_id = null;
       while(!temp_id || $(".standard_name[name='grading_standard[standard_data][scheme_" + temp_id + "][name]']").length > 0) {
-        temp_id = Math.round(Math.random() * 10000);    
+        temp_id = Math.round(Math.random() * 10000);
       }
       $row.find(".standard_name").val("-").attr('name', 'grading_standard[standard_data][scheme_' + temp_id + '][name]');
       $row.find(".standard_value").attr('name', 'grading_standard[standard_data][scheme_' + temp_id + '][value]');
@@ -342,8 +342,7 @@ define([
     $(".grading_standard input[type='text']").bind('blur change', function() {
       var $standard = $(this).parents(".grading_standard");
       var val = parseFloat($(this).parents(".grading_standard_row").find(".standard_value").val());
-      // round to 0.1
-      val = Math.round(val * 10) / 10.0;
+      val = round(val,2);
       $(this).parents(".grading_standard_row").find(".standard_value").val(val);
       if(isNaN(val)) { val = null; }
       var lastVal = val || 100;
@@ -418,7 +417,6 @@ define([
         }
         var label = $(this).data('label');
         $(this).attr('aria-label', label + ' ' + $(this).find('.edit_max_score').text() + '%');
-        debugger;
       });
     });
   });

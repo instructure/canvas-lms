@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -519,57 +519,7 @@ class CalendarEvent < ActiveRecord::Base
     item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
     item ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
     item ||= context.calendar_events.new
-    item.migration_id = hash[:migration_id]
-    item.workflow_state = 'active' if item.deleted?
-    item.title = hash[:title] || hash[:name]
-    hash[:missing_links] = []
-    description = ImportedHtmlConverter.convert(hash[:description] || "", context, {:missing_links => hash[:missing_links]})
-    if hash[:attachment_type] == 'external_url'
-      url = hash[:attachment_value]
-      description += "<p><a href='#{url}'>" + ERB::Util.h(t(:see_related_link, "See Related Link")) + "</a></p>" if url
-    elsif hash[:attachment_type] == 'assignment'
-      assignment = context.assignments.find_by_migration_id(hash[:attachment_value]) rescue nil
-      description += "<p><a href='/#{context.class.to_s.downcase.pluralize}/#{context.id}/assignments/#{assignment.id}'>" + ERB::Util.h(t(:see_assignment, "See %{assignment_name}", :assignment_name => assignment.title)) + "</a></p>" if assignment
-    elsif hash[:attachment_type] == 'assessment'
-      quiz = context.quizzes.find_by_migration_id(hash[:attachment_value]) rescue nil
-      description += "<p><a href='/#{context.class.to_s.downcase.pluralize}/#{context.id}/quizzes/#{quiz.id}'>" + ERB::Util.h(t(:see_quiz, "See %{quiz_name}", :quiz_name => quiz.title)) + "</a></p>" if quiz
-    elsif hash[:attachment_type] == 'file'
-      file = context.attachments.find_by_migration_id(hash[:attachment_value]) rescue nil
-      description += "<p><a href='/#{context.class.to_s.downcase.pluralize}/#{context.id}/files/#{file.id}/download'>" + ERB::Util.h(t(:see_file, "See %{file_name}", :file_name => file.display_name)) + "</a></p>" if file
-    elsif hash[:attachment_type] == 'area'
-     # ignored, no idea what this is
-    elsif hash[:attachment_type] == 'web_link'
-      link = context.external_url_hash[hash[:attachment_value]] rescue nil
-      link ||= context.full_migration_hash['web_link_categories'].map{|c| c['links'] }.flatten.select{|l| l['link_id'] == hash[:attachment_value] } rescue nil
-      description += "<p><a href='#{link['url']}'>#{link['name'] || ERB::Util.h(t(:see_related_link, "See Related Link"))}</a></p>" if link
-    elsif hash[:attachment_type] == 'media_collection'
-     # ignored, no idea what this is
-    elsif hash[:attachment_type] == 'topic'
-      topic = context.discussion_topic.find_by_migration_id(hash[:attachment_value]) rescue nil
-      description += "<p><a href='/#{context.class.to_s.downcase.pluralize}/#{context.id}/discussion_topics/#{topic.id}'>" + ERB::Util.h(t(:see_discussion_topic, "See %{discussion_topic_name}", :discussion_topic_name => topic.title)) + "</a></p>" if topic
-    end
-    item.description = description
-
-    hash[:start_at] ||= hash[:start_date]
-    hash[:end_at] ||= hash[:end_date]
-    item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at]) unless hash[:start_at].nil?
-    item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) unless hash[:end_at].nil?
-
-    item.all_day_date = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:all_day_date]).to_date if hash[:all_day_date].present?
-    item.imported = true
-
-    item.save_without_broadcasting!
-    if context.respond_to?(:content_migration) && context.content_migration
-      context.content_migration.add_missing_content_links(:class => item.class.to_s,
-        :id => item.id, :missing_links => hash[:missing_links],
-        :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.underscore.pluralize}/#{item.id}")
-    end
-    context.imported_migration_items << item if context.imported_migration_items
-    if hash[:all_day]
-      item.all_day = hash[:all_day]
-      item.save
-    end
-    item
+    MigrationImport::CalendarEvent.import_from_migration(hash, context, item)
   end
 
   def self.max_visible_calendars

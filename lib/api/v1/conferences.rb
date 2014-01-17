@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,13 +17,33 @@
 #
 
 module Api::V1::Conferences
-  def conferences_json(conferences, context, user, session)
+
+  API_CONFERENCE_JSON_OPTS = {
+    :only => %w(id title conference_type description
+      duration ended_at started_at user_ids long_running
+      recordings join_url had_advanced_settings)
+  }
+
+  def api_conferences_json(conferences, user, session)
+    json = conferences.map do |c|
+      api_json(c, user, session, API_CONFERENCE_JSON_OPTS)
+    end
+    json.each do |j|
+      j['has_advanced_settings'] = value_to_boolean(j['has_advanced_settings'])
+      j['long_running'] = value_to_boolean(j['long_running'])
+      j['duration'] = j['duration'].to_i if j['duration']
+      j['users'] = Array(j.delete('user_ids'))
+    end
+    {'conferences' => json}
+  end
+
+  def ui_conferences_json(conferences, context, user, session)
     conferences.map do |c|
       c.as_json(
         permissions: {
           user: user,
           session: session,
-          },
+        },
         url: named_context_url(context, :context_conference_url, c)
       )
     end

@@ -24,9 +24,10 @@ require [
   'compiled/views/assignments/AssignmentSettingsView'
   'compiled/views/assignments/AssignmentGroupWeightsView'
   'compiled/views/assignments/ToggleShowByView'
+  'underscore'
 ], (AssignmentGroupCollection, Course, AssignmentGroupListView,
   CreateGroupView, IndexView, AssignmentSettingsView,
-  AssignmentGroupWeightsView, ToggleShowByView) ->
+  AssignmentGroupWeightsView, ToggleShowByView, _) ->
 
   course = new Course
   course.url = ENV.URLS.course_url
@@ -36,6 +37,9 @@ require [
   if ENV.PERMISSIONS.manage
     includes.push "all_dates"
     includes.push "module_ids"
+  # observers
+  else if !_.include(ENV.current_user_roles, "student")
+    includes.push "all_dates"
 
   assignmentGroups = new AssignmentGroupCollection [],
     course: course

@@ -86,7 +86,7 @@ module Crummy
             content_tag_without_nil_return(:ul, nil, nil, false) do
               crumbs.collect do |crumb|
                 content_tag(:li, crumb_to_html(crumb), crumb[2])
-              end.join
+              end.join.html_safe
             end
           end
         else
@@ -94,7 +94,7 @@ module Crummy
             content_tag(:ul, nil, nil, false) do
               crumbs.collect do |crumb|
                 content_tag(:li, crumb_to_html(crumb), crumb[2])
-              end.join
+              end.join.html_safe
             end
           end
         end

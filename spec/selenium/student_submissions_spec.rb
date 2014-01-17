@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/submissions_common')
 
 
 describe "submissions" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context 'as a student' do
 
@@ -127,11 +127,13 @@ describe "submissions" do
       wait_for_ajaximations
       assignment_form = f('#submit_online_text_entry_form')
       wait_for_tiny(assignment_form)
+
       submit_form(assignment_form)
       wait_for_ajaximations
 
       # it should not actually submit and pop up an error message
-      f('.error_box').should be_displayed
+      ff('.error_box')[1].should include_text('Required')
+
       Submission.count.should == 0
 
       # now make sure it works
@@ -150,7 +152,7 @@ describe "submissions" do
       submit_form("#submit_online_text_entry_form")
 
       # it should not actually submit and pop up an error message
-      f('.error_box').should be_displayed
+      ff('.error_box')[1].should include_text('Required')
       Submission.count.should == 0
 
       # navigate off the page and dismiss the alert box to avoid problems
@@ -205,6 +207,7 @@ describe "submissions" do
       end
     end
 
+
     it "should submit an assignment and validate confirmation information" do
       pending "BUG 6783 - Coming Up assignments update error" do
         @assignment.update_attributes(:submission_types => 'online_url')
@@ -223,7 +226,7 @@ describe "submissions" do
     end
 
     describe 'uploaded files for submission' do
-      it_should_behave_like "in-process server selenium tests"
+      include_examples "in-process server selenium tests"
 
       def fixture_file_path(file)
         path = ActionController::TestCase.respond_to?(:fixture_path) ? ActionController::TestCase.send(:fixture_path) : nil

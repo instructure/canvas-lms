@@ -2,6 +2,7 @@ require 'lib/canvas/require_js/plugin_extension'
 module Canvas
   module RequireJs
     class << self
+      @@matcher = nil
       def get_binding
         binding
       end
@@ -9,8 +10,12 @@ module Canvas
       PATH_REGEX = %r{.*?/javascripts/(plugins/)?(.*)\.js\z}
       JS_ROOT = "#{Rails.root}/public/javascripts"
 
+      def matcher=(value)
+        @@matcher = value
+      end
+
       def matcher
-        ENV['JS_SPEC_MATCHER'] || '**/*{Spec,.spec}.js'
+        @@matcher || ENV['JS_SPEC_MATCHER'] || '**/*Spec.js'
       end
 
       # get all regular canvas (and plugin) bundles
@@ -53,14 +58,22 @@ module Canvas
 
       def paths(cache_busting = false)
         @paths ||= {
-          :ember => 'vendor/ember/ember',
           :common => 'compiled/bundles/common',
           :jqueryui => 'vendor/jqueryui',
           :use => 'vendor/use',
-          :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min'
+          :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min',
+          'ic-dialog' => 'vendor/ic-dialog/dist/main.amd',
         }.update(cache_busting ? cache_busting_paths : {}).update(plugin_paths).update(Canvas::RequireJs::PluginExtension.paths).to_json.gsub(/([,{])/, "\\1\n    ")
       end
-  
+
+      def packages
+        @packages ||= [
+          {'name' => 'ic-ajax', 'location' => 'bower/ic-ajax'},
+          {'name' => 'ic-styled', 'location' => 'bower/ic-styled'},
+          {'name' => 'ic-menu', 'location' => 'bower/ic-menu'},
+        ].to_json
+      end
+
       def plugin_paths
         @plugin_paths ||= begin
           Dir['public/javascripts/plugins/*'].inject({}) { |hash, plugin|
@@ -78,13 +91,19 @@ module Canvas
       def shims
         <<-JS.gsub(%r{\A +|^ {8}}, '')
           {
+            'bower/ember/ember': {
+              deps: ['jquery', 'handlebars'],
+              attach: 'Ember'
+            },
+            'bower/handlebars/handlebars.runtime': {
+              attach: 'Handlebars'
+            },
             'vendor/backbone': {
               deps: ['underscore', 'jquery'],
               attach: function(_, $){
                 return Backbone;
               }
             },
-        
             // slick grid shim
             'vendor/slickgrid/lib/jquery.event.drag-2.2': {
               deps: ['jquery'],

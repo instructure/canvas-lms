@@ -424,13 +424,18 @@ describe QuizQuestionLinkMigrator do
     end
 
     it "should migrate links in the question's data" do
-      @question.question_data[:question_text] = @source_blob.dup
+      qd = @question.question_data
+      qd[:question_text] = @source_blob.dup
+      @question.question_data = qd
+
       QuizQuestionLinkMigrator.migrate_file_links_in_question(@question)
       @question.question_data[:question_text].should == @target_blob
     end
 
     it "should return true iff a question was migrated" do
-      @question.question_data[:question_text] = @source_blob.dup
+      qd = @question.question_data
+      qd[:question_text] = @source_blob.dup
+      @question.question_data = qd
 
       # first time true, second time false because it's already migrated
       QuizQuestionLinkMigrator.migrate_file_links_in_question(@question).should be_true

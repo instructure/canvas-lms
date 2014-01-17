@@ -969,7 +969,8 @@ define([
       module_id: data.moduleId,
       course_id: data.courseId,
       published: data.published,
-      publishable: data.publishable
+      publishable: data.publishable,
+      unpublishable: data.unpublishable
     });
     var view = new PublishIconView({model: model, el: $el[0]});
     var row = $el.closest('.ig-row');

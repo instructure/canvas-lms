@@ -39,6 +39,7 @@ define [
   # Dummy form view for testing
   class MyForm extends ValidatedFormView
     initialize: ->
+      super
       @model = new Model
       @model.url = '/fail'
       @render()

@@ -21,7 +21,7 @@ class CollectionItemData < ActiveRecord::Base
 
   # rails3 realized that plural form is actually "data",
   # but we don't want to rename the table at this point
-  set_table_name :collection_item_datas
+  self.table_name = :collection_item_datas
 
   belongs_to :root_item, :class_name => "CollectionItem"
   belongs_to :image_attachment, :class_name => "Attachment"

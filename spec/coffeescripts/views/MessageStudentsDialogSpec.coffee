@@ -30,11 +30,11 @@ define [
 
     deepEqual @dialog.recipientGroups, @testData.recipientGroups,
       'saves recipientGroups'
-    
+
     deepEqual @dialog.recipients, @testData.recipientGroups[0].recipients,
       'saves first recipientGroups recipients to be displayed'
 
-    ok @dialog.title.match(@testData.context), 'saves the title to be displayed'
+    ok @dialog.options.title.match(@testData.context), 'saves the title to be displayed'
 
     ok @dialog.model, 'creates conversation automatically'
 

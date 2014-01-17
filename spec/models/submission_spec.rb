@@ -126,6 +126,18 @@ describe Submission do
     @submission = @assignment.submit_homework(se.user, :media_comment_id => "fake", :media_comment_type => "audio")
   end
 
+  it "should log submissions with grade changes" do
+    submission_spec_model
+
+    Auditors::GradeChange.expects(:record).once
+
+    @submission.score = 5
+    @submission.save!
+
+    @submission.grader_id = @user.id
+    @submission.save!
+  end
+
   context "Discussion Topic" do
     it "should use correct date for its submitted_at value" do
       course_with_student_logged_in(:active_all => true)
@@ -789,6 +801,26 @@ describe Submission do
     end
   end
 
+  describe "autograded" do
+    let(:submission) { Submission.new }
+
+    it "returns false when its not autograded" do
+      assignment = stub(:muted? => false)
+      @submission = Submission.new
+      @submission.autograded?.should == false
+
+      @submission.grader_id = Shard.global_id_for(@user.id)
+      @submission.autograded?.should == false
+    end
+
+    it "returns true when its autograded" do
+      assignment = stub(:muted? => false)
+      @submission = Submission.new
+      @submission.grader_id = -1
+      @submission.autograded?.should == true
+    end
+  end
+
   describe "past_due" do
     before do
       u1 = @user
@@ -907,6 +939,21 @@ describe Submission do
 
       submission = @assignment.submissions.create(:user => @user)
       submission.cached_due_date.should == override.due_at
+    end
+  end
+
+  describe "update_attachment_associations" do
+    begin
+      course_with_student active_all: true
+      @assignment = @course.assignments.create!
+    end
+
+    it "doesn't include random attachment ids" do
+      f = Attachment.create! uploaded_data: StringIO.new('blah'),
+        context: @course,
+        filename: 'blah.txt'
+      sub = @assignment.submit_homework(@user, attachments: [f])
+      sub.attachments.should == []
     end
   end
 

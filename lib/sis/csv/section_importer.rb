@@ -42,7 +42,7 @@ module SIS
             end
 
             begin
-              importer.add_section(row['section_id'], row['course_id'], row['name'], row['status'], start_date, end_date)
+              importer.add_section(row['section_id'], row['course_id'], row['name'], row['status'], start_date, end_date, row['integration_id'])
             rescue ImportError => e
               add_warning(csv, "#{e}")
             end

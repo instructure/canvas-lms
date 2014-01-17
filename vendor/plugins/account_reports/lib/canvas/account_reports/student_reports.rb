@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -213,8 +213,12 @@ module Canvas::AccountReports
         end
 
         csv << ['user id','user sis id','user name','last access at','last ip']
+
+        pseudonyms_in_report = Set.new
         Shackles.activate(:slave) do
           students.find_each do |u|
+            next if pseudonyms_in_report.include? [u.user_id, u.sis_user_id]
+            pseudonyms_in_report << [u.user_id, u.sis_user_id]
             row = []
             row << u.user_id
             row << u.sis_user_id

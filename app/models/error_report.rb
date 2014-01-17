@@ -49,7 +49,7 @@ class ErrorReport < ActiveRecord::Base
     attr_reader :opts, :exception
 
     def log_error(category, opts)
-      opts[:category] = category.to_s
+      opts[:category] = category.to_s.presence || 'default'
       @opts = opts
       # sanitize invalid encodings
       @opts[:message] = TextHelper.strip_invalid_utf8(@opts[:message]) if @opts[:message]

@@ -116,12 +116,14 @@ describe "Feature Flags API", :type => :integration do
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_site_admin.id}/features",
                         { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_site_admin.to_param })
         json.map { |f| f['feature'] }.sort.should eql %w(account_feature course_feature hidden_feature root_account_feature root_opt_in_feature user_feature)
+        json.find { |f| f['feature'] == 'hidden_feature' }['hidden'].should be_true
       end
 
       it "should show hidden features on root accounts to a site admin user" do
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_root_account.id}/features",
            { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_root_account.to_param })
         json.map { |f| f['feature'] }.sort.should eql %w(account_feature course_feature hidden_feature root_account_feature root_opt_in_feature)
+        json.find { |f| f['feature'] == 'hidden_feature' }['hidden'].should be_true
       end
 
       it "should show un-hidden features on root accounts" do
@@ -129,6 +131,16 @@ describe "Feature Flags API", :type => :integration do
         json = api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features",
                         { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_root_account.to_param })
         json.map { |f| f['feature'] }.sort.should eql %w(account_feature course_feature hidden_feature root_account_feature root_opt_in_feature)
+        json.find { |f| f['feature'] == 'hidden_feature' }['hidden'].should be_nil
+      end
+
+      it "should show 'hidden' flag for site admin even after a feature has been un-hidden" do
+        t_root_account.feature_flags.create! feature: 'hidden_feature'
+        json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_root_account.id}/features",
+                                { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_root_account.to_param })
+        feature = json.find { |f| f['feature'] == 'hidden_feature' }
+        feature['hidden'].should be_true
+        feature['feature_flag']['state'].should eql 'allowed'
       end
     end
 
@@ -312,6 +324,30 @@ describe "Feature Flags API", :type => :integration do
         api_call_as_user(site_admin_user, :put, "/api/v1/accounts/#{t_root_account.id}/features/flags/hidden_feature",
                  { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_root_account.to_param, feature: 'hidden_feature' })
         t_root_account.feature_flags.where(feature: 'hidden_feature').count.should eql 1
+      end
+
+      context "AccountManager" do
+        before do
+          t_site_admin.role_overrides.create!(permission: 'manage_feature_flags',
+                                              enrollment_type: 'AccountManager',
+                                              enabled: true,
+                                              applies_to_self: false,
+                                              applies_to_descendants: true)
+          @site_admin_member = site_admin_user(membership_type: 'AccountManager')
+        end
+
+        it "should not create a site admin feature flag" do
+          api_call_as_user(@site_admin_member, :put, "/api/v1/accounts/#{t_site_admin.id}/features/flags/hidden_feature",
+                           { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_site_admin.to_param, feature: 'hidden_feature' },
+                           {}, {}, { expected_status: 401 })
+          t_site_admin.feature_flags.where(feature: 'hidden_feature').should_not be_any
+        end
+
+        it "should create a root account feature flag" do
+          api_call_as_user(@site_admin_member, :put, "/api/v1/accounts/#{t_root_account.id}/features/flags/hidden_feature",
+                           { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_root_account.to_param, feature: 'hidden_feature' })
+          t_root_account.feature_flags.where(feature: 'hidden_feature').count.should eql 1
+        end
       end
 
       it "should not create a root account feature flag with root admin privileges" do

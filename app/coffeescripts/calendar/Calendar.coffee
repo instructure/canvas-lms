@@ -10,7 +10,7 @@ define [
   'underscore'
   'compiled/userSettings'
   'compiled/util/hsvToRgb'
-  'compiled/util/colorSlicer'
+  'bower/color-slicer/dist/color-slicer'
   'jst/calendar/calendarApp'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/commonEventFactory'
@@ -44,7 +44,7 @@ define [
 
       @el = $(selector).html calendarAppTemplate()
 
-      @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'), showAgenda: @options.showAgenda)
+      @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'))
       @schedulerNavigator.hide()
 
       @agenda = new AgendaView(el: $('.agenda-wrapper'), dataSource: @dataSource)
@@ -131,22 +131,12 @@ define [
       @agenda.on('agendaDateRange', @renderDateRange)
 
     initializeFullCalendarParams: ->
-      weekColumnFormatter = """
-        '<span class="agenda-col-wrapper">
-          <span class="day-num">'d'</span>
-          <span class="day-and-month">
-            <span class="day-name">'dddd'</span><br />
-            <span class="month-name">'MMM'</span>
-          </span>
-        </span>'
-      """
-
       _.defaults(
         header: false
         editable: true
         columnFormat:
-          month: if ENV.CALENDAR.SHOW_AGENDA then 'ddd' else 'dddd'
-          week: if ENV.CALENDAR.SHOW_AGENDA then 'ddd M/d' else weekColumnFormatter
+          month: 'ddd'
+          week: 'ddd M/d'
         buttonText:
           today: I18n.t 'today', 'Today'
         defaultEventMinutes: 60
@@ -279,24 +269,22 @@ define [
       $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-event-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}"))
       $element.find('.fc-event-inner').prepend($("<span class='screenreader-only'>#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}</span>"));
       $element.find('.fc-event-title').prepend($("<span class='screenreader-only'>#{screenReaderTitleHint}</span>"))
-
-      if ENV.CALENDAR.SHOW_AGENDA && event.eventType.match(/assignment/)
-        element.find('.fc-event-inner').prepend($('<i />', {'class': "icon-#{event.assignmentType()}"}))
+      element.find('.fc-event-inner').prepend($('<i />', {'class': "icon-#{event.iconType()}"}))
       true
 
     eventAfterRender: (event, element, view) =>
       if event.isDueAtMidnight()
         # show the actual time instead of the midnight fudged time
-        element.find('.fc-event-time').html @calendar.fullCalendar('formatDate', event.startDate(), 'h(:mm)t')
+        time = element.find('.fc-event-time')
+        html = time.html()
+        # the time element also contains the title for calendar events
+        html = html.replace(/^\d+:\d+\w?/, @calendar.fullCalendar('formatDate', event.startDate(), 'h(:mm)t'))
+        time.html(html)
       if event.eventType.match(/assignment/) && view.name == "agendaWeek"
         element.height('') # this fixes it so it can wrap and not be forced onto 1 line
           .find('.ui-resizable-handle').remove()
-      if ENV.CALENDAR.SHOW_AGENDA
-        if event.eventType.match(/assignment/) && event.isDueAtMidnight()
-          element.find('.fc-event-time').empty()
-      else
-        if event.eventType.match(/assignment/)
-          element.find('.fc-event-time').html I18n.t('labels.due', 'due')
+      if event.eventType.match(/assignment/) && event.isDueAtMidnight() && view.name == "month"
+        element.find('.fc-event-time').empty()
       if event.eventType == 'calendar_event' && @options?.activateEvent && event.id == "calendar_event_#{@options?.activateEvent}"
         @options.activateEvent = null
         @eventClick event,
@@ -393,7 +381,7 @@ define [
       weekStart <= date2 <= weekEnd
 
     drawNowLine: =>
-      return unless @currentView == 'week' && ENV.CALENDAR.SHOW_AGENDA
+      return unless @currentView == 'week'
 
       if !@nowLine
         @nowLine = $('<div />', {'class': 'calendar-nowline'})
@@ -567,28 +555,31 @@ define [
     setCurrentView: (view) ->
       @updateFragment view_name: view
       @currentView = view
-      userSettings.set('calendar_view', view) if @options.showAgenda
+      userSettings.set('calendar_view', view)
 
     getCurrentView: ->
       if @currentView
         @currentView
       else if (data = @dataFromDocumentHash()) && data.view_name
         data.view_name
-      else if userSettings.get('calendar_view') && @options.showAgenda
+      else if userSettings.get('calendar_view')
         userSettings.get('calendar_view')
       else
         'month'
 
     loadView: (view) =>
+      return if view == @currentView
       @setCurrentView(view)
 
       $('.agenda-wrapper').removeClass('active')
       @header.showNavigator()
       @header.showPrevNext()
+      @header.hideAgendaRecommendation()
       if view != 'scheduler' and view != 'agenda'
         @calendar.removeClass('scheduler-mode').removeClass('agenda-mode')
         @displayAppointmentEvents = null
         @scheduler.hide()
+        @header.showAgendaRecommendation()
         @calendar.show()
         @schedulerNavigator.hide()
         @calendar.fullCalendar('refetchEvents')
@@ -618,10 +609,14 @@ define [
 
     renderDateRange: (start, end) =>
       @setDateTitle(I18n.l('#date.formats.medium', start)+' &ndash; '+I18n.l('#date.formats.medium', end))
-      $.screenReaderPoliteMessage I18n.t('agenda_view_displaying_start_end', "Now displaying %{start} through %{end}",
-        start: I18n.l('#date.formats.long', start)
-        end:   I18n.l('#date.formats.long', end)
-      )
+      # for "load more" with voiceover, we want the alert to happen later so
+      # the focus change doesn't interrupt it.
+      window.setTimeout =>
+        $.screenReaderFlashMessage I18n.t('agenda_view_displaying_start_end', "Now displaying %{start} through %{end}",
+          start: I18n.l('#date.formats.long', start)
+          end:   I18n.l('#date.formats.long', end)
+        )
+      , 500
 
     showSchedulerSingle: ->
       @calendar.show()
@@ -649,27 +644,14 @@ define [
       "rgb(#{rgbArray.join ' ,'})"
 
     colorizeContexts: =>
-      if ENV.CALENDAR.SHOW_AGENDA
-        colors = colorSlicer.getColors(@contextCodes.length)
-        html = for contextCode, index in @contextCodes
-          color = colors[index]
-          ".group_#{contextCode}{
-             color: #{color};
-             border-color: #{color};
-             background-color: #{color};
-          }"
-      else
-        [bgSaturation, bgBrightness]         = [30, 96]
-        [textSaturation, textBrightness]     = [60, 40]
-        [strokeSaturation, strokeBrightness] = [70, 70]
-
-        html = for contextCode, index in @contextCodes
-          hue = hues[index % hues.length]
-          ".group_#{contextCode}{
-            color: #{cssColor hue, textSaturation, textBrightness};
-            border-color: #{cssColor hue, strokeSaturation, strokeBrightness};
-            background-color: #{cssColor hue, bgSaturation, bgBrightness};
-          }"
+      colors = colorSlicer.getColors(@contextCodes.length)
+      html = for contextCode, index in @contextCodes
+        color = colors[index]
+        ".group_#{contextCode}{
+           color: #{color};
+           border-color: #{color};
+           background-color: #{color};
+        }"
 
       $styleContainer.html "<style>#{html.join('')}</style>"
 

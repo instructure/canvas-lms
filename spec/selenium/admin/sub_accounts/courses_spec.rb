@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../common')
 
 describe "sub account courses" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
     let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
     let(:url) { "/accounts/#{account.id}" }
 

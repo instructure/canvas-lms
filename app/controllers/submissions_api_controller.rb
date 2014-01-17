@@ -48,7 +48,6 @@ class SubmissionsApiController < ApplicationController
   # @response_field grade The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example).
   # @response_field grade_matches_current_submission A boolean flag which is false if the student has re-submitted since the submission was last graded.
   # @response_field preview_url Link to the URL in canvas where the submission can be previewed. This will require the user to log in.
-  # @response_field submitted_at Timestamp when the submission was made.
   # @response_field url If the submission was made as a URL.
   # @response_field late Whether the submission was made after the applicable due date.
   def index
@@ -124,19 +123,19 @@ class SubmissionsApiController < ApplicationController
     elsif can_view_all
       inaccessible_students = student_ids - visible_user_ids(:include_priors => true)
       if !inaccessible_students.empty?
-        return render_unauthorized_action(@course)
+        return render_unauthorized_action
       end
     else
       # can view observees
       allowed_student_ids = @context.observer_enrollments.where(:user_id => @current_user.id, :workflow_state => 'active').where("associated_user_id IS NOT NULL").pluck(:associated_user_id)
       # can view self, if a student
       allowed_student_ids << @current_user.id if is_authorized_action?(@context, @current_user, :participate_as_student)
-      return render_unauthorized_action(@course) if allowed_student_ids.empty?
+      return render_unauthorized_action if allowed_student_ids.empty?
       if all
         student_ids = allowed_student_ids
       else
         inaccessible_students = student_ids - allowed_student_ids
-        return render_unauthorized_action(@course) if !inaccessible_students.empty?
+        return render_unauthorized_action if !inaccessible_students.empty?
       end
     end
 
@@ -282,6 +281,10 @@ class SubmissionsApiController < ApplicationController
   # @argument comment[media_comment_type] [String, "audio"|"video"]
   #   The type of media comment being added.
   #
+  # @argument comment[file_ids][] [Optional,Integer]
+  #   Attach files to this comment that were previously uploaded using the
+  #   Submission Comment API's files action
+  #
   # @argument submission[posted_grade] [String]
   #   Assign a score to the submission, updating both the "score" and "grade"
   #   fields on the submission record. This parameter can be passed in a few
@@ -351,7 +354,7 @@ class SubmissionsApiController < ApplicationController
     @user = get_user_considering_section(params[:user_id])
 
     authorized = false
-    @submission = @assignment.find_or_initialize_submission(@user)
+    @submission = @assignment.submissions.where(user_id: @user).first || @assignment.submissions.build(user: @user)
 
     if params[:submission] || params[:rubric_assessment]
       authorized = authorized_action(@submission, @current_user, :grade)
@@ -389,9 +392,22 @@ class SubmissionsApiController < ApplicationController
         admin_in_context = !@context_enrollment || @context_enrollment.admin?
         comment = {
           :comment => comment[:text_comment], :author => @current_user,
-          :hidden => @assignment.muted? && admin_in_context }.merge(
+          :hidden => @assignment.muted? && admin_in_context,
+        }.merge(
           comment.slice(:media_comment_id, :media_comment_type, :group_comment)
         ).with_indifferent_access
+        if file_ids = params[:comment][:file_ids]
+          attachments = Attachment.where(id: file_ids).all
+          attachable = attachments.all? { |a|
+            a.grants_right?(@current_user, :attach_to_submission_comment)
+          }
+          unless attachable
+            render_unauthorized_action
+            return
+          end
+          attachments.each { |a| a.ok_for_submission_comment = true }
+          comment[:attachments] = attachments
+        end
         @assignment.update_submission(@submission.user, comment)
       end
       # We need to reload because some of this stuff is getting set on the

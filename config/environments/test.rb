@@ -1,4 +1,55 @@
-environment_configuration(defined?(config) && config) do |config|
+if ENV['COVERAGE'] == "1"
+  puts "Code Coverage enabled"
+  require 'simplecov'
+  require 'simplecov-rcov'
+
+  SimpleCov.command_name "RSpec:#{Process.pid}#{ENV['TEST_ENV_NUMBER']}"
+
+  SimpleCov.start do
+    class SimpleCov::Formatter::MergedFormatter
+      def format(result)
+        SimpleCov::Formatter::HTMLFormatter.new.format(result)
+        SimpleCov::Formatter::RcovFormatter.new.format(result)
+      end
+    end
+    SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
+    add_filter '/spec/'
+    add_filter '/config/'
+    add_filter '/parallelized_specs/'
+    add_filter '/db_imports/'
+    add_filter 'spec_canvas'
+
+    add_group 'Controllers', 'app/controllers'
+    add_group 'Models', 'app/models'
+    add_group 'Services', 'app/services'
+    add_group 'App', '/app/'
+    add_group 'Helpers', 'app/helpers'
+    add_group 'Libraries', '/lib/'
+    add_group 'Plugins', 'vendor/plugins'
+    add_group "Long files" do |src_file|
+      src_file.lines.count > 500
+    end
+    SimpleCov.at_exit do
+      SimpleCov.result.format!
+    end
+  end
+else
+  puts "Code coverage not enabled"
+end
+
+if ENV['BULLET']
+  puts "Bullet enabled"
+  require 'bullet'
+
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.bullet_logger = true
+  end
+else
+  puts "Bullet not enabled"
+end
+
+  environment_configuration(defined?(config) && config) do |config|
   # Settings specified here will take precedence over those in config/application.rb
 
   # The test environment is used exclusively to run your application's
