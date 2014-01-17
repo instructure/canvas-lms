@@ -149,7 +149,7 @@ define [
     loadOutcomes: () ->
       course = ENV.context_asset_string.split('_')[1]
       @$('.outcome-gradebook-wrapper').disableWhileLoading(@hasOutcomes)
-      @_loadPage("/api/v1/courses/#{course}/outcome_rollups?per_page=100")
+      @_loadPage("/api/v1/courses/#{course}/outcome_rollups?per_page=100&include[]=outcomes&include[]=users")
 
     # Internal: Load a page of outcome results from the given URL.
     #

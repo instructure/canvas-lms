@@ -69,7 +69,7 @@ class OutcomeResultsController < ApplicationController
   before_filter :verify_include_parameter
   before_filter :require_outcomes
   before_filter :require_users
-  
+
   # @API Get outcome result rollups
   # @beta
   #
@@ -91,19 +91,20 @@ class OutcomeResultsController < ApplicationController
   #   results. it is an error to specify an id for an outcome which is not linked
   #   to the context.
   #
-  # @argument include[] [Optional, String, "outcome_groups"|"outcome_links"]
+  # @argument include[] [Optional, String, "courses"|"outcomes"|"outcome_groups"|"outcome_links"|"users"]
   #   Specify additional collections to be side loaded with the result.
   #
   # @example_response
   #    {
   #      "rollups": [OutcomeRollup],
   #      "linked": {
+  #        // (Optional) Included if include[] has outcomes
   #        "outcomes": [Outcome],
   #
-  #        // (Optional) Included if aggregate is not set
+  #        // (Optional) Included if aggregate is not set and include[] has users
   #        "users": [User],
   #
-  #        // (Optional) Included if aggregate is 'course'
+  #        // (Optional) Included if aggregate is 'course' and include[] has courses
   #        "courses": [Course]
   #
   #        // (Optional) Included if include[] has outcome_groups
@@ -118,7 +119,7 @@ class OutcomeResultsController < ApplicationController
       when 'course' then aggregate_rollups
       else user_rollups
     end
-    json[:linked].merge!(linked_include_collections)
+    json[:linked] = linked_include_collections if params[:include].present?
     render json: json if json
   end
 
@@ -130,7 +131,6 @@ class OutcomeResultsController < ApplicationController
     @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes)
     rollups = outcome_results_rollups(@results, @users)
     json = outcome_results_rollups_json(rollups)
-    json[:linked] = { users: outcome_results_linked_users_json(@users) }
     json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
     json
   end
@@ -144,9 +144,6 @@ class OutcomeResultsController < ApplicationController
     @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes)
     aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context)]
     json = aggregate_outcome_results_rollups_json(aggregate_rollups)
-    json[:linked] = {
-      courses: outcome_results_linked_courses_json([@context])
-    }
     # no pagination, so no meta field
     json
   end
@@ -159,11 +156,20 @@ class OutcomeResultsController < ApplicationController
   # Returns a result Hash that should be merged into the linked section.
   def linked_include_collections
     linked = {}
-    includes = params[:include] + ['outcomes']
+    includes = params[:include]
     includes.uniq.each do |include_name|
       linked[include_name] = self.send(include_method_name(include_name))
     end
     linked
+  end
+
+  # Internal: Serialize courses for the context.
+  #
+  # currently the only course we ever need is @context itself.
+  #
+  # Returns an Array of serialized courses.
+  def include_courses
+    outcome_results_linked_courses_json([@context])
   end
 
   # Internal: Serialize @outcomes for the context.
@@ -189,43 +195,48 @@ class OutcomeResultsController < ApplicationController
     outcome_results_include_outcome_links_json(links)
   end
 
+  # Internal: Serialize users for the context.
+  #
+  # Returns an Array of serialized users.
+  def include_users
+    outcome_results_linked_users_json(@users)
+  end
+
   # Internal: Makes sure the context is a valid context for outcome_results and
   #   the current_user has appropriate permissions. This method is meant to be
   #   used as a before_filter.
   #
-  # Returns nothing. May render if current_user does not have permissions.
+  # Returns nothing. May raise if current_user does not have permissions.
   def require_outcome_context
-    unless @context.is_a?(Course)
-      return render json: {message: "invalid context type"}, status: :bad_request
-    end
+    reject! "invalid context type" unless @context.is_a?(Course)
 
     authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
   end
 
   # Internal: Verifies the aggregate parameter.
   #
-  # Returns false and renders an error if the aggregate parameter is invalid.
+  # Raises an ApiError error if the aggregate parameter is invalid.
   #   Returns true otherwise.
   def verify_aggregate_parameter
     aggregate = params[:aggregate]
-    if aggregate && !%w(course).include?(aggregate)
-      render json: {message: "invalid aggregate parameter value"}, status: :bad_request
-      false
-    else
-      true
-    end
+    reject! "invalid aggregate parameter value" if aggregate && !%w(course).include?(aggregate)
+    true
   end
 
   # Internal: Verifies the include[] parameter
   #
-  # Returns false and renders and error if the include parameter is invalid
+  # Raises an ApiError if the include parameter is invalid
   #  Returns true otherwise
   def verify_include_parameter
     params[:include] ||= []
     params[:include].each do |include_name|
-      unless self.respond_to? include_method_name(include_name)
-        render json: {message: "invalid include: #{include_name}"}, status: :bad_request
-        return false
+      case include_name
+      when 'courses'
+        reject! "can't include courses unless aggregate is 'course'" if params[:aggregate] != 'course'
+      when 'users'
+        reject! "can't include users unless aggregate is not set" if params[:aggregate].present?
+      else
+        reject! "invalid include: #{include_name}" unless self.respond_to? include_method_name(include_name)
       end
     end
     true
@@ -241,51 +252,33 @@ class OutcomeResultsController < ApplicationController
   # Returns an outcome scope
   def require_outcomes
     @outcomes = @context.linked_learning_outcomes
-    if params[:outcome_ids] && params[:outcome_group_id]
-      render json: {message: "can only filter by outcome_ids or by outcome_group_id"}, status: :bad_request
-      return false
-    end
+    reject! "can't filter by both outcome_ids and outcome_group_id" if params[:outcome_ids] && params[:outcome_group_id]
     if params[:outcome_ids]
       outcome_ids = Api.value_to_array(params[:outcome_ids]).map(&:to_i).uniq
       @outcomes = @outcomes.where(id: outcome_ids)
-      if @outcomes.count != outcome_ids.count
-        render json: {message: "can only include id's of outcomes in the outcome context"}, status: :bad_request
-        return false
-      end
+      reject! "can only include id's of outcomes in the outcome context" if @outcomes.count != outcome_ids.count
     elsif params[:outcome_group_id]
       outcome_group = @context.learning_outcome_groups.where(id: params[:outcome_group_id].to_i).first
-      if !outcome_group
-        render json: {message: "can only include an outcome group id in the outcome context"}, status: :bad_request
-        return false
-      end
+      reject! "can only include an outcome group id in the outcome context" unless outcome_group
       @outcomes = outcome_group.child_outcome_links.map(&:content)
     end
   end
-  
+
   # Internal: Filter context users by user_ids param (if provided), ensuring
   #  that user_ids does not include users not in the context.
   #
-  # Returns false and renders an error if user_ids includes a user outside the
+  # Raises an ApiError if user_ids includes a user outside the
   #  context. Returns a User scope otherwise.
   def require_users
-    if params[:user_ids] && params[:section_id]
-      render json: {message: "cannot specify both user_ids and section_id"}, status: :bad_request
-      return false
-    end
+    reject! "cannot specify both user_ids and section_id" if params[:user_ids] && params[:section_id]
 
     if params[:user_ids]
       user_ids = Api.value_to_array(params[:user_ids]).map(&:to_i).uniq
       @users = users_for_outcome_context.where(id: user_ids)
-      if @users.count != user_ids.count
-        render json: {message: "can only include id's of users in the outcome context"}, status: :bad_request
-        return false
-      end
+      reject!( "can only include id's of users in the outcome context") if @users.count != user_ids.count
     elsif params[:section_id]
       @section = @context.course_sections.where(id: params[:section_id].to_i).first
-      unless @section
-        render json: {message: "invalid section id"}, status: :bad_request
-        return false
-      end
+      reject! "invalid section id" unless @section
       @users = @section.students
     end
     @users ||= users_for_outcome_context
@@ -301,5 +294,4 @@ class OutcomeResultsController < ApplicationController
     # need to treat them differently.
     @context.students
   end
-
 end

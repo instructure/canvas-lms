@@ -1,18 +1,15 @@
 module Api::V1
   class ApiError < ::RuntimeError
-    attr_accessor :response_status, :status
+    attr_accessor :response_status
 
-    def initialize(response_status, message)
-      self.response_status = response_status
-      self.status = Rack::Utils::HTTP_STATUS_CODES[self.response_status]
-      self.status = self.status.underscore.to_sym
-
+    def initialize(message, status=:bad_request)
+      self.response_status = Rack::Utils.status_code(status)
       super(message)
     end
 
     def error_json
       {
-        status: self.status,
+        status: (Rack::Utils::SYMBOL_TO_STATUS_CODE.key(self.response_status) || :internal_server_error).to_s,
         message: self.message
       }
     end

@@ -283,7 +283,7 @@ class QuizSubmissionsApiController < ApplicationController
     resource_params = params[:quiz_submissions]
 
     unless resource_params.is_a?(Array)
-      reject! 400, 'missing required key :quiz_submissions'
+      reject! 'missing required key :quiz_submissions'
     end
 
     if resource_params = resource_params[0]
@@ -359,7 +359,7 @@ class QuizSubmissionsApiController < ApplicationController
   def validate_ldb_status!(quiz = @quiz)
     if quiz.require_lockdown_browser?
       unless ldb_plugin.authorized?(self)
-        reject! 403, 'this quiz requires the lockdown browser'
+        reject! 'this quiz requires the lockdown browser', :forbidden
       end
     end
   end

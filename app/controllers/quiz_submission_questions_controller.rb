@@ -138,14 +138,14 @@ class QuizSubmissionQuestionsController < ApplicationController
   #  }
   def answer
     unless params.has_key?(:answer)
-      reject! 400, 'missing required parameter :answer'
+      reject! 'missing required parameter :answer', 400
     end
 
     serializer = QuizQuestion::AnswerSerializers.serializer_for @question
     serialization_rc = serializer.serialize(params[:answer])
 
     unless serialization_rc.valid?
-      reject! 400, serialization_rc.error
+      reject! serialization_rc.error, 400
     end
 
     submission_data = @service.update_question(serialization_rc.answer,
@@ -235,7 +235,7 @@ class QuizSubmissionQuestionsController < ApplicationController
   def validate_ldb_status!(quiz = @quiz)
     if quiz.require_lockdown_browser?
       unless ldb_plugin.authorized?(self)
-        reject! 403, 'this quiz requires the lockdown browser'
+        reject! 'this quiz requires the lockdown browser', 403
       end
     end
   end
