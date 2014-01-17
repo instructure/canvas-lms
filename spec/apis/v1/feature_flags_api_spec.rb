@@ -398,7 +398,7 @@ describe "Feature Flags API", :type => :integration do
       t_root_account.feature_flags.create! feature: 'course_feature'
       api_call_as_user(t_root_admin, :delete, "/api/v1/accounts/#{t_root_account.id}/features/flags/course_feature",
                { controller: 'feature_flags', action: 'delete', format: 'json', account_id: t_root_account.to_param, feature: 'course_feature' })
-      t_root_account.feature_flags.should be_empty
+      t_root_account.feature_flags.where(feature: 'course_feature').should be_empty
     end
 
     it "should not delete an inherited flag" do
@@ -412,7 +412,7 @@ describe "Feature Flags API", :type => :integration do
       t_teacher.feature_flags.create! feature: 'user_feature', state: 'on'
       api_call_as_user(t_teacher, :delete, "/api/v1/users/#{t_teacher.id}/features/flags/user_feature",
                { controller: 'feature_flags', action: 'delete', format: 'json', user_id: t_teacher.to_param, feature: 'user_feature' })
-      t_teacher.feature_flags.should be_empty
+      t_teacher.feature_flags.where(feature: 'course_feature').should be_empty
 
       t_teacher.feature_flags.create! feature: 'user_feature', state: 'on', locking_account: t_root_account
       api_call_as_user(t_teacher, :delete, "/api/v1/users/#{t_teacher.id}/features/flags/user_feature",
