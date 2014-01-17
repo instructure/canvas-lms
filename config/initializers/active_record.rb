@@ -14,6 +14,21 @@ class ActiveRecord::Base
     end
 
     alias :clone :dup
+
+    def serializable_hash(options = nil)
+      if options && options[:include_root]
+        {self.class.base_ar_class.model_name.element => super}
+      else
+        super
+      end
+    end
+
+    # See ActiveModel#serializable_add_includes
+    def serializable_add_includes(options = {}, &block)
+      super(options) do |association, records, opts|
+        yield association, records, opts.merge(:include_root => options[:include_root])
+      end
+    end
   end
 
   if CANVAS_RAILS2
@@ -292,7 +307,7 @@ class ActiveRecord::Base
 
     self.revert_from_serialization_options if self.respond_to?(:revert_from_serialization_options)
 
-    hash
+    hash.with_indifferent_access
   end
 
   def class_name
