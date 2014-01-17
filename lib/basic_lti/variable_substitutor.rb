@@ -30,7 +30,7 @@ module BasicLTI
     def method_missing(method, *args, &block)
       name = method.to_s
       if name[0] == '$'
-        klass = var_to_class_name(name).constantize
+        klass = var_to_class(name)
 
         #Create or use the appropriate variable substitutor
         @substitutors[klass] ||= klass.new(@launch)
@@ -75,16 +75,24 @@ module BasicLTI
     # This method splits out the name of the class and prepends the namespace for
     # variable substitution.  For example, $Canvas.enrollment.enrollment_state,
     # would be converted to BasicLTI::VariableSubstitution::Canvas::Enrollment
-    def var_to_class_name(var)
-      var[1..-1].split('.')[0...-1].map{|ns| ns.titleize}.unshift('BasicLTI::VariableSubstitution').join('::')
+    def var_to_class(var)
+      names = var[1..-1].split('.')[0...-1].map{|ns| ns.titleize}
+      names.inject(::BasicLTI::VariableSubstitution) do |constant, name|
+        constant.const_get(name)
+      end
     end
 
     def var_to_method_name(var)
-      var.split('.').last.underscore
+      var.split('.').last.underscore.to_sym
     end
 
     def valid_method?(var)
-      var_to_class_name(var).constantize.method_defined?(var_to_method_name(var)) rescue false
+      begin
+        valid_methods = var_to_class(var).public_instance_methods(false)
+      rescue NameError
+        valid_methods = []
+      end
+      valid_methods.include?(var_to_method_name(var))
     end
   end
 end
