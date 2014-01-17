@@ -299,6 +299,12 @@ $page-dark: #ebeff2;
     border-bottom: 1px solid #b0afaf;
     margin-bottom: 10px;
   }
+  .ratings {
+    font-weight: normal;
+    .rating {
+      list-style-type: none;
+    }
+  }
   .description {
     margin: 10px 0;
     font-size: 11px;
