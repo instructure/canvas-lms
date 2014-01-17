@@ -27,7 +27,7 @@ module SIS
       course_ids_to_update_associations = [].to_set
 
       importer = Work.new(@batch_id, @root_account, @logger, courses_to_update_sis_batch_id, course_ids_to_update_associations, messages)
-      Course.skip_callback(:update_enrollments_later) do
+      Course.suspend_callbacks(:update_enrollments_later) do
         Course.process_as_sis(@sis_options) do
           Course.skip_updating_account_associations do
             yield importer

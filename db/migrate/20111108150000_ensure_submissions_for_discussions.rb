@@ -33,7 +33,7 @@ class EnsureSubmissionsForDiscussions < ActiveRecord::Migration
     touched_user_ids = [].to_set
 
     # don't touch the user on each submission, we'll do them in bulk later
-    Submission.skip_callbacks(:touch_user) do
+    Submission.suspend_callbacks(:touch_user) do
       entries.each do |entry|
         # streamlined entry.discussiont_topic.ensure_submission(entry.user)
         assignment = Assignment.find_by_sql(<<-SQL).first

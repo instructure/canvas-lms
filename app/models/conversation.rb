@@ -611,7 +611,7 @@ class Conversation < ActiveRecord::Base
   def merge_into(other)
     transaction do
       new_participants = other.conversation_participants.index_by(&:user_id)
-      ConversationParticipant.skip_callback(:destroy_conversation_message_participants) do
+      ConversationParticipant.suspend_callbacks(:destroy_conversation_message_participants) do
         conversation_participants(true).each do |cp|
           if new_cp = new_participants[cp.user_id]
             new_cp.update_attribute(:workflow_state, cp.workflow_state) if cp.unread? || new_cp.archived?

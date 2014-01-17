@@ -884,7 +884,7 @@ class User < ActiveRecord::Base
   # avoid extraneous callbacks when enrolled in multiple sections
   def delete_enrollments
     courses_to_update = self.enrollments.active.select(:course_id).uniq.map(&:course_id)
-    Enrollment.skip_callback(:update_cached_due_dates) do
+    Enrollment.suspend_callbacks(:update_cached_due_dates) do
       self.enrollments.each { |e| e.destroy }
     end
     courses_to_update.each do |course|

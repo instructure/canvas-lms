@@ -24,7 +24,7 @@ module SIS
     def process
       start = Time.now
       importer = Work.new(@batch_id, @root_account, @logger)
-      Account.skip_callback(:update_account_associations_if_changed) do
+      Account.suspend_callbacks(:update_account_associations_if_changed) do
         Account.process_as_sis(@sis_options) do
           yield importer
         end

@@ -25,7 +25,7 @@
 #    might not work with Rails 3 (which has built in support for this type
 #    of thing), but this way definitely will
 class ActiveRecord::Base
-  def self.skip_callback(callback, &block)
+  def self.suspend_callback(callback, &block)
     method = instance_method(callback)
     begin
       remove_method(callback)
@@ -43,11 +43,15 @@ class ActiveRecord::Base
     end
   end
 
-  def self.skip_callbacks(*callbacks, &block)
+  def self.suspend_callbacks(*callbacks, &block)
     return block.call if callbacks.size == 0
-    skip_callback(callbacks[0]) { skip_callbacks(*callbacks[1..-1], &block) }
+    suspend_callback(callbacks[0]) { suspend_callbacks(*callbacks[1..-1], &block) }
   end
 
+  # temporary
+  def self.skip_callback(callback, &block)
+    suspend_callback(callback, &block)
+  end
 
   if CANVAS_RAILS2
     def save_without_callbacks
