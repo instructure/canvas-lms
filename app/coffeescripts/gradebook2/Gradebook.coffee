@@ -119,21 +119,24 @@ define [
           gotAllStudents.resolve()
 
       gotCustomColumns = @getCustomColumns()
-      $.when(gotCustomColumns, gotAllStudents).done @doSlickgridStuff
+      @gotAllData = $.when(gotCustomColumns, gotAllStudents)
 
       @allSubmissionsLoaded.done =>
         for c in @customColumns
           url = @options.custom_column_data_url.replace /:id/, c.id
           @getCustomColumnData(c.id)
 
+      @showCustomColumnDropdownOption()
+
+    onShow: ->
       @spinner = new Spinner()
       $(@spinner.spin().el).css(
         opacity: 0.5
         top: '55px'
         left: '50%'
       ).addClass('use-css-transitions-for-show-hide').appendTo('#main')
-
-      @showCustomColumnDropdownOption()
+      $('#gradebook-grid-wrapper').hide()
+      @gotAllData.done @doSlickgridStuff
 
     getCustomColumns: ->
       # not going to support pagination because that would be crazy
@@ -664,7 +667,7 @@ define [
     onGridInit: () ->
       tooltipTexts = {}
       $(@spinner.el).remove()
-      $('#gradebook_wrapper').show()
+      $('#gradebook-grid-wrapper').show()
       @uid = @grid.getUID()
       @$grid = grid = $('#gradebook_grid')
         .fillWindowWithMe({
@@ -794,7 +797,7 @@ define [
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
       userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
-      @buildRows()
+      @buildRows() if @grid
 
     initHeader: =>
       @drawSectionSelectButton() if @sections_enabled

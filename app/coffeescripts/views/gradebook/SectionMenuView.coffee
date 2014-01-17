@@ -35,6 +35,7 @@ define [
 
     attachEvents: ->
       $.subscribe('currentSection/change', @onSectionChange)
+      @$('.section-select-menu').on('click', (e) -> e.preventDefault())
       @$('.section-select-menu').on('menuselect', (event, ui) =>
         section = @$('[aria-checked=true] input[name=section_to_show_radio]').val() || undefined
         $.publish('currentSection/change', [section, @cid])

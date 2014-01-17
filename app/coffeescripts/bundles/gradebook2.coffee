@@ -1,28 +1,46 @@
 require [
   'jquery'
+  'Backbone'
   'compiled/gradebook2/Gradebook'
   'compiled/views/gradebook/NavigationPillView'
   'compiled/views/gradebook/OutcomeGradebookView'
-], ($, Gradebook, NavigationPillView, OutcomeGradebookView) ->
+], ($, Backbone, Gradebook, NavigationPillView, OutcomeGradebookView) ->
+  class GradebookRouter extends Backbone.Router
+    routes:
+      '': 'showGrades'
+      'outcomes': 'showOutcomes'
 
-  isLoaded      = false
-  initGradebook = () -> new Gradebook(ENV.GRADEBOOK_OPTIONS)
-  initOutcomes  = (gradebook) ->
-    navigation = new NavigationPillView(el: $('.gradebook-navigation'))
-    book       = new OutcomeGradebookView(
-      el: $('.outcome-gradebook-container'),
-      gradebook: gradebook)
-    book.render()
+    initialize: ->
+      @isLoaded      = false
+      @views = {}
+      @views.gradebook = new Gradebook(ENV.GRADEBOOK_OPTIONS)
+      if ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled
+        @views['outcome-gradebook'] = @initOutcomes()
 
-    navigation.on 'pillchange', (viewName) ->
+    initOutcomes: ->
+      book = new OutcomeGradebookView(
+        el: $('.outcome-gradebook-container'),
+        gradebook: @views.gradebook)
+      book.render()
+      @navigation = new NavigationPillView(el: $('.gradebook-navigation'))
+      @navigation.on 'pillchange', @handlePillChange
+      book
+
+    handlePillChange: (viewname) =>
+      route = if viewname == 'gradebook' then '' else 'outcomes'
+      @navigate(route, trigger: true)
+
+    showGrades: ->
+      @showView('gradebook')
+
+    showOutcomes: ->
+      @showView('outcome-gradebook')
+
+    showView: (viewName) ->
+      @navigation.setActiveView(viewName) if @navigation
       $('.gradebook-container, .outcome-gradebook-container').addClass('hidden')
       $(".#{viewName}-container").removeClass('hidden')
-      loadOutcomes(book) if !isLoaded and viewName is 'outcome-gradebook'
+      @views[viewName].onShow()
 
-  loadOutcomes = (book) ->
-    isLoaded = true
-    book.loadOutcomes()
-
-  $(document).ready ->
-    gradebook = initGradebook()
-    initOutcomes(gradebook) if ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled
+  @router = new GradebookRouter
+  Backbone.history.start()

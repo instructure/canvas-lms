@@ -117,15 +117,15 @@ define [
     #
     # Returns an object.
     toJSON: ->
-      _.extend({}, @checkboxes, menu: @menu)
+      _.extend({}, @checkboxes)
 
     # Public: Render the view once all needed data is loaded.
     #
     # Returns this.
     render: ->
       $.when(@gradebook.hasSections)
-        .then(@_initMenu)
         .then(=> super)
+        .then(@_drawSectionMenu)
       $.when(@hasOutcomes).then(@renderGrid)
       this
 
@@ -149,10 +149,18 @@ define [
       Grid.Events.init(@grid)
       @_attachEvents()
 
+    isLoaded: false
+    onShow: ->
+      @loadOutcomes() if !@isLoaded
+      @isLoaded = true
+
     # Public: Load all outcome results from API.
     #
     # Returns nothing.
     loadOutcomes: () ->
+      $.when(@gradebook.hasSections).then(@_loadOutcomes)
+
+    _loadOutcomes: =>
       course = ENV.context_asset_string.split('_')[1]
       @$('.outcome-gradebook-wrapper').disableWhileLoading(@hasOutcomes)
       @_loadPage("/api/v1/courses/#{course}/outcome_rollups?per_page=100&include[]=outcomes&include[]=users")
@@ -190,12 +198,13 @@ define [
     #   the menu needs to wait for relevant course sections to load.
     #
     # Returns nothing.
-    _initMenu: =>
+    _drawSectionMenu: =>
       @menu = new SectionMenuView(
         sections: @gradebook.sectionList()
         currentSection: @gradebook.sectionToShow
-        className: 'outcome-gradebook-section-select'
+        el: $('.section-button-placeholder'),
       )
+      @menu.render()
 
     # Internal: Create an event listener function used to filter SlickGrid results.
     #
