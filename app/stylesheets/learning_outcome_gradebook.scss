@@ -341,18 +341,34 @@ $page-dark: #ebeff2;
   padding: 18px 12px;
   border-radius: 8px;
   font-weight: 500;
+  color: #4f5f6e;
   .title {
-    color: #4f5f6e;
     font-size: 14px;
     padding-bottom: 10px;
     border-bottom: 1px solid #b0afaf;
     margin-bottom: 10px;
   }
+  .chart {
+    font-size: 11px;
+    text-align: center;
+  }
   .ratings {
     font-weight: normal;
+    display: inline-block;
+    text-align: left;
     .rating {
       list-style-type: none;
     }
+    .legend-color {
+      width: 13px;
+      height: 13px;
+      display: inline-block;
+      margin-right: 3px;
+      vertical-align: sub;
+    }
+  }
+  .mastery {
+    color: #555;
   }
   .description {
     margin: 10px 0;
