@@ -329,14 +329,20 @@ require [
           dataType: 'json'
           success: ->
             alert "#{course.displayName()} already exists in Canvas, and cannot be added again."
-          error: -> #(jqXHR, textStatus, errorThrown) ->
-            # course doesn't already exist in Canvas; add it to the list
+          error: -> # course doesn't already exist in Canvas (NOTE: we expect a 404 here to indicate such condition)
+            # ignore this course if it's already in the search results; we don't want duplicates
+            return if searchedCourseList.has course
 
             # attach the corresponding term to the course
             course.term = _.first(terms.where({sis_source_id: ui.item.term}))
 
-            # make sure we don't add the same course twice
-            searchedCourseList.addUnique course
+            # again, we don't want duplicates between search results and Suggested Courses
+            if course.term.courses.has course
+              alert "#{course.displayName()} is already in your Suggested Courses. Please use that instead."
+              return
+
+            # now it's sane to add it to the search results
+            searchedCourseList.add course
 
         # empty the search field and cancel the event to prevent value from getting changed
         $(this).val ''
