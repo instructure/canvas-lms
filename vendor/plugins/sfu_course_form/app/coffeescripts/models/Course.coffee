@@ -15,6 +15,7 @@ define [
       $.extend Backbone.Model.prototype.toJSON.call(this),
         term: @term.get('name')
         selected: @selected
+        displayName: @displayName()
 
     addSectionTutorials: (newTutorials) ->
       # NOTE: does not currently check if course already has section tutorials
@@ -23,3 +24,5 @@ define [
           sectionTutorials: newTutorials
           key: "#{@get('key')}:::#{newTutorials.join(',').toLowerCase()}"
       this
+
+    displayName: -> "#{@get('name')}#{@get('number')} - #{@get('section')} #{@get('title')}"

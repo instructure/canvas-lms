@@ -328,7 +328,7 @@ require [
           url: "/sfu/api/v1/course/#{ui.item.sis_source_id}"
           dataType: 'json'
           success: ->
-            alert "#{ui.item.name}#{ui.item.number} - #{ui.item.section} #{ui.item.title} already exists in Canvas, and cannot be added again."
+            alert "#{course.displayName()} already exists in Canvas, and cannot be added again."
           error: -> #(jqXHR, textStatus, errorThrown) ->
             # course doesn't already exist in Canvas; add it to the list
 
