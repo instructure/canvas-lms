@@ -107,26 +107,26 @@ define [
     ENV.GROUP_CATEGORIES = null
     ENV.ASSIGNMENT_GROUPS = null
 
-  test 'shows a warning when dangerously changing group status', ->
-    # bleh
-    window.addGroupCategory = ->
+  # test 'shows a warning when dangerously changing group status', ->
+  #   # bleh
+  #   window.addGroupCategory = ->
 
-    checkWarning = (view, showsWarning) ->
-      $("#assignment_toggle_advanced_options").click()
-      equal $(".group_submission_warning").is(":visible"), false
-      $("#assignment_has_group_category").click()
-      equal $(".group_submission_warning").is(":visible"), showsWarning
-      $("#assignment_has_group_category").click()
-      equal $(".group_submission_warning").is(":visible"), false
+  #   checkWarning = (view, showsWarning) ->
+  #     $("#assignment_toggle_advanced_options").click()
+  #     equal $(".group_submission_warning").is(":visible"), false
+  #     $("#assignment_has_group_category").click()
+  #     equal $(".group_submission_warning").is(":visible"), showsWarning
+  #     $("#assignment_has_group_category").click()
+  #     equal $(".group_submission_warning").is(":visible"), false
 
-    # should warn here
-    view = editView has_submitted_submissions: true
-    checkWarning view, true
+  #   # should warn here
+  #   view = editView has_submitted_submissions: true
+  #   checkWarning view, true
 
-    # don't show the warning if you start out with a group
-    view = editView has_submitted_submissions: true, group_category_id: 1
-    checkWarning view, false
+  #   # don't show the warning if you start out with a group
+  #   view = editView has_submitted_submissions: true, group_category_id: 1
+  #   checkWarning view, false
 
-    # don't show the warning if there are no submitted submissions
-    view = editView
-    checkWarning view, false
+  #   # don't show the warning if there are no submitted submissions
+  #   view = editView
+  #   checkWarning view, false
