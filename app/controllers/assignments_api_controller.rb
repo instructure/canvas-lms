@@ -82,7 +82,7 @@
 #
 #       // Settings to pass along to turnitin to control what kinds of matches
 #       // should be considered.
-#       // originality_report_visibility can be 'immediate', 'after_grading', or 'after_due_date'
+#       // originality_report_visibility can be 'immediate', 'after_grading', 'after_due_date', or 'never'
 #       // exclude_small_matches_type can be null, 'percent', 'words'
 #       // exclude_small_matches_value:
 #       // - if type is null, this will be null also

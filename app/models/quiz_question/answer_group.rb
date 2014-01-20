@@ -1,8 +1,28 @@
+#
+# Copyright (C) 2013 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+
 class QuizQuestion::AnswerGroup
   attr_accessor :answers, :taken_ids
 
   extend Forwardable
-  def_delegators :@answers, :each, :<<, :[], :[]=, :each_with_index
+  def_delegators :@answers, :each, :<<, :[], :[]=, :each_with_index, :empty?, :first
+  include Enumerable
 
 
   def initialize(answers = [])
@@ -12,10 +32,12 @@ class QuizQuestion::AnswerGroup
 
   def set_correct_if_none
     return if @answers.empty?
-    @answers[0][:weight] = 100.to_f unless correct_answer
+    @answers.first[:weight] = 100.to_f unless correct_answer
   end
 
-  def map!
+  # This method supplies the group alongside each answer
+  # in an iterator, and modifies in place.
+  def map_with_group!
     mapped = @answers.map do |a|
       yield self, a
     end
@@ -56,6 +78,11 @@ class QuizQuestion::AnswerGroup
 
     def to_hash
       @data
+    end
+
+    def any_value_of(keys, default="")
+      key = keys.find { |key| @data.key?(key) }
+      @data[key] || default
     end
 
     def correct?

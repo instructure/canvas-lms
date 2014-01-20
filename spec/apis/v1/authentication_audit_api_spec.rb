@@ -23,14 +23,27 @@ describe "AuthenticationAudit API", type: :integration do
   it_should_behave_like "cassandra audit logs"
 
   before do
+    Setting.set('enable_page_views', 'cassandra')
+    @request_id = UUIDSingleton.instance.generate
+    RequestContextGenerator.stubs( :request_id => @request_id )
+
     @viewing_user = site_admin_user(user: user_with_pseudonym(account: Account.site_admin))
     @account = Account.default
     user_with_pseudonym(active_all: true)
+
+    @page_view = PageView.new(options)
+    @page_view.user = @viewing_user
+    @page_view.request_id = @request_id
+    @page_view.remote_ip = '10.10.10.10'
+    @page_view.created_at = Time.now
+    @page_view.updated_at = Time.now
+    @page_view.save!
+
     @event = Auditors::Authentication.record(@pseudonym, 'login')
   end
 
   def fetch_for_context(context, options={})
-    type = context.class.to_s.downcase
+    type = context.class.to_s.downcase unless type = options.delete(:type)
     id = context.id.to_s
 
     arguments = { controller: 'authentication_audit_api', action: "for_#{type}", :"#{type}_id" => id, format: 'json' }
@@ -57,15 +70,19 @@ describe "AuthenticationAudit API", type: :integration do
   end
 
   def expect_event_for_context(context, event, options={})
-    json = fetch_for_context(context, options)
-    json['events'].map{ |e| [Shard.global_id_for(e['pseudonym_id']), e['event_type']] }.
-      should include([event.pseudonym_id, event.event_type])
+    json = options.delete(:json)
+    json ||= fetch_for_context(context, options)
+    json['events'].map{ |e| [e['id'], e['event_type']] }
+                  .should include([event.id, event.event_type])
+    json
   end
 
   def forbid_event_for_context(context, event, options={})
-    json = fetch_for_context(context, options)
-    json['events'].map{ |e| [e['pseudonym_id'], e['event_type']] }.
-      should_not include([event.pseudonym_id, event.event_type])
+    json = options.delete(:json)
+    json ||= fetch_for_context(context, options)
+    json['events'].map{ |e| [e['id'], e['event_type']] }
+                  .should_not include([event.id, event.event_type])
+    json
   end
 
   describe "formatting" do
@@ -73,8 +90,26 @@ describe "AuthenticationAudit API", type: :integration do
       @json = fetch_for_context(@user)
     end
 
-    it "should have a meta key with primaryCollection=events" do
-      @json['meta']['primaryCollection'].should == 'events'
+    it "should have correct root keys" do
+      @json.keys.sort.should == %w{events linked links}
+    end
+
+    it "should have a formatted links key" do
+      links = {
+        "events.login" => nil,
+        "events.account" => "http://www.example.com/api/v1/accounts/{events.account}",
+        "events.user" => nil,
+        "events.page_view" => nil
+      }
+      @json['links'].should == links
+    end
+
+    it "should have a formatted linked key" do
+      @json['linked'].keys.sort.should == %w{accounts logins page_views users}
+      @json['linked']['accounts'].is_a?(Array).should be_true
+      @json['linked']['logins'].is_a?(Array).should be_true
+      @json['linked']['page_views'].is_a?(Array).should be_true
+      @json['linked']['users'].is_a?(Array).should be_true
     end
 
     describe "events collection" do
@@ -84,18 +119,22 @@ describe "AuthenticationAudit API", type: :integration do
 
       it "should be formatted as an array of AuthenticationEvent objects" do
         @json.should == [{
+          "id" => @event.id,
           "created_at" => @event.created_at.in_time_zone.iso8601,
           "event_type" => @event.event_type,
-          "pseudonym_id" => @pseudonym.id,
-          "account_id" => @account.id,
-          "user_id" => @user.id
+          "links" => {
+            "login" => @pseudonym.id,
+            "account" => @account.id,
+            "user" => @user.id,
+            "page_view" => @event.request_id
+          }
         }]
       end
     end
 
-    describe "pseudonyms collection" do
+    describe "logins collection" do
       before do
-        @json = @json['pseudonyms']
+        @json = @json['linked']['logins']
       end
 
       it "should be formatted as an array of Pseudonym objects" do
@@ -111,7 +150,7 @@ describe "AuthenticationAudit API", type: :integration do
 
     describe "accounts collection" do
       before do
-        @json = @json['accounts']
+        @json = @json['linked']['accounts']
       end
 
       it "should be formatted as an array of Account objects" do
@@ -130,7 +169,7 @@ describe "AuthenticationAudit API", type: :integration do
 
     describe "users collection" do
       before do
-        @json = @json['users']
+        @json = @json['linked']['users']
       end
 
       it "should be formatted as an array of User objects" do
@@ -143,11 +182,21 @@ describe "AuthenticationAudit API", type: :integration do
         }]
       end
     end
+
+    describe "page_views collection" do
+      before do
+        @json = @json['linked']['page_views']
+      end
+
+      it "should be formatted as an array of page_view objects" do
+        @json.size.should eql(1)
+      end
+    end
   end
 
   context "nominal cases" do
-    it "should include events at pseudonym endpoint" do
-      expect_event_for_context(@pseudonym, @event)
+    it "should include events at login endpoint" do
+      expect_event_for_context(@pseudonym, @event, type: 'login')
     end
 
     it "should include events at account endpoint" do
@@ -165,8 +214,8 @@ describe "AuthenticationAudit API", type: :integration do
       user_with_pseudonym(user: @user, account: @account, active_all: true)
     end
 
-    it "should not include cross-account events at pseudonym endpoint" do
-      forbid_event_for_context(@pseudonym, @event)
+    it "should not include cross-account events at login endpoint" do
+      forbid_event_for_context(@pseudonym, @event, type: 'login')
     end
 
     it "should not include cross-account events at account endpoint" do
@@ -183,8 +232,8 @@ describe "AuthenticationAudit API", type: :integration do
       user_with_pseudonym(active_all: true)
     end
 
-    it "should not include cross-user events at pseudonym endpoint" do
-      forbid_event_for_context(@pseudonym, @event)
+    it "should not include cross-user events at login endpoint" do
+      forbid_event_for_context(@pseudonym, @event, type: 'login')
     end
 
     it "should include cross-user events at account endpoint" do
@@ -208,14 +257,14 @@ describe "AuthenticationAudit API", type: :integration do
       end
     end
 
-    it "should recognize :start_time for pseudonyms" do
-      expect_event_for_context(@pseudonym, @event, start_time: 12.hours.ago)
-      forbid_event_for_context(@pseudonym, @event2, start_time: 12.hours.ago)
+    it "should recognize :start_time for logins" do
+      expect_event_for_context(@pseudonym, @event, start_time: 12.hours.ago, type: 'login')
+      forbid_event_for_context(@pseudonym, @event2, start_time: 12.hours.ago, type: 'login')
     end
 
-    it "should recognize :newest for pseudonyms" do
-      expect_event_for_context(@pseudonym, @event2, end_time: 12.hours.ago)
-      forbid_event_for_context(@pseudonym, @event, end_time: 12.hours.ago)
+    it "should recognize :newest for logins" do
+      expect_event_for_context(@pseudonym, @event2, end_time: 12.hours.ago, type: 'login')
+      forbid_event_for_context(@pseudonym, @event, end_time: 12.hours.ago, type: 'login')
     end
 
     it "should recognize :start_time for accounts" do
@@ -240,9 +289,9 @@ describe "AuthenticationAudit API", type: :integration do
   end
 
   context "deleted entities" do
-    it "should 404 for inactive pseudonyms" do
+    it "should 404 for inactive logins" do
       @pseudonym.destroy
-      fetch_for_context(@pseudonym, expected_status: 404)
+      fetch_for_context(@pseudonym, expected_status: 404, type: 'login')
     end
 
     it "should 404 for inactive accounts" do
@@ -264,8 +313,8 @@ describe "AuthenticationAudit API", type: :integration do
     end
 
     context "no permission on account" do
-      it "should not authorize the pseudonym endpoint" do
-        fetch_for_context(@pseudonym, expected_status: 401)
+      it "should not authorize the login endpoint" do
+        fetch_for_context(@pseudonym, expected_status: 401, type: 'login')
       end
 
       it "should not authorize the account endpoint" do
@@ -285,8 +334,8 @@ describe "AuthenticationAudit API", type: :integration do
           :role_changes => {:view_statistics => true})
       end
 
-      it "should authorize the pseudonym endpoint" do
-        fetch_for_context(@pseudonym, expected_status: 200)
+      it "should authorize the login endpoint" do
+        fetch_for_context(@pseudonym, expected_status: 200, type: 'login')
       end
 
       it "should authorize the account endpoint" do
@@ -306,8 +355,8 @@ describe "AuthenticationAudit API", type: :integration do
           :role_changes => {:manage_user_logins => true})
       end
 
-      it "should authorize the pseudonym endpoint" do
-        fetch_for_context(@pseudonym, expected_status: 200)
+      it "should authorize the login endpoint" do
+        fetch_for_context(@pseudonym, expected_status: 200, type: 'login')
       end
 
       it "should authorize the account endpoint" do
@@ -327,8 +376,8 @@ describe "AuthenticationAudit API", type: :integration do
           :role_changes => {:view_statistics => true})
       end
 
-      it "should authorize the pseudonym endpoint" do
-        fetch_for_context(@pseudonym, expected_status: 200)
+      it "should authorize the login endpoint" do
+        fetch_for_context(@pseudonym, expected_status: 200, type: 'login')
       end
 
       it "should authorize the account endpoint" do
@@ -348,8 +397,8 @@ describe "AuthenticationAudit API", type: :integration do
           :role_changes => {:manage_user_logins => true})
       end
 
-      it "should authorize the pseudonym endpoint" do
-        fetch_for_context(@pseudonym, expected_status: 200)
+      it "should authorize the login endpoint" do
+        fetch_for_context(@pseudonym, expected_status: 200, type: 'login')
       end
 
       it "should authorize the account endpoint" do

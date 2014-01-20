@@ -21,11 +21,16 @@ def maintain_plugin_symlinks(local_path, plugin_path=nil)
   end
 end
 
-maintain_plugin_symlinks('public')
-# our new unified build.js and friends require these two symlinks
-maintain_plugin_symlinks('public/javascripts')
-maintain_plugin_symlinks('public/optimized')
-maintain_plugin_symlinks('app/coffeescripts')
-maintain_plugin_symlinks('app/views/jst')
-maintain_plugin_symlinks('app/stylesheets')
-maintain_plugin_symlinks('spec/coffeescripts', 'spec_canvas/coffeescripts')
+File.open(__FILE__) do |f|
+  f.flock(File::LOCK_EX)
+
+  maintain_plugin_symlinks('public')
+  # our new unified build.js and friends require these two symlinks
+  maintain_plugin_symlinks('public/javascripts')
+  maintain_plugin_symlinks('public/optimized')
+  maintain_plugin_symlinks('app/coffeescripts')
+  maintain_plugin_symlinks('app/views/jst')
+  maintain_plugin_symlinks('app/stylesheets')
+  maintain_plugin_symlinks('spec/coffeescripts', 'spec_canvas/coffeescripts')
+
+end

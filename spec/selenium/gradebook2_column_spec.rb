@@ -56,9 +56,7 @@ describe "assignment column headers" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
     first_column = ff('.slick-column-name')[0]
-    2.times do
-      first_column.click
-    end
+    first_column.click
     meta_cells = find_slick_cells(0, f('#gradebook_grid  .container_0'))
     grade_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     #filter validation

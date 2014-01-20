@@ -363,10 +363,11 @@ class ContextModuleItemsApiController < ApplicationController
       @tag.url = params[:module_item][:external_url] if %w(ExternalUrl ContextExternalTool).include?(@tag.content_type) && params[:module_item][:external_url]
       @tag.indent = params[:module_item][:indent] if params[:module_item][:indent]
       @tag.new_tab = value_to_boolean(params[:module_item][:new_tab]) if params[:module_item][:new_tab]
-      if target_module_id = params[:module_item][:module_id]
+      if (target_module_id = params[:module_item][:module_id]) && target_module_id.to_i != @tag.context_module_id
         target_module = @context.context_modules.find_by_id(target_module_id)
         return render :json => {:message => "invalid module_id"}, :status => :bad_request unless target_module
         old_module = @context.context_modules.find(@tag.context_module_id)
+        @tag.remove_from_list
         @tag.context_module = target_module
         if req_index = old_module.completion_requirements.find_index { |req| req[:id] == @tag.id }
           old_module.completion_requirements_will_change!
@@ -511,7 +512,7 @@ class ContextModuleItemsApiController < ApplicationController
     return true unless @tag && params[:module_item][:position]
 
     @tag.reload
-    if @tag.insert_at_position(params[:module_item][:position], @tag.context_module.content_tags.not_deleted)
+    if @tag.insert_at(params[:module_item][:position].to_i)
       # see ContextModulesController#reorder_items
       @tag.touch_context_module
       ContentTag.update_could_be_locked(@tag.context_module.content_tags)

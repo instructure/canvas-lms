@@ -175,7 +175,7 @@ describe GoogleDocs do
       mock_consumer()
 
       lambda { lib.google_docs_retrieve_access_token }.should \
-        raise_error(RuntimeError, 'User does not have valid Google Docs token')
+        raise_error(GoogleDocsTest::NoTokenError, 'User does not have a valid Google Docs token')
     end
 
     it "should use the current_user if no real_current_user" do

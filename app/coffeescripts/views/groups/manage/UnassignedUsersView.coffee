@@ -52,6 +52,7 @@ define [
     toJSON: ->
       loading: !@collection.loadedAll
       count: @collection.length
+      ENV: ENV
 
     remove: ->
       @assignToGroupMenu?.remove()

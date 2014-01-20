@@ -58,17 +58,22 @@ module Canvas
 
       def paths(cache_busting = false)
         @paths ||= {
-          :ember => 'vendor/ember/ember',
           :common => 'compiled/bundles/common',
           :jqueryui => 'vendor/jqueryui',
           :use => 'vendor/use',
           :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min',
-          'ic-menu' => 'vendor/ic-menu/dist/main.amd',
           'ic-dialog' => 'vendor/ic-dialog/dist/main.amd',
-          'ic-ajax' => 'vendor/ic-ajax/main',
         }.update(cache_busting ? cache_busting_paths : {}).update(plugin_paths).update(Canvas::RequireJs::PluginExtension.paths).to_json.gsub(/([,{])/, "\\1\n    ")
       end
-  
+
+      def packages
+        @packages ||= [
+          {'name' => 'ic-ajax', 'location' => 'bower/ic-ajax'},
+          {'name' => 'ic-styled', 'location' => 'bower/ic-styled'},
+          {'name' => 'ic-menu', 'location' => 'bower/ic-menu'},
+        ].to_json
+      end
+
       def plugin_paths
         @plugin_paths ||= begin
           Dir['public/javascripts/plugins/*'].inject({}) { |hash, plugin|
@@ -86,13 +91,19 @@ module Canvas
       def shims
         <<-JS.gsub(%r{\A +|^ {8}}, '')
           {
+            'bower/ember/ember': {
+              deps: ['jquery', 'handlebars'],
+              attach: 'Ember'
+            },
+            'bower/handlebars/handlebars.runtime': {
+              attach: 'Handlebars'
+            },
             'vendor/backbone': {
               deps: ['underscore', 'jquery'],
               attach: function(_, $){
                 return Backbone;
               }
             },
-        
             // slick grid shim
             'vendor/slickgrid/lib/jquery.event.drag-2.2': {
               deps: ['jquery'],

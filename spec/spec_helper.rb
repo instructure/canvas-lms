@@ -18,40 +18,6 @@
 
 begin; require File.expand_path(File.dirname(__FILE__) + "/../parallelized_specs/lib/parallelized_specs.rb"); rescue LoadError; end
 
-if ENV['COVERAGE'] == "1"
-  puts "Code Coverage enabled"
-  require 'simplecov'
-  require 'simplecov-rcov'
-  SimpleCov.start do
-    class SimpleCov::Formatter::MergedFormatter
-      def format(result)
-        SimpleCov::Formatter::HTMLFormatter.new.format(result)
-        SimpleCov::Formatter::RcovFormatter.new.format(result)
-      end
-    end
-    SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
-    add_filter '/spec/'
-    add_filter '/config/'
-    add_filter 'spec_canvas'
-
-    add_group 'Controllers', 'app/controllers'
-    add_group 'Models', 'app/models'
-    add_group 'App', '/app/'
-    add_group 'Helpers', 'app/helpers'
-    add_group 'Libraries', '/lib/'
-    add_group 'Plugins', 'vendor/plugins'
-    add_group "Long files" do |src_file|
-      src_file.lines.count > 500
-    end
-    SimpleCov.at_exit do
-      SimpleCov.result.format!
-    end
-  end
-else
-  puts "Code coverage not enabled"
-end
-
-
 ENV["RAILS_ENV"] = 'test'
 
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
@@ -66,6 +32,7 @@ require 'webrat'
 require 'mocha/api'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
+require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
@@ -107,7 +74,8 @@ def truncate_all_tables
   models_by_connection = ActiveRecord::Base.all_models.group_by { |m| m.connection }
   models_by_connection.each do |connection, models|
     if connection.adapter_name == "PostgreSQL"
-      connection.execute("TRUNCATE TABLE #{models.map(&:table_name).map { |t| connection.quote_table_name(t) }.join(',')}")
+      table_names = connection.tables & models.map(&:table_name)
+      connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
     else
       models.each { |model| truncate_table(model) }
     end
@@ -861,13 +829,22 @@ Spec::Runner.configure do |config|
   def enable_cache(new_cache = ActiveSupport::Cache::MemoryStore.new)
     old_cache = RAILS_CACHE
     ActionController::Base.cache_store = new_cache
-    silence_warnings { Object.const_set(:RAILS_CACHE, new_cache) }
     old_perform_caching = ActionController::Base.perform_caching
+    if CANVAS_RAILS2
+      ActionController::Base.cache_store = new_cache
+      silence_warnings { Object.const_set(:RAILS_CACHE, new_cache) }
+    else
+      Switchman::DatabaseServer.all.each {|s| s.stubs(:cache_store).returns(new_cache)}
+    end
     ActionController::Base.perform_caching = true
     yield
   ensure
-    silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
-    ActionController::Base.cache_store = old_cache
+    if CANVAS_RAILS2
+      ActionController::Base.cache_store = old_cache
+      silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
+    else
+      Switchman::DatabaseServer.all.each {|s| s.unstub(:cache_store)}
+    end
     ActionController::Base.perform_caching = old_perform_caching
   end
 

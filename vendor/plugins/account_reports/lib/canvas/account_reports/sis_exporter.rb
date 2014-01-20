@@ -235,7 +235,7 @@ module Canvas::AccountReports
             #for sis import format 'claimed', 'created', and 'available' are all considered active
             if @sis_format
               if c.workflow_state == 'deleted' || c.workflow_state == 'completed'
-                row << course_state_sub[c.workflow_state]
+                row << c.workflow_state
               else
                 row << 'active'
               end

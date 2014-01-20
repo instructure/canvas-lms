@@ -110,8 +110,10 @@ class SearchController < ApplicationController
         params[:user_id] = api_find(User, params[:user_id]).id
       end
 
+      permissions = params[:permissions] || []
+      permissions << :send_messages if params[:messageable_only]
       load_all_contexts :context => get_admin_search_context(params[:context]),
-                        :permissions => params[:permissions]
+                        :permissions => permissions
 
       types = (params[:types] || [] + [params[:type]]).compact
       types |= [:course, :section, :group] if types.delete('context')
@@ -139,6 +141,7 @@ class SearchController < ApplicationController
             :context => params[:context],
             :synthetic_contexts => params[:synthetic_contexts],
             :include_inactive => params[:include_inactive],
+            :messageable_only => params[:messageable_only],
             :exclude_ids => MessageableUser.context_recipients(exclude),
             :search_all_contexts => params[:search_all_contexts],
             :types => types[:context]
@@ -223,7 +226,8 @@ class SearchController < ApplicationController
               result = sections + groups
             else # otherwise we show synthetic contexts
               result = synthetic_contexts_for(course, context_name)
-              result << {:id => "#{context_name}_sections", :name => t(:course_sections, "Course Sections"), :item_count => sections.size, :type => :context} if sections.size > 1
+              found_custom_sections = sections.any? { |s| s[:id] != course[:default_section_id] }
+              result << {:id => "#{context_name}_sections", :name => t(:course_sections, "Course Sections"), :item_count => sections.size, :type => :context} if found_custom_sections
               result << {:id => "#{context_name}_groups", :name => t(:student_groups, "Student Groups"), :item_count => groups.size, :type => :context} if groups.size > 0
               return result
             end
@@ -278,10 +282,13 @@ class SearchController < ApplicationController
         # more permission (possibly inherited from the course, like
         # :send_messages_all)
         ret[:permissions] = course_for_section(context)[:permissions]
+      elsif context[:type] == :group && context[:parent]
+        ret[:permissions] = course_for_group(context)[:permissions]
       end
       ret[:context_name] = context[:context_name] if context[:context_name] && context_name.nil?
       ret
     }
+    result = result.select{ |context| context[:permissions].include? :send_messages } if options[:messageable_only]
 
     result.reject!{ |context| terms.any?{ |part| !context[:name].downcase.include?(part) } } if terms.present?
     result.reject!{ |context| exclude.include?(context[:id]) }
@@ -290,6 +297,10 @@ class SearchController < ApplicationController
 
   def course_for_section(section)
     @contexts[:courses][section[:parent][:course]]
+  end
+
+  def course_for_group(group)
+    course_for_section(group)
   end
 
   def synthetic_contexts_for(course, context)

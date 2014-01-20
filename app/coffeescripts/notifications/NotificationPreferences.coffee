@@ -86,7 +86,7 @@ define [
     buildPolicyCellsHtml: (category) =>
       fragments = for c in @channels
         policy = _.find @policies, (p) ->
-          p.channel_id is c.id and p.category is category.category
+          p.communication_channel_id is c.id and p.category is category.category
         frequency = 'never'
         frequency = policy['frequency'] if policy
         @policyCellHtml(category, c, frequency)

@@ -57,7 +57,6 @@ describe "conversations recipient finder" do
   end
 
   it "should respect permissions" do
-    # only affects courses/sections, not groups
     RoleOverride.create!(:context => Account.default, :permission => 'send_messages_all', :enrollment_type => 'TeacherEnrollment', :enabled => false)
 
     browse_menu
@@ -84,21 +83,10 @@ describe "conversations recipient finder" do
       end
       browse "Student Groups" do
         menu.should == ["the group"]
-        browse("the group") { menu.should == ["Select All", "nobody@example.com", "student 1"] }
+        browse("the group") { menu.should == ["nobody@example.com", "student 1"] }
       end
     end
-    browse("the group") { menu.should == ["Select All", "nobody@example.com", "student 1"] }
-  end
-
-  it "should return recently concluded courses" do
-    @course.complete!
-
-    browse_menu
-    menu.should == ["the course", "the group"]
-
-    search("course") do
-      menu.should == ["the course"]
-    end
+    browse("the group") { menu.should == ["nobody@example.com", "student 1"] }
   end
 
   it "should not show concluded enrollments as students in the course" do
@@ -119,7 +107,7 @@ describe "conversations recipient finder" do
     @course.update_attribute :conclude_at, 1.year.ago
 
     browse_menu
-    menu.should == ["the group"]
+    menu.should == ["No results found"]
 
     search("course") do
       menu.should == ["No results found"]

@@ -230,7 +230,6 @@ class UserList
     end
     sms_account_ids = @search_method != :closed ? [@root_account] : all_account_ids
     Shard.partition_by_shard(sms_account_ids) do |account_ids|
-      next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
       sms_scope = @search_method != :closed ? Pseudonym : Pseudonym.where(:account_id => account_ids)
       sms_scope.active.
           select('path AS address, users.name AS name, communication_channels.user_id AS user_id').

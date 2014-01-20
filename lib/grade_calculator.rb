@@ -26,10 +26,9 @@ class GradeCalculator
       @course = course :
       @course = Course.find(course)
     @course_id = @course.id
-    @groups = @course.assignment_groups.active.includes(:assignments)
-    @assignments = @groups.map(&:assignments).flatten.select { |a|
-      a.graded? && a.active?
-    }
+    assignment_scope = AssignmentGroup.assignment_scope_for_grading(@course)
+    @groups = @course.assignment_groups.active.includes(assignment_scope)
+    @assignments = @groups.flat_map(&assignment_scope).select(&:graded?)
     @user_ids = Array(user_ids).map(&:to_i)
     @current_updates = []
     @final_updates = []
@@ -45,7 +44,7 @@ class GradeCalculator
   # recomputes the scores and saves them to each user's Enrollment
   def compute_scores
     @submissions = @course.submissions.
-        except(:includes, :order).
+        except(:includes, :order, :select).
         for_user(@user_ids).
         select("submissions.id, user_id, assignment_id, score")
     submissions_by_user = @submissions.group_by(&:user_id)

@@ -160,8 +160,13 @@ class QuizzesApiController < ApplicationController
     if authorized_action(@context, @current_user, :read) && tab_enabled?(@context.class::TAB_QUIZZES)
       api_route = polymorphic_url([:api, :v1, @context, :quizzes])
       scope = Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
-      @quizzes = Api.paginate(scope, self, api_route)
-      render :json => quizzes_json(@quizzes, @context, @current_user, session)
+      json = if accepts_jsonapi?
+        jsonapi_quizzes_json(scope: scope, api_route: api_route)
+      else
+        @quizzes = Api.paginate(scope, self, api_route)
+        quizzes_json(@quizzes, @context, @current_user, session)
+      end
+      render json: json
     end
   end
 
@@ -172,7 +177,7 @@ class QuizzesApiController < ApplicationController
   # @returns Quiz
   def show
     if authorized_action(@quiz, @current_user, :read)
-      render :json => quiz_json(@quiz, @context, @current_user, session)
+      render_json
     end
   end
 
@@ -283,9 +288,9 @@ class QuizzesApiController < ApplicationController
   def create
     if authorized_action(@context.quizzes.new, @current_user, :create)
       @quiz = @context.quizzes.build
-      update_api_quiz(@quiz, params[:quiz])
+      update_api_quiz(@quiz, params)
       unless @quiz.new_record?
-        render :json => quiz_json(@quiz, @context, @current_user, session)
+        render_json
       else
         # TODO: we don't really have a strategy in the API yet for returning
         # errors.
@@ -306,9 +311,9 @@ class QuizzesApiController < ApplicationController
   # @returns Quiz
   def update
     if authorized_action(@quiz, @current_user, :update)
-      update_api_quiz(@quiz, params[:quiz])
+      update_api_quiz(@quiz, params)
       if @quiz.valid?
-        render :json => quiz_json(@quiz, @context, @current_user, session)
+        render_json
       else
         errors = @quiz.errors.as_json[:errors]
         errors['published'] = errors.delete('workflow_state') if errors.has_key?('workflow_state')
@@ -323,7 +328,11 @@ class QuizzesApiController < ApplicationController
   def destroy
     if authorized_action(@quiz, @current_user, :delete)
       @quiz.destroy
-      render json: quiz_json(@quiz, @context, @current_user, session)
+      if accepts_jsonapi?
+        head :no_content
+      else
+        render json: quiz_json(@quiz, @context, @current_user, session)
+      end
     end
   end
 
@@ -348,13 +357,22 @@ class QuizzesApiController < ApplicationController
   end
 
   private
-    def require_quiz
-      unless @quiz = @context.quizzes.find_by_id(params[:id])
-        render :json => {:message => @@errors[:quiz_not_found]}, :status => :not_found
-      end
-    end
 
-    def quiz_params
-      filter_params params[:quiz]
+  def render_json
+    if accepts_jsonapi?
+      render json: { quizzes: quizzes_json([@quiz], @context, @current_user, session) }
+    else
+      render json: quiz_json(@quiz, @context, @current_user, session)
     end
+  end
+
+  def require_quiz
+    unless @quiz = @context.quizzes.find_by_id(params[:id])
+      render :json => {:message => @@errors[:quiz_not_found]}, :status => :not_found
+    end
+  end
+
+  def quiz_params
+    filter_params params[:quiz]
+  end
 end

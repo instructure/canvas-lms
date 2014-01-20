@@ -46,7 +46,7 @@ module SIS
         @success_count = 0
       end
 
-      def add_account(account_id, parent_account_id, status, name)
+      def add_account(account_id, parent_account_id, status, name, integration_id)
         @logger.debug("Processing Account #{[account_id, parent_account_id, status, name].inspect}")
 
         raise ImportError, "No account_id given for an account" if account_id.blank?
@@ -73,6 +73,7 @@ module SIS
         # only update the name on new records, and ones that haven't been changed since the last sis import
         account.name = name if name.present? && (account.new_record? || (!account.stuck_sis_fields.include?(:name)))
 
+        account.integration_id = integration_id
         account.sis_source_id = account_id
         account.sis_batch_id = @batch_id if @batch_id
 

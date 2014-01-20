@@ -209,7 +209,9 @@ define([
           var root_folder_id;
           for(var idx in data.folders) {
             var folder = data.folders[idx].folder;
-            folders[folder.id] = folder;
+            if(!folders[folder.id]) {
+              folders[folder.id] = folder;
+            }
             if(!folder.parent_folder_id) {
               root_folder_id = folder.id;
               continue;

@@ -73,6 +73,7 @@ define [
     toJSON: ->
       count: @model.usersCount()
       locked: @model.isLocked()
+      ENV: ENV
 
     renderItem: (model) =>
       super

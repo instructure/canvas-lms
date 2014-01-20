@@ -2,7 +2,10 @@
   {{#if days}}
     {{#each days}}
       <div class="agenda-day{{#if isToday}} agenda-today{{/if}}">
-        <h3 class="agenda-date" tabindex="-1">{{date}}</h3>
+        <h3 class="agenda-date" tabindex="-1">
+          <span aria-hidden="true">{{date}}</span>
+          <span class="screenreader-only">{{accessibleDate}}</span>
+        </h3>
 
         <div class="agenda-events">
           <div class="item-group-condensed">

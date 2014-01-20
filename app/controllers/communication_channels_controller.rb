@@ -33,7 +33,7 @@
 #       "address": "sheldon@caltech.example.com",
 #
 #       // The type of communcation channel being described. Possible values
-#       // are: "email", "sms", "chat", "facebook" or "twitter". This field
+#       // are: "email", "sms", "facebook" or "twitter". This field
 #       // determines the type of value seen in "address".
 #       "type": "email",
 #

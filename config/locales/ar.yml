@@ -29,6 +29,9 @@ ar:
       other: "%{count} من المستخدمين"
       two: "%{count} مستخدم"
       zero: "%{count} مستخدم"
+  GroupUserCollection: 
+    flash: 
+      userAlreadyInGroup: "تحذير: %{user} هو عضو بالفعل في %{group}"
   academic_benchmark: 
     api_error: "تعذر تحديث المعايير للتفويض %{auth}."
     bad_ab_file: "حدث خطأ في ملف المعيار الأكاديمي المتوفر."
@@ -556,6 +559,15 @@ ar:
             text: "course_id:"
           outcome: 
             text: "outcome_id:"
+    cv_submission_data_csv_description: 
+      account_reports: 
+        galen: 
+          cv: 
+            attendance: 
+              text: "يوضع هذا التقرير عمليات الإرسال التي قام بها الطلاب حتى التاريخ المحدد. ويستخدم هذا لحضور CampusVue."
+        tmcc: 
+          description: 
+            header: مثال
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -607,6 +619,23 @@ ar:
           last_user_access: 
             header: مثال
             text: "يوضح هذا التقرير آخر عملية تسجيل دخول للمستخدمين النشطاء."
+    learning_outcome_assignment_type_csv_description: 
+      account_reports: 
+        newark: 
+          student_activity: 
+            text: "يقدم هذا التقرير تصديرًا للبيانات التي تربط النتائج بالمهام."
+        samuel_merrit_university: 
+          description: 
+            header: مثال
+    learning_outcome_assignment_type_csv_parameters: 
+      account_reports: 
+        samuel_merrit_university: 
+          course: 
+            sis: 
+              text: "معرف SIS للمساق"
+            text: "معرف المساق"
+          parameters: 
+            note1: "يمكن ترك معرف المساق خاليًا لتشغيل التقرير لكل المساقات في الفصل الدراسي."
     mississippi_sis_csv_description: 
       account_reports: 
         mississisppi: 
@@ -801,6 +830,7 @@ ar:
         outgoing_email_default_name_option_custom: "اسم  \"من\" المخصص"
         outgoing_email_default_name_option_default: "إعداد Canvas الافتراضي\n"
         prevent_course_renaming_by_teachers: "عدم السماح للمعلمين بإعادة تسمية المساقات الخاصة بهم"
+        restrict_quiz_questions: "تقييد الطلاب من عرض أسئلة الاختبار بعد تاريخ انتهاء المساق"
         restrict_student_future_view: "تقييد الطلاب من عرض المساقات قبل تاريخ البدء"
         self_enrollment: "السماح بالتسجيل الذاتي"
         self_registration: "التسجيل الذاتي"
@@ -1263,6 +1293,7 @@ ar:
     no_title: "بلا عنوان"
   announcements: 
     announcements_crumb: الإعلانات
+    error_draft_state: "لا يمكن تعيين هذا الموضوع على حالة المسودة لأنه إعلان."
     external_feed: 
       alts: 
         deleted_feed: "حذف هذا الموجز"
@@ -1403,6 +1434,8 @@ ar:
       a_quiz: اختبار
       a_text_entry_box: "مربع إدخال نص"
       a_website_url: "عنوان URL لموقع ويب"
+      external_tool: "أداة خارجية"
+      on_paper: "على الورق"
     titles: 
       grading_scheme_info: "عرض/تحرير نظام تقييم الدرجات"
   assignment_details_dialog: 
@@ -1800,6 +1833,21 @@ ar:
       title_add_group: "إضافة مجموعة المهام"
     invalid_file_retrieval: "حدثت مشكلة أثناء استرداد الملف المرسل من هذه الأداة."
     invalid_tool_return: "أرجعت الأداة التي تم تشغيلها موردًا غير صالح لهذه المهمة"
+    keyboard_add_item: "إضافة مهمة لمجموعة مختارة"
+    keyboard_close_menu: "إغلاق الحوار النشط"
+    keyboard_del_item: "حذف المهمة أو المجموعة الحالية"
+    keyboard_edit_item: "تحرير المهمة أو المجموعة الحالية"
+    keyboard_next_item: "التركيز على المهمة أو المجموعة التالية"
+    keyboard_prev_item: "التركيز على المهمة أو المجموعة السابقة"
+    keyboard_show_assign: "عرض المعاينة الكاملة للمهمة المختارة"
+    keycodes: 
+      add_item: a
+      close_menu: esc
+      del_item: d
+      edit_item: e
+      next: j
+      previous: k
+      show_assign: f
     labels: 
       assignment_group_move_label: "مجموعة المهام"
       label_place_before: "منزلة قبل"
@@ -1830,6 +1878,7 @@ ar:
       aria_assignments: المهام
       assignments: المهام
       no_assignments_found: "لم يتم العثور على مهام"
+    no_name_error: "مطلوب اسم"
     no_tools_found: "لم يتم العثور على أدوات"
     non_number: "يجب استخدام رقم"
     notices: 
@@ -2078,6 +2127,7 @@ ar:
           internet_check: "قاعدة بيانات الإنترنت"
           journal_check: "دفاتر اليومية والمجلات الدورية والمنشورات"
           student_paper_check: "صفحات الطالب الأخرى"
+        originality_report_never: مطلقًا
         originality_report_visibility: "يستطيع الطلاب رؤية تقرير الابتكارات"
         originality_report_visible_after_due_date: "بعد تاريخ الاستحقاق"
         originality_report_visible_after_grading: "بعد تقييم درجات المهمة"
@@ -2150,6 +2200,7 @@ ar:
   bb_file_description: "تصدير Blackboard 6/7/8/9 بتنسيق ملف zip."
   bb_name: "محول Blackboard"
   big_blue_button_conference: 
+    conference_is_recorded: "يتم تسجيل هذا المؤتمر."
     recording_setting: تسجيل
     recording_setting_description: "تسجيل هذا المؤتمر"
   blackboard: 
@@ -2226,6 +2277,7 @@ ar:
     delete: حذف
     done: انتهاء
     filter: تصفية
+    find_user: "العثور على مستخدم"
     hide_all_artifacts: "إخفاء كل الأدوات"
     import: استيراد
     login: "تسجيل الدخول"
@@ -2358,7 +2410,7 @@ ar:
       create_event: "إنشاء حدث جديد"
       done_go_back_to_list: "تم. يرجى العودة إلى القائمة"
       links: 
-        accessibility_warning: "تحذير: هذا العرض لا يمكن للمستخدمين الذين لديهم قارئات شاشة الوصول إليه"
+        accessibility_warning: "تحذير: هذا العرض لا يمكن الوصول إليه من قِبل قراء الشاشة. استخدم عرض جدول الأعمال بدلاً من ذلك."
         calendar_agenda: "جدول الأعمال"
         calendar_month: الشهر
         calendar_scheduler: المجدوِّل
@@ -2741,9 +2793,6 @@ ar:
       update_assignment_points: "هذا التعيين يشتمل على %{assignmentPoints} نقطة ممكنة، هل ترغب في تغييره بحيث يشتمل على %{rubricPoints} نقطة ممكنة لمطابقة هذا المعيار؟"
     titles: 
       update_assignment_points: "هل تريد تغيير النقاط الممكنة لمطابقة نموذج التقييم؟"
-  chat: 
-    notifications: 
-      tinychat_inaccessible: "تحذير: هذه الصفحة تستخدم Tinychat، المكون الإضافي الخاص بالجهة الخارجية الذي لا يمكن الوصول إليه عن طريق برامج قراءة الشاشة."
   collaboration: 
     default_title: "تعاون بدون تسمية"
   collaborations: 
@@ -3202,10 +3251,6 @@ ar:
   context: 
     all_marked_read: "تم وضع علامة أمام كل رسائل صندوق الوارد كمقروء"
     bad_message: "تعذر عرض هذه الرسالة"
-    chat: 
-      titles: 
-        chat: الدردشة
-    chat_not_enabled: "لم يتم تمكين الدردشة لموقع Canvas هذا"
     communication: 
       headings: 
         discussions: المناقشات
@@ -4575,6 +4620,8 @@ ar:
       index: 
         add_people: "إضافة أشخاص"
         cannot_add_users: "لا يمكن إضافة مستخدمين جدد بسبب انتهاء هذا المساق"
+        filter_field_description: "بينما تقوم بالكتابة في هذا الحقل، سيتم تصفية قائمة الأشخاص تلقائيا لتشمل فقط أولئك الذين تطابق أسماؤهم إدخالك."
+        filter_list_of_people: "تصفية قائمة الأشخاص"
         role_to_search: "تقييد البحث على الدور"
         search_people: "البحث عن أشخاص"
       invitations_view: 
@@ -4890,7 +4937,6 @@ ar:
     announcements: الإعلانات
     assignments: المهام
     calendar_events: "أحداث التقويم"
-    chat: الدردشة
     conferences: المؤتمرات
     confirmation: تأكيد
     copy_course: "نسخ المساق"
@@ -5085,7 +5131,8 @@ ar:
     formats: 
       date_at_time: "%b %-d at %l:%M%P"
       default: "%Y-%m-%d"
-      long: "%B %d, %Y"
+      long: "%B %-d، %Y"
+      long_with_weekday: "%A، %B %-d"
       medium: "%b %e, %Y"
       medium_month: "%b %Y"
       medium_with_weekday: "%a %b %-d، %Y"
@@ -5316,7 +5363,7 @@ ar:
       separated_conversation_notice: "تم تقسيم المحادثة الخاصة بهذا الموضوع إلى مجموعات منفصلة. فيما يلي قائمة بموضوعات المجموعة التي يمكنك الوصول إليها."
       show_due_dates: "إظهار تواريخ الاستحقاق"
       until: حتى
-    cannot_unpublish: "لا يمكن إلغاء النشر"
+    cannot_unpublish_with_replies: "لا يمكن إلغاء النشر إذا كان هناك ردود"
     confirm_delete_announcement: 
       few: "هل أنت متأكد من أنك تريد حذف بضع إعلانات؟"
       many: "هل أنت متأكد من أنك تريد حذف عدة إعلانات؟"
@@ -5337,8 +5384,9 @@ ar:
     discussion: 
       close_for_comments: "إغلاق التعليقات"
       delete: حذف
-      due: "موعد الاستحقاق"
+      due_at: "*مستحق في* %{assignment.display_due_at}"
       graded_discussion: "مناقشة بدرجات"
+      last_post_date: "آخر مشاركة في t %{display_last_reply_at}"
       manage: إدارة
       no_due_date: "بلا تاريخ استحقاق"
       open_to_comments: "فتح التعليقات"
@@ -5395,8 +5443,6 @@ ar:
         other: "إظهار %{count} إدخالات إضافية"
         two: "إظهار %{count} إدخالات إضافية"
         zero: "إظهار %{count} إدخالات إضافية"
-    error_draft_state_announcement: "لا يمكن تعيين هذا الموضوع على حالة المسودة. إنه إعلان."
-    error_draft_state_graded: "لا يمكن تعيين هذا الموضوع على حالة المسودة لأنه مهمة"
     error_draft_state_unauthorized: "ليس لديك إذن لتعيين هذا الموضوع على حالة المسودة."
     error_draft_state_with_posts: "لا يمكن تعيين هذا الموضوع على حالة المسودة لأنه يحتوي على منشورات."
     group_assignment_discussion_entry: 
@@ -5449,7 +5495,10 @@ ar:
       zero: "بلا ردود"
     show: 
       add_rubric: "إضافة العنوان"
+      announcement_closed: "هذا الإعلان مغلق للتعليقات"
       announcement_locked: "لن يكون هذا الإعلان مرئيًا للمستخدمين حتى *%{date}*"
+      announcement_not_visible: "هذا الإعلان غير مرئي للمستخدمين"
+      announcement_will_open_on: "سيفتح هذا الإعلان للتعليق في *%{date}*"
       authors_name: "اسم المؤلف"
       collapse_replies: "طي الردود"
       confirm_delete_discussion: "هل تريد بالتأكيد حذف هذه المناقشة؟"
@@ -5487,6 +5536,7 @@ ar:
       topic_subscribe_tooltip: "أنت غير مشترك ولن يتم إعلامك بالتعليقات الجديدة"
       topic_subscribed_tooltip: "أنت مشترك وسيتم إعلامك بالتعليقات الجديدة"
       topic_unsubscribe: مشترك
+      topic_will_open_on: "هذا الموضوع سيفتح للتعليق في *%{date}*"
       unlock_topic: "الفتح أمام التعليقات"
       unread: "غير مقروء"
     sub_entry: 
@@ -6566,6 +6616,8 @@ ar:
     resubmitted: "تمت إعادة إرساله منذ آخر تصحيح"
     row_student_name: 
       student_placeholder: الطالب
+    screenreader: 
+      page_titles: "دفتر درجات قارئ الشاشة"
     secondary_id: "المعرف الثانوي"
     section_to_show_menu: 
       choose_a_section_to_show: "اختيار قسم لعرضه"
@@ -6731,6 +6783,11 @@ ar:
         show_what_if: "عرض مجموعات نقاط \"ماذا لو\" التي يتم حفظها"
       change_score_instructions: "انقر فوق أي درجة وأدخل قيمة جديدة لعرض كيفية تأثير التغيير على الإجمالي لديك."
       click_to_change: "انقر لاختبار درجة مختلفة"
+      close_comments: إغلاق
+      close_comments_label: "إغلاق التعليقات"
+      close_rubric: "إغلاق العنوان"
+      close_score: إغلاق
+      close_score_screenreader: "إغلاق تفاصيل الدرجات"
       comment_count: 
         few: "%{count} من التعليقات"
         many: "%{count} من التعليقات"
@@ -6738,6 +6795,7 @@ ar:
         other: "%{count} من التعليقات"
         two: "%{count} من التعليقات"
         zero: "%{count} من التعليقات"
+      comment_count_screenreader: "قراءة التعليقات"
       faculty_journal: "دفتر الكلية من أجل %{user}"
       for_course: "بالنسبة للمساق،"
       headers: 
@@ -6772,7 +6830,9 @@ ar:
       percent: "في المائة"
       print_grades: "طباعة الدرجات"
       see_rubric_results: "عرض نتائج العنوان"
+      see_rubric_results_screenreader: "عرض نتائج العنوان"
       see_scoring_details: "عرض تفاصيل الدرجات"
+      see_scoring_details_screenreader: "عرض تفاصيل الدرجات"
       see_turnitin_results: "عرض نتائج Turnitin"
       student_mute_legend: "يعمل المعلم في حساب الدرجات. بينما يعمل المعلم في حساب الدرجات، لا تكون معلومات الدرجات والتعليقات متاحة."
       student_mute_notification: "يعمل المعلم في حساب الدرجات"
@@ -6782,7 +6842,6 @@ ar:
         turnitin_score: "رصد التشابه حسب Turnitin - مزيد من المعلومات"
         view_rubric_evaluation: "عرض تقييم العنوان"
         view_scoring_details: "عرض تفاصيل الدرجات"
-      view_comments: "عرض تفاصيل التعليقات والدرجات"
     gradebook: 
       all_sections: الكل
       assignment_submitted_late: (متأخر)
@@ -7091,7 +7150,6 @@ ar:
     name_required: "الاسم مطلوب"
     name_too_long: "أدخل اسمًا أقل طولاً للمجموعة"
     tabs: 
-      chat: الدردشة
       discussions: المناقشات
       files: الملفات
       home: البداية
@@ -7180,7 +7238,7 @@ ar:
         two: "%{count} من الطلاب"
         zero: "%{count} من الطلاب"
       warnings: 
-        studend_groups: "يتم تنظيم هذه المجموعات ذاتيًا بواسطة الطلاب. وعلى عكس أنواع المجموعات الأخرى، يستطيع الطلاب أن ينضموا إلى أكثر من واحدة من هذه المجموعات في المرة، لذلك فربما لا تكون هذه المجموعات هي الحل الأفضل للمهام التي تم تقييم درجاتها."
+        studend_groups: "يتم تنظيم هذه المجموعات ذاتيًا بواسطة الطلاب. وعلى عكس أنواع المجموعات الأخرى، يستطيع الطلاب أن ينضموا إلى أكثر من واحدة من هذه المجموعات في المرة، لذلك لا يمكن استخدام هذه المجموعات للمهام التي تم تقييم درجاتها."
     confirm: 
       assign_students: "سيقوم هذا الإجراء عشوائيًا بتعيين كافة الطلاب غير المعينين بالتساوي بقدر الإمكان على مجموعات الطلاب الموجودة."
       delete_group: "هل ترغب بالتأكيد في حذف هذه المجموعة؟"
@@ -7316,6 +7374,7 @@ ar:
       group_category: 
         randomly_assigning_students: "تعيين الطلاب عشوائيًا"
         search_groups: "بحث عن مجموعات"
+        search_users: "البحث عن مستخدمين"
       group_category_create: 
         allow_self_signup: "السماح بالتسجيل الذاتي"
         cancel: إلغاء
@@ -7340,7 +7399,7 @@ ar:
         message_all_unassigned_option: "إرسال رسائل إلى كل الطلاب غير المعينين"
         randomly_assign_students_option: "تعيين الطلاب عشوائيًا"
         restricted_self_signup_blurb: "يلزم وجود كافة الطلاب الموجودين في المجموعة في نفس القسم."
-        self_organized_warning: "يتم تنظيم هذه المجموعات ذاتيًا بواسطة الطلاب. وعلى عكس أنواع المجموعات الأخرى، يستطيع الطلاب أن ينضموا إلى أكثر من مجموعة واحدة من هذه المجموعات في كل مرة، لذلك فربما لا تكون هذه المجموعات هي الحل الأفضل للمهام التي تم تقييم درجاتها."
+        self_organized_warning: "يتم تنظيم هذه المجموعات ذاتيًا بواسطة الطلاب. وعلى عكس أنواع المجموعات الأخرى، يستطيع الطلاب أن ينضموا إلى أكثر من واحدة من هذه المجموعات في المرة، لذلك لا يمكن استخدام هذه المجموعات للمهام التي تم تقييم درجاتها."
         self_signup_blurb: "تم تمكين التسجيل الذاتي لهذه المجموعات."
         settings: إعدادات
       group_category_edit: 
@@ -7377,6 +7436,8 @@ ar:
         remove: إزالة
         remove_from_group: "إزالة %{name} من مجموعة"
       group_users: 
+        no_matching_students: "لا يوجد تطابق للطلاب."
+        no_matching_users: "لا يوجد تطابق للمستخدمين."
         no_students: "لا يوجد طلاب في هذه المجموعة حاليًا. أضف طلابًا حتى يمكن البدء."
         no_users: "لا يوجد مستخدمون في هذه المجموعة حاليًا. أضف مستخدمًا حتى يمكن البدء."
       groups: 
@@ -7497,6 +7558,8 @@ ar:
         other: "*%{count}* من المناقشات"
         two: "*%{count}* من المناقشات"
         zero: "*%{count}* من المناقشات"
+  ic_actions: 
+    manage: إدارة
   images: 
     error_checking_color: "خطأ في التحقق من لون الصورة"
     invalid_background_color: "يجب أن يكون لون الصورة %{color}"
@@ -10596,16 +10659,6 @@ ar:
         minimum_rows_for_parallel: "أدنى حد من الصفوف في استيراد SIS قبل استخدام المعالجة المتوازية"
         parallelism: "عدد معالجات الوظيفة المراد استخدامها لمعالجة عمليات استيراد SIS على التوازي"
         queue_for_parallel_jobs: "قائمة انتظار الوظائف المراد استخدامها للوظائف المتوازية (فارغة افتراضيًا)"
-    tinychat: 
-      description: "غرفة دردشة Tinychat"
-      name: Tinychat
-    tinychat_settings: 
-      description: |-
-          سيلزمك تسجيل [تطبيق جديد على Tinychat](%{tinychat_url}).
-          قم بتدوين ملاحظة عن المفتاح العمومي للتطبيق وقيم المفتاح السري.
-      labels: 
-        api_key: "المفتاح العمومي"
-        secret_key: "المفتاح السري"
     twitter: 
       description: "إعلامات Twitter"
       name: Twitter
@@ -11055,6 +11108,7 @@ ar:
     login: 
       invalid_login: "تسجيل دخول غير صالح"
       invalid_password: "كلمة مرور غير صالحة"
+      parent_signup: "تسجيل ولي الأمر"
       password_confirmation_sent: "تم إرسال تأكيد كلمة المرور إلى %{email_address}. وتأكد من مراجعة صندوق البريد العشوائي ربما يصل البريد هناك."
     notices: 
       account_registered: "تم تسجيل الحساب!"
@@ -11071,10 +11125,18 @@ ar:
       publishing: "جارٍ النشر..."
       unpublish: "إلغاء النشر"
       unpublishing: "جارٍ إلغاء النشر..."
+  publish_icon_component: 
+    publish: نشر
+    publish_click: "تم النشر، انقر لإلغاء النشر"
+    unpublish: "إلغاء النشر"
+    unpublish_click: "لم يتم النشر، انقر للنشر"
   publishable: 
     cant_unpublish: "لا يمكن إلغاء النشر"
   publishableModuleItem: 
     disabled: "تم تعطيل النشر لهذا العنصر"
+    disabled_assignment: "لا يمكن إلغاء النشر في حالة وجود عمليات إرسال لطالب"
+    disabled_discussion_topic: "لا يمكن إلغاء النشر في حالة وجود عمليات إرسال لطالب"
+    disabled_quiz: "لا يمكن إلغاء النشر في حالة وجود عمليات إرسال لطالب"
   purchases: 
     new: 
       payment_info: "معلومات الدفع"
@@ -11398,6 +11460,9 @@ ar:
       no_more_attempts: "لا توجد محاولات متبقية للاختبار"
       no_possible_solution: "الرجاء إنشاء حل ممكن واحد على الأقل"
       quiz_deleted: "لقد تم حذف ذلك الاختبار"
+      quiz_score_not_a_number: "يجب أن تكون الدرجة رقمًا بين 0 و2,000,000,000."
+      quiz_score_too_long: "يجب أن تكون الدرجة أقل من 2,000,000,000."
+      quiz_score_too_short: "يجب أن تكون الدرجة أكبر من 0."
       quiz_update_failed: "فشل تحديث الاختبار"
       retrieving_filters_failed: "فشل استرداد عوامل التصفية"
     fabulous_quizzes: 
@@ -11817,6 +11882,7 @@ ar:
       show_correct_answers: "تمكين الطلاب من رؤية الإجابات الصحيحة"
       show_correct_answers_at: "إظهار الإجابات الصحيحة في"
       shuffle_answers: "تنظيم الإجابات"
+      students_cannot_view_responses_after_course_concludes: "لا يمكن للطلاب عرض إجابات الاختبار بعد ختام المساق"
       time_limit: "كم عدد الدقائق؟"
       titles: 
         click_to_select_filter: "انقر لتحديد عامل التصفية هذا"
@@ -12361,6 +12427,7 @@ ar:
       unpublished_changes: "*لقد أجريت تغييرات غير منشورة في هذا الاختبار.* ولن تظهر هذه التغييرات للطلاب حتى تقوم بنشر الاختبار أو تعيد نشره."
       unpublished_quiz: "*هذا الاختبار غير منشور* يمكن للمعلمين فقط مشاهدة هذا الاختبار حتى يتم نشره."
   quizzes_model: 
+    cant_unpublish_when_students_submit: "لا يمكن إلغاء النشر في حالة وجود عمليات إرسال لطالب"
     confirms: 
       delete_quiz: "هل ترغب بالتأكيد في حذف هذا الاختبار؟"
     delete_quiz: "حذف الاختبار"
@@ -12551,6 +12618,9 @@ ar:
   roster: 
     delete_confirm: "هل ترغب بالتأكيد في إزالة هذه المستخدم؟"
     error_sending_invitations: "حدث خطأ في إرسال الدعوة.  يرجى المحاولة مرة أخرى."
+    filter_multiple_users_found: "تم العثور على %{userCount} من المستخدمين."
+    filter_no_users_found: "لم يتم العثور على تطابق للمستخدمين."
+    filter_one_user_found: "تم العثور على 1 من المستخدمين."
     flash: 
       removeError: "غير قادر على إزالة المستخدم. الرجاء إعادة المحاولة مرة أخرى."
       removed: "تمت إزالة المستخدم بنجاح."
@@ -13049,6 +13119,7 @@ ar:
       back_to_login: "عودة إلى تسجيل الدخول"
       buttons: 
         request_password: "طلب كلمة المرور"
+      coenrollment_banner: "*هل أنت ولي أمر أحد مستخدمي Canvas؟* **انقر هنا للحصول على حساب**"
       default_login_message: "تسجيل الدخول إلى المؤسسة"
       dont_know_password: "لا أعرف كلمة مروري"
       labels: 
@@ -13506,11 +13577,21 @@ ar:
       loading: "جارٍ التحميل..."
     titles: 
       value_over_time: "%{value} بمرور الوقت"
+    user_search: 
+      find_user_by: "العثور على مستخدم حسب تسجيل الدخول/البريد الإلكتروني"
+      find_user_by_label: "تسجيل الدخول/البريد الإلكتروني"
+    users: 
+      user_search_label: "البحث عن مستخدم"
+      users_matching_label: "مطابقة المستخدمين"
   slideshow: 
     titles: 
       back: عودة
       close: إغلاق
       forward: "إعادة توجيه"
+  sr_gradebook: 
+    all_sections: "كل الأقسام"
+    no_assignment: "لم يتم اختيار مهمة"
+    no_student: "لم يتم اختيار أي طالب"
   statistics: 
     csv_columns: 
       attempt: المحاولة
@@ -13630,7 +13711,7 @@ ar:
         save_comment: "حفظ التعليق"
       crumbs: 
         assignments: المهام
-      hide_rubric_button: "إخفاء زر العنوان"
+      hide_rubric_button: "إخفاء عنوان"
       labels: 
         add_a_comment: "إضافة تعليق"
         grade: الدرجة
@@ -13706,7 +13787,6 @@ ar:
   tabs: 
     announcements: الإعلانات
     assignments: المهام
-    chat: الدردشة
     collaborations: "الأعمال الجماعية"
     conferences: المؤتمرات
     discussions: المناقشات
@@ -14259,6 +14339,8 @@ ar:
       resending: "جارٍ إعادة الإرسال..."
       sent_email_paragraph: "أرسلنا بريدًا إلكترونيًا إلى %{email_address}. *انقر فوق الارتباط الموجود في البريد الإلكتروني لإنهاء التسجيل*. وإذا كنت لا تراه، **فانقر لإعادة إرسال البريد الإلكتروني**، وتأكد من مراجعة مربع البريد العشوائي كل حين."
       while_you_wait: "بينما أنت في وضع الانتظار..."
+    scheduled_conference: 
+      current_conference_text: "لقد تمت دعوتك للانضمام إلى %{conference}. وهو يبدأ في %{starts_at}."
     service_not_enabled: "لم يتم تمكين تلك الخدمة"
     show: 
       accounts: الحسابات

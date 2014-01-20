@@ -43,6 +43,16 @@ class PseudonymSession < Authlogic::Session::Base
     @valid_basic_auth
   end
 
+  unless CANVAS_RAILS2
+    # In authlogic 3.2.0, it tries to parse the last part of the cookie (delimited by '::')
+    # as a timestamp to verify whether the cookie is stale.
+    # This conflicts with the uuid that we use instead in that place,
+    # so skip that check for now, to keep behavior similar between Rails 2 and 3.
+    def remember_me_expired?
+      false
+    end
+  end
+
   # modifications to authlogic's cookie persistence (used for the "remember me" token)
   # see the SessionPersistenceToken class for details
   #

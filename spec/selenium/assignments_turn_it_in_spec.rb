@@ -49,7 +49,8 @@ describe "assignments turn it in" do
         'exclude_biblio' => '0',
         'exclude_quoted' => '0',
         'exclude_type' => '1',
-        'exclude_value' => '5'
+        'exclude_value' => '5',
+        's_view_report' => '1'
     }
   end
 

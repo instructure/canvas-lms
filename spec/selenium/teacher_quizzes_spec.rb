@@ -345,6 +345,7 @@ describe "quizzes" do
         wait_for_ajaximations
         error_displayed?.should be_true
         input.send_keys(:tab)
+        wait_for_ajaximations
         input[:value].should be_blank
 
         input.click
@@ -371,7 +372,7 @@ describe "quizzes" do
         in_frame f('.essay_question iframe')[:id] do
           f('#tinymce').send_keys :shift # no content, but it gives the iframe focus
         end
-        wait_for_ajax_requests
+        wait_for_ajaximations
         ff('#question_list .answered').size.should == 1
         input.should have_attribute(:value, "1.0000")
       end

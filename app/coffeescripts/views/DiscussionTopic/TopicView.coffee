@@ -161,6 +161,7 @@ define [
       if ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
         modelData = @model.toJSON()
         modelData.showBoxReplyLink = true
+        modelData.root = true
         html = replyTemplate modelData
         @$('#discussion_topic').append html
       super

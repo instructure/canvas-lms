@@ -72,15 +72,15 @@ describe Notification do
 
   context "by_name" do
     before do
-      Notification.create(:name => "foo")
-      Notification.create(:name => "bar")
+      @foo = Notification.create(:name => "foo")
+      @bar = Notification.create(:name => "bar")
     end
 
     it "should look up all notifications once and cache them thereafter" do
-      notifications = Notification.all
-      Notification.expects(:all).once.returns { notifications }
-      Notification.by_name("foo").should eql(Notification.find_by_name("foo"))
-      Notification.by_name("bar").should eql(Notification.find_by_name("bar"))
+      Notification.all
+      Notification.expects(:connection).never
+      Notification.by_name("foo").should eql(@foo)
+      Notification.by_name("bar").should eql(@bar)
     end
 
     it "should give you different object for the same notification" do

@@ -76,7 +76,8 @@ class GradebooksController < ApplicationController
 
   def light_weight_ags_json(assignment_groups)
     assignment_groups.map do |ag|
-      assignments = ag.active_assignments.map do |a|
+      assignment_scope = AssignmentGroup.assignment_scope_for_grading(@context)
+      assignments = ag.send(assignment_scope).map do |a|
         {
           :id => a.id,
           :submission_types => a.submission_types_array,
@@ -237,13 +238,13 @@ class GradebooksController < ApplicationController
         # (in this case, the worst part was the assignment 'description' which could be a massive wikipage)
 
         assignment_fields = ["id", "title", "due_at", "unlock_at", "lock_at",
-          "points_possible", "min_score", "max_score",
-          "mastery_score", "grading_type", "submission_types",
+          "points_possible", "grading_type", "submission_types",
           "assignment_group_id", "grading_scheme_id",
           "grading_standard_id", "grade_group_students_individually"].map do |field|
             "assignments.#{field}"
         end
-        render :json => @context.assignments.active.gradeable.
+        workflow_scope = @context.feature_enabled?(:draft_state) ? :published : :active
+        render :json => @context.assignments.send(workflow_scope).gradeable.
           select(assignment_fields + ["group_categories.name as group_category", "quizzes.id as quiz_id"]).
           joins("LEFT OUTER JOIN group_categories ON group_categories.id=assignments.group_category_id").
           joins("LEFT OUTER JOIN quizzes on quizzes.assignment_id=assignments.id") + groups_as_assignments
@@ -508,8 +509,12 @@ class GradebooksController < ApplicationController
 
 
   def assignment_groups_json
-    @context.assignment_groups.active.map { |g|
-      assignment_group_json(g, @current_user, session, ['assignments'], {stringify_json_ids: stringify_json_ids?})
+    assignment_scope = AssignmentGroup.assignment_scope_for_grading(@context)
+    @context.assignment_groups.active.includes(assignment_scope).map { |g|
+      assignment_group_json(g, @current_user, session, ['assignments'], {
+        stringify_json_ids: stringify_json_ids?,
+        assignment_group_assignment_scope: assignment_scope
+      })
     }
   end
 end

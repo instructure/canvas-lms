@@ -28,7 +28,15 @@
 #     * have a master auditor that fails jobs if a whole pool dies
 #     * audit strands ocasionally, look for any stuck strands where the strand queue isn't empty but there's no strand job running or queued
 module Delayed::Backend::Redis
-class Job < ActiveRecord::Base
+if CANVAS_RAILS2
+  class Job < ActiveRecord::Base; end
+end
+
+class Job
+  unless CANVAS_RAILS2
+    extend ActiveModel::Callbacks
+    define_model_callbacks :create
+  end
   include Delayed::Backend::Base
   # This redis instance needs to be set by the application during jobs configuration
   cattr_accessor :redis

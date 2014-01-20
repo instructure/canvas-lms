@@ -953,7 +953,7 @@ describe "context_modules" do
       @student_enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
       @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1')
-      @due_at = 3.days.from_now
+      @due_at = 1.year.from_now
       override_for_student(@student, @due_at)
 
       course_module
@@ -983,7 +983,7 @@ describe "context_modules" do
 
       wait_for_ajaximations
       f(".due_date_display").text.should_not be_blank
-      f(".due_date_display").text.should == @due_at.strftime('%b %-d')
+      f(".due_date_display").text.should == @due_at.strftime('%b %-d, %Y')
     end
 
     it "when not associated, and in multiple sections, it should show the latest due date" do
@@ -1004,7 +1004,7 @@ describe "context_modules" do
 
       wait_for_ajaximations
       f(".due_date_display").text.should_not be_blank
-      f(".due_date_display").text.should == @due_at.strftime('%b %-d')
+      f(".due_date_display").text.should == @due_at.strftime('%b %-d, %Y')
     end
 
     it "when associated with a student, it should show the student's overridden due date" do

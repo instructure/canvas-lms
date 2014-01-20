@@ -974,7 +974,7 @@ define([
       lastField = $obj;
     });
     if (lastField) {lastField.focus();}
-    for(var idx in elementErrors) {
+    for(var idx=0, l=elementErrors.length; idx < l; idx++) {
       var $obj = elementErrors[idx][0];
       var msg = elementErrors[idx][1];
       hasErrors = true;

@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require [
+  'i18n!roster'
   'Backbone'
   'compiled/models/CreateUserList'
   'compiled/models/Role'
@@ -31,7 +32,7 @@ require [
   'compiled/views/courses/roster/RosterView'
   'compiled/views/courses/roster/ResendInvitationsView'
   'jquery'
-], ({Model}, CreateUserList, Role, CreateUsersView, RoleSelectView, rosterUsersTemplate, RosterUserCollection, RolesCollection, SectionCollection, InputFilterView, PaginatedCollectionView, RosterUserView, RosterView, ResendInvitationsView, $) ->
+], (I18n, {Model}, CreateUserList, Role, CreateUsersView, RoleSelectView, rosterUsersTemplate, RosterUserCollection, RolesCollection, SectionCollection, InputFilterView, PaginatedCollectionView, RosterUserView, RosterView, ResendInvitationsView, $) ->
 
   fetchOptions =
     include: ['avatar_url', 'enrollments', 'email', 'observed_users']
@@ -78,6 +79,18 @@ require [
     roles: ENV.ALL_ROLES
     permissions: ENV.permissions
     course: ENV.course
+    
+  users.once 'reset', ->
+    users.on 'reset', ->
+      numUsers = users.length
+      if numUsers is 0
+        msg = I18n.t "filter_no_users_found", "No matching users found."
+      else if numUsers is 1
+        msg = I18n.t "filter_one_user_found", "1 user found."
+      else
+        msg = I18n.t "filter_multiple_users_found", "%{userCount} users found.", userCount: numUsers
+      $('#aria_alerts').empty().text msg
+    
 
   @app.render()
   @app.$el.appendTo $('#content')

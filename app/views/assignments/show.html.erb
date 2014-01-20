@@ -58,7 +58,7 @@
         <span class='title'><%= t :points, 'Points' %></span>
         <span class='value'><%= @assignment.points_possible || t(:no_points, 'None') %></span>
       </li>
-      <% if @assignment.expects_submission? %>
+      <% if @assignment.expects_submission? || @assignment.expects_external_submission? %>
         <% turnitin_text = @assignment.turnitin_enabled? ? ' ' + t(:turnitin_enabled_short, '(Turnitin enabled)') : '' %>
         <li>
           <span class='title'><%= t :submitting, 'Submitting' %></span>

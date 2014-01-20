@@ -27,7 +27,7 @@ class User < ActiveRecord::Base
   include UserFollow::FollowedItem
 
   attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use, :self_enrollment_code, :initial_enrollment_type
-  attr_accessor :original_id, :menu_data
+  attr_accessor :previous_id, :menu_data
 
   before_save :infer_defaults
   serialize :preferences
@@ -1739,7 +1739,7 @@ class User < ActiveRecord::Base
         Shackles.activate(:slave) do
           submissions = []
           submissions += self.submissions.after(opts[:start_at]).for_context_codes(context_codes).
-            where("submissions.score IS NOT NULL AND assignments.workflow_state<>? AND assignments.muted=?", 'deleted', false).
+            where("submissions.score IS NOT NULL AND assignments.workflow_state=? AND assignments.muted=?", 'published', false).
             order('submissions.created_at DESC').
             limit(opts[:limit]).all
 
@@ -1756,9 +1756,9 @@ class User < ActiveRecord::Base
                   AND (submission_comments.author_id <> ?)
                 GROUP BY submission_id
               ) AS relevant_submission_comments ON submissions.id = submission_id
-              INNER JOIN assignments ON assignments.id = submissions.assignment_id AND assignments.workflow_state <> 'deleted'
+              INNER JOIN assignments ON assignments.id = submissions.assignment_id
             SQL
-            where(assignments: {muted: false}).
+            where(assignments: {muted: false, workflow_state: 'published'}).
             order('last_updated_at_from_db DESC').
             limit(opts[:limit]).all
 
@@ -1862,7 +1862,7 @@ class User < ActiveRecord::Base
     ev = CalendarEvent.active if !opts[:include_deleted_events]
     event_codes = context_codes + AppointmentGroup.manageable_by(self, context_codes).intersecting(opts[:start_at], opts[:end_at]).map(&:asset_string)
     events += ev.for_user_and_context_codes(self, event_codes, []).between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at])
-    events += Assignment.active.for_context_codes(context_codes).due_between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at]).with_just_calendar_attributes
+    events += Assignment.published.for_context_codes(context_codes).due_between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at]).with_just_calendar_attributes
     events.sort_by{|e| [e.start_at, Canvas::ICU.collation_key(e.title || SortFirst)] }.uniq
   end
 
@@ -1906,7 +1906,7 @@ class User < ActiveRecord::Base
 
     undated_events = []
     undated_events += CalendarEvent.active.for_user_and_context_codes(self, context_codes, []).undated.updated_after(opts[:updated_at])
-    undated_events += Assignment.active.for_context_codes(context_codes).undated.updated_after(opts[:updated_at]).with_just_calendar_attributes
+    undated_events += Assignment.published.for_context_codes(context_codes).undated.updated_after(opts[:updated_at]).with_just_calendar_attributes
     Canvas::ICU.collate_by(undated_events, &:title)
   end
 

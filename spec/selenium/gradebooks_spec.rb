@@ -65,6 +65,7 @@ describe "gradebook1" do
     click_option("#section-to-show", section_name)
     driver.execute_script("$('#section-to-show').parent().parent().find('button').click()")
     wait_for_ajaximations
+    sleep 2
   end
 
   it "should filter by section" do

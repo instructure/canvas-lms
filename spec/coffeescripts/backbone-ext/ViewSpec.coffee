@@ -100,25 +100,25 @@ define ['Backbone', 'compiled/util/mixin'], ({View}, mixing) ->
 
   test 'toJSON', ->
     view = new Backbone.View foo: 'bar'
-    expected = foo: 'bar', cid: view.cid
+    expected = foo: 'bar', cid: view.cid, ENV: ENV
     deepEqual expected, view.toJSON(), 'returns options'
 
     collection = new Backbone.Collection
     collection.toJSON = -> foo: 'bar'
     view = new Backbone.View {collection}
-    expected = foo: 'bar', cid: view.cid
+    expected = foo: 'bar', cid: view.cid, ENV: ENV
     deepEqual expected, view.toJSON(), 'uses @collection.toJSON'
     collection.present = -> foo: 'baz'
-    expected = foo: 'baz', cid: view.cid
+    expected = foo: 'baz', cid: view.cid, ENV: ENV
     deepEqual expected, view.toJSON(), 'uses @collection.present over toJSON'
 
     model = new Backbone.Model
     model.toJSON = -> foo: 'qux'
     view.model = model
-    expected = foo: 'qux', cid: view.cid
+    expected = foo: 'qux', cid: view.cid, ENV: ENV
     deepEqual expected, view.toJSON(), 'uses @model.toJSON over @collection'
     model.present = -> foo: 'quux'
-    expected = foo: 'quux', cid: view.cid
+    expected = foo: 'quux', cid: view.cid, ENV: ENV
     deepEqual expected, view.toJSON(), 'uses @model.present over toJSON'
 
   test 'View.mixin', 3, ->
