@@ -43,7 +43,8 @@ module DataFixup::ReassociateConversationAttachments
         WHERE author_id IS NOT NULL
       SQL
       cmas = conn.select_all("SELECT * FROM _conversation_message_attachments WHERE author_id IS NOT NULL")
-      conn.execute "DROP TABLE _conversation_message_attachments"
+      temp = " TEMPORARY" if ['MySQL', 'Mysql2'].include?(conn.adapter_name)
+      conn.execute "DROP#{temp} TABLE _conversation_message_attachments"
     end
 
     cmas.group_by{ |r| r['conversation_message_id'] }.each_slice(1000) do |groups|
