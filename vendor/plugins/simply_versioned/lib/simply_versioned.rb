@@ -72,7 +72,7 @@ module SoftwareHeretics
                    :inverse_of => :versionable, :extend => VersionsProxyMethods
           # INSTRUCTURE: Added to allow quick access to the most recent version
           # See 'current_version' below for the common use of current_version_unidirectional
-          has_one :current_version_unidirectional, :class_name => 'Version', :order => 'number DESC', :as => :versionable, :dependent => :destroy, :extend => VersionsProxyMethods
+          has_one :current_version_unidirectional, :class_name => 'Version', :order => 'number DESC', :as => :versionable, :dependent => :destroy
           # INSTRUCTURE: Lets us ignore certain things when deciding whether to store a new version
           before_save :check_if_changes_are_worth_versioning
           after_save :simply_versioned_create_version
