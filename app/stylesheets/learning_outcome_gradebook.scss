@@ -147,6 +147,16 @@ $page-dark: #ebeff2;
     background: none;
   }
 
+  .slick-sort-indicator {
+    display: none;
+  }
+
+  .slick-header-column-sorted, .slick-header-column-sorted:hover {
+    background: #fff;
+    font-style: normal;
+    font-weight: bold;
+  }
+
   .slick-header-column:hover .slick-resizable-handle {
     background-color: $border-light;
   }
