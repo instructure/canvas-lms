@@ -1623,7 +1623,7 @@ class Course < ActiveRecord::Base
     else
       asset.ignores.where(:purpose => 'grading', :permanent => false).delete_all
     end
-    instructors.each(&:touch)
+    instructors.order(:id).each(&:touch)
   end
 
   def grading_standard_enabled
