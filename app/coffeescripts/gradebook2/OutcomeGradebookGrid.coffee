@@ -223,10 +223,20 @@ define [
       #
       # Returns cell HTML.
       cell: (row, cell, value, columnDef, dataContext) ->
+        Grid.View.cellHtml(value, columnDef, true)
+
+      # Internal: Determine HTML for a cell.
+      #
+      # value - The proposed value for the cell
+      # columnDef - The object for the current column
+      # applyFilter - Wheter filtering should be applied
+      #
+      # Returns cell HTML
+      cellHtml: (value, columnDef, shouldFilter) ->
         outcome     = Grid.Util.lookupOutcome(columnDef.field)
         return unless outcome and !(_.isNull(value) or _.isUndefined(value))
         className   = Grid.View.masteryClassName(value, outcome)
-        return '' unless _.include(Grid.filter, className)
+        return '' if shouldFilter and !_.include(Grid.filter, className)
         cellTemplate(score: value, className: className, masteryScore: outcome.mastery_points)
 
       studentCell: (row, cell, value, columnDef, dataContext) ->
@@ -257,7 +267,7 @@ define [
         results = Grid.View.getColumnResults(grid.getData(), column)
         return $(node).empty() unless results.length
         value = Grid.Math[fn].call(this, (results))
-        $(node).empty().append(Grid.View.cell(null, null, value, column, null))
+        $(node).empty().append(Grid.View.cellHtml(value, column, false))
 
       redrawHeader: (grid, fn = Grid.averageFn) ->
         header = grid.getHeaderRow().childNodes
