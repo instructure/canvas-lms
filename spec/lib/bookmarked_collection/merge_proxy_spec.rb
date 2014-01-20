@@ -164,8 +164,8 @@ describe "BookmarkedCollection::MergeProxy" do
         @domain_root_account = Account.create!
 
         @courses = 6.times.map{ @domain_root_account.courses.create! }
-        @scope1 = @domain_root_account.courses.select("id, '1' as scope").where("id<?", @courses[4].id)
-        @scope2 = @domain_root_account.courses.select("id, '2' as scope").where("id>?", @courses[1].id)
+        @scope1 = @domain_root_account.courses.select("id, '1' as scope").where("id<?", @courses[4].id).order(:id)
+        @scope2 = @domain_root_account.courses.select("id, '2' as scope").where("id>?", @courses[1].id).order(:id)
 
         @collection1 = BookmarkedCollection.wrap(MyBookmarker, @scope1)
         @collection2 = BookmarkedCollection.wrap(MyBookmarker, @scope2)
