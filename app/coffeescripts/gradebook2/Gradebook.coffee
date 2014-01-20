@@ -53,7 +53,7 @@ define [
 
     DISPLAY_PRECISION = 2
 
-    numberOfFrozenCols: 2
+    numberOfFrozenCols: 3 # SFU MOD - CANVAS-188 Add extra column for SIS ID
 
     constructor: (@options) ->
       @chunk_start = 0
@@ -881,8 +881,9 @@ define [
         field: 'sis_id'
         width: 100
         cssClass: "meta-cell secondary_identifier_cell"
-        resizable: false
+        resizable: true
         sortable: true
+        formatter: @htmlContentFormatter
       }]
       # END SFU MOD
 
@@ -1010,7 +1011,9 @@ define [
           bScore = -99999999999 if not bScore and bScore != 0
           if data.sortAsc then bScore - aScore else aScore - bScore
       @grid.onSort.subscribe (event, data) =>
-        propertyToSortBy = {display_name: 'sortable_name', secondary_identifier: 'secondary_identifier'}[data.sortCol.field]
+        # SFU MOD CANVAS-188 Make SIS ID column sortable
+        propertyToSortBy = {display_name: 'sortable_name', secondary_identifier: 'secondary_identifier', sis_id: 'sis_id'}[data.sortCol.field]
+        # END SFU MOD
         sortRowsBy (a, b) ->
           res = if a[propertyToSortBy] < b[propertyToSortBy] then -1
           else if a[propertyToSortBy] > b[propertyToSortBy] then 1
