@@ -1754,6 +1754,29 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
 
 end
 
+unless CANVAS_RAILS2
+  ActiveRecord::AttributeMethods::Serialization::Attribute.class_eval do
+    def unserialize
+      self.state = :unserialized
+      if value.nil?
+        nil
+      else
+        self.value = coder.load(value)
+      end
+    end
+
+    def serialized_value
+      return nil if value.nil?
+      unserialize if state == :serialized
+      coder.dump(value)
+    end
+
+    def serialize
+      serialized_value
+    end
+  end
+end
+
 if Rails.version >= '3' && Rails.version < '4'
   ActiveRecord::Sanitization::ClassMethods.module_eval do
     def quote_bound_value_with_relations(value, c = connection)
