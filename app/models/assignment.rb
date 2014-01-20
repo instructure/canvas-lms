@@ -1399,7 +1399,7 @@ class Assignment < ActiveRecord::Base
   def peer_reviews_to_csv
     # Don't generate it if the assignment has no peer reviews
     return unless self.has_peer_reviews?
-    peer_reviews = self.rubric_association.rubric_assessments.includes(:user).order("users.sortable_name ASC")
+    peer_reviews = self.rubric_association.rubric_assessments.includes(:user).order("users.sortable_name ASC, score ASC")
     # TODO: it would be better to eager load the artifact, but it can't seem possible to eager load a polymorphic association.
     # So I used the same method as the one used in the peer_reviews.html.erb view to prevent a N+1 request.
     submissions  = self.submissions.select([:id, :user_id, :score]).to_a
@@ -1409,43 +1409,30 @@ class Assignment < ActiveRecord::Base
     
     res = CSV.generate do |csv|
       # Header
-      row = ["Student", "Student ID", "Submission ID"]
+      row = ["Student", "Student ID", "Submission ID", "Current grade"]
       for i in 1..max_reviews
         row << "Grade #{i}"
         row << "Peer ID"
       end
-      row << "Current grade"
       csv << row
       
-      user_id = 0
-      row = []
+      user_row = []
       reviews_number = peer_reviews.length
       
-      peer_reviews.each_with_index do |peer_review, index|
-        # Group score and assessor id by student id
-        if peer_review.user_id != user_id
-          # Get some records
-          user_id = peer_review.user_id
-          student = peer_review.user
-          submission = submissions.find{|s| s.user_id == user_id}
-          submission_id = submission.id
-          current_score = submission.score || "-"
-          # Put the previous row in the csv by skipping the empty ones
-          unless row.empty?
-            row << current_score
-            csv << row
-          end
-          # Create the new row
-          row = [student.last_name_first.gsub(",", ""), user_id, submission_id]
+      # Grouping peer reviews by user id will ease the generation of the CSV
+      peer_reviews.group_by{|pr| pr.user_id}.each do |user_id, reviews|
+        # Get the student, his submission and current score
+        student     = reviews.first.user
+        submission  = submissions.find{|s| s.user_id == user_id}
+        current_score = submission.score || "-"
+        # Fill in the first columns of the csv row
+        user_row    = [student.last_name_first.gsub(",", ""), user_id, submission.id, current_score]
+        # Go through all reviews for each user to grab his scores and assessors' id 
+        reviews.each do |review|
+          user_row << review.score
+          user_row << review.assessor_id
         end
-        row << peer_review.score
-        row << peer_review.assessor_id
-        # Grap the last line
-        if index == reviews_number - 1
-          submission = submissions.find{|s| s.user_id == user_id}
-          row << submission.score || "-"
-          csv << row
-        end
+        csv << user_row
       end
     end
   end
