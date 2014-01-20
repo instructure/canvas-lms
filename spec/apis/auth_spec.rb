@@ -246,6 +246,7 @@ describe "API Authentication", :type => :integration do
       end
 
       it "should execute for saml login" do
+        pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
         Setting.set_config("saml", {})
         account = account_with_saml(:account => Account.default)
         flow do
