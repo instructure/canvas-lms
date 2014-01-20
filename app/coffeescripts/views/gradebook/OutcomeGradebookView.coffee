@@ -58,6 +58,14 @@ define [
       view.on('togglestate', @_createFilter(name)) for name, view of @checkboxes
       $.subscribe('currentSection/change', Grid.Events.sectionChangeFunction(@grid))
 
+    # Internal: Listen for events on grid.
+    #
+    # Returns nothing.
+    _attachGridEvents: ->
+      @grid.onHeaderRowCellRendered.subscribe(Grid.Events.headerRowCellRendered)
+      @grid.onHeaderCellRendered.subscribe(Grid.Events.headerCellRendered)
+      @grid.onSort.subscribe(Grid.Events.sort)
+
     # Public: Create object to be passed to the view.
     #
     # Returns an object.
@@ -88,19 +96,47 @@ define [
         rows,
         columns,
         Grid.options)
-      @grid.onHeaderRowCellRendered.subscribe(Grid.Events.headerRowCellRendered)
-      @grid.onHeaderCellRendered.subscribe(Grid.Events.headerCellRendered)
+      @_attachGridEvents()
       @grid.init()
       Grid.Events.init(@grid)
       @_attachEvents()
 
-    # Public: Pass outcomes from outcome rollup API to the view.
-    #
-    # outcomeResponse - The JSON response from Canvas.
+    # Public: Load all outcome results from API.
     #
     # Returns nothing.
-    loadOutcomes: (outcomeResponse) ->
-      @hasOutcomes.resolve(outcomeResponse)
+    loadOutcomes: () ->
+      course = ENV.context_asset_string.split('_')[1]
+      @$('.outcome-gradebook-wrapper').disableWhileLoading(@hasOutcomes)
+      @_loadPage("/api/v1/courses/#{course}/outcome_rollups?per_page=100")
+
+    # Internal: Load a page of outcome results from the given URL.
+    #
+    # url - The URL to load results from.
+    # outcomes - An existing response from the API.
+    #
+    # Returns nothing.
+    _loadPage: (url, outcomes) ->
+      dfd  = $.getJSON(url)
+      dfd.then (response, status, xhr) =>
+        outcomes = @_mergeResponses(outcomes, response)
+        if response.meta.pagination.next
+          @_loadPage(response.meta.pagination.next, outcomes)
+        else
+          @hasOutcomes.resolve(outcomes)
+
+    # Internal: Merge two API responses into one.
+    #
+    # a - The first API response received.
+    # b - The second API response received.
+    #
+    # Returns nothing.
+    _mergeResponses: (a, b) ->
+      return b unless a
+      response = {}
+      response.meta    = _.extend({}, a.meta, b.meta)
+      response.linked  = { outcomes: a.linked.outcomes, users: a.linked.users.concat(b.linked.users) }
+      response.rollups = a.rollups.concat(b.rollups)
+      response
 
     # Internal: Initialize the child SectionMenuView. This happens here because
     #   the menu needs to wait for relevant course sections to load.

@@ -289,6 +289,7 @@ class OutcomeResultsController < ApplicationController
       @users = @section.students
     end
     @users ||= users_for_outcome_context
+    @users = @users.order(:id)
   end
 
   # Internal: Gets a list of users that should have results returned based on
