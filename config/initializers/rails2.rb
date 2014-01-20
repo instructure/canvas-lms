@@ -216,6 +216,17 @@ ActiveRecord::NamedScope::Scope.class_eval do
     # no, it's not a freaking Hash, and don't instantiate a gazillion things to find that out
     super || klass >= Array
   end
+
+  remove_method :respond_to_missing?
+#  def respond_to_missing?(method, include_super)
+#    return super if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(method)
+#    super || @proxy_scope.respond_to_missing?(method, include_super)
+#  end
+
+#  def respond_to?(method, include_private = false)
+#    return super if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(method)
+#    super || @proxy_scope.respond_to?(method, include_private)
+#  end
 end
 
 ActiveRecord::Associations::AssociationCollection.class_eval do
