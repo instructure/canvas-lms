@@ -60,10 +60,66 @@ define [
           Grid.View.redrawHeader(grid)
           grid.invalidate()
 
+      # Public: Sort and rerender the grid.
+      #
+      # e - jQuery event object.
+      # grid - SlickGrid instance.
+      # sortAsc - Boolean to determine if sort is ascending or descending.
+      # sortCol - The column object to sort on.
+      #
+      # Returns nothing.
+      sort: (e, {grid, sortAsc, sortCol}) ->
+        sortFn = if sortCol.field == 'student' then '_sortStudents' else '_sortResults'
+        rows = grid.getData().sort((a, b) -> Grid.Events[sortFn].call(null, a, b, sortAsc, sortCol.field))
+        grid.setData(rows)
+        grid.invalidate()
+
+      # Internal: Sort the grid by student names.
+      #
+      # a - Object to sort.
+      # b - Object to compare a against.
+      # sortAsc - Boolean to determine if the sort is ascending or descending.
+      #
+      # Returns a number used to sort with.
+      _sortStudents: (a, b, sortAsc) ->
+        if ''.localeCompare
+          nameA = a.student.sortable_name
+          nameB = b.student.sortable_name
+          n     = if sortAsc then 1 else -1
+          nameA.localeCompare(nameB, window.I18n.locale, sensitivity: 'accent', ignorePunctuation: true, numeric: true) * n
+        else
+          nameA = a.student.sortable_name.toLowerCase()
+          nameB = b.student.sortable_name.toLowerCase()
+          f     = if sortAsc then 1 else -1
+          if nameA < nameB
+            -1 * f
+          else if nameB < nameA
+            1 * f
+          else
+            0
+
+      # Internal: Sort the grid by outcome result.
+      #
+      # a - Object to sort.
+      # b - Object to compare a against.
+      # sortAsc - Boolean to determine if the sort is ascending or descending.
+      # field - The name of the field to sort on (e.g. "outcome_6").
+      #
+      # Returns a number used to sort with.
+      _sortResults: (a, b, sortAsc, field) ->
+        scoreA = a[field] or 0
+        scoreB = b[field] or 0
+        val = if sortAsc then scoreA - scoreB else scoreB - scoreA
+        if val == 0
+          Grid.Events._sortStudents(a, b, sortAsc)
+        else
+          val
+
     Util:
       COLUMN_OPTIONS:
-        width: 121
-        minWidth: 50
+        width    : 121
+        minWidth : 50
+        sortable : true
 
       # Public: Translate an API response to columns and rows that can be used by SlickGrid.
       #
