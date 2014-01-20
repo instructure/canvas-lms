@@ -61,88 +61,48 @@
   </div>
 </div>
 
-<div id="grading_type_selector" class="control-group"></div>
-
-<div style="{{hiddenUnless isSimple}}" id="assignment_due_date_controls">
-  <div class="form-column-left no-group">
-    <label for="assignment_due_date">
-      {{#t "due_date"}}Due Date{{/t}}
-    </label>
-  </div>
-  <div class="form-column-right">
-    <div class="control-group">
-    <input id="assignment_due_date"
-    name="due_at"
-    value="{{datetimeFormatted dueAt}}"
-    type="text"
-    {{#if isSimple}}
-      class="date_field datetime_field hasDatePicker"
-    {{/if}}
-    {{disabledIfIncludes frozenAttributes "due_at"}}/>
-    </div>
-  </div>
-</div>
-
-<fieldset id="assignment_group_selector">
+<fieldset id="assignment_group_selector" class="control-group">
 </fieldset>
 
-{{#if isSimple}}
-<div class="form-controls">
-  <div class="controls">
-    <a href="#"
-      id="assignment_toggle_advanced_options"
-      aria-controls="advanced_assignment_options">
-      {{#t "show_advanced_options"}}Show Advanced Options{{/t}} ▼
-    </a>
-  </div>
+<div id="grading_type_selector"></div>
+
+<div id="graded_assignment_fields"
+  aria-expanded="{{not isNotGraded}}"
+  style="{{hiddenIf isNotGraded}}">
+
+  {{>[assignments/submission_types_form]}}
+
+  {{#unless isLargeRoster}}
+    <fieldset id="group_category_selector"
+      class="control-group"
+      style="{{hiddenIf isExternalTool}}">
+    </fieldset>
+  {{/unless}}
+
+  {{#unless isLargeRoster}}
+    <fieldset id="assignment_peer_reviews_fields"
+      class="control-group"
+      style="{{hiddenIf isExternalTool}}">
+    </fieldset>
+  {{/unless}}
+
 </div>
+
+{{#if canFreeze}}
+  <div class="form-column-left"></div>
+  <div class="form-column-right">
+    <fieldset>
+      <label class="checkbox">
+        {{checkbox "freezeOnCopy"
+          id="assignment_freeze_on_copy"
+          name="freeze_on_copy"}}
+          {{#t "freeze_properties"}}Lock assignment properties when copied{{/t}}
+      </label>
+    </fieldset>
+  </div>
 {{/if}}
 
-<div id="advanced_assignment_options"
-  aria-expanded="{{not isSimple}}"
-  class="advanced-togglable-{{isSimple}}"
-  style="{{hiddenIf isSimple}}">
-
-  <div id="graded_assignment_fields"
-    aria-expanded="{{not isNotGraded}}"
-    style="{{hiddenIf isNotGraded}}"
-    class="content-box">
-
-    {{>[assignments/submission_types_form]}}
-
-    {{#unless isLargeRoster}}
-      <fieldset id="group_category_selector"
-        class="control-group"
-        style="{{hiddenIf isExternalTool}}">
-      </fieldset>
-    {{/unless}}
-
-    {{#unless isLargeRoster}}
-      <fieldset id="assignment_peer_reviews_fields"
-        class="control-group"
-        style="{{hiddenIf isExternalTool}}">
-      </fieldset>
-    {{/unless}}
-
-  </div>
-
-  {{#if canFreeze}}
-    <div class="form-column-left"></div>
-    <div class="form-column-right">
-      <fieldset>
-        <label class="checkbox">
-          {{checkbox "freezeOnCopy"
-            id="assignment_freeze_on_copy"
-            name="freeze_on_copy"}}
-          {{#t "freeze_properties"}}Lock assignment properties when copied{{/t}}
-        </label>
-      </fieldset>
-    </div>
-  {{/if}}
-
-  <div class='js-assignment-overrides'></div>
-
-</div>
+<div class='js-assignment-overrides'></div>
 
 <div class="form-actions flush" style="padding-left: 10px;">
 

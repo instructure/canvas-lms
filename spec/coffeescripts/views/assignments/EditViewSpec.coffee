@@ -125,3 +125,4 @@ define [
   test 'does not warn if there are no submitted submissions', ->
     view = editView()
     checkWarning view, false
+

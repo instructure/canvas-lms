@@ -8,10 +8,6 @@ module AssignmentOverridesSeleniumHelper
     replace_content(f('#assignment_name'), title.to_s)
   end
 
-  def toggle_advanced_options
-    f('#assignment_toggle_advanced_options').click
-  end
-
   def fill_assignment_overrides
       f('.due-date-overrides [name="due_at"]').
         send_keys(due_at.strftime('%b %-d, %y'))
