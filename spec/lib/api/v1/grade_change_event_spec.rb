@@ -46,6 +46,8 @@ describe Api::V1::GradeChangeEvent do
   end
 
   before do
+    pending("needs auditors cassandra keyspace configured") unless Auditors::GradeChange::Stream.available?
+
     @request_id = UUIDSingleton.instance.generate
     RequestContextGenerator.stubs( :request_id => @request_id )
 

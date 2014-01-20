@@ -63,6 +63,7 @@ describe AccountAuthorizationConfig do
 
   context "SAML settings" do
     before(:each) do
+      pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
       @account = Account.create!(:name => "account")
       @file_that_exists = File.expand_path(__FILE__)
     end

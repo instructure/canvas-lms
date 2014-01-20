@@ -210,6 +210,10 @@ describe PseudonymSessionsController do
   end
 
   context "saml" do
+    before do
+      pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
+    end
+
     it "should scope logins to the correct domain root account" do
       Setting.set_config("saml", {})
       unique_id = 'foo@example.com'

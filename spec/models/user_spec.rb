@@ -1834,21 +1834,24 @@ describe User do
 
   describe "order_by_sortable_name" do
     it "should sort lexicographically" do
-      User.create!(:name => "John Johnson")
-      User.create!(:name => "John John")
-      User.order_by_sortable_name.all.map(&:sortable_name).should == ["John, John", "Johnson, John"]
+      ids = []
+      ids << User.create!(:name => "John Johnson")
+      ids << User.create!(:name => "John John")
+      User.order_by_sortable_name.where(id: ids).all.map(&:sortable_name).should == ["John, John", "Johnson, John"]
     end
 
     it "should sort support direction toggle" do
-      User.create!(:name => "John Johnson")
-      User.create!(:name => "John John")
-      User.order_by_sortable_name(:direction => :descending).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
+      ids = []
+      ids << User.create!(:name => "John Johnson")
+      ids << User.create!(:name => "John John")
+      User.order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
     end
 
     it "should sort support direction toggle with a prior select" do
-      User.create!(:name => "John Johnson")
-      User.create!(:name => "John John")
-      User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
+      ids = []
+      ids << User.create!(:name => "John Johnson")
+      ids << User.create!(:name => "John John")
+      User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
     end
 
     it "should sort by the current locale with pg_collkey if possible" do

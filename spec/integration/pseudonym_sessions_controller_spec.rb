@@ -186,6 +186,10 @@ describe PseudonymSessionsController do
   end
 
   context "SAML" do
+    before do
+      pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
+    end
+
     it 'redirects to the discovery page when hitting a deep link while unauthenticated' do
       account = account_with_saml( :account => Account.default )
       discovery_url = 'http://discovery-url.example.com'
