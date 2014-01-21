@@ -17,13 +17,38 @@
 #
 
 module Api::V1::QuizSubmissionQuestion
+  include Api::V1::QuizQuestion
 
-  def quiz_submission_questions_json(quiz_questions, submission_data)
-    {
-      quiz_submission_questions: quiz_questions.map do |qq|
-        quiz_submission_question_json(qq, submission_data)
-      end
-    }
+  Includables = %w[ quiz_question ]
+
+  # @param [Array<QuizQuestion>] quiz_questions
+  # @param [Hash] submission_data
+  # @param [Hash] meta
+  # @param [Array<String>] meta[:includes]
+  # @param [User] meta[:user]
+  # @param [Hash] meta[:session]
+  def quiz_submission_questions_json(quiz_questions, submission_data, meta = {})
+    quiz_questions = [ quiz_questions ] unless quiz_questions.kind_of?(Array)
+    includes = (meta[:includes] || []) & Includables
+
+    data = {}
+    data[:quiz_submission_questions] = quiz_questions.map do |qq|
+      quiz_submission_question_json(qq, submission_data)
+    end
+
+    if includes.include? 'quiz_question'
+      data[:quiz_questions] = questions_json(quiz_questions,
+        meta[:user],
+        meta[:session])
+    end
+
+    unless includes.empty?
+      data[:meta] = {
+        primaryCollection: 'quiz_submission_questions'
+      }
+    end
+
+    data
   end
 
   # A renderable version of a QuizQuestion's "answer" record in a submission's

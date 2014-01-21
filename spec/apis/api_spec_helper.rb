@@ -239,11 +239,13 @@ def assert_jsonapi_compliance(json, primary_set, associations = [])
     required_keys << 'meta'
   end
 
+  # test key values instead of nr. of keys so we get meaningful failures
+  json.keys.sort.should == required_keys.sort
+
   required_keys.each do |key|
     json.should be_has_key(key)
     json[key].is_a?(Array).should be_true unless key == 'meta'
   end
-  json.size.should == required_keys.size
 
   if associations.any?
     json['meta']['primaryCollection'].should == primary_set

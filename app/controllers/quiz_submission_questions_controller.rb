@@ -19,18 +19,91 @@
 # @API Quiz Submission Questions
 # @beta
 #
-
+# API for answering and flagging questions in a quiz-taking session.
+#
+# @model QuizSubmissionQuestion
+#     {
+#       "id": "QuizSubmissionQuestion",
+#       "required": ["id"],
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the QuizQuestion this answer is for.",
+#           "example": 1,
+#           "type": "integer",
+#           "format": "int64"
+#         },
+#         "flagged": {
+#           "description": "Whether this question is flagged.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "answer": {
+#           "description": "The provided answer (if any) for this question. The format of this parameter depends on the type of the question, see the Appendix for more information."
+#         }
+#       }
+#     }
+#
 class QuizSubmissionQuestionsController < ApplicationController
   include Api::V1::QuizSubmissionQuestion
   include Api::V1::Helpers::QuizzesApiHelper
   include Api::V1::Helpers::QuizSubmissionsApiHelper
 
-  before_filter :require_user,
-    :require_quiz_submission,
-    :export_scopes,
-    :prepare_service,
-    :validate_ldb_status!,
-    :require_question
+  before_filter :require_user, :require_quiz_submission, :export_scopes
+  before_filter :require_question, except: [ :index ]
+  before_filter :prepare_service, except: [ :index, :show ]
+  before_filter :validate_ldb_status!, except: [ :index, :show ]
+
+  # @API Get all quiz submission questions.
+  # @beta
+  #
+  # Get a list of all the question records for this quiz submission.
+  #
+  # @argument include[] [String, "quiz_question"]
+  #   Associations to include with the quiz submission question.
+  #
+  # <b>200 OK</b> response code is returned if the request was successful.
+  #
+  # @example_response
+  #  {
+  #    "quiz_submission_questions": [QuizSubmissionQuestion]
+  #  }
+  def index
+    if authorized_action(@quiz_submission, @current_user, :read)
+      render json: quiz_submission_questions_json(@quiz.quiz_questions,
+        @quiz_submission.submission_data,
+        {
+          user: @current_user,
+          session: session,
+          includes: extract_includes
+        })
+    end
+  end
+
+  # @API Get a single quiz submission question.
+  # @beta
+  #
+  # Get a single question record.
+  #
+  # @argument include[] [String, "quiz_question"]
+  #   Associations to include with the quiz submission question.
+  #
+  # <b>200 OK</b> response code is returned if the request was successful.
+  #
+  # @example_response
+  #  {
+  #    "quiz_submission_questions": [QuizSubmissionQuestion]
+  #  }
+  def show
+    if authorized_action(@quiz_submission, @current_user, :read)
+      render json: quiz_submission_questions_json(@question,
+        @quiz_submission.submission_data,
+        {
+          user: @current_user,
+          session: session,
+          includes: extract_includes
+        })
+    end
+  end
 
   # @API Answering a question.
   # @beta
@@ -189,6 +262,10 @@ class QuizSubmissionQuestionsController < ApplicationController
       params[:attempt],
       # we don't want a snapshot generated for each flagging action
       false)
+  end
+
+  def extract_includes(key = :include, hash = params)
+    Array(hash[key])
   end
 
   # @!appendix Question Answer Formats

@@ -37,6 +37,39 @@ describe QuizSubmissionQuestionsController, :type => :integration do
       qq
     end
 
+    def ask_and_answer_stuff
+      @qq1 = create_question 'multiple_choice'
+      @qq2 = create_question 'true_false'
+
+      @quiz_submission.submission_data = {
+        "question_#{@qq1.id}" => "1658",
+        "question_#{@qq2.id}" => "8950"
+      }
+    end
+
+    def api_index(data = {}, options = {})
+      helper = method(options[:raw] ? :raw_api_call : :api_call)
+      helper.call(:get,
+        "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions",
+        { :controller => 'quiz_submission_questions',
+          :action => 'index',
+          :format => 'json',
+          :quiz_submission_id => @quiz_submission.id.to_s
+        }, data)
+    end
+
+    def api_show(data = {}, options = {})
+      helper = method(options[:raw] ? :raw_api_call : :api_call)
+      helper.call(:get,
+        "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}",
+        { :controller => 'quiz_submission_questions',
+          :action => 'show',
+          :format => 'json',
+          :quiz_submission_id => @quiz_submission.id.to_s,
+          :id => @question[:id].to_s
+        }, data)
+    end
+
     def api_update(data = {}, options = {})
       data = {
         validation_token: @quiz_submission.validation_token,
@@ -95,6 +128,95 @@ describe QuizSubmissionQuestionsController, :type => :integration do
     course_with_student_logged_in(:active_all => true)
     @quiz = quiz_model(course: @course)
     @quiz_submission = @quiz.generate_submission(@student)
+  end
+
+  describe 'GET /quiz_submissions/:quiz_submission_id/questions [index]' do
+    it 'should return an empty list' do
+      json = api_index
+      json.has_key?('quiz_submission_questions').should be_true
+      json['quiz_submission_questions'].size.should == 0
+    end
+
+    it 'should list all items' do
+      ask_and_answer_stuff
+
+      json = api_index
+      json['quiz_submission_questions'].size.should == 2
+    end
+
+    it 'should restrict access to itself' do
+      student_in_course
+      json = api_index({}, { raw: true })
+      response.status.to_i.should == 401
+    end
+  end
+
+  describe 'GET /quiz_submissions/:quiz_submission_id/questions/:id [show]' do
+    before :each do
+      ask_and_answer_stuff
+      @question = @qq1
+    end
+
+    it 'should grant access to its student' do
+      json = api_show
+      json.has_key?('quiz_submission_questions').should be_true
+      json['quiz_submission_questions'].length.should == 1
+    end
+
+    it 'should deny access by other students' do
+      student_in_course
+      api_show({}, { raw: true })
+      response.status.to_i.should == 401
+    end
+
+    context 'Output' do
+      it 'should include the quiz question id' do
+        json = api_show
+        json.has_key?('quiz_submission_questions').should be_true
+        json['quiz_submission_questions'][0]['id'].should ==
+          @question.id
+      end
+
+      it 'should include the flagged status' do
+        json = api_show
+        json.has_key?('quiz_submission_questions').should be_true
+        json['quiz_submission_questions'][0].has_key?('flagged').should be_true
+        json['quiz_submission_questions'][0]['flagged'].should be_false
+      end
+    end
+
+    context 'Links' do
+      it 'should include its linked quiz_question' do
+        json = api_show({
+          :include => %w[ quiz_question ]
+        })
+
+        json.has_key?('quiz_submission_questions').should be_true
+        json['quiz_submission_questions'].size.should == 1
+
+        json.has_key?('quiz_questions').should be_true
+        json['quiz_questions'].size.should == 1
+        json['quiz_questions'][0]['id'].should ==
+          json['quiz_submission_questions'][0]['id']
+      end
+    end
+
+    context 'JSON-API compliance' do
+      it 'should conform to the JSON-API spec when returning the object' do
+        json = api_show
+        assert_jsonapi_compliance(json, 'quiz_submission_questions')
+      end
+
+      it 'should conform to the JSON-API spec when returning linked objects' do
+        includables = Api::V1::QuizSubmissionQuestion::Includables
+
+        json = api_show({
+          :include => includables
+        })
+
+        assert_jsonapi_compliance(json, 'quiz_submission_questions', includables)
+      end
+    end
   end
 
   describe 'PUT /quiz_submissions/:quiz_submission_id/questions/:id [update]' do
