@@ -759,10 +759,10 @@ describe Course, "gradebook_to_csv" do
                       "Some Assignment Group 2 Current Score",
                       "Some Assignment Group 2 Final Score"]
 
-    rows[2][-10].should == "100"       # ag1 current score
+    rows[2][-10].should == "100"    # ag1 current score
     rows[2][-9].should  == "50"     # ag1 final score
     rows[2][-6].should  == "50"     # ag2 current score
-    rows[2][-5].should  == "25"    # ag2 final score
+    rows[2][-5].should  == "25"     # ag2 final score
   end
 
   it "should alphabetize by sortable name with the test student at the end" do

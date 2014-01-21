@@ -93,7 +93,7 @@ class GradeCalculator
   #    :id       => 1
   #    :score    => 5,
   #    :possible => 7,
-  #    :grade    => 0.71
+  #    :grade    => 71.42,
   #    :weight   => 50},
   #   ...]
   # each group
