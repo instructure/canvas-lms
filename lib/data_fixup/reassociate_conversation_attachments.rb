@@ -2,8 +2,12 @@ module DataFixup::ReassociateConversationAttachments
 
   def self.run
     conn = ConversationMessage.connection
-    adapter_name = conn.adapter_name.downcase
-    temp_table_options = adapter_name =~ /mysql/ ? 'engine=innodb' : 'AS'
+    if ['MySQL', 'Mysql2'].include?(conn.adapter_name)
+      temp_table_options = '(INDEX _cma_cmid_index (conversation_message_id), INDEX _cma_aid_index (attachment_id)) engine=innodb'
+    else
+      temp_table_options = 'AS'
+    end
+
     cmas = []
 
     ConversationMessage.transaction do
@@ -15,9 +19,11 @@ module DataFixup::ReassociateConversationAttachments
         FROM attachments a
         WHERE context_type = 'ConversationMessage'
       SQL
-      conn.add_index :_conversation_message_attachments, :conversation_message_id, :name => '_cma_cmid_index'
-      conn.add_index :_conversation_message_attachments, :attachment_id, :name => '_cma_aid_index'
-      conn.execute "ANALYZE _conversation_message_attachments" if adapter_name =~ /postgres/
+      unless ['MySQL', 'Mysql2'].include?(conn.adapter_name)
+        conn.add_index :_conversation_message_attachments, :conversation_message_id, :name => '_cma_cmid_index'
+        conn.add_index :_conversation_message_attachments, :attachment_id, :name => '_cma_aid_index'
+      end
+      conn.execute "ANALYZE _conversation_message_attachments" if conn.adapter_name == 'PostgreSQL'
   
       # make sure users w/ conversation attachments have root folders
       conn.execute <<-SQL
