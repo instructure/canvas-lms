@@ -96,6 +96,7 @@ class DueDateCacher
         # copy the results back to the submission table
         submissions.
           joins("INNER JOIN calculated_due_ats ON calculated_due_ats.submission_id=submissions.id").
+          where("cached_due_date<>calculated_due_ats.due_at OR (cached_due_date IS NULL)<>(calculated_due_ats.due_at IS NULL)").
           update_all("cached_due_date=calculated_due_ats.due_at")
 
         # clean up
