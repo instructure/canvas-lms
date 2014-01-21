@@ -1290,17 +1290,18 @@ describe ContentMigration do
     end
     
     it "should re-use kaltura media objects" do
-      media_id = '0_deadbeef'
-      @copy_from.media_objects.create!(:media_id => media_id)
-      att = Attachment.create!(:filename => 'video.mp4', :uploaded_data => StringIO.new('pixels and frames and stuff'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
-      att.media_entry_id = media_id
-      att.content_type = "video/mp4"
-      att.save!
+      expect {
+        media_id = '0_deadbeef'
+        @copy_from.media_objects.create!(:media_id => media_id)
+        att = Attachment.create!(:filename => 'video.mp4', :uploaded_data => StringIO.new('pixels and frames and stuff'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+        att.media_entry_id = media_id
+        att.content_type = "video/mp4"
+        att.save!
 
-      run_course_copy
+        run_course_copy
 
-      @copy_to.attachments.find_by_migration_id(mig_id(att)).media_entry_id.should == media_id
-      Delayed::Job.find_by_tag('MediaObject.add_media_files').should be_nil
+        @copy_to.attachments.find_by_migration_id(mig_id(att)).media_entry_id.should == media_id
+      }.to change { Delayed::Job.jobs_count(:tag, 'MediaObject.add_media_files') }.by(0)
     end
 
     it "should include implied files for course exports" do
