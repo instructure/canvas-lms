@@ -1,7 +1,8 @@
 define [
   'Backbone'
+  'compiled/views/feature_flags/FeatureFlagDialog'
   'jst/feature_flags/featureFlag'
-], (Backbone, template) ->
+], (Backbone, FeatureFlagDialog, template) ->
 
   class FeatureFlagView extends Backbone.View
 
@@ -32,13 +33,27 @@ define [
       ENV.ACCOUNT?.site_admin && @model.get('hidden') && action == 'off'
 
     toggleValue: ($target) ->
-      $target.siblings().removeClass('active').attr('aria-checked', false)
-      $target.addClass('active').attr('aria-checked', true)
       action = $target.data('action')
-      if @shouldDelete(action) then @deleteFlag() else @updateFlag(action)
+      $.when(@canUpdate(action)).then =>
+        $target.siblings().removeClass('active').attr('aria-checked', false)
+        $target.addClass('active').attr('aria-checked', true)
+        if @shouldDelete(action) then @deleteFlag() else @updateFlag(action)
+
+    canUpdate: (action) ->
+      deferred = $.Deferred()
+      warning  = @model.warningFor(action)
+      return deferred.resolve() if !warning
+      view = new FeatureFlagDialog
+        deferred: deferred
+        message: warning.message
+        title: @model.get('display_name')
+        hasCancelButton: !warning.locked
+      view.render()
+      view.show()
+      deferred
 
     deleteFlag: ->
       @model.destroy(silent: true)
 
     updateFlag: (action) ->
-      @model.save(state: action)
+      @model.save(state: action).then(@model.updateTransitions)
