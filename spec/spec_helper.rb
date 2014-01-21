@@ -524,7 +524,7 @@ end
   VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
 
   def group(opts={})
-    context = opts[:group_context] || Account.default
+    context = opts[:group_context] || opts[:context] || Account.default
     @group = context.groups.create! opts.slice(*VALID_GROUP_ATTRIBUTES)
   end
 
