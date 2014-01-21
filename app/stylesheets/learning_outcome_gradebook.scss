@@ -125,12 +125,12 @@ $page-dark: #ebeff2;
 /* slickgrid */
 
 /* slickgrid overrides */
-.slick-viewport {
-  border-left: 1px solid $border-light;
-  border-top: 1px solid $border-dark;
-}
-
 .outcome-gradebook-wrapper {
+  .slick-viewport {
+    border-left: 1px solid $border-light;
+    border-top: 1px solid $border-dark;
+  }
+
   .ui-state-default {
     background: none;
     border: none;
