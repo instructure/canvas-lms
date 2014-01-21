@@ -1,0 +1,478 @@
+#
+# Copyright (C) 2011 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+require "spec_helper"
+
+describe BasicLtiOutbound::ToolLaunch do
+  before do
+    @account = BasicLtiOutbound::LTIAccount.new.tap do |account|
+      account.domain = "account_domain"
+      account.lti_guid = "account_lti_guid"
+      account.name = "account_name"
+      account.id = "account_id"
+      account.sis_source_id = "account_sis_source_id"
+    end
+    @root_account = BasicLtiOutbound::LTIAccount.new.tap do |account|
+      account.domain = "root_account_domain"
+      account.lti_guid = "root_account_lti_guid"
+      account.name = "root_account_name"
+      account.id = "root_account_id"
+      account.sis_source_id = "root_account_sis_source_id"
+    end
+    @course = BasicLtiOutbound::LTICourse.new.tap do |course|
+      course.root_account = @root_account
+      course.opaque_identifier = "course_opaque_identifier"
+      course.name = "course_name"
+      course.id = "course_id"
+      course.course_code = "course_code"
+      course.sis_source_id = "course_sis_source_id"
+    end
+    @tool = BasicLtiOutbound::LTITool.new.tap do |tool|
+      tool.name = "tool_name"
+      tool.context = @course
+      tool.privacy_level = BasicLtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
+    end
+    teacher_role = BasicLtiOutbound::LTIRole.new.tap do |role|
+      role.type = BasicLtiOutbound::LTIRole::INSTRUCTOR
+      role.state = :active
+    end
+    @user = BasicLtiOutbound::LTIUser.new.tap do |user|
+      user.avatar_url = "avatar_url"
+      user.current_enrollments = "current_enrollments"
+      user.email = 'nobody@example.com'
+      user.first_name = "first_name"
+      user.id = "user_id"
+      user.last_name = "last_name"
+      user.login_id = "user_login_id"
+      user.name = "user_name"
+      user.opaque_identifier = "user_opaque_identifier"
+      user.sis_user_id = "sis_user_id"
+      user.current_enrollments = [teacher_role]
+      user.concluded_enrollments = []
+      user.root_account = @root_account
+    end
+    @assignment = BasicLtiOutbound::LTIAssignment.new.tap do |assignment|
+      assignment.id = 'assignment_id'
+      assignment.source_id = '123456'
+      assignment.title = 'assignment1'
+      assignment.points_possible = 100
+      assignment.return_types = ['url', 'text']
+      assignment.allowed_extensions = ['jpg', 'pdf']
+    end
+    @tool_launch = BasicLtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
+                                                    :tool => @tool,
+                                                    :user => @user,
+                                                    :context => @course,
+                                                    :link_code => '123456',
+                                                    :return_url => 'http://www.google.com',
+                                                    :outgoing_email_address => "outgoing_email_address")
+  end
+
+  describe "#generate" do
+    it "generates correct parameters" do
+      hash = @tool_launch.generate
+
+      expect(hash['lti_message_type']).to eq 'basic-lti-launch-request'
+      expect(hash['lti_version']).to eq 'LTI-1p0'
+      expect(hash['resource_link_id']).to eq '123456'
+      expect(hash['resource_link_title']).to eq "tool_name"
+      expect(hash['user_id']).to eq "user_opaque_identifier"
+      expect(hash['user_image']).to eq "avatar_url"
+      expect(hash['roles']).to eq 'Instructor'
+      expect(hash['context_id']).to eq "course_opaque_identifier"
+      expect(hash['context_title']).to eq "course_name"
+      expect(hash['context_label']).to eq "course_code"
+      expect(hash['custom_canvas_user_id']).to eq "user_id"
+      expect(hash['custom_canvas_user_login_id']).to eq "user_login_id"
+      expect(hash['custom_canvas_course_id']).to eq "course_id"
+      expect(hash['custom_canvas_api_domain']).to eq "root_account_domain"
+      expect(hash['lis_course_offering_sourcedid']).to eq 'course_sis_source_id'
+      expect(hash['lis_person_contact_email_primary']).to eq 'nobody@example.com'
+      expect(hash['lis_person_name_full']).to eq 'user_name'
+      expect(hash['lis_person_name_family']).to eq 'last_name'
+      expect(hash['lis_person_name_given']).to eq 'first_name'
+      expect(hash['lis_person_sourcedid']).to eq 'sis_user_id'
+      expect(hash['launch_presentation_locale']).to eq "en" #was I18n.default_locale.to_s
+      expect(hash['launch_presentation_document_target']).to eq 'iframe'
+      expect(hash['launch_presentation_return_url']).to eq 'http://www.google.com'
+      expect(hash['tool_consumer_instance_guid']).to eq "root_account_lti_guid"
+      expect(hash['tool_consumer_instance_name']).to eq "root_account_name"
+      expect(hash['tool_consumer_instance_contact_email']).to eq "outgoing_email_address"
+      expect(hash['tool_consumer_info_product_family_code']).to eq 'canvas'
+      expect(hash['tool_consumer_info_version']).to eq 'cloud'
+      expect(hash['oauth_callback']).to eq 'about:blank'
+    end
+
+    it "sets the locale if I18n.localizer exists" do
+      I18n.localizer = lambda { :es }
+      hash = @tool_launch.generate
+
+      expect(hash['launch_presentation_locale']).to eq 'es'
+      I18n.localizer = lambda { :en }
+    end
+
+    it "adds account info in launch data for account navigation" do
+      hash = BasicLtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
+                                              :tool => @tool,
+                                              :user => @user,
+                                              :context => @account,
+                                              :link_code => '123456',
+                                              :return_url => 'http://www.google.com').generate
+      expect(hash['custom_canvas_account_id']).to eq "account_id"
+      expect(hash['custom_canvas_account_sis_id']).to eq 'account_sis_source_id'
+      expect(hash['custom_canvas_user_login_id']).to eq "user_login_id"
+    end
+
+    it "adds account and user info in launch data for user profile launch" do
+      hash = BasicLtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
+                                              :tool => @tool,
+                                              :user => @user,
+                                              :context => @user,
+                                              :link_code => '123456',
+                                              :return_url => 'http://www.google.com').generate
+      expect(hash['custom_canvas_account_id']).to eq "root_account_id"
+      expect(hash['custom_canvas_account_sis_id']).to eq 'root_account_sis_source_id'
+      expect(hash['lis_person_sourcedid']).to eq 'sis_user_id'
+      expect(hash['custom_canvas_user_id']).to eq "user_id"
+      expect(hash['tool_consumer_instance_guid']).to eq "root_account_lti_guid" #was hash['tool_consumer_instance_guid']).to eq sub_account.root_account.lti_guid
+    end
+
+    it "includes URI query parameters" do
+      hash = BasicLtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com?paramater_a=value_a&parameter_b=value_b',
+                                              :tool => @tool,
+                                              :user => @user,
+                                              :context => @course,
+                                              :link_code => '123456',
+                                              :return_url => 'http://www.google.com').generate
+      expect(hash['paramater_a']).to eq 'value_a'
+      expect(hash['parameter_b']).to eq 'value_b'
+    end
+
+    it "does not allow overwriting other parameters from the URI query string" do
+      hash = BasicLtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com?user_id=ATTEMPT_TO_SET_DATA&oauth_callback=ATTEMPT_TO_SET_DATA',
+                                              :tool => @tool,
+                                              :user => @user,
+                                              :context => @course,
+                                              :link_code => '123456',
+                                              :return_url => 'http://www.google.com').generate
+      expect(hash['user_id']).to eq "user_opaque_identifier"
+      expect(hash['oauth_callback']).to eq 'about:blank'
+    end
+
+    it "includes custom fields" do
+      @tool.privacy_level = BasicLtiOutbound::LTITool::PRIVACY_LEVEL_ANYNOMOUS
+      @tool.settings = {:custom_fields => {
+          'custom_bob' => 'bob',
+          'custom_fred' => 'fred',
+          'john' => 'john',
+          '@$TAA$#$#' => 123}}
+      hash = @tool_launch.generate
+      expect(hash.keys.select { |k| k.match(/^custom_/) }.sort).to eq(
+                                                                       ['custom___taa____', 'custom_bob', 'custom_canvas_enrollment_state', 'custom_fred', 'custom_john'])
+      expect(hash['custom_bob']).to eql('bob')
+      expect(hash['custom_fred']).to eql('fred')
+      expect(hash['custom_john']).to eql('john')
+      expect(hash['custom___taa____']).to eql('123')
+      expect(hash).to_not have_key '@$TAA$#$#'
+      expect(hash).to_not have_key 'john'
+    end
+
+    it "does not include name and email if anonymous" do
+      @tool.privacy_level = BasicLtiOutbound::LTITool::PRIVACY_LEVEL_ANYNOMOUS
+      hash = @tool_launch.generate
+      expect(hash).to_not have_key 'lis_person_name_given'
+      expect(hash).to_not have_key 'lis_person_name_family'
+      expect(hash).to_not have_key 'lis_person_name_full'
+      expect(hash).to_not have_key 'lis_person_contact_email_primary'
+    end
+
+    it "includes name if name_only" do
+      @tool.privacy_level = BasicLtiOutbound::LTITool::PRIVACY_LEVEL_NAME_ONLY
+      hash = @tool_launch.generate
+      expect(hash['lis_person_name_given']).to eq "first_name"
+      expect(hash['lis_person_name_family']).to eq "last_name"
+      expect(hash['lis_person_name_full']).to eq "user_name"
+      expect(hash['lis_person_contact_email_primary']).to be_nil
+    end
+
+    it "includes email if email_only" do
+      @tool.privacy_level = BasicLtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY
+      hash = @tool_launch.generate
+      expect(hash['lis_person_name_given']).to eq nil
+      expect(hash['lis_person_name_family']).to eq nil
+      expect(hash['lis_person_name_full']).to eq nil
+      expect(hash['lis_person_contact_email_primary']).to eq "nobody@example.com"
+    end
+
+    it "includes email if public" do
+      @tool.privacy_level = BasicLtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
+      hash = @tool_launch.generate
+      expect(hash['lis_person_name_given']).to eq 'first_name'
+      expect(hash['lis_person_name_family']).to eq "last_name"
+      expect(hash['lis_person_name_full']).to eq "user_name"
+      expect(hash['lis_person_contact_email_primary']).to eq "nobody@example.com"
+    end
+
+    it "includes text if set" do
+      @launch = BasicLtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
+                                                 :tool => @tool,
+                                                 :user => @user,
+                                                 :context => @course,
+                                                 :link_code => '123456',
+                                                 :return_url => 'http://www.yahoo.com')
+      html = "<p>this has <a href='#'>a link</a></p>"
+      @launch.has_selection_html!(html)
+      hash = @launch.generate
+      expect(hash['text']).to eq CGI::escape(html)
+    end
+
+    it "gets the correct width and height based on resource type" do
+      @tool.settings = {editor_button: {:selection_width => 1000, :selection_height => 300, :icon_url => 'www.example.com/icon', :url => 'www.example.com'}}
+      hash = BasicLtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
+                                              :tool => @tool,
+                                              :user => @user,
+                                              :context => @course,
+                                              :link_code => '123456',
+                                              :return_url => 'http://www.yahoo.com',
+                                              :resource_type => 'editor_button').generate
+      expect(hash['launch_presentation_width']).to eq '1000'
+      expect(hash['launch_presentation_height']).to eq '300'
+    end
+
+    describe "variable substitutions" do
+      before do
+        @substitutor = double('Substitutor', substitute!: 'something')
+        BasicLtiOutbound::VariableSubstitutor.stub(:new).and_return(@substitutor)
+      end
+
+      it "substitutes $Canvas.user" do
+        @tool_launch.generate
+
+        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.user', @user)
+      end
+
+      it "substitutes $Canvas.context" do
+        @tool_launch.generate
+
+        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.context', @course)
+      end
+
+      it "substitutes $Canvas.api" do
+        @tool_launch.generate
+
+        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.api', @root_account)
+      end
+
+      it "substitutes $Canvas.assignment" do
+        @tool_launch.for_homework_submission!(@assignment)
+        @tool_launch.generate
+
+        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.assignment', @assignment)
+      end
+
+      it "does no substutue $Canvas.assignment if no assignment is given" do
+        @tool_launch.generate
+
+        expect(@substitutor).to_not have_received(:substitute!).with(anything, '$Canvas.assignment', anything)
+      end
+
+      it "substitutes $Canvas.account with root account if context is not account" do
+        @tool_launch.generate
+
+        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.account', @course.root_account)
+      end
+
+      it "substitutes $Canvas.account with account if context is account" do
+        tool_launch = BasicLtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
+                                                       :tool => @tool,
+                                                       :user => @user,
+                                                       :context => @account,
+                                                       :link_code => '123456',
+                                                       :return_url => 'http://www.google.com',
+                                                       :outgoing_email_address => "outgoing_email_address")
+        tool_launch.generate
+
+        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.account', @account)
+      end
+
+      it "substitutes $Canvas.membership" do
+        @tool_launch.generate
+
+        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.membership', @user)
+      end
+
+      it "substitutes $Canvas.enrollment" do
+        @tool_launch.generate
+
+        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.enrollment', @user)
+      end
+
+      it "substitutes $Person.name" do
+        @tool_launch.generate
+
+        expect(@substitutor).to have_received(:substitute!).with(anything, '$Person.name', @user)
+      end
+
+      it "substitutes $Person.address" do
+        @tool_launch.generate
+
+        expect(@substitutor).to have_received(:substitute!).with(anything, '$Person.address', @user)
+      end
+    end
+  end
+
+  describe "#for_assignment!" do
+    it "includes assignment outcome service params for student" do
+      student_role = BasicLtiOutbound::LTIRole.new.tap do |role|
+        role.type = BasicLtiOutbound::LTIRole::LEARNER
+        role.state = :active
+      end
+      @user.current_enrollments = [student_role]
+      @tool_launch.for_assignment!(@assignment, '/my/test/url', '/my/other/test/url')
+
+      hash = @tool_launch.generate
+
+      expect(hash['lis_result_sourcedid']).to eq '123456'
+      expect(hash['lis_outcome_service_url']).to eq "/my/test/url"
+      expect(hash['ext_ims_lis_basic_outcome_url']).to eq "/my/other/test/url"
+      expect(hash['ext_outcome_data_values_accepted']).to eq 'url,text'
+      expect(hash['custom_canvas_assignment_title']).to eq "assignment1"
+      expect(hash['custom_canvas_assignment_points_possible']).to eq "100"
+      expect(hash['custom_canvas_assignment_id']).to eq "assignment_id"
+    end
+
+    it "includes assignment outcome service params for teacher" do
+      @tool_launch.for_assignment!(@assignment, '/my/test/url', '/my/other/test/url')
+
+      hash = @tool_launch.generate
+
+      expect(hash['lis_result_sourcedid']).to be_nil
+      expect(hash['lis_outcome_service_url']).to eq "/my/test/url"
+      expect(hash['ext_ims_lis_basic_outcome_url']).to eq "/my/other/test/url"
+      expect(hash['ext_outcome_data_values_accepted']).to eq 'url,text'
+      expect(hash['custom_canvas_assignment_title']).to eq "assignment1"
+      expect(hash['custom_canvas_assignment_points_possible']).to eq "100"
+    end
+  end
+
+  describe "#for_homework_submission!" do
+    it "includes content keys if present" do
+      @tool_launch.for_homework_submission!(@assignment)
+
+      hash = @tool_launch.generate
+
+      expect(hash['ext_content_return_types']).to eq 'url,text'
+      expect(hash['ext_content_file_extensions']).to eq 'jpg,pdf'
+      expect(hash['custom_canvas_assignment_id']).to eq 'assignment_id'
+    end
+
+    it "excludes file_extensions if not present" do
+      @assignment.allowed_extensions = nil
+      @tool_launch.for_homework_submission!(@assignment)
+
+      hash = @tool_launch.generate
+
+      expect(hash['ext_content_file_extensions']).to eq nil
+    end
+  end
+
+  #TODO: do not test private methods
+  describe ".generate_params" do
+    def explicit_signature_settings(timestamp, nonce)
+      BasicLtiOutbound::ToolLaunch.instance_variable_set(:"@timestamp", timestamp)
+      BasicLtiOutbound::ToolLaunch.instance_variable_set(:"@nonce", nonce)
+    end
+
+    it "generate a correct signature" do
+      explicit_signature_settings('1251600739', 'c8350c0e47782d16d2fa48b2090c1d8f')
+
+      hash = BasicLtiOutbound::ToolLaunch.send(:generate_params, {
+          :resource_link_id => '120988f929-274612',
+          :user_id => '292832126',
+          :roles => 'Instructor',
+          :lis_person_name_full => 'Jane Q. Public',
+          :lis_person_contact_email_primary => 'user@school.edu',
+          :lis_person_sourced_id => 'school.edu:user',
+          :context_id => '456434513',
+          :context_title => 'Design of Personal Environments',
+          :context_label => 'SI182',
+          :lti_version => 'LTI-1p0',
+          :lti_message_type => 'basic-lti-launch-request',
+          :tool_consumer_instance_guid => 'lmsng.school.edu',
+          :tool_consumer_instance_description => 'University of School (LMSng)',
+          :basiclti_submit => 'Launch Endpoint with BasicLTI Data'
+      }, 'http://dr-chuck.com/ims/php-simple/tool.php', '12345', 'secret')
+
+      expect(hash['oauth_signature']).to eql('TPFPK4u3NwmtLt0nDMP1G1zG30U=')
+    end
+
+    it "generate a correct signature with URL query parameters" do
+      explicit_signature_settings('1251600739', 'c8350c0e47782d16d2fa48b2090c1d8f')
+      hash = BasicLtiOutbound::ToolLaunch.send(:generate_params, {
+          :resource_link_id => '120988f929-274612',
+          :user_id => '292832126',
+          :roles => 'Instructor',
+          :lis_person_name_full => 'Jane Q. Public',
+          :lis_person_contact_email_primary => 'user@school.edu',
+          :lis_person_sourced_id => 'school.edu:user',
+          :context_id => '456434513',
+          :context_title => 'Design of Personal Environments',
+          :context_label => 'SI182',
+          :lti_version => 'LTI-1p0',
+          :lti_message_type => 'basic-lti-launch-request',
+          :tool_consumer_instance_guid => 'lmsng.school.edu',
+          :tool_consumer_instance_description => 'University of School (LMSng)',
+          :basiclti_submit => 'Launch Endpoint with BasicLTI Data'
+      }, 'http://dr-chuck.com/ims/php-simple/tool.php?a=1&b=2&c=3%20%26a', '12345', 'secret')
+      expect(hash['oauth_signature']).to eql('uF7LooyefQN5aocx7UlYQ4tQM5k=')
+      expect(hash['c']).to eq "3 &a"
+    end
+
+    it "generate a correct signature with a non-standard port" do
+      #signatures generated using http://oauth.googlecode.com/svn/code/javascript/example/signature.html
+      explicit_signature_settings('1251600739', 'c8350c0e47782d16d2fa48b2090c1d8f')
+      hash = BasicLtiOutbound::ToolLaunch.send(:generate_params, {
+      }, 'http://dr-chuck.com:123/ims/php-simple/tool.php', '12345', 'secret')
+      expect(hash['oauth_signature']).to eql('ghEdPHwN4iJmsM3Nr4AndDx2Kx8=')
+
+      hash = BasicLtiOutbound::ToolLaunch.send(:generate_params, {
+      }, 'http://dr-chuck.com/ims/php-simple/tool.php', '12345', 'secret')
+      expect(hash['oauth_signature']).to eql('WoSpvCr2HEsLzao6Do0eukxwAsk=')
+
+      hash = BasicLtiOutbound::ToolLaunch.send(:generate_params, {
+      }, 'http://dr-chuck.com:80/ims/php-simple/tool.php', '12345', 'secret')
+      expect(hash['oauth_signature']).to eql('WoSpvCr2HEsLzao6Do0eukxwAsk=')
+
+      hash = BasicLtiOutbound::ToolLaunch.send(:generate_params, {
+      }, 'http://dr-chuck.com:443/ims/php-simple/tool.php', '12345', 'secret')
+      expect(hash['oauth_signature']).to eql('KqAV7eIS/+iWIDpvCyDfY8ZpmT4=')
+
+      hash = BasicLtiOutbound::ToolLaunch.send(:generate_params, {
+      }, 'https://dr-chuck.com/ims/php-simple/tool.php', '12345', 'secret')
+      expect(hash['oauth_signature']).to eql('wFRB/1ZXi/91dop6GwahfboWPvQ=')
+
+      hash = BasicLtiOutbound::ToolLaunch.send(:generate_params, {
+      }, 'https://dr-chuck.com:443/ims/php-simple/tool.php', '12345', 'secret')
+      expect(hash['oauth_signature']).to eql('wFRB/1ZXi/91dop6GwahfboWPvQ=')
+
+      hash = BasicLtiOutbound::ToolLaunch.send(:generate_params, {
+      }, 'https://dr-chuck.com:80/ims/php-simple/tool.php', '12345', 'secret')
+      expect(hash['oauth_signature']).to eql('X8Aq2HXSHnr6u/6z/G9zI5aDoR0=')
+    end
+  end
+end
