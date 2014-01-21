@@ -40,6 +40,7 @@ if CANVAS_RAILS2
     unless args.last.is_a?(Hash)
       args << {}
     end
+    raise "please use type: :request instead of type: :integration for rspec 2 compatibility" if args.last[:type] == :integration
     if args.last[:type] == :request
       args.last[:type] = :integration
     end
