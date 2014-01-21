@@ -329,6 +329,7 @@ define [
     # Returns nothing.
     _drawResults: ->
       @resultView.empty = !@resultView.collection.length
+      @resultView.$('.collectionViewItems').empty()
       @resultView.render()
       $el = @$resultList.find('li:first').addClass('selected')
       @selectedModel = @_getModel($el.data('id'))
