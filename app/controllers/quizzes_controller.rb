@@ -420,6 +420,7 @@ class QuizzesController < ApplicationController
               report = @quiz.current_statistics_for(report_type, :includes_all_versions => all_versions)
               json = quiz_statistics_json(report, @current_user, session, :include => ['file'])
               json[:course_id] = @context.id
+              json[:report_disabled] = @quiz.survey? && report_type == "item_analysis"
               json[:report_name] = report.readable_type
               json[:progress] = progress_json(report.progress, @current_user, session) if report.progress
               json
