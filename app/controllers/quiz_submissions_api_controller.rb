@@ -150,16 +150,20 @@ class QuizSubmissionsApiController < ApplicationController
   #    "quiz_submissions": [QuizSubmission]
   #  }
   def index
-    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      scope = @quiz.quiz_submissions.where(:user_id => visible_user_ids)
-      api_route = api_v1_course_quiz_submissions_url(@context, @quiz)
+    quiz_submissions = if is_authorized_action?(@context, @current_user, [:manage_grades, :view_all_grades])
+      # teachers have access to all student submissions
+      Api.paginate @quiz.quiz_submissions.where(:user_id => visible_user_ids),
+        self,
+        api_v1_course_quiz_submissions_url(@context, @quiz)
+    elsif is_authorized_action?(@quiz, @current_user, :submit)
+      # students have access only to their own
+      @quiz.quiz_submissions.where(:user_id => @current_user)
+    end
 
-      quiz_submissions = Api.paginate(scope, self, api_route)
-
-      includes = Array(params[:include])
-      out = quiz_submissions_json(quiz_submissions, @quiz, @current_user, session, @context, includes)
-
-      render :json => out
+    if !quiz_submissions
+      render_unauthorized_action
+    else
+      serialize_and_render quiz_submissions
     end
   end
 
@@ -179,7 +183,7 @@ class QuizSubmissionsApiController < ApplicationController
   #  }
   def show
     if authorized_action(@quiz_submission, @current_user, :read)
-      render_quiz_submission(@quiz_submission)
+      serialize_and_render @quiz_submission
     end
   end
 
@@ -217,7 +221,7 @@ class QuizSubmissionsApiController < ApplicationController
 
     log_asset_access(@quiz, 'quizzes', 'quizzes', 'participate')
 
-    render_quiz_submission(quiz_submission)
+    serialize_and_render quiz_submission
   end
 
   # @API Update student question scores and comments.
@@ -288,7 +292,7 @@ class QuizSubmissionsApiController < ApplicationController
         resource_params)
     end
 
-    render_quiz_submission(@quiz_submission)
+    serialize_and_render @quiz_submission
   end
 
   # @API Complete the quiz submission (turn it in).
@@ -327,7 +331,7 @@ class QuizSubmissionsApiController < ApplicationController
   def complete
     @service.complete @quiz_submission, params[:attempt]
 
-    render_quiz_submission(@quiz_submission)
+    serialize_and_render @quiz_submission
   end
 
   private
@@ -341,8 +345,10 @@ class QuizSubmissionsApiController < ApplicationController
     scope.pluck(:user_id)
   end
 
-  def render_quiz_submission(qs)
-    render :json => quiz_submissions_json([ qs ],
+  def serialize_and_render(quiz_submissions)
+    quiz_submissions = [ quiz_submissions ] unless quiz_submissions.is_a? Array
+
+    render :json => quiz_submissions_json(quiz_submissions,
       @quiz,
       @current_user,
       session,

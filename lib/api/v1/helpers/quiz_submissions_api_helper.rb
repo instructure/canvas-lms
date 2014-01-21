@@ -26,8 +26,15 @@ module Api::V1::Helpers::QuizSubmissionsApiHelper
   def require_quiz_submission
     collection = @quiz ? @quiz.quiz_submissions : QuizSubmission
     id = params[:quiz_submission_id] || params[:id] || ''
+    query = {}
 
-    unless @quiz_submission = collection.find(id.to_i)
+    if id.to_s == 'self'
+      query[:user_id] = @current_user.id
+    else
+      query[:id] = id.to_i
+    end
+
+    unless @quiz_submission = collection.where(query).first
       raise ActiveRecord::RecordNotFound
     end
   end

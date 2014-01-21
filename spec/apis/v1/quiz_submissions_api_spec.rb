@@ -55,8 +55,8 @@ describe QuizSubmissionsApiController, type: :request do
       end
     end
 
-    def enroll_student_and_submit(submission_data = {})
-      enroll_student
+    def enroll_student_and_submit(submission_data = {}, login=false)
+      enroll_student({ login: login })
 
       @quiz_submission = @quiz.generate_submission(@student)
       @quiz_submission.submission_data = submission_data
@@ -160,6 +160,14 @@ describe QuizSubmissionsApiController, type: :request do
       json['quiz_submissions'].size.should == 1
     end
 
+    it 'should be accessible by the owner student' do
+      enroll_student_and_submit({}, true)
+
+      json = qs_api_index
+      json.has_key?('quiz_submissions').should be_true
+      json['quiz_submissions'].length.should == 1
+    end
+
     it 'should restrict access to itself' do
       student_in_course
       json = qs_api_index(true)
@@ -174,6 +182,15 @@ describe QuizSubmissionsApiController, type: :request do
 
     it 'should grant access to its student' do
       @user = @student
+      json = qs_api_show
+      json.has_key?('quiz_submissions').should be_true
+      json['quiz_submissions'].length.should == 1
+    end
+
+    it 'should be accessible implicitly to its own student as "self"' do
+      @user = @student
+      @quiz_submission.stubs(:id).returns 'self'
+
       json = qs_api_show
       json.has_key?('quiz_submissions').should be_true
       json['quiz_submissions'].length.should == 1
