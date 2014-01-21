@@ -22,7 +22,8 @@ define [
       syncColumnCellResize   : true
       showHeaderRow          : true
       explicitInitialization : true
-      fullWidthRows:           true
+      fullWidthRows          : true
+      numberOfColumnsToFreeze: 1
 
     Events:
       # Public: Draw header cell contents.
@@ -42,10 +43,10 @@ define [
         Grid.View.headerCell(options)
 
       init: (grid) ->
-        header       = $(grid.getHeaderRow()).parent()
-        columnHeader = header.prev()
-
-        header.insertBefore(columnHeader)
+        headers = $('.outcome-gradebook-wrapper .slick-header')
+        headerRows = $('.outcome-gradebook-wrapper .slick-headerrow')
+        _.each(_.zip(headers, headerRows), ([header, headerRow]) ->
+          $(headerRow).insertBefore($(header)))
 
       # Public: Generate a section change callback for the given grid.
       #
@@ -270,10 +271,11 @@ define [
         $(node).empty().append(Grid.View.cellHtml(value, column, false))
 
       redrawHeader: (grid, fn = Grid.averageFn) ->
-        header = grid.getHeaderRow().childNodes
-        cols   = grid.getColumns()
         Grid.averageFn = fn
-        _.each(header, (node, i) -> Grid.View.headerRowCell(node: node, column: cols[i], grid: grid, fn))
+        cols = grid.getColumns()
+        _.each(cols, (col) ->
+          header = grid.getHeaderRowColumn(col.id)
+          Grid.View.headerRowCell(node: header, column: col, grid: grid, fn))
 
       studentHeaderRowCell: (node, column, grid) ->
         $(node).addClass('average-filter')
