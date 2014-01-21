@@ -16,6 +16,8 @@ define [
 
 ], (I18n, $, setDefaultGradeDialogTemplate, _) ->
 
+  PAGE_SIZE = 50
+
   class SetDefaultGradeDialog
     constructor: ({@assignment, @students, @context_id, @selected_section}) ->
       @initDialog()
@@ -34,31 +36,57 @@ define [
         open: => @$dialog.find(".grading_box").focus()
         close: => @$dialog.remove()
       ).fixDialogButtons()
-      @$dialog.formSubmit
-        disableWhileLoading: true
-        processData: (data) =>
-          studentsAffected = 0
-          hasNoScore = (student) => !student["assignment_#{@assignment.id}"]?.score?
-          canOverwrite = data.overwrite_existing_grades
-          inSection = (student) => if @selected_section
-            _.include(student.sections, @selected_section)
-          else
-            true
-          updateData = (idx, student) =>
-            studentsAffected = studentsAffected + 1
-            data["submissions[submission_#{idx}][assignment_id]"] = @assignment.id
-            data["submissions[submission_#{idx}][user_id]"] = student.id
-            data["submissions[submission_#{idx}][grade]"] = data.default_grade
 
-          updateData(idx, student) for idx, student of @students when (hasNoScore(student) or canOverwrite) and inSection(student)
+      $form = @$dialog
+      $form.submit (e) =>
+        e.preventDefault()
+        submittingDfd = $.Deferred()
+        $form.disableWhileLoading(submittingDfd)
 
-          if studentsAffected is 0
-            alert I18n.t('alerts.none_to_update', "None to Update")
-            return false
-          data
-        success: (data) =>
-          # fix
-          submissions = (datum.submission for datum in data)
+        formData = $form.getFormData()
+
+        students = getStudents()
+        pages = (students.splice 0, PAGE_SIZE while students.length)
+
+        postDfds = pages.map (page) =>
+          studentParams = getParams(page, formData.default_grade)
+          params = _.extend {}, studentParams,
+            dont_overwrite_grades: not formData.overwrite_existing_grades
+          $.ajaxJSON $form.attr("action"), "POST", params
+
+        $.when(postDfds...).then (responses...) =>
+          responses = [responses] if postDfds.length == 1
+          submissions = getSubmissions(responses)
           $.publish 'submissions_updated', [submissions]
-          alert(I18n.t('alerts.scores_updated', {'one': '1 Student score updated', 'other': '%{count} Student scores updated'}, {'count': data.length}))
+          alert(I18n.t 'alerts.scores_updated'
+          ,
+            one: '1 Student score updated'
+            other: '%{count} Student scores updated'
+          ,
+            count: submissions.length)
+          submittingDfd.resolve()
           @$dialog.remove()
+
+      getStudents = =>
+        if @selected_section
+          _(@students).filter (s) =>
+            _.include(s.sections, @selected_section)
+        else
+          _(@students).values()
+
+      getParams = (page, grade) =>
+        _.chain(page)
+         .map (s) =>
+           prefix = "submissions[submission_#{s.id}]"
+           [["#{prefix}[assignment_id]", @assignment.id],
+            ["#{prefix}[user_id]", s.id],
+            ["#{prefix}[grade]", grade]]
+         .flatten(true)
+         .object()
+         .value()
+
+      getSubmissions = (responses) =>
+        _.chain(responses)
+         .map ([response, __]) ->
+           [s.submission for s in response]
+         .flatten().value()

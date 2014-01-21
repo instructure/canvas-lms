@@ -919,6 +919,7 @@ class Assignment < ActiveRecord::Base
     raise "Student must be enrolled in the course as a student to be graded" unless context.includes_student?(original_student)
     raise "Grader must be enrolled as a course admin" if opts[:grader] && !self.context.grants_right?(opts[:grader], nil, :manage_grades)
     opts.delete(:id)
+    dont_overwrite_grade = opts.delete(:dont_overwrite_grade)
     group_comment = Canvas::Plugin.value_to_boolean(opts.delete(:group_comment))
     group, students = group_students(original_student)
     grader = opts.delete :grader
@@ -936,6 +937,7 @@ class Assignment < ActiveRecord::Base
       student = submission.user
       if student == original_student || !grade_group_students_individually
         previously_graded = submission.grade.present?
+        next if previously_graded && dont_overwrite_grade
         submission.attributes = opts
         submission.assignment_id = self.id
         submission.user_id = student.id

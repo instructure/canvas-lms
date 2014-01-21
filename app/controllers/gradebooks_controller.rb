@@ -393,14 +393,15 @@ class GradebooksController < ApplicationController
           if @assignment.grading_type == "percent" && submission[:grade] && submission[:grade] !~ /%\z/
             submission[:grade] = "#{submission[:grade]}%"
           end
-          # requires: assignment_id, user_id, and grade or comment
+
+          submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
           @submissions += @assignment.grade_student(@user, submission)
         rescue => e
           @error_message = e.to_s
         end
       end
       @submissions = @submissions.reverse.uniq.reverse
-      @submissions = nil if @submissions.empty?
+      @submissions = nil if submissions.empty?  # no valid submissions
 
       respond_to do |format|
         if @submissions && !@error_message#&& !@submission.errors || @submission.errors.empty?
