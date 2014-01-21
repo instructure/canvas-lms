@@ -167,7 +167,8 @@ define [
       #
       # Returns an array of rows.
       toRows: (rollups, options = {}) ->
-        _.reject(_.map(rollups, Grid.Util._toRowFn(options.section)), (v) -> v == null)
+        rows = _.reject(_.map(rollups, Grid.Util._toRowFn(options.section)), (v) -> v == null)
+        rows.sort((a, b) -> Grid.Events._sortStudents(a, b, true))
 
       # Internal: Generate a toRow function that filters by the given section.
       #
