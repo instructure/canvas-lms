@@ -161,6 +161,19 @@ class Attachment < ActiveRecord::Base
   end
 
   def before_attachment_saved
+    run_before_attachment_saved
+  end
+
+  def after_attachment_saved
+    run_after_attachment_saved
+  end
+
+  unless CANVAS_RAILS2
+    before_attachment_saved :run_before_attachment_saved
+    after_attachment_saved :run_after_attachment_saved
+  end
+
+  def run_before_attachment_saved
     @after_attachment_saved_workflow_state = self.workflow_state
     self.workflow_state = 'unattached'
   end
@@ -171,7 +184,7 @@ class Attachment < ActiveRecord::Base
   # It blocks and makes the user wait.  The good thing is that sending
   # it to scribd from that point does not make the user wait since that
   # does happen asynchronously and the data goes directly from s3 to scribd.
-  def after_attachment_saved
+  def run_after_attachment_saved
     if workflow_state == 'unattached' && @after_attachment_saved_workflow_state
       self.workflow_state = @after_attachment_saved_workflow_state
       @after_attachment_saved_workflow_state = nil
