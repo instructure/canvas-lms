@@ -142,7 +142,12 @@ class MediaObject < ActiveRecord::Base
       if entry[:originalId].present? && (Integer(entry[:originalId]).is_a?(Integer) rescue false)
         attachment_id = entry[:originalId]
       elsif entry[:originalId].present? && entry[:originalId].length >= 2
-        partner_data = JSON.parse(entry[:originalId]).with_indifferent_access
+        partner_data = begin
+          JSON.parse(entry[:originalId]).with_indifferent_access
+        rescue JSON::ParserError
+          Rails.logger.error("Failed to parse kaltura partner info: #{entry[:originalId]}")
+          {}
+        end
         attachment_id = partner_data[:attachment_id] if partner_data[:attachment_id].present?
       end
       attachment = Attachment.find_by_id(attachment_id) if attachment_id
