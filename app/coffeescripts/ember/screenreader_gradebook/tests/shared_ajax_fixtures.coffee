@@ -491,6 +491,15 @@ define [
         { id: '2', name: 'Slayers and Scoobies' }
       ]
 
+  customColumns = [
+    hidden: false
+    id: "1"
+    position: 1
+    teacher_notes: true
+    title: "Notes"
+  ]
+
+  custom_columns: customColumns
   set_default_grade_response: default_grade_response
   students: students
   concluded_enrollments: concludedStudents
@@ -512,7 +521,9 @@ define [
           context_url: '/courses/1'
           context_id: 1
           group_weighting_scheme: "equal"
-          change_grade_url: 'http://localhost:3000/api/v1/courses/2/assignments/:assignment/submissions/:submission'
+          change_grade_url: '/api/v1/courses/1/assignments/:assignment/submissions/:submission'
+          custom_columns_url: 'api/v1/courses/1/custom_gradebook_columns'
+          custom_column_data_url: 'api/v1/courses/1/custom_gradebook_columns/:id'
         }
       }
 
@@ -541,5 +552,8 @@ define [
       jqXHR: { getResponseHeader: -> {} }
       textStatus: ''
 
-      #ajax.defineFixture overide.url, override.options for override in overrides?
+    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.custom_columns_url,
+      response: clone customColumns
+      jqXHR: { getResponseHeader: -> {} }
+      textStatus: ''
 

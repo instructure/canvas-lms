@@ -1,0 +1,12 @@
+{{#unless column.hidden}}
+<label {{bind-attr for=id}}>
+  {{column.title}}
+</label>
+{{
+  textarea
+  value=value
+  name=id
+  id=id
+  disabled=column.isLoading
+}}
+{{/unless}}

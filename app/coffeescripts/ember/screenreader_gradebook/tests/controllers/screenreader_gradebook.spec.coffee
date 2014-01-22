@@ -12,10 +12,10 @@ define [
   originalIsDraft = null
   originalWeightingScheme = null
 
-  fixtures.create()
   clone = (obj) ->
     Em.copy obj, true
 
+  fixtures.create()
   setup = (isDraftState=false) ->
     window.ENV.GRADEBOOK_OPTIONS.draft_state_enabled = isDraftState
     originalWeightingScheme =  window.ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
@@ -326,7 +326,7 @@ define [
         sections: Ember.ArrayProxy.create(content: clone fixtures.sections)
       })
 
-  module 'grade calc',
+  module 'screenreader_gradebook_controller: grade calc',
     setup: ->
       calculationSetup.call this
 
@@ -339,3 +339,91 @@ define [
 
   test 'calculates final grade', ->
     equal @srgb.get('students.firstObject.total_percent'), 0
+
+
+  module 'screenreader_gradebook_controller: notes computed props',
+    setup: ->
+      ENV.GRADEBOOK_OPTIONS.custom_column_url = '/here/is/an/:id'
+      ENV.GRADEBOOK_OPTIONS.teacher_notes = id:'42'
+      @server = sinon.fakeServer.create()
+      setup.call this
+      Ember.run =>
+        #@srgb.set('custom_columns', [{teacher_notes: true, id: '42'}])
+        @srgb.reopen
+          updateOrCreateNotesColumn: ->
+    teardown: ->
+      ENV.GRADEBOOK_OPTIONS.custom_column_url = null
+      ENV.GRADEBOOK_OPTIONS.teacher_notes = null
+      @server.restore()
+      teardown.call this
+
+  test 'computes showNotesColumn correctly', ->
+    ENV.GRADEBOOK_OPTIONS.teacher_notes =
+      hidden: false
+    equal @srgb.get('showNotesColumn'), true
+
+    ENV.GRADEBOOK_OPTIONS.teacher_notes =
+      hidden: true
+    equal @srgb.get('showNotesColumn'), false
+
+    ENV.GRADEBOOK_OPTIONS.teacher_notes = null
+    equal @srgb.get('showNotesColumn'), false
+
+  test 'shouldCreateNotes, no notes in ENV', ->
+    ENV.GRADEBOOK_OPTIONS.teacher_notes = null
+    Ember.run =>
+      @srgb.set('showNotesColumn', true)
+    equal @srgb.get('shouldCreateNotes'), true, 'true if no teacher_notes and showNotesColumns is true'
+
+  test 'shouldCreateNotes, notes in ENV, hidden', ->
+    ENV.GRADEBOOK_OPTIONS.teacher_notes =
+      hidden: true
+    Ember.run =>
+      @srgb.set('showNotesColumn', true)
+    actual = @srgb.get('shouldCreateNotes')
+    equal actual, false, 'does not create if there is a teacher_notes object in the ENV'
+
+  test 'shouldCreateNotes, notes in ENV, shown', ->
+    ENV.GRADEBOOK_OPTIONS.teacher_notes =
+      hidden: false
+    Ember.run =>
+      @srgb.set('showNotesColumn', true)
+    equal @srgb.get('shouldCreateNotes'), false, 'does not create if there is a teacher_notes object in the ENV'
+
+  test 'notesURL, no notes object in ENV', ->
+    Ember.run =>
+      @srgb.set('shouldCreateNotes', true)
+    equal @srgb.get('notesURL'), ENV.GRADEBOOK_OPTIONS.custom_columns_url, 'computes properly when creating'
+    Ember.run =>
+      @srgb.set('shouldCreateNotes', false)
+    equal @srgb.get('notesURL'), '/here/is/an/42', 'computes properly when showing'
+
+  test 'notesParams', ->
+    Ember.run =>
+      @srgb.set('showNotesColumn', true)
+      @srgb.set('shouldCreateNotes', false)
+    deepEqual @srgb.get('notesParams'), "column[hidden]": false
+
+    Ember.run =>
+      @srgb.set('showNotesColumn', false)
+      @srgb.set('shouldCreateNotes', false)
+    deepEqual @srgb.get('notesParams'), "column[hidden]": true
+
+    Ember.run =>
+      @srgb.set('showNotesColumn', true)
+      @srgb.set('shouldCreateNotes', true)
+    deepEqual @srgb.get('notesParams'),
+        "column[title]": "Notes"
+        "column[position]": 1
+        "column[teacher_notes]": true
+
+  test 'notesVerb', ->
+    Ember.run =>
+      @srgb.set('shouldCreateNotes', true)
+    equal @srgb.get('notesVerb'), 'POST'
+
+    Ember.run =>
+      @srgb.set('shouldCreateNotes', false)
+    equal @srgb.get('notesVerb'), 'PUT'
+
+

@@ -1,14 +1,16 @@
 define [
+  'ic-ajax'
   'compiled/util/round'
   'compiled/userSettings'
   '../../shared/xhr/fetch_all_pages'
+  '../../shared/xhr/parse_link_header'
   'i18n!sr_gradebook'
   'ember'
   'underscore'
   'compiled/AssignmentDetailsDialog'
   'compiled/AssignmentMuter'
   'compiled/grade_calculator'
-  ], (round, userSettings, fetchAllPages, I18n, Ember, _,  AssignmentDetailsDialog, AssignmentMuter, GradeCalculator ) ->
+  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _,  AssignmentDetailsDialog, AssignmentMuter, GradeCalculator ) ->
 
   {get, set, setProperties} = Ember
 
@@ -62,6 +64,9 @@ define [
     weightingScheme: null
 
     actions:
+
+      columnUpdated: (columnData, columnID) ->
+        @updateColumnData columnData, columnID
 
       gradeUpdated: (submissions) ->
         @updateSubmissionsFromExternal submissions
@@ -158,6 +163,117 @@ define [
         fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, student_ids: student_ids,  @get('submissions'))
     ).observes('students.@each').on('init')
 
+    teacherNotes: (->
+      ENV.GRADEBOOK_OPTIONS.teacher_notes
+    ).property().volatile()
+
+    showNotesColumn: (->
+      notes = @get('teacherNotes')
+      if notes
+        !notes.hidden
+      else
+        false
+    ).property().volatile()
+
+    shouldCreateNotes: (->
+      !@get('teacherNotes') and @get('showNotesColumn')
+    ).property('teacherNotes', 'showNotesColumn', 'custom_columns.@each')
+
+    notesURL: (->
+      if @get('shouldCreateNotes')
+        ENV.GRADEBOOK_OPTIONS.custom_columns_url
+      else
+        notesID = @get('teacherNotes')?.id
+        ENV.GRADEBOOK_OPTIONS.custom_column_url.replace(/:id/, notesID)
+    ).property('shouldCreateNotes', 'custom_columns.@each')
+
+    notesParams: (->
+      if @get('shouldCreateNotes')
+        "column[title]": I18n.t("notes", "Notes")
+        "column[position]": 1
+        "column[teacher_notes]": true
+      else
+        "column[hidden]": !@get('showNotesColumn')
+    ).property('shouldCreateNotes', 'showNotesColumn')
+
+    notesVerb: (->
+      if @get('shouldCreateNotes') then "POST" else "PUT"
+    ).property('shouldCreateNotes')
+
+    updateOrCreateNotesColumn: (->
+      ajax(
+        dataType: "json"
+        type: @get('notesVerb')
+        url: @get('notesURL')
+        data: @get('notesParams')
+      ).then @boundNotesSuccess
+    ).observes('showNotesColumn')
+
+    bindNotesSuccess:(->
+      @boundNotesSuccess = _.bind(@onNotesUpdateSuccess, this)
+    ).on('init')
+
+    onNotesUpdateSuccess: (col) ->
+      customColumns = @get('custom_columns')
+      method = if col.hidden then 'removeObject' else 'unshiftObject'
+      column = customColumns.findBy('id', col.id) or col
+      customColumns[method] column
+
+      if col.teacher_notes
+        @set 'teacherNotes', col
+
+      unless col.hidden
+        ajax(
+          url: ENV.GRADEBOOK_OPTIONS.reorder_custom_columns_url
+          type:"POST"
+          data:
+            order: customColumns.mapBy('id')
+        )
+
+    studentColumnData: {}
+
+    updateColumnData: (columnDatum, columnID) ->
+      studentData = @get('studentColumnData')
+      dataForStudent = studentData[columnDatum.user_id] or Ember.A()
+
+      columnForStudent = dataForStudent.findBy('column_id', columnID)
+      if columnForStudent
+        columnForStudent.set 'content', columnDatum.content
+      else
+        dataForStudent.push Ember.Object.create
+                              column_id: columnID
+                              content: columnDatum.content
+      studentData[columnDatum.user_id] = dataForStudent
+
+    fetchColumnData: (col, url) ->
+      url ||= ENV.GRADEBOOK_OPTIONS.custom_column_data_url.replace /:id/, col.id
+      ajax.raw(url, {dataType:"json"}).then (result) =>
+        for datum in result.response
+          @updateColumnData datum, col.id
+        meta = parseLinkHeader result.jqXHR
+        if meta.next
+          @fetchColumnData col, meta.next
+        else
+          setProperties col,
+            'isLoading': false
+            'isLoaded': true
+
+    dataForStudent: (->
+      selectedStudent = @get('selectedStudent')
+      return unless selectedStudent?
+      @get('studentColumnData')[selectedStudent.id]
+    ).property('selectedStudent', 'custom_columns.@each.isLoaded')
+
+    loadCustomColumnData: (->
+      return unless (@get('enrollments.isLoaded'))
+      @get('custom_columns').filter((col) ->
+        return false if get(col, 'isLoaded') or get(col, 'isLoading')
+        set col, 'isLoading', true
+        col
+      ).forEach (col) =>
+        @fetchColumnData col
+    ).observes('enrollments.isLoaded', 'custom_columns.@each')
+
     studentsInSelectedSection: (->
       students = @get('students')
       currentSection = @get('selectedSection')
@@ -174,8 +290,9 @@ define [
           submission.submissions.forEach ((s) ->
             @updateSubmission(s, student)
           ), this
-          set(student, 'isLoading', false)
-          set(student, 'isLoaded', true)
+          setProperties student,
+            'isLoading': false
+            'isLoaded': true
           @calculateStudentGrade student
       ), this
     ).observes('submissions.@each')

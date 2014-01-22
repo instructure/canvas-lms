@@ -103,6 +103,18 @@
   </label>
 </div>
 
+<div>
+  <label>
+  {{
+    input
+    type="checkbox"
+    id="show_notes"
+    name="show_notes"
+    checked=showNotesColumn
+  }}
+  {{#t "show_notes"}}Show Notes in Student Info{{/t}}
+  </label>
+</div>
 <!-- -------- -->
 
 <h2>Content Selection</h2>
@@ -248,6 +260,15 @@
   </div>
 
   <div>{{#t 'sections'}}Sections:{{/t}} {{selectedStudentSections}}</div>
+  {{#each column in custom_columns}}
+  {{
+    custom-column-cell
+    student=selectedStudent
+    column=column
+    dataForStudent=dataForStudent
+    on-column-save='columnUpdated'
+  }}
+  {{/each}}
 
   <div>
     {{#t 'final_grade'}}Final Grade:{{/t}} 

@@ -4,8 +4,7 @@ define [
   '../shared_ajax_fixtures'
 ], (Ember, startApp, fixtures) ->
 
-  {ContainerView, run} = Ember
-  originalChangeGrade = null
+  {run} = Ember
 
   fixtures.create()
 
@@ -20,7 +19,6 @@ define [
         run => @assignment.set('grading_type', type)
       @component.reopen
         changeGradeURL: ->
-          originalChangeGrade = this._super
           "/api/v1/assignment/:assignment/:submission"
       run =>
         @submission = Ember.Object.create
@@ -73,7 +71,7 @@ define [
     sinon.stub(@component, 'ajax').returns requestStub
 
     run =>
-      @component.$('input').val('ohi')
+      @component.set('value', 'ohai')
       @component.send('focusOut')
 
       requestStub.then ->
