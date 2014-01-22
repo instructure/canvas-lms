@@ -15,38 +15,4 @@
   </div>
 </form>
 
-<% js_block do %>
-<script>
-require([
-  'jquery' /* $ */,
-  'jquery.instructure_forms' /* formSubmit, formErrors, errorBox */,
-  'jquery.loadingImg' /* loadingImage */,
-  'compiled/jquery.rails_flash_notifications'
-], function($) {
-
-$(document).ready(function() {
-  $(".submit_error_link").click(function(event) {
-    event.preventDefault();
-    $("#submit_error_form").slideToggle(function() {
-      $("#submit_error_form :input:visible:first").focus().select();
-    });
-  });
-  $("#submit_error_form").formSubmit({
-    formErrors: false,
-    beforeSubmit: function(data) {
-      $(this).loadingImage();
-    },
-    success: function(data) {
-      $(this).loadingImage('remove');
-      $.flashMessage(<%= raw t('message_sent', "Thank you for your help!  We'll get right on this.").to_json %>);
-      $("#submit_error_form").slideToggle();
-    },
-    error: function(data) {
-      $(this).loadingImage('remove');
-      $(this).errorBox(<%= raw t('message_failed', "Report didn't send.  Please try again.").to_json %>);
-    }
-  });
-});
-});
-</script>
-<% end %>
+<% js_bundle 'legacy/error_form' %>
