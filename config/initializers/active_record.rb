@@ -442,6 +442,7 @@ class ActiveRecord::Base
   end
 
   def self.distinct_on(columns, options)
+    columns = Array(columns)
     bad_options = options.keys - [:select, :order]
     if bad_options.present?
       # while it's possible to make this work with :limit, it would be gross
@@ -450,8 +451,8 @@ class ActiveRecord::Base
     end
 
     native = (connection.adapter_name == 'PostgreSQL')
-    options[:select] = "DISTINCT ON (#{Array(columns).join(', ')}) " + (options[:select] || '*') if native
-    raise "distinct on columns must match the leftmost part of the order-by clause" unless options[:order] && options[:order] =~ /\A#{Array(columns).map{ |c| Regexp.escape(c) }.join(' *(?:asc|desc)?, *')}/i
+    options[:select] = "DISTINCT ON (#{columns.join(', ')}) " + (options[:select] || '*') if native
+    raise "distinct on columns must match the leftmost part of the order-by clause" unless options[:order] && options[:order] =~ /\A#{columns.map{ |c| Regexp.escape(c) }.join(' *(?:asc|desc)?, *')}/i
 
     scope = self
     scope = scope.select(options[:select]) if options[:select]
