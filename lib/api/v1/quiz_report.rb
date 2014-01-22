@@ -16,12 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Api::V1::QuizStatistics
+module Api::V1::QuizReport
   include Api::V1::Json
   include Api::V1::Progress
   include Api::V1::Attachment
 
-  API_ALLOWED_QUIZ_STATISTICS_FIELDS = %w{
+  API_ALLOWED_QUIZ_REPORT_FIELDS = %w{
     id
     quiz_id
     includes_all_versions
@@ -31,12 +31,12 @@ module Api::V1::QuizStatistics
     report_type
   }
 
-  def quiz_statistics_json(stats, current_user, session, opts = {})
-    api_json(stats, current_user, session, :only => API_ALLOWED_QUIZ_STATISTICS_FIELDS).tap do |hash|
+  def quiz_report_json(stats, current_user, session, opts = {})
+    api_json(stats, current_user, session, :only => API_ALLOWED_QUIZ_REPORT_FIELDS).tap do |hash|
       if opts[:include]
         if opts[:include].include?('progress_url') && stats.progress && stats.progress.pending?
           hash['progress_url'] = polymorphic_url([:api_v1, stats.progress])
-        end 
+        end
         if opts[:include].include?('file') && stats.csv_attachment
           hash['file'] = attachment_json(stats.csv_attachment, current_user)
         end

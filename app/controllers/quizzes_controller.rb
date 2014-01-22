@@ -18,7 +18,7 @@
 
 class QuizzesController < ApplicationController
   include Api::V1::Quiz
-  include Api::V1::QuizStatistics
+  include Api::V1::QuizReport
   include Api::V1::AssignmentOverride
   include KalturaHelper
 
@@ -418,7 +418,7 @@ class QuizzesController < ApplicationController
 
             js_env :quiz_reports => QuizStatistics::REPORTS.map { |report_type|
               report = @quiz.current_statistics_for(report_type, :includes_all_versions => all_versions)
-              json = quiz_statistics_json(report, @current_user, session, :include => ['file'])
+              json = quiz_report_json(report, @current_user, session, :include => ['file'])
               json[:course_id] = @context.id
               json[:report_disabled] = @quiz.survey? && report_type == "item_analysis"
               json[:report_name] = report.readable_type
