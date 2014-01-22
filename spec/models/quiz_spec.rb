@@ -26,10 +26,13 @@ describe Quiz do
 
   describe ".mark_quiz_edited" do
     it "should mark a quiz as having unpublished changes" do
-      quiz = @course.quizzes.create! :title => "hello"
-      quiz.published_at = Time.now
-      quiz.publish!
-      quiz.unpublished_changes?.should be_false
+      quiz = nil
+      Timecop.freeze(5.minutes.ago) do
+        quiz = @course.quizzes.create! :title => "hello"
+        quiz.published_at = Time.now
+        quiz.publish!
+        quiz.unpublished_changes?.should be_false
+      end
 
       Quiz.mark_quiz_edited(quiz.id)
       quiz.reload.unpublished_changes?.should be_true
@@ -38,10 +41,13 @@ describe Quiz do
 
   describe "#mark_edited!" do
     it "should mark a quiz as having unpublished changes" do
-      quiz = @course.quizzes.create! :title => "hello"
-      quiz.published_at = Time.now
-      quiz.publish!
-      quiz.unpublished_changes?.should be_false
+      quiz = nil
+      Timecop.freeze(5.minutes.ago) do
+        quiz = @course.quizzes.create! :title => "hello"
+        quiz.published_at = Time.now
+        quiz.publish!
+        quiz.unpublished_changes?.should be_false
+      end
 
       quiz.mark_edited!
       quiz.reload.unpublished_changes?.should be_true
