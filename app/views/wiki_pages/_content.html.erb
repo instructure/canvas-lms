@@ -138,23 +138,6 @@ course will see this page first.  You can change that from [the course home page
       </div>
     </div>
   <% end -%>
-<% js_block do  %>
-  <script type="text/javascript">
-  require([
-    'jquery' /* $ */,
-    'wiki',
-    'vendor/jquery.pageless' /* pageless */
-  ], function($, wikiPage) {
-    wikiPage.init(); //this is purposly not in a domready, for some reason it wont work there.
-
-    <% if @editing %>
-      $(document).ready(function() {
-        $("#wiki_show_view_secondary .edit_link:first").click();
-      });
-    <% end %>
-
-  });
-  </script>
-<% end %>
+<% js_bundle 'legacy/wiki_pages_content' %>
 </div>
 <div id="wiki_page_version_number" style="display: none;"><%= @page.version_number %></div>
