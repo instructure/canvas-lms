@@ -134,6 +134,7 @@ describe "shared files tests" do
 
       it "should save changes from HTML view" do
         click_edit_link
+        wait_for_ajaximations
         switch_html_edit_views
         type_in_tiny('#edit_content_textarea', 'I am typing')
         save_html_content
