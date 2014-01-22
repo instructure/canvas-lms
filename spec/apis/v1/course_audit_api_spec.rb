@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper'
 describe "CourseAudit API", type: :integration do
   context "not configured" do
     before do
-      Canvas::Cassandra::Database.stubs(:configured?).with('auditors').returns(false)
+      Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).with('auditors').returns(false)
       course
     end
 
