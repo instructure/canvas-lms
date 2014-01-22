@@ -49,21 +49,7 @@
   <% end %>
   </div>
 <% elsif @submission.submission_type == "online_text_entry" %>
-  <% js_block do %>
-  <script>
-  require(['jquery'], function($) {
-    $(document).ready(function() {
-      $(".data_view").change(function() {
-        if($(this).val() == "paper") {
-          $("#submission_preview").removeClass('plain_text').addClass('paper');
-        } else {
-          $("#submission_preview").removeClass('paper').addClass('plain_text');
-        }
-      }).change();
-    });
-  });
-  </script>
-  <% end %>
+  <% js_bundle 'legacy/submissions_show_preview_text' %>
   <div style="text-align: right; margin-top: 15px;">
     <select class="data_view">
       <option value="paper"><%= t('paper_view', 'Paper View') %></option>
@@ -115,41 +101,8 @@
       </div>
     </div>
   </div>
-  <% js_block do %>
-    <script>
-    require([
-      'jquery',
-      'vendor/swfobject/swfobject',
-      'jqueryui/dialog',
-      'jquery.doc_previews' // loadDocPreview
-    ], function($, swfobject, _docPreviews) {
-      $(document).ready(function(){
 
-        $("a.flash").click(function() {
-          swfobject.embedSWF($(this).attr('href'), "main", "100%", "100%", "9.0.0", false, null, { wmode: "opaque" }, null);
-          return false;
-        });
-
-        if ($.filePreviewsEnabled()) {
-          $('.modal_preview_link').live('click', function() {
-            $('<div style="padding:0; overflow:hidden;">') //overflow:hidden is because of some weird thing where the google doc preview gets double scrollbars
-              .dialog({
-                title: "Preview of " + $(this).data('dialog-title'),
-                width: $(document).width() * .95,
-                height: $(document).height() * .75
-              })
-              .loadDocPreview($.extend({
-                height: '100%'
-              }, $(this).data()));
-            return false;
-          });
-        }
-
-      });
-    });
-    </script>
-  <% end %>
-
+  <% js_bundle 'legacy/submissions_show_preview_upload' %>
 <% elsif @submission.submission_type == "online_quiz" %>
   <% content_for :stylesheets do %>
     <meta HTTP-EQUIV="REFRESH" content="0; url=<%= context_url(@context, :context_quiz_history_url, @assignment.quiz.id, :user_id => @submission.user_id, :headless => 1, :version => @submission.quiz_submission_version) %>"/>
@@ -165,24 +118,7 @@
   </div>
   <div class="media_comment_id" style="display: none;"><%= @submission.media_comment_id %></div>
 
-  <% js_block do %>
-    <script>
-    require([
-      'jquery',
-      'media_comments'
-    ], function($, _mediaComments) {
-      $(document).ready(function() {
-        $(".play_media_recording_link").click(function(event) {
-          event.preventDefault();
-          var id = $(".media_comment_id:first").text();
-          $("#media_recording_box .box_content").mediaComment('show_inline', id);
-          $(this).remove();
-        });
-        $(".play_media_recording_link").mediaCommentThumbnail();
-      });
-    });
-    </script>
-  <% end %>
+  <% js_bundle 'legacy/submissions_show_preview_media' %>
 <% elsif @submission.has_submission? || @assignment.expects_external_submission? %>
   <div style="margin: 20px auto; width: 400px; height: 50px; font-size: 1.5em;  font-weight: bold;">
     <%= t('no_preview_available', 'No Preview Available') %>
