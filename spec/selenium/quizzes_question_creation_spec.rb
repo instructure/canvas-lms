@@ -525,7 +525,6 @@ describe "quizzes question creation" do
       wait_for_ajaximations
       click_settings_tab
       sleep 2 # wait for page to load
-
       quiz_attempt_field = lambda {
         set_value(f('#multiple_attempts_option'), false)
         set_value(f('#multiple_attempts_option'), true)
