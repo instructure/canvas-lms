@@ -39,9 +39,51 @@ define [
       'near-mastery': new CheckboxView(Dictionary.nearMastery)
       remedial:       new CheckboxView(Dictionary.remedial)
 
+    events:
+      'click .sidebar-toggle': 'onSidebarToggle'
+
     constructor: (options) ->
       super
       @_validateOptions(options)
+
+    # Public: Show/hide the sidebar.
+    #
+    # e - Event object.
+    #
+    # Returns nothing.
+    onSidebarToggle: (e) ->
+      e.preventDefault()
+      isCollapsed = @_toggleSidebarCollapse()
+      @_toggleSidebarArrow()
+      @_toggleSidebarTooltips(isCollapsed)
+
+    # Internal: Toggle collapsed class on sidebar.
+    #
+    # Returns true if collapsed, false if expanded.
+    _toggleSidebarCollapse: ->
+      @$('.outcome-gradebook-sidebar')
+        .toggleClass('collapsed')
+        .hasClass('collapsed')
+
+    # Internal: Toggle the direction of the sidebar collapse arrow.
+    #
+    # Returns nothing.
+    _toggleSidebarArrow: ->
+      @$('.sidebar-toggle')
+        .toggleClass('icon-arrow-right')
+        .toggleClass('icon-arrow-left')
+
+    # Internal: Toggle the direction of the sidebar collapse arrow.
+    #
+    # Returns nothing.
+    _toggleSidebarTooltips: (shouldShow) ->
+      if shouldShow
+        @$('.checkbox-view').each ->
+          $(this).find('.checkbox')
+            .attr('data-tooltip', 'left')
+            .attr('title', $(this).find('.checkbox-label').text())
+      else
+        @$('.checkbox').removeAttr('data-tooltip').removeAttr('title')
 
     # Internal: Validate options passed to constructor.
     #
