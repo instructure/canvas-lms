@@ -32,6 +32,7 @@ define [
           hiddenNameCounter += 1
         student.sections ||= []
         student.sections.push(enrollment.course_section_id)
+        student.role ||= enrollment.role
         return array if iMeta.students[student.id]
         iMeta.students[student.id] = student
         array.pushObject(student)
@@ -148,7 +149,8 @@ define [
     studentsHash: ->
       students = {}
       @get('students').forEach (s) ->
-        students[s.id] = s
+        unless s.role == "StudentViewEnrollment"
+          students[s.id] = s
       students
 
     fetchStudentSubmissions: (->

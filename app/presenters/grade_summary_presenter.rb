@@ -145,17 +145,25 @@ class GradeSummaryPresenter
     @submission_counts ||= @context.assignments.active
       .except(:order)
       .joins(:submissions)
+      .where("submissions.user_id in (?)", real_and_active_student_ids)
       .group("assignments.id")
       .count("submissions.id")
   end
 
   def assignment_stats
     @stats ||= @context.assignments.active
-    .except(:order)
-    .joins(:submissions)
-    .group("assignments.id")
-    .select("assignments.id, max(score) max, min(score) min, avg(score) avg")
-    .index_by(&:id)
+      .except(:order)
+      .joins(:submissions)
+      .where("submissions.user_id in (?)", real_and_active_student_ids)
+      .group("assignments.id")
+      .select("assignments.id, max(score) max, min(score) min, avg(score) avg")
+      .index_by(&:id)
+  end
+
+  def real_and_active_student_ids
+    @context.all_real_student_enrollments
+      .where("workflow_state not in (?)", ['rejected','inactive'])
+      .pluck(:user_id).uniq
   end
 
   def assignment_presenters
