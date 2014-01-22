@@ -1,9 +1,17 @@
 <div class="outcome-gradebook-sidebar">
-  <ul class="checkboxes unstyled">
-    <li>{{view mastery}}</li>
-    <li>{{view near-mastery}}</li>
-    <li>{{view remedial}}</li>
-  </ul>
+  <div class="outcome-gradebook-sidebar-header">
+    <a href="#" class="icon-arrow-right sidebar-toggle">
+      <span class="screenreader-only">{{#t "toggle_sidebar"}}Toggle Sidebar{{/t}}</span>
+    </a>
+  </div>
+
+  <div class="outcome-gradebook-sidebar-content">
+    <ul class="checkboxes unstyled">
+      <li>{{view mastery}}</li>
+      <li>{{view near-mastery}}</li>
+      <li>{{view remedial}}</li>
+    </ul>
+  </div>
 </div>
 
 <div class="outcome-gradebook-wrapper"></div>
