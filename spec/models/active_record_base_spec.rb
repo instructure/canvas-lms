@@ -20,10 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ActiveRecord::Base do
   describe "count_by_date" do
-    def create_courses(start_times)
+    def create_courses(account, start_times)
       start_times.each_with_index do |time, i|
         (i + 1).times do
-          course = Course.new
+          course = account.courses.build
           course.start_at = time
           course.save!
         end
@@ -37,12 +37,13 @@ describe ActiveRecord::Base do
         Time.zone.now.advance(:days => -2),
         Time.zone.now.advance(:days => -3)
       ]
-      create_courses(start_times)
+      account = Account.create!
+      create_courses(account, start_times)
 
       # updated_at
-      Course.count_by_date.should eql({start_times.first.to_date => 10})
+      account.courses.count_by_date.should eql({start_times.first.to_date => 10})
 
-      Course.count_by_date(:column => :start_at).should eql Hash[
+      account.courses.count_by_date(:column => :start_at).should eql Hash[
         start_times.each_with_index.map{ |t, i| [t.to_date, i + 1]}
       ]
     end
@@ -54,12 +55,13 @@ describe ActiveRecord::Base do
         Time.zone.now.advance(:days => -20),
         Time.zone.now.advance(:days => 1)
       ]
-      create_courses(start_times)
+      account = Account.create!
+      create_courses(account, start_times)
 
       # updated_at
-      Course.count_by_date.should eql({start_times.first.to_date => 10})
+      account.courses.count_by_date.should eql({start_times.first.to_date => 10})
 
-      Course.count_by_date(:column => :start_at).should eql Hash[
+      account.courses.count_by_date(:column => :start_at).should eql Hash[
         start_times[0..1].each_with_index.map{ |t, i| [t.to_date, i + 1]}
       ]
     end
@@ -67,21 +69,21 @@ describe ActiveRecord::Base do
 
   describe "find in batches" do
     before do
-      c1 = course(:name => 'course1', :active_course => true)
-      c2 = course(:name => 'course2', :active_course => true)
+      @c1 = course(:name => 'course1', :active_course => true)
+      @c2 = course(:name => 'course2', :active_course => true)
       u1 = user(:name => 'user1', :active_user => true)
       u2 = user(:name => 'user2', :active_user => true)
       u3 = user(:name => 'user3', :active_user => true)
-      @e1 = c1.enroll_student(u1, :enrollment_state => 'active')
-      @e2 = c1.enroll_student(u2, :enrollment_state => 'active')
-      @e3 = c1.enroll_student(u3, :enrollment_state => 'active')
-      @e4 = c2.enroll_student(u1, :enrollment_state => 'active')
-      @e5 = c2.enroll_student(u2, :enrollment_state => 'active')
-      @e6 = c2.enroll_student(u3, :enrollment_state => 'active')
+      @e1 = @c1.enroll_student(u1, :enrollment_state => 'active')
+      @e2 = @c1.enroll_student(u2, :enrollment_state => 'active')
+      @e3 = @c1.enroll_student(u3, :enrollment_state => 'active')
+      @e4 = @c2.enroll_student(u1, :enrollment_state => 'active')
+      @e5 = @c2.enroll_student(u2, :enrollment_state => 'active')
+      @e6 = @c2.enroll_student(u3, :enrollment_state => 'active')
     end
 
     it "should find all enrollments from course join in batches" do
-      e = Course.active.select("enrollments.id AS e_id").
+      e = Course.active.where(id: [@c1, @c2]).select("enrollments.id AS e_id").
                         joins(:enrollments).order("e_id asc")
       batch_size = 2
       es = []
@@ -360,15 +362,16 @@ describe ActiveRecord::Base do
   context "bulk_insert" do
     it "should work" do
       User.bulk_insert [
-        {:name => "foo", :workflow_state => "registered"},
-        {:name => "bar", :workflow_state => "registered"}
+        {:name => "bulk_insert_1", :workflow_state => "registered"},
+        {:name => "bulk_insert_2", :workflow_state => "registered"}
       ]
-      User.order(:name).pluck(:name).should eql ["bar", "foo"]
+      names = User.order(:name).pluck(:name)
+      names.should be_include("bulk_insert_1")
+      names.should be_include("bulk_insert_2")
     end
 
     it "should not raise an error if there are no records" do
-      lambda { Course.bulk_insert [] }.should_not raise_error
-      Course.count.should eql 0
+      expect { Course.bulk_insert [] }.should change(Course, :count).by(0)
     end
   end
 
@@ -395,7 +398,7 @@ describe ActiveRecord::Base do
       ids = []
       5.times { ids << User.create!().id }
       batches = []
-      User.find_ids_in_batches(:batch_size => 2) do |found_ids|
+      User.where(id: ids).find_ids_in_batches(:batch_size => 2) do |found_ids|
         batches << found_ids
       end
       batches.should == [ ids[0,2], ids[2,2], ids[4,1] ]
@@ -407,7 +410,7 @@ describe ActiveRecord::Base do
       ids = []
       10.times { ids << User.create!().id }
       batches = []
-      User.find_ids_in_ranges(:batch_size => 4) do |*found_ids|
+      User.where(id: ids).find_ids_in_ranges(:batch_size => 4) do |*found_ids|
         batches << found_ids
       end
       batches.should == [ [ids[0], ids[3]],
@@ -419,7 +422,7 @@ describe ActiveRecord::Base do
       user = User.create!
       user2 = User.create!
       user2.destroy
-      User.active.find_ids_in_ranges do |*found_ids|
+      User.active.where(id: [user, user2]).find_ids_in_ranges do |*found_ids|
         found_ids.should == [user.id, user.id]
       end
     end
@@ -609,8 +612,8 @@ describe ActiveRecord::Base do
 
     describe "pluck" do
       it "should work on models, associations, and scopes" do
-        User.pluck(:id).should == [@user.id]
-        User.scoped.pluck(:id).should == [@user.id]
+        User.pluck(:id).should be_include(@user.id)
+        User.where(id: @user).pluck(:id).should == [@user.id]
         @user.communication_channels.pluck(:id).should == [@cc.id]
       end
     end
