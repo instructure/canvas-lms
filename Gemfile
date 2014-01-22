@@ -158,7 +158,7 @@ group :postgres do
 end
 
 group :sqlite do
-  gem 'sqlite3-ruby', '1.3.2'
+  gem 'sqlite3', '1.3.8'
 end
 
 group :test do
