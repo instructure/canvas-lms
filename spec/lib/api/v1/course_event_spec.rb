@@ -38,6 +38,8 @@ describe Api::V1::CourseEvent do
   end
 
   before do
+    pending("needs auditors cassandra keyspace configured") unless Auditors::Course::Stream.available?
+
     @request_id = UUIDSingleton.instance.generate
     RequestContextGenerator.stubs( :request_id => @request_id )
 
