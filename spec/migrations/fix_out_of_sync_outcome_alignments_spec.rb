@@ -24,7 +24,7 @@ describe DataFixup::FixOutOfSyncOutcomeAlignments do
     outcome_with_rubric
     @rubric_association_object = @course.assignments.create!(:title => 'blah')
     @rubric_association = @rubric.rubric_associations.create!({
-      :association => @rubric_association_object,
+      :association_object => @rubric_association_object,
       :context => @course,
       :purpose => 'grading'
     })

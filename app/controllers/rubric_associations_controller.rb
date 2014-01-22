@@ -36,8 +36,8 @@ class RubricAssociationsController < ApplicationController
       if params[:rubric] && @rubric.grants_rights?(@current_user, session, :update)[:update]
         @rubric.update_criteria(params[:rubric])
       end
-      params[:rubric_association][:association] = @association.association if @association
-      params[:rubric_association][:association] ||= @association_object
+      params[:rubric_association][:association_object] = @association.association_object if @association
+      params[:rubric_association][:association_object] ||= @association_object
       params[:rubric_association][:id] = @association.id if @association
       @association = RubricAssociation.generate(@current_user, @rubric, @context, params[:rubric_association])
       json_res = {

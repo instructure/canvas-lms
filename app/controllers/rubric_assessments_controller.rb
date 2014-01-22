@@ -74,7 +74,7 @@ class RubricAssessmentsController < ApplicationController
   def update
     @association = @context.rubric_associations.find(params[:rubric_association_id])
     @assessment = @association.rubric_assessments.find_by_id(params[:id])
-    @association_object = @association.association
+    @association_object = @association.association_object
 
     # only check if there's no @assessment object, since that's the only time
     # this param matters (assessing_user_id and arg find_asset_for_assessment)

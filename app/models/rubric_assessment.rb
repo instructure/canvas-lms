@@ -48,7 +48,7 @@ class RubricAssessment < ActiveRecord::Base
   
   def update_outcomes_for_assessment(outcome_ids=[])
     return if outcome_ids.empty?
-    alignments = self.rubric_association.association.learning_outcome_alignments.find_all_by_learning_outcome_id(outcome_ids)
+    alignments = self.rubric_association.association_object.learning_outcome_alignments.find_all_by_learning_outcome_id(outcome_ids)
     (self.data || []).each do |rating|
       if rating[:learning_outcome_id]
         alignments.each do |alignment|
@@ -134,7 +134,7 @@ class RubricAssessment < ActiveRecord::Base
     if self.artifact_type == 'Submission' && self.artifact
       Submission.where(:id => self.artifact).update_all(:has_rubric_assessment => true)
       if self.rubric_association && self.rubric_association.use_for_grading && self.artifact.score != self.score
-        if self.rubric_association.association.grants_right?(self.assessor, nil, :grade)
+        if self.rubric_association.association_object.grants_right?(self.assessor, nil, :grade)
           # TODO: this should go through assignment.grade_student to 
           # handle group assignments.
           self.artifact.workflow_state = 'graded'
@@ -161,7 +161,7 @@ class RubricAssessment < ActiveRecord::Base
     given {|user, session| 
       self.rubric_association && 
       self.rubric_association.grants_rights?(user, session, :manage)[:manage] &&
-      (self.rubric_association.association.context.grants_right?(self.assessor, nil, :manage_rubrics) rescue false)
+      (self.rubric_association.association_object.context.grants_right?(self.assessor, nil, :manage_rubrics) rescue false)
     }
     can :update
   end
@@ -189,10 +189,10 @@ class RubricAssessment < ActiveRecord::Base
   end
   
   def related_group_submissions_and_assessments
-    if self.rubric_association && self.rubric_association.association.is_a?(Assignment) && !self.rubric_association.association.grade_group_students_individually 
-      students = self.rubric_association.association.group_students(self.user).last
+    if self.rubric_association && self.rubric_association.association_object.is_a?(Assignment) && !self.rubric_association.association_object.grade_group_students_individually
+      students = self.rubric_association.association_object.group_students(self.user).last
       submissions = students.map do |student|
-        submission = self.rubric_association.association.find_asset_for_assessment(self.rubric_association, student.id).first
+        submission = self.rubric_association.association_object.find_asset_for_assessment(self.rubric_association, student.id).first
         {:submission => submission, :rubric_assessments => submission.rubric_assessments.map{|ra| ra.as_json(:methods => :assessor_name)}}
       end
     else

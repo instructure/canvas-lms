@@ -103,8 +103,8 @@ describe RubricAssessmentsController do
       rubric_association_model(:user => @user, :context => @course)
       assessor = User.create!
       @course.enroll_student(assessor)
-      assessor_asset = @rubric_association.association.find_or_create_submission(assessor)
-      user_asset = @rubric_association.association.find_or_create_submission(assessor)
+      assessor_asset = @rubric_association.association_object.find_or_create_submission(assessor)
+      user_asset = @rubric_association.association_object.find_or_create_submission(assessor)
       @assessment_request = @rubric_association.assessment_requests.create!(user: @user, asset: user_asset, assessor: assessor, assessor_asset: assessor_asset)
     end
 
@@ -228,7 +228,7 @@ def setup_course_assessment
   @course.enroll_student(@student3).accept!
   @course.enroll_teacher(@teacher2).accept!
   @assignment = @course.assignments.create!(:title => "Some Assignment")
-  rubric_assessment_model(:user => @user, :context => @course, :association => @assignment, :purpose => 'grading')
+  rubric_assessment_model(:user => @user, :context => @course, :association_object => @assignment, :purpose => 'grading')
   student1_asset = @assignment.find_or_create_submission(@student1)
   student2_asset = @assignment.find_or_create_submission(@student2)
   student3_asset = @assignment.find_or_create_submission(@student3)
