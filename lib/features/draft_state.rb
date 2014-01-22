@@ -33,11 +33,10 @@ end
 Feature.register('draft_state' => {
     display_name: lambda { I18n.t('features.draft_state', 'Draft State') },
     description: lambda { I18n.t('draft_state_description', <<END) },
-Draft state is a *beta* feature that allows course content to be published and unpublished.
-Unpublished content won't be visible to students and won't affect grades.
-It also includes a redesign of some course areas to make them more consistent in look and functionality.
-
-Unpublished content may not be available if Draft State is disabled.
+This beta feature redesigns many parts of Canvas and allows content to exist in
+a new unpublished state that is invisible to students and excluded from grade
+calculations. Caution--disabling this feature may delete newly created or edited
+content from the teacher's view.
 END
     applies_to: 'Course',
     state: 'hidden',
