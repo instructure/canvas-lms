@@ -134,7 +134,7 @@ class Worker
         job.invoke_job
       end
       Delayed::Stats.job_complete(job, self)
-      Rails.logger.silence do
+      Rails.logger.quietly do
         job.destroy
       end
     end

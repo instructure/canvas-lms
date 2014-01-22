@@ -41,6 +41,7 @@ class SyslogWrapper
       yield self
     end
   end
+  alias :quietly :silence
 
   # facility is a logical-or-ed collection of the following constants in Syslog
   #   LOG_AUTHPRIV - security or authorization messages which should be kept private
