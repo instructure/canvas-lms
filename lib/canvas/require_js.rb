@@ -95,6 +95,10 @@ module Canvas
               deps: ['jquery', 'handlebars'],
               attach: 'Ember'
             },
+            'bower/ember-data/ember-data': {
+              deps: ['ember'],
+              attach: 'DS'
+            },
             'bower/handlebars/handlebars.runtime': {
               attach: 'Handlebars'
             },

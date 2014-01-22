@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "ember": "1.3.2",
+    "ember-data": "~1.0.0-beta.6",
     "handlebars": "1.3.0",
     "ic-ajax": "~0.2.0",
     "ic-menu": "~0.1.0",

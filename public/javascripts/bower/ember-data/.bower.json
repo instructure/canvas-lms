@@ -1,0 +1,18 @@
+{
+  "name": "ember-data",
+  "version": "1.0.0-beta.6",
+  "main": "ember-data.js",
+  "dependencies": {
+    "ember": ">= 1.0.0"
+  },
+  "homepage": "https://github.com/components/ember-data",
+  "_release": "1.0.0-beta.6",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.0.0-beta.6",
+    "commit": "3c05b68695bc2d960f88669dc4e0f025a56a3b36"
+  },
+  "_source": "git://github.com/components/ember-data.git",
+  "_target": "~1.0.0-beta.6",
+  "_originalSource": "ember-data"
+}

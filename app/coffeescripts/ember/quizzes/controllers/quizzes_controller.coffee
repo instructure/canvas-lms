@@ -3,8 +3,10 @@ define [
   '../shared/environment',
   'i18n!quizzes',
   '../shared/search_matcher',
-  '../shared/quiz_sorter'
-], (Ember, environment, I18n, searchMatcher, quizSorter) ->
+], (Ember, environment, I18n, searchMatcher) ->
+
+  {compare} = Ember
+  {filter, filterBy, alias, sort} = Ember.computed
 
   # http://emberjs.com/guides/controllers/
   # http://emberjs.com/api/classes/Ember.Controller.html
@@ -12,7 +14,6 @@ define [
   # http://emberjs.com/api/classes/Ember.ObjectController.html
 
   QuizzesController = Ember.ArrayController.extend
-
     searchFilter: ''
     searchPlaceholder: I18n.t('search_placeholder', 'Search for Quiz')
     addQuiz: I18n.t('title_add_quiz', 'Add Quiz')
@@ -20,54 +21,47 @@ define [
     practicesLabel: I18n.t('practices_label', 'Practice Quizzes toggle quiz visibility')
     surveysLabel: I18n.t('surveys_label', 'Surveys toggle quiz visibility')
 
-    canManage: ( ->
-      environment.get('canManage')
-    ).property('environment.canManage')
+    canManage: alias 'environment.canManage'
 
-    newQuizLink: ( ->
+    newQuizLink: (->
       "/courses/#{environment.get('courseId')}/quizzes/new?fresh=1"
     ).property('environment.courseId')
 
-    questionBanksUrl: ( ->
+    questionBanksUrl: (->
       "/courses/#{environment.get('courseId')}/question_banks"
     ).property('environment.courseId')
 
-    surveyTypes: ['survey', 'graded_survey']
-
     filtered: (->
-      quizSorter(@get('model')).filter ({title}) => searchMatcher(title, @get('searchFilter'))
-    ).property('model.@each', 'searchFilter', 'model')
+      @get('arrangedContent').filter (quiz) =>
+        searchMatcher quiz.get('title'), @get('searchFilter')
+    ).property('arrangedContent.[]', 'searchFilter')
 
-    assignments: (->
-      @get('filtered').filterBy('quiz_type', 'assignment')
-    ).property('filtered.@each')
+    # Seems weird, but things won't disappear from the list when 
+    # undestroyedContent: filterBy 'arrangedContent', 'isDestroyed', false
 
-    practices: (->
-      @get('filtered').filterBy('quiz_type', 'practice_quiz')
-    ).property('filtered.@each')
+    assignments: filterBy 'filtered', 'isAssignment'
 
-    surveys: (->
-      surveyTypes = this.get('surveyTypes')
-      @get('filtered').filter ({quiz_type, title}) =>
-        quiz_type in surveyTypes
-    ).property('filtered.@each')
+    practices: filterBy 'filtered', 'isPracticeQuiz'
 
-    rawAssignments: (->
-      @get('model').filterBy('quiz_type', 'assignment')
-    ).property('model.@each')
+    surveys: filterBy 'filtered', 'isSurvey'
 
-    rawPractices: (->
-      @get('model').filterBy('quiz_type', 'practice_quiz')
-    ).property('model.@each')
+    rawAssignments: filterBy 'model', 'isAssignment'
 
-    rawSurveys: (->
-      surveyTypes = this.get('surveyTypes')
-      @get('model').filter ({quiz_type, title}) =>
-        quiz_type in surveyTypes
-    ).property('model.@each')
+    rawPractices: filterBy 'model', 'isPracticeQuiz'
 
+    rawSurveys: filterBy 'model', 'isSurvey'
+
+    sortProperties: ['due_at']
+
+    sortFunction: (x, y) ->
+      return 1 unless x
+      compare x, y
+
+    disabledMessage: I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
     actions:
       editBanks: ->
         window.location = @get('questionBanksUrl')
 
+      delete: ->
+        @get('model')
 
