@@ -2032,7 +2032,11 @@ class Course < ActiveRecord::Base
     migration.workflow_state = :imported
     migration.save
     ActiveRecord::Base.skip_touch_context(false)
-    self.touch
+    if self.changed?
+      self.save
+    else
+      self.touch
+    end
     @imported_migration_items
   end
   attr_accessor :imported_migration_items, :full_migration_hash, :external_url_hash, :content_migration
