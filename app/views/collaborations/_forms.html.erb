@@ -92,10 +92,4 @@ HEREDOC
     <button type="button" class="btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
   </div>
 <% end %>
-<% js_block do %>
-<script>
-require(['INST'], function(INST) {
-  INST.collaboration_types = <%= raw Collaboration.collaboration_types.to_json %>;
-});
-</script>
-<% end %>
+<% js_bundle 'legacy/collaborations_forms' %>
