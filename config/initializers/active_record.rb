@@ -689,13 +689,22 @@ class ActiveRecord::Base
   # note this does a raw connection.select_values, so it doesn't work with scopes
   def self.find_ids_in_batches(options = {})
     batch_size = options[:batch_size] || 1000
-    ids = connection.select_values("select #{primary_key} from #{table_name} order by #{primary_key} limit #{batch_size.to_i}")
+    scope = scope(:find) || {}
+    scope[:select] = primary_key
+    scope[:order] = primary_key
+    scope[:limit] = batch_size
+    ids = nil
+    with_exclusive_scope(find: scope) do
+      ids = connection.select_values(scoped.to_sql)
+    end
     ids = ids.map(&:to_i) unless options[:no_integer_cast]
     while ids.present?
       yield ids
       break if ids.size < batch_size
       last_value = ids.last
-      ids = connection.select_values(sanitize_sql_array(["select #{primary_key} from #{table_name} where #{primary_key} > ? order by #{primary_key} limit #{batch_size.to_i}", last_value]))
+      with_exclusive_scope(find: scope) do
+        ids = connection.select_values(where("#{primary_key}>?", last_value).to_sql)
+      end
       ids = ids.map(&:to_i) unless options[:no_integer_cast]
     end
   end
