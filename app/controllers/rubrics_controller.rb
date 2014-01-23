@@ -33,7 +33,7 @@ class RubricsController < ApplicationController
 
   def show
     return unless authorized_action(@context, @current_user, :manage)
-    if (id = params[:id]) =~ /\A\d+\Z/
+    if (id = params[:id]) =~ Api::ID_REGEX
       js_env :ROOT_OUTCOME_GROUP => get_root_outcome
       @rubric_association = @context.rubric_associations.bookmarked.find_by_rubric_id(params[:id])
       raise ActiveRecord::RecordNotFound unless @rubric_association

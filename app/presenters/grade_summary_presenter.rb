@@ -60,6 +60,7 @@ class GradeSummaryPresenter
   def student_enrollment
     @student_enrollment ||= begin
       if @id_param # always use id if given
+        validate_id
         user_id = Shard.relative_id_for(@id_param, @context.shard)
         @context.all_student_enrollments.find_by_user_id(user_id)
       elsif observed_students.present? # otherwise try to find an observed student
@@ -68,6 +69,11 @@ class GradeSummaryPresenter
         @context.all_student_enrollments.find_by_user_id(@current_user)
       end
     end
+  end
+
+  def validate_id
+    raise ActiveRecord::RecordNotFound if ( !@id_param.is_a?(User) && (@id_param.to_s =~ Api::ID_REGEX).nil? )
+    true
   end
 
   def student

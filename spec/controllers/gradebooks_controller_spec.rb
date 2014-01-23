@@ -62,7 +62,7 @@ describe GradebooksController do
       assert_unauthorized
     end
 
-    it" should allow access for a linked observer" do
+    it "should allow access for a linked observer" do
       course_with_student(:active_all => true)
       @student = @user
       user(:active_all => true)
@@ -330,6 +330,13 @@ describe GradebooksController do
 
         check_grades_page(@due_at + 1.day)
       end
+    end
+
+    it "should raise an exception on a non-integer :id" do
+      course_with_teacher_logged_in(:active_all => true)
+      expect {
+        get 'grade_summary', :course_id => @course.id, :id => "lqw"
+      }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 

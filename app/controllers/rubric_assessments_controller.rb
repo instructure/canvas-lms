@@ -79,7 +79,7 @@ class RubricAssessmentsController < ApplicationController
     # only check if there's no @assessment object, since that's the only time
     # this param matters (assessing_user_id and arg find_asset_for_assessment)
     user_id = params[:rubric_assessment][:user_id]
-    if !@assessment && user_id !~ /\A\d+\Z/
+    if !@assessment && user_id !~ Api::ID_REGEX
       raise ActiveRecord::RecordNotFound
     end
 
