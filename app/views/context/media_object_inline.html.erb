@@ -8,17 +8,4 @@
   <div id="media_comment">
   </div>
 </div>
-<% js_block do %>
-<script>
-require([
-  'jquery' /* $ */,
-  'media_comments' /* mediaComment */
-], function($) {
-
-$(document).ready(function() {
-  $("#media_comment").mediaComment('show_inline', <%= raw params[:id].to_json %>, <%= raw((@media_object ? @media_object.media_type.to_s : 'video').to_json) %>);
-});
-
-});
-</script>
-<% end %>
+<% js_bundle 'legacy/context_media_object_inline' %>

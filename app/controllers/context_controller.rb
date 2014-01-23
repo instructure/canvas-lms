@@ -46,6 +46,8 @@ class ContextController < ApplicationController
     @show_left_side = false
     @show_right_side = false
     @media_object = MediaObject.by_media_id(params[:id]).first
+    js_env(MEDIA_OBJECT_ID: params[:id],
+           MEDIA_OBJECT_TYPE: @media_object ? @media_object.media_type.to_s : 'video')
     render
   end
 
