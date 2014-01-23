@@ -18,6 +18,18 @@
           {{/if}}
           {{#if CAN.PUBLISH}}
             <span class="publish-button"></span>
+          {{else}}
+            {{#if CAN.VIEW_UNPUBLISHED}}
+              {{#if published}}
+                <span class='published-status published'>
+                  <i class="icon-publish"></i> {{#t 'published_indicator'}}Published{{/t}}
+                </span>    
+              {{else}}
+                <span class='published-status unpublished'>
+                  <i class="icon-unpublished"></i> {{#t 'unpublished_indicator'}}Not Published{{/t}}
+                </span>
+              {{/if}}
+            {{/if}}
           {{/if}}
         {{/unless}}
         {{#if CAN.UPDATE_CONTENT}}

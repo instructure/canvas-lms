@@ -265,7 +265,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user, session| self.wiki.grants_right?(user, session, :read) && can_read_page?(user, session)}
+    given {|user, session| self.can_read_page?(user, session)}
     can :read
 
     given {|user, session| self.can_edit_page?(user)}
@@ -280,35 +280,51 @@ class WikiPage < ActiveRecord::Base
     given {|user, session| user && self.can_edit_page?(user) && self.wiki.grants_right?(user, session, :update_page)}
     can :update and can :read_revisions
 
-    given {|user, session| user && self.can_edit_page?(user) && self.active? && self.wiki.grants_right?(user, session, :update_page_content)}
+    given {|user, session| user && self.can_edit_page?(user) && self.published? && self.wiki.grants_right?(user, session, :update_page_content)}
     can :update_content and can :read_revisions
 
-    given {|user, session| user && self.can_edit_page?(user) && self.active? && self.wiki.grants_right?(user, session, :delete_page)}
+    given {|user, session| user && self.can_edit_page?(user) && self.published? && self.wiki.grants_right?(user, session, :delete_page)}
     can :delete
 
-    given {|user, session| user && self.can_edit_page?(user) && self.workflow_state == 'unpublished' && self.wiki.grants_right?(user, session, :delete_unpublished_page)}
+    given {|user, session| user && self.can_edit_page?(user) && self.unpublished? && self.wiki.grants_right?(user, session, :delete_unpublished_page)}
     can :delete
   end
 
   def can_read_page?(user, session=nil)
-    self.wiki.grants_right?(user, session, :manage) || (self.active?)
+    return true if self.wiki.grants_right?(user, session, :manage)
+    return true if self.unpublished? && self.wiki.grants_right?(user, session, :view_unpublished_items)
+    self.published? && self.wiki.grants_right?(user, session, :read)
   end
 
   def can_edit_page?(user, session=nil)
-    context_roles = context.default_wiki_editing_roles rescue nil
-    roles = (editing_roles || context_roles || default_roles).split(",")
-    roles.clear if roles == %w(teachers) # "Only teachers" option doesn't grant rights excluded by RoleOverrides
-
-    # managers are always allowed to edit
+    # wiki managers are always allowed to edit
     return true if wiki.grants_right?(user, session, :manage)
 
+    roles = effective_roles
+    # teachers implies all course admins (teachers, TAs, etc)
     return true if roles.include?('teachers') && context.respond_to?(:admins) && context.admins.include?(user)
-    # the remaining edit roles all require read access, so just check here
-    return false unless can_read_page?(user, session) && !self.locked_for?(user)
+
+    # the page must be available for users of the following roles
+    return false unless available_for?(user, session)
     return true if roles.include?('students') && context.respond_to?(:students) && context.includes_student?(user)
     return true if roles.include?('members') && context.respond_to?(:users) && context.users.include?(user)
     return true if roles.include?('public')
     false
+  end
+
+  def effective_roles
+    context_roles = context.default_wiki_editing_roles rescue nil
+    roles = (editing_roles || context_roles || default_roles).split(',')
+    roles == %w(teachers) ? [] : roles # "Only teachers" option doesn't grant rights excluded by RoleOverrides
+  end
+
+  def available_for?(user, session=nil)
+    return true if wiki.grants_right?(user, session, :manage)
+
+    return false unless published? || (unpublished? && wiki.grants_right?(user, session, :view_unpublished_items))
+    return false if locked_for?(user)
+
+    true
   end
 
   def default_roles
