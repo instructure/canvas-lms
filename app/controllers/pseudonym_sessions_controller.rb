@@ -593,7 +593,6 @@ class PseudonymSessionsController < ApplicationController
           redirect_to login_url
         else
           @errored = true
-          @pre_registered = @user if @user && !@user.registered?
           @headers = false
           maybe_render_mobile_login :bad_request
         end
