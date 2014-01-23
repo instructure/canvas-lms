@@ -44,6 +44,10 @@ define([
   'vendor/scribd.view' /* scribd */
 ], function(_, INST, I18n, $, htmlEscape) {
 
+  if(typeof ENV.contexts === "string"){
+    ENV.contexts = $.parseJSON(ENV.contexts);
+  }
+
   var files = {};
   var fileStructureData = [];
   (function() {
@@ -64,15 +68,15 @@ define([
         $files_content.prepend($swfupload_holder);
         files.clearDataCache.cacheIndex = 0;
 
-        for(var idx in contexts) {
+        for(var idx in ENV.contexts) {
           var obj = {
-            context: contexts[idx],
-            context_name: contexts[idx].name,
-            context_string: contexts[idx].asset_string
+            context: ENV.contexts[idx],
+            context_name: ENV.contexts[idx].name,
+            context_string: ENV.contexts[idx].asset_string
           };
-          if(contexts[idx].asset_string) {
-            var context_type = contexts[idx].asset_string.replace(/_\d+$/, '');
-            obj[context_type] = contexts[idx];
+          if(ENV.contexts[idx].asset_string) {
+            var context_type = ENV.contexts[idx].asset_string.replace(/_\d+$/, '');
+            obj[context_type] = ENV.contexts[idx];
           }
           fileStructureData.push([
             obj, {}

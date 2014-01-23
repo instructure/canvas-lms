@@ -231,6 +231,17 @@ class FilesController < ApplicationController
       if @contexts.empty?
         format.html { redirect_to !@context || @context == @current_user ? dashboard_url : named_context_url(@context, :context_url) }
       else
+        js_env(:contexts =>
+           @contexts.to_json(:permissions =>
+                                 {:user => @current_user,
+                                  :policies =>
+                                      [:manage_files,
+                                       :update,
+                                       :manage_grades,
+                                       :read_roster]
+                                 },
+                             :methods => :asset_string,
+                             :include_root => false))
         format.html { render :action => 'full_index' }
       end
       format.json { render :json => @file_structures }
