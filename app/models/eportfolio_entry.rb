@@ -17,7 +17,7 @@
 #
 
 class EportfolioEntry < ActiveRecord::Base
-  attr_accessible :eportfolio, :eportfolio_category, :name, :artifact_type, :attachment, :allow_comments, :show_comments, :url, :content
+  attr_accessible :eportfolio, :eportfolio_category, :name, :artifact_type, :attachment, :allow_comments, :show_comments, :url
   attr_readonly :eportfolio_id, :eportfolio_category_id
   belongs_to :eportfolio
   belongs_to :eportfolio_category
