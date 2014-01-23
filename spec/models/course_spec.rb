@@ -3765,3 +3765,18 @@ describe Course, "multiple_sections?" do
     @course.multiple_sections?.should be_true
   end
 end
+
+describe Course, "default_section" do
+  it "should create the default section" do
+    c = Course.create!
+    s = c.default_section
+    c.course_sections.pluck(:id).should eql [s.id]
+  end
+
+  it "unless we ask it not to" do
+    c = Course.create!
+    s = c.default_section(no_create: true)
+    s.should be_nil
+    c.course_sections.pluck(:id).should be_empty
+  end
+end
