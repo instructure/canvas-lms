@@ -44,7 +44,7 @@ module SearchHelper
             :state => type == :current ? :active : (course.recently_ended? ? :recently_active : :inactive),
             :available => type == :current && course.available?,
             :permissions => course.grants_rights?(@current_user),
-            :default_section_id => course.default_section.id
+            :default_section_id => course.default_section(no_create: true).try(:id)
           }
         end
       end
