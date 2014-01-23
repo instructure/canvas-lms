@@ -100,11 +100,7 @@ describe CalendarsController do
     it "should retrieve events for a given month and year" do
       course_with_student_logged_in(:active_all => true)
       e1 = course_event("Jan 1 2008")
-      e2 = course_event("Feb 15 2008")
       get 'show', :month => "01", :year => "2008" #, :course_id => @course.id, :month => "01", :year => "2008"
-      response.should be_success
-
-      get 'show', :month => "02", :year => "2008"
       response.should be_success
     end
 

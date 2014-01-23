@@ -95,6 +95,7 @@ describe "shared files tests" do
         link.should be_displayed
         link.text.should == "edit content"
         link.click
+        wait_for_ajaximations
         keep_trying_until { fj("#edit_content_dialog").should be_displayed }
       end
 
