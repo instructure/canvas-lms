@@ -88,8 +88,8 @@ define([
     $finalGradeRow.find(".grade").text(finalGrade);
     $finalGradeRow.find(".score_teaser").text(teaserText);
 
-    if(window.grading_scheme) {
-      $(".final_letter_grade .grade").text(GradeCalculator.letter_grade(grading_scheme, scoreAsPercent));
+    if(ENV.grading_scheme) {
+      $(".final_letter_grade .grade").text(GradeCalculator.letter_grade(ENV.grading_scheme, scoreAsPercent));
     }
 
     $(".revert_all_scores").showIf($("#grades_summary .revert_score_link").length > 0);

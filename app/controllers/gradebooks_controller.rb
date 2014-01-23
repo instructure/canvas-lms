@@ -66,7 +66,8 @@ class GradebooksController < ApplicationController
           js_env submissions: submissions_json,
                  assignment_groups: ags_json,
                  group_weighting_scheme: @context.group_weighting_scheme,
-                 show_total_grade_as_points: @context.settings[:show_total_grade_as_points]
+                 show_total_grade_as_points: @context.settings[:show_total_grade_as_points],
+                 grading_scheme: @context.grading_standard.try(:data) || GradingStandard.default_grading_standard
           format.html { render :action => 'grade_summary' }
         else
           format.html { render :action => 'grade_summary_list' }

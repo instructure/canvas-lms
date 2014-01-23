@@ -125,7 +125,7 @@ describe "grading standards" do
     @assignment = @course.assignments.create!(:title => "new assignment", :points_possible => 1000, :assignment_group => @course.assignment_groups.first, :grading_type => 'points')
     @assignment.grade_student(student, :grade => 899)
     get "/courses/#{@course.id}/grades/#{student.id}"
-    grading_scheme = driver.execute_script "return grading_scheme"
+    grading_scheme = driver.execute_script "return ENV.grading_scheme"
     grading_scheme[2][0].should == 'B+'
     f("#right-side .final_grade .grade").text.should == '89.9%'
     f("#final_letter_grade_text").text.should == 'B+'

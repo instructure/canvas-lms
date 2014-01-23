@@ -45,7 +45,7 @@ define([
   'jqueryui/progressbar' /* /\.progressbar/ */
 ], function(round, INST, I18n, $, _, userSettings, datagrid, GradeCalculator, htmlEscape, Turnitin) {
 
-  var grading_scheme = window.grading_scheme;
+  var grading_scheme = ENV.grading_scheme;
   var readOnlyGradebook = window.readOnlyGradebook;
   var gradebook = window.gradebook;
   var speedGraderEnabled = ENV.speed_grader_enabled;
