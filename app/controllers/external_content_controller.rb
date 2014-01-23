@@ -111,5 +111,6 @@ class ExternalContentController < ApplicationController
   
   def cancel
     @headers = false
+    js_env(service: params[:service])
   end
 end
