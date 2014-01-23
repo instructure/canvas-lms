@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,22 +20,21 @@ require 'spec_helper'
 
 describe LtiOutbound::ToolLaunch do
   before do
+    @consumer_instance = LtiOutbound::LTIConsumerInstance.new.tap do |consumer_instance|
+      consumer_instance.id = 'root_account_id'
+      consumer_instance.sis_source_id = 'root_account_sis_source_id'
+      consumer_instance.domain = 'root_account_domain'
+      consumer_instance.lti_guid = 'root_account_lti_guid'
+      consumer_instance.name = 'root_account_name'
+    end
     @account = LtiOutbound::LTIAccount.new.tap do |account|
-      account.domain = 'account_domain'
-      account.lti_guid = 'account_lti_guid'
       account.name = 'account_name'
       account.id = 'account_id'
       account.sis_source_id = 'account_sis_source_id'
-    end
-    @root_account = LtiOutbound::LTIAccount.new.tap do |account|
-      account.domain = 'root_account_domain'
-      account.lti_guid = 'root_account_lti_guid'
-      account.name = 'root_account_name'
-      account.id = 'root_account_id'
-      account.sis_source_id = 'root_account_sis_source_id'
+      account.consumer_instance = @consumer_instance
     end
     @course = LtiOutbound::LTICourse.new.tap do |course|
-      course.root_account = @root_account
+      course.consumer_instance = @consumer_instance
       course.opaque_identifier = 'course_opaque_identifier'
       course.name = 'course_name'
       course.id = 'course_id'
@@ -44,16 +43,12 @@ describe LtiOutbound::ToolLaunch do
     end
     @tool = LtiOutbound::LTITool.new.tap do |tool|
       tool.name = 'tool_name'
-      tool.context = @course
       tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
     end
-    teacher_role = LtiOutbound::LTIRole.new.tap do |role|
-      role.type = LtiOutbound::LTIRole::INSTRUCTOR
-      role.state = :active
-    end
+    teacher_role = LtiOutbound::LTIRole::INSTRUCTOR
     @user = LtiOutbound::LTIUser.new.tap do |user|
       user.avatar_url = 'avatar_url'
-      user.current_enrollments = 'current_enrollments'
+      user.current_roles = 'current_roles'
       user.email = 'nobody@example.com'
       user.first_name = 'first_name'
       user.id = 'user_id'
@@ -61,10 +56,10 @@ describe LtiOutbound::ToolLaunch do
       user.login_id = 'user_login_id'
       user.name = 'user_name'
       user.opaque_identifier = 'user_opaque_identifier'
-      user.sis_user_id = 'sis_user_id'
-      user.current_enrollments = [teacher_role]
-      user.concluded_enrollments = []
-      user.root_account = @root_account
+      user.sis_source_id = 'sis_user_id'
+      user.current_roles = [teacher_role]
+      user.concluded_roles = []
+      user.consumer_instance = @consumer_instance
     end
     @assignment = LtiOutbound::LTIAssignment.new.tap do |assignment|
       assignment.id = 'assignment_id'
@@ -175,7 +170,7 @@ describe LtiOutbound::ToolLaunch do
     end
 
     it 'includes custom fields' do
-      @tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANYNOMOUS
+      @tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
       @tool.settings = {:custom_fields => {
           'custom_bob' => 'bob',
           'custom_fred' => 'fred',
@@ -193,7 +188,7 @@ describe LtiOutbound::ToolLaunch do
     end
 
     it 'does not include name and email if anonymous' do
-      @tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANYNOMOUS
+      @tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
       hash = @tool_launch.generate
       expect(hash).to_not have_key 'lis_person_name_given'
       expect(hash).to_not have_key 'lis_person_name_family'
@@ -256,48 +251,24 @@ describe LtiOutbound::ToolLaunch do
 
     describe 'variable substitutions' do
       before do
-        @substitutor = double('Substitutor', substitute!: 'something')
+        @substitutor = double('Substitutor', substitute_all!: 'something')
         LtiOutbound::VariableSubstitutor.stub(:new).and_return(@substitutor)
       end
 
-      it 'substitutes $Canvas.user' do
+      it 'substitutes for a course context' do
         @tool_launch.generate
 
-        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.user', @user)
+        expect(@substitutor).to have_received(:substitute_all!).with(anything, @user, nil, @course, @consumer_instance)
       end
 
-      it 'substitutes $Canvas.context' do
-        @tool_launch.generate
-
-        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.context', @course)
-      end
-
-      it 'substitutes $Canvas.api' do
-        @tool_launch.generate
-
-        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.api', @root_account)
-      end
-
-      it 'substitutes $Canvas.assignment' do
+      it 'substitutes with an assignment' do
         @tool_launch.for_homework_submission!(@assignment)
         @tool_launch.generate
 
-        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.assignment', @assignment)
+        expect(@substitutor).to have_received(:substitute_all!).with(anything, @user, @assignment, @course, @consumer_instance)
       end
 
-      it 'does no substutue $Canvas.assignment if no assignment is given' do
-        @tool_launch.generate
-
-        expect(@substitutor).to_not have_received(:substitute!).with(anything, '$Canvas.assignment', anything)
-      end
-
-      it 'substitutes $Canvas.account with root account if context is not account' do
-        @tool_launch.generate
-
-        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.account', @course.root_account)
-      end
-
-      it 'substitutes $Canvas.account with account if context is account' do
+      it 'substitutes account if context is account' do
         tool_launch = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
                                                        :tool => @tool,
                                                        :user => @user,
@@ -307,42 +278,15 @@ describe LtiOutbound::ToolLaunch do
                                                        :outgoing_email_address => 'outgoing_email_address')
         tool_launch.generate
 
-        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.account', @account)
-      end
-
-      it 'substitutes $Canvas.membership' do
-        @tool_launch.generate
-
-        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.membership', @user)
-      end
-
-      it 'substitutes $Canvas.enrollment' do
-        @tool_launch.generate
-
-        expect(@substitutor).to have_received(:substitute!).with(anything, '$Canvas.enrollment', @user)
-      end
-
-      it 'substitutes $Person.name' do
-        @tool_launch.generate
-
-        expect(@substitutor).to have_received(:substitute!).with(anything, '$Person.name', @user)
-      end
-
-      it 'substitutes $Person.address' do
-        @tool_launch.generate
-
-        expect(@substitutor).to have_received(:substitute!).with(anything, '$Person.address', @user)
+        expect(@substitutor).to have_received(:substitute_all!).with(anything, @user, nil, @account, @consumer_instance)
       end
     end
   end
 
   describe '#for_assignment!' do
     it 'includes assignment outcome service params for student' do
-      student_role = LtiOutbound::LTIRole.new.tap do |role|
-        role.type = LtiOutbound::LTIRole::LEARNER
-        role.state = :active
-      end
-      @user.current_enrollments = [student_role]
+      student_role = LtiOutbound::LTIRole::LEARNER
+      @user.current_roles = [student_role]
       @tool_launch.for_assignment!(@assignment, '/my/test/url', '/my/other/test/url')
 
       hash = @tool_launch.generate

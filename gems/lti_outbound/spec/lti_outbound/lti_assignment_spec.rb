@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -26,7 +26,7 @@ describe LtiOutbound::LTIAssignment do
   it_behaves_like 'it has an attribute setter and getter for', :return_types
   it_behaves_like 'it has an attribute setter and getter for', :allowed_extensions
 
-  it_behaves_like 'it provides variable mapping', '.id', :id
-  it_behaves_like 'it provides variable mapping', '.title', :title
-  it_behaves_like 'it provides variable mapping', '.pointsPossible', :points_possible
+  it_behaves_like 'it provides variable mapping', '$Canvas.assignment.id', :id
+  it_behaves_like 'it provides variable mapping', '$Canvas.assignment.title', :title
+  it_behaves_like 'it provides variable mapping', '$Canvas.assignment.pointsPossible', :points_possible
 end

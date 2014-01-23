@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,7 +20,6 @@ require 'spec_helper'
 
 describe LtiOutbound::LTITool do
   it_behaves_like 'it has an attribute setter and getter for', :consumer_key
-  it_behaves_like 'it has an attribute setter and getter for', :context
   it_behaves_like 'it has an attribute setter and getter for', :privacy_level
   it_behaves_like 'it has an attribute setter and getter for', :name
   it_behaves_like 'it has an attribute setter and getter for', :shared_secret
@@ -35,7 +34,7 @@ describe LtiOutbound::LTITool do
       expect(subject.include_name?).to eq true
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY
       expect(subject.include_name?).to eq false
-      subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANYNOMOUS
+      subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
       expect(subject.include_name?).to eq false
     end
   end
@@ -50,7 +49,7 @@ describe LtiOutbound::LTITool do
       expect(subject.include_email?).to eq false
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY
       expect(subject.include_email?).to eq true
-      subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANYNOMOUS
+      subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
       expect(subject.include_email?).to eq false
     end
   end
@@ -65,7 +64,7 @@ describe LtiOutbound::LTITool do
       expect(subject.public?).to eq false
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY
       expect(subject.public?).to eq false
-      subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANYNOMOUS
+      subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
       expect(subject.public?).to eq false
     end
   end

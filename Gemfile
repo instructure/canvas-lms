@@ -151,6 +151,7 @@ gem 'canvas_crummy', :path => 'gems/canvas_crummy'
 gem 'canvas_mimetype_fu', :path => 'gems/canvas_mimetype_fu'
 gem 'canvas_sanitize', :path => 'gems/canvas_sanitize'
 gem 'canvas_stringex', :path => 'gems/canvas_stringex'
+gem 'lti_outbound', :path => 'gems/lti_outbound'
 
 group :assets do
   gem 'compass-rails', '1.0.3'

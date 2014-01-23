@@ -19,16 +19,17 @@
 module LtiOutbound
   class VariableSubstitutor
     #This method changes given data_hash!
-    def substitute!(data_hash, substitution_base_name, substitution_object)
+    def substitute!(data_hash, substitution_object)
       data_hash.each do |key, val|
-        if val.to_s.start_with?(substitution_base_name)
-          attribute = val.gsub(substitution_base_name, "")
-          if substitution_object.has_variable_mapping?(attribute)
-            replacement_value = substitution_object.variable_substitution_mapping(attribute)
-            data_hash[key] = replacement_value if replacement_value
-          end
+        if substitution_object.has_variable_mapping?(val)
+          replacement_value = substitution_object.variable_substitution_mapping(val)
+          data_hash[key] = replacement_value if replacement_value
         end
       end
+    end
+
+    def substitute_all!(data_hash, *substitution_objects)
+      substitution_objects.compact.each {|obj| substitute!(data_hash, obj)}
     end
   end
 end

@@ -18,16 +18,14 @@
 
 require 'spec_helper'
 
-describe LtiOutbound::LTIRole do
-  describe 'constants' do
-    it 'provides role constants' do
-      expect(LtiOutbound::LTIRole::INSTRUCTOR).to eq 'Instructor'
-      expect(LtiOutbound::LTIRole::LEARNER).to eq 'Learner'
-      expect(LtiOutbound::LTIRole::ADMIN).to eq 'urn:lti:instrole:ims/lis/Administrator'
-      expect(LtiOutbound::LTIRole::CONTENT_DEVELOPER).to eq 'ContentDeveloper'
-      expect(LtiOutbound::LTIRole::OBSERVER).to eq 'urn:lti:instrole:ims/lis/Observer'
-      expect(LtiOutbound::LTIRole::TEACHING_ASSISTANT).to eq 'urn:lti:role:ims/lis/TeachingAssistant'
-      expect(LtiOutbound::LTIRole::NONE).to eq 'urn:lti:sysrole:ims/lis/None'
-    end
-  end
+describe LtiOutbound::LTIConsumerInstance do
+  it_behaves_like 'it has an attribute setter and getter for', :id
+  it_behaves_like 'it has an attribute setter and getter for', :sis_source_id
+  it_behaves_like 'it has an attribute setter and getter for', :lti_guid
+  it_behaves_like 'it has an attribute setter and getter for', :name
+  it_behaves_like 'it has an attribute setter and getter for', :domain
+
+  it_behaves_like 'it provides variable mapping', '$Canvas.account.id', :id
+  it_behaves_like 'it provides variable mapping', '$Canvas.account.sisSourceId', :sis_source_id
+  it_behaves_like 'it provides variable mapping', '$Canvas.api.domain', :domain
 end

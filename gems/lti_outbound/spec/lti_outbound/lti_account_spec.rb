@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -21,9 +21,6 @@ require 'spec_helper'
 describe LtiOutbound::LTIAccount do
   it_behaves_like 'an LTI context'
 
-  it_behaves_like 'it has an attribute setter and getter for', :lti_guid
-  it_behaves_like 'it has an attribute setter and getter for', :name
-  it_behaves_like 'it has an attribute setter and getter for', :domain
-
-  it_behaves_like 'it provides variable mapping', '.domain', :domain
+  it_behaves_like 'it provides variable mapping', '$Canvas.account.id', :id
+  it_behaves_like 'it provides variable mapping', '$Canvas.account.sisSourceId', :sis_source_id
 end

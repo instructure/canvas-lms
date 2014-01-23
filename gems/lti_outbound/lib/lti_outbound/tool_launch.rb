@@ -18,7 +18,7 @@
 module LtiOutbound
   class ToolLaunch
     attr_reader :url, :tool, :user, :context, :link_code, :return_url,
-                :resource_type, :root_account, :hash, :assignment, :outgoing_email_address
+                :resource_type, :consumer_instance, :hash, :assignment, :outgoing_email_address
 
     def initialize(options)
       @url = options[:url] || raise('URL required for generating LTI content')
@@ -29,7 +29,7 @@ module LtiOutbound
       @return_url = options[:return_url] || raise('Return URL required for generating LTI content')
       @resource_type = options[:resource_type]
       @outgoing_email_address = options[:outgoing_email_address]
-      @root_account = context.root_account || tool.context.root_account || raise('Root account required for generating LTI content')
+      @consumer_instance = context.consumer_instance || raise('Consumer instance required for generating LTI content')
 
       @hash = {}
     end
@@ -83,10 +83,10 @@ module LtiOutbound
       end
       if tool.public?
         hash['custom_canvas_user_id'] = '$Canvas.user.id'
-        hash['lis_person_sourcedid'] = user.sis_user_id if user.sis_user_id
-        hash['custom_canvas_user_login_id'] = '$Canvas.user.login_id'
+        hash['lis_person_sourcedid'] = user.sis_source_id if user.sis_source_id
+        hash['custom_canvas_user_login_id'] = '$Canvas.user.loginId'
         if context.is_a?(LTICourse)
-          hash['custom_canvas_course_id'] = '$Canvas.context.id'
+          hash['custom_canvas_course_id'] = '$Canvas.course.id'
           hash['lis_course_offering_sourcedid'] = context.sis_source_id if context.sis_source_id
         elsif context.is_a?(LTIAccount) || context.is_a?(LTIUser)
           hash['custom_canvas_account_id'] = '$Canvas.account.id'
@@ -110,8 +110,8 @@ module LtiOutbound
         hash['launch_presentation_height'] = tool.selection_height(resource_type)
       end
       hash['launch_presentation_return_url'] = return_url
-      hash['tool_consumer_instance_guid'] = root_account.lti_guid
-      hash['tool_consumer_instance_name'] = root_account.name
+      hash['tool_consumer_instance_guid'] = consumer_instance.lti_guid
+      hash['tool_consumer_instance_name'] = consumer_instance.name
       hash['tool_consumer_instance_contact_email'] = outgoing_email_address # TODO: find a better email address to use here
       hash['tool_consumer_info_product_family_code'] = 'canvas'
       hash['tool_consumer_info_version'] = 'cloud'
@@ -133,15 +133,7 @@ module LtiOutbound
       hash['oauth_callback'] = 'about:blank'
 
       variable_substitutor = VariableSubstitutor.new
-      variable_substitutor.substitute!(hash, '$Canvas.user', user)
-      variable_substitutor.substitute!(hash, '$Canvas.context', context)
-      variable_substitutor.substitute!(hash, '$Canvas.api', root_account)
-      variable_substitutor.substitute!(hash, '$Canvas.assignment', assignment) if assignment
-      variable_substitutor.substitute!(hash, '$Canvas.account', context.is_a?(LTIAccount) ? context : root_account)
-      variable_substitutor.substitute!(hash, '$Canvas.membership', user)
-      variable_substitutor.substitute!(hash, '$Canvas.enrollment', user)
-      variable_substitutor.substitute!(hash, '$Person.name', user)
-      variable_substitutor.substitute!(hash, '$Person.address', user)
+      variable_substitutor.substitute_all!(hash, user, assignment, context, consumer_instance)
 
       self.class.generate_params(hash, url, tool.consumer_key, tool.shared_secret)
     end
