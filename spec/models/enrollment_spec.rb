@@ -573,12 +573,11 @@ describe Enrollment do
 
     context 'dates change' do
       before do
-        @old_cache = RAILS_CACHE
-        silence_warnings { Object.const_set(:RAILS_CACHE, ActiveSupport::Cache::MemoryStore.new) }
+        Rails.force_cache!
       end
 
       after do
-        silence_warnings { Object.const_set(:RAILS_CACHE, @old_cache) }
+        Rails.unforce_cache!
       end
 
       it "should return the right state based on availability dates on enrollment" do
