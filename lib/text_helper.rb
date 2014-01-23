@@ -73,7 +73,7 @@ module TextHelper
   # Returns a string.
   def append_base_url(subject, base)
     output = Nokogiri::HTML.fragment(subject)
-    tags   = output.search('*[@href]')
+    tags   = output.css('*[href]')
 
     tags.each do |tag|
       next if tag.attributes['href'].value.match(/^https?|mailto|ftp/)
