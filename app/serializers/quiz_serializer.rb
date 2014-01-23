@@ -1,5 +1,6 @@
 class QuizSerializer < Canvas::APISerializer
   include LockedSerializer
+  include PermissionsSerializer
 
   root :quiz
 
@@ -13,7 +14,7 @@ class QuizSerializer < Canvas::APISerializer
               :hide_correct_answers_at, :all_dates, :can_unpublish, :can_update,
               :require_lockdown_browser, :require_lockdown_browser_for_results,
               :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
-              :speed_grader_url
+              :speed_grader_url, :permissions
 
   def_delegators :@controller,
     :api_v1_course_assignment_group_url,

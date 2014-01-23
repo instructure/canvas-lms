@@ -190,10 +190,56 @@
 #           "description": "Link to Speed Grader for this quiz. Will not be present if quiz is unpublished",
 #           "example": "http://canvas.instructure.com/courses/1/speed_grader?assignment_id=1",
 #           "type": "string"
+#         },
+#         "permissions": {
+#           "$ref": "QuizPermissions",
+#           "description": "Permissions the user has for the quiz"
 #         }
 #       }
 #     }
 #
+# @model QuizPermissions
+#     {
+#       "id": "QuizPermissions",
+#       "description": "Permissions the user has for the quiz",
+#       "properties": {
+#         "read": {
+#           "description": "whether the user can view the quiz",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "submit": {
+#           "description": "whether the user may submit a submission for the quiz",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "create": {
+#           "description": "whether the user may create a new quiz",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "manage": {
+#           "description": "whether the user may edit, update, or delete the quiz",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "read_statistics": {
+#           "description": "whether the user may view quiz statistics for this quiz",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "review_grades": {
+#           "description": "whether the user may review grades for all quiz submissions for this quiz",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "update": {
+#           "description": "whether the user may update the quiz",
+#           "example": true,
+#           "type": "boolean"
+#         }
+#       }
+#     }
 class Quizzes::QuizzesApiController < ApplicationController
   include Api::V1::Quiz
   include Filters::Quizzes
