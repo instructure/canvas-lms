@@ -1156,6 +1156,7 @@ describe QuizzesController do
       response.should render_template('read_only')
 
       @enrollment.conclude
+      controller.js_env.clear
       get 'read_only', :course_id => @course.id, :quiz_id => @quiz.id
       response.should be_success
       response.should render_template('read_only')

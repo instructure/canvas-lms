@@ -1,10 +1,4 @@
 <% question_bank_id ||= "" %>
-<% max_combinations = 200 %>
-<% js_block do %>
-  <script>
-  var maxCombinations = <%= raw max_combinations %>;
-  </script>
-<% end %>
 
 <form id="question_form_template" class="question_form" style="display: none;">
 <div class="question">
@@ -146,7 +140,7 @@
         </div>
       </div>
       <div class="equation_content variables_specified formulas_specified">
-        <%= t(:offer_combinations, "Offer %{how_many} possible value combinations (max %{max_combinations})", :how_many => raw('<input type="text" class="combination_count combinations_option" style="width: 30px;"/>'), :max_combinations => max_combinations) %><br/>
+        <%= t(:offer_combinations, "Offer %{how_many} possible value combinations (max %{max_combinations})", :how_many => raw('<input type="text" class="combination_count combinations_option" style="width: 30px;"/>'), :max_combinations => @js_env[:quiz_max_combination_count]) %><br/>
         <%= t(:allow_tolerance, "allow an error margin of +/- %{tolerance}", :tolerance => raw('<input type="text" placeholder="2.0 or 10%" class="combination_answer_tolerance" style="width: 30px;" value="0"/>')) %>
         <button type="button" class="btn compute_combinations combinations_option"><%= t('buttons.generate', "Generate") %></button>
       </div>

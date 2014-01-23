@@ -3240,8 +3240,8 @@ define([
       var cnt = parseInt($question.find(".combination_count").val(), 10) || 10;
       if (cnt < 0) {
         cnt = 10;
-      } else if (cnt > maxCombinations) {
-        cnt = maxCombinations;
+      } else if (cnt > ENV.quiz_max_combination_count) {
+        cnt = ENV.quiz_max_combination_count;
       }
       $question.find(".combination_count").val(cnt);
       var succeeded = 0;

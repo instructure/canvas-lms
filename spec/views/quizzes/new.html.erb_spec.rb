@@ -35,6 +35,7 @@ describe "/quizzes/new" do
     course_with_student
     view_context
     assigns[:quiz] = @course.quizzes.create!
+    assigns[:js_env] = {quiz_max_combination_count: 200}
     render "quizzes/new"
     response.should_not be_nil
   end
@@ -44,6 +45,7 @@ describe "/quizzes/new" do
       course_with_teacher_logged_in(:active_all => true)
       @quiz = course_quiz
       assigns[:quiz] = @quiz
+      assigns[:js_env] = {quiz_max_combination_count: 200}
       view_context
     end
     it "should not display 'NOTE:' message when questions within limit" do
@@ -66,6 +68,7 @@ describe "/quizzes/new" do
       course_with_teacher_logged_in(:active_all => true)
       @quiz = course_quiz
       assigns[:quiz] = @quiz
+      assigns[:js_env] = {quiz_max_combination_count: 200}
       view_context
     end
 

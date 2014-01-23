@@ -30,6 +30,7 @@ class QuizzesController < ApplicationController
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
   QUIZ_QUESTIONS_DETAIL_LIMIT = 25
+  QUIZ_MAX_COMBINATION_COUNT = 200
 
   def index
     if authorized_action(@context, @current_user, :read)
@@ -226,7 +227,8 @@ class QuizzesController < ApplicationController
              :QUIZZES_URL => course_quizzes_url(@context),
              :QUIZ_IP_FILTERS_URL => api_v1_course_quiz_ip_filters_url(@context, @quiz),
              :CONTEXT_ACTION_SOURCE => :quizzes,
-             :REGRADE_OPTIONS => regrade_options }
+             :REGRADE_OPTIONS => regrade_options,
+             :quiz_max_combination_count => QUIZ_MAX_COMBINATION_COUNT }
       append_sis_data(hash)
       js_env(hash)
       render :action => "new"
@@ -577,6 +579,7 @@ class QuizzesController < ApplicationController
     @assignment = @quiz.assignment
     if authorized_action(@quiz, @current_user, :read_statistics)
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
+      js_env(quiz_max_combination_count: QUIZ_MAX_COMBINATION_COUNT)
       render
     end
   end

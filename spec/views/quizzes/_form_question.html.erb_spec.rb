@@ -23,6 +23,7 @@ describe "/quizzes/_form_question" do
   it "should render" do
     course_with_student
     view_context
+    assigns[:js_env] = {quiz_max_combination_count: 200}
     render :partial => "quizzes/form_question"
     response.should_not be_nil
   end
