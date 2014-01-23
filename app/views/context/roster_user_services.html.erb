@@ -121,19 +121,6 @@
 
 <% js_block do %>
 <script type="text/javascript" src="http://download.skype.com/share/skypebuttons/js/skypeCheck.js"></script>
-<script>
-require([
-  'jquery' /* $ */,
-  'jquery.ajaxJSON' /* ajaxJSON */
-], function($) {
-
-$(document).ready(function() {
-  $(".show_user_services_checkbox").change(function() {
-    $.ajaxJSON($(".profile_url").attr('href'), 'PUT', {'user[show_user_services]': $(this).prop('checked')}, function(data) {
-    }, function(data) {
-    });
-  });
-});
-});
-</script>
 <% end %>
+
+<% js_bundle 'legacy/context_roster_user_services' %>
