@@ -87,6 +87,7 @@ class AssignmentsController < ApplicationController
           @current_user_submissions ||= @current_user && @current_user.submissions.
               select([:id, :assignment_id, :score, :workflow_state]).
               where(:assignment_id => @upcoming_assignments)
+          js_env(:submissions_hash => @submissions_hash)
           format.html { render :action => :student_index }
         end
         # TODO: eager load the rubric associations
