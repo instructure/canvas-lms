@@ -339,6 +339,8 @@ class ContextController < ApplicationController
       respond_to do |format|
         format.html do
           @accesses = @accesses.paginate(page: params[:page], per_page: 50)
+          js_env(context_url: context_url(@context, :context_user_usage_url, @user, :format => :json),
+                 accesses_total_pages: @accesses.total_pages)
         end
         format.json do
           @accesses = Api.paginate(@accesses, self, polymorphic_url([@context, :user_usage], user_id: @user), default_per_page: 50)
