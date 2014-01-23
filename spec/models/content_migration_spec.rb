@@ -223,6 +223,8 @@ describe ContentMigration do
       @copy_from.save!
 
       gs.destroy
+      @copy_from.reload
+
       run_course_copy
 
       @copy_to.grading_standards.should be_empty
