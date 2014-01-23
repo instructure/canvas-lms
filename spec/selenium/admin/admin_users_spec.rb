@@ -10,7 +10,7 @@ describe "admin courses tab" do
       let(:account) { Account.default }
       let(:url) { "/accounts/#{account.id}/users" }
       let(:opts) { {:name => 'student'} }
-      it_should_behave_like "users basic tests"
+      include_examples "users basic tests"
     end
   end
 

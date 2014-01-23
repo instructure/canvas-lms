@@ -197,7 +197,7 @@ describe "Collections API", type: :request do
     end
 
     context "a user's own collections" do
-      it_should_behave_like "full access to collections"
+      include_examples "full access to collections"
 
       it "should create a default private collection if no collections exist for the context" do
         @empty_user = user_with_pseudonym
@@ -210,7 +210,7 @@ describe "Collections API", type: :request do
     end
 
     context "another user's collections" do
-      it_should_behave_like "public only access to collections"
+      include_examples "public only access to collections"
     end
 
     it "should not allow following your own collection" do
@@ -489,7 +489,7 @@ describe "Collections API", type: :request do
         @group_membership = @group.add_user(@user, 'accepted', true)
       end
 
-      it_should_behave_like "full access to collections"
+      include_examples "full access to collections"
     end
 
     context "a group's collections, as member" do
@@ -540,7 +540,7 @@ describe "Collections API", type: :request do
     end
 
     context "a group's collections, as a non-member" do
-      it_should_behave_like "public only access to collections"
+      include_examples "public only access to collections"
     end
 
     describe "following" do

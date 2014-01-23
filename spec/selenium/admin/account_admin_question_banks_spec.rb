@@ -4,6 +4,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/basic/question_ba
 describe "account admin question banks" do
   describe "shared question bank specs" do
     let(:url) { "/accounts/#{Account.default.id}/question_banks" }
-    it_should_behave_like "question bank basic tests"
+    include_examples "question bank basic tests"
   end
 end

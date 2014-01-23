@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common.rb')
 
 describe QuizStatistics::StudentAnalysis do
   let(:report_type) { 'student_analysis' }
-  it_should_behave_like "QuizStatistics::Report"
+  include_examples "QuizStatistics::Report"
 end
 
 describe QuizStatistics::StudentAnalysis do

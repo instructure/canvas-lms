@@ -173,7 +173,7 @@ describe "admin_tools" do
   end
 
   context "Logging" do
-    it_should_behave_like "cassandra audit logs"
+    include_examples "cassandra audit logs"
 
     it "should change log types with dropdown" do
       load_admin_tools_page
@@ -275,7 +275,7 @@ describe "admin_tools" do
   end
 
   context "Authentication Logging" do
-    it_should_behave_like "cassandra audit logs"
+    include_examples "cassandra audit logs"
 
     before do
       Auditors::Authentication.record(@student.pseudonyms.first, 'login')
@@ -304,7 +304,7 @@ describe "admin_tools" do
   end
 
   context "Grade Change Logging" do
-    it_should_behave_like "cassandra audit logs"
+    include_examples "cassandra audit logs"
 
     before do
       course_with_teacher(course: @course, :user => user_with_pseudonym(:name => 'Teacher TestUser'))

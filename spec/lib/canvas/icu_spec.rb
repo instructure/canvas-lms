@@ -78,7 +78,7 @@ describe Canvas::ICU do
   end
 
   context "NaiveCollator" do
-    it_should_behave_like "Collator"
+    include_examples "Collator"
 
     before do
       Canvas::ICU.stubs(:collator).returns(Canvas::ICU::NaiveCollator)
@@ -86,7 +86,7 @@ describe Canvas::ICU do
   end
 
   context "ICU" do
-    it_should_behave_like "Collator"
+    include_examples "Collator"
 
     before do
       pending if Canvas::ICU.collator == Canvas::ICU::NaiveCollator

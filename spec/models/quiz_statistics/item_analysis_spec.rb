@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common.rb')
 
 describe QuizStatistics::ItemAnalysis do
   let(:report_type) { 'item_analysis' }
-  it_should_behave_like "QuizStatistics::Report"
+  include_examples "QuizStatistics::Report"
 end
 
 describe QuizStatistics::ItemAnalysis do

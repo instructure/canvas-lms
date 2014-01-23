@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides
 
 describe "quizzes" do
   include AssignmentOverridesSeleniumHelper
-  it_should_behave_like "quizzes selenium tests"
+  include_examples "quizzes selenium tests"
 
   context "as a teacher" do
     let(:due_at) { Time.zone.now }

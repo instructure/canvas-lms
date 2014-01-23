@@ -274,11 +274,11 @@ describe "Users API", type: :request do
     end
   end
 
-  it_should_behave_like "page view api"
+  include_examples "page view api"
 
   describe "cassandra page views" do
-    it_should_behave_like "cassandra page views"
-    it_should_behave_like "page view api"
+    include_examples "cassandra page views"
+    include_examples "page view api"
   end
 
   it "shouldn't find users in other root accounts by sis id" do
@@ -763,8 +763,8 @@ describe "Users API", type: :request do
       @context = @user
     end
     
-    it_should_behave_like "file uploads api with folders"
-    it_should_behave_like "file uploads api with quotas"
+    include_examples "file uploads api with folders"
+    include_examples "file uploads api with quotas"
 
     def preflight(preflight_params)
       api_call(:post, "/api/v1/users/self/files",

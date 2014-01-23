@@ -6,6 +6,6 @@ describe "sub account users" do
     let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
     let(:url) { "/accounts/#{account.id}/users" }
     let(:opts) { {:name => 'student'} }
-    it_should_behave_like "users basic tests"
+    include_examples "users basic tests"
   end
 end

@@ -33,7 +33,7 @@ describe "AuthenticationAudit API", type: :request do
   end
 
   context "configured" do
-    it_should_behave_like "cassandra audit logs"
+    include_examples "cassandra audit logs"
 
     before do
       Setting.set('enable_page_views', 'cassandra')

@@ -35,7 +35,7 @@ describe AssignmentsApiController, type: :request do
       api_get_assignment_in_course(locked_item, @course)
     end
 
-    it_should_behave_like 'a locked api item'
+    include_examples 'a locked api item'
   end
 
   def create_submitted_assignment_with_user(user=@user)

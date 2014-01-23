@@ -2060,8 +2060,8 @@ describe 'Submissions API', type: :request do
         @always_scribd = true
       end
 
-      it_should_behave_like "file uploads api"
-      it_should_behave_like "file uploads api without quotas"
+      include_examples "file uploads api"
+      include_examples "file uploads api without quotas"
 
       def preflight(preflight_params)
         api_call(:post, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}/files",

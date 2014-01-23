@@ -30,7 +30,7 @@ describe 'Submissions Comment API', type: :request do
         submission_types: "online_upload"
     end
 
-    it_should_behave_like "file uploads api"
+    include_examples "file uploads api"
     def has_query_exemption?; false; end
     def preflight(preflight_params)
       api_call :post,

@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_s
 require File.expand_path(File.dirname(__FILE__) + '/support/textual_answer_serializers_specs.rb')
 
 describe QuizQuestion::AnswerSerializers::ShortAnswer do
-  it_should_behave_like 'Answer Serializers'
+  include_examples 'Answer Serializers'
 
   let :input do
     'hello world!'
@@ -26,6 +26,6 @@ describe QuizQuestion::AnswerSerializers::ShortAnswer do
   end
 
   context 'validations' do
-    it_should_behave_like 'Textual Answer Serializers'
+    include_examples 'Textual Answer Serializers'
   end
 end

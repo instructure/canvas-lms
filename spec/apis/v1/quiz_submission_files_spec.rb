@@ -31,7 +31,7 @@ describe QuizSubmissionFilesController, type: :request do
       s = @quiz.generate_submission(@student)
     end
 
-    it_should_behave_like "file uploads api"
+    include_examples "file uploads api"
 
     def preflight(preflight_params)
       json = api_call :post,

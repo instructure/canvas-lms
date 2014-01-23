@@ -59,7 +59,7 @@ describe QuizQuestion::AnswerParsers::Matching do
 
     let(:parser_class) { QuizQuestion::AnswerParsers::Matching }
 
-    it_should_behave_like "All answer parsers"
+    include_examples "All answer parsers"
 
   end
 end

@@ -21,7 +21,7 @@ require File.expand_path '../../../mocha_rspec_adapter', __FILE__
 require File.expand_path '../mailbox_spec_helper', __FILE__
 
 describe IncomingMail::Pop3Mailbox do
-  it_should_behave_like 'Mailbox'
+  include_examples 'Mailbox'
 
   def default_config
     {

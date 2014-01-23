@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_s
 require File.expand_path(File.dirname(__FILE__) + '/support/id_answer_serializers_specs.rb')
 
 describe QuizQuestion::AnswerSerializers::MultipleChoice do
-  it_should_behave_like 'Answer Serializers'
+  include_examples 'Answer Serializers'
 
   let :input do
     2405
@@ -16,6 +16,6 @@ describe QuizQuestion::AnswerSerializers::MultipleChoice do
   end
 
   context 'validations' do
-    it_should_behave_like 'Id Answer Serializers'
+    include_examples 'Id Answer Serializers'
   end
 end

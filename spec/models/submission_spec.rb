@@ -39,7 +39,7 @@ describe Submission do
     Submission.create!(@valid_attributes)
   end
 
-  it_should_behave_like "url validation tests"
+  include_examples "url validation tests"
   it "should check url validity" do
     test_url_validation(Submission.create!(@valid_attributes))
   end

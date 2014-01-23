@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.r
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
 
 describe CourseAuditApiController do
-  it_should_behave_like "cassandra audit logs"
+  include_examples "cassandra audit logs"
 
   before do
     RequestContextGenerator.stubs( :request_id => 'xyz' )

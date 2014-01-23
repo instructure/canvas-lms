@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_s
 require File.expand_path(File.dirname(__FILE__) + '/support/textual_answer_serializers_specs.rb')
 
 describe QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
-  it_should_behave_like 'Answer Serializers'
+  include_examples 'Answer Serializers'
 
   let :input do
     {
@@ -38,7 +38,7 @@ describe QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
   end
 
   context 'validations' do
-    it_should_behave_like 'Textual Answer Serializers'
+    include_examples 'Textual Answer Serializers'
 
     it 'should reject unexpected types' do
       [ 'asdf', nil ].each do |bad_input|

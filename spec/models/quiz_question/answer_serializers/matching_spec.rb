@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_specs.rb')
 
 describe QuizQuestion::AnswerSerializers::Matching do
-  it_should_behave_like 'Answer Serializers'
+  include_examples 'Answer Serializers'
 
   let :input do
     [

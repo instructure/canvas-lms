@@ -101,7 +101,7 @@ describe 'ExternalFeedsController', type: :request do
   end
 
   describe "in a Course" do
-    it_should_behave_like "Announcement External Feeds"
+    include_examples "Announcement External Feeds"
     before do
       @allowed_user = teacher_in_course(:active_all => true).user
       @context = @course
@@ -112,7 +112,7 @@ describe 'ExternalFeedsController', type: :request do
   end
 
   describe "in a Group" do
-    it_should_behave_like "Announcement External Feeds"
+    include_examples "Announcement External Feeds"
     before do
       group_with_user(:moderator => true, :active_all => true)
       @allowed_user = @user

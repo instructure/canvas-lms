@@ -34,7 +34,7 @@ describe "GradeChangeAudit API", type: :request do
   end
 
   context "configured" do
-    it_should_behave_like "cassandra audit logs"
+    include_examples "cassandra audit logs"
 
     before do
       @request_id = UUIDSingleton.instance.generate

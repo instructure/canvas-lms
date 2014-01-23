@@ -453,14 +453,14 @@ shared_examples_for "an object whose dates are overridable" do
 end
 
 describe Assignment do
-  it_should_behave_like "an object whose dates are overridable"
+  include_examples "an object whose dates are overridable"
 
   let(:overridable) { assignment_model(:due_at => 5.days.ago) }
   let(:overridable_type) { :assignment }
 end
 
 describe Quizzes::Quiz do
-  it_should_behave_like "an object whose dates are overridable"
+  include_examples "an object whose dates are overridable"
 
   let(:overridable) { quiz_model(:due_at => 5.days.ago) }
   let(:overridable_type) { :quiz }

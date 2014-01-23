@@ -636,7 +636,7 @@ shared_examples_for 'a backend' do
     end
 
     describe "scope: current" do
-      it_should_behave_like "scope"
+      include_examples "scope"
       before do
         @flavor = 'current'
         Timecop.freeze(5.minutes.ago) do
@@ -648,7 +648,7 @@ shared_examples_for 'a backend' do
     end
 
     describe "scope: future" do
-      it_should_behave_like "scope"
+      include_examples "scope"
       before do
         @flavor = 'future'
         Timecop.freeze(5.minutes.ago) do
@@ -660,7 +660,7 @@ shared_examples_for 'a backend' do
     end
 
     describe "scope: strand" do
-      it_should_behave_like "scope"
+      include_examples "scope"
       before do
         @flavor = 'strand'
         @query = 's1'
@@ -675,7 +675,7 @@ shared_examples_for 'a backend' do
     end
 
     describe "scope: tag" do
-      it_should_behave_like "scope"
+      include_examples "scope"
       before do
         @flavor = 'tag'
         @query = 'String#to_i'

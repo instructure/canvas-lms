@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_s
 require File.expand_path(File.dirname(__FILE__) + '/support/id_answer_serializers_specs.rb')
 
 describe QuizQuestion::AnswerSerializers::MultipleAnswers do
-  it_should_behave_like 'Answer Serializers'
+  include_examples 'Answer Serializers'
 
   let :factory_options do
     {
@@ -35,7 +35,7 @@ describe QuizQuestion::AnswerSerializers::MultipleAnswers do
   end
 
   context 'validations' do
-    it_should_behave_like 'Id Answer Serializers'
+    include_examples 'Id Answer Serializers'
 
     it 'should reject unexpected types' do
       [ nil, 'asdf' ].each do |bad_input|

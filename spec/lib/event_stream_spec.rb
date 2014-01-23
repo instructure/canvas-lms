@@ -406,7 +406,7 @@ describe EventStream do
           @database.stubs(:batch).raises(@exception)
         end
 
-        it_should_behave_like "recording failures"
+        include_examples "recording failures"
       end
 
       context "failing callbacks" do
@@ -430,7 +430,7 @@ describe EventStream do
           @stream.update(@record)
         end
 
-        it_should_behave_like "recording failures"
+        include_examples "recording failures"
       end
     end
   end

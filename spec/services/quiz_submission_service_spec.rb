@@ -88,7 +88,7 @@ describe QuizSubmissionService do
         lambda { |*_| subject.create quiz }
       end
 
-      it_should_behave_like 'Takeable Quiz Services'
+      include_examples 'Takeable Quiz Services'
 
       it 'should create a QS' do
         expect { subject.create quiz }.to_not raise_error
@@ -171,7 +171,7 @@ describe QuizSubmissionService do
         lambda { |*_| subject.complete qs, qs.attempt }
       end
 
-      it_should_behave_like 'Takeable Quiz Services'
+      include_examples 'Takeable Quiz Services'
 
       it 'should complete the QS' do
         expect do
@@ -240,7 +240,7 @@ describe QuizSubmissionService do
         lambda { |*_| subject.update_question({}, qs, qs.attempt) }
       end
 
-      it_should_behave_like 'Takeable Quiz Services'
+      include_examples 'Takeable Quiz Services'
 
       it 'should update a question' do
         expect do

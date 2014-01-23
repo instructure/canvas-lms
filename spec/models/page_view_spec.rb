@@ -38,7 +38,7 @@ describe PageView do
   end
 
   describe "cassandra page views" do
-    it_should_behave_like "cassandra page views"
+    include_examples "cassandra page views"
     it "should store and load from cassandra" do
       expect {
         @page_view.save!
@@ -319,7 +319,7 @@ describe PageView do
     end
 
     context "cassandra-backed" do
-      it_should_behave_like "cassandra page views"
+      include_examples "cassandra page views"
 
       it "should return the existing page view" do
         page_views = (0..3).map { |index| page_view_model }
@@ -354,7 +354,7 @@ describe PageView do
     end
 
     context "cassandra-backed" do
-      it_should_behave_like "cassandra page views"
+      include_examples "cassandra page views"
 
       it "should return the existing page view" do
         page_views = (0..3).map { |index| page_view_model }
@@ -387,7 +387,7 @@ describe PageView do
     end
 
     context "cassandra-backed" do
-      it_should_behave_like "cassandra page views"
+      include_examples "cassandra page views"
 
       it "should return the existing page view" do
         pv = page_view_model
@@ -417,7 +417,7 @@ describe PageView do
     end
 
     context "cassandra-backed" do
-      it_should_behave_like "cassandra page views"
+      include_examples "cassandra page views"
 
       it "should return the existing page view" do
         pv = page_view_model
@@ -447,7 +447,7 @@ describe PageView do
     end
 
     context "cassandra-backed" do
-      it_should_behave_like "cassandra page views"
+      include_examples "cassandra page views"
 
       it "should return the existing page view" do
         pv = page_view_model
@@ -499,7 +499,7 @@ describe PageView do
     end
 
     context "cassandra-backed" do
-      it_should_behave_like "cassandra page views"
+      include_examples "cassandra page views"
 
       it "should interpret ids relative to the default shard" do
         user_id = 1

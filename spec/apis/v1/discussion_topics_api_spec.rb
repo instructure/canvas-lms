@@ -90,7 +90,7 @@ describe DiscussionTopicsController, type: :request do
       )
     end
 
-    it_should_behave_like 'a locked api item'
+    include_examples 'a locked api item'
   end
 
   before(:each) do

@@ -100,7 +100,7 @@ describe 'Collections' do
   end
 
   describe "user collections" do
-    it_should_behave_like "auto-follow context"
+    include_examples "auto-follow context"
     before do
       @context = user_model
       @user = user_model
@@ -109,7 +109,7 @@ describe 'Collections' do
   end
 
   describe "group collections as non-member" do
-    it_should_behave_like "auto-follow context"
+    include_examples "auto-follow context"
     before do
       @context = group_model
       @user = user_model
@@ -118,7 +118,7 @@ describe 'Collections' do
   end
 
   describe "group collections as member" do
-    it_should_behave_like "auto-follow context"
+    include_examples "auto-follow context"
     before do
       group_with_user
       @context = @group

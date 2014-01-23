@@ -93,7 +93,7 @@ describe "public courses" do
         @course
       end
 
-      it_should_behave_like 'a public course'
+      include_examples 'a public course'
     end
 
     context 'with draft state enabled' do
@@ -104,7 +104,7 @@ describe "public courses" do
         @course
       end
 
-      it_should_behave_like 'a public course'
+      include_examples 'a public course'
     end
   end
 end

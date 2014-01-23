@@ -110,7 +110,7 @@ describe "UserFollow" do
     end
 
     context "follow from user shard" do
-      it_should_behave_like "sharded user following"
+      include_examples "sharded user following"
 
       before do
         @uf = UserFollow.create_follow(@user1, @collection)
@@ -119,7 +119,7 @@ describe "UserFollow" do
     end
 
     context "follow from thing shard" do
-      it_should_behave_like "sharded user following"
+      include_examples "sharded user following"
 
       before do
         @uf = @collection.shard.activate { UserFollow.create_follow(@user1, @collection) }
@@ -128,7 +128,7 @@ describe "UserFollow" do
     end
 
     context "follow from a third shard" do
-      it_should_behave_like "sharded user following"
+      include_examples "sharded user following"
 
       before do
         @uf = @shard2.activate { UserFollow.create_follow(@user1, @collection) }
