@@ -88,7 +88,7 @@ describe "Module Items API", type: :request do
               "position" => 2,
               "title" => @quiz_tag.title,
               "indent" => 0,
-              "completion_requirement" => { "type" => "min_score", "min_score" => 10 },
+              "completion_requirement" => { "type" => "min_score", "min_score" => 10.0 },
               "published" => true,
               "module_id" => @module1.id
           },
@@ -365,12 +365,12 @@ describe "Module Items API", type: :request do
                         {:module_item => {:title => 'title', :type => 'Assignment', :content_id => assignment.id,
                          :completion_requirement => {:type => 'min_score', :min_score => 2}}})
 
-        json['completion_requirement'].should == {"type" => "min_score", "min_score" => "2"}
+        json['completion_requirement'].should == {"type" => "min_score", "min_score" => 2}
 
         @module1.reload
         req = @module1.completion_requirements.find{|h| h[:id] == json['id'].to_i}
         req[:type].should == 'min_score'
-        req[:min_score].should == "2"
+        req[:min_score].should == 2
       end
 
       it "should require valid completion requirement type" do
@@ -474,12 +474,12 @@ describe "Module Items API", type: :request do
                         {:module_item => {:title => 'title',
                                           :completion_requirement => {:type => 'min_score', :min_score => 3}}})
 
-        json['completion_requirement'].should == {"type" => "min_score", "min_score" => "3"}
+        json['completion_requirement'].should == {"type" => "min_score", "min_score" => 3}
 
         @module1.reload
         req = @module1.completion_requirements.find{|h| h[:id] == json['id'].to_i}
         req[:type].should == 'min_score'
-        req[:min_score].should == "3"
+        req[:min_score].should == 3
       end
 
       it "should remove completion requirement" do
