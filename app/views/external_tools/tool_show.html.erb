@@ -10,11 +10,7 @@
   </div>
 <% end %>
 
-<% js_block do %>
-<script>
-  require(['tool_inline']);
-</script>
-<% end %>
+<% js_bundle 'legacy/external_tools_tool_show' %>
 
 
 <% if @resource_url.start_with?('http://') %>
