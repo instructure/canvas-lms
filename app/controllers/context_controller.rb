@@ -229,6 +229,8 @@ class ContextController < ApplicationController
     respond_to do |format|
       format.html do
         @messages = @messages.paginate(page: params[:page], per_page: 15)
+        js_env(discussion_replies_path: discussion_replies_path(:format => :json),
+               total_pages: @messages.size)
         render :action => :inbox
       end
       format.json do
