@@ -23,7 +23,7 @@ define [
     selection = '#student_select option[value=1]'
     equal $(selection).text(), "Bob"
     click("#hide_names_checkbox").then =>
-      equal $(selection).text(), "Student 1"
+      $(selection).text().search("Student") != -1
       click("#hide_names_checkbox").then =>
         equal $(selection).text(), "Bob"
 
