@@ -221,7 +221,7 @@ class ContextModule < ActiveRecord::Base
       tag_ids = self.content_tags.active.pluck(:id)
       val.each do |id, opts|
         if tag_ids.include?(id.to_i)
-          res << {:id => id.to_i, :type => opts[:type], :min_score => opts[:min_score], :max_score => opts[:max_score]} #id => id.to_i, :type => type
+          res << {:id => id.to_i, :type => opts[:type], :min_score => opts[:min_score] && opts[:min_score].to_f, :max_score => opts[:max_score] && opts[:max_score].to_f}
         end
       end
       val = res

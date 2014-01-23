@@ -76,12 +76,12 @@
       <div class="span4">
         <span class="completion_requirement">
           <span class="requirement_type min_score_requirement">
-            <% score_display = %{<span class='min_score'>#{(criterion && criterion[:min_score]) || nbsp}</span>}.html_safe %>
+            <% score_display = content_tag(:span, criterion && criterion[:min_score] || nbsp, class: 'min_score') %>
             <span class="unfulfilled"><%= t 'min_score.unfulfilled', 'must score at least a %{score}', :score => score_display %></span>
             <span class="fulfilled"><%= t 'min_score.fulfilled', 'scored at least a %{score}', :score => score_display %></span>
           </span>
           <span class="requirement_type max_score_requirement">
-            <% score_display = %{<span class='min_score'>#{(criterion && criterion[:max_score]) || nbsp}</span>}.html_safe %>
+            <% score_display = content_tag(:span, criterion && criterion[:max_score] || nbsp, class: 'min_score') %>
             <span class="unfulfilled"><%= t 'max_score.unfulfilled', 'must score no more than a %{score}', :score => score_display %></span>
             <span class="fulfilled"><%= t 'max_score.fulfilled', 'scored no more than a%{score}', :score => score_display %></span>
           </span>
