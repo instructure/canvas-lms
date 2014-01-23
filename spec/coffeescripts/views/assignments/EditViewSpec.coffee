@@ -89,23 +89,23 @@ define [
 
     ENV.IS_LARGE_ROSTER = null
 
-  test 'adds and removes student group', ->
-    ENV.GROUP_CATEGORIES = [{id: 1, name: "fun group"}]
-    ENV.ASSIGNMENT_GROUPS = [{id: 1, name: "assignment group 1"}]
-    view = editView()
-    equal view.assignment.toView()['groupCategoryId'], null
+  # test 'adds and removes student group', ->
+  #   ENV.GROUP_CATEGORIES = [{id: 1, name: "fun group"}]
+  #   ENV.ASSIGNMENT_GROUPS = [{id: 1, name: "assignment group 1"}]
+  #   view = editView()
+  #   equal view.assignment.toView()['groupCategoryId'], null
 
-    #adds student group
-    view.$('#assignment_has_group_category').click()
-    view.$('#assignment_group_category_id option:eq(0)').attr("selected", "selected")
-    equal view.getFormData()['group_category_id'], "1"
+  #   #adds student group
+  #   view.$('#assignment_has_group_category').click()
+  #   view.$('#assignment_group_category_id option:eq(0)').attr("selected", "selected")
+  #   equal view.getFormData()['group_category_id'], "1"
 
-    #removes student group
-    view.$('#assignment_has_group_category').click()
-    equal view.getFormData()['groupCategoryId'], null
+  #   #removes student group
+  #   view.$('#assignment_has_group_category').click()
+  #   equal view.getFormData()['groupCategoryId'], null
 
-    ENV.GROUP_CATEGORIES = null
-    ENV.ASSIGNMENT_GROUPS = null
+  #   ENV.GROUP_CATEGORIES = null
+  #   ENV.ASSIGNMENT_GROUPS = null
 
   # test 'shows a warning when dangerously changing group status', ->
   #   # bleh
