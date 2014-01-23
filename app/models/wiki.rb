@@ -143,6 +143,9 @@ class Wiki < ActiveRecord::Base
     given {|user, session| self.cached_context_grants_right?(user, session, :read)}
     can :read
 
+    given {|user, session| self.cached_context_grants_right?(user, session, :view_unpublished_items)}
+    can :view_unpublished_items
+
     given {|user, session| self.cached_context_grants_right?(user, session, :participate_as_student) && self.context.allow_student_wiki_edits}
     can :read and can :create_page and can :update_page and can :update_page_content
 

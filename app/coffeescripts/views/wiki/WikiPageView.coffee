@@ -101,6 +101,7 @@ define [
       json.CAN =
         VIEW_PAGES: !!@WIKI_RIGHTS.read
         PUBLISH: !!@WIKI_RIGHTS.manage && json.contextName == 'courses'
+        VIEW_UNPUBLISHED: !!@WIKI_RIGHTS.manage || !!@WIKI_RIGHTS.view_unpublished_items
         UPDATE_CONTENT: !!@PAGE_RIGHTS.update || !!@PAGE_RIGHTS.update_content
         DELETE: !!@PAGE_RIGHTS.delete && !@course_home
         READ_REVISIONS: !!@PAGE_RIGHTS.read_revisions
