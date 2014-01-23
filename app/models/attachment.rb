@@ -128,8 +128,14 @@ class Attachment < ActiveRecord::Base
       # attachment in the same context and the same full path, we return that
       # instead, to emulate replacing a file without having to update every
       # by-id reference in every user content field.
-      if att.deleted?
-        new_att = Folder.find_attachment_in_context_with_path(proxy_owner, att.full_display_path)
+      if CANVAS_RAILS2
+        owner = proxy_owner
+      elsif self.respond_to?(:proxy_association)
+        owner = proxy_association.owner
+      end
+
+      if att.deleted? && owner
+        new_att = Folder.find_attachment_in_context_with_path(owner, att.full_display_path)
         new_att || att
       else
         att
