@@ -296,7 +296,6 @@ define [
     ##
     # DEPRECATED - don't use views option, use `child` constructor method
     renderViews: ->
-      console?.warn? 'the `views` option is deprecated in favor of @child`'
       _.each @options.views, @renderView
 
     ##

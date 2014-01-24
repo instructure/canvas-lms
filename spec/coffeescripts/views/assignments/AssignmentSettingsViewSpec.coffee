@@ -6,9 +6,9 @@ define [
   'compiled/views/assignments/AssignmentSettingsView'
   'compiled/views/assignments/AssignmentGroupWeightsView'
   'jquery'
-  'helpers/jquery.simulate'
   'helpers/fakeENV'
-], (Backbone, AssignmentGroupCollection, Course, AssignmentGroup, AssignmentSettingsView, AssignmentGroupWeightsView, $) ->
+  'helpers/jquery.simulate'
+], (Backbone, AssignmentGroupCollection, Course, AssignmentGroup, AssignmentSettingsView, AssignmentGroupWeightsView, $, fakeENV) ->
 
   group = ->
     new AssignmentGroup {group_weight: 50}
@@ -27,7 +27,9 @@ define [
     view.open()
     view
 
-  module 'AssignmentSettingsView'
+  module 'AssignmentSettingsView',
+    setup: -> fakeENV.setup()
+    teardown: -> fakeENV.teardown()
 
   test 'it should set the checkbox to the right value on open', ->
     view = createView(true)

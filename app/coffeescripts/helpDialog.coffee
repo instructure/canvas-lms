@@ -17,8 +17,6 @@ define [
   'jquery.disableWhileLoading'
 ], (I18n, helpDialogTemplate, $, _, INST, htmlEscape, preventDefault) ->
 
-  showEmail = not ENV.current_user_id
-
   helpDialog =
     defaultTitle: I18n.t 'Help', "Help"
 
@@ -41,7 +39,7 @@ define [
             role is 'user' or
             (ENV.current_user_roles and role in ENV.current_user_roles)
         locals =
-          showEmail: showEmail
+          showEmail: ENV.current_user_id
           helpLinks: links
           url: window.location
           contextAssetString: ENV.context_asset_string
@@ -59,7 +57,7 @@ define [
         disableWhileLoading: true
         required: ->
           requiredFields = ['error[subject]', 'error[comments]', 'error[user_perceived_severity]']
-          requiredFields.push 'error[email]' if showEmail
+          requiredFields.push 'error[email]' if ENV.current_user_id
           requiredFields
         success: =>
           @$dialog.dialog('close')

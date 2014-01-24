@@ -9,9 +9,9 @@ define [
   'compiled/views/ExternalTools/ExternalToolsCollectionView'
   'compiled/views/ExternalTools/AppThumbnailView'
   'helpers/assertions'
+  'helpers/fakeENV'
 ], (Backbone, $, AppCenterTemplate, IndexView, ExternalToolCollection, PaginatedCollection, 
-  PaginatedCollectionView, ExternalToolsCollectionView, AppThumbnailView, assert) ->
-
+  PaginatedCollectionView, ExternalToolsCollectionView, AppThumbnailView, assert, fakeENV) ->
   externalTools = null
   apps = null
   appCenterView = null
@@ -21,6 +21,7 @@ define [
   module "ExternalTools",
 
     setup: ->
+      fakeENV.setup()
       externalTools = new ExternalToolCollection
       apps = new PaginatedCollection
       apps.resourceName = 'app_center/apps'
@@ -41,6 +42,7 @@ define [
       view.render()
 
     teardown: ->
+      fakeENV.teardown()
       view.remove()
 
   test 'IndexView: afterRender', ->

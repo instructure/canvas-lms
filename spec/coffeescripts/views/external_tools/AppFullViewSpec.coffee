@@ -3,8 +3,9 @@ define [
   'jquery'
   'compiled/views/ExternalTools/AppFullView'
   'helpers/assertions'
+  'helpers/fakeENV'
   'helpers/jquery.simulate'
-], (Backbone, $, AppFullView, assert) ->
+], (Backbone, $, AppFullView, assert, fakeENV) ->
 
   view = null
   server = null
@@ -12,6 +13,7 @@ define [
   module "ExternalTools",
 
     setup: ->
+      fakeENV.setup()
       server = sinon.fakeServer.create()
       server.respondWith("GET", /reviews/,
         [200, { "Content-Type": "application/json" }, JSON.stringify([
@@ -53,6 +55,7 @@ define [
       $('#fixtures').html view.$el
 
     teardown: ->
+      fakeENV.teardown()
       server.restore()
       view.remove()
 

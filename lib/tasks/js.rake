@@ -1,4 +1,5 @@
 require 'timeout'
+require 'json'
 
 namespace :js do
 
@@ -13,7 +14,7 @@ namespace :js do
       end
     end
     Rake::Task['js:generate_runner'].invoke
-    exec('testem -f config/testem.yml')
+    exec('karma start --browsers Firefox,Chrome,Safari')
   end
 
   def matcher_for_ember_app app_name
@@ -31,37 +32,59 @@ namespace :js do
     output = Erubis::Eruby.new(File.read("#{Rails.root}/spec/javascripts/runner.html.erb")).
         result(Canvas::RequireJs.get_binding)
     File.open("#{Rails.root}/spec/javascripts/runner.html", 'w') { |f| f.write(output) }
+    build_requirejs_config
   end
 
-  desc 'test javascript specs with PhantomJS'
-  task :test do
+  def build_requirejs_config
+    require 'canvas/require_js'
+    require 'erubis'
+    output = Erubis::Eruby.new(File.read("#{Rails.root}/spec/javascripts/requirejs_config.js.erb")).
+        result(Canvas::RequireJs.get_binding)
+    File.open("#{Rails.root}/spec/javascripts/requirejs_config.js", 'w') { |f| f.write(output) }
+
+    matcher = Canvas::RequireJs.matcher
+    tests = Dir[
+      "public/javascripts/#{matcher}",
+      "spec/javascripts/compiled/#{matcher}",
+      "spec/plugins/*/javascripts/compiled/#{matcher}"
+    ].map{ |file| file.sub(/\.js$/, '').sub(/public\/javascripts\//, '') }
+    File.open("#{Rails.root}/spec/javascripts/tests.js", 'w') { |f|
+      f.write("window.__TESTS__ = #{JSON.pretty_generate(tests)}")
+    }
+  end
+
+  desc 'test javascript specs with Karma'
+  task :test, :reporter do |task, args|
+    reporter = args[:reporter]
     require 'canvas/require_js'
 
     # run test for each ember app individually
     matcher = ENV['JS_SPEC_MATCHER']
 
     if !matcher || matcher.to_s =~ %r{app/coffeescripts/ember}
-      ignored_embers = ['shared']
-      Dir.entries('app/coffeescripts/ember').reject { |d| d.match(/^\./) || ignored_embers.include?(d) }.each do |ember_app|
+      ignored_embers = ['shared','modules'] #,'quizzes','screenreader_gradebook'
+      Dir.entries('app/coffeescripts/ember').reject { |d|
+        d.match(/^\./) || ignored_embers.include?(d)
+      }.each do |ember_app|
         puts "--> Running tests for '#{ember_app}' ember app"
         Canvas::RequireJs.matcher = matcher_for_ember_app ember_app
-        test_suite
+        test_suite(reporter)
       end
     end
 
     # run test for non-ember apps
     Canvas::RequireJs.matcher = nil
-    test_suite
+    test_suite(reporter)
   end
 
-  def test_suite
-    if test_js_with_timeout(300) != 0 && !ENV['JS_SPEC_MATCHER']
-      puts "--> PhantomJS tests failed. retrying PhantomJS..."
-      raise "PhantomJS tests failed on second attempt." if test_js_with_timeout(400) != 0
+  def test_suite(reporter=nil)
+    if test_js_with_timeout(300,reporter) != 0 && !ENV['JS_SPEC_MATCHER']
+      puts "--> Karma tests failed." # retrying karma...
+      raise "Karma tests failed on second attempt." if test_js_with_timeout(400,reporter) != 0
     end
   end
 
-  def test_js_with_timeout(timeout)
+  def test_js_with_timeout(timeout,reporter)
     require 'canvas/require_js'
     begin
       Timeout::timeout(timeout) do
@@ -70,32 +93,21 @@ namespace :js do
           puts "--> do rake js:test quick=true to skip generating compiled coffeescript and handlebars."
           Rake::Task['js:generate'].invoke
         end
-        puts "--> executing phantomjs tests"
+        puts "--> executing browser tests with Karma"
         build_runner
-        phantomjs_output = `phantomjs spec/javascripts/support/qunit/test.js file:///#{Dir.pwd}/spec/javascripts/runner.html 2>&1`
-        puts phantomjs_output
+        karma_output = `./node_modules/karma/bin/karma start --browsers Chrome --single-run --reporters progress,#{reporter} 2>&1`
+        puts karma_output
 
         if $?.exitstatus != 0
           puts 'some specs failed'
           result = 1
-        elsif ENV['JS_SPEC_MATCHER'] || Canvas::RequireJs.matcher
-          # running a subset of tests in isolation, don't be paranoid about
-          # some unrun tests getting lost
-          result = 0
-        elsif phantomjs_output.match(/^Took .* (\d+) tests/)[1].to_i < 2000
-          # ran all tests but didn't see enough? do be paranoid about some
-          # unrun tests getting lost
-          puts 'all run specs passed, but not all specs were run'
-          result = 1
         else
-          # good exit status, and it seems enough specs ran to assuage our
-          # paranoia
           result = 0
         end
         return result
       end
     rescue Timeout::Error
-      puts "PhantomJS tests reached timeout!"
+      puts "Karma tests reached timeout!"
     end
   end
 
@@ -202,7 +214,7 @@ namespace :js do
 
     puts "--> Optimizing canvas-lms"
     optimize_time = Benchmark.realtime do
-      output = `node #{Rails.root}/node_modules/requirejs/bin/r.js -o #{Rails.root}/config/build.js 2>&1`
+      output = `node #{Rails.root}/node_modules/rjs-old/r.js-1.0.8/dist/r.js -o #{Rails.root}/config/build.js 2>&1`
       raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
     end
     puts "--> Optimized canvas-lms in #{optimize_time}"

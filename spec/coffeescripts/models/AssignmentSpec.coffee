@@ -3,7 +3,7 @@ define [
   'compiled/models/Submission'
   'compiled/models/DateGroup'
   'helpers/fakeENV'
-], (Assignment, Submission, DateGroup) ->
+], (Assignment, Submission, DateGroup, fakeENV) ->
 
   module "Assignment"
 
@@ -386,10 +386,12 @@ define [
     assignment = new Assignment
     deepEqual assignment.allDates(), []
 
-  module "Assignment#singleSectionDueDate"
+  module "Assignment#singleSectionDueDate",
+    setup: -> fakeENV.setup()
+    teardown: -> fakeENV.teardown()
 
   test "gets the due date for section instead of null", ->
-    dueAt = new Date("2013-11-27 11:01:00")
+    dueAt = new Date("2013-11-27T11:01:00Z")
     assignment = new Assignment all_dates: [
       {due_at: null, title: "Everyone"},
       {due_at: dueAt, title: "Summer"}
@@ -538,7 +540,7 @@ define [
     equal json.allDates.length, 2
 
   test "includes singleSectionDueDate", ->
-    dueAt = new Date("2013-11-27 11:01:00")
+    dueAt = new Date("2013-11-27T11:01:00Z")
     assignment = new Assignment all_dates: [
       {due_at: null, title: "Everyone"},
       {due_at: dueAt, title: "Summer"}

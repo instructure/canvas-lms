@@ -1,9 +1,13 @@
 define [
   'underscore'
   'compiled/gradebook2/OutcomeGradebookGrid'
-], (_, Grid) ->
+  'helpers/fakeENV'
+  'i18n!gradebook2'
+], (_, Grid,fakeENV) ->
 
-  module 'OutcomeGradebookGrid'
+  module 'OutcomeGradebookGrid',
+    setup: -> fakeENV.setup()
+    teardown: -> fakeENV.teardown()
 
   test 'Grid.Math.mean', ->
     subject = [1,1,2,4,5]

@@ -3,6 +3,8 @@ require [
   'underscore'
   'compiled/jquery/mediaCommentThumbnail'
 ], ($, _)->
+  # fragile spec
+
   module 'mediaCommentThumbnail',
     setup: ->
       # flop out the _.defer function to just call directly down to the passed
@@ -35,5 +37,4 @@ require [
     $('.instructure_inline_media_comment', @$fixtures).mediaCommentThumbnail('normal')
 
     equal $('.media_comment_thumbnail', @$fixtures).length, 1
-    equal $('.media_comment_thumbnail', @$fixtures).first().css('background-image'),
-      "url(https://#{resourceDomain}/p/#{partnerId}/thumbnail/entry_id/#{mediaId}/width/140/height/100/bgcolor/000000/type/2/vid_sec/5)"
+    ok $('.media_comment_thumbnail', @$fixtures).first().css('background-image').indexOf("https://#{resourceDomain}/p/#{partnerId}/thumbnail/entry_id/#{mediaId}/width/140/height/100/bgcolor/000000/type/2/vid_sec/5") > 0

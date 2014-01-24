@@ -1,9 +1,8 @@
 require [
   'compiled/helpDialog'
-  'vendor/jquery.ba-tinypubsub'
   'helpers/fakeENV'
-], (helpDialog)->
-
+  'vendor/jquery.ba-tinypubsub'
+], (helpDialog,fakeENV)->
   # more tests are in spec/selenium/help_dialog_spec.rb
 
   # mock INST.browser for test to work
@@ -12,14 +11,15 @@ require [
     version: 8
 
   module 'HelpDialog',
-
     setup: ->
+      fakeENV.setup()
       @clock = sinon.useFakeTimers()
       @server = sinon.fakeServer.create()
       @server.respondWith '/help_links', '[]'
       @server.respondWith '/api/v1/courses.json', '[]'
 
     teardown: ->
+      fakeENV.teardown()
       @server.restore()
 
       # if we don't close it after each test, subsequent tests get messed up.

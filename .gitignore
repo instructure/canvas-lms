@@ -33,9 +33,13 @@ Gemfile.lock
 /public/stylesheets/compiled/
 /RAILS3
 /spec/javascripts/runner.html
+/spec/javascripts/tests.js
 /spec/javascripts/compiled/
 /tmp/
 /vendor/plugins/rails_upgrade
+/node_modules
+/spec/javascripts/tests.js
+/spec/javascripts/requirejs_config.js
 
 # generated plugin stuff
 /app/coffeescripts/plugins/

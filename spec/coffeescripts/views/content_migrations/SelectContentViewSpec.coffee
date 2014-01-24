@@ -2,9 +2,9 @@ define [
   'Backbone'
   'compiled/views/content_migrations/SelectContentView'
   'compiled/models/ProgressingContentMigration'
-  'helpers/jquery.simulate'
   'helpers/fakeENV'
-], (Backbone, SelectContentView, ProgressingMigration) -> 
+  'helpers/jquery.simulate'
+], (Backbone, SelectContentView, ProgressingMigration, fakeENV) -> 
 
   class SelectContentHelper
     @url = '/api/v1/courses/42/content_migrations/5/selective_data'
@@ -65,6 +65,7 @@ define [
   module 'SelectContentView: Main Behaviors',
     setup: -> 
       @server = sinon.fakeServer.create()
+      fakeENV.setup()
       @$fixtures = $('#fixtures')
       @model = new ProgressingMigration
                   id: 5
@@ -84,6 +85,7 @@ define [
       @server.respond()
 
     teardown: -> 
+      fakeENV.teardown()
       @server.restore()
       @selectContentView.remove()
 
