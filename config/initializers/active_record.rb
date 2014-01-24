@@ -1390,6 +1390,8 @@ end
 else
 
 class ActiveModel::Errors
+  alias :length :size
+
   def as_json(*a)
     {:errors => Hash[to_hash.map{|k,v| [k, v.map{|m| {:attribute => k, :message => m, :type => m}}]}]}.as_json(*a)
   end
