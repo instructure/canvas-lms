@@ -498,7 +498,7 @@ define [
         templateOpts.warning = @totalGradeWarning
         templateOpts.lastColumn = true
         templateOpts.showPointsNotPercent = @displayPointTotals()
-
+        templateOpts.hideTooltip = @weightedGroups() and not @totalGradeWarning
       groupTotalCellTemplate templateOpts
 
     htmlContentFormatter: (row, col, val, columnDef, student) =>

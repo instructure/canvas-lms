@@ -87,6 +87,9 @@ define([
     var $finalGradeRow = $(".student_assignment.final_grade");
     $finalGradeRow.find(".grade").text(finalGrade);
     $finalGradeRow.find(".score_teaser").text(teaserText);
+    if (groupWeightingScheme == "percent") {
+      $finalGradeRow.find(".score_teaser").hide()
+    }
 
     if(ENV.grading_scheme) {
       $(".final_letter_grade .grade").text(GradeCalculator.letter_grade(ENV.grading_scheme, scoreAsPercent));
