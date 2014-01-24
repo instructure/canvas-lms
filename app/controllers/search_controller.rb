@@ -283,7 +283,10 @@ class SearchController < ApplicationController
         # :send_messages_all)
         ret[:permissions] = course_for_section(context)[:permissions]
       elsif context[:type] == :group && context[:parent]
-        ret[:permissions] = course_for_group(context)[:permissions]
+        course = course_for_group(context)
+        # People have groups in unpublished courses that they use for messaging.
+        # We should really train them to use subaccount-level groups.
+        ret[:permissions] = course ? course[:permissions] : {send_messages: true}
       end
       ret[:context_name] = context[:context_name] if context[:context_name] && context_name.nil?
       ret
