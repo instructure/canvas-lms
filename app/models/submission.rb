@@ -818,7 +818,7 @@ class Submission < ActiveRecord::Base
   end
 
   def add_comment(opts={})
-    opts.symbolize_keys!
+    opts = opts.symbolize_keys
     opts[:author] = opts.delete(:commenter) || opts.delete(:author) || self.user
     opts[:comment] = opts[:comment].try(:strip) || ""
     opts[:attachments] ||= opts.delete :comment_attachments
