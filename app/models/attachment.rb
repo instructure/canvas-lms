@@ -1548,10 +1548,10 @@ class Attachment < ActiveRecord::Base
 
   def self.attachment_list_from_migration(context, ids)
     return "" if !ids || !ids.is_a?(Array) || ids.empty?
-    description = "<h3>#{t 'title.migration_list', "Associated Files"}</h3><ul>"
+    description = "<h3>#{ERB::Util.h(t('title.migration_list', "Associated Files"))}</h3><ul>"
     ids.each do |id|
       attachment = context.attachments.find_by_migration_id(id)
-      description += "<li><a href='/courses/#{context.id}/files/#{attachment.id}/download' class='#{'instructure_file_link' if attachment.scribdable?}'>#{attachment.display_name}</a></li>" if attachment
+      description += "<li><a href='/courses/#{context.id}/files/#{attachment.id}/download' class='#{'instructure_file_link' if attachment.scribdable?}'>#{ERB::Util.h(attachment.display_name)}</a></li>" if attachment
     end
     description += "</ul>";
     description
