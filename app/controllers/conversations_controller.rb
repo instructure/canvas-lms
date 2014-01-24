@@ -805,7 +805,7 @@ class ConversationsController < ApplicationController
     }.reject(&:blank?)
 
     content += "<hr />"
-    content += "<div>#{t('conversation_context', "From a conversation with")} "
+    content += "<div>#{ERB::Util.h(t('conversation_context', "From a conversation with"))} "
     participant_list_cutoff = 2
     if audience_names.length <= participant_list_cutoff
       content += "#{ERB::Util.h(audience_names.to_sentence)}"
@@ -815,7 +815,7 @@ class ConversationsController < ApplicationController
         :other => "and %{count} others"
       },
         :count => audience_names.length - participant_list_cutoff)
-      content += "#{ERB::Util.h(audience_names[0...participant_list_cutoff].join(", "))} #{others_string}"
+      content += "#{ERB::Util.h(audience_names[0...participant_list_cutoff].join(", "))} #{ERB::Util.h(others_string)}"
     end
 
     if !audience_context_names.empty?

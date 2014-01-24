@@ -245,7 +245,7 @@
     </div>
     <div style="text-align: right;" class="submission_grade">
       <span style="font-weight: bold;"><%= before_label(:grade, "Grade") %></span> <span class="grade_entry">&nbsp;</span>
-      <%= t(:out_of_points_possible, "*out of* %{points_possible}", :wrapper => '<span style="font-size: 0.8em;" class="out_of">\1</span>', :points_possible => raw("<span class=\"points_possible\">#{t('#not_applicable', "N/A")}</span>")) %>
+      <%= t(:out_of_points_possible, "*out of* %{points_possible}", :wrapper => '<span style="font-size: 0.8em;" class="out_of">\1</span>', :points_possible => raw("<span class=\"points_possible\">#{h(t('#not_applicable', "N/A"))}</span>")) %>
     </div>
     <div class="button-container save_buttons">
       <button type="button" class="btn update_button"><%= t('buttons.update', "Update") %></button>

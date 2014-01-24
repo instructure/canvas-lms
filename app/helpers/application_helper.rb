@@ -654,7 +654,7 @@ module ApplicationHelper
       :collection_size        => all_courses_count,
       :more_link_for_over_max => courses_path,
       :title                  => t('#menu.my_courses', "My Courses"),
-      :link_text              => raw(t('#layouts.menu.view_all_enrollments', 'View all courses')),
+      :link_text              => t('#layouts.menu.view_all_enrollments', 'View all courses'),
       :edit                   => t("#menu.customize", "Customize")
     }
   end
@@ -667,7 +667,7 @@ module ApplicationHelper
       :max_to_show => 8,
       :more_link_for_over_max => groups_path,
       :title => t('#menu.current_groups', "Current Groups"),
-      :link_text => raw(t('#layouts.menu.view_all_groups', 'View all groups'))
+      :link_text => t('#layouts.menu.view_all_groups', 'View all groups')
     }
   end
 
@@ -679,7 +679,7 @@ module ApplicationHelper
       :max_to_show => 8,
       :more_link_for_over_max => accounts_path,
       :title => t('#menu.managed_accounts', "Managed Accounts"),
-      :link_text => raw(t('#layouts.menu.view_all_accounts', 'View all accounts'))
+      :link_text => t('#layouts.menu.view_all_accounts', 'View all accounts')
     }
   end
 
