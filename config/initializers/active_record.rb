@@ -888,7 +888,7 @@ unless CANVAS_RAILS2
       # already in a transaction (or transactions don't matter); cursor is fine
       if (connection.adapter_name == 'PostgreSQL' && (Shackles.environment == :slave || connection.open_transactions > (Rails.env.test? ? 1 : 0))) && !options[:start]
         self.activate { find_in_batches_with_cursor(options, &block) }
-      elsif order_values.any? || group_values.any? || select_values.to_s =~ /DISTINCT/i
+      elsif order_values.any? || group_values.any? || select_values.to_s =~ /DISTINCT/i || uniq_value
         raise ArgumentError.new("GROUP and ORDER are incompatible with :start") if options[:start]
         self.activate { find_in_batches_with_temp_table(options, &block) }
       else
