@@ -84,10 +84,10 @@ class QuizSubmission < ActiveRecord::Base
       self.quiz.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user_id, 'active') }
     can :read
 
-    given {|user, session| self.quiz.grants_right?(user, session, :manage) }
+    given {|user, session| quiz.cached_context_grants_right?(user, session, :manage_grades) }
     can :update_scores
 
-    given {|user, session| self.quiz.grants_right?(user, session, :manage) }
+    given {|user, session| quiz.cached_context_grants_right?(user, session, :manage_grades) }
     can :add_attempts
   end
 
