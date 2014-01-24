@@ -100,7 +100,7 @@
   </table>
   <div>
     <% ot(:end_quiz_when, "End the quiz %{n} minutes from %{reference_time}.",
-          :n => raw("<input type=\"text\" name=\"time\" style=\"width: 50px;\" title=\"#{t('titles.minutes_to_add', "minutes to add")}\"/>"),
+          :n => raw("<input type=\"text\" name=\"time\" style=\"width: 50px;\" title=\"#{h(t('titles.minutes_to_add', "minutes to add"))}\"/>"),
           :reference_time => capture{ %>
     <select name="time_type">
       <option value="extend_from_now"><%= t(:end_quiz_reference_time_now, "now") %></option>
