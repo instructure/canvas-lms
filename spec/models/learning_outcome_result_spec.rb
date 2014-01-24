@@ -25,7 +25,7 @@ describe LearningOutcomeResult do
     outcome = @course.created_learning_outcomes.create!(title: 'outcome')
 
     LearningOutcomeResult.new(alignment: ContentTag.create!(title: 'content', context: @course)).tap do |lor|
-      lor.association = quiz_model
+      lor.association_object = quiz_model
       lor.context = @course
       lor.learning_outcome = outcome
       lor.associated_asset = quiz_model
@@ -46,7 +46,7 @@ describe LearningOutcomeResult do
 
     it 'returns the association type attribute if not a quiz' do
       learning_outcome_result = create_learning_outcome_result
-      learning_outcome_result.association = assignment_model
+      learning_outcome_result.association_object = assignment_model
       learning_outcome_result.send(:update_without_callbacks)
 
       learning_outcome_result.association_type.should == 'Assignment'
