@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe QuizSubmissionQuestionsController, :type => :integration do
+describe QuizSubmissionQuestionsController, :type => :request do
   module Helpers
     def create_question(type, factory_options = {}, quiz=@quiz)
       factory = method(:"#{type}_question_data")
