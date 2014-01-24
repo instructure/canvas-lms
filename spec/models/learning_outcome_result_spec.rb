@@ -39,7 +39,7 @@ describe LearningOutcomeResult do
       learning_outcome_result.association_type.should == 'Quizzes::Quiz'
 
       learning_outcome_result.association_type = 'Quiz'
-      learning_outcome_result.send(:update_without_callbacks)
+      learning_outcome_result.send(:save_without_callbacks)
 
       LearningOutcomeResult.first.association_type.should == 'Quizzes::Quiz'
     end
@@ -47,8 +47,7 @@ describe LearningOutcomeResult do
     it 'returns the association type attribute if not a quiz' do
       learning_outcome_result = create_learning_outcome_result
       learning_outcome_result.association_object = assignment_model
-      learning_outcome_result.send(:update_without_callbacks)
-
+      learning_outcome_result.send(:save_without_callbacks)
       learning_outcome_result.association_type.should == 'Assignment'
     end
   end
@@ -59,7 +58,7 @@ describe LearningOutcomeResult do
       learning_outcome_result.associated_asset_type.should == 'Quizzes::Quiz'
 
       learning_outcome_result.associated_asset_type = 'Quiz'
-      learning_outcome_result.send(:update_without_callbacks)
+      learning_outcome_result.send(:save_without_callbacks)
 
       LearningOutcomeResult.first.associated_asset_type.should == 'Quizzes::Quiz'
     end
@@ -67,7 +66,7 @@ describe LearningOutcomeResult do
     it 'returns the associated asset type attribute if not a quiz' do
       learning_outcome_result = create_learning_outcome_result
       learning_outcome_result.associated_asset = assignment_model
-      learning_outcome_result.send(:update_without_callbacks)
+      learning_outcome_result.send(:save_without_callbacks)
 
       learning_outcome_result.associated_asset_type.should == 'Assignment'
     end

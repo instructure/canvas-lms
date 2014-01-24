@@ -26,7 +26,7 @@ describe ClonedItem do
       cloned_item.original_item_type.should == 'Quizzes::Quiz'
 
       cloned_item.original_item_type = 'Quiz'
-      cloned_item.send(:update_without_callbacks)
+      cloned_item.send(:save_without_callbacks)
 
       ClonedItem.first.original_item_type.should == 'Quizzes::Quiz'
     end

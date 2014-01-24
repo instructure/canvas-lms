@@ -351,7 +351,7 @@ describe "Outcome Reports" do
       # NOTE: remove after data migration of polymorphic relationships having: Quiz
       result = LearningOutcomeResult.where(association_type: 'Quizzes::Quiz').first
       result.association_type = 'Quiz'
-      result.send(:update_without_callbacks)
+      result.send(:save_without_callbacks)
 
       parsed = read_report(@type, {order: [0, 13]})
       parsed[2][5].should == 'assignment'

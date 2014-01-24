@@ -152,7 +152,7 @@ describe 'simply_versioned' do
       version.versionable_type.should == 'Quizzes::Quiz'
 
       version.versionable_type = 'Quiz'
-      version.send(:update_without_callbacks)
+      version.send(:save_without_callbacks)
       Version.find(version.id).versionable_type.should == 'Quizzes::Quiz'
     end
 

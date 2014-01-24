@@ -408,7 +408,7 @@ describe ContentTag do
       content_tag.content_type.should == 'Quizzes::Quiz'
 
       content_tag.content_type = 'Quiz'
-      content_tag.send(:update_without_callbacks)
+      content_tag.send(:save_without_callbacks)
 
       ContentTag.find(content_tag.id).content_type.should == 'Quizzes::Quiz'
     end

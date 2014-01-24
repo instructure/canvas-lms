@@ -31,7 +31,7 @@ describe PolymorphicTypeOverride do
       fizz_buzz.content_type.should == 'Quizzes::Quiz'
 
       fizz_buzz.content_type = 'OldClassInDatabase'
-      fizz_buzz.send(:update_without_callbacks)
+      fizz_buzz.send(:save_without_callbacks)
 
       updated_fizz_buzz = ContentTag.first
       updated_fizz_buzz.content_type.should == 'Quizzes::Quiz'
@@ -51,7 +51,7 @@ describe PolymorphicTypeOverride do
 
       fizz_buzz.content_type = 'OldClassInDatabase'
       fizz_buzz.context_type = 'AnotherOldClassInDatabase'
-      fizz_buzz.send(:update_without_callbacks)
+      fizz_buzz.send(:save_without_callbacks)
 
       updated_fizz_buzz = ContentTag.first
 
