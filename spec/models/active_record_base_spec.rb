@@ -371,7 +371,7 @@ describe ActiveRecord::Base do
     end
 
     it "should not raise an error if there are no records" do
-      expect { Course.bulk_insert [] }.should change(Course, :count).by(0)
+      expect { Course.bulk_insert [] }.to change(Course, :count).by(0)
     end
   end
 
@@ -480,15 +480,15 @@ describe ActiveRecord::Base do
     end
 
     it "should fail with improper nested hashes" do
-      lambda {
+      expect {
         User.where(:name => { :users => { :id => @user }}).first
-      }.should raise_error(ActiveRecord::StatementInvalid)
+      }.to raise_error(ActiveRecord::StatementInvalid)
     end
 
     it "should fail with dot in nested column name" do
-      lambda {
+      expect {
         User.where(:name => { "users.id" => @user }).first
-      }.should raise_error(ActiveRecord::StatementInvalid)
+      }.to raise_error(ActiveRecord::StatementInvalid)
     end
 
     it "should not fail with a dot in column name only" do
@@ -546,6 +546,7 @@ describe ActiveRecord::Base do
 
   context "fake arel extensions" do
     before do
+      pending "only apply to rails 2" unless CANVAS_RAILS2
       @user = User.create!(:name => 'a')
       @cc = @user.communication_channels.create!(:path => 'nobody@example.com')
     end
