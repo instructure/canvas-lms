@@ -321,7 +321,7 @@ describe QuizSubmissionService do
         end.to_not raise_error
       end
 
-      it 'should generate the correct "legacy" format' do
+      it 'should generate the correct legacy format' do
         qs.workflow_state = 'complete'
         qs.expects(:update_scores).with({
           "submission_version_number" => qs.attempt,
