@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
-class TestCourseApi
+class DiscussionTopicsTestCourseApi
   include Api
   include Api::V1::DiscussionTopics
   def feeds_topic_format_path(topic_id, code, format); "feeds_topic_format_path(#{topic_id.inspect}, #{code.inspect}, #{format.inspect})"; end
@@ -29,7 +29,7 @@ end
 
 describe Api::V1::DiscussionTopics do
   before do
-    @test_api = TestCourseApi.new
+    @test_api = DiscussionTopicsTestCourseApi.new
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @me = @user
     student_in_course(:active_all => true, :course => @course)

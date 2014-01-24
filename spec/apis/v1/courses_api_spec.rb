@@ -26,7 +26,6 @@ class TestCourseApi
   def api_user_content(syllabus, course); return "api_user_content(#{syllabus}, #{course.id})"; end
 end
 
-
 describe Api::V1::Course do
 
   describe '#course_json' do
