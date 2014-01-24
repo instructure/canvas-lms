@@ -1378,6 +1378,21 @@ describe QuizSubmission do
       qs = @quiz.generate_submission(@user)
       qs.grants_right?(@observer, nil, :read).should be_true
     end
+
+    it "allows users with the manage_grades permission but not 'manage' permission to update scores and add attempts" do
+      RoleOverride.create!(
+        context: Account.default,
+        enrollment_type: 'TeacherEnrollment',
+        permission: 'manage_assignments',
+        enabled: false
+      )
+      course_with_teacher(active_all: true)
+      course_quiz(course: @course)
+      student_in_course(course: @course)
+      qs = @quiz.generate_submission(@student)
+      qs.grants_right?(@teacher, :update_scores).should == true
+      qs.grants_right?(@teacher, :add_attempts).should == true
+    end
   end
 
   describe "#question" do
