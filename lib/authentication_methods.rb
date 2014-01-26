@@ -308,6 +308,7 @@ module AuthenticationMethods
   end
 
   def initiate_saml_login(current_host=nil, aac=nil)
+    increment_saml_stat("login_attempt")
     reset_session_for_login
     aac ||= @domain_root_account.account_authorization_config
     settings = aac.saml_settings(current_host)
@@ -328,5 +329,9 @@ module AuthenticationMethods
 
   def delegated_auth_redirect_uri(uri)
     uri
+  end
+
+  def increment_saml_stat(key)
+    Canvas::Statsd.increment("canvas.saml.#{Canvas::Statsd.escape(request.host)}.#{key}")
   end
 end
