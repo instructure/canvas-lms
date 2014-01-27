@@ -271,7 +271,10 @@ describe 'Student reports' do
     end
 
     it 'should run the zero activity report with no params' do
-      parsed = read_report(@type, {order: 1})
+      report = run_report
+      report.parameters["extra_text"].should ==  "Term: All Terms;"
+      parsed = parse_report(report, {order: 1})
+
       parsed.length.should == 3
 
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
@@ -412,7 +415,9 @@ describe 'Student reports' do
       param = {}
       param['enrollment_term'] = term1.id
 
-      parsed = read_report(@type, {params: param, order: 1})
+      report = run_report(@type, {params: param})
+      report.parameters["extra_text"].should == "Term: Fall;"
+      parsed = parse_report(report, {order: 1})
       parsed[0].should == [@user1.id.to_s, 'secondSIS', 'Clair, John St.',
                            @last_login_time.iso8601, p1b.current_login_ip]
       parsed[1].should == [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.',
