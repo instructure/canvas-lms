@@ -184,7 +184,7 @@ class User < ActiveRecord::Base
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :calendar_events, :as => 'context', :dependent => :destroy, :include => [:parent_event]
   has_many :eportfolios, :dependent => :destroy
-  has_many :quiz_submissions, :dependent => :destroy
+  has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
   has_many :dashboard_messages, :class_name => 'Message', :conditions => {:to => "dashboard", :workflow_state => 'dashboard'}, :order => 'created_at DESC', :dependent => :destroy
   has_many :collaborations, :order => 'created_at DESC'
   has_many :user_services, :order => 'created_at', :dependent => :destroy

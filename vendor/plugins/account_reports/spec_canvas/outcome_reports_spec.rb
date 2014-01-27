@@ -357,6 +357,17 @@ describe "Outcome Reports" do
       parsed[2][5].should == 'assignment'
       parsed[0][5].should == 'quiz'
       parsed[1][5].should == 'quiz'
+
+      # NOTE: remove after data migration of polymorphic relationships having: QuizSubmission
+      result = LearningOutcomeResult.where(artifact_type: 'Quizzes::QuizSubmission').first
+      result.association_type = 'QuizSubmission'
+      result.send(:update_without_callbacks)
+
+      parsed = read_report(@type, {order: [0, 13]})
+      parsed[0][6].should == sub.finished_at.iso8601
+      parsed[0][7].should == sub.score.to_s
+      parsed[1][6].should == sub.finished_at.iso8601
+      parsed[1][7].should == sub.score.to_s
     end
 
     it 'should include in extra text if option is set' do

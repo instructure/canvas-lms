@@ -73,25 +73,25 @@ describe Message do
       Message.in_state([:bounced, :sent]).sort_by(&:id).should == [m1, m2].sort_by(&:id)
       Message.in_state([:bounced, :sent]).should_not be_include(m3)
     end
-    
+
     it "should be able to search on its context" do
       user_model
       message_model
       @message.update_attribute(:context, @user)
       Message.for(@user).should == [@message]
     end
-    
+
     it "should have a list of messages to dispatch" do
       message_model(:dispatch_at => Time.now - 1, :workflow_state => 'staged', :to => 'somebody', :user => user)
       Message.to_dispatch.should == [@message]
     end
-    
+
     it "should not have a message to dispatch if the message's delay moves it to the future" do
       message_model(:dispatch_at => Time.now - 1, :to => 'somebody')
       @message.stage
       Message.to_dispatch.should == []
     end
-    
+
     it "should filter on notification name" do
       notification_model(:name => 'Some Name')
       message_model(:notification_id => @notification.id)
@@ -115,7 +115,7 @@ describe Message do
         end
       end
     end
-    
+
     it "should go back to the staged state if sending fails" do
       message_model(:dispatch_at => Time.now - 1, :workflow_state => 'sending', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user)
       @message.errored_dispatch
@@ -167,4 +167,81 @@ describe Message do
     end
 
   end
+
+  describe '.context_type' do
+    it 'returns the correct representation of a quiz regrade run' do
+      message = message_model
+      regrade = Quizzes::QuizRegrade.create(:user_id => user_model.id, :quiz_id => quiz_model.id, :quiz_version => 1)
+      regrade_run = Quizzes::QuizRegradeRun.create(quiz_regrade_id: regrade.id)
+
+      message.context = regrade_run
+      message.save
+      message.context_type.should == "Quizzes::QuizRegradeRun"
+
+      message.context_type = 'QuizRegradeRun'
+      message.send(:update_without_callbacks)
+
+      Message.find(message.id).context_type.should == 'Quizzes::QuizRegradeRun'
+    end
+
+    it 'returns the correct representation of a quiz submission' do
+      message = message_model
+      submission = quiz_model.quiz_submissions.create!
+      message.context = submission
+      message.save
+      message.context_type.should == 'Quizzes::QuizSubmission'
+
+      message.context_type = 'QuizSubmission'
+      message.send(:update_without_callbacks)
+
+      Message.find(message.id).context_type.should == 'Quizzes::QuizSubmission'
+    end
+
+    it 'returns the context type attribute if not a quiz' do
+      message = message_model
+      message.context = assignment_model
+      message.send(:update_without_callbacks)
+
+      message.context_type.should == 'Assignment'
+    end
+  end
+
+  describe '.asset_context_type' do
+    it 'returns the correct representation of a quiz regrade run' do
+      message = message_model
+      regrade = Quizzes::QuizRegrade.create(:user_id => user_model.id, :quiz_id => quiz_model.id, :quiz_version => 1)
+      regrade_run = Quizzes::QuizRegradeRun.create(quiz_regrade_id: regrade.id)
+
+      message.asset_context = regrade_run
+      message.save
+      message.asset_context_type.should == "Quizzes::QuizRegradeRun"
+
+      message.asset_context_type = 'QuizRegradeRun'
+      message.send(:update_without_callbacks)
+
+      Message.find(message.id).asset_context_type.should == 'Quizzes::QuizRegradeRun'
+    end
+
+    it 'returns the correct representation of a quiz submission' do
+      message = message_model
+      submission = quiz_model.quiz_submissions.create!
+      message.asset_context = submission
+      message.save
+      message.asset_context_type.should == 'Quizzes::QuizSubmission'
+
+      message.asset_context_type = 'QuizSubmission'
+      message.send(:update_without_callbacks)
+
+      Message.find(message.id).asset_context_type.should == 'Quizzes::QuizSubmission'
+    end
+
+    it 'returns the context type attribute if not a quiz' do
+      message = message_model
+      message.asset_context = assignment_model
+      message.send(:update_without_callbacks)
+
+      message.asset_context_type.should == 'Assignment'
+    end
+  end
+
 end

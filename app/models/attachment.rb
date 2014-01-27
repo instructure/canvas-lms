@@ -23,6 +23,10 @@ class Attachment < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
   attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data, :hidden
+
+  include PolymorphicTypeOverride
+  override_polymorphic_types context_type: {'QuizStatistics' => 'Quizzes::QuizStatistics'}
+
   include HasContentTags
   include ContextModuleItem
   include SearchTermHelper

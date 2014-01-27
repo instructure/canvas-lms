@@ -140,7 +140,7 @@ class QuizSubmissionQuestionsController < ApplicationController
       reject! 'missing required parameter :answer', 400
     end
 
-    serializer = QuizQuestion::AnswerSerializers.serializer_for @question
+    serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for @question
     serialization_rc = serializer.serialize(params[:answer])
 
     unless serialization_rc.valid?

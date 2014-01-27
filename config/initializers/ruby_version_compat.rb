@@ -138,20 +138,20 @@ class ActiveRecord::Base
   # existed in the DB before Canvas was Ruby 1.9 only. We've verified that
   # none of these columns should legitimately contain binary data, only text.
   SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8 = {
-    'AssessmentQuestion'       => %w[question_data],
-    'ContextExternalTool'      => %w[settings],
-    'EportfolioEntry'          => %w[content],
-    'ErrorReport'              => %w[http_env data],
-    'LearningOutcome'          => %w[data],
-    'Profile'                  => %w[data],
-    'Quizzes::Quiz'            => %w[quiz_data],
-    'QuizQuestion'             => %w[question_data],
-    'QuizSubmission'           => %w[quiz_data submission_data],
-    'QuizSubmissionSnapshot'   => %w[data],
-    'Rubric'                   => %w[data],
-    'RubricAssessment'         => %w[data],
-    'SisBatch'                 => %w[processing_errors processing_warnings],
-    'StreamItem'               => %w[data]
+    'AssessmentQuestion'                => %w[question_data],
+    'ContextExternalTool'               => %w[settings],
+    'EportfolioEntry'                   => %w[content],
+    'ErrorReport'                       => %w[http_env data],
+    'LearningOutcome'                   => %w[data],
+    'Profile'                           => %w[data],
+    'Quizzes::Quiz'                     => %w[quiz_data],
+    'Quizzes::QuizQuestion'             => %w[question_data],
+    'Quizzes::QuizSubmission'           => %w[quiz_data submission_data],
+    'Quizzes::QuizSubmissionSnapshot'   => %w[data],
+    'Rubric'                            => %w[data],
+    'RubricAssessment'                  => %w[data],
+    'SisBatch'                          => %w[processing_errors processing_warnings],
+    'StreamItem'                        => %w[data]
   }
 
   class << self

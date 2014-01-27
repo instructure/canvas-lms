@@ -145,6 +145,17 @@ describe 'simply_versioned' do
   
   # INSTRUCTURE: shim for quizzes namespacing
   describe '.versionable_type' do
+    it 'returns the correct representation of a quiz submission' do
+      submission = quiz_model.quiz_submissions.create
+      submission.with_versioning(explicit: true, &:save!)
+      version = Version.find_by_versionable_id(submission.id)
+      version.versionable_type.should == 'Quizzes::QuizSubmission'
+
+      version.versionable_type = 'QuizSubmission'
+      version.send(:update_without_callbacks)
+      Version.find(version.id).versionable_type.should == 'Quizzes::QuizSubmission'
+    end
+
     it 'returns the correct representation of a quiz' do
       quiz = quiz_model
       quiz.with_versioning(explicit: true, &:save!)

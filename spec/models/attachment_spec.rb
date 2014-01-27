@@ -680,17 +680,17 @@ describe Attachment do
       @attachment.file_state = 'available'
       @attachment.save!
     end
-    
+
     it "should disassociate but not delete the associated media object" do
       @attachment.media_entry_id = '0_feedbeef'
       @attachment.save!
-      
+
       media_object = @course.media_objects.build :media_id => '0_feedbeef'
       media_object.attachment_id = @attachment.id
       media_object.save!
-      
+
       @attachment.destroy
-      
+
       media_object.reload
       media_object.should_not be_deleted
       media_object.attachment_id.should be_nil
@@ -1600,6 +1600,33 @@ describe Attachment do
       @attachment.full_path.should == "/#{@attachment.display_name}"
     end
   end
+
+  describe '.context_type' do
+    it 'returns the correct representation of a quiz statistics relation' do
+      stats = Quizzes::QuizStatistics.create!(report_type: 'student_analysis')
+      attachment = attachment_obj_with_context(Account.default.default_enrollment_term)
+      attachment.context = stats
+      attachment.save
+      attachment.context_type.should == "Quizzes::QuizStatistics"
+
+      attachment.context_type = 'QuizStatistics'
+      attachment.send(:update_without_callbacks)
+
+      Attachment.find(attachment.id).context_type.should == 'Quizzes::QuizStatistics'
+    end
+
+    it 'returns the context type attribute if not a quiz statistics relation' do
+      attachment = Attachment.create!(context: assignment_model,
+                                      filename: "foo.txt",
+                                      uploaded_data: StringIO.new("bar"))
+
+      attachment.context = assignment_model
+      attachment.send(:update_without_callbacks)
+
+      attachment.context_type.should == 'Assignment'
+    end
+  end
+
 end
 
 def processing_model

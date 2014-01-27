@@ -209,7 +209,7 @@ module Canvas::AccountReports
                LEFT OUTER JOIN submissions subs ON subs.assignment_id = a.id
                  AND subs.user_id = u.id
                LEFT OUTER JOIN quiz_submissions qs ON r.artifact_id = qs.id
-                 AND r.artifact_type = 'QuizSubmission'
+                 AND r.artifact_type IN ('QuizSubmission', 'Quizzes::QuizSubmission')
                LEFT OUTER JOIN assessment_questions aq ON aq.id = r.associated_asset_id
                  AND r.associated_asset_type = 'AssessmentQuestion'").
         where("ct.workflow_state <> 'deleted'

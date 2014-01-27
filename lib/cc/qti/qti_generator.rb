@@ -253,7 +253,7 @@ module CC
                   else
                     add_quiz_question(section_node, item)
                   end
-                elsif item[:questions] # It's a QuizGroup
+                elsif item[:questions] # It's a Quizzes::QuizGroup
                   if for_cc
                     add_cc_group(section_node, item)
                   else
