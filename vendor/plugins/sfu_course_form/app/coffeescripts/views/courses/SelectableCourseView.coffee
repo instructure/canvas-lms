@@ -7,7 +7,7 @@ define [
 
   class SelectableCourseView extends CourseView
 
-    template: _.template '<div><input type="checkbox" id="chk-course-<%= cid %>-<%= sis_source_id %>" <% if (selected) { %>checked="checked"<% } %> /> <label for="chk-course-<%= cid %>-<%= sis_source_id %>"><span class="term tag"><%= term %></span> <%= name %><%= number %> - <%= section %> <%= title %><% if (sectionTutorials.length) { %></div><div class="tutorial_sections">&mdash; includes tutorial sections: <%= sectionTutorials.join(", ") %></div><% } %></label>'
+    template: _.template '<div><input type="checkbox" id="chk-course-<%= cid %>-<%= sis_source_id %>" <% if (selected) { %>checked="checked"<% } %> /> <label for="chk-course-<%= cid %>-<%= sis_source_id %>"><span class="term tag"><%= term %></span> <%= displayName %><% if (sectionTutorials.length) { %></div><div class="tutorial_sections">&mdash; includes tutorial sections: <%= sectionTutorials.join(", ") %></div><% } %></label>'
 
     render: ->
       # cid maintains checkbox uniqueness when multiple courses with the same sis_source_id are present
