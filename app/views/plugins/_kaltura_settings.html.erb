@@ -111,5 +111,9 @@ TEXT
       <td><%= f.check_box :do_analytics, {}, 'yes', 'no' %></td>
     </tr>
     <tr><td colspan="2">(#{domain}/api_v3/index.php?service=stats&action=collect&...)</td></tr>
+    <tr>
+      <td><%= f.label :do_flash_var_test, :en => "Enable experimental flash settings" %></td>
+      <td><%= f.check_box :do_flash_var_test, {}, 'yes', 'no' %></td>
+    </tr>
   </table>
 <% end %>

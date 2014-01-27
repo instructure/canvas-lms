@@ -56,7 +56,9 @@ module Kaltura
 
       # default settings
       res = res.dup
-      res['max_file_size_bytes'] = 500.megabytes unless res['max_file_size_bytes'].to_i > 0
+      # the kaltura flash widget's calculation is a bit off, so give a bit extra space
+      # to make sure 500 mb files can be uploaded
+      res['max_file_size_bytes'] = 510.megabytes unless res['max_file_size_bytes'].to_i > 0
 
       res
     end

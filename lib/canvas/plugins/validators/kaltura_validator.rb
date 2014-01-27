@@ -42,10 +42,11 @@ module Canvas::Plugins::Validators::KalturaValidator
       end
 
       settings[:do_analytics] = Canvas::Plugin.value_to_boolean(settings[:do_analytics])
+      settings[:do_flash_var_test] = Canvas::Plugin.value_to_boolean(settings[:do_flash_var_test])
       settings.slice(:domain, :resource_domain, :rtmp_domain, :partner_id,
                      :subpartner_id, :secret_key, :user_secret_key,
                      :player_ui_conf, :kcw_ui_conf, :upload_ui_conf, :cache_play_list_seconds,
-                     :kaltura_sis, :do_analytics)
+                     :kaltura_sis, :do_analytics, :do_flash_var_test)
     end
   end
 end
