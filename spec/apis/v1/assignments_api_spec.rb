@@ -238,9 +238,6 @@ describe AssignmentsApiController, :type => :integration do
 
     describe "enable draft" do
       before do
-        #set @domain_root_account
-        @domain_root_account = Account.default
-
         course_with_teacher(:active_all => true)
         @assignment = @course.assignments.create :name => 'some assignment'
         @assignment.workflow_state = 'unpublished'
@@ -253,7 +250,7 @@ describe AssignmentsApiController, :type => :integration do
       end
 
       it "should include published flag for accounts that do have enabled_draft" do
-        Account.default.enable_feature!(:draft_state)
+        @course.account.enable_feature!(:draft_state)
 
         @json = api_get_assignment_in_course(@assignment, @course)
 
@@ -277,7 +274,7 @@ describe AssignmentsApiController, :type => :integration do
              )
       assign = json.first
       assign['submission'].should ==
-        json_parse(@controller.submission_json(submission,assignment,@user,session).to_json)
+        json_parse(controller.submission_json(submission,assignment,@user,session).to_json)
     end
     it "returns due dates as they apply to the user" do
         course_with_student(:active_all => true)
@@ -332,11 +329,8 @@ describe AssignmentsApiController, :type => :integration do
     describe "draft state" do
 
       before do
-        Account.default.enable_feature!(:draft_state)
-        @domain_root_account = Account.default
-
         course_with_student_logged_in(:active_all => true)
-
+        @course.account.enable_feature!(:draft_state)
         @published = @course.assignments.create!({:name => "published assignment"})
         @published.workflow_state = 'published'
         @published.save!
@@ -636,10 +630,8 @@ describe AssignmentsApiController, :type => :integration do
   describe "PUT /courses/:course_id/assignments/:id (#update)" do
 
     it "should update published/unpublished" do
-      Account.default.enable_feature!(:draft_state)
-      @domain_root_account = Account.default
-
       course_with_teacher(:active_all => true)
+      @course.account.enable_feature!(:draft_state)
       @assignment = @course.assignments.create({
         :name => "some assignment",
         :points_possible => 15
@@ -952,7 +944,8 @@ describe AssignmentsApiController, :type => :integration do
           'exclude_biblio' => '1',
           'exclude_quoted' => '0',
           'exclude_type' => '2',
-          'exclude_value' => '50'
+          'exclude_value' => '50',
+          's_view_report' => '1'
         }
       end
 
@@ -1246,7 +1239,7 @@ describe AssignmentsApiController, :type => :integration do
           :id => assignment.id.to_s},
           {:include => ['submission']})
         json['submission'].should ==
-          json_parse(@controller.submission_json(submission,assignment,@user,session).to_json)
+          json_parse(controller.submission_json(submission,assignment,@user,session).to_json)
       end
 
       context "AssignmentFreezer plugin disabled" do
@@ -1377,11 +1370,8 @@ describe AssignmentsApiController, :type => :integration do
     context "draft state" do
 
       before do
-        Account.default.enable_feature!(:draft_state)
-        @domain_root_account = Account.default
-
         course_with_student_logged_in(:active_all => true)
-
+        @course.account.enable_feature!(:draft_state)
         @assignment = @course.assignments.create!({
           :name => "unpublished assignment",
           :points_possible => 15
@@ -1431,18 +1421,16 @@ describe AssignmentsApiController, :type => :integration do
     let(:result) { assignment_json(@assignment, @user, {}) }
 
     before do
-      #set @domain_root_account
-      @domain_root_account = Account.default
-
       course_with_teacher(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment")
     end
 
     context "when turnitin_enabled is true on the context" do
       before {
-        @domain_root_account.update_attributes! turnitin_account_id: 1234,
+        @course.account.update_attributes! turnitin_account_id: 1234,
                                                 turnitin_shared_secret: 'foo',
                                                 turnitin_host: 'example.com'
+        @assignment.reload
       }
 
       it "contains a turnitin_enabled key" do

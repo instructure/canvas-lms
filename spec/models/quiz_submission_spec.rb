@@ -20,6 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe QuizSubmission do
+  context 'with course and quiz' do
   before(:each) do
     course
     @quiz = @course.quizzes.create!
@@ -54,6 +55,12 @@ describe QuizSubmission do
       qs.errors.on(:extra_attempts).should == "must be less than or equal to 1000"
     end
 
+    it "should validate quiz points possible is not too long" do
+      qs = QuizSubmission.new
+      qs.quiz = Quiz.new(:points_possible => 2000000001)
+      qs.valid?.should == false
+      qs.errors.on(:quiz_points_possible).should == "must be less than or equal to 2000000000"
+    end
   end
 
   it "should copy the quiz's points_possible whenever it's saved" do
@@ -79,51 +86,6 @@ describe QuizSubmission do
 
     q.reload
     q.end_at.should eql original_end_at
-  end
-
-  describe "#time_left" do
-    it "should return nil if there's no end_at" do
-      q = @quiz.quiz_submissions.create!
-      q.update_attribute(:end_at, nil)
-
-      q.time_left.should be_nil
-    end
-
-    it "should return the correct time left in seconds" do
-      q = @quiz.quiz_submissions.create!
-      q.update_attribute(:end_at, Time.now + 1.hour)
-
-      q.time_left.should eql(60 * 60)
-    end
-  end
-
-  describe "#time_spent" do
-    it "should return nil if there's no finished_at" do
-      q = @quiz.quiz_submissions.new
-      q.finished_at = nil
-
-      q.time_spent.should be_nil
-    end
-
-    it "should return the correct time spent in seconds" do
-      anchor = Time.now
-
-      q = @quiz.quiz_submissions.new
-      q.started_at = anchor
-      q.finished_at = anchor + 1.hour
-      q.time_spent.should eql(1.hour.to_i)
-    end
-
-    it "should account for extra time" do
-      anchor = Time.now
-
-      q = @quiz.quiz_submissions.new
-      q.started_at = anchor
-      q.finished_at = anchor + 1.hour
-      q.extra_time = 5.minutes
-
-      q.time_spent.should eql((1.hour + 5.minutes).to_i)
-    end
   end
 
   describe "#update_scores" do
@@ -1418,7 +1380,7 @@ describe QuizSubmission do
     end
   end
 
-  describe "question" do
+  describe "#question" do
     let(:submission) { @quiz.quiz_submissions.build }
     let(:question1) { {:id => 1} }
     let(:question2) { {:id => 2} }
@@ -1451,7 +1413,7 @@ describe QuizSubmission do
     end
   end
 
-  describe "question_answered?" do
+  describe "#question_answered?" do
     let(:submission) { @quiz.quiz_submissions.build }
 
     before do
@@ -1549,7 +1511,30 @@ describe QuizSubmission do
     end
   end
 
-  describe "update_submission_version" do
+  describe "#results_visible?" do
+    it "return true if no quiz" do
+      qs = QuizSubmission.new
+      qs.results_visible?.should be_true
+    end
+
+    it "returns false if quiz restricts answers for concluded courses" do
+      quiz = Quiz.new
+      quiz.stubs(:restrict_answers_for_concluded_course? => true)
+
+      qs = QuizSubmission.new(:quiz => quiz)
+      qs.results_visible?.should be_false
+    end
+
+    it "returns true if quiz doesn't restrict answers for concluded courses" do
+      quiz = Quiz.new
+      quiz.stubs(:restrict_answers_for_concluded_course? => false)
+
+      qs = QuizSubmission.new(:quiz => quiz)
+      qs.results_visible?.should be_true
+    end
+  end
+
+  describe "#update_submission_version" do
     let(:submission) { @quiz.quiz_submissions.create! }
 
     before do
@@ -1593,7 +1578,7 @@ describe QuizSubmission do
 
   end
 
-  describe "submitted_attempts" do
+  describe "#submitted_attempts" do
     let(:submission) { @quiz.quiz_submissions.build }
 
     before do
@@ -1605,7 +1590,7 @@ describe QuizSubmission do
     end
   end
 
-  describe "attempts" do
+  describe "#attempts" do
     let(:quiz)       { @course.quizzes.create! }
     let(:submission) { quiz.quiz_submissions.new }
 
@@ -1751,5 +1736,113 @@ describe QuizSubmission do
       @submission.reload.messages_sent.keys.should_not include 'Submission Needs Grading'
     end
   end
+  end
 
+  describe "#time_spent" do
+    it "should return nil if there's no finished_at" do
+      subject.finished_at = nil
+      subject.time_spent.should be_nil
+    end
+
+    it "should return the correct time spent in seconds" do
+      anchor = Time.now
+
+      subject.started_at = anchor
+      subject.finished_at = anchor + 1.hour
+      subject.time_spent.should eql(1.hour.to_i)
+    end
+
+    it "should account for extra time" do
+      anchor = Time.now
+
+      subject.started_at = anchor
+      subject.finished_at = anchor + 1.hour
+      subject.extra_time = 5.minutes
+
+      subject.time_spent.should eql((1.hour + 5.minutes).to_i)
+    end
+  end
+
+  describe "#time_left" do
+    it "should return nil if there's no end_at" do
+      subject.end_at = nil
+      subject.time_left.should be_nil
+    end
+
+    it "should return the correct time left in seconds" do
+      subject.end_at = 1.hour.from_now
+      subject.time_left.should eql(60 * 60)
+    end
+  end
+
+  describe '#retriable?' do
+    it 'should not be retriable by default' do
+      subject.stubs(:attempts_left).returns 0
+      subject.retriable?.should be_false
+    end
+
+    it 'should not be retriable unless it is complete' do
+      subject.stubs(:attempts_left).returns 3
+      subject.retriable?.should be_false
+    end
+
+    it 'should be retriable if it is a preview QS' do
+      subject.workflow_state = 'preview'
+      subject.retriable?.should be_true
+    end
+
+    it 'should be retriable if it is a settings only QS' do
+      subject.workflow_state = 'settings_only'
+      subject.retriable?.should be_true
+    end
+
+    it 'should be retriable if it is complete and has attempts left to spare' do
+      subject.workflow_state = 'complete'
+      subject.stubs(:attempts_left).returns 3
+      subject.retriable?.should be_true
+    end
+
+    it 'should be retriable if it is complete and the quiz has unlimited attempts' do
+      subject.workflow_state = 'complete'
+      subject.stubs(:attempts_left).returns 0
+      subject.quiz = Quiz.new
+      subject.quiz.stubs(:unlimited_attempts?).returns true
+      subject.retriable?.should be_true
+    end
+  end
+
+  describe '#snapshot!' do
+    before :each do
+      subject.quiz = Quiz.new
+      subject.attempt = 1
+    end
+
+    it 'should generate a snapshot' do
+      snapshot_data = { 'question_5_marked' => true }
+
+      QuizSubmissionSnapshot.expects(:create).with({
+        quiz_submission: subject,
+        attempt: 1,
+        data: snapshot_data.with_indifferent_access
+      })
+
+      subject.snapshot! snapshot_data
+    end
+
+    it 'should generate a full snapshot' do
+      subject.stubs(:submission_data).returns({
+        'question_5' => 100
+      })
+
+      snapshot_data = { 'question_5_marked' => true }
+
+      QuizSubmissionSnapshot.expects(:create).with({
+        quiz_submission: subject,
+        attempt: 1,
+        data: snapshot_data.merge(subject.submission_data).with_indifferent_access
+      })
+
+      subject.snapshot! snapshot_data, true
+    end
+  end
 end

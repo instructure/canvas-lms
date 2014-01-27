@@ -117,7 +117,7 @@ describe QuizIpFiltersController, :type => :integration do
           pending 'CNVS-8978: JSON-API compliance API spec helper'
 
           json = get_index
-          assert_jsonapi_compliance!(json, 'quiz_ip_filters')
+          assert_jsonapi_compliance(json, 'quiz_ip_filters')
         end
       end
     end

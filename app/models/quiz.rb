@@ -54,6 +54,7 @@ class Quiz < ActiveRecord::Base
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :context_id
   validates_presence_of :context_type
+  validates_numericality_of :points_possible, less_than_or_equal_to: 2000000000, allow_nil: true
   validate :validate_quiz_type, :if => :quiz_type_changed?
   validate :validate_ip_filter, :if => :ip_filter_changed?
   validate :validate_hide_results, :if => :hide_results_changed?
@@ -292,6 +293,12 @@ class Quiz < ActiveRecord::Base
     return false if hide_at.present? && Time.now > hide_at
 
     show_at.present? ? Time.now > show_at : true
+  end
+
+  def restrict_answers_for_concluded_course?
+    course    = self.context
+    concluded = course.conclude_at && course.conclude_at < Time.now
+    concluded && course.root_account.settings[:restrict_quiz_questions]
   end
 
   def update_existing_submissions
@@ -647,6 +654,16 @@ class Quiz < ActiveRecord::Base
     # Make sure the submission gets graded when it becomes overdue (if applicable)
     submission.grade_when_overdue unless preview || !submission.end_at
     submission
+  end
+
+  def generate_submission_for_participant(quiz_participant)
+    identity = if quiz_participant.anonymous?
+      :user_code
+    else
+      :user
+    end
+
+    generate_submission quiz_participant.send(identity), false
   end
 
   def prepare_answers(question)
@@ -1119,7 +1136,7 @@ class Quiz < ActiveRecord::Base
     can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit
     
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }#admins.include? user }
-    can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit and can :grade
+    can :read_statistics and can :read and can :submit and can :grade
     
     given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? }
     can :submit
@@ -1210,6 +1227,8 @@ class Quiz < ActiveRecord::Base
     !has_student_submissions? &&
       (!assignment || !assignment.has_student_submissions?)
   end
+  alias_method :unpublishable?, :can_unpublish?
+  alias_method :unpublishable, :can_unpublish?
 
   # marks a quiz as having unpublished changes
   def self.mark_quiz_edited(id)
@@ -1239,6 +1258,7 @@ class Quiz < ActiveRecord::Base
     draft_state == 'active'
   end
   alias_method :published?, :active?
+  alias_method :published, :active?
 
   def unpublished?; !published?; end
 

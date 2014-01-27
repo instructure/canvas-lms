@@ -17,7 +17,7 @@
 #
 
 module Api::V1::Helpers::QuizzesApiHelper
-  private
+  protected
 
   def require_quiz
     unless @quiz = @context.quizzes.find(params[:quiz_id])

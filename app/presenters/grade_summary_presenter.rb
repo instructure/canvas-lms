@@ -104,7 +104,7 @@ class GradeSummaryPresenter
   end
 
   def relevant_assignments_scope
-   @context.feature_enabled?(:draft_state) ? :published_assignments : :active_assignments
+    AssignmentGroup.assignment_scope_for_grading(@context)
   end
 
   def submissions
@@ -146,7 +146,7 @@ class GradeSummaryPresenter
     @stats ||= @context.active_assignments
     .joins(:submissions)
     .group("assignments.id")
-    .select("assignments.id, max(score), min(score), avg(score)")
+    .select("assignments.id, max(score) max, min(score) min, avg(score) avg")
     .index_by(&:id)
   end
 

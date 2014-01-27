@@ -21,6 +21,9 @@ zh:
     user_count: 
       one: "%{count} 个用户"
       other: "%{count} 个用户"
+  GroupUserCollection: 
+    flash: 
+      userAlreadyInGroup: "警告: %{user} 已经是 %{group} 的成员"
   academic_benchmark: 
     api_error: "无法更新授权 %{auth} 的标准。"
     bad_ab_file: 提供的学术基准文件有错误。
@@ -541,6 +544,15 @@ zh:
             text: 课程_ID：
           outcome: 
             text: 成果_ID：
+    cv_submission_data_csv_description: 
+      account_reports: 
+        galen: 
+          cv: 
+            attendance: 
+              text: "此报告显示直到所提供日期的学生提交文件。此信息用于了解 CampusVue 参与情况。"
+        tmcc: 
+          description: 
+            header: 示例
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -592,6 +604,23 @@ zh:
           last_user_access: 
             header: 示例
             text: 此报告显示活动用户的上次登录信息。
+    learning_outcome_assignment_type_csv_description: 
+      account_reports: 
+        newark: 
+          student_activity: 
+            text: 此报告提供与作业结果相关的数据导出。
+        samuel_merrit_university: 
+          description: 
+            header: 示例
+    learning_outcome_assignment_type_csv_parameters: 
+      account_reports: 
+        samuel_merrit_university: 
+          course: 
+            sis: 
+              text: "课程 SIS ID"
+            text: "课程 ID"
+          parameters: 
+            note1: "课程 ID 可留空，以运行学期中所有课程的报告。"
     mississippi_sis_csv_description: 
       account_reports: 
         mississisppi: 
@@ -786,6 +815,7 @@ zh:
         outgoing_email_default_name_option_custom: 自定义“发件人”姓名
         outgoing_email_default_name_option_default: "默认 Canvas 设置"
         prevent_course_renaming_by_teachers: 不要让教师重命名其课程
+        restrict_quiz_questions: 限制学生在课程结束日期后查看测验题
         restrict_student_future_view: 限制学生在开始日期之前查看课程
         self_enrollment: 允许自我注册
         self_registration: 自行注册
@@ -1232,6 +1262,7 @@ zh:
     no_title: 无标题
   announcements: 
     announcements_crumb: 通告
+    error_draft_state: 此主题无法设置为草稿状态，因为这是一个通告。
     external_feed: 
       alts: 
         deleted_feed: 删除此馈送
@@ -1364,6 +1395,8 @@ zh:
       a_quiz: 测验
       a_text_entry_box: 将作业输入文本框
       a_website_url: "网站 URL"
+      external_tool: 外部工具
+      on_paper: 书面
     titles: 
       grading_scheme_info: 查看/编辑评分方案
   assignment_details_dialog: 
@@ -1742,6 +1775,21 @@ zh:
       title_add_group: 添加作业小组
     invalid_file_retrieval: 检索通过此工具发送的文件时出现问题。
     invalid_tool_return: 已启动的工具对此次作业返回了无效资源
+    keyboard_add_item: 将作业添加到所选小组
+    keyboard_close_menu: 关闭活动对话框
+    keyboard_del_item: 删除当前作业或小组
+    keyboard_edit_item: 编辑当前作业或小组
+    keyboard_next_item: 关注下一个作业或小组
+    keyboard_prev_item: "关注上一个作业或小组Focus on the previous assignment or group"
+    keyboard_show_assign: 显示所选作业的完全预览
+    keycodes: 
+      add_item: a
+      close_menu: esc
+      del_item: d
+      edit_item: e
+      next: j
+      previous: k
+      show_assign: f
     labels: 
       assignment_group_move_label: 作业小组
       label_place_before: 放在前面
@@ -1772,6 +1820,7 @@ zh:
       aria_assignments: 作业
       assignments: 作业
       no_assignments_found: 未找到作业
+    no_name_error: 需要名称
     no_tools_found: 找不到工具
     non_number: 您必须使用数字
     notices: 
@@ -2013,6 +2062,7 @@ zh:
           internet_check: "Internet 数据库"
           journal_check: 杂志、期刊和出版物
           student_paper_check: 其它学生论文
+        originality_report_never: 从不
         originality_report_visibility: 学生可查看原始报告
         originality_report_visible_after_due_date: 在截止时间之后
         originality_report_visible_after_grading: 在作业计分之后
@@ -2085,6 +2135,7 @@ zh:
   bb_file_description: "Blackboard 6/7/8/9 export .zip 文件"
   bb_name: "Blackboard 转换器"
   big_blue_button_conference: 
+    conference_is_recorded: 正在对此会议进行录制。
     recording_setting: 录制
     recording_setting_description: 录制此会议
   blackboard: 
@@ -2161,6 +2212,7 @@ zh:
     delete: 删除
     done: 完成
     filter: 过滤
+    find_user: 查找用户
     hide_all_artifacts: 隐藏所有产物
     import: 导入
     login: 登录
@@ -2292,7 +2344,7 @@ zh:
       create_event: 创建新事件
       done_go_back_to_list: 完成，返回列表
       links: 
-        accessibility_warning: "警告: 用户无法通过屏幕阅读器访问此视图"
+        accessibility_warning: "警告: 无法通过屏幕阅读器访问此视图。请使用议程视图。"
         calendar_agenda: 议程
         calendar_month: 月
         calendar_scheduler: 计划程序
@@ -2667,9 +2719,6 @@ zh:
       update_assignment_points: "这份作业可能有 %{assignmentPoints} 分，您是否希望改变它以获得 %{rubricPoints} 分以匹配评分标准?"
     titles: 
       update_assignment_points: 是否改变可能得分以匹配评分标准?
-  chat: 
-    notifications: 
-      tinychat_inaccessible: "警告: 此页使用 Tinychat，这是一个第三方插件，\\⏎对于屏幕阅读器是不可访问的。"
   collaboration: 
     default_title: 未命名的协作
   collaborations: 
@@ -3123,10 +3172,6 @@ zh:
   context: 
     all_marked_read: 收件箱消息全部标记为已读
     bad_message: 此消息无法显示
-    chat: 
-      titles: 
-        chat: 聊天
-    chat_not_enabled: "聊天尚未为此 Canvas 网站启用"
     communication: 
       headings: 
         discussions: 讨论
@@ -4468,6 +4513,8 @@ zh:
       index: 
         add_people: 填加人员
         cannot_add_users: 由于该课程已结束，无法添加新用户
+        filter_field_description: 在此字段中键入时，人员列表将自动过滤，以便仅包括与您的输入匹配的那些姓名。
+        filter_list_of_people: 过滤人员列表
         role_to_search: 将搜索限制为身份
         search_people: 搜索人员
       invitations_view: 
@@ -4771,7 +4818,6 @@ zh:
     announcements: 通告
     assignments: 作业
     calendar_events: 日历事件
-    chat: 聊天
     conferences: 会议
     confirmation: 确认
     copy_course: 复制课程
@@ -4934,7 +4980,8 @@ zh:
     formats: 
       date_at_time: "%b %-d 于 %H:%M"
       default: "%Y-%m-%d"
-      long: "%B %d, %Y"
+      long: "%B %-d，%Y"
+      long_with_weekday: "%A，%B %-d"
       medium: "%b %e, %Y"
       medium_month: "%b %Y"
       medium_with_weekday: "%a %b %-d, %Y"
@@ -5117,7 +5164,7 @@ zh:
       separated_conversation_notice: "由于这是一个小组作业，每个小组都有关于此主题的会话。以下是您可以访问的内容:"
       show_due_dates: 显示截止时间
       until: 结束时间
-    cannot_unpublish: 无法取消发布
+    cannot_unpublish_with_replies: 如果有回复则无法取消发布
     confirm_delete_announcement: 
       one: "是否确定要删除这 %{count} 个通告?"
       other: "是否确定要删除这 %{count} 个通告?"
@@ -5130,8 +5177,9 @@ zh:
     discussion: 
       close_for_comments: 关闭评论
       delete: 删除
-      due: 截止时间
+      due_at: "*截止时间* %{assignment.display_due_at}"
       graded_discussion: 计分的讨论
+      last_post_date: "最新回复发布于 %{display_last_reply_at}"
       manage: 管理
       no_due_date: 无截止时间
       open_to_comments: 开放评论
@@ -5184,8 +5232,6 @@ zh:
       show_more_entries: 
         one: "再显示 %{count} 个条目"
         other: "再显示 %{count} 个条目"
-    error_draft_state_announcement: 此主题无法设置为草稿状态，因为这是一个通告。
-    error_draft_state_graded: 此主题无法设置为草稿状态，因为它是作业。
     error_draft_state_unauthorized: 您无权将此主题设置为草稿状态。
     error_draft_state_with_posts: 此主题无法设置为草稿状态，因为它包含帖子。
     group_assignment_discussion_entry: 
@@ -5234,7 +5280,10 @@ zh:
       zero: 无回复
     show: 
       add_rubric: 添加评分标准说明
+      announcement_closed: 此通告已关闭评论
       announcement_locked: "此通告将对用户不可见，直至 *%{date}*"
+      announcement_not_visible: 此通告对用户不可见
+      announcement_will_open_on: "此通告将于 *%{date}* 开放评论"
       authors_name: 作者姓名
       collapse_replies: 隐藏回复
       confirm_delete_discussion: 是否确定要删除这个讨论?
@@ -5272,6 +5321,7 @@ zh:
       topic_subscribe_tooltip: 您已取消订阅，将不再收到新评论的通知
       topic_subscribed_tooltip: 您已订阅，将收到新评论的通知
       topic_unsubscribe: 已订阅
+      topic_will_open_on: "此主题将于 *%{date}* 开放评论"
       unlock_topic: 开放评论
       unread: 未读
     sub_entry: 
@@ -6319,6 +6369,8 @@ zh:
     resubmitted: 自上次计分后已重新提交
     row_student_name: 
       student_placeholder: 学生
+    screenreader: 
+      page_titles: 屏幕阅读器评分册
     secondary_id: 第二类身份证明
     section_to_show_menu: 
       choose_a_section_to_show: 选择要显示的班级
@@ -6480,9 +6532,15 @@ zh:
         show_what_if: "显示已保存的 \"假设\" 分数"
       change_score_instructions: 单击任何分数并输入新值以查看该更改对总分的影响。
       click_to_change: 单击以测试不同分数
+      close_comments: 关闭
+      close_comments_label: 关闭评论
+      close_rubric: 关闭评分标准
+      close_score: 关闭
+      close_score_screenreader: 关闭评分详细信息
       comment_count: 
         one: "%{count} 条评论"
         other: "%{count} 条评论"
+      comment_count_screenreader: 阅读评论
       faculty_journal: "%{user} 的教师日志"
       for_course: 课程
       headers: 
@@ -6517,7 +6575,9 @@ zh:
       percent: 百分比
       print_grades: 打印评分
       see_rubric_results: 查看评分标准结果
+      see_rubric_results_screenreader: 查看评分标准结果
       see_scoring_details: 查看评分详细信息
+      see_scoring_details_screenreader: 查看评分详细信息
       see_turnitin_results: "查看 Turnitin 答案"
       student_mute_legend: 您的教师正在处理评分。当教师在处理评分时，评分和评论信息不可用。
       student_mute_notification: 教师正在进行评分
@@ -6527,7 +6587,6 @@ zh:
         turnitin_score: "Turnitin 相似分数 – 更多信息"
         view_rubric_evaluation: 查看评分标准评估
         view_scoring_details: 查看评分详细信息
-      view_comments: 查看评论和评分详细信息
     gradebook: 
       all_sections: 全部
       assignment_submitted_late: （延迟）
@@ -6816,7 +6875,6 @@ zh:
     name_required: 需要名称
     name_too_long: 输入一个更短的小组名称
     tabs: 
-      chat: 聊天
       discussions: 讨论
       files: 文件
       home: 主页
@@ -6903,7 +6961,7 @@ zh:
         one: "%{count} 个学生"
         other: "%{count} 个学生"
       warnings: 
-        studend_groups: 这些学习小组是学生自发组织的。与其它类型的组不同，在这些学习小组中，学生可以同时属于多个学习小组，因此，这些学习小组未必是计分作业的最佳解决方案。
+        studend_groups: 这些小组是学生自发组织的。与其他类型的小组不同，在这些小组中，学生可以同时属于多个小组，因此，这些小组不能用于评分作业。
     confirm: 
       assign_students: 这会将所有未分配的学生尽可能均匀地随机分配到现有的学习小组
       delete_group: 是否确定要删除此小组?
@@ -7035,6 +7093,7 @@ zh:
       group_category: 
         randomly_assigning_students: 随机分配学生
         search_groups: 搜索小组
+        search_users: 搜索用户
       group_category_create: 
         allow_self_signup: 允许自行注册
         cancel: 取消
@@ -7059,7 +7118,7 @@ zh:
         message_all_unassigned_option: 向所有未分配的学生发送消息
         randomly_assign_students_option: 随机分配学生
         restricted_self_signup_blurb: 学习小组内所有学生需要在相同的班级中
-        self_organized_warning: 这些小组是学生自发组织的。与其它类型的组不同，在这些小组中，学生可以同时属于多个小组，因此这些小组未必是计分作业的最佳解决方案。
+        self_organized_warning: 这些小组是学生自发组织的。与其他类型的小组不同，在这些小组中，学生可以同时属于多个小组，因此，这些小组不能用于评分作业。
         self_signup_blurb: 对这些小组启用自行注册。
         settings: 设置
       group_category_edit: 
@@ -7096,6 +7155,8 @@ zh:
         remove: 删除
         remove_from_group: "从小组中删除 %{name}"
       group_users: 
+        no_matching_students: 无匹配学生。
+        no_matching_users: 无匹配用户。
         no_students: 此小组中目前没有学生。请添加学生以开始。
         no_users: 此小组中目前没有用户。请添加用户以开始。
       groups: 
@@ -7196,6 +7257,8 @@ zh:
       x_new_in_discussions: 
         one: "*%{count}* 个讨论"
         other: "*%{count}* 个讨论"
+  ic_actions: 
+    manage: 管理
   images: 
     error_checking_color: 检查图像颜色时出错
     invalid_background_color: "背景色必须为 %{color}"
@@ -10223,16 +10286,6 @@ zh:
         minimum_rows_for_parallel: "使用并行处理之前 SIS 导入中的最少行数"
         parallelism: "用于处理并行 SIS 导入的工作处理器数"
         queue_for_parallel_jobs: 用于并行工作的工作队列（默认为空）
-    tinychat: 
-      description: "Tinychat 聊天室"
-      name: Tinychat
-    tinychat_settings: 
-      description: |-
-          您将需要注册 [Tinychat 上的新应用程序](%{tinychat_url})。
-          记下您的应用程序的"公钥"和"加密密钥"值。
-      labels: 
-        api_key: 公钥
-        secret_key: 加密密钥
     twitter: 
       description: "Twitter 通知"
       name: Twitter
@@ -10697,6 +10750,7 @@ zh:
     login: 
       invalid_login: 登录信息无效
       invalid_password: 密码无效
+      parent_signup: 父级注册
       password_confirmation_sent: "密码确认已发送到 %{email_address}。确保检查您的垃圾邮件箱。"
     notices: 
       account_registered: 帐户已注册！
@@ -10713,10 +10767,18 @@ zh:
       publishing: 正在发布...
       unpublish: 取消发布
       unpublishing: 正在取消发布...
+  publish_icon_component: 
+    publish: 发布
+    publish_click: 已发布，单击可取消发布
+    unpublish: 取消发布
+    unpublish_click: 已取消发布，单击可发布
   publishable: 
     cant_unpublish: 无法取消发布
   publishableModuleItem: 
     disabled: 此项目已禁用发布
+    disabled_assignment: 如有学生提交文件，则无法取消发布
+    disabled_discussion_topic: 如有学生提交文件，则无法取消发布
+    disabled_quiz: 如有学生提交文件，则无法取消发布
   purchases: 
     new: 
       payment_info: 付款信息
@@ -11017,6 +11079,9 @@ zh:
       no_more_attempts: 您没有剩余的测验尝试
       no_possible_solution: 请生成至少一个可能的解
       quiz_deleted: 该测验已删除
+      quiz_score_not_a_number: "分数必须是 0 到 2,000,000,000 之间的数字。"
+      quiz_score_too_long: "分数必须小于 2,000,000,000。"
+      quiz_score_too_short: "分数必须大于 0。"
       quiz_update_failed: 测验无法更新
       retrieving_filters_failed: 检索过滤器失败
     fabulous_quizzes: 
@@ -11428,6 +11493,7 @@ zh:
       show_correct_answers: 允许学生看到正确答案
       show_correct_answers_at: 显示正确答案
       shuffle_answers: 置乱答案
+      students_cannot_view_responses_after_course_concludes: 学生不能在课程结束后查看测验响应
       time_limit: 多少分钟?
       titles: 
         click_to_select_filter: 单击以选择此过滤器
@@ -11872,6 +11938,7 @@ zh:
       unpublished_changes: "*您已对此测验进行未发布的更改。* 这些更改将不会对学生显示，直到您发布或重新发布测验。"
       unpublished_quiz: "*此测验未发布* 在发布之前，只有教师才能查看此课程。"
   quizzes_model: 
+    cant_unpublish_when_students_submit: 如有学生提交文件，则无法取消发布
     confirms: 
       delete_quiz: 是否确定要删除此测验?
     delete_quiz: 删除测验
@@ -12042,6 +12109,9 @@ zh:
   roster: 
     delete_confirm: 是否确定要删除此用户？
     error_sending_invitations: 发送邀请时出错。请重试。
+    filter_multiple_users_found: "找到 %{userCount} 个用户。"
+    filter_no_users_found: 未找到匹配用户。
+    filter_one_user_found: "找到 1 个用户。"
     flash: 
       removeError: 无法删除用户。请稍后重试。
       removed: 用户已成功删除。
@@ -12516,6 +12586,7 @@ zh:
       back_to_login: 返回登录
       buttons: 
         request_password: 请求密码
+      coenrollment_banner: "*Canvas 用户的父级?* **单击此处以获得帐户**"
       default_login_message: 在您的机构登录
       dont_know_password: 我不知道我的密码
       labels: 
@@ -12962,11 +13033,21 @@ zh:
       loading: 正在加载...
     titles: 
       value_over_time: "%{value} 超时"
+    user_search: 
+      find_user_by: 通过登录/电子邮件查找用户
+      find_user_by_label: 登录/电子邮件
+    users: 
+      user_search_label: 用户搜索
+      users_matching_label: 用户匹配
   slideshow: 
     titles: 
       back: 返回
       close: 关闭
       forward: 转发
+  sr_gradebook: 
+    all_sections: 所有班级
+    no_assignment: 未选择作业
+    no_student: 未选择学生
   statistics: 
     csv_columns: 
       attempt: 已尝试次数
@@ -13070,7 +13151,7 @@ zh:
         save_comment: 保存评论
       crumbs: 
         assignments: 作业
-      hide_rubric_button: 隐藏评分标准按钮
+      hide_rubric_button: 隐藏评分标准说明
       labels: 
         add_a_comment: 添加评论
         grade: 评分
@@ -13148,7 +13229,6 @@ zh:
   tabs: 
     announcements: 通告
     assignments: 作业
-    chat: 聊天
     collaborations: 协作
     conferences: 会议
     discussions: 讨论
@@ -13653,6 +13733,8 @@ zh:
       resending: 正在重新发送...
       sent_email_paragraph: "我们已发送电子邮件到 %{email_address}。*单击该电子邮件中的链接以完成注册*。如果您没有看到电子邮件，**单击以重新发送电子邮件**，然后确保检查您的垃圾邮件箱。"
       while_you_wait: 您等待时...
+    scheduled_conference: 
+      current_conference_text: "您已经受邀参加 %{conference}。将于 %{starts_at} 开始。"
     service_not_enabled: 该服务尚未启用
     show: 
       accounts: 帐户

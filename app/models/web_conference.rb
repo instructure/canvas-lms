@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -272,6 +272,16 @@ class WebConference < ActiveRecord::Base
     self.ended_at = nil
     self.save
   end
+
+  # Default implementation since most implementations don't support scheduling yet
+  def scheduled?
+    self.started_at.nil? && scheduled_date && scheduled_date > Time.now
+  end
+
+  # Default implementation since most implementations don't support scheduling yet
+  def scheduled_date
+    nil
+  end
   
   def active?(force_check=false)
     if !force_check
@@ -332,7 +342,6 @@ class WebConference < ActiveRecord::Base
     []
   end
 
-
   def craft_url(user=nil,session=nil,return_to="http://www.instructure.com")
     user ||= self.user
     initiate_conference and touch or return nil
@@ -358,13 +367,13 @@ class WebConference < ActiveRecord::Base
     
     given { |user, session| self.users.include?(user) && self.cached_context_grants_right?(user, session, :read) && long_running? && active? }
     can :resume
-    
-    given { |user, session| (self.is_public rescue false) }
+
+    given { |user, session| (self.respond_to?(:is_public) && self.is_public rescue false) }
     can :read and can :join
-    
+
     given { |user, session| self.cached_context_grants_right?(user, session, :create_conferences) }
     can :create
-    
+
     given { |user, session| user && user.id == self.user_id && self.cached_context_grants_right?(user, session, :create_conferences) }
     can :initiate
     

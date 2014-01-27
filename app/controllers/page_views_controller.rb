@@ -18,23 +18,18 @@
 
 # @API Users
 #
+#
 # @model PageView
 #     {
 #       "id": "PageView",
 #       "description": "The record of a user page view access in Canvas",
-#       "required": ["request_id"],
+#       "required": ["id"],
 #       "properties": {
-#         "request_id": {
-#           "description": "A UUID representing the page view",
+#         "id": {
+#           "description": "A UUID representing the page view.  This is also the unique request id",
 #           "example": "3e246700-e305-0130-51de-02e33aa501ef",
 #           "type": "string",
 #           "format": "uuid"
-#         },
-#         "user_id": {
-#           "description": "The ID of the user for this page view",
-#           "example": "1234",
-#           "type": "integer",
-#           "format": "int64"
 #         },
 #         "url": {
 #           "description": "The URL requested",
@@ -46,22 +41,10 @@
 #           "example": "Course",
 #           "type": "string"
 #         },
-#         "context_id": {
-#           "description": "The ID of the context for the request (course id if context_type is Course, etc)",
-#           "example": "1234",
-#           "type": "integer",
-#           "format": "int64"
-#         },
 #         "asset_type": {
 #           "description": "The type of asset in the context for the request, if any",
 #           "example": "Discussion",
 #           "type": "string"
-#         },
-#         "asset_id": {
-#           "description": "The ID of the asset for the request, if any",
-#           "example": "1234",
-#           "type": "integer",
-#           "format": "int64"
 #         },
 #         "controller": {
 #           "description": "The rails controller that handled the request",
@@ -109,18 +92,6 @@
 #           "example": "false",
 #           "type": "boolean"
 #         },
-#         "account_id": {
-#           "description": "The ID of the account context for this page view",
-#           "example": "1234",
-#           "type": "integer",
-#           "format": "int64"
-#         },
-#         "real_user_id": {
-#           "description": "The ID of the actual user who made this request, if the request was made by a user who was masquerading",
-#           "example": "1234",
-#           "type": "integer",
-#           "format": "int64"
-#         },
 #         "http_method": {
 #           "description": "The HTTP method such as GET or POST",
 #           "example": "GET",
@@ -130,9 +101,52 @@
 #           "description": "The origin IP address of the request",
 #           "example": "173.194.46.71",
 #           "type": "string"
+#         },
+#         "links": {
+#           "description": "The page view links to define the relationships",
+#           "type": "PageViewLinks",
+#           "example": "{}"
 #         }
 #       }
 #     }
+#
+# @object PageViewLinks
+#   {
+#     "id": "PageViewLinks",
+#     "description": "The links of a page view access in Canvas",
+#     "properties": {
+#        "user": {
+#          "description": "The ID of the user for this page view",
+#          "example": "1234",
+#          "type": "integer",
+#          "format": "int64"
+#        },
+#        "context": {
+#          "description": "The ID of the context for the request (course id if context_type is Course, etc)",
+#          "example": "1234",
+#          "type": "integer",
+#          "format": "int64"
+#        },
+#        "asset": {
+#          "description": "The ID of the asset for the request, if any",
+#          "example": "1234",
+#          "type": "integer",
+#          "format": "int64"
+#        },
+#        "real_user": {
+#          "description": "The ID of the actual user who made this request, if the request was made by a user who was masquerading",
+#          "example": "1234",
+#          "type": "integer",
+#          "format": "int64"
+#        },
+#         "account": {
+#           "description": "The ID of the account context for this page view",
+#           "example": "1234",
+#           "type": "integer",
+#           "format": "int64"
+#        }
+#     }
+#   }
 
 class PageViewsController < ApplicationController
   before_filter :require_user, :only => [:index]

@@ -55,17 +55,25 @@ define [
         .popup('open')
       new AssignmentMuter(@$menu.find("[data-action=toggleMuting]"), @assignment, "#{@gradebook.options.context_url}/assignments/#{@assignment.id}/mute")
 
-    showAssignmentDetails: =>
-      new AssignmentDetailsDialog(@assignment, @gradebook)
+    showAssignmentDetails: (opts={
+      assignment:@assignment,
+      students:@gradebook.students
+    })=>
+      new AssignmentDetailsDialog(opts)
 
-    messageStudentsWho: =>
-      students = _.map @gradebook.students, (student)=>
+    messageStudentsWho: (opts={
+      assignment:@assignment,
+      students:@gradebook.students
+    }) =>
+      {students, assignment} = opts
+      students = _.map students, (student)=>
+        sub = student["assignment_#{assignment.id}"]
         id: student.id
         name: student.name
-        score: student["assignment_#{@assignment.id}"].score
-        submitted_at: student["assignment_#{@assignment.id}"].submitted_at
+        score: sub?.score
+        submitted_at: sub?.submitted_at
 
-      submissionTypes = @assignment.submission_types
+      submissionTypes = assignment.submission_types
       hasSubmission = true
       if submissionTypes.length == 0
         hasSubmission = false
@@ -81,10 +89,10 @@ define [
 
       window.messageStudents
         options: options
-        title: @assignment.name
-        points_possible: @assignment.points_possible
+        title: assignment.name
+        points_possible: assignment.points_possible
         students: students
-        context_code: "course_"+@assignment.course_id
+        context_code: "course_"+assignment.course_id
         callback: (selected, cutoff, students) ->
           students = $.grep students, ($student, idx) ->
             student = $student.user_data
@@ -100,19 +108,28 @@ define [
         subjectCallback: (selected, cutoff) =>
           cutoff = cutoff || ''
           if selected == I18n.t('students_who.not_submitted_yet', "Haven't submitted yet")
-            I18n.t('students_who.no_submission_for', 'No submission for %{assignment}', assignment: @assignment.name)
+            I18n.t('students_who.no_submission_for', 'No submission for %{assignment}', assignment: assignment.name)
           else if selected == I18n.t("students_who.havent_been_graded", "Haven't been graded")
-            I18n.t('students_who.no_grade_for', 'No grade for %{assignment}', assignment: @assignment.name)
+            I18n.t('students_who.no_grade_for', 'No grade for %{assignment}', assignment: assignment.name)
           else if selected == I18n.t('students_who.scored_less_than', "Scored less than")
-            I18n.t('students_who.scored_less_than_on', 'Scored less than %{cutoff} on %{assignment}', assignment: @assignment.name, cutoff: cutoff)
+            I18n.t('students_who.scored_less_than_on', 'Scored less than %{cutoff} on %{assignment}', assignment: assignment.name, cutoff: cutoff)
           else if selected == I18n.t('students_who.scored_more_than', "Scored more than")
-            I18n.t('students_who.scored_more_than_on', 'Scored more than %{cutoff} on %{assignment}', assignment: @assignment.name, cutoff: cutoff)
+            I18n.t('students_who.scored_more_than_on', 'Scored more than %{cutoff} on %{assignment}', assignment: assignment.name, cutoff: cutoff)
 
-    setDefaultGrade: =>
-      new SetDefaultGradeDialog(@assignment, @gradebook)
+    setDefaultGrade: (opts={
+      assignment:@assignment,
+      students:@gradebook.students
+      context_id:@gradebook.options.context_id
+      selected_section: @gradebook.sectionToShow
+    }) =>
+      new SetDefaultGradeDialog(opts)
 
-    curveGrades: =>
-      new CurveGradesDialog(@assignment, @gradebook)
+    curveGrades: (opts={
+      assignment:@assignment,
+      students:@gradebook.students,
+      context_url:@gradebook.options.context_url
+    }) =>
+      new CurveGradesDialog(opts)
 
     downloadSubmissions: =>
       url = $.replaceTags @gradebook.options.download_assignment_submissions_url, "assignment_id", @assignment.id

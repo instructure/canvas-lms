@@ -157,11 +157,31 @@ describe WikiPage do
   end
 
   describe '#can_edit_page?' do
-    it 'is true if the editing roles include teachers and the user is a teacher' do
+    it 'is true if the user has manage_wiki rights' do
       course_with_teacher(:active_all => true)
       page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'teachers', :hide_from_students => true)
-      teacher = @course.teachers.first
-      page.can_edit_page?(teacher).should be_true
+      page.can_edit_page?(@teacher).should be_true
+    end
+
+    describe "without :manage_wiki rights" do
+      before do
+        course_with_teacher(:active_all => true)
+        course_with_ta(:course => @course, :active_all => true)
+        @course.account.role_overrides.create!(:enrollment_type => 'TeacherEnrollment', :permission => 'manage_wiki', :enabled => false)
+        @course.account.role_overrides.create!(:enrollment_type => 'TaEnrollment', :permission => 'manage_wiki', :enabled => false)
+      end
+
+      it 'does not grant teachers or TAs edit rights when editing roles are "Only teachers"' do
+        page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'teachers', :hide_from_students => true)
+        page.can_edit_page?(@teacher).should be_false
+        page.can_edit_page?(@ta).should be_false
+      end
+
+      it 'grants teachers and TAs edit rights when editing roles are "Teachers and students"' do
+        page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'teachers,students', :hide_from_students => true)
+        page.can_edit_page?(@teacher).should be_true
+        page.can_edit_page?(@ta).should be_true
+      end
     end
 
     it 'is true for students who are in the course' do

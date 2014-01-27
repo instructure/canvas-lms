@@ -349,6 +349,30 @@ describe GradebooksController do
         data.first(2).sort_by{ |a| a['assignment']['title'] }.map{ |a| a['assignment']['group_category'] }.
           should == [assignment1, assignment2].map{ |a| a.group_category.name }
       end
+
+      context "draft state" do
+        it "should should not return unpublished assignments" do
+          course_with_teacher_logged_in(:active_all => true)
+          @course.account.enable_feature!(:draft_state)
+          ag = @course.assignment_groups.create! group_weight: 100
+          a1 = ag.assignments.create! :submission_types => 'online_upload',
+                                      :points_possible  => 10,
+                                      :context  => @course
+          a2 = ag.assignments.build :title => "unpub assign",
+                                    :submission_types => 'online_upload',
+                                    :points_possible  => 10,
+                                    :context  => @course
+          a2.workflow_state = 'unpublished'
+          a2.save!
+
+          get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'json'
+          response.should be_success
+          data = json_parse
+          data.should_not be_nil
+          data.size.should == 3 # 1 assignment (no unpublished) + an assignment group + a total
+          data.map{|a| a['assignment']['title']}.include?(a2.title).should be_false
+        end
+      end
     end
 
     describe "csv" do
@@ -378,6 +402,10 @@ describe GradebooksController do
         assign_ids.include?(assignment2.id).should be_true
         assign_ids.include?("group-#{assignment2.assignment_group.id}").should be_true
         assign_ids.include?("final-grade").should be_true
+
+        ag_assign_ids = assigns[:js_env][:assignment_groups].first['assignments'].map{|a| a['id']}
+        ag_assign_ids.include?(assignment1.id).should be_false
+        ag_assign_ids.include?(assignment2.id).should be_true
       end
     end
   end
@@ -561,6 +589,7 @@ describe GradebooksController do
       a  = ag.assignments.create! :submission_types => 'online_upload',
                                   :points_possible  => 10,
                                   :context  => @course
+      @controller.instance_variable_set(:@context, @course)
       @controller.light_weight_ags_json([ag]).should == [
         {
           id: ag.id,
@@ -575,6 +604,38 @@ describe GradebooksController do
           ],
         },
       ]
+    end
+
+    context 'draft state' do
+      it 'should not return unpublished assignments' do
+        course_with_teacher(:active_all => true)
+        @course.account.enable_feature!(:draft_state)
+        ag = @course.assignment_groups.create! group_weight: 100
+        a1 = ag.assignments.create! :submission_types => 'online_upload',
+                                    :points_possible  => 10,
+                                    :context  => @course
+        a2 = ag.assignments.build :submission_types => 'online_upload',
+                                  :points_possible  => 10,
+                                  :context  => @course
+        a2.workflow_state = 'unpublished'
+        a2.save!
+
+      @controller.instance_variable_set(:@context, @course)
+      @controller.light_weight_ags_json([ag]).should == [
+        {
+          id: ag.id,
+          rules: {},
+          group_weight: 100,
+          assignments: [
+            {
+              id: a1.id,
+              points_possible: 10,
+              submission_types: ['online_upload'],
+            }
+          ],
+        },
+      ]
+      end
     end
   end
 end

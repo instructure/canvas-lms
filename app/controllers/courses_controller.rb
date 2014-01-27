@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -302,6 +302,9 @@ class CoursesController < ApplicationController
   # @argument offer [Optional, Boolean]
   #   If this option is set to true, the course will be available to students
   #   immediately.
+  #
+  # @argument course[syllabus_body] [Optional, String]
+  #   The syllabus body for the course
   #
   # @returns Course
   def create
@@ -649,9 +652,7 @@ class CoursesController < ApplicationController
     end
     if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
-      @context.workflow_state = 'deleted'
-      @context.sis_source_id = nil
-      @context.save
+      @context.destroy
       flash[:notice] = t('notices.deleted', "Course successfully deleted")
     else
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
@@ -1189,6 +1190,7 @@ class CoursesController < ApplicationController
           @contexts += @user_groups if @user_groups
         end
         @current_conferences = @context.web_conferences.select{|c| c.active? && c.users.include?(@current_user) }
+        @scheduled_conferences = @context.web_conferences.select{|c| c.scheduled? && c.users.include?(@current_user)}
         @stream_items = @current_user.try(:cached_recent_stream_items, { :contexts => @contexts }) || []
       end
 
@@ -1622,9 +1624,11 @@ class CoursesController < ApplicationController
       f.id = course_url(@context)
     end
     @entries = []
-    @entries.concat @context.assignments.active
+    @entries.concat @context.assignments.published
     @entries.concat @context.calendar_events.active
-    @entries.concat @context.discussion_topics.active.reject{|a| a.locked_for?(@current_user, :check_policies => true) }
+    @entries.concat(@context.discussion_topics.active.select{ |dt|
+      dt.published? && !dt.locked_for?(@current_user, :check_policies => true)
+    })
     @entries.concat @context.wiki.wiki_pages
     @entries = @entries.sort_by{|e| e.updated_at}
     @entries.each do |entry|

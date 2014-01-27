@@ -21,6 +21,9 @@ ja:
     user_count: 
       one: "%{count} 人のユーザ"
       other: "%{count} 人のユーザ"
+  GroupUserCollection: 
+    flash: 
+      userAlreadyInGroup: "警告: %{user} は既に %{group} のメンバーです"
   academic_benchmark: 
     api_error: "受講生を権限 %{auth} に更新できませんでした。"
     bad_ab_file: "提供された Academic Benchmark ファイルにはエラーがあります。"
@@ -542,6 +545,15 @@ ja:
             text: "course_id:"
           outcome: 
             text: "outcome_id:"
+    cv_submission_data_csv_description: 
+      account_reports: 
+        galen: 
+          cv: 
+            attendance: 
+              text: "このレポートには、指定された日付までの受講生の提出物が表示されます。CampusVue の出欠に使用されます。"
+        tmcc: 
+          description: 
+            header: 例
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -593,6 +605,23 @@ ja:
           last_user_access: 
             header: 例
             text: このレポートには、アクティブなユーザの最終ログインが表示されます。
+    learning_outcome_assignment_type_csv_description: 
+      account_reports: 
+        newark: 
+          student_activity: 
+            text: このレポートでは、成果を課題に関連付けるデータがエクスポートされます。
+        samuel_merrit_university: 
+          description: 
+            header: 例
+    learning_outcome_assignment_type_csv_parameters: 
+      account_reports: 
+        samuel_merrit_university: 
+          course: 
+            sis: 
+              text: "コース SIS ID"
+            text: "コース ID"
+          parameters: 
+            note1: "期間内のすべてのコースに対してレポートを実行する場合は、コース ID を空白のままにしてもかまいません。"
     mississippi_sis_csv_description: 
       account_reports: 
         mississisppi: 
@@ -787,6 +816,7 @@ ja:
         outgoing_email_default_name_option_custom: "カスタム \"送信元\" 名"
         outgoing_email_default_name_option_default: "Canvas のデフォルト設定"
         prevent_course_renaming_by_teachers: 講師によるコース名の変更を許可しない
+        restrict_quiz_questions: コースの終了日以降のクイズ問題は受講生に表示しない
         restrict_student_future_view: 開始日前のコースは受講生に表示しない
         self_enrollment: セルフ登録を許可する
         self_registration: 自己登録
@@ -1230,6 +1260,7 @@ ja:
     no_title: タイトルなし
   announcements: 
     announcements_crumb: アナウンス
+    error_draft_state: このトピックはアナウンスのため、ドラフト状態に設定できません。
     external_feed: 
       alts: 
         deleted_feed: このフィードを削除
@@ -1362,6 +1393,8 @@ ja:
       a_quiz: クイズ
       a_text_entry_box: テキスト入力ボックス
       a_website_url: "Web サイト URL"
+      external_tool: 外部ツール
+      on_paper: 筆記
     titles: 
       grading_scheme_info: 採点スキームの表示/編集
   assignment_details_dialog: 
@@ -1740,6 +1773,21 @@ ja:
       title_add_group: 課題グループの追加
     invalid_file_retrieval: このツールから送信されたファイルを取得する際に問題が発生しました。
     invalid_tool_return: 起動されたツールは、この課題に関して無効なリソースを返しました。
+    keyboard_add_item: 選択したグループへの課題の追加
+    keyboard_close_menu: アクティブなダイアログを閉じる
+    keyboard_del_item: 現在の課題またはグループの削除
+    keyboard_edit_item: 現在の課題またはグループの編集
+    keyboard_next_item: 次の課題またはグループへのフォーカスの移動
+    keyboard_prev_item: 前の課題またはグループへのフォーカスの移動
+    keyboard_show_assign: "選択した課題のフル プレビューの表示"
+    keycodes: 
+      add_item: a
+      close_menu: Esc
+      del_item: d
+      edit_item: e
+      next: j
+      previous: k
+      show_assign: f
     labels: 
       assignment_group_move_label: 課題グループ
       label_place_before: 前に配置
@@ -1770,6 +1818,7 @@ ja:
       aria_assignments: 課題
       assignments: 課題
       no_assignments_found: 課題が見つかりません
+    no_name_error: 名前が必要です
     no_tools_found: ツールが見つかりませんでした
     non_number: 数字を使用する必要があります
     notices: 
@@ -2011,6 +2060,7 @@ ja:
           internet_check: "インターネット データベース"
           journal_check: ジャーナル、定期刊行物、出版物
           student_paper_check: 他の受講生の論文
+        originality_report_never: 許可しない
         originality_report_visibility: 受講生が独創性レポートを閲覧できる時期
         originality_report_visible_after_due_date: 期日後
         originality_report_visible_after_grading: 課題の採点後
@@ -2083,6 +2133,7 @@ ja:
   bb_file_description: "Blackboard 6/7/8/9 から .zip ファイルをエクスポート"
   bb_name: "Blackboard コンバータ"
   big_blue_button_conference: 
+    conference_is_recorded: この会議は記録されています。
     recording_setting: 記録
     recording_setting_description: この会議を記録
   blackboard: 
@@ -2159,6 +2210,7 @@ ja:
     delete: 削除
     done: 完了
     filter: フィルタ
+    find_user: ユーザの検索
     hide_all_artifacts: すべての成果物を非表示
     import: インポート
     login: ログイン
@@ -2291,7 +2343,7 @@ ja:
       create_event: 新しいイベントの作成
       done_go_back_to_list: 完了し、リストに戻る
       links: 
-        accessibility_warning: "警告: スクリーン リーダーを使用しているユーザは、このビューにアクセスできません"
+        accessibility_warning: "警告: スクリーン リーダーはこのビューにアクセスできません。代わりにアジェンダ ビューを使用してください。"
         calendar_agenda: アジェンダ
         calendar_month: 月
         calendar_scheduler: スケジューラ
@@ -2666,11 +2718,6 @@ ja:
       update_assignment_points: "この課題の配点は %{assignmentPoints} 点です。配点を %{rubricPoints} 点に変更し、この注釈に一致させますか?"
     titles: 
       update_assignment_points: 注釈と一致するように配点を変更しますか?
-  chat: 
-    notifications: 
-      tinychat_inaccessible: |-
-          警告: このページで使用されるサードパーティ プラグイン Tinychat は\
-                スクリーン リーダーからアクセスできません。
   collaboration: 
     default_title: 名前の付いていない共同作業
   collaborations: 
@@ -3124,10 +3171,6 @@ ja:
   context: 
     all_marked_read: 受信箱のメッセージをすべて既読にする
     bad_message: このメッセージは表示できませんでした
-    chat: 
-      titles: 
-        chat: チャット
-    chat_not_enabled: "この Canvas サイトではチャットは使用可能になっていません"
     communication: 
       headings: 
         discussions: ディスカッション
@@ -4468,6 +4511,8 @@ ja:
       index: 
         add_people: メンバーの追加
         cannot_add_users: このコースは完了しているため、新しいユーザを追加できません
+        filter_field_description: このフィールドに入力すると、メンバーのリストが自動的にフィルタリングされて、入力した文字に一致する名前を持つメンバーのみが表示されます。
+        filter_list_of_people: メンバーのリストをフィルタリング
         role_to_search: 制限付きの役割検索
         search_people: メンバーの検索
       invitations_view: 
@@ -4775,7 +4820,6 @@ ja:
     announcements: アナウンス
     assignments: 課題
     calendar_events: "カレンダー イベント"
-    chat: チャット
     conferences: 会議
     confirmation: 確認
     copy_course: コースのコピー
@@ -4938,7 +4982,8 @@ ja:
     formats: 
       date_at_time: "%b %-d %l:%M%P"
       default: "%Y-%m-%d"
-      long: "%B %d, %Y"
+      long: "%B %-d, %Y"
+      long_with_weekday: "%A, %B %-d"
       medium: "%b %e, %Y"
       medium_month: "%b %Y"
       medium_with_weekday: "%a %b %-d, %Y"
@@ -5121,7 +5166,7 @@ ja:
       separated_conversation_notice: "これはグループ課題であるため、各グループ用に、このトピックに関する会話が用意されています。以下のグループ トピックにアクセスできます。"
       show_due_dates: 期日の表示
       until: 次の日時まで
-    cannot_unpublish: 未公開にできません
+    cannot_unpublish_with_replies: 返信がある場合は公開を中止できません
     confirm_delete_announcement: 
       one: "この %{count} 個のアナウンスを削除してもよろしいですか?"
       other: "この %{count} 個のアナウンスを削除してもよろしいですか?"
@@ -5134,8 +5179,9 @@ ja:
     discussion: 
       close_for_comments: コメントを締め切る
       delete: 削除
-      due: 期限
+      due_at: "*期限* %{assignment.display_due_at}"
       graded_discussion: 課題用ディスカッション
+      last_post_date: "前回の投稿 %{display_last_reply_at}"
       manage: 管理
       no_due_date: 期日なし
       open_to_comments: コメントを受け付ける
@@ -5188,8 +5234,6 @@ ja:
       show_more_entries: 
         one: "さらに %{count} エントリを表示"
         other: "さらに %{count} エントリを表示"
-    error_draft_state_announcement: このトピックはアナウンスのため、ドラフト状態に設定できません。
-    error_draft_state_graded: このトピックは課題のため、ドラフト状態に設定できません
     error_draft_state_unauthorized: このトピックをドラフト状態に設定する権限がありません。
     error_draft_state_with_posts: このトピックには投稿が含まれているため、ドラフト状態に設定できません。
     group_assignment_discussion_entry: 
@@ -5238,7 +5282,10 @@ ja:
       zero: 返信なし
     show: 
       add_rubric: 注釈の追加
+      announcement_closed: このアナウンスへのコメントは締め切られています
       announcement_locked: "このアナウンスは *%{date}* までユーザに表示されません"
+      announcement_not_visible: このアナウンスはユーザに表示されません
+      announcement_will_open_on: "このアナウンスでは *%{date}* からコメントを受け付けます"
       authors_name: 作成者名
       collapse_replies: 返信を折りたたむ
       confirm_delete_discussion: このディスカッションを削除してもよろしいですか?
@@ -5276,6 +5323,7 @@ ja:
       topic_subscribe_tooltip: 購読が中止されました。新しいコメントの通知は行われません
       topic_subscribed_tooltip: 購読されました。新しいコメントが通知されます
       topic_unsubscribe: 購読済み
+      topic_will_open_on: "このトピックでは *%{date}* からコメントを受け付けます"
       unlock_topic: コメントを受け付ける
       unread: 未読です
     sub_entry: 
@@ -6324,6 +6372,8 @@ ja:
     resubmitted: 前回の採点後に再提出されました
     row_student_name: 
       student_placeholder: 受講生
+    screenreader: 
+      page_titles: "スクリーン リーダーの成績表"
     secondary_id: "セカンダリ ID"
     section_to_show_menu: 
       choose_a_section_to_show: 表示するセクションを選択
@@ -6484,9 +6534,15 @@ ja:
         show_what_if: "保存済みの \"What-If\" スコアを表示"
       change_score_instructions: 任意のスコアをクリックして別の値を入力すると、変更後の合計がどうなるかを確認できます。
       click_to_change: クリックして、別のスコアをテスト
+      close_comments: 閉じる
+      close_comments_label: コメントを閉じる
+      close_rubric: 注釈を閉じる
+      close_score: 閉じる
+      close_score_screenreader: スコアの詳細を閉じる
       comment_count: 
         one: "%{count} 件のコメント"
         other: "%{count} 件のコメント"
+      comment_count_screenreader: コメントを読む
       faculty_journal: "%{user} についての講師日誌"
       for_course: "対象コース: "
       headers: 
@@ -6521,7 +6577,9 @@ ja:
       percent: パーセント
       print_grades: 採点の印刷
       see_rubric_results: 注釈の結果を参照
+      see_rubric_results_screenreader: 注釈の結果を参照
       see_scoring_details: 採点の詳細を参照
+      see_scoring_details_screenreader: 採点の詳細を参照
       see_turnitin_results: "Turnitin の結果を参照"
       student_mute_legend: インストラクタが採点中です。インストラクタが採点を行なっているときは、成績やコメントの情報を利用できません。
       student_mute_notification: インストラクタが採点中です
@@ -6531,7 +6589,6 @@ ja:
         turnitin_score: "Turnitin の類似性スコア -- 詳細情報"
         view_rubric_evaluation: 注釈の評価の表示
         view_scoring_details: 採点の詳細を表示
-      view_comments: コメントと採点の詳細情報を表示
     gradebook: 
       all_sections: すべて
       assignment_submitted_late: (遅延)
@@ -6820,7 +6877,6 @@ ja:
     name_required: 名前は必須項目です
     name_too_long: 短いグループ名を入力してください
     tabs: 
-      chat: チャット
       discussions: ディスカッション
       files: ファイル
       home: ホーム
@@ -6908,7 +6964,7 @@ ja:
         one: "%{count} 人の受講生"
         other: "%{count} 人の受講生"
       warnings: 
-        studend_groups: これらのグループは、受講生によって自己管理されています。ほかのタイプのグループと違って、受講生はこれらのグループのうち複数のグループに同時に所属することができます。そのため、これらのグループは、採点対象の課題のためには最適なソリューションではない場合があります。
+        studend_groups: これらのグループは、受講生によって自己管理されています。ほかのタイプのグループと違って、受講生はこららのグループのうち複数のグループに同時に所属することができます。そのため、これらのグループは、採点対象の課題には使用できません。
     confirm: 
       assign_students: 未割り当ての全受講生を、無作為に、できるだけ均等に、既存の受講生グループに割り当てます。
       delete_group: このグループを削除してもよろしいですか?
@@ -7040,6 +7096,7 @@ ja:
       group_category: 
         randomly_assigning_students: 受講生を無作為に割り当て
         search_groups: グループの検索
+        search_users: ユーザの検索
       group_category_create: 
         allow_self_signup: "セルフ サインアップを許可"
         cancel: キャンセル
@@ -7064,7 +7121,7 @@ ja:
         message_all_unassigned_option: すべての未割り当ての受講生にメッセージを送る
         randomly_assign_students_option: 受講生を無作為に割り当てます
         restricted_self_signup_blurb: 同じグループの受講生は全員が同じセクションに入っている必要があります。
-        self_organized_warning: これらのグループは、受講生によって自己管理されています。ほかのタイプのグループと違って、受講生はこららのグループのうち複数のグループに同時に所属することができます。そのため、これらのグループは、採点対象の課題のためには最適なソリューションではない場合があります。
+        self_organized_warning: これらのグループは、受講生によって自己管理されています。ほかのタイプのグループと違って、受講生はこららのグループのうち複数のグループに同時に所属することができます。そのため、これらのグループは、採点対象の課題には使用できません。
         self_signup_blurb: "これらのグループでは、セルフ サインアップが使用可能になっています。"
         settings: 設定
       group_category_edit: 
@@ -7101,6 +7158,8 @@ ja:
         remove: 削除
         remove_from_group: "%{name} をグループから削除"
       group_users: 
+        no_matching_students: 一致する受講生はいません。
+        no_matching_users: 一致するユーザはいません。
         no_students: 現在、このグループには受講生がいません。最初に受講生を追加してください。
         no_users: 現在、このグループにはユーザがいません。最初にユーザを追加してください。
       groups: 
@@ -7201,6 +7260,8 @@ ja:
       x_new_in_discussions: 
         one: "*%{count}* 件のディスカッション"
         other: "*%{count}* 件のディスカッション"
+  ic_actions: 
+    manage: 管理
   images: 
     error_checking_color: 画像の色の確認でエラーが発生しました
     invalid_background_color: "背景色は %{color} にする必要があります"
@@ -10214,16 +10275,6 @@ ja:
         minimum_rows_for_parallel: "並列処理を使用する前の、SIS インポートの最小行数"
         parallelism: "SIS インポートを並列処理するために使用するジョブ プロセッサの数"
         queue_for_parallel_jobs: "並列ジョブに使用するジョブ キュー (デフォルトの場合は空白)"
-    tinychat: 
-      description: "Tinychat のチャット ルーム"
-      name: Tinychat
-    tinychat_settings: 
-      description: |-
-          [Tinychat 上で新しいアプリ](%{tinychat_url}) を登録することが必要になります。
-          ご自分のアプリの公開鍵とシークレット鍵の値をメモしてください。
-      labels: 
-        api_key: 公開鍵
-        secret_key: シークレット鍵
     twitter: 
       description: "Twitter 通知"
       name: Twitter
@@ -10681,6 +10732,7 @@ ja:
     login: 
       invalid_login: 無効なログインです
       invalid_password: 無効なパスワードです
+      parent_signup: 親のサインアップ
       password_confirmation_sent: "パスワードの確認が %{email_address} に送信されました。スパム用の受信箱も確認してみてください。"
     notices: 
       account_registered: アカウントが登録されました!
@@ -10697,10 +10749,18 @@ ja:
       publishing: 公開しています...
       unpublish: 未公開
       unpublishing: 公開を中止しています...
+  publish_icon_component: 
+    publish: 公開
+    publish_click: 公開されています。クリックすると未公開にします
+    unpublish: 未公開
+    unpublish_click: 未公開です。クリックすると公開します
   publishable: 
     cant_unpublish: 未公開にできません
   publishableModuleItem: 
     disabled: このアイテムでは公開は無効になっています
+    disabled_assignment: 受講生の提出物がある場合は、未公開にできません
+    disabled_discussion_topic: 受講生の提出物がある場合は、未公開にできません
+    disabled_quiz: 受講生の提出物がある場合は、未公開にできません
   purchases: 
     new: 
       payment_info: 支払情報
@@ -11001,6 +11061,9 @@ ja:
       no_more_attempts: 試行回数の残りのクイズはありません
       no_possible_solution: "可能な解を少なくとも 1 つ生成してください"
       quiz_deleted: そのクイズは削除されました
+      quiz_score_not_a_number: "スコアは 0 ～ 2,000,000,000 の数字で指定してください。"
+      quiz_score_too_long: "スコアは 2,000,000,000 未満の数字で指定してください。"
+      quiz_score_too_short: "スコアは 0 より大きい数字で指定してください。"
       quiz_update_failed: クイズの更新が失敗しました
       retrieving_filters_failed: フィルタの取得に失敗しました
     fabulous_quizzes: 
@@ -11412,6 +11475,7 @@ ja:
       show_correct_answers: 受講生に正解を表示
       show_correct_answers_at: 正解を表示
       shuffle_answers: 解答のシャッフル
+      students_cannot_view_responses_after_course_concludes: 受講生はコース終了後はクイズの回答を表示できません
       time_limit: 何分ですか?
       titles: 
         click_to_select_filter: クリックでこのフィルタを選択
@@ -11858,6 +11922,7 @@ ja:
       unpublished_changes: "*このクイズに加えた変更内容は未公開です。*これらの変更内容は、クイズを公開または再公開するまで、受講生には表示されません。"
       unpublished_quiz: "*このクイズは未公開です* 公開されるまでは、このクイズを表示できるのは講師のみです。"
   quizzes_model: 
+    cant_unpublish_when_students_submit: 受講生の提出物がある場合は、未公開にできません
     confirms: 
       delete_quiz: このクイズを削除してもよろしいですか?
     delete_quiz: クイズの削除
@@ -12028,6 +12093,9 @@ ja:
   roster: 
     delete_confirm: このユーザを削除してもよろしいですか?
     error_sending_invitations: 招待の送信時にエラーが発生しました。もう一度、試してください。
+    filter_multiple_users_found: "%{userCount} 人のユーザが見つかりました。"
+    filter_no_users_found: 一致するユーザは見つかりませんでした。
+    filter_one_user_found: "1 人のユーザが見つかりました。"
     flash: 
       removeError: ユーザを削除できません。後でもう一度試してください。
       removed: ユーザは正常に削除されました。
@@ -12501,6 +12569,7 @@ ja:
       back_to_login: ログインに戻る
       buttons: 
         request_password: パスワードの要求
+      coenrollment_banner: "*Canvas ユーザの親ですか?* **アカウントはこちらをクリックしてください**"
       default_login_message: ご利用の教育機関でログインしてください
       dont_know_password: パスワードが分かりません
       labels: 
@@ -12947,11 +13016,21 @@ ja:
       loading: 読み込んでいます...
     titles: 
       value_over_time: "%{value} 経時変化"
+    user_search: 
+      find_user_by: ログイン/電子メールでユーザを検索
+      find_user_by_label: ログイン/電子メール
+    users: 
+      user_search_label: ユーザの検索
+      users_matching_label: 一致するユーザ
   slideshow: 
     titles: 
       back: 戻る
       close: 閉じる
       forward: 早送り
+  sr_gradebook: 
+    all_sections: すべてのセクション
+    no_assignment: 課題が選択されていません
+    no_student: 受講生が選択されていません
   statistics: 
     csv_columns: 
       attempt: 試行
@@ -13055,7 +13134,7 @@ ja:
         save_comment: コメントの保存
       crumbs: 
         assignments: 課題
-      hide_rubric_button: 注釈ボタンを非表示
+      hide_rubric_button: 注釈を非表示
       labels: 
         add_a_comment: コメントの追加
         grade: 成績
@@ -13131,7 +13210,6 @@ ja:
   tabs: 
     announcements: アナウンス
     assignments: 課題
-    chat: チャット
     collaborations: 共同作業
     conferences: 会議
     discussions: ディスカッション
@@ -13636,6 +13714,8 @@ ja:
       resending: 再送信しています...
       sent_email_paragraph: "%{email_address} に電子メールをお送りしました。*電子メールのリンクをクリックして、登録を完了してください*。電子メールが見つからない場合は、**クリックして電子メールを再送信** し、スパム用の受信箱も確認してみてください。"
       while_you_wait: お待ちの間...
+    scheduled_conference: 
+      current_conference_text: "%{conference} への参加を招待されました。%{starts_at} に開始します。"
     service_not_enabled: そのサービスは使用可能になっていません
     show: 
       accounts: アカウント

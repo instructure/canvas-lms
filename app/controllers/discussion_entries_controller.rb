@@ -43,28 +43,29 @@ class DiscussionEntriesController < ApplicationController
     @entry.user_id = @current_user ? @current_user.id : nil
     @entry.parent_id = parent_id
     if authorized_action(@entry, @current_user, :create)
-      return if params[:attachment] && params[:attachment][:uploaded_data] &&
-        params[:attachment][:uploaded_data].size > 1.kilobytes &&
-        @entry.grants_right?(@current_user, session, :attach) &&
-        quota_exceeded(named_context_url(@context, :context_discussion_topic_url, @topic.id))
+
+      return if context_file_quota_exceeded?
+
       respond_to do |format|
         if @entry.save
           @entry.update_topic
           log_asset_access(@topic, 'topics', 'topics', 'participate')
           @entry.context_module_action
-          if params[:attachment] && params[:attachment][:uploaded_data] && params[:attachment][:uploaded_data].size > 0 && @entry.grants_right?(@current_user, session, :attach)
-            @attachment = @context.attachments.create(params[:attachment])
-            @entry.attachment = @attachment
-            @entry.save
-          end
+          save_attachment
           flash[:notice] = t :created_entry_notice, 'Entry was successfully created.'
-          format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @topic.id) }
-          format.json { render :json => @entry.as_json(:include => :attachment, :methods => [:user_name, :read_state], :permissions => {:user => @current_user, :session => session}), :status => :created }
-          format.text { render :json => @entry.as_json(:include => :attachment, :methods => [:user_name, :read_state], :permissions => {:user => @current_user, :session => session}), :status => :created }
+          format.html {
+            redirect_to named_context_url(@context, :context_discussion_topic_url, @topic.id)
+          }
+          format.json {
+            json = @entry.as_json(include: :attachment,
+                                  methods: [:user_name, :read_state],
+                                  permissions: {
+                                    user: @current_user,
+                                    session: session })
+            render(json: json, status: :created)
+          }
         else
-          format.html { render :action => "new" }
-          format.json { render :json => @entry.errors, :status => :bad_request }
-          format.text { render :json => @entry.errors, :status => :bad_request }
+          respond_to_bad_request(format, 'new')
         end
       end
     end
@@ -100,28 +101,18 @@ class DiscussionEntriesController < ApplicationController
     @entry.current_user = @current_user
     @entry.attachment_id = nil if @remove_attachment == '1'
     if authorized_action(@entry, @current_user, :update)
-      return if params[:attachment] && params[:attachment][:uploaded_data] &&
-        params[:attachment][:uploaded_data].size > 1.kilobytes &&
-        @entry.grants_right?(@current_user, session, :attach) &&
-        quota_exceeded(named_context_url(@context, :context_discussion_topic_url, @topic.id))
+      return if context_file_quota_exceeded?
       @entry.editor = @current_user
       respond_to do |format|
         if @entry.update_attributes(params[:discussion_entry].slice(:message, :plaintext_message))
-          if params[:attachment] && params[:attachment][:uploaded_data] && params[:attachment][:uploaded_data].size > 0 && @entry.grants_right?(@current_user, session, :attach)
-            @attachment = @context.attachments.create(params[:attachment])
-            @entry.attachment = @attachment
-            @entry.save
-          end
+          save_attachment
           format.html {
             flash[:notice] = t :updated_entry_notice, 'Entry was successfully updated.'
             redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id)
           }
           format.json { render :json => discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name]).first }
-          format.text {  render :json => discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name]).first }
         else
-          format.html { render :action => "edit" }
-          format.json { render :json => @entry.errors, :status => :bad_request }
-          format.text { render :json => @entry.errors, :status => :bad_request }
+          respond_to_bad_request(format, 'edit')
         end
       end
     end
@@ -210,4 +201,49 @@ class DiscussionEntriesController < ApplicationController
     end
   end
 
+  private
+
+  # Internal: Determine if the current user can attach a file to the entry.
+  #
+  # min_filesize - The minimum size the file can be (default: 0).
+  #
+  # Returns a boolean.
+  def can_attach?(min_filesize = 0)
+    return false unless attachment = params[:attachment]
+
+    attachment[:uploaded_data].try(:size).to_i > min_filesize &&
+      @entry.grants_right?(@current_user, session, :attach)
+  end
+
+  # Internal: Save an attachment on the context and entry.
+  #
+  # Returns nothing.
+  def save_attachment
+    return unless can_attach?
+
+    @attachment = @context.attachments.create(params[:attachment])
+    @entry.attachment = @attachment
+    @entry.save
+  end
+
+  # Internal: Determine if the current context's file quota has been exceeded.
+  #
+  # Returns a boolean.
+  def context_file_quota_exceeded?
+    context = named_context_url(@context, :context_discussion_topic_url,
+      @topic.id)
+    can_attach?(1.kilobyte) && quota_exceeded(context)
+  end
+
+
+  # Internal: Respond to a bad request by redirecting or returning error JSON.
+  #
+  # format - The format object from a respond_to block.
+  # action - The action to redirect to for HTML requests.
+  #
+  # Returns nothing.
+  def respond_to_bad_request(format, action)
+    format.html { render(action: action) }
+    format.json { render(json: @entry.errors, status: :bad_request) }
+  end
 end

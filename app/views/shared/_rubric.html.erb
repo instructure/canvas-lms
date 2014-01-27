@@ -20,6 +20,7 @@
   class="rubric_container rubric <%= "assessing" if assessing %> <%= "for_grading" if rubric_association.try(:use_for_grading) %>"
   id="<%= rubric ? "rubric_#{rubric.id}" : "default_rubric" %>"
   style="<%= hidden unless rubric %>"
+  tabindex="0"
 >
   <div class="screenreader-only"><h3><%= t 'rubric', "Rubric" %></h3></div>
   <div class="rubric_title">

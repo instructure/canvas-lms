@@ -38,21 +38,7 @@ class ErrorsController < ApplicationController
       @reports = @reports.where(:category => params[:category])
     end
 
-    # XXX: temporary
-    # will_paginate view helper doesn't currently handle having total_entries
-    # nil. a fix via folio is in gerrit, but we need a stop gap. we can set
-    # total_entries to the real count when we're on the last page, or
-    # n*per_page+1 when on page n where n is less than the last page (so that a
-    # next page link shows up). the check for a record at offset+per_page lets
-    # us know whether the current page is the last page or not. we don't use
-    # exists? because it blows up trying to instantiate something. we don't use
-    # .limit(1).any? or .count > 0 because the count stays zero for some reason
-    # even if there's a record. so... limit(1).pluck(:id), and see if it's
-    # empty. :/
-    scope = @reports
-    @reports = scope.order('id DESC').paginate(:per_page => PER_PAGE, :page => params[:page], :total_entries => nil)
-    @reports.total_entries = @reports.offset + @reports.size
-    @reports.total_entries += 1 if scope.offset(@reports.offset + PER_PAGE).limit(1).pluck(:id).any?
+    @reports = @reports.order('id DESC').paginate(:per_page => PER_PAGE, :page => params[:page], :total_entries => nil)
   end
 
   def show

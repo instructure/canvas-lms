@@ -14,27 +14,25 @@ define [
 
     needs: ['quizzes']
 
-    uiId:( ->
-      "ui-id-#{@get('id')}-1"
-    ).property('id')
-
-    editId:( ->
-      "ui-id-#{@get('id')}-2"
-    ).property('id')
-
-    deleteId:( ->
-      "ui-id-#{@get('id')}-3"
-    ).property('id')
-
     questionCountLabel: (->
       I18n.t('questions', 'Question', count: @get('question_count'))
     ).property('question_count')
 
     canUpdate: true
 
-    publishable: (->
+    disabled: (->
       !@get('unpublishable')
     ).property('unpublishable')
+
+    disabledMessage: I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
+
+    pubUrl: ( ->
+      "/courses/#{environment.get('courseId')}/quizzes/publish"
+    ).property('environment.courseId')
+
+    unPubUrl: ( ->
+      "/courses/#{environment.get('courseId')}/quizzes/unpublish"
+    ).property('environment.courseId')
 
     editTitle: I18n.t('edit_quiz', 'Edit Quiz')
     deleteTitle: I18n.t('delete_quiz', 'Delete Quiz')
@@ -52,7 +50,26 @@ define [
       I18n.t('points', 'pt', count: @get('points_possible'))
     ).property('points_possible')
 
+    updatePublished: (url, publishing) ->
+      ajax(url,
+        type: 'POST',
+        data: {quizzes: [@get('id')]},
+        dataType: 'json'
+      ).then =>
+        @set('published', publishing)
+      .fail =>
+        @set('published', !publishing)
+
     actions:
+      publish: ->
+        @updatePublished(@get('pubUrl'), true)
+
+      unpublish: ->
+        @updatePublished(@get('unPubUrl'), false)
+
+      edit: ->
+        window.location = @get('editUrl')
+
       delete: ->
         ok = window.confirm I18n.t('confirms.delete_quiz', 'Are you sure you want to delete this quiz?')
         quizzesController = @get('controllers.quizzes')

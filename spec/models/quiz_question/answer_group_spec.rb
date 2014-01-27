@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2013 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe QuizQuestion::AnswerGroup do
@@ -105,6 +123,20 @@ describe QuizQuestion::AnswerGroup::Answer do
         @answer[:weight] = 5
         @answer.correct?.should be_false
       end
+    end
+  end
+
+  describe "#any_value_of" do
+    it "returns the value of the first key that exists" do
+      @answer.any_value_of([:answer_weight, :weight]).should == 100
+    end
+
+    it "ignores any keys supplied that don't exist" do
+      @answer.any_value_of([:blah, :weight, :answer_weight, :foo]).should == 100
+    end
+
+    it "returns the supplied default if none of the keys are found" do
+      @answer.any_value_of([:foo], "default").should == "default"
     end
   end
 

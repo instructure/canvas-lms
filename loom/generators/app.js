@@ -1,5 +1,6 @@
 var parent = require('loom/lib/generic_generator');
 var msg = require('loom/lib/message');
+var inflector = require('../lib/inflector');
 
 exports.before = function(env) {
   if (!env.args[0]) {
@@ -10,7 +11,8 @@ exports.before = function(env) {
 
 exports.present = function(appName) {
   return {
-    appName: appName
+    appName: appName,
+    routeName: inflector.objectify(appName)+'Route'
   }
 };
 

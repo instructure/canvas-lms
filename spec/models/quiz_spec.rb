@@ -962,6 +962,14 @@ describe Quiz do
   end
 
   context "custom validations" do
+    context "changinging quiz points" do
+      it "should not allow quiz points higher than allowable by postgres" do
+        q = Quiz.new(:points_possible => 2000000001)
+        q.valid?.should == false
+        q.errors.on(:points_possible).should == "must be less than or equal to 2000000000"
+      end
+    end
+
     context "quiz_type" do
       it "should not save an invalid quiz_type" do
         quiz = @course.quizzes.create! :title => "test quiz"
@@ -1235,6 +1243,41 @@ describe Quiz do
 
   end
 
+  describe "#restrict_answers_for_concluded_course?" do
+    it "returns true if course has concluded and account setting is true" do
+      acct = Account.new
+      acct.settings[:restrict_quiz_questions] = true
+
+      context = Course.new(:conclude_at => 10.minutes.ago)
+      context.stubs(:root_account => acct)
+
+      quiz = Quiz.new(:context => context)
+      quiz.restrict_answers_for_concluded_course?.should be_true
+    end
+
+    it "returns false if course has not concluded" do
+      acct = Account.new
+      acct.settings[:restrict_quiz_questions] = true
+
+      context = Course.new(:conclude_at => 10.minutes.from_now)
+      context.stubs(:root_account => acct)
+
+      quiz = Quiz.new(:context => context)
+      quiz.restrict_answers_for_concluded_course?.should be_false
+    end
+
+    it "returns false if account setting is false" do
+      acct = Account.new
+      acct.settings[:restrict_quiz_questions] = false
+
+      context = Course.new(:conclude_at => 10.minutes.ago)
+      context.stubs(:root_account => acct)
+
+      quiz = Quiz.new(:context => context)
+      quiz.restrict_answers_for_concluded_course?.should be_false
+    end
+  end
+
   context "show_correct_answers" do
     it "totally hides the correct answers" do
       quiz = @course.quizzes.create!({
@@ -1422,6 +1465,25 @@ describe Quiz do
       @quiz.destroy
       @quiz.restore
       @quiz.reload.should be_unpublished
+    end
+  end
+
+  describe '#generate_submission_for_participant' do
+    let :participant do
+      QuizParticipant.new(User.new, 'foobar')
+    end
+
+    it 'should link the generated QS to a user' do
+      subject.expects(:generate_submission).with(participant.user, false)
+
+      subject.generate_submission_for_participant(participant)
+    end
+
+    it 'should link the generated QS to a temporary user code' do
+      subject.expects(:generate_submission).with(participant.user_code, false)
+
+      participant.stubs(:anonymous?).returns true
+      subject.generate_submission_for_participant(participant)
     end
   end
 end

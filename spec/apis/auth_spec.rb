@@ -275,7 +275,7 @@ describe "API Authentication", :type => :integration do
           CASClient::Client.stubs(:new).returns(cas)
 
           get response['Location']
-          response.should redirect_to(@controller.delegated_auth_redirect_uri(cas.add_service_to_login_url(cas_login_url)))
+          response.should redirect_to(controller.delegated_auth_redirect_uri(cas.add_service_to_login_url(cas_login_url)))
 
           get '/login', :ticket => 'ST-abcd'
           response.should be_redirect

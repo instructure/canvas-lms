@@ -67,7 +67,7 @@ class Pseudonym < ActiveRecord::Base
     password_changed? || (send(crypted_password_field).blank? && sis_ssha.blank?) || @require_password
   end
 
-  acts_as_list :scope => :user_id
+  acts_as_list :scope => :user
 
   set_broadcast_policy do |p|
     p.dispatch :confirm_registration
@@ -262,18 +262,7 @@ class Pseudonym < ActiveRecord::Base
     user.save!
     user.email
   end
-  
-  def chat
-    user.chat if user
-  end
-  
-  def chat=(c)
-    return false unless user
-    self.user.chat=(c)
-    user.save!
-    user.chat
-  end
-  
+
   def sms
     user.sms if user
   end

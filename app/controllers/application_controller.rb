@@ -30,6 +30,7 @@ class ApplicationController < ActionController::Base
   end
 
   attr_accessor :active_tab
+  attr_reader :context
 
   include Api
   include LocaleSelection
@@ -532,11 +533,22 @@ class ApplicationController < ActionController::Base
     @context = @courses.first
 
     if @just_viewing_one_course
-      @groups = @context.assignment_groups.active.includes(:active_assignments)
-      @assignments = @groups.map(&:active_assignments).flatten
+
+      # fake assignment used for checking if the @current_user can read unpublished assignments
+      fake = @context.assignments.new
+      fake.workflow_state = 'unpublished'
+
+      assignment_scope = :active_assignments
+      if @context.feature_enabled?(:draft_state) && !fake.grants_right?(@current_user, session, :read)
+        # user should not see unpublished assignments
+        assignment_scope = :published_assignments
+      end
+
+      @groups = @context.assignment_groups.active.includes(assignment_scope)
+      @assignments = @groups.flat_map(&assignment_scope)
     else
       assignments_and_groups = Shard.partition_by_shard(@courses) do |courses|
-        [[Assignment.active.for_course(courses).all,
+        [[Assignment.published.for_course(courses).all,
          AssignmentGroup.active.for_course(courses).order(:position).all]]
       end
       @assignments = assignments_and_groups.map(&:first).flatten
@@ -1214,8 +1226,6 @@ class ApplicationController < ActionController::Base
         !!Kaltura::ClientV3.config
       elsif feature == :web_conferences
         !!WebConference.config
-      elsif feature == :tinychat
-        !!Tinychat.config
       elsif feature == :scribd
         !!ScribdAPI.config
       elsif feature == :scribd_html5
@@ -1492,16 +1502,24 @@ class ApplicationController < ActionController::Base
       if !browser_supported? && !@embedded_view && !cookies['unsupported_browser_dismissed']
         notices << {:type => 'warning', :content => unsupported_browser, :classes => 'unsupported_browser'} 
       end
-      if error = flash.delete(:error)
+      if error = flash[:error]
+        flash.delete(:error)
         notices << {:type => 'error', :content => error, :icon => 'warning'}
       end
-      if warning = flash.delete(:warning)
+      if warning = flash[:warning]
+        flash.delete(:warning)
         notices << {:type => 'warning', :content => warning, :icon => 'warning'}
       end
-      if info = flash.delete(:info)
+      if info = flash[:info]
+        flash.delete(:info)
         notices << {:type => 'info', :content => info, :icon => 'info'}
       end
-      if notice = (flash[:html_notice] ? flash.delete(:html_notice).html_safe : flash.delete(:notice))
+      if notice = (flash[:html_notice] ? flash[:html_notice].html_safe : flash[:notice])
+        if flash[:html_notice]
+          flash.delete(:html_notice)
+        else
+          flash.delete(:notice)
+        end
         notices << {:type => 'success', :content => notice, :icon => 'check'}
       end
       notices
@@ -1570,7 +1588,7 @@ class ApplicationController < ActionController::Base
     # the rails "Completed in XXms" line.
     # this is fixed in Rails 3.x
     def complete_request_uri
-      uri = LoggingFilter.filter_uri(request.request_uri)
+      uri = LoggingFilter.filter_uri(request.fullpath)
       "#{request.protocol}#{request.host}#{uri}"
     end
   end
@@ -1628,4 +1646,5 @@ class ApplicationController < ActionController::Base
 
     js_env hash
   end
+
 end

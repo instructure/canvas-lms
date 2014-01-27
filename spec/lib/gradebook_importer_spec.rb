@@ -111,24 +111,24 @@ describe GradebookImporter do
       hash = @gi.as_json
 
       hash[:students][0][:id].should == @u1.id
-      hash[:students][0][:original_id].should == @u1.id
+      hash[:students][0][:previous_id].should == @u1.id
       hash[:students][0][:name].should eql(@u1.name)
 
       hash[:students][1][:id].should == @u2.id
-      hash[:students][1][:original_id].should == @u2.id
+      hash[:students][1][:previous_id].should == @u2.id
 
       hash[:students][2][:id].should == @u3.id
-      hash[:students][2][:original_id].should == @u3.id
+      hash[:students][2][:previous_id].should == @u3.id
 
       # Looking up by login, but there are no active pseudonyms for u4
       hash[:students][3][:id].should < 0
-      hash[:students][3][:original_id].should be_nil
+      hash[:students][3][:previous_id].should be_nil
 
       hash[:students][4][:id].should == @u5.id
-      hash[:students][4][:original_id].should == @u5.id
+      hash[:students][4][:previous_id].should == @u5.id
 
       hash[:students][5][:id].should <  0
-      hash[:students][5][:original_id].should be_nil
+      hash[:students][5][:previous_id].should be_nil
     end
     
     it "should allow ids that look like numbers" do
@@ -158,10 +158,10 @@ describe GradebookImporter do
       hash = @gi.as_json
 
       hash[:students][0][:id].should == @u0.id
-      hash[:students][0][:original_id].should == @u0.id
+      hash[:students][0][:previous_id].should == @u0.id
 
       hash[:students][1][:id].should == @u1.id
-      hash[:students][1][:original_id].should == @u1.id
+      hash[:students][1][:previous_id].should == @u1.id
     end
   end
 
@@ -269,7 +269,7 @@ describe GradebookImporter do
       students = hash[:students]
       students.should be_is_a(Array)
       student = students.first
-      student.keys.sort.should eql([:id, :last_name_first, :name, :original_id, :submissions])
+      student.keys.sort.should eql([:id, :last_name_first, :name, :previous_id, :submissions])
       submissions = student[:submissions]
       submissions.should be_is_a(Array)
       submission = submissions.first
@@ -277,7 +277,7 @@ describe GradebookImporter do
       assignments = hash[:assignments]
       assignments.should be_is_a(Array)
       assignment = assignments.first
-      assignment.keys.sort.should eql([:grading_type, :id, :original_id, :points_possible, :title])
+      assignment.keys.sort.should eql([:grading_type, :id, :points_possible, :previous_id, :title])
     end
   end
 end

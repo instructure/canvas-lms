@@ -13,7 +13,8 @@
       <a href="#">{{#t "switch_views"}}Switch Views{{/t}}</a>
     </div>
 
-    <textarea class="reply-textarea" id="reply_message_for_{{id}}"></textarea>
+    <textarea class="reply-textarea"
+              id="{{#if root}}root_{{/if}}reply_message_for_{{id}}"></textarea>
 
     <div class="clearfix">
       <div class="discussion-reply-buttons">

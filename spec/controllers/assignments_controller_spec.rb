@@ -91,6 +91,15 @@ describe AssignmentsController do
 
         @course.reload.assignment_groups.count.should == 1
       end
+
+      it "should separate manage_assignments and manage_grades permissions" do
+        course_with_teacher_logged_in active_all: true
+        @course.account.role_overrides.create! enrollment_type: 'TeacherEnrollment', permission: 'manage_assignments', enabled: false
+        get 'index', course_id: @course.id
+        assigns[:js_env][:PERMISSIONS][:manage_grades].should be_true
+        assigns[:js_env][:PERMISSIONS][:manage_assignments].should be_false
+        assigns[:js_env][:PERMISSIONS][:manage].should be_false
+      end
     end
 
     context "sharding" do
@@ -338,7 +347,7 @@ describe AssignmentsController do
       expected_assignment_json = subject.send(:assignment_json, @assignment,
         assigns[:current_user], session)
       expected_assignment_json[:has_submitted_submissions] = @assignment.has_submitted_submissions?
-      assigns[:js_env][:ASSIGNMENT].should == expected_assignment_json
+      assigns[:js_env][:ASSIGNMENT].should == Api.recursively_stringify_json_ids(expected_assignment_json)
       assigns[:js_env][:ASSIGNMENT_OVERRIDES].should ==
         subject.send(:assignment_overrides_json,
                      @assignment.overrides_visible_to(assigns[:current_user]))

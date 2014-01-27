@@ -1,7 +1,7 @@
 # This class both creates the slickgrid instance, and acts as the data source for that instance.
 define [
   'compiled/views/KeyboardNavDialog'
-  'jst/gradebook2/KeyboardNavDialog'
+  'jst/KeyboardNavDialog'
   'vendor/slickgrid'
   'compiled/gradebook2/TotalColumnHeaderView'
   'compiled/util/round'
@@ -18,7 +18,7 @@ define [
   'compiled/gradebook2/SubmissionCell'
   'compiled/gradebook2/GradebookHeaderMenu'
   'str/htmlEscape'
-  'jst/gradebook_uploads_form'
+  'compiled/gradebook2/UploadDialog'
   'jst/gradebook2/section_to_show_menu'
   'jst/gradebook2/column_header'
   'jst/gradebook2/group_total_cell'
@@ -35,7 +35,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, gradebook_uploads_form, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
+], (KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, UploadDialog, sectionToShowMenuTemplate, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate) ->
 
   class Gradebook
     columnWidths =
@@ -169,6 +169,7 @@ define [
             display_name: student.name
             url: student.enrollment.grades.html_url
             sectionNames: sectionNames
+            alreadyEscaped: true
 
           # fill in dummy submissions, so there's something there even if the
           # student didn't submit anything for that assignment
@@ -292,26 +293,14 @@ define [
         column.cssClass = if @show_attendance then '' else 'completely-hidden'
         @$grid.find("##{@uid}#{column.id}").showIf(@show_attendance)
 
-      for id, student of @students
-        student.row = -1
-        if @rowFilter(student)
-          @rows.push(student)
-          @calculateStudentGrade(student)
+      @withAllStudents (students) =>
+        for id, student of @students
+          student.row = -1
+          if @rowFilter(student)
+            @rows.push(student)
+            @calculateStudentGrade(student)
 
-      @rows.sort (a, b) ->
-        a.sortable_name.localeCompare(b.sortable_name,
-          window.I18n.locale,
-          {sensitivity: 'accent', numeric: true})
-
-      for id, student of @studentViewStudents
-        student.row = -1
-        if @rowFilter(student)
-          @rows.push(student)
-          @calculateStudentGrade(student)
-
-
-      student.row = i for student, i in @rows
-      @grid.invalidate()
+      @sortRowsBy (a, b) => @localeSort(a.sortable_name, b.sortable_name)
 
     getSubmissionsChunks: =>
       @withAllStudents (allStudentsObj) =>
@@ -593,8 +582,12 @@ define [
           'mouseleave.gradebook focusout.gradebook' : @unhighlightColumns
           'mouseenter focusin' : (event) ->
             grid.find('.hover, .focus').removeClass('hover focus')
+            if $(this).parent().css('top') == '0px'
+              $(this).find('div.gradebook-tooltip').addClass('first-row')
             $(this).addClass (if event.type == 'mouseenter' then 'hover' else 'focus')
-          'mouseleave focusout' : -> $(this).removeClass('hover focus')
+          'mouseleave focusout' : (event) ->
+            $(this).removeClass('hover focus')
+            $(this).find('div.gradebook-tooltip').removeClass('first-row')
         .delegate '.gradebook-cell-comment', 'click.gradebook', (event) =>
           event.preventDefault()
           data = $(event.currentTarget).data()
@@ -740,23 +733,9 @@ define [
 
       $('#gradebook_settings').show().kyleMenu()
 
-      $upload_modal = null
       $settingsMenu.find('.gradebook_upload_link').click (event) =>
         event.preventDefault()
-        unless $upload_modal
-          locals =
-            download_gradebook_csv_url: "#{@options.context_url}/gradebook.csv"
-            action: "#{@options.context_url}/gradebook_uploads"
-            authenticityToken: ENV.AUTHENTICITY_TOKEN
-          $upload_modal = $(gradebook_uploads_form(locals))
-            .dialog
-              bgiframe: true
-              autoOpen: false
-              modal: true
-              width: 720
-              resizable: false
-            .fixDialogButtons()
-        $upload_modal.dialog('open')
+        new UploadDialog(@options.context_url)
 
       $settingsMenu.find('.student_names_toggle').click (e) ->
         $wrapper = $('.grid-canvas')
@@ -923,7 +902,7 @@ define [
 
       @aggregateColumns = for id, group of @assignmentGroups
         html = "#{group.name}"
-        if group.group_weight?
+        if group.group_weight? and @weightedGroups()
           percentage =  I18n.toPercentage(group.group_weight, precision: 2)
           html += """
             <div class='assignment-points-possible'>
@@ -978,6 +957,7 @@ define [
       }, @options)
 
       @grid = new Slick.Grid('#gradebook_grid', @rows, @getVisibleGradeGridColumns(), options)
+      @grid.setSortColumn("student")
       # this is the magic that actually updates group and final grades when you edit a cell
 
       @grid.onCellChange.subscribe (event, data) =>
@@ -985,7 +965,35 @@ define [
         @grid.invalidate()
       # this is a faux blur event for SlickGrid.
       $('body').on('click', @onGridBlur)
-      respectorOfPersonsSort = (sortFn) =>
+
+      @grid.onSort.subscribe (event, data) =>
+        if data.sortCol.field == "display_name" || data.sortCol.field == "secondary_identifier"
+          sortProp = if data.sortCol.field == "display_name"
+            "sortable_name"
+          else
+            "secondary_identifier"
+          @sortRowsBy (a, b) =>
+            [b, a] = [a, b] if not data.sortAsc
+            @localeSort(a[sortProp], b[sortProp])
+        else
+          @sortRowsBy (a, b) ->
+            aScore = a[data.sortCol.field]?.score
+            bScore = b[data.sortCol.field]?.score
+            aScore = -99999999999 if not aScore and aScore != 0
+            bScore = -99999999999 if not bScore and bScore != 0
+            if data.sortAsc then aScore - bScore else bScore - aScore
+
+      @grid.onKeyDown.subscribe ->
+        # TODO: start editing automatically when a number or letter is typed
+        false
+
+      @grid.onColumnsReordered.subscribe @storeCustomColumnOrder
+
+      @onGridInit()
+
+
+    sortRowsBy: (sortFn) ->
+      respectorOfPersonsSort = =>
         if _(@studentViewStudents).size()
           (a, b) =>
             if @studentViewStudents[a.id]
@@ -997,12 +1005,11 @@ define [
         else
           sortFn
 
-      sortRowsBy = (sortFn) =>
-        @rows.sort(respectorOfPersonsSort(sortFn))
-        for student, i in @rows
-          student.row = i
-          @addDroppedClass(student)
-        @grid.invalidate()
+      @rows.sort respectorOfPersonsSort()
+      for student, i in @rows
+        student.row = i
+        @addDroppedClass(student)
+      @grid.invalidate()
       @grid.onSort.subscribe (event, data) =>
         sortRowsBy (a, b) ->
           aScore = a[data.sortCol.field]?.score
@@ -1020,13 +1027,10 @@ define [
           else 0
           if data.sortAsc then res else 0 - res
 
-      @grid.onKeyDown.subscribe ->
-        # TODO: start editing automatically when a number or letter is typed
-        false
-
-      @grid.onColumnsReordered.subscribe @storeCustomColumnOrder
-
-      @onGridInit()
+    localeSort: (a, b) =>
+      a.localeCompare b,
+        window.I18n.locale,
+        sensitivity: 'accent', numeric: true
 
     # show warnings for bad grading setups
     setAssignmentWarnings: =>

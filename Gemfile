@@ -25,10 +25,17 @@ if CANVAS_RAILS2
   else
     gem 'rails', :github => 'makandra/rails', :branch => '2-3-lts', :ref => 'e86daf8ff727d5efc0040c876ba00c9444a5d915'
   end
+  # AMS needs to be loaded BEFORE authlogic because it defines the constant
+  # "ActiveModel", and aliases ActiveRecord::Errors to ActiveModel::Errors
+  # so Authlogic will use the right thing when it detects that ActiveModel
+  # is defined.
+  gem 'active_model_serializers_rails_2.3', '0.9.0pre2', require: 'active_model_serializers'
   gem 'authlogic', '2.1.3'
 else
   # just to be clear, Canvas is NOT READY to run under Rails 3 in production
   gem 'rails', '3.2.15'
+  gem 'active_model_serializers', '0.9.0pre',
+    :github => 'rails-api/active_model_serializers', :ref => '99fa399ae6dc071b97b15e1ef2b42f0d23c492ec'
   gem 'authlogic', '3.2.0'
 end
 
@@ -37,16 +44,15 @@ gem 'barby', '0.5.0'
 gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
 # enforce the version of bundler itself, to avoid any surprises
-gem 'bundler', '1.3.5'
+gem 'bundler', ['>=1.3.5', '<=1.5.1', '!=1.5.0']
 gem 'canvas_connect', '0.3.2'
-gem 'canvas_webex', '0.7'
+gem 'canvas_webex', '0.8'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
 if CANVAS_RAILS2
-  gem 'encrypted_cookie_store-instructure', '1.0.4', :require => 'encrypted_cookie_store',
-      :github => "instructure/encrypted_cookie_store", :branch => "rails2", :ref => "d078a875eb510de9b0a75baa97e9332c4480c97e"
+  gem 'encrypted_cookie_store-instructure', '1.0.5', :require => 'encrypted_cookie_store'
 else
-  gem 'encrypted_cookie_store-instructure', '1.1.0', :require => 'encrypted_cookie_store'
+  gem 'encrypted_cookie_store-instructure', '1.1.1', :require => 'encrypted_cookie_store'
 end
 gem 'erubis', '2.7.0'
 if CANVAS_RAILS2
@@ -101,14 +107,17 @@ gem 'zip-zip', '0.2' # needed until plugins use the new namespace
 gem 'safe_yaml-instructure', '0.8.0', :require => false
 gem 'sanitize', '2.0.3'
 gem 'shackles', '1.0.2'
+unless CANVAS_RAILS2
+  gem 'switchman', '0.0.1'
+end
 gem 'tzinfo', '0.3.35'
 gem 'useragent', '0.4.16'
 gem 'uuid', '2.3.2'
 if CANVAS_RAILS2
-  gem 'folio-pagination-legacy', :github => "instructure/folio", :ref => "5f7d23fbab78ee263d9a7799e6fd2eaf4868b862"
+  gem 'folio-pagination-legacy', '0.0.3', :require => 'folio/rails'
   gem 'will_paginate', '2.3.15', :require => false
 else
-  gem 'folio-pagination', :github => "instructure/folio", :ref => "b530e4b56a69c234fb0dd48fd69fa801cb109257"
+  gem 'folio-pagination', '0.0.3', :require => 'folio/rails'
   gem 'will_paginate', '3.0.4', :require => false
 end
 gem 'xml-simple', '1.0.12', :require => 'xmlsimple'
@@ -149,6 +158,7 @@ group :test do
     gem 'rspec', '2.13.0'
     gem 'rspec-rails', '2.13.0'
   end
+  gem 'sequel', '4.5.0', :require => false
   gem 'selenium-webdriver', '2.37.0'
   gem 'webrat', '0.7.3'
   gem 'yard', '0.8.0'
@@ -168,7 +178,7 @@ group :development do
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
-    gem 'byebug', :github => 'deivid-rodriguez/byebug', :platforms => :ruby_20
+    gem 'byebug', '2.4.1', :platforms => :ruby_20
     gem 'debugger', '1.5.0', :platforms => :ruby_19
   end
 end

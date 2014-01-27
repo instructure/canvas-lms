@@ -15,7 +15,8 @@ define([
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
   'compiled/jquery.rails_flash_notifications',
-  'jquery.templateData' /* fillTemplateData, getTemplateData */
+  'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'jquery.instructure_date_and_time' /* parseFromISO, date_field */
 
 ], function(INST, I18n, $, _, newConferenceTemplate, concludedConferenceTemplate, editConferenceFormTemplate, userSettingOptionsTemplate) {
 
@@ -29,6 +30,8 @@ define([
       conferenceData['recording'] = conferenceData.recordings[0];
       conferenceData['recordingCount'] = conferenceData.recordings.length;
       conferenceData['multipleRecordings'] = conferenceData.recordingCount > 1;
+      conferenceData['scheduled'] = 'scheduled_date' in conferenceData.user_settings
+      conferenceData['scheduled_at'] = conferenceData.user_settings.scheduled_date
       $conference_row = $(newConferenceTemplate(conferenceData));
       $conference_row.data('conference', conferenceData);
       return $conference_row;
@@ -89,6 +92,16 @@ define([
           case 'text':
             optionObj['isText'] = true;
             optionObj['value'] = currentVal;
+            break;
+          case 'date_picker':
+            if(currentVal){
+              optionObj['value'] = $.parseFromISO(currentVal).datetime.toString($.datetime.defaultFormat)
+            }
+            else{
+              optionObj['value'] = currentVal;
+            }
+            optionObj['isDatePicker'] = true;
+            break;
           }
         });
       });
@@ -122,6 +135,12 @@ define([
         conference: conferenceData,
         conference_started: !!conferenceData['started_at']
       }));
+      $('.date_entry').each(function() {
+          if(!this.disabled){
+              $(this).datetime_field({alwaysShowTime: true});
+          }
+      });
+        //$(".date_entry").datetime_field({alwaysShowTime: true});
     };
 
     var updatedConferenceListCount = function(){
@@ -276,6 +295,26 @@ define([
       // Reflect the current 'all users" state
       $dialog.find(".all_users_checkbox").trigger('change');
       $dialog.dialog('open');
+    });
+    $('body').on('click', '.start-button', function(event) {
+      var w = window.open(this.href, '_blank');
+      if (!w) {return;}
+      event.preventDefault();
+
+      w.onload = function() {
+        window.location.reload(true);
+      };
+
+      // cross-domain
+      var i = setInterval(function() {
+        if (!w) {return;}
+        try {
+          var href = w.location.href;
+        } catch (e) {
+          clearInterval(i);
+          window.location.reload(true);
+        }
+      }, 100);
     });
     $('body').on('click', '.delete_conference_link', function(event) {
       event.preventDefault();

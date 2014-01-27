@@ -452,8 +452,13 @@ describe AssignmentOverrideApplicator do
     end
 
     it "should copy pre-loaded associations" do
-      @overridden.loaded_context?.should == @assignment.loaded_context?
-      @overridden.loaded_rubric?.should == @assignment.loaded_rubric?
+      if CANVAS_RAILS2
+        @overridden.loaded_context?.should == @assignment.loaded_context?
+        @overridden.loaded_rubric?.should == @assignment.loaded_rubric?
+      else
+        @overridden.association(:context).loaded?.should == @assignment.association(:context).loaded?
+        @overridden.association(:rubric).loaded?.should == @assignment.association(:rubric).loaded?
+      end
       @overridden.learning_outcome_alignments.loaded? == @assignment.learning_outcome_alignments.loaded?
     end
   end

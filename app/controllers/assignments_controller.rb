@@ -42,7 +42,7 @@ class AssignmentsController < ApplicationController
       @context.require_assignment_group
 
       permissions = @context.grants_rights?(@current_user, :manage_assignments, :manage_grades)
-      permissions[:manage] = permissions[:manage_assignments] || permissions[:manage_grades]
+      permissions[:manage] = permissions[:manage_assignments]
       js_env({
         :URLS => {
           :new_assignment_url => new_polymorphic_url([@context, :assignment]),
@@ -133,7 +133,9 @@ class AssignmentsController < ApplicationController
 
       begin
         @google_docs_token = google_docs_retrieve_access_token
-      rescue RuntimeError => ex; end
+      rescue NoTokenError
+        #do nothing
+      end
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
       log_asset_access(@assignment, "assignments", @assignment.assignment_group)
@@ -159,8 +161,11 @@ class AssignmentsController < ApplicationController
     assignment ||= @context.assignments.find(params[:id])
     # prevent masquerading users from accessing google docs
     if assignment.allow_google_docs_submission? && @real_current_user.blank?
+      docs = {}
       begin
         docs = google_docs_list_with_extension_filter(assignment.allowed_extensions)
+      rescue NoTokenError
+        #do nothing
       rescue => e
         ErrorReport.log_exception(:oauth, e)
         raise e
@@ -358,8 +363,12 @@ class AssignmentsController < ApplicationController
         select { |c| !c.student_organized? }.
         map { |c| { :id => c.id, :name => c.name } }
 
+      json_for_assignment_groups = assignment_groups.map do |group|
+        assignment_group_json(group, @current_user, session, [], {stringify_json_ids: true})
+      end
+
       hash = {
-        :ASSIGNMENT_GROUPS => assignment_groups.map{|g| assignment_group_json(g, @current_user, session, [], {stringify_json_ids: stringify_json_ids?}) },
+        :ASSIGNMENT_GROUPS => Api.recursively_stringify_json_ids(json_for_assignment_groups),
         :GROUP_CATEGORIES => group_categories,
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
         :SECTION_LIST => (@context.course_sections.active.map { |section|
@@ -369,7 +378,8 @@ class AssignmentsController < ApplicationController
           (assignment_overrides_json(@assignment.overrides_visible_to(@current_user))),
         :ASSIGNMENT_INDEX_URL => polymorphic_url([@context, :assignments]),
       }
-      hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
+
+      hash[:ASSIGNMENT] = Api.recursively_stringify_json_ids(assignment_json(@assignment, @current_user, session, override_dates: false))
       hash[:ASSIGNMENT][:has_submitted_submissions] = @assignment.has_submitted_submissions?
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])

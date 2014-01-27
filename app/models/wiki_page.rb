@@ -292,11 +292,12 @@ class WikiPage < ActiveRecord::Base
   def can_edit_page?(user, session=nil)
     context_roles = context.default_wiki_editing_roles rescue nil
     roles = (editing_roles || context_roles || default_roles).split(",")
+    roles.clear if roles == %w(teachers) # "Only teachers" option doesn't grant rights excluded by RoleOverrides
 
     # managers are always allowed to edit
     return true if wiki.grants_right?(user, session, :manage)
 
-    return true if roles.include?('teachers') && context.respond_to?(:teachers) && context.teachers.include?(user)
+    return true if roles.include?('teachers') && context.respond_to?(:admins) && context.admins.include?(user)
     # the remaining edit roles all require read access, so just check here
     return false unless can_read_page?(user, session) && !self.locked_for?(user)
     return true if roles.include?('students') && context.respond_to?(:students) && context.includes_student?(user)

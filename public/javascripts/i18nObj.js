@@ -23,14 +23,14 @@ I18n.locale = document.documentElement.getAttribute('lang');
 // anything not already safe should be html-escaped
 I18n.PLACEHOLDER = /%h?\{(.*?)\}/gm;
 
-I18n.isValidNode = function(obj, node) { 
+I18n.isValidNode = function(obj, node) {
   // handle names like "foo.bar.baz"
   var nameParts = node.split('.');
   for (var j=0; j < nameParts.length; j++) {
     obj = obj[nameParts[j]];
     if (typeof obj === 'undefined' || obj === null) return false;
   }
-  return true; 
+  return true;
 };
 
 I18n.lookup = function(scope, options) {
@@ -146,7 +146,7 @@ I18n.applyWrappers = function(string, wrappers) {
     keys.push(key);
   }
   keys.sort().reverse();
-  for (var i in keys) {
+  for (var i=0, l=keys.length; i < l; i++) {
     key = keys[i];
     if (!this.wrapperRegexes[key]) {
       var escapedKey = escapeRegex(key);

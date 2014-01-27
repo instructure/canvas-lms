@@ -133,6 +133,17 @@ define [
     # Returns the formatted String
     formattedDayString: (event) =>
       I18n.l('#date.formats.short_with_weekday', event.originalStart)
+    
+    # Internal: returns the 'start' of the event formatted for the template
+    # Shown to screen reader users, so they hear real month and day names, and
+    # not letters like "D E C" or "W E D", or words like "dec" (read "deck")
+    #
+    # event - the event to format
+    #
+    # Returns the formatted String
+    formattedLongDayString: (event) =>
+      I18n.l '#date.formats.long_with_weekday', event.originalStart
+      
 
     # Internal: change a box of events into an output hash for toJSON
     #
@@ -148,6 +159,7 @@ define [
         now.getMonth() == start.getMonth() &&
         now.getFullYear() == start.getFullYear()
       date: @formattedDayString(event)
+      accessibleDate: @formattedLongDayString(event)
       isToday: isToday
       events: events
 

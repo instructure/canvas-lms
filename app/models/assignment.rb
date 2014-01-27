@@ -31,7 +31,7 @@ class Assignment < ActiveRecord::Base
   include Canvas::DraftStateValidations
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
-    :min_score, :max_score, :mastery_score, :grading_type, :submission_types,
+    :grading_type, :submission_types,
     :assignment_group, :unlock_at, :lock_at, :group_category, :group_category_id,
     :peer_review_count, :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
@@ -39,7 +39,7 @@ class Assignment < ActiveRecord::Base
     :context, :position, :allowed_extensions, :external_tool_tag_attributes,
     :freeze_on_copy, :assignment_group_id
 
-  attr_accessor :original_id, :updating_user, :copying
+  attr_accessor :previous_id, :updating_user, :copying
 
   attr_reader :assignment_changed
 
@@ -124,7 +124,7 @@ class Assignment < ActiveRecord::Base
   validates_length_of :allowed_extensions, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
 
-  acts_as_list :scope => :assignment_group_id
+  acts_as_list :scope => :assignment_group
   simply_versioned :keep => 5
   sanitize_field :description, Instructure::SanitizeField::SANITIZE
   copy_authorized_links( :description) { [self.context, nil] }
@@ -236,7 +236,10 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_grades_if_details_changed
-    if @points_possible_was != self.points_possible || @grades_affected || @muted_was != self.muted
+    if @points_possible_was != self.points_possible ||
+        @grades_affected ||
+        @muted_was != self.muted ||
+        workflow_state_changed?
       connection.after_transaction_commit { self.context.recompute_student_scores }
     end
     true
@@ -304,7 +307,6 @@ class Assignment < ActiveRecord::Base
     if !self.assignment_group || (self.assignment_group.deleted? && !self.deleted?)
       ensure_assignment_group(false)
     end
-    self.mastery_score = [self.mastery_score, self.points_possible].min if self.mastery_score && self.points_possible
     self.submission_types ||= "none"
     self.peer_reviews_assign_at = [self.due_at, self.peer_reviews_assign_at].compact.max
     @workflow_state_was = self.workflow_state_was
@@ -458,18 +460,18 @@ class Assignment < ActiveRecord::Base
 
     p.dispatch :assignment_created
     p.to { participants }
-    p.whenever { |record|
-      record.context.available? &&
-      record.just_created
+    p.whenever { |assignment|
+      policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
+      policy.should_dispatch_assignment_created?
     }
-    p.filter_asset_by_recipient { |record, user|
-      record.overridden_for(user)
+    p.filter_asset_by_recipient { |assignment, user|
+      assignment.overridden_for(user)
     }
 
     p.dispatch :assignment_unmuted
     p.to { participants }
-    p.whenever { |record|
-      record.recently_unmuted
+    p.whenever { |assignment|
+      assignment.recently_unmuted
     }
 
   end
@@ -792,7 +794,7 @@ class Assignment < ActiveRecord::Base
     can :submit and can :attach_submission_comment_files
 
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }
-    can :update and can :grade and can :delete and can :create and can :read and can :attach_submission_comment_files
+    can :grade and can :read and can :attach_submission_comment_files
 
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }
     can :update and can :delete and can :create and can :read and can :attach_submission_comment_files
@@ -1510,7 +1512,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def readable_submission_types
-    return nil unless self.expects_submission?
+    return nil unless expects_submission? || expects_external_submission?
     res = (self.submission_types || "").split(",").map{|s| readable_submission_type(s) }.compact
     res.to_sentence(:or)
   end
@@ -1529,6 +1531,10 @@ class Assignment < ActiveRecord::Base
       t 'submission_types.a_discussion_post', "a discussion post"
     when 'media_recording'
       t 'submission_types.a_media_recording', "a media recording"
+    when 'on_paper'
+      t 'submission_types.on_paper', "on paper"
+    when 'external_tool'
+      t 'submission_types.external_tool', "an external tool"
     else
       nil
     end
@@ -1676,8 +1682,8 @@ class Assignment < ActiveRecord::Base
 
     [:turnitin_enabled, :peer_reviews_assigned, :peer_reviews,
      :automatic_peer_reviews, :anonymous_peer_reviews,
-     :grade_group_students_individually, :allowed_extensions, :min_score,
-     :max_score, :mastery_score, :position, :peer_review_count
+     :grade_group_students_individually, :allowed_extensions,
+     :position, :peer_review_count
     ].each do |prop|
       item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
     end

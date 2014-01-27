@@ -22,36 +22,44 @@
 #
 # For each endpoint, a compound document is returned. The primary collection of
 # event objects is paginated, ordered by date descending. Secondary collections
-# of pseudonyms (logins), accounts, and users related to the returned events
-# are also included. Refer to the Logins, Accounts, and Users APIs for
-# descriptions of the objects in those collections.
+# of logins, accounts, page views, and users related to the returned events
+# are also included. Refer to the Logins, Accounts, Page Views, and Users APIs 
+# for descriptions of the objects in those collections.
 #
 # @object AuthenticationEvent
 #     {
+#       // ID of the event.
+#       "id": "e2b76430-27a5-0131-3ca1-48e0eb13f29b",
+#
 #       // timestamp of the event
 #       "created_at": "2012-07-19T15:00:00-06:00",
 #
 #       // authentication event type ('login' or 'logout')
 #       "event_type": "login",
+# 
+#       "links": {
+#          // ID of the login associated with the event
+#          "login_id": 9478,
 #
-#       // ID of the pseudonym (login) associated with the event
-#       "pseudonym_id": 9478,
+#          // ID of the account associated with the event. will match the
+#          // account_id in the associated login.
+#          "account_id": 2319,
 #
-#       // ID of the account associated with the event. will match the
-#       // account_id in the associated pseudonym.
-#       "account_id": 2319,
+#          // ID of the user associated with the event will match the user_id in
+#          // the associated login.
+#          "user_id": 362,
 #
-#       // ID of the user associated with the event will match the user_id in
-#       // the associated pseudonym.
-#       "user_id": 362
+#          // ID of the page view during the event if it exists.
+#          "page_view_id": "e2b76430-27a5-0131-3ca1-48e0eb13f29b"
+#       }
 #     }
 #
 class AuthenticationAuditApiController < ApplicationController
   include Api::V1::AuthenticationEvent
 
-  # @API Query by pseudonym.
+  # @API Query by login.
   #
-  # List authentication events for a given pseudonym.
+  # List authentication events for a given login.
   #
   # @argument start_time [Optional, DateTime]
   #   The beginning of the time range from which you want events.
@@ -59,11 +67,11 @@ class AuthenticationAuditApiController < ApplicationController
   # @argument end_time [Optional, Datetime]
   #   The end of the time range from which you want events.
   #
-  def for_pseudonym
-    @pseudonym = Pseudonym.active.find(params[:pseudonym_id])
+  def for_login
+    @pseudonym = Pseudonym.active.find(params[:login_id])
     if account_visible(@pseudonym.account) || account_visible(Account.site_admin)
       events = Auditors::Authentication.for_pseudonym(@pseudonym, date_options)
-      render_events(events, @pseudonym)
+      render_events(events, @pseudonym, api_v1_audit_authentication_login_url(@pseudonym))
     else
       render_unauthorized_action
     end
@@ -133,8 +141,8 @@ class AuthenticationAuditApiController < ApplicationController
     account.grants_rights?(@current_user, nil, :view_statistics, :manage_user_logins).values.any?
   end
 
-  def render_events(events, context)
-    route = polymorphic_url([:api_v1, :audit_authentication, context])
+  def render_events(events, context, route=nil)
+    route ||= polymorphic_url([:api_v1, :audit_authentication, context])
     events = Api.paginate(events, self, route)
     render :json => authentication_events_compound_json(events, @current_user, session)
   end

@@ -45,15 +45,21 @@ class PageView < ActiveRecord::Base
     self.new(attributes).tap do |p|
       p.url = LoggingFilter.filter_uri(request.url)[0,255]
       p.http_method = request.method.to_s
-      p.remote_ip = request.remote_ip
       p.controller = request.path_parameters['controller']
       p.action = request.path_parameters['action']
       p.session_id = request.session_options[:id].to_s.force_encoding(Encoding::UTF_8).presence
-      p.user_agent = request.user_agent.try(:force_encoding, Encoding::UTF_8)
+      p.user_agent = request.user_agent
+      p.remote_ip = request.remote_ip
       p.interaction_seconds = 5
       p.created_at = Time.now
       p.updated_at = Time.now
       p.id = RequestContextGenerator.request_id
+      p.export_columns.each do |c|
+        v = p.send(c)
+        if !v.nil? && v.respond_to?(:force_encoding)
+          p.send("#{c}=", v.force_encoding(Encoding::UTF_8))
+        end
+      end
     end
   end
 
@@ -304,8 +310,9 @@ class PageView < ActiveRecord::Base
   def export_columns(format = nil)
     PageView::EXPORTED_COLUMNS
   end
+
   def to_row(format = nil)
-    export_columns(format).map { |c| self.send(c) }
+    export_columns(format).map { |c| self.send(c).presence }
   end
 
   # utility class to migrate a postgresql/mysql/sqlite3 page_views table to cassandra

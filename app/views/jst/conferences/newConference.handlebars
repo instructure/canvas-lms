@@ -14,6 +14,9 @@
     {{/if}}
     <div class="ig-details row-fluid">
       <div class="span4 ellipses">{{description}}</div>
+      {{#if scheduled}}
+        <div class="span4 ellipses">{{datetimeFormatted scheduled_at}}</div>
+      {{/if}}
       <div class="span4 ellipses {{#if has_actions}}has_actions{{/if}}">
         {{#if started_at}}
           <span class="label label-success">{{#t "in_progress"}}In Progress{{/t}}</span>

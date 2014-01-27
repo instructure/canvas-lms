@@ -291,6 +291,13 @@ describe PageView do
       pv.reload
       pv.url.should ==  'http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]'
     end
+
+    it "should force encoding on string fields" do
+      request = stub(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0'.encode(Encoding::US_ASCII))
+      pv = PageView.generate(request,attributes)
+
+      pv.remote_ip.encoding.should == Encoding::UTF_8
+    end
   end
 
   describe ".find_all_by_id" do

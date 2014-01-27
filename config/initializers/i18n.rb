@@ -179,8 +179,8 @@ else
   ActionView::TemplateRenderer.class_eval do
     def render_template_with_assign(template, *a)
       old_i18n_scope = @lookup_context.i18n_scope
-      @lookup_context.i18n_scope = @current_template.virtual_path.sub(/\/_/, '/').gsub('/', '.')
-      _render_template_without_assign(template, *a)
+      @lookup_context.i18n_scope = template.virtual_path.sub(/\/_/, '/').gsub('/', '.')
+      render_template_without_assign(template, *a)
     ensure
       @lookup_context.i18n_scope = old_i18n_scope
     end

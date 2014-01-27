@@ -191,10 +191,25 @@ class UserMerge
           # on the table, and if both the old user and the new user
           # have a submission for the same assignment there will be
           # a conflict.
-          already_there_ids = table.to_s.classify.constantize.where(:user_id => target_user).pluck(unique_id)
-          scope = table.to_s.classify.constantize.where(:user_id => from_user)
-          scope = scope.where("#{unique_id} NOT IN (?)", already_there_ids) unless already_there_ids.empty?
-          scope.update_all(:user_id => target_user)
+          model = table.to_s.classify.constantize
+          already_scope = model.where(:user_id => target_user)
+          scope = model.where(:user_id => from_user)
+          # empty submission objects from e.g. what_if grades will show up in the scope
+          # these records will not have associated quiz_submission records even if the assignment in question is a quiz,
+          # so we only need to fine-tune the scope for Submission
+          if model.name == "Submission"
+            # we prefer submissions that are not simply empty objects
+            # also we delete empty objects in cases of collision so that we don't end up with multiple submission records for a given assignment
+            # for the target user, we
+            # a) delete empty submissions where there is a non-empty submission in the from user
+            # b) don't delete otherwise
+            already_scope.where(unique_id => scope.having_submission.select(unique_id)).without_submission.delete_all
+          end
+          # for the from user
+          # a) we ignore the empty submissions in our update unless the target user has no submission
+          # b) move the empty submission over to the new user if there is no collision, as we don't mind persisting the what_if history in this case
+          # c) if there is an empty submission for each user for this assignment, prefer the target user
+          scope.where("#{unique_id} NOT IN (?)", already_scope.select(unique_id)).update_all(:user_id => target_user)
         rescue => e
           Rails.logger.error "migrating #{table} column user_id failed: #{e.to_s}"
         end

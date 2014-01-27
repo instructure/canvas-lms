@@ -9,10 +9,7 @@ describe "quizzes" do
       :time_limit => 5
     })
 
-    @quiz.quiz_questions.create!(:question_data => {
-        :name => 'test 3',
-        :question_type => 'multiple_choice_question',
-        :answers => {'answer_0' => {'answer_text' => '0'}, 'answer_1' => {'answer_text' => '1'}}})
+    @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
     @quiz.generate_quiz_data
     @quiz.save
     @quiz
@@ -207,6 +204,17 @@ describe "quizzes" do
       take_and_answer_quiz
 
       ff('.correct_answer').length.should > 0
+    end
+
+    it "should always highlight incorrect answers" do
+      @quiz.update_attributes(show_correct_answers: false)
+      @quiz.save!
+
+      take_and_answer_quiz do |answers|
+        answers[1][:id] # don't answer
+      end
+
+      ff('.incorrect.answer_arrow').length.should > 0
     end
   end
 end

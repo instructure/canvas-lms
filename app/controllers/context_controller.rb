@@ -217,64 +217,7 @@ class ContextController < ApplicationController
     @item && @item.destroy
     render :json => @item
   end
-  
-  def chat
-    if !Tinychat.config
-      flash[:error] = t(:chat_not_enabled, "Chat has not been enabled for this Canvas site")
-      redirect_to named_context_url(@context, :context_url)
-      return
-    end
-    if authorized_action(@context, @current_user, :read_roster)
-      return unless tab_enabled?(@context.class::TAB_CHAT)
 
-      add_crumb(t('#crumbs.chat', "Chat"), named_context_url(@context, :context_chat_url))
-      self.active_tab="chat"
-
-      js_env :tinychat => {
-               :room => "inst#{Digest::MD5.hexdigest(@context.asset_string)}",
-               :nick => (@current_user.short_name.gsub(/[^\w]+/, '_').sub(/_\z/, '') rescue 'user'),
-               :key  => Tinychat.config['api_key']
-             }
-
-      res = nil
-      begin
-        session[:last_chat] ||= {}
-        if true || !session[:last_chat][@context.id] || !session[:last_chat][@context.id][:last_check_at] || session[:last_chat][@context.id][:last_check_at] < 5.minutes.ago
-          session[:last_chat][@context.id] = {}
-          session[:last_chat][@context.id][:last_check_at] = Time.now
-          require 'net/http'
-          details_url = URI.parse("http://api.tinychat.com/i-#{ Digest::MD5.hexdigest(@context.asset_string) }.json")
-          req = Net::HTTP::Get.new(details_url.path)
-          data = Net::HTTP.start(details_url.host, details_url.port) {|http|
-            http.read_timeout = 1
-            http.request(req)
-          }
-          res = data
-        end
-      rescue => e
-      rescue Timeout::Error => e
-      end
-      @room_details = session[:last_chat][@context.id][:data] rescue nil
-      if res || !@room_details
-        @room_details = ActiveSupport::JSON.decode(res.body) rescue nil
-      end
-      if @room_details
-        session[:last_chat][@context.id][:data] = @room_details
-      end
-      respond_to do |format|
-        format.html {
-          log_asset_access("chat:#{@context.asset_string}", "chat", "chat")
-          render :action => 'chat'
-        }
-        format.json { render :json => @room_details }
-      end
-    end
-  end
-
-  def chat_iframe
-    render :layout => false
-  end
-  
   def inbox
     redirect_to conversations_url, :status => :moved_permanently
   end

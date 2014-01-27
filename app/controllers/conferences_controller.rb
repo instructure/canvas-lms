@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,6 +16,77 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Conferences
+#
+# API for accessing information on conferences.
+#
+# @object Conference
+#   {
+#     // The id of the conference
+#     "id": 170,
+#
+#     // The type of conference
+#     "conference_type": "AdobeConnect",
+#
+#     // The description for the conference
+#     "description": "Conference Description",
+#
+#     // The expected duration the conference is supposed to last
+#     "duration": 60,
+#
+#     // The date that the conference ended at, null if it hasn't ended
+#     "ended_at": "2013-12-13T17:23:26Z",
+#
+#     // The date the conference started at, null if it hasn't started
+#     "started_at": "2013-12-12T23:02:17Z",
+#
+#     // The title of the conference
+#     "title": "Test conference",
+#
+#     // Array of user ids that are participants in the conference
+#     "users": [
+#       1,
+#       7,
+#       8,
+#       9,
+#       10
+#     ],
+#
+#     // True if the conference type has advanced settings.
+#     "has_advanced_settings": false,
+#
+#     // If true the conference is long running and has no expected end time
+#     "long_running": false,
+#
+#     // A collection of settings specific to the conference type
+#     "user_settings": {},
+#
+#     // A List of recordings for the conference
+#     "recordings": [
+#       {
+#         //How long the recording is in minutes
+#         "duration_minutes": 0,
+#
+#         // The recording title
+#         "title": "course2: Test conference 3 [170]_0",
+#
+#         // The date the recording was last updated
+#         "updated_at": "2013-12-12T16:09:33.903-07:00",
+#
+#         // The date the recording was created
+#         "created_at": "2013-12-12T16:09:09.960-07:00",
+#
+#         // URL for playback of the recording
+#         "playback_url": "http://example.com/recording_url"
+#       }
+#     ],
+#
+#      // URL for the conference, may be null if the conference type doesn't set it
+#     "url": null,
+#
+#     // URL to join the conference, may be null if the conference type doesn't set it
+#     "join_url": null
+#   }
 class ConferencesController < ApplicationController
   include Api::V1::Conferences
 
@@ -26,35 +97,57 @@ class ConferencesController < ApplicationController
   before_filter :reject_student_view_student
   before_filter :get_conference, :except => [:index, :create]
 
+  # @API List conferences
+  # Retrieve the list of conferences for this context
+  #
+  # This API returns a JSON object containing the list of conferences,
+  # the key for the list of conferences is "conferences"
+  #
+  #  Examples:
+  #     curl 'https://<canvas>/api/v1/courses/<course_id>/conferences' \
+  #         -H "Authorization: Bearer <token>"
+  #
+  #     curl 'https://<canvas>/api/v1/groups/<group_id>/conferences' \
+  #         -H "Authorization: Bearer <token>"
+  #
+  # @returns [Conference]
   def index
-    @new_conferences, @concluded_conferences = @context.web_conferences.select { |conference|
-      conference.grants_right?(@current_user, session, :read)
-    }.partition { |conference|
+    return unless authorized_action(@context, @current_user, :read)
+    return unless tab_enabled?(@context.class::TAB_CONFERENCES)
+    return unless @current_user
+    conferences = @context.grants_right?(@current_user, :manage_content) ?
+      @context.web_conferences :
+      @current_user.web_conferences.where(context_type: @context.class.to_s, context_id: @context.id)
+    api_request? ? api_index(conferences) : web_index(conferences)
+  end
+
+  def api_index(conferences)
+    route = polymorphic_url([:api_v1, @context, :conferences])
+    web_conferences = Api.paginate(conferences, self, route)
+    render json: api_conferences_json(web_conferences, @current_user, session)
+  end
+  protected :api_index
+
+  def web_index(conferences)
+    @new_conferences, @concluded_conferences = conferences.partition { |conference|
       conference.ended_at.nil?
     }
-
-    if authorized_action(@context, @current_user, :read)
-      return unless tab_enabled?(@context.class::TAB_CONFERENCES)
-      log_asset_access("conferences:#{@context.asset_string}", "conferences", "other")
-
-      scope = @context.users
-      if @context.respond_to?(:participating_typical_users)
-        scope = @context.participating_typical_users
-      end
-      @users = scope.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).all.uniq
-
-      permissions = {:permissions => {:user => @current_user, :session => session}}
-      # exposing the initial data as json embedded on page.
-      js_env(
-        current_conferences: conferences_json(@new_conferences, @context, @current_user, session),
-        concluded_conferences: conferences_json(@concluded_conferences, @context, @current_user, session),
-        default_conference: default_conference_json(@context, @current_user, session),
-        conference_type_details: conference_types_json(WebConference.conference_types),
-        users: @users.map{|u| {:id => u.id, :name => u.last_name_first}},
-      )
-
+    log_asset_access("conferences:#{@context.asset_string}", "conferences", "other")
+    scope = @context.users
+    if @context.respond_to?(:participating_typical_users)
+      scope = @context.participating_typical_users
     end
+    @users = scope.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).all.uniq
+    # exposing the initial data as json embedded on page.
+    js_env(
+      current_conferences: ui_conferences_json(@new_conferences, @context, @current_user, session),
+      concluded_conferences: ui_conferences_json(@concluded_conferences, @context, @current_user, session),
+      default_conference: default_conference_json(@context, @current_user, session),
+      conference_type_details: conference_types_json(WebConference.conference_types),
+      users: @users.map { |u| {:id => u.id, :name => u.last_name_first} },
+    )
   end
+  protected :web_index
 
   def show
     if authorized_action(@conference, @current_user, :read)

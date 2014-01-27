@@ -196,6 +196,7 @@ class Submission < ActiveRecord::Base
           when 'immediate'; true
           when 'after_grading'; current_submission_graded?
           when 'after_due_date'; assignment.due_at && assignment.due_at < Time.now.utc
+          when 'never'; false
         end
       )
     }
@@ -461,8 +462,6 @@ class Submission < ActiveRecord::Base
 
   def infer_values
     if assignment
-      self.score = self.assignment.max_score if self.assignment.max_score && self.score && self.score > self.assignment.max_score
-      self.score = self.assignment.min_score if self.assignment.min_score && self.score && self.score < self.assignment.min_score
       self.context_code = assignment.context_code
     end
     self.submitted_at ||= Time.now if self.has_submission? || (self.submission_type && !self.submission_type.empty?)
@@ -730,6 +729,7 @@ class Submission < ActiveRecord::Base
   scope :in_workflow_state, lambda { |provided_state| where(:workflow_state => provided_state) }
 
   scope :having_submission, where("submissions.submission_type IS NOT NULL")
+  scope :without_submission, where(submission_type: nil, workflow_state: "unsubmitted")
 
   scope :include_user, includes(:user)
 
@@ -957,7 +957,7 @@ class Submission < ActiveRecord::Base
     res.user_id = self.user_id
     res.workflow_state = 'assigned' if res.new_record?
     just_created = res.new_record?
-    res.save
+    res.send_reminder! # this method also saves the assessment_request
     case obj
     when User
       user = obj

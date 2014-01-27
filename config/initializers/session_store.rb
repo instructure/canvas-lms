@@ -41,6 +41,7 @@ if CANVAS_RAILS2
   ActionController::Base.session_store = session_store
 else
   CanvasRails::Application.config.session_store(session_store, config)
+  CanvasRails::Application.config.secret_token = config[:secret]
 end
 
 ActionController::Flash::FlashHash.class_eval do

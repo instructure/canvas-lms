@@ -186,6 +186,9 @@ define([
           }
         }
         if(!found) {
+          if (!data.rubric_assessment) {
+            data = { rubric_assessment: data };
+          }
           rubricAssessments.push(data);
           var $option = $(document.createElement('option'));
           $option.val(assessment.id).text(assessment.assessor_name).attr('id', 'rubric_assessment_option_' + assessment.id);
@@ -205,12 +208,16 @@ define([
     $("#rubric_holder .rubric").css('width', 'auto').css('marginTop', 0);
     $(".hide_rubric_link").click(function(event) {
       event.preventDefault();
-      $("#rubric_holder").fadeOut();
+      $("#rubric_holder").fadeOut(function() {
+        $(".assess_submission_link").focus();
+      });
     });
     $(".assess_submission_link").click(function(event) {
       event.preventDefault();
       $("#rubric_assessments_select").change();
-      $("#rubric_holder").fadeIn();
+      $("#rubric_holder").fadeIn(function() {
+        $(this).find('.hide_rubric_link').focus();
+      });
     });
     $("#rubric_assessments_select").change(function() {
       var id = $(this).val();

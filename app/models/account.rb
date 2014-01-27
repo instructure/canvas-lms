@@ -141,6 +141,7 @@ class Account < ActiveRecord::Base
   add_setting :restrict_student_future_view, :boolean => true, :root_only => true, :default => false
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
+  add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
   add_setting :support_url, :root_only => true
@@ -171,6 +172,9 @@ class Account < ActiveRecord::Base
   # invitation.
   add_setting :allow_invitation_previews, :boolean => true, :root_only => true, :default => false
   add_setting :self_registration, :boolean => true, :root_only => true, :default => false
+  # if self_registration_type is 'observer', then only observers (i.e. parents) can self register.
+  # else, any user type can self register.
+  add_setting :self_registration_type, :root_only => true
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
   add_setting :enable_fabulous_quizzes, :boolean => true, :root_only => true, :default => false
@@ -232,6 +236,16 @@ class Account < ActiveRecord::Base
 
   def self_registration?
     !!settings[:self_registration] && canvas_authentication?
+  end
+
+  def self_registration_type
+    settings[:self_registration_type]
+  end
+
+  def self_registration_allowed_for?(type)
+    return false unless self_registration?
+    return false if self_registration_type && type != self_registration_type
+    true
   end
 
   def terms_of_use_url
@@ -331,6 +345,10 @@ class Account < ActiveRecord::Base
   
   def domain
     HostUrl.context_host(self)
+  end
+
+  def self.find_by_domain(domain)
+    self.default if HostUrl.default_host == domain
   end
   
   def root_account?
@@ -660,9 +678,11 @@ class Account < ActiveRecord::Base
     return [] unless user
     @account_users_cache ||= {}
     if self == Account.site_admin
-      @account_users_cache[user] ||= Rails.cache.fetch('all_site_admin_account_users') do
-        self.account_users.all
-      end.select { |au| au.user_id == user.id }.each { |au| au.account = self }
+      shard.activate do
+        @account_users_cache[user] ||= Rails.cache.fetch('all_site_admin_account_users') do
+          self.account_users.all
+        end.select { |au| au.user_id == user.id }.each { |au| au.account = self }
+      end
     else
       @account_chain_ids ||= self.account_chain(:include_site_admin => true).map { |a| a.active? ? a.id : nil }.compact
       @account_users_cache[user] ||= Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|

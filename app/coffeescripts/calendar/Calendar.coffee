@@ -10,7 +10,7 @@ define [
   'underscore'
   'compiled/userSettings'
   'compiled/util/hsvToRgb'
-  'compiled/util/colorSlicer'
+  'bower/color-slicer/dist/color-slicer'
   'jst/calendar/calendarApp'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/commonEventFactory'
@@ -568,6 +568,7 @@ define [
         'month'
 
     loadView: (view) =>
+      return if view == @currentView
       @setCurrentView(view)
 
       $('.agenda-wrapper').removeClass('active')

@@ -21,106 +21,188 @@ module Api::V1::DiscussionTopics
   include Api::V1::User
   include Api::V1::Attachment
   include Api::V1::Locked
+  include Api::V1::Assignment
 
-  def discussion_topics_api_json(topics, context, user, session)
-    # remove the topics which are not visible for the current user from the returned list of topics
-    topics.reject! { |t| !t.visible_for?(user, :check_policies => true) }
+  # Public: DiscussionTopic fields to serialize.
+  ALLOWED_TOPIC_FIELDS  = %w{id title assignment_id delayed_post_at lock_at
+    last_reply_at posted_at root_topic_id podcast_has_student_posts
+    discussion_type position}
 
-    topics.map do |topic|
-      discussion_topic_api_json(topic, context, user, session)
-    end
-  end
+  # Public: DiscussionTopic methods to serialize.
+  ALLOWED_TOPIC_METHODS = [:user_name, :discussion_subentry_count]
 
-  def discussion_topic_api_json(topic, context, user, session, include_assignment = true)
-    attachments = []
-    if topic.attachment
-      attachments << attachment_json(topic.attachment, user)
-    end
-
-    url = nil
-    if topic.podcast_enabled
-      code = (@context_enrollment || @context || context).feed_code
-      url = feeds_topic_format_path(topic.id, code, :rss)
-    end
-
-    children = topic.child_topics.pluck(:id)
-
-    api_json(topic, user, session, {
-                  :only => %w(id title assignment_id delayed_post_at lock_at last_reply_at posted_at root_topic_id podcast_has_student_posts),
-                  :methods => [:user_name, :discussion_subentry_count], }, [:attach, :update, :delete]
-    ).tap do |json|
-      json.merge! :message => api_user_content(topic.message, context),
-                  :discussion_type => topic.discussion_type,
-                  :require_initial_post => topic.require_initial_post?,
-                  :user_can_see_posts => topic.user_can_see_posts?(user),
-                  :podcast_url => url,
-                  :pinned => !!topic.pinned,
-                  :position => topic.position,
-                  :read_state => topic.read_state(user),
-                  :unread_count => topic.unread_count(user),
-                  :subscribed => topic.subscribed?(user),
-                  :topic_children => children,
-                  :attachments => attachments,
-                  :published => topic.published?,
-                  :can_unpublish => topic.can_unpublish?,
-                  :locked => topic.locked?,
-                  :author => user_display_json(topic.user, topic.context),
-                  :html_url => context.is_a?(CollectionItem) ? nil :
-                          named_context_url(context,
-                                            :context_discussion_topic_url,
-                                            topic,
-                                            :include_host => true)
-      subscription_hold = topic.subscription_hold(user, @context_enrollment, session)
-      json[:subscription_hold] = subscription_hold if subscription_hold
-      locked_json(json, topic, user, session)
-      json[:url] = json[:html_url] # deprecated
-      if include_assignment && topic.assignment
-        extend Api::V1::Assignment
-        json[:assignment] = assignment_json(topic.assignment, user, session, include_discussion_topic: false)
-      end
-      json
-    end
-  end
-
-  # this is called normally from controllers, but also in non-controller
-  # context by the code to build the optimized materialized view of the
-  # discussion
+  # Public: Serialize an array of DiscussionTopic objects for returning as JSON.
   #
-  # there is no specific user attached to this view of the discussion, the same
-  # json is returned to all users who can access the discussion, so it's a bit
-  # different than our normal api_json helpers
+  # topics - An array of DiscussionTopic objects.
+  # context - The current context.
+  # user - The current user.
+  # session - The current session.
+  #
+  # Returns an array of hashes.
+  def discussion_topics_api_json(topics, context, user, session)
+    topics.inject([]) do |result, topic|
+      if topic.visible_for?(user, check_policies: true)
+        result << discussion_topic_api_json(topic, context, user, session)
+      end
+
+      result
+    end
+  end
+
+  # Public: Serialize a discussion topic for returning as JSON.
+  #
+  # topic - The discussion topic to serialize.
+  # context - The current context.
+  # user - The requesting user.
+  # session - The current session.
+  # include_assignment - Optionally include the topic's assignment, if any (default: true).
+  #
+  # Returns a hash.
+  def discussion_topic_api_json(topic, context, user, session, include_assignment = true)
+    json = api_json(topic, user, session, {only: ALLOWED_TOPIC_FIELDS, methods: ALLOWED_TOPIC_METHODS }, [:attach, :update, :delete])
+    json.merge!(serialize_additional_topic_fields(topic, context, user))
+
+    if hold = topic.subscription_hold(user, @context_enrollment, session)
+      json[:subscription_hold] = hold
+    end
+
+    locked_json(json, topic, user, session)
+    if include_assignment && topic.assignment
+      json[:assignment] = assignment_json(topic.assignment, user, session, include_discussion_topic: false)
+    end
+
+    json
+  end
+
+  # Internal: Return a hash of hard-to-generate fields for topic object.
+  #
+  # topic - The DiscussionTopic subject.
+  # context - Current context.
+  # user - Requesting user.
+  #
+  # Returns a hash.
+  def serialize_additional_topic_fields(topic, context, user)
+    attachments = topic.attachment ? [attachment_json(topic.attachment, user)] : []
+    html_url    = if context.is_a?(CollectionItem)
+                    nil
+                  else
+                    named_context_url(context, :context_discussion_topic_url,
+                                      topic, include_host: true)
+                  end
+    url         = if topic.podcast_enabled?
+                    code = (@context_enrollment || @context || context).feed_code
+                    feeds_topic_format_path(topic.id, code, :rss)
+                  else
+                    nil
+                  end
+
+    { message: api_user_content(topic.message, context),
+      require_initial_post: topic.require_initial_post?,
+      user_can_see_posts: topic.user_can_see_posts?(user), podcast_url: url,
+      read_state: topic.read_state(user), unread_count: topic.unread_count(user),
+      subscribed: topic.subscribed?(user), topic_children: topic.child_topics.pluck(:id),
+      attachments: attachments, published: topic.published?, can_unpublish: topic.can_unpublish?,
+      locked: topic.locked?, author: user_display_json(topic.user, topic.context),
+      html_url: html_url, url: html_url, pinned: !!topic.pinned }
+  end
+
+  # Public: Serialize discussion entries for returning a JSON response. This method,
+  #   though normally called from controllers can also be called while generating a
+  #   materialized view. It returns the same JSON for every user who can access the
+  #   discussion, so differs a little from normal api_json helpers.
+  #
+  # entries - An array of DiscussionEntry objects.
+  # context - The current context.
+  # user - The current user.
+  # session - The current session.
+  # includes - An array of optional fields to include in the response (default: [:user_name, :subentries]).
+  #   Recognized fields: user_name, subentries.
+  #
+  # Returns an array of hashes ready to be serialized.
   def discussion_entry_api_json(entries, context, user, session, includes = [:user_name, :subentries])
     entries.map do |entry|
-      if entry.deleted?
-        json = api_json(entry, user, session, :only => %w(id created_at updated_at parent_id editor_id))
-        json[:deleted] = true
-      else
-        json = api_json(entry, user, session,
-                        :only => %w(id user_id created_at updated_at parent_id))
-        json[:user_name] = entry.user_name if includes.include?(:user_name)
-        json[:editor_id] = entry.editor_id if entry.editor_id
-        json[:message] = api_user_content(entry.message, context, user)
-        if entry.attachment
-          json[:attachment] = attachment_json(entry.attachment, user, :host => HostUrl.context_host(context))
-          # this is for backwards compatibility, and can go away if we make an api v2
-          json[:attachments] = [json[:attachment]]
-        end
-      end
+      serialize_entry(entry, user, context, session, includes)
+    end
+  end
 
-      if user
-        participant = entry.find_existing_participant(user)
-        json[:read_state] = participant.workflow_state
-        json[:forced_read_state] = participant.forced_read_state?
-      end
+  # Internal: Serialize a DiscussionEntry for returning a JSON response.
+  #
+  # entry - The DiscussionEntry subject.
+  # user - The current user.
+  # context - The current context.
+  # session - The current session.
+  # includes - An array of optional fields to include in the response.
+  #
+  # Returns a hash.
+  def serialize_entry(entry, user, context, session, includes)
+    allowed_fields  = %w{id created_at updated_at parent_id}
+    allowed_methods = []
+    allowed_fields << 'editor_id' if entry.deleted? || entry.editor_id
+    allowed_fields << 'user_id'   if !entry.deleted?
+    allowed_methods << 'user_name' if !entry.deleted? && includes.include?(:user_name)
 
-      if includes.include?(:subentries) && entry.root_entry_id.nil?
-        replies = entry.flattened_discussion_subentries.active.newest_first.limit(11).all
-        unless replies.empty?
-          json[:recent_replies] = discussion_entry_api_json(replies.first(10), context, user, session, includes)
-          json[:has_more_replies] = replies.size > 10
-        end
-      end
-      json
+    json = api_json(entry, user, session, only: allowed_fields, methods: allowed_methods)
+
+    if entry.deleted?
+      json[:deleted] = true
+    else
+      json[:message] = api_user_content(entry.message, context, user)
+    end
+
+    json.merge!(discussion_entry_attachment(entry, user, context))
+    json.merge!(discussion_entry_read_state(entry, user))
+    json.merge!(discussion_entry_subentries(entry, user, context, session, includes))
+
+    json
+  end
+
+  # Internal: Serialize a DiscussionEntry's attachment object.
+  #
+  # entry - The DiscussionEntry subject.
+  # user - The current user.
+  # context - The current context.
+  #
+  # Returns a hash.
+  def discussion_entry_attachment(entry, user, context)
+    return {} unless entry.attachment
+    json = {attachment: attachment_json(entry.attachment, user, host: HostUrl.context_host(context))}
+    json[:attachments] = [json[:attachment]]
+
+    json
+  end
+
+  # Internal: Serialize a DiscussionEntry's read state.
+  #
+  # entry - The DiscussionEntry  subject.
+  # user - The current user.
+  #
+  # Returns a hash.
+  def discussion_entry_read_state(entry, user)
+    return {} unless user
+    participant = entry.find_existing_participant(user)
+
+    { read_state: participant.workflow_state,
+      forced_read_state: participant.forced_read_state? }
+  end
+
+  # Internal: Serialize a DiscussionEntry's subentries.
+  #
+  # entry - The DiscussionEntry subject.
+  # user - The current user.
+  # context - The current context.
+  # session - The current session.
+  # includes - An array of optional fields to include in the response.
+  #
+  # Returns a hash.
+  def discussion_entry_subentries(entry, user, context, session, includes)
+    return {} unless includes.include?(:subentries) && entry.root_entry_id.nil?
+    replies = entry.flattened_discussion_subentries.active.newest_first.limit(11).all
+
+    if replies.empty?
+      {}
+    else
+      { recent_replies: discussion_entry_api_json(replies.first(10), context, user, session, includes),
+        has_more_replies: replies.size > 10 }
     end
   end
 
