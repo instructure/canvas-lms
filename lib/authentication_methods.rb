@@ -332,6 +332,6 @@ module AuthenticationMethods
   end
 
   def increment_saml_stat(key)
-    Canvas::Statsd.increment("canvas.saml.#{Canvas::Statsd.escape(request.host)}.#{key}")
+    Canvas::Statsd.increment("saml.#{Canvas::Statsd.escape(request.host)}.#{key}")
   end
 end
