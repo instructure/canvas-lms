@@ -64,7 +64,11 @@
   <div class="content">
     <div class="items context_module_items <%= 'manageable' if editable %>" style="min-height: 10px;">
       <% if context_module %>
-        <% context_module.content_tags.active.each do |tag| %>
+        <%
+          tags = context_module.content_tags
+          tags = can_do(@context, @current_user, :manage_content) ? tags.not_deleted : tags.active
+          tags.each do |tag|
+        %>
           <%= render :partial => 'context_modules/module_item', :object => tag, :locals => {:completion_criteria => context_module.completion_requirements, :editable => editable} %>
         <% end %>
       <% end %>
