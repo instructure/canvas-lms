@@ -137,6 +137,7 @@ describe QuizStatistics::StudentAnalysis do
       section2.sis_source_id = 'SISSection02'
       section2.save!
       @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active', :allow_multiple_enrollments => true, :section => section2)
+      @student.save!
       # one complete submission
       qs = @quiz.generate_submission(@student)
       qs.grade_submission
@@ -227,10 +228,7 @@ describe QuizStatistics::StudentAnalysis do
     q.generate_quiz_data
     q.save!
     qs = q.generate_submission student
-    io = ActionController::TestUploadedFile.new(
-      File.expand_path(File.dirname(__FILE__) +
-                       '/../../fixtures/scribd_docs/doc.doc'),
-                       'application/msword', true)
+    io = fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
     attach = qs.attachments.create! :filename => "doc.doc",
       :display_name => "attachment.png", :user => student,
       :uploaded_data => io
@@ -245,7 +243,8 @@ describe QuizStatistics::StudentAnalysis do
     qs.updated_at = 3.days.ago
     qs.save!
     stats = CSV.parse(csv({:include_all_versions => true},q.reload))
-    stats.last[7].should == attach.display_name
+    stats = stats.sort_by {|s| s[1] } # sort by the id
+    stats.first[7].should == attach.display_name
   end
 
   it 'should strip tags from html multiple-choice/multiple-answers' do
