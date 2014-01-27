@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -231,7 +231,8 @@ class Attachment < ActiveRecord::Base
     existing ||= self.cloned_item_id ? context.attachments.find_by_cloned_item_id(self.cloned_item_id) : nil
     dup ||= Attachment.new
     dup = existing if existing && options[:overwrite]
-    dup.assign_attributes(self.attributes.except(*%w[id root_attachment_id uuid folder_id user_id filename namespace]), :without_protection => true)
+    dup.assign_attributes(self.attributes.except(*%w[id root_attachment_id uuid folder_id user_id filename namespace
+                                                     scribd_doc workflow_state submitted_to_scribd_at scribd_attempts]), :without_protection => true)
     dup.write_attribute(:filename, self.filename)
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
     if dup.new_record? || ![self.id, self.root_attachment_id].include?(dup.id)
@@ -1071,7 +1072,7 @@ class Attachment < ActiveRecord::Base
   alias_method_chain :thumbnail, :root_attachment
 
   def scribd_doc
-    self.read_attribute(:scribd_doc) || self.root_attachment.try(:scribd_doc)
+    self.root_attachment.try(:scribd_doc) || self.read_attribute(:scribd_doc)
   end
 
   def content_directory
@@ -1377,6 +1378,38 @@ class Attachment < ActiveRecord::Base
     !!@skip_media_object_creation
   end
 
+  def needs_scribd_doc?
+    if self.scribd_doc?
+      Scribd::API.instance.user = scribd_user
+      begin
+        status = self.scribd_doc.conversion_status
+        if status == 'DONE'
+          false
+        elsif status == 'PROCESSING'
+          false
+        elsif status == 'ERROR'
+          self.resubmit_to_scribd!
+        elsif status == 'DISPLAYABLE'
+          false
+        else #unknow_status, don't send it.
+          false
+        end
+      rescue Scribd::ResponseError => e
+        if e.code == '611' #Insufficient permissions to access this document
+          self.resubmit_to_scribd!
+        elsif e.code == '619' #Document has been deleted from scribd
+          self.resubmit_to_scribd!
+        elsif e.code == '612' #Document could not be found in scribd
+          self.resubmit_to_scribd!
+        else
+          ErrorReport.log_exception(:scribd, e, :attachment_id => self.id)
+        end
+      end
+    else
+      true
+    end
+  end
+
   # This is the engine of the Scribd machine.  Submits the code to
   # scribd when appropriate, otherwise adjusts the state machine. This
   # should be called from another service, creating an asynchronous upload
@@ -1386,29 +1419,33 @@ class Attachment < ActiveRecord::Base
   # state to processed so that it doesn't try to do that again.
   def submit_to_scribd!
     # Newly created record that needs to be submitted to scribd
-    if self.pending_upload? and self.scribdable? and self.filename and ScribdAPI.enabled?
+    a = self.root_attachment if self.root_account_id
+    a ||= self
+    return true unless a.needs_scribd_doc?
+    if a.pending_upload? and a.scribdable? and a.filename and ScribdAPI.enabled?
       Scribd::API.instance.user = scribd_user
       begin
         upload_path = if Attachment.local_storage?
-                 self.full_filename
-               else
-                 self.authenticated_s3_url(:expires => 1.year)
-               end
-        self.write_attribute(:scribd_doc, ScribdAPI.upload(upload_path, self.after_extension || self.scribd_mime_type.extension))
-        self.cached_scribd_thumbnail = self.scribd_doc.thumbnail
-        self.workflow_state = 'processing'
+                        a.full_filename
+                      else
+                        a.authenticated_s3_url(:expires => 1.year)
+                      end
+        return false if upload_path.length > 300
+        a.write_attribute(:scribd_doc, ScribdAPI.upload(upload_path, a.after_extension || a.scribd_mime_type.extension))
+        a.cached_scribd_thumbnail = a.scribd_doc.thumbnail
+        a.workflow_state = 'processing'
       rescue => e
-        self.workflow_state = 'errored'
-        ErrorReport.log_exception(:scribd, e, :attachment_id => self.id)
+        a.workflow_state = 'errored'
+        ErrorReport.log_exception(:scribd, e, :attachment_id => a.id)
       end
-      self.submitted_to_scribd_at = Time.now
-      self.scribd_attempts ||= 0
-      self.scribd_attempts += 1
-      self.save
+      a.submitted_to_scribd_at = Time.now
+      a.scribd_attempts ||= 0
+      a.scribd_attempts += 1
+      a.save
       return true
     # Newly created record that isn't appropriate for scribd
-    elsif self.pending_upload? and not self.scribdable?
-      self.process!
+    elsif a.pending_upload? and not a.scribdable?
+      a.process!
       return true
     else
       return false
