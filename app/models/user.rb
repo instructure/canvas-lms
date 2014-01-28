@@ -131,7 +131,7 @@ class User < ActiveRecord::Base
   end
 
   has_many :communication_channels, :order => 'communication_channels.position ASC', :dependent => :destroy
-  has_one :communication_channel, :order => 'position'
+  has_one :communication_channel, :conditions => ["workflow_state<>'retired'"], :order => 'position'
   has_many :enrollments, :dependent => :destroy
 
   has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:active), :order => 'enrollments.created_at'

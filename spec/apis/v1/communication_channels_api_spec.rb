@@ -183,81 +183,86 @@ describe 'CommunicationChannels API', type: :request do
   end
 
   describe 'destroy' do
-    before do
-      @someone = user_with_pseudonym
-      @admin   = user_with_pseudonym
-      @channel = @someone.communication_channel
-
-      Account.default.add_user(@admin)
-
-      @path = "/api/v1/users/#{@someone.id}/communication_channels/#{@channel.id}"
-      @path_options = { :controller => 'communication_channels',
-        :action => 'destroy', :user_id => @someone.to_param, :format => 'json',
-        :id => @channel.to_param }
+    # let! so that these are evaluated before the before(:each) { @user = ... }
+    # blocks. otherwise they stomp on @user and make api calls as the wrong user
+    let! (:someone) { user_with_pseudonym }
+    let! (:admin) do
+      user = user_with_pseudonym
+      Account.default.add_user(user)
+      user
+    end
+    let (:channel) { someone.communication_channel }
+    let (:path) {"/api/v1/users/#{someone.id}/communication_channels/#{channel.id}"}
+    let (:path_options) do
+      { :controller => 'communication_channels',
+        :action => 'destroy', :user_id => someone.to_param, :format => 'json',
+        :id => channel.to_param }
     end
 
     context 'an admin' do
+      before(:each) { @user = admin }
+
       it "should be able to delete others' channels" do
-        json = api_call(:delete, @path, @path_options)
+        json = api_call(:delete, path, path_options)
 
         json.should == {
           'position' => 1,
-          'address' => 'nobody@example.com',
-          'id' => @channel.id,
+          'address' => channel.path,
+          'id' => channel.id,
           'workflow_state' => 'retired',
-          'user_id' => @someone.id,
+          'user_id' => someone.id,
           'type' => 'email'
         }
       end
     end
 
     context 'a user' do
-      before { @user = @someone }
+      before(:each) { @user = someone }
 
       it 'should be able to delete its own channels' do
-        json = api_call(:delete, @path, @path_options)
+        json = api_call(:delete, path, path_options)
 
         json.should == {
           'position' => 1,
-          'address' => 'nobody@example.com',
-          'id' => @channel.id,
+          'address' => channel.path,
+          'id' => channel.id,
           'workflow_state' => 'retired',
-          'user_id' => @someone.id,
+          'user_id' => someone.id,
           'type' => 'email'
         }
       end
 
       it "should 404 if already deleted" do
-        api_call(:delete, @path, @path_options)
-        raw_api_call(:delete, @path, @path_options)
+        api_call(:delete, path, path_options)
+        raw_api_call(:delete, path, path_options)
         response.code.should == '404'
       end
 
       it "should not be able to delete others' channels" do
-        @channel = @admin.communication_channel
-        raw_api_call(:delete, "/api/v1/users/#{@admin.id}/communication_channels/#{@channel.id}",
-          @path_options.merge(:user_id => @admin.to_param, :id => @channel.to_param))
+        admin_channel = admin.communication_channel
+        raw_api_call(:delete, "/api/v1/users/#{admin.id}/communication_channels/#{admin_channel.id}",
+                     path_options.merge(:user_id => admin.to_param, :id => admin_channel.to_param))
 
         response.code.should eql '401'
       end
 
       it "should be able to delete by path, instead of id" do
-        api_call(:delete, "/api/v1/users/#{@someone.id}/communication_channels/#{@channel.path_type}/#{URI.escape(@channel.path)}",
+        api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI.escape(channel.path)}",
                  :controller => 'communication_channels',
-                 :action => 'destroy', :user_id => @someone.to_param, :format => 'json',
-                 :type => @channel.path_type, :address => @channel.path)
-        @channel.reload.should be_retired
+                 :action => 'destroy', :user_id => someone.to_param, :format => 'json',
+                 :type => channel.path_type, :address => channel.path)
+        CommunicationChannel.find(channel.id).should be_retired # for some reason, .reload on a let() bound model returns nil
       end
 
       it "should 404 if already deleted by path" do
-        api_call(:delete, "/api/v1/users/#{@someone.id}/communication_channels/#{@channel.path_type}/#{URI.escape(@channel.path)}",
+        api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI.escape(channel.path)}",
                  :controller => 'communication_channels',
-                 :action => 'destroy', :user_id => @someone.to_param, :format => 'json',
-                 :type => @channel.path_type, :address => @channel.path)
-        raw_api_call(:delete, "/api/v1/users/#{@someone.id}/communication_channels/#{@channel.path_type}/#{URI.escape(@channel.path)}",
+                 :action => 'destroy', :user_id => someone.to_param, :format => 'json',
+                 :type => channel.path_type, :address => channel.path)
+        raw_api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI.escape(channel.path)}",
                      :controller => 'communication_channels',
-                     :action => 'destroy', :user_id => @someone.to_param, :format => 'json',
-                     :type => @channel.path_type, :address => @channel.path)
+                     :action => 'destroy', :user_id => someone.to_param, :format => 'json',
+                     :type => channel.path_type, :address => channel.path)
         response.code.should == '404'
       end
     end
