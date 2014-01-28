@@ -64,6 +64,9 @@ define [
   module 'EditView',
     teardown: ->
       fixtures.empty()
+      ENV.IS_LARGE_ROSTER = null
+      ENV.GROUP_CATEGORIES = null
+      ENV.ASSIGNMENT_GROUPS = null
 
   test 'renders', ->
     view = editView()
@@ -80,53 +83,52 @@ define [
     view = editView()
     equal view.$("#group_category_selector").length, 0
 
-    ENV.IS_LARGE_ROSTER = null
 
   test 'does not allow peer review for large rosters', ->
     ENV.IS_LARGE_ROSTER = true
     view = editView()
     equal view.$("#assignment_peer_reviews_fields").length, 0
 
-    ENV.IS_LARGE_ROSTER = null
 
-  # test 'adds and removes student group', ->
-  #   ENV.GROUP_CATEGORIES = [{id: 1, name: "fun group"}]
-  #   ENV.ASSIGNMENT_GROUPS = [{id: 1, name: "assignment group 1"}]
-  #   view = editView()
-  #   equal view.assignment.toView()['groupCategoryId'], null
+  test 'adds and removes student group', ->
+    ENV.GROUP_CATEGORIES = [{id: 1, name: "fun group"}]
+    ENV.ASSIGNMENT_GROUPS = [{id: 1, name: "assignment group 1"}]
+    view = editView()
+    equal view.assignment.toView()['groupCategoryId'], null
 
-  #   #adds student group
-  #   view.$('#assignment_has_group_category').click()
-  #   view.$('#assignment_group_category_id option:eq(0)').attr("selected", "selected")
-  #   equal view.getFormData()['group_category_id'], "1"
+    #adds student group
+    view.$('#assignment_has_group_category').click()
+    view.$('#assignment_group_category_id option:eq(0)').attr("selected", "selected")
+    equal view.getFormData()['group_category_id'], "1"
 
-  #   #removes student group
-  #   view.$('#assignment_has_group_category').click()
-  #   equal view.getFormData()['groupCategoryId'], null
+    #removes student group
+    view.$('#assignment_has_group_category').click()
+    equal view.getFormData()['groupCategoryId'], null
 
-  #   ENV.GROUP_CATEGORIES = null
-  #   ENV.ASSIGNMENT_GROUPS = null
 
-  # test 'shows a warning when dangerously changing group status', ->
-  #   # bleh
-  #   window.addGroupCategory = ->
+  checkWarning = (view, showsWarning) ->
+    view.$("#assignment_toggle_advanced_options").click()
+    equal view.$(".group_submission_warning").is(":visible"), false, 'warning isn\'t initially shown'
+    view.$("#assignment_has_group_category").click()
+    equal view.$(".group_submission_warning").is(":visible"), showsWarning, 'warning has expected visibility of visible:'+showsWarning
+    view.$("#assignment_has_group_category").click()
+    equal view.$(".group_submission_warning").is(":visible"), false, 'warning is hidden after clicking again'
 
-  #   checkWarning = (view, showsWarning) ->
-  #     $("#assignment_toggle_advanced_options").click()
-  #     equal $(".group_submission_warning").is(":visible"), false
-  #     $("#assignment_has_group_category").click()
-  #     equal $(".group_submission_warning").is(":visible"), showsWarning
-  #     $("#assignment_has_group_category").click()
-  #     equal $(".group_submission_warning").is(":visible"), false
+  module 'EditView: warning on group status change',
+    setup: ->
+      window.addGroupCategory = sinon.stub()
+    teardown: ->
+      window.addGroupCategory = null
+      fixtures.empty()
 
-  #   # should warn here
-  #   view = editView has_submitted_submissions: true
-  #   checkWarning view, true
+  test 'warns when has submitted submissions', ->
+    view = editView has_submitted_submissions: true
+    checkWarning view, true
 
-  #   # don't show the warning if you start out with a group
-  #   view = editView has_submitted_submissions: true, group_category_id: 1
-  #   checkWarning view, false
+  test 'does not warn if starting with a group', ->
+    view = editView has_submitted_submissions: true, group_category_id: 1
+    checkWarning view, false
 
-  #   # don't show the warning if there are no submitted submissions
-  #   view = editView
-  #   checkWarning view, false
+  test 'does not warn if there are no submitted submissions', ->
+    view = editView()
+    checkWarning view, false
