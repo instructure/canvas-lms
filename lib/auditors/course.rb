@@ -93,11 +93,13 @@ class Auditors::Course
 
   def self.record_created(course, user, changes)
     return unless course && changes
+    return if changes.empty?
     self.record(course, user, 'created', changes)
   end
 
   def self.record_updated(course, user, changes)
     return unless course && changes
+    return if changes.empty?
     self.record(course, user, 'updated', changes)
   end
 

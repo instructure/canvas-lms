@@ -351,7 +351,7 @@ class CoursesController < ApplicationController
         @course.apply_assignment_group_weights = value_to_boolean apply_assignment_group_weights
       end
 
-      changes = @course.changes
+      changes = changed_settings(@course.changes, @course.settings)
 
       respond_to do |format|
         if @course.save
@@ -784,13 +784,22 @@ class CoursesController < ApplicationController
     return unless api_request?
     @course = api_find(Course, params[:course_id])
     return unless authorized_action(@course, @current_user, :update)
-    @course.update_attributes params.slice(
+
+    old_settings = @course.settings
+    @course.attributes = params.slice(
       :allow_student_discussion_topics,
       :allow_student_forum_attachments,
       :allow_student_discussion_editing,
       :show_total_grade_as_points
     )
-    render :json => course_settings_json(@course)
+    changes = changed_settings(@course.changes, @course.settings, old_settings)
+
+    if @course.save
+      Auditors::Course.record_updated(@course, @current_user, changes)
+      render :json => course_settings_json(@course)
+    else
+      render :json => @course.errors, :status => :bad_request
+    end
   end
 
   def update_nav
@@ -1494,6 +1503,8 @@ class CoursesController < ApplicationController
   #   }
   def update
     @course = api_find(Course, params[:id])
+    old_settings = @course.settings
+
     if authorized_action(@course, @current_user, :update)
       params[:course] ||= {}
       if params[:course].has_key?(:syllabus_body)
@@ -1554,13 +1565,23 @@ class CoursesController < ApplicationController
         @course.lock_all_announcements = false
       end
 
+      if params[:course].has_key?(:locale) && params[:course][:locale].blank?
+        params[:course][:locale] = nil
+      end
+
+      if params[:course].has_key?(:is_pubic) && !value_to_boolean(params[:course][:is_public])
+        params[:course][:indexed] = nil if params[:course].has_key?(:indexed)
+      elsif !@course.is_public
+        params[:course][:indexed] = nil if params[:course].has_key?(:indexed)
+      end
+
       @course.process_event(params[:course].delete(:event)) if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
       respond_to do |format|
         @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
 
         @course.attributes = params[:course]
-        changes = @course.changes
+        changes = changed_settings(@course.changes, @course.settings, old_settings)
 
         if @course.save
           Auditors::Course.record_updated(@course, @current_user, changes)
@@ -1726,6 +1747,39 @@ class CoursesController < ApplicationController
     else
       :nothing
     end
+  end
+
+  def changed_settings(changes, new_settings, old_settings=nil)
+    # frd? storing a hash?
+    # Settings is stored as a hash in a column which
+    # causes us to do some more work if it has been changed.
+
+    # Since course uses write_attribute on settings its not accurate
+    # so just ignore it if its in the changes hash
+    changes.delete("settings") if changes.has_key?("settings")
+
+    unless old_settings == new_settings
+      settings = Course.settings_options.keys.inject({}) do |results, key|
+        if old_settings.present? && old_settings.has_key?(key)
+          old_value = old_settings[key]
+        else
+          old_value = nil
+        end
+
+        if new_settings.present? && new_settings.has_key?(key)
+          new_value = new_settings[key]
+        else
+          new_value = nil
+        end
+
+        results[key.to_s] = [ old_value, new_value ] unless old_value == new_value
+
+        results
+      end
+      changes.merge!(settings)
+    end
+
+    changes
   end
 
 end
