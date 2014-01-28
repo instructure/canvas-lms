@@ -378,7 +378,12 @@ describe Course do
       @course.self_enrollment = true
       @course.sis_source_id = 'sis_id'
       @course.stuck_sis_fields = [].to_set
+      profile = @course.profile
+      profile.description = "description"
+      profile.save!
       @course.save!
+      @course.reload
+
       @course.course_sections.should_not be_empty
       @course.students.should == [@student]
       @course.stuck_sis_fields.should == [].to_set
@@ -436,8 +441,13 @@ describe Course do
       @course.stuck_sis_fields = [].to_set
       @course.name = "course_name"
       @course.stuck_sis_fields.should == [:name].to_set
+      profile = @course.profile
+      profile.description = "description"
+      profile.save!
       @course.save!
       @course.stuck_sis_fields.should == [:name].to_set
+
+      @course.reload
 
       @new_course = @course.reset_content
 
@@ -651,7 +661,7 @@ end
 describe Course, "score_to_grade" do
   it "should correctly map scores to grades" do
     default = GradingStandard.default_grading_standard
-    default.to_json.should eql([["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["B-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]].to_json)
+    default.to_json.should == ([["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["B-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0.0]].to_json)
     course_model
     @course.score_to_grade(95).should eql(nil)
     @course.grading_standard_id = 0
@@ -2806,7 +2816,7 @@ describe Course, "inherited_assessment_question_banks" do
     @course.inherited_assessment_question_banks(true).should be_empty
 
     bank = @course.assessment_question_banks.create
-    @course.inherited_assessment_question_banks(true).should eql [bank]
+    @course.inherited_assessment_question_banks(true).should == [bank]
   end
 
   it "should include all banks in the account hierarchy" do
@@ -2819,7 +2829,7 @@ describe Course, "inherited_assessment_question_banks" do
     account_bank = @account.assessment_question_banks.create
 
     @course = Course.create(:account => @account)
-    @course.inherited_assessment_question_banks.sort_by(&:id).should eql [root_bank, account_bank]
+    @course.inherited_assessment_question_banks.sort_by(&:id).should == [root_bank, account_bank]
   end
 
   it "should return a useful scope" do
@@ -2835,7 +2845,7 @@ describe Course, "inherited_assessment_question_banks" do
     bank = @course.assessment_question_banks.create
 
     banks = @course.inherited_assessment_question_banks(true)
-    banks.order(:id).should eql [root_bank, account_bank, bank]
+    banks.order(:id).should == [root_bank, account_bank, bank]
     banks.find_by_id(bank.id).should eql bank
     banks.find_by_id(account_bank.id).should eql account_bank
     banks.find_by_id(root_bank.id).should eql root_bank
@@ -2880,7 +2890,7 @@ describe Course, "section_visibility" do
     end
 
     it "should return user's sections if a student" do
-      @course.sections_visible_to(@student1).should eql [@course.default_section]
+      @course.sections_visible_to(@student1).should == [@course.default_section]
     end
 
     it "should return users from all sections" do
@@ -2901,31 +2911,31 @@ describe Course, "section_visibility" do
 
   context "sections" do
     it "should return students from user's sections" do
-      @course.students_visible_to(@ta).should eql [@student1]
+      @course.students_visible_to(@ta).should == [@student1]
     end
 
     it "should return user's sections" do
-      @course.sections_visible_to(@ta).should eql [@course.default_section]
+      @course.sections_visible_to(@ta).should == [@course.default_section]
     end
 
     it "should return non-limited admins from other sections" do
-      @course.enrollments_visible_to(@ta, :type => :teacher, :return_users => true).should eql [@teacher]
+      @course.enrollments_visible_to(@ta, :type => :teacher, :return_users => true).should == [@teacher]
     end
   end
 
   context "restricted" do
     it "should return no students except self and the observed" do
-      @course.students_visible_to(@observer).should eql [@student1]
+      @course.students_visible_to(@observer).should == [@student1]
       RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
                            :enrollment_type => "StudentEnrollment", :enabled => false)
-      @course.students_visible_to(@student1).should eql [@student1]
+      @course.students_visible_to(@student1).should == [@student1]
     end
 
     it "should return no sections" do
-      @course.sections_visible_to(@observer).should eql []
+      @course.sections_visible_to(@observer).should == []
       RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
                            :enrollment_type => "StudentEnrollment", :enabled => false)
-      @course.sections_visible_to(@student1).should eql []
+      @course.sections_visible_to(@student1).should == []
     end
   end
 
@@ -3018,13 +3028,13 @@ describe Course, "enrollments" do
     @course.root_account = a1
     @course.save!
 
-    @course.student_enrollments.map(&:root_account_id).should eql [a1.id]
-    @course.course_sections.reload.map(&:root_account_id).should eql [a1.id]
+    @course.student_enrollments.map(&:root_account_id).should == [a1.id]
+    @course.course_sections.reload.map(&:root_account_id).should == [a1.id]
 
     @course.root_account = a2
     @course.save!
-    @course.student_enrollments(true).map(&:root_account_id).should eql [a2.id]
-    @course.course_sections.reload.map(&:root_account_id).should eql [a2.id]
+    @course.student_enrollments(true).map(&:root_account_id).should == [a2.id]
+    @course.course_sections.reload.map(&:root_account_id).should == [a2.id]
   end
 end
 
