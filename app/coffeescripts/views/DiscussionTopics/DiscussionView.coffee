@@ -47,10 +47,13 @@ define [
     # Public: Topic is able to be pinned/unpinned.
     @optionProperty 'pinnable'
 
+    @child 'publishIcon', '[data-view=publishIcon]' if ENV.permissions.publish
+
     @child 'toggleableSubscriptionIcon', '[data-view=toggleableSubscriptionIcon]'
 
     initialize: (options) ->
       @attachModel()
+      options.publishIcon = new PublishIconView(model: @model) if ENV.permissions.publish
       options.toggleableSubscriptionIcon = new ToggleableSubscriptionIconView(model: @model)
       super
 
@@ -125,6 +128,10 @@ define [
       # handle a student locking their own discussion (they should lose permissions).
       if @model.get('locked') and !_.intersection(ENV.current_user_roles, ['teacher', 'ta', 'admin']).length
         base.permissions.delete = false
+      base.display_last_reply_at = I18n.l "#date.formats.medium", base.last_reply_at
+      if base.assignment?.due_at?
+        base.assignment.display_due_at = I18n.l "#date.formats.medium", base.assignment.due_at
+      base.ENV = ENV
       base
 
     # Internal: Add event handlers to the model.
@@ -132,3 +139,4 @@ define [
     # Returns nothing.
     attachModel: ->
       @model.on('change:hidden', @hide)
+      @model.on('change:published', @render)

@@ -4,11 +4,12 @@ skip_locale_loading = (Rails.env.development? || Rails.env.test? || $0 == 'irb')
 if skip_locale_loading
   I18n.load_path = I18n.load_path.grep(%r{/(locales|en)\.yml\z})
 end
-if CANVAS_RAILS2
-  I18n.backend = I18nema::Backend.new
-  I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
-  I18n.backend.init_translations
-end
+
+I18n.backend = I18nema::Backend.new
+I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
+I18n.backend.init_translations
+
+I18n.enforce_available_locales = true
 
 I18n.send :extend, I18n::Lolcalize if ENV['LOLCALIZE']
 
@@ -178,8 +179,8 @@ else
   ActionView::TemplateRenderer.class_eval do
     def render_template_with_assign(template, *a)
       old_i18n_scope = @lookup_context.i18n_scope
-      @lookup_context.i18n_scope = @current_template.virtual_path.sub(/\/_/, '/').gsub('/', '.')
-      _render_template_without_assign(template, *a)
+      @lookup_context.i18n_scope = template.virtual_path.sub(/\/_/, '/').gsub('/', '.')
+      render_template_without_assign(template, *a)
     ensure
       @lookup_context.i18n_scope = old_i18n_scope
     end

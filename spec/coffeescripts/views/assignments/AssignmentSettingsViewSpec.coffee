@@ -17,7 +17,9 @@ define [
     @groups = new AssignmentGroupCollection([group(), group()])
 
   createView = (apply_assignment_group_weights) ->
-    @course = new Course {apply_assignment_group_weights: apply_assignment_group_weights}
+    @course = new Course
+      apply_assignment_group_weights: apply_assignment_group_weights
+    @course.urlRoot = "/courses/1" #without this it keeps throwing an error
     view = new AssignmentSettingsView
       model: @course
       assignmentGroups: assignmentGroups()
@@ -49,3 +51,16 @@ define [
 
     attributes = view.getFormData()
     ok !!attributes.apply_assignment_group_weights
+
+  test 'group weights should be saved', ->
+    view = createView(true)
+    view.render()
+    view.open()
+    view.$(".ag-weights-tr:eq(0) .group_weight_value").val("20")
+    view.$(".ag-weights-tr:eq(1) .group_weight_value").val("80")
+
+    view.$("#update-assignment-settings").click()
+    equal view.assignmentGroups.first().get('group_weight'), 20
+    equal view.assignmentGroups.last().get('group_weight'), 80
+    view.close()
+

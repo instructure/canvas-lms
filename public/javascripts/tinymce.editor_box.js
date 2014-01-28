@@ -130,16 +130,16 @@ define([
     var equella_button = INST && INST.equellaEnabled ? ",instructure_equella" : "";
     instructure_buttons = instructure_buttons + equella_button;
 
-    var buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,bullist,outdent,indent,numlist,table,instructure_links,unlink" + instructure_buttons + ",fontsizeselect,formatselect";
+    var buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,bullist,outdent,indent,sup,sub,numlist,table,instructure_links,unlink" + instructure_buttons + ",fontsizeselect,formatselect";
     var buttons2 = "";
     var buttons3 = "";
 
     if (width < 359 && width > 0) {
       buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright";
-      buttons2 = "outdent,indent,bullist,numlist,table,instructure_links,unlink" + instructure_buttons;
+      buttons2 = "outdent,indent,sup,sub,bullist,numlist,table,instructure_links,unlink" + instructure_buttons;
       buttons3 = "fontsizeselect,formatselect";
     } else if (width < 600) {
-      buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,outdent,indent,bullist,numlist";
+      buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,outdent,indent,sup,sub,bullist,numlist";
       buttons2 = "table,instructure_links,unlink" + instructure_buttons + ",fontsizeselect,formatselect";
     }
 
@@ -180,8 +180,29 @@ define([
           $(document).triggerHandler('editor_box_focus', $editor);
           $.publish('editorBox/focus', $editor);
         };
+        
+        // Make shift+tab take the user to the previous focusable element in the DOM.
+        var focusPrevious = function (ed, event) {
+          if (event.keyCode == 9 && event.shiftKey) {
+            var $cur = $(ed.getContainer());
+            while (true) {
+              // When jQuery is upgraded to 1.8+, use .addBack instead.
+              if ($cur.prevAll().find(':tabbable').andSelf().filter(':tabbable').last().focus().length) {
+                return false;
+              }
+              $cur = $cur.parent();
+              if (!$cur || !$cur.length || $cur.is(document)) {
+                return false;
+              }
+            }
+          } else {
+            return true;
+          }
+        };
+        
         ed.onClick.add(focus);
         ed.onKeyPress.add(focus);
+        ed.onKeyUp.add(focusPrevious);
         ed.onActivate.add(focus);
         ed.onEvent.add(function() {
           if(enableBookmarking && ed.selection) {
@@ -477,6 +498,10 @@ define([
     var id = this.attr('id');
     this._setContentCode(this._getContentCode());
     tinyMCE.execCommand('mceToggleEditor', false, id);
+    // Ensure that keyboard focus doesn't get trapped in the ether.
+    this.removeAttr('aria-hidden')
+      .filter('textarea:visible')
+      .focus();
   };
 
   $.fn._removeEditor = function() {

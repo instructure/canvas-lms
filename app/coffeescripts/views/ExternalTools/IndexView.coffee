@@ -101,6 +101,7 @@ define [
       tool = view.model
       tool.on 'sync', @onToolSync
       @editView = new EditView(model: tool).render()
+      false
 
     onToolSync: (model) =>
       @addAppView.remove() if @addAppView
@@ -133,6 +134,7 @@ define [
             tool.destroy()
             dialog.dialog 'close'
         ]
+      false
 
     toggleInstalledState: (event) =>
       elm = @$(event.currentTarget)

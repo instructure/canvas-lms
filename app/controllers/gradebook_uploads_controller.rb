@@ -65,12 +65,12 @@ class GradebookUploadsController < ApplicationController
         @assignments = @data_to_load["assignments"]
         assignment_map = {}
         new_assignment_ids = {}
-        new_assignments, old_assignments = @assignments.partition { |a| !a['original_id'] && a['id'].to_i < 0 }
+        new_assignments, old_assignments = @assignments.partition { |a| !a['previous_id'] && a['id'].to_i < 0 }
         new_assignments.each do |assignment|
           a = @context.assignments.create!(:title => assignment['title'], :points_possible => assignment['points_possible'])
           new_assignment_ids[assignment['id']] = a.id
           assignment['id'] = a.id
-          assignment['original_id'] = a.id
+          assignment['previous_id'] = a.id
           assignment_map[a.id] = a
         end
         @context.assignments.find(old_assignments.map { |a| a['id'].to_i }).each do |a|
@@ -81,7 +81,7 @@ class GradebookUploadsController < ApplicationController
           student_record['submissions'].each do |submission_record|
             list << {
               :assignment_id => new_assignment_ids[submission_record['assignment_id']] || submission_record['assignment_id'].to_i,
-              :user_id => student_record['original_id'].to_i,
+              :user_id => student_record['previous_id'].to_i,
               :grade => submission_record['grade']
             }
           end
@@ -90,7 +90,7 @@ class GradebookUploadsController < ApplicationController
 
         all_submissions = {}
         @context.submissions.where(:assignment_id => assignment_map.keys,
-                                   :user_id => @students.map { |s| s['original_id'].to_i }).
+                                   :user_id => @students.map { |s| s['previous_id'].to_i }).
             except(:includes).each do |s|
           all_submissions[[s.assignment_id, s.user_id]] = s
         end

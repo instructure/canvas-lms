@@ -269,7 +269,7 @@ class ContextModulesApiController < ApplicationController
       if ids = params[:module][:prerequisite_module_ids]
         @module.prerequisites = ids.map{|id| "module_#{id}"}.join(',')
       end
-      if @context.draft_state_enabled?
+      if @context.feature_enabled?(:draft_state)
         @module.workflow_state = 'unpublished'
       else
         @module.workflow_state = 'active'
@@ -375,7 +375,7 @@ class ContextModulesApiController < ApplicationController
   def set_position
     return true unless @module && params[:module][:position]
 
-    if @module.insert_at_position(params[:module][:position], @context.context_modules.not_deleted)
+    if @module.insert_at(params[:module][:position].to_i)
       # see ContextModulesController#reorder
       @context.touch
       @context.context_modules.not_deleted.each{|m| m.save_without_touching_context }

@@ -8,7 +8,6 @@ describe "calendar2" do
     Account.default.tap do |a|
       a.settings[:enable_scheduler] = true
       a.settings[:show_scheduler]   = true
-      a.settings[:agenda_view]      = true
       a.save!
     end
   end
@@ -28,7 +27,7 @@ describe "calendar2" do
   end
 
   def find_middle_day
-    f('.calendar .fc-week1 .fc-wed')
+    f('.calendar .fc-week:nth-child(1) .fc-wed')
   end
 
   def change_calendar(direction = :next)
@@ -236,9 +235,9 @@ describe "calendar2" do
       it "should drag and drop an event" do
         pending('drag and drop not working correctly')
         create_middle_day_event
-        driver.action.drag_and_drop(f('.calendar .fc-event'), f('.calendar .fc-week2 .fc-last')).perform
+        driver.action.drag_and_drop(f('.calendar .fc-event'), f('.calendar .fc-week:nth-child(2) .fc-last')).perform
         wait_for_ajaximations
-        CalendarEvent.last.start_at.strftime('%d').should == f('.calendar .fc-week2 .fc-last .fc-day-number').text
+        CalendarEvent.last.start_at.strftime('%d').should == f('.calendar .fc-week:nth-child(2) .fc-last .fc-day-number').text
       end
 
       it "should create an assignment by clicking on a calendar day" do
@@ -465,14 +464,15 @@ describe "calendar2" do
 
       it "should navigate with jump-to-date control" do
         Account.default.change_root_account_setting!(:agenda_view, true)
-        make_event(start: 1.month.from_now)
+        # needs to be 2 months out so it doesn't appear at the start of the next month
+        eventStart = 2.months.from_now
+        make_event(start: eventStart)
 
         get "/calendar2"
         wait_for_ajaximations
         f('.fc-event').should be_nil
-        next_month_num = (Time.now.month % 12) + 1
-        next_month = Date::MONTHNAMES[next_month_num]
-        quick_jump_to_date(next_month)
+        eventStartText = eventStart.strftime("%Y %m %d")
+        quick_jump_to_date(eventStartText)
         f('.fc-event').should_not be_nil
       end
 
@@ -818,6 +818,26 @@ describe "calendar2" do
         fj('.ui-dialog:visible .btn-primary').click()
         wait_for_ajaximations
         ffj('.ig-row').length.should == 0
+      end
+
+      it "should display midnight assignments at 11:59" do
+        assignment_model(:course => @course,
+                         :title => "super important",
+                         :due_at => Time.zone.now.beginning_of_day + 1.day - 1.minute)
+        calendar_events = @teacher.calendar_events_for_calendar.last
+
+        calendar_events.title.should == "super important"
+        @assignment.due_date.should == (Time.zone.now.beginning_of_day + 1.day - 1.minute).to_date
+
+        get "/calendar2"
+        wait_for_ajaximations
+
+        f('#agenda').click
+        wait_for_ajaximations
+
+        f('.ig-details').should include_text('11:59')
+        f('.ig-row').click()
+        fj('.event-details:visible time').should include_text('11:59')
       end
     end
   end

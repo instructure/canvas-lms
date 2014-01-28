@@ -22,6 +22,7 @@ define [
       'focus .expander': 'onExpandClick'
 
     initialize: ->
+      super
       @model or= new QuickStartBarModel
       @model.on 'change:modelName', @switchFormView
       @model.on 'change:expanded', @toggleExpanded

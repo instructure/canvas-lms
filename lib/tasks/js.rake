@@ -6,7 +6,7 @@ namespace :js do
   task :dev do
     app = ARGV[1]
     if app
-      ENV['JS_SPEC_MATCHER'] = "**/#{app}/**/*.spec.js"
+      ENV['JS_SPEC_MATCHER'] = matcher_for_ember_app app
       unless File.exists?("app/coffeescripts/ember/#{app}")
         puts "no app found at app/coffeescripts/ember/#{app}"
         exit
@@ -16,9 +16,16 @@ namespace :js do
     exec('testem -f config/testem.yml')
   end
 
+  def matcher_for_ember_app app_name
+    "**/#{app_name}/**/*.spec.js"
+  end
+
   desc 'generate QUnit runner file @ spec/javascripts/runner.html'
   task :generate_runner do
-    #Rake::Task['js:generate'].invoke
+    build_runner
+  end
+
+  def build_runner
     require 'canvas/require_js'
     require 'erubis'
     output = Erubis::Eruby.new(File.read("#{Rails.root}/spec/javascripts/runner.html.erb")).
@@ -28,6 +35,21 @@ namespace :js do
 
   desc 'test javascript specs with PhantomJS'
   task :test do
+    require 'canvas/require_js'
+
+    # run test for each ember app individually
+    Dir.entries('app/coffeescripts/ember').reject { |d| d.match(/^\./) || d == 'shared' }.each do |ember_app|
+      puts "--> Running tests for '#{ember_app}' ember app"
+      Canvas::RequireJs.matcher = matcher_for_ember_app ember_app
+      test_suite
+    end
+
+    # run test for non-ember apps
+    Canvas::RequireJs.matcher = nil
+    test_suite
+  end
+
+  def test_suite
     if test_js_with_timeout(300) != 0 && !ENV['JS_SPEC_MATCHER']
       puts "--> PhantomJS tests failed. retrying PhantomJS..."
       raise "PhantomJS tests failed on second attempt." if test_js_with_timeout(400) != 0
@@ -35,6 +57,7 @@ namespace :js do
   end
 
   def test_js_with_timeout(timeout)
+    require 'canvas/require_js'
     begin
       Timeout::timeout(timeout) do
         quick = ENV["quick"] && ENV["quick"] == "true"
@@ -43,14 +66,14 @@ namespace :js do
           Rake::Task['js:generate'].invoke
         end
         puts "--> executing phantomjs tests"
-        Rake::Task['js:generate_runner'].invoke
+        build_runner
         phantomjs_output = `phantomjs spec/javascripts/support/qunit/test.js file:///#{Dir.pwd}/spec/javascripts/runner.html 2>&1`
         puts phantomjs_output
 
         if $?.exitstatus != 0
           puts 'some specs failed'
           result = 1
-        elsif ENV['JS_SPEC_MATCHER']
+        elsif ENV['JS_SPEC_MATCHER'] || Canvas::RequireJs.matcher
           # running a subset of tests in isolation, don't be paranoid about
           # some unrun tests getting lost
           result = 0
@@ -103,10 +126,10 @@ namespace :js do
     # clear out all the files in case there are any old compiled versions of
     # files that don't map to any source file anymore
     paths_to_remove = [
-      'public/javascripts/{compiled,jst}',
-      'public/plugins/*/javascripts/{compiled,jst}',
+      Dir.glob('public/javascripts/{compiled,jst}'),
+      Dir.glob('public/plugins/*/javascripts/{compiled,jst}'),
       'spec/javascripts/compiled',
-      'spec/plugins/*/javascripts/compiled'
+      Dir.glob('spec/plugins/*/javascripts/compiled')
     ]
     FileUtils.rm_rf(paths_to_remove)
 
@@ -128,6 +151,11 @@ namespace :js do
       ember_handlebars_time = Benchmark.realtime { Rake::Task['jst:ember'].invoke }
       puts "--> Pre-compiling ember handlebars templates finished in #{ember_handlebars_time}"
     end
+
+    # can't be in own thread, needs to happen before coffeescript
+    puts "--> Creating ember app bundles"
+    bundle_time = Benchmark.realtime { Rake::Task['js:bundle_ember_apps'].invoke }
+    puts "--> Creating ember app bundles finished in #{bundle_time}"
 
     threads << Thread.new do
       coffee_time = Benchmark.realtime do
@@ -152,11 +180,6 @@ namespace :js do
         end
       end
       puts "--> Compiling CoffeeScript finished in #{coffee_time}"
-
-      # can't be in own thread, needs coffeescript first
-      puts "--> Creating ember app bundles"
-      bundle_time = Benchmark.realtime { Rake::Task['js:bundle_ember_apps'].invoke }
-      puts "--> Creating ember app bundles finished in #{bundle_time}"
     end
 
     threads.each(&:join)

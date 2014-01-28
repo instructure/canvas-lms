@@ -30,7 +30,7 @@ class Rubric < ActiveRecord::Base
   after_save :update_alignments
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :title, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
 
   before_save :default_values
   after_save :update_alignments

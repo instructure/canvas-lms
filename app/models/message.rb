@@ -640,11 +640,6 @@ class Message < ActiveRecord::Base
     true
   end
 
-  # Internal: No-op included for compatibility.
-  #
-  # Returns nothing.
-  def deliver_via_chat; end
-
   # Internal: Deliver the message through Twitter.
   #
   # The template should define the content for :link and not place into the body of the template itself

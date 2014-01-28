@@ -7,19 +7,23 @@
   border-radius: 3px;
   position: relative;
   cursor: pointer;
-
   &.ui-draggable-dragging {
     cursor: move;
+    list-style: none;
+    z-index: 9999;
   }
-
   &.group-user-highlight {
     animation: highlight-shadow-fade ease-in 1s;
     -webkit-animation: highlight-shadow-fade ease-in 1s;
     -moz-animation: highlight-shadow-fade ease-in 1s;
   }
+  .al-trigger {
+    padding: 0;
+    text-align:right;
+  }
 }
 
-.remove-from-group,
+.group-user-actions,
 .assign-to-group {
   position: absolute;
   top: 0px;
@@ -28,6 +32,9 @@
   i:before {
     color: #aaa;
     font-size: 0.8em;
+  }
+  .icon-mini-arrow-down{
+    text-align:left;
   }
 }
 
@@ -38,8 +45,8 @@
 }
 
 .group .group-users {
-  margin: 1.25em -8px -8px;
-  padding: 8px;
+  margin: 1.25em 0 -8px;
+  padding: 8px 0;
   overflow: hidden;
   .collectionViewItems {
     width: 103%;
@@ -61,6 +68,7 @@
 }
 
 .group-user-name {
+  max-width: 85%;
   overflow: hidden;
   white-space: nowrap;
   margin-right: 10px;

@@ -1,3 +1,3 @@
 class CourseProfile < Profile
-  acts_as_list :scope => :root_account_id
+  acts_as_list :scope => :root_account
 end

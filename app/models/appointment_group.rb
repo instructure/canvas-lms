@@ -37,6 +37,10 @@ class AppointmentGroup < ActiveRecord::Base
     appointment_group_contexts.map &:context
   end
 
+  def active_contexts
+    contexts.reject { |context| context.workflow_state == 'deleted' }
+  end
+
   def sub_contexts
     appointment_group_sub_contexts.map &:sub_context
   end
@@ -215,7 +219,7 @@ class AppointmentGroup < ActiveRecord::Base
   set_policy do
     given { |user, session|
       next false if deleted?
-      next false unless contexts.all? { |c| c.grants_right? user, nil, :manage_calendar }
+      next false unless active_contexts.all? { |c| c.grants_right? user, nil, :manage_calendar }
       if appointment_group_sub_contexts.present? && appointment_group_sub_contexts.first.sub_context_type == 'CourseSection'
         sub_context_ids = appointment_group_sub_contexts.map(&:sub_context_id)
         user_visible_sections = sub_context_ids & contexts.map { |c|
@@ -384,12 +388,12 @@ class AppointmentGroup < ActiveRecord::Base
     end
 
     if changed.present?
-      CalendarEvent.where(:parent_calendar_event_id => appointments, :workflow_state => ['active', 'locked']).update_all(changed)
+      CalendarEvent.joins(:parent_event).where(workflow_state: ['active', 'locked'], parent_events_calendar_events: { context_id: self, context_type: 'AppointmentGroup' }).update_all(changed)
     end
 
     if desc
       appointments.where(:description => description_was).update_all(:description => desc)
-      CalendarEvent.where(:parent_calendar_event_id => appointments, :workflow_state => ['active', 'locked'], :description => description_was).update_all(:description => desc)
+      CalendarEvent.joins(:parent_event).where(workflow_state: ['active', 'locked'], parent_events_calendar_events: { context_id: self, context_type: 'AppointmentGroup' }, description: description_was).update_all(:description => desc)
     end
 
     @new_appointments.each(&:reload) if @new_appointments.present?

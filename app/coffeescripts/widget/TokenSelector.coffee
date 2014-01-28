@@ -329,7 +329,7 @@ define [
             list.appendTo(@$menu)
           @list = list
           @autoSelectFirst()
-      , 100
+      , 200
 
     preparePost: (data) ->
       postData = $.extend({}, @options.baseData ? {}, data ? {}, {search: @input.val().replace(/^\s+|\s+$/g, "")})
@@ -341,12 +341,14 @@ define [
         postData.exclude = postData.exclude.concat @input.tokenValues()
       postData
 
+    lastFetch: null
     collectionForQuery: (query) ->
+      @lastFetch?.abort()
       cacheKey = JSON.stringify(query)
       unless @cache[cacheKey]?
         collection = new RecipientCollection
         collection.url = @url
-        collection.fetch data: query
+        @lastFetch = collection.fetch data: query
         @cache[cacheKey] = collection
       @cache[cacheKey]
 

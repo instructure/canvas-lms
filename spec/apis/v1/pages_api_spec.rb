@@ -504,10 +504,8 @@ describe "Pages API", :type => :integration do
       end
       
       it "should create a new page in unpublished state (draft state)" do
-        @course.account.settings[:allow_draft] = true
-        @course.account.save!
-        @course.enable_draft = true
-        @course.save!
+        @course.account.allow_feature!(:draft_state)
+        @course.enable_feature!(:draft_state)
 
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
@@ -658,6 +656,18 @@ describe "Pages API", :type => :integration do
             @test_page.reload
             @test_page.should be_active
             @test_page.hide_from_students.should be_true
+          end
+
+          it 'should not set hide_from_students to nil' do
+            json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@test_page.url}",
+                            { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param, :url => @test_page.url },
+                            { :wiki_page => {'hide_from_students' => nil} })
+            json['published'].should be_true
+            json['hide_from_students'].should be_false
+
+            @test_page.reload
+            @test_page.should be_active
+            @test_page.hide_from_students.should be_false
           end
 
           it 'should ignore published' do
@@ -821,10 +831,8 @@ describe "Pages API", :type => :integration do
       before do
         @deleted_page = @wiki.wiki_pages.create! :title => "Deleted page", :hide_from_students => true
         @deleted_page.destroy
-        @course.account.settings[:allow_draft] = true
-        @course.account.save!
-        @course.enable_draft = true
-        @course.save!
+        @course.account.allow_feature!(:draft_state)
+        @course.enable_feature!(:draft_state)
         @unpublished_page = @wiki.wiki_pages.create(:title => "Draft Page", :body => "Don't text and drive.")
         @unpublished_page.workflow_state = :unpublished
         @unpublished_page.save!
@@ -1076,10 +1084,8 @@ describe "Pages API", :type => :integration do
 
     context "unpublished pages" do
       before do
-        @course.account.settings[:allow_draft] = true
-        @course.account.save!
-        @course.enable_draft = true
-        @course.save!
+        @course.account.allow_feature!(:draft_state)
+        @course.enable_feature!(:draft_state)
         @unpublished_page = @wiki.wiki_pages.create(:title => "Draft Page", :body => "Don't text and drive.")
         @unpublished_page.workflow_state = :unpublished
         @unpublished_page.save!

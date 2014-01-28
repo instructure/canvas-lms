@@ -70,6 +70,11 @@ describe ErrorReport do
     report.url.should == "https://www.instructure.example.com?access_token=[FILTERED]"
   end
 
+  it "should use class name for category" do
+    report = ErrorReport.log_exception(nil, e = Exception.new("error"))
+    report.category.should == e.class.name
+  end
+
   it "should filter params" do
     req = mock(
       :env => {

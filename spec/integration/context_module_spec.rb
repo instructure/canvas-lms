@@ -24,6 +24,22 @@ describe ContextModule do
     @module = @course.context_modules.create!(:name => "some module")
   end
 
+  describe "index" do
+    it "should require manage_content permission before showing add controls" do
+      course_with_teacher_logged_in active_all: true
+      get "/courses/#{@course.id}/modules"
+      doc = Nokogiri::HTML(response.body)
+      doc.at_css('.context-modules-main-toolbar .add_module_link').should_not be_nil
+
+      @course.account.role_overrides.create! enrollment_type: 'TaEnrollment', permission: 'manage_content', enabled: false
+      course_with_ta course: @course
+      user_session(@ta)
+      get "/courses/#{@course.id}/modules"
+      doc = Nokogiri::HTML(response.body)
+      doc.at_css('.context-modules-main-toolbar .add_module_link').should be_nil
+    end
+  end
+
   it "should clear the page cache on individual tag change" do
     enable_cache do
       course_with_teacher_logged_in(:active_all => true)

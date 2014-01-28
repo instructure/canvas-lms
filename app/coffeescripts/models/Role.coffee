@@ -2,24 +2,26 @@ define [
   'Backbone'
   'underscore'
   'compiled/models/Account'
-], (Backbone, _, Account) ->
-  class Role extends Backbone.Model
+], ({Model}, _, Account) ->
+  class Role extends Model
     # Method Summary
-    #   Each role has an Account model nested in it. When creating 
-    #   a new role, run it through and makes sure attributes have 
-    #   and account model nested in model.account. It's NOT using
-    #   parse because parse sets the id to role in parse (because roles
-    #   have 'fake' ids so backbone will work) and when an id is set
-    #   when you try to save, it assumes it was all ready created and
-    #   does a PUT instead of a POST request. Thus, we don't call parse
-    #   we call nestAccountModel.
+    #   Set the attributes as well as the Account model. Note that we
+    #   don't use parse, because it sets the model as being not new.
+    #   Backbone keys off of isNew() to know if it should do a PUT vs.
+    #   POST.
     # @api backbone override
-    initialize: (attributes, options) -> 
+    initialize: (attributes, options) ->
       super
 
       if attributes
-        parsedAttributes = @nestAccountModel attributes
-        @set parsedAttributes
+        @set @nestAccountModel(attributes)
+
+    # Roles don't use a traditional id, and instead use the unique
+    # name (role) in any URLs
+    idAttribute: 'role'
+
+    isNew: ->
+      not @get('id')?
 
     # Method Summary
     #   urlRoot is used in url to generate the a restful url. Because 
@@ -53,15 +55,11 @@ define [
       data
 
     # Method Summary
-    #   Parse is called when data is set via attributes to the model. 
-    #   Because roles might not always have a unique id, we are 
-    #   setting the id to be the role name. This takes care of checks
-    #   for "isNew()" as well as issues with generating a correct url.
-    #   Also, ensure that account is wrapped in a backbone model since
-    #   the url relies on it being a backbone model.
+    #   When we get data from the server, flag the model as not new and
+    #   make sure the account is set up correctly
     # @api override backbone
     parse: (data) ->
-      data.id = data.role if data.role
+      @set 'id', data.role if data.role
       data = @nestAccountModel(data)
       data
 

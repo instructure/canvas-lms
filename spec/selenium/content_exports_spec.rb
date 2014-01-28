@@ -44,7 +44,7 @@ describe "content exports" do
       @export.export_type.should == 'qti'
 
       file_handle = @export.attachment.open :need_local_file => true
-      zip_file = Zip::ZipFile.open(file_handle.path)
+      zip_file = Zip::File.open(file_handle.path)
       manifest_doc = Nokogiri::XML.parse(zip_file.read("imsmanifest.xml"))
 
       manifest_doc.at_css("resource[identifier=#{CC::CCHelper.create_key(q1)}]").should_not be_nil

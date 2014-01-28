@@ -92,6 +92,7 @@ define [
 
     validateBeforeSave: (data, errors) ->
       errors = @_validateTitle data, errors
+      errors = @_validatePointsPossible data, errors
       errors
 
     _validateTitle: (data, errors) ->
@@ -100,5 +101,14 @@ define [
       if !frozenTitle and (!data.name or $.trim(data.name.toString()).length == 0)
         errors["name"] = [
           message: I18n.t 'name_is_required', 'Name is required!'
+        ]
+      errors
+
+    _validatePointsPossible: (data, errors) =>
+      frozenPoints = _.contains(@model.frozenAttributes(), "points_possible")
+
+      if !frozenPoints and data.points_possible and isNaN(parseFloat(data.points_possible))
+        errors["points_possible"] = [
+          message: I18n.t 'points_possible_number', 'Points possible must be a number'
         ]
       errors

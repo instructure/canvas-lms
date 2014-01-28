@@ -20,6 +20,7 @@ define [
         browser: false
 
     initialize: ->
+      super
       @model or= new Message
 
     save: (json) ->

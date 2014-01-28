@@ -15,31 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-if ENV['COVERAGE'] == "1"
-  puts "Code Coverage enabled"
-  require 'simplecov'
-  SimpleCov.start do
-    SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
-    add_filter '/spec/'
-    add_filter '/config/'
-    add_filter 'spec_canvas'
 
-    add_group 'Controllers', 'app/controllers'
-    add_group 'Models', 'app/models'
-    add_group 'App', '/app/'
-    add_group 'Helpers', 'app/helpers'
-    add_group 'Libraries', '/lib/'
-    add_group 'Plugins', 'vendor/plugins'
-    add_group "Long files" do |src_file|
-      src_file.lines.count > 500
-    end
-    SimpleCov.at_exit do
-      SimpleCov.result.format!
-    end
-  end
-else
-  puts "Code coverage not enabled"
-end
+begin; require File.expand_path(File.dirname(__FILE__) + "/../parallelized_specs/lib/parallelized_specs.rb"); rescue LoadError; end
 
 ENV["RAILS_ENV"] = 'test'
 
@@ -55,6 +32,7 @@ require 'webrat'
 require 'mocha/api'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
+require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
@@ -96,7 +74,8 @@ def truncate_all_tables
   models_by_connection = ActiveRecord::Base.all_models.group_by { |m| m.connection }
   models_by_connection.each do |connection, models|
     if connection.adapter_name == "PostgreSQL"
-      connection.execute("TRUNCATE TABLE #{models.map(&:table_name).map { |t| connection.quote_table_name(t) }.join(',')}")
+      table_names = connection.tables & models.map(&:table_name)
+      connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
     else
       models.each { |model| truncate_table(model) }
     end
@@ -142,26 +121,29 @@ Mocha::Mock.class_eval do
     return true if [:marshal_dump, :marshal_load].include?(symbol)
     respond_to_without_marshalling?(symbol, include_private)
   end
+
   alias_method_chain :respond_to?, :marshalling
 end
 
-[ActiveSupport::Cache::MemoryStore, NilStore].each do |store|
+[ActiveSupport::Cache::MemoryStore, (CANVAS_RAILS2 ? NilStore : ActiveSupport::Cache::NullStore)].each do |store|
   store.class_eval do
     def write_with_serialization_check(name, value, options = nil)
       Marshal.dump(value)
       write_without_serialization_check(name, value, options)
     end
+
     alias_method_chain :write, :serialization_check
   end
 end
 
 unless CANVAS_RAILS2
-  NilStore.class_eval do
+  ActiveSupport::Cache::NullStore.class_eval do
     def fetch_with_serialization_check(name, options = {}, &block)
       result = fetch_without_serialization_check(name, options, &block)
       Marshal.dump(result) if result
       result
     end
+
     alias_method_chain :fetch, :serialization_check
   end
 end
@@ -282,12 +264,8 @@ Spec::Runner.configure do |config|
         @teacher = u
       end
       if opts[:draft_state]
-        account.settings[:allow_draft] = true
-        account.save!
-        @course.enable_draft = true
-        @course.save!
-        # to reload the @course.root_account
-        @course.reload
+        account.allow_feature!(:draft_state)
+        @course.enable_feature!(:draft_state)
       end
     end
     @course
@@ -473,10 +451,8 @@ Spec::Runner.configure do |config|
     course = opts[:course] || @course
     account = opts[:account] || course.account
 
-    account.settings[:allow_draft] = true
-    account.save! unless opts[:no_save]
-    course.enable_draft = enabled
-    course.save! unless opts[:no_save]
+    account.allow_feature!(:draft_state)
+    course.set_feature_flag!(:draft_state, enabled ? 'on' : 'off')
 
     enabled
   end
@@ -681,46 +657,46 @@ Spec::Runner.configure do |config|
     @outcome_group.save!
 
     rubric_params = {
-      :title => 'My Rubric',
-      :hide_score_total => false,
-      :criteria => {
-        "0" => {
-          :points => 3,
-          :mastery_points => 0,
-          :description => "Outcome row",
-          :long_description => @outcome.description,
-          :ratings => {
+        :title => 'My Rubric',
+        :hide_score_total => false,
+        :criteria => {
             "0" => {
-              :points => 3,
-              :description => "Rockin'",
+                :points => 3,
+                :mastery_points => 0,
+                :description => "Outcome row",
+                :long_description => @outcome.description,
+                :ratings => {
+                    "0" => {
+                        :points => 3,
+                        :description => "Rockin'",
+                    },
+                    "1" => {
+                        :points => 0,
+                        :description => "Lame",
+                    }
+                },
+                :learning_outcome_id => @outcome.id
             },
             "1" => {
-              :points => 0,
-              :description => "Lame",
+                :points => 5,
+                :description => "no outcome row",
+                :long_description => 'non outcome criterion',
+                :ratings => {
+                    "0" => {
+                        :points => 5,
+                        :description => "Amazing",
+                    },
+                    "1" => {
+                        :points => 3,
+                        :description => "not too bad",
+                    },
+                    "2" => {
+                        :points => 0,
+                        :description => "no bueno",
+                    }
+                }
             }
-          },
-          :learning_outcome_id => @outcome.id
-        },
-        "1" => {
-          :points => 5,
-          :description => "no outcome row",
-          :long_description => 'non outcome criterion',
-          :ratings => {
-            "0" => {
-              :points => 5,
-              :description => "Amazing",
-            },
-            "1" => {
-              :points => 3,
-              :description => "not too bad",
-            },
-            "2" => {
-              :points => 0,
-              :description => "no bueno",
-            }
-          }
         }
-      }
     }
 
     @rubric = @course.rubrics.build
@@ -853,13 +829,22 @@ Spec::Runner.configure do |config|
   def enable_cache(new_cache = ActiveSupport::Cache::MemoryStore.new)
     old_cache = RAILS_CACHE
     ActionController::Base.cache_store = new_cache
-    silence_warnings { Object.const_set(:RAILS_CACHE, new_cache) }
     old_perform_caching = ActionController::Base.perform_caching
+    if CANVAS_RAILS2
+      ActionController::Base.cache_store = new_cache
+      silence_warnings { Object.const_set(:RAILS_CACHE, new_cache) }
+    else
+      Switchman::DatabaseServer.all.each {|s| s.stubs(:cache_store).returns(new_cache)}
+    end
     ActionController::Base.perform_caching = true
     yield
   ensure
-    silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
-    ActionController::Base.cache_store = old_cache
+    if CANVAS_RAILS2
+      ActionController::Base.cache_store = old_cache
+      silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
+    else
+      Switchman::DatabaseServer.all.each {|s| s.unstub(:cache_store)}
+    end
     ActionController::Base.perform_caching = old_perform_caching
   end
 
@@ -1184,8 +1169,44 @@ Spec::Runner.configure do |config|
       Rails.application.config.consider_all_requests_local = value
     end
   end
+
+  def page_view_for(opts={})
+    @account = opts[:account] || Account.default
+    @context = opts[:context] || course(opts)
+
+    @request_id = opts[:request_id] || RequestContextGenerator.request_id
+    unless @request_id
+      @request_id = UUIDSingleton.instance.generate
+      RequestContextGenerator.stubs(:request_id => @request_id)
+    end
+
+    Setting.set('enable_page_views', 'db')
+
+    @page_view = PageView.new { |p|
+      p.send(:attributes=, {
+          :id => @request_id,
+          :url => "http://test.one/",
+          :session_id => "phony",
+          :context => @context,
+          :controller => opts[:controller] || 'courses',
+          :action => opts[:action] || 'show',
+          :user_request => true,
+          :render_time => 0.01,
+          :user_agent => 'None',
+          :account_id => @account.id,
+          :request_id => request_id,
+          :interaction_seconds => 5,
+          :user => @user,
+          :remote_ip => '192.168.0.42'
+      }, false)
+    }
+    @page_view.save!
+    @page_view
+  end
 end
 
 Dir[Rails.root+'vendor/plugins/*/spec_canvas/spec_helper.rb'].each do |f|
   require f
 end
+
+

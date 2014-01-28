@@ -105,6 +105,8 @@ class UsersController < ApplicationController
   include LinkedIn
   include DeliciousDiigo
   include SearchHelper
+  include I18nUtilities
+
   before_filter :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
     :user_dashboard, :toggle_dashboard, :masquerade, :external_tool,
@@ -276,7 +278,7 @@ class UsersController < ApplicationController
   before_filter :require_password_session, :only => [:masquerade]
   def masquerade
     @user = User.find_by_id(params[:user_id])
-    return render_unauthorized_action(@user) unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
+    return render_unauthorized_action unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
     if request.post?
       if @user == @real_current_user
         session.delete(:become_user_id)
@@ -718,7 +720,10 @@ class UsersController < ApplicationController
   end
 
   def delete_user_service
-    @current_user.user_services.find(params[:id]).destroy
+    deleted = @current_user.user_services.find(params[:id]).destroy
+    if deleted.service == "google_docs"
+      Rails.cache.delete(['google_docs_tokens', @current_user].cache_key)
+    end
     render :json => {:deleted => true}
   end
 
@@ -794,7 +799,7 @@ class UsersController < ApplicationController
     @tool = ContextExternalTool.find_for(params[:id], @domain_root_account, :user_navigation)
     @resource_title = @tool.label_for(:user_navigation)
     @resource_url = @tool.user_navigation(:url)
-    @opaque_id = @current_user.opaque_identifier(:asset_string)
+    @opaque_id = @tool.opaque_identifier_for(@current_user)
     @resource_type = 'user_navigation'
     @return_url = user_profile_url(@current_user, :include_host => true)
     @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @domain_root_account, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
@@ -1144,7 +1149,7 @@ class UsersController < ApplicationController
         end
       end
     else
-      render_unauthorized_action(@user)
+      render_unauthorized_action
     end
   end
 
@@ -1357,7 +1362,8 @@ class UsersController < ApplicationController
     get_context
     @context = @domain_root_account || Account.default unless @context.is_a?(Account)
     @context = @context.root_account
-    unless @context.grants_right?(@current_user, session, :manage_user_logins) || @context.self_registration?
+    unless @context.grants_right?(@current_user, session, :manage_user_logins) ||
+        @context.self_registration_allowed_for?(params[:user] && params[:user][:initial_enrollment_type])
       flash[:error] = t('no_self_registration', "Self registration has not been enabled for this account")
       respond_to do |format|
         format.html { redirect_to root_url }
@@ -1369,7 +1375,7 @@ class UsersController < ApplicationController
 
   def all_menu_courses
     render :json => Rails.cache.fetch(['menu_courses', @current_user].cache_key) {
-      @template.map_courses_for_menu(@current_user.courses_with_primary_enrollment)
+      map_courses_for_menu(@current_user.courses_with_primary_enrollment)
     }
   end
 

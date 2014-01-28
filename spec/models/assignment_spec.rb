@@ -71,12 +71,24 @@ describe Assignment do
     @submission.versions.length.should eql(1)
   end
 
-  it "does not allow itself to be unpublished if it has student submissions" do
-    setup_assignment_with_students
-    @assignment.context.root_account.enable_draft!
-    @assignment.unpublish
-    @assignment.should_not be_valid
-    @assignment.errors['workflow_state'].should == "Can't unpublish if there are student submissions"
+  describe "#has_student_submissions?" do
+    before do
+      setup_assignment_with_students
+      @assignment.context.root_account.enable_feature!(:draft_state)
+    end
+
+    it "does not allow itself to be unpublished if it has student submissions" do
+      @assignment.submit_homework @stu1, :submission_type => "online_text_entry"
+      @assignment.unpublish
+      @assignment.should_not be_valid
+      @assignment.errors['workflow_state'].should == "Can't unpublish if there are student submissions"
+    end
+
+    it "does allow itself to be unpiblished if it has nil submissions" do
+      @assignment.submit_homework @stu1, :submission_type => nil
+      @assignment.unpublish
+      @assignment.workflow_state.should == "unpublished"
+    end
   end
 
   describe '#grade_student' do
@@ -401,6 +413,10 @@ describe Assignment do
 
     it "should allow grading an assignment with nil points_possible as percent" do
       Assignment.interpret_grade("100%", nil).should == 0
+    end
+
+    it "should not round scores" do
+      Assignment.interpret_grade("88.75%", 15).should == 13.3125
     end
   end
 
@@ -1135,7 +1151,7 @@ describe Assignment do
 
     it "updates the draft state of its associated quiz" do
       assignment_model(:course => @course, :submission_types => "online_quiz")
-      Account.default.enable_draft!
+      Account.default.enable_feature!(:draft_state)
       @a.reload
       @a.publish
       @a.save!
@@ -1783,7 +1799,8 @@ describe Assignment do
         :exclude_biblio => '1',
         :exclude_quoted => '0',
         :exclude_type => '0',
-        :exclude_value => ''
+        :exclude_value => '',
+        :s_view_report => '1'
       })
     end
 
@@ -2494,6 +2511,54 @@ describe Assignment do
       comments.map { |g|
         g.map { |c| c.submission.user }.sort_by(&:id)
       }.should == [[s1, s2]]
+    end
+  end
+
+  describe "restore" do
+    it "should restore to unpublished state if draft_state is enabled" do
+      course(draft_state: true)
+      assignment_model course: @course
+      @a.destroy
+      @a.restore
+      @a.reload.should be_unpublished
+    end
+  end
+
+  describe '#readable_submission_type' do
+    it "should work for on paper assignments" do
+      assignment_model(:submission_types => 'on_paper')
+      @assignment.readable_submission_types.should == 'on paper'
+    end
+  end
+
+  describe '#update_grades_if_details_changed' do
+    before do
+      assignment_model
+    end
+
+    it "should update grades if points_possible changes" do
+      @assignment.context.expects(:recompute_student_scores).once
+      @assignment.points_possible = 3
+      @assignment.save!
+    end
+
+    it "should update grades if muted changes" do
+      @assignment.context.expects(:recompute_student_scores).once
+      @assignment.muted = true
+      @assignment.save!
+    end
+
+    it "should update grades if workflow_state changes" do
+      @assignment.context.expects(:recompute_student_scores).once
+      @assignment.unpublish
+    end
+
+    it "should not update grades otherwise" do
+      @assignment.context.expects(:recompute_student_scores).never
+      @assignment.title = 'hi'
+      @assignment.due_at = 1.hour.ago
+      @assignment.description = 'blah'
+      @assignment.save!
     end
   end
 end

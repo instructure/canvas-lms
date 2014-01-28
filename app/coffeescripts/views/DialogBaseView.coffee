@@ -33,6 +33,7 @@ define [
   class DialogBaseView extends Backbone.View
 
     initialize: ->
+      super
       @initDialog()
       @setElement @dialog
 

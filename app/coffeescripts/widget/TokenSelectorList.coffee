@@ -49,13 +49,14 @@ define [
       91: 'Command'
 
     initialize: (options) ->
+      @paginationScrollContainer = $('<ul />', role: 'menu')
+      super
       @selector = @options.selector
       @parent = @options.parent
       @ancestors = @options.ancestors
       @query = @options.query
 
       @$heading                  = $('<ul />', class: 'heading').appendTo(@$el)
-      @paginationScrollContainer = $('<ul />', role: 'menu')
       @$body                     = @paginationScrollContainer.appendTo(@$el)
 
       @$el.find('ul')
@@ -65,7 +66,6 @@ define [
 
       @collection.on 'beforeFetch', @showPaginationLoader, this
       @collection.on 'fetch', @render
-      super
 
     render: =>
       activeIndex = @paginationScrollContainer.children('.active').index()

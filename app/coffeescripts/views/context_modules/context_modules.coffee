@@ -112,6 +112,7 @@ define [
     itemSelector: "table.context_module_item"
 
     initialize: ->
+      super
       @$contextModules = $("#context_modules")
       @$contextModules.parent().on 'keydown', @onKeyDown
 

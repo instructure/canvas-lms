@@ -237,6 +237,20 @@ This text has a http://www.google.com link in it...
         tconvo.reload.should be_read
       end
 
+      it "should not create conversations for teachers in new conversations" do
+        @teacher1.preferences[:use_new_conversations] = true
+        @teacher1.save!
+        @submission1.add_comment(author: @student1, comment: 'test')
+        @teacher1.reload.unread_conversations_count.should == 0
+      end
+
+      it "should not create conversations for students in new conversations" do
+        @student1.preferences[:use_new_conversations] = true
+        @student1.save!
+        @submission1.add_comment(author: @teacher1, comment: 'test')
+        @student1.reload.unread_conversations_count.should == 0
+      end
+
       context "teacher makes first submission comment" do
         it "should only show as sent for the teacher if private converstation does not already exist" do
           @submission1.add_comment(:author => @teacher1, :comment => "test comment")

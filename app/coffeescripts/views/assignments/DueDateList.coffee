@@ -12,6 +12,7 @@ define [
   class DueDateList extends Backbone.View
 
     initialize: (options) ->
+      super
       @dueDateList = @model
       @dueDateViews = []
       @dueDateList.overrides.forEach (override) =>

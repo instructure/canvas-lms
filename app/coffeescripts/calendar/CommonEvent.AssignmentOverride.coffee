@@ -33,7 +33,6 @@ define [
       @description = @assignment.description
       @start = @parseStartDate()
       @end = null # in case it got set by midnight fudging
-      @originalStartDate = new Date(@start) if @start
 
     copyDataFromOverride: (override) ->
       @override = override
@@ -43,16 +42,13 @@ define [
     fullDetailsURL: () ->
       @assignment.html_url
 
-    startDate: () -> @originalStartDate
-
     parseStartDate: () ->
       if @assignment.due_at then $.parseFromISO(@assignment.due_at, 'due_date').time else null
 
     displayTimeString: () ->
-      if !@start
+      unless date = @originalStart
         return "No Date" # TODO: i18n
 
-      date = @start
       # TODO: i18n
       time_string = "#{$.dateString(date)} at #{$.timeString(date)}"
       "Due: <time datetime='#{date.toISOString()}'>#{time_string}</time>"

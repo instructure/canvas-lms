@@ -60,6 +60,15 @@ Add an additional class `.btn-large`, `.btn-small`, `.btn-mini` to change button
   <button class="btn btn-mini" type="button">Mini button</button>
 </p>
 ```
+
+### Artificial buttons
+
+To create something that acts like a button when you can't use a button element,
+listen to the "click" and "keyclick" events and add tabindex="0" and role="button".
+
+```html
+<div class="btn" tabindex="0" role="button">Activate me</div>
+```
 */
 
 .btn {

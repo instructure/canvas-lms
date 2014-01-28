@@ -27,7 +27,7 @@
       <span style="color: #888;"> &nbsp; &nbsp; <%= t 'instructions.group_assignment', "drag students to assign to groups" %></span>
       </div>
       <% if student_organized %>
-        <div style="color: #444;"><%= image_tag "warning.png" %> <%= t 'warnings.studend_groups', "These groups are self-organized by students.  Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups may not be the best solution for graded assignments." %></div>
+        <div style="color: #444;"><%= image_tag "warning.png" %> <%= t 'warnings.studend_groups', "These groups are self-organized by students.  Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups cannot be used for graded assignments." %></div>
       <% end %>
       <div style="color: #444;<%= hidden unless category && category.self_signup? %>" class="self_signup_text">
         <%= t 'self_signup_blurb', "Self sign-up is enabled for these groups." %>

@@ -25,9 +25,8 @@ class ProfileController < ApplicationController
   before_filter :require_password_session, :only => [:settings, :communication, :communication_update, :update]
 
   include Api::V1::Avatar
-  include Api::V1::Notification
-  include Api::V1::NotificationPolicy
   include Api::V1::CommunicationChannel
+  include Api::V1::NotificationPolicy
   include Api::V1::UserProfile
 
   include TextHelper
@@ -120,10 +119,20 @@ class ProfileController < ApplicationController
 
     # Get the list of Notification models (that are treated like categories) that make up the full list of Categories.
     full_category_list = Notification.dashboard_categories(@user)
+    categories = full_category_list.map do |category|
+      category.as_json(only: %w{id name workflow_state user_id}, include_root: false).tap do |json|
+        # Add custom method result entries to the json
+        json[:category]             = category.category.underscore.gsub(/\s/, '_')
+        json[:display_name]         = category.category_display_name
+        json[:category_description] = category.category_description
+        json[:option]               = category.related_user_setting(@user)
+      end
+    end
+
     js_env  :NOTIFICATION_PREFERENCES_OPTIONS => {
       :channels => @user.communication_channels.all_ordered_for_display(@user).map { |c| communication_channel_json(c, @user, session) },
-      :policies => NotificationPolicy.setup_with_default_policies(@user, full_category_list).map{ |p| notification_policy_json(p, @user, session) },
-      :categories => full_category_list.map{ |c| notification_category_json(c, @user, session) },
+      :policies => NotificationPolicy.setup_with_default_policies(@user, full_category_list).map { |p| notification_policy_json(p, @user, session).tap { |json| json[:communication_channel_id] = p.communication_channel_id } },
+      :categories => categories,
       :update_url => communication_update_profile_path,
       },
       :READ_PRIVACY_INFO => @user.preferences[:read_notification_privacy_info],

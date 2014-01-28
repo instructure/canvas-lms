@@ -217,7 +217,7 @@ describe NotificationPolicy do
       }
       n1 = notification_policy_model(trifecta_opts.merge(:notification => notify1) )
       n2 = notification_policy_model(trifecta_opts.merge(:notification => notify2) )
-      params = {:category => 'MultiCategory', :channel_id => @communication_channel.id, :frequency => Notification::FREQ_IMMEDIATELY}
+      params = {:category => 'multi_category', :channel_id => @communication_channel.id, :frequency => Notification::FREQ_IMMEDIATELY}
       NotificationPolicy.setup_for(@user, params)
       n1.reload; n2.reload
       n1.frequency.should == Notification::FREQ_IMMEDIATELY
@@ -227,9 +227,10 @@ describe NotificationPolicy do
 
   describe "setup_with_default_policies" do
     before :each do
-      user_model
-      communication_channel_model
+      @user = User.create!
+      @communication_channel = @user.communication_channels.create!(path: 'email@example.com')
       @announcement = notification_model(:name => 'Setting 1', :category => 'Announcement')
+      Notification.stubs(:all).returns([@notification])
     end
 
     it "should create default NotificationPolicy entries if missing" do

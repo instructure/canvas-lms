@@ -65,6 +65,7 @@ define([
       endAt: endAt,
       startedAtText: startedAtText,
       timeLimit: parseInt($(".time_limit").text(), 10) || null,
+      hasTimeLimit: !!ENV.QUIZ.time_limit,
       timeLeft: parseInt($(".time_left").text()) * 1000,
       oneAtATime: $("#submit_quiz_form").hasClass("one_question_at_a_time"),
       cantGoBack: $("#submit_quiz_form").hasClass("cant_go_back"),
@@ -208,9 +209,9 @@ define([
       },
 
       updateTime: function() {
-        var timeLeft = quizSubmission.timeLeft = quizSubmission.timeLeft - quizSubmission.clockInterval;
-
-        if(!timeLeft) {
+        if(quizSubmission.hasTimeLimit) {
+          var timeLeft = quizSubmission.timeLeft = quizSubmission.timeLeft - quizSubmission.clockInterval;
+        } else {
           return quizSubmission.updateCounter();
         }
 

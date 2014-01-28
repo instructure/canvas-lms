@@ -18,26 +18,13 @@ define [
       # if the user is being removed from a group, or is being moved to
       # another group AND the category allows multiple memberships (in
       # which case rails won't delete the old membership, so we have to)
-      if previousGroupId and (not groupId? or @category?.get('allows_multiple_memberships'))
+      if previousGroupId and (not groupId? or @get('category').get('allows_multiple_memberships'))
         @leaveGroup(previousGroupId)
 
     # creating membership will delete pre-existing membership in same group category
     joinGroup: (groupId) ->
-      $.ajaxJSON "/api/v1/groups/#{groupId}/memberships", 'POST', {user_id: @get('id')}, @addToCollectionIfCopy
-
-    # when moving (not copying) a user, the collections will ensure it's
-    # added/removed correctly to/from them. in the case of copying, otoh,
-    # the user is not yet in any collection (and so no reassignment
-    # happens), so we manage that logic here
-    addToCollectionIfCopy: (data) =>
-      return unless @copy
-      return unless groupUsers = @category.groupUsersFor(@get('groupId'))
-      delete @copy
-
-      if data.just_created
-        groupUsers.addUser this
-      else # user was already in this group
-        groupUsers.get(@id)?.moved()
+      $.ajaxJSON "/api/v1/groups/#{groupId}/memberships", 'POST', {user_id: @get('id')},
+        (data) => @trigger('ajaxJoinGroupSuccess', data)
 
     leaveGroup: (groupId) ->
       $.ajaxJSON "/api/v1/groups/#{groupId}/users/#{@get('id')}", 'DELETE'
@@ -46,18 +33,3 @@ define [
     # once everything is done
     moved: =>
       @trigger 'moved', this
-
-    moveTo: (newGroupId) ->
-      groupId = @get('groupId')
-      category = @collection?.getCategory?()
-      return if groupId is newGroupId
-
-      model = this
-      # if we're in the Unassigned/Everyone collection, and the category
-      # allows multiple memberships, don't actually move this, move a copy
-      # instead
-      if not groupId? and category?.get('allows_multiple_memberships')
-        model = model.clone()
-        model.copy = true
-      model.category = category
-      model.save groupId: newGroupId

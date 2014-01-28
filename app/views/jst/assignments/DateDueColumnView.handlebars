@@ -19,8 +19,8 @@
   </div>
 
 {{else}}
-  {{#if dueAt}}
-  <strong>{{#t "due_date"}}Due{{/t}}</strong>
-  {{datetimeFormatted dueAt}}
+  {{#if singleSectionDueDate}}
+    <strong>{{#t "due_date"}}Due{{/t}}</strong>
+    {{datetimeFormatted singleSectionDueDate}}
   {{/if}}
 {{/if}}

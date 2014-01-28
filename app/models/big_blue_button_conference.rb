@@ -47,6 +47,7 @@ class BigBlueButtonConference < WebConference
       :moderatorPW => settings[:admin_key],
       :logoutURL => (settings[:default_return_url] || "http://www.instructure.com"),
       :record => settings[:record] ? "true" : "false",
+      :welcome => settings[:record] ? t(:conference_is_recorded, "This conference is being recorded.") : ""
     }) or return nil
     @conference_active = true
     save
@@ -105,7 +106,7 @@ class BigBlueButtonConference < WebConference
   end
 
   def fetch_recordings
-    return [] unless conference_key
+    return [] unless conference_key && settings[:record]
     response = send_request(:getRecordings, {
       :meetingID => conference_key,
       })

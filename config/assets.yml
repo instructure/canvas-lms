@@ -107,6 +107,8 @@ stylesheets:
     - public/stylesheets/compiled/quizzes-mobile.css
     - public/stylesheets/compiled/message_students.css
     - public/stylesheets/compiled/ui.selectmenu.css
+  quizzes_ember:
+    - public/stylesheets/compiled/quizzes_ember.css
   moderate_quiz:
     - public/stylesheets/compiled/moderate_quiz.css
   assignments:

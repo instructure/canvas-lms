@@ -4,11 +4,11 @@ define [
   'Backbone'
   'compiled/views/MessageStudentsDialog',
   'compiled/views/groups/manage/RandomlyAssignMembersView'
-  'compiled/views/groups/manage/GroupEditView'
+  'compiled/views/groups/manage/GroupCreateView'
   'compiled/views/groups/manage/GroupCategoryEditView'
   'compiled/models/Group'
   'jst/groups/manage/groupCategoryDetail'
-], (I18n, _, {View}, MessageStudentsDialog, RandomlyAssignMembersView, GroupEditView, GroupCategoryEditView, Group, template) ->
+], (I18n, _, {View}, MessageStudentsDialog, RandomlyAssignMembersView, GroupCreateView, GroupCategoryEditView, Group, template) ->
 
   class GroupCategoryDetailView extends View
 
@@ -25,6 +25,9 @@ define [
     els:
       '.randomly-assign-members': '$randomlyAssignMembersLink'
       '.al-trigger': '$groupCategoryActions'
+      '.edit-category': '$editGroupCategoryLink'
+      '.message-all-unassigned': '$messageAllUnassignedLink'
+      '.add-group': '$addGroupButton'
 
     initialize: (options) ->
       super
@@ -38,12 +41,14 @@ define [
     afterRender: ->
       # its trigger will not be rendered yet, set it manually
       @randomlyAssignUsersView.setTrigger @$randomlyAssignMembersLink
-      # pass in a closure to define the focus target within this scope
-      _.extend @randomlyAssignUsersView.options, focusReturnsTo: => @$el.find('.al-trigger')
+      # reassign the trigger for the createView modal if instantiated
+      @createView?.setTrigger @$addGroupButton
 
     toJSON: ->
       json = super
+      json.canMessageMembers = @model.canMessageUnassignedMembers()
       json.canAssignMembers = @model.canAssignUnassignedMembers()
+      json.locked = @model.isLocked()
       json
 
     deleteCategory: (e) =>
@@ -57,15 +62,19 @@ define [
 
     addGroup: (e) ->
       e.preventDefault()
-      @createView ?= new GroupEditView({editing: false, focusReturnsTo: => @$el.find('.add-group')})
-      new_group = new Group(group_category_id: @model.id)
-      new_group.on 'sync', _.once =>
-        @collection.add(new_group)
-      @createView.model = new_group
-      @createView.toggle()
+      @createView ?= new GroupCreateView
+        groupCategory: @model
+        trigger: @$addGroupButton
+      newGroup = new Group({group_category_id: @model.id}, {newAndEmpty: true})
+      newGroup.once 'sync', =>
+        @collection.add(newGroup)
+      @createView.model = newGroup
+      @createView.open()
 
     editCategory: ->
-      @editCategoryView ?= new GroupCategoryEditView({@model, focusReturnsTo: => @$el.find('.al-trigger')})
+      @editCategoryView ?= new GroupCategoryEditView
+        model: @model
+        trigger: @$editGroupCategoryLink
       @editCategoryView.open()
 
     messageAllUnassigned: (e) ->
@@ -77,11 +86,11 @@ define [
         students = @model.unassignedUsers().map (user)->
           {id: user.get("id"), short_name: user.get("short_name")}
         dialog = new MessageStudentsDialog
+          trigger: @$messageAllUnassignedLink
           context: @model.get 'name'
           recipientGroups: [
             {name: I18n.t('students_who_have_not_joined_a_group', 'Students who have not joined a group'), recipients: students}
           ]
-          focusReturnsTo: => @$el.find('.al-trigger')
         dialog.open()
       users = @model.unassignedUsers()
       # get notified when last page is fetched and then open the dialog

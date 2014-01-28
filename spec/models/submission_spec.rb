@@ -789,6 +789,26 @@ describe Submission do
     end
   end
 
+  describe "autograded" do
+    let(:submission) { Submission.new }
+
+    it "returns false when its not autograded" do
+      assignment = stub(:muted? => false)
+      @submission = Submission.new
+      @submission.autograded?.should == false
+
+      @submission.grader_id = Shard.global_id_for(@user.id)
+      @submission.autograded?.should == false
+    end
+
+    it "returns true when its autograded" do
+      assignment = stub(:muted? => false)
+      @submission = Submission.new
+      @submission.grader_id = -1
+      @submission.autograded?.should == true
+    end
+  end
+
   describe "past_due" do
     before do
       u1 = @user
@@ -945,6 +965,36 @@ describe Submission do
       submissions.each_with_index { |s, i|
         s.versioned_attachments.should == attachments[i]
       }
+    end
+  end
+
+  describe "#assign_assessor" do
+    def peer_review_assignment
+      assignment = @course.assignments.build(title: 'Peer review',
+        due_at: Time.now - 1.day,
+        points_possible: 5,
+        submission_types: 'online_text_entry')
+      assignment.peer_reviews_assigned = true
+      assignment.peer_reviews = true
+      assignment.automatic_peer_reviews = true
+      assignment.save!
+
+      assignment
+    end
+
+    before(:each) do
+      student_in_course(active_all: true)
+      @student2 = user
+      @course.enroll_student(@student2).accept!
+      @assignment = peer_review_assignment
+      @assignment.submit_homework(@student,  body: 'Lorem ipsum dolor')
+      @assignment.submit_homework(@student2, body: 'Sit amet consectetuer')
+    end
+
+    it "should send a reminder notification" do
+      AssessmentRequest.any_instance.expects(:send_reminder!).once
+      submission1, submission2 = @assignment.submissions
+      submission1.assign_assessor(submission2)
     end
   end
 end

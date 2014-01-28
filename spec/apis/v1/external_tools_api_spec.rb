@@ -68,7 +68,8 @@ describe ExternalToolsController, :type => :integration do
 
     if Canvas.redis_enabled?
       it 'should allow sessionless launches' do
-        sessionless_launch(@course, 'course')
+        sessionless_launch_by_url(@course, 'course')
+        sessionless_launch_by_id(@course, 'course')
       end
     end
   end
@@ -118,7 +119,8 @@ describe ExternalToolsController, :type => :integration do
 
     if Canvas.redis_enabled?
       it 'should allow sessionless launches' do
-        sessionless_launch(@account, 'account')
+        sessionless_launch_by_url(@account, 'account')
+        sessionless_launch_by_id(@account, 'account')
       end
     end
   end
@@ -277,19 +279,22 @@ describe ExternalToolsController, :type => :integration do
     hash
   end
 
-  def sessionless_launch(context, type)
-    et = context.context_external_tools.create!(
-      :name => 'Example',
-      :url => 'http://www.example.com',
-      :consumer_key => 'key',
-      :shared_secret => 'secret',
-    )
+  def sessionless_launch_by_url(context, type)
+    tool = tool_with_everything(context)
+    sessionless_launch(context, type, tool, {url: tool.url})
+  end
 
+  def sessionless_launch_by_id(context, type)
+    tool = tool_with_everything(context)
+    sessionless_launch(context, type, tool, {id: tool.id.to_s})
+  end
+
+  def sessionless_launch(context, type, tool, params)
     # initial api call
     json = api_call(
       :get,
-      "/api/v1/#{type}s/#{context.id}/external_tools/sessionless_launch?url=http%3A%2F%2Fwww.example.com",
-      {:controller => 'external_tools', :action => 'generate_sessionless_launch', :format => 'json', :"#{type}_id" => context.id.to_s, :url => 'http://www.example.com'}
+      "/api/v1/#{type}s/#{context.id}/external_tools/sessionless_launch?#{params.map{|k,v| "#{k}=#{v}" }.join('&')}",
+      {:controller => 'external_tools', :action => 'generate_sessionless_launch', :format => 'json', :"#{type}_id" => context.id.to_s}.merge(params)
     )
     json.should include('url')
 
@@ -302,7 +307,7 @@ describe ExternalToolsController, :type => :integration do
 
     doc = Nokogiri::HTML(response.body)
     doc.at_css('form').should_not be_nil
-    doc.at_css('form')['action'].should == 'http://www.example.com'
+    doc.at_css('form')['action'].should == tool.url
   end
   
   def example_json(et=nil)

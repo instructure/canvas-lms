@@ -64,6 +64,8 @@ describe "people" do
 
       #add first student
       @student_1 = create_user('student@test.com')
+      Account.default.settings[:enable_manage_groups2] = false
+      Account.default.save!
 
       e1 = @course.enroll_student(@student_1)
       e1.workflow_state = 'active'

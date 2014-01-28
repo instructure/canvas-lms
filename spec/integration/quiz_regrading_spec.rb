@@ -5,7 +5,7 @@ describe "QuizRegrading" do
   def create_quiz_question!(data)
     question = @quiz.quiz_questions.create!
     data.merge!(:id => question.id)
-    question.write_attribute(:question_data,data)
+    question.write_attribute(:question_data, data.to_hash)
     question.save!
     question
   end
@@ -84,16 +84,16 @@ describe "QuizRegrading" do
     data = @true_false_question.question_data
     data[:answers].first[:weight]  = 0
     data[:answers].second[:weight]  = 100
-    @true_false_question.write_attribute(:question_data, data)
+    @true_false_question.write_attribute(:question_data, data.to_hash)
     @true_false_question.save!
     data = @multiple_choice_question.question_data
     data[:answers].first[:weight] = 0
     data[:answers].second[:weight]  = 100
-    @multiple_choice_question.write_attribute(:data, data)
+    @multiple_choice_question.write_attribute(:question_data, data.to_hash)
     @multiple_choice_question.save!
     data = @multiple_answers_question.reload.question_data
     data[:answers].second[:weight]  = 0
-    @multiple_answers_question.write_attribute(:data, data)
+    @multiple_answers_question.write_attribute(:question_data, data.to_hash)
     @multiple_answers_question.save!
     @quiz.reload
 

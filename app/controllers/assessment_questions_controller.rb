@@ -17,6 +17,8 @@
 #
 
 class AssessmentQuestionsController < ApplicationController
+  include Api::V1::QuizQuestion
+
   before_filter :require_context
   before_filter :require_bank
   def create
@@ -26,8 +28,7 @@ class AssessmentQuestionsController < ApplicationController
       params[:assessment_question][:form_question_data] ||= params[:question]
       @question = @bank.assessment_questions.build(params[:assessment_question])
       if @question.with_versioning(&:save)
-        @question.insert_at_bottom
-        render :json => @question
+        render json: question_json(@question, @current_user, session, [:assessment_question])
       else
         render :json => @question.errors, :status => :bad_request
       end
@@ -43,8 +44,7 @@ class AssessmentQuestionsController < ApplicationController
       params[:assessment_question][:form_question_data] ||= params[:question]
       @question.edited_independent_of_quiz_question
       if @question.with_versioning { @question.update_attributes(params[:assessment_question]) }
-        @question.ensure_in_list
-        render :json => @question
+        render json: question_json(@question, @current_user, session, [:assessment_question])
       else
         render :json => @question.errors, :status => :bad_request
       end

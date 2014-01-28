@@ -46,6 +46,7 @@ define [
 
     toJSON: ->
       users: @collection.toJSON()
+      ENV: ENV
 
     focus: ->
       @inputFilterView.el.focus()

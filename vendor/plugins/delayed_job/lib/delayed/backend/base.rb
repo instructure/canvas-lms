@@ -308,8 +308,7 @@ module Delayed
         end
       end
 
-    protected
-
+    public
       def before_save
         self.queue ||= Delayed::Worker.queue
         self.run_at ||= self.class.db_time_now

@@ -36,7 +36,7 @@ class AccountReport < ActiveRecord::Base
   end
 
   scope :last_complete_of_type, lambda{ |type|
-    last_of_type(type).where(:workflow_state => 'complete')  }
+    last_of_type(type).where(:progress => '100')  }
 
   scope :last_of_type, lambda {|type|
     where(:report_type => type).order("updated_at DESC").limit(1)

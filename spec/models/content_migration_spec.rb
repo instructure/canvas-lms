@@ -282,7 +282,7 @@ describe ContentMigration do
 
     context "unpublished items" do
       before :each do
-        Course.any_instance.stubs(:draft_state_enabled?).returns(true)
+        Account.default.enable_feature!(:draft_state)
       end
 
       it "should copy unpublished modules" do
@@ -360,8 +360,7 @@ describe ContentMigration do
       end
 
       it "should copy wiki has_no_front_page setting if draft state is enabled" do
-        @copy_from.root_account.settings[:enable_draft] = true
-        @copy_from.root_account.save!
+        @copy_from.root_account.enable_feature!(:draft_state)
 
         @copy_from.wiki.front_page.save!
         @copy_from.wiki.unset_front_page!
@@ -383,8 +382,7 @@ describe ContentMigration do
       end
 
       it "should set default view to feed if wiki front page is missing and draft state is enabled" do
-        @copy_from.root_account.settings[:enable_draft] = true
-        @copy_from.root_account.save!
+        @copy_from.root_account.enable_feature!(:draft_state)
 
         @copy_from.default_view = 'wiki'
         @copy_from.save!
@@ -1474,7 +1472,9 @@ describe ContentMigration do
       )
       @copy_from.quizzes.create!(:due_at => "05 Jul 2012 06:00:00 UTC +00:00",
                                  :unlock_at => old_start + 1.days,
-                                 :lock_at => old_start + 5.days
+                                 :lock_at => old_start + 5.days,
+                                 :show_correct_answers_at => old_start + 6.days,
+                                 :hide_correct_answers_at => old_start + 7.days
       )
       @copy_from.discussion_topics.create!(:title => "some topic",
                                            :message => "<p>some text</p>",
@@ -1502,6 +1502,8 @@ describe ContentMigration do
       new_quiz.due_at.to_i.should  == (new_start + 4.day).to_i
       new_quiz.unlock_at.to_i.should == (new_start + 1.day).to_i
       new_quiz.lock_at.to_i.should == (new_start + 5.day).to_i
+      new_quiz.show_correct_answers_at.to_i.should == (new_start + 6.day).to_i
+      new_quiz.hide_correct_answers_at.to_i.should == (new_start + 7.day).to_i
 
       new_disc = @copy_to.discussion_topics.first
       new_disc.delayed_post_at.to_i.should == (new_start + 3.day).to_i
@@ -1522,7 +1524,7 @@ describe ContentMigration do
               :title => 'quiz',
               :description => "<p>description eh</p>",
               :shuffle_answers => true,
-              :show_correct_answers => 'true',
+              :show_correct_answers => true,
               :time_limit => 20,
               :allowed_attempts => 4,
               :scoring_policy => 'keep_highest',
@@ -1993,7 +1995,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
     context "external tools" do
       append_before do
-        @tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
+        @tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :custom_fields => {'a' => '1', 'b' => '2'}, :url => "http://www.example.com")
         @tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
         @tool_from.save!
       end
@@ -2078,6 +2080,32 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
         tool.account_navigation.should == @tool_from.account_navigation
         tool.user_navigation.should_not be_nil
         tool.user_navigation.should == @tool_from.user_navigation
+      end
+
+      it "should keep reference to ContextExternalTool by id for courses" do
+        mod1 = @copy_from.context_modules.create!(:name => "some module")
+        tag = mod1.add_item :type => 'context_external_tool', :id => @tool_from.id,
+                      :url => "https://www.example.com/launch"
+        run_course_copy
+
+        tool_copy = @copy_to.context_external_tools.find_by_migration_id(CC::CCHelper.create_key(@tool_from))
+        tag = @copy_to.context_modules.first.content_tags.first
+        tag.content_type.should == 'ContextExternalTool'
+        tag.content_id.should == tool_copy.id
+      end
+
+      it "should keep reference to ContextExternalTool by id for accounts" do
+        account = @copy_from.root_account
+        @tool_from.context = account
+        @tool_from.save!
+        mod1 = @copy_from.context_modules.create!(:name => "some module")
+        mod1.add_item :type => 'context_external_tool', :id => @tool_from.id, :url => "https://www.example.com/launch"
+
+        run_course_copy
+
+        tag = @copy_to.context_modules.first.content_tags.first
+        tag.content_type.should == 'ContextExternalTool'
+        tag.content_id.should == @tool_from.id
       end
     end
   end

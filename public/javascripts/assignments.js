@@ -971,7 +971,7 @@ define([
       event.preventDefault();
       event.stopPropagation();
       if(event.keyString == 'f') {
-        $(this).find(".preview_assignment_link:visible:first").click();
+        window.location = $(this).find(".title:visible:first").attr("href");
       } else if(event.keyString == 'e') {
         $(this).find(".edit_assignment_link:visible:first").click();
       } else if(event.keyString == 'd') {

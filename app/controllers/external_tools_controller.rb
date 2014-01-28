@@ -105,17 +105,14 @@ class ExternalToolsController < ApplicationController
       end
       @resource_title = @tool.name
       @resource_url = params[:url]
-      @opaque_id = @context.opaque_identifier(:asset_string)
+      @opaque_id = @tool.opaque_identifier_for(@context)
       add_crumb(@context.name, named_context_url(@context, :context_url))
       @return_url = url_for(@context)
       @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
       @tool_settings = @launch.generate
 
-      if params[:borderless]
-        render :partial => 'external_tools/borderless_launch'
-      else
-        render :template => 'external_tools/tool_show'
-      end
+      @tool_launch_type = 'self'
+      render :template => 'external_tools/tool_show'
     end
   end
 
@@ -238,7 +235,8 @@ class ExternalToolsController < ApplicationController
     @resource_title = launch_settings['tool_name']
     @tool_settings = launch_settings['tool_settings']
 
-    render :partial => 'external_tools/borderless_launch'
+    @tool_launch_type = 'self'
+    render :template => 'external_tools/tool_show'
   end
 
   # @API Get a single external tool
@@ -307,7 +305,7 @@ class ExternalToolsController < ApplicationController
 
     @return_url    = external_content_success_url('external_tool')
     @headers       = false
-    @self_target   = true
+    @tool_launch_type = 'self'
 
     find_tool(params[:external_tool_id], selection_type)
     render_tool(selection_type)

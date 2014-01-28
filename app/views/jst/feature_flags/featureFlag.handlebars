@@ -1,0 +1,85 @@
+<div class="row-fluid">
+  <div class="span4">
+    <a href="#"
+       class="icon-mini-arrow-right element_toggler"
+       aria-controls="{{id}}-details"
+       aria-expanded="false"
+       role="button">
+       <span class="screenreader-only">
+         {{#t "toggle_feature_details"}}Toggle feature details{{/t}}
+       </span>
+    </a>
+    <span class="feature-title">{{title}}</span>
+
+    {{#each labels}}
+      <span class="label label-{{cssClass}}">{{name}}</span>
+    {{/each}}
+  </div>
+
+  <div class="span4 feature-release text-center">
+    {{#if releaseOn}}
+      {{#t "estimated_release"}}Estimated Release:{{/t}}
+      <span class="feature-release-date">
+        {{strftime releaseOn "%B %-d, %Y"}}
+      </span>
+    {{/if}}
+  </div>
+
+
+  <div class="span4 text-right">
+    {{#if isLocked}}
+      <span class="feature-lock-message">
+        {{#if isOn}}
+          {{#t "enabled"}}Enabled{{/t}}
+        {{else}}
+          {{#t "disabled"}}Disabled{{/t}}
+        {{/if}}
+      </span>
+    {{else}}
+      <div class="btn-group" role="radiogroup">
+        {{#unless isSiteAdmin}}
+          <button type="button"
+                  class="btn {{#if isOn}}active{{/if}}"
+                  data-action="on"
+                  data-name="{{id}}"
+                  role="radio"
+                  aria-checked="{{#if isOn}}true{{else}}false{{/if}}">{{#t "on"}}On{{/t}}</button>
+        {{/unless}}
+        {{#if currentContextIsAccount}}
+          <button type="button"
+                  class="btn {{#if isAllowed}}active{{/if}}"
+                  data-action="allowed"
+                  data-name="{{id}}"
+                  role="radio"
+                  aria-checked="{{#if isAllowed}}true{{else}}false{{/if}}">{{#t "allow"}}Allow{{/t}}</button>
+        {{/if}}
+        <button type="button"
+                class="btn {{#if isOff}}active{{/if}}"
+                data-action="off"
+                data-name="{{id}}"
+                role="radio"
+                aria-checked="{{#if isOff}}true{{else}}false{{/if}}">{{#t "off"}}Off{{/t}}</button>
+      </div>
+    {{/if}}
+  </div>
+</div>
+
+<div class="feature-details row-fluid" id="{{id}}-details">
+  <div class="span10">
+    <p class="feature-description">
+      {{#if description}}
+        {{description}}
+      {{else}}
+        ({{#t "no_description"}}no description{{/t}})
+      {{/if}}
+    </p>
+  </div>
+
+  <div class="span2 text-right feature-detail-links">
+    {{#if releaseNotesUrl}}
+    <a href="{{releaseNotesUrl}}" class="feature-release-notes-link">
+        {{#t "release_notes"}}release notes{{/t}}
+      </a>
+    {{/if}}
+  </div>
+</div>

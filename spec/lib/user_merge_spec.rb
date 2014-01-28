@@ -28,9 +28,15 @@ describe UserMerge do
     it "should move submissions to the new user (but only if they don't already exist)" do
       a1 = assignment_model
       s1 = a1.find_or_create_submission(user1)
+      s1.submission_type = "online_quiz"
+      s1.save!
       s2 = a1.find_or_create_submission(user2)
+      s2.submission_type = "online_quiz"
+      s2.save!
       a2 = assignment_model
       s3 = a2.find_or_create_submission(user2)
+      s3.submission_type = "online_quiz"
+      s3.save!
       user2.submissions.length.should eql(2)
       user1.submissions.length.should eql(1)
       UserMerge.from(user2).into(user1)
@@ -41,6 +47,35 @@ describe UserMerge do
       user1.submissions.length.should eql(2)
       user1.submissions.map(&:id).should be_include(s1.id)
       user1.submissions.map(&:id).should be_include(s3.id)
+    end
+
+    it "should overwrite submission objects that do not contain actual student submissions (e.g. what_if grades)" do
+      a1 = assignment_model
+      s1 = a1.find_or_create_submission(user1)
+      s2 = a1.find_or_create_submission(user2)
+      s2.submission_type = "online_quiz"
+      s2.save!
+
+      UserMerge.from(user2).into(user1)
+
+      user1.reload.submissions.should == [s2.reload]
+      user2.reload.submissions.should == []
+
+      user1.destroy
+      user2.destroy
+
+      user1 = user_model
+      user2 = user_model
+      a2 = assignment_model
+      s3 = a2.find_or_create_submission(user1)
+      s3.submission_type = "online_quiz"
+      s3.save!
+      s4 = a2.find_or_create_submission(user2)
+
+      UserMerge.from(user2).into(user1)
+
+      user1.reload.submissions.should == [s3.reload]
+      user2.reload.submissions.should == [s4.reload]
     end
 
     it "should move ccs to the new user (but only if they don't already exist)" do

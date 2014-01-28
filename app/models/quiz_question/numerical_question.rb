@@ -60,7 +60,7 @@ class QuizQuestion::NumericalQuestion < QuizQuestion::Base
   def stats(responses)
     super
 
-    @question_data[:answers].each do |answer|
+    @question_data.answers.each do |answer|
       if answer[:numerical_answer_type] == 'exact_answer'
         answer[:text] = I18n.t('statistics.exact_answer', "%{exact_value} +/- %{margin}", :exact_value => answer[:exact], :margin => answer[:margin])
       else

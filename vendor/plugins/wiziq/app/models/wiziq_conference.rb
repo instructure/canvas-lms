@@ -32,9 +32,7 @@ class WiziqConference < WebConference
   end
 
   def schedule_wiziq_class
-    tz = @user.try(:time_zone).presence || "UTC"
-    tz_info = ActiveSupport::TimeZone.find_tzinfo tz
-    @time_zone = tz_info.name
+    @time_zone = user.time_zone || context.root_account.default_time_zone || Time.zone
     aglive_com = Wiziq::AgliveComUtil.new(ApiMethods::SCHEDULE)
     self.duration = 300 if self.long_running?
     wiziq_class = Wiziq::WiziqClassHelper.new(self)

@@ -20,6 +20,7 @@ require [
   'compiled/license_help'
   'compiled/behaviors/ujsLinks'
   'compiled/behaviors/admin-links'
+  'compiled/behaviors/activate'
   'compiled/behaviors/elementToggler'
   # uncomment these to turn on collection pinning and voting
   # 'compiled/behaviors/upvote-item'

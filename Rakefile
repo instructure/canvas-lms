@@ -15,7 +15,7 @@ require 'rdoc/task'
 
 if CANVAS_RAILS2
   require 'tasks/rails'
-  begin; require 'parallelized_specs/tasks'; rescue LoadError; end
+  begin; require 'parallelized_specs/lib/parallelized_specs/tasks'; rescue LoadError; end
 else
   CanvasRails::Application.load_tasks
 end

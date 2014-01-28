@@ -96,7 +96,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
       t.spec_files = FileList['vendor/plugins/**/spec/**/*/*_spec.rb'].exclude('vendor/plugins/rspec/*')
     end
 
-    [:models, :controllers, :views, :helpers, :lib, :selenium].each do |sub|
+    [:models, :services, :controllers, :views, :helpers, :lib, :selenium].each do |sub|
       desc "Run the code examples in spec/#{sub}"
       Spec::Rake::SpecTask.new(sub) do |t|
         t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
@@ -122,12 +122,14 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     task :statsetup do
       require 'code_statistics'
       ::STATS_DIRECTORIES << %w(Model\ specs spec/models) if File.exist?('spec/models')
+      ::STATS_DIRECTORIES << %w(Service\ specs spec/services) if File.exist?('spec/services')
       ::STATS_DIRECTORIES << %w(View\ specs spec/views) if File.exist?('spec/views')
       ::STATS_DIRECTORIES << %w(Controller\ specs spec/controllers) if File.exist?('spec/controllers')
       ::STATS_DIRECTORIES << %w(Helper\ specs spec/helpers) if File.exist?('spec/helpers')
       ::STATS_DIRECTORIES << %w(Library\ specs spec/lib) if File.exist?('spec/lib')
       ::STATS_DIRECTORIES << %w(Routing\ specs spec/lib) if File.exist?('spec/routing')
       ::CodeStatistics::TEST_TYPES << "Model specs" if File.exist?('spec/models')
+      ::CodeStatistics::TEST_TYPES << "Service specs" if File.exist?('spec/services')
       ::CodeStatistics::TEST_TYPES << "View specs" if File.exist?('spec/views')
       ::CodeStatistics::TEST_TYPES << "Controller specs" if File.exist?('spec/controllers')
       ::CodeStatistics::TEST_TYPES << "Helper specs" if File.exist?('spec/helpers')

@@ -120,11 +120,11 @@ require [
     EntryView.collapseRootEntries()
     scrollToTop()
 
-  toolbarView.on 'markAllAsRead', ->
+  topicView.on 'markAllAsRead', ->
     data.markAllAsRead()
     setAllReadStateAllViews('read')
 
-  toolbarView.on 'markAllAsUnread', ->
+  topicView.on 'markAllAsUnread', ->
     data.markAllAsUnread()
     setAllReadStateAllViews('unread')
 

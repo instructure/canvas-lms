@@ -42,7 +42,7 @@ define [
 
     fullDetailsURL: () -> null
 
-    startDate: () -> @date
+    startDate: () -> @originalStart || @date
     endDate: () -> @startDate()
 
     possibleContexts: () -> @allPossibleContexts || [ @contextInfo ]
@@ -80,9 +80,10 @@ define [
       $.ajaxJSON url, method, params, onSuccess, onError
 
     isDueAtMidnight: () ->
-      @start && (@midnightFudged || (@start.getHours() == 23 && @start.getMinutes() == 59))
+      @start && (@midnightFudged || (@start.getHours() == 23 && @start.getMinutes() > 30))
 
     copyDataFromObject: (data) ->
+      @originalStart = new Date(@start) if @start
       @midnightFudged = false # clear out cached value because now we have new data
       if @isDueAtMidnight()
         @midnightFudged = true
@@ -106,3 +107,6 @@ define [
         if type == 'discussion_topic'
           return 'discussion'
       return 'assignment'
+
+    iconType: ->
+      if type = @assignmentType() then type else 'calendar-month'

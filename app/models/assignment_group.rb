@@ -22,13 +22,14 @@ class AssignmentGroup < ActiveRecord::Base
 
   attr_accessible :name, :rules, :assignment_weighting_scheme, :group_weight, :position, :default_assignment_name
   attr_readonly :context_id, :context_type
-  acts_as_list :scope => 'assignment_groups.context_type = #{connection.quote(context_type)} AND assignment_groups.context_id = #{context_id} AND assignment_groups.workflow_state <> \'deleted\''
+  belongs_to :context, :polymorphic => true
+  acts_as_list scope: { context: self, workflow_state: 'available' }
   has_a_broadcast_policy
 
   has_many :assignments, :order => 'position, due_at, title', :dependent => :destroy
   has_many :active_assignments, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted'], :order => 'assignments.position, assignments.due_at, assignments.title'
+  has_many :published_assignments, :class_name => 'Assignment', :conditions => "assignments.workflow_state = 'published'", :order => 'assignments.position, assignments.due_at, assignments.title'
 
-  belongs_to :context, :polymorphic => true
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_length_of :rules, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :default_assignment_name, :maximum => maximum_string_length, :allow_nil => true
@@ -42,7 +43,9 @@ class AssignmentGroup < ActiveRecord::Base
   after_save :update_student_grades
 
   def generate_default_values
-    self.name ||= t 'default_title', "Assignments"
+    if self.name == "" || self.name.nil?
+      self.name = t 'default_title', "Assignments"
+    end
     if !self.group_weight
       self.group_weight = 0
     end
@@ -63,10 +66,10 @@ class AssignmentGroup < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.context.grants_rights?(user, session, :read, :view_all_grades).any?(&:last) }
+    given { |user, session| self.context.grants_rights?(user, session, :read, :view_all_grades, :manage_grades).any?(&:last) }
     can :read
 
-    given { |user, session| self.context.grants_rights?(user, session, :manage_assignments, :manage_grades).any?(&:last) }
+    given { |user, session| self.context.grants_rights?(user, session, :manage_assignments).any?(&:last) }
     can :read and can :create and can :update and can :delete
   end
 
@@ -269,4 +272,11 @@ class AssignmentGroup < ActiveRecord::Base
     self.reload
   end
 
+  def self.assignment_scope_for_grading(context)
+    if context.feature_enabled?(:draft_state)
+      :published_assignments
+    else
+      :active_assignments
+    end
+  end
 end

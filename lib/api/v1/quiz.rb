@@ -19,31 +19,6 @@
 module Api::V1::Quiz
   include Api::V1::Json
   include Api::V1::AssignmentOverride
-  include Api::V1::Locked
-
-  API_ALLOWED_QUIZ_OUTPUT_FIELDS = {
-    :only => %w(
-      id
-      title
-      description
-      quiz_type
-      assignment_group_id
-      time_limit
-      shuffle_answers
-      hide_results
-      show_correct_answers
-      scoring_policy
-      allowed_attempts
-      one_question_at_a_time
-      points_possible
-      cant_go_back
-      access_code
-      ip_filter
-      due_at
-      lock_at
-      unlock_at
-      )
-  }
 
   API_ALLOWED_QUIZ_INPUT_FIELDS = {
     :only => %w(
@@ -55,6 +30,8 @@ module Api::V1::Quiz
       shuffle_answers
       hide_results
       show_correct_answers
+      show_correct_answers_at
+      hide_correct_answers_at
       scoring_policy
       allowed_attempts
       one_question_at_a_time
@@ -75,25 +52,31 @@ module Api::V1::Quiz
   end
 
   def quiz_json(quiz, context, user, session)
-    hash = api_json(quiz, user, session, API_ALLOWED_QUIZ_OUTPUT_FIELDS).merge(
-      :html_url => polymorphic_url([context, quiz]),
-      :mobile_url => polymorphic_url([context, quiz], :persist_headless => 1, :force_user => 1),
-      :question_count => quiz.available_question_count,
-      :published => quiz.published?
-    )
-    hash.delete(:access_code) unless quiz.grants_right?(user, session, :grade)
-    if context.grants_right?(user, session, :manage_assignments)
-      hash[:unpublishable] = quiz.can_unpublish?
-    end
-    locked_json(hash, quiz, user, 'quiz', :context => context)
-    hash
+    QuizSerializer.new(quiz,
+                       scope: user,
+                       session: session,
+                       root: false,
+                       controller: self).as_json
+  end
+
+  def jsonapi_quizzes_json(options)
+    scope = options.fetch(:scope)
+    api_route = options.fetch(:api_route)
+    @quizzes, meta = Api.jsonapi_paginate(scope, self, api_route)
+    meta[:primaryCollection] = 'quizzes'
+    ActiveModel::ArraySerializer.new(@quizzes,
+                          scope: @current_user,
+                          controller: self,
+                          root: :quizzes,
+                          meta: meta).as_json
   end
 
   def filter_params(quiz_params)
     quiz_params.slice(*API_ALLOWED_QUIZ_INPUT_FIELDS[:only])
   end
 
-  def update_api_quiz(quiz, quiz_params, save = true)
+  def update_api_quiz(quiz, params, save = true)
+    quiz_params = accepts_jsonapi? ? Array(params[:quizzes]).first : params[:quiz]
     return nil unless quiz.is_a?(Quiz) && quiz_params.is_a?(Hash)
     update_params = filter_params(quiz_params)
 
@@ -102,6 +85,17 @@ module Api::V1::Quiz
       ag_id = update_params.delete("assignment_group_id").presence
       ag = quiz.context.assignment_groups.find_by_id(ag_id)
       update_params["assignment_group_id"] = ag.try(:id)
+    end
+
+    # make sure allowed_attempts isn't set with a silly negative value
+    # (note that -1 is ok and it means unlimited attempts)
+    if update_params.has_key?('allowed_attempts')
+      allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts)
+      allowed_attempts = -1 if allowed_attempts.nil?
+
+      if allowed_attempts.to_i < -1
+        update_params.delete 'allowed_attempts'
+      end
     end
 
     # hide_results="until_after_last_attempt" is valid if allowed_attempts > 1
@@ -120,6 +114,14 @@ module Api::V1::Quiz
       end
     end
 
+    # show_correct_answers_at and hide_correct_answers_at are valid only if
+    # show_correct_answers=true
+    unless update_params.fetch('show_correct_answers', quiz.show_correct_answers)
+      %w[ show_correct_answers_at hide_correct_answers_at ].each do |key|
+        update_params.delete(key) if update_params.has_key?(key)
+      end
+    end
+
     # scoring_policy is valid if allowed_attempts > 1
     if update_params.has_key?('scoring_policy')
       allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts)
@@ -133,6 +135,15 @@ module Api::V1::Quiz
       one_question_at_a_time = update_params.fetch('one_question_at_a_time', quiz.one_question_at_a_time)
       unless one_question_at_a_time
         update_params.delete 'one_question_at_a_time'
+      end
+    end
+
+    # discard time limit if it's a negative value
+    if update_params.has_key?('time_limit')
+      time_limit = update_params.fetch('time_limit', quiz.time_limit)
+
+      if time_limit && time_limit.to_i < 0
+        update_params.delete 'time_limit'
       end
     end
 

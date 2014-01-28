@@ -1,3 +1,21 @@
+{{#if draftStateEnabled}}
+  <div class="discussion-edit-header row-fluid">
+    <div class="span4 offset8 text-right">
+      {{#if published}}
+        <span id="topic-draft-state" class="published-status published">
+          <i class="icon-publish"></i>
+          {{#t "buttons.published"}}Published{{/t}}
+        </span>
+      {{else}}
+        <span id="topic-draft-state" class="published-status unpublished">
+          <i class="icon-unpublished"></i>
+          {{#t "buttons.not_published"}}Not Published{{/t}}
+        </span>
+      {{/if}}
+    </div>
+  </div>
+{{/if}}
+
 <fieldset>
   <div class="control-group">
     <label class="hidden-inline-text" for="discussion-title">{{#t "topic_title"}}Topic Title{{/t}}</label>
@@ -150,7 +168,7 @@
       <div class="control-group">
         <label class="control-label" for="discussion_topic_assignment_points_possible">{{#t "points_possible"}}Points Possible{{/t}}</label>
         <div class="controls">
-          <input type="number"
+          <input type="text"
                  id="discussion_topic_assignment_points_possible"
                  name="assignment[points_possible]"
                  class="input-small"

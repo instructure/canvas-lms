@@ -73,7 +73,7 @@
           <span class="type_icon" title="<%= access.asset.class if access.asset %>"><%= image_tag "blank.png", :alt => '', :style => "height: 20px;" %></span>
           <span class="readable_name"><%= access.readable_name %></span>
         </td>
-        <td class="view_score"><%= access.view_score %></td>
+        <td class="view_score"><%= access.corrected_view_score %></td>
         <td class="participate_score"><%= access.participate_score %></td>
         <td class="last_viewed time_ago_date"><%= datetime_string(access.last_access) %></td>
       </tr>

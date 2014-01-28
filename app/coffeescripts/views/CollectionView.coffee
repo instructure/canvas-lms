@@ -1,8 +1,9 @@
 define [
   'jquery'
+  'underscore'
   'Backbone'
   'jst/collectionView'
-], ($, Backbone, template) ->
+], ($, _, Backbone, template) ->
 
   ##
   # Renders a collection of items with an item view. Binds to a handful of
@@ -67,7 +68,7 @@ define [
     ##
     # @api public
 
-    toJSON: -> @options
+    toJSON: -> _.extend(@options, {ENV})
 
     ##
     # Reorder child views according to current collection ordering.
@@ -78,7 +79,7 @@ define [
     #
     # @api public
 
-    reorder: ->
+    reorder: =>
       @collection.sort()
       @$list.children().detach()
       children = (model.itemView.$el for model in @collection.models)

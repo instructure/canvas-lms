@@ -11,7 +11,11 @@ class RouteView < HashView
     @route ||= begin
       routes = ApiRouteSet::V1.api_methods_for_controller_and_action(@controller, @action)
       # Choose shortest route (preferrably without .json suffix)
-      routes.sort_by { |r| r.segments.join.size }.first
+      if CANVAS_RAILS2
+        routes.sort_by { |r| r.segments.join.size }.first
+      else
+        routes.sort_by { |r| r.path.spec.to_s.size }.first
+      end
     end
   end
 
@@ -26,7 +30,11 @@ class RouteView < HashView
   end
 
   def api_path
-    path = route.segments.inject("") { |str,s| str << s.to_s }
+    if CANVAS_RAILS2
+      path = route.segments.inject("") { |str,s| str << s.to_s }
+    else
+      path = route.path.spec.to_s
+    end
     path.chop! if path.length > 1 # remove trailing slash
     path
   end
@@ -42,7 +50,13 @@ class RouteView < HashView
   end
 
   def verb
-    route.conditions[:method].to_s.upcase
+    if CANVAS_RAILS2
+      route.conditions[:method].to_s.upcase
+    else
+      if route.verb.source =~ /\^?(\w*)\$/
+        $1.upcase
+      end
+    end
   end
 
   def reqs

@@ -66,7 +66,7 @@ describe "profile" do
     submit_form(edit_form)
     wait_for_ajaximations
     #login with new password
-    login_as('nobody@example.com', new_password)
+    keep_trying_until { login_as('nobody@example.com', new_password) }
   end
 
   context "non password tests" do

@@ -25,7 +25,7 @@ describe QuizQuestionsController do
     @quiz.save!
     @quiz
   end
-  
+
   def quiz_question
     @question = @quiz.quiz_questions.build
     @question.write_attribute(:question_data, {:answers => [
@@ -35,7 +35,7 @@ describe QuizQuestionsController do
     @question.save!
     @question
   end
-  
+
   def quiz_group
     @quiz.quiz_groups.create
   end
@@ -47,7 +47,7 @@ describe QuizQuestionsController do
       post 'create', :course_id => @course.id, :quiz_id => @quiz, :question => {}
       assert_unauthorized
     end
-    
+
     it "should create a quiz question" do
       course_with_teacher_logged_in(:active_all => true)
       course_quiz
@@ -74,34 +74,35 @@ describe QuizQuestionsController do
       course_quiz
       post 'create', :course_id => @course.id, :quiz_id => @quiz, :question => {
         :question_type => "multiple_choice_question",
-        :answers => {
-          '0' => {
+        :answers => [
+          {
             :id => 123456,
             :answer_text => 'asdf',
             :weight => 100
           },
-          '1' => {
+          {
             :id => 654321,
             :answer_text => 'jkl;',
             :weight => 0
           },
-          '2' => {
+          {
             :id => 654321,
             :answer_text => 'qwer',
             :weight => 0
           }
-        }
+        ]
       }
       assigns[:question].should_not be_nil
       assigns[:question].question_data.should_not be_nil
       data = assigns[:question].question_data[:answers]
+
       data.length.should eql(3)
       data[0][:id].should eql(123456)
       data[1][:id].should eql(654321)
       data[2][:id].should_not eql(654321)
     end
   end
-  
+
   describe "PUT 'update'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -170,4 +171,4 @@ describe QuizQuestionsController do
     end
   end
 end
-  
+

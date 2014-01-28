@@ -23,9 +23,12 @@ describe 'rubric_assessment_submission_reminder.facebook' do
   it "should render" do
     user_model
     rubric_assessment_model(:user => @user)
-    @object = @rubric_assessment
+    @submission = @course.assignments.first.submissions.create!(:user => @user)
+    @object = @rubric_association.assessment_requests.create!(:user => @user, :asset => @submission, :assessor => @user, :assessor_asset => @submission)
     @object.rubric_association.should_not be_nil
     @object.rubric_association.context.should_not be_nil
+    @object.user.should_not be_nil
+    @object.submission.should_not be_nil
     generate_message(:rubric_assessment_submission_reminder, :facebook, @object, :user => @user)
   end
 end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -517,6 +517,16 @@ describe CoursesController, :type => :integration do
         json.should == { 'delete' => true }
         @course.reload
         @course.workflow_state.should eql 'deleted'
+      end
+
+      it "should not clear sis_id for course" do
+        @course.sis_source_id = 'sis_course_3'
+        @course.save
+        json = api_call(:delete, @path, @params, { :event => 'delete' })
+        json.should == { 'delete' => true }
+        @course.reload
+        @course.workflow_state.should == 'deleted'
+        @course.sis_source_id.should == 'sis_course_3'
       end
 
       it "should conclude when completing a course" do
@@ -1169,6 +1179,26 @@ describe CoursesController, :type => :integration do
     end
 
     describe "/users" do
+      it "returns an empty array for a page past the end" do
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json?page=5",
+          controller: 'courses',
+          action: 'users',
+          course_id: @course1.id.to_s,
+          page: '5',
+          format: 'json')
+        json.should == []
+      end
+
+      it "returns a 404 for an otherwise invalid page" do
+        raw_api_call(:get, "/api/v1/courses/#{@course1.id}/users.json?page=invalid",
+          controller: 'courses',
+          action: 'users',
+          course_id: @course1.id.to_s,
+          page: 'invalid',
+          format: 'json')
+        response.status.should == "404 Not Found"
+      end
+
       it "returns a list of users" do
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })

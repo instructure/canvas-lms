@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+if CANVAS_RAILS2
 class Shard
   def self.stubbed?
     true
@@ -132,4 +133,5 @@ module ActiveRecord::Associations
       end
     end
   end
+end
 end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,11 +19,12 @@
 module Api
   # find id in collection, by either id or sis_*_id
   # if the collection is over the users table, `self` is replaced by @current_user.id
-  def api_find(collection, id)
-    api_find_all(collection, [id], 1).first || raise(ActiveRecord::RecordNotFound, "Couldn't find #{collection.name} with API id '#{id}'")
+  def api_find(collection, id, options = {account: nil})
+    options = options.merge limit: 1
+    api_find_all(collection, [id], options).first || raise(ActiveRecord::RecordNotFound, "Couldn't find #{collection.name} with API id '#{id}'")
   end
 
-  def api_find_all(collection, ids, limit=nil)
+  def api_find_all(collection, ids, options = { limit: nil, account: nil })
     if collection.table_name == User.table_name && @current_user
       ids = ids.map{|id| id == 'self' ? @current_user.id : id }
     end
@@ -42,9 +43,9 @@ module Api
       end
     end
 
-    find_params = Api.sis_find_params_for_collection(collection, ids, @domain_root_account)
+    find_params = Api.sis_find_params_for_collection(collection, ids, options[:account] || @domain_root_account)
     return [] if find_params == :not_found
-    find_params[:limit] = limit unless limit.nil?
+    find_params[:limit] = options[:limit] unless options[:limit].nil?
     return collection.all(find_params)
   end
 
@@ -201,46 +202,101 @@ module Api
   # The collection needs to be a will_paginate collection (or act like one)
   # a new, paginated collection will be returned
   def self.paginate(collection, controller, base_url, pagination_args = {})
+    collection = paginate_collection!(collection, controller, pagination_args)
+    links = build_links(base_url, meta_for_pagination(controller, collection))
+    controller.response.headers["Link"] = links.join(',') if links.length > 0
+    collection
+  end
+
+  # Returns collection as the first return value, and the meta information hash
+  # as the second return value
+  def self.jsonapi_paginate(collection, controller, base_url, pagination_args={})
+    collection = paginate_collection!(collection, controller, pagination_args)
+    meta = jsonapi_meta(collection, controller, base_url)
+
+    return collection, meta
+  end
+
+  def self.jsonapi_meta(collection, controller, base_url)
+    pagination = meta_for_pagination(controller, collection)
+
+    meta = {
+      per_page: collection.per_page
+    }
+
+    meta.merge!(build_links_hash(base_url, pagination))
+
+    if collection.ordinal_pages?
+      meta[:page] = pagination[:current]
+      meta[:template] = meta[:current].sub(/page=\d+/, "page={page}")
+    end
+
+    meta[:count] = collection.total_entries if collection.total_entries
+    meta[:page_count] = collection.total_pages if collection.total_pages
+
+    { pagination: meta }
+  end
+
+  def self.paginate_collection!(collection, controller, pagination_args)
+    wrap_pagination_args!(pagination_args, controller)
+    begin
+      paginated = collection.paginate(pagination_args)
+    rescue Folio::InvalidPage
+      if pagination_args[:page].to_s =~ /\d+/ && pagination_args[:page].to_i > 0 && collection.build_page.ordinal_pages?
+        # for backwards compatibility we currently require returning [] for
+        # pages beyond the end of an ordinal collection, rather than a 404.
+        paginated = Folio::Ordinal::Page.create
+        paginated.current_page = pagination_args[:page].to_i
+      else
+        # we're not dealing with a simple out-of-bounds on an ordinal
+        # collection, let the exception propagate (and turn into a 404)
+        raise
+      end
+    end
+    paginated
+  end
+
+  def self.wrap_pagination_args!(pagination_args, controller)
     pagination_args.reverse_merge!(
       page: controller.params[:page],
       per_page: per_page_for(controller,
         default: pagination_args.delete(:default_per_page),
         max: pagination_args.delete(:max_per_page)))
-    collection = collection.paginate(pagination_args)
-    return unless collection.respond_to?(:next_page)
-
-    first_page = collection.respond_to?(:first_page) && collection.first_page
-    first_page ||= 1
-
-    last_page = (pagination_args[:without_count] ? nil : collection.total_pages)
-    last_page = nil if last_page.to_i <= 1
-
-    links = build_links(base_url, {
-      :query_parameters => controller.request.query_parameters,
-      :per_page => collection.per_page,
-      :current => collection.current_page || first_page,
-      :next => collection.next_page,
-      :prev => collection.previous_page,
-      :first => first_page,
-      :last => last_page,
-    })
-    controller.response.headers["Link"] = links.join(',') if links.length > 0
-    collection
   end
 
+  def self.meta_for_pagination(controller, collection)
+    {
+      query_parameters: controller.request.query_parameters,
+      per_page: collection.per_page,
+      current: collection.current_page,
+      next: collection.next_page,
+      prev: collection.previous_page,
+      first: collection.first_page,
+      last: collection.last_page,
+    }
+  end
+
+  PAGINATION_PARAMS = [:current, :next, :prev, :first, :last]
   EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key)
   def self.build_links(base_url, opts={})
-    links = []
+    links = build_links_hash(base_url, opts)
+    # iterate in order, but only using the keys present from build_links_hash
+    (PAGINATION_PARAMS & links.keys).map do |k|
+      v = links[k]
+      "<#{v}>; rel=\"#{k}\""
+    end
+  end
+
+  def self.build_links_hash(base_url, opts={})
     base_url += (base_url =~ /\?/ ? '&': '?')
     qp = opts[:query_parameters] || {}
     qp = qp.with_indifferent_access.except(*EXCLUDE_IN_PAGINATION_LINKS)
     base_url += "#{qp.to_query}&" if qp.present?
-    [:current, :next, :prev, :first, :last].each do |k|
-      if opts[k].present?
-        links << "<#{base_url}page=#{opts[k]}&per_page=#{opts[:per_page]}>; rel=\"#{k}\""
+    PAGINATION_PARAMS.each_with_object({}) do |param, obj|
+      if opts[param].present?
+        obj[param] = "#{base_url}page=#{opts[param]}&per_page=#{opts[:per_page]}"
       end
     end
-    links
   end
 
   def self.parse_pagination_links(link_header)
@@ -317,12 +373,12 @@ module Api
 
       if ["Course", "Group", "Account", "User"].include?(obj.context_type)
         if match.rest.start_with?("/preview")
-          url = self.send("#{obj.context_type.downcase}_file_preview_url", obj.context_id, obj.id, :verifier => obj.uuid, :host => host, :protocol => protocol)
+          url = self.send("#{obj.context_type.downcase}_file_preview_url", obj.context_id, obj.id, :verifier => obj.uuid, :only_path => true)
         else
-          url = self.send("#{obj.context_type.downcase}_file_download_url", obj.context_id, obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
+          url = self.send("#{obj.context_type.downcase}_file_download_url", obj.context_id, obj.id, :verifier => obj.uuid, :download => '1', :only_path => true)
         end
       else
-        url = file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :host => host, :protocol => protocol)
+        url = file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :only_path => true)
       end
       url
     end
@@ -584,5 +640,16 @@ module Api
 
   def accepts_jsonapi?
     !!(/application\/vnd\.api\+json/ =~ request.headers['Accept'].to_s)
+  end
+
+  # Reject the API request by halting the execution of the current handler
+  # and returning a helpful error message (and HTTP status code).
+  #
+  # @param [Fixnum] status
+  #   HTTP status code.
+  # @param [String] cause
+  #   The reason the request is rejected for.
+  def reject!(status, cause)
+    raise Api::V1::ApiError.new(status, cause)
   end
 end

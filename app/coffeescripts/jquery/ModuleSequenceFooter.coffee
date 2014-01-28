@@ -108,9 +108,9 @@ define [
       fetch: ->
         params = @getQueryParams(@location.search)
         if params.module_item_id
-          $.ajaxJSON @url, 'GET', {asset_type: 'ModuleItem', asset_id: params.module_item_id}, @success, null, {}
+          $.ajaxJSON @url, 'GET', {asset_type: 'ModuleItem', asset_id: params.module_item_id, frame_external_urls: true}, @success, null, {}
         else
-          $.ajaxJSON @url, 'GET', {asset_type: @assetType, asset_id: @assetID}, @success, null, {}
+          $.ajaxJSON @url, 'GET', {asset_type: @assetType, asset_id: @assetID, frame_external_urls: true}, @success, null, {}
 
       # Determines if the data retrieved should be used to generate a buttom bar or hide it. We 
       # can only have 1 item in the data set for this to work else we hide the sequence bar. 

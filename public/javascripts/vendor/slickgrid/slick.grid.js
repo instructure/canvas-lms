@@ -263,38 +263,32 @@ if (typeof Slick === "undefined") {
 
       // FreezeColumns - Add outerContainer and frozen column structure - Begin
       if (options.numberOfColumnsToFreeze > 0) {
-        // Calculate frozen and nonFrozen widths
         var totalWidthOfFrozenColumns = 0;
         var container_1Width = 0;
-        var outerContainerWidth = parseFloat($.css($outerContainer[0], "width", true));
-        var outerContainerHeight = parseFloat($.css($outerContainer[0], "height", true));
+        var containerCSS = {
+            overflow: "hidden",
+            position: "absolute",
+            left: 0,
+            top: 0,
+            bottom: 0,
+            outline: 0
+        };
+        var containerClass = uid + " ui-widget";
+        // Calculate frozen widths
         for (var i = 0, len = columns.length; i < len; i++) {
           if (i < options.numberOfColumnsToFreeze) {
             totalWidthOfFrozenColumns += columns[i].width;
           } else {
-            container_1Width += columns[i].width;
+            break;
           }
         }
-        //if (leftWidth + rightWidth < outerContainerWidth) {
-        // The container is wide enough to display all columns, so turn off freezeColumns
-        //   options.numberOfColumnsToFreeze = 0;
-        //} else {
-        container_1Width = outerContainerWidth - totalWidthOfFrozenColumns;
-        $container_0 = $("<div class='container_0'></div>").css("overflow", "hidden")
-          .css("outline", 0).css("position", "absolute")
-          .css("width", outerContainerWidth)
-          .css("height", outerContainerHeight)
-          .css("left", 0)
-          .css("top", 0)
-          .addClass(uid).addClass("ui-widget")
+        $container_0 = $("<div class='container_0'></div>")
+          .css($.extend({}, containerCSS, {width: totalWidthOfFrozenColumns}))
+          .addClass(containerClass)
           .appendTo($outerContainer);
-        $container_1 = $("<div class='container_1'></div>").css("overflow", "hidden")
-          .css("outline", 0).css("position", "absolute")
-          .css("width", container_1Width)
-          .css("height", outerContainerHeight)
-          .css("left", totalWidthOfFrozenColumns)
-          .css("top", 0)
-          .addClass(uid).addClass("ui-widget")
+        $container_1 = $("<div class='container_1'></div>")
+          .css($.extend({}, containerCSS, {left: totalWidthOfFrozenColumns, right: 0}))
+          .addClass(containerClass)
           .appendTo($outerContainer);
 
         $headerScroller_0 = $("<div class='headerScroller_0 slick-header ui-state-default' style='overflow:hidden;position:relative;' />").appendTo($container_0);
@@ -1121,6 +1115,9 @@ if (typeof Slick === "undefined") {
                 }
               }
               applyColumnHeaderWidths();
+              if (options.numberOfColumnsToFreeze > 0) {
+                updateCanvasWidth(true);
+              }
               if (options.syncColumnCellResize) {
                 applyColumnWidths();
               }
@@ -1309,6 +1306,10 @@ if (typeof Slick === "undefined") {
       args = args || {};
       args.grid = self;
       return evt.notify(args, e, self);
+    }
+
+    function getUID() {
+      return uid;
     }
 
     function getEditorLock() {
@@ -3832,6 +3833,7 @@ if (typeof Slick === "undefined") {
       "setCellCssStyles": setCellCssStyles,
       "removeCellCssStyles": removeCellCssStyles,
       "getCellCssStyles": getCellCssStyles,
+      "getUID": getUID,
 
       "init": finishInitialization,
       "destroy": destroy,

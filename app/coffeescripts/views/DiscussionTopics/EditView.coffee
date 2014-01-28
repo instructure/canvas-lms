@@ -66,6 +66,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         canModerate: @permissions.CAN_MODERATE
         isLargeRoster: ENV?.IS_LARGE_ROSTER || false
         threaded: data.discussion_type is "threaded"
+        draftStateEnabled: ENV.DRAFT_STATE
       json.assignment = json.assignment.toView()
       json
 
@@ -211,9 +212,20 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
           errors = @groupCategorySelector.validateBeforeSave(data, errors)
         data2 =
           assignment_overrides: @dueDateOverrideView.getAllDates(data.assignment.toJSON())
-        errors = @dueDateOverrideView.validateBeforeSave(data2,errors)
+        errors = @dueDateOverrideView.validateBeforeSave(data2, errors)
+        errors = @_validatePointsPossible(data, errors)
       else
         @model.set 'assignment', {set_assignment: false}
+      errors
+
+    _validatePointsPossible: (data, errors) =>
+      assign = data.assignment
+      frozenPoints = _.contains(assign.frozenAttributes(), "points_possible")
+
+      if !frozenPoints and assign.pointsPossible() and isNaN(parseFloat(assign.pointsPossible()))
+        errors["assignment[points_possible]"] = [
+          message: I18n.t 'points_possible_number', 'Points possible must be a number'
+        ]
       errors
 
     showErrors: (errors) ->

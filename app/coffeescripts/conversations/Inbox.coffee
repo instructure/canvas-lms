@@ -568,6 +568,7 @@ define [
               selectAllText
           baseData:
             permissions: ["send_messages_all"]
+            messageable_only: true
 
       return if $scope
 
