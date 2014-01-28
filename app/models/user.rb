@@ -274,25 +274,21 @@ class User < ActiveRecord::Base
     order_clause = clause = sortable_name_order_by_clause
     order_clause = "#{clause} DESC" if options[:direction] == :descending
     scope = self.order(order_clause)
-    if CANVAS_RAILS2
-      if (scope.scope(:find, :select))
-        scope = scope.select(clause)
-      end
-    else
-      if scope.select_values.empty?
-        scope = scope.select(self.arel_table[Arel.star])
-      end
+    if !CANVAS_RAILS2 && scope.select_values.empty?
+      scope = scope.select(self.arel_table[Arel.star])
+    end
+    if scope.select_values.present?
       scope = scope.select(clause)
     end
-    if CANVAS_RAILS2 ? scope.scope(:find, :group) : scope.group_values.present?
+    if scope.group_values.present?
       scope = scope.group(clause)
     end
     scope
   end
 
   def self.by_top_enrollment
-    scope = self
-    if (!scope.scope(:find, :select))
+    scope = self.scoped
+    if scope.select_values.blank?
       scope = scope.select("users.*")
     end
     scope.select("MIN(#{Enrollment.type_rank_sql(:student)}) AS enrollment_rank").

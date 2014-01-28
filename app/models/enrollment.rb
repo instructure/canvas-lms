@@ -903,8 +903,10 @@ class Enrollment < ActiveRecord::Base
   def self.order_by_sortable_name
     clause = User.sortable_name_order_by_clause('users')
     scope = self.order(clause)
-    if scope.scope(:find, :select)
+    if scope.select_values.present?
       scope = scope.select(clause)
+    elsif !CANVAS_RAILS2
+      scope = scope.select(self.arel_table[Arel.star])
     end
     scope
   end

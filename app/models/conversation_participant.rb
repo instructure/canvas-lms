@@ -80,7 +80,10 @@ class ConversationParticipant < ActiveRecord::Base
   #   instantiated to get id)
   #
   tagged_scope_handler(/\Auser_(\d+)\z/) do |tags, options|
-    scope_shard = scope(:find, :shard) || Shard.current
+    if (s = scoped.shard_value) && s.is_a?(Shard)
+      scope_shard = s
+    end
+    scope_shard ||= Shard.current
     exterior_user_ids = tags.map{ |t| t.sub(/\Auser_/, '').to_i }
 
     # which users have conversations on which shards?

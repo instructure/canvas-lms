@@ -370,4 +370,21 @@ ActiveRecord::AutosaveAssociation.class_eval do
   end
 end
 
+  ActiveRecord::NamedScope::Scope.class_eval do
+    def where_values
+      Array(scope(:find, :conditions))
+    end
+
+    def select_values
+      Array(scope(:find, :select))
+    end
+
+    def group_values
+      Array(scope(:find, :group))
+    end
+
+    def shard_value
+      scope(:find, :shard)
+    end
+  end
 end

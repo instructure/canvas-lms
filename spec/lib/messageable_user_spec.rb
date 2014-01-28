@@ -74,11 +74,7 @@ describe "MessageableUser" do
 
   describe ".prepped" do
     def group_scope(scope)
-      if CANVAS_RAILS2
-        scope.scope(:find, :group)
-      else
-        scope.group_values.join(", ")
-      end
+      scope.group_values.join(", ")
     end
 
     it "should group by id" do

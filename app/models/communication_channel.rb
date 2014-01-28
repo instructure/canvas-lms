@@ -356,7 +356,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
     def self.create_push(access_token, device_token)
-      (scope(:find, :shard) || Shard.current).activate do
+      (scoped.shard_value || Shard.current).activate do
         connection.transaction do
           cc = new
           cc.path_type = CommunicationChannel::TYPE_PUSH
