@@ -188,7 +188,7 @@ class Course < ActiveRecord::Base
   validates_length_of :course_code, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_locale :allow_nil => true
 
-  sanitize_field :syllabus_body, Instructure::SanitizeField::SANITIZE
+  sanitize_field :syllabus_body, CanvasSanitize::SANITIZE
 
   include StickySisFields
   are_sis_sticky :name, :course_code, :start_at, :conclude_at, :restrict_enrollments_to_course_dates, :enrollment_term_id, :workflow_state

@@ -47,7 +47,7 @@ class DiscussionEntry < ActiveRecord::Base
   before_validation :set_depth, :on => :create
   validate :validate_depth, on: :create
 
-  sanitize_field :message, Instructure::SanitizeField::SANITIZE
+  sanitize_field :message, CanvasSanitize::SANITIZE
 
   has_a_broadcast_policy
   attr_accessor :new_record_header

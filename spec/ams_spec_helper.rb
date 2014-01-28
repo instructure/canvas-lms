@@ -5,7 +5,6 @@ require 'action_controller'
 require 'active_support'
 require 'active_record'
 require 'mocha/api'
-require File.expand_path(File.dirname(__FILE__) +  '/../vendor/plugins/sanitize_field/lib/sanitize_field')
 require 'api'
 
 # You can include just this file if your serializer doesn't need too much

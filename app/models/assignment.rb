@@ -126,7 +126,7 @@ class Assignment < ActiveRecord::Base
 
   acts_as_list :scope => :assignment_group
   simply_versioned :keep => 5
-  sanitize_field :description, Instructure::SanitizeField::SANITIZE
+  sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links( :description) { [self.context, nil] }
 
   def root_account

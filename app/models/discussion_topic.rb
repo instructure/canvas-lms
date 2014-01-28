@@ -60,7 +60,7 @@ class DiscussionTopic < ActiveRecord::Base
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validate :validate_draft_state_change, :if => :workflow_state_changed?
 
-  sanitize_field :message, Instructure::SanitizeField::SANITIZE
+  sanitize_field :message, CanvasSanitize::SANITIZE
   copy_authorized_links(:message) { [self.context, nil] }
   acts_as_list scope: { context: self, pinned: true }
 

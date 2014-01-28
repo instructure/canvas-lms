@@ -139,7 +139,7 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
-  sanitize_field :body, Instructure::SanitizeField::SANITIZE
+  sanitize_field :body, CanvasSanitize::SANITIZE
   copy_authorized_links(:body) { [self.context, self.user] }
 
   validates_each :title do |record, attr, value|

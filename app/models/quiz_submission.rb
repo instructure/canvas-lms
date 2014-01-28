@@ -96,12 +96,12 @@ class QuizSubmission < ActiveRecord::Base
       question_id = q['id']
       if submission_data.is_a?(Array)
         if submission = submission_data.find {|s| s[:question_id] == question_id }
-          submission[:text] = Sanitize.clean(submission[:text] || "", Instructure::SanitizeField::SANITIZE)
+          submission[:text] = Sanitize.clean(submission[:text] || "", CanvasSanitize::SANITIZE)
         end
       elsif submission_data.is_a?(Hash)
         question_key = "question_#{question_id}"
         if submission_data[question_key]
-          submission_data[question_key] = Sanitize.clean(submission_data[question_key] || "", Instructure::SanitizeField::SANITIZE)
+          submission_data[question_key] = Sanitize.clean(submission_data[question_key] || "", CanvasSanitize::SANITIZE)
         end
       end
     end

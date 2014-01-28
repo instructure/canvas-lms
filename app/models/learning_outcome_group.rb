@@ -27,7 +27,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :title, :workflow_state
-  sanitize_field :description, Instructure::SanitizeField::SANITIZE
+  sanitize_field :description, CanvasSanitize::SANITIZE
 
   attr_accessor :building_default
 

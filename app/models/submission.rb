@@ -89,7 +89,7 @@ class Submission < ActiveRecord::Base
   scope :needs_grading, where(needs_grading_conditions)
 
 
-  sanitize_field :body, Instructure::SanitizeField::SANITIZE
+  sanitize_field :body, CanvasSanitize::SANITIZE
 
   attr_accessor :saved_by,
                 :assignment_changed_not_sub

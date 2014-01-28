@@ -36,7 +36,7 @@ module QuizQuestion::AnswerSerializers
       end
 
       def sanitize_html(html)
-        Sanitize.clean((html || '').to_s, Instructure::SanitizeField::SANITIZE)
+        Sanitize.clean((html || '').to_s, CanvasSanitize::SANITIZE)
       end
 
       def sanitize_text(text)

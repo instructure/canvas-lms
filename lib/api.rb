@@ -323,7 +323,7 @@ module Api
   end
 
   # a hash of allowed html attributes that represent urls, like { 'a' => ['href'], 'img' => ['src'] }
-  UrlAttributes = Instructure::SanitizeField::SANITIZE[:protocols].inject({}) { |h,(k,v)| h[k] = v.keys; h }
+  UrlAttributes = CanvasSanitize::SANITIZE[:protocols].inject({}) { |h,(k,v)| h[k] = v.keys; h }
 
   def api_bulk_load_user_content_attachments(htmls, context = @context, user = @current_user)
     rewriter = UserContent::HtmlRewriter.new(context, user)

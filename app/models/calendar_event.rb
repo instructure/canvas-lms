@@ -26,7 +26,7 @@ class CalendarEvent < ActiveRecord::Base
       :participants_per_appointment, :child_event_data,
       :remove_child_events, :all_day
   attr_accessor :cancel_reason, :imported
-  sanitize_field :description, Instructure::SanitizeField::SANITIZE
+  sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [self.effective_context, nil] }
 
   include Workflow
