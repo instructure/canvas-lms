@@ -459,8 +459,8 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def move_to_user(new_user)
-    self.class.send :with_exclusive_scope do
-      conversation.shard.activate do
+    conversation.shard.activate do
+      self.class.send :with_exclusive_scope do
         old_shard = self.user.shard
         conversation.conversation_messages.where(:author_id => user_id).update_all(:author_id => new_user)
         if existing = conversation.conversation_participants.find_by_user_id(new_user)
@@ -480,6 +480,8 @@ class ConversationParticipant < ActiveRecord::Base
           new_cp.save!
         end
       end
+    end
+    self.class.send :with_exclusive_scope do
       conversation.regenerate_private_hash! if private?
     end
   end

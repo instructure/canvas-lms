@@ -1057,12 +1057,21 @@ unless CANVAS_RAILS2
     alias_method_chain :delete_all, :limit
   end
 
-  def with_each_shard
-    if block_given?
-      Array(yield(self))
-    else
-      self.to_a
+  def with_each_shard(*args)
+    scope = self
+    if (owner = self.try(:proxy_association).try(:owner)) && self.shard_category != :explicit
+      scope = scope.shard(owner)
     end
+    scope = scope.shard(args) if args.any?
+    if block_given?
+      scope.activate{|rel| yield(rel) }
+    else
+      scope.to_a
+    end
+  end
+
+  ActiveRecord::Associations::CollectionProxy.class_eval do
+    delegate :with_each_shard, :to => :scoped
   end
 end
 
