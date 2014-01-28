@@ -29,31 +29,64 @@
 # are also included. Refer to the Logins, Accounts, Page Views, and Users APIs
 # for descriptions of the objects in those collections.
 #
-# @object AuthenticationEvent
+# @model AuthenticationEventLinks
 #     {
-#       // ID of the event.
-#       "id": "e2b76430-27a5-0131-3ca1-48e0eb13f29b",
+#       "id": "AuthenticationEventLinks",
+#       "description": "",
+#       "properties": {
+#         "login_id": {
+#           "description": "ID of the login associated with the event",
+#           "example": 9478,
+#           "type": "integer"
+#         },
+#         "account_id": {
+#           "description": "ID of the account associated with the event. will match the account_id in the associated login.",
+#           "example": 2319,
+#           "type": "integer"
+#         },
+#         "user_id": {
+#           "description": "ID of the user associated with the event will match the user_id in the associated login.",
+#           "example": 362,
+#           "type": "integer"
+#         },
+#         "page_view_id": {
+#           "description": "ID of the page view during the event if it exists.",
+#           "example": "e2b76430-27a5-0131-3ca1-48e0eb13f29b",
+#           "type": "string"
+#         }
+#       }
+#     }
 #
-#       // timestamp of the event
-#       "created_at": "2012-07-19T15:00:00-06:00",
-#
-#       // authentication event type ('login' or 'logout')
-#       "event_type": "login",
-#
-#       "links": {
-#          // ID of the login associated with the event
-#          "login_id": 9478,
-#
-#          // ID of the account associated with the event. will match the
-#          // account_id in the associated login.
-#          "account_id": 2319,
-#
-#          // ID of the user associated with the event will match the user_id in
-#          // the associated login.
-#          "user_id": 362,
-#
-#          // ID of the page view during the event if it exists.
-#          "page_view_id": "e2b76430-27a5-0131-3ca1-48e0eb13f29b"
+# @model AuthenticationEvent
+#     {
+#       "id": "AuthenticationEvent",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "ID of the event.",
+#           "example": "e2b76430-27a5-0131-3ca1-48e0eb13f29b",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "description": "timestamp of the event",
+#           "example": "2012-07-19T15:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "event_type": {
+#           "description": "authentication event type ('login' or 'logout')",
+#           "example": "login",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "login",
+#               "logout"
+#             ]
+#           }
+#         },
+#         "links": {
+#           "example": "{\"login_id\"=>9478, \"account_id\"=>2319, \"user_id\"=>362, \"page_view_id\"=>\"e2b76430-27a5-0131-3ca1-48e0eb13f29b\"}",
+#           "type": "integer"
+#         }
 #       }
 #     }
 #

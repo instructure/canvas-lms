@@ -36,98 +36,106 @@
 #
 #     /api/v1/collection_items/<id>/discussion_topics/self/view
 #
-# @object CollectionItem
-#
+# @model CollectionItem
 #     {
-#       // The ID of the collection item.
-#       "id": 7,
-#
-#       // The ID of the collection that this item belongs to.
-#       "collection_id": 2,
-#
-#       // The type of the item.
-#       // Currently defined types are: "url", "image", "audio", and "video".
-#       //
-#       // Canvas may define new item types at any time. "url" is the most
-#       // generic type, and just means any sort of web link. If an api consumer
-#       // sees an item_type that it doesn't yet know how to handle, treating it
-#       // as a "url" is a safe bet.
-#       //
-#       // "image", "audio" and "video" are URLs either directly to a file of that mime type, or
-#       // to a web page that was determined to contain that type as its main content.
-#       "item_type": "url",
-#
-#       // The link to the item. For item type of "url", this is the entire
-#       // contents of the collection item. For other item types, this may be a
-#       // web preview or other representation of the item data.
-#       "link_url": "https://example.com/some/path",
-#
-#       // The number of posts of this item, including the original. This count
-#       // is shared between the original item and all clones.
-#       "post_count": 2,
-#
-#       // The number of users who have voted up this item. This count is
-#       // shared between the original item and all clones.
-#       "upvote_count": 3,
-#
-#       // Boolean indicating whether this user has upvoted this item (or any of its clones)
-#       "upvoted_by_user": false,
-#
-#       // If this item was cloned from another item, this will be the ID of
-#       // the first, original item that all clones are derived from.
-#       // In other words, if item 7 was cloned from item 5, and
-#       // 5 was cloned from item 3, and 3 is the original, then the
-#       // root_item_id of items 7, 5 and 3 will all be 3.
-#       "root_item_id": 3,
-#
-#       // An image representation of the collection item. This will be in a
-#       // common web format such as png or jpeg. The resolution and geometry may depend on
-#       // the item, but Canvas will attempt to make it 640 pixels wide
-#       // when possible.
-#       "image_url": "https://<canvas>/files/item_image.png",
-#
-#       // If true, the image for this item is still being processed and
-#       // image_url will be null. Check back later.
-#       // If image_url is null but image_pending is false, the item has no image.
-#       "image_pending": false,
-#
-#       // The title of the item.
-#       "title": "My Image",
-#
-#       // The description of the item. This is plain text.
-#       "description": "some block of plain text",
-#
-#       // Any user-provided comments on the item. A user can add their own
-#       // comments when cloning an existing item. This is plain text.
-#       "user_comment": "some block of plain text",
-#
-#       // A snippet of HTML that can be used as an in-line preview of the
-#       // item. For example, a link to a youtube page may have an iframe inline
-#       // embed of the video.
-#       // If no preview is available, this field will be null.
-#       "html_preview": "<iframe>...</iframe>",
-#
-#       // The API URL for this item. Used to clone the collection item.
-#       "url": "https://<canvas>/api/v1/collections/items/7",
-#
-#       // The timestamp of when the item was posted by the user
-#       "created_at": "2012-05-30T17:45:25Z",
-#
-#       // Information on the user that created the collection item.
-#       "user" : {
-#         // The ID of the user.
-#         "id": 37,
-#
-#         // The display name of the user.
-#         "display_name": "John Doe",
-#
-#         // The URL of the user's avatar image, or a fallback image if the user has not given one.
-#         "avatar_image_url": "http://...",
-#
-#         // The URL to the HTML page in Canvas of this user's public profile.
-#         "html_url": "https://<canvas>/users/37"
+#       "id": "CollectionItem",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the collection item.",
+#           "example": 7,
+#           "type": "integer"
+#         },
+#         "collection_id": {
+#           "description": "The ID of the collection that this item belongs to.",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "item_type": {
+#           "description": "The type of the item. Currently defined types are: 'url', 'image', 'audio', and 'video'. Canvas may define new item types at any time. 'url' is the most generic type, and just means any sort of web link. If an api consumer sees an item_type that it doesn't yet know how to handle, treating it as a 'url' is a safe bet. 'image', 'audio' and 'video' are URLs either directly to a file of that mime type, or to a web page that was determined to contain that type as its main content.",
+#           "example": "url",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "url",
+#               "image",
+#               "audio",
+#               "video"
+#             ]
+#           }
+#         },
+#         "link_url": {
+#           "description": "The link to the item. For item type of 'url', this is the entire contents of the collection item. For other item types, this may be a web preview or other representation of the item data.",
+#           "example": "https://example.com/some/path",
+#           "type": "string"
+#         },
+#         "post_count": {
+#           "description": "The number of posts of this item, including the original. This count is shared between the original item and all clones.",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "upvote_count": {
+#           "description": "The number of users who have voted up this item. This count is shared between the original item and all clones.",
+#           "example": 3,
+#           "type": "integer"
+#         },
+#         "upvoted_by_user": {
+#           "description": "Boolean indicating whether this user has upvoted this item (or any of its clones)",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "root_item_id": {
+#           "description": "If this item was cloned from another item, this will be the ID of the first, original item that all clones are derived from. In other words, if item 7 was cloned from item 5, and 5 was cloned from item 3, and 3 is the original, then the root_item_id of items 7, 5 and 3 will all be 3.",
+#           "example": 3,
+#           "type": "integer"
+#         },
+#         "image_url": {
+#           "description": "An image representation of the collection item. This will be in a common web format such as png or jpeg. The resolution and geometry may depend on the item, but Canvas will attempt to make it 640 pixels wide when possible.",
+#           "example": "https://<canvas>/files/item_image.png",
+#           "type": "string"
+#         },
+#         "image_pending": {
+#           "description": "If true, the image for this item is still being processed and image_url will be null. Check back later. If image_url is null but image_pending is false, the item has no image.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "title": {
+#           "description": "The title of the item.",
+#           "example": "My Image",
+#           "type": "string"
+#         },
+#         "description": {
+#           "description": "The description of the item. This is plain text.",
+#           "example": "some block of plain text",
+#           "type": "string"
+#         },
+#         "user_comment": {
+#           "description": "Any user-provided comments on the item. A user can add their own comments when cloning an existing item. This is plain text.",
+#           "example": "some block of plain text",
+#           "type": "string"
+#         },
+#         "html_preview": {
+#           "description": "A snippet of HTML that can be used as an in-line preview of the item. For example, a link to a youtube page may have an iframe inline embed of the video. If no preview is available, this field will be null.",
+#           "example": "<iframe>...</iframe>",
+#           "type": "string"
+#         },
+#         "url": {
+#           "description": "The API URL for this item. Used to clone the collection item.",
+#           "example": "https://<canvas>/api/v1/collections/items/7",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "description": "The timestamp of when the item was posted by the user",
+#           "example": "2012-05-30T17:45:25Z",
+#           "type": "datetime"
+#         },
+#         "user": {
+#           "description": "Information on the user that created the collection item",
+#           "$ref": "User"
+#         }
 #       }
 #     }
+#
 class CollectionItemsController < ApplicationController
   before_filter :require_collection, :only => [:index, :create]
 

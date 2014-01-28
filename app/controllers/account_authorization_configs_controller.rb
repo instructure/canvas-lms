@@ -18,49 +18,110 @@
 
 # @API Account Authentication Services
 #
-# @object AccountAuthorizationConfig
-#     // SAML configuration
+# @model AccountAuthorizationConfig
 #     {
-#       "login_handle_name":null,
-#       "identifier_format":"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
-#       "auth_type":"saml",
-#       "id":1649,
-#       "log_out_url":"http://example.com/saml1/slo",
-#       "log_in_url":"http://example.com/saml1/sli",
-#       "certificate_fingerprint":"111222",
-#       "change_password_url":null,
-#       "requested_authn_context":null,
-#       "position":1,
-#       "idp_entity_id":"http://example.com/saml1",
-#       "login_attribute":"nameid"
-#     }
-#     // LDAP configuration
-#     {
-#       "auth_type":"ldap",
-#       "id":1650,
-#       "auth_host":"127.0.0.1",
-#       "auth_filter":"filter1",
-#       "auth_over_tls":null,
-#       "position":1,
-#       "auth_base":null,
-#       "auth_username":"username1",
-#       "auth_port":null
-#     }
-#     // CAS configuration
-#     {
-#       "login_handle_name":null,
-#       "auth_type":"cas",
-#       "id":1651,
-#       "log_in_url":null,
-#       "position":1,
-#       "auth_base":"127.0.0.1"
+#       "id": "AccountAuthorizationConfig",
+#       "description": "",
+#       "properties": {
+#         "login_handle_name": {
+#           "description": "Valid for SAML and CAS authorization.",
+#           "type": "string"
+#         },
+#         "identifier_format": {
+#           "description": "Valid for SAML authorization.",
+#           "example": "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+#           "type": "string"
+#         },
+#         "auth_type": {
+#           "description": "Valid for SAML, LDAP and CAS authorization.",
+#           "example": "saml",
+#           "type": "string"
+#         },
+#         "id": {
+#           "description": "Valid for SAML, LDAP and CAS authorization.",
+#           "example": 1649,
+#           "type": "integer"
+#         },
+#         "log_out_url": {
+#           "description": "Valid for SAML authorization.",
+#           "example": "http://example.com/saml1/slo",
+#           "type": "string"
+#         },
+#         "log_in_url": {
+#           "description": "Valid for SAML and CAS authorization.",
+#           "example": "http://example.com/saml1/sli",
+#           "type": "string"
+#         },
+#         "certificate_fingerprint": {
+#           "description": "Valid for SAML authorization.",
+#           "example": "111222",
+#           "type": "string"
+#         },
+#         "change_password_url": {
+#           "description": "Valid for SAML authorization.",
+#           "type": "string"
+#         },
+#         "requested_authn_context": {
+#           "description": "Valid for SAML authorization.",
+#           "type": "string"
+#         },
+#         "auth_host": {
+#           "description": "Valid for LDAP authorization.",
+#           "example": "127.0.0.1",
+#           "type": "string"
+#         },
+#         "auth_filter": {
+#           "description": "Valid for LDAP authorization.",
+#           "example": "filter1",
+#           "type": "string"
+#         },
+#         "auth_over_tls": {
+#           "description": "Valid for LDAP authorization.",
+#           "type": "integer"
+#         },
+#         "auth_base": {
+#           "description": "Valid for LDAP and CAS authorization.",
+#           "type": "string"
+#         },
+#         "auth_username": {
+#           "description": "Valid for LDAP authorization.",
+#           "example": "username1",
+#           "type": "string"
+#         },
+#         "auth_port": {
+#           "description": "Valid for LDAP authorization.",
+#           "type": "integer"
+#         },
+#         "position": {
+#           "description": "Valid for SAML, LDAP and CAS authorization.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "idp_entity_id": {
+#           "description": "Valid for SAML authorization.",
+#           "example": "http://example.com/saml1",
+#           "type": "string"
+#         },
+#         "login_attribute": {
+#           "description": "Valid for SAML authorization.",
+#           "example": "nameid",
+#           "type": "string"
+#         }
+#       }
 #     }
 #
-# @object DiscoveryUrl
+# @model DiscoveryUrl
 #     {
-#       "discovery_url": "http://..."
+#       "id": "DiscoveryUrl",
+#       "description": "",
+#       "properties": {
+#         "discovery_url": {
+#           "example": "http://...",
+#           "type": "string"
+#         }
+#       }
 #     }
-
+#
 class AccountAuthorizationConfigsController < ApplicationController
   before_filter :require_context, :require_root_account_management
   include Api::V1::AccountAuthorizationConfig

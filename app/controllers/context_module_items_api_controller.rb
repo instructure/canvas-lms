@@ -19,119 +19,169 @@
 # @API Modules
 # @subtopic Module Items
 #
-# @object ModuleItem
+# @model CompletionRequirement
 #     {
-#       // the unique identifier for the module item
-#       "id": 768,
-#
-#       // the id of the Module this item appears in
-#       "module_id": 123,
-#
-#       // the position of this item in the module (1-based)
-#       "position": 1,
-#
-#       // the title of this item
-#       "title": "Square Roots: Irrational numbers or boxy vegetables?",
-#
-#       // 0-based indent level; module items may be indented to show a hierarchy
-#       "indent": 0,
-#
-#       // the type of object referred to
-#       // one of "File", "Page", "Discussion", "Assignment", "Quiz", "SubHeader",
-#       // "ExternalUrl", "ExternalTool"
-#       "type": "Assignment",
-#
-#       // the id of the object referred to
-#       // applies to "File", "Discussion", "Assignment", "Quiz", "ExternalTool" types
-#       "content_id": 1337,
-#
-#       // link to the item in Canvas
-#       "html_url": "https://canvas.example.edu/courses/222/modules/items/768",
-#
-#       // (Optional) link to the Canvas API object, if applicable
-#       "url": "https://canvas.example.edu/api/v1/courses/222/assignments/987",
-#
-#       // (only for 'Page' type) unique locator for the linked wiki page
-#       "page_url": "my-page-title",
-#
-#       // (only for 'ExternalUrl' and 'ExternalTool' types) external url that the item points to
-#       "external_url": "https://www.example.com/externalurl",
-#
-#       // (only for 'ExternalTool' type) whether the external tool opens in a new tab
-#       "new_tab": false,
-#
-#       // Completion requirement for this module item
-#       "completion_requirement": {
-#         // one of "must_view", "must_submit", "must_contribute", "min_score"
-#         "type": "min_score",
-#
-#         // minimum score required to complete (only present when type == 'min_score')
-#         "min_score": 10,
-#
-#         // whether the calling user has met this requirement
-#         // (Optional; present only if the caller is a student
-#         // or if the optional parameter 'student_id' is included)
-#         "completed": true
-#       },
-#
-#       // (Present only if requested through include[]=content_details)
-#       // If applicable, returns additional details specific to the associated object
-#       "content_details": {
-#         "points_possible": 20,
-#         "due_at": "2012-12-31T06:00:00-06:00",
-#         "unlock_at": "2012-12-31T06:00:00-06:00",
-#         "lock_at": "2012-12-31T06:00:00-06:00"
+#       "id": "CompletionRequirement",
+#       "description": "",
+#       "properties": {
+#         "type": {
+#           "description": "one of 'must_view', 'must_submit', 'must_contribute', 'min_score'",
+#           "example": "min_score",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "must_view",
+#               "must_submit",
+#               "must_contribute",
+#               "min_score"
+#             ]
+#           }
+#         },
+#         "min_score": {
+#           "description": "minimum score required to complete (only present when type == 'min_score')",
+#           "example": 10,
+#           "type": "integer"
+#         },
+#         "completed": {
+#           "description": "whether the calling user has met this requirement (Optional; present only if the caller is a student or if the optional parameter 'student_id' is included)",
+#           "example": true,
+#           "type": "boolean"
+#         }
 #       }
 #     }
 #
-#
-# @object ModuleItemSequence
+# @model ContentDetails
 #     {
-#       // an array containing one hash for each appearence of the asset in the module sequence
-#       // (up to 10 total)
-#       "items": [
-#         {
-#           // the ModuleItem for the previous asset in the sequence, if present
-#           // this is the previous asset in the module, or the last asset in the previous module,
-#           // or null if this is the first module item in the course sequence
-#           "prev": null,
-#
-#           // the ModuleItem for the requested asset
-#           "current": {
-#             "id": 768,
-#             "module_id": 123,
-#             "title": "A lonely page",
-#             "type": "Page"
-#             // ...
-#           },
-#
-#           // the ModuleItem for the next asset in the sequence, if present
-#           // this is the next asset in the module, or the first asset in the next module,
-#           // or null if this is the last module item in the course sequence
-#           "next": {
-#             "id": 769,
-#             "module_id": 127,
-#             "title": "Project 1",
-#             "type": "Assignment"
-#             // ...
-#           }
-#         }
-#       ],
-#
-#       // an array containing each Module referenced above
-#       "modules": [
-#         {
-#           "id": 123,
-#           "name": "Module A"
-#           // ...
+#       "id": "ContentDetails",
+#       "description": "",
+#       "properties": {
+#         "points_possible": {
+#           "example": 20,
+#           "type": "integer"
 #         },
-#         {
-#           "id": 127,
-#           "name": "Module B"
-#           // ...
+#         "due_at": {
+#           "example": "2012-12-31T06:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "unlock_at": {
+#           "example": "2012-12-31T06:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "lock_at": {
+#           "example": "2012-12-31T06:00:00-06:00",
+#           "type": "datetime"
 #         }
-#       ]
+#       }
 #     }
+#
+# @model ModuleItem
+#     {
+#       "id": "ModuleItem",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the unique identifier for the module item",
+#           "example": 768,
+#           "type": "integer"
+#         },
+#         "module_id": {
+#           "description": "the id of the Module this item appears in",
+#           "example": 123,
+#           "type": "integer"
+#         },
+#         "position": {
+#           "description": "the position of this item in the module (1-based)",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "title": {
+#           "description": "the title of this item",
+#           "example": "Square Roots: Irrational numbers or boxy vegetables?",
+#           "type": "string"
+#         },
+#         "indent": {
+#           "description": "0-based indent level; module items may be indented to show a hierarchy",
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "type": {
+#           "description": "the type of object referred to one of 'File', 'Page', 'Discussion', 'Assignment', 'Quiz', 'SubHeader', 'ExternalUrl', 'ExternalTool'",
+#           "example": "Assignment",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "File",
+#               "Page",
+#               "Discussion",
+#               "Assignment",
+#               "Quiz",
+#               "SubHeader",
+#               "ExternalUrl",
+#               "ExternalTool"
+#             ]
+#           }
+#         },
+#         "content_id": {
+#           "description": "the id of the object referred to applies to 'File', 'Discussion', 'Assignment', 'Quiz', 'ExternalTool' types",
+#           "example": 1337,
+#           "type": "integer"
+#         },
+#         "html_url": {
+#           "description": "link to the item in Canvas",
+#           "example": "https://canvas.example.edu/courses/222/modules/items/768",
+#           "type": "string"
+#         },
+#         "url": {
+#           "description": "(Optional) link to the Canvas API object, if applicable",
+#           "example": "https://canvas.example.edu/api/v1/courses/222/assignments/987",
+#           "type": "string"
+#         },
+#         "page_url": {
+#           "description": "(only for 'Page' type) unique locator for the linked wiki page",
+#           "example": "my-page-title",
+#           "type": "string"
+#         },
+#         "external_url": {
+#           "description": "(only for 'ExternalUrl' and 'ExternalTool' types) external url that the item points to",
+#           "example": "https://www.example.com/externalurl",
+#           "type": "string"
+#         },
+#         "new_tab": {
+#           "description": "(only for 'ExternalTool' type) whether the external tool opens in a new tab",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "completion_requirement": {
+#           "description": "Completion requirement for this module item",
+#           "example": "{\"type\"=>\"min_score\", \"min_score\"=>10, \"completed\"=>true}",
+#           "$ref": "CompletionRequirement"
+#         },
+#         "content_details": {
+#           "description": "(Present only if requested through include[]=content_details) If applicable, returns additional details specific to the associated object",
+#           "example": "{\"points_possible\"=>20, \"due_at\"=>\"2012-12-31T06:00:00-06:00\", \"unlock_at\"=>\"2012-12-31T06:00:00-06:00\", \"lock_at\"=>\"2012-12-31T06:00:00-06:00\"}",
+#           "$ref": "ContentDetails"
+#         }
+#       }
+#     }
+#
+# @model ModuleItemSequence
+#     {
+#       "id": "ModuleItemSequence",
+#       "description": "",
+#       "properties": {
+#         "items": {
+#           "description": "an array containing one hash for each appearence of the asset in the module sequence (up to 10 total)",
+#           "example": "[{\"prev\"=>nil, \"current\"=>{\"id\"=>768, \"module_id\"=>123, \"title\"=>\"A lonely page\", \"type\"=>\"Page\"}, \"next\"=>{\"id\"=>769, \"module_id\"=>127, \"title\"=>\"Project 1\", \"type\"=>\"Assignment\"}}]",
+#           "type": "string"
+#         },
+#         "modules": {
+#           "description": "an array containing each Module referenced above",
+#           "type": "array",
+#           "items": { "$ref": "Module" }
+#         }
+#       }
+#     }
+#
 class ContextModuleItemsApiController < ApplicationController
   before_filter :require_context
   before_filter :find_student, :only => [:index, :show]

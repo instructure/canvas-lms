@@ -257,6 +257,21 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
+  # @model RubricAssessment
+  #  {
+  #     "id" : "RubricAssessment",
+  #     "required": ["criterion_id"],
+  #     "properties": {
+  #       "criterion_id": {
+  #         "description": "The ID of the quiz question.",
+  #         "example": 1,
+  #         "type": "integer",
+  #         "format": "int64"
+  #       },
+  #     }
+  #  }
+  #
+  #
   # @API Grade or comment on a submission
   #
   # Comment on and/or update the grading for a student's assignment submission.

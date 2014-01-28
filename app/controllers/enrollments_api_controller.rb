@@ -20,85 +20,118 @@
 #
 # API for creating and viewing course enrollments
 #
-# @object Enrollment
+# @model Grade
 #     {
-#       // The unique identifier for the enrollment.
-#       "id": 1,
-#
-#       // The unique identifier for the course.
-#       "course_id": 1,
-#
-#       // The unique identifier for the section.
-#       "course_section_id": 1,
-#
-#       // The current state of the enrollment.
-#       "enrollment_state": "active",
-#
-#       // User can only access his or her own course section.
-#       "limit_privileges_to_course_section": true,
-#
-#       // The unique identifier for the account.
-#       "root_account_id": 1,
-#
-#       // The type of the enrollment.
-#       "type": "StudentEnrollment",
-#
-#       // The enrollment role, for course-level permissions.
-#       "role": "StudentEnrollment",
-#
-#       // The unique identifier for the user.
-#       "user_id": 1,
-#
-#       // The date and time the enrollment was last updated, in ISO8601 format.
-#       "updated_at": "2012-04-18T23:08:51Z",
-#
-#       // The date and time the enrollment was created, in ISO8601 format.
-#       "created_at": "2012-04-18T23:08:51Z",
-#
-#       // The last activity date and time of the user for the enrollment, in ISO8601 format.
-#       "last_activity_at": "2012-04-24T08:08:12Z",
-#
-#       // The URL to the Canvas web UI page for this course enrollment.
-#       "html_url": "https://...",
-#
-#       // The grade information for the enrollment, if this is a student enrollment.
-#       "grades": {
-#
-#         // The URL to the Canvas web UI page for the user's grades.
-#         "html_url": "https://...",
-#
-#         // The user's current score in the course. Only included if user has permissions to view this grade.
-#         "current_score": null,
-#
-#         // The user's final score in the course. Only included if user has permissions to view this grade.
-#         "final_score": 0,
-#
-#         // The user's current grade in the course. Only included if user has permissions to view this grade.
-#         "current_grade": null,
-#
-#         // The user's final grade in the course. Only included if user has permissions to view this grade.
-#         "final_grade": null
-#       },
-#
-#         // The user object for the enrollment.
-#       "user": {
-#
-#         // The unique id of the user.
-#         "id": 1,
-#
-#         // The unique login of the user.
-#         "login_id": "bieberfever@example.com",
-#
-#         // The name of the user.
-#         "name": "Justin Bieber",
-#
-#         // The short name of the user.
-#         "short_name": "Justin B.",
-#
-#         // The sortable name of the user.
-#         "sortable_name": "Bieber, Justin"
+#       "id": "Grade",
+#       "description": "",
+#       "properties": {
+#         "html_url": {
+#           "description": "The URL to the Canvas web UI page for the user's grades, if this is a student enrollment.",
+#           "example": "",
+#           "type": "string"
+#         },
+#         "current_grade": {
+#           "description": "The user's current grade in the class. Only included if user has permissions to view this grade.",
+#           "example": "",
+#           "type": "string"
+#         },
+#         "final_grade": {
+#           "description": "The user's final grade for the class. Only included if user has permissions to view this grade.",
+#           "example": "",
+#           "type": "string"
+#         },
+#         "current_score": {
+#           "description": "The user's current score in the class. Only included if user has permissions to view this score.",
+#           "example": "",
+#           "type": "string"
+#         },
+#         "final_score": {
+#           "description": "The user's final score for the class. Only included if user has permissions to view this score.",
+#           "example": "",
+#           "type": "string"
+#         }
 #       }
 #     }
+#
+# @model Enrollment 
+#       {
+#         "id": "Enrollment",
+#         "description": "",
+#         "properties": {
+#           "id": {
+#             "description": "The ID of the enrollment.",
+#             "example": 1,
+#             "type": "integer"
+#           },
+#           "course_id": {
+#             "description": "The unique id of the course.",
+#             "example": 1,
+#             "type": "integer"
+#           },
+#           "course_section_id": {
+#             "description": "The unique id of the user's section.",
+#             "example": 1,
+#             "type": "integer"
+#           },
+#           "enrollment_state": {
+#             "description": "The state of the user's enrollment in the course.",
+#             "example": "active",
+#             "type": "string"
+#           },
+#           "limit_privileges_to_course_section": {
+#             "description": "User can only access his or her own course section.",
+#             "example": true,
+#             "type": "boolean"
+#           },
+#           "root_account_id": {
+#             "description": "The unique id of the user's account.",
+#             "example": 1,
+#             "type": "integer"
+#           },
+#           "type": {
+#             "description": "The enrollment role, for course-level permissions.",
+#             "example": "StudentEnrollment",
+#             "type": "string"
+#           },
+#           "user_id": {
+#             "description": "The unique id of the user.",
+#             "example": 1,
+#             "type": "integer"
+#           },
+#           "associated_user_id": {
+#             "example": null,
+#             "type": "integer"
+#           },
+#           "role": {
+#             "description": "The enrollment role, for course-level permissions",
+#             "example": null,
+#             "type": "string"
+#           },
+#           "updated_at": {
+#             "description": "The updated time of the enrollment, in ISO8601 format.",
+#             "example": "2012-04-18T23:08:51Z",
+#             "type": "datetime"
+#           },
+#           "last_activity_at": {
+#             "description": "The last activity time of the user for the enrollment, in ISO8601 format.",
+#             "example": "2012-04-18T23:08:51Z",
+#             "type": "datetime"
+#           },
+#           "html_url": {
+#             "description": "The URL to the Canvas web UI page for this course enrollment.",
+#             "example":  "https://...",
+#             "type": "string"
+#           },
+#           "grades": {
+#             "description": "The URL to the Canvas web UI page the grades associated with this enrollment.",
+#             "$ref": "Grade"
+#           },
+#           "user": {
+#             "description": "A description of the user.",
+#             "type": "User"
+#           }
+#         }
+#       }
 #
 class EnrollmentsApiController < ApplicationController
   before_filter :get_course_from_section, :require_context

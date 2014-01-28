@@ -19,18 +19,36 @@
 # @API Collaborations
 # API for accessing course and group collaboration information.
 #
-# @object Collaborator
-#   {
-#     // The unique user or group identifier for the collaborator.
-#     "id": 12345,
+# @model Collaborator
+#     {
+#       "id": "Collaborator",
+#       "description": "",
+#       "required": ["id"],
+#       "properties": {
+#         "id": {
+#           "description": "The unique user or group identifier for the collaborator.",
+#           "example": 12345,
+#           "type": "integer"
+#         },
+#         "type": {
+#           "description": "The type of collaborator (e.g. 'user' or 'group').",
+#           "example": "user",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "user",
+#               "group"
+#             ]
+#           }
+#         },
+#         "name": {
+#           "description": "The name of the collaborator.",
+#           "example": "Don Draper",
+#           "type": "string"
+#         }
+#       }
+#     }
 #
-#     // The type of collaborator (e.g. "user" or "group").
-#     "type": "user",
-#
-#     // The name of the collaborator.
-#     "name": "Don Draper"
-#   }
-
 class CollaborationsController < ApplicationController
   before_filter :require_context, :except => [:members]
   before_filter :require_collaboration_and_context, :only => [:members]

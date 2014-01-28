@@ -20,25 +20,133 @@
 #
 # API for accessing account reports.
 #
-# @object Report
+# @model Report
 #     {
-#       // The unique identifier for the report.
-#       "id": 1,
+#       "id": "Report",
+#       "properties": {
+#         "id": {
+#           "description": "The unique identifier for the report.",
+#           "example": "1",
+#           "type": "integer"
+#         },
+#         "report": {
+#           "description": "The type of report.",
+#           "example": "sis_export_csv",
+#           "type": "string"
+#         },
+#         "file_url": {
+#           "description": "The url to the report download.",
+#           "example": "https://example.com/some/path",
+#           "type": "string"
+#         },
+#         "status": {
+#           "description": "The status of the report",
+#           "example": "complete",
+#           "type": "string"
+#         },
+#         "parameters": {
+#           "description": "The report parameters",
+#           "$ref": "ReportParameters"
+#         },
+#         "progress": {
+#           "description": "The progress of the report",
+#           "example": "100",
+#           "type": "string"
+#         }
+#       }
+#     }
 #
-#       // The type of report.
-#       "report": "sis_export_csv",
-#
-#       // The url to the report download.
-#       "file_url": "https://example.com/some/path",
-#
-#       // The status of the report
-#       "status": "complete",
-#
-#       // The report parameters
-#       "parameters": {"enrollment_term":"2","sis_terms_csv":"1","sis_accounts_csv":"1"},
-#
-#       // The progress of the report
-#       "progress": "100"
+# @model ReportParameters
+#     {
+#       "id": "ReportParameters",
+#       "description": "The parameters returned will vary for each report.",
+#       "properties": {
+#         "enrollment_term_id": {
+#           "description": "The canvas id of the term to get grades from",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "include_deleted": {
+#           "description": "Include deleted objects",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "course_id": {
+#           "description": "The course to report on",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "order": {
+#           "description": "The sort order for the csv, Options: 'users', 'courses', 'outcomes'.",
+#           "example": "users",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "users",
+#               "courses",
+#               "outcomes"
+#             ]
+#           }
+#         },
+#         "users": {
+#           "description": "Get the data for users",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "accounts": {
+#           "description": "Get the data for accounts",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "terms": {
+#           "description": "Get the data for terms",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "courses": {
+#           "description": "Get the data for courses",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "sections": {
+#           "description": "Get the data for sections",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "enrollments": {
+#           "description": "Get the data for enrollments",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "groups": {
+#           "description": "Get the data for groups",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "xlist": {
+#           "description": "Get the data for cross-listed courses",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "start_at": {
+#           "description": "The beginning date for submissions. Max time range is 2 weeks.",
+#           "example": "2012-07-13T10:55:20-06:00",
+#           "type": "datetime"
+#         },
+#         "end_at": {
+#           "description": "The end date for submissions. Max time range is 2 weeks.",
+#           "example": "2012-07-13T10:55:20-06:00",
+#           "type": "datetime"
+#         },
+#         "sis_terms_csv": {
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "sis_accounts_csv": {
+#           "example": 1,
+#           "type": "integer"
+#         }
+#       }
 #     }
 #
 class AccountReportsController < ApplicationController
@@ -116,7 +224,7 @@ class AccountReportsController < ApplicationController
 #
 # @argument [parameters] The parameters will vary for each report
 #
-# @returns report
+# @returns Report
 #
   def create
     if authorized_action(@context, @current_user, :read_reports)

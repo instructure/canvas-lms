@@ -32,28 +32,48 @@
 # Group collections can only be created, updated, or deleted by group
 # moderators.
 #
-# @object Collection
+# @model Collection
 #     {
-#       // The ID of the collection.
-#       "id": 5,
-#
-#       // The display name of the collection, set by the collection creator.
-#       "name": "My Collection",
-#
-#       // The visibility of the collection. If "public", the collection is
-#       // visible to everybody, and can be followed.  If "private", the
-#       // collection is visible only to the creating user.
-#       // The default is "private".
-#       "visibility": "public",
-#
-#       // Boolean indicating whether this user is following this collection.
-#       "followed_by_user": false,
-#
-#       // The number of people following this collection.
-#       "followers_count": 10,
-#
-#       // The number of items in this collection.
-#       "items_count": 7
+#       "id": "Collection",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the collection.",
+#           "example": 5,
+#           "type": "integer"
+#         },
+#         "name": {
+#           "description": "The display name of the collection, set by the collection creator.",
+#           "example": "My Collection",
+#           "type": "string"
+#         },
+#         "visibility": {
+#           "description": "The visibility of the collection. If 'public', the collection is visible to everybody, and can be followed.  If 'private', the collection is visible only to the creating user. The default is 'private'.",
+#           "example": "public",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "public",
+#               "private"
+#             ]
+#           }
+#         },
+#         "followed_by_user": {
+#           "description": "Boolean indicating whether this user is following this collection.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "followers_count": {
+#           "description": "The number of people following this collection.",
+#           "example": 10,
+#           "type": "integer"
+#         },
+#         "items_count": {
+#           "description": "The number of items in this collection.",
+#           "example": 7,
+#           "type": "integer"
+#         }
+#       }
 #     }
 #
 class CollectionsController < ApplicationController

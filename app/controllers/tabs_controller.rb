@@ -17,14 +17,30 @@
 #
 
 # @API Tabs
-# @object Tab
-#       {
-#         "html_url": "/courses/1/external_tools/4",
-#         "id": "context_external_tool_4",
-#         "label": "WordPress",
-#         "type": "external"
+# @model Tab
+#     {
+#       "id": "Tab",
+#       "description": "",
+#       "properties": {
+#         "html_url": {
+#           "example": "/courses/1/external_tools/4",
+#           "type": "string"
+#         },
+#         "id": {
+#           "example": "context_external_tool_4",
+#           "type": "string"
+#         },
+#         "label": {
+#           "example": "WordPress",
+#           "type": "string"
+#         },
+#         "type": {
+#           "example": "external",
+#           "type": "string"
+#         }
 #       }
-
+#     }
+#
 class TabsController < ApplicationController
   include Api::V1::Tab
 

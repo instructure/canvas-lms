@@ -15,133 +15,203 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 # @API Discussion Topics
 #
-# A discussion topic object looks like:
+# @model FileAttachment
+#     {
+#       "id": "FileAttachment",
+#       "description": "",
+#       "properties": {
+#         "content-type": {
+#           "example": "unknown/unknown",
+#           "type": "string"
+#         },
+#         "url": {
+#           "example": "http://www.example.com/courses/1/files/1/download",
+#           "type": "string"
+#         },
+#         "filename": {
+#           "example": "content.txt",
+#           "type": "string"
+#         },
+#         "display_name": {
+#           "example": "content.txt",
+#           "type": "string"
+#         }
+#       }
+#     }
 #
-#      !!!javascript
-#      {
-#        // The ID of this topic.
-#        "id":1,
+# @model DiscussionTopic
+#     {
+#       "id": "",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of this topic.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "title": {
+#           "description": "The topic title.",
+#           "example": "Topic 1",
+#           "type": "string"
+#         },
+#         "message": {
+#           "description": "The HTML content of the message body.",
+#           "example": "<p>content here</p>",
+#           "type": "string"
+#         },
+#         "html_url": {
+#           "description": "The URL to the discussion topic in canvas.",
+#           "example": "https://<canvas>/courses/1/discussion_topics/2",
+#           "type": "string"
+#         },
+#         "posted_at": {
+#           "description": "The datetime the topic was posted. If it is null it hasn't been posted yet. (see delayed_post_at)",
+#           "example": "2037-07-21T13:29:31Z",
+#           "type": "datetime"
+#         },
+#         "last_reply_at": {
+#           "description": "The datetime for when the last reply was in the topic.",
+#           "example": "2037-07-28T19:38:31Z",
+#           "type": "datetime"
+#         },
+#         "require_initial_post": {
+#           "description": "If true then a user may not respond to other replies until that user has made an initial reply. Defaults to false.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "user_can_see_posts": {
+#           "description": "Whether or not posts in this topic are visible to the user.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "discussion_subentry_count": {
+#           "description": "The count of entries in the topic.",
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "read_state": {
+#           "description": "The read_state of the topic for the current user, 'read' or 'unread'.",
+#           "example": "read",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "read",
+#               "unread"
+#             ]
+#           }
+#         },
+#         "unread_count": {
+#           "description": "The count of unread entries of this topic for the current user.",
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "subscribed": {
+#           "description": "Whether or not the current user is subscribed to this topic.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "subscription_hold": {
+#           "description": "(Optional) Why the user cannot subscribe to this topic. Only one reason will be returned even if multiple apply. Can be one of: 'initial_post_required': The user must post a reply first 'not_in_group_set': The user is not in the group set for this graded group discussion 'not_in_group': The user is not in this topic's group 'topic_is_announcement': This topic is an announcement",
+#           "example": "not_in_group_set",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "initial_post_required",
+#               "not_in_group_set",
+#               "not_in_group",
+#               "topic_is_announcement"
+#             ]
+#           }
+#         },
+#         "assignment_id": {
+#           "description": "The unique identifier of the assignment if the topic is for grading, otherwise null.",
+#           "type": "integer"
+#         },
+#         "delayed_post_at": {
+#           "description": "The datetime to publish the topic (if not right away).",
+#           "type": "datetime"
+#         },
+#         "published": {
+#           "description": "Whether this discussion topic is published (true) or draft state (false)",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "lock_at": {
+#           "description": "The datetime to lock the topic (if ever).",
+#           "type": "datetime"
+#         },
+#         "locked": {
+#           "description": "whether or not this is locked for students to see.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "pinned": {
+#           "description": "whether or not the discussion has been 'pinned' by an instructor",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "locked_for_user": {
+#           "description": "Whether or not this is locked for the user.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "lock_info": {
+#           "description": "(Optional) Information for the user about the lock. Present when locked_for_user is true.",
+#           "$ref": "LockInfo"
+#         },
+#         "lock_explanation": {
+#           "description": "(Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.",
+#           "example": "This discussion is locked until September 1 at 12:00am",
+#           "type": "string"
+#         },
+#         "user_name": {
+#           "description": "The username of the topic creator.",
+#           "example": "User Name",
+#           "type": "string"
+#         },
+#         "topic_children": {
+#           "description": "An array of topic_ids for the group discussions the user is a part of.",
+#           "example": "[5, 7, 10]",
+#           "type": "array",
+#           "items": { "type": "integer"}
+#         },
+#         "root_topic_id": {
+#           "description": "If the topic is for grading and a group assignment this will point to the original topic in the course.",
+#           "type": "integer"
+#         },
+#         "podcast_url": {
+#           "description": "If the topic is a podcast topic this is the feed url for the current user.",
+#           "example": "/feeds/topics/1/enrollment_1XAcepje4u228rt4mi7Z1oFbRpn3RAkTzuXIGOPe.rss",
+#           "type": "string"
+#         },
+#         "discussion_type": {
+#           "description": "The type of discussion. Values are 'side_comment', for discussions that only allow one level of nested comments, and 'threaded' for fully threaded discussions.",
+#           "example": "side_comment",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "side_comment",
+#               "threaded"
+#             ]
+#           }
+#         },
+#         "attachments": {
+#           "description": "Array of file attachments.",
+#           "type": "array",
+#           "items": { "$ref": "FileAttachment" }
+#         },
+#         "permissions": {
+#           "description": "The current user's permissions on this topic.",
+#           "example": "{\"attach\"=>true}",
+#           "type": "map",
+#           "key": { "type": "string" },
+#           "value": { "type": "boolean" }
+#         }
+#       }
+#     }
 #
-#        // The topic title.
-#        "title":"Topic 1",
-#
-#        // The HTML content of the message body.
-#        "message":"<p>content here</p>",
-#
-#        // The URL to the discussion topic in canvas.
-#        "html_url": "https://<canvas>/courses/1/discussion_topics/2",
-#
-#        // The datetime the topic was posted. If it is null it hasn't been
-#        // posted yet. (see delayed_post_at)
-#        "posted_at":"2037-07-21T13:29:31Z",
-#
-#        // The datetime for when the last reply was in the topic.
-#        "last_reply_at":"2037-07-28T19:38:31Z",
-#
-#        // If true then a user may not respond to other replies until that user
-#        // has made an initial reply. Defaults to false.
-#        "require_initial_post":false,
-#
-#        // Whether or not posts in this topic are visible to the user.
-#       "user_can_see_posts":true,
-#
-#        // The count of entries in the topic.
-#        "discussion_subentry_count":0,
-#
-#        // The read_state of the topic for the current user, "read" or "unread".
-#        "read_state":"read",
-#
-#        // The count of unread entries of this topic for the current user.
-#        "unread_count":0,
-#
-#        // Whether or not the current user is subscribed to this topic.
-#        "subscribed":true,
-#
-#        // (Optional) Why the user cannot subscribe to this topic. Only one reason
-#        // will be returned even if multiple apply. Can be one of:
-#        // 'initial_post_required': The user must post a reply first
-#        // 'not_in_group_set': The user is not in the group set for this graded group discussion
-#        // 'not_in_group': The user is not in this topic's group
-#        // 'topic_is_announcement': This topic is an announcement
-#        "subscription_hold":"not_in_group_set",
-#
-#        // The unique identifier of the assignment if the topic is for grading, otherwise null.
-#        "assignment_id":null,
-#
-#        // The datetime to publish the topic (if not right away).
-#        "delayed_post_at":null,
-#
-#        // Whether this discussion topic is published (true) or draft state (false)
-#        "published":true,
-#
-#        // The datetime to lock the topic (if ever).
-#        "lock_at":null,
-#
-#        // whether or not this is locked for students to see.
-#        "locked":false,
-#
-#        // whether or not the discussion has been "pinned" by an instructor
-#        "pinned":false,
-#
-#        // Whether or not this is locked for the user.
-#        "locked_for_user":true,
-#
-#        // (Optional) Information for the user about the lock. Present when locked_for_user is true.
-#        "lock_info": {
-#          // Asset string for the object causing the lock
-#          "asset_string":"discussion_topic_1",
-#
-#          // (Optional) Time at which this was/will be unlocked.
-#          "unlock_at":"2013-01-01T00:00:00-06:00",
-#
-#          // (Optional) Time at which this was/will be locked.
-#          "lock_at":"2013-02-01T00:00:00-06:00",
-#
-#          // (Optional) Context module causing the lock.
-#          "context_module":{ ... }
-#        },
-#
-#        // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
-#        "lock_explanation":"This discussion is locked until September 1 at 12:00am",
-#
-#        // The username of the topic creator.
-#        "user_name":"User Name",
-#
-#        // An array of topic_ids for the group discussions the user is a part of.
-#        "topic_children":[5, 7, 10],
-#
-#        // If the topic is for grading and a group assignment this will
-#        // point to the original topic in the course.
-#        "root_topic_id":null,
-#
-#        // If the topic is a podcast topic this is the feed url for the current user.
-#        "podcast_url":"/feeds/topics/1/enrollment_1XAcepje4u228rt4mi7Z1oFbRpn3RAkTzuXIGOPe.rss",
-#
-#        // The type of discussion. Values are 'side_comment', for discussions
-#        // that only allow one level of nested comments, and 'threaded' for
-#        // fully threaded discussions.
-#        "discussion_type":"side_comment",
-#
-#        // Array of file attachments.
-#        "attachments":[
-#          {
-#            "content-type":"unknown/unknown",
-#            "url":"http://www.example.com/courses/1/files/1/download",
-#            "filename":"content.txt",
-#            "display_name":"content.txt"
-#          }
-#        ],
-#
-#        // The current user's permissions on this topic.
-#        "permissions":
-#        {
-#          // If true, the calling user can attach files to this discussion's entries.
-#          "attach": true
-#        }
-#      }
 class DiscussionTopicsController < ApplicationController
   before_filter :require_context, :except => :public_feed
 

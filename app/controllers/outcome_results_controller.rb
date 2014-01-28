@@ -21,43 +21,80 @@
 #
 # API for accessing learning outcome results
 #
-# @object OutcomeRollupScore
+# @model OutcomeRollupScoreLinks
 #     {
-#       // The rollup score for the outcome, based on the student assessment
-#       // scores related to the outcome. This could be null if the student has
-#       // no related scores.
-#       "score": 3,
-#
-#       "links": {
-#         // The id of the related outcome
-#         "outcome": "42"
+#       "id": "OutcomeRollupScoreLinks",
+#       "description": "",
+#       "properties": {
+#         "outcome": {
+#           "description": "The id of the related outcome",
+#           "example": 42,
+#           "type": "integer"
+#         }
 #       }
 #     }
 #
-# @object OutcomeRollup
+# @model OutcomeRollupScore
 #     {
-#       // an array of OutcomeRollupScore objects
-#       "scores": ["OutcomeRollupScore"],
-#
-#       // The name of the resource for this rollup. For example, the user name.
-#       "name": "John Doe",
-#
-#       "links": {
-#         // If an aggregate result was requested, the course field will be present
-#         // Otherwise, the user and section field will be present
-#
-#         // (Optional) The id of the course that this rollup applies to
-#         "course": "42",
-#
-#         // (Optional) The id of the user that this rollup applies to
-#         "user": "42",
-#
-#         // (Optional) The id of the section the user is in
-#         "section": "57"
+#       "id": "OutcomeRollupScore",
+#       "description": "",
+#       "properties": {
+#         "score": {
+#           "description": "The rollup score for the outcome, based on the student assessment scores related to the outcome. This could be null if the student has no related scores.",
+#           "example": 3,
+#           "type": "integer"
+#         },
+#         "links": {
+#           "example": "{\"outcome\"=>\"42\"}",
+#           "$ref": "OutcomeRollupScoreLinks"
+#         }
 #       }
 #     }
 #
-
+# @model OutcomeRollupLinks
+#     {
+#       "id": "OutcomeRollupLinks",
+#       "description": "",
+#       "properties": {
+#         "course": {
+#           "description": "If an aggregate result was requested, the course field will be present Otherwise, the user and section field will be present (Optional) The id of the course that this rollup applies to",
+#           "example": 42,
+#           "type": "integer"
+#         },
+#         "user": {
+#           "description": "(Optional) The id of the user that this rollup applies to",
+#           "example": 42,
+#           "type": "integer"
+#         },
+#         "section": {
+#           "description": "(Optional) The id of the section the user is in",
+#           "example": 57,
+#           "type": "integer"
+#         }
+#       }
+#     }
+#
+# @model OutcomeRollup
+#     {
+#       "id": "OutcomeRollup",
+#       "description": "",
+#       "properties": {
+#         "scores": {
+#           "description": "an array of OutcomeRollupScore objects",
+#           "$ref": "OutcomeRollupScore"
+#         },
+#         "name": {
+#           "description": "The name of the resource for this rollup. For example, the user name.",
+#           "example": "John Doe",
+#           "type": "string"
+#         },
+#         "links": {
+#           "example": "{\"course\"=>42, \"user\"=>42, \"section\"=>57}",
+#           "$ref": "OutcomeRollupLinks"
+#         }
+#       }
+#     }
+#
 class OutcomeResultsController < ApplicationController
   include Api::V1::OutcomeResults
   include Outcomes::ResultAnalytics
