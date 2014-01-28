@@ -19,28 +19,89 @@
 # @API Files
 # @subtopic Folders
 #
-# @object Folder
+# @model Folder
 #     {
-#       "context_type": "Course",
-#       "context_id": 1401,
-#       "files_count": 0,
-#       "position": 3,
-#       "updated_at": "2012-07-06T14:58:50Z",
-#       "folders_url": "https://www.example.com/api/v1/folders/2937/folders",
-#       "files_url": "https://www.example.com/api/v1/folders/2937/files",
-#       "full_name": "course files/11folder",
-#       "lock_at": null,
-#       "id": 2937,
-#       "folders_count": 0,
-#       "name": "11folder",
-#       "parent_folder_id": 2934,
-#       "created_at": "2012-07-06T14:58:50Z",
-#       "unlock_at": null,
-#       "hidden": null,
-#       "hidden_for_user": false,
-#       "locked": true,
-#       "locked_for_user": false
+#       "id": "Folder",
+#       "description": "",
+#       "properties": {
+#         "context_type": {
+#           "example": "Course",
+#           "type": "string"
+#         },
+#         "context_id": {
+#           "example": 1401,
+#           "type": "integer"
+#         },
+#         "files_count": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "position": {
+#           "example": 3,
+#           "type": "integer"
+#         },
+#         "updated_at": {
+#           "example": "2012-07-06T14:58:50Z",
+#           "type": "datetime"
+#         },
+#         "folders_url": {
+#           "example": "https://www.example.com/api/v1/folders/2937/folders",
+#           "type": "string"
+#         },
+#         "files_url": {
+#           "example": "https://www.example.com/api/v1/folders/2937/files",
+#           "type": "string"
+#         },
+#         "full_name": {
+#           "example": "course files/11folder",
+#           "type": "string"
+#         },
+#         "lock_at": {
+#           "example": "2012-07-06T14:58:50Z",
+#           "type": "datetime"
+#         },
+#         "id": {
+#           "example": 2937,
+#           "type": "integer"
+#         },
+#         "folders_count": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "name": {
+#           "example": "11folder",
+#           "type": "string"
+#         },
+#         "parent_folder_id": {
+#           "example": 2934,
+#           "type": "integer"
+#         },
+#         "created_at": {
+#           "example": "2012-07-06T14:58:50Z",
+#           "type": "datetime"
+#         },
+#         "unlock_at": {
+#           "type": "datetime"
+#         },
+#         "hidden": {
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "hidden_for_user": {
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "locked": {
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "locked_for_user": {
+#           "example": false,
+#           "type": "boolean"
+#         }
+#       }
 #     }
+#
 class FoldersController < ApplicationController
   include Api::V1::Folders
   include Api::V1::Attachment

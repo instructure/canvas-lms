@@ -110,7 +110,7 @@
 #       }
 #     }
 #
-# @object PageViewLinks
+# @model PageViewLinks
 #   {
 #     "id": "PageViewLinks",
 #     "description": "The links of a page view access in Canvas",

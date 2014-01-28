@@ -81,12 +81,12 @@
 #       "answers": {
 #         "description": "An array of available answers to display to the student.",
 #         "type": "array",
-#         "items": { "$ref": "string" }
+#         "items": { "$ref": "Answer" }
 #       }
 #     }
 #   }
 #
-# @object Answer
+# @model Answer
 #   {
 #     "required": ["answer_text", "answer_weight"],
 #     "properties": {

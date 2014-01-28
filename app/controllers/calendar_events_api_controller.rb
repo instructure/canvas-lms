@@ -20,170 +20,246 @@
 #
 # API for creating, accessing and updating calendar events.
 #
-# @object CalendarEvent
+# @model CalendarLink
 #     {
-#       // The ID of the calendar event
-#       "id": 234,
-#
-#       // The title of the calendar event
-#       "title": "Paintball Fight!",
-#
-#       // The start timestamp of the event
-#       "start_at": "2012-07-19T15:00:00-06:00",
-#
-#       // The end timestamp of the event
-#       "end_at": "2012-07-19T16:00:00-06:00",
-#
-#       // The HTML description of the event
-#       "description": "<b>It's that time again!</b>",
-#
-#       // The location name of the event
-#       "location_name": "Greendale Community College",
-#
-#       // The address where the event is taking place
-#       "location_address": "Greendale, Colorado",
-#
-#       // the context code of the calendar this event belongs to (course, user
-#       // or group)
-#       "context_code": "course_123",
-#
-#       // if specified, it indicates which calendar this event should be
-#       // displayed on. for example, a section-level event would have the
-#       // course's context code here, while the section's context code would
-#       // be returned above)
-#       "effective_context_code": null,
-#
-#       // Current state of the event ("active", "locked" or "deleted")
-#       // "locked" indicates that start_at/end_at cannot be changed (though
-#       // the event could be deleted). Normally only reservations or time
-#       // slots with reservations are locked (see the Appointment Groups API)
-#       "workflow_state": "active",
-#
-#       // Whether this event should be displayed on the calendar. Only true
-#       // for course-level events with section-level child events.
-#       "hidden": false,
-#
-#       // Normally null. If this is a reservation (see the Appointment Groups
-#       // API), the id will indicate the time slot it is for. If this is a
-#       // section-level event, this will be the course-level parent event.
-#       "parent_event_id": null,
-#
-#       // The number of child_events. See child_events (and parent_event_id)
-#       "child_events_count": 0,
-#
-#       // Included by default, but may be excluded (see include[] option).
-#       // If this is a time slot (see the Appointment Groups API) this will
-#       // be a list of any reservations. If this is a course-level event,
-#       // this will be a list of section-level events (if any)
-#       "child_events": [],
-#
-#       // URL for this calendar event (to update, delete, etc.)
-#       "url": "https://example.com/api/v1/calendar_events/234",
-#
-#       // URL for a user to view this event
-#       "html_url": "https://example.com/calendar?event_id=234&include_contexts=course_123",
-#
-#       // The date of this event
-#       "all_day_date": "2012-07-19",
-#
-#       // Boolean indicating whether this is an all-day event (midnight to
-#       // midnight)
-#       "all_day": false,
-#
-#       // When the calendar event was created
-#       "created_at": "2012-07-12T10:55:20-06:00",
-#
-#       // When the calendar event was last updated
-#       "updated_at": "2012-07-12T10:55:20-06:00",
-#
-#
-#       ///////////////////////////////////////////////////////////////////////
-#       // Various Appointment-Group-related fields                          //
-#       //                                                                   //
-#       // These fields are only pertinent to time slots (appointments) and  //
-#       // reservations of those time slots. See the Appointment Groups API  //
-#       ///////////////////////////////////////////////////////////////////////
-#
-#       // The id of the appointment group
-#       "appointment_group_id": null,
-#
-#       // The API URL of the appointment group
-#       "appointment_group_url": null,
-#
-#       // If the event is a reservation, this a boolean indicating whether it
-#       // is the current user's reservation, or someone else's
-#       "own_reservation": null,
-#
-#       // If the event is a time slot, the API URL for reserving it 
-#       "reserve_url": null,
-#
-#       // If the event is a time slot, a boolean indicating whether the user
-#       // has already made a reservation for it 
-#       "reserved": null,
-#
-#       // If the event is a time slot, this is the participant limit
-#       "participants_per_appointment": null,
-#
-#       // If the event is a time slot and it has a participant limit, an
-#       // integer indicating how many slots are available
-#       "available_slots": null,
-#
-#       // If the event is a user-level reservation, this will contain the user
-#       // participant JSON (refer to the Users API).
-#       "user": null,
-#
-#       // If the event is a group-level reservation, this will contain the
-#       // group participant JSON (refer to the Groups API).
-#       "group": null
+#       "id": "CalendarLink",
+#       "description": "",
+#       "properties": {
+#         "ics": {
+#           "description": "The URL of the calendar in ICS format",
+#           "example": "https://canvas.instructure.com/feeds/calendars/course_abcdef.ics",
+#           "type": "string"
+#          }
+#       }
 #     }
 #
-# @object AssignmentEvent
+# @model CalendarEvent
 #     {
-#       // A synthetic ID for the assignment
-#       "id": "assignment_987",
-#
-#       // The title of the assignment
-#       "title": "Essay",
-#
-#       // The due_at timestamp of the assignment
-#       "start_at": "2012-07-19T23:59:00-06:00",
-#
-#       // The due_at timestamp of the assignment
-#       "end_at": "2012-07-19T23:59:00-06:00",
-#
-#       // The HTML description of the assignment
-#       "description": "<b>Write an essay. Whatever you want.</b>",
-#
-#       // the context code of the (course) calendar this assignment belongs to
-#       "context_code": "course_123",
-#
-#       // Current state of the assignment ("published" or "deleted")
-#       "workflow_state": "published",
-#
-#       // URL for this assignment (note that updating/deleting should be done
-#       // via the Assignments API)
-#       "url": "https://example.com/api/v1/calendar_events/assignment_987",
-#
-#       // URL for a user to view this assignment
-#       "html_url": "http://example.com/courses/123/assignments/987",
-#
-#       // The due date of this assignment
-#       "all_day_date": "2012-07-19",
-#
-#       // Boolean indicating whether this is an all-day event (e.g. assignment
-#       // due at midnight)
-#       "all_day": true,
-#
-#       // When the assignment was created
-#       "created_at": "2012-07-12T10:55:20-06:00",
-#
-#       // When the assignment was last updated
-#       "updated_at": "2012-07-12T10:55:20-06:00",
-#
-#       // The full assignment JSON data (See the Assignments API)
-#       "assignment": {}
+#       "id": "CalendarEvent",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the calendar event",
+#           "example": 234,
+#           "type": "integer"
+#         },
+#         "title": {
+#           "description": "The title of the calendar event",
+#           "example": "Paintball Fight!",
+#           "type": "string"
+#         },
+#         "start_at": {
+#           "description": "The start timestamp of the event",
+#           "example": "2012-07-19T15:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "end_at": {
+#           "description": "The end timestamp of the event",
+#           "example": "2012-07-19T16:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "description": {
+#           "description": "The HTML description of the event",
+#           "example": "<b>It's that time again!</b>",
+#           "type": "string"
+#         },
+#         "location_name": {
+#           "description": "The location name of the event",
+#           "example": "Greendale Community College",
+#           "type": "string"
+#         },
+#         "location_address": {
+#           "description": "The address where the event is taking place",
+#           "example": "Greendale, Colorado",
+#           "type": "string"
+#         },
+#         "context_code": {
+#           "description": "the context code of the calendar this event belongs to (course, user or group)",
+#           "example": "course_123",
+#           "type": "string"
+#         },
+#         "effective_context_code": {
+#           "description": "if specified, it indicates which calendar this event should be displayed on. for example, a section-level event would have the course's context code here, while the section's context code would be returned above)",
+#           "type": "string"
+#         },
+#         "workflow_state": {
+#           "description": "Current state of the event ('active', 'locked' or 'deleted') 'locked' indicates that start_at/end_at cannot be changed (though the event could be deleted). Normally only reservations or time slots with reservations are locked (see the Appointment Groups API)",
+#           "example": "active",
+#           "type": "string"
+#         },
+#         "hidden": {
+#           "description": "Whether this event should be displayed on the calendar. Only true for course-level events with section-level child events.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "parent_event_id": {
+#           "description": "Normally null. If this is a reservation (see the Appointment Groups API), the id will indicate the time slot it is for. If this is a section-level event, this will be the course-level parent event.",
+#           "type": "integer"
+#         },
+#         "child_events_count": {
+#           "description": "The number of child_events. See child_events (and parent_event_id)",
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "child_events": {
+#           "description": "Included by default, but may be excluded (see include[] option). If this is a time slot (see the Appointment Groups API) this will be a list of any reservations. If this is a course-level event, this will be a list of section-level events (if any)",
+#           "type": "array",
+#           "items": {"type": "integer"}
+#         },
+#         "url": {
+#           "description": "URL for this calendar event (to update, delete, etc.)",
+#           "example": "https://example.com/api/v1/calendar_events/234",
+#           "type": "string"
+#         },
+#         "html_url": {
+#           "description": "URL for a user to view this event",
+#           "example": "https://example.com/calendar?event_id=234&include_contexts=course_123",
+#           "type": "string"
+#         },
+#         "all_day_date": {
+#           "description": "The date of this event",
+#           "example": "2012-07-19",
+#           "type": "datetime"
+#         },
+#         "all_day": {
+#           "description": "Boolean indicating whether this is an all-day event (midnight to midnight)",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "created_at": {
+#           "description": "When the calendar event was created",
+#           "example": "2012-07-12T10:55:20-06:00",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "When the calendar event was last updated",
+#           "example": "2012-07-12T10:55:20-06:00",
+#           "type": "datetime"
+#         },
+#         "appointment_group_id": {
+#           "description": "Various Appointment-Group-related fields.These fields are only pertinent to time slots (appointments) and reservations of those time slots. See the Appointment Groups API. The id of the appointment group",
+#           "type": "integer"
+#         },
+#         "appointment_group_url": {
+#           "description": "The API URL of the appointment group",
+#           "type": "string"
+#         },
+#         "own_reservation": {
+#           "description": "If the event is a reservation, this a boolean indicating whether it is the current user's reservation, or someone else's",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "reserve_url": {
+#           "description": "If the event is a time slot, the API URL for reserving it",
+#           "type": "string"
+#         },
+#         "reserved": {
+#           "description": "If the event is a time slot, a boolean indicating whether the user has already made a reservation for it",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "participants_per_appointment": {
+#           "description": "If the event is a time slot, this is the participant limit",
+#           "type": "integer"
+#         },
+#         "available_slots": {
+#           "description": "If the event is a time slot and it has a participant limit, an integer indicating how many slots are available",
+#           "type": "integer"
+#         },
+#         "user": {
+#           "description": "If the event is a user-level reservation, this will contain the user participant JSON (refer to the Users API).",
+#           "type": "string"
+#         },
+#         "group": {
+#           "description": "If the event is a group-level reservation, this will contain the group participant JSON (refer to the Groups API).",
+#           "type": "string"
+#         }
+#       }
 #     }
-
+#
+# @model AssignmentEvent
+#     {
+#       "id": "AssignmentEvent",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "A synthetic ID for the assignment",
+#           "example": "assignment_987",
+#           "type": "string"
+#         },
+#         "title": {
+#           "description": "The title of the assignment",
+#           "example": "Essay",
+#           "type": "string"
+#         },
+#         "start_at": {
+#           "description": "The due_at timestamp of the assignment",
+#           "example": "2012-07-19T23:59:00-06:00",
+#           "type": "datetime"
+#         },
+#         "end_at": {
+#           "description": "The due_at timestamp of the assignment",
+#           "example": "2012-07-19T23:59:00-06:00",
+#           "type": "datetime"
+#         },
+#         "description": {
+#           "description": "The HTML description of the assignment",
+#           "example": "<b>Write an essay. Whatever you want.</b>",
+#           "type": "string"
+#         },
+#         "context_code": {
+#           "description": "the context code of the (course) calendar this assignment belongs to",
+#           "example": "course_123",
+#           "type": "string"
+#         },
+#         "workflow_state": {
+#           "description": "Current state of the assignment ('published' or 'deleted')",
+#           "example": "published",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "published",
+#               "deleted"
+#             ]
+#           }
+#         },
+#         "url": {
+#           "description": "URL for this assignment (note that updating/deleting should be done via the Assignments API)",
+#           "example": "https://example.com/api/v1/calendar_events/assignment_987",
+#           "type": "string"
+#         },
+#         "html_url": {
+#           "description": "URL for a user to view this assignment",
+#           "example": "http://example.com/courses/123/assignments/987",
+#           "type": "string"
+#         },
+#         "all_day_date": {
+#           "description": "The due date of this assignment",
+#           "example": "2012-07-19",
+#           "type": "datetime"
+#         },
+#         "all_day": {
+#           "description": "Boolean indicating whether this is an all-day event (e.g. assignment due at midnight)",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "created_at": {
+#           "description": "When the assignment was created",
+#           "example": "2012-07-12T10:55:20-06:00",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "When the assignment was last updated",
+#           "example": "2012-07-12T10:55:20-06:00",
+#           "type": "datetime"
+#         },
+#         "assignment": {
+#           "description": "The full assignment JSON data (See the Assignments API)",
+#           "$ref": "Assignment"
+#         }
+#       }
+#     }
+#
 class CalendarEventsApiController < ApplicationController
   include Api::V1::CalendarEvent
 

@@ -20,29 +20,49 @@
 #
 # Group memberships are the objects that tie users and groups together. 
 #
-# @object GroupMembership
+# @model GroupMembership
 #     {
-#       // The id of the membership object
-#       "id": 92,
-#
-#       // The id of the group object to which the membership belongs
-#       "group_id": 17,
-#
-#       // The id of the user object to which the membership belongs
-#       "user_id": 3,
-#
-#       // The current state of the membership. Current possible values are
-#       // "accepted", "invited", and "requested"
-#       "workflow_state": "accepted",
-#
-#       // Whether or not the user is a moderator of the group (the must also
-#       // be an active member of the group to moderate)
-#       "moderator": true,
-#
-#       // optional: whether or not the record was just created on a
-#       // create call (POST), i.e. was the user just added to the group,
-#       // or was the user already a member
-#       "just_created": true
+#       "id": "GroupMembership",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The id of the membership object",
+#           "example": 92,
+#           "type": "integer"
+#         },
+#         "group_id": {
+#           "description": "The id of the group object to which the membership belongs",
+#           "example": 17,
+#           "type": "integer"
+#         },
+#         "user_id": {
+#           "description": "The id of the user object to which the membership belongs",
+#           "example": 3,
+#           "type": "integer"
+#         },
+#         "workflow_state": {
+#           "description": "The current state of the membership. Current possible values are 'accepted', 'invited', and 'requested'",
+#           "example": "accepted",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "accepted",
+#               "invited",
+#               "requested"
+#             ]
+#           }
+#         },
+#         "moderator": {
+#           "description": "Whether or not the user is a moderator of the group (the must also be an active member of the group to moderate)",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "just_created": {
+#           "description": "optional: whether or not the record was just created on a create call (POST), i.e. was the user just added to the group, or was the user already a member",
+#           "example": true,
+#           "type": "boolean"
+#         }
+#       }
 #     }
 #
 class GroupMembershipsController < ApplicationController

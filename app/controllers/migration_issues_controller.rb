@@ -19,36 +19,77 @@
 # @API Content Migrations
 # @subtopic Migration Issues
 #
-# @object MigrationIssue
-#   {
-#       // the unique identifier for the issue
-#       "id": 370663,
+# @model MigrationIssue
+#     {
+#       "id": "MigrationIssue",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the unique identifier for the issue",
+#           "example": 370663,
+#           "type": "integer"
+#         },
+#         "content_migration_url": {
+#           "description": "API url to the content migration",
+#           "example": "https://example.com/api/v1/courses/1/content_migrations/1",
+#           "type": "string"
+#         },
+#         "description": {
+#           "description": "Description of the issue for the end-user",
+#           "example": "Questions in this quiz couldn't be converted",
+#           "type": "string"
+#         },
+#         "workflow_state": {
+#           "description": "Current state of the issue: active, resolved",
+#           "example": "active",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "active",
+#               "resolved"
+#             ]
+#           }
+#         },
+#         "fix_issue_html_url": {
+#           "description": "HTML Url to the Canvas page to investigate the issue",
+#           "example": "https://example.com/courses/1/quizzes/2",
+#           "type": "string"
+#         },
+#         "issue_type": {
+#           "description": "Severity of the issue: todo, warning, error",
+#           "example": "warning",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "todo",
+#               "warning",
+#               "error"
+#             ]
+#           }
+#         },
+#         "error_report_html_url": {
+#           "description": "Link to a Canvas error report if present (If the requesting user has permissions)",
+#           "example": "https://example.com/error_reports/3",
+#           "type": "string"
+#         },
+#         "error_message": {
+#           "description": "Site administrator error message (If the requesting user has permissions)",
+#           "example": "admin only message",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "description": "timestamp",
+#           "example": "2012-06-01T00:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "timestamp",
+#           "example": "2012-06-01T00:00:00-06:00",
+#           "type": "datetime"
+#         }
+#       }
+#     }
 #
-#       // API url to the content migration
-#       "content_migration_url": "https://example.com/api/v1/courses/1/content_migrations/1",
-#
-#       // Description of the issue for the end-user
-#       "description":  "Questions in this quiz couldn't be converted",
-#
-#       // Current state of the issue: active, resolved
-#       "workflow_state": "active",
-#
-#       // HTML Url to the Canvas page to investigate the issue
-#       "fix_issue_html_url": "https://example.com/courses/1/quizzes/2",
-#
-#       // Severity of the issue: todo, warning, error
-#       "issue_type": "warning",
-#
-#       // Link to a Canvas error report if present (If the requesting user has permissions)
-#       "error_report_html_url": "https://example.com/error_reports/3",
-#
-#       // Site administrator error message (If the requesting user has permissions)
-#       "error_message": "admin only message",
-#
-#       // timestamps
-#       "created_at": "2012-06-01T00:00:00-06:00",
-#       "updated_at": "2012-06-01T00:00:00-06:00"
-#   }
 class MigrationIssuesController < ApplicationController
   include Api::V1::ContentMigration
 
