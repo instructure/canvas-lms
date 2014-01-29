@@ -232,6 +232,10 @@ Rails.configuration.to_prepare do
           :required => false,
           :description => 'The canvas id of the term to get grades from'
         },
+        :start_at => {
+          :required => false,
+          :description => 'The first date in the date range, the second date is the time the report is run.'
+        },
         :course_id => {
           :required => false,
           :description => 'The course to report on'

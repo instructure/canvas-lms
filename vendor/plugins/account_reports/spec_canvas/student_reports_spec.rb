@@ -309,8 +309,9 @@ describe 'Student reports' do
         update_all(:updated_at => 6.days.ago)
       parameter = {}
       parameter['start_at'] = 3.days.ago
-      parsed = read_report(@type, {params: parameter, order: [1,5]})
-
+      report = run_report(@type, {params: parameter})
+      (report.parameters["extra_text"].include? "Start At:").should == true
+      parsed = parse_report(report, {order: [1,5]})
       parsed.length.should == 4
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section1.id.to_s,
