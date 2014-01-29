@@ -44,6 +44,7 @@ unless CANVAS_RAILS2
   end
 
   ::Shard = Switchman::Shard
+  ::DatabaseServer = Switchman::DatabaseServer
 
   Switchman::DefaultShard.class_eval do
     attr_writer :settings
