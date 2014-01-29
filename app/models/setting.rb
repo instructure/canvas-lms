@@ -17,6 +17,11 @@
 #
 
 class Setting < ActiveRecord::Base
+  # This is needed because Setting is called in Canvas.cache_store_config
+  # before switchman is loaded
+  cattr_accessor :shard_category unless self.respond_to?(:shard_category)
+  self.shard_category = :unsharded
+
   attr_accessible :name, :value
 
   @@cache = {}
