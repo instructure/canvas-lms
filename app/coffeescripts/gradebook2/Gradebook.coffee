@@ -1012,22 +1012,6 @@ define [
         student.row = i
         @addDroppedClass(student)
       @grid.invalidate()
-      @grid.onSort.subscribe (event, data) =>
-        sortRowsBy (a, b) ->
-          aScore = a[data.sortCol.field]?.score
-          bScore = b[data.sortCol.field]?.score
-          aScore = -99999999999 if not aScore and aScore != 0
-          bScore = -99999999999 if not bScore and bScore != 0
-          if data.sortAsc then bScore - aScore else aScore - bScore
-      @grid.onSort.subscribe (event, data) =>
-        # SFU MOD CANVAS-188 Make SIS ID column sortable
-        propertyToSortBy = {display_name: 'sortable_name', secondary_identifier: 'secondary_identifier', sis_id: 'sis_id'}[data.sortCol.field]
-        # END SFU MOD
-        sortRowsBy (a, b) ->
-          res = if a[propertyToSortBy] < b[propertyToSortBy] then -1
-          else if a[propertyToSortBy] > b[propertyToSortBy] then 1
-          else 0
-          if data.sortAsc then res else 0 - res
 
     localeSort: (a, b) =>
       a.localeCompare b,
