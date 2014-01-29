@@ -144,9 +144,10 @@ gem 'crocodoc-ruby', '0.0.1', :require => 'crocodoc'
 # we can go back to the gem once 1.7.8 is released
 gem 'regru-premailer', :require => 'premailer', :github => "regru/premailer", :ref => "08a73c70701f5d81bc4a5cf6c959a45ad94db88e"
 
-gem 'canvas_sanitize', path: 'gems/canvas_sanitize'
+gem 'canvas_breach_mitigation', path: 'gems/canvas_breach_mitigation'
 gem 'canvas_crummy', path: 'gems/canvas_crummy'
 gem 'canvas_mimetype_fu', path: 'gems/canvas_mimetype_fu'
+gem 'canvas_sanitize', path: 'gems/canvas_sanitize'
 
 group :assets do
   gem 'compass-rails', '1.0.3'

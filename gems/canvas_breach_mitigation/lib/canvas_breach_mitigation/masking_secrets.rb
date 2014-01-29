@@ -1,4 +1,4 @@
-module BreachMitigation
+module CanvasBreachMitigation
   class MaskingSecrets
     class << self
       AUTHENTICITY_TOKEN_LENGTH = 32

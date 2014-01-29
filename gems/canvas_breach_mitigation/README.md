@@ -1,4 +1,8 @@
-# breach-mitigation-rails
+# Canvas Breach Mitigation
+
+This is a fork of the breach-mitigation-rails gem: http://rubygems.org/gems/breach-mitigation-rails
+
+TODO: Ideally this should be replaced with the gem
 
 Makes Rails applications less susceptible to the BREACH /
 CRIME attacks. See [breachattack.com](http://breachattack.com/) for

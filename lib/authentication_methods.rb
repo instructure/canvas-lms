@@ -119,8 +119,8 @@ module AuthenticationMethods
         @developer_key ||
           request.get? ||
           !allow_forgery_protection ||
-          BreachMitigation::MaskingSecrets.valid_authenticity_token?(session, form_authenticity_param) ||
-          BreachMitigation::MaskingSecrets.valid_authenticity_token?(session, request.headers['X-CSRF-Token']) ||
+          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, form_authenticity_param) ||
+          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, request.headers['X-CSRF-Token']) ||
           raise(AccessTokenError)
       end
     end

@@ -1020,15 +1020,15 @@ class ApplicationController < ActionController::Base
         redirect_to(login_url(:needs_cookies => '1'))
         return false
       else
-        raise(ActionController::InvalidAuthenticityToken) unless BreachMitigation::MaskingSecrets.valid_authenticity_token?(session, form_authenticity_param) ||
-          BreachMitigation::MaskingSecrets.valid_authenticity_token?(session, request.headers['X-CSRF-Token'])
+        raise(ActionController::InvalidAuthenticityToken) unless CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, form_authenticity_param) ||
+          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, request.headers['X-CSRF-Token'])
       end
     end
     Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
   end
 
   def form_authenticity_token
-    BreachMitigation::MaskingSecrets.masked_authenticity_token(session)
+    CanvasBreachMitigation::MaskingSecrets.masked_authenticity_token(session)
   end
 
   API_REQUEST_REGEX = %r{\A/api/v\d}
