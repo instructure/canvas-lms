@@ -967,11 +967,13 @@ define [
       $('body').on('click', @onGridBlur)
 
       @grid.onSort.subscribe (event, data) =>
-        if data.sortCol.field == "display_name" || data.sortCol.field == "secondary_identifier"
+        # SFU MOD CANVAS-188 Make SIS ID column sortable
+        if data.sortCol.field == "display_name" || data.sortCol.field == "secondary_identifier" || data.sortCol.field == "sis_id"
+        # END SFU MOD
           sortProp = if data.sortCol.field == "display_name"
             "sortable_name"
           else
-            "secondary_identifier"
+            data.sortCol.field # SFU MOD - CANVAS-188 Make SIS ID column sortable
           @sortRowsBy (a, b) =>
             [b, a] = [a, b] if not data.sortAsc
             @localeSort(a[sortProp], b[sortProp])
