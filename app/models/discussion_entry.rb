@@ -460,10 +460,11 @@ class DiscussionEntry < ActiveRecord::Base
     participant = discussion_entry_participants.where(:user_id => user).first
     unless participant
       # return a temporary record with default values
-      participant = discussion_entry_participants.new({
+      participant = DiscussionEntryParticipant.new({
         :workflow_state => "unread",
         :forced_read_state => false,
         })
+      participant.discussion_entry = self
       participant.user = user
     end
 
