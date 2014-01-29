@@ -2,6 +2,15 @@ unless CANVAS_RAILS2
   Switchman::Shard.class_eval do
     class << self
       alias :birth :default
+
+      def current_with_delayed_jobs(category=:default)
+        if category == :delayed_jobs
+          active_shards[category] || current_without_delayed_jobs(:default).delayed_jobs_shard
+        else
+          current_without_delayed_jobs(category)
+        end
+      end
+      alias_method_chain :current, :delayed_jobs
     end
 
     self.primary_key = "id"
@@ -40,6 +49,23 @@ unless CANVAS_RAILS2
         self.settings = s
       end
       s
+    end
+
+    def delayed_jobs_shard
+      shard = Shard.lookup(self.delayed_jobs_shard_id) if self.read_attribute(:delayed_jobs_shard_id)
+      shard || self.database_server.delayed_jobs_shard(self)
+    end
+  end
+
+  Switchman::DatabaseServer.class_eval do
+    def delayed_jobs_shard(shard = nil)
+      return shard if self.config[:delayed_jobs_shard] == 'self'
+      dj_shard = self.config[:delayed_jobs_shard] &&
+        Shard.lookup(self.config[:delayed_jobs_shard])
+      # have to avoid recursion for the default shard asking for the default shard's dj shard
+      dj_shard ||= shard if shard.default?
+      dj_shard ||= Shard.default.delayed_jobs_shard
+      dj_shard
     end
   end
 
