@@ -54,10 +54,12 @@ module ReportSpecHelper
 
   def parse_csv(csv, options = {})
     col_sep = options[:col_sep] || ','
+    skip_order = true if options[:order] == 'skip'
     order = Array(options[:order]).presence || [0, 1]
     all_parsed = CSV.parse(csv, {:col_sep => col_sep}).to_a
     header = all_parsed[0]
-    all_parsed = all_parsed[1..-1].sort_by { |r| r.values_at(*order).join }
+    all_parsed = all_parsed[1..-1]
+    all_parsed = all_parsed.sort_by { |r| r.values_at(*order).join } unless skip_order
     all_parsed.unshift(header) if options[:header]
     all_parsed
   end
