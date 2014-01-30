@@ -1,10 +1,9 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../lib/mimetype_fu')
+require 'spec_helper'
 
 describe 'A file with a know extension' do
   
   before(:each) do
-    @file = File.open(File.dirname(__FILE__) + '/fixtures/file.jpg')
+    @file = File.open(File.dirname(__FILE__) + '/../fixtures/file.jpg')
   end
   
   it 'should have an extension' do
@@ -20,7 +19,7 @@ end
 describe 'A file with anunknow extension' do
   
   before(:each) do
-    @file = File.open(File.dirname(__FILE__) + '/fixtures/file.unknown')
+    @file = File.open(File.dirname(__FILE__) + '/../fixtures/file.unknown')
   end
   
   it 'should have an extension' do
