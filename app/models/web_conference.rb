@@ -112,8 +112,12 @@ class WebConference < ActiveRecord::Base
       read_inheritable_attribute(:user_setting_fields) || write_inheritable_attribute(:user_setting_fields, {})
     end
   else
-    class_attribute :user_setting_fields
-    self.user_setting_fields = {}
+    def self.user_setting_fields
+      @user_setting_fields ||= {}
+    end
+    def self.user_setting_fields=(val)
+      @user_setting_fields = val
+    end
   end
 
   def self.user_setting_field_name(key)
@@ -143,8 +147,12 @@ class WebConference < ActiveRecord::Base
       read_inheritable_attribute(:external_urls) || write_inheritable_attribute(:external_urls, {})
     end
   else
-    class_attribute :external_urls
-    self.external_urls = {}
+    def self.external_urls
+      @external_urls ||= {}
+    end
+    def self.external_urls=(val)
+      @external_urls = val
+    end
   end
 
   def self.external_url(name, options)
