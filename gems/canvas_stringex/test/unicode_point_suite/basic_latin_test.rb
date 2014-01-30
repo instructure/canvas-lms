@@ -1,6 +1,7 @@
 require "test/unit"
 
-require File.join(File.dirname(__FILE__), "../../init")
+require 'canvas_stringex'
+
 require File.join(File.dirname(__FILE__), "codepoint_test_helper")
 include CodepointTestHelper
 

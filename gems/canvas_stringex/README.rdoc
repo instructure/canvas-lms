@@ -1,4 +1,8 @@
-= Stringex
+= Canvas Stringex
+
+This is a fork of the Stringex gem: http://rubygems.org/gems/stringex
+
+TODO: Use a current version of this stringex gem at some point
 
 Some [hopefully] useful extensions to Ruby's String class. It is made up of three libraries: ActsAsUrl, Unidecoder, and StringExtensions.
 

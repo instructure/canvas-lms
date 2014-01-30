@@ -2,8 +2,7 @@
 
 require "test/unit"
 
-$: << File.join(File.dirname(__FILE__), '../lib')
-require File.join(File.dirname(__FILE__), "../init")
+require 'canvas_stringex'
 
 class StringExtensionsTest < Test::Unit::TestCase
   def test_to_html

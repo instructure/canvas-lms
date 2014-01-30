@@ -2,8 +2,7 @@
 
 require "test/unit"
 
-$: << File.join(File.dirname(__FILE__), '../lib')
-require File.join(File.dirname(__FILE__), "../init")
+require 'canvas_stringex'
 
 class UnidecoderTest < Test::Unit::TestCase
   # Silly phrases courtesy of Frank da Cruz
