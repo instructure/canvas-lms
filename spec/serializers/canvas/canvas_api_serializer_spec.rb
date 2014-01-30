@@ -1,4 +1,4 @@
-require 'ams_spec_helper'
+require 'spec_helper'
 
 describe Canvas::APISerializer do
 
