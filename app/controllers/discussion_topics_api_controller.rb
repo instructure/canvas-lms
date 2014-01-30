@@ -509,11 +509,7 @@ class DiscussionTopicsApiController < ApplicationController
   
   protected
   def require_topic
-    if params[:topic_id] == "self" && @context.is_a?(CollectionItem)
-      @topic = @context.discussion_topic
-    else
-      @topic = @context.all_discussion_topics.active.find(params[:topic_id])
-    end
+    @topic = @context.all_discussion_topics.active.find(params[:topic_id])
     return authorized_action(@topic, @current_user, :read)
   end
 

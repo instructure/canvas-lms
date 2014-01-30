@@ -38,12 +38,10 @@ module Api::V1::Group
 
     hash = api_json(group, user, session, API_GROUP_JSON_OPTS, permissions_to_include)
     hash.merge!(context_data(group))
-    followed = ::UserFollow.followed_by_user([group], user)
-    hash['followed_by_user'] = !!followed.include?(group)
     image = group.avatar_attachment
     hash['avatar_url'] = image && thumbnail_image_url(image, image.uuid)
     hash['role'] = group.group_category.role if group.group_category
-    
+
     if includes.include?('users')
       # TODO: this should be switched to user_display_json
       hash['users'] = group.users.map{ |u| user_json(u, user, session) }

@@ -173,8 +173,6 @@ class StreamItem < ActiveRecord::Base
     when WebConference
       res = object.attributes
       res['users'] = object.users.map{|u| prepare_user(u)}
-    when CollectionItem
-      res = object.attributes
     else
       raise "Unexpected stream item type: #{object.class.to_s}"
     end

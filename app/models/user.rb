@@ -24,7 +24,6 @@ class User < ActiveRecord::Base
   end
 
   include Context
-  include UserFollow::FollowedItem
 
   attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use, :self_enrollment_code, :initial_enrollment_type
   attr_accessor :previous_id, :menu_data
@@ -219,13 +218,6 @@ class User < ActiveRecord::Base
   has_many :favorites
   has_many :zip_file_imports, :as => :context
   has_many :messages
-
-  has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
-  has_many :user_follows, :foreign_key => 'following_user_id'
-
-  has_many :collections, :as => :context
-  has_many :collection_items, :through => :collections
-  has_many :collection_item_upvotes
 
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile
@@ -990,9 +982,6 @@ class User < ActiveRecord::Base
   set_policy do
     given { |user| user == self }
     can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar and can :manage_feature_flags
-
-    given { |user| user.present? && self.public? }
-    can :follow
 
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
@@ -2424,10 +2413,6 @@ class User < ActiveRecord::Base
 
   def private?
     not public?
-  end
-
-  def default_collection_name
-    t('#user.default_collection_name', "%{user_name}'s Collection", :user_name => self.short_name)
   end
 
   def profile(force_reload = false)

@@ -100,35 +100,6 @@ describe UsersController, type: :request do
     }]
   end
 
-  it "should format DiscussionTopic for a CollectionItem" do
-    @item = collection_item_model
-    @item.discussion_topic.save!
-    @item.discussion_topic.discussion_subentries.create!(:message => "test", :user => @user, :discussion_topic => @item.discussion_topic)
-    json = api_call(:get, "/api/v1/users/activity_stream.json",
-                    { :controller => "users", :action => "activity_stream", :format => 'json' })
-    json.should == [{
-      'id' => StreamItem.last.id,
-      'title' => "No Title",
-      'message' => nil,
-      'type' => 'DiscussionTopic',
-      'read_state' => StreamItemInstance.last.read?,
-      'context_type' => "CollectionItem",
-      'created_at' => StreamItem.last.created_at.as_json,
-      'updated_at' => StreamItem.last.updated_at.as_json,
-      'require_initial_post' => nil,
-      'user_has_posted' => nil,
-
-      'total_root_discussion_entries' => 1,
-      'root_discussion_entries' => [
-        {
-          'user' => { 'user_id' => @user.id, 'user_name' => 'User' },
-          'message' => 'test',
-        },
-      ],
-      'collection_item_id' => @item.id,
-    }]
-  end
-
   it "should not return discussion entries if user has not posted" do
     @context = @course
     course_with_teacher(:course => @context, :active_all => true)
@@ -548,52 +519,6 @@ describe UsersController, type: :request do
     }]
   end
 
-  it "should format CollectionItem" do
-    @user1 = @user
-    group_with_user
-    @user2 = @user
-    @user = @user1
-    @coll = @group.collections.create!
-    UserFollow.create_follow(@user1, @coll)
-    @item = collection_item_model(:collection => @coll, :user => @user2)
-
-    json = api_call(:get, "/api/v1/users/activity_stream.json",
-                    { :controller => "users", :action => "activity_stream", :format => 'json' })
-    json.should == [{
-      'id' => StreamItem.last.id,
-      'title' => @item.data.title,
-      'type' => 'CollectionItem',
-      'read_state' => StreamItemInstance.last.read?,
-      'message' => @item.data.description,
-      'created_at' => StreamItem.last.created_at.as_json,
-      'updated_at' => StreamItem.last.updated_at.as_json,
-      'collection_item' => {
-        'id' => @item.id,
-        'collection_id' => @item.collection_id,
-        'user' => {
-          'id' => @item.user.id,
-          'display_name' => @item.user.short_name,
-          'avatar_image_url' => "http://www.example.com/images/messages/avatar-50.png",
-          'html_url' => (@item.user == @user) ? "http://www.example.com/profile" : "http://www.example.com/users/#{@item.user.id}",
-        },
-        'item_type' => @item.collection_item_data.item_type,
-        'link_url' => @item.collection_item_data.link_url,
-        'post_count' => @item.collection_item_data.post_count,
-        'upvote_count' => @item.collection_item_data.upvote_count,
-        'upvoted_by_user' => false,
-        'root_item_id' => @item.collection_item_data.root_item_id,
-        'image_url' => "http://www.example.com/images/thumbnails/#{@item.data.image_attachment.id}/#{@item.data.image_attachment.uuid}?size=640x%3E",
-        'image_pending' => @item.data.image_pending,
-        'html_preview' => @item.data.html_preview,
-        'user_comment' => @item.user_comment,
-        'url' => "http://www.example.com/api/v1/collections/items/#{@item.id}",
-        'created_at' => @item.created_at.iso8601,
-        'description' => @item.data.description,
-        'title' => @item.data.title,
-      }
-    }]
-  end
-
   it "should return the course-specific activity stream" do
     @course1 = @course
     @course2 = course_with_student(:user => @user, :active_all => true).course
@@ -643,9 +568,7 @@ describe UsersController, type: :request do
 
   context "stream items" do
     it "should hide the specified stream_item" do
-      item = collection_item_model
-      item.discussion_topic.save!
-      item.discussion_topic.discussion_subentries.create!(:message => "test", :user => @user, :discussion_topic => item.discussion_topic)
+      discussion_topic_model
       @user.stream_item_instances.where(:hidden => false).count.should == 1
 
       json = api_call(:delete, "/api/v1/users/self/activity_stream/#{StreamItem.last.id}",
@@ -658,10 +581,8 @@ describe UsersController, type: :request do
 
     it "should hide all of the stream items" do
       3.times do |n|
-        collection = @user.collections.create! :name => 'Test #{n}'
-        item = collection_item_model(:collection => collection)
-        item.discussion_topic.save!
-        item.discussion_topic.discussion_subentries.create!(:message => "test", :user => @user, :discussion_topic => item.discussion_topic)
+        dt = discussion_topic_model title: "Test #{n}"
+        dt.discussion_subentries.create! :message => "test", :user => @user
       end
       @user.stream_item_instances.where(:hidden => false).count.should == 3
 

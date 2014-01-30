@@ -1,4 +1,9 @@
 module DataFixup::CountExistingCollectionItemsAndFollowers
+  class Collection < ActiveRecord::Base
+    attr_accessible :workflow_state
+    scope :active, where(:workflow_state => 'active')
+  end
+
   def self.run
     Collection.active.find_ids_in_batches do |ids|
       Collection.connection.execute(Collection.send(:sanitize_sql_array, [<<-SQL, ids]))

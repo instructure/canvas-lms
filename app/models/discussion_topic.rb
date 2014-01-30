@@ -159,7 +159,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def draft_state_enabled?
-    context = self.context.is_a?(CollectionItem) ? self.context.collection.context : self.context
+    context = self.context
     context && context.respond_to?(:feature_enabled?) && context.feature_enabled?(:draft_state)
   end
   attr_accessor :saved_by
@@ -555,9 +555,6 @@ class DiscussionTopic < ActiveRecord::Base
       false
     elsif self.assignment && self.assignment.submission_types == 'discussion_topic' && (!self.assignment.due_at || self.assignment.due_at > 1.week.from_now) # TODO: vdd
       false
-    elsif self.context.is_a?(CollectionItem)
-      # we'll only send notifications of entries to the streams, not creations of topics
-      false
     else
       true
     end
@@ -799,11 +796,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def participants(include_observers=false)
     participants = [ self.user ]
-    if self.context.is_a?(CollectionItem)
-      participants += self.posters
-    else
-      participants += context.participants(include_observers)
-    end
+    participants += context.participants(include_observers)
     participants.compact.uniq
   end
 

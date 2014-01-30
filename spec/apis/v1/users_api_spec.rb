@@ -788,55 +788,7 @@ describe "Users API", type: :request do
     end
   end
 
-  describe "following" do
-    before do
-      @me = @user
-      @u2 = user_model
-      @user = @me
-      @u2.update_attribute(:public, true)
-    end
-
-    it "should allow following a public user" do
-      json = api_call(:put, "/api/v1/users/#{@u2.id}/followers/self", :controller => "users", :action => "follow", :user_id => @u2.to_param, :format => "json")
-      @user.user_follows.map(&:followed_item).should == [@u2]
-      uf = @user.user_follows.first
-      json.should == { "following_user_id" => @user.id, "followed_user_id" => @u2.id, "created_at" => uf.created_at.as_json }
-    end
-
-    it "should do nothing if already following the user" do
-      @user.user_follows.create!(:followed_item => @u2)
-      uf = @user.user_follows.first
-      @user.user_follows.map(&:followed_item).should == [@u2]
-
-      json = api_call(:put, "/api/v1/users/#{@u2.id}/followers/self", :controller => "users", :action => "follow", :user_id => @u2.to_param, :format => "json")
-      @user.user_follows.map(&:followed_item).should == [@u2]
-      uf = @user.user_follows.first
-      json.should == { "following_user_id" => @user.id, "followed_user_id" => @u2.id, "created_at" => uf.created_at.as_json }
-    end
-
-    it "should not allow following a private user" do
-      @u2.update_attribute(:public, false)
-      json = api_call(:put, "/api/v1/users/#{@u2.id}/followers/self", { :controller => "users", :action => "follow", :user_id => @u2.to_param, :format => "json" }, {}, {}, :expected_status => 401)
-      @user.reload.user_follows.should == []
-    end
-
-    describe "unfollowing" do
-      it "should allow unfollowing a collection" do
-        @user.user_follows.create!(:followed_item => @u2)
-        @user.reload.user_follows.map(&:followed_item).should == [@u2]
-
-        json = api_call(:delete, "/api/v1/users/#{@u2.id}/followers/self", :controller => "users", :action => "unfollow", :user_id => @u2.to_param, :format => "json")
-        @user.reload.user_follows.should == []
-      end
-
-      it "should do nothing if not following" do
-        @user.reload.user_follows.should == []
-        json = api_call(:delete, "/api/v1/users/#{@u2.id}/followers/self", :controller => "users", :action => "unfollow", :user_id => @u2.to_param, :format => "json")
-        @user.reload.user_follows.should == []
-      end
-    end
-  end
-  describe "user merge" do
+    describe "user merge" do
     before do
       @account = Account.default
       @user1 = user_with_managed_pseudonym(
