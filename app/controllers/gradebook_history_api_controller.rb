@@ -206,7 +206,7 @@
 #       }
 #     }
 #
- class GradebookHistoryApiController < ApplicationController
+class GradebookHistoryApiController < ApplicationController
   before_filter :require_context
   before_filter :require_manage_grades
 

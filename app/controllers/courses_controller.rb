@@ -421,8 +421,11 @@ class CoursesController < ApplicationController
         @course.apply_assignment_group_weights = value_to_boolean apply_assignment_group_weights
       end
 
+      changes = @course.changes
+
       respond_to do |format|
         if @course.save
+          Auditors::Course.record_created(@course, @current_user, changes)
           @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active') if params[:enroll_me].to_s == 'true'
           # offer updates the workflow state, saving the record without doing validation callbacks
           @course.offer if api_request? and params[:offer].present?
@@ -573,7 +576,7 @@ class CoursesController < ApplicationController
       user_id = params.delete(:user_id)
       if user_id.present? && user = users.where(:users => { :id => user_id }).first
         position_scope = users.where("#{User.sortable_name_order_by_clause}<=#{User.best_unicode_collation_key('?')}", user.sortable_name)
-        position = position_scope.count(:select => "users.*", :distinct => true)
+        position = position_scope.count(:select => "users.id", :distinct => true)
         per_page = Api.per_page_for(self)
         params[:page] = (position.to_f / per_page.to_f).ceil
       end
@@ -608,7 +611,7 @@ class CoursesController < ApplicationController
   # user must have the 'View usage reports' permission.
   #
   # @example_request
-  #     curl -H 'Authorization: Bearer <token>' \ 
+  #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/<course_id>/recent_users
   #
   # @returns [User]
@@ -731,6 +734,7 @@ class CoursesController < ApplicationController
 
       @context.complete
       if @context.save
+        Auditors::Course.record_concluded(@context, @current_user)
         flash[:notice] = t('notices.concluded', "Course successfully concluded")
       else
         flash[:notice] = t('notices.failed_conclude', "Course failed to conclude")
@@ -1622,7 +1626,12 @@ class CoursesController < ApplicationController
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
       respond_to do |format|
         @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
-        if @course.update_attributes(params[:course])
+
+        @course.attributes = params[:course]
+        changes = @course.changes
+
+        if @course.save
+          Auditors::Course.record_updated(@course, @current_user, changes)
           @current_user.touch
           if params[:update_default_pages]
             @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
