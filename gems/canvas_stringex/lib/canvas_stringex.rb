@@ -1,3 +1,5 @@
+require 'fake_arel'
+
 module CanvasStringex
   require "lucky_sneaks/string_extensions"
   require "lucky_sneaks/unidecoder"
