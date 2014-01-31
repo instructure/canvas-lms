@@ -380,7 +380,8 @@ class PageView < ActiveRecord::Base
 
       inserted = rows.count do |attrs|
         begin
-          created_at = Time.zone.parse(attrs['created_at'])
+          created_at = attrs['created_at']
+          created_at = Time.zone.parse(created_at) unless created_at.is_a?(Time)
           # if the created_at is the same as the last_created_at,
           # we may have already inserted this page view
           # use to_i here to avoid sub-second precision problems

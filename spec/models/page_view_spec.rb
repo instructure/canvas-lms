@@ -151,7 +151,9 @@ describe PageView do
         expect { PageView.find(moved_later.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
         # it should resume where the last migrator left off
         migrator = PageView::CassandraMigrator.new
-        migrator.run_once(2)
+        # it could find the first two twice if we're on mysql, due to no sub-second precision,
+        # so do a batch of 3
+        migrator.run_once(3)
         PageView.find(moved.map(&:request_id) + [moved_later.request_id]).size.should == 3
 
         expect { PageView.find(deleted.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
