@@ -49,6 +49,12 @@ class AssessmentRequest < ActiveRecord::Base
   scope :incomplete, where(:workflow_state => 'assigned')
   scope :for_assessee, lambda { |user_id| where(:user_id => user_id) }
 
+  def self.send_all_reminders!
+    self.all.each do |assessment_request|
+      assessment_request.send_reminder!
+    end
+  end
+
   def send_reminder!
     @send_reminder = true
     self.updated_at = Time.now
