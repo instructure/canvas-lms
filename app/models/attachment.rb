@@ -1530,6 +1530,8 @@ class Attachment < ActiveRecord::Base
   def matches_full_path?(path)
     f_path = full_path
     f_path == path || URI.unescape(f_path) == path || f_path.downcase == path.downcase || URI.unescape(f_path).downcase == path.downcase
+  rescue
+    false
   end
 
   def full_display_path
@@ -1539,6 +1541,8 @@ class Attachment < ActiveRecord::Base
   def matches_full_display_path?(path)
     fd_path = full_display_path
     fd_path == path || URI.unescape(fd_path) == path || fd_path.downcase == path.downcase || URI.unescape(fd_path).downcase == path.downcase
+  rescue
+    false
   end
 
   def matches_filename?(match)
@@ -1546,6 +1550,8 @@ class Attachment < ActiveRecord::Base
       URI.unescape(filename) == match || URI.unescape(display_name) == match ||
       filename.downcase == match.downcase || display_name.downcase == match.downcase ||
       URI.unescape(filename).downcase == match.downcase || URI.unescape(display_name).downcase == match.downcase
+  rescue
+    false
   end
 
   def protect_for(user)
