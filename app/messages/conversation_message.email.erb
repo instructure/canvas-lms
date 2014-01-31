@@ -18,7 +18,7 @@ Subject: <%= asset.conversation.subject %>
 <% if asset.has_media_objects? %>
 <%= t :audio_comment, "This message includes media comments. To listen or reply, click the link below:" %>
 <% else %>
-<%= t :reply_message, "To reply to this message, click the link below:" %>
+<%= t :reply_to_conversation_message, "You can reply to this message in Canvas by replying directly to this email." %>
 <% end %>
 
 <%= content :link %>
