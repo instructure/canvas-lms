@@ -10,7 +10,7 @@
 #
 # That's what .git/info/exclude and core.excludesfile are for :)
 
-/.bundle/
+.bundle/
 /.yardoc/
 /app/coffeescripts/ember/*/main.coffee
 /app/views/info/styleguide.html.erb
@@ -21,7 +21,7 @@
 /db/*.sqlite*
 /db/*sql
 /exports/
-/Gemfile.lock
+Gemfile.lock
 /log/
 /public/app/
 /public/assets/
