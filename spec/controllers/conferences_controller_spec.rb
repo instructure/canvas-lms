@@ -72,6 +72,18 @@ describe ConferencesController do
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
+
+    it "should not list conferences that use a disabled plugin" do
+      course_with_teacher_logged_in(:active_all => true)
+      plugin = PluginSetting.find_or_create_by_name('adobe_connect')
+      plugin.update_attribute(:settings, { :domain => 'adobe_connect.test' })
+
+      @conference = @course.web_conferences.create!(:conference_type => 'AdobeConnect', :duration => 60, :user => @teacher)
+      plugin.disabled = true
+      plugin.save!
+      get 'index', :course_id => @course.id
+      assigns[:new_conferences].should be_empty
+    end
   end
 
   describe "POST 'create'" do

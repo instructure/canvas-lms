@@ -52,6 +52,21 @@ describe "Conferences API", type: :request do
       json.should == api_conferences_json(@conferences.reverse.map{|c| WebConference.find(c.id)}, @course, @user)
     end
 
+    it "should not list conferences for disabled plugins" do
+      course_with_teacher(:active_all => true)
+      plugin = PluginSetting.find_or_create_by_name('adobe_connect')
+      plugin.update_attribute(:settings, { :domain => 'adobe_connect.test' })
+      @conferences = ['AdobeConnect', 'Wimba'].map {|ct| @course.web_conferences.create!(:conference_type => ct,
+                                                                                         :duration => 60,
+                                                                                         :user => @teacher,
+                                                                                         :title => ct)}
+      plugin.disabled = true
+      plugin.save!
+      json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options.
+        merge(action: 'index', course_id: @course.to_param))
+      json.should == api_conferences_json([WebConference.find(@conferences[1].id)], @course, @user)
+    end
+
     it "should only list conferences the user is a participant of" do
       course_with_student(:active_all => true)
       @conferences = (1..2).map { |i| @course.web_conferences.create!(:conference_type => 'Wimba',
