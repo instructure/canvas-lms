@@ -725,7 +725,7 @@ class ActiveRecord::Base
     subquery_scope = self.scoped.except(:select).select("#{quoted_table_name}.#{primary_key} as id").reorder(primary_key).limit(batch_size)
     ids = connection.select_rows("select min(id), max(id) from (#{subquery_scope.to_sql}) as subquery").first
     while ids.first.present?
-      ids.map!(&:to_i) if columns_hash[primary_key].type == :integer
+      ids.map!(&:to_i) if columns_hash[primary_key.to_s].type == :integer
       yield(*ids)
       last_value = ids.last
       next_subquery_scope = subquery_scope.where(["#{quoted_table_name}.#{primary_key}>?", last_value])
