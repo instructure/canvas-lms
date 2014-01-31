@@ -39,6 +39,8 @@ class WebConference < ActiveRecord::Base
   
   scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
 
+  scope :with_config, lambda { where(conference_type: WebConference.conference_types.map{|ct| ct['conference_type']}) }
+
   serialize :settings
   def settings
     read_attribute(:settings) || write_attribute(:settings, default_settings)
