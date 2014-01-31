@@ -116,6 +116,21 @@
     }
     // END no-flash upload FIX
 
+    // Alphabetize course drop-down list (Import Content page only)
+    // NOTE: This is no longer needed when XHR results are pre-sorted by Canvas
+    utils.onPage(/courses\/\d+\/content_migrations/, function() {
+        $(document).ajaxComplete(function (event, XMLHttpRequest, ajaxOptions) {
+            // Sort <option>s inside each <optgroup> when the relevant XHR call completes
+            if (ajaxOptions.url && ajaxOptions.url.match(/users\/\d+\/manageable_courses/)) {
+                $('optgroup', $('#courseSelect')).each(function (i, termGroup) {
+                    $('option', termGroup)
+                        .sort(function (a, b) { return $(a).text().localeCompare($(b).text()); })
+                        .appendTo(termGroup);
+                });
+            }
+        });
+    });
+
     // Fix for the new conversations page - toolbar renders underneath the rainbow bar
     utils.onPage(/conversations/, function() {
         // are we on the new conversations page?
