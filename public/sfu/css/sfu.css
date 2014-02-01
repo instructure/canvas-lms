@@ -58,6 +58,7 @@
 
 #topbar {
     margin-top: 10px;
+    width: auto; /* so it doesn't block clicks on the SFU Canvas logo */
 }
 
 #identity .user_name {
