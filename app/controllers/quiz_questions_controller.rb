@@ -172,14 +172,10 @@
 #
 class QuizQuestionsController < ApplicationController
   include Api::V1::QuizQuestion
-  include Api::V1::Helpers::QuizzesApiHelper
+  include Filters::Quizzes
 
   before_filter :require_context, :require_quiz
   before_filter :require_question, :only => [:show]
-
-  @@errors = {
-    :question_not_found => "Question not found"
-  }
 
   # @API List questions in a quiz
   # @beta
@@ -379,8 +375,8 @@ class QuizQuestionsController < ApplicationController
   private
 
   def require_question
-    unless @question = @quiz.quiz_questions.active.find_by_id(params[:id])
-      render :json => {:message => @@errors[:question_not_found]}, :status => :not_found
+    unless @question = @quiz.quiz_questions.active.find(params[:id])
+      raise ActiveRecord::RecordNotFound.new('Quiz Question not found')
     end
   end
 

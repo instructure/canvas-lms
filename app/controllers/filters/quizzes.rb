@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,12 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Api::V1::Helpers::QuizzesApiHelper
+module Filters::Quizzes
   protected
 
   def require_quiz
-    unless @quiz = @context.quizzes.find(params[:quiz_id])
+    id = params.has_key?(:quiz_id) ? params[:quiz_id] : params[:id]
+
+    unless @quiz = @context.quizzes.find(id)
       raise ActiveRecord::RecordNotFound.new('Quiz not found')
     end
+
+    @quiz
   end
 end

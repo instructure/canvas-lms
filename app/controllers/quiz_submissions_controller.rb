@@ -18,11 +18,13 @@
 
 class QuizSubmissionsController < ApplicationController
   include Api::V1::QuizSubmission
-  include Api::V1::Helpers::QuizzesApiHelper
+  include Filters::Quizzes
+  include Filters::QuizSubmissions
 
   protect_from_forgery :except => [:create, :backup, :record_answer]
   before_filter :require_context
   before_filter :require_quiz, :only => [ :index, :create, :extensions, :show, :update ]
+  before_filter :require_quiz_submission, :only => [ :show ]
   batch_jobs_in_actions :only => [:update, :create], :batch => { :priority => Delayed::LOW_PRIORITY }
 
   def index
@@ -74,7 +76,7 @@ class QuizSubmissionsController < ApplicationController
   end
 
   def backup
-    @quiz = @context.quizzes.find(params[:quiz_id])
+    @quiz = require_quiz
     if authorized_action(@quiz, @current_user, :submit)
       if @current_user.nil? || is_previewing?
         @submission = @quiz.quiz_submissions.find_by_temporary_user_code(temporary_user_code(false))
@@ -121,7 +123,7 @@ class QuizSubmissionsController < ApplicationController
   def record_answer
     # temporary fix for CNVS-8651 while we rewrite front-end quizzes
     if request.get?
-      @quiz = @context.quizzes.find(params[:quiz_id])
+      @quiz = require_quiz
       user_id = @current_user && @current_user.id
       redirect_to course_quiz_take_url(@context, @quiz, user_id: user_id)
     else
@@ -165,9 +167,10 @@ class QuizSubmissionsController < ApplicationController
   end
 
   def show
-    @submission = @quiz.quiz_submissions.find(params[:id])
-    if authorized_action(@submission, @current_user, :read)
-      redirect_to named_context_url(@context, :context_quiz_history_url, @quiz.id, :user_id => @submission.user_id)
+    if authorized_action(@quiz_submission, @current_user, :read)
+      redirect_to named_context_url(@context, :context_quiz_history_url,
+        @quiz.id,
+        user_id: @quiz_submission.user_id)
     end
   end
 
@@ -180,7 +183,6 @@ class QuizSubmissionsController < ApplicationController
   def previewing_params
     is_previewing? ? { :preview => 1 } : {}
   end
-
 
   def generate_submission_zip(quiz, context)
     attachment = quiz_submission_zip(quiz)

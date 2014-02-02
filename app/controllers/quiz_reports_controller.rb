@@ -60,7 +60,7 @@
 #     }
 #
 class QuizReportsController < ApplicationController
-  include Api::V1::Helpers::QuizzesApiHelper
+  include Filters::Quizzes
   include Api::V1::QuizReport
 
   before_filter :require_context, :require_quiz

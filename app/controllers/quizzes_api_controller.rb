@@ -136,13 +136,10 @@
 #
 class QuizzesApiController < ApplicationController
   include Api::V1::Quiz
+  include Filters::Quizzes
 
   before_filter :require_context
   before_filter :require_quiz, :only => [:show, :update, :destroy, :reorder]
-
-  @@errors = {
-    :quiz_not_found => "Quiz not found"
-  }
 
   # @API List quizzes in a course
   #
@@ -366,12 +363,6 @@ class QuizzesApiController < ApplicationController
       render json: { quizzes: quizzes_json([@quiz], @context, @current_user, session) }
     else
       render json: quiz_json(@quiz, @context, @current_user, session)
-    end
-  end
-
-  def require_quiz
-    unless @quiz = @context.quizzes.find_by_id(params[:id])
-      render :json => {:message => @@errors[:quiz_not_found]}, :status => :not_found
     end
   end
 

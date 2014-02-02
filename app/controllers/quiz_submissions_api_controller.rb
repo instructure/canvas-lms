@@ -126,8 +126,8 @@
 #
 class QuizSubmissionsApiController < ApplicationController
   include Api::V1::QuizSubmission
-  include Api::V1::Helpers::QuizzesApiHelper
-  include Api::V1::Helpers::QuizSubmissionsApiHelper
+  include Filters::Quizzes
+  include Filters::QuizSubmissions
 
   before_filter :require_user, :require_context, :require_quiz
   before_filter :require_overridden_quiz, :except => [ :index ]

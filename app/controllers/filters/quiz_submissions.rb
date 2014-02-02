@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Api::V1::Helpers::QuizSubmissionsApiHelper
+module Filters::QuizSubmissions
   protected
 
   def require_overridden_quiz
@@ -24,19 +24,25 @@ module Api::V1::Helpers::QuizSubmissionsApiHelper
   end
 
   def require_quiz_submission
-    collection = @quiz ? @quiz.quiz_submissions : QuizSubmission
-    id = params[:quiz_submission_id] || params[:id] || ''
     query = {}
+    scope = @quiz ? @quiz.quiz_submissions : QuizSubmission
+    id = if params.has_key?(:quiz_submission_id)
+      params[:quiz_submission_id]
+    else
+      params[:id]
+    end
 
     if id.to_s == 'self'
-      query[:user_id] = @current_user.id
+      query[:user_id] = @current_user
     else
       query[:id] = id.to_i
     end
 
-    unless @quiz_submission = collection.where(query).first
-      raise ActiveRecord::RecordNotFound
+    unless @quiz_submission = scope.where(query).first
+      raise ActiveRecord::RecordNotFound.new('Quiz Submission not found')
     end
+
+    @quiz_submission
   end
 
   def prepare_service

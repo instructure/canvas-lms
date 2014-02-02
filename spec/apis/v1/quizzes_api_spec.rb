@@ -149,7 +149,7 @@ describe QuizzesApiController, type: :request do
       end
 
       it "should return a not found error message" do
-        @json.should contain /not found/
+        @json.should contain "does not exist"
       end
     end
   end

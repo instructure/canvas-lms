@@ -45,8 +45,7 @@
 #
 class QuizSubmissionQuestionsController < ApplicationController
   include Api::V1::QuizSubmissionQuestion
-  include Api::V1::Helpers::QuizzesApiHelper
-  include Api::V1::Helpers::QuizSubmissionsApiHelper
+  include Filters::QuizSubmissions
 
   before_filter :require_user, :require_quiz_submission, :export_scopes
   before_filter :require_question, except: [ :index ]

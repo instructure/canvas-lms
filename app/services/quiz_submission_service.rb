@@ -1,7 +1,4 @@
 class QuizSubmissionService
-  include Api::V1::Helpers::QuizzesApiHelper
-  include Api::V1::Helpers::QuizSubmissionsApiHelper
-
   attr_accessor :participant
 
   # @param [QuizParticipant] participant
