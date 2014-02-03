@@ -92,10 +92,10 @@ describe Api::V1::GradeChangeEvent do
     event[:grade_before].should == @previous_grade
     event[:grade_after].should == @submission.grade
     event[:version_number].should == @submission.version_number
-    event[:links][:assignment].should == Shard.relative_id_for(@assignment)
-    event[:links][:course].should == Shard.relative_id_for(@course)
-    event[:links][:student].should == Shard.relative_id_for(@student)
-    event[:links][:grader].should == Shard.relative_id_for(@teacher)
+    event[:links][:assignment].should == Shard.relative_id_for(@assignment, Shard.current, Shard.current)
+    event[:links][:course].should == Shard.relative_id_for(@course, Shard.current, Shard.current)
+    event[:links][:student].should == Shard.relative_id_for(@student, Shard.current, Shard.current)
+    event[:links][:grader].should == Shard.relative_id_for(@teacher, Shard.current, Shard.current)
     event[:links][:page_view].should == @page_view.id
   end
 

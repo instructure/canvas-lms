@@ -80,9 +80,9 @@ describe Api::V1::CourseEvent do
 
     event[:links].keys.sort.should == [:course, :page_view, :user]
 
-    event[:links][:course].should == Shard.relative_id_for(@course)
+    event[:links][:course].should == Shard.relative_id_for(@course, Shard.current, Shard.current)
     event[:links][:page_view].should == @page_view.id
-    event[:links][:user].should == Shard.relative_id_for(@teacher)
+    event[:links][:user].should == Shard.relative_id_for(@teacher, Shard.current, Shard.current)
   end
 
   it "should be formatted as an array of course content event hashes" do

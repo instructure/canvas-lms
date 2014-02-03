@@ -187,10 +187,10 @@ describe "MessageableUser" do
       specs_require_sharding
 
       it "should translate keys to the current shard" do
-        user = MessageableUser.prepped(:common_course_column => @shard2.relative_id_for(1), :common_role_column => "'StudentEnrollment'").first
+        user = MessageableUser.prepped(:common_course_column => Shard.relative_id_for(1, @shard2, Shard.current), :common_role_column => "'StudentEnrollment'").first
         [Shard.default, @shard1, @shard2].each do |shard|
           shard.activate do
-            user.common_courses.should == {@shard2.relative_id_for(1) => ['StudentEnrollment']}
+            user.common_courses.should == {Shard.relative_id_for(1, @shard2, Shard.current) => ['StudentEnrollment']}
           end
         end
       end
@@ -225,10 +225,10 @@ describe "MessageableUser" do
       specs_require_sharding
 
       it "should translate keys to the current shard" do
-        user = MessageableUser.prepped(:common_group_column => @shard2.relative_id_for(1)).first
+        user = MessageableUser.prepped(:common_group_column => Shard.relative_id_for(1, @shard2, Shard.current)).first
         [Shard.default, @shard1, @shard2].each do |shard|
           shard.activate do
-            user.common_groups.should == {@shard2.relative_id_for(1) => ['Member']}
+            user.common_groups.should == {Shard.relative_id_for(1, @shard2, Shard.current) => ['Member']}
           end
         end
       end

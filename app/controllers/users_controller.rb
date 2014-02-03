@@ -667,7 +667,7 @@ class UsersController < ApplicationController
   #     }
   def ignore_stream_item
     @current_user.shard.activate do # can't just pass in the user's shard to relative_id_for, since local ids will be incorrectly scoped to the current shard, not the user's
-      if item = @current_user.stream_item_instances.where(stream_item_id: Shard.relative_id_for(params[:id])).first
+      if item = @current_user.stream_item_instances.where(stream_item_id: Shard.relative_id_for(params[:id], Shard.current, Shard.current)).first
         item.update_attribute(:hidden, true) # observer handles cache invalidation
       end
     end

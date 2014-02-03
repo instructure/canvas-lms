@@ -80,8 +80,8 @@ describe Api::V1::PageView do
     page_view[:action].should == @page_view.action
     page_view[:controller].should == @page_view.controller
 
-    page_view[:links][:user].should == Shard.relative_id_for(@page_view.user)
-    page_view[:links][:real_user].should == Shard.relative_id_for(@page_view.real_user)
+    page_view[:links][:user].should == Shard.relative_id_for(@page_view.user, Shard.current, Shard.current)
+    page_view[:links][:real_user].should == Shard.relative_id_for(@page_view.real_user, Shard.current, Shard.current)
     page_view[:links][:context].should == @page_view.context_id
     page_view[:links][:asset].should == @page_view.asset_id
     page_view[:links][:account].should == @page_view.account_id

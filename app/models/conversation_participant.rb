@@ -100,7 +100,7 @@ class ConversationParticipant < ActiveRecord::Base
     end
     users_by_conversation_shard.each do |shard, user_ids|
       user_ids.each do |user_id|
-        user_id = shard.relative_id_for(user_id)
+        user_id = Shard.relative_id_for(user_id, shard, Shard.current)
         conversation_shards_by_user[user_id] << shard
       end
     end
@@ -140,7 +140,7 @@ class ConversationParticipant < ActiveRecord::Base
       else
         with_exclusive_scope do
           conversation_ids = ConversationParticipant.where(shard_conditions).select(:conversation_id).map do |c|
-            Shard.relative_id_for(c.conversation_id, scope_shard)
+            Shard.relative_id_for(c.conversation_id, Shard.current, scope_shard)
           end
           [sanitize_sql(:conversation_id => conversation_ids)]
         end
@@ -165,7 +165,7 @@ class ConversationParticipant < ActiveRecord::Base
       # the filters are assumed relative to the current shard and need to be
       # cast to an id relative to the default shard before use in queries.
       type, id = ActiveRecord::Base.parse_asset_string(tag)
-      id = Shard.relative_id_for(id, Shard.birth)
+      id = Shard.relative_id_for(id, Shard.current, Shard.birth)
       wildcard('conversation_participants.tags', "#{type.underscore}_#{id}", :delimiter => ',')
     end
   end

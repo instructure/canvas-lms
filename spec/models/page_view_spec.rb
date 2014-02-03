@@ -491,8 +491,8 @@ describe PageView do
         page_view2 = @shard2.activate{ PageView.from_attributes(attributes) }
         [@shard1, @shard2].each do |shard|
           shard.activate do
-            page_view1.user_id.should == @shard1.relative_id_for(user_id)
-            page_view2.user_id.should == @shard2.relative_id_for(user_id)
+            page_view1.user_id.should == Shard.relative_id_for(user_id, @shard1, Shard.current)
+            page_view2.user_id.should == Shard.relative_id_for(user_id, @shard2, Shard.current)
           end
         end
       end
@@ -508,8 +508,8 @@ describe PageView do
         page_view2 = @shard2.activate{ PageView.from_attributes(attributes) }
         [@shard1, @shard2].each do |shard|
           shard.activate do
-            page_view1.user_id.should == Shard.default.relative_id_for(user_id)
-            page_view2.user_id.should == Shard.default.relative_id_for(user_id)
+            page_view1.user_id.should == Shard.relative_id_for(user_id, Shard.default, Shard.current)
+            page_view2.user_id.should == Shard.relative_id_for(user_id, Shard.default, Shard.current)
           end
         end
       end

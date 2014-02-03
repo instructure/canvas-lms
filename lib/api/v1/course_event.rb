@@ -24,9 +24,9 @@ module Api::V1::CourseEvent
 
   def course_event_json(event, user, session)
     links = {
-      :course => Shard.relative_id_for(event.course_id),
+      :course => Shard.relative_id_for(event.course_id, Shard.current, Shard.current),
       :page_view => event.page_view.nil? ? nil : event.request_id,
-      :user => Shard.relative_id_for(event.user_id)
+      :user => Shard.relative_id_for(event.user_id, Shard.current, Shard.current)
     }
 
     {

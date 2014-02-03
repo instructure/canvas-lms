@@ -61,7 +61,7 @@ class GradeSummaryPresenter
     @student_enrollment ||= begin
       if @id_param # always use id if given
         validate_id
-        user_id = Shard.relative_id_for(@id_param, @context.shard)
+        user_id = Shard.relative_id_for(@id_param, Shard.current, @context.shard)
         @context.all_student_enrollments.find_by_user_id(user_id)
       elsif observed_students.present? # otherwise try to find an observed student
         observed_student

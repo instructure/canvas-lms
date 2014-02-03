@@ -197,7 +197,7 @@ class MessageableUser < User
       if pager.current_bookmark
         name, id = pager.current_bookmark
         scope_shard = scope.shard_value
-        id = Shard.relative_id_for(id, scope_shard) if scope_shard
+        id = Shard.relative_id_for(id, Shard.current, scope_shard) if scope_shard
 
         condition = [
           <<-SQL,
