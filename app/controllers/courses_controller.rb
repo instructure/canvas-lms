@@ -218,7 +218,9 @@ class CoursesController < ApplicationController
         includes.delete 'permissions'
 
         hash = []
-        enrollments.group_by(&:course_id).each do |course_id, course_enrollments|
+        enrollments_by_course = enrollments.group_by(&:course_id).values
+        enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url) if api_request?
+        enrollments_by_course.each do |course_enrollments|
           course = course_enrollments.first.course
           hash << course_json(course, @current_user, session, includes, course_enrollments)
         end

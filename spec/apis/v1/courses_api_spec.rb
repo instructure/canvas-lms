@@ -182,6 +182,15 @@ describe CoursesController, type: :request do
     courses.length.should == 2
   end
 
+  it 'should paginate the course list' do
+    json = api_call(:get, "/api/v1/courses.json?per_page=1",
+            { :controller => 'courses', :action => 'index', :format => 'json', :per_page => '1' })
+    json.length.should == 1
+    json += api_call(:get, "/api/v1/courses.json?per_page=1&page=2",
+            { :controller => 'courses', :action => 'index', :format => 'json', :per_page => '1', :page => '2' })
+    json.length.should == 2
+  end
+
   it 'should not include permissions' do
     # When its asked to return permissions make sure they are not returned for a list of courses
     json = api_call(:get, "/api/v1/courses.json?include[]=permissions",

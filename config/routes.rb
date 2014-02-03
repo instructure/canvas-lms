@@ -822,7 +822,7 @@ routes.draw do
   # inline in the routes file, but getting concerns working would rawk.
   ApiRouteSet::V1.draw(self) do
     scope(:controller => :courses) do
-      get 'courses', :action => :index
+      get 'courses', :action => :index, :path_name => 'courses'
       put 'courses/:id', :action => :update
       get 'courses/:id', :action => :show, :path_name => 'course'
       delete 'courses/:id', :action => :destroy
