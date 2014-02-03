@@ -272,12 +272,12 @@ class ProfileController < ApplicationController
     @profile.attributes = params[:user_profile]
 
     if params[:link_urls] && params[:link_titles]
-      links = params[:link_urls].zip(params[:link_titles]).
+      @profile.links = []
+      params[:link_urls].zip(params[:link_titles]).
         reject { |url, title| url.blank? && title.blank? }.
-        map { |url, title|
-          UserProfileLink.new :url => url, :title => title
+        each { |url, title|
+          @profile.links.build :url => url, :title => title
         }
-      @profile.links = links
     end
 
     if @user.valid? && @profile.valid?
