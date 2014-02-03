@@ -121,6 +121,7 @@ gem 'ruby-saml-mod', '0.1.23'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip', '1.0.0', :require => 'zip'
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace
+gem 'safe_yaml', '0.9.7', :require => false
 gem 'safe_yaml-instructure', '0.8.0', :require => false
 gem 'sanitize', '2.0.3'
 gem 'shackles', '1.0.2'
