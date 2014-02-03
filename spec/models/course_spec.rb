@@ -90,11 +90,16 @@ describe Course do
   end
 
   context "#old_gradebook_visible?" do
-    it "should always return false when enrollment count is large enough" do
-        @course.large_roster = false
-        @course.old_gradebook_visible?.should be_true
-        @course.students.stubs(:count).returns(251)
+    it "should return true for small enrollments" do
+      @course.large_roster = false
+      @course.old_gradebook_visible?.should be_true
+    end
+
+    it "should return false when enrollment count is large enough" do
+      enable_cache do
+        Rails.cache.write(['student_count', @course].cache_key, 251)
         @course.old_gradebook_visible?.should be_false
+      end
     end
   end
 

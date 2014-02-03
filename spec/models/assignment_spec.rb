@@ -649,7 +649,8 @@ describe Assignment do
         sub = yield(@assignment, @user)
       }.should_not raise_error
       sub.should_not be_new_record
-      sub.should eql real_sub
+      sub.user.should eql real_sub.user
+      sub.assignment.should eql real_sub.assignment
     end
 
     it "should handle them gracefully in find_or_create_submission" do
