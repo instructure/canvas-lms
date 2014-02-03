@@ -31,7 +31,7 @@ define [
     ).property('assignment.muted')
 
     setup: (->
-      assignment = this.get('assignment')
-      url = "#{ENV.GRADEBOOK_OPTIONS.context_url}/assignments/#{assignment.id}/mute"
-      @muter = new AssignmentMuter(null, assignment, url, Em.set)
+      if assignment = this.get('assignment')
+        url = "#{ENV.GRADEBOOK_OPTIONS.context_url}/assignments/#{assignment.id}/mute"
+        @muter = new AssignmentMuter(null, assignment, url, Em.set)
     ).observes('assignment').on('init')
