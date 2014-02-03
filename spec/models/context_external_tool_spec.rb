@@ -682,6 +682,11 @@ describe ContextExternalTool do
       tool.save!
       (ContextExternalTool.find_for(tool.id, @course, :user_navigation) rescue nil).should be_nil
     end
+
+    it "should raise RecordNotFound if the id is invalid" do
+      course_model
+      expect { ContextExternalTool.find_for("horseshoes", @course, :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
   end
   
   describe "import_from_migration" do
