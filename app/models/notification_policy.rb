@@ -110,11 +110,11 @@ class NotificationPolicy < ActiveRecord::Base
             p = NotificationPolicy.includes(:communication_channel).where("communication_channels.user_id=?", user).
                 find_or_initialize_by_communication_channel_id_and_notification_id(params[:channel_id], notification_id)
           else
-            p = NotificationPolicy.joins(:communication_channel).where(
+            p = NotificationPolicy.select('notification_policies.*').joins(:communication_channel).where(
               communication_channels: {user_id: user},
               communication_channel_id: params[:channel_id],
               notification_id: notification_id
-            ).find_or_initialize
+            ).first_or_initialize
           end
           # Set the frequency and save
           p.frequency = frequency
