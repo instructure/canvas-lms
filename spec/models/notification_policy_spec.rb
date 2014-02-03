@@ -112,18 +112,18 @@ describe NotificationPolicy do
     it "should have a named scope for users" do
       user_with_pseudonym(:active_all => 1)
       notification_policy_model(:communication_channel => @cc)
-      NotificationPolicy.for(@user).should eql([@notification_policy])
+      NotificationPolicy.for(@user).should == [@notification_policy]
     end
 
     it "should have a named scope for notifications" do
       notification_model
       notification_policy_model(:notification => @notification)
-      NotificationPolicy.for(@notification).should eql([@notification_policy])
+      NotificationPolicy.for(@notification).should == [@notification_policy]
     end
     
     it "should not slow down from other kinds of input on the *for* named scope" do
       notification_policy_model
-      NotificationPolicy.for(:anything_else).should eql(NotificationPolicy.all)
+      NotificationPolicy.for(:anything_else).should == NotificationPolicy.all
     end
     
     context "by" do
@@ -136,10 +136,10 @@ describe NotificationPolicy do
       end
       
       it "should have a scope to differentiate by frequency" do
-        NotificationPolicy.by(:immediately).should eql([@n1])
-        NotificationPolicy.by(:daily).should eql([@n2])
-        NotificationPolicy.by(:weekly).should eql([@n3])
-        NotificationPolicy.by(:never).should eql([@n4])
+        NotificationPolicy.by(:immediately).should == [@n1]
+        NotificationPolicy.by(:daily).should == [@n2]
+        NotificationPolicy.by(:weekly).should == [@n3]
+        NotificationPolicy.by(:never).should == [@n4]
       end
     
       it "should be able to differentiate by several frequencies at once" do
@@ -186,7 +186,7 @@ describe NotificationPolicy do
       policies.should_not be_include(n2)
       policies.should be_include(n3)
       policies.should be_include(n4)
-      policies.size.should eql(2)
+      policies.size.should == 2
       
     end
     
@@ -327,12 +327,12 @@ describe NotificationPolicy, "communication_preference" do
   
   it "should use the channel defined, if one is given" do
     @notification_policy.stubs(:communication_channel).returns(@cc2)
-    @notification_policy.communication_preference.should eql(@cc2)
+    @notification_policy.communication_preference.should == @cc2
   end
 
   it "should use the users default communication channel if one isn't given" do
     @notification_policy.stubs(:communication_channel).returns(nil)
-    @notification_policy.communication_preference.should eql(@cc1)
+    @notification_policy.communication_preference.should == @cc1
   end
   
 end
