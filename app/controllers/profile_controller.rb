@@ -278,6 +278,8 @@ class ProfileController < ApplicationController
         each { |url, title|
           @profile.links.build :url => url, :title => title
         }
+    elsif params[:delete_links]
+      @profile.links = []
     end
 
     if @user.valid? && @profile.valid?

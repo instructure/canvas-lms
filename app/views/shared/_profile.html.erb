@@ -122,6 +122,7 @@
       </div>
 
       <% if @user_data[:can_edit] %>
+        <input type="hidden" name="delete_links" value="1">
         <div class="show-if-editing">
           <table id="edit_links_table">
             <thead>
