@@ -504,8 +504,8 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def self.conversation_ids
-    raise "conversation_ids needs to be scoped to a user" unless scope(:find, :conditions) =~ /user_id = \d+/
-    order = 'last_message_at DESC' unless scoped?(:find, :order)
+    raise "conversation_ids needs to be scoped to a user" unless scoped.where_values.any? { |v| v =~ /user_id = \d+/ }
+    order = 'last_message_at DESC' unless scoped.order_values.present?
     self.order(order).pluck(:conversation_id)
   end
 

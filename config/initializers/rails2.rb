@@ -395,6 +395,10 @@ end
       Array(scope(:find, :group))
     end
 
+    def order_values
+      Array(scope(:find, :order))
+    end
+
     def shard_value
       scope(:find, :shard)
     end
