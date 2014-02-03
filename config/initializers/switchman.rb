@@ -20,10 +20,11 @@ unless CANVAS_RAILS2
 
     def settings
       s = super
+      unless s.is_a?(Hash) || s.nil?
+        s = s.unserialize
+      end
       if s.nil?
         self.settings = s = {}
-      elsif !s.is_a?(Hash)
-        s = s.unserialize
       end
 
       salt = s.delete(:encryption_key_salt)
