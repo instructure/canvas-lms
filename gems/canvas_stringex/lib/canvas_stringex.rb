@@ -1,4 +1,6 @@
-require 'fake_arel'
+if CANVAS_RAILS2
+  require 'fake_arel'
+end
 
 module CanvasStringex
   require "lucky_sneaks/string_extensions"
