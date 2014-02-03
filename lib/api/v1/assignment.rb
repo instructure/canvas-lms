@@ -178,6 +178,10 @@ module Api::V1::Assignment
       hash['unpublishable'] = assignment.can_unpublish?
     end
 
+    if assignment.context.feature_enabled?(:differentiated_assignments)
+      hash['only_visible_to_overrides'] = value_to_boolean(assignment.only_visible_to_overrides)
+    end
+
     if submission = opts[:submission]
       hash['submission'] = submission_json(submission,assignment,user,session)
     end
@@ -346,6 +350,12 @@ module Api::V1::Assignment
       if assignment_params.has_key? "published"
         published = value_to_boolean(assignment_params['published'])
         assignment.workflow_state = published ? 'published' : 'unpublished'
+      end
+    end
+
+    if assignment.context.feature_enabled?(:differentiated_assignments)
+      if assignment_params.has_key? "only_visible_to_overrides"
+        assignment.only_visible_to_overrides = value_to_boolean(assignment_params['only_visible_to_overrides'])
       end
     end
 

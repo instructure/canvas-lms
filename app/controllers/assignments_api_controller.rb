@@ -352,6 +352,11 @@
 #           "example": false,
 #           "type": "boolean"
 #         },
+#         "only_visible_to_overrides": {
+#           "description": "(Only visible if 'differentiated assignments' account setting is on) Whether the assignment is only visible to overrides.",
+#           "example": false,
+#           "type": "boolean"
+#         },
 #         "locked_for_user": {
 #           "description": "Whether or not this is locked for the user.",
 #           "example": false,
@@ -629,9 +634,13 @@ class AssignmentsApiController < ApplicationController
   #   List of overrides for the assignment.
   #   NOTE: The assignment overrides feature is in beta.
   #
+  # @argument assignment[only_visible_to_overrides] [Optional, Boolean]
+  #   Whether this assignment is only visible to overrides
+  #   (Only useful if 'differentiated assignments' account setting is on)
+  #
   # @argument assignment[published] [Optional, Boolean]
   #   Whether this assignment is published.
-  #   (Only uaeful if 'enable draft' account setting is on)
+  #   (Only useful if 'draft state' account setting is on)
   #   Unpublished assignments are not visible to students.
   #
   # @returns Assignment
