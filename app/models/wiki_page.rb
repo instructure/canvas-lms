@@ -260,8 +260,9 @@ class WikiPage < ActiveRecord::Base
   end
 
   def context_module_action(user, context, action)
-    tag = self.context_module_tags.find_by_context_id_and_context_type(context.id, context.class.to_s)
-    tag.context_module_action(user, action) if tag
+    self.context_module_tags.find_all_by_context_id_and_context_type(context.id, context.class.to_s).each do |tag|
+      tag.context_module_action(user, action)
+    end
   end
 
   set_policy do
