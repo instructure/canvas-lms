@@ -13,8 +13,8 @@ require [
       @$fixtures = $('#fixtures')
 
     teardown: ->
+      _.defer.restore()
       window.INST.kalturaSettings = null
-      @stub.restore
 
   test "creates a thumbnail span with a background image URL generated from kaltura settings and media id", ->
     resourceDomain = 'resources.example.com'
