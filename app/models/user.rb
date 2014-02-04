@@ -248,7 +248,7 @@ class User < ActiveRecord::Base
     PageView.for_user(self, options)
   end
 
-  scope :of_account, lambda { |account| where("EXISTS (?)", account.user_account_associations.where("user_account_associations.user_id=users.id")) }
+  scope :of_account, lambda { |account| where("EXISTS (?)", account.user_account_associations.where("user_account_associations.user_id=users.id")).shard(account.shard) }
   scope :recently_logged_in, lambda {
     includes(:pseudonyms).
         where("pseudonyms.current_login_at>?", 1.month.ago).
