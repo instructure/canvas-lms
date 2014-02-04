@@ -3402,9 +3402,9 @@ define([
           if (matches[idx]) {
             var variable = matches[idx].substring(1, matches[idx].length - 1);
             if (!matchHash[variable]) {
-              var $variable = $question.find(".variables tr.variable").eq(idx);
+              var $variable = $question.find('.variables tr.variable[data-name="' + variable + '"]');
               if ($variable.length === 0) {
-                var label_id = "label_for_var_" + idx;
+                var label_id = "label_for_var_" + variable;
 
                 $variable = $("<tr class='variable'>"
                               + "<th id='" + label_id + "' class='name'></th>"
