@@ -60,7 +60,8 @@ module Canvas
       # Setting
       require_dependency 'app/models/setting'
       @cache_stores = {}
-      Setting.from_config('cache_store', nil).each do |env, config|
+      configs = Setting.from_config('cache_store', nil) || {}
+      configs.each do |env, config|
         config = {'cache_store' => 'mem_cache_store'}.merge(config)
         case config.delete('cache_store')
         when 'mem_cache_store'
