@@ -227,6 +227,8 @@ ActiveRecord::NamedScope::Scope.class_eval do
 #    return super if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(method)
 #    super || @proxy_scope.respond_to?(method, include_private)
 #  end
+
+  alias :klass :proxy_scope
 end
 
 ActiveRecord::Associations::AssociationCollection.class_eval do

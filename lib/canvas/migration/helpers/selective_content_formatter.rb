@@ -192,9 +192,9 @@ module Canvas::Migration::Helpers
                   scope = scope.select(:title)
                 end
 
-                if scope.respond_to?(:not_deleted)
+                if scope.klass.respond_to?(:not_deleted)
                   scope = scope.not_deleted
-                elsif scope.respond_to?(:active)
+                elsif scope.klass.respond_to?(:active)
                   scope = scope.active
                 end
 
@@ -217,9 +217,9 @@ module Canvas::Migration::Helpers
               count = source.discussion_topics.active.only_discussion_topics.count
             elsif source.respond_to?(type) && source.send(type).respond_to?(:count)
               scope = source.send(type).except(:includes)
-              if scope.respond_to?(:not_deleted)
+              if scope.klass.respond_to?(:not_deleted)
                 scope = scope.not_deleted
-              elsif scope.respond_to?(:active)
+              elsif scope.klass.respond_to?(:active)
                 scope = scope.active
               end
               count = scope.count
