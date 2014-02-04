@@ -48,7 +48,7 @@ class ContentTag < ActiveRecord::Base
   validates_as_url :url
 
   include PolymorphicTypeOverride
-  override_polymorphic_types [type: 'content', from: 'Quiz', to: 'Quizzes::Quiz']
+  override_polymorphic_types [type: 'content_type', from: 'Quiz', to: 'Quizzes::Quiz']
 
   acts_as_list :scope => :context_module
 

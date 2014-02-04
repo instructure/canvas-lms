@@ -17,7 +17,7 @@ class Version < ActiveRecord::Base #:nodoc:
 
   # INSTRUCTURE: shims for quizzes namespacing
   include PolymorphicTypeOverride
-  override_polymorphic_types [type: 'versionable', from: 'Quiz', to: 'Quizzes::Quiz']
+  override_polymorphic_types [type: 'versionable_type', from: 'Quiz', to: 'Quizzes::Quiz']
 
   before_create :initialize_number
 

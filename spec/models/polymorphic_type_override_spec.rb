@@ -24,7 +24,7 @@ describe PolymorphicTypeOverride do
     it 'overrides a single old polymorphic type with a new one' do
       class ContentTag
         include PolymorphicTypeOverride
-        override_polymorphic_types [type: 'content', from: 'OldClassInDatabase', to: 'Quizzes::Quiz']
+        override_polymorphic_types [type: 'content_type', from: 'OldClassInDatabase', to: 'Quizzes::Quiz']
       end
 
       fizz_buzz = ContentTag.create! content: quiz_model, context: course_model
@@ -41,8 +41,8 @@ describe PolymorphicTypeOverride do
     it 'overrides multiple old polymorphic types with a new one' do
       class ContentTag
         extend PolymorphicTypeOverride
-        override_polymorphic_types [{type: 'content', from: 'OldClassInDatabase', to: 'Quizzes::Quiz'},
-                                    {type: 'context', from: 'AnotherOldClassInDatabase', to: 'Quizzes::Quiz'}]
+        override_polymorphic_types [{type: 'content_type', from: 'OldClassInDatabase', to: 'Quizzes::Quiz'},
+                                    {type: 'context_type', from: 'AnotherOldClassInDatabase', to: 'Quizzes::Quiz'}]
       end
 
       fizz_buzz = ContentTag.create! content: quiz_model, context: quiz_model
@@ -61,15 +61,5 @@ describe PolymorphicTypeOverride do
       updated_fizz_buzz.context_type.should == 'Quizzes::Quiz'
       updated_fizz_buzz.context_id.should_not == 'Quizzes::Quiz'
     end
-
-    it 'raises if new class does not exist' do
-      expect {
-        class ContentTag
-          extend PolymorphicTypeOverride
-          override_polymorphic_types [type: 'content', from: 'OldClassInDatabase', to: 'ThisClassDoesNotExist']
-        end
-      }.to raise_error NameError
-    end
   end
-
 end
