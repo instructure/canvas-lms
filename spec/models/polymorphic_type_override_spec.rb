@@ -21,39 +21,20 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe PolymorphicTypeOverride do
 
   describe '.override_polymorphic_types' do
-    it 'overrides a single old polymorphic type with a new one' do
-      class ContentTag
-        include PolymorphicTypeOverride
-        override_polymorphic_types [type: 'content_type', from: 'OldClassInDatabase', to: 'Quizzes::Quiz']
-      end
-
-      fizz_buzz = ContentTag.create! content: quiz_model, context: course_model
-      fizz_buzz.content_type.should == 'Quizzes::Quiz'
-
-      fizz_buzz.content_type = 'OldClassInDatabase'
-      fizz_buzz.send(:save_without_callbacks)
-
-      updated_fizz_buzz = ContentTag.first
-      updated_fizz_buzz.content_type.should == 'Quizzes::Quiz'
-      updated_fizz_buzz.content_id.should_not == 'Quizzes::Quiz'
-    end
-
     it 'overrides multiple old polymorphic types with a new one' do
       class ContentTag
-        extend PolymorphicTypeOverride
-        override_polymorphic_types [{type: 'content_type', from: 'OldClassInDatabase', to: 'Quizzes::Quiz'},
-                                    {type: 'context_type', from: 'AnotherOldClassInDatabase', to: 'Quizzes::Quiz'}]
+        include PolymorphicTypeOverride
+        override_polymorphic_types content_type: {from: 'OldClassInDatabase', to: 'Quizzes::Quiz'},
+                                   context_type: {from: 'AnotherOldClassInDatabase', to: 'Quizzes::Quiz'}
       end
 
       fizz_buzz = ContentTag.create! content: quiz_model, context: quiz_model
       fizz_buzz.content_type.should == 'Quizzes::Quiz'
       fizz_buzz.context_type.should == 'Quizzes::Quiz'
 
-      fizz_buzz.content_type = 'OldClassInDatabase'
-      fizz_buzz.context_type = 'AnotherOldClassInDatabase'
-      fizz_buzz.send(:save_without_callbacks)
+      ContentTag.update_all("content_type='OldClassInDatabase', context_type='AnotherOldClassInDatabase'", "id=#{fizz_buzz.id}")
 
-      updated_fizz_buzz = ContentTag.first
+      updated_fizz_buzz = ContentTag.find(fizz_buzz.id)
 
       updated_fizz_buzz.content_type.should == 'Quizzes::Quiz'
       updated_fizz_buzz.content_id.should_not == 'Quizzes::Quiz'
@@ -61,5 +42,23 @@ describe PolymorphicTypeOverride do
       updated_fizz_buzz.context_type.should == 'Quizzes::Quiz'
       updated_fizz_buzz.context_id.should_not == 'Quizzes::Quiz'
     end
+
+    it 'overrides a single old polymorphic type with a new one' do
+      class ContentTag
+        include PolymorphicTypeOverride
+        override_polymorphic_types content_type: {from: 'OldClassInDatabase', to: 'Quizzes::Quiz'}
+      end
+
+      fizz_buzz = ContentTag.create! content: quiz_model, context: course_model
+      fizz_buzz.content_type.should == 'Quizzes::Quiz'
+
+      ContentTag.update_all("content_type='OldClassInDatabase'", "id=#{fizz_buzz.id}")
+
+      updated_fizz_buzz = ContentTag.find(fizz_buzz.id)
+      updated_fizz_buzz.content_type.should == 'Quizzes::Quiz'
+      updated_fizz_buzz.content_id.should_not == 'Quizzes::Quiz'
+    end
+
+
   end
 end
