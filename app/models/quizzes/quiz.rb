@@ -309,7 +309,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     # If the quiz suddenly changes from non-graded to graded,
     # then this will update the existing submissions to reflect quiz
     # scores in the gradebook.
-    self.quiz_submissions.each { |s| s.touch }
+    self.quiz_submissions.each { |s| s.save }
   end
 
   attr_accessor :saved_by
