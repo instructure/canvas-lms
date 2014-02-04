@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   unless CANVAS_RAILS3
-    spec.add_dependency 'fake_arel', '1.4.0'
+    spec.add_dependency 'fake_arel', '~> 1.5'
   end
 
   spec.add_development_dependency "activerecord"

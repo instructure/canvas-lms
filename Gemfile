@@ -96,7 +96,7 @@ if CANVAS_RAILS2
   gem 'erubis', '2.7.0'
 end
 if CANVAS_RAILS2
-  gem 'fake_arel', '1.4.0'
+  gem 'fake_arel', '1.5.0'
   gem 'fake_rails3_routes', '1.0.4'
     gem 'journey', '1.0.4'
 end
