@@ -90,8 +90,8 @@ module Canvas::AccountReports
                              FROM submissions s
                              INNER JOIN assignments a ON s.assignment_id = a.id
                                AND a.context_type = 'Course'
-                               AND a.context_id = courses.id
                              WHERE s.user_id = p.user_id
+                               AND a.context_id = courses.id
                              #{time_span_join})")
 
         no_subs = add_term_scope(no_subs)
