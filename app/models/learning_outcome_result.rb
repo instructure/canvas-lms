@@ -18,8 +18,8 @@
 
 class LearningOutcomeResult < ActiveRecord::Base
   include PolymorphicTypeOverride
-  override_polymorphic_types [{type: 'association_type', from: 'Quiz', to: 'Quizzes::Quiz'},
-                              {type: 'associated_asset_type', from: 'Quiz', to: 'Quizzes::Quiz'}]
+  override_polymorphic_types association_type: {from: 'Quiz', to: 'Quizzes::Quiz'},
+                             associated_asset_type: { from: 'Quiz', to: 'Quizzes::Quiz'}
 
   belongs_to :user
   belongs_to :learning_outcome
