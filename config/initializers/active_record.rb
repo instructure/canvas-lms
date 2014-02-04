@@ -1820,6 +1820,19 @@ unless CANVAS_RAILS2
       serialized_value
     end
   end
+
+  ActiveRecord::Associations::CollectionAssociation.class_eval do
+    # CollectionAssociation implements uniq for :uniq option, in its
+    # own special way. re-implement, but as a relation if it's not an
+    # internal use of it
+    def uniq(records = true)
+      if records.is_a?(Array)
+        records.uniq
+      else
+        scoped.uniq(records)
+      end
+    end
+  end
 end
 
 if Rails.version >= '3' && Rails.version < '4'
