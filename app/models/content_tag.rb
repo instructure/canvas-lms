@@ -158,6 +158,8 @@ class ContentTag < ActiveRecord::Base
       else
         'assignment'
       end
+    elsif self.content_type == 'Quizzes::Quiz'
+      'quiz'
     else
       self.content_type.underscore
     end
