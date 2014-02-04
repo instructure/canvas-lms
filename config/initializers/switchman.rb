@@ -14,6 +14,8 @@ unless CANVAS_RAILS2
     end
 
     self.primary_key = "id"
+    reset_column_information # make sure that the id column object knows it is the primary key
+
     serialize :settings, Hash
 
     before_save :encrypt_settings
