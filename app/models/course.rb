@@ -21,6 +21,7 @@ class Course < ActiveRecord::Base
   include Context
   include Workflow
   include TextHelper
+  include HtmlTextHelper
 
   attr_accessible :name,
                   :section,

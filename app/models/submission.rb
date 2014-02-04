@@ -152,7 +152,7 @@ class Submission < ActiveRecord::Base
     :on_create => lambda{ |model,version| SubmissionVersion.index_version(version) },
     :on_load => lambda{ |model,version| model.cached_due_date = version.versionable.cached_due_date }
 
-  # This needs to be after simply_versioned because the grade change audit uses 
+  # This needs to be after simply_versioned because the grade change audit uses
   # versioning to grab the previous grade.
   after_save :grade_change_audit
 
@@ -237,7 +237,7 @@ class Submission < ActiveRecord::Base
   end
 
   def plaintext_body
-    self.extend TextHelper
+    self.extend HtmlTextHelper
     strip_tags((self.body || "").gsub(/\<\s*br\s*\/\>/, "\n<br/>").gsub(/\<\/p\>/, "</p>\n"))
   end
 

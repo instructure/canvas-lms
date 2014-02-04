@@ -21,6 +21,7 @@
 # RubricAssociation, which may or may not have an association model.
 class RubricAssessment < ActiveRecord::Base
   include TextHelper
+  include HtmlTextHelper
 
   attr_accessible :rubric, :rubric_association, :user, :score, :data, :comments, :assessor, :artifact, :assessment_type
   belongs_to :rubric

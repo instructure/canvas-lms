@@ -24,6 +24,7 @@ class DiscussionTopic < ActiveRecord::Base
   include HasContentTags
   include CopyAuthorizedLinks
   include TextHelper
+  include HtmlTextHelper
   include ContextModuleItem
   include SearchTermHelper
 

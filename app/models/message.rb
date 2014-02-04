@@ -26,6 +26,7 @@ class Message < ActiveRecord::Base
   include ERB::Util
   include SendToStream
   include TextHelper
+  include HtmlTextHelper
   include Twitter
   include Workflow
 

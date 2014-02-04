@@ -21,6 +21,8 @@ module IncomingMail
 
   class IncomingMessageProcessor
 
+    extend HtmlTextHelper
+
     class SilentIgnoreError < StandardError; end
     class ReplyFromError < StandardError; end
     class UnknownAddressError < ReplyFromError; end
@@ -72,7 +74,6 @@ module IncomingMail
       end
       body ||= utf8ify(incoming_message.body.decoded, incoming_message.charset)
       if !html_body
-        self.extend TextHelper
         html_body = format_message(body).first
       end
 
@@ -135,7 +136,7 @@ module IncomingMail
         elsif IncomingMail::DeprecatedSettings.members.map(&:to_sym).include?(key)
           Rails.logger.warn("deprecated setting sent to IncomingMessageProcessor: #{key}")
           self.deprecated_settings.send("#{key}=", value)
-        else 
+        else
           raise "unrecognized setting sent to IncomingMessageProcessor: #{key}"
         end
       end
@@ -188,8 +189,8 @@ module IncomingMail
         # old klugey stuff uses this
         when 'Precedence' then ['bulk', 'list', 'junk'].include?(field.value)
 
-        # Exchange sets this        
-        when 'X-Auto-Response-Suppress' then true 
+        # Exchange sets this
+        when 'X-Auto-Response-Suppress' then true
 
         # some other random headers I found that are easy to check
         when 'X-Autoreply', 'X-Autorespond', 'X-Autoresponder' then true
@@ -264,7 +265,7 @@ module IncomingMail
       return unless secure_id && outgoing_message_id
       self.process_single(message, secure_id, outgoing_message_id, account)
     rescue => e
-      ErrorReport.log_exception(error_report_category, e, 
+      ErrorReport.log_exception(error_report_category, e,
         :from => message.from.try(:first),
         :to => message.to.to_s)
     end
@@ -316,7 +317,7 @@ module IncomingMail
 
       unless outgoing_message_delivered
         # Can't use our usual mechanisms, so just try to send it once now
-        begin 
+        begin
           res = Mailer.create_message(outgoing_message).deliver
         rescue => e
           # TODO: put some kind of error logging here?

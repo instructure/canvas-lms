@@ -1,5 +1,5 @@
 class QuizStatistics::ItemAnalysis::Item
-  include TextHelper
+  include HtmlTextHelper
 
   def self.from(summary, question)
     return unless allowed_types.include?(question[:question_type])

@@ -21,6 +21,7 @@ class DiscussionEntry < ActiveRecord::Base
   include SendToInbox
   include SendToStream
   include TextHelper
+  include HtmlTextHelper
 
   attr_accessible :plaintext_message, :message, :discussion_topic, :user, :parent, :attachment, :parent_entry
   attr_readonly :discussion_topic_id, :user_id, :parent_id
