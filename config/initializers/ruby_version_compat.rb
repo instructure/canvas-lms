@@ -37,6 +37,10 @@ if CANVAS_RAILS2
   require "active_support/core_ext/string/output_safety"
   class ERB
     module Util
+
+      # rails 2 uses decimal, rails 3 uses hex, so we use hex everywhere
+      HTML_ESCAPE["'"] = "&#x27;"
+
       # see https://github.com/rails/rails/issues/7430
       def html_escape(s)
         s = s.to_s

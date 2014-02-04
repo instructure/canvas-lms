@@ -50,7 +50,7 @@ describe Message do
       message      = generate_message(:account_user_notification, :email, account_user)
 
       message.html_body.should_not include "<script>"
-      message.html_body.should include "<b>Your content</b>: &lt;script&gt;alert(&#39;haha&#39;)&lt;/script&gt;"
+      message.html_body.should include "<b>Your content</b>: &lt;script&gt;alert(&#x27;haha&#x27;)&lt;/script&gt;"
     end
   end
 

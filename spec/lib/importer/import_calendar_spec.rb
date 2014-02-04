@@ -37,7 +37,7 @@ describe "Importing Calendar Events" do
         
         event = CalendarEvent.find_by_migration_id(data[:migration_id])
         event.title.should == data[:title]
-        event.description.gsub("&#39;", "'").index(data[:description]).should_not be_nil
+        event.description.gsub("&#x27;", "'").index(data[:description]).should_not be_nil
       end
     end
   end
