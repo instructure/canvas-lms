@@ -10,6 +10,9 @@
 {{#if assignment_grading_type_is_letter_grade}}
   <input name="default_grade" type="text" value="{{ submission.score }}" class="grading_value grading_box score_value" id="student_grading_{{assignment.id}}" style="text-align: center; width: 50px;"/>
 {{/if}}
+{{#if assignment_grading_type_is_gpa_scale}}
+  <input name="default_grade" type="text" value="{{ submission.score }}" class="grading_value grading_box score_value" id="student_grading_{{assignment.id}}" style="text-align: center; width: 50px;"/>
+{{/if}}
 {{#if assignment_grading_type_is_pass_fail}}
   <select name="default_grade" class="grading_value grading_box pass_fail" id="student_grading_<%= assignment.id %>">
     <option value="">---</option>

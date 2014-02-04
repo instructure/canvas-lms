@@ -598,12 +598,16 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def grading_standard_or_default
+    grading_standard || GradingStandard.default_instance
+  end
+
   def score_to_grade(score=0.0, given_grade=nil)
     result = score.to_f
-    if self.grading_type == "percent"
-      result = score_to_grade_percent(score)
-      result = "#{result}%"
-    elsif self.grading_type == "pass_fail"
+    case self.grading_type
+    when "percent"
+      result = "#{score_to_grade_percent(score)}%"
+    when "pass_fail"
       if self.points_possible.to_f > 0.0
         passed = score.to_f == self.points_possible.to_f
       elsif given_grade
@@ -615,10 +619,10 @@ class Assignment < ActiveRecord::Base
         passed = score.to_f > 0.0
       end
       result = passed ? "complete" : "incomplete"
-    elsif self.grading_type == "letter_grade"
+    when "letter_grade", "gpa_scale"
       if self.points_possible.to_f > 0.0
         score = score.to_f / self.points_possible.to_f
-        result = GradingStandard.score_to_grade(self.grading_scheme, score * 100)
+        result = grading_standard_or_default.score_to_grade(score * 100)
       elsif given_grade
         # the score for a zero-point letter_grade assignment could be considered
         # to be *any* grade, so look at what the current given grade is
@@ -628,28 +632,34 @@ class Assignment < ActiveRecord::Base
         # there's not really any reasonable value we can set here -- if the
         # assignment is worth no points, and the grader didn't enter an
         # explicit letter grade, any letter grade is as valid as any other.
-        result = GradingStandard.score_to_grade(self.grading_scheme, score.to_f)
+        result = grading_standard_or_default.score_to_grade(score.to_f)
       end
     end
     result.to_s
   end
 
-  def self.interpret_grade(grade, points_possible, grading_scheme = nil)
+  def interpret_grade(grade)
     case grade.to_s
     when %r{%$}
       # interpret as a percentage
       percentage = grade.to_f / 100.0
       points_possible.to_f * percentage
     when %r{[\d\.]+}
-      # interpret as a numerical score
-      grade.to_f
+      if grading_type == "gpa_scale"
+        # if it matches something in a scheme, take that, else return nil
+        return nil unless standard_based_score = grading_standard_or_default.grade_to_score(grade)
+        (points_possible || 0.0) * standard_based_score / 100.0
+      else
+        # interpret as a numerical score
+        grade.to_f
+      end
     when "pass", "complete"
       points_possible.to_f
     when "fail", "incomplete"
       0.0
     else
       # try to treat it as a letter grade
-      if grading_scheme && standard_based_score = GradingStandard.grade_to_score(grading_scheme, grade)
+      if uses_grading_standard && standard_based_score = grading_standard_or_default.grade_to_score(grade)
         (points_possible || 0.0) * standard_based_score / 100.0
       else
         nil
@@ -659,11 +669,9 @@ class Assignment < ActiveRecord::Base
 
   def grade_to_score(grade=nil)
     return nil if grade.nil?
-    grading_scheme = self.grading_type == "letter_grade" && self.grading_scheme
-    parsed_grade = Assignment.interpret_grade(grade, points_possible, grading_scheme)
-
+    parsed_grade = interpret_grade(grade)
     case self.grading_type
-    when "points", "percent", "letter_grade"
+    when "points", "percent", "letter_grade", "gpa_scale"
       score = parsed_grade
     when "pass_fail"
       # only allow full points or no points for pass_fail assignments
@@ -681,6 +689,10 @@ class Assignment < ActiveRecord::Base
       raise "oops, we need to interpret a new grading_type. get coding."
     end
     score
+  end
+
+  def uses_grading_standard
+    ["letter_grade", "gpa_scale"].include? grading_type
   end
 
   def infer_times

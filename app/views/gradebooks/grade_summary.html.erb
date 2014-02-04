@@ -164,7 +164,7 @@
                 <%= render :partial => 'submission_score', :object => submission, :locals => {:student_score => !can_do(@context, @current_user, :manage_grades)} %>
               <% end %>
             </span>
-            <% if assignment_presenter.is_letter_graded? %>
+            <% if assignment_presenter.is_letter_graded? || assignment_presenter.is_gpa_scaled?%>
               <span class="score_value" style="font-size: 0.8em; color: #aaa;">
                 <%= assignment_presenter.display_score %>
               </span>

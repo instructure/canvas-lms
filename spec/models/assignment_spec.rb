@@ -347,7 +347,7 @@ describe Assignment do
     @submission.user_id.should eql(@user.id)
   end
 
-  it "should preserve letter grades with no points possible" do
+  it "should preserve letter grades grades with nil points possible" do
     setup_assignment_without_submission
     @assignment.grading_type = 'letter_grade'
     @assignment.points_possible = nil
@@ -361,6 +361,72 @@ describe Assignment do
     @submission.state.should eql(:graded)
     @submission.score.should eql(0.0)
     @submission.grade.should eql('C')
+    @submission.user_id.should eql(@user.id)
+  end
+
+  it "should preserve gpa scale grades with nil points possible" do
+    setup_assignment_without_submission
+    @assignment.grading_type = 'gpa_scale'
+    @assignment.points_possible = nil
+    @assignment.context.grading_standards.build({title: "GPA"})
+    gs = @assignment.context.grading_standards.last
+    gs.data = {"4.0" => 0.94,
+               "3.7" => 0.90,
+               "3.3" => 0.87,
+               "3.0" => 0.84,
+               "2.7" => 0.80,
+               "2.3" => 0.77,
+               "2.0" => 0.74,
+               "1.7" => 0.70,
+               "1.3" => 0.67,
+               "1.0" => 0.64,
+               "0" => 0.01,
+               "M" => 0.0 }
+    gs.assignments << @assignment
+    gs.save!
+    @assignment.save!
+
+    s = @assignment.grade_student(@user, :grade => '3.0')
+    s.should be_is_a(Array)
+    @assignment.reload
+    @assignment.submissions.size.should eql(1)
+    @submission = @assignment.submissions.first
+    @submission.state.should eql(:graded)
+    @submission.score.should eql(0.0)
+    @submission.grade.should eql('3.0')
+    @submission.user_id.should eql(@user.id)
+  end
+
+  it "should preserve gpa scale grades with zero points possible" do
+    setup_assignment_without_submission
+    @assignment.grading_type = 'gpa_scale'
+    @assignment.points_possible = 0.0
+    @assignment.context.grading_standards.build({title: "GPA"})
+    gs = @assignment.context.grading_standards.last
+    gs.data = {"4.0" => 0.94,
+               "3.7" => 0.90,
+               "3.3" => 0.87,
+               "3.0" => 0.84,
+               "2.7" => 0.80,
+               "2.3" => 0.77,
+               "2.0" => 0.74,
+               "1.7" => 0.70,
+               "1.3" => 0.67,
+               "1.0" => 0.64,
+               "0" => 0.01,
+               "M" => 0.0 }
+    gs.assignments << @assignment
+    gs.save!
+    @assignment.save!
+
+    s = @assignment.grade_student(@user, :grade => '3.0')
+    s.should be_is_a(Array)
+    @assignment.reload
+    @assignment.submissions.size.should eql(1)
+    @submission = @assignment.submissions.first
+    @submission.state.should eql(:graded)
+    @submission.score.should eql(0.0)
+    @submission.grade.should eql('3.0')
     @submission.user_id.should eql(@user.id)
   end
 
@@ -406,16 +472,23 @@ describe Assignment do
   end
 
   describe  "interpret_grade" do
-    it "should return nil when no grade was entered and assignment uses a grading standard (letter grade)" do
-      Assignment.interpret_grade("", 20, GradingStandard.default_grading_standard).should be_nil
+    before do
+      setup_assignment_without_submission
     end
 
-    it "should allow grading an assignment with nil points_possible as percent" do
-      Assignment.interpret_grade("100%", nil).should == 0
+    it "should return nil when no grade was entered and assignment uses a grading standard (letter grade)" do
+      @assignment.points_possible = 100
+      @assignment.interpret_grade("").should be_nil
+    end
+
+    it "should allow grading an assignment with nil points_possible" do
+      @assignment.points_possible = nil
+      @assignment.interpret_grade("100%").should == 0
     end
 
     it "should not round scores" do
-      Assignment.interpret_grade("88.75%", 15).should == 13.3125
+      @assignment.points_possible = 15
+      @assignment.interpret_grade("88.75%").should == 13.3125
     end
   end
 
@@ -823,7 +896,7 @@ describe Assignment do
     end
   end
 
-  context "grading" do
+  context "grading letter grades" do
     it "should update grades when assignment changes" do
       setup_assignment_without_submission
       @a.update_attributes(:grading_type => 'letter_grade', :points_possible => 20)
@@ -853,6 +926,71 @@ describe Assignment do
       @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => 'c').first
       @sub.grade.should eql('C')
       @sub.score.should eql(15.2)
+    end
+  end
+
+  context "grading gpa scale grades" do
+    it "should update grades when assignment changes" do
+      setup_assignment_without_submission
+      @a.update_attributes(:grading_type => 'gpa_scale', :points_possible => 20)
+      @a.context.grading_standards.build({title: "GPA"})
+      gs = @a.context.grading_standards.last
+      gs.data = {"4.0" => 0.94,
+                 "3.7" => 0.90,
+                 "3.3" => 0.87,
+                 "3.0" => 0.84,
+                 "2.7" => 0.80,
+                 "2.3" => 0.77,
+                 "2.0" => 0.74,
+                 "1.7" => 0.70,
+                 "1.3" => 0.67,
+                 "1.0" => 0.64,
+                 "0" => 0.01,
+                 "M" => 0.0 }
+      gs.assignments << @a
+      gs.save!
+      @teacher = @a.context.enroll_user(User.create(:name => "user 1"), 'TeacherEnrollment').user
+      @student = @a.context.enroll_user(User.create(:name => "user 1"), 'StudentEnrollment').user
+      @enrollment = @student.enrollments.first
+      @assignment.reload
+      @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => '2.0').first
+      @sub.grade.should eql('2.0')
+      @sub.score.should eql(15.2)
+      @enrollment.reload.computed_current_score.should == 76
+
+      @assignment.points_possible = 30
+      @assignment.save!
+      @sub.reload
+      @sub.score.should eql(15.2)
+      @sub.grade.should eql('0')
+      @enrollment.reload.computed_current_score.should == 50.7
+    end
+
+    it "should accept lowercase gpa grades" do
+      setup_assignment_without_submission
+      @a.update_attributes(:grading_type => 'gpa_scale', :points_possible => 20)
+      @a.context.grading_standards.build({title: "GPA"})
+      gs = @a.context.grading_standards.last
+      gs.data = {"4.0" => 0.94,
+                 "3.7" => 0.90,
+                 "3.3" => 0.87,
+                 "3.0" => 0.84,
+                 "2.7" => 0.80,
+                 "2.3" => 0.77,
+                 "2.0" => 0.74,
+                 "1.7" => 0.70,
+                 "1.3" => 0.67,
+                 "1.0" => 0.64,
+                 "0" => 0.01,
+                 "M" => 0.0 }
+      gs.assignments << @a
+      gs.save!
+      @teacher = @a.context.enroll_user(User.create(:name => "user 1"), 'TeacherEnrollment').user
+      @student = @a.context.enroll_user(User.create(:name => "user 1"), 'StudentEnrollment').user
+      @assignment.reload
+      @sub = @assignment.grade_student(@student, :grader => @teacher, :grade => 'm').first
+      @sub.grade.should eql('M')
+      @sub.score.should eql(0.0)
     end
   end
 

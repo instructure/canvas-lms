@@ -255,7 +255,13 @@ define([
           if($grade.find("img.graded_icon").length) {
             val = $grade.find("img.graded_icon").attr('alt').toLowerCase();
           } else if($obj.find(".score").length > 0 && !(val && val.match(/.+%/))) {
-            val = $.trim($obj.find(".score").text());
+            var submission = objectData(grid.cell);
+            var grading_type = $("#outer_assignment_" + submission.assignment_id).find(".grading_type").text();
+            if(grading_type == "gpa_scale"){
+              val = $.trim($obj.find(".grade").text());
+            }else{
+              val = $.trim($obj.find(".score").text());
+            }
           }
           val = $.trim(val);
           if(val == "-") {

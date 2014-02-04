@@ -476,6 +476,7 @@ class Submission < ActiveRecord::Base
     if assignment
       self.context_code = assignment.context_code
     end
+
     self.submitted_at ||= Time.now if self.has_submission? || (self.submission_type && !self.submission_type.empty?)
     self.quiz_submission.reload if self.quiz_submission_id
     self.workflow_state = 'unsubmitted' if self.submitted? && !self.has_submission?

@@ -63,39 +63,47 @@ class GradingStandard < ActiveRecord::Base
     read_attribute(:version).presence || 1
   end
 
-  # e.g. convert 89.7 to B+
-  def self.score_to_grade(scheme, score)
-    score = 0 if score < 0
-    # assign the highest grade whose min cutoff is less than the score
-    # if score is less than all scheme cutoffs, assign the lowest grade
-    scheme.max_by {|s| score >= s[1] * 100 ? s[1] : -s[1] }[0]
+  def ordered_scheme
+    @ordered_scheme ||= grading_scheme.to_a.sort_by { |_, percent| -percent }
+  end
+
+  def place_in_scheme(key_name)
+    # look for keys with only digits and a single '.'
+    if key_name.to_s =~ (/\A(\d*[.])?\d+\Z/)
+    # compare numbers
+      # second condition to filter letters so zeros work properly ("A".to_f == 0)
+      ordered_scheme.index { |g, _| g.to_f == key_name.to_f && g.to_s.match(/\A(\d*[.])?\d+\Z/)}
+    else
+    # compare words
+      ordered_scheme.index { |g, _| g.to_s.downcase == key_name.to_s.downcase}
+    end
   end
 
   # e.g. convert B to 86
-  def self.grade_to_score(scheme, grade)
-    scheme = scheme.to_a.sort_by { |g, percent| -percent }
-    idx = scheme.index { |g, percent| g.downcase == grade.downcase }
-    if idx && idx > 0
-      # if there's room to step down at least one whole number, do that. this
-      # matches the previous behavior, before we added support for fractional
-      # grade cutoffs.
-      # otherwise, we step down just 1/10th of a point, which is the
-      # granularity we support right now
-      if (scheme[idx].last - scheme[idx - 1].last).abs >= 0.01
-        scheme[idx - 1].last * 100.0 - 1.0
-      else
-        scheme[idx - 1].last * 100.0 - 0.1
-      end
-    elsif idx
-      # first grade always goes to 100%
+  def grade_to_score(grade)
+    idx = place_in_scheme(grade)
+    if idx == 0
       100.0
+    # if there's room to step down at least one whole number, do that. this
+    # matches the previous behavior, before we added support for fractional
+    # grade cutoffs.
+    # otherwise, we step down just 1/10th of a point, which is the
+    # granularity we support right now
+    elsif idx && (ordered_scheme[idx].last - ordered_scheme[idx - 1].last).abs >= 0.01
+      ordered_scheme[idx - 1].last * 100.0 - 1.0
+    elsif idx
+      ordered_scheme[idx - 1].last * 100.0 - 0.1
     else
       nil
     end
   end
 
+  # e.g. convert 89.7 to B+
   def score_to_grade(score)
-    GradingStandard.score_to_grade(data, score)
+    score = 0 if score < 0
+    # assign the highest grade whose min cutoff is less than the score
+    # if score is less than all scheme cutoffs, assign the lowest grade
+    ordered_scheme.max_by {|grade_name, lower_bound| score >= lower_bound * 100 ? lower_bound : -lower_bound }[0]
   end
 
   def data=(new_val)
@@ -103,8 +111,9 @@ class GradingStandard < ActiveRecord::Base
     # round values to the nearest 0.01 (0.0001 since e.g. 78 is stored as .78)
     # and dup the data while we're at it. (new_val.dup only dups one level, the
     # elements of new_val.dup are the same objects as the elements of new_val)
-    new_val = new_val.map{ |row| [ row[0], (row[1] * 10000).to_i / 10000.0 ] }
+    new_val = new_val.map{ |grade_name, lower_bound| [ grade_name, (lower_bound * 10000).to_i / 10000.0 ] }
     write_attribute(:data, new_val)
+    @ordered_scheme = nil
   end
 
   def data
@@ -135,19 +144,19 @@ class GradingStandard < ActiveRecord::Base
     self.usage_count = self.assignments.active.count
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
   end
-  
+
   set_policy do
     given {|user| true }
     can :read and can :create
-    
+
     given {|user| self.assignments.active.length < 2}
     can :update and can :delete
   end
-  
+
   def update_data(params)
-    self.data = params.to_a.sort_by{|i| i[1]}.reverse
+    self.data = params.to_a.sort_by{|_, lower_bound| lower_bound}.reverse
   end
-  
+
   def display_name
     res = ""
     res += self.user.name + ", " rescue ""
@@ -155,45 +164,52 @@ class GradingStandard < ActiveRecord::Base
     res = t("unknown_grading_details", "Unknown Details") if res.empty?
     res
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.save
   end
-  
+
   def grading_scheme
     res = {}
-    self.data.sort_by{|i| i[1]}.reverse.each do |i|
-      res[i[0].to_s] = i[1].to_f
+    self.data.sort_by{|_, lower_bound| lower_bound}.reverse.each do |grade_name, lower_bound|
+      res[grade_name] = lower_bound.to_f
     end
     res
   end
-  
+
   def self.standards_for(context)
     context_codes = [context.asset_string]
     context_codes.concat Account.all_accounts_for(context).map(&:asset_string)
     GradingStandard.active.where(:context_code => context_codes.uniq)
   end
-  
+
   def standard_data=(params={})
     params ||= {}
     res = {}
     params.each do |key, row|
       res[row[:name]] = (row[:value].to_f / 100.0) if row[:name] && row[:value]
     end
-    self.data = res.to_a.sort_by{|i| i[1]}.reverse
+    self.data = res.to_a.sort_by{|_, lower_bound| lower_bound}.reverse
   end
 
   def valid_grading_scheme_data
     self.errors.add(:data, 'grading scheme values cannot be negative') if self.data.any?{ |v| v[1] < 0 }
     self.errors.add(:data, 'grading scheme cannot contain duplicate values') if self.data.map{|v| v[1]} != self.data.map{|v| v[1]}.uniq
   end
-  
+
   def self.default_grading_standard
-    default_grading_scheme.to_a.sort_by{|i| i[1]}.reverse
+    default_grading_scheme.to_a.sort_by{|_, lower_bound| lower_bound}.reverse
   end
-  
+
+  def self.default_instance
+    gs = GradingStandard.new()
+    gs.data = default_grading_scheme
+    gs.title = "Default Grading Standard"
+    gs
+  end
+
   def self.default_grading_scheme
     {
       "A" => 0.94,
@@ -210,7 +226,7 @@ class GradingStandard < ActiveRecord::Base
       "F" => 0.0,
     }
   end
-  
+
   def self.process_migration(data, migration)
     standards = data['grading_standards'] || []
     standards.each do |standard|
@@ -237,10 +253,9 @@ class GradingStandard < ActiveRecord::Base
     rescue
       #todo - add to message to display to user
     end
-    
+
     item.save!
     context.imported_migration_items << item if context.imported_migration_items && item.new_record?
     item
   end
-  
 end

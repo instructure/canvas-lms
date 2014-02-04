@@ -336,7 +336,7 @@
 #           }
 #         },
 #         "grading_type": {
-#           "description": "The type of grading the assignment receives; one of 'pass_fail', 'percent', 'letter_grade', 'points'",
+#           "description": "The type of grading the assignment receives; one of 'pass_fail', 'percent', 'letter_grade', 'gpa_scale', 'points'",
 #           "example": "points",
 #           "type": "string",
 #           "allowableValues": {
@@ -344,12 +344,13 @@
 #               "pass_fail",
 #               "percent",
 #               "letter_grade",
+#               "gpa_scale",
 #               "points"
 #             ]
 #           }
 #         },
 #         "grading_standard_id": {
-#           "description": "The id of the grading standard being applied to this assignment. Valid if grading_type is 'letter_grade'.",
+#           "description": "The id of the grading standard being applied to this assignment. Valid if grading_type is 'letter_grade' or 'gpa_scale'.",
 #           "type": "integer"
 #         },
 #         "published": {
@@ -611,7 +612,7 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[points_possible] [Float]
   #   The maximum points possible on the assignment.
   #
-  # @argument assignment[grading_type] [Optional, "pass_fail"|"percent"|"letter_grade"|"points"]
+  # @argument assignment[grading_type] [Optional, "pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading the assignment.
   #  The assignment is ungraded if this field is omitted.
   #
@@ -669,7 +670,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[grading_standard_id] [Optional, Integer]
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
-  #   This will update the grading_type for the course to 'letter_grade'.
+  #   This will update the grading_type for the course to 'letter_grade' unless it is already 'gpa_scale'.
   #
   # If the assignment[assignment_overrides] key is absent, any existing
   # overrides are kept as is. If the assignment[assignment_overrides] key is

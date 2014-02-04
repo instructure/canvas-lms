@@ -64,6 +64,9 @@ define [
     run => @assignment.set('points_possible', 10)
     equal @component.get('nilPointsPossible'), false
 
+  test "isGpaScale", ->
+    setType 'gpa_scale'
+    ok @component.get('isGpaScale')
 
   asyncTest "focusOut", ->
     stub = sinon.stub @component, 'boundUpdateSuccess'

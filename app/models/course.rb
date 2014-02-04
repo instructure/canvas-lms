@@ -1542,9 +1542,11 @@ class Course < ActiveRecord::Base
 
   def score_to_grade(score)
     return nil unless self.grading_standard_enabled? && score
-    @scheme ||= self.grading_standard.try(:data) ||
-                GradingStandard.default_grading_standard
-    GradingStandard.score_to_grade(@scheme, score)
+    if grading_standard
+      grading_standard.score_to_grade(score)
+    else
+      GradingStandard.default_instance.score_to_grade(score)
+    end
   end
 
   def participants(include_observers=false)

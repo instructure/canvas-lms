@@ -146,7 +146,7 @@
             <%= render :partial => "grading_box_extended", :object => @assignment %>
             <% if @assignment.grading_type == "points" %>
               <%= t('#gradebooks.out_of_points_possible', "out of %{points_possible}", :points_possible => @assignment.points_possible) %>
-            <% else %>
+            <% elsif  @assignment.grading_type != "gpa_scale" %>
               (<span class="score">&nbsp;</span> / <%= @assignment.points_possible %>)
             <% end %>
             </label>
