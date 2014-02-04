@@ -315,6 +315,22 @@ describe ContextModulesController do
       ct1.context_module.should == m1
     end
 
+    it "should reorder unpublished items" do
+      course_with_teacher_logged_in(active_all: true, draft_state: true)
+      pageA = @course.wiki.wiki_pages.create title: "pageA"
+      pageA.workflow_state = 'unpublished'
+      pageA.save
+      pageB = @course.wiki.wiki_pages.create! title: "pageB"
+      m1 = @course.context_modules.create!
+      tagB = m1.add_item({type: "wiki_page", id: pageB.id}, nil, position: 1)
+      tagB.should be_published
+      tagA = m1.add_item({type: "wiki_page", id: pageA.id}, nil, position: 2)
+      tagA.should be_unpublished
+      m1.reload.content_tags.order(:position).pluck(:id).should == [tagB.id, tagA.id]
+      post 'reorder_items', course_id: @course.id, context_module_id: m1.id, order: "#{tagA.id},#{tagB.id}"
+      m1.reload.content_tags.order(:position).pluck(:id).should == [tagA.id, tagB.id]
+    end
+
     it "should only touch module once on reorder" do
       course_with_teacher_logged_in(:active_all => true)
       assign_group = @course.assignment_groups.create!
