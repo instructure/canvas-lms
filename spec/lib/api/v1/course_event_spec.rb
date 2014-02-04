@@ -48,10 +48,10 @@ describe Api::V1::CourseEvent do
     course_with_teacher(account: @domain_root_account)
 
     @page_view = PageView.new { |p|
-      p.send(:attributes=, {
+      p.assign_attributes({
         :request_id => @request_id,
         :remote_ip => '10.10.10.10'
-      }, false)
+      }, :without_protection => true)
     }
 
     PageView.stubs(

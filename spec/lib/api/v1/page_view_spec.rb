@@ -33,7 +33,7 @@ describe Api::V1::PageView do
     @page_views = []
     (1..5).each do |i|
       @page_views << PageView.new { |p|
-        p.send(:attributes=, {
+        p.assign_attributes({
           :request_id => @request_id,
           :remote_ip => '10.10.10.10',
           :user => @student,
@@ -52,7 +52,7 @@ describe Api::V1::PageView do
           :action => "index",
           :controller => "controller",
           :account_id => @domain_root_account.id
-        }, false)
+        }, :without_protection => true)
       }
     end
     @page_view = @page_views.first

@@ -200,7 +200,7 @@ class PageView < ActiveRecord::Base
     shard = PageView.cassandra? ? Shard.birth : Shard.current
     page_view = shard.activate do
       if new_record
-        new{ |pv| pv.send(:attributes=, attrs, false) }
+        new{ |pv| pv.assign_attributes(attrs, :without_protection => true) }
       else
         instantiate(@blank_template.merge(attrs))
       end

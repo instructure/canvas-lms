@@ -178,6 +178,16 @@ ActiveRecord::Base.class_eval do
     save_without_rails3_options(options)
   end
   alias_method_chain :save, :rails3_options
+
+  public :assign_attributes
+  def assign_attributes_with_rails3_options(new_attributes, options = {})
+    if options[:without_protection]
+      self.send(:attributes=, new_attributes, false)
+    else
+      assign_attributes_without_rails3_options(new_attributes)
+    end
+  end
+  alias_method_chain :assign_attributes, :rails3_options
 end
 
 ActiveRecord::NamedScope::ClassMethods.module_eval do

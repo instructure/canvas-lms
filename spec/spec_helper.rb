@@ -1223,7 +1223,7 @@ end
     Setting.set('enable_page_views', 'db')
 
     @page_view = PageView.new { |p|
-      p.send(:attributes=, {
+      p.assign_attributes({
           :id => @request_id,
           :url => "http://test.one/",
           :session_id => "phony",
@@ -1238,7 +1238,7 @@ end
           :interaction_seconds => 5,
           :user => @user,
           :remote_ip => '192.168.0.42'
-      }, false)
+      }, :without_protection => true)
     }
     @page_view.save!
     @page_view
