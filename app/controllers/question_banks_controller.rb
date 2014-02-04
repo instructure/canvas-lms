@@ -88,6 +88,9 @@ class QuestionBanksController < ApplicationController
       else
         @questions.update_all(:assessment_question_bank_id => @new_bank)
       end
+
+      [ @bank, @new_bank ].each(&:touch)
+
       render :json => {}
     end
   end
