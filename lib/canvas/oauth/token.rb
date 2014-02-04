@@ -65,8 +65,10 @@ module Canvas::Oauth
     end
 
     def self.find_userinfo_access_token(user, developer_key, scopes, purpose)
-      user.access_tokens.active.where(:remember_access => true, :developer_key_id => developer_key, :purpose => purpose).detect do |token|
-        token.scoped_to?(scopes) && token.scoped_to?(['userinfo'])
+      user.shard.activate do
+        user.access_tokens.active.where(:remember_access => true, :developer_key_id => developer_key, :purpose => purpose).detect do |token|
+          token.scoped_to?(scopes) && token.scoped_to?(['userinfo'])
+        end
       end
     end
 
