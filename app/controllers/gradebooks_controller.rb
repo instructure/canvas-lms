@@ -88,7 +88,7 @@ class GradebooksController < ApplicationController
       end
       {
         :id           => ag.id,
-        :rules        => ag.rules_hash,
+        :rules        => ag.rules_hash({stringify_json_ids: true}),
         :group_weight => ag.group_weight,
         :assignments  => assignments,
       }
@@ -199,7 +199,7 @@ class GradebooksController < ApplicationController
 
           # this can't happen in the slave block because this may trigger
           # writes in ContextModule
-          js_env :assignment_groups => assignment_groups_json,
+          js_env :assignment_groups => assignment_groups_json({:stringify_json_ids => true}),
                  :speed_grader_enabled => @context.allows_speed_grader?
           set_gradebook_warnings(@groups, @just_assignments)
           if params[:view] == "simple"
@@ -510,11 +510,11 @@ class GradebooksController < ApplicationController
   private :set_gradebook_warnings
 
 
-  def assignment_groups_json
+  def assignment_groups_json(opts={})
     assignment_scope = AssignmentGroup.assignment_scope_for_grading(@context)
     @context.assignment_groups.active.includes(assignment_scope).map { |g|
       assignment_group_json(g, @current_user, session, ['assignments'], {
-        stringify_json_ids: stringify_json_ids?,
+        stringify_json_ids: opts[:stringify_json_ids] || stringify_json_ids?,
         assignment_group_assignment_scope: assignment_scope
       })
     }

@@ -595,11 +595,16 @@ describe GradebooksController do
       a  = ag.assignments.create! :submission_types => 'online_upload',
                                   :points_possible  => 10,
                                   :context  => @course
+      AssignmentGroup.add_never_drop_assignment(ag, a)
       @controller.instance_variable_set(:@context, @course)
       @controller.light_weight_ags_json([ag]).should == [
         {
           id: ag.id,
-          rules: {},
+          rules: {
+            'never_drop' => [
+              a.id.to_s
+            ]
+          },
           group_weight: 100,
           assignments: [
             {
