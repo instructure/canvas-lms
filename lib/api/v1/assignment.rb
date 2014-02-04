@@ -142,6 +142,8 @@ module Api::V1::Assignment
         row_hash
       end
       hash['rubric_settings'] = {
+        'id' => rubric.id,
+        'title' => rubric.title,
         'points_possible' => rubric.points_possible,
         'free_form_criterion_comments' => !!rubric.free_form_criterion_comments
       }

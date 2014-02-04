@@ -147,6 +147,7 @@ describe AssignmentsApiController, type: :request do
       @rubric = rubric_model(:user => @user,
                              :context => @course,
                              :data => larger_rubric_data,
+                             :title => 'some rubric',
                              :points_possible => 12,
                               :free_form_criterion_comments => true)
 
@@ -157,6 +158,8 @@ describe AssignmentsApiController, type: :request do
       @assignment.rubric_association.save!
       json = api_get_assignments_index_from_course(@course)
       json.first['rubric_settings'].should == {
+        'id' => @rubric.id,
+        'title' => 'some rubric',
         'points_possible' => 12,
         'free_form_criterion_comments' => true
       }
