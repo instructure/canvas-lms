@@ -404,7 +404,7 @@ module QuizzesHelper
 
     unless answer_list && !answer_list.empty?
       answers.delete_if { |k, v| !k.match /^question_#{hash_get(question, :id)}/ }
-      answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, v.to_s }
+      answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, h(v) }
       res.gsub! /\{\{question_[^}]+\}\}/, ""
     end
 
