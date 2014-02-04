@@ -1120,6 +1120,7 @@ class CoursesController < ApplicationController
 
 
     @context = Course.active.find(params[:id])
+    assign_localizer
     js_env :DRAFT_STATE => @context.feature_enabled?(:draft_state)
     if request.xhr?
       if authorized_action(@context, @current_user, [:read, :read_as_admin])
