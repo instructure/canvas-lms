@@ -197,7 +197,7 @@ class DiscussionTopic < ActiveRecord::Base
     return nil unless self.old_assignment && self.old_assignment.deleted?
     self.old_assignment.workflow_state = 'published'
     self.old_assignment.saved_by = :discussion_topic
-    self.old_assignment.save(false)
+    self.old_assignment.save(:validate => false)
     self.old_assignment
   end
 

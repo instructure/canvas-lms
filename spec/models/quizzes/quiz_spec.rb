@@ -987,7 +987,7 @@ describe Quizzes::Quiz do
       it "should not validate quiz_type if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :quiz_type => 'invalid'
         quiz.workflow_state = 'created'
-        quiz.save(false).should be_true  # save without validation
+        quiz.save(:validate => false).should be_true  # save without validation
         quiz.reload
         quiz.save.should be_true
         quiz.errors.should be_blank
@@ -1006,7 +1006,7 @@ describe Quizzes::Quiz do
       it "should not validate ip_filter if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :ip_filter => '123.fourfivesix'
         quiz.workflow_state = 'created'
-        quiz.save(false).should be_true  # save without validation
+        quiz.save(:validate => false).should be_true  # save without validation
         quiz.reload
         quiz.save.should be_true
         quiz.errors.should be_blank
@@ -1047,7 +1047,7 @@ describe Quizzes::Quiz do
       it "should not validate hide_results if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :hide_results => 'invalid'
         quiz.workflow_state = 'created'
-        quiz.save(false).should be_true  # save without validation
+        quiz.save(:validate => false).should be_true  # save without validation
         quiz.reload
         quiz.save.should be_true
         quiz.errors.should be_blank

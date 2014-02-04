@@ -359,7 +359,7 @@ ActiveRecord::AutosaveAssociation.class_eval do
               association.send(:insert_record, record)
             end
           elsif autosave
-            saved = record.save(false)
+            saved = record.save(:validate => false)
           end
 
           raise ActiveRecord::Rollback if saved == false
