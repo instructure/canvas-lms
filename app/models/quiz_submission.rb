@@ -38,6 +38,7 @@ class QuizSubmission < ActiveRecord::Base
   before_save :sanitize_responses
   before_save :update_assignment_submission
   before_create :assign_validation_token
+  after_save :save_assignment_submission
 
   has_many :attachments, :as => :context, :dependent => :destroy
 
@@ -363,24 +364,26 @@ class QuizSubmission < ActiveRecord::Base
 
   def update_assignment_submission
     return if self.manually_scored || @skip_after_save_score_updates
-
     if self.quiz && self.quiz.for_assignment? && assignment && !self.submission && self.user_id
       self.submission = assignment.find_or_create_submission(self.user_id)
     end
     if self.completed? && self.submission
-      s = self.submission
-      s.score = self.kept_score if self.kept_score
-      s.submitted_at = self.finished_at
-      s.grade_matches_current_submission = true
-      s.quiz_submission_id = self.id
-      s.graded_at = self.end_at || Time.now
-      s.grader_id = "-#{self.quiz_id}".to_i
-      s.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.score}, time: #{Time.now.to_s}"
-      s.user_id = self.user_id
-      s.submission_type = "online_quiz"
-      s.saved_by = :quiz_submission
-      s.save!
+      @assignment_submission = self.submission
+      @assignment_submission.score = self.kept_score if self.kept_score
+      @assignment_submission.submitted_at = self.finished_at
+      @assignment_submission.grade_matches_current_submission = true
+      @assignment_submission.quiz_submission_id = self.id
+      @assignment_submission.graded_at = self.end_at || Time.now
+      @assignment_submission.grader_id = "-#{self.quiz_id}".to_i
+      @assignment_submission.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.score}, time: #{Time.now.to_s}"
+      @assignment_submission.user_id = self.user_id
+      @assignment_submission.submission_type = "online_quiz"
+      @assignment_submission.saved_by = :quiz_submission
     end
+  end
+
+  def save_assignment_submission
+    @assignment_submission.save! if @assignment_submission
   end
 
   def highest_score_so_far(exclude_version_id=nil)
@@ -588,13 +591,13 @@ class QuizSubmission < ActiveRecord::Base
   # simply_versioned for making this possible!
   def update_submission_version(version, attrs)
     version_data = YAML::load(version.yaml)
-    TextHelper.recursively_strip_invalid_utf8!(version_data, true)
     version_data["submission_data"] = self.submission_data if attrs.include?(:submission_data)
     version_data["temporary_user_code"] = "was #{version_data['score']} until #{Time.now.to_s}"
     version_data["score"] = self.score if attrs.include?(:score)
     version_data["fudge_points"] = self.fudge_points if attrs.include?(:fudge_points)
     version_data["workflow_state"] = self.workflow_state if attrs.include?(:workflow_state)
     version_data["manually_scored"] = self.manually_scored if attrs.include?(:manually_scored)
+    TextHelper.recursively_strip_invalid_utf8!(version_data, true)
     version.yaml = version_data.to_yaml
     res = version.save
     res

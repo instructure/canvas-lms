@@ -31,35 +31,35 @@ describe QuizSubmission do
       qs = QuizSubmission.new
       qs.extra_time = 'asdf'
       qs.valid?.should == false
-      qs.errors.on(:extra_time).should == "is not a number"
+      Array(qs.errors[:extra_time]).should == ["is not a number"]
     end
 
     it "should validate extra time is not too long" do
       qs = QuizSubmission.new
       qs.extra_time = 10081
       qs.valid?.should == false
-      qs.errors.on(:extra_time).should == "must be less than or equal to 10080"
+      Array(qs.errors[:extra_time]).should == ["must be less than or equal to 10080"]
     end
 
     it "should validate numericality of extra attempts" do
       qs = QuizSubmission.new
       qs.extra_attempts = 'asdf'
       qs.valid?.should == false
-      qs.errors.on(:extra_attempts).should == "is not a number"
+      Array(qs.errors[:extra_attempts]).should == ["is not a number"]
     end
 
     it "should validate extra attempts is not too long" do
       qs = QuizSubmission.new
       qs.extra_attempts = 1001
       qs.valid?.should == false
-      qs.errors.on(:extra_attempts).should == "must be less than or equal to 1000"
+      Array(qs.errors[:extra_attempts]).should == ["must be less than or equal to 1000"]
     end
 
     it "should validate quiz points possible is not too long" do
       qs = QuizSubmission.new
       qs.quiz = Quizzes::Quiz.new(:points_possible => 2000000001)
       qs.valid?.should == false
-      qs.errors.on(:quiz_points_possible).should == "must be less than or equal to 2000000000"
+      Array(qs.errors[:quiz_points_possible]).should == ["must be less than or equal to 2000000000"]
     end
   end
 
@@ -1555,13 +1555,13 @@ describe QuizSubmission do
     before do
       submission.with_versioning(true) do |s|
         s.score = 10
-        s.save_without_validation
+        s.save(:validate => false)
       end
       submission.version_number.should == 1
 
       submission.with_versioning(true) do |s|
         s.score = 15
-        s.save_without_validation
+        s.save(:validate => false)
       end
       submission.version_number.should == 2
     end
