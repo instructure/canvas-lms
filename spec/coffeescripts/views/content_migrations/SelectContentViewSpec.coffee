@@ -9,7 +9,7 @@ define [
 
   class SelectContentHelper
     @url = '/api/v1/courses/42/content_migrations/5/selective_data'
-    @$carrot = -> @$fixtures.find('.checkbox-carrot').first()
+    @$caret = -> @$fixtures.find('.checkbox-caret').first()
     @toplevelCheckboxResponse = -> [200, { "Content-Type": "application/json" }, JSON.stringify([
 
                                               {
@@ -63,7 +63,7 @@ define [
                                               }
                                           ])]
 
-  module 'SelectContentView: Main Behaviors',
+  module 'SelectContentView: Integration Tests',
     setup: -> 
       @server = sinon.fakeServer.create()
       fakeENV.setup()
@@ -84,6 +84,7 @@ define [
       @server.respondWith('GET',SelectContentHelper.url, SelectContentHelper.toplevelCheckboxResponse())
       @selectContentView.open()
       @server.respond()
+      @tree = @selectContentView.$el.find('ul[role=tree]')
 
     teardown: -> 
       fakeENV.teardown()
@@ -96,7 +97,7 @@ define [
 
   test 'changes parents to intermediate when not all of the sublevel checkboxes are check', ->
     @server.respondWith('GET',SelectContentHelper.url+"?type=assignments", SelectContentHelper.sublevelCheckboxResponse())
-    @selectContentView.$el.find('.checkbox-carrot[data-type=assignments]').simulate 'click'
+    @selectContentView.$el.find('[data-type=assignments] .checkbox-caret').simulate 'click'
     @server.respond()
     $subCheckboxes = @selectContentView.$el.find('.collectionViewItems').last().find('[type=checkbox]')
     @selectContentView.$el.find("[data-state='closed']").show()
@@ -105,20 +106,18 @@ define [
     
     ok (indeterminate || indeterminate == 'true'), "Parent changed to intermediate"
     
-  test "clicking the carrot shows and hides checkboxes", ->
-    $carrot = @selectContentView.$el.find(".checkbox-carrot[data-type=assignments]")
-    $sublevelCheckboxes = $carrot.siblings('ul').first()
+  test "clicking the caret shows and hides checkboxes", ->
+    $caret = @selectContentView.$el.find("[data-type=assignments] .checkbox-caret").first()
+    $sublevelCheckboxes = $caret.closest('div').siblings('ul').first()
 
-    equal $carrot.data('state'), 'closed'
-    equal $sublevelCheckboxes.is(':visible'), false
-    $carrot.simulate 'click'
+    equal $caret.parents('[role=treeitem]').attr('aria-expanded'), 'false'
+    $caret.simulate 'click'
 
-    equal $carrot.data('state'), 'open'
-    equal $sublevelCheckboxes.is(':visible'), true
+    equal $caret.parents('[role=treeitem]').attr('aria-expanded'), 'true'
 
   test "checking a checkbox checks all children checkboxes", ->
     @server.respondWith('GET',SelectContentHelper.url+"?type=assignments", SelectContentHelper.sublevelCheckboxResponse())
-    $assignmentCarrot = @selectContentView.$el.find('.checkbox-carrot[data-type=assignments]')
+    $assignmentCarrot = @selectContentView.$el.find('[data-type=assignments] .checkbox-caret')
     $assignmentCarrot.simulate 'click'
     @server.respond()
 
@@ -128,7 +127,7 @@ define [
 
     clock.tick 1
 
-    $assignmentCarrot.siblings('ul').first().find('input[type=checkbox]').each ->
+    @selectContentView.$el.find('[data-type=assignments] input[type=checkbox]').each ->
       ok $(this).is(':checked'), 'checkbox is checked'
     clock.restore()
 
@@ -137,13 +136,12 @@ define [
     @selectContentView.$el.find("input[name='copy[all_assignments]']").simulate 'click'
 
     clock = sinon.useFakeTimers()
-    $assignmentCarrot = @selectContentView.$el.find('.checkbox-carrot[data-type=assignments]')
+    $assignmentCarrot = @selectContentView.$el.find('[data-type=assignments] .checkbox-caret')
     $assignmentCarrot.simulate 'click'
     @server.respond()
 
     clock.tick 1
-
-    $assignmentCarrot.siblings('ul').first().find('input[type=checkbox]').each ->
+    @selectContentView.$el.find('[data-type=assignments] input[type=checkbox]').each -> 
       ok $(this).is(':checked'), 'checkbox is checked'
 
     clock.restore()
@@ -158,4 +156,61 @@ define [
     ok !@selectContentView.$el.find('#selectContentBtn').prop('disabled'), 'Enabled after checking item'
     @selectContentView.$el.find('input[type=checkbox]').first().simulate('click')
     ok @selectContentView.$el.find('#selectContentBtn').prop('disabled'), 're-disabled if no selected'
+
+  test "pressing the up/down arrow selects the next treeitem", ->
+    downEvent = jQuery.Event( "keyup", { which: 40 } )
+    upEvent = jQuery.Event( "keyup", { which: 38 } )
+
+    $treeitems = @selectContentView.$el.find('[role=treeitem]:visible')
+    @tree = @selectContentView.$el.find('ul[role=tree]')
+
+    @tree.trigger(downEvent)
+    @tree.trigger(downEvent)
+    $currentlySelected = @selectContentView.$el.find('[aria-selected=true]')
+    equal $treeitems.index($currentlySelected), 1, "pressing down moves to the second item"
+
+    @tree.trigger(upEvent)
+    $currentlySelected = @selectContentView.$el.find('[aria-selected=true]')
+    equal $treeitems.index($currentlySelected), 0, "pressing up moves to the first item"
+
+  test "pressing home/end buttons move you to the first and last treeitem", ->
+    homeEvent = jQuery.Event( "keyup", { which: 36 } )
+    endEvent = jQuery.Event( "keyup", { which: 35 } )
+    $treeitems = @selectContentView.$el.find('[role=treeitem]:visible')
+
+    @tree.trigger endEvent
+    $currentlySelected = @selectContentView.$el.find('[aria-selected=true]')
+    equal $treeitems.index($currentlySelected), $treeitems.length - 1, "pressing the end button moves to last item"
+
+    @tree.trigger homeEvent
+    $currentlySelected = @selectContentView.$el.find('[aria-selected=true]')
+    equal $treeitems.index($currentlySelected), 0, "pressing the home button moves to the first item"
+
+  test "pressing right arrow expands", ->
+    rightEvent = jQuery.Event( "keyup", { which: 39 } )
+    downEvent = jQuery.Event( "keyup", { which: 40 } )
+
+    @tree.trigger downEvent
+    @tree.trigger downEvent
+    @tree.trigger downEvent
+    @tree.trigger rightEvent
+
+    $currentlySelected = @selectContentView.$el.find('[aria-selected=true]')
+    equal $currentlySelected.attr('aria-expanded'), "true", "expands the tree item when right is pressed"
+
+  test "aria levels are correctly represented", ->
+    @server.respondWith('GET',SelectContentHelper.url+"?type=assignments", SelectContentHelper.sublevelCheckboxResponse())
+    @selectContentView.$el.find("input[name='copy[all_assignments]']").simulate 'click'
+
+    clock = sinon.useFakeTimers()
+    $assignmentCarrot = @selectContentView.$el.find('[data-type=assignments] .checkbox-caret')
+    $assignmentCarrot.simulate 'click'
+    @server.respond()
+
+    clock.tick 1
+
+    equal @selectContentView.$el.find("[name='copy[all_assignments]']").parents('[role=treeitem]').attr('aria-level'), "1", 'top level aria level is 1'
+    equal @selectContentView.$el.find("[name='copy[assignment_groups][id_i6314c45816f1cc6d9519d88e4b7f64ab]']").parents('[role=treeitem]').attr('aria-level'), "2", 'second level has a level of 2'
+
+    clock.restore()
 

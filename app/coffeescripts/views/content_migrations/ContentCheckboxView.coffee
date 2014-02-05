@@ -13,11 +13,15 @@ define [
     attributes: -> 
       attr = {}
       attr.role = "treeitem"
+      attr.id = "treeitem-#{@cid}"
+      attr['data-type'] = @model.get('type')
+      attr['aria-checked'] = false
+      attr['aria-level'] = @model.collection?.options.ariaLevel
 
       if @model.collection?.isTopLevel
         attr.class = "top-level-treeitem"
-      else if !(@hasSubItems || @hasSubItemsUrl)
-        attr.class = "small-spacing"
+      else
+        attr.class = "normal-treeitem"
 
       attr
 
@@ -31,25 +35,21 @@ define [
       super
       @hasSubItemsUrl = !!@model.get('sub_items_url')
       @hasSubItems = !!@model.get('sub_items')
-      @linkedTarget = @model.collection?.linkedTarget
 
       if @hasSubItemsUrl || @hasSubItems
-        @$el.on "fetchCheckboxes", "#carrot-#{@cid}", @toplevelCarrotEvents
-
-      if @model.get('linked_resource')
-        @$el.on "click", "#checkbox-#{@cid}", @syncWithLinkedResource
+        @$el.on "fetchCheckboxes", @fetchCheckboxes
 
     toJSON: -> 
       json = super
       json.hasSubCheckboxes = @hasSubItems || @hasSubItemsUrl
       json.isTopLevel = @model.collection?.isTopLevel
       json.iconClass = @getIconClass()
-      json.type = @model.get('type')
       json.count = @model.get('count')
-      linkedItem = @model.get('linked_resource')
 
-      if linkedItem && linkedItem.message
-        json.linkedMessage = linkedItem.message
+      json.screenreaderType = {
+        assignment_groups: 'group'
+        folders: 'folders'
+      }[@model.get('type')]
 
       json
 
@@ -85,41 +85,47 @@ define [
     # @api custom backbone override
 
     afterRender: ->
+      if @hasSubItemsUrl || @hasSubItems
+        @$el.attr('aria-expanded', false)
+
       if @hasSubItems
-        @sublevelCheckboxes = new CheckboxCollection @model.get('sub_items')
-        @sublevelCheckboxes.linkedTarget = @linkedTarget if @linkedTarget
+        @sublevelCheckboxes = new CheckboxCollection @model.get('sub_items'),
+                                ariaLevel: @model.collection?.ariaLevel + 1
         @renderSublevelCheckboxes()
+
+      if @model.get('linked_resource')
+        @attachLinkedResource()
 
     # Determins if we should hide the sublevel checkboxes or 
     # fetch new ones based on clicking the carrot next to it.
     # @returns undefined
     # @api private
 
-    toplevelCarrotEvents: (event) =>
-      return unless @hasSubItemsUrl
+    fetchCheckboxes: (event, options={}) =>
       event.preventDefault()
+      event.stopPropagation()
+      return unless @hasSubItemsUrl
 
       $target = $(event.currentTarget)
 
-      unless @sublevelCheckboxes
-          @linkedTarget = $target.data('linkedTarget')
-
-          @fetchSublevelCheckboxes()
-          @renderSublevelCheckboxes()
+      if !@sublevelCheckboxes
+        @fetchSublevelCheckboxes(options.silent)
+        @renderSublevelCheckboxes()
 
     # Attempt to fetch sublevel in a new checkbox collection. Cache
     # the collection so it doesn't call the server twice.
     # @api private
 
-    fetchSublevelCheckboxes: -> 
-      @sublevelCheckboxes = new CheckboxCollection
+    fetchSublevelCheckboxes: (silent) -> 
+      @sublevelCheckboxes = new CheckboxCollection null,
+                              ariaLevel: @model.collection?.ariaLevel + 1
       @sublevelCheckboxes.url = @model.get('sub_items_url')
-      @sublevelCheckboxes.linkedTarget = @linkedTarget if @linkedTarget
 
       dfd = @sublevelCheckboxes.fetch()
       dfd.done => 
-        @$el.find("#carrot-#{@cid}").trigger 'doneFetchingCheckboxes', @$el.find("#checkbox-#{@cid}")
-      @$el.disableWhileLoading dfd
+        @$el.trigger 'doneFetchingCheckboxes', @$el.find("#checkbox-#{@cid}")
+      @$el.disableWhileLoading dfd unless silent
+      dfd
     
     # Render all sublevel checkboxes in a collection view. The template
     # should take care of rendering any "sublevel" checkboxes that may
@@ -135,29 +141,11 @@ define [
 
       checkboxCollectionView.render()
 
-    # Items such as Quizzes and Discussions can be duplicated as an item in an Assignment. Since
-    # it wouldn't make sense to just check one of those items we ensure that they are synced together.
-    # If There are duplicate times there will be a 'linked_resource' object that has a migration_id and
-    # type assoicated with it. We are building our own custom 'property' based on these two attributes
-    # so we can ensure they are synced. Whenever we change a checkbox we ensure that a change event
-    # is triggered so indeterminate states of high level checkboxes can be calculated.
-    # returns nada
+    # Some checkboxes will have a linked resource. If they do, build the linked resource
+    # property and attach it to the checkbox as a data element.
 
-    syncWithLinkedResource: =>
-      linkedItem = @model.get('linked_resource')
-      checked = @$el.find("#checkbox-#{@cid}").is(':checked')
+    attachLinkedResource: ->
+      linkedResource = @model.get('linked_resource')
+      property = "copy[#{linkedResource.type}][id_#{linkedResource.migration_id}]"
 
-      linkedProperty = "copy[#{linkedItem.type}][id_#{linkedItem.migration_id}]"
-
-      $collection_box = $("[name=\"copy[all_#{linkedItem.type}]\"]")
-      if !checked && $collection_box.is(':checked')
-        $collection_box.data('linkedTarget', linkedProperty)
-                       .prop
-                         'indeterminate': false, 'checked': false
-                       .trigger('change')
-
-      if $linked_el = $("[name=\"#{linkedProperty}\"]")
-        $linked_el.prop
-                    'indeterminate': false
-                    'checked': checked
-                 .trigger('change')
+      @$el.find("#checkbox-#{@cid}").data 'linkedResourceProperty', property
