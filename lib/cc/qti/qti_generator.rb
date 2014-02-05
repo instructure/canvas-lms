@@ -191,6 +191,8 @@ module CC
           q_node.points_possible quiz.points_possible
           q_node.require_lockdown_browser quiz.require_lockdown_browser unless quiz.require_lockdown_browser.nil?
           q_node.require_lockdown_browser_for_results quiz.require_lockdown_browser_for_results unless quiz.require_lockdown_browser_for_results.nil?
+          q_node.require_lockdown_browser_monitor quiz.require_lockdown_browser_monitor unless quiz.require_lockdown_browser_monitor.nil?
+          q_node.lockdown_browser_monitor_data quiz.lockdown_browser_monitor_data
           q_node.access_code quiz.access_code unless quiz.access_code.blank?
           q_node.ip_filter quiz.ip_filter unless quiz.ip_filter.blank?
           q_node.show_correct_answers quiz.show_correct_answers unless quiz.show_correct_answers.nil?

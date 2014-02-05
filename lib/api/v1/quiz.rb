@@ -41,6 +41,10 @@ module Api::V1::Quiz
       lock_at
       unlock_at
       published
+      require_lockdown_browser
+      require_lockdown_browser_for_results
+      require_lockdown_browser_monitor
+      lockdown_browser_monitor_data
       )
   }
 

@@ -10,7 +10,9 @@ class QuizSerializer < Canvas::APISerializer
               :access_code, :ip_filter, :due_at, :lock_at, :unlock_at,
               :published, :unpublishable, :locked_for_user, :lock_info,
               :lock_explanation, :hide_results, :show_correct_answers_at,
-              :hide_correct_answers_at, :all_dates, :can_unpublish, :can_update
+              :hide_correct_answers_at, :all_dates, :can_unpublish, :can_update,
+              :require_lockdown_browser, :require_lockdown_browser_for_results,
+              :require_lockdown_browser_monitor, :lockdown_browser_monitor_data
 
   def_delegators :@controller, :api_v1_course_assignment_group_url
 
@@ -63,6 +65,22 @@ class QuizSerializer < Canvas::APISerializer
 
   def question_count
     quiz.available_question_count
+  end
+  
+  def require_lockdown_browser
+    quiz.require_lockdown_browser?
+  end
+  
+  def require_lockdown_browser_for_results
+    quiz.require_lockdown_browser_for_results?
+  end
+  
+  def require_lockdown_browser_monitor
+    quiz.require_lockdown_browser_monitor?
+  end
+  
+  def lockdown_browser_monitor_data
+    quiz.lockdown_browser_monitor_data
   end
 
   def serializable_object(options={})
