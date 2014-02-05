@@ -129,6 +129,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.last_assignment_id = self.assignment_id_was if self.assignment_id_was
     if (!graded? && self.assignment_id) || (self.assignment_id_was && self.assignment_id != self.assignment_id_was)
       @old_assignment_id = self.assignment_id_was
+      @assignment_to_set = self.assignment
       self.assignment_id = nil
     end
     self.assignment_group_id ||= self.assignment.assignment_group_id if self.assignment
@@ -349,10 +350,11 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
 
     send_later_if_production(:update_existing_submissions) if @update_existing_submissions
-    if self.assignment && (@assignment_id_set || self.for_assignment?) && @saved_by != :assignment
+    if (self.assignment || @assignment_to_set) && (@assignment_id_set || self.for_assignment?) && @saved_by != :assignment
       if !self.graded? && @old_assignment_id
       else
         Quizzes::Quiz.where("assignment_id=? AND id<>?", self.assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if self.assignment_id
+        self.assignment = @assignment_to_set if @assignment_to_set && !self.assignment
         a = self.assignment
         a.points_possible = self.points_possible
         a.description = self.description
