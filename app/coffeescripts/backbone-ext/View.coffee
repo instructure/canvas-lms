@@ -1,6 +1,6 @@
 define [
   'jquery'
-  'use!vendor/backbone'
+  'vendor/backbone'
   'underscore'
   'str/htmlEscape'
   'compiled/util/mixin'

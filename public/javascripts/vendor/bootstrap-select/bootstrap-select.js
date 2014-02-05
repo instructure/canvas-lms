@@ -1,3 +1,5 @@
+define(['jquery'],function($) {
+
 // INSTRUCTURE modified
 
 !function($) {
@@ -689,3 +691,5 @@
         .on('keydown', '[data-toggle=dropdown], [role=menu]' , Selectpicker.prototype.keydown)
 
 }(window.jQuery);
+
+});

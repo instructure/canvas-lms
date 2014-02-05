@@ -1,7 +1,7 @@
 # copied from: https://gist.github.com/1998897
 
 define [
-  'use!vendor/backbone'
+  'vendor/backbone'
   'underscore'
   'jquery'
 ], (Backbone, _, $) ->

@@ -7,8 +7,8 @@ describe "quizzes" do
 
   context "as a teacher" do
     let(:due_at) { Time.zone.now }
-    let(:unlock_at) { Time.zone.now - 2.days }
-    let(:lock_at) { Time.zone.now + 4.days }
+    let(:unlock_at) { Time.zone.now.advance(days:-2) }
+    let(:lock_at) { Time.zone.now.advance(days:4) }
 
     def create_quiz_with_default_due_dates
       @context = @course
@@ -125,7 +125,7 @@ describe "quizzes" do
       keep_trying_until { f('#quiz_description_ifr').should be_displayed }
       type_in_tiny '#quiz_description', test_text
       in_frame "quiz_description_ifr" do
-        f('#tinymce').text.include?(test_text).should be_true
+        f('#tinymce').should include_text(test_text)
       end
       click_save_settings_button
       wait_for_ajaximations
@@ -346,7 +346,9 @@ describe "quizzes" do
         error_displayed?.should be_true
         input.send_keys(:tab)
         wait_for_ajaximations
-        input[:value].should be_blank
+        keep_trying_until {
+          input[:value].should be_blank  
+        }
 
         input.click
         input.send_keys('1')
@@ -372,8 +374,12 @@ describe "quizzes" do
         in_frame f('.essay_question iframe')[:id] do
           f('#tinymce').send_keys :shift # no content, but it gives the iframe focus
         end
+        sleep 1
         wait_for_ajaximations
-        ff('#question_list .answered').size.should == 1
+        keep_trying_until {
+          ff('#question_list .answered').size.should == 1  
+        }
+        
         input.should have_attribute(:value, "1.0000")
       end
     end
@@ -405,7 +411,9 @@ describe "quizzes" do
           wait_for_ajaximations
         end
         # not marked as answered
-        ff('#question_list .answered').should be_empty
+        keep_trying_until {
+          ff('#question_list .answered').should be_empty
+        }
 
         # fully answer each question
         dropdowns.each do |d|
@@ -416,7 +424,9 @@ describe "quizzes" do
         end
 
         # marked as answer
-        ff('#question_list .answered').size.should == 2
+        keep_trying_until {
+          ff('#question_list .answered').size.should == 2 
+        }
         wait_for_ajaximations
 
         driver.find_element(:link, 'Quizzes').click
@@ -534,9 +544,10 @@ describe "quizzes" do
       keep_trying_until do
         fj('.answered').should == nil
       end
+
+      fj('.upload-label').click
+      wait_for_ajaximations
       keep_trying_until do
-        fj('.upload-label').click
-        wait_for_ajaximations
         file_upload_submission_data.should == [""]
       end
       upload_attachment_answer
@@ -548,6 +559,7 @@ describe "quizzes" do
       attachment = file_upload_attachment
       fj('.file-upload-box').text.should include attachment.display_name
       f('#submit_quiz_button').click
+      wait_for_ajaximations
       keep_trying_until do
         fj('.selected_answer').text.should include attachment.display_name
       end
@@ -632,6 +644,7 @@ describe "quizzes" do
     end
 
     it "creates assignment with default due date" do
+      pending('daylight savings time fix')
       get "/courses/#{@course.id}/quizzes/new"
       wait_for_ajaximations
       fill_assignment_overrides
@@ -694,7 +707,9 @@ describe "quizzes" do
       f('.show_rubric_link').click
       wait_for_ajaximations
       fj('#rubrics .add_rubric_link:visible').click
-      fj('.rubric_grading:visible').should be_nil
+      keep_trying_until {
+        fj('.rubric_grading:visible').should be_nil
+      }
     end
 
     context "with draft state" do
@@ -718,7 +733,9 @@ describe "quizzes" do
 
         # move mouse to not be hover over the button
         driver.mouse.move_to f('#footer')
-        f('#quiz-publish-link').should include_text("Published")
+        keep_trying_until {
+          f('#quiz-publish-link').should include_text("Published")
+        }
       end
 
       it "should click the unpublish button to unpublish a quiz" do
@@ -737,8 +754,10 @@ describe "quizzes" do
         # move mouse to not be hover over the button
         driver.mouse.move_to f('#footer')
 
-        f('#quiz-publish-link').should_not include_text("Published")
-        f('#quiz-publish-link').should include_text("Publish")
+        keep_trying_until {
+          f('#quiz-publish-link').should_not include_text("Published")
+          f('#quiz-publish-link').should include_text("Publish")
+        }
       end
 
       it "should show a summary of due dates if there are multiple" do

@@ -1,10 +1,47 @@
-/*
- * g.Raphael 0.5 - Charting library, based on Raphaël
+/*!
+ * g.Raphael 0.51 - Charting library, based on Raphaël
  *
- * Copyright (c) 2009 Dmitry Baranovskiy (http://g.raphaeljs.com)
+ * Copyright (c) 2009-2012 Dmitry Baranovskiy (http://g.raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
-(function () {
+
+define(['./g.raphael'], function (Raphael) {
+
+   /*
+   * piechart method on paper
+   */
+  /*\
+   * Paper.piechart
+   [ method ]
+   **
+   * Creates a pie chart
+   **
+   > Parameters
+   **
+   - cx (number) x coordinate of the chart
+   - cy (number) y coordinate of the chart
+   - r (integer) radius of the chart
+   - values (array) values used to plot
+   - opts (object) options for the chart
+   o {
+   o minPercent (number) minimal percent threshold which will have a slice rendered. Sliced corresponding to data points below this threshold will be collapsed into 1 additional slice. [default `1`]
+   o maxSlices (number) a threshold for how many slices should be rendered before collapsing all remaining slices into 1 additional slice (to focus on most important data points). [default `100`]
+   o stroke (string) color of the circle stroke in HTML color format [default `"#FFF"`]
+   o strokewidth (integer) width of the chart stroke [default `1`]
+   o init (boolean) whether or not to show animation when the chart is ready [default `false`]
+   o colors (array) colors be used to plot the chart
+   o href (array) urls to to set up clicks on chart slices
+   o legend (array) array containing strings that will be used in a legend. Other label options work if legend is defined.
+   o legendcolor (string) color of text in legend [default `"#000"`]
+   o legendothers (string) text that will be used in legend to describe options that are collapsed into 1 slice, because they are too small to render [default `"Others"`]
+   o legendmark (string) symbol used as a bullet point in legend that has the same colour as the chart slice [default `"circle"`]
+   o legendpos (string) position of the legend on the chart [default `"east"`]. Other options are `"north"`, `"south"`, `"west"`
+   o }
+   **
+   = (object) path element of the popup
+   > Usage
+   | r.piechart(cx, cy, r, values, opts)
+   \*/
 
     function Piechart(paper, cx, cy, r, values, opts) {
         opts = opts || {};
@@ -19,8 +56,9 @@
             angle = 0,
             total = 0,
             others = 0,
-            cut = 9,
-            defcut = true;
+            cut = opts.maxSlices || 100,
+            minPercent = parseFloat(opts.minPercent) || 1,
+            defcut = Boolean( minPercent );
 
         function sector(cx, cy, r, startAngle, endAngle, fill) {
             var rad = Math.PI / 180,
@@ -44,10 +82,11 @@
         chart.covers = covers;
 
         if (len == 1) {
-            series.push(paper.circle(cx, cy, r).attr({ fill: chartinst.colors[0], stroke: opts.stroke || "#fff", "stroke-width": opts.strokewidth == null ? 1 : opts.strokewidth }));
+            series.push(paper.circle(cx, cy, r).attr({ fill: opts.colors && opts.colors[0] || chartinst.colors[0], stroke: opts.stroke || "#fff", "stroke-width": opts.strokewidth == null ? 1 : opts.strokewidth }));
             covers.push(paper.circle(cx, cy, r).attr(chartinst.shim));
             total = values[0];
             values[0] = { value: values[0], order: 0, valueOf: function () { return this.value; } };
+            opts.href && opts.href[0] && covers[0].attr({ href: opts.href[0] });
             series[0].middle = {x: cx, y: cy};
             series[0].mangle = 180;
         } else {
@@ -56,12 +95,13 @@
                 values[i] = { value: values[i], order: i, valueOf: function () { return this.value; } };
             }
 
+            //values are sorted numerically
             values.sort(function (a, b) {
                 return b.value - a.value;
             });
 
             for (i = 0; i < len; i++) {
-                if (defcut && values[i] * 360 / total <= 1.5) {
+                if (defcut && values[i] * 100 / total < minPercent) {
                     cut = i;
                     defcut = false;
                 }
@@ -90,7 +130,8 @@
                 }
 
                 var path = sector(cx, cy, r, angle, angle -= 360 * values[i] / total);
-                var p = paper.path(opts.init ? ipath : path).attr({ fill: opts.colors && opts.colors[i] || chartinst.colors[i] || "#666", stroke: opts.stroke || "#fff", "stroke-width": (opts.strokewidth == null ? 1 : opts.strokewidth), "stroke-linejoin": "round" });
+                var j = (opts.matchColors && opts.matchColors == true) ? values[i].order : i;
+                var p = paper.path(opts.init ? ipath : path).attr({ fill: opts.colors && opts.colors[j] || chartinst.colors[j] || "#666", stroke: opts.stroke || "#fff", "stroke-width": (opts.strokewidth == null ? 1 : opts.strokewidth), "stroke-linejoin": "round" });
 
                 p.value = values[i];
                 p.middle = path.middle;
@@ -241,15 +282,16 @@
 
         return chart;
     };
-    
+
     //inheritance
     var F = function() {};
     F.prototype = Raphael.g;
     Piechart.prototype = new F;
-    
+
     //public
     Raphael.fn.piechart = function(cx, cy, r, values, opts) {
         return new Piechart(this, cx, cy, r, values, opts);
     }
-    
-})();
+
+    return Raphael;
+});

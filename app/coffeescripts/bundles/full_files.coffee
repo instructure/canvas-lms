@@ -1,4 +1,4 @@
-require ['jquery', 'full_files', 'jquery.google-analytics', 'use!uploadify'], ($) ->
+require ['jquery', 'full_files', 'jquery.google-analytics', 'uploadify'], ($) ->
 
   $ ->
     $('.manage_collaborations').on 'click', ->

@@ -3,5 +3,4 @@
 #   - Be strict about what you include or allow to be included here.
 #   - Don't write code here, include helpers from their own files
 
-define ['compiled/ember/shared/helpers/t']
-
+define ['compiled/ember/shared/helpers/t'], -> 

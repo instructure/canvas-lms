@@ -1,2 +1,3 @@
-define(['use!bower/handlebars/handlebars.runtime'], function(Handlebars) { return Handlebars; });
-
+define(['bower/handlebars/handlebars.runtime'], function(Handlebars) {
+	return Handlebars; 
+});

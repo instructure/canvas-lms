@@ -1,2 +1,2 @@
-define(['use!bower/ember/ember'], function(Ember) { return Ember; });
+define(['bower/ember/ember'], function(Ember) { return Ember; });
 

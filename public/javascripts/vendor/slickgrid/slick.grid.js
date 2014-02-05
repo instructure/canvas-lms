@@ -1,3 +1,5 @@
+define(['jquery','vendor/slickgrid/slick.core'],function(jQuery) {
+
 /**
  * @license
  * (c) 2009-2013 Michael Leibman
@@ -3858,3 +3860,5 @@ if (typeof Slick === "undefined") {
     init();
   }
 }(jQuery));
+
+});

@@ -3,7 +3,7 @@ define [
   'jquery'
   'underscore'
   'compiled/models/File'
-  'use!vendor/FileAPI/FileAPI.min'
+  'vendor/FileAPI/FileAPI.min'
 ], (I18n, $, _, File, FileAPI) ->
 
   class ImageFile extends File

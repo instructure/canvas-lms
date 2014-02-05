@@ -4,8 +4,8 @@ define [
   'Backbone'
   'compiled/views/conversations/CourseSelectionView'
   'compiled/views/conversations/SearchView'
-  'use!vendor/bootstrap/bootstrap-dropdown'
-  'use!vendor/bootstrap-select/bootstrap-select'
+  'vendor/bootstrap/bootstrap-dropdown'
+  'vendor/bootstrap-select/bootstrap-select'
 ], (I18n, _, {View}, CourseSelectionView, SearchView) ->
 
   class InboxHeaderView extends View

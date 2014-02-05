@@ -10,6 +10,7 @@ require [
 
   # modules that do their own thing on every page that simply need to
   # be required
+  'translations/_core'
   'translations/_core_en'
   'jquery.ajaxJSON'
   'vendor/firebugx'
@@ -34,7 +35,6 @@ require [
 
   # other stuff several bundles use
   'media_comments'
-  'order'
   'jqueryui/effects/drop'
   'jqueryui/progressbar'
   'jqueryui/tabs'

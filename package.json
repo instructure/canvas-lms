@@ -2,10 +2,11 @@
   "name": "canvas-lms",
   "version": "0.0.0",
   "dependencies": {
-    "napa": "~0.3.0"
+    "requirejs": "~2.1.10",
+    "uglify-js": "~2.4.12",
+    "glob": "~3.2.9"
   },
   "devDependencies": {
-    "requirejs": "~2.1.10",
     "loom": "~2.0.0",
     "fleck": "~0.5.1",
     "testem": "~0.3.30",
@@ -22,11 +23,8 @@
     "type": "git",
     "url": "git://github.com/instructure/canvas-lms.git"
   },
-  "napa": {
-    "rjs-old": "https://github.com/jrburke/r.js/archive/1.0.8.tar.gz"
-  },
   "scripts": {
-    "install": "./node_modules/napa/bin/napa",
-    "test": "./node_modules/karma/bin/karma start --browsers Chrome,Firefox,Safari --single-run"
+    "test": "./node_modules/karma/bin/karma start --browsers Chrome,Firefox,Safari --single-run",
+    "compress": "node script/compress.js"
   }
 }

@@ -1,3 +1,5 @@
+define(['underscore','jquery'],function(_, $) {
+
 //     Backbone.js 1.1.0
 
 //     (c) 2010-2011 Jeremy Ashkenas, DocumentCloud Inc.
@@ -1579,3 +1581,6 @@
   };
 
 }).call(this);
+
+  return Backbone;
+}); 

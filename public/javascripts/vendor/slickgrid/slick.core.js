@@ -1,3 +1,5 @@
+define(['jquery','vendor/slickgrid/lib/jquery.event.drag-2.2'],function($) {
+
 /***
  * Contains core SlickGrid classes.
  * @module Core
@@ -456,4 +458,4 @@
   }
 })(jQuery);
 
-
+});

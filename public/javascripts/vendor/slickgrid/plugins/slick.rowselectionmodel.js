@@ -1,3 +1,5 @@
+define(['jquery','vendor/slickgrid/slick.core'],function(jQuery) {
+
 (function ($) {
   // register namespace
   $.extend(true, window, {
@@ -185,3 +187,5 @@
     });
   }
 })(jQuery);
+
+});

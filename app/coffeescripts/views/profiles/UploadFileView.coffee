@@ -21,7 +21,7 @@ define [
   'compiled/views/profiles/AvatarUploadBaseView'
   'jst/profiles/uploadFileView'
   'compiled/util/BlobFactory'
-  'use!vendor/jquery.jcrop'
+  'vendor/jquery.jcrop'
 ], (_, BaseView, template, BlobFactory) ->
 
   class UploadFileView extends BaseView

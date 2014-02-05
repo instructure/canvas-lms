@@ -28,7 +28,8 @@ define([
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
-  'jquery.templateData' /* fillTemplateData */
+  'jquery.templateData' /* fillTemplateData */,
+  'compiled/bundles/legacy/add_assignment'
 ], function(INST, I18n, $) {
 
 $(document).ready(function() {

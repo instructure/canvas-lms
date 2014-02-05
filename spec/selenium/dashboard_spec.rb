@@ -228,12 +228,13 @@ describe "dashboard" do
       get "/"
 
       course_menu = f('#courses_menu_item')
-
+      
       driver.action.move_to(course_menu).perform
-      keep_trying_until { course_menu.should include_text('My Courses') }
-      course_menu.should include_text(@course.name)
+      keep_trying_until {
+        course_menu.should include_text('My Courses')
+        course_menu.should include_text(@course.name)  
+      }
     end
-
 
     it "should display student groups in course menu" do
       group = Group.create!(:name => "group1", :context => @course)
@@ -246,8 +247,10 @@ describe "dashboard" do
       course_menu = f('#courses_menu_item')
 
       driver.action.move_to(course_menu).perform
-      keep_trying_until { course_menu.should include_text('Current Groups') }
-      course_menu.should include_text(group.name)
+      keep_trying_until {
+        course_menu.should include_text(group.name)
+        course_menu.should include_text('Current Groups')
+      }
     end
 
     it "should go to /courses when the courses nav item is clicked" do

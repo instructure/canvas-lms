@@ -60,9 +60,8 @@ module Canvas
         @paths ||= {
           :common => 'compiled/bundles/common',
           :jqueryui => 'vendor/jqueryui',
-          :use => 'vendor/use',
           :uploadify => '../flash/uploadify/jquery.uploadify-3.1.min',
-          'ic-dialog' => 'vendor/ic-dialog/dist/main.amd',
+          'ic-dialog' => 'vendor/ic-dialog/dist/main.amd'
         }.update(cache_busting ? cache_busting_paths : {}).update(plugin_paths).update(Canvas::RequireJs::PluginExtension.paths).to_json.gsub(/([,{])/, "\\1\n    ")
       end
 
@@ -93,66 +92,34 @@ module Canvas
           {
             'bower/ember/ember': {
               deps: ['jquery', 'handlebars'],
-              attach: 'Ember'
+              exports: 'Ember'
             },
             'bower/ember-data/ember-data': {
               deps: ['ember'],
-              attach: 'DS'
+              exports: 'DS'
             },
             'bower/handlebars/handlebars.runtime': {
-              attach: 'Handlebars'
+              exports: 'Handlebars'
             },
-            'vendor/backbone': {
-              deps: ['underscore', 'jquery'],
-              attach: function(_, $){
-                return Backbone;
-              }
-            },
-            // slick grid shim
-            'vendor/slickgrid/lib/jquery.event.drag-2.2': {
-              deps: ['jquery'],
-              attach: '$'
-            },
-            'vendor/slickgrid/slick.core': {
-              deps: ['jquery', 'use!vendor/slickgrid/lib/jquery.event.drag-2.2'],
-              attach: 'Slick'
-            },
-            'vendor/slickgrid/slick.grid': {
-              deps: ['use!vendor/slickgrid/slick.core'],
-              attach: 'Slick'
-            },
-            'vendor/slickgrid/slick.editors': {
-              deps: ['use!vendor/slickgrid/slick.core'],
-              attach: 'Slick'
-            },
-            'vendor/slickgrid/plugins/slick.rowselectionmodel': {
-              deps: ['use!vendor/slickgrid/slick.core'],
-              attach: 'Slick'
-            },
-
-            'uploadify' : {
-              deps: ['jquery'],
-              attach: '$'
-            },
-
             'vendor/FileAPI/FileAPI.min': {
               deps: ['jquery', 'vendor/FileAPI/config'],
-              attach: 'FileAPI'
+              exports: 'FileAPI'
             },
-
-            'vendor/bootstrap/bootstrap-dropdown' : {
+            'uploadify': {
               deps: ['jquery'],
-              attach: '$'
+              exports: '$'
             },
-
             'vendor/bootstrap-select/bootstrap-select' : {
               deps: ['jquery'],
-              attach: '$'
+              exports: '$'
             },
-
             'vendor/jquery.jcrop': {
               deps: ['jquery'],
-              attach: '$'
+              exports: '$'
+            },
+            'handlebars': {
+              deps: ['bower/handlebars/handlebars.runtime.amd'],
+              exports: 'Handlebars'
             }
           }
         JS

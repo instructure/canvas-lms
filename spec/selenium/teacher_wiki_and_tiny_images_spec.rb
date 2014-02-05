@@ -203,7 +203,9 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       add_canvas_image(f("#question_content_0_parent"), 'Course files', 'course.jpg')
 
       in_frame "question_content_0_ifr" do
-        f("#tinymce").find_elements(:css, "img").length.should == 1
+        keep_trying_until {
+          f("#tinymce").find_elements(:css, "img").length.should == 1
+        }
         check_element_attrs(f('#tinymce img'), :src => /\/files\/#{@course_attachment.id}/, :alt => 'course.jpg')
       end
 

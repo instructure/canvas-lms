@@ -1,10 +1,12 @@
 /*!
- * g.Raphael 0.5 - Charting library, based on Raphaël
+ * g.Raphael 0.51 - Charting library, based on Raphaël
  *
- * Copyright (c) 2009 Dmitry Baranovskiy (http://g.raphaeljs.com)
+ * Copyright (c) 2009-2012 Dmitry Baranovskiy (http://g.raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
-(function () {
+
+
+define(['./g.raphael'], function (Raphael) {
 
     function shrink(values, dim) {
         var k = values.length / dim,
@@ -22,7 +24,7 @@
                 sum = values[j++] * -l;
                 l += k;
             } else {
-                sum += values[j++];
+                sum += values[j++] * 1;
             }
         }
         return res;
@@ -52,9 +54,9 @@
     }
 
     function Linechart(paper, x, y, width, height, valuesx, valuesy, opts) {
-        
+
         var chartinst = this;
-        
+
         opts = opts || {};
 
         if (!paper.raphael.is(valuesx[0], "array")) {
@@ -78,6 +80,14 @@
             len = Math.max(len, valuesy[i].length);
         }
 
+ /*\
+ * linechart.shades
+ [ object ]
+ **
+ * Set containing Elements corresponding to shades plotted in the chart (if `opts.shade` was `true`).
+ **
+ **
+ \*/
         var shades = paper.set();
 
         for (i = 0, ii = valuesy.length; i < ii; i++) {
@@ -106,6 +116,14 @@
             kx = (width - gutter * 2) / ((maxx - minx) || 1),
             ky = (height - gutter * 2) / ((maxy - miny) || 1);
 
+ /*\
+ * linechart.axis
+ [ object ]
+ **
+ * Set containing Elements of the chart axis. The set is populated if `'axis'` definition string was passed to @Paper.linechart
+ **
+ **
+ \*/
         var axis = paper.set();
 
         if (opts.axis) {
@@ -116,7 +134,23 @@
             +ax[3] && axis.push(chartinst.axis(x + gutter, y + height - gutter, height - 2 * gutter, miny, maxy, opts.axisystep || Math.floor((height - 2 * gutter) / 20), 1, paper));
         }
 
+ /*\
+ * linechart.lines
+ [ object ]
+ **
+ * Set containing Elements corresponding to lines plotted in the chart.
+ **
+ **
+ \*/
         var lines = paper.set(),
+ /*\
+ * linechart.symbols
+ [ object ]
+ **
+ * Set containing Elements corresponding to symbols plotted in the chart.
+ **
+ **
+ \*/
             symbols = paper.set(),
             line;
 
@@ -182,7 +216,7 @@
                 Xs = Xs.concat(valuesx[i]);
             }
 
-            Xs.sort();
+            Xs.sort(function(a,b) { return a - b; });
             // remove duplicates
 
             var Xs2 = [],
@@ -236,8 +270,7 @@
                     var X = x + gutter + ((valuesx[i] || valuesx[0])[j] - minx) * kx,
                         nearX = x + gutter + ((valuesx[i] || valuesx[0])[j ? j - 1 : 1] - minx) * kx,
                         Y = y + height - gutter - (valuesy[i][j] - miny) * ky;
-
-                    f ? (C = {}) : cvrs.push(C = paper.circle(X, Y, Math.abs(nearX - X) / 2).attr({ stroke: "none", fill: "#000", opacity: 0 }));
+                    f ? (C = {}) : cvrs.push(C = paper.circle(X, Y, Math.abs(nearX - X) / 2).attr({ stroke: "#000", fill: "#000", opacity: 1 }));
                     C.x = X;
                     C.y = Y;
                     C.value = valuesy[i][j];
@@ -259,18 +292,59 @@
         chart.symbols = symbols;
         chart.axis = axis;
 
+ /*\
+ * linechart.hoverColumn
+ [ method ]
+ > Parameters
+ - mouseover handler (function) handler for the event
+ - mouseout handler (function) handler for the event
+ - this (object) callback is executed in a context of a cover element
+ * Conveniece method to set up hover-in and hover-out event handlers on the entire area of the chart.
+ * The handlers are passed a event object containing
+ o {
+ o x (number) x coordinate on all lines in the chart
+ o y (array) y coordinates of all lines corresponding to the x
+ o }
+ = (object) @linechart object
+ **
+ \*/
+
         chart.hoverColumn = function (fin, fout) {
             !columns && createColumns();
             columns.mouseover(fin).mouseout(fout);
             return this;
         };
 
+ /*\
+ * linechart.clickColumn
+ [ method ]
+ > Parameters
+ - click handler (function) handler for the event
+ - this (object) callback is executed in a context of a cover element
+ * Conveniece method to set up click event handler on the antire area of the chart.
+ * The handler is passed a event object containing
+ o {
+ o x (number) x coordinate on all lines in the chart
+ o y (array) y coordinates of all lines corresponding to the x
+ o }
+ = (object) @linechart object
+ **
+ \*/
         chart.clickColumn = function (f) {
             !columns && createColumns();
             columns.click(f);
             return this;
         };
 
+ /*\
+ * linechart.hrefColumn
+ [ method ]
+ > Parameters
+ - cols (object) object containing values as keys and URLs as values, e.g. {1: 'http://www.raphaeljs.com', 2: 'http://g.raphaeljs.com'}
+ * Creates click-throughs on the whole area of the chart corresponding to x values
+ = (object) @linechart object
+ **
+ \*/
         chart.hrefColumn = function (cols) {
             var hrefs = paper.raphael.is(arguments[0], "array") ? arguments[0] : arguments;
 
@@ -291,23 +365,75 @@
             return this;
         };
 
+ /*\
+ * linechart.hover
+ [ method ]
+ > Parameters
+ - mouseover handler (function) handler for the event
+ - mouseout handler (function) handler for the event
+ * Conveniece method to set up hover-in and hover-out event handlers working on the lines of the chart.
+ * Use @linechart.hoverColumn to work with the entire chart area.
+ = (object) @linechart object
+ **
+ \*/
         chart.hover = function (fin, fout) {
             !dots && createDots();
             dots.mouseover(fin).mouseout(fout);
             return this;
         };
 
+ /*\
+ * linechart.click
+ [ method ]
+ > Parameters
+ - click handler (function) handler for the event
+ - this (object) callback is executed in a context of a cover element
+ * Conveniece method to set up click event handler on the lines of the chart
+ * Use @linechart.clickColumn to work with the entire chart area.
+ = (object) @linechart object
+ **
+ \*/
         chart.click = function (f) {
             !dots && createDots();
             dots.click(f);
             return this;
         };
 
+ /*\
+ * linechart.each
+ [ method ]
+ > Parameters
+ - callback (function) function executed for every data point
+ - this (object) context of the callback function.
+ o {
+ o x (number) x coordinate of the data point
+ o y (number) y coordinate of the data point
+ o value (number) value represented by the data point
+ o }
+ * Iterates over each unique data point plotted on every line on the chart.
+ = (object) @linechart object
+ **
+ \*/
         chart.each = function (f) {
             createDots(f);
             return this;
         };
 
+ /*\
+ * linechart.eachColumn
+ [ method ]
+ > Parameters
+ - callback (function) function executed for every column
+ - this (object) context of the callback function.
+ o {
+ o x (number) x coordinate of the data point
+ o y (array) y coordinates of data points existing for the given x
+ o values (array) values represented by the data points existing for the given x
+ o }
+ * Iterates over each column area (area plotted above the chart).
+ = (object) @linechart object
+ **
+ \*/
         chart.eachColumn = function (f) {
             createColumns(f);
             return this;
@@ -315,15 +441,51 @@
 
         return chart;
     };
-    
+
     //inheritance
     var F = function() {};
     F.prototype = Raphael.g;
     Linechart.prototype = new F;
-    
-    //public
+
+ /*
+ * linechart method on paper
+ */
+/*\
+ * Paper.linechart
+ [ method ]
+ **
+ * Creates a line chart
+ **
+ > Parameters
+ **
+ - x (number) x coordinate of the chart
+ - y (number) y coordinate of the chart
+ - width (number) width of the chart (including the axis)
+ - height (number) height of the chart (including the axis)
+ - valuesx (array) values to plot on axis x
+ - valuesy (array) values to plot on axis y
+ - opts (object) options for the chart
+ o {
+ o gutter (number) distance between symbols on the chart
+ o symbol (string) (array) symbol to be plotted as nodes of the chart, if array are passed symbols are printed iteratively. Currently `'circle'` and `''` (no symbol) are the only supported options.
+ o width (number) controls the size of the plotted symbol. Also controls the thickness of the line using a formula stroke-width=width/2. This option is likely to change in the future versions of g.raphael.
+ o colors (array) colors to plot data series. Raphael default colors are used if not passed
+ o shade (boolean) whether or not to plot a shade of the chart [default: false]. Currently only a shade between the line and x axis is supported.
+ o nostroke (boolean) whether or not to plot lines [default: false]. Only practical when shade is enabled.
+ o dash (string) changes display of the line from continues to dashed or dotted (Possible values are the same as stroke-dasharray attribute, see @Element.attr).
+ o smooth (boolean) changes display of the line from point-to-point straight lines to curves (type C, see @Paper.path).
+ o axis (string) Which axes should be renedered. String of four values evaluated in order `'top right bottom left'` e.g. `'0 0 1 1'`.
+ o axisxstep (number) distance between values on axis X
+ o axisystep (number) distance between values on axis Y
+ o }
+ **
+ = (object) path element of the popup
+ > Usage
+ | r.linechart(0, 0, 99, 99, [1,2,3,4,5], [[1,2,3,4,5], [1,3,9,16,25], [100,50,25,12,6]], {smooth: true, colors: ['#F00', '#0F0', '#FF0'], symbol: 'circle'});
+ \*/
     Raphael.fn.linechart = function(x, y, width, height, valuesx, valuesy, opts) {
         return new Linechart(this, x, y, width, height, valuesx, valuesy, opts);
-    }
-    
-})();
+    };
+
+    return Raphael;
+});

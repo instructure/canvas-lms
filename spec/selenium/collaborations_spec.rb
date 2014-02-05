@@ -47,7 +47,9 @@ describe "collaborations" do
       if execute_script
         driver.execute_script 'window.confirm = function(msg) { return true; }'
       end
-      form_visible?.should == form_visible
+      keep_trying_until {
+        form_visible?.should == form_visible  
+      }
     end
   end
 
@@ -200,7 +202,9 @@ describe "collaborations" do
 
           wait_for_ajaximations
 
-          ffj('.available-users:visible li').length.should == 1
+          keep_trying_until {
+            ffj('.available-users:visible li').length.should == 1
+          }
         end
 
         it 'should select collaborators' do
@@ -212,9 +216,10 @@ describe "collaborations" do
           get "/courses/#{@course.id}/collaborations"
 
           wait_for_ajaximations
-
           fj('.available-users:visible a').click
-          ffj('.members-list li').length.should == 1
+          keep_trying_until {
+            ffj('.members-list li').length.should == 1  
+          }
         end
 
         it 'should deselect collaborators' do

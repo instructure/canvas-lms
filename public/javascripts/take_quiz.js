@@ -428,6 +428,16 @@ define([
       }
     });
 
+    $('.file-upload-question-holder').each(function(i,el) {
+      var $el = $(el);
+      var val = parseInt($el.find('input.attachment-id').val(),10);
+      if (val && val !==  0){
+        $el.find('.file-upload-box').addClass('file-upload-box-with-file');
+      }
+      var model = new File(ENV.ATTACHMENTS[val], {preflightUrl: ENV.UPLOAD_URL});
+      new FileUploadQuestionView({el: el, model: model}).render();
+    });
+
     $questions
       .delegate(":checkbox,:radio,label", 'change mouseup', function(event) {
         var $answer = $(this).parents(".answer");
@@ -628,16 +638,6 @@ define([
 
     // now that JS has been initialized, enable the next and previous buttons
     $submit_buttons.removeAttr('disabled');
-  });
-
-  $('.file-upload-question-holder').each(function(i,el) {
-    var $el = $(el);
-    var val = parseInt($el.find('input.attachment-id').val(),10);
-    if (val && val !==  0){
-      $el.find('.file-upload-box').addClass('file-upload-box-with-file');
-    }
-    var model = new File(ENV.ATTACHMENTS[val], {preflightUrl: ENV.UPLOAD_URL});
-    new FileUploadQuestionView({el: el, model: model}).render();
   });
 
   showDeauthorizedDialog = function() {

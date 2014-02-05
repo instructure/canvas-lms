@@ -11,7 +11,7 @@
     baseUrl: '<%= js_base_url %>',
     paths: <%= raw Canvas::RequireJs.paths(true) %>,
     packages : <%= raw Canvas::RequireJs.packages %>,
-    use: <%= raw Canvas::RequireJs.shims %>
+    shim: <%= raw Canvas::RequireJs.shims %>
   };
 </script>
 
@@ -31,7 +31,7 @@
   var timeout = 10;
   var check = function() {
     attempts++;
-    var done = require.resourcesDone === true
+    var done = !window.requirejs.s.contexts._.defQueue.length
     var giveup = attempts === 100; // 1 second
     if (done || giveup) {
       var className = document.documentElement.className;

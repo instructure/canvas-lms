@@ -1,7 +1,7 @@
 ({
 
   // file optimizations
-  optimize: "uglify",
+  optimize: "none",
 
   // continue to let Jammit do its thing
   optimizeCss: "none",
@@ -22,7 +22,7 @@
   packages: <%= packages %>,
 
   // non-amd shims
-  use: <%= shims %>,
+  shim: <%= shims %>,
 
   // which modules should have their dependencies concatenated into them
   modules: [
@@ -36,7 +36,6 @@
       // this is the intersection of common and tinymce, we need to script this
       // config file...
       exclude: [
-        'order',
         'i18n',
         'str/escapeRegex',
         'vendor/date',
