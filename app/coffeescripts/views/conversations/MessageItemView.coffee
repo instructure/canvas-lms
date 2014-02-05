@@ -3,6 +3,7 @@ define [
   'underscore'
   'Backbone'
   'jst/conversations/messageItem'
+  'jst/_avatar' # needed by messageItem template
 ], (I18n, _, {View}, template) ->
 
   class MessageItemView extends View

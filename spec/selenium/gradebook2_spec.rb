@@ -154,7 +154,7 @@ describe "gradebook2" do
       wait_for_ajaximations
 
       ff('.student-name').length.should == @all_students.size
-      ff('.avatar img').length.should == @all_students.size
+      ff('.avatar').length.should == @all_students.size
     end
 
 

@@ -1105,10 +1105,15 @@ describe User do
         "https://#{HostUrl.default_host}/images/messages/avatar-50.png"
       User.avatar_fallback_url("/somepath").should ==
         "https://#{HostUrl.default_host}/somepath"
+      HostUrl.expects(:default_host).returns('somedomain:3000')
+      User.avatar_fallback_url("/path").should ==
+        "https://somedomain:3000/path"
       User.avatar_fallback_url("//somedomain/path").should ==
         "https://somedomain/path"
       User.avatar_fallback_url("http://somedomain/path").should ==
         "http://somedomain/path"
+      User.avatar_fallback_url("http://somedomain:3000/path").should ==
+        "http://somedomain:3000/path"
       User.avatar_fallback_url(nil, OpenObject.new(:host => "foo", :protocol => "http://")).should ==
         "http://foo/images/messages/avatar-50.png"
       User.avatar_fallback_url("/somepath", OpenObject.new(:host => "bar", :protocol => "https://")).should ==

@@ -292,20 +292,18 @@ $page-dark: #ebeff2;
     font-size: 14px;
   }
 
-  .avatar-circle {
-    border: 1px solid $border-light;
-    border-radius: 25px;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    float: left;
-    height: 25px;
-    margin: 5px 8px 0 -4px;
-    width: 25px;
-  }
-
   .outcome-student-cell-content {
     padding-left: 8px;
     margin-top: 1px;
+    .avatar {
+      width: 25px;
+      height: 25px;
+      margin-top: 3px;
+      margin-right: 4px;
+      float: left;
+      position: relative;
+      z-index: 1;
+    }
   }
 }
 

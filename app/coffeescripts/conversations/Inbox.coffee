@@ -27,6 +27,7 @@ define [
   'compiled/util/contextList'
   'compiled/widget/ContextSearch'
   'compiled/str/TextHelper'
+  'jst/_avatar'
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
@@ -39,7 +40,7 @@ define [
   'vendor/jquery.ba-hashchange'
   'vendor/jquery.elastic'
   'jqueryui/position'
-], (I18n, _, h, introSlideshow, ConversationsPane, MessageFormPane, audienceList, contextList, TokenInput, TextHelper) ->
+], (I18n, _, h, introSlideshow, ConversationsPane, MessageFormPane, audienceList, contextList, TokenInput, TextHelper, avatarPartial) ->
 
   class
     constructor: (@options) ->
@@ -161,6 +162,13 @@ define [
       @toggleMessageActions(off)
       @buildMessage(message).prependTo(@$messageList).slideDown 'fast'
 
+    UNKNOWN_USER_NAMES: [I18n.t('unknown_user', 'Unknown user'), h(I18n.t('unknown_user', 'Unknown user'))]
+    # Returns [userName, htmlName]
+    userNames: (user) ->
+      return @UNKNOWN_USER_NAMES unless user
+      user.htmlName ?= @htmlNameForUser(user)
+      [user.name, user.htmlName]
+
     buildMessage: (data) ->
       return @buildSubmission(data) if data.submission
       $message = $("#message_blank").clone(true).attr('id', 'message_' + data.id)
@@ -174,11 +182,9 @@ define [
       )
       $message.addClass('forwardable')
       user = @userCache[data.author_id]
-      if avatar = user?.avatar_url
-        $message.prepend $('<img />').attr('src', avatar).addClass('avatar')
-      user.htmlName ?= @htmlNameForUser(user) if user
-      userName = user?.name ? I18n.t('unknown_user', 'Unknown user')
-      $message.find('.audience').html user?.htmlName || h(userName)
+      [userName, htmlName] = @userNames user
+      $message.prepend avatarPartial avatar_url: user.avatar_url, display_name: userName if user
+      $message.find('.audience').html htmlName
       $message.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
       $message.find('p').html TextHelper.formatMessage(data.body)
       $message.find("a.show_quoted_text_link").click (e) =>
@@ -251,15 +257,14 @@ define [
       href = $.replaceTags($header.find('a').attr('href'), course_id: data.assignment.course_id, assignment_id: data.assignment_id, id: data.user_id)
       $header.find('a').attr('href', href)
       user = @userCache[data.user_id]
-      user.htmlName ?= @htmlNameForUser(user) if user
-      userName = user?.name ? I18n.t('unknown_user', 'Unknown user')
+      [userName, htmlName] = @userNames user
       $header.find('.title').html h(data.assignment.name)
       $header.find('span.date').text(if data.submitted_at
         $.parseFromISO(data.submitted_at).datetime_formatted
       else
         I18n.t('not_applicable', 'N/A')
       )
-      $header.find('.audience').html user?.htmlName || h(userName)
+      $header.find('.audience').html htmlName
       if data.score && data.assignment.points_possible
         score = "#{data.score} / #{data.assignment.points_possible}"
       else
@@ -303,11 +308,9 @@ define [
     buildSubmissionComment: (blank, data) ->
       $comment = blank.clone(true)
       user = @userCache[data.author_id]
-      if avatar = user?.avatar_url
-        $comment.prepend $('<img />').attr('src', avatar).addClass('avatar')
-      user.htmlName ?= @htmlNameForUser(user) if user
-      userName = user?.name ? I18n.t('unknown_user', 'Unknown user')
-      $comment.find('.audience').html user?.htmlName || h(userName)
+      [userName, htmlName] = @userNames user
+      $comment.prepend avatarPartial avatar_url: user.avatar_url, display_name: userName if user
+      $comment.find('.audience').html htmlName
       $comment.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
       $comment.find('p').html h(data.comment).replace(/\n/g, '<br />')
       $comment
@@ -592,6 +595,7 @@ define [
             synthetic_contexts: 1
             types: ['course', 'user', 'group']
             include_inactive: true
+            blank_avatar_fallback: false
       filterInput = $('#context_tags').data('token_input')
       filterInput.change = (tokenValues) =>
         filters = for pair in filterInput.tokenPairs()

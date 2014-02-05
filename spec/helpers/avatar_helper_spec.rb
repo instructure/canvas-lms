@@ -22,46 +22,90 @@ describe AvatarHelper do
   include AvatarHelper
 
   context "avatars" do
-    before do
-      @services = {}
-    end
-
-    def avatar_size; 50; end
+    let(:user) {user_model(short_name: "test user")}
+    let(:services) {{avatars: true}}
+    let(:avatar_size) {50}
 
     def service_enabled?(type)
-      @services[type]
+      services[type]
+    end
+
+    describe ".avatar_image_attrs" do
+      it "accepts a user id" do
+        self.expects(:avatar_url_for_user).with(user).returns("test_url")
+        avatar_image_attrs(user.id).should == ["test_url", user.short_name]
+      end
+
+      it "accepts a user" do
+        self.expects(:avatar_url_for_user).with(user).returns("test_url")
+        avatar_image_attrs(user).should == ["test_url", user.short_name]
+      end
+
+      it "falls back to blank avatar when given a user id of 0" do
+        avatar_image_attrs(0).should == ["/images/messages/avatar-50.png", '']
+      end
+
+      it "falls back to blank avatar when user's avatar has been reported during this session" do
+        self.expects(:session).returns({"reported_#{user.id}" => true})
+        avatar_image_attrs(user).should == ["/images/messages/avatar-50.png", '']
+      end
+    end
+
+    describe ".avatar" do
+      let(:user) {user_model}
+
+      it "leaves off the href if url is nil" do
+        avatar(user, url: nil).should_not match(/href/)
+      end
+
+      it "sets the href to the given url" do
+        avatar(user, url: "/test_url").should match(/href="\/test_url"/)
+      end
+
+      it "links to the context user's page when given a context_code" do
+        self.expects(:context_prefix).with('course_1').returns('/courses/1')
+        avatar(user, context_code: "course_1").should match("href=\"/courses/1/users/#{user.id}\"")
+      end
+
+      it "links to the user's page" do
+        avatar(user).should match("/users/#{user.id}")
+      end
+    end
+
+    context "with avatar service off" do
+      let(:services) {{avatars: false}}
+
+      it "should return full URIs for users" do
+        avatar_url_for_user(user).should match(%r{\Ahttps?://})
+        avatar_url_for_user(user, true).should match(%r{\Ahttps?://})
+      end
     end
 
     it "should return full URIs for users" do
-      user = user()
-      avatar_url_for_user(user).should match(%r{\Ahttps?://})
-      avatar_url_for_user(user, true).should match(%r{\Ahttps?://})
+      user
+      avatar_url_for_user(@user).should match(%r{\Ahttps?://})
+      avatar_url_for_user(@user, true).should match(%r{\Ahttps?://})
 
-      @services[:avatars] = true
+      @user.avatar_image_source = 'no_pic'
+      @user.save!
       # reload to clear instance vars
-      user = User.find(user.id)
-      avatar_url_for_user(user).should match(%r{\Ahttps?://})
-      avatar_url_for_user(user, true).should match(%r{\Ahttps?://})
+      @user = User.find(@user.id)
+      avatar_url_for_user(@user).should match(%r{\Ahttps?://})
+      avatar_url_for_user(@user, true).should match(%r{\Ahttps?://})
 
-      user.avatar_image_source = 'no_pic'
-      user.save!
-      user = User.find(user.id)
-      avatar_url_for_user(user).should match(%r{\Ahttps?://})
-      avatar_url_for_user(user, true).should match(%r{\Ahttps?://})
+      @user.avatar_state = 'approved'
 
-      user.avatar_state = 'approved'
+      @user.avatar_image_source = 'attachment'
+      @user.avatar_image_url = "/relative/canvas/path"
+      @user.save!
+      @user = User.find(@user.id)
+      avatar_url_for_user(@user).should == "http://test.host/relative/canvas/path"
 
-      user.avatar_image_source = 'attachment'
-      user.avatar_image_url = "/relative/canvas/path"
-      user.save!
-      user = User.find(user.id)
-      avatar_url_for_user(user).should == "http://test.host/relative/canvas/path"
-
-      user.avatar_image_source = 'external'
-      user.avatar_image_url = "http://www.example.com/path"
-      user.save!
-      user = User.find(user.id)
-      avatar_url_for_user(user).should == "http://www.example.com/path"
+      @user.avatar_image_source = 'external'
+      @user.avatar_image_url = "http://www.example.com/path"
+      @user.save!
+      @user = User.find(@user.id)
+      avatar_url_for_user(@user).should == "http://www.example.com/path"
     end
 
     it "should return full URIs for groups" do

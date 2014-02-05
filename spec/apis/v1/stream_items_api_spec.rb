@@ -302,7 +302,7 @@ describe UsersController, type: :request do
           'id' => @teacher.id,
           'display_name' => 'teacher',
           'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-          'avatar_image_url' => 'http://www.example.com/images/messages/avatar-50.png'
+          'avatar_image_url' => User.avatar_fallback_url
         },
         'author_name' => 'teacher',
         'author_id' => @teacher.id,
@@ -316,7 +316,7 @@ describe UsersController, type: :request do
           'id' => @user.id,
           'display_name' => 'User',
           'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
-          'avatar_image_url' => 'http://www.example.com/images/messages/avatar-50.png'
+          'avatar_image_url' => User.avatar_fallback_url
         },
         'author_name' => 'User',
         'author_id' => @user.id,
@@ -402,7 +402,7 @@ describe UsersController, type: :request do
           'id' => @teacher.id,
           'display_name' => 'teacher',
           'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-          'avatar_image_url' => 'http://www.example.com/images/messages/avatar-50.png'
+          'avatar_image_url' => User.avatar_fallback_url
         },
         'author_name' => 'teacher',
         'author_id' => @teacher.id,
@@ -416,7 +416,7 @@ describe UsersController, type: :request do
           'id' => @user.id,
           'display_name' => 'User',
           'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
-          'avatar_image_url' => 'http://www.example.com/images/messages/avatar-50.png'
+          'avatar_image_url' => User.avatar_fallback_url
         },
         'author_name' => 'User',
         'author_id' => @user.id,

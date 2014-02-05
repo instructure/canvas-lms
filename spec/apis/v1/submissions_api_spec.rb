@@ -405,7 +405,7 @@ describe 'Submissions API', type: :request do
       "id" => @student.id,
       "display_name" => "User",
       "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}",
-      "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png"
+      "avatar_image_url" => User.avatar_fallback_url
     }
   end
 
@@ -502,7 +502,7 @@ describe 'Submissions API', type: :request do
               "id" => @teacher.id,
               "display_name" => "User",
               "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png"
+              "avatar_image_url" => User.avatar_fallback_url
            },
            "author_name"=>"User",
            "id" => comment.id,
@@ -763,7 +763,7 @@ describe 'Submissions API', type: :request do
              "id" => @teacher.id,
              "display_name" => "User",
              "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-             "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png"
+             "avatar_image_url" => User.avatar_fallback_url
            },
            "author_name"=>"User",
            "id"=>comment.id,

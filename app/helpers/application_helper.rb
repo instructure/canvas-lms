@@ -65,7 +65,8 @@ module ApplicationHelper
     end
   end
 
-  def avatar_image(user_or_id, width=50, opts = {})
+  # don't use this anymore. circular avatars are the new hotness
+  def square_avatar_image(user_or_id, width=50, opts = {})
     user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
     user = user_or_id.is_a?(User) && user_or_id
     if session["reported_#{user_id}"]
@@ -91,10 +92,10 @@ module ApplicationHelper
     end
   end
 
-  def avatar(user_or_id, context_code, width=50, opts = {})
+  def square_avatar(user_or_id, context_code, width=50, opts = {})
     user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
     if service_enabled?(:avatars)
-      link_to(avatar_image(user_or_id, width, opts), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;', :class => 'avatar img-circle')
+      link_to(square_avatar_image(user_or_id, width, opts), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;', :class => 'avatar')
     end
   end
 

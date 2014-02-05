@@ -36,7 +36,7 @@
 <% if @topic.draft_state_enabled? && (@unlock_at && @unlock_at > Time.now) &&
      !can_do(@context, @current_user, :moderate_forum) %>
   <div class="topic">
-    <div class="entry_content">
+    <div class="entry-content">
      <h1><%= @topic.title %></h1>
 
      <div class="alert alert-info">
@@ -138,12 +138,12 @@
 
   <div id="discussion_container">
     <article id="discussion_topic" class="admin-link-hover-area topic discussion_entry <%= @topic.class.to_s.underscore %> <%= 'has_podcast' if @topic.podcast_enabled %> <%= 'has_unread_entries' if @topic.unread_count(@current_user) > 0 %> can_be_marked_as_read <%= @topic.read_state(@current_user) %>" data-mark-read-url="<%= context_url(@topic.context, :api_v1_context_discussion_topic_mark_read_url, @topic) %>">
-      <div class="entry_content">
+      <div class="entry-content">
         <% if @topic.for_assignment? %>
           <%= render :partial => 'assignment_details' %>
         <% end %>
         <header class="discussion-section clearfix">
-          <%= avatar((@topic.user), @context.asset_string, 50, image_class: 'img-circle') %>
+          <%= avatar((@topic.user), context_code: @context.asset_string) %>
           <div class="discussion-header-content right-of-avatar">
             <div class="pull-left">
               <h1 class="discussion-title"><%= @topic.title %></h1>

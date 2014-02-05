@@ -204,7 +204,7 @@ define [
         @model.set 'deleted', true
         @model.destroy()
         html = deletedEntriesTemplate @toJSON()
-        @$('.entry_content:first').html html
+        @$('.entry-content:first').html html
 
     edit: ->
       return unless @model.canModerate()

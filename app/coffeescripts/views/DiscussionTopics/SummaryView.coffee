@@ -3,7 +3,7 @@ define [
   'Backbone'
   'underscore'
   'jst/DiscussionTopics/SummaryView'
-  'jst/_api_avatar'
+  'jst/_avatar'
 ], (I18n, Backbone, _, template) ->
 
   class DiscussionTopicSummaryView extends Backbone.View

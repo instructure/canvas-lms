@@ -558,7 +558,7 @@ describe "discussions" do
 
       it "should validate a group assignment discussion" do
         get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}"
-        f('.entry_content').should include_text('This is a graded discussion')
+        f('.entry-content').should include_text('This is a graded discussion')
       end
 
       context "teacher topic" do
@@ -762,7 +762,7 @@ describe "discussions" do
           f('.new-and-total-badge .new-items').text.should == reply_count.to_s
 
           #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
-          driver.execute_script("$('.entry_content').last().get(0).scrollIntoView()")
+          driver.execute_script("$('.entry-content').last().get(0).scrollIntoView()")
           keep_trying_until { ff('.discussion_entry.unread').should be_empty }
           ff('.discussion_entry.read').length.should == reply_count + 1 # +1 because the topic also has the .discussion_entry class
 
@@ -782,7 +782,7 @@ describe "discussions" do
           ff(".discussion_entry.unread").size.should == 2
           f('.new-and-total-badge .new-items').text.should == '2'
 
-          driver.execute_script("$('.entry_content').last().get(0).scrollIntoView()")
+          driver.execute_script("$('.entry-content').last().get(0).scrollIntoView()")
           keep_trying_until { ff('.discussion_entry.unread').size < 2 }
           wait_for_ajaximations
           ff(".discussion_entry.unread").size.should == 1

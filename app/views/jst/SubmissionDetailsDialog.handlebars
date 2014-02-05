@@ -37,7 +37,7 @@
           {{#each submission_comments}}
             <article class="comment clearfix">
               {{friendlyDatetime created_at pubdate=true}}
-              <img class="photo" src="{{image_url}}" />
+              {{>avatar author}}
               <div class="middle">
                 <address class="vcard">
                   <a class="fn url" href="{{url}}">{{author_name}}</a>

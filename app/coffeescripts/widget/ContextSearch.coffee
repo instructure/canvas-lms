@@ -23,7 +23,8 @@ define [
   'compiled/util/contextList'
   'compiled/widget/TokenInput'
   'str/htmlEscape'
-], (I18n, $, _, contextList, TokenInput, h) ->
+  'jst/_avatar'
+], (I18n, $, _, contextList, TokenInput, h, avatarTemplate) ->
 
   class ContextSearch extends TokenInput
 
@@ -53,7 +54,11 @@ define [
       data.type ?= 'user'
 
       if data.avatar_url
-        $node.append($('<img />', alt: '', class: 'avatar', src: data.avatar_url))
+        if data.type == 'user'
+          $node.append avatarTemplate data
+        else
+          $node.append $('<div class="avatar-box" />')
+
       $b = $('<b />')
       $b.text(data.name)
       $description = $('<span />', id: "#{data.type}-#{data.id}-description")

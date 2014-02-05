@@ -373,8 +373,8 @@ class User < ActiveRecord::Base
     # enrollments are always on the course's shard
     # and courses are always on the root account's shard
     account.shard.activate do
-      Enrollment.where(user_id: self).active.joins(:course).where("courses.account_id=? OR courses.root_account_id=?",account,account) 
-    end 
+      Enrollment.where(user_id: self).active.joins(:course).where("courses.account_id=? OR courses.root_account_id=?",account,account)
+    end
   end
 
   def self.add_to_account_chain_cache(account_id, account_chain_cache)
@@ -1308,9 +1308,8 @@ class User < ActiveRecord::Base
         uri.host = request.host
         uri.port = request.port if ![80, 443].include?(request.port)
       elsif !uri.host
-        host, port =  HostUrl.default_host.split(":")
-        uri.host = host
-        uri.port = port.to_i if port
+        uri.host, port = HostUrl.default_host.split(/:/)
+        uri.port = Integer(port) if port
       end
       uri.to_s
     else

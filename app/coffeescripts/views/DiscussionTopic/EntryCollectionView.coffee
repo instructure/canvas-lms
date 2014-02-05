@@ -68,7 +68,7 @@ define [
       @nestEntries()
 
     nestEntries: ->
-      $('.entry_content[data-should-position]').each ->
+      $('.entry-content[data-should-position]').each ->
         $el    = $(this)
         offset = ($el.parents('li.entry').length - 1) * 30
         $el.css('padding-left', offset).removeAttr('data-should-position')
