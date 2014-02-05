@@ -39,7 +39,7 @@ class QuizRegrader::Submission
 
   def submitted_answers
     @submitted_answers ||= submission.submission_data.select do |answer|
-      question_regrades[answer[:question_id]].present?
+      question_regrades[answer[:question_id]]
     end
   end
 
