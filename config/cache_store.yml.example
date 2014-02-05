@@ -1,3 +1,5 @@
+# Configure the cache_store by environment. Should be a hash at top level, one
+# key per environment, with configuration hashes as values.
 test:
   cache_store: redis_store
 development:
