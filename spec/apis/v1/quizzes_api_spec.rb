@@ -351,6 +351,39 @@ describe QuizzesApiController, type: :request do
       updated_quiz.title.should == 'title'
     end
 
+    context 'lockdown_browser' do
+      before do
+        # require_lockdown_browser, require_lockdown_browser_for_results and
+        # require_lockdown_browser_monitor will only return true if the plugin is enabled,
+        # so register and enable it for these test
+        Canvas::Plugin.register(:example_spec_lockdown_browser, :lockdown_browser, {
+                :settings => {:enabled => false}})
+        setting = PluginSetting.find_or_create_by_name('example_spec_lockdown_browser')
+        setting.settings = {:enabled => true}
+        setting.save!
+      end
+
+      it 'should allow setting require_lockdown_browser' do
+        api_update_quiz({'require_lockdown_browser' => false}, {'require_lockdown_browser' => true})
+        updated_quiz.require_lockdown_browser.should be_true
+      end
+
+      it 'should allow setting require_lockdown_browser_for_results' do
+        api_update_quiz({'require_lockdown_browser_for_results' => false}, {'require_lockdown_browser_for_results' => true})
+        updated_quiz.require_lockdown_browser_for_results.should be_true
+      end
+
+      it 'should allow setting require_lockdown_browser_monitor' do
+        api_update_quiz({'require_lockdown_browser_monitor' => false}, {'require_lockdown_browser_monitor' => true})
+        updated_quiz.require_lockdown_browser_monitor.should be_true
+      end
+
+      it 'should allow setting lockdown_browser_monitor_data' do
+        api_update_quiz({'lockdown_browser_monitor_data' => nil}, {'lockdown_browser_monitor_data' => 'VGVzdCBEYXRhCg=='})
+        updated_quiz.lockdown_browser_monitor_data.should == 'VGVzdCBEYXRhCg=='
+      end
+    end
+
     context "draft state changes" do
 
       it "allows un/publishing an unpublished quiz" do

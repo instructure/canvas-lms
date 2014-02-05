@@ -1540,7 +1540,9 @@ describe ContentMigration do
               :require_lockdown_browser_for_results => true,
               :notify_of_update => true,
               :one_question_at_a_time => true,
-              :cant_go_back => true
+              :cant_go_back => true,
+              :require_lockdown_browser_monitor => true,
+              :lockdown_browser_monitor_data => 'VGVzdCBEYXRhCg==',
       )
 
       run_course_copy
@@ -1551,7 +1553,8 @@ describe ContentMigration do
        :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
        :access_code, :anonymous_submissions,
        :hide_results, :ip_filter, :require_lockdown_browser,
-       :require_lockdown_browser_for_results].each do |prop|
+       :require_lockdown_browser_for_results, :require_lockdown_browser_monitor,
+       :lockdown_browser_monitor_data].each do |prop|
         new_quiz.send(prop).should == q.send(prop)
       end
 

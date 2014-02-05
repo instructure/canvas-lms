@@ -465,6 +465,8 @@
         <xs:element name="hide_results" type="xs:string" minOccurs="0"/>
         <xs:element name="require_lockdown_browser" type="xs:boolean" minOccurs="0"/>
         <xs:element name="require_lockdown_browser_for_results" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="require_lockdown_browser_monitor" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="lockdown_browser_monitor_data" type="xs:string" minOccurs="0"/>
         <xs:element name="access_code" type="xs:string" minOccurs="0"/>
         <xs:element name="ip_filter" type="xs:string" minOccurs="0"/>
         <xs:element name="show_correct_answers" type="xs:boolean" minOccurs="0"/>

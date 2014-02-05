@@ -38,7 +38,8 @@ class Quizzes::Quiz < ActiveRecord::Base
     :lock_at, :unlock_at, :due_at, :access_code, :anonymous_submissions, :assignment_group_id,
     :hide_results, :locked, :ip_filter, :require_lockdown_browser,
     :require_lockdown_browser_for_results, :context, :notify_of_update,
-    :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at
+    :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at,
+    :require_lockdown_browser_monitor, :lockdown_browser_monitor_data
 
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
@@ -1041,6 +1042,8 @@ class Quizzes::Quiz < ActiveRecord::Base
       quiz_type
       one_question_at_a_time
       cant_go_back
+      require_lockdown_browser_monitor
+      lockdown_browser_monitor_data
     ].each do |attr|
       attr = attr.to_sym
       item.send("#{attr}=", hash[attr]) if hash.key?(attr)
@@ -1194,7 +1197,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def self.lockdown_browser_plugin_enabled?
-    Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
+    Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| Canvas::Plugin.value_to_boolean(p.settings[:enabled]) }
+  end
+  
+  def lockdown_browser_use_lti_tool?
+    Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| Canvas::Plugin.value_to_boolean(p.settings[:use_lti_tool]) }
   end
 
   def require_lockdown_browser
@@ -1208,6 +1215,16 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   alias :require_lockdown_browser_for_results? :require_lockdown_browser_for_results
+  
+  def require_lockdown_browser_monitor
+    self[:require_lockdown_browser_monitor] && Quizzes::Quiz.lockdown_browser_plugin_enabled?
+  end
+  
+  alias :require_lockdown_browser_monitor? :require_lockdown_browser_monitor
+ 
+  def lockdown_browser_monitor_data
+    self[:lockdown_browser_monitor_data]
+  end
 
   def self.non_shuffled_questions
     ["true_false_question", "matching_question", "fill_in_multiple_blanks_question"]
