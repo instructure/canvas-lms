@@ -172,22 +172,27 @@ describe AssetUserAccess do
   end
 
   describe '#corrected_view_score' do
-    let(:access) { AssetUserAccess.new }
-
     it 'should deduct the participation score from the view score for a quiz' do
-      access.stubs(:view_score).returns(10)
-      access.stubs(:participate_score).returns(4)
-      access.stubs(:asset_group_code).returns('quizzes')
+      subject.view_score = 10
+      subject.participate_score = 4
+      subject.asset_group_code = 'quizzes'
 
-      access.corrected_view_score.should == 6
+      subject.corrected_view_score.should == 6
     end
 
     it 'should return the normal view score for anything but a quiz' do
-      access.stubs(:view_score).returns(10)
-      access.stubs(:participate_score).returns(4)
+      subject.view_score = 10
+      subject.participate_score = 4
 
-      access.corrected_view_score.should == 10
+      subject.corrected_view_score.should == 10
     end
 
+    it 'should not complain if there is no current score' do
+      subject.view_score = nil
+      subject.participate_score = 4
+      subject.stubs(:asset_group_code).returns('quizzes')
+
+      subject.corrected_view_score.should == -4
+    end
   end
 end

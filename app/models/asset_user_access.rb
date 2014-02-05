@@ -185,10 +185,11 @@ class AssetUserAccess < ActiveRecord::Base
   def corrected_view_score
     deductible_points = 0
 
-    if %w[ quizzes ].include?(self.asset_group_code || '')
+    if 'quizzes' == self.asset_group_code
       deductible_points = self.participate_score || 0
     end
 
+    self.view_score ||= 0
     self.view_score -= deductible_points
   end
 
