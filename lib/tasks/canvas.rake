@@ -218,6 +218,10 @@ namespace :db do
       end
       create_database(queue) if queue
       create_database(config)
+      unless CANVAS_RAILS2
+        ::ActiveRecord::Base.connection.schema_cache.clear!
+        ::ActiveRecord::Base.descendants.each(&:reset_column_information)
+      end
       Rake::Task['db:migrate'].invoke
     end
   end
