@@ -10151,6 +10151,7 @@ es:
       labels: 
         download_url: "URL de descarga del navegador LockDown Browser"
         plugin_enabled: Activado
+        use_lti_tool: "Utilizar la herramienta externa para manejar la configuración de LockDown Browser en los exámenes (Requerido para Monitor)"
     med_cornell_export: 
       labels: 
         password: "Contraseña para autenticación"

@@ -177,6 +177,18 @@
           </span>
         </div>
       </div>
+      <% if @quiz.lockdown_browser_use_lti_tool? %>
+        <div class="control-group">
+          <label class="control-label">
+            <%= t(:require_lockdown_browser_monitor, "Webcam Required") %>
+          </label>
+          <div class="controls">
+            <span class="value">
+              <%= @quiz.require_lockdown_browser_monitor ? t('#options.yes', "Yes") : t('#options.no', "No") %>
+            </span>
+          </div>
+      	</div>
+      <% end %>
     <% end %>
 
     <% if @quiz.one_question_at_a_time %>

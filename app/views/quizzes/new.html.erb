@@ -353,7 +353,7 @@
                     <%= link_to(image_tag("find.png"), '#', :class => 'ip_filtering_link', :title => t('titles.find_ip_address_filter', 'Find IP Address Filter')) %>
                   </div>
                 </div>
-                <% if feature_enabled?(:lockdown_browser) %>
+                <% if feature_enabled?(:lockdown_browser) && !@quiz.lockdown_browser_use_lti_tool? %>
                   <div class="option-group">
                     <label class="checkbox" for="quiz_require_lockdown_browser">
                       <%= check_box :quiz, :require_lockdown_browser %>
