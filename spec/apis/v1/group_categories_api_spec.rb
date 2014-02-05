@@ -129,6 +129,14 @@ describe "Group Categories API", type: :request do
           @category_unassigned_users.map(&:id).should include(user['id'])
         end
       end
+
+      it "should include custom student roles in search" do
+        teacher = @user
+        custom_student = user(name: "blah")
+        @course.enroll_user(custom_student, 'StudentEnrollment', role_name: 'CustomStudent')
+        json = api_call_as_user(teacher, :get, api_url, api_route)
+        json.map{|u|u['id']}.should be_include custom_student.id
+      end
     end
 
     describe "teacher actions with no group" do

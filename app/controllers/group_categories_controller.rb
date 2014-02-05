@@ -313,7 +313,7 @@ class GroupCategoriesController < ApplicationController
     search_term = params[:search_term].presence
 
     search_params = params.slice(:search_term)
-    search_params[:enrollment_role] = "StudentEnrollment" if @context.is_a? Course
+    search_params[:enrollment_type] = "student" if @context.is_a? Course
 
     @group_category ||= @context.group_categories.find_by_id(params[:category_id])
     exclude_groups = value_to_boolean(params[:unassigned]) ? @group_category.groups.active.pluck(:id) : []
