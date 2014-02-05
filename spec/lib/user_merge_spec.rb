@@ -278,6 +278,26 @@ describe UserMerge do
       UserMerge.from(user1).into(user2)
       oe.reload.associated_user_id.should == user2.id
     end
+
+    it "should move appointments" do
+      enrollment1 = course1.enroll_user(user1, 'StudentEnrollment', :enrollment_state => 'active')
+      enrollment2 = course1.enroll_user(user2, 'StudentEnrollment', :enrollment_state => 'active')
+      ag = AppointmentGroup.create(:title => "test",
+       :contexts => [course1],
+       :participants_per_appointment => 1,
+       :min_appointments_per_participant => 1,
+       :new_appointments => [
+         ["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"],
+         ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]
+       ]
+      )
+      res1 = ag.appointments.first.reserve_for(user1, @teacher)
+      res2 = ag.appointments.last.reserve_for(user2, @teacher)
+      UserMerge.from(user1).into(user2)
+      res1.reload
+      res1.context_id.should == user2.id
+      res1.context_code.should == user2.asset_string
+    end
   end
 
   it "should update account associations" do
