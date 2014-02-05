@@ -56,6 +56,8 @@ describe Course do
     }}.with_indifferent_access
 
     course.import_from_migration(data, migration.migration_settings[:migration_ids_to_import], migration)
+    course.reload
+
     # discussion topic tests
     course.discussion_topics.length.should eql(3)
     migration_ids = ["1864019689002", "1865116155002", "4488523052421"].sort
