@@ -1694,7 +1694,11 @@ class Assignment < ActiveRecord::Base
       tag.content_type = 'ContextExternalTool'
       if !tag.save
         context.add_migration_warning(t('errors.import.external_tool_url', "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.", :assignment_name => item.title)) if tag.errors["url"]
-        item.external_tool_tag = nil
+        if CANVAS_RAILS2
+          item.external_tool_tag = nil
+        else
+          item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
+        end
       end
     end
 
