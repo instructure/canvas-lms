@@ -206,7 +206,7 @@ module IncomingMail
       encoding ||= 'UTF-8'
       encoding = encoding.upcase
       # change encoding; if it throws an exception (i.e. unrecognized encoding), just strip invalid UTF-8
-      Iconv.conv('UTF-8//TRANSLIT//IGNORE', encoding, string) rescue TextHelper.strip_invalid_utf8(string)
+      Iconv.conv('UTF-8//TRANSLIT//IGNORE', encoding, string) rescue Utf8Cleaner.strip_invalid_utf8(string)
     end
 
 

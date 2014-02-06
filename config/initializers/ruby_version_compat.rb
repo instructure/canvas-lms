@@ -157,7 +157,7 @@ class ActiveRecord::Base
   class << self
     def strip_invalid_utf8_from_attribute(attr_name, value)
       if SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8[self.name].try(:include?, attr_name.to_s)
-        TextHelper.recursively_strip_invalid_utf8!(value, true)
+        Utf8Cleaner.recursively_strip_invalid_utf8!(value, true)
       end
       value
     end

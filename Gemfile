@@ -205,6 +205,7 @@ gem 'canvas_uuid', :path => 'gems/canvas_uuid'
 gem 'html_text_helper', :path => 'gems/html_text_helper'
 gem 'lti_outbound', :path => 'gems/lti_outbound'
 gem 'multipart', :path => 'gems/multipart'
+gem 'utf8_cleaner', :path => 'gems/utf8_cleaner'
 gem 'workflow', :path => 'gems/workflow'
 
 group :assets do
