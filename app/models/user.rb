@@ -1308,7 +1308,9 @@ class User < ActiveRecord::Base
         uri.host = request.host
         uri.port = request.port if ![80, 443].include?(request.port)
       elsif !uri.host
-        uri.host, uri.port = HostUrl.default_host.split(/:/)
+        host, port =  HostUrl.default_host.split(":")
+        uri.host = host
+        uri.port = port.to_i if port
       end
       uri.to_s
     else
