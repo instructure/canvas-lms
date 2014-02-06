@@ -2252,15 +2252,22 @@ define([
     $("#add_question_group_dialog .submit_button").click(function(event) {
       var $dialog = $("#add_question_group_dialog");
       $dialog.find("button").attr('disabled', true).filter(".submit_button").text(I18n.t('buttons.creating_group', "Creating Group..."));
+
       var params = $dialog.getFormData();
+      var newParams = {};
+      _.each(params, function(val, key) {
+        newParams[key.replace('quiz_group[', 'quiz_groups[][')] = val;
+      });
+
       var url = $dialog.find(".add_question_group_url").attr('href');
-      $.ajaxJSON(url, 'POST', params, function(data) {
+      $.ajaxJSON(url, 'POST', newParams, function(data) {
         $dialog.find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('buttons.create_group', "Create Group"));
 
         var $group_top = $("#group_top_template").clone(true).attr('id', 'group_top_new');
         var $group_bottom = $("#group_bottom_template").clone(true).attr('id', 'group_bottom_new');
         $("#questions").append($group_top.show()).append($group_bottom.show());
-        var group = data.quiz_group;
+        var groups = data.quiz_groups;
+        var group = groups[0];
         $group_top.fillTemplateData({
           data: group,
           id: 'group_top_' + group.id,
@@ -2271,7 +2278,7 @@ define([
         $group_bottom.attr('id', 'group_bottom_' + group.id);
         quiz.updateDisplayComments();
 
-        updateFindQuestionDialogQuizGroups(data.quiz_group.id);
+        updateFindQuestionDialogQuizGroups(group.id);
         $dialog.dialog('close');
       }, function(data) {
         $dialog.find("button").attr('disabled', false).filter(".submit_button").text(I18n.t('errors.creating_group_failed', "Create Group Failed, Please Try Again"));
