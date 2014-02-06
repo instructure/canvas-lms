@@ -290,6 +290,10 @@ $page-dark: #ebeff2;
 
   .outcome-student-cell.slick-cell {
     font-size: 14px;
+    line-height: 21px;
+    .student-section {
+      color: $font-color;
+    }
   }
 
   .outcome-student-cell-content {

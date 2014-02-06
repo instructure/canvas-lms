@@ -184,7 +184,14 @@ define [
       # Returns an object.
       _toRow: (rollup, section) ->
         return null unless Grid.Util.sectionFilter(section, rollup)
-        row = { student: Grid.Util.lookupStudent(rollup.links.user), section: rollup.links.section }
+        student = Grid.Util.lookupStudent(rollup.links.user)
+        section = Grid.Util.lookupSection(rollup.links.section)
+        row =
+          student: _.extend(
+            grades_html_url: "/courses/#{section.course_id}/grades/#{student.id}" # probably should get this from the enrollment api
+            section: if _.keys(Grid.sections).length > 1 then section else null
+            student)
+          section: rollup.links.section
         _.each rollup.scores, (score) ->
           row["outcome_#{score.links.outcome}"] = score.score
         row
@@ -234,11 +241,30 @@ define [
 
       # Public: Look up a student in the current student list.
       #
-      # name - The id for the student to look for.
+      # id - The id for the student to look for.
       #
-      # Returns an student or null.
+      # Returns a student or null.
       lookupStudent: (id) ->
         Grid.students[id]
+
+      # Public: Parse and store a list of section from the outcome rollups API (actually just from the gradebook's list for now)
+      #
+      # sections - An array of section objects.
+      #
+      # Returns nothing.
+      saveSections: (sections) ->
+        Grid.sections = _.reduce(sections, (result, section) ->
+          result[section.id] = section
+          result
+        , {})
+
+      # Public: Look up a section in the current section list.
+      #
+      # id - The id for the section to look for.
+      #
+      # Returns a section or null.
+      lookupSection: (id) ->
+        Grid.sections[id]
 
     Math:
       mean: (values, round = false) ->
