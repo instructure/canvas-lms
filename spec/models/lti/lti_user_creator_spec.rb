@@ -20,6 +20,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Lti::LtiUserCreator do
   describe '#convert' do
+    let(:tool) do
+      ContextExternalTool.new.tap do |tool|
+        tool.stubs(:opaque_identifier_for).returns('this is opaque')
+      end
+    end
+
     it 'converts a canvas user to an lti user' do
       canvas_user = user(name: 'Shorty McLongishname')
       canvas_user.email = 'user@email.com'
@@ -31,11 +37,11 @@ describe Lti::LtiUserCreator do
       pseudonym = pseudonym(canvas_user, account: sub_account, username: 'login_id')
 
       pseudonym.sis_user_id = 'sis id!'
-      opaque_identifier = 'this is opaque'
+      pseudonym.save!
 
       Time.zone.tzinfo.stubs(:name).returns('my/zone')
 
-      user_factory = Lti::LtiUserCreator.new(canvas_user, pseudonym, opaque_identifier)
+      user_factory = Lti::LtiUserCreator.new(canvas_user, root_account, tool)
       lti_user = user_factory.convert
 
       lti_user.class.should == LtiOutbound::LTIUser
@@ -54,7 +60,7 @@ describe Lti::LtiUserCreator do
     end
 
     context 'the user does not have a pseudonym' do
-      let(:user_creator) { Lti::LtiUserCreator.new(user, nil, 'monkey') }
+      let(:user_creator) { Lti::LtiUserCreator.new(user, nil, tool) }
 
       it 'does not have a login_id' do
         lti_user = user_creator.convert

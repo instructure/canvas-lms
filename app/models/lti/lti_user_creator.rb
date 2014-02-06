@@ -1,9 +1,9 @@
 module Lti
   class LtiUserCreator
-    def initialize(canvas_user, pseudonym, opaque_identifier)
+    def initialize(canvas_user, canvas_root_account, canvas_tool)
       @canvas_user = canvas_user
-      @pseudonym = pseudonym
-      @opaque_identifier = opaque_identifier
+      @pseudonym = canvas_user.find_pseudonym_for_account(canvas_root_account)
+      @opaque_identifier = canvas_tool.opaque_identifier_for(canvas_user)
     end
 
     def convert

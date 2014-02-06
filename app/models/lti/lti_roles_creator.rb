@@ -16,7 +16,7 @@ module Lti
 
     end
 
-    def current_enrollments
+    def current_roles
       map_enrollments_to_roles(current_course_enrollments + current_account_enrollments)
     end
 
@@ -24,7 +24,7 @@ module Lti
       current_course_enrollments.any?{|membership| membership.state_based_on_date == :active}
     end
 
-    def concluded_enrollments
+    def concluded_roles
       map_enrollments_to_roles(concluded_course_enrollments)
     end
 

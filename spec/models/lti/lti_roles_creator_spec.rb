@@ -29,7 +29,7 @@ describe Lti::LtiRolesCreator do
     it "collects current active student enrollments" do
       student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true)
 
-      enrollments = course_enrollments_creator.current_enrollments
+      enrollments = course_enrollments_creator.current_roles
 
       enrollments.should == [LtiOutbound::LTIRole::LEARNER]
     end
@@ -37,7 +37,7 @@ describe Lti::LtiRolesCreator do
     it "collects current active student view enrollments" do
       course_with_user('StudentViewEnrollment', user: canvas_user, course: canvas_course, active_enrollment: true)
 
-      enrollments = course_enrollments_creator.current_enrollments
+      enrollments = course_enrollments_creator.current_roles
 
       enrollments.should == [LtiOutbound::LTIRole::LEARNER]
     end
@@ -45,7 +45,7 @@ describe Lti::LtiRolesCreator do
     it "collects current active teacher enrollments" do
       teacher_in_course(user: canvas_user, course: canvas_course, active_enrollment: true)
 
-      enrollments = course_enrollments_creator.current_enrollments
+      enrollments = course_enrollments_creator.current_roles
 
       enrollments.should == [LtiOutbound::LTIRole::INSTRUCTOR]
     end
@@ -53,7 +53,7 @@ describe Lti::LtiRolesCreator do
     it "collects current active ta enrollments" do
       course_with_ta(user: canvas_user, course: canvas_course, active_enrollment: true)
 
-      enrollments = course_enrollments_creator.current_enrollments
+      enrollments = course_enrollments_creator.current_roles
 
       enrollments.should == [LtiOutbound::LTIRole::TEACHING_ASSISTANT]
     end
@@ -61,7 +61,7 @@ describe Lti::LtiRolesCreator do
     it "collects current active course designer enrollments" do
       course_with_designer(user: canvas_user, course: canvas_course, active_enrollment: true)
 
-      enrollments = course_enrollments_creator.current_enrollments
+      enrollments = course_enrollments_creator.current_roles
 
       enrollments.should == [LtiOutbound::LTIRole::CONTENT_DEVELOPER]
     end
@@ -69,7 +69,7 @@ describe Lti::LtiRolesCreator do
     it "collects current active account user enrollments from an account" do
       account_admin_user(user: canvas_user, account: canvas_account)
 
-      enrollments = account_enrollments_creator.current_enrollments
+      enrollments = account_enrollments_creator.current_roles
 
       enrollments.should == [LtiOutbound::LTIRole::ADMIN]
     end
@@ -77,7 +77,7 @@ describe Lti::LtiRolesCreator do
     it "collects current active account user enrollments from a course" do
       account_admin_user(user: canvas_user, account: canvas_course.root_account)
 
-      enrollments = course_enrollments_creator.current_enrollments
+      enrollments = course_enrollments_creator.current_roles
 
       enrollments.should == [LtiOutbound::LTIRole::ADMIN]
     end
@@ -87,7 +87,7 @@ describe Lti::LtiRolesCreator do
       canvas_course.account.root_account = root_account
       account_admin_user(user: canvas_user, account: root_account)
 
-      enrollments = course_enrollments_creator.current_enrollments
+      enrollments = course_enrollments_creator.current_roles
 
       enrollments.should == [LtiOutbound::LTIRole::ADMIN]
     end
@@ -98,7 +98,7 @@ describe Lti::LtiRolesCreator do
       other_course = course(active_course: true)
       teacher_in_course(user: canvas_user, course: other_course, active_enrollment: true)
 
-      enrollments = course_enrollments_creator.current_enrollments
+      enrollments = course_enrollments_creator.current_roles
       enrollments.size.should == 1
     end
 
@@ -106,7 +106,7 @@ describe Lti::LtiRolesCreator do
       student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true)
       course_with_user('StudentViewEnrollment', user: canvas_user, course: canvas_course, active_enrollment: true)
 
-      enrollments = course_enrollments_creator.current_enrollments
+      enrollments = course_enrollments_creator.current_roles
 
       enrollments.size.should == 1
     end
@@ -116,7 +116,7 @@ describe Lti::LtiRolesCreator do
       course_with_designer(user: canvas_user, course: canvas_course, active_enrollment: true)
       account_admin_user(user: canvas_user, account: canvas_course.account)
 
-      enrollments = course_enrollments_creator.current_enrollments
+      enrollments = course_enrollments_creator.current_roles
 
       enrollments.size.should == 3
     end
@@ -124,7 +124,7 @@ describe Lti::LtiRolesCreator do
     it "does not return any course enrollments when the context is an account" do
       canvas_account.stubs(:id).returns(canvas_course.id)
       student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true)
-      account_enrollments_creator.current_enrollments.size.should == 0
+      account_enrollments_creator.current_roles.size.should == 0
     end
   end
 
@@ -151,7 +151,7 @@ describe Lti::LtiRolesCreator do
       course_with_designer(user: canvas_user, course: canvas_course, active_enrollment: true)
       account_admin_user(user: canvas_user, account: canvas_course.account)
 
-      enrollments = course_enrollments_creator.concluded_enrollments
+      enrollments = course_enrollments_creator.concluded_roles
 
       enrollments.should == [LtiOutbound::LTIRole::LEARNER]
     end
@@ -159,7 +159,7 @@ describe Lti::LtiRolesCreator do
     it "does not return any course enrollments when the context is an account" do
       canvas_account.stubs(:id).returns(canvas_course.id)
       student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true).conclude
-      account_enrollments_creator.concluded_enrollments.size.should == 0
+      account_enrollments_creator.concluded_roles.size.should == 0
     end
   end
 end
