@@ -24,14 +24,21 @@ class TestLogger
 end
 
 describe "execute and update" do
+  let(:config_path) { File.expand_path("../../../../../config/cassandra.yml", __FILE__) }
+  let(:cassandra_configured?) do
+    File.exists?(config_path) &&
+        YAML.load(ERB.new(File.read(config_path)).result) &&
+        YAML.load(ERB.new(File.read(config_path)).result)['test']
+  end
   let(:db) do
     # TODO: Setting.from_config really deserves to be its own Config component that we could use here
-    config_path = File.expand_path("../../../../../config/cassandra.yml", __FILE__)
     test_config = YAML.load(ERB.new(File.read(config_path)).result)['test']['page_views']
     CanvasCassandra::Database.new("test_conn", test_config['servers'], {keyspace: test_config['keyspace'], cql_version: '3.0.0'}, TestLogger.new)
   end
 
   before do
+    pending "needs cassandra page_views configuration" unless cassandra_configured?
+
     begin
       db.execute("drop table page_views")
     rescue CassandraCQL::Error::InvalidRequestException
@@ -40,7 +47,7 @@ describe "execute and update" do
   end
 
   after do
-    db.execute("drop table page_views")
+    db.execute("drop table page_views") if cassandra_configured?
   end
 
   it "should return the result from execute" do
