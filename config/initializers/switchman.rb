@@ -17,6 +17,13 @@ unless CANVAS_RAILS2
     reset_column_information # make sure that the id column object knows it is the primary key
 
     serialize :settings, Hash
+    # the default shard was already loaded, but didn't deserialize it
+    if default.is_a?(self)
+      settings = ActiveRecord::AttributeMethods::Serialization::Attribute.new(serialized_attributes['settings'],
+                                                                   default.read_attribute('settings'),
+                                                                   :serialized).unserialize
+      default.settings = settings
+    end
 
     before_save :encrypt_settings
 
