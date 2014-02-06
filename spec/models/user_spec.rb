@@ -1269,7 +1269,7 @@ describe User do
       (1..3).each do |x|
         course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
         @courses << course
-        @user.favorites.build(context: course)
+        @user.favorites.create!(context: course)
       end
 
       @user.save!
@@ -1293,7 +1293,7 @@ describe User do
         (4..6).each do |x|
           course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
           @courses << course
-          @user.favorites.build(context: course)
+          @user.favorites.create!(context: course)
         end
 
         @user.save!
