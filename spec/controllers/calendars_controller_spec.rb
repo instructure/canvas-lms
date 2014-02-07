@@ -224,7 +224,7 @@ describe CalendarEventsApiController do
     end
 
     it "should assign variables" do
-      get 'public_feed', :feed_code => "course_#{@course.uuid}"
+      get 'public_feed', :feed_code => "course_#{@course.uuid}", :format => 'ics'
       response.should be_success
       assigns[:events].should be_present
       assigns[:events][0].should eql(@event)
@@ -234,7 +234,7 @@ describe CalendarEventsApiController do
       s2 = @course.course_sections.create!(:name => 's2')
       c1 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => @course.default_section, :start_at => 2.hours.ago, :end_at => 1.hour.ago)
       c2 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => s2, :start_at => 3.hours.ago, :end_at => 2.hours.ago)
-      get 'public_feed', :feed_code => "user_#{@user.uuid}"
+      get 'public_feed', :feed_code => "user_#{@user.uuid}", :format => 'ics'
       response.should be_success
       assigns[:events].should be_present
       assigns[:events].should == [c1]
@@ -245,7 +245,7 @@ describe CalendarEventsApiController do
       s2 = @course.course_sections.create!(:name => 's2')
       c1 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => @course.default_section, :start_at => 2.hours.ago, :end_at => 1.hour.ago)
       c2 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => s2, :start_at => 3.hours.ago, :end_at => 2.hours.ago)
-      get 'public_feed', :feed_code => "course_#{@course.uuid}"
+      get 'public_feed', :feed_code => "course_#{@course.uuid}", :format => 'ics'
       response.should be_success
       assigns[:events].should be_present
       assigns[:events].should == [c1]
