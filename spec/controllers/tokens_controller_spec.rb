@@ -44,7 +44,7 @@ describe TokensController do
       session[:become_user_id] = user_with_pseudonym.id
 
       post 'create', :access_token => {:purpose => "test", :expires_at => "jun 1 2011"}
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
     end
 
     it "should not allow explicitly setting the token value" do
@@ -85,11 +85,11 @@ describe TokensController do
       session[:become_user_id] = user_with_pseudonym.id
 
       delete 'destroy', :id => token.id
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
     end
 
     it "should not allow deleting someone else's access token" do
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       user(:active_user => true)
       user_session(@user)
       user2 = User.create!
@@ -131,7 +131,7 @@ describe TokensController do
     end
     
     it "should not allow retrieving someone else's access token" do
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       user(:active_user => true)
       user_session(@user)
       user2 = User.create!
@@ -182,7 +182,7 @@ describe TokensController do
       Account.site_admin.add_user(@user)
       session[:become_user_id] = user_with_pseudonym.id
       put 'update', :id => token.id, :access_token => {:regenerate => '1'}
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
     end
 
     it "should not allow regenerating a protected token" do
@@ -200,7 +200,7 @@ describe TokensController do
     end
     
     it "should not allow updating someone else's token" do
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       user(:active_user => true)
       user_session(@user)
       user2 = User.create!
