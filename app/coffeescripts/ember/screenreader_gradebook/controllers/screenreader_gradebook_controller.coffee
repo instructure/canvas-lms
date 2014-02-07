@@ -73,6 +73,10 @@ define [
       ENV.GRADEBOOK_OPTIONS.show_total_grade_as_points
     ).property()
 
+    changeGradebookVersionUrl: (->
+      "#{get(window, 'ENV.GRADEBOOK_OPTIONS.change_gradebook_version_url')}"
+    ).property()
+
     hideStudentNames: false
 
     showConcludedEnrollments: false

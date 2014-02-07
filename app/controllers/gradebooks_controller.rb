@@ -419,7 +419,11 @@ class GradebooksController < ApplicationController
   end
 
   def change_gradebook_version
-    @current_user.preferences[:use_gradebook2] = params[:version] == '2'
+    if @context.feature_enabled?(:screenreader_gradebook)
+      @current_user.preferences[:gradebook_version] = params[:version]
+    else
+      @current_user.preferences[:use_gradebook2] = params[:version] == '2'
+    end
     @current_user.save!
     redirect_to_appropriate_gradebook_version
   end

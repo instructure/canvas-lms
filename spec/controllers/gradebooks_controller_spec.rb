@@ -440,7 +440,7 @@ describe GradebooksController do
         course_with_teacher_logged_in(:active_all => true)
         @user.preferences[:use_gradebook2] = false
         @user.save!
-        @user.prefers_gradebook2?.should == false
+        @user.prefers_gradebook2?(@course).should == false
         @course.large_roster = true
         @course.save!
         @course.reload

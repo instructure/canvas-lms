@@ -235,11 +235,9 @@ routes.draw do
       end
     end
 
-    resource :gradebook2, :controller => :gradebook2 do
-      collection do
-        get :screenreader
-      end
-    end
+    resource :gradebook2, :controller => :gradebook2
+    match 'screenreader_gradebook' => 'gradebook2#screenreader'
+
     match 'attendance' => 'gradebooks#attendance', :as => :attendance
     match 'attendance/:user_id' => 'gradebooks#attendance', :as => :attendance_user
     concerns :zip_file_imports

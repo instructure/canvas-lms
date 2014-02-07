@@ -2230,7 +2230,11 @@ describe User do
 
   describe "prefers_gradebook2?" do
     let(:user) { User.new }
-    subject { user.prefers_gradebook2? }
+    subject { user.prefers_gradebook2?(@ctx) }
+    before {
+      @ctx = mock()
+      @ctx.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+    }
 
     context "by default" do
       it { should be_true }
@@ -2249,6 +2253,27 @@ describe User do
     context "with an explicit preference for gradebook 1" do
       before { user.stubs(:preferences => { :use_gradebook2 => false }) }
       it { should be_false }
+    end
+
+    context "with screenreader_gradebook enabled" do
+      before {
+        @ctx.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+      }
+
+      context "prefers gb2" do
+        before { user.stubs(:preferences => { :gradebook_version => '2' }) }
+        it {should be_true}
+      end
+
+      context "prefers srgb" do
+        before { user.stubs(:preferences => { :gradebook_version => 'srgb' }) }
+        it {should be_false}
+      end
+
+      context "nil preference" do
+        before { user.stubs(:preferences => { :gradebook_version => nil }) }
+        it {should be_true}
+      end
     end
   end
 
