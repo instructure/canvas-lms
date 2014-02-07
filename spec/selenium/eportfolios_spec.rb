@@ -82,6 +82,7 @@ describe "eportfolios" do
     end
 
     it "should have a working flickr search dialog" do
+      pending("karma upgrade")
       get "/eportfolios/#{@eportfolio.id}"
       edit_link = keep_trying_until do
         f("#page_list a.page_url").click
