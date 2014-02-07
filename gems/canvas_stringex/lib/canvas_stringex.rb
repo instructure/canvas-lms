@@ -1,4 +1,4 @@
-if CANVAS_RAILS2
+if !CANVAS_RAILS3
   require 'fake_arel'
 end
 

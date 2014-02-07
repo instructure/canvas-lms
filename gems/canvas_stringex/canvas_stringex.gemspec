@@ -2,6 +2,8 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
+CANVAS_RAILS3 = !!ENV['CANVAS_RAILS3'] || File.exist?(File.expand_path("../../RAILS3", __FILE__))
+
 Gem::Specification.new do |spec|
   spec.name          = "canvas_stringex"
   spec.version       = '0.0.1'
@@ -14,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  unless defined?(CANVAS_RAILS2) && !CANVAS_RAILS2
+  if !CANVAS_RAILS3
     spec.add_dependency 'fake_arel', '1.4.0'
   end
 

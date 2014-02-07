@@ -4,6 +4,11 @@ require "test/unit"
 
 require 'canvas_stringex'
 
+if RUBY_VERSION >= '2.0.0'
+  require 'syck'
+end
+YAML::ENGINE.yamler = 'syck' if defined?(YAML::ENGINE)
+
 class UnidecoderTest < Test::Unit::TestCase
   # Silly phrases courtesy of Frank da Cruz
   # http://www.columbia.edu/kermit/utf8.html
