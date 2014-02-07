@@ -1,13 +1,14 @@
-<h1>Screenreader Gradebook</h1>
-
-<!-- global -->
-<!-- -------- -->
-
-<h2>Global Settings</h2>
-
-<!-- filter by section -->
-<div>
-  <label for="section_select">Select a section</label>
+<h1>{{#t 'screenreader_gradebook'}}Screenreader Gradebook{{/t}}</h1>
+<em>
+  {{#t 'save_instructions'}}Note: Grades and notes will be saved automatically after moving out of the field.{{/t}}
+</em>
+<h2>{{#t 'global_settings'}}Global Settings{{/t}}</h2>
+<div class="form-horizontal">
+<div class="control-group">
+  <label for="section_select" class="control-label">
+    {{#t 'select_a_section'}}Select a section{{/t}}
+  </label>
+  <div class="controls">
   {{
     fast-select
     id="section_select"
@@ -18,50 +19,14 @@
     labelDefault=sectionSelectDefaultLabel
     selected=selectedSection
   }}
+  </div>
 </div>
 
-<!-- filter by name or secondary id -->
-
-<!-- don't think this makes sense for this interface -->
-
-<!-- grading history -->
-
-<a href="{{ unbound gradingHistoryUrl }}">View Grading History</a>
-
-<!-- download scores -->
-
-<a href="{{ unbound downloadUrl }}">Download Scores (.csv)</a>
-
-<!-- upload scores -->
-
-<button id="upload" {{ action 'openDialog' 'upload' target=view }}>Upload Scores (.csv)</button>
-
-<!-- set group weights -->
-
-<button id="ag_weights" {{ action 'openDialog' 'ag_weights' target=view }} {{ bind-attr disabled=assignment_groups.isLoading }}>Set Group Weights</button>
-
-<!-- show/hide student names -->
-
-<div>
-  <label>
-  {{
-    input
-    type="checkbox"
-    id="hide_names_checkbox"
-    name="hide_names_checkbox"
-    checked=hideStudentNames
-  }}
-  {{#t "hide_student_names_label"}}Hide Student Names{{/t}}
+<div class="control-group">
+  <label for="arrange_assignments" class="control-label">
+    {{#t 'sort_assignments'}}Sort assignments{{/t}}
   </label>
-</div>
-
-
-<!-- not sure this makes sense in this interface -->
-
-<!-- arrange columns by due date -->
-
-<fieldset>
-  <label for="arrange_assignments">Arrange assignments</label>
+  <div class="controls">
   {{
     fast-select
     name="arrange_assignments"
@@ -69,60 +34,96 @@
     items=assignmentSortOptions
     selected=assignmentSort
   }}
-
-</fieldset>
-
-<!-- treat ungraded as 0 -->
-
-<div>
-  <label for="ungraded">
-  {{
-    input
-    type="checkbox"
-    id="ungraded"
-    name="ungraded"
-    checked=includeUngradedAssignments
-  }}
-  {{#t "include_ungraded_assignments"}}Treat Ungraded as 0{{/t}}
-  </label>
+  </div>
 </div>
 
-<!-- show concluded enrollments -->
-
-<div>
-  <label>
-  {{
-    input
-    type="checkbox"
-    id="concluded_enrollments"
-    name="concluded_enrollments"
-    checked=showConcludedEnrollments
-    disabled=enrollments.isLoading
-  }}
-  {{#t 'show_concluded_enrollments_label'}}Show Concluded Enrollments{{/t}}
-  </label>
+<div class="control-group">
+  <div class="controls">
+    <label class="checkbox">
+    {{
+      input
+      type="checkbox"
+      id="ungraded"
+      name="ungraded"
+      checked=includeUngradedAssignments
+    }}
+    {{#t "include_ungraded_assignments"}}Treat Ungraded as 0{{/t}}
+    </label>
+    <label class="checkbox">
+      {{
+        input
+        type="checkbox"
+        id="hide_names_checkbox"
+        name="hide_names_checkbox"
+        checked=hideStudentNames
+      }}
+      {{#t "hide_student_names_label"}}Hide Student Names{{/t}}
+    </label>
+    <label class="checkbox">
+      {{
+        input
+        type="checkbox"
+        id="concluded_enrollments"
+        name="concluded_enrollments"
+        checked=showConcludedEnrollments
+        disabled=enrollments.isLoading
+      }}
+      {{#t 'show_concluded_enrollments_label'}}Show Concluded Enrollments{{/t}}
+    </label>
+    <label class="checkbox">
+    {{
+      input
+      type="checkbox"
+      id="show_notes"
+      name="show_notes"
+      checked=showNotesColumn
+    }}
+    {{#t "show_notes"}}Show Notes in Student Info{{/t}}
+    </label>
+  </div>
 </div>
 
-<div>
-  <label>
-  {{
-    input
-    type="checkbox"
-    id="show_notes"
-    name="show_notes"
-    checked=showNotesColumn
-  }}
-  {{#t "show_notes"}}Show Notes in Student Info{{/t}}
-  </label>
+<div class="control-group">
+  <div class="controls">
+    <button
+      id="ag_weights"
+      class="btn"
+      {{ action 'openDialog' 'ag_weights' target=view }}
+      {{ bind-attr disabled=assignment_groups.isLoading }}
+    >
+      {{#t 'set_group_weights'}}Set Group Weights{{/t}}
+    </button>
+  </div>
 </div>
-<!-- -------- -->
+<div class="control-group">
+  <div class="controls">
+    <a class="btn" role="button" href="{{ unbound downloadUrl }}">
+      {{#t 'download_scores'}}Download Scores (.csv){{/t}}
+    </a>
+    <button
+      id="upload"
+      class="btn"
+      {{ action 'openDialog' 'upload' target=view }}
+    >
+      {{#t 'upload_scores'}}Upload Scores (.csv){{/t}}
+    </button>
+  </div>
+</div>
+<div class="control-group">
+  <div class="controls">
+    <a href="{{ unbound gradingHistoryUrl }}">
+      {{#t 'grading_history'}}View Grading History{{/t}}
+    </a>
+  </div>
+</div>
 
-<h2>Content Selection</h2>
 
-<div>
-  <label for="student_select">
+<h2>{{#t 'content_selection'}}Content Selection{{/t}}</h2>
+<div class="control-group">
+  <label for="student_select" class="control-label">
     {{#t 'select_student'}}Select a student{{/t}}
   </label>
+  <div class="controls">
   {{
     fast-select id="student_select"
     class="student_select"
@@ -132,42 +133,35 @@
     labelDefault=studentSelectDefaultLabel
     selected=selectedStudent
   }}
-</div>
-<div id="student_navigation">
-  <button
-    id="prev_student"
-    {{action 'selectItem' 'selectedStudent' 'previous'}}
-    {{bind-attr disabled=disablePrevStudentButton}}
-  >
-    {{#t 'previous_student'}}Previous Student{{/t}}
-  </button>
-
-  <button
-    id="next_student"
-    {{action 'selectItem' 'selectedStudent' 'next'}}
-    {{bind-attr disabled=disableNextStudentButton}}
-  >
-    {{#t 'next_student'}}Next Student{{/t}}
-  </button>
+  </div>
 </div>
 
-<!-- not sure we need this
-<div>
-  <label for="assignment_group_select">Select an assignment group</label>
-  <select
-    id="assignment_group_select"
-    class="assignment_group_select"
-    name="assignment_group">
-    <option value="">All</option>
-    <option value="2">Test Assignment Group</option>
-  </select>
+<div id="student_navigation" class="control-group">
+  <div class="controls">
+    <button
+      id="prev_student"
+      class="btn"
+      {{action 'selectItem' 'selectedStudent' 'previous'}}
+      {{ bind-attr disabled=disablePrevStudentButton }}
+    >
+      {{#t 'previous_student'}}Previous Student{{/t}}
+    </button>
+    <button
+      id="next_student"
+      class="btn"
+      {{action 'selectItem' 'selectedStudent' 'next'}}
+      {{ bind-attr disabled=disableNextStudentButton }}
+    >
+      {{#t 'next_student'}}Next Student{{/t}}
+    </button>
+  </div>
 </div>
--->
 
-<div>
-  <label for="assignment_select">
+<div class="control-group">
+  <label for="assignment_select" class="control-label">
     {{#t 'select_assignment'}}Select an assignment{{/t}}
   </label>
+  <div class="controls">
    {{
     fast-select id="assignment_select"
     class="assignment_select"
@@ -177,11 +171,14 @@
     labelDefault=assignmentSelectDefaultLabel
     selected=selectedAssignment
   }}
+  </div>
 </div>
 
-<div id="assignment_navigation">
+<div id="assignment_navigation" class="control-group">
+  <div class="controls">
   <button
     id="prev_assignment"
+    class="btn"
     {{action 'selectItem' 'selectedAssignment' 'previous'}}
     {{bind-attr disabled=disablePrevAssignmentButton}}
   >
@@ -190,133 +187,164 @@
 
   <button
     id="next_assignment"
+    class="btn"
     {{action 'selectItem' 'selectedAssignment' 'next'}}
     {{bind-attr disabled=disableNextAssignmentButton}}
   >
     {{#t 'next_assignment'}}Next Assignment{{/t}}
   </button>
+
+  </div>
 </div>
 
-<!-- student + assignment -->
-<!-- -------------------- -->
-
-{{#if selectedSubmission}}
-
-<div id="grading">
-
-  <h2>Grading</h2>
-
-  <!-- see/change a student's grade for a specific assignment -->
-  <div>
-    <label for="student_and_assignment_grade">Grade</label>
-    {{
-      grading-cell
-      assignment=selectedAssignment
-      input-id="student_and_assignment_grade"
-      submission=selectedSubmission
-      on-submit-grade="gradeUpdated"
-    }}
-  </div>
-
-  {{#if selectedSubmission.drop}}
-  {{#t 'is_dropped'}}This grade is currently dropped for this student.{{/t}}
-  {{/if}}
+<div id="grading" >
+  <h2>{{#t 'grading'}}Grading{{/t}}</h2>
+  {{#unless selectedSubmission}}
+    <p class="submission_selection">
+      {{#t 'empty_submission_selection"}}Select a student and an assignment to view and edit grades.{{/t}}
+    </p>
+  {{else}}
+    <div class="control-group">
+      <label for="student_and_assignment_grade">
+        {{#with selectedAssignment}}
+        {{#t 'grade_for'}}Grade for {{name}}{{/t}}
+        {{/with}}
+      </label>
+      {{
+        grading-cell
+        assignment=selectedAssignment
+        input-id="student_and_assignment_grade"
+        submission=selectedSubmission
+        on-submit-grade="gradeUpdated"
+      }}
+    {{#if selectedSubmission.drop}}
+      <p class="dropped">
+      {{#t 'is_dropped'}}This grade is currently dropped for this student.{{/t}}
+      </p>
+    {{/if}}
+    </div>
   <button
     id="submission_details"
+    class="btn"
     {{action 'openDialog' 'submission' target=view}}
   >
-   {{#t 'submission_details'}}Submission Details{{/t}}
+    {{#t 'submission_details'}}Submission Details{{/t}}
   </button>
+{{/unless}}
 </div>
 
-{{/if}}
-
-<!-- student -->
-<!-- -------- -->
 <div id="student_information">
-
-  <h2>Student Information</h2>
+  <h2>{{#t 'student_info'}}Student Information{{/t}}</h2>
   {{#unless selectedStudent}}
-  <p class="student_selection">
-  {{#t "empty_student_selection"}}Select a student to view additional information here.{{/t}}
-  </p>
+    <p class="student_selection">
+      {{#t 'empty_student_selection"}}Select a student to view additional information here.{{/t}}
+    </p>
   {{else}}
     <h3 class="student_selection">
-    {{#if hideStudentNames}}
-      {{selectedStudent.hiddenName}}
-    {{else}}
-      {{selectedStudent.name}}
-    {{/if}}
+      {{#if hideStudentNames}}
+        {{selectedStudent.hiddenName}}
+      {{else}}
+      <a {{bind-attr href="studentUrl"}}>
+        {{selectedStudent.name}}
+      </a>
+      {{/if}}
     </h3>
     {{#if selectedStudent.isLoaded}}
-    <div>{{#t 'secondary_id'}}Secondary ID:{{/t}}
-      <span id="secondary_id">
-      {{#if hideStudentNames}}
-        <em>hidden</em>
-      {{else}}
-        {{selectedStudent.login_id}}
-      {{/if}}
-      </span>
-    </div>
-    <div>{{#t 'sections'}}Sections:{{/t}} {{selectedStudentSections}}</div>
-    {{#each column in custom_columns}}
-    {{
-      custom-column-cell
-      student=selectedStudent
-      column=column
-      dataForStudent=dataForStudent
-      on-column-save='columnUpdated'
-    }}
-    {{/each}}
-    <div>
-      {{#t 'final_grade'}}Final Grade:{{/t}}
-      {{#if selectedStudent.total_grade.possible}}
-        {{selectedStudent.total_percent}}%
-      {{else}}
-        -
-      {{/if}}
-    </div>
-  <!-- sub-total grade for each assignment group (percentage + points) -->
-
-    {{#each assignment_group in assignment_groups}}
+      <div>{{#t 'secondary_id'}}Secondary ID:{{/t}}
+        <span id="secondary_id">
+          {{#if hideStudentNames}}
+            <em>{{#t 'hidden'}}hidden{{/t}}</em>
+          {{else}}
+            {{selectedStudent.login_id}}
+          {{/if}}
+        </span>
+      </div>
+      <div>{{#t 'sections'}}Sections:{{/t}} {{selectedStudentSections}}</div>
+      <div class="control-group">
+      {{#each column in custom_columns}}
       {{
-        assignment-group-grades
-        ag=assignment_group
+        custom-column-cell
         student=selectedStudent
-        weightingScheme=weightingScheme
-        gradingStandard=ENV.GRADEBOOK_OPTIONS.grading_standard
+        column=column
+        dataForStudent=dataForStudent
+        on-column-save='columnUpdated'
       }}
-    {{/each}}
-  {{else}}
-    <p>{{#t 'submissions_loading'}}Submissions for this student are still loading...{{/t}}</p>
-  {{/if}}
-  </div>
-{{/unless}}
+      {{/each}}
 
-<!-- assignment -->
-<!-- ------------ -->
+      </div>
+      <h4>{{#t 'grades'}}Grades{{/t}}</h4>
+      <dl>
+        {{#each assignment_group in assignment_groups}}
+          {{
+            assignment-group-grades
+            ag=assignment_group
+            student=selectedStudent
+            weightingScheme=weightingScheme
+            gradingStandard=ENV.GRADEBOOK_OPTIONS.grading_standard
+          }}
+        {{/each}}
+        <dt class="total-grade">
+          {{#t 'final_grade'}}Final Grade{{/t}}
+        </dt>
+        <dd class="total-grade">
+          {{#if selectedStudent.total_grade.possible}}
+            {{selectedStudent.total_percent}}%
+          {{else}}
+            -
+          {{/if}}
+        </dd>
+      </dl>
+    {{else}}
+      <p>{{#t 'submissions_loading'}}Submissions for this student are still loading...{{/t}}</p>
+    {{/if}}
+  {{/unless}}
+</div>
 
 <div id="assignment_information">
-  <h2>Assignment Information</h2>
+  <h2>{{#t 'assignment_info'}}Assignment Information{{/t}}</h2>
   {{#unless selectedAssignment}}
-  <p class="assignment_selection">
-    {{#t 'empty_assignment_selection'}}Select an assignment to view additional information here.{{/t}}
-  </p>
+    <p class="assignment_selection">
+      {{#t 'empty_assignment_selection'}}Select an assignment to view additional information here.{{/t}}
+    </p>
   {{else}}
-  <h3 class="assignment_selection">
-    <a {{bind-attr href="selectedAssignment.html_url"}}>{{selectedAssignment.name}}</a>
-  </h3>
+    <h3 class="assignment_selection">
+      <a {{bind-attr href="selectedAssignment.html_url"}}>{{selectedAssignment.name}}</a>
+    </h3>
+    <p>
+      <a {{bind-attr href="speedGraderUrl"}}>{{#t 'assignment_in_speedgrader'}}See this assignment in speedgrader{{/t}}</a>
+    </p>
 
-
-   <div>Points possible:
-    {{#if points_possible}}
-      {{points_possible}}
-    {{else}}
-      {{#t 'no_points'}}No points possible{{/t}}
-    {{/if}}
-   </div>
-    <div>
-      <label>
+    <div class="control-group">
+      {{#if assignmentDetails}}
+      {{#with assignmentDetails}}
+        <div>{{#t 'submission_count'}}{{cnt}} Submissions{{/t}}</div>
+        {{/with}}
+      {{/if}}
+      <dl>
+        <dt>{{#t 'points_possible'}}Points possible{{/t}}</dt>
+        <dd>
+        {{#if selectedAssignment.points_possible}}
+          {{selectedAssignment.points_possible}}
+        {{else}}
+          {{#t 'no_points'}}No points possible{{/t}}
+        {{/if}}
+        </dd>
+      {{#if assignmentDetails}}
+        {{#with assignmentDetails }}
+          {{#if cnt}}
+          <dt>{{#t 'avg_score'}}Average Score{{/t}}</dt>
+            <dd>{{average}}</dd>
+            <dt>{{#t 'high_score'}}High Score{{/t}}</dt>
+            <dd>{{max}}</dd>
+            <dt>{{#t 'low_score'}}Low Score{{/t}}</dt>
+            <dd>{{min}}</dd>
+          {{/if}}
+        {{/with}}
+      {{/if}}
+      </dl>
+    </div>
+    <div class="control-group">
+      <label class="checkbox">
         {{#t 'assignment_is_muted'}}Muted?{{/t}}
         {{
           assignment-muter
@@ -326,32 +354,40 @@
         }}
       </label>
     </div>
-
-    <!-- assignment stats: average/high/low score + submission count -->
-    {{#if assignmentDetails}}
-    {{#with assignmentDetails }}
-    {{#if cnt}}
-    <div>Average Score: {{average}}</div>
-    <div>High Score: {{max}}</div>
-    <div>Low Score: {{min}}</div>
-    {{/if}}
-    <div>{{cnt}} Submissions</div>
-    {{/with}}
-    {{/if}}
-    <!-- go to assignment in speedgrader -->
-
-    <a href="#speedgrader">See this assignment in speedgrader</a>
-
-    <!-- message students who -->
-    <button id="message_students" {{ action 'openDialog' 'message_students' target=view }}>Message students who...</button>
-    <!-- set default grades -->
-    <button id="set_default_grade" {{ action 'openDialog' 'set_default_grade' target=view }}>Set default grade</button>
-    <!-- curve grades -->
-    <button id="curve_grades" {{ action 'openDialog' 'curve_grades' target=view }}>Curve Grades</button>
-
+    <div class="control-group">
+      <button
+        id="message_students"
+        class="btn"
+        {{ action 'openDialog' 'message_students' target=view }}
+      >
+        {{#t 'message_students'}}Message students who...{{/t}}
+      </button>
+    </div>
+    <div class="control-group">
+      <button
+        id="set_default_grade"
+        class="btn"
+        {{ action 'openDialog' 'set_default_grade' target=view }}
+      >
+        {{#t 'set_default_grade'}}Set default grade{{/t}}
+      </button>
+      <button
+        id="curve_grades"
+        class="btn"
+        {{ action 'openDialog' 'curve_grades' target=view }}
+      >
+        {{#t 'curve_grades'}}Curve Grades{{/t}}
+      </button>
+    </div>
   {{/unless}}
+</div>
 
 </div>
-<div class="aria-announcer" aria-live="assertive" aria-atomic="true" aria-relative="all">{{ariaAnnounced}}</div>
-
-
+<div
+  class="aria-announcer hide-text affix"
+  aria-live="assertive"
+  aria-atomic="true"
+  aria-relative="all"
+>
+  {{ariaAnnounced}}
+</div>

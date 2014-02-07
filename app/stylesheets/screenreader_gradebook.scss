@@ -1,0 +1,37 @@
+@import "bootstrap/mixins";
+.assignment_selection {
+  margin-bottom: 0;
+}
+dl {
+  @include clearfix;
+}
+dt,
+dd {
+  float: left;
+  width: 200px;
+  margin: 8px 16px 8px 0;
+
+}
+dt {
+  clear: left;
+}
+dd {
+  width: 40px;
+  text-align: right;
+  &.assignment-group-grade,
+  &.total-grade {
+    width: 100px;
+  }
+}
+.total-grade {
+  margin-top: 25px;
+  font-size: 17px;
+}
+.assignment-group-grade span {
+  display: block;
+}
+.weight,
+.dropped {
+  font-style: italic;
+}
+

@@ -51,9 +51,26 @@ define [
 
   ScreenreaderGradebookController = Ember.ObjectController.extend
 
-    downloadUrl: "#{get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')}/gradebook.csv"
-    gradingHistoryUrl: "#{get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')}/history"
+    contextUrl: get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')
+
+    downloadUrl: (->
+      "#{@get('contextUrl')}/gradebook.csv"
+    ).property()
+
+    gradingHistoryUrl:(->
+      "#{@get('contextUrl')}/gradebook/history"
+    ).property()
+
+    speedGraderUrl: (->
+      "#{@get('contextUrl')}/gradebook/speed_grader?assignment_id=#{@get('selectedAssignment.id')}"
+    ).property('selectedAssignment')
+
+    studentUrl: (->
+      "#{@get('contextUrl')}/grades/#{@get('selectedStudent.id')}"
+    ).property('selectedStudent')
+
     hideStudentNames: false
+
     showConcludedEnrollments: false
 
     selectedStudent: null
