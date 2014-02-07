@@ -150,6 +150,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     end
 
     it "should add image via url" do
+      pending('karma upgrade')
       get "/courses/#{@course.id}/wiki/blank"
       wait_for_ajaximations
       f('.edit_link').click
@@ -171,6 +172,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       end
       
       it "should add a course image" do
+        pending('karma upgrade')
         add_canvas_image(driver, 'Course files', 'course.jpg')
         submit_form("#edit_wiki_page_#{@blank_page.id}")
         keep_trying_until { f('#wiki_body').should be_displayed }
@@ -178,6 +180,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       end
       
       it "should add a user image" do
+        pending('karma upgrade')
         add_canvas_image(driver, 'My files', 'teacher.jpg')
         submit_form("#edit_wiki_page_#{@blank_page.id}")
         keep_trying_until { f('#wiki_body').should be_displayed }
@@ -186,6 +189,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     end
 
     it "should put images into the right editor" do
+      pending('karma upgrade')
       @course_root = Folder.root_folders(@course).first
       @course_attachment = @course_root.attachments.create!(:context => @course, :uploaded_data => jpeg_data_frd, :filename => 'course.jpg', :display_name => 'course.jpg')
       @course_attachment2 = @course_root.attachments.create!(:context => @course, :uploaded_data => jpeg_data_frd, :filename => 'course2.jpg', :display_name => 'course2.jpg')
