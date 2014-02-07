@@ -377,7 +377,7 @@ define([
     $(".course_form_more_options_link").click(function(event) {
       event.preventDefault();
       var $moreOptions = $(".course_form_more_options");
-      var optionText = $moreOptions.is(':visible') ? I18n.t('links.more_options', 'more options') : I18n.t('links.less_options', 'less options');
+      var optionText = $moreOptions.is(':visible') ? I18n.t('links.more_options', 'more options') : I18n.t('links.fewer_options', 'fewer options');
       $(this).text(optionText);
       $moreOptions.slideToggle();
     });
