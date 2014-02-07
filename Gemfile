@@ -59,10 +59,12 @@ else
 end
 
 gem "aws-sdk", '1.21.0'
+  gem 'uuidtools', '2.1.4'
 gem 'barby', '0.5.0'
 gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
 gem 'canvas_connect', '0.3.2'
+  gem 'adobe_connect', '1.0.0'
 gem 'canvas_webex', '0.12'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
@@ -75,16 +77,21 @@ gem 'erubis', '2.7.0'
 if CANVAS_RAILS2
   gem 'fake_arel', '1.4.0'
   gem 'fake_rails3_routes', '1.0.4'
+    gem 'journey', '1.0.4'
 end
 gem 'ffi', '1.1.5'
 gem 'hairtrigger', '0.2.3'
+  gem 'ruby2ruby', '2.0.7'
 gem 'sass', '3.2.3'
 gem 'hashery', '1.3.0', :require => 'hashery/dictionary'
 gem 'highline', '1.6.1'
+gem 'hoe', '3.8.1'
 gem 'i18n', '0.6.8'
 gem 'i18nema', '0.0.7'
 gem 'icalendar', '1.1.5'
 gem 'jammit', '0.6.6'
+  gem 'cssmin', '1.0.3'
+  gem 'jsmin', '1.0.1'
 gem 'json', '1.8.1'
 gem 'oj', '2.1.7'
 unless CANVAS_RAILS2
@@ -94,11 +101,14 @@ end
 gem 'libxml-ruby', '2.6.0', :require => 'xml/libxml'
 gem 'macaddr', '1.0.0' # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
 gem 'mail', '2.5.4'
+  gem 'treetop', '1.4.15'
+    gem 'polyglot', '0.3.3'
 gem 'marginalia', '1.1.3', :require => false
 gem 'mime-types', '1.17.2', :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
 # with mini_magick 3.1
 gem 'mini_magick', '1.3.2'
+  gem 'subexec', '0.0.4'
 gem 'multi_json', '1.8.2'
 gem 'netaddr', '1.5.0'
 gem 'nokogiri', '1.5.6'
@@ -123,6 +133,7 @@ gem 'rubyzip', '1.0.0', :require => 'zip'
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace
 gem 'safe_yaml', '0.9.7', :require => false
 gem 'safe_yaml-instructure', '0.8.0', :require => false
+  gem 'hashie', '2.0.5'
 gem 'sanitize', '2.0.3'
 gem 'shackles', '1.0.2'
 unless CANVAS_RAILS2
@@ -144,6 +155,8 @@ gem 'crocodoc-ruby', '0.0.1', :require => 'crocodoc'
 # needs https://github.com/regru/premailer/commit/8d3ae698eff135011b19e1587a68c399ec97b185
 # we can go back to the gem once 1.7.8 is released
 gem 'regru-premailer', :require => 'premailer', :github => "regru/premailer", :ref => "08a73c70701f5d81bc4a5cf6c959a45ad94db88e"
+  gem 'css_parser', '1.3.5'
+  gem 'htmlentities', '4.3.1'
 
 gem 'adheres_to_policy', :path => 'gems/adheres_to_policy'
 gem 'canvas_breach_mitigation', :path => 'gems/canvas_breach_mitigation'
@@ -155,7 +168,15 @@ gem 'lti_outbound', :path => 'gems/lti_outbound'
 
 group :assets do
   gem 'compass-rails', '1.0.3'
+    gem 'compass', '0.12.2'
+      gem 'chunky_png', '1.2.9'
+      gem 'fssm', '0.2.10'
   gem 'dress_code', '1.0.2'
+    gem 'colored', '1.2'
+    gem 'mustache', '0.99.5'
+    gem 'pygments.rb', '0.5.4'
+      gem 'posix-spawn', '0.3.8'
+      gem 'yajl-ruby', '1.1.0'
 end
 
 group :mysql do
@@ -172,11 +193,15 @@ end
 
 group :test do
 
-  gem 'simplecov', :require => false
-  gem 'simplecov-rcov', :require => false
+  gem 'simplecov', '0.8.2', :require => false
+    gem 'docile', '1.1.3'
+  gem 'simplecov-rcov', '0.2.3', :require => false
   gem 'bluecloth', '2.0.10' # for generating api docs
+    gem 'redcarpet', '3.0.0'
   gem 'mocha', '1.0.0.alpha', :require => false
+    gem 'metaclass', '0.0.2'
   gem 'thin', '1.5.1'
+    gem 'eventmachine', '1.0.3'
   if CANVAS_RAILS2
     gem 'rspec', '1.3.2'
     gem 'rspec-rails', '1.3.4'
@@ -186,13 +211,19 @@ group :test do
   end
   gem 'sequel', '4.5.0', :require => false
   gem 'selenium-webdriver', '2.39.0'
+    gem 'childprocess', '0.4.0'
+    gem 'websocket', '1.0.7'
   gem 'webrat', '0.7.3'
+    gem 'rack-test', '0.6.2', :require => false
   gem 'webmock', '1.16.1', :require => false
+    gem 'addressable', '2.3.5'
+    gem 'crack', '0.4.1'
   gem 'yard', '0.8.0'
   gem 'yard-appendix', '>=0.1.8'
   gem 'timecop', '0.6.3'
   gem 'test-unit', '1.2.3'
   gem 'bullet', '4.5.0', :require => false
+    gem 'uniform_notifier', '1.4.0'
 end
 
 group :development do
@@ -212,7 +243,7 @@ group :development do
 end
 
 group :development, :test do
-  gem 'coffee-script'
+  gem 'coffee-script', '2.2.0'
   gem 'coffee-script-source', '1.6.2' #pinned so everyone's compiled output matches
   gem 'execjs', '1.4.0'
   gem 'parallel', '0.5.16'
@@ -232,11 +263,17 @@ end
 
 group :cassandra do
   gem 'cassandra-cql', '1.2.1', :github => 'kreynolds/cassandra-cql', :ref => 'd100be075b04153cf4116da7512892a1e8c0a7e4' #dependency of canvas_cassandra
+    gem 'simple_uuid', '0.4.0'
+    gem 'thrift', '0.8.0'
+    gem 'thrift_client', '0.8.4'
   gem "canvas_cassandra", path: "gems/canvas_cassandra"
 end
 
 group :embedly do
   gem 'embedly', '1.5.5'
+    gem 'oauth', '0.4.7'
+    gem 'querystring', '0.1.0'
+    gem 'typhoeus', '0.3.3'
 end
 
 group :statsd do
