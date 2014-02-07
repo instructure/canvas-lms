@@ -2068,7 +2068,7 @@ describe User do
       [@course1, @course2].each do |course|
         assignment = course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
         [@studentA, @studentB].each do |student|
-          bare_submission_model assignment, student, :submission_type => "online_text_entry", :body => "submission for #{student.name}"
+          assignment.submit_homework student, body: "submission for #{student.name}"
         end
       end
     end
