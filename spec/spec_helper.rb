@@ -49,6 +49,16 @@ if CANVAS_RAILS2
   end
   alias :describe_without_rspec2_types :describe
   alias :describe :describe_with_rspec2_types
+
+  ActionController::TestProcess.module_eval do
+    def process_with_use_route_shim(action, parameters = nil, session = nil, flash = nil, http_method = 'GET')
+      if parameters.is_a?(Hash)
+        parameters.delete(:use_route)
+      end
+      process_without_use_route_shim(action, parameters, session, flash, http_method)
+    end
+    alias_method_chain :process, :use_route_shim
+  end
 else
   require 'rspec/rails'
 end

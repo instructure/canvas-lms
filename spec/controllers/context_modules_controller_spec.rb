@@ -104,19 +104,19 @@ describe ContextModulesController do
       assignmentTag2 = @module.add_item :type => 'assignment', :id => assignment2.id
       header2 = @module.add_item :type => 'context_module_sub_header'
 
-      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1, :use_route => :course_context_module_first_redirect
       response.should redirect_to course_assignment_url(@course.id, assignment1.id, :module_item_id => assignmentTag1.id)
 
-      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1, :use_route => :course_context_module_last_redirect
       response.should redirect_to course_assignment_url(@course.id, assignment2.id, :module_item_id => assignmentTag2.id)
 
       assignmentTag1.destroy
       assignmentTag2.destroy
 
-      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1, :use_route => :course_context_module_first_redirect
       response.should redirect_to course_context_modules_url(@course.id, :anchor => "module_#{@module.id}")
 
-      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1, :use_route => :course_context_module_last_redirect
       response.should redirect_to course_context_modules_url(@course.id, :anchor => "module_#{@module.id}")
     end
   end
@@ -342,7 +342,7 @@ describe ContextModulesController do
         tags << make_content_tag(assign, @course, mod)
       end
 
-      ContextModule.expects(:update_all).once
+      ContentTag.expects(:touch_context_modules).once
       order = tags.reverse.map(&:id)
       post 'reorder_items', :course_id => @course.id, :context_module_id => mod.id, :order => order.join(",")
       mod.reload.content_tags.map(&:id).should == order
