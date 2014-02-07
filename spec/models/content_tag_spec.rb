@@ -41,6 +41,10 @@ describe ContentTag do
       content_tag = ContentTag.new(:content_type => "WikiPage")
       content_tag.sync_workflow_state_to_asset?.should be_true
     end
+
+    it "true when content_type is DiscussionTopic" do
+      ContentTag.new(content_type: "DiscussionTopic").should be_sync_workflow_state_to_asset
+    end
   end
 
   describe "#content_type_quiz?" do

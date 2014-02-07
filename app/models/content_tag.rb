@@ -313,7 +313,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def sync_workflow_state_to_asset?
-    self.content_type_quiz? || ['Assignment', 'WikiPage'].include?(self.content_type)
+    self.content_type_quiz? || ['Assignment', 'WikiPage', 'DiscussionTopic'].include?(self.content_type)
   end
 
   def content_type_quiz?
