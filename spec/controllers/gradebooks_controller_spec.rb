@@ -454,7 +454,7 @@ describe GradebooksController do
 
       it 'should not render gb1 json' do
         get 'show', :course_id => @course.id, :format => :json
-        response.status.to_i.should == 404
+        assert_status(404)
       end
 
       it 'should not prevent you from getting gradebook.csv' do

@@ -73,7 +73,7 @@ describe QuizzesApiController, type: :request do
                    :action => "index",
                    :format => "json",
                    :course_id => "#{@course.id}")
-      response.status.to_i.should == 404
+      assert_status(404)
     end
 
     context "jsonapi style" do

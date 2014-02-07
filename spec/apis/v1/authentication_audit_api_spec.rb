@@ -28,7 +28,7 @@ describe "AuthenticationAudit API", type: :request do
 
     it "should 404" do
       raw_api_call(:get, "/api/v1/audit/authentication/logins/#{@pseudonym.id}", controller: 'authentication_audit_api', action: "for_login", :login_id => @pseudonym.id.to_s, format: 'json')
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
   end
 

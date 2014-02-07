@@ -68,7 +68,7 @@ describe QuizIpFiltersController, type: :request do
       student_in_course
 
       json = get_index(true)
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     context 'Pagination' do
@@ -96,7 +96,7 @@ describe QuizIpFiltersController, type: :request do
 
       it 'should bail out on an invalid cursor' do
         get_index true, { page: 'invalid' }
-        response.status.to_i.should == 404
+        assert_status(404)
       end
     end
 

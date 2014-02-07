@@ -25,7 +25,7 @@ describe UsersController, type: :request do
   context "without current_user" do
     it "should check for auth" do
       get("/api/v1/users/self/upcoming_events")
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
     end
   end
 

@@ -132,7 +132,7 @@ describe AssignmentsController do
       course_with_student_logged_in(:active_all => true)
 
       get 'show', :course_id => @course.id, :id => 5
-      response.status.should eql('404 Not Found')
+      assert_status(404)
     end
 
     it "should return unauthorized if not enrolled" do

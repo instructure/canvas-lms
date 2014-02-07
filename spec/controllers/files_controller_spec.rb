@@ -701,20 +701,20 @@ describe FilesController do
 
     it "should reject a blank policy" do
       post "api_create", { :file => @content }
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should reject an expired policy" do
       params = @attachment.ajax_upload_params(@user.pseudonym, "", "", :expiration => -60)
       post "api_create", params[:upload_params].merge({ :file => @content })
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should reject a modified policy" do
       params = @attachment.ajax_upload_params(@user.pseudonym, "", "")
       params[:upload_params]['Policy'] << 'a'
       post "api_create", params[:upload_params].merge({ :file => @content })
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should reject a good policy if the attachment data is already uploaded" do
@@ -722,7 +722,7 @@ describe FilesController do
       @attachment.uploaded_data = @content
       @attachment.save!
       post "api_create", params[:upload_params].merge(:file => @content)
-      response.status.to_i.should == 400
+      assert_status(400)
     end
   end
 

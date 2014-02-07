@@ -70,7 +70,7 @@ describe CrocodocSessionsController do
 
     it "should not create a session for others" do
       post :create, :attachment_id => @attachment.id
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
     end
   end
 

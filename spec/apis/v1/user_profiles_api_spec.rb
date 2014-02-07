@@ -118,7 +118,7 @@ describe "User Profile API", type: :request do
     @user = @student
     raw_api_call(:get, "/api/v1/users/#{@admin.id}/profile",
              :controller => "profile", :action => "settings", :user_id => @admin.to_param, :format => 'json')
-    response.status.should == "401 Unauthorized"
+    assert_status(401)
   end
 
   context "user_services" do

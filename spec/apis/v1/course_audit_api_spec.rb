@@ -28,7 +28,7 @@ describe "CourseAudit API", type: :request do
 
     it "should 404" do
       raw_api_call(:get, "/api/v1/audit/course/courses/#{@course.id}", controller: 'course_audit_api', action: "for_course", course_id: @course.id.to_s, format: 'json')
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
   end
 

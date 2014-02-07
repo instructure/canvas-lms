@@ -49,7 +49,7 @@ describe CustomGradebookColumnsApiController, type: :request do
         "/api/v1/courses/#{@course.id}/custom_gradebook_columns",
         course_id: @course.to_param, action: "index",
         controller: "custom_gradebook_columns_api", format: "json"
-      response.status.should == "401 Unauthorized"
+      assert_status(401)
     end
 
     it 'should return the custom columns' do
@@ -88,7 +88,7 @@ describe CustomGradebookColumnsApiController, type: :request do
         "/api/v1/courses/#{@course.id}/custom_gradebook_columns",
         course_id: @course.to_param, action: "create",
         controller: "custom_gradebook_columns_api", format: "json"
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
     end
 
     it 'creates a column' do
@@ -112,7 +112,7 @@ describe CustomGradebookColumnsApiController, type: :request do
         {course_id: @course.to_param, id: @col.to_param, action: "update",
          controller: "custom_gradebook_columns_api", format: "json"},
         "column[title]" => "Bar"
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
       @col.reload.title.should == "Foo"
     end
 
@@ -139,7 +139,7 @@ describe CustomGradebookColumnsApiController, type: :request do
         "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}",
         course_id: @course.to_param, id: @col.to_param, action: "destroy",
         controller: "custom_gradebook_columns_api", format: "json"
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
     end
 
     it 'works' do

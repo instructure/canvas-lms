@@ -32,7 +32,7 @@ describe "site-wide" do
     expect {
       get "/dashbo"
     }.to change(ErrorReport, :count).by +1
-    response.status.should == "404 Not Found"
+    assert_status(404)
     ErrorReport.last.category.should == "404"
   end
 

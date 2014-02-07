@@ -167,7 +167,7 @@ describe "Outcome Results API", type: :request do
         course_with_student_logged_in
         raw_api_call(:get, outcome_rollups_url(outcome_course),
           controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
-        response.status.to_i.should == 401
+        assert_status(401)
       end
 
       it "requires an existing context" do
@@ -176,7 +176,7 @@ describe "Outcome Results API", type: :request do
         bogus_course = Course.new { |c| c.id = -1 }
         raw_api_call(:get, outcome_rollups_url(bogus_course),
           controller: 'outcome_results', action: 'rollups', format: 'json', course_id: bogus_course.id.to_s)
-        response.status.to_i.should == 404
+        assert_status(404)
       end
 
       it "verifies the aggregate parameter" do
@@ -185,7 +185,7 @@ describe "Outcome Results API", type: :request do
         raw_api_call(:get, outcome_rollups_url(@course, aggregate: 'invalid'),
           controller: 'outcome_results', action: 'rollups', format: 'json',
           course_id: @course.id.to_s, aggregate: 'invalid')
-        response.status.to_i.should == 400
+        assert_status(400)
       end
 
       it "requires user ids to be students in the context" do
@@ -194,7 +194,7 @@ describe "Outcome Results API", type: :request do
         raw_api_call(:get, outcome_rollups_url(@course, user_ids: "#{@teacher.id}"),
           controller: 'outcome_results', action: 'rollups', format: 'json',
           course_id: @course.id.to_s, user_ids: @teacher.id)
-        response.status.to_i.should == 400
+        assert_status(400)
       end
 
       it "requires section id to be a section in the context" do
@@ -204,7 +204,7 @@ describe "Outcome Results API", type: :request do
         raw_api_call(:get, outcome_rollups_url(outcome_course, section_id: bogus_section.id),
           controller: 'outcome_results', action: 'rollups', format: 'json',
           course_id: @course.id.to_s, section_id: bogus_section.id.to_s)
-        response.status.to_i.should == 400
+        assert_status(400)
       end
 
       it "verifies the include[] parameter" do
@@ -213,7 +213,7 @@ describe "Outcome Results API", type: :request do
         raw_api_call(:get, outcome_rollups_url(@course, include: ['invalid']),
           controller: 'outcome_results', action: 'rollups', format: 'json',
           course_id: @course.id.to_s, include: ['invalid'])
-        response.status.to_i.should == 400
+        assert_status(400)
       end
     end
 

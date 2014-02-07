@@ -337,7 +337,7 @@ describe "Accounts API", type: :request do
     other_sub.update_attribute(:sis_source_id, 'sis2')
     raw_api_call(:get, "/api/v1/accounts/sis_account_id:sis1",
                     { :controller => 'accounts', :action => 'show', :id => "sis_account_id:sis1", :format => 'json' })
-    response.status.should == "404 Not Found"
+    assert_status(404)
   end
 
   context "courses_api" do

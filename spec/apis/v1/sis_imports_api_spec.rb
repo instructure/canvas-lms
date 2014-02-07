@@ -434,7 +434,7 @@ describe SisImportsApiController, type: :request do
             :import_type => 'instructure_csv' },
           {},
           { 'content-type' => 'text/csv; charset=ISO-8859-1-Windows-3.0-Latin-1' })
-    response.status.should match(/400/)
+    assert_status(400)
     SisBatch.count.should == 0
   end
 

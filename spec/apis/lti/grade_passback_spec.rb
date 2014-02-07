@@ -51,12 +51,12 @@ describe LtiApiController, type: :request do
 
   it "should require a content-type of application/xml" do
     make_call('content-type' => 'application/other')
-    response.status.should == "415 Unsupported Media Type"
+    assert_status(415)
   end
 
   it "should require the correct shared secret" do
     make_call('secret' => 'bad secret is bad')
-    response.status.should == "401 Unauthorized"
+    assert_status(401)
   end
 
   def replace_result(score=nil, sourceid = nil, result_data=nil)
@@ -399,9 +399,9 @@ to because the assignment has no points possible.
   if Canvas.redis_enabled?
     it "should not allow the same nonce to be used more than once" do
       make_call('nonce' => 'not_so_random', 'content-type' => 'none')
-      response.status.should == "415 Unsupported Media Type"
+      assert_status(415)
       make_call('nonce' => 'not_so_random', 'content-type' => 'none')
-      response.status.should == "401 Unauthorized"
+      assert_status(401)
       response.body.should match(/nonce/i)
     end
   end
@@ -409,7 +409,7 @@ to because the assignment has no points possible.
   it "should block timestamps more than 90 minutes old" do
     # the 90 minutes value is suggested by the LTI spec
     make_call('timestamp' => 2.hours.ago.utc.to_i, 'content-type' => 'none')
-    response.status.should == "401 Unauthorized"
+    assert_status(401)
     response.body.should match(/expired/i)
   end
 
@@ -427,7 +427,7 @@ to because the assignment has no points possible.
 
     it "should require the correct shared secret" do
       make_call('secret' => 'bad secret is bad')
-      response.status.should == "401 Unauthorized"
+      assert_status(401)
     end
 
     def sourceid

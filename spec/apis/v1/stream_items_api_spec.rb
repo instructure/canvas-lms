@@ -28,12 +28,12 @@ describe UsersController, type: :request do
 
   it "should check for auth" do
     get("/api/v1/users/self/activity_stream")
-    response.status.should == '401 Unauthorized'
+    assert_status(401)
 
     @course = factory_with_protected_attributes(Course, course_valid_attributes)
     raw_api_call(:get, "/api/v1/courses/#{@course.id}/activity_stream",
                 :controller => "courses", :action => "activity_stream", :format => "json", :course_id => @course.to_param)
-    response.status.should == '401 Unauthorized'
+    assert_status(401)
   end
 
   it "should return the activity stream" do

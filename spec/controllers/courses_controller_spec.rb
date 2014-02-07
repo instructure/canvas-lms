@@ -114,7 +114,7 @@ describe CoursesController do
       @course.workflow_state = 'claimed'
       @course.save!
       get 'settings', :course_id => @course.id
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
       assigns[:unauthorized_reason].should == :unpublished
       assigns[:unauthorized_message].should_not be_nil
 
@@ -124,7 +124,7 @@ describe CoursesController do
       @enrollment.end_at = 4.days.from_now
       @enrollment.save!
       get 'settings', :course_id => @course.id
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
       assigns[:unauthorized_reason].should == :unpublished
       assigns[:unauthorized_message].should_not be_nil
     end
@@ -260,7 +260,7 @@ describe CoursesController do
       @course.workflow_state = 'claimed'
       @course.save!
       get 'show', :id => @course.id
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
       assigns[:unauthorized_reason].should == :unpublished
       assigns[:unauthorized_message].should_not be_nil
 
@@ -270,7 +270,7 @@ describe CoursesController do
       @enrollment.end_at = 4.days.from_now
       @enrollment.save!
       get 'show', :id => @course.id
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
       assigns[:unauthorized_reason].should == :unpublished
       assigns[:unauthorized_message].should_not be_nil
     end
@@ -310,7 +310,7 @@ describe CoursesController do
       @course.save!
 
       get 'show', :id => @course.id
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
       assigns[:unauthorized_message].should_not be_nil
 
       a.settings[:restrict_student_future_view] = false
@@ -437,7 +437,7 @@ describe CoursesController do
         @course.save!
 
         get 'show', :id => @course.id, :invitation => @enrollment.uuid
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
         assigns[:unauthorized_message].should_not be_nil
 
         # unpublished course with invited student in account that disallows previews
@@ -447,7 +447,7 @@ describe CoursesController do
         @course.save!
 
         get 'show', :id => @course.id, :invitation => @enrollment.uuid
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
         assigns[:unauthorized_message].should_not be_nil
       end
 
@@ -486,7 +486,7 @@ describe CoursesController do
       it "should ignore invitations that have been accepted (not logged in)" do
         course_with_student(:active_course => 1, :active_enrollment => 1)
         get 'show', :id => @course.id, :invitation => @enrollment.uuid
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
       end
 
       it "should ignore invitations that have been accepted (logged in)" do
@@ -583,7 +583,7 @@ describe CoursesController do
       user_session(@user)
 
       get 'show', :id => @course.id
-      response.status.should == '302 Found'
+      response.should be_redirect
       response.location.should match(%r{/courses/#{@course.id}/settings})
     end
 
@@ -594,7 +594,7 @@ describe CoursesController do
       user_session(@user)
 
       xhr :get, 'show', :id => @course.id
-      response.status.should == '200 OK'
+      response.should be_success
     end
 
     it "should redirect to the xlisted course" do
@@ -906,7 +906,7 @@ describe CoursesController do
       @enrollment.update_attribute(:self_enrolled, true)
 
       post 'self_unenrollment', :course_id => @course.id, :self_unenrollment => 'abc'
-      response.status.should =~ /400 Bad Request/
+      assert_status(400)
       @enrollment.reload
       @enrollment.should be_active
     end
@@ -915,7 +915,7 @@ describe CoursesController do
       course_with_student_logged_in(:active_all => true)
 
       post 'self_unenrollment', :course_id => @course.id, :self_unenrollment => @enrollment.uuid
-      response.status.should =~ /400 Bad Request/
+      assert_status(400)
       @enrollment.reload
       @enrollment.should be_active
     end
@@ -925,7 +925,7 @@ describe CoursesController do
     it 'should check for authorization' do
       course_with_student_logged_in :active_all => true
       get 'sis_publish_status', :course_id => @course.id
-      response.status.should =~ /401 Unauthorized/
+      assert_status(401)
     end
 
     it 'should not try and publish grades' do
@@ -1089,7 +1089,7 @@ describe CoursesController do
       course_with_ta(:active_all => true)
       user_session(@user)
       post 'reset_content', :course_id => @course.id
-      response.status.to_i.should == 401
+      assert_status(401)
       @course.reload.should be_available
     end
   end

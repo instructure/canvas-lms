@@ -324,7 +324,7 @@ describe AssignmentGroupsApiController, type: :request do
         :format => 'json',
         :course_id => @course.id.to_s,
         :assignment_group_id => not_exist.to_s)
-      response.status.to_i.should == 404
+      assert_status(404)
     end
 
     it 'should include assignments' do

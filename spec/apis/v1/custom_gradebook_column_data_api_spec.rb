@@ -57,7 +57,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
         "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data",
         course_id: @course.to_param, id: @col.to_param, action: "index",
         controller: "custom_gradebook_column_data_api", format: "json"
-      response.status.should == "401 Unauthorized"
+      assert_status(401)
     end
 
     it 'only shows students you have permission for' do
@@ -112,7 +112,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
          controller: "custom_gradebook_column_data_api", format: "json"},
         "column_data[content]" => "haha"
 
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
     end
 
     it 'only lets you make notes for students you can see' do
@@ -127,7 +127,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
          user_id: @student1.to_param, action: "update",
          controller: "custom_gradebook_column_data_api", format: "json"},
         "column_data[content]" => "jkl;"
-      response.status.should == "404 Not Found"
+      assert_status(404)
     end
 
     it 'works' do

@@ -68,7 +68,7 @@ describe 'Account Reports API', type: :request do
     it 'should 404 for non existing reports' do
       raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/reports/bad_report_csv",
                    { :report=> 'bad_report_csv', :controller => 'account_reports', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s })
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
   end
 

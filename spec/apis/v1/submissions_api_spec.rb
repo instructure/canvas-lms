@@ -128,7 +128,7 @@ describe 'Submissions API', type: :request do
         :format => 'json', :section_id => @default_section.id.to_s,
         :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
         { :submission => { :posted_grade => '75%' } })
-      response.status.should == "404 Not Found"
+      assert_status(404)
 
       expect {
       json = api_call(:put,
@@ -221,7 +221,7 @@ describe 'Submissions API', type: :request do
             { :controller => 'submissions_api', :action => 'index',
               :format => 'json', :section_id => 'sis_section_id:section-2',
               :assignment_id => @a1.id.to_s })
-      response.status.should == "404 Not Found" # rather than 401 unauthorized
+      assert_status(404) # rather than 401 unauthorized
     end
 
     context 'submission comment attachments' do
@@ -247,7 +247,7 @@ describe 'Submissions API', type: :request do
       it "doesn't let you attach files you don't have permission for" do
         course_with_student_logged_in(course: @course, active_all: true)
         put_comment_attachment
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
       end
 
       it 'works' do
@@ -519,7 +519,7 @@ describe 'Submissions API', type: :request do
                       :format => "json", :course_id => @course.id.to_s,
                       :assignment_id => a1.id.to_s, :user_id => student1.id.to_s },
                     { :include => %w(submission_comments) })
-    response.status.should =~ /401/
+    assert_status(401)
   end
 
   it "should return grading information for observers" do
@@ -1389,7 +1389,7 @@ describe 'Submissions API', type: :request do
             :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
           { :comment => { :text_comment => 'witty remark' },
             :submission => { :posted_grade => 'B' } })
-    response.status.should == '401 Unauthorized'
+    assert_status(401)
   end
 
   it "should not allow rubricking by a student" do
@@ -1407,7 +1407,7 @@ describe 'Submissions API', type: :request do
             :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
           { :comment => { :text_comment => 'witty remark' },
             :rubric_assessment => { :criteria => { :points => 5 } } })
-    response.status.should == '401 Unauthorized'
+    assert_status(401)
   end
 
   it "should not return submissions for no-longer-enrolled students" do
@@ -1837,7 +1837,7 @@ describe 'Submissions API', type: :request do
           { :controller => 'submissions_api', :action => 'show',
             :format => 'json', :course_id => @course.id.to_s,
             :assignment_id => @assignment.id.to_s, :user_id => s2.user_id.to_s })
-    response.status.should == "404 Not Found"
+    assert_status(404)
 
     # try querying the other section directly
     raw_api_call(:get,
@@ -1845,7 +1845,7 @@ describe 'Submissions API', type: :request do
           { :controller => 'submissions_api', :action => 'show',
             :format => 'json', :section_id => section2.id.to_s,
             :assignment_id => @assignment.id.to_s, :user_id => s2.user_id.to_s })
-    response.status.should == "404 Not Found"
+    assert_status(404)
 
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/students/submissions",
@@ -1880,7 +1880,7 @@ describe 'Submissions API', type: :request do
             :format => 'json', :course_id => @course.id.to_s,
             :assignment_id => @assignment.id.to_s, :user_id => s2.user_id.to_s },
           { :submission => { :posted_grade => '10' } })
-    response.status.should == "404 Not Found"
+    assert_status(404)
 
     # try querying the other section directly
     raw_api_call(:put,
@@ -1889,7 +1889,7 @@ describe 'Submissions API', type: :request do
             :format => 'json', :section_id => section2.id.to_s,
             :assignment_id => @assignment.id.to_s, :user_id => s2.user_id.to_s },
           { :submission => { :posted_grade => '10' } })
-    response.status.should == "404 Not Found"
+    assert_status(404)
   end
 
   context 'map_user_ids' do
@@ -2152,7 +2152,7 @@ describe 'Submissions API', type: :request do
                 :user_id => @student.id.to_s
               },
               opts)
-      response.status.should == "401 Unauthorized"
+      assert_status(401)
     end
   end
 

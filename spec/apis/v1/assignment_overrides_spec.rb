@@ -63,7 +63,7 @@ describe AssignmentOverridesController, type: :request do
   end
 
   def expect_errors(errors)
-    response.status.should == '400 Bad Request'
+    assert_status(400)
     json = JSON.parse(response.body)
     json.should == {"errors" => errors}
   end
@@ -158,7 +158,7 @@ describe AssignmentOverridesController, type: :request do
       @override.save!
 
       raw_api_show_override(@course, @assignment, @override)
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
 
     it "should exclude due_at/all_day/all_day_date/lock_at/unlock_at when not overridden" do
@@ -251,7 +251,7 @@ describe AssignmentOverridesController, type: :request do
                    :controller => 'assignment_overrides', :action => 'group_alias', :format => 'json',
                    :group_id => @other_group.id.to_s,
                    :assignment_id => @assignment.id.to_s)
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
 
     it "should 404 for unconnected group/assignment" do
@@ -262,7 +262,7 @@ describe AssignmentOverridesController, type: :request do
                    :controller => 'assignment_overrides', :action => 'group_alias', :format => 'json',
                    :group_id => @other_group.id.to_s,
                    :assignment_id => @assignment.id.to_s)
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
   end
 
@@ -292,7 +292,7 @@ describe AssignmentOverridesController, type: :request do
                    :controller => 'assignment_overrides', :action => 'section_alias', :format => 'json',
                    :course_section_id => @section.id.to_s,
                    :assignment_id => @assignment.id.to_s)
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
 
     it "should 404 for unconnected section/assignment" do
@@ -302,7 +302,7 @@ describe AssignmentOverridesController, type: :request do
                    :controller => 'assignment_overrides', :action => 'section_alias', :format => 'json',
                    :course_section_id => @course.default_section.id.to_s,
                    :assignment_id => @assignment.id.to_s)
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
   end
 
@@ -944,7 +944,7 @@ describe AssignmentOverridesController, type: :request do
       raw_api_call(:delete, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides/#{@override.id}.json",
                    :controller => 'assignment_overrides', :action => 'destroy', :format => 'json',
                    :course_id => @course.id.to_s, :assignment_id => @assignment.id.to_s, :id => @override.id.to_s)
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
   end
 end

@@ -1514,13 +1514,13 @@ describe DiscussionTopicsController, type: :request do
     it "should set the read state for a topic" do
       student_in_course(:active_all => true)
       call_mark_topic_read(@course, @topic)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_true
       @topic.unread_count(@user).should == 2
 
       call_mark_topic_unread(@course, @topic)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_false
       @topic.unread_count(@user).should == 2
@@ -1529,13 +1529,13 @@ describe DiscussionTopicsController, type: :request do
     it "should be idempotent for setting topic read state" do
       student_in_course(:active_all => true)
       call_mark_topic_read(@course, @topic)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_true
       @topic.unread_count(@user).should == 2
 
       call_mark_topic_read(@course, @topic)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_true
       @topic.unread_count(@user).should == 2
@@ -1556,19 +1556,19 @@ describe DiscussionTopicsController, type: :request do
     it "should set the read state for a entry" do
       student_in_course(:active_all => true)
       call_mark_entry_read(@course, @topic, @entry)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @entry.read?(@user).should be_true
       @entry.find_existing_participant(@user).should_not be_forced_read_state
       @topic.unread_count(@user).should == 1
 
       call_mark_entry_unread(@course, @topic, @entry)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @entry.read?(@user).should be_false
       @entry.find_existing_participant(@user).should be_forced_read_state
       @topic.unread_count(@user).should == 2
 
       call_mark_entry_read(@course, @topic, @entry)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @entry.read?(@user).should be_true
       @entry.find_existing_participant(@user).should be_forced_read_state
       @topic.unread_count(@user).should == 1
@@ -1577,12 +1577,12 @@ describe DiscussionTopicsController, type: :request do
     it "should be idempotent for setting entry read state" do
       student_in_course(:active_all => true)
       call_mark_entry_read(@course, @topic, @entry)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @entry.read?(@user).should be_true
       @topic.unread_count(@user).should == 1
 
       call_mark_entry_read(@course, @topic, @entry)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @entry.read?(@user).should be_true
       @topic.unread_count(@user).should == 1
     end
@@ -1604,7 +1604,7 @@ describe DiscussionTopicsController, type: :request do
       @entry.change_read_state('read', @user, :forced => true)
 
       call_mark_all_as_read_state('read')
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_true
 
@@ -1621,7 +1621,7 @@ describe DiscussionTopicsController, type: :request do
       [@topic, @entry].each { |e| e.change_read_state('read', @user) }
 
       call_mark_all_as_read_state('unread', :forced => true)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_false
 
@@ -1646,14 +1646,12 @@ describe DiscussionTopicsController, type: :request do
       @user = user
       raw_api_call(:put, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/subscribed",
                    { :controller => "discussion_topics_api", :action => "subscribe_topic", :format => "json", :course_id => course.id.to_s, :topic_id => topic.id.to_s})
-      response.status.to_i
     end
 
     def call_unsubscribe(topic, user, course=@course)
       @user = user
       raw_api_call(:delete, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/subscribed",
                    { :controller => "discussion_topics_api", :action => "unsubscribe_topic", :format => "json", :course_id => course.id.to_s, :topic_id => topic.id.to_s})
-      response.status.to_i
     end
 
     it "should allow subscription" do

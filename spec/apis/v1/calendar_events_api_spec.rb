@@ -621,7 +621,7 @@ describe CalendarEventsApiController, type: :request do
       json = api_call(:post, "/api/v1/calendar_events",
                       {:controller => 'calendar_events_api', :action => 'create', :format => 'json'},
                       {:calendar_event => {:context_code => @course.asset_string, :title => "ohai"}})
-      response.status.should =~ /201/
+      assert_status(201)
       json.keys.sort.should eql expected_fields
       json['title'].should eql 'ohai'
     end
@@ -707,7 +707,7 @@ describe CalendarEventsApiController, type: :request do
         json = api_call(:post, "/api/v1/calendar_events",
                         {:controller => 'calendar_events_api', :action => 'create', :format => 'json'},
                         {:calendar_event => {:context_code => @course.asset_string, :title => "ohai", :child_event_data => {"0" => {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string}}}})
-        response.status.should =~ /201/
+        assert_status(201)
         json.keys.sort.should eql expected_fields
         json['title'].should eql 'ohai'
         json['child_events'].size.should eql 1
@@ -980,7 +980,7 @@ describe CalendarEventsApiController, type: :request do
       assignment = @course.assignments.create(:title => 'undated')
       raw_api_call(:delete, "/api/v1/calendar_events/assignment_#{assignment.id}", {
         :controller => 'calendar_events_api', :action => 'destroy', :id => "assignment_#{assignment.id}", :format => 'json'})
-      response.status.should == "404 Not Found"
+      assert_status(404)
     end
 
     context 'date overrides' do

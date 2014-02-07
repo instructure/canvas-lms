@@ -147,7 +147,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
     it 'should restrict access to itself' do
       student_in_course
       json = api_index({}, { raw: true })
-      response.status.to_i.should == 401
+      assert_status(401)
     end
   end
 
@@ -166,7 +166,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
     it 'should deny access by other students' do
       student_in_course
       api_show({}, { raw: true })
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     context 'Output' do
@@ -400,7 +400,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
 
       api_update({ answer: 1658 }, { raw: true })
 
-      response.status.to_i.should == 400
+      assert_status(400)
       response.body.should match(/unknown answer '1658'/i)
 
       json = api_update({ answer: 1659 })
@@ -415,7 +415,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
 
       api_update({ answer: 'asdf' }, { raw: true })
 
-      response.status.to_i.should == 400
+      assert_status(400)
       response.body.should match(/must be of type integer/i)
     end
 
@@ -439,7 +439,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
 
       api_update({}, { raw: true })
 
-      response.status.to_i.should == 403
+      assert_status(403)
       response.body.should match(/requires the lockdown browser/i)
     end
   end

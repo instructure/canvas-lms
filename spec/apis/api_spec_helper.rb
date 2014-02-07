@@ -44,7 +44,7 @@ end
 def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   raw_api_call(method, path, params, body_params, headers, opts)
   if opts[:expected_status]
-    response.status.to_i.should == opts[:expected_status]
+    assert_status(opts[:expected_status])
   else
     response.should be_success, response.body
   end
@@ -55,7 +55,7 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   end
 
   if jsonapi_call?(headers) && method == :delete
-    response.status.should == '204 No Content'
+    assert_status(204)
     return
   end
 

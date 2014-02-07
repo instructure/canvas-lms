@@ -36,7 +36,7 @@ shared_examples_for 'Quiz Submissions API Restricted Endpoints' do
       attempt: 1
     }
 
-    response.status.to_i.should == 403
+    assert_status(403)
     response.body.should match(/requires the lockdown browser/i)
   end
 end
@@ -171,7 +171,7 @@ describe QuizSubmissionsApiController, type: :request do
     it 'should restrict access to itself' do
       student_in_course
       json = qs_api_index(true)
-      response.status.to_i.should == 401
+      assert_status(401)
     end
   end
 
@@ -199,7 +199,7 @@ describe QuizSubmissionsApiController, type: :request do
     it 'should deny access by other students' do
       student_in_course
       qs_api_show(true)
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     context 'Output' do
@@ -372,14 +372,14 @@ describe QuizSubmissionsApiController, type: :request do
           attempt: 1
         }
 
-        response.status.to_i.should == 400
+        assert_status(400)
         response.body.should match(/already complete/)
       end
 
       it 'should require the attempt index' do
         json = qs_api_complete true
 
-        response.status.to_i.should == 400
+        assert_status(400)
         response.body.should match(/invalid attempt/)
       end
 
@@ -388,7 +388,7 @@ describe QuizSubmissionsApiController, type: :request do
           attempt: 123123123
         }
 
-        response.status.to_i.should == 400
+        assert_status(400)
         response.body.should match(/attempt.*can not be modified/)
       end
 
@@ -397,7 +397,7 @@ describe QuizSubmissionsApiController, type: :request do
           validation_token: 'aaaooeeeee'
         }
 
-        response.status.to_i.should == 403
+        assert_status(403)
         response.body.should match(/invalid token/)
       end
     end

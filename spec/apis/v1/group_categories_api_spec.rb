@@ -398,7 +398,7 @@ describe "Group Categories API", type: :request do
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => category.to_param),
                      {'sync' => true}
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
       end
 
       it "should require valid group :category_id" do
@@ -409,7 +409,7 @@ describe "Group Categories API", type: :request do
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => (category.id + 1).to_param),
                      {'sync' => true}
-        response.status.should == '404 Not Found'
+        assert_status(404)
       end
 
       it "should fail for student organized groups" do
@@ -420,7 +420,7 @@ describe "Group Categories API", type: :request do
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => category.to_param),
                      {'sync' => true}
-        response.status.should == '400 Bad Request'
+        assert_status(400)
       end
 
       it "should fail for restricted self signup groups" do
@@ -433,7 +433,7 @@ describe "Group Categories API", type: :request do
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => category.to_param),
                      {'sync' => true}
-        response.status.should == '400 Bad Request'
+        assert_status(400)
 
         category.configure_self_signup(true, false)
         category.save

@@ -57,21 +57,21 @@ describe PseudonymSessionsController do
 
   it "should re-render if no user" do
     post 'create'
-    response.status.should == '400 Bad Request'
+    assert_status(400)
     response.should render_template('new')
   end
 
   it "should re-render if incorrect password" do
     user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
     post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'dvorak'}
-    response.status.should == '400 Bad Request'
+    assert_status(400)
     response.should render_template('new')
   end
 
   it "should re-render if no password given" do
     user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
     post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => ''}
-    response.status.should == '400 Bad Request'
+    assert_status(400)
     response.should render_template('new')
     flash[:error].should match(/no password/i)
   end
@@ -117,7 +117,7 @@ describe PseudonymSessionsController do
       aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).once.with('username', 'password').returns(nil)
       post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.should render_template('new')
     end
 
@@ -1066,13 +1066,13 @@ describe PseudonymSessionsController do
 
     it 'renders a 400 when there is no client_id' do
       get :oauth2_auth
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.body.should =~ /invalid client_id/
     end
 
     it 'renders 400 on a bad redirect_uri' do
       get :oauth2_auth, :client_id => key.id
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.body.should =~ /invalid redirect_uri/
     end
 
@@ -1102,20 +1102,20 @@ describe PseudonymSessionsController do
 
     it 'renders a 400 if theres no client_id' do
       get :oauth2_token
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.body.should =~ /invalid client_id/
     end
 
     it 'renders a 400 if the secret is invalid' do
       get :oauth2_token, :client_id => key.id, :client_secret => key.api_key + "123"
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.body.should =~ /invalid client_secret/
     end
 
     it 'renders a 400 if the provided code does not match a token' do
       Canvas.stubs(:redis => redis)
       get :oauth2_token, :client_id => key.id, :client_secret => key.api_key, :code => "NotALegitCode"
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.body.should =~ /invalid code/
     end
 

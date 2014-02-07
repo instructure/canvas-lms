@@ -512,7 +512,7 @@ describe ConversationsController, type: :request do
           raw_api_call(:post, "/api/v1/conversations",
                   { :controller => 'conversations', :action => 'create', :format => 'json' },
                   { :recipients => [@bob.id], :body => "test", :context_code => "account_#{Account.default.id}" })
-          response.status.to_i.should == 400
+          assert_status(400)
         end
 
         it "should allow site admin to set any account context" do
@@ -546,7 +546,7 @@ describe ConversationsController, type: :request do
             raw_api_call(:post, "/api/v1/conversations",
                     { :controller => 'conversations', :action => 'create', :format => 'json' },
                     { :recipients => [@bob.id], :body => "test", :context_code => "account_#{@sub_account.id}" })
-            response.status.to_i.should == 400
+            assert_status(400)
           end
         end
       end
@@ -1885,7 +1885,7 @@ describe ConversationsController, type: :request do
       json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
         {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s},
         {:domain_root_account => Account.site_admin})
-      response.status.should eql "401 Unauthorized"
+      assert_status(401)
 
       account_admin_user
       p = Account.default.pseudonyms.create!(:unique_id => 'admin', :user => @user)
@@ -1893,13 +1893,13 @@ describe ConversationsController, type: :request do
       json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
         {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s},
         {})
-      response.status.should eql "401 Unauthorized"
+      assert_status(401)
 
       user_session(@me)
       json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
         {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s},
         {})
-      response.status.should eql "401 Unauthorized"
+      assert_status(401)
 
       @me.all_conversations.size.should eql 1
       @joe.conversations.size.should eql 1
@@ -1910,7 +1910,7 @@ describe ConversationsController, type: :request do
       json = raw_api_call(:delete, "/api/v1/conversations/0/delete_for_all",
         {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => "0"},
         {})
-      response.status.should eql "404 Not Found"
+      assert_status(404)
     end
 
     it "should delete the conversation for all participants" do

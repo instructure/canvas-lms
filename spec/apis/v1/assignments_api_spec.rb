@@ -483,7 +483,7 @@ describe AssignmentsApiController, type: :request do
           },
           {:assignment => { 'name' => name_too_long} }
         )
-        response.status.to_i.should == 400
+        assert_status(400)
       }.should_not change(Assignment, :count)
     end
 
@@ -508,7 +508,7 @@ describe AssignmentsApiController, type: :request do
         },
         { :assignment => { 'name' => name_too_long} }
       )
-      response.status.to_i.should == 400
+      assert_status(400)
       @assignment.reload
       @assignment.name.should == 'some name'
     end

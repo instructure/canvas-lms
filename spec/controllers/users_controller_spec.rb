@@ -88,7 +88,7 @@ describe UsersController do
       course_with_teacher_logged_in
       student_in_course :course => @course
       get 'delete', :user_id => @student.id
-      response.status.should =~ /401 Unauthorized/
+      assert_status(401)
     end
 
     it "should succeed when the current user has the :manage permission and is not deleting any system-generated pseudonyms" do
@@ -131,7 +131,7 @@ describe UsersController do
       student_in_course :course => @course
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      response.status.should =~ /401 Unauthorized/
+      assert_status(401)
       @student.reload.workflow_state.should_not == 'deleted'
     end
 
@@ -203,7 +203,7 @@ describe UsersController do
 
         it "should not allow teachers to self register" do
           post 'create', :pseudonym => { :unique_id => 'jane@example.com' }, :user => { :name => 'Jane Teacher', :terms_of_use => '1', :initial_enrollment_type => 'teacher' }, :format => 'json'
-          response.status.should match /403 Forbidden/
+          assert_status(403)
         end
 
         it "should not allow students to self register" do
@@ -211,7 +211,7 @@ describe UsersController do
           @course.update_attribute(:self_enrollment, true)
 
           post 'create', :pseudonym => { :unique_id => 'jane@example.com', :password => 'lolwut', :password_confirmation => 'lolwut' }, :user => { :name => 'Jane Student', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1', :format => 'json'
-          response.status.should match /403 Forbidden/
+          assert_status(403)
         end
 
         it "should allow observers to self register" do
@@ -245,7 +245,7 @@ describe UsersController do
         u = User.create! { |u| u.workflow_state = 'registered' }
         p = u.pseudonyms.create!(:unique_id => 'jacob@instructure.com')
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }
-        response.status.should =~ /400 Bad Request/
+        assert_status(400)
         json = JSON.parse(response.body)
         json["errors"]["pseudonym"]["unique_id"].should be_present
         Pseudonym.find_all_by_unique_id('jacob@instructure.com').should == [p]
@@ -291,7 +291,7 @@ describe UsersController do
 
       it "should validate acceptance of the terms" do
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
-        response.status.should =~ /400 Bad Request/
+        assert_status(400)
         json = JSON.parse(response.body)
         json["errors"]["user"]["terms_of_use"].should be_present
       end
@@ -304,21 +304,21 @@ describe UsersController do
 
       it "should require email pseudonyms by default" do
         post 'create', :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }
-        response.status.should =~ /400 Bad Request/
+        assert_status(400)
         json = JSON.parse(response.body)
         json["errors"]["pseudonym"]["unique_id"].should be_present
       end
 
       it "should require email pseudonyms if not self enrolling" do
         post 'create', :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }, :pseudonym_type => 'username'
-        response.status.should =~ /400 Bad Request/
+        assert_status(400)
         json = JSON.parse(response.body)
         json["errors"]["pseudonym"]["unique_id"].should be_present
       end
 
       it "should validate the self enrollment code" do
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => 'omg ... not valid', :initial_enrollment_type => 'student' }, :self_enrollment => '1'
-        response.status.should =~ /400 Bad Request/
+        assert_status(400)
         json = JSON.parse(response.body)
         json["errors"]["user"]["self_enrollment_code"].should be_present
       end
@@ -347,7 +347,7 @@ describe UsersController do
         @course.update_attribute(:self_enrollment, true)
 
         post 'create', :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1'
-        response.status.should =~ /400 Bad Request/
+        assert_status(400)
         json = JSON.parse(response.body)
         json["errors"]["pseudonym"]["password"].should be_present
         json["errors"]["pseudonym"]["password_confirmation"].should be_present
@@ -369,7 +369,7 @@ describe UsersController do
         user_with_pseudonym(:active_all => true, :password => 'lolwut')
 
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'not it' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'observer' }
-        response.status.should =~ /400 Bad Request/
+        assert_status(400)
         json = JSON.parse(response.body)
         json["errors"]["observee"]["unique_id"].should be_present
       end

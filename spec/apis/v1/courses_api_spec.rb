@@ -354,7 +354,7 @@ describe CoursesController, type: :request do
             }
           }
         )
-        response.status.should eql '401 Unauthorized'
+        assert_status(401)
       end
     end
   end
@@ -1211,7 +1211,7 @@ describe CoursesController, type: :request do
           course_id: @course1.id.to_s,
           page: 'invalid',
           format: 'json')
-        response.status.should == "404 Not Found"
+        assert_status(404)
       end
 
       it "returns a list of users" do
@@ -1629,7 +1629,7 @@ describe CoursesController, type: :request do
       @course.update_attribute('sis_source_id', 'OTHER-SIS')
       raw_api_call(:get, "/api/v1/courses/sis_course_id:OTHER-SIS",
                    :controller => "courses", :action => "show", :id => "sis_course_id:OTHER-SIS", :format => "json")
-      response.status.should == "404 Not Found"
+      assert_status(404)
     end
 
     it 'should include permissions' do
@@ -1951,7 +1951,7 @@ describe ContentImportsController, type: :request do
     status = raw_api_call(:post, "/api/v1/courses/#{to_id}/course_copy",
             { :controller => 'content_imports', :action => 'copy_course_content', :course_id => to_id, :format => 'json' },
     {:source_course => from_id})
-    response.status.should == "404 Not Found"
+    assert_status(404)
   end
 
   def run_only_copy(option)
@@ -2001,14 +2001,14 @@ describe ContentImportsController, type: :request do
   it "should return 404 for an import that isn't found" do
     raw_api_call(:get, "/api/v1/courses/#{@copy_to.id}/course_copy/444",
                  { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => '444', :format => 'json' })
-    response.status.should == "404 Not Found"
+    assert_status(404)
   end
 
   it "shouldn't allow both only and except options" do
     raw_api_call(:post, "/api/v1/courses/#{@copy_to.id}/course_copy",
             { :controller => 'content_imports', :action => 'copy_course_content', :course_id => @copy_to.to_param, :format => 'json' },
     {:source_course => @copy_from.to_param, :only => [:topics], :except => [:assignments]})
-    response.status.to_i.should == 400
+    assert_status(400)
     json = JSON.parse(response.body)
     json['errors'].should == 'You can not use "only" and "except" options at the same time.'
   end

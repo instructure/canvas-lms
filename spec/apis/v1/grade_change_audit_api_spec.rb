@@ -29,7 +29,7 @@ describe "GradeChangeAudit API", type: :request do
 
     it "should 404" do
       raw_api_call(:get, "/api/v1/audit/grade_change/students/#{@user.id}", controller: 'grade_change_audit_api', action: "for_student", student_id: @user.id.to_s, format: 'json')
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
   end
 

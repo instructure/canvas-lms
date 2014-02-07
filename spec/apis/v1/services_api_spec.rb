@@ -32,7 +32,7 @@ describe "Services API", type: :request do
   
   it "should check for auth" do
     get("/api/v1/services/kaltura")
-    response.status.should == '401 Unauthorized'
+    assert_status(401)
   end
   
   it "should return the config information for kaltura" do

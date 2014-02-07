@@ -33,7 +33,7 @@ describe "User Content" do
       response.body.should be_include(obj_data)
 
       post "http://canvas.example.com/object_snippet", :object_data => snippet, :s => sig
-      response.status.to_i.should == 400
+      assert_status(400)
       response.body.should be_blank
     end
 

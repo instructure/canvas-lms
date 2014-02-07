@@ -222,7 +222,7 @@ describe "Users API", type: :request do
     @user = @student
     raw_api_call(:get, "/api/v1/users/#{@admin.id}/avatars",
                  :controller => "profile", :action => "profile_pics", :user_id => @admin.to_param, :format => 'json')
-    response.status.should == "401 Unauthorized"
+    assert_status(401)
   end
 
   shared_examples_for "page view api" do
@@ -292,7 +292,7 @@ describe "Users API", type: :request do
     @user = @me
     raw_api_call(:get, "/api/v1/users/sis_user_id:other-sis/page_views",
                        { :controller => "page_views", :action => "index", :user_id => 'sis_user_id:other-sis', :format => 'json' })
-    response.status.should == "404 Not Found"
+    assert_status(404)
   end
 
   it "should allow id of 'self'" do
@@ -431,7 +431,7 @@ describe "Users API", type: :request do
             :pseudonym => { :unique_id => "test@example.com" }
           }
         )
-        response.status.should eql "403 Forbidden"
+        assert_status(403)
       end
 
       it "should require an email pseudonym" do
@@ -444,7 +444,7 @@ describe "Users API", type: :request do
             :pseudonym => { :unique_id => "invalid" }
           }
         )
-        response.status.should eql "400 Bad Request"
+        assert_status(400)
       end
 
       it "should require acceptance of the terms" do
@@ -457,7 +457,7 @@ describe "Users API", type: :request do
             :pseudonym => { :unique_id => "test@example.com" }
           }
         )
-        response.status.should eql "400 Bad Request"
+        assert_status(400)
       end
 
       it "should let you create a user if you pass all the validations" do
@@ -499,7 +499,7 @@ describe "Users API", type: :request do
           :pseudonym => { :password => "password123" }
         }
       )
-      response.status.should eql "400 Bad Request"
+      assert_status(400)
       errors = JSON.parse(response.body)['errors']
       errors['pseudonym'].should be_present
       errors['pseudonym']['unique_id'].should be_present
@@ -525,7 +525,7 @@ describe "Users API", type: :request do
           }
         }
       )
-      response.status.should eql "200 OK"
+      response.should be_success
       users = User.find_all_by_name "Test User"
       users.size.should == 1
       users.first.pseudonyms.first.unique_id.should == "test"
@@ -842,7 +842,7 @@ describe "Users API", type: :request do
         { controller: 'users', action: 'merge_into', format: 'json',
           id: @user2.to_param, destination_user_id: @user1.to_param}
       )
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
     end
   end
 end
