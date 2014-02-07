@@ -293,6 +293,7 @@ class ContentMigrationsController < ApplicationController
         return render(:json => {:message => t('must_upload_file', "File upload or url is required")}, :status => :bad_request)
       end
     end
+    lookup_sis_source_course_id
     if validator = settings[:required_options_validator]
       if res = validator.has_error(params[:settings], @current_user, @context)
         return render(:json => { :message => res.respond_to?(:call) ? res.call : res }, :status => :bad_request)
@@ -319,9 +320,16 @@ class ContentMigrationsController < ApplicationController
     @content_migration = @context.content_migrations.find(params[:id])
     @content_migration.check_for_pre_processing_timeout
     @plugin = Canvas::Plugin.find(@content_migration.migration_type)
-
+    lookup_sis_source_course_id
     update_migration
   end
+
+  def lookup_sis_source_course_id
+    if params.has_key?(:settings) && params[:settings].has_key?(:source_course_id)
+      params[:settings][:source_course_id] = api_find(Course, params[:settings][:source_course_id]).id
+    end
+  end
+  private :lookup_sis_source_course_id
 
 
   # @API List Migration Systems
