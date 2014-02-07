@@ -44,8 +44,7 @@ describe CalendarsController do
       Account.default.update_attribute(:settings, {:enable_scheduler => true})
       course_with_student_logged_in(:active_all => true)
       get 'show', :user_id => @user.id
-      response.should be_redirect
-      response.redirected_to.should == {:action => 'show2', :anchor => ' '}
+      response.should redirect_to(calendar2_url(anchor: ' '))
     end
 
     it "should assign variables" do
@@ -115,8 +114,7 @@ describe CalendarsController do
       @user.save!
       get 'show'
 
-      response.should be_redirect
-      response.redirected_to.should == {:action => 'show2', :anchor => ' '}
+      response.should redirect_to(calendar2_url(anchor: ' '))
     end
   end
 
@@ -124,8 +122,7 @@ describe CalendarsController do
     it "should redirect if the user should be on the old calendar" do
       course_with_student_logged_in(:active_all => true)
       get 'show2', :user_id => @user.id
-      response.should be_redirect
-      response.redirected_to.should == {:action => 'show', :anchor => ' '}
+      response.should redirect_to(calendar_url(anchor: ' '))
     end
 
     it "should assign variables" do
@@ -169,8 +166,7 @@ describe CalendarsController do
       @user.preferences[:use_calendar1].should be_nil
 
       post 'switch_calendar', {:preferred_calendar => '1'}
-      response.should be_redirect
-      response.redirected_to.should == {:action => 'show', :anchor => ' '}
+      response.should redirect_to(calendar_url(anchor: ' '))
       @user.reload.preferences[:use_calendar1].should be_true
     end
 
@@ -179,7 +175,7 @@ describe CalendarsController do
       course_with_student_logged_in(:active_all => true)
       @user.preferences[:use_calendar1].should be_nil
       post 'switch_calendar', {:preferred_calendar => '1'}
-      response.redirected_to.should == {:action => 'show2', :anchor => ' '}
+      response.should redirect_to(calendar2_url(anchor: ' '))
 
       # not messing with their preference in case they prefer cal1 in a
       # different account
@@ -191,8 +187,7 @@ describe CalendarsController do
       @user.preferences[:use_calendar1].should be_nil
 
       post 'switch_calendar', {:preferred_calendar => '2'}
-      response.should be_redirect
-      response.redirected_to.should == {:action => 'show', :anchor => ' '}
+      response.should redirect_to(calendar_url(anchor: ' '))
       @user.reload.preferences[:use_calendar1].should be_nil
     end
 
@@ -202,8 +197,7 @@ describe CalendarsController do
       @user.update_attribute(:preferences, {:use_calendar1 => true})
 
       post 'switch_calendar', {:preferred_calendar => '2'}
-      response.should be_redirect
-      response.redirected_to.should == {:action => 'show2', :anchor => ' '}
+      response.should redirect_to(calendar2_url(anchor: ' '))
       @user.reload.preferences[:use_calendar1].should be_nil
     end
   end

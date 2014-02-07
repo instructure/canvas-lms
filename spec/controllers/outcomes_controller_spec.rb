@@ -129,7 +129,7 @@ describe OutcomesController do
       @course.save!
 
       get 'show', :course_id => @course.id, :id => @outcome.id
-      response.response_code.should == 302 # requests are redirected for large_roster courses
+      response.should be_redirect
     end
   end
 

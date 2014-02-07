@@ -102,7 +102,7 @@ describe UsersController do
       managed_pseudonym @student
       get 'delete', :user_id => @student.id
       flash[:error].should =~ /cannot delete a system-generated user/
-      response.redirected_to.should == user_profile_url(@student)
+      response.should redirect_to(user_profile_url(@student))
     end
 
     it "should succeed when the current user has enough permissions to delete any system-generated pseudonyms" do
@@ -139,7 +139,7 @@ describe UsersController do
       course_with_student_logged_in
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      response.redirected_to.should == root_url
+      response.should redirect_to(root_url)
       @student.reload.workflow_state.should == 'deleted'
     end
 
@@ -158,7 +158,7 @@ describe UsersController do
       managed_pseudonym @student
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      response.redirected_to.should == users_url
+      response.should redirect_to(users_url)
       @student.reload.workflow_state.should == 'deleted'
     end
 
@@ -168,7 +168,7 @@ describe UsersController do
       managed_pseudonym @admin
       PseudonymSession.find(1).expects(:destroy).returns(nil)
       post 'destroy', :id => @admin.id
-      response.redirected_to.should == root_url
+      response.should redirect_to(root_url)
       @admin.reload.workflow_state.should == 'deleted'
     end
 
@@ -176,7 +176,7 @@ describe UsersController do
       course_with_student_logged_in
       PseudonymSession.find(1).expects(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      response.redirected_to.should == root_url
+      response.should redirect_to(root_url)
       @student.reload.workflow_state.should == 'deleted'
     end
   end
