@@ -3,7 +3,7 @@ module LuckySneaks
     def self.included(base)
       base.extend ClassMethods
     end
-    
+
     module ClassMethods # :doc:
       # Creates a callback to automatically create an url-friendly representation
       # of the <tt>attribute</tt> argument. Example:
@@ -30,11 +30,15 @@ module LuckySneaks
         cattr_accessor :scope_for_url
         cattr_accessor :url_attribute # The attribute on the DB
         cattr_accessor :only_when_blank
-        
+
         if options[:sync_url]
           before_validation :ensure_unique_url
         else
-          before_validation_on_create :ensure_unique_url
+          if CANVAS_RAILS3
+            before_validation(:ensure_unique_url, :on => :create)
+          else
+            before_validation_on_create(:ensure_unique_url)
+          end
         end
 
         self.attribute_to_urlify = attribute
@@ -57,8 +61,8 @@ module LuckySneaks
         end
       end
     end
-      
-  private
+
+    private
     def ensure_unique_url
       url_attribute = self.class.url_attribute
       base_url = self.send(url_attribute)
@@ -75,7 +79,7 @@ module LuckySneaks
       url_owners = self.class.where(conditions).all
       if url_owners.size > 0
         n = 1
-        while url_owners.detect{|u| u.send(url_attribute) == "#{base_url}-#{n}"}
+        while url_owners.detect { |u| u.send(url_attribute) == "#{base_url}-#{n}" }
           n = n.succ
         end
         write_attribute url_attribute, "#{base_url}-#{n}"
