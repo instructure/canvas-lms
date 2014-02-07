@@ -131,7 +131,7 @@ class AccountsController < ApplicationController
   #   If present, only return courses that have at least one enrollment.
   #   Equivalent to 'with_enrollments=true'; retained for compatibility.
   #
-  # @argument state[] [Optional, "created"|"claimed"|"available"|"completed"|"deleted"]
+  # @argument state[] [Optional, "created"|"claimed"|"available"|"completed"|"deleted"|"all"]
   #   If set, only return courses that are in the given state(s). By default,
   #   all states but "deleted" are returned.
   #
@@ -146,6 +146,7 @@ class AccountsController < ApplicationController
     return unless authorized_action(@account, @current_user, :read)
 
     params[:state] ||= %w{created claimed available completed}
+    params[:state] = %w{created claimed available completed deleted} if Array(params[:state]).include?('all')
     if value_to_boolean(params[:published])
       params[:state] -= %w{created claimed completed deleted}
     elsif !params[:published].nil? && !value_to_boolean(params[:published])

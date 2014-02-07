@@ -379,19 +379,39 @@ describe "Accounts API", type: :request do
       end
     end
 
-    it "should return courses filtered by state[]" do
-      @me = @user
-      [:c1, :c2].each do |course|
-        instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1))
+    describe "courses filtered by state[]" do
+      before do
+        @me = @user
+        [:c1, :c2, :c3, :c4].each do |course|
+          instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1))
+        end
+        @c2.destroy
+        Course.where(id: @c1).update_all(workflow_state: 'claimed')
+        Course.where(id: @c3).update_all(workflow_state: 'available')
+        Course.where(id: @c4).update_all(workflow_state: 'completed')
+        @user = @me
       end
-      @c2.destroy
-      @user = @me
 
-      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?state[]=deleted",
-        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :state => %w[deleted] })
+      it "should return courses filtered by state[]='deleted'" do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?state[]=deleted",
+                        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :state => %w[deleted] })
+        json.length.should eql 1
+        json.first['name'].should eql 'c2'
+      end
 
-      json.length.should eql 1
-      json.first['name'].should eql 'c2'
+      it "should return courses filtered by state[]=nil" do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
+                        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' })
+        json.length.should eql 3
+        json.collect{ |c| c['id'].to_i }.sort.should == [@c1.id, @c3.id, @c4.id].sort
+      end
+
+      it "should return courses filtered by state[]='all'" do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?state[]=all",
+                        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :state => %w[all] })
+        json.length.should eql 4
+        json.collect{ |c| c['id'].to_i }.sort.should == [@c1.id, @c2.id, @c3.id, @c4.id].sort
+      end
     end
 
     it "should return courses filtered by enrollment_term" do
