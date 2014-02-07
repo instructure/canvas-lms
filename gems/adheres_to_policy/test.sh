@@ -9,11 +9,12 @@ result+=$?
 
 
 echo "################ Running tests against Rails 3 ################"
-rm -f Gemfile.lock
+mv Gemfile.lock Gemfile.lock.rails2
 export CANVAS_RAILS3=true
 bundle install
 bundle exec rspec spec
 result+=$?
+mv Gemfile.lock.rails2 Gemfile.lock
 
 
 if [ $result -eq 0 ]; then
