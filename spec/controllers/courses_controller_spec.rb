@@ -242,7 +242,9 @@ describe CoursesController do
     it "should not find deleted courses" do
       course_with_teacher_logged_in(:active_all => true)
       @course.destroy
-      lambda { get 'show', :id => @course.id }.should raise_exception(ActiveRecord::RecordNotFound)
+      assert_page_not_found do
+        get 'show', :id => @course.id
+      end
     end
 
     it "should assign variables" do

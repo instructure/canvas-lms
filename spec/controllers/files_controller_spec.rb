@@ -442,8 +442,13 @@ describe FilesController do
     it "should fail if the file path doesn't match" do
       course_with_teacher_logged_in(:active_all => true)
       file_in_a_module
-      proc { get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path+"blah" }.should raise_error(ActiveRecord::RecordNotFound)
-      proc { get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+"blah" }.should raise_error(ActiveRecord::RecordNotFound)
+      assert_page_not_found do
+        get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path+"blah"
+      end
+
+      assert_page_not_found do
+        get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+"blah"
+      end
     end
 
     it "should ignore bad file_ids" do

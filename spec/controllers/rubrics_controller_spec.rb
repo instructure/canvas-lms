@@ -513,15 +513,15 @@ describe RubricsController do
     before { course_with_teacher_logged_in(active_all: true) }
 
     it "doesn't load nonsense" do
-      lambda {
+      assert_page_not_found do
         get 'show', id: "cats", course_id: @course.id
-      }.should raise_error ActiveRecord::RecordNotFound
+      end
     end
 
     it "returns 404 if record doesn't exist" do
-      lambda {
+      assert_page_not_found do
         get 'show', id: "1", course_id: @course.id
-      }.should raise_error ActiveRecord::RecordNotFound
+      end
     end
 
 

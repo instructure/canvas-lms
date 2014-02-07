@@ -840,6 +840,15 @@ end
     response.should render_template("shared/unauthorized")
   end
 
+  def assert_page_not_found(&block)
+    if CANVAS_RAILS2
+      block.should raise_exception(ActiveRecord::RecordNotFound)
+    else
+      yield
+      assert_status(404)
+    end
+  end
+
   def assert_require_login
     response.should be_redirect
     flash[:warning].should eql("You must be logged in to access this page")

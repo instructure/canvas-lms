@@ -65,12 +65,12 @@ describe RubricAssessmentsController do
 
     it "should not pass invalid ids through to the database" do
       course_with_teacher_logged_in(:active_all => true)
-      lambda {
+      assert_page_not_found do
         rubric_assessment_model(:user => @user, :context => @course, :purpose => 'grading')
         post 'create', :course_id => @course.id,
           :rubric_association_id => @rubric_association.id,
           :rubric_assessment => {:user_id => 'garbage', :assessment_type => "no_reason"}
-      }.should raise_error ActiveRecord::RecordNotFound
+      end
     end
   end
   

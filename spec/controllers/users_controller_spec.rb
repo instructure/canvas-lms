@@ -79,7 +79,9 @@ describe UsersController do
     it "should fail when the user doesn't exist" do
       account_admin_user
       user_session(@admin)
-      lambda { get 'delete', :user_id => (User.all.map(&:id).max + 1)}.should raise_error(ActiveRecord::RecordNotFound)
+      assert_page_not_found do
+        get 'delete', :user_id => (User.all.map(&:id).max + 1)
+      end
     end
 
     it "should fail when the current user doesn't have user manage permissions" do
@@ -119,7 +121,9 @@ describe UsersController do
       account_admin_user
       user_session(@admin)
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
-      lambda { post 'destroy', :id => (User.all.map(&:id).max + 1)}.should raise_error(ActiveRecord::RecordNotFound)
+      assert_page_not_found do
+        post 'destroy', :id => (User.all.map(&:id).max + 1)
+      end
     end
 
     it "should fail when the current user doesn't have user manage permissions" do

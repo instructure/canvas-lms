@@ -334,9 +334,9 @@ describe GradebooksController do
 
     it "should raise an exception on a non-integer :id" do
       course_with_teacher_logged_in(:active_all => true)
-      expect {
+      assert_page_not_found do
         get 'grade_summary', :course_id => @course.id, :id => "lqw"
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      end
     end
   end
 

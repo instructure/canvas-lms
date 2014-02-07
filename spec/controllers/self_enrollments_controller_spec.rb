@@ -38,9 +38,9 @@ describe SelfEnrollmentsController do
     end
 
     it "should not render for an incorrect code" do
-      lambda {
+      assert_page_not_found do
         get 'new', :self_enrollment_code => 'abc'
-      }.should raise_exception(ActiveRecord::RecordNotFound)
+      end
     end
 
     it "should render even if self_enrollment is disabled" do
