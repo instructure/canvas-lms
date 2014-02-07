@@ -192,7 +192,7 @@ class ApplicationController < ActionController::Base
   end
 
   def check_pending_otp
-    if session[:pending_otp] && !(params[:action] == 'otp_login' && request.method == :post)
+    if session[:pending_otp] && !(params[:action] == 'otp_login' && request.post?)
       reset_session
       redirect_to login_url
     end
@@ -720,7 +720,7 @@ class ApplicationController < ActionController::Base
     # We only record page_views for html page requests coming from within the
     # app, or if coming from a developer api request and specified as a 
     # page_view.
-    if (@developer_key && params[:user_request]) || (!@developer_key && @current_user && !request.xhr? && request.method == :get)
+    if (@developer_key && params[:user_request]) || (!@developer_key && @current_user && !request.xhr? && request.get?)
       generate_page_view
     end
   end
@@ -741,7 +741,7 @@ class ApplicationController < ActionController::Base
   def generate_page_view
     attributes = { :user => @current_user, :developer_key => @developer_key, :real_user => @real_current_user }
     @page_view = PageView.generate(request, attributes)
-    @page_view.user_request = true if params[:user_request] || (@current_user && !request.xhr? && request.method == :get)
+    @page_view.user_request = true if params[:user_request] || (@current_user && !request.xhr? && request.get?)
     @page_before_render = Time.now.utc
   end
 
