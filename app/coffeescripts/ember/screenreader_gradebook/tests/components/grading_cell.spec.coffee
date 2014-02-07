@@ -59,6 +59,11 @@ define [
     setType 'letter_grade'
     ok @component.get('isLetterGrade')
 
+  test "nilPointsPossible", ->
+    ok @component.get('nilPointsPossible')
+    run => @assignment.set('points_possible', 10)
+    equal @component.get('nilPointsPossible'), false
+
 
   asyncTest "focusOut", ->
     stub = sinon.stub @component, 'boundUpdateSuccess'

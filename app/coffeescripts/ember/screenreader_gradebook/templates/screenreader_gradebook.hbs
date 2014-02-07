@@ -307,7 +307,13 @@
   <div>Selected Assignment: <a {{bind-attr href="html_url"}}>{{name}}</a></div>
   <!-- how many points is the assignment worth -->
 
-  <div>Points possible: {{points_possible}}</div>
+  <div>Points possible:
+    {{#if points_possible}}
+      {{points_possible}}
+    {{else}}
+      {{#t 'no_points'}}No points possible{{/t}}
+    {{/if}}
+  </div>
 
 {{/with}}
 
