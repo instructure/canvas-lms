@@ -730,15 +730,15 @@ describe Quizzes::Quiz do
 
   it "should ignore lockdown-browser setting if that plugin is not enabled" do
     q = @course.quizzes.build(:title => "some quiz")
-    q1 = @course.quizzes.build(:title => "some quiz", :require_lockdown_browser => true, :require_lockdown_browser_for_results => false)
-    q2 = @course.quizzes.build(:title => "some quiz", :require_lockdown_browser => true, :require_lockdown_browser_for_results => true)
+    q1 = @course.quizzes.build(:title => "some quiz", :require_lockdown_browser => true, :require_lockdown_browser_for_results => false, :require_lockdown_browser_monitor => false)
+    q2 = @course.quizzes.build(:title => "some quiz", :require_lockdown_browser => true, :require_lockdown_browser_for_results => true, :require_lockdown_browser_monitor => true)
 
     # first, disable any lockdown browsers that might be configured already
     Canvas::Plugin.all_for_tag(:lockdown_browser).each { |p| p.settings[:enabled] = false }
 
     # nothing should be restricted
     Quizzes::Quiz.lockdown_browser_plugin_enabled?.should be_false
-    [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?]).
+    [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?]).
         each { |qs| qs[0].send(qs[1]).should be_false }
 
     # register a plugin
@@ -747,7 +747,7 @@ describe Quizzes::Quiz do
 
     # nothing should change yet
     Quizzes::Quiz.lockdown_browser_plugin_enabled?.should be_false
-    [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?]).
+    [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?]).
         each { |qs| qs[0].send(qs[1]).should be_false }
 
     # now actually enable the plugin
@@ -757,13 +757,13 @@ describe Quizzes::Quiz do
 
     # now the restrictions should take effect
     Quizzes::Quiz.lockdown_browser_plugin_enabled?.should be_true
-    [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?].
+    [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?].
         each { |s| q.send(s).should be_false }
     [:require_lockdown_browser, :require_lockdown_browser?].
         each { |s| q1.send(s).should be_true }
-    [:require_lockdown_browser_for_results, :require_lockdown_browser_for_results?].
+    [:require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?].
         each { |s| q1.send(s).should be_false }
-    [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?].
+    [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?].
         each { |s| q2.send(s).should be_true }
   end
 

@@ -9471,6 +9471,7 @@ en-AU:
       labels: 
         download_url: "LockDown Browser Download URL"
         plugin_enabled: Enabled
+        use_lti_tool: "Use LTI Tool to Manage LockDown Browser Quiz Settings (Required for Monitor)"
     notices: 
       settings_updated: "Plugin settings successfully updated."
     qti_converter_settings: 
