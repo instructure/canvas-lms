@@ -132,7 +132,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       result = Rails.cache.fetch([ @context, @current_user, "content_tag_assignment_info_all" ].cache_key) do
         info = {}
-        @context.context_module_tags.active.map do |tag|
+        @context.context_module_tags.not_deleted.map do |tag|
           if tag.assignment
             info[tag.id] = tag.assignment.context_module_tag_info(@current_user)
           else
