@@ -17769,4 +17769,5 @@ tinymce.onAddEditor.add(function(tinymce, ed) {
 	};
 })(tinymce);
 
+	return this.tinyMCE;
 });

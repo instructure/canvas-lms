@@ -23,7 +23,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should type a web address link, save it, and validate auto link plugin worked correctly" do
-      pending('karma upgrade')
       text = "http://www.google.com/"
       wysiwyg_state_setup(text, val = true)
       save_wiki
@@ -31,7 +30,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should remove web address link previously embedded, save it and persist" do
-      pending('karma upgrade')
       text = "http://www.google.com/"
       wysiwyg_state_setup(text, val = true)
 
@@ -227,7 +225,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
   end
 
   it "should add an equation to the rce by using equation buttons" do
-    pending('karma upgrade')
     get "/courses/#{@course.id}/wiki"
 
     f('#wiki_page_body_instructure_equation').click
@@ -255,7 +252,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
   end
 
   it "should add an equation to the rce by using the equation editor" do
-    pending('karma upgrade fix')
     equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}=\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
 
     get "/courses/#{@course.id}/wiki"
@@ -339,7 +335,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
   end
 
   it "should add an equation to the rce by using the equation editor in advanced view" do
-    pending('karma upgrade fix')
     equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}= \\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
 
     get "/courses/#{@course.id}/wiki"
