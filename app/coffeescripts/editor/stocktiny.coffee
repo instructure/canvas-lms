@@ -11,6 +11,7 @@ define [
   'tinymce/jscripts/tiny_mce/plugins/table/editor_plugin_src'
   'tinymce/jscripts/tiny_mce/plugins/table/langs/en_dlg'
   'tinymce/jscripts/tiny_mce/plugins/inlinepopups/editor_plugin_src'
+  'tinymce/jscripts/tiny_mce/plugins/autolink/editor_plugin'
 ], (markScriptsLoaded, punch) ->
 
   # prevent tiny from loading any CSS assets
@@ -26,6 +27,7 @@ define [
     'plugins/table/editor_plugin'
     'plugins/table/langs/en_dlg'
     'plugins/inlinepopups/editor_plugin'
+    'plugins/autolink/editor_plugin'
   ]
 
   tinymce

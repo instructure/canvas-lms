@@ -18,16 +18,11 @@ define [
   AssignmentGroupSelector, DueDateListView, DueDateOverrideView, EditView,
   GradingTypeSelector, GroupCategorySelector, PeerReviewsSelector, fakeENV) ->
 
-
-  fixtures = $('#fixtures')
-
   defaultAssignmentOpts =
     name: 'Test Assignment'
     assignment_overrides: []
 
   editView = (assignmentOpts = {}) ->
-    $('<form id="content"></form>').appendTo fixtures
-
     assignmentOpts = _.extend {}, assignmentOpts, defaultAssignmentOpts
     assignment = new Assignment assignmentOpts
 
@@ -46,7 +41,6 @@ define [
       parentModel: assignment
 
     app = new EditView
-      el: '#content'
       model: assignment
       assignmentGroupSelector: assignmentGroupSelector
       gradingTypeSelector: gradingTypeSelector
@@ -65,7 +59,6 @@ define [
     setup: ->
       fakeENV.setup()
     teardown: ->
-      fixtures.empty()
       fakeENV.teardown()
 
   test 'renders', ->
@@ -83,12 +76,10 @@ define [
     view = editView()
     equal view.$("#group_category_selector").length, 0
 
-
   test 'does not allow peer review for large rosters', ->
     ENV.IS_LARGE_ROSTER = true
     view = editView()
     equal view.$("#assignment_peer_reviews_fields").length, 0
-
 
   test 'adds and removes student group', ->
     ENV.GROUP_CATEGORIES = [{id: 1, name: "fun group"}]
@@ -122,7 +113,6 @@ define [
     teardown: ->
       fakeENV.teardown()
       window.addGroupCategory = null
-      fixtures.empty()
 
   test 'warns when has submitted submissions', ->
     view = editView has_submitted_submissions: true

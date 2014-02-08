@@ -12,12 +12,12 @@ define [
   'compiled/views/calendar/MissingDateDialogView'
   'compiled/views/assignments/AssignmentGroupSelector'
   'compiled/views/assignments/GroupCategorySelector'
+  'compiled/jquery/toggleAccessibly'
   'compiled/tinymce'
   'tinymce.editor_box'
   'jqueryui/dialog'
   'jquery.toJSON'
-  'compiled/jquery.rails_flash_notifications',
-  'compiled/jquery/toggleAccessibly',
+  'compiled/jquery.rails_flash_notifications'
 ], (INST, I18n, ValidatedFormView, _, $, wikiSidebar, template,
 TurnitinSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
 AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
