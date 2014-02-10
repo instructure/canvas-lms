@@ -97,6 +97,11 @@ require 'securerandom'
 #           "description": "the integration identifier for the course, if defined. This field is only included if the user has permission to view SIS information.",
 #           "type": "string"
 #         },
+#         "sis_import_id": {
+#           "description": "the unique identifier for the SIS import. This field is only included if the user has permission to manage SIS information.",
+#           "example": 34,
+#           "type": "integer"
+#         },
 #         "name": {
 #           "description": "the full name of the course",
 #           "example": "InstructureCon 2012",

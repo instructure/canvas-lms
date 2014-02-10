@@ -85,6 +85,9 @@ module Api::V1
       if course.grants_any_right?(user, :read_sis, :manage_sis)
         hash['sis_course_id'] = course.sis_source_id
       end
+      if course.root_account.grants_right?(user, :manage_sis)
+        hash['sis_import_id'] = course.sis_batch_id
+      end
     end
 
     def set_integration_id(hash, course, user)
@@ -114,7 +117,7 @@ module Api::V1
 
     INCLUDE_CHECKERS.each do |key, val|
       define_method("include_#{key}".to_sym) do
-        @includes.include?( val.to_sym )
+        @includes.include?(val.to_sym)
       end
     end
 
