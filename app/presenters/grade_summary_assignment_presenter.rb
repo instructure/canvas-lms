@@ -69,18 +69,6 @@ class GradeSummaryAssignmentPresenter
     !assignment.special_class && (has_comments? || has_scoring_details?)
   end
 
-  def hide_max_scores?
-    assignment && assignment.hide_max_scores_for_assignments
-  end
-
-  def hide_min_scores?
-    assignment && assignment.hide_min_scores_for_assignments
-  end
-
-  def show_all_scores?
-    assignment && !hide_max_scores? && !hide_min_scores?
-  end
-
   def special_class
     assignment.special_class ? ("hard_coded " + assignment.special_class) : "editable"
   end

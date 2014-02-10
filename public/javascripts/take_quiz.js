@@ -579,7 +579,7 @@ define([
           }
         }
         else {
-          unanswered = $("#question_list .list_question:not(.answered)").length;
+          unanswered = $("#question_list .list_question:not(.answered):not(.text_only)").length;
           if(unanswered > 0) {
             warningMessage = I18n.t('confirms.unanswered_questions',
               {'one': "You have 1 unanswered question (see the right sidebar for details).  Submit anyway?",

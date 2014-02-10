@@ -104,9 +104,18 @@ class WikiPagesController < ApplicationController
   end
 
   def perform_update
+    if params[:wiki_page].include?(:hide_from_students)
+      hide_from_students = Canvas::Plugin::value_to_boolean(params[:wiki_page].delete(:hide_from_students))
+      if hide_from_students
+        @page.workflow_state = 'unpublished'
+      else
+        @page.workflow_state = 'published'
+      end
+    end
+
     if @page.update_attributes(params[:wiki_page].merge(:user_id => @current_user.id))
       unless @page.context.feature_enabled?(:draft_state)
-        @page.set_as_front_page! if !@page.wiki.has_front_page? and @page.url == Wiki::DEFAULT_FRONT_PAGE_URL
+        @page.set_as_front_page! if @page.is_front_page?
       end
 
       log_asset_access(@page, "wiki", @wiki, 'participate')
@@ -152,7 +161,8 @@ class WikiPagesController < ApplicationController
   def front_page
     return unless tab_enabled?(@context.class::TAB_PAGES)
 
-    if @context.wiki.has_front_page?
+    front_page = @context.wiki.front_page if @context.wiki.has_front_page?
+    if front_page && !front_page.new_record?
       redirect_to polymorphic_url([@context, :named_page], :wiki_page_id => @context.wiki.front_page)
     else
       redirect_to polymorphic_url([@context, :pages])

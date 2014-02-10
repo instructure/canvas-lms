@@ -388,6 +388,27 @@ define [
         chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
         context._uniqid_ = (chars.charAt(Math.floor(Math.random() * chars.length)) for [1..8]).join ''
       return context._uniqid_
+
+    # Public: Render a child Backbone view.
+    #
+    # backboneView - A class that extends from Backbone.View.
+    #
+    # Examples
+    #   childView = Backbone.View.extend(...)
+    #
+    #   {{view childView}}
+    #
+    # Returns the child view's HTML.
+    view: (backboneView) ->
+      onNextFrame = (fn) -> (window.requestAnimationFrame or setTimeout)(fn, 0)
+      id          = "placeholder-#{$.guid++}"
+      replace     = ->
+        $span = $("##{id}")
+        if $span.length then $span.replaceWith(backboneView.$el) else onNextFrame(replace)
+
+      backboneView.render()
+      onNextFrame(replace)
+      new Handlebars.SafeString("<span id=\"#{id}\">pk</span>")
   }
 
   return Handlebars

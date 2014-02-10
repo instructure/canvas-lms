@@ -1,5 +1,5 @@
 shared_examples_for "permission tests" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     course_with_admin_logged_in

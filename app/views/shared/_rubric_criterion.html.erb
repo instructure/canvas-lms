@@ -84,7 +84,7 @@
   <td class="nobr points_form">
     <div class="editing" style="white-space: normal">
       <span style="white-space: nowrap; font-size: 0.8em">
-        <% rating_points = %{<input type="text" aria-label="#{t :points_label, "Points" }" value="#{ assessing ? (assessment_rating.points rescue "") : (criterion.points rescue 5) }" class="criterion_points span1 no-margin-bottom" />}.html_safe %>
+        <% rating_points = %{<input type="text" aria-label="#{h(t(:points_label, "Points"))}" value="#{ assessing ? (assessment_rating.points rescue "") : (criterion.points rescue 5) }" class="criterion_points span1 no-margin-bottom" />}.html_safe %>
         <% if assessing && criterion && criterion.points %>
           <%= t :points_out_of2, "%{points} / %{total} pts", :points => rating_points, :total => criterion.points %>
         <% else %>

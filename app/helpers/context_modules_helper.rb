@@ -19,7 +19,7 @@
 module ContextModulesHelper
   def cache_if_module(context_module, editable, draft_state, &block)
     if context_module
-      cache(['context_module_render_3_', context_module.cache_key, editable, draft_state].join('/'), nil, &block)
+      cache(['context_module_render_4_', context_module.cache_key, editable, draft_state].join('/'), nil, &block)
     else
       yield
     end
@@ -42,23 +42,11 @@ module ContextModulesHelper
   end
 
   def module_item_publishable?(item)
-    return true if item.nil? || !item.content
-    content_type_class = item.content_type_class
-    if (content_type_class == 'attachment')
-      # don't know how to publish/unpublish attachments yet
-      false
-    elsif (content_type_class == 'quiz')
-      # quizzes can't be unpublished once they have been published and
-      # taken by at least one person (maybe this should be abstracted
-      # elsewhere?) also, I know this is probably bad for the db.
-      item.content.quiz_submissions.count == 0
-    elsif (content_type_class == 'discussion_topic')
-      # don't know what this means for discussions yet really
-      #item.content.can_unpublish?
-      false
-    else
-      true
-    end
+    true
   end
 
+  def module_item_unpublishable?(item)
+    return true if item.nil? || !item.content || !item.content.respond_to?(:can_unpublish?)
+    item.content.can_unpublish?
+  end
 end

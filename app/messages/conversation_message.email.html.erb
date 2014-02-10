@@ -17,6 +17,10 @@
     background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
     background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
 
+<% if asset.conversation.subject.present? %>
+<h4><%= format_message(asset.conversation.subject).first %></h4>
+<% end %>
+
 <%= format_message(asset.body).first %>
 
 <hr style="border: 0;

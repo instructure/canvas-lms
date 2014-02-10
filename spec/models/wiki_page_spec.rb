@@ -59,19 +59,28 @@ describe WikiPage do
     course_with_teacher(:active_all => true)
     front_page = @course.wiki.front_page
     front_page.save!
-    front_page.hide_from_students = true
+    front_page.workflow_state = 'unpublished'
     front_page.valid?.should_not be_true
 
     new_front_page = @course.wiki.wiki_pages.create!(:title => "asdf")
     new_front_page.set_as_front_page!
 
     front_page.reload
-    front_page.hide_from_students = true
+    front_page.workflow_state = 'unpublished'
     front_page.valid?.should be_true
 
     new_front_page.reload
-    new_front_page.hide_from_students = true
+    new_front_page.workflow_state = 'unpublished'
     new_front_page.valid?.should_not be_true
+  end
+
+  it "shouldn't allow the front page to be unpublished" do
+    course_with_teacher(active_all: true, draft_state: true)
+    front_page = @course.wiki.front_page
+    front_page.should_not be_can_unpublish
+    # the data model doesn't actually disallow this (yet)
+    # front_page.workflow_state = 'unpublished'
+    # front_page.should_not be_valid
   end
 
   it "should transliterate unicode characters in the title for the url" do
@@ -159,7 +168,8 @@ describe WikiPage do
   describe '#can_edit_page?' do
     it 'is true if the user has manage_wiki rights' do
       course_with_teacher(:active_all => true)
-      page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'teachers', :hide_from_students => true)
+      page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'teachers')
+      page.workflow_state = 'unpublished'
       page.can_edit_page?(@teacher).should be_true
     end
 
@@ -172,13 +182,15 @@ describe WikiPage do
       end
 
       it 'does not grant teachers or TAs edit rights when editing roles are "Only teachers"' do
-        page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'teachers', :hide_from_students => true)
+        page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'teachers')
+        page.workflow_state = 'unpublished'
         page.can_edit_page?(@teacher).should be_false
         page.can_edit_page?(@ta).should be_false
       end
 
       it 'grants teachers and TAs edit rights when editing roles are "Teachers and students"' do
-        page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'teachers,students', :hide_from_students => true)
+        page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'teachers,students')
+        page.workflow_state = 'unpublished'
         page.can_edit_page?(@teacher).should be_true
         page.can_edit_page?(@ta).should be_true
       end
@@ -186,94 +198,57 @@ describe WikiPage do
 
     it 'is true for students who are in the course' do
       course_with_student(:active_all => true)
-      page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'students', :hide_from_students => false)
+      page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'students')
       student = @course.students.first
       page.can_edit_page?(student).should be_true
     end
 
     it 'is true for users who are not in the course' do
       course(:active_all => true)
-      page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'public', :hide_from_students => false)
+      page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'public')
       user(:active_all => true)
       page.can_edit_page?(@user).should be_true
     end
   end
 
-  context '#sync_hidden_and_unpublished' do
-    before :each do
-      course :active_all => true
-      @page = @course.wiki.wiki_pages.build(:title => 'Test Page', :url => 'test-page')
-    end
-
-    context 'with draft state disabled' do
-      before :each do
-        @course.account.disable_feature!(:draft_state)
-      end
-
-      it 'should be performed on save' do
-        @page.workflow_state = 'unpublished'
-        @page.hide_from_students = false
-        @page.save!
-        @page.workflow_state.should == 'active'
-        @page.hide_from_students.should be_true
-        @page.reload
-        @page.workflow_state.should == 'active'
-        @page.hide_from_students.should be_true
-      end
-
-      it 'should be performed on load' do
-        @page.save!
-        WikiPage.update_all({:workflow_state => 'unpublished', :hide_from_students => false}, {:id => @page.id})
-
-        @page = @course.wiki.wiki_pages.last
-        @page.workflow_state.should == 'active'
-        @page.hide_from_students.should be_true
-      end
-    end
-
-    context 'with draft state enabled' do
-      before :each do
-        @course.account.allow_feature!(:draft_state)
-        @course.enable_feature!(:draft_state)
-      end
-
-      it 'should be performed on save' do
-        @page.workflow_state = 'active'
-        @page.hide_from_students = true
-        @page.save!
-        @page.workflow_state.should == 'unpublished'
-        @page.hide_from_students.should be_false
-        @page.reload
-        @page.workflow_state.should == 'unpublished'
-        @page.hide_from_students.should be_false
-      end
-
-      it 'should be performed on load' do
-        @page.save!
-        WikiPage.update_all({:workflow_state => 'active', :hide_from_students => true}, {:id => @page.id})
-
-        @page = @course.wiki.wiki_pages.last
-        @page.workflow_state.should == 'unpublished'
-        @page.hide_from_students.should be_false
-      end
-    end
-  end
-
   context 'initialize_wiki_page' do
-    it 'should set the course front page body' do
-      course_with_teacher_logged_in
-      front_page = @course.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
-      front_page.body.should be_nil
-      front_page.initialize_wiki_page(@teacher)
-      front_page.body.should_not be_empty
+    context 'on a course' do
+      before do
+        course_with_teacher_logged_in
+      end
+
+      it 'should set the front page body' do
+        front_page = @course.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
+        front_page.body.should be_nil
+        front_page.initialize_wiki_page(@teacher)
+        front_page.body.should_not be_empty
+      end
+
+      context 'with draft state' do
+        before do
+          @course.account.allow_feature!(:draft_state)
+          @course.enable_feature!(:draft_state)
+        end
+
+        it 'should publish the front page' do
+          front_page = @course.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
+          front_page.initialize_wiki_page(@teacher)
+          front_page.should be_published
+        end
+      end
     end
 
-    it 'should set the group front page body' do
-      group_with_user_logged_in
-      front_page = @group.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
-      front_page.body.should be_nil
-      front_page.initialize_wiki_page(@user)
-      front_page.body.should_not be_empty
+    context 'on a group' do
+      before do
+        group_with_user_logged_in
+      end
+
+      it 'should set the front page body' do
+        front_page = @group.wiki.wiki_pages.new(:title => 'Front Page', :url => 'front-page')
+        front_page.body.should be_nil
+        front_page.initialize_wiki_page(@user)
+        front_page.body.should_not be_empty
+      end
     end
   end
 
@@ -352,7 +327,7 @@ describe WikiPage do
       end
 
       it 'should be given read rights, unless hidden from students' do
-        @page.hide_from_students = true
+        @page.workflow_state = 'unpublished'
         @page.grants_right?(@user, :read).should be_false
       end
 

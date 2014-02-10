@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 describe "edititing grades" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   ASSIGNMENT_1_POINTS = "10"
   ASSIGNMENT_2_POINTS = "5"

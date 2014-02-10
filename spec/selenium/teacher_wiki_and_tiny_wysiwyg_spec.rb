@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 
 describe "Wiki pages and Tiny WYSIWYG editor features" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context "WYSIWYG generic as a teacher" do
 
@@ -162,10 +162,10 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should add and remove links" do
       title = "test_page"
-      hfs = false
+      unpublished = false
       edit_roles = "public"
 
-      create_wiki_page(title, hfs, edit_roles)
+      create_wiki_page(title, unpublished, edit_roles)
 
       get "/courses/#{@course.id}/wiki"
       wait_for_tiny(keep_trying_until { f("#new_wiki_page") })

@@ -100,7 +100,7 @@ describe QuizzesController do
   end
 
   describe "GET 'index' with draft state enabled" do
-    setup do
+    before do
       Account.default.enable_feature! :draft_state
     end
 

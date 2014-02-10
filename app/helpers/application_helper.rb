@@ -489,7 +489,7 @@ module ApplicationHelper
     global_inst_object = { :environment =>  Rails.env }
     {
       :allowMediaComments       => Kaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
-      :kalturaSettings          => Kaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes', 'do_analytics'),
+      :kalturaSettings          => Kaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes', 'do_analytics', 'do_flash_var_test'),
       :equellaEnabled           => !!equella_enabled?,
       :googleAnalyticsAccount   => Setting.get('google_analytics_key', nil),
       :http_status              => @status,
@@ -654,7 +654,7 @@ module ApplicationHelper
       :collection_size        => all_courses_count,
       :more_link_for_over_max => courses_path,
       :title                  => t('#menu.my_courses', "My Courses"),
-      :link_text              => raw(t('#layouts.menu.view_all_enrollments', 'View all courses')),
+      :link_text              => t('#layouts.menu.view_all_enrollments', 'View all courses'),
       :edit                   => t("#menu.customize", "Customize")
     }
   end
@@ -667,7 +667,7 @@ module ApplicationHelper
       :max_to_show => 8,
       :more_link_for_over_max => groups_path,
       :title => t('#menu.current_groups', "Current Groups"),
-      :link_text => raw(t('#layouts.menu.view_all_groups', 'View all groups'))
+      :link_text => t('#layouts.menu.view_all_groups', 'View all groups')
     }
   end
 
@@ -679,7 +679,7 @@ module ApplicationHelper
       :max_to_show => 8,
       :more_link_for_over_max => accounts_path,
       :title => t('#menu.managed_accounts', "Managed Accounts"),
-      :link_text => raw(t('#layouts.menu.view_all_accounts', 'View all accounts'))
+      :link_text => t('#layouts.menu.view_all_accounts', 'View all accounts')
     }
   end
 

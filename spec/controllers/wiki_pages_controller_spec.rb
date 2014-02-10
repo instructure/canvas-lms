@@ -117,7 +117,7 @@ describe WikiPagesController do
       page.should_not be_nil
       page.should_not be_new_record
       page.title.should == "Some Secret Page"
-      page.hide_from_students = true
+      page.workflow_state = 'unpublished'
       page.save
       page.reload
       student = user()

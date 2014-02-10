@@ -1,5 +1,7 @@
 $stdout, stdout_saved = (Class.new do def puts(string); end; def write(string); end; end).new, $stdout
-require 'erubis/helpers/rails_helper'
+if CANVAS_RAILS2
+  require 'erubis/helpers/rails_helper'
+end
 $stdout = stdout_saved
 
 module RailsXss
@@ -33,5 +35,10 @@ module RailsXss
   end
 end
 
-Erubis::Helpers::RailsHelper.engine_class = RailsXss::Erubis
-Erubis::Helpers::RailsHelper.show_src = false
+if CANVAS_RAILS2
+  Erubis::Helpers::RailsHelper.engine_class = RailsXss::Erubis
+  Erubis::Helpers::RailsHelper.show_src = false
+else
+  ActionView::Template.register_default_template_handler :erb, RailsXss::Erubis
+  ActionView::Template.register_template_handler :rhtml, RailsXss::Erubis
+end

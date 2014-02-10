@@ -37,26 +37,24 @@ class AssignmentGroup < ActiveRecord::Base
 
   before_save :set_context_code
   before_save :generate_default_values
-  before_save :group_weight_changed
   after_save :course_grading_change
   after_save :touch_context
   after_save :update_student_grades
 
   def generate_default_values
-    if self.name == "" || self.name.nil?
+    if self.name.blank?
       self.name = t 'default_title', "Assignments"
     end
     if !self.group_weight
       self.group_weight = 0
     end
-    @grades_changed = self.rules_changed? || self.group_weight_changed?
     self.default_assignment_name = self.name
     self.default_assignment_name = self.default_assignment_name.singularize if I18n.locale == :en
   end
   protected :generate_default_values
 
   def update_student_grades
-    if @grades_changed
+    if self.rules_changed? || self.group_weight_changed?
       connection.after_transaction_commit { self.context.recompute_student_scores }
     end
   end
@@ -146,13 +144,8 @@ class AssignmentGroup < ActiveRecord::Base
   scope :for_context_codes, lambda { |codes| active.where(:context_code => codes).order(:position) }
   scope :for_course, lambda { |course| where(:context_id => course, :context_type => 'Course') }
 
-  def group_weight_changed
-    @group_weight_changed = self.group_weight_changed?
-    true
-  end
-
   def course_grading_change
-    self.context.grade_weight_changed! if @group_weight_changed && self.context && self.context.group_weighting_scheme == 'percent'
+    self.context.grade_weight_changed! if group_weight_changed? && self.context && self.context.group_weighting_scheme == 'percent'
     true
   end
 

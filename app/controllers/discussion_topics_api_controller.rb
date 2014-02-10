@@ -95,25 +95,35 @@ class DiscussionTopicsApiController < ApplicationController
   #     ]
   #   }
   def view
-    structure, participant_ids, entry_ids, new_entries_structure = @topic.materialized_view(:include_new_entries => params[:include_new_entries] == '1')
+    structure, participant_ids, entry_ids, new_entries = @topic.materialized_view(:include_new_entries => params[:include_new_entries] == '1')
 
     if structure
+
+      # we assume that json_structure will typically be served to users requesting string IDs
+      unless stringify_json_ids?
+        entries = JSON.parse(structure)
+        Api.recursively_stringify_json_ids(entries, reverse: true)
+        structure = entries.to_json
+      end
+
       participant_info = Shard.partition_by_shard(participant_ids) do |shard_ids|
         User.find(shard_ids).map do |user|
           user_display_json(user, @context.is_a_context? && @context)
         end
       end
       unread_entries = entry_ids - DiscussionEntryParticipant.read_entry_ids(entry_ids, @current_user)
+      unread_entries = unread_entries.map(&:to_s) if stringify_json_ids?
       forced_entries = DiscussionEntryParticipant.forced_read_state_entry_ids(entry_ids, @current_user)
+      forced_entries = forced_entries.map(&:to_s) if stringify_json_ids?
       # as an optimization, the view structure is pre-serialized as a json
       # string, so we have to do a bit of manual json building here to fit it
       # into the response.
       fragments = {
         :unread_entries => unread_entries.to_json,
         :forced_entries => forced_entries.to_json,
-        :participants   => participant_info.to_json,
+        :participants   => json_cast(participant_info).to_json,
         :view           => structure,
-        :new_entries    => new_entries_structure,
+        :new_entries    => json_cast(new_entries).to_json,
       }
       fragments = fragments.map { |k, v| %("#{k}": #{v}) }
       render :json => "{ #{fragments.join(', ')} }"

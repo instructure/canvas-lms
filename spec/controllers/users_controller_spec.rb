@@ -726,4 +726,57 @@ describe UsersController do
       user['name'].should == @student.name
     end
   end
+
+  describe "POST 'masquerade'" do
+    specs_require_sharding
+
+    it "should associate the user with target user's shard" do
+      PageView.stubs(:page_view_method).returns(:db)
+      user_with_pseudonym
+      admin = @user
+      Account.site_admin.add_user(admin)
+      user_session(admin)
+      @shard1.activate do
+        account = Account.create!
+        user2 = user_with_pseudonym(account: account)
+        LoadAccount.stubs(:default_domain_root_account).returns(account)
+        post 'masquerade', user_id: user2.id
+        response.should be_redirect
+
+        admin.associated_shards(:shadow).should be_include(@shard1)
+      end
+    end
+
+    it "should not associate the user with target user's shard if masquerading failed" do
+      PageView.stubs(:page_view_method).returns(:db)
+      user_with_pseudonym
+      admin = @user
+      user_session(admin)
+      @shard1.activate do
+        account = Account.create!
+        user2 = user_with_pseudonym(account: account)
+        LoadAccount.stubs(:default_domain_root_account).returns(account)
+        post 'masquerade', user_id: user2.id
+        response.should_not be_redirect
+
+        admin.associated_shards(:shadow).should_not be_include(@shard1)
+      end
+    end
+
+    it "should not associate the user with target user's shard for non-db page views" do
+      user_with_pseudonym
+      admin = @user
+      Account.site_admin.add_user(admin)
+      user_session(admin)
+      @shard1.activate do
+        account = Account.create!
+        user2 = user_with_pseudonym(account: account)
+        LoadAccount.stubs(:default_domain_root_account).returns(account)
+        post 'masquerade', user_id: user2.id
+        response.should be_redirect
+
+        admin.associated_shards(:shadow).should_not be_include(@shard1)
+      end
+    end
+  end
 end

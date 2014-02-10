@@ -118,6 +118,85 @@ class QuizSubmissionService
     quiz_submission.complete!
   end
 
+  # Modify question scores and comments for a student's quiz submission.
+  #
+  # @param [Hash] scoring_data
+  #   So this is the set that contains the modifications you want to apply.
+  #   The format is well-documented in the QuizSubmissionsApi#update endpoint,
+  #   so check it out there.
+  #
+  # @option [Integer] attempt
+  #   The attempt the modifications are for. This needs to map to a valid and
+  #   _complete_ quiz submission attempt.
+  #
+  # @option [Float] scoring_data.fudge_points
+  #   Amount of points to fudge the totalscore by.
+  #
+  # @option [Hash] scoring_data.questions
+  #   Question scores and comments. The key is the question id.
+  #
+  # @option [Float] scoring_data.questions.score
+  #   Question score. Nil, or lack of, represents no change.
+  #
+  # @option [String] scoring_data.questions.comment
+  #   Question/answer comment. Nil, or lack of, represents no change. Empty
+  #   string means remove any previous comments.
+  #
+  # @return [nil] nothing of significance
+  #
+  # @throw ApiError(403) if the participant user isn't a teacher
+  # @throw ApiError(400) if the attempt isn't valid, or isn't complete
+  # @throw ApiError(400) if a question score is funny
+  def update_scores(quiz_submission, attempt, scoring_data)
+    unless quiz_submission.grants_right?(participant.user, :update_scores)
+      reject! 403, 'you are not allowed to update scores for this quiz submission'
+    end
+
+    if !attempt
+      reject! 400, 'invalid attempt'
+    end
+
+    version = quiz_submission.versions.get(attempt.to_i)
+
+    if version.nil?
+      reject! 400, 'invalid attempt'
+    elsif !version.model.completed?
+      reject! 400, 'quiz submission attempt must be complete'
+    end
+
+    # map the scoring data to the legacy format of QuizSubmission#update_scores
+    legacy_params = {}.with_indifferent_access
+    legacy_params[:submission_version_number] = attempt.to_i
+
+    if scoring_data[:fudge_points].present?
+      legacy_params[:fudge_points] = scoring_data[:fudge_points].to_f
+    end
+
+    if scoring_data[:questions].is_a?(Hash)
+      scoring_data[:questions].each_pair do |question_id, question_data|
+        question_id = question_id.to_i
+        score, comment = question_data[:score], question_data[:comment]
+
+        if score.present?
+          legacy_params["question_score_#{question_id}".to_sym] = begin
+            score.to_f
+          rescue
+            reject! 400, 'question score must be an unsigned decimal'
+          end
+        end
+
+        # nil represents lack of change to a comment, '' means no comment
+        unless comment.nil?
+          legacy_params["question_comment_#{question_id}".to_sym] = comment.to_s
+        end
+      end
+    end
+
+    unless legacy_params.except(:submission_version_number).empty?
+      quiz_submission.update_scores(legacy_params)
+    end
+  end
+
   protected
 
   # Abort the current service request with an error similar to an API error.

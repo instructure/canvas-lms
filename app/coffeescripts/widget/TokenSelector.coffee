@@ -313,6 +313,9 @@ define [
       clearTimeout @timeout
       @select(null)
       @timeout = setTimeout =>
+        if @lastFetch and !@lastFetch.isResolved()
+          @nextRequest = true
+          return
         list = @listForQuery(@preparePost())
         if list is @list
           # no change
@@ -365,6 +368,8 @@ define [
       unless collection.atLeastOnePageFetched
         collection.on 'fetch', _.once =>
           @autoSelectFirst list
+          @updateSearch() if @nextRequest
+          delete @nextRequest
 
       list
 

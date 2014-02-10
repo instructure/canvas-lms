@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 shared_examples_for "quizzes selenium tests" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def create_multiple_choice_question
     question = fj(".question_form:visible")

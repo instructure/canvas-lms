@@ -702,7 +702,7 @@ define([
             var valid_ids = [];
             for(var idx in ids) {
               var id = ids[idx];
-              id = parseInt(id.substring(5));
+              id = id.substring(5);
               if(!isNaN(id)) { valid_ids.push(id); }
             }
             var order = valid_ids.join(",");
@@ -833,7 +833,7 @@ define([
             var valid_ids = [];
             for(var idx in ids) {
               var id = ids[idx];
-              id = parseInt(id.substring(8));
+              id = id.substring(8);
               if(!isNaN(id)) { valid_ids.push(id); }
             }
             var order = valid_ids.join(",");

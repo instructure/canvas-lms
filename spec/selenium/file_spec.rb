@@ -2,15 +2,11 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "shared files tests" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def fixture_file_path(file)
     path = ActionController::TestCase.respond_to?(:fixture_path) ? ActionController::TestCase.send(:fixture_path) : nil
     return "#{path}#{file}"
-  end
-
-  def fixture_file_upload(file, mimetype)
-    ActionController::TestUploadedFile.new(fixture_file_path(file), mimetype)
   end
 
   def add_file(fixture, context, name)
@@ -189,7 +185,7 @@ end
 
 
 describe "zip file uploads" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context "courses" do
     before do

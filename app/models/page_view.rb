@@ -17,7 +17,7 @@
 #
 
 class PageView < ActiveRecord::Base
-  set_primary_key 'request_id'
+  self.primary_key = 'request_id'
 
   belongs_to :developer_key
   belongs_to :user
@@ -44,7 +44,7 @@ class PageView < ActiveRecord::Base
   def self.generate(request, attributes={})
     self.new(attributes).tap do |p|
       p.url = LoggingFilter.filter_uri(request.url)[0,255]
-      p.http_method = request.method.to_s
+      p.http_method = request.method.to_s.downcase
       p.controller = request.path_parameters['controller']
       p.action = request.path_parameters['action']
       p.session_id = request.session_options[:id].to_s.force_encoding(Encoding::UTF_8).presence
@@ -366,7 +366,7 @@ class PageView < ActiveRecord::Base
           order("created_at asc").limit(batch_size).to_sql
 
       # query just the raw attributes, don't instantiate AR objects
-      rows = PageView.connection.execute(finder_sql).to_a
+      rows = PageView.connection.select_all(finder_sql).to_a
 
       return false if rows.empty?
 
@@ -401,7 +401,7 @@ class PageView < ActiveRecord::Base
       logger.info "account #{Shard.current.id}~#{account_id}: added #{inserted} page views starting at #{last_created_at}"
 
       last_created_at = rows.last['created_at']
-      last_created_at = Time.zone.parse(last_created_at)
+      last_created_at = Time.zone.parse(last_created_at) unless last_created_at.is_a?(Time)
       cassandra.execute("UPDATE page_views_migration_metadata_per_account SET last_created_at = ? WHERE shard_id = ? AND account_id = ?", last_created_at, Shard.current.id.to_s, account_id)
       data['last_created_at'] = last_created_at
       return inserted > 0

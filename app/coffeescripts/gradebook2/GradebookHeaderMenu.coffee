@@ -22,6 +22,10 @@ define [
         assignmentUrl: "#{@gradebook.options.context_url}/assignments/#{@assignment.id}"
         speedGraderUrl: "#{@gradebook.options.context_url}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       templateLocals.speedGraderUrl = null unless @gradebook.options.speed_grader_enabled
+
+      @gradebook.allSubmissionsLoaded.done =>
+        @allSubmissionsLoaded = true
+
       @$menu = $(gradebookHeaderMenuTemplate(templateLocals)).insertAfter(@$trigger)
       @$trigger.kyleMenu(noButton:true)
       @$menu
@@ -44,15 +48,16 @@ define [
         )
         .bind('popupopen',  =>
           @$menu.find("[data-action=#{action}]").showIf(condition) for action, condition of {
-            showAssignmentDetails: @gradebook.allSubmissionsLoaded
-            messageStudentsWho:    @gradebook.allSubmissionsLoaded
-            setDefaultGrade:       @gradebook.allSubmissionsLoaded
-            curveGrades:           @gradebook.allSubmissionsLoaded && @assignment.grading_type != 'pass_fail' && @assignment.points_possible
+            showAssignmentDetails: @allSubmissionsLoaded
+            messageStudentsWho:    @allSubmissionsLoaded
+            setDefaultGrade:       @allSubmissionsLoaded
+            curveGrades:           @allSubmissionsLoaded && @assignment.grading_type != 'pass_fail' && @assignment.points_possible
             downloadSubmissions:   "#{@assignment.submission_types}".match(/(online_upload|online_text_entry|online_url)/)
             reuploadSubmissions:   @assignment.submissions_downloads > 0
           }
         )
         .popup('open')
+
       new AssignmentMuter(@$menu.find("[data-action=toggleMuting]"), @assignment, "#{@gradebook.options.context_url}/assignments/#{@assignment.id}/mute")
 
     showAssignmentDetails: (opts={

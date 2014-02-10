@@ -77,6 +77,7 @@
 .defaultSkin .mceColorSplitMenu td {padding:2px}
 .defaultSkin .mceColorSplitMenu a {display:block; width:9px; height:9px; overflow:hidden; border:1px solid #808080}
 .defaultSkin .mceColorSplitMenu td.mceMoreColors {padding:1px 3px 1px 1px}
+.defaultSkin .mceColorSplitMenu td.selectedColor { background-color: rgba(0, 0, 0, 0.4) }
 .defaultSkin .mceColorSplitMenu a.mceMoreColors {width:100%; height:auto; text-align:center; font-family:Tahoma,Verdana,Arial,Helvetica; font-size:11px; line-height:20px; border:1px solid #FFF}
 .defaultSkin .mceColorSplitMenu a.mceMoreColors:hover {border:1px solid #0A246A; background-color:#B6BDD2}
 .defaultSkin a.mceMoreColors:hover {border:1px solid #0A246A}

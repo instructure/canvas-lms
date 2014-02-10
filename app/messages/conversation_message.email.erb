@@ -9,6 +9,10 @@
 <% end %>
 <%= t :body, "%{user_name} just sent you a message in Canvas:", :user_name => content(:user_name) %>
 
+<% if asset.conversation.subject.present? %>
+Subject: <%= asset.conversation.subject %>
+
+<% end %>
 <%= asset.body %>
 
 <% if asset.has_media_objects? %>
@@ -22,7 +26,7 @@
 <% unless asset.attachments.empty? %>
 <%= t :attached_files, "Attached Files:" %>
 <% asset.attachments.each do |attachment| %>
-<%= attachment.display_name %> - <%= attachment.readable_size %> 
+<%= attachment.display_name %> - <%= attachment.readable_size %>
 <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/files/<%= attachment.id %>/download?verifier=<%= attachment.uuid %>
 <% end %>
 <% end %>

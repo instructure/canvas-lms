@@ -59,8 +59,8 @@ def stub_png_data(filename = 'test my file? hai!&.png', data = nil)
 end
 
 def jpeg_data_frd
-  fixture_path = File.expand_path(File.dirname(__FILE__) + '/../fixtures/test_image.jpg')
-  ActionController::TestUploadedFile.new(fixture_path, 'image/jpeg', true)
+  fixture_path = '/test_image.jpg'
+  fixture_file_upload(fixture_path, 'image/jpeg', true)
 end
 
 # Makes sure we have a value in scribd_mime_types and that the attachment model points to that.

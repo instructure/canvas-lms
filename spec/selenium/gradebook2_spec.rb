@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 
 describe "gradebook2" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   ASSIGNMENT_1_POINTS = "10"
   ASSIGNMENT_2_POINTS = "5"
@@ -164,35 +164,33 @@ describe "gradebook2" do
       edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
       edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', 1)
 
-      button = f('#section_to_show')
-      choose_section = lambda do |name|
-        button.click
+      choose_section = ->(name) do
+        fj('.section-select-button:visible').click
         wait_for_js
-        ff('#section-to-show-menu a').find { |a| a.text.include? name }.click
+        ffj('.section-select-menu:visible a').find { |a| a.text.include? name }.click
         wait_for_js
       end
 
       choose_section.call "All Sections"
-      button.should include_text("All Sections")
+      fj('.section-select-button:visible').should include_text("All Sections")
 
       choose_section.call @other_section.name
-      button.should include_text(@other_section.name)
+      fj('.section-select-button:visible').should include_text(@other_section.name)
 
       validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'), '1')
 
       # verify that it remembers the section to show across page loads
       get "/courses/#{@course.id}/gradebook2"
-      button = fj('#section_to_show')
-      button.should include_text @other_section.name
+      fj('.section-select-button:visible').should include_text @other_section.name
       validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'), '1')
 
       # now verify that you can set it back
 
-      button.click
+      fj('.section-select-button:visible').click
       wait_for_ajaximations
-      keep_trying_until { fj('#section-to-show-menu').should be_displayed }
+      keep_trying_until { fj('.section-select-menu:visible').should be_displayed }
       fj("label[for='section_option_#{''}']").click
-      keep_trying_until { button.should include_text "All Sections" }
+      keep_trying_until { fj('.section-select-button:visible').should include_text "All Sections" }
 
       # validate all grades (i.e. submissions) were loaded
       validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'), '0')
@@ -684,6 +682,71 @@ describe "gradebook2" do
         should_show_percentages
       end
     end
+
+    def header_text(n)
+      f(".container_0 .slick-header-column:nth-child(#{n})").try(:text)
+    end
+
+    context "custom gradebook columns" do
+      def custom_column(opts = {})
+        opts.reverse_merge! title: "<b>SIS ID</b>"
+        @course.custom_gradebook_columns.create! opts
+      end
+
+      it "shows custom columns" do
+        hidden = custom_column title: "hidden", hidden: true
+        col = custom_column
+        col.update_order([col.id, hidden.id])
+
+        col.custom_gradebook_column_data.new.tap { |d|
+          d.user_id = @student_1.id
+          d.content = "123456"
+        }.save!
+
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+
+        header_text(3).should == col.title
+        header_text(4).should_not == hidden.title
+        ff(".slick-cell.custom_column").select { |c|
+          c.text == "123456"
+        }.size.should == 1
+      end
+
+      it "lets you show and hide the teacher notes column" do
+        get "/courses/#{@course.id}/gradebook2"
+
+        has_notes_column = lambda {
+          ff(".container_0 .slick-header-column").any? { |h|
+            h.text == "Notes"
+          }
+        }
+        has_notes_column.call.should be_false
+
+        dropdown_link = f("#gradebook_settings")
+        click_dropdown_option = lambda { |option|
+          dropdown_link.click
+          ff(".gradebook_drop_down a").find { |a|
+            a.text == option
+          }.click
+          wait_for_ajaximations
+        }
+        show_notes = lambda { click_dropdown_option.("Show Notes Column") }
+        hide_notes = lambda { click_dropdown_option.("Hide Notes Column") }
+
+        # create the column
+        show_notes.call
+        has_notes_column.call.should be_true
+
+        # hide the column
+        hide_notes.call
+        has_notes_column.call.should be_false
+
+        # un-hide the column
+        show_notes.call
+        has_notes_column.call.should be_true
+      end
+    end
   end
 
   context "as an observer" do
@@ -697,6 +760,25 @@ describe "gradebook2" do
       f("#only_consider_graded_assignments").click
       wait_for_ajax_requests
       f(".final_grade .grade").should include_text("12.5")
+    end
+  end
+
+  describe "outcome gradebook" do
+    before(:each) { data_setup }
+
+    it "should not be visible by default" do
+      get "/courses/#{@course.id}/gradebook2"
+      ff('.gradebook-navigation').length.should == 0
+    end
+
+    it "should be visible when enabled" do
+      Account.default.set_feature_flag!('outcome_gradebook', 'on')
+      get "/courses/#{@course.id}/gradebook2"
+      ff('.gradebook-navigation').length.should == 1
+
+      f('a[data-id=outcome-gradebook]').click
+      wait_for_ajaximations
+      f('.outcome-gradebook-container').should_not be_nil
     end
   end
 end

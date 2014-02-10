@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -67,9 +67,9 @@ module Canvas::AccountReports
       CSV.open(file, "w") do |csv|
 
         condition = [""]
-        condition.first << " AND submitted_at > ?"
+        condition.first << " AND s.submitted_at > ?"
         condition << start_at
-        condition.first << " AND submitted_at < ?"
+        condition.first << " AND s.submitted_at < ?"
         condition << end_at
 
         time_span_join = Pseudonym.send(:sanitize_sql, condition)
@@ -86,13 +86,12 @@ module Canvas::AccountReports
                  INNER JOIN pseudonyms p ON e.user_id = p.user_id
                    AND courses.root_account_id = p.account_id
                  INNER JOIN users u ON u.id = p.user_id").
-          where("NOT EXISTS (SELECT user_id
+          where("NOT EXISTS (SELECT s.user_id
                              FROM submissions s
                              INNER JOIN assignments a ON s.assignment_id = a.id
-                             INNER JOIN courses c ON a.context_id = c.id
                                AND a.context_type = 'Course'
+                               AND a.context_id = courses.id
                              WHERE s.user_id = p.user_id
-                             AND c.id = courses.id
                              #{time_span_join})")
 
         no_subs = add_term_scope(no_subs)
@@ -213,8 +212,12 @@ module Canvas::AccountReports
         end
 
         csv << ['user id','user sis id','user name','last access at','last ip']
+
+        pseudonyms_in_report = Set.new
         Shackles.activate(:slave) do
           students.find_each do |u|
+            next if pseudonyms_in_report.include? [u.user_id, u.sis_user_id]
+            pseudonyms_in_report << [u.user_id, u.sis_user_id]
             row = []
             row << u.user_id
             row << u.sis_user_id

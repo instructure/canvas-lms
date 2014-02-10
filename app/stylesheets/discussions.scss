@@ -616,8 +616,10 @@ body.with-right-side.with-left-side {
   .headerBar {
     padding: 10px 10px 6px 14px;
     border-bottom: solid 1px $border;
-    min-height: 33px;
+    min-height: 53px;
     overflow: visible;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
   }
   .headerBar:after {
     clear: both;
@@ -633,8 +635,9 @@ body.with-right-side.with-left-side {
     margin-right: $right_side_width + 1;
     z-index: 3;
     background: white;
-    height: 33px;
-    min-width: 623px;
+    height: 53px;
+    min-width: 647px;
+    max-width: 1100px;
     border-color: $menu-border-color;
   }
   [disabled] {

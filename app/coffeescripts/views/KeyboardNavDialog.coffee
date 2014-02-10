@@ -22,9 +22,10 @@ define [
 
     bindOpenKeys: ->
       activeElement = null
-      $(document).keypress((e) =>
-        commaOrQuestionMark = e.which == 44 || e.which == 63
+      $(document).keydown((e) =>
+        commaOrQuestionMark = e.keyCode == 188 || e.keyCode == 191
         if (commaOrQuestionMark && !$(e.target).is(":input"))
+          e.preventDefault()
           if(@$el.is(":visible"))
             @$el.dialog("close")
             if(activeElement)

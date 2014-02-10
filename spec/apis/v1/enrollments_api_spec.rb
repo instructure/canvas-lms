@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -64,6 +64,7 @@ describe EnrollmentsApiController, :type => :integration do
           },
           'associated_user_id'                 => nil,
           'updated_at'                         => new_enrollment.updated_at.xmlschema,
+          'created_at'                         => new_enrollment.created_at.xmlschema,
           'last_activity_at'                   => nil
         }
         new_enrollment.root_account_id.should eql @course.account.id
@@ -401,6 +402,7 @@ describe EnrollmentsApiController, :type => :integration do
           },
           'associated_user_id'                 => nil,
           'updated_at'                         => new_enrollment.updated_at.xmlschema,
+          'created_at'                         => new_enrollment.created_at.xmlschema,
           'last_activity_at'                   => nil
         }
         new_enrollment.root_account_id.should eql @course.account.id
@@ -441,6 +443,57 @@ describe EnrollmentsApiController, :type => :integration do
             }
           }
         response.code.should eql '401'
+      end
+    end
+
+    context "self enrollment" do
+      before do
+        course(active_all: true)
+        @course.update_attribute(:self_enrollment, true)
+        @unenrolled_user = user_with_pseudonym
+        @path = "/api/v1/courses/#{@course.id}/enrollments"
+        @path_options = {controller: 'enrollments_api', action: 'create', format: 'json', course_id: @course.id.to_s}
+      end
+
+      it "should require a logged-in user" do
+        @user = nil
+        raw_api_call :post, @path, @path_options,
+          {
+            enrollment: {
+              user_id: 'self',
+              self_enrollment_code: @course.self_enrollment_code
+            }
+          }
+        response.code.should eql '401'
+      end
+
+      it "should require a valid code and user" do
+        raw_api_call :post, @path, @path_options,
+          {
+            enrollment: {
+              user_id: 'invalid',
+              self_enrollment_code: 'invalid'
+            }
+          }
+        response.code.should eql '403'
+        json = JSON.parse(response.body)
+        json["message"].should be_include "enrollment[self_enrollment_code] is invalid"
+        json["message"].should be_include "enrollment[user_id] must be 'self' when self-enrolling"
+      end
+
+      it "should let anyone self-enroll" do
+        json = api_call :post, @path, @path_options,
+          {
+            enrollment: {
+              user_id: 'self',
+              self_enrollment_code: @course.self_enrollment_code
+            }
+          }
+        new_enrollment = Enrollment.find(json['id'])
+        new_enrollment.user_id.should == @unenrolled_user.id
+        new_enrollment.type.should == 'StudentEnrollment'
+        new_enrollment.should be_active
+        new_enrollment.should be_self_enrolled
       end
     end
   end
@@ -496,6 +549,7 @@ describe EnrollmentsApiController, :type => :integration do
             },
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
+            'created_at'  => e.created_at.xmlschema,
             'last_activity_at' => nil
           }
         }
@@ -534,6 +588,7 @@ describe EnrollmentsApiController, :type => :integration do
             },
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
+            'created_at' => e.created_at.xmlschema,
             'last_activity_at' => e.last_activity_at.xmlschema
           }
         }
@@ -671,6 +726,7 @@ describe EnrollmentsApiController, :type => :integration do
             'html_url' => course_user_url(@course, e.user),
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
+            'created_at' => e.created_at.xmlschema,
             'last_activity_at' => nil,
             'user' => {
               'name' => e.user.name,
@@ -733,6 +789,7 @@ describe EnrollmentsApiController, :type => :integration do
             },
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
+            'created_at' => e.created_at.xmlschema,
             'last_activity_at' => nil
           }
         }
@@ -819,6 +876,7 @@ describe EnrollmentsApiController, :type => :integration do
             'html_url' => course_user_url(@course, e.user),
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
+            'created_at' => e.created_at.xmlschema,
             'last_activity_at' => nil
           }
           h['grades'] = {
@@ -874,6 +932,7 @@ describe EnrollmentsApiController, :type => :integration do
             'html_url' => course_user_url(@course, e.user),
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
+            'created_at' => e.created_at.xmlschema,
             'last_activity_at' => nil
           }
           h['grades'] = {
@@ -944,6 +1003,7 @@ describe EnrollmentsApiController, :type => :integration do
             },
             'associated_user_id'                 => @enrollment.associated_user_id,
             'updated_at'                         => @enrollment.updated_at.xmlschema,
+            'created_at'                         => @enrollment.created_at.xmlschema,
             'last_activity_at'                   => nil
           }
         end
@@ -971,6 +1031,7 @@ describe EnrollmentsApiController, :type => :integration do
             },
             'associated_user_id'                 => @enrollment.associated_user_id,
             'updated_at'                         => @enrollment.updated_at.xmlschema,
+            'created_at'                         => @enrollment.created_at.xmlschema,
             'last_activity_at'                   => nil
           }
         end
@@ -1027,6 +1088,7 @@ describe EnrollmentsApiController, :type => :integration do
             },
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
+            'created_at' => e.created_at.xmlschema,
             'last_activity_at' => nil,
             'user' => {
               'name' => e.user.name,
@@ -1060,6 +1122,7 @@ describe EnrollmentsApiController, :type => :integration do
             'html_url' => course_user_url(@course, e.user),
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
+            'created_at' => e.created_at.xmlschema,
             'last_activity_at' => nil,
             'user' => {
               'name' => e.user.name,

@@ -2,8 +2,9 @@ define [
   'ember',
   '../shared/environment',
   'i18n!quizzes',
-  '../shared/search_matcher'
-], (Ember, environment, I18n, searchMatcher) ->
+  '../shared/search_matcher',
+  '../shared/quiz_sorter'
+], (Ember, environment, I18n, searchMatcher, quizSorter) ->
 
   # http://emberjs.com/guides/controllers/
   # http://emberjs.com/api/classes/Ember.Controller.html
@@ -12,7 +13,6 @@ define [
 
   QuizzesController = Ember.ArrayController.extend
 
-
     searchFilter: ''
     searchPlaceholder: I18n.t('search_placeholder', 'Search for Quiz')
     addQuiz: I18n.t('title_add_quiz', 'Add Quiz')
@@ -20,6 +20,9 @@ define [
     practicesLabel: I18n.t('practices_label', 'Practice Quizzes toggle quiz visibility')
     surveysLabel: I18n.t('surveys_label', 'Surveys toggle quiz visibility')
 
+    canManage: ( ->
+      environment.get('canManage')
+    ).property('environment.canManage')
 
     newQuizLink: ( ->
       "/courses/#{environment.get('courseId')}/quizzes/new?fresh=1"
@@ -32,8 +35,8 @@ define [
     surveyTypes: ['survey', 'graded_survey']
 
     filtered: (->
-      @get('model').filter ({title}) => searchMatcher(title, @get('searchFilter'))
-    ).property('model.@each', 'searchFilter')
+      quizSorter(@get('model')).filter ({title}) => searchMatcher(title, @get('searchFilter'))
+    ).property('model.@each', 'searchFilter', 'model')
 
     assignments: (->
       @get('filtered').filterBy('quiz_type', 'assignment')
@@ -62,5 +65,9 @@ define [
       @get('model').filter ({quiz_type, title}) =>
         quiz_type in surveyTypes
     ).property('model.@each')
+
+    actions:
+      editBanks: ->
+        window.location = @get('questionBanksUrl')
 
 

@@ -61,12 +61,12 @@ define [
       requests.push $.ajaxJSON courseUrl, 'PUT', {'course[group_weighting_scheme]' : newGroupWeightingScheme}, (data) =>
         @options.context.group_weighting_scheme = data.course.group_weighting_scheme
 
-    @$dialog.find('.assignment_group_row').each (i, row)->
+    @$dialog.find('.assignment_group_row').each (i, row) =>
       group = $(row).data('assignment_group')
       newWeight = Number($(row).find('input').val())
       if newWeight != group.group_weight
-        requests.push $.ajaxJSON "#{courseUrl}/assignment_groups/#{group.id}", 'PUT', {'assignment_group[group_weight]' : newWeight}, (data) ->
-          $.extend(group, data.assignment_group)
+        requests.push $.ajaxJSON "/api/v1#{courseUrl}/assignment_groups/#{group.id}", 'PUT', {'group_weight' : newWeight}, (data) ->
+          $.extend(group, data)
 
     # when all the requests come back, call @afterSave
     promise = $.when.apply($, requests).done(@afterSave)

@@ -8,9 +8,13 @@ describe QuizRegrader::Submission do
     {1 => 'no_regrade', 2 => 'full_credit', 3 => 'current_correct_only' }
   end
 
+  let(:question_group) do
+    stub(:pick_count => 1, :question_points => 25)
+  end
+
   let(:question_regrades) do
     1.upto(3).each_with_object({}) do |i, hash|
-      hash[i] = stub(:quiz_question  => stub(:id => i, :question_data => {:id => i}),
+      hash[i] = stub(:quiz_question  => stub(:id => i, :question_data => {:id => i}, :quiz_group => question_group),
                      :question_data  => {:id => i},
                      :regrade_option => regrade_options[i])
     end
@@ -25,10 +29,13 @@ describe QuizRegrader::Submission do
   end
 
   let(:submission) do
-    stub(:score           => 0,
-         :quiz_data       => quiz_data,
-         :submission_data => submission_data,
-         :write_attribute => {})
+    stub(:score                 => 0,
+         :score_before_regrade  => 1,
+         :quiz_data             => quiz_data,
+         :score=                => nil,
+         :score_before_regrade= => nil,
+         :submission_data       => submission_data,
+         :write_attribute       => {})
   end
 
   let(:wrapper) do
@@ -64,10 +71,27 @@ describe QuizRegrader::Submission do
       submission.expects(:score=).with(3)
       submission.expects(:score_before_regrade).returns nil
       submission.expects(:score_before_regrade=).with(0)
-      submission.expects(:quiz_data=).with(question_regrades.map { |id, q| q.question_data })
+      submission.expects(:quiz_data=)
       submission.expects(:attempts => stub(:last_versions => []))
 
       wrapper.regrade!
+    end
+  end
+
+  describe "#rescored_submission" do
+    it "scores the submission based on the regraded answers" do
+      params = question_regrades.map do |key, qr|
+        {:id => key, :points_possible => question_group.question_points}
+      end
+
+      submission.expects(:quiz_data=).with(params)
+
+      regrade_submission = QuizRegrader::Submission.new(
+        :submission        => submission,
+        :question_regrades => question_regrades)
+
+      regrade_submission.expects(:answers_to_grade).returns []
+      regrade_submission.rescored_submission
     end
   end
 

@@ -2,7 +2,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "profile" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def click_edit
     f('.edit_settings_link').click

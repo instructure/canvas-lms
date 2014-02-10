@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'action_controller_test_process'
+
 module CC
   class CCExporter
     include TextHelper
@@ -62,8 +64,7 @@ module CC
           att = Attachment.new
           att.context = @content_export
           att.user = @content_export.user
-          up_data = ActionController::TestUploadedFile.new(@zip_path, Attachment.mimetype(@zip_path))
-          att.uploaded_data = up_data
+          att.uploaded_data = Rack::Test::UploadedFile.new(@zip_path, Attachment.mimetype(@zip_path))
           if att.save
             @content_export.attachment = att
             @content_export.save

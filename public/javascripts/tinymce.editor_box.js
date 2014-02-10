@@ -169,6 +169,7 @@ define([
       extended_valid_elements : "iframe[src|width|height|name|align|style|class|sandbox]",
       content_css: "/stylesheets/compiled/instructure_style.css,/stylesheets/compiled/tinymce.editor_box.css",
       editor_css: editor_css,
+      auto_focus: options.focus ? id : null,
 
       onchange_callback: function(e) {
         $("#" + id).trigger('change');
@@ -530,15 +531,11 @@ define([
     }
   };
 
-  $.fn._editorFocus = function(keepTrying) {
+  // you probably want to just pass focus: true in your initial options
+  $.fn._editorFocus = function() {
     var $element = this,
         id = $element.attr('id'),
         editor = $instructureEditorBoxList._getEditor(id);
-    if (keepTrying && (!editor || !editor.dom.doc.hasFocus())) {
-      setTimeout(function(){
-        $element.editorBox('focus', true);
-      }, 50);
-    }
     if(!editor ) {
       return false;
     }

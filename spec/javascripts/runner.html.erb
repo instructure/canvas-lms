@@ -80,9 +80,8 @@
   <script>
     // keep JSON.stingify from puking on dom nodes in testem
     (function() {
-      var old = QUnit.log;
       var toString = Object.prototype.toString;
-      QUnit.log = function(result) {
+      QUnit.log(function(result) {
         if (result.actual instanceof HTMLElement) {
           result.actual = result.actual.toString();
           result.expected = result.expected.toString();
@@ -95,8 +94,7 @@
             }
           }
         }
-        return old.call(this, result);
-      };
+      });
     })();
 
     // start loading specs now. if there's a callback by the time they finish

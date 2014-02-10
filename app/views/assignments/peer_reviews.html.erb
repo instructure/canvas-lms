@@ -161,7 +161,7 @@ require([
   <% @students.each do |student| %>
     <% submission = @submissions.to_a.find{|s| s.user_id == student.id} %>
     <li style="font-size: 1.2em; margin-bottom: 10px;" class="student_reviews">
-      <a <%= submission && submission.has_submission? ? "class='person' title='#{t :submitted, "submitted"}'" : "class='person_gray' title='#{t :not_yet_submitted, "not yet submitted"}'" %> href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, student.id) %>">
+      <a <%= submission && submission.has_submission? ? "class='person' title='#{h(t(:submitted, "submitted"))}'" : "class='person_gray' title='#{h(t(:not_yet_submitted, "not yet submitted"))}'" %> href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, student.id) %>">
         <span class="assessor_name"><%= student.last_name_first %></span>
         <span class="user_id student_review_id" style="display: none;"><%= student.id %></span>
       </a>

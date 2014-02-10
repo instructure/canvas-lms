@@ -39,6 +39,8 @@ class CourseSection < ActiveRecord::Base
 
   before_validation :infer_defaults, :verify_unique_sis_source_id
   validates_presence_of :course_id, :root_account_id, :workflow_state
+  validates_length_of :sis_source_id, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => false
+  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false
 
   before_save :set_update_account_associations_if_changed
   before_save :maybe_touch_all_enrollments
@@ -130,7 +132,7 @@ class CourseSection < ActiveRecord::Base
   alias_method :parent_event_context, :course
 
   def section_code
-    self.name ||= read_attribute(:section_code)
+    self.name
   end
 
   def infer_defaults
@@ -146,10 +148,6 @@ class CourseSection < ActiveRecord::Base
     # - use the method display_name to consolidate this logic
     self.name ||= self.course.name if self.default_section
     self.name ||= "#{self.course.name} #{Time.zone.today.to_s}"
-    self.section_code ||= self.name
-    if name_had_changed
-      self.section_code = self.name
-    end
   end
 
   def defined_by_sis?
@@ -163,7 +161,7 @@ class CourseSection < ActiveRecord::Base
   # The only place this is used by itself right now is when listing
   # enrollments within a course
   def display_name
-    @section_display_name ||= self.name || self.section_code
+    @section_display_name ||= self.name
   end
 
   def move_to_course(course, *opts)

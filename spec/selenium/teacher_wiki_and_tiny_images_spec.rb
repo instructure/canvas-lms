@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "Wiki pages and Tiny WYSIWYG editor Images" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
   it_should_behave_like "quizzes selenium tests"
 
   context "wiki and tiny images as a teacher" do
@@ -39,13 +39,38 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       keep_trying_until { @image_list.find_elements(:css, '.img').length }.should == 2
     end
 
+    it "adds a tabindex to flickr search results" do
+      wiki_page_tools_file_tree_setup
+      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      f('.find_new_image_link').click
+      f('#image_search_form input[type=text]').send_keys('dog')
+      f('#image_search_form button[type=submit]').click
+      wait_for_animations
+      results = f('.results .image_link[tabindex="0"]')
+      results.should_not be_nil
+    end
+
+    it "inserts a flickr image when you hit enter" do
+      wiki_page_tools_file_tree_setup
+      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      f('.find_new_image_link').click
+      f('#image_search_form input[type=text]').send_keys('dog')
+      f('#image_search_form button[type=submit]').click
+      wait_for_animations
+      results = fj('.results .image_link[tabindex="0"]:first')
+      results.send_keys(:return)
+      in_frame "wiki_page_body_ifr" do
+        f('#tinymce img').should be_displayed
+      end
+    end
+
     it "should infini-scroll images" do
       wiki_page_tools_file_tree_setup
       90.times do |i|
         image = @root_folder.attachments.build(:context => @course)
         path = File.expand_path(File.dirname(__FILE__) + '/../../public/images/graded.png')
         image.display_name = "image #{i}"
-        image.uploaded_data = ActionController::TestUploadedFile.new(path, Attachment.mimetype(path))
+        image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
         image.save!
       end
       @image_list.should_not have_class('initialized')

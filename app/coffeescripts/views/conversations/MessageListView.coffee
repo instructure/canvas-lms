@@ -57,3 +57,6 @@ define [
       super
       @$('.current-context').text(@course.name)
       @$('.list-header')[if @course.name then 'show' else 'hide']()
+
+    selectAll: ->
+      @collection.each (x) -> x.set('selected', true)

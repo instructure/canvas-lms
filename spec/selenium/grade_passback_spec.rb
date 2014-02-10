@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "grade exchange course settings tab" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def getpseudonym(user_sis_id)
     pseudo = Pseudonym.find_by_sis_user_id(user_sis_id)

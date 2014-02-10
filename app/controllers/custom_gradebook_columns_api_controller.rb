@@ -21,13 +21,16 @@
 # API for adding additional columns to the gradebook.  Custom gradebook
 # columns will be displayed with the other frozen gradebook columns.
 #
-# @object Custom Column
+# @object CustomColumn
 #    {
 #      // header text
 #      "title": "Stuff",
 #
 #      // column order
-#      "position": 1
+#      "position": 1,
+#
+#      // won't be displayed if hidden is true
+#      "hidden": false
 #    }
 class CustomGradebookColumnsApiController < ApplicationController
   before_filter :require_context, :require_user
@@ -38,11 +41,17 @@ class CustomGradebookColumnsApiController < ApplicationController
   #
   # List all custom gradebook columns for a course
   #
-  # @returns [Custom Column]
+  # @param include_hidden [Boolean]
+  #   Include hidden parameters (defaults to false)
+  #
+  # @returns [CustomColumn]
   def index
     if authorized_action? @context.custom_gradebook_columns.build,
                           @current_user, :read
-      columns = Api.paginate(@context.custom_gradebook_columns.active, self,
+      scope = value_to_boolean(params[:include_hidden]) ?
+        @context.custom_gradebook_columns.not_deleted :
+        @context.custom_gradebook_columns.active
+      columns = Api.paginate(scope, self,
                              api_v1_course_custom_gradebook_columns_url(@context))
 
       render :json => columns.map { |c|
@@ -58,8 +67,13 @@ class CustomGradebookColumnsApiController < ApplicationController
   # @argument column[title] [String]
   # @argument column[position] [Int]
   #   The position of the column relative to other custom columns
+  # @argument column[hidden] [Optional, Boolean]
+  #   Hidden columns are not displayed in the gradebook
+  # @argument column[teacher_notes] [Optional, Boolean]
+  #   Set this if the column is created by a teacher.  The gradebook only
+  #   supports one teacher_notes column.
   #
-  # @returns Custom Column
+  # @returns CustomColumn
   def create
     column = @context.custom_gradebook_columns.build(params[:column])
     update_column(column)
@@ -69,9 +83,9 @@ class CustomGradebookColumnsApiController < ApplicationController
   #
   # Accepts the same parameters as custom gradebook column creation
   #
-  # @returns Custom Column
+  # @returns CustomColumn
   def update
-    column = @context.custom_gradebook_columns.active.find(params[:id])
+    column = @context.custom_gradebook_columns.not_deleted.find(params[:id])
     column.attributes = params[:column]
     update_column(column)
   end
@@ -80,14 +94,26 @@ class CustomGradebookColumnsApiController < ApplicationController
   #
   # Permanently deletes a custom column and its associated data
   #
-  # @returns Custom Column
+  # @returns CustomColumn
   def destroy
-    column = @context.custom_gradebook_columns.active.find(params[:id])
+    column = @context.custom_gradebook_columns.not_deleted.find(params[:id])
     if authorized_action? column, @current_user, :manage
       column.destroy
       render :json => custom_gradebook_column_json(column,
                                                    @current_user, session)
     end
+  end
+
+  # @API Reorder custom columns
+  #
+  # Puts the given columns in the specified order
+  #
+  # @argument order[] [Required, Integer]
+  #
+  # <b>200 OK</b> is returned if successful
+  def reorder
+    @context.custom_gradebook_columns.build.update_order(params[:order])
+    render :status => 200, :json => {}
   end
 
   def update_column(column)

@@ -126,6 +126,18 @@ describe Submission do
     @submission = @assignment.submit_homework(se.user, :media_comment_id => "fake", :media_comment_type => "audio")
   end
 
+  it "should log submissions with grade changes" do
+    submission_spec_model
+
+    Auditors::GradeChange.expects(:record).once
+
+    @submission.score = 5
+    @submission.save!
+
+    @submission.grader_id = @user.id
+    @submission.save!
+  end
+
   context "Discussion Topic" do
     it "should use correct date for its submitted_at value" do
       course_with_student_logged_in(:active_all => true)
@@ -924,9 +936,26 @@ describe Submission do
       override.set = @course.default_section
       override.override_due_at(Time.zone.now + 1.day)
       override.save!
+      # mysql just truncated the timestamp
+      override.reload
 
       submission = @assignment.submissions.create(:user => @user)
       submission.cached_due_date.should == override.due_at
+    end
+  end
+
+  describe "update_attachment_associations" do
+    begin
+      course_with_student active_all: true
+      @assignment = @course.assignments.create!
+    end
+
+    it "doesn't include random attachment ids" do
+      f = Attachment.create! uploaded_data: StringIO.new('blah'),
+        context: @course,
+        filename: 'blah.txt'
+      sub = @assignment.submit_homework(@user, attachments: [f])
+      sub.attachments.should == []
     end
   end
 

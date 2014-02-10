@@ -480,8 +480,7 @@ describe GradebooksController do
       course_with_teacher_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment")
       @student = @course.enroll_user(User.create!(:name => "some user"))
-      require 'action_controller_test_process'
-      data = ActionController::TestUploadedFile.new(File.join(File.dirname(__FILE__), "/../fixtures/scribd_docs/doc.doc"), "application/msword", true)
+      data = fixture_file_upload("scribd_docs/doc.doc", "application/msword", true)
       post 'update_submission', :course_id => @course.id, :attachments => {"0" => {:uploaded_data => data}}, :submission => {:comment => "some comment", :assignment_id => @assignment.id, :user_id => @student.user_id}
       response.should be_redirect
       assigns[:assignment].should eql(@assignment)
@@ -589,11 +588,16 @@ describe GradebooksController do
       a  = ag.assignments.create! :submission_types => 'online_upload',
                                   :points_possible  => 10,
                                   :context  => @course
+      AssignmentGroup.add_never_drop_assignment(ag, a)
       @controller.instance_variable_set(:@context, @course)
       @controller.light_weight_ags_json([ag]).should == [
         {
           id: ag.id,
-          rules: {},
+          rules: {
+            'never_drop' => [
+              a.id.to_s
+            ]
+          },
           group_weight: 100,
           assignments: [
             {

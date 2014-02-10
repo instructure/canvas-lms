@@ -83,8 +83,8 @@ end
 def switch_to_section(section=nil)
   section = section.id if section.is_a?(CourseSection)
   section ||= ""
-  fj('#section_to_show').click
-  keep_trying_until { f('#section-to-show-menu').should be_displayed }
+  fj('.section-select-button:visible').click
+  keep_trying_until { fj('.section-select-menu:visible').should be_displayed }
   fj("label[for='section_option_#{section}']").click
   wait_for_ajaximations
 end

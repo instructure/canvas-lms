@@ -117,7 +117,7 @@ class GroupCategory < ActiveRecord::Base
       return unless context and protected_role_for_context?(role, context)
       category = context.group_categories.find_by_role(role) ||
                  context.group_categories.build(:name => name_for_role(role), :role => role)
-      category.save(false) if category.new_record?
+      category.save(CANVAS_RAILS2 ? false : {:validate => false}) if category.new_record?
       category
     end
   end
@@ -177,7 +177,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def group_for(user)
-    groups.active.to_a.find{ |g| g.users.include?(user) }
+    groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).first
   end
 
   alias_method :destroy!, :destroy

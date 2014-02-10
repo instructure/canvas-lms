@@ -40,7 +40,6 @@ module Api::V1::GradeChangeEvent
       :grade_before => event.grade_before,
       :grade_after => event.grade_after,
       :version_number => event.version_number,
-      :request_id => event.request_id,
       :links => links
     }
   end
@@ -50,6 +49,29 @@ module Api::V1::GradeChangeEvent
   end
 
   def grade_change_events_compound_json(events, user, session)
+    {
+      links: links_json,
+      events: grade_change_events_json(events, user, session),
+      linked: linked_json(events, user, session)
+    }
+  end
+
+  private
+
+  def links_json
+    # This should include users and page_views.  There is no end point
+    # for returning single json objects for those models.
+    user = { href: nil, type: 'user' }
+    {
+      "events.assignment" => templated_url(:api_v1_course_assignment_url, "{events.course}", "{events.assignment}"),
+      "events.course" => templated_url(:api_v1_course_url, "{events.course}"),
+      "events.student" => user,
+      "events.grader" => user,
+      "events.page_view" => nil
+    }
+  end
+
+  def linked_json(events, user, session)
     course_ids = events.map{ |event| event.course_id }
     courses = Course.find_all_by_id(course_ids) if course_ids.length > 0
     courses ||= []
@@ -68,8 +90,6 @@ module Api::V1::GradeChangeEvent
     page_views ||= []
 
     {
-      meta: { primaryCollection: 'events' },
-      events: grade_change_events_json(events, user, session),
       page_views: page_views_json(page_views, user, session),
       assignments: assignments_json(assignments, user, session),
       courses: courses_json(courses, user, session, [], []),

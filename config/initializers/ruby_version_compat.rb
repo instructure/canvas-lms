@@ -1,7 +1,4 @@
-# ruby 1.9 compatibility fixes for Rails 2.3
-
-# TODO RAILS3: are those not already wrapped in a CANVAS_RAILS2 branch still
-# needed
+# ruby pre-2.0 compatibility fixes
 
 if RUBY_VERSION < '2.0'
   # see https://bugs.ruby-lang.org/issues/7547

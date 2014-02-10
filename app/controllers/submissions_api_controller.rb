@@ -354,7 +354,7 @@ class SubmissionsApiController < ApplicationController
     @user = get_user_considering_section(params[:user_id])
 
     authorized = false
-    @submission = @assignment.find_or_initialize_submission(@user)
+    @submission = @assignment.submissions.where(user_id: @user).first || @assignment.submissions.build(user: @user)
 
     if params[:submission] || params[:rubric_assessment]
       authorized = authorized_action(@submission, @current_user, :grade)

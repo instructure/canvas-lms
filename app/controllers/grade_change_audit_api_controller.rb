@@ -20,6 +20,9 @@
 #
 # Query audit log of grade change events.
 #
+# Only available if the server has configured audit logs; will return 404 Not
+# Found response otherwise.
+#
 # For each endpoint, a compound document is returned. The primary collection of
 # event objects is paginated, ordered by date descending. Secondary collections
 # of assignments, courses, students and graders related to the returned events
@@ -46,9 +49,6 @@
 #       // Version Number of the grade change submission.
 #       "version_number": "1",
 #
-#       // The unique request id of the request during the grade change.
-#       "request_id": "e2b76430-27a5-0131-3ca1-48e0eb13f29b",
-#
 #       "links": {
 #          // ID of the assignment associated with the event.
 #          "assignment": 2319,
@@ -71,7 +71,7 @@
 #       }
 #     }
 #
-class GradeChangeAuditApiController < ApplicationController
+class GradeChangeAuditApiController < AuditorApiController
   include Api::V1::GradeChangeEvent
 
   # @API Query by assignment.

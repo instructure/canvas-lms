@@ -2,15 +2,18 @@ define [
   'Backbone'
   'jquery'
   'compiled/views/accounts/admin_tools/AuthLoggingContentPaneView'
+  'compiled/views/accounts/admin_tools/GradeChangeLoggingContentView'
   'jst/accounts/admin_tools/loggingContentPane'
 ], (
   Backbone, 
   $,
   AuthLoggingContentPaneView,
+  GradeChangeLoggingContentView,
   template
 ) ->
   class LoggingContentPaneView extends Backbone.View
     @child 'authentication', '#loggingAuthentication'
+    @child 'gradeChange', '#loggingGradeChange'
 
     events:
       'change #loggingType': 'onTypeChange'
@@ -21,6 +24,7 @@ define [
       super
       @permissions = @options.permissions
       @authentication = @initAuthLogging()
+      @gradeChange = @initGradeChangeLogging()
 
     afterRender: ->
       @$el.find(".loggingTypeContent").hide()
@@ -40,4 +44,11 @@ define [
         return new Backbone.View
 
       return new AuthLoggingContentPaneView
+        users: @options.users
+
+    initGradeChangeLogging: ->
+      unless @permissions.grade_change
+        return new Backbone.View
+
+      return new GradeChangeLoggingContentView
         users: @options.users

@@ -56,8 +56,7 @@ describe WikiPagesController do
   it "should permit the student to view the page history if they have permissions" do
     @wiki_page = @course.wiki.wiki_pages.create :title => "Some random wiki page",
                                                 :body => "this is the content of the wikipage body asdfasdf",
-                                                :editing_roles => "teachers,students",
-                                                :hide_from_students => false
+                                                :editing_roles => "teachers,students"
     student = user()
     enrollment = @course.enroll_student(student)
     enrollment.accept!
@@ -115,6 +114,7 @@ describe WikiPagesController do
       end
 
       it "should forward /wiki to /pages/front-page" do
+        @front.save!
         @front.set_as_front_page!
         get @base_url + "wiki"
         response.code.should == '302'

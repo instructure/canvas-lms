@@ -84,10 +84,10 @@ class QuizSubmission < ActiveRecord::Base
       self.quiz.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user_id, 'active') }
     can :read
 
-    given {|user, session| self.quiz.grants_right?(user, session, :manage) }
+    given {|user, session| quiz.cached_context_grants_right?(user, session, :manage_grades) }
     can :update_scores
 
-    given {|user, session| self.quiz.grants_right?(user, session, :manage) }
+    given {|user, session| quiz.cached_context_grants_right?(user, session, :manage_grades) }
     can :add_attempts
   end
 
@@ -645,7 +645,7 @@ class QuizSubmission < ActiveRecord::Base
       answer = answer.with_indifferent_access
       score = params["question_score_#{answer["question_id"]}".to_sym]
       answer["more_comments"] = params["question_comment_#{answer["question_id"]}".to_sym] if params["question_comment_#{answer["question_id"]}".to_sym]
-      if score != "--" && score != ""
+      if score != "--" && score.present?# != ""
         answer["points"] = (score.to_f rescue nil) || answer["points"] || 0
         answer["correct"] = "defined" if answer["correct"] == "undefined" && (score.to_f rescue nil)
       elsif score == "--"

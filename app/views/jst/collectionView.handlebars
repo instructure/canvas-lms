@@ -1,7 +1,5 @@
 {{#if collection.length}}
-<ul class="collectionViewItems"></ul>
+<ul class="collectionViewItems {{listClassName}}"></ul>
 {{else}}
-<p>
-  {{#t "no_items"}}No items.{{/t}}
-</p>
+<p class="emptyMessage">{{emptyMessage}}</p>
 {{/if}}

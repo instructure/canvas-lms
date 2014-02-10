@@ -47,7 +47,7 @@
       <ul class="unstyled_list" style="margin: 5px 10px 10px;">
         <li style="<%= hidden unless @current_user_submission.assigned_assessments.empty? %>"><%= t 'labels.none_assigned', "None Assigned" %></li>
         <% @current_user_submission.assigned_assessments.each do |assessment| %>
-          <li><a <%= assessment.completed? ? "class='pass' title='#{t 'tooltips.finished', "finished"}'" : "class='warning' title='#{t 'tooltips.incomplete', "incomplete"}'" %> href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, assessment.asset.user_id) %> ">
+          <li><a <%= assessment.completed? ? "class='pass' title='#{h(t('tooltips.finished', "finished"))}'" : "class='warning' title='#{h(t('tooltips.incomplete', "incomplete"))}'" %> href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, assessment.asset.user_id) %> ">
             <%= assessment.asset_user_name %>
           </a></li>
         <% end %>

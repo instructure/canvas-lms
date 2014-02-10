@@ -1,15 +1,13 @@
 define [
   'ember',
-  'ic-ajax',
+  '../shared/fetch_all_jsonapi',
   '../shared/environment'
-], (Ember, ajax, environment) ->
-
-  # http://emberjs.com/guides/routing/
-  # http://emberjs.com/api/classes/Ember.Route.html
+], (Ember, fetchAll, environment) ->
 
   QuizzesRoute = Ember.Route.extend
 
     model: (params) ->
       environment.setEnv(ENV)
       id = environment.get('courseId')
-      ajax("/api/v1/courses/#{id}/quizzes")
+
+      fetchAll("/api/v1/courses/#{id}/quizzes")

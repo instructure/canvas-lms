@@ -1,4 +1,4 @@
-<form action="<%= url_for(request.query_parameters) %>" method="post" id="enroll_form" class="form-horizontal bootstrap-form">
+<form action="<%= self_enrollment_url %>" method="post" id="enroll_form" class="form-horizontal bootstrap-form">
   <input type="hidden" name="initial_action" value="enroll">
   <%= registration_summary || content_tag(:p, mt(:getting_started, "You are enrolling in **%{course}**", :course => @course.name)) %>
   <% if params[:login_warning] %>

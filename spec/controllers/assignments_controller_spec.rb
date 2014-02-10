@@ -347,7 +347,7 @@ describe AssignmentsController do
       expected_assignment_json = subject.send(:assignment_json, @assignment,
         assigns[:current_user], session)
       expected_assignment_json[:has_submitted_submissions] = @assignment.has_submitted_submissions?
-      assigns[:js_env][:ASSIGNMENT].should == Api.recursively_stringify_json_ids(expected_assignment_json)
+      assigns[:js_env][:ASSIGNMENT].should == expected_assignment_json
       assigns[:js_env][:ASSIGNMENT_OVERRIDES].should ==
         subject.send(:assignment_overrides_json,
                      @assignment.overrides_visible_to(assigns[:current_user]))

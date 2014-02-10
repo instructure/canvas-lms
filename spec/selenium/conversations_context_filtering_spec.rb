@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common')
 
 describe "conversations context filtering" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     conversation_setup
@@ -20,7 +20,6 @@ describe "conversations context filtering" do
   end
 
   it "should capture the course when sending a message to a group" do
-    pending('selupgrade')
     new_conversation
     browse_menu
 

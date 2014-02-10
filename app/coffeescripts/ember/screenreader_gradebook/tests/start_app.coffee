@@ -12,7 +12,6 @@ define ['../main'], (Application) ->
       App.Router.reopen history: 'none'
       App.setupForTesting()
       App.injectTestHelpers()
-      App.advanceReadiness()
     window.App = App
     App
 

@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
 
 describe "public courses" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def ensure_logged_out
     driver.navigate.to(app_host + '/logout')

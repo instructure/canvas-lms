@@ -629,7 +629,6 @@ routes.draw do
   match 'register' => 'users#new', :as => :register
   match 'register_from_website' => 'users#new', :as => :register_from_website
   match 'enroll/:self_enrollment_code' => 'self_enrollments#new', :as => :enroll, :via => :get
-  match 'enroll/:self_enrollment_code' => 'self_enrollments#create', :as => :enroll_frd, :via => :post
   match 'services' => 'users#services', :as => :services
   match 'search/bookmarks' => 'users#bookmark_search', :as => :bookmark_search
   match 'search/rubrics' => 'search#rubrics', :as => :search_rubrics
@@ -853,6 +852,7 @@ routes.draw do
     scope(:controller => :tabs) do
       get "courses/:course_id/tabs", :action => :index, :path_name => 'course_tabs'
       get "groups/:group_id/tabs", :action => :index, :path_name => 'group_tabs'
+      put "courses/:course_id/tabs/:tab_id", :action => :update
     end
 
     scope(:controller => :sections) do
@@ -1047,6 +1047,9 @@ routes.draw do
 
       get 'users/:id/settings', controller: 'users', action: 'settings'
       put 'users/:id/settings', controller: 'users', action: 'settings', path_name: 'user_settings'
+
+      put 'users/:id/merge_into/:destination_user_id', controller: 'users', action: 'merge_into'
+      put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
     end
 
     scope(:controller => :pseudonyms) do
@@ -1353,6 +1356,10 @@ routes.draw do
     scope(:controller => :outcome_groups_api) do
       def og_routes(context)
         prefix = (context == "global" ? context : "#{context}s/:#{context}_id")
+        unless context == "global"
+          get "#{prefix}/outcome_groups", :action => :index, :path_name => "#{context}_outcome_groups"
+          get "#{prefix}/outcome_group_links", :action => :link_index, :path_name => "#{context}_outcome_group_links"
+        end
         get "#{prefix}/root_outcome_group", :action => :redirect, :path_name => "#{context}_redirect"
         get "#{prefix}/outcome_groups/account_chain", :action => :account_chain, :path_name => "#{context}_account_chain"
         get "#{prefix}/outcome_groups/:id", :action => :show, :path_name => "#{context}_outcome_group"
@@ -1378,6 +1385,10 @@ routes.draw do
       get "outcomes/:id", :action => :show, :path_name => "outcome"
       put "outcomes/:id", :action => :update
       delete "outcomes/:id", :action => :destroy
+    end
+
+    scope(:controller => :outcome_results) do
+      get 'courses/:course_id/outcome_rollups', :action => :rollups, :path_name => 'course_outcome_rollups'
     end
 
     scope(:controller => :group_categories) do
@@ -1427,14 +1438,24 @@ routes.draw do
       prefix = "courses/:course_id/custom_gradebook_columns"
       get prefix, :action => :index, :path_name => "course_custom_gradebook_columns"
       post prefix, :action => :create
-      put "#{prefix}/:id", :action => :update
+      post "#{prefix}/reorder", :action => :reorder,
+        :path_name => "custom_gradebook_columns_reorder"
+      put "#{prefix}/:id", :action => :update,
+        :path_name => "course_custom_gradebook_column"
       delete "#{prefix}/:id", :action => :destroy
     end
 
     scope(:controller => :custom_gradebook_column_data_api) do
       prefix = "courses/:course_id/custom_gradebook_columns/:id/data"
       get prefix, :action => :index, :path_name => "course_custom_gradebook_column_data"
-      put "#{prefix}/:user_id", :action => :update
+      put "#{prefix}/:user_id", :action => :update, :path_name => "course_custom_gradebook_column_datum"
+    end
+
+    scope(:controller => :content_exports_api) do
+      prefix = "courses/:course_id/content_exports"
+      get prefix, :action => :index, :path_name => "course_content_exports"
+      post prefix, :action => :create
+      get "#{prefix}/:id", :action => :show
     end
   end
 

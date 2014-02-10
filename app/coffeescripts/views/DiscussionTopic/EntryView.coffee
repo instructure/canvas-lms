@@ -43,6 +43,7 @@ define [
     events:
       'click .loadDescendants': 'loadDescendants'
       'click [data-event]': 'handleDeclarativeEvent'
+      'keydown': 'handleKeyDown'
 
     defaults:
       treeView: null
@@ -158,10 +159,14 @@ define [
 
     renderTree: (opts = {}) =>
       return if @treeView?
+
       replies = @model.get 'replies'
       descendants = (opts.descendants or @options.descendants) - 1
       children = opts.children or @options.children
       collection = new EntryCollection replies, perPage: children
+      boundReplies = collection.map (x) -> x.attributes
+      @model.set 'replies', boundReplies
+
       page = collection.getPageAsCollection 0
       @treeView = new @options.treeView
         el: @$replies[0]
@@ -194,6 +199,7 @@ define [
         descendants: @options.showMoreDescendants
 
     remove: ->
+      return unless @model.canModerate()
       if confirm I18n.t('are_your_sure_delete', 'Are you sure you want to delete this entry?')
         @model.set 'deleted', true
         @model.destroy()
@@ -201,8 +207,14 @@ define [
         @$('.entry_content:first').html html
 
     edit: ->
+      return unless @model.canModerate()
       @editor ?= new EntryEditor this
       @editor.edit() if not @editor.editing
+      # defer for rerender
+      @editor.on('display', => setTimeout(@focus, 0))
+
+    focus: =>
+      @$('.author').first().focus()
 
     addReply: (event, $el) ->
       @reply ?= new Reply this, focus: true
@@ -212,6 +224,7 @@ define [
         @renderTree()
         @treeView.collection.add entry
         @treeView.collection.fullCollection.add entry
+        @model.get('replies').push entry.attributes
         @trigger 'addReply'
         EntryView.trigger 'addReply', entry
 
@@ -233,5 +246,18 @@ define [
         value
       else
         htmlEscape value
+
+    handleKeyDown: (e) =>
+      nodeName = e.target.nodeName.toLowerCase()
+      return if nodeName == 'input' || nodeName == 'textarea'
+      if e.which == 68 # d
+        @remove()
+      else if e.which == 69 # e
+        @edit()
+      else if e.which == 82 # r
+        @addReply()
+      else return
+      e.preventDefault()
+      e.stopPropagation()
 
   _.extend EntryView, Backbone.Events

@@ -27,6 +27,7 @@ class ContentExport < ActiveRecord::Base
   serialize :settings
   attr_accessible :course
   validates_presence_of :course_id, :workflow_state
+  has_one :job_progress, :class_name => 'Progress', :as => :context
 
   alias_method :context, :course
 
@@ -57,14 +58,21 @@ class ContentExport < ActiveRecord::Base
       record.changed_state(:failed) && self.content_migration.blank?
     }
   end
-  
+
+  set_policy do
+    given { |user, session| self.course.grants_right?(user, session, :manage_files) }
+    can :manage_files and can :read
+  end
+
   def export_course(opts={})
     self.workflow_state = 'exporting'
     self.save
     begin
+      self.job_progress.try :start!
       @cc_exporter = CC::CCExporter.new(self, opts.merge({:for_course_copy => for_course_copy?}))
       if @cc_exporter.export
         self.progress = 100
+        self.job_progress.try :complete!
         if for_course_copy?
           self.workflow_state = 'exported_for_course_copy'
         else
@@ -72,15 +80,32 @@ class ContentExport < ActiveRecord::Base
         end
       else
         self.workflow_state = 'failed'
+        self.job_progress.try :fail!
       end
     rescue
       add_error("Error running course export.", $!)
       self.workflow_state = 'failed'
+      self.job_progress.try :fail!
     ensure
       self.save
     end
   end
   handle_asynchronously :export_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+
+  def queue_api_job
+    if self.job_progress
+      p = self.job_progress
+    else
+      p = Progress.new(:context => self, :tag => "content_export")
+      self.job_progress = p
+    end
+    p.workflow_state = 'queued'
+    p.completion = 0
+    p.user = self.user
+    p.save!
+
+    export_course
+  end
 
   def referenced_files
     @cc_exporter ? @cc_exporter.referenced_files : {}
@@ -182,10 +207,11 @@ class ContentExport < ActiveRecord::Base
     content_migration.update_conversion_progress(val) if content_migration
     self.progress = val
     ContentExport.where(:id => self).update_all(:progress=>val)
+    self.job_progress.try(:update_completion!, val)
   end
   
   scope :active, where("workflow_state<>'deleted'")
-  scope :not_for_copy, where("workflow_state<>'exported_for_course_copy'")
+  scope :not_for_copy, where("export_type<>?", COURSE_COPY)
   scope :common_cartridge, where(:export_type => COMMON_CARTRIDGE)
   scope :qti, where(:export_type => QTI)
   scope :course_copy, where(:export_type => COURSE_COPY)

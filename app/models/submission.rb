@@ -109,7 +109,6 @@ class Submission < ActiveRecord::Base
   after_save :check_for_media_object
   after_save :update_quiz_submission
   after_save :update_participation
-  after_save :grade_change_audit
 
   def autograded?
     # AutoGrader == (quiz_id * -1)
@@ -152,6 +151,10 @@ class Submission < ActiveRecord::Base
     :when => lambda{ |model| model.new_version_needed? },
     :on_create => lambda{ |model,version| SubmissionVersion.index_version(version) },
     :on_load => lambda{ |model,version| model.cached_due_date = version.versionable.cached_due_date }
+
+  # This needs to be after simply_versioned because the grade change audit uses 
+  # versioning to grab the previous grade.
+  after_save :grade_change_audit
 
   def new_version_needed?
     turnitin_data_changed? || (changes.keys - [
@@ -211,7 +214,7 @@ class Submission < ActiveRecord::Base
   end
 
   def update_final_score
-    if @score_changed
+    if score_changed?
       connection.after_transaction_commit { Enrollment.send_later_if_production(:recompute_final_score, self.user_id, self.context.id) }
       self.assignment.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score) if self.assignment
     end
@@ -439,14 +442,23 @@ class Submission < ActiveRecord::Base
     return if unassociated_ids.empty?
     attachments = Attachment.find_all_by_id(unassociated_ids)
     attachments.each do |a|
-      if((a.context_type == 'User' && a.context_id == user_id) ||
-          (a.context_type == 'Group' && a.context_id == group_id) ||
-          (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?))
+      if (a.context_type == 'User' && a.context_id == user_id) ||
+         (a.context_type == 'Group' && a.context_id == group_id) ||
+         (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?) ||
+         attachment_fake_belongs_to_group(a)
         aa = self.attachment_associations.find_by_attachment_id(a.id)
         aa ||= self.attachment_associations.create(:attachment => a)
       end
     end
   end
+
+  def attachment_fake_belongs_to_group(attachment)
+    return false unless attachment.context_type == "User" &&
+      assignment.has_group_category?
+    gc = assignment.group_category
+    gc.group_for(user) == gc.group_for(attachment.context)
+  end
+  private :attachment_fake_belongs_to_group
 
   def submit_attachments_to_crocodoc
     if attachment_ids_changed?
@@ -492,7 +504,6 @@ class Submission < ActiveRecord::Base
     end
     @just_submitted = self.submitted? && self.submission_type && (self.new_record? || self.workflow_state_changed?)
     if score_changed?
-      @score_changed = true
       self.grade = assignment ?
         assignment.score_to_grade(score, grade) :
         score.to_s
@@ -708,7 +719,7 @@ class Submission < ActiveRecord::Base
   private :validate_single_submission
 
   def grade_change_audit
-    Auditors::GradeChange.record(self) if @score_changed
+    Auditors::GradeChange.record(self) if self.grade_changed?
   end
 
   include Workflow

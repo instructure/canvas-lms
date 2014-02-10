@@ -21,18 +21,41 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 describe AccountNotification do
 
   before do
-    @announcement = Account.default.announcements.create!(:message => 'hello')
+    account_notification 
     user
   end
 
   it "should find notifications" do
-    AccountNotification.for_user_and_account(@user, Account.default).should == [@announcement]
+    AccountNotification.for_user_and_account(@user, @account).should == [@announcement]
   end
 
   it "should find site admin announcements" do
     @announcement.destroy
-    @sa_announcement = Account.site_admin.announcements.create!(:message => 'hello')
-    AccountNotification.for_user_and_account(@user, Account.default).should == [@sa_announcement]
+    account_notification(:account => Account.site_admin)
+    AccountNotification.for_user_and_account(@user, Account.default).should == [@announcement]
+  end
+
+  it "should find announcements only if user has a role in the list of roles to which the announcement is restricted" do
+    @announcement.destroy
+    account_notification(:roles => ["TeacherEnrollment","AccountAdmin"], :message => "Announcement 1")
+    @a1 = @announcement
+    account_notification(:account => @account, :roles => ["NilEnrollment"], :message => "Announcement 2") #students not currently taking a course
+    @a2 = @announcement
+    account_notification(:account => @account, :message => "Announcement 3") # no roles, should go to all
+    @a3 = @announcement
+
+    @unenrolled = @user
+    course_with_teacher(:account => @account)
+    @teacher = @user
+    account_admin_user(:account => @account)
+    @admin = @user
+    course_with_student(:course => @course)
+    @student = @user
+
+    AccountNotification.for_user_and_account(@teacher, @account).map(&:id).sort.should == [@a1.id, @a3.id]
+    AccountNotification.for_user_and_account(@admin, @account).map(&:id).sort.should == [@a1.id, @a2.id, @a3.id]
+    AccountNotification.for_user_and_account(@student, @account).map(&:id).sort.should == [@a3.id]
+    AccountNotification.for_user_and_account(@unenrolled, @account).map(&:id).sort.should == [@a2.id, @a3.id]
   end
 
   it "should allow closing an announcement" do
@@ -52,7 +75,7 @@ describe AccountNotification do
   describe "survey notifications" do
     it "should only display for flagged accounts" do
       flag = AccountNotification::ACCOUNT_SERVICE_NOTIFICATION_FLAGS.first
-      @announcement = Account.site_admin.announcements.create!(message: "hello", required_account_service: flag)
+      account_notification(:required_account_service => flag, :account => Account.site_admin)
       @a1 = account_model
       @a2 = account_model
       @a2.enable_service(flag)
@@ -88,15 +111,16 @@ describe AccountNotification do
     specs_require_sharding
 
     it "should always find notifications for site admin" do
-      @sa_announcement = Account.site_admin.announcements.create!(:message => 'hello')
+      account_notification(:account => Account.site_admin)
 
       @shard1.activate do
         @account = Account.create!
-        AccountNotification.for_user_and_account(@user, @account).should == [@sa_announcement]
+        user
+        AccountNotification.for_user_and_account(@user, @account).should == [@announcement]
       end
 
       @shard2.activate do
-        AccountNotification.for_user_and_account(@user, @account).should == [@sa_announcement]
+        AccountNotification.for_user_and_account(@user, @account).should == [@announcement]
       end
     end
 

@@ -197,6 +197,24 @@ describe QuizRegrader::Answer do
         assert_answer_has_regrade_option!('current_correct_only')
       end
     end
+
+    context 'no_regrade option' do
+      before { wrapper.regrade_option = 'no_regrade' }
+
+      it 'returns 0 when regrading' do
+        mark_original_answer_as!(:correct)
+        wrapper.regrade!.should == 0
+      end
+    end
+
+    context 'disabled option' do
+      before { wrapper.regrade_option = 'disabled' }
+
+      it 'returns 0 when regrading' do
+        mark_original_answer_as!(:correct)
+        wrapper.regrade!.should == 0
+      end
+    end
   end
 
 end

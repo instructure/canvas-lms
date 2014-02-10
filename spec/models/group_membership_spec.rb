@@ -88,7 +88,7 @@ describe GroupMembership do
       }.should_not raise_error(ActiveRecord::RecordInvalid)
     end
   end
-  
+
   it "should dispatch a 'new_student_organized_group' message if the first membership in a student organized group" do
     course_with_teacher
     student = user_model
@@ -101,7 +101,20 @@ describe GroupMembership do
     group_membership = group.group_memberships.create(:user => student)
     group_membership.messages_sent.should be_include("New Student Organized Group")
   end
-  
+
+  it "should not dispatch a message if the membership has been created with SIS" do
+    course_with_teacher(active_all: true)
+    student    = user_model
+    group      = @course.groups.create(group_category: GroupCategory.student_organized_for(@course))
+    membership = group.group_memberships.build(user: student)
+    @course.enroll_student(student).accept!
+    Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
+    Notification.create!(name: 'New Context Group Membership Invitation', category: 'TestImmediately')
+    membership.sis_batch_id = '12345'
+    membership.save!
+    membership.messages_sent.should be_empty
+  end
+
   it "should be invalid if group wants a common section, but doesn't have one with the user" do
     course_with_teacher(:active_all => true)
     section1 = @course.course_sections.create

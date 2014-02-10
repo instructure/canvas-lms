@@ -1,12 +1,13 @@
 class AccountNotification < ActiveRecord::Base
   attr_accessible :subject, :icon, :message,
-    :account, :user, :start_at, :end_at,
+    :account, :account_notification_roles, :user, :start_at, :end_at,
     :required_account_service, :months_in_display_cycle
 
   validates_presence_of :start_at, :end_at, :account_id
   before_validation :infer_defaults
   belongs_to :account, :touch => true
   belongs_to :user
+  has_many :account_notification_roles, dependent: :destroy
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => false, :allow_blank => false
   sanitize_field :message, Instructure::SanitizeField::SANITIZE
 
@@ -23,6 +24,30 @@ class AccountNotification < ActiveRecord::Base
 
   def self.for_user_and_account(user, account)
     current = self.for_account(account)
+    preload_associations(current, [:account, :account_notification_roles])
+    user_role_types = {}
+
+    current.select! do |announcement|
+      role_types = announcement.account_notification_roles.map(&:role_type)
+      unless user_role_types.key?(announcement.account_id)
+        if announcement.account.site_admin?
+          # roles user holds with respect to courses
+          user_role_types[announcement.account_id] = user.enrollments.with_each_shard{ |scope| scope.active.select(:type).uniq.map(&:type) }.uniq
+          # announcements intended for users not enrolled in any courses have the NilEnrollment role type
+          user_role_types[announcement.account_id] = ["NilEnrollment"] if user_role_types[announcement.account_id].empty?
+          # roles user holds with respect to accounts
+          user_role_types[announcement.account_id] |= user.account_users.with_each_shard{ |scope| scope.select(:membership_type).uniq.map(&:type) }.uniq
+        else #if announcement.account == account
+          # roles user holds with respect to courses
+          user_role_types[account.id] = user.enrollments_for_account_and_sub_accounts(account).map(&:type)
+          # announcements intended for users not enrolled in any courses have the NilEnrollment role type
+          user_role_types[account.id] = ["NilEnrollment"] if user_role_types[account.id].empty?
+          # roles user holds with respect to accounts
+          user_role_types[account.id] |= account.all_account_users_for(user).map(&:membership_type)
+        end
+      end
+      role_types.empty? || (role_types & user_role_types[announcement.account_id]).present?
+    end
 
     user.shard.activate do
       closed_ids = user.preferences[:closed_notifications] || []

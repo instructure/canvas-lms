@@ -87,6 +87,9 @@
     color: black
     font-weight: normal
 
+#grades_summary th.assignment_score
+  text-align: center
+
 #grades_summary td.assignment_score
   cursor: pointer
   text-align: center
@@ -99,14 +102,25 @@
   color: #800
   font-weight: bold
 
+#grades_summary th.possible
+  text-align: right
+  white-space: nowrap
+
 #grades_summary td.possible
   text-align: right
   padding-right: 15px
+
+#grades_summary td.details
+  text-align: right
+  padding-left: 0
+  white-space: nowrap
+  min-width: 80px // 4 x 20 pixel icons
 
 #grades_summary th.title
   font-size: 1.1em
   font-weight: normal
   padding-left: 20px
+  word-break: break-all
   
   @media print
     padding-left: 0

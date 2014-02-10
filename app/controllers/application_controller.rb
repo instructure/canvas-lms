@@ -373,8 +373,7 @@ class ApplicationController < ActionController::Base
   def get_context
     unless @context
       if params[:course_id]
-        @context = api_request? ?
-          api_find(Course.active, params[:course_id]) : Course.active.find(params[:course_id])
+        @context = api_find(Course.active, params[:course_id])
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
         if @context && session[:enrollment_uuid_course_id] == @context.id
@@ -389,42 +388,27 @@ class ApplicationController < ActionController::Base
         @context_enrollment = @context.enrollments.find_all_by_user_id(@current_user.id).sort_by{|e| [e.state_sortable, e.rank_sortable, e.id] }.first if @context && @current_user
         @context_membership = @context_enrollment
       elsif params[:account_id] || (self.is_a?(AccountsController) && params[:account_id] = params[:id])
-        case params[:account_id]
-        when 'self'
-          @context = @domain_root_account
-        when 'default'
-          @context = Account.default
-        when 'site_admin'
-          @context = Account.site_admin
-        else
-          @context = api_request? ?
-            api_find(Account, params[:account_id]) : Account.find(params[:account_id])
-        end
+        @context = api_find(Account, params[:account_id])
         params[:context_id] = @context.id
         params[:context_type] = "Account"
         @context_enrollment = @context.account_users.find_by_user_id(@current_user.id) if @context && @current_user
         @context_membership = @context_enrollment
         @account = @context
       elsif params[:group_id]
-        @context = api_request? ? api_find(Group, params[:group_id]) : Group.find(params[:group_id])
+        @context = api_find(Group, params[:group_id])
         params[:context_id] = params[:group_id]
         params[:context_type] = "Group"
         @context_enrollment = @context.group_memberships.find_by_user_id(@current_user.id) if @context && @current_user      
         @context_membership = @context_enrollment
       elsif params[:user_id] || (self.is_a?(UsersController) && params[:user_id] = params[:id])
-        case params[:user_id]
-        when 'self'
-          @context = @current_user
-        else
-          @context = api_request? ? api_find(User, params[:user_id]) : User.find(params[:user_id])
-        end
+        @context = api_find(User, params[:user_id])
         params[:context_id] = params[:user_id]
         params[:context_type] = "User"
         @context_membership = @context if @context == @current_user
       elsif params[:course_section_id] || (self.is_a?(SectionsController) && params[:course_section_id] = params[:id])
         params[:context_id] = params[:course_section_id]
         params[:context_type] = "CourseSection"
-        @context = api_request? ? api_find(CourseSection, params[:course_section_id]) : CourseSection.find(params[:course_section_id])
+        @context = api_find(CourseSection, params[:course_section_id])
       elsif params[:collection_item_id]
         params[:context_id] = params[:collection_item_id]
         params[:context_type] = 'CollectionItem'
@@ -846,6 +830,43 @@ class ApplicationController < ActionController::Base
     logger.error "Pageview error!"
     raise e if Rails.env.development?
     true
+  end
+
+  unless CANVAS_RAILS2
+    rescue_from Exception, :with => :rescue_exception
+
+    # analogous to rescue_action_without_handler from ActionPack 2.3
+    def rescue_exception(exception)
+      ActiveSupport::Deprecation.silence do
+        message = "\n#{exception.class} (#{exception.message}):\n"
+        message << exception.annoted_source_code.to_s if exception.respond_to?(:annoted_source_code)
+        message << "  " << exception.backtrace.join("\n  ")
+        logger.fatal("#{message}\n\n")
+      end
+
+      if config.consider_all_requests_local || local_request?
+        rescue_action_locally(exception)
+      else
+        rescue_action_in_public(exception)
+      end
+    end
+
+    def interpret_status(code)
+      Rack::Utils::HTTP_STATUS_CODES[Rack::Utils.status_code(code)] || Rack::Utils::HTTP_STATUS_CODES[500]
+    end
+
+    def response_code_for_rescue(exception)
+      ActionDispatch::ExceptionWrapper.status_code_for_exception(exception.class.name)
+    end
+
+    def render_optional_error_file(status)
+      path = "#{Rails.public_path}/#{status.to_s[0,3]}.html"
+      if File.exist?(path)
+        render :file => path, :status => status, :content_type => Mime::HTML, :layout => false
+      else
+        head status
+      end
+    end
   end
 
   # Custom error catching and message rendering.
@@ -1401,14 +1422,18 @@ class ApplicationController < ActionController::Base
     request.headers['Accept'] =~ %r{application/json\+canvas-string-ids}
   end
 
+  def json_cast(obj)
+    stringify_json_ids? ? Api.recursively_stringify_json_ids(obj) : obj
+  end
+
   def render(options = nil, extra_options = {}, &block)
     set_layout_options
     if options && options.key?(:json)
       json = options.delete(:json)
       unless json.is_a?(String)
-        Api.recursively_stringify_json_ids(json) if stringify_json_ids?
+        json_cast(json)
         if CANVAS_RAILS2
-          json = MultiJson.dump(json)
+          json = MultiJson.dump(json).force_encoding(Encoding::ASCII_8BIT)
         else
           json = ActiveSupport::JSON.encode(json)
         end

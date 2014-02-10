@@ -61,7 +61,7 @@ describe "Importing modules" do
 
     ass = get_import_data('bb8', 'assignment')
     Assignment.import_from_migration(ass, context)
-    Assignment.count.should == 1
+    context.assignments.count.should == 1
     
     topic = ContextModule.import_from_migration(data, context)
     topic.content_tags.count.should == 1

@@ -8,9 +8,13 @@ describe QuizRegrader::AttemptVersion do
     {1 => 'no_regrade', 2 => 'full_credit', 3 => 'current_correct_only' }
   end
 
+  let(:question_group) do
+    stub(:pick_count => 1, :question_points => 25)
+  end
+
   let(:question_regrades) do
     1.upto(3).each_with_object({}) do |i, hash|
-      hash[i] = stub(:quiz_question  => stub(:id => i, :question_data => {:id => i}),
+      hash[i] = stub(:quiz_question  => stub(:id => i, :question_data => {:id => i}, :quiz_group => question_group),
                      :question_data  => {:id => i},
                      :regrade_option => regrade_options[i])
     end
@@ -25,10 +29,13 @@ describe QuizRegrader::AttemptVersion do
   end
 
   let(:submission) do
-    stub(:score           => 0,
-         :quiz_data       => quiz_data,
-         :submission_data => submission_data,
-         :write_attribute => {})
+    stub(:score                 => 0,
+         :score_before_regrade  => 1,
+         :quiz_data             => quiz_data,
+         :score=                => nil,
+         :score_before_regrade= => nil,
+         :submission_data       => submission_data,
+         :write_attribute       => {})
   end
 
   let(:version) do
@@ -66,7 +73,7 @@ describe QuizRegrader::AttemptVersion do
       submission.expects(:score=).with(3)
       submission.expects(:score_before_regrade).returns nil
       submission.expects(:score_before_regrade=).with(0)
-      submission.expects(:quiz_data=).with(question_regrades.map { |id, q| q.question_data })
+      submission.expects(:quiz_data=)
 
       version.expects(:model=)
       version.expects(:save!)

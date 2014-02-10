@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -287,6 +287,7 @@ class UsersController < ApplicationController
       end
       return_url = session[:masquerade_return_to]
       session.delete(:masquerade_return_to)
+      @current_user.associate_with_shard(@user.shard, :shadow) if PageView.db?
       return return_to(return_url, request.referer || dashboard_url)
     end
   end
@@ -823,8 +824,14 @@ class UsersController < ApplicationController
   # @API Create a user
   # Create and return a new user and pseudonym for an account.
   #
+  # If you don't have the "Modify login details for users" permission, but
+  # self-registration is enabled on the account, you can still use this
+  # endpoint to register new users. Certain fields will be required, and
+  # others will be ignored (see below).
+  #
   # @argument user[name] [Optional, String]
   #   The full name of the user. This name will be used by teacher for grading.
+  #   Required if this is a self-registration.
   #
   # @argument user[short_name] [Optional, String]
   #   User's name as it will be displayed in discussions, messages, and comments.
@@ -843,11 +850,17 @@ class UsersController < ApplicationController
   # @argument user[birthdate] [Optional, Date]
   #   The user's birth date.
   #
+  # @argument user[terms_of_use] [Optional, Boolean]
+  #   Whether the user accepts the terms of use. Required if this is a
+  #   self-registration and this canvas instance requires users to accept
+  #   the terms (on by default).
+  #
   # @argument pseudonym[unique_id] [String]
-  #   User's login ID.
+  #   User's login ID. If this is a self-registration, it must be a valid
+  #   email address.
   #
   # @argument pseudonym[password] [Optional, String]
-  #   User's password.
+  #   User's password. Cannot be set during self-registration.
   #
   # @argument pseudonym[sis_user_id] [Optional, String]
   #   SIS ID for the user's account. To set this parameter, the caller must be
@@ -855,6 +868,7 @@ class UsersController < ApplicationController
   #
   # @argument pseudonym[send_confirmation] [Optional, Boolean]
   #   Send user notification of account creation if true.
+  #   Automatically set to true during self-registration.
   #
   # @argument communication_channel[type] [Optional, String]
   #   The communication channel type, e.g. 'email' or 'sms'.
@@ -872,7 +886,6 @@ class UsersController < ApplicationController
     manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
     self_enrollment = params[:self_enrollment].present?
     allow_non_email_pseudonyms = manage_user_logins || self_enrollment && params[:pseudonym_type] == 'username'
-    @domain_root_account.email_pseudonyms = !allow_non_email_pseudonyms
     require_password = self_enrollment && allow_non_email_pseudonyms
     allow_password = require_password || manage_user_logins
 
@@ -928,6 +941,7 @@ class UsersController < ApplicationController
     end
 
     @pseudonym ||= @user.pseudonyms.build(:account => @context)
+    @pseudonym.account.email_pseudonyms = !allow_non_email_pseudonyms
     @pseudonym.require_password = require_password
     # pre-populate the reverse association
     @pseudonym.user = @user
@@ -1498,6 +1512,51 @@ class UsersController < ApplicationController
       user_follow = @current_user.user_follows.where(:followed_item_id => @user, :followed_item_type => 'User').first
       user_follow.try(:destroy)
       render :json => { "ok" => true }
+    end
+  end
+
+  # @API Merge user into another user
+  #
+  # Merge a user into another user.
+  # To merge users, the caller must have permissions to manage both users.
+  #
+  # When finding users by SIS ids in different accounts the
+  # destination_account_id is required.
+  #
+  # The account can also be identified by passing the domain in destination_account_id.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/<user_id>/merge_into/<destination_user_id> \
+  #          -X PUT \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/<user_id>/merge_into/accounts/<destination_account_id>/users/<destination_user_id> \
+  #          -X PUT \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns User
+  def merge_into
+    user = api_find(User, params[:id])
+    if authorized_action(user, @current_user, :manage_logins)
+
+      if (account_id = params[:destination_account_id])
+        destination_account = Account.find_by_domain(account_id)
+        destination_account ||= Account.find(account_id)
+      else
+        destination_account ||= @domain_root_account
+      end
+
+      into_user = api_find(User, params[:destination_user_id], account: destination_account)
+
+      if authorized_action(into_user, @current_user, :manage_logins)
+        UserMerge.from(user).into into_user
+        render(:json => user_json(into_user,
+                                  @current_user,
+                                  session,
+                                  %w{locale},
+                                  destination_account))
+      end
     end
   end
 

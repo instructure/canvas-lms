@@ -5243,6 +5243,9 @@ en:
       allow_threaded_replies: "Allow threaded replies"
       attachment: Attachment
       available_from: "Available From"
+      buttons: 
+        not_published: "Not Published"
+        published: Published
       delay_posting: "Delay posting"
       enable_podcast_feed: "Enable podcast feed"
       include_replies_in_podcast_feed: "Include Replies in podcast feed"
@@ -6036,6 +6039,7 @@ en:
   features: 
     draft_state: "Draft State"
     google_docs_domain_restriction: "Google Docs Domain Restriction"
+    screenreader_gradebook: "Screenreader Gradebook"
   filebrowserview: 
     course_files: "Course files"
     group_files: "Group files"
@@ -6289,6 +6293,7 @@ en:
     graded_then_resubmitted: "graded, then resubmitted (%{when})"
     gradee_index_of_total: "%{gradee} %{x} of %{y}"
     group: Group
+    hide_all_details_button: "Hide All Details"
     hide_all_things: "Hide All %{things}"
     hide_column: "Hide Column"
     hide_student_name: "Hide Student Names"
@@ -6315,6 +6320,7 @@ en:
     reupload_submissions: "Re-Upload Submissions"
     set_default_grade: "Set Default Grade"
     set_group_weights: "Set Group Weights"
+    show_all_details_button: "Show All Details"
     show_student_name: "Show Student Names"
     showing_all_sections: "Showing All Sections"
     showing_section: "Showing Section: %{section}"
@@ -6930,6 +6936,7 @@ en:
       communities: Communities
       imported: "Imported Groups"
       student_organized: "Student Groups"
+      uncategorized: Uncategorized
     invalid_self_signup: "Self-signup needs to be one of the following values: %{values}"
     name_required: "Name is required"
     name_reserved: "%{name} is a reserved name."
@@ -7152,7 +7159,7 @@ en:
         save: Save
         saving: Saving...
         self_signup: "Self Sign-Up"
-        split_into_groups: "Split students into %h{split_num} equal groups"
+        split_into_groups: "Split students into %h{num_groups} equal groups"
       group_category_detail: 
         add_group: "Add Group"
         category_settings: Settings
@@ -7166,6 +7173,7 @@ en:
         self_organized_warning: "These groups are self-organized by students. Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups cannot be used for graded assignments."
         self_signup_blurb: "Self sign-up is enabled for these groups."
         settings: Settings
+        uncategorized_groups: "These groups are not associated to any particular group set. Because they were imported via SIS, they can only be updated or deleted via SIS."
       group_category_edit: 
         allow_self_signup: "Allow self sign-up"
         cancel: Cancel
@@ -7200,10 +7208,12 @@ en:
         remove: Remove
         remove_from_group: "Remove %{name} from group"
       group_users: 
+        add_student: "Add a student to get started."
+        add_user: "Add a user to get started."
         no_matching_students: "No matching students."
         no_matching_users: "No matching users."
-        no_students: "There are currently no students in this group. Add a student to get started."
-        no_users: "There are currently no users in this group. Add a user to get started."
+        no_students: "There are currently no students in this group."
+        no_users: "There are currently no users in this group."
       groups: 
         no_groups: "There are currently no groups in this group set. Add a group to get started."
         no_matching_groups: "There are no groups that match your current search term."
@@ -7236,6 +7246,7 @@ en:
       students_assigned: "Students assigned to groups."
       update_success: "Group was successfully updated."
       welcome: "Welcome to the group %{group_name}!"
+    positive_group_count: "Must enter a positive group count"
     randomly_assigning_members: "Randomly Assigning Students"
     show: 
       coming_up: "Coming Up"
@@ -12273,6 +12284,7 @@ en:
         are_you_sure_delete: "Are you sure you want to delete this rubric? Any course currently associated with this rubric will still have access to it, but, no new courses will be able to use it."
         are_you_sure_remove: "Are you sure you want to remove this rubric from your list?"
       remove_rubric: "Remove this Rubric from my list"
+  screenreader_gradebook_description: "Screenreader Gradebook provides an interface to gradebook that is designed for accessibility."
   scribd: 
     upgrade_flash: "Hello, you have an old version of Adobe Flash Player. To use iPaper (and lots of other stuff on the web) you need to %{link_tag}get the latest Flash player%{end_link}."
   search: 

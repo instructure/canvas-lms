@@ -4,6 +4,7 @@
 <!-- -------- -->
 
 <h2>Global Settings</h2>
+
 <!-- filter by section -->
 <div>
   <label for="section_select">Select a section</label>
@@ -41,25 +42,49 @@
 
 <!-- show/hide student names -->
 
+<div>
+  <label>
+  {{
+    input
+    type="checkbox"
+    id="hide_names_checkbox"
+    name="hide_names_checkbox"
+    checked=hideStudentNames
+  }}
+  {{#t "hide_student_names_label"}}Hide Student Names{{/t}}
+  </label>
+</div>
+
+
 <!-- not sure this makes sense in this interface -->
 
 <!-- arrange columns by due date -->
 
 <fieldset>
-  <legend>Arrange Assignments</legend>
-  <input type="radio" name="arrange_assignments" id="assigns_alphabetical" value="assigns_alphabetical">
-  <label for="assigns_alphabetical">Alphabetically</label><br />
-  <input type="radio" name="arrange_assignments" id="assigns_position" value="assigns_position" checked>
-  <label for="assigns_position">By Assignment Group and Position</label><br />
-  <input type="radio" name="arrange_assignments" id="assigns_due_date" value="assigns_due_date">
-  <label for="assigns_due_date">By Due Date</label>
+  <label for="arrange_assignments">Arrange assignments</label>
+  {{
+    fast-select
+    name="arrange_assignments"
+    id="arrange_assignments"
+    items=assignmentSortOptions
+    selected=assignmentSort
+  }}
+
 </fieldset>
 
 <!-- treat ungraded as 0 -->
 
 <div>
-  <label for="ungraded">Treat Ungraded as 0</label>
-  <input type="checkbox" name="ungraded" id="ungraded" value="ungraded">
+  <label for="ungraded">
+  {{
+    input
+    type="checkbox"
+    id="ungraded"
+    name="ungraded"
+    checked=includeUngradedAssignments
+  }}
+  {{#t "include_ungraded_assignments"}}Treat Ungraded as 0{{/t}}
+  </label>
 </div>
 
 <!-- show concluded enrollments -->
@@ -74,20 +99,35 @@
 <h2>Content Selection</h2>
 
 <div>
-  <label for="student_select">Select a student</label>
+  <label for="student_select">
+    {{#t 'select_student'}}Select a student{{/t}}
+  </label>
   {{
     fast-select id="student_select"
     class="student_select"
-    items=students
+    items=studentsInSelectedSection
     valuePath="id"
-    labelPath="name"
+    labelPath=displayName
     labelDefault=studentSelectDefaultLabel
     selected=selectedStudent
   }}
 </div>
 <div id="student_navigation">
-  <a href="#prev_student" id="prev_student">Previous Student</a>
-  <a href="#next_student" id="next_student">Next Student</a>
+  <button
+    id="prev_student"
+    {{action 'selectItem' 'selectedStudent' 'previous'}}
+    {{bind-attr aria-disabled=ariaDisabledPrevStudent disabled=disablePrevStudentButton}}
+  >
+    {{#t 'previous_student'}}Previous Student{{/t}}
+  </button>
+
+  <button
+    id="next_student"
+    {{action 'selectItem' 'selectedStudent' 'next'}}
+    {{bind-attr aria-disabled=ariaDisabledNextStudent disabled=disableNextStudentButton}}
+  >
+    {{#t 'next_student'}}Next Student{{/t}}
+  </button>
 </div>
 
 <!-- not sure we need this
@@ -104,7 +144,9 @@
 -->
 
 <div>
-  <label for="assignment_select">Select an assignment</label>
+  <label for="assignment_select">
+    {{#t 'select_assignment'}}Select an assignment{{/t}}
+  </label>
    {{
     fast-select id="assignment_select"
     class="assignment_select"
@@ -117,8 +159,21 @@
 </div>
 
 <div id="assignment_navigation">
-  <a href="#prev_assignment" id="prev_assignment">Previous Assignment</a> 
-  <a href="#next_assignment" id="next_assignment">Next Assignment</a>
+  <button
+    id="prev_assignment"
+    {{action 'selectItem' 'selectedAssignment' 'previous'}}
+    {{bind-attr aria-disabled=ariaDisabledPrevAssignment disabled=disablePrevAssignmentButton}}
+  >
+    {{#t 'previous_assignment'}}Previous Assignment{{/t}}
+  </button>
+
+  <button
+    id="next_assignment"
+    {{action 'selectItem' 'selectedAssignment' 'next'}}
+    {{bind-attr aria-disabled=ariaDisabledNextAssignment disabled=disableNextAssignmentButton}}
+  >
+    {{#t 'next_assignment'}}Next Assignment{{/t}}
+  </button>
 </div>
 
 <!-- student + assignment -->
@@ -143,7 +198,12 @@
 
   </div>
 
-  <a href="#details">Submission Details</a>
+  <button
+    id="submission_details"
+    {{action 'openDialog' 'submission' target=view}}
+  >
+   {{#t 'submission_details'}}Submission Details{{/t}}
+  </button>
 
 </div>
 
@@ -151,23 +211,35 @@
 
 <!-- student -->
 <!-- -------- -->
-
 {{#if selectedStudent}}
-{{#with selectedStudent}}
 
 <div id="student_information">
 
   <h2>Student Information</h2>
 
-  <div>Selected Student: {{name}}</div>
+  <div>Selected Student:
+  {{#if hideStudentNames}}
+    {{selectedStudent.hiddenName}}
+  {{else}}
+    {{selectedStudent.name}}
+  {{/if}}
+  </div>
 
   <!-- what section they are in -->
 
   <div>Section: Section 3</div>
-
   <!-- secondary id -->
-  {{#unless isLoaded}}
-  <div>Secondary ID: {{login_id}}</div>
+  {{#if selectedStudent.isLoaded}}
+
+  <div>Secondary ID: <span id="secondary_id">
+    {{#if hideStudentNames}}
+      <em>hidden</em>
+    {{else}}
+      {{selectedStudent.login_id}}
+    {{/if}}
+    </span>
+  </div>
+
 
   <!-- final score/grade -->
 
@@ -178,11 +250,10 @@
   <div>Assignment Group Grade: 30% (50% of grade)</div>
   {{else}}
   <p>Submissions for this student are still loading...</p>
-  {{/unless}}
+  {{/if}}
 
 </div>
 
-{{/with}}
 {{/if}}
 
 <!-- assignment -->
@@ -197,18 +268,26 @@
   <!-- how many points is the assignment worth -->
 
   <div>Points possible: {{points_possible}}</div>
-  <!-- is the assignment muted -->
-
-  <div>
-    <label for="muted">Muted</label>
-    <input type="checkbox" name="muted" id="muted" value="muted"><br>
-  </div>
 
 {{/with}}
+
+  <!-- is the assignment muted -->
+  <div>
+    <label for="assignment_muted_check">
+      {{#t 'assignment_is_muted'}}Muted?{{/t}}
+      {{
+        assignment-muter
+        assignment=selectedAssignment
+        id='assignment_muted_check'
+        name='assignment_muted_check'
+      }}
+    </label>
+  </div>
+
   <!-- assignment stats: average/high/low score + submission count -->
   {{#if assignmentDetails}}
   {{#with assignmentDetails }}
-  {{#if cnt}} 
+  {{#if cnt}}
   <div>Average Score: {{average}}</div>
   <div>High Score: {{max}}</div>
   <div>Low Score: {{min}}</div>

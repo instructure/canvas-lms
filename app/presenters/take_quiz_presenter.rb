@@ -79,6 +79,7 @@ class TakeQuizPresenter
     classes << "marked" if marked?(q)
     classes << "seen" if question_seen?(q)
     classes << "current_question" if one_question_at_a_time? && current_question?(q)
+    classes << "text_only" if text_only?(q)
     classes.join(' ')
   end
 
@@ -86,6 +87,9 @@ class TakeQuizPresenter
     submission_data["question_#{q[:id]}_marked"].present?
   end
 
+  def text_only?(q)
+    q['question_type'] == "text_only_question"
+  end
   def answered_icon(q)
     question_answered?(q) ? 'icon-check' : 'icon-question'
   end
