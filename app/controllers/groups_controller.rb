@@ -109,9 +109,7 @@ class GroupsController < ApplicationController
   def context_group_members
     @group = @context
     if authorized_action(@group, @current_user, :read_roster)
-      respond_to do |format|
-        format.json { render :json => @group.members_json_cached }
-      end
+      render :json => @group.members_json_cached
     end
   end
 
@@ -136,20 +134,16 @@ class GroupsController < ApplicationController
     end
 
     if authorized_action(@context, @current_user, :manage)
-      respond_to do |format|
-        format.json {
-          json = {
-            :pages => users.total_pages,
-            :current_page => users.current_page,
-            :next_page => users.next_page,
-            :previous_page => users.previous_page,
-            :total_entries => users.total_entries,
-            :users => users.map { |u| u.group_member_json(@context) }
-          }
-          json[:pagination_html] = render_to_string(:partial => 'user_pagination', :locals => { :users => users }) unless params[:no_html]
-          render :json => json
-        }
-      end
+      json = {
+        :pages => users.total_pages,
+        :current_page => users.current_page,
+        :next_page => users.next_page,
+        :previous_page => users.previous_page,
+        :total_entries => users.total_entries,
+        :users => users.map { |u| u.group_member_json(@context) }
+      }
+      json[:pagination_html] = render_to_string(:partial => 'user_pagination', :locals => { :users => users }) unless params[:no_html]
+      render :json => json
     end
   end
 
