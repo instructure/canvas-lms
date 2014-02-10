@@ -145,6 +145,9 @@ module Api::V1::User
       json[:enrollment_state] = json.delete('workflow_state')
       json[:role] = enrollment.role
       json[:last_activity_at] = enrollment.last_activity_at
+      if enrollment.root_account.grants_right?(user, session, :manage_sis)
+        json[:sis_import_id] = enrollment.sis_batch_id
+      end
       if enrollment.student?
         json[:grades] = {
           :html_url => course_student_grades_url(enrollment.course_id, enrollment.user_id),
