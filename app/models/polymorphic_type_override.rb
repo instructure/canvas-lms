@@ -39,8 +39,7 @@ module PolymorphicTypeOverride
     def shard_category_code_for_reflection(reflection)
       mapper = @@polymorphic_type_mappings[self.name]
 
-      if mapper && reflection.options[:foreign_type]
-
+      if mapper && reflection && reflection.options && reflection.options[:foreign_type]
         if mapper.overrides?(reflection.options[:foreign_type])
           const = mapper.new_constant_for(reflection.options[:foreign_type])
           return "'#{const}'.try(:constantize).try(:shard_category) || :default"
