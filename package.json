@@ -1,6 +1,9 @@
 {
   "name": "canvas-lms",
   "version": "0.0.0",
+  "dependencies": {
+    "napa": "~0.3.0"
+  },
   "devDependencies": {
     "requirejs": "~2.1.10",
     "loom": "~2.0.0",
@@ -12,7 +15,6 @@
     "karma-opera-launcher": "~0.1.0",
     "karma-coverage": "~0.1.4",
     "karma-ie-launcher": "~0.1.1",
-    "napa": "~0.3.0",
     "karma-osx-reporter": "0.0.4",
     "karma-firework-reporter": "~0.2.3"
   },
