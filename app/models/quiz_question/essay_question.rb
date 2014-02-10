@@ -33,7 +33,7 @@ class QuizQuestion::EssayQuestion < QuizQuestion::Base
     responses.each do |response|
       stats[:essay_responses] << {
         :user_id => response[:user_id],
-        :text => response[:text].strip
+        :text => response[:text].to_s.strip
       }
     end
 
