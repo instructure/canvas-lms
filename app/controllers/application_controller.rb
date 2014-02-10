@@ -1369,7 +1369,8 @@ class ApplicationController < ActionController::Base
   # refs #6632 -- once the speed grader ipad app is upgraded, we can remove these exceptions
   SKIP_JSON_CSRF_REGEX = %r{\A(?:/login|/logout|/dashboard/comment_session)}
   def prepend_json_csrf?
-    request.get? && in_app? && !request.path.match(SKIP_JSON_CSRF_REGEX)
+    requested_json = request.headers['Accept'] =~ %r{application/json}
+    request.get? && !requested_json && in_app? && !request.path.match(SKIP_JSON_CSRF_REGEX)
   end
 
   def in_app?

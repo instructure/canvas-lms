@@ -201,6 +201,14 @@ describe "security" do
     response.body.should match(%r{^while\(1\);})
   end
 
+  it "should not prepend GET JSON responses to Accept application/json requests with protection" do
+    course_with_teacher_logged_in
+    get "/courses.json", nil, { 'Accept' => 'application/json' }
+    response.should be_success
+    response['Content-Type'].should match(%r"^application/json")
+    response.body.should_not match(%r{^while\(1\);})
+  end
+
   it "should not prepend non-GET JSON responses with protection" do
     course_with_teacher_logged_in
     delete "/dashboard/ignore_stream_item/1"
