@@ -169,6 +169,7 @@ class ErrorReport < ActiveRecord::Base
     stuff = request.env.slice(*USEFUL_ENV)
     stuff['REMOTE_ADDR'] = request.remote_ip # ActionController::Request#remote_ip has proxy smarts
     stuff['QUERY_STRING'] = LoggingFilter.filter_query_string("?" + stuff['QUERY_STRING'])
+    stuff['REQUEST_URI'] = request.url unless CANVAS_RAILS2
     stuff['REQUEST_URI'] = LoggingFilter.filter_uri(stuff['REQUEST_URI'])
     stuff['path_parameters'] = LoggingFilter.filter_params(request.path_parameters.dup).inspect # params rails picks up from the url
     stuff['query_parameters'] = LoggingFilter.filter_params(request.query_parameters.dup).inspect # params rails picks up from the query string
