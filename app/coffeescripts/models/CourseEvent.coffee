@@ -40,7 +40,7 @@ define [
       if _.isString(value)
         return blank if !value.length
         if value.match /^\d{4}-\d{2}-\d{2}(T| )\d{2}:\d{2}:\d{2}(.\d+)?Z$/
-          return I18n.l("date.formats.medium", value) + " " + I18n.l("time.formats.tiny", value)
+          return I18n.l("#date.formats.medium", value) + " " + I18n.l("#time.formats.tiny", value)
       return value
 
     presentLabel: (label) ->
