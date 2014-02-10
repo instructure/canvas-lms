@@ -1304,12 +1304,10 @@ class CoursesController < ApplicationController
     get_context
     @enrollment = @context.enrollments.find(params[:id])
     if @enrollment.can_be_deleted_by(@current_user, @context, session)
-      respond_to do |format|
-        if (!@enrollment.defined_by_sis? || @context.grants_right?(@current_user, session, :manage_account_settings)) && @enrollment.destroy
-          format.json { render :json => @enrollment }
-        else
-          format.json { render :json => @enrollment, :status => :bad_request }
-        end
+      if (!@enrollment.defined_by_sis? || @context.grants_right?(@current_user, session, :manage_account_settings)) && @enrollment.destroy
+        render :json => @enrollment
+      else
+        render :json => @enrollment, :status => :bad_request
       end
     else
       authorized_action(@context, @current_user, :permission_fail)
@@ -1339,43 +1337,39 @@ class CoursesController < ApplicationController
     if @current_user && @current_user.can_create_enrollment_for?(@context, session, params[:enrollment_type])
       params[:user_list] ||= ""
 
-      respond_to do |format|
-        # Enrollment settings hash
-        # Change :limit_privileges_to_course_section to be an explicit true/false value
-        enrollment_options = params.slice(:course_section_id, :enrollment_type, :limit_privileges_to_course_section)
-        limit_privileges = value_to_boolean(enrollment_options[:limit_privileges_to_course_section])
-        enrollment_options[:limit_privileges_to_course_section] = limit_privileges
-        enrollment_options[:role_name] = custom_role.name if custom_role
-        list = UserList.new(params[:user_list],
-                            :root_account => @context.root_account,
-                            :search_method => @context.user_list_search_mode_for(@current_user),
-                            :initial_type => params[:enrollment_type])
-        if !(@context.completed? || @context.soft_concluded?) && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
-          format.json do
-            Enrollment.send(:preload_associations, @enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
-            json = @enrollments.map { |e|
-              { 'enrollment' =>
-                { 'associated_user_id' => e.associated_user_id,
-                  'communication_channel_id' => e.user.communication_channel.try(:id),
-                  'email' => e.email,
-                  'id' => e.id,
-                  'name' => (e.user.last_name_first || e.user.name),
-                  'pseudonym_id' => e.user.pseudonym.try(:id),
-                  'section' => e.course_section.display_name,
-                  'short_name' => e.user.short_name,
-                  'type' => e.type,
-                  'user_id' => e.user_id,
-                  'workflow_state' => e.workflow_state,
-                  'custom_role_asset_string' => custom_role ? custom_role.asset_string : nil,
-                  'already_enrolled' => e.already_enrolled
-                }
-              }
+      # Enrollment settings hash
+      # Change :limit_privileges_to_course_section to be an explicit true/false value
+      enrollment_options = params.slice(:course_section_id, :enrollment_type, :limit_privileges_to_course_section)
+      limit_privileges = value_to_boolean(enrollment_options[:limit_privileges_to_course_section])
+      enrollment_options[:limit_privileges_to_course_section] = limit_privileges
+      enrollment_options[:role_name] = custom_role.name if custom_role
+      list = UserList.new(params[:user_list],
+                          :root_account => @context.root_account,
+                          :search_method => @context.user_list_search_mode_for(@current_user),
+                          :initial_type => params[:enrollment_type])
+      if !(@context.completed? || @context.soft_concluded?) && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
+        Enrollment.send(:preload_associations, @enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
+        json = @enrollments.map { |e|
+          { 'enrollment' =>
+            { 'associated_user_id' => e.associated_user_id,
+              'communication_channel_id' => e.user.communication_channel.try(:id),
+              'email' => e.email,
+              'id' => e.id,
+              'name' => (e.user.last_name_first || e.user.name),
+              'pseudonym_id' => e.user.pseudonym.try(:id),
+              'section' => e.course_section.display_name,
+              'short_name' => e.user.short_name,
+              'type' => e.type,
+              'user_id' => e.user_id,
+              'workflow_state' => e.workflow_state,
+              'custom_role_asset_string' => custom_role ? custom_role.asset_string : nil,
+              'already_enrolled' => e.already_enrolled
             }
-            render :json => json
-          end
-        else
-          format.json { render :json => "", :status => :bad_request }
-        end
+          }
+        }
+        render :json => json
+      else
+        render :json => "", :status => :bad_request
       end
     else
       authorized_action(@context, @current_user, :permission_fail)
