@@ -24,8 +24,16 @@ module DraftState
       course.quizzes.where(workflow_state: 'unpublished').update_all(workflow_state: 'edited')
       course.assignments.where(workflow_state: 'unpublished').update_all(workflow_state: 'published')
       course.context_modules.where(workflow_state: 'unpublished').update_all(workflow_state: 'active')
-      course.context_module_tags.where(workflow_state: 'unpublished').update_all(workflow_state: 'active')
       course.discussion_topics.where(workflow_state: 'unpublished').update_all(workflow_state: 'active')
+
+      # content tags referencing wiki pages or quizzes do not need to be updated
+      # wiki pages and quizzes handle unpublished values correctly in non-draft state
+      course.context_module_tags.where(workflow_state: 'unpublished')
+        .where("content_type NOT IN ('WikiPage', 'Quiz', 'Quizzes::Quiz')")
+        .update_all(workflow_state: 'active')
+
+      # invalidate cache for modules
+      course.context_modules.where("workflow_state<>'deleted'").update_all(updated_at: Time.now.utc)
     end
   end
 end

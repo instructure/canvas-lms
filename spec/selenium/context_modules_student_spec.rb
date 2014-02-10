@@ -45,6 +45,7 @@ describe "context_modules" do
 
       @module_3 = create_context_module('Module Three')
       @quiz_1 = @course.quizzes.create!(:title => "some quiz")
+      @quiz_1.publish!
       @tag_3 = @module_3.add_item({:id => @quiz_1.id, :type => 'quiz'})
       @module_3.completion_requirements = {@tag_3.id => {:type => 'must_view'}}
       @module_3.prerequisites = "module_#{@module_2.id}"

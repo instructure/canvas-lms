@@ -249,7 +249,7 @@ class ContextModule < ActiveRecord::Base
 
   def add_item(params, added_item=nil, opts={})
     params[:type] = params[:type].underscore if params[:type]
-    position = opts[:position] || (self.content_tags.active.maximum(:position) || 0) + 1
+    position = opts[:position] || (self.content_tags.not_deleted.maximum(:position) || 0) + 1
     if params[:type] == "wiki_page" || params[:type] == "page"
       item = opts[:wiki_page] || self.context.wiki.wiki_pages.find_by_id(params[:id])
     elsif params[:type] == "attachment" || params[:type] == "file"
@@ -261,7 +261,7 @@ class ContextModule < ActiveRecord::Base
     elsif params[:type] == "quiz"
       item = opts[:quiz] || self.context.quizzes.active.find_by_id(params[:id])
     end
-    workflow_state = item.workflow_state if item && item.respond_to?(:workflow_state) && ['active', 'unpublished'].include?(item.workflow_state)
+    workflow_state = ContentTag.asset_workflow_state(item) if item
     workflow_state ||= 'active'
     if params[:type] == 'external_url'
       title = params[:title]

@@ -191,42 +191,71 @@ class ContentTag < ActiveRecord::Base
     name
   end
 
+  def self.asset_workflow_state(asset)
+    if asset.respond_to?(:published?)
+      if asset.respond_to?(:deleted?) && asset.deleted?
+        'deleted'
+      elsif asset.published?
+        'active'
+      else
+        'unpublished'
+      end
+    else
+      if asset.respond_to?(:workflow_state)
+        workflow_state = asset.workflow_state.to_s
+        if ['active', 'available', 'published'].include?(workflow_state)
+          'active'
+        elsif ['unpublished', 'deleted'].include?(workflow_state)
+          workflow_state
+        end
+      else
+        nil
+      end
+    end
+  end
+
+  def asset_workflow_state
+    ContentTag.asset_workflow_state(self.content)
+  end
+
+  def asset_context_matches?
+    self.content && self.content.respond_to?(:context) && self.content.context == context
+  end
+
   def update_asset_name!
     return unless self.sync_title_to_asset_title?
-    correct_context = content && content.respond_to?(:context) && content.context == context
-    if correct_context
-      # Assignment proxies name= and name to title= and title, which breaks the asset_safe_title logic
-      if content.respond_to?("name=") && content.respond_to?("name") && !content.is_a?(Assignment)
-        content.name = asset_safe_title('name')
-      elsif content.respond_to?("title=")
-        content.title = asset_safe_title('title')
-      elsif content.respond_to?("display_name=")
-        content.display_name = asset_safe_title('display_name')
-      end
-      content.save if content.changed?
+    return unless self.asset_context_matches?
+
+    # Assignment proxies name= and name to title= and title, which breaks the asset_safe_title logic
+    if content.respond_to?("name=") && content.respond_to?("name") && !content.is_a?(Assignment)
+      content.name = asset_safe_title('name')
+    elsif content.respond_to?("title=")
+      content.title = asset_safe_title('title')
+    elsif content.respond_to?("display_name=")
+      content.display_name = asset_safe_title('display_name')
     end
+    content.save if content.changed?
   end
 
   def update_asset_workflow_state!
     return unless self.sync_workflow_state_to_asset?
-    correct_context = self.content && self.content.respond_to?(:context) && self.content.context == self.context
-    if correct_context
-      asset_workflow_state = nil
-      if self.unpublished? && self.content.respond_to?(:unpublished?)
-        asset_workflow_state = 'unpublished'
-      elsif self.active?
-        if self.content.respond_to?(:active?)
-          asset_workflow_state = 'active'
-        elsif self.content.respond_to?(:available?)
-          asset_workflow_state = 'available'
-        elsif self.content.respond_to?(:published?)
-          asset_workflow_state = 'published'
-        end
+    return unless self.asset_context_matches?
+
+    new_asset_workflow_state = nil
+    if self.unpublished? && self.content.respond_to?(:unpublished?)
+      new_asset_workflow_state = 'unpublished'
+    elsif self.active?
+      if self.content.respond_to?(:active?)
+        new_asset_workflow_state = 'active'
+      elsif self.content.respond_to?(:available?)
+        new_asset_workflow_state = 'available'
+      elsif self.content.respond_to?(:published?)
+        new_asset_workflow_state = 'published'
       end
-      if asset_workflow_state
-        self.content.update_attribute(:workflow_state, asset_workflow_state)
-        self.class.update_for(self.content)
-      end
+    end
+    if new_asset_workflow_state
+      self.content.update_attribute(:workflow_state, new_asset_workflow_state)
+      self.class.update_for(self.content)
     end
   end
 
@@ -296,15 +325,12 @@ class ContentTag < ActiveRecord::Base
     # update workflow_state
     tag_ids = tags.select{|t| t.sync_workflow_state_to_asset? }.map(&:id)
     attr_hash = {:updated_at => Time.now.utc}
-    if asset.respond_to?(:workflow_state)
-      if ['active', 'available', 'published'].include?(asset.workflow_state)
-        attr_hash[:workflow_state] = 'active'
-      elsif ['unpublished', 'deleted'].include?(asset.workflow_state)
-        attr_hash[:workflow_state] = asset.workflow_state
-      end
-    end
+
+    workflow_state = asset_workflow_state(asset)
+    attr_hash[:workflow_state] = workflow_state if workflow_state
     ContentTag.where(:id => tag_ids).update_all(attr_hash) if attr_hash[:workflow_state] && !tag_ids.empty?
 
+    # update the module timestamp
     ContentTag.touch_context_modules(module_ids)
   end
   

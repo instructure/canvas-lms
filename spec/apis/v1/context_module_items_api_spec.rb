@@ -25,6 +25,7 @@ describe "Module Items API", type: :request do
     @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 20)
     @assignment_tag = @module1.add_item(:id => @assignment.id, :type => 'assignment')
     @quiz = @course.quizzes.create!(:title => "score 10")
+    @quiz.publish!
     @quiz_tag = @module1.add_item(:id => @quiz.id, :type => 'quiz')
     @topic = @course.discussion_topics.create!(:message => 'pls contribute')
     @topic_tag = @module1.add_item(:id => @topic.id, :type => 'discussion_topic')

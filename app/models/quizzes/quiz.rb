@@ -771,6 +771,11 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
   end
 
+  def clear_locked_cache(user)
+    super
+    Rails.cache.delete(assignment.locked_cache_key(user)) if self.for_assignment?
+  end
+
   def context_module_action(user, action, points=nil)
     tags_to_update = self.context_module_tags.to_a
     if self.assignment

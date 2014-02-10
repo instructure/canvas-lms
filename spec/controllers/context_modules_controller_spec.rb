@@ -233,6 +233,7 @@ describe ContextModulesController do
       
       @module = @course.context_modules.create!
       quiz = @course.quizzes.create!
+      quiz.publish!
 
       tag = @module.add_item :type => 'quiz', :id => quiz.id
       

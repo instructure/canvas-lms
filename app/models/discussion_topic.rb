@@ -901,6 +901,12 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  def clear_locked_cache(user)
+    super
+    Rails.cache.delete(assignment.locked_cache_key(user)) if assignment
+    Rails.cache.delete(root_topic.locked_cache_key(user)) if root_topic
+  end
+
   def self.process_migration(data, migration)
     process_announcements_migration(Array(data['announcements']), migration)
     process_discussion_topics_migration(Array(data['discussion_topics']), migration)
