@@ -88,5 +88,9 @@ unless CANVAS_RAILS2
     def settings
       {}
     end
+
+    def delayed_jobs_shard
+      self
+    end
   end
 end
