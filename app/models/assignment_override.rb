@@ -253,34 +253,4 @@ class AssignmentOverride < ActiveRecord::Base
     p.to { applies_to_admins }
     p.whenever { |record| record.notify_change? }
   end
-
-  scope :visible_to, lambda { |admin, course|
-    scopes = []
-
-    # adhoc overrides for visible students
-    scopes << course.enrollments_visible_to(admin).
-        select("assignment_override_students.assignment_override_id AS id").
-        joins("INNER JOIN assignment_override_students ON assignment_override_students.user_id=enrollments.user_id").
-        uniq
-
-    # group overrides for visible groups
-    scopes << course.groups_visible_to(admin).
-        select("assignment_overrides.id").
-        joins("INNER JOIN assignment_overrides ON assignment_overrides.set_type='Group' AND groups.id=assignment_overrides.set_id")
-
-    # section overrides for visible sections
-    scopes << course.sections_visible_to(admin).
-        select("assignment_overrides.id").
-        joins("INNER JOIN assignment_overrides ON assignment_overrides.set_type='CourseSection' AND course_sections.id=assignment_overrides.set_id")
-
-    # section overrides for visible students
-    scopes << course.enrollments_visible_to(admin).
-        select("assignment_overrides.id").
-        joins("INNER JOIN assignment_overrides ON assignment_overrides.set_type='CourseSection' AND enrollments.course_section_id=assignment_overrides.set_id")
-
-    # union the visible override subselects and join against them
-    subselect = scopes.map{ |scope| scope.to_sql }.join(' UNION ')
-    join_clause = "INNER JOIN (#{subselect}) AS visible_overrides ON visible_overrides.id=assignment_overrides.id"
-    joins(join_clause).readonly(false)
-  }
 end

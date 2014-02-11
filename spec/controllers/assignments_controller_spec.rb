@@ -350,7 +350,7 @@ describe AssignmentsController do
       assigns[:js_env][:ASSIGNMENT].should == expected_assignment_json
       assigns[:js_env][:ASSIGNMENT_OVERRIDES].should ==
         subject.send(:assignment_overrides_json,
-                     @assignment.overrides_visible_to(assigns[:current_user]))
+                     AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, assigns[:current_user]))
     end
 
   end

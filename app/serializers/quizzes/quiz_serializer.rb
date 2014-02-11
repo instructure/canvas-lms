@@ -89,7 +89,7 @@ module Quizzes
     end
 
     def all_dates
-      quiz.formatted_dates_hash(due_dates[1])
+      quiz.formatted_dates_hash(quiz.all_due_dates)
     end
 
     def section_count
@@ -100,7 +100,7 @@ module Quizzes
 
     # Teacher or Observer?
     def include_all_dates?
-      due_dates[1].present?
+      due_dates == all_dates
     end
 
     def include_unpublishable?
@@ -132,6 +132,7 @@ module Quizzes
     def question_count
       quiz.available_question_count
     end
+
     def require_lockdown_browser
       quiz.require_lockdown_browser?
     end
@@ -188,7 +189,7 @@ module Quizzes
     end
 
     def due_dates
-      @due_dates ||= quiz.due_dates_for(current_user)
+      @due_dates ||= quiz.dates_hash_visible_to(current_user)
     end
 
     # If the current user is a student and is in a course section which has
@@ -197,7 +198,7 @@ module Quizzes
     #
     # @param [:due_at|:lock_at|:unlock_at] domain
     def overridden_date(domain)
-      due_dates[0] ? due_dates[0][domain] : quiz.send(domain)
+      context.user_has_been_student?(current_user) ? due_dates[0][domain] : quiz.send(domain)
     end
 
     def due_at

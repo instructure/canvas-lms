@@ -944,7 +944,7 @@ describe Quizzes::QuizzesController do
         }
       response.should be_success
       quiz = assigns[:quiz].overridden_for(@user)
-      overrides = quiz.overrides_visible_to(@user)
+      overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(quiz, @user)
       overrides.length.should == 1
       overrides.first[:due_at].iso8601.should == section_due_date
     end
@@ -1027,7 +1027,7 @@ describe Quizzes::QuizzesController do
           }]
         }
       quiz = quiz.reload.overridden_for(@user)
-      overrides = quiz.overrides_visible_to(@user)
+      overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(quiz, @user)
       overrides.length.should == 1
     end
 

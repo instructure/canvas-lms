@@ -332,16 +332,16 @@ describe Quizzes::QuizSerializer do
   end
 
   it 'displays overridden dates for students' do
+    course_with_student_logged_in(active_all: true)
+    course_quiz(true)
+    serializer = quiz_serializer(scope: @student)
     student_overrides = {
       due_at: 5.minutes.from_now,
       lock_at: nil,
       unlock_at: 3.minutes.from_now
     }
 
-    quiz.expects(:due_at).never
-    quiz.expects(:lock_at).never
-    quiz.expects(:unlock_at).never
-    serializer.stubs(:due_dates).returns [student_overrides, nil]
+    serializer.stubs(:due_dates).returns [student_overrides]
 
     output = serializer.as_json[:quiz]
     output.should_not have_key :all_dates
@@ -352,10 +352,12 @@ describe Quizzes::QuizSerializer do
   end
 
   it 'displays quiz dates for students if not overridden' do
+    student_overrides = []
+
     quiz.expects(:due_at).at_least_once.returns 5.minutes.from_now
     quiz.expects(:lock_at).at_least_once.returns nil
     quiz.expects(:unlock_at).at_least_once.returns 3.minutes.from_now
-    serializer.stubs(:due_dates).returns [nil, nil]
+    serializer.stubs(:due_dates).returns student_overrides
 
     output = serializer.as_json[:quiz]
 
@@ -380,9 +382,8 @@ describe Quizzes::QuizSerializer do
     }]
 
     quiz.expects(:due_at).at_least_once
-    quiz.expects(:lock_at).at_least_once
-    quiz.expects(:unlock_at).at_least_once
-    serializer.stubs(:due_dates).returns [nil, teacher_overrides]
+    serializer.stubs(:all_dates).returns teacher_overrides
+    serializer.stubs(:include_all_dates?).returns true
 
     output = serializer.as_json[:quiz]
     output.should have_key :all_dates

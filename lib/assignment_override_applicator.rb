@@ -68,7 +68,6 @@ module AssignmentOverrideApplicator
     assignment_overridden_for(quiz, user)
   end
 
-
   def self.assignment_overriden_for_section(assignment_or_quiz, section)
     section_overrides = assignment_or_quiz.assignment_overrides.where(:set_type => 'CourseSection', :set_id => section)
     override_for_due_at(assignment_or_quiz, section_overrides)
@@ -80,72 +79,108 @@ module AssignmentOverrideApplicator
   # value for a particular field is used for that field
   def self.overrides_for_assignment_and_user(assignment_or_quiz, user)
     Rails.cache.fetch([user, assignment_or_quiz, 'overrides'].cache_key) do
-
-      # return an empty array to the block if there is nothing to do here
-      next [] if user.nil? || !assignment_or_quiz.has_overrides?
-
+      next [] if self.has_invalid_args?(assignment_or_quiz, user)
+      context = assignment_or_quiz.context
       overrides = []
 
-      # get list of overrides that might apply. adhoc override is highest
-      # priority, then group override, then section overrides by position. DO
-      # NOT exclude deleted overrides, yet
-      key = assignment_or_quiz.is_a?(Quizzes::Quiz) ? :quiz_id : :assignment_id
-      adhoc_membership = AssignmentOverrideStudent.where(key => assignment_or_quiz, :user_id => user).first
-
-      overrides << adhoc_membership.assignment_override if adhoc_membership
-
-      if assignment_or_quiz.is_a?(Assignment) && assignment_or_quiz.group_category && group = user.current_groups.where(:group_category_id => assignment_or_quiz.group_category_id).first
-        group_override = assignment_or_quiz.assignment_overrides.
-          where(:set_type => 'Group', :set_id => group).
-          first
-        overrides << group_override if group_override
+      if context.account_membership_allows(user, nil, :manage_courses)
+        overrides = assignment_or_quiz.assignment_overrides.active.to_a
+        unless assignment_or_quiz.current_version?
+          overrides = current_override_version(assignment_or_quiz, overrides)
+        end
+        return overrides
       end
 
-      context = assignment_or_quiz.context
-
-      observed_students = ObserverEnrollment.observed_students(context, user)
-      observed_student_overrides = observed_students.map do |student, enrollments|
-        overrides_for_assignment_and_user(assignment_or_quiz, student)
+      # priority: adhoc, group, section (do not exclude deleted)
+      if context.user_has_been_admin?(user)
+        adhoc = adhoc_admin_overrides(assignment_or_quiz, user, context)
+        overrides += adhoc if adhoc
+      else
+        adhoc = adhoc_override(assignment_or_quiz, user)
+        overrides << adhoc.assignment_override if adhoc
       end
 
-      overrides += observed_student_overrides.flatten.uniq
+      if ObserverEnrollment.observed_students(context, user).empty?
+        group = group_override(assignment_or_quiz, user)
+        overrides << group if group
+        sections = section_overrides(assignment_or_quiz, user)
+        overrides += sections if sections
+      else
+        observed = observer_overrides(assignment_or_quiz, user)
+        overrides += observed if observed
+      end
 
-      section_ids = context.sections_visible_to(user).map(&:id)
-      # section visibilities is only useful if the user can read_roster in the course.
-      # otherwise, we need to get section ids this way:
-      section_ids += context.section_visibilities_for(user).select { |v|
+      unless assignment_or_quiz.current_version?
+        overrides = current_override_version(assignment_or_quiz, overrides)
+      end
+
+      overrides.compact.select(&:active?)
+    end
+  end
+
+  def self.has_invalid_args?(assignment_or_quiz, user)
+    user.nil? || !assignment_or_quiz.has_overrides?
+  end
+
+  def self.adhoc_override(assignment_or_quiz, user)
+    key = assignment_or_quiz.is_a?(Quizzes::Quiz) ? :quiz_id : :assignment_id
+    AssignmentOverrideStudent.where(key => assignment_or_quiz, :user_id => user).first
+  end
+
+  def self.adhoc_admin_overrides(assignment_or_quiz, user, course)
+    key = assignment_or_quiz.is_a?(Quizzes::Quiz) ? :quiz_id : :assignment_id
+    students = course.enrollments_visible_to(user).pluck(:user_id)
+    adhoc = AssignmentOverrideStudent.where(:user_id => students, key => assignment_or_quiz)
+    adhoc.map(&:assignment_override)
+  end
+
+  def self.group_override(assignment_or_quiz, user)
+    return nil unless assignment_or_quiz.is_a?(Assignment) && assignment_or_quiz.group_category
+
+    if assignment_or_quiz.context.user_has_been_student?(user)
+      group = user.current_groups.where(:group_category_id => assignment_or_quiz.group_category_id).first
+    else
+      group = assignment_or_quiz.context.groups.where(:group_category_id => assignment_or_quiz.group_category_id).first
+    end
+
+    if group
+      assignment_or_quiz.assignment_overrides.where(:set_type => 'Group', :set_id => group.id).first
+    else
+      nil
+    end
+  end
+
+  def self.observer_overrides(assignment_or_quiz, user)
+    context = assignment_or_quiz.context
+    observed_students = ObserverEnrollment.observed_students(context, user)
+    observed_student_overrides = observed_students.map do |student, enrollments|
+      overrides_for_assignment_and_user(assignment_or_quiz, student)
+    end
+    observed_student_overrides.flatten.uniq
+  end
+
+  def self.section_overrides(assignment_or_quiz, user)
+    context = assignment_or_quiz.context
+    section_ids = context.sections_visible_to(user).map(&:id)
+    section_ids += context.section_visibilities_for(user).select { |v|
         ['StudentEnrollment', 'ObserverEnrollment', 'StudentViewEnrollment'].include? v[:type]
       }.map { |v| v[:course_section_id] }
+    section_overrides = assignment_or_quiz.assignment_overrides.where(:set_type => 'CourseSection', :set_id => section_ids.uniq)
+    section_overrides
+  end
 
-      section_overrides = assignment_or_quiz.assignment_overrides.
-        where(:set_type => 'CourseSection', :set_id => section_ids.uniq)
-
-      # TODO add position column to assignment_override, nil for non-section
-      # overrides, (assignment_or_quiz, position) unique for section overrides
-      overrides += section_overrides#.order(:position)
-
-      # For each potential override discovered, make sure we look at the
-      # appropriate version. If current_version? is true (the common case),
-      # then we know we have the live model already, not a previous version,
-      # and we can skip this check.
-      unless assignment_or_quiz.current_version?
-        overrides = overrides.map do |override|
-          if override.versions.length.zero?
-            override
-          else
-            override_version = override.versions.detect do |version|
-              model_version = assignment_or_quiz.is_a?(Quizzes::Quiz) ? version.model.quiz_version : version.model.assignment_version
-              next if model_version.nil?
-              model_version <= assignment_or_quiz.version_number
-            end
-            override_version ? override_version.model : nil
-          end
+  def self.current_override_version(assignment_or_quiz, all_overrides)
+    all_overrides.map do |override|
+      if !override.versions.exists?
+        override
+      else
+        override_version = override.versions.detect do |version|
+          model_version = assignment_or_quiz.is_a?(Quizzes::Quiz) ? version.model.quiz_version : version.model.assignment_version
+          next if model_version.nil?
+          model_version <= assignment_or_quiz.version_number
         end
+        override_version ? override_version.model : nil
       end
-
-      # discard overrides where there was no appropriate version or the
-      # appropriate version is in the deleted state
-      overrides.compact.select(&:active?)
     end
   end
 

@@ -60,7 +60,7 @@ define [
         available.concat(section)
       else
         available
-    
+
     addOverride: ( override ) => @overrides.add override
 
     removeOverride: ( override ) => @overrides.remove override

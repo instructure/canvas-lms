@@ -274,7 +274,7 @@ describe "varied due dates" do
 
           assert_due_date response, multiple_due_dates
           response.body.should_not include formatted_date(@course_due_date)
-          response.body.should_not include formatted_date(@section_due_date)          
+          response.body.should_not include formatted_date(@section_due_date)
         end
       end
 
@@ -303,7 +303,7 @@ describe "varied due dates" do
 
               assert_due_date response, @section_due_date
               response.body.should_not include formatted_date(@course_due_date)
-              response.body.should_not include multiple_due_dates              
+              response.body.should_not include multiple_due_dates
             end
           end
 
@@ -314,7 +314,7 @@ describe "varied due dates" do
 
               assert_due_date response, @section_due_date
               response.body.should_not include formatted_date(@course_due_date)
-              response.body.should_not include multiple_due_dates              
+              response.body.should_not include multiple_due_dates
             end
           end
         end
@@ -353,13 +353,13 @@ describe "varied due dates" do
 
           assert_due_date response, multiple_due_dates
           response.body.should_not include formatted_date(@course_due_date)
-          response.body.should_not include formatted_date(@section_due_date)          
+          response.body.should_not include formatted_date(@section_due_date)
         end
       end
 
       describe "as an account admin, accessing the course assignments page" do
         before do
-          account_admin_user
+          account_admin_user(active_all: true)
           user_session(@admin)
         end
 

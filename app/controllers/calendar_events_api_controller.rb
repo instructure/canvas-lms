@@ -759,22 +759,28 @@ class CalendarEventsApiController < ApplicationController
   def apply_assignment_overrides(events)
     events = events.inject([]) do |assignments, assignment|
 
-      _, admin_dates = assignment.due_dates_for(@current_user)
-      if admin_dates.present?
-        overridden_dates, original_dates = admin_dates.partition { |date| date[:override] }
+      if assignment.context.user_has_been_student?(@current_user)
+        assignment = assignment.overridden_for(@current_user)
+        assignment.infer_all_day
+        assignments << assignment
+      else
+        dates_list = assignment.all_dates_visible_to(@current_user)
 
+        if dates_list.empty?
+          assignments << assignment
+          return assignments
+        end
+
+        original_dates, overridden_dates = dates_list.partition { |date| date[:base] }
         overridden_dates.each do |date|
           assignments << AssignmentOverrideApplicator.assignment_with_overrides(assignment, [date[:override]])
         end
 
-        if original_dates.present? && assignment.context.course_sections.active.count != overridden_dates.size
-          assignments << assignment
+        if original_dates.present?
+          if (assignment.context.user_has_been_observer?(@current_user) && assignments.empty?) || (assignment.context.course_sections.active.count != overridden_dates.size)
+            assignments << assignment
+          end
         end
-
-      else
-        assignment = assignment.overridden_for(@current_user)
-        assignment.infer_all_day
-        assignments << assignment
       end
       assignments
     end
