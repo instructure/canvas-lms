@@ -21,96 +21,119 @@
 # Pages are rich content associated with Courses and Groups in Canvas.
 # The Pages API allows you to create, retrieve, update, and delete pages.
 #
-# @object Page
+# @model Page
 #     {
-#       // the unique locator for the page
-#       "url": "my-page-title",
-#
-#       // the title of the page
-#       "title": "My Page Title",
-#
-#       // the creation date for the page
-#       "created_at": "2012-08-06T16:46:33-06:00",
-#
-#       // the date the page was last updated
-#       "updated_at": "2012-08-08T14:25:20-06:00",
-#
-#       // whether this page is hidden from students
-#       // (note: students will never see this true; pages hidden from them will be omitted from results)
-#       "hide_from_students": false,
-#
-#       // roles allowed to edit the page; comma-separated list comprising a combination of
-#       // 'teachers', 'students', 'members', and/or 'public'
-#       // if not supplied, course defaults are used
-#       "editing_roles": "teachers,students",
-#
-#       // the User who last edited the page
-#       // (this may not be present if the page was imported from another system)
-#       "last_edited_by": { 
-#         "id": 133,
-#         "display_name": "Rey del Pueblo",
-#         "avatar_image_url": "https://canvas.example.com/images/thumbnails/bm90aGluZyBoZXJl",
-#         "html_url": "https://canvas.example.com/courses/789/users/133"
-#       },
-#
-#       // the page content, in HTML
-#       // (present when requesting a single page; omitted when listing pages)
-#       "body": "<p>Page Content</p>",
-#
-#       // whether the page is published (true) or draft state (false).
-#       "published": true,
-#
-#       // whether this page is the front page for the wiki
-#       "front_page": false,
-#
-#       // Whether or not this is locked for the user.
-#       "locked_for_user": false,
-#
-#       // (Optional) Information for the user about the lock. Present when locked_for_user is true.
-#       "lock_info": {
-#         // Asset string for the object causing the lock
-#         "asset_string": "wiki_page_1",
-#
-#         // (Optional) Context module causing the lock.
-#         "context_module": {}
-#       },
-#
-#       // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
-#       "lock_explanation": "This page is locked until September 1 at 12:00am"
+#       "id": "Page",
+#       "description": "",
+#       "properties": {
+#         "url": {
+#           "description": "the unique locator for the page",
+#           "example": "my-page-title",
+#           "type": "string"
+#         },
+#         "title": {
+#           "description": "the title of the page",
+#           "example": "My Page Title",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "description": "the creation date for the page",
+#           "example": "2012-08-06T16:46:33-06:00",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "the date the page was last updated",
+#           "example": "2012-08-08T14:25:20-06:00",
+#           "type": "datetime"
+#         },
+#         "hide_from_students": {
+#           "description": "whether this page is hidden from students (note: students will never see this true; pages hidden from them will be omitted from results)",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "editing_roles": {
+#           "description": "roles allowed to edit the page; comma-separated list comprising a combination of 'teachers', 'students', 'members', and/or 'public' if not supplied, course defaults are used",
+#           "example": "teachers,students",
+#           "type": "string"
+#         },
+#         "last_edited_by": {
+#           "description": "the User who last edited the page (this may not be present if the page was imported from another system)",
+#           "$ref": "User"
+#         },
+#         "body": {
+#           "description": "the page content, in HTML (present when requesting a single page; omitted when listing pages)",
+#           "example": "<p>Page Content</p>",
+#           "type": "string"
+#         },
+#         "published": {
+#           "description": "whether the page is published (true) or draft state (false).",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "front_page": {
+#           "description": "whether this page is the front page for the wiki",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "locked_for_user": {
+#           "description": "Whether or not this is locked for the user.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "lock_info": {
+#           "description": "(Optional) Information for the user about the lock. Present when locked_for_user is true.",
+#           "$ref": "LockInfo"
+#         },
+#         "lock_explanation": {
+#           "description": "(Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.",
+#           "example": "This page is locked until September 1 at 12:00am",
+#           "type": "string"
+#         }
+#       }
 #     }
 #
-# @object PageRevision
+# @model PageRevision
 #     {
-#       // an identifier for this revision of the page
-#       "revision_id": 7,
-#
-#       // the time when this revision was saved
-#       "updated_at": "2012-08-07T11:23:58-06:00",
-#
-#       // whether this is the latest revision or not
-#       "latest": true,
-#
-#       // the User who saved this revision, if applicable
-#       // (this may not be present if the page was imported from another system)
-#       "edited_by": {
-#         "id": 1123,
-#         "display_name": "Leonardo Fibonacci",
-#         "avatar_image_url": "https://canvas.example.com/images/thumbnails/bWVhbmluZ2xlc3M=",
-#         "html_url": "https://canvas.example.com/courses/789/users/1123"
-#       },
-#
-#       // the following fields are not included in the index action
-#       // and may be omitted from the show action via summary=1
-#
-#       // the historic url of the page
-#       "url": "old-page-title",
-#
-#       // the historic page title
-#       "title": "Old Page Title",
-#
-#       // the historic page contents
-#       "body": "<p>Old Page Content</p>"
+#       "id": "PageRevision",
+#       "description": "",
+#       "properties": {
+#         "revision_id": {
+#           "description": "an identifier for this revision of the page",
+#           "example": 7,
+#           "type": "integer"
+#         },
+#         "updated_at": {
+#           "description": "the time when this revision was saved",
+#           "example": "2012-08-07T11:23:58-06:00",
+#           "type": "datetime"
+#         },
+#         "latest": {
+#           "description": "whether this is the latest revision or not",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "edited_by": {
+#           "description": "the User who saved this revision, if applicable (this may not be present if the page was imported from another system)",
+#           "$ref": "User"
+#         },
+#         "url": {
+#           "description": "the following fields are not included in the index action and may be omitted from the show action via summary=1 the historic url of the page",
+#           "example": "old-page-title",
+#           "type": "string"
+#         },
+#         "title": {
+#           "description": "the historic page title",
+#           "example": "Old Page Title",
+#           "type": "string"
+#         },
+#         "body": {
+#           "description": "the historic page contents",
+#           "example": "<p>Old Page Content</p>",
+#           "type": "string"
+#         }
+#       }
 #     }
+#
 class WikiPagesApiController < ApplicationController
   before_filter :require_context
   before_filter :get_wiki_page, :except => [:create, :index]

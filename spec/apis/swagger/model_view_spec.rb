@@ -20,7 +20,9 @@ describe ModelView do
           "name" => {
             "type" => "string"
           }
-        }
+        },
+        "description" => "",
+        "required" => []
       }
     }
   end
