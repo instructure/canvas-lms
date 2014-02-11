@@ -149,9 +149,8 @@ class DiscussionEntriesController < ApplicationController
     @topic = @context.discussion_topics.active.find(params[:discussion_topic_id])
     if !@topic.podcast_enabled && request.format == :rss
       @problem = t :disabled_podcasts_notice, "Podcasts have not been enabled for this topic."
-      @template_format = 'html'
-      @template.template_format = 'html'
-      render :text => @template.render(:file => "shared/unauthorized_feed", :layout => "layouts/application"), :status => :bad_request # :template => "shared/unauthorized_feed", :status => :bad_request
+      params[:format] = 'html' if CANVAS_RAILS2
+      render :template => "shared/unauthorized_feed", :layout => "layouts/application", :status => :bad_request, :formats => [:html] # :template => "shared/unauthorized_feed", :status => :bad_request
       return
     end
     if authorized_action(@topic, @current_user, :read)
