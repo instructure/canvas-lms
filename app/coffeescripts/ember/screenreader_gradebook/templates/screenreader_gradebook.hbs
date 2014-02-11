@@ -137,7 +137,7 @@
   <button
     id="prev_student"
     {{action 'selectItem' 'selectedStudent' 'previous'}}
-    {{bind-attr aria-disabled=ariaDisabledPrevStudent disabled=disablePrevStudentButton}}
+    {{bind-attr disabled=disablePrevStudentButton}}
   >
     {{#t 'previous_student'}}Previous Student{{/t}}
   </button>
@@ -145,7 +145,7 @@
   <button
     id="next_student"
     {{action 'selectItem' 'selectedStudent' 'next'}}
-    {{bind-attr aria-disabled=ariaDisabledNextStudent disabled=disableNextStudentButton}}
+    {{bind-attr disabled=disableNextStudentButton}}
   >
     {{#t 'next_student'}}Next Student{{/t}}
   </button>
@@ -183,7 +183,7 @@
   <button
     id="prev_assignment"
     {{action 'selectItem' 'selectedAssignment' 'previous'}}
-    {{bind-attr aria-disabled=ariaDisabledPrevAssignment disabled=disablePrevAssignmentButton}}
+    {{bind-attr disabled=disablePrevAssignmentButton}}
   >
     {{#t 'previous_assignment'}}Previous Assignment{{/t}}
   </button>
@@ -191,7 +191,7 @@
   <button
     id="next_assignment"
     {{action 'selectItem' 'selectedAssignment' 'next'}}
-    {{bind-attr aria-disabled=ariaDisabledNextAssignment disabled=disableNextAssignmentButton}}
+    {{bind-attr disabled=disableNextAssignmentButton}}
   >
     {{#t 'next_assignment'}}Next Assignment{{/t}}
   </button>
@@ -233,126 +233,125 @@
 
 <!-- student -->
 <!-- -------- -->
-{{#if selectedStudent}}
-
 <div id="student_information">
 
   <h2>Student Information</h2>
-
-  <div>{{#t 'selected_student'}}Selected Student:{{/t}} 
+  {{#unless selectedStudent}}
+  <p class="student_selection">
+  {{#t "empty_student_selection"}}Select a student to view additional information here.{{/t}}
+  </p>
+  {{else}}
+    <h3 class="student_selection">
     {{#if hideStudentNames}}
       {{selectedStudent.hiddenName}}
     {{else}}
       {{selectedStudent.name}}
     {{/if}}
-  </div>
-
-  {{#if selectedStudent.isLoaded}}
-
-  <div>{{#t 'secondary_id'}}Secondary ID:{{/t}}
-    <span id="secondary_id">
-    {{#if hideStudentNames}}
-      <em>{{#t "hidden_secondary_id"}}hidden{{/t}}</em>
-    {{else}}
-      {{selectedStudent.login_id}}
-    {{/if}}
-    </span>
-  </div>
-
-  <div>{{#t 'sections'}}Sections:{{/t}} {{selectedStudentSections}}</div>
-  {{#each column in custom_columns}}
-  {{
-    custom-column-cell
-    student=selectedStudent
-    column=column
-    dataForStudent=dataForStudent
-    on-column-save='columnUpdated'
-  }}
-  {{/each}}
-
-  <div>
-    {{#t 'final_grade'}}Final Grade:{{/t}} 
-    {{#if selectedStudent.total_grade.possible}}
-      {{selectedStudent.total_percent}}%
-    {{else}}
-      -
-    {{/if}}
-  </div>
+    </h3>
+    {{#if selectedStudent.isLoaded}}
+    <div>{{#t 'secondary_id'}}Secondary ID:{{/t}}
+      <span id="secondary_id">
+      {{#if hideStudentNames}}
+        <em>hidden</em>
+      {{else}}
+        {{selectedStudent.login_id}}
+      {{/if}}
+      </span>
+    </div>
+    <div>{{#t 'sections'}}Sections:{{/t}} {{selectedStudentSections}}</div>
+    {{#each column in custom_columns}}
+    {{
+      custom-column-cell
+      student=selectedStudent
+      column=column
+      dataForStudent=dataForStudent
+      on-column-save='columnUpdated'
+    }}
+    {{/each}}
+    <div>
+      {{#t 'final_grade'}}Final Grade:{{/t}}
+      {{#if selectedStudent.total_grade.possible}}
+        {{selectedStudent.total_percent}}%
+      {{else}}
+        -
+      {{/if}}
+    </div>
   <!-- sub-total grade for each assignment group (percentage + points) -->
 
-  {{#each assignment_group in assignment_groups}}
-    {{
-      assignment-group-grades
-      ag=assignment_group
-      student=selectedStudent
-      weightingScheme=weightingScheme
-      gradingStandard=ENV.GRADEBOOK_OPTIONS.grading_standard
-    }}
-  {{/each}}
+    {{#each assignment_group in assignment_groups}}
+      {{
+        assignment-group-grades
+        ag=assignment_group
+        student=selectedStudent
+        weightingScheme=weightingScheme
+        gradingStandard=ENV.GRADEBOOK_OPTIONS.grading_standard
+      }}
+    {{/each}}
   {{else}}
-  <p>{{#t 'submissions_loading'}}Submissions for this student are still loading...{{/t}}</p>
+    <p>{{#t 'submissions_loading'}}Submissions for this student are still loading...{{/t}}</p>
   {{/if}}
-</div>
-
-{{/if}}
+  </div>
+{{/unless}}
 
 <!-- assignment -->
 <!-- ------------ -->
 
-{{#if selectedAssignment}}
-{{#with selectedAssignment}}
-
 <div id="assignment_information">
   <h2>Assignment Information</h2>
-  <div>Selected Assignment: <a {{bind-attr href="html_url"}}>{{name}}</a></div>
-  <!-- how many points is the assignment worth -->
+  {{#unless selectedAssignment}}
+  <p class="assignment_selection">
+    {{#t 'empty_assignment_selection'}}Select an assignment to view additional information here.{{/t}}
+  </p>
+  {{else}}
+  <h3 class="assignment_selection">
+    <a {{bind-attr href="selectedAssignment.html_url"}}>{{selectedAssignment.name}}</a>
+  </h3>
 
-  <div>Points possible:
+
+   <div>Points possible:
     {{#if points_possible}}
       {{points_possible}}
     {{else}}
       {{#t 'no_points'}}No points possible{{/t}}
     {{/if}}
-  </div>
+   </div>
+    <div>
+      <label>
+        {{#t 'assignment_is_muted'}}Muted?{{/t}}
+        {{
+          assignment-muter
+          assignment=selectedAssignment
+          id='assignment_muted_check'
+          name='assignment_muted_check'
+        }}
+      </label>
+    </div>
 
-{{/with}}
+    <!-- assignment stats: average/high/low score + submission count -->
+    {{#if assignmentDetails}}
+    {{#with assignmentDetails }}
+    {{#if cnt}}
+    <div>Average Score: {{average}}</div>
+    <div>High Score: {{max}}</div>
+    <div>Low Score: {{min}}</div>
+    {{/if}}
+    <div>{{cnt}} Submissions</div>
+    {{/with}}
+    {{/if}}
+    <!-- go to assignment in speedgrader -->
 
-  <!-- is the assignment muted -->
-  <div>
-    <label for="assignment_muted_check">
-      {{#t 'assignment_is_muted'}}Muted?{{/t}}
-      {{
-        assignment-muter
-        assignment=selectedAssignment
-        id='assignment_muted_check'
-        name='assignment_muted_check'
-      }}
-    </label>
-  </div>
+    <a href="#speedgrader">See this assignment in speedgrader</a>
 
-  <!-- assignment stats: average/high/low score + submission count -->
-  {{#if assignmentDetails}}
-  {{#with assignmentDetails }}
-  {{#if cnt}}
-  <div>Average Score: {{average}}</div>
-  <div>High Score: {{max}}</div>
-  <div>Low Score: {{min}}</div>
-  {{/if}}
-  <div>{{cnt}} Submissions</div>
-  {{/with}}
-  {{/if}}
-  <!-- go to assignment in speedgrader -->
+    <!-- message students who -->
+    <button id="message_students" {{ action 'openDialog' 'message_students' target=view }}>Message students who...</button>
+    <!-- set default grades -->
+    <button id="set_default_grade" {{ action 'openDialog' 'set_default_grade' target=view }}>Set default grade</button>
+    <!-- curve grades -->
+    <button id="curve_grades" {{ action 'openDialog' 'curve_grades' target=view }}>Curve Grades</button>
 
-  <a href="#speedgrader">See this assignment in speedgrader</a>
-
-  <!-- message students who -->
-  <button id="message_students" {{ action 'openDialog' 'message_students' target=view }}>Message students who...</button>
-  <!-- set default grades -->
-  <button id="set_default_grade" {{ action 'openDialog' 'set_default_grade' target=view }}>Set default grade</button>
-  <!-- curve grades -->
-  <button id="curve_grades" {{ action 'openDialog' 'curve_grades' target=view }}>Curve Grades</button>
+  {{/unless}}
 
 </div>
+<div class="aria-announcer" aria-live="assertive" aria-atomic="true" aria-relative="all">{{ariaAnnounced}}</div>
 
-{{/if}}
 

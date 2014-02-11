@@ -64,6 +64,8 @@ define [
 
     weightingScheme: null
 
+    ariaAnnounced: null
+
     actions:
 
       columnUpdated: (columnData, columnID) ->
@@ -77,7 +79,20 @@ define [
         currentIndex = list.indexOf(@get(property))
         item = list.objectAt(currentIndex - 1) if goTo == 'previous'
         item = list.objectAt(currentIndex + 1) if goTo == 'next'
-        @set(property, item)
+        @announce property, item
+        @set property, item
+
+    announce: (prop, item) ->
+      Ember.run.next =>
+        if prop is 'selectedStudent' and @get('hideStudentNames')
+          name = get item, 'hiddenName'
+        else
+          name = get item, 'name'
+        @set 'ariaAnnounced', name
+
+    hideStudentNamesChanged: (->
+      @set 'ariaAnnounced', null
+    ).observes('hideStudentNames')
 
     setupSubmissionCallback: (->
       $.subscribe 'submissions_updated', _.bind(@updateSubmissionsFromExternal, this)
@@ -446,22 +461,6 @@ define [
       next = @get('studentsInSelectedSection').objectAt(@get('studentIndex') + 1)
       !(@get('studentsInSelectedSection.length') and next)
     ).property('selectedStudent', 'studentsInSelectedSection', 'selectedSection')
-
-    ariaDisabledPrevAssignment: (->
-      new Boolean(@get('disablePrevAssignmentButton'))?.toString()
-    ).property('disablePrevAssignmentButton')
-
-    ariaDisabledPrevStudent: (->
-      new Boolean(@get('disablePrevStudentButton'))?.toString()
-    ).property('disablePrevStudentButton')
-
-    ariaDisabledNextAssignment: (->
-      new Boolean(@get('disableNextAssignmentButton'))?.toString()
-    ).property('disableNextAssignmentButton')
-
-    ariaDisabledNextStudent: (->
-      new Boolean(@get('disableNextStudentButton'))?.toString()
-    ).property('disableNextStudentButton')
 
     displayName: (->
       if @get('hideStudentNames')
