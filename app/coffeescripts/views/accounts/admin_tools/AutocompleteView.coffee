@@ -20,6 +20,7 @@ define [
       @options.valueProperty ||= 'id'
       @options.fieldName ||= @options.valueProperty
       @options.placeholder ||= @options.fieldName
+      @options.sourceParameters ||= {}
 
     toJSON: ->
       @options
@@ -33,8 +34,8 @@ define [
 
     autocompleteSource: (request, response) ->
       @$searchTerm.addClass("loading")
-      params = data:
-        search_term: request.term
+      params = data: @options.sourceParameters
+      params.data.search_term = request.term
       labelProperty = @options.labelProperty
       success = ->
         items = @collection.map (item) ->
