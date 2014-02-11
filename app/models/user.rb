@@ -1607,12 +1607,12 @@ class User < ActiveRecord::Base
     @courses_with_primary_enrollment ||= {}
     @courses_with_primary_enrollment.fetch(cache_key) do
       res = self.shard.activate do
-        Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options].cache_key, :expires_in => 15.minutes) do
+        result = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options].cache_key, :expires_in => 15.minutes) do
 
           # Set the actual association based on if its asking for favorite courses or not.
           actual_association = association == :favorite_courses ? :current_and_invited_courses : association
-
-          send(actual_association).with_each_shard do |scope|
+          relation = CANVAS_RAILS2 ? send(actual_association) : association(actual_association).scoped
+          relation.with_each_shard do |scope|
 
             # Limit favorite courses based on current shard.
             if association == :favorite_courses
@@ -1634,10 +1634,10 @@ class User < ActiveRecord::Base
               date_restricted_ids = enrollments.select{ |e| e.completed? || e.inactive? }.map(&:id)
               courses.reject! { |course| date_restricted_ids.include?(course.primary_enrollment_id.to_i) }
             end
-
             courses
           end
-        end.dup
+        end
+        result.dup
       end
 
       if association == :current_and_invited_courses

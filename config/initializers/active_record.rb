@@ -1055,18 +1055,18 @@ unless CANVAS_RAILS2
       delete_all_without_limit(conditions)
     end
     alias_method_chain :delete_all, :limit
-  end
 
-  def with_each_shard(*args)
-    scope = self
-    if (owner = self.try(:proxy_association).try(:owner)) && self.shard_category != :explicit
-      scope = scope.shard(owner)
-    end
-    scope = scope.shard(args) if args.any?
-    if block_given?
-      scope.activate{|rel| yield(rel) }
-    else
-      scope.to_a
+    def with_each_shard(*args)
+      scope = self
+      if self.respond_to?(:proxy_association) && (owner = self.proxy_association.try(:owner)) && self.shard_category != :explicit
+        scope = scope.shard(owner)
+      end
+      scope = scope.shard(args) if args.any?
+      if block_given?
+        scope.activate{|rel| yield(rel) }.to_a
+      else
+        scope.to_a
+      end
     end
   end
 
