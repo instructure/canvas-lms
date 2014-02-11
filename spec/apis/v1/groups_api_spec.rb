@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2013 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -42,14 +42,16 @@ describe "Groups API", type: :request do
     json
   end
 
-  def membership_json(membership)
-    {
+  def membership_json(membership, is_admin = false)
+    json = {
       'id' => membership.id,
       'group_id' => membership.group_id,
       'user_id' => membership.user_id,
       'workflow_state' => membership.workflow_state,
       'moderator' => membership.moderator,
     }
+    json['sis_import_id'] = membership.sis_batch_id if membership.group.context_type == 'Account' && is_admin
+    json
   end
 
   before do
@@ -612,7 +614,22 @@ describe "Groups API", type: :request do
 
       @membership = GroupMembership.where(:user_id => @to_add, :group_id => @group).first
       @membership.workflow_state.should == "accepted"
-      json.should == membership_json(@membership).merge("just_created" => true)
+      json.should == membership_json(@membership, true).merge("just_created" => true)
+    end
+
+    it "should show sis_import_id for group" do
+      user_model
+      sis_batch = @community.root_account.sis_batches.create
+      SisBatch.where(id: sis_batch).update_all(workflow_state: 'imported')
+      membership = @community.add_user(@user, 'invited')
+      membership.sis_batch_id = sis_batch.id
+      membership.save!
+      @user = account_admin_user(:account => @account, :active_all => true)
+      json = api_call(:get, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "index"), {
+        :filter_states => ["invited"]
+      })
+      json.first['sis_import_id'].should == sis_batch.id
+      json.first.should == membership_json(@community.group_memberships.where(:workflow_state => 'invited').first, true)
     end
   end
 
