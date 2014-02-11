@@ -19,10 +19,12 @@ module DataFixup
     end
 
     def self.create_users
-      @deleted_user = User.create(name: 'rescued attachments')
-      @deleted_user.destroy
-      @broken_user = User.create(name: 'broken attachments')
-      @broken_user.destroy
+      Shackles.activate(:master) do
+        @deleted_user = User.create(name: 'rescued attachments')
+        @deleted_user.destroy
+        @broken_user = User.create(name: 'broken attachments')
+        @broken_user.destroy
+      end
     end
 
     def self.other_namespace(attachment)
