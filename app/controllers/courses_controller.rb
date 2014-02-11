@@ -723,7 +723,7 @@ class CoursesController < ApplicationController
   # @argument event [String, "delete"|"conclude"]
   #   The action to take on the course.
   def destroy
-    @context = api_request? ? api_find(Course, params[:id]) : Course.find(params[:id])
+    @context = api_find(Course, params[:id])
     if api_request? && !['delete', 'conclude'].include?(params[:event])
       return render(:json => { :message => 'Only "delete" and "conclude" events are allowed.' }, :status => :bad_request)
     end

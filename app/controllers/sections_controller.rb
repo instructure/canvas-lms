@@ -128,11 +128,7 @@ class SectionsController < ApplicationController
     case @context
       when Course
         section_id = params[:section_id] || params[:id]
-        if api_request?
-          @section = api_find(@context.active_course_sections, section_id)
-        else
-          @section = @context.active_course_sections.find(section_id)
-        end
+        @section = api_find(@context.active_course_sections, section_id)
       when CourseSection
         @section = @context
         raise ActiveRecord::RecordNotFound if @section.deleted? || @section.course.try(:deleted?)
@@ -163,11 +159,7 @@ class SectionsController < ApplicationController
   #
   # @returns Section
   def crosslist
-    if api_request?
-      @new_course = api_find(@section.root_account.all_courses.not_deleted, params[:new_course_id])
-    else
-      @new_course = @section.root_account.all_courses.not_deleted.find(params[:new_course_id])
-    end
+    @new_course = api_find(@section.root_account.all_courses.not_deleted, params[:new_course_id])
     if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage)
       @section.crosslist_to_course @new_course
       respond_to do |format|

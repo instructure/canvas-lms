@@ -733,7 +733,7 @@ class GroupsController < ApplicationController
       @group = api_find(Group.active, params[:group_id])
     else
       @group = @context if @context.is_a?(Group)
-      @group ||= (@context ? @context.groups : Group).find(params[:id])
+      @group ||= api_find(@context ? @context.groups : Group, params[:id])
     end
   end
 
