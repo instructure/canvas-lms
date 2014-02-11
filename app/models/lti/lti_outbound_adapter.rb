@@ -16,13 +16,7 @@ module Lti
 
     def generate_post_payload
       lti_context = Lti::LtiContextCreator.new(@context, @tool).convert
-      lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool).convert
-
-      roles_creator = Lti::LtiRolesCreator.new(@user, @context)
-      lti_user.current_roles = roles_creator.current_roles
-      lti_user.concluded_roles = roles_creator.concluded_roles
-      lti_user.currently_active_in_course = roles_creator.currently_active_in_course?
-
+      lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context).convert
       lti_tool = Lti::LtiToolCreator.new(@tool).convert
 
       LtiOutbound::ToolLaunch.new({

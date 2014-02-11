@@ -48,14 +48,6 @@ describe Lti::LtiOutboundAdapter, pending: true do
   before(:each) do
     Lti::LtiContextCreator.any_instance.stubs(:convert).returns(lti_context)
     Lti::LtiUserCreator.any_instance.stubs(:convert).returns(lti_user)
-
-    lti_role_creator = mock()
-    lti_role_creator.stubs({
-                               current_roles: nil,
-                               currently_active_in_course?: nil,
-                               concluded_roles: nil})
-    Lti::LtiRolesCreator.stubs(:new).returns(lti_role_creator)
-
     Lti::LtiToolCreator.any_instance.stubs(:convert).returns(lti_tool)
   end
 
@@ -96,25 +88,12 @@ describe Lti::LtiOutboundAdapter, pending: true do
   end
 
   it 'creates an lti_user' do
-    lti_role_creator = mock
-    lti_role_creator.stubs(:current_roles).returns([LtiOutbound::LTIRole::LEARNER])
-    lti_role_creator.stubs(:currently_active_in_course?).returns(true)
-    lti_role_creator.stubs(:concluded_roles).returns([LtiOutbound::LTIRole::TEACHING_ASSISTANT])
-    Lti::LtiRolesCreator.stubs(:new).returns(lti_role_creator)
-
     LtiOutbound::ToolLaunch.expects(:new).with { |options| options[:user] == lti_user }.returns(tool_launch)
-
     adapter.generate_post_payload
-
-    lti_user.current_roles.should == [LtiOutbound::LTIRole::LEARNER]
-    lti_user.currently_active_in_course.should == true
-    lti_user.concluded_roles.should == [LtiOutbound::LTIRole::TEACHING_ASSISTANT]
   end
 
   it 'creates an lti_tool' do
     LtiOutbound::ToolLaunch.expects(:new).with { |options| options[:tool] == lti_tool }.returns(tool_launch)
-    #LtiOutbound::ToolLaunch.expects(:new).with { |options| options[:tool] == lti_tool }.returns(tool_launch)
-
     adapter.generate_post_payload
   end
 
