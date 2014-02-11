@@ -1,4 +1,4 @@
-Object IDs and SIS IDs
+Object IDs, SIS IDs, and special IDs
 ======================
 
 Throughout the API, objects are referenced by internal IDs. You can also
@@ -17,6 +17,16 @@ The following objects support SIS IDs in the API:
  * `sis_account_id`
  * `sis_section_id`
  * `sis_group_id`
+
+Additionally, some objects support special IDs:
+ * Users support `self` to mean the current user.
+ * Accounts support `self` to mean the root account for the current domain,
+   `default` to mean the Default account, and `site_admin` to mean the Site
+    Admin account.
+ * Terms support `default` to mean the default term, and `current` to mean
+   the term that is currently active according to term dates. A term must have
+   a start date or an end date to be considered the current term. If there is
+   more than one term that's active, `current` will not be found.
 
 Encoding and Escaping
 ---------------------

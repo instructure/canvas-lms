@@ -94,6 +94,31 @@ describe Api do
       Account.site_admin.should == TestApiInstance.new(account, nil).api_find(Account, 'site_admin')
     end
 
+    it 'should find term id "default"' do
+      account = Account.create!
+      TestApiInstance.new(account, nil).api_find(account.enrollment_terms, 'default').should == account.default_enrollment_term
+    end
+
+    it 'should find term id "current"' do
+      account = Account.create!
+      term = account.enrollment_terms.create!(start_at: 1.week.ago, end_at: 1.week.from_now)
+      TestApiInstance.new(account, nil).api_find(account.enrollment_terms, 'current').should == term
+    end
+
+    it 'should not find a "current" term if there is more than one candidate' do
+      account = Account.create!
+      account.enrollment_terms.create!(start_at: 1.week.ago, end_at: 1.week.from_now)
+      account.enrollment_terms.create!(start_at: 2.weeks.ago, end_at: 2.weeks.from_now)
+      TestApiInstance.new(account, nil).api_find_all(account.enrollment_terms, ['current']).should == []
+    end
+
+    it 'should find an open ended "current" term' do
+      account = Account.create!
+      term = account.enrollment_terms.create!(start_at: 1.week.ago)
+      TestApiInstance.new(account, nil).api_find(account.enrollment_terms, 'current').should == term
+    end
+
+
     it 'should not find a user with an invalid AR id' do
       (lambda {@api.api_find(User, "a1")}).should raise_error(ActiveRecord::RecordNotFound)
     end
