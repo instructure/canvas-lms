@@ -387,5 +387,16 @@ describe NotificationMessageCreator do
         messages.each { |m| m.shard.should == @shard1 }
       end
     end
+
+    it "should create policies on the user's shard" do
+      @shard1.activate do
+        @user = User.create!
+        @user.communication_channels.create!(path: "user@example.com").confirm!
+      end
+      notification_model(category: 'TestWeekly')
+      creator = NotificationMessageCreator.new(@notification, nil)
+      creator.expects(:too_many_messages_for?).returns(false)
+      creator.send(:delayed_policies_for, @user).first.shard.should == @shard1
+    end
   end
 end

@@ -197,8 +197,7 @@ class NotificationMessageCreator
     elsif channel &&
         channel.active? &&
         ['daily', 'weekly'].include?(@notification.default_frequency)
-      policies << NotificationPolicy.create(:notification => @notification,
-                                            :communication_channel => channel,
+      policies << channel.notification_policies.create!(:notification => @notification,
                                             :frequency => @notification.default_frequency)
     end
     policies
