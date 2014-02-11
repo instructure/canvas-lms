@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["rweiner@pivotallabs.com", "djulia@pivotallabs.com"]
   spec.summary       = %q{Subset of breach-mitigation-rails gem}
 
-  spec.files         = `git ls-files`.split($/)
+  spec.files         = Dir.glob("{lib,spec}/**/*") + %w(LICENSE.txt README.md test.sh)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
