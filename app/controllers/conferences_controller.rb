@@ -20,73 +20,113 @@
 #
 # API for accessing information on conferences.
 #
-# @object Conference
-#   {
-#     // The id of the conference
-#     "id": 170,
-#
-#     // The type of conference
-#     "conference_type": "AdobeConnect",
-#
-#     // The description for the conference
-#     "description": "Conference Description",
-#
-#     // The expected duration the conference is supposed to last
-#     "duration": 60,
-#
-#     // The date that the conference ended at, null if it hasn't ended
-#     "ended_at": "2013-12-13T17:23:26Z",
-#
-#     // The date the conference started at, null if it hasn't started
-#     "started_at": "2013-12-12T23:02:17Z",
-#
-#     // The title of the conference
-#     "title": "Test conference",
-#
-#     // Array of user ids that are participants in the conference
-#     "users": [
-#       1,
-#       7,
-#       8,
-#       9,
-#       10
-#     ],
-#
-#     // True if the conference type has advanced settings.
-#     "has_advanced_settings": false,
-#
-#     // If true the conference is long running and has no expected end time
-#     "long_running": false,
-#
-#     // A collection of settings specific to the conference type
-#     "user_settings": {},
-#
-#     // A List of recordings for the conference
-#     "recordings": [
-#       {
-#         //How long the recording is in minutes
-#         "duration_minutes": 0,
-#
-#         // The recording title
-#         "title": "course2: Test conference 3 [170]_0",
-#
-#         // The date the recording was last updated
-#         "updated_at": "2013-12-12T16:09:33.903-07:00",
-#
-#         // The date the recording was created
-#         "created_at": "2013-12-12T16:09:09.960-07:00",
-#
-#         // URL for playback of the recording
-#         "playback_url": "http://example.com/recording_url"
+# @model ConferenceRecording
+#     {
+#       "id": "ConferenceRecording",
+#       "description": "",
+#       "properties": {
+#         "duration_minutes": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "title": {
+#           "example": "course2: Test conference 3 [170]_0",
+#           "type": "string"
+#         },
+#         "updated_at": {
+#           "example": "2013-12-12T16:09:33.903-07:00",
+#           "type": "datetime"
+#         },
+#         "created_at": {
+#           "example": "2013-12-12T16:09:09.960-07:00",
+#           "type": "datetime"
+#         },
+#         "playback_url": {
+#           "example": "http://example.com/recording_url",
+#           "type": "string"
+#         }
 #       }
-#     ],
+#     }
 #
-#      // URL for the conference, may be null if the conference type doesn't set it
-#     "url": null,
+# @model Conference
+#     {
+#       "id": "Conference",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The id of the conference",
+#           "example": 170,
+#           "type": "integer"
+#         },
+#         "conference_type": {
+#           "description": "The type of conference",
+#           "example": "AdobeConnect",
+#           "type": "string"
+#         },
+#         "description": {
+#           "description": "The description for the conference",
+#           "example": "Conference Description",
+#           "type": "string"
+#         },
+#         "duration": {
+#           "description": "The expected duration the conference is supposed to last",
+#           "example": 60,
+#           "type": "integer"
+#         },
+#         "ended_at": {
+#           "description": "The date that the conference ended at, null if it hasn't ended",
+#           "example": "2013-12-13T17:23:26Z",
+#           "type": "datetime"
+#         },
+#         "started_at": {
+#           "description": "The date the conference started at, null if it hasn't started",
+#           "example": "2013-12-12T23:02:17Z",
+#           "type": "datetime"
+#         },
+#         "title": {
+#           "description": "The title of the conference",
+#           "example": "Test conference",
+#           "type": "string"
+#         },
+#         "users": {
+#           "description": "Array of user ids that are participants in the conference",
+#           "example": "[1, 7, 8, 9, 10]",
+#           "type": "array",
+#           "items": { "type": "integer"}
+#         },
+#         "has_advanced_settings": {
+#           "description": "True if the conference type has advanced settings.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "long_running": {
+#           "description": "If true the conference is long running and has no expected end time",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "user_settings": {
+#           "description": "A collection of settings specific to the conference type",
+#           "example": "{}",
+#           "type": "map",
+#           "key": { "type": "string" },
+#           "value": { "type": "string" }
+#         },
+#         "recordings": {
+#           "description": "A List of recordings for the conference",
+#           "type": "array",
+#           "items": { "$ref": "ConferenceRecording" }
+#         },
+#         "url": {
+#           "description": "URL for the conference, may be null if the conference type doesn't set it",
+#           "type": "string"
+#         },
+#         "join_url": {
+#           "description": "URL to join the conference, may be null if the conference type doesn't set it",
+#           "type": "string"
+#         }
+#       }
+#     }
 #
-#     // URL to join the conference, may be null if the conference type doesn't set it
-#     "join_url": null
-#   }
 class ConferencesController < ApplicationController
   include Api::V1::Conferences
 
