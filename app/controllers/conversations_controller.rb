@@ -19,6 +19,91 @@
 # @API Conversations
 #
 # API for creating, accessing and updating user conversations.
+#
+# @model Conversation
+#     {
+#       "id": "Conversation",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the unique identifier for the conversation.",
+#           "example": 2,
+#           "type": "integer",
+#           "format": "int64"
+#         },
+#         "subject": {
+#           "description": "the subject of the conversation.",
+#           "example": 2,
+#           "type": "string"
+#         },
+#         "workflow_state": {
+#           "description": "The current state of the conversation (read, unread or archived).",
+#           "example": "unread",
+#           "type": "string"
+#         },
+#         "last_message": {
+#           "description": "A <=100 character preview from the most recent message.",
+#           "example": "sure thing, here's the file",
+#           "type": "string"
+#         },
+#         "start_at": {
+#           "description": "the date and time at which the last message was sent.",
+#           "example": "2011-09-02T12:00:00Z",
+#           "type": "datetime"
+#         },
+#         "message_count": {
+#           "description": "the number of messages in the conversation.",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "subscribed": {
+#           "description": "whether the current user is subscribed to the conversation.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "private": {
+#           "description": "whether the conversation is private.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "starred": {
+#           "description": "whether the conversation is starred.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "properties": {
+#           "description": "Additional conversation flags (last_author, attachments, media_objects). Each listed property means the flag is set to true (i.e. the current user is the most recent author, there are attachments, or there are media objects)",
+#           "type": "[string]"
+#         },
+#         "audience": {
+#           "description": "Array of user ids who are involved in the conversation, ordered by participation level, then alphabetical. Excludes current user, unless this is a monologue.",
+#           "type": "[integer]"
+#         },
+#         "audience_contexts": {
+#           "description": "Most relevant shared contexts (courses and groups) between current user and other participants. If there is only one participant, it will also include that user's enrollment(s)/ membership type(s) in each course/group.",
+#           "type": "[string]"
+#         },
+#         "avatar_url": {
+#           "description": "URL to appropriate icon for this conversation (custom, individual or group avatar, depending on audience).",
+#           "example": "https://canvas.instructure.com/images/messages/avatar-group-50.png",
+#           "type": "string"
+#         },
+#         "participants": {
+#           "description": "Array of users (id, name) participating in the conversation. Includes current user.",
+#           "type": "[string]"
+#         },
+#         "visible": {
+#           "description": "indicates whether the conversation is visible under the current scope and filter. This attribute is always true in the index API response, and is primarily useful in create/update responses so that you can know if the record should be displayed in the UI. The default scope is assumed, unless a scope or filter is passed to the create/update API call.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "context_name": {
+#           "description": "Name of the course or group in which the conversation is occurring.",
+#           "example": "Canvas 101",
+#           "type": "string"
+#         }
+#       }
+#     }
 class ConversationsController < ApplicationController
   include ConversationsHelper
   include SearchHelper
@@ -125,6 +210,8 @@ class ConversationsController < ApplicationController
   #       "context_name": "Canvas 101"
   #     }
   #   ]
+  # @returns [Conversation]
+  #
   def index
     if request.format == :json
       conversations = Api.paginate(@conversations_scope, self, api_v1_conversations_url)
@@ -276,7 +363,7 @@ class ConversationsController < ApplicationController
     render :json => err.record.errors, :status => :bad_request
   end
 
-  # @API
+  # @API Get running batches
   # Returns any currently running conversation batches for the current user.
   # Conversation batches are created when a bulk private message is sent
   # asynchronously (see the mode argument to the {api:ConversationsController#create create API action}).

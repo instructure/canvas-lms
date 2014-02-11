@@ -25,55 +25,284 @@
 # minimum score on a quiz. Modules themselves can be unlocked by the completion
 # of other Modules.
 #
-# @object Module
+# @model ModuleItemCompletionRequirement
 #     {
-#       // the unique identifier for the module
-#       "id": 123,
-#
-#       // the state of the module: active, deleted
-#       "workflow_state": "active",
-#
-#       // the position of this module in the course (1-based)
-#       "position": 2,
-#
-#       // the name of this module
-#       "name": "Imaginary Numbers and You",
-#
-#       // (Optional) the date this module will unlock
-#       "unlock_at": "2012-12-31T06:00:00-06:00",
-#
-#       // Whether module items must be unlocked in order
-#       "require_sequential_progress": true,
-#
-#       // IDs of Modules that must be completed before this one is unlocked
-#       "prerequisite_module_ids": [121, 122],
-#
-#       // The number of items in the module
-#       "items_count": 10,
-#
-#       // The API URL to retrive this module's items
-#       "items_url": "https://canvas.example.com/api/v1/modules/123/items",
-#
-#       // The contents of this module, as an array of Module Items.
-#       // (Present only if requested via include[]=items
-#       //  AND the module is not deemed too large by Canvas.)
-#       "items": [],
-#
-#       // The state of this Module for the calling user
-#       // one of 'locked', 'unlocked', 'started', 'completed'
-#       // (Optional; present only if the caller is a student
-#       // or if the optional parameter 'student_id' is included)
-#       "state": "started",
-#
-#       // the date the calling user completed the module
-#       // (Optional; present only if the caller is a student
-#       // or if the optional parameter 'student_id' is included)
-#       "completed_at": null,
-#
-#       // if the student's final grade for the course should be published
-#       // to the SIS upon completion of this module
-#       "publish_final_grade": false
+#       "id": "ModuleItemCompletionRequirement",
+#       "description": "",
+#       "properties": {
+#         "type": {
+#           "example": "min_score",
+#           "type": "string"
+#         },
+#         "min_score": {
+#           "example": 10,
+#           "type": "integer"
+#         },
+#         "completed": {
+#           "example": true,
+#           "type": "boolean"
+#         }
+#       }
 #     }
+#
+# @model ModuleItemContentDetails
+#     {
+#       "id": "ModuleItemContentDetails",
+#       "description": "",
+#       "properties": {
+#         "points_possible": {
+#           "example": 20,
+#           "type": "integer"
+#         },
+#         "due_at": {
+#           "example": "2012-12-31T06:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "unlock_at": {
+#           "example": "2012-12-31T06:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "lock_at": {
+#           "example": "2012-12-31T06:00:00-06:00",
+#           "type": "datetime"
+#         }
+#       }
+#     }
+#
+# @model ModuleItem
+#     {
+#       "id": "ModuleItem",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the unique identifier for the module item",
+#           "example": 768,
+#           "type": "integer"
+#         },
+#         "module_id": {
+#           "description": "the id of the Module this item appears in",
+#           "example": 123,
+#           "type": "integer"
+#         },
+#         "position": {
+#           "description": "the position of this item in the module (1-based)",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "title": {
+#           "description": "the title of this item",
+#           "example": "Square Roots: Irrational numbers or boxy vegetables?",
+#           "type": "string"
+#         },
+#         "indent": {
+#           "description": "0-based indent level; module items may be indented to show a hierarchy",
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "type": {
+#           "description": "the type of object referred to one of 'File', 'Page', 'Discussion', 'Assignment', 'Quiz', 'SubHeader', 'ExternalUrl', 'ExternalTool'",
+#           "example": "Assignment",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "File",
+#               "Page",
+#               "Discussion",
+#               "Assignment",
+#               "Quiz",
+#               "SubHeader",
+#               "ExternalUrl",
+#               "ExternalTool"
+#             ]
+#           }
+#         },
+#         "content_id": {
+#           "description": "the id of the object referred to applies to 'File', 'Discussion', 'Assignment', 'Quiz', 'ExternalTool' types",
+#           "example": 1337,
+#           "type": "integer"
+#         },
+#         "html_url": {
+#           "description": "link to the item in Canvas",
+#           "example": "https://canvas.example.edu/courses/222/modules/items/768",
+#           "type": "string"
+#         },
+#         "url": {
+#           "description": "(Optional) link to the Canvas API object, if applicable",
+#           "example": "https://canvas.example.edu/api/v1/courses/222/assignments/987",
+#           "type": "string"
+#         },
+#         "page_url": {
+#           "description": "(only for 'Page' type) unique locator for the linked wiki page",
+#           "example": "my-page-title",
+#           "type": "string"
+#         },
+#         "external_url": {
+#           "description": "(only for 'ExternalUrl' and 'ExternalTool' types) external url that the item points to",
+#           "example": "https://www.example.com/externalurl",
+#           "type": "string"
+#         },
+#         "new_tab": {
+#           "description": "(only for 'ExternalTool' type) whether the external tool opens in a new tab",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "completion_requirement": {
+#           "description": "Completion requirement for this module item",
+#           "$ref": "ModuleItemCompletionRequirement"
+#         },
+#         "content_details": {
+#           "description": "(Present only if requested through include[]=content_details) If applicable, returns additional details specific to the associated object",
+#           "$ref": "ModuleItemContentDetails"
+#         }
+#       }
+#     }
+#
+# @model ModuleItemSequenceAsset
+#     {
+#       "id": "ModuleItemSequenceAsset",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "example": 768,
+#           "type": "integer"
+#         },
+#         "module_id": {
+#           "example": 123,
+#           "type": "integer"
+#         },
+#         "title": {
+#           "example": "A lonely page",
+#           "type": "string"
+#         },
+#         "type": {
+#           "example": "Page",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
+# @model ModuleItemSequenceNode
+#     {
+#       "id": "ModuleItemSequenceNode",
+#       "description": "",
+#       "properties": {
+#         "prev": {
+#           "$ref": "ModuleItemSequenceAsset"
+#         },
+#         "current": {
+#           "$ref": "ModuleItemSequenceAsset"
+#         },
+#         "next": {
+#           "$ref": "ModuleItemSequenceAsset"
+#         }
+#       }
+#     }
+#
+# @model ModuleItemSequence
+#     {
+#       "id": "ModuleItemSequence",
+#       "description": "",
+#       "properties": {
+#         "items": {
+#           "description": "an array containing one hash for each appearence of the asset in the module sequence (up to 10 total)",
+#           "type": "array",
+#           "items": { "$ref": "ModuleItemSequenceNode" }
+#         },
+#         "modules": {
+#           "description": "an array containing each Module referenced above",
+#           "type": "array",
+#           "items": { "$ref": "Module" }
+#         }
+#       }
+#     }
+#
+# @model Module
+#     {
+#       "id": "Module",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the unique identifier for the module",
+#           "example": 123,
+#           "type": "integer"
+#         },
+#         "workflow_state": {
+#           "description": "the state of the module: 'active', 'deleted'",
+#           "example": "active",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "active",
+#               "deleted"
+#             ]
+#           }
+#         },
+#         "position": {
+#           "description": "the position of this module in the course (1-based)",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "name": {
+#           "description": "the name of this module",
+#           "example": "Imaginary Numbers and You",
+#           "type": "string"
+#         },
+#         "unlock_at": {
+#           "description": "(Optional) the date this module will unlock",
+#           "example": "2012-12-31T06:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "require_sequential_progress": {
+#           "description": "Whether module items must be unlocked in order",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "prerequisite_module_ids": {
+#           "description": "IDs of Modules that must be completed before this one is unlocked",
+#           "example": "\[121, 122\]",
+#           "type": "array",
+#           "items": {"type": "integer"}
+#         },
+#         "items_count": {
+#           "description": "The number of items in the module",
+#           "example": 10,
+#           "type": "integer"
+#         },
+#         "items_url": {
+#           "description": "The API URL to retrive this module's items",
+#           "example": "https://canvas.example.com/api/v1/modules/123/items",
+#           "type": "string"
+#         },
+#         "items": {
+#           "description": "The contents of this module, as an array of Module Items. (Present only if requested via include[]=items AND the module is not deemed too large by Canvas.)",
+#           "example": "\[\]",
+#           "type": "array",
+#           "items": { "$ref": "ModuleItem" }
+#         },
+#         "state": {
+#           "description": "The state of this Module for the calling user one of 'locked', 'unlocked', 'started', 'completed' (Optional; present only if the caller is a student or if the optional parameter 'student_id' is included)",
+#           "example": "started",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "locked",
+#               "unlocked",
+#               "started",
+#               "completed"
+#             ]
+#           }
+#         },
+#         "completed_at": {
+#           "description": "the date the calling user completed the module (Optional; present only if the caller is a student or if the optional parameter 'student_id' is included)",
+#           "type": "datetime"
+#         },
+#         "publish_final_grade": {
+#           "description": "if the student's final grade for the course should be published to the SIS upon completion of this module",
+#           "type": "boolean"
+#         }
+#       }
+#     }
+#
 class ContextModulesApiController < ApplicationController
   before_filter :require_context
   before_filter :find_student, :only => [:index, :show]

@@ -28,69 +28,125 @@
 # of courses, users and page_views related to the returned events
 # are also included.
 #
-# @object CourseEvent
+# @model CourseEventLink
 #     {
-#       // ID of the event.
-#       "id": "e2b76430-27a5-0131-3ca1-48e0eb13f29b",
-#
-#       // timestamp of the event
-#       "created_at": "2012-07-19T15:00:00-06:00",
-#
-#       // Course event type
-#       // The event type defines the type and schema of the event_data object.
-#       "event_type": "updated",
-#
-#       // Course event data
-#       // Depeding on the event type.  This will return an object
-#       // containing the relevant event data.  An updated event
-#       // type will return an UpdatedEventData object.
-#       "event_data": {
-#       },
-#
-#       // Jsonapi.org links
-#       "links": {
-#          // ID of the course for the event.
-#          "course": "12345",
-#
-#          // ID of the user for the event (who made the change).
-#          "user": "12345",
-#
-#          // ID of the page view during the event if it exists.
-#          "page_view": "e2b76430-27a5-0131-3ca1-48e0eb13f29b"
+#       "id": "CourseEventLink",
+#       "description": "",
+#       "properties": {
+#         "course": {
+#           "description": "ID of the course for the event.",
+#           "example": 12345,
+#           "type": "integer"
+#         },
+#         "user": {
+#           "description": "ID of the user for the event (who made the change).",
+#           "example": 12345,
+#           "type": "integer"
+#         },
+#         "page_view": {
+#           "description": "ID of the page view during the event if it exists.",
+#           "example": "e2b76430-27a5-0131-3ca1-48e0eb13f29b",
+#           "type": "string"
+#         }
 #       }
 #     }
 #
-# The created event data object returns all the fields that were set in the
-# format of the following example.  If a field does not exist it was not set.
-# The value of each field changed is in the format of [:old_value, :new_value].
+# @model CourseEvent
+#     {
+#       "id": "CourseEvent",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "ID of the event.",
+#           "example": "e2b76430-27a5-0131-3ca1-48e0eb13f29b",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "description": "timestamp of the event",
+#           "example": "2012-07-19T15:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "event_type": {
+#           "description": "Course event type The event type defines the type and schema of the event_data object.",
+#           "example": "updated",
+#           "type": "string"
+#         },
+#         "event_data": {
+#           "description": "Course event data Depeding on the event type.  This will return an object containing the relevant event data.  An updated event type will return an UpdatedEventData object.",
+#           "example": "{}",
+#           "type": "string"
+#         },
+#         "links": {
+#           "description": "Jsonapi.org links",
+#           "example": "{\"course\"=>\"12345\", \"user\"=>\"12345\", \"page_view\"=>\"e2b76430-27a5-0131-3ca1-48e0eb13f29b\"}",
+#           "$ref": "CourseEventLink"
+#         }
+#       }
+#     }
 #
-# @object CreatedEventData
-#   {
-#     "name": [ null, "Course 1" ],
-#     "start_at": [ null, "2012-01-19T15:00:00-06:00" ],
-#     "conclude_at": [ null, "2012-01-19T15:00:00-08:00" ],
-#     "is_public": [ null, false ]
-#   }
+# @model CreatedEventData
+#     {
+#       "id": "CreatedEventData",
+#       "description": "The created event data object returns all the fields that were set in the format of the following example.  If a field does not exist it was not set. The value of each field changed is in the format of [:old_value, :new_value].",
+#       "properties": {
+#         "name": {
+#           "example": "[nil, \"Course 1\"]",
+#           "type": "array",
+#           "items": { "type": "string" }
+#         },
+#         "start_at": {
+#           "example": "[nil, \"2012-01-19T15:00:00-06:00\"]",
+#           "type": "array",
+#           "items": { "type": "datetime" }
+#         },
+#         "conclude_at": {
+#           "example": "[nil, \"2012-01-19T15:00:00-08:00\"]",
+#           "type": "array",
+#           "items": { "type": "datetime" }
+#         },
+#         "is_public": {
+#           "example": "[nil, false]",
+#           "type": "array",
+#           "items": { "type": "boolean" }
+#         }
+#       }
+#     }
 #
-# The updated event data object returns all the fields that have
-# changed in the format of the following example.  If a field does
-# not exist it was not changed.  The value is an array that contains
-# the before and after values for the change as in [:old_value, :new_value].
+# @model UpdatedEventData
+#     {
+#       "id": "UpdatedEventData",
+#       "description": "The updated event data object returns all the fields that have changed in the format of the following example.  If a field does not exist it was not changed.  The value is an array that contains the before and after values for the change as in [:old_value, :new_value].",
+#       "properties": {
+#         "name": {
+#           "example": "[\"Course 1\", \"Course 2\"]",
+#           "type": "array",
+#           "items": { "type": "string" }
+#         },
+#         "start_at": {
+#           "example": "[\"2012-01-19T15:00:00-06:00\", \"2012-07-19T15:00:00-06:00\"]",
+#           "type": "array",
+#           "items": { "type": "datetime" }
+#         },
+#         "conclude_at": {
+#           "example": "[\"2012-01-19T15:00:00-08:00\", \"2012-07-19T15:00:00-08:00\"]",
+#           "type": "array",
+#           "items": { "type": "datetime" }
+#         },
+#         "is_public": {
+#           "example": "[true, false]",
+#           "type": "array",
+#           "items": { "type": "boolean" }
+#         }
+#       }
+#     }
 #
-# @object UpdatedEventData
-#   {
-#     "name": [ "Course 1", "Course 2" ],
-#     "start_at": [ "2012-01-19T15:00:00-06:00", "2012-07-19T15:00:00-06:00" ],
-#     "conclude_at": [ "2012-01-19T15:00:00-08:00", "2012-07-19T15:00:00-08:00" ],
-#     "is_public": [ true, false ]
-#   }
-#
-# The concluded event data object returns an empty object.  The concluded event
-# does not have any log data associated.
-#
-# @object ConcludedEventData
-#   {
-#   }
+# @model ConcludedEventData
+#     {
+#       "id": "ConcludedEventData",
+#       "description": "The concluded event data object returns an empty object.  The concluded event does not have any log data associated.",
+#       "properties": {
+#       }
+#     }
 #
 class CourseAuditApiController < AuditorApiController
   include Api::V1::CourseEvent

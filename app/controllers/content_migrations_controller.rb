@@ -20,58 +20,108 @@
 # @beta
 #
 # API for accessing content migrations and migration issues
-# @object ContentMigration
-#   {
-#       // the unique identifier for the migration
-#       "id": 370663,
+# @model ContentMigration
+#     {
+#       "id": "ContentMigration",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the unique identifier for the migration",
+#           "example": 370663,
+#           "type": "integer"
+#         },
+#         "migration_type": {
+#           "description": "the type of content migration",
+#           "example": "common_cartridge_importer",
+#           "type": "string"
+#         },
+#         "migration_type_title": {
+#           "description": "the name of the content migration type",
+#           "example": "Canvas Cartridge Importer",
+#           "type": "string"
+#         },
+#         "migration_issues_url": {
+#           "description": "API url to the content migration's issues",
+#           "example": "https://example.com/api/v1/courses/1/content_migrations/1/migration_issues",
+#           "type": "string"
+#         },
+#         "attachment": {
+#           "description": "attachment api object for the uploaded file may not be present for all migrations",
+#           "example": "{\"url\"=>\"https://example.com/api/v1/courses/1/content_migrations/1/download_archive\"}",
+#           "type": "string"
+#         },
+#         "progress_url": {
+#           "description": "The api endpoint for polling the current progress",
+#           "example": "https://example.com/api/v1/progress/4",
+#           "type": "string"
+#         },
+#         "user_id": {
+#           "description": "The user who started the migration",
+#           "example": 4,
+#           "type": "integer"
+#         },
+#         "workflow_state": {
+#           "description": "Current state of the content migration: pre_processing, pre_processed, running, waiting_for_select, completed, failed",
+#           "example": "running",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "pre_processing",
+#               "pre_processed",
+#               "running",
+#               "waiting_for_select",
+#               "completed",
+#               "failed"
+#             ]
+#           }
+#         },
+#         "started_at": {
+#           "description": "timestamp",
+#           "example": "2012-06-01T00:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "finished_at": {
+#           "description": "timestamp",
+#           "example": "2012-06-01T00:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "pre_attachment": {
+#           "description": "file uploading data, see {file:file_uploads.html File Upload Documentation} for file upload workflow This works a little differently in that all the file data is in the pre_attachment hash if there is no upload_url then there was an attachment pre-processing error, the error message will be in the message key This data will only be here after a create or update call",
+#           "example": "{\"upload_url\"=>\"\", \"message\"=>\"file exceeded quota\", \"upload_params\"=>{}}",
+#           "type": "string"
+#         }
+#       }
+#     }
 #
-#       // the type of content migration
-#       "migration_type": "common_cartridge_importer",
+# @model Migrator
+#     {
+#       "id": "Migrator",
+#       "description": "",
+#       "properties": {
+#         "type": {
+#           "description": "The value to pass to the create endpoint",
+#           "example": "common_cartridge_importer",
+#           "type": "string"
+#         },
+#         "requires_file_upload": {
+#           "description": "Whether this endpoint requires a file upload",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "name": {
+#           "description": "Description of the package type expected",
+#           "example": "Common Cartridge 1.0/1.1/1.2 Package",
+#           "type": "string"
+#         },
+#         "required_settings": {
+#           "description": "A list of fields this system requires",
+#           "example": "\[\]",
+#           "type": "array",
+#           "items": {"type": "string"}
+#         }
+#       }
+#     }
 #
-#       // the name of the content migration type
-#       "migration_type_title": "Canvas Cartridge Importer",
-#
-#       // API url to the content migration's issues
-#       "migration_issues_url": "https://example.com/api/v1/courses/1/content_migrations/1/migration_issues",
-#
-#       // attachment api object for the uploaded file
-#       // may not be present for all migrations
-#       "attachment": {"url":"https://example.com/api/v1/courses/1/content_migrations/1/download_archive"},
-#
-#       // The api endpoint for polling the current progress
-#       "progress_url": "https://example.com/api/v1/progress/4",
-#
-#       // The user who started the migration
-#       "user_id": 4,
-#
-#       // Current state of the content migration: pre_processing pre_processed running waiting_for_select completed failed
-#       "workflow_state": "running",
-#
-#       // timestamps
-#       "started_at": "2012-06-01T00:00:00-06:00",
-#       "finished_at": "2012-06-01T00:00:00-06:00",
-#
-#       // file uploading data, see {file:file_uploads.html File Upload Documentation} for file upload workflow
-#       // This works a little differently in that all the file data is in the pre_attachment hash
-#       // if there is no upload_url then there was an attachment pre-processing error, the error message will be in the message key
-#       // This data will only be here after a create or update call
-#       "pre_attachment":{"upload_url": "", "message": "file exceeded quota", "upload_params": {}}
-#   }
-#
-# @object Migrator
-#   {
-#       // The value to pass to the create endpoint
-#       "type":"common_cartridge_importer",
-#
-#       // Whether this endpoint requires a file upload
-#       "requires_file_upload":true,
-#
-#       // Description of the package type expected
-#       "name":"Common Cartridge 1.0/1.1/1.2 Package",
-#
-#       // A list of fields this system requires
-#       "required_settings":[]
-#   }
 class ContentMigrationsController < ApplicationController
   include Api::V1::ContentMigration
 
