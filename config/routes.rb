@@ -740,7 +740,7 @@ routes.draw do
   match 'switch_calendar/:preferred_calendar' => 'calendars#switch_calendar', :as => :switch_calendar, :via => :post
   match 'files' => 'files#full_index', :as => :files, :via => :get
   match 'files/s3_success/:id' => 'files#s3_success', :as => :s3_success
-  match 'files/:id/public_url.:format' => 'files#public_url', :as => :public_url
+  match 'files/:id/public_url' => 'files#public_url', :as => :public_url
   match 'files/preflight' => 'files#preflight', :as => :file_preflight
   match 'files/pending' => 'files#create_pending', :as => :file_create_pending
   resources :assignments, :only => [:index] do

@@ -1655,7 +1655,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def filter_attributes_for_user(hash, user, session)
-    hash.delete(:scribd_doc) unless grants_right?(user, session, :download)
+    hash.delete('scribd_doc') unless grants_right?(user, session, :download)
   end
 
   def self.process_scribd_conversion_statuses

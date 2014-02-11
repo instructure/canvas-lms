@@ -273,19 +273,15 @@ class FilesController < ApplicationController
 
   # this is used for the google docs preview of a document
   def public_url
-    respond_to do |format|
-      format.json do
-        @attachment = Attachment.find(params[:id])
-        # if the attachment is part of a submisison, its 'context' will be the student that submmited the assignment.  so if  @current_user is a 
-        # teacher authorized_action(@attachment, @current_user, :download) will be false, we need to actually check if they have perms to see the 
-        # submission.
-        @submission = Submission.find(params[:submission_id]) if params[:submission_id]
-        # verify that the requested attachment belongs to the submission
-        return render_unauthorized_action if @submission && !@submission.attachments.where(:id => params[:id]).any?
-        if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
-          render :json  => { :public_url => @attachment.authenticated_s3_url(:secure => request.ssl?) }
-        end
-      end
+    @attachment = Attachment.find(params[:id])
+    # if the attachment is part of a submisison, its 'context' will be the student that submmited the assignment.  so if  @current_user is a
+    # teacher authorized_action(@attachment, @current_user, :download) will be false, we need to actually check if they have perms to see the
+    # submission.
+    @submission = Submission.find(params[:submission_id]) if params[:submission_id]
+    # verify that the requested attachment belongs to the submission
+    return render_unauthorized_action if @submission && !@submission.attachments.where(:id => params[:id]).any?
+    if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
+      render :json  => { :public_url => @attachment.authenticated_s3_url(:secure => request.ssl?) }
     end
   end
 
