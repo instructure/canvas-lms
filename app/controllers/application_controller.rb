@@ -1548,7 +1548,7 @@ class ApplicationController < ActionController::Base
   helper_method :flash_notices
 
   def unsupported_browser
-    t("#application.warnings.unsupported_browser", "Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Guides* for a complete list of supported browsers.", :wrapper => @template.link_to('\1', 'http://guides.instructure.com/s/2204/m/4214/l/41056-which-browsers-does-canvas-support'))
+    t("#application.warnings.unsupported_browser", "Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Guides* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', 'http://guides.instructure.com/s/2204/m/4214/l/41056-which-browsers-does-canvas-support'))
   end
 
   def browser_supported?
@@ -1610,6 +1610,10 @@ class ApplicationController < ActionController::Base
     def complete_request_uri
       uri = LoggingFilter.filter_uri(request.fullpath)
       "#{request.protocol}#{request.host}#{uri}"
+    end
+
+    def view_context
+      @template
     end
   end
 
