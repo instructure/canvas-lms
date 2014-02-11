@@ -2593,7 +2593,10 @@ define([
         data.answer_text = $answer.find("input[name='answer_text']:visible").val();
         data.answer_html = $answer.find(".answer_html").html();
         if (questionData.question_type == "true_false_question") {
-          data.answer_text = (i == 0) ? I18n.t('true', "True") : I18n.t('false', "False");
+          data.answer_text = $answer.find(".fixed_answer .answer_text").text();
+          if (data.answer_text.length == 0) {
+            data.answer_text = (i == 0) ? I18n.t('true', "True") : I18n.t('false', "False");
+          }
         }
         if ($answer.hasClass('correct_answer')) {
           data.answer_weight = 100;
