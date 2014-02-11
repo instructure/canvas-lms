@@ -42,6 +42,25 @@ module Api
         end
       end
     end
+    if collection.table_name == EnrollmentTerm.table_name
+      current_term = nil
+      ids = ids.map do |id|
+        case id
+        when 'default'
+          @domain_root_account.default_enrollment_term
+        when 'current'
+          if !current_term
+            current_terms = @domain_root_account.enrollment_terms.active.
+                where("(start_at<=? OR start_at IS NULL) AND (end_at >=? OR end_at IS NULL) AND NOT (start_at IS NULL AND end_at IS NULL)", Time.now.utc, Time.now.utc).
+                limit(2).to_a
+            current_term = current_terms.length == 1 ? current_terms.first : :nil
+          end
+          current_term == :nil ? nil : current_term
+        else
+          id
+        end
+      end
+    end
 
     find_params = Api.sis_find_params_for_collection(collection, ids, options[:account] || @domain_root_account)
     return [] if find_params == :not_found
