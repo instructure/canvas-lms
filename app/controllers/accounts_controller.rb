@@ -17,6 +17,62 @@
 #
 
 # @API Accounts
+#
+# API for accessing account data.
+#
+# @model Account
+#     {
+#       "id": "Account",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the ID of the Account object",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "name": {
+#           "description": "The display name of the account",
+#           "example": "Canvas Account",
+#           "type": "string"
+#         },
+#         "parent_account_id": {
+#           "description": "The account's parent ID, or null if this is the root account",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "root_account_id": {
+#           "description": "The ID of the root account, or null if this is the root account",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "default_storage_quota_mb": {
+#           "description": "The storage quota for the account in megabytes, if not otherwise specified",
+#           "example": 500,
+#           "type": "integer"
+#         },
+#         "default_user_storage_quota_mb": {
+#           "description": "The storage quota for a user in the account in megabytes, if not otherwise specified",
+#           "example": 50,
+#           "type": "integer"
+#         },
+#         "default_group_storage_quota_mb": {
+#           "description": "The storage quota for a group in the account in megabytes, if not otherwise specified",
+#           "example": 50,
+#           "type": "integer"
+#         },
+#         "default_time_zone": {
+#           "description": "The default time zone of the account. Allowed time zones are {http://www.iana.org/time-zones IANA time zones} or friendlier {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.",
+#           "example": "America/Denver",
+#           "type": "string"
+#         },
+#         "sis_account_id": {
+#           "description": "The account's identifier in the Student Information System.",
+#           "example": "123xyz",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
 class AccountsController < ApplicationController
   before_filter :require_user, :only => [:index]
   before_filter :reject_student_view_student
@@ -30,6 +86,8 @@ class AccountsController < ApplicationController
   # List accounts that the current user can view or manage.  Typically,
   # students and even teachers will get an empty list in response, only
   # account admins can view the accounts that they are in.
+  #
+  # @returns [Account]
   def index
     respond_to do |format|
       format.html do
@@ -49,6 +107,8 @@ class AccountsController < ApplicationController
   # @API Get a single account
   # Retrieve information on an individual account, given by id or sis
   # sis_account_id.
+  #
+  # @returns Account
   def show
     return unless authorized_action(@account, @current_user, :read)
     respond_to do |format|
@@ -74,6 +134,8 @@ class AccountsController < ApplicationController
   # @example_request
   #     curl https://<canvas>/api/v1/accounts/<account_id>/sub_accounts \
   #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Account]
   def sub_accounts
     return unless authorized_action(@account, @current_user, :read)
     recursive = value_to_boolean(params[:recursive])
