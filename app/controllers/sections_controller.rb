@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -36,8 +36,14 @@
 #           "type": "string"
 #         },
 #         "sis_section_id": {
-#           "description": "The sis id of the section. Ignored if the calling user does not have permission to manage SIS.",
+#           "description": "The sis id of the section. This field is only included if the user has permission to view SIS information.",
+#           "example": "s34643",
 #           "type": "string"
+#         },
+#         "sis_import_id": {
+#           "description": "The unique identifier for the SIS import if created through SIS. This field is only included if the user has permission to manage SIS information.",
+#           "example": 47,
+#           "type": "integer"
 #         },
 #         "course_id": {
 #           "description": "The unique identifier for the course the section belongs to",
