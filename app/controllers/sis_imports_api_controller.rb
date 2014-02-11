@@ -20,56 +20,138 @@
 #
 # API for importing data from Student Information Systems
 #
-# @object SisImport
+# @model SisImportData
 #     {
-#       // The unique identifier for the SIS import.
-#       "id": 1,
-#
-#       // The date the SIS import was created.
-#       "created_at": "2013-12-01T23:59:00-06:00",
-#
-#       // The date the SIS import finished.
-#       // Returns null if not finished.
-#       "ended_at": "2013-12-02T00:03:21-06:00",
-#
-#       // The date the SIS import was last updated.
-#       "updated_at": "2013-12-02T00:03:21-06:00",
-#
-#       // The current state of the SIS import.
-#       // - 'created': The SIS import has been created.
-#       // - 'imported': The SIS import is currently processing.
-#       // - 'imported': The SIS import has completed successfully.
-#       // - 'imported_with_messages': The SIS import completed with errors or warnings.
-#       // - 'failed_with_messages': The SIS import failed with errors.
-#       // - 'failed': The SIS import failed.
-#       "workflow_state": "imported",
-#
-#       // data
-#       "data": {
-#         // The type of SIS import
-#       "import_type": "instructure_csv",
-#
-#         // Which file were included in the SIS import
-#       "supplied_batches": ["term", "course", "section", "user", "enrollment"],
-#
-#         // The number of rows processed for each type of import
-#       "counts": {
-#         "accounts": 0,
-#         "terms": 3,
-#         "abstract_courses": 0,
-#         "courses": 121,
-#         "sections": 278,
-#         "xlists": 0,
-#         "users": 346,
-#         "enrollments": 1542,
-#         "groups": 0,
-#         "group_memberships": 0,
-#         "grade_publishing_results": 0
+#       "id": "SisImportData",
+#       "description": "",
+#       "properties": {
+#         "import_type": {
+#           "description": "The type of SIS import",
+#           "example": "instructure_csv",
+#           "type": "string"
+#         },
+#         "supplied_batches": {
+#           "description": "Which file were included in the SIS import",
+#           "example": "[\"term\", \"course\", \"section\", \"user\", \"enrollment\"]",
+#           "type": "array",
+#           "items": { "type": "string" }
+#         },
+#         "counts": {
+#           "description": "The number of rows processed for each type of import",
+#           "$ref": "SisImportCounts"
 #         }
-#       },
+#       }
+#     }
 #
-#       // The progress of the SIS import.
-#       "progress": "100"
+# @model SisImportCounts
+#     {
+#       "id": "SisImportCounts",
+#       "description": "",
+#       "properties": {
+#         "accounts": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "terms": {
+#           "example": 3,
+#           "type": "integer"
+#         },
+#         "abstract_courses": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "courses": {
+#           "example": 121,
+#           "type": "integer"
+#         },
+#         "sections": {
+#           "example": 278,
+#           "type": "integer"
+#         },
+#         "xlists": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "users": {
+#           "example": 346,
+#           "type": "integer"
+#         },
+#         "enrollments": {
+#           "example": 1542,
+#           "type": "integer"
+#         },
+#         "groups": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "group_memberships": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "grade_publishing_results": {
+#           "example": 0,
+#           "type": "integer"
+#         }
+#       }
+#     }
+#
+# @model SisImport
+#     {
+#       "id": "SisImport",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The unique identifier for the SIS import.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "created_at": {
+#           "description": "The date the SIS import was created.",
+#           "example": "2013-12-01T23:59:00-06:00",
+#           "type": "datetime"
+#         },
+#         "ended_at": {
+#           "description": "The date the SIS import finished. Returns null if not finished.",
+#           "example": "2013-12-02T00:03:21-06:00",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "The date the SIS import was last updated.",
+#           "example": "2013-12-02T00:03:21-06:00",
+#           "type": "datetime"
+#         },
+#         "workflow_state": {
+#           "description": "The current state of the SIS import. - 'created': The SIS import has been created.\n - 'imported': The SIS import is currently processing.\n - 'imported': The SIS import has completed successfully.\n - 'imported_with_messages': The SIS import completed with errors or warnings.\n - 'failed_with_messages': The SIS import failed with errors.\n - 'failed': The SIS import failed.",
+#           "example": "imported",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "created",
+#               "imported",
+#               "imported_with_messages",
+#               "failed_with_messages",
+#               "failed"
+#             ]
+#           }
+#         },
+#         "data": {
+#           "description": "data",
+#           "$ref": "SisImportData"
+#         },
+#         "progress": {
+#           "description": "The progress of the SIS import.",
+#           "example": "100",
+#           "type": "string"
+#         },
+#         "processing_warnings": {
+#           "description": "Only imports that are complete will get this data. An array of csv/warning pairs.",
+#           "example": "[['students.csv','user John Doe has already claimed john_doe's requested login information, skipping], ...]",
+#           "type": "array",
+#           "items": {
+#             "$ref": "Array"
+#           }
+#         }
+#       }
 #     }
 #
 class SisImportsApiController < ApplicationController

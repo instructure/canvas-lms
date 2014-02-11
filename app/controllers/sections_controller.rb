@@ -20,30 +20,46 @@
 #
 # API for accessing section information.
 #
-# @object Section
+# @model Section
 #     {
-#       // The unique identifier for the section.
-#       "id": 1,
-#
-#       // The name of the section.
-#       "name": "Section A",
-#
-#       // The sis id of the section.
-#       // Ignored if the calling user does not have permission to manage SIS.
-#       "sis_section_id": null,
-#
-#       // The unique identifier for the course the section belongs to
-#       "course_id": 7,
-#
-#       // the start date for the section, if applicable
-#       "start_at": "2012-06-01T00:00:00-06:00",
-#
-#       // the end date for the section, if applicable
-#       "end_at": null,
-#
-#       // The unique identifier of the original course of a cross-listed section
-#       "nonxlist_course_id": null
+#       "id": "Section",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The unique identifier for the section.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "name": {
+#           "description": "The name of the section.",
+#           "example": "Section A",
+#           "type": "string"
+#         },
+#         "sis_section_id": {
+#           "description": "The sis id of the section. Ignored if the calling user does not have permission to manage SIS.",
+#           "type": "string"
+#         },
+#         "course_id": {
+#           "description": "The unique identifier for the course the section belongs to",
+#           "example": 7,
+#           "type": "integer"
+#         },
+#         "start_at": {
+#           "description": "the start date for the section, if applicable",
+#           "example": "2012-06-01T00:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "end_at": {
+#           "description": "the end date for the section, if applicable",
+#           "type": "datetime"
+#         },
+#         "nonxlist_course_id": {
+#           "description": "The unique identifier of the original course of a cross-listed section",
+#           "type": "integer"
+#         }
+#       }
 #     }
+#
 class SectionsController < ApplicationController
   before_filter :require_context
   before_filter :require_section, :except => [:index, :create]
