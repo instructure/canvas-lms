@@ -68,6 +68,9 @@ gem 'canvas_connect', '0.3.2'
 gem 'canvas_webex', '0.12'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
+unless CANVAS_RAILS2
+  gem 'dynamic_form', '1.1.4'
+end
 if CANVAS_RAILS2
   gem 'encrypted_cookie_store-instructure', '1.0.5', :require => 'encrypted_cookie_store'
 else
