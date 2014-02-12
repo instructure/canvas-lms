@@ -32,7 +32,7 @@ module CanvasSanitize #:nodoc:
     style = node['style'] || ""
     # taken from https://github.com/flavorjones/loofah/blob/master/lib/loofah/html5/scrub.rb
     # the gauntlet
-    style = '' unless style =~ /\A([-:,\;#%.\(\)\/\sa-zA-Z0-9!]|\w-\w|\'[\s\w]+\'|\"[\s\w]+\"|\([\d,\s]+\))*\z/
+    style = '' unless style =~ /\A([-:,\;#%.\(\)\/\sa-zA-Z0-9!]|\'[\s\w]+\'|\"[\s\w]+\"|\([\d,\s]+\))*\z/
     style = '' unless style =~ /\A\s*([-\w]+\s*:[^\;]*(\;\s*|$))*\z/
 
     config = env[:config]
