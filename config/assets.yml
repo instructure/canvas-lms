@@ -101,6 +101,7 @@ stylesheets:
     - public/stylesheets/compiled/message_students.css
     - public/stylesheets/compiled/gradebook2.css
   screenreader_gradebook:
+    - public/stylesheets/compiled/message_students.css
     - public/stylesheets/compiled/screenreader_gradebook.css
   attendance:
     - public/stylesheets/compiled/attendance.css
