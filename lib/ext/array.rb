@@ -17,10 +17,6 @@
 #
 
 class Array
-  def to_atom
-    self.map {|item| item.to_atom}
-  end
-  
   def cache_key
     if @cache_key
       @cache_key

@@ -274,7 +274,7 @@ class GroupsController < ApplicationController
         end
       end
 
-      format.atom { render :xml => @groups.to_atom.to_xml }
+      format.atom { render :xml => @groups.map { |group| group.to_atom }.to_xml }
 
       format.json do
         path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
