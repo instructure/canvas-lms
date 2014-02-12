@@ -106,6 +106,12 @@ describe Sanitize do
     res.should == "<p>but not me</p>"
   end
 
+  it "should not be extremely slow with long, weird microsoft styles" do
+    str = %{<span lang="EN" style="font-family: 'Times New Roman','serif'; color: #17375e; font-size: 12pt; mso-fareast-font-family: 'Times New Roman'; mso-themecolor: text2; mso-themeshade: 191; mso-style-textfill-fill-color: #17375E; mso-style-textfill-fill-themecolor: text2; mso-style-textfill-fill-alpha: 100.0%; mso-ansi-language: EN; mso-style-textfill-fill-colortransforms: lumm=75000"><p></p></span>}
+    # the above string took over a minute to sanitize as of 8ae4ba8e
+    Timeout.timeout(1) { Sanitize.clean(str, CanvasSanitize::SANITIZE) }
+  end
+
   Dir.glob(Rails.root.join('spec', 'fixtures', 'xss', '*.xss')) do |filename|
     name = File.split(filename).last
     it "should sanitize xss attempts for #{name}" do
