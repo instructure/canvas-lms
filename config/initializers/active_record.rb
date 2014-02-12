@@ -1073,6 +1073,16 @@ unless CANVAS_RAILS2
   ActiveRecord::Associations::CollectionProxy.class_eval do
     delegate :with_each_shard, :to => :scoped
   end
+
+  ActiveRecord::Associations::CollectionAssociation.class_eval do
+    def scoped
+      scope = super
+      proxy_association = self
+      scope.extending do
+        define_method(:proxy_association) { proxy_association }
+      end
+    end
+  end
 end
 
 ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
