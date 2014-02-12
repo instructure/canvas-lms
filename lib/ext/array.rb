@@ -16,19 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
-
 class Array
-  def to_csv(options = {})
-    if all? { |e| e.respond_to?(:to_row) }
-      header_row = first.export_columns(options[:format]).to_csv
-      content_rows = map { |e| e.to_row(options[:format]) }.map(&:to_csv)
-      ([header_row] + content_rows).join
-    else
-      CSV.generate_line(self, options)
-    end
-  end
-
   def to_atom
     self.map {|item| item.to_atom}
   end

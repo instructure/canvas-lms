@@ -172,35 +172,42 @@ class PageViewsController < ApplicationController
   # @returns [PageView]
   def index
     @user = api_find(User, params[:user_id])
-    if authorized_action(@user, @current_user, :view_statistics)
-      date_options = {}
-      url_options = {user_id: @user}
-      if start_time = TimeHelper.try_parse(params[:start_time])
-        date_options[:oldest] = start_time
-        url_options[:start_time] = params[:start_time]
-      end
-      if end_time = TimeHelper.try_parse(params[:end_time])
-        date_options[:newest] = end_time
-        url_options[:end_time] = params[:end_time]
-      end
-      page_views = @user.page_views(date_options)
-      url = api_v1_user_page_views_url(url_options)
 
-      respond_to do |format|
-        format.json do
-          @page_views = Api.paginate(page_views, self, url, :total_entries => nil)
-          render :json => page_views_json(@page_views, @current_user, session)
-        end
-        format.csv do
-          cancel_cache_buster
-          data = @user.page_views.paginate(:page => 1, :per_page => Setting.get('page_views_csv_export_rows', '300').to_i)
-          send_data(
-            data.to_a.to_csv,
-            :type => "text/csv",
-            :filename => t(:download_filename, "Pageviews For %{user}", :user => @user.name.to_s.gsub(/ /, "_")) + '.csv',
-            :disposition => "attachment"
-          )
-        end
+    return unless authorized_action(@user, @current_user, :view_statistics)
+
+    date_options = {}
+    url_options = {user_id: @user}
+    if start_time = TimeHelper.try_parse(params[:start_time])
+      date_options[:oldest] = start_time
+      url_options[:start_time] = params[:start_time]
+    end
+    if end_time = TimeHelper.try_parse(params[:end_time])
+      date_options[:newest] = end_time
+      url_options[:end_time] = params[:end_time]
+    end
+    page_views = @user.page_views(date_options)
+    url = api_v1_user_page_views_url(url_options)
+
+    respond_to do |format|
+      format.json do
+        @page_views = Api.paginate(page_views, self, url, :total_entries => nil)
+        render :json => page_views_json(@page_views, @current_user, session)
+      end
+      format.csv do
+        cancel_cache_buster
+        per_page = Setting.get('page_views_csv_export_rows', '300').to_i
+        page_views = @user.page_views.paginate(:page => 1, :per_page => per_page)
+        options = {
+          type: 'text/csv',
+          filename: t(:download_filename, 'Pageviews For %{user}',
+          user: @user.name.to_s.gsub(/ /, '_')) + '.csv', disposition: 'attachment'
+        }
+
+        header = Array(page_views.first.export_columns.to_csv)
+        rows   = Array(page_views.map { |view| view.to_row.to_csv })
+        csv    = (header + rows).join
+
+        send_data(csv, options)
       end
     end
   end
