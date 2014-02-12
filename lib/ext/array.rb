@@ -27,20 +27,6 @@ class Array
     end
   end
 
-  def to_ics(name="", desc="")
-    cal = Icalendar::Calendar.new
-    # to appease Outlook
-    cal.custom_property("METHOD","PUBLISH")
-    cal.custom_property("X-WR-CALNAME",name)
-    cal.custom_property("X-WR-CALDESC",desc)
-    
-    self.each do |item|
-      event = item.to_ics(false)
-      cal.add_event(event) if event
-    end
-    cal.to_ical
-  end
-  
   # backport from ActiveSupport 3.x
   # Like uniq, but using a criteria given by a block, similar to sort_by
   unless method_defined?(:uniq_by)
