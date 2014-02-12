@@ -45,6 +45,7 @@ class Message < ActiveRecord::Base
     :notification_name, :asset_context, :data, :root_account_id
 
   attr_writer :delayed_messages
+  attr_accessor :output_buffer
 
   # Callbacks
   after_save  :stage_message
@@ -262,7 +263,7 @@ class Message < ActiveRecord::Base
     @output_buffer = old_output_buffer.sub(/\n\z/, '')
 
     if old_output_buffer.is_a?(ActiveSupport::SafeBuffer) && old_output_buffer.html_safe?
-      @output_buffer = ActiveSupport::SafeBuffer.new(@output_buffer)
+      @output_buffer = old_output_buffer.class.new(@output_buffer)
     end
 
     ''
@@ -326,6 +327,7 @@ class Message < ActiveRecord::Base
     return nil unless template = load_html_template
 
     # Add the attribute 'inner_html' with the value of inner_html into the _binding
+    @output_buffer = nil
     inner_html = RailsXss::Erubis.new(template, :bufvar => '@output_buffer').result(_binding)
     setter = eval "inner_html = nil; lambda { |v| inner_html = v }", _binding
     setter.call(inner_html)
@@ -354,6 +356,7 @@ class Message < ActiveRecord::Base
 
     if path_type == 'facebook'
       # this will ensure we escape anything that's not already safe
+      @output_buffer = nil
       self.body = RailsXss::Erubis.new(message_body_template).result(_binding)
     else
       self.body = Erubis::Eruby.new(message_body_template,
