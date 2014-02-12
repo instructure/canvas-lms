@@ -84,7 +84,7 @@ module DataFixup
       Shackles.activate(:master) do
         Attachment.s3_storage? ? s3_save(rescued_orphan, ns) : local_storage_save(rescued_orphan)
         if rescued_orphan.id != attachment.root_attachment_id
-          Attachment.where(root_attachment_id: attachment.root_attachment_id).update_all(:root_attachment_id, rescued_orphan.id)
+          Attachment.where(root_attachment_id: attachment.root_attachment_id).update_all(root_attachment_id: rescued_orphan.id)
         end
       end
     end
