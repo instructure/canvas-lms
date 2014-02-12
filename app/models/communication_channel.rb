@@ -200,9 +200,9 @@ class CommunicationChannel < ActiveRecord::Base
   def set_confirmation_code(reset=false)
     self.confirmation_code = nil if reset
     if self.path_type == TYPE_EMAIL or self.path_type.nil?
-      self.confirmation_code ||= AutoHandle.generate(nil, 25)
+      self.confirmation_code ||= CanvasUuid::Uuid.generate(nil, 25)
     else
-      self.confirmation_code ||= AutoHandle.generate
+      self.confirmation_code ||= CanvasUuid::Uuid.generate
     end
     true
   end

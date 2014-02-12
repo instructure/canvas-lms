@@ -279,7 +279,7 @@ class Group < ActiveRecord::Base
         :updated_at => current_time
     }.merge(options)
     GroupMembership.bulk_insert(users.map{ |user|
-      options.merge({:user_id => user.id, :uuid => AutoHandle.generate_securish_uuid})
+      options.merge({:user_id => user.id, :uuid => CanvasUuid::Uuid.generate_securish_uuid})
     })
   end
 
@@ -333,8 +333,8 @@ class Group < ActiveRecord::Base
   end
 
   def ensure_defaults
-    self.name ||= AutoHandle.generate_securish_uuid
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    self.name ||= CanvasUuid::Uuid.generate_securish_uuid
+    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
     self.group_category ||= GroupCategory.student_organized_for(self.context)
     self.join_level ||= 'invitation_only'
     self.is_public ||= false

@@ -290,7 +290,7 @@ class Account < ActiveRecord::Base
   end
   
   def ensure_defaults
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
     self.lti_guid ||= self.uuid if self.respond_to?(:lti_guid)
   end
 

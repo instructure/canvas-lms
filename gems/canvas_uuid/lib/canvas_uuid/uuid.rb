@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,20 +16,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Slug.generate
+module CanvasUuid
+  class Uuid
+    class << self
+      CHARS = ('0'..'9').to_a + ('a'..'z').to_a + ('A'..'Z').to_a
 
-class AutoHandle
-  class << self
-    CHARS = ('0'..'9').to_a + ('a'..'z').to_a + ('A'..'Z').to_a
-    def generate_securish_uuid(length = 40)
-      Array.new(length) { CHARS[SecureRandom.random_number(CHARS.length)] }.join
-    end
-    
-    def generate(purpose = nil, length = 4)
-      slug = ''
-      slug << purpose << '-' if purpose
-      slug << generate_securish_uuid(length)
-      slug
+      def generate_securish_uuid(length = 40)
+        Array.new(length) { CHARS[SecureRandom.random_number(CHARS.length)] }.join
+      end
+
+      def generate(purpose = nil, length = 4)
+        slug = ''
+        slug << purpose << '-' if purpose
+        slug << generate_securish_uuid(length)
+        slug
+      end
     end
   end
 end
