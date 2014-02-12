@@ -52,15 +52,6 @@ class Array
     end
   end
   
-  def count_per(&block)
-    self.inject({}) do |hash, item|
-      mapped = block.call(item)
-      hash[mapped] ||= 0
-      hash[mapped] += 1
-      hash
-    end
-  end
-  
   def to_ics(name="", desc="")
     cal = Icalendar::Calendar.new
     # to appease Outlook

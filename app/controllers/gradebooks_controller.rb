@@ -141,7 +141,7 @@ class GradebooksController < ApplicationController
       # Find which assignment group most attendance items belong to,
       # it'll be a better guess for default assignment group than the first
       # in the list...
-      @default_group_id = @assignments.to_a.count_per(&:assignment_group_id).sort_by{|id, cnt| cnt }.reverse.first[0] rescue nil
+      @default_group_id = @assignments.to_a.inject(Hash.new(0)){|h,a| h[a.assignment_group_id] += 1; h}.sort_by{|id, cnt| cnt }.reverse.first[0] rescue nil
     elsif @enrollment && @enrollment.grants_right?(@current_user, session, :read_grades)
       @assignments = @context.assignments.active.where(:submission_types => 'attendance').all
       @students = @context.students_visible_to(@current_user).order_by_sortable_name
