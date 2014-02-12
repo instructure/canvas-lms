@@ -99,7 +99,7 @@
           <%= 'data-tooltip' unless @quiz.can_unpublish? %>>
         </button>
 
-        <% link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post, :class => 'btn', :id => 'preview_quiz_button' do %>
+        <%= link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post, :class => 'btn', :id => 'preview_quiz_button' do %>
           <%= t('links.preview', "Preview") %>
         <% end %>
       </div>
@@ -258,7 +258,7 @@
             <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :manage) %>
 
 
-              <% link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post, :class => 'btn', :id => 'preview_quiz_button' do %><%= t('links.preview', "Preview") %><% end %>
+              <%= link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post, :class => 'btn', :id => 'preview_quiz_button' do %><%= t('links.preview', "Preview") %><% end %>
               <%= form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :style => 'display:inline', :id => 'publish_quiz_form'} do %>
                 <input type="hidden" name="activate" value="true"/>
                 <button type="submit" class="btn btn-primary quiz-publish-button">

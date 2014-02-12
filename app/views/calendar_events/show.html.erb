@@ -6,7 +6,7 @@
       <li><a class="return_url calendar_url" href="<%= return_to_url %>"><i class="icon-arrow-left" aria-hidden='true'></i> <%= t 'links.back_to_calendar', "Back to Calendar" %></a></li>
       <% if can_do(@event, @current_user, :update) %>
         <li>
-          <% link_to context_url(@context, :edit_context_calendar_event_url, @event.id, :return_to => params[:return_to]) do %>
+          <%= link_to context_url(@context, :edit_context_calendar_event_url, @event.id, :return_to => params[:return_to]) do %>
             <i class="icon-edit" aria-hidden='true'></i> <%= t 'links.edit', "Edit Calendar Event" %>
           <% end %>
         </li>

@@ -441,7 +441,7 @@
         </label>
       </div>
       <div class="span6">
-        <% link_to context_url(@context, :context_quiz_url, @quiz), :class => 'btn', :id => 'cancel_button' do %>
+        <%= link_to context_url(@context, :context_quiz_url, @quiz), :class => 'btn', :id => 'cancel_button' do %>
           <%= t('links.cancel', "Cancel") %>
         <% end %>
         <button type="submit" class="save_quiz_button btn btn-primary"><%= t('buttons.save', "Save") %></button>
@@ -459,7 +459,7 @@
         </label>
       </div>
       <div class="span6">
-        <% link_to context_url(@context, :context_quiz_url, @quiz), :class => 'btn', :style => 'width:50px', :id => 'cancel_button' do %><%= t('links.cancel', "Cancel") %><% end %>
+        <%= link_to context_url(@context, :context_quiz_url, @quiz), :class => 'btn', :style => 'width:50px', :id => 'cancel_button' do %><%= t('links.cancel', "Cancel") %><% end %>
         <button type="submit" class="save_quiz_button btn btn-primary" style="width:90px"><%= t('buttons.save', "Save") %></button>
       </div>
     </div>

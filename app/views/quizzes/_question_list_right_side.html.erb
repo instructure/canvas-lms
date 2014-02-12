@@ -13,7 +13,7 @@
             <span class="screenreader-only marked-status"><%= marked %></span>
           <span>
         <% else %>
-          <% link_to @quiz_presenter.question_path(q[:id]), :class => "no-warning" do %>
+          <%= link_to @quiz_presenter.question_path(q[:id]), :class => "no-warning" do %>
             <i class="placeholder <%= icon %>"><span class="screenreader-only icon-text"><%= text %></span></i><%= q[:question_name] %>
             <span class="screenreader-only marked-status"><%= marked %></span>
           <% end %>

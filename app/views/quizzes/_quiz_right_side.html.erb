@@ -50,7 +50,7 @@
     </div>
   </div>
     <% if @submission && params[:preview] %>
-      <% link_to context_url(@context, :context_quiz_take_url, @quiz.id, :preview => 1), :method => :post do %><%= @quiz.survey? ?
+      <%= link_to context_url(@context, :context_quiz_take_url, @quiz.id, :preview => 1), :method => :post do %><%= @quiz.survey? ?
           t('links.preview_survey_again', "Preview the Survey Again") :
           t('links.preview_quiz_again', "Preview the Quiz Again") %><% end %><br/>
     <% elsif !@quiz.single_attempt? || can_do(@quiz, @current_user, :update) %>
