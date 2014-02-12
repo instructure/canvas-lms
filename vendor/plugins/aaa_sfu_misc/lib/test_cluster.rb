@@ -18,6 +18,7 @@
 # SFU Note: Slightly modified from the original provided by ccutrer in IRC.
 #           Original file can be found at https://gist.github.com/grahamb/ed5475ac5f4cbbacf62b
 
+require Pathname(File.dirname(__FILE__)) + "../../sfu_api/app/model/sfu/sfu"
 
 ApplicationController.class_eval do
   def self.test_cluster
@@ -29,6 +30,13 @@ ApplicationController.class_eval do
 
   def self.test_cluster?
     !!self.test_cluster
+  end
+
+  def current_username
+    user = User.find(@current_user.id)
+    sfuid = user.pseudonym.unique_id
+    sfuid.slice! "@sfu.ca"
+    sfuid
   end
 
   before_filter :add_tc_warning
@@ -57,7 +65,7 @@ ApplicationController.class_eval do
     get_context rescue nil
     # avoid double-crumbs cause we nil out @context and it gets called again
     crumbs.replace(old_crumbs)
-    if @context.is_a?(Course) && !@context.grants_right?(@current_user, :read_as_admin)
+    if @context.is_a?(Course) && !(@context.grants_right?(@current_user, :read_as_admin) || SFU::User.belongs_to_maillist?(current_username, "canvas-test-cluster-bypass"))
       @unauthorized_message = "Students are not allowed to access test installations."
       return render_unauthorized_action
     end

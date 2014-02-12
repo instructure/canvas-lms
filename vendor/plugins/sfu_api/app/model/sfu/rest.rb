@@ -27,14 +27,22 @@ module SFU
       "#{rest_server}/rest/course/course.js"
     end
 
+    def maillist_membership_url
+      "#{rest_server}/rest/maillist/members.js"
+    end
+
     def canvas_sis_import_url
       account_id = Account.find_by_name("Simon Fraser University").id
       "#{canvas_server}/api/v1/accounts/#{account_id}/sis_imports.json?extension=csv"
     end
 
+    def text(url, params)
+      rest_url = "#{url}?art=#{sfu_rest_token}#{params}"
+      RestClient.get rest_url
+    end
+
     def json(url, params)
       rest_url = "#{url}?art=#{sfu_rest_token}#{params}"
-
       begin
         json_out = RestClient.get rest_url
         JSON.parse json_out
