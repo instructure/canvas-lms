@@ -23,7 +23,7 @@
 
 <%
   rubric_associations = @context.rubric_associations.bookmarked.before(@range_end)
-  rubric_associations = rubric_associations.select(&:rubric_id).once_per(&:rubric_id)
+  rubric_associations = rubric_associations.select(&:rubric_id).uniq(&:rubric_id)
 %>
 <div id="reports-tabs" style="display:none;">
   <ul>

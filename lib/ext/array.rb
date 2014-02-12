@@ -43,17 +43,6 @@ class Array
     end
   end
   
-  def once_per(&block)
-    finds = {}
-    self.inject([]) do |array, item|
-      mapped = block.call(item)
-      found = finds[mapped]
-      finds[mapped] = true
-      array << item unless found
-      array
-    end
-  end
-  
   def clump_per(&block)
     self.inject({}) do |hash, item|
       mapped = block.call(item)

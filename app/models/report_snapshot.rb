@@ -44,7 +44,7 @@ class ReportSnapshot < ActiveRecord::Base
         items << [stamp*1000, week[key]]
       end
     end
-    items.sort_by(&:first).once_per(&:first)
+    items.sort_by(&:first).uniq(&:first)
   end
   
   def report_value_over_time(*args)

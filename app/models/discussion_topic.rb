@@ -969,7 +969,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
     media_objects = media_object_ids.empty? ? [] : MediaObject.find_all_by_media_id(media_object_ids)
     media_objects += media_object_ids.map{|id| MediaObject.new(:media_id => id) }
-    media_objects = media_objects.once_per(&:media_id)
+    media_objects = media_objects.uniq(&:media_id)
     media_objects = media_objects.map do |media_object|
       if media_object.new_record?
         media_object.context = context
