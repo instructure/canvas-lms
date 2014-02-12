@@ -33,6 +33,10 @@ class Worker
   end
   cattr_reader :on_max_failures
 
+  def self.lifecycle
+    @lifecycle ||= Delayed::Lifecycle.new
+  end
+
   def initialize(options = {})
     @exit = false
     @config = options
@@ -123,22 +127,24 @@ class Worker
 
   def perform(job)
     count = 1
-    set_process_name("run:#{job.id}:#{job.name}")
-    say("Processing #{log_job(job, :long)}", :info)
-    runtime = Benchmark.realtime do
-      if job.batch?
-        # each job in the batch will have perform called on it, so we don't
-        # need a timeout around this 
-        count = perform_batch(job.payload_object)
-      else
-        job.invoke_job
+    self.class.lifecycle.run_callbacks(:perform, self, job) do
+      set_process_name("run:#{job.id}:#{job.name}")
+      say("Processing #{log_job(job, :long)}", :info)
+      runtime = Benchmark.realtime do
+        if job.batch?
+          # each job in the batch will have perform called on it, so we don't
+          # need a timeout around this 
+          count = perform_batch(job.payload_object)
+        else
+          job.invoke_job
+        end
+        Delayed::Stats.job_complete(job, self)
+        Rails.logger.quietly do
+          job.destroy
+        end
       end
-      Delayed::Stats.job_complete(job, self)
-      Rails.logger.quietly do
-        job.destroy
-      end
+      say("Completed #{log_job(job)} #{"%.0fms" % (runtime * 1000)}", :info)
     end
-    say("Completed #{log_job(job)} #{"%.0fms" % (runtime * 1000)}", :info)
     count
   rescue Exception => e
     handle_failed_job(job, e)
