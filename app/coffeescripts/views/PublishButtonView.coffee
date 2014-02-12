@@ -28,6 +28,7 @@ define [
 
     setElement: ->
       super
+      @$el.attr 'data-tooltip', ''
       @disable() if !@model.get('unpublishable')
 
     # events
