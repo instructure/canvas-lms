@@ -45,6 +45,16 @@ if ENV['BULLET']
     Bullet.enable = true
     Bullet.bullet_logger = true
   end
+
+elsif ENV['BULLET_GEM']
+  puts "Bullet enabled"
+  require 'bullet-pretty'
+
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.bullet_logger = true
+  end
+
 else
   puts "Bullet not enabled"
 end
