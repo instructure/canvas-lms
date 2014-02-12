@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013-2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,11 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require 'spec_helper.rb'
 
-describe "Multipart" do
-  let(:multi) { Multipart::MultipartPost.new }
-
+describe Multipart::Post do
   def parse_params(query, header)
     Rack::Utils::Multipart.parse_multipart({ 'CONTENT_TYPE' => header['CONTENT_TYPE'], 'CONTENT_LENGTH' => query.size, 'rack.input' => StringIO.new(query) })
   end
@@ -29,7 +27,7 @@ describe "Multipart" do
     file = Tempfile.new(["test","txt"])
     file.write("file on disk")
     file.rewind
-    query, header = multi.prepare_query(:a => "string", :b => file)
+    query, header = subject.prepare_query(:a => "string", :b => file)
     params = parse_params(query, header)
     params["a"].should == "string"
     params["b"][:filename].should == File.basename(file.path)
@@ -37,7 +35,7 @@ describe "Multipart" do
   end
 
   it "should prepare_query with a StringIO" do
-    query, header = multi.prepare_query(:a => "string", :b => StringIO.new("file in mem"))
+    query, header = subject.prepare_query(:a => "string", :b => StringIO.new("file in mem"))
     params = parse_params(query, header)
     params["a"].should == "string"
     params["b"][:filename].should == "b"

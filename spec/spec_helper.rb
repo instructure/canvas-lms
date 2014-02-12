@@ -1219,7 +1219,7 @@ end
   # an array of [k,v] params so that the order of the params can be
   # defined
   def send_multipart(url, post_params = {}, http_headers = {}, method = :post)
-    mp = Multipart::MultipartPost.new
+    mp = Multipart::Post.new
     query, headers = mp.prepare_query(post_params)
     send(method, url, query, headers.merge(http_headers))
   end

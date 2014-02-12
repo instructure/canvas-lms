@@ -26,7 +26,7 @@ require 'libxml'
 # Test Console and API Documentation at:
 # http://www.kaltura.com/api_v3/testmeDoc/index.php
 module Kaltura
-  include Multipart
+
   class SessionType
     USER = 0;
     ADMIN = 2;
@@ -330,7 +330,7 @@ module Kaltura
 
     def postRequest(service, action, params)
       requestParams = "service=#{service}&action=#{action}"
-      multipart_body, headers = Multipart::MultipartPost.new.prepare_query(params)
+      multipart_body, headers = Multipart::Post.new.prepare_query(params)
       response = sendRequest(
         Net::HTTP::Post.new("#{@endpoint}/?#{requestParams}", headers),
         multipart_body
