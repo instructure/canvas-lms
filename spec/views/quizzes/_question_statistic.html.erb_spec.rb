@@ -59,7 +59,7 @@ describe "/quizzes/_question_statistic" do
     view_context
     question = {question_type: 'file_upload_question',
                 unexpected_response_values: []}
-    quiz = @course.quizzes.build
+    quiz = @course.quizzes.create
     quiz.stubs(:quiz_data).returns [question]
     assigns[:quiz] = quiz
     render :partial => 'quizzes/question_statistic', object: question

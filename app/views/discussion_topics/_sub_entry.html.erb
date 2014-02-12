@@ -2,7 +2,7 @@
 <div id="<%= "entry_#{entry.id}" if entry %>" style="<%= hidden unless entry %>" class="communication_sub_message <%= 'toggled_communication_sub_message' if hide_entry %> <%= 'blank' unless entry %> can_be_marked_as_read <%= entry ? entry.read_state(@current_user) : 'read' %>" data-mark-read-url="<%= entry && context_url(entry_context, :api_v1_context_discussion_topic_discussion_entry_mark_read_url, entry.discussion_topic, entry)%>">
   <div class="header">
     <div class="header_title">
-      <a title="<%= t :authors_name, "Author's name" %>" href="<%= context_url(entry_context, :context_user_url, entry ? entry.user_id : nil) %>" class="user_name">
+      <a title="<%= t :authors_name, "Author's name" %>" href="<%= context_url(entry_context, :context_user_url, entry ? entry.user_id : '') %>" class="user_name">
         <%= context_user_name(entry ? entry.context : nil, entry ? entry.user_id : nil) %>
       </a>
     </div>

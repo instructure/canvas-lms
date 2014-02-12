@@ -59,8 +59,101 @@ if CANVAS_RAILS2
     end
     alias_method_chain :process, :use_route_shim
   end
+
+  Spec::Rails::Example::ViewExampleGroup.class_eval do
+    alias :view :template
+
+    def content_for(name)
+      response.capture(name)
+    end
+  end
 else
   require 'rspec/rails'
+
+  ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
+
+  module RSpec::Rails
+    module ViewExampleGroup
+      module ExampleMethods
+        # normally in rspec 2, assigns returns a newly constructed hash
+        # which means that 'assigns[:key] = value' in view specs does nothing
+        def assigns
+          @assigns ||= super
+        end
+        alias :view_assigns :assigns
+
+        delegate :content_for, :to => :view
+
+        def render_with_helpers(*args)
+          controller_class = ("#{@controller.controller_path.camelize}Controller".constantize rescue nil) || ApplicationController
+
+          # this extends the controller's helper methods to the view
+          # however, these methods are delegated to the test controller
+          view.singleton_class.class_eval do
+            include controller_class._helpers unless included_modules.include?(controller_class._helpers)
+          end
+
+          # so create a "real_controller"
+          # and delegate the helper methods to it
+          @controller.singleton_class.class_eval do
+            attr_accessor :real_controller
+
+            controller_class._helper_methods.each do |helper|
+              delegate helper, :to => :real_controller
+            end
+          end
+
+          real_controller = controller_class.new
+          real_controller.instance_variable_set(:@_request, @controller.request)
+          @controller.real_controller = real_controller
+
+          # just calling "render 'path/to/view'" by default looks for a partial
+          if args.first && args.first.is_a?(String)
+            file = args.shift
+            args = [{:template => file}] + args
+          end
+          render_without_helpers(*args)
+        end
+        alias_method_chain :render, :helpers
+      end
+    end
+
+    module Matchers
+      class HaveTag
+        include ActionDispatch::Assertions::SelectorAssertions
+        include Test::Unit::Assertions
+
+        def initialize(expected)
+          @expected = expected
+        end
+
+        def matches?(html, &block)
+          @selected = [HTML::Document.new(html).root]
+          assert_select(*@expected, &block)
+          return !@failed
+        end
+
+        def assert(val, msg=nil)
+          unless !!val
+            @msg = msg
+            @failed = true
+          end
+        end
+
+        def failure_message_for_should
+          @msg
+        end
+
+        def failure_message_for_should_not
+          @msg
+        end
+      end
+
+      def have_tag(*args)
+        HaveTag.new(args)
+      end
+    end
+  end
 end
 require 'webrat'
 require 'mocha/api'

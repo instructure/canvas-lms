@@ -83,7 +83,7 @@
             <% if @account.multi_auth? %>
               <tr>
                 <td><%= t :auth_url, "Login url for this config" %></td>
-                <td><%= aac_login_url(config) %></td>
+                <td><%= aac_login_url(config.id || '') %></td>
               </tr>
             <% end %>
             <tr>

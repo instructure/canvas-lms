@@ -42,9 +42,9 @@ describe "/quizzes/statistics" do
 
     render "quizzes/statistics"
     response.should_not be_nil
-    response.capture(:right_side).should_not be_nil
+    content_for(:right_side).should_not be_nil
     kv = {}
-    page = Nokogiri::HTML(response.capture(:right_side))
+    page = Nokogiri::HTML(content_for(:right_side))
     page.css('#statistics_summary').first.children.each do |row|
       next if row.name != 'tr'
       row = row.children.find_all{|col| col.name == 'td'}
@@ -72,9 +72,9 @@ describe "/quizzes/statistics" do
     assigns[:submitted_users] = []
     render "quizzes/statistics"
     response.should_not be_nil
-    response.capture(:right_side).should_not be_nil
+    content_for(:right_side).should_not be_nil
     kv = {}
-    page = Nokogiri::HTML(response.capture(:right_side))
+    page = Nokogiri::HTML(content_for(:right_side))
     page.css('#statistics_summary').first.children.each do |row|
       next if row.name != 'tr'
       row = row.children.find_all{|col| col.name == 'td'}
