@@ -48,12 +48,13 @@ class WikiPage < ActiveRecord::Base
 
   def ensure_unique_title
     return if deleted?
-    self.title ||= (self.url || "page").to_cased_title
+    to_cased_title = ->(string) { string.gsub(/[^\w]+/, " ").gsub(/\b('?[a-z])/){$1.capitalize}.strip }
+    self.title ||= to_cased_title.call(self.url || "page")
     return unless self.wiki
     # TODO i18n (see wiki.rb)
     if self.title == "Front Page" && self.new_record?
       baddies = self.wiki.wiki_pages.not_deleted.find_all_by_title("Front Page").select{|p| p.url != "front-page" }
-      baddies.each{|p| p.title = p.url.to_cased_title; p.save_without_broadcasting! }
+      baddies.each{|p| p.title = to_cased_title.call(p.url); p.save_without_broadcasting! }
     end
     if existing = self.wiki.wiki_pages.not_deleted.find_by_title(self.title)
       return if existing == self

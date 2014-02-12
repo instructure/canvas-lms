@@ -359,7 +359,7 @@ module ApplicationHelper
             path = send(tab[:href], @context)
           end
           hide = tab[:hidden] || tab[:hidden_unused]
-          class_name = tab[:css_class].to_css_class
+          class_name = tab[:css_class].downcase.replace_whitespace("-")
           class_name += ' active' if @active_tab == tab[:css_class]
           html << "<li class='section #{"section-tab-hidden" if hide }'>" + link_to(tab[:label], path, :class => class_name) + "</li>" if tab[:href]
         end
