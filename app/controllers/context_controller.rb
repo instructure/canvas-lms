@@ -335,7 +335,12 @@ class ContextController < ApplicationController
       @services = @services.select{|service|
         !UserService.configured_service?(service.service) || feature_and_service_enabled?(service.service.to_sym)
       }
-      @services_hash = @services.to_a.clump_per{|s| s.service }
+      @services_hash = @services.to_a.inject({}) do |hash, item|
+        mapped = item.service
+        hash[mapped] ||= []
+        hash[mapped] << item
+        hash
+      end
     end
   end
 

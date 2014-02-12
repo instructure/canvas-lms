@@ -30,16 +30,7 @@ class Array
       value
     end
   end
-  
-  def clump_per(&block)
-    self.inject({}) do |hash, item|
-      mapped = block.call(item)
-      hash[mapped] ||= []
-      hash[mapped] << item
-      hash
-    end
-  end
-  
+
   def to_ics(name="", desc="")
     cal = Icalendar::Calendar.new
     # to appease Outlook
