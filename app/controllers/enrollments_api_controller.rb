@@ -112,6 +112,16 @@
 #             "example": "2012-04-18T23:08:51Z",
 #             "type": "datetime"
 #           },
+#           "start_at": {
+#             "description": "The start time of the enrollment, in ISO8601 format.",
+#             "example": "2012-04-18T23:08:51Z",
+#             "type": "datetime"
+#           },
+#           "end_at": {
+#             "description": "The end time of the enrollment, in ISO8601 format.",
+#             "example": "2012-04-18T23:08:51Z",
+#             "type": "datetime"
+#           },
 #           "last_activity_at": {
 #             "description": "The last activity time of the user for the enrollment, in ISO8601 format.",
 #             "example": "2012-04-18T23:08:51Z",

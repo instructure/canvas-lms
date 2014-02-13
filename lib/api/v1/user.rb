@@ -134,6 +134,8 @@ module Api::V1::User
                               :workflow_state,
                               :updated_at,
                               :created_at,
+                              :start_at,
+                              :end_at,
                               :type]
 
   def enrollment_json(enrollment, user, session, includes = [])

@@ -1556,6 +1556,8 @@ class Course < ActiveRecord::Base
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
     associated_user_id = opts[:associated_user_id]
     role_name = opts[:role_name]
+    start_at = opts[:start_at]
+    end_at = opts[:end_at]
     self_enrolled = opts[:self_enrolled]
     section ||= self.default_section
     enrollment_state ||= self.available? ? "invited" : "creation_pending"
@@ -1593,6 +1595,8 @@ class Course < ActiveRecord::Base
     e.associated_user_id = associated_user_id
     e.role_name = role_name
     e.self_enrolled = self_enrolled
+    e.start_at = start_at
+    e.end_at = end_at
     if e.changed?
       transaction do
         if connection.adapter_name == 'PostgreSQL' && connection.send(:postgresql_version) < 90300

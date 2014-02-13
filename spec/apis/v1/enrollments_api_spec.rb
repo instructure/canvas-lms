@@ -40,7 +40,9 @@ describe EnrollmentsApiController, type: :request do
               :type                               => 'StudentEnrollment',
               :enrollment_state                   => 'active',
               :course_section_id                  => @section.id,
-              :limit_privileges_to_course_section => true
+              :limit_privileges_to_course_section => true,
+              :start_at                           => nil,
+              :end_at                             => nil
             }
           }
         new_enrollment = Enrollment.find(json['id'])
@@ -65,6 +67,8 @@ describe EnrollmentsApiController, type: :request do
           'associated_user_id'                 => nil,
           'updated_at'                         => new_enrollment.updated_at.xmlschema,
           'created_at'                         => new_enrollment.created_at.xmlschema,
+          'start_at'                           => nil,
+          'end_at'                             => nil,
           'last_activity_at'                   => nil
         }
         new_enrollment.root_account_id.should eql @course.account.id
@@ -403,6 +407,8 @@ describe EnrollmentsApiController, type: :request do
           'associated_user_id'                 => nil,
           'updated_at'                         => new_enrollment.updated_at.xmlschema,
           'created_at'                         => new_enrollment.created_at.xmlschema,
+          'start_at'                           => nil,
+          'end_at'                             => nil,
           'last_activity_at'                   => nil
         }
         new_enrollment.root_account_id.should eql @course.account.id
@@ -550,6 +556,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
             'created_at'  => e.created_at.xmlschema,
+            'start_at'  => nil,
+            'end_at'  => nil,
             'last_activity_at' => nil
           }
         }
@@ -587,9 +595,11 @@ describe EnrollmentsApiController, type: :request do
               'current_grade' => nil,
             },
             'associated_user_id' => nil,
-            'updated_at' => e.updated_at.xmlschema,
-            'created_at' => e.created_at.xmlschema,
-            'last_activity_at' => e.last_activity_at.xmlschema
+            'updated_at'         => e.updated_at.xmlschema,
+            'created_at'         => e.created_at.xmlschema,
+            'start_at'           => nil,
+            'end_at'             => nil,
+            'last_activity_at'   => e.last_activity_at.xmlschema
           }
         }
       end
@@ -727,6 +737,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
             'created_at' => e.created_at.xmlschema,
+            'start_at' => nil,
+            'end_at' => nil,
             'last_activity_at' => nil,
             'user' => {
               'name' => e.user.name,
@@ -788,9 +800,11 @@ describe EnrollmentsApiController, type: :request do
               'current_grade' => nil,
             },
             'associated_user_id' => nil,
-            'updated_at' => e.updated_at.xmlschema,
-            'created_at' => e.created_at.xmlschema,
-            'last_activity_at' => nil
+            'updated_at'         => e.updated_at.xmlschema,
+            'created_at'         => e.created_at.xmlschema,
+            'start_at'           => nil,
+            'end_at'             => nil,
+            'last_activity_at'   => nil
           }
         }
       end
@@ -877,6 +891,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
             'created_at' => e.created_at.xmlschema,
+            'start_at' => nil,
+            'end_at' => nil,
             'last_activity_at' => nil
           }
           h['grades'] = {
@@ -933,6 +949,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
             'created_at' => e.created_at.xmlschema,
+            'start_at' => nil,
+            'end_at' => nil,
             'last_activity_at' => nil
           }
           h['grades'] = {
@@ -1004,6 +1022,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id'                 => @enrollment.associated_user_id,
             'updated_at'                         => @enrollment.updated_at.xmlschema,
             'created_at'                         => @enrollment.created_at.xmlschema,
+            'start_at'                           => nil,
+            'end_at'                             => nil,
             'last_activity_at'                   => nil
           }
         end
@@ -1032,6 +1052,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id'                 => @enrollment.associated_user_id,
             'updated_at'                         => @enrollment.updated_at.xmlschema,
             'created_at'                         => @enrollment.created_at.xmlschema,
+            'start_at'                           => nil,
+            'end_at'                             => nil,
             'last_activity_at'                   => nil
           }
         end
@@ -1089,6 +1111,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
             'created_at' => e.created_at.xmlschema,
+            'start_at'   => nil,
+            'end_at'     => nil,
             'last_activity_at' => nil,
             'user' => {
               'name' => e.user.name,
@@ -1123,6 +1147,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
             'created_at' => e.created_at.xmlschema,
+            'start_at'   => nil,
+            'end_at'     => nil,
             'last_activity_at' => nil,
             'user' => {
               'name' => e.user.name,
