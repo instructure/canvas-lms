@@ -388,15 +388,19 @@ describe NotificationMessageCreator do
       end
     end
 
-    it "should create policies on the user's shard" do
+    it "should create policies and summary messages on the user's shard" do
       @shard1.activate do
         @user = User.create!
-        @user.communication_channels.create!(path: "user@example.com").confirm!
+        @cc = @user.communication_channels.create!(path: "user@example.com")
+        @cc.confirm!
       end
       notification_model(category: 'TestWeekly')
-      creator = NotificationMessageCreator.new(@notification, nil)
-      creator.expects(:too_many_messages_for?).returns(false)
-      creator.send(:delayed_policies_for, @user).first.shard.should == @shard1
+      Message.any_instance.stubs(:get_template).returns('template')
+      @cc.notification_policies.should be_empty
+      @cc.delayed_messages.should be_empty
+      NotificationMessageCreator.new(@notification, @user, :to_list => @user).create_message
+      @cc.notification_policies.should_not be_empty
+      @cc.delayed_messages.reload.should_not be_empty
     end
   end
 end
