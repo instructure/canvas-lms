@@ -32,6 +32,9 @@ ar:
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "تحذير: %{user} هو عضو بالفعل في %{group}"
+  LongTextEditor: 
+    cancel: إلغاء
+    save: حفظ
   academic_benchmark: 
     api_error: "تعذر تحديث المعايير للتفويض %{auth}."
     bad_ab_file: "حدث خطأ في ملف المعيار الأكاديمي المتوفر."
@@ -397,8 +400,27 @@ ar:
         successfull_restore: 
           add_enrollments: "إضافة تسجيلات"
           subtext: "ماذا تود فعله فيما بعد؟"
+      date_range_search: 
+        message_date_from: "من تاريخ"
+        message_date_to: "إلى تاريخ"
+      grade_change_logging_content: 
+        auth_logging: "نشاط تغيير الدرجة"
+        find: بحث
+        message_assignment_id: "معرف المهمة"
+        message_course_id: "معرف المساق"
+      grade_change_logging_results: 
+        Assignment: المهمة
+        Course: المساق
+        Grader: التقييم
+        Student: الطالب
+        To: إلى
+        date: التاريخ
+        from: من
+        no_item_found: "لم يتم العثور على أي عناصر"
+        time: الوقت
       logging_content_pane: 
         authentication: "نشاط تسجيل الدخول/تسجيل الخروج"
+        grade_change: "نشاط تغيير الدرجة"
         select_default: "تحديد نوع سجل"
         select_label: "تحديد نوع سجل للبحث."
       page_title: "أدوات المسؤول لـ %{account}"
@@ -551,12 +573,10 @@ ar:
         edison: 
           description: 
             header: مثال
-            text: "يعرض هذا التقرير نتائج التحصيل الدراسي لجميع الطلاب. وسيحتوي ملف CSV الناتج على صف واحد لكل زوج من نتيجة تحصيل الطالب، وسوف يُظهر تفاصيل النتيجة بما في ذلك المهمة المقترنة."
+            text: "يعرض هذا التقرير نتائج التحصيل الدراسي لجميع الطلاب لمساق ونتيجة محددين. وسيحتوي ملف CSV الناتج على صف واحد لكل طالب، وسوف يُظهر تفاصيل النتيجة بما في ذلك المهمة المقترنة."
     custom_outcomes_csv_parameters: 
       account_reports: 
         edison: 
-          course: 
-            text: "course_id:"
           outcome: 
             text: "outcome_id:"
     cv_submission_data_csv_description: 
@@ -745,6 +765,7 @@ ar:
         site_admin_quotas: "حصص مسؤول الموقع"
         student_quota: "حصة الطالب"
         update: تحديث
+      account_roles: "أدوار الحساب:"
       account_settings_title: "إعدادات الحساب"
       add_a_custom_help_link: "إضافة رابط تعليمات مخصص"
       add_admin_title: "إضافة مسؤولي الحساب"
@@ -758,6 +779,8 @@ ar:
       alert_icon_warning_option: تحذير
       alert_timespan: "من %{start_at} إلى %{end_at}"
       alerts_title: تنبيهات
+      announcement_blank_to_all: "(في حالة عدم تحديد أي شخص، يتم الإرسال للجميع)"
+      announcement_sent_to_roles: "إرسال فقط إلى أنواع المستخدمين التالية:"
       announcement_sent_to_subset: "تم الإرسال إلى 1 / %{denominator} مستخدمين كل شهر"
       buttons: 
         add_users: "يبدو اختيار \"موافق\" جيدًا، قم بإضافة هؤلاء المستخدمين"
@@ -765,6 +788,7 @@ ar:
         modify_users: "قم بالعودة إلى قائمة المستخدمين وتحريرها"
       confirm_global_announcement: "سيتم عرض هذا الإعلان على *جميع* مستخدمي Canvas. فقم بالتأكيد على أنك تريد إنشائه."
       confirm_turnitin_settings_link: "تأكيد إعدادات Turnitin"
+      course_roles: "أدوار المساق:"
       create_courses_description: "(يمكن لمسؤولي الحساب دائمًا إنشاء مساقات)"
       create_courses_title: "الأشخاص الذين يمكنهم إنشاء مساقات جديدة"
       custom_links_to_include_in_the_help_dialog_popup: "تخصيص الارتباطات لتضمينها في نافذة مربع الحوار تعليمات"
@@ -791,6 +815,7 @@ ar:
       help_link_available_to_all_teachers: المعلمون
       help_link_available_to_all_users: المستخدمون
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "إذا رغبت في الارتباط بموقع ويب لدعم مجمع المباني الخاص بك في مربع الحوار تعليمات فيمكنك ذلك من هنا"
+      interpolate_account_domain: "ملاحظة: أدخل \"{{ACCOUNT_DOMAIN}}\" لاستبدال مجال الحساب الجذر للمستخدم"
       ip_filter_filter_label: تصفية
       ip_filter_name_label: الاسم
       labels: 
@@ -862,6 +887,7 @@ ar:
         select_type_label: "البحث عن مساق أو مجموعة"
         update_button: "تحديث المساق"
       never_allow_self_enrollment_option: مطلقًا
+      no_enrollment_roles: "مستخدمون غير مسجلين"
       no_language_preference: "غير معيّن (افتراضي على %{language})"
       notifications: 
         custom_name_description: "في حالة التحديد، سيقوم ذلك باستبدال جميع العلامات الأخرى التي تم إرسالها في إشعارات Canvas."
@@ -1069,6 +1095,20 @@ ar:
           description: 
             header: مثال
             text: "يعرض هذا التقرير نتائج التحصيل الدراسي لكل الطلاب. وسيتضمن ملف csv الناتج على صف واحد لكل زوج من نتائج تحصيل الطالب، وسيعرض تفاصيل النتيجة بما في ذلك المهمة المقترنة. ويعرض هذا التقرير نتائج التحصيل الدراسي فقط للمهام ولا يتضمن النتائج المرتبطة ببنوك الأسئلة."
+    student_grades_csv_description: 
+      account_reports: 
+        auburn: 
+          student_grades: 
+            description: 
+              text: "يعرض هذا التقرير نتائج الدرجات النهائية لجميع الطلاب في فصل دراسي معين. وسيحتوي ملف CSV الناتج على صف واحد لكل تسجيل، وسوف يُظهر الدرجة الحالية والدرجة النهائية المعروضتين في دفتر درجات المساق."
+        default: 
+          description: 
+            header: مثال
+    student_grades_csv_parameters: 
+      account_reports: 
+        auburn: 
+          pseudonym_ids: 
+            field: "معرفات الأسماء المستعارة"
     student_ip_csv_description: 
       account_reports: 
         dubspot: 
@@ -1438,6 +1478,8 @@ ar:
       on_paper: "على الورق"
     titles: 
       grading_scheme_info: "عرض/تحرير نظام تقييم الدرجات"
+  assignment_details: 
+    no_graded_submissions: "لا توجد عمليات إرسال تم تقدير درجاتها"
   assignment_details_dialog: 
     average_score: "متوسط مجموع النقاط:"
     count_of_submissions: "%{cnt} إرسالاً/إرسالات"
@@ -1601,6 +1643,10 @@ ar:
       warnings: 
         delete_assignment_group: "مجموعة المهام %{group} تحتوي على %{assignment_count}. يمكنك إما حذف هذه المهام أو نقلها إلى مجموعة مهام أخرى."
     assignments_list_content: 
+      assignments: 
+        graded: "تم تقييم درجات هذه المهمة"
+        needs_grading_count: "لا يزال %{needs_grading_count} من عمليات الإرسال لهذه المهمة بحاجة إلى تقييم الدرجة"
+        overdue: "هذه المهمة متأخرة"
       no_assignments: "لم يتم إنشاء أي مهام لهذا المساق."
       titles: 
         assignments: المهام
@@ -1772,7 +1818,6 @@ ar:
     grade_pass_fail_screenreader: "الدرجة: %{grade}"
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "الدرجة: %{grade}%"
-    graded: "تم تقييم درجات هذه المهمة"
     grading_type_selector: 
       grading_type: "نوع التقييم"
       grading_type_options: 
@@ -1863,7 +1908,6 @@ ar:
       submitting: "جارٍ الإرسال..."
     multiple_due_dates: "تواريخ استحقاق عديدة"
     name_is_required: "الاسم مطلوب!"
-    needs_grading_count: "%{needs_grading_count} إرسالاً/إرسالات لهذه المهمة ما زال بحاجة إلى التقييم"
     never_drop: 
       remove_rule: "إزالة القاعدة"
     never_drop_collection: 
@@ -1893,7 +1937,6 @@ ar:
       two: "%{count} من التعيينات"
       zero: "%{count} من التعيينات"
     other_assignments: "مهام أخرى"
-    overdue: "هذه المهمة متأخرة"
     peer_review_assignment: 
       titles: 
         remind_reviewer: "تذكير %{user} بالتقييم"
@@ -1925,6 +1968,7 @@ ar:
       titles: 
         automatically_assign_reviews: "تعيين المراجعات تلقائيًا"
         remind: "تذكير %{assessor} بالتقييم، آخر تذكير كان بتاريخ %{time}"
+        reminder: "تذكير %{assessor} بالتقييم، آخر إشعار كان في %{time}"
     peer_reviews_selector: 
       labels: 
         automatically_assign_peer_reviews: "تعيين المراجعات النظيرة تلقائيًا"
@@ -1933,7 +1977,6 @@ ar:
       locked_until: "تعيين المراجعات"
       peer_reviews_assign_at_explanation: "يجب أن يأتي بعد تاريخ الاستحقاق. إذا كان فارغًا، فاستخدم تاريخ الاستحقاق."
       reviews_per_user: "المراجعات لكل مستخدم"
-    percent_of_final_grade: "%{percent} من الدرجة النهائية"
     points_possible_number: "النقاط الممكنة لابد أن تكون رقمًا"
     positive_number: "يجب استخدام عدد موجب"
     redirect_page: 
@@ -2278,12 +2321,12 @@ ar:
     done: انتهاء
     filter: تصفية
     find_user: "العثور على مستخدم"
-    hide_all_artifacts: "إخفاء كل الأدوات"
     import: استيراد
     login: "تسجيل الدخول"
     manage_rubrics: "إدارة العناوين"
     masquerade: "إخفاء الاسم باعتبارك مستخدمًا"
     ok: موافق
+    okay: موافق
     refresh: تحديث
     save: حفظ
     search: بحث
@@ -2889,8 +2932,6 @@ ar:
     new: 
       pin_to_canvas_network: "تثبيت في شبكة Canvas"
       saved_successfully: "تم الحفظ بنجاح"
-  collection_view: 
-    no_items: "لا توجد عناصر."
   comm_messages: 
     from_beginning: البداية
     to_now: الآن
@@ -2969,10 +3010,6 @@ ar:
     disabled_error: "لم يتم تمكين مؤتمر الويب لموقع Canvas هذا"
     edit_conference_form: 
       advanced_settings: "جارٍ إدارة إعدادات متقدمة..."
-      buttons: 
-        cancel: إلغاء
-        create_conference: "إنشاء مؤتمر"
-        update_condference: "تحديث مؤتمر"
       conference_type: النوع
       description: الوصف
       duration: المدة
@@ -2989,8 +3026,6 @@ ar:
       concluded_conferences: "المؤتمرات المنجزة"
       new_conference: "مؤتمر جديد"
       new_conferences: "مؤتمرات جديدة"
-      no_concluded_conferences: "لا توجد مؤتمرات منجزة"
-      no_new_conferences: "لا توجد مؤتمرات جديدة"
       page_title: "مؤتمرات عبر الويب"
     loading_urls_message: "جارٍ التحميل، يرجى الانتظار..."
     multiple_urls_message: "هناك العديد من صفحات %{type} المتاحة لهذا المؤتمر. الرجاء تحديد صفحة واحدة:"
@@ -3005,7 +3040,8 @@ ar:
       setings: إعدادات
       start: بدء
       view: عرض
-    new_conference_title: "مؤتمر جديد"
+    no_concluded_conferences: "لا توجد مؤتمرات منجزة"
+    no_new_conferences: "لا توجد مؤتمرات جديدة"
     no_settings_error: "لا يحتوي المؤتمر على صفحة إعدادات متقدمة"
     no_urls_error: "للأسف، يبدو أنه لا توجد أي صفحات %{type} لهذا المؤتمر بعد."
     notifications: 
@@ -3028,7 +3064,6 @@ ar:
         new: "لم يبدأ بعد"
         started: "بدأ %{time}"
     type_disabled_error: "لم يعد هذا النوع من المؤتمرات ممكّنًا لموقع Canvas هذا"
-    update_conference_title: "تحديث مؤتمر"
   content_exports: 
     buttons: 
       process: "بيانات العملية"
@@ -3066,6 +3101,7 @@ ar:
       no_only_and_except: "لا يمكنك استخدام خيارات \"فقط\" و\"باستثناء\" في نفس الوقت."
     files: 
       buttons: 
+        cancel: إلغاء
         skip: "تخطي هذه الخطوة"
       description: "يمكنك تحميل مجموعة ملفات مضغوطة إلى المساق وسنقوم باستخراجها بالكامل من أجلك. وتعد هذه وسيلة سهلة لنقل الملفات من نظام آخر إلى Canvas."
       page_title: "استيراد الملفات"
@@ -3125,9 +3161,6 @@ ar:
       options: خيارات
     common_cartridge: 
       options: خيارات
-    content_checkbox: 
-      select_all: "تحديد الكل"
-      select_non: "حدد لا شيء"
     content_migration: "ترحيل المحتوى"
     content_migration_issue: 
       error_report: "تقارير الأخطاء"
@@ -3153,6 +3186,8 @@ ar:
       options: خيارات
     must_upload_file: "تحميل الملف أو عنوان url مطلوب"
     no_content_selected: "لم تحدد أي محتوى لاستيراده."
+    no_day_substitutions: "لم تتم إضافة استبدالات اليوم"
+    no_migrations_running: "لا توجد أي ترحيلات قيد التشغيل حاليًا"
     progressing_content_migration: 
       issues_text: المشكلات
       select_content: "تحديد محتوى"
@@ -3166,6 +3201,7 @@ ar:
       options: خيارات
     school_required: "يجب تحديد مدرسة."
     select_content: 
+      cancel_btn: إلغاء
       select_content_btn: "تحديد محتوى"
     select_course: "تحديد مساق"
     show_issues: "إظهار المشكلات"
@@ -3414,6 +3450,7 @@ ar:
         user_access_report: "تقرير وصول %{user}"
       links: 
         back_to_user: "العودة إلى صفحة المستخدم"
+      loading_more_results: "تحميل مزيد من النتائج"
       table_headings: 
         content: المحتوى
         last_viewed_time: "آخر مرة تم العرض"
@@ -3422,10 +3459,13 @@ ar:
       titles: 
         access_report: "تقرير الوصول"
     undelete_index: 
+      are_you_sure: "هل ترغب بالفعل في استعادة %{item_name}؟"
       headings: 
         restore__items: "استعادة العناصر المحذوفة"
       help: 
         restore_items: "ضع في اعتبارك أن بعض العناصر قد تفقد بعض البيانات المرتبطة بها عند حذفها. لا تنس تأكيد نتائج أية عمليات استعادة تقوم بها."
+      restore_failed: "فشلت الاستعادة"
+      restoring: "جارٍ الاستعادة..."
   context_external_tool: 
     external_tool_attention_needed: "تحتاج معلمات الأمان الخاصة بالأداة الخارجية \"%{tool_name}\" إلى الضبط في إعدادات المساق."
     url_or_domain_required: "يجب ضبط إما url أو المجال"
@@ -4352,23 +4392,6 @@ ar:
     greater_than_three: "يرجى إدخال مصطلح بحث يضم ثلاثة أحرف أو أكثر"
     unknown_error: "حدث خطأ في بحثك. يرجى إعادة المحاولة."
   courses: 
-    add_users: 
-      buttons: 
-        add_users: "يبدو اختيار \"موافق\" جيدًا، قم بإضافة هؤلاء المستخدمين"
-        continue: "جارٍ المتابعة..."
-        modify_users: "العودة إلى قائمة المستخدمين وتحريرها"
-      cannot_add_users_to_concluded_course: "لا يمكنك إضافة مستخدمين لمساق منتهي."
-      headings: 
-        add_users: "إضافة مستخدمي المساق"
-      invite_to_unpublished_course: "بسبب عدم نشر المساق، ستتم إضافة الطلاب ومساعدي المعلمين، لكن لم تتم الدعوة للانضمام للمساق. سيتم إرسال الدعوات عند نشر المساق."
-      labels: 
-        course_section_id: "بالنسبة للقسم"
-      limit_privileges_to_course_section: "يمكن للمسؤولين فقط تقييم الطلاب في القسم الخاص بهم"
-      links: 
-        add_users: "إضافة مستخدمين"
-      teacherless_invite_details: "عند دعوة المعلمين وقبولهم الدعوة، فإنك تتخلى عن الامتيازات الإدارية لهذا المساق."
-      titles: 
-        course_section: "قسم المساق"
     assignments_needing_grading: 
       headings: 
         grade: "تقييم %{assignment}"
@@ -4529,11 +4552,6 @@ ar:
         teacher: "لقد تمت دعوتك للانضمام لهذا المساق *كمعلم* لحساب المستخدم *%{user}*."
       invitiation: 
         look_around: "لك مطلق الحرية في التجول عبر المساق والاطلاع فيه. عندما تكون مستعدًا، يمكنك إما قبول الدعوة أو رفضها."
-    enrollment_type_select: 
-      labels: 
-        enrollment_type: "إضافة المزيد"
-      titles: 
-        enrollment_type: "نوع التسجيل"
     errors: 
       create_failed: "فشل إنشاء المساق"
       invalid_role: "نوع دور غير صالح"
@@ -5157,6 +5175,10 @@ ar:
       - ديسمبر
   dates: 
     no_date: "بلا تاريخ"
+  dates_available_component: 
+    available: التوفر
+    due: الاستحقاق
+    multiple_dates: "تواريخ متعددة"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -5384,7 +5406,7 @@ ar:
     discussion: 
       close_for_comments: "إغلاق التعليقات"
       delete: حذف
-      due_at: "*مستحق في* %{assignment.display_due_at}"
+      due: الاستحقاق
       graded_discussion: "مناقشة بدرجات"
       last_post_date: "آخر مشاركة في t %{display_last_reply_at}"
       manage: إدارة
@@ -5415,6 +5437,9 @@ ar:
       allow_threaded_replies: "السماح بالردود المترابطة"
       attachment: مرفق
       available_from: "متوفر من"
+      buttons: 
+        not_published: "لم يتم النشر"
+        published: "تم النشر"
       delay_posting: "تأخير النشر"
       enable_podcast_feed: "تمكين موجز بودكاست"
       include_replies_in_podcast_feed: "تضمين الردود في موجز البودكاست"
@@ -5497,8 +5522,8 @@ ar:
       add_rubric: "إضافة العنوان"
       announcement_closed: "هذا الإعلان مغلق للتعليقات"
       announcement_locked: "لن يكون هذا الإعلان مرئيًا للمستخدمين حتى *%{date}*"
+      announcement_locked_until: "هذا الإعلان مؤمّن حتى %{time}"
       announcement_not_visible: "هذا الإعلان غير مرئي للمستخدمين"
-      announcement_will_open_on: "سيفتح هذا الإعلان للتعليق في *%{date}*"
       authors_name: "اسم المؤلف"
       collapse_replies: "طي الردود"
       confirm_delete_discussion: "هل تريد بالتأكيد حذف هذه المناقشة؟"
@@ -5530,13 +5555,13 @@ ar:
       show_rubric: "إظهار العنوان"
       speed_grader: "تقييم سريع"
       topic: الموضوع
+      topic_locked_until: "هذا الموضوع مؤمّن حتى %{time}"
       topic_not_visible: "لا يظهر هذا الموضوع للمستخدمين"
       topic_podcast_feed_link: "موجز Podcast للموضوع"
       topic_subscribe: اشتراك
       topic_subscribe_tooltip: "أنت غير مشترك ولن يتم إعلامك بالتعليقات الجديدة"
       topic_subscribed_tooltip: "أنت مشترك وسيتم إعلامك بالتعليقات الجديدة"
       topic_unsubscribe: مشترك
-      topic_will_open_on: "هذا الموضوع سيفتح للتعليق في *%{date}*"
       unlock_topic: "الفتح أمام التعليقات"
       unread: "غير مقروء"
     sub_entry: 
@@ -5606,7 +5631,6 @@ ar:
       attach_file: إرفاق
       cancel: إلغاء
       post_reply: "نشر رد"
-      switch_views: "تبديل العروض"
       write_a_reply: رد
     results_entry: 
       authors_name: "اسم المؤلف"
@@ -5633,11 +5657,10 @@ ar:
     unsubscribed: "غير مشترك"
     unsubscribed_hint: "أنت غير مشترك في هذا الموضوع. انقر للاشتراك."
   draft_state_description: |-
-      يقصد بحالة المسودة ميزة *بيتا* التي تسمح بنشر محتوى المساق وإلغاء نشره.
-      لن يكون المحتوى غير المنشور ظاهرًا للطلاب ولن يؤثر على الدرجات.
-      كما أنه يتضمن إعادة تصميم بعض أجزاء المساق لجعلها أكثر اتساقًا من حيث المظهر والوظيفة.
-      
-      قد لا يتوفر المحتوى غير المنشور إذا تم تعطيل حالة المسودة.
+      تعمل هذه الميزة، التي في الإصدار بيتا، على إعادة تصميم العديد من أجزاء Canvas وتتيح للمحتوى أن يوجد
+      بحالة غير منشورة جديدة وغير مرئية للطلاب ويتم استبعادها من حسابات الدرجات
+      تنبيه--قد يؤدي تعطيل هذه الميزة إلى حذف المحتوى المضاف
+      أو المحرر من طريقة عرض المدرس.
   due_dates: 
     due_at: "موعد الاستحقاق: %{assignment_due_date_time}"
     multiple_due_dates: "موعد الاستحقاق: تواريخ محددة عديدة"
@@ -5677,16 +5700,19 @@ ar:
     image_not_found: "لم يتم العثور على صورة، الرجاء تجربة استخدام URL جديد"
     instructions: "قم بلصق URL الخاص بالصورة التي تريد تضمينها أو اكتبه:"
     loading: "جارٍ التحميل..."
+    mathjax_text_entry_field_label: "أدخل المعادلة كـ LaTeX."
     more_external_tools: "مزيد من الأدوات الخارجية"
     role: 
       duplicate_role_error: "تعذر إنشاء هذا الدور نظرًا لوجود دور آخر بهذا الاسم، الرجاء استخدام اسم آخر "
       remove_role_confirmation: "إذا كان هناك أي مستخدم معيّن لهذا الدور، فسيحتفظ بالأذونات الحالية، ولكنك لن تتمكن من إنشاء مستخدمين جدد لهذا الدور. انقر فوق موافق لمتابعة حذف هذا الدور."
     save_failed: "فشل الحفظ، الرجاء إعادة المحاولة لاحقًا"
     saving: "جارٍ الحفظ..."
+    screen_reader_tip: "مستخدمو قارئ الشاشة: أفضل طريقة سهلة لاستخدام هذا المحرر هي التبديل إلى طريقة العرض المتقدمة، ثم إما إدخال LaTeX مباشرةً أو استخدام شريط الأدوات لمساعدتك في فعل ذلك. ويمكن العثور على الارتباط للتبديل إلى طريقة العرض المتقدمة بالقرب من نهاية هذا الحوار، قبل حقل التحرير مباشرةً."
     search_flickr: "بحث flickr creative commons"
+    switch_editor_html: "محرر HTML"
+    switch_editor_visual: "المحرر البصري"
     switch_to_mathjax: "تبديل العرض إلى الأساسي"
     switch_to_mathquill: "تبديل العرض إلى المتقدم"
-    switch_views: "تبديل العروض"
     tabs: 
       arrows: الأسهم
       basic: أساسي
@@ -5920,7 +5946,6 @@ ar:
         portfolio: "الانتقال إلى ePortfolio الفعلية"
         rich_content: "محتوى Rich Text"
         share: "انسخ هذا الارتباط وشاركه لمنح الآخرين الوصول إلى ePortfolio الخاصة بك."
-        switch_views: "تبديل العروض"
         view_original: "عرض الملف الأصلي"
         wizard: "معالج بدء التشغيل"
       login_required: "عليك أن تكون *مسجلاً* لإنشاء تعليقات على هذه الصفحة."
@@ -6226,7 +6251,17 @@ ar:
       no_features_available: "لا توجد ميزات متاحة حاليًا."
   features: 
     draft_state: "حالة المسودة"
+    draft_state_account_disable_warning: |-
+        سيؤثر إيقاف تشغيل هذه الميزة على المساقات الموجودة. للحصول على المساعدة حول إيقاف تشغيل هذه الميزة، يرجى الاتصال
+        بـ Canvas Success Manager لديك.
+    draft_state_course_disable_warning: |-
+        سيؤدي إيقاف تشغيل هذه الميزة إلى نشر كل الكائنات الموجودة في المساق. يرجى التأكد من أن المحتوى الذي بحالة المسودة
+        جاهز للنشر ومتاح لكل المستخدمين في المساق قبل المتابعة.
     google_docs_domain_restriction: "قيد على مجال Google Docs"
+    outcome_gradebook: "دفتر درجات النتيجة"
+    screenreader_gradebook: "دفتر درجات قارئ الشاشة"
+  file_browser_view: 
+    folder_tree_instructions: "استخدم السهم السفلي والسهم العلوي للتنقل خلال الشجرة، واضغط على السهم الأيمن لتوسيع المجلدات وعلى السهم الأيسر لطيها، واضغط على مفتاح الإدخال لاختيار صورة."
   filebrowserview: 
     course_files: "ملفات المساق"
     group_files: "ملفات المجموعة"
@@ -6305,6 +6340,7 @@ ar:
         download_as_zip: "تنزيل الملفات في هذا المجلد كملف مضغوط"
         download_file: "تنزيل هذا الملف"
         download_with_size: "تنزيل الملف (%{size})"
+        download_zip: "انقر هنا لتنزيل %{size}"
         edit_content: "تحرير المحتوى"
         import_zip: "استيراد ملف مضغوط"
         lock_file: "تأمين هذا الملف"
@@ -6319,14 +6355,19 @@ ar:
       locked: "لم يتم إلغاء تأمين هذا الملف بعد، لذلك لا يمكن تنزيله."
       locked2: "تم تأمين هذا الملف ولا يمكن تنزيله بواسطة الطلاب."
       messages: 
+        creating_zip: "جارٍ إنشاء الملف المضغوط..."
         gathering_and_zipping: "**يجري تجميع محتويات هذا المجلد** وضغطها            في ملف مضغوط.  وقد يستغرق ذلك بعض الوقت، حسب حجم وعدد الملفات."
+        gathering_data: "جارٍ تجميع البيانات..."
         gathering_files: "جارٍ تجميع الملفات..."
+        gathering_files_with_progress: "جارٍ تجميع الملفات (%{progress}%)..."
         no_preview_avaialble: "لا توجد معاينة متاحة"
         uploading: "جارٍ تحميل 5 ملفات..."
+        zip_finished: "انتهى! جارٍ إعادة التوجيه إلى الملف..."
       page_title: الملفات
       storage_used: "التخزين المستخدم: %{size1} من %{size2}"
       switch_views: "تبديل العروض"
       titles: 
+        download_folder_contents: "تنزيل محتويات المجلد"
         edit_file: "تحرير %{file}"
         edit_file_contents: "تحرير محتويات الملف"
         file_locked: مُؤَمّن
@@ -6337,10 +6378,8 @@ ar:
         too_many: "هناك العديد من المساقات/المجموعات لعرضها بالكامل مرة واحدة. فيما يلي أولى 15 نتيجة."
     links: 
       add_files: "إضافة ملفات"
-      download_zip: "انقر هنا لتنزيل %{size}"
     messages: 
       access_denied: "لا يمكنك قراءة محتويات هذا المجلد."
-      creating_zip: "جارٍ إنشاء ملف مضغوط..."
       done_uploading: "انتهاء التحميل"
       error_count: 
         few: "%{count} من الأخطاء"
@@ -6352,8 +6391,6 @@ ar:
       extraction_complete: "احجبل الاستخراج!  جارٍ تحديث بنية الملف..."
       finalizing: إنهاء
       folder_empty: "لا يوجد شيء في هذا المجلد"
-      gathering_data: "جارٍ تجميع البيانات..."
-      gathering_files_with_progress: "جارٍ تجميع الملفات (%{progress}%)..."
       loading_files: "جارٍ تحميل الملفات..."
       no_files_selected: "لم يتم تحديد ملفات صالحة"
       queued: "‏‏في قائمة الانتظار"
@@ -6367,7 +6404,6 @@ ar:
         other: "جارٍ تحميل %{count} من الملفات..."
         two: "جارٍ تحميل %{count} من الملفات..."
         zero: "جارٍ تحميل %{count} من الملفات..."
-      zip_finished: "انتهى!  جارٍ إعادة التوجيه للملف..."
     new: 
       buttons: 
         create: إنشاء
@@ -6389,7 +6425,6 @@ ar:
       page_title: "معاينة الملف"
     titles: 
       click_and_drag: "انقر واسحب لنقل المجلد إلى مجلد آخر"
-      download_folder_contents: "تنزيل محتويات المجلد"
       drag_to_move: "اسحب للانتقال إلى مجلد مختلف"
       extracting: "استخراج الملفات إلى مجلدات"
       file_uplaods_queue: "قائمة انتظار تحميل الملف"
@@ -6490,6 +6525,7 @@ ar:
     graded_then_resubmitted: "تم تقييم الدرجات، ثم تمت إعادة الإرسال (%{when})"
     gradee_index_of_total: "%{gradee} %{x} من %{y}"
     group: المجموعة
+    hide_all_details_button: "إخفاء كل التفاصيل"
     hide_all_things: "إخفاء الكل %{things}"
     hide_column: "إخفاء الأعمدة"
     hide_student_name: "إخفاء أسماء الطلاب"
@@ -6516,6 +6552,7 @@ ar:
     reupload_submissions: "إعادة تحميل الإرسالات"
     set_default_grade: "ضبط الدرجة الافتراضية"
     set_group_weights: "ضبط تقييمات المجموعة"
+    show_all_details_button: "إظهار كل التفاصيل"
     show_student_name: "إظهار أسماء الطلاب"
     showing_all_sections: "إظهار كل الأقسام"
     showing_section: "إظهار قسم: %{section}"
@@ -6577,6 +6614,9 @@ ar:
       this_assignment_is_muted: "تم إخفاء درجة هذا التعيين"
       zero_point_assignment: "المهام في هذه المجموعة ليس بها نقاط ممكنة ولا يمكن تضمينها في حساب الدرجات"
     concluded_course_error_message: "هذه هي إحدى الدورات التدريبية المنتهية، لذلك لا تتوفر سوى التسجيلات المنتهية."
+    course_average: "معدل المساق"
+    course_median: "متوسط المساق"
+    course_mode: "وضع المساق"
     dropped_for_grading: "تم إسقاطه لأغراض التصحيح"
     error: 
       update: "حدث خطأ عند تحديث هذه المهمة. يرجى تحديث الصفحة والمحاولة مرة أخرى.\n"
@@ -6591,6 +6631,11 @@ ar:
       re_upload_submissions: "إعادة تحميل الإرسالات"
       set_default_grade: "ضبط الدرجة الافتراضية"
       speedgrader: SpeedGrader
+    header_filter: 
+      course_average: "معدل المساق"
+      course_median: "متوسط المساق"
+      course_mode: "وضع المساق"
+    hide_notes: "إخفاء عمود الملاحظات"
     hide_student_names: "إخفاء أسماء الطلاب"
     invalid_assignment_groups_warning: 
       few: "لا يتضمن مجموع الدرجات بضع مجموعات لأنها ليست لديها نقاط ممكنة"
@@ -6610,9 +6655,20 @@ ar:
       goto_assignment: g
       menu: m
       sort: s
+    learning_outcome: "ناتج التعلم"
+    mastery: إتقان
+    near_mastery: "قريب من الإتقان"
     no_assignments_have_points_warning: "لا يمكن حساب مجموع الدرجات إلا أن تكون للمهمة نقاط ممكنة"
+    notes: ملاحظات
+    outcome_gradebook: 
+      toggle_sidebar: "تبديل الشريط الجانبي"
+    outcome_popover: 
+      mastery_set_at: "الإتقان عند"
+      no_results: "(بلا نتائج)"
+      view_more_details: "عرض مزيد من التفاصيل"
     percent_of_grade: " %{percentage} من الدرجة"
     points_out_of: "من %{points_possible}"
+    remedial: "بحاجة إلى تحسين"
     resubmitted: "تمت إعادة إرساله منذ آخر تصحيح"
     row_student_name: 
       student_placeholder: الطالب
@@ -6621,22 +6677,24 @@ ar:
     secondary_id: "المعرف الثانوي"
     section_to_show_menu: 
       choose_a_section_to_show: "اختيار قسم لعرضه"
+      showing_sections: "جارٍ عرض *%{currentSection}*"
     show: 
-      all_sections: "كل الأقسام"
       arrange_columns_by_due_date: "ترتيب الأعمدة حسب موعد الاستحقاق"
       arrange_columns_by_group: "ترتيب الأعمدة حسب مجموعات المهام"
       download_scores: "تنزيل الدرجات (csv.)"
       filter_by_student: "التصفية حسب اسم الطالب أو المعرف الثانوي"
-      go_back_to_the_old_gradebook: "العودة إلى دفتر الدرجات القديم"
+      grades: الدرجات
       hide_student_names: "إخفاء أسماء الطلاب"
-      include_ungraded: "تضمين المهام التي لم يتم تقييم درجاتها"
+      include_ungraded: "اعتبار درجة المهام التي لم يتم تقييمها كـ 0"
+      learning_mastery: "إتقان التعلم"
+      old_gradebook: "دفتر الدرجات القديم"
       publish_to_sis: "نشر الدرجات على SIS"
       set_group_weights: "ضبط تقييمات المجموعة"
       show_attendance_columns: "إظهار أعمدة الحضور"
       show_concluded_enrollments: "عرض التسجيلات المنتهية"
-      showing_sections: "يتم عرض: *%{section_being_shown}*"
       upload_scores: "تحميل الدرجات (من csv.)"
       view_grading_history: "عرض محفوظات التقييم"
+    show_notes: "إظهار عمود الملاحظات"
     show_student_names: "إظهار أسماء الطلاب"
     student_name: "اسم الطالب"
     students_who: 
@@ -6827,7 +6885,6 @@ ar:
       media_comment: "هذا تعليق وسائط،"
       not_official: "*ملاحظة*: هذه ليست درجتك الرسمية."
       page_title: "الدرجات لـ %{student}"
-      percent: "في المائة"
       print_grades: "طباعة الدرجات"
       see_rubric_results: "عرض نتائج العنوان"
       see_rubric_results_screenreader: "عرض نتائج العنوان"
@@ -6838,10 +6895,12 @@ ar:
       student_mute_notification: "يعمل المعلم في حساب الدرجات"
       submission_score: "*%{score}* من %{possible}"
       titles: 
+        enter_score: "أدخل درجة للاختبار"
         revert_score: "العودة إلى الدرجة الأصلية"
         turnitin_score: "رصد التشابه حسب Turnitin - مزيد من المعلومات"
         view_rubric_evaluation: "عرض تقييم العنوان"
         view_scoring_details: "عرض تفاصيل الدرجات"
+      total: الإجمالي
     gradebook: 
       all_sections: الكل
       assignment_submitted_late: (متأخر)
@@ -7118,6 +7177,12 @@ ar:
       total: الإجمالي
   grading_box: 
     out_of_points_possible: "من %{assignment.points_possible}"
+  grading_cell: 
+    grade_complete: مكتمل
+    grade_incomplete: "غير مكتمل"
+    grade_ungraded: "لم يتم تقييم الدرجة"
+    out_of: "(من %{points})"
+    out_of_with_score: "(%{score} من %{points})"
   grading_standard: 
     unknown_grading_details: "تفاصيل غير معروفة"
   grading_standards: 
@@ -7145,7 +7210,6 @@ ar:
     titles: 
       grading_scheme_info: "عرض/تحرير نظام تقييم الدرجات"
   group: 
-    default_collection_name: "مجموعة %{group_name}"
     memeber: العضو
     name_required: "الاسم مطلوب"
     name_too_long: "أدخل اسمًا أقل طولاً للمجموعة"
@@ -7167,6 +7231,7 @@ ar:
       communities: المجتمعات
       imported: "المجموعات المستوردة"
       student_organized: "مجموعات الطلاب"
+      uncategorized: "غير مصنّف"
     invalid_self_signup: "يجب أن يكون التسجيل الذاتي أحد القيم التالية: %{values}"
     name_required: "الاسم مطلوب"
     name_reserved: "%{name}  هو اسم محجوز."
@@ -7388,7 +7453,7 @@ ar:
         save: حفظ
         saving: "جارٍ الحفظ..."
         self_signup: "التسجيل الذاتي"
-        split_into_groups: "تقسيم الطلاب إلى %h{split_num} مجموعات متساوية"
+        split_into_groups: "تقسيم الطلاب إلى %h{num_groups} مجموعة/مجموعات متساوية"
       group_category_detail: 
         add_group: "إضافة المجموعة"
         category_settings: إعدادات
@@ -7402,6 +7467,7 @@ ar:
         self_organized_warning: "يتم تنظيم هذه المجموعات ذاتيًا بواسطة الطلاب. وعلى عكس أنواع المجموعات الأخرى، يستطيع الطلاب أن ينضموا إلى أكثر من واحدة من هذه المجموعات في المرة، لذلك لا يمكن استخدام هذه المجموعات للمهام التي تم تقييم درجاتها."
         self_signup_blurb: "تم تمكين التسجيل الذاتي لهذه المجموعات."
         settings: إعدادات
+        uncategorized_groups: "لا ترتبط هذه المجموعات بأي تجميع مجموعات محدد. ولأنه تم استيرادها عبر SIS، فلا يمكن تحديثها أو حذفها إلا عبر SIS."
       group_category_edit: 
         allow_self_signup: "السماح بالتسجيل الذاتي"
         cancel: إلغاء
@@ -7436,10 +7502,12 @@ ar:
         remove: إزالة
         remove_from_group: "إزالة %{name} من مجموعة"
       group_users: 
+        add_student: "أضف طالبًا للشروع في العمل."
+        add_user: "أضف مستخدمًا للشروع في العمل."
         no_matching_students: "لا يوجد تطابق للطلاب."
         no_matching_users: "لا يوجد تطابق للمستخدمين."
-        no_students: "لا يوجد طلاب في هذه المجموعة حاليًا. أضف طلابًا حتى يمكن البدء."
-        no_users: "لا يوجد مستخدمون في هذه المجموعة حاليًا. أضف مستخدمًا حتى يمكن البدء."
+        no_students: "لا يوجد حاليًا أي طلاب في هذه المجموعة."
+        no_users: "لا يوجد حاليًا أي مستخدمين في هذه المجموعة."
       groups: 
         no_groups: "لا توجد مجموعات في هذه الفئة من المجموعات حاليًا. أضف مجموعة حتى يمكن البدء."
         no_matching_groups: "لا توجد مجموعات مطابقة لمصطلح البحث الحالي."
@@ -7475,6 +7543,7 @@ ar:
       students_assigned: "تم تعيين الطلاب إلى مجموعات."
       update_success: "تم تحديث المجموعة بنجاح."
       welcome: "مرحبًا بك في مجموعة %{group_name}!"
+    positive_group_count: "يجب إدخال عدد مجموعات موجب"
     randomly_assigning_members: "تعيين الطلاب عشوائيًا"
     show: 
       coming_up: متطور
@@ -7615,6 +7684,7 @@ ar:
       view_equella_content_in_new_window: "عرض المحتوى في نافذة جديدة"
     loading: "جارٍ التحميل..."
     no_description: "بلا وصف"
+    no_items: "لا توجد عناصر."
     no_results_found: "لم يتم العثور على نتائج"
     status: 
       diigo_search_throttling: "يقوم Diigo بتقييد المستخدمين إلى بحث واحد كل عشر ثوان.  يرجى الانتظار..."
@@ -7848,7 +7918,6 @@ ar:
       feedback: "انقر هنا لإخبارنا عما حدث"
     help: تعليمات
     show_me_where: "إظهاري حيث"
-    switch_views: "تبديل طرق العرض"
   locales: 
     ar: العربية
     en: الإنجليزية
@@ -9973,6 +10042,7 @@ ar:
   name: "مستورد القياس الأكاديمي"
   new_facebook_message: "لديك رسالة جديدة من Canvas"
   no_migration_file: "الملف مطلوب لترحيل المحتوى."
+  not_a_number: "يجب أن تكون القيمة عددًا موجبًا"
   not_applicable: "لا يوجد"
   notification: 
     added_to_conversation_description: "تمت إضافتك إلى المحادثة"
@@ -10180,6 +10250,11 @@ ar:
     : لا
     ? "yes"
     : نعم
+  outcome_gradebook_description: |-
+      يوفر "دفتر درجات النتيجة" طريقة للمدرسين لعرض تقدم الطلاب والمساق بسرعة
+      في نتائج التعلم للمساق. ويتم عرض النتائج بتنسيق يشبه دفتر الدرجات ويتم عرض تقدم
+      الطلاب كدرجة رقمية وكتقدير من بين إتقان/قريب من الإتقان/
+      بحاجة إلى تحسين.
   outcome_groups: 
     invalid_file: "ملف مجموعة النتائج غير صالح"
   outcome_groups_api: 
@@ -10569,10 +10644,12 @@ ar:
         domain: "بالنسبة للحسابات المستضافة، استخدم \"www.kaltura.com\""
         resource_domain: "بالنسبة للحسابات المستضافة، استخدم \"cdn.kaltura.com\""
         rtmp_domain: "بالنسبة للحسابات المستضافة، استخدم \"www.kaltura.com\""
+      kaltura_path_example: مثال
       kaltura_sis_explanation: "في حالة التحديد، سيتم تقديم بيانات SIS للمساق والمستخدم المحدد إلى Kaltura."
       labels: 
         cache_play_list_seconds: "ثوان لإجراء التخزين المؤقت لعنوان URL الخاص بقائمة التشغيل"
         do_analytics: "إرسال أحداث التحليلات"
+        do_flash_var_test: "تمكين إعدادات flash التجريبية"
         domain: المجال
         kaltura_sis: "كتابة بيانات SIS في Kaltura"
         kcw_ui_conf: "معرف تكوين واجهة المستخدم (UI) لـ KCW"
@@ -11023,11 +11100,7 @@ ar:
         no_idp_found: "لم يتمكن Canvas من تسجيل خروجك من موفر الهوية\n"
       max_attempts: "عدد كبير للغاية من محاولات تسجيل الدخول الفاشلة. الرجاء المحاولة مرة أخرى لاحقًا أو اتصل بمسؤول النظام."
       no_matching_user: "لا يحتوي Canvas على حساب للمستخدم: %{user}"
-      request_failed: "فشل الطلب. حاول مرة أخرى."
       user_deleted: "لقد تم حذف حساب المستخدم ذاك.  الرجاء الاتصال بمسؤول النظام لإعادة تنشيط حسابك."
-    messages: 
-      resending: "جارٍ إعادة الإرسال..."
-      sent: "تم الإرسال! قد تستغرق عملية وصول الرسالة عدة دقائق."
     mobile_login: 
       back_to_login: "عودة إلى تسجيل الدخول"
       buttons: 
@@ -11038,12 +11111,7 @@ ar:
       password: "كلمة المرور"
       sending: "جارٍ الإرسال..."
     new: 
-      details: "قبل أن تستطيع تسجيل الدخول، سيلزم إنهاء عملية التسجيل. ينبغي أن تكون قد تلقيت بريدًا إلكترونيًا مع ارتباط تأكيد يقوم بإرجاعك إلى Canvas. ثم اتبع ذلك الارتباط لإكمال العملية. وتأكد من مراجعة صندوق البريد العشوائي ربما يصل البريد هناك."
-      links: 
-        resend_email: "إعادة إرسال البريد الإلكتروني"
       page_title: "تسجيل الدخول إلى Canvas"
-      titles: 
-        registration_complete: "عملية التسجيل غير كاملة"
     notices: 
       mfa_complete: "تم تكوين المصادقة متعددة العوامل"
     oauth2_auth: 
@@ -11146,7 +11214,54 @@ ar:
   question_answered: "تمت الإجابة"
   question_bank: 
     align_outcomes: "محاذاة النتائج"
+    already_bookmarked: "تم وضع إشارة مرجعية بالفعل"
+    bookmark_failed: "فشل وضع الإشارة المرجعية"
+    bookmarking: "جارٍ وضع الإشارة المرجعية..."
+    buttons: 
+      submit_copying: 
+        few: "جارٍ نسخ الأسئلة..."
+        many: "جارٍ نسخ الأسئلة..."
+        one: "جارٍ نسخ السؤال..."
+        other: "جارٍ نسخ الأسئلة..."
+        two: "جارٍ نسخ السؤالين..."
+        zero: "جارٍ نسخ الأسئلة..."
+      submit_copying_failed: 
+        few: "فشل نسخ الأسئلة، الرجاء إعادة المحاولة"
+        many: "فشل نسخ الأسئلة، الرجاء إعادة المحاولة"
+        one: "فشل نسخ السؤال، الرجاء إعادة المحاولة"
+        other: "فشل نسخ الأسئلة، الرجاء إعادة المحاولة"
+        two: "فشل نسخ السؤالين، الرجاء إعادة المحاولة"
+        zero: "فشل نسخ الأسئلة، الرجاء إعادة المحاولة"
+      submit_moving: 
+        few: "جارٍ نقل الأسئلة..."
+        many: "جارٍ نقل الأسئلة..."
+        one: "جارٍ نقل السؤال..."
+        other: "جارٍ نقل الأسئلة..."
+        two: "جارٍ نقل السؤالين..."
+        zero: "جارٍ نقل الأسئلة..."
+      submit_moving_failed: 
+        few: "فشل نقل الأسئلة، الرجاء إعادة المحاولة"
+        many: "فشل نقل الأسئلة، الرجاء إعادة المحاولة"
+        one: "فشل نقل السؤال، الرجاء إعادة المحاولة"
+        other: "فشل نقل الأسئلة، الرجاء إعادة المحاولة"
+        two: "فشل نقل السؤالين، الرجاء إعادة المحاولة"
+        zero: "فشل نقل الأسئلة، الرجاء إعادة المحاولة"
+      submit_retry_copying: "فشل نسخ السؤال، الرجاء المحاولة مرة أخرى..."
+      submit_retry_moving: "فشل نقل السؤال، الرجاء المحاولة مرة أخرى..."
+    default_name: "بلا اسم"
+    delete_are_you_sure: "هل ترغب بالفعل في حذف بنك الأسئلة هذا؟"
+    error_loading_banks: "خطأ أثناء تحميل البنوك"
+    links: 
+      more_questions: "مزيد من الأسئلة"
+    load_questions: "جارٍ تحميل الأسئلة..."
+    loading_banks: "جارٍ تحميل البنوك..."
+    loading_more_fail: "فشل تحميل المزيد من الأسئلة، يرجى المحاولة مرة أخرى"
+    move_questions: "نقل الأسئلة"
+    multiple_questions: "أسئلة متعددة"
+    question_bank: "بنك الأسئلة"
     remove_outcome_from_bank: "هل ترغب بالتأكيد في إزالة هذا الناتج من بنك الأسئلة؟"
+    title: 
+      move_copy_questions: "نقل/نسخ الأسئلة"
     update_outcomes_fail: "فشل تحديث النتائج"
     updating_outcomes: "جارٍ تحديث النتائج..."
   question_banks: 
@@ -11182,11 +11297,8 @@ ar:
       links: 
         delete_question: "حذف هذا السؤال"
         edit_question: "تحرير هذا السؤال"
-      move_bank: "نقل/نسخ سؤال إلى بنوك أخرى"
+      move_bank: "نقل/نسخ السؤال إلى بنك آخر"
     show: 
-      already_bookmarked: "تم وضع إشارة مرجعية بالفعل"
-      bookmark_failed: "فشل وضع الإشارة المرجعية"
-      bookmarking: "جارٍ وضع الإشارات المرجعية..."
       button: 
         cancel: إلغاء
         move_copy_question: "نقل/نسخ السؤال"
@@ -11197,40 +11309,7 @@ ar:
         delete: "حذف البنك"
         edit: "تحرير تفاصيل البنك"
         move_questions: "نقل الأسئلة المتعددة"
-        submit_copying: 
-          few: "جارٍ نسخ الأسئلة..."
-          many: "جارٍ نسخ الأسئلة..."
-          one: "جارٍ نسخ السؤال..."
-          other: "جارٍ نسخ الأسئلة..."
-          two: "جارٍ نسخ الأسئلة..."
-          zero: "جارٍ نسخ الأسئلة..."
-        submit_copying_failed: 
-          few: "فشل نسخ الأسئلة، الرجاء إعادة المحاولة"
-          many: "فشل نسخ الأسئلة، الرجاء إعادة المحاولة"
-          one: "فشل نسخ السؤال، الرجاء إعادة المحاولة"
-          other: "فشل نسخ الأسئلة، الرجاء إعادة المحاولة"
-          two: "فشل نسخ الأسئلة، الرجاء إعادة المحاولة"
-          zero: "فشل نسخ الأسئلة، الرجاء إعادة المحاولة"
-        submit_moving: 
-          few: "جارٍ نقل الأسئلة..."
-          many: "جارٍ نقل الأسئلة..."
-          one: "جارٍ نقل السؤال..."
-          other: "جارٍ نقل الأسئلة..."
-          two: "جارٍ نقل الأسئلة..."
-          zero: "جارٍ نقل الأسئلة..."
-        submit_moving_failed: 
-          few: "فشل نقل الأسئلة، الرجاء إعادة المحاولة"
-          many: "فشل نقل الأسئلة، الرجاء إعادة المحاولة"
-          one: "فشل نقل السؤال، الرجاء إعادة المحاولة"
-          other: "فشل نقل الأسئلة، الرجاء إعادة المحاولة"
-          two: "فشل نقل الأسئلة، الرجاء إعادة المحاولة"
-          zero: "فشل نقل الأسئلة، الرجاء إعادة المحاولة"
-        submit_retry_copying: "فشل نسخ السؤال، الرجاء المحاولة مرة أخرى..."
-        submit_retry_moving: "فشل نقل السؤال، الرجاء المحاولة مرة أخرى..."
-      default_name: "لا يوجد اسم"
-      delete_are_you_sure: "هل ترغب بالتأكيد في حذف بنك الأسئلة هذا؟"
       edit_warning: "تذكر، التغييرات التي تمت على قوالب الأسئلة لن تحدّث الاختبارات التي تستخدم تلك الأسئلة بالفعل تلقائيًا."
-      error_loading_banks: "خطأ أثناء تحميل البنوك"
       headings: 
         aligned_outcomes: "النتائج التي تمت محاذاتها"
       labels: 
@@ -11241,18 +11320,11 @@ ar:
       links: 
         align_outcome: "محاذاة الناتج"
         more_questions: "مزيد من الأسئلة"
-      load_questions: "جارٍ تحميل الأسئلة..."
       loading_banks: "جارٍ تحميل البنوك..."
-      loading_more_fail: "فشل تحميل مزيد من الأسئلة، يرجى المحاولة مرة أخرى"
       mastery_threshold: "الإتقان في %{threshold_percentage}"
       move_copy: نقل/نسخ
-      move_questions: "نقل الأسئلة"
-      multiple_questions: "الأسئلة المتعددة"
-      question_bank: "بنك الأسئلة"
       select_bank: "حدد بنك أسئلة الوجهة لهذا السؤال:"
       show_details: "إظهار تفاصيل السؤال"
-      title: 
-        move_copy_questions: "نقل/نسخ الأسئلة"
   question_unanswered: "لم تتم الإجابة بعد"
   quick_start_bar: 
     announcement: 
@@ -11269,24 +11341,13 @@ ar:
     quick_start_bar_view: 
       new: "جديد:"
   quiz: 
-    current_filter: "عامل التصفية الحالي"
-    default_question_input: "[ تحديد ]"
-    default_text_only_question_name: مباعد
-    default_title: "اختبار غير مسمى"
-    errors: 
-      invalid_hide_results: "إخفاء النتائج غير صالح."
-      invalid_ip_filter: "عامل تصفية IP غير صالح"
-      invalid_quiz_type: "نوع الاختبار غير صالح"
-    question_name_counter: "السؤال %{question_number}"
     regrade: 
       give_everyone_full_credit: "امنح كل شخص الدرجة الكاملة لهذا السؤال."
       no_scores_reduced: "منح النقاط لكل من الأسئلة التي تم تصحيحها والأسئلة الصحيحة السابقة (*لن يتم تقليل أي درجات*)"
+      regrade_disabled: "غير مسموح بإعادة تقييم الدرجة لهذا السؤال لأنه تم حذف إحدى الإجابات بعد أن أكمل الطالب عملية الإرسال."
       regrade_options: "خيارات إعادة النقييم *(للطلاب الذين أجابوا بالفعل على هذا السؤال):*"
       some_scores_reduced: "منح النقاط للإجابة الصحيحة فقط (*قد يتم تقليل بعض درجات الطلاب*)"
       update_question_without_regrading: "تحديث السؤال دون إعادة تقييم"
-    types: 
-      quiz: اختبار
-      survey: استطلاع
   quiz_group: 
     errors: 
       no_bank: "تعذر العثور على بنك أسئلة لمجموعة الاختبار %{group_name}"
@@ -11301,6 +11362,7 @@ ar:
       generate_report_name: "إنشاء %{report_name}"
       generated_at_date_time: "تم الإنشاء في %{dateAndTime}"
       generating_report_name: "جارٍ إنشاء %{report_name}..."
+      item_analysis_not_available: "تحليل العنصر غير متاح للاستبيانات"
   quiz_statistics: 
     statistics_filename: "تقرير %{quiz_title} %{quiz_type} %{report_type}"
     types: 
@@ -11359,6 +11421,7 @@ ar:
     cant_unpublish_when_students_submit: "لا يمكن إلغاء النشر في حالة وجود عمليات إرسال لطالب"
     choose_option: "[ اختيار ]"
     confirms: 
+      delete_answer: "هل أنت متأكد؟ حذف إجابات من سؤال تمت له عمليات إرسال يؤدي إلى تعطيل هذا الخيار الخاص بإعادة تقدير درجة هذا السؤال."
       delete_question: "هل ترغب بالتأكيد في حذف هذا السؤال؟"
       delete_quiz: "هل ترغب بالتأكيد في حذف هذا الاختبار؟"
       scrap_and_restart: "هل تريد كشط هذا الاختبار والبدء من جديد؟"
@@ -11538,7 +11601,7 @@ ar:
         essay: "سيتم منح الطلاب حقلا نصيًا لتأليف الإجابة الصحيحة."
         file_upload: "سيتمكن الطلاب من تحميل ملف لإجابتهم."
         fill_in_multiple_blanks: "أدخل سؤالك، محددًا إلى أين يجب أن ينتقل كل فراغ. ثم حدد الإجابة الصحيحة الممكنة لكل فراغ. ويجب على الطلاب كتابة الإجابات الصحيحة في المربعات النصية في كل فراغ."
-        formula_definition: "وبعد ذلك، سيلزم كتابة الصيغة أو الصيغة المستخدمة لاحتساب الإجابة الصحيحة. وما عليك سوى استخدام نفس أسماء المتغيرات المسرودة أعلاه."
+        formula_definition: "بعد ذلك، ستحتاج إلى كتابة الصيغة أو الصيغ المستخدمة لحساب الإجابة الصحيحة. وما عليك سوى استخدام نفس أسماء المتغيرات المذكورة أعلاه."
         matching: "قم بتكوين زوجين من القيم المتطابقة. وسيرى الطلاب القيم الموجودة على اليسار ويجب عليهم تحديد القيمة المطابقة على اليمين من قائمة منسدلة. ويمكن أن تحمل الصفوف المتعددة نفس الإجابة، كما يمكنك إضافة إجابات غير صحيحة إضافية على الجانب الأيمن."
         missing_word: "حدد النص للانتقال قبل القائمة المنسدلة وبعدها. وقم بتكوين مجموعة من الإجابات الممكنة وحدد إجابة صحيحة واحدة."
         multi_answer_sets: "في المربع أدناه، وفي كل مكان تريد أن تظهر فيه مربع إجابة، اكتب كلمة مرجعية (بلا مسافات) محاطة بأقواس "
@@ -11576,7 +11639,6 @@ ar:
       links: 
         add_another_answer: "إضافة إجابة أخرى"
         need_help: "هل تريد المساعدة؟"
-        switch_views: "تبديل طرق العرض"
       multi_answer_sets_example: "على سبيل المثال، \"الورود باللون [color1], البنفسج باللون [color2]\""
       offer_combinations: "يقدم %{how_many} مجموعات قيم ممكنة (أقصى حد %{max_combinations})"
       options: 
@@ -11866,7 +11928,6 @@ ar:
         new_question: "السؤال الجديد"
         new_question_group: "مجموعة الأسئلة الجديدة"
         show_assignment_rubric: "إظهار عنوان المهمة"
-        switch_views: "تبديل طرق العرض"
       manage: إدارة
       minutes: دقائق
       new_assignment: "مهمة جديدة"
@@ -12426,6 +12487,19 @@ ar:
     warnings: 
       unpublished_changes: "*لقد أجريت تغييرات غير منشورة في هذا الاختبار.* ولن تظهر هذه التغييرات للطلاب حتى تقوم بنشر الاختبار أو تعيد نشره."
       unpublished_quiz: "*هذا الاختبار غير منشور* يمكن للمعلمين فقط مشاهدة هذا الاختبار حتى يتم نشره."
+  quizzes/quiz: 
+    current_filter: "عامل التصفية الحالي"
+    default_question_input: "[ تحديد ]"
+    default_text_only_question_name: مباعد
+    default_title: "اختبار غير مسمى"
+    errors: 
+      invalid_hide_results: "إخفاء النتائج غير صالح."
+      invalid_ip_filter: "عامل تصفية IP غير صالح"
+      invalid_quiz_type: "نوع الاختبار غير صالح"
+    question_name_counter: "السؤال %{question_number}"
+    types: 
+      quiz: الاختبار
+      survey: الاستطلاع
   quizzes_model: 
     cant_unpublish_when_students_submit: "لا يمكن إلغاء النشر في حالة وجود عمليات إرسال لطالب"
     confirms: 
@@ -12572,6 +12646,7 @@ ar:
       undelete_courses: "إلغاء حذف المساقات"
       view_all_grades: "عرض كافة الدرجات"
       view_analytics: "عرض صفحات المعلومات التحليلية"
+      view_course_changes: "عرض سجلات تغيير المساق"
       view_error_reports: "عرض تقارير الأخطاء"
       view_grade_changes: "عرض سجلات تغيير الدرجات"
       view_group_pages: "عرض صفحات المجموعات الخاصة بكافة مجموعات الطلاب"
@@ -12690,6 +12765,7 @@ ar:
         are_you_sure_delete: "هل ترغب بالتأكيد في حذف هذا العنوان؟  أي مكان ما زال يستخدم العنوان حاليًا سيظل قادرًا على الوصول لهذا العنوان، لكن لن يستطيع أي شخص آخر استخدامه."
         are_you_sure_remove: "هل ترغب بالتأكيد في إزالة هذا العنوان من قائمتك؟"
       remove_rubric: "إزالة هذا العنوان من قائمتي"
+  screenreader_gradebook_description: "يوفر \"دفتر درجات قارئ الشاشة\" واجهة لدفتر الدرجات المصمم بغرض إمكانية وصول ذوي الاحتياجات الخاصة."
   scribd: 
     upgrade_flash: "مرحبًا، إصدار Adobe Flash Player الذي لديك قديم. لاستخدام iPaper (وكثير من المواد الأخرى على الويب) تحتاج إلى %{link_tag}get the latest Flash player%{end_link}."
   search: 
@@ -13433,6 +13509,15 @@ ar:
         click_to_embed: "انقر لتضمين %{image}"
         embed_image: "انقر لتضمين الصورة "
     wiki_sidebar: 
+      aria: 
+        file_label: "حدد ملفًا، حد التحميل 50"
+      aria_label: 
+        folder_select_label: "حدد مجلدًا لتحميل صورتك إليه"
+        image_form_collapsed: "انقر لتبديل نموذج تحميل صورة جديدة (مطوي)"
+      aria_labels: 
+        files: "الملفات، استخدم السهم السفلي والسهم العلوي للتنقل خلال الشجرة، واضغط على السهم الأيمن لتوسيع المجلدات وعلى السهم الأيسر لطيها"
+      aria_only: 
+        folder: مجلد
       buttons: 
         insert_link: "إدراج الارتباط"
         upload: تحميل
@@ -13505,7 +13590,6 @@ ar:
       new_page_name: "ماذا تود أن تسمي الصفحة الجديدة؟"
       select_destination: "حدد مجلد وجهة لـ %{count} ملفًا (ملفات) هذه:"
       tabs: 
-        collections: المجموعات
         files: الملفات
         images: الصور
         links: ارتباطات
@@ -13590,8 +13674,14 @@ ar:
       forward: "إعادة توجيه"
   sr_gradebook: 
     all_sections: "كل الأقسام"
+    assignment_muted: "انقر لإلغاء كتم الصوت."
+    assignment_order_alpha: أبجديًا
+    assignment_order_assignment_groups: "حسب مجموعة المهام والمنصب"
+    assignment_order_due_date: "حسب تاريخ الاستحقاق"
+    assignment_unmuted: "انقر لكتم الصوت."
     no_assignment: "لم يتم اختيار مهمة"
     no_student: "لم يتم اختيار أي طالب"
+    student_hidden_name: "الطالب %{position}"
   statistics: 
     csv_columns: 
       attempt: المحاولة
@@ -13608,6 +13698,14 @@ ar:
     exact_answer: "%{exact_value} +/- %{margin}"
     inexact_answer: "%{lower_bound} إلى %{upper_bound}"
     no_answer: "لا توجد إجابة"
+  status_dates: 
+    available: متوفر
+    available_until: "متوفر حتى"
+    closed: مغلق
+    due: مستحق
+    everyone_else: "أي شخص آخر"
+    not_available: "متوفر في"
+    pending: "غير متوفر حتى"
   step: خطوة
   sub_accounts: 
     alerts: 
@@ -13752,6 +13850,7 @@ ar:
       paper_view: "عرض الصفحة"
       plain_view: "عرض نص عادي"
       preview_document: "معاينة المستند"
+      preview_title: "معاينة %{title}"
       quiz_submission: "كان هذا الإرسال إرسال اختبار. تمت إعادة التوجيه إلى صفحة الاختبار."
       show_entire_discussion: "إظهار المناقشة الكاملة"
       student: الطالب
@@ -13802,6 +13901,8 @@ ar:
     quizzes: الاختبارات
     settings: إعدادات
     syllabus: المناهج
+    tab_location_error: "موقع علامة التبويب هذه غير صالح"
+    tab_unmanagable_error: "%{css_class} غير قابل للإدارة"
   terms: 
     index: 
       date: 
@@ -13821,6 +13922,7 @@ ar:
       titles: 
         enrollment_terms: "شروط التسجيل"
         term_details: "تفاصيل الشروط"
+      update_term: "تحديث الشرط"
     term: 
       buttons: 
         add: "إضافة المصطلح"
@@ -13909,6 +14011,7 @@ ar:
       flickr: Flickr
       image_height: "ارتفاع الصورة"
       image_source: "مصدر الصورة"
+      image_url_field_label: "عنوان URL للصورة"
       image_width: "عرض الصورة"
       url: URL
   title_separator: ": "
@@ -13960,7 +14063,6 @@ ar:
   unknown_quiz: "الاختبار غير معروف"
   unsupported_package: "حزمة محتوى غير مدعومة"
   user: 
-    default_collection_name: "مجموعة %{user_name}"
     default_user_name: المستخدم
     errors: 
       already_enrolled: "أنت مسجل بالفعل في هذا المساق"
@@ -13975,10 +14077,6 @@ ar:
   user_date_range_search: 
     cant_be_blank: "لا يمكن ترك معرف مستخدم Canvas فارغًا"
     cant_come_before_from: "لا يمكن أن يكون \"إلى تاريخ\" قبل \"من تاريخ\""
-  user_follow: 
-    errors: 
-      follow_own_collection: "لا يمكنك متابعة المجموعة الخاصة بك"
-      follow_self: "لا يمكنك متابعة نفسك"
   user_lists: 
     add_n_users: 
       few: "حسنًا يبدو جيدًا، أضف هؤلاء الـ %{count} من المستخدمين"
@@ -14440,6 +14538,9 @@ ar:
     default_group_wiki_name: "%{group_name} Wiki"
     front_page_name: "الصفحة الأمامية"
     sidebar: 
+      aria_tree: 
+        file: ملف
+        folder: مجلد
       buttons: 
         uploading: "جارٍ التحميل..."
       errors: 
@@ -14447,6 +14548,9 @@ ar:
         no_valid_image_files_selected: "لم يتم تحديد أي ملفات صور صالحة"
         unexpected_upload_problem: "حدثت مشكلة غير متوقعة أثناء تحميل %{filename}.  يرجى المحاولة مرة أخرى."
         upload_failed: "فشل التحميل، الرجاء المحاولة مرة أخرى"
+      image_form: 
+        collapsed: "انقر لتبديل نموذج الصورة الجديدة (مطوي)"
+        expanded: "انقر لتبديل نموذج الصورة الجديدة (موسّع)"
       loading_more_results: "تحميل مزيد من النتائج"
       no_title: "بلا عنوان"
       titles: 
@@ -14462,8 +14566,10 @@ ar:
       page_locked_by_modules: "ستتم إتاحة هذه الصفحة بمجرد إكمال هذه الوحدات:"
       page_locked_by_modules_until: "ستتم إتاحة هذه الصفحة على %{lock_info.unlock_at} في حالة إكمال هذه الوحدات:"
       page_locked_until: "ستتم إتاحة هذه الصفحة على %{lock_info.unlock_at}"
+      published_indicator: منشور
       toolbar_menu: 
         settings: إعدادات
+      unpublished_indicator: "غير منشور"
       view_page_history_wiki: "عرض محفوظات الصفحات"
     wiki_page_content: 
       page_locked: "هذه الصفحة مُؤَمّنة"
@@ -14519,6 +14625,7 @@ ar:
     atom_entry_title: "صفحة Wiki، %{course_or_group_name}: %{page_title}"
     cannot_hide_page: "لا يمكن إخفاء الصفحة الأمامية"
     cannot_set_hidden_front_page: "لا يمكن التعيين كصفحة أمامية لأنها مخفية"
+    cannot_set_unpublished_front_page: "لا يمكن التعيين كصفحة أمامية لأنها غير منشورة"
     defaults: 
       no_content: "لا يوجد محتوى"
     errors: 
@@ -14625,8 +14732,8 @@ ar:
       wiki_description_header: "ما الهدف من وجود wiki؟"
   wiki_pages_api: 
     cannot_delete_front_page: "لا يمكن حذف الصفحة الأمامية"
+    cannot_have_hidden_front_page: "لا يمكن أن تكون الصفحة الأمامية مخفية"
     cannot_have_unpublished_front_page: "تعذر إلغاء نشر الصفحة الأمامية"
-    cannot_hide_front_page: "يتعذر إخفاء الصفحة الأمامية عن الطلاب"
     cannot_update_editing_roles: "غير مسموح لك بتحديث أدوار التحرير لصفحة wiki هذه"
     cannot_update_front_page: "غير مسموح لك بتغيير صفحة wiki الأمامية"
     cannot_update_hide_from_students: "غير مسموح لك بتحديث علامة المخفي من الطلاب الخاصة بصفحة wiki هذه"
