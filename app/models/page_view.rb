@@ -250,21 +250,44 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def create_without_callbacks
-    user.shard.activate do
-      return super unless PageView.cassandra?
-      self.created_at ||= Time.zone.now
-      PageView::EventStream.insert(self)
-      @new_record = false
-      self.id
+  if CANVAS_RAILS2
+    def create_without_callbacks
+      user.shard.activate do
+        return super unless PageView.cassandra?
+        self.created_at ||= Time.zone.now
+        PageView::EventStream.insert(self)
+        @new_record = false
+        self.id
+      end
     end
-  end
 
-  def update_without_callbacks
-    user.shard.activate do
+    def update_without_callbacks
+      user.shard.activate do
+        return super unless PageView.cassandra?
+        PageView::EventStream.update(self)
+        true
+      end
+    end
+  else
+    def create
       return super unless PageView.cassandra?
-      PageView::EventStream.update(self)
-      true
+      user.shard.activate do
+        run_callbacks(:create) do
+          PageView::EventStream.insert(self)
+          @new_record = false
+          self.id
+        end
+      end
+    end
+
+    def update
+      return super unless PageView.cassandra?
+      user.shard.activate do
+        run_callbacks(:update) do
+          PageView::EventStream.update(self)
+          true
+        end
+      end
     end
   end
 
