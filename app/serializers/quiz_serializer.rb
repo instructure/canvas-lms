@@ -12,11 +12,19 @@ class QuizSerializer < Canvas::APISerializer
               :lock_explanation, :hide_results, :show_correct_answers_at,
               :hide_correct_answers_at, :all_dates, :can_unpublish, :can_update,
               :require_lockdown_browser, :require_lockdown_browser_for_results,
-              :require_lockdown_browser_monitor, :lockdown_browser_monitor_data
+              :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
+              :speed_grader_url
 
-  def_delegators :@controller, :api_v1_course_assignment_group_url
+  def_delegators :@controller,
+    :api_v1_course_assignment_group_url,
+    :speed_grader_course_gradebook_url
 
   has_one :assignment_group, embed: :ids, key: :assignment_group
+
+  def speed_grader_url
+    return nil unless show_speedgrader?
+    speed_grader_course_gradebook_url(quiz.context, assignment_id: quiz.assignment.id)
+  end
 
   def html_url
     controller.send(:course_quiz_url, context, quiz)
@@ -36,7 +44,7 @@ class QuizSerializer < Canvas::APISerializer
     quiz.grants_right?(current_user, session, :update)
   end
 
-  def include_access_code?
+  def include_grading_attribute?
     quiz.grants_right?(current_user, session, :grade)
   end
 
@@ -48,7 +56,7 @@ class QuizSerializer < Canvas::APISerializer
     super(keys).select do |key|
       case key
       when :all_dates then include_all_dates?
-      when :access_code then include_access_code?
+      when :access_code, :speed_grader_url then include_grading_attribute?
       when :unpublishable then include_unpublishable?
       else true
       end
@@ -100,6 +108,12 @@ class QuizSerializer < Canvas::APISerializer
 
   def stringify_ids?
     !!(accepts_jsonapi? || stringify_json_ids?)
+  end
+
+  private
+
+  def show_speedgrader?
+    quiz.assignment.present? && quiz.published? && quiz.context.allows_speed_grader?
   end
 
 end

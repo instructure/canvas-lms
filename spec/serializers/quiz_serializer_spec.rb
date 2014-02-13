@@ -52,6 +52,33 @@ describe QuizSerializer do
     json[:html_url].should == 'http://example.com/courses/1/quizzes/1'
   end
 
+  it "serializes speed_grader_url" do
+    # No assignment, so it should be nil
+    json[:speed_grader_url].should be_nil
+    assignment = Assignment.new
+    assignment.id = 1
+    assignment.context_id = @context.id
+    @quiz.stubs(:assignment).returns assignment
+
+    # nil when quiz is unpublished
+    @quiz.stubs(:published?).returns false
+    @serializer.as_json[:quiz][:speed_grader_url].should be_nil
+
+    # nil when context doesn't allow speedgrader
+    @quiz.stubs(:published?).returns true
+    @context.expects(:allows_speed_grader?).returns false
+    @serializer.as_json[:quiz][:speed_grader_url].should be_nil
+
+    @context.expects(:allows_speed_grader?).returns true
+    json = @serializer.as_json[:quiz]
+    json[:speed_grader_url].should ==
+      controller.send(:speed_grader_course_gradebook_url, @quiz.context, assignment_id: @quiz.assignment.id)
+
+    # Students shouldn't be able to see speed_grader_url
+    @quiz.stubs(:grants_right?).returns false
+    @serializer.as_json[:quiz].should_not have_key :speed_grader_url
+  end
+
   it "doesn't include the access code unless the user can grade" do
     quiz.expects(:grants_right?).with(@user, @session, :grade).
       at_least_once.returns true

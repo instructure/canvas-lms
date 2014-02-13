@@ -185,6 +185,11 @@
 #           "description": "(Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.",
 #           "example": "This quiz is locked until September 1 at 12:00am",
 #           "type": "string"
+#         },
+#         "speedgrader_url": {
+#           "description": "Link to Speed Grader for this quiz. Will not be present if quiz is unpublished",
+#           "example": "http://canvas.instructure.com/courses/1/speed_grader?assignment_id=1",
+#           "type": "string"
 #         }
 #       }
 #     }
