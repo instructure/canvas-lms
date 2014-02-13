@@ -1092,16 +1092,18 @@ shared_examples_for "in-process server selenium tests" do
       @db_connection = ActiveRecord::Base.connection
       @dj_connection = Delayed::Backend::ActiveRecord::Job.connection
 
-      # synchronize the execute method for a modicum of thread safety
+      # synchronize db connection methods for a modicum of thread safety
+      methods_to_sync = CANVAS_RAILS2 ? %w{execute} : %w{execute exec_cache exec_no_cache query}
       [@db_connection, @dj_connection].each do |conn|
-        if !conn.respond_to?(:execute_without_synchronization)
-          conn.class.class_eval do
-            def execute_with_synchronization(*args)
-              @mutex ||= Mutex.new
-              @mutex.synchronize { execute_without_synchronization(*args) }
-            end
-
-            alias_method_chain :execute, :synchronization
+        methods_to_sync.each do |method_name|
+          if conn.respond_to?(method_name, true) && !conn.respond_to?("#{method_name}_with_synchronization", true)
+            conn.class.class_eval <<-RUBY
+              def #{method_name}_with_synchronization(*args)
+                @mutex ||= Mutex.new
+                @mutex.synchronize { #{method_name}_without_synchronization(*args) }
+              end
+              alias_method_chain :#{method_name}, :synchronization
+            RUBY
           end
         end
       end
