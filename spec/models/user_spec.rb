@@ -161,7 +161,7 @@ describe User do
       course_with_teacher(:active_all => true)
       course_with_student(:active_all => true, :course => @course)
       assignment = @course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
-      sub = bare_submission_model assignment, @student, :submission_type => "online_text_entry", :body => "submission"
+      sub = assignment.submit_homework @student, body: "submission"
       sub.add_comment :author => @teacher, :comment => "lol"
       item = StreamItem.last
       item.asset.should == sub
@@ -2116,9 +2116,9 @@ describe User do
     it "should limit the number of returned assignments" do
       20.times do |x|
         assignment = @course1.assignments.create!(:title => "excess assignment #{x}", :submission_types => ['online_text_entry'])
-        bare_submission_model assignment, @studentB
+        assignment.submit_homework @studentB, body: "hello"
       end
-      @teacher.assignments_needing_grading.size.should < 22
+      @teacher.assignments_needing_grading.size.should == 15
     end
 
     context "sharding" do
@@ -2133,7 +2133,7 @@ describe User do
           @course3.enroll_student(@studentA).accept!
           @course3.enroll_student(@studentB).accept!
           @assignment3 = @course3.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
-          bare_submission_model @assignment3, @studentA, :submission_type => "online_text_entry", :body => "submission for A"
+          @assignment3.submit_homework @studentA, body: "submission for A"
         end
       end
 
