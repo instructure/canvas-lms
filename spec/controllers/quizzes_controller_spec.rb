@@ -323,10 +323,10 @@ describe QuizzesController do
       create_attachment_for_file_upload_submission!(submission)
       get 'show', :course_id => @course.id, :id => @quiz.id
       attachment = submission.attachments.first
-      assigns[:js_env][:ATTACHMENTS].should == {
-        attachment.id => {:id => attachment.id,
-                          :display_name => attachment.display_name }
-      }
+
+      attach = assigns[:js_env][:ATTACHMENTS][attachment.id]
+      attach[:id].should == attachment.id
+      attach[:display_name].should == attachment.display_name
     end
 
     it "assigns js_env for versions if submission is present" do
@@ -1067,7 +1067,6 @@ describe QuizzesController do
             }],
             :notify_of_update => true
           }
-
         @student.messages.detect{|m| m.notification_id == @notification.id}.should_not be_nil
       end
 
@@ -1279,5 +1278,6 @@ describe QuizzesController do
       response.body.should match(/^\s?$/)
     end
   end
+
 end
 

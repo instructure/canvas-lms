@@ -76,7 +76,9 @@ if CANVAS_RAILS2
 else
   gem 'encrypted_cookie_store-instructure', '1.1.1', :require => 'encrypted_cookie_store'
 end
-gem 'erubis', '2.7.0'
+if CANVAS_RAILS2
+  gem 'erubis', '2.7.0'
+end
 if CANVAS_RAILS2
   gem 'fake_arel', '1.4.0'
   gem 'fake_rails3_routes', '1.0.4'
