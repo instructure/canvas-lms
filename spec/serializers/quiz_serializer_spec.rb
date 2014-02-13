@@ -139,7 +139,6 @@ describe QuizSerializer do
       quiz.expects(:grants_right?).with(@user, session, :manage).returns true
       serializer.filter(serializer.class._attributes).should include :unpublishable
       quiz.unstub(:grants_right?)
-      quiz.expects(:grants_right?).with(@user, session, :update).at_least_once.returns false
       quiz.expects(:grants_right?).with(@user, session, :grade).at_least_once.returns false
       quiz.expects(:grants_right?).with(@user, session, :manage).at_least_once.returns false
       serializer.filter(serializer.class._attributes).should_not include :unpublishable
@@ -196,4 +195,66 @@ describe QuizSerializer do
       }
     end
   end
+
+  it 'displays overridden dates for students' do
+    student_overrides = {
+      due_at: 5.minutes.from_now,
+      lock_at: nil,
+      unlock_at: 3.minutes.from_now
+    }
+
+    quiz.expects(:due_at).never
+    quiz.expects(:lock_at).never
+    quiz.expects(:unlock_at).never
+    serializer.stubs(:due_dates).returns [student_overrides, nil]
+
+    output = serializer.as_json[:quiz]
+    output.should_not have_key :all_dates
+
+    [ :due_at, :lock_at, :unlock_at ].each do |key|
+      output[key].should == student_overrides[key]
+    end
+  end
+
+  it 'displays quiz dates for students if not overridden' do
+    quiz.expects(:due_at).at_least_once.returns 5.minutes.from_now
+    quiz.expects(:lock_at).at_least_once.returns nil
+    quiz.expects(:unlock_at).at_least_once.returns 3.minutes.from_now
+    serializer.stubs(:due_dates).returns [nil, nil]
+
+    output = serializer.as_json[:quiz]
+
+    [ :due_at, :lock_at, :unlock_at ].each do |key|
+      output[key].should == quiz.send(key)
+    end
+  end
+
+  it 'includes all_dates for teachers and observers' do
+    quiz.due_at = 1.hour.from_now
+
+    teacher_overrides = [{
+      due_at: quiz.due_at,
+      lock_at: nil,
+      unlock_at: nil,
+      base: true
+    }, {
+      due_at: 30.minutes.from_now,
+      lock_at: 1.hour.from_now,
+      unlock_at: 10.minutes.from_now,
+      title: 'Some Section'
+    }]
+
+    quiz.expects(:due_at).at_least_once
+    quiz.expects(:lock_at).at_least_once
+    quiz.expects(:unlock_at).at_least_once
+    serializer.stubs(:due_dates).returns [nil, teacher_overrides]
+
+    output = serializer.as_json[:quiz]
+    output.should have_key :all_dates
+    output[:all_dates].length.should == 2
+    output[:all_dates].detect { |e| e[:base] }.should == teacher_overrides[0]
+    output[:all_dates].detect { |e| !e[:base] }.should == teacher_overrides[1]
+    output[:due_at].should == quiz.due_at
+  end
+
 end

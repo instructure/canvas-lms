@@ -60,9 +60,6 @@ class Quizzes::QuizzesController < ApplicationController
             :can_update    => is_authorized_action?(q, @current_user, :update),
             :can_unpublish => q.can_unpublish?
           }
-          hash[q.id][:all_dates] = if is_authorized_action?(q, @current_user, :update)
-            q.dates_hash_visible_to(@current_user)
-          end
         end
 
       # legacy

@@ -36,13 +36,14 @@ class QuizSerializer < Canvas::APISerializer
   end
 
   def all_dates
-    quiz.dates_hash_visible_to user
+    quiz.formatted_dates_hash(due_dates[1])
   end
 
   def locked_for_json_type; 'quiz' end
 
+  # Teacher or Observer?
   def include_all_dates?
-    quiz.grants_right?(current_user, session, :update)
+    due_dates[1].present?
   end
 
   def include_grading_attribute?
@@ -117,4 +118,28 @@ class QuizSerializer < Canvas::APISerializer
     quiz.assignment.present? && quiz.published? && quiz.context.allows_speed_grader?
   end
 
+  def due_dates
+    @due_dates ||= quiz.due_dates_for(current_user)
+  end
+
+  # If the current user is a student and is in a course section which has
+  # an assignment override, the date will be that of the section's, otherwise
+  # we will use the Quiz's.
+  #
+  # @param [:due_at|:lock_at|:unlock_at] domain
+  def overridden_date(domain)
+    due_dates[0] ? due_dates[0][domain] : quiz.send(domain)
+  end
+
+  def due_at
+    overridden_date :due_at
+  end
+
+  def lock_at
+    overridden_date :lock_at
+  end
+
+  def unlock_at
+    overridden_date :unlock_at
+  end
 end
