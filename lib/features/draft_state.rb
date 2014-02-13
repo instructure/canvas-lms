@@ -17,23 +17,25 @@
 #
 
 
-module DraftState
-  class Publisher < Struct.new(:course_id)
-    def perform
-      course = Course.find(course_id)
-      course.quizzes.where(workflow_state: 'unpublished').update_all(workflow_state: 'edited')
-      course.assignments.where(workflow_state: 'unpublished').update_all(workflow_state: 'published')
-      course.context_modules.where(workflow_state: 'unpublished').update_all(workflow_state: 'active')
-      course.discussion_topics.where(workflow_state: 'unpublished').update_all(workflow_state: 'active')
+module Features
+  module DraftState
+    class Publisher < Struct.new(:course_id)
+      def perform
+        course = Course.find(course_id)
+        course.quizzes.where(workflow_state: 'unpublished').update_all(workflow_state: 'edited')
+        course.assignments.where(workflow_state: 'unpublished').update_all(workflow_state: 'published')
+        course.context_modules.where(workflow_state: 'unpublished').update_all(workflow_state: 'active')
+        course.discussion_topics.where(workflow_state: 'unpublished').update_all(workflow_state: 'active')
 
-      # content tags referencing wiki pages or quizzes do not need to be updated
-      # wiki pages and quizzes handle unpublished values correctly in non-draft state
-      course.context_module_tags.where(workflow_state: 'unpublished')
-        .where("content_type NOT IN ('WikiPage', 'Quiz', 'Quizzes::Quiz')")
-        .update_all(workflow_state: 'active')
+        # content tags referencing wiki pages or quizzes do not need to be updated
+        # wiki pages and quizzes handle unpublished values correctly in non-draft state
+        course.context_module_tags.where(workflow_state: 'unpublished')
+          .where("content_type NOT IN ('WikiPage', 'Quiz', 'Quizzes::Quiz')")
+          .update_all(workflow_state: 'active')
 
-      # invalidate cache for modules
-      course.context_modules.where("workflow_state<>'deleted'").update_all(updated_at: Time.now.utc)
+        # invalidate cache for modules
+        course.context_modules.where("workflow_state<>'deleted'").update_all(updated_at: Time.now.utc)
+      end
     end
   end
 end
@@ -74,7 +76,7 @@ END
 
     after_state_change_proc: ->(context, old_state, new_state) do
       if context.is_a?(Course) && old_state == 'on' && new_state == 'off'
-        Delayed::Job.enqueue(DraftState::Publisher.new(context.id), max_attempts: 1)
+        Delayed::Job.enqueue(Features::DraftState::Publisher.new(context.id), max_attempts: 1)
       end
     end
   }
