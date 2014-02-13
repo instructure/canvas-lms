@@ -112,8 +112,7 @@ class NotificationMessageCreator
   def build_fallback_for(user)
     fallback_channel = immediate_channels_for(user).sort_by(&:path_type).first
     fallback_policy = fallback_channel.notification_policies.by('daily').where(:notification_id => nil).first
-    fallback_policy ||= NotificationPolicy.new(:communication_channel => fallback_channel,
-                                               :frequency => 'daily')
+    fallback_policy ||= fallback_channel.notification_policies.create!(frequency: 'daily')
 
     build_summary_for(user, fallback_policy)
   end
@@ -125,15 +124,14 @@ class NotificationMessageCreator
   def build_summary_for(user, policy)
     message = user.messages.build(message_options_for(user))
     message.parse!('summary')
-    delayed_message = DelayedMessage.new(:notification => @notification,
-                                         :notification_policy => policy,
-                                         :frequency => policy.frequency,
-                                         :communication_channel_id => policy.communication_channel_id,
-                                         :root_account_id => message.context_root_account.try(:id),
-                                         :linked_name => 'work on this link!!!',
-                                         :name_of_topic => message.subject,
-                                         :link => message.url,
-                                         :summary => message.body)
+    delayed_message = policy.delayed_messages.build(:notification => @notification,
+                                  :frequency => policy.frequency,
+                                  :communication_channel_id => policy.communication_channel_id,
+                                  :root_account_id => message.context_root_account.try(:id),
+                                  :linked_name => 'work on this link!!!',
+                                  :name_of_topic => message.subject,
+                                  :link => message.url,
+                                  :summary => message.body)
     delayed_message.context = @asset
     delayed_message.save! if Rails.env.test?
     delayed_message

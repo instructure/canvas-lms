@@ -20,6 +20,7 @@ class NotificationPolicy < ActiveRecord::Base
   
   belongs_to :notification
   belongs_to :communication_channel
+  has_many :delayed_messages
   
   attr_accessible :notification, :communication_channel, :frequency, :notification_id, :communication_channel_id
 
