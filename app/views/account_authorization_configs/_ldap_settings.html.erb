@@ -17,7 +17,7 @@
       <th style="text-align: left"><%= before_label(t(:auth_type_label, "Type")) %></th>
       <th style="text-align: left"><%= t :setting_type_ldap, 'LDAP' %></th>
     </tr>
-    <%= fields_for @ldap_configs[0], :index => 0 do |f| %>
+    <%= fields_for :account_authorization_config, @ldap_configs[0], :index => 0 do |f| %>
       <%= f.hidden_field :disabled, :value => '0' %>
       <%= render :partial => 'ldap_settings_fields', :locals => { :f => f, :account_config => @ldap_configs[0] } %>
 
@@ -59,7 +59,7 @@
         <% end %>
       </th>
     </tr>
-    <%= fields_for @ldap_configs[1], :index => 1 do |f| %>
+    <%= fields_for :account_authorization_config, @ldap_configs[1], :index => 1 do |f| %>
       <%= f.hidden_field :disabled, :value => @ldap_configs[1].ldap_authentication? ? '0' : '1', :id => 'secondary_ldap_config_disabled' %>
       <%= render :partial => 'ldap_settings_fields', :locals => { :f => f, :account_config => @ldap_configs[1] } %>
     <% end %>
@@ -74,7 +74,7 @@
           <th><%= before_label(t(:auth_type_label, "Type")) %></th>
           <th><%= t(:secondary_ldap_label, "Secondary LDAP") %></th>
         </tr>
-        <%= fields_for aac, :index => i + 2 do |f| %>
+        <%= fields_for :account_authorization_config, aac, :index => i + 2 do |f| %>
           <%= f.hidden_field :disabled, :value => '0' %>
           <%= render :partial => 'ldap_settings_fields', :locals => { :f => f, :account_config => aac } %>
         <% end %>

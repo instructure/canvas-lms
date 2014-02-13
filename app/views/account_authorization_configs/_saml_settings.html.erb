@@ -136,7 +136,7 @@
            method = config.new_record? ? :post : :put
         %>
           <%= form_tag(url, :method => method, :id => form_id, :class => "form-horizontal bootstrap-form auth_type saml_form well", :style => hidden) do %>
-          <%= fields_for config do |f| %>
+          <%= fields_for :account_authorization_config, config do |f| %>
             <%= f.hidden_field :auth_type, :value => 'saml' %>
             <%= f.hidden_field :id %>
 

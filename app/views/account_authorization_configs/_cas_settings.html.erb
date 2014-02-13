@@ -4,7 +4,7 @@
 <% active = @account_config.cas_authentication? ? 'class="active"' : '' %>
 <div id="cas_div" <%= raw active %>>
 <%= form_tag(context_url(@account, :context_update_all_authorization_configs_url), :method => :put, :id => form_id, :class => "auth_type cas_form") do %>
-  <%= fields_for @account_config, :index => 0 do |f| %>
+  <%= fields_for :account_authorization_config, @account_config, :index => 0 do |f| %>
     <%= f.hidden_field :auth_type, :value => 'cas' %>
     <%= f.hidden_field :id %>
     <table class="formtable" style="margin-left: 20px;">
