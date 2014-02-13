@@ -33,14 +33,14 @@ describe GradebooksController do
   describe "GET 'grade_summary'" do
     it "should redirect teacher to gradebook" do
       course_with_teacher_logged_in(:active_all => true)
-      get 'grade_summary', :course_id => @course.id
+      get 'grade_summary', :course_id => @course.id, :id => nil
       response.should be_redirect
       response.should redirect_to(:controller => 'gradebook2', :action => 'show')
     end
 
     it "should render for current user" do
       course_with_student_logged_in(:active_all => true)
-      get 'grade_summary', :course_id => @course.id
+      get 'grade_summary', :course_id => @course.id, :id => nil
       response.should render_template('grade_summary')
     end
 
@@ -56,7 +56,7 @@ describe GradebooksController do
       @student = @user
       user(:active_all => true)
       user_session(@user)
-      get 'grade_summary', :course_id => @course.id
+      get 'grade_summary', :course_id => @course.id, :id => nil
       assert_unauthorized
       get 'grade_summary', :course_id => @course.id, :id => @student.id
       assert_unauthorized
@@ -206,11 +206,12 @@ describe GradebooksController do
       a1.grade_student(@student, grade: 10)
       a2.grade_student(@student, grade: 5)
       get 'grade_summary', course_id: @course.id, id: @student.id
+      expected =
       assigns[:js_env][:submissions].sort_by { |s|
-        s[:assignment_id]
+        s['assignment_id']
       }.should == [
-        {score: nil, assignment_id: a1.id},
-        {score: 5, assignment_id: a2.id}
+        {'score' => nil, 'assignment_id' => a1.id},
+        {'score' => 5, 'assignment_id' => a2.id}
       ]
     end
 
@@ -420,7 +421,7 @@ describe GradebooksController do
   describe "GET 'change_gradebook_version'" do
     it 'should switch to gradebook2 if clicked and back to gradebook1 if clicked with reset=true' do
       course_with_teacher_logged_in(:active_all => true)
-      get 'grade_summary', :course_id => @course.id
+      get 'grade_summary', :course_id => @course.id, :id => nil
 
       response.should be_redirect
       response.should redirect_to(:controller => 'gradebook2', :action => 'show')
@@ -447,7 +448,7 @@ describe GradebooksController do
       end
 
       it 'should use gradebook2 always for large_roster courses even if user prefers gradebook 1' do
-        get 'grade_summary', :course_id => @course.id
+        get 'grade_summary', :course_id => @course.id, :id => nil
         response.should be_redirect
         response.should redirect_to(:controller => 'gradebook2', :action => 'show')
       end
@@ -465,9 +466,12 @@ describe GradebooksController do
   end
 
   describe "POST 'update_submission'" do
-    it "should have a route for update_submission" do
-      params_from(:post, "/courses/20/gradebook/update_submission").should ==
-        {:controller => "gradebooks", :action => "update_submission", :course_id => "20"}
+    # rails 3 checks that a route exists when calling it
+    if CANVAS_RAILS2
+      it "should have a route for update_submission" do
+        params_from(:post, "/courses/20/gradebook/update_submission").should ==
+          {:controller => "gradebooks", :action => "update_submission", :course_id => "20"}
+      end
     end
 
     it "should allow adding comments for submission" do
@@ -524,9 +528,12 @@ describe GradebooksController do
   end
 
   describe "GET 'speed_grader'" do
-    it "should have a route for speed_grader" do
-      params_from(:get, "/courses/20/gradebook/speed_grader").should ==
-        {:controller => "gradebooks", :action => "speed_grader", :course_id => "20"}
+    # rails 3 checks that a route exists when calling it
+    if CANVAS_RAILS2
+      it "should have a route for speed_grader" do
+        params_from(:get, "/courses/20/gradebook/speed_grader").should ==
+          {:controller => "gradebooks", :action => "speed_grader", :course_id => "20"}
+      end
     end
 
     it "should redirect user if course's large_roster? setting is true" do
@@ -537,7 +544,7 @@ describe GradebooksController do
 
       get 'speed_grader', :course_id => @course.id, :assignment_id => assignment.id
       response.should be_redirect
-      response.flash[:notice].should == 'SpeedGrader is disabled for this course'
+      flash[:notice].should == 'SpeedGrader is disabled for this course'
     end
 
     context "draft state" do
@@ -555,7 +562,7 @@ describe GradebooksController do
 
         get 'speed_grader', course_id: @course, assignment_id: @assign.id
         response.should be_redirect
-        response.flash[:notice].should == I18n.t(
+        flash[:notice].should == I18n.t(
           :speedgrader_enabled_only_for_published_content,
                            'Speedgrader is enabled only for published content.')
 

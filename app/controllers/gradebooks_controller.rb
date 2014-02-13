@@ -43,35 +43,33 @@ class GradebooksController < ApplicationController
 
     if authorized_action(@presenter.student_enrollment, @current_user, :read_grades)
       log_asset_access("grades:#{@context.asset_string}", "grades", "other")
-      respond_to do |format|
-        if @presenter.student
-          add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url, @presenter.student_id))
+      if @presenter.student
+        add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url, @presenter.student_id))
 
-          Shackles.activate(:slave) do
-            #run these queries on the slave database for speed
-            @presenter.assignments
-            @presenter.groups_assignments = groups_as_assignments(@presenter.groups, :out_of_final => true, :exclude_total => @context.hide_final_grades?)
-            @presenter.submissions
-            @presenter.submission_counts
-            @presenter.assignment_stats
-          end
-
-          submissions_json = @presenter.submissions.map { |s|
-            {
-              assignment_id: s.assignment_id,
-              score: s.grants_right?(@current_user, :read_grade)? s.score  : nil
-            }
-          }
-          ags_json = light_weight_ags_json(@presenter.groups)
-          js_env submissions: submissions_json,
-                 assignment_groups: ags_json,
-                 group_weighting_scheme: @context.group_weighting_scheme,
-                 show_total_grade_as_points: @context.settings[:show_total_grade_as_points],
-                 grading_scheme: @context.grading_standard.try(:data) || GradingStandard.default_grading_standard
-          format.html { render :action => 'grade_summary' }
-        else
-          format.html { render :action => 'grade_summary_list' }
+        Shackles.activate(:slave) do
+          #run these queries on the slave database for speed
+          @presenter.assignments
+          @presenter.groups_assignments = groups_as_assignments(@presenter.groups, :out_of_final => true, :exclude_total => @context.hide_final_grades?)
+          @presenter.submissions
+          @presenter.submission_counts
+          @presenter.assignment_stats
         end
+
+        submissions_json = @presenter.submissions.map { |s|
+          {
+            'assignment_id' => s.assignment_id,
+            'score' => s.grants_right?(@current_user, :read_grade)? s.score  : nil
+          }
+        }
+        ags_json = light_weight_ags_json(@presenter.groups)
+        js_env submissions: submissions_json,
+               assignment_groups: ags_json,
+               group_weighting_scheme: @context.group_weighting_scheme,
+               show_total_grade_as_points: @context.settings[:show_total_grade_as_points],
+               grading_scheme: @context.grading_standard.try(:data) || GradingStandard.default_grading_standard
+        render :action => 'grade_summary'
+      else
+        render :action => 'grade_summary_list'
       end
     end
   end
