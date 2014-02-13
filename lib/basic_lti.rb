@@ -18,7 +18,4 @@
 module BasicLTI
 end
 
-require_dependency 'basic_lti/basic_lti'
-require_dependency 'basic_lti/tool_launch'
 require_dependency 'basic_lti/basic_outcomes'
-require_dependency 'basic_lti/variable_substitutor'

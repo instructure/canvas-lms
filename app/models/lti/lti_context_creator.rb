@@ -14,7 +14,7 @@ module Lti
     def convert
       lti_context = case @canvas_context
                       when Account
-                        LtiOutbound::LTIContext.new.tap do |lti_account|
+                        LtiOutbound::LTIAccount.new.tap do |lti_account|
                           lti_account.sis_source_id = @canvas_context.sis_source_id
                         end
                       when Course
@@ -37,7 +37,7 @@ module Lti
     private
 
     def consumer_instance
-      LtiOutbound::LTIConsumerInstance.new.tap do |consumer_instance|
+      Lti::LtiOutboundAdapter.consumer_instance_class.new.tap do |consumer_instance|
         consumer_instance.name = @root_account.name
         consumer_instance.lti_guid = @root_account.lti_guid
         consumer_instance.domain = @root_account.domain

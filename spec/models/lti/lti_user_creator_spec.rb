@@ -200,6 +200,11 @@ describe Lti::LtiUserCreator do
 
           course_user_creator.convert.currently_active_in_course.should == false
         end
+
+        it "returns nil if the context is not a course" do
+          account_admin_user(user: canvas_user, account: canvas_course.account)
+          account_user_creator.convert.currently_active_in_course.should == nil
+        end
       end
 
       describe "#concluded_enrollments" do

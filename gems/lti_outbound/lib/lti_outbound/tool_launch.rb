@@ -18,7 +18,7 @@
 module LtiOutbound
   class ToolLaunch
     attr_reader :url, :tool, :user, :context, :link_code, :return_url,
-                :resource_type, :consumer_instance, :hash, :assignment, :outgoing_email_address
+                :resource_type, :consumer_instance, :hash, :assignment, :outgoing_email_address, :selected_html
 
     def initialize(options)
       @url = options[:url] || raise('URL required for generating LTI content')
@@ -29,6 +29,7 @@ module LtiOutbound
       @return_url = options[:return_url] || raise('Return URL required for generating LTI content')
       @resource_type = options[:resource_type]
       @outgoing_email_address = options[:outgoing_email_address]
+      @selected_html = options[:selected_html]
       @consumer_instance = context.consumer_instance || raise('Consumer instance required for generating LTI content')
 
       @hash = {}
@@ -57,10 +58,6 @@ module LtiOutbound
       hash['custom_canvas_assignment_id'] = '$Canvas.assignment.id'
     end
 
-    def has_selection_html!(html)
-      hash['text'] = CGI::escape(html)
-    end
-
     def generate
       hash['lti_message_type'] = 'basic-lti-launch-request'
       hash['lti_version'] = 'LTI-1p0'
@@ -68,6 +65,7 @@ module LtiOutbound
       hash['resource_link_title'] = tool.name
       hash['user_id'] = user.opaque_identifier
       hash['user_image'] = user.avatar_url
+      hash['text'] = CGI::escape(selected_html) if selected_html
 
       hash['roles'] = user.current_role_types # AccountAdmin, Student, Faculty or Observer
 

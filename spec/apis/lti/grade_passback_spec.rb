@@ -43,6 +43,13 @@ describe LtiApiController, type: :request do
       { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
   end
 
+  def source_id
+    @tool.shard.activate do
+      payload = [@tool.id, @course.id, @assignment.id, @student.id].join('-')
+      "#{payload}-#{Canvas::Security.hmac_sha1(payload, @tool.shard.settings[:encryption_key])}"
+    end
+  end
+
   it "should respond 'unsupported' for any unknown xml body" do
     body = %{<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
     make_call('body' => body)
@@ -60,7 +67,7 @@ describe LtiApiController, type: :request do
   end
 
   def replace_result(score=nil, sourceid = nil, result_data=nil)
-    sourceid ||= BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @student)
+    sourceid ||= source_id()
     
     score_xml = ''
     if score
@@ -108,7 +115,7 @@ XML
   end
 
   def read_result(sourceid = nil)
-    sourceid ||= BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @student)
+    sourceid ||= source_id()
     body = <<-XML
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
@@ -132,7 +139,7 @@ XML
   end
 
   def delete_result(sourceid = nil)
-    sourceid ||= BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @student)
+    sourceid ||= source_id()
     body = <<-XML
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
@@ -430,12 +437,8 @@ to because the assignment has no points possible.
       assert_status(401)
     end
 
-    def sourceid
-      BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @student)
-    end
-
     def update_result(score, sourcedid = nil)
-      sourcedid ||= sourceid
+      sourcedid ||= source_id()
       body = {
         'lti_message_type' => 'basic-lis-updateresult',
         'sourcedid' => sourcedid,
@@ -444,7 +447,7 @@ to because the assignment has no points possible.
     end
 
     def read_result(sourcedid = nil)
-      sourcedid ||= sourceid
+      sourcedid ||= source_id()
       body = {
         'lti_message_type' => 'basic-lis-readresult',
         'sourcedid' => sourcedid,
@@ -452,7 +455,7 @@ to because the assignment has no points possible.
     end
 
     def delete_result(sourcedid = nil)
-      sourcedid ||= sourceid
+      sourcedid ||= source_id()
       body = {
         'lti_message_type' => 'basic-lis-deleteresult',
         'sourcedid' => sourcedid,
@@ -483,7 +486,7 @@ to because the assignment has no points possible.
         make_call('body' => update_result('0.6'))
         xml = check_success
 
-        xml.at_css('message_response > result > sourcedid').content.should == sourceid
+        xml.at_css('message_response > result > sourcedid').content.should == source_id()
         xml.at_css('message_response > result > resultscore > resultvaluesourcedid').content.should == 'decimal'
         xml.at_css('message_response > result > resultscore > textstring').content.should == '0.6'
         submission = @assignment.submissions.find_by_user_id(@student.id)
@@ -539,7 +542,7 @@ to because the assignment has no points possible.
 
         make_call('body' => read_result)
         xml = check_success
-        xml.at_css('message_response > result > sourcedid').content.should == sourceid
+        xml.at_css('message_response > result > sourcedid').content.should == source_id()
         xml.at_css('message_response > result > resultscore > textstring').content.should == '0.4'
       end
     end

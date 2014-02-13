@@ -15,8 +15,4 @@ module LtiOutbound
   require 'lti_outbound/lti_consumer_instance'
   require 'lti_outbound/tool_launch'
   require 'lti_outbound/variable_substitutor'
-
-  def self.generate(*args)
-    LtiOutbound::ToolLaunch.new(*args).generate
-  end
 end
