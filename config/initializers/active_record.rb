@@ -1063,7 +1063,10 @@ unless CANVAS_RAILS2
       end
       scope = scope.shard(args) if args.any?
       if block_given?
-        scope.activate{|rel| yield(rel) }.to_a
+        ret = scope.activate{ |rel|
+          yield(rel)
+        }
+        Array(ret)
       else
         scope.to_a
       end
