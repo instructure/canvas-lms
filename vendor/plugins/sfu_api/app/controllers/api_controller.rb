@@ -141,7 +141,7 @@ class ApiController < ApplicationController
   end
 
   def course_info(sis_id, property = nil)
-    course = Course.where(:sis_source_id => sis_id.downcase).all
+    course = Course.active.where(:sis_source_id => sis_id.downcase).all
     if course.empty?
       raise(ActiveRecord::RecordNotFound)
     end
