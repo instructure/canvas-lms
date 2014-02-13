@@ -19,6 +19,7 @@ The following objects support SIS IDs in the API:
  * `sis_group_id`
 
 Additionally, some objects support special IDs:
+
  * Users support `self` to mean the current user.
  * Accounts support `self` to mean the root account for the current domain,
    `default` to mean the Default account, and `site_admin` to mean the Site
