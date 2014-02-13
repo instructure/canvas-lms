@@ -361,7 +361,7 @@ end
   config.use_instantiated_fixtures = false
   config.fixture_path = Rails.root+'spec/fixtures/'
 
-  config.debug = true unless CANVAS_RAILS2
+  (config.debug = true rescue nil) unless CANVAS_RAILS2
 
   config.include Webrat::Matchers, :type => :views
   config.include Helpers
