@@ -1,3 +1,5 @@
+require 'csv'
+
 class QuizStatistics::ItemAnalysis < QuizStatistics::Report
 
   def filename

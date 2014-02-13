@@ -17,6 +17,7 @@
 #
 
 require 'rubygems'
+require 'csv'
 require 'net/http'
 require 'uri'
 require 'nokogiri'

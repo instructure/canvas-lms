@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
+require 'csv'
+
 describe QuizStatistics do
   before(:each) do
     student_in_course(:active_all => true)

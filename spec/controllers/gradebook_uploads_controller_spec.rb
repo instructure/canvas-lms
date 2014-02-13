@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'csv'
+
 describe GradebookUploadsController do
 
   describe "POST 'create'" do

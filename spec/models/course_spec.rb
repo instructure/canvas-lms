@@ -17,6 +17,8 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+
+require 'csv'
 require 'socket'
 
 describe Course do

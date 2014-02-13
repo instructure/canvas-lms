@@ -2,6 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/item_analysis/common.rb')
 require File.expand_path(File.dirname(__FILE__) + '/common.rb')
 
+require 'csv'
+
 describe QuizStatistics::ItemAnalysis do
   let(:report_type) { 'item_analysis' }
   include_examples "QuizStatistics::Report"

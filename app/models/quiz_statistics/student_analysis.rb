@@ -1,3 +1,5 @@
+require 'csv'
+
 class QuizStatistics::StudentAnalysis < QuizStatistics::Report
   include HtmlTextHelper
 

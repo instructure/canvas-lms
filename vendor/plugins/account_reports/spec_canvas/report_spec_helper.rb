@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../../spec/spec_helper')
 
+require 'csv'
+
 module ReportSpecHelper
   def read_report(type = @type, options = {})
     account_report = run_report(type, options)
