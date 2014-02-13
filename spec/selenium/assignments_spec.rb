@@ -199,7 +199,7 @@ describe "assignments" do
       # Assert input element is hidden to the user, but still present in the
       # form so the due date doesn't get changed to no due date.
       fj('.add_assignment_form .input-append').attribute('style').
-          should contain 'display: none;'
+          should include 'display: none;'
       f('.vdd_no_edit').text.
           should == I18n.t("#assignments.multiple_due_dates", "Multiple Due Dates")
       assignment_title = f("#assignment_title")

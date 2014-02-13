@@ -28,7 +28,7 @@ describe "web conference" do
         wait_for_ajaximations
         fj("#new-conference-list .ig-title").should be_displayed
       end
-      fj("#new-conference-list .ig-title").text.should contain(conference_title)
+      fj("#new-conference-list .ig-title").text.should include(conference_title)
     end
 
     it "should cancel creating a web conference" do

@@ -64,7 +64,7 @@ describe QuizQuestionsController, type: :request do
 
         it "has only the allowed question output fields" do
           question_fields = Api::V1::QuizQuestion::API_ALLOWED_QUESTION_OUTPUT_FIELDS[:only].map(&:to_sym) +  Api::V1::QuizQuestion::API_ALLOWED_QUESTION_DATA_OUTPUT_FIELDS.map(&:to_sym)
-          @json.keys.each { |key| question_fields.should include(key) }
+          @json.keys.each { |key| question_fields.to_s.should include(key.to_s) }
         end
 
         it "has the question data fields" do
@@ -90,7 +90,7 @@ describe QuizQuestionsController, type: :request do
         end
 
         it "should return a not found error message" do
-          @json.should contain "does not exist"
+          @json.inspect.should include "does not exist"
         end
       end
     end

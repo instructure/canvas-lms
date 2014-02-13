@@ -1227,7 +1227,7 @@ describe CoursesController, type: :request do
         test_student = @course1.student_view_student
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
-        json.map{ |s| s["name"] }.should_not contain("Test Student")
+        json.map{ |s| s["name"] }.should_not include("Test Student")
       end
 
       it "includes the test student if told to do so" do
@@ -1235,7 +1235,7 @@ describe CoursesController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json'},
                           :include => ['test_student'] )
-        json.map{ |s| s["name"] }.should contain("Test Student")
+        json.map{ |s| s["name"] }.should include("Test Student")
       end
 
       it "returns a list of users with emails" do

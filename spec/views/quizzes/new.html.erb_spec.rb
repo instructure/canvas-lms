@@ -51,13 +51,13 @@ describe "/quizzes/new" do
     it "should not display 'NOTE:' message when questions within limit" do
       QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT.times { quiz_question }
       render 'quizzes/new'
-      response.should_not contain('NOTE: Question details not available when more than')
+      response.inspect.should_not include('NOTE: Question details not available when more than')
     end
 
     it "should explain why 'Show Question Details' is disabled" do
       (QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT+1).times { quiz_question }
       render 'quizzes/new'
-      response.should contain('NOTE: Question details not available when more than')
+      response.inspect.should include('NOTE: Question details not available when more than')
     end
   end
 
@@ -75,14 +75,14 @@ describe "/quizzes/new" do
     it 'has a published inditactor when the quiz is published' do
       @quiz.stubs(:published?).returns true
       render 'quizzes/new'
-      response.should contain("Published")
-      response.should_not contain("Not Published")
+      response.inspect.should include("Published")
+      response.inspect.should_not include("Not Published")
     end
 
     it 'has a not_published indicator when the quiz is not published' do
       @quiz.stubs(:published?).returns false
       render 'quizzes/new'
-      response.should contain("Not Published")
+      response.inspect.should include("Not Published")
     end
   end
 
