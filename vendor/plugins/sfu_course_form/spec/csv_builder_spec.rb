@@ -31,8 +31,34 @@ describe 'A courses request' do
     end
   end
 
+  context 'with an excessively long cross-list' do
+    it 'should fail with error' do
+      lambda do
+        # This course name from this cross-list is not too long due to omitted titles, but the SIS ID is.
+        courses = [
+            '1141:::mse:::193:::d100:::Optional Job Practicum',
+            '1141:::mse:::293:::d100:::Industrial Internship I',
+            '1141:::mse:::293:::d200:::Industrial Internship I',
+            '1141:::mse:::294:::d100:::Special Internship I',
+            '1141:::mse:::294:::d200:::Special Internship I',
+            '1141:::mse:::393:::d100:::Industrial Internship II',
+            '1141:::mse:::393:::d200:::Industrial Internship II',
+            '1141:::mse:::394:::d100:::Special Internship II',
+            '1141:::mse:::394:::d200:::Special Internship II',
+            '1141:::mse:::493:::d100:::Industrial Internship III',
+            '1141:::mse:::493:::d200:::Industrial Internship III',
+            '1141:::mse:::493:::d300:::Industrial Internship III',
+            '1141:::mse:::494:::d100:::Special Internship III',
+            '1141:::mse:::494:::d200:::Special Internship III',
+            '1141:::mse:::494:::d300:::Special Internship III'
+        ]
+        SFU::CourseForm::CSVBuilder.build('kipling', courses, 2, 'kipling', '55599068', nil, nil, true)
+      end.should raise_error
+    end
+  end
+
   context 'with an excessively long name' do
-    let(:long_name) { 'The course has a very extremely unbelievably inexplicably ridiculously crazily really really really really really really really really really really really really really really really really really really really really really really really really long name' }
+    let(:long_name) { (0...256).map { (65 + rand(26)).chr }.join }
     it 'should fail with error for a calendar course' do
       lambda do
         SFU::CourseForm::CSVBuilder.build('kipling', ["1141:::long:::999:::d100:::#{long_name}"], 2, 'kipling', '55599068', nil, nil, false)

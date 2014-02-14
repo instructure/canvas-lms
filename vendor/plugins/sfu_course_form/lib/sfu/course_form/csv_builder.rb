@@ -2,8 +2,9 @@ module SFU
   module CourseForm
     class CSVBuilder
 
-      # Canvas course names have a limit of 255 characters max.
+      # Canvas course names and SIS IDs have a limit of 255 characters max.
       CANVAS_COURSE_NAME_MAX = 255
+      CANVAS_COURSE_SIS_ID_MAX = 255
 
       def self.build(req_user, selected_courses, account_id, teacher_username, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role, cross_list)
         builder = self.new
@@ -18,6 +19,7 @@ module SFU
         enrollment_array = [%w(course_id user_id role section_id status)]
 
         course_name_too_long = false
+        course_sis_id_too_long = false
 
         if cross_list
 
@@ -60,6 +62,7 @@ module SFU
           enrollment_array.push [course_id, teacher2_sis_user_id, teacher2_role, nil, 'active'] unless teacher2_sis_user_id.nil?
 
           course_name_too_long = true if long_name.length > CANVAS_COURSE_NAME_MAX
+          course_sis_id_too_long = true if course_id.length > CANVAS_COURSE_SIS_ID_MAX
 
         else
 
@@ -72,6 +75,7 @@ module SFU
               enrollment_array.concat sandbox[:enrollments]
 
               course_name_too_long = true if sandbox[:short_long_name].length > CANVAS_COURSE_NAME_MAX
+              course_sis_id_too_long = true if sandbox[:course_id].length > CANVAS_COURSE_SIS_ID_MAX
             elsif course.starts_with? 'ncc'
               Rails.logger.info "[SFU Course Form] Creating ncc course for #{teacher_username} requested by #{req_user}"
               ncc_course = ncc_info(course, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
@@ -80,6 +84,7 @@ module SFU
               enrollment_array.concat ncc_course[:enrollments]
 
               course_name_too_long = true if ncc_course[:short_long_name].length > CANVAS_COURSE_NAME_MAX
+              course_sis_id_too_long = true if ncc_course[:course_id].length > CANVAS_COURSE_SIS_ID_MAX
             else
               Rails.logger.info "[SFU Course Form] Creating single course container : #{course} requested by #{req_user}"
               course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
@@ -93,12 +98,14 @@ module SFU
               enrollment_array.concat course_info[:enrollments]
 
               course_name_too_long = true if course_info[:long_name].length > CANVAS_COURSE_NAME_MAX
+              course_sis_id_too_long = true if course_info[:course_id].length > CANVAS_COURSE_SIS_ID_MAX
             end
           end
 
         end
 
         raise 'The course name is too long.' if course_name_too_long
+        raise 'The resulting course SIS ID is too long.' if course_sis_id_too_long
 
         course_csv = csv_string(course_array)
         section_csv = csv_string(section_array)
@@ -159,12 +166,12 @@ module SFU
         account_sis_id = 'sfu:::sandbox:::instructors'
         course_arr = course_line.split('-')
         sandbox = { :enrollments => [] }
-        course_id = course_line
+        sandbox[:course_id] = course_line
         sandbox[:short_long_name] = "Sandbox - #{username} - #{course_arr.last}"
 
-        sandbox[:course] = [course_id, sandbox[:short_long_name], sandbox[:short_long_name], account_sis_id, nil, 'active']
-        sandbox[:enrollments] << [course_id, teacher1, 'teacher', nil, 'active']
-        sandbox[:enrollments] << [course_id, teacher2, teacher2_role, nil, 'active'] unless teacher2.nil?
+        sandbox[:course] = [sandbox[:course_id], sandbox[:short_long_name], sandbox[:short_long_name], account_sis_id, nil, 'active']
+        sandbox[:enrollments] << [sandbox[:course_id], teacher1, 'teacher', nil, 'active']
+        sandbox[:enrollments] << [sandbox[:course_id], teacher2, teacher2_role, nil, 'active'] unless teacher2.nil?
         sandbox
       end
 
@@ -173,13 +180,13 @@ module SFU
         account_sis_id = 'sfu:::ncc'
         course_arr = course_line.split('-')
         ncc = { :enrollments => [] }
-        course_id = course_arr.first(3).join('-')
+        ncc[:course_id] = course_arr.first(3).join('-')
         term = course_arr[3] # Can be empty!
         ncc[:short_long_name] = course_arr.last
 
-        ncc[:course] = [course_id, ncc[:short_long_name], ncc[:short_long_name], account_sis_id, term, 'active']
-        ncc[:enrollments] << [course_id, teacher1, 'teacher', nil, 'active']
-        ncc[:enrollments] << [course_id, teacher2, teacher2_role, nil, 'active'] unless teacher2.nil?
+        ncc[:course] = [ncc[:course_id], ncc[:short_long_name], ncc[:short_long_name], account_sis_id, term, 'active']
+        ncc[:enrollments] << [ncc[:course_id], teacher1, 'teacher', nil, 'active']
+        ncc[:enrollments] << [ncc[:course_id], teacher2, teacher2_role, nil, 'active'] unless teacher2.nil?
         ncc
       end
 
