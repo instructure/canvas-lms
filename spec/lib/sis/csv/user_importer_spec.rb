@@ -535,6 +535,16 @@ describe SIS::CSV::UserImporter do
     Pseudonym.find_by_unique_id('user2').should be_nil
   end
 
+  it "should not present an error for the same login_id with different case for same user" do
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status",
+        "user_1,user1,User,Uno,user1@example.com,active",
+        "user_1,USer1,User,Uno,user1@example.com,active"
+    )
+    Pseudonym.find_by_unique_id('USer1').should_not be_nil
+    Pseudonym.find_by_unique_id('user1').should be_nil
+  end
+
   it "should use an existing pseudonym if it wasn't imported from sis and has the same login id" do
     u = User.create!
     u.register!
