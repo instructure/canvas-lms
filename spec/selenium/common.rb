@@ -934,13 +934,31 @@ shared_examples_for "all selenium tests" do
     truncate_all_tables unless self.use_transactional_fixtures
   end
 
+  unless CANVAS_RAILS2
+    EncryptedCookieStore.class_eval do
+      cattr_accessor :test_secret
+
+      def call_with_test_secret(env)
+        @secret = self.class.test_secret
+        @encryption_key = unhex(@secret)
+        call_without_test_secret(env)
+      end
+      alias_method_chain :call, :test_secret
+    end
+  end
+
   append_before (:each) do
     #the driver sometimes gets in a hung state and this if almost always the first line of code to catch it
     begin
       tries ||= 3
       driver.manage.timeouts.implicit_wait = 3
       driver.manage.timeouts.script_timeout = 60
-      EncryptedCookieStore.any_instance.stubs(:secret).returns(SecureRandom.hex(64))
+      if CANVAS_RAILS2
+        EncryptedCookieStore.any_instance.stubs(:secret).returns(SecureRandom.hex(64))
+      else
+        EncryptedCookieStore.test_secret = SecureRandom.hex(64)
+      end
+
       enable_forgery_protection
     rescue
       if ENV['PARALLEL_EXECS'] != nil
