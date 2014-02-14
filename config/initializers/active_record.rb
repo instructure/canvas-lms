@@ -19,7 +19,9 @@ class ActiveRecord::Base
 
     def serializable_hash(options = nil)
       if options && options[:include_root]
-        {self.class.base_ar_class.model_name.element => super}
+        options = options.dup
+        options.delete(:include_root)
+        {self.class.base_ar_class.model_name.element => super(options)}
       else
         super
       end
