@@ -635,7 +635,7 @@ class PseudonymSessionsController < ApplicationController
         redirect_to oauth2_auth_confirm_url
       end
     else
-      redirect_to login_url(:canvas_login => params[:canvas_login])
+      redirect_to login_url(params.slice(:canvas_login, :pseudonym_session))
     end
   end
 
