@@ -44,7 +44,7 @@ describe "AuthenticationAudit API", type: :request do
       @account = Account.default
       user_with_pseudonym(active_all: true)
 
-      @page_view = PageView.new(options)
+      @page_view = PageView.new
       @page_view.user = @viewing_user
       @page_view.request_id = @request_id
       @page_view.remote_ip = '10.10.10.10'
