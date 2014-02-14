@@ -28,7 +28,7 @@ describe WikiPagesController do
                                                 :body => "this is the content of the wikipage body asdfasdf"
     @wiki_page.destroy
     get course_wiki_page_url(@course, @wiki_page)
-    response.body.should_not have_text @wiki_page.body
+    response.body.should_not include(@wiki_page.body)
   end
 
   it "should link correctly in the breadcrumbs for group wikis" do
