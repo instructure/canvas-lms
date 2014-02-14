@@ -848,7 +848,9 @@ class ApplicationController < ActionController::Base
     end
 
     def interpret_status(code)
-      Rack::Utils::HTTP_STATUS_CODES[Rack::Utils.status_code(code)] || Rack::Utils::HTTP_STATUS_CODES[500]
+      message = Rack::Utils::HTTP_STATUS_CODES[code]
+      code, message = [500, Rack::Utils::HTTP_STATUS_CODES[500]] unless message
+      "#{code} #{message}"
     end
 
     def response_code_for_rescue(exception)
