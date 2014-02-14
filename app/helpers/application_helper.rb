@@ -507,6 +507,10 @@ module ApplicationHelper
       # dont worry about keys that are nil or false because in javascript: if (INST.featureThatIsUndefined ) { //won't happen }
       global_inst_object[key] = value if value
     end
+    if @context && @context.respond_to?(:root_account) && global_inst_object.has_key?(:kalturaSettings)
+      global_inst_object[:kalturaSettings][:js_kaltura_uploader] = @context.root_account.settings[:js_kaltura_uploader]
+    end
+
     global_inst_object
   end
 

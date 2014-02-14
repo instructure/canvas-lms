@@ -21,6 +21,7 @@ define([
   'vendor/jquery.ba-tinypubsub',
   'jquery' /* $ */,
   'str/htmlEscape',
+  'compiled/media_comments/js_uploader',
   'compiled/jquery/mediaComment' /* $.fn.mediaComment */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jqueryui/dialog',
@@ -28,7 +29,8 @@ define([
   'jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, _, pubsub, $, htmlEscape) {
+], function(I18n, _, pubsub, $, htmlEscape, JsUploader) {
+
 
   $.mediaComment = function(command, arg1, arg2) {
     var $container = $("<div/>")
@@ -38,18 +40,17 @@ define([
 
   var domainRootAccountId;
   $.mediaComment.partnerData = function(params) {
-
-      var hash = {
-          context_code: $.mediaComment.contextCode(),
-          root_account_id: domainRootAccountId || (domainRootAccountId = Number($("#domain_root_account_id").text())),
-          context_source: ENV.CONTEXT_ACTION_SOURCE
-      }
-      if(ENV.SIS_SOURCE_ID){
-          hash['sis_source_id'] = ENV.SIS_SOURCE_ID
-      }
-      if(ENV.SIS_USER_ID){
-          hash['sis_user_id'] = ENV.SIS_USER_ID
-      }
+    var hash = {
+      context_code: $.mediaComment.contextCode(),
+      root_account_id: domainRootAccountId || (domainRootAccountId = Number($("#domain_root_account_id").text())),
+      context_source: ENV.CONTEXT_ACTION_SOURCE
+    }
+    if(ENV.SIS_SOURCE_ID){
+      hash['sis_source_id'] = ENV.SIS_SOURCE_ID
+    }
+    if(ENV.SIS_USER_ID){
+      hash['sis_user_id'] = ENV.SIS_USER_ID
+    }
     return JSON.stringify(hash);
   }
 
@@ -81,15 +82,17 @@ define([
     if (!entryId || addedEntryIds[entryId]) return;
     addedEntryIds[entryId] = true;
     var entry = {
-          mediaType: entryType,
-          entryId: entryId,
-          title: title,
-          userTitle: userTitle
-        };
+      mediaType: entryType,
+      entryId: entryId,
+      title: title,
+      userTitle: userTitle
+    };
     addEntry(entry);
   };
 
-
+  // **********************************************************************
+  // audio delegate for flash
+  // **********************************************************************
   $.mediaComment.audio_delegate = {
     readyHandler: function() {
       try {
@@ -118,7 +121,9 @@ define([
     }
   };
 
-
+  // **********************************************************************
+  // video delegate for flash
+  // **********************************************************************
   $.mediaComment.video_delegate = {
     readyWatcher: null,
     expectReady: function() {
@@ -155,7 +160,9 @@ define([
     }
   };
 
-
+  // **********************************************************************
+  // uploader flash delegate
+  // **********************************************************************
   $.mediaComment.upload_delegate = {
     currentType: 'audio',
     submit: function() {
@@ -249,12 +256,11 @@ define([
     }
   };
 
-
   var reset_selectors = false;
   var lastInit = null;
-  $.mediaComment.init = function(media_type, opts) {
+  $.mediaComment.init = function(mediaType, opts) {
     lastInit = lastInit || new Date();
-    media_type = media_type || "any";
+    mediaType = mediaType || "any";
     opts = opts || {};
     var user_name = $.trim($("#identity .user_name").text() || "");
     if(user_name) {
@@ -262,12 +268,20 @@ define([
     }
     var defaultTitle = opts.defaultTitle || user_name || I18n.t('titles.media_contribution', "Media Contribution");
     var mediaCommentReady = function() {
+      var ks, uid;
+      if (INST.kalturaSettings.js_kaltura_uploader) {
+        ks = jsUploader.getKs()
+        uid = jsUploader.getUid();
+      } else {
+        ks = $dialog.data('ks');
+        uid = $dialog.data('uid') || "ANONYMOUS"
+      }
       $("#video_record_title,#audio_record_title").val(defaultTitle);
       $dialog.dialog({
         title: I18n.t('titles.record_upload_media_comment', "Record/Upload Media Comment"),
         width: 560,
         height: 475,
-        modal: false
+        modal: true
       });
       $dialog.dialog('option', 'close', function() {
         $("#audio_record").before("<div id='audio_record'/>").remove();
@@ -279,14 +293,13 @@ define([
       $("#audio_record").before("<div id='audio_record'/>").remove();
       $("#video_record").before("<div id='video_record'/>").remove();
 
-      var ks = $dialog.data('ks');
 
-      if(media_type == "video") {
+      if(mediaType == "video") {
         $("#video_record_option").click();
         $("#media_record_option_holder").hide();
         $("#audio_upload_holder").hide();
         $("#video_upload_holder").show();
-      } else if(media_type == "audio") {
+      } else if(mediaType == "audio") {
         $("#audio_record_option").click();
         $("#media_record_option_holder").hide();
         $("#audio_upload_holder").show();
@@ -302,6 +315,9 @@ define([
       $(document).triggerHandler('reset_media_comment_forms');
 
       var temporaryName = $.trim($("#identity .user_name").text()) + " " + (new Date()).toISOString();
+      // **********************************************************************
+      // Flash audio video record (and upload)
+      // **********************************************************************
       setTimeout(function() {
         var recordVars = {
           host:location.protocol + "//" + INST.kalturaSettings.domain,
@@ -309,7 +325,7 @@ define([
           kshowId:"-1",
           pid:INST.kalturaSettings.partner_id,
           subpid:INST.kalturaSettings.subpartner_id,
-          uid:$dialog.data('uid') || "ANONYMOUS",
+          uid: uid,
           ks:ks,
           themeUrl:"/media_record/skin.swf",
           localeUrl:"/media_record/locale.xml",
@@ -357,11 +373,14 @@ define([
         // render funky in ie
       }, INST.browser.ie ? 500 : 10);
 
+      // **********************************************************************
+      // Flash uploaders
+      // **********************************************************************
       var flashVars = {
         host:location.protocol + "//" + INST.kalturaSettings.domain,
         partnerId:INST.kalturaSettings.partner_id,
         subPId:INST.kalturaSettings.subpartner_id,
-        uid:$dialog.data('uid') || "ANONYMOUS",
+        uid: uid,
         entryId: "-1",
         ks:ks,
         thumbOffset:"1",
@@ -374,11 +393,11 @@ define([
         jsDelegate: "$.mediaComment.audio_delegate"
       };
       if ( INST.kalturaSettings.do_flash_var_test ) {
-          // deprecated
-          delete flashVars['uid']
-          // stability experiments
-          flashVars.maxUploads = 5;
-        }
+        // deprecated
+        delete flashVars['uid']
+        // stability experiments
+        flashVars.maxUploads = 5;
+      }
       var params = {
         "align": "middle",
         "quality": "high",
@@ -394,80 +413,91 @@ define([
       var height = "50";
       swfobject.embedSWF("//" + INST.kalturaSettings.domain + "/kupload/ui_conf_id/" + INST.kalturaSettings.upload_ui_conf, "audio_upload", width, height, "9.0.0", false, flashVars, params);
 
-      flashVars = $.extend({}, flashVars, {jsDelegate: '$.mediaComment.video_delegate'});
-      $("#video_upload").text(I18n.t('messages.flash_required_upload_video', "Flash required for uploading video."));
-      var width = "180";
-      var height = "50";
-      swfobject.embedSWF("//" + INST.kalturaSettings.domain + "/kupload/ui_conf_id/" + INST.kalturaSettings.upload_ui_conf, "video_upload", width, height, "9.0.0", false, flashVars, params);
+        flashVars = $.extend({}, flashVars, {jsDelegate: '$.mediaComment.video_delegate'});
+        $("#video_upload").text(I18n.t('messages.flash_required_upload_video', "Flash required for uploading video."));
+        var width = "180";
+        var height = "50";
+        swfobject.embedSWF("//" + INST.kalturaSettings.domain + "/kupload/ui_conf_id/" + INST.kalturaSettings.upload_ui_conf, "video_upload", width, height, "9.0.0", false, flashVars, params);
 
-      var $audio_record_holder, $audio_record, $audio_record_meter;
-      var audio_record_counter, current_audio_level, audio_has_volume;
-      var $video_record_holder, $video_record, $video_record_meter;
-      var video_record_counter, current_video_level, video_has_volume = false;
-      reset_selectors = true;
-      setInterval(function() {
-        if(reset_selectors) {
-          $audio_record_holder = $("#audio_record_holder");
-          $audio_record = $("#audio_record");
-          $audio_record_meter = $("#audio_record_meter");
-          audio_record_counter = 0;
-          current_audio_level = 0;
-          $video_record_holder = $("#video_record_holder");
-          $video_record = $("#video_record");
-          $video_record_meter = $("#video_record_meter");
-          video_record_counter = 0;
-          current_video_level = 0;
-          reset_selectors = false;
-        }
-        audio_record_counter++;
-        video_record_counter++;
-        var audio_level = null, video_level = null;
-        if($audio_record && $audio_record[0] && $audio_record[0].getMicophoneActivityLevel && $audio_record.parent().length) {
-          audio_level = $audio_record[0].getMicophoneActivityLevel();
-        } else {
-          $audio_record = $("#audio_record");
-        }
-        if($video_record && $video_record[0] && $video_record[0].getMicophoneActivityLevel && $video_record.parent().length) {
-          video_level = $video_record[0].getMicophoneActivityLevel();
-        } else {
-          $video_record = $("#video_record");
-        }
-        if(audio_level != null) {
-          audio_level = Math.max(audio_level, current_audio_level);
-          if(audio_level > -1 && !$audio_record_holder.hasClass('with_volume')) {
-            $audio_record_meter.css('display', 'none');
-            $("#audio_record_holder").addClass('with_volume').animate({'width': 420}, function() {
-              $audio_record_meter.css('display', '');
-            });
-          }
-          if(audio_record_counter > 4) {
-            current_audio_level = 0;
-            audio_record_counter = 0;
-            var band = (audio_level - (audio_level % 10)) / 10;
-            $audio_record_meter.attr('class', 'volume_meter band_' + band);
-          } else {
-            current_audio_level = audio_level;
-          }
-        }
-        if(video_level != null) {
-          video_level = Math.max(video_level, current_video_level);
-          if(video_level > -1 && !$video_record_holder.hasClass('with_volume')) {
-            $video_record_meter.css('display', 'none');
-            $("#video_record_holder").addClass('with_volume').animate({'width': 420}, function() {
-              $video_record_meter.css('display', '');
-            });
-          }
-          if(video_record_counter > 4) {
-            current_video_level = 0;
-            video_record_counter = 0;
-            var band = (video_level - (video_level % 10)) / 10;
-            $video_record_meter.attr('class', 'volume_meter band_' + band);
-          } else {
-            current_video_level = video_level;
-          }
-        }
-      }, 20);
+          // **********************************************************************
+          // Audio meters for audio and video recording
+          // **********************************************************************
+          var $audio_record_holder, $audio_record, $audio_record_meter;
+          var audio_record_counter, current_audio_level, audio_has_volume;
+          var $video_record_holder, $video_record, $video_record_meter;
+          var video_record_counter, current_video_level, video_has_volume = false;
+          reset_selectors = true;
+          setInterval(function() {
+            if(reset_selectors) {
+              $audio_record_holder = $("#audio_record_holder");
+              $audio_record = $("#audio_record");
+              $audio_record_meter = $("#audio_record_meter");
+              audio_record_counter = 0;
+              current_audio_level = 0;
+              $video_record_holder = $("#video_record_holder");
+              $video_record = $("#video_record");
+              $video_record_meter = $("#video_record_meter");
+              video_record_counter = 0;
+              current_video_level = 0;
+              reset_selectors = false;
+            }
+            audio_record_counter++;
+            video_record_counter++;
+            var audio_level = null, video_level = null;
+            if($audio_record && $audio_record[0] && $audio_record[0].getMicophoneActivityLevel && $audio_record.parent().length) {
+              audio_level = $audio_record[0].getMicophoneActivityLevel();
+            } else {
+              $audio_record = $("#audio_record");
+            }
+            if($video_record && $video_record[0] && $video_record[0].getMicophoneActivityLevel && $video_record.parent().length) {
+              video_level = $video_record[0].getMicophoneActivityLevel();
+            } else {
+              $video_record = $("#video_record");
+            }
+            if(audio_level != null) {
+              audio_level = Math.max(audio_level, current_audio_level);
+              if(audio_level > -1 && !$audio_record_holder.hasClass('with_volume')) {
+                $audio_record_meter.css('display', 'none');
+                $("#audio_record_holder").addClass('with_volume').animate({'width': 420}, function() {
+                  $audio_record_meter.css('display', '');
+                });
+              }
+              if(audio_record_counter > 4) {
+                current_audio_level = 0;
+                audio_record_counter = 0;
+                var band = (audio_level - (audio_level % 10)) / 10;
+                $audio_record_meter.attr('class', 'volume_meter band_' + band);
+              } else {
+                current_audio_level = audio_level;
+              }
+            }
+            if(video_level != null) {
+              video_level = Math.max(video_level, current_video_level);
+              if(video_level > -1 && !$video_record_holder.hasClass('with_volume')) {
+                $video_record_meter.css('display', 'none');
+                $("#video_record_holder").addClass('with_volume').animate({'width': 420}, function() {
+                  $video_record_meter.css('display', '');
+                });
+              }
+              if(video_record_counter > 4) {
+                current_video_level = 0;
+                video_record_counter = 0;
+                var band = (video_level - (video_level % 10)) / 10;
+                $video_record_meter.attr('class', 'volume_meter band_' + band);
+              } else {
+                current_video_level = video_level;
+              }
+            }
+          }, 20);
+    } // END mediaCommentReady function
+
+    // Do JS uploader is appropriate
+    if (INST.kalturaSettings.js_kaltura_uploader) {
+      jsUploader = new JsUploader(mediaType, opts);
+      jsUploader.onReady = mediaCommentReady
+      jsUploader.addEntry = addEntry
     }
+
     var now = new Date();
     if((now - lastInit) > 300000) {
       $("#media_comment_dialog").dialog('close').remove();
@@ -475,7 +505,7 @@ define([
     lastInit = now;
 
     var $dialog = $("#media_comment_dialog");
-    if($dialog.length == 0) {
+    if($dialog.length == 0 && !INST.kalturaSettings.js_kaltura_uploader) {
       var $div = $("<div/>").attr('id', 'media_comment_dialog');
       $div.text(I18n.t('messages.loading', "Loading..."));
       $div.dialog({
@@ -483,8 +513,12 @@ define([
         resizable: false,
         width: 470,
         height: 300,
-        modal: false
+        modal: true
       });
+
+      // **********************************************************************
+      // load kaltura_session
+      // **********************************************************************
       $.ajaxJSON('/api/v1/services/kaltura_session', 'POST', {}, function(data) {
         $div.data('ks', data.ks);
         if ( !INST.kalturaSettings.do_flash_var_test ) {
@@ -497,6 +531,9 @@ define([
           $div.data('ks-error', I18n.t('errors.load_failed', "Media Comment Application failed to load.  Please try again."));
         }
       });
+      // **********************************************************************
+      // Load dialog html
+      // **********************************************************************
       $.get("/partials/_media_comments.html", function(html) {
         var checkForKS = function() {
           if($div.data('ks')) {
@@ -513,10 +550,11 @@ define([
         $dialog = $("#media_comment_dialog");
       });
       $dialog = $div;
-    } else {
+    } else if (!INST.kalturaSettings.js_kaltura_uploader) {
+      // only call mediaCommentReady if we are not doing js uploader
       mediaCommentReady();
     }
-  }
+  } // End of init function
   $(document).ready(function() {
     $(document).bind('reset_media_comment_forms', function() {
       $("#audio_record_holder_message,#video_record_holder_message").removeClass('saving')
