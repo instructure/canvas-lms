@@ -275,13 +275,6 @@ group :cassandra do
   gem "canvas_cassandra", path: "gems/canvas_cassandra"
 end
 
-group :embedly do
-  gem 'embedly', '1.5.5'
-    gem 'oauth', '0.4.7'
-    gem 'querystring', '0.1.0'
-    gem 'typhoeus', '0.3.3'
-end
-
 group :statsd do
   gem 'statsd-ruby', '1.0.0', :require => 'statsd'
 end
