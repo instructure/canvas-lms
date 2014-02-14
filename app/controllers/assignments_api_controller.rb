@@ -466,7 +466,7 @@ class AssignmentsApiController < ApplicationController
 
       if Array(params[:include]).include?('submission')
         submissions = Hash[
-          @context.submissions.except(:includes).
+          @context.submissions.
             where(:assignment_id => @assignments.except(:order)).
             for_user(@current_user).
             map { |s| [s.assignment_id,s] }

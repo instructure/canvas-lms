@@ -116,7 +116,6 @@ class GradeSummaryPresenter
   def submissions
     @submissions ||= begin
       ss = @context.submissions
-      .except(:includes)
       .includes(:visible_submission_comments,
                 {:rubric_assessments => [:rubric, :rubric_association]},
                 :content_participations)

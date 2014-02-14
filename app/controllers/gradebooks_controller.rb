@@ -114,7 +114,7 @@ class GradebooksController < ApplicationController
     Shackles.activate(:slave) do
       updated = Time.parse(params[:updated]) rescue nil
       updated ||= Time.parse("Jan 1 2000")
-      @new_submissions = @context.submissions.except(:includes).
+      @new_submissions = @context.submissions.
         includes(:submission_comments, :attachments).
           where('submissions.updated_at > ?', updated).all
 
@@ -136,7 +136,6 @@ class GradebooksController < ApplicationController
     if !@enrollment && @context.grants_right?(@current_user, session, :manage_grades)
       @assignments = @context.assignments.active.where(:submission_types => 'attendance').all
       @students = @context.students_visible_to(@current_user).order_by_sortable_name
-      @submissions = @context.submissions
       @at_least_one_due_at = @assignments.any?{|a| a.due_at }
       # Find which assignment group most attendance items belong to,
       # it'll be a better guess for default assignment group than the first
@@ -222,7 +221,7 @@ class GradebooksController < ApplicationController
         }
         format.json  {
           Shackles.activate(:slave) do
-            @submissions = @context.submissions
+            @submissions = @context.submissions.includes(:quiz_submission)
             @new_submissions = @submissions
             render :json => @new_submissions.map{ |s| s.as_json(include: [:quiz_submission, :submission_comments, :attachments]) }
           end
@@ -257,7 +256,7 @@ class GradebooksController < ApplicationController
         params[:user_ids] ||= params[:user_id]
         user_ids = params[:user_ids].split(",").map(&:to_i) if params[:user_ids]
         assignment_ids = params[:assignment_ids].split(",").map(&:to_i) if params[:assignment_ids]
-        @submissions = @context.submissions.except(:includes).
+        @submissions = @context.submissions.
           includes(:submission_comments, :attachments)
         @submissions = @submissions.where(:user_id => user_ids) if user_ids
         @submissions = @submissions.where(:assignment_id => assignment_ids) if assignment_ids

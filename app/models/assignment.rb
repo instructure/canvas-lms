@@ -1147,7 +1147,6 @@ class Assignment < ActiveRecord::Base
         map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
 
-
     submissions = self.submissions.where(:user_id => students)
                   .includes(:submission_comments,
                             :attachments,
