@@ -855,9 +855,9 @@ class ApplicationController < ActionController::Base
     end
 
     def render_optional_error_file(status)
-      path = "#{Rails.public_path}/#{status.to_s[0,3]}.html"
+      path = "#{Rails.public_path}/#{status.to_s[0,3]}#{".html" if CANVAS_RAILS2}"
       if File.exist?(path)
-        render :file => path, :status => status, :content_type => Mime::HTML, :layout => false
+        render :file => path, :status => status, :content_type => Mime::HTML, :layout => false, :formats => [:html]
       else
         head status
       end
