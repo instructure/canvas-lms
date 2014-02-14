@@ -214,15 +214,14 @@ class ConversationsController < ApplicationController
   #
   def index
     if request.format == :json
+      @conversations_scope = @conversations_scope.where('message_count > 0')
       conversations = Api.paginate(@conversations_scope, self, api_v1_conversations_url)
       # optimize loading the most recent messages for each conversation into a single query
       ConversationParticipant.preload_latest_messages(conversations, @current_user)
       @conversations_json = conversations_json(conversations, @current_user,
         session, include_participant_avatars: false,
         include_participant_contexts: false, visible: true,
-        include_context_name: true, include_beta: params[:include_beta]).reject { |c|
-          c['message_count'] == 0
-        }
+        include_context_name: true, include_beta: params[:include_beta])
 
       if params[:include_all_conversation_ids]
         @conversations_json = {:conversations => @conversations_json, :conversation_ids => @conversations_scope.conversation_ids}
