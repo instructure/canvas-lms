@@ -1369,6 +1369,10 @@ if CANVAS_RAILS2
   end
 end
 
+unless CANVAS_RAILS2
+  ActiveRecord::Associations::Builder::HasMany.valid_options << :joins
+end
+
 class ActiveRecord::Serialization::Serializer
   def serializable_record
     hash = HashWithIndifferentAccess.new.tap do |serializable_record|
