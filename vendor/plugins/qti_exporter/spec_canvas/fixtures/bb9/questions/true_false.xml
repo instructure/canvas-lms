@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop>
+  <assessment title="Chapter 2 - Computing Wages and Salaries Achievement TEST">
+    <assessmentmetadata>
+      <bbmd_asi_object_id>assessment_1</bbmd_asi_object_id>
+      <bbmd_asitype>Assessment</bbmd_asitype>
+      <bbmd_assessmenttype>Test</bbmd_assessmenttype>
+      <bbmd_sectiontype>Subsection</bbmd_sectiontype>
+      <bbmd_questiontype>Multiple Choice</bbmd_questiontype>
+      <bbmd_is_from_cartridge>false</bbmd_is_from_cartridge>
+      <bbmd_numbertype>none</bbmd_numbertype>
+      <bbmd_partialcredit/>
+      <bbmd_orientationtype>vertical</bbmd_orientationtype>
+      <bbmd_is_extracredit>false</bbmd_is_extracredit>
+      <qmd_absolutescore_max>100.0</qmd_absolutescore_max>
+      <qmd_weighting>0.1</qmd_weighting>
+    </assessmentmetadata>
+    <rubric view="All">
+      <flow_mat class="Block">
+        <material>
+          <mat_extension>
+            <mat_formattedtext type="HTML"/>
+          </mat_extension>
+        </material>
+      </flow_mat>
+    </rubric>
+    <presentation_material>
+      <flow_mat class="Block">
+        <material>
+          <mat_extension>
+            <mat_formattedtext type="HTML"/>
+          </mat_extension>
+        </material>
+      </flow_mat>
+    </presentation_material>
+    <section>
+      <sectionmetadata>
+        <bbmd_asi_object_id>section_0</bbmd_asi_object_id>
+        <bbmd_asitype>Section</bbmd_asitype>
+        <bbmd_assessmenttype>Test</bbmd_assessmenttype>
+        <bbmd_sectiontype>Subsection</bbmd_sectiontype>
+        <bbmd_questiontype>Multiple Choice</bbmd_questiontype>
+        <bbmd_is_from_cartridge>false</bbmd_is_from_cartridge>
+        <bbmd_numbertype>none</bbmd_numbertype>
+        <bbmd_partialcredit/>
+        <bbmd_orientationtype>vertical</bbmd_orientationtype>
+        <bbmd_is_extracredit>false</bbmd_is_extracredit>
+        <qmd_absolutescore_max>0.0</qmd_absolutescore_max>
+        <qmd_weighting>0.0</qmd_weighting>
+      </sectionmetadata>
+      <item maxattempts="0">
+        <itemmetadata>
+          <bbmd_asi_object_id>question_1_1</bbmd_asi_object_id>
+          <bbmd_asitype>Item</bbmd_asitype>
+          <bbmd_assessmenttype>Test</bbmd_assessmenttype>
+          <bbmd_sectiontype>Subsection</bbmd_sectiontype>
+          <bbmd_questiontype>True/False</bbmd_questiontype>
+          <bbmd_is_from_cartridge>false</bbmd_is_from_cartridge>
+          <bbmd_numbertype>letter_lower</bbmd_numbertype>
+          <bbmd_partialcredit>false</bbmd_partialcredit>
+          <bbmd_orientationtype>vertical</bbmd_orientationtype>
+          <bbmd_is_extracredit>false</bbmd_is_extracredit>
+          <qmd_absolutescore_max>3.0</qmd_absolutescore_max>
+          <qmd_weighting>0.0</qmd_weighting>
+        </itemmetadata>
+        <presentation>
+          <flow class="Block">
+            <flow class="QUESTION_BLOCK">
+              <flow class="FORMATTED_TEXT_BLOCK">
+                <material>
+                  <mat_extension>
+                    <mat_formattedtext type="SMART_TEXT">An enterprise is covered under the FLSA if there are at least two employees engaged in interstate commerce and if the enterprise has a gross annual sales volume of at least $400,000.</mat_formattedtext>
+                  </mat_extension>
+                </material>
+              </flow>
+            </flow>
+            <flow class="RESPONSE_BLOCK">
+              <response_lid ident="response" rcardinality="Single" rtiming="No">
+                <render_choice maxnumber="0" minnumber="0" shuffle="Yes">
+                  <flow_label class="Block">
+                    <response_label ident="true" rarea="Ellipse" rrange="Exact" shuffle="Yes">
+                      <flow_mat class="Block">
+                        <material>
+                          <mattext charset="us-ascii" texttype="text/plain" xml:space="default">false</mattext>
+                        </material>
+                      </flow_mat>
+                    </response_label>
+                    <response_label ident="false" rarea="Ellipse" rrange="Exact" shuffle="Yes">
+                      <flow_mat class="Block">
+                        <material>
+                          <mattext charset="us-ascii" texttype="text/plain" xml:space="default">true</mattext>
+                        </material>
+                      </flow_mat>
+                    </response_label>
+                  </flow_label>
+                </render_choice>
+              </response_lid>
+            </flow>
+          </flow>
+        </presentation>
+        <resprocessing scoremodel="SumOfScores">
+          <outcomes>
+            <decvar defaultval="0.0" maxvalue="3.0" minvalue="0.0" varname="SCORE" vartype="Decimal"/>
+          </outcomes>
+          <respcondition title="correct">
+            <conditionvar>
+              <varequal case="No" respident="response">false</varequal>
+            </conditionvar>
+            <setvar action="Set" variablename="SCORE">SCORE.max</setvar>
+            <displayfeedback feedbacktype="Response" linkrefid="correct"/>
+          </respcondition>
+          <respcondition title="incorrect">
+            <conditionvar>
+              <other/>
+            </conditionvar>
+            <setvar action="Set" variablename="SCORE">0.0</setvar>
+            <displayfeedback feedbacktype="Response" linkrefid="incorrect"/>
+          </respcondition>
+        </resprocessing>
+        <itemfeedback ident="correct" view="All">
+          <flow_mat class="Block"/>
+        </itemfeedback>
+        <itemfeedback ident="incorrect" view="All">
+          <flow_mat class="Block"/>
+        </itemfeedback>
+      </item>
+    </section>
+  </assessment>
+</questestinterop>
