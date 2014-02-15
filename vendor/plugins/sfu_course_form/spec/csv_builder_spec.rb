@@ -432,11 +432,35 @@ describe 'A non-calendar course request' do
 
 end
 
-# TODO: implement this
 describe 'A non-calendar course request' do
 
+  before do
+    @hyphenated_name = 'Introd-uction to hyphen-nation'
+    @courses_csv, @sections_csv, @enrollments_csv = SFU::CourseForm::CSVBuilder.build('kipling', ["ncc-kipling-71113273-#{term}-#@hyphenated_name"], 2, 'kipling', '55599068', nil, nil, false)
+    @courses = CSV.parse(@courses_csv, :headers => true)
+  end
+
+  def verify_courses(expected_term, expected_course_name)
+    @courses.count.should == 1
+    @courses[0]['course_id'].should == 'ncc-kipling-71113273'
+    @courses[0]['long_name'].should == expected_course_name
+    @courses[0]['account_id'].should == 'sfu:::ncc'
+    @courses[0]['term_id'].should == expected_term
+    @courses[0]['status'].should == 'active'
+  end
+
   context 'with hyphens in the course name' do
-    it 'should be handled properly'
+
+    let(:term) { '1141' }
+    it 'should be handled properly for a specific term' do
+      verify_courses(term, @hyphenated_name)
+    end
+
+    let(:term) { '' }
+    it 'should be handled properly for the default term' do
+      verify_courses(term, @hyphenated_name)
+    end
+
   end
 
 end

@@ -178,7 +178,7 @@ module SFU
       # e.g. course_line = ncc-kipling-71113273-1134-My special course
       def ncc_info(course_line, teacher1, teacher2 = nil, teacher2_role = 'teacher')
         account_sis_id = 'sfu:::ncc'
-        course_arr = course_line.split('-')
+        course_arr = course_line.split('-', 5)
         ncc = { :enrollments => [] }
         ncc[:course_id] = course_arr.first(3).join('-')
         term = course_arr[3] # Can be empty!
