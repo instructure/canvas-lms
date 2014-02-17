@@ -152,9 +152,7 @@ describe "quizzes" do
 
   context "who closes the session without submitting" do
     it "should automatically grade the submission when it becomes overdue" do
-      pending('disabled because of regression')
-
-      job_tag = 'QuizSubmission#grade_if_untaken'
+      job_tag = 'Quizzes::QuizSubmission#grade_if_untaken'
 
       course_with_student_logged_in
       quiz = prepare_quiz
