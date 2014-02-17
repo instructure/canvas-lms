@@ -409,7 +409,7 @@ pl:
       grade_change_logging_results: 
         Assignment: Zadanie
         Course: Kurs
-        Grader: "Osoba oceniająca"
+        Grader: Oceniający
         Student: Uczestnik
         To: Do
         date: Data
@@ -565,7 +565,7 @@ pl:
         edison: 
           description: 
             header: Przykład
-            text: "W tym raporcie przedstawiono oceny wszystkich studentów za podane wyniki i kursy. Wynikowy plik csv będzie zawierał jeden rząd na wynik użytkownika. Zostaną w nim przedstawione informacje szczegółowe na temat wyniku z uwzględnieniem powiązanego zadania."
+            text: "W tym raporcie przedstawiono oceny wszystkich uczestników w podanych kursach. Wynikowy plik csv będzie zawierał jeden rząd na wynik użytkownika. Zostaną w nim przedstawione informacje szczegółowe na temat wyniku z uwzględnieniem powiązanego zadania."
     custom_outcomes_csv_parameters: 
       account_reports: 
         edison: 
@@ -807,7 +807,7 @@ pl:
       help_link_available_to_all_teachers: Instruktorzy
       help_link_available_to_all_users: Użytkownicy
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "Jeśli chcesz wstawić łącze do własnej strony pomocy w okienku pomocy, możesz to zrobić tutaj"
-      interpolate_account_domain: "Uwaga: naciśnij  \"{{ACCOUNT_DOMAIN}}\", aby zamienić domenę konta źródłowego użytkownika"
+      interpolate_account_domain: "Uwaga: naciśnij \"{{ACCOUNT_DOMAIN}}\", aby zamienić domenę konta źródłowego użytkownika"
       ip_filter_filter_label: Filtruj
       ip_filter_name_label: Nazwa
       labels: 
@@ -1089,7 +1089,7 @@ pl:
       account_reports: 
         auburn: 
           pseudonym_ids: 
-            field: "Identyfikatory pseudonimu"
+            field: "Identyfikatory pseudonimów"
     student_ip_csv_description: 
       account_reports: 
         dubspot: 
@@ -5482,7 +5482,7 @@ pl:
     unsubscribed_hint: "Uczestnik nie ma subskrypcji do tego tematu. Kliknij, aby subskrybować."
   draft_state_description: |-
       Ta funkcja beta uwzględnia ponowne zaprojektowanie wielu elementów systemu Canvas i umożliwia przechowywanie treści w
-      w nowym nieopublikowanym stanie, która będzie niewidoczna dla uczestników i nie będzie miała wpływu
+      nowym nieopublikowanym stanie, która będzie niewidoczna dla uczestników i nie będzie miała wpływu
       na oceny. Uwaga — wyłączenie tej funkcji może spowodować usunięcie nowo utworzonej lub edytowanej
       zawartości z podglądu instruktora.
   due_dates: 
@@ -6065,8 +6065,8 @@ pl:
       no_features_available: "Obecnie nie są dostępne żadne funkcje."
   features: 
     draft_state: "Wersja robocza"
-    draft_state_account_disable_warning: "Wyłączenie tej funkcji będzie miało wpływ na istniejące kursy. Aby uzyskać pomoc podczas wyłączania tej funkcji, skontaktuj się \n\
-        kierownikiem firmy Canvas. "
+    draft_state_account_disable_warning: "Wyłączenie tej funkcji będzie miało wpływ na istniejące kursy. Aby uzyskać pomoc podczas wyłączania tej funkcji, skontaktuj się z:\n\
+        Canvas Success Manager. "
     draft_state_course_disable_warning: |-
         Wyłączenie tej funkcji spowoduje opublikowanie WSZYSTKICH obiektów w kursie. Sprawdź, czy wersja robocza
         jest gotowa do opublikowania i dostępna dla wszystkich użytkowników kursu przed kontynuacją.
@@ -6419,7 +6419,7 @@ pl:
       this_assignment_is_muted: "To zadanie jest wyłączone"
       zero_point_assignment: "Zadania w tej grupie nie mają przydzielonych punktów i nie można ich uwzględniać w obliczeniach ocen"
     concluded_course_error_message: "Jest to ukończony kurs, zatem jedynie zaakceptowane wpisy są dostępne."
-    course_average: "Średni wynik kursu"
+    course_average: "Średnia kursu"
     course_median: "Mediana kursu"
     course_mode: "Tryb kursu"
     dropped_for_grading: "Opuszczono w celu ocenienia"
@@ -6437,7 +6437,7 @@ pl:
       set_default_grade: "Ustaw ocenę domyślną"
       speedgrader: SpeedGrader
     header_filter: 
-      course_average: "Średni wynik kursu"
+      course_average: "Średnia kursu"
       course_median: "Mediana kursu"
       course_mode: "Tryb kursu"
     hide_notes: "Ukryj kolumnę uwag"
@@ -6470,7 +6470,7 @@ pl:
       view_more_details: "pokaż więcej informacji szczegółowych"
     percent_of_grade: "%{percentage} z oceny"
     points_out_of: "na %{points_possible} możliwych"
-    remedial: wyrównawcze
+    remedial: "wymagający poprawy"
     resubmitted: "Wysłano ponownie po ocenieniu"
     row_student_name: 
       student_placeholder: Uczestnik
@@ -6488,7 +6488,7 @@ pl:
       grades: Oceny
       hide_student_names: "Ukryj nazwy uczestników"
       include_ungraded: "Potraktuj nieocenione jako 0"
-      learning_mastery: "Nauka biegłości"
+      learning_mastery: "Nauka poziomu biegłości"
       old_gradebook: "stary dzienniczek"
       publish_to_sis: "Publikuj stopnie w systemie SIS"
       set_group_weights: "Ustaw wyważanie grup"
