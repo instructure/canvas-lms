@@ -22,7 +22,8 @@ class GradingStandard < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :user
   has_many :assignments
-  validates_presence_of :context_id, :context_type, :workflow_state
+  validates_presence_of :context_id, :context_type, :workflow_state, :data
+  validate :valid_grading_scheme_data
 
   # version 1 data is an array of [ letter, max_integer_value ]
   # we created a version 2 because this is ambiguous once we added support for
@@ -182,6 +183,11 @@ class GradingStandard < ActiveRecord::Base
       res[row[:name]] = (row[:value].to_f / 100.0) if row[:name] && row[:value]
     end
     self.data = res.to_a.sort_by{|i| i[1]}.reverse
+  end
+
+  def valid_grading_scheme_data
+    self.errors.add(:data, 'grading scheme values cannot be negative') if self.data.any?{ |v| v[1] < 0 }
+    self.errors.add(:data, 'grading scheme cannot contain duplicate values') if self.data.map{|v| v[1]} != self.data.map{|v| v[1]}.uniq
   end
   
   def self.default_grading_standard

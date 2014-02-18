@@ -471,6 +471,7 @@ class CoursesController < ApplicationController
           @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active') if params[:enroll_me].to_s == 'true'
           # offer updates the workflow state, saving the record without doing validation callbacks
           @course.offer if api_request? and params[:offer].present?
+
           format.html { redirect_to @course }
           format.json { render :json => course_json(
             @course,
@@ -1591,6 +1592,12 @@ class CoursesController < ApplicationController
   #
   # For possible arguments, see the Courses#create documentation (note: the enroll_me param is not allowed in the update action).
   #
+  # Additional arguments available for Courses#update
+  #
+  # @argument course[grading_standard_id] [Optional, Integer]
+  #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
+  #
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
   #     -X PUT \
@@ -1619,10 +1626,6 @@ class CoursesController < ApplicationController
       if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses)
         @course.root_account = Account.root_accounts.find(root_account_id)
       end
-      standard_id = params[:course].delete :grading_standard_id
-      if standard_id.present? && @course.grants_right?(@current_user, session, :manage_grades)
-        @course.grading_standard = GradingStandard.standards_for(@course).find_by_id(standard_id)
-      end
       if @course.root_account.grants_right?(@current_user, session, :manage_courses)
         if params[:course][:account_id]
           account = api_find(Account, params[:course].delete(:account_id))
@@ -1635,6 +1638,18 @@ class CoursesController < ApplicationController
         params[:course].delete :account_id
         params[:course].delete :term_id
         params[:course].delete :enrollment_term_id
+      end
+
+      if params[:course].has_key? :grading_standard_id
+        standard_id = params[:course].delete :grading_standard_id
+        if @course.grants_right?(@current_user, session, :manage_grades)
+          if standard_id.present?
+            grading_standard = GradingStandard.standards_for(@course).find_by_id(standard_id)
+            @course.grading_standard = grading_standard if grading_standard
+          else
+            @course.grading_standard = nil
+          end
+        end
       end
       unless @course.account.grants_right? @current_user, session, :manage_storage_quotas
         params[:course].delete :storage_quota

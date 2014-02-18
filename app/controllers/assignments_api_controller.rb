@@ -667,6 +667,10 @@ class AssignmentsApiController < ApplicationController
   # Modify an existing assignment. See the documentation for assignment
   # creation.
   #
+  # @argument assignment[grading_standard_id] [Optional, Integer]
+  #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
+  #   This will update the grading_type for the course to 'letter_grade'.
+  #
   # If the assignment[assignment_overrides] key is absent, any existing
   # overrides are kept as is. If the assignment[assignment_overrides] key is
   # present, existing overrides are updated or deleted (and new ones created,

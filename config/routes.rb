@@ -1490,6 +1490,11 @@ routes.draw do
       get '#{prefix}/:id', :action => :show, :path_name => "data_export"
       delete '#{prefix}/:id', :action => :cancel
     end
+
+    scope(:controller => :grading_standards_api) do
+      post 'accounts/:account_id/grading_standards', :action => :create
+      post 'courses/:course_id/grading_standards', :action => :create
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented

@@ -745,7 +745,7 @@ describe AssignmentsApiController, type: :request do
           'grading_standard_id' => @new_grading_standard.id,
           'group_category_id' => nil,
           'description' => 'assignment description',
-          'grading_type' => 'points',
+          'grading_type' => 'letter_grade',
           'due_at' => '2011-01-01',
           'position' => 1,
           'muted' => true
@@ -793,6 +793,15 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "updates the assignment's grading_type" do
+        @assignment.grading_type.should == 'letter_grade'
+        @json['grading_type'].should == @assignment.grading_type
+      end
+
+      it "updates the assignments grading_type when outcome not provided" do
+        @json = api_update_assignment_call(@course,@assignment,{
+            'grading_type' => 'points'
+        })
+        @assignment.reload
         @assignment.grading_type.should == 'points'
         @json['grading_type'].should == @assignment.grading_type
       end
@@ -1066,6 +1075,141 @@ describe AssignmentsApiController, type: :request do
           :only_visible_to_overrides => !@flag_before
         })
         @assignment.reload.only_visible_to_overrides.should == !@flag_before
+      end
+    end
+
+    context "when an admin tried to update a grading_standard" do
+      before(:each) do
+        @user = account_admin_user
+        course_with_teacher(:active_all => true, :user => @user)
+        @assignment = @course.assignments.create({:name => "some assignment"})
+        @assignment.save!
+        @account_standard = @course.account.grading_standards.create!(:title => "account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+        @course_standard = @course.grading_standards.create!(:title => "course standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+      end
+
+      it "allows setting an account grading standard" do
+        raw_api_call(
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+            {
+                :controller => 'assignments_api',
+                :action => 'update',
+                :format => 'json',
+                :course_id => @course.id.to_s,
+                :id => @assignment.id.to_s
+            },
+            { :assignment => { :grading_standard_id => @account_standard.id } }
+        )
+        @assignment.reload
+        @assignment.grading_standard.should == @account_standard
+        @assignment.grading_type.should == 'letter_grade'
+      end
+
+      it "allows setting a course level grading standard" do
+        raw_api_call(
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+            {
+                :controller => 'assignments_api',
+                :action => 'update',
+                :format => 'json',
+                :course_id => @course.id.to_s,
+                :id => @assignment.id.to_s
+            },
+            { :assignment => { :grading_standard_id => @course_standard.id } }
+        )
+        @assignment.reload
+        @assignment.grading_standard.should == @course_standard
+        @assignment.grading_type.should == 'letter_grade'
+      end
+
+      it "should update a sub account level grading standard" do
+        sub_account = @course.account.sub_accounts.create!
+        c2 = sub_account.courses.create!
+        assignment2 = c2.assignments.create({:name => "some assignment"})
+        assignment2.save!
+        sub_account_standard = sub_account.grading_standards.create!(:title => "sub account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+        raw_api_call(
+            :put,
+            "/api/v1/courses/#{c2.id}/assignments/#{assignment2.id}.json",
+            {
+                :controller => 'assignments_api',
+                :action => 'update',
+                :format => 'json',
+                :course_id => c2.id.to_s,
+                :id => assignment2.id.to_s
+            },
+            { :assignment => { :grading_standard_id => sub_account_standard.id } }
+        )
+        assignment2.reload
+        assignment2.grading_standard.should == sub_account_standard
+        assignment2.grading_type.should == 'letter_grade'
+      end
+
+      it "should not update grading standard from sub account not on account chain" do
+        sub_account = @course.account.sub_accounts.create!
+        sub_account2 = @course.account.sub_accounts.create!
+        c2 = sub_account.courses.create!
+        assignment2 = c2.assignments.create({:name => "some assignment"})
+        assignment2.save!
+        sub_account_standard = sub_account2.grading_standards.create!(:title => "sub account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+        raw_api_call(
+            :put,
+            "/api/v1/courses/#{c2.id}/assignments/#{assignment2.id}.json",
+            {
+                :controller => 'assignments_api',
+                :action => 'update',
+                :format => 'json',
+                :course_id => c2.id.to_s,
+                :id => assignment2.id.to_s
+            },
+            { :assignment => { :grading_standard_id => sub_account_standard.id } }
+        )
+        assignment2.reload
+        assignment2.grading_standard.should == nil
+      end
+
+      it "should not delete grading standard if invalid standard provided" do
+        @assignment.grading_standard = @account_standard
+        @assignment.save!
+        sub_account = @course.account.sub_accounts.create!
+        sub_account_standard = sub_account.grading_standards.create!(:title => "sub account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+        raw_api_call(
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+            {
+                :controller => 'assignments_api',
+                :action => 'update',
+                :format => 'json',
+                :course_id => @course.id.to_s,
+                :id => @assignment.id.to_s
+            },
+            { :assignment => { :grading_standard_id => sub_account_standard.id } }
+        )
+        @assignment.reload
+        @assignment.grading_standard.should == @account_standard
+      end
+
+      it "should remove a standard if empty value passed" do
+        @assignment.grading_standard = @account_standard
+        @assignment.save!
+        sub_account = @course.account.sub_accounts.create!
+        sub_account_standard = sub_account.grading_standards.create!(:title => "sub account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+        raw_api_call(
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+            {
+                :controller => 'assignments_api',
+                :action => 'update',
+                :format => 'json',
+                :course_id => @course.id.to_s,
+                :id => @assignment.id.to_s
+            },
+            { :assignment => { :grading_standard_id => nil } }
+        )
+        @assignment.reload
+        @assignment.grading_standard.should == nil
       end
     end
   end

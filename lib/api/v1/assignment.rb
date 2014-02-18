@@ -312,7 +312,16 @@ module Api::V1::Assignment
       assignment.group_category = assignment.context.group_categories.find_by_id(gc_id)
     end
 
-    #TODO: validate grading_standard_id (it's permissions are currently useless)
+    if update_params.has_key?("grading_standard_id")
+      standard_id = update_params.delete("grading_standard_id")
+      if standard_id.present?
+        grading_standard = GradingStandard.standards_for(context).find_by_id(standard_id)
+        assignment.grading_standard = grading_standard if grading_standard
+        update_params['grading_type'] = 'letter_grade'
+      else
+        assignment.grading_standard = nil
+      end
+    end
 
     if assignment_params.key? "muted"
       assignment.muted = value_to_boolean(assignment_params.delete("muted"))
