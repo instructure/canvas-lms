@@ -21,4 +21,4 @@ define [
       sections:  _.map(@sections, (section) -> section.toJSON() )
 
     updateCourseSectionID: =>
-      @override.set 'course_section_id', parseInt(@$el.val(), 10)
+      @override.set 'course_section_id', @$el.val()

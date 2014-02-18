@@ -79,13 +79,15 @@ describe Assignment do
 
     it "does not allow itself to be unpublished if it has student submissions" do
       @assignment.submit_homework @stu1, :submission_type => "online_text_entry"
+      @assignment.should_not be_can_unpublish
       @assignment.unpublish
       @assignment.should_not be_valid
       @assignment.errors['workflow_state'].should == "Can't unpublish if there are student submissions"
     end
 
-    it "does allow itself to be unpiblished if it has nil submissions" do
+    it "does allow itself to be unpublished if it has nil submissions" do
       @assignment.submit_homework @stu1, :submission_type => nil
+      @assignment.should be_can_unpublish
       @assignment.unpublish
       @assignment.workflow_state.should == "unpublished"
     end
@@ -151,7 +153,7 @@ describe Assignment do
 
     it "should not update when non-student submissions transition state" do
       assignment_model
-      s = Assignment.find_or_create_submission(@assignment.id, @teacher.id)
+      s = @assignment.find_or_create_submission(@teacher)
       s.submission_type = 'online_quiz'
       s.workflow_state = 'submitted'
       s.save!
@@ -637,32 +639,22 @@ describe Assignment do
       @course.enroll_student(@user).update_attribute(:workflow_state, 'accepted')
       @assignment.context.reload
 
-      dummy_sub = Submission.new
-      dummy_sub.assignment_id = @assignment.id
-      dummy_sub.user_id = @user.id
+      real_sub = @assignment.submissions.build(user: @user)
 
-      real_sub = Submission.new
-      real_sub.assignment_id = @assignment.id
-      real_sub.user_id = @user.id
-      real_sub.save!
-
-      Submission.expects(:find_or_initialize_by_assignment_id_and_user_id).
-        twice.
-        returns(dummy_sub).
-        returns(real_sub)
+      @assignment.submissions.expects(:where).once.returns(Submission.none)
+      @assignment.submissions.expects(:build).once.returns(real_sub)
 
       sub = nil
       lambda {
         sub = yield(@assignment, @user)
       }.should_not raise_error
       sub.should_not be_new_record
-      sub.should_not eql dummy_sub
       sub.should eql real_sub
     end
 
     it "should handle them gracefully in find_or_create_submission" do
       concurrent_inserts do |assignment, user|
-        Assignment.find_or_create_submission(assignment.id, user.id)
+        assignment.find_or_create_submission(user)
       end
     end
 
@@ -1532,6 +1524,7 @@ describe Assignment do
       subs.map(&:submission_type).uniq.should eql(['online_text_entry'])
       subs.map(&:body).uniq.should eql(['Some text for you'])
     end
+
     it "should submit the homework for all students in the group if grading them individually" do
       setup_assignment_with_group
       @a.update_attribute(:grade_group_students_individually, true)
@@ -1543,6 +1536,7 @@ describe Assignment do
       submissions.map(&:submission_type).uniq.should eql ["online_text_entry"]
       submissions.map(&:body).uniq.should eql ["Test submission"]
     end
+
     it "should update submission for all students in the same group" do
       setup_assignment_with_group
       res = @a.grade_student(@u1, :grade => "10")
@@ -1552,6 +1546,7 @@ describe Assignment do
       res.map{|s| s.user}.should be_include(@u1)
       res.map{|s| s.user}.should be_include(@u2)
     end
+
     it "should create an initial submission comment for only the submitter by default" do
       setup_assignment_with_group
       sub = @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Some text for you", :comment => "hey teacher, i hate my group. i did this entire project by myself :(")
@@ -1561,6 +1556,7 @@ describe Assignment do
       other_sub = (@a.submissions - [sub])[0]
       other_sub.submission_comments.size.should eql 0
     end
+
     it "should add a submission comment for only the specified user by default" do
       setup_assignment_with_group
       res = @a.grade_student(@u1, :comment => "woot")
@@ -1570,6 +1566,7 @@ describe Assignment do
       res.find{|s| s.user == @u1}.submission_comments.should_not be_empty
       res.find{|s| s.user == @u2}.should be_nil #.submission_comments.should be_empty
     end
+
     it "should update submission for only the individual student if set thay way" do
       setup_assignment_with_group
       @a.update_attribute(:grade_group_students_individually, true)
@@ -1579,6 +1576,7 @@ describe Assignment do
       res.length.should eql(1)
       res[0].user.should eql(@u1)
     end
+
     it "should create an initial submission comment for all group members if specified" do
       setup_assignment_with_group
       sub = @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Some text for you", :comment => "ohai teacher, we had so much fun working together", :group_comment => "1")
@@ -1588,6 +1586,7 @@ describe Assignment do
       other_sub = (@a.submissions - [sub])[0]
       other_sub.submission_comments.size.should eql 1
     end
+
     it "should add a submission comment for all group members if specified" do
       setup_assignment_with_group
       res = @a.grade_student(@u1, :comment => "woot", :group_comment => "1")
@@ -1603,6 +1602,7 @@ describe Assignment do
       group_comment_id.should be_present
       comments.all? { |c| c.group_comment_id == group_comment_id }.should be_true
     end
+
     it "return the single submission if the user is not in a group" do
       setup_assignment_with_group
       res = @a.grade_student(@u3, :comment => "woot", :group_comment => "1")
@@ -1612,6 +1612,18 @@ describe Assignment do
       comments = res.find{|s| s.user == @u3}.submission_comments
       comments.size.should == 1
       comments[0].group_comment_id.should be_nil
+    end
+
+    it "associates attachments with all submissions" do
+      setup_assignment_with_group
+      @a.update_attribute :submission_types, "online_upload"
+      f = @u1.attachments.create! uploaded_data: StringIO.new('blah'),
+        context: @u1,
+        filename: 'blah.txt'
+      @a.submit_homework(@u1, attachments: [f])
+      @a.submissions.reload.each { |s|
+        s.attachments.should == [f]
+      }
     end
   end
 

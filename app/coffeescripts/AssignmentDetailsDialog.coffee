@@ -1,9 +1,10 @@
 define [
+  'i18n!assignment_details'
   'jquery'
   'jst/AssignmentDetailsDialog'
   'jqueryui/dialog'
   'compiled/jquery/fixDialogButtons'
-], ($, assignmentDetailsDialogTemplate) ->
+], (I18n, $, assignmentDetailsDialogTemplate) ->
 
   class AssignmentDetailsDialog
     constructor: ({@assignment, @students}) ->
@@ -35,14 +36,18 @@ define [
       locals =
         assignment: assignment
         cnt: scores.length
-        max: Math.max scores...
-        min: Math.min scores...
-        average: do (scores) ->
+        max: @nonNumericGuard Math.max scores...
+        min: @nonNumericGuard Math.min scores...
+        average: do (scores) =>
           total = 0
           total += score for score in scores
-          Math.round(total / scores.length)
+          @nonNumericGuard Math.round(total / scores.length)
 
       scores: scores
       locals: locals
 
-
+    nonNumericGuard: (number) =>
+      if isFinite(number) and not isNaN(number)
+        number
+      else
+        I18n.t('no_graded_submissions', "No graded submissions")

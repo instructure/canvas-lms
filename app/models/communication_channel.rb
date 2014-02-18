@@ -17,8 +17,6 @@
 #
 
 class CommunicationChannel < ActiveRecord::Base
-  extend ActiveSupport::Memoizable
-
   # You should start thinking about communication channels
   # as independent of pseudonyms
   include Workflow

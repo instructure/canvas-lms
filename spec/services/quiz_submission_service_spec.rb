@@ -222,4 +222,105 @@ describe QuizSubmissionService do
       end
     end
   end
+
+  describe '#update_scores' do
+    let :qs do
+      qs = QuizSubmission.new
+      qs.attempt = 1
+      qs.quiz = quiz
+      qs
+    end
+
+    context 'as a teacher' do
+      before :each do
+        qs.expects(:grants_right?).with(participant.user, :update_scores).returns true
+        qs.versions.expects(:get).with(qs.attempt).at_most_once.returns do
+          o = Object.new
+          o.stubs(:model).returns(qs)
+          o
+        end
+      end
+
+      it 'should update the scores' do
+        qs.workflow_state = 'complete'
+        qs.expects(:update_scores)
+
+        expect do
+          subject.update_scores qs, qs.attempt, {
+            fudge_points: 2
+          }
+        end.to_not raise_error
+      end
+
+      it 'should generate the correct "legacy" format' do
+        qs.workflow_state = 'complete'
+        qs.expects(:update_scores).with({
+          "submission_version_number" => qs.attempt,
+          "fudge_points" => 2.0,
+          "question_score_5" => 3.2,
+          "question_comment_5" => "Roar.",
+          "question_score_2" => 0
+        }.with_indifferent_access)
+
+        subject.update_scores qs, qs.attempt, {
+          fudge_points: 2,
+          questions: {
+            "2" => {
+              score: 0
+            },
+            "3" => {},
+            "5" => {
+              score: 3.2,
+              comment: "Roar."
+            }
+          }
+        }
+      end
+
+      it 'should require a valid attempt' do
+        qs.versions.stubs(:get).returns nil
+
+        expect do
+          subject.update_scores qs, qs.attempt, {}
+        end.to raise_error(ApiError, /invalid attempt/i)
+      end
+
+      it 'should require a complete attempt' do
+        expect do
+          subject.update_scores qs, qs.attempt, {}
+        end.to raise_error(ApiError, /attempt must be complete/i)
+      end
+
+      it 'should reject a bad score' do
+        qs.workflow_state = 'complete'
+
+        expect do
+          subject.update_scores qs, qs.attempt, {
+            questions: {
+              "1" => { score: [ 'adooken' ] }
+            }
+          }
+        end.to raise_error(ApiError, /must be an unsigned decimal/i)
+      end
+
+      it 'should be a no-op if no changes are requested' do
+        qs.workflow_state = 'complete'
+        qs.expects(:update_scores).never
+
+        subject.update_scores qs, qs.attempt, {}
+      end
+    end
+
+    context 'as someone else' do
+      before :each do
+        qs.expects(:grants_right?).with(participant.user, :update_scores).returns false
+      end
+
+      it 'should deny access' do
+        expect do
+          subject.update_scores qs, qs.attempt, {}
+        end.to raise_error(ApiError, /not allowed/i)
+      end
+    end
+  end
 end

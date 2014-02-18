@@ -37,6 +37,13 @@ class PluginSetting < ActiveRecord::Base
   before_save :encrypt_settings
   after_save :clear_cache
   after_destroy :clear_cache
+  if CANVAS_RAILS2
+    def after_initialize
+      initialize_plugin_setting
+    end
+  else
+    after_initialize :initialize_plugin_setting
+  end
   
   def validate_uniqueness_of_name?
     true
@@ -56,7 +63,7 @@ class PluginSetting < ActiveRecord::Base
   # dummy value for encrypted fields so that you can still have something in the form (to indicate
   # it's set) and be able to tell when it gets blanked out.
   DUMMY_STRING = "~!?3NCRYPT3D?!~"
-  def after_initialize
+  def initialize_plugin_setting
     return unless settings && self.plugin
     @valid_settings = true
     if self.plugin.encrypted_settings

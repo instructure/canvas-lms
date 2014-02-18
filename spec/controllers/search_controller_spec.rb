@@ -73,6 +73,16 @@ describe SearchController do
       response.body.should =~ /\[\]\z/
     end
 
+    it "should handle groups in courses without messageable enrollments" do
+      course_with_student_logged_in
+      group = @course.groups.create(:name => 'this_is_a_test_group')
+      group.users = [@user]
+      get 'recipients', {:search => '', :type => 'context'}
+      response.should be_success
+      # This is questionable legacy behavior.
+      response.body.should include(group.name)
+    end
+
     context "with admin_context" do
       it "should return nothing if the user doesn't have rights" do
         user_session(user)

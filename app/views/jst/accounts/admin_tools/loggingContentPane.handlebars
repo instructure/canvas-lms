@@ -9,10 +9,19 @@
       {{#t "authentication"}}Login / Logout Activity{{/t}}
     </option>
     {{/if}}
+    {{#if grade_change}}
+    <option value='#loggingGradeChange'>
+      {{#t "grade_change"}}Grade Change Activity{{/t}}
+    </option>
+    {{/if}}
   </select>
 </div>
 <hr/>
 
 {{#if authentication}}
 <div id="loggingAuthentication" class="loggingTypeContent"></div>
+{{/if}}
+
+{{#if grade_change}}
+<div id="loggingGradeChange" class="loggingTypeContent"></div>
 {{/if}}

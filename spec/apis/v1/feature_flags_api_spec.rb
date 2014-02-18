@@ -32,7 +32,7 @@ describe "Feature Flags API", :type => :integration do
       'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course', state: 'allowed', development: true, release_notes_url: 'http://example.com', display_name: "not localized", description: "srsly"),
       'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User', state: 'allowed'),
       'root_opt_in_feature' => Feature.new(feature: 'root_opt_in_feature', applies_to: 'Course', state: 'allowed', root_opt_in: true),
-      'hidden_feature' => Feature.new(feature: 'hidden_feature', applies_to: 'Course', state: 'hidden')
+      'hidden_feature' => Feature.new(feature: 'hidden_feature', applies_to: 'Course', state: 'hidden'),
     })
   end
 
@@ -56,7 +56,8 @@ describe "Feature Flags API", :type => :integration do
            "feature_flag"=>
                {"feature"=>"account_feature",
                 "state"=>"on",
-                "locked"=>true}},
+                "locked"=>true,
+                "transitions"=>{"allowed"=>{"locked"=>false}, "off"=>{"locked"=>false}}}},
           {"feature"=>"course_feature",
            "applies_to"=>"Course",
            "development"=>true,
@@ -69,13 +70,15 @@ describe "Feature Flags API", :type => :integration do
                 "locking_account_id"=>t_site_admin.id,
                 "feature"=>"course_feature",
                 "state"=>"on",
-                "locked"=>true}},
+                "locked"=>true,
+                "transitions"=>{"allowed"=>{"locked"=>false}, "off"=>{"locked"=>false}}}},
           {"feature"=>"root_account_feature",
            "applies_to"=>"RootAccount",
            "feature_flag"=>
                {"feature"=>"root_account_feature",
                 "state"=>"off",
-                "locked"=>true}},
+                "locked"=>true,
+                "transitions"=>{"allowed"=>{"locked"=>false}, "on"=>{"locked"=>false}}}},
           {"feature"=>"root_opt_in_feature",
            "applies_to"=>"Course",
            "root_opt_in"=>true,
@@ -85,7 +88,8 @@ describe "Feature Flags API", :type => :integration do
                 "feature"=>"root_opt_in_feature",
                 "state"=>"off",
                 "locking_account_id"=>nil,
-                "locked"=>false}}])
+                "locked"=>false,
+                "transitions"=>{"allowed"=>{"locked"=>false}, "on"=>{"locked"=>false}}}}])
     end
 
     it "should paginate" do
@@ -188,12 +192,13 @@ describe "Feature Flags API", :type => :integration do
     it "should return the correct format" do
       json = api_call_as_user(t_teacher, :get, "/api/v1/users/#{t_teacher.id}/features/flags/user_feature",
                { controller: 'feature_flags', action: 'show', format: 'json', user_id: t_teacher.to_param, feature: 'user_feature' })
-      json.should eql({"feature"=>"user_feature", "state"=>"allowed", "locked"=>false})
+      json.should eql({"feature"=>"user_feature", "state"=>"allowed", "locked"=>false, "transitions"=>{"on"=>{"locked"=>false}, "off"=>{"locked"=>false}}})
 
       t_teacher.feature_flags.create! feature: 'user_feature', state: 'on'
       json = api_call_as_user(t_teacher, :get, "/api/v1/users/#{t_teacher.id}/features/flags/user_feature",
                       { controller: 'feature_flags', action: 'show', format: 'json', user_id: t_teacher.to_param, feature: 'user_feature' })
-      json.should eql({"feature"=>"user_feature", "state"=>"on", "context_type"=>"User", "context_id"=>t_teacher.id, "locked"=>false, "locking_account_id"=>nil})
+      json.should eql({"feature"=>"user_feature", "state"=>"on", "context_type"=>"User", "context_id"=>t_teacher.id, "locked"=>false, "locking_account_id"=>nil,
+                       "transitions"=>{"off"=>{"locked"=>false}}})
     end
 
     describe "hidden" do
@@ -398,7 +403,7 @@ describe "Feature Flags API", :type => :integration do
       t_root_account.feature_flags.create! feature: 'course_feature'
       api_call_as_user(t_root_admin, :delete, "/api/v1/accounts/#{t_root_account.id}/features/flags/course_feature",
                { controller: 'feature_flags', action: 'delete', format: 'json', account_id: t_root_account.to_param, feature: 'course_feature' })
-      t_root_account.feature_flags.should be_empty
+      t_root_account.feature_flags.where(feature: 'course_feature').should be_empty
     end
 
     it "should not delete an inherited flag" do
@@ -412,7 +417,7 @@ describe "Feature Flags API", :type => :integration do
       t_teacher.feature_flags.create! feature: 'user_feature', state: 'on'
       api_call_as_user(t_teacher, :delete, "/api/v1/users/#{t_teacher.id}/features/flags/user_feature",
                { controller: 'feature_flags', action: 'delete', format: 'json', user_id: t_teacher.to_param, feature: 'user_feature' })
-      t_teacher.feature_flags.should be_empty
+      t_teacher.feature_flags.where(feature: 'course_feature').should be_empty
 
       t_teacher.feature_flags.create! feature: 'user_feature', state: 'on', locking_account: t_root_account
       api_call_as_user(t_teacher, :delete, "/api/v1/users/#{t_teacher.id}/features/flags/user_feature",
@@ -420,4 +425,82 @@ describe "Feature Flags API", :type => :integration do
                {}, {}, { expected_status: 403 })
     end
   end
+
+  describe "custom_transition_proc" do
+    before do
+      Feature.stubs(:definitions).returns({
+          'custom_feature' => Feature.new(feature: 'custom_feature', applies_to: 'Course', state: 'allowed',
+                custom_transition_proc: ->(user, context, from_state, transitions) do
+                  transitions['off'] = { 'locked'=>true, 'message'=>"don't ever turn this off" } if from_state == 'on'
+                  transitions['on'] = { 'locked'=>false, 'message'=>"this is permanent?!" } if transitions.has_key?('on')
+                end
+          )
+      })
+    end
+
+    it "should give message for unlocked transition" do
+      json = api_call_as_user(t_teacher, :get, "/api/v1/courses/#{t_course.id}/features",
+          { controller: 'feature_flags', action: 'index', format: 'json', course_id: t_course.to_param })
+      json.should eql([
+          {"feature"=>"custom_feature",
+           "applies_to"=>"Course",
+           "feature_flag"=>
+               {"feature"=>"custom_feature",
+                "state"=>"allowed",
+                "locked"=>false,
+                "transitions"=>{"on"=>{"locked"=>false,"message"=>"this is permanent?!"},"off"=>{"locked"=>false}}}}])
+    end
+
+    context "locked transition" do
+      before do
+        t_course.enable_feature! :custom_feature
+      end
+
+      it "should indicate a transition is locked" do
+        json = api_call_as_user(t_teacher, :get, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature",
+           { controller: 'feature_flags', action: 'show', format: 'json', course_id: t_course.id, feature: 'custom_feature' })
+        json.should eql({"context_id"=>t_course.id,"context_type"=>"Course","feature"=>"custom_feature",
+                         "locking_account_id"=>nil,"state"=>"on", "locked"=>false,
+                         "transitions"=>{"off"=>{"locked"=>true,"message"=>"don't ever turn this off"}}})
+      end
+
+      it "should reject a locked state transition" do
+        api_call_as_user(t_root_admin, :put, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature?state=off",
+           { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'custom_feature', state: 'off' },
+           {}, {}, { expected_status: 403 })
+      end
+    end
+  end
+
+  describe "after_state_change_proc" do
+    let(:t_state_changes) { [] }
+
+    before do
+      Feature.stubs(:definitions).returns({
+          'custom_feature' => Feature.new(feature: 'custom_feature', applies_to: 'Course', state: 'allowed',
+                after_state_change_proc: ->(context, from_state, to_state) do
+                  t_state_changes << [context.id, from_state, to_state]
+                end
+          )
+      })
+    end
+
+    it "should fire when creating a feature flag to enable an allowed feature" do
+      expect {
+        api_call_as_user(t_root_admin, :put, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature?state=on",
+           { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'custom_feature', state: 'on' })
+      }.to change(t_state_changes, :size).by(1)
+      t_state_changes.last.should eql [t_course.id, 'allowed', 'on']
+    end
+
+    it "should fire when changing a feature flag's state" do
+      t_course.disable_feature! 'custom_feature'
+      expect {
+        api_call_as_user(t_root_admin, :put, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature?state=on",
+           { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'custom_feature', state: 'on' })
+      }.to change(t_state_changes, :size).by(1)
+      t_state_changes.last.should eql [t_course.id, 'off', 'on']
+    end
+  end
+
 end

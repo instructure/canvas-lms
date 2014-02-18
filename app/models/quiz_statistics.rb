@@ -17,7 +17,7 @@
 #
 
 class QuizStatistics < ActiveRecord::Base
-  set_table_name :quiz_statistics
+  self.table_name = :quiz_statistics
 
   attr_accessible :includes_all_versions, :anonymous, :report_type
 

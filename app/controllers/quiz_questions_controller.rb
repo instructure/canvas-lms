@@ -188,12 +188,17 @@ class QuizQuestionsController < ApplicationController
   #
   # @returns [QuizQuestion]
   def index
-    if authorized_action(@quiz, @current_user, :update)
+    if authorized_action(@quiz, @current_user, :read)
       scope = @quiz.quiz_questions
       api_route = polymorphic_url([:api, :v1, @context, :quiz_questions])
       @questions = Api.paginate(scope, self, api_route)
 
-      render :json => questions_json(@questions, @current_user, session, [:assessment_question])
+      render :json => questions_json(@questions,
+        @current_user,
+        session,
+        @context,
+        parse_includes,
+        censored?)
     end
   end
 
@@ -207,8 +212,13 @@ class QuizQuestionsController < ApplicationController
   #
   # @returns QuizQuestion
   def show
-    if authorized_action(@quiz, @current_user, :update)
-      render :json => question_json(@question, @current_user, session, [:assessment_question])
+    if authorized_action(@quiz, @current_user, :read)
+      render :json => question_json(@question,
+        @current_user,
+        session,
+        @context,
+        parse_includes,
+        censored?)
     end
   end
 
@@ -374,4 +384,11 @@ class QuizQuestionsController < ApplicationController
     end
   end
 
+  def parse_includes
+    Array(params[:include] || []).map(&:to_sym)
+  end
+
+  def censored?
+    !@quiz.grants_right?(@current_user, session, :update)
+  end
 end

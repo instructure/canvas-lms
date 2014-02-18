@@ -43,6 +43,7 @@ define [
 
     click: (event) ->
       event.preventDefault()
+      event.stopPropagation()
       return if @isDisabled()
       @keepState = true
       if @isPublish()

@@ -3,15 +3,14 @@ define ['underscore', 'Backbone'], (_, Backbone) ->
   class FeatureFlag extends Backbone.Model
 
     LABEL:
-      beta:   { cssClass: 'info',      name: 'beta'        }
-      hidden: { cssClass: 'default',   name: 'hidden'      }
-      dev:    { cssClass: 'important', name: 'development' }
+      beta        : { cssClass: 'info',      name: 'beta'        }
+      hidden      : { cssClass: 'default',   name: 'hidden'      }
+      development : { cssClass: 'important', name: 'development' }
 
     resourceName: 'features'
 
     urlRoot: ->
-      [context, id] = ENV.context_asset_string.split('_')
-      "/api/v1/#{context}s/#{id}/features/flags"
+      "/api/v1/#{@contextType()}s/#{@contextId()}/features/flags"
 
     flagContext: ->
       flag = @get('flag')
@@ -38,13 +37,33 @@ define ['underscore', 'Backbone'], (_, Backbone) ->
     isSiteAdmin: ->
       !!ENV.ACCOUNT?.site_admin
 
+    contextType: ->
+      ENV.context_asset_string.split('_')[0]
+
+    contextId: ->
+      ENV.context_asset_string.split('_')[1]
+
+    isContext: (type) ->
+      @contextType() == type.toLowerCase()
+
     currentContextIsAccount: ->
       ENV.context_asset_string.split('_')[0] == 'account'
+
+    warningFor: (action) ->
+      settings = @transitions()[action]
+      return if settings?.message then settings else false
+
+    updateTransitions: =>
+      $.getJSON(@url()).then ({transitions}) =>
+        @get('feature_flag').transitions = transitions
+
+    transitions: ->
+      @get('feature_flag').transitions
 
     toJSON: ->
       _.extend(super, isAllowed: @isAllowed(), isHidden: @isHidden(),
         isOff: @isOff(true), isOn: @isOn(), isSiteAdmin: @isSiteAdmin(),
-        currentContextIsAccount: @currentContextIsAccount())
+        currentContextIsAccount: @isContext('account'))
 
     parse: (json) ->
       _.extend(json, @attributes)
@@ -60,8 +79,7 @@ define ['underscore', 'Backbone'], (_, Backbone) ->
         labels: []
       feature.flag = json.feature_flag if json.feature_flag
       feature.state = json.feature_flag.state if json.feature_flag
-      feature.labels.push(FeatureFlag::LABEL.beta)   if json.beta
-      feature.labels.push(FeatureFlag::LABEL.hidden) if json.hidden
-      feature.labels.push(FeatureFlag::LABEL.dev)    if json.development
-      console.log(feature.labels)
+      feature.labels.push(FeatureFlag::LABEL.beta)        if json.beta
+      feature.labels.push(FeatureFlag::LABEL.hidden)      if json.hidden
+      feature.labels.push(FeatureFlag::LABEL.development) if json.development
       _.extend(json, feature)

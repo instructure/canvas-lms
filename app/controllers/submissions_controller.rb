@@ -138,8 +138,8 @@ class SubmissionsController < ApplicationController
     append_sis_data(hash)
     js_env(hash)
 
-    @submission = @assignment.find_submission(@user)
-    @submission ||= @context.submissions.build(:user => @user, :assignment_id => @assignment.id)
+    @submission = @assignment.submissions.where(user_id: @user).first
+    @submission ||= @assignment.submissions.build(:user => @user)
     @submission.grants_rights?(@current_user, session)
     @rubric_association = @assignment.rubric_association
     @rubric_association.assessing_user_id = @submission.user_id if @rubric_association
@@ -438,7 +438,7 @@ class SubmissionsController < ApplicationController
     end
 
     @attachment = @assignment.attachments.new(
-      uploaded_data: ActionController::TestUploadedFile.new(path, document_response.content_type, true),
+      uploaded_data: Rack::Test::UploadedFile.new(path, document_response.content_type, true),
       display_name: display_name, user: @current_user
     )
     @attachment.save!

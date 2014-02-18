@@ -335,7 +335,7 @@ define([
   $("#submit_from_external_tool_form .tools li").live('click', function(event) {
     event.preventDefault();
     var tool = $(this).data('tool');
-    var url = "/courses/" + $("#identity .course_id").text() + "/external_tools/" + tool.id + "/resource_selection?homework=1&assignment_id=" + ENV.SUBMIT_ASSIGNMENT.ID;
+    var url = "/courses/" + ENV.COURSE_ID + "/external_tools/" + tool.id + "/resource_selection?homework=1&assignment_id=" + ENV.SUBMIT_ASSIGNMENT.ID;
     var width = tool.homework_submission.selection_width || tool.selection_width;
     var height = tool.homework_submission.selection_height || tool.selection_height;
     var title = tool.display_text;

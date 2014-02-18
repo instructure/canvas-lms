@@ -38,7 +38,7 @@ require [
                     model: new Backbone.Model
                     filterModel: filterModel
 
-  entriesView   = new EntriesView
+  @entriesView   = new EntriesView
                     el: '#discussion_subentries'
                     collection: entries
                     descendants: descendants
@@ -88,7 +88,7 @@ require [
     router.navigate '',
       trigger: false
       replace: true
-    $container.scrollTo top
+    $container.scrollTop(top)
 
   ##
   # catch when an EntryView changes the read_state

@@ -19,9 +19,9 @@
 # @API Custom Gradebook Columns
 # @subtopic Custom Gradebook Column Data
 #
-# Column Datum objects contain the entry for a column for each user.
+# ColumnDatum objects contain the entry for a column for each user.
 #
-# @object Column Datum
+# @object ColumnDatum
 #    {
 #      "content": "Nut allergy",
 #
@@ -36,7 +36,7 @@ class CustomGradebookColumnDataApiController < ApplicationController
   #
   # This does not list entries for students without associated data.
   #
-  # @returns [Column Datum]
+  # @returns [ColumnDatum]
   def index
     col = @context.custom_gradebook_columns.active.find(params[:id])
 
@@ -59,7 +59,7 @@ class CustomGradebookColumnDataApiController < ApplicationController
   # @argument column_data[content] [String]
   #   Column content.  Setting this to blank will delete the datum object.
   #
-  # @returns Column Datum
+  # @returns ColumnDatum
   def update
     user = allowed_users.where(:id => params[:user_id]).first
     raise ActiveRecord::RecordNotFound unless user

@@ -59,7 +59,7 @@ def file_setup
 end
 
 describe "common file behaviors" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def add_file(file_fullpath)
     attachment_field = keep_trying_until do
@@ -168,7 +168,7 @@ describe "common file behaviors" do
 end
 
 describe "files without s3 and forked tests" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     @folder_name = "my folder"
@@ -219,7 +219,7 @@ describe "files without s3 and forked tests" do
 end
 
 describe "course files" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   it "should not show root folder files in the collaborations folder when there is a collaboration" do
     course_with_teacher_logged_in
@@ -252,7 +252,7 @@ describe "course files" do
 end
 
 describe "scribd re-rendering" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before do
     ScribdAPI.stubs(:config).returns({ :key => "key", :secret => "what" })

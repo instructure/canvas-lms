@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CourseSection, "moving to new course" do
-  
+
   it "should transfer enrollments to the new root account" do
     account1 = Account.create!(:name => "1")
     account2 = Account.create!(:name => "2")
@@ -33,43 +33,43 @@ describe CourseSection, "moving to new course" do
     e.workflow_state = 'active'
     e.save!
     course1.reload
-    
+
     course1.course_sections.find_by_id(cs.id).should_not be_nil
     course2.course_sections.find_by_id(cs.id).should be_nil
     course3.course_sections.find_by_id(cs.id).should be_nil
     e.root_account.should eql(account1)
     e.course.should eql(course1)
-    
+
     cs.move_to_course(course2)
     course1.reload
     course2.reload
     cs.reload
     e.reload
-    
+
     course1.course_sections.find_by_id(cs.id).should be_nil
     course2.course_sections.find_by_id(cs.id).should_not be_nil
     course3.course_sections.find_by_id(cs.id).should be_nil
     e.root_account.should eql(account2)
     e.course.should eql(course2)
-    
+
     cs.move_to_course(course3)
     course1.reload
     course2.reload
     cs.reload
     e.reload
-    
+
     course1.course_sections.find_by_id(cs.id).should be_nil
     course2.course_sections.find_by_id(cs.id).should be_nil
     course3.course_sections.find_by_id(cs.id).should_not be_nil
     e.root_account.should eql(account2)
     e.course.should eql(course3)
-    
+
     cs.move_to_course(course1)
     course1.reload
     course2.reload
     cs.reload
     e.reload
-    
+
     course1.course_sections.find_by_id(cs.id).should_not be_nil
     course2.course_sections.find_by_id(cs.id).should be_nil
     course3.course_sections.find_by_id(cs.id).should be_nil
@@ -81,7 +81,7 @@ describe CourseSection, "moving to new course" do
     course2.reload
     cs.reload
     e.reload
-    
+
     course1.course_sections.find_by_id(cs.id).should_not be_nil
     course2.course_sections.find_by_id(cs.id).should be_nil
     course3.course_sections.find_by_id(cs.id).should be_nil
@@ -140,7 +140,7 @@ describe CourseSection, "moving to new course" do
     u.reload
     u.associated_accounts.map(&:id).sort.should == [root_account.id, sub_account1.id]
   end
-  
+
   it "should crosslist and uncrosslist" do
     account1 = Account.create!(:name => "1")
     account2 = Account.create!(:name => "2")
@@ -164,7 +164,7 @@ describe CourseSection, "moving to new course" do
     course3.workflow_state = 'active'
     course3.save
     e.reload
-    
+
     course1.course_sections.find_by_id(cs.id).should_not be_nil
     course2.course_sections.find_by_id(cs.id).should be_nil
     course3.course_sections.find_by_id(cs.id).should be_nil
@@ -174,13 +174,13 @@ describe CourseSection, "moving to new course" do
     course1.workflow_state.should == 'created'
     course2.workflow_state.should == 'created'
     course3.workflow_state.should == 'created'
-    
+
     cs.crosslist_to_course(course2)
     course1.reload
     course2.reload
     cs.reload
     e.reload
-    
+
     course1.course_sections.find_by_id(cs.id).should be_nil
     course2.course_sections.find_by_id(cs.id).should_not be_nil
     course3.course_sections.find_by_id(cs.id).should be_nil
@@ -190,14 +190,14 @@ describe CourseSection, "moving to new course" do
     course1.workflow_state.should == 'created'
     course2.workflow_state.should == 'created'
     course3.workflow_state.should == 'created'
-      
+
     cs.crosslist_to_course(course3)
     course1.reload
     course2.reload
     course3.reload
     cs.reload
     e.reload
-    
+
     course1.course_sections.find_by_id(cs.id).should be_nil
     course2.course_sections.find_by_id(cs.id).should be_nil
     course3.course_sections.find_by_id(cs.id).should_not be_nil
@@ -207,14 +207,14 @@ describe CourseSection, "moving to new course" do
     course1.workflow_state.should == 'created'
     course2.workflow_state.should == 'created'
     course3.workflow_state.should == 'created'
-      
+
     cs.uncrosslist
     course1.reload
     course2.reload
     course3.reload
     cs.reload
     e.reload
-    
+
     course1.course_sections.find_by_id(cs.id).should_not be_nil
     course2.course_sections.find_by_id(cs.id).should be_nil
     course3.course_sections.find_by_id(cs.id).should be_nil
@@ -225,7 +225,7 @@ describe CourseSection, "moving to new course" do
     course2.workflow_state.should == 'created'
     course3.workflow_state.should == 'created'
   end
-  
+
   it 'should update course account associations on save' do
     account1 = Account.create!(:name => "1")
     account2 = account1.sub_accounts.create!(:name => "2")
@@ -246,22 +246,46 @@ describe CourseSection, "moving to new course" do
     CourseAccountAssociation.find_all_by_course_id(course1.id).map(&:account_id).uniq.should == [account1.id]
     CourseAccountAssociation.find_all_by_course_id(course2.id).map(&:account_id).uniq.sort.should == [account1.id, account2.id].sort
   end
-  
+
+  describe 'validation' do
+    before(:each) do
+      course = Course.create_unique
+      @section = CourseSection.create(course: course)
+      @long_string = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
+    end
+
+    it "should validate the length of attributes" do
+      @section.name = @long_string
+      @section.sis_source_id = @long_string
+      (lambda {@section.save!}).should raise_error("Validation failed: Sis source is too long (maximum is 255 characters), Name is too long (maximum is 255 characters)")
+    end
+
+    it "should validate the length of sis_source_id" do
+      @section.sis_source_id = @long_string
+      (lambda {@section.save!}).should raise_error("Validation failed: Sis source is too long (maximum is 255 characters)")
+    end
+
+    it "should validate the length of section name" do
+      @section.name = @long_string
+      (lambda {@section.save!}).should raise_error("Validation failed: Name is too long (maximum is 255 characters)")
+    end
+  end
+
   describe 'deletable?' do
     before do
       course_with_teacher
       @section = course.course_sections.create!
     end
-    
+
     it 'should be deletable if empty' do
       @section.should be_deletable
     end
-    
+
     it 'should not be deletable if it has real enrollments' do
       student_in_course :section => @section
       @section.should_not be_deletable
     end
-    
+
     it 'should be deletable if it only has a student view enrollment' do
       @course.student_view_student
       @section.enrollments.map(&:type).should eql ['StudentViewEnrollment']

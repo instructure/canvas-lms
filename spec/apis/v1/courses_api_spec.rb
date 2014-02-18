@@ -26,6 +26,7 @@ class TestCourseApi
   def api_user_content(syllabus, course); return "api_user_content(#{syllabus}, #{course.id})"; end
 end
 
+
 describe Api::V1::Course do
 
   describe '#course_json' do
@@ -660,6 +661,7 @@ describe CoursesController, :type => :integration do
 
       it "should deal gracefully with an invalid course id" do
         @course2.enrollments.scoped.delete_all
+        @course2.course_account_associations.scoped.delete_all
         @course2.destroy!
         json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course1.id}&course_ids[]=#{@course2.id}",
                         @params.merge(:event => 'offer', :course_ids => [@course1.id.to_s, @course2.id.to_s]))
@@ -717,6 +719,7 @@ describe CoursesController, :type => :integration do
 
       it "should report a failure if no updates succeeded" do
         @course2.enrollments.scoped.delete_all
+        @course2.course_account_associations.scoped.delete_all
         @course2.destroy!
         json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course2.id}",
                         @params.merge(:event => 'offer', :course_ids => [@course2.id.to_s]))
@@ -1163,6 +1166,7 @@ describe CoursesController, :type => :integration do
         specs_require_sharding
 
         it "should load the user's enrollment for an out-of-shard user" do
+          pend_with_bullet
           @shard1.activate { @user = User.create!(name: 'outofshard') }
           enrollment = @course1.enroll_student(@user)
           @course1.root_account.pseudonyms.create!(user: @user, unique_id: 'outofshard')
@@ -1179,6 +1183,7 @@ describe CoursesController, :type => :integration do
     end
 
     describe "/users" do
+
       it "returns an empty array for a page past the end" do
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json?page=5",
           controller: 'courses',
@@ -1247,6 +1252,7 @@ describe CoursesController, :type => :integration do
       end
 
       it "doesn't return enrollments from another course" do
+        pend_with_bullet
         other_enroll = @course2.enroll_user(@student1, 'StudentEnrollment')
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },

@@ -7,8 +7,23 @@ $selectedBorderColor: #31b5ff;
 div#content {
   overflow: visible;
   padding: 0;
+  min-width: 763px;
 }
 
+#ember-loading {
+  padding: 10px;
+  text-align: center;
+  background-color: #FFF;
+  border-bottom: 1px solid #C1C7CF;
+  min-height: 33px;
+}
+li.quiz .ig-title {
+  right: 554px;
+}
+
+.header-bar {
+  overflow: visible;
+}
 
 
 .item-group-container {
@@ -46,6 +61,6 @@ li.quiz {
   cursor: pointer;
   .ig-details {
     right: 110px;
-    width: 415px;
+    width: 425px;
   }
 }

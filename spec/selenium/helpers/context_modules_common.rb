@@ -1,8 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def io
-    require 'action_controller_test_process'
-    ActionController::TestUploadedFile.new(File.expand_path(File.dirname(__FILE__) + '/../fixtures/scribd_docs/txt.txt'), 'text/plain', true)
+    fixture_file_upload('scribd_docs/txt.txt', 'text/plain', true)
   end
 
   def add_existing_module_item(item_select_selector, module_name, item_name)

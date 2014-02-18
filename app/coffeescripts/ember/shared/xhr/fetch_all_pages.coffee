@@ -4,19 +4,19 @@ define [
   './parse_link_header'
 ], ({$, ArrayProxy}, ajax, parseLinkHeader) ->
 
-  fetch = (url, records, data) ->
+  fetch = (url, data, records) ->
     opts = $.extend({dataType: "json"}, {data: data})
     ajax.raw(url, opts).then (result) ->
       records.pushObjects result.response
       meta = parseLinkHeader result.jqXHR
       if meta.next
-        fetch meta.next, records, data
+        fetch meta.next, data, records
       else
         records.set('isLoaded', true)
         records.set('isLoading', false)
 
-  fetchAllPages = (url, data) ->
-    records = ArrayProxy.create({content: []})
+  fetchAllPages = (url, data, records) ->
+    records ||= ArrayProxy.create({content: []})
     records.set('isLoading', true)
-    fetch url, records, data
+    fetch url, data, records
     records

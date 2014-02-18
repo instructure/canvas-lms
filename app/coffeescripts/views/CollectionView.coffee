@@ -1,9 +1,10 @@
 define [
+  'i18n!instructure'
   'jquery'
   'underscore'
   'Backbone'
   'jst/collectionView'
-], ($, _, Backbone, template) ->
+], (I18n, $, _, Backbone, template) ->
 
   ##
   # Renders a collection of items with an item view. Binds to a handful of
@@ -28,6 +29,10 @@ define [
 
     @optionProperty 'itemViewOptions'
 
+    @optionProperty 'emptyMessage'
+
+    @optionProperty 'listClassName'
+
     className: 'collectionView'
 
     els:
@@ -35,6 +40,7 @@ define [
 
     defaults:
       itemViewOptions: {}
+      emptyMessage: I18n.t("no_items", "No items.")
 
     ##
     # When using a different template ensure it contains an element with a
@@ -68,7 +74,7 @@ define [
     ##
     # @api public
 
-    toJSON: -> _.extend(@options, {ENV})
+    toJSON: -> _.extend(@options, {@emptyMessage, @listClassName, ENV})
 
     ##
     # Reorder child views according to current collection ordering.

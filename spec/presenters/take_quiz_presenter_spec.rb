@@ -281,6 +281,51 @@ describe TakeQuizPresenter do
     end
   end
 
+  describe "#question_class" do
+    it "always returns 'list_question'" do
+      presenter.question_class(question1).should =~ /list_question/
+      presenter.question_class(question2).should =~/list_question/
+
+    end
+
+    it "adds 'answered' if the question was answered" do
+      submission.stubs(:submission_data).returns(
+        "question_#{question1[:id]}" => true,
+        "question_#{question2[:id]}" => nil
+      )
+      presenter.reload!
+
+      presenter.question_class(question1).should =~ /answered/
+      presenter.question_class(question2).should_not =~ /answered/
+    end
+
+    it "adds 'marked' if the question was marked" do
+      submission.stubs(:submission_data).returns(
+        "question_#{question1[:id]}_marked" => true,
+        "question_#{question2[:id]}_marked" => false
+      )
+
+      presenter.reload!
+
+      presenter.question_class(question1).should =~ /marked/
+      presenter.question_class(question2).should_not =~ /marked/
+    end
+
+    it "adds 'seen' if the question was seen" do
+      presenter.question_class(question1).should =~ /seen/
+      presenter.question_class(question2).should_not =~ /seen/
+
+    end
+
+    it "adds 'text_only' if the question is a text only question" do
+      q2 = question2.dup
+      q2['question_type'] = 'text_only_question'
+
+      presenter.question_class(question1).should_not =~ /text_only/
+      presenter.question_class(q2).should =~ /text_only/
+    end
+  end
+
   describe 'building the answer set' do
     it 'should discard irrelevant entries' do
       submission.stubs(:submission_data).returns({

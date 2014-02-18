@@ -368,7 +368,7 @@ class AssignmentsController < ApplicationController
       end
 
       hash = {
-        :ASSIGNMENT_GROUPS => Api.recursively_stringify_json_ids(json_for_assignment_groups),
+        :ASSIGNMENT_GROUPS => json_for_assignment_groups,
         :GROUP_CATEGORIES => group_categories,
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
         :SECTION_LIST => (@context.course_sections.active.map { |section|
@@ -379,7 +379,7 @@ class AssignmentsController < ApplicationController
         :ASSIGNMENT_INDEX_URL => polymorphic_url([@context, :assignments]),
       }
 
-      hash[:ASSIGNMENT] = Api.recursively_stringify_json_ids(assignment_json(@assignment, @current_user, session, override_dates: false))
+      hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
       hash[:ASSIGNMENT][:has_submitted_submissions] = @assignment.has_submitted_submissions?
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])

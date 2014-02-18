@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
 describe "grades" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     course_with_teacher(:active_all => true)
@@ -119,7 +119,7 @@ describe "grades" do
     it "should allow student to test modifying grades" do
       get "/courses/#{@course.id}/grades"
 
-      Assignment.expects(:find_or_create_submission).twice.returns(@submission)
+      Assignment.any_instance.expects(:find_or_create_submission).twice.returns(@submission)
 
       #check initial total
       f('#submission_final-grade .assignment_score .grade').text.should == '33.3'

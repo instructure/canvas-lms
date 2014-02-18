@@ -150,6 +150,49 @@ describe "Outcome Groups API", :type => :integration do
     end
   end
 
+  describe "index" do
+    before :each do
+      @account = Account.default
+      @account_user = @user.account_users.create(:account => @account)
+    end
+
+    it "should return active groups" do
+      @child_group = @account.root_outcome_group.child_outcome_groups.create!(title: 'child group')
+      @deleted_group = @account.root_outcome_group.child_outcome_groups.create!(title: 'deleted group')
+      @deleted_group.workflow_state = 'deleted'
+      @deleted_group.save!
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups",
+        controller: 'outcome_groups_api', action: 'index', account_id: @account.id, format: 'json')
+      expected_ids = [@account.root_outcome_group, @child_group].map(&:id).sort
+      json.map{|j| j['id']}.sort.should == expected_ids
+    end
+
+  end
+
+  describe "link_index" do
+    before :each do
+      @account = Account.default
+      @account_user = @user.account_users.create(:account => @account)
+      @group = @account.root_outcome_group
+    end
+
+    it "should return active links" do
+      @links = (1..3).map{ create_outcome }
+      link = @links.pop
+      link.workflow_state = 'deleted'
+      link.save!
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_group_links",
+        controller: 'outcome_groups_api', action: 'link_index', account_id: @account.id, format: 'json')
+      expected_outcome_ids = @links.map(&:content).map(&:id).sort
+      expected_group_ids = @links.map(&:associated_asset).map(&:id).sort
+      json.map {|j| j['outcome']['id']}.sort.should == expected_outcome_ids
+      json.map {|j| j['outcome_group']['id']}.sort.should == expected_group_ids
+    end
+
+  end
+
   describe "show" do
     describe "global context" do
       before :each do

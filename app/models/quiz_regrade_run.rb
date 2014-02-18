@@ -14,10 +14,13 @@ class QuizRegradeRun < ActiveRecord::Base
   set_broadcast_policy do |policy|
     policy.dispatch :quiz_regrade_finished
     policy.to { teachers }
-    policy.whenever do |run|
-      old,new = run.changes['finished_at']
-      !!(new && old.nil?)
-    end
+    policy.whenever { |run| run.send_messages? }
+  end
+
+  def send_messages?
+    old,new = changes['finished_at']
+    !!(new && old.nil?) &&
+      QuizRegradeRun.where(quiz_regrade_id: quiz_regrade).count == 1
   end
 
   delegate :teachers, :quiz, to: :quiz_regrade

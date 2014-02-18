@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "layout" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     course_with_student_logged_in
@@ -40,6 +40,6 @@ describe "layout" do
   end
 
   it "should have ENV available to the JavaScript from js_env" do
-    driver.execute_script("return ENV.current_user_id").should == @user.id
+    driver.execute_script("return ENV.current_user_id").should == @user.id.to_s
   end
 end

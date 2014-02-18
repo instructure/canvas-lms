@@ -18,7 +18,25 @@ define [
       I18n.t('questions', 'Question', count: @get('question_count'))
     ).property('question_count')
 
-    canUpdate: true
+    canUpdate: ( ->
+      @get('can_update')
+    ).property('can_update')
+
+    isPublishedStatusVisible: ( ->
+      @get('published') && @get('can_update')
+    ).property('published', 'can_update')
+
+    allDates: ( ->
+      if @get('all_dates')
+        @get('all_dates')
+      else
+        [{
+          base: true,
+          unlock_at: @get('unlock_at'),
+          due_at: @get('due_at'),
+          lock_at: @get('lock_at')
+        }]
+    ).property('all_dates')
 
     disabled: (->
       !@get('unpublishable')
@@ -27,11 +45,7 @@ define [
     disabledMessage: I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
 
     pubUrl: ( ->
-      "/courses/#{environment.get('courseId')}/quizzes/publish"
-    ).property('environment.courseId')
-
-    unPubUrl: ( ->
-      "/courses/#{environment.get('courseId')}/quizzes/unpublish"
+      "/api/v1/courses/#{environment.get('courseId')}/quizzes/#{@get('id')}/"
     ).property('environment.courseId')
 
     editTitle: I18n.t('edit_quiz', 'Edit Quiz')
@@ -51,12 +65,14 @@ define [
     ).property('points_possible')
 
     updatePublished: (url, publishing) ->
+      @set('published', publishing)
       ajax(url,
-        type: 'POST',
-        data: {quizzes: [@get('id')]},
-        dataType: 'json'
-      ).then =>
-        @set('published', publishing)
+        type: 'PUT',
+        dataType: 'json',
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({quizzes: [@get('model')]})
+      ).then (result) =>
+        @set('model', result.quizzes[0])
       .fail =>
         @set('published', !publishing)
 
@@ -65,7 +81,7 @@ define [
         @updatePublished(@get('pubUrl'), true)
 
       unpublish: ->
-        @updatePublished(@get('unPubUrl'), false)
+        @updatePublished(@get('pubUrl'), false)
 
       edit: ->
         window.location = @get('editUrl')

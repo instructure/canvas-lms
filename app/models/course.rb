@@ -197,6 +197,10 @@ class Course < ActiveRecord::Base
 
   has_a_broadcast_policy
 
+  def [](attr)
+    attr.to_s == 'asset_string' ? self.asset_string : super
+  end
+
   def events_for(user)
     if user
       CalendarEvent.
@@ -556,9 +560,12 @@ class Course < ActiveRecord::Base
 
   def user_has_been_instructor?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_has_been_instructor"].cache_key) do
-      # active here is !deleted; it still includes concluded, etc.
-      self.instructor_enrollments.active.find_by_user_id(user.id).present?
+    # enrollments should be on the course's shard
+    self.shard.activate do
+      Rails.cache.fetch([self, user, "course_user_has_been_instructor"].cache_key) do
+        # active here is !deleted; it still includes concluded, etc.
+        self.instructor_enrollments.active.find_by_user_id(user.id).present?
+      end
     end
   end
 
@@ -664,7 +671,7 @@ class Course < ActiveRecord::Base
   def update_course_section_names
     return if @course_name_was == self.name || !@course_name_was
     sections = self.course_sections
-    fields_to_possibly_rename = [:name, :section_code]
+    fields_to_possibly_rename = [:name]
     sections.each do |section|
       something_changed = false
       fields_to_possibly_rename.each do |field|
@@ -988,7 +995,7 @@ class Course < ActiveRecord::Base
 
     # Active admins (Teacher/TA/Designer)
     given { |user, session| (self.available? || self.created? || self.claimed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
-    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_hidden_items and can :view_unpublished_items and can :manage_feature_flags
+    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_unpublished_items and can :manage_feature_flags
 
     # Teachers and Designers can delete/reset, but not TAs
     given { |user, session| !self.deleted? && !self.sis_source_id && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_content_admin? } && (!session || !session["role_course_#{self.id}"]) }
@@ -1059,7 +1066,7 @@ class Course < ActiveRecord::Base
     can :read_as_admin
 
     given { |user, session| self.account_membership_allows(user, session, :manage_courses) }
-    can :read_as_admin and can :manage and can :update and can :delete and can :use_student_view and can :reset_content and can :view_hidden_items and can :view_unpublished_items and can :manage_feature_flags
+    can :read_as_admin and can :manage and can :update and can :delete and can :use_student_view and can :reset_content and can :view_unpublished_items and can :manage_feature_flags
 
     given { |user, session| self.account_membership_allows(user, session, :read_course_content) }
     can :read and can :read_outcomes
@@ -1557,10 +1564,19 @@ class Course < ActiveRecord::Base
     e.role_name = role_name
     e.self_enrolled = self_enrolled
     if e.changed?
-      if opts[:no_notify]
-        e.save_without_broadcasting
-      else
-        e.save
+      transaction do
+        if connection.adapter_name == 'PostgreSQL' && connection.send(:postgresql_version) < 90300
+          # without this, inserting/updating on enrollments will share lock the course, but then
+          # it tries to touch the course, which will deadlock with another transaction doing the
+          # same thing. on 9.3, it will KEY SHARE lock, which doesn't conflict with the NO KEY
+          # UPDATE needed to touch it
+          self.lock!
+        end
+        if opts[:no_notify]
+          e.save_without_broadcasting
+        else
+          e.save
+        end
       end
     end
     e.user = user
@@ -1607,7 +1623,7 @@ class Course < ActiveRecord::Base
     else
       asset.ignores.where(:purpose => 'grading', :permanent => false).delete_all
     end
-    instructors.each(&:touch)
+    instructors.order(:id).each(&:touch)
   end
 
   def grading_standard_enabled
@@ -1692,7 +1708,7 @@ class Course < ActiveRecord::Base
     if !section && opts[:include_xlists]
       section = CourseSection.active.where(:nonxlist_course_id => self).order(:id).first
     end
-    if !section
+    if !section && !opts[:no_create]
       section = course_sections.build
       section.default_section = true
       section.course = self
@@ -2548,7 +2564,7 @@ class Course < ActiveRecord::Base
           tabs.detect { |t| t[:id] == TAB_SYLLABUS }[:manageable] = true
           tabs.detect { |t| t[:id] == TAB_QUIZZES }[:manageable] = true
         end
-        tabs.delete_if { |t| t[:hidden] && t[:external] }
+        tabs.delete_if { |t| t[:hidden] && t[:external] } unless opts[:api] && self.grants_rights?(user, nil, :manage_content)
         tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_rights?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades).values.any?
         tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if self.grants_rights?(user, opts[:session], :view_all_grades, :manage_grades).values.any?
         tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_rights?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users).values.any?

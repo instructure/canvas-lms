@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2013 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -493,6 +493,9 @@ describe "Default Account Reports" do
       end
 
       it "should run the provisioning report" do
+        @course6.destroy
+        @course4.destroy
+        Course.where(id: @course6.id).update_all(updated_at: 122.days.ago)
         parameters = {}
         parameters["include_deleted"] = true
         parameters["courses"] = true
@@ -511,10 +514,8 @@ describe "Default Account Reports" do
         parsed[3].should == [@course5.id.to_s,"SIS_COURSE_ID_5","ENG101","Sd Math 100",
                              @sub_account.id.to_s,"sub1",@term1.id.to_s,"fall12","deleted",nil,nil]
         parsed[4].should == [@course4.id.to_s,nil,"self","self help",@course4.account_id.to_s,nil,
-                             @default_term.id.to_s,nil,"unpublished",nil,nil]
-        parsed[5].should == [@course6.id.to_s,nil,"Tal101","talking 101",@course6.account_id.to_s,
-                             nil,@default_term.id.to_s,nil,"concluded",nil,nil]
-        parsed.length.should == 6
+                             @default_term.id.to_s,nil,"deleted",nil,nil]
+        parsed.length.should == 5
       end
 
       it "should run the sis report on a sub account" do

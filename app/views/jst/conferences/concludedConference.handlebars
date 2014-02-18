@@ -1,77 +1,75 @@
-<li class="conference">
-  <div class="ig-row">
-    {{#if recording}}
-      <a class="ig-title ellipses element_toggler"
-          href="#"
-          aria-controls="conference-{{id}}"
-          aria-expanded="false"
-          role="button">
-        <i class="icon-mini-arrow-right"></i>
-        {{title}}
-      </a>
-    {{else}}
-      <span class="ig-title ellipses">{{title}}</span>
-    {{/if}}
-    <div class="ig-details row-fluid">
-      <div class="span4 ellipses">{{description}}</div>
-      <div class="span4 ellipses">{{dateString ended_at}}</div>
-      {{#if recording}}
-        {{#if multipleRecordings}}
-          <div class="span4 ellipses">{{#t "recordings"}}{{recordingCount}} Recordings{{/t}}</div>
-        {{else}}
-          <div class="span4 ellipses">{{#t "recording"}}1 Recording{{/t}}</div>
-        {{/if}}
-      {{else}}
-        <div class="span4 ellipses">
-          {{#if user_settings.record}}
-            {{#t "preparing_video"}}Preparing Video{{/t}}
-          {{else}}
-            {{#t "no_recording"}}No Recordings{{/t}}
-          {{/if}}
-        </div>
-      {{/if}}
-    </div>
-    <div class="ig-admin">
-      {{#if permissions.delete}}
-        <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="{{id}}-content-1" aria-label="{{#t "setings"}}settings{{/t}}" href="#">
-          <i class="icon-settings"></i>
-          <i class="icon-mini-arrow-down"></i>
-        </a>
-        <ul id="{{id}}-content-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false" aria-activedescendant="{{id}}-content-2">
-          <li role="presentation">
-            <a href="{{ url }}"
-                class="icon-trash  delete_conference_link"
-                id="{{id}}-content-3"
-                role="menuitem"
-                aria-label="{{#t "delete"}}Delete{{/t}}"
-                title="{{#t "delete"}}Delete{{/t}}">{{#t "delete"}}Delete{{/t}}
-            </a>
-          </li>
-        </ul>
-      {{/if}}
-    </div>
-  </div>
+<div class="ig-row">
   {{#if recording}}
-    <div class="ig-sublist" id="conference-{{id}}" style="display: none;">
-      <ul>
-        {{#each recordings}}
-          <li>
-            <div class="ig-row row-fluid">
-              <a href="{{playback_url}}" target="_blank" class="ig-title ellipses">{{title}}</a>
-              <div class="ig-details row-fluid">
-                <div class="span4 ellipses"></div>
-                <div class="span4 ellipses">{{dateString created_at}}</div>
-                <div class="span4 ellipses">{{minutesToHM duration_minutes}}</div>
-              </div>
-              <div class="ig-button">
-                <a class="btn btn-small" target="_blank" href="{{playback_url}}">
-                  {{#t "view"}}View{{/t}}
-                </a>
-              </div>
-            </div>
-          </li>
-        {{/each}}
-      </ul>
-    </div>
+    <a class="ig-title ellipses element_toggler"
+        href="#"
+        aria-controls="conference-{{id}}"
+        aria-expanded="false"
+        role="button">
+      <i class="icon-mini-arrow-right"></i>
+      {{title}}
+    </a>
+  {{else}}
+    <span class="ig-title ellipses">{{title}}</span>
   {{/if}}
-</li>
+  <div class="ig-details row-fluid">
+    <div class="span4 ellipses">{{description}}</div>
+    <div class="span4 ellipses">{{dateString ended_at}}</div>
+    {{#if recording}}
+      {{#if multipleRecordings}}
+        <div class="span4 ellipses">{{#t "recordings"}}{{recordingCount}} Recordings{{/t}}</div>
+      {{else}}
+        <div class="span4 ellipses">{{#t "recording"}}1 Recording{{/t}}</div>
+      {{/if}}
+    {{else}}
+      <div class="span4 ellipses">
+        {{#if user_settings.record}}
+          {{#t "preparing_video"}}Preparing Video{{/t}}
+        {{else}}
+          {{#t "no_recording"}}No Recordings{{/t}}
+        {{/if}}
+      </div>
+    {{/if}}
+  </div>
+  <div class="ig-admin">
+    {{#if permissions.delete}}
+      <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="{{id}}-content-1" aria-label="{{#t "setings"}}settings{{/t}}" href="#">
+        <i class="icon-settings"></i>
+        <i class="icon-mini-arrow-down"></i>
+      </a>
+      <ul id="{{id}}-content-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false" aria-activedescendant="{{id}}-content-2">
+        <li role="presentation">
+          <a href="{{ url }}"
+              class="icon-trash  delete_conference_link"
+              id="{{id}}-content-3"
+              role="menuitem"
+              aria-label="{{#t "delete"}}Delete{{/t}}"
+              title="{{#t "delete"}}Delete{{/t}}">{{#t "delete"}}Delete{{/t}}
+          </a>
+        </li>
+      </ul>
+    {{/if}}
+  </div>
+</div>
+{{#if recording}}
+  <div class="ig-sublist" id="conference-{{id}}" style="display: none;">
+    <ul>
+      {{#each recordings}}
+        <li>
+          <div class="ig-row row-fluid">
+            <a href="{{playback_url}}" target="_blank" class="ig-title ellipses">{{title}}</a>
+            <div class="ig-details row-fluid">
+              <div class="span4 ellipses"></div>
+              <div class="span4 ellipses">{{dateString created_at}}</div>
+              <div class="span4 ellipses">{{minutesToHM duration_minutes}}</div>
+            </div>
+            <div class="ig-button">
+              <a class="btn btn-small" target="_blank" href="{{playback_url}}">
+                {{#t "view"}}View{{/t}}
+              </a>
+            </div>
+          </div>
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+{{/if}}

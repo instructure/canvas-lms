@@ -15,22 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
-module ActiveSupport
-  module CoreExtensions
-    module Date
-      module Conversions
-        # Returns midnight on this date in the specified time zone (defaulting to
-        # Time.zone). Use this rather than Date#to_time, which returns a Time object at
-        # midnight in the system time zone, which we never care about.
-        def in_time_zone(zone=::Time.zone)
-          # would do zone = Time.get_zone(zone), but that's a private method,
-          # and I'm a good boy
-          ::Time.use_zone(zone) do
-            ::Time.zone.local(self.year, self.month, self.day)
-          end
-        end
-      end
+class Date
+  def in_time_zone(zone=::Time.zone)
+    # would do zone = Time.get_zone(zone), but that's a private method,
+    # and I'm a good boy
+    ::Time.use_zone(zone) do
+      ::Time.zone.local(self.year, self.month, self.day)
     end
   end
 end

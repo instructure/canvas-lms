@@ -37,26 +37,6 @@ class MethodView < HashView
     select_tags("argument")
   end
 
-  def query_args
-    raw_arguments.map do |tag|
-      ArgumentView.new(tag.text, route.verb, route.path_variables)
-    end
-  end
-
-  def query_arg_names
-    query_args.map{ |arg| arg.name }
-  end
-
-  def path_args
-    (route.path_variables - query_arg_names).map do |path_variable|
-      ArgumentView.new("#{path_variable} [String] ID", route.verb, route.path_variables)
-    end
-  end
-
-  def arguments
-    path_args + query_args
-  end
-
   def return_tag
     select_tags("returns").first
   end
@@ -69,40 +49,28 @@ class MethodView < HashView
     end
   end
 
-  def route
-    @route ||= RouteView.new(@method)
+  def controller
+    @method.parent.path.underscore.sub("_controller", '')
   end
 
-  def parameters
-    arguments.map do |arg|
-      arg.to_swagger
+  def action
+    @method.path.sub(/^.*#/, '').sub(/_with_.*$/, '')
+  end
+
+  def raw_routes
+    ApiRouteSet::V1.api_methods_for_controller_and_action(controller, action)
+  end
+
+  def routes
+    @routes ||= raw_routes.map do |raw_route|
+      RouteView.new(raw_route, self)
+    end.select do |route|
+      route.api_path !~ /json$/
     end
-  end
-
-  def path
-    route.swagger_path
   end
 
   def swagger_type
     returns.to_swagger
-  end
-
-  def operation
-    {
-      "method" => route.verb,
-      "summary" => summary,
-      "notes" => desc,
-      "nickname" => nickname,
-      "parameters" => parameters,
-    }.merge(swagger_type)
-  end
-
-  def to_swagger
-    {
-      "path" => path,
-      "description" => desc,
-      "operations" => [operation]
-    }
   end
 
   def to_hash

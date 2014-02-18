@@ -81,6 +81,8 @@
       <a href="#" class="delete_question_link no-hover" title="<%= delete_question_title %>"><i class="icon-end standalone-icon"><span class="screenreader-only"><%= delete_question_title %></span></i></a>
     </div>
     <div style="display: none;">
+      <span class="regrade_option"><%= hash_get(question, :regrade_option) %></span>
+      <span class="regrade_disabled"><%= hash_get(question, :regrade_option) == 'disabled' ? 1 : 0 %></span>
       <span class="question_type"><%= (question_type.try_rescue(:question_type)) %></span>
       <span class="answer_selection_type"></span>
       <% if question_bank_id %>

@@ -570,6 +570,7 @@ module Technoweenie # :nodoc:
           end
         end
 
+        if CANVAS_RAILS2
         # Yanked from ActiveRecord::Callbacks, modified so I can pass args to the callbacks besides self.
         # Only accept blocks, however
         if ActiveSupport.const_defined?(:Callbacks)
@@ -601,6 +602,26 @@ module Technoweenie # :nodoc:
               return false if result == false
             end
             result
+          end
+        end
+
+        else
+          # callback is not defined in Rails 3
+          def callback(method)
+            runner_method = "_run_#{method}_callbacks"
+            unless self.respond_to?(runner_method, true)
+              chain = ActiveSupport::Callbacks::CallbackChain.new(method, {})
+
+              kind, chain_name = method.to_s.split('_', 2) # e.g. :after_save becomes 'after', 'save'
+              chain.concat(self.send("_#{chain_name}_callbacks").to_a.select{|callback| callback.kind.to_s == kind})
+
+              str = chain.compile
+              class_eval <<-RUBY_EVAL, __FILE__, __LINE__ + 1
+                def #{runner_method}() #{str} end
+                protected :#{runner_method}
+              RUBY_EVAL
+            end
+            self.send(runner_method)
           end
         end
 

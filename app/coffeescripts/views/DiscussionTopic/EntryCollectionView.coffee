@@ -30,6 +30,10 @@ define [
 
     els: '.discussion-entries': 'list'
 
+    initialize: ->
+      super
+      @childViews = []
+
     attach: ->
       @collection.on 'reset', @addAll
       @collection.on 'add', @add
@@ -60,6 +64,7 @@ define [
         @list.prepend view.el
       else
         @list.append view.el
+      @childViews.push(view)
       @nestEntries()
 
     nestEntries: ->
@@ -70,7 +75,7 @@ define [
 
     addNewView: (view) ->
       view.model.set 'new', false
-      if @options.threaded
+      if !@options.threaded and !@options.root
         @list.prepend view.el
       else
         @list.append view.el

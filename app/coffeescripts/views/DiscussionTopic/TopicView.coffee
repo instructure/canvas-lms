@@ -56,6 +56,7 @@ define [
 
       # catch when non-root replies are added so we can twiddle the subscribed button
       EntryView.on('addReply', => @setSubscribed(true))
+      $(window).on('keydown', @handleKeyDown)
 
     hideIfFiltering: =>
       if @filterModel.hasFilter()
@@ -172,7 +173,6 @@ define [
         htmlEscape value
 
     addRootReply: (event) ->
-      $el = @$ event.currentTarget
       target = $('#discussion_topic .discussion-reply-form')
       @addReply event
       $('html, body').animate scrollTop: target.offset().top - 100
@@ -184,3 +184,11 @@ define [
     markAllAsUnread: (event) ->
       event.preventDefault()
       @trigger 'markAllAsUnread'
+
+    handleKeyDown: (e) =>
+      nodeName = e.target.nodeName.toLowerCase()
+      return if nodeName == 'input' || nodeName == 'textarea'
+      return if e.which != 78 # n
+      @addRootReply(e)
+      e.preventDefault()
+      e.stopPropagation()

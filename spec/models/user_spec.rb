@@ -418,6 +418,14 @@ describe User do
               [Account.site_admin, @account].sort_by(&:id)
           @account.reload.user_account_associations.map(&:user).should == [@user]
         end
+        UserAccountAssociation.delete_all
+
+        @shard1.activate do
+          # check sharding for when we pass user IDs into update_account_associations, rather than user objects themselves
+          User.update_account_associations([@user.id], :all_shards => true)
+          @account.reload.all_users.should == [@user]
+        end
+        @shard2.activate { @account.reload.all_users.should == [@user] }
       end
     end
   end

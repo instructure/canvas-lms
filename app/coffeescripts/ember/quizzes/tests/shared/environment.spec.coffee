@@ -9,3 +9,15 @@ define ['../../shared/environment'], (environment) ->
 
   test 'computes course id correctly', ->
     equal environment.get('courseId'), 10, 'courseId'
+
+  test 'returns false for permissions when not available', ->
+    equal environment.get('canManage'), false
+
+  test 'returns appropriate permissions when available', ->
+    expect(2)
+    environment.setEnv
+      PERMISSIONS:
+        manage: true
+        update: true
+    equal environment.get('canManage'), true
+    equal environment.get('canUpdate'), true

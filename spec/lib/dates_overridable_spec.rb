@@ -488,6 +488,8 @@ shared_examples_for "an object whose dates are overridable" do
       override.set = course.default_section
       override.override_lock_at(2.days.ago)
       override.save!
+      # mysql probably just truncated the timestamp; reload it
+      override.reload
     end
 
     context "for a student" do

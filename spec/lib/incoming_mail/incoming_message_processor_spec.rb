@@ -41,7 +41,7 @@ describe IncomingMail::IncomingMessageProcessor do
 
   def check_new_message(bounce_type)
     Message.count.should == @previous_message_count + 1
-    @new_message = Message.order("created_at DESC").first
+    @new_message = Message.order("created_at DESC, id DESC").first
     @new_message.subject.should match(/Reply Failed/)
     @new_message.body.should match(case bounce_type
       when :unknown then /unknown mailbox/
@@ -172,6 +172,14 @@ describe IncomingMail::IncomingMessageProcessor do
       DiscussionTopic.incoming_replies.length.should == 1
       DiscussionTopic.incoming_replies[0][:text].should == 'This is plain text'
       DiscussionTopic.incoming_replies[0][:html].should == '<h1>This is HTML</h1>'
+    end
+
+    it "should not try to load messages with invalid IDs" do
+      account, message = [mock, mock]
+      account.expects(:address).returns('user@example.com')
+      message.expects(:to).returns(['user@example.com'])
+      result = IncomingMessageProcessor.find_matching_to_address(message, account)
+      result.should == [false, false]
     end
 
     describe "when data is not found" do

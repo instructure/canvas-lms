@@ -18,28 +18,28 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
-# Helpers
-def message(sent_at)
-  message = Message.new(notification: @notification, context: @context,
-          communication_channel: @recipient.communication_channel)
-  message.sent_at = sent_at
-  message.save!
-  message
-end
-
-def old_messages(count = 2)
-  (1..count).map do
-    message(700.days.ago)
-  end
-end
-
-def new_messages(count = 2)
-  (1..count).map do
-    message(Time.now)
-  end
-end
-
 describe MessageScrubber do
+
+  # Helpers
+  def message(sent_at)
+    message = Message.new(notification: @notification, context: @context,
+            communication_channel: @recipient.communication_channel)
+    message.sent_at = sent_at
+    message.save!
+    message
+  end
+
+  def old_messages(count = 2)
+    (1..count).map do
+      message(700.days.ago)
+    end
+  end
+
+  def new_messages(count = 2)
+    (1..count).map do
+      message(Time.now)
+    end
+  end
 
   describe '#scrub' do
 

@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "eportfolios" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def create_eportfolio(is_public = false)
     get "/dashboard/eportfolios"
@@ -265,7 +265,7 @@ describe "eportfolios" do
 end
 
 describe "eportfolios file upload" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     @password = "asdfasdf"

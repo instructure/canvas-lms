@@ -30,8 +30,10 @@ describe QuizGroup do
       quiz.publish!
       quiz.unpublished_changes?.should be_false
 
-      group.update_attribute :question_points, 10.0
-      quiz.reload.unpublished_changes?.should be_true
+      Timecop.freeze(5.minutes.from_now) do
+        group.update_attribute :question_points, 10.0
+        quiz.reload.unpublished_changes?.should be_true
+      end
     end
   end
 

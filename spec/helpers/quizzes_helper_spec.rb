@@ -23,6 +23,93 @@ describe QuizzesHelper do
   include ApplicationHelper
   include QuizzesHelper
 
+  describe "#needs_unpublished_warning" do
+    before do
+      course_with_teacher
+    end
+
+    context "with draft state enabled" do
+      before do
+        @course.account.enable_feature!(:draft_state)
+      end
+
+      it "is false if quiz not manageable" do
+        quiz = Quiz.new(:context => @course)
+
+        def can_publish(quiz); false; end
+        needs_unpublished_warning?(quiz, User.new).should be_false
+      end
+
+      it "is false if quiz is available with no unpublished changes" do
+        quiz = Quiz.new(:context => @course)
+        quiz.workflow_state = 'available'
+        quiz.last_edited_at = 10.minutes.ago
+        quiz.published_at   = Time.now
+
+        def can_publish(quiz); true; end
+        needs_unpublished_warning?(quiz, User.new).should be_false
+      end
+
+      it "is true if quiz is not available" do
+        quiz = Quiz.new(:context => @course)
+        quiz.workflow_state = 'created'
+
+        def can_publish(quiz); true; end
+        needs_unpublished_warning?(quiz, User.new).should be_true
+      end
+
+      it "is true if quiz has unpublished changes" do
+        quiz = Quiz.new(:context => @course)
+        quiz.workflow_state = 'available'
+        quiz.last_edited_at = Time.now
+        quiz.published_at   = 10.minutes.ago
+
+        def can_publish(quiz); true; end
+        needs_unpublished_warning?(quiz, User.new).should be_true
+      end
+    end
+
+    context "with draft state disabled" do
+
+      it "is false if quiz is not readable" do
+        quiz = Quiz.new(:context => @course)
+
+        def can_read(quiz); false; end
+        needs_unpublished_warning?(quiz, User.new).should be_false
+      end
+
+      it "is false if quiz is available with no unpublished changes" do
+        quiz = Quiz.new(:context => @course)
+        quiz.workflow_state = 'available'
+        quiz.last_edited_at = 10.minutes.ago
+        quiz.published_at   = Time.now
+
+        def can_publish(quiz); true; end
+        needs_unpublished_warning?(quiz, User.new).should be_false
+      end
+
+      it "is true if quiz is not available" do
+        quiz = Quiz.new(:context => @course)
+        quiz.workflow_state = 'created'
+
+        def can_read(quiz); true; end
+        def can_publish(quiz); false; end
+        needs_unpublished_warning?(quiz, User.new).should be_true
+      end
+
+      it "is true if quiz has unpublished changes" do
+        quiz = Quiz.new(:context => @course)
+        quiz.workflow_state = 'available'
+        quiz.last_edited_at = Time.now
+        quiz.published_at   = 10.minutes.ago
+
+        def can_read(quiz); true; end
+        def can_publish(quiz); true; end
+        needs_unpublished_warning?(quiz, User.new).should be_true
+      end
+    end
+  end
+
   describe "#attachment_id_for" do
 
     it "returns the attachment id if attachment exists" do
@@ -130,7 +217,7 @@ describe QuizzesHelper do
   context 'fill_in_multiple_blanks_question' do
     before(:each) do
       @question_text = %q|<input name="question_1" 'value={{question_1}}' />|
-      @answer_list = [] 
+      @answer_list = []
       @answers = []
 
       def user_content(stuff); stuff; end # mock #user_content
@@ -146,13 +233,13 @@ describe QuizzesHelper do
 
       html.should == %q|<input name="question_1" 'value=&#39;&gt;&lt;script&gt;alert(&#39;ha!&#39;)&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
     end
-    
+
     it 'should add an appropriate label' do
       html = fill_in_multiple_blanks_question(
         :question => {:question_text => @question_text},
         :answer_list => @answer_list,
         :answers => @answers
-      ) 
+      )
 
       html.should =~ /aria\-label/
       html.should =~ /Fill in the blank/

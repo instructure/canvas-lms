@@ -15,10 +15,7 @@ define [
       module_id: null
       published: true
       publishable: true
-
-    initialize: ->
-      @set('unpublishable', @get('publishable'))
-      super
+      unpublishable: true
 
     branch: (key) ->
       (@[key][@get('module_type')] or @[key].generic).call(this)

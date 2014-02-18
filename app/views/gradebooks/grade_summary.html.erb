@@ -111,9 +111,9 @@
     <tr>
       <th scope="col"><%= t('headers.name', "Name") %></th>
       <th scope="col"><%= t('headers.due', "Due") %></th>
-      <th scope="col"><%= t('headers.score', "Score") %></th>
-      <th scope="col" style="text-align: right; white-space: nowrap;"><%= t('headers.out_of', "Out of") %></th>
-      <th scope="col"><span class="accessible_hide"><%= t('headers.details', "Details") %></span></th>
+      <th scope="col" class="assignment_score"><%= t('headers.score', "Score") %></th>
+      <th scope="col" class="possible"><%= t('headers.out_of', "Out of") %></th>
+      <th scope="col"><span class="screenreader-only"><%= t('headers.details', "Details") %></span></th>
     </tr>
   </thead>
   <% @presenter.assignment_presenters.each do |assignment_presenter| %>
@@ -188,7 +188,7 @@
       </td>
       <td class="possible points_possible" <%= "colspan='2'".html_safe if assignment.special_class %>><%= assignment.points_possible %></td>
       <% if !assignment.special_class %>
-      <td style="padding-left: 10px; white-space: nowrap;">
+      <td class="details">
         <a href="#" class="toggle_comments_link tooltip" aria-label="<%= t(:comment_count_screenreader, 'Read comments') %>" <% if assignment_presenter.has_comments? %>aria-expanded="false" aria-controls="comments_thread_<%= assignment.id %>"<% else %>aria-hidden='true' role='presentation' tabindex='-1'<% end %> style="<%= 'visibility: hidden;' unless assignment_presenter.has_comments? %>">
           <span class="tooltip_wrap right">
             <span class="tooltip_text"><%= t(:comment_count, "comment", :count => (submission.visible_submission_comments.size rescue 0)) %></span>
@@ -239,8 +239,8 @@
             <% high, low, mean = assignment_presenter.grade_distribution  %>
             <% title = "" %>
             <% title += " " + before_label(:mean_score, "Mean") + " " + (mean.round(1) rescue 0).to_s %>
-            <% title += " " + before_label(:high_score, "High") + " " + high.to_s unless assignment_presenter.hide_max_scores? %>
-            <% title += " " + before_label(:low_score, "Low") + " " + low.to_s unless assignment_presenter.hide_min_scores? %>
+            <% title += " " + before_label(:high_score, "High") + " " + high.to_s %>
+            <% title += " " + before_label(:low_score, "Low") + " " + low.to_s %>
             <% if mean && high && low %>
               <table id="score_details_<%= assignment.id %>" class="score_details_table">
                 <thead>
@@ -261,35 +261,21 @@
                     </td>
                     <td>
                       <%= before_label(:high, "High") %>
-                      <% if assignment_presenter.hide_max_scores? %>
-                        disabled
-                      <% else %>
-                        <%= high %>
-                      <% end %>
+                      <%= high %>
                     </td>
                     <td>
                       <%= before_label(:low, "Low") %>
-                      <% if assignment_presenter.hide_min_scores? %>
-                        disabled
-                      <% else %>
-                        <%= low %>
-                      <% end %>
+                      <%= low %>
                     </td>
                     <td>
                       <div style="cursor: pointer; float: right; height: 30px; margin-left: 20px; width: 160px; position: relative; margin-right: 30px;" title="<%= title %>">
-                        <% if assignment_presenter.show_all_scores? %>
-                          <% graph = assignment_presenter.graph %>
-                          <div style="position: absolute; top: 0; left: 0; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-right-width: 0;">&nbsp;</div>
-                          <div style="position: absolute; top: 0; left: 0px; width: <%= graph.low_width %>px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden; border-top-width: 0;">&nbsp;</div>
-                          <div style="position: absolute; top: 0; left: <%= graph.high_left %>px; width: <%= graph.high_width %>px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden;">&nbsp;</div>
-                          <div style="position: absolute; top: 0; left: <%= graph.low_width %>px; width: <%= graph.mean_low_width %>px; height: 20px; border: 2px solid #aaa; overflow: hidden; -moz-border-radius-topleft: 3px; -moz-border-radius-bottomleft: 3px; border-right-width: 0; background: #fff;">&nbsp;</div>
-                          <div style="position: absolute; top: 0; left: <%= graph.mean_left%>px; width: <%= graph.mean_high_width%>px; height: 20px; border: 2px solid #aaa; overflow: hidden; -moz-border-radius-topright: 3px; -moz-border-radius-bottomright: 3px; background: #fff;">&nbsp;</div>
-                          <div style="position: absolute; top: 0; left: <%= graph.max_left %>px; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-left-width: 0;">&nbsp;</div>
-                        <% else %>
-                          <div style="position: absolute; top: 0; left: 0; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-right-width: 0;">&nbsp;</div>
-                          <div style="position: absolute; top: 0; left: 0px; width: 150px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden; border-top-width: 0;">&nbsp;</div>
-                          <div style="position: absolute; top: 0; left: 150px; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-left-width: 0;">&nbsp;</div>
-                        <% end %>
+                        <% graph = assignment_presenter.graph %>
+                        <div style="position: absolute; top: 0; left: 0; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-right-width: 0;">&nbsp;</div>
+                        <div style="position: absolute; top: 0; left: 0px; width: <%= graph.low_width %>px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden; border-top-width: 0;">&nbsp;</div>
+                        <div style="position: absolute; top: 0; left: <%= graph.high_left %>px; width: <%= graph.high_width %>px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden;">&nbsp;</div>
+                        <div style="position: absolute; top: 0; left: <%= graph.low_width %>px; width: <%= graph.mean_low_width %>px; height: 20px; border: 2px solid #aaa; overflow: hidden; -moz-border-radius-topleft: 3px; -moz-border-radius-bottomleft: 3px; border-right-width: 0; background: #fff;">&nbsp;</div>
+                        <div style="position: absolute; top: 0; left: <%= graph.mean_left%>px; width: <%= graph.mean_high_width%>px; height: 20px; border: 2px solid #aaa; overflow: hidden; -moz-border-radius-topright: 3px; -moz-border-radius-bottomright: 3px; background: #fff;">&nbsp;</div>
+                        <div style="position: absolute; top: 0; left: <%= graph.max_left %>px; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-left-width: 0;">&nbsp;</div>
                         <% if submission && submission.score %>
                           <div style="position: absolute; top: 5px; height: 10px; width: 10px; left: <%= graph.score_left %>px; border: 2px solid #248; background-color: #abd; overflow: hidden; -moz-border-radius: 3px;" title="<%= before_label(:your_score, "Your Score") %>
                             <%= t(:submission_score, "*%{score}* out of %{possible}", :wrapper => '\1', :score => submission.score, :possible => assignment.points_possible) %>">&nbsp;

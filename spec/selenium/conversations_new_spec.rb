@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common')
 
 describe "conversations new" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def conversations_url
     "/conversations"
@@ -403,13 +403,15 @@ describe "conversations new" do
                         conversation(@teacher, @s1, @s2, workflow_state: 'read')]
     end
 
-    def select_all_conversations
-      modifier = if driver.execute_script('return !!window.navigator.userAgent.match(/Macintosh/)')
-                   :meta
-                 else
-                   :control
-                 end
+    let :modifier do
+      if driver.execute_script('return !!window.navigator.userAgent.match(/Macintosh/)')
+        :meta
+      else
+        :control
+      end
+    end
 
+    def select_all_conversations
       driver.action.key_down(modifier).perform
       ff('.messages li').each do |message|
         message.click
@@ -420,6 +422,15 @@ describe "conversations new" do
     it "should select multiple conversations" do
       get_conversations
       select_all_conversations
+      ff('.messages li.active').count.should == 2
+    end
+
+    it "should select all conversations" do
+      get_conversations
+      driver.action.key_down(modifier)
+        .send_keys('a')
+        .key_up(modifier)
+        .perform
       ff('.messages li.active').count.should == 2
     end
 

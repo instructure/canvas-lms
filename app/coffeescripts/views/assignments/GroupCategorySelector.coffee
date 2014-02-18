@@ -34,6 +34,10 @@ define [
 
     initialize: ->
       super
+
+      # delete this after Ifa654f7d853fd167d5bfbaee6184657209d58272 hits prod
+      gc.id = gc.id.toString() for gc in @groupCategories
+
       @startedOutAsGroupAssignment = @parentModel.get('group_category_id')?
 
     showGroupCategoryCreateDialog: =>

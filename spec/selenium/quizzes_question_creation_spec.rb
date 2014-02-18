@@ -524,10 +524,19 @@ describe "quizzes question creation" do
     def fill_out_attempts_and_validate(attempts, alert_text, expected_attempt_text)
       wait_for_ajaximations
       click_settings_tab
+      sleep 2 # wait for page to load
       f('#multiple_attempts_option').click
+
+      quiz_attempt_field = lambda {
       f('#limit_attempts_option').click
       replace_content(f('#quiz_allowed_attempts'), attempts)
       f('#quiz_time_limit').click
+      }
+      quiz_attempt_field.call
+      if !alert_present?
+        quiz_attempt_field.call
+        wait_for_ajaximations
+      end
       alert = driver.switch_to.alert
       alert.text.should == alert_text
       alert.dismiss
@@ -555,10 +564,9 @@ describe "quizzes question creation" do
       f('#quiz_time_limit').click
       alert_present?.should be_false
       fj('#quiz_allowed_attempts').should have_attribute('value', attempts) # fj to avoid selenium caching
-      expect_new_page_load {
-        f('.save_quiz_button').click
-        wait_for_ajax_requests
-      }
+      expect_new_page_load { f('.save_quiz_button').click }
+      wait_for_ajaximations
+      keep_trying_until { f('.admin-links').should be_displayed }
       Quiz.last.allowed_attempts.should == attempts.to_i
     end
   end

@@ -20,6 +20,7 @@ define [
       'click .open-message': 'onSelect'
       'click .star-btn':   'toggleStar'
       'click .read-state': 'toggleRead'
+      'mousedown': 'onMouseDown'
 
     messages:
       read:     I18n.t('mark_as_read', 'Mark as read')
@@ -38,6 +39,8 @@ define [
 
     onSelect: (e) ->
       return if e and e.target.className.match(/star|read-state/)
+      if e.shiftKey
+        return @model.collection.selectRange(@model)
       modifier = e.metaKey or e.ctrlKey
       if @model.get('selected') and modifier then @deselect(modifier) else @select(modifier)
 
@@ -64,6 +67,13 @@ define [
       @$readBtn.attr
         'aria-checked': @model.unread()
         title: if @model.unread() then @messages.read else @messages.unread
+
+    onMouseDown: (e) ->
+      if e.shiftKey
+        e.preventDefault()
+        setTimeout ->
+          window.getSelection().removeAllRanges() # IE
+        , 0
 
     toJSON: ->
       @model.toJSON().conversation

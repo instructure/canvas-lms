@@ -146,7 +146,7 @@ def test_selective_content(source_course=nil)
 end
 
 describe "content migrations" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context "common cartridge importing" do
     before :each do

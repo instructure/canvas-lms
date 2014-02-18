@@ -32,23 +32,23 @@ describe RubricAssociation do
     })
   end
 
-  context "course rubrics" do
+  context "assignment rubrics" do
     before :each do
       # Create a course, 2 students and enroll them
       course_with_teacher(:active_course => true, :active_user => true)
       @student_1 = student_in_course(:active_user => true).user
       @student_2 = student_in_course(:active_user => true).user
+
+      # Create the assignment
+      @assignment = @course.assignments.create!(
+        :title => 'Test Assignment',
+        :peer_reviews => true,
+        :submission_types => 'online_text_entry'
+      )
     end
 
     context "when a peer-review assignment has been completed AFTER rubric created" do
       before :each do
-        # Create the assignment
-        @assignment = @course.assignments.create!(
-          :title => 'Test Assignment',
-          :peer_reviews => true,
-          :submission_types => 'online_text_entry'
-        )
-
         # Create the rubric
         @rubric = @course.rubrics.create! { |r| r.user = @teacher }
 
@@ -75,13 +75,6 @@ describe RubricAssociation do
 
     context "when a peer-review assignment has been completed BEFORE rubric created" do
       before :each do
-        # Create the assignment
-        @assignment = @course.assignments.create!(
-          :title => 'Test Assignment',
-          :peer_reviews => true,
-          :submission_types => 'online_text_entry'
-        )
-
         # students complete it
         @assignment.submit_homework(@student_1, :submission_type => 'online_text_entry', :body => 'Finished first')
         @assignment.submit_homework(@student_2, :submission_type => 'online_text_entry', :body => 'Finished second')
@@ -180,6 +173,17 @@ describe RubricAssociation do
       rubric_association_params = HashWithIndifferentAccess.new({:association=>@account, :hide_score_total=>"0", :use_for_grading=>"0", :purpose=>"bookmark"})
       #8864: the below raised a MethodNotFound error by trying to call @account.submissions
       lambda { @rubric.update_with_association(@user, rubric_params, @account, rubric_association_params) }.should_not raise_error
+    end
+  end
+
+  context "when a rubric is associated with a course" do
+    it "should not try to link to assessments" do
+      course_with_teacher(:active_all => true)
+      @rubric = @course.rubrics.build
+      rubric_params = HashWithIndifferentAccess.new({"title"=>"Some Rubric", "criteria"=>{"0"=>{"learning_outcome_id"=>"", "ratings"=>{"0"=>{"points"=>"5", "id"=>"blank", "description"=>"Full Marks"}, "1"=>{"points"=>"0", "id"=>"blank_2", "description"=>"No Marks"}}, "points"=>"5", "long_description"=>"", "id"=>"", "description"=>"Description of criterion"}}, "points_possible"=>"5", "free_form_criterion_comments"=>"0"})
+      rubric_association_params = HashWithIndifferentAccess.new({:association=>@course, :hide_score_total=>"0", :use_for_grading=>"0", :purpose=>"bookmark"})
+      @course.any_instantiation.expects(:submissions).never
+      @rubric.update_with_association(@user, rubric_params, @course, rubric_association_params)
     end
   end
 end

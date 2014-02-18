@@ -139,6 +139,30 @@ class OutcomeGroupsApiController < ApplicationController
     end
   end
 
+  # @API Get all outcome groups for context
+  # @beta
+  #
+  # @returns [OutcomeGroup]
+  def index
+    return unless can_read_outcomes
+
+    url = polymorphic_url [:api_v1, @context || :global, :outcome_groups]
+    groups = Api.paginate(context_outcome_groups, self, url)
+    render json: groups.map { |group| outcome_group_json(group, @current_user, session) }
+  end
+
+  # @API Get all outcome links for context
+  # @beta
+  #
+  # @returns [OutcomeLink]
+  def link_index
+    return unless can_read_outcomes
+
+    url = polymorphic_url [:api_v1, @context || :global, :outcome_group_links]
+    links = Api.paginate(context_outcome_links, self, url)
+    render json: links.map { |link| outcome_link_json(link, @current_user, session) }
+  end
+
   # @API Show an outcome group
   #
   # @returns OutcomeGroup
@@ -603,6 +627,13 @@ class OutcomeGroupsApiController < ApplicationController
   # get the active outcome groups in the context/global
   def context_outcome_groups
     LearningOutcomeGroup.for_context(@context).active
+  end
+
+  def context_outcome_links
+    if @context
+      @context.learning_outcome_links
+    # else, there's no convenient way to find the global content tags; not supporting this for now
+    end
   end
 
   # verify the outcome is eligible to be linked into the context,

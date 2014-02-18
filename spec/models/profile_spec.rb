@@ -24,7 +24,7 @@ describe Profile do
       class FooProfile < Profile; end
 
       class Foo < ActiveRecord::Base
-        set_table_name :users
+        self.table_name = :users
         include Profile::Association
         def root_account; Account.default; end
       end

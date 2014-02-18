@@ -372,7 +372,7 @@ class ContextModulesController < ApplicationController
           end
           render :json => @progressions
         else
-          @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@current_user, true) }
+          @progressions = @context.context_modules.active.order(:id).map{|m| m.evaluate_for(@current_user, true) }
           render :json => @progressions
         end
       elsif !@context.feature_enabled?(:draft_state)

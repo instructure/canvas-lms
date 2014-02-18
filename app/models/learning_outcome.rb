@@ -125,8 +125,6 @@ class LearningOutcome < ActiveRecord::Base
     state :retired
     state :deleted
   end
-  
-  scope :active, where("workflow_state<>'deleted'")
 
   def cached_context_short_name
     @cached_context_name ||= Rails.cache.fetch(['short_name_lookup', self.context_code].cache_key) do

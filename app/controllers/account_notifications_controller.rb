@@ -5,6 +5,12 @@ class AccountNotificationsController < ApplicationController
     @notification = AccountNotification.new(params[:account_notification])
     @notification.account = @account
     @notification.user = @current_user
+    unless params[:account_notification_roles].nil?
+      roles = params[:account_notification_roles].select do |r|
+        !r.nil? && ( r.to_s == "NilEnrollment" || RoleOverride.enrollment_types.any?{ |rt| rt[:name] == r.to_s } || @account.available_account_roles.include?(r.to_s))
+      end.map { |r| { :role_type => r.to_s } }
+      @notification.account_notification_roles.build(roles)
+    end
     respond_to do |format|
       if @notification.save
         flash[:notice] = t(:announcement_created_notice, "Announcement successfully created")

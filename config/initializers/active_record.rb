@@ -1,8 +1,6 @@
 class ActiveRecord::Base
   # XXX: Rails3 There are lots of issues with these patches in Rails3 still
 
-  extend ActiveSupport::Memoizable # used for a lot of the reporting queries
-
   unless CANVAS_RAILS2
     class << self
       def preload_associations(records, associations, preload_options={})
@@ -14,9 +12,17 @@ class ActiveRecord::Base
       value = super
       value.is_a?(ActiveRecord::AttributeMethods::Serialization::Attribute) ? value.value : value
     end
+
+    alias :clone :dup
   end
 
   if CANVAS_RAILS2
+    if instance_method(:transaction).arity == 0
+      def transaction(options = {}, &block)
+        self.class.transaction(options, &block)
+      end
+    end
+
     # this functionality is built into rails 3
     class ProtectedAttributeAssigned < Exception; end
     def log_protected_attribute_removal_with_raise(*attributes)
@@ -268,7 +274,7 @@ class ActiveRecord::Base
       options[:include_root] = ActiveRecord::Base.include_root_in_json
     end
 
-    hash = Serializer.new(self, options).serializable_record
+    hash = CANVAS_RAILS2 ? Serializer.new(self, options).serializable_record : serializable_hash(options)
 
     if options[:permissions]
       obj_hash = options[:include_root] ? hash[self.class.base_ar_class.model_name.element] : hash
@@ -520,11 +526,12 @@ class ActiveRecord::Base
     batch_size = options[:batch_size] || 1000
     transaction do
       begin
-        cursor = "#{table_name}_in_batches_cursor"
         scope = scope(:find)
         scope = scope ? scope.dup : {}
         scope.delete(:include)
-        with_exclusive_scope(find: scope) { connection.execute("DECLARE #{cursor} CURSOR FOR #{scoped.to_sql}") }
+        sql = with_exclusive_scope(find: scope) { scoped.to_sql }
+        cursor = "#{table_name}_in_batches_cursor_#{sql.hash.abs.to_s(36)}"
+        connection.execute("DECLARE #{cursor} CURSOR FOR #{sql}")
         includes = scope(:find, :include)
         with_exclusive_scope do
           batch = connection.uncached { find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
@@ -548,7 +555,11 @@ class ActiveRecord::Base
     scope = scope(:find)
     scope = scope ? scope.dup : {}
     scope.delete(:include)
-    with_exclusive_scope(find: scope) { connection.execute "CREATE TEMPORARY TABLE #{table} AS #{scoped.to_sql}" }
+    sql = with_exclusive_scope(find: scope) { scoped.to_sql }
+    if %w{MySQL Mysql2}.include?(connection.adapter_name)
+      table_options = " (temp_primary_key MEDIUMINT NOT NULL AUTO_INCREMENT PRIMARY KEY)"
+    end
+    connection.execute "CREATE TEMPORARY TABLE #{table}#{table_options} AS #{sql}"
     begin
       index = "temp_primary_key"
       case connection.adapter_name
@@ -561,8 +572,7 @@ class ActiveRecord::Base
           connection.raw_connection.set_notice_processor(&old_proc) if old_proc
         end
       when 'MySQL', 'Mysql2'
-        connection.execute "ALTER TABLE #{table}
-                               ADD temp_primary_key MEDIUMINT NOT NULL PRIMARY KEY AUTO_INCREMENT"
+        # created as part of the temp table
       when 'SQLite'
         # Sqlite always has an implicit primary key
         index = 'rowid'
@@ -681,6 +691,7 @@ class ActiveRecord::Base
     subquery_scope = self.scoped.except(:select).select("#{quoted_table_name}.#{primary_key} as id").reorder(primary_key).limit(batch_size)
     ids = connection.select_rows("select min(id), max(id) from (#{subquery_scope.to_sql}) as subquery").first
     while ids.first.present?
+      ids.map!(&:to_i) if columns_hash[primary_key].type == :integer
       yield(*ids)
       last_value = ids.last
       next_subquery_scope = subquery_scope.where(["#{quoted_table_name}.#{primary_key}>?", last_value])
@@ -928,6 +939,41 @@ unless CANVAS_RAILS2
         connection.execute "DROP #{temporary}TABLE #{table}"
       end
     end
+
+    def update_all_with_joins(updates, conditions = nil, options = {})
+      if joins_values.any?
+        if conditions
+          where(conditions).update_all
+        else
+          case connection.adapter_name
+          when 'PostgreSQL'
+            stmt = Arel::UpdateManager.new(arel.engine)
+
+            stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
+            stmt.table(table)
+            stmt.key = table[primary_key]
+
+            sql = stmt.to_sql
+
+            tables, join_conditions = deconstruct_joins(arel.join_sql.to_s)
+
+            unless tables.empty?
+              sql.concat(' FROM ')
+              sql.concat(tables.join(', '))
+              sql.concat(' ')
+            end
+
+            sql.concat(where(join_conditions).arel.where_sql.to_s)
+            connection.update(sql, "#{name} Update")
+          else
+            update_all_without_joins(updates, conditions, options)
+          end
+        end
+      else
+        update_all_without_joins(updates, conditions, options)
+      end
+    end
+    alias_method_chain :update_all, :joins
 
     def delete_all_with_joins(conditions = nil)
       if joins_values.any?
@@ -1245,10 +1291,12 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
 
 end
 
-ActiveRecord::Associations::AssociationProxy.class_eval do
-  def respond_to?(*args)
-    return proxy_respond_to?(*args) if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(args.first)
-    proxy_respond_to?(*args) || (load_target && @target.respond_to?(*args))
+if CANVAS_RAILS2
+  ActiveRecord::Associations::AssociationProxy.class_eval do
+    def respond_to?(*args)
+      return proxy_respond_to?(*args) if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(args.first)
+      proxy_respond_to?(*args) || (load_target && @target.respond_to?(*args))
+    end
   end
 end
 
@@ -1280,6 +1328,8 @@ class ActiveRecord::Serialization::Serializer
 
 end
 
+if CANVAS_RAILS2
+
 class ActiveRecord::Errors
   def as_json(*a)
     {:errors => @errors}.as_json(*a)
@@ -1301,6 +1351,16 @@ class ActiveRecord::Error
   def as_json(*a)
     super.slice('attribute', 'type', 'message')
   end
+end
+
+else
+
+class ActiveModel::Errors
+  def as_json(*a)
+    {:errors => Hash[to_hash.map{|k,v| [k, v.map{|m| {:attribute => k, :message => m, :type => m}}]}]}.as_json(*a)
+  end
+end
+
 end
 
 if CANVAS_RAILS2
@@ -1692,4 +1752,17 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     end
   end
 
+end
+
+if Rails.version >= '3' && Rails.version < '4'
+  ActiveRecord::Sanitization::ClassMethods.module_eval do
+    def quote_bound_value_with_relations(value, c = connection)
+      if ActiveRecord::Relation === value
+        value.to_sql
+      else
+        quote_bound_value_without_relations(value, c)
+      end
+    end
+    alias_method_chain :quote_bound_value, :relations
+  end
 end

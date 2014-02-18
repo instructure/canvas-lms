@@ -20,6 +20,14 @@ module Api::V1::Outcome
   include Api::V1::Json
 
   # style can be :full or :abbrev; anything unrecognized defaults to :full.
+  # abbreviated includes only id, title, url, subgroups_url, outcomes_url, and can_edit. full expands on
+  # that by adding import_url, parent_outcome_group (if any),
+  # context id and type, and description.
+  def outcomes_json(outcomes, user, session, style=:full)
+    outcomes.map { |o| outcome_json(o, user, session, style) }
+  end
+
+  # style can be :full or :abbrev; anything unrecognized defaults to :full.
   # abbreviated includes only id, title, context id and type, url, and
   # can_edit. full expands on that by adding description and criterion values
   # (if any).

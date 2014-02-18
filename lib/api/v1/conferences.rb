@@ -80,11 +80,19 @@ module Api::V1::Conferences
       visible_field = visible_field.call if visible_field.respond_to?(:call)
       next a unless visible_field
 
-      resolved_field_options = field_options.each_with_object({}) do |(k, v), h|
-        h[k] = v.respond_to?(:call) ? v.call() : v
-      end
+      resolved_field_options = translate_strings(field_options)
       resolved_field_options[:field] = field_name
       a << resolved_field_options
+    end
+  end
+
+  def translate_strings(object)
+    object.each_with_object({}) do |(k, v), h|
+      if v.is_a? Array
+        h[k] = v.map{|a| translate_strings(a)}
+      else
+        h[k] = v.respond_to?(:call) ? v.call() : v
+      end
     end
   end
 

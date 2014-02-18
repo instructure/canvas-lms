@@ -186,10 +186,8 @@ class UserFollow < ActiveRecord::Base
   # could be expanded later to partition the query by item type.
   def self.followed_by_user(items, user)
     user.shard.activate do
-      item_subset = items
-      item_ids = item_subset.map(&:id)
-      followed_ids = Set.new(connection.select_values(sanitize_sql_for_conditions(["SELECT followed_item_id FROM #{table_name} WHERE following_user_id = ? AND followed_item_type = ? AND followed_item_id IN (?)", user.id, item_subset.first.class.name, item_ids])))
-      item_subset.find_all { |c| followed_ids.include?(c.id.to_s) }
+      followed_ids = self.where(following_user_id: user, followed_item_type: items.first.class.base_ar_class.name, followed_item_id: items).pluck(:followed_item_id).to_set
+      items.select { |c| followed_ids.include?(c.id) }
     end
   end
 

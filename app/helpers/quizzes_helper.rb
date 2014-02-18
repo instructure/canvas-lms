@@ -17,18 +17,24 @@
 #
 
 module QuizzesHelper
-  def needs_unpublished_warning?(quiz=@quiz)
+  def needs_unpublished_warning?(quiz=@quiz, user=@current_user)
     if quiz.feature_enabled?(:draft_state)
-      return false unless quiz.grants_right?(@current_user, session, :read)
+      return false unless can_publish(quiz)
+      show_unpublished_changes = true
     else
-      return false unless quiz.grants_right?(@current_user, session, :manage)
+      return false unless can_read(quiz)
+      show_unpublished_changes = can_publish(quiz)
     end
 
-    !quiz.available? || quiz.unpublished_changes?
+    !quiz.available? || (show_unpublished_changes && quiz.unpublished_changes?)
   end
 
-  def can_publish(quiz)
-    can_do(quiz, @current_user, :update) || can_do(quiz, @current_user, :manage)
+  def can_read(quiz, user=@current_user)
+    can_do(quiz, user, :read)
+  end
+
+  def can_publish(quiz, user=@current_user)
+    can_do(quiz, user, :update) || can_do(quiz, user, :manage)
   end
 
   def unpublished_quiz_warning

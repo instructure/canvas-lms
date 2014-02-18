@@ -151,7 +151,7 @@ class QuizzesApiController < ApplicationController
   # @argument search_term [Optional, String]
   #   The partial title of the quizzes to match and return.
   #
-  # @example_request    
+  # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/quizzes \ 
   #          -H 'Authorization: Bearer <token>'
   #
@@ -161,6 +161,9 @@ class QuizzesApiController < ApplicationController
       api_route = polymorphic_url([:api, :v1, @context, :quizzes])
       scope = Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
       json = if accepts_jsonapi?
+        unless is_authorized_action?(@context, @current_user, :manage_assignments)
+          scope = scope.available
+        end
         jsonapi_quizzes_json(scope: scope, api_route: api_route)
       else
         @quizzes = Api.paginate(scope, self, api_route)

@@ -40,6 +40,7 @@ define [
 
     els:
       '.screenreader-only': '$title'
+      '.discussion-row': '$row'
 
     # Public: Topic is able to be locked/unlocked.
     @optionProperty 'lockable'
@@ -129,14 +130,25 @@ define [
       if @model.get('locked') and !_.intersection(ENV.current_user_roles, ['teacher', 'ta', 'admin']).length
         base.permissions.delete = false
       base.display_last_reply_at = I18n.l "#date.formats.medium", base.last_reply_at
-      if base.assignment?.due_at?
-        base.assignment.display_due_at = I18n.l "#date.formats.medium", base.assignment.due_at
       base.ENV = ENV
       base
+
+    # Internal: Re-render for publish state change preserving focus
+    #
+    # Returns nothing.
+    renderPublishChange: =>
+      @publishIcon?.render()
+      if ENV.permissions.publish
+        if @model.get('published')
+          @$row.removeClass('discussion-unpublished')
+          @$row.addClass('discussion-published')
+        else
+          @$row.removeClass('discussion-published')
+          @$row.addClass('discussion-unpublished')
 
     # Internal: Add event handlers to the model.
     #
     # Returns nothing.
     attachModel: ->
       @model.on('change:hidden', @hide)
-      @model.on('change:published', @render)
+      @model.on('change:published', @renderPublishChange)

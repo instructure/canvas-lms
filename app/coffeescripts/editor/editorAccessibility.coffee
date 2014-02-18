@@ -13,8 +13,14 @@ define [
       @_cacheElements()
       @_addTitles()
       @_addLabels()
+      @_highlightSelectedColor()
 
     ### PRIVATE FUNCTIONS ###
+    _highlightSelectedColor: ->
+      $("body").on 'click', '.mceColorSplitMenu td', ->
+        $(this).parentsUntil(".mceColorSplitMenu").find(".selectedColor").removeClass("selectedColor")
+        $(this).addClass("selectedColor")
+
     _cacheElements: ->
       @$iframe = @$el.find(".mceIframeContainer iframe")
 

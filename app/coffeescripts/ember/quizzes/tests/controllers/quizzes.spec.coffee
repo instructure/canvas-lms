@@ -2,27 +2,24 @@ define [
   '../start_app',
   'ember',
   'ic-ajax',
-  '../../shared/environment',
-  '../../controllers/quizzes_controller'
-], (startApp, Ember, ajax, environment, QuizzesController) ->
+  '../../controllers/quizzes_controller',
+  '../environment_setup',
+], (startApp, Ember, ajax, QuizzesController) ->
 
   App = null
-
-  window.ENV = {
-    context_asset_string: 'course_1'
-  }
 
   module 'quizzes_controller',
     setup: ->
       App = startApp()
       @qc = new QuizzesController()
-      @qc.set('model', [
-        {quiz_type: 'survey', title: 'Test Quiz'},
-        {quiz_type: 'graded_survey', title: 'Test survey'},
-        {quiz_type: 'practice_quiz', title: 'Test practice quiz'},
-        {quiz_type: 'practice_quiz', title: 'Other practice'},
-        {quiz_type: 'assignment', title: 'Assignment test'}
-      ])
+      quizzes = Em.A [
+          {quiz_type: 'survey', title: 'Test Quiz'},
+          {quiz_type: 'graded_survey', title: 'Test survey'},
+          {quiz_type: 'practice_quiz', title: 'Test practice quiz'},
+          {quiz_type: 'practice_quiz', title: 'Other practice'},
+          {quiz_type: 'assignment', title: 'Assignment test'}
+        ]
+      @qc.set('model', quizzes)
 
     teardown: ->
       Ember.run App, 'destroy'

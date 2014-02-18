@@ -255,7 +255,7 @@ class FilesController < ApplicationController
     @skip_crumb = true
     if @attachment.deleted?
       flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", :display_name => @attachment.display_name
-      redirect_to dashboard_url
+      return redirect_to dashboard_url
     end
     show
   end
@@ -449,7 +449,8 @@ class FilesController < ApplicationController
       end
 
       stream = @attachment.open
-      render :json => { :body => stream.read }
+      json = { :body => stream.read.force_encoding(Encoding::ASCII_8BIT) }
+      render json: json
      end
   end
 
@@ -526,7 +527,6 @@ class FilesController < ApplicationController
         }
       end
     end
-    render :json => {}
   end
 
   def create_pending

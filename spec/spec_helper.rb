@@ -30,11 +30,30 @@ else
 end
 require 'webrat'
 require 'mocha/api'
+require 'action_controller_test_process'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
 require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
+
+def pend_with_bullet
+  if Bullet.enable?
+    pending ('PENDING: Bullet')
+  end
+end
+
+def require_webmock
+  # pull in webmock for selected tests, but leave it disabled by default.
+  # funky require order is to skip typhoeus because of an incompatibility
+  # see: https://github.com/typhoeus/typhoeus/issues/196
+  require 'webmock/util/version_checker'
+  require 'webmock/http_lib_adapters/http_lib_adapter_registry'
+  require 'webmock/http_lib_adapters/http_lib_adapter'
+  require 'webmock/http_lib_adapters/typhoeus_hydra_adapter'
+  WebMock::HttpLibAdapterRegistry.instance.http_lib_adapters.delete :typhoeus
+  require 'webmock/rspec'
+end
 
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
@@ -148,7 +167,8 @@ unless CANVAS_RAILS2
   end
 end
 
-Spec::Matchers.define :encompass do |expected|
+matchers_module = (CANVAS_RAILS2 ? Spec::Matchers : RSpec::Matchers)
+matchers_module.define :encompass do |expected|
   match do |actual|
     if expected.is_a?(Array) && actual.is_a?(Array)
       expected.size == actual.size && expected.zip(actual).all? { |e, a| a.slice(*e.keys) == e }
@@ -160,7 +180,7 @@ Spec::Matchers.define :encompass do |expected|
   end
 end
 
-Spec::Matchers.define :match_ignoring_whitespace do |expected|
+matchers_module.define :match_ignoring_whitespace do |expected|
   def whitespaceless(str)
     str.gsub(/\s+/, '')
   end
@@ -170,7 +190,7 @@ Spec::Matchers.define :match_ignoring_whitespace do |expected|
   end
 end
 
-Spec::Runner.configure do |config|
+(CANVAS_RAILS2 ? Spec::Runner : RSpec).configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
   # in your config/boot.rb
@@ -476,6 +496,16 @@ Spec::Runner.configure do |config|
     session[:become_user_id].should == @fake_student.id.to_s
   end
 
+  def account_notification(opts={})
+    req_service = opts[:required_account_service] || nil
+    roles = opts[:roles] || []
+    message = opts[:message] || "hi there"
+    @account = opts[:account] || Account.default
+    @announcement = @account.announcements.create!(message: message, required_account_service: req_service)
+    @announcement.account_notification_roles.build(roles.map{ |r| { account_notification_id: @announcement.id, role_type: r} }) unless roles.empty?
+    @announcement.save!
+  end
+
   VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
 
   def group(opts={})
@@ -776,9 +806,12 @@ Spec::Runner.configure do |config|
     flash[:warning].should eql("You must be logged in to access this page")
   end
 
+  def fixture_file_upload(path, mime_type=nil, binary=false)
+    Rack::Test::UploadedFile.new(File.join(ActionController::TestCase.fixture_path, path), mime_type, binary)
+  end
+
   def default_uploaded_data
-    require 'action_controller_test_process'
-    ActionController::TestUploadedFile.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/scribd_docs/doc.doc'), 'application/msword', true)
+    fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
   end
 
   def valid_gradebook_csv_content
@@ -851,12 +884,12 @@ Spec::Runner.configure do |config|
   # enforce forgery protection, so we can verify usage of the authenticity token
   def enable_forgery_protection(enable = true)
     old_value = ActionController::Base.allow_forgery_protection
-    ActionController::Base.stubs(:allow_forgery_protection).including_subclasses.returns(enable)
+    ActionController::Base.stubs(:allow_forgery_protection).returns(enable)
 
     yield if block_given?
 
   ensure
-    ActionController::Base.stubs(:allow_forgery_protection).including_subclasses.returns(old_value) if block_given?
+    ActionController::Base.stubs(:allow_forgery_protection).returns(old_value) if block_given?
   end
 
   def start_test_http_server(requests=1)
@@ -1137,10 +1170,7 @@ Spec::Runner.configure do |config|
   end
 
   def dummy_io
-    ActionController::TestUploadedFile.new(
-        File.expand_path(File.dirname(__FILE__) +
-                             '/./fixtures/scribd_docs/doc.doc'),
-        'application/msword', true)
+    fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
   end
 
   def create_attachment_for_file_upload_submission!(submission, opts={})
@@ -1208,5 +1238,3 @@ end
 Dir[Rails.root+'vendor/plugins/*/spec_canvas/spec_helper.rb'].each do |f|
   require f
 end
-
-

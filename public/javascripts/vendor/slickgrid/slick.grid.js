@@ -1445,6 +1445,16 @@ if (typeof Slick === "undefined") {
       }
     }
 
+    /*
+     * updates the numberOfColumnsToFreeze.
+     *
+     * doesn't change the number of frozen columns until you do something to
+     * re-build the grid (like setColumns)
+     */
+    function setNumberOfColumnsToFreeze(n) {
+      options.numberOfColumnsToFreeze = n;
+    }
+
     function setSortColumn(columnId, ascending) {
       setSortColumns([{ columnId: columnId, sortAsc: ascending}]);
     }
@@ -3630,6 +3640,7 @@ if (typeof Slick === "undefined") {
               trigger(self.onCellChange, {
                 row: activeRow,
                 cell: activeCell,
+                column: column,
                 item: item
               });
             } else {
@@ -3767,6 +3778,7 @@ if (typeof Slick === "undefined") {
       "setColumns": setColumns,
       "getColumnIndex": getColumnIndex,
       "updateColumnHeader": updateColumnHeader,
+      "setNumberOfColumnsToFreeze": setNumberOfColumnsToFreeze,
       "setSortColumn": setSortColumn,
       "setSortColumns": setSortColumns,
       "getSortColumns": getSortColumns,

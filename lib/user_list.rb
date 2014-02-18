@@ -95,7 +95,7 @@ class UserList
     # any non-word characters
     if path =~ /^([^\d\w]*\d[^\d\w]*){10}$/
       type = :sms
-    elsif path.include?('@') && (address = TMail::Address::parse(path) rescue nil)
+    elsif path.include?('@') && (address = (CANVAS_RAILS2 ? TMail::Address.parse(path) : Mail::Address.new(path)) rescue nil)
       type = :email
       name = address.name
       path = address.address
@@ -151,9 +151,8 @@ class UserList
     Shard.partition_by_shard(all_account_ids) do |account_ids|
       next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
       Pseudonym.active.
-          select('unique_id AS address, users.name AS name, user_id, account_id, sis_user_id').
-          joins(:user).
-          where("pseudonyms.workflow_state='active' AND (LOWER(unique_id) IN (?) OR sis_user_id IN (?)) AND account_id IN (?)", @addresses.map {|x| x[:address].downcase}, @addresses.map {|x| x[:address]}, account_ids).
+          select('unique_id AS address, (SELECT name FROM users WHERE users.id=user_id) AS name, user_id, account_id, sis_user_id').
+          where("(LOWER(unique_id) IN (?) OR sis_user_id IN (?)) AND account_id IN (?)", @addresses.map {|x| x[:address].downcase}, @addresses.map {|x| x[:address]}, account_ids).
           map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
         addresses = @addresses.select { |a| a[:address].downcase == login[:address].downcase ||
             a[:address] ==  login[:sis_user_id]}

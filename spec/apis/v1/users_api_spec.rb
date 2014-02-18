@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -418,16 +418,60 @@ describe "Users API", :type => :integration do
       }
     end
 
-    it "should not allow non-admins to create users" do
-      @user = @student
-      raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
-        { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
-        {
-          :user      => { :name => "Test User" },
-          :pseudonym => { :unique_id => "test@example.com", :password => "password123" }
-        }
-      )
-      response.status.should eql "403 Forbidden"
+    context "as a non-administrator" do
+      before do
+        user(active_all: true)
+      end
+
+      it "should not let you create a user if self_registration is off" do
+        raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
+          { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+          {
+            :user      => { :name => "Test User" },
+            :pseudonym => { :unique_id => "test@example.com" }
+          }
+        )
+        response.status.should eql "403 Forbidden"
+      end
+
+      it "should require an email pseudonym" do
+        @admin.account.settings[:self_registration] = true
+        @admin.account.save!
+        raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
+          { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+          {
+            :user      => { :name => "Test User", :terms_of_use => "1" },
+            :pseudonym => { :unique_id => "invalid" }
+          }
+        )
+        response.status.should eql "400 Bad Request"
+      end
+
+      it "should require acceptance of the terms" do
+        @admin.account.settings[:self_registration] = true
+        @admin.account.save!
+        raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
+          { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+          {
+            :user      => { :name => "Test User" },
+            :pseudonym => { :unique_id => "test@example.com" }
+          }
+        )
+        response.status.should eql "400 Bad Request"
+      end
+
+      it "should let you create a user if you pass all the validations" do
+        @admin.account.settings[:self_registration] = true
+        @admin.account.save!
+        json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
+          { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+          {
+            :user      => { :name => "Test User", :terms_of_use => "1" },
+            :pseudonym => { :unique_id => "test@example.com" }
+          }
+        )
+        json['name'].should == 'Test User'
+      end
     end
 
     it "should send a confirmation if send_confirmation is set to 1" do
@@ -790,6 +834,63 @@ describe "Users API", :type => :integration do
         json = api_call(:delete, "/api/v1/users/#{@u2.id}/followers/self", :controller => "users", :action => "unfollow", :user_id => @u2.to_param, :format => "json")
         @user.reload.user_follows.should == []
       end
+    end
+  end
+  describe "user merge" do
+    before do
+      @account = Account.default
+      @user1 = user_with_managed_pseudonym(
+        active_all: true, account: @account, name: 'Jony Ive',
+        username: 'jony@apple.com', sis_user_id: 'user_sis_id_01'
+      )
+      @user2 = user_with_managed_pseudonym(
+        active_all: true, name: 'Steve Jobs', account: @account,
+        username: 'steve@apple.com', sis_user_id: 'user_sis_id_02'
+      )
+      @user = account_admin_user(account: @account)
+    end
+
+    it "should merge users" do
+      json = api_call(
+        :put, "/api/v1/users/#{@user2.id}/merge_into/#{@user1.id}",
+        { controller: 'users', action: 'merge_into', format: 'json',
+          id: @user2.to_param, destination_user_id: @user1.to_param }
+      )
+      Pseudonym.find_by_sis_user_id('user_sis_id_02').user_id.should == @user1.id
+      @user2.pseudonyms.should be_empty
+    end
+
+    it "should merge users cross accounts" do
+      account = Account.create(name: 'new account')
+      @user1.pseudonym.account_id = account.id
+      @user1.pseudonym.save!
+      @user = account_admin_user(account: account, user: @user)
+
+      api_call(
+        :put,
+        "/api/v1/users/sis_user_id:user_sis_id_02/merge_into/accounts/#{account.id}/users/sis_user_id:user_sis_id_01",
+        { controller: 'users', action: 'merge_into', format: 'json',
+          id: 'sis_user_id:user_sis_id_02',
+          destination_user_id: 'sis_user_id:user_sis_id_01',
+          destination_account_id: account.to_param
+        }
+      )
+      Pseudonym.find_by_sis_user_id('user_sis_id_02').user_id.should == @user1.id
+      @user2.pseudonyms.should be_empty
+    end
+
+    it "should fail to merge users cross accounts without permissions" do
+      account = Account.create(name: 'new account')
+      @user1.pseudonym.account_id = account.id
+      @user1.pseudonym.save!
+
+      raw_api_call(
+        :put,
+        "/api/v1/users/#{@user2.id}/merge_into/#{@user1.id}",
+        { controller: 'users', action: 'merge_into', format: 'json',
+          id: @user2.to_param, destination_user_id: @user1.to_param}
+      )
+      response.status.should == '401 Unauthorized'
     end
   end
 end

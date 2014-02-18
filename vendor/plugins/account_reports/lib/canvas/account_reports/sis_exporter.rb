@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2013 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -209,7 +209,9 @@ module Canvas::AccountReports
         courses = courses.where("courses.sis_source_id IS NOT NULL") if @sis_format
 
         if @include_deleted
-          courses = courses.where("courses.workflow_state<>'deleted' OR courses.sis_source_id IS NOT NULL")
+          courses = courses.where("(courses.workflow_state='deleted' AND courses.updated_at > ?)
+                                    OR courses.workflow_state<>'deleted'
+                                    OR courses.sis_source_id IS NOT NULL", 120.days.ago)
         else
           courses = courses.where("courses.workflow_state<>'deleted' AND courses.workflow_state<>'completed'")
         end

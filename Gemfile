@@ -4,13 +4,32 @@ source 'http://rubygems.org/'
 if RUBY_VERSION == "2.0.0"
   warn "Ruby 2.0 support is untested"
   ruby '2.0.0', :engine => 'ruby', :engine_version => '2.0.0'
+elsif RUBY_VERSION == "2.1.0"
+  warn "Ruby 2.1 support is untested"
+  ruby '2.1.0', :engine => 'ruby', :engine_version => '2.1.0'
 else
   ruby '1.9.3', :engine => 'ruby', :engine_version => '1.9.3'
 end
 
+# enforce the version of bundler itself, to avoid any surprises
+required_bundler_version = '1.5.1'..'1.5.2'
+gem 'bundler', [">=#{required_bundler_version.first}", "<=#{required_bundler_version.last}"]
+
+unless required_bundler_version.include?(Bundler::VERSION)
+  if Bundler::VERSION < required_bundler_version.first
+    bundle_command = "gem install bundler -v #{required_bundler_version.last}"
+  else
+    require 'shellwords'
+    bundle_command = "bundle _#{required_bundler_version.last}_ #{ARGV.map { |a| Shellwords.escape(a) }.join(' ')}"
+  end
+
+  warn "Bundler version #{required_bundler_version.first} is required; you're currently running #{Bundler::VERSION}. Maybe try `#{bundle_command}`."
+  exit 1
+end
+
 require File.expand_path("../config/canvas_rails3", __FILE__)
 
-platforms :ruby_20 do
+platforms :ruby_20, :ruby_21 do
   gem 'syck', '1.0.1'
   gem 'iconv', '1.0.3'
 end
@@ -29,7 +48,7 @@ if CANVAS_RAILS2
   # "ActiveModel", and aliases ActiveRecord::Errors to ActiveModel::Errors
   # so Authlogic will use the right thing when it detects that ActiveModel
   # is defined.
-  gem 'active_model_serializers_rails_2.3', '0.9.0pre2', require: 'active_model_serializers'
+  gem 'active_model_serializers_rails_2.3', '0.9.0pre2', :require => 'active_model_serializers'
   gem 'authlogic', '2.1.3'
 else
   # just to be clear, Canvas is NOT READY to run under Rails 3 in production
@@ -43,10 +62,8 @@ gem "aws-sdk", '1.21.0'
 gem 'barby', '0.5.0'
 gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
-# enforce the version of bundler itself, to avoid any surprises
-gem 'bundler', ['>=1.3.5', '<=1.5.1', '!=1.5.0']
 gem 'canvas_connect', '0.3.2'
-gem 'canvas_webex', '0.8'
+gem 'canvas_webex', '0.12'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
 if CANVAS_RAILS2
@@ -86,9 +103,9 @@ gem 'multi_json', '1.8.2'
 gem 'netaddr', '1.5.0'
 gem 'nokogiri', '1.5.6'
 # oauth gem, with rails3 fixes rolled in
-gem 'oauth-instructure', '0.4.9', :require => 'oauth'
+gem 'oauth-instructure', '0.4.10', :require => 'oauth'
 gem 'rack', CANVAS_RAILS2 ? '1.1.3' : '1.4.5'
-gem 'rake', '10.1.0'
+gem 'rake', '10.1.1'
 gem 'rdoc', '3.12'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
 gem 'rdiscount', '1.6.8'
@@ -100,7 +117,7 @@ gem 'rotp', '1.4.1'
 gem 'rqrcode', '0.4.2'
 gem 'rscribd', '1.2.0'
 gem 'net-ldap', '0.3.1', :require => 'net/ldap'
-gem 'ruby-saml-mod', '0.1.22'
+gem 'ruby-saml-mod', '0.1.24'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip', '1.0.0', :require => 'zip'
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace
@@ -108,7 +125,7 @@ gem 'safe_yaml-instructure', '0.8.0', :require => false
 gem 'sanitize', '2.0.3'
 gem 'shackles', '1.0.2'
 unless CANVAS_RAILS2
-  gem 'switchman', '0.0.1'
+  gem 'switchman', '0.0.1', :github => "instructure/switchman"
 end
 gem 'tzinfo', '0.3.35'
 gem 'useragent', '0.4.16'
@@ -149,22 +166,24 @@ group :test do
   gem 'simplecov', :require => false
   gem 'simplecov-rcov', :require => false
   gem 'bluecloth', '2.0.10' # for generating api docs
-  gem 'mocha', :github => 'ccutrer/mocha', :require => false
+  gem 'mocha', '1.0.0.alpha', :require => false
   gem 'thin', '1.5.1'
   if CANVAS_RAILS2
     gem 'rspec', '1.3.2'
     gem 'rspec-rails', '1.3.4'
   else
-    gem 'rspec', '2.13.0'
-    gem 'rspec-rails', '2.13.0'
+    gem 'rspec', '2.14.1'
+    gem 'rspec-rails', '2.14.1'
   end
   gem 'sequel', '4.5.0', :require => false
-  gem 'selenium-webdriver', '2.37.0'
+  gem 'selenium-webdriver', '2.39.0'
   gem 'webrat', '0.7.3'
+  gem 'webmock', '1.16.1', :require => false
   gem 'yard', '0.8.0'
   gem 'yard-appendix', '>=0.1.8'
   gem 'timecop', '0.6.3'
   gem 'test-unit', '1.2.3'
+  gem 'bullet', '4.5.0', :require => false
 end
 
 group :development do
@@ -178,7 +197,7 @@ group :development do
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
-    gem 'byebug', '2.4.1', :platforms => :ruby_20
+    gem 'byebug', '2.4.1', :platforms => [:ruby_20, :ruby_21]
     gem 'debugger', '1.5.0', :platforms => :ruby_19
   end
 end

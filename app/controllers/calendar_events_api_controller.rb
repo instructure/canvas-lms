@@ -621,12 +621,12 @@ class CalendarEventsApiController < ApplicationController
     sql = []
     conditions = []
     unless view_unpublished.empty?
-      sql << '("assignments"."context_code" IN (?))'
+      sql << '(assignments.context_code IN (?))'
       conditions << view_unpublished.map(&:asset_string)
     end
 
     unless other.empty?
-      sql << '("assignments"."context_code" IN (?) AND "assignments"."workflow_state" = ?)'
+      sql << '(assignments.context_code IN (?) AND assignments.workflow_state = ?)'
       conditions << other.map(&:asset_string)
       conditions << 'published'
     end

@@ -52,7 +52,7 @@ describe GoogleDocs do
 
   before do
     @user = User.create!
-    PluginSetting.create!(:name => 'google_docs', :settings => google_doc_settings)
+    GoogleDocs.stubs(:config).returns(google_doc_settings)
     UserService.register(
       :service => "google_docs",
       :token => GoogleDocs.config["test_user_token"],

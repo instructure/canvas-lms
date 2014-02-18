@@ -71,43 +71,44 @@ describe QuizStatistics do
 
   it 'generates a new quiz_statistics if the quiz changed' do
     QuizStatistics.any_instance.expects(:generate_csv).twice
-    @quiz.statistics_csv('student_analysis') # once
-    run_jobs
+    Timecop.freeze(5.minutes.ago) do
+      @quiz.statistics_csv('student_analysis') # once
+      run_jobs
+    end
     @quiz.one_question_at_a_time = true
     @quiz.published_at = Time.now
     @quiz.save!
+    @quiz.reload
     @quiz.statistics_csv('student_analysis') # twice
     run_jobs
-    @quiz.update_attribute(:one_question_at_a_time, false)
-    @quiz.statistics_csv('student_analysis') # unpublished changes don't matter
-    run_jobs
+    Timecop.freeze(5.minutes.from_now) do
+      @quiz.update_attribute(:one_question_at_a_time, false)
+      @quiz.statistics_csv('student_analysis') # unpublished changes don't matter
+      run_jobs
+    end
   end
 
   it 'generates a new quiz_statistics if new submissions are in' do
     QuizStatistics.any_instance.expects(:generate_csv).twice
     @quiz.statistics_csv('student_analysis')
     run_jobs
-    qs = @quiz.quiz_submissions.build
-    qs.save!
-    qs.mark_completed
-    @quiz.statistics_csv('student_analysis')
-    run_jobs
+    Timecop.freeze(5.minutes.from_now) do
+      qs = @quiz.quiz_submissions.build
+      qs.save!
+      qs.mark_completed
+      @quiz.statistics_csv('student_analysis')
+      run_jobs
+    end
   end
 
   it 'uses the previously generated quiz_statistics if possible' do
     QuizStatistics.any_instance.expects(:generate_csv).once
+    @quiz.reload
     @quiz.statistics_csv('student_analysis')
     run_jobs
-    @quiz.statistics_csv('student_analysis')
-    run_jobs
+    Timecop.freeze(5.minutes.from_now) do
+      @quiz.statistics_csv('student_analysis')
+      run_jobs
+    end
   end
-
-  it 'generates a new quiz_statistics if none exist' do
-    QuizStatistics.any_instance.expects(:generate_csv).once
-    @quiz.statistics_csv('student_analysis')
-    run_jobs
-    @quiz.statistics_csv('student_analysis')
-    run_jobs
-  end
-
 end

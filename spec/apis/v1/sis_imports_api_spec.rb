@@ -46,7 +46,7 @@ describe SisImportsApiController, :type => :integration do
         { :controller => "sis_imports_api", :action => "create",
           :format => "json", :account_id => @account.id.to_s },
         opts.merge({ :import_type => "instructure_csv",
-          :attachment => ActionController::TestUploadedFile.new(path)}))
+          :attachment => Rack::Test::UploadedFile.new(path)}))
     json.has_key?("created_at").should be_true
     json.delete("created_at")
     json.has_key?("updated_at").should be_true

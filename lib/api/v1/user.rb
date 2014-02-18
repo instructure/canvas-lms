@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -133,6 +133,7 @@ module Api::V1::User
                               :limit_privileges_to_course_section,
                               :workflow_state,
                               :updated_at,
+                              :created_at,
                               :type]
 
   def enrollment_json(enrollment, user, session, includes = [])
