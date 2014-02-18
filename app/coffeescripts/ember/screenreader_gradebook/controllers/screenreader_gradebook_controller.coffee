@@ -71,7 +71,7 @@ define [
 
     showTotalAsPoints: (->
       ENV.GRADEBOOK_OPTIONS.show_total_grade_as_points
-      ).property()
+    ).property()
 
     hideStudentNames: false
 
@@ -389,13 +389,46 @@ define [
       ENV.GRADEBOOK_OPTIONS.draft_state_enabled
 
     processAssignment: (as, assignmentGroups) ->
+      assignmentGroup = assignmentGroups.findBy('id', as.assignment_group_id)
       set as, 'sortable_name', as.name.toLowerCase()
-      set as, 'ag_position', assignmentGroups.findBy('id', as.assignment_group_id).position
+      set as, 'ag_position', assignmentGroup.position
+      set as, 'noPointsPossibleWarning', assignmentGroup.invalid
       if as.due_at
         set as, 'due_at', Ember.$.parseFromISO(as.due_at)
         set as, 'sortable_date', as.due_at.timestamp
       else
         set as, 'sortable_date', Number.MAX_VALUE
+
+    checkForNoPointsWarning: (ag) ->
+      pointsPossible = _.inject ag.assignments
+      , ((sum, a) -> sum + (a.points_possible || 0))
+      , 0
+      pointsPossible == 0
+
+    checkForInvalidGroups: (->
+      @get('assignment_groups').forEach (ag) =>
+        set ag, "invalid", @checkForNoPointsWarning(ag)
+    ).observes('assignment_groups.@each')
+
+    invalidAssignmentGroups: (->
+      @get('assignment_groups').filterProperty('invalid',true)
+    ).property('assignment_groups.@each.invalid')
+
+    showInvalidGroupWarning: (->
+      @get("invalidAssignmentGroups").length > 0 && @get('weightingScheme') == "percent"
+    ).property("invalidAssignmentGroups", "weightingScheme")
+
+    invalidGroupNames: (->
+      names = @get("invalidAssignmentGroups").map (group) ->
+        group.name
+    ).property("invalidAssignmentGroups").readOnly()
+
+    invalidGroupsWarningPhrases:(->
+      I18n.t("invalid_group_warning",
+        {one: "Note: Score does not include assignments from the group %{list_of_group_names} because it has no points possible.",
+        other:"Note: Score does not include assignments from the groups %{list_of_group_names} because they have no points possible."}
+        {count: @get('invalidGroupNames').length, list_of_group_names: @get('invalidGroupNames').join(" or ")})
+    ).property('invalidGroupNames')
 
     populateAssignments: (->
       assignmentGroups = @get('assignment_groups')
@@ -477,6 +510,10 @@ define [
           assignment_id: assignment.id
         }
     ).property('selectedStudent', 'selectedAssignment')
+
+    showAssignmentPointsWarning: (->
+      @get("selectedAssignment.noPointsPossibleWarning") and @get('groupsAreWeighted')
+    ).property('selectedAssignment', 'groupsAreWeighted')
 
     selectedStudentSections: (->
       student = @get('selectedStudent')

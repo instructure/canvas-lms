@@ -422,4 +422,21 @@ define [
       @srgb.set('shouldCreateNotes', false)
     equal @srgb.get('notesVerb'), 'PUT'
 
+  module 'screenreader_gradebook_controller:invalidGroups',
+    setup: ->
+      setup.call this, true
+      Em.run =>
+        @srgb.set('assignment_groups',Ember.ArrayProxy.create(content: clone fixtures.assignment_groups))
+    teardown: ->
+      teardown.call this
+
+  test 'calculates invalidGroupsWarningPhrases properly', ->
+    equal @srgb.get('invalidGroupsWarningPhrases'), "Note: Score does not include assignments from the group Invalid AG because it has no points possible."
+
+  test 'sets showInvalidGroupWarning to false if groups are not weighted', ->
+    @srgb.set('weightingScheme', "equal")
+    equal @srgb.get('showInvalidGroupWarning'), false
+    @srgb.set('weightingScheme', "percent")
+    equal @srgb.get('showInvalidGroupWarning'), true
+
 

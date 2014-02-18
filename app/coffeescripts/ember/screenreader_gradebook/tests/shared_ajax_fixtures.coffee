@@ -431,6 +431,24 @@ define [
             }
           ]
         }
+        {
+          id: '5'
+          name: 'Invalid AG'
+          position: 3
+          assignments: [
+            {
+              id: '24'
+              name: 'No Points Assignment'
+              points_possible: 0
+              grading_type: "percent"
+              submission_types: ["not_graded"]
+              due_at: "2013-09-01T10:00:00Z"
+              position: 1
+              assignment_group_id:'4'
+              published: true
+            }
+          ]
+        }
       ]
 
   submissions = [

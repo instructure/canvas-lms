@@ -312,6 +312,9 @@
         {{/each}}
         <dt class="total-grade">
           {{#t 'final_grade'}}Final Grade{{/t}}
+          {{#if showInvalidGroupWarning}}
+            <i class="icon-warning" {{bind-attr aria-label="invalidGroupsWarningPhrases"}}></i>
+          {{/if}}
         </dt>
         <dd class="total-grade">
           {{#if selectedStudent.total_grade.possible}}
@@ -340,6 +343,13 @@
   {{else}}
     <h3 class="assignment_selection">
       <a {{bind-attr href="selectedAssignment.html_url"}}>{{selectedAssignment.name}}</a>
+      {{#if showAssignmentPointsWarning}}
+        <a
+        {{bind-attr href="selectedAssignment.html_url"}}
+        title={{#t 'no_points_possible_warning'}} "Assignments in this group have no points possible and cannot be included in grade calculation."{{/t}}>
+          <i class="icon-warning"></i>
+        </a>
+      {{/if}}
     </h3>
     <p>
       <a {{bind-attr href="speedGraderUrl"}}>{{#t 'assignment_in_speedgrader'}}See this assignment in speedgrader{{/t}}</a>
