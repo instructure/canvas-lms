@@ -1037,8 +1037,8 @@ define [
       @grid.onSort.subscribe (event, data) =>
         if data.sortCol.field == "display_name" ||
            data.sortCol.field == "secondary_identifier" ||
-           data.sortCol.field.match /^custom_col/
-           || data.sortCol.field == "sis_id" # SFU MOD - CANVAS-188 Make SIS ID sortable
+           data.sortCol.field.match /^custom_col/  ||
+           data.sortCol.field == "sis_id" # SFU MOD - CANVAS-188 Make SIS ID sortable
           sortProp = if data.sortCol.field == "display_name"
             "sortable_name"
           else
