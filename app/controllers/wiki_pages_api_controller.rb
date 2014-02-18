@@ -582,10 +582,10 @@ class WikiPagesApiController < ApplicationController
     end
 
     if page_params.has_key?(:front_page)
-      @set_front_page = true
       @set_as_front_page = value_to_boolean(page_params.delete(:front_page))
+      @set_front_page = true if @was_front_page != @set_as_front_page
     end
-    change_front_page = @set_front_page && @was_front_page != @set_as_front_page
+    change_front_page = !!@set_front_page
 
     # check user permissions
     rejected_fields = Set[]

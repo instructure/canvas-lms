@@ -600,6 +600,32 @@ describe "Pages API", type: :request do
         json['front_page'].should == false
       end
 
+      it "should not change the front page unless set differently" do
+        set_course_draft_state true
+
+        # make sure we don't catch the default 'front-page'
+        @front_page.title = 'Different Front Page'
+        @front_page.save!
+
+        wiki = @course.wiki.reload
+        wiki.set_front_page_url!(@front_page.url)
+
+        # create and update another page
+        other_page = @wiki.wiki_pages.create!(:title => "Other Page", :body => "Body of other page")
+        other_page.workflow_state = 'active'
+        other_page.save!
+
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{other_page.url}",
+                        { :controller => 'wiki_pages_api', :action => 'update', :format => 'json',
+                          :course_id => @course.to_param, :url => other_page.url },
+                        { :wiki_page =>
+                          { :title => 'Another Page', :body => 'Another page body', :front_page => false }
+                        })
+
+        # the front page url should remain unchanged
+        wiki.reload.get_front_page_url.should == @front_page.url
+      end
+
       it "should update wiki front page url if page url is updated" do
         page = @course.wiki.wiki_pages.create!(:title => "hrup")
         page.set_as_front_page!
