@@ -8,6 +8,7 @@ define [
   'compiled/views/gradebook/SectionMenuView'
   'jst/gradebook2/outcome_gradebook'
   'vendor/jquery.ba-tinypubsub'
+  'jquery.instructure_misc_plugins'
 ], (I18n, _, {View}, Slick, Grid, CheckboxView, SectionMenuView, template, cellTemplate) ->
 
   Dictionary =
@@ -99,6 +100,9 @@ define [
     _attachEvents: ->
       view.on('togglestate', @_createFilter(name)) for name, view of @checkboxes
       $.subscribe('currentSection/change', Grid.Events.sectionChangeFunction(@grid))
+      @$el.fillWindowWithMe({
+        onResize: => @grid.resizeCanvas()
+      })
 
     # Internal: Listen for events on grid.
     #

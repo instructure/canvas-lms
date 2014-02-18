@@ -78,7 +78,6 @@ $page-dark: #ebeff2;
   border-top: 1px solid $border-dark;
   box-sizing: border-box;
   color: $font-color;
-  min-height: 450px;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   padding-left: 22px;
@@ -91,7 +90,7 @@ $page-dark: #ebeff2;
 .outcome-gradebook-wrapper, .outcome-gradebook-sidebar {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
-  min-height: 450px;
+  height: 100%;
 }
 
 .outcome-gradebook-sidebar {
