@@ -182,7 +182,7 @@ define [
     ad = @srgb.get('assignmentDetails')
     selectedAssignment = @srgb.get('selectedAssignment')
     strictEqual ad.assignment, selectedAssignment
-    strictEqual ad.cnt, 0
+    strictEqual ad.cnt, 3
 
   test 'selectedSubmission is computed properly', ->
     selectedSubmission = @srgb.get('selectedSubmission')
@@ -200,6 +200,13 @@ define [
 
     teardown: ->
       Ember.run App, 'destroy'
+
+  test 'gets the submission types', ->
+    equal @srgb.get('assignmentSubmissionTypes'), 'None'
+    Ember.run =>
+      assignments = @srgb.get('assignments')
+      @srgb.set('selectedAssignment', assignments.objectAt(1))
+    equal @srgb.get('assignmentSubmissionTypes'), 'Online URL, Online text entry'
 
   test 'correctly determines if prev/next assignment exists for first assignment', ->
     equal @srgb.get('assignmentIndex'), 0
@@ -221,6 +228,7 @@ define [
     equal @srgb.get('assignmentIndex'), 6
     equal @srgb.get('disablePrevAssignmentButton'), false
     equal @srgb.get('disableNextAssignmentButton'), true
+
 
   module 'screenreader_gradebook_controller:draftState',
     setup: ->

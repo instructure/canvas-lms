@@ -53,7 +53,7 @@ define [
 
     contextUrl: get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')
 
-    downloadUrl: (->
+    downloadCsvUrl: (->
       "#{@get('contextUrl')}/gradebook.csv"
     ).property()
 
@@ -535,6 +535,31 @@ define [
       }
       locals
     ).property('selectedAssignment', 'students.@each.total_grade')
+
+    assignmentSubmissionTypes: (->
+      types = @get('selectedAssignment.submission_types')
+      submissionTypes = @get('submissionTypes')
+      if types == undefined || types.length == 0
+        submissionTypes['none']
+      else if types.length == 1
+        submissionTypes[types[0]]
+      else
+        result = []
+        types.forEach (type) -> result.push(submissionTypes[type])
+        result.join(', ')
+    ).property('selectedAssignment')
+
+    submissionTypes: {
+      'discussion_topic': I18n.t 'discussion_topic', 'Discussion topic'
+      'online_quiz': I18n.t 'online_quiz', 'Online quiz'
+      'on_paper': I18n.t 'on_paper', 'On paper'
+      'none': I18n.t 'none', 'None'
+      'external_tool': I18n.t 'external_tool', 'External tool'
+      'online_text_entry': I18n.t 'online_text_entry', 'Online text entry'
+      'online_url': I18n.t 'online_url', 'Online URL'
+      'online_upload': I18n.t 'online_upload', 'Online upload'
+      'media_recording': I18n.t 'media_recordin', 'Media recording'
+    }
 
     # Next/Previous Student/Assignment
 
