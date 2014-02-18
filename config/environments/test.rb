@@ -116,7 +116,7 @@ end
     Canvas.dynamic_finder_nil_arguments_error = :raise
   else
     # Raise exceptions instead of rendering exception templates
-    config.action_dispatch.show_exceptions = false
+    config.action_dispatch.show_exceptions = true
 
     # Print deprecation notices to the stderr
     config.active_support.deprecation = :stderr
