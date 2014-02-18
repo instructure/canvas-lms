@@ -1475,23 +1475,35 @@ class Assignment < ActiveRecord::Base
 
   # This should only be used in the course drop down to show assignments needing a submission
   scope :need_submitting_info, lambda { |user_id, limit|
-    api_needed_fields.
-      select("(SELECT name FROM courses WHERE courses.id = assignments.context_id) AS context_name").
+    chain = api_needed_fields.
       where("(SELECT COUNT(id) FROM submissions
             WHERE assignment_id = assignments.id
             AND submission_type IS NOT NULL
             AND user_id = ?) = 0", user_id).
       limit(limit).
       order("assignments.due_at")
+
+    # select doesn't work with include() in rails3, and include(:context)
+    # doesn't work because of the polymorphic association. So we'll preload
+    # context for the assignments in a single query.
+    if CANVAS_RAILS2
+      chain.select("(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name, needs_grading_count")
+    else
+      chain.preload(:context)
+    end
   }
 
   # This should only be used in the course drop down to show assignments not yet graded.
   scope :need_grading_info, lambda { |limit|
-    api_needed_fields.
-        select("(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name, needs_grading_count").
+    chain = api_needed_fields.
         where("assignments.needs_grading_count>0").
         limit(limit).
         order("assignments.due_at")
+    if CANVAS_RAILS2
+      chain.select("(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name, needs_grading_count")
+    else
+      chain.preload(:context)
+    end
   }
 
   scope :expecting_submission, where("submission_types NOT IN ('', 'none', 'not_graded', 'on_paper') AND submission_types IS NOT NULL")
@@ -1513,6 +1525,12 @@ class Assignment < ActiveRecord::Base
 
   def overdue?
     due_at && due_at <= Time.now
+  end
+
+  # We can replace context_name with context.name in _menu_assignment.html.erb
+  # and remove this once the rails3 switch is complete
+  def context_name
+    CANVAS_RAILS2 ? read_attribute('context_name') : context.name
   end
 
   def readable_submission_types
