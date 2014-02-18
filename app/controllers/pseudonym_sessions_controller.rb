@@ -455,7 +455,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def otp_remember_me_cookie_domain
-    ActionController::Base.session_options[:domain]
+    CANVAS_RAILS2 ? ActionController::Base.session_options[:domain] : CanvasRails::Application.config.session_options[:domain]
   end
 
   def otp_login(send_otp = false)
@@ -511,12 +511,12 @@ class PseudonymSessionsController < ApplicationController
 
       if params[:otp_login][:remember_me] == '1'
         now = Time.now.utc
-        self.cookies['canvas_otp_remember_me'] = {
+        cookies['canvas_otp_remember_me'] = {
               :value => @current_user.otp_secret_key_remember_me_cookie(now),
               :expires => now + 30.days,
               :domain => otp_remember_me_cookie_domain,
               :httponly => true,
-              :secure => ActionController::Base.session_options[:secure],
+              :secure => CANVAS_RAILS2 ? ActionController::Base.session_options[:secure] : CanvasRails::Application.config.session_options[:secure],
               :path => '/login'
             }
       end
@@ -659,7 +659,11 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def oauth2_token
-    basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if ActionController::HttpAuthentication::Basic.authorization(request)
+    if CANVAS_RAILS2
+      basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if ActionController::HttpAuthentication::Basic.authorization(request)
+    else
+      basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if ActionController::HttpAuthentication::Basic.authenticate(request)
+    end
 
     client_id = params[:client_id].presence || basic_user
     secret = params[:client_secret].presence || basic_pass
