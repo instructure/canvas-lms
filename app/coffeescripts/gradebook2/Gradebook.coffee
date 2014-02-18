@@ -18,6 +18,7 @@ define [
   'compiled/gradebook2/AssignmentGroupWeightsDialog'
   'compiled/gradebook2/SubmissionCell'
   'compiled/gradebook2/GradebookHeaderMenu'
+  'compiled/gradebook2/NumberCompare'
   'str/htmlEscape'
   'compiled/gradebook2/UploadDialog'
   'jst/gradebook2/column_header'
@@ -36,7 +37,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, UploadDialog, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
+], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
 
   class Gradebook
     columnWidths =
@@ -1053,9 +1054,7 @@ define [
           @sortRowsBy (a, b) ->
             aScore = a[data.sortCol.field]?.score
             bScore = b[data.sortCol.field]?.score
-            aScore = -99999999999 if not aScore and aScore != 0
-            bScore = -99999999999 if not bScore and bScore != 0
-            if data.sortAsc then aScore - bScore else bScore - aScore
+            numberCompare(aScore, bScore, data.sortAsc)
 
       @grid.onKeyDown.subscribe ->
         # TODO: start editing automatically when a number or letter is typed

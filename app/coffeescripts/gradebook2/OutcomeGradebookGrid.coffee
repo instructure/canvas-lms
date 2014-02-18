@@ -3,9 +3,10 @@ define [
   'underscore'
   'compiled/views/gradebook/HeaderFilterView'
   'compiled/views/gradebook/OutcomeColumnView'
+  'compiled/gradebook2/NumberCompare'
   'jst/gradebook2/outcome_gradebook_cell'
   'jst/gradebook2/outcome_gradebook_student_cell'
-], (I18n, _, HeaderFilterView, OutcomeColumnView, cellTemplate, studentCellTemplate) ->
+], (I18n, _, HeaderFilterView, OutcomeColumnView, numberCompare, cellTemplate, studentCellTemplate) ->
 
   Grid =
     filter: ['mastery', 'near-mastery', 'remedial']
@@ -107,9 +108,9 @@ define [
       #
       # Returns a number used to sort with.
       _sortResults: (a, b, sortAsc, field) ->
-        scoreA = a[field] or 0
-        scoreB = b[field] or 0
-        val = if sortAsc then scoreA - scoreB else scoreB - scoreA
+        scoreA = a[field]
+        scoreB = b[field]
+        val = numberCompare(scoreA, scoreB, sortAsc)
         if val == 0
           Grid.Events._sortStudents(a, b, sortAsc)
         else
@@ -318,7 +319,7 @@ define [
       # Returns cell HTML
       cellHtml: (value, columnDef, shouldFilter) ->
         outcome     = Grid.Util.lookupOutcome(columnDef.field)
-        return unless outcome and !(_.isNull(value) or _.isUndefined(value))
+        return unless outcome and _.isNumber(value)
         className   = Grid.View.masteryClassName(value, outcome)
         return '' if shouldFilter and !_.include(Grid.filter, className)
         cellTemplate(score: value, className: className, masteryScore: outcome.mastery_points)
@@ -342,7 +343,7 @@ define [
       getColumnResults: (data, column) ->
         _.chain(data)
           .pluck(column.field)
-          .reject((value) -> _.isNull(value) or _.isUndefined(value))
+          .filter(_.isNumber)
           .value()
 
       headerRowCell: ({node, column, grid}, fn = Grid.averageFn) ->
