@@ -8,6 +8,7 @@ class AddForeignKeys13 < ActiveRecord::Migration
     DelayedMessage.where("communication_channel_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM communication_channels WHERE communication_channel_id=communication_channels.id)").delete_all
     NotificationPolicy.where("communication_channel_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM communication_channels WHERE communication_channel_id=communication_channels.id)").delete_all
     add_foreign_key_if_not_exists :notification_policies, :communication_channels, delay_validation: true
+    WebConferenceParticipant.where("NOT EXISTS (SELECT 1 FROM web_conferences WHERE web_conference_id=web_conferences.id)").delete_all
     add_foreign_key_if_not_exists :web_conference_participants, :web_conferences, delay_validation: true
     add_foreign_key_if_not_exists :pseudonyms, :accounts, delay_validation: true
     add_foreign_key_if_not_exists :assessment_requests, :submissions, column: :asset_id, delay_validation: true
