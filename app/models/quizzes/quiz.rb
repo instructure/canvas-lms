@@ -1378,4 +1378,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     %w(Quiz Quizzes::Quiz)
   end
 
+  def self.reflection_type_name
+    'quizzes:quiz'
+  end
 end
