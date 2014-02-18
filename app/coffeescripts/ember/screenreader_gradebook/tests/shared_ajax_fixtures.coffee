@@ -524,6 +524,7 @@ define [
           change_grade_url: '/api/v1/courses/1/assignments/:assignment/submissions/:submission'
           custom_columns_url: 'api/v1/courses/1/custom_gradebook_columns'
           custom_column_data_url: 'api/v1/courses/1/custom_gradebook_columns/:id'
+          setting_update_url: 'api/v1/courses/1/settings'
         }
       }
 
@@ -554,6 +555,11 @@ define [
 
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.custom_columns_url,
       response: clone customColumns
+      jqXHR: { getResponseHeader: -> {} }
+      textStatus: ''
+
+    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.setting_update_url,
+      response: true
       jqXHR: { getResponseHeader: -> {} }
       textStatus: ''
 

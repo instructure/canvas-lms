@@ -69,6 +69,10 @@ define [
       "#{@get('contextUrl')}/grades/#{@get('selectedStudent.id')}"
     ).property('selectedStudent')
 
+    showTotalAsPoints: (->
+      ENV.GRADEBOOK_OPTIONS.show_total_grade_as_points
+      ).property()
+
     hideStudentNames: false
 
     showConcludedEnrollments: false
@@ -170,7 +174,18 @@ define [
 
     calculateAllGrades: (->
       @get('students').forEach (student) => @calculateStudentGrade student
-    ).observes('includeUngradedAssignments')
+    ).observes('includeUngradedAssignments','groupsAreWeighted')
+
+    setFinalGradeDisplay: (->
+      @get('students').forEach (student) =>
+        set(student, "final_grade_point_ratio", @pointRatioDisplay(student, @get('groupsAreWeighted')))
+    ).observes('students.@each.total_grade','groupsAreWeighted')
+
+    pointRatioDisplay: (student, weighted_groups) ->
+      if weighted_groups or not student.total_grade
+        null
+      else
+        "#{student.total_grade.score} / #{student.total_grade.possible}"
 
     sectionSelectDefaultLabel: I18n.t "all_sections", "All Sections"
     studentSelectDefaultLabel: I18n.t "no_student", "No Student Selected"
@@ -216,6 +231,7 @@ define [
       else
         false
     ).property().volatile()
+
 
     shouldCreateNotes: (->
       !@get('teacherNotes') and @get('showNotesColumn')
@@ -271,6 +287,27 @@ define [
           data:
             order: customColumns.mapBy('id')
         )
+
+    displayPointTotals: (->
+      if @get("groupsAreWeighted")
+        false
+      else
+        @get("showTotalAsPoints")
+    ).property('groupsAreWeighted', 'showTotalAsPoints')
+
+    groupsAreWeighted: (->
+      @get("weightingScheme") == "percent"
+    ).property("weightingScheme")
+
+    updateShowTotalAs: (->
+      @set "showTotalAsPoints", @get("displayPointTotals")
+      ajax(
+        dataType: "json"
+        type: "PUT"
+        url: ENV.GRADEBOOK_OPTIONS.setting_update_url
+        data:
+          show_total_grade_as_points: @get("displayPointTotals"))
+    ).observes('showTotalAsPoints', 'groupsAreWeighted')
 
     studentColumnData: {}
 

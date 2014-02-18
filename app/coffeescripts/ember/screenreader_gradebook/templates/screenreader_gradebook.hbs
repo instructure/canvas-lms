@@ -80,6 +80,18 @@
     }}
     {{#t "show_notes"}}Show Notes in Student Info{{/t}}
     </label>
+    {{#unless groupsAreWeighted}}
+      <label class="checkbox">
+      {{
+        input
+        type="checkbox"
+        id="show_total_as_points"
+        name="show_total_as_points"
+        checked=showTotalAsPoints
+      }}
+      {{#t "show_total_as_points"}}Show Student Grade Totals as Points {{/t}}
+      </label>
+    {{/unless}}
     {{#if publishToSisEnabled}}
       <a href="{{ unbound publishToSisURL }}">
         {{#t "sis_export"}}Publish grades to SIS{{/t}}
@@ -304,6 +316,10 @@
         <dd class="total-grade">
           {{#if selectedStudent.total_grade.possible}}
             {{selectedStudent.total_percent}}%
+            {{#if selectedStudent.final_grade_point_ratio}}
+              </br>
+              {{selectedStudent.final_grade_point_ratio}}
+            {{/if}}
           {{else}}
             -
           {{/if}}
