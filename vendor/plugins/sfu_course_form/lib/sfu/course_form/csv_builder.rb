@@ -51,7 +51,7 @@ module SFU
           long_name = (long_names[0, 1] + short_names[1..-1]).join(' / ') if long_name.length > CANVAS_COURSE_NAME_MAX
 
           # create course csv
-          selected_term = term(term)
+          selected_term = self.class.term(term)
           course_array.push [course_id, short_name, long_name, account_id, term, 'active', selected_term.start_at, selected_term.end_at]
 
           # create section csv
@@ -126,7 +126,7 @@ module SFU
         title = course_arr[4].to_s
         child_sections = course_arr[5]
 
-        selected_term = term(course[:term])
+        selected_term = self.class.term(course[:term])
 
         course[:course_id] = "#{course[:term]}-#{name}-#{number}-#{section_name}"
         course[:main_section_id] = "#{course[:course_id]}:::#{time_stamp}"
@@ -205,7 +205,7 @@ module SFU
         end
       end
 
-      def term(term_code)
+      def self.term(term_code)
         EnrollmentTerm.find(:all, :conditions => ["workflow_state = 'active' AND sis_source_id = :term", {:term => term_code}]).first
       end
 

@@ -117,12 +117,15 @@ describe 'A multiple calendar courses request' do
   end
 
   def verify_courses(expected_course_ids)
+    term = SFU::CourseForm::CSVBuilder.term('1141')
     @courses.count.should == 2
     @courses.each_with_index do |course, index|
       course['course_id'].should == expected_course_ids[index]
       course['account_id'].should == '2'
       course['term_id'].should == '1141'
       course['status'].should == 'active'
+      course['start_date'].should == term.start_at.to_s
+      course['end_date'].should == term.end_at.to_s
     end
   end
 
@@ -258,11 +261,14 @@ describe 'A cross-list course request' do
   end
 
   def verify_courses(expected_course_id)
+    term = SFU::CourseForm::CSVBuilder.term('1141')
     @courses.count.should == 1
     @courses[0]['course_id'].should == expected_course_id
     @courses[0]['account_id'].should == '2'
     @courses[0]['term_id'].should == '1141'
     @courses[0]['status'].should == 'active'
+    @courses[0]['start_date'].should == term.start_at.to_s
+    @courses[0]['end_date'].should == term.end_at.to_s
   end
 
   def verify_sections(expected_count, expected_section_ids, expected_names, expected_course_id)
