@@ -38,7 +38,7 @@ describe "site-wide" do
 
   it "should set the x-ua-compatible http header" do
     get "/login"
-    response['x-ua-compatible'].should == "IE=edge,chrome=1"
+    response['x-ua-compatible'].should == "IE=Edge,chrome=1"
   end
 
   it "should set no-cache headers for html requests" do

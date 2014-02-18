@@ -177,7 +177,8 @@ class ApplicationController < ActionController::Base
   end
 
   def set_response_headers
-    headers['X-UA-Compatible'] = 'IE=edge,chrome=1'
+    headers['X-UA-Compatible'] = 'IE=Edge,chrome=1' if CANVAS_RAILS2
+
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
