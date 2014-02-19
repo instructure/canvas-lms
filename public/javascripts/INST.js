@@ -44,7 +44,9 @@ define(['jquery'], function($) {
       // not far behind Gecko and Webkit
       addClasses = false;
     }
-    else if (/*@cc_on!@*/false) {
+    // need to eval here because the optimizer will strip any comments, so using
+    // /*@cc_on@*/ will not make it through:
+    else if (eval('/*@cc_on!@*/0')) {
       classifyIE(10);
       addClasses = false;
     }
