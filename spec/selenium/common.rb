@@ -925,7 +925,7 @@ shared_examples_for "all selenium tests" do
     driver.execute_script("return $('.error_text:visible').filter(function(){ return $(this).offset().left >= 0 }).length > 0")
   end
 
-  append_after(:each) do
+  after(:each) do
     begin
       wait_for_ajax_requests
     rescue Selenium::WebDriver::Error::WebDriverError
@@ -991,7 +991,7 @@ shared_examples_for "all selenium tests" do
     end
   end
 
-  append_after(:each) do
+  after(:each) do
     clear_timers!
   end
 
