@@ -77,7 +77,7 @@ class DueDateCacher
           "submissions.assignment_id",
           "assignments.due_at",
           "CAST(#{Submission.sanitize(false)} AS #{cast}) AS overridden"
-        ]).joins(:assignment).to_sql})")
+        ]).joins(:assignment).where(assignments: { id: @assignments }).to_sql})")
 
         # create an ActiveRecord class around that temp table for the update_all
         scope = Class.new(ActiveRecord::Base) do
