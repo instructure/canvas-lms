@@ -63,19 +63,9 @@ describe Progress do
 
       progress.context_type.should == "Quizzes::QuizStatistics"
 
-      progress.context_type = 'QuizStatistics'
-      progress.send(:update_without_callbacks)
+      Progress.where(id: progress).update_all(context_type: 'QuizStatistics')
 
       Progress.find(progress.id).context_type.should == 'Quizzes::QuizStatistics'
-    end
-
-    it 'returns the context type attribute if not a quiz statistics relation' do
-      progress = Progress.create!(tag: "test", context: user)
-
-      progress.context = user
-      progress.send(:update_without_callbacks)
-
-      progress.context_type.should == 'User'
     end
   end
 end

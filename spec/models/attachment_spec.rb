@@ -1609,21 +1609,9 @@ describe Attachment do
       attachment.save
       attachment.context_type.should == "Quizzes::QuizStatistics"
 
-      attachment.context_type = 'QuizStatistics'
-      attachment.send(:update_without_callbacks)
+      Attachment.where(id: attachment).update_all(context_type: 'QuizStatistics')
 
       Attachment.find(attachment.id).context_type.should == 'Quizzes::QuizStatistics'
-    end
-
-    it 'returns the context type attribute if not a quiz statistics relation' do
-      attachment = Attachment.create!(context: assignment_model,
-                                      filename: "foo.txt",
-                                      uploaded_data: StringIO.new("bar"))
-
-      attachment.context = assignment_model
-      attachment.send(:update_without_callbacks)
-
-      attachment.context_type.should == 'Assignment'
     end
   end
 

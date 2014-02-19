@@ -360,8 +360,7 @@ describe "Outcome Reports" do
 
       # NOTE: remove after data migration of polymorphic relationships having: QuizSubmission
       result = LearningOutcomeResult.where(artifact_type: 'Quizzes::QuizSubmission').first
-      result.association_type = 'QuizSubmission'
-      result.send(:update_without_callbacks)
+      LearningOutcomeResult.where(id: result).update_all(association_type: 'QuizSubmission')
 
       parsed = read_report(@type, {order: [0, 13]})
       parsed[0][6].should == sub.finished_at.iso8601

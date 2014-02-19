@@ -61,18 +61,9 @@ describe LearningOutcomeResult do
       learning_outcome_result.save
       learning_outcome_result.artifact_type.should == 'Quizzes::QuizSubmission'
 
-      learning_outcome_result.association_type = 'QuizSubmission'
-      learning_outcome_result.send(:update_without_callbacks)
+      LearningOutcomeResult.where(id: learning_outcome_result).update_all(association_type: 'QuizSubmission')
 
       LearningOutcomeResult.find(learning_outcome_result.id).artifact_type.should == 'Quizzes::QuizSubmission'
-    end
-
-    it 'returns the artifact type attribute if not a quiz submission' do
-      learning_outcome_result = create_learning_outcome_result
-      learning_outcome_result.artifact = assignment_model
-      learning_outcome_result.send(:update_without_callbacks)
-
-      learning_outcome_result.artifact_type.should == 'Assignment'
     end
   end
 

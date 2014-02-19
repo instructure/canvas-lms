@@ -178,8 +178,7 @@ describe Message do
       message.save
       message.context_type.should == "Quizzes::QuizRegradeRun"
 
-      message.context_type = 'QuizRegradeRun'
-      message.send(:update_without_callbacks)
+      Message.where(id: message).update_all(context_type: 'QuizRegradeRun')
 
       Message.find(message.id).context_type.should == 'Quizzes::QuizRegradeRun'
     end
@@ -191,18 +190,9 @@ describe Message do
       message.save
       message.context_type.should == 'Quizzes::QuizSubmission'
 
-      message.context_type = 'QuizSubmission'
-      message.send(:update_without_callbacks)
+      Message.where(id: message).update_all(context_type: 'QuizSubmission')
 
       Message.find(message.id).context_type.should == 'Quizzes::QuizSubmission'
-    end
-
-    it 'returns the context type attribute if not a quiz' do
-      message = message_model
-      message.context = assignment_model
-      message.send(:update_without_callbacks)
-
-      message.context_type.should == 'Assignment'
     end
   end
 
@@ -216,8 +206,7 @@ describe Message do
       message.save
       message.asset_context_type.should == "Quizzes::QuizRegradeRun"
 
-      message.asset_context_type = 'QuizRegradeRun'
-      message.send(:update_without_callbacks)
+      Message.where(id: message).update_all(asset_context_type: 'QuizRegradeRun')
 
       Message.find(message.id).asset_context_type.should == 'Quizzes::QuizRegradeRun'
     end
@@ -229,19 +218,11 @@ describe Message do
       message.save
       message.asset_context_type.should == 'Quizzes::QuizSubmission'
 
-      message.asset_context_type = 'QuizSubmission'
-      message.send(:update_without_callbacks)
+      Message.where(id: message).update_all(asset_context_type: 'QuizSubmission')
 
       Message.find(message.id).asset_context_type.should == 'Quizzes::QuizSubmission'
     end
 
-    it 'returns the context type attribute if not a quiz' do
-      message = message_model
-      message.asset_context = assignment_model
-      message.send(:update_without_callbacks)
-
-      message.asset_context_type.should == 'Assignment'
-    end
   end
 
 end

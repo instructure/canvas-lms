@@ -151,8 +151,7 @@ describe 'simply_versioned' do
       version = Version.find_by_versionable_id(submission.id)
       version.versionable_type.should == 'Quizzes::QuizSubmission'
 
-      version.versionable_type = 'QuizSubmission'
-      version.send(:update_without_callbacks)
+      Version.where(id: version).update_all(versionable_type: 'QuizSubmission')
       Version.find(version.id).versionable_type.should == 'Quizzes::QuizSubmission'
     end
 

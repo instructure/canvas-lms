@@ -26,8 +26,7 @@ describe DelayedNotification do
 
       notification.asset_type.should == 'Quizzes::QuizSubmission'
 
-      notification.asset_type = 'QuizSubmission'
-      notification.send(:update_without_callbacks)
+      DelayedNotification.where(id: notification).update_all(asset_type: 'QuizSubmission')
 
       DelayedNotification.find(notification.id).asset_type.should == 'Quizzes::QuizSubmission'
     end
