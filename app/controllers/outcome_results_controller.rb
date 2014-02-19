@@ -95,6 +95,28 @@
 #       }
 #     }
 #
+# @model OutcomeAlignment
+#     {
+#       "id": "OutcomeAlignment",
+#       "description": "An asset aligned with this outcome",
+#       "properties": {
+#         "id": {
+#           "description": "A unique identifier for this alignment",
+#           "example": "quiz_3",
+#           "type": "string"
+#         },
+#         "name": {
+#           "description": "",
+#           "example": "Big mid-term test",
+#           "type": "string"
+#         },
+#         "html_url": {
+#           "description": "(Optional) A URL for details about this alignment",
+#           "type": "string"
+#         }
+#       }
+#     }
+
 class OutcomeResultsController < ApplicationController
   include Api::V1::OutcomeResults
   include Outcomes::ResultAnalytics
@@ -128,7 +150,7 @@ class OutcomeResultsController < ApplicationController
   #   results. it is an error to specify an id for an outcome which is not linked
   #   to the context.
   #
-  # @argument include[] [Optional, String, "courses"|"outcomes"|"outcome_groups"|"outcome_links"|"users"]
+  # @argument include[] [Optional, String, "courses"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"users"]
   #   Specify additional collections to be side loaded with the result.
   #
   # @example_response
@@ -149,6 +171,9 @@ class OutcomeResultsController < ApplicationController
   #
   #        // (Optional) Included if include[] has outcome_links
   #        "outcome_links": [OutcomeLink]
+  #
+  #        // (Optional) Included if include[] has outcomes.alignments
+  #        "outcomes.alignments": [OutcomeAlignment]
   #      }
   #    }
   def rollups
@@ -239,6 +264,14 @@ class OutcomeResultsController < ApplicationController
     outcome_results_linked_users_json(@users)
   end
 
+  # Internal: Query and serialize alignments for @outcomes
+  #
+  # Returns an Array of serialized alignments
+  def include_outcomes_alignments
+    alignments = @outcomes.map(&:alignments).flatten.map(&:content)
+    outcome_results_include_alignments_json(alignments)
+  end
+
   # Internal: Makes sure the context is a valid context for outcome_results and
   #   the current_user has appropriate permissions. This method is meant to be
   #   used as a before_filter.
@@ -281,7 +314,7 @@ class OutcomeResultsController < ApplicationController
 
   # Internal: Returns the potential method name for the include parameter value.
   def include_method_name(include_name)
-    "include_#{include_name}"
+    "include_#{include_name.parameterize.underscore}"
   end
 
   # Internal: Finds context outcomes

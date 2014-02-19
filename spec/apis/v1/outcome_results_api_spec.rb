@@ -361,6 +361,26 @@ describe "Outcome Results API", type: :request do
           json['linked']['users'].should be_present
           json['linked']['users'][0]['id'].should == outcome_student.id.to_s
         end
+
+        it "side loads alignments" do
+          outcome_assessment
+          course_with_teacher_logged_in(course: outcome_course, active_all: true)
+          api_call(:get, outcome_rollups_url(outcome_course, include: ['outcomes', 'outcomes.alignments']),
+                   controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, include: ['outcomes', 'outcomes.alignments'])
+          json = JSON.parse(response.body)
+          json['linked'].should be_present
+          json['linked']['outcomes'].should be_present
+          json['linked']['outcomes.alignments'].should be_present
+          json['linked']['outcomes'][0]['alignments'].sort.should == [outcome_assignment.asset_string, outcome_rubric.asset_string]
+          alignments = json['linked']['outcomes.alignments']
+          alignments.sort_by!{|a| a['id']}
+          alignments[0]['id'].should == outcome_assignment.asset_string
+          alignments[0]['name'].should == outcome_assignment.name
+          alignments[0]['html_url'].should == course_assignment_url(outcome_course, outcome_assignment)
+          alignments[1]['id'].should == outcome_rubric.asset_string
+          alignments[1]['name'].should == outcome_rubric.title
+          alignments[1]['html_url'].should == course_rubric_url(outcome_course, outcome_rubric)
+        end
       end
     end
 
