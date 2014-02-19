@@ -181,10 +181,15 @@ module SFU
         course_arr = course_line.split('-', 5)
         ncc = { :enrollments => [] }
         ncc[:course_id] = course_arr.first(3).join('-')
-        term = course_arr[3] # Can be empty!
+        ncc[:term] = course_arr[3] # Can be empty!
         ncc[:short_long_name] = course_arr.last
 
-        ncc[:course] = [ncc[:course_id], ncc[:short_long_name], ncc[:short_long_name], account_sis_id, term, 'active']
+        # Similar to credit courses, we explicitly set the start/end dates (except for "default term")
+        selected_term = self.class.term(ncc[:term])
+        start_date = selected_term ? selected_term.start_at : ''
+        end_date = selected_term ? selected_term.end_at : ''
+
+        ncc[:course] = [ncc[:course_id], ncc[:short_long_name], ncc[:short_long_name], account_sis_id, ncc[:term], 'active', start_date, end_date]
         ncc[:enrollments] << [ncc[:course_id], teacher1, 'teacher', nil, 'active']
         ncc[:enrollments] << [ncc[:course_id], teacher2, teacher2_role, nil, 'active'] unless teacher2.nil?
         ncc

@@ -416,24 +416,47 @@ end
 
 describe 'A non-calendar course request' do
 
-  before(:all) do
-    @courses_csv, @sections_csv, @enrollments_csv = SFU::CourseForm::CSVBuilder.build('kipling', ['ncc-kipling-71113273-1141-My special course'], 2, 'kipling', '55599068', nil, nil, false)
+  before do
+    @courses_csv, @sections_csv, @enrollments_csv = SFU::CourseForm::CSVBuilder.build('kipling', selected_courses, 2, 'kipling', '55599068', nil, nil, false)
     @courses = CSV.parse(@courses_csv, :headers => true)
     @sections = CSV.parse(@sections_csv, :headers => true)
   end
 
-  it 'should create one course' do
-    @courses.count.should == 1
-    @courses[0]['course_id'].should == 'ncc-kipling-71113273'
-    @courses[0]['short_name'].should == 'My special course'
-    @courses[0]['long_name'].should == 'My special course'
-    @courses[0]['account_id'].should == 'sfu:::ncc'
-    @courses[0]['term_id'].should == '1141'
-    @courses[0]['status'].should == 'active'
+  context 'for a specific term' do
+    let(:selected_courses) { ['ncc-kipling-71113273-1141-My special course'] }
+    it 'should create one course' do
+      term = SFU::CourseForm::CSVBuilder.term('1141')
+      @courses.count.should == 1
+      @courses[0]['course_id'].should == 'ncc-kipling-71113273'
+      @courses[0]['short_name'].should == 'My special course'
+      @courses[0]['long_name'].should == 'My special course'
+      @courses[0]['account_id'].should == 'sfu:::ncc'
+      @courses[0]['term_id'].should == '1141'
+      @courses[0]['status'].should == 'active'
+      @courses[0]['start_date'].should == term.start_at.to_s
+      @courses[0]['end_date'].should == term.end_at.to_s
+    end
+    it 'should not create any sections' do
+      @sections.count.should == 0
+    end
   end
 
-  it 'should not create any sections' do
-    @sections.count.should == 0
+  context 'for the default term' do
+    let(:selected_courses) { ['ncc-kipling-71113273--My special course'] }
+    it 'should create one course' do
+      @courses.count.should == 1
+      @courses[0]['course_id'].should == 'ncc-kipling-71113273'
+      @courses[0]['short_name'].should == 'My special course'
+      @courses[0]['long_name'].should == 'My special course'
+      @courses[0]['account_id'].should == 'sfu:::ncc'
+      @courses[0]['term_id'].should == ''
+      @courses[0]['status'].should == 'active'
+      @courses[0]['start_date'].should == ''
+      @courses[0]['end_date'].should == ''
+    end
+    it 'should not create any sections' do
+      @sections.count.should == 0
+    end
   end
 
 end
