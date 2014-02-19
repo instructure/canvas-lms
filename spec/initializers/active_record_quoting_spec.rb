@@ -62,22 +62,10 @@ module ActiveRecord
 
           # check we didn't screw up default handlings
           describe "fallback to original implementation" do
-            it 'properly quotes strings in binary columns' do
-              value = "value"
-              c = Column.new(nil, 1, 'binary')
-              assert_equal "'\\x76616c7565'", @conn.quote(value, c)
-            end
-
             it 'properly quotes strings in xml columns' do
               value = "<value/>"
               c = Column.new(nil, 1, 'xml')
               assert_equal "xml '#{value}'", @conn.quote(value, c)
-            end
-
-            it 'properly quotes Numerics in money columns' do
-              value = 1.23
-              c = Column.new(nil, 1, 'money')
-              assert_equal "'#{value}'", @conn.quote(value, c)
             end
 
             it 'properly quotes other Floats' do
