@@ -165,7 +165,7 @@ require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
 def pend_with_bullet
-  if Bullet.enable?
+  if defined?(Bullet) && Bullet.enable?
     pending ('PENDING: Bullet')
   end
 end
