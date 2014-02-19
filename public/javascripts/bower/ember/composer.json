@@ -4,7 +4,7 @@
     "type": "component",
     "license": "MIT",
     "require": {
-        "components/jquery": ">=1.7 < 2.1",
+        "components/jquery": ">=1.7 <= 2.1",
         "components/handlebars.js": "1.*"
     },
     "extra": {
