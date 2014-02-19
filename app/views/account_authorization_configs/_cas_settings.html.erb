@@ -1,5 +1,5 @@
 <% @account_config = @account_configs.first %>
-<% @account_config ||= @account.account_authorization_configs.new %>
+<% @account_config ||= @account.account_authorization_configs.scoped.new %>
 <% form_id = @account_config.cas_authentication? ? 'auth_form' : 'cas_form' %>
 <% active = @account_config.cas_authentication? ? 'class="active"' : '' %>
 <div id="cas_div" <%= raw active %>>

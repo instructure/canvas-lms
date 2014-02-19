@@ -441,7 +441,7 @@ class AssignmentsApiController < ApplicationController
       @assignments = Assignment.search_by_attribute(@assignments, :title, params[:search_term])
 
       # fake assignment used for checking if the @current_user can read unpublished assignments
-      fake = @context.assignments.new
+      fake = @context.assignments.scoped.new
       fake.workflow_state = 'unpublished'
 
       if @context.feature_enabled?(:draft_state) && !fake.grants_right?(@current_user, session, :read)

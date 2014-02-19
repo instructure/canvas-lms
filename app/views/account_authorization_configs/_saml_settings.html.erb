@@ -1,6 +1,6 @@
 <%
    @saml_configs = @account_configs.clone
-   @saml_configs << @account.account_authorization_configs.new
+   @saml_configs << @account.account_authorization_configs.scoped.new
    @account_config = @saml_configs.first
    active = @account_config.saml_authentication? ? 'class="active"' : ''
    position_options = []

@@ -92,7 +92,7 @@ class Quizzes::QuizzesController < ApplicationController
     end
     @body_classes << 'with_item_groups'
     js_env(:PERMISSIONS => {
-      :create  => can_do(@context.quizzes.new, @current_user, :create),
+      :create  => can_do(@context.quizzes.scoped.new, @current_user, :create),
       :manage  => can_do(@context, @current_user, :manage_assignments)
     },
     :FLAGS => {
@@ -180,7 +180,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def new
-    if authorized_action(@context.quizzes.new, @current_user, :create)
+    if authorized_action(@context.quizzes.scoped.new, @current_user, :create)
       @assignment = nil
       @assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id]
       @quiz = @context.quizzes.build
@@ -237,7 +237,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def create
-    if authorized_action(@context.quizzes.new, @current_user, :create)
+    if authorized_action(@context.quizzes.scoped.new, @current_user, :create)
       params[:quiz][:title] = nil if params[:quiz][:title] == "undefined"
       params[:quiz][:title] ||= t(:default_title, "New Quiz")
       params[:quiz].delete(:points_possible) unless params[:quiz][:quiz_type] == 'graded_survey'

@@ -182,7 +182,7 @@
 <div class="item-group-container" id="context_modules_sortable_container">
 
   <div id="no_context_modules_message" style="display:none; clear: both;">
-    <% if can_do(@context.context_modules.new, @current_user, :create) %>
+    <% if can_do(@context.context_modules.scoped.new, @current_user, :create) %>
       <%= mt 'help.create', <<TEXT, :button => t('#context_modules.buttons.add_module_first', 'Add a New Module')
   Course modules let you organize your assignments, pages, files, etc. into smaller sections or units. Modules could be centered around a theme, focused on a specific topic, or even just grouped chronologically.
 
