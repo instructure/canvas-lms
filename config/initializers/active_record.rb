@@ -906,6 +906,20 @@ class ActiveRecord::Base
   end
 end
 
+unless defined? OpenDataExport
+  if CANVAS_RAILS2
+    %w{valid_keys_for_has_many_association valid_keys_for_has_one_association
+      valid_keys_for_belongs_to_association valid_keys_for_has_and_belongs_to_many_association}.each do |mattr|
+      ActiveRecord::Associations::ClassMethods.send(mattr) << :exportable
+    end
+  else
+    # allow an exportable option that we don't actually do anything with, because our open-source build may not contain OpenDataExport
+    ActiveRecord::Associations::Builder::Association.class_eval do
+      ([self] + self.descendants).each { |klass| klass.valid_options << :exportable }
+    end
+  end
+end
+
 unless CANVAS_RAILS2
   # join dependencies in AR 3 insert the conditions right away, but because we have
   # some reflection conditions that rely on joined tables, we need to insert them later on
