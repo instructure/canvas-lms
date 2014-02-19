@@ -143,12 +143,14 @@
           <%= render :partial => 'assignment_details' %>
         <% end %>
         <header class="discussion-section clearfix">
-          <%= avatar((@topic.user), context_code: @context.asset_string) %>
+          <%= avatar((@topic.user), context_code: @context.asset_string) if @topic.user %>
           <div class="discussion-header-content right-of-avatar">
             <div class="pull-left">
               <h1 class="discussion-title"><%= @topic.title %></h1>
               <div class="discussion-subtitle">
-                <a class="author" href="<%= context_url(@topic.context, :context_user_url, @topic.user_id) %>" title="<%= t :authors_name, "Author's name" %>"><%= context_user_name(@topic.context, @topic.user) %></a>
+                <% if @topic.user %>
+                  <a class="author" href="<%= context_url(@topic.context, :context_user_url, @topic.user_id) %>" title="<%= t :authors_name, "Author's name" %>"><%= context_user_name(@topic.context, @topic.user) %></a>
+                <% end %>
               </div>
               <% if @topic.root_topic.try(:context) && @topic.root_topic.try(:context) != @context %>
                 <span class="discussion-subtitle">
