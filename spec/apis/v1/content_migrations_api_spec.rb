@@ -144,8 +144,9 @@ describe ContentMigrationsController, type: :request do
     end
 
     it "should not return attachment for course copies" do
-      @migration.migration_type = nil
+      @migration.migration_type = 'course_copy_importer'
       @migration.source_course_id = @course.id
+      @migration.source_course = @course
       @attachment = Attachment.create!(:context => @migration, :filename => "test.zip", :uploaded_data => StringIO.new("test file"))
       @attachment.file_state = "deleted"
       @attachment.workflow_state = "unattached"
@@ -158,8 +159,9 @@ describe ContentMigrationsController, type: :request do
     end
 
     it "should return source course info for course copy" do
-      @migration.migration_type = nil
+      @migration.migration_type = 'course_copy_importer'
       @migration.source_course_id = @course.id
+      @migration.source_course = @course
       @migration.save!
 
       json = api_call(:get, @migration_url, @params)
@@ -248,12 +250,12 @@ describe ContentMigrationsController, type: :request do
       migration.workflow_state.should == "created"
       migration.job_progress.should be_nil
     end
-    
+
     it "should error if expected setting isn't set" do
       json = api_call(:post, @migration_url, @params, {:migration_type => 'course_copy_importer'}, {}, :expected_status => 400)
       json.should == {"message"=>'A course copy requires a source course.'}
     end
-    
+
     it "should queue if correct settings set" do
       # implicitly tests that the response was a 200
       api_call(:post, @migration_url, @params, {:migration_type => 'course_copy_importer', :settings => {:source_course_id => @course.id.to_param}})
@@ -290,7 +292,7 @@ describe ContentMigrationsController, type: :request do
         migration = ContentMigration.find json['id']
         migration.workflow_state.should == "pre_processing"
       end
-      
+
       it "should error if upload file required but not provided" do
         @post_params.delete :pre_attachment
         json = api_call(:post, @migration_url, @params, @post_params, {}, :expected_status => 400)
@@ -341,7 +343,7 @@ describe ContentMigrationsController, type: :request do
         migration.attachment.should be_nil
         migration.migration_settings[:file_url].should == post_params[:settings][:file_url]
       end
-      
+
     end
 
     context "by LTI extension" do

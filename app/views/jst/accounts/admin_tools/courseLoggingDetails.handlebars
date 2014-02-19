@@ -7,8 +7,34 @@
   <dd>{{tTimeToString created_at "tiny"}}</dd>
   <dt>{{#t "user"}}User{{/t}}:</dt>
   <dd>{{user.name}}</dd>
+  <dt>{{#t "event_source_label"}}Source{{/t}}:</dt>
+  <dd>{{event_source_present}}</dd>
   <dt>{{#t "event_type_label"}}Type{{/t}}:</dt>
   <dd>{{event_type_present}}</dd>
+  {{#ifEqual event_type 'copied_to'}}
+    <dt>{{#t "copied_to_label"}}Copied To{{/t}}:</dt>
+    {{#if copied_to}}
+      <dd>
+        {{#with copied_to}}
+          <a href="courses/{{id}}">{{name}}</a>
+        {{/with}}
+      </dd>
+    {{else}}
+      <dd>{{#t "blank_placeholder"}}-{{/t}}</dd>
+    {{/if}}
+  {{/ifEqual}}
+  {{#ifEqual event_type 'copied_from'}}
+    <dt>{{#t "copied_from_label"}}Copied From{{/t}}:</dt>
+    {{#if copied_from}}
+      <dd>
+        {{#with copied_from}}
+          <a href="courses/{{id}}">{{name}}</a>
+        {{/with}}
+      </dd>
+    {{else}}
+      <dd>{{#t "blank_placeholder"}}-{{/t}}</dd>
+    {{/if}}
+  {{/ifEqual}}
 </dl>
 
 {{#ifEqual event_type 'created'}}

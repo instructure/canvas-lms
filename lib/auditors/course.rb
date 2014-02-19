@@ -21,14 +21,21 @@ module Auditors; end
 class Auditors::Course
   class Record < ::EventStream::Record
     attributes :course_id,
-               :user_id
+               :user_id,
+               :event_source,
+               :sis_batch_id
 
-    def self.generate(course, user, event_type, event_data)
+    def self.generate(course, user, event_type, event_data = {}, opts = {})
+      event_source = opts[:source] || :manual
+      sis_batch_id = opts[:sis_batch_id]
+
       new(
         'course' => course,
         'user' => user,
         'event_type' => event_type,
-        'event_data' => event_data
+        'event_data' => event_data,
+        'event_source' => event_source.to_s,
+        'sis_batch_id' => sis_batch_id
       )
     end
 
@@ -46,6 +53,14 @@ class Auditors::Course
       if attributes['event_data']
         self.event_data = attributes.delete('event_data')
       end
+
+      if attributes['sis_batch']
+        self.sis_batch = attributes.delete('sis_batch')
+      end
+    end
+
+    def event_source
+      attributes['event_source'].to_sym if attributes['event_source']
     end
 
     def user
@@ -56,6 +71,16 @@ class Auditors::Course
       @user = user
 
       attributes['user_id'] = Shard.global_id_for(@user)
+    end
+
+    def sis_batch
+      @sis_batch ||= SisBatch.find(sis_batch_id)
+    end
+
+    def sis_batch=(batch)
+      @sis_batch = batch
+
+      attributes['sis_batch_id'] = Shard.global_id_for(batch)
     end
 
     def course
@@ -91,27 +116,54 @@ class Auditors::Course
     end
   end
 
-  def self.record_created(course, user, changes)
+  def self.record_created(course, user, changes, opts = {})
     return unless course && changes
     return if changes.empty?
-    self.record(course, user, 'created', changes)
+    self.record(course, user, "created", changes, opts)
   end
 
-  def self.record_updated(course, user, changes)
+  def self.record_updated(course, user, changes, opts = {})
     return unless course && changes
     return if changes.empty?
-    self.record(course, user, 'updated', changes)
+    self.record(course, user, 'updated', changes, opts)
   end
 
-  def self.record_concluded(course, user)
+  def self.record_concluded(course, user, opts = {})
     return unless course
-    self.record(course, user, 'concluded')
+    self.record(course, user, 'concluded', {}, opts)
   end
 
-  def self.record(course, user, event_type, data={})
+  def self.record_unconcluded(course, user, opts = {})
+    return unless course
+    self.record(course, user, 'unconcluded', {}, opts)
+  end
+
+  def self.record_deleted(course, user, opts = {})
+    return unless course
+    self.record(course, user, 'deleted', {}, opts)
+  end
+
+  def self.record_restored(course, user, opts = {})
+    return unless course
+    self.record(course, user, 'restored', {}, opts)
+  end
+
+  def self.record_published(course, user, opts = {})
+    return unless course
+    self.record(course, user, 'published', {}, opts)
+  end
+
+  def self.record_copied(course, copy, user, opts = {})
+    return unless course && copy
+    copied_from = self.record(copy, user, 'copied_from', { copied_from: Shard.global_id_for(course) }, opts)
+    copied_to = self.record(course, user, 'copied_to', { copied_to: Shard.global_id_for(copy) }, opts)
+    return copied_from, copied_to
+  end
+
+  def self.record(course, user, event_type, data={}, opts = {})
     return unless course
     course.shard.activate do
-      record = Auditors::Course::Record.generate(course, user, event_type, data)
+      record = Auditors::Course::Record.generate(course, user, event_type, data, opts)
       Auditors::Course::Stream.insert(record)
     end
   end

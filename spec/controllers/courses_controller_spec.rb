@@ -762,7 +762,7 @@ describe CoursesController do
       changes.delete("settings")
       changes["lock_all_announcements"] = [ nil, true ]
 
-      Auditors::Course.expects(:record_created).with(anything, anything, changes)
+      Auditors::Course.expects(:record_created).with(anything, anything, changes, anything)
 
       post 'create', { :account_id => @account.id, :course =>
           { :name => course.name, :lock_all_announcements => true } }
@@ -796,6 +796,12 @@ describe CoursesController do
       assigns[:course].state.should eql(:completed)
     end
 
+    it "should log published event on update" do
+      Auditors::Course.expects(:record_published).once
+      course_with_teacher_logged_in(:active_all => true)
+      put 'update', :id => @course.id, :offer => true
+    end
+
     it "should lock active course announcements" do
       course_with_teacher_logged_in(:active_all => true)
       active_announcement  = @course.announcements.create!(:title => 'active', :message => 'test')
@@ -826,7 +832,7 @@ describe CoursesController do
         "lock_all_announcements" => [ true, false ]
       }
 
-      Auditors::Course.expects(:record_updated).with(anything, anything, changes)
+      Auditors::Course.expects(:record_updated).with(anything, anything, changes, source: :manual)
 
       put 'update', :id => @course.id, :course => {
         :name => changes["name"].last,
@@ -892,6 +898,7 @@ describe CoursesController do
       response.should be_redirect
       @course.reload.should be_completed
       @course.conclude_at.should <= Time.now
+      Auditors::Course.expects(:record_unconcluded).with(anything, anything, source: :manual)
 
       post 'unconclude', :course_id => @course.id
       response.should be_redirect

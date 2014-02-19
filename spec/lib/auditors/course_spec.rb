@@ -34,13 +34,30 @@ describe CourseAuditApiController do
     @course.name = "Course 2"
     @course.start_at = Date.today
     @course.conclude_at = Date.today + 7.days
-
-    @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
   end
 
   context "nominal cases" do
     it "should include event" do
+      @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
       Auditors::Course.for_course(@course).paginate(:per_page => 5).should include(@event)
+    end
+  end
+
+  context "event source" do
+    it "should default event source to :manual" do
+      @event = Auditors::Course.record_created(@course, @teacher, @course.changes)
+      @event.event_source.should == :manual
+    end
+
+    it "should log event with api source" do
+      @event = Auditors::Course.record_created(@course, @teacher, @course.changes, source: :api)
+      @event.event_source.should == :api
+    end
+
+    it "should log event with sis_batch_id and event source of sis" do
+      @event = Auditors::Course.record_created(@course, @teacher, @course.changes, source: :sis, sis_batch_id: 42)
+      @event.event_source.should == :sis
+      @event.sis_batch_id.should == 42
     end
   end
 
@@ -65,15 +82,61 @@ describe CourseAuditApiController do
       @event.event_type.should == "concluded"
       @event.event_data.should == {}
     end
+
+    it "should log unconcluded event" do
+      @event = Auditors::Course.record_unconcluded(@course, @teacher)
+      @event.course.should == @course
+      @event.event_type.should == "unconcluded"
+      @event.event_data.should == {}
+    end
+
+    it "should log published event" do
+      @event = Auditors::Course.record_published(@course, @teacher)
+      @event.course.should == @course
+      @event.event_type.should == "published"
+      @event.event_data.should == {}
+    end
+
+    it "should log deleted event" do
+      @event = Auditors::Course.record_deleted(@course, @teacher)
+      @event.course.should == @course
+      @event.event_type.should == "deleted"
+      @event.event_data.should == {}
+    end
+
+    it "should log restored event" do
+      @event = Auditors::Course.record_restored(@course, @teacher)
+      @event.course.should == @course
+      @event.event_type.should == "restored"
+      @event.event_data.should == {}
+    end
+
+
+    it "should log copied event" do
+      @course, @copy_course = @course, course(:active_all => true)
+      @from_event, @to_event = Auditors::Course.record_copied(@course, @copy_course, @teacher, source: :api)
+
+      @from_event.course.should == @copy_course
+      @from_event.event_type.should == "copied_from"
+      @from_event.event_data.should == { :"copied_from" => Shard.global_id_for(@course) }
+
+      @to_event.course.should == @course
+      @to_event.event_type.should == "copied_to"
+      @to_event.event_data.should == { :"copied_to" => Shard.global_id_for(@copy_course) }
+    end
   end
 
   describe "options forwarding" do
     before do
+      @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
+
       record = Auditors::Course::Record.new(
         'course' => @course,
         'user' => @teacher,
         'event_type' => 'updated',
         'event_data' => @course.changes,
+        'event_source' => 'manual',
+        'sis_batch_id' => nil,
         'created_at' => 1.day.ago
       )
       @event2 = Auditors::Course::Stream.insert(record)

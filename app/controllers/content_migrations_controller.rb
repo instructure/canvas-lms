@@ -135,7 +135,7 @@ class ContentMigrationsController < ApplicationController
   #
   # @example_request
   #
-  #     curl https://<canvas>/api/v1/courses/<course_id>/content_migrations \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/content_migrations \
   #         -H 'Authorization: Bearer <token>'
   #
   # @returns [ContentMigration]
@@ -180,7 +180,7 @@ class ContentMigrationsController < ApplicationController
   #
   # @example_request
   #
-  #     curl https://<canvas>/api/v1/courses/<course_id>/content_migrations/<id> \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/content_migrations/<id> \
   #         -H 'Authorization: Bearer <token>'
   #
   # @returns ContentMigration
@@ -288,20 +288,20 @@ class ContentMigrationsController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'https://<canvas>/api/v1/courses/<course_id>/content_migrations' \ 
-  #        -F 'migration_type=common_cartridge_importer' \ 
-  #        -F 'settings[question_bank_name]=importquestions' \ 
-  #        -F 'date_shift_options[old_start_date]=1999-01-01' \ 
-  #        -F 'date_shift_options[new_start_date]=2013-09-01' \ 
-  #        -F 'date_shift_options[old_end_date]=1999-04-15' \ 
-  #        -F 'date_shift_options[new_end_date]=2013-12-15' \ 
-  #        -F 'date_shift_options[day_substitutions][1]=2' \ 
-  #        -F 'date_shift_options[day_substitutions][2]=3' \ 
-  #        -F 'date_shift_options[shift_dates]=true' \ 
-  #        -F 'pre_attachment[name]=mycourse.imscc' \ 
-  #        -F 'pre_attachment[size]=12345' \ 
-  #        -H 'Authorization: Bearer <token>' 
-  # 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/content_migrations' \
+  #        -F 'migration_type=common_cartridge_importer' \
+  #        -F 'settings[question_bank_name]=importquestions' \
+  #        -F 'date_shift_options[old_start_date]=1999-01-01' \
+  #        -F 'date_shift_options[new_start_date]=2013-09-01' \
+  #        -F 'date_shift_options[old_end_date]=1999-04-15' \
+  #        -F 'date_shift_options[new_end_date]=2013-12-15' \
+  #        -F 'date_shift_options[day_substitutions][1]=2' \
+  #        -F 'date_shift_options[day_substitutions][2]=3' \
+  #        -F 'date_shift_options[shift_dates]=true' \
+  #        -F 'pre_attachment[name]=mycourse.imscc' \
+  #        -F 'pre_attachment[size]=12345' \
+  #        -H 'Authorization: Bearer <token>'
+  #
   # @returns ContentMigration
   def create
     @plugin = find_migration_plugin params[:migration_type]
@@ -319,15 +319,21 @@ class ContentMigrationsController < ApplicationController
         return render(:json => {:message => t('must_upload_file', "File upload or url is required")}, :status => :bad_request)
       end
     end
-    lookup_sis_source_course_id
+    source_course = lookup_sis_source_course
     if validator = settings[:required_options_validator]
       if res = validator.has_error(params[:settings], @current_user, @context)
         return render(:json => { :message => res.respond_to?(:call) ? res.call : res }, :status => :bad_request)
       end
     end
 
-    @content_migration = @context.content_migrations.build(:user => @current_user, :context => @context, :migration_type => params[:migration_type])
+    @content_migration = @context.content_migrations.build(
+      user: @current_user,
+      context: @context,
+      migration_type: params[:migration_type],
+      initiated_source: :api
+    )
     @content_migration.workflow_state = 'created'
+    @content_migration.source_course = source_course if source_course
 
     update_migration
   end
@@ -346,16 +352,18 @@ class ContentMigrationsController < ApplicationController
     @content_migration = @context.content_migrations.find(params[:id])
     @content_migration.check_for_pre_processing_timeout
     @plugin = find_migration_plugin @content_migration.migration_type
-    lookup_sis_source_course_id
+    lookup_sis_source_course
     update_migration
   end
 
-  def lookup_sis_source_course_id
+  def lookup_sis_source_course
     if params.has_key?(:settings) && params[:settings].has_key?(:source_course_id)
-      params[:settings][:source_course_id] = api_find(Course, params[:settings][:source_course_id]).id
+      course = api_find(Course, params[:settings][:source_course_id])
+      params[:settings][:source_course_id] = course.id
+      course
     end
   end
-  private :lookup_sis_source_course_id
+  private :lookup_sis_source_course
 
 
   # @API List Migration Systems

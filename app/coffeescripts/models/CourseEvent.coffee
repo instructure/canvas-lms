@@ -24,15 +24,37 @@ define [
             data[dataKey] = _.object([ "from", "to" ], @presentField(dataValues))
         when "concluded"
           json.event_type_present = I18n.t("event_type.concluded", "Concluded")
+        when "unconcluded"
+          json.event_type_present = I18n.t("event_type.unconcluded", "Unconcluded")
+        when "restored"
+          json.event_type_present = I18n.t("event_type.restored", "Restored")
+        when "deleted"
+          json.event_type_present = I18n.t("event_type.deleted", "Deleted")
+        when "published"
+          json.event_type_present = I18n.t("event_type.published", "Published")
+        when "copied_from"
+          json.event_type_present = I18n.t("event_type.copied_from", "Copied From")
+        when "copied_to"
+          json.event_type_present = I18n.t("event_type.copied_to", "Copied To")
         else
           json.event_type_present = json.event_type
+
+      switch json.event_source
+        when "manual"
+          json.event_source_present = I18n.t("event_source.manual", "Manual")
+        when "api"
+          json.event_source_present = I18n.t("event_source.api", "Api")
+        when "sis"
+          json.event_source_present = I18n.t("event_source.sis", "SIS")
+        else
+          json.event_source_present = json.event_source || I18n.t("blank_placeholder", "-")
 
       _.each json.event_data, iterator
       json.event_data = data unless _.isEmpty(data)
       return json
 
     presentField: (value) ->
-      blank = "-"
+      blank = I18n.t("blank_placeholder", "-")
       return blank if _.isNull(value)
       return value.toString() if _.isBoolean(value)
       if _.isArray(value)

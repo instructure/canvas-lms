@@ -483,7 +483,9 @@ class CoursesController < ApplicationController
       end
 
       @course = (@sub_account || @account).courses.build(params[:course])
-      @course.sis_source_id = sis_course_id if api_request? && @account.grants_right?(@current_user, :manage_sis)
+      if api_request? && @account.grants_right?(@current_user, :manage_sis)
+        @course.sis_source_id = sis_course_id
+      end
 
       if apply_assignment_group_weights
         @course.apply_assignment_group_weights = value_to_boolean apply_assignment_group_weights
@@ -493,11 +495,13 @@ class CoursesController < ApplicationController
 
       respond_to do |format|
         if @course.save
-          Auditors::Course.record_created(@course, @current_user, changes)
+          Auditors::Course.record_created(@course, @current_user, changes, source: (api_request? ? :api : :manual))
           @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active') if params[:enroll_me].to_s == 'true'
           # offer updates the workflow state, saving the record without doing validation callbacks
-          @course.offer if api_request? and params[:offer].present?
-
+          if api_request? and params[:offer].present?
+            @course.offer
+            Auditors::Course.record_published(@course, @current_user, source: :api)
+          end
           format.html { redirect_to @course }
           format.json { render :json => course_json(
             @course,
@@ -565,6 +569,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :change_course_state)
       @context.unconclude
+      Auditors::Course.record_unconcluded(@context, @current_user, source: (api_request? ? :api : :manual))
       flash[:notice] = t('notices.unconcluded', "Course un-concluded")
       redirect_to(named_context_url(@context, :context_url))
     end
@@ -797,13 +802,14 @@ class CoursesController < ApplicationController
     if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
       @context.destroy
+      Auditors::Course.record_deleted(@context, @current_user, source: (api_request? ? :api : :manual))
       flash[:notice] = t('notices.deleted', "Course successfully deleted")
     else
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
 
       @context.complete
       if @context.save
-        Auditors::Course.record_concluded(@context, @current_user)
+        Auditors::Course.record_concluded(@context, @current_user, source: (api_request? ? :api : :manual))
         flash[:notice] = t('notices.concluded', "Course successfully concluded")
       else
         flash[:notice] = t('notices.failed_conclude', "Course failed to conclude")
@@ -934,7 +940,7 @@ class CoursesController < ApplicationController
     changes = changed_settings(@course.changes, @course.settings, old_settings)
 
     if @course.save
-      Auditors::Course.record_updated(@course, @current_user, changes)
+      Auditors::Course.record_updated(@course, @current_user, changes, source: :api)
       render :json => course_settings_json(@course)
     else
       render :json => @course.errors, :status => :bad_request
@@ -1592,7 +1598,7 @@ class CoursesController < ApplicationController
       @course.save
       @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active')
 
-      @content_migration = @course.content_migrations.build(:user => @current_user, :context => @course, :migration_type => 'course_copy_importer')
+      @content_migration = @course.content_migrations.build(:user => @current_user, :source_course => @context, :context => @course, :migration_type => 'course_copy_importer', :initiated_source => api_request? ? :api : :manual)
       @content_migration.migration_settings[:source_course_id] = @context.id
       @content_migration.workflow_state = 'created'
       @content_migration.set_date_shift_options(params[:date_shift_options])
@@ -1643,6 +1649,7 @@ class CoursesController < ApplicationController
   def update
     @course = api_find(Course, params[:id])
     old_settings = @course.settings
+    logging_source = api_request? ? :api : :manual
 
     if authorized_action(@course, @current_user, :update)
       params[:course] ||= {}
@@ -1726,7 +1733,12 @@ class CoursesController < ApplicationController
         params[:course][:indexed] = nil if params[:course].has_key?(:indexed)
       end
 
-      @course.process_event(params[:course].delete(:event)) if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
+      if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
+        event = params[:course].delete(:event)
+        @course.process_event(event)
+        Auditors::Course.record_published(@course, @current_user, source: logging_source) if event.to_sym == :offer
+      end
+
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
       respond_to do |format|
         @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
@@ -1735,7 +1747,7 @@ class CoursesController < ApplicationController
         changes = changed_settings(@course.changes, @course.settings, old_settings)
 
         if @course.save
-          Auditors::Course.record_updated(@course, @current_user, changes)
+          Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
           @current_user.touch
           if params[:update_default_pages]
             @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
@@ -1795,7 +1807,7 @@ class CoursesController < ApplicationController
       update_params = params.slice(:event).with_indifferent_access
       return render(:json => { :message => 'need to specify event' }, :status => :bad_request) unless update_params[:event]
       return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w(offer conclude delete undelete).include? update_params[:event]
-      progress = Course.batch_update(@account, @current_user, @course_ids, update_params)
+      progress = Course.batch_update(@account, @current_user, @course_ids, update_params, :api)
       render :json => progress_json(progress, @current_user, session)
     end
   end

@@ -283,6 +283,7 @@ describe CoursesController, type: :request do
           'default_view' => 'feed',
           'storage_quota_mb' => @account.default_storage_quota_mb
         })
+        Auditors::Course.expects(:record_created).once
         json = api_call(:post, @resource_path, @resource_params, post_params)
         new_course = Course.find(json['id'])
         [:name, :course_code, :start_at, :end_at,
@@ -363,6 +364,7 @@ describe CoursesController, type: :request do
       end
 
       it "should offer a course if passed the 'offer' parameter" do
+        Auditors::Course.expects(:record_published).once
         json = api_call(:post, @resource_path,
           @resource_params,
           { :account_id => @account.id, :offer => true, :course => { :name => 'Test Course' } }
@@ -372,6 +374,8 @@ describe CoursesController, type: :request do
       end
 
       it "should allow setting sis_course_id without offering the course" do
+        Auditors::Course.expects(:record_created).once
+        Auditors::Course.expects(:record_published).never
         json = api_call(:post, @resource_path,
           @resource_params,
           { :account_id => @account.id, :course => { :name => 'Test Course', :sis_course_id => '9999' } }
@@ -478,6 +482,8 @@ describe CoursesController, type: :request do
 
     context "an account admin" do
       it "should be able to update a course" do
+        Auditors::Course.expects(:record_updated).once
+
         json = api_call(:put, @path, @params, @new_values)
         @course.reload
 
@@ -702,6 +708,7 @@ describe CoursesController, type: :request do
     end
     context "an authorized user" do
       it "should be able to delete a course" do
+        Auditors::Course.expects(:record_deleted).once
         json = api_call(:delete, @path, @params, { :event => 'delete' })
         json.should == { 'delete' => true }
         @course.reload
@@ -719,6 +726,7 @@ describe CoursesController, type: :request do
       end
 
       it "should conclude when completing a course" do
+        Auditors::Course.expects(:record_concluded).once
         json = api_call(:delete, @path, @params, { :event => 'conclude' })
         json.should == { 'conclude' => true }
 
@@ -766,32 +774,39 @@ describe CoursesController, type: :request do
     end
 
     context "an authorized user" do
+      let(:course_ids){ [@course1.id, @course2.id, @course3.id] }
       it "should delete multiple courses" do
-        api_call(:put, @path, @params, { :event => 'delete', :course_ids => [@course1.id, @course2.id, @course3.id] })
+        Auditors::Course.expects(:record_deleted).times(course_ids.length)
+        api_call(:put, @path, @params, { :event => 'delete', :course_ids => course_ids })
         run_jobs
         [@course1, @course2, @course3].each { |c| c.reload.should be_deleted }
       end
 
       it "should conclude multiple courses" do
-        api_call(:put, @path, @params, { :event => 'conclude', :course_ids => [@course1.id, @course2.id, @course3.id] })
+        Auditors::Course.expects(:record_concluded).times(course_ids.length)
+        api_call(:put, @path, @params, { :event => 'conclude', :course_ids => course_ids })
         run_jobs
         [@course1, @course2, @course3].each { |c| c.reload.should be_completed }
       end
 
       it "should publish multiple courses" do
-        api_call(:put, @path, @params, { :event => 'offer', :course_ids => [@course1.id, @course2.id, @course3.id] })
+        Auditors::Course.expects(:record_published).times(course_ids.length)
+        api_call(:put, @path, @params, { :event => 'offer', :course_ids => course_ids })
         run_jobs
         [@course1, @course2, @course3].each { |c| c.reload.should be_available }
       end
 
       it "should accept sis ids" do
-        api_call(:put, @path, @params, { :event => 'offer', :course_ids => ['sis_course_id:course1', 'sis_course_id:course2', 'sis_course_id:course3'] })
+        course_ids = ['sis_course_id:course1', 'sis_course_id:course2', 'sis_course_id:course3']
+        Auditors::Course.expects(:record_published).times(course_ids.length)
+        api_call(:put, @path, @params, { :event => 'offer', :course_ids => course_ids })
         run_jobs
         [@course1, @course2, @course3].each { |c| c.reload.should be_available }
       end
 
       it 'should undelete courses' do
         [@course1, @course2].each { |c| c.destroy }
+        Auditors::Course.expects(:record_restored).twice
         api_call(:put, @path, @params, { :event => 'undelete', :course_ids => [@course1.id, 'sis_course_id:course2'] })
         run_jobs
         [@course1, @course2].each { |c| c.reload.should be_claimed }
@@ -799,6 +814,7 @@ describe CoursesController, type: :request do
 
       it "should not conclude deleted courses" do
         @course1.destroy
+        Auditors::Course.expects(:record_concluded).once
         api_call(:put, @path, @params, { :event => 'conclude', :course_ids => [@course1.id, @course2.id] })
         run_jobs
         @course1.reload.should be_deleted
@@ -807,6 +823,7 @@ describe CoursesController, type: :request do
 
       it "should not publish deleted courses" do
         @course1.destroy
+        Auditors::Course.expects(:record_published).once
         api_call(:put, @path, @params, { :event => 'offer', :course_ids => [@course1.id, @course2.id] })
         run_jobs
         @course1.reload.should be_deleted
@@ -879,7 +896,8 @@ describe CoursesController, type: :request do
 
       it "should succeed when publishing already published courses" do
         @course1.offer!
-        json = api_call(:put, @path, @params, { :event => 'offer', :course_ids => [@course1.id, @course2.id, @course3.id] })
+        Auditors::Course.expects(:record_published).twice
+        json = api_call(:put, @path, @params, { :event => 'offer', :course_ids => course_ids })
         run_jobs
         progress = Progress.find(json['id'])
         progress.message.should be_include "3 courses processed"
@@ -889,7 +907,8 @@ describe CoursesController, type: :request do
       it "should succeed when concluding already concluded courses" do
         @course1.complete!
         @course2.complete!
-        json = api_call(:put, @path, @params, { :event => 'conclude', :course_ids => [@course1.id, @course2.id, @course3.id] })
+        Auditors::Course.expects(:record_concluded).once
+        json = api_call(:put, @path, @params, { :event => 'conclude', :course_ids => course_ids })
         run_jobs
         progress = Progress.find(json['id'])
         progress.message.should be_include "3 courses processed"
@@ -899,7 +918,8 @@ describe CoursesController, type: :request do
       it "should be able to unconclude courses" do
         @course1.complete!
         @course2.complete!
-        json = api_call(:put, @path, @params, { :event => 'offer', :course_ids => [@course1.id, @course2.id, @course3.id] })
+        Auditors::Course.expects(:record_unconcluded).twice
+        json = api_call(:put, @path, @params, { :event => 'offer', :course_ids => course_ids })
         run_jobs
         progress = Progress.find(json['id'])
         progress.message.should be_include "3 courses processed"
@@ -1961,6 +1981,8 @@ describe CoursesController, type: :request do
     end
 
     it "should update settings" do
+      Auditors::Course.expects(:record_updated).with(anything, anything, anything, source: :api)
+
       json = api_call(:put, "/api/v1/courses/#{@course.id}/settings", {
         :controller => 'courses',
         :action => 'update_settings',
@@ -2156,6 +2178,11 @@ describe ContentImportsController, type: :request do
   it "should copy a course with canvas id" do
     run_copy
     check_counts 1
+  end
+
+  it "should log copied event to course activity" do
+    Auditors::Course.expects(:record_copied).once
+    run_copy
   end
 
   it "should copy a course using sis ids" do

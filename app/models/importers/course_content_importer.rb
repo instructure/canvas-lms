@@ -192,6 +192,7 @@ module Importers
       else
         course.touch
       end
+      Auditors::Course.record_copied(migration.source_course, course, migration.user, source: migration.initiated_source)
       course.imported_migration_items
     end
 

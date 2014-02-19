@@ -75,5 +75,26 @@ describe EventStream::Failure do
       @event.attribute1.should == 'value1'
       @event.attribute2.should == 'value2'
     end
+
+    it "should work when request_id is an integer" do
+      @request_id = 42
+
+      RequestContextGenerator.stubs( :request_id => @request_id, :cassandra? => true )
+      @event = EventRecord.new(
+        'attribute1' => 'value1',
+        'attribute2' => 'value2'
+      )
+
+      @event.request_id.should == @request_id.to_s
+    end
+
+    it "should work when request_id is nil" do
+      RequestContextGenerator.stubs( :request_id => nil, :cassandra? => true )
+      @event = EventRecord.new(
+        'attribute1' => 'value1',
+        'attribute2' => 'value2'
+      )
+      @event.request_id.should be_nil
+    end
   end
 end

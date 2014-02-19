@@ -28,6 +28,11 @@
 # of courses, users and page_views related to the returned events
 # are also included.
 #
+# The event data for `ConcludedEventData`, `UnconcludedEventData`, `PublishedEventData`,
+# `UnpublishedEventData`, `DeletedEventData`, `RestoredEventData`, `CopiedFromEventData`,
+# and `CopiedToEventData` objects will return a empty objects as these do not have
+# any additional log data associated.
+#
 # @model CourseEventLink
 #     {
 #       "id": "CourseEventLink",
@@ -47,6 +52,21 @@
 #           "description": "ID of the page view during the event if it exists.",
 #           "example": "e2b76430-27a5-0131-3ca1-48e0eb13f29b",
 #           "type": "string"
+#         },
+#         "copied_from": {
+#           "description": "ID of the course that this course was copied from. This is only included if the event_type is copied_from.",
+#           "example": 12345,
+#           "type": "integer"
+#         },
+#         "copied_to": {
+#           "description": "ID of the course that this course was copied to. This is only included if the event_type is copied_to.",
+#           "example": 12345,
+#           "type": "integer"
+#         },
+#         "sis_batch": {
+#           "description": "ID of the SIS batch that triggered the event.",
+#           "example": 12345,
+#           "type": "integer"
 #         }
 #       }
 #     }
@@ -72,8 +92,13 @@
 #           "type": "string"
 #         },
 #         "event_data": {
-#           "description": "Course event data Depeding on the event type.  This will return an object containing the relevant event data.  An updated event type will return an UpdatedEventData object.",
+#           "description": "Course event data depending on the event type.  This will return an object containing the relevant event data.  An updated event type will return an UpdatedEventData object.",
 #           "example": "{}",
+#           "type": "string"
+#         },
+#         "event_source": {
+#           "description": "Course event source depending on the event type.  This will return a string containing the source of the event.",
+#           "example": "manual|sis|api",
 #           "type": "string"
 #         },
 #         "links": {
@@ -87,7 +112,7 @@
 # @model CreatedEventData
 #     {
 #       "id": "CreatedEventData",
-#       "description": "The created event data object returns all the fields that were set in the format of the following example.  If a field does not exist it was not set. The value of each field changed is in the format of [:old_value, :new_value].",
+#       "description": "The created event data object returns all the fields that were set in the format of the following example.  If a field does not exist it was not set. The value of each field changed is in the format of [:old_value, :new_value].  The created event type also includes a created_source field to specify what triggered the creation of the course.",
 #       "properties": {
 #         "name": {
 #           "example": "[nil, \"Course 1\"]",
@@ -108,7 +133,8 @@
 #           "example": "[nil, false]",
 #           "type": "array",
 #           "items": { "type": "boolean" }
-#         }
+#         },
+#         "created_source": "manual|sis|api"
 #       }
 #     }
 #
@@ -137,14 +163,6 @@
 #           "type": "array",
 #           "items": { "type": "boolean" }
 #         }
-#       }
-#     }
-#
-# @model ConcludedEventData
-#     {
-#       "id": "ConcludedEventData",
-#       "description": "The concluded event data object returns an empty object.  The concluded event does not have any log data associated.",
-#       "properties": {
 #       }
 #     }
 #

@@ -32,7 +32,7 @@ class ContentMigration < ActiveRecord::Base
   cattr_accessor :export_file_path
   DATE_FORMAT = "%m/%d/%Y"
 
-  attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type
+  attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type, :initiated_source
   attr_accessor :outcome_to_id_map
 
   EXPORTABLE_ATTRIBUTES = [
@@ -105,6 +105,14 @@ class ContentMigration < ActiveRecord::Base
 
   def strand
     migration_settings[:strand]
+  end
+
+  def initiated_source
+    migration_settings[:initiated_source] || :manual
+  end
+
+  def initiated_source=(value)
+    migration_settings[:initiated_source] = value
   end
 
   def n_strand
@@ -448,7 +456,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def for_course_copy?
-    !!self.source_course || (self.migration_type && self.migration_type == 'course_copy_importer')
+    self.migration_type && self.migration_type == 'course_copy_importer'
   end
 
   def set_date_shift_options(opts)
@@ -515,7 +523,7 @@ class ContentMigration < ActiveRecord::Base
   def progress
     return nil if self.workflow_state == 'created'
     mig_prog = read_attribute(:progress) || 0
-    if self.source_course
+    if self.for_course_copy?
       # this is for a course copy so it needs to combine the progress of the export and import
       # The export will count for 40% of progress
       # The importing step (so the value of progress on this object)will be 60%

@@ -94,7 +94,7 @@ describe Course do
     file.should_not be_nil
     re = Regexp.new("\\/courses\\/#{course.id}\\/files\\/#{file.id}\\/preview")
     page.body.should match(re) #)
-    
+
     # assignment tests
     course.reload
     length = course.root_account.feature_enabled?(:draft_state) ? 5 : 4
@@ -106,8 +106,8 @@ describe Course do
     assignment.title.should eql("Concert Review Assignment")
     assignment.description.should match(Regexp.new("USE THE TEXT BOX!  DO NOT ATTACH YOUR ASSIGNMENT!!"))
     # The old due date (Fri Mar 27 23:55:00 -0600 2009) should have been adjusted to new time frame
-    assignment.due_at.year.should == 2011 
-    
+    assignment.due_at.year.should == 2011
+
     # discussion topic assignment
     assignment = course.assignments.find_by_migration_id("1865116155002")
     assignment.should_not be_nil
@@ -127,10 +127,10 @@ describe Course do
     file = course.attachments.find_by_migration_id("1865116527002")
     file.should_not be_nil
     assignment.description.should match(Regexp.new("/files/#{file.id}/download"))
-    
+
     # calendar events
     course.calendar_events.should be_empty
-    
+
     # rubrics
     course.rubrics.length.should eql(1)
     rubric = course.rubrics.first
@@ -146,7 +146,7 @@ describe Course do
     criterion["ratings"][1]["description"].should eql("Meet Expectations - asdf")
     criterion["ratings"][2]["points"].should eql(5.0)
     criterion["ratings"][2]["description"].should eql("Need Improvement - rubric entry text")
-    
+
     # Grammar
     criterion = rubric.data[1]
     criterion["description"].should eql("Grammar")
@@ -158,7 +158,7 @@ describe Course do
     criterion["ratings"][1]["description"].should eql("Meet Expectations")
     criterion["ratings"][2]["points"].should eql(5.0)
     criterion["ratings"][2]["description"].should eql("Need Improvement - you smell")
-    
+
     # Style
     criterion = rubric.data[2]
     criterion["description"].should eql("Style")
@@ -170,7 +170,7 @@ describe Course do
     criterion["ratings"][1]["description"].should eql("Meet Expectations")
     criterion["ratings"][2]["points"].should eql(5.0)
     criterion["ratings"][2]["description"].should eql("Need Improvement")
-    
+
     #groups
     course.groups.length.should eql(2)
 
@@ -264,9 +264,12 @@ describe Course do
     before do
       course_with_teacher
       @course.storage_quota = 1
-      @cm = ContentMigration.new(:context => @course, :user => @user, :copy_options => {:everything => "1"})
-      @cm.user = @user
-      @cm.save!
+      @cm = ContentMigration.create!(
+        :context => @course,
+        :user => @user,
+        :source_course => @course,
+        :copy_options => {:everything => "1"}
+      )
     end
 
     it "should not adjust for unauthorized user" do
@@ -281,9 +284,31 @@ describe Course do
     end
 
     it "should be set for course copy" do
-      @cm.source_course = @course
+      @cm.migration_type = 'course_copy_importer'
       Importers::CourseContentImporter.import_settings_from_migration(@course, {:course=>{:storage_quota => 4}}, @cm)
       @course.storage_quota.should == 4
+    end
+  end
+
+  describe "audit logging" do
+    it "should log content migration in audit logs" do
+      course
+
+      json = File.open(File.join(IMPORT_JSON_DIR, 'assessments.json')).read
+      data = JSON.parse(json).with_indifferent_access
+
+      params = {"copy" => {"quizzes" => {"i7ed12d5eade40d9ee8ecb5300b8e02b2" => true}}}
+
+      migration = ContentMigration.create!(:context => @course)
+      migration.migration_settings[:migration_ids_to_import] = params
+      migration.source_course = @course
+      migration.initiated_source = :manual
+      migration.user = @user
+      migration.save!
+
+      Auditors::Course.expects(:record_copied).once.with(migration.source_course, @course, migration.user, source: migration.initiated_source)
+
+      @course.import_from_migration(data, params, migration)
     end
   end
 end

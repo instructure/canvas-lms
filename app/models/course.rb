@@ -891,7 +891,7 @@ class Course < ActiveRecord::Base
     return 'unpublished' if workflow_state == 'created' || workflow_state == 'claimed'
     workflow_state
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
@@ -2638,27 +2638,38 @@ class Course < ActiveRecord::Base
     student_enrollments.find_by_user_id(user.id).present?
   end
 
-  def update_one(update_params)
+  def update_one(update_params, user, update_source = :manual)
+    options = { source: update_source }
+
     case update_params[:event]
       when 'offer'
         if self.completed?
           self.unconclude!
+          Auditors::Course.record_unconcluded(self, user, options)
         else
-          self.offer! unless self.available?
+          unless self.available?
+            self.offer!
+            Auditors::Course.record_published(self, user, options)
+          end
         end
       when 'conclude'
-        self.complete! unless self.completed?
+        unless self.completed?
+          self.complete!
+          Auditors::Course.record_concluded(self, user, options)
+        end
       when 'delete'
         self.sis_source_id = nil
         self.workflow_state = 'deleted'
         self.save!
+        Auditors::Course.record_deleted(self, user, options)
       when 'undelete'
         self.workflow_state = 'claimed'
         self.save!
+        Auditors::Course.record_restored(self, user, options)
     end
   end
 
-  def self.do_batch_update(progress, user, course_ids, update_params)
+  def self.do_batch_update(progress, user, course_ids, update_params, update_source = :manual)
     account = progress.context
     progress_runner = ProgressRunner.new(progress)
 
@@ -2675,16 +2686,16 @@ class Course < ActiveRecord::Base
       raise t('course_not_found', "The course was not found") unless course &&
           (course.workflow_state != 'deleted' || update_params[:event] == 'undelete')
       raise t('access_denied', "Access was denied") unless course.grants_right? user, :update
-      course.update_one(update_params)
+      course.update_one(update_params, user, update_source)
     end
 
   end
 
-  def self.batch_update(account, user, course_ids, update_params)
+  def self.batch_update(account, user, course_ids, update_params, update_source = :manual)
     progress = account.progresses.create! :tag => "course_batch_update", :completion => 0.0
     job = Course.send_later_enqueue_args(:do_batch_update,
                                          { no_delay: true },
-                                         progress, user, course_ids, update_params)
+                                         progress, user, course_ids, update_params, update_source)
     progress.user_id = user.id
     progress.delayed_job_id = job.id
     progress.save!

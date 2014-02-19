@@ -57,6 +57,21 @@ describe "admin_tools" do
     wait_for_ajaximations
   end
 
+  def show_event_details(event_type, search_term = nil, event = nil)
+    search_term ||= @course.name
+    event ||= @event
+
+    perform_autocomplete_search("#course_id-autocompleteField", search_term)
+    f('#loggingCourse button[name=course_submit]').click
+    wait_for_ajaximations
+
+    cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
+    cols[3].text.should == event_type
+
+    fj('#courseLoggingSearchResults table tbody tr:last td:last a').click
+    fj('.ui-dialog dl dd:first').text.should == event.id
+  end
+
   before do
     @account = Account.default
     setup_users
@@ -393,11 +408,12 @@ describe "admin_tools" do
 
       ff('#courseLoggingSearchResults table tbody tr').length.should == @events.length
       cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
-      cols.size.should == 5
+      cols.size.should == 6
 
       cols[2].text.should == @teacher.name
       cols[3].text.should == "Updated"
-      cols[4].text.should == "View Details"
+      cols[4].text.should == "Manual"
+      cols[5].text.should == "View Details"
     end
 
     it "should search by course id" do
@@ -408,7 +424,7 @@ describe "admin_tools" do
       f('#loggingCourse button[name=course_submit]').click
       wait_for_ajaximations
       cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
-      cols.size.should == 5
+      cols.size.should == 6
     end
 
     it "should find courses in any workflow state" do
@@ -422,7 +438,7 @@ describe "admin_tools" do
       wait_for_ajaximations
 
       cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
-      cols.size.should == 5
+      cols.size.should == 6
     end
 
     it "should show created event details" do
@@ -431,12 +447,7 @@ describe "admin_tools" do
       course.name = @course.name
       @event = Auditors::Course.record_created(@course, @teacher, course.changes)
 
-      perform_autocomplete_search("#course_id-autocompleteField", @course.name)
-      f('#loggingCourse button[name=course_submit]').click
-      wait_for_ajaximations
-      fj('#courseLoggingSearchResults table tbody tr:last td:last a').click
-
-      fj('.ui-dialog dl dd:first').text.should == @event.id
+      show_event_details("Created")
       cols = ffj('.ui-dialog table:first tbody tr:first td')
       cols.size.should == 2
       cols[0].text.should == "Name"
@@ -448,12 +459,7 @@ describe "admin_tools" do
       @course.name = "Course Updated"
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
 
-      perform_autocomplete_search("#course_id-autocompleteField", old_name)
-      f('#loggingCourse button[name=course_submit]').click
-      wait_for_ajaximations
-      fj('#courseLoggingSearchResults table tbody tr:last td:last a').click
-
-      fj('.ui-dialog dl dd:first').text.should == @event.id
+      show_event_details("Updated", old_name)
       cols = ffj('.ui-dialog table:first tbody tr:first td')
       cols.size.should == 3
       cols[0].text.should == "Name"
@@ -463,13 +469,43 @@ describe "admin_tools" do
 
     it "should show concluded event details" do
       @event = Auditors::Course.record_concluded(@course, @teacher)
+      show_event_details("Concluded")
+    end
 
-      perform_autocomplete_search("#course_id-autocompleteField", @course.name)
-      f('#loggingCourse button[name=course_submit]').click
-      wait_for_ajaximations
-      fj('#courseLoggingSearchResults table tbody tr:last td:last a').click
+    it "should show unconcluded event details" do
+      @event = Auditors::Course.record_unconcluded(@course, @teacher)
+      show_event_details("Unconcluded")
+    end
 
-      fj('.ui-dialog dl dd:first').text.should == @event.id
+    it "should show deleted event details" do
+      @event = Auditors::Course.record_deleted(@course, @teacher)
+      show_event_details("Deleted")
+    end
+
+    it "should show restored event details" do
+      @event = Auditors::Course.record_restored(@course, @teacher)
+      show_event_details("Restored")
+    end
+
+    it "should show published event details" do
+      @event = Auditors::Course.record_published(@course, @teacher)
+      show_event_details("Published")
+    end
+
+    it "should show copied_to event details" do
+      @course, @copied_course = @course, course(active_course: true, course_name: "Copied Course")
+      @from_event, @to_event = Auditors::Course.record_copied(@course, @copied_course, @teacher)
+
+      show_event_details("Copied To", @course.name, @to_event)
+      fj('.ui-dialog dl dd:last').text.should == @copied_course.name
+    end
+
+    it "should show copied_from event details" do
+      @course, @copied_course = @course, course(active_course: true, course_name: "Copied Course")
+      @from_event, @to_event = Auditors::Course.record_copied(@course, @copied_course, @teacher)
+
+      show_event_details("Copied From", @copied_course.name, @from_event)
+      fj('.ui-dialog dl dd:last').text.should == @course.name
     end
   end
 end
