@@ -263,7 +263,8 @@ describe "content migrations" do
 
   context "course copy" do
     before :all do
-      @copy_from = course_model(:name => "copy from me")
+      @copy_from = course
+      @copy_from.update_attribute(:name, 'copy from me')
       data = File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip')
 
       cm = ContentMigration.new(:context => @copy_from, :migration_type => "common_cartridge_importer")
@@ -280,6 +281,7 @@ describe "content migrations" do
       worker_class = Canvas::Migration::Worker.const_get(Canvas::Plugin.find(cm.migration_type).settings['worker'])
       worker_class.new(cm.id).perform
 
+      @course = nil
       @type = "course_copy_importer"
     end
 
