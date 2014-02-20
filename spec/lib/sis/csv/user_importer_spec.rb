@@ -541,8 +541,7 @@ describe SIS::CSV::UserImporter do
         "user_1,user1,User,Uno,user1@example.com,active",
         "user_1,USer1,User,Uno,user1@example.com,active"
     )
-    Pseudonym.find_by_unique_id('USer1').should_not be_nil
-    Pseudonym.find_by_unique_id('user1').should be_nil
+    Pseudonym.find_by_sis_user_id('user_1').unique_id.should == 'USer1'
   end
 
   it "should use an existing pseudonym if it wasn't imported from sis and has the same login id" do
