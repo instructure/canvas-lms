@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <title><%= t :title, "Facebook Page" %></title>
   <noscript> <meta http-equiv=refresh content="0; URL=/enable-javascript.html" /> </noscript> 
-  <!--[if lte IE 6]> <meta http-equiv=refresh content="0; URL=/ie-6-is-not-supported.html" /> <![endif]-->
+  <!--[if lte IE 8]> <meta http-equiv=refresh content="0; URL=/ie-8-is-not-supported.html" /> <![endif]-->
   <%= include_common_stylesheets %>
   <%= include_stylesheets :facebook %>
 </head>
@@ -15,7 +15,6 @@
   </div>
 
   <script>
-    window.JSON || document.write('<%= (javascript_include_tag "#{js_base_url}/vendor/json2.js").gsub("</script>", "<\\/script>") %>');
 
     INST = <%= raw(inst_env.to_json) %>;
     ENV = <%= raw js_env.to_json %>;
