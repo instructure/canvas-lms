@@ -108,6 +108,7 @@ module Api::V1::User
   # optimization hint, currently user only needs to pull pseudonyms from the db
   # if a site admin is making the request or they can manage_students
   def user_json_is_admin?(context = @context, current_user = @current_user)
+    return false if context.nil? || current_user.nil?
     @user_json_is_admin ||= {}
     @user_json_is_admin[[context.class.name, context.id, current_user.id]] ||= (
       if context.is_a?(::UserProfile)
