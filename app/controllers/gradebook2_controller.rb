@@ -43,6 +43,8 @@ class Gradebook2Controller < ApplicationController
       :gradebook_is_editable => @gradebook_is_editable,
       :setting_update_url => api_v1_course_settings_url(@context),
       :show_total_grade_as_points => @context.settings[:show_total_grade_as_points],
+      :publish_to_sis_enabled => @context.allows_grade_publishing_by(@current_user) && @gradebook_is_editable,
+      :publish_to_sis_url => context_url(@context, :context_details_url, :anchor => 'tab-grade-publishing'),
       :speed_grader_enabled => @context.allows_speed_grader?,
       :draft_state_enabled => @context.feature_enabled?(:draft_state),
       :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook),

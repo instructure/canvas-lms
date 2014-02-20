@@ -197,6 +197,14 @@ define [
         fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, student_ids: student_ids,  @get('submissions'))
     ).observes('students.@each').on('init')
 
+    publishToSisEnabled: (->
+      ENV.GRADEBOOK_OPTIONS.publish_to_sis_enabled
+      ).property()
+
+    publishToSisURL:(->
+      ENV.GRADEBOOK_OPTIONS.publish_to_sis_url
+      ).property()
+
     teacherNotes: (->
       ENV.GRADEBOOK_OPTIONS.teacher_notes
     ).property().volatile()

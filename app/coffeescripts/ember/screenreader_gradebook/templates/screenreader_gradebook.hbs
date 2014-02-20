@@ -80,6 +80,11 @@
     }}
     {{#t "show_notes"}}Show Notes in Student Info{{/t}}
     </label>
+    {{#if publishToSisEnabled}}
+      <a href="{{ unbound publishToSisURL }}">
+        {{#t "sis_export"}}Publish grades to SIS{{/t}}
+      </a>
+    {{/if}}
   </div>
 </div>
 
@@ -201,7 +206,7 @@
   <h2>{{#t 'grading'}}Grading{{/t}}</h2>
   {{#unless selectedSubmission}}
     <p class="submission_selection">
-      {{#t 'empty_submission_selection"}}Select a student and an assignment to view and edit grades.{{/t}}
+      {{#t "empty_submission_selection"}}Select a student and an assignment to view and edit grades.{{/t}}
     </p>
   {{else}}
     <div class="control-group">
@@ -237,7 +242,7 @@
   <h2>{{#t 'student_info'}}Student Information{{/t}}</h2>
   {{#unless selectedStudent}}
     <p class="student_selection">
-      {{#t 'empty_student_selection"}}Select a student to view additional information here.{{/t}}
+      {{#t "empty_student_selection"}}Select a student to view additional information here.{{/t}}
     </p>
   {{else}}
     <h3 class="student_selection">
