@@ -43,7 +43,7 @@ define [
 
   test 'upload scores dialog displays properly', ->
     visit('/')
-    openAndCloseDialog('#upload', 'Choose a CSV to Upload')
+    openAndCloseDialog('#upload', 'Choose a CSV file to Upload')
 
   test 'set group weights dialog displays propery', ->
     visit('/')
