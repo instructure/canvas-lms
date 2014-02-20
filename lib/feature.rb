@@ -109,8 +109,8 @@ END
       description:  -> { I18n.t('outcome_gradebook_description', <<-END) },
 Outcome Gradebook provides a way for teachers to quickly view student and course
 progress on course learning outcomes. Outcomes are presented in a Gradebook-like
-format and student progress is displayed both as a numerical score and as mastered/
-near mastery/remedial.
+format and student progress is displayed both as a numerical score and as mastered/near
+mastery/remedial.
 END
       applies_to: 'Course',
       state: 'allowed',
