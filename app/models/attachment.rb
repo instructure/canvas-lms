@@ -1383,6 +1383,10 @@ class Attachment < ActiveRecord::Base
   end
 
   def needs_scribd_doc?
+    if self.scribd_attempts >= MAX_SCRIBD_ATTEMPTS
+      self.mark_errored
+      false
+    end
     if self.scribd_doc?
       Scribd::API.instance.user = scribd_user
       begin
@@ -1481,6 +1485,7 @@ class Attachment < ActiveRecord::Base
       Scribd::API.instance.user = scribd_user
       self.scribd_doc.destroy rescue nil
     end
+    self.scribd_doc = nil
     self.workflow_state = 'pending_upload'
     self.submit_to_scribd!
   end
@@ -1637,7 +1642,7 @@ class Attachment < ActiveRecord::Base
 
   scope :scribdable?, where("scribd_mime_type_id IS NOT NULL")
   scope :recyclable, where("attachments.scribd_attempts<? AND attachments.workflow_state='errored'", MAX_SCRIBD_ATTEMPTS)
-  scope :needing_scribd_conversion_status, lambda { where("attachments.workflow_state='processing' AND attachments.updated_at<?", 30.minutes.ago).limit(50) }
+  scope :needing_scribd_conversion_status, lambda { where("attachments.workflow_state='processing' AND attachments.updated_at<? AND scribd_doc IS NOT NULL", 30.minutes.ago).limit(50) }
   scope :uploadable, where(:workflow_state => 'pending_upload')
   scope :active, where(:file_state => 'available')
   scope :thumbnailable?, where(:content_type => Technoweenie::AttachmentFu.content_types)
