@@ -72,6 +72,7 @@ describe "collaborations" do
     @collaboration         = Collaboration.typed_collaboration_instance(title)
     @collaboration.context = @course
     @collaboration.title   = title
+    @collaboration.user = @user
     @collaboration.save!
   end
 
@@ -85,6 +86,14 @@ describe "collaborations" do
             CollaborationsController.any_instance.
               stubs(:google_docs_verify_access_token).
               returns(true)
+
+            GoogleDocsCollaboration.any_instance.
+                stubs(:initialize_document).
+                returns(nil)
+
+            GoogleDocsCollaboration.any_instance.
+                stubs(:delete_document).
+                returns(nil)
           end
         end
 
@@ -157,10 +166,12 @@ describe "collaborations" do
           @collaboration1 = Collaboration.typed_collaboration_instance(title)
           @collaboration1.context = @course
           @collaboration1.attributes = {:title => "My Collab 1"}
+          @collaboration1.user = @user
           @collaboration1.save!
           @collaboration2 = Collaboration.typed_collaboration_instance(title)
           @collaboration2.context = @course
           @collaboration2.attributes = {:title => "My Collab 2"}
+          @collaboration2.user = @user
           @collaboration2.save!
 
           validate_collaborations("/courses/#{@course.id}/collaborations/", false, true)
