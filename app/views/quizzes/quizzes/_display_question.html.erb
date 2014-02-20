@@ -289,6 +289,10 @@
                 <% else %>
                   <% matched_answer = hash_get(question, :answers, []).find{|a| hash_get(a, :text) == hash_get(user_answer, :text) || hash_get(a, :id) == hash_get(user_answer, :answer_id) } %>
                   <% hash_get(question, :answers, []).each do |a|
+                    # Temporary workaround until we can figure out why the
+                    # "answers" aren't getting cleared out when switching
+                    # question types
+                    break if hash_get(question, :question_type) == 'file_upload_question'
                     val = hash_get(user_answer, :text).to_f
                     matched_answer = a if hash_get(a, :numerical_answer_type) == 'exact_answer' && val <= (hash_get(a, :exact) + hash_get(a, :margin, 0)) && val >= (hash_get(a, :exact) - hash_get(a, :margin, 0))
                     matched_answer = a if hash_get(a, :numerical_answer_type) == 'range_answer' && val <= hash_get(a, :end) && val >= hash_get(a, :start)
