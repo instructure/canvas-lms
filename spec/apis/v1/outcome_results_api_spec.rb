@@ -161,6 +161,10 @@ describe "Outcome Results API", type: :request do
     api_v1_course_outcome_rollups_url(context, params)
   end
 
+  def outcome_results_url(context, params = {})
+    api_v1_course_outcome_results_url(context, params)
+  end
+
   describe "outcome rollups" do
     describe "error handling" do
       it "requires manage grades permisssion" do
@@ -501,6 +505,35 @@ describe "Outcome Results API", type: :request do
           end
         end
       end
+    end
+  end
+
+  describe "index" do
+    # the filtering and inclusion logic is shared with the rollup endpoint, so we don't retest it here
+    # we test some of that logic that is more specifically useful to the index endpoint
+    it "side loads alignments" do
+      outcome_assessment
+      course_with_teacher_logged_in(course: outcome_course, active_all: true)
+      api_call(:get, outcome_results_url(outcome_course, include: ['alignments']),
+               controller: 'outcome_results', action: 'index', format: 'json', course_id: outcome_course.id.to_s, include: ['alignments'])
+      json = JSON.parse(response.body)
+      json['linked'].should be_present
+      json['linked']['alignments'].should be_present
+      json['linked']['alignments'][0]['id'].should == outcome_assignment.asset_string
+    end
+
+    it "returns outcome results" do
+      outcome_assessment
+      course_with_teacher_logged_in(course: outcome_course, active_all: true)
+      api_call(:get, outcome_results_url(outcome_course),
+               controller: 'outcome_results', action: 'index', format: 'json', course_id: outcome_course.id.to_s)
+      json = JSON.parse(response.body)
+      json['outcome_results'].should be_present
+      json['outcome_results'][0]["id"].should == outcome_result.id.to_s
+      json['outcome_results'][0]["score"].should == outcome_result.score
+      json['outcome_results'][0]["links"]["learning_outcome"].should == outcome_object.id.to_s
+      json['outcome_results'][0]["links"]["alignment"].should == outcome_assignment.asset_string
+      json['outcome_results'][0]["links"]["user"].should == outcome_student.id.to_s
     end
   end
 

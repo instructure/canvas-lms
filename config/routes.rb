@@ -1406,6 +1406,7 @@ routes.draw do
 
     scope(:controller => :outcome_results) do
       get 'courses/:course_id/outcome_rollups', :action => :rollups, :path_name => 'course_outcome_rollups'
+      get 'courses/:course_id/outcome_results', :action => :index, :path_name => 'course_outcome_results'
     end
 
     scope(:controller => :group_categories) do

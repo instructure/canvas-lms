@@ -19,9 +19,30 @@
 module Api::V1::OutcomeResults
   include Api::V1::Outcome
 
+  # Public: Serializes OutcomeResults
+  #
+  # results - The OutcomeResults to serialize
+  #
+  # Returns a hash that can be converted into json
+  def outcome_results_json(results)
+    {
+      outcome_results: results.map{|r| outcome_result_json(r)}
+    }
+  end
+
+  def outcome_result_json(result)
+    hash = api_json(result, @current_user, session, only: %w(id score))
+    hash[:links] = {
+      user: result.user.id.to_s,
+      learning_outcome: result.learning_outcome_id.to_s,
+      alignment: result.alignment.content.asset_string
+    }
+    Api.recursively_stringify_json_ids(hash)
+  end
+
   # Public: Serializes the rollups produced by Outcomes::ResultAnalytics.
   #
-  # rollups - The rollups from Outcomes::ResultAnalytics to seralize
+  # rollups - The rollups from Outcomes::ResultAnalytics to serialize
   #
   # Returns a hash that can be converted into json.
   def outcome_results_rollups_json(rollups)

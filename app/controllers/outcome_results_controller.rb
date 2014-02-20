@@ -21,6 +21,28 @@
 #
 # API for accessing learning outcome results
 #
+# @model OutcomeResult
+#     {
+#       "id": "OutcomeResult",
+#       "description": "A student's result for an outcome",
+#       "properties": {
+#         "id": {
+#           "example": "42",
+#           "type": "integer",
+#           "description": "A unique identifier for this result"
+#         },
+#         "score": {
+#           "example": 6,
+#           "type": "integer",
+#           "description": "The student's score"
+#         },
+#         "links": {
+#           "example": "{\"user\"=>\"3\", \"learning_outcome\"=>\"97\", \"alignment\"=>\"53\"}",
+#           "description": "Unique identifiers of objects associated with this result"
+#         }
+#       }
+#     }
+#
 # @model OutcomeRollupScoreLinks
 #     {
 #       "id": "OutcomeRollupScoreLinks",
@@ -124,10 +146,44 @@ class OutcomeResultsController < ApplicationController
   before_filter :require_user
   before_filter :require_context
   before_filter :require_outcome_context
-  before_filter :verify_aggregate_parameter
+  before_filter :verify_aggregate_parameter, only: :rollups
   before_filter :verify_include_parameter
   before_filter :require_outcomes
   before_filter :require_users
+
+  # @API Get outcome results
+  # @beta
+  #
+  # Gets the outcome results for users and outcomes in the specified context.
+  #
+  # @argument user_ids[] [Optional, Integer]
+  #   If specified, only the users whose ids are given will be included in the
+  #   results. it is an error to specify an id for a user who is not a student in
+  #   the context
+  #
+  # @argument outcome_ids[] [Optional, Integer]
+  #   If specified, only the outcomes whose ids are given will be included in the
+  #   results. it is an error to specify an id for an outcome which is not linked
+  #   to the context.
+  #
+  # @argument include[] [Optional, String, "alignments"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"users"]
+  #   Specify additional collections to be side loaded with the result.
+  #   "alignments" includes only the alignments referenced by the returned
+  #   results.
+  #   "outcomes.alignments" includes all alignments referenced by outcomes in the
+  #   context.
+  #
+  # @example_response
+  #    {
+  #      outcome_results: [OutcomeResult]
+  #    }
+  def index
+    @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes)
+    @results = Api.paginate(@results, self, api_v1_course_outcome_results_url)
+    json = outcome_results_json(@results)
+    json[:linked] = linked_include_collections if params[:include].present?
+    render json: json
+  end
 
   # @API Get outcome result rollups
   # @beta
@@ -218,7 +274,7 @@ class OutcomeResultsController < ApplicationController
   # Returns a result Hash that should be merged into the linked section.
   def linked_include_collections
     linked = {}
-    includes = params[:include]
+    includes = Api.value_to_array(params[:include])
     includes.uniq.each do |include_name|
       linked[include_name] = self.send(include_method_name(include_name))
     end
@@ -264,11 +320,19 @@ class OutcomeResultsController < ApplicationController
     outcome_results_linked_users_json(@users)
   end
 
+  # Internal: Query and serialize alignments for @results
+  #
+  # Returns an Array of serialized alignments
+  def include_alignments
+    alignments = @results.map(&:alignment).map(&:content).uniq
+    outcome_results_include_alignments_json(alignments)
+  end
+
   # Internal: Query and serialize alignments for @outcomes
   #
   # Returns an Array of serialized alignments
   def include_outcomes_alignments
-    alignments = @outcomes.map(&:alignments).flatten.map(&:content)
+    alignments = @outcomes.map(&:alignments).flatten.map(&:content).uniq
     outcome_results_include_alignments_json(alignments)
   end
 
@@ -299,7 +363,7 @@ class OutcomeResultsController < ApplicationController
   #  Returns true otherwise
   def verify_include_parameter
     params[:include] ||= []
-    params[:include].each do |include_name|
+    Api.value_to_array(params[:include]).each do |include_name|
       case include_name
       when 'courses'
         reject! "can't include courses unless aggregate is 'course'" if params[:aggregate] != 'course'
