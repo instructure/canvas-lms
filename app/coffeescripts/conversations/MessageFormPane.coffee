@@ -60,7 +60,7 @@ define [
       @$node.on 'click', '.action_media_comment', preventDefault =>
         @form.addMediaComment()
       @$node.on 'click', '.media_comment a.remove_link', preventDefault =>
-        @form.removeMediaComment
+        @form.removeMediaComment()
 
       @$node.on 'click', '.action_add_recipients', preventDefault (e) =>
         @app.addRecipients($(e.currentTarget))
