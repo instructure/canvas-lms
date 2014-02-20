@@ -31,7 +31,9 @@ dd {
   display: block;
 }
 .weight,
-.dropped {
+.dropped,
+.late,
+.resubmitted {
   font-style: italic;
 }
 
