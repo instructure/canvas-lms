@@ -322,6 +322,7 @@ define [
           id: '1'
           name: 'AG1'
           position: 1
+          group_weight: 0
           assignments: [
             {
               id: '1'
@@ -365,6 +366,7 @@ define [
           id: '2'
           name: 'AG2'
           position: 10
+          group_weight: 0
           assignments: [
             {
               id: '4'
@@ -406,6 +408,7 @@ define [
           id: '4'
           name: 'Silent Assignments'
           position: 2
+          group_weight: 0
           assignments: [
             {
               id: '20'
@@ -435,6 +438,7 @@ define [
           id: '5'
           name: 'Invalid AG'
           position: 3
+          group_weight: 0
           assignments: [
             {
               id: '24'

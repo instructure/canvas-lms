@@ -178,7 +178,7 @@ define [
 
     calculateAllGrades: (->
       @get('students').forEach (student) => @calculateStudentGrade student
-    ).observes('includeUngradedAssignments','groupsAreWeighted')
+    ).observes('includeUngradedAssignments','groupsAreWeighted', 'assignment_groups.@each.group_weight')
 
     setFinalGradeDisplay: (->
       @get('students').forEach (student) =>

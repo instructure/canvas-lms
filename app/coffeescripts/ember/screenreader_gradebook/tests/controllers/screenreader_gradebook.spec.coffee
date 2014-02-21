@@ -446,5 +446,3 @@ define [
     equal @srgb.get('showInvalidGroupWarning'), false
     @srgb.set('weightingScheme', "percent")
     equal @srgb.get('showInvalidGroupWarning'), true
-
-

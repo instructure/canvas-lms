@@ -32,6 +32,9 @@ define [
       JSON.stringify Ember.copy response, true
     ]
 
+  mockServerResponse = (server, url, response = '') ->
+    server.respond url, JSON.stringify response
+
   module 'screenreader_gradebook: dialogs open and close',
     setup: ->
       App = startApp()
@@ -87,7 +90,7 @@ define [
   test 'submission details dialog', ->
     openAndCloseDialog('#submission_details', "#{@student.name}")
 
-  module 'screenreader_gradebook: assignment dialogs saving',
+  module 'screenreader_gradebook: assignment and assignment_group dialogs saving',
     setup: ->
       App = startApp()
       visit('/').then =>
@@ -96,6 +99,12 @@ define [
         @selStudent = @controller.get('students').objectAt(0)
         @server = sinon.fakeServer.create()
         @alert = sinon.stub(window, 'alert')
+        @modified_assignment_group = {
+          id: '1'
+          name: 'AG1'
+          position: 1
+          group_weight: 100
+        }
         Ember.run =>
           @controller.set('submissions', Em.copy fixtures.submissions, true)
           @controller.set('selectedAssignment', @selAssignment)
@@ -123,3 +132,21 @@ define [
     andThen ->
       equal parseInt(find('#student_and_assignment_grade').val(), 10), 100
 
+  test 'group weights dialog update groups weights and final grade', ->
+    $dialog = null
+    visit('/').then =>
+      initial_final_grade = find(".total-grade").last().text()
+      equal(parseFloat(initial_final_grade), "2.1")
+      openDialog("#ag_weights").then =>
+        $dialog = find('.ui-dialog:visible', 'body')
+        click(find('#group_weighting_scheme', $dialog))
+        mockServerResponse(@server, "/courses/1", {course: {group_weighting_scheme: 'percent'}})
+        andThen =>
+          fillIn(find('#assignment_group_1_weight', $dialog), 100).then =>
+            click(find('.ui-button', $dialog))
+            mockServerResponse(@server, "/api/v1/courses/1/assignment_groups/1", @modified_assignment_group)
+            andThen =>
+              new_final_grade = find(".total-grade").last().text()
+              assignment_group_text = find(".assignment-group-grade").first().text()
+              equal(parseFloat(new_final_grade), "3")
+              notEqual(assignment_group_text.indexOf("100% of grade"), -1)

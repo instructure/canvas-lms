@@ -71,7 +71,6 @@ define [
         equal @con.get('selectedAssignment.muted'), false
         server.restore()
 
-
   module 'screenreader_gradebook assignment_muter_component: unmuted',
     setup: ->
       App = startApp()

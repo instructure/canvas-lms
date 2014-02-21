@@ -28,6 +28,8 @@ define [
 
     @$group_template = @$dialog.find('.assignment_group_row.blank').removeClass('blank').detach().show()
     @$groups_holder = @$dialog.find('.groups_holder')
+    # ember objects dont work with $.extend, so for srgb we pass in options.mergeFunction
+    @mergeFunction = options.mergeFunction || $.extend
     @update(options)
 
   render: =>
@@ -77,8 +79,8 @@ define [
       group = $(row).data('assignment_group')
       newWeight = Number($(row).find('input').val())
       if newWeight != group.group_weight
-        requests.push $.ajaxJSON "/api/v1#{courseUrl}/assignment_groups/#{group.id}", 'PUT', {'group_weight' : newWeight}, (data) ->
-          $.extend(group, data)
+        requests.push $.ajaxJSON "/api/v1#{courseUrl}/assignment_groups/#{group.id}", 'PUT', {'group_weight' : newWeight}, (data) =>
+          @mergeFunction(group, data)
 
     # when all the requests come back, call @afterSave
     promise = $.when.apply($, requests).done(@afterSave)
