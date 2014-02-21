@@ -18,14 +18,45 @@
       <a {{bind-attr href="editURL"}} class="btn">
         <i class="icon-edit"></i>{{#t 'edit'}}Edit{{/t}}
       </a>
-      {{#ic-menu}}
-        {{#ic-menu-trigger}}
-          <button class="btn">
-            <i class="icon-settings"></i>
-          </button>
-        {{/ic-menu-trigger}}
-      {{/ic-menu}}
     </div>
+      {{#ic-actions}}
+        {{#ic-menu-item on-select="speedGrader"}}
+          <i class="icon-speed-grader"></i>
+          <a {{bindAttr href="speedGraderUrl"}}>
+            {{#t "speed_grader"}}Speed Grader{{/t}}
+          </a>
+        {{/ic-menu-item}}
+
+        {{#ic-menu-item on-select="messageStudents"}}
+          <i class="icon-discussion"></i>
+          {{#t 'Message Students'}}Message Students{{/t}}
+        {{/ic-menu-item}}
+
+        {{#ic-menu-item class="js-delete" on-select="confirmDeletion"}}
+          <i class="icon-trash"></i>
+          {{#t "delete"}}Delete{{/t}}
+        {{/ic-menu-item}}
+
+        {{#ic-menu-item}}
+          <i class="icon-mark-as-read"></i>
+          {{#t 'preview'}}Preview{{/t}}
+        {{/ic-menu-item}}
+
+        {{#if lockAt}}
+          {{#ic-menu-item class="js-due-date-toggler" on-select="unlock"}}
+            <i class="icon-unlock"></i>
+            {{#t 'unlock_this_quiz_now'}}Unlock This Quiz Now{{/t}}
+          {{/ic-menu-item}}
+        {{else}}
+          {{#ic-menu-item class="js-due-date-toggler" on-select="lock"}}
+            <i class="icon-lock"></i>
+            {{#t 'lock_this_quiz_now'}}
+              Lock This Quiz Now
+            {{/t}}
+          {{/ic-menu-item}}
+        {{/if}}
+
+      {{/ic-actions}}
   </div>
 
   <div class="row-fluid" id="quiz-show-tabs">

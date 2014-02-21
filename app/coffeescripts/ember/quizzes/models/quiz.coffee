@@ -10,6 +10,7 @@ define [
 
   Em.onerror = (error) ->
     console.log 'ERR', error, error.stack
+    throw new Ember.Error error
 
   {Model, attr} = DS
   Quiz = Model.extend
@@ -21,7 +22,6 @@ define [
     editURL: (->
       "#{@get('htmlURL')}/edit"
     ).property('htmlURL')
-    allDates: attr()
     mobileURL: attr()
     description: attr()
     timeLimit: attr()
@@ -37,6 +37,7 @@ define [
     ipFilter: attr()
     pointsPossible: attr()
     published: attr()
+    speedGraderUrl: attr()
     allowedAttempts: attr('number')
     unpublishable: attr()
     canNotUnpublish: equal 'unpublishable', false
@@ -95,6 +96,17 @@ define [
       title = @get('title') or ''
       dueAt + title
     ).property('isAssignment', 'dueAt', 'lockAt', 'title')
+    assignmentOverrides: hasMany 'assignment_override'
+    allDates: (->
+      dates = []
+      dates.push Ember.Object.create
+        lockAt: @get 'lockAt'
+        unlockAt: @get 'unlockAt'
+        dueAt: @get 'dueAt'
+        base: true
+      dates = dates.concat(@get('assignmentOverrides').toArray())
+      Ember.A(dates)
+    ).property('lockAt', 'unlockAt', 'dueAt', 'assignmentOverrides.[]')
 
   Quiz.SORT_LAST = 'ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ'
 

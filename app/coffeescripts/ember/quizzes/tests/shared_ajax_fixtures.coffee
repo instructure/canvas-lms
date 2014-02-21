@@ -1,7 +1,8 @@
 define [
   'ic-ajax',
   'ember'
-], (ajax, Ember) ->
+  'underscore'
+], (ajax, Ember, _) ->
 
   quizIndexResponse =
     "meta":
@@ -29,6 +30,22 @@ define [
           "quiz_submission_html_url": "/courses/1/quizzes/1/submission_html"
           "ip_filter":null,
           "due_at":"2013-11-01T06:59:59Z",
+          "all_dates": [
+            {
+              base: true,
+              title: "Everyone"
+              due_at: new Date()
+              lock_at: null
+              unlock_at: null
+            },
+            {
+              id: "1"
+              title: "My Section"
+              due_at: new Date()
+              lock_at: null
+              unlock_at: null
+            }
+          ]
           "lock_at":"2013-11-01T06:59:59Z",
           "unlock_at":"2013-10-27T07:00:00Z",
           "one_question_at_a_time":false,
@@ -60,6 +77,17 @@ define [
           "hide_results":null,
           "id":2,
           "ip_filter":null,
+          "links":
+            "assignment_group": "/api/v1/courses/1/assignment_groups/1"
+          "all_dates": [
+            {
+              base: true,
+              title: "Everyone"
+              due_at: new Date()
+              lock_at: null
+              unlock_at: null
+            }
+          ]
           "due_at":"2013-12-01T06:59:59Z",
           "lock_at":"2013-12-01T06:59:59Z",
           "unlock_at":"2013-11-27T07:00:00Z",
@@ -90,12 +118,15 @@ define [
   quizReportsResponse = {"quiz_reports":[{"id":"14","report_type":"student_analysis","readable_type":"Student Analysis","includes_all_versions":false,"generatable":true,"anonymous":false,"url":"http://localhost:3000/api/v1/courses/1/quizzes/1/reports/14","created_at":"2014-04-29T08:57:36Z","updated_at":"2014-04-29T09:08:55Z","links":{"quiz":"http://localhost:3000/api/v1/courses/1/quizzes/1"},"file":{"id":154,"content-type":"text/csv","display_name":"CNVS-4338 Quiz Student Analysis Report.csv","filename":"quiz_student_analysis_report.csv","url":"http://localhost:3000/files/154/download?download_frd=1&verifier=XDl5emZ8E5KHjrmkcMUArhyLCHEJsi6DxNoLqsd4","size":1093,"created_at":"2014-04-29T09:08:55Z","updated_at":"2014-04-29T09:08:55Z","unlock_at":null,"locked":false,"hidden":false,"lock_at":null,"hidden_for_user":false,"thumbnail_url":null,"locked_for_user":false},"progress":{"completion":100,"context_id":13,"context_type":"Quizzes::QuizStatistics","created_at":"2014-04-02T06:41:47Z","id":143,"message":null,"tag":"Quizzes::QuizStatistics","updated_at":"2014-04-02T06:41:47Z","user_id":null,"workflow_state":"completed","url":"http://localhost:3000/api/v1/progress/143"}},{"id":"13","report_type":"item_analysis","readable_type":"Item Analysis","includes_all_versions":true,"generatable":true,"anonymous":false,"url":"http://localhost:3000/api/v1/courses/1/quizzes/1/reports/13","created_at":"2014-04-29T08:57:36Z","updated_at":"2014-04-29T09:08:25Z","links":{"quiz":"http://localhost:3000/api/v1/courses/1/quizzes/1"}}]}
 
   {
+    QUIZ_INDEX_RESPONSE: _.cloneDeep quizIndexResponse
     QUIZZES: quizIndexResponse.quizzes
     ASSIGNMENT_GROUP: assignmentGroup
     QUIZ_STATISTICS: quizStatisticsResponse.quiz_statistics
     QUIZ_REPORTS: quizReportsResponse.quiz_reports
 
     create: ->
+      # TODO: This slows the tests down. We need to figure out a good way of
+      # making this immutable
       ajax.defineFixture '/api/v1/courses/1/quizzes',
         response: JSON.parse(JSON.stringify quizIndexResponse),
         jqXHR: {}
@@ -124,5 +155,14 @@ define [
         response: quizReportsResponse,
         jqXHR: {}
         testStatus: '200'
+
+      ajax.defineFixture '/api/v1/courses/1/assignment_overrides/1',
+        response:
+          id: "1"
+          title: "My Section"
+          due_at: new Date()
+          lock_at: new Date()
+        testStatus: '200'
+        jqXHR: {}
   }
 

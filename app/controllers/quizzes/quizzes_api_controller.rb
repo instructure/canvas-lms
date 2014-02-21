@@ -423,7 +423,11 @@ class Quizzes::QuizzesApiController < ApplicationController
     if authorized_action(@quiz, @current_user, :update)
       update_api_quiz(@quiz, params)
       if @quiz.valid?
-        render_json
+        if accepts_jsonapi?
+          head :no_content
+        else
+          render_json
+        end
       else
         errors = @quiz.errors.as_json[:errors]
         errors['published'] = errors.delete(:workflow_state) if errors.has_key?(:workflow_state)

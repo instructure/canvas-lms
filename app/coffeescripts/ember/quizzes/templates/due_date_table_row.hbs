@@ -1,10 +1,4 @@
-<td>
-  {{#if due_at}}
-    {{friendlyDatetimeFromString due_at}}
-  {{else}}
-    -
-  {{/if}}
-</td>
+<td>{{friendlyDatetime dueAt}}</td>
 <td>
   {{#if title}}
     {{title}}
@@ -15,14 +9,21 @@
 <td>
   {{#if alwaysAvailable}}
     -
+    <span class="screenreader-only">
+      {{#t "no_lock_or_unlock_date_for_quiz"}}
+        No lock or unlock date for quiz.
+      {{/t}}
+    </span>
   {{else}}
     {{#if hasLockDateRange}}
       {{{friendlyDateRangeString}}}
     {{else}}
-      {{#if lock_at}}
-        {{#t 'until_lock_date'}}Until {{friendlyLockAt}}{{/t}}
+      {{#if lockAt}}
+        {{friendlyLockAt}}
       {{else}}
-        {{#t 'from_unlock_date'}}From {{friendlyUnlockAt}}{{/t}}
+        {{#if unlockAt}}
+          {{friendlyUnlockAt}}
+        {{/if}}
       {{/if}}
     {{/if}}
   {{/if}}

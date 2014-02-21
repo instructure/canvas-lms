@@ -17,4 +17,3 @@ define [
         perms.create = @store.metadataFor('quiz').permissions.quizzes.create
         env.set 'env.PERMISSIONS', perms
         quizzes
-

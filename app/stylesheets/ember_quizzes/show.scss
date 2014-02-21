@@ -1,6 +1,10 @@
 #quiz-show {
   font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 
+  .edit-header {
+    padding-right: 20px;
+  }
+
   //===== Action Buttons In the Top Right Corner ===
 
   .edit-header {
@@ -21,6 +25,9 @@
     vertical-align: bottom;
     min-height: 60px;
     padding-top: 15px;
+
+    // Margin-right for the ic-actions dropdown to be absolutely positioned.
+    margin-right: 15px;
   }
 
   //===== Tabs ===
@@ -175,4 +182,28 @@
     }
 
   }
+
+  // ic-actions overrides
+
+  ic-actions {
+    position: absolute;
+    top: 41px;
+    right: 0;
+    padding-right: 5px;
+  }
+
+  ic-menu-item {
+    display: block;
+  }
+
+  ic-menu-item a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  ic-menu-list {
+    top: 32px;
+    right: 5px;
+  }
+
 }

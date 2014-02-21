@@ -19,17 +19,19 @@ define [
       container = App.__container__
       store = container.lookup 'store:main'
       quizzes = null
-      run ->
-        quizzes = [
+      run =>
+        quizzes = Em.A [
             store.createRecord('quiz', {quizType: 'survey', title: 'Test Quiz'}),
             store.createRecord('quiz', {quizType: 'graded_survey', title: 'Test survey'}),
             store.createRecord('quiz', {quizType: 'practice_quiz', title: 'Test practice quiz'}),
             store.createRecord('quiz', {quizType: 'practice_quiz', title: 'Other practice'}),
             store.createRecord('quiz', {quizType: 'assignment', title: 'Assignment test'})
           ]
-      @qc.set('model', quizzes)
+        @qc.set('model', quizzes)
 
     teardown: ->
+      run =>
+        @qc.destroy()
       run App, 'destroy'
 
   test 'raw quiz types counts calculated correctly', ->

@@ -6,19 +6,21 @@ define [
 ], ({ObjectController, computed}, $, I18n) ->
 
   DueDateTableRowController = ObjectController.extend
-    alwaysAvailable: computed.equal 'hasLockDateRange', false
+    alwaysAvailable: (->
+      !@get('lockAt') && !@get('unlockAt')
+    ).property('lockAt', 'unlockAt')
 
-    hasLockDateRange: computed.and 'lock_at', 'unlock_at'
+    hasLockDateRange: computed.and 'lockAt', 'unlockAt'
 
     friendlyLockAt: (->
-      return '' unless lockAt = @get 'lock_at'
-      $.friendlyDatetime $.fudgeDateForProfileTimezone(lockAt)
-    ).property 'lock_at'
+      return '' unless lockAt = @get 'lockAt'
+      I18n.t 'until_lock_date', 'From %{date}', date: $.friendlyDatetime lockAt
+    ).property('lockAt')
 
     friendlyUnlockAt: (->
-      return '' unless unlockAt = @get 'unlock_at'
-      $.friendlyDatetime $.fudgeDateForProfileTimezone(unlockAt)
-    ).property 'unlock_at'
+      return '' unless unlockAt = @get 'unlockAt'
+      I18n.t 'from_unlock_date', 'From %{date}', date: $.friendlyDatetime unlockAt
+    ).property('unlockAt')
 
     friendlyDateRangeString: (->
       I18n.t 'time.ranges.different_days',
@@ -26,4 +28,4 @@ define [
         wrapper: '<span>$1</span>'
         start_date_and_time: @get('friendlyUnlockAt')
         end_date_and_time: @get('friendlyLockAt')
-    ).property 'hasLockDateRange'
+    ).property('hasLockDateRange')

@@ -2,19 +2,24 @@ define [
   'ember'
   '../start_app'
   '../shared_ajax_fixtures'
+  'ic-ajax'
+  'jquery'
+  'jqueryui/dialog'
   '../environment_setup'
   'ic-ajax'
-], (Ember, startApp, fixtures, ajax) ->
+], (Ember, startApp, fixtures, ajax, $) ->
   App = null
 
   QUIZ = fixtures.QUIZZES[0]
   ASSIGNMENT_GROUP = {fixtures}
+  store = null
 
   module "Quiz Show Integration",
 
     setup: ->
       App = startApp()
       fixtures.create()
+      store = App.__container__.lookup('store:main')
 
      teardown: ->
        Ember.run App, 'destroy'
@@ -41,3 +46,45 @@ define [
     text = find('#quiz-show').text()
     ok text.match 'submission html!'
 
+  testShowPage 'allows user to delete a quiz', ->
+
+    quiz = null
+
+    click('ic-menu-trigger')
+      .then -> click('ic-menu-item.js-delete')
+      .then ->
+        stop()
+        store.find('quiz', 1).then (_quiz) ->
+          quiz = _quiz
+      .then ->
+        start()
+        ajax.defineFixture '/api/v1/courses/1/quizzes/1',
+          response: {}
+          jqXHR:
+            statusCode: 204
+          textStatus: 'success'
+        click($ '.confirm-dialog-confirm-btn')
+      .then -> wait()
+      .then ->
+          ok quiz.get('isDeleted'), 'quiz deleted'
+
+  testShowPage 'allows locking/unlocking from the dropdown menu', ->
+
+    quiz = null
+    lockAt = null
+
+    clickLockUnlockToggler = ->
+      click('ic-menu-trigger').then ->
+        click('ic-menu-item.js-due-date-toggler')
+
+    stop()
+    store.find('quiz', 1).then (_quiz) ->
+      quiz = _quiz
+      lockAt = quiz.get 'lockAt'
+      start()
+    clickLockUnlockToggler().then ->
+      ok quiz.get('lockAt') != lockAt, 'lock date updated'
+    .then ->
+      clickLockUnlockToggler()
+    .then ->
+      ok !quiz.get('lockAt'), 'can unlock quiz'
