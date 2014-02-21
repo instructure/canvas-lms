@@ -173,7 +173,7 @@ class Account < ActiveRecord::Base
   add_setting :allow_invitation_previews, :boolean => true, :root_only => true, :default => false
   add_setting :self_registration, :boolean => true, :root_only => true, :default => false
   # if self_registration_type is 'observer', then only observers (i.e. parents) can self register.
-  # else, any user type can self register.
+  # if self_registration_type is 'all' or nil, any user type can self register.
   add_setting :self_registration_type, :root_only => true
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
@@ -244,7 +244,7 @@ class Account < ActiveRecord::Base
 
   def self_registration_allowed_for?(type)
     return false unless self_registration?
-    return false if self_registration_type && type != self_registration_type
+    return false if self_registration_type && self_registration_type != 'all' && type != self_registration_type
     true
   end
 

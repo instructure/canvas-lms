@@ -302,6 +302,10 @@ define([
     displayCustomEmailFromName();
     $('.notification_from_name_option').trigger('change');
 
+    $('#account_settings_self_registration').change(function() {
+      $('#self_registration_type_radios').toggle(this.checked);
+    }).trigger('change');
+
   });
 
 });
