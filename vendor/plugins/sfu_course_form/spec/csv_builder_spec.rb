@@ -31,8 +31,34 @@ describe 'A courses request' do
     end
   end
 
+  context 'with an excessively long cross-list' do
+    it 'should fail with error' do
+      lambda do
+        # This course name from this cross-list is not too long due to omitted titles, but the SIS ID is.
+        courses = [
+            '1141:::mse:::193:::d100:::Optional Job Practicum',
+            '1141:::mse:::293:::d100:::Industrial Internship I',
+            '1141:::mse:::293:::d200:::Industrial Internship I',
+            '1141:::mse:::294:::d100:::Special Internship I',
+            '1141:::mse:::294:::d200:::Special Internship I',
+            '1141:::mse:::393:::d100:::Industrial Internship II',
+            '1141:::mse:::393:::d200:::Industrial Internship II',
+            '1141:::mse:::394:::d100:::Special Internship II',
+            '1141:::mse:::394:::d200:::Special Internship II',
+            '1141:::mse:::493:::d100:::Industrial Internship III',
+            '1141:::mse:::493:::d200:::Industrial Internship III',
+            '1141:::mse:::493:::d300:::Industrial Internship III',
+            '1141:::mse:::494:::d100:::Special Internship III',
+            '1141:::mse:::494:::d200:::Special Internship III',
+            '1141:::mse:::494:::d300:::Special Internship III'
+        ]
+        SFU::CourseForm::CSVBuilder.build('kipling', courses, 2, 'kipling', '55599068', nil, nil, true)
+      end.should raise_error
+    end
+  end
+
   context 'with an excessively long name' do
-    let(:long_name) { 'The course has a very extremely unbelievably inexplicably ridiculously crazily really really really really really really really really really really really really really really really really really really really really really really really really long name' }
+    let(:long_name) { (0...256).map { (65 + rand(26)).chr }.join }
     it 'should fail with error for a calendar course' do
       lambda do
         SFU::CourseForm::CSVBuilder.build('kipling', ["1141:::long:::999:::d100:::#{long_name}"], 2, 'kipling', '55599068', nil, nil, false)
@@ -91,12 +117,15 @@ describe 'A multiple calendar courses request' do
   end
 
   def verify_courses(expected_course_ids)
+    term = SFU::CourseForm::CSVBuilder.term('1141')
     @courses.count.should == 2
     @courses.each_with_index do |course, index|
       course['course_id'].should == expected_course_ids[index]
       course['account_id'].should == '2'
       course['term_id'].should == '1141'
       course['status'].should == 'active'
+      course['start_date'].should == term.start_at.to_s
+      course['end_date'].should == term.end_at.to_s
     end
   end
 
@@ -232,11 +261,14 @@ describe 'A cross-list course request' do
   end
 
   def verify_courses(expected_course_id)
+    term = SFU::CourseForm::CSVBuilder.term('1141')
     @courses.count.should == 1
     @courses[0]['course_id'].should == expected_course_id
     @courses[0]['account_id'].should == '2'
     @courses[0]['term_id'].should == '1141'
     @courses[0]['status'].should == 'active'
+    @courses[0]['start_date'].should == term.start_at.to_s
+    @courses[0]['end_date'].should == term.end_at.to_s
   end
 
   def verify_sections(expected_count, expected_section_ids, expected_names, expected_course_id)
@@ -384,33 +416,80 @@ end
 
 describe 'A non-calendar course request' do
 
-  before(:all) do
-    @courses_csv, @sections_csv, @enrollments_csv = SFU::CourseForm::CSVBuilder.build('kipling', ['ncc-kipling-71113273-1141-My special course'], 2, 'kipling', '55599068', nil, nil, false)
+  before do
+    @courses_csv, @sections_csv, @enrollments_csv = SFU::CourseForm::CSVBuilder.build('kipling', selected_courses, 2, 'kipling', '55599068', nil, nil, false)
     @courses = CSV.parse(@courses_csv, :headers => true)
     @sections = CSV.parse(@sections_csv, :headers => true)
   end
 
-  it 'should create one course' do
-    @courses.count.should == 1
-    @courses[0]['course_id'].should == 'ncc-kipling-71113273'
-    @courses[0]['short_name'].should == 'My special course'
-    @courses[0]['long_name'].should == 'My special course'
-    @courses[0]['account_id'].should == 'sfu:::ncc'
-    @courses[0]['term_id'].should == '1141'
-    @courses[0]['status'].should == 'active'
+  context 'for a specific term' do
+    let(:selected_courses) { ['ncc-kipling-71113273-1141-My special course'] }
+    it 'should create one course' do
+      term = SFU::CourseForm::CSVBuilder.term('1141')
+      @courses.count.should == 1
+      @courses[0]['course_id'].should == 'ncc-kipling-71113273'
+      @courses[0]['short_name'].should == 'My special course'
+      @courses[0]['long_name'].should == 'My special course'
+      @courses[0]['account_id'].should == 'sfu:::ncc'
+      @courses[0]['term_id'].should == '1141'
+      @courses[0]['status'].should == 'active'
+      @courses[0]['start_date'].should == term.start_at.to_s
+      @courses[0]['end_date'].should == term.end_at.to_s
+    end
+    it 'should not create any sections' do
+      @sections.count.should == 0
+    end
   end
 
-  it 'should not create any sections' do
-    @sections.count.should == 0
+  context 'for the default term' do
+    let(:selected_courses) { ['ncc-kipling-71113273--My special course'] }
+    it 'should create one course' do
+      @courses.count.should == 1
+      @courses[0]['course_id'].should == 'ncc-kipling-71113273'
+      @courses[0]['short_name'].should == 'My special course'
+      @courses[0]['long_name'].should == 'My special course'
+      @courses[0]['account_id'].should == 'sfu:::ncc'
+      @courses[0]['term_id'].should == ''
+      @courses[0]['status'].should == 'active'
+      @courses[0]['start_date'].should == ''
+      @courses[0]['end_date'].should == ''
+    end
+    it 'should not create any sections' do
+      @sections.count.should == 0
+    end
   end
 
 end
 
-# TODO: implement this
 describe 'A non-calendar course request' do
 
+  before do
+    @hyphenated_name = 'Introd-uction to hyphen-nation'
+    @courses_csv, @sections_csv, @enrollments_csv = SFU::CourseForm::CSVBuilder.build('kipling', ["ncc-kipling-71113273-#{term}-#@hyphenated_name"], 2, 'kipling', '55599068', nil, nil, false)
+    @courses = CSV.parse(@courses_csv, :headers => true)
+  end
+
+  def verify_courses(expected_term, expected_course_name)
+    @courses.count.should == 1
+    @courses[0]['course_id'].should == 'ncc-kipling-71113273'
+    @courses[0]['long_name'].should == expected_course_name
+    @courses[0]['account_id'].should == 'sfu:::ncc'
+    @courses[0]['term_id'].should == expected_term
+    @courses[0]['status'].should == 'active'
+  end
+
   context 'with hyphens in the course name' do
-    it 'should be handled properly'
+
+    let(:term) { '1141' }
+    it 'should be handled properly for a specific term' do
+      verify_courses(term, @hyphenated_name)
+    end
+
+    let(:term) { '' }
+    it 'should be handled properly for the default term' do
+      verify_courses(term, @hyphenated_name)
+    end
+
   end
 
 end
