@@ -934,7 +934,7 @@ shared_examples_for "all selenium tests" do
     truncate_all_tables unless self.use_transactional_fixtures
   end
 
-  unless CANVAS_RAILS2
+  unless CANVAS_RAILS2 || EncryptedCookieStore.respond_to?(:test_secret)
     EncryptedCookieStore.class_eval do
       cattr_accessor :test_secret
 
