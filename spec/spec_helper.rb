@@ -561,6 +561,7 @@ end
     @course = opts[:course] || course(opts)
     @user = opts[:user] || @course.shard.activate { user(opts) }
     @enrollment = @course.enroll_user(@user, enrollment_type, opts)
+    @user.save!
     @enrollment.course = @course # set the reverse association
     if opts[:active_enrollment] || opts[:active_all]
       @enrollment.workflow_state = 'active'
@@ -595,6 +596,7 @@ end
   def student_in_section(section, opts={})
     user
     enrollment = section.course.enroll_user(@user, 'StudentEnrollment', :section => section)
+    @user.save!
     enrollment.workflow_state = 'active'
     enrollment.save!
     @user
