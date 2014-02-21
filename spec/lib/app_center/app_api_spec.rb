@@ -28,7 +28,7 @@ describe AppCenter::AppApi do
     default_settings['apps_index_endpoint'] = '/apps'
     default_settings['app_reviews_endpoint'] = '/apps/:id'
     default_settings['token'] = 'ABCDEFG1234567'
-    PluginSetting.create(:name => api.app_center.id, :settings => default_settings)
+    PluginSetting.create!(:name => api.app_center.id, :settings => default_settings)
   end
 
   it "finds the app_center plugin" do
@@ -66,15 +66,6 @@ describe AppCenter::AppApi do
       api.fetch_app_center_response('', 12.minutes, 8, 3).should == {}
     end
 
-    it "resets the cache when getting an invalid response" do
-      enable_cache do
-        response.stubs(:body).returns('')
-        Canvas::HTTP.expects(:get).returns(response).twice()
-        api.fetch_app_center_response('', 13.minutes, 7, 4).should == {}
-        api.fetch_app_center_response('', 13.minutes, 7, 4).should == {}
-      end
-    end
-
     it "can handle an error response" do
       message = {"message" => "Tool not found", "type" => "error"}
       response.stubs(:body).returns(message.to_json)
@@ -107,6 +98,33 @@ describe AppCenter::AppApi do
       results = response['objects']
       results.size.should == 4
       response['meta']['next_page'].should be_nil
+    end
+
+    describe "caching" do
+      it "resets the cache when getting an invalid response" do
+        enable_cache do
+          response.stubs(:body).returns('')
+          Canvas::HTTP.expects(:get).returns(response).twice()
+          api.fetch_app_center_response('', 13.minutes, 7, 4).should == {}
+          api.fetch_app_center_response('', 13.minutes, 7, 4).should == {}
+        end
+      end
+
+      it "uses the configured token as part of the cache key" do
+        enable_cache do
+          Canvas::HTTP.expects(:get).returns(response).twice()
+
+          api.fetch_app_center_response('/endpoint/url', 13.minutes, 7, 4)
+
+          plugin_setting = PluginSetting.where(name: api.app_center.id).first
+          plugin_setting.settings['token'] = 'new_token'
+          plugin_setting.save!
+
+          api2 = AppCenter::AppApi.new
+
+          api2.fetch_app_center_response('/endpoint/url', 13.minutes, 7, 4)
+        end
+      end
     end
   end
 
@@ -162,7 +180,7 @@ describe AppCenter::AppApi do
 
     it "caches apps results" do
       enable_cache do
-        Canvas::HTTP.expects(:get).returns(response)
+        Canvas::HTTP.expects(:get).returns(response).once
         api.get_apps()
         api.get_apps()
       end
@@ -232,13 +250,13 @@ describe AppCenter::AppApi do
           "average_rating" => 5,
           "total_ratings" => 1,
           "config_options" => [
-            {
-                "name" => "launch_url",
-                "description" => "Launch URL",
-                "type" => "text",
-                "value" => "example.com",
-                "required" => true
-            }
+              {
+                  "name" => "launch_url",
+                  "description" => "Launch URL",
+                  "type" => "text",
+                  "value" => "example.com",
+                  "required" => true
+              }
           ]
       }
 
