@@ -386,6 +386,7 @@ describe Attachment do
         a = attachment_with_scribd_doc(fake_scribd_doc('zero'))
         course
         new_a = a.clone_for(@course)
+        new_a.save!
         new_a.read_attribute(:scribd_doc).should be_nil
         new_a.scribd_doc.id.should == a.scribd_doc.id
       end
