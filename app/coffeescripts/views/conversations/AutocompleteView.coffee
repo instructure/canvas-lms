@@ -1,13 +1,14 @@
 define [
   'i18n!conversations'
   'Backbone'
+  'jquery'
   'underscore'
   'compiled/collections/PaginatedCollection'
   'compiled/models/ConversationSearchResult'
   'compiled/views/PaginatedCollectionView'
   'jst/conversations/autocompleteToken'
   'jst/conversations/autocompleteResult'
-], (I18n, Backbone, _, PaginatedCollection, ConversationSearchResult, PaginatedCollectionView, tokenTemplate, resultTemplate) ->
+], (I18n, Backbone, $, _, PaginatedCollection, ConversationSearchResult, PaginatedCollectionView, tokenTemplate, resultTemplate) ->
 
   # Public: Helper method for capitalizing a string
   #

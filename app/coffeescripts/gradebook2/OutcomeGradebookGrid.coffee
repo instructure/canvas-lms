@@ -1,12 +1,13 @@
 define [
   'i18n!gradebook2'
+  'jquery'
   'underscore'
   'compiled/views/gradebook/HeaderFilterView'
   'compiled/views/gradebook/OutcomeColumnView'
   'compiled/gradebook2/NumberCompare'
   'jst/gradebook2/outcome_gradebook_cell'
   'jst/gradebook2/outcome_gradebook_student_cell'
-], (I18n, _, HeaderFilterView, OutcomeColumnView, numberCompare, cellTemplate, studentCellTemplate) ->
+], (I18n, $, _, HeaderFilterView, OutcomeColumnView, numberCompare, cellTemplate, studentCellTemplate) ->
 
   Grid =
     filter: ['mastery', 'near-mastery', 'remedial']

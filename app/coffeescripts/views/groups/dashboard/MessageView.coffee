@@ -1,6 +1,7 @@
 define [
+  'jquery'
   'compiled/views/QuickStartBar/MessageView'
-], (BaseMessageView) ->
+], ($, BaseMessageView) ->
 
   class MessageView extends BaseMessageView
     

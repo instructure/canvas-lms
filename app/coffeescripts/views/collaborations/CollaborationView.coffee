@@ -18,11 +18,12 @@
 
 define [
   'i18n!collaborations'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/views/collaborations/CollaboratorPickerView'
   'jst/collaborations/edit'
-], (I18n, {extend}, {View}, CollaboratorPickerView, editForm) ->
+], (I18n, $, {extend}, {View}, CollaboratorPickerView, editForm) ->
 
   class CollaborationView extends View
     events:

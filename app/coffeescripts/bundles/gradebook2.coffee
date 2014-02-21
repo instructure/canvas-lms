@@ -1,8 +1,9 @@
 require [
+  'jquery'
   'compiled/gradebook2/Gradebook'
   'compiled/views/gradebook/NavigationPillView'
   'compiled/views/gradebook/OutcomeGradebookView'
-], (Gradebook, NavigationPillView, OutcomeGradebookView) ->
+], ($, Gradebook, NavigationPillView, OutcomeGradebookView) ->
 
   isLoaded      = false
   initGradebook = () -> new Gradebook(ENV.GRADEBOOK_OPTIONS)

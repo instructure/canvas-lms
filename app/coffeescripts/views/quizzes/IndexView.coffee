@@ -1,9 +1,10 @@
 define [
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/views/quizzes/QuizItemGroupView'
   'jst/quizzes/IndexView'
-], (_, Backbone, QuizItemGroupView, template) ->
+], ($, _, Backbone, QuizItemGroupView, template) ->
 
   class IndexView extends Backbone.View
     template: template

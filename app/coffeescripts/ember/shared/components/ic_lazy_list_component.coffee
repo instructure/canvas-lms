@@ -6,7 +6,7 @@ define [
   '../templates/components/ic-lazy-list'
 ], (register, Ember, parseLinkHeader, {throttle}) ->
 
-  $window = $ window
+  $window = Ember.$ window
 
   IcLazyList = Ember.Component.extend
 

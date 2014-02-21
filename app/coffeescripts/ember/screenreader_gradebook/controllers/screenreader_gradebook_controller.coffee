@@ -112,17 +112,17 @@ define [
     ).observes('hideStudentNames')
 
     setupSubmissionCallback: (->
-      $.subscribe 'submissions_updated', _.bind(@updateSubmissionsFromExternal, this)
+      Ember.$.subscribe 'submissions_updated', _.bind(@updateSubmissionsFromExternal, this)
     ).on('init')
 
     setupAssignmentGroupsChange: (->
-      $.subscribe 'assignment_group_weights_changed', _.bind(@checkWeightingScheme, this)
+      Ember.$.subscribe 'assignment_group_weights_changed', _.bind(@checkWeightingScheme, this)
       @set 'weightingScheme', ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
     ).on('init')
 
     willDestroy: ->
-      $.unsubscribe 'submissions_updated'
-      $.unsubscribe 'assignment_group_weights_changed'
+      Ember.$.unsubscribe 'submissions_updated'
+      Ember.$.unsubscribe 'assignment_group_weights_changed'
       @_super()
 
     checkWeightingScheme: ({assignmentGroups})->
@@ -332,7 +332,7 @@ define [
     ).observes('submissions.@each')
 
     updateSubmission: (submission, student) ->
-      submission.submitted_at = $.parseFromISO(submission.submitted_at) if submission.submitted_at
+      submission.submitted_at = Ember.$.parseFromISO(submission.submitted_at) if submission.submitted_at
       set(student, "assignment_#{submission.assignment_id}", submission)
 
     assignments: Ember.ArrayProxy.createWithMixins(Ember.SortableMixin,
@@ -347,7 +347,7 @@ define [
       set as, 'sortable_name', as.name.toLowerCase()
       set as, 'ag_position', assignmentGroups.findBy('id', as.assignment_group_id).position
       if as.due_at
-        set as, 'due_at', $.parseFromISO(as.due_at)
+        set as, 'due_at', Ember.$.parseFromISO(as.due_at)
         set as, 'sortable_date', as.due_at.timestamp
       else
         set as, 'sortable_date', Number.MAX_VALUE

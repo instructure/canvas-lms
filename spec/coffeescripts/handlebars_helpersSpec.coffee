@@ -1,7 +1,8 @@
 define [
   'compiled/handlebars_helpers'
+  'jquery'
   'underscore'
-], ({helpers}, _) ->
+], ({helpers}, $, _) ->
 
   module 'handlebars_helpers'
 

@@ -18,12 +18,13 @@
 
 define [
   'i18n!conversations'
+  'jquery'
   'underscore'
   'compiled/util/shortcut'
   'compiled/conversations/MessageForm'
   'compiled/conversations/MessageProgressTracker'
   'compiled/fn/preventDefault'
-], (I18n, _, shortcut, MessageForm, MessageProgressTracker, preventDefault) ->
+], (I18n, $, _, shortcut, MessageForm, MessageProgressTracker, preventDefault) ->
 
   class MessageFormPane
     shortcut this, 'form',

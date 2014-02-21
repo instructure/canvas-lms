@@ -17,10 +17,11 @@
 #
 
 define [
+  'jquery'
   'underscore'
   'Backbone'
   'jst/courses/Syllabus'
-], (_, Backbone, template) ->
+], ($, _, Backbone, template) ->
 
   class SyllabusView extends Backbone.View
     template: template

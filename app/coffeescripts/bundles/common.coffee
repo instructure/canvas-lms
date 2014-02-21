@@ -1,4 +1,6 @@
 require [
+  'jquery'
+
   # true modules that we manage in this file
   'Backbone'
   'compiled/widget/courseList'
@@ -47,7 +49,7 @@ require [
   'vendor/jquery.pageless'
   'vendor/jquery.scrollTo'
   'compiled/badge_counts'
-], (Backbone, courseList, helpDialog, tours) ->
+], ($, Backbone, courseList, helpDialog, tours) ->
   courseList.init()
   helpDialog.initTriggers()
   tours.init()

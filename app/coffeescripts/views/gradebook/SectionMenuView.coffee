@@ -1,12 +1,13 @@
 define [
   'i18n!gradebook2'
+  'jquery'
   'underscore'
   'Backbone'
   'jst/gradebook2/section_to_show_menu'
 
   'compiled/jquery.kylemenu'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, _, {View}, template) ->
+], (I18n, $, _, {View}, template) ->
 
   class SectionMenuView extends View
 

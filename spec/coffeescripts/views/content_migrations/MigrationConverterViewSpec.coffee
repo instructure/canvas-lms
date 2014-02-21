@@ -1,7 +1,8 @@
 define [
+  'jquery'
   'Backbone'
   'compiled/views/content_migrations/MigrationConverterView'
-], (Backbone, MigrationConverterView) ->
+], ($, Backbone, MigrationConverterView) ->
   class SomeBackboneView extends Backbone.View
     className: 'someViewRendered'
     template: -> '<div id="rendered">Rendered</div>'

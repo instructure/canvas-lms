@@ -1,5 +1,6 @@
 define [
   'i18n!gradebook2'
+  'jquery'
   'underscore'
   'Backbone'
   'vendor/slickgrid'
@@ -9,7 +10,7 @@ define [
   'jst/gradebook2/outcome_gradebook'
   'vendor/jquery.ba-tinypubsub'
   'jquery.instructure_misc_plugins'
-], (I18n, _, {View}, Slick, Grid, CheckboxView, SectionMenuView, template, cellTemplate) ->
+], (I18n, $, _, {View}, Slick, Grid, CheckboxView, SectionMenuView, template, cellTemplate) ->
 
   Dictionary =
     mastery:

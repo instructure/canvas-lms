@@ -1,6 +1,7 @@
 define [
   'compiled/util/round'
   'i18n!assignments'
+  'jquery'
   'underscore'
   'compiled/models/AssignmentGroup'
   'compiled/collections/NeverDropCollection'
@@ -8,7 +9,7 @@ define [
   'compiled/views/DialogFormView'
   'jst/assignments/CreateGroup'
   'jst/EmptyDialogFormWrapper'
-], (round, I18n, _, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
+], (round, I18n, $, _, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
 
   class CreateGroupView extends DialogFormView
     defaults:

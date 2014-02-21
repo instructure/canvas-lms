@@ -1,5 +1,6 @@
 define [
   'Backbone'
+  'jquery'
   'underscore'
   'i18n!content_migrations'
   'jst/content_migrations/SelectContent'
@@ -9,7 +10,7 @@ define [
   'compiled/views/CollectionView'
   'compiled/collections/content_migrations/ContentCheckboxCollection'
   'compiled/views/content_migrations/ContentCheckboxView'
-], (Backbone, _, I18n, template, wrapperTemplate, checkboxCollectionTemplate, DialogFormView, CollectionView , CheckboxCollection, CheckboxView) ->
+], (Backbone, $, _, I18n, template, wrapperTemplate, checkboxCollectionTemplate, DialogFormView, CollectionView , CheckboxCollection, CheckboxView) ->
   class SelectContentView extends DialogFormView
 
     els:

@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'underscore'
   'Backbone'
   'jst/groups/manage/group'
   'compiled/views/groups/manage/GroupUsersView'
   'compiled/views/groups/manage/GroupDetailView'
-], (_, {View}, template, GroupUsersView, GroupDetailView) ->
+], ($, _, {View}, template, GroupUsersView, GroupDetailView) ->
 
   class GroupView extends View
 

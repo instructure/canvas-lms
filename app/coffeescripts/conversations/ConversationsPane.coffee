@@ -1,10 +1,11 @@
 define [
   'i18n!conversations.conversations_pane'
+  'jquery'
   'compiled/conversations/ConversationsList'
   'str/htmlEscape'
   'compiled/util/shortcut'
   'compiled/jquery/offsetFrom'
-], (I18n, ConversationsList, h, shortcut) ->
+], (I18n, $, ConversationsList, h, shortcut) ->
 
   class
     shortcut this, 'list',

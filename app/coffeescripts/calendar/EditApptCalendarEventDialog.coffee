@@ -1,7 +1,8 @@
 define [
   'i18n!appt_calendar_event_dialog'
+  'jquery'
   'jst/calendar/editApptCalendarEvent'
-], (I18n, editApptCalendarEventTemplate) ->
+], (I18n, $, editApptCalendarEventTemplate) ->
 
   class EditApptCalendarEventDialog
     constructor: (@event) ->

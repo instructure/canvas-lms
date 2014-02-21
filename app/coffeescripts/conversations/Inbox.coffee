@@ -18,6 +18,7 @@
 
 define [
   'i18n!conversations'
+  'jquery'
   'underscore'
   'str/htmlEscape'
   'compiled/conversations/introSlideshow'
@@ -40,7 +41,7 @@ define [
   'vendor/jquery.ba-hashchange'
   'vendor/jquery.elastic'
   'jqueryui/position'
-], (I18n, _, h, introSlideshow, ConversationsPane, MessageFormPane, audienceList, contextList, TokenInput, TextHelper, avatarPartial) ->
+], (I18n, $, _, h, introSlideshow, ConversationsPane, MessageFormPane, audienceList, contextList, TokenInput, TextHelper, avatarPartial) ->
 
   class
     constructor: (@options) ->

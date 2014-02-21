@@ -1,8 +1,9 @@
 define [
   'i18n!assignments'
+  'jquery'
   'Backbone'
   'jst/MoveDialogSelect'
-], (I18n, Backbone, template) ->
+], (I18n, $, Backbone, template) ->
 
   class MoveDialogSelect extends Backbone.View
     setViewProperties: false

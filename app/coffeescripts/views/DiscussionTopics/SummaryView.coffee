@@ -1,10 +1,11 @@
 define [
   'i18n!discussion_topics'
   'Backbone'
+  'jquery'
   'underscore'
   'jst/DiscussionTopics/SummaryView'
   'jst/_avatar'
-], (I18n, Backbone, _, template) ->
+], (I18n, Backbone, $, _, template) ->
 
   class DiscussionTopicSummaryView extends Backbone.View
 

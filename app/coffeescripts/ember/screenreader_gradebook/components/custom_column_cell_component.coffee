@@ -24,7 +24,7 @@ define [
 
     ajax: (url, options) ->
       {type, data} = options
-      $.ajaxJSON url, type, data
+      Ember.$.ajaxJSON url, type, data
 
     customColURL: ->
       ENV.GRADEBOOK_OPTIONS.custom_column_datum_url

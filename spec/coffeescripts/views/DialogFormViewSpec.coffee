@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'Backbone'
   'compiled/views/DialogFormView'
   'helpers/assertions'
   'helpers/util'
   'helpers/jquery.simulate'
-], (Backbone, DialogFormView, assert, util) ->
+], ($, Backbone, DialogFormView, assert, util) ->
 
   # global test vars
   server = null

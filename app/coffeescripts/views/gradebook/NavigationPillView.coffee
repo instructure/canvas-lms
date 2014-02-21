@@ -1,4 +1,4 @@
-define ['Backbone'], ({View}) ->
+define ['jquery', 'Backbone'], ($, {View}) ->
 
   class NavigationPillView extends View
 

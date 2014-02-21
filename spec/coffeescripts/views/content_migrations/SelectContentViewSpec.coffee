@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'Backbone'
   'compiled/views/content_migrations/SelectContentView'
   'compiled/models/ProgressingContentMigration'
   'helpers/fakeENV'
   'helpers/jquery.simulate'
-], (Backbone, SelectContentView, ProgressingMigration, fakeENV) -> 
+], ($, Backbone, SelectContentView, ProgressingMigration, fakeENV) -> 
 
   class SelectContentHelper
     @url = '/api/v1/courses/42/content_migrations/5/selective_data'
