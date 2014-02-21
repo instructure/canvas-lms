@@ -5,7 +5,18 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
+
+require 'simplecov'
+require 'simplecov-rcov'
+SimpleCov.coverage_dir('../../coverage')
+SimpleCov.at_exit {
+  SimpleCov.result
+}
+SimpleCov.command_name('activesupport-suspend-callback-gem')
+SimpleCov.start('test_frameworks')
+
 require "active_support/callbacks/suspension"
+
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true

@@ -8,6 +8,8 @@ else
   gem 'rails', :github => 'makandra/rails', :branch => '2-3-lts', :ref => 'e86daf8ff727d5efc0040c876ba00c9444a5d915'
 end
 
+gem 'simplecov', '0.8.2', :require => false
+gem 'simplecov-rcov', '0.2.3', :require => false
 gemspec
 
 platforms :ruby_20, :ruby_21 do

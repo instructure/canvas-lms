@@ -5,6 +5,15 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
+require 'simplecov'
+require 'simplecov-rcov'
+SimpleCov.coverage_dir('../../coverage')
+SimpleCov.at_exit {
+  SimpleCov.result
+}
+SimpleCov.command_name('canvas-mimetype-fu-gem')
+SimpleCov.start('test_frameworks')
+
 require "tempfile"
 require "canvas_mimetype_fu"
 
