@@ -4,6 +4,7 @@ describe FilesController do
   context "should support Submission as a context" do
     before(:each) do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      host!("test.host")
       login_as
       @me = @user
       submission_model
@@ -44,6 +45,7 @@ describe FilesController do
   context "should support User as a context" do
     before(:each) do
       user_with_pseudonym
+      host!("test.host")
       login_as
       @me = @user
       @att = @me.attachments.create(:uploaded_data => stub_png_data('my-pic.png'))
@@ -126,6 +128,7 @@ describe FilesController do
 
   it "should use relative urls for safefiles in course context" do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    host!("test.host")
     login_as
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
     HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
@@ -194,6 +197,7 @@ describe FilesController do
   it "should update module progressions for html safefiles iframe" do
     HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
     course_with_student(:active_all => true, :user => user_with_pseudonym)
+    host!("test.host")
     login_as
     @att = @course.attachments.create(:uploaded_data => stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"))
     @module = @course.context_modules.create!(:name => "module")
@@ -223,6 +227,7 @@ describe FilesController do
   context "should support AssessmentQuestion as a context" do
     before do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      host!("test.host")
       login_as
       bank = @course.assessment_question_banks.create!
       @aq = assessment_question_model(:bank => bank)
