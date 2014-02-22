@@ -24,6 +24,9 @@ de:
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "ACHTUNG: %{user} ist bereits Mitglied von %{group}"
+  LongTextEditor: 
+    cancel: Abbrechen
+    save: Speichern
   academic_benchmark: 
     api_error: "Die Standards für die Stelle %{auth} konnten nicht aktualisiert werden."
     bad_ab_file: "Die bereitgestellte Academic Benchmark-Datei weist einen Fehler auf."
@@ -387,8 +390,27 @@ de:
         successfull_restore: 
           add_enrollments: "Einschreibungen hinzufügen"
           subtext: "Was möchten Sie als nächstes tun?"
+      date_range_search: 
+        message_date_from: "Von Datum"
+        message_date_to: "Bis Datum"
+      grade_change_logging_content: 
+        auth_logging: Notenänderungsaktivität
+        find: Suchen
+        message_assignment_id: Aufgaben-ID
+        message_course_id: Kurs-ID
+      grade_change_logging_results: 
+        Assignment: Aufgabe
+        Course: Kurs
+        Grader: Benoter
+        Student: Student
+        To: An
+        date: Datum
+        from: Von
+        no_item_found: "Keine Elemente gefunden"
+        time: Uhrzeit
       logging_content_pane: 
         authentication: Anmeldungs-/Abmeldungsaktivität
+        grade_change: Notenänderungsaktivität
         select_default: "Protokolltyp auswählen"
         select_label: "Wählen Sie einen Protokolltyp aus, nach dem gesucht werden soll."
       page_title: "Verwaltungs-Tools für %{account}"
@@ -533,12 +555,10 @@ de:
         edison: 
           description: 
             header: Beispiel
-            text: "Dieser Bericht zeigt die Lernergebnisse für alle Studenten. Die erstellte CSV-Datei enthält eine Zeile pro Benutzer, die auch dessen Ergebnis beinhaltet, und zeigt die Details für das Ergebnis, einschließlich der zugehörigen Aufgaben."
+            text: "Dieser Bericht zeigt die Lernergebnisse für alle Studenten für ein bestimmtes Lernziel und einen Kurs. Die erstellte CSV-Datei enthält eine Zeile pro Benutzer und zeigt Details für das Ergebnis, einschließlich der zugehörigen Aufgaben."
     custom_outcomes_csv_parameters: 
       account_reports: 
         edison: 
-          course: 
-            text: "course_id:"
           outcome: 
             text: "outcome_id:"
     cv_submission_data_csv_description: 
@@ -726,6 +746,7 @@ de:
         site_admin_quotas: Site-Administrator-Kontingent
         student_quota: Studentenkontingent
         update: Aktualisieren
+      account_roles: "Kontorollen:"
       account_settings_title: Kontoeinstellungen
       add_a_custom_help_link: "fügen sie einen Customlink als Hilfestellung hinzu"
       add_admin_title: "Kontoadministratoren hinzufügen"
@@ -739,6 +760,8 @@ de:
       alert_icon_warning_option: Warnung
       alert_timespan: "von %{start_at} bis %{end_at}"
       alerts_title: Benachrichtigungen
+      announcement_blank_to_all: "(Wenn keine ausgewählt sind, alle alle senden)"
+      announcement_sent_to_roles: "Nur an die folgenden Benutzertypen senden:"
       announcement_sent_to_subset: "Gesendet an 1 / %{denominator} Benutzer jeden Monat"
       buttons: 
         add_users: "In Ordnung, diese Benutzer hinzufügen"
@@ -746,6 +769,7 @@ de:
         modify_users: "Zurückgehen und Benutzerliste bearbeiten"
       confirm_global_announcement: "Diese Ankündigung wird *allen* Canvas-Benutzern angezeigt. Bestätigen Sie, dass sie erstellt werden soll."
       confirm_turnitin_settings_link: "Turnitin-einstellungen bestätigen"
+      course_roles: "Kursrollen:"
       create_courses_description: "(Kontoadministratoren können immer Kurse erstellen)"
       create_courses_title: "Wer kann neue Kurse erstellen"
       custom_links_to_include_in_the_help_dialog_popup: "Customlinks, die im Hilfemenü enthalten sein sollen"
@@ -772,6 +796,7 @@ de:
       help_link_available_to_all_teachers: Dozenten
       help_link_available_to_all_users: Benutzer
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "Falls sie einen Link zum Onlinesupport ihres eigenen Campusses im Hilfefenster setzen möchten, können sie dies hier tun"
+      interpolate_account_domain: "Hinweis: Geben Sie \"{{ACCOUNT_DOMAIN}}\" ein, um die Root-Konto-Domain des Benutzers zu ersetzen"
       ip_filter_filter_label: Filter
       ip_filter_name_label: Name
       labels: 
@@ -843,6 +868,7 @@ de:
         select_type_label: "Nach Kurs oder Gruppe suchen"
         update_button: "Kontingent aktualisieren"
       never_allow_self_enrollment_option: Nie
+      no_enrollment_roles: "Nicht eingeschriebene Benutzer"
       no_language_preference: "Nicht festgelegt (Standard %{language})"
       notifications: 
         custom_name_description: "Bei Auswahl dieser Option wird das Branding in allen anderen Canvas-Benachrichtigungen ersetzt."
@@ -1031,6 +1057,20 @@ de:
           description: 
             header: Beispiel
             text: "Dieser Bericht zeigt die Lernergebnisse für alle Studenten. Die erstellte CSV-Datei enthält eine Zeile pro  Benutzer, die auch dessen Ergebnis beinhaltet, und zeigt die Details für das Ergebnis, einschließlich der zugehörigen Aufgaben. Der Bericht zeigt nur die Ergebnisse für Aufgaben und enthält keine Ergebnisse für Fragenpools."
+    student_grades_csv_description: 
+      account_reports: 
+        auburn: 
+          student_grades: 
+            description: 
+              text: "Dieser Report zeigt die endgültigen Notenergebnisse für die Studenten einer Kursperiode. Die erstellte CSV-Datei enthält eine Zeile pro Einschreibung und zeigt die aktuelle und die endgültige Note, die im Kurs-Notenbuch angezeigt werden."
+        default: 
+          description: 
+            header: Beispiel
+    student_grades_csv_parameters: 
+      account_reports: 
+        auburn: 
+          pseudonym_ids: 
+            field: Pseudonym-IDs
     student_ip_csv_description: 
       account_reports: 
         dubspot: 
@@ -1388,6 +1428,8 @@ de:
       on_paper: "Als Papierdokument"
     titles: 
       grading_scheme_info: "Benotungssystem anzeigen/bearbeiten"
+  assignment_details: 
+    no_graded_submissions: "Keine benoteten Einreichungen"
   assignment_details_dialog: 
     average_score: "Durchschnittliche Punktzahl:"
     count_of_submissions: "%{cnt} Einsendungen"
@@ -1542,6 +1584,10 @@ de:
       warnings: 
         delete_assignment_group: "Die Aufgabengruppe %{group} umfasst %{assignment_count} Aufgaben. Sie können diese löschen oder in eine andere Aufgabengruppe verschieben."
     assignments_list_content: 
+      assignments: 
+        graded: "Diese Aufgabe wurde benotet"
+        needs_grading_count: "%{needs_grading_count} Einsendungen für diese Aufgabe müssen noch benotet werden"
+        overdue: "Die Abgabefrist dieser Aufgabe ist abgelaufen"
       no_assignments: "Es wurden keine Aufgaben für diesen Kurs erstellt."
       titles: 
         assignments: Aufgaben
@@ -1699,7 +1745,6 @@ de:
     grade_pass_fail_screenreader: "Note: %{grade}"
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "Note: %{grade}%"
-    graded: "Diese Aufgabe wurde benotet"
     grading_type_selector: 
       grading_type: Benotungsart
       grading_type_options: 
@@ -1790,7 +1835,6 @@ de:
       submitting: "Wird eingesandt..."
     multiple_due_dates: "Mehrere Abgabetermine"
     name_is_required: "Name erforderlich!"
-    needs_grading_count: "%{needs_grading_count} Einsendungen für diese Aufgabe müssen noch benotet werden"
     never_drop: 
       remove_rule: "Regel entfernen"
     never_drop_collection: 
@@ -1816,7 +1860,6 @@ de:
       one: "1 Aufgabe"
       other: "%{count} Aufgaben"
     other_assignments: "Sonstige Aufgaben"
-    overdue: "Die Abgabefrist dieser Aufgabe ist abgelaufen"
     peer_review_assignment: 
       titles: 
         remind_reviewer: "%{user} an Beurteilung erinnern"
@@ -1848,6 +1891,7 @@ de:
       titles: 
         automatically_assign_reviews: "Korrekturen automatisch zuweisen"
         remind: "%{assessor} an Beurteilung erinnern, zuletzt benachrichtigt %{time}"
+        reminder: "%{assessor} an Beurteilung erinnern, zuletzt benachrichtigt %{time}"
     peer_reviews_selector: 
       labels: 
         automatically_assign_peer_reviews: "Peer-Reviews automatisch zuweisen"
@@ -1856,7 +1900,6 @@ de:
       locked_until: "Überprüfungen zuweisen"
       peer_reviews_assign_at_explanation: "Muss nach dem Abgabetermin liegen. Bei leerem Feld gilt der Abgabetermin."
       reviews_per_user: "Überprüfungen pro Benutzer"
-    percent_of_final_grade: "%{percent} der Gesamtnote"
     points_possible_number: "Der Wert für die möglichen Punkte muss eine Zahl sein"
     positive_number: "Sie müssen eine positive Zahl verwenden"
     redirect_page: 
@@ -2195,12 +2238,12 @@ de:
     done: Fertig
     filter: Filter
     find_user: "Nach Benutzer suchen"
-    hide_all_artifacts: "Alle Artefakte ausblenden"
     import: Importieren
     login: Anmeldung
     manage_rubrics: "Rubriken verwalten"
     masquerade: "Sich als Benutzer ausgeben"
     ok: OK
+    okay: OK
     refresh: Aktualisieren
     save: Speichern
     search: Suchen
@@ -2786,8 +2829,6 @@ de:
     new: 
       pin_to_canvas_network: "Pin für das Canvasnetzwerk"
       saved_successfully: "Erfolgreich gespeichert"
-  collection_view: 
-    no_items: "Keine Elemente."
   comm_messages: 
     from_beginning: "der Anfang"
     to_now: jetzt
@@ -2867,10 +2908,6 @@ de:
     disabled_error: "Für diese Canvas-seite wurden keine Webkonferenzen aktiviert"
     edit_conference_form: 
       advanced_settings: "Erweiterte Einstellungen verwalten..."
-      buttons: 
-        cancel: Abbrechen
-        create_conference: "Konferenz erstellen"
-        update_condference: "Konferenz aktualisieren"
       conference_type: Typ
       description: Beschreibung
       duration: Dauer
@@ -2887,8 +2924,6 @@ de:
       concluded_conferences: "Abgeschlossene Konferenzen"
       new_conference: "Neue Konferenz"
       new_conferences: "Neue Konferenzen"
-      no_concluded_conferences: "Es sind keine abgeschlossenen Konferenzen vorhanden"
-      no_new_conferences: "Es sind keine neuen Konferenzen vorhanden"
       page_title: Webkonferenzen
     loading_urls_message: "Ladevorgang. Bitte warten..."
     multiple_urls_message: "Für diese Konferenz existieren mehrere %{type}-seiten. Bitte auswählen:"
@@ -2903,7 +2938,8 @@ de:
       setings: Einstellungen
       start: Start
       view: Anzeigen
-    new_conference_title: "Neue Konferenz"
+    no_concluded_conferences: "Es sind keine abgeschlossenen Konferenzen vorhanden"
+    no_new_conferences: "Es sind keine neuen Konferenzen vorhanden"
     no_settings_error: "Für diese Konferenz existiert keine Seite 'Erweiterte Einstellungen'."
     no_urls_error: "Offenbar sind noch keine %{type}-seiten für diese Konferenz verfügbar."
     notifications: 
@@ -2922,7 +2958,6 @@ de:
         new: "Hat noch nicht begonnen"
         started: "Begonnen um %{time}"
     type_disabled_error: "Diese Konferenzart ist für diese Canvas-seite nicht länger verfügbar"
-    update_conference_title: "Konferenz aktualisieren"
   content_exports: 
     buttons: 
       process: "Daten verarbeiten"
@@ -2960,6 +2995,7 @@ de:
       no_only_and_except: "Die Optionen \"nur\" und \"ohne\" können nicht gleichzeitig verwendet werden."
     files: 
       buttons: 
+        cancel: Abbrechen
         skip: "Diesen Schritt überspringen"
       description: "Sie können eine Zip-datei aus mehreren Einzeldateien in Ihren Kurs hochladen, die dort automatisch extrahiert werden. Mit dieser Methode können Sie Dateien eines anderen Systems problemlos in Canvas importieren."
       page_title: "Dateien importieren"
@@ -3019,9 +3055,6 @@ de:
       options: Optionen
     common_cartridge: 
       options: Optionen
-    content_checkbox: 
-      select_all: "Alle auswählen"
-      select_non: "Keine auswählen"
     content_migration: Inhaltsmigration
     content_migration_issue: 
       error_report: Fehlerbericht
@@ -3047,6 +3080,8 @@ de:
       options: Optionen
     must_upload_file: "Hochladen einer Datei oder URL erforderlich"
     no_content_selected: "Sie haben keine Inhalte zum Importieren ausgewählt."
+    no_day_substitutions: "Keine Tages-Verschiedungen hinzugefügt"
+    no_migrations_running: "Derzeit werden keine Migrationen ausgeführt"
     progressing_content_migration: 
       issues_text: Probleme
       select_content: "Inhalt auswählen"
@@ -3060,6 +3095,7 @@ de:
       options: Optionen
     school_required: "Sie müssen eine Schule auswählen."
     select_content: 
+      cancel_btn: Abbrechen
       select_content_btn: "Inhalt auswählen"
     select_course: "Kurs auswählen"
     show_issues: "Probleme anzeigen"
@@ -3308,6 +3344,7 @@ de:
         user_access_report: "%{user} Zugriffsbericht"
       links: 
         back_to_user: "Zurück zur Benutzerseite"
+      loading_more_results: "Weitere Ergebnisse laden"
       table_headings: 
         content: Inhalt
         last_viewed_time: "Zuletzt aufgerufen"
@@ -3316,10 +3353,13 @@ de:
       titles: 
         access_report: Zugriffsbericht
     undelete_index: 
+      are_you_sure: "Möchten Sie %{item_name} wirklich wiederherstellen?"
       headings: 
         restore__items: "Gelöschte Elemente wiederherstellen"
       help: 
         restore_items: "Bitte bedenken Sie, dass einige Elemente zugeordnete Daten durch das Löschen verloren haben können. Beachten Sie, dass die Ergebnisse jeder Datenwiederherstellung bestätigt werden müssen."
+      restore_failed: "Wiederherstellung fehlgeschlagen"
+      restoring: "Wird wiederhergestellt ..."
   context_external_tool: 
     external_tool_attention_needed: "Die Sicherheitsparameter für das externe Tool \"%{tool_name}\" werden über die Kurseinstellungen konfiguriert."
     url_or_domain_required: "Entweder URL oder Domain angeben."
@@ -4222,23 +4262,6 @@ de:
     greater_than_three: "Geben Sie einen Suchbegriff mit drei oder mehr Zeichen ein"
     unknown_error: "Bei Ihrer Suche ist ein Problem aufgetreten. Versuchen Sie es erneut."
   courses: 
-    add_users: 
-      buttons: 
-        add_users: "In Ordnung. Diese Benutzer hinzufügen"
-        continue: Fortfahren...
-        modify_users: "Zurückgehen und Benutzerliste bearbeiten"
-      cannot_add_users_to_concluded_course: "Sie können keine Benutzer zu einem abgeschlossenen Kurs hinzufügen."
-      headings: 
-        add_users: "Kursbenutzer hinzufügen"
-      invite_to_unpublished_course: "Da der Kurs noch nicht veröffentlicht wurde, können Studenten und Lehrassistenten zwar hinzugefügt werden, erhalten jedoch keine Einladung zur Teilnahme am Kurs. Die Einladungen werden verschickt, sobald der Kurs veröffentlicht wurde."
-      labels: 
-        course_section_id: "Für den Abschnitt"
-      limit_privileges_to_course_section: "Diese Administratoren können nur Studenten in ihrem Abschnitt benoten"
-      links: 
-        add_users: "Benutzer hinzufügen"
-      teacherless_invite_details: "Wenn Sie einen Dozenten einladen und dieser die Einladung akzeptiert, geben Sie dadurch Ihre Administratorberechtigungen für diesen Kurs auf."
-      titles: 
-        course_section: Kursabschnitt
     assignments_needing_grading: 
       headings: 
         grade: "Note %{assignment}"
@@ -4393,11 +4416,6 @@ de:
         teacher: "Sie wurden eingeladen, an diesem Kurs als *Dozent* über das Benutzerkonto *%{user}* teilzunehmen."
       invitiation: 
         look_around: "Bitte schauen Sie sich auf den Kursseiten in aller Ruhe um. Sobald Sie sich entschieden haben, können Sie die Einladung entweder akzeptieren oder ablehnen."
-    enrollment_type_select: 
-      labels: 
-        enrollment_type: "Weitere hinzufügen"
-      titles: 
-        enrollment_type: Einschreibungstyp
     errors: 
       create_failed: "Kurserstellung fehlgeschlagen"
       invalid_role: "Ungültiger Rollentyp"
@@ -4982,6 +5000,10 @@ de:
       - Dezember
   dates: 
     no_date: "Kein Datum"
+  dates_available_component: 
+    available: Verfügbar
+    due: Fällig
+    multiple_dates: "Mehrere Daten"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -5153,7 +5175,7 @@ de:
     discussion: 
       close_for_comments: "Für Kommentare schließen"
       delete: Löschen
-      due_at: "*Fällig* %{assignment.display_due_at}"
+      due: Fällig
       graded_discussion: "Benotete Diskussion"
       last_post_date: "Letzter Beitrag %{display_last_reply_at}"
       manage: Verwalten
@@ -5184,6 +5206,9 @@ de:
       allow_threaded_replies: "Gelistete Antworten zulassen"
       attachment: Anhang
       available_from: "Verfügbar ab"
+      buttons: 
+        not_published: "Nicht veröffentlicht"
+        published: Veröffentlicht
       delay_posting: "Einstellen verzögern"
       enable_podcast_feed: "Podcast-feed zulassen"
       include_replies_in_podcast_feed: "Antworten in Podcast-feed miteinbeziehen"
@@ -5258,8 +5283,8 @@ de:
       add_rubric: "Rubrik hinzufügen"
       announcement_closed: "Für diese Ankündigung können keine Kommentare abgegeben werden"
       announcement_locked: "Diese Ankündigung ist für Benutzer bis zum *%{date}* nicht sichtbar"
+      announcement_locked_until: "Diese Ankündigung ist gesperrt bis %{time}"
       announcement_not_visible: "Diese Ankündigung ist für Benutzer nicht sichtbar"
-      announcement_will_open_on: "Für diese Ankündigung können am *%{date}* Kommentare abgegeben werden"
       authors_name: "Name des Autors"
       collapse_replies: "Antworten minimieren"
       confirm_delete_discussion: "Möchten Sie diese Diskussion wirklich löschen?"
@@ -5292,13 +5317,13 @@ de:
       speed_grader: "Speed Grader"
       topic: Thema
       topic_locked: "Dieses Thema ist bis *%{date}* für Benutzer nicht sichtbar"
+      topic_locked_until: "Dieses Thema ist bis %{time} gesperrt"
       topic_not_visible: "Dieses Thema ist für Benutzer nicht sichtbar"
       topic_podcast_feed_link: "Podcast-feed des Themas"
       topic_subscribe: Anmelden
       topic_subscribe_tooltip: "Sie haben sich abgemeldet und erhalten keine Benachrichtigungen über neue Kommentare."
       topic_subscribed_tooltip: "Sie haben sich angemeldet und erhalten Benachrichtigungen über neue Kommentare."
       topic_unsubscribe: Angemeldet
-      topic_will_open_on: "Für dieses Thema können am *%{date}* Kommentare abgegeben werden"
       unlock_topic: "Für Kommentare öffnen"
       unread: Ungelesen
     sub_entry: 
@@ -5368,7 +5393,6 @@ de:
       attach_file: Anhängen
       cancel: Abbrechen
       post_reply: "Antwort veröffentlichen"
-      switch_views: "Ansicht wechseln"
       write_a_reply: Antwort
     results_entry: 
       authors_name: "Name des Autors"
@@ -5391,11 +5415,10 @@ de:
     unsubscribed: Abgemeldet
     unsubscribed_hint: "Sie haben sich nicht für dieses Thema angemeldet. Klicken Sie, um sich anzumelden."
   draft_state_description: |-
-      Der Status "Entwurf" ist eine *Beta*-Funktion, mit der Kursinhalte veröffentlicht werden können und deren Veröffentlichung rückgängig gemacht werden kann.
-      Nicht veröffentlichte Inhalte werden den Studenten nicht angezeigt und haben keinen Einfluss auf die Noten.
-      Der Status umfasst außerdem ein Neudesign für eine Reihe von Kursbereichen, um deren Aussehen und Funktionen konsistenter zu machen.
-      
-      Nicht veröffentlichte Inhalte sind möglicherweise nicht verfügbar, wenn der Status "Entwurf" deaktiviert ist.
+      Diese Beta-Funktion gestaltet viele Bereiche von Canvas neu und ermöglicht, dass Inhalte
+      als nicht veröffentlichte Inhalte vorhanden sind, die für Studenten nicht sichtbar und von
+      der Benotung ausgeschlossen sind. Achtung: Wenn Sie diese Funktion deaktivieren, können neu
+      erstellte oder bearbeitete Inhalte aus der Dozentenansicht gelöscht werden.
   due_dates: 
     due_at: "fällig: %{assignment_due_date_time}"
     multiple_due_dates: "fällig: Mehrere Abgabetermine"
@@ -5435,16 +5458,19 @@ de:
     image_not_found: "Bild wurde nicht gefunden, bitte probieren Sie es mit einer anderen URL"
     instructions: "Tippen oder fügen Sie die URL des Bildes ein, das Sie einfügen möchten:"
     loading: "Ladevorgang läuft..."
+    mathjax_text_entry_field_label: "Geben Sie die Gleichung als LaTeX ein."
     more_external_tools: "Weitere externe Tools"
     role: 
       duplicate_role_error: "Die Rolle konnte nicht erstellt werden, da bereits eine Rolle mit diesem Namen vorhanden ist. Verwenden Sie einen anderen Namen."
       remove_role_confirmation: "Wenn Benutzer mit dieser Rolle vorhanden sind, behalten sie die derzeitigen Berechtigungen bei. Sie können jedoch keine neuen Benutzer mit dieser Rolle erstellen. Klicken Sie auf \"OK\", um mit dem Löschen der Rolle fortzufahren."
     save_failed: "Konnte nicht gespeichert werden, bitte versuchen Sie es später nochmal"
     saving: "Speichervorgang läuft..."
+    screen_reader_tip: "Benutzer von Sprachausgabeprogrammen: Um auf einfache Weise auf diesen Editor zuzugreifen, wechseln Sie in die erweiterte Ansicht,, und geben Sie entweder LaTeX direkt oder mithilfe der Symbolleiste ein. Sie finden den Link zur erweiterten Ansicht am Ende des Dialogfelds, vor dem Bearbeitungsfeld."
     search_flickr: "Durchsuchen Sie flickr creative commons"
+    switch_editor_html: HTML-Editor
+    switch_editor_visual: "Visual Editor"
     switch_to_mathjax: "Zur Basisansicht wechseln"
     switch_to_mathquill: "Zur erweiterten Ansicht wechseln"
-    switch_views: "Ansicht wechseln"
     tabs: 
       arrows: Pfeile
       basic: Standard
@@ -5666,7 +5692,6 @@ de:
         portfolio: "Normalansicht des ePortfolios aufrufen"
         rich_content: "Formatierter Text (Rich Text)"
         share: "Kopieren Sie diesen Link, um anderen den Zugang zu Ihrem privaten ePortfolio zur ermöglichen."
-        switch_views: "Ansicht wechseln"
         view_original: "Originaldatei anzeigen"
         wizard: Einführungsassistent
       login_required: "Sie müssen *angemeldet* sein, um Kommentare auf dieser Seite einzustellen."
@@ -5971,7 +5996,18 @@ de:
       no_features_available: "Derzeit sind keine Funktionen verfügbar."
   features: 
     draft_state: "Status \"Entwurf\""
+    draft_state_account_disable_warning: |-
+        Die Deaktivierung dieser Funktion wirkt sich auf vorhandene Kurse aus. Um Hilfestellung bei der Deaktivierung
+        
+        der Funktion zu erhalten, wenden Sie sich an Ihren Canvas Success Manager.
+    draft_state_course_disable_warning: |-
+        Bei Deaktivierung dieser Funktion werden ALLE im Kurs vorhandenen Objekte veröffentlicht. Bevor Sie fortfahren,
+        stellen Sie sicher, dass alle Entwurfsinhalte bereit für die Veröffentlichung sind und allen Benutzern des Kurses zur Verfügung stehen.
     google_docs_domain_restriction: "Google Docs Domain-Beschränkung"
+    outcome_gradebook: "Notenbuch für Ergebnisse"
+    screenreader_gradebook: "Sprachausgabeprogramm – Notenbuch"
+  file_browser_view: 
+    folder_tree_instructions: "Verwenden Sie die Nach-oben- und die Nach-unten-Tasten, um in der Baumstruktur zu navigieren. Drücken Sie die Nach-rechts-Taste, um Ordner zu erweitern, die Nach-links-Taste, um sie auszublenden, und die Eingabetaste, um ein Bild auszuwählen."
   filebrowserview: 
     course_files: Kursdateien
     group_files: Gruppendateien
@@ -6050,6 +6086,7 @@ de:
         download_as_zip: "Die Dateien in diesem Ordner als Zip-datei herunterladen"
         download_file: "Diese Datei herunterladen"
         download_with_size: "Die Datei herunterladen (%{size})"
+        download_zip: "Zum Herunterladen hier klicken %{size}"
         edit_content: "Inhalt bearbeiten"
         import_zip: "Eine Zip-datei importieren"
         lock_file: "Diese Datei sperren"
@@ -6064,16 +6101,21 @@ de:
       locked: "Diese Datei ist noch nicht freigegeben und kann nicht heruntergeladen werden."
       locked2: "Diese Datei ist gesperrt und kann von Studenten nicht heruntergeladen werden."
       messages: 
+        creating_zip: "Zip-datei wird erstellt..."
         gathering_and_zipping: |-
             **Die Inhalte dieses Ordners werden gesammelt** und zu einer
             Zip-datei komprimiert.  Dies kann abhängig von der Größe und Anzahl der Dateien eine Weile dauern.
+        gathering_data: "Daten werden gesammelt..."
         gathering_files: "Dateien werden gesammelt..."
+        gathering_files_with_progress: "Dateien werden gesammelt (%{progress}%)..."
         no_preview_avaialble: "Keine Vorschau verfügbar"
         uploading: "5 Dateien werden hochgeladen..."
+        zip_finished: "Fertig!  Weiterleitung zu Datei..."
       page_title: Dateien
       storage_used: "Verwendeter Speicherplatz: %{size1} von %{size2}"
       switch_views: "Ansichten wechseln"
       titles: 
+        download_folder_contents: "Ordnerinhalte herunterladen"
         edit_file: "%{file} bearbeiten"
         edit_file_contents: "Dateiinhalte bearbeiten"
         file_locked: Gesperrt
@@ -6084,10 +6126,8 @@ de:
         too_many: "Es gibt zu viele Kurse/Gruppen, um alle gleichzeitig zu zeigen. Gezeigt werden die ersten 15 Ergebnisse."
     links: 
       add_files: "Dateien hinzufügen"
-      download_zip: "Zum Herunterladen hier klicken %{size}"
     messages: 
       access_denied: "Sie können die Inhalte dieses Ordners nicht anzeigen."
-      creating_zip: "Zip-datei wird erstellt..."
       done_uploading: "Upload abgeschlossen"
       error_count: 
         one: "1 Fehler"
@@ -6095,8 +6135,6 @@ de:
       extraction_complete: "Extraktion abgeschlossen!  Dateistruktur wird aktualisiert..."
       finalizing: Fertigstellen
       folder_empty: "Keine Inhalte in diesem Ordner"
-      gathering_data: "Daten werden gesammelt..."
-      gathering_files_with_progress: "Dateien werden gesammelt (%{progress}%)..."
       loading_files: "Dateien werden geladen..."
       no_files_selected: "Es wurden keine gültigen Dateien ausgewählt"
       queued: "In Warteschlange"
@@ -6106,7 +6144,6 @@ de:
       uploading_files: 
         one: "1 Datei wird hochgeladen..."
         other: "%{count} Dateien werden hochgeladen..."
-      zip_finished: "Fertig!  Weiterleitung zu Datei..."
     new: 
       buttons: 
         create: Erstellen
@@ -6128,7 +6165,6 @@ de:
       page_title: Dateivorschau
     titles: 
       click_and_drag: "Klicken und ziehen, um den Ordner in einen anderen Ordner zu verschieben"
-      download_folder_contents: "Ordnerinhalte herunterladen"
       drag_to_move: "Ziehen zum Verschieben in einen anderen Ordner"
       extracting: "Dateien in Ordner extrahieren"
       file_uplaods_queue: "Warteschleife für Dateiuploads"
@@ -6223,6 +6259,7 @@ de:
     graded_then_resubmitted: "benotet und anschließend neu eingesandt um (%{when})"
     gradee_index_of_total: "%{gradee} %{x} von %{y}"
     group: Gruppe
+    hide_all_details_button: "Alle Details ausblenden"
     hide_all_things: "Alle %{things} ausblenden"
     hide_column: "Spalte ausblenden"
     hide_student_name: "Namen des Studenten ausblenden"
@@ -6249,6 +6286,7 @@ de:
     reupload_submissions: "Einsendungen erneut hochladen"
     set_default_grade: "Standardnote festlegen"
     set_group_weights: "Gruppengewichtungen festlegen"
+    show_all_details_button: "Alle Details anzeigen"
     show_student_name: "Namen des Studenten anzeigen"
     showing_all_sections: "Alle Kursabschnitte werden angezeigt"
     showing_section: "Angezeigter Kursabschnitt: %{section}"
@@ -6306,6 +6344,9 @@ de:
       this_assignment_is_muted: "Die Aufgabe ist stummgeschaltet"
       zero_point_assignment: "Für die Aufgaben in dieser Gruppe können keine Punkte vergeben werden, und sie können bei der Notenberechnung nicht berücksichtig werden"
     concluded_course_error_message: "Dies ist ein abgeschlossener Kurs. Aus diesem Grund stehen nur abgeschlossene Einschreibungen zur Verfügung."
+    course_average: Kursdurchschnitt
+    course_median: "Mittelwert für den Kurs"
+    course_mode: Kursmodus
     dropped_for_grading: "Bleibt bei der Bewertung unberücksichtigt"
     error: 
       update: "Beim Aktualisieren der Aufgabe ist ein Fehler aufgetreten. Aktualisieren Sie die Seite, und versuchen Sie es erneut."
@@ -6320,6 +6361,11 @@ de:
       re_upload_submissions: "Einsendungen erneut hochladen"
       set_default_grade: "Standardnote festlegen"
       speedgrader: SpeedGrader
+    header_filter: 
+      course_average: Kursdurchschnitt
+      course_median: "Mittelwert für den Kurs"
+      course_mode: Kursmodus
+    hide_notes: "Anmerkungsspalte ausblenden"
     hide_student_names: "Namen der Studenten ausblenden"
     invalid_assignment_groups_warning: 
       one: "%{groups} ist in der Punktzahl nicht enthalten, da hierfür keine Punkte vergeben werden können"
@@ -6335,9 +6381,20 @@ de:
       goto_assignment: g
       menu: m
       sort: s
+    learning_outcome: Lernergebnis
+    mastery: "Leistungsziel erreicht"
+    near_mastery: "Leistungsziel fast erreicht"
     no_assignments_have_points_warning: "Die Punktzahl kann erst berechnet werden, wenn für die Aufgabe Punkte vergeben werden können"
+    notes: Anmerkungen
+    outcome_gradebook: 
+      toggle_sidebar: "Seitenleiste ein/aus"
+    outcome_popover: 
+      mastery_set_at: "Leistungsziel festgelegt als"
+      no_results: "(keine Ergebnisse)"
+      view_more_details: "Weitere Details anzeigen"
     percent_of_grade: "%{percentage} der Note"
     points_out_of: "von insgesamt %{points_possible}"
+    remedial: Abhilfemaßnahme
     resubmitted: "seit letzter Benotung erneut eingesandt"
     row_student_name: 
       student_placeholder: Student
@@ -6346,22 +6403,24 @@ de:
     secondary_id: Zweit-ID
     section_to_show_menu: 
       choose_a_section_to_show: "Wählen Sie einen Kursabschnitt aus, der angezeigt werden soll"
+      showing_sections: "*%{currentSection}* wird angezeigt"
     show: 
-      all_sections: "Alle Abschnitte"
       arrange_columns_by_due_date: "Spalten nach Abgabefrist sortieren"
       arrange_columns_by_group: "Spalten nach Aufgabengruppe sortieren"
       download_scores: "Punktzahlen herunterladen (.csv)"
       filter_by_student: "Nach Studentenname oder Zweit-ID filtern"
-      go_back_to_the_old_gradebook: "Zum alten Notenbuch zurückkehren"
+      grades: Noten
       hide_student_names: "Namen der Studenten ausblenden"
-      include_ungraded: "Nicht benotete Aufgaben als Ausfälle behandeln"
+      include_ungraded: "Nicht benotet als 0 behandeln"
+      learning_mastery: "Lernziel erreicht"
+      old_gradebook: "altes Notenbuch"
       publish_to_sis: "Noten im SIS veröffentlichen"
       set_group_weights: "Gruppengewichtungen festlegen"
       show_attendance_columns: "Anwesenheitsspalten anzeigen"
       show_concluded_enrollments: "Abgeschlossene Einschreibungen anzeigen"
-      showing_sections: "Jetzt angezeigt: *%{section_being_shown}*"
       upload_scores: "Punktzahlen hochladen (von .csv)"
       view_grading_history: "Notenverlauf anzeigen"
+    show_notes: "Anmerkungsspalte anzeigen"
     show_student_names: "Namen der Studenten anzeigen"
     student_name: "Name des Studenten"
     students_who: 
@@ -6544,7 +6603,6 @@ de:
       media_comment: "Dies ist ein Multimediakommentar,"
       not_official: "*ANMERKUNG*: Dies ist NICHT Ihre offizielle Punktzahl."
       page_title: "Noten für %{student}"
-      percent: Prozent
       print_grades: "Noten drucken"
       see_rubric_results: "Siehe Rubrikergebnisse"
       see_rubric_results_screenreader: "Rubrik-Ergebnisse anzeigen"
@@ -6555,10 +6613,12 @@ de:
       student_mute_notification: "Dozent arbeitet zurzeit an der Benotung"
       submission_score: "*%{score}* von insgesamt %{possible}"
       titles: 
+        enter_score: "Punktestand zum Testen eingeben"
         revert_score: "Zu ursprünglicher Punktzahl zurückkehren"
         turnitin_score: "Turnitin-similarity-score -- weitere Informationen"
         view_rubric_evaluation: "Rubrik-bewertung anzeigen"
         view_scoring_details: "Bewertungsdetails anzeigen"
+      total: Gesamt
     gradebook: 
       all_sections: Alle
       assignment_submitted_late: (verspätet)
@@ -6815,6 +6875,12 @@ de:
       total: Gesamt
   grading_box: 
     out_of_points_possible: "von insgesamt %{assignment.points_possible}"
+  grading_cell: 
+    grade_complete: Abgeschlossen
+    grade_incomplete: Unvollständig
+    grade_ungraded: "Nicht benotet"
+    out_of: "(von %{points})"
+    out_of_with_score: "(%{score} von %{points})"
   grading_standard: 
     unknown_grading_details: "Unbekannte Details"
   grading_standards: 
@@ -6842,7 +6908,6 @@ de:
     titles: 
       grading_scheme_info: "Benotungssystem anzeigen/bearbeiten"
   group: 
-    default_collection_name: "%{group_name}s Sammlung"
     memeber: Mitglied
     name_required: "Name erforderlich"
     name_too_long: "Kürzeren Gruppennamen eingeben"
@@ -6864,6 +6929,7 @@ de:
       communities: Gemeinschaften
       imported: "Importierte Gruppen"
       student_organized: Studentengruppen
+      uncategorized: "Nicht kategorisiert"
     invalid_self_signup: "Selbstregistrierung muss einen der folgenden Werte aufweisen: %{values}"
     name_required: "Name erforderlich"
     name_reserved: "%{name} ist ein reservierter Name."
@@ -7077,7 +7143,7 @@ de:
         save: Speichern
         saving: "Wird gespeichert..."
         self_signup: Selbstregistrierung
-        split_into_groups: "Studenten in %h{split_num} gleiche Gruppen aufteilen"
+        split_into_groups: "Studenten in %h{num_groups} gleich große Gruppen aufteilen"
       group_category_detail: 
         add_group: "Gruppe hinzufügen"
         category_settings: Einstellungen
@@ -7091,6 +7157,7 @@ de:
         self_organized_warning: "Diese Gruppen werden von Studenten selbst organisiert. Im Gegensatz zu anderen Gruppenarten können Studenten mehr als einer dieser Gruppen gleichzeitig angehören. Deshalb können diese Gruppen nicht für benotete Aufgaben verwendet werden."
         self_signup_blurb: "Selbstregistrierung für diese Gruppen wurde aktiviert."
         settings: Einstellungen
+        uncategorized_groups: "Diese Gruppen sind nicht mit einem bestimmten Gruppensatz verknüpft. Das sie über SIS importiert wurden, können sie nur über SIS aktualisiert oder gelöscht werden."
       group_category_edit: 
         allow_self_signup: "Selbstregistrierung zulassen"
         cancel: Abbrechen
@@ -7125,10 +7192,12 @@ de:
         remove: Entfernen
         remove_from_group: "%{name} aus Gruppe entfernen"
       group_users: 
+        add_student: "Fügen Sie einen Studenten hinzu, um zu beginnen."
+        add_user: "Fügen Sie einen Benutzer hinzu, um zu beginnen."
         no_matching_students: "Keine übereinstimmenden Studenten."
         no_matching_users: "Keine übereinstimmenden Benutzer."
-        no_students: "Derzeit sind keine Studenten in dieser Gruppe vorhanden. Fügen Sie einen Studenten hinzu, um zu beginnen."
-        no_users: "Derzeit sind keine Benutzer in dieser Gruppe vorhanden. Fügen Sie einen Benutzer hinzu, um zu beginnen."
+        no_students: "Diese Gruppe enthält derzeit keine Studenten."
+        no_users: "Diese Gruppe enthält derzeit keine Benutzer."
       groups: 
         no_groups: "Derzeit sind keine Gruppen in diesem Gruppensatz vorhanden. Fügen Sie eine Gruppe hinzu, um zu beginnen."
         no_matching_groups: "Es sind keine Gruppen vorhanden, die mit Ihrem derzeitigen Suchbegriff übereinstimmen."
@@ -7160,6 +7229,7 @@ de:
       students_assigned: "Die Studenten wurden den Gruppen zugewiesen."
       update_success: "Die Gruppe wurde erfolgreich aktualisiert."
       welcome: "Willkommen in der Gruppe %{group_name}!"
+    positive_group_count: "Eingabe einer positiven Zahl für die Gruppe erforderlich"
     randomly_assigning_members: "Studenten werden nach dem Zufallsprinzip zugewiesen"
     show: 
       coming_up: Demnächst
@@ -7284,6 +7354,7 @@ de:
       view_equella_content_in_new_window: "Inhalt in neuem Fenster anzeigen"
     loading: "Ladevorgang läuft..."
     no_description: "Keine Beschreibung"
+    no_items: "Keine Elemente."
     no_results_found: "Keine Ergebnisse gefunden"
     status: 
       diigo_search_throttling: "Diigo begrenzt Benutzer auf einen Suchvorgang pro 10 Sekunden.  Bitte warten ..."
@@ -7515,7 +7586,6 @@ de:
       feedback: "Klicken Sie hier und beschreiben Sie uns das Problem."
     help: Hilfe
     show_me_where: Wo?
-    switch_views: "Ansicht wechseln"
   locales: 
     de: Deutsch
     en: Englisch
@@ -9549,6 +9619,7 @@ de:
   name: "Academic Benchmark Importer"
   new_facebook_message: "Sie haben eine neue Nachricht von Canvas"
   no_migration_file: "Für die Inhaltsmigration ist eine Datei erforderlich."
+  not_a_number: "muss eine positive Zahl sein"
   not_applicable: k. A.
   notification: 
     added_to_conversation_description: "Sie werden zu einer Konversation hinzugefügt"
@@ -9753,6 +9824,11 @@ de:
     : Nein
     ? "yes"
     : Ja
+  outcome_gradebook_description: |-
+      Mithilfe des Notenbuchs mit Ergebnissen können Dozenten den Fortschritt von Studenten und
+      Kursen in Bezug auf die Lernergebnisse des Kurses schnell anzeigen. Die Ergebnisse werden in
+      einem Notenbuch-ähnlichen Format und die Fortschritte der Studenten als numerischer Punktestand
+      und als Leistungziel erreicht/Leistungsziel fast erreicht/Wiederholung angezeigt.
   outcome_groups: 
     invalid_file: "Ungültige Resultatsgruppen-datei"
   outcome_groups_api: 
@@ -10134,10 +10210,12 @@ de:
         domain: "Für serverbasierte Benutzerkonten verwenden Sie \"www.kaltura.com\""
         resource_domain: "Für serverbasierte Benutzerkonten verwenden Sie \"cdn.kaltura.com\""
         rtmp_domain: "Für serverbasierte Benutzerkonten verwenden Sie \"www.kaltura.com\""
+      kaltura_path_example: "z. B."
       kaltura_sis_explanation: "Bei Aktivierung werden Benutzer- und Kurs-SIS-Daten an Kaltura weitergegeben."
       labels: 
         cache_play_list_seconds: "Sekunden zum Zwischenspeichern der Wiedergabeliste-URL"
         do_analytics: "Analyse-Events senden"
+        do_flash_var_test: "Experimentelle Flash-Einstellungen aktivieren"
         domain: Domain
         kaltura_sis: "SIS-Daten an Kaltura weitergeben"
         kcw_ui_conf: "KCW UI Conf ID"
@@ -10587,11 +10665,7 @@ de:
         no_idp_found: "Sie konnten von Canvas nicht bei Ihrem Identitätsanbieter abgemeldet werden"
       max_attempts: "Zu viele fehlgeschlagene Anmeldeversuche. Versuchen Sie es später erneut oder wenden Sie sich an Ihren Systemadministrator."
       no_matching_user: "Bei Canvas existiert kein Benutzerkonto für: %{user}"
-      request_failed: "Die Anforderung ist fehlgeschlagen. Versuchen Sie es erneut."
       user_deleted: "Dieses Benutzerkonto wurde gelöscht.  Bitte kontaktieren Sie Ihren Systemadministrator, um Ihr Benutzerkonto zu reaktivieren."
-    messages: 
-      resending: "Wird erneut verschickt..."
-      sent: "Verschickt. Bis zur Zustellung der Nachricht können einige Minuten vergehen."
     mobile_login: 
       back_to_login: "Zurück zur Anmeldung"
       buttons: 
@@ -10602,12 +10676,7 @@ de:
       password: Passwort
       sending: "Wird verschickt..."
     new: 
-      details: "Bevor Sie sich anmelden können, müssen Sie die Registrierung abschließen. Sie sollten eine E-mail mit einem Bestätigungslink zu Canvas erhalten haben. Klicken Sie auf diesen Link, um die Registrierung abzuschließen. Überprüfen Sie gegebenenfalls auch Ihren Spamordner."
-      links: 
-        resend_email: "E-mail erneut verschicken"
       page_title: "Bei Canvas anmelden"
-      titles: 
-        registration_complete: "Registrierung nicht abgeschlossen"
     notices: 
       mfa_complete: "Mehrstufige Authentifizierung rekonfiguriert"
     oauth2_auth: 
@@ -10710,7 +10779,38 @@ de:
   question_answered: Beantwortet
   question_bank: 
     align_outcomes: "Resultate anpassen"
+    already_bookmarked: "Lesezeichen existiert bereits"
+    bookmark_failed: "Hinzufügen des Lesezeichens fehlgeschlagen"
+    bookmarking: "Lesezeichen wird hinzugefügt..."
+    buttons: 
+      submit_copying: 
+        one: "Frage wird kopiert ..."
+        other: "Fragen werden kopiert ..."
+      submit_copying_failed: 
+        one: "Kopieren der Frage fehlgeschlagen. Versuchen Sie es erneut"
+        other: "Kopieren der Fragen fehlgeschlagen. Versuchen Sie es erneut"
+      submit_moving: 
+        one: "Frage wird verschoben ..."
+        other: "Fragen werden verschoben ..."
+      submit_moving_failed: 
+        one: "Verschieben der Frage fehlgeschlagen. Versuchen Sie es erneut"
+        other: "Verschieben der Fragen fehlgeschlagen. Versuchen Sie es erneut"
+      submit_retry_copying: "Kopieren der Frage fehlgeschlagen, bitte erneut versuchen..."
+      submit_retry_moving: "Verschieben der Frage fehlgeschlagen, bitte erneut versuchen..."
+    default_name: "Kein Name"
+    delete_are_you_sure: "Möchten Sie diesen Fragenpool wirklich löschen?"
+    error_loading_banks: "Fehler beim Laden der Fragenpools"
+    links: 
+      more_questions: "weitere Fragen"
+    load_questions: "Fragen werden geladen..."
+    loading_banks: "Pools werden geladen..."
+    loading_more_fail: "Das Laden weiterer Fragen ist fehlgeschlagen, bitte erneut versuchen"
+    move_questions: "Fragen verschieben"
+    multiple_questions: "Mehrere Fragen"
+    question_bank: Fragenpool
     remove_outcome_from_bank: "Möchten Sie dieses Resultat wirklich aus dem Pool entfernen?"
+    title: 
+      move_copy_questions: "Fragen verschieben/kopieren"
     update_outcomes_fail: "Aktualisierung der Resultate fehlgeschlagen"
     updating_outcomes: "Resultate werden aktualisiert..."
   question_banks: 
@@ -10742,11 +10842,8 @@ de:
       links: 
         delete_question: "Diese Frage löschen"
         edit_question: "Diese Frage bearbeiten"
-      move_bank: "diese Frage in andere Fragenpools verschieben/kopieren"
+      move_bank: "diese Frage in einen anderen Fragenpool verschieben/kopieren"
     show: 
-      already_bookmarked: "Lesezeichen existiert bereits"
-      bookmark_failed: "Hinzufügen des Lesezeichens fehlgeschlagen"
-      bookmarking: "Lesezeichen wird hinzugefügt..."
       button: 
         cancel: Abbrechen
         move_copy_question: "Frage verschieben/kopieren"
@@ -10757,24 +10854,7 @@ de:
         delete: "Pool löschen"
         edit: "Pool-details bearbeiten"
         move_questions: "Mehrere Fragen verschieben"
-        submit_copying: 
-          one: "Frage wird kopiert..."
-          other: "Fragen werden kopiert..."
-        submit_copying_failed: 
-          one: "Kopieren der Frage fehlgeschlagen, bitte erneut versuchen"
-          other: "Kopieren der Fragen fehlgeschlagen, bitte erneut versuchen"
-        submit_moving: 
-          one: "Frage wird verschoben..."
-          other: "Fragen werden verschoben..."
-        submit_moving_failed: 
-          one: "Verschieben der Frage fehlgeschlagen, bitte erneut versuchen"
-          other: "Verschieben der Fragen fehlgeschlagen, bitte erneut versuchen"
-        submit_retry_copying: "Kopieren der Frage fehlgeschlagen, bitte erneut versuchen..."
-        submit_retry_moving: "Verschieben der Frage fehlgeschlagen, bitte erneut versuchen..."
-      default_name: "Kein Name"
-      delete_are_you_sure: "Möchten Sie diesen Fragenpool wirklich löschen?"
       edit_warning: "Bedenken Sie, dass Änderungen an Fragenvorlagen nicht automatisch zur Aktualisierung der Quizzes führen, die diese Fragen verwenden."
-      error_loading_banks: "Fehler beim Laden der Fragenpools"
       headings: 
         aligned_outcomes: "Angepasste Resultate"
       labels: 
@@ -10785,18 +10865,11 @@ de:
       links: 
         align_outcome: "Resultat anpassen"
         more_questions: "weitere Fragen"
-      load_questions: "Fragen werden geladen..."
       loading_banks: "Pools werden geladen..."
-      loading_more_fail: "Das Laden weiterer Fragen ist fehlgeschlagen, bitte erneut versuchen"
       mastery_threshold: "Leistungsziel erreicht bei %{threshold_percentage}"
       move_copy: Verschieben/Kopieren
-      move_questions: "Fragen verschieben"
-      multiple_questions: "Mehrere Fragen"
-      question_bank: Fragenpool
       select_bank: "Wählen Sie den Ziel-fragenpool für diese Frage aus:"
       show_details: "Alle Details der Frage zeigen"
-      title: 
-        move_copy_questions: "Fragen verschieben/kopieren"
   question_unanswered: "Haben noch nicht geantwortet"
   quick_start_bar: 
     announcement: 
@@ -10813,24 +10886,13 @@ de:
     quick_start_bar_view: 
       new: "Neu:"
   quiz: 
-    current_filter: "Aktueller Filter"
-    default_question_input: "[ Bitte auswählen ]"
-    default_text_only_question_name: Abstandshalter
-    default_title: "Unbenanntes Quiz"
-    errors: 
-      invalid_hide_results: "Ausblenden von Ergebnissen ist nicht gültig"
-      invalid_ip_filter: "IP-Filter ist nicht gültig"
-      invalid_quiz_type: "Quiztyp ist nicht gültig"
-    question_name_counter: "Frage %{question_number}"
     regrade: 
       give_everyone_full_credit: "Allen die volle Punktzahl für diese Frage geben."
       no_scores_reduced: "Punkte für korrigierte und zuvor richtig beantwortete Fragen vergeben (*es werden keine Punktzahlen reduziert*)"
+      regrade_disabled: "Für diese Frage ist keine Neubenotung zulässig, da die Antwort nach Abschluss einer Einsendung durch einen Studenten entfernt wurde."
       regrade_options: "Optionen für die Neubenotung *(für Studenten, die diese Frage bereits beantwortet haben):*"
       some_scores_reduced: "Punkte nur für richtige Anwort vergeben (*die Punkte mancher Studenten werden möglicherweise reduziert*)"
       update_question_without_regrading: "Frage aktualisieren, ohne eine Neubenotung durchzuführen"
-    types: 
-      quiz: Quiz
-      survey: Befragung
   quiz_group: 
     errors: 
       no_bank: "Der Fragenpool für Quizgruppe %{group_name} konnte nicht gefunden werden"
@@ -10845,6 +10907,7 @@ de:
       generate_report_name: "%{report_name} generieren"
       generated_at_date_time: "Generiert %{dateAndTime}"
       generating_report_name: "%{report_name} wird generiert..."
+      item_analysis_not_available: "Elementanalyse steht für Befragungen nicht zur Verfügung"
   quiz_statistics: 
     statistics_filename: "%{quiz_title} %{quiz_type} %{report_type}-Bericht"
     types: 
@@ -10895,6 +10958,7 @@ de:
     cant_unpublish_when_students_submit: "Veröffentlichung kann nicht rückgängig gemacht werden, wenn Einsendungen von Studenten vorhanden sind"
     choose_option: "[ Bitte auswählen ]"
     confirms: 
+      delete_answer: "Sind Sie sicher? Wenn Sie die Antworten für eine Frage löschen, für die Einsendungen vorliegen, wird die Option zur Neubenotung der Frage deaktiviert."
       delete_question: "Möchten Sie diese Frage wirklich löschen?"
       delete_quiz: "Möchten Sie dieses Quiz wirklich löschen?"
       scrap_and_restart: "Dieses Quiz verwerfen und von vorne beginnen?"
@@ -11072,7 +11136,7 @@ de:
         essay: "Die Studenten geben ihre Antwort in ein Textfeld ein."
         file_upload: "Studenten können eine Datei für Ihre Antwort hochladen."
         fill_in_multiple_blanks: "Geben Sie Ihre Frage ein und legen Sie die Positionen der Leerfelder fest. Dann definieren Sie die mögliche richtige Antwort für jedes Leerfeld. Die Studenten müssen die richtige Antwort in jedes Leerfeld eingeben."
-        formula_definition: "Anschließend erstellen Sie die Formel oder die Formeln zur Berechnung der richtigen Antwort. Verwenden Sie dabei die Variablennamen, die oben aufgeführt sind."
+        formula_definition: "Als nächstes müssen Sie die Formel bzw. Formeln eingeben, die zur Berechnung der richtigen Antwort dienen. Verwenden Sie dabei dieselben Variablennamen, wie oben aufgeführt."
         matching: "Bilden Sie Paare aus passenden Werten. Auf der linken Seite sehen die Studenten mehrere Werte und müssen die passenden Werte aus einer Dropdownliste auf der rechten Seite auswählen. Dabei darf in mehreren Zeilen dieselbe Antwort enthalten sein, und Sie können rechts zusätzliche falsche Antworten einfügen."
         missing_word: "Definieren Sie den Text, der vor und hinter der Dropdownliste stehen soll. Erstellen Sie einen Satz möglicher Antworten, und wählen Sie eine richtige Antwort aus."
         multi_answer_sets: "Im unten stehenden Kasten fügen Sie für jedes Antworttextfeld ein in eckige Klammern gefasstes Referenzwort (ohne Leerzeichen) ein"
@@ -11110,7 +11174,6 @@ de:
       links: 
         add_another_answer: "Weitere Antwort hinzufügen"
         need_help: "Benötigen Sie Hilfe?"
-        switch_views: "Ansichten wechseln"
       multi_answer_sets_example: "d. h. \"Rosen sind [farbe1], Veilchen sind [farbe2]\""
       offer_combinations: "%{how_many} mögliche Wertekombinationen anbieten (max. %{max_combinations})"
       options: 
@@ -11392,7 +11455,6 @@ de:
         new_question: "Neue Frage"
         new_question_group: "Neue Fragengruppe"
         show_assignment_rubric: "Rubrik anzeigen"
-        switch_views: "Ansichten wechseln"
       manage: Verwalten
       minutes: Minuten
       new_assignment: "Neue Aufgabe"
@@ -11852,6 +11914,19 @@ de:
     warnings: 
       unpublished_changes: "*Sie haben nicht veröffentlichte Änderungen an diesem Quiz vorgenommen.* Diese Änderungen werden den Studenten erst angezeigt, wenn Sie das Quiz veröffentlichen oder neu veröffentlichen."
       unpublished_quiz: "*Dieses Quiz wurde nicht veröffentlicht* Das Quiz ist bis zur Veröffentlichung nur für Dozenten sichtbar."
+  quizzes/quiz: 
+    current_filter: "Aktueller Filter"
+    default_question_input: "[ Bitte auswählen ]"
+    default_text_only_question_name: Abstandshalter
+    default_title: "Unbenanntes Quiz"
+    errors: 
+      invalid_hide_results: "Ausblenden von Ergebnissen ist nicht gültig"
+      invalid_ip_filter: "IP-Filter ist nicht gültig"
+      invalid_quiz_type: "Quiztyp ist nicht gültig"
+    question_name_counter: "Frage %{question_number}"
+    types: 
+      quiz: Quiz
+      survey: Befragung
   quizzes_model: 
     cant_unpublish_when_students_submit: "Veröffentlichung kann nicht rückgängig gemacht werden, wenn Einsendungen von Studenten vorhanden sind"
     confirms: 
@@ -11978,6 +12053,7 @@ de:
       undelete_courses: "Nicht gelöschte Kurse"
       view_all_grades: "Alle Noten anzeigen"
       view_analytics: "Analyseseiten anzeigen"
+      view_course_changes: "Kursänderungsprotokolle anzeige"
       view_error_reports: "Fehlerberichte anzeigen"
       view_grade_changes: "Protokolle für Notenänderungen anzeigen"
       view_group_pages: "Gruppenseiten aller Studentengruppen anzeigen"
@@ -12088,6 +12164,7 @@ de:
         are_you_sure_delete: "Möchten Sie diese Rubrik wirklich löschen?  Für jeden Benutzer, der die Rubrik zurzeit verwendet, bleibt sie weiterhin verfügbar, aber niemand sonst kann sie einsetzen."
         are_you_sure_remove: "Möchten Sie diese Rubrik wirklich aus Ihrer Liste entfernen?"
       remove_rubric: "Diese Rubrik aus meiner Liste entfernen"
+  screenreader_gradebook_description: "Screenreader Gradebook stellt eine zugriffsfreundliche Schnittstelle zu einem Notenbuch bereit."
   scribd: 
     upgrade_flash: "Hallo, Sie verfügen über eine veraltete Version von Adobe Flash Player. Um iPaper (und viele andere Dinge im Netz) zu verwenden, benötigen Sie %{link_tag}den aktuellen Flash player%{end_link}."
   search: 
@@ -12799,6 +12876,15 @@ de:
         click_to_embed: "%{image} durch Anklicken einbetten"
         embed_image: "Durch Anklicken Bild einbetten"
     wiki_sidebar: 
+      aria: 
+        file_label: "Datei auswählen. Hochladegrenze 50"
+      aria_label: 
+        folder_select_label: "Ordner zum Hochladen des Bildes auswählen"
+        image_form_collapsed: "Klicken, um das Hochladen einer neuen Bildform (minimiert) ein-/auszuschalten"
+      aria_labels: 
+        files: "Dateien. Verwenden Sie die Nach-oben- und Nach-unten-Tasten, um durch die Baumstruktur zu navigieren. Drücken Sie die Nach-rechts-Taste, um Ordner aufzuklappen, und die Nach-links-Taste, um sie zu minimieren"
+      aria_only: 
+        folder: Ordner
       buttons: 
         insert_link: "Link einfügen"
         upload: Hochladen
@@ -12871,7 +12957,6 @@ de:
       new_page_name: "Welchen Namen möchten Sie der neuen Seite geben?"
       select_destination: "Wählen Sie einen Zielordner für diese %{count} Dateien:"
       tabs: 
-        collections: Sammlungen
         files: Dateien
         images: Bilder
         links: Links
@@ -12956,8 +13041,14 @@ de:
       forward: Weiterleiten
   sr_gradebook: 
     all_sections: "Alle Abschnitte"
+    assignment_muted: "Zum Lautschalten klicken."
+    assignment_order_alpha: Alphabetisch
+    assignment_order_assignment_groups: "Nach Aufgabengruppe und Position"
+    assignment_order_due_date: "nach Abgabefrist"
+    assignment_unmuted: "Zum Stummschalten klicken"
     no_assignment: "Keine Aufgabe ausgewählt"
     no_student: "Kein Student ausgewählt"
+    student_hidden_name: "Student %{position}"
   statistics: 
     csv_columns: 
       attempt: Versuch
@@ -12974,6 +13065,14 @@ de:
     exact_answer: "%{exact_value} +/- %{margin}"
     inexact_answer: "%{lower_bound} bis %{upper_bound}"
     no_answer: "Keine Antwort"
+  status_dates: 
+    available: Verfügbar
+    available_until: "Verfügbar bis"
+    closed: Geschlossen
+    due: Fällig
+    everyone_else: "Alle anderen"
+    not_available: "Verfügbar am"
+    pending: "Erst verfügbar am"
   step: Schritt
   sub_accounts: 
     alerts: 
@@ -13102,6 +13201,7 @@ de:
       paper_view: "Aufsatz anzeigen"
       plain_view: "Ansicht als Klartext"
       preview_document: "Dokument als Vorschau anzeigen"
+      preview_title: "Vorschau von %{title}"
       quiz_submission: "Diese Einsendung war eine Quizeinsendung. Sie werden zur Quizseite weitergeleitet."
       show_entire_discussion: "Ganze Diskussion zeigen"
       student: Student
@@ -13152,6 +13252,8 @@ de:
     quizzes: Quizzes
     settings: Einstellungen
     syllabus: Syllabus
+    tab_location_error: "Dieser Registerkartenspeicherort ist ungültig"
+    tab_unmanagable_error: "%{css_class} ist nicht verwaltbar"
   terms: 
     index: 
       date: 
@@ -13171,6 +13273,7 @@ de:
       titles: 
         enrollment_terms: Einschreibungszeiträume
         term_details: "Details der Kursperiode"
+      update_term: "Kursperiode aktualisieren"
     term: 
       buttons: 
         add: "Kursperiode hinzufügen"
@@ -13243,6 +13346,7 @@ de:
       flickr: Flickr
       image_height: Bildhöhe
       image_source: Bildquelle
+      image_url_field_label: Bild-URL
       image_width: Bildbreite
       url: URL
   title_separator: ": "
@@ -13294,7 +13398,6 @@ de:
   unknown_quiz: "Unbekanntes Quiz"
   unsupported_package: "Nicht unterstütztes Inhaltspaket"
   user: 
-    default_collection_name: "%{user_name}s Sammlung"
     default_user_name: Benutzer
     errors: 
       already_enrolled: "Sie sind bereits für diesen Kurs eingeschrieben"
@@ -13309,10 +13412,6 @@ de:
   user_date_range_search: 
     cant_be_blank: "Canvas-Benutzer-ID darf nicht leer sein"
     cant_come_before_from: "'Bis Datum' kann nicht vor 'Von Datum' liegen"
-  user_follow: 
-    errors: 
-      follow_own_collection: "Sie können nicht Ihre eigene Sammlung abonnieren"
-      follow_self: "Sie können nicht sich selbst abonnieren"
   user_lists: 
     add_n_users: 
       one: "In Ordnung, diesen 1 Benutzer hinzufügen"
@@ -13739,6 +13838,9 @@ de:
     default_group_wiki_name: "%{group_name}-wiki"
     front_page_name: Startseite
     sidebar: 
+      aria_tree: 
+        file: Datei
+        folder: Ordner
       buttons: 
         uploading: "Datei wird hochgeladen..."
       errors: 
@@ -13746,6 +13848,9 @@ de:
         no_valid_image_files_selected: "Es wurden keine gültigen Bilddateien ausgewählt"
         unexpected_upload_problem: "Während des Uploads von %{filename} ist ein unerwartetes Problem aufgetreten.  Bitte versuchen Sie es erneut."
         upload_failed: "Der Upload ist fehlgeschlagen, bitte erneut versuchen"
+      image_form: 
+        collapsed: "Klicken, um neue Bildform (minimiert) umzuschalten"
+        expanded: "Klicken, um neue Bildform (aufgeklappt) umzuschalten"
       loading_more_results: "Weitere Ergebnisse laden"
       no_title: "Ohne Titel"
       titles: 
@@ -13761,8 +13866,10 @@ de:
       page_locked_by_modules: "Diese Seite steht zur Verfügung, wenn Sie die folgenden Module abgeschlossen haben:"
       page_locked_by_modules_until: "Diese Seite steht auf %{lock_info.unlock_at} zur Verfügung, wenn Sie die folgenden Module abgeschlossen haben:"
       page_locked_until: "Diese Seite steht auf %{lock_info.unlock_at} zur Verfügung"
+      published_indicator: Veröffentlicht
       toolbar_menu: 
         settings: Einstellungen
+      unpublished_indicator: "Nicht veröffentlicht"
       view_page_history_wiki: "Seitenverlauf anzeigen"
     wiki_page_content: 
       page_locked: "Diese Seite ist gesperrt"
@@ -13818,6 +13925,7 @@ de:
     atom_entry_title: "Wikiseite %{course_or_group_name}: %{page_title}"
     cannot_hide_page: "Startseite kann nicht ausgeblendet werden"
     cannot_set_hidden_front_page: "konnte nicht als Startseite gesendet werden, da ausgeblendet"
+    cannot_set_unpublished_front_page: "konnte nicht als Startseite festgelegt werden, da nicht veröffentlicht"
     defaults: 
       no_content: "keine Inhalte vorhanden"
     errors: 
@@ -13921,8 +14029,8 @@ de:
       wiki_description_header: "Welchen Zwecken dient ein Wiki?"
   wiki_pages_api: 
     cannot_delete_front_page: "Die Startseite kann nicht gelöscht werden"
+    cannot_have_hidden_front_page: "Die Startseite kann nicht ausgeblendet werden"
     cannot_have_unpublished_front_page: "Die Veröffentlichung der Startseite kann nicht rückgängig gemacht werden"
-    cannot_hide_front_page: "Die Startseite kann für die Studenten nicht ausgeblendet werden"
     cannot_update_editing_roles: "Sie dürfen die Bearbeitungsrollen für diese Wiki-Seite nicht aktualisieren"
     cannot_update_front_page: "Sie dürfen die Wiki-Startseite nicht ändern"
     cannot_update_hide_from_students: "Sie dürfen die Kennzeichnung \"Für Studenten ausgeblendet\" für diese Wiki-Seite nicht aktualisieren"
