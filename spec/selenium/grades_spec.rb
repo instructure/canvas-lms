@@ -97,6 +97,18 @@ describe "grades" do
       end
     end
 
+    it "should show the student outcomes report if enabled" do
+      @outcome_group ||= @course.root_outcome_group
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
+      @outcome_group.add_outcome(@outcome)
+      Account.default.set_feature_flag!('student_outcome_gradebook', 'on')
+      get "/courses/#{@course.id}/grades/#{@student_1.id}"
+      f('#navpills').should_not be_nil
+      f('a[href="#outcomes"]').click
+      wait_for_ajaximations
+      ff('#outcomes li').count.should == @course.learning_outcome_links.count
+    end
+
     context 'student view' do
       it "should be available to student view student" do
         @fake_student = @course.student_view_student

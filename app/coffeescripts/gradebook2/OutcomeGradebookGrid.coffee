@@ -190,7 +190,7 @@ define [
         section = Grid.Util.lookupSection(rollup.links.section)
         row =
           student: _.extend(
-            grades_html_url: "/courses/#{section.course_id}/grades/#{student.id}" # probably should get this from the enrollment api
+            grades_html_url: "/courses/#{section.course_id}/grades/#{student.id}#tab-outcomes" # probably should get this from the enrollment api
             section: if _.keys(Grid.sections).length > 1 then section else null
             student)
           section: rollup.links.section

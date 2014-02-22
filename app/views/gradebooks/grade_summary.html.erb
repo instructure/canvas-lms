@@ -58,6 +58,7 @@
 <a class="btn btn-small print-grades icon-printer" href="javascript:window.print()">
   <%= t :print_grades, "Print grades" %>
 </a>
+
 <h2>
 <% ot('headers.grades', "Grades For %{student}", :student => capture { %>
  <% unless @presenter.multiple_observed_students?  %>
@@ -71,8 +72,8 @@
   </select>
  <% end %>
 <% }) %>
-
 </h2>
+
 <% if @presenter.has_courses_with_grades? %>
   <div style="margin-left: 10px;">
   <%= t(:for_course, "For the course,") %>
@@ -92,6 +93,16 @@
   <% js_bundle 'legacy/gradebooks_grade_summary' %>
 <% end %>
 </h2>
+
+<% if @context.feature_enabled?(:student_outcome_gradebook) %>
+  <ul id="navpills">
+    <li><a href="#assignments"><%= t :assignments, "Assignments" %></a></li>
+    <li><a href="#outcomes"><%= t :learning_outcomes, "Learning Mastery" %></a></li>
+  </ul>
+  <div id="outcomes"></div>
+<% end %>
+
+<div id="assignments">
 <table style="width: 100%;" id="grades_summary" class="<%= 'editable' if @presenter.editable? %>">
   <thead>
     <tr>
@@ -335,6 +346,7 @@
     </tr>
   <% end %>
 </table>
+</div>
 <% if @presenter.has_muted_assignments? %>
   <small><%= image_tag "sound_mute.png", :alt => "" %><%= t(:student_mute_legend, "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable.") %></small>
 <% end %>

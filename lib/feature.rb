@@ -117,6 +117,20 @@ END
       root_opt_in: false,
       development: false
     },
+    'student_outcome_gradebook' =>
+    {
+      display_name: -> { I18n.t('features.student_outcome_gradebook', 'Student Outcome Gradebook') },
+      description:  -> { I18n.t('student_outcome_gradebook_description', <<-END) },
+Student Outcome Gradebook provides a way for students to quickly view progress
+on course learning outcomes. Outcomes are presented in a Gradebook-like
+format and progress is displayed both as a numerical score and as mastered/near
+mastery/remedial.
+END
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true,
+      development: true
+    },
     'screenreader_gradebook' =>
     {
       display_name: -> { I18n.t('features.screenreader_gradebook', 'Screenreader Gradebook') },

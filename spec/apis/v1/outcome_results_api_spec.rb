@@ -171,7 +171,27 @@ describe "Outcome Results API", type: :request do
         course_with_student_logged_in
         raw_api_call(:get, outcome_rollups_url(outcome_course),
           controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
-        assert_status(401)
+        assert_status(403)
+      end
+
+      it "allows students to read their own results" do
+        outcome_students
+        @user = outcome_students[0]
+        user_session(@user)
+        raw_api_call(:get, outcome_rollups_url(outcome_course),
+          controller: 'outcome_results', action: 'rollups', format: 'json',
+          course_id: outcome_course.id.to_s, user_ids: [outcome_students[0].id])
+        assert_status(200)
+      end
+
+      it "does not allow students to read other users' results" do
+        outcome_students
+        @user = outcome_students[0]
+        user_session(@user)
+        raw_api_call(:get, outcome_rollups_url(outcome_course),
+          controller: 'outcome_results', action: 'rollups', format: 'json',
+          course_id: outcome_course.id.to_s, user_ids: [outcome_students[1].id])
+        assert_status(403)
       end
 
       it "requires an existing context" do
