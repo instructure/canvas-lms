@@ -52,10 +52,10 @@ describe 'Student reports' do
       :active_all => true, :account => @account, :name => 'Rick Astley',
       :sortable_name => 'Astley, Rick', :username => 'rick@roll.com',
       :sis_user_id => 'user_sis_id_03')
-    @course1.enroll_user(@user1, 'StudentEnrollment', {:enrollment_state => 'active'})
-    @course2.enroll_user(@user2, 'StudentEnrollment', {:enrollment_state => 'active'})
-    @course2.enroll_user(@user1, 'StudentEnrollment', {:enrollment_state => 'active'})
-    @course1.enroll_user(@user2, 'StudentEnrollment', {:enrollment_state => 'active'})
+    @e1 = @course1.enroll_user(@user1, 'StudentEnrollment', {enrollment_state: 'active'})
+    @e2 = @course2.enroll_user(@user2, 'StudentEnrollment', {enrollment_state: 'active'})
+    @e3 = @course2.enroll_user(@user1, 'StudentEnrollment', {enrollment_state: 'active'})
+    @e4 = @course1.enroll_user(@user2, 'StudentEnrollment', {enrollment_state: 'active'})
     @section1 = @course1.course_sections.first
     @section2 = @course2.course_sections.first
     @section3 = @course3.course_sections.first
@@ -86,28 +86,76 @@ describe 'Student reports' do
       s.save!
     end
 
-    it 'should find users that have not submitted anything after a date' do
+    it 'should find users that with no submissions after a date in all states' do
+      Enrollment.where(id: @e1).update_all(workflow_state: 'completed')
+      Enrollment.where(id: @e2).update_all(workflow_state: 'deleted')
+      Enrollment.where(id: @e3).update_all(workflow_state: 'invited')
+      Enrollment.where(id: @e4).update_all(workflow_state: 'rejected')
       parameters = {}
       parameters['start_at'] = @start_at2
+      parameters['include_enrollment_state'] = true
+      parameters['enrollment_state'] = ['all']
       parsed = read_report(@type, {params: parameters, order: [1,8]})
       parsed.length.should == 4
 
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
-                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101',
+                           'completed']
       parsed[1].should == [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
-                           @course2.id.to_s, nil, 'Math 101']
+                           @course2.id.to_s, nil, 'Math 101', 'invited']
       parsed[2].should == [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section1.id.to_s,
                            @section1.sis_source_id, @section1.name,
-                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101']
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101',
+                           'rejected']
       parsed[3].should == [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
-                           @course2.id.to_s, nil, 'Math 101']
+                           @course2.id.to_s, nil, 'Math 101', 'deleted']
+    end
+
+    it 'should filter on enrollment states' do
+      Enrollment.where(id: @e1).update_all(workflow_state: 'completed')
+      Enrollment.where(id: @e2).update_all(workflow_state: 'deleted')
+      Enrollment.where(id: @e3).update_all(workflow_state: 'invited')
+      parameters = {}
+      parameters['start_at'] = @start_at2
+      parameters['include_enrollment_state'] = true
+      parameters['enrollment_state'] = ['invited', 'completed']
+      parsed = read_report(@type, {params: parameters, order: [1,8]})
+      parsed.length.should == 2
+
+      parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
+                           @user1.sortable_name, @section1.id.to_s,
+                           @section1.sis_source_id, @section1.name,
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101',
+                           'completed']
+      parsed[1].should == [@user1.id.to_s, 'user_sis_id_01',
+                           @user1.sortable_name, @section2.id.to_s,
+                           @section2.sis_source_id, @section2.name,
+                           @course2.id.to_s, nil, 'Math 101', 'invited']
+    end
+
+    it 'should filter on enrollment state' do
+      Enrollment.where(id: @e1).update_all(workflow_state: 'completed')
+      Enrollment.where(id: @e2).update_all(workflow_state: 'deleted')
+      Enrollment.where(id: @e3).update_all(workflow_state: 'invited')
+      parameters = {}
+      parameters['start_at'] = @start_at2
+      parameters['include_enrollment_state'] = true
+      parameters['enrollment_state'] = 'active'
+      parsed = read_report(@type, params: parameters)
+      parsed.length.should == 1
+
+      parsed[0].should == [@user2.id.to_s, 'user_sis_id_02',
+                           'Bolton, Michael', @section1.id.to_s,
+                           @section1.sis_source_id, @section1.name,
+                           @course1.id.to_s, 'SIS_COURSE_ID_1', 'English 101',
+                           'active']
     end
 
     it 'should find users that have not submitted anything in a date range' do
@@ -194,18 +242,18 @@ describe 'Student reports' do
     it 'should find users that have not submitted for one course' do
       parameters = {}
       parameters['course'] = @course2.id
+      parameters['include_enrollment_state'] = true
       parsed = read_report(@type, {params: parameters, order: 1})
 
       parsed[0].should == [@user1.id.to_s, 'user_sis_id_01',
                            @user1.sortable_name, @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
-                           @course2.id.to_s, nil, 'Math 101']
+                           @course2.id.to_s, nil, 'Math 101', 'active']
       parsed[1].should == [@user2.id.to_s, 'user_sis_id_02',
                            'Bolton, Michael', @section2.id.to_s,
                            @section2.sis_source_id, @section2.name,
-                           @course2.id.to_s, nil, 'Math 101']
+                           @course2.id.to_s, nil, 'Math 101', 'active']
       parsed.length.should == 2
-
     end
   end
 

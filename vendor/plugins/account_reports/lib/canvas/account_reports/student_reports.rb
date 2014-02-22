@@ -56,9 +56,33 @@ module Canvas::AccountReports
       if !start_at && !end_at
         @start = 2.weeks.ago
         @account_report.parameters["start_at"] = @start
-        @end = Time.now
+        @end = Time.zone.now
         @account_report.parameters["end_at"] = @end
       end
+    end
+
+    def include_enrollment_state
+      if @account_report.has_parameter? "include_enrollment_state"
+        state = @account_report.parameters["include_enrollment_state"]
+      end
+      state
+    end
+
+    def enrollment_states
+      if @account_report.has_parameter? "enrollment_state"
+        states = @account_report.parameters["enrollment_state"]
+      end
+      states = nil if Array(states).include?('all')
+      states
+    end
+
+    def enrollment_states_string
+      if enrollment_states
+        states = Array(enrollment_states).join(' ')
+      else
+        states = 'all'
+      end
+      states
     end
 
     def students_with_no_submissions
@@ -80,7 +104,8 @@ module Canvas::AccountReports
           select("p.user_id, p.sis_user_id, courses.id AS course_id,
                   u.sortable_name, courses.name AS course_name,
                   courses.sis_source_id AS course_sis_id, cs.id AS section_id,
-                  cs.sis_source_id AS section_sis_id, cs.name AS section_name").
+                  cs.sis_source_id AS section_sis_id, cs.name AS section_name,
+                  e.workflow_state AS enrollment_state").
           joins("INNER JOIN enrollments e ON e.course_id = courses.id
                    AND e.root_account_id = courses.root_account_id
                    AND e.type = 'StudentEnrollment'
@@ -96,13 +121,25 @@ module Canvas::AccountReports
                                AND a.context_id = courses.id
                              #{time_span_join})")
 
+        no_subs = no_subs.where(e: {workflow_state: enrollment_states}) if enrollment_states
         no_subs = add_term_scope(no_subs)
         no_subs = add_course_enrollments_scope(no_subs, 'e')
         no_subs = add_course_sub_account_scope(no_subs) unless course
 
-        csv << ['user id','user sis id','user name','section id',
-                'section sis id', 'section name','course id',
-                'course sis id', 'course name']
+        if include_enrollment_state
+          add_extra_text(I18n.t('account_reports.student.enrollment_state',
+                                'Include Enrollment State: true;'))
+        end
+
+        add_extra_text(I18n.t('account_reports.student.enrollment_states',
+                              "Enrollment States: %{states};", states: enrollment_states_string))
+
+        headers = ['user id','user sis id','user name','section id',
+                   'section sis id', 'section name','course id',
+                   'course sis id', 'course name']
+        headers << 'enrollment state' if include_enrollment_state
+
+        csv << headers
         Shackles.activate(:slave) do
           no_subs.find_each do |u|
             row = []
@@ -115,6 +152,7 @@ module Canvas::AccountReports
             row << u["course_id"]
             row << u["course_sis_id"]
             row << u["course_name"]
+            row << u["enrollment_state"] if include_enrollment_state
             csv << row
           end
         end

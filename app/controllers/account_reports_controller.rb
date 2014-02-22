@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2013 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -128,6 +128,24 @@
 #           "example": false,
 #           "type": "boolean"
 #         },
+#         "sis_terms_csv": {
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "sis_accounts_csv": {
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "include_enrollment_state": {
+#           "description": "Include enrollment state. Defaults to false",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "enrollment_state[]": {
+#           "description": "Include enrollment state. Defaults to 'all' Options: ['active'| 'invited'| 'creation_pending'| 'deleted'| 'rejected'| 'completed'| 'inactive'| 'all']",
+#           "example": "['all']",
+#           "type": "string"
+#         },
 #         "start_at": {
 #           "description": "The beginning date for submissions. Max time range is 2 weeks.",
 #           "example": "2012-07-13T10:55:20-06:00",
@@ -137,14 +155,6 @@
 #           "description": "The end date for submissions. Max time range is 2 weeks.",
 #           "example": "2012-07-13T10:55:20-06:00",
 #           "type": "datetime"
-#         },
-#         "sis_terms_csv": {
-#           "example": 1,
-#           "type": "integer"
-#         },
-#         "sis_accounts_csv": {
-#           "example": 1,
-#           "type": "integer"
 #         }
 #       }
 #     }
