@@ -462,6 +462,18 @@ describe "Pages API", type: :request do
         page.user_id.should == @teacher.id
       end
 
+      it 'should process body with process_incoming_html_content' do
+        WikiPagesApiController.any_instance.stubs(:process_incoming_html_content).returns('processed content')
+
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
+                 { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
+                 { :wiki_page => { :title => 'New Wiki Page', :body => 'content to process' } })
+        page = @course.wiki.wiki_pages.find_by_url!(json['url'])
+        page.title.should == 'New Wiki Page'
+        page.url.should == 'new-wiki-page'
+        page.body.should == 'processed content'
+      end
+
       it "should set as front page" do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
@@ -780,6 +792,17 @@ describe "Pages API", type: :request do
                  { :wiki_page => { :body => "<p>lolcats</p><script>alert('what')</script>" }})
         @hidden_page.reload
         @hidden_page.body.should == "<p>lolcats</p>alert('what')"
+      end
+
+      it 'should process body with process_incoming_html_content' do
+        WikiPagesApiController.any_instance.stubs(:process_incoming_html_content).returns('processed content')
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
+                   :url => @hidden_page.url },
+                 { :wiki_page => { :body => 'content to process' } })
+        @hidden_page.reload
+        @hidden_page.body.should == 'processed content'
       end
       
       it "should not allow invalid editing_roles" do

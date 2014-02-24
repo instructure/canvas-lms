@@ -655,6 +655,7 @@ class WikiPagesApiController < ApplicationController
     @page.workflow_state = workflow_state if workflow_state
 
     page_params[:user_id] = @current_user.id if @current_user
+    page_params[:body] = process_incoming_html_content(page_params[:body]) if page_params.include?(:body)
     page_params
   end
 
