@@ -72,8 +72,8 @@ define [
     # Returns nothing.
     _toggleSidebarArrow: ->
       @$('.sidebar-toggle')
-        .toggleClass('icon-arrow-right')
-        .toggleClass('icon-arrow-left')
+        .toggleClass('icon-arrow-open-right')
+        .toggleClass('icon-arrow-open-left')
 
     # Internal: Toggle the direction of the sidebar collapse arrow.
     #
