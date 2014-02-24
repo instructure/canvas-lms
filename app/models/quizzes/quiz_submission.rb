@@ -39,6 +39,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   before_save :update_kept_score
   before_save :sanitize_responses
   before_save :update_assignment_submission
+  after_save :save_assignment_submission
   before_create :assign_validation_token
 
   has_many :attachments, :as => :context, :dependent => :destroy
