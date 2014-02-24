@@ -69,7 +69,7 @@ module Api::V1::User
       if includes.include?('last_login')
         last_login = user.read_attribute(:last_login)
         if last_login.is_a?(String)
-          Time.use_zone('utc') { last_login = Time.zone.parse(last_login) }
+          Time.use_zone('UTC') { last_login = Time.zone.parse(last_login) }
         end
         json[:last_login] = last_login.try(:iso8601)
       end
