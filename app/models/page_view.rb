@@ -92,7 +92,7 @@ class PageView < ActiveRecord::Base
   end
 
   # the list of columns we display to users, export to csv, etc
-  EXPORTED_COLUMNS = %w(request_id user_id url context_id context_type asset_id asset_type controller action contributed interaction_seconds created_at user_request render_time user_agent participated account_id real_user_id http_method remote_ip)
+  EXPORTED_COLUMNS = %w(request_id user_id url context_id context_type asset_id asset_type controller action interaction_seconds created_at user_request render_time user_agent participated account_id real_user_id http_method remote_ip)
 
   def self.page_views_enabled?
     !!page_view_method
@@ -260,7 +260,6 @@ class PageView < ActiveRecord::Base
     shard.activate do
       updated_at = params['updated_at'] || self.updated_at || Time.now
       updated_at = Time.parse(updated_at) if updated_at.is_a?(String)
-      self.contributed ||= params['page_view_contributed'] || params['contributed']
       seconds = self.interaction_seconds || 0
       if params['interaction_seconds'].to_i > 0
         seconds += params['interaction_seconds'].to_i

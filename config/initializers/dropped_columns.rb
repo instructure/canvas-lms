@@ -36,6 +36,7 @@ class ActiveRecord::Base
     'enrollments' => %w(invitation_email can_participate_before_start_at limit_priveleges_to_course_sections),
     'groups' => %w(sis_name type groupable_id groupable_type),
     'notification_policies' => %w(user_id),
+    'page_views' => %w(contributed),
     'pseudonyms' => %w(sis_update_data deleted_unique_id sis_source_id crypted_webdav_access_code type),
     'role_overrides' => %w(context_code),
     'users' => %w(type creation_unique_id creation_sis_batch_id creation_email sis_name bio),

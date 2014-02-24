@@ -786,7 +786,7 @@ class ApplicationController < ActionController::Base
     return true if !page_views_enabled?
 
     if @current_user && @log_page_views != false
-      updated_fields = params.slice(:interaction_seconds, :page_view_contributed)
+      updated_fields = params.slice(:interaction_seconds)
       if request.xhr? && params[:page_view_id] && !updated_fields.empty? && !(@page_view && @page_view.generated_by_hand)
         @page_view = PageView.find_for_update(params[:page_view_id])
         if @page_view

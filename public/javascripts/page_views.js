@@ -55,9 +55,6 @@ define([
       });
       $(document).bind('page_view_update', function(event, force) {
         var data = {};
-        if($page_view_id.hasClass('contributed')) {
-          data.contributed = true;
-        }
 
         if(force || (interactionSeconds > 10 && secondsSinceLastEvent < intervalInSeconds)) {
           data.interaction_seconds = interactionSeconds;
