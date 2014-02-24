@@ -1,4 +1,4 @@
-source 'http://rubygems.org/'
+source 'https://rubygems.org/'
 
 # this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
 if RUBY_VERSION == "2.0.0"
