@@ -2205,28 +2205,6 @@ class User < ActiveRecord::Base
     messageable_user_calculator.messageable_groups
   end
 
-  def short_name_with_shared_contexts(user)
-    if (contexts = shared_contexts(user)).present?
-      "#{short_name} (#{contexts[0, 2].to_sentence})"
-    else
-      short_name
-    end
-  end
-
-  def shared_contexts(user)
-    contexts = []
-    if info = load_messageable_user(user)
-      if CANVAS_RAILS2
-        contexts += Course.find(:all, :conditions => {:id => info.common_courses.keys}) if info.common_courses.present?
-        contexts += Group.find(:all, :conditions => {:id => info.common_groups.keys}) if info.common_groups.present?
-      else
-        contexts += Course.where(:id => info.common_courses.keys).all if info.common_courses.present?
-        contexts += Group.where(:id => info.common_groups.keys).all if info.common_groups.present?
-      end
-    end
-    Canvas::ICU.collate(contexts.map(&:name))
-  end
-
   def mark_all_conversations_as_read!
     conversations.unread.update_all(:workflow_state => 'read')
     User.where(:id => id).update_all(:unread_conversations_count => 0)

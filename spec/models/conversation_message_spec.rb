@@ -48,6 +48,18 @@ describe ConversationMessage do
       @conversation.add_participants([@last_student])
     end
 
+    it "should format an author line with shared contexts" do
+      message = add_message
+      message.author_short_name_with_shared_contexts(@first_student).should == "#{message.author.short_name} (#{@course.name})"
+    end
+
+    it "should format an author line without shared contexts" do
+      user
+      @conversation = @teacher.initiate_conversation([@user])
+      message = add_message
+      message.author_short_name_with_shared_contexts(@user).should == "#{message.author.short_name}"
+    end
+
     it "should create appropriate notifications on new message" do
       message = add_message
       message.messages_sent.should be_include("Conversation Message")
