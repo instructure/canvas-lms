@@ -1,5 +1,5 @@
 <% @context ||= @current_user %>
-<% cache(['wiki_sidebar_render_2', @context.cache_key, @current_user].cache_key.to_s) do %>
+<% cache(['wiki_sidebar_render_3', @context.cache_key, @current_user].cache_key.to_s) do %>
 <% load_wiki_sidebar %>
 <div id="editor_tabs" style="display: none;">
 
@@ -27,7 +27,7 @@
             <ul class="wiki_pages page_list">
               <% (@wiki_sidebar_data[:wiki_pages]).each do |wiki_page|  %>
                 <% if can_do(@wiki, @current_user, :manage) || wiki_page.published? %>
-                  <li title="<%= t('insert.wiki_pages', %{Click to insert a link to this page}) %>"><%= link_to wiki_page.title.titleize, context_url(@context, :context_wiki_page_url, wiki_page.url) rescue "" %></li>
+                  <li title="<%= t('insert.wiki_pages', %{Click to insert a link to this page}) %>"><%= link_to wiki_page.title.titleize, polymorphic_path([@context, :named_page], wiki_page_id: wiki_page) %></li>
                 <% end %>
               <% end %>
             </ul>
@@ -36,7 +36,7 @@
               <div class="row-fluid">
                 <label for="new_page_name"><%= t('new_page_name', %{What would you like to call the new page?}) %></label><br />
                 <input type="text" name="new_page_name" id="new_page_name" class="span12">
-                <input type="hidden" name="new_page_url_prefix" value="<%= context_url(@context, :context_wiki_pages_url) %>" id="new_page_url_prefix" />
+                <input type="hidden" name="new_page_url_prefix" value="<%= polymorphic_path([@context, :pages]) %>" id="new_page_url_prefix" />
                 <button id="new_page_submit" class="btn btn-small" type="submit"><%= t('buttons.insert_link', %{Insert Link}) %></button>
               </div>
             </form>
