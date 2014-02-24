@@ -29,6 +29,15 @@ end
 
 require File.expand_path("../config/canvas_rails3", __FILE__)
 
+# patch bundler to do github over https
+class Bundler::Dsl
+  alias_method :_old_normalize_options, :_normalize_options
+  def _normalize_options(name, version, opts)
+    _old_normalize_options(name, version, opts)
+    opts['git'].sub!('git://', 'https://') if opts['git'] && opts['git'] =~ %r{^git://github.com}
+  end
+end
+
 platforms :ruby_20, :ruby_21 do
   gem 'syck', '1.0.1'
   gem 'iconv', '1.0.3'
