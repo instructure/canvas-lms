@@ -37,7 +37,7 @@ module ActiveModel
 
         options = {
           :default => keys,
-          :model => base.class.human_name,
+          :model => base.class.name.humanize,
           :attribute => base.class.human_attribute_name(attribute),
           :value => value
         }.merge(self.options)
@@ -63,7 +63,8 @@ module ActiveModel
       end
 
       def i18n_keys
-        keys = base.class.self_and_descendants_from_active_record.map do |klass|
+        self_and_descendants = CANVAS_RAILS2 ? base.class.self_and_descendants_from_active_record : ([base.class] + base.class.descendants)
+        keys = self_and_descendants.map do |klass|
           [ :"models.#{klass.name.underscore}.attributes.#{attribute}.#{type}",
             :"models.#{klass.name.underscore}.#{type}" ]
         end.flatten
