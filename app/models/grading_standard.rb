@@ -206,10 +206,9 @@ class GradingStandard < ActiveRecord::Base
   end
   
   def self.process_migration(data, migration)
-    standards = data['grading_standards'] ? data['grading_standards']: []
-    to_import = migration.to_import 'grading_standards'
+    standards = data['grading_standards'] || []
     standards.each do |standard|
-      if standard['migration_id'] && (!to_import || to_import[standard['migration_id']])
+      if migration.import_object?('grading_standards', standard['migration_id'])
         begin
           import_from_migration(standard, migration.context)
         rescue

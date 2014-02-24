@@ -124,13 +124,14 @@ describe ContentMigration do
       @copy_to.syllabus_body.should == nil
     end
 
-    def make_grading_standard(context)
+    def make_grading_standard(context, opts = {})
       gs = context.grading_standards.new
-      gs.title = "Standard eh"
+      gs.title = opts[:title] || "Standard eh"
       gs.data = [["A", 0.93], ["A-", 0.89], ["B+", 0.85], ["B", 0.83], ["B!-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]]
       gs.save!
       gs
     end
+
     it "should copy course attributes" do
       #set all the possible values to non-default values
       @copy_from.start_at = 5.minutes.ago
@@ -180,56 +181,87 @@ describe ContentMigration do
       @copy_to.tab_configuration.should == @copy_from.tab_configuration
      end
 
-    it "should retain reference to account grading standard" do
-      gs = make_grading_standard(@copy_from.root_account)
-      @copy_from.grading_standard = gs
-      @copy_from.grading_standard_enabled = true
-      @copy_from.save!
+    describe "grading standards" do
+      it "should retain reference to account grading standard" do
+        gs = make_grading_standard(@copy_from.root_account)
+        @copy_from.grading_standard = gs
+        @copy_from.grading_standard_enabled = true
+        @copy_from.save!
 
-      run_course_copy
+        run_course_copy
 
-      @copy_to.grading_standard.should == gs
+        @copy_to.grading_standard.should == gs
+      end
+
+      it "should copy a course grading standard not owned by the copy_from course" do
+        @other_course = course_model
+        gs = make_grading_standard(@other_course)
+        @copy_from.grading_standard = gs
+        @copy_from.grading_standard_enabled = true
+        @copy_from.save!
+
+        run_course_copy
+
+        @copy_to.grading_standard_enabled.should be_true
+        @copy_to.grading_standard.data.should == gs.data
+      end
+
+      it "should create a warning if an account grading standard can't be found" do
+        gs = make_grading_standard(@copy_from.root_account)
+        @copy_from.grading_standard = gs
+        @copy_from.grading_standard_enabled = true
+        @copy_from.save!
+
+        gs.delete
+
+        run_course_copy(["Couldn't find account grading standard for the course."])
+
+        @copy_to.grading_standard.should == nil
+      end
+
+      it "should not copy deleted grading standards" do
+        gs = make_grading_standard(@copy_from)
+        @copy_from.grading_standard_enabled = true
+        @copy_from.save!
+
+        gs.destroy
+        @copy_from.reload
+
+        run_course_copy
+
+        @copy_to.grading_standards.should be_empty
+      end
+
+      it "should not copy grading standards if nothing is selected" do
+        gs = make_grading_standard(@copy_from)
+        @copy_from.update_attribute(:grading_standard, gs)
+        @cm.copy_options = { 'everything' => '0' }
+        @cm.save!
+        run_course_copy
+        @copy_to.grading_standards.should be_empty
+      end
+
+      it "should copy the course's grading standard (once) if course_settings are selected" do
+        gs = make_grading_standard(@copy_from, title: 'What')
+        @copy_from.update_attribute(:grading_standard, gs)
+        @cm.copy_options = { 'everything' => '0', 'all_course_settings' => '1' }
+        @cm.save!
+        run_course_copy
+        @copy_to.grading_standards.count.should eql 1 # no dupes
+        @copy_to.grading_standard.title.should eql gs.title
+      end
+
+      it "should copy grading standards referenced by exported assignments" do
+        gs1, gs2 = make_grading_standard(@copy_from, title: 'One'), make_grading_standard(@copy_from, title: 'Two')
+        assign = @copy_from.assignments.build
+        assign.grading_standard = gs2
+        assign.save!
+        @cm.copy_options = { 'everything' => '0', 'assignments' => { mig_id(assign) => "1" } }
+        run_course_copy
+        @copy_to.grading_standards.map(&:title).should eql %w(Two)
+        @copy_to.assignments.first.grading_standard.title.should eql 'Two'
+      end
     end
-
-    it "should copy a course grading standard not owned by the copy_from course" do
-      @other_course = course_model
-      gs = make_grading_standard(@other_course)
-      @copy_from.grading_standard = gs
-      @copy_from.grading_standard_enabled = true
-      @copy_from.save!
-
-      run_course_copy
-
-      @copy_to.grading_standard_enabled.should be_true
-      @copy_to.grading_standard.data.should == gs.data
-    end
-
-    it "should create a warning if an account grading standard can't be found" do
-      gs = make_grading_standard(@copy_from.root_account)
-      @copy_from.grading_standard = gs
-      @copy_from.grading_standard_enabled = true
-      @copy_from.save!
-
-      gs.delete
-
-      run_course_copy(["Couldn't find account grading standard for the course."])
-
-      @copy_to.grading_standard.should == nil
-    end
-
-    it "should not copy deleted grading standards" do
-      gs = make_grading_standard(@copy_from)
-      @copy_from.grading_standard_enabled = true
-      @copy_from.save!
-
-      gs.destroy
-      @copy_from.reload
-
-      run_course_copy
-
-      @copy_to.grading_standards.should be_empty
-    end
-
 
     def mig_id(obj)
       CC::CCHelper.create_key(obj)
