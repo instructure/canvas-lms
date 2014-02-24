@@ -179,6 +179,7 @@ gem 'regru-premailer', :require => 'premailer', :github => "regru/premailer", :r
   gem 'css_parser', '1.3.5'
   gem 'htmlentities', '4.3.1'
 
+gem 'activesupport-suspend_callbacks', :path => 'gems/activesupport-suspend_callbacks'
 gem 'adheres_to_policy', :path => 'gems/adheres_to_policy'
 gem 'canvas_breach_mitigation', :path => 'gems/canvas_breach_mitigation'
 gem 'canvas_crummy', :path => 'gems/canvas_crummy'
@@ -186,9 +187,9 @@ gem 'canvas_mimetype_fu', :path => 'gems/canvas_mimetype_fu'
 gem 'canvas_sanitize', :path => 'gems/canvas_sanitize'
 gem 'canvas_stringex', :path => 'gems/canvas_stringex'
 gem 'canvas_uuid', :path => 'gems/canvas_uuid'
-gem 'lti_outbound', :path => 'gems/lti_outbound'
 gem 'html_text_helper', :path => 'gems/html_text_helper'
-gem 'activesupport-suspend_callbacks', :path => 'gems/activesupport-suspend_callbacks'
+gem 'lti_outbound', :path => 'gems/lti_outbound'
+gem 'workflow', :path => 'gems/workflow'
 
 group :assets do
   gem 'compass-rails', '1.0.3'
