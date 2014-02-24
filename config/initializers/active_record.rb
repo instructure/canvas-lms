@@ -1373,6 +1373,14 @@ end
 
 unless CANVAS_RAILS2
   ActiveRecord::Associations::Builder::HasMany.valid_options << :joins
+
+  ActiveRecord::Associations::HasOneAssociation.class_eval do
+    def create_scope
+      scope = scoped.scope_for_create.stringify_keys
+      scope = scope.except(klass.primary_key) unless klass.primary_key.to_s == reflection.foreign_key.to_s
+      scope
+    end
+  end
 end
 
 class ActiveRecord::Serialization::Serializer
