@@ -22,14 +22,13 @@ describe "security" do
 
   describe "session fixation" do
     it "should change the cookie session id after logging in" do
-    
       u = user_with_pseudonym :active_user => true,
                               :username => "nobody@example.com",
                               :password => "asdfasdf"
       u.save!
-    
+
       https!
-      
+
       get_via_redirect "/login"
       assert_response :success
       cookie = cookies['_normandy_session']
@@ -41,7 +40,7 @@ describe "security" do
                                   "pseudonym_session[remember_me]" => "1",
                                   "redirect_to_ssl" => "1"
       assert_response :success
-      path.should eql("/?login_success=1")
+      request.fullpath.should eql("/?login_success=1")
       new_cookie = cookies['_normandy_session']
       new_cookie.should be_present
       cookie.should_not eql(new_cookie)
@@ -175,7 +174,7 @@ describe "security" do
     u.save!
     post "/login", { "pseudonym_session[unique_id]" => "nobody@example.com",
       "pseudonym_session[password]" => "asdfasdf",
-      "pseudonym_session[remember_me]" => "1" }, { 'Accept' => 'application/json' }
+      "pseudonym_session[remember_me]" => "1" }, { 'HTTP_ACCEPT' => 'application/json' }
     response.should be_success
     response['Content-Type'].should match(%r"^application/json")
     response.body.should_not match(%r{^while\(1\);})
@@ -188,7 +187,7 @@ describe "security" do
     response.should be_success
     response.body.should_not match(%r{^while\(1\);})
 
-    get "/logout", {}, { 'accept' => 'application/json' }
+    get "/logout", {}, { 'HTTP_ACCEPT' => 'application/json' }
     response.should be_success
     response.body.should_not match(%r{^while\(1\);})
   end
@@ -203,7 +202,7 @@ describe "security" do
 
   it "should not prepend GET JSON responses to Accept application/json requests with protection" do
     course_with_teacher_logged_in
-    get "/courses.json", nil, { 'Accept' => 'application/json' }
+    get "/courses.json", nil, { 'HTTP_ACCEPT' => 'application/json' }
     response.should be_success
     response['Content-Type'].should match(%r"^application/json")
     response.body.should_not match(%r{^while\(1\);})
@@ -442,7 +441,7 @@ describe "security" do
         post_via_redirect "/login",
           { "pseudonym_session[unique_id]" => "second@example.com", "pseudonym_session[password]" => "12341234" },
           { "REMOTE_ADDR" => "5.5.5.5" }
-        path.should eql("/?login_success=1")
+        request.fullpath.should eql("/?login_success=1")
       end
 
       it "should apply limitations correctly for cross-account logins" do
