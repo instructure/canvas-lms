@@ -20,7 +20,7 @@ describe QuizSerializer do
     @user = User.new
     @quiz.stubs(:locked_for?).returns false
     @quiz.stubs(:grants_right?).returns true
-    @session = stub
+    @session = stub(:[] => nil)
     controller.stubs(:session).returns session
     controller.stubs(:context).returns context
     @quiz.stubs(:grants_right?).at_least_once.returns true
@@ -176,6 +176,41 @@ describe QuizSerializer do
           group.id = 1
           serializer.as_json[:quiz]['assignment_group_id'].should == 1
         end
+      end
+    end
+
+    describe "quiz_submissions" do
+
+      it "sends the url for all submissions when user may grade" do
+        course_with_teacher_logged_in(active_all: true)
+        quiz_with_graded_submission([], course: @course)
+        serializer = QuizSerializer.new(@quiz,
+                                        controller: controller,
+                                        scope: @teacher)
+        serializer.as_json[:quiz]['links']['quiz_submissions'].should ==
+          controller.send(:api_v1_course_quiz_submissions_url, @quiz.context.id, @quiz.id)
+      end
+
+      it "sends the url to a student's submission for students" do
+        course_with_student_logged_in(active_all: true)
+        quiz_with_graded_submission([], user: @student, course: @course)
+        serializer = QuizSerializer.new(@quiz,
+                                        controller: controller,
+                                        scope: @student)
+        serializer.as_json[:quiz]['links']['quiz_submissions'].should ==
+          controller.send(:api_v1_course_quiz_submission_url,
+                          @quiz.context.id,
+                          @quiz.id,
+                          @quiz.quiz_submissions.where(user_id: @student).first.id)
+
+      end
+
+      it "sends nil if user can't grade and doesn't have a submission" do
+        course_with_student_logged_in(active_all: true)
+        serializer = QuizSerializer.new(@quiz,
+                                        controller: controller,
+                                        scope: @student)
+        serializer.as_json[:quiz]['links']['quiz_submissions'].should be_nil
       end
     end
   end

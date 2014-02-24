@@ -18,13 +18,29 @@ class QuizSerializer < Canvas::APISerializer
 
   def_delegators :@controller,
     :api_v1_course_assignment_group_url,
-    :speed_grader_course_gradebook_url
+    :speed_grader_course_gradebook_url,
+    :api_v1_course_quiz_submission_url,
+    :api_v1_course_quiz_submissions_url
 
   has_one :assignment_group, embed: :ids, key: :assignment_group
+  has_many :quiz_submissions, embed: :ids, key: :quiz_submissions
 
   def speed_grader_url
     return nil unless show_speedgrader?
     speed_grader_course_gradebook_url(quiz.context, assignment_id: quiz.assignment.id)
+  end
+
+  def quiz_submissions_url
+    if user_may_grade?
+      api_v1_course_quiz_submissions_url(quiz.context, quiz)
+    else
+      quiz_submission = quiz.quiz_submissions.where(user_id: current_user).first
+      if quiz_submission
+        api_v1_course_quiz_submission_url(quiz.context, quiz, quiz_submission)
+      else
+        nil
+      end
+    end
   end
 
   def html_url
@@ -46,10 +62,6 @@ class QuizSerializer < Canvas::APISerializer
     due_dates[1].present?
   end
 
-  def include_grading_attribute?
-    quiz.grants_right?(current_user, session, :grade)
-  end
-
   def include_unpublishable?
     quiz.grants_right?(current_user, session, :manage)
   end
@@ -58,7 +70,7 @@ class QuizSerializer < Canvas::APISerializer
     super(keys).select do |key|
       case key
       when :all_dates then include_all_dates?
-      when :access_code, :speed_grader_url then include_grading_attribute?
+      when :access_code, :speed_grader_url then user_may_grade?
       when :unpublishable then include_unpublishable?
       else true
       end
@@ -142,4 +154,9 @@ class QuizSerializer < Canvas::APISerializer
   def unlock_at
     overridden_date :unlock_at
   end
+
+  def user_may_grade?
+    quiz.grants_right?(current_user, session, :grade)
+  end
+
 end
