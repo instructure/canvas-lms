@@ -182,6 +182,7 @@ gem 'regru-premailer', :require => 'premailer', :github => "regru/premailer", :r
 gem 'activesupport-suspend_callbacks', :path => 'gems/activesupport-suspend_callbacks'
 gem 'adheres_to_policy', :path => 'gems/adheres_to_policy'
 gem 'canvas_breach_mitigation', :path => 'gems/canvas_breach_mitigation'
+gem 'canvas_color', :path => 'gems/canvas_color'
 gem 'canvas_crummy', :path => 'gems/canvas_crummy'
 gem 'canvas_mimetype_fu', :path => 'gems/canvas_mimetype_fu'
 gem 'canvas_sanitize', :path => 'gems/canvas_sanitize'
