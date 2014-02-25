@@ -407,9 +407,9 @@ ja:
         Course: コース
         Grader: 評価者
         Student: 受講生
-        To: 宛先
+        To: 変更後
         date: 日付
-        from: 自
+        from: 変更前
         no_item_found: アイテムが見つかりません
         time: 時刻
       logging_content_pane: 
@@ -5442,7 +5442,7 @@ ja:
     unsubscribed: 購読中止済み
     unsubscribed_hint: このトピックを購読していません。購読するにはクリックします。
   draft_state_description: |-
-      このベータ機能は、Canvas の多くの部分を再設計しており、コンテンツを新しい未公開の状態に
+      このベータ機能では、Canvas の多くの部分を再設計し、コンテンツを新しい未公開の状態に
       することができます。この状態では、コンテンツは受講生に表示されず、成績の計算からも除外され
       ます。注意: この機能を無効にすると、新しく作成または編集されたコンテンツが講師のビューに
       表示されなくなる可能性があります。
@@ -6139,7 +6139,7 @@ ja:
         gathering_files_with_progress: "ファイルを収集しています (%{progress}%) ..."
         no_preview_avaialble: プレビューは利用できません
         uploading: "5 ファイルをアップロードしています..."
-        zip_finished: 完了しました!ファイルにリダイレクトしています...
+        zip_finished: "完了しました! ファイルにリダイレクトしています..."
       page_title: ファイル
       storage_used: "使用済みストレージ:%{size1} 総容量 %{size2}"
       switch_views: ビューの切り替え
@@ -7175,7 +7175,7 @@ ja:
         save: 保存
         saving: 保存しています...
         self_signup: "セルフ サインアップ"
-        split_into_groups: "%h{num_groups} つの均等なグループに受講生を分割"
+        split_into_groups: "%h{num_groups} 個の均等なグループに受講生を分割"
       group_category_detail: 
         add_group: グループの追加
         category_settings: 設定
@@ -10947,7 +10947,7 @@ ja:
     regrade: 
       give_everyone_full_credit: この問題で全員を満点にします。
       no_scores_reduced: "修正された回答と元々正しい回答両方に対して点数を与える (*減点なし*)"
-      regrade_disabled: 受講生が提出物を完了した後、解答が削除されているため、この問題についての再評価はできません。
+      regrade_disabled: 受講生が提出物を完了した後に解答が削除されているため、この問題についての再評価はできません。
       regrade_options: "再評価オプション *(すでにこの問題に回答した受講生用):*"
       some_scores_reduced: "正しい回答に対してのみポイントを与える (*一部の受講生は減点される場合があります*)"
       update_question_without_regrading: 再評価せずに問題を更新する
@@ -12231,7 +12231,7 @@ ja:
         are_you_sure_delete: この注釈を削除してもよろしいですか?注釈を削除しても、現在この注釈を使用している場所からは注釈にアクセスできますが、ほかの人はこの注釈を使用できなくなります。
         are_you_sure_remove: この注釈をリストから削除してもよろしいですか?
       remove_rubric: "この注釈をマイ リストから削除"
-  screenreader_gradebook_description: "スクリーン リーダー用成績表は、アクセシビリティに配慮した設計の成績表へのインターフェイスを提供します。"
+  screenreader_gradebook_description: "スクリーン リーダー用成績表は、アクセシビリティに配慮して設計された成績表へのインターフェイスを提供します。"
   scribd: 
     upgrade_flash: "古いバージョンの Adobe Flash Player をお使いです。iPaper (および Web 上のさまざまな機能) を使用するには、%{link_tag}最新の Flash Player を入手する%{end_link}必要があります。"
   search: 
@@ -13995,7 +13995,7 @@ ja:
     atom_entry_title: "Wiki ページ、%{course_or_group_name}: %{page_title}"
     cannot_hide_page: "トップ ページは非表示にできません"
     cannot_set_hidden_front_page: "このページは非表示なので、トップ ページとして設定できませんでした"
-    cannot_set_unpublished_front_page: "このページは未公開なので、トップ ページとして設定できませんでした"
+    cannot_set_unpublished_front_page: "は未公開なので、トップ ページとして設定できませんでした"
     defaults: 
       no_content: コンテンツなし
     errors: 
