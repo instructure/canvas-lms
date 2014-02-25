@@ -543,8 +543,9 @@ module Api
     Canvas::Plugin.value_to_boolean(value)
   end
 
+  # takes a comma separated string, an array, or nil and returns an array
   def self.value_to_array(value)
-    value.is_a?(String) ? value.split(',') : value
+    value.is_a?(String) ? value.split(',') : (value || [])
   end
 
   # regex for shard-aware ID

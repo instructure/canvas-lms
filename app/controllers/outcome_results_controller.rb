@@ -362,7 +362,6 @@ class OutcomeResultsController < ApplicationController
   # Raises an ApiError if the include parameter is invalid
   #  Returns true otherwise
   def verify_include_parameter
-    params[:include] ||= []
     Api.value_to_array(params[:include]).each do |include_name|
       case include_name
       when 'courses'
