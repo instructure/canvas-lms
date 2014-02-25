@@ -19,7 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Quizzes::TakeQuizPresenter do
-  let(:presenter) { Quizzes::TakeQuizPresenter.new(quiz, submission, params) }
 
   let(:quiz) { Quizzes::Quiz.new }
   let(:submission) { Quizzes::QuizSubmission.new }
@@ -29,27 +28,11 @@ describe Quizzes::TakeQuizPresenter do
   let(:question3) { {:id => 3, :name => "Question 3"} }
   let(:all_questions) { [question1, question2, question3] }
 
-  def set_current_question(question)
-    presenter.reload! true
+  let(:presenter) { Quizzes::TakeQuizPresenter.new(quiz, submission, params) }
 
+  def set_current_question(question)
     params[:question_id] = question[:id]
     submission.stubs(:question).with(question[:id]).returns(question)
-  end
-
-  before(:all) do
-    # Invalidate cached versions of stuff in the presenter, this is needed
-    # if you stub or modify the submission's data, current question, or question
-    # set.
-    def presenter.reload!(soft = false)
-      @current_questions = nil
-
-      unless soft
-        self.submission_data = submission.temporary_data
-        self.answers = resolve_answers
-      end
-
-      self
-    end
   end
 
   before do
@@ -149,7 +132,6 @@ describe Quizzes::TakeQuizPresenter do
         "question_#{question1[:id]}_marked" => true,
         "question_#{question2[:id]}_marked" => false
       )
-      presenter.reload!
     end
 
     it "returns true if the submission is marked" do
@@ -167,7 +149,6 @@ describe Quizzes::TakeQuizPresenter do
         "question_#{question1[:id]}" => true,
         "question_#{question2[:id]}" => nil
       })
-      presenter.reload!
     end
 
     it 'returns icon-check for answered questions' do
@@ -185,7 +166,6 @@ describe Quizzes::TakeQuizPresenter do
         "question_#{question1[:id]}" => true,
         "question_#{question2[:id]}" => nil
       })
-      presenter.reload!
     end
 
     it 'returns icon-check for answered questions' do
@@ -203,7 +183,6 @@ describe Quizzes::TakeQuizPresenter do
         "question_#{question1[:id]}_marked" => true,
         "question_#{question2[:id]}_marked" => false
       )
-      presenter.reload!
     end
 
     it "returns text if the submission is marked" do
@@ -269,7 +248,6 @@ describe Quizzes::TakeQuizPresenter do
         "question_#{question1[:id]}" => true,
         "question_#{question2[:id]}" => nil
       )
-      presenter.reload!
     end
 
     it 'returns true for answered questions' do
@@ -285,7 +263,6 @@ describe Quizzes::TakeQuizPresenter do
     it "always returns 'list_question'" do
       presenter.question_class(question1).should =~ /list_question/
       presenter.question_class(question2).should =~/list_question/
-
     end
 
     it "adds 'answered' if the question was answered" do
@@ -293,7 +270,6 @@ describe Quizzes::TakeQuizPresenter do
         "question_#{question1[:id]}" => true,
         "question_#{question2[:id]}" => nil
       )
-      presenter.reload!
 
       presenter.question_class(question1).should =~ /answered/
       presenter.question_class(question2).should_not =~ /answered/
@@ -304,8 +280,6 @@ describe Quizzes::TakeQuizPresenter do
         "question_#{question1[:id]}_marked" => true,
         "question_#{question2[:id]}_marked" => false
       )
-
-      presenter.reload!
 
       presenter.question_class(question1).should =~ /marked/
       presenter.question_class(question2).should_not =~ /marked/
