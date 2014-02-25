@@ -48,9 +48,6 @@ module Errors
   define_error :multiple_cas_configs,
     message: "Only one CAS config is supported"
 
-  define_error :inclusion,
-    message: "This field must be present"
-
 
   def self.error_message(error_id)
     error_info = Api::Errors.errors[error_id]
@@ -62,7 +59,7 @@ module Errors
     def api_raise(error_id)
       error_info = Api::Errors.errors[error_id]
       # this will cause a 500 error, which is appropriate in this case
-      raise(ArgumentError, "uknown api error #{error_id}") unless error_info
+      raise(ArgumentError, "unknown api error #{error_id}") unless error_info
       raise Api::Error.new(error_id, error_info)
     end
   end

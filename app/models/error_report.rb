@@ -107,7 +107,9 @@ class ErrorReport < ActiveRecord::Base
       if respond_to?(:"#{k}=")
         self.send(:"#{k}=", v)
       else
-        self.data[k.to_s] = v
+        # dup'ing because some strings come in from Rack as frozen sometimes,
+        # depending on the web server, and our invalid utf-8 stripping breaks on that
+        self.data[k.to_s] = v.is_a?(String) ? v.dup : v
       end
     end
   end

@@ -982,7 +982,7 @@ class ApplicationController < ActionController::Base
       # we want api requests to behave the same on error locally as in prod, to
       # ease testing and development. you can still view the backtrace, etc, in
       # the logs.
-      rescue_action_in_api(exception, nil)
+      rescue_action_in_public(exception)
     else
       super
     end

@@ -70,7 +70,7 @@ else
 end
 
 if CANVAS_RAILS2
-  gem 'instructure-active_model-better_errors', '1.6.5.rails2.2', :require => 'active_model/better_errors'
+  gem 'instructure-active_model-better_errors', '1.6.5.rails2.3', :require => 'active_model/better_errors'
 else
   gem 'active_model-better_errors', '1.6.7', :require => 'active_model/better_errors'
 end

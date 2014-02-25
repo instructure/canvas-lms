@@ -133,11 +133,10 @@ describe "AccountAuthorizationConfigs API", type: :request do
     it "should not allow multiple cas aacs (for now)" do
       call_create(@cas_hash)
       json = call_create(@cas_hash, 422)
-      json.should == {
-        "errors" => [
-          { "field" => "auth_type", "error_code" => "multiple_cas_configs", "message" => "Only one CAS config is supported" },
-        ],
-      }
+      json.keys.sort.should == ['error_report_id', 'errors']
+      json['errors'].should == [
+        { "field" => "auth_type", "error_code" => "multiple_cas_configs", "message" => "Only one CAS config is supported" },
+      ]
     end
 
     it "should error when mixing auth_types (for now)" do
@@ -161,18 +160,17 @@ describe "AccountAuthorizationConfigs API", type: :request do
 
     it "should error if deprecated and new style are used" do
       json = call_create({:account_authorization_config => {"0" => @ldap_hash}}.merge(@ldap_hash), 400)
-      json.should == {
-        "errors" => [
-          "error_code" => "deprecated_request_syntax",
-          "message" => "This request syntax has been deprecated",
-          "field" => nil,
-        ],
-      }
+      json.keys.sort.should == ['error_report_id', 'errors']
+      json['errors'].should == [
+        "error_code" => "deprecated_request_syntax",
+        "message" => "This request syntax has been deprecated",
+        "field" => nil,
+      ]
     end
 
     it "should error if empty post params sent" do
       json = call_create({}, 422)
-      json['errors'].first.should == { 'field' => 'auth_type', 'message' => 'This field must be present', 'error_code' => 'inclusion' }
+      json['errors'].first.should == { 'field' => 'auth_type', 'message' => "invalid auth_type, must be one of #{AccountAuthorizationConfig::VALID_AUTH_TYPES.join(',')}", 'error_code' => 'inclusion' }
     end
 
     it "should return unauthorized error" do
