@@ -662,7 +662,7 @@ class PseudonymSessionsController < ApplicationController
     if CANVAS_RAILS2
       basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if ActionController::HttpAuthentication::Basic.authorization(request)
     else
-      basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if ActionController::HttpAuthentication::Basic.authenticate(request)
+      basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if request.authorization
     end
 
     client_id = params[:client_id].presence || basic_user

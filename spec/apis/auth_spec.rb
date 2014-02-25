@@ -49,11 +49,11 @@ describe "API Authentication", type: :request do
       response.response_code.should == 401
       get "/api/v1/courses.json?api_key=#{@key.api_key}"
       response.response_code.should == 401
-      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
+      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
       response.response_code.should == 401
-      get "/api/v1/courses.json", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+      get "/api/v1/courses.json", {}, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
       response.should be_success
-      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
       response.should be_success
     end
   end
@@ -82,17 +82,17 @@ describe "API Authentication", type: :request do
         get "/api/v1/courses.json"
         response.should be_success
         get "/api/v1/courses.json?api_key=#{@key.api_key}", {},
-            { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
+            { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
         response.response_code.should == 401
         get "/api/v1/courses.json", {},
-            { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+            { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
         response.should be_success
       end
 
       it "should allow basic auth with api key" do
 
         get "/api/v1/courses.json?api_key=#{@key.api_key}", {},
-            { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+            { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
         response.should be_success
       end
 
@@ -117,14 +117,14 @@ describe "API Authentication", type: :request do
         response.response_code.should == 401
         post "/api/v1/courses/#{@course.id}/assignments.json",
              { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } },
-             { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+             { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
         response.response_code.should == 401
       end
 
       it "should allow post with api key and basic auth" do
         post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}",
              { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } },
-             { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+             { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
         response.should be_success
         @course.assignments.count.should == 1
         @course.assignments.first.title.should == 'test assignment'
@@ -156,11 +156,11 @@ describe "API Authentication", type: :request do
       it "should allow replacing the authenticity token with api_key when basic auth is correct" do
         post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}",
              { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } },
-             { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'badpass') }
+             { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'badpass') }
         response.response_code.should == 401
         post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}",
              { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } },
-             { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+             { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
         response.should be_success
       end
     end
@@ -191,7 +191,7 @@ describe "API Authentication", type: :request do
 
           # we have the code, we can close the browser session
           if opts[:basic_auth]
-            post "/login/oauth2/token", { :code => code }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
+            post "/login/oauth2/token", { :code => code }, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
           else
             post "/login/oauth2/token", :client_id => @client_id, :client_secret => @client_secret, :code => code
           end
@@ -445,7 +445,7 @@ describe "API Authentication", type: :request do
             code.should be_present
 
             # exchange the code for the token
-            post "/login/oauth2/token", { :code => code }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
+            post "/login/oauth2/token", { :code => code }, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
             response.should be_success
             response.header['content-type'].should == 'application/json; charset=utf-8'
             json = JSON.parse(response.body)
@@ -486,7 +486,7 @@ describe "API Authentication", type: :request do
     end
 
     it "should allow passing the access token in the authorization header" do
-      check_used { get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" } }
+      check_used { get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
       JSON.parse(response.body).size.should == 1
     end
 
@@ -505,18 +505,18 @@ describe "API Authentication", type: :request do
     end
 
     it "should error if the access token is expired or non-existent" do
-      get "/api/v1/courses", nil, { 'Authorization' => "Bearer blahblah" }
+      get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer blahblah" }
       assert_status(401)
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       @token.update_attribute(:expires_at, 1.hour.ago)
-      get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" }
+      get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" }
       assert_status(401)
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
     end
 
     it "should require an active pseudonym for the access token user" do
       @user.pseudonym.destroy
-      get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" }
+      get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" }
       assert_status(401)
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       json = JSON.parse(response.body)
@@ -555,7 +555,7 @@ describe "API Authentication", type: :request do
         end
         LoadAccount.stubs(:default_domain_root_account).returns(@account)
 
-        check_used { get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" } }
+        check_used { get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
         JSON.parse(response.body).size.should == 1
       end
     end
@@ -702,7 +702,7 @@ describe "API Authentication", type: :request do
 
     it "should not prepend the CSRF protection to HTTP Basic API requests" do
       user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
-      get "/api/v1/users/self/profile", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+      get "/api/v1/users/self/profile", {}, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
       response.should be_success
       raw_json = response.body
       raw_json.should_not match(%r{^while\(1\);})
