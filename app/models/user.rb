@@ -1696,14 +1696,32 @@ class User < ActiveRecord::Base
   # this method takes an optional {:include_enrollment_uuid => uuid}   so that you can pass it the session[:enrollment_uuid] and it will include it.
   def cached_current_enrollments(opts={})
     self.shard.activate do
+      real_res = nil
       res = Rails.cache.fetch([self, 'current_enrollments2', opts[:include_enrollment_uuid], opts[:include_future] ].cache_key) do
         res = (opts[:include_future] ? current_and_future_enrollments : current_and_invited_enrollments).with_each_shard
         if opts[:include_enrollment_uuid] && pending_enrollment = Enrollment.find_by_uuid_and_workflow_state(opts[:include_enrollment_uuid], "invited")
           res << pending_enrollment
           res.uniq!
         end
+        begin
+          Marshal.dump(res)
+        rescue
+          ActiveRecord::Base.class_eval do
+            alias_method :old_to_yaml, :to_yaml
+            remove_method :to_yaml
+          end
+          additional_data = {result: res.to_yaml}
+          ActiveRecord::Base.class_eval do
+            alias_method :to_yaml, :old_to_yaml
+          end
+          ErrorReport.log_exception(:cached_current_enrollments, $!, additional_data)
+
+          real_res = res
+          res = nil
+        end
         res
       end
+      res ||= real_res
     end + temporary_invitations
   end
 
