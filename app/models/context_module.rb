@@ -379,7 +379,7 @@ class ContextModule < ActiveRecord::Base
   end
   
 
-  def prerequisites_satisfied?(user, recursive_check=false)
+  def prerequisites_satisfied?(user)
     unlocked = (self.active_prerequisites || []).all? do |pre|
       if pre[:type] == 'context_module'
         prog = user.module_progression_for(pre[:id])
@@ -531,7 +531,7 @@ class ContextModule < ActiveRecord::Base
       if !self.to_be_unlocked
         progression.requirements_met ||= []
         if progression.locked?
-          progression.workflow_state = 'unlocked' if self.prerequisites_satisfied?(user, recursive_check)
+          progression.workflow_state = 'unlocked' if self.prerequisites_satisfied?(user)
         end
         if progression.unlocked? || progression.started?
           orig_reqs = (progression.requirements_met || []).map{|r| "#{r[:id]}_#{r[:type]}" }.sort

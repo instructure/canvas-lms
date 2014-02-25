@@ -296,21 +296,21 @@ describe ContextModule do
       mp2.workflow_state = 'locked'
       mp2.save!
 
-      @module2.prerequisites_satisfied?(@user, true).should == true
+      @module2.prerequisites_satisfied?(@user).should == true
     end
 
     it "should be satisfied if no prereqs" do
-      @module3.prerequisites_satisfied?(@user, true).should == true
+      @module3.prerequisites_satisfied?(@user).should == true
     end
 
     it "should be satisfied if prereq is unpublished" do
-      @module2.prerequisites_satisfied?(@user, true).should == true
+      @module2.prerequisites_satisfied?(@user).should == true
     end
 
     it "should be satisfied if prereq's prereq is unpublished" do
       @module3.prerequisites = "module_#{@module2.id}"
       @module3.save!
-      @module3.prerequisites_satisfied?(@user, true).should == true
+      @module3.prerequisites_satisfied?(@user).should == true
     end
 
     it "should be satisfied if dependant on both a published and unpublished module" do
@@ -320,7 +320,7 @@ describe ContextModule do
       @module3.reload
       @module3.prerequisites.count.should == 2
 
-      @module3.prerequisites_satisfied?(@user, true).should == true
+      @module3.prerequisites_satisfied?(@user).should == true
     end
 
     it "should skip incorrect prereq hashes" do
@@ -333,9 +333,9 @@ describe ContextModule do
 
     it "should update when publishing or unpublishing" do
       @module.publish
-      @module2.prerequisites_satisfied?(@user, true).should == false
+      @module2.prerequisites_satisfied?(@user).should == false
       @module.unpublish
-      @module2.prerequisites_satisfied?(@user, true).should == true
+      @module2.prerequisites_satisfied?(@user).should == true
     end
   end
   
