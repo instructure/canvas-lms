@@ -26,6 +26,7 @@ module Canvas::AccountReports
 
     def initialize(account_report)
       @account_report = account_report
+      @account_report.parameters ||= {}
     end
 
     def start_and_end_times
