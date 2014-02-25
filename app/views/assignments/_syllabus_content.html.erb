@@ -1,5 +1,5 @@
 <% js_env :CAN_READ => can_do(@context, @current_user, :read) %>
-<% js_env :SYLLABUS_BODY => user_content(@syllabus_body) %>
+<% js_env :SYLLABUS_BODY => user_content(@syllabus_body || '') %>
 <% @active_tab = "syllabus" %>
 <% course_home ||= false %>
 <% if !course_home %>
