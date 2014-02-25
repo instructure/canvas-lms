@@ -11,6 +11,13 @@ unless CANVAS_RAILS2
         end
       end
       alias_method_chain :current, :delayed_jobs
+
+      def activate_with_delayed_jobs!(categories)
+        if !categories[:delayed_jobs] && categories[:default]
+          categories[:delayed_jobs] = categories[:default].delayed_jobs_shard
+        end
+        activate_without_delayed_jobs!(categories)
+      end
     end
 
     self.primary_key = "id"
@@ -97,4 +104,6 @@ unless CANVAS_RAILS2
   Delayed::Backend::ActiveRecord::Job.class_eval do
     self.shard_category = :delayed_jobs
   end
+
+  Shard.default.delayed_jobs_shard.activate!(:delayed_jobs)
 end
