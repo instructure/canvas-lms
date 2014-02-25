@@ -1,46 +1,43 @@
 require [
   'jquery'
   'Backbone'
+  'compiled/userSettings'
   'compiled/gradebook2/Gradebook'
   'compiled/views/gradebook/NavigationPillView'
   'compiled/views/gradebook/OutcomeGradebookView'
-], ($, Backbone, Gradebook, NavigationPillView, OutcomeGradebookView) ->
+], ($, Backbone, userSettings, Gradebook, NavigationPillView, OutcomeGradebookView) ->
   class GradebookRouter extends Backbone.Router
     routes:
-      '': 'showGrades'
-      'outcomes': 'showOutcomes'
+      '': 'tab'
+      'tab-:viewName': 'tab'
 
     initialize: ->
       @isLoaded      = false
       @views = {}
-      @views.gradebook = new Gradebook(ENV.GRADEBOOK_OPTIONS)
+      @views.assignment = new Gradebook(ENV.GRADEBOOK_OPTIONS)
       if ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled
-        @views['outcome-gradebook'] = @initOutcomes()
+        @views.outcome = @initOutcomes()
 
     initOutcomes: ->
       book = new OutcomeGradebookView(
         el: $('.outcome-gradebook-container'),
-        gradebook: @views.gradebook)
+        gradebook: @views.assignment)
       book.render()
       @navigation = new NavigationPillView(el: $('.gradebook-navigation'))
       @navigation.on 'pillchange', @handlePillChange
       book
 
     handlePillChange: (viewname) =>
-      route = if viewname == 'gradebook' then '' else 'outcomes'
-      @navigate(route, trigger: true)
+      @navigate('tab-'+viewname, trigger: true) if viewname
 
-    showGrades: ->
-      @showView('gradebook')
-
-    showOutcomes: ->
-      @showView('outcome-gradebook')
-
-    showView: (viewName) ->
+    tab: (viewName) ->
+      viewName ||= userSettings.contextGet 'gradebook_tab'
+      viewName = 'assignment' if viewName != 'outcome' || !@views.outcome
       @navigation.setActiveView(viewName) if @navigation
-      $('.gradebook-container, .outcome-gradebook-container').addClass('hidden')
-      $(".#{viewName}-container").removeClass('hidden')
+      $('.assignment-gradebook-container, .outcome-gradebook-container').addClass('hidden')
+      $(".#{viewName}-gradebook-container").removeClass('hidden')
       @views[viewName].onShow()
+      userSettings.contextSet 'gradebook_tab', viewName
 
   @router = new GradebookRouter
   Backbone.history.start()

@@ -129,7 +129,7 @@ define [
       @showCustomColumnDropdownOption()
 
     onShow: ->
-      @spinner = new Spinner()
+      @spinner = new Spinner() unless @spinner
       $(@spinner.spin().el).css(
         opacity: 0.5
         top: '55px'

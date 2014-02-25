@@ -776,7 +776,7 @@ describe "gradebook2" do
       get "/courses/#{@course.id}/gradebook2"
       ff('.gradebook-navigation').length.should == 1
 
-      f('a[data-id=outcome-gradebook]').click
+      f('a[data-id=outcome]').click
       wait_for_ajaximations
       f('.outcome-gradebook-container').should_not be_nil
     end

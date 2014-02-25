@@ -101,9 +101,6 @@ define [
     _attachEvents: ->
       view.on('togglestate', @_createFilter(name)) for name, view of @checkboxes
       $.subscribe('currentSection/change', Grid.Events.sectionChangeFunction(@grid))
-      @$el.fillWindowWithMe({
-        onResize: => @grid.resizeCanvas()
-      })
 
     # Internal: Listen for events on grid.
     #
@@ -153,6 +150,9 @@ define [
     onShow: ->
       @loadOutcomes() if !@isLoaded
       @isLoaded = true
+      @$el.fillWindowWithMe({
+        onResize: => @grid.resizeCanvas() if @grid
+      })
 
     # Public: Load all outcome results from API.
     #

@@ -18,11 +18,11 @@
         <ul class="nav nav-pills gradebook-navigation-pills">
           <li class="active">
             <a href="#"
-               data-id="gradebook"><%= t(:grades, "Grades") %></a>
+               data-id="assignment"><%= t(:grades, "Grades") %></a>
           </li>
           <li>
             <a href="#"
-               data-id="outcome-gradebook"><%= t(:learning_mastery, "Learning Mastery") %></a>
+               data-id="outcome"><%= t(:learning_mastery, "Learning Mastery") %></a>
           </li>
         </ul>
       </nav>
@@ -31,7 +31,7 @@
     </div>
   <% end %>
 
-  <div class="gradebook-container hidden">
+  <div class="assignment-gradebook-container hidden">
     <div id="gradebook-toolbar" class="toolbar">
       <% if !@context.feature_enabled?(:outcome_gradebook) %>
         <span class="section-button-placeholder"></span>
