@@ -66,7 +66,7 @@ else
   gem 'rails', '3.2.15'
   gem 'active_model_serializers', '0.9.0pre',
     :github => 'rails-api/active_model_serializers', :ref => '99fa399ae6dc071b97b15e1ef2b42f0d23c492ec'
-  gem 'authlogic', '3.2.0'
+  gem 'authlogic', '3.3.0'
 end
 
 if CANVAS_RAILS2
