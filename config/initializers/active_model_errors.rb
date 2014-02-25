@@ -59,7 +59,11 @@ module ActiveModel
       end
 
       def options
-        super().merge(scope: [:activerecord, :errors])
+        if CANVAS_RAILS2
+          super().merge(scope: [:activerecord, :errors])
+        else
+          super().merge(scope: [:errors])
+        end
       end
 
       def i18n_keys
