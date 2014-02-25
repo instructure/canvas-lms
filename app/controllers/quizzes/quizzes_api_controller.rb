@@ -194,6 +194,10 @@
 #         "permissions": {
 #           "$ref": "QuizPermissions",
 #           "description": "Permissions the user has for the quiz"
+#         },
+#         "all_dates": {
+#           "$ref": "AssignmentDate",
+#           "description": "list of due dates for the quiz"
 #         }
 #       }
 #     }

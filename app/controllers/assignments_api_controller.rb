@@ -122,8 +122,18 @@
 # @model AssignmentDate
 #     {
 #       "id": "AssignmentDate",
-#       "description": "",
+#       "description": "Object representing a due date for an assignment or quiz. If the due date came from an assignment override, it will have an 'id' field.",
 #       "properties": {
+#         "id": {
+#           "example": 1,
+#           "type": "integer",
+#           "description": "(Optional, missing if 'base' is present) id of the assignment override this date represents"
+#         },
+#         "base": {
+#           "example": true,
+#           "type": "boolean",
+#           "description": "(Optional, present if 'id' is missing) whether this date represents the assignment's or quiz's default due date"
+#         },
 #         "title": {
 #           "example": "Summer Session",
 #           "type": "string"
