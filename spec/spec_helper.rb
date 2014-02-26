@@ -1267,7 +1267,11 @@ end
         compare_json(a, e)
       end
     else
-      actual.to_json.should == expected.to_json
+      if actual.is_a?(Fixnum) || actual.is_a?(Float)
+        actual.should == expected
+      else
+        actual.to_json.should == expected.to_json
+      end
     end
   end
 
