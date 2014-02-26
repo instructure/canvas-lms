@@ -52,10 +52,7 @@ describe Assignment do
     group = @course.assignment_groups.create!(:name => "Assignments")
     AssignmentGroup.where(:id => group).update_all(:updated_at => 1.hour.ago)
     orig_time = group.reload.updated_at.to_i
-    a = @course.assignments.build(
-                                          "title"=>"test",
-                                          "external_tool_tag_attributes"=>{"url"=>"", "new_tab"=>""}
-                                  )
+    a = @course.assignments.build("title"=>"test")
     a.assignment_group = group
     a.save!
     @course.assignments.count.should == 1
