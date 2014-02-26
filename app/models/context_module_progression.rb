@@ -46,54 +46,101 @@ class ContextModuleProgression < ActiveRecord::Base
     self.save
   end
   
-  def deep_evaluate(mod)
-    mod = nil if mod && mod.id != self.context_module_id
-    mod ||= self.context_module
-    return if mod.completion_requirements.blank?
-    tags_hash = mod.content_tags_hash
+  def evaluate_requirements_met
     met = self.requirements_met || []
     orig_reqs = met.map{|r| "#{r[:id]}_#{r[:type]}"}.sort
-    (mod.completion_requirements || []).each do |req|
-      next if met.any?{|r| r[:id] == req[:id] && r[:type] == req[:type]}
-      tag = tags_hash[req[:id]]
-      if !req[:id] || !tag
-        met << req
+
+    met = evaluate_uncompleted_requirements(met)
+    new_reqs = met.map{|r| "#{r[:id]}_#{r[:type]}"}.sort
+
+    if orig_reqs != new_reqs
+      self.requirements_met = met
+      self.save
+    end
+  end
+
+  def evaluate_uncompleted_requirements(met)
+    met = met.dup
+    uncompleted_view_reqs = []
+    context_module.completion_requirements.each do |req|
+      next if requirement_met?(req, met)
+
+      req_met = nil
+      tag = context_module.content_tags_hash[req[:id]]
+      if !tag
+        req_met = req
       elsif req[:type] == "must_view"
-        view = false
-        view = true if met.any?{|r| r[:id] == req[:id] }
-        met << req if view
+        uncompleted_view_reqs << req
       elsif req[:type] == "must_contribute"
         
       elsif req[:type] == "must_submit"
-        obj = tag.content
-        if obj.is_a?(DiscussionTopic)
-          obj = obj.assignment
-        end
-        if obj.is_a?(Assignment)
-          met << req if self.user.submitted_submission_for(obj.id)
-        elsif obj.is_a?(Quizzes::Quiz)
-          met << req if self.user.attempted_quiz_submission_for(obj.id)
-        end
+        req_met = evaluate_submit_requirement_met(req, tag)
       elsif req[:type] == "max_score" || req[:type] == "min_score"
-        obj = tag.content
-        sub = nil
-        if obj.is_a?(Assignment)
-          sub = self.user.submitted_submission_for(obj.id)
-          score = sub.try(:score)
-        elsif obj.is_a?(Quizzes::Quiz)
-          sub = self.user.attempted_quiz_submission_for(obj.id)
-          score = sub.try(:kept_score)
-        end
-        if req[:type == "max_score"]
-          met << req if score && score <= req[:max_score].to_f
-        else
-          met << req if score && score >= req[:min_score].to_f
-        end
+        req_met = evaluate_score_requirement_met(req, tag)
       end
+
+      met << req_met if req_met
+    end 
+
+    uncompleted_view_reqs.each do |req|
+      met << req if other_requirement_met?(req, met)
     end
-    new_reqs = met.map{|r| "#{r[:id]}_#{r[:type]}"}.sort
-    self.requirements_met = met
-    self.save if orig_reqs != new_reqs
+
+    met
+  end
+  private :evaluate_uncompleted_requirements
+
+  def requirement_met?(req, met_reqs)
+    met_reqs.any? {|r| r[:id] == req[:id] && r[:type] == req[:type] }
+  end
+
+  def other_requirement_met?(req, met_reqs)
+    met_reqs.any? {|r| r[:id] == req[:id] }
+  end
+
+  def get_submission_score(tag_content)
+    if tag_content.is_a?(Assignment)
+      submission = self.user.submitted_submission_for(tag_content.id)
+      submission.try(:score)
+    elsif tag_content.is_a?(Quizzes::Quiz)
+      submission = self.user.attempted_quiz_submission_for(tag_content.id)
+      submission.try(:kept_score)
+    end
+  end
+  private :get_submission_score
+
+  def evaluate_score_requirement_met(requirement, tag)
+    score = get_submission_score(tag.content)
+    if requirement[:type] == "max_score"
+      requirement if score && score <= requirement[:max_score].to_f
+    else
+      requirement if score && score >= requirement[:min_score].to_f
+    end
+  end
+  private :evaluate_score_requirement_met
+
+  def evaluate_submit_requirement_met(requirement, tag)
+    content = tag.content
+    content = content.assignment if content.is_a?(DiscussionTopic)
+    if content.is_a?(Assignment)
+      requirement if self.user.submitted_submission_for(content.id)
+    elsif content.is_a?(Quizzes::Quiz)
+      requirement if self.user.attempted_quiz_submission_for(content.id)
+    end
+  end
+  private :evaluate_submit_requirement_met
+
+  def mark_as_dirty
+    self.workflow_state = 'locked'
+    nil
+  end
+
+  def mark_as_dirty!
+    mark_as_dirty
+    Shackles.activate(:master) do
+      self.save if self.workflow_state_changed?
+    end
+    nil
   end
 
   def trigger_completion_events

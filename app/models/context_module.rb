@@ -149,7 +149,7 @@ class ContextModule < ActiveRecord::Base
   def available_for?(user, opts={})
     return true if self.active? && !self.to_be_unlocked && self.prerequisites.blank? && !self.require_sequential_progress
     if self.grants_right?(user, nil, :update)
-     return true
+      return true
     elsif !self.active?
       return false
     end
@@ -417,7 +417,7 @@ class ContextModule < ActiveRecord::Base
     users = Array(users)
     users.each{|u| u.clear_cached_lookups }
     progressions = self.find_or_create_progressions(users)
-    progressions.each{|p| p.workflow_state = 'locked' }
+    progressions.each(&:mark_as_dirty)
     @already_confirmed_valid_requirements = true if skip_confirm_valid_requirements
     progressions.each do |progression|
       self.evaluate_for(progression, true, true)
@@ -542,7 +542,7 @@ class ContextModule < ActiveRecord::Base
             elsif ['min_score', 'max_score', 'must_submit'].include?(req[:type]) && !tag.scoreable?
               res = true
             else
-              progression.deep_evaluate(self) if deep_check
+              progression.evaluate_requirements_met if deep_check
               res = progression.requirements_met.any?{|r| r[:id] == req[:id] && r[:type] == req[:type] } #include?(req)
               if req[:type] == 'min_score'
                 progression.requirements_met = progression.requirements_met.select{|r| r[:id] != req[:id] || r[:type] != req[:type]}
