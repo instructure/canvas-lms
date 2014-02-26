@@ -7,14 +7,18 @@
 
 require 'simplecov'
 require 'simplecov-rcov'
-SimpleCov.coverage_dir('../../coverage')
-SimpleCov.at_exit {
-  SimpleCov.result
-}
-SimpleCov.command_name('html-text-helper-spec-gem')
-SimpleCov.start('test_frameworks')
-require 'html_text_helper'
 
+SimpleCov.command_name('html-text-helper-spec-gem')
+SimpleCov.start('test_frameworks') do
+  SimpleCov.coverage_dir('../../coverage')
+  SimpleCov.use_merging
+  SimpleCov.merge_timeout(10000)
+  SimpleCov.at_exit {
+    SimpleCov.result
+  }
+end
+
+require 'html_text_helper'
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true

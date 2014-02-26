@@ -7,16 +7,19 @@
 
 require 'simplecov'
 require 'simplecov-rcov'
-  SimpleCov.coverage_dir('../../coverage')
-  SimpleCov.at_exit {
-    SimpleCov.result
-}
 
 SimpleCov.command_name('lti_outbound-gem')
-SimpleCov.start('test_frameworks')
-
+SimpleCov.start('test_frameworks') do
+  SimpleCov.coverage_dir('../../coverage')
+  SimpleCov.use_merging
+  SimpleCov.merge_timeout(10000)
+  SimpleCov.at_exit {
+    SimpleCov.result
+  }
+end
 
 require 'lti_outbound'
+
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/shared_examples/*.rb").each { |file| require file }
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/support/*.rb").each { |file| require file }
 
