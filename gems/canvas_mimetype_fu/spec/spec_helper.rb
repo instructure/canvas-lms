@@ -7,16 +7,12 @@
 
 require 'simplecov'
 require 'simplecov-rcov'
-
+SimpleCov.coverage_dir('../../coverage')
+SimpleCov.at_exit {
+  SimpleCov.result
+}
 SimpleCov.command_name('canvas-mimetype-fu-gem')
-SimpleCov.start('test_frameworks') do
-  SimpleCov.coverage_dir('../../coverage')
-  SimpleCov.use_merging
-  SimpleCov.merge_timeout(10000)
-  SimpleCov.at_exit {
-    SimpleCov.result
-  }
-end
+SimpleCov.start('test_frameworks')
 
 require "tempfile"
 require "canvas_mimetype_fu"
