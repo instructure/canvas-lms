@@ -83,8 +83,8 @@
 
     <td class="links">
       &nbsp;
-      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" aria-label="<%= t('links.outdent_label', %{Outdent item}) %>" class="outdent_item_link" title="<%= t('links.outdent', %{Outdent item}) %>"><%= @module_item_image_tags['outdent'] %></a>
-      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" aria-label="<%= t('links.indent_label', %{Indent item}) %>" class="indent_item_link" title="<%= t('links.indent', %{Indent item}) %>"><%= @module_item_image_tags['indent'] %></a>
+      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" aria-label="<%= t('links.outdent_label', %{Decrease indent}) %>" class="outdent_item_link" title="<%= t('links.outdent', %{Decrease indent}) %>"><%= @module_item_image_tags['outdent'] %></a>
+      <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" aria-label="<%= t('links.indent_label', %{Increase indent}) %>" class="indent_item_link" title="<%= t('links.indent', %{Increase indent}) %>"><%= @module_item_image_tags['indent'] %></a>
       <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" aria-label="<%= t('links.edit_item_details_label', %{Edit item details}) %>" class="edit_item_link edit_link" title="<%= t('links.edit_item', %{Edit item details}) %>"><%= @module_item_image_tags['edit'] %></a>
       <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>" aria-label="<%= t('links.remove_item_label', %{Remove this item from the module}) %>" class="delete_item_link delete_link" title="<%= t('links.remove_item', %{Remove this item from the module}) %>"><%= @module_item_image_tags['delete'] %></a>
     </td>
