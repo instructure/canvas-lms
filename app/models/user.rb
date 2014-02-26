@@ -149,15 +149,15 @@ class User < ActiveRecord::Base
     has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section],
             :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at'
   else
-    has_many :current_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:active), :order => 'enrollments.created_at'
-    has_many :invited_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:invited), :order => 'enrollments.created_at'
+    has_many :current_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:active), :order => 'enrollments.created_at', :readonly => false
+    has_many :invited_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:invited), :order => 'enrollments.created_at', :readonly => false
     has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
-            :conditions => enrollment_conditions(:current_and_invited)
+            :conditions => enrollment_conditions(:current_and_invited), :readonly => false
     has_many :current_and_future_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
-            :conditions => enrollment_conditions(:current_and_invited, false)
-    has_many :concluded_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at'
+            :conditions => enrollment_conditions(:current_and_invited, false), :readonly => false
+    has_many :concluded_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at', :readonly => false
     has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :joins => [:course],
-            :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at'
+            :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at', :readonly => false
   end
 
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')", :order => 'enrollments.created_at'
