@@ -412,6 +412,10 @@ class ContextModule < ActiveRecord::Base
   def clear_cached_lookups
     @cached_tags = nil
   end
+
+  def cached_tags
+    @cached_tags ||= self.content_tags.active
+  end
   
   def re_evaluate_for(users, skip_confirm_valid_requirements=false)
     users = Array(users)
@@ -494,114 +498,18 @@ class ContextModule < ActiveRecord::Base
     self.content_tags.each{|t| @tags_hash[t.id] = t }
     @tags_hash
   end
-  
-  def evaluate_for(user, recursive_check=false, deep_check=false)
-    progression = nil
-    if user.is_a?(ContextModuleProgression)
-      progression = user
-      user = progression.user
+
+  def evaluate_for(user_or_progression, recursive_check=false, deep_check=false)
+    if user_or_progression.is_a?(ContextModuleProgression)
+      progression, user = [user_or_progression, user_or_progression.user]
+    else
+      progression, user = [self.find_or_create_progression_with_multiple_lookups(user_or_progression), user_or_progression] if user_or_progression
     end
-    return nil unless user
-    progression ||= self.find_or_create_progression_with_multiple_lookups(user)
-    return unless progression
-    if self.unpublished?
-      progression.workflow_state = 'locked'
-      Shackles.activate(:master) do
-        progression.save if progression.workflow_state_changed?
-      end
-      return progression
-    end
-    requirements_met_changed = false
-    if User.module_progression_jobs_queued?(user.id)
-      progression.workflow_state = 'locked'
-    end
-    if deep_check
-      confirm_valid_requirements(true) rescue nil
-    end
-    @cached_tags ||= self.content_tags.active
-    tags = @cached_tags
-    if recursive_check || progression.new_record? || progression.updated_at < self.updated_at || User.module_progression_jobs_queued?(user.id)
-      if self.completion_requirements.blank? && active_prerequisites.empty?
-        progression.workflow_state = 'completed'
-        Shackles.activate(:master) do
-          progression.save
-        end
-      end
-      progression.workflow_state = 'locked'
-      if !self.to_be_unlocked
-        progression.requirements_met ||= []
-        if progression.locked?
-          progression.workflow_state = 'unlocked' if self.prerequisites_satisfied?(user)
-        end
-        if progression.unlocked? || progression.started?
-          orig_reqs = (progression.requirements_met || []).map{|r| "#{r[:id]}_#{r[:type]}" }.sort
-          completes = (self.completion_requirements || []).map do |req|
-            tag = tags.detect{|t| t.id == req[:id].to_i}
-            if !tag
-              res = true
-            elsif ['min_score', 'max_score', 'must_submit'].include?(req[:type]) && !tag.scoreable?
-              res = true
-            else
-              progression.evaluate_requirements_met if deep_check
-              res = progression.requirements_met.any?{|r| r[:id] == req[:id] && r[:type] == req[:type] } #include?(req)
-              if req[:type] == 'min_score'
-                progression.requirements_met = progression.requirements_met.select{|r| r[:id] != req[:id] || r[:type] != req[:type]}
-                if tag.content_type_quiz?
-                  submission = Quizzes::QuizSubmission.find_by_quiz_id_and_user_id(tag.content_id, user.id)
-                  score = submission.try(:kept_score)
-                elsif tag.content_type == "DiscussionTopic"
-                  if tag.content
-                    submission = Submission.find_by_assignment_id_and_user_id(tag.content.assignment_id, user.id)
-                    score = submission.try(:score)
-                  else
-                    score = nil
-                  end
-                else
-                  submission = Submission.find_by_assignment_id_and_user_id(tag.content_id, user.id)
-                  score = submission.try(:score)
-                end
-                if score && score >= req[:min_score].to_f
-                  progression.requirements_met << req
-                  res = true
-                else
-                  res = false
-                end
-              end
-            end
-            res
-          end
-          new_reqs = (progression.requirements_met || []).map{|r| "#{r[:id]}_#{r[:type]}" }.sort
-          requirements_met_changed = new_reqs != orig_reqs
-          progression.workflow_state = 'started' if completes.any?
-          progression.workflow_state = 'completed' if completes.all?
-        end
-      end
-    end
-    position = nil
-    found_failure = false
-    if self.require_sequential_progress
-      tags.each do |tag|
-        requirements_for_tag = (self.completion_requirements || []).select{|r| r[:id] == tag.id }.sort_by{|r| r[:id]}
-        next if found_failure
-        if requirements_for_tag.empty?
-          position = tag.position
-        else
-          all_met = requirements_for_tag.all? do |req|
-            (progression.requirements_met || []).any?{|r| r[:id] == req[:id] && r[:type] == req[:type] }
-          end
-          if all_met
-            position = tag.position if tag.position && all_met
-          else
-            position = tag.position
-            found_failure = true
-          end
-        end
-      end
-    end
-    progression.current_position = position
-    Shackles.activate(:master) do
-      progression.save if progression.workflow_state_changed? || requirements_met_changed
-    end
+    return nil unless progression && user
+
+    progression.context_module = self if progression.context_module_id == self.id
+    progression.user = user if progression.user_id == user.id
+    progression.evaluate(recursive_check, deep_check)
     progression
   end
 
