@@ -107,6 +107,8 @@ class Assignment < ActiveRecord::Base
     copied
     all_day
     all_day_date
+    created_at
+    updated_at
   )
   # create a shim for plugins that use the old association name. this is
   # TEMPORARY. the plugins should update to use the new association name, and
