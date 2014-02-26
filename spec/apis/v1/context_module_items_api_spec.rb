@@ -66,7 +66,8 @@ describe "Module Items API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
                       :controller => "context_module_items_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
-      json.should eql [
+
+      expected = [
           {
               "type" => "Assignment",
               "id" => @assignment_tag.id,
@@ -128,6 +129,7 @@ describe "Module Items API", type: :request do
               "module_id" => @module1.id
           }
       ]
+      compare_json(json, expected)
     end
 
     it "should include item content details for index" do
@@ -445,7 +447,7 @@ describe "Module Items API", type: :request do
       end
 
       it "should update the position" do
-        tags = @module1.content_tags
+        tags = @module1.content_tags.to_a
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
                         {:controller => "context_module_items_api", :action => "update", :format => "json",
@@ -819,6 +821,8 @@ describe "Module Items API", type: :request do
       @override_student.user = @student
       @override_student.save!
       overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+      @student = nil
+      overrides
     end
 
     it "should list module items" do
@@ -844,7 +848,6 @@ describe "Module Items API", type: :request do
     end
 
     it "should include user specific content details on index" do
-      @assignment_tag.unpublish
       override_assignment
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?include[]=content_details",
@@ -858,7 +861,6 @@ describe "Module Items API", type: :request do
     end
 
     it "should include user specific content details on show" do
-      @assignment_tag.unpublish
       override_assignment
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?include[]=content_details",
