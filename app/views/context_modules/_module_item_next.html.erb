@@ -32,7 +32,7 @@
     <%= item_class %>
   "
 >
-  <div class="ig-row <%= 'ig-published' if module_item_published?(module_item) %>">
+  <div class="ig-row <%= 'ig-published' if module_item_published?(module_item) %> <%= 'student-view' unless editable %>">
     <div class="ig-title ellipses">
       <% if editable || module_item.nil? %>
       <span

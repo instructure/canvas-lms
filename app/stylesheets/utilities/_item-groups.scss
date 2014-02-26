@@ -243,6 +243,10 @@ is for items that are not draggable.
     color: #34832b;
   }
 
+  &.ig-published.student-view .ig-title {
+    color: #4d4d4d;
+  }
+
   &.ig-row-empty {
     height: 30px;
     background: #f3f6f7;
