@@ -1083,7 +1083,11 @@ class Assignment < ActiveRecord::Base
     self.submissions_downloads && self.submissions_downloads > 0
   end
 
-  def as_json(options=nil)
+  def serializable_hash(opts = {})
+    super(opts.reverse_merge include_root: true)
+  end
+
+  def as_json(options={})
     json = super(options)
     if json && json['assignment']
       # remove anything coming automatically from deprecated db column
