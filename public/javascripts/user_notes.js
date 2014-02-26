@@ -23,8 +23,12 @@ define([
   'jquery.loadingImg',
   'jquery.instructure_date_and_time',
   'jquery.instructure_misc_plugins',
-  'vendor/jquery.pageless' // this is for the $(...).pageless call in app/helpers/user_notes_helper.rb
+  'vendor/jquery.pageless' /* pageless */
 ], function(I18n, $) {
+
+  if (ENV.user_note_list_pageless_options) {
+    $('#user_note_list').pageless(ENV.user_note_list_pageless_options);
+  }
 
   $(".cancel_button").click(function() {
     $("#create_entry").slideUp();

@@ -32,6 +32,9 @@ define([
   'vendor/jquery.scrollTo', /* /\.scrollTo/ */
   'rubric_assessment'
 ], function (round, I18n, $, GradeFormatHelper) {
+
+  var rubricAssessments = ENV.rubricAssessments;
+
   $("#content").addClass('padless');
   var fileIndex = 1;
   function submissionLoaded (data) {

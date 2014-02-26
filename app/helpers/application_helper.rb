@@ -172,31 +172,6 @@ module ApplicationHelper
     @wiki_sidebar_data
   end
 
-  # js_block captures the content of what you pass it and render_js_blocks will
-  # render all of the blocks that were captured by js_block inside of a <script> tag
-  # if you are in the development environment it will also print out a javascript // comment
-  # that shows the file and line number of where this block of javascript came from.
-  def js_block(options = {}, &block)
-    js_blocks << options.merge(
-      :file_and_line => block.to_s,
-      :contents => capture(&block)
-    )
-  end
-
-  def js_blocks; @js_blocks ||= []; end
-
-  def render_js_blocks
-    output = js_blocks.inject('') do |str, e|
-      # print file and line number for debugging in development mode.
-      value = ""
-      value << "<!-- BEGIN SCRIPT BLOCK FROM: " + e[:file_and_line] + " --> \n" if Rails.env.development?
-      value << e[:contents]
-      value << "<!-- END SCRIPT BLOCK FROM: " + e[:file_and_line] + " --> \n" if Rails.env.development?
-      str << value
-    end
-    raw(output)
-  end
-
   def hidden_dialog(id, &block)
     content = capture(&block)
     if !Rails.env.production? && hidden_dialogs[id] && hidden_dialogs[id] != content
