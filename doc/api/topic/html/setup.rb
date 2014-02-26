@@ -59,7 +59,11 @@ def indent(str, amount = 2, char = ' ')
 end
 
 def render_comment(string, wrap = 75)
-  indent(word_wrap(string), 2, '/')
+  if string
+    indent(word_wrap(string), 2, '/')
+  else
+    ""
+  end
 end
 
 def render_value(value, type = 'string')
