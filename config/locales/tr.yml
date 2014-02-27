@@ -5,7 +5,7 @@ tr:
     and_n_contexts: "ve diğer %{n}"
     and_n_sectionCodes: "ve diğer %{n}"
     bad_max_appts: "Katılımcı başına en az bir randevuya izin verimelidir"
-    bad_per_slot: "Alan başına en az bir randevuya izin verimelidir"
+    bad_per_slot: "Zaman aralığı başına en az bir randevuya izin verimelidir"
     context_required: "Bir takvim seçmeniz gerekmektedir"
     select_calendars: "Takvim Seç"
   EditGroupAssignmentView: 
@@ -79,7 +79,6 @@ tr:
     default_delegated_login_handle_name: "Oturum Aç"
     default_login_handle_name: Eposta
     saml_eppn_domain_stripped: "%{eppn} (ayrılmış etki alanı)"
-    test_bind_failed: "Birleştirme başarısız: %{error}"
     test_connection_timeout: "Bağlanırken zaman aşımına uğradı"
     test_host_unknown: "Bilinmeyen sağlayıcı: %{host}"
     test_login_auth_exception: "Oturum açma hatası: %{error}"
@@ -187,7 +186,7 @@ tr:
     saml_settings: 
       auth_type: Tür
       auth_url: "Bu ayar için oturum açma bağlantısı"
-      certificate_fingerprint: "Parmak İzi Sertifikası"
+      certificate_fingerprint: "Sertifika Parmakizi"
       change_password_url: "Parola Linkini Değiştir"
       discovery_url: "Keşif Bağlantısı:"
       discovery_url_description: "Bir bildirme url'si ayarlanırsa kimlik doğrulama gerektiğinde canvas tüm kullanıcıları bu URL'ye yönlendirecek. Bu sayfada kullanıcı oturum açmak için nereye gitmesi gerektiğini bulabilecek. Eğer bildirme url'si yapılandırılmazsa kullanıcının kimliğini doğrulamak için ilk SAML yapılandırılması kullanılacak."
@@ -204,7 +203,7 @@ tr:
         login_handle_name: "Oturum Açma Etiketi"
         position: Pozisyon
         requested_authn_context: "Kimlik Doğrulama Bağlamı"
-      log_in_url: "Oturum Açma URL'si"
+      log_in_url: "Hesap Oluşturma URL'si"
       log_out_url: "Oturum Kapatma URL'si"
       login_attribute: "Oturum Açma Özelliği"
       login_handle_name: "Oturum Açma Etiketi"
@@ -212,7 +211,7 @@ tr:
       no_discovery_url: Ayarlanmadı
       position: Pozisyon
       refresh_debugging: Yenile
-      requested_authn_context: "Kimlik Doğrulama Metni"
+      requested_authn_context: "Kimlik Doğrulama Bağlamı"
       saml_debug_instructions: "Hata ayıklamaya başladığınızda sonraki SAML oturum açma girişimleri hakkındaki tüm bilgiler toplanacaktır. Toplanan veri veya toplanan verilerin temizlemek ve geçerli hata ayıklama girişimini durdurmak için \"Hata Ayıklamayı Durdur\" ya da toplanan verileri görüntülemek için \"Yenile\" düğmesini tıklayın."
       saml_debugging: "Hata  Ayıklaması"
       save_button: "Kimlik Doğrulama Ayarlarını Kaydet"
@@ -353,7 +352,7 @@ tr:
         auth_logging: "Kullanıcı Giriş / Çıkış Etkinliği"
       auth_logging_search_results: 
         activity: Etkinlik
-        date: "Tarih:"
+        date: Tarih
         no_item_found: "Hiçbir öğe bulunamadı"
         time: Zaman
       comm_message_item: 
@@ -395,8 +394,8 @@ tr:
           add_enrollments: "Kullanıcıları Ekle"
           subtext: "Bir sonraki adımda ne yapmak istersiniz?"
       date_range_search: 
-        message_date_from: Tarih
-        message_date_to: Tarih
+        message_date_from: "Kimden Tarihi"
+        message_date_to: "Kime Tarihi"
       grade_change_logging_content: 
         auth_logging: "Not Değiştirme Etkinliği"
         find: Ara
@@ -408,7 +407,7 @@ tr:
         Grader: Notlandıran
         Student: Öğrenci
         To: Kime
-        date: "Tarih:"
+        date: Tarih
         from: Kimden
         no_item_found: "Hiçbir öğe bulunamadı"
         time: Zaman
@@ -553,7 +552,7 @@ tr:
       account_reports: 
         ross: 
           parameters: 
-            note: "Dersler ilgili durdurulan ödevler varsa, bu raporda puanlar doğru  görüntülenemeyebilir."
+            note: "Askıya alınmış ödev içeren derslerde bu rapordaki notlar doğru görünmeyebilir."
     custom_outcomes_csv_description: 
       account_reports: 
         edison: 
@@ -651,11 +650,11 @@ tr:
       account_reports: 
         default: 
           enrollments: 
-            check_box: "CSV Kayıtları"
+            check_box: "Kayıtlar CSV"
           sections: 
-            check_box: "CSV Bölümleri"
+            check_box: "Bölümler CSV"
           users: 
-            check_box: "CSV Kullanıcıları"
+            check_box: "Kullanıcılar CSV"
     no_user_message: "Bu kullanıcı id ile hiç kullanıcı bulunanmadı"
     outcome_results_csv_description: 
       account_reports: 
@@ -671,14 +670,14 @@ tr:
           order: 
             label: Emir
           outcome: 
-            radio: Çıktılar
+            radio: "Öğrenme Çıktıları"
           user: 
             radio: Kullanıcılar
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
           description: 
-            text: "Bu rapor, kategorilerdeki Canvas karşılık ayırma işlemleri ile ilgili tüm bilgileri vererecektir."
+            text: "Bu rapor, ilgili kategorilerindeki Canvas ön hazırlığı ile ilgili gerekli tüm bilgileri dışa aktaracak."
     quiz_data_csv_description: 
       account_reports: 
         ace: 
@@ -877,7 +876,7 @@ tr:
       no_language_preference: "Ayarlanmadı (varsayılan dil %{language})"
       notifications: 
         custom_name_description: "Seçildiği taktirde Canvas bildirimlerindeki gönderilen tüm markalaşma ayarları değişecek."
-        email_date: "Tarih:"
+        email_date: Tarih
         email_reply_to: Yanıtla
         email_to: Kime
         example: "Örnek:"
@@ -961,24 +960,24 @@ tr:
       account_reports: 
         default: 
           accounts: 
-            check_box: "CSV Hesapları"
+            check_box: "Hesaplar CSV"
           courses: 
             check_box: "Dersler CSV"
           enrollments: 
-            check_box: "CSV Kayıtları"
+            check_box: "Kayıtlar CSV"
           group_membership: 
             login: 
-              check_box: "Grup Üyeliği CSV'leri"
+              check_box: "Grup Üyeliği CSV"
           groups: 
-            check_box: "CSV Grupları"
+            check_box: "Gruplar CSV"
           sections: 
-            check_box: "CSV Bölümleri"
+            check_box: "Bölümler CSV"
           terms: 
             check_box: "Dönemler CSV"
           users: 
-            check_box: "CSV Kullanıcıları"
+            check_box: "Kullanıcılar CSV"
           xlist: 
-            check_box: "Tanımlanmamış CSV Listeleri"
+            check_box: "X liste CSV"
         sis_default: 
           parameters: 
             note: "*Dönem ayarları yalnızca Dersleri, Bölümleri, Kayıtları ve CSV dosyalarındaki X listeyi etkiler."
@@ -1016,7 +1015,7 @@ tr:
       title: "SIS İçe Aktarımı"
       try_import_again_link: "İçe aktarımı yeniden deneyin"
     site_admin_statistics: 
-      page_title: "%{account} İçin İstatistikler"
+      page_title: "%{account} için İstatistikler"
     statistics: 
       concluded_at: "%{at} tarihinde sonlandırıldı"
       created_at: "%{at} de oluşturuldu"
@@ -1135,12 +1134,12 @@ tr:
             text: "Ders Numarası"
           parameters: 
             note1: "Dönemdeki tüm dersler için raporu çalıştırmak için Ders ID boş bırakılabilir."
-            note2: "Dersler ilgili durdurulan ödevler varsa, bu raporda puanlar doğru  görüntülenemeyebilir."
+            note2: "Askıya alınmış ödev içeren derslerde bu rapordaki notlar doğru görünmeyebilir."
     terms_parameters: 
       account_reports: 
         default: 
           parameters: 
-            header: Koşul
+            header: Dönem
       all_terms: "Tüm Dönemler"
     test_ldap_dialog_title: "LDAP Ayarlarını Test Et"
     test_ldap_result_canceled: "İptal Edildi"
@@ -1164,8 +1163,6 @@ tr:
             text: "Bu rapor, şu öğelerden hiçbirini içermeyen tüm dersler içindir: ödevler, duyurular, tartışmalar, dosyalar, modüller, sayfalar veya kısa sınavlar."
     update_failed_notice: "Hesap ayarları güncellenemedi"
     user_add_failed_message: "Kullanıcı ekleme başarısız, lütfen tekrar deneyin"
-    user_added_message: "*%{user}* başarıyla eklendi!"
-    user_added_message_sent_message: "*%{user}* başarıyla eklendi! Onay epostası gönderildi."
     user_deleted_message: "%{username} başarıyla silindi"
     user_inactivity_csv_description: 
       account_reports: 
@@ -1181,7 +1178,7 @@ tr:
             day_drop: "Minimum ders öğeleri ziyaret edildi:"
     users_list: 
       login_name_or_sis_id: "Oturum / SIS ID :"
-      name: Name
+      name: İsim
       no_people_found: "Hiç kişi bulunamadı"
       you_can_search_by: "Buna göre ara:"
     zero_activity_csv_description: 
@@ -1513,7 +1510,6 @@ tr:
         never_drop: "Asla Düşürme"
         no_assignments: "[Ödev Yok]"
         weighted_by_points: "Puanlara Göre Ağırlıklı"
-      percent_of_total_grade: "Toplam Puanın % o'si"
     assignment_count: 
       one: "1 Ödev"
       other: "%{count} Ödev"
@@ -1530,7 +1526,7 @@ tr:
       no_assignment_groups: "Ödev Grupları bulunamadı"
     assignment_group_list_item: 
       add_assignment_to: "%{name}'a Ödev Ekle"
-      assignment_group_delete: "Ödev Grubu Sil"
+      assignment_group_delete: "Ödev Grubunu Sil"
       assignment_group_edit: "Ödev Gruplarını Düzenle"
       assignment_group_move: "Ödev Gruplarını Taşı"
       delete: Sil
@@ -1546,7 +1542,7 @@ tr:
       one: "1 Grup"
       other: "%{count} Grup"
     assignment_list_item: 
-      assignment_delete: "Ödev Sil"
+      assignment_delete: "Ödevi Sil"
       assignment_edit: "Ödevi Düzenle"
       assignment_move: "Ödevleri Taşı"
       delete: Sil
@@ -1598,7 +1594,7 @@ tr:
       assignments: 
         graded: "Bu ödev notlandırıldı"
         needs_grading_count: "Bu ödev için %{needs_grading_count} gönderi notlandırılmayı bekliyor"
-        overdue: "Bu ödev süresi geçmiş"
+        overdue: "Bu ödevin süresi geçmiş"
       no_assignments: "Bu ders için Ödev oluşturulmadı."
       titles: 
         assignments: Ödevler
@@ -1634,7 +1630,7 @@ tr:
       delete_group: "Bu grubu silmek istediğinize emin misiniz?"
     confirm_delete_group: "Bu ödev grubunu silmek istediğinize emin misiniz?"
     confirms: 
-      delete_assignment: "Ödevi silmek isteğinize emin misiniz?"
+      delete_assignment: "Bu ödevi silmek isteğinize emin misiniz?"
     create_assignment: 
       assignment: Ödev
       assignment_due_at: "Bitiş:"
@@ -1647,7 +1643,7 @@ tr:
       more: "Daha Fazla Seçenek"
       multiple_due_dates: "Çoklu bitiş tarihleri"
       not_graded_type: Notlandırılmamış
-      quiz_type: Sınav
+      quiz_type: "Kısa Sınav"
       save: Kaydet
       saving: Kaydediliyor...
     create_group: 
@@ -1682,7 +1678,7 @@ tr:
       options: 
         select_group: "Grup Seçiniz"
       tooltips: 
-        target_group: "Ödevleri taşımak için grup seç"
+        target_group: "Bu ödevi taşımak için bir grup seçin"
       warnings: 
         delete_assignment_group: "İçinde **%{assignment_count}** ödev olan *%{name}*i silmek üzeresiniz."
       would_you_like: "Yapmak isterim : "
@@ -1848,7 +1844,7 @@ tr:
       record_before_submitting: "Göndermeden Önce Kaydet"
       submit_failed: "Gönderim Başarısız, lütfen tekrar deneyin"
       submitting: Gönderiliyor...
-    multiple_due_dates: "Çoklu Bitiş Tarihi"
+    multiple_due_dates: "Çoklu Bitiş Tarihleri"
     name_is_required: "İsim zorunludur!"
     never_drop: 
       remove_rule: "Kuralı Sil"
@@ -1939,7 +1935,7 @@ tr:
         assign_rubric: "Değerlendirme Listesi Ata"
         edit: Düzenle
       messages: 
-        locked: "Ödev Kilitli"
+        locked: "Bu ödev şu anda kilitli"
       new_assignment: "Yeni Ödev"
       no_due_date: "Bitiş Tarihi Yok"
       no_points: Yok
@@ -2086,9 +2082,9 @@ tr:
       uploading: "Gönderi Yükleniyor"
     toggle_message: "ödev görünürlüğünü değiştir"
     toggle_show_by: 
-      date: "Tarih:"
+      date: Tarih
       show_by: "Göster: "
-      type: Tip
+      type: Tür
     turnitin_settings_dialog: 
       assignments: 
         turnitin_settings: 
@@ -2191,6 +2187,7 @@ tr:
     export_failed_not_found: "%{user_name} kullanıcılı bb_lcid %{id}'li dersi Blackboard'da bulunamadı"
     export_failed_with_id: "bb_lcid %{id}'li dersin Canvas'a aktarımında hata oluştu"
     no_course_found: "%{id}'nin %{id_type}'lı dersi yoktu"
+    no_course_id_given: "%{id_type} için tanımlanmış Canvas dersi yoktu"
     no_credentials_found: "%{user_name} kullanıcı ismi için kimlik bilgileri bulunamadı"
     no_credentials_given: "%{course_identifier} dersi için belirlenmiş kullanıcı adı yoktu"
     no_lcid_found: "Satır için belirlenmiş bb_lcid yoktu"
@@ -2378,8 +2375,7 @@ tr:
       scheduler_explanation_teacher_paragraph_1: "Bu Program Yapma Aracıdır. Bu aracı, öğrencilerinizin katılmak için kayıt yaptırabilecekleri randevu grupları oluşturmak için kullanabilirsiniz."
       scheduler_explanation_teacher_paragraph_2: "Örnek olarak diyelim ki dersinizi alan her bir öğrenci ile ara sınav ödevini görüşmek istediniz. Aracı kullanarak yeni bir randevu grubu oluşturabilir, sizin için uygun olan tarih ve zamanı belirtebilir, araca bu süreyi 15'er dakikalık bloklara böldürüp her zaman bloğu için bir öğrenci ayarlamasını sağlayabilirsiniz."
       scheduler_explanation_teacher_paragraph_3: "Daha sonra öğrenciler bilgilendirilecek ve belirlenmiş zaman bloklarından birine kayıt yaptırmaları gerektiğini görecekler. Öğrenciler kendilerine uygun bir zamanı belirleyebilmeleri için diğer takvimlerin de üstünde bir takvim üzerinde zaman bloklarını görecekler."
-      x_groups_have_signed_up: "%{participant_count} grubuna kayıt oldu"
-      x_people_have_signed_up: "%{participant_count} kişi kayıt oldu"
+      scheduler_explanation_teacher_paragraph_4: "* Sağ tarafta bulunan \"Randevu grubu oluştur\" butonuna tıklayarak başlayabilirsiniz *"
     buttons: 
       cancel: İptal
       send_message: Gönder
@@ -2395,7 +2391,7 @@ tr:
         calendar_week: Hafta
         screenreader_recommend_agenda: "Ekranokuyucu kullanıcıları: Olayları görmek için Gündem'i kullanın"
       loading: Yükleniyor
-      my_appointment_groups: "Benim Randevu Gruplarım"
+      my_appointment_groups: "Randevu Gruplarım"
     calendar_navigator: 
       enter_navigation_date: "Gitmek istediğiniz tarihi girin."
       next: Sonraki
@@ -2426,7 +2422,7 @@ tr:
       appt_group_options_help1: "Bazı varolan rezervasyonlar belirlemiş olduğunuz limitin üzerindedir. Bu durum etkilemeyecektir, değişikliğiniz sadece yeni rezervasyonlar üzerinde uygulanacaktır."
       appt_group_options_help2: "Ancak, elle herhangi bir mevcut rezervasyonları kaldırabilirsiniz."
       calendar: Takvim
-      date: "Tarih:"
+      date: Tarih
       details: "Ayrıntılar:"
       group_category: "Grup Kategorisi"
       group_signup: "Gruplarda kayıtlı kullanıcılar var."
@@ -2455,7 +2451,6 @@ tr:
       from: "Kimden:"
       links: 
         more_options: "Daha fazla seçenek"
-      timespan_separator: ile
       title: "Başlık:"
     edit_calendar_event_full: 
       buttons: 
@@ -2498,7 +2493,7 @@ tr:
       assignment: Ödev
       discussion: Tartışma
       event: Olay
-      quiz: Sınav
+      quiz: "Kısa Sınav"
     input_is_invalid_date: "Girilen değer geçerli bir tarih değil"
     loading_more_items: "Daha fazla öğe yükleniyor."
     loading_undated_events: "Tarihsiz olaylar yükleniyor"
@@ -2814,10 +2809,6 @@ tr:
         update: "İşbirliğini Güncelle"
       collaboration_name: "%{course_or_group_name} İşbirliği"
       descriptions: 
-        etherpad: |-
-            EtherPad hızlı bir şekilde paylaşılan belgeler oluşturmanızı sağlayan bir açık kaynak projesidir.  Diğerlerinin yazdıklarını onlar yazarken görebileceğiniz kadar hızlıdır. Fakat "pad" ler şifre ile korunmadığından bağlantı adresine sahip herkes düzenleme yapabilir. Herkese açık ve Google hesabı olmadan katılımı sağlamak istiyorsanız EtherPad Google Drive'a göre daha uygun olabilir.  
-              
-            **Uyarı**: çalışmanızın kaydedilmiş olarak saklandığına emin olmak için [EtherPad silme politikası](%{etherpad_deletion_policy_url}) ile ilgili bilginiz olmalı.
         google_docs: "Google Drive grup projelerinde işbirliği için güzel bir ortam. Microsoft Word e benzer fakat diğer paylaşılan kişilere eposta ile göndermek zorunda kalmadan aynı belfe üzerinde birlikte çalışabilirsiniz. \n\n\n\
             **Uyarı**: Google Drive da işbirliği yaparak çalışmak için (işbirliği yaptığınız kişilerin) ve sizin Google hesabınız olmalı. "
       labels: 
@@ -2981,7 +2972,7 @@ tr:
       setings: ayarlar
       start: Başlat
       view: Göster
-    no_concluded_conferences: "Tamamlanmış konferans yok"
+    no_concluded_conferences: "Sonlandırılmış konferans yok"
     no_new_conferences: "Yeni konferans yok"
     no_settings_error: "Konferansın gelişmiş ayarlar sayfası yok"
     no_urls_error: "Üzgünüz, bu konferans için henüz %{type} sayfa bulunmamakta."
@@ -3148,7 +3139,7 @@ tr:
       course_find_select: 
         course_name: "Ders ismi"
         include_completed_courses: "Tamamlanan dersleri içer"
-        or: o
+        or: veya
         search_label: "Ders arayınız"
         select_default: "Ders seçiniz"
       date_shift: 
@@ -3335,7 +3326,6 @@ tr:
       enrollment_linked_to: "*%{linked_user}* ile ilişkilendirildi"
       headings: 
         recent_messages: "Son Mesajlar"
-        user_services: "Kayıt Olunan Web Servisleri"
       help: 
         list_services: "Kayıtlı servislerin listesi etkinleştirilmemiş. Bu listeyi etkinleştimek ders ve grup üyelerinin sınıf dışında size daha kolay bağlanmalarını sağlar. "
         services: "Kullanıcı profilinizi herhangi bir dış servisle ilişkilendirmediniz. Canvas hesabınızı Facebook ve Twitter gibi servislere bağlayabilirsiniz. Bunu yaparsanız ders ve grup üyeleri sınıf dışında size daha kolay bağlanabilirler."
@@ -3345,27 +3335,20 @@ tr:
       legends: 
         memberships: Üyelik(ler)
       links: 
-        access_report: "Erişim Raporu"
         cant_delete: Silinemez
         conclude_enrollment: "Bu derse kaydı sonlandır"
         delete_enrollment: "Bu derse kaydı sil"
-        faculty_journal: "Öğretim Üyesi Kaydı"
         link_enrollment: "Bu ders kaydına link ver"
         link_services: "Web servislerini hesabıma bağla"
-        message_user: "Mesaj Gönder"
         more_about_this_user: "Bu Kullanıcı Hakkında Daha Fazla"
         more_user_details: "daha fazla kullanıcı ayrıntısı..."
         remove_avatar: "Avatar resmini kaldır"
         report_avatar: "Uygunsuz resim bildir"
         restore_enrollment: "Bu derse kaydı Yenile"
-        student_teacher_activity: "Sizinle olan Etkileşimler"
-        teacher_activity: "Öğrenci Etkileşim Raporu"
         title: 
           enrollment_sis_defined: "Bu derse kayıt üniversite tarafından tanımlanmıştır ve silinemez"
         user_account_details: "Kullanıcı Hesabı Ayrıntıları"
-        user_grades: Notlar
         user_only_view_section: "bu kullanıcı sadece bölüm arkadaşlarını görebilsin"
-        user_outcomes: "Öğrenme Çıktıları"
         user_view_all_sections: "bu kullanıcı tüm ders katılımcılarını görebilsin"
       no_messages: "Mesaj Yok"
       no_services: "%{user} kullanıcı hesabını henüz harici servislerle ilişkilendirmedi."
@@ -3628,7 +3611,7 @@ tr:
         add_prerequisite: "Ön koşul ekle"
         add_requirement: "Gereklilik ekle"
         reload_student: "Öğrenci İlerleme Durumunu Yeniden Yükle"
-        sort_by_name: Name
+        sort_by_name: İsim
         sort_by_progress: İlerleme
         student_progress: "İlerleme Durumunu Göster"
         title: 
@@ -3698,7 +3681,7 @@ tr:
     context_module_next: 
       images: 
         alt: 
-          incomplete: tamamlanmadı
+          incomplete: tamamlanmamış
         title: 
           complete: "Modül Tamamlandı"
           incomplete: "Modül Tamamlanmadı"
@@ -4341,7 +4324,6 @@ tr:
         delete_course: "Dersi Sil"
       details: 
         conclude_alt_text: "Öğrencilerin derse erişimini sınırlandırıp notları değiştirebilme yetkisini tekrar elde etmek isterseniz lütfen ders tarihleri ayarını kullanın. Ders tarih ayarları hakkında bilgiyi *burada* bulabilirsiniz"
-        confirm_conclude: "Uyarı: Dersi sonlandırırsanız notları değiştiremez ve ders içeriğine erişemezsiniz."
         confirm_delete: "Bu dersi silmek istediğinize emin misiniz? Silerseniz, öğrenciler ve öğretmenler birdaha erişemeyeceklerdir. Eğer açılır menüden kaldırılmasını istiyorsanız *dersi sonlandırmalısınız*."
         confirm_delete_addendum: "Dersi sonlandırmaya izin vermiyorsa, *ders bitiş tarihini değiştirmelisiniz* veya yöneticiye dersin sonlandırılması için başvurun."
       headings: 
@@ -4358,10 +4340,10 @@ tr:
       conclude_at: "Bitiş Tarihi"
       course_code: "Ders Kodu"
       details: "Lütfen yeni dersin detaylarını girin."
-      enrollment_term_id: Koşul
+      enrollment_term_id: Dönem
       headings: 
         copy_course: "%{course} Kopyala"
-      name: Name
+      name: İsim
       start_at: "Başlangıç Tarihi"
       titles: 
         copy_course: "Dersi Kopyala"
@@ -4606,7 +4588,6 @@ tr:
         add_section: "Bölüm Ekle"
         move_course: "Dersi Taşı"
         update_course: "Ders Detaylarını Güncelle"
-      course_open_enrollment: "Bu derse herkesin kayıt olması etkinleştirildi. Öğrencilerle *%{url}* bağlantısını paylaşırsanız kendileri kaydolabilirler. Alternatif olarak *%{url2}* adresinde hesap oluşturup şu giriş kodunu kullanabilirler: *%{code}*"
       course_open_enrollment_without_code: "Bu derste açık kayıt olma etkindir. Öğrencilerle şu URL'yi paylaşırsanız kendi kendilerine derse kayıt olabilirler: *%{url}*"
       course_overrides_term: "Herhangi bir dönem hazır ayarının üzerine yazılacaktır."
       date_restricted: "Kullanıcılar derse yalnızca bu tarihler arasında katılabilirler"
@@ -4846,7 +4827,7 @@ tr:
       website_url: "Web Sayfası URL"
     syllabus: 
       headers: 
-        date: "Tarih:"
+        date: Tarih
         day: Gün
         details: Ayrıntılar
       syllabus: 
@@ -5322,7 +5303,7 @@ tr:
         other: "%{count} cevap"
         zero: "Cevap yok"
       unread_count_tooltip: 
-        one: "Okunmamış 1 yanıt"
+        one: "%{count} okunmamış cevap"
         other: "%{count} okunmamış cevap"
         zero: "Okunmamış cevap yok"
     page_nav: 
@@ -5406,8 +5387,6 @@ tr:
     closed_for_comments: "Yorumlara Kapatıldı"
     confirm_delete_discussion_topic: "Bu tartışma başlığını silmek istediğinize emin misiniz?"
     delete: Sil
-    deleted_entry: 
-      deleted: "%{edited_at} tarihinde *%{editor_name}* tarafından silindi"
     discussions: Tartışmalar
     edit_settings: "Tartışma Ayarlarını Düzenle"
     entry_collection_view: 
@@ -5855,7 +5834,7 @@ tr:
         comments: yorumlar
         created_at: oluşturuldu
         request_context_id: "bağlam id isteği"
-        url: URL
+        url: url
         user: kullanıcı
       message_contains: "Mesaj içeriği"
     max_attempts: "Çok fazla oturum açma denemesi meydana geldi. Lütfen daha sonra tekrar deneyiniz veya sistem yönetici ile iletişime geçiniz."
@@ -5984,7 +5963,7 @@ tr:
     save_failed: "İnceleme kaydedilemiyor: %{message}"
     saving: Kaydediliyor...
     shared_secret: "Shared Secret"
-    submit: Onayla
+    submit: Gönder
     tool_show: 
       load_tool_button: "%{tool} Yükle"
       load_tool_new_tab_button: "%{tool} aracını teni pencerede Yükle"
@@ -6169,7 +6148,7 @@ tr:
         gathering_files_with_progress: "Dosyalar Toplanıyor (%{progress}%)..."
         no_preview_avaialble: "No Preview Available"
         uploading: "5 Dosya Yükleniyor..."
-        zip_finished: "Tamamlandı! Dosyasına Yönlendiriliyor..."
+        zip_finished: "Tamamlandı! Dosyaya Yönlendiriliyor..."
       page_title: Dosyalar
       storage_used: "Kullanılan Depolama: %{size1} / %{size2}"
       switch_views: "Düzenleyici Görünümünü Değiştir"
@@ -6442,7 +6421,7 @@ tr:
       goto_assignment: g
       menu: m
       sort: s
-    learning_outcome: "Öğrenme Çıktıları"
+    learning_outcome: "Öğrenme Çıktısı"
     mastery: yeterlik
     near_mastery: "yeterliğe yakın"
     no_assignments_have_points_warning: "Bir ödevde olası puanlar olmadıkça not hesaplanamaz"
@@ -7804,7 +7783,7 @@ tr:
           interaction_description: "%{count} gündür öğrenci/öğretmen etkileşimi yok"
           subject: "Uyarı: %{user_name}"
           ungraded_count_description: "%{count} veya daha fazla gönderi henüz notlandırılmadı"
-          ungraded_timespan_description: "%{count} Gün için, kalan puanlanmamış gönderiler"
+          ungraded_timespan_description: "%{count} gündür bir ödev notlandırılmadı"
           usernote_description: "%{count} gündür öğretim üyesi kaydı yok"
           view_here: "Buradan görebilirsiniz"
         interaction_description: "%{count} gündür öğrenci/öğretmen etkileşimi yok"
@@ -8793,6 +8772,7 @@ tr:
         no_time_set: "Zaman Ayarlanmadı"
         subject: "Olay Tarihi Değişti: %{event_title}, %{course_name}"
       twitter: 
+        email_body: "%{course_name} dersi %{course_name} olayının zamanı değiştirildi. Şu anda: %{new_time}"
         from_to_time: "%{start_date_time} ile %{end_date_time} arası"
         no_time_set: "Zaman Ayarlanmadı"
     file_locked: "Bu dosya kilitli."
@@ -8941,7 +8921,6 @@ tr:
           click_to_preferences: "Bildirim tercihlerinizi düzenlemek için buraya tıklayın"
     merge_email_communication_channel: 
       email: 
-        body: "%{host} üzerinde sizin için bir hesap oluşturuldu. Fakat Canvas hesabına da sahipsiniz. Birlikte kullanmak istiyorsanız bu iki hesabı birleştirebiliriz, lütfen şu bağlantıyı ziyaret ediniz:"
         html: 
           account_created: "%{host} üzerinde sizin için bir hesap oluşturuldu. Fakat Canvas hesabına da sahipsiniz."
           merge2: "Bunları birleştirmek istiyorsanız *click here* tıklayın"
@@ -9636,7 +9615,7 @@ tr:
     learning_outcome_type: "Öğrenme Çıktıları"
     module_type: Modül
     quiz_question_type: "Kısa Sınav Sorusu"
-    quiz_type: Sınav
+    quiz_type: "Kısa Sınav"
     rubric_type: "Değerlendirme Listesi"
     webct: 
       course_not_found: "Blackboard dersi bulunamadı."
@@ -9651,7 +9630,7 @@ tr:
     external_url: "Harici URL"
     file: Dosya
     page: Sayfa
-    quiz: Sınav
+    quiz: "Kısa Sınav"
     sub_header: "Alt Başlık"
   modules: 
     add_module_item_dialog: 
@@ -9719,17 +9698,9 @@ tr:
   notification: 
     added_to_conversation_description: "Karşılıklı konuşmaya eklendiniz"
     added_to_conversation_display: "Karşılıklı Konuşmalara Eklendi"
-    all_submissions_description: |-
-        *Sadece Eğitmen ve Yönetici* 
-        
-        Ödev gönder / tekrar gönder
     all_submissions_display: "Tüm Gönderiler"
     announcement_description: "Dersinizde yeni duyuru"
     announcement_display: Duyuru
-    appointment_availability_description: |-
-        *Sadece eğitmen ve yönetici:*
-        
-        Randevu saatlerini değiştirin
     appointment_availability_display: "Varolan Randevu"
     appointment_cancelations_description: "Randevu iptali"
     appointment_cancelations_display: "Randevu İptalleri"
@@ -9763,12 +9734,6 @@ tr:
       submission_comment: "Gönderi Yorumu"
     conversation_message_description: "Yeni Gelen Mesajlar"
     conversation_message_display: "Sohbet Mesajları"
-    course_content_description: |-
-        Ders içeriğini değiştirin:
-        
-        * Wiki sayfası
-        * Kısa sınav içeriği
-        * Ödev içeriği
     course_content_display: "Ders İçeriği"
     discussion_description: "Ders için yeni tartışma başlığı"
     discussion_display: Tartışma
@@ -9778,29 +9743,11 @@ tr:
     due_date_display: "Bitiş Tarihi"
     files_description: "Dersinize yeni bir dosya eklendi"
     files_display: Dosyalar
-    grading_description: "Şunları Kapsar:\n\n\
-        * Ödev / gönderi notları girişi / değişikliği\n\
-        * Açık ödev notları\n\
-        * Not ağırlıkları değişikliği\n\n\
-        &nbsp;\n\n\
-        Eğer bildirimlerde notlarınızı görmek istiyorsanız 'Not değişikliklerinde uyarı gönderiminizi' kapsamasını kontrol edin. "
     grading_display: Notlandırma
     grading_notify_include_grade: "No değişiklikleri ile ilgili uyarılarda puanları dahil et."
     grading_policies_description: "Ders değerlendirme kuralı değişikliği"
     grading_policies_display: "Notlandırma Kuralları"
-    invitation_description: |-
-        Davet:
-        
-        * Web konferansı
-        * Grup
-        * İşbirliği
-        * Ders
-        * Akran Değerlendirmesi & hatırlatma
     invitation_display: Davet
-    late_grading_description: |-
-        *Sadece Eğitmen ve Yönetici*
-        
-        Geç ödev gönderimi
     late_grading_display: "Geç Notlandırma"
     membership_update_description: |-
         *Sadece yönetici: kayıt aktivasyonu gönderildi*
@@ -9879,22 +9826,8 @@ tr:
       updated_wiki_page: "Wiki Sayfası Düzenlendi"
       web_conference_invitation: "Web Konferans Daveti"
     no_subject: "Konu Yok"
-    other_description: |-
-        *Sadece eğitmen ve yöneticiler:*
-        
-        * Ders kayıtları
-        * Rapor üretimleri
-        * İçerik dışarı aktarma
-        * Göç raporu
-        * Yeni hesap kullanıcısı
-        * Yeni öğretmen kaydı
-        * Yeni öğrenci grubu
     other_display: "Yönetimden Gelen Bildirimler"
     reminder_display: Hatırlatma
-    student_appointment_description: |-
-        *Sadece Eğitmen ve Yönetici:*
-        
-        Öğrenci ödev kaydı
     student_appointment_display: "Öğrenci Randevu Oturumları"
     submission_comment_description: |-
         Ödevi gönderi yorumu
@@ -9989,6 +9922,7 @@ tr:
     confirm: 
       delete: "Silmek istediğinize emin misiniz?"
       import_group: "\"%{group}\" grubunu \"%{target}\" grubuna aktarsın mı ? "
+      import_outcome: "\"%{outcome}\" öğrenme çıktısı \"%{outcome}\" grubuna aktarılsın mı?"
     criteria: 
       does_not_meet_expectations: "Beklentileri Karşılamıyor"
       exceeds_expectations: "Beklentilerin Üstünde"
@@ -10009,6 +9943,7 @@ tr:
     find_instructions: 
       instructions: 
         find: 
+          description: "*Kurumunuz ya da devlet tarafından oluşturulan Öğrenme çıktılarına buradan erişilebilir. Dersinizde olduğu gibi soldaki bölümde varolan öğrenme çıktıları arasında gezinebilirsiniz. Kullanmak istediğiniz öğrenme çıktısı ya da öğrenme çıktı grubunu bulduğunuzda dersinize eklemek için aşağıdaki içe aktar butonuna tıklayın."
           title: "Öğrenme Çıktıları Aranıyor"
     flash: 
       addSuccess: "Oluşturma başarılı"
@@ -10024,6 +9959,7 @@ tr:
       instructions: 
         main: 
           manage: 
+            description: "*Öğrenme çıktıları bir dersteki yeterlilikleri izlemek için oluşturulur. İlk olarak üst sıradaki menü çubuğuna göz gezidirin. Yeni bir öğrenme çıktısı oluşturmak için Yeni Öğrenme Çıktısı butonuna tıklayın ya da öğrenme çıktılarınızı düzenleyeceğiniz bir grup oluşturmak için Yeni Grup butonuna tıklayın. Ara butonu sayesinde bölgeniz ya da kurumunuz tarafından oluşturulmuş öğrenme çıktılarını kullanabilirsiniz. Öğrenme çıktılarını oluşturup kullandıkça bu çıktılar arasında gezinmek için soldaki paneli kullanabileceksiniz. Farklı seviyelerdeki öğrenme çıktılarını sürükle bırak yaparak kendi yapınızı oluşturabilirsiniz.* Daha da önemlisi, Canvas'ta notlandırma listelerine öğrenme çıktıları ekleyerek ödevleri notlandırırken yeterliliği değerlendirebilirsiniz. Öğrenme çıktılarını oluşturduktan sonra bunları notlandırmada kullanmaya başlamak için Değerlendirme Listelerini Yönet'e tıklayın.*"
             title: "Öğrenme Çıktılarını Ayarlama"
     mastery_error: "Daha büyük ceya 0'a eşit olmalıdır"
     missing_outcome: "Bu öğrenme çıktısı bulunamadı"
@@ -10132,6 +10068,7 @@ tr:
     notices: 
       delete_failed: "\"%{title}\" sayfası silinemiyor."
       page_deleted: "\"%{title}\" sayfası silindi."
+    reload_editing_page: "Siz düzenlemeye başladığınızdan beri bu sayfa değişti. * Tekrar yüklemenizde * tüm değişiklikleri kaybedersiniz."
     reload_viewing_page: "Siz incelemeye başladığınızdan beri bu sayfa değişti.  *Tekrar Yükle*"
     restore_failed: "Sayfa gözden geçirmeyi geri yükleme başarısız"
     save_button: Kaydet
@@ -10772,6 +10709,7 @@ tr:
       validations: 
         should_be_10_digits: "10 haneli bir sayı olmalıdır"
     ways_to_contact_me: "Benimle iletişim yolları"
+    you_have_no_services: "Herhangi bir hizmet kayıtlı değil, ayarlar sayfasından ekleyebilirsiniz."
   profiles: 
     avatar_dialog: 
       butons: 
@@ -10942,7 +10880,7 @@ tr:
   question_bank: 
     align_outcomes: "Çıktıları Sırala"
     already_bookmarked: "Zaten Sık Kullanılanlara Eklendi"
-    bookmark_failed: "Yer imi Oluşturma Başarısız"
+    bookmark_failed: "Sık Kullananlara Ekleme Başarısız"
     bookmarking: "Sık Kullanılanlara Ekleniyor..."
     buttons: 
       submit_copying: 
@@ -10957,16 +10895,16 @@ tr:
       submit_moving_failed: 
         one: "Sorunun Taşınması Başarısız, lütfen tekrar deneyin"
         other: "Soruların Taşınması Başarısız, lütfen tekrar deneyin"
-      submit_retry_copying: "Soruları kopyalama başarısız, lütfen tekrar deneyin"
-      submit_retry_moving: "Soruları taşıma başarısız, lütfen tekrar deneyin"
+      submit_retry_copying: "Soru kopyalama başarısız, lütfen tekrar deneyin"
+      submit_retry_moving: "Soru taşıma başarısız, lütfen tekrar deneyin..."
     default_name: "İsim Yok"
-    delete_are_you_sure: "Soru bankasını silmek istediğinize emin misiniz?"
-    error_loading_banks: "Soru bankasının yüklenmesi başarısız"
+    delete_are_you_sure: "Bu soru bankasını silmek istediğinize emin misiniz?"
+    error_loading_banks: "Soru bankasını yüklemede hata"
     links: 
       more_questions: "daha fazla soru"
     load_questions: "Sorular Yükleniyor..."
-    loading_banks: "Soru bankası yükleniyor..."
-    loading_more_fail: "daha fazla soruların yüklenmesi başarısız, lütfen tekrar deneyin"
+    loading_banks: "Soru bankaları yükleniyor..."
+    loading_more_fail: "daha fazla sorunun yüklenmesi başarısız, lütfen tekrar deneyin"
     move_questions: "Soruları Taşı"
     multiple_questions: "Çoklu Sorular"
     question_bank: "Soru Bankası"
@@ -11442,7 +11380,7 @@ tr:
       titles: 
         this_quiz_is_locked: "Bu kısa sınav kilitlidir. Ayrıntılı bilgi için tıklayınız."
     index_view: 
-      add_quiz: Sınav
+      add_quiz: "Kısa Sınav"
       links: 
         manage_question_banks: "Soru Bankalarını Yönet"
         publish_multiple_quizzes: "Çoklu Kısa Sınavları Yayınla"
@@ -11943,7 +11881,6 @@ tr:
       page_title: İstatistikler
       quiz_all_version_disclaimer: "Bu rapor, tüm kullanıcılar için tüm giriş haklarına dayalı kısa sınav istatistiklerini göstermektedir."
       quiz_latest_version_disclaimer: "Bu rapor, her bir kullanıcı için son giriş haklarına dayalı kısa sınav istatistiklerini göstermektedir."
-      student_n: "%{student_counter} öğrenci"
       survey_all_version_disclaimer: "Bu rapor, tüm kullanıcılar için tüm giriş haklarına dayalı anket istatistiklerini göstermektedir."
       survey_latest_version_disclaimer: "Bu rapor, her bir öğrenci için tüm giriş haklarına dayalı anket istatistiklerini göstermektedir."
       titles: 
@@ -12035,7 +11972,7 @@ tr:
         return_to_quiz_page: "Kısa sınav sayfasına dönmek için [tıklayınız](%{url})"
     take_quiz_right_side: 
       labels: 
-        attempt_due: "Bitiş nedeni"
+        attempt_due: "Hak bitiş tarihi"
         score: Puan
         time_elapsed: "Geçen Zaman"
         time_running: "Zaman İşliyor"
@@ -12072,9 +12009,9 @@ tr:
     default_text_only_question_name: Aralayıcı
     default_title: "İsimsiz Kısa Sınav"
     errors: 
-      invalid_hide_results: "Gizli sonuçlar geçersizdir"
-      invalid_ip_filter: "Geçersiz IP filtresi"
-      invalid_quiz_type: "Kısa sınav tipi doğrulanamadı"
+      invalid_hide_results: "Sonuçları gizleme geçersiz"
+      invalid_ip_filter: "IP filtresi geçersiz"
+      invalid_quiz_type: "Kısa sınav tipi geçersiz"
     question_name_counter: "Soru %{question_number}"
     types: 
       quiz: "Kısa Sınav"
@@ -12100,7 +12037,7 @@ tr:
   recent_student: 
     last_logged_in: "son oturum %{last_login}"
   recipient_input: 
-    context_search_placeholder: "Ders veya grup adı girin"
+    context_search_placeholder: "Bir isim, ders ya da grup girin"
     context_search_title: "İsim, ders veya grup"
     groups_count: 
       one: "1 grup"
@@ -12241,7 +12178,7 @@ tr:
     site_admin_permissions: "Site Yöneticisi İzinleri"
     update_failed_notice: "Rol yaratma başarısız"
   roles: 
-    account_admin: "Yönetici Hesabı"
+    account_admin: "Hesap Yöneticisi"
     permission_button: 
       rolebutton: 
         disable: "Devre Dışı"
@@ -12686,7 +12623,7 @@ tr:
       range_lower: "Aralık alt sınırı"
       range_of_numbers: "%{lower_number} ile %{higher_number} arası"
       range_upper: "Aralık üst sınırı"
-      remove_row: "Satırı Sil"
+      remove_row: "Satırı sil"
       remove_scheme: "Notlandırma Şemasını Sil"
       some_standard: "Bazı standartlar"
       use_this_standard: "Bu Notlandırma Standartını Kullan"
@@ -12824,7 +12761,7 @@ tr:
       user_has_no_bio: "%{user} biyografisini eklememiş"
       ways_to_contact_user: "%{name} ile iletişim yolları"
     recent_activity: 
-      date_column: "Tarih:"
+      date_column: Tarih
       message_column: Mesaj
       recent_activity: "En Son Etkinlik"
       recent_activity_in_course: "%{course_or_group} 'deki En Son Etkinlikler"
@@ -13218,17 +13155,17 @@ tr:
       section_id: section_id
       section_sis_id: section_sis_id
       sis_id: sis_id
-      submitted: onaylanan
+      submitted: gönderildi
     exact_answer: "%{exact_value} +/- %{margin}"
     inexact_answer: "%{lower_bound} ile %{upper_bound}"
     no_answer: "Cevap Yok"
   status_dates: 
-    available: Mevcut
+    available: Kullanılabilir
     available_until: "Şu zamana kadar kullanılabilir"
     closed: Kapalı
     due: Bitiş
     everyone_else: "Geri kalan herkes"
-    not_available: Kullanılabilir
+    not_available: "Şu tarihte kullanılabilir"
     pending: "Şu zamana kadar kullanılamaz"
   step: Adım
   sub_accounts: 
@@ -13430,7 +13367,7 @@ tr:
       titles: 
         enrollment_terms: "Kayıt Dönemleri"
         term_details: "Koşul Detayları"
-      update_term: "Koşulu Güncelle"
+      update_term: "Dönemi Güncelle"
     term: 
       buttons: 
         add: "Koşul Ekle"
@@ -13749,7 +13686,7 @@ tr:
       roles_student: "Öğrenci olarak kayıtlı."
       roles_ta: "Öğretmen yardımcısı olarak kayıtlı."
       roles_teacher: "Öğretmen olarak kayıtlı."
-      unpublished: Yayınlanmamış
+      unpublished: Yayınlanmadı
     errors: 
       no_teacher_courses: "Öğretmen ve öğrenci arasında paylaşılan ders bulunamadı"
       user_not_teacher: "Bu kullanıcı bu dersin eğitmeni değildir"
@@ -13914,7 +13851,7 @@ tr:
         last_journal_entry: "En son Öğretim Üyesi Kayıt Girişi"
         student_name: Öğrenci
         teacher_activity: "%{teacher} için Öğretmen Aktivite Raporu"
-        ungraded: "Puanlanmamış Ödevler"
+        ungraded: "Notlandırılmamış Ödevler"
       last_time: 
         one: "1 gün önce"
         other: "%{count} gün önce"
