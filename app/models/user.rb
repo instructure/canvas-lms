@@ -774,7 +774,11 @@ class User < ActiveRecord::Base
 
   def email_channel
     # It's already ordered, so find the first one, if there's one.
-    communication_channels.to_a.find{|cc| cc.path_type == 'email' && cc.workflow_state != 'retired' }
+    if communication_channels.loaded?
+      communication_channels.to_a.find { |cc| cc.path_type == 'email' && cc.workflow_state != 'retired' }
+    else
+      communication_channels.email.unretired.first
+    end
   end
 
   def email

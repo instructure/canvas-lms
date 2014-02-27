@@ -1466,10 +1466,10 @@ describe User do
 
   describe "email_channel" do
     it "should not return retired channels" do
-      u = User.new
-      retired = u.communication_channels.build(:path => 'retired@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired'}
+      u = User.create!
+      retired = u.communication_channels.create!(:path => 'retired@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired'}
       u.email_channel.should be_nil
-      active = u.communication_channels.build(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
+      active = u.communication_channels.create!(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
       u.email_channel.should == active
     end
   end
