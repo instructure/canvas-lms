@@ -1032,7 +1032,7 @@ define([
 
     handleStudentChanged: function(){
       var id = $selectmenu.val();
-      this.currentStudent = jsonData.studentMap[id];
+      this.currentStudent = jsonData.studentMap[id] || _.values(jsonData.studentsWithSubmissions)[0];
       document.location.hash = "#" + encodeURIComponent(JSON.stringify({
         "student_id": this.currentStudent.id
       }));
