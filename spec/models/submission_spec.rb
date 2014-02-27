@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -106,11 +106,16 @@ describe Submission do
     assignment_model
     @assignment.workflow_state = 'published'
     @assignment.save!
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'invited')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'completed')
+    section1 = @course.course_sections.create(name: '1')
+    section2 = @course.course_sections.create(name: '2')
+    section3 = @course.course_sections.create(name: '3')
+    section4 = @course.course_sections.create(name: '4')
+    section5 = @course.course_sections.create(name: '5')
+    section1.enroll_user(@teacher, 'TeacherEnrollment', 'accepted')
+    section2.enroll_user(@teacher, 'TeacherEnrollment', 'accepted')
+    section3.enroll_user(@teacher, 'TeacherEnrollment', 'accepted')
+    section4.enroll_user(@teacher, 'TeacherEnrollment', 'invited')
+    section5.enroll_user(@teacher, 'TeacherEnrollment', 'completed')
     @course.offer!
     @course.enroll_student(@student = user)
     @assignment.context.reload

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -324,28 +324,31 @@ class Enrollment < ActiveRecord::Base
 
   def update_linked_enrollments
     observers.each do |observer|
-      if enrollment = linked_enrollment_for(observer)
+      if enrollment = active_linked_enrollment_for(observer)
         enrollment.update_from(self)
       end
     end
   end
 
   def create_linked_enrollment_for(observer)
-    enrollment = linked_enrollment_for(observer) || observer.observer_enrollments.build
+    # we don't want to create a new observer enrollment if one exists
+    return true if linked_enrollment_for(observer)
+    enrollment = observer.observer_enrollments.build
     enrollment.associated_user_id = user_id
     enrollment.update_from(self)
   end
 
   def linked_enrollment_for(observer)
-    # there should really only ever be one, but due to SIS or legacy data there
-    # could be multiple. we'll use the best match (based on workflow_state)
-    enrollment = observer.observer_enrollments.where(
+    observer.observer_enrollments.where(
       :associated_user_id => user_id,
       :course_id => course_id,
-      :course_section_id => course_section_id_was).
-      order(self.class.state_rank_sql).first
+      :course_section_id => course_section_id_was).first
+  end
+
+  def active_linked_enrollment_for(observer)
+    enrollment = linked_enrollment_for(observer)
     # we don't want to "undelete" observer enrollments that have been
-    # explicitly deleted 
+    # explicitly deleted
     return nil if enrollment && enrollment.deleted? && workflow_state_was != 'deleted'
     enrollment
   end
@@ -959,47 +962,6 @@ class Enrollment < ActiveRecord::Base
   # course it is currently tied to
   def enrollment_term
     self.course.enrollment_term
-  end
-
-  def self.remove_duplicate_enrollments_from_sections
-    # clean up for enrollments that aren't unique on (user_id,
-    # course_section_id, type, associated_user_id)
-    #
-    # eventually we'll make this a db constraint, and we can drop this method,
-    # but that'll require some more code changes
-    deleted = 0
-    while true
-      pairs = self.connection.select_rows("
-          SELECT user_id, course_section_id, type, associated_user_id
-          FROM enrollments
-          WHERE sis_source_id IS NOT NULL
-          GROUP BY user_id, course_section_id, type, associated_user_id
-          HAVING count(*) > 1 LIMIT 50000")
-      break if pairs.empty?
-      pairs.each do |(user_id, course_section_id, type, associated_user_id)|
-        scope = self.where(:user_id => user_id, :course_section_id => course_section_id, :type => type, :associated_user_id => associated_user_id).
-            where("sis_source_id IS NOT NULL")
-        keeper = scope.select([:id, :workflow_state]).order(:sis_batch_id).last
-        deleted += scope.where("id<>?", keeper).delete_all if keeper
-      end
-    end
-    return deleted
-  end
-
-  # similar to above, but used on a scope or association (e.g. User#enrollments)
-  def self.remove_duplicates!
-    raise "remove_duplicates! needs to be scoped" unless scoped.where_values.present?
-
-    where(["workflow_state NOT IN (?)", ['deleted', 'inactive', 'rejected']]).
-      group_by{ |e| [e.user_id, e.course_id, e.course_section_id, e.associated_user_id] }.
-      each do |key, enrollments|
-        next if enrollments.size == 1
-        enrollments.
-          sort_by{ |e| [e.sis_batch_id || ''] + [-e.state_sortable] }.
-          reverse.
-          slice(1, enrollments.size - 1).
-          each(&:destroy)
-      end
   end
 
   def effective_start_at

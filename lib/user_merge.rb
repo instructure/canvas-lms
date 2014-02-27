@@ -91,96 +91,14 @@ class UserMerge
 
     destroy_conflicting_module_progressions(@from_user, target_user)
 
+    move_enrollments(@from_user, target_user)
+
     Shard.with_each_shard(from_user.associated_shards + from_user.associated_shards(:weak) + from_user.associated_shards(:shadow)) do
       max_position = Pseudonym.where(:user_id => target_user).order(:position).last.try(:position) || 0
       Pseudonym.where(:user_id => from_user).update_all(["user_id=?, position=position+?", target_user, max_position])
 
-      to_delete_ids = []
-      target_user_enrollments = Enrollment.where(:user_id => target_user).all
-      Enrollment.where(:user_id => from_user).each do |enrollment|
-        source_enrollment = enrollment
-        # non-deleted enrollments should be unique per [course_section, type]
-        target_enrollment = target_user_enrollments.detect { |enrollment| enrollment.course_section_id == source_enrollment.course_section_id && enrollment.type == source_enrollment.type && !['deleted', 'inactive', 'rejected'].include?(enrollment.workflow_state) }
-        next unless target_enrollment
-
-        # we prefer keeping the "most" active one, preferring the target user if they're equal
-        # the comments inline show all the different cases, with the source enrollment on the left,
-        # target enrollment on the right.  The * indicates the enrollment that will be deleted in order
-        # to resolve the conflict.
-        if target_enrollment.active?
-          # deleted, active
-          # inactive, active
-          # rejected, active
-          # invited*, active
-          # creation_pending*, active
-          # active*, active
-          # completed*, active
-          to_delete = source_enrollment
-        elsif source_enrollment.active?
-          # active, deleted
-          # active, inactive
-          # active, rejected
-          # active, invited*
-          # active, creation_pending*
-          # active, completed*
-          to_delete = target_enrollment
-        elsif target_enrollment.completed?
-          # deleted, completed
-          # inactive, completed
-          # rejected, completed
-          # invited*, completed
-          # creation_pending*, completed
-          # completed*, completed
-          to_delete = source_enrollment
-        elsif source_enrollment.completed?
-          # completed, deleted
-          # completed, inactive
-          # completed, rejected
-          # completed, invited*
-          # completed, creation_pending*
-          to_delete = target_enrollment
-        elsif target_enrollment.invited?
-          # deleted, invited
-          # inactive, invited
-          # rejected, invited
-          # creation_pending*, invited
-          # invited*, invited
-          to_delete = source_enrollment
-        elsif source_enrollment.invited?
-          # invited, deleted
-          # invited, inactive
-          # invited, rejected
-          # invited, creation_pending*
-          to_delete = target_enrollment
-        elsif target_enrollment.creation_pending?
-          # deleted, creation_pending
-          # inactive, creation_pending
-          # rejected, creation_pending
-          # creation_pending*, creation_pending
-          to_delete = source_enrollment
-        end
-        #elsif
-          # creation_pending, deleted
-          # creation_pending, inactive
-          # creation_pending, rejected
-          # deleted, rejected
-          # inactive, rejected
-          # rejected, rejected
-          # rejected, deleted
-          # rejected, inactive
-          # deleted, inactive
-          # inactive, inactive
-          # inactive, deleted
-          # deleted, deleted
-        #end
-
-        to_delete_ids << to_delete.id if to_delete && !['deleted', 'inactive', 'rejected'].include?(to_delete.workflow_state)
-      end
-      unless to_delete_ids.empty?
-        Enrollment.where(:id => to_delete_ids).update_all(:workflow_state => 'deleted')
-        target_user.communication_channels.email.unretired.each do |cc|
-          Rails.cache.delete([cc.path, 'invited_enrollments'].cache_key)
-        end
+      target_user.communication_channels.email.unretired.each do |cc|
+        Rails.cache.delete([cc.path, 'invited_enrollments'].cache_key)
       end
       [
         [:quiz_id, :quiz_submissions],
@@ -225,22 +143,21 @@ class UserMerge
           Rails.logger.error "migrating #{table} column user_id failed: #{e.to_s}"
         end
       end
-      from_user.all_conversations.find_each{ |c| c.move_to_user(target_user) } unless Shard.current != target_user.shard
+      from_user.all_conversations.find_each { |c| c.move_to_user(target_user) } unless Shard.current != target_user.shard
       updates = {}
-      ['account_users','asset_user_accesses',
-        'attachments',
-        'calendar_events','collaborations',
-        'context_module_progressions','discussion_entries','discussion_topics',
-        'enrollments','group_memberships','page_comments',
-        'rubric_assessments',
-        'submission_comment_participants','user_services','web_conferences',
-        'web_conference_participants','wiki_pages'].each do |key|
+      ['account_users', 'asset_user_accesses',
+       'attachments',
+       'calendar_events', 'collaborations',
+       'context_module_progressions', 'discussion_entries', 'discussion_topics',
+       'group_memberships', 'page_comments',
+       'rubric_assessments',
+       'submission_comment_participants', 'user_services', 'web_conferences',
+       'web_conference_participants', 'wiki_pages'].each do |key|
         updates[key] = "user_id"
       end
       updates['submission_comments'] = 'author_id'
       updates['conversation_messages'] = 'author_id'
       updates = updates.to_a
-      updates << ['enrollments', 'associated_user_id']
       updates.each do |table, column|
         begin
           klass = table.classify.constantize
@@ -260,9 +177,6 @@ class UserMerge
       end
 
       unless Shard.current != target_user.shard
-        # delete duplicate enrollments where this user is the observee
-        target_user.observee_enrollments.remove_duplicates!
-
         # delete duplicate observers/observees, move the rest
         from_user.user_observees.where(:user_id => target_user.user_observees.map(&:user_id)).delete_all
         from_user.user_observees.update_all(:observer_id => target_user)
@@ -304,6 +218,65 @@ class UserMerge
                     WHEN workflow_state = 'Unlocked' THEN 2
                     WHEN workflow_state = 'Locked' THEN 3
                 END DESC").first.destroy
+    end
+  end
+
+  def conflict_scope(column)
+    other_column = (column == :user_id) ?  :associated_user_id : :user_id
+    Enrollment.
+      select("type, role_name, course_section_id, #{other_column}").
+      group("type, role_name, course_section_id, #{other_column}").
+      having("COUNT(*) > 1")
+  end
+
+  def enrollment_conflicts(enrollment, column, users)
+    scope = Enrollment.
+      where(type: enrollment.type,
+            role_name: enrollment.role_name,
+            course_section_id: enrollment.course_section_id)
+
+    if column == :user_id
+      scope = scope.where(user_id: users, associated_user_id: enrollment.associated_user_id)
+    else
+      scope = scope.where(user_id: enrollment.user_id, associated_user_id: users)
+    end
+    scope
+  end
+
+  def enrollment_keeper(scope)
+    # prefer active enrollments to have no impact to the end user.
+    # then prefer enrollments that were created by sis imports
+    # then just keep the newest one.
+    scope.order("CASE WHEN workflow_state='active' THEN 1
+                      WHEN workflow_state='invited' THEN 2
+                      WHEN workflow_state='creation_pending' THEN 3
+                      WHEN sis_batch_id IS NOT NULL THEN 4
+                      WHEN workflow_state='completed' THEN 5
+                      WHEN workflow_state='rejected' THEN 6
+                      WHEN workflow_state='inactive' THEN 7
+                      WHEN workflow_state='deleted' THEN 8
+                      ELSE 9
+                      END, sis_batch_id DESC, updated_at DESC").first
+  end
+
+  def move_enrollments(from_user, target_user)
+    [:associated_user_id, :user_id].each do |column|
+      users = [from_user, target_user]
+      Shard.with_each_shard(from_user.associated_shards) do
+        conflict_scope(column).where(column => users).find_each do |e|
+
+          scope = enrollment_conflicts(e, column, users)
+          keeper = enrollment_keeper(scope)
+
+          # delete all conflicts from target user
+          scope.where("id<>?", keeper).where(column => target_user).delete_all
+
+          # mark all conflicts on from_user as deleted so they will be left
+          scope.active.where("id<>?", keeper).where(column => from_user).destroy_all
+        end
+        # move all the enrollments that are not marked as deleted to the target user
+        Enrollment.active.where(column => from_user).update_all(column => target_user)
+      end
     end
   end
 

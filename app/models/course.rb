@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -78,6 +78,7 @@ class Course < ActiveRecord::Base
   has_many :course_sections
   has_many :active_course_sections, :class_name => 'CourseSection', :conditions => {:workflow_state => 'active'}
   has_many :enrollments, :include => [:user, :course], :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
+  has_many :all_enrollments, :class_name => 'Enrollment'
   has_many :current_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')", :include => :user
   has_many :typical_current_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type NOT IN ('StudentViewEnrollment', 'ObserverEnrollment', 'DesignerEnrollment')", :include => :user
   has_many :prior_enrollments, :class_name => 'Enrollment', :include => [:user, :course], :conditions => "enrollments.workflow_state = 'completed'"
@@ -1566,19 +1567,17 @@ class Course < ActiveRecord::Base
     else
       enrollment_state = 'creation_pending' if enrollment_state == 'invited' && !self.available?
     end
-    if opts[:allow_multiple_enrollments] && associated_user_id
-      e = self.enrollments.find_by_user_id_and_type_and_role_name_and_course_section_id_and_associated_user_id(user.id, type, role_name, section.id, associated_user_id)
-    elsif opts[:allow_multiple_enrollments]
-      e = self.enrollments.find_by_user_id_and_type_and_role_name_and_course_section_id(user.id, type, role_name, section.id)
+    if opts[:allow_multiple_enrollments]
+      e = self.all_enrollments.where(user_id: user, type: type, role_name: role_name, associated_user_id: associated_user_id, course_section_id: section.id).first
     else
-      e = self.enrollments.find_by_user_id_and_type_and_role_name(user.id, type, role_name)
+      e = self.all_enrollments.where(user_id: user, type: type, role_name: role_name, associated_user_id: associated_user_id).first
     end
     if e
       e.already_enrolled = true
       e.attributes = {
         :course_section => section,
         :workflow_state => 'invited',
-        :limit_privileges_to_course_section => limit_privileges_to_course_section } if e.completed? || e.rejected?
+        :limit_privileges_to_course_section => limit_privileges_to_course_section } if e.completed? || e.rejected? || e.deleted?
     end
     # if we're creating a new enrollment, we want to return it as the correct
     # subclass, but without using associations, we need to manually activate
@@ -1637,16 +1636,16 @@ class Course < ActiveRecord::Base
     enrollment
   end
 
-  def enroll_ta(user)
-    enroll_user(user, 'TaEnrollment')
+  def enroll_ta(user, opts={})
+    enroll_user(user, 'TaEnrollment', opts)
   end
 
-  def enroll_designer(user)
-    enroll_user(user, 'DesignerEnrollment')
+  def enroll_designer(user, opts={})
+    enroll_user(user, 'DesignerEnrollment', opts)
   end
 
-  def enroll_teacher(user)
-    enroll_user(user, 'TeacherEnrollment')
+  def enroll_teacher(user, opts={})
+    enroll_user(user, 'TeacherEnrollment', opts)
   end
 
   def resubmission_for(asset)

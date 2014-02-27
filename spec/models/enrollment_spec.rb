@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -37,12 +37,15 @@ describe Enrollment do
     @enrollment.state.should eql(:active)
     @enrollment.reject
     @enrollment.state.should eql(:rejected)
+    @enrollment.destroy!
     enrollment_model
     @enrollment.complete
     @enrollment.state.should eql(:completed)
+    @enrollment.destroy!
     enrollment_model
     @enrollment.reject
     @enrollment.state.should eql(:rejected)
+    @enrollment.destroy!
     enrollment_model
     @enrollment.accept
     @enrollment.state.should eql(:active)
@@ -51,6 +54,7 @@ describe Enrollment do
   it "should be pending if it is invited or creation_pending" do
     enrollment_model(:workflow_state => 'invited')
     @enrollment.should be_pending
+    @enrollment.destroy!
 
     enrollment_model(:workflow_state => 'creation_pending')
     @enrollment.should be_pending
@@ -1307,60 +1311,6 @@ describe Enrollment do
     end
   end
 
-  describe ".remove_duplicate_enrollments_from_sections" do
-    before do
-      course_with_student(:active_all => true)
-      @e1 = @enrollment
-      @e1.sis_batch_id = 2
-      @e1.sis_source_id = 'ohai'
-      @e1.save!
-    end
-
-    it "should leave single enrollments alone" do
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-      @e1.reload.should be_active
-    end
-
-    it "should remove duplicates" do
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :workflow_state => 'active', :type => "StudentEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(-1)
-    end
-
-    it "should prefer the highest sis_batch_id" do
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :type => "StudentEnrollment", :sis_batch_id => 1)
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(-1)
-      @e1.reload.state.should == :active
-    end
-
-    it "should group by user_id" do
-      enrollment_model(:course_section => @course.course_sections.first, :user => user, :sis_source_id => 'ohai2', :type => "StudentEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-    end
-
-    it "should group by type" do
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :type => "TeacherEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-    end
-
-    it "should group by section" do
-      enrollment_model(:course_section => @course.course_sections.create!(:name => 's2'), :user => @user, :sis_source_id => 'ohai', :type => "StudentEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-    end
-
-    it "should group by associated_user_id" do
-      @e1.type = "ObserverEnrollment"
-      @e1.save!
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :associated_user_id => user.id, :type => "ObserverEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-    end
-
-    it "should ignore non-sis enrollments" do
-      @e1.update_attribute('sis_source_id', nil)
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :type => "StudentEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-    end
-  end
-
   describe "effective_start_at" do
     before :each do
       course_with_student(:active_all => true)
@@ -1515,31 +1465,6 @@ describe Enrollment do
 
       se.complete
       pe.reload.should be_completed
-    end
-
-    it 'should update the best observer enrollment if there are duplicates' do
-      se = course_with_student(:user => @student)
-      pe = @parent.observer_enrollments.first
-      pe.should_not be_nil
-
-      pe.destroy
-      pe2 = @parent.observer_enrollments.build
-      pe2.course_id = pe.course_id
-      pe2.course_section_id = pe.course_section_id
-      pe2.associated_user_id = pe.associated_user_id
-      pe2.save!
-
-      se.invite
-      pe.reload.should be_deleted
-      pe2.reload.should be_invited
-
-      se.accept
-      pe.reload.should be_deleted
-      pe2.reload.should be_active
-
-      se.complete
-      pe.reload.should be_deleted
-      pe2.reload.should be_completed
     end
 
     it 'should not undelete observer enrollments if the student enrollment wasn\'t already deleted' do
