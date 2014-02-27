@@ -21,7 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ApplicationHelper do
   include ApplicationHelper
-  
+  include ERB::Util
+
   context "folders_as_options" do
     before(:each) do
       course_model

@@ -22,6 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe QuizzesHelper do
   include ApplicationHelper
   include QuizzesHelper
+  include ERB::Util
 
   describe "#needs_unpublished_warning" do
     before do
