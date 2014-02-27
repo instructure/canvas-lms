@@ -2572,7 +2572,11 @@ class User < ActiveRecord::Base
   end
 
   def all_accounts
-    @all_accounts ||= self.accounts.with_each_shard
+    @all_accounts ||= shard.activate do
+      Rails.cache.fetch(['all_accounts', self].cache_key) do
+        self.accounts.with_each_shard
+      end
+    end
   end
 
   def all_paginatable_accounts
