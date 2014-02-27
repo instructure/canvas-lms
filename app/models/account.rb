@@ -729,7 +729,7 @@ class Account < ActiveRecord::Base
       result = false
 
       if !site_admin? && user
-        scope = user.enrollments.where(:root_account_id => root_account).where("enrollments.workflow_state<>'deleted'")
+        scope = root_account.enrollments.active.where(user_id: user)
         result = root_account.teachers_can_create_courses? &&
             scope.where(:type => ['TeacherEnrollment', 'DesignerEnrollment']).exists?
         result ||= root_account.students_can_create_courses? &&
