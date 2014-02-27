@@ -129,6 +129,7 @@ class AccountsController < ApplicationController
         js_env(:ACCOUNT_COURSES_PATH => account_courses_path(@account, :format => :json))
         load_course_right_side
         @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
+        Course.send(:preload_associations, @courses, :enrollment_term)
         build_course_stats
       end
       format.json { render :json => account_json(@account, @current_user, session, params[:includes] || []) }
