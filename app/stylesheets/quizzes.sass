@@ -1719,3 +1719,12 @@ ul#quiz_versions
       font-size: 15px
   span.field + span.field
     margin-left: 0
+
+// Fix for IE10 not showing hover icons for drag/drop when hovering over
+// questions on the "Questions" tab.
+.hover
+  .move .move_icon
+    display: inline
+    cursor: move
+  .links a
+    left: 0
