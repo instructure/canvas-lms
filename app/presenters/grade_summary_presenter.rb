@@ -51,7 +51,7 @@ class GradeSummaryPresenter
   end
 
   def selectable_courses
-    courses_with_grades.select do |course|
+    courses_with_grades.to_a.select do |course|
       student_enrollment = course.all_student_enrollments.find_by_user_id(student)
       student_enrollment.grants_right?(@current_user, nil, :read_grades)
     end
@@ -61,12 +61,12 @@ class GradeSummaryPresenter
     @student_enrollment ||= begin
       if @id_param # always use id if given
         validate_id
-        user_id = Shard.relative_id_for(@id_param, Shard.current, @context.shard)
-        @context.all_student_enrollments.find_by_user_id(user_id)
+        user_id = Shard.relative_id_for(@id_param, @context.shard, @context.shard)
+        @context.shard.activate { @context.all_student_enrollments.find_by_user_id(user_id) }
       elsif observed_students.present? # otherwise try to find an observed student
         observed_student
       else # or just fall back to @current_user
-        @context.all_student_enrollments.find_by_user_id(@current_user)
+        @context.shard.activate { @context.all_student_enrollments.find_by_user_id(@current_user) }
       end
     end
   end
