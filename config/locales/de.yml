@@ -391,8 +391,8 @@ de:
           add_enrollments: "Einschreibungen hinzufügen"
           subtext: "Was möchten Sie als nächstes tun?"
       date_range_search: 
-        message_date_from: "Von Datum"
-        message_date_to: "Bis Datum"
+        message_date_from: "Datum von"
+        message_date_to: "Datum bis"
       grade_change_logging_content: 
         auth_logging: Notenänderungsaktivität
         find: Suchen
@@ -403,7 +403,7 @@ de:
         Course: Kurs
         Grader: Benoter
         Student: Student
-        To: An
+        To: Bis
         date: Datum
         from: Von
         no_item_found: "Keine Elemente gefunden"
@@ -555,7 +555,7 @@ de:
         edison: 
           description: 
             header: Beispiel
-            text: "Dieser Bericht zeigt die Lernergebnisse für alle Studenten für ein bestimmtes Lernziel und einen Kurs. Die erstellte CSV-Datei enthält eine Zeile pro Benutzer und zeigt Details für das Ergebnis, einschließlich der zugehörigen Aufgaben."
+            text: "Dieser Bericht zeigt die Lernergebnisse für alle Studenten für ein bestimmtes Lernziel und einen Kurs. Die erstellte CSV-Datei enthält eine Zeile pro Benutzer und zeigt die Details für das Ergebnis, einschließlich der zugehörigen Aufgaben."
     custom_outcomes_csv_parameters: 
       account_reports: 
         edison: 
@@ -760,7 +760,7 @@ de:
       alert_icon_warning_option: Warnung
       alert_timespan: "von %{start_at} bis %{end_at}"
       alerts_title: Benachrichtigungen
-      announcement_blank_to_all: "(Wenn keine ausgewählt sind, alle alle senden)"
+      announcement_blank_to_all: "(Wenn keine ausgewählt sind, an alle senden)"
       announcement_sent_to_roles: "Nur an die folgenden Benutzertypen senden:"
       announcement_sent_to_subset: "Gesendet an 1 / %{denominator} Benutzer jeden Monat"
       buttons: 
@@ -1429,7 +1429,7 @@ de:
     titles: 
       grading_scheme_info: "Benotungssystem anzeigen/bearbeiten"
   assignment_details: 
-    no_graded_submissions: "Keine benoteten Einreichungen"
+    no_graded_submissions: "Keine benoteten Einsendungen"
   assignment_details_dialog: 
     average_score: "Durchschnittliche Punktzahl:"
     count_of_submissions: "%{cnt} Einsendungen"
@@ -1891,7 +1891,7 @@ de:
       titles: 
         automatically_assign_reviews: "Korrekturen automatisch zuweisen"
         remind: "%{assessor} an Beurteilung erinnern, zuletzt benachrichtigt %{time}"
-        reminder: "%{assessor} an Beurteilung erinnern, zuletzt benachrichtigt %{time}"
+        reminder: "%{assessor} an Leistungstest erinnern, zuletzt benachrichtigt %{time}"
     peer_reviews_selector: 
       labels: 
         automatically_assign_peer_reviews: "Peer-Reviews automatisch zuweisen"
@@ -3080,7 +3080,7 @@ de:
       options: Optionen
     must_upload_file: "Hochladen einer Datei oder URL erforderlich"
     no_content_selected: "Sie haben keine Inhalte zum Importieren ausgewählt."
-    no_day_substitutions: "Keine Tages-Verschiedungen hinzugefügt"
+    no_day_substitutions: "Keine Tagesverschiebungen hinzugefügt"
     no_migrations_running: "Derzeit werden keine Migrationen ausgeführt"
     progressing_content_migration: 
       issues_text: Probleme
@@ -5283,7 +5283,7 @@ de:
       add_rubric: "Rubrik hinzufügen"
       announcement_closed: "Für diese Ankündigung können keine Kommentare abgegeben werden"
       announcement_locked: "Diese Ankündigung ist für Benutzer bis zum *%{date}* nicht sichtbar"
-      announcement_locked_until: "Diese Ankündigung ist gesperrt bis %{time}"
+      announcement_locked_until: "Diese Ankündigung ist bis %{time} gesperrt"
       announcement_not_visible: "Diese Ankündigung ist für Benutzer nicht sichtbar"
       authors_name: "Name des Autors"
       collapse_replies: "Antworten minimieren"
@@ -5458,14 +5458,14 @@ de:
     image_not_found: "Bild wurde nicht gefunden, bitte probieren Sie es mit einer anderen URL"
     instructions: "Tippen oder fügen Sie die URL des Bildes ein, das Sie einfügen möchten:"
     loading: "Ladevorgang läuft..."
-    mathjax_text_entry_field_label: "Geben Sie die Gleichung als LaTeX ein."
+    mathjax_text_entry_field_label: "Geben Sie die Gleichung im LaTeX-Format ein."
     more_external_tools: "Weitere externe Tools"
     role: 
       duplicate_role_error: "Die Rolle konnte nicht erstellt werden, da bereits eine Rolle mit diesem Namen vorhanden ist. Verwenden Sie einen anderen Namen."
       remove_role_confirmation: "Wenn Benutzer mit dieser Rolle vorhanden sind, behalten sie die derzeitigen Berechtigungen bei. Sie können jedoch keine neuen Benutzer mit dieser Rolle erstellen. Klicken Sie auf \"OK\", um mit dem Löschen der Rolle fortzufahren."
     save_failed: "Konnte nicht gespeichert werden, bitte versuchen Sie es später nochmal"
     saving: "Speichervorgang läuft..."
-    screen_reader_tip: "Benutzer von Sprachausgabeprogrammen: Um auf einfache Weise auf diesen Editor zuzugreifen, wechseln Sie in die erweiterte Ansicht,, und geben Sie entweder LaTeX direkt oder mithilfe der Symbolleiste ein. Sie finden den Link zur erweiterten Ansicht am Ende des Dialogfelds, vor dem Bearbeitungsfeld."
+    screen_reader_tip: "Benutzer von Sprachausgabeprogrammen: Um auf einfache Weise auf diesen Editor zuzugreifen, wechseln Sie in die erweiterte Ansicht,, und öffnen Sie entweder LaTeX direkt oder mithilfe der Symbolleiste. Sie finden den Link zur erweiterten Ansicht am Ende des Dialogfelds, vor dem Bearbeitungsfeld."
     search_flickr: "Durchsuchen Sie flickr creative commons"
     switch_editor_html: HTML-Editor
     switch_editor_visual: "Visual Editor"
@@ -6005,9 +6005,9 @@ de:
         stellen Sie sicher, dass alle Entwurfsinhalte bereit für die Veröffentlichung sind und allen Benutzern des Kurses zur Verfügung stehen.
     google_docs_domain_restriction: "Google Docs Domain-Beschränkung"
     outcome_gradebook: "Notenbuch für Ergebnisse"
-    screenreader_gradebook: "Sprachausgabeprogramm – Notenbuch"
+    screenreader_gradebook: "Screenreader Gradebook"
   file_browser_view: 
-    folder_tree_instructions: "Verwenden Sie die Nach-oben- und die Nach-unten-Tasten, um in der Baumstruktur zu navigieren. Drücken Sie die Nach-rechts-Taste, um Ordner zu erweitern, die Nach-links-Taste, um sie auszublenden, und die Eingabetaste, um ein Bild auszuwählen."
+    folder_tree_instructions: "Verwenden Sie die Nach-oben- und die Nach-unten-Tasten, um durch die Baumstruktur zu navigieren. Drücken Sie die Nach-rechts-Taste, um Ordner zu erweitern, die Nach-links-Taste, um sie zu minimieren, und die Eingabetaste, um ein Bild auszuwählen."
   filebrowserview: 
     course_files: Kursdateien
     group_files: Gruppendateien
@@ -6101,16 +6101,16 @@ de:
       locked: "Diese Datei ist noch nicht freigegeben und kann nicht heruntergeladen werden."
       locked2: "Diese Datei ist gesperrt und kann von Studenten nicht heruntergeladen werden."
       messages: 
-        creating_zip: "Zip-datei wird erstellt..."
+        creating_zip: "ZIP-Datei wird erstellt ..."
         gathering_and_zipping: |-
             **Die Inhalte dieses Ordners werden gesammelt** und zu einer
             Zip-datei komprimiert.  Dies kann abhängig von der Größe und Anzahl der Dateien eine Weile dauern.
-        gathering_data: "Daten werden gesammelt..."
+        gathering_data: "Daten werden erfasst ..."
         gathering_files: "Dateien werden gesammelt..."
-        gathering_files_with_progress: "Dateien werden gesammelt (%{progress}%)..."
+        gathering_files_with_progress: "Dateien werden erfasst (%{progress}%) ..."
         no_preview_avaialble: "Keine Vorschau verfügbar"
         uploading: "5 Dateien werden hochgeladen..."
-        zip_finished: "Fertig!  Weiterleitung zu Datei..."
+        zip_finished: "Fertig!  Weiterleitung zur Datei ..."
       page_title: Dateien
       storage_used: "Verwendeter Speicherplatz: %{size1} von %{size2}"
       switch_views: "Ansichten wechseln"
@@ -6345,7 +6345,7 @@ de:
       zero_point_assignment: "Für die Aufgaben in dieser Gruppe können keine Punkte vergeben werden, und sie können bei der Notenberechnung nicht berücksichtig werden"
     concluded_course_error_message: "Dies ist ein abgeschlossener Kurs. Aus diesem Grund stehen nur abgeschlossene Einschreibungen zur Verfügung."
     course_average: Kursdurchschnitt
-    course_median: "Mittelwert für den Kurs"
+    course_median: "Mittlerer Wert für Kurs"
     course_mode: Kursmodus
     dropped_for_grading: "Bleibt bei der Bewertung unberücksichtigt"
     error: 
@@ -6363,7 +6363,7 @@ de:
       speedgrader: SpeedGrader
     header_filter: 
       course_average: Kursdurchschnitt
-      course_median: "Mittelwert für den Kurs"
+      course_median: "Mittlerer Wert für Kurs"
       course_mode: Kursmodus
     hide_notes: "Anmerkungsspalte ausblenden"
     hide_student_names: "Namen der Studenten ausblenden"
@@ -6389,12 +6389,12 @@ de:
     outcome_gradebook: 
       toggle_sidebar: "Seitenleiste ein/aus"
     outcome_popover: 
-      mastery_set_at: "Leistungsziel festgelegt als"
+      mastery_set_at: "Leistungsziel festgelegt auf"
       no_results: "(keine Ergebnisse)"
       view_more_details: "Weitere Details anzeigen"
     percent_of_grade: "%{percentage} der Note"
     points_out_of: "von insgesamt %{points_possible}"
-    remedial: Abhilfemaßnahme
+    remedial: Wiederholung
     resubmitted: "seit letzter Benotung erneut eingesandt"
     row_student_name: 
       student_placeholder: Student
@@ -6411,9 +6411,9 @@ de:
       filter_by_student: "Nach Studentenname oder Zweit-ID filtern"
       grades: Noten
       hide_student_names: "Namen der Studenten ausblenden"
-      include_ungraded: "Nicht benotet als 0 behandeln"
-      learning_mastery: "Lernziel erreicht"
-      old_gradebook: "altes Notenbuch"
+      include_ungraded: "Nicht benotete als 0 behandeln"
+      learning_mastery: "Leistungsziel erreicht"
+      old_gradebook: "Altes Notenbuch"
       publish_to_sis: "Noten im SIS veröffentlichen"
       set_group_weights: "Gruppengewichtungen festlegen"
       show_attendance_columns: "Anwesenheitsspalten anzeigen"
@@ -9825,10 +9825,10 @@ de:
     ? "yes"
     : Ja
   outcome_gradebook_description: |-
-      Mithilfe des Notenbuchs mit Ergebnissen können Dozenten den Fortschritt von Studenten und
-      Kursen in Bezug auf die Lernergebnisse des Kurses schnell anzeigen. Die Ergebnisse werden in
+      Mithilfe des Notenbuchs für Ergebnisse können Dozenten den Fortschritt von Studenten und
+      Kursen in Bezug auf die Lernergebnisse des Kurses rasch anzeigen. Die Ergebnisse werden in
       einem Notenbuch-ähnlichen Format und die Fortschritte der Studenten als numerischer Punktestand
-      und als Leistungziel erreicht/Leistungsziel fast erreicht/Wiederholung angezeigt.
+      und als Leistungziel erreicht/Leistungsziel fast erreicht/Abhilfe angezeigt.
   outcome_groups: 
     invalid_file: "Ungültige Resultatsgruppen-datei"
   outcome_groups_api: 
@@ -10781,7 +10781,7 @@ de:
     align_outcomes: "Resultate anpassen"
     already_bookmarked: "Lesezeichen existiert bereits"
     bookmark_failed: "Hinzufügen des Lesezeichens fehlgeschlagen"
-    bookmarking: "Lesezeichen wird hinzugefügt..."
+    bookmarking: "Lesezeichen wird hinzugefügt ..."
     buttons: 
       submit_copying: 
         one: "Frage wird kopiert ..."
@@ -10795,16 +10795,16 @@ de:
       submit_moving_failed: 
         one: "Verschieben der Frage fehlgeschlagen. Versuchen Sie es erneut"
         other: "Verschieben der Fragen fehlgeschlagen. Versuchen Sie es erneut"
-      submit_retry_copying: "Kopieren der Frage fehlgeschlagen, bitte erneut versuchen..."
-      submit_retry_moving: "Verschieben der Frage fehlgeschlagen, bitte erneut versuchen..."
+      submit_retry_copying: "Kopieren der Frage fehlgeschlagen. Versuchen Sie es erneut ..."
+      submit_retry_moving: "Verschieben der Frage fehlgeschlagen. Versuchen Sie es erneut ..."
     default_name: "Kein Name"
     delete_are_you_sure: "Möchten Sie diesen Fragenpool wirklich löschen?"
     error_loading_banks: "Fehler beim Laden der Fragenpools"
     links: 
       more_questions: "weitere Fragen"
-    load_questions: "Fragen werden geladen..."
-    loading_banks: "Pools werden geladen..."
-    loading_more_fail: "Das Laden weiterer Fragen ist fehlgeschlagen, bitte erneut versuchen"
+    load_questions: "Fragen werden geladen ..."
+    loading_banks: "Fragenpools werden geladen ..."
+    loading_more_fail: "Das Laden weiterer Fragen ist fehlgeschlagen. Versuchen Sie es erneut"
     move_questions: "Fragen verschieben"
     multiple_questions: "Mehrere Fragen"
     question_bank: Fragenpool
@@ -10842,7 +10842,7 @@ de:
       links: 
         delete_question: "Diese Frage löschen"
         edit_question: "Diese Frage bearbeiten"
-      move_bank: "diese Frage in einen anderen Fragenpool verschieben/kopieren"
+      move_bank: "Frage in einen anderen Fragenpool verschieben/kopieren"
     show: 
       button: 
         cancel: Abbrechen
@@ -11136,7 +11136,7 @@ de:
         essay: "Die Studenten geben ihre Antwort in ein Textfeld ein."
         file_upload: "Studenten können eine Datei für Ihre Antwort hochladen."
         fill_in_multiple_blanks: "Geben Sie Ihre Frage ein und legen Sie die Positionen der Leerfelder fest. Dann definieren Sie die mögliche richtige Antwort für jedes Leerfeld. Die Studenten müssen die richtige Antwort in jedes Leerfeld eingeben."
-        formula_definition: "Als nächstes müssen Sie die Formel bzw. Formeln eingeben, die zur Berechnung der richtigen Antwort dienen. Verwenden Sie dabei dieselben Variablennamen, wie oben aufgeführt."
+        formula_definition: "Als nächstes müssen Sie die Formel bzw. Formeln eingeben, die zur Berechnung der richtigen Antwort dienen. Verwenden Sie dabei die oben aufgeführten Variablennamen."
         matching: "Bilden Sie Paare aus passenden Werten. Auf der linken Seite sehen die Studenten mehrere Werte und müssen die passenden Werte aus einer Dropdownliste auf der rechten Seite auswählen. Dabei darf in mehreren Zeilen dieselbe Antwort enthalten sein, und Sie können rechts zusätzliche falsche Antworten einfügen."
         missing_word: "Definieren Sie den Text, der vor und hinter der Dropdownliste stehen soll. Erstellen Sie einen Satz möglicher Antworten, und wählen Sie eine richtige Antwort aus."
         multi_answer_sets: "Im unten stehenden Kasten fügen Sie für jedes Antworttextfeld ein in eckige Klammern gefasstes Referenzwort (ohne Leerzeichen) ein"
@@ -11916,7 +11916,7 @@ de:
       unpublished_quiz: "*Dieses Quiz wurde nicht veröffentlicht* Das Quiz ist bis zur Veröffentlichung nur für Dozenten sichtbar."
   quizzes/quiz: 
     current_filter: "Aktueller Filter"
-    default_question_input: "[ Bitte auswählen ]"
+    default_question_input: "[ Auswählen ]"
     default_text_only_question_name: Abstandshalter
     default_title: "Unbenanntes Quiz"
     errors: 
@@ -12053,7 +12053,7 @@ de:
       undelete_courses: "Nicht gelöschte Kurse"
       view_all_grades: "Alle Noten anzeigen"
       view_analytics: "Analyseseiten anzeigen"
-      view_course_changes: "Kursänderungsprotokolle anzeige"
+      view_course_changes: "Kursänderungsprotokolle anzeigen"
       view_error_reports: "Fehlerberichte anzeigen"
       view_grade_changes: "Protokolle für Notenänderungen anzeigen"
       view_group_pages: "Gruppenseiten aller Studentengruppen anzeigen"
@@ -12164,7 +12164,7 @@ de:
         are_you_sure_delete: "Möchten Sie diese Rubrik wirklich löschen?  Für jeden Benutzer, der die Rubrik zurzeit verwendet, bleibt sie weiterhin verfügbar, aber niemand sonst kann sie einsetzen."
         are_you_sure_remove: "Möchten Sie diese Rubrik wirklich aus Ihrer Liste entfernen?"
       remove_rubric: "Diese Rubrik aus meiner Liste entfernen"
-  screenreader_gradebook_description: "Screenreader Gradebook stellt eine zugriffsfreundliche Schnittstelle zu einem Notenbuch bereit."
+  screenreader_gradebook_description: "Screenreader Gradebook stellt eine zugriffsfreundliche Schnittstelle zum Notenbuch bereit."
   scribd: 
     upgrade_flash: "Hallo, Sie verfügen über eine veraltete Version von Adobe Flash Player. Um iPaper (und viele andere Dinge im Netz) zu verwenden, benötigen Sie %{link_tag}den aktuellen Flash player%{end_link}."
   search: 
@@ -12877,12 +12877,12 @@ de:
         embed_image: "Durch Anklicken Bild einbetten"
     wiki_sidebar: 
       aria: 
-        file_label: "Datei auswählen. Hochladegrenze 50"
+        file_label: "Datei auswählen. Obergrenze für Hochladevorgänge 50"
       aria_label: 
         folder_select_label: "Ordner zum Hochladen des Bildes auswählen"
-        image_form_collapsed: "Klicken, um das Hochladen einer neuen Bildform (minimiert) ein-/auszuschalten"
+        image_form_collapsed: "Klicken, um das Hochladen einer neuen Bildform umzuschalten (minimiert)"
       aria_labels: 
-        files: "Dateien. Verwenden Sie die Nach-oben- und Nach-unten-Tasten, um durch die Baumstruktur zu navigieren. Drücken Sie die Nach-rechts-Taste, um Ordner aufzuklappen, und die Nach-links-Taste, um sie zu minimieren"
+        files: "Dateien. Verwenden Sie die Nach-oben- und Nach-unten-Tasten, um durch die Baumstruktur zu navigieren. Drücken Sie die Nach-rechts-Taste, um Ordner zu erweitern, und die Nach-links-Taste, um sie zu minimieren"
       aria_only: 
         folder: Ordner
       buttons: 
@@ -13044,8 +13044,8 @@ de:
     assignment_muted: "Zum Lautschalten klicken."
     assignment_order_alpha: Alphabetisch
     assignment_order_assignment_groups: "Nach Aufgabengruppe und Position"
-    assignment_order_due_date: "nach Abgabefrist"
-    assignment_unmuted: "Zum Stummschalten klicken"
+    assignment_order_due_date: "Nach Abgabefrist"
+    assignment_unmuted: "Zum Stummschalten klicken."
     no_assignment: "Keine Aufgabe ausgewählt"
     no_student: "Kein Student ausgewählt"
     student_hidden_name: "Student %{position}"
@@ -13849,8 +13849,8 @@ de:
         unexpected_upload_problem: "Während des Uploads von %{filename} ist ein unerwartetes Problem aufgetreten.  Bitte versuchen Sie es erneut."
         upload_failed: "Der Upload ist fehlgeschlagen, bitte erneut versuchen"
       image_form: 
-        collapsed: "Klicken, um neue Bildform (minimiert) umzuschalten"
-        expanded: "Klicken, um neue Bildform (aufgeklappt) umzuschalten"
+        collapsed: "Klicken, um die neue Bildform umzuschalten (minimiert)"
+        expanded: "Klicken, um die neue Bildform umzuschalten (erweitert)"
       loading_more_results: "Weitere Ergebnisse laden"
       no_title: "Ohne Titel"
       titles: 
