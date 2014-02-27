@@ -101,7 +101,7 @@ class PageView < ActiveRecord::Base
   def self.page_view_method
     enable_page_views = Setting.get('enable_page_views', 'false')
     return false if enable_page_views == 'false'
-    enable_page_views = 'db' if %w[true queue].include?(enable_page_views) # backwards compat
+    enable_page_views = 'db' if %w[true cache].include?(enable_page_views) # backwards compat
     enable_page_views.to_sym
   end
 
