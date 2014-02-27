@@ -129,41 +129,45 @@ describe "security" do
       c2.should be_present
     end
 
-    it "should make both cookies httponly" do
-      u = user_with_pseudonym :active_user => true,
-                              :username => "nobody@example.com",
-                              :password => "asdfasdf"
-      u.save!
-      https!
-      post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
-        "pseudonym_session[password]" => "asdfasdf",
-        "pseudonym_session[remember_me]" => "1"
-      assert_response 302
-      c1 = response['Set-Cookie'].lines.grep(/\Apseudonym_credentials=/).first
-      c2 = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
-      c1.should match(/; *HttpOnly/)
-      c2.should match(/; *HttpOnly/)
-      c1.should_not match(/; *secure/)
-      c2.should_not match(/; *secure/)
-    end
+    # these specs aren't needed in rails3, where we use a newer authlogic that
+    # has built-in support for the httponly/secure options
+    if CANVAS_RAILS2
+      it "should make both cookies httponly" do
+        u = user_with_pseudonym :active_user => true,
+                                :username => "nobody@example.com",
+                                :password => "asdfasdf"
+        u.save!
+        https!
+        post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+          "pseudonym_session[password]" => "asdfasdf",
+          "pseudonym_session[remember_me]" => "1"
+        assert_response 302
+        c1 = response['Set-Cookie'].lines.grep(/\Apseudonym_credentials=/).first
+        c2 = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
+        c1.should match(/; *HttpOnly/)
+        c2.should match(/; *HttpOnly/)
+        c1.should_not match(/; *secure/)
+        c2.should_not match(/; *secure/)
+      end
 
-    it "should make both cookies secure only if configured" do
-      ActionController::Base.session_options[:secure] = true
-      u = user_with_pseudonym :active_user => true,
-                              :username => "nobody@example.com",
-                              :password => "asdfasdf"
-      u.save!
-      https!
+      it "should make both cookies secure only if configured" do
+        ActionController::Base.session_options[:secure] = true
+        u = user_with_pseudonym :active_user => true,
+                                :username => "nobody@example.com",
+                                :password => "asdfasdf"
+        u.save!
+        https!
 
-      post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
-        "pseudonym_session[password]" => "asdfasdf",
-        "pseudonym_session[remember_me]" => "1"
-      assert_response 302
-      c1 = response['Set-Cookie'].lines.grep(/\Apseudonym_credentials=/).first
-      c2 = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
-      c1.should match(/; *secure/)
-      c2.should match(/; *secure/)
-      ActionController::Base.session_options[:secure] = nil
+        post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+          "pseudonym_session[password]" => "asdfasdf",
+          "pseudonym_session[remember_me]" => "1"
+        assert_response 302
+        c1 = response['Set-Cookie'].lines.grep(/\Apseudonym_credentials=/).first
+        c2 = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
+        c1.should match(/; *secure/)
+        c2.should match(/; *secure/)
+        ActionController::Base.session_options[:secure] = nil
+      end
     end
   end
 
