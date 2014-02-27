@@ -173,11 +173,6 @@ end
 gem 'xml-simple', '1.0.12', :require => 'xmlsimple'
 gem 'foreigner', '0.9.2'
 gem 'crocodoc-ruby', '0.0.1', :require => 'crocodoc'
-# needs https://github.com/regru/premailer/commit/8d3ae698eff135011b19e1587a68c399ec97b185
-# we can go back to the gem once 1.7.8 is released
-gem 'regru-premailer', :require => 'premailer', :github => "regru/premailer", :ref => "08a73c70701f5d81bc4a5cf6c959a45ad94db88e"
-  gem 'css_parser', '1.3.5'
-  gem 'htmlentities', '4.3.1'
 
 gem 'activesupport-suspend_callbacks', :path => 'gems/activesupport-suspend_callbacks'
 gem 'adheres_to_policy', :path => 'gems/adheres_to_policy'

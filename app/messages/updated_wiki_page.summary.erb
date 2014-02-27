@@ -6,4 +6,4 @@
   <%= t :subject, "Updated Wiki Page: %{title}, %{user}", :title => asset.title.titleize, :user => asset.context.name %>
 <% end %>
 
-<%= truncate_text(html_to_simple_text(asset.body), :max_length => 200) %> 
+<%= truncate_text(html_to_text(asset.body), :max_length => 200) %>

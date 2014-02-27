@@ -8,10 +8,9 @@
 
 <%= t :body, "A page has been updated on the wiki for %{title} that may make your life easier.", :title => asset.context.name %>
 
-<%= asset.title.titleize %> 
+<%= asset.title.titleize %>
 
-<%= truncate_text(html_to_simple_text(asset.body, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}"), :max_length => 200) %> 
+<%= truncate_text(html_to_text(asset.body, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}"), :max_length => 200) %>
 
 
 <%= t :link_message, "You can review it here: %{link}", :link => content(:link) %>
-
