@@ -25,6 +25,9 @@ describe AvatarHelper do
     let(:user) {user_model(short_name: "test user")}
     let(:services) {{avatars: true}}
     let(:avatar_size) {50}
+    unless CANVAS_RAILS2
+      let(:request) { Rack::Request.new(Rack::MockRequest.env_for("http://test.host/")) }
+    end
 
     def service_enabled?(type)
       services[type]
