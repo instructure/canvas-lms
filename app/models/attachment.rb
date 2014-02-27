@@ -601,35 +601,35 @@ class Attachment < ActiveRecord::Base
     self.content_type = details[:content_type]
     self.size = details[:content_length]
 
-    if existing_attachment = find_existing_attachment_for_md5
-      if existing_attachment.s3object.exists?
-        # deduplicate. the existing attachment's s3object should be the same as
-        # that just uploaded ('cuz md5 match). delete the new copy and just
-        # have this attachment inherit from the existing attachment.
-        s3object.delete rescue nil
-        self.root_attachment = existing_attachment
-        write_attribute(:filename, nil)
-        clear_cached_urls
-      else
-        # it looks like we had a duplicate, but the existing attachment doesn't
-        # actually have an s3object (probably from an earlier bug). update it
-        # and all its inheritors to inherit instead from this attachment.
-        existing_attachment.root_attachment = self
-        existing_attachment.write_attribute(:filename, nil)
-        existing_attachment.clear_cached_urls
-        existing_attachment.save!
-        Attachment.where(root_attachment_id: existing_attachment).update_all(
-          root_attachment_id: self,
-          filename: nil,
-          cached_scribd_thumbnail: nil,
-          updated_at: Time.zone.now)
+    self.shard.activate do
+      if existing_attachment = find_existing_attachment_for_md5
+        if existing_attachment.s3object.exists?
+          # deduplicate. the existing attachment's s3object should be the same as
+          # that just uploaded ('cuz md5 match). delete the new copy and just
+          # have this attachment inherit from the existing attachment.
+          s3object.delete rescue nil
+          self.root_attachment = existing_attachment
+          write_attribute(:filename, nil)
+          clear_cached_urls
+        else
+          # it looks like we had a duplicate, but the existing attachment doesn't
+          # actually have an s3object (probably from an earlier bug). update it
+          # and all its inheritors to inherit instead from this attachment.
+          existing_attachment.root_attachment = self
+          existing_attachment.write_attribute(:filename, nil)
+          existing_attachment.clear_cached_urls
+          existing_attachment.save!
+          Attachment.where(root_attachment_id: existing_attachment).update_all(
+            root_attachment_id: self,
+            filename: nil,
+            cached_scribd_thumbnail: nil,
+            updated_at: Time.zone.now)
+        end
       end
+      save!
+      # normally this would be called by attachment_fu after it had uploaded the file to S3.
+      after_attachment_saved
     end
-
-    save!
-
-    # normally this would be called by attachment_fu after it had uploaded the file to S3.
-    after_attachment_saved
   end
 
   CONTENT_LENGTH_RANGE = 10.gigabytes
