@@ -864,7 +864,7 @@ class DiscussionTopic < ActiveRecord::Base
     # topic is not published
     if !published?
       false
-    elsif !draft_state_enabled? && unlock_at = available_from_for(user)
+    elsif unlock_at = available_from_for(user)
     # unlock date exists and has passed
       unlock_at < Time.now.utc
     # everything else
