@@ -121,7 +121,7 @@
 #           "type": "datetime"
 #         },
 #         "workflow_state": {
-#           "description": "The current state of the SIS import. - 'created': The SIS import has been created.\n - 'imported': The SIS import is currently processing.\n - 'imported': The SIS import has completed successfully.\n - 'imported_with_messages': The SIS import completed with errors or warnings.\n - 'failed_with_messages': The SIS import failed with errors.\n - 'failed': The SIS import failed.",
+#           "description": "The current state of the SIS import. - 'created': The SIS import has been created.\n - 'importing': The SIS import is currently processing.\n - 'imported': The SIS import has completed successfully.\n - 'imported_with_messages': The SIS import completed with errors or warnings.\n - 'failed_with_messages': The SIS import failed with errors.\n - 'failed': The SIS import failed.",
 #           "example": "imported",
 #           "type": "string",
 #           "allowableValues": {
