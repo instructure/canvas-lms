@@ -207,7 +207,7 @@ describe FilesController do
     hash[@tag.id.to_s] = {:type => 'must_view'}
     @module.completion_requirements = hash
     @module.save!
-    @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+    @module.evaluate_for(@user, true).state.should eql(:unlocked)
 
     # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
     get "http://test.host/courses/#{@course.id}/files/#{@att.id}"
@@ -221,7 +221,7 @@ describe FilesController do
     reset!
     get location
     response.should be_success
-    @module.evaluate_for(@user, true, true).state.should eql(:completed)
+    @module.evaluate_for(@user, true).state.should eql(:completed)
   end
 
   context "should support AssessmentQuestion as a context" do

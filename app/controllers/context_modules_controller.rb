@@ -76,7 +76,7 @@ class ContextModulesController < ApplicationController
     if tag.content && tag.content.respond_to?(:locked_for?)
       locked = tag.content.locked_for?(@current_user, :context => @context)
       if locked
-        @context.context_modules.active.each { |m| m.evaluate_for(@current_user, true, true) }
+        @context.context_modules.active.each { |m| m.evaluate_for(@current_user, true) }
         if tag.content.respond_to?(:clear_locked_cache)
           tag.content.clear_locked_cache(@current_user)
         end
@@ -362,7 +362,7 @@ class ContextModulesController < ApplicationController
       if request.format == :json
         if @context.context_modules.scoped.new.grants_right?(@current_user, session, :update)
           if params[:user_id] && @user = @context.students.find(params[:user_id])
-            @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@user, true, true) }
+            @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@user, true) }
           else
             if @context.large_roster
               @progressions = []

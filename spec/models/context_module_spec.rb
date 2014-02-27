@@ -263,81 +263,6 @@ describe ContextModule do
       mods_with_progressions.should_not be_include othermods[2].id
     end
   end
-
-  describe "prerequisites_satisfied?" do
-    before do
-      @course = course(:active_all => true)
-      @module = @course.context_modules.create!(:name => "some module")
-
-      @assignment = @course.assignments.create!(:title => "some assignment")
-      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
-      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
-      @module.workflow_state = 'unpublished'
-      @module.save!
-
-      @module2 = @course.context_modules.create!(:name => "another module")
-      @module2.publish
-      @module2.prerequisites = "module_#{@module.id}"
-      @module2.save!
-
-      @module3 = @course.context_modules.create!(:name => "another module again")
-      @module3.publish
-      @module3.save!
-
-      @user = User.create!(:name => "some name")
-      @course.enroll_student(@user)
-    end
-
-    it "should correctly ignore already-calculated context_module_prerequisites" do
-      mp = @user.context_module_progressions.create!(:context_module => @module2)
-      mp.workflow_state = 'locked'
-      mp.save!
-      mp2 = @user.context_module_progressions.create!(:context_module => @module)
-      mp2.workflow_state = 'locked'
-      mp2.save!
-
-      @module2.prerequisites_satisfied?(@user).should == true
-    end
-
-    it "should be satisfied if no prereqs" do
-      @module3.prerequisites_satisfied?(@user).should == true
-    end
-
-    it "should be satisfied if prereq is unpublished" do
-      @module2.prerequisites_satisfied?(@user).should == true
-    end
-
-    it "should be satisfied if prereq's prereq is unpublished" do
-      @module3.prerequisites = "module_#{@module2.id}"
-      @module3.save!
-      @module3.prerequisites_satisfied?(@user).should == true
-    end
-
-    it "should be satisfied if dependant on both a published and unpublished module" do
-      @module3.prerequisites = "module_#{@module.id}"
-      @module3.prerequisites = [{:type=>"context_module", :id=>@module.id, :name=>@module.name}, {:type=>"context_module", :id=>@module2.id, :name=>@module2.name}]
-      @module3.save!
-      @module3.reload
-      @module3.prerequisites.count.should == 2
-
-      @module3.prerequisites_satisfied?(@user).should == true
-    end
-
-    it "should skip incorrect prereq hashes" do
-      @module3.prerequisites = [{:type=>"context_module", :id=>@module.id},
-                                {:type=>"not_context_module", :id=>@module2.id, :name=>@module2.name}]
-      @module3.save!
-
-      @module3.prerequisites.count.should == 0
-    end
-
-    it "should update when publishing or unpublishing" do
-      @module.publish
-      @module2.prerequisites_satisfied?(@user).should == false
-      @module.unpublish
-      @module2.prerequisites_satisfied?(@user).should == true
-    end
-  end
   
   describe "evaluate_for" do
     it "should create a completed progression for no prerequisites and no requirements" do
@@ -726,7 +651,7 @@ describe ContextModule do
       @submission.submission_data = nil
       @submission.with_versioning(&:save)
 
-      @progression = @module.evaluate_for(@user, true, true)
+      @progression = @module.evaluate_for(@user, true)
       @progression.should_not be_nil
       @progression.should be_completed
       @progression.current_position.should eql(@tag2.position)
@@ -740,7 +665,7 @@ describe ContextModule do
       @submission.with_versioning(&:save)
       @submission.kept_score.should == 100
 
-      @progression = @module.evaluate_for(@user, true, true)
+      @progression = @module.evaluate_for(@user, true)
       @progression.should_not be_nil
       @progression.should be_completed
       @progression.current_position.should eql(@tag2.position)

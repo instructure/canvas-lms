@@ -126,7 +126,7 @@ class ContextModule < ActiveRecord::Base
         :context_type => self.context_type, :context_id => self.context_id, :workflow_state => 'active')
     students = user ? [user] : self.context.students
     modules.each do |mod|
-      mod.re_evaluate_for(students, true)
+      mod.re_evaluate_for(students)
     end
   end
   
@@ -163,7 +163,7 @@ class ContextModule < ActiveRecord::Base
       res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
     end
     if !res && opts[:deep_check_if_needed]
-      progression = self.evaluate_for(user, true, true)
+      progression = self.evaluate_for(user, true)
       if tag && tag.context_module_id == self.id && self.require_sequential_progress
         res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
       end
@@ -339,7 +339,7 @@ class ContextModule < ActiveRecord::Base
   
   def update_for(user, action, tag, points=nil)
     return nil unless self.context.users.include?(user)
-    return nil unless self.prerequisites_satisfied?(user)
+    return nil unless ContextModuleProgression.prerequisites_satisfied?(user, self)
     progression = self.find_or_create_progression(user)
     return unless progression
     progression.requirements_met ||= []
@@ -377,30 +377,6 @@ class ContextModule < ActiveRecord::Base
       nil
     end
   end
-  
-
-  def prerequisites_satisfied?(user)
-    unlocked = (self.active_prerequisites || []).all? do |pre|
-      if pre[:type] == 'context_module'
-        prog = user.module_progression_for(pre[:id])
-        if prog
-          prog.completed?
-        elsif pre[:id].present?
-          if prereq = self.context.context_modules.active.find_by_id(pre[:id])
-            prog = prereq.evaluate_for(user, true)
-            prog.completed?
-          else
-            true
-          end
-        else
-          true
-        end
-      else
-        true
-      end
-    end
-    unlocked
-  end
 
   def active_prerequisites
     return [] unless self.prerequisites.any?
@@ -408,23 +384,27 @@ class ContextModule < ActiveRecord::Base
     active_ids = self.context.context_modules.active.where(:id => prereq_ids).pluck(:id)
     self.prerequisites.select{|pre| pre[:type] == 'context_module' && active_ids.member?(pre[:id])}
   end
+
+  def reload
+    clear_cached_lookups
+    super
+  end
   
   def clear_cached_lookups
-    @cached_tags = nil
+    @cached_active_tags = nil
   end
 
-  def cached_tags
-    @cached_tags ||= self.content_tags.active
+  def cached_active_tags
+    @cached_active_tags ||= self.content_tags.active
   end
   
-  def re_evaluate_for(users, skip_confirm_valid_requirements=false)
+  def re_evaluate_for(users)
     users = Array(users)
     users.each{|u| u.clear_cached_lookups }
     progressions = self.find_or_create_progressions(users)
     progressions.each(&:mark_as_dirty)
-    @already_confirmed_valid_requirements = true if skip_confirm_valid_requirements
     progressions.each do |progression|
-      self.evaluate_for(progression, true, true)
+      self.evaluate_for(progression, true)
     end
   end
   
@@ -491,15 +471,8 @@ class ContextModule < ActiveRecord::Base
   def find_or_create_progression_with_multiple_lookups(user)
     user.module_progression_for(self.id) || self.find_or_create_progression(user)
   end
-  
-  def content_tags_hash
-    return @tags_hash if @tags_hash
-    @tags_hash = {}
-    self.content_tags.each{|t| @tags_hash[t.id] = t }
-    @tags_hash
-  end
 
-  def evaluate_for(user_or_progression, recursive_check=false, deep_check=false)
+  def evaluate_for(user_or_progression, force_evaluate_requirements=false)
     if user_or_progression.is_a?(ContextModuleProgression)
       progression, user = [user_or_progression, user_or_progression.user]
     else
@@ -509,7 +482,7 @@ class ContextModule < ActiveRecord::Base
 
     progression.context_module = self if progression.context_module_id == self.id
     progression.user = user if progression.user_id == user.id
-    progression.evaluate(recursive_check, deep_check)
+    progression.evaluate(force_evaluate_requirements)
     progression
   end
 

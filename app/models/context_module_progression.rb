@@ -27,6 +27,11 @@ class ContextModuleProgression < ActiveRecord::Base
   after_save :trigger_completion_events
   
   serialize :requirements_met
+
+  def completion_requirements
+    context_module.try(:completion_requirements) || []
+  end
+  private :completion_requirements
   
   def infer_defaults
     if self.completed?
@@ -45,90 +50,143 @@ class ContextModuleProgression < ActiveRecord::Base
     self.collapsed = false
     self.save
   end
-  
-  def evaluate_requirements_met
-    met = self.requirements_met || []
-    orig_reqs = met.map{|r| "#{r[:id]}_#{r[:type]}"}.sort
 
-    met = evaluate_uncompleted_requirements(met)
-    new_reqs = met.map{|r| "#{r[:id]}_#{r[:type]}"}.sort
+  class CompletedRequirementCalculator
+    attr_accessor :requirements_met, :view_requirements
 
-    if orig_reqs != new_reqs
-      self.requirements_met = met
-      self.save
+    def started?
+      @started
     end
-  end
 
-  def evaluate_uncompleted_requirements(met)
-    met = met.dup
-    uncompleted_view_reqs = []
-    context_module.completion_requirements.each do |req|
-      next if requirement_met?(req, met)
+    def completed?
+      @completed
+    end
 
-      req_met = nil
-      tag = context_module.content_tags_hash[req[:id]]
-      if !tag
-        req_met = req
-      elsif req[:type] == "must_view"
-        uncompleted_view_reqs << req
-      elsif req[:type] == "must_contribute"
-        
-      elsif req[:type] == "must_submit"
-        req_met = evaluate_submit_requirement_met(req, tag)
-      elsif req[:type] == "max_score" || req[:type] == "min_score"
-        req_met = evaluate_score_requirement_met(req, tag)
+    def changed?
+      @orig_keys != sorted_requirement_keys
+    end
+
+    def initialize(requirements_met)
+      @requirements_met = requirements_met
+      @orig_keys = sorted_requirement_keys
+      @view_requirements = []
+      @started = false
+      @completed = true
+
+      @requirements_met = @requirements_met.reject{ |r| %w(min_score max_score).include?(r[:type]) }
+    end
+
+    def sorted_requirement_keys
+      requirements_met.map{ |r| "#{r[:id]}_#{r[:type]}" }.sort
+    end
+
+    def requirement_met?(req)
+      met = requirements_met.any? {|r| r[:id] == req[:id] && r[:type] == req[:type] }
+      @started = true if met
+      met
+    end
+
+    def requirement_met(req, is_met)
+      unless is_met
+        @completed = false
+        return
       end
 
-      met << req_met if req_met
-    end 
-
-    uncompleted_view_reqs.each do |req|
-      met << req if other_requirement_met?(req, met)
+      @started = true
+      requirements_met << req
     end
 
-    met
+    def other_requirement_met?(req)
+      met = requirements_met.any? {|r| r[:id] == req[:id] }
+      @started = true if met
+      met
+    end
+
+    def view_requirement(req)
+      view_requirements << req
+    end
+
+    def check_view_requirements
+      view_requirements.each do |req|
+        requirement_met(req, other_requirement_met?(req))
+      end
+    end
+  end
+  
+  def evaluate_requirements_met
+    result = evaluate_uncompleted_requirements
+    if result.completed?
+      self.workflow_state = 'completed'
+    elsif result.started?
+      self.workflow_state = 'started'
+    end
+
+    if result.changed?
+      self.requirements_met = result.requirements_met
+    end
+  end
+  private :evaluate_requirements_met
+
+  def evaluate_uncompleted_requirements
+    tags_hash = nil
+    calc = CompletedRequirementCalculator.new(self.requirements_met || [])
+    completion_requirements.each do |req|
+      # create the hash inside the loop in case the completion_requirements is empty (performance)
+      tags_hash ||= context_module.cached_active_tags.index_by(&:id)
+
+      tag = tags_hash[req[:id]]
+      next unless tag
+
+      next if calc.requirement_met?(req)
+
+      if req[:type] == 'must_view'
+        calc.view_requirement(req)
+      elsif req[:type] == 'must_contribute'
+        calc.requirement_met(req, false)
+      elsif req[:type] == 'must_submit'
+        calc.requirement_met(req, !!get_submission_or_quiz_submission(tag))
+      elsif req[:type] == 'min_score' || req[:type] == 'max_score'
+        calc.requirement_met(req, evaluate_score_requirement_met(req, tag)) if tag.scoreable?
+      end
+      # must_contribute is handled by ContextModule#update_for
+    end
+    calc.check_view_requirements
+    calc
   end
   private :evaluate_uncompleted_requirements
 
-  def requirement_met?(req, met_reqs)
-    met_reqs.any? {|r| r[:id] == req[:id] && r[:type] == req[:type] }
+  def get_submission_or_quiz_submission(tag)
+    if tag.content_type_quiz?
+      Quizzes::QuizSubmission.find_by_quiz_id_and_user_id(tag.content_id, user.id)
+    elsif tag.content_type_discussion?
+      if tag.content
+        Submission.find_by_assignment_id_and_user_id(tag.content.assignment_id, user.id)
+      end
+    else
+      Submission.find_by_assignment_id_and_user_id(tag.content_id, user.id)
+    end
   end
+  private :get_submission_or_quiz_submission
 
-  def other_requirement_met?(req, met_reqs)
-    met_reqs.any? {|r| r[:id] == req[:id] }
-  end
-
-  def get_submission_score(tag_content)
-    if tag_content.is_a?(Assignment)
-      submission = self.user.submitted_submission_for(tag_content.id)
-      submission.try(:score)
-    elsif tag_content.is_a?(Quizzes::Quiz)
-      submission = self.user.attempted_quiz_submission_for(tag_content.id)
+  def get_submission_score(tag)
+    submission = get_submission_or_quiz_submission(tag)
+    if tag.content_type_quiz?
       submission.try(:kept_score)
+    else
+      submission.try(:score)
     end
   end
   private :get_submission_score
 
   def evaluate_score_requirement_met(requirement, tag)
-    score = get_submission_score(tag.content)
+    score = get_submission_score(tag)
     if requirement[:type] == "max_score"
-      requirement if score && score <= requirement[:max_score].to_f
+      !!score && score <= requirement[:max_score].to_f
     else
-      requirement if score && score >= requirement[:min_score].to_f
+      !!score && score >= requirement[:min_score].to_f
     end
   end
   private :evaluate_score_requirement_met
-
-  def evaluate_submit_requirement_met(requirement, tag)
-    content = tag.content
-    content = content.assignment if content.is_a?(DiscussionTopic)
-    if content.is_a?(Assignment)
-      requirement if self.user.submitted_submission_for(content.id)
-    elsif content.is_a?(Quizzes::Quiz)
-      requirement if self.user.attempted_quiz_submission_for(content.id)
-    end
-  end
-  private :evaluate_submit_requirement_met
 
   def mark_as_dirty
     self.workflow_state = 'locked'
@@ -143,109 +201,75 @@ class ContextModuleProgression < ActiveRecord::Base
     nil
   end
 
-  def mark_as_complete
-    self.workflow_state = 'completed'
-    nil
-  end
-
-  def mark_as_complete!
-    mark_as_complete
-    Shackles.activate(:master) do
-      self.save if self.workflow_state_changed?
+  def self.prerequisites_satisfied?(user, context_module)
+    unlocked = (context_module.active_prerequisites || []).all? do |pre|
+      if pre[:type] == 'context_module'
+        prog = user.module_progression_for(pre[:id])
+        if prog
+          prog.completed?
+        elsif pre[:id].present?
+          if prereq = context_module.context.context_modules.active.find_by_id(pre[:id])
+            prog = prereq.evaluate_for(user, true)
+            prog.completed?
+          else
+            true
+          end
+        else
+          true
+        end
+      else
+        true
+      end
     end
-    nil
+    unlocked
   end
 
-  def evaluate(recursive_check=false, deep_check=false)
+  def prerequisites_satisfied?
+    ContextModuleProgression.prerequisites_satisfied?(user, context_module)
+  end
+
+  def check_prerequisites
+    return false if context_module.to_be_unlocked
+    if self.locked?
+      self.workflow_state = 'unlocked' if prerequisites_satisfied?
+    end
+    return !self.locked?
+  end
+  private :check_prerequisites
+
+  def evaluate_current_position
+    self.current_position = nil
+    return unless context_module.require_sequential_progress
+
+    completion_requirements = context_module.completion_requirements || []
+    requirements_met = self.requirements_met || []
+
+    context_module.cached_active_tags.each do |tag|
+      self.current_position = tag.position if tag.position
+      all_met = completion_requirements.select{|r| r[:id] == tag.id }.all? do |req|
+        requirements_met.any?{|r| r[:id] == req[:id] && r[:type] == req[:type] }
+      end
+      break unless all_met
+    end
+  end
+  private :evaluate_current_position
+
+  def evaluate(force_evaluate_requirements)
     # there is no valid progression state for unpublished modules
     return mark_as_dirty! if context_module.unpublished?
 
-    requirements_met_changed = false
-    if User.module_progression_jobs_queued?(user.id)
-      mark_as_dirty
-    end
-    if deep_check
-      context_module.confirm_valid_requirements(true) rescue nil
-    end
-    tags = context_module.cached_tags
-    if recursive_check || self.new_record? || self.updated_at < context_module.updated_at || User.module_progression_jobs_queued?(user.id)
-      if context_module.completion_requirements.blank? && context_module.active_prerequisites.empty?
-        mark_as_complete!
-      end
-      mark_as_dirty
-      if !context_module.to_be_unlocked
-        self.requirements_met ||= []
-        if self.locked?
-          self.workflow_state = 'unlocked' if context_module.prerequisites_satisfied?(user)
-        end
-        if self.unlocked? || self.started?
-          orig_reqs = (self.requirements_met || []).map{|r| "#{r[:id]}_#{r[:type]}" }.sort
-          completes = (context_module.completion_requirements || []).map do |req|
-            tag = tags.detect{|t| t.id == req[:id].to_i}
-            if !tag
-              res = true
-            elsif ['min_score', 'max_score', 'must_submit'].include?(req[:type]) && !tag.scoreable?
-              res = true
-            else
-              self.evaluate_requirements_met if deep_check
-              res = self.requirements_met.any?{|r| r[:id] == req[:id] && r[:type] == req[:type] } #include?(req)
-              if req[:type] == 'min_score'
-                self.requirements_met = self.requirements_met.select{|r| r[:id] != req[:id] || r[:type] != req[:type]}
-                if tag.content_type_quiz?
-                  submission = Quizzes::QuizSubmission.find_by_quiz_id_and_user_id(tag.content_id, user.id)
-                  score = submission.try(:kept_score)
-                elsif tag.content_type == "DiscussionTopic"
-                  if tag.content
-                    submission = Submission.find_by_assignment_id_and_user_id(tag.content.assignment_id, user.id)
-                    score = submission.try(:score)
-                  else
-                    score = nil
-                  end
-                else
-                  submission = Submission.find_by_assignment_id_and_user_id(tag.content_id, user.id)
-                  score = submission.try(:score)
-                end
-                if score && score >= req[:min_score].to_f
-                  self.requirements_met << req
-                  res = true
-                else
-                  res = false
-                end
-              end
-            end
-            res
-          end
-          new_reqs = (self.requirements_met || []).map{|r| "#{r[:id]}_#{r[:type]}" }.sort
-          requirements_met_changed = new_reqs != orig_reqs
-          self.workflow_state = 'started' if completes.any?
-          self.workflow_state = 'completed' if completes.all?
-        end
+    if force_evaluate_requirements || self.new_record? || self.updated_at < context_module.updated_at || User.module_progression_jobs_queued?(user.id)
+      self.requirements_met ||= []
+      self.workflow_state = 'locked'
+      if check_prerequisites
+        evaluate_requirements_met
       end
     end
-    position = nil
-    found_failure = false
-    if context_module.require_sequential_progress
-      tags.each do |tag|
-        requirements_for_tag = (context_module.completion_requirements || []).select{|r| r[:id] == tag.id }.sort_by{|r| r[:id]}
-        next if found_failure
-        if requirements_for_tag.empty?
-          position = tag.position
-        else
-          all_met = requirements_for_tag.all? do |req|
-            (self.requirements_met || []).any?{|r| r[:id] == req[:id] && r[:type] == req[:type] }
-          end
-          if all_met
-            position = tag.position if tag.position && all_met
-          else
-            position = tag.position
-            found_failure = true
-          end
-        end
-      end
-    end
-    self.current_position = position
+
+    evaluate_current_position
+
     Shackles.activate(:master) do
-      self.save if self.workflow_state_changed? || requirements_met_changed
+      self.save if self.changed?
     end
   end
 
