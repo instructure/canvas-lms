@@ -382,7 +382,7 @@ class CoursesController < ApplicationController
   #
   # @returns Course
   def create
-    @account = params[:account_id] ? Account.find(params[:account_id]) : @domain_root_account.manually_created_courses_account
+    @account = params[:account_id] ? api_find(Account, params[:account_id]) : @domain_root_account.manually_created_courses_account
     if authorized_action(@account, @current_user, [:manage_courses, :create_courses])
       params[:course] ||= {}
 
@@ -395,7 +395,7 @@ class CoursesController < ApplicationController
       end
 
       if enrollment_term_id = params[:course].delete(:enrollment_term_id)
-        params[:course][:enrollment_term] = @account.root_account.enrollment_terms.find(enrollment_term_id)
+        params[:course][:enrollment_term] = api_find(@account.root_account.enrollment_terms, enrollment_term_id)
       end
 
       sis_course_id = params[:course].delete(:sis_course_id)
@@ -1200,7 +1200,7 @@ class CoursesController < ApplicationController
     end
 
 
-    @context = Course.active.find(params[:id])
+    @context = api_find(Course.active, params[:id])
     assign_localizer
     js_env :DRAFT_STATE => @context.feature_enabled?(:draft_state)
     if request.xhr?
@@ -1586,11 +1586,11 @@ class CoursesController < ApplicationController
       end
       if @course.root_account.grants_right?(@current_user, session, :manage_courses)
         if params[:course][:account_id]
-          account = Account.find(params[:course].delete(:account_id))
+          account = api_find(Account, params[:course].delete(:account_id))
           @course.account = account if account != @course.account && account.grants_right?(@current_user, session, :manage)
         end
         if params[:course][:enrollment_term_id]
-          enrollment_term = @course.root_account.enrollment_terms.active.find(params[:course].delete(:enrollment_term_id))
+          enrollment_term = api_find(@course.root_account.enrollment_terms.active, params[:course].delete(:enrollment_term_id))
           @course.enrollment_term = enrollment_term if enrollment_term != @course.enrollment_term
         end
       else
@@ -1696,7 +1696,7 @@ class CoursesController < ApplicationController
   #
   # @returns Progress
   def batch_update
-    @account = Account.find(params[:account_id])
+    @account = api_find(Account, params[:account_id])
     if params[:event] == 'undelete'
       permission = :undelete_courses
     else

@@ -3026,7 +3026,7 @@ define([
       if ($(this).closest('.group_top').length == 0) { return; }
       event.preventDefault();
       $(this).parents(".group_top").find(".collapse_link").addClass('hidden').end()
-        .find(".expand_link").removeClass('hidden');
+        .find(".expand_link").removeClass('hidden').focus();
       var $obj = $(this).parents(".group_top").next();
       while($obj.length > 0 && $obj.hasClass('question_holder')) {
         $obj.hide();
@@ -3035,7 +3035,7 @@ define([
     }).delegate(".expand_link", 'click', function(event) {
       if ($(this).closest('.group_top').length == 0) { return; }
       event.preventDefault();
-      $(this).parents(".group_top").find(".collapse_link").removeClass('hidden').end()
+      $(this).parents(".group_top").find(".collapse_link").removeClass('hidden').focus().end()
         .find(".expand_link").addClass('hidden');
       var $obj = $(this).parents(".group_top").next();
       while($obj.length > 0 && $obj.hasClass('question_holder')) {

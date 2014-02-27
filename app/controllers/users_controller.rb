@@ -51,9 +51,14 @@
 #           "type": "string"
 #         },
 #         "sis_user_id": {
-#           "description": "The SIS ID associated with the user.  This field is only included if the user came from a SIS import.",
+#           "description": "The SIS ID associated with the user.  This field is only included if the user came from a SIS import and has permissions to view SIS information.",
 #           "example": "SHEL93921",
 #           "type": "string"
+#         },
+#         "sis_import_id": {
+#           "description": "The id of the SIS import.  This field is only included if the user came from a SIS import and has permissions to manage SIS information.",
+#           "example": "18",
+#           "type": "int64"
 #         },
 #         "sis_login_id": {
 #           "description": "DEPRECATED: The SIS login ID associated with the user. Please use the sis_user_id or login_id. This field will be removed in a future version of the API.",
@@ -149,7 +154,7 @@ class UsersController < ApplicationController
     elsif params[:service] == "facebook"
       oauth_request = OauthRequest.create(
         :service => 'facebook',
-        :secret => AutoHandle.generate("fb", 10),
+        :secret => CanvasUuid::Uuid.generate("fb", 10),
         :return_url => return_to_url,
         :user => @current_user,
         :original_host_with_port => request.host_with_port
@@ -227,10 +232,11 @@ class UsersController < ApplicationController
         if @context && @context.is_a?(Account) && @query
           @users = @context.users_name_like(@query)
         elsif params[:enrollment_term_id].present? && @root_account == @context
-          # fast_all_users already specifies a select for the distinct to work on
-          @users = @context.fast_all_users.joins(:courses).
-              where(:courses => { :enrollment_term_id => params[:enrollment_term_id] })
-          @users = @users.uniq
+          @users = @context.fast_all_users.
+              where("EXISTS (?)", Enrollment.where("enrollments.user_id=users.id").
+                joins(:course).
+                where(User.enrollment_conditions(:active)).
+                where(courses: { enrollment_term_id: params[:enrollment_term_id]}))
         elsif !api_request?
           @users = @context.fast_all_users
         end
@@ -249,7 +255,7 @@ class UsersController < ApplicationController
           return render :json => users.map { |u| user_json(u, @current_user, session) }
         else
           @users ||= []
-          @users = @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
+          @users = @users.paginate(:page => params[:page])
         end
 
         respond_to do |format|

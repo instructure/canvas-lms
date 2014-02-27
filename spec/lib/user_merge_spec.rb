@@ -472,6 +472,7 @@ describe UserMerge do
 
       cc1 = @user2.communication_channels.sms.create!(:path => 'abc')
       cc1.retire!
+      @user2.reload
 
       UserMerge.from(@user2).into(user1)
       user1.communication_channels.reload.length.should == 1

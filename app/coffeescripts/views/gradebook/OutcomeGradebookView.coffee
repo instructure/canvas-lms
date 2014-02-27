@@ -1,5 +1,6 @@
 define [
   'i18n!gradebook2'
+  'jquery'
   'underscore'
   'Backbone'
   'vendor/slickgrid'
@@ -8,7 +9,8 @@ define [
   'compiled/views/gradebook/SectionMenuView'
   'jst/gradebook2/outcome_gradebook'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, _, {View}, Slick, Grid, CheckboxView, SectionMenuView, template, cellTemplate) ->
+  'jquery.instructure_misc_plugins'
+], (I18n, $, _, {View}, Slick, Grid, CheckboxView, SectionMenuView, template, cellTemplate) ->
 
   Dictionary =
     mastery:
@@ -70,8 +72,8 @@ define [
     # Returns nothing.
     _toggleSidebarArrow: ->
       @$('.sidebar-toggle')
-        .toggleClass('icon-arrow-right')
-        .toggleClass('icon-arrow-left')
+        .toggleClass('icon-arrow-open-right')
+        .toggleClass('icon-arrow-open-left')
 
     # Internal: Toggle the direction of the sidebar collapse arrow.
     #
@@ -99,6 +101,9 @@ define [
     _attachEvents: ->
       view.on('togglestate', @_createFilter(name)) for name, view of @checkboxes
       $.subscribe('currentSection/change', Grid.Events.sectionChangeFunction(@grid))
+      @$el.fillWindowWithMe({
+        onResize: => @grid.resizeCanvas()
+      })
 
     # Internal: Listen for events on grid.
     #
@@ -112,15 +117,15 @@ define [
     #
     # Returns an object.
     toJSON: ->
-      _.extend({}, @checkboxes, menu: @menu)
+      _.extend({}, @checkboxes)
 
     # Public: Render the view once all needed data is loaded.
     #
     # Returns this.
     render: ->
       $.when(@gradebook.hasSections)
-        .then(@_initMenu)
         .then(=> super)
+        .then(@_drawSectionMenu)
       $.when(@hasOutcomes).then(@renderGrid)
       this
 
@@ -144,10 +149,18 @@ define [
       Grid.Events.init(@grid)
       @_attachEvents()
 
+    isLoaded: false
+    onShow: ->
+      @loadOutcomes() if !@isLoaded
+      @isLoaded = true
+
     # Public: Load all outcome results from API.
     #
     # Returns nothing.
     loadOutcomes: () ->
+      $.when(@gradebook.hasSections).then(@_loadOutcomes)
+
+    _loadOutcomes: =>
       course = ENV.context_asset_string.split('_')[1]
       @$('.outcome-gradebook-wrapper').disableWhileLoading(@hasOutcomes)
       @_loadPage("/api/v1/courses/#{course}/outcome_rollups?per_page=100&include[]=outcomes&include[]=users")
@@ -185,12 +198,13 @@ define [
     #   the menu needs to wait for relevant course sections to load.
     #
     # Returns nothing.
-    _initMenu: =>
+    _drawSectionMenu: =>
       @menu = new SectionMenuView(
         sections: @gradebook.sectionList()
         currentSection: @gradebook.sectionToShow
-        className: 'outcome-gradebook-section-select'
+        el: $('.section-button-placeholder'),
       )
+      @menu.render()
 
     # Internal: Create an event listener function used to filter SlickGrid results.
     #

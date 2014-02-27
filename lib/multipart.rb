@@ -42,8 +42,8 @@ module Multipart
     end
   end
   class MultipartPost
-    BOUNDARY = AutoHandle.generate('canvas-rules', 15)
-    HEADER = {"Content-type" => "multipart/form-data, boundary=" + BOUNDARY}
+    BOUNDARY = CanvasUuid::Uuid.generate('canvas-rules', 15)
+    HEADER = {"CONTENT_TYPE" => "multipart/form-data, boundary=" + BOUNDARY}
 
     def prepare_query (params, field_priority=[])
       fp = []

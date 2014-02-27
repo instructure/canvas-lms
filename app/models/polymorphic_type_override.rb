@@ -10,13 +10,13 @@ module PolymorphicTypeOverride
       @@polymorphic_type_mappings ||= {}
       @@polymorphic_type_mappings[self.name] = OverrideMapper.new(polymorphic_type_mappings)
 
-      # Iterate and re-define the attr_reader
       @@polymorphic_type_mappings[self.name].each_with_mapping do |overridden, old_class, new_class|
         # define attr_reader for mapping[:type] e.g., ContentTag#content_type
         define_method overridden do
           if self.instance_variable_get(:@attributes)[overridden.to_s] == old_class
             return new_class
           end
+
           super()
         end
       end
@@ -32,7 +32,6 @@ module PolymorphicTypeOverride
 
         super attr
       end
-
     end
 
     # override .shard_category_code_for_reflection here
@@ -41,11 +40,10 @@ module PolymorphicTypeOverride
 
       if mapper && reflection && reflection.options && reflection.options[:foreign_type]
         if mapper.overrides?(reflection.options[:foreign_type])
-          const = mapper.new_constant_for(reflection.options[:foreign_type])
-          return "'#{const}'.try(:constantize).try(:shard_category) || :default"
+          const_hash = mapper.constants_mapping(reflection.options[:foreign_type])
+          return "#{const_hash}[self[:#{reflection.options[:foreign_type]}]].try(:constantize).try(:shard_category) || :default"
         end
       end
-
       super reflection
     end
 
@@ -53,9 +51,6 @@ module PolymorphicTypeOverride
 
     class OverrideMapper
       attr_reader :mappings
-
-      extend Forwardable
-      def_delegator :mappings, :each
 
       def initialize(mappings)
         @mappings = mappings.symbolize_keys
@@ -65,26 +60,28 @@ module PolymorphicTypeOverride
         mappings.key?(type.to_sym)
       end
 
-      def new_constant_for(type)
-        mappings[type.to_sym][:to]
+      def constants_mapping(type)
+        mappings[type.to_sym]
       end
 
       def override_from_attributes(attr, attributes)
         mapping = mappings[attr.to_sym]
-        original_class_name = mapping.fetch(:from)
-        new_class_name = mapping.fetch(:to)
         attr = attr.to_s
 
-        if attributes[attr] == original_class_name
-          return new_class_name
+        mapping.each do |original_class, new_class|
+          if attributes[attr] == original_class
+            return new_class
+          end
         end
+
+        false
       end
 
       def each_with_mapping
         mappings.each do |attr, mapping|
-          original_class = mapping.fetch(:from)
-          new_class = mapping.fetch(:to)
-          yield attr, original_class, new_class
+          mapping.each do |original_class, new_class|
+            yield attr, original_class, new_class
+          end
         end
 
       end

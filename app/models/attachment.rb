@@ -23,6 +23,10 @@ class Attachment < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
   attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data, :hidden
+
+  include PolymorphicTypeOverride
+  override_polymorphic_types context_type: {'QuizStatistics' => 'Quizzes::QuizStatistics'}
+
   include HasContentTags
   include ContextModuleItem
   include SearchTermHelper
@@ -157,6 +161,19 @@ class Attachment < ActiveRecord::Base
   end
 
   def before_attachment_saved
+    run_before_attachment_saved
+  end
+
+  def after_attachment_saved
+    run_after_attachment_saved
+  end
+
+  unless CANVAS_RAILS2
+    before_attachment_saved :run_before_attachment_saved
+    after_attachment_saved :run_after_attachment_saved
+  end
+
+  def run_before_attachment_saved
     @after_attachment_saved_workflow_state = self.workflow_state
     self.workflow_state = 'unattached'
   end
@@ -167,7 +184,7 @@ class Attachment < ActiveRecord::Base
   # It blocks and makes the user wait.  The good thing is that sending
   # it to scribd from that point does not make the user wait since that
   # does happen asynchronously and the data goes directly from s3 to scribd.
-  def after_attachment_saved
+  def run_after_attachment_saved
     if workflow_state == 'unattached' && @after_attachment_saved_workflow_state
       self.workflow_state = @after_attachment_saved_workflow_state
       @after_attachment_saved_workflow_state = nil
@@ -482,9 +499,10 @@ class Attachment < ActiveRecord::Base
     self.scribd_attempts ||= 0
     self.folder_id ||= Folder.root_folders(context).first.id rescue nil
     if self.root_attachment && self.new_record?
-      [:md5, :size, :content_type, :scribd_mime_type_id, :submitted_to_scribd_at, :workflow_state, :scribd_doc].each do |key|
+      [:md5, :size, :content_type, :scribd_mime_type_id].each do |key|
         self.send("#{key.to_s}=", self.root_attachment.send(key))
       end
+      self.workflow_state = 'processed'
       self.write_attribute(:filename, self.root_attachment.filename)
     end
     self.context = self.folder.context if self.folder && (!self.context || (self.context.respond_to?(:is_a_context? ) && self.context.is_a_context?))
@@ -767,7 +785,7 @@ class Attachment < ActiveRecord::Base
 
   before_save :assign_uuid
   def assign_uuid
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
   end
   protected :assign_uuid
 
@@ -1379,6 +1397,10 @@ class Attachment < ActiveRecord::Base
   end
 
   def needs_scribd_doc?
+    if self.scribd_attempts >= MAX_SCRIBD_ATTEMPTS
+      self.mark_errored
+      false
+    end
     if self.scribd_doc?
       Scribd::API.instance.user = scribd_user
       begin
@@ -1477,6 +1499,7 @@ class Attachment < ActiveRecord::Base
       Scribd::API.instance.user = scribd_user
       self.scribd_doc.destroy rescue nil
     end
+    self.scribd_doc = nil
     self.workflow_state = 'pending_upload'
     self.submit_to_scribd!
   end
@@ -1633,7 +1656,7 @@ class Attachment < ActiveRecord::Base
 
   scope :scribdable?, where("scribd_mime_type_id IS NOT NULL")
   scope :recyclable, where("attachments.scribd_attempts<? AND attachments.workflow_state='errored'", MAX_SCRIBD_ATTEMPTS)
-  scope :needing_scribd_conversion_status, lambda { where("attachments.workflow_state='processing' AND attachments.updated_at<?", 30.minutes.ago).limit(50) }
+  scope :needing_scribd_conversion_status, lambda { where("attachments.workflow_state='processing' AND attachments.updated_at<? AND scribd_doc IS NOT NULL", 30.minutes.ago).limit(50) }
   scope :uploadable, where(:workflow_state => 'pending_upload')
   scope :active, where(:file_state => 'available')
   scope :thumbnailable?, where(:content_type => Technoweenie::AttachmentFu.content_types)

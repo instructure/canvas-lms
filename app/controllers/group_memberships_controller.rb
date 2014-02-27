@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -61,6 +61,11 @@
 #           "description": "optional: whether or not the record was just created on a create call (POST), i.e. was the user just added to the group, or was the user already a member",
 #           "example": true,
 #           "type": "boolean"
+#         },
+#         "sis_import_id": {
+#           "description": "The id of the SIS import if created through SIS. Only included if the user has permission to manage SIS information.",
+#           "example": 4,
+#           "type": "integer"
 #         }
 #       }
 #     }
@@ -96,6 +101,7 @@ class GroupMembershipsController < ApplicationController
       only_states = ALLOWED_MEMBERSHIP_FILTER
       only_states = only_states & params[:filter_states] if params[:filter_states]
       scope = scope.where(:workflow_state => only_states)
+      scope = scope.includes(:group => :root_account)
 
       @memberships = Api.paginate(scope, self, memberships_route)
       render :json => @memberships.map{ |gm| group_membership_json(gm, @current_user, session) }

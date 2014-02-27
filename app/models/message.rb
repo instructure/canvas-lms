@@ -23,6 +23,13 @@ class Message < ActiveRecord::Base
   else
     include Rails.application.routes.url_helpers
   end
+
+  include PolymorphicTypeOverride
+  override_polymorphic_types context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
+                                            'QuizRegradeRun' => 'Quizzes::QuizRegradeRun'},
+                             asset_context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
+                                                  'QuizRegradeRun' => 'Quizzes::QuizRegradeRun'}
+
   include ERB::Util
   include SendToStream
   include TextHelper
@@ -206,7 +213,7 @@ class Message < ActiveRecord::Base
   end
 
   # Public: Custom getter that delegates and caches notification category to
-  # associated notification 
+  # associated notification
   #
   # Returns a notification category string.
   def notification_category

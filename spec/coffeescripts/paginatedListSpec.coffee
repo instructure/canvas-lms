@@ -1,6 +1,7 @@
 define [
+  'jquery'
   'compiled/PaginatedList'
-], (PaginatedList) ->
+], ($, PaginatedList) ->
   paginatedListFixture = """
     <h3>Paginated List Spec</h3>
     <div id="list-wrapper">

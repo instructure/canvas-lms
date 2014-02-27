@@ -268,6 +268,15 @@ TEXT
                   <%= settings.check_box :self_registration, :checked => @account.self_registration? %>
                   <%= settings.label :self_registration, :en => "Self Registration" %>
                 </div>
+                <div id="self_registration_type_radios">
+                  <%= settings.radio_button :self_registration_type, 'all',
+                                            :checked => !(@account.settings[:self_registration_type] == 'observer') %>
+                  <%= settings.label :self_registration_type_all, :en => "All Account Types" %>
+                  <br/>
+                  <%= settings.radio_button :self_registration_type, 'observer',
+                                            :checked => @account.settings[:self_registration_type] == 'observer' %>
+                  <%= settings.label :self_registration_type_observer, :en => "Observer Accounts Only" %>
+                </div>
                 <div>
                   <%= settings.check_box :open_registration, :checked => @account.open_registration? %>
                   <%= settings.label :open_registration, :en => "Open Registration" %>

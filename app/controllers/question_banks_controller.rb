@@ -96,7 +96,7 @@ class QuestionBanksController < ApplicationController
   end
   
   def create
-    if authorized_action(@context.assessment_question_banks.new, @current_user, :create)
+    if authorized_action(@context.assessment_question_banks.scoped.new, @current_user, :create)
       @bank = @context.assessment_question_banks.build(params[:assessment_question_bank])
       respond_to do |format|
         if @bank.save

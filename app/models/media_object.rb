@@ -73,12 +73,13 @@ class MediaObject < ActiveRecord::Base
       if Kaltura::ClientV3.config['kaltura_sis'].present? && Kaltura::ClientV3.config['kaltura_sis'] == "1"
         sis_source_id = %Q[,"sis_source_id":"#{attachment.context.sis_source_id}"] if attachment.context.respond_to?('sis_source_id') && attachment.context.sis_source_id
         sis_user_id = %Q[,"sis_user_id":"#{pseudonym ? pseudonym.sis_user_id : ''}"] if pseudonym
+        context_code = %Q[,"context_code":"#{[attachment.context_type, attachment.context_id].join('_').underscore}"]
       end
       files << {
                   :name       => attachment.display_name,
                   :url        => attachment.cacheable_s3_download_url,
                   :media_type => (attachment.content_type || "").match(/\Avideo/) ? 'video' : 'audio',
-                  :partner_data  => %Q[{"attachment_id":"#{attachment.id}","context_source":"file_upload" #{sis_source_id} #{sis_user_id}}]
+                  :partner_data  => %Q[{"attachment_id":"#{attachment.id}","context_source":"file_upload","root_account_id":"#{attachment.root_account_id}" #{sis_source_id} #{sis_user_id} #{context_code}}]
                }
     end
     res = client.bulkUploadAdd(files)

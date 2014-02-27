@@ -204,7 +204,8 @@ shared_examples_for 'a backend' do
       Delayed::Job.get_and_lock_next_available('w2').should == nil
       job1.destroy
       # update time since the failed lock pushed it forward
-      job2.update_attribute(:run_at, 1.minute.ago)
+      job2.run_at = 1.minute.ago
+      job2.save!
       Delayed::Job.get_and_lock_next_available('w3').should == job2
       Delayed::Job.get_and_lock_next_available('w4').should == nil
     end
@@ -224,7 +225,8 @@ shared_examples_for 'a backend' do
       # now job1 is done
       job1.destroy
       # update time since the failed lock pushed it forward
-      job2.update_attribute(:run_at, 1.minute.ago)
+      job2.run_at = 1.minute.ago
+      job2.save!
       Delayed::Job.get_and_lock_next_available('w2').should == job2
     end
 
@@ -232,13 +234,15 @@ shared_examples_for 'a backend' do
       job1 = create_job(:strand => 'myjobs')
       job2 = create_job(:strand => 'myjobs')
       job3 = create_job(:strand => 'myjobs')
-      Delayed::Job.get_and_lock_next_available('w1').should == job1.reload
+      Delayed::Job.get_and_lock_next_available('w1').should == job1
       Delayed::Job.find_available(1).should == []
       job1.destroy
       Delayed::Job.find_available(1).should == [job2]
       # move job2's time forward
-      job2.update_attribute(:run_at, 1.second.ago)
-      job3.update_attribute(:run_at, 5.seconds.ago)
+      job2.run_at = 1.second.ago
+      job2.save!
+      job3.run_at = 5.seconds.ago
+      job3.save!
       # we should still get job2, not job3
       Delayed::Job.get_and_lock_next_available('w1').should == job2
     end
@@ -491,7 +495,7 @@ shared_examples_for 'a backend' do
     end
 
     it "should return the queued jobs" do
-      Set.new(Delayed::Job.list_jobs(:current, 100)).should == Set.new(@jobs)
+      Delayed::Job.list_jobs(:current, 100).map(&:id).sort.should == @jobs.map(&:id).sort
     end
 
     it "should paginate the returned jobs" do
@@ -617,16 +621,16 @@ shared_examples_for 'a backend' do
         @ignored_jobs.any? { |j| j.on_hold? }.should be_false
         Delayed::Job.bulk_update('hold', :flavor => @flavor, :query => @query).should == @affected_jobs.size
 
-        @affected_jobs.all? { |j| j.reload.on_hold? }.should be_true
-        @ignored_jobs.any? { |j| j.reload.on_hold? }.should be_false
+        @affected_jobs.all? { |j| Delayed::Job.find(j.id).on_hold? }.should be_true
+        @ignored_jobs.any? { |j| Delayed::Job.find(j.id).on_hold? }.should be_false
       end
 
       it "should un-hold a scope of jobs" do
-        pending "fragile on mysql for unknown reasons" if %w{MySQL Mysql2}.include?(Delayed::Job.connection.adapter_name)
+        pending "fragile on mysql for unknown reasons" if Delayed::Job == Delayed::Backend::ActiveRecord::Job && %w{MySQL Mysql2}.include?(Delayed::Job.connection.adapter_name)
         Delayed::Job.bulk_update('unhold', :flavor => @flavor, :query => @query).should == @affected_jobs.size
 
-        @affected_jobs.any? { |j| j.reload.on_hold? }.should be_false
-        @ignored_jobs.any? { |j| j.reload.on_hold? }.should be_false
+        @affected_jobs.any? { |j| Delayed::Job.find(j.id).on_hold? }.should be_false
+        @ignored_jobs.any? { |j| Delayed::Job.find(j.id).on_hold? }.should be_false
       end
 
       it "should delete a scope of jobs" do
@@ -695,14 +699,14 @@ shared_examples_for 'a backend' do
       j2 = create_job(:run_at => 2.hours.from_now)
       j3 = "test".send_later_enqueue_args(:to_i, :strand => 's1', :no_delay => true)
       Delayed::Job.bulk_update('hold', :ids => [j1.id, j2.id]).should == 2
-      j1.reload.on_hold?.should be_true
-      j2.reload.on_hold?.should be_true
-      j3.reload.on_hold?.should be_false
+      Delayed::Job.find(j1.id).on_hold?.should be_true
+      Delayed::Job.find(j2.id).on_hold?.should be_true
+      Delayed::Job.find(j3.id).on_hold?.should be_false
 
       Delayed::Job.bulk_update('unhold', :ids => [j2.id]).should == 1
-      j1.reload.on_hold?.should be_true
-      j2.reload.on_hold?.should be_false
-      j3.reload.on_hold?.should be_false
+      Delayed::Job.find(j1.id).on_hold?.should be_true
+      Delayed::Job.find(j2.id).on_hold?.should be_false
+      Delayed::Job.find(j3.id).on_hold?.should be_false
     end
 
     it "should delete given job ids" do
@@ -732,8 +736,9 @@ shared_examples_for 'a backend' do
                                                       { :tag => "String#upcase", :count => 2 },
                                                       { :tag => "String#downcase", :count => 1 }]
       @cur[0,4].each { |j| j.destroy }
-      @future[0].update_attribute(:run_at, 1.hour.ago)
-      @future[1].update_attribute(:run_at, 1.hour.ago)
+      @future[0].run_at = @future[1].run_at = 1.hour.ago
+      @future[0].save!
+      @future[1].save!
 
       Delayed::Job.tag_counts(:current, 5).should == [{ :tag => "String#to_i", :count => 4 },
                                                       { :tag => "String#downcase", :count => 3 },
@@ -773,10 +778,10 @@ shared_examples_for 'a backend' do
 
     Delayed::Job.unlock_orphaned_jobs(nil, "Jobworker").should == 1
 
-    job1.reload.locked_by.should_not be_nil
-    job2.reload.locked_by.should be_nil
-    job3.reload.locked_by.should_not be_nil
-    job4.reload.locked_by.should_not be_nil
+    Delayed::Job.find(job1.id).locked_by.should_not be_nil
+    Delayed::Job.find(job2.id).locked_by.should be_nil
+    Delayed::Job.find(job3.id).locked_by.should_not be_nil
+    Delayed::Job.find(job4.id).locked_by.should_not be_nil
 
     Delayed::Job.unlock_orphaned_jobs(nil, "Jobworker").should == 0
   end
@@ -798,10 +803,10 @@ shared_examples_for 'a backend' do
     Delayed::Job.unlock_orphaned_jobs(child_pid2, "Jobworker").should == 0
     Delayed::Job.unlock_orphaned_jobs(child_pid, "Jobworker").should == 1
 
-    job1.reload.locked_by.should_not be_nil
-    job2.reload.locked_by.should be_nil
-    job3.reload.locked_by.should_not be_nil
-    job4.reload.locked_by.should_not be_nil
+    Delayed::Job.find(job1.id).locked_by.should_not be_nil
+    Delayed::Job.find(job2.id).locked_by.should be_nil
+    Delayed::Job.find(job3.id).locked_by.should_not be_nil
+    Delayed::Job.find(job4.id).locked_by.should_not be_nil
 
     Delayed::Job.unlock_orphaned_jobs(child_pid, "Jobworker").should == 0
   end

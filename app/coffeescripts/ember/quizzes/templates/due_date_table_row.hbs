@@ -1,0 +1,21 @@
+<td>{{friendlyDatetimeFromString due_at}}</td>
+<td>
+  {{#if title}}
+    {{title}}
+  {{else}}
+    {{#t 'everyone'}}Everyone{{/t}}
+  {{/if}}
+</td>
+<td>
+  {{#unless alwaysAvailable}}
+    {{#if hasLockDateRange}}
+      {{friendlyDateRangeString}}
+    {{else}}
+      {{#if lock_at}}
+        {{#t 'until_lock_date'}}Until {{friendlyLockAt}}{{/t}}
+      {{else}}
+        {{#t 'from_unlock_date'}}From {{friendlyUnlockAt}}{{/t}}
+      {{/if}}
+    {{/if}}
+  {{/unless}}
+</td>

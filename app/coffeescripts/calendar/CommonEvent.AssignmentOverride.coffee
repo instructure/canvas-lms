@@ -1,9 +1,10 @@
 define [
   'i18n!calendar'
+  'jquery'
   'compiled/calendar/CommonEvent'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
-], (I18n, CommonEvent) ->
+], (I18n, $, CommonEvent) ->
 
   deleteConfirmation = I18n.t('prompts.delete_override', 'Are you sure you want to delete this assignment override?')
 

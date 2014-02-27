@@ -925,7 +925,7 @@ shared_examples_for "all selenium tests" do
     driver.execute_script("return $('.error_text:visible').filter(function(){ return $(this).offset().left >= 0 }).length > 0")
   end
 
-  append_after(:each) do
+  after(:each) do
     begin
       wait_for_ajax_requests
     rescue Selenium::WebDriver::Error::WebDriverError
@@ -934,7 +934,7 @@ shared_examples_for "all selenium tests" do
     truncate_all_tables unless self.use_transactional_fixtures
   end
 
-  unless CANVAS_RAILS2
+  unless CANVAS_RAILS2 || EncryptedCookieStore.respond_to?(:test_secret)
     EncryptedCookieStore.class_eval do
       cattr_accessor :test_secret
 
@@ -991,7 +991,7 @@ shared_examples_for "all selenium tests" do
     end
   end
 
-  append_after(:each) do
+  after(:each) do
     clear_timers!
   end
 

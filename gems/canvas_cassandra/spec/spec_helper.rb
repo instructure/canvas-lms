@@ -23,6 +23,19 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
+require 'simplecov'
+require 'simplecov-rcov'
+
+SimpleCov.command_name('canvas-cassandra-gem')
+SimpleCov.start('test_frameworks') do
+  SimpleCov.coverage_dir('../../coverage')
+  SimpleCov.use_merging
+  SimpleCov.merge_timeout(10000)
+  SimpleCov.at_exit {
+    SimpleCov.result
+  }
+end
+
 require "canvas_cassandra"
 require "yaml"
 

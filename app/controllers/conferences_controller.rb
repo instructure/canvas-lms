@@ -205,7 +205,7 @@ class ConferencesController < ApplicationController
   end
 
   def create
-    if authorized_action(@context.web_conferences.new, @current_user, :create)
+    if authorized_action(@context.web_conferences.scoped.new, @current_user, :create)
       params[:web_conference].try(:delete, :long_running)
       @conference = @context.web_conferences.build(params[:web_conference])
       @conference.settings[:default_return_url] = named_context_url(@context, :context_url, :include_host => true)
@@ -305,7 +305,10 @@ class ConferencesController < ApplicationController
 
   def destroy
     if authorized_action(@conference, @current_user, :delete)
-      @conference.destroy
+      @conference.transaction do
+        @conference.web_conference_participants.scoped.delete_all
+        @conference.destroy
+      end
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_conferences_url) }
         format.json { render :json => @conference }

@@ -367,7 +367,7 @@ TEXT
         </span>
         <div class="clear"></div>
       </li>
-      <% if can_do(@context.course_sections.new, @current_user, :create) %>
+      <% if can_do(@context.course_sections.scoped.new, @current_user, :create) %>
         <li>
           <%= form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
             <h3><%= f.blabel :name, :course_section_name, :en => "Add a New Section" %></h3>

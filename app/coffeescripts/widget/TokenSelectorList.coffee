@@ -17,10 +17,11 @@
 #
 
 define [
+  'jquery'
   'underscore'
   'compiled/views/PaginatedView'
   'jquery.disableWhileLoading'
-], (_, PaginatedView) ->
+], ($, _, PaginatedView) ->
 
   class TokenSelectorList extends PaginatedView
     tagName: 'div'

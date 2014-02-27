@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -104,6 +104,16 @@
 #         "group_category_id": {
 #           "description": "The ID of the group's category.",
 #           "example": 4,
+#           "type": "integer"
+#         },
+#         "sis_group_id": {
+#           "description": "The SIS ID of the group. Only included if the user has permission to view SIS information.",
+#           "example": "group4a",
+#           "type": "string"
+#         },
+#         "sis_import_id": {
+#           "description": "The id of the SIS import if created through SIS. Only included if the user has permission to manage SIS information.",
+#           "example": 14,
 #           "type": "integer"
 #         },
 #         "storage_quota_mb": {
@@ -415,7 +425,7 @@ class GroupsController < ApplicationController
 
     attrs = api_request? ? params : params[:group]
     attrs.delete :storage_quota_mb unless @context.grants_right? @current_user, session, :manage_storage_quotas
-    @group = @context.groups.new(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
+    @group = @context.groups.scoped.new(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
 
     if authorized_action(@group, @current_user, :create)
       respond_to do |format|

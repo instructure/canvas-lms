@@ -257,7 +257,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def context_module_tag_for(context)
-    @tag ||= self.context_module_tags.find_by_context_id_and_context_type(context.id, context.class.to_s)
+    @tag ||= self.context_module_tags.where(context_id: context, context_type: context.class.base_ar_class.name).first
   end
 
   def context_module_action(user, context, action)

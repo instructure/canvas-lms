@@ -164,7 +164,7 @@ describe Qti::Converter do
       a.each_with_index do |e,i|
         match_ignoring(e.to_hash, b[i], ignoring)
       end
-    when QuizQuestion::QuestionData
+    when Quizzes::QuizQuestion::QuestionData
       a.to_hash.should == b
     else
       a.should == b

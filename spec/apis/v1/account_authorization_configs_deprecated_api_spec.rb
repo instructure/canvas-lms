@@ -76,11 +76,11 @@ describe "AccountAuthorizationConfigs API", type: :request do
   end
 
   it "should delete configs not referenced" do
-    config = @account.account_authorization_configs.create!("auth_type" => "cas", "auth_base" => "127.0.0.1")
-    config = @account.account_authorization_configs.create!("auth_type" => "cas", "auth_base" => "127.0.0.1")
+    config = @account.account_authorization_configs.create!("auth_type" => "ldap")
+    config = @account.account_authorization_configs.create!("auth_type" => "ldap")
     api_call(:post, "/api/v1/accounts/#{@account.id}/account_authorization_configs",
              { :controller => 'account_authorization_configs', :action => 'create', :account_id => @account.id.to_s, :format => 'json' },
-             { :account_authorization_config => {"0" => {"id" => config.id.to_s, "auth_type" => "cas", "auth_base" => "127.0.0.2"}}})
+             { :account_authorization_config => {"0" => {"id" => config.id.to_s, "auth_type" => "ldap"}}})
     @account.reload
     @account.account_authorization_configs.count.should == 1
   end

@@ -177,7 +177,8 @@ class ApplicationController < ActionController::Base
   end
 
   def set_response_headers
-    headers['X-UA-Compatible'] = 'IE=edge,chrome=1'
+    headers['X-UA-Compatible'] = 'IE=Edge,chrome=1' if CANVAS_RAILS2
+
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
@@ -515,7 +516,7 @@ class ApplicationController < ActionController::Base
     if @just_viewing_one_course
 
       # fake assignment used for checking if the @current_user can read unpublished assignments
-      fake = @context.assignments.new
+      fake = @context.assignments.scoped.new
       fake.workflow_state = 'unpublished'
 
       assignment_scope = :active_assignments
@@ -847,7 +848,9 @@ class ApplicationController < ActionController::Base
     end
 
     def interpret_status(code)
-      Rack::Utils::HTTP_STATUS_CODES[Rack::Utils.status_code(code)] || Rack::Utils::HTTP_STATUS_CODES[500]
+      message = Rack::Utils::HTTP_STATUS_CODES[code]
+      code, message = [500, Rack::Utils::HTTP_STATUS_CODES[500]] unless message
+      "#{code} #{message}"
     end
 
     def response_code_for_rescue(exception)
@@ -947,23 +950,30 @@ class ApplicationController < ActionController::Base
   end
 
   def api_error_json(exception, status_code)
-    if status_code.is_a?(Symbol)
-      status_code_string = status_code.to_s
-    else
-      # we want to return a status string of the form "not_found", so take the rails-style "Not Found" and tweak it
-      status_code_string = interpret_status(status_code).sub(/\d\d\d /, '').gsub(' ', '').underscore
-    end
-
-    data = { :status => status_code_string }
-    # inject exception-specific data into the response
     case exception
-      when ActiveRecord::RecordNotFound
-        data[:message] = 'The specified resource does not exist.'
-      when AuthenticationMethods::AccessTokenError
-        add_www_authenticate_header
-        data[:message] = 'Invalid access token.'
+    when ActiveRecord::RecordInvalid
+      errors = exception.record.errors
+      errors.set_reporter(:hash, Api::Errors::Reporter)
+      data = errors.to_hash
+    when Api::Error
+      errors = ActiveModel::BetterErrors::Errors.new(nil)
+      errors.error_collection.add(:base, exception.error_id, message: exception.message)
+      errors.set_reporter(:hash, Api::Errors::Reporter)
+      data = errors.to_hash
+    when ActiveRecord::RecordNotFound
+      data = { errors: [{message: 'The specified resource does not exist.'}] }
+    when AuthenticationMethods::AccessTokenError
+      add_www_authenticate_header
+      data = { errors: [{message: 'Invalid access token.'}] }
+    else
+      if status_code.is_a?(Symbol)
+        status_code_string = status_code.to_s
+      else
+        # we want to return a status string of the form "not_found", so take the rails-style "Not Found" and tweak it
+        status_code_string = interpret_status(status_code).sub(/\d\d\d /, '').gsub(' ', '').underscore
+      end
+      data = { errors: [{message: "An error occurred.", error_code: status_code_string}] }
     end
-    data[:message] ||= "An error occurred."
     data
   end
 
@@ -972,7 +982,7 @@ class ApplicationController < ActionController::Base
       # we want api requests to behave the same on error locally as in prod, to
       # ease testing and development. you can still view the backtrace, etc, in
       # the logs.
-      rescue_action_in_api(exception, nil)
+      rescue_action_in_public(exception)
     else
       super
     end

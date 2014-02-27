@@ -6,16 +6,18 @@ describe Moodle::Converter do
     fixture_dir = File.dirname(__FILE__) + '/fixtures'
     archive_file_path = File.join(fixture_dir, 'moodle_backup_1_9.zip')
     unzipped_file_path = File.join(File.dirname(archive_file_path), "moodle_#{File.basename(archive_file_path, '.zip')}", 'oi')
-    @converter = Moodle::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
-    @converter.export
-    @course_data = @converter.course.with_indifferent_access
-    @converter.delete_unzipped_archive
+    converter = Moodle::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
+    converter.export
+    @base_course_data = converter.course.with_indifferent_access
+    converter.delete_unzipped_archive
     if File.exists?(unzipped_file_path)
       FileUtils::rm_rf(unzipped_file_path)
     end
   end
 
   before(:each) do
+    # make a deep copy
+    @course_data = Marshal.load(Marshal.dump(@base_course_data))
     @course = Course.create(:name => "test course")
     @cm = ContentMigration.create(:context => @course)
     @course.content_migration = @cm

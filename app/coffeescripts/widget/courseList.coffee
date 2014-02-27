@@ -5,6 +5,7 @@ define [
   'jst/courseList/content'
   'vendor/jquery.ba-tinypubsub'
 ], (jQuery, CustomList, wrapper, content) ->
+  $ = jQuery
 
   init: ->
     jQuery ->

@@ -51,9 +51,30 @@ define [
 
   ScreenreaderGradebookController = Ember.ObjectController.extend
 
-    downloadUrl: "#{get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')}/gradebook.csv"
-    gradingHistoryUrl: "#{get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')}/history"
+    contextUrl: get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')
+
+    downloadUrl: (->
+      "#{@get('contextUrl')}/gradebook.csv"
+    ).property()
+
+    gradingHistoryUrl:(->
+      "#{@get('contextUrl')}/gradebook/history"
+    ).property()
+
+    speedGraderUrl: (->
+      "#{@get('contextUrl')}/gradebook/speed_grader?assignment_id=#{@get('selectedAssignment.id')}"
+    ).property('selectedAssignment')
+
+    studentUrl: (->
+      "#{@get('contextUrl')}/grades/#{@get('selectedStudent.id')}"
+    ).property('selectedStudent')
+
+    showTotalAsPoints: (->
+      ENV.GRADEBOOK_OPTIONS.show_total_grade_as_points
+      ).property()
+
     hideStudentNames: false
+
     showConcludedEnrollments: false
 
     selectedStudent: null
@@ -95,17 +116,17 @@ define [
     ).observes('hideStudentNames')
 
     setupSubmissionCallback: (->
-      $.subscribe 'submissions_updated', _.bind(@updateSubmissionsFromExternal, this)
+      Ember.$.subscribe 'submissions_updated', _.bind(@updateSubmissionsFromExternal, this)
     ).on('init')
 
     setupAssignmentGroupsChange: (->
-      $.subscribe 'assignment_group_weights_changed', _.bind(@checkWeightingScheme, this)
+      Ember.$.subscribe 'assignment_group_weights_changed', _.bind(@checkWeightingScheme, this)
       @set 'weightingScheme', ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
     ).on('init')
 
     willDestroy: ->
-      $.unsubscribe 'submissions_updated'
-      $.unsubscribe 'assignment_group_weights_changed'
+      Ember.$.unsubscribe 'submissions_updated'
+      Ember.$.unsubscribe 'assignment_group_weights_changed'
       @_super()
 
     checkWeightingScheme: ({assignmentGroups})->
@@ -153,7 +174,18 @@ define [
 
     calculateAllGrades: (->
       @get('students').forEach (student) => @calculateStudentGrade student
-    ).observes('includeUngradedAssignments')
+    ).observes('includeUngradedAssignments','groupsAreWeighted')
+
+    setFinalGradeDisplay: (->
+      @get('students').forEach (student) =>
+        set(student, "final_grade_point_ratio", @pointRatioDisplay(student, @get('groupsAreWeighted')))
+    ).observes('students.@each.total_grade','groupsAreWeighted')
+
+    pointRatioDisplay: (student, weighted_groups) ->
+      if weighted_groups or not student.total_grade
+        null
+      else
+        "#{student.total_grade.score} / #{student.total_grade.possible}"
 
     sectionSelectDefaultLabel: I18n.t "all_sections", "All Sections"
     studentSelectDefaultLabel: I18n.t "no_student", "No Student Selected"
@@ -180,6 +212,14 @@ define [
         fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, student_ids: student_ids,  @get('submissions'))
     ).observes('students.@each').on('init')
 
+    publishToSisEnabled: (->
+      ENV.GRADEBOOK_OPTIONS.publish_to_sis_enabled
+      ).property()
+
+    publishToSisURL:(->
+      ENV.GRADEBOOK_OPTIONS.publish_to_sis_url
+      ).property()
+
     teacherNotes: (->
       ENV.GRADEBOOK_OPTIONS.teacher_notes
     ).property().volatile()
@@ -191,6 +231,7 @@ define [
       else
         false
     ).property().volatile()
+
 
     shouldCreateNotes: (->
       !@get('teacherNotes') and @get('showNotesColumn')
@@ -246,6 +287,27 @@ define [
           data:
             order: customColumns.mapBy('id')
         )
+
+    displayPointTotals: (->
+      if @get("groupsAreWeighted")
+        false
+      else
+        @get("showTotalAsPoints")
+    ).property('groupsAreWeighted', 'showTotalAsPoints')
+
+    groupsAreWeighted: (->
+      @get("weightingScheme") == "percent"
+    ).property("weightingScheme")
+
+    updateShowTotalAs: (->
+      @set "showTotalAsPoints", @get("displayPointTotals")
+      ajax(
+        dataType: "json"
+        type: "PUT"
+        url: ENV.GRADEBOOK_OPTIONS.setting_update_url
+        data:
+          show_total_grade_as_points: @get("displayPointTotals"))
+    ).observes('showTotalAsPoints', 'groupsAreWeighted')
 
     studentColumnData: {}
 
@@ -315,7 +377,7 @@ define [
     ).observes('submissions.@each')
 
     updateSubmission: (submission, student) ->
-      submission.submitted_at = $.parseFromISO(submission.submitted_at) if submission.submitted_at
+      submission.submitted_at = Ember.$.parseFromISO(submission.submitted_at) if submission.submitted_at
       set(student, "assignment_#{submission.assignment_id}", submission)
 
     assignments: Ember.ArrayProxy.createWithMixins(Ember.SortableMixin,
@@ -330,7 +392,7 @@ define [
       set as, 'sortable_name', as.name.toLowerCase()
       set as, 'ag_position', assignmentGroups.findBy('id', as.assignment_group_id).position
       if as.due_at
-        set as, 'due_at', $.parseFromISO(as.due_at)
+        set as, 'due_at', Ember.$.parseFromISO(as.due_at)
         set as, 'sortable_date', as.due_at.timestamp
       else
         set as, 'sortable_date', Number.MAX_VALUE

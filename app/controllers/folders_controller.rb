@@ -139,7 +139,7 @@ class FoldersController < ApplicationController
       else
         scope = scope.by_name
       end
-      @folders = Api.paginate(scope, self, api_v1_list_folders_url(@context))
+      @folders = Api.paginate(scope, self, api_v1_list_folders_url(folder))
       render :json => folders_json(@folders, @current_user, session, :can_manage_files => can_manage_files)
     end
   end

@@ -53,7 +53,7 @@ module AvatarHelper
   end
 
   def avatar_url_for_group(blank_fallback=false)
-    "#{request.protocol}#{request.host_with_port}" + (blank_fallback ?
+    request.base_url + (blank_fallback ?
       "/images/blank.png" :
       "/images/messages/avatar-group-50.png" # always fall back to -50, it'll get scaled down if a smaller size is wanted
     )
@@ -69,7 +69,7 @@ module AvatarHelper
 
     if !url.match(%r{\Ahttps?://})
       # make sure that the url is not just a path
-      url = "#{request.protocol}#{request.host_with_port}#{url}"
+      url = "#{request.base_url}#{url}"
     end
 
     url

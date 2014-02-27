@@ -1,4 +1,4 @@
-source 'http://rubygems.org/'
+source 'https://rubygems.org/'
 
 # this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
 if RUBY_VERSION == "2.0.0"
@@ -29,6 +29,17 @@ end
 
 require File.expand_path("../config/canvas_rails3", __FILE__)
 
+# patch bundler to do github over https
+unless Bundler::Dsl.private_instance_methods.include?(:_old_normalize_options)
+  class Bundler::Dsl
+    alias_method :_old_normalize_options, :_normalize_options
+    def _normalize_options(name, version, opts)
+      _old_normalize_options(name, version, opts)
+      opts['git'].sub!('git://', 'https://') if opts['git'] && opts['git'] =~ %r{^git://github.com}
+    end
+  end
+end
+
 platforms :ruby_20, :ruby_21 do
   gem 'syck', '1.0.1'
   gem 'iconv', '1.0.3'
@@ -52,12 +63,17 @@ if CANVAS_RAILS2
   gem 'authlogic', '2.1.3'
 else
   # just to be clear, Canvas is NOT READY to run under Rails 3 in production
-  gem 'rails', '3.2.15'
+  gem 'rails', '3.2.17'
   gem 'active_model_serializers', '0.9.0pre',
     :github => 'rails-api/active_model_serializers', :ref => '99fa399ae6dc071b97b15e1ef2b42f0d23c492ec'
-  gem 'authlogic', '3.2.0'
+  gem 'authlogic', '3.3.0'
 end
 
+if CANVAS_RAILS2
+  gem 'instructure-active_model-better_errors', '1.6.5.rails2.3', :require => 'active_model/better_errors'
+else
+  gem 'active_model-better_errors', '1.6.7', :require => 'active_model/better_errors'
+end
 gem "aws-sdk", '1.21.0'
   gem 'uuidtools', '2.1.4'
 gem 'barby', '0.5.0'
@@ -151,7 +167,7 @@ if CANVAS_RAILS2
   gem 'folio-pagination-legacy', '0.0.3', :require => 'folio/rails'
   gem 'will_paginate', '2.3.15', :require => false
 else
-  gem 'folio-pagination', '0.0.3', :require => 'folio/rails'
+  gem 'folio-pagination', '0.0.6', :require => 'folio/rails'
   gem 'will_paginate', '3.0.4', :require => false
 end
 gem 'xml-simple', '1.0.12', :require => 'xmlsimple'
@@ -169,8 +185,10 @@ gem 'canvas_crummy', :path => 'gems/canvas_crummy'
 gem 'canvas_mimetype_fu', :path => 'gems/canvas_mimetype_fu'
 gem 'canvas_sanitize', :path => 'gems/canvas_sanitize'
 gem 'canvas_stringex', :path => 'gems/canvas_stringex'
+gem 'canvas_uuid', :path => 'gems/canvas_uuid'
 gem 'lti_outbound', :path => 'gems/lti_outbound'
 gem 'html_text_helper', :path => 'gems/html_text_helper'
+gem 'activesupport-suspend_callbacks', :path => 'gems/activesupport-suspend_callbacks'
 
 group :assets do
   gem 'compass-rails', '1.0.3'
@@ -273,13 +291,6 @@ group :cassandra do
     gem 'thrift', '0.8.0'
     gem 'thrift_client', '0.8.4'
   gem "canvas_cassandra", path: "gems/canvas_cassandra"
-end
-
-group :embedly do
-  gem 'embedly', '1.5.5'
-    gem 'oauth', '0.4.7'
-    gem 'querystring', '0.1.0'
-    gem 'typhoeus', '0.3.3'
 end
 
 group :statsd do

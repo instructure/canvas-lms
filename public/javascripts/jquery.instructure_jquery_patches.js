@@ -17,29 +17,6 @@
  */
 define(['vendor/jquery-1.7.2'], function($) {
 
-  // This is so that if you disable an element, that it also gives it the class disabled.
-  // that way you can add css classes for our friend IE6. so rather than using selector:disabled,
-  // you can do selector.disabled.
-  // works on both $(elem).attr('disabled', ...) AND $(elem).prop('disabled', ...)
-  $.each([ "prop", "attr" ], function(i, propOrAttr ) {
-    // set the `disabled.set` hook like this so we don't override any existing `get` hook
-    $[propOrAttr+'Hooks'].disabled = $.extend( $[propOrAttr+'Hooks'].disabled, {
-      set: function( elem, value, name ) {
-        $(elem).toggleClass('disabled', !!value);
-
-        // have to replicate wat jQuery's boolHook does because once you define your own hook
-        // for an attribute/property it wont fall back to boolHook. and it is not exposed externally.
-        elem[value ? 'setAttribute' : 'removeAttribute' ]('disabled', 'disabled');
-        if ( 'disabled' in elem ) {
-          // Only set the IDL specifically if it already exists on the element
-          // ie for an <input> but not a <div>
-          elem.disabled = !!value;
-        }
-        return value;
-      }
-    });
-  });
-
   // monkey patch jquery's JSON parsing so we can have all of our ajax responses return with
   // 'while(1);' prepended to them to protect against a CSRF attack vector.
   var _parseJSON = $.parseJSON;

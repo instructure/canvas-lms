@@ -83,6 +83,11 @@
 #             "example": true,
 #             "type": "boolean"
 #           },
+#           "sis_import_id": {
+#             "description": "The unique identifier for the SIS import. This field is only included if the user has permission to manage SIS information.",
+#             "example": 83,
+#             "type": "integer"
+#           },
 #           "root_account_id": {
 #             "description": "The unique id of the user's account.",
 #             "example": 1,

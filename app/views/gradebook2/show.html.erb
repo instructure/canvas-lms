@@ -10,7 +10,7 @@
   js_bundle :gradebook2
 %>
 <div id="keyboard_navigation"></div>
-<div id="gradebook_wrapper" class="use-css-transitions-for-show-hide" style="display:none;">
+<div id="gradebook_wrapper">
 
   <% if @context.feature_enabled?(:outcome_gradebook) %>
     <div class="gradebook-header">
@@ -31,7 +31,7 @@
     </div>
   <% end %>
 
-  <div class="gradebook-container">
+  <div class="gradebook-container hidden">
     <div id="gradebook-toolbar" class="toolbar">
       <% if !@context.feature_enabled?(:outcome_gradebook) %>
         <span class="section-button-placeholder"></span>
@@ -64,7 +64,7 @@
         <input type="text" class="search-query" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
       </div>
     </div>
-    <div id="gradebook-grid-wrapper">
+    <div id="gradebook-grid-wrapper" class="use-css-transitions-for-show-hide" style="display:none;">
       <div id="gradebook_grid"></div>
     </div>
     <div style="display:none;">

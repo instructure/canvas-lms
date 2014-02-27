@@ -17,13 +17,14 @@
 #
 
 define [
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/models/Group'
   'compiled/models/User'
   'compiled/collections/CollaboratorCollection'
   'jst/collaborations/collaborator'
-], ({extend, filter, map}, {View}, Group, User, CollaboratorCollection, collaboratorTemplate) ->
+], ($, {extend, filter, map}, {View}, Group, User, CollaboratorCollection, collaboratorTemplate) ->
 
   class MemberListView extends View
     events:

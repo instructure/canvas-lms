@@ -38,7 +38,7 @@ class DiscussionEntriesController < ApplicationController
     @topic = @context.discussion_topics.active.find(params[:discussion_entry].delete(:discussion_topic_id))
     params[:discussion_entry].delete :remove_attachment rescue nil
     parent_id = params[:discussion_entry].delete(:parent_id)
-    @entry = @topic.discussion_entries.new(params[:discussion_entry])
+    @entry = @topic.discussion_entries.scoped.new(params[:discussion_entry])
     @entry.current_user = @current_user
     @entry.user_id = @current_user ? @current_user.id : nil
     @entry.parent_id = parent_id

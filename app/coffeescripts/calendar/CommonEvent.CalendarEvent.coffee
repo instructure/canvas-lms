@@ -1,10 +1,11 @@
 define [
   'i18n!calendar'
+  'jquery'
   'compiled/util/semanticDateRange'
   'compiled/calendar/CommonEvent'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
-], (I18n, semanticDateRange, CommonEvent) ->
+], (I18n, $, semanticDateRange, CommonEvent) ->
 
   deleteConfirmation = I18n.t('prompts.delete_event', "Are you sure you want to delete this event?")
 

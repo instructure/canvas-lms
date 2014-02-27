@@ -28,11 +28,10 @@ module ReportSpecHelper
 
   def run_report(type = @type, options = {})
     account = options[:account] || @account
-    parameters = options[:params] || {}
+    parameters = options[:params]
     account_report = AccountReport.new(:user => @admin || user,
                                        :account => account,
                                        :report_type => type)
-    account_report.parameters = {}
     account_report.parameters = parameters
     account_report.save
     Canvas::AccountReports.for_account(account)[type][:proc].call(account_report)

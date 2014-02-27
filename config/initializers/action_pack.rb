@@ -26,5 +26,9 @@ end
 if CANVAS_RAILS2
   ActionController::Request.class_eval do
     alias_method :fullpath, :request_uri
+
+    def base_url
+      "#{protocol}#{host_with_port}"
+    end
   end
 end

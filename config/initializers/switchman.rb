@@ -93,4 +93,8 @@ unless CANVAS_RAILS2
       self
     end
   end
+
+  Delayed::Backend::ActiveRecord::Job.class_eval do
+    self.shard_category = :delayed_jobs
+  end
 end

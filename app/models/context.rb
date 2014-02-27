@@ -47,9 +47,9 @@ module Context
     MediaObject = ::MediaObject
     Progress = ::Progress
     Quiz = ::Quizzes::Quiz
-    QuizGroup = ::QuizGroup
-    QuizQuestion = ::QuizQuestion
-    QuizSubmission = ::QuizSubmission
+    QuizGroup = ::Quizzes::QuizGroup
+    QuizQuestion = ::Quizzes::QuizQuestion
+    QuizSubmission = ::Quizzes::QuizSubmission
     Rubric = ::Rubric
     RubricAssociation = ::RubricAssociation
     Submission = ::Submission

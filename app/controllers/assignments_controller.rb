@@ -79,7 +79,7 @@ class AssignmentsController < ApplicationController
           else
             format.html { redirect_to root_url }
           end
-        elsif @just_viewing_one_course && @context.assignments.new.grants_right?(@current_user, session, :update)
+        elsif @just_viewing_one_course && @context.assignments.scoped.new.grants_right?(@current_user, session, :update)
           format.html {
             render :action => :index
           }
@@ -330,7 +330,7 @@ class AssignmentsController < ApplicationController
   end
 
   def new
-    @assignment ||= @context.assignments.new
+    @assignment ||= @context.assignments.scoped.new
     @assignment.workflow_state = 'unpublished' if @context.feature_enabled?(:draft_state)
     add_crumb t :create_new_crumb, "Create new"
 

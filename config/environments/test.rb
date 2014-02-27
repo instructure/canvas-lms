@@ -6,6 +6,8 @@ if ENV['COVERAGE'] == "1"
   SimpleCov.command_name "RSpec:#{Process.pid}#{ENV['TEST_ENV_NUMBER']}"
 
   SimpleCov.start do
+    SimpleCov.use_merging
+    SimpleCov.merge_timeout(10000)
     class SimpleCov::Formatter::MergedFormatter
       def format(result)
         SimpleCov::Formatter::HTMLFormatter.new.format(result)
@@ -23,9 +25,12 @@ if ENV['COVERAGE'] == "1"
     add_group 'Models', 'app/models'
     add_group 'Services', 'app/services'
     add_group 'App', '/app/'
+    add_group 'Gems', 'gems/'
     add_group 'Helpers', 'app/helpers'
     add_group 'Libraries', '/lib/'
     add_group 'Plugins', 'vendor/plugins'
+    add_group 'Db', '/db/'
+
     add_group "Long files" do |src_file|
       src_file.lines.count > 500
     end
@@ -116,7 +121,7 @@ end
     Canvas.dynamic_finder_nil_arguments_error = :raise
   else
     # Raise exceptions instead of rendering exception templates
-    config.action_dispatch.show_exceptions = false
+    config.action_dispatch.show_exceptions = true
 
     # Print deprecation notices to the stderr
     config.active_support.deprecation = :stderr

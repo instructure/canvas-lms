@@ -13,11 +13,11 @@
 # class with those attributes.
 #
 class Version < ActiveRecord::Base #:nodoc:
-  belongs_to :versionable, :polymorphic => true
-
   # INSTRUCTURE: shims for quizzes namespacing
   include PolymorphicTypeOverride
-  override_polymorphic_types versionable_type: {from: 'Quiz', to: 'Quizzes::Quiz'}
+  override_polymorphic_types versionable_type: {'Quiz' => 'Quizzes::Quiz', 'QuizSubmission' => 'Quizzes::QuizSubmission'}
+
+  belongs_to :versionable, :polymorphic => true
 
   before_create :initialize_number
 
@@ -44,12 +44,12 @@ class Version < ActiveRecord::Base #:nodoc:
     options = model.class.simply_versioned_options
     self.yaml = model.attributes.except(*options[:exclude]).to_yaml
   end
-  
+
   # Return the next higher numbered version, or nil if this is the last version
   def next
     versionable.versions.next_version( self.number )
   end
-  
+
   # Return the next lower numbered version, or nil if this is the first version
   def previous
     versionable.versions.previous_version( self.number )
@@ -71,5 +71,5 @@ class Version < ActiveRecord::Base #:nodoc:
     return false unless versionable
     self.number = (versionable.versions.maximum( :number ) || 0) + 1
   end
-  
+
 end

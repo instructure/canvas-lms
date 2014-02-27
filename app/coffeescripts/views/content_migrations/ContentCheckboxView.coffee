@@ -1,11 +1,12 @@
 define [
+  'jquery'
   'Backbone'
   'jst/content_migrations/ContentCheckbox'
   'jst/content_migrations/ContentCheckboxCollection'
   'compiled/collections/content_migrations/ContentCheckboxCollection'
   'compiled/views/CollectionView'
   'compiled/str/TextHelper'
-], (Backbone, template, checkboxCollectionTemplate, CheckboxCollection, CollectionView, TextHelper) ->
+], ($, Backbone, template, checkboxCollectionTemplate, CheckboxCollection, CollectionView, TextHelper) ->
   class ContentCheckboxView extends Backbone.View
     template: template
     tagName: 'li'

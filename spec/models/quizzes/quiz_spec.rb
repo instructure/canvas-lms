@@ -400,7 +400,7 @@ describe Quizzes::Quiz do
 
     qq1 = q.quiz_questions.create!(:question_data => { :name => "test 1" }, :quiz_group => g)
     # make sure we handle sorting with nil positions
-    QuizQuestion.where(:id => qq1).update_all(:position => nil)
+    Quizzes::QuizQuestion.where(:id => qq1).update_all(:position => nil)
 
     q.quiz_questions.create!(:question_data => { :name => "test 2" }, :quiz_group => g)
     q.quiz_questions.create!(:question_data => { :name => "test 3" })
@@ -825,7 +825,7 @@ describe Quizzes::Quiz do
       @user = User.create!
       @enrollment = @user.student_enrollments.create!(:course => course)
       @enrollment.update_attribute(:workflow_state, 'active')
-      @submission = QuizSubmission.create!(:quiz => @quiz, :user => @user)
+      @submission = Quizzes::QuizSubmission.create!(:quiz => @quiz, :user => @user)
       @submission.update_attribute(:workflow_state, 'untaken')
     end
 
@@ -846,7 +846,7 @@ describe Quizzes::Quiz do
     end
 
     it 'is true if only one submission of many matches the conditions' do
-      QuizSubmission.create!(:quiz => @quiz, :user => User.create!)
+      Quizzes::QuizSubmission.create!(:quiz => @quiz, :user => User.create!)
       @quiz.has_student_submissions?.should be_true
     end
   end
@@ -1136,7 +1136,7 @@ describe Quizzes::Quiz do
 
     it "returns the regrade for the quiz and quiz version" do
       course_with_teacher_logged_in(active_all: true, course: @course)
-      regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id,@quiz.version_number) { |qr| qr.user_id = @teacher.id }
+      regrade = Quizzes::QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id,@quiz.version_number) { |qr| qr.user_id = @teacher.id }
       @quiz.current_regrade.should == regrade
     end
   end
@@ -1148,7 +1148,7 @@ describe Quizzes::Quiz do
     it "returns the correct question ids" do
       course_with_teacher_logged_in(active_all: true, course: @course)
       q = @quiz.quiz_questions.create!
-      regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) { |qr| qr.user_id = @teacher.id }
+      regrade = Quizzes::QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) { |qr| qr.user_id = @teacher.id }
       rq = regrade.quiz_question_regrades.create! quiz_question_id: q.id, regrade_option: 'current_correct_only'
       @quiz.current_quiz_question_regrades.should == [rq]
     end
@@ -1160,18 +1160,18 @@ describe Quizzes::Quiz do
       course_with_teacher_logged_in(course: @course, active_all: true)
       quiz = @course.quizzes.create!
       q = quiz.quiz_questions.create!
-      regrade = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(quiz.id,quiz.version_number) { |qr| qr.user_id = @teacher.id }
+      regrade = Quizzes::QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(quiz.id,quiz.version_number) { |qr| qr.user_id = @teacher.id }
       regrade.quiz_question_regrades.create!(
         quiz_question_id: q.id,
         regrade_option: 'current_correct_only')
-      QuizRegrader.expects(:send_later).once.
+      Quizzes::QuizRegrader::Regrader.expects(:send_later).once.
         with(:regrade!, quiz: quiz, version_number: quiz.version_number)
       quiz.save!
     end
 
     it "does not queue a job to regrade when no current question regrades" do
       course_with_teacher_logged_in(course: @course, active_all: true)
-      QuizRegrader.expects(:send_later).never
+      Quizzes::QuizRegrader::Regrader.expects(:send_later).never
       quiz = @course.quizzes.create!
       quiz.save!
     end
@@ -1187,14 +1187,14 @@ describe Quizzes::Quiz do
       first_regrade_time = 1.hour.ago
       Timecop.freeze(first_regrade_time) do
         # regrade once
-        regrade1 = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) do |qr|
+        regrade1 = Quizzes::QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number) do |qr|
           qr.user_id = @teacher.id
         end
         regrade1.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
       end
 
       # regrade twice
-      regrade2 = QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number-1) do |qr|
+      regrade2 = Quizzes::QuizRegrade.find_or_create_by_quiz_id_and_quiz_version(@quiz.id, @quiz.version_number-1) do |qr|
         qr.user_id = @teacher.id
       end
       regrade2.quiz_question_regrades.create(:quiz_question_id => @quiz.quiz_questions.create.id, :regrade_option => 'current_correct_only')
@@ -1477,7 +1477,7 @@ describe Quizzes::Quiz do
 
   describe '#generate_submission_for_participant' do
     let :participant do
-      QuizParticipant.new(User.new, 'foobar')
+      Quizzes::QuizParticipant.new(User.new, 'foobar')
     end
 
     it 'should link the generated QS to a user' do

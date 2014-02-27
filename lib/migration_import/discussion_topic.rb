@@ -14,9 +14,9 @@ module MigrationImport
                                       context_id: context.id).
                                 where(['id = ? OR (migration_id IS NOT NULL AND migration_id = ?)', options[:id], options[:migration_id]]).first
       topic ||= if options[:type] =~ /announcement/i
-                  context.announcements.new
+                  context.announcements.scoped.new
                 else
-                  context.discussion_topics.new
+                  context.discussion_topics.scoped.new
                 end
       topic
     end

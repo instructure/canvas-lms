@@ -71,7 +71,7 @@ class AccessToken < ActiveRecord::Base
 
   def generate_token(overwrite=false)
     if overwrite || !self.crypted_token
-      self.token = AutoHandle.generate(nil, TOKEN_SIZE)
+      self.token = CanvasUuid::Uuid.generate(nil, TOKEN_SIZE)
     end
   end
 

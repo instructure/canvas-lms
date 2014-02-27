@@ -1,7 +1,7 @@
 <%
    @ldap_configs = @account_configs.clone
    while @ldap_configs.length < 2
-    @ldap_configs << @account.account_authorization_configs.new
+    @ldap_configs << @account.account_authorization_configs.scoped.new
     @ldap_configs.last.auth_over_tls = :start_tls
   end
    @account_config = @ldap_configs.first

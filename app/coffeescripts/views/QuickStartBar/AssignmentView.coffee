@@ -1,12 +1,13 @@
 define [
   'compiled/views/QuickStartBar/BaseItemView'
+  'jquery'
   'underscore'
   'compiled/models/QuickStartAssignment'
   'jst/quickStartBar/assignment'
   'compiled/widget/ContextSearch'
   'jquery.instructure_date_and_time'
   'jquery.disableWhileLoading'
-], (BaseItemView, _, QuickStartAssignment, template, ContextSearch) ->
+], (BaseItemView, $, _, QuickStartAssignment, template, ContextSearch) ->
 
   class AssignmentView extends BaseItemView
 

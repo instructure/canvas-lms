@@ -1,11 +1,12 @@
 define [
   'i18n!conversations.conversations_list'
+  'jquery'
   'compiled/widget/ScrollableList'
   'compiled/conversations/Conversation'
   'jst/conversations/conversationItem'
   'jquery.instructure_date_and_time'
   'jst/_avatar' # needed by conversationItem template
-], (I18n, ScrollableList, Conversation, conversationItemTemplate) ->
+], (I18n, $, ScrollableList, Conversation, conversationItemTemplate) ->
 
   class extends ScrollableList
     constructor: (@pane, $scroller) ->

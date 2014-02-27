@@ -250,13 +250,13 @@ module AuthenticationMethods
     if @current_user
       render :json => {
                :status => I18n.t('lib.auth.status_unauthorized', 'unauthorized'),
-               :errors => { :message => I18n.t('lib.auth.not_authorized', "user not authorized to perform that action") }
+               :errors => [{ :message => I18n.t('lib.auth.not_authorized', "user not authorized to perform that action") }]
              },
              :status => :unauthorized
     else
       render :json => {
                :status => I18n.t('lib.auth.status_unauthenticated', 'unauthenticated'),
-               :errors => { :message => I18n.t('lib.auth.authentication_required', "user authorization required") }
+               :errors => [{ :message => I18n.t('lib.auth.authentication_required', "user authorization required") }]
              },
              :status => :unauthorized
     end

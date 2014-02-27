@@ -765,6 +765,10 @@ describe Api do
     it "does nothing to arrays" do
       Api.value_to_array(['1', '2', '3']).should == ['1', '2', '3']
     end
+
+    it "returns an empty array for nil" do
+      Api.value_to_array(nil).should == []
+    end
   end
 
   describe "#templated_url" do

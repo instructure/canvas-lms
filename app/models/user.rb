@@ -23,6 +23,7 @@ class User < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
+
   include Context
 
   attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use, :self_enrollment_code, :initial_enrollment_type
@@ -126,6 +127,10 @@ class User < ActiveRecord::Base
         enrollment_conditions(:active, strict_course_state, course_workflow_state) +
         " OR " +
         enrollment_conditions(:invited, strict_course_state, course_workflow_state)
+      when :current_and_concluded
+        enrollment_conditions(:active, strict_course_state, course_workflow_state) +
+        " OR " +
+        enrollment_conditions(:completed, strict_course_state, course_workflow_state)
     end
   end
 
@@ -133,14 +138,29 @@ class User < ActiveRecord::Base
   has_one :communication_channel, :conditions => ["workflow_state<>'retired'"], :order => 'position'
   has_many :enrollments, :dependent => :destroy
 
-  has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:active), :order => 'enrollments.created_at'
-  has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:invited), :order => 'enrollments.created_at'
-  has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course], :order => 'enrollments.created_at',
-           :conditions => enrollment_conditions(:current_and_invited)
-  has_many :current_and_future_enrollments, :class_name => 'Enrollment', :include => [:course], :order => 'enrollments.created_at',
-           :conditions => enrollment_conditions(:current_and_invited, false)
+  if CANVAS_RAILS2
+    has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:active), :order => 'enrollments.created_at'
+    has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:invited), :order => 'enrollments.created_at'
+    has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :order => 'enrollments.created_at',
+            :conditions => enrollment_conditions(:current_and_invited)
+    has_many :current_and_future_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :order => 'enrollments.created_at',
+            :conditions => enrollment_conditions(:current_and_invited, false)
+    has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at'
+    has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section],
+            :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at'
+  else
+    has_many :current_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:active), :order => 'enrollments.created_at', :readonly => false
+    has_many :invited_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:invited), :order => 'enrollments.created_at', :readonly => false
+    has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
+            :conditions => enrollment_conditions(:current_and_invited), :readonly => false
+    has_many :current_and_future_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
+            :conditions => enrollment_conditions(:current_and_invited, false), :readonly => false
+    has_many :concluded_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at', :readonly => false
+    has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :joins => [:course],
+            :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at', :readonly => false
+  end
+
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')", :order => 'enrollments.created_at'
-  has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at'
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
   has_many :user_observers, :dependent => :delete_all
@@ -151,8 +171,6 @@ class User < ActiveRecord::Base
   has_many :current_and_invited_courses, :source => :course, :through => :current_and_invited_enrollments
   has_many :concluded_courses, :source => :course, :through => :concluded_enrollments, :uniq => true
   has_many :all_courses, :source => :course, :through => :enrollments
-  has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section],
-           :conditions => [enrollment_conditions(:active), enrollment_conditions(:completed)].join(' OR '), :order => 'enrollments.created_at'
   has_many :current_and_concluded_courses, :source => :course, :through => :current_and_concluded_enrollments
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
@@ -184,7 +202,7 @@ class User < ActiveRecord::Base
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :calendar_events, :as => 'context', :dependent => :destroy, :include => [:parent_event]
   has_many :eportfolios, :dependent => :destroy
-  has_many :quiz_submissions, :dependent => :destroy
+  has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
   has_many :dashboard_messages, :class_name => 'Message', :conditions => {:to => "dashboard", :workflow_state => 'dashboard'}, :order => 'created_at DESC', :dependent => :destroy
   has_many :collaborations, :order => 'created_at DESC'
   has_many :user_services, :order => 'created_at', :dependent => :destroy
@@ -613,7 +631,7 @@ class User < ActiveRecord::Base
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it
     # doesn't already exist
-    self.uuid = AutoHandle.generate_securish_uuid if !read_attribute(:uuid)
+    self.uuid = CanvasUuid::Uuid.generate_securish_uuid if !read_attribute(:uuid)
   end
   protected :assign_uuid
 
@@ -1492,7 +1510,7 @@ class User < ActiveRecord::Base
 
   def uuid
     if !read_attribute(:uuid)
-      self.update_attribute(:uuid, AutoHandle.generate_securish_uuid)
+      self.update_attribute(:uuid, CanvasUuid::Uuid.generate_securish_uuid)
     end
     read_attribute(:uuid)
   end
@@ -2028,7 +2046,7 @@ class User < ActiveRecord::Base
               all)
 
       concluded_courses.concat(
-          Enrollment.
+          Enrollment.joins(:course).
               where(enrollment_conditions(:completed)).
               where(user_id: users).
               select([:user_id, :course_id]).

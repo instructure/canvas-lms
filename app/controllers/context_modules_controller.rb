@@ -85,7 +85,7 @@ class ContextModulesController < ApplicationController
   end
   
   def create
-    if authorized_action(@context.context_modules.new, @current_user, :create)
+    if authorized_action(@context.context_modules.scoped.new, @current_user, :create)
       @module = @context.context_modules.build
       if @context.feature_enabled?(:draft_state)
         @module.workflow_state = 'unpublished'
@@ -106,7 +106,7 @@ class ContextModulesController < ApplicationController
   end
   
   def reorder
-    if authorized_action(@context.context_modules.new, @current_user, :update)
+    if authorized_action(@context.context_modules.scoped.new, @current_user, :update)
       m = @context.context_modules.not_deleted.first
       
       m.update_order(params[:order].split(","))
@@ -132,7 +132,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       result = Rails.cache.fetch([ @context, @current_user, "content_tag_assignment_info_all" ].cache_key) do
         info = {}
-        @context.context_module_tags.active.map do |tag|
+        @context.context_module_tags.not_deleted.map do |tag|
           if tag.assignment
             info[tag.id] = tag.assignment.context_module_tag_info(@current_user)
           else
@@ -359,7 +359,7 @@ class ContextModulesController < ApplicationController
   def progressions
     if authorized_action(@context, @current_user, :read)
       if request.format == :json
-        if @context.context_modules.new.grants_right?(@current_user, session, :update)
+        if @context.context_modules.scoped.new.grants_right?(@current_user, session, :update)
           if params[:user_id] && @user = @context.students.find(params[:user_id])
             @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@user, true, true) }
           else

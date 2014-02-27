@@ -1,7 +1,8 @@
 define [
+  'jquery'
   'compiled/views/content_migrations/ProgressStatusView'
   'compiled/models/ProgressingContentMigration'
-], (ProgressStatusView, ProgressingModel) -> 
+], ($, ProgressStatusView, ProgressingModel) -> 
 
   module 'ProgressStatusViewSpec', 
     setup: -> 

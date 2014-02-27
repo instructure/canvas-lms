@@ -16,13 +16,13 @@
 <% content_for :right_side do %>
   <div id="sidebar_content">
   <p>
-    <% if can_do(@context.discussion_topics.new, @current_user, :create) %>
+    <% if can_do(@context.discussion_topics.scoped.new, @current_user, :create) %>
       <a href="#" class="add_topic_link btn button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> <%= t('links.start_topic', %{Start a New Topic}) %></a>
     <% end %>
-    <% if can_do(@context.web_conferences.new, @current_user, :create) %>
+    <% if can_do(@context.web_conferences.scoped.new, @current_user, :create) %>
       <a href="#" class="add_collaboration_link btn button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> <%= t('links.start_collaboration', %{Start a Collaboration}) %></a>
     <% end %>
-    <% if can_do(@context.collaborations.new, @current_user, :create) %>
+    <% if can_do(@context.collaborations.scoped.new, @current_user, :create) %>
       <a href="#" class="add_conference_link btn button-sidebar-wide"><%= image_tag 'add.png', :alt => '' %> <%= t('links.start_conference', %{Start a Web Conference}) %></a>
     <% end %>
   </p>

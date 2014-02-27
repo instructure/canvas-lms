@@ -27,7 +27,7 @@ describe Attachment do
     end
 
     it "should require a context" do
-      lambda{attachment_model(:context => nil)}.should raise_error(ActiveRecord::RecordInvalid, /Validation failed: Context can't be blank/)
+      lambda{attachment_model(:context => nil)}.should raise_error(ActiveRecord::RecordInvalid, /Context/)
     end
 
   end
@@ -386,6 +386,7 @@ describe Attachment do
         a = attachment_with_scribd_doc(fake_scribd_doc('zero'))
         course
         new_a = a.clone_for(@course)
+        new_a.save!
         new_a.read_attribute(:scribd_doc).should be_nil
         new_a.scribd_doc.id.should == a.scribd_doc.id
       end
@@ -680,17 +681,17 @@ describe Attachment do
       @attachment.file_state = 'available'
       @attachment.save!
     end
-    
+
     it "should disassociate but not delete the associated media object" do
       @attachment.media_entry_id = '0_feedbeef'
       @attachment.save!
-      
+
       media_object = @course.media_objects.build :media_id => '0_feedbeef'
       media_object.attachment_id = @attachment.id
       media_object.save!
-      
+
       @attachment.destroy
-      
+
       media_object.reload
       media_object.should_not be_deleted
       media_object.attachment_id.should be_nil
@@ -1600,6 +1601,21 @@ describe Attachment do
       @attachment.full_path.should == "/#{@attachment.display_name}"
     end
   end
+
+  describe '.context_type' do
+    it 'returns the correct representation of a quiz statistics relation' do
+      stats = Quizzes::QuizStatistics.create!(report_type: 'student_analysis')
+      attachment = attachment_obj_with_context(Account.default.default_enrollment_term)
+      attachment.context = stats
+      attachment.save
+      attachment.context_type.should == "Quizzes::QuizStatistics"
+
+      Attachment.where(id: attachment).update_all(context_type: 'QuizStatistics')
+
+      Attachment.find(attachment.id).context_type.should == 'Quizzes::QuizStatistics'
+    end
+  end
+
 end
 
 def processing_model

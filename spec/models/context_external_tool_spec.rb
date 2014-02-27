@@ -99,8 +99,8 @@ describe ContextExternalTool do
     it "should not validate with no domain or url setting" do
       @tool = @course.context_external_tools.create(:name => "a", :consumer_key => '12345', :shared_secret => 'secret')
       @tool.should be_new_record
-      @tool.errors['url'].should == "Either the url or domain should be set."
-      @tool.errors['domain'].should == "Either the url or domain should be set."
+      @tool.errors['url'].should == ["Either the url or domain should be set."]
+      @tool.errors['domain'].should == ["Either the url or domain should be set."]
     end
 
     it "should accept both a domain and a url" do

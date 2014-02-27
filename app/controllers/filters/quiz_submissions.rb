@@ -25,7 +25,7 @@ module Filters::QuizSubmissions
 
   def require_quiz_submission
     query = {}
-    scope = @quiz ? @quiz.quiz_submissions : QuizSubmission
+    scope = @quiz ? @quiz.quiz_submissions : Quizzes::QuizSubmission
     id = if params.has_key?(:quiz_submission_id)
       params[:quiz_submission_id]
     else
@@ -46,11 +46,11 @@ module Filters::QuizSubmissions
   end
 
   def prepare_service
-    participant = QuizParticipant.new(@current_user, temporary_user_code)
+    participant = Quizzes::QuizParticipant.new(@current_user, temporary_user_code)
     participant.access_code = params[:access_code]
     participant.ip_address = request.remote_ip
     participant.validation_token = params[:validation_token]
 
-    @service = QuizSubmissionService.new(participant)
+    @service = Quizzes::QuizSubmissionService.new(participant)
   end
 end

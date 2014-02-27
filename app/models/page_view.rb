@@ -148,51 +148,75 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  #
-  # We don't know what shard the request_id to so its the callers
-  # responsibility to activate the correct shard.
-  #
-  def self.find_by_id(id, options={})
-    find_all_by_id([id], options).first
-  end
-
-  #
-  # We don't know what shard the request_id to so its the callers
-  # responsibility to activate the correct shard.
-  #
-  def self.find_one(id, options={})
-    self.find_by_id(id, options) || raise(ActiveRecord::RecordNotFound, "Couldn't find PageView with ID=#{id}")
-  end
-
-  #
-  # We don't know what shard the request_id to so its the callers
-  # responsibility to activate the correct shard.
-  #
-  def self.find_all_by_id(ids, options={})
-    raise(NotImplementedError, "options not implemented: #{options.inspect}") if options.present?
-    return PageView::EventStream.fetch(ids) if PageView.cassandra?
-    PageView.where(request_id: ids).all
-  end
-
-  #
-  # We don't know what shard the request_id to so its the callers
-  # responsibility to activate the correct shard.
-  #
-  def self.find_some(ids, options={})
-    return super unless PageView.cassandra?
-    raise(NotImplementedError, "options not implemented: #{options.inspect}") if options.present?
-
-    result = self.find_all_by_id(ids, options)
-    if result.size == ids.length
-      result
-    else
-      raise ActiveRecord::RecordNotFound, "Couldn't find all PageViews with IDs (#{ids.join(',')}) (found #{result.size} results, but was looking for #{ids.length})"
+  if CANVAS_RAILS2
+    #
+    # We don't know what shard the request_id to so its the callers
+    # responsibility to activate the correct shard.
+    #
+    def self.find_by_id(id, options={})
+      find_all_by_id([id], options).first
     end
-  end
 
-  def self.find_every(options={})
-    return super unless PageView.cassandra?
-    raise(NotImplementedError, "find_every not implemented")
+    #
+    # We don't know what shard the request_id to so its the callers
+    # responsibility to activate the correct shard.
+    #
+    def self.find_one(id, options={})
+      self.find_by_id(id, options) || raise(ActiveRecord::RecordNotFound, "Couldn't find PageView with ID=#{id}")
+    end
+
+    #
+    # We don't know what shard the request_id to so its the callers
+    # responsibility to activate the correct shard.
+    #
+    def self.find_all_by_id(ids, options={})
+      raise(NotImplementedError, "options not implemented: #{options.inspect}") if options.present?
+      return PageView::EventStream.fetch(ids) if PageView.cassandra?
+      PageView.where(request_id: ids).all
+    end
+
+    #
+    # We don't know what shard the request_id to so its the callers
+    # responsibility to activate the correct shard.
+    #
+    def self.find_some(ids, options={})
+      return super unless PageView.cassandra?
+      raise(NotImplementedError, "options not implemented: #{options.inspect}") if options.present?
+
+      result = self.find_all_by_id(ids, options)
+      if result.size == ids.length
+        result
+      else
+        raise ActiveRecord::RecordNotFound, "Couldn't find all PageViews with IDs (#{ids.join(',')}) (found #{result.size} results, but was looking for #{ids.length})"
+      end
+    end
+
+    def self.find_every(options={})
+      return super unless PageView.cassandra?
+      raise(NotImplementedError, "find_every not implemented")
+    end
+  else
+    def self.find(ids, options={})
+      return super unless PageView.cassandra?
+      raise(NotImplementedError, "options not implemented: #{options.inspect}") if options.present?
+
+      case ids
+      when Array
+        result = PageView::EventStream.fetch(ids)
+        raise ActiveRecord::RecordNotFound, "Couldn't find all PageViews with IDs (#{ids.join(',')}) (found #{result.length} results, but was looking for #{ids.length})" unless ids.length == result.length
+        result
+      else
+        find([ids]).first
+      end
+    end
+
+    def self.find_all_by_id(ids)
+      PageView.cassandra? ? PageView::EventStream.fetch(ids) : where(request_id: ids).to_a
+    end
+
+    def self.find_by_id(id)
+      PageView.cassandra? ? PageView::EventStream.fetch([id]).first : where(request_id: id).first
+    end
   end
 
   def self.from_attributes(attrs, new_record=false)
@@ -271,6 +295,7 @@ class PageView < ActiveRecord::Base
   else
     def create
       return super unless PageView.cassandra?
+      self.created_at ||= Time.zone.now
       user.shard.activate do
         run_callbacks(:create) do
           PageView::EventStream.insert(self)
@@ -319,6 +344,12 @@ class PageView < ActiveRecord::Base
       end
     end
     alias_method_chain :transaction, :cassandra_check
+  end
+
+  unless CANVAS_RAILS2
+    def add_to_transaction
+      super unless PageView.cassandra?
+    end
   end
 
   def self.user_count_bucket_for_time(time)

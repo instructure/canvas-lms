@@ -1,11 +1,12 @@
 define [
   'i18n!discussions'
+  'jquery'
   'compiled/arr/walk'
   'Backbone'
   'jst/discussions/EntryCollectionView'
   'jst/discussions/entryStats'
   'compiled/views/DiscussionTopic/EntryView'
-], (I18n, walk, {View}, template, entryStats, EntryView) ->
+], (I18n, $, walk, {View}, template, entryStats, EntryView) ->
 
   class EntryCollectionView extends View
 

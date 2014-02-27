@@ -1,4 +1,4 @@
-define ['underscore', 'compiled/views/gradebook/CheckboxView'], (_, CheckboxView) ->
+define ['jquery', 'underscore', 'compiled/views/gradebook/CheckboxView'], ($, _, CheckboxView) ->
 
   module 'gradebook/CheckboxView',
     setup: ->

@@ -4,6 +4,7 @@ class DropBodyAndSmsBodyColumns < ActiveRecord::Migration
   def self.up
     remove_column :notifications, :body
     remove_column :notifications, :sms_body
+    ::ActiveRecord::Base.connection.schema_cache.clear! unless CANVAS_RAILS2
     Notification.reset_column_information
   end
 

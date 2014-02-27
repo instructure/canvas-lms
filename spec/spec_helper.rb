@@ -165,7 +165,7 @@ require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
 def pend_with_bullet
-  if Bullet.enable?
+  if defined?(Bullet) && Bullet.enable?
     pending ('PENDING: Bullet')
   end
 end
@@ -561,6 +561,7 @@ end
     @course = opts[:course] || course(opts)
     @user = opts[:user] || @course.shard.activate { user(opts) }
     @enrollment = @course.enroll_user(@user, enrollment_type, opts)
+    @user.save!
     @enrollment.course = @course # set the reverse association
     if opts[:active_enrollment] || opts[:active_all]
       @enrollment.workflow_state = 'active'
@@ -595,6 +596,7 @@ end
   def student_in_section(section, opts={})
     user
     enrollment = section.course.enroll_user(@user, 'StudentEnrollment', :section => section)
+    @user.save!
     enrollment.workflow_state = 'active'
     enrollment.save!
     @user
@@ -1028,11 +1030,15 @@ end
   def enable_forgery_protection(enable = true)
     old_value = ActionController::Base.allow_forgery_protection
     ActionController::Base.stubs(:allow_forgery_protection).returns(enable)
+    ActionController::Base.any_instance.stubs(:allow_forgery_protection).returns(enable)
 
     yield if block_given?
 
   ensure
-    ActionController::Base.stubs(:allow_forgery_protection).returns(old_value) if block_given?
+    if block_given?
+      ActionController::Base.stubs(:allow_forgery_protection).returns(old_value)
+      ActionController::Base.any_instance.stubs(:allow_forgery_protection).returns(old_value)
+    end
   end
 
   def start_test_http_server(requests=1)
@@ -1261,7 +1267,11 @@ end
         compare_json(a, e)
       end
     else
-      actual.to_json.should == expected.to_json
+      if actual.is_a?(Fixnum) || actual.is_a?(Float)
+        actual.should == expected
+      else
+        actual.to_json.should == expected.to_json
+      end
     end
   end
 

@@ -352,6 +352,11 @@
 #           "example": false,
 #           "type": "boolean"
 #         },
+#         "only_visible_to_overrides": {
+#           "description": "(Only visible if 'differentiated assignments' account setting is on) Whether the assignment is only visible to overrides.",
+#           "example": false,
+#           "type": "boolean"
+#         },
 #         "locked_for_user": {
 #           "description": "Whether or not this is locked for the user.",
 #           "example": false,
@@ -441,7 +446,7 @@ class AssignmentsApiController < ApplicationController
       @assignments = Assignment.search_by_attribute(@assignments, :title, params[:search_term])
 
       # fake assignment used for checking if the @current_user can read unpublished assignments
-      fake = @context.assignments.new
+      fake = @context.assignments.scoped.new
       fake.workflow_state = 'unpublished'
 
       if @context.feature_enabled?(:draft_state) && !fake.grants_right?(@current_user, session, :read)
@@ -629,9 +634,13 @@ class AssignmentsApiController < ApplicationController
   #   List of overrides for the assignment.
   #   NOTE: The assignment overrides feature is in beta.
   #
+  # @argument assignment[only_visible_to_overrides] [Optional, Boolean]
+  #   Whether this assignment is only visible to overrides
+  #   (Only useful if 'differentiated assignments' account setting is on)
+  #
   # @argument assignment[published] [Optional, Boolean]
   #   Whether this assignment is published.
-  #   (Only uaeful if 'enable draft' account setting is on)
+  #   (Only useful if 'draft state' account setting is on)
   #   Unpublished assignments are not visible to students.
   #
   # @returns Assignment
@@ -670,7 +679,7 @@ class AssignmentsApiController < ApplicationController
       render :json => assignment_json(@assignment, @current_user, session), :status => 201
     else
       errors = @assignment.errors.as_json[:errors]
-      errors['published'] = errors.delete('workflow_state') if errors.has_key?('workflow_state')
+      errors['published'] = errors.delete(:workflow_state) if errors.has_key?(:workflow_state)
       render :json => {errors: errors}, status: :bad_request
     end
   end

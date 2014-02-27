@@ -19,9 +19,30 @@
 module Api::V1::OutcomeResults
   include Api::V1::Outcome
 
+  # Public: Serializes OutcomeResults
+  #
+  # results - The OutcomeResults to serialize
+  #
+  # Returns a hash that can be converted into json
+  def outcome_results_json(results)
+    {
+      outcome_results: results.map{|r| outcome_result_json(r)}
+    }
+  end
+
+  def outcome_result_json(result)
+    hash = api_json(result, @current_user, session, only: %w(id score))
+    hash[:links] = {
+      user: result.user.id.to_s,
+      learning_outcome: result.learning_outcome_id.to_s,
+      alignment: result.alignment.content.asset_string
+    }
+    Api.recursively_stringify_json_ids(hash)
+  end
+
   # Public: Serializes the rollups produced by Outcomes::ResultAnalytics.
   #
-  # rollups - The rollups from Outcomes::ResultAnalytics to seralize
+  # rollups - The rollups from Outcomes::ResultAnalytics to serialize
   #
   # Returns a hash that can be converted into json.
   def outcome_results_rollups_json(rollups)
@@ -34,7 +55,11 @@ module Api::V1::OutcomeResults
   #
   # Returns a Hash containing serialized outcomes.
   def outcome_results_include_outcomes_json(outcomes)
-    outcomes.map { |o| Api.recursively_stringify_json_ids(outcome_json(o, @current_user, session)) }
+    outcomes.map do |o|
+      hash = outcome_json(o, @current_user, session)
+      hash.merge!(alignments: o.alignments.map(&:content).map(&:asset_string))
+      Api.recursively_stringify_json_ids(hash)
+    end
   end
 
   # Public: Serializes outcome groups in a hash that can be added to the linked hash.
@@ -66,6 +91,16 @@ module Api::V1::OutcomeResults
         sortable_name: u.sortable_name
       }
       hash[:avatar_url] = avatar_url_for_user(u, blank_fallback) if service_enabled?(:avatars)
+      hash
+    end
+  end
+
+  # Public: Returns an Array of serialized Alignment objects for the linked hash.
+  def outcome_results_include_alignments_json(alignments)
+    alignments.map do |alignment|
+      hash = {id: alignment.asset_string, name: alignment.title}
+      html_url = polymorphic_url([alignment.context, alignment]) rescue nil
+      hash[:html_url] = html_url if html_url
       hash
     end
   end

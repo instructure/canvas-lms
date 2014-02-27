@@ -487,7 +487,7 @@ class ContextModulesApiController < ApplicationController
   #
   # @returns Module
   def create
-    if authorized_action(@context.context_modules.new, @current_user, :create)
+    if authorized_action(@context.context_modules.scoped.new, @current_user, :create)
       return render :json => {:message => "missing module parameter"}, :status => :bad_request unless params[:module]
       return render :json => {:message => "missing module name"}, :status => :bad_request unless params[:module][:name].present?
 

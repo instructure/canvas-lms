@@ -32,7 +32,7 @@ class Submission < ActiveRecord::Base
   has_many :hidden_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :hidden => true }
   has_many :assessment_requests, :as => :asset
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
-  belongs_to :quiz_submission
+  belongs_to :quiz_submission, :class_name => 'Quizzes::QuizSubmission'
   has_one :rubric_assessment, :as => :artifact, :conditions => {:assessment_type => "grading"}
   has_many :rubric_assessments, :as => :artifact
   has_many :attachment_associations, :as => :context
@@ -499,8 +499,8 @@ class Submission < ActiveRecord::Base
       raise "Can't create media submission without media object"
     end
     if self.submission_type == 'online_quiz'
-      self.quiz_submission ||= QuizSubmission.find_by_submission_id(self.id) rescue nil
-      self.quiz_submission ||= QuizSubmission.find_by_user_id_and_quiz_id(self.user_id, self.assignment.quiz.id) rescue nil
+      self.quiz_submission ||= Quizzes::QuizSubmission.find_by_submission_id(self.id) rescue nil
+      self.quiz_submission ||= Quizzes::QuizSubmission.find_by_user_id_and_quiz_id(self.user_id, self.assignment.quiz.id) rescue nil
     end
     @just_submitted = self.submitted? && self.submission_type && (self.new_record? || self.workflow_state_changed?)
     if score_changed?

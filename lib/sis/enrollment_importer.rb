@@ -17,7 +17,6 @@
 #
 
 require "set"
-require "skip_callback"
 
 module SIS
   class EnrollmentImporter < BaseImporter
