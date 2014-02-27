@@ -842,7 +842,7 @@ TEXT
           <th class="reports"><%= t 'headers.report_last_run', 'Last Run' %></th>
           <th class="reports"></th>
         </tr>
-        <% @available_reports.each do |report, details|
+        <% @available_reports.sort_by {|_, details| details[:title]}.each do |report, details|
            title = details[:title] || details
            description = details[:description]
            description_partial = details[:description_partial]
