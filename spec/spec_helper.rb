@@ -25,7 +25,21 @@ if CANVAS_RAILS2
   end
 end
 
-begin; require File.expand_path(File.dirname(__FILE__) + "/../parallelized_specs/lib/parallelized_specs.rb"); rescue LoadError; end
+unless CANVAS_RAILS2
+  require 'timeout'
+  RSpec.configure do |c|
+    c.around(:each) do |example|
+      Timeout::timeout(300) {
+        example.run
+      }
+    end
+  end
+end
+
+begin
+  ; require File.expand_path(File.dirname(__FILE__) + "/../parallelized_specs/lib/parallelized_specs.rb");
+rescue LoadError;
+end
 
 ENV["RAILS_ENV"] = 'test'
 
@@ -47,6 +61,7 @@ if CANVAS_RAILS2
     args.last[:location] ||= caller(0)[1]
     describe_without_rspec2_types(*args, &block)
   end
+
   alias :describe_without_rspec2_types :describe
   alias :describe :describe_with_rspec2_types
 
@@ -57,6 +72,7 @@ if CANVAS_RAILS2
       end
       process_without_use_route_shim(action, parameters, session, flash, http_method)
     end
+
     alias_method_chain :process, :use_route_shim
   end
 
@@ -80,6 +96,7 @@ else
         def assigns
           @assigns ||= super
         end
+
         alias :view_assigns :assigns
 
         delegate :content_for, :to => :view
@@ -114,6 +131,7 @@ else
           end
           render_without_helpers(*args)
         end
+
         alias_method_chain :render, :helpers
       end
     end
@@ -669,7 +687,7 @@ end
     @account = opts[:account] || Account.default
     @announcement = @account.announcements.build(message: message, required_account_service: req_service)
     @announcement.start_at = opts[:start_at] || 5.minutes.ago.utc
-    @announcement.account_notification_roles.build(roles.map{ |r| { account_notification_id: @announcement.id, role_type: r} }) unless roles.empty?
+    @announcement.account_notification_roles.build(roles.map { |r| {account_notification_id: @announcement.id, role_type: r} }) unless roles.empty?
     @announcement.save!
   end
 
@@ -949,7 +967,7 @@ end
 
   def assert_unauthorized
     assert_status(401) #unauthorized
-                       #    response.headers['Status'].should eql('401 Unauthorized')
+    #    response.headers['Status'].should eql('401 Unauthorized')
     response.should render_template("shared/unauthorized")
   end
 
@@ -1339,21 +1357,21 @@ end
 
     @page_view = PageView.new { |p|
       p.assign_attributes({
-          :id => @request_id,
-          :url => "http://test.one/",
-          :session_id => "phony",
-          :context => @context,
-          :controller => opts[:controller] || 'courses',
-          :action => opts[:action] || 'show',
-          :user_request => true,
-          :render_time => 0.01,
-          :user_agent => 'None',
-          :account_id => @account.id,
-          :request_id => request_id,
-          :interaction_seconds => 5,
-          :user => @user,
-          :remote_ip => '192.168.0.42'
-      }, :without_protection => true)
+                              :id => @request_id,
+                              :url => "http://test.one/",
+                              :session_id => "phony",
+                              :context => @context,
+                              :controller => opts[:controller] || 'courses',
+                              :action => opts[:action] || 'show',
+                              :user_request => true,
+                              :render_time => 0.01,
+                              :user_agent => 'None',
+                              :account_id => @account.id,
+                              :request_id => request_id,
+                              :interaction_seconds => 5,
+                              :user => @user,
+                              :remote_ip => '192.168.0.42'
+                          }, :without_protection => true)
     }
     @page_view.save!
     @page_view
