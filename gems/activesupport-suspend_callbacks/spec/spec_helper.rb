@@ -8,11 +8,11 @@
 require 'simplecov'
 require 'simplecov-rcov'
 
+SimpleCov.use_merging
+SimpleCov.merge_timeout(10000)
 SimpleCov.command_name('activesupport-suspend-callback-gem')
 SimpleCov.start do
   SimpleCov.coverage_dir('../../coverage')
-  SimpleCov.use_merging
-  SimpleCov.merge_timeout(10000)
   SimpleCov.at_exit {
     SimpleCov.result
   }

@@ -3,40 +3,15 @@ if ENV['COVERAGE'] == "1"
   require 'simplecov'
   require 'simplecov-rcov'
 
+  SimpleCov.use_merging
+  SimpleCov.merge_timeout(10000)
+
   SimpleCov.command_name "RSpec:#{Process.pid}#{ENV['TEST_ENV_NUMBER']}"
-
   SimpleCov.start do
-    SimpleCov.use_merging
-    SimpleCov.merge_timeout(10000)
-    class SimpleCov::Formatter::MergedFormatter
-      def format(result)
-        SimpleCov::Formatter::HTMLFormatter.new.format(result)
-        SimpleCov::Formatter::RcovFormatter.new.format(result)
-      end
-    end
-    SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
-    add_filter '/spec/'
-    add_filter '/config/'
-    add_filter '/parallelized_specs/'
-    add_filter '/db_imports/'
-    add_filter 'spec_canvas'
-
-    add_group 'Controllers', 'app/controllers'
-    add_group 'Models', 'app/models'
-    add_group 'Services', 'app/services'
-    add_group 'App', '/app/'
-    add_group 'Gems', 'gems/'
-    add_group 'Helpers', 'app/helpers'
-    add_group 'Libraries', '/lib/'
-    add_group 'Plugins', 'vendor/plugins'
-    add_group 'Db', '/db/'
-
-    add_group "Long files" do |src_file|
-      src_file.lines.count > 500
-    end
-    SimpleCov.at_exit do
-      SimpleCov.result.format!
-    end
+    SimpleCov.at_exit {
+      SimpleCov.result
+      #SimpleCov.result.format! to get a coverage report without vendored_gems
+    }
   end
 else
   puts "Code coverage not enabled"
@@ -64,7 +39,7 @@ else
   puts "Bullet not enabled"
 end
 
-  environment_configuration(defined?(config) && config) do |config|
+environment_configuration(defined?(config) && config) do |config|
   # Settings specified here will take precedence over those in config/application.rb
 
   # The test environment is used exclusively to run your application's
@@ -89,7 +64,7 @@ end
   # ENV['USE_OPTIMIZED_JS']                            = 'true'
 
   # Disable request forgery protection in test environment
-  config.action_controller.allow_forgery_protection    = false
+  config.action_controller.allow_forgery_protection = false
 
   # Tell Action Mailer not to deliver emails to the real world.
   # The :test delivery method accumulates sent emails in the

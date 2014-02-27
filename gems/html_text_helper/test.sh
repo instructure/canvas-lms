@@ -1,3 +1,4 @@
+#!/bin/bash
 result=0
 
 echo "################ Running tests against Rails 2 ################"
