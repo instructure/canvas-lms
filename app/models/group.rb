@@ -25,6 +25,9 @@ class Group < ActiveRecord::Base
   validates_presence_of :context_id, :context_type, :account_id, :root_account_id, :workflow_state
   validates_allowed_transitions :is_public, false => true
 
+  # use to skip queries in can_participate?, called by policy block
+  attr_accessor :can_participate
+
   has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
   has_many :users, :through => :group_memberships, :conditions => ['users.workflow_state != ?', 'deleted']
   has_many :participating_group_memberships, :class_name => "GroupMembership", :conditions => ['group_memberships.workflow_state = ?', 'accepted']
@@ -136,11 +139,18 @@ class Group < ActiveRecord::Base
 
   def has_member?(user)
     return nil unless user.present?
-    self.shard.activate { self.participating_group_memberships.find_by_user_id(user.id) }
+    if self.group_memberships.loaded?
+      return self.group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id }
+    else
+      self.shard.activate { self.participating_group_memberships.find_by_user_id(user.id) }
+    end
   end
 
   def has_moderator?(user)
     return nil unless user.present?
+    if self.group_memberships.loaded?
+      return self.group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id && gm.moderator }
+    end
     self.shard.activate { self.participating_group_memberships.moderators.find_by_user_id(user.id) }
   end
 
@@ -433,12 +443,13 @@ class Group < ActiveRecord::Base
 
   # Helper needed by several permissions, use grants_right?(user, :participate)
   def can_participate?(user)
+    return true if can_participate
     return false unless user.present? && self.context.present?
     return true if self.group_category.try(:communities?)
     if self.context.is_a?(Course)
-      return self.context.enrollments.not_fake.where(:user_id => user.id).first.present?
+      return self.context.enrollments.not_fake.except(:includes).where(:user_id => user.id).exists?
     elsif self.context.is_a?(Account)
-      return self.context.user_account_associations.where(:user_id => user.id).first.present?
+      return self.context.user_account_associations.where(:user_id => user.id).exists?
     end
     return false
   end
