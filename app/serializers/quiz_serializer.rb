@@ -22,8 +22,8 @@ class QuizSerializer < Canvas::APISerializer
     :api_v1_course_quiz_submission_url,
     :api_v1_course_quiz_submissions_url
 
-  has_one :assignment_group, embed: :ids, key: :assignment_group
-  has_many :quiz_submissions, embed: :ids, key: :quiz_submissions
+  has_one :assignment_group, embed: :ids, root: :assignment_group
+  has_many :quiz_submissions, embed: :ids, root: :quiz_submissions
 
   def speed_grader_url
     return nil unless show_speedgrader?

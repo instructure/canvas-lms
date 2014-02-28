@@ -59,13 +59,13 @@ if CANVAS_RAILS2
   # "ActiveModel", and aliases ActiveRecord::Errors to ActiveModel::Errors
   # so Authlogic will use the right thing when it detects that ActiveModel
   # is defined.
-  gem 'active_model_serializers_rails_2.3', '0.9.0pre2', :require => 'active_model_serializers'
+  gem 'active_model_serializers_rails_2.3', '0.9.0alpha1', :require => 'active_model_serializers'
   gem 'authlogic', '2.1.3'
 else
   # just to be clear, Canvas is NOT READY to run under Rails 3 in production
   gem 'rails', '3.2.17'
-  gem 'active_model_serializers', '0.9.0pre',
-    :github => 'rails-api/active_model_serializers', :ref => '99fa399ae6dc071b97b15e1ef2b42f0d23c492ec'
+  gem 'active_model_serializers', '0.9.0alpha1',
+    :github => 'rails-api/active_model_serializers', :ref => '61882e1e4127facfe92e49057aec71edbe981829'
   gem 'authlogic', '3.3.0'
 end
 
