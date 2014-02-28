@@ -97,7 +97,8 @@ describe Quizzes::QuizSubmissionZipper do
         zip_attachment: attachment).zip!
       attachment.reload
       attachment.should be_zipped
-      names = Zip::File.foreach(attachment.full_filename) { |f| f.name }
+      names = []
+      Zip::File.foreach(attachment.full_filename) { |f| names << f.name }
       names.length.should == 1
       names.first.should == "user#{student.id}_question_#{question.id}_#{attach.id}_#{attach.display_name}"
     end

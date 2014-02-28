@@ -66,7 +66,7 @@ module Canvas::Migration
       else
         :unknown
       end
-    rescue Zip::ZipError
+    rescue Zip::Error
       # Not a valid zip file
       :invalid_archive
     end
