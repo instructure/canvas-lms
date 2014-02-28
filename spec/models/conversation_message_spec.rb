@@ -288,7 +288,7 @@ describe ConversationMessage do
       conversation = Conversation.initiate(users, false, :context_type => 'Course', :context_id => @course.id)
       cm1 = conversation.add_message(users[0], "initial message", :root_account_id => Account.default.id)
       cm2 = conversation.add_message(users[1], "subsequent message", :root_account_id => Account.default.id)
-      cm2.recipients.size.should == 2
+      cm2.conversation_message_participants.size.should == 3
       cm3 = cm2.reply_from({
         :purpose => 'general',
         :user => users[2],
@@ -296,8 +296,8 @@ describe ConversationMessage do
         :html => "body",
         :text => "body"
       })
-      cm3.conversation_message_participants.size.should == 1
-      cm3.conversation_message_participants[0].user.should == users[1]
+      cm3.conversation_message_participants.size.should == 2
+      cm3.conversation_message_participants.map{|x| x.user_id}.sort.should == [users[1].id, users[2].id].sort
     end
   end
 end
