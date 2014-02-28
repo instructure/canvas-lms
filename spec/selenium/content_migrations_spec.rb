@@ -111,11 +111,14 @@ describe "content migrations" do
     it "should submit, queue and list migrations" do
       visit_page
       fill_migration_form
+      ff('[name=selective_import]')[0].click
       submit
 
       ff('.migrationProgressItem').count.should == 1
 
       fill_migration_form(:filename => 'cc_ark_test.zip')
+
+      ff('[name=selective_import]')[0].click
       submit
 
       visit_page
@@ -143,6 +146,7 @@ describe "content migrations" do
       pending unless Qti.qti_enabled?
       visit_page
       fill_migration_form
+      ff('[name=selective_import]')[0].click
       submit
       run_migration
 
@@ -164,7 +168,7 @@ describe "content migrations" do
       pending unless Qti.qti_enabled?
       visit_page
       fill_migration_form
-      f('#selectContentCheckbox').click
+      ff('[name=selective_import]')[1].click
       submit
       run_migration
 
@@ -210,6 +214,7 @@ describe "content migrations" do
         fill_migration_form(:filename => 'cc_default_qb_test.zip', :data => data)
 
         click_option('.questionBank', bank.id.to_s, :value)
+        ff('[name=selective_import]')[0].click
 
         submit
         run_migration
@@ -231,6 +236,7 @@ describe "content migrations" do
 
         f('#createQuestionInput').send_keys('new bank naem')
 
+        ff('[name=selective_import]')[0].click
         submit
         run_migration
 
@@ -251,6 +257,7 @@ describe "content migrations" do
         click_option('.questionBank', 'new_question_bank', :value)
         click_option('.questionBank', f('.questionBank option').text, :text)
 
+        ff('[name=selective_import]')[0].click
         submit
         run_migration
 
@@ -314,6 +321,7 @@ describe "content migrations" do
       el.text.should == @copy_from.name
       el.click
 
+      ff('[name=selective_import]')[0].click
       submit
 
       cm = @course.content_migrations.last
@@ -375,7 +383,7 @@ describe "content migrations" do
       f("option[value=\"#{enrolled_course.id}\"]").should_not be_nil
     end
 
-    it "should copy all content from a course by default" do
+    it "should copy all content from a course" do
       pending unless Qti.qti_enabled?
       visit_page
 
@@ -383,6 +391,7 @@ describe "content migrations" do
       wait_for_ajaximations
 
       click_option('#courseSelect', @copy_from.id.to_s, :value)
+      ff('[name=selective_import]')[0].click
       submit
 
       run_migration
@@ -403,7 +412,7 @@ describe "content migrations" do
       wait_for_ajaximations
 
       click_option('#courseSelect', @copy_from.id.to_s, :value)
-      f('#selectContentCheckbox').click
+      ff('[name=selective_import]')[1].click
       submit
 
       test_selective_content(@copy_from)
@@ -439,6 +448,7 @@ describe "content migrations" do
       f('#newStartDate').send_keys('8-5-2012')
       f('#newEndDate').send_keys('Aug 15, 2012')
 
+      ff('[name=selective_import]')[0].click
       submit
 
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
@@ -466,6 +476,7 @@ describe "content migrations" do
       click_option('#courseSelect', new_course.id.to_s, :value)
 
       f('#dateShiftCheckbox').click
+      ff('[name=selective_import]')[0].click
 
       submit
 

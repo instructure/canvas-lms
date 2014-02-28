@@ -39,10 +39,24 @@
   <% end %>
 
   <div class="control-group">
+    <div class="control-label">
+      <strong><%= t('content_label', 'Content') %></strong>
+    </div>
+
     <div class="controls">
-      <label class="checkbox" for="selectContentCheckbox">
-        <input name="selective_import" type="checkbox"><%= t('choose_content', 'Choose which items to copy') %>
-      </label>
+      <div class="radio">
+        <label>
+          <input type="radio" name="selective_import" checked value=false>
+          <%= t('select_all_content', 'All content') %>
+        </label>
+      </div>
+
+      <div class="radio">
+        <label>
+          <input type="radio" name="selective_import" value=true>
+          <%= t('select_specific_content', 'Select specific content') %>
+        </label>
+      </div>
     </div>
   </div>
 
