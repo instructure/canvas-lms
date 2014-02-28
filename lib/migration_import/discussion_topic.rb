@@ -50,7 +50,9 @@ module MigrationImport
     end
 
     private
+
     def fetch_assignment
+      return nil unless context.respond_to?(:assignments)
       if options[:assignment]
         Assignment.import_from_migration(options[:assignment], context)
       elsif options[:grading]
