@@ -414,7 +414,7 @@ tr:
       logging_content_pane: 
         authentication: "Giriş / Çıkış Etkinliği"
         grade_change: "Not Değiştirme Etkinliği"
-        select_default: "Log tipi seçiniz"
+        select_default: "Log türü seçiniz"
         select_label: "Aramak için bir log türü seçin."
       page_title: "%{account} için Yönetici Araçları"
       user_date_range_search_form: 
@@ -12266,7 +12266,7 @@ tr:
   section: 
     confirms: 
       delete_enrollment: "Kaydı kalıcı olarak silmek istediğinizden emin misiniz?"
-    default_course_name: "Ders No \"%{course_id}\""
+    default_course_name: "Ders ID \"%{course_id}\""
     enrolled_as_designer: "tasarımcı olarak kayıtlı"
     enrolled_as_limited_designer: "sadece bölüm erişimi olan bir tasarımcı olarak kayıtlı"
     enrolled_as_limited_observer: "sadece bölüm erişimi olan bir gözlemci olarak kayıtlı"
@@ -13357,7 +13357,7 @@ tr:
       errors: 
         submit: "Gönderimde Hata"
       links: 
-        add_new_term: "Yeni Koşul Ekle"
+        add_new_term: "Yeni Dönem Ekle"
       messages: 
         classes_in_term: "Sınıfların içeride bulunduğu dönemi silemezsiniz."
         submitting: Gönderiliyor...
@@ -13366,12 +13366,12 @@ tr:
         delete: "Bu koşulu silmek istediğinize emin misiniz?"
       titles: 
         enrollment_terms: "Kayıt Dönemleri"
-        term_details: "Koşul Detayları"
+        term_details: "Dönem Ayrıntıları"
       update_term: "Dönemi Güncelle"
     term: 
       buttons: 
         add: "Koşul Ekle"
-        update: "Koşulu Güncelle"
+        update: "Dönemi Güncelle"
       course_count: 
         one: "1 Ders"
         other: "%{count} Ders"
@@ -13381,7 +13381,7 @@ tr:
         students_can_access_from: "**Öğrenciler** şunlara erişebilir"
         tas_can_access_from: "**Asistan öğretmenler** şunlara erişebilir"
         teachers_can_access_from: "**Öğretmenler** şunlara erişebilir"
-      name: "Şart Adı :"
+      name: "Dönem Adı :"
       sis_source_id: "SIS ID:"
       term_runs_from: "den **Dönem Başlıyor**"
       titles: 
