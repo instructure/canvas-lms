@@ -44,8 +44,8 @@
     </td><!-- module_item_icons -->
 
     <td style="text-align: left;" class="item_name">
-      <a role="heading" aria-level="4" aria-label='<%= tag && tag.title %>' class="title <%= '_explicit_external_link' if tag && tag.content_type == 'ExternalUrl' %>" href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>"><%= tag && tag.title %></a>
-      <span class="title locked_title" role="heading" aria-level="4" ><%= tag && tag.title %></span>
+        <a  aria-label='<%= tag && tag.title %>' class="title <%= '_explicit_external_link' if tag && tag.content_type == 'ExternalUrl' %>" href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>"><%= tag && tag.title %></a>
+      <span class="title locked_title"><%= tag && tag.title %></span>
       <span class="points_possible" style="display: none;"><%= tag.try_rescue(:assignment).try_rescue(:points_possible) || nbsp %></span>
       <span class="requirement" style="display: none;">&nbsp;</span>
       <span class="completion_requirement" style="display: none;">&nbsp;</span>
