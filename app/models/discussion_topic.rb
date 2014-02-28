@@ -930,7 +930,8 @@ class DiscussionTopic < ActiveRecord::Base
     discussion_topics.each do |topic|
       context = Group.where(context_id: migration.context.id,
         context_type: migration.context.class.to_s,
-        migration_id: topic['group_id']).first || migration.context
+        migration_id: topic['group_id']).first if topic['group_id']
+      context ||= migration.context
       next unless context && can_import_topic?(topic, migration)
       begin
         import_from_migration(topic.merge(topic_entries_to_import: topic_entries_to_import), context)
