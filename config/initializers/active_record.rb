@@ -680,11 +680,15 @@ class ActiveRecord::Base
     # take a lock (e.g. when we create a submission).
     retries.times do
       begin
-        return transaction(:requires_new => true) { uncached { yield } }
+        result = transaction(:requires_new => true) { uncached { yield } }
+        connection.clear_query_cache
+        return result
       rescue UniqueConstraintViolation
       end
     end
-    transaction(:requires_new => true) { uncached { yield } }
+    result = transaction(:requires_new => true) { uncached { yield } }
+    connection.clear_query_cache
+    result
   end
 
   # returns batch_size ids at a time, working through the primary key from
