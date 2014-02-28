@@ -213,6 +213,27 @@ describe ContextModule do
       @module.completion_requirements = reqs + [{:id => -1, :type => 'asdf'}]
       @module.completion_requirements.should eql(reqs)
     end
+
+    it 'should ignore invalid requirements' do
+      course_module
+      @module.completion_requirements = {"none"=>"none"} # the front-end likes to pass this in...
+      @module.save!
+
+      @module.completion_requirements.should be_empty
+    end
+
+    it 'should not remove unpublished requirements' do
+      course_module
+      @assignment = @course.assignments.create!(title: 'some assignment')
+      @assignment.workflow_state = 'unpublished'
+      @assignment.save!
+
+      @tag = @module.add_item({id: @assignment.id, type: 'assignment'})
+      @module.completion_requirements = { @tag.id => {type: 'must_view'} }
+      @module.save!
+
+      @module.completion_requirements.should eql([id: @tag.id, type: 'must_view'])
+    end
   end
   
   describe "update_for" do
@@ -531,7 +552,7 @@ describe ContextModule do
       sub.save!
       
       p = mod.evaluate_for(@student)
-      p.requirements_met.should == [{:type=>"min_score", :min_score=>5, :max_score=>nil, :id=>tag.id}]
+      p.requirements_met.should == [{:type=>"min_score", :min_score=>5, :id=>tag.id}]
       p.workflow_state.should == 'completed'
     end
   end
@@ -686,6 +707,35 @@ describe ContextModule do
       @quiz.reload; @assignment = Assignment.find(@assignment.id)
       @quiz.locked_for?(@user).should be_false
       @assignment.locked_for?(@user).should be_false
+    end
+  end
+
+  context 'unpublished completion requirements' do
+    before do
+      course_module
+      course_with_student(course: @course, user: @student, active_all: true)
+
+      @assignment = @course.assignments.create!(title: 'some assignment')
+      @assignment.workflow_state = 'unpublished'
+      @assignment.save!
+      @assignment_tag = @module.add_item({id: @assignment.id, type: 'assignment'})
+
+      @other_assignment = @course.assignments.create!(title: 'other assignment')
+      @other_assignment_tag = @module.add_item({id: @other_assignment.id, type: 'assignment'})
+
+      @module.completion_requirements = [
+        {id: @assignment_tag.id, type: 'min_score', min_score: 90},
+        {id: @other_assignment_tag.id, type: 'min_score', min_score: 90},
+      ]
+      @module.save!
+
+      @module.completion_requirements.include?({id: @assignment_tag.id, type: 'min_score', min_score: 90}).should be_true
+      @module.completion_requirements.include?({id: @other_assignment_tag.id, type: 'min_score', min_score: 90}).should be_true
+    end
+
+    it 'should not prevent a student from completing a module' do
+      @other_assignment.grade_student(@student, :grade => '95')
+      @module.evaluate_for(@student).should be_completed
     end
   end
 

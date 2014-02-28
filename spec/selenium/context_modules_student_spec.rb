@@ -138,7 +138,7 @@ describe "context_modules" do
       @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'}, module1_unpublished_tag.id => {:type => 'must_view'}}
       @module_1.save!
       @module_1.completion_requirements.map{|h| h[:id]}.should include(@tag_1.id)
-      @module_1.completion_requirements.map{|h| h[:id]}.should_not include(module1_unpublished_tag.id)
+      @module_1.completion_requirements.map{|h| h[:id]}.should include(module1_unpublished_tag.id) # unpublished requirements SHOULD remain
 
       module2_published_tag = @module_2.add_item({:id => @quiz_1.id, :type => 'quiz'})
       @module_2.save!

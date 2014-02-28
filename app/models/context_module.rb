@@ -217,18 +217,42 @@ class ContextModule < ActiveRecord::Base
       val = hash
     end
     if val.is_a?(Hash)
-      res = []
-      tag_ids = self.content_tags.active.pluck(:id)
-      val.each do |id, opts|
-        if tag_ids.include?(id.to_i)
-          res << {:id => id.to_i, :type => opts[:type], :min_score => opts[:min_score] && opts[:min_score].to_f, :max_score => opts[:max_score] && opts[:max_score].to_f}
+      # requirements hash can contain invalid data (e.g. {"none"=>"none"}) from the ui,
+      # filter & manipulate the data to something more reasonable
+      val = val.map do |id, req|
+        if req.is_a?(Hash)
+          req[:id] = id unless req[:id]
+          req
         end
       end
-      val = res
+      val = validate_completion_requirements(val.compact)
     else
       val = nil
     end
     write_attribute(:completion_requirements, val)
+  end
+
+  def validate_completion_requirements(requirements)
+    requirements = requirements.map do |req|
+      new_req = {
+        id: req[:id].to_i,
+        type: req[:type],
+      }
+      new_req[:min_score] = req[:min_score].to_f if req[:type] == 'min_score' && req[:min_score]
+      new_req[:max_score] = req[:max_score].to_f if req[:type] == 'max_score' && req[:max_score]
+      new_req
+    end
+
+    tags = self.content_tags.not_deleted.index_by(&:id)
+    requirements.select do |req|
+      if req[:id] && tag = tags[req[:id]]
+        if %w(must_view must_contribute).include?(req[:type])
+          true
+        elsif %w(must_submit min_score max_score).include?(req[:type])
+          true if tag.scoreable?
+        end
+      end
+    end
   end
 
   def content_tags_visible_to(user)
@@ -411,29 +435,10 @@ class ContextModule < ActiveRecord::Base
   def confirm_valid_requirements(do_save=false)
     return if @already_confirmed_valid_requirements
     @already_confirmed_valid_requirements = true
-    tags = self.content_tags.active
-    new_reqs = []
-    changed = false
-    (self.completion_requirements || []).each do |req|
-      added = false
-      if !req[:id]
-        
-      elsif req[:type] == 'must_view'
-        new_reqs << req if tags.any?{|t| t.id == req[:id].to_i }
-        added = true
-      elsif req[:type] == 'must_contribute'
-        new_reqs << req if tags.any?{|t| t.id == req[:id].to_i }
-        added = true
-      elsif req[:type] == 'must_submit' || req[:type] == 'min_score' || req[:type] == 'max_score'
-        tag = tags.detect{|t| t.id == req[:id].to_i }
-        new_reqs << req if tag && tag.scoreable?
-        added = true
-      end
-      changed = true if !added
-    end
-    self.completion_requirements = new_reqs
-    self.save if do_save && changed
-    new_reqs
+    # the write accessor validates for us
+    self.completion_requirements = self.completion_requirements || []
+    self.save if do_save && self.completion_requirements_changed?
+    self.completion_requirements
   end
   
   def find_or_create_progressions(users)
