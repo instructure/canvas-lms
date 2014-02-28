@@ -1563,30 +1563,6 @@ class User < ActiveRecord::Base
     @self_enrolling = false
   end
 
-  def time_difference_from_date(hash)
-    n = hash[:number].to_i
-    n = nil if n == 0
-    if hash[:metric] == "weeks"
-      (n || 1).weeks.to_i
-    elsif hash[:metric] == "days"
-      (n || 1).days.to_i
-    elsif hash[:metric] == "hours"
-      (n || 1).hours.to_i
-    elsif hash[:metric] == "never"
-      0
-    else
-      nil
-    end
-  end
-
-  def remind_for_due_dates=(hash)
-    self.reminder_time_for_due_dates = time_difference_from_date(hash)
-  end
-
-  def remind_for_grading=(hash)
-    self.reminder_time_for_grading = time_difference_from_date(hash)
-  end
-
   def is_a_context?
     true
   end
