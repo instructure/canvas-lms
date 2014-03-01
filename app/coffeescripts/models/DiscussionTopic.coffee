@@ -6,7 +6,8 @@ define [
   'compiled/collections/ParticipantCollection'
   'compiled/collections/DiscussionEntriesCollection'
   'compiled/models/Assignment'
-], (I18n, Backbone, $, _, ParticipantCollection, DiscussionEntriesCollection, Assignment) ->
+  'compiled/models/DateGroup'
+], (I18n, Backbone, $, _, ParticipantCollection, DiscussionEntriesCollection, Assignment, DateGroup) ->
 
   class DiscussionTopic extends Backbone.Model
     resourceName: 'discussion_topics'
@@ -40,11 +41,14 @@ define [
       assign_attributes = @get('assignment') or {}
       assign_attributes.assignment_overrides or= []
       assign_attributes.turnitin_settings or= {}
-      assign = new Assignment(assign_attributes)
-      assign.alreadyScoped = true
-      @set 'assignment', assign
+      @set 'assignment', @createAssignment(assign_attributes)
       @set 'publishable',  @get('can_unpublish')
       @set 'unpublishable', @get('can_unpublish')
+
+    createAssignment: (attributes) ->
+      assign = new Assignment(attributes)
+      assign.alreadyScoped = true
+      assign
 
     # always include assignment in view presentation
     present: =>
@@ -71,19 +75,12 @@ define [
     toJSON: ->
       json = super
       delete json.assignment unless json.set_assignment
-      assignment = if json.assignment
-        if typeof json.assignment.toJSON is 'function'
-          json.assignment.toJSON()
-        else
-          json.assignment
-      else
-        null
-
       _.extend json,
-        summary: @summary(),
-        unread_count_tooltip: @unreadTooltip(),
+        summary: @summary()
+        unread_count_tooltip: @unreadTooltip()
         reply_count_tooltip: @replyTooltip()
-        assignment: assignment
+        assignment: json.assignment?.toJSON()
+        defaultDates: @defaultDates().toJSON()
 
     unreadTooltip: ->
       I18n.t 'unread_count_tooltip', {
@@ -132,3 +129,23 @@ define [
       collection.remove this, silent: true
       collection.models.splice (otherIndex), 0, this
       collection.reset collection.models
+
+    defaultDates: ->
+      group = new DateGroup
+        due_at:    @dueAt()
+        unlock_at: @unlockAt()
+        lock_at:   @lockAt()
+      return group
+
+    dueAt: ->
+      @get('assignment')?.get('due_at')
+
+    unlockAt: ->
+      if unlock_at = @get('assignment')?.get('unlock_at')
+        return unlock_at
+      @get('delayed_post_at')
+
+    lockAt:  ->
+      if lock_at = @get('assignment')?.get('lock_at')
+        return lock_at
+      @get('lock_at')
