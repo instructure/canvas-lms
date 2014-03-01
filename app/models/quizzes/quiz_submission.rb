@@ -56,6 +56,19 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   simply_versioned :automatic => false
 
+  has_many :versions,
+    :order => 'number DESC',
+    :as => :versionable,
+    :dependent => :destroy,
+    :inverse_of => :versionable,
+    :extend => SoftwareHeretics::ActiveRecord::SimplyVersioned::VersionsProxyMethods do
+      def construct_sql
+        @finder_sql = @counter_sql =
+          "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_id = #{owner_quoted_id} AND " +
+        "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_type IN ('QuizSubmission', #{@owner.class.quote_value(@owner.class.base_class.name.to_s)})"
+      end
+    end
+
   workflow do
     state :untaken do
       event :start_grading, :transitions_to => :pending_review
@@ -92,6 +105,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     given {|user, session| quiz.cached_context_grants_right?(user, session, :manage_grades) }
     can :add_attempts
+  end
+
+  # override has_one relationship provided by simply_versioned
+  def current_version_unidirectional
+    versions.limit(1)
   end
 
   def sanitize_responses

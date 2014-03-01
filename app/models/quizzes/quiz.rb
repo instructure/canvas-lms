@@ -74,6 +74,20 @@ class Quizzes::Quiz < ActiveRecord::Base
   serialize :quiz_data
 
   simply_versioned
+
+  has_many :versions,
+    :order => 'number DESC',
+    :as => :versionable,
+    :dependent => :destroy,
+    :inverse_of => :versionable,
+    :extend => SoftwareHeretics::ActiveRecord::SimplyVersioned::VersionsProxyMethods do
+      def construct_sql
+        @finder_sql = @counter_sql =
+          "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_id = #{owner_quoted_id} AND " +
+        "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_type IN ('Quiz', #{@owner.class.quote_value(@owner.class.base_class.name.to_s)})"
+      end
+    end
+
   # This callback is listed here in order for the :link_assignment_overrides
   # method to be called after the simply_versioned callbacks. We want the
   # overrides to reflect the most recent version of the quiz.
@@ -82,6 +96,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   # last version of the assignment, because the next callback would be a
   # simply_versioned callback updating the version.
   after_save :link_assignment_overrides, :if => :assignment_id_changed?
+
+  # override has_one relationship provided by simply_versioned
+  def current_version_unidirectional
+    versions.limit(1)
+  end
 
   def infer_times
     # set the time to 11:59 pm in the creator's time zone, if none given
@@ -1209,7 +1228,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def self.lockdown_browser_plugin_enabled?
     Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| Canvas::Plugin.value_to_boolean(p.settings[:enabled]) }
   end
-  
+
   def lockdown_browser_use_lti_tool?
     Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| Canvas::Plugin.value_to_boolean(p.settings[:use_lti_tool]) }
   end
@@ -1225,13 +1244,13 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   alias :require_lockdown_browser_for_results? :require_lockdown_browser_for_results
-  
+
   def require_lockdown_browser_monitor
     self[:require_lockdown_browser_monitor] && Quizzes::Quiz.lockdown_browser_plugin_enabled?
   end
-  
+
   alias :require_lockdown_browser_monitor? :require_lockdown_browser_monitor
- 
+
   def lockdown_browser_monitor_data
     self[:lockdown_browser_monitor_data]
   end

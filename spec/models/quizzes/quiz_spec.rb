@@ -1499,4 +1499,19 @@ describe Quizzes::Quiz do
       Quizzes::Quiz.class_names.should == ['Quiz', 'Quizzes::Quiz']
     end
   end
+
+  context 'with versioning' do
+    let(:quiz) { @course.quizzes.create! title: 'Test Quiz' }
+    describe "#versions" do
+      it "finds the versions of both namespaced and non-namespaced quizzes" do
+        quiz.title = "Renamed Test Quiz"
+        quiz.save
+        quiz.versions.count.should == 2
+
+        Version.update_all("versionable_type='Quiz'","versionable_id=#{quiz.id} AND versionable_type='Quizzes::Quiz'")
+
+        Quizzes::Quiz.find(quiz).versions.count.should == 2
+      end
+    end
+  end
 end
