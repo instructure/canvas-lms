@@ -53,7 +53,7 @@
     <div class="headerBar">
       <div class="row-fluid form-inline" style="overflow: visible;">
         <div class="pull-right">
-          <% if @context.feature_enabled?(:draft_state) && can_do(@context, @current_user, :moderate_forum) %>
+          <% if @topic.draft_state_enabled? && can_do(@context, @current_user, :moderate_forum) %>
             <button
               id="topic_publish_button"
               data-id='<%= @topic.id %>'
