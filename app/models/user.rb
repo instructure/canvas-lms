@@ -135,6 +135,7 @@ class User < ActiveRecord::Base
   end
 
   has_many :communication_channels, :order => 'communication_channels.position ASC', :dependent => :destroy
+  has_many :notification_policies, through: :communication_channels
   has_one :communication_channel, :conditions => ["workflow_state<>'retired'"], :order => 'position'
   has_many :enrollments, :dependent => :destroy
 
