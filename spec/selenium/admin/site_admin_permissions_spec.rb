@@ -6,6 +6,6 @@ describe "account permissions" do
   describe "shared permission specs" do
     let(:url) { "/accounts/#{Account.default.id}/permissions?account_roles=1" }
     let(:account) { Account.default }
-    it_should_behave_like "permission tests"
+    include_examples "permission tests"
   end
 end

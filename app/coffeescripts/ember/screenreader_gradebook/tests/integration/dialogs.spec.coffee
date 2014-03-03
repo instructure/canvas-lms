@@ -112,7 +112,6 @@ define [
 
   test 'default grade dialog updates the current students grade', ->
     $dialog = null
-    server = @server
     visit('/').then =>
       openDialog('#set_default_grade').then =>
         $dialog = find('.ui-dialog:visible', 'body')
@@ -120,7 +119,6 @@ define [
           click(find('[name=overwrite_existing_grades]', $dialog)).then =>
             click('.button_type_submit', $dialog)
             sendSuccess(@server, "/courses/#{ENV.GRADEBOOK_OPTIONS.context_id}/gradebook/update_submission", fixtures.set_default_grade_response)
-
 
     andThen ->
       equal parseInt(find('#student_and_assignment_grade').val(), 10), 100

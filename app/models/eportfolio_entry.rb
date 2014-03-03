@@ -97,7 +97,7 @@ class EportfolioEntry < ActiveRecord::Base
       obj = params[("section_" + (idx + 1).to_s).to_sym].slice(:section_type, :content, :submission_id, :attachment_id)
       new_obj = {:section_type => obj[:section_type]}
       if obj[:section_type] == 'rich_text' || obj[:section_type] == 'html'
-        config = Instructure::SanitizeField::SANITIZE
+        config = CanvasSanitize::SANITIZE
         new_obj[:content] = Sanitize.clean(obj[:content] || '', config).strip
         new_obj = nil if new_obj[:content].empty?
       elsif obj[:section_type] == 'submission'

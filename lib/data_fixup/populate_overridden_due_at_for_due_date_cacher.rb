@@ -18,7 +18,9 @@
 
 module DataFixup::PopulateOverriddenDueAtForDueDateCacher
   def self.run
-    Shackles.activate(:slave) do
+    env = Shackles.environment
+    env = nil unless env == :deploy
+    Shackles.activate(env || :slave) do
       overrides = AssignmentOverride.active
                                     .overriding_due_at
                                     .select("DISTINCT assignment_id")
@@ -26,7 +28,7 @@ module DataFixup::PopulateOverriddenDueAtForDueDateCacher
 
       overrides.find_in_batches do |batch|
         assignment_ids = batch.map(&:assignment_id)
-        Shackles.activate(:master) do
+        Shackles.activate(env || :master) do
           DueDateCacher.recompute_batch(assignment_ids)
         end
       end

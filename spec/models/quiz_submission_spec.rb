@@ -31,44 +31,44 @@ describe QuizSubmission do
       qs = QuizSubmission.new
       qs.extra_time = 'asdf'
       qs.valid?.should == false
-      qs.errors.on(:extra_time).should == "is not a number"
+      Array(qs.errors[:extra_time]).should == ["is not a number"]
     end
 
     it "should validate extra time is not too long" do
       qs = QuizSubmission.new
       qs.extra_time = 10081
       qs.valid?.should == false
-      qs.errors.on(:extra_time).should == "must be less than or equal to 10080"
+      Array(qs.errors[:extra_time]).should == ["must be less than or equal to 10080"]
     end
 
     it "should validate numericality of extra attempts" do
       qs = QuizSubmission.new
       qs.extra_attempts = 'asdf'
       qs.valid?.should == false
-      qs.errors.on(:extra_attempts).should == "is not a number"
+      Array(qs.errors[:extra_attempts]).should == ["is not a number"]
     end
 
     it "should validate extra attempts is not too long" do
       qs = QuizSubmission.new
       qs.extra_attempts = 1001
       qs.valid?.should == false
-      qs.errors.on(:extra_attempts).should == "must be less than or equal to 1000"
+      Array(qs.errors[:extra_attempts]).should == ["must be less than or equal to 1000"]
     end
 
     it "should validate quiz points possible is not too long" do
       qs = QuizSubmission.new
-      qs.quiz = Quiz.new(:points_possible => 2000000001)
+      qs.quiz = Quizzes::Quiz.new(:points_possible => 2000000001)
       qs.valid?.should == false
-      qs.errors.on(:quiz_points_possible).should == "must be less than or equal to 2000000000"
+      Array(qs.errors[:quiz_points_possible]).should == ["must be less than or equal to 2000000000"]
     end
   end
 
   it "should copy the quiz's points_possible whenever it's saved" do
-    Quiz.where(:id => @quiz).update_all(:points_possible => 1.1)
+    Quizzes::Quiz.where(:id => @quiz).update_all(:points_possible => 1.1)
     q = @quiz.quiz_submissions.create!
     q.reload.quiz_points_possible.should eql 1.1
 
-    Quiz.where(:id => @quiz).update_all(:points_possible => 1.9)
+    Quizzes::Quiz.where(:id => @quiz).update_all(:points_possible => 1.9)
     q.reload.quiz_points_possible.should eql 1.1
 
     q.save!
@@ -1533,7 +1533,7 @@ describe QuizSubmission do
     end
 
     it "returns false if quiz restricts answers for concluded courses" do
-      quiz = Quiz.new
+      quiz = Quizzes::Quiz.new
       quiz.stubs(:restrict_answers_for_concluded_course? => true)
 
       qs = QuizSubmission.new(:quiz => quiz)
@@ -1541,7 +1541,7 @@ describe QuizSubmission do
     end
 
     it "returns true if quiz doesn't restrict answers for concluded courses" do
-      quiz = Quiz.new
+      quiz = Quizzes::Quiz.new
       quiz.stubs(:restrict_answers_for_concluded_course? => false)
 
       qs = QuizSubmission.new(:quiz => quiz)
@@ -1555,13 +1555,13 @@ describe QuizSubmission do
     before do
       submission.with_versioning(true) do |s|
         s.score = 10
-        s.save_without_validation
+        s.save(:validate => false)
       end
       submission.version_number.should == 1
 
       submission.with_versioning(true) do |s|
         s.score = 15
-        s.save_without_validation
+        s.save(:validate => false)
       end
       submission.version_number.should == 2
     end
@@ -1820,7 +1820,7 @@ describe QuizSubmission do
     it 'should be retriable if it is complete and the quiz has unlimited attempts' do
       subject.workflow_state = 'complete'
       subject.stubs(:attempts_left).returns 0
-      subject.quiz = Quiz.new
+      subject.quiz = Quizzes::Quiz.new
       subject.quiz.stubs(:unlimited_attempts?).returns true
       subject.retriable?.should be_true
     end
@@ -1828,7 +1828,7 @@ describe QuizSubmission do
 
   describe '#snapshot!' do
     before :each do
-      subject.quiz = Quiz.new
+      subject.quiz = Quizzes::Quiz.new
       subject.attempt = 1
     end
 
@@ -1858,6 +1858,33 @@ describe QuizSubmission do
       })
 
       subject.snapshot! snapshot_data, true
+    end
+  end
+
+  context "with versioning" do
+    before(:each) do
+      student_in_course
+      assignment_quiz([])
+      qd = multiple_choice_question_data
+      @quiz.quiz_data = [qd]
+      @quiz.points_possible = qd[:points_possible]
+      @quiz.save!
+    end
+
+    describe "#versions" do
+      it "finds the versions with both namespaced and non-namespaced quizzes" do
+      qs = @quiz.generate_submission(@student)
+      qs.submission_data = { "question_1" => "2405" }
+      qs.grade_submission
+
+      qs = @quiz.generate_submission(@student)
+      qs.submission_data = { "question_1" => "8544" }
+      qs.grade_submission
+
+      qs.versions.count.should == 2
+      Version.update_all("versionable_type='QuizSubmission'","versionable_id=#{qs.id} AND versionable_type='Quizzes::QuizSubmission'")
+      Quizzes::QuizSubmission.find(qs).versions.count.should == 2
+      end
     end
   end
 end

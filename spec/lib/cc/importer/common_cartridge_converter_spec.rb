@@ -68,7 +68,7 @@ describe "Standard Common Cartridge importing" do
     if Qti.qti_enabled?
       tag = mod1.content_tags[index]
       tag.title.should == "Pretest"
-      tag.content_type.should == 'Quiz'
+      tag.content_type.should == 'Quizzes::Quiz'
       tag.content_id.should == @course.quizzes.find_by_migration_id("I_00003_R").id
       tag.indent.should == 1
       index += 1

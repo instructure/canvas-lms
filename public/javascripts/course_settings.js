@@ -291,12 +291,18 @@ define([
     }).change();
     $course_form.formSubmit({
       processData: function(data) {
-        if(data['course[start_at]']) {
-          data['course[start_at]'] += " 12:00am";
+        var date = $.datetime.parse(data['course[start_at]']);
+        if (date) {
+          date.setHours(0); date.setMinutes(0); date.setSeconds(0); date.setMilliseconds(0);
         }
-        if(data['course[conclude_at]']) {
-          data['course[conclude_at]'] += " 11:55pm";
+        data['course[start_at]'] = date ? $.unfudgeDateForProfileTimezone(date).toISOString() : "";
+
+        date = $.datetime.parse(data['course[conclude_at]']);
+        if (date) {
+          date.setHours(23); date.setMinutes(55); date.setSeconds(0); date.setMilliseconds(0);
         }
+        data['course[conclude_at]'] = date ? $.unfudgeDateForProfileTimezone(date).toISOString() : "";
+
         return data;
       },
       beforeSubmit: function(data) {

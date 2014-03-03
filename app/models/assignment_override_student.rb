@@ -20,7 +20,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :assignment_override
   belongs_to :user
-  belongs_to :quiz
+  belongs_to :quiz, class_name: 'Quizzes::Quiz'
 
   attr_accessible :user
 

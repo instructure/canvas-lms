@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe PseudonymsController, :type => :integration do
+describe PseudonymsController, type: :request do
   before do
     course_with_student(:active_all => true)
     account_admin_user

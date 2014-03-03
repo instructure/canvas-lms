@@ -50,6 +50,12 @@ shared_examples_for 'Takeable Quiz Services' do
 
     expect { service_action.call }.to_not raise_error
   end
+
+  it '[transient:CNVS-10224] it should reject CGB-OQAAT quiz requests' do
+    quiz.stubs(:cant_go_back).returns true
+
+    expect { service_action.call }.to raise_error(ApiError, /not supported/i)
+  end
 end
 
 describe QuizSubmissionService do
@@ -58,7 +64,7 @@ describe QuizSubmissionService do
   subject { QuizSubmissionService.new participant }
 
   let :quiz do
-    quiz = Quiz.new
+    quiz = Quizzes::Quiz.new
     quiz.workflow_state = 'available'
     quiz
   end
@@ -82,7 +88,7 @@ describe QuizSubmissionService do
         lambda { |*_| subject.create quiz }
       end
 
-      it_should_behave_like 'Takeable Quiz Services'
+      include_examples 'Takeable Quiz Services'
 
       it 'should create a QS' do
         expect { subject.create quiz }.to_not raise_error
@@ -165,7 +171,7 @@ describe QuizSubmissionService do
         lambda { |*_| subject.complete qs, qs.attempt }
       end
 
-      it_should_behave_like 'Takeable Quiz Services'
+      include_examples 'Takeable Quiz Services'
 
       it 'should complete the QS' do
         expect do
@@ -201,14 +207,6 @@ describe QuizSubmissionService do
           subject.complete qs, qs.attempt
         end.to raise_error(ApiError, /already complete/)
       end
-
-      it 'should require the QS to be untaken' do
-        qs.workflow_state = 'complete'
-
-        expect do
-          subject.complete qs, qs.attempt
-        end.to raise_error(ApiError, /already complete/)
-      end
     end
 
     context 'as someone else' do
@@ -219,6 +217,77 @@ describe QuizSubmissionService do
         expect do
           subject.complete qs, qs.attempt
         end.to raise_error(ApiError, /not allowed to complete/i)
+      end
+    end
+  end
+
+  describe '#update_question' do
+    let :qs do
+      qs = QuizSubmission.new
+      qs.attempt = 1
+      qs.quiz = quiz
+      qs.stubs(:completed?).returns false
+      qs.stubs(:backup_submission_data)
+      qs
+    end
+
+    context 'as the participant' do
+      before :each do
+        quiz.stubs(:grants_right?).returns true
+      end
+
+      let :service_action do
+        lambda { |*_| subject.update_question({}, qs, qs.attempt) }
+      end
+
+      include_examples 'Takeable Quiz Services'
+
+      it 'should update a question' do
+        expect do
+          subject.update_question({ question_5_marked: true }, qs, qs.attempt)
+        end.to_not raise_error
+      end
+
+      it 'should reject when the QS is complete' do
+        qs.stubs(:completed?).returns true
+
+        expect do
+          subject.update_question({ question_5_marked: true }, qs, qs.attempt)
+        end.to raise_error(ApiError, /already complete/)
+      end
+
+      it 'should reject when the QS is overdue' do
+        qs.stubs(:overdue?).returns true
+
+        expect do
+          subject.update_question({ question_5_marked: true }, qs, qs.attempt)
+        end.to raise_error(ApiError, /is overdue/)
+      end
+
+      it 'should reject an invalid attempt' do
+        expect do
+          subject.update_question({ question_5_marked: true }, qs, qs.attempt-1)
+        end.to raise_error(ApiError, /attempt \d can not be modified/)
+      end
+
+      it 'should reject an invalid validation_token' do
+        qs.validation_token = 'yep'
+        participant.validation_token = 'nope'
+
+        expect do
+          subject.update_question({ question_5_marked: true }, qs, qs.attempt)
+        end.to raise_error(ApiError, /invalid token/)
+      end
+    end
+
+    context 'as someone else' do
+      it 'should deny access' do
+        quiz.context = Course.new
+        participant.user = nil
+
+        expect do
+          subject.update_question({}, qs, qs.attempt)
+        end.to raise_error(ApiError, /you are not allowed to update questions/i)
       end
     end
   end
@@ -252,7 +321,7 @@ describe QuizSubmissionService do
         end.to_not raise_error
       end
 
-      it 'should generate the correct "legacy" format' do
+      it 'should generate the correct legacy format' do
         qs.workflow_state = 'complete'
         qs.expects(:update_scores).with({
           "submission_version_number" => qs.attempt,

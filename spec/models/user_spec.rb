@@ -1269,7 +1269,7 @@ describe User do
       (1..3).each do |x|
         course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
         @courses << course
-        @user.favorites.build(context: course)
+        @user.favorites.create!(context: course)
       end
 
       @user.save!
@@ -1293,7 +1293,7 @@ describe User do
         (4..6).each do |x|
           course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
           @courses << course
-          @user.favorites.build(context: course)
+          @user.favorites.create!(context: course)
         end
 
         @user.save!
@@ -1704,13 +1704,13 @@ describe User do
         assignments.each do |assignment|
           assignment.expects(:grants_right?).with(user,nil,:delete).returns true
         end
-        assignments.first.expects(:all_dates_visible_to).with(user).
+        assignments.first.expects(:dates_hash_visible_to).with(user).
           returns [due_date1]
-        assignments.second.expects(:all_dates_visible_to).with(user).
+        assignments.second.expects(:dates_hash_visible_to).with(user).
           returns [due_date2]
-        assignments.third.expects(:all_dates_visible_to).with(user).
+        assignments.third.expects(:dates_hash_visible_to).with(user).
           returns [due_date3]
-        assignments[3].expects(:all_dates_visible_to).with(user).
+        assignments[3].expects(:dates_hash_visible_to).with(user).
           returns [due_date4]
         upcoming_assignments = user.select_upcoming_assignments(assignments,{
           :end_at => 1.week.from_now
@@ -1834,21 +1834,24 @@ describe User do
 
   describe "order_by_sortable_name" do
     it "should sort lexicographically" do
-      User.create!(:name => "John Johnson")
-      User.create!(:name => "John John")
-      User.order_by_sortable_name.all.map(&:sortable_name).should == ["John, John", "Johnson, John"]
+      ids = []
+      ids << User.create!(:name => "John Johnson")
+      ids << User.create!(:name => "John John")
+      User.order_by_sortable_name.where(id: ids).all.map(&:sortable_name).should == ["John, John", "Johnson, John"]
     end
 
     it "should sort support direction toggle" do
-      User.create!(:name => "John Johnson")
-      User.create!(:name => "John John")
-      User.order_by_sortable_name(:direction => :descending).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
+      ids = []
+      ids << User.create!(:name => "John Johnson")
+      ids << User.create!(:name => "John John")
+      User.order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
     end
 
     it "should sort support direction toggle with a prior select" do
-      User.create!(:name => "John Johnson")
-      User.create!(:name => "John John")
-      User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
+      ids = []
+      ids << User.create!(:name => "John Johnson")
+      ids << User.create!(:name => "John John")
+      User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
     end
 
     it "should sort by the current locale with pg_collkey if possible" do

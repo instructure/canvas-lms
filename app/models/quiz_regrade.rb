@@ -1,6 +1,6 @@
 class QuizRegrade < ActiveRecord::Base
   attr_accessible :user_id, :quiz_id, :quiz_version
-  belongs_to :quiz
+  belongs_to :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :user
   has_many :quiz_regrade_runs
   has_many :quiz_question_regrades

@@ -61,7 +61,7 @@
 #
 class QuizReportsController < ApplicationController
   include Api::V1::Helpers::QuizzesApiHelper
-  include Api::V1::QuizStatistics
+  include Api::V1::QuizReport
 
   before_filter :require_context, :require_quiz
 
@@ -84,7 +84,10 @@ class QuizReportsController < ApplicationController
     if authorized_action(@quiz, @current_user, :read_statistics)
       if params[:quiz_report] && QuizStatistics::REPORTS.include?(params[:quiz_report][:report_type])
         stats = @quiz.statistics_csv(params[:quiz_report][:report_type], :async => true, :includes_all_versions => value_to_boolean(params[:quiz_report][:includes_all_versions]))
-        render :json => quiz_statistics_json(stats, @current_user, session, :include => ['file', 'progress_url'])
+        render :json => quiz_report_json(stats,
+          @current_user,
+          session,
+          :include => ['file', 'progress_url'])
       else
         render :json => {:errors => {:report_type => "invalid"}}, :status => :bad_request
       end
@@ -99,7 +102,10 @@ class QuizReportsController < ApplicationController
   def show
     if authorized_action(@quiz, @current_user, :read_statistics)
       @stats = @quiz.quiz_statistics.find(params[:id])
-      render :json => quiz_statistics_json(@stats, @current_user, session, :include => ['file', 'progress_url'])
+      render :json => quiz_report_json(@stats,
+        @current_user,
+        session,
+        :include => ['file', 'progress_url'])
     end
   end
 end

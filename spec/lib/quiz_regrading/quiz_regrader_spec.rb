@@ -57,7 +57,7 @@ describe QuizRegrader do
       }
 
       Version.stubs(:where).with(
-        versionable_type: 'Quiz',
+        versionable_type: Quizzes::Quiz.class_names,
         number: 2,
         versionable_id: quiz.id
       ).once.returns([ stub(:model => quiz_stub) ])

@@ -1,5 +1,9 @@
+development:
+  session_store: encrypted_cookie_store
+  expire_after: 86400 # 1 day in seconds
+
 production:
-  session_store: active_record_store
+  session_store: encrypted_cookie_store
   expire_after: 86400 # 1 day in seconds
   # uncomment this option if your canvas install is over HTTPS, and the cookies
   # will be SSL-only
@@ -9,26 +13,7 @@ production:
   # change the time that "stay logged in" tokens are valid for, defaults to 1 month
   #
   # expire_remember_me_after: 2592000
-  #
-  # for memcache, the list of servers will be read from config/memcache.yml (or
-  # default to localhost:11211)
-  #
-  # session_store: mem_cache_store
-  #
-  # you can override that by adding a memcache_servers key with a list of servers, e.g.:
-  # memcache_servers:
-  #   - memcache1:11211
-  #   - memcache2:11211
-  #
-  # redis is very similar to memcache, using the redis-store gem. the list of servers will be read from config/redis.yml (or default to localhost:6379)
-  #
-  # session_store: redis_session_store
-  #
-  # you can override that by adding a servers key with a list of servers, .e.g:
-  # redis_servers:
-  #   - redis1:6379
-  #   - redis2:6379
 
 test:
-  session_store: active_record_store
+  session_store: encrypted_cookie_store
   expire_after: 86400 # 1 day in seconds

@@ -90,11 +90,16 @@ describe Course do
   end
 
   context "#old_gradebook_visible?" do
-    it "should always return false when enrollment count is large enough" do
-        @course.large_roster = false
-        @course.old_gradebook_visible?.should be_true
-        @course.students.stubs(:count).returns(251)
+    it "should return true for small enrollments" do
+      @course.large_roster = false
+      @course.old_gradebook_visible?.should be_true
+    end
+
+    it "should return false when enrollment count is large enough" do
+      enable_cache do
+        Rails.cache.write(['student_count', @course].cache_key, 251)
         @course.old_gradebook_visible?.should be_false
+      end
     end
   end
 
@@ -378,7 +383,12 @@ describe Course do
       @course.self_enrollment = true
       @course.sis_source_id = 'sis_id'
       @course.stuck_sis_fields = [].to_set
+      profile = @course.profile
+      profile.description = "description"
+      profile.save!
       @course.save!
+      @course.reload
+
       @course.course_sections.should_not be_empty
       @course.students.should == [@student]
       @course.stuck_sis_fields.should == [].to_set
@@ -436,8 +446,13 @@ describe Course do
       @course.stuck_sis_fields = [].to_set
       @course.name = "course_name"
       @course.stuck_sis_fields.should == [:name].to_set
+      profile = @course.profile
+      profile.description = "description"
+      profile.save!
       @course.save!
       @course.stuck_sis_fields.should == [:name].to_set
+
+      @course.reload
 
       @new_course = @course.reset_content
 
@@ -651,7 +666,7 @@ end
 describe Course, "score_to_grade" do
   it "should correctly map scores to grades" do
     default = GradingStandard.default_grading_standard
-    default.to_json.should eql([["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["B-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]].to_json)
+    default.to_json.should == ([["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["B-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0.0]].to_json)
     course_model
     @course.score_to_grade(95).should eql(nil)
     @course.grading_standard_id = 0
@@ -710,24 +725,24 @@ describe Course, "gradebook_to_csv" do
     rows[1][-2].should == "(read only)"
     rows[2][-2].should == "100"
   end
-  
-  it "should order assignments by position" do
+
+  it "should order assignments and groups by position" do
     course_with_student(:active_all => true)
 
     @assignment_group_1, @assignment_group_2 = [@course.assignment_groups.create!(:name => "Some Assignment Group 1", :group_weight => 100), @course.assignment_groups.create!(:name => "Some Assignment Group 2", :group_weight => 100)].sort_by{|a| a.id}
 
     now = Time.now
 
-    @course.assignments.create!(:title => "Assignment 01", :due_at => now + 1.days, :position => 3, :assignment_group => @assignment_group_1)
-    @course.assignments.create!(:title => "Assignment 02", :due_at => now + 1.days, :position => 1, :assignment_group => @assignment_group_1)
+    g1a1 = @course.assignments.create!(:title => "Assignment 01", :due_at => now + 1.days, :position => 3, :assignment_group => @assignment_group_1, :points_possible => 10)
+    @course.assignments.create!(:title => "Assignment 02", :due_at => now + 1.days, :position => 1, :assignment_group => @assignment_group_1, :points_possible => 10)
     @course.assignments.create!(:title => "Assignment 03", :due_at => now + 1.days, :position => 2, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 05", :due_at => now + 4.days, :position => 4, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 04", :due_at => now + 5.days, :position => 5, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 06", :due_at => now + 7.days, :position => 6, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 07", :due_at => now + 6.days, :position => 7, :assignment_group => @assignment_group_1)
-    @course.assignments.create!(:title => "Assignment 08", :due_at => now + 8.days, :position => 1, :assignment_group => @assignment_group_2)
+    g2a1 = @course.assignments.create!(:title => "Assignment 08", :due_at => now + 8.days, :position => 1, :assignment_group => @assignment_group_2, :points_possible => 10)
     @course.assignments.create!(:title => "Assignment 09", :due_at => now + 8.days, :position => 9, :assignment_group => @assignment_group_1)
-    @course.assignments.create!(:title => "Assignment 10", :due_at => now + 8.days, :position => 10, :assignment_group => @assignment_group_2)
+    @course.assignments.create!(:title => "Assignment 10", :due_at => now + 8.days, :position => 10, :assignment_group => @assignment_group_2, :points_possible => 10)
     @course.assignments.create!(:title => "Assignment 12", :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 14", :due_at => nil, :position => 14, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 11", :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
@@ -737,15 +752,32 @@ describe Course, "gradebook_to_csv" do
     @user.reload
     @course.reload
 
+    g1a1.grade_student(@user, grade: 10)
+    g2a1.grade_student(@user, grade: 5)
+
     csv = @course.gradebook_to_csv
     csv.should_not be_nil
     rows = CSV.parse(csv)
     rows.length.should equal(3)
-    assignments = []
+    assignments, groups = [], []
     rows[0].each do |column|
-      assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment/
+      assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment \d+/
+      groups << column if column =~ /Some Assignment Group/
     end
     assignments.should == ["Assignment 02", "Assignment 03", "Assignment 01", "Assignment 05",  "Assignment 04", "Assignment 06", "Assignment 07", "Assignment 09", "Assignment 11", "Assignment 12", "Assignment 13", "Assignment 14", "Assignment 08", "Assignment 10"]
+    groups.should == ["Some Assignment Group 1 Current Points",
+                      "Some Assignment Group 1 Final Points",
+                      "Some Assignment Group 1 Current Score",
+                      "Some Assignment Group 1 Final Score",
+                      "Some Assignment Group 2 Current Points",
+                      "Some Assignment Group 2 Final Points",
+                      "Some Assignment Group 2 Current Score",
+                      "Some Assignment Group 2 Final Score"]
+
+    rows[2][-10].should == "100"    # ag1 current score
+    rows[2][-9].should  == "50"     # ag1 final score
+    rows[2][-6].should  == "50"     # ag2 current score
+    rows[2][-5].should  == "25"     # ag2 final score
   end
 
   it "should alphabetize by sortable name with the test student at the end" do
@@ -818,9 +850,9 @@ describe Course, "gradebook_to_csv" do
     rows[0][2].should == 'SIS User ID'
     rows[0][3].should == 'SIS Login ID'
     rows[0][4].should == 'Section'
-    rows[1][2].should == ''
-    rows[1][3].should == ''
-    rows[1][4].should == ''
+    rows[1][2].should == nil
+    rows[1][3].should == nil
+    rows[1][4].should == nil
     rows[1][-1].should == '(read only)'
     rows[2][1].should == @user1.id.to_s
     rows[2][2].should == 'SISUSERID'
@@ -842,6 +874,12 @@ describe Course, "gradebook_to_csv" do
 
     it "includes points for unweighted courses" do
       csv = CSV.parse(@course.gradebook_to_csv)
+      csv[0][-8].should == "Assignments Current Points"
+      csv[0][-7].should == "Assignments Final Points"
+      csv[1][-8].should == "(read only)"
+      csv[1][-7].should == "(read only)"
+      csv[2][-8].should == "8"
+      csv[2][-7].should == "8"
       csv[0][-4].should == "Current Points"
       csv[0][-3].should == "Final Points"
       csv[1][-4].should == "(read only)"
@@ -853,6 +891,8 @@ describe Course, "gradebook_to_csv" do
     it "doesn't include points for weighted courses" do
       @course.update_attribute(:group_weighting_scheme, 'percent')
       csv = CSV.parse(@course.gradebook_to_csv)
+      csv[0][-8].should_not == "Assignments Current Points"
+      csv[0][-7].should_not == "Assignments Final Points"
       csv[0][-4].should_not == "Current Points"
       csv[0][-3].should_not == "Final Points"
     end
@@ -902,12 +942,12 @@ describe Course, "gradebook_to_csv" do
       rows[0][2].should == 'SIS User ID'
       rows[0][3].should == 'SIS Login ID'
       rows[0][4].should == 'Section'
-      rows[1][0].should == ''
+      rows[1][0].should == nil
       rows[1][5].should == 'Muted'
-      rows[1][6].should == ''
-      rows[2][2].should == ''
-      rows[2][3].should == ''
-      rows[2][4].should == ''
+      rows[1][6].should == nil
+      rows[2][2].should == nil
+      rows[2][3].should == nil
+      rows[2][4].should == nil
       rows[2][-1].should == '(read only)'
       rows[3][1].should == @user1.id.to_s
       rows[3][2].should == 'SISUSERID'
@@ -2781,7 +2821,7 @@ describe Course, "inherited_assessment_question_banks" do
     @course.inherited_assessment_question_banks(true).should be_empty
 
     bank = @course.assessment_question_banks.create
-    @course.inherited_assessment_question_banks(true).should eql [bank]
+    @course.inherited_assessment_question_banks(true).should == [bank]
   end
 
   it "should include all banks in the account hierarchy" do
@@ -2794,7 +2834,7 @@ describe Course, "inherited_assessment_question_banks" do
     account_bank = @account.assessment_question_banks.create
 
     @course = Course.create(:account => @account)
-    @course.inherited_assessment_question_banks.sort_by(&:id).should eql [root_bank, account_bank]
+    @course.inherited_assessment_question_banks.sort_by(&:id).should == [root_bank, account_bank]
   end
 
   it "should return a useful scope" do
@@ -2810,7 +2850,7 @@ describe Course, "inherited_assessment_question_banks" do
     bank = @course.assessment_question_banks.create
 
     banks = @course.inherited_assessment_question_banks(true)
-    banks.order(:id).should eql [root_bank, account_bank, bank]
+    banks.order(:id).should == [root_bank, account_bank, bank]
     banks.find_by_id(bank.id).should eql bank
     banks.find_by_id(account_bank.id).should eql account_bank
     banks.find_by_id(root_bank.id).should eql root_bank
@@ -2855,7 +2895,7 @@ describe Course, "section_visibility" do
     end
 
     it "should return user's sections if a student" do
-      @course.sections_visible_to(@student1).should eql [@course.default_section]
+      @course.sections_visible_to(@student1).should == [@course.default_section]
     end
 
     it "should return users from all sections" do
@@ -2876,31 +2916,31 @@ describe Course, "section_visibility" do
 
   context "sections" do
     it "should return students from user's sections" do
-      @course.students_visible_to(@ta).should eql [@student1]
+      @course.students_visible_to(@ta).should == [@student1]
     end
 
     it "should return user's sections" do
-      @course.sections_visible_to(@ta).should eql [@course.default_section]
+      @course.sections_visible_to(@ta).should == [@course.default_section]
     end
 
     it "should return non-limited admins from other sections" do
-      @course.enrollments_visible_to(@ta, :type => :teacher, :return_users => true).should eql [@teacher]
+      @course.enrollments_visible_to(@ta, :type => :teacher, :return_users => true).should == [@teacher]
     end
   end
 
   context "restricted" do
     it "should return no students except self and the observed" do
-      @course.students_visible_to(@observer).should eql [@student1]
+      @course.students_visible_to(@observer).should == [@student1]
       RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
                            :enrollment_type => "StudentEnrollment", :enabled => false)
-      @course.students_visible_to(@student1).should eql [@student1]
+      @course.students_visible_to(@student1).should == [@student1]
     end
 
     it "should return no sections" do
-      @course.sections_visible_to(@observer).should eql []
+      @course.sections_visible_to(@observer).should == []
       RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
                            :enrollment_type => "StudentEnrollment", :enabled => false)
-      @course.sections_visible_to(@student1).should eql []
+      @course.sections_visible_to(@student1).should == []
     end
   end
 
@@ -2993,13 +3033,13 @@ describe Course, "enrollments" do
     @course.root_account = a1
     @course.save!
 
-    @course.student_enrollments.map(&:root_account_id).should eql [a1.id]
-    @course.course_sections.reload.map(&:root_account_id).should eql [a1.id]
+    @course.student_enrollments.map(&:root_account_id).should == [a1.id]
+    @course.course_sections.reload.map(&:root_account_id).should == [a1.id]
 
     @course.root_account = a2
     @course.save!
-    @course.student_enrollments(true).map(&:root_account_id).should eql [a2.id]
-    @course.course_sections.reload.map(&:root_account_id).should eql [a2.id]
+    @course.student_enrollments(true).map(&:root_account_id).should == [a2.id]
+    @course.course_sections.reload.map(&:root_account_id).should == [a2.id]
   end
 end
 

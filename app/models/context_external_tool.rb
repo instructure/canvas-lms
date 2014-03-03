@@ -501,6 +501,8 @@ class ContextExternalTool < ActiveRecord::Base
   scope :having_setting, lambda { |setting| setting ? where("has_#{setting.to_s}" => true) : scoped }
 
   def self.find_for(id, context, type)
+    id = id[Api::ID_REGEX] if id.is_a?(String)
+    raise ActiveRecord::RecordNotFound unless id.present?
     tool = context.context_external_tools.having_setting(type).find_by_id(id)
     if !tool && context.is_a?(Group)
       context = context.context

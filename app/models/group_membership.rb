@@ -35,10 +35,8 @@ class GroupMembership < ActiveRecord::Base
 
   after_save :ensure_mutually_exclusive_membership
   after_save :touch_groups
-  after_save :check_auto_follow_group
   after_save :update_cached_due_dates
   after_destroy :touch_groups
-  after_destroy :check_auto_follow_group
 
   has_a_broadcast_policy
 
@@ -142,15 +140,6 @@ class GroupMembership < ActiveRecord::Base
     true
   end
   protected :capture_old_group_id
-
-  def check_auto_follow_group
-    if (self.id_changed? || self.workflow_state_changed?) && self.active?
-      UserFollow.create_follow(self.user, self.group)
-    elsif self.destroyed? || (self.workflow_state_changed? && self.deleted?)
-      user_follow = self.user.shard.activate { self.user.user_follows.where(:followed_item_id => self.group_id, :followed_item_type => 'Group').first }
-      user_follow.try(:destroy)
-    end
-  end
 
   def update_cached_due_dates
     if workflow_state_changed? && group.group_category_id && group.context_type == 'Course'

@@ -71,7 +71,7 @@ class ContextModuleProgression < ActiveRecord::Base
         end
         if obj.is_a?(Assignment)
           met << req if self.user.submitted_submission_for(obj.id)
-        elsif obj.is_a?(Quiz)
+        elsif obj.is_a?(Quizzes::Quiz)
           met << req if self.user.attempted_quiz_submission_for(obj.id)
         end
       elsif req[:type] == "max_score" || req[:type] == "min_score"
@@ -80,7 +80,7 @@ class ContextModuleProgression < ActiveRecord::Base
         if obj.is_a?(Assignment)
           sub = self.user.submitted_submission_for(obj.id)
           score = sub.try(:score)
-        elsif obj.is_a?(Quiz)
+        elsif obj.is_a?(Quizzes::Quiz)
           sub = self.user.attempted_quiz_submission_for(obj.id)
           score = sub.try(:kept_score)
         end

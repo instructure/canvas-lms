@@ -1,7 +1,8 @@
 define [
   'Backbone'
   'compiled/views/CollectionView'
-], (Backbone, CollectionView) ->
+  'helpers/fakeENV'
+], (Backbone, CollectionView, fakeENV) ->
 
   collection = null
   view = null
@@ -21,6 +22,7 @@ define [
 
   module 'CollectionView',
     setup: ->
+      fakeENV.setup()
       collection = new Collection [
         {name: 'Jon', id: 24}
         {name: 'Ryan', id: 56}
@@ -32,6 +34,7 @@ define [
       view.$el.appendTo $('#fixtures')
       view.render()
     teardown: ->
+      fakeENV.teardown()
       ItemView['testing removed'] = 0
       view.remove()
 

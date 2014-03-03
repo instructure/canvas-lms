@@ -1,30 +1,14 @@
 <% @context ||= @current_user %>
 <% cache(['wiki_sidebar_render_2', @context.cache_key, @current_user].cache_key.to_s) do %>
-<% collections = [] #@current_user && @current_user.collections.all %>
 <% load_wiki_sidebar %>
 <div id="editor_tabs" style="display: none;">
 
   <span class="wiki-sidebar-header" role="heading" aria-level="2"><%= t('headings.insert_content', %{Insert Content into the Page}) %></span>
   <ul>
-    <% if collections.present? %>
-    <li><a href="#editor_tabs_1"><%= t('tabs.collections', %{Collections}) %></a></li>
-    <% end %>
     <li><a href="#editor_tabs_2"><%= t('tabs.links', %{Links}) %></a></li>
     <li><a href="#editor_tabs_3"><%= t('tabs.files', %{Files}) %></a></li>
     <li><a href="#editor_tabs_4"><%= t('tabs.images', %{Images}) %></a></li>
   </ul>
-  <% if collections.present? %>
-  <div id="editor_tabs_1">
-    <div id="wiki_sidebar_collections">
-      <select>
-        <% collections.each do |collection| %>
-          <option value="<%= collection.id %>"><%= collection.name %></option>
-        <% end %>
-      </select>
-      <ul></ul>
-    </div>
-  </div>
-  <% end %>
   <div id="editor_tabs_2">
     <%= @context.is_a?(Group) ? t('group_links', 'Link to other content in the group.') : t('course_links', 'Link to other content in the course.') %>
     <% if @context.is_a?(Course) || @context.is_a?(Group) %>

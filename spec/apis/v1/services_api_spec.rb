@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Services API", :type => :integration do
+describe "Services API", type: :request do
   before do
     user_with_pseudonym(:active_all => true)
     @kal = mock('Kaltura::ClientV3')
@@ -32,7 +32,7 @@ describe "Services API", :type => :integration do
   
   it "should check for auth" do
     get("/api/v1/services/kaltura")
-    response.status.should == '401 Unauthorized'
+    assert_status(401)
   end
   
   it "should return the config information for kaltura" do

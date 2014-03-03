@@ -16,6 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../config/canvas_rails3')
+if CANVAS_RAILS2
+  Spec::Example::ExampleGroupMethods.module_eval do
+    def include_examples(*args)
+      it_should_behave_like(*args)
+    end
+  end
+end
+
 begin; require File.expand_path(File.dirname(__FILE__) + "/../parallelized_specs/lib/parallelized_specs.rb"); rescue LoadError; end
 
 ENV["RAILS_ENV"] = 'test'
@@ -25,6 +34,21 @@ if CANVAS_RAILS2
   require 'spec'
   # require 'spec/autorun'
   require 'spec/rails'
+
+  # integration specs were renamed to request specs in rspec 2
+  def describe_with_rspec2_types(*args, &block)
+    unless args.last.is_a?(Hash)
+      args << {}
+    end
+    raise "please use type: :request instead of type: :integration for rspec 2 compatibility" if args.last[:type] == :integration
+    if args.last[:type] == :request
+      args.last[:type] = :integration
+    end
+    args.last[:location] ||= caller(0)[1]
+    describe_without_rspec2_types(*args, &block)
+  end
+  alias :describe_without_rspec2_types :describe
+  alias :describe :describe_with_rspec2_types
 else
   require 'rspec/rails'
 end
@@ -102,8 +126,8 @@ def truncate_all_tables
 end
 
 def truncate_all_cassandra_tables
-  Canvas::Cassandra::Database.config_names.each do |cass_config|
-    db = Canvas::Cassandra::Database.from_config(cass_config)
+  Canvas::Cassandra::DatabaseBuilder.config_names.each do |cass_config|
+    db = Canvas::Cassandra::DatabaseBuilder.from_config(cass_config)
     db.tables.each do |table|
       db.execute("TRUNCATE #{table}")
     end
@@ -190,6 +214,34 @@ matchers_module.define :match_ignoring_whitespace do |expected|
   end
 end
 
+module Helpers
+  def message(opts={})
+    m = Message.new
+    m.to = opts[:to] || 'some_user'
+    m.from = opts[:from] || 'some_other_user'
+    m.subject = opts[:subject] || 'a message for you'
+    m.body = opts[:body] || 'nice body'
+    m.sent_at = opts[:sent_at] || 5.days.ago
+    m.workflow_state = opts[:workflow_state] || 'sent'
+    m.user_id = opts[:user_id] || opts[:user].try(:id)
+    m.path_type = opts[:path_type] || 'email'
+    m.root_account_id = opts[:account_id] || Account.default.id
+    m.save!
+    m
+  end
+end
+
+# Make sure extensions will work with dynamically created shards
+if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' &&
+    ActiveRecord::Base.connection.schema_search_path == 'public'
+  %w{pg_trgm pg_collkey}.each do |extension|
+    current_schema = ActiveRecord::Base.connection.select_value("SELECT nspname FROM pg_extension INNER JOIN pg_namespace ON extnamespace=pg_namespace.oid WHERE extname='#{extension}'")
+    if current_schema && current_schema == 'public'
+      ActiveRecord::Base.connection.execute("ALTER EXTENSION #{extension} SET SCHEMA pg_catalog") rescue nil
+    end
+  end
+end
+
 (CANVAS_RAILS2 ? Spec::Runner : RSpec).configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
@@ -199,6 +251,7 @@ end
   config.fixture_path = Rails.root+'spec/fixtures/'
 
   config.include Webrat::Matchers, :type => :views
+  config.include Helpers
 
   config.before :all do
     # so before(:all)'s don't get confused
@@ -501,7 +554,8 @@ end
     roles = opts[:roles] || []
     message = opts[:message] || "hi there"
     @account = opts[:account] || Account.default
-    @announcement = @account.announcements.create!(message: message, required_account_service: req_service)
+    @announcement = @account.announcements.build(message: message, required_account_service: req_service)
+    @announcement.start_at = opts[:start_at] || 5.minutes.ago.utc
     @announcement.account_notification_roles.build(roles.map{ |r| { account_notification_id: @announcement.id, role_type: r} }) unless roles.empty?
     @announcement.save!
   end
@@ -509,7 +563,7 @@ end
   VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
 
   def group(opts={})
-    context = opts[:group_context] || Account.default
+    context = opts[:group_context] || opts[:context] || Account.default
     @group = context.groups.create! opts.slice(*VALID_GROUP_ATTRIBUTES)
   end
 
@@ -597,7 +651,7 @@ end
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
-    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
     @quiz.generate_quiz_data
     @quiz.published_at = Time.now
@@ -622,7 +676,7 @@ end
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
-    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
     @quiz.anonymous_submissions = true
     @quiz.quiz_type = "graded_survey"
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
@@ -776,21 +830,6 @@ end
     mo
   end
 
-  def message(opts={})
-    m = Message.new
-    m.to = opts[:to] || 'some_user'
-    m.from = opts[:from] || 'some_other_user'
-    m.subject = opts[:subject] || 'a message for you'
-    m.body = opts[:body] || 'nice body'
-    m.sent_at = opts[:sent_at] || 5.days.ago
-    m.workflow_state = opts[:workflow_state] || 'sent'
-    m.user_id = opts[:user_id] || opts[:user].try(:id)
-    m.path_type = opts[:path_type] || 'email'
-    m.root_account_id = opts[:account_id] || Account.default.id
-    m.save!
-    m
-  end
-
   def assert_status(status=500)
     response.status.to_i.should eql(status)
   end
@@ -799,6 +838,15 @@ end
     assert_status(401) #unauthorized
                        #    response.headers['Status'].should eql('401 Unauthorized')
     response.should render_template("shared/unauthorized")
+  end
+
+  def assert_page_not_found(&block)
+    if CANVAS_RAILS2
+      block.should raise_exception(ActiveRecord::RecordNotFound)
+    else
+      yield
+      assert_status(404)
+    end
   end
 
   def assert_require_login
@@ -859,26 +907,8 @@ end
     importer.warnings.should == []
   end
 
-  def enable_cache(new_cache = ActiveSupport::Cache::MemoryStore.new)
-    old_cache = RAILS_CACHE
-    ActionController::Base.cache_store = new_cache
-    old_perform_caching = ActionController::Base.perform_caching
-    if CANVAS_RAILS2
-      ActionController::Base.cache_store = new_cache
-      silence_warnings { Object.const_set(:RAILS_CACHE, new_cache) }
-    else
-      Switchman::DatabaseServer.all.each {|s| s.stubs(:cache_store).returns(new_cache)}
-    end
-    ActionController::Base.perform_caching = true
-    yield
-  ensure
-    if CANVAS_RAILS2
-      ActionController::Base.cache_store = old_cache
-      silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
-    else
-      Switchman::DatabaseServer.all.each {|s| s.unstub(:cache_store)}
-    end
-    ActionController::Base.perform_caching = old_perform_caching
+  def enable_cache(new_cache=:memory_store)
+    Rails.force_cache(new_cache) { yield }
   end
 
   # enforce forgery protection, so we can verify usage of the authenticity token
@@ -1213,7 +1243,7 @@ end
     Setting.set('enable_page_views', 'db')
 
     @page_view = PageView.new { |p|
-      p.send(:attributes=, {
+      p.assign_attributes({
           :id => @request_id,
           :url => "http://test.one/",
           :session_id => "phony",
@@ -1228,7 +1258,7 @@ end
           :interaction_seconds => 5,
           :user => @user,
           :remote_ip => '192.168.0.42'
-      }, false)
+      }, :without_protection => true)
     }
     @page_view.save!
     @page_view

@@ -43,7 +43,7 @@ module MigrationImport
       if context.respond_to?(:content_migration) && context.content_migration
         context.content_migration.add_missing_content_links(:class => item.class.to_s,
           :id => item.id, :missing_links => hash[:missing_links],
-          :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.underscore.pluralize}/#{item.id}")
+          :url => "/#{context.class.to_s.demodulize.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}")
       end
       context.imported_migration_items << item if context.imported_migration_items
       if hash[:all_day]
@@ -118,7 +118,7 @@ module MigrationImport
     def self.object_url_part(object)
       case object
       when Attachment then "files/#{object.id}/download"
-      else "#{object.class.to_s.underscore.pluralize}/#{object.id}"
+      else "#{object.class.to_s.demodulize.underscore.pluralize}/#{object.id}"
       end
     end
 

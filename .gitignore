@@ -10,7 +10,7 @@
 #
 # That's what .git/info/exclude and core.excludesfile are for :)
 
-/.bundle/
+.bundle/
 /.yardoc/
 /app/coffeescripts/ember/*/main.coffee
 /app/views/info/styleguide.html.erb
@@ -21,7 +21,7 @@
 /db/*.sqlite*
 /db/*sql
 /exports/
-/Gemfile.lock
+Gemfile.lock
 /log/
 /public/app/
 /public/assets/
@@ -33,9 +33,13 @@
 /public/stylesheets/compiled/
 /RAILS3
 /spec/javascripts/runner.html
+/spec/javascripts/tests.js
 /spec/javascripts/compiled/
 /tmp/
 /vendor/plugins/rails_upgrade
+/node_modules
+/spec/javascripts/tests.js
+/spec/javascripts/requirejs_config.js
 
 # generated plugin stuff
 /app/coffeescripts/plugins/

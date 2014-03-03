@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
-describe QuizzesApiController, :type => :integration do
+describe QuizzesApiController, type: :request do
 
   context 'locked api item' do
     let(:item_type) { 'quiz' }
@@ -36,7 +36,7 @@ describe QuizzesApiController, :type => :integration do
       )
     end
 
-    it_should_behave_like 'a locked api item'
+    include_examples 'a locked api item'
   end
 
   describe "GET /courses/:course_id/quizzes (index)" do
@@ -73,7 +73,7 @@ describe QuizzesApiController, :type => :integration do
                    :action => "index",
                    :format => "json",
                    :course_id => "#{@course.id}")
-      response.status.to_i.should == 404
+      assert_status(404)
     end
 
     context "jsonapi style" do
@@ -173,7 +173,7 @@ describe QuizzesApiController, :type => :integration do
                          { quizzes: [{ 'title' => 'blah blah', 'published' => true }] },
                         'Accept' => 'application/vnd.api+json')
         @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
-        @quiz = Quiz.first
+        @quiz = Quizzes::Quiz.first
         @json.should =~ [
           QuizSerializer.new(@quiz, scope: @user, controller: controller, session: session).
           as_json[:quiz].with_indifferent_access
@@ -349,6 +349,39 @@ describe QuizzesApiController, :type => :integration do
       json = api_update_quiz({}, {'title' => long_title}, :expected_status => 400 )
       json.should have_key 'errors'
       updated_quiz.title.should == 'title'
+    end
+
+    context 'lockdown_browser' do
+      before do
+        # require_lockdown_browser, require_lockdown_browser_for_results and
+        # require_lockdown_browser_monitor will only return true if the plugin is enabled,
+        # so register and enable it for these test
+        Canvas::Plugin.register(:example_spec_lockdown_browser, :lockdown_browser, {
+                :settings => {:enabled => false}})
+        setting = PluginSetting.find_or_create_by_name('example_spec_lockdown_browser')
+        setting.settings = {:enabled => true}
+        setting.save!
+      end
+
+      it 'should allow setting require_lockdown_browser' do
+        api_update_quiz({'require_lockdown_browser' => false}, {'require_lockdown_browser' => true})
+        updated_quiz.require_lockdown_browser.should be_true
+      end
+
+      it 'should allow setting require_lockdown_browser_for_results' do
+        api_update_quiz({'require_lockdown_browser_for_results' => false}, {'require_lockdown_browser_for_results' => true})
+        updated_quiz.require_lockdown_browser_for_results.should be_true
+      end
+
+      it 'should allow setting require_lockdown_browser_monitor' do
+        api_update_quiz({'require_lockdown_browser_monitor' => false}, {'require_lockdown_browser_monitor' => true})
+        updated_quiz.require_lockdown_browser_monitor.should be_true
+      end
+
+      it 'should allow setting lockdown_browser_monitor_data' do
+        api_update_quiz({'lockdown_browser_monitor_data' => nil}, {'lockdown_browser_monitor_data' => 'VGVzdCBEYXRhCg=='})
+        updated_quiz.lockdown_browser_monitor_data.should == 'VGVzdCBEYXRhCg=='
+      end
     end
 
     context "draft state changes" do

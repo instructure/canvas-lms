@@ -4,9 +4,9 @@ define [
   'compiled/models/Submission'
   'compiled/views/assignments/AssignmentListItemView'
   'jquery'
-  'helpers/jquery.simulate'
   'helpers/fakeENV'
-], (Backbone, Assignment, Submission, AssignmentListItemView, $) ->
+  'helpers/jquery.simulate'
+], (Backbone, Assignment, Submission, AssignmentListItemView, $, fakeENV) ->
   screenreaderText = null
   nonScreenreaderText = null
 
@@ -122,9 +122,7 @@ define [
       ["First", "Second"]
 
   genSetup = (model=assignment1()) ->
-    ENV = window.ENV ||= {}
-    ENV.PERMISSIONS = {manage: false}
-    window.ENV = ENV
+    fakeENV.setup(PERMISSIONS: {manage: false})
 
     @model = model
     @submission = new Submission
@@ -135,7 +133,7 @@ define [
       $.trim @view.$('.js-score .non-screenreader').text()
 
   genTeardown = ->
-    ENV.PERMISSIONS = {}
+    fakeENV.teardown()
     $('#fixtures').empty()
 
 

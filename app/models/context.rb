@@ -46,7 +46,7 @@ module Context
     LearningOutcomeGroup = ::LearningOutcomeGroup
     MediaObject = ::MediaObject
     Progress = ::Progress
-    Quiz = ::Quiz
+    Quiz = ::Quizzes::Quiz
     QuizGroup = ::QuizGroup
     QuizQuestion = ::QuizQuestion
     QuizSubmission = ::QuizSubmission

@@ -30,6 +30,10 @@ class SortFirstClass
     nil
   end
 
+  def to_datetime
+    -Date::Infinity.new
+  end
+
   def inspect
     'SortFirst'
   end

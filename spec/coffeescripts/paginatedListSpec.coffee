@@ -1,7 +1,13 @@
 define [
-  'compiled/PaginatedList',
-  'helpers/loadFixture'
-], (PaginatedList, loadFixture) ->
+  'compiled/PaginatedList'
+], (PaginatedList) ->
+  paginatedListFixture = """
+    <h3>Paginated List Spec</h3>
+    <div id="list-wrapper">
+      <ul></ul>
+    </div>
+    """
+
   module 'PaginatedList',
 
     setup: ->
@@ -12,7 +18,7 @@ define [
         tpl = (opt) ->
           "<li>#{opt['value']}</li>"
         (tpl(opt) for opt in opts).join ''
-      @fixture  = loadFixture 'PaginatedList'
+      @fixture = $(paginatedListFixture).appendTo('#fixtures')
       @el =
         wrapper: $('#list-wrapper')
         list: $('#list-wrapper').find('ul')
@@ -21,7 +27,7 @@ define [
     teardown: ->
       @clock.restore()
       @server.restore()
-      @fixture.detach()
+      @fixture.remove()
 
   test 'should fetch and display results', ->
     @server.respondWith(/.+/, @response)

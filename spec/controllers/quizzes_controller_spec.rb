@@ -50,7 +50,7 @@ describe QuizzesController do
     @assignment.workflow_state = "available"
     @assignment.submission_types = "online_quiz"
     @assignment.save
-    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
     @quiz.anonymous_submissions = false
     @quiz.quiz_type = "survey"
 
@@ -212,7 +212,7 @@ describe QuizzesController do
       assigns[:quiz].should_not eql(q)
 
       get 'new', :course_id => @course.id, :fresh => 1
-      # Quiz.find_by_id(q.id).should be_deleted
+      # Quizzes::Quiz.find_by_id(q.id).should be_deleted
       assigns[:quiz].should_not be_nil
       assigns[:quiz].should_not eql(q)
     end
@@ -421,7 +421,7 @@ describe QuizzesController do
       @assignment.workflow_state = "available"
       @assignment.submission_types = "online_quiz"
       @assignment.save
-      @quiz = Quiz.find_by_assignment_id(@assignment.id)
+      @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
       @quiz.anonymous_submissions = true
       @quiz.quiz_type = "survey"
 

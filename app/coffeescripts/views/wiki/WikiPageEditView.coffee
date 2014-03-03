@@ -119,6 +119,9 @@ define [
     switchViews: (event) ->
       event?.preventDefault()
       @$wikiPageBody.editorBox('toggle')
+      # hide the clicked link, and show the other toggle link.
+      # todo: replace .andSelf with .addBack when JQuery is upgraded.
+      $(event.currentTarget).siblings('a').andSelf().toggle()
 
     # Validate they entered in a title.
     # @api ValidatedFormView override

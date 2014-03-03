@@ -17,7 +17,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Feature Flags API", :type => :integration do
+describe "Feature Flags API", type: :request do
   let(:t_site_admin) { Account.site_admin }
   let(:t_root_account) { account_model }
   let(:t_teacher) { user_with_pseudonym account: t_root_account }

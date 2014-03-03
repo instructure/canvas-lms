@@ -288,11 +288,42 @@ var speakMessage = function ($this, message) {
     return I18n.l('#date.formats.medium', date);
   };
   $.fn.parseFromISO = $.parseFromISO;
-  
+
+  $.datetime = {};
+  $.datetime.shortFormat = "MMM d, yyyy";
+  $.datetime.defaultFormat = "MMM d, yyyy h:mmtt";
+  $.datetime.sortableFormat = "yyyy-MM-ddTHH:mm:ss";
+  $.datetime.parse = function(text, /* optional */ intermediate_format) {
+    return Date.parse((text || "").toString(intermediate_format).replace(/ (at|by)/, ""))
+  }
+  $.datetime.clean = function(text) {
+    var date = $.datetime.parse(text, $.datetime.sortableFormat) || text;
+    var result = "";
+    if(date) {
+      if(date.getHours() || date.getMinutes()) {
+        result = date.toString($.datetime.defaultFormat);
+      } else {
+        result = date.toString($.datetime.shortFormat);
+      }
+    }
+    return result;
+  };
+  $.datetime.process = function(text) {
+    var date = text;
+    if(typeof(text) == "string") {
+      date = $.datetime.parse(text);
+    }
+    var result = "";
+    if(date) {
+      result = date.toString($.datetime.sortableFormat);
+    }
+    return result;
+  };
+
   
   $.datepicker.oldParseDate = $.datepicker.parseDate;
   $.datepicker.parseDate = function(format, value, settings) {
-    return Date.parse((value || "").toString().replace(/ (at|by)/, "")) || $.datepicker.oldParseDate(format, value, settings);
+    return $.datetime.parse(value) || $.datepicker.oldParseDate(format, value, settings);
   };
   $.datepicker._generateDatepickerHTML = $.datepicker._generateHTML;
   $.datepicker._generateHTML = function(inst) {
@@ -461,7 +492,7 @@ var speakMessage = function ($this, message) {
         if (options.timeOnly && val && parseInt(val, 10) == val) {
           val += (val < 8) ? "pm" : "am";
         }
-        var d = Date.parse((val || "").toString().replace(/ (at|by)/, ""));
+        var d = $.datetime.parse(val);
         var parse_error_message = I18n.t('errors.not_a_date', "That's not a date!");
         var text = parse_error_message;
         if (!$this.val()) { text = ""; }
@@ -504,34 +535,6 @@ var speakMessage = function ($this, message) {
     return this;
   };
 
-
-  $.datetime = {};
-  $.datetime.shortFormat = "MMM d, yyyy";
-  $.datetime.defaultFormat = "MMM d, yyyy h:mmtt";
-  $.datetime.sortableFormat = "yyyy-MM-ddTHH:mm:ss";
-  $.datetime.clean = function(text) {
-    var date = Date.parse((text || "").toString("yyyy-MM-ddTHH:mm:ss").replace(/ (at|by)/, "")) || text;
-    var result = "";
-    if(date) {
-      if(date.getHours() || date.getMinutes()) {
-        result = date.toString($.datetime.defaultFormat);
-      } else {
-        result = date.toString($.datetime.shortFormat);
-      }
-    }
-    return result;
-  };
-  $.datetime.process = function(text) {
-    var date = text;
-    if(typeof(text) == "string") {
-      date = Date.parse((text || "").toString().replace(/ (at|by)/, ""));
-    }
-    var result = "";
-    if(date) {
-      result = date.toString($.datetime.sortableFormat);
-    }
-    return result;
-  };
     /* Based loosely on:
     jQuery ui.timepickr - 0.6.5
     http://code.google.com/p/jquery-utils/

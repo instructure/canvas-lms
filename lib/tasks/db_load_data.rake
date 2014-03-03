@@ -144,7 +144,7 @@ namespace :db do
         Account.default.add_user(user, 'AccountAdmin')
         user
       rescue => e
-        STDERR.puts "Problem creating administrative account, please try again: " + e
+        STDERR.puts "Problem creating administrative account, please try again: #{e}"
         nil
       end
     end

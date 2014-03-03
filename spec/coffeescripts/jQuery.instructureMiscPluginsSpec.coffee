@@ -1,14 +1,13 @@
 define [
   'jquery'
-  'helpers/loadFixture'
   'jquery.instructure_misc_plugins'
-], (jQuery, loadFixture) ->
+], (jQuery) ->
 
   module 'instructure misc plugins'
 
   test 'showIf', ->
-    fixture = loadFixture "jQuery.instructureMiscPlugins"
-    el = jQuery '#checkbox1'
+    el = $('<input type="checkbox" id="checkbox1">').appendTo("#fixtures")
+
     el.showIf(-> true)
     equal(el.is(":visible"), true, 'should show if callback returns true')
 
@@ -22,20 +21,19 @@ define [
 
     el.showIf(true)
     equal(el.is(":visible"), true)
-    equal(el.showIf(-> true), el)
-    equal(el.showIf(-> false), el)
-    equal(el.showIf(true), el)
-    equal(el.showIf(false), el)
+    ok(el.showIf(-> true) is el)
+    ok(el.showIf(-> false) is el)
+    ok(el.showIf(true) is el)
+    ok(el.showIf(false) is el)
 
     el.showIf ->
       ok(this.nodeType)
       notEqual(this.constructor, jQuery)
 
-    fixture.remove()
+    el.remove()
 
   test 'disableIf', ->
-    fixture = loadFixture "jQuery.instructureMiscPlugins"
-    el = jQuery '#checkbox1'
+    el = $('<input type="checkbox" id="checkbox1">').appendTo($("#fixtures"))
 
     el.disableIf(-> true)
     equal(el.is(":disabled"), true)
@@ -56,4 +54,4 @@ define [
     equal(el.disableIf(true), el)
     equal(el.disableIf(false), el)
 
-    fixture.remove()
+    el.remove()

@@ -20,7 +20,7 @@ class QuizGroup < ActiveRecord::Base
   attr_accessible :name, :pick_count, :question_points, :assessment_question_bank_id
   attr_readonly :quiz_id
 
-  belongs_to :quiz
+  belongs_to :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :assessment_question_bank
   has_many :quiz_questions, :dependent => :destroy
 
@@ -45,7 +45,7 @@ class QuizGroup < ActiveRecord::Base
 
   # QuizGroup.data is used when creating and editing a quiz, but
   # once the quiz is "saved" then the "rendered" version of the
-  # quiz is stored in Quiz.quiz_data.  Hence, the teacher can
+  # quiz is stored in Quizzes::Quiz.quiz_data.  Hence, the teacher can
   # be futzing with questions and groups and not affect
   # the quiz, as students see it.
   def data
@@ -136,7 +136,7 @@ class QuizGroup < ActiveRecord::Base
   private
 
   def update_quiz
-    Quiz.mark_quiz_edited(self.quiz_id)
+    Quizzes::Quiz.mark_quiz_edited(self.quiz_id)
   end
 
   def infer_position

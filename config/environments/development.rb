@@ -23,12 +23,9 @@ environment_configuration(defined?(config) && config) do |config|
   # Really do care if the message wasn't sent.
   config.action_mailer.raise_delivery_errors = true
 
-  # initialize cache store
-  # this needs to happen in each environment config file, rather than a
-  # config/initializer/* file, to allow Rails' full initialization of the cache
-  # to take place, including middleware inserts and such.
-  require_dependency 'canvas'
-  config.cache_store = Canvas.cache_store_config
+  # initialize cache store. has to eval, not just require, so that it has
+  # access to config.
+  eval(File.new(File.dirname(__FILE__) + "/cache_store.rb").read)
 
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }

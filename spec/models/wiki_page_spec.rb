@@ -454,4 +454,22 @@ describe WikiPage do
       @page.reload.should be_unpublished
     end
   end
+
+  describe "context_module_action" do
+    it "should process all content tags" do
+      course_with_student_logged_in active_all: true
+      page = @course.wiki.wiki_pages.create! title: 'teh page'
+      mod1 = @course.context_modules.create name: 'module1'
+      tag1 = mod1.add_item type: 'wiki_page', id: page.id
+      mod1.completion_requirements = { tag1.id => { type: 'must_view' } }
+      mod1.save
+      mod2 = @course.context_modules.create name: 'module2'
+      tag2 = mod2.add_item type: 'wiki_page', id: page.id
+      mod2.completion_requirements = { tag2.id => { type: 'must_view' } }
+      mod2.save
+      page.context_module_action(@student, @course, :read)
+      mod1.evaluate_for(@student).requirements_met.detect { |rm| rm[:id] == tag1.id && rm[:type] == 'must_view' }.should_not be_nil
+      mod2.evaluate_for(@student).requirements_met.detect { |rm| rm[:id] == tag2.id && rm[:type] == 'must_view' }.should_not be_nil
+    end
+  end
 end

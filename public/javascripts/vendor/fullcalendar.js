@@ -1,6 +1,6 @@
 /**
  * @preserve
- * FullCalendar v1.5.2
+ * FullCalendar v1.6.4
  * http://arshaw.com/fullcalendar/
  *
  * Use fullcalendar.css for basic styling.
@@ -14,6 +14,7 @@
  * Date: Sat Nov 19 18:21:10 2011 -0800
  *
  * AMD by instructure
+ * Also other edits, marked by INSTRUCTURE:
  */
  
 define(['jquery'], function($, undefined) {
@@ -705,7 +706,9 @@ function Calendar(element, options, eventSources) {
 			.bind('dragstart', function(ev, ui) {
 				var _e = ev.target;
 				var e = $(_e);
-				if (!e.parents('.fc').length) { // not already inside a calendar
+				// INSTRUCTURE: enable dragging to another calendar by checking element
+				// is not contained in *this* calendar, instead of *any* calendar
+				if (!$.contains(_element, _e)) { // not already inside this calendar
 					var accept = options.dropAccept;
 					if ($.isFunction(accept) ? accept.call(_e, e) : e.is(accept)) {
 						_dragElement = _e;
@@ -2566,7 +2569,9 @@ function BasicView(element, calendar, viewName) {
 	
 	coordinateGrid = new CoordinateGrid(function(rows, cols) {
 		var e, n, p;
-		headCells.each(function(i, _e) {
+		// INSTRUCTURE: use bodyRows instead of headCells to calculate cell widths
+		// so we can hide the thead with css.
+		bodyRows.first().find('td').each(function(i, _e) {
 			e = $(_e);
 			n = e.offset().left;
 			if (i) {
@@ -4046,6 +4051,11 @@ function AgendaEventRenderer() {
 		eventElement.draggable({
 			opacity: opt('dragOpacity', 'month'), // use whatever the month view was using
 			revertDuration: opt('dragRevertDuration'),
+			// INSTRUCTURE: Additional drag options to help with dragging to other calendars
+			helper: opt('dragHelper'),
+			appendTo: opt('dragAppendTo'),
+			zIndex: opt('dragZIndex'),
+			cursorAt: opt('dragCursorAt'),
 			start: function(ev, ui) {
 				trigger('eventDragStart', eventElement, event, ev, ui);
 				hideEvents(event, eventElement);
@@ -4150,6 +4160,11 @@ function AgendaEventRenderer() {
 			axis: colCnt==1 ? 'y' : false,
 			opacity: opt('dragOpacity'),
 			revertDuration: opt('dragRevertDuration'),
+			// INSTRUCTURE: Additional drag options to help with dragging to other calendars
+			helper: opt('dragHelper'),
+			appendTo: opt('dragAppendTo'),
+			zIndex: opt('dragZIndex'),
+			cursorAt: opt('dragCursorAt'),
 			start: function(ev, ui) {
 
 				trigger('eventDragStart', eventElement, event, ev, ui);
@@ -5656,6 +5671,11 @@ function DayEventRenderer() {
 			delay: 50,
 			opacity: opt('dragOpacity'),
 			revertDuration: opt('dragRevertDuration'),
+			// INSTRUCTURE: Additional drag options to help with dragging to other calendars
+			helper: opt('dragHelper'),
+			appendTo: opt('dragAppendTo'),
+			zIndex: opt('dragZIndex'),
+			cursorAt: opt('dragCursorAt'),
 			start: function(ev, ui) {
 				trigger('eventDragStart', eventElement, event, ev, ui);
 				hideEvents(event, eventElement);

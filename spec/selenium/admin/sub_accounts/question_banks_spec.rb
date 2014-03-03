@@ -5,6 +5,6 @@ describe "sub account question banks" do
   describe "shared question bank specs" do
     let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
     let(:url) { "/accounts/#{account.id}/question_banks" }
-    it_should_behave_like "question bank basic tests"
+    include_examples "question bank basic tests"
   end
 end

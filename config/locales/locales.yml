@@ -42,3 +42,7 @@ en-GB:
 en-AU:
   locales:
     en-AU: English (Australia)
+tr:
+  locales:
+    tr: Türkçe (crowd-sourced)
+  crowdsourced: true

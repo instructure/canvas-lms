@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'tmpdir'
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe SisBatch do
@@ -25,30 +26,26 @@ describe SisBatch do
 
   def create_csv_data(data)
     i = 0
-    tempfile = Tempfile.new("sis_rspec.zip")
-    path = tempfile.path
-    # we just want the path, and if we don't tell the tempfile to close,
-    # it'll try to delete the file later during finalization, which is
-    # not a convenient time for us.
-    tempfile.close!
-    Zip::File.open(path, Zip::File::CREATE) do |z|
-      data.each do |dat|
-        z.get_output_stream("csv_#{i}.csv") { |f| f.puts(dat) }
-        i += 1
+    Dir.mktmpdir("sis_rspec") do |tmpdir|
+      path = "#{tmpdir}/sisfile.zip"
+      Zip::File.open(path, Zip::File::CREATE) do |z|
+        data.each do |dat|
+          z.get_output_stream("csv_#{i}.csv") { |f| f.puts(dat) }
+          i += 1
+        end
       end
-    end
-    tmp = File.open(path, 'rb')
 
-    # arrrgh attachment.rb
-    def tmp.original_filename; File.basename(path); end
-    old_job_count = Delayed::Job.count
-    batch = SisBatch.create_with_attachment(@account, 'instructure_csv', tmp)
-    # SisBatches shouldn't need any background processing
-    Delayed::Job.count.should == old_job_count
-    yield batch if block_given?
-    batch
-  ensure
-    FileUtils.rm(path) if path and File.file?(path)
+      old_job_count = Delayed::Job.count
+      batch = File.open(path, 'rb') do |tmp|
+        # arrrgh attachment.rb
+        def tmp.original_filename; File.basename(path); end
+        SisBatch.create_with_attachment(@account, 'instructure_csv', tmp)
+      end
+      # SisBatches shouldn't need any background processing
+      Delayed::Job.count.should == old_job_count
+      yield batch if block_given?
+      batch
+    end
   end
 
   def process_csv_data(data, opts = {})

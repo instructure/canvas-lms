@@ -19,19 +19,19 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
-describe QuizSubmissionFilesController, :type => :integration do
+describe QuizSubmissionFilesController, type: :request do
 
   context "quiz submissions file uploads" do
     before do
       course_with_student_logged_in :active_all => true
-      @quiz = Quiz.create!(:title => 'quiz', :context => @course)
+      @quiz = Quizzes::Quiz.create!(:title => 'quiz', :context => @course)
       @quiz.did_edit!
       @quiz.offer!
 
       s = @quiz.generate_submission(@student)
     end
 
-    it_should_behave_like "file uploads api"
+    include_examples "file uploads api"
 
     def preflight(preflight_params)
       json = api_call :post,

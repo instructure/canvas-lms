@@ -30,6 +30,10 @@ class SortLastClass
     nil
   end
 
+  def to_datetime
+    Date::Infinity.new
+  end
+
   def inspect
     'SortLast'
   end

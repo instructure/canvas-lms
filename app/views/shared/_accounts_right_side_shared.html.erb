@@ -8,26 +8,4 @@
       </fieldset>
     <% end -%>
   </div>
-
-  <% js_block do %>
-    <script type="text/javascript">
-    require([
-      'jquery' /* jQuery, $ */,
-      'jqueryui/autocomplete' /* /\.autocomplete/ */
-    ], function($) {
-
-      // disabling until we can make this fast
-      /*$(function(){
-        $("#new_user").find("#user_name").autocomplete({
-          minLength: 4,
-          delay: 150, //miliseconds
-          source: $("#new_user")[0].action + ".json",
-          select: function(event, ui){
-            window.location = $("#new_user")[0].action + "/" + ui.item.id;
-          }
-        });
-      });*/
-    });
-    </script>
-  <% end %>
 <% end %>

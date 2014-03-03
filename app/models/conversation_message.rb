@@ -17,6 +17,8 @@
 #
 
 class ConversationMessage < ActiveRecord::Base
+  include HtmlTextHelper
+
   if CANVAS_RAILS2
     include ActionController::UrlWriter
   else
@@ -226,14 +228,12 @@ class ConversationMessage < ActiveRecord::Base
     recipient = recipients.first
     return unless recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }
 
-    self.extend TextHelper
     title = t(:subject, "Private message, %{timestamp}", :timestamp => date_string(created_at))
     note = format_message(body).first
     recipient.user_notes.create(:creator => author, :title => title, :note => note)
   end
 
   def formatted_body(truncate=nil)
-    self.extend TextHelper
     res = format_message(body).first
     res = truncate_html(res, :max_length => truncate, :words => true) if truncate
     res

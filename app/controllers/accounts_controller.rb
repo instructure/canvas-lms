@@ -433,10 +433,12 @@ class AccountsController < ApplicationController
 
     authentication_logging = @account.grants_rights?(@current_user, :view_statistics, :manage_user_logins).values.any?
     grade_change_logging = @account.grants_rights?(@current_user, :view_grade_changes).values.any?
-    if authentication_logging || grade_change_logging
+    course_logging = @account.grants_rights?(@current_user, :view_course_changes).values.any?
+    if authentication_logging || grade_change_logging || course_logging
       logging = {
         authentication: authentication_logging,
-        grade_change: grade_change_logging
+        grade_change: grade_change_logging,
+        course: course_logging
       }
     end
     logging ||= false

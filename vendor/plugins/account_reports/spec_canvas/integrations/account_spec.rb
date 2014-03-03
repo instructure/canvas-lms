@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../../../spec/spec_helper')
 
-describe "Account Reports" , :type => :integration do
+describe "Account Reports" , type: :request do
 
   it "should see extra text when there is extra text" do
 

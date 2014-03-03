@@ -13,6 +13,7 @@ module Delayed
       def self.included(base)
         base.extend ClassMethods
         base.default_priority = Delayed::NORMAL_PRIORITY
+        base.before_save :initialize_defaults unless CANVAS_RAILS2
       end
 
       attr_writer :current_shard
@@ -309,11 +310,16 @@ module Delayed
       end
 
     public
-      def before_save
+      if CANVAS_RAILS2
+        def before_save
+          initialize_defaults
+        end
+      end
+
+      def initialize_defaults
         self.queue ||= Delayed::Worker.queue
         self.run_at ||= self.class.db_time_now
       end
-
     end
   end
 end

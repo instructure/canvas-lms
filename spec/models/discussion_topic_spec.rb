@@ -39,7 +39,7 @@ describe DiscussionTopic do
   it "should require a valid discussion_type" do
     @topic = course_model.discussion_topics.build(:message => 'test', :discussion_type => "gesundheit")
     @topic.save.should == false
-    @topic.errors.detect { |e| e.first == 'discussion_type' }.should be_present
+    @topic.errors.detect { |e| e.first.to_s == 'discussion_type' }.should be_present
   end
 
   it "should update the assignment it is associated with" do

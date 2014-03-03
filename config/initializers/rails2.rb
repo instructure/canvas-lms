@@ -178,6 +178,16 @@ ActiveRecord::Base.class_eval do
     save_without_rails3_options(options)
   end
   alias_method_chain :save, :rails3_options
+
+  public :assign_attributes
+  def assign_attributes_with_rails3_options(new_attributes, options = {})
+    if options[:without_protection]
+      self.send(:attributes=, new_attributes, false)
+    else
+      assign_attributes_without_rails3_options(new_attributes)
+    end
+  end
+  alias_method_chain :assign_attributes, :rails3_options
 end
 
 ActiveRecord::NamedScope::ClassMethods.module_eval do
@@ -216,6 +226,19 @@ ActiveRecord::NamedScope::Scope.class_eval do
     # no, it's not a freaking Hash, and don't instantiate a gazillion things to find that out
     super || klass >= Array
   end
+
+  remove_method :respond_to_missing?
+#  def respond_to_missing?(method, include_super)
+#    return super if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(method)
+#    super || @proxy_scope.respond_to_missing?(method, include_super)
+#  end
+
+#  def respond_to?(method, include_private = false)
+#    return super if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(method)
+#    super || @proxy_scope.respond_to?(method, include_private)
+#  end
+
+  alias :klass :proxy_scope
 end
 
 ActiveRecord::Associations::AssociationCollection.class_eval do
@@ -346,7 +369,7 @@ ActiveRecord::AutosaveAssociation.class_eval do
               association.send(:insert_record, record)
             end
           elsif autosave
-            saved = record.save(false)
+            saved = record.save(:validate => false)
           end
 
           raise ActiveRecord::Rollback if saved == false
@@ -359,4 +382,25 @@ ActiveRecord::AutosaveAssociation.class_eval do
   end
 end
 
+  ActiveRecord::NamedScope::Scope.class_eval do
+    def where_values
+      Array(scope(:find, :conditions))
+    end
+
+    def select_values
+      Array(scope(:find, :select))
+    end
+
+    def group_values
+      Array(scope(:find, :group))
+    end
+
+    def order_values
+      Array(scope(:find, :order))
+    end
+
+    def shard_value
+      scope(:find, :shard)
+    end
+  end
 end

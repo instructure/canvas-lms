@@ -26,7 +26,7 @@
             <% if submission.pending_review? %>
               <i class="icon-warning"><span class="screenreader-only"><%= t('titles.submission_needs_review', "This submission needs review") %></span></i>
             <% end %>
-          <a href="<%= polymorphic_path([@context, @quiz, :history], :quiz_submission_id => submission.id) %>" class="name">
+          <a href="<%= course_quiz_history_path(@context, @quiz, quiz_submission_id: submission.id) %>" class="name">
             <% if @quiz.anonymous_survey? %>
               <%= t(:anonymous_student, "Student %{user_counter}", :user_counter => index + 1) %>
             <% else %>
@@ -34,7 +34,7 @@
             <% end %>
           </a>
           <% elsif logged_out.present? %>
-            <a href="<%= polymorphic_path([@context, @quiz, :history], :quiz_submission_id => logged_out.id) %>&u_index=<%= anon_index + 1 %>" class="name">
+            <a href="<%= course_quiz_history_path(@context, @quiz, :history, quiz_submission_id: logged_out.id) %>&u_index=<%= anon_index + 1 %>" class="name">
               <%= t(:logged_out_user, "Logged Out User %{user_counter}", :user_counter => anon_index + 1) %>
             </a>
           <% end %>

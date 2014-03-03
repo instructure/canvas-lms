@@ -62,7 +62,7 @@ describe GradebooksController do
       assert_unauthorized
     end
 
-    it" should allow access for a linked observer" do
+    it "should allow access for a linked observer" do
       course_with_student(:active_all => true)
       @student = @user
       user(:active_all => true)
@@ -331,6 +331,13 @@ describe GradebooksController do
         check_grades_page(@due_at + 1.day)
       end
     end
+
+    it "should raise an exception on a non-integer :id" do
+      course_with_teacher_logged_in(:active_all => true)
+      assert_page_not_found do
+        get 'grade_summary', :course_id => @course.id, :id => "lqw"
+      end
+    end
   end
 
   describe "GET 'show'" do
@@ -447,7 +454,7 @@ describe GradebooksController do
 
       it 'should not render gb1 json' do
         get 'show', :course_id => @course.id, :format => :json
-        response.status.to_i.should == 404
+        assert_status(404)
       end
 
       it 'should not prevent you from getting gradebook.csv' do

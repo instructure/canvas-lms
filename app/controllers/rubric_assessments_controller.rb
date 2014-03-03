@@ -74,12 +74,12 @@ class RubricAssessmentsController < ApplicationController
   def update
     @association = @context.rubric_associations.find(params[:rubric_association_id])
     @assessment = @association.rubric_assessments.find_by_id(params[:id])
-    @association_object = @association.association
+    @association_object = @association.association_object
 
     # only check if there's no @assessment object, since that's the only time
     # this param matters (assessing_user_id and arg find_asset_for_assessment)
     user_id = params[:rubric_assessment][:user_id]
-    if !@assessment && user_id !~ /\A\d+\Z/
+    if !@assessment && user_id !~ Api::ID_REGEX
       raise ActiveRecord::RecordNotFound
     end
 

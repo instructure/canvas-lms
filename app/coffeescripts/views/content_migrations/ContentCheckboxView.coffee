@@ -8,10 +8,20 @@ define [
 ], (Backbone, template, checkboxCollectionTemplate, CheckboxCollection, CollectionView, TextHelper) ->
   class ContentCheckboxView extends Backbone.View
     template: template
+    tagName: 'li'
+    attributes: -> 
+      attr = {}
+      attr.role = "treeitem"
+
+      if @model.collection?.isTopLevel
+        attr.class = "top-level-treeitem"
+      else if !(@hasSubItems || @hasSubItemsUrl)
+        attr.class = "small-spacing"
+
+      attr
 
     els: 
       '[data-content=sublevelCheckboxes]' : '$sublevelCheckboxes'
-      '.showHide'                         : '$showHide'
 
     # Bind a change event only to top level checkboxes that are 
     # initially loaded.
@@ -22,27 +32,24 @@ define [
       @hasSubItems = !!@model.get('sub_items')
       @linkedTarget = @model.collection?.linkedTarget
 
-      @$el.on  "click", "#selectAll-#{@cid}", @checkAllChildren
-      @$el.on  "click", "#selectNone-#{@cid}", @uncheckAllChildren
-
-      if @hasSubItemsUrl
-        @$el.on "change", "#checkbox-#{@cid}", @toplevelCheckboxEvents
+      if @hasSubItemsUrl || @hasSubItems
+        @$el.on "fetchCheckboxes", "#carrot-#{@cid}", @toplevelCarrotEvents
 
       if @model.get('linked_resource')
-        @$el.on "change", "#checkbox-#{@cid}", @syncWithLinkedResource
+        @$el.on "click", "#checkbox-#{@cid}", @syncWithLinkedResource
 
     toJSON: -> 
       json = super
       json.hasSubCheckboxes = @hasSubItems || @hasSubItemsUrl
-      json.onlyLabel = @hasSubItems and !@hasSubItemsUrl
-      json.checked = @model.collection?.isTopLevel
-      json.checked ||= true if @model.collection?.linkedTarget
+      json.isTopLevel = @model.collection?.isTopLevel
       json.iconClass = @getIconClass()
+      json.type = @model.get('type')
       json.count = @model.get('count')
-      json.showHide = @model.get('count') || (@hasSubItems and @model.get('sub_items').length > 2)
       linkedItem = @model.get('linked_resource')
+
       if linkedItem && linkedItem.message
         json.linkedMessage = linkedItem.message
+
       json
 
     # This is a map for icon classes depending on the type of checkbox that is being
@@ -64,11 +71,10 @@ define [
       groups:                       "icon-group"
       learning_outcomes:            "icon-standards"
       attachments:                  "icon-document"
-      assignment_groups:            "icon-gradebook"
+      assignment_groups:            "icon-folder"
       folders:                      "icon-folder"
-
     
-    # This retreaves the iconClass out of the iconClasses object map
+    # This retrieves the iconClass out of the iconClasses object map
     # @api private
 
     getIconClass: -> @iconClasses[@model.get('type')]
@@ -78,59 +84,28 @@ define [
     # @api custom backbone override
 
     afterRender: ->
-      if @model.get('linked_resource')
-        if @linkedTarget && @model.get('property') == @linkedTarget
-          @$el.find("#checkbox-#{@cid}").prop('checked', false)
-        else
-          @$el.find("#checkbox-#{@cid}").prop('checked', true)
-          @syncWithLinkedResource()
       if @hasSubItems
         @sublevelCheckboxes = new CheckboxCollection @model.get('sub_items')
         @sublevelCheckboxes.linkedTarget = @linkedTarget if @linkedTarget
         @renderSublevelCheckboxes()
 
-    # Check/Uncheck all children checkboxes. Slice(1) ensures that we do not
-    # uncheck/check the toplevel checkbox. Instead we leave that for the user
-    # to do.
-    # @api private
-
-    checkAllChildren: (event) => 
-      event.preventDefault()
-      if @model.collection?.isTopLevel
-        @$el.find('[type=checkbox]').slice(1).prop('checked', true).trigger('change')
-      else
-        @$el.find('[type=checkbox]').prop('checked', true).trigger('change')
-
-    uncheckAllChildren: (event) => 
-      event.preventDefault()
-      if @model.collection?.isTopLevel
-        @$el.find('[type=checkbox]').slice(1).prop('checked', false).trigger('change')
-      else
-        @$el.find('[type=checkbox]').prop('checked', false).trigger('change')
-
     # Determins if we should hide the sublevel checkboxes or 
-    # fetch new ones. 
+    # fetch new ones based on clicking the carrot next to it.
     # @returns undefined
     # @api private
 
-    toplevelCheckboxEvents: (event) => 
+    toplevelCarrotEvents: (event) =>
       return unless @hasSubItemsUrl
+      event.preventDefault()
 
-      $target = $(event.target)
-      if $target.is(':checked')
-        @$el.find('[type=checkbox]').slice(1).prop('checked', true).trigger('change')
-        @$sublevelCheckboxes.hide()
-        @$showHide.hide()
-      else
-        @$sublevelCheckboxes.show()
-        @$showHide.show()
+      $target = $(event.currentTarget)
 
-        unless @sublevelCheckboxes
+      unless @sublevelCheckboxes
           @linkedTarget = $target.data('linkedTarget')
 
           @fetchSublevelCheckboxes()
           @renderSublevelCheckboxes()
-    
+
     # Attempt to fetch sublevel in a new checkbox collection. Cache
     # the collection so it doesn't call the server twice.
     # @api private
@@ -141,6 +116,8 @@ define [
       @sublevelCheckboxes.linkedTarget = @linkedTarget if @linkedTarget
 
       dfd = @sublevelCheckboxes.fetch()
+      dfd.done => 
+        @$el.find("#carrot-#{@cid}").trigger 'doneFetchingCheckboxes', @$el.find("#checkbox-#{@cid}")
       @$el.disableWhileLoading dfd
     
     # Render all sublevel checkboxes in a collection view. The template
@@ -157,6 +134,14 @@ define [
 
       checkboxCollectionView.render()
 
+    # Items such as Quizzes and Discussions can be duplicated as an item in an Assignment. Since
+    # it wouldn't make sense to just check one of those items we ensure that they are synced together.
+    # If There are duplicate times there will be a 'linked_resource' object that has a migration_id and
+    # type assoicated with it. We are building our own custom 'property' based on these two attributes
+    # so we can ensure they are synced. Whenever we change a checkbox we ensure that a change event
+    # is triggered so indeterminate states of high level checkboxes can be calculated.
+    # returns nada
+
     syncWithLinkedResource: =>
       linkedItem = @model.get('linked_resource')
       checked = @$el.find("#checkbox-#{@cid}").is(':checked')
@@ -165,7 +150,13 @@ define [
 
       $collection_box = $("[name=\"copy[all_#{linkedItem.type}]\"]")
       if !checked && $collection_box.is(':checked')
-        $collection_box.data('linkedTarget', linkedProperty).prop('checked', false).trigger('change')
+        $collection_box.data('linkedTarget', linkedProperty)
+                       .prop
+                         'indeterminate': false, 'checked': false
+                       .trigger('change')
 
       if $linked_el = $("[name=\"#{linkedProperty}\"]")
-        $linked_el.prop('checked', checked)
+        $linked_el.prop
+                    'indeterminate': false
+                    'checked': checked
+                 .trigger('change')

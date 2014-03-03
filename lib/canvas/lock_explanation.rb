@@ -55,22 +55,22 @@ module Canvas
           case type
             when "quiz"
               I18n.t('messages.quiz_locked_module', "This quiz is part of the module *%{module}* and hasn't been unlocked yet.",
-                :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+                :module => HtmlTextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
             when "assignment"
               I18n.t('messages.assignment_locked_module', "This assignment is part of the module *%{module}* and hasn't been unlocked yet.",
-                :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+                :module => HtmlTextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
             when "topic"
               I18n.t('messages.topic_locked_module', "This topic is part of the module *%{module}* and hasn't been unlocked yet.",
-                :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+                :module => HtmlTextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
             when "file"
               I18n.t('messages.file_locked_module', "This file is part of the module *%{module}* and hasn't been unlocked yet.",
-                :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+                :module => HtmlTextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
             when "page"
               I18n.t('messages.page_locked_module', "This page is part of the module *%{module}* and hasn't been unlocked yet.",
-                :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+                :module => HtmlTextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
             else
               I18n.t('messages.content_locked_module', "This content is part of the module *%{module}* and hasn't been unlocked yet.",
-                :module => TextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
+                :module => HtmlTextHelper.escape_html(obj.name), :wrapper => '<b>\1</b>')
           end
         end
         if context && (obj.workflow_state != 'unpublished')

@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Profile do
   context "sub-classing" do
-    before do
+    before(:all) do
       class FooProfile < Profile; end
 
       class Foo < ActiveRecord::Base
@@ -30,10 +30,12 @@ describe Profile do
       end
     end
 
-    after do
-      subclasses = ActiveRecord::Base.send(:class_variable_get, :@@subclasses)[ActiveRecord::Base]
-      subclasses.delete(FooProfile)
-      subclasses.delete(Foo)
+    after(:all) do
+      if CANVAS_RAILS2
+        subclasses = ActiveRecord::Base.send(:class_variable_get, :@@subclasses)[ActiveRecord::Base]
+        subclasses.delete(FooProfile)
+        subclasses.delete(Foo)
+      end
       Object.send(:remove_const, :FooProfile)
       Object.send(:remove_const, :Foo)
     end

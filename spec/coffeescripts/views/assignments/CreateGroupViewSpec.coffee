@@ -6,9 +6,9 @@ define [
   'compiled/models/Assignment'
   'compiled/views/assignments/CreateGroupView'
   'jquery'
-  'helpers/jquery.simulate'
   'helpers/fakeENV'
-], (_, Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, CreateGroupView, $) ->
+  'helpers/jquery.simulate'
+], (_, Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, CreateGroupView, $, fakeENV) ->
 
   group = ->
     new AssignmentGroup
@@ -25,7 +25,9 @@ define [
 
     new CreateGroupView(args)
 
-  module 'CreateGroupView'
+  module 'CreateGroupView',
+    setup: -> fakeENV.setup()
+    teardown: -> fakeENV.teardown()
 
   test 'it should not add errors when never_drop rules are added', ->
     view = createView()

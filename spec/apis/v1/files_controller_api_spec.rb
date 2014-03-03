@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
-describe "Files API", :type => :integration do
+describe "Files API", type: :request do
   context 'locked api item' do
     let(:item_type) { 'file' }
 
@@ -36,7 +36,7 @@ describe "Files API", :type => :integration do
       )
     end
 
-    it_should_behave_like 'a locked api item'
+    include_examples 'a locked api item'
   end
 
   before do
@@ -130,7 +130,7 @@ describe "Files API", :type => :integration do
       upload_data
       raw_api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=abcde",
                    { :controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => "abcde" })
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should fail if the attachment is already available" do
@@ -138,7 +138,7 @@ describe "Files API", :type => :integration do
       @attachment.update_attribute(:file_state, 'available')
       raw_api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
                    { :controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid })
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     context "upload success context callback" do

@@ -104,7 +104,7 @@ describe QuizSubmissionsController do
       QuizSubmission.where(:id => @qs).update_all(:updated_at => 1.hour.ago)
 
       put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test', :validation_token => @qs.validation_token
-      response.status.to_i.should == 401
+      assert_status(401)
 
       @qs.reload.submission_data[:a].should be_nil
     end
@@ -145,7 +145,7 @@ describe QuizSubmissionsController do
 
     it "should require authentication" do
       post 'record_answer', :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test'
-      response.status.to_i.should == 401
+      assert_status(401)
 
       @qsub.reload.submission_data[:a].should be_nil
     end
@@ -154,12 +154,13 @@ describe QuizSubmissionsController do
       user_session(@student)
 
       post 'record_answer', :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test'
-      response.status.to_i.should == 401
+      assert_status(401)
 
       @qsub.reload.submission_data[:a].should be_nil
     end
 
     it "should redirect back to quiz after login if unauthorized" do
+      controller.request.env['HTTP_REFERER'] = 'http://test.host/'
       post 'record_answer', :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test'
       assert_unauthorized
       session[:return_to].should_not be_nil

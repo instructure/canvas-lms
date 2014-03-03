@@ -37,7 +37,7 @@ describe "/discussion_topics/show" do
 
   it "should render in a group context" do
     assignment_model(:submission_types => 'discussion_topic')
-    rubric_association_model(:association => @assignment, :purpose => 'grading')
+    rubric_association_model(:association_object => @assignment, :purpose => 'grading')
     group_model
     view_context(@group, @user)
     @topic = @assignment.discussion_topic

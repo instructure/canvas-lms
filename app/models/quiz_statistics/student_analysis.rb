@@ -1,5 +1,5 @@
 class QuizStatistics::StudentAnalysis < QuizStatistics::Report
-  include TextHelper
+  include HtmlTextHelper
 
   class TemporaryUser < Struct.new(:id, :short_name)
   end

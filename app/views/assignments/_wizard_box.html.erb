@@ -84,48 +84,5 @@
     </div>
   </div>
   <div class="clear"></div>
-<% js_block do %>
-<script>
-require([
-  'jquery' /* $ */,
-  'jquery.instructure_misc_plugins' /* /\.indicate/ */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function($) {
-
-$(document).ready(function() {
-  $(document).bind('add_assignment', function() {
-    if($("#wizard_box .option.create_assignment_option.selected").length > 0) {
-      $("#wizard_box .edit_assignment_option").click();
-    }
-  }).bind('assignment_update', function() {
-    if($("#wizard_box .option.edit_assignment_option.selected").length > 0) {
-      $("#wizard_box .review_assignment_option").click();
-    }
-  });
-  $(".highlight_add_assignment_icon").hover(function() {
-    $link = $(".assignment_group:visible:first").find(".add_assignment_link");
-    if($link.length == 0) {
-      $(".no_groups_message").show();
-    }
-    $("html,body").scrollTo($link);
-    $link.indicate();
-  }, function() {
-    $(".no_groups_message").hide();
-  });
-  $(".highlight_add_assignment_group_icon").hover(function() {
-    var $link = $(".add_group_link:visible:first");
-    $("html,body").scrollTo($link);
-    $link.indicate();
-  }, function() {
-  });
-  $(".highlight_weight_groups").hover(function() {
-    var $item = $("#class_weighting_box");
-    $("html,body").scrollTo($item);
-    $item.indicate();
-  }, function() {});
-});
-
-});
-</script>
-<% end %>
+<% js_bundle 'legacy/assignments_wizard_box' %>
  

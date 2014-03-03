@@ -37,7 +37,7 @@ class QuizRegrader
   def find_quiz_version(quiz)
     return quiz unless quiz_version_number.present?
     Version.where(
-      versionable_type: "Quiz",
+      versionable_type: Quizzes::Quiz.class_names,
       versionable_id: quiz.id,
       number: quiz_version_number).first.model
   end

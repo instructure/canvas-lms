@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe SearchController, :type => :integration do
+describe SearchController, type: :request do
   before do
     @account = Account.default
     course_with_teacher(:active_course => true, :active_enrollment => true, :user => user_with_pseudonym(:active_user => true))

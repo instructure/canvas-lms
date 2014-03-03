@@ -12,12 +12,12 @@ define [
   'compiled/views/calendar/MissingDateDialogView'
   'compiled/views/assignments/AssignmentGroupSelector'
   'compiled/views/assignments/GroupCategorySelector'
+  'compiled/jquery/toggleAccessibly'
   'compiled/tinymce'
   'tinymce.editor_box'
   'jqueryui/dialog'
   'jquery.toJSON'
-  'compiled/jquery.rails_flash_notifications',
-  'compiled/jquery/toggleAccessibly',
+  'compiled/jquery.rails_flash_notifications'
 ], (INST, I18n, ValidatedFormView, _, $, wikiSidebar, template,
 TurnitinSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
 AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
@@ -179,7 +179,11 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
 
     _attachEditorToDescription: =>
       @$description.editorBox()
-      $('.rte_switch_views_link').click preventDefault => @$description.editorBox('toggle')
+      $('.rte_switch_views_link').click (e) =>
+        e.preventDefault()
+        @$description.editorBox 'toggle'
+        # hide the clicked link, and show the other toggle link.
+        $(e.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
 
     _attachDatepickerToDateFields: =>
       if @assignment.isSimple()

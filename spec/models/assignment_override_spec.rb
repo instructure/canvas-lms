@@ -544,7 +544,7 @@ describe AssignmentOverride do
 
   describe "default_values" do
     let(:override) { AssignmentOverride.new }
-    let(:quiz) { Quiz.new }
+    let(:quiz) { Quizzes::Quiz.new }
     let(:assignment) { Assignment.new }
 
     context "when the override belongs to a quiz" do

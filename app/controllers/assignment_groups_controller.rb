@@ -119,10 +119,8 @@ class AssignmentGroupsController < ApplicationController
     if authorized_action(@context.assignment_groups.new, @current_user, :update)
       order = params[:order].split(',')
       @context.assignment_groups.first.update_order(order)
-      respond_to do |format|
-        new_order = @context.assignment_groups.pluck(:id)
-        format.json { render :json => {:reorder => true, :order => new_order}, :status => :ok }
-      end
+      new_order = @context.assignment_groups.pluck(:id)
+      render :json => {:reorder => true, :order => new_order}, :status => :ok
     end
   end
 

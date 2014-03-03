@@ -24,9 +24,9 @@ module Api::V1::AuthenticationEvent
 
   def authentication_event_json(event, user, session)
     links = {
-      :login => Shard.relative_id_for(event.pseudonym_id),
-      :account => Shard.relative_id_for(event.account_id),
-      :user => Shard.relative_id_for(event.user_id),
+      :login => Shard.relative_id_for(event.pseudonym_id, Shard.current, Shard.current),
+      :account => Shard.relative_id_for(event.account_id, Shard.current, Shard.current),
+      :user => Shard.relative_id_for(event.user_id, Shard.current, Shard.current),
       :page_view => event.page_view.nil? ? nil : event.request_id
     }
 

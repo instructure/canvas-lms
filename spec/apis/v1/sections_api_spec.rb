@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe SectionsController, :type => :integration do
+describe SectionsController, type: :request do
   describe '#index' do
     USER_API_FIELDS = %w(id name sortable_name short_name)
 
@@ -462,6 +462,14 @@ describe SectionsController, :type => :integration do
         foreign_course = foreign_account.courses.create!
         api_call(:post, "/api/v1/sections/#{@section.id}/crosslist/#{foreign_course.id}",
                  @params.merge(:id => @section.to_param, :new_course_id => foreign_course.to_param), {}, {}, :expected_status => 404)
+      end
+
+      it "should confirm crosslist by sis id" do
+        @dest_course.update_attribute(:sis_source_id, "blargh")
+        raw_api_call(:get, "/courses/#{@course.id}/sections/#{@section.id}/crosslist/confirm/#{@dest_course.sis_source_id}",
+                 @params.merge(:action => 'crosslist_check', :course_id => @course.to_param, :section_id => @section.to_param, :new_course_id => @dest_course.sis_source_id))
+        json = JSON.parse response.body.gsub(/\Awhile\(1\)\;/, '')
+        json['course']['id'].should eql @dest_course.id
       end
     end
 

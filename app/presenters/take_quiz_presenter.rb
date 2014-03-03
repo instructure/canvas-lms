@@ -171,10 +171,7 @@ class TakeQuizPresenter
   end
 
   def submit_form_action(session, user)
-    polymorphic_path(
-      [quiz.context,quiz,:quiz_submissions],
-      form_action_params(session, user)
-    )
+    course_quiz_quiz_submissions_path(quiz.context, quiz, form_action_params(session, user))
   end
 
   def next_question_form_action(session, user)

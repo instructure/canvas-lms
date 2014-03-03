@@ -27,7 +27,7 @@ class AssignmentOverride < ActiveRecord::Base
   attr_accessor :dont_touch_assignment
 
   belongs_to :assignment
-  belongs_to :quiz
+  belongs_to :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :set, :polymorphic => true
   has_many :assignment_override_students, :dependent => :destroy
 

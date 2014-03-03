@@ -110,57 +110,7 @@
 </p>
 <% else %>
 <% jammit_css :quizzes %>
-<% js_block do %>
-<script>
-require([
-  'i18nObj' /* I18n.t */,
-  'jquery' /* $ */,
-  'compiled/behaviors/quiz_selectmenu'
-], function(I18n, $) {
-
-$(document).ready(function() {
-  $("#questions.assessment_results .question").hover(function() {
-    $(this).addClass('hover');
-  }, function() {
-    $(this).removeClass('hover');
-  });
-});
-$(document).ready(function() {
-  $(".quiz_response_text img").each(function() {
-    $(this).css({
-      borderColor: '#f44',
-      borderStyle: 'solid',
-      borderWidth: '2px',
-      padding: 2
-    }).attr('title', <%= jt('titles.this_is_an_image', 'This is an image, not text, and could have changed since the student submitted') %>);
-  });
-  $(".quiz_response_text iframe").each(function() {
-    $(this).css({
-      borderColor: '#f44',
-      borderStyle: 'solid',
-      borderWidth: '2px',
-      padding: 2
-    }).attr('title', <%= jt('titles.this_is_an_external_frame', 'This is an external frame, not text, and could have changed since the student submitted') %>);
-  });
-  var $list = $("nothing");
-  $(".quiz_response_text").find("object,embed").each(function() {
-    $list.add($(this).parents("object,embed:first"));
-  });
-  $list.each(function() {
-    var $holder = $("<span/>").css('display', 'inline-block');
-    $holder.before($(this));
-    $holder.append($(this));
-    $holder.css({
-      borderColor: '#f44',
-      borderStyle: 'solid',
-      borderWidth: '2px',
-      padding: 2
-    }).attr('title', <%= jt('titles.this_is_an_external_element', 'This is an external element, not text, and could have changed since the student submitted') %>);
-  });
-});
-});
-</script>
-<% end %>
+<% js_bundle 'legacy/quiz_submission' %>
 <div id="questions" class="assessment_results <%= 'survey_results' if @quiz.survey? %> <%= (show_correct_answers? ? 'show_correct_answers' : 'suppress_correct_answers') %>">
   <%= render :partial => "quizzes/display_question", :collection => submission_questions, :locals => {:assessment_results => true, :user_answer_hash => submission_data_hash, :editable => editable} %>
 </div>

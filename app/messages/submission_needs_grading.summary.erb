@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= polymorphic_path([asset.quiz.context,asset.quiz,:history],:quiz_submission_id => asset.id) %>
+  <%= HostUrl.protocol %>://<%= course_quiz_history_path(asset.quiz.context, asset.quiz, quiz_submission_id: asset.id) %>
 <% end %>
 
 <% define_content :subject do %>

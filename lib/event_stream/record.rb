@@ -43,11 +43,7 @@ class EventStream::Record < Struct.new(:attributes)
       @page_view = attributes.delete('page_view')
     end
 
-    if CANVAS_RAILS3
-      attributes['event_type'] ||= self.class.name.deconstantize.demodulize.underscore
-    else
-      attributes['event_type'] ||= self.class.name.gsub("::#{self.class.name.demodulize}", '').demodulize.underscore
-    end
+    attributes['event_type'] ||= self.class.name.gsub("::#{self.class.name.demodulize}", '').demodulize.underscore
   end
 
   def changes

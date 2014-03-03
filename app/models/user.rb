@@ -24,7 +24,6 @@ class User < ActiveRecord::Base
   end
 
   include Context
-  include UserFollow::FollowedItem
 
   attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use, :self_enrollment_code, :initial_enrollment_type
   attr_accessor :previous_id, :menu_data
@@ -131,7 +130,7 @@ class User < ActiveRecord::Base
   end
 
   has_many :communication_channels, :order => 'communication_channels.position ASC', :dependent => :destroy
-  has_one :communication_channel, :order => 'position'
+  has_one :communication_channel, :conditions => ["workflow_state<>'retired'"], :order => 'position'
   has_many :enrollments, :dependent => :destroy
 
   has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:active), :order => 'enrollments.created_at'
@@ -220,13 +219,6 @@ class User < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :messages
 
-  has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
-  has_many :user_follows, :foreign_key => 'following_user_id'
-
-  has_many :collections, :as => :context
-  has_many :collection_items, :through => :collections
-  has_many :collection_item_upvotes
-
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile
 
@@ -248,7 +240,7 @@ class User < ActiveRecord::Base
     PageView.for_user(self, options)
   end
 
-  scope :of_account, lambda { |account| where("EXISTS (?)", account.user_account_associations.where("user_account_associations.user_id=users.id")) }
+  scope :of_account, lambda { |account| where("EXISTS (?)", account.user_account_associations.where("user_account_associations.user_id=users.id")).shard(account.shard) }
   scope :recently_logged_in, lambda {
     includes(:pseudonyms).
         where("pseudonyms.current_login_at>?", 1.month.ago).
@@ -274,25 +266,21 @@ class User < ActiveRecord::Base
     order_clause = clause = sortable_name_order_by_clause
     order_clause = "#{clause} DESC" if options[:direction] == :descending
     scope = self.order(order_clause)
-    if CANVAS_RAILS2
-      if (scope.scope(:find, :select))
-        scope = scope.select(clause)
-      end
-    else
-      if scope.select_values.empty?
-        scope = scope.select(self.arel_table[Arel.star])
-      end
+    if !CANVAS_RAILS2 && scope.select_values.empty?
+      scope = scope.select(self.arel_table[Arel.star])
+    end
+    if scope.select_values.present?
       scope = scope.select(clause)
     end
-    if CANVAS_RAILS2 ? scope.scope(:find, :group) : scope.group_values.present?
+    if scope.group_values.present?
       scope = scope.group(clause)
     end
     scope
   end
 
   def self.by_top_enrollment
-    scope = self
-    if (!scope.scope(:find, :select))
+    scope = self.scoped
+    if scope.select_values.blank?
       scope = scope.select("users.*")
     end
     scope.select("MIN(#{Enrollment.type_rank_sql(:student)}) AS enrollment_rank").
@@ -512,7 +500,9 @@ class User < ActiveRecord::Base
         data[:courses] += Course.select([:id, :account_id]).where(:id => course_ids.to_a).all unless course_ids.empty?
 
         data[:pseudonyms] += Pseudonym.active.select([:user_id, :account_id]).uniq.where(:user_id => shard_user_ids).all
-        data[:account_users] += AccountUser.select([:user_id, :account_id]).uniq.where(:user_id => shard_user_ids).all
+        AccountUser.send(:with_exclusive_scope) do
+          data[:account_users] += AccountUser.select([:user_id, :account_id]).uniq.where(:user_id => shard_user_ids).all
+        end
       end
       # now make it easy to get the data by user id
       data[:enrollments] = data[:enrollments].group_by(&:user_id)
@@ -992,9 +982,6 @@ class User < ActiveRecord::Base
   set_policy do
     given { |user| user == self }
     can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar and can :manage_feature_flags
-
-    given { |user| user.present? && self.public? }
-    can :follow
 
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
@@ -1906,7 +1893,7 @@ class User < ActiveRecord::Base
     time = opts[:time] || Time.zone.now
     assignments.select do |a|
       if a.grants_right?(self, nil, :delete)
-        a.all_dates_visible_to(self).any? do |due_hash|
+        a.dates_hash_visible_to(self).any? do |due_hash|
           due_hash[:due_at] && due_hash[:due_at] >= time && due_hash[:due_at] <= opts[:end_at]
         end
       else
@@ -2321,7 +2308,7 @@ class User < ActiveRecord::Base
 
     # Return ids relative for the current shard and only the ids for the current shard.
     context_ids.map { |id|
-      Shard.relative_id_for(id) if Shard.current == Shard.shard_for(id)
+      Shard.relative_id_for(id, Shard.current, Shard.current) if Shard.current == Shard.shard_for(id)
     }.compact
   end
 
@@ -2426,10 +2413,6 @@ class User < ActiveRecord::Base
 
   def private?
     not public?
-  end
-
-  def default_collection_name
-    t('#user.default_collection_name', "%{user_name}'s Collection", :user_name => self.short_name)
   end
 
   def profile(force_reload = false)
@@ -2570,7 +2553,11 @@ class User < ActiveRecord::Base
   end
 
   def all_accounts
-    @all_accounts ||= self.accounts.with_each_shard
+    @all_accounts ||= shard.activate do
+      Rails.cache.fetch(['all_accounts', self].cache_key) do
+        self.accounts.with_each_shard
+      end
+    end
   end
 
   def all_paginatable_accounts

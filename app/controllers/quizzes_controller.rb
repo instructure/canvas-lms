@@ -18,7 +18,7 @@
 
 class QuizzesController < ApplicationController
   include Api::V1::Quiz
-  include Api::V1::QuizStatistics
+  include Api::V1::QuizReport
   include Api::V1::AssignmentOverride
   include KalturaHelper
 
@@ -147,14 +147,14 @@ class QuizzesController < ApplicationController
       if @submission
         upload_url = api_v1_quiz_submission_files_path(:course_id => @context.id, :quiz_id => @quiz.id)
         js_env :UPLOAD_URL => upload_url
-        js_env :SUBMISSION_VERSIONS_URL => polymorphic_url([@context, @quiz, 'submission_versions']) unless @quiz.muted?
+        js_env :SUBMISSION_VERSIONS_URL => course_quiz_submission_versions_url(@context, @quiz) unless @quiz.muted?
       end
 
       setup_attachments
       submission_counts if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
-      hash = { :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
+      hash = { :QUIZZES_URL => course_quizzes_url(@context),
              :IS_SURVEY => @quiz.survey?,
              :QUIZ => quiz_json(@quiz,@context,@current_user,session),
              :COURSE_ID => @context.id,
@@ -223,8 +223,8 @@ class QuizzesController < ApplicationController
              :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_visible_to(@current_user)),
              :QUIZ => quiz_json(@quiz, @context, @current_user, session),
              :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
-             :QUIZZES_URL => polymorphic_url([@context, :quizzes]),
-             :QUIZ_IP_FILTERS_URL => polymorphic_url([:api, :v1, @context, @quiz, :ip_filters]),
+             :QUIZZES_URL => course_quizzes_url(@context),
+             :QUIZ_IP_FILTERS_URL => api_v1_course_quiz_ip_filters_url(@context, @quiz),
              :CONTEXT_ACTION_SOURCE => :quizzes,
              :REGRADE_OPTIONS => regrade_options }
       append_sis_data(hash)
@@ -418,8 +418,9 @@ class QuizzesController < ApplicationController
 
             js_env :quiz_reports => QuizStatistics::REPORTS.map { |report_type|
               report = @quiz.current_statistics_for(report_type, :includes_all_versions => all_versions)
-              json = quiz_statistics_json(report, @current_user, session, :include => ['file'])
+              json = quiz_report_json(report, @current_user, session, :include => ['file'])
               json[:course_id] = @context.id
+              json[:report_disabled] = @quiz.survey? && report_type == "item_analysis"
               json[:report_name] = report.readable_type
               json[:progress] = progress_json(report.progress, @current_user, session) if report.progress
               json
@@ -630,7 +631,7 @@ class QuizzesController < ApplicationController
 
   def force_user
     if !@current_user
-      session[:return_to] = polymorphic_path([@context, @quiz])
+      session[:return_to] = course_quiz_path(@context, @quiz)
       redirect_to login_path
     end
     return @current_user.present?
@@ -691,7 +692,7 @@ class QuizzesController < ApplicationController
         take_quiz
       else
         # redirect to avoid refresh issues
-        redirect_to polymorphic_url([@context, @quiz, 'take'], quiz_redirect_params(:preview => params[:preview]))
+        redirect_to course_quiz_take_url(@context, @quiz, quiz_redirect_params(:preview => params[:preview]))
       end
     else
       flash[:error] = t('errors.no_more_attempts', "You have no quiz attempts left") unless @just_graded

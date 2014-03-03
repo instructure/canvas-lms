@@ -22,9 +22,9 @@
 # The other purpose of this class is just to make rubrics reusable.
 class RubricAssociation < ActiveRecord::Base
   attr_accessor :skip_updating_points_possible
-  attr_accessible :rubric, :association, :context, :use_for_grading, :title, :description, :summary_data, :purpose, :url, :hide_score_total, :bookmarked
+  attr_accessible :rubric, :association_object, :context, :use_for_grading, :title, :description, :summary_data, :purpose, :url, :hide_score_total, :bookmarked
   belongs_to :rubric
-  belongs_to :association, :polymorphic => true
+  belongs_to :association_object, :polymorphic => true, :foreign_type => :association_type, :foreign_key => :association_id
 
   belongs_to :context, :polymorphic => true
   has_many :rubric_assessments, :dependent => :nullify
@@ -90,8 +90,8 @@ class RubricAssociation < ActiveRecord::Base
   end
   
   def assignment
-    if self.association.is_a?(Assignment)
-      self.association
+    if self.association_object.is_a?(Assignment)
+      self.association_object
     else
       nil
     end
@@ -123,7 +123,7 @@ class RubricAssociation < ActiveRecord::Base
   def update_values
     self.bookmarked = true if self.purpose == 'bookmark' || self.bookmarked.nil?
     self.context_code ||= "#{self.context_type.underscore}_#{self.context_id}" rescue nil
-    self.title ||= (self.association.title rescue self.association.name) rescue nil
+    self.title ||= (self.association_object.title rescue self.association_object.name) rescue nil
   end
   protected :update_values
   
@@ -141,8 +141,8 @@ class RubricAssociation < ActiveRecord::Base
   end
   
   def update_assignment_points
-    if self.use_for_grading && !self.skip_updating_points_possible && self.association && self.association.respond_to?(:points_possible=) && self.rubric && self.rubric.points_possible && self.association.points_possible != self.rubric.points_possible
-      self.association.update_attribute(:points_possible, self.rubric.points_possible) 
+    if self.use_for_grading && !self.skip_updating_points_possible && self.association_object && self.association_object.respond_to?(:points_possible=) && self.rubric && self.rubric.points_possible && self.association_object.points_possible != self.rubric.points_possible
+      self.association_object.update_attribute(:points_possible, self.rubric.points_possible)
     end
   end
   protected :update_assignment_points
@@ -176,7 +176,7 @@ class RubricAssociation < ActiveRecord::Base
     # Update each submission's assessment_requests with a link to this rubric association
     # but only if not already associated and the assessment is incomplete.
     if self.association_id && self.association_type == 'Assignment'
-      self.association.submissions.each do |sub|
+      self.association_object.submissions.each do |sub|
         sub.assessment_requests.incomplete.where(:rubric_association_id => nil).
             update_all(:rubric_association_id => self)
       end
@@ -190,11 +190,11 @@ class RubricAssociation < ActiveRecord::Base
   
   def self.generate(current_user, rubric, context, params)
     raise "context required" unless context
-    association_object = params.delete :association
+    association_object = params.delete :association_object
     if (association_id = params.delete(:id)) && association_id.present?
       association = RubricAssociation.find_by_id(association_id)
     end
-    association = nil unless association && association.context == context && association.association == association_object
+    association = nil unless association && association.context == context && association.association_object == association_object
     raise "association required" unless association || association_object
     # Update/create the association -- this is what ties the rubric to an entity
     update_if_existing = params.delete(:update_if_existing)
@@ -203,12 +203,12 @@ class RubricAssociation < ActiveRecord::Base
     association.context = context
     association.skip_updating_points_possible = params.delete :skip_updating_points_possible
     association.update_attributes(params)
-    association.association = association_object
+    association.association_object = association_object
     association
   end
   
   def assessments_unique_per_asset?(assessment_type)
-    self.association.is_a?(Assignment) && self.purpose == "grading" && assessment_type == "grading"
+    self.association_object.is_a?(Assignment) && self.purpose == "grading" && assessment_type == "grading"
   end
 
   def assess(opts={})
@@ -222,10 +222,10 @@ class RubricAssociation < ActiveRecord::Base
     raise "Artifact required for assessing" unless opts[:artifact]
     raise "Assessment type required for assessing" unless params[:assessment_type]
     
-    if self.association.is_a?(Assignment) && !self.association.grade_group_students_individually
-      students_to_assess = self.association.group_students(opts[:artifact].user).last
+    if self.association_object.is_a?(Assignment) && !self.association_object.grade_group_students_individually
+      students_to_assess = self.association_object.group_students(opts[:artifact].user).last
       artifacts_to_assess = students_to_assess.map do |student| 
-        self.association.find_asset_for_assessment(self, student).first 
+        self.association_object.find_asset_for_assessment(self, student).first
       end
     else
       artifacts_to_assess = [opts[:artifact]]

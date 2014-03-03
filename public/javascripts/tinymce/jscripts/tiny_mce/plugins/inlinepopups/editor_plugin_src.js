@@ -1,3 +1,5 @@
+define(['tinymce/jscripts/tiny_mce/tiny_mce_src'], function() {
+
 /**
  * editor_plugin_src.js
  *
@@ -697,3 +699,4 @@
 	tinymce.PluginManager.add('inlinepopups', tinymce.plugins.InlinePopups);
 })();
 
+});

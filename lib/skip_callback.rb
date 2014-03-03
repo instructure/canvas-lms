@@ -68,7 +68,7 @@ class ActiveRecord::Base
           elsif name == :save
             yield
           else
-            run_callbacks_orig(name, &Proc.new)
+            run_callbacks_orig(name, &Proc.new{})
           end
         end
       end

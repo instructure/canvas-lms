@@ -22,7 +22,7 @@ class QuizQuestion::EssayQuestion < QuizQuestion::Base
   end
 
   def correct_answer_parts(user_answer)
-    config = Instructure::SanitizeField::SANITIZE
+    config = CanvasSanitize::SANITIZE
     user_answer.answer_details[:text] = Sanitize.clean(user_answer.answer_text, config) || ""
     nil
   end
@@ -33,7 +33,7 @@ class QuizQuestion::EssayQuestion < QuizQuestion::Base
     responses.each do |response|
       stats[:essay_responses] << {
         :user_id => response[:user_id],
-        :text => response[:text].strip
+        :text => response[:text].to_s.strip
       }
     end
 

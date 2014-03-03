@@ -649,7 +649,8 @@ describe Assignment do
         sub = yield(@assignment, @user)
       }.should_not raise_error
       sub.should_not be_new_record
-      sub.should eql real_sub
+      sub.user.should eql real_sub.user
+      sub.assignment.should eql real_sub.assignment
     end
 
     it "should handle them gracefully in find_or_create_submission" do
@@ -1092,7 +1093,7 @@ describe Assignment do
       @quiz.assignment_id.should eql(@a.id)
       @a.submission_types = 'on_paper'
       @a.save!
-      @quiz = Quiz.find(@quiz.id)
+      @quiz = Quizzes::Quiz.find(@quiz.id)
       @quiz.assignment_id.should eql(nil)
       @quiz.state.should eql(:deleted)
       @a.reload
@@ -1117,7 +1118,7 @@ describe Assignment do
       @a.reload
       @a.quiz.should be_nil
       @a.state.should eql(:published)
-      @quiz = Quiz.find(@quiz.id)
+      @quiz = Quizzes::Quiz.find(@quiz.id)
       @quiz.assignment_id.should eql(nil)
       @quiz.state.should eql(:created)
     end

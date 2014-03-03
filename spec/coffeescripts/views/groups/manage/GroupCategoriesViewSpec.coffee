@@ -3,16 +3,15 @@ define [
   'compiled/views/groups/manage/GroupCategoriesView'
   'compiled/collections/GroupCategoryCollection'
   'compiled/models/GroupCategory'
-  'compiled/views/groups/manage/GroupCategoryView'
   'helpers/fakeENV'
-], ($, GroupCategoriesView, GroupCategoryCollection, GroupCategory) ->
-
+], ($, GroupCategoriesView, GroupCategoryCollection, GroupCategory, fakeENV) ->
   clock = null
   view = null
   categories = null
 
   module 'GroupCategoriesView',
     setup: ->
+      fakeENV.setup()
       ENV.group_categories_url = '/api/v1/courses/1/group_categories'
       clock = sinon.useFakeTimers()
       categories = new GroupCategoryCollection [
@@ -25,6 +24,7 @@ define [
       view.$el.appendTo($(document.body))
 
     teardown: ->
+      fakeENV.teardown()
       clock.restore()
       view.remove()
       $('.group_categories_area').remove()

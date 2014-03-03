@@ -102,10 +102,10 @@ describe "BookmarkedCollection" do
 
   describe ".merge" do
     before :each do
-      @created_scope = Course.where(:workflow_state => 'created')
-      @deleted_scope = Course.where(:workflow_state => 'deleted')
+      account = Account.create!
+      @created_scope = account.courses.where(:workflow_state => 'created')
+      @deleted_scope = account.courses.where(:workflow_state => 'deleted')
 
-      Course.delete_all
       @created_course1 = @created_scope.create!
       @deleted_course1 = @deleted_scope.create!
       @created_course2 = @created_scope.create!
@@ -145,10 +145,13 @@ describe "BookmarkedCollection" do
 
     context "with a merge proc" do
       before :each do
+        (@created_scope.to_a + @deleted_scope.to_a).each do |c|
+          c.course_account_associations.scoped.delete_all
+          c.destroy!
+        end
+
         # the name bookmarker will generate the same bookmark for both of the
         # courses.
-        CourseAccountAssociation.delete_all
-        Course.delete_all
         @created_course = @created_scope.create!(:name => "Same Name")
         @deleted_course = @deleted_scope.create!(:name => "Same Name")
 
@@ -167,10 +170,13 @@ describe "BookmarkedCollection" do
 
     context "with ties across collections" do
       before :each do
+        (@created_scope.to_a + @deleted_scope.to_a).each do |c|
+          c.course_account_associations.scoped.delete_all
+          c.destroy!
+        end
+
         # the name bookmarker will generate the same bookmark for both of the
         # courses.
-        CourseAccountAssociation.delete_all
-        Course.delete_all
         @created_course = @created_scope.create!(:name => "Same Name")
         @deleted_course = @deleted_scope.create!(:name => "Same Name")
 
@@ -200,10 +206,10 @@ describe "BookmarkedCollection" do
 
   describe ".concat" do
     before :each do
-      @created_scope = Course.where(:workflow_state => 'created')
-      @deleted_scope = Course.where(:workflow_state => 'deleted')
+      account = Account.create!
+      @created_scope = account.courses.where(:workflow_state => 'created')
+      @deleted_scope = account.courses.where(:workflow_state => 'deleted')
 
-      Course.delete_all
       @created_course1 = @created_scope.create!
       @deleted_course1 = @deleted_scope.create!
       @created_course2 = @created_scope.create!
@@ -256,16 +262,15 @@ describe "BookmarkedCollection" do
 
   describe "nested compositions" do
     before :each do
-      @user_scope = User
-      @created_scope = Course.where(:workflow_state => 'created')
-      @deleted_scope = Course.where(:workflow_state => 'deleted')
+      account = Account.create!
+      @created_scope = account.courses.where(:workflow_state => 'created')
+      @deleted_scope = account.courses.where(:workflow_state => 'deleted')
 
       # user's names are so it sorts Created X < Creighton < Deanne < Deleted
       # X when using NameBookmarks
-      Course.delete_all
-      User.delete_all
-      @user1 = @user_scope.create!(:name => "Creighton")
-      @user2 = @user_scope.create!(:name => "Deanne")
+      @user1 = User.create!(:name => "Creighton")
+      @user2 = User.create!(:name => "Deanne")
+      @user_scope = User.where(id: [@user1, @user2])
       @created_course1 = @created_scope.create!(:name => "Created 1")
       @deleted_course1 = @deleted_scope.create!(:name => "Deleted 1")
       @created_course2 = @created_scope.create!(:name => "Created 2")

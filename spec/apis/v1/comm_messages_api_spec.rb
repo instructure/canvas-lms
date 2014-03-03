@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe CommMessagesApiController, :type => :integration do
+describe CommMessagesApiController, type: :request do
   describe "index" do
     context "a site admin" do
       context "with permission" do

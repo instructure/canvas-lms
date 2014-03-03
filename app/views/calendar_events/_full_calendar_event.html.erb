@@ -59,7 +59,10 @@
     <% end %>
     <tr>
       <td colspan="4">
-        <a href="#" style="font-size: 0.8em; float: right;" class="switch_full_calendar_event_view"><%= t '#links.switch_views', "Switch Views" %></a>
+        <div style="font-size: 0.8em; float: right;">
+          <a href="#" class="switch_full_calendar_event_view"><%= t '#editor.switch_editor_html', "HTML Editor" %></a>
+          <a href="#" class="switch_full_calendar_event_view" style="display:none;"><%= t '#editor.switch_editor_visual', "Visual Editor" %></a>
+        </div>
         <div>
           <%= before_label :event_description, "Event Description" %>
         </div>

@@ -14,6 +14,21 @@ class ActiveRecord::Base
     end
 
     alias :clone :dup
+
+    def serializable_hash(options = nil)
+      if options && options[:include_root]
+        {self.class.base_ar_class.model_name.element => super}
+      else
+        super
+      end
+    end
+
+    # See ActiveModel#serializable_add_includes
+    def serializable_add_includes(options = {}, &block)
+      super(options) do |association, records, opts|
+        yield association, records, opts.merge(:include_root => options[:include_root])
+      end
+    end
   end
 
   if CANVAS_RAILS2
@@ -292,7 +307,7 @@ class ActiveRecord::Base
 
     self.revert_from_serialization_options if self.respond_to?(:revert_from_serialization_options)
 
-    hash
+    hash.with_indifferent_access
   end
 
   def class_name
@@ -427,6 +442,7 @@ class ActiveRecord::Base
   end
 
   def self.distinct_on(columns, options)
+    columns = Array(columns)
     bad_options = options.keys - [:select, :order]
     if bad_options.present?
       # while it's possible to make this work with :limit, it would be gross
@@ -435,8 +451,8 @@ class ActiveRecord::Base
     end
 
     native = (connection.adapter_name == 'PostgreSQL')
-    options[:select] = "DISTINCT ON (#{Array(columns).join(', ')}) " + (options[:select] || '*') if native
-    raise "distinct on columns must match the leftmost part of the order-by clause" unless options[:order] && options[:order] =~ /\A#{Array(columns).map{ |c| Regexp.escape(c) }.join(' *(?:asc|desc)?, *')}/i
+    options[:select] = "DISTINCT ON (#{columns.join(', ')}) " + (options[:select] || '*') if native
+    raise "distinct on columns must match the leftmost part of the order-by clause" unless options[:order] && options[:order] =~ /\A#{columns.map{ |c| Regexp.escape(c) }.join(' *(?:asc|desc)?, *')}/i
 
     scope = self
     scope = scope.select(options[:select]) if options[:select]
@@ -673,13 +689,31 @@ class ActiveRecord::Base
   # note this does a raw connection.select_values, so it doesn't work with scopes
   def self.find_ids_in_batches(options = {})
     batch_size = options[:batch_size] || 1000
-    ids = connection.select_values("select #{primary_key} from #{table_name} order by #{primary_key} limit #{batch_size.to_i}")
+    if CANVAS_RAILS2
+      scope = scope(:find) || {}
+      scope[:select] = primary_key
+      scope[:order] = primary_key
+      scope[:limit] = batch_size
+      ids = nil
+      with_exclusive_scope(find: scope) do
+        ids = connection.select_values(scoped.to_sql)
+      end
+    else
+      scope = except(:select).select(primary_key).reorder(primary_key).limit(batch_size)
+      ids = connection.select_values(scope.to_sql)
+    end
     ids = ids.map(&:to_i) unless options[:no_integer_cast]
     while ids.present?
       yield ids
       break if ids.size < batch_size
       last_value = ids.last
-      ids = connection.select_values(sanitize_sql_array(["select #{primary_key} from #{table_name} where #{primary_key} > ? order by #{primary_key} limit #{batch_size.to_i}", last_value]))
+      if CANVAS_RAILS2
+        with_exclusive_scope(find: scope) do
+          ids = connection.select_values(where("#{primary_key}>?", last_value).to_sql)
+        end
+      else
+        ids = connection.select_values(scope.where("#{primary_key}>?", last_value).to_sql)
+      end
       ids = ids.map(&:to_i) unless options[:no_integer_cast]
     end
   end
@@ -691,7 +725,7 @@ class ActiveRecord::Base
     subquery_scope = self.scoped.except(:select).select("#{quoted_table_name}.#{primary_key} as id").reorder(primary_key).limit(batch_size)
     ids = connection.select_rows("select min(id), max(id) from (#{subquery_scope.to_sql}) as subquery").first
     while ids.first.present?
-      ids.map!(&:to_i) if columns_hash[primary_key].type == :integer
+      ids.map!(&:to_i) if columns_hash[primary_key.to_s].type == :integer
       yield(*ids)
       last_value = ids.last
       next_subquery_scope = subquery_scope.where(["#{quoted_table_name}.#{primary_key}>?", last_value])
@@ -854,7 +888,7 @@ unless CANVAS_RAILS2
       # already in a transaction (or transactions don't matter); cursor is fine
       if (connection.adapter_name == 'PostgreSQL' && (Shackles.environment == :slave || connection.open_transactions > (Rails.env.test? ? 1 : 0))) && !options[:start]
         self.activate { find_in_batches_with_cursor(options, &block) }
-      elsif order_values.any? || group_values.any? || select_values.to_s =~ /DISTINCT/i
+      elsif order_values.any? || group_values.any? || select_values.to_s =~ /DISTINCT/i || uniq_value
         raise ArgumentError.new("GROUP and ORDER are incompatible with :start") if options[:start]
         self.activate { find_in_batches_with_temp_table(options, &block) }
       else
@@ -1023,12 +1057,21 @@ unless CANVAS_RAILS2
     alias_method_chain :delete_all, :limit
   end
 
-  def with_each_shard
-    if block_given?
-      Array(yield(self))
-    else
-      self.to_a
+  def with_each_shard(*args)
+    scope = self
+    if (owner = self.try(:proxy_association).try(:owner)) && self.shard_category != :explicit
+      scope = scope.shard(owner)
     end
+    scope = scope.shard(args) if args.any?
+    if block_given?
+      scope.activate{|rel| yield(rel) }
+    else
+      scope.to_a
+    end
+  end
+
+  ActiveRecord::Associations::CollectionProxy.class_eval do
+    delegate :with_each_shard, :to => :scoped
   end
 end
 
@@ -1356,6 +1399,8 @@ end
 else
 
 class ActiveModel::Errors
+  alias :length :size
+
   def as_json(*a)
     {:errors => Hash[to_hash.map{|k,v| [k, v.map{|m| {:attribute => k, :message => m, :type => m}}]}]}.as_json(*a)
   end
@@ -1754,6 +1799,29 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
 
 end
 
+unless CANVAS_RAILS2
+  ActiveRecord::AttributeMethods::Serialization::Attribute.class_eval do
+    def unserialize
+      self.state = :unserialized
+      if value.nil?
+        nil
+      else
+        self.value = coder.load(value)
+      end
+    end
+
+    def serialized_value
+      return nil if value.nil?
+      unserialize if state == :serialized
+      coder.dump(value)
+    end
+
+    def serialize
+      serialized_value
+    end
+  end
+end
+
 if Rails.version >= '3' && Rails.version < '4'
   ActiveRecord::Sanitization::ClassMethods.module_eval do
     def quote_bound_value_with_relations(value, c = connection)
@@ -1764,5 +1832,28 @@ if Rails.version >= '3' && Rails.version < '4'
       end
     end
     alias_method_chain :quote_bound_value, :relations
+  end
+end
+
+if Rails.version < '4'
+  klass = ActiveRecord::ConnectionAdapters::Mysql2Column if defined?(ActiveRecord::ConnectionAdapters::Mysql2Column)
+  klass = ActiveRecord::ConnectionAdapter::AbstractMysqlAdapter::Column if defined?(ActiveRecord::ConnectionAdapter::AbstractMysqlAdapter::Column)
+  if klass
+    klass.class_eval do
+      def extract_default(default)
+        if sql_type =~ /blob/i || type == :text
+          if default.blank?
+            # CHANGED - don't believe the '' default
+            return nil
+          else
+            raise ArgumentError, "#{type} columns cannot have a default value: #{default.inspect}"
+          end
+        elsif missing_default_forged_as_empty_string?(default)
+          nil
+        else
+          super
+        end
+      end
+    end
   end
 end

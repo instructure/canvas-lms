@@ -49,7 +49,7 @@ describe QuizQuestion::AnswerParsers::MissingWord do
     let(:parser_class) { QuizQuestion::AnswerParsers::MissingWord }
 
     context "in general" do
-      it_should_behave_like "All answer parsers"
+      include_examples "All answer parsers"
     end
 
     context "with no answer specified as correct" do

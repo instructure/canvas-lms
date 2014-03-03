@@ -89,6 +89,7 @@ define [
       $.mediaComment.init(mediaType, initOpts)
 
     show_inline: (id, mediaType = 'video', downloadUrl) ->
+      # todo: replace .andSelf with .addBack when JQuery is upgraded.
       $holder = $(this).closest('.instructure_file_link_holder').andSelf().first()
       $holder.text I18n.t('loading', 'Loading media...')
 

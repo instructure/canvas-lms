@@ -56,6 +56,8 @@ define([
     $('#wiki_edit_view_main .wiki_switch_views_link').click(function(event) {
       event.preventDefault();
       $("#wiki_page_body").editorBox('toggle');
+      // When JQuery is upgraded, use .addBack instead of .andSelf.
+      $(this).siblings(".wiki_switch_views_link").andSelf().toggle();
     });
     if ($("a#page_doesnt_exist_so_start_editing_it_now").length) {
       $("a#page_doesnt_exist_so_start_editing_it_now").click(function(event){

@@ -29,7 +29,6 @@ define [
         "storage_quota_mb": 50,
         "context_type": "Course",
         "course_id": 1,
-        "followed_by_user": false,
         "avatar_url": null,
         "role": null
       },
@@ -44,7 +43,6 @@ define [
         "storage_quota_mb": 50,
         "context_type": "Course",
         "course_id": 1,
-        "followed_by_user": false,
         "avatar_url": null,
         "role": null
       },
@@ -59,7 +57,6 @@ define [
         "storage_quota_mb": 50,
         "context_type": "Course",
         "course_id": 1,
-        "followed_by_user": false,
         "avatar_url": null,
         "role": null
       }

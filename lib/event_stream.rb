@@ -31,11 +31,11 @@ class EventStream
   end
 
   def database
-    Canvas::Cassandra::Database.from_config(database_name)
+    Canvas::Cassandra::DatabaseBuilder.from_config(database_name)
   end
 
   def available?
-    Canvas::Cassandra::Database.configured?(database_name)
+    Canvas::Cassandra::DatabaseBuilder.configured?(database_name)
   end
 
   def on_insert(&callback)

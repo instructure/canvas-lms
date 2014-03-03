@@ -392,8 +392,8 @@ $gradebook_checkbox_width: 16px
 .gradebook_filter input
   width: 300px
 
-=gradebook_menu_label
-  font-size: 12px
+=gradebook_menu_label($fontsize)
+  font-size: $fontsize
   font-weight: bold
   margin-bottom: 0
   vertical-align: 0px !important
@@ -406,7 +406,7 @@ $gradebook_checkbox_width: 16px
   overflow-y: auto
   max-height: 550px
   label
-    +gradebook_menu_label
+    +gradebook_menu_label(12px)
   .ui-state-focus:last-child
     margin: 0 !important
 
@@ -440,5 +440,5 @@ $gradebook_checkbox_width: 16px
   margin-left: -16px
 
 .gradebook_drop_down
-  label
-    +gradebook_menu_label
+  li, label
+    +gradebook_menu_label(13px)

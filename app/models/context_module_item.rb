@@ -44,6 +44,7 @@ module ContextModuleItem
   # If no preferred is found, but more than one tag exists for the same obj, we
   # return nothing, since we can't know which tag is appropriate to return.
   def self.find_tag_with_preferred(objs_to_search, preferred_id)
+    preferred_id = preferred_id[Api::ID_REGEX] if preferred_id.is_a?(String)
     objs_to_search.each do |obj|
       next unless obj.present?
       tag = obj.context_module_tags.find_by_id(preferred_id)

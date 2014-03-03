@@ -5,7 +5,6 @@ require 'action_controller'
 require 'active_support'
 require 'active_record'
 require 'mocha/api'
-require File.expand_path(File.dirname(__FILE__) +  '/../vendor/plugins/sanitize_field/lib/sanitize_field')
 require 'api'
 
 # You can include just this file if your serializer doesn't need too much
@@ -43,6 +42,10 @@ module ActiveModel
 
   end
 end
+
+require File.expand_path(File.dirname(__FILE__)) + '/../app/serializers/canvas/api_serialization.rb'
+require File.expand_path(File.dirname(__FILE__)) + '/../app/serializers/canvas/api_serializer.rb'
+require File.expand_path(File.dirname(__FILE__)) + '/../app/serializers/canvas/api_array_serializer.rb'
 
 Dir[File.expand_path(File.dirname(__FILE__) + '/../app/serializers/*.rb')].each do |file|
   require file

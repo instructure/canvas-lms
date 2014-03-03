@@ -46,9 +46,6 @@
 #       // cannot be changed back to private.
 #       "is_public": false,
 #
-#       // Whether or not the current user is following this group.
-#       "followed_by_user": false,
-#
 #       // How people are allowed to join the group.  For all groups except for
 #       // community groups, the user must share the group's parent course or
 #       // account.  For student organized or community groups, where a user
@@ -104,7 +101,6 @@ class GroupsController < ApplicationController
   include Api::V1::Attachment
   include Api::V1::Group
   include Api::V1::GroupCategory
-  include Api::V1::UserFollow
 
   SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment storage_quota_mb)
 
@@ -506,59 +502,6 @@ class GroupsController < ApplicationController
           format.json { render :json => @group.errors, :status => :bad_request }
         end
       end
-    end
-  end
-
-  # @API Follow a group
-  # @beta
-  #
-  # Follow this group. If the current user is already following the
-  # group, nothing happens. The user must have permissions to view the
-  # group in order to follow it.
-  #
-  # Responds with a 401 if the user doesn't have permission to follow the
-  # group.
-  #
-  # @example_request
-  #     curl https://<canvas>/api/v1/groups/<group_id>/followers/self \ 
-  #          -X PUT \ 
-  #          -H 'Content-Length: 0' \ 
-  #          -H 'Authorization: Bearer <token>'
-  #
-  # @example_response
-  #     {
-  #       following_user_id: 5,
-  #       followed_group_id: 6,
-  #       created_at: <timestamp>
-  #     }
-  def follow
-    find_group
-    if authorized_action(@group, @current_user, :follow)
-      user_follow = UserFollow.create_follow(@current_user, @group)
-      if !user_follow.new_record?
-        render :json => user_follow_json(user_follow, @current_user, session)
-      else
-        render :json => user_follow.errors, :status => :bad_request
-      end
-    end
-  end
-
-  # @API Un-follow a group
-  # @beta
-  #
-  # Stop following this group. If the current user is not already
-  # following the group, nothing happens.
-  #
-  # @example_request
-  #     curl https://<canvas>/api/v1/groups/<group_id>/followers/self \ 
-  #          -X DELETE \ 
-  #          -H 'Authorization: Bearer <token>'
-  def unfollow
-    find_group
-    if authorized_action(@group, @current_user, :follow)
-      user_follow = @current_user.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first
-      user_follow.try(:destroy)
-      render :json => { "ok" => true }
     end
   end
 

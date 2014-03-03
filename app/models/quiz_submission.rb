@@ -31,13 +31,14 @@ class QuizSubmission < ActiveRecord::Base
                                                    allow_nil: true
 
   before_validation :update_quiz_points_possible
-  belongs_to :quiz
+  belongs_to :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :user
   belongs_to :submission, :touch => true
   before_save :update_kept_score
   before_save :sanitize_responses
   before_save :update_assignment_submission
   before_create :assign_validation_token
+  after_save :save_assignment_submission
 
   has_many :attachments, :as => :context, :dependent => :destroy
 
@@ -52,6 +53,19 @@ class QuizSubmission < ActiveRecord::Base
   serialize :submission_data
 
   simply_versioned :automatic => false
+
+  has_many :versions,
+    :order => 'number DESC',
+    :as => :versionable,
+    :dependent => :destroy,
+    :inverse_of => :versionable,
+    :extend => SoftwareHeretics::ActiveRecord::SimplyVersioned::VersionsProxyMethods do
+      def construct_sql
+        @finder_sql = @counter_sql =
+          "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_id = #{owner_quoted_id} AND " +
+        "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_type IN ('QuizSubmission', #{@owner.class.quote_value(@owner.class.base_class.name.to_s)})"
+      end
+    end
 
   workflow do
     state :untaken do
@@ -91,17 +105,22 @@ class QuizSubmission < ActiveRecord::Base
     can :add_attempts
   end
 
+  # override has_one relationship provided by simply_versioned
+  def current_version_unidirectional
+    versions.limit(1)
+  end
+
   def sanitize_responses
     questions && questions.select {|q| q['question_type'] == 'essay_question' }.each do |q|
       question_id = q['id']
       if submission_data.is_a?(Array)
         if submission = submission_data.find {|s| s[:question_id] == question_id }
-          submission[:text] = Sanitize.clean(submission[:text] || "", Instructure::SanitizeField::SANITIZE)
+          submission[:text] = Sanitize.clean(submission[:text] || "", CanvasSanitize::SANITIZE)
         end
       elsif submission_data.is_a?(Hash)
         question_key = "question_#{question_id}"
         if submission_data[question_key]
-          submission_data[question_key] = Sanitize.clean(submission_data[question_key] || "", Instructure::SanitizeField::SANITIZE)
+          submission_data[question_key] = Sanitize.clean(submission_data[question_key] || "", CanvasSanitize::SANITIZE)
         end
       end
     end
@@ -280,6 +299,8 @@ class QuizSubmission < ActiveRecord::Base
     new_params[:cnt] = (new_params[:cnt].to_i + 1) % 5
     snapshot!(params) if new_params[:cnt] == 1
     conn.execute("UPDATE quiz_submissions SET user_id=#{self.user_id || 'NULL'}, submission_data=#{conn.quote(new_params.to_yaml)} WHERE workflow_state NOT IN ('complete', 'pending_review') AND id=#{self.id}")
+
+    new_params
   end
 
   def sanitize_params(params)
@@ -361,24 +382,26 @@ class QuizSubmission < ActiveRecord::Base
 
   def update_assignment_submission
     return if self.manually_scored || @skip_after_save_score_updates
-
     if self.quiz && self.quiz.for_assignment? && assignment && !self.submission && self.user_id
       self.submission = assignment.find_or_create_submission(self.user_id)
     end
     if self.completed? && self.submission
-      s = self.submission
-      s.score = self.kept_score if self.kept_score
-      s.submitted_at = self.finished_at
-      s.grade_matches_current_submission = true
-      s.quiz_submission_id = self.id
-      s.graded_at = self.end_at || Time.now
-      s.grader_id = "-#{self.quiz_id}".to_i
-      s.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.score}, time: #{Time.now.to_s}"
-      s.user_id = self.user_id
-      s.submission_type = "online_quiz"
-      s.saved_by = :quiz_submission
-      s.save!
+      @assignment_submission = self.submission
+      @assignment_submission.score = self.kept_score if self.kept_score
+      @assignment_submission.submitted_at = self.finished_at
+      @assignment_submission.grade_matches_current_submission = true
+      @assignment_submission.quiz_submission_id = self.id
+      @assignment_submission.graded_at = self.end_at || Time.now
+      @assignment_submission.grader_id = "-#{self.quiz_id}".to_i
+      @assignment_submission.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.score}, time: #{Time.now.to_s}"
+      @assignment_submission.user_id = self.user_id
+      @assignment_submission.submission_type = "online_quiz"
+      @assignment_submission.saved_by = :quiz_submission
     end
+  end
+
+  def save_assignment_submission
+    @assignment_submission.save! if @assignment_submission
   end
 
   def highest_score_so_far(exclude_version_id=nil)
@@ -586,13 +609,13 @@ class QuizSubmission < ActiveRecord::Base
   # simply_versioned for making this possible!
   def update_submission_version(version, attrs)
     version_data = YAML::load(version.yaml)
-    TextHelper.recursively_strip_invalid_utf8!(version_data, true)
     version_data["submission_data"] = self.submission_data if attrs.include?(:submission_data)
     version_data["temporary_user_code"] = "was #{version_data['score']} until #{Time.now.to_s}"
     version_data["score"] = self.score if attrs.include?(:score)
     version_data["fudge_points"] = self.fudge_points if attrs.include?(:fudge_points)
     version_data["workflow_state"] = self.workflow_state if attrs.include?(:workflow_state)
     version_data["manually_scored"] = self.manually_scored if attrs.include?(:manually_scored)
+    TextHelper.recursively_strip_invalid_utf8!(version_data, true)
     version.yaml = version_data.to_yaml
     res = version.save
     res

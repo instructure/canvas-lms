@@ -1324,15 +1324,19 @@ define([
           };
         }
         if (crocodocAvailable) {
+          var currentStudentIDAsOfAjaxCall = this.currentStudent.id;
+          var that = this;
           $iframe_holder.show();
           $iframe_holder.disableWhileLoading($.ajaxJSON(
             '/submissions/' + this.currentStudent.submission.id + '/attachments/' + attachment.id + '/crocodoc_sessions/',
             'POST',
             {version: this.currentStudent.submission.currentSelectedIndex},
             function(response) {
-              $iframe_holder.loadDocPreview($.extend(previewOptions, {
-                crocodoc_session_url: response.session_url
-              }));
+              if (currentStudentIDAsOfAjaxCall == that.currentStudent.id) {
+                $iframe_holder.loadDocPreview($.extend(previewOptions, {
+                  crocodoc_session_url: response.session_url
+                }));
+              }
             },
             function() {
               // pretend there isn't a crocodoc and try again
@@ -1350,6 +1354,11 @@ define([
               scribd_access_key: attachment.scribd_doc.attributes.access_key
             });
           }
+          var currentStudentIDAsOfAjaxCall = this.currentStudent.id;
+          previewOptions = $.extend(previewOptions, {
+              ajax_valid: _.bind(function() {
+                return(currentStudentIDAsOfAjaxCall == this.currentStudent.id);
+              },this)});
           $iframe_holder.show().loadDocPreview(previewOptions);
 	      }
 	      else if (attachment && browserableCssClasses.test(attachment.mime_class)) {

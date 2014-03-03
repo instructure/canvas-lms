@@ -24,19 +24,20 @@ class FacebookController < ApplicationController
   def notification_preferences
     @cc = @user.communication_channels.find_by_path_type('facebook')
     if @cc
-      @old_policies = @cc.notification_policies
+      @old_policies = @cc.notification_policies.to_a
       @policies = []
       params[:types].each do |type, frequency|
         notifications = Notification.find_all_by_category(type)
         notifications.each do |notification|
-          pref = @cc.notification_policies.new
+          pref = @old_policies.find { |p| p.notification_id == notification.id }
+          pref ||= @cc.notification_policies.build
           pref.notification_id = notification.id
           pref.frequency = frequency
           @policies << pref unless frequency == 'never'
         end
       end
       NotificationPolicy.transaction do
-        @old_policies.each{|p| p.destroy}
+        @old_policies.each{|p| p.frequency = p.notification.default_frequency; p.save! if p.changed? }
         @policies.each{|p| p.save!}
       end
     end

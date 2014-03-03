@@ -19,22 +19,22 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
 
-describe "GradeChangeAudit API", type: :integration do
+describe "GradeChangeAudit API", type: :request do
   context "not configured" do
     before do
-      Canvas::Cassandra::Database.stubs(:configured?).with('auditors').returns(false)
+      Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).with('auditors').returns(false)
       user_with_pseudonym(account: Account.default)
       @user.account_users.create(account: Account.default)
     end
 
     it "should 404" do
       raw_api_call(:get, "/api/v1/audit/grade_change/students/#{@user.id}", controller: 'grade_change_audit_api', action: "for_student", student_id: @user.id.to_s, format: 'json')
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
   end
 
   context "configured" do
-    it_should_behave_like "cassandra audit logs"
+    include_examples "cassandra audit logs"
 
     before do
       @request_id = UUIDSingleton.instance.generate

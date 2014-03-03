@@ -17,6 +17,7 @@
  */
 
 define([
+  'compiled/util/round',
   'INST' /* INST */,
   'i18n!assignments',
   'jquery' /* $ */,
@@ -38,7 +39,7 @@ define([
   'jqueryui/datepicker' /* /\.datepicker/ */,
   'jqueryui/droppable' /* /\.droppable/ */,
   'jqueryui/sortable' /* /\.sortable/ */
-], function(INST, I18n, $, htmlEscape, vddTooltip) {
+], function(round, INST, I18n, $, htmlEscape, vddTooltip) {
 
   var defaultShowDateOptions = false;
   function hideAssignmentForm() {
@@ -496,12 +497,16 @@ define([
         if(isNaN(val)) { val = 0; }
         tally += val;
       });
-      $("#group_weight #group_weight_total").text(tally + "%");
+      $("#group_weight #group_weight_total").text(round(tally,2) + "%");
     });
-    $("#group_weight .weight").bind('change', function(event, submit) {
+    $("#assignment_group_group_weight").on('change', function(event){
+      var val = parseFloat($(this).val(), 10);
+      $(this).val(round(val,2));
+    })
+    $("#group_weight .weight").on('change', function(event, submit) {
       var val = parseFloat($(this).val(), 10);
       if(isNaN(val)) { val = 0; }
-      $(this).val(val);
+      $(this).val(round(val,2));
       $("#group_weight").triggerHandler('weight_change');
       if(submit !== false) {
         var $weight = $(this);

@@ -1,0 +1,12 @@
+{{ag.name}} {{#t 'grade'}}Grade:{{/t}}
+{{#if hasGrade}}
+  {{percent}} {{scoreDetail}}
+{{else}}
+  -
+{{/if}}
+{{#if hasWeightedGroups}}
+  {{#t 'percent_of_grade'}}({{ag.group_weight}}% of grade){{/t}}
+{{/if}}
+{{#if letterGrade}}
+  <span class='letter-grade-points'>{{letterGrade}}</span>
+{{/if}}

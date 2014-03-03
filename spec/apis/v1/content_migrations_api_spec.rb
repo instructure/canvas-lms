@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe ContentMigrationsController, :type => :integration do
+describe ContentMigrationsController, type: :request do
   before do
     course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
     @migration_url = "/api/v1/courses/#{@course.id}/content_migrations"

@@ -95,6 +95,8 @@ end
   end
 
   if CANVAS_RAILS2
+    require_dependency 'canvas'
+
     # Raise an exception on bad mass assignment. Helps us catch these bugs before
     # they hit.
     Canvas.protected_attribute_error = :raise

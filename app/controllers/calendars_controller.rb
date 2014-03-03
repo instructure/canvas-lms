@@ -48,6 +48,10 @@ class CalendarsController < ApplicationController
         @contexts.each do |context|
           log_asset_access("dashboard_calendar:#{context.asset_string}", "calendar", 'other')
         end
+        calendarManagementContexts = @contexts.select{|c| can_do(c, @current_user, :manage_calendar) }.map(&:asset_string)
+        canCreateEvent = calendarManagementContexts.length > 0
+        js_env(calendarManagementContexts: calendarManagementContexts,
+               canCreateEvent: canCreateEvent)
         render :action => "show"
       end
       # this  unless @dont_render_again stuff is ugly but I wanted to send back a 304 but it started giving me "Double Render errors"

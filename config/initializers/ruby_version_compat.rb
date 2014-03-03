@@ -37,6 +37,10 @@ if CANVAS_RAILS2
   require "active_support/core_ext/string/output_safety"
   class ERB
     module Util
+
+      # rails 2 uses decimal, rails 3 uses hex, so we use hex everywhere
+      HTML_ESCAPE["'"] = "&#x27;"
+
       # see https://github.com/rails/rails/issues/7430
       def html_escape(s)
         s = s.to_s
@@ -140,7 +144,7 @@ class ActiveRecord::Base
     'ErrorReport'              => %w[http_env data],
     'LearningOutcome'          => %w[data],
     'Profile'                  => %w[data],
-    'Quiz'                     => %w[quiz_data],
+    'Quizzes::Quiz'            => %w[quiz_data],
     'QuizQuestion'             => %w[question_data],
     'QuizSubmission'           => %w[quiz_data submission_data],
     'QuizSubmissionSnapshot'   => %w[data],

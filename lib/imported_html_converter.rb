@@ -18,6 +18,7 @@
 
 class ImportedHtmlConverter
   include TextHelper
+  include HtmlTextHelper
 
   CONTAINER_TYPES = ['div', 'p', 'body']
 

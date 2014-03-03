@@ -231,6 +231,17 @@ class FilesController < ApplicationController
       if @contexts.empty?
         format.html { redirect_to !@context || @context == @current_user ? dashboard_url : named_context_url(@context, :context_url) }
       else
+        js_env(:contexts =>
+           @contexts.to_json(:permissions =>
+                                 {:user => @current_user,
+                                  :policies =>
+                                      [:manage_files,
+                                       :update,
+                                       :manage_grades,
+                                       :read_roster]
+                                 },
+                             :methods => :asset_string,
+                             :include_root => false))
         format.html { render :action => 'full_index' }
       end
       format.json { render :json => @file_structures }
@@ -611,6 +622,11 @@ class FilesController < ApplicationController
   def s3_success
     if params[:id].present?
       @attachment = Attachment.find_by_id_and_workflow_state_and_uuid(params[:id], 'unattached', params[:uuid])
+      if bucket = @attachment.try_rescue(:bucket)
+        prefix = request.ssl? ? 'https' : 'http'
+        response.headers['Access-Control-Allow-Origin']  = "#{prefix}://#{bucket.name}.#{bucket.config.s3_endpoint}/"
+        response.headers['Access-Control-Allow-Methods'] = 'GET'
+      end
     end
     details = @attachment.s3object.head rescue nil
     if @attachment && details

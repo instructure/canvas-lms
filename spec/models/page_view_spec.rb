@@ -23,7 +23,7 @@ describe PageView do
   before do
     # sets both @user and @course (@user is a teacher in @course)
     course_model
-    @page_view = PageView.new { |p| p.send(:attributes=, { :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }, false) }
+    @page_view = PageView.new { |p| p.assign_attributes({ :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }, :without_protection => true) }
   end
 
   describe "sharding" do
@@ -38,7 +38,7 @@ describe PageView do
   end
 
   describe "cassandra page views" do
-    it_should_behave_like "cassandra page views"
+    include_examples "cassandra page views"
     it "should store and load from cassandra" do
       expect {
         @page_view.save!
@@ -48,7 +48,7 @@ describe PageView do
     end
 
     it "should not start a db transaction on save" do
-      PageView.new { |p| p.send(:attributes=, { :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }, false) }.store
+      PageView.new { |p| p.assign_attributes({ :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }, :without_protection => true) }.store
       PageView.connection.expects(:transaction).never
       PageView.find("abcdef").should be_present
     end
@@ -151,7 +151,9 @@ describe PageView do
         expect { PageView.find(moved_later.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
         # it should resume where the last migrator left off
         migrator = PageView::CassandraMigrator.new
-        migrator.run_once(2)
+        # it could find the first two twice if we're on mysql, due to no sub-second precision,
+        # so do a batch of 3
+        migrator.run_once(3)
         PageView.find(moved.map(&:request_id) + [moved_later.request_id]).size.should == 3
 
         expect { PageView.find(deleted.request_id) }.to raise_error(ActiveRecord::RecordNotFound)
@@ -221,8 +223,8 @@ describe PageView do
         store_time_2 = Time.zone.parse('2012-01-13T15:47:52Z')
         @user1 = @user
         @user2 = user_model
-        pv2 = PageView.new { |p| p.send(:attributes=, { :user => @user2, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "req1", :interaction_seconds => 5 }, false) }
-        pv3 = PageView.new { |p| p.send(:attributes=, { :user => @user2, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "req2", :interaction_seconds => 5 }, false) }
+        pv2 = PageView.new { |p| p.assign_attributes({ :user => @user2, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "req1", :interaction_seconds => 5 }, :without_protection => true) }
+        pv3 = PageView.new { |p| p.assign_attributes({ :user => @user2, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "req2", :interaction_seconds => 5 }, :without_protection => true) }
         pv2.created_at = store_time
         pv3.created_at = store_time_2
         pv2.store.should be_true
@@ -319,7 +321,7 @@ describe PageView do
     end
 
     context "cassandra-backed" do
-      it_should_behave_like "cassandra page views"
+      include_examples "cassandra page views"
 
       it "should return the existing page view" do
         page_views = (0..3).map { |index| page_view_model }
@@ -354,7 +356,7 @@ describe PageView do
     end
 
     context "cassandra-backed" do
-      it_should_behave_like "cassandra page views"
+      include_examples "cassandra page views"
 
       it "should return the existing page view" do
         page_views = (0..3).map { |index| page_view_model }
@@ -387,7 +389,7 @@ describe PageView do
     end
 
     context "cassandra-backed" do
-      it_should_behave_like "cassandra page views"
+      include_examples "cassandra page views"
 
       it "should return the existing page view" do
         pv = page_view_model
@@ -417,7 +419,7 @@ describe PageView do
     end
 
     context "cassandra-backed" do
-      it_should_behave_like "cassandra page views"
+      include_examples "cassandra page views"
 
       it "should return the existing page view" do
         pv = page_view_model
@@ -447,7 +449,7 @@ describe PageView do
     end
 
     context "cassandra-backed" do
-      it_should_behave_like "cassandra page views"
+      include_examples "cassandra page views"
 
       it "should return the existing page view" do
         pv = page_view_model
@@ -491,15 +493,15 @@ describe PageView do
         page_view2 = @shard2.activate{ PageView.from_attributes(attributes) }
         [@shard1, @shard2].each do |shard|
           shard.activate do
-            page_view1.user_id.should == @shard1.relative_id_for(user_id)
-            page_view2.user_id.should == @shard2.relative_id_for(user_id)
+            page_view1.user_id.should == Shard.relative_id_for(user_id, @shard1, Shard.current)
+            page_view2.user_id.should == Shard.relative_id_for(user_id, @shard2, Shard.current)
           end
         end
       end
     end
 
     context "cassandra-backed" do
-      it_should_behave_like "cassandra page views"
+      include_examples "cassandra page views"
 
       it "should interpret ids relative to the default shard" do
         user_id = 1
@@ -508,8 +510,8 @@ describe PageView do
         page_view2 = @shard2.activate{ PageView.from_attributes(attributes) }
         [@shard1, @shard2].each do |shard|
           shard.activate do
-            page_view1.user_id.should == Shard.default.relative_id_for(user_id)
-            page_view2.user_id.should == Shard.default.relative_id_for(user_id)
+            page_view1.user_id.should == Shard.relative_id_for(user_id, Shard.default, Shard.current)
+            page_view2.user_id.should == Shard.relative_id_for(user_id, Shard.default, Shard.current)
           end
         end
       end

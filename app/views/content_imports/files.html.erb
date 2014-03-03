@@ -6,17 +6,4 @@
   </p>
   <%= render :partial => 'shared/zip_file_import_form' %>
 </div>
-<% js_block do %>
-<script type="text/javascript">
-require([
-  'jquery' /* $ */
-], function($) {
-
-  $(function(){
-    $("#zip_file_import_form .cancel_button")
-      .attr("href", "<%= return_or_context_url %>")
-      .text(<%= params[:return_to] ? t('#buttons.cancel', "Cancel").to_json.html_safe : t('buttons.skip', "Skip this Step").to_json.html_safe %>);
-  });
-});
-</script>
-<% end %>
+<% js_bundle 'legacy/content_imports_files' %>

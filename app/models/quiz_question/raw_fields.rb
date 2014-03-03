@@ -38,7 +38,7 @@ class QuizQuestion::RawFields
   end
 
   def sanitize(html)
-    Sanitize.clean(html || "", Instructure::SanitizeField::SANITIZE)
+    Sanitize.clean(html || "", CanvasSanitize::SANITIZE)
   end
 
   private

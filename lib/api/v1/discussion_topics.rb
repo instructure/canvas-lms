@@ -83,12 +83,8 @@ module Api::V1::DiscussionTopics
   # Returns a hash.
   def serialize_additional_topic_fields(topic, context, user)
     attachments = topic.attachment ? [attachment_json(topic.attachment, user)] : []
-    html_url    = if context.is_a?(CollectionItem)
-                    nil
-                  else
-                    named_context_url(context, :context_discussion_topic_url,
-                                      topic, include_host: true)
-                  end
+    html_url    = named_context_url(context, :context_discussion_topic_url,
+                                    topic, include_host: true)
     url         = if topic.podcast_enabled?
                     code = (@context_enrollment || @context || context).feed_code
                     feeds_topic_format_path(topic.id, code, :rss)

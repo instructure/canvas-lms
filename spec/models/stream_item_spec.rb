@@ -57,21 +57,6 @@ describe StreamItem do
   context "across shards" do
     specs_require_sharding
 
-    it "should create stream items on the user's shard" do
-      group_with_user
-      @user1 = @user
-      @user2 = @shard1.activate { user_model }
-      @coll = @group.collections.create!
-
-      UserFollow.create_follow(@user1, @coll)
-      UserFollow.create_follow(@user2, @coll)
-
-      @item = collection_item_model(:collection => @coll, :user => @user1)
-      @user2.reload.stream_item_instances.map { |i| i.stream_item.data }.should == [@item]
-      @user2.stream_item_instances.first.shard.should == @shard1
-      @user2.stream_item_instances.first.stream_item.shard.should == Shard.current
-    end
-
     it "should delete instances on all associated shards" do
       course_with_teacher(:active_all => 1)
       @user2 = @shard1.activate { user_model }

@@ -63,15 +63,11 @@ class Shard
     "default"
   end
 
-  def relative_id_for(any_id, target_shard = nil)
-    any_id
-  end
-
   def self.global_id_for(any_id)
     any_id.is_a?(ActiveRecord::Base) ? any_id.global_id : any_id
   end
 
-  def self.relative_id_for(any_id, target_shard = nil)
+  def self.relative_id_for(any_id, source_shard, target_shard)
     any_id.is_a?(ActiveRecord::Base) ? any_id.local_id : any_id
   end
 

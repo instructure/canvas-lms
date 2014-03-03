@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Folders API", :type => :integration do
+describe "Folders API", type: :request do
   before do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @root = Folder.root_folders(@course).first

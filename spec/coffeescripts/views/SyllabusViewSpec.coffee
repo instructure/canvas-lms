@@ -27,7 +27,7 @@ define [
   'spec/javascripts/compiled/views/SyllabusViewPrerendered'
   'helpers/fakeENV'
   'helpers/jquery.simulate'
-], ($, _, SyllabusBehaviors, SyllabusCollection, SyllabusCalendarEventsCollection, SyllabusAppointmentGroupsCollection, SyllabusView, SyllabusViewPrerendered) ->
+], ($, _, SyllabusBehaviors, SyllabusCollection, SyllabusCalendarEventsCollection, SyllabusAppointmentGroupsCollection, SyllabusView, SyllabusViewPrerendered, fakeENV) ->
 
   setupServerResponses = ->
     server = sinon.fakeServer.create()
@@ -74,6 +74,7 @@ define [
 
   module 'Syllabus',
     setup: ->
+      fakeENV.setup()
       # Setup stubs/mocks
       @server = setupServerResponses()
 
@@ -129,6 +130,7 @@ define [
         collection: acollection
 
     teardown: ->
+      fakeENV.teardown()
       @syllabusContainer.remove()
       @miniMonth.remove()
       @jumpToToday.remove()

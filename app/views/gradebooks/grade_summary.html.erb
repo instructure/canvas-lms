@@ -17,7 +17,7 @@
       </div>
     <% else %>
       <div class="student_assignment final_grade" style="font-size: 1.2em;">
-        <%= before_label(:total, "Total") %> <%= raw(number_to_percentage(100, :precision => 0).sub(/100/, '<span class="grade"></span>')) %>
+        <%= before_label(:total, "Total") %> <span class="grade"></span>
         <% if @context.grading_standard_enabled? %>
           <span class="final_letter_grade">
             (<span class="grade" id="final_letter_grade_text">-</span>)
@@ -89,21 +89,7 @@
     <% end %>
   </select>
   </div>
-  <% js_block do %>
-    <script>
-    require([
-      'jquery' /* $ */
-    ], function($) {
-      $(document).ready(function() {
-        $("#course_url").change(function() {
-          if(location.href != $(this).val()) {
-            location.href = $(this).val();
-          }
-        });
-      });
-    });
-    </script>
-  <% end %>
+  <% js_bundle 'legacy/gradebooks_grade_summary' %>
 <% end %>
 </h2>
 <table style="width: 100%;" id="grades_summary" class="<%= 'editable' if @presenter.editable? %>">
@@ -150,17 +136,20 @@
                   <% if assignment.muted? %>
                     <%= t(:student_mute_notification, "Instructor is working on grades") %>
                   <% elsif assignment.special_class %>
-                    <%= t(:percent, "Percent") %>
+                    <%= t(:total, "Total") %>
                   <% else %>
                     <%= t(:click_to_change, "Click to test a different score") %>
                   <% end %>
                 </span>
               <% end %>
             </span>
-            <span class="grade">
+            <span class="grade" tabindex="0">
               <% if assignment.muted? %>
                 <%= image_tag "sound_mute.png", :alt => t("#gradebooks.grade.muted", "Muted"), :class => "muted_icon" %>
               <% else %>
+                <span class="screenreader-only" role="link">
+                  <%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>
+                </span>
                 <%= render :partial => 'submission_score', :object => submission, :locals => {:student_score => !can_do(@context, @current_user, :manage_grades)} %>
               <% end %>
             </span>
@@ -169,7 +158,6 @@
                 <%= assignment_presenter.display_score %>
               </span>
             <% end %>
-            <%= "%" if assignment.special_class %>
           </span>
           <div style="display: none;">
             <span class="original_score">
@@ -352,13 +340,6 @@
 <% end %>
 <div id="total_groups_weight" style="display: none;"><%= @presenter.total_weight %></div>
 <%= render :partial => "shared/rubric_criterion_dialog" %>
-<input type="text" style="width: 40px; display: none;" id="grade_entry"/>
+<input type="text" style="width: 40px; display: none;" id="grade_entry" title="<%= t('titles.enter_score', "Enter a score to test") %>"/>
 <a href="#" id="revert_score_template" class="revert_score_link" title="<%= t('titles.revert_score', "Revert to original score") %>"><%= image_tag "back.png", :alt => "" %></a>
 <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", @presenter.student_id) %>" class="update_submission_url" style="display: none;">&nbsp;</a>
-<% if @context.grading_standard_enabled? %>
-  <% js_block do %>
-  <script>
-    var grading_scheme = <%= raw((@context.grading_standard.try(:data) || GradingStandard.default_grading_standard).to_json) %>;
-  </script>
-  <% end %>
-<% end %>

@@ -237,7 +237,7 @@ class AssessmentItemConverter
     # root may not be an html element, so we just sanitize its children so we
     # don't blow away the whole thing
     node.children.each do |child|
-      Sanitize.clean_node!(child, Instructure::SanitizeField::SANITIZE)
+      Sanitize.clean_node!(child, CanvasSanitize::SANITIZE)
     end
 
     # replace any file references with the migration id of the file

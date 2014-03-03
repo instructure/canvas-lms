@@ -95,11 +95,12 @@ describe "shared files tests" do
         link.should be_displayed
         link.text.should == "edit content"
         link.click
+        wait_for_ajaximations
         keep_trying_until { fj("#edit_content_dialog").should be_displayed }
       end
 
       def switch_html_edit_views
-        f('.switch_views').click
+        fj('.switch_views:visible').click
       end
 
       def save_html_content
@@ -121,19 +122,20 @@ describe "shared files tests" do
 
       it "should validate adding a bold line changes the html" do
         click_edit_link
-        f('.switch_views').click
+        fj('.switch_views:visible').click
         f('.mce_bold').click
         type_in_tiny('#edit_content_textarea', 'this is bold')
-        f('.switch_views').click
+        fj('.switch_views:visible').click
         driver.execute_script("return $('#edit_content_textarea')[0].value;").should =~ /<strong>this is bold<\/strong>/
         driver.execute_script("return $('#edit_content_textarea')[0].value = '<fake>lol</fake>';")
-        f('.switch_views').click
-        f('.switch_views').click
+        fj('.switch_views:visible').click
+        fj('.switch_views:visible').click
         driver.execute_script("return $('#edit_content_textarea')[0].value;").should =~ /<fake>lol<\/fake>/
       end
 
       it "should save changes from HTML view" do
         click_edit_link
+        wait_for_ajaximations
         switch_html_edit_views
         type_in_tiny('#edit_content_textarea', 'I am typing')
         save_html_content

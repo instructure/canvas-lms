@@ -19,7 +19,7 @@ describe 'Delayed::Backend::Redis::Job' do
     Delayed::Job.redis.flushdb
   end
 
-  it_should_behave_like 'a delayed_jobs implementation'
+  include_examples 'a delayed_jobs implementation'
 
   describe "tickle_strand" do
     it "should continue trying to tickle until the strand is empty" do

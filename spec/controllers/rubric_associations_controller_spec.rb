@@ -29,13 +29,13 @@ describe RubricAssociationsController do
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
-      post 'create', :course_id => @course.id, :rubric_association => {:rubric_id => @rubric.id, :title => "some association", :association_type => @rubric_association.association.class.name, :association_id => @rubric_association.association.id}
+      post 'create', :course_id => @course.id, :rubric_association => {:rubric_id => @rubric.id, :title => "some association", :association_type => @rubric_association.association_object.class.name, :association_id => @rubric_association.association_object.id}
       assigns[:association].should_not be_nil
       assigns[:association].title.should eql("some association")
       response.should be_success
     end
   end
-  
+
   describe "PUT 'update'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -81,7 +81,7 @@ describe RubricAssociationsController do
       response.should be_success
     end
   end
-  
+
   describe "DELETE 'destroy'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
