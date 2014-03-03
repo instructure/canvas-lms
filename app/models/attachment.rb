@@ -582,8 +582,13 @@ class Attachment < ActiveRecord::Base
     write_attribute(:namespace, new_namespace)
 
     if Attachment.s3_storage?
-      bucket.objects[old_full_filename].rename_to(self.full_filename,
+      # copying rather than moving to avoid unhappy accidents
+      # note that GC of the S3 bucket isn't yet implemented,
+      # so there's a bit of a cost here
+      if !s3object.exists?
+        bucket.objects[old_full_filename].copy_to(self.full_filename,
                                                   :acl => attachment_options[:s3_access])
+      end
     else
       FileUtils.mv old_full_filename, full_filename
     end
