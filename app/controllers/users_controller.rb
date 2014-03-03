@@ -48,6 +48,7 @@
 #         },
 #         "short_name": {
 #           "description": "A short name the user has selected, for use in conversations or other less formal places through the site.",
+#           "example": "Shelly",
 #           "type": "string"
 #         },
 #         "sis_user_id": {
