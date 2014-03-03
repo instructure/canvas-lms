@@ -365,7 +365,7 @@ class DiscussionTopicsController < ApplicationController
                      map { |category| { id: category.id, name: category.name } },
                  CONTEXT_ID: @context.id,
                  CONTEXT_ACTION_SOURCE: :discussion_topic,
-                 DRAFT_STATE: @context.feature_enabled?(:draft_state)}
+                 DRAFT_STATE: @topic.draft_state_enabled?}
       append_sis_data(js_hash)
       js_env(js_hash)
       render :action => "edit"
