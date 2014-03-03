@@ -455,7 +455,7 @@ describe 'Student reports' do
       term1.save!
       @course1.enrollment_term = term1
       @course1.save!
-      p1b = @user1.pseudonym.build(unique_id: 'unique@example.com')
+      p1b = @user1.pseudonyms.build(unique_id: 'unique@example.com')
       p1b.account = @account
       p1b.sis_user_id = 'secondSIS'
       p1b.last_login_at = @last_login_time
