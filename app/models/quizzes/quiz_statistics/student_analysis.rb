@@ -369,7 +369,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       :user_ids => question[:user_ids] - question[:answers].map { |a| a[:user_ids] }.flatten
     } rescue nil
     question[:answers] << none if none && none[:responses] > 0
-    question
+    question.to_hash.with_indifferent_access
   end
 
 end

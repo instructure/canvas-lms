@@ -34,11 +34,48 @@ class Quizzes::QuizStatistics::ItemAnalysis < Quizzes::QuizStatistics::Report
 
   MIN_STATS_FOR_ALPHA = 15
 
+  def generate
+    stats = summary_stats_for_quiz
+    stats.map do |item|
+      question_item_analysis = {
+        question_id: item.question[:id],
+        answered_student_count: item.num_respondents,
+        top_student_count: item.num_respondents(:top),
+        middle_student_count: item.num_respondents(:middle),
+        bottom_student_count: item.num_respondents(:bottom),
+        correct_student_count: item.num_respondents(:correct),
+        incorrect_student_count: item.num_respondents(:incorrect),
+        correct_student_ratio: item.ratio_for(:correct),
+        incorrect_student_ratio: item.ratio_for(:incorrect),
+        correct_top_student_count: item.num_respondents(:top, :correct),
+        correct_middle_student_count: item.num_respondents(:middle, :correct),
+        correct_bottom_student_count: item.num_respondents(:bottom, :correct),
+        variance: item.variance,
+        stdev: item.standard_deviation,
+        difficulty_index: item.difficulty_index,
+        alpha: stats.size > MIN_STATS_FOR_ALPHA ? stats.alpha : nil,
+        point_biserials: []
+      }
+
+      sorted_answers = item.answers
+      item.point_biserials.each_with_index do |point_biserial, i|
+        question_item_analysis[:point_biserials] << {
+          answer_id: sorted_answers[i],
+          point_biserial: point_biserial,
+          correct: i == 0,
+          distractor: i != 0
+        }
+      end
+
+      question_item_analysis
+    end
+  end
+
   def to_csv
     @csv ||=
       CSV.generate do |csv|
       start_progress
-      stats = Quizzes::QuizStatistics::ItemAnalysis::Summary.new(quiz)
+      stats = summary_stats_for_quiz
       headers = [
         I18n.t('csv.question.id', 'Question Id'),
         I18n.t('csv.question.title', 'Question Title'),
@@ -95,4 +132,9 @@ class Quizzes::QuizStatistics::ItemAnalysis < Quizzes::QuizStatistics::Report
       end
   end
 
+  private
+
+  def summary_stats_for_quiz
+    @summary_stats ||= Quizzes::QuizStatistics::ItemAnalysis::Summary.new(quiz)
+  end
 end

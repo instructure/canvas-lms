@@ -1374,6 +1374,9 @@ routes.draw do
     scope(:controller => 'quizzes/quiz_ip_filters') do
       get 'courses/:course_id/quizzes/:quiz_id/ip_filters', :action => :index, :path_name => 'course_quiz_ip_filters'
     end
+    scope(:controller => 'quizzes/quiz_statistics') do
+      get 'courses/:course_id/quizzes/:quiz_id/statistics', :action => :index, :path_name => 'course_quiz_statistics'
+    end
 
     scope(:controller => :outcome_groups_api) do
       def og_routes(context)
