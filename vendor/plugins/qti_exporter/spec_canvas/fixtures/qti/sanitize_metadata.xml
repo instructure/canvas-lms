@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop xmlns="http://www.imsglobal.org/xsd/ims_qtiasiv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/ims_qtiasiv1p2 http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd">
+  <objectbank ident="i66f4fc6f38b808e5f77336fccbef862f">
+    <qtimetadata>
+      <qtimetadatafield>
+        <fieldlabel>bank_title</fieldlabel>
+        <fieldentry>Sad &amp; Broken</fieldentry>
+      </qtimetadatafield>
+    </qtimetadata>
+    <item ident="i40f26b0425e63898769b8ad978173383" title="Is this thing broken?">
+      <itemmetadata>
+        <qtimetadata>
+          <qtimetadatafield>
+            <fieldlabel>question_type</fieldlabel>
+            <fieldentry>true_false_question</fieldentry>
+          </qtimetadatafield>
+          <qtimetadatafield>
+            <fieldlabel>points_possible</fieldlabel>
+            <fieldentry>1</fieldentry>
+          </qtimetadatafield>
+        </qtimetadata>
+      </itemmetadata>
+      <presentation>
+        <material>
+          <mattext texttype="text/html">&lt;div&gt;&lt;p&gt;Well, is it?&lt;/p&gt;&lt;/div&gt;</mattext>
+        </material>
+        <response_lid ident="response1" rcardinality="Single">
+          <render_choice>
+            <response_label ident="7492">
+              <material>
+                <mattext texttype="text/plain">True</mattext>
+              </material>
+            </response_label>
+            <response_label ident="4703">
+              <material>
+                <mattext texttype="text/plain">False</mattext>
+              </material>
+            </response_label>
+          </render_choice>
+        </response_lid>
+      </presentation>
+      <resprocessing>
+        <outcomes>
+          <decvar maxvalue="100" minvalue="0" varname="SCORE" vartype="Decimal"/>
+        </outcomes>
+        <respcondition continue="No">
+          <conditionvar>
+            <varequal respident="response1">7492</varequal>
+          </conditionvar>
+          <setvar action="Set" varname="SCORE">100</setvar>
+        </respcondition>
+      </resprocessing>
+    </item>
+  </objectbank>
+</questestinterop>
