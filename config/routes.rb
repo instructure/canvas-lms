@@ -1054,6 +1054,13 @@ routes.draw do
       put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
     end
 
+    scope(:controller => :custom_data) do
+      glob = CANVAS_RAILS2 ? '/*scope' : '(/*scope)'
+      get "users/:user_id/custom_data#{glob}", action: 'get_data'
+      put "users/:user_id/custom_data#{glob}", action: 'set_data'
+      delete "users/:user_id/custom_data#{glob}", action: 'delete_data'
+    end
+
     scope(:controller => :pseudonyms) do
       get 'accounts/:account_id/logins', :action => :index, :path_name => 'account_pseudonyms'
       get 'users/:user_id/logins', :action => :index, :path_name => 'user_pseudonyms'
