@@ -39,7 +39,7 @@ describe SisBatch do
       batch = File.open(path, 'rb') do |tmp|
         # arrrgh attachment.rb
         def tmp.original_filename; File.basename(path); end
-        SisBatch.create_with_attachment(@account, 'instructure_csv', tmp)
+        SisBatch.create_with_attachment(@account, 'instructure_csv', tmp, @user || user)
       end
       # SisBatches shouldn't need any background processing
       Delayed::Job.count.should == old_job_count
@@ -63,7 +63,7 @@ describe SisBatch do
   end
 
   it "should keep the batch in initializing state during create_with_attachment" do
-    batch = SisBatch.create_with_attachment(@account, 'instructure_csv', stub_file_data('test.csv', 'abc', 'text')) do |batch|
+    batch = SisBatch.create_with_attachment(@account, 'instructure_csv', stub_file_data('test.csv', 'abc', 'text'), user) do |batch|
       batch.attachment.should_not be_new_record
       batch.workflow_state.should == 'initializing'
       batch.options = { :override_sis_stickiness => true }

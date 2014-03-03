@@ -237,6 +237,7 @@ class User < ActiveRecord::Base
   has_many :favorites
   has_many :zip_file_imports, :as => :context
   has_many :messages
+  has_many :sis_batches
 
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile
