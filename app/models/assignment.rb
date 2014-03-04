@@ -73,8 +73,13 @@ class Assignment < ActiveRecord::Base
       assignment.external_tool_tag.context = assignment
       assignment.external_tool_tag.content_type = "ContextExternalTool"
     else
-      assignment.external_tool_tag = nil
+      if CANVAS_RAILS2
+        assignment.external_tool_tag = nil
+      else
+        assignment.association(:external_tool_tag).reset
+      end
     end
+    true
   end
 
   API_NEEDED_FIELDS = %w(
