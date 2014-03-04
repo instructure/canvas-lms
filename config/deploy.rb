@@ -87,6 +87,7 @@ namespace :canvas do
 
   desc "Compile static assets"
   task :compile_assets do
+    run "cd #{latest_release} && npm install"
     # On remote: bundle exec rake canvas:compile_assets
     run "cd #{latest_release} && #{rake} RAILS_ENV=#{rails_env} canvas:compile_assets[false]"
     run "cd #{latest_release} && chown -R canvasuser:canvasuser ."
