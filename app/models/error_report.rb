@@ -54,8 +54,8 @@ class ErrorReport < ActiveRecord::Base
       # sanitize invalid encodings
       @opts[:message] = TextHelper.strip_invalid_utf8(@opts[:message]) if @opts[:message]
       @opts[:exception_message] = TextHelper.strip_invalid_utf8(@opts[:exception_message]) if @opts[:exception_message]
-      Canvas::Statsd.increment("errors.all")
-      Canvas::Statsd.increment("errors.#{category}")
+      CanvasStatsd::Statsd.increment("errors.all")
+      CanvasStatsd::Statsd.increment("errors.#{category}")
       run_callbacks :on_log_error
       create_error_report(opts)
     end

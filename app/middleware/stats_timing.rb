@@ -12,7 +12,7 @@ class StatsTiming
     action = path_parameters.try(:[], :action)
 
     if controller && action
-      Canvas::Statsd.timing("request.#{controller}.#{action}", ms)
+      CanvasStatsd::Statsd.timing("request.#{controller}.#{action}", ms)
     end
 
     result

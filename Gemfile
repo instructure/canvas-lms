@@ -199,6 +199,7 @@ gem 'canvas_color', :path => 'gems/canvas_color'
 gem 'canvas_crummy', :path => 'gems/canvas_crummy'
 gem 'canvas_mimetype_fu', :path => 'gems/canvas_mimetype_fu'
 gem 'canvas_sanitize', :path => 'gems/canvas_sanitize'
+gem 'canvas_statsd', :path => 'gems/canvas_statsd'
 gem 'canvas_stringex', :path => 'gems/canvas_stringex'
 gem 'canvas_uuid', :path => 'gems/canvas_uuid'
 gem 'html_text_helper', :path => 'gems/html_text_helper'
@@ -307,10 +308,6 @@ group :cassandra do
     gem 'thrift', '0.8.0'
     gem 'thrift_client', '0.8.4'
   gem "canvas_cassandra", path: "gems/canvas_cassandra"
-end
-
-group :statsd do
-  gem 'statsd-ruby', '1.0.0', :require => 'statsd'
 end
 
 group :icu do
