@@ -15,7 +15,8 @@ module Quizzes
                 :hide_correct_answers_at, :all_dates, :can_unpublish, :can_update,
                 :require_lockdown_browser, :require_lockdown_browser_for_results,
                 :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
-                :speed_grader_url, :permissions, :quiz_reports_url, :quiz_statistics_url
+                :speed_grader_url, :permissions, :quiz_reports_url, :quiz_statistics_url,
+                :message_students_url
 
     def_delegators :@controller,
       :api_v1_course_assignment_group_url,
@@ -23,27 +24,56 @@ module Quizzes
       :api_v1_course_quiz_submission_url,
       :api_v1_course_quiz_submissions_url,
       :api_v1_course_quiz_reports_url,
-      :api_v1_course_quiz_statistics_url
+      :api_v1_course_quiz_statistics_url,
+      :api_v1_course_quiz_submission_users_url,
+      :api_v1_course_quiz_submission_users_message_url
+
+   def_delegators :@object,
+     :context,
+     :submitted_students_visible_to,
+     :unsubmitted_students_visible_to
 
     has_one :assignment_group, embed: :ids, root: :assignment_group
     has_many :quiz_submissions, embed: :ids, root: :quiz_submissions
+    has_many :submitted_students, embed: :ids, root: :submitted_students
+    has_many :unsubmitted_students, embed: :ids, root: :unsubmitted_students
+
+    def submitted_students
+      user_finder.submitted_students
+    end
+
+    def unsubmitted_students
+      user_finder.unsubmitted_students
+    end
+
+    def message_students_url
+      api_v1_course_quiz_submission_users_message_url(context, quiz)
+    end
 
     def speed_grader_url
       return nil unless show_speedgrader?
-      speed_grader_course_gradebook_url(quiz.context, assignment_id: quiz.assignment.id)
+      speed_grader_course_gradebook_url(context, assignment_id: quiz.assignment.id)
     end
 
     def quiz_submissions_url
       if user_may_grade?
-        api_v1_course_quiz_submissions_url(quiz.context, quiz)
+        api_v1_course_quiz_submissions_url(context, quiz)
       else
         quiz_submission = quiz.quiz_submissions.where(user_id: current_user).first
         if quiz_submission
-          api_v1_course_quiz_submission_url(quiz.context, quiz, quiz_submission)
+          api_v1_course_quiz_submission_url(context, quiz, quiz_submission)
         else
           nil
         end
       end
+    end
+
+    def unsubmitted_students_url
+      api_v1_course_quiz_submission_users_url(context, quiz, submitted: 'false')
+    end
+
+    def submitted_students_url
+      api_v1_course_quiz_submission_users_url(context, quiz, submitted: true)
     end
 
     def html_url
@@ -73,8 +103,9 @@ module Quizzes
       super(keys).select do |key|
         case key
         when :all_dates then include_all_dates?
-        when :access_code, :speed_grader_url then user_may_grade?
+        when :access_code, :speed_grader_url, :message_students_url then user_may_grade?
         when :unpublishable then include_unpublishable?
+        when :submitted_students, :unsubmitted_students then user_may_grade?
         else true
         end
       end
@@ -91,19 +122,18 @@ module Quizzes
     def question_count
       quiz.available_question_count
     end
-    
     def require_lockdown_browser
       quiz.require_lockdown_browser?
     end
-    
+
     def require_lockdown_browser_for_results
       quiz.require_lockdown_browser_for_results?
     end
-    
+
     def require_lockdown_browser_monitor
       quiz.require_lockdown_browser_monitor?
     end
-    
+
     def lockdown_browser_monitor_data
       quiz.lockdown_browser_monitor_data
     end
@@ -126,7 +156,7 @@ module Quizzes
     end
 
     def assignment_group_url
-      api_v1_course_assignment_group_url(quiz.context, quiz.assignment_group.id)
+      api_v1_course_assignment_group_url(context, quiz.assignment_group.id)
     end
 
     def quiz_reports_url
@@ -144,7 +174,7 @@ module Quizzes
     private
 
     def show_speedgrader?
-      quiz.assignment.present? && quiz.published? && quiz.context.allows_speed_grader?
+      quiz.assignment.present? && quiz.published? && context.allows_speed_grader?
     end
 
     def due_dates
@@ -176,5 +206,8 @@ module Quizzes
       quiz.grants_right?(current_user, session, :grade)
     end
 
+    def user_finder
+      @user_finder ||= Quizzes::QuizUserFinder.new(quiz, current_user)
+    end
   end
 end

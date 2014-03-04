@@ -784,7 +784,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   }
   scope :for_user_ids, lambda { |user_ids| where(:user_id => user_ids) }
   scope :logged_out, where("temporary_user_code is not null")
-  scope :not_settings_only, where("workflow_state<>'settings_only'")
+  scope :not_settings_only, where("quiz_submissions.workflow_state<>'settings_only'")
   scope :completed, where(:workflow_state => %w(complete pending_review))
 
   has_a_broadcast_policy

@@ -1295,4 +1295,5 @@ class Quizzes::Quiz < ActiveRecord::Base
   def self.reflection_type_name
     'quizzes:quiz'
   end
+
 end

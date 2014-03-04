@@ -638,12 +638,12 @@ end
   end
 
   def student_in_section(section, opts={})
-    user
-    enrollment = section.course.enroll_user(@user, 'StudentEnrollment', :section => section)
-    @user.save!
+    student = opts.fetch(:user) { user }
+    enrollment = section.course.enroll_user(student, 'StudentEnrollment', :section => section)
+    student.save!
     enrollment.workflow_state = 'active'
     enrollment.save!
-    @user
+    student
   end
 
   def teacher_in_course(opts={})
