@@ -25,7 +25,17 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
   it 'should calculate mean/stddev as expected with a few submissions' do
     q = @course.quizzes.create!
+    question = q.quiz_questions.create!({
+      question_data: {
+        name: 'q1',
+        points_possible: 30,
+        question_type: 'essay_question',
+        question_text: 'ohai mark'
+      }
+    })
+    q.generate_quiz_data
     q.save!
+
     @user1 = User.create! :name => "some_user 1"
     @user2 = User.create! :name => "some_user 2"
     @user3 = User.create! :name => "some_user 2"
@@ -34,31 +44,37 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     student_in_course :course => @course, :user => @user3
     sub = q.generate_submission(@user1)
     sub.workflow_state = 'complete'
-    sub.submission_data = [{ :points => 15, :text => "", :correct => "undefined", :question_id => -1 }]
+    sub.submission_data = [{ :points => 15, :text => "", :correct => "undefined", :question_id => question.id }]
+    sub.score = 15
     sub.with_versioning(true, &:save!)
     stats = q.statistics
     stats[:submission_score_average].should == 15
     stats[:submission_score_high].should == 15
     stats[:submission_score_low].should == 15
     stats[:submission_score_stdev].should == 0
+    stats[:submission_scores].should == { 50 => 1 }
     sub = q.generate_submission(@user2)
     sub.workflow_state = 'complete'
-    sub.submission_data = [{ :points => 17, :text => "", :correct => "undefined", :question_id => -1 }]
+    sub.submission_data = [{ :points => 17, :text => "", :correct => "undefined", :question_id => question.id }]
+    sub.score = 17
     sub.with_versioning(true, &:save!)
     stats = q.statistics
     stats[:submission_score_average].should == 16
     stats[:submission_score_high].should == 17
     stats[:submission_score_low].should == 15
     stats[:submission_score_stdev].should == 1
+    stats[:submission_scores].should == { 50 => 1, 57 => 1 }
     sub = q.generate_submission(@user3)
     sub.workflow_state = 'complete'
-    sub.submission_data = [{ :points => 20, :text => "", :correct => "undefined", :question_id => -1 }]
+    sub.submission_data = [{ :points => 20, :text => "", :correct => "undefined", :question_id => question.id }]
+    sub.score = 20
     sub.with_versioning(true, &:save!)
     stats = q.statistics
     stats[:submission_score_average].should be_close(17 + 1.0/3, 0.0000000001)
     stats[:submission_score_high].should == 20
     stats[:submission_score_low].should == 15
     stats[:submission_score_stdev].should be_close(Math::sqrt(4 + 2.0/9), 0.0000000001)
+    stats[:submission_scores].should == { 50 => 1, 57 => 1, 67 => 1 }
   end
 
   context "csv" do

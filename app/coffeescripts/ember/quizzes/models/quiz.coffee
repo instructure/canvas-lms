@@ -6,15 +6,15 @@ define [
 ], (Em, DS, I18n, ajax) ->
 
   {alias, equal, any} = Em.computed
-  {belongsTo, PromiseObject} = DS
+  {belongsTo, PromiseObject, hasMany, Model, attr} = DS
 
   Em.onerror = (error) ->
     console.log 'ERR', error, error.stack
 
-  {Model, attr} = DS
   Model.extend
     title: attr()
     quizType: attr()
+    links: attr()
     htmlURL: attr()
     # editURL is temporary until we have a real ember route for it
     editURL: (->
@@ -86,3 +86,5 @@ define [
         { html: html }
       PromiseObject.create promise: promise
     ).property('quizSubmissionHtmlURL')
+    quizStatistics: hasMany 'quiz_statistics', async: true
+    quizReports: hasMany 'quiz_report', async: true

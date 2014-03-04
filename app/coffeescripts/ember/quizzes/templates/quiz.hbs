@@ -42,7 +42,11 @@
         {{/link-to}}
       {{/link-to}}
 
-      <li><a href="#">Statistics</a></li>
+      {{#link-to 'quiz.statistics' this tagName='li'}}
+        {{#link-to 'quiz.statistics' this.id}}
+          {{#t 'statistics'}}Statistics{{/t}}
+        {{/link-to}}
+      {{/link-to}}
     </ol>
   </div>
 

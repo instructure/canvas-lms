@@ -65,12 +65,14 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     found_ids = {}
     score_counter = Stats::Counter.new
     questions_hash = {}
+    quiz_points = [quiz.current_points_possible.to_f, 1.0].max
     stats[:questions] = []
     stats[:multiple_attempts_exist] = submissions.any? { |s|
       s.attempt && s.attempt > 1
     }
     stats[:submission_user_ids] = Set.new
     stats[:submission_logged_out_users] = []
+    stats[:submission_scores] = Hash.new(0)
     stats[:unique_submission_count] = 0
     correct_cnt = incorrect_cnt = total_duration = 0
     submissions.each_with_index do |sub, index|
@@ -82,7 +84,9 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
         stats[:submission_logged_out_users] << temp_user
       end
       if !found_ids[sub.id]
+        percentile = (sub.score.to_f / quiz_points * 100).round
         stats[:unique_submission_count] += 1
+        stats[:submission_scores][percentile] += 1
         found_ids[sub.id] = true
       end
       answers = sub.submission_data || []

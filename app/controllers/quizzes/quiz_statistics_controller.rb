@@ -226,6 +226,11 @@
 #           "example": 1.24721912892465,
 #           "type": "number"
 #         },
+#         "scores": {
+#           "description": "A percentile distribution of the student scores, each key is the percentile (ranges between 0 and 100%) while the value is the number of students who received that score.",
+#           "example": { "50": 1, "34": 5, "100": 1 },
+#           "type": "object"
+#         },
 #         "correct_count_average": {
 #           "description": "The mean of the number of questions answered correctly by each student.",
 #           "example": 3.66666666666667,
