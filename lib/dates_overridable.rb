@@ -130,7 +130,7 @@ module DatesOverridable
       [ due_at.present? ? SortFirst : SortLast, due_at.presence || SortFirst ]
     end
 
-    dates.map { |h| h.slice(:due_at, :unlock_at, :lock_at, :title, :base) }
+    dates.map { |h| h.slice(:id, :due_at, :unlock_at, :lock_at, :title, :base) }
   end
 
   def observed_student_due_dates(user)
