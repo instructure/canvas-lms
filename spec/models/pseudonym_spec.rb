@@ -301,25 +301,6 @@ describe Pseudonym do
     end
   end
 
-  describe "mfa_settings" do
-    it "should inherit from the account" do
-      account = Account.create!
-      user = User.create!
-      p = user.pseudonyms.create!(:account => account, :unique_id => 'user')
-      Account.default.add_user(user)
-
-      p.mfa_settings.should == :disabled
-      p.account.settings[:mfa_settings] = :optional
-      p.mfa_settings.should == :optional
-      p.account.settings[:mfa_settings] = :required
-      p.mfa_settings.should == :required
-      p.account.settings[:mfa_settings] = :required_for_admins
-      p.mfa_settings.should == :optional
-      account.add_user(user)
-      p.mfa_settings.should == :required
-    end
-  end
-
   describe 'valid_arbitrary_credentials?' do
     it "should ignore password if canvas authentication is disabled" do
       user_with_pseudonym(:password => 'qwerty')

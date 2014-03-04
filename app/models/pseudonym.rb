@@ -420,15 +420,6 @@ class Pseudonym < ActiveRecord::Base
     nil
   end
 
-  def mfa_settings
-    case self.account.mfa_settings
-    when :required_for_admins
-      self.account.all_account_users_for(self.user).empty? ? :optional : :required
-    else
-      self.account.mfa_settings
-    end
-  end
-
   def claim_cas_ticket(ticket)
     return unless Canvas.redis_enabled?
     Canvas.redis.setex("cas_session:#{ticket}", 1.day, global_id)
