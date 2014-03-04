@@ -139,7 +139,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                         'Accept' => 'application/vnd.api+json')
         @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
         @json.should =~ [
-          QuizSerializer.new(@quiz, scope: @user, controller: controller, session: session).
+          Quizzes::QuizSerializer.new(@quiz, scope: @user, controller: controller, session: session).
           as_json[:quiz].with_indifferent_access
         ]
       end
@@ -179,7 +179,7 @@ describe Quizzes::QuizzesApiController, type: :request do
         @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
         @quiz = Quizzes::Quiz.first
         @json.should =~ [
-          QuizSerializer.new(@quiz, scope: @user, controller: controller, session: session).
+          Quizzes::QuizSerializer.new(@quiz, scope: @user, controller: controller, session: session).
           as_json[:quiz].with_indifferent_access
         ]
       end
@@ -337,7 +337,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                         'Accept' => 'application/vnd.api+json')
         @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
         @json.should =~ [
-          QuizSerializer.new(@quiz.reload, scope: @user, controller: controller, session: session).
+          Quizzes::QuizSerializer.new(@quiz.reload, scope: @user, controller: controller, session: session).
           as_json[:quiz].with_indifferent_access
         ]
       end

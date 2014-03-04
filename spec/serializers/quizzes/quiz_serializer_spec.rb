@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe QuizSerializer do
+describe Quizzes::QuizSerializer do
   let(:quiz) { @quiz }
   let(:context ) { @context }
   let(:serializer) { @serializer }
@@ -24,7 +24,7 @@ describe QuizSerializer do
     controller.stubs(:session).returns session
     controller.stubs(:context).returns context
     @quiz.stubs(:grants_right?).at_least_once.returns true
-    @serializer = QuizSerializer.new(@quiz,
+    @serializer = Quizzes::QuizSerializer.new(@quiz,
                                      controller: controller,
                                      scope: @user,
                                      session: @session)
@@ -116,7 +116,7 @@ describe QuizSerializer do
       quiz.expects(:locked_for?).
         with(@user, check_policies: true, context: @context).
         returns({due_at: true})
-      json = QuizSerializer.new(quiz, scope: @user, controller: controller).
+      json = Quizzes::QuizSerializer.new(quiz, scope: @user, controller: controller).
         as_json[:quiz]
       json.should have_key :lock_info
       json.should have_key :lock_explanation
@@ -125,7 +125,7 @@ describe QuizSerializer do
       quiz.expects(:locked_for?).
         with(@user, check_policies: true, context: @context).
         returns false
-      json = QuizSerializer.new(quiz, scope: @user, controller: controller).
+      json = Quizzes::QuizSerializer.new(quiz, scope: @user, controller: controller).
         as_json[:quiz]
       json.should_not have_key :lock_info
       json.should_not have_key :lock_explanation
@@ -184,7 +184,7 @@ describe QuizSerializer do
       it "sends the url for all submissions when user may grade" do
         course_with_teacher_logged_in(active_all: true)
         quiz_with_graded_submission([], course: @course)
-        serializer = QuizSerializer.new(@quiz,
+        serializer = Quizzes::QuizSerializer.new(@quiz,
                                         controller: controller,
                                         scope: @teacher)
         serializer.as_json[:quiz]['links']['quiz_submissions'].should ==
@@ -194,7 +194,7 @@ describe QuizSerializer do
       it "sends the url to a student's submission for students" do
         course_with_student_logged_in(active_all: true)
         quiz_with_graded_submission([], user: @student, course: @course)
-        serializer = QuizSerializer.new(@quiz,
+        serializer = Quizzes::QuizSerializer.new(@quiz,
                                         controller: controller,
                                         scope: @student)
         serializer.as_json[:quiz]['links']['quiz_submissions'].should ==
@@ -207,7 +207,7 @@ describe QuizSerializer do
 
       it "sends nil if user can't grade and doesn't have a submission" do
         course_with_student_logged_in(active_all: true)
-        serializer = QuizSerializer.new(@quiz,
+        serializer = Quizzes::QuizSerializer.new(@quiz,
                                         controller: controller,
                                         scope: @student)
         serializer.as_json[:quiz]['links']['quiz_submissions'].should be_nil
