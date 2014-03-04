@@ -422,6 +422,17 @@ describe ContextModulesController do
       json["next_module"]["context_module"]["id"].should == @m3.id
     end
 
+    it "should parse namespaced quiz as id" do
+      course_with_teacher_logged_in(:course => @course, :active_all => true)
+      quiz = @course.quizzes.create!
+      quiz.publish!
+
+      quiz_tag = @m2.add_item :type => 'quiz', :id => quiz.id
+
+      get 'item_details', :course_id => @course.id, :module_item_id => quiz_tag.id, :id => "quizzes:quiz_#{quiz.id}"
+      json = JSON.parse response.body.gsub("while(1);",'')
+      json['current_item']['content_tag']['content_type'].should == 'Quizzes::Quiz'
+    end
   end
   
   describe "GET progressions" do
