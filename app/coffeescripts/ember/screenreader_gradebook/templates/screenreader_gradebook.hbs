@@ -450,6 +450,14 @@
         <div>
           <a {{bind-attr href="speedGraderUrl"}}>{{#t 'assignment_in_speedgrader'}}See this assignment in speedgrader{{/t}}</a>
         </div>
+        {{#if showDownloadSubmissionsButton}}
+          <div class="pad-box no-sides">
+            {{
+              ic-submission-download-dialog
+              assignmentUrl=selectedAssignment.html_url
+            }}
+          </div>
+        {{/if}}
         <div class="pad-box no-sides">
           <p><strong>
             {{#t 'submission_types'}}Submission types: {{/t}} {{assignmentSubmissionTypes}}

@@ -11,7 +11,8 @@ define [
   'compiled/AssignmentDetailsDialog'
   'compiled/AssignmentMuter'
   'compiled/grade_calculator'
-  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator) ->
+  '../../shared/components/ic_submission_download_dialog_component'
+  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator, ic_submission_download_dialog ) ->
 
   {get, set, setProperties} = Ember
 
@@ -90,7 +91,7 @@ define [
 
     showDownloadSubmissionsButton: (->
       @get('selectedAssignment.has_submitted_submissions') and
-      @get('selectedAssignment.submission_types').match(/(online_upload|online_text_entry|online_url)/)
+      _.intersection(@get('selectedAssignment.submission_types'), ['online_upload','online_text_entry','online_url']) != []
     ).property('selectedAssignment')
 
     hideStudentNames: false
