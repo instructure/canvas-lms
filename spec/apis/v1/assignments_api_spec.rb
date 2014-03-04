@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
-describe AssignmentsApiController, :type => :integration do
+describe AssignmentsApiController, type: :request do
   include Api
   include Api::V1::Assignment
   include Api::V1::Submission
@@ -35,7 +35,7 @@ describe AssignmentsApiController, :type => :integration do
       api_get_assignment_in_course(locked_item, @course)
     end
 
-    it_should_behave_like 'a locked api item'
+    include_examples 'a locked api item'
   end
 
   def create_submitted_assignment_with_user(user=@user)
@@ -147,6 +147,7 @@ describe AssignmentsApiController, :type => :integration do
       @rubric = rubric_model(:user => @user,
                              :context => @course,
                              :data => larger_rubric_data,
+                             :title => 'some rubric',
                              :points_possible => 12,
                               :free_form_criterion_comments => true)
 
@@ -157,6 +158,8 @@ describe AssignmentsApiController, :type => :integration do
       @assignment.rubric_association.save!
       json = api_get_assignments_index_from_course(@course)
       json.first['rubric_settings'].should == {
+        'id' => @rubric.id,
+        'title' => 'some rubric',
         'points_possible' => 12,
         'free_form_criterion_comments' => true
       }
@@ -480,7 +483,7 @@ describe AssignmentsApiController, :type => :integration do
           },
           {:assignment => { 'name' => name_too_long} }
         )
-        response.status.to_i.should == 400
+        assert_status(400)
       }.should_not change(Assignment, :count)
     end
 
@@ -505,7 +508,7 @@ describe AssignmentsApiController, :type => :integration do
         },
         { :assignment => { 'name' => name_too_long} }
       )
-      response.status.to_i.should == 400
+      assert_status(400)
       @assignment.reload
       @assignment.name.should == 'some name'
     end
@@ -1339,7 +1342,7 @@ describe AssignmentsApiController, :type => :integration do
         context "assignment with quiz" do
           before do
             course_with_teacher(:active_all => true)
-            @quiz = Quiz.create!(:title => 'Quiz Name', :context => @course)
+            @quiz = Quizzes::Quiz.create!(:title => 'Quiz Name', :context => @course)
             @quiz.did_edit!
             @quiz.offer!
             assignment = @quiz.assignment

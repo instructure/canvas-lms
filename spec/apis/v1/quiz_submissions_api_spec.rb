@@ -19,35 +19,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 shared_examples_for 'Quiz Submissions API Restricted Endpoints' do
-  it 'should require a valid access token' do
-    @quiz.access_code = 'foobar'
-    @quiz.save!
-
-    @request_proxy.call true, {
-      attempt: 1
-    }
-
-    response.status.to_i.should == 403
-    response.body.should match(/invalid access code/)
-  end
-
-  it 'should require a valid ip' do
-    @quiz.ip_filter = '10.0.0.1/24'
-    @quiz.save!
-
-    @request_proxy.call true, {
-      attempt: 1
-    }
-
-    response.status.to_i.should == 403
-    response.body.should match(/ip address denied/i)
-  end
-
   it 'should require the LDB' do
     @quiz.require_lockdown_browser = true
     @quiz.save
 
-    Quiz.stubs(:lockdown_browser_plugin_enabled?).returns true
+    Quizzes::Quiz.stubs(:lockdown_browser_plugin_enabled?).returns true
 
     fake_plugin = Object.new
     fake_plugin.stubs(:authorized?).returns false
@@ -60,12 +36,12 @@ shared_examples_for 'Quiz Submissions API Restricted Endpoints' do
       attempt: 1
     }
 
-    response.status.to_i.should == 403
+    assert_status(403)
     response.body.should match(/requires the lockdown browser/i)
   end
 end
 
-describe QuizSubmissionsApiController, :type => :integration do
+describe QuizSubmissionsApiController, type: :request do
   module Helpers
     def enroll_student(opts = {})
       last_user = @teacher = @user
@@ -79,8 +55,8 @@ describe QuizSubmissionsApiController, :type => :integration do
       end
     end
 
-    def enroll_student_and_submit(submission_data = {})
-      enroll_student
+    def enroll_student_and_submit(submission_data = {}, login=false)
+      enroll_student({ login: login })
 
       @quiz_submission = @quiz.generate_submission(@student)
       @quiz_submission.submission_data = submission_data
@@ -164,12 +140,10 @@ describe QuizSubmissionsApiController, :type => :integration do
   before :each do
     course_with_teacher_logged_in :active_all => true
 
-    @quiz = Quiz.create!(:title => 'quiz', :context => @course)
+    @quiz = Quizzes::Quiz.create!(:title => 'quiz', :context => @course)
     @quiz.published_at = Time.now
     @quiz.workflow_state = 'available'
     @quiz.save!
-
-    @assignment = @quiz.assignment
   end
 
   describe 'GET /courses/:course_id/quizzes/:quiz_id/submissions [INDEX]' do
@@ -186,10 +160,18 @@ describe QuizSubmissionsApiController, :type => :integration do
       json['quiz_submissions'].size.should == 1
     end
 
+    it 'should be accessible by the owner student' do
+      enroll_student_and_submit({}, true)
+
+      json = qs_api_index
+      json.has_key?('quiz_submissions').should be_true
+      json['quiz_submissions'].length.should == 1
+    end
+
     it 'should restrict access to itself' do
       student_in_course
       json = qs_api_index(true)
-      response.status.to_i.should == 401
+      assert_status(401)
     end
   end
 
@@ -205,10 +187,19 @@ describe QuizSubmissionsApiController, :type => :integration do
       json['quiz_submissions'].length.should == 1
     end
 
+    it 'should be accessible implicitly to its own student as "self"' do
+      @user = @student
+      @quiz_submission.stubs(:id).returns 'self'
+
+      json = qs_api_show
+      json.has_key?('quiz_submissions').should be_true
+      json['quiz_submissions'].length.should == 1
+    end
+
     it 'should deny access by other students' do
       student_in_course
       qs_api_show(true)
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     context 'Output' do
@@ -243,7 +234,7 @@ describe QuizSubmissionsApiController, :type => :integration do
         json.has_key?('quiz_submissions').should be_true
 
         qs_json = json['quiz_submissions'][0]
-        qs_json['html_url'].should == polymorphic_url([@course, @quiz, @quiz_submission])
+        qs_json['html_url'].should == course_quiz_quiz_submission_url(@course, @quiz, @quiz_submission)
       end
     end
 
@@ -339,27 +330,11 @@ describe QuizSubmissionsApiController, :type => :integration do
       qs_api_create
     end
 
-    context 'parameter, permission, and state validations' do
-      it_should_behave_like 'Quiz Submissions API Restricted Endpoints'
+    context 'access validations' do
+      include_examples 'Quiz Submissions API Restricted Endpoints'
 
       before :each do
         @request_proxy = method(:qs_api_create)
-      end
-
-      it 'should reject creating a QS when one already exists' do
-        qs_api_create
-        qs_api_create(true)
-        response.status.to_i.should == 409
-      end
-
-      it 'should respect the number of allowed attempts' do
-        json = qs_api_create
-        qs = QuizSubmission.find(json['quiz_submissions'][0]['id'])
-        qs.mark_completed
-        qs.save!
-
-        qs_api_create(true)
-        response.status.to_i.should == 409
       end
     end
   end
@@ -382,8 +357,8 @@ describe QuizSubmissionsApiController, :type => :integration do
       json['quiz_submissions'][0]['workflow_state'].should == 'complete'
     end
 
-    context 'parameter, permission, and state validations' do
-      it_should_behave_like 'Quiz Submissions API Restricted Endpoints'
+    context 'access validations' do
+      include_examples 'Quiz Submissions API Restricted Endpoints'
 
       before do
         @request_proxy = method(:qs_api_complete)
@@ -397,14 +372,14 @@ describe QuizSubmissionsApiController, :type => :integration do
           attempt: 1
         }
 
-        response.status.to_i.should == 400
+        assert_status(400)
         response.body.should match(/already complete/)
       end
 
       it 'should require the attempt index' do
         json = qs_api_complete true
 
-        response.status.to_i.should == 400
+        assert_status(400)
         response.body.should match(/invalid attempt/)
       end
 
@@ -413,7 +388,7 @@ describe QuizSubmissionsApiController, :type => :integration do
           attempt: 123123123
         }
 
-        response.status.to_i.should == 400
+        assert_status(400)
         response.body.should match(/attempt.*can not be modified/)
       end
 
@@ -422,7 +397,7 @@ describe QuizSubmissionsApiController, :type => :integration do
           validation_token: 'aaaooeeeee'
         }
 
-        response.status.to_i.should == 403
+        assert_status(403)
         response.body.should match(/invalid token/)
       end
     end

@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe ProgressController, :type => :integration do
+describe ProgressController, type: :request do
 
   describe "show" do
     before do

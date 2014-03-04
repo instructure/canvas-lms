@@ -196,8 +196,8 @@ class MessageableUser < User
     def self.restrict_scope(scope, pager)
       if pager.current_bookmark
         name, id = pager.current_bookmark
-        scope_shard = scope.scope(:find, :shard)
-        id = Shard.relative_id_for(id, scope_shard) if scope_shard
+        scope_shard = scope.shard_value
+        id = Shard.relative_id_for(id, Shard.current, scope_shard) if scope_shard
 
         condition = [
           <<-SQL,

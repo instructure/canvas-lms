@@ -34,7 +34,7 @@ describe "quizzes assignments" do
       driver.execute_script %{$('#assignment_#{assign.id} .edit_assignment_link:first').addClass('focus');}
       f("#assignment_#{assign.id} .edit_assignment_link").click
       edit_assignment(:name => "Retest!", :submit => true)
-      Quiz.find_by_assignment_id(assign.id).title.should == "Retest!"
+      Quizzes::Quiz.find_by_assignment_id(assign.id).title.should == "Retest!"
     end
   end
 

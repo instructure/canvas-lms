@@ -158,8 +158,8 @@ class QuizzesApiController < ApplicationController
   # @returns [Quiz]
   def index
     if authorized_action(@context, @current_user, :read) && tab_enabled?(@context.class::TAB_QUIZZES)
-      api_route = polymorphic_url([:api, :v1, @context, :quizzes])
-      scope = Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
+      api_route = api_v1_course_quizzes_url(@context)
+      scope = Quizzes::Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
       json = if accepts_jsonapi?
         unless is_authorized_action?(@context, @current_user, :manage_assignments)
           scope = scope.available

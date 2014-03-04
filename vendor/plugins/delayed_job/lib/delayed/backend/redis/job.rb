@@ -35,7 +35,7 @@ end
 class Job
   unless CANVAS_RAILS2
     extend ActiveModel::Callbacks
-    define_model_callbacks :create
+    define_model_callbacks :create, :save
   end
   include Delayed::Backend::Base
   # This redis instance needs to be set by the application during jobs configuration

@@ -18,6 +18,7 @@
 
 class SubmissionComment < ActiveRecord::Base
   include SendToStream
+  include HtmlTextHelper
 
   belongs_to :submission #, :touch => true
   belongs_to :author, :class_name => 'User'
@@ -200,7 +201,6 @@ class SubmissionComment < ActiveRecord::Base
     if formatted_body = read_attribute(:formatted_body)
       return formatted_body
     end
-    self.extend TextHelper
     res = format_message(comment).first
     res = truncate_html(res, :max_length => truncate, :words => true) if truncate
     res

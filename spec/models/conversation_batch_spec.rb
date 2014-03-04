@@ -37,11 +37,12 @@ describe ConversationBatch do
     end
 
     it "should create a sync batch and run it" do
+      start_count = ConversationMessage.count
       batch = ConversationBatch.generate(@message, [@user2, @user3], :sync)
       batch.should be_sent
       batch.completion.should eql 1
       batch.root_conversation_message.reload.conversation.should be_nil
-      ConversationMessage.count.should eql 3 # the root message, plus the ones to each recipient
+      (ConversationMessage.count - start_count).should eql 3 # the root message, plus the ones to each recipient
       @user1.reload.unread_conversations_count.should eql 0
       @user1.all_conversations.size.should eql 2
       @user2.reload.unread_conversations_count.should eql 1
@@ -51,13 +52,14 @@ describe ConversationBatch do
 
   context "deliver" do
     it "should be sent to all recipients" do
+      start_count = ConversationMessage.count
       batch = ConversationBatch.generate(@message, [@user2, @user3], :async)
       batch.deliver
 
       batch.should be_sent
       batch.completion.should eql 1
       batch.root_conversation_message.reload.conversation.should be_nil
-      ConversationMessage.count.should eql 3 # the root message, plus the ones to each recipient
+      (ConversationMessage.count - start_count).should eql 3 # the root message, plus the ones to each recipient
       @user1.reload.unread_conversations_count.should eql 0
       @user1.all_conversations.size.should eql 2
       @user2.reload.unread_conversations_count.should eql 1
@@ -65,12 +67,13 @@ describe ConversationBatch do
     end
 
     it "should apply the tags to each conversation" do
+      start_count = ConversationMessage.count
       g = @course.groups.create
       g.users << @user1 << @user2
       batch = ConversationBatch.generate(@message, [@user2, @user3], :async, :tags => [g.asset_string])
       batch.deliver
 
-      ConversationMessage.count.should eql 3 # the root message, plus the ones to each recipient
+      (ConversationMessage.count - start_count).should eql 3 # the root message, plus the ones to each recipient
       @user1.reload.unread_conversations_count.should eql 0
       @user1.all_conversations.size.should eql 2
       @user2.reload.unread_conversations_count.should eql 1
@@ -80,22 +83,24 @@ describe ConversationBatch do
     end
 
     it "should copy the attachment(s) to each conversation" do
+      start_count = ConversationMessage.count
       attachment = attachment_model(:context => @user1, :folder => @user1.conversation_attachments_folder)
       @message = Conversation.build_message @user1, "hi all", :attachment_ids => [attachment.id]
 
       batch = ConversationBatch.generate(@message, [@user2, @user3], :async)
       batch.deliver
 
-      ConversationMessage.count.should eql 3
+      (ConversationMessage.count - start_count).should eql 3
       ConversationMessage.all.each do |message|
         message.attachments.should == @message.attachments
       end
     end
 
     it "should send group messages" do
+      start_count = Conversation.count
       batch = ConversationBatch.generate(@message, [@user, @user3], :async, group: true)
       batch.deliver
-      Conversation.count.should == 2
+      (Conversation.count - start_count).should == 2
       Conversation.all.each { |c| c.should_not be_private }
     end
 

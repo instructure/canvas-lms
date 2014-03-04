@@ -37,7 +37,7 @@ describe AssessmentQuestion do
   it "should infer_defaults from question_data before validation" do
     @question = assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
     @question.name = "1" * 300
-    @question.save(false) # save without validations
+    @question.save(validate: false)
     @question.name.length.should == 300
 
     @question.question_data[:question_name] = "valid name"

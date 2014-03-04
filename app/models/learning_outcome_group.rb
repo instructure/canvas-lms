@@ -27,7 +27,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :title, :workflow_state
-  sanitize_field :description, Instructure::SanitizeField::SANITIZE
+  sanitize_field :description, CanvasSanitize::SANITIZE
 
   attr_accessor :building_default
 
@@ -310,7 +310,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   def self.order_by_title
     scope = self
-    scope = scope.select("learning_outcome_groups.*") if !scoped?(:find, :select)
+    scope = scope.select("learning_outcome_groups.*") if !scoped.select_values.present?
     scope.select(title_order_by_clause).order(title_order_by_clause)
   end
 end

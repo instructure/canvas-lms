@@ -91,44 +91,5 @@
 </table>
 </div>
 <%= will_paginate(@accesses) %>
-<% js_block do %>
-  <script type="text/javascript">
-  require([
-    'jquery' /* $ */,
-    'jquery.instructure_date_and_time' /* parseFromISO */,
-    'jquery.templateData' /* fillTemplateData */,
-    'vendor/jquery.pageless' /* pageless */
-  ], function($) {
-
-
-    $(function(){
-      var url = "<%= context_url(@context, :context_user_usage_url, @user, :format => :json) %>";
-      $('#usage_report').pageless({
-        totalPages: <%= @accesses.total_pages %>,
-        url: url,
-        loaderMsg: "Loading more results",
-        scrape: function(data) {
-            if(typeof(data) == 'string') {
-              try {
-                data = $.parseJSON(data);
-              } catch(e) {
-                data = [];
-              }
-            }
-            for(var idx in data) {
-              var $access = $("#usage_report .access.blank:first").clone(true).removeClass('blank');
-              var access = data[idx].asset_user_access;
-              $access.addClass(access.asset_class_name);
-              access.readable_name = access.readable_name || access.display_name || access.asset_code;
-              access.last_viewed = $.parseFromISO(access.last_access).datetime_formatted;
-              $access.fillTemplateData({data: access});
-              $("#usage_report table tbody").append($access.show());
-            }
-          return "";
-        }
-      });
-    });
-  });
-  </script>
-<% end %>
+<% js_bundle 'legacy/context_roster_user_usage' %>
 

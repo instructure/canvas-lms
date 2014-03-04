@@ -26,6 +26,7 @@ class Message < ActiveRecord::Base
   include ERB::Util
   include SendToStream
   include TextHelper
+  include HtmlTextHelper
   include Twitter
   include Workflow
 
@@ -611,7 +612,7 @@ class Message < ActiveRecord::Base
     logger.info "Delivering mail: #{self.inspect}"
 
     begin
-      res = Mailer.message(self).deliver
+      res = Mailer.create_message(self).deliver
     rescue Net::SMTPServerBusy => e
       @exception = e
       logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"

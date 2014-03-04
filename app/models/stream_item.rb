@@ -173,8 +173,6 @@ class StreamItem < ActiveRecord::Base
     when WebConference
       res = object.attributes
       res['users'] = object.users.map{|u| prepare_user(u)}
-    when CollectionItem
-      res = object.attributes
     else
       raise "Unexpected stream item type: #{object.class.to_s}"
     end
@@ -337,7 +335,7 @@ class StreamItem < ActiveRecord::Base
     scope = scope.includes(:stream_item_instances) if touch_users
 
     while true
-      batch = scope.all
+      batch = scope.reload.all
       batch.each do |item|
         count += 1
         if touch_users

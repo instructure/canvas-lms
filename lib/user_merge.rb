@@ -252,6 +252,13 @@ class UserMerge
         end
       end
 
+      context_updates = ['calendar_events']
+      context_updates.each do |table|
+        klass = table.classify.constantize
+        klass.where(context_id: from_user, context_type: 'User').
+          update_all(context_id: target_user.id, context_code: target_user.asset_string)
+      end
+
       unless Shard.current != target_user.shard
         # delete duplicate enrollments where this user is the observee
         target_user.observee_enrollments.remove_duplicates!

@@ -46,6 +46,8 @@ class ContextController < ApplicationController
     @show_left_side = false
     @show_right_side = false
     @media_object = MediaObject.by_media_id(params[:id]).first
+    js_env(MEDIA_OBJECT_ID: params[:id],
+           MEDIA_OBJECT_TYPE: @media_object ? @media_object.media_type.to_s : 'video')
     render
   end
 
@@ -229,6 +231,8 @@ class ContextController < ApplicationController
     respond_to do |format|
       format.html do
         @messages = @messages.paginate(page: params[:page], per_page: 15)
+        js_env(discussion_replies_path: discussion_replies_path(:format => :json),
+               total_pages: @messages.size)
         render :action => :inbox
       end
       format.json do
@@ -335,6 +339,8 @@ class ContextController < ApplicationController
       respond_to do |format|
         format.html do
           @accesses = @accesses.paginate(page: params[:page], per_page: 50)
+          js_env(context_url: context_url(@context, :context_user_usage_url, @user, :format => :json),
+                 accesses_total_pages: @accesses.total_pages)
         end
         format.json do
           @accesses = Api.paginate(@accesses, self, polymorphic_url([@context, :user_usage], user_id: @user), default_per_page: 50)
@@ -346,7 +352,7 @@ class ContextController < ApplicationController
 
   def roster_user
     if authorized_action(@context, @current_user, :read_roster)
-      user_id = Shard.relative_id_for(params[:id], @context.shard)
+      user_id = Shard.relative_id_for(params[:id], Shard.current, @context.shard)
       if @context.is_a?(Course)
         @membership = @context.enrollments.find_by_user_id(user_id)
         log_asset_access(@membership, "roster", "roster")

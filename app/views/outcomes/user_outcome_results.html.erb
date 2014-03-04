@@ -60,27 +60,7 @@
 }
 </style>
 <% end %>
-<% js_block do %>
-  <script>
-  require([
-    'jquery' /* $ */
-  ], function($) {
-
-  $(document).ready(function() {
-    var showAllArtifacts = $("#show_all_artifacts_link");
-    showAllArtifacts.click(function(event) {
-      event.preventDefault();
-      $("tr.artifact_details").toggle();
-      if (showAllArtifacts.html() === '<%= t "#buttons.show_all_artifacts", "Show All Artifacts" %>') {
-        showAllArtifacts.html('<%= t "#buttons.hide_all_artifacts", "Hide All Artifacts" %>');
-      } else {
-        showAllArtifacts.html('<%= t "#buttons.show_all_artifacts", "Show All Artifacts" %>');
-      }
-    });
-  });
-  });
-  </script>
-<% end %>
+<% js_bundle 'legacy/user_outcome_results' %>
 
 <table id="outcomes">
 <thead>

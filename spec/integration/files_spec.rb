@@ -309,10 +309,10 @@ describe FilesController do
 
   it "should return the dynamically generated thumbnail of the size given" do
     attachment_model(:uploaded_data => stub_png_data)
-    sz = CollectionItemData::THUMBNAIL_SIZE
+    sz = "640x>"
     @attachment.any_instantiation.expects(:create_or_update_thumbnail).with(anything, sz, sz).returns { @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data) }
-    get "/images/thumbnails/#{@attachment.id}/#{@attachment.uuid}?size=#{CollectionItemData::THUMBNAIL_SIZE}"
-    thumb = @attachment.thumbnails.find_by_thumbnail(CollectionItemData::THUMBNAIL_SIZE)
+    get "/images/thumbnails/#{@attachment.id}/#{@attachment.uuid}?size=640x>"
+    thumb = @attachment.thumbnails.find_by_thumbnail("640x>")
     response.should redirect_to(thumb.authenticated_s3_url)
   end
   

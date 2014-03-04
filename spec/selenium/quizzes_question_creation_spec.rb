@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "quizzes question creation" do
-  it_should_behave_like "quizzes selenium tests"
+  include_examples "quizzes selenium tests"
 
   before (:each) do
     course_with_teacher_logged_in
@@ -525,17 +525,17 @@ describe "quizzes question creation" do
       wait_for_ajaximations
       click_settings_tab
       sleep 2 # wait for page to load
-      f('#multiple_attempts_option').click
-
       quiz_attempt_field = lambda {
-      f('#limit_attempts_option').click
-      replace_content(f('#quiz_allowed_attempts'), attempts)
-      f('#quiz_time_limit').click
+        set_value(f('#multiple_attempts_option'), false)
+        set_value(f('#multiple_attempts_option'), true)
+        set_value(f('#limit_attempts_option'), false)
+        set_value(f('#limit_attempts_option'), true)
+        replace_content(f('#quiz_allowed_attempts'), attempts)
+        driver.execute_script(%{$('#quiz_allowed_attempts').blur();}) unless alert_present?
       }
-      quiz_attempt_field.call
-      if !alert_present?
+      keep_trying_until do
         quiz_attempt_field.call
-        wait_for_ajaximations
+        alert_present?
       end
       alert = driver.switch_to.alert
       alert.text.should == alert_text
@@ -564,10 +564,14 @@ describe "quizzes question creation" do
       f('#quiz_time_limit').click
       alert_present?.should be_false
       fj('#quiz_allowed_attempts').should have_attribute('value', attempts) # fj to avoid selenium caching
-      expect_new_page_load { f('.save_quiz_button').click }
-      wait_for_ajaximations
-      keep_trying_until { f('.admin-links').should be_displayed }
-      Quiz.last.allowed_attempts.should == attempts.to_i
+
+      expect_new_page_load {
+        f('.save_quiz_button').click
+        wait_for_ajaximations
+        keep_trying_until { f('.admin-links').should be_displayed }
+      }
+
+      Quizzes::Quiz.last.allowed_attempts.should == attempts.to_i
     end
   end
 

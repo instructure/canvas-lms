@@ -18,11 +18,11 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe QuizIpFiltersController, :type => :integration do
+describe QuizIpFiltersController, type: :request do
   before :each do
     course_with_teacher_logged_in :active_all => true
 
-    @quiz = Quiz.create!(:title => 'quiz', :context => @course)
+    @quiz = Quizzes::Quiz.create!(:title => 'quiz', :context => @course)
     @quiz.save!
   end
 
@@ -68,7 +68,7 @@ describe QuizIpFiltersController, :type => :integration do
       student_in_course
 
       json = get_index(true)
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     context 'Pagination' do
@@ -96,7 +96,7 @@ describe QuizIpFiltersController, :type => :integration do
 
       it 'should bail out on an invalid cursor' do
         get_index true, { page: 'invalid' }
-        response.status.to_i.should == 404
+        assert_status(404)
       end
     end
 

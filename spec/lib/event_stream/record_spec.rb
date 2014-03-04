@@ -60,9 +60,9 @@ describe EventStream::Failure do
       @event.page_view.should be_nil
 
       @page_view = PageView.new { |p|
-        p.send(:attributes=, {
+        p.assign_attributes({
           :request_id => @request_id
-        }, false)
+        }, :without_protection => true)
       }
       PageView.stubs( :find_by_id => @page_view )
       @event.page_view.should == @page_view

@@ -79,7 +79,13 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       $textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message'))
       _.defer ->
         $textarea.editorBox()
-        $('.rte_switch_views_link').click preventDefault -> $textarea.editorBox('toggle')
+        $('.rte_switch_views_link').click (event) ->
+          event.preventDefault()
+          event.stopPropagation()
+          $textarea.editorBox 'toggle'
+          # hide the clicked link, and show the other toggle link.
+          # todo: replace .andSelf with .addBack when JQuery is upgraded.
+          $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
       wikiSidebar.attachToEditor $textarea
 
       wikiSidebar.show()

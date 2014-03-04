@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe TakeQuizPresenter do
   let(:presenter) { TakeQuizPresenter.new(quiz, submission, params) }
 
-  let(:quiz) { Quiz.new }
+  let(:quiz) { Quizzes::Quiz.new }
   let(:submission) { QuizSubmission.new }
   let(:params) { {} }
   let(:question1) { {:id => 1, :name => "Question 1"} }

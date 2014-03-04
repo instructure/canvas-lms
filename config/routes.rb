@@ -822,7 +822,7 @@ routes.draw do
   # inline in the routes file, but getting concerns working would rawk.
   ApiRouteSet::V1.draw(self) do
     scope(:controller => :courses) do
-      get 'courses', :action => :index
+      get 'courses', :action => :index, :path_name => 'courses'
       put 'courses/:id', :action => :update
       get 'courses/:id', :action => :show, :path_name => 'course'
       delete 'courses/:id', :action => :destroy
@@ -877,6 +877,10 @@ routes.draw do
       delete 'courses/:course_id/enrollments/:id', :action => :destroy
     end
 
+    scope(:controller => :terms_api) do
+      get 'accounts/:account_id/terms', :action => :index, :path_name => 'enrollment_terms'
+    end
+
     scope(:controller => :authentication_audit_api) do
       get 'audit/authentication/logins/:login_id', :action => :for_login, :path_name => 'audit_authentication_login'
       get 'audit/authentication/accounts/:account_id', :action => :for_account, :path_name => 'audit_authentication_account'
@@ -888,6 +892,10 @@ routes.draw do
       get 'audit/grade_change/courses/:course_id', :action => :for_course, :path_name => 'audit_grade_change_course'
       get 'audit/grade_change/students/:student_id', :action => :for_student, :path_name => 'audit_grade_change_student'
       get 'audit/grade_change/graders/:grader_id', :action => :for_grader, :path_name => 'audit_grade_change_grader'
+    end
+
+    scope(:controller => :course_audit_api) do
+      get 'audit/course/courses/:course_id', :action => :for_course, :path_name => 'audit_course_for_course'
     end
 
     scope(:controller => :assignments_api) do
@@ -1347,6 +1355,14 @@ routes.draw do
       post 'courses/:course_id/quizzes/:quiz_id/submissions', :action => :create, :path_name => 'course_quiz_submission_create'
       put 'courses/:course_id/quizzes/:quiz_id/submissions/:id', :action => :update, :path_name => 'course_quiz_submission_update'
       post 'courses/:course_id/quizzes/:quiz_id/submissions/:id/complete', :action => :complete, :path_name => 'course_quiz_submission_complete'
+    end
+
+    scope(:controller => :quiz_submission_questions) do
+      get '/quiz_submissions/:quiz_submission_id/questions', :action => :index, :path_name => 'quiz_submission_questions'
+      get '/quiz_submissions/:quiz_submission_id/questions/:id', :action => :show, :path_name => 'quiz_submission_question'
+      put '/quiz_submissions/:quiz_submission_id/questions/:id', :action => :answer, :path_name => 'quiz_submission_question_answer'
+      put '/quiz_submissions/:quiz_submission_id/questions/:id/flag', :action => :flag, :path_name => 'quiz_submission_question_flag'
+      put '/quiz_submissions/:quiz_submission_id/questions/:id/unflag', :action => :unflag, :path_name => 'quiz_submission_question_unflag'
     end
 
     scope(:controller => :quiz_ip_filters) do

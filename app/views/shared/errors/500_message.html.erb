@@ -8,7 +8,6 @@
 %>
 <% content_for :page_title, t('title', 'Page Error') %>
 
-<%= render :partial => "shared/errors/backtrace", :locals => {:exception => exception} %>
 <div style="width: 400px; margin-left: auto; margin-right: auto; margin-top: 50px;">
   <h2><%= t('headings.page', %{Page Error}) %></h2>
   <p><%= t('description', %{Well, it looks like something broke unexpectedly.  Sorry you had to see that.  If you have a second, please let us know what you were doing when the error happened.}) %></p>

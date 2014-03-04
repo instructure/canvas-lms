@@ -41,6 +41,8 @@ class Gradebook2Controller < ApplicationController
       :grading_standard =>  @context.grading_standard_enabled? && (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard),
       :course_is_concluded => @context.completed?,
       :gradebook_is_editable => @gradebook_is_editable,
+      :setting_update_url => api_v1_course_settings_url(@context),
+      :show_total_grade_as_points => @context.settings[:show_total_grade_as_points],
       :speed_grader_enabled => @context.allows_speed_grader?,
       :draft_state_enabled => @context.feature_enabled?(:draft_state),
       :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook),

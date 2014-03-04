@@ -23,7 +23,7 @@ describe QuizSortables do
     end
 
     it "should assign the quiz" do
-      quiz = Quiz.new
+      quiz = Quizzes::Quiz.new
       sortables = QuizSortables.new(:quiz => quiz, :order => [])
 
       sortables.quiz.should == quiz

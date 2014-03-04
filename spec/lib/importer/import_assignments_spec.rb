@@ -37,8 +37,8 @@ describe "Importing assignments" do
         a = Assignment.find_by_migration_id(data[:migration_id])
         
         a.title.should == data[:title]
-        a.description.should contain(data[:instructions]) if data[:instructions]
-        a.description.should contain(data[:description]) if data[:description]
+        a.description.should include(data[:instructions]) if data[:instructions]
+        a.description.should include(data[:description]) if data[:description]
         a.due_at = Time.at(data[:due_date].to_i / 1000)
         a.points_possible.should == data[:grading][:points_possible].to_f
       end

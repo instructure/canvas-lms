@@ -592,7 +592,7 @@ define([
       event.start_time_formatted = '';
       event.end_time_formatted = '';
     }
-    var isManagementContext = managementContexts && $.inArray(event.context_code, managementContexts) != -1;
+    var isManagementContext = ENV.calendarManagementContexts && $.inArray(event.context_code, ENV.calendarManagementContexts) != -1;
     if(event.permissions || isManagementContext) {
       event.can_edit = isManagementContext || (event.permissions && event.permissions.update);
       event.can_delete = isManagementContext || (event.permissions && event.permissions['delete']);
@@ -1316,7 +1316,7 @@ define([
       }
       event.preventDefault();
       event.stopPropagation();
-      if(canCreateEvent) {
+      if(ENV.canCreateEvent) {
         editEvent($("#event_blank"), $(this));
         var context_code = ($(".group_reference_checkbox:checked:first").attr('id') || "").replace(/^group_/, '');
         if(!context_code) {

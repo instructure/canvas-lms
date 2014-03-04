@@ -19,7 +19,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Outcomes API", :type => :integration do
+describe "Outcomes API", type: :request do
   before :each do
     Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
     user_with_pseudonym(:active_all => true)
@@ -47,7 +47,7 @@ describe "Outcomes API", :type => :integration do
                    :action => 'show',
                    :id => @outcome.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 200
+      response.should be_success
     end
 
     it "should require read permission" do
@@ -58,7 +58,7 @@ describe "Outcomes API", :type => :integration do
                    :action => 'show',
                    :id => @outcome.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should not require any permission for global outcomes" do
@@ -69,7 +69,7 @@ describe "Outcomes API", :type => :integration do
                    :action => 'show',
                    :id => @outcome.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 200
+      response.should be_success
     end
 
     it "should still require a user for global outcomes" do
@@ -80,7 +80,7 @@ describe "Outcomes API", :type => :integration do
                    :action => 'show',
                    :id => @outcome.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should 404 for deleted outcomes" do
@@ -90,7 +90,7 @@ describe "Outcomes API", :type => :integration do
                    :action => 'show',
                    :id => @outcome.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 404
+      assert_status(404)
     end
 
     it "should return the outcome json" do
@@ -157,7 +157,7 @@ describe "Outcomes API", :type => :integration do
                    :action => 'update',
                    :id => @outcome.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should require manage_global_outcomes permission for global outcomes" do
@@ -169,7 +169,7 @@ describe "Outcomes API", :type => :integration do
                    :action => 'update',
                    :id => @outcome.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should fail (400) if the outcome is invalid" do
@@ -188,7 +188,7 @@ describe "Outcomes API", :type => :integration do
                    { :points => 0, :description => "Does Not Meet Expectations" }
                  ]
                })
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should update the outcome" do

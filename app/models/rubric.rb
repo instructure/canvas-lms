@@ -162,7 +162,7 @@ class Rubric < ActiveRecord::Base
       return res if res
     end
     purpose = opts[:purpose] || "unknown"
-    self.rubric_associations.create(:association => association, :context => context, :use_for_grading => !!opts[:use_for_grading], :purpose => purpose)
+    self.rubric_associations.create(:association_object => association, :context => context, :use_for_grading => !!opts[:use_for_grading], :purpose => purpose)
   end
 
   def update_with_association(current_user, rubric_params, context, association_params)
@@ -170,7 +170,7 @@ class Rubric < ActiveRecord::Base
     self.user ||= current_user
     rubric_params[:hide_score_total] ||= association_params[:hide_score_total]
     self.update_criteria(rubric_params)
-    RubricAssociation.generate(current_user, self, context, association_params) if association_params[:association] || association_params[:url]
+    RubricAssociation.generate(current_user, self, context, association_params) if association_params[:association_object] || association_params[:url]
   end
   
   def unique_item_id(id=nil)

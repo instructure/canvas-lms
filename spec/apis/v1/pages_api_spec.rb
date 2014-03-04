@@ -18,7 +18,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
-describe "Pages API", :type => :integration do
+describe "Pages API", type: :request do
   include Api::V1::User
   def avatar_url_for_user(user, *a)
     "http://www.example.com/images/messages/avatar-50.png"
@@ -46,7 +46,7 @@ describe "Pages API", :type => :integration do
       )
     end
 
-    it_should_behave_like 'a locked api item'
+    include_examples 'a locked api item'
   end
 
   before do

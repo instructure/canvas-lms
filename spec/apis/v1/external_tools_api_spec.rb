@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe ExternalToolsController, :type => :integration do
+describe ExternalToolsController, type: :request do
   
   describe "in a course" do
     before(:each) do
@@ -140,7 +140,7 @@ describe ExternalToolsController, :type => :integration do
     raw_api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools/0.json",
                  {:controller => 'external_tools', :action => 'show', :format => 'json',
                   :"#{type}_id" => context.id.to_s, :external_tool_id => "0"})
-    response.status.should == "404 Not Found"
+    assert_status(404)
   end
 
   def index_call(context, type="course")

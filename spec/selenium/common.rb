@@ -16,15 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../config/canvas_rails3')
-if CANVAS_RAILS2
-  Spec::Example::ExampleGroupMethods.module_eval do
-    def include_examples(*args)
-      it_should_behave_like(*args)
-    end
-  end
-end
-
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require "selenium-webdriver"
 require "socket"

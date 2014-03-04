@@ -248,56 +248,6 @@ describe GroupMembership do
     end
   end
 
-  context 'following' do
-    before do
-      user_model
-      @communities = GroupCategory.communities_for(Account.default)
-      group_model(:name => "Algebra Teachers", :group_category => @communities, :join_level => "parent_context_request")
-    end
-
-    it "should auto-follow the group when joining the group" do
-      @group.add_user(@user, 'accepted')
-      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should_not be_nil
-    end
-
-    it "should auto-follow the group when a request is accepted" do
-      @membership = @group.add_user(@user, 'requested')
-      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should be_nil
-      @membership.workflow_state = 'accepted'
-      @membership.save!
-      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should_not be_nil
-    end
-
-    it "should auto-follow the group when an invitation is accepted" do
-      @membership = @group.add_user(@user, 'invited')
-      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should be_nil
-      @membership.workflow_state = 'accepted'
-      @membership.save!
-      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should_not be_nil
-    end
-  end
-
-  context 'unfollowing' do
-    before do
-      user_model
-      @communities = GroupCategory.communities_for(Account.default)
-      group_model(:name => "Algebra Teachers", :group_category => @communities, :join_level => "parent_context_request")
-    end
-
-    it "should auto-unfollow the group when leaving the group" do
-      @membership = @group.add_user(@user, 'accepted')
-      @membership.workflow_state = 'deleted'
-      @membership.save!
-      @user.reload.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' }).should be_nil
-    end
-
-    it "should auto-unfollow the group when the membership is destroyed" do
-      @membership = @group.add_user(@user, 'accepted')
-      @membership.destroy
-      @user.reload.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' }).should be_nil
-    end
-  end
-
   describe "updating cached due dates" do
     before do
       course

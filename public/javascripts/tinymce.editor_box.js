@@ -38,16 +38,17 @@ define([
   //'compiled/tinymce', // required, but the bundles that ACTUALLY use
                         // tiny can require it themselves or else we have
                         // build problems
+  'INST', // for IE detection; need to handle links in a special way
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.instructure_misc_plugins' /* /\.indicate/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/jquery.ba-tinypubsub',
   'vendor/scribd.view' /* scribd */
-], function(I18nObj, $, EditorAccessibility) {
+], function(I18nObj, $, EditorAccessibility, INST) {
 
-  var enableBookmarking = $("body").hasClass('ie');
+  var enableBookmarking = !!INST.browser.ie;
   $(document).ready(function() {
-    enableBookmarking = $("body").hasClass('ie');
+    enableBookmarking = !!INST.browser.ie;
   });
 
   function EditorBoxList() {
@@ -187,7 +188,7 @@ define([
           if (event.keyCode == 9 && event.shiftKey) {
             var $cur = $(ed.getContainer());
             while (true) {
-              // When jQuery is upgraded to 1.8+, use .addBack instead.
+              // When jQuery is upgraded to 1.8+, use .addBack(':tabbable') instead of andSelf().filter(...)
               if ($cur.prevAll().find(':tabbable').andSelf().filter(':tabbable').last().focus().length) {
                 return false;
               }

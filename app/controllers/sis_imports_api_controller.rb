@@ -37,7 +37,7 @@
 #
 #       // The current state of the SIS import.
 #       // - 'created': The SIS import has been created.
-#       // - 'imported': The SIS import is currently processing.
+#       // - 'importing': The SIS import is currently processing.
 #       // - 'imported': The SIS import has completed successfully.
 #       // - 'imported_with_messages': The SIS import completed with errors or warnings.
 #       // - 'failed_with_messages': The SIS import failed with errors.

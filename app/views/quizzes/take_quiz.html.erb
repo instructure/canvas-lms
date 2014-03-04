@@ -99,7 +99,7 @@
 <form id="deauthorized_dialog"
   class="hide"
   title="<%= t :login_required, "Login Required" %>"
-  action="<%= polymorphic_path([@context, @quiz]) %>"
+  action="<%= course_quiz_path(@context, @quiz) %>"
   method="get">
   <div class="text-center">
     <%= t :logged_out_of_canvas,

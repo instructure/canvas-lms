@@ -5,6 +5,6 @@ describe "sub account permissions" do
   describe "shared permission specs" do
     let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
     let(:url) { "/accounts/#{account.id}/permissions?account_roles=1" }
-    it_should_behave_like "permission tests"
+    include_examples "permission tests"
   end
 end

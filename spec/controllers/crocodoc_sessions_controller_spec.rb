@@ -49,11 +49,11 @@ describe CrocodocSessionsController do
 
     it "should ensure the attachment is tied to the submission" do
       @submission.update_attribute :attachment_ids, nil
-      lambda {
+      assert_page_not_found do
         post :create,
              :submission_id => @submission.id,
              :attachment_id => @attachment.id
-      }.should raise_error(ActiveRecord::RecordNotFound)
+      end
     end
   end
 
@@ -70,15 +70,15 @@ describe CrocodocSessionsController do
 
     it "should not create a session for others" do
       post :create, :attachment_id => @attachment.id
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
     end
   end
 
   it "should 404 if a crocodoc document is unavailable" do
-    lambda {
+    assert_page_not_found do
       post :create,
            :submission_id => @submission.id,
            :attachment_id => @attachment.id
-    }.should raise_error(ActiveRecord::RecordNotFound)
+    end
   end
 end

@@ -20,8 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe AccountsController do
   def account_with_admin_logged_in(opts = {})
-    @account = Account.default
-    account_admin_user
+    @account = opts[:account] || Account.default
+    account_admin_user(account: @account)
     user_session(@admin)
   end
 
@@ -178,8 +178,9 @@ describe AccountsController do
 
   describe "courses" do
     it "should count total courses correctly" do
-      account_with_admin_logged_in
-      course
+      account = Account.create!
+      account_with_admin_logged_in(account: account)
+      course(account: account)
       @course.course_sections.create!
       @course.course_sections.create!
       @course.update_account_associations

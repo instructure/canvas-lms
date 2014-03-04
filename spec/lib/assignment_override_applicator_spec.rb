@@ -904,11 +904,13 @@ describe AssignmentOverrideApplicator do
     @assignment = assignment_model(:course => @course)
     @assignment.due_at = original_due_at
     @assignment.save!
+    @assignment.reload
 
     @section_override = assignment_override_model(:assignment => @assignment)
     @section_override.set = @course.default_section
     @section_override.override_due_at(5.days.from_now)
     @section_override.save!
+    @section_override.reload
 
     @adhoc_override = assignment_override_model(:assignment => @assignment)
     @override_student = @adhoc_override.assignment_override_students.build
@@ -917,6 +919,7 @@ describe AssignmentOverrideApplicator do
 
     @adhoc_override.override_due_at(7.days.from_now)
     @adhoc_override.save!
+    @adhoc_override.reload
     @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
     @overridden_assignment.due_at.should == @adhoc_override.due_at
 

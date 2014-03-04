@@ -636,48 +636,56 @@ shared_examples_for 'a backend' do
     end
 
     describe "scope: current" do
-      it_should_behave_like "scope"
+      include_examples "scope"
       before do
         @flavor = 'current'
-        3.times { @affected_jobs << create_job }
-        @ignored_jobs << create_job(:run_at => 2.hours.from_now)
-        @ignored_jobs << create_job(:queue => 'q2')
+        Timecop.freeze(5.minutes.ago) do
+          3.times { @affected_jobs << create_job }
+          @ignored_jobs << create_job(:run_at => 2.hours.from_now)
+          @ignored_jobs << create_job(:queue => 'q2')
+        end
       end
     end
 
     describe "scope: future" do
-      it_should_behave_like "scope"
+      include_examples "scope"
       before do
         @flavor = 'future'
-        3.times { @affected_jobs << create_job(:run_at => 2.hours.from_now) }
-        @ignored_jobs << create_job
-        @ignored_jobs << create_job(:queue => 'q2', :run_at => 2.hours.from_now)
+        Timecop.freeze(5.minutes.ago) do
+          3.times { @affected_jobs << create_job(:run_at => 2.hours.from_now) }
+          @ignored_jobs << create_job
+          @ignored_jobs << create_job(:queue => 'q2', :run_at => 2.hours.from_now)
+        end
       end
     end
 
     describe "scope: strand" do
-      it_should_behave_like "scope"
+      include_examples "scope"
       before do
         @flavor = 'strand'
         @query = 's1'
-        @affected_jobs << create_job(:strand => 's1')
-        @affected_jobs << create_job(:strand => 's1', :run_at => 2.hours.from_now)
-        @ignored_jobs << create_job
-        @ignored_jobs << create_job(:strand => 's2')
-        @ignored_jobs << create_job(:strand => 's2', :run_at => 2.hours.from_now)
+        Timecop.freeze(5.minutes.ago) do
+          @affected_jobs << create_job(:strand => 's1')
+          @affected_jobs << create_job(:strand => 's1', :run_at => 2.hours.from_now)
+          @ignored_jobs << create_job
+          @ignored_jobs << create_job(:strand => 's2')
+          @ignored_jobs << create_job(:strand => 's2', :run_at => 2.hours.from_now)
+        end
       end
     end
 
     describe "scope: tag" do
-      it_should_behave_like "scope"
+      include_examples "scope"
       before do
         @flavor = 'tag'
         @query = 'String#to_i'
-        @affected_jobs << "test".send_later_enqueue_args(:to_i, :no_delay => true)
-        @affected_jobs << "test".send_later_enqueue_args(:to_i, :strand => 's1', :no_delay => true)
-        @affected_jobs << "test".send_later_enqueue_args(:to_i, :run_at => 2.hours.from_now, :no_delay => true)
-        @ignored_jobs << create_job
-        @ignored_jobs << create_job(:run_at => 1.hour.from_now)
+        Timecop.freeze(5.minutes.ago) do
+          @affected_jobs << "test".send_later_enqueue_args(:to_i, :no_delay => true)
+          @affected_jobs << "test".send_later_enqueue_args(:to_i, :strand => 's1', :no_delay => true)
+          @affected_jobs << "test".send_later_enqueue_args(:to_i, :run_at => 2.hours.from_now, :no_delay => true)
+          @ignored_jobs << create_job
+          @ignored_jobs << create_job(:run_at => 1.hour.from_now)
+        end
       end
     end
 

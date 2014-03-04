@@ -20,11 +20,7 @@ require [
 
   loadOutcomes = (book) ->
     isLoaded = true
-    courseID = ENV.context_asset_string.split('_')[1]
-    url      = "/api/v1/courses/#{courseID}/outcome_rollups?per_page=50"
-    dfd      = $.getJSON(url)
-    $('.outcome-gradebook-wrapper').disableWhileLoading(dfd)
-    dfd.then((response) -> book.loadOutcomes(response))
+    book.loadOutcomes()
 
   $(document).ready ->
     gradebook = initGradebook()

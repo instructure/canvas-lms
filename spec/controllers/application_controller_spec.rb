@@ -58,7 +58,7 @@ describe ApplicationController do
       get 'pages_index', :course_id => @course.id
 
       @controller.js_env.should include(:WIKI_RIGHTS)
-      @controller.js_env[:WIKI_RIGHTS].should include(Hash[@course.wiki.check_policy(@teacher).map {|right| [right, true]}])
+      @controller.js_env[:WIKI_RIGHTS].should == Hash[@course.wiki.check_policy(@teacher).map {|right| [right, true]}]
     end
   end
 
@@ -188,10 +188,13 @@ describe ApplicationController do
     end
   end
 
-  describe "#complete_request_uri" do
-    it "should filter sensitive parameters from the query string" do
-      @controller.stubs(:request).returns(mock(:protocol => "https://", :host => "example.com", :fullpath => "/api/v1/courses?password=abcd&test=5&Xaccess_token=13&access_token=sekrit"))
-      @controller.send(:complete_request_uri).should == "https://example.com/api/v1/courses?password=[FILTERED]&test=5&Xaccess_token=13&access_token=[FILTERED]"
+  if CANVAS_RAILS2
+    describe "#complete_request_uri" do
+      it "should filter sensitive parameters from the query string" do
+        @controller.stubs(:request).returns(mock(:protocol => "https://", :host => "example.com", :fullpath => "/api/v1/courses?password=abcd&test=5&Xaccess_token=13&access_token=sekrit"))
+        @controller.send(:complete_request_uri).should == "https://example.com/api/v1/courses?password=[FILTERED]&test=5&Xaccess_token=13&access_token=[FILTERED]"
+      end
     end
   end
+
 end

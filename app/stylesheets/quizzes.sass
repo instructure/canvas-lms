@@ -1655,3 +1655,12 @@ ul#quiz_versions
     right: 0px
     bottom: 0px
     padding-bottom: 0px
+
+// Fix for IE10 not showing hover icons for drag/drop when hovering over
+// questions on the "Questions" tab.
+.hover
+  .move .move_icon
+    display: inline
+    cursor: move
+  .links a
+    left: 0

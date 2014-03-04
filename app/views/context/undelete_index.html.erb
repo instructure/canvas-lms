@@ -42,33 +42,4 @@
 <ul id="deleted_items_list" class="unstyled_list">
 <%= render :partial => 'deleted_item', :collection => @deleted_items %>
 </ul>
-<% js_block do %>
-<script>
-require([
-  'jquery' /* $ */,
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_misc_plugins' /* .dim */
-], function($) {
-
-$(document).ready(function() {
-  $(".restore_link").click(function(event) {
-    event.preventDefault();
-    var $link = $(this);
-    var $item = $link.parents(".item");
-    var result = confirm("Are you sure you want to restore \"" + $.trim($item.find(".name").text()) + "\"?");
-    if(result) {
-      $link.text("restoring...");
-      $item.dim();
-      $.ajaxJSON($link.attr('href'), "POST", {}, function() {
-        $item.slideUp(function() {
-          $item.remove();
-        });
-      }, function() {
-        $link.text("restore failed");
-      });
-    }
-  });
-});
-});
-</script>
-<% end %>
+<% js_bundle 'legacy/context_undelete_item' %>

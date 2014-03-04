@@ -93,7 +93,7 @@ describe ContextController do
 
     it "should require a valid HMAC" do
       post 'object_snippet', :object_data => @data, :s => 'DENIED'
-      response.status.should == '400 Bad Request'
+      assert_status(400)
     end
 
     it "should render given a correct HMAC" do

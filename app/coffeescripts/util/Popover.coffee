@@ -19,7 +19,7 @@ define [
   activePopovers = []
 
   class Popover
-    constructor: (clickEvent, @content) ->
+    constructor: (clickEvent, @content, @options = {}) ->
       @trigger = $(clickEvent.currentTarget)
       @el = $(@content)
               .addClass('carat-bottom')
@@ -84,10 +84,10 @@ define [
 
     position: =>
       @el.position
-        my: 'center bottom',
-        at: 'center top',
+        my: 'center '+(if @options.verticalSide == 'bottom' then 'top' else 'bottom'),
+        at: 'center '+(@options.verticalSide || 'top'),
         of: @trigger,
         offset: '0 -10px',
         within: 'body',
-        collision: 'flipfit flipfit'
+        collision: 'flipfit '+(if @options.verticalSide then 'none' else 'flipfit')
         using: using

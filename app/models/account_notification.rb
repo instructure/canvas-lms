@@ -9,7 +9,7 @@ class AccountNotification < ActiveRecord::Base
   belongs_to :user
   has_many :account_notification_roles, dependent: :destroy
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => false, :allow_blank => false
-  sanitize_field :message, Instructure::SanitizeField::SANITIZE
+  sanitize_field :message, CanvasSanitize::SANITIZE
 
   ACCOUNT_SERVICE_NOTIFICATION_FLAGS = %w[account_survey_notifications]
   validates_inclusion_of :required_account_service, in: ACCOUNT_SERVICE_NOTIFICATION_FLAGS, allow_nil: true

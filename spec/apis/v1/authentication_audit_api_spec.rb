@@ -19,21 +19,21 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
 
-describe "AuthenticationAudit API", type: :integration do
+describe "AuthenticationAudit API", type: :request do
   context "not configured" do
     before do
-      Canvas::Cassandra::Database.stubs(:configured?).with('auditors').returns(false)
+      Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).with('auditors').returns(false)
       site_admin_user(user: user_with_pseudonym(account: Account.site_admin))
     end
 
     it "should 404" do
       raw_api_call(:get, "/api/v1/audit/authentication/logins/#{@pseudonym.id}", controller: 'authentication_audit_api', action: "for_login", :login_id => @pseudonym.id.to_s, format: 'json')
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
   end
 
   context "configured" do
-    it_should_behave_like "cassandra audit logs"
+    include_examples "cassandra audit logs"
 
     before do
       Setting.set('enable_page_views', 'cassandra')

@@ -393,7 +393,7 @@ module QuizzesHelper
       if answer_list && !answer_list.empty?
 
         #  Replace the {{question_BLAH}} template text with the user's answer text.
-        match = match.sub(/\{\{question_.*?\}\}/, a).
+        match = match.sub(/\{\{question_.*?\}\}/, a.to_s).
           # Match on "/>" but only when at the end of the string and insert "readonly" if set to be readonly
           sub(/\/\>\Z/, readonly_markup)
       end
@@ -404,7 +404,7 @@ module QuizzesHelper
 
     unless answer_list && !answer_list.empty?
       answers.delete_if { |k, v| !k.match /^question_#{hash_get(question, :id)}/ }
-      answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, v }
+      answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, h(v) }
       res.gsub! /\{\{question_[^}]+\}\}/, ""
     end
 
@@ -468,7 +468,7 @@ module QuizzesHelper
 
   def take_quiz_url
     user_id = @current_user && @current_user.id
-    polymorphic_path([@context, @quiz, :take], :user_id => user_id)
+    course_quiz_take_path(@context, @quiz, user_id: user_id)
   end
 
   def link_to_take_or_retake_poll(opts={})

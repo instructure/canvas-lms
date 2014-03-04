@@ -210,14 +210,18 @@ namespace :db do
       queue = config['queue']
       drop_database(queue) if queue rescue nil
       drop_database(config) rescue nil
-      Canvas::Cassandra::Database.config_names.each do |cass_config|
-        db = Canvas::Cassandra::Database.from_config(cass_config)
+      Canvas::Cassandra::DatabaseBuilder.config_names.each do |cass_config|
+        db = Canvas::Cassandra::DatabaseBuilder.from_config(cass_config)
         db.tables.each do |table|
           db.execute("DROP TABLE #{table}")
         end
       end
       create_database(queue) if queue
       create_database(config)
+      unless CANVAS_RAILS2
+        ::ActiveRecord::Base.connection.schema_cache.clear!
+        ::ActiveRecord::Base.descendants.each(&:reset_column_information)
+      end
       Rake::Task['db:migrate'].invoke
     end
   end

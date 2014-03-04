@@ -204,7 +204,7 @@ describe Api::V1::User do
 
 end
 
-describe "Users API", :type => :integration do
+describe "Users API", type: :request do
   def avatar_url(id)
     "http://www.example.com/images/users/#{User.avatar_key(id)}?fallback=http%3A%2F%2Fwww.example.com%2Fimages%2Fmessages%2Favatar-50.png"
   end
@@ -222,7 +222,7 @@ describe "Users API", :type => :integration do
     @user = @student
     raw_api_call(:get, "/api/v1/users/#{@admin.id}/avatars",
                  :controller => "profile", :action => "profile_pics", :user_id => @admin.to_param, :format => 'json')
-    response.status.should == "401 Unauthorized"
+    assert_status(401)
   end
 
   shared_examples_for "page view api" do
@@ -274,11 +274,11 @@ describe "Users API", :type => :integration do
     end
   end
 
-  it_should_behave_like "page view api"
+  include_examples "page view api"
 
   describe "cassandra page views" do
-    it_should_behave_like "cassandra page views"
-    it_should_behave_like "page view api"
+    include_examples "cassandra page views"
+    include_examples "page view api"
   end
 
   it "shouldn't find users in other root accounts by sis id" do
@@ -292,7 +292,7 @@ describe "Users API", :type => :integration do
     @user = @me
     raw_api_call(:get, "/api/v1/users/sis_user_id:other-sis/page_views",
                        { :controller => "page_views", :action => "index", :user_id => 'sis_user_id:other-sis', :format => 'json' })
-    response.status.should == "404 Not Found"
+    assert_status(404)
   end
 
   it "should allow id of 'self'" do
@@ -431,7 +431,7 @@ describe "Users API", :type => :integration do
             :pseudonym => { :unique_id => "test@example.com" }
           }
         )
-        response.status.should eql "403 Forbidden"
+        assert_status(403)
       end
 
       it "should require an email pseudonym" do
@@ -444,7 +444,7 @@ describe "Users API", :type => :integration do
             :pseudonym => { :unique_id => "invalid" }
           }
         )
-        response.status.should eql "400 Bad Request"
+        assert_status(400)
       end
 
       it "should require acceptance of the terms" do
@@ -457,7 +457,7 @@ describe "Users API", :type => :integration do
             :pseudonym => { :unique_id => "test@example.com" }
           }
         )
-        response.status.should eql "400 Bad Request"
+        assert_status(400)
       end
 
       it "should let you create a user if you pass all the validations" do
@@ -499,7 +499,7 @@ describe "Users API", :type => :integration do
           :pseudonym => { :password => "password123" }
         }
       )
-      response.status.should eql "400 Bad Request"
+      assert_status(400)
       errors = JSON.parse(response.body)['errors']
       errors['pseudonym'].should be_present
       errors['pseudonym']['unique_id'].should be_present
@@ -525,7 +525,7 @@ describe "Users API", :type => :integration do
           }
         }
       )
-      response.status.should eql "200 OK"
+      response.should be_success
       users = User.find_all_by_name "Test User"
       users.size.should == 1
       users.first.pseudonyms.first.unique_id.should == "test"
@@ -763,8 +763,8 @@ describe "Users API", :type => :integration do
       @context = @user
     end
     
-    it_should_behave_like "file uploads api with folders"
-    it_should_behave_like "file uploads api with quotas"
+    include_examples "file uploads api with folders"
+    include_examples "file uploads api with quotas"
 
     def preflight(preflight_params)
       api_call(:post, "/api/v1/users/self/files",
@@ -788,55 +788,7 @@ describe "Users API", :type => :integration do
     end
   end
 
-  describe "following" do
-    before do
-      @me = @user
-      @u2 = user_model
-      @user = @me
-      @u2.update_attribute(:public, true)
-    end
-
-    it "should allow following a public user" do
-      json = api_call(:put, "/api/v1/users/#{@u2.id}/followers/self", :controller => "users", :action => "follow", :user_id => @u2.to_param, :format => "json")
-      @user.user_follows.map(&:followed_item).should == [@u2]
-      uf = @user.user_follows.first
-      json.should == { "following_user_id" => @user.id, "followed_user_id" => @u2.id, "created_at" => uf.created_at.as_json }
-    end
-
-    it "should do nothing if already following the user" do
-      @user.user_follows.create!(:followed_item => @u2)
-      uf = @user.user_follows.first
-      @user.user_follows.map(&:followed_item).should == [@u2]
-
-      json = api_call(:put, "/api/v1/users/#{@u2.id}/followers/self", :controller => "users", :action => "follow", :user_id => @u2.to_param, :format => "json")
-      @user.user_follows.map(&:followed_item).should == [@u2]
-      uf = @user.user_follows.first
-      json.should == { "following_user_id" => @user.id, "followed_user_id" => @u2.id, "created_at" => uf.created_at.as_json }
-    end
-
-    it "should not allow following a private user" do
-      @u2.update_attribute(:public, false)
-      json = api_call(:put, "/api/v1/users/#{@u2.id}/followers/self", { :controller => "users", :action => "follow", :user_id => @u2.to_param, :format => "json" }, {}, {}, :expected_status => 401)
-      @user.reload.user_follows.should == []
-    end
-
-    describe "unfollowing" do
-      it "should allow unfollowing a collection" do
-        @user.user_follows.create!(:followed_item => @u2)
-        @user.reload.user_follows.map(&:followed_item).should == [@u2]
-
-        json = api_call(:delete, "/api/v1/users/#{@u2.id}/followers/self", :controller => "users", :action => "unfollow", :user_id => @u2.to_param, :format => "json")
-        @user.reload.user_follows.should == []
-      end
-
-      it "should do nothing if not following" do
-        @user.reload.user_follows.should == []
-        json = api_call(:delete, "/api/v1/users/#{@u2.id}/followers/self", :controller => "users", :action => "unfollow", :user_id => @u2.to_param, :format => "json")
-        @user.reload.user_follows.should == []
-      end
-    end
-  end
-  describe "user merge" do
+    describe "user merge" do
     before do
       @account = Account.default
       @user1 = user_with_managed_pseudonym(
@@ -890,7 +842,7 @@ describe "Users API", :type => :integration do
         { controller: 'users', action: 'merge_into', format: 'json',
           id: @user2.to_param, destination_user_id: @user1.to_param}
       )
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
     end
   end
 end

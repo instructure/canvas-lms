@@ -679,13 +679,13 @@ class Account < ActiveRecord::Base
     @account_users_cache ||= {}
     if self == Account.site_admin
       shard.activate do
-        @account_users_cache[user] ||= Rails.cache.fetch('all_site_admin_account_users') do
+        @account_users_cache[user.global_id] ||= Rails.cache.fetch('all_site_admin_account_users') do
           self.account_users.all
         end.select { |au| au.user_id == user.id }.each { |au| au.account = self }
       end
     else
       @account_chain_ids ||= self.account_chain(:include_site_admin => true).map { |a| a.active? ? a.id : nil }.compact
-      @account_users_cache[user] ||= Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|
+      @account_users_cache[user.global_id] ||= Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|
         if account_chain_ids == [Account.site_admin.id]
           Account.site_admin.account_users_for(user)
         else
@@ -693,8 +693,8 @@ class Account < ActiveRecord::Base
         end
       end
     end
-    @account_users_cache[user] ||= []
-    @account_users_cache[user]
+    @account_users_cache[user.global_id] ||= []
+    @account_users_cache[user.global_id]
   end
 
   # returns all account users for this entire account tree

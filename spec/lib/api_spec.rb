@@ -94,6 +94,31 @@ describe Api do
       Account.site_admin.should == TestApiInstance.new(account, nil).api_find(Account, 'site_admin')
     end
 
+    it 'should find term id "default"' do
+      account = Account.create!
+      TestApiInstance.new(account, nil).api_find(account.enrollment_terms, 'default').should == account.default_enrollment_term
+    end
+
+    it 'should find term id "current"' do
+      account = Account.create!
+      term = account.enrollment_terms.create!(start_at: 1.week.ago, end_at: 1.week.from_now)
+      TestApiInstance.new(account, nil).api_find(account.enrollment_terms, 'current').should == term
+    end
+
+    it 'should not find a "current" term if there is more than one candidate' do
+      account = Account.create!
+      account.enrollment_terms.create!(start_at: 1.week.ago, end_at: 1.week.from_now)
+      account.enrollment_terms.create!(start_at: 2.weeks.ago, end_at: 2.weeks.from_now)
+      TestApiInstance.new(account, nil).api_find_all(account.enrollment_terms, ['current']).should == []
+    end
+
+    it 'should find an open ended "current" term' do
+      account = Account.create!
+      term = account.enrollment_terms.create!(start_at: 1.week.ago)
+      TestApiInstance.new(account, nil).api_find(account.enrollment_terms, 'current').should == term
+    end
+
+
     it 'should not find a user with an invalid AR id' do
       (lambda {@api.api_find(User, "a1")}).should raise_error(ActiveRecord::RecordNotFound)
     end
@@ -765,6 +790,42 @@ describe Api do
     it "should return url with a combination of items" do
       url = @api.templated_url(:course_assignment_url, "{courses.id}", "1}")
       url.should == "http://www.example.com/courses/{courses.id}/assignments/1%7D"
+    end
+  end
+
+  describe "#reject!" do
+    before do
+      @api = TestApiInstance.new Account.default, nil
+    end
+
+    it "sets the message and status in the error json" do
+      expect { @api.reject!('test message', :not_found) }.to(raise_error(Api::V1::ApiError) do |e|
+        e.message.should == 'test message'
+        e.error_json[:message].should == 'test message'
+        e.error_json[:status].should == 'not_found'
+        e.response_status.should == 404
+      end)
+    end
+
+    it "defaults status to 'bad_request'" do
+      expect { @api.reject!('test message') }.to(raise_error(Api::V1::ApiError) do |e|
+        e.error_json[:status].should == 'bad_request'
+        e.response_status.should == 400
+      end)
+    end
+
+    it "accepts numeric status codes" do
+      expect { @api.reject!('test message', 403) }.to(raise_error(Api::V1::ApiError) do |e|
+        e.error_json[:status].should == 'forbidden'
+        e.response_status.should == 403
+      end)
+    end
+
+    it "accepts symbolic status codes" do
+      expect { @api.reject!('test message', :service_unavailable) }.to(raise_error(Api::V1::ApiError) do |e|
+        e.error_json[:status].should == 'service_unavailable'
+        e.response_status.should == 503
+      end)
     end
   end
 end

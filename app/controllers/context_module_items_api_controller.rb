@@ -470,7 +470,12 @@ class ContextModuleItemsApiController < ApplicationController
         end
 
         # find the associated assignment id, if applicable
-        if (asset_type == 'DiscussionTopic' || asset_type == 'Quiz')
+        if asset_type == 'Quizzes::Quiz'
+          asset = @context.quizzes.find_by_id(asset_id.to_i)
+          associated_assignment_id = asset.assignment_id if asset
+        end
+
+        if asset_type == 'DiscussionTopic'
           asset = @context.send(asset_type.tableize).find_by_id(asset_id.to_i)
           associated_assignment_id = asset.assignment_id if asset
         end

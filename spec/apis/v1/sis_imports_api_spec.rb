@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe SisImportsApiController, :type => :integration do
+describe SisImportsApiController, type: :request do
   before do
     @user = user_with_pseudonym :active_all => true
     user_session @user
@@ -434,7 +434,7 @@ describe SisImportsApiController, :type => :integration do
             :import_type => 'instructure_csv' },
           {},
           { 'content-type' => 'text/csv; charset=ISO-8859-1-Windows-3.0-Latin-1' })
-    response.status.should match(/400/)
+    assert_status(400)
     SisBatch.count.should == 0
   end
 

@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../models/quiz_statistics/item_analysis/common')
 
-describe QuizReportsController, :type => :integration do
+describe QuizReportsController, type: :request do
   describe "POST /courses/:course_id/quizzes/:quiz_id/reports" do
     before do
       teacher_in_course(:active_all => true)

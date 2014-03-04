@@ -7,7 +7,7 @@
     <% end %>
   </td>
   <td>
-    <a href="<%= polymorphic_path([@context,@quiz,:history], version: version.version_number)%>">
+    <a href="<%= course_quiz_history_path(@context, @quiz, version: version.version_number)%>">
       <%= t 'attempt_number', 'Attempt %{att_no}', :att_no => index %>
     </a>
   </td>

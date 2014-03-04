@@ -113,9 +113,9 @@ format and student progress is displayed both as a numerical score and as master
 near mastery/remedial.
 END
       applies_to: 'Course',
-      state: 'hidden',
-      root_opt_in: true,
-      development: true
+      state: 'allowed',
+      root_opt_in: false,
+      development: false
     },
     'screenreader_gradebook' =>
     {

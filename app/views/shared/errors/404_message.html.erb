@@ -9,7 +9,6 @@
 %>
 <% content_for :page_title, t('title', 'Page Not Found') %>
 
-<%= render :partial => "shared/errors/backtrace", :locals => {:exception => exception} %>
 <div style="width: 410px; margin-left: auto; margin-right: auto; margin-top: 50px;">
   <h2><%= t('headings.page', %{Page Not Found}) %></h2>
   <% if @not_found_message %>

@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
-describe "API Authentication", :type => :integration do
+describe "API Authentication", type: :request do
 
   before do
     @key = DeveloperKey.create!
@@ -246,6 +246,7 @@ describe "API Authentication", :type => :integration do
       end
 
       it "should execute for saml login" do
+        pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
         Setting.set_config("saml", {})
         account = account_with_saml(:account => Account.default)
         flow do
@@ -505,18 +506,18 @@ describe "API Authentication", :type => :integration do
 
     it "should error if the access token is expired or non-existent" do
       get "/api/v1/courses", nil, { 'Authorization' => "Bearer blahblah" }
-      response.status.to_i.should == 401
+      assert_status(401)
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       @token.update_attribute(:expires_at, 1.hour.ago)
       get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" }
-      response.status.to_i.should == 401
+      assert_status(401)
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
     end
 
     it "should require an active pseudonym for the access token user" do
       @user.pseudonym.destroy
       get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" }
-      response.status.to_i.should == 401
+      assert_status(401)
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       json = JSON.parse(response.body)
       json['message'].should == "Invalid access token."
@@ -524,7 +525,7 @@ describe "API Authentication", :type => :integration do
 
     it "should error if no access token is given and authorization is required" do
       get "/api/v1/courses"
-      response.status.to_i.should == 401
+      assert_status(401)
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       json = json_parse
       json["errors"]["message"].should == "user authorization required"
@@ -538,7 +539,7 @@ describe "API Authentication", :type => :integration do
       response.should be_success
 
       get "/api/v1/courses?access_token=#{@token.full_token}"
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     context "sharding" do
@@ -665,7 +666,7 @@ describe "API Authentication", :type => :integration do
 
       raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=sis_user_id:bogus",
                    :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json', :as_user_id => "sis_user_id:bogus")
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
       JSON.parse(response.body).should == { 'errors' => 'Invalid as_user_id' }
     end
 
@@ -675,7 +676,7 @@ describe "API Authentication", :type => :integration do
       @user = @student
       raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{@admin.id}",
                    :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json', :as_user_id => @admin.id.to_param)
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
       JSON.parse(response.body).should == { 'errors' => 'Invalid as_user_id' }
     end
   end

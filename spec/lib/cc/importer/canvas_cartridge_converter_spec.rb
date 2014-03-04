@@ -418,7 +418,7 @@ describe "Canvas Cartridge importing" do
     rubric2.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}, {:ignore_for_scoring=>false, :mastery_points=>3, :learning_outcome_id=>lo.id, :ratings=>[{:criterion_id=>"309_343", :points=>5, :description=>"Exceeds Expectations", :id=>"309_6516", :long_description=>""}, {:criterion_id=>"309_343", :points=>0, :description=>"Does Not Meet Expectations", :id=>"309_9962", :long_description=>""}], :points=>5, :description=>"Learning Outcome", :id=>"309_343", :long_description=>"<p>Outcome</p>"}]
     rubric2.save!
 
-    assoc = RubricAssociation.create!(:context => @copy_from, :rubric => rubric2, :association => @copy_from, :title => rubric2.title, :purpose => 'bookmark')
+    assoc = RubricAssociation.create!(:context => @copy_from, :rubric => rubric2, :association_object => @copy_from, :title => rubric2.title, :purpose => 'bookmark')
 
     #export to xml
     builder = Builder::XmlMarkup.new(:indent=>2)
@@ -916,7 +916,7 @@ XML
     ag.migration_id = "i713e960ab2685259505efeb08cd48a1d"
     ag.save!
     
-    Quiz.import_from_migration(quiz_hash, @copy_to, {})
+    Quizzes::Quiz.import_from_migration(quiz_hash, @copy_to, {})
     q = @copy_to.quizzes.find_by_migration_id("ie3d8f8adfad423eb225229c539cdc450")
     a = q.assignment
     a.assignment_group.id.should == ag.id

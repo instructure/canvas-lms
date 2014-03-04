@@ -27,6 +27,7 @@ class CommunicationChannel < ActiveRecord::Base
   has_many :pseudonyms
   belongs_to :user
   has_many :notification_policies, :dependent => :destroy
+  has_many :delayed_messages
   has_many :messages
   belongs_to :access_token
 
@@ -189,7 +190,7 @@ class CommunicationChannel < ActiveRecord::Base
     m = self.messages.new
     m.to = self.path
     m.body = t :body, "Your Canvas verification code is %{verification_code}", :verification_code => code
-    Mailer.message(m).deliver rescue nil # omg! just ignore delivery failures
+    Mailer.create_message(m).deliver rescue nil # omg! just ignore delivery failures
   end
 
   # If you are creating a new communication_channel, do nothing, this just
@@ -340,6 +341,7 @@ class CommunicationChannel < ActiveRecord::Base
     scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)
     merge_candidates = {}
     Shard.with_each_shard(shards) do
+      scope = scope.shard(Shard.current) unless CANVAS_RAILS2
       scope.where("user_id<>?", self.user_id).includes(:user).map(&:user).select do |u|
         result = merge_candidates.fetch(u.global_id) do
           merge_candidates[u.global_id] = (u.all_active_pseudonyms.length != 0)
@@ -355,7 +357,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
     def self.create_push(access_token, device_token)
-      (scope(:find, :shard) || Shard.current).activate do
+      (scoped.shard_value || Shard.current).activate do
         connection.transaction do
           cc = new
           cc.path_type = CommunicationChannel::TYPE_PUSH

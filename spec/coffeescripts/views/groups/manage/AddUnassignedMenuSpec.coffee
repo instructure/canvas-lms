@@ -5,12 +5,14 @@ define [
   'compiled/models/Group'
   'compiled/views/groups/manage/AddUnassignedMenu'
   'jquery'
+  'helpers/fakeENV'
 ], (GroupUserCollection,
     GroupUser,
     GroupCategory,
     Group,
     AddUnassignedMenu,
-    $) ->
+    $,
+    fakeENV) ->
 
   clock = null
   server = null
@@ -25,6 +27,7 @@ define [
 
   module 'AddUnassignedMenu',
     setup: ->
+      fakeENV.setup()
       clock = sinon.useFakeTimers()
       server = sinon.fakeServer.create()
       waldo = new GroupUser id: 4, name: "Waldo", sortable_name: "Waldo"
@@ -45,6 +48,7 @@ define [
       view.$el.appendTo($(document.body))
 
     teardown: ->
+      fakeENV.teardown()
       clock.restore()
       server.restore()
       view.remove()

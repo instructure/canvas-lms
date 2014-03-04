@@ -105,7 +105,15 @@ class PageView < ActiveRecord::Base
     enable_page_views.to_sym
   end
 
-  def after_initialize
+  if CANVAS_RAILS2
+    def after_initialize
+      initialize_shard
+    end
+  else
+    after_initialize :initialize_shard
+  end
+
+  def initialize_shard
     # remember the page view method selected at the time of creation, so that
     # we use the right method when saving
     if PageView.cassandra? && new_record?
@@ -192,7 +200,7 @@ class PageView < ActiveRecord::Base
     shard = PageView.cassandra? ? Shard.birth : Shard.current
     page_view = shard.activate do
       if new_record
-        new{ |pv| pv.send(:attributes=, attrs, false) }
+        new{ |pv| pv.assign_attributes(attrs, :without_protection => true) }
       else
         instantiate(@blank_template.merge(attrs))
       end
@@ -372,7 +380,8 @@ class PageView < ActiveRecord::Base
 
       inserted = rows.count do |attrs|
         begin
-          created_at = Time.zone.parse(attrs['created_at'])
+          created_at = attrs['created_at']
+          created_at = Time.zone.parse(created_at) unless created_at.is_a?(Time)
           # if the created_at is the same as the last_created_at,
           # we may have already inserted this page view
           # use to_i here to avoid sub-second precision problems

@@ -151,7 +151,7 @@ module Canvas::AccountReports::ReportHelper
   end
 
   def report_extra_text
-    if term && check_report_key(:enrollment_term_id)
+    if check_report_key(:enrollment_term_id)
       add_extra_text(I18n.t('account_reports.default.term_text', "Term: %{term_name};",
                        :term_name => term_name))
     end

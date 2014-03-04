@@ -86,7 +86,7 @@ define [
           nameA = a.student.sortable_name
           nameB = b.student.sortable_name
           n     = if sortAsc then 1 else -1
-          nameA.localeCompare(nameB, window.I18n.locale, sensitivity: 'accent', ignorePunctuation: true, numeric: true) * n
+          nameA.localeCompare(nameB, window.I18n.locale or 'en', sensitivity: 'accent', ignorePunctuation: true, numeric: true) * n
         else
           nameA = a.student.sortable_name.toLowerCase()
           nameB = b.student.sortable_name.toLowerCase()

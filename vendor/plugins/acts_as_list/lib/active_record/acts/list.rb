@@ -121,7 +121,7 @@ module ActiveRecord
               list_scope_base.order(self.class.nulls(:last, self.class.position_column), self.class.primary_key)
             end
 
-            before_destroy :remove_from_list
+            before_destroy :remove_from_list_for_destroy
             before_create  :add_to_list_bottom
           RUBY
 
@@ -147,7 +147,7 @@ module ActiveRecord
           return unless in_scope?
           return move_to_top if position == :top
           current_position = self.position
-          return if in_list? && position == current_position
+          return true if in_list? && position == current_position
           transaction do
             if in_list?
               if position < current_position
@@ -291,6 +291,11 @@ module ActiveRecord
             return unless in_scope?
             return if in_list?
             self[self.class.position_column] = bottom_position.to_i + 1
+          end
+
+          def remove_from_list_for_destroy
+            list_scope.where("#{self.class.position_column}>?", position).
+                update_all("#{self.class.position_column} = (#{self.class.position_column} - 1)")
           end
       end
     end

@@ -1,6 +1,8 @@
 module DataFixup::MoveScribdDocsToRootAttachments
   def self.run
-    Shackles.activate(:slave) do
+    env = Shackles.environment
+    env = nil unless env == :deploy
+    Shackles.activate(env || :slave) do
       Attachment.where("scribd_doc IS NOT NULL AND root_attachment_id IS NOT NULL").includes(:root_attachment).find_each do |a|
         ra = a.root_attachment
         # bad data!
@@ -24,7 +26,7 @@ module DataFixup::MoveScribdDocsToRootAttachments
         a.scribd_doc = nil
         a.scribd_attempts = 0
         a.workflow_state = 'deleted'  # not file_state :P
-        Shackles.activate(:master) do
+        Shackles.activate(env || :master) do
           a.save!
           ra.save! if ra.changed?
         end

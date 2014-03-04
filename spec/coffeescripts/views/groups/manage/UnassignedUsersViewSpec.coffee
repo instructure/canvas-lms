@@ -8,7 +8,7 @@ define [
   'compiled/models/GroupCategory'
   'helpers/fakeENV'
   'helpers/jquery.simulate'
-], ($, UnassignedUsersView, AssignToGroupMenu, GroupCollection, UnassignedGroupUserCollection, Group, GroupCategory) ->
+], ($, UnassignedUsersView, AssignToGroupMenu, GroupCollection, UnassignedGroupUserCollection, Group, GroupCategory, fakeENV) ->
 
   clock = null
   view = null
@@ -17,6 +17,7 @@ define [
 
   module 'UnassignedUsersView',
     setup: ->
+      fakeENV.setup()
       $('#fixtures').html('<div id="content"></div>')
       clock = sinon.useFakeTimers()
       groups = new GroupCollection [
@@ -38,6 +39,7 @@ define [
                     .append( $('<div />', id: 'content') )
 
     teardown: ->
+      fakeENV.teardown()
       $('#fixtures').empty()
       clock.restore()
       view.remove()

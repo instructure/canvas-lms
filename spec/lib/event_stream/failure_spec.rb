@@ -23,8 +23,8 @@ describe EventStream::Failure do
     before do
       @record = stub('record',
         :id => stub('record_id', :to_s => 'record_id_string'),
-        :attributes => { stub('attribute') => stub('attribute_value') },
-        :changes => { stub('changed_attribute') => stub('changed_value') })
+        :attributes => { 'attribute' => 'attribute_value' },
+        :changes => { 'changed_attribute' => 'changed_value' })
 
       @stream = stub('stream', :identifier => 'stream_identifier')
       @stream.stubs(:operation_payload).with(:insert, @record).returns(@record.attributes)

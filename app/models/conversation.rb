@@ -40,6 +40,7 @@ class Conversation < ActiveRecord::Base
 
   def reload(options = nil)
     @current_context_strings = {}
+    @participants = nil
     super
   end
 
@@ -415,7 +416,8 @@ class Conversation < ActiveRecord::Base
             cp.update_attribute(:tags, updated_tags)
             if cp.user.shard != self.shard
               cp.user.shard.activate do
-                ConversationParticipant.where(:conversation_id => self, :user_id => cp.user_id).update_all(:tags => serialized_tags(cp.tags))
+                ConversationParticipant.where(:conversation_id => self, :user_id => cp.user_id).
+                  update_all(:tags => serialized_tags(cp.tags))
               end
             end
           end
@@ -581,10 +583,12 @@ class Conversation < ActiveRecord::Base
   def regenerate_private_hash!(user_ids = nil)
     return unless private?
     self.private_hash = Conversation.private_hash_for(user_ids ||
-      Shard.birth.activate { self.conversation_participants.map(&:user_id) } )
+      Shard.birth.activate { self.conversation_participants.reload.map(&:user_id) } )
     return unless private_hash_changed?
     existing = self.shard.activate do
-      ConversationParticipant.find_by_private_hash(private_hash).try(:conversation)
+      ConversationParticipant.send(:with_exclusive_scope) do
+        ConversationParticipant.find_by_private_hash(private_hash).try(:conversation)
+      end
     end
     if existing
       merge_into(existing)
@@ -636,7 +640,7 @@ class Conversation < ActiveRecord::Base
             if cp.user.shard != self.shard
               cp.user.shard.activate do
                 ConversationParticipant.where(:conversation_id => self, :user_id => cp.user_id).
-                    update_all(:conversation_id => other)
+                  update_all(:conversation_id => other)
               end
             end
             # create a new duplicate cp on the target conversation's shard
@@ -651,7 +655,6 @@ class Conversation < ActiveRecord::Base
           end
         end
       end
-
       if other.shard == self.shard
         conversation_messages.update_all(:conversation_id => other)
       else

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -25,7 +25,6 @@ class TestCourseApi
   def course_url(course, opts = {}); return "course_url(Course.find(#{course.id}), :host => #{HostUrl.context_host(@course1)})"; end
   def api_user_content(syllabus, course); return "api_user_content(#{syllabus}, #{course.id})"; end
 end
-
 
 describe Api::V1::Course do
 
@@ -127,7 +126,7 @@ describe Api::V1::Course do
   end
 end
 
-describe CoursesController, :type => :integration do
+describe CoursesController, type: :request do
   USER_API_FIELDS = %w(id name sortable_name short_name)
 
   before do
@@ -181,6 +180,15 @@ describe CoursesController, :type => :integration do
 
     courses = json.select { |c| [@course1.id, @course2.id].include?(c['id']) }
     courses.length.should == 2
+  end
+
+  it 'should paginate the course list' do
+    json = api_call(:get, "/api/v1/courses.json?per_page=1",
+            { :controller => 'courses', :action => 'index', :format => 'json', :per_page => '1' })
+    json.length.should == 1
+    json += api_call(:get, "/api/v1/courses.json?per_page=1&page=2",
+            { :controller => 'courses', :action => 'index', :format => 'json', :per_page => '1', :page => '2' })
+    json.length.should == 2
   end
 
   it 'should not include permissions' do
@@ -346,7 +354,7 @@ describe CoursesController, :type => :integration do
             }
           }
         )
-        response.status.should eql '401 Unauthorized'
+        assert_status(401)
       end
     end
   end
@@ -770,6 +778,7 @@ describe CoursesController, :type => :integration do
       'id' => @course1.enrollment_term_id,
       'name' => @course1.enrollment_term.name,
       'sis_term_id' => nil,
+      'workflow_state' => 'active',
     )
 
     # course2
@@ -780,6 +789,7 @@ describe CoursesController, :type => :integration do
       'id' => @course2.enrollment_term_id,
       'name' => @course2.enrollment_term.name,
       'sis_term_id' => nil,
+      'workflow_state' => 'active',
     )
   end
 
@@ -1201,7 +1211,7 @@ describe CoursesController, :type => :integration do
           course_id: @course1.id.to_s,
           page: 'invalid',
           format: 'json')
-        response.status.should == "404 Not Found"
+        assert_status(404)
       end
 
       it "returns a list of users" do
@@ -1619,7 +1629,7 @@ describe CoursesController, :type => :integration do
       @course.update_attribute('sis_source_id', 'OTHER-SIS')
       raw_api_call(:get, "/api/v1/courses/sis_course_id:OTHER-SIS",
                    :controller => "courses", :action => "show", :id => "sis_course_id:OTHER-SIS", :format => "json")
-      response.status.should == "404 Not Found"
+      assert_status(404)
     end
 
     it 'should include permissions' do
@@ -1718,8 +1728,8 @@ describe CoursesController, :type => :integration do
 
 
   context "course files" do
-    it_should_behave_like "file uploads api with folders"
-    it_should_behave_like "file uploads api with quotas"
+    include_examples "file uploads api with folders"
+    include_examples "file uploads api with quotas"
 
     before :each do
       @context = @course
@@ -1868,7 +1878,7 @@ def each_copy_option
    [:modules, :context_modules], [:outcomes, :created_learning_outcomes]].each{|o| yield o}
 end
 
-describe ContentImportsController, :type => :integration do
+describe ContentImportsController, type: :request do
   before(:each) do
     course_with_teacher_logged_in(:active_all => true, :name => 'origin story')
     @copy_from = @course
@@ -1941,7 +1951,7 @@ describe ContentImportsController, :type => :integration do
     status = raw_api_call(:post, "/api/v1/courses/#{to_id}/course_copy",
             { :controller => 'content_imports', :action => 'copy_course_content', :course_id => to_id, :format => 'json' },
     {:source_course => from_id})
-    response.status.should == "404 Not Found"
+    assert_status(404)
   end
 
   def run_only_copy(option)
@@ -1991,14 +2001,14 @@ describe ContentImportsController, :type => :integration do
   it "should return 404 for an import that isn't found" do
     raw_api_call(:get, "/api/v1/courses/#{@copy_to.id}/course_copy/444",
                  { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => '444', :format => 'json' })
-    response.status.should == "404 Not Found"
+    assert_status(404)
   end
 
   it "shouldn't allow both only and except options" do
     raw_api_call(:post, "/api/v1/courses/#{@copy_to.id}/course_copy",
             { :controller => 'content_imports', :action => 'copy_course_content', :course_id => @copy_to.to_param, :format => 'json' },
     {:source_course => @copy_from.to_param, :only => [:topics], :except => [:assignments]})
-    response.status.to_i.should == 400
+    assert_status(400)
     json = JSON.parse(response.body)
     json['errors'].should == 'You can not use "only" and "except" options at the same time.'
   end

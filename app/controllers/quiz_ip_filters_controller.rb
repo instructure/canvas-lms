@@ -65,10 +65,7 @@ class QuizIpFiltersController < ApplicationController
     if authorized_action(@quiz, @current_user, :update)
       quiz_ip_filters = @quiz.available_ip_filters
 
-      paginated_set = Api.paginate(quiz_ip_filters, self, polymorphic_url([
-        :api, :v1, @context, @quiz, :ip_filters
-      ]))
-
+      paginated_set = Api.paginate(quiz_ip_filters, self, api_v1_course_quiz_ip_filters_url(@context, @quiz))
       renderable = quiz_ip_filters_json(paginated_set, @context, @current_user, session)
 
       render :json => renderable

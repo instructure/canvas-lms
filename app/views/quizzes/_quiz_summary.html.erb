@@ -40,7 +40,7 @@
         <% elsif submission %>
           <%= datetime_string(submission.started_at) %><br/>
           <% if q.cant_go_back? %>
-            <%= link_to(resume_poll_message(q), polymorphic_url([@context, q])) %>
+            <%= link_to(resume_poll_message(q), course_quiz_url(@context, q)) %>
           <% elsif !q.locked? %>
             <%= link_to(resume_poll_message(q), context_url(@context, :context_quiz_take_url, q.id, :user_id => @current_user && @current_user.id), :method => :post) %>
           <% end %>

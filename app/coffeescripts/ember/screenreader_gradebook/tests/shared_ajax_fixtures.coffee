@@ -307,6 +307,16 @@ define [
         }
       ]
 
+  concludedStudents = [
+        {
+          user: { id: '105', name: 'Lyra' }
+          course_section_id: '1'
+          user_id: '105'
+          workflow_state: 'completed'
+          completed_at: "2013-10-01T10:00:00Z"
+        }
+      ]
+
   assignmentGroups = [
         {
           id: '1'
@@ -380,6 +390,16 @@ define [
               published: true
               muted: true
             }
+            {
+              id: '6'
+              name: 'Da Fish and Chips!'
+              points_possible: 40
+              grading_type: "pass_fail"
+              submission_types: ["none"]
+              due_at: "2013-09-01T10:00:00Z"
+              position: 9
+              assignment_group_id:'2'
+            }
           ]
         }
         {
@@ -411,7 +431,6 @@ define [
             }
           ]
         }
-
       ]
 
   submissions = [
@@ -420,6 +439,7 @@ define [
           submissions: [
             { id: '1', user_id: '1', assignment_id: '1', grade: '3' }
             { id: '2', user_id: '1', assignment_id: '2', grade: null }
+            { id: '5', user_id: '1', assignment_id: '6', grade: 'incomplete' }
           ]
         }
         {
@@ -473,6 +493,7 @@ define [
 
   set_default_grade_response: default_grade_response
   students: students
+  concluded_enrollments: concludedStudents
   assignment_groups: assignmentGroups
   submissions: submissions
   sections: sections
@@ -484,6 +505,7 @@ define [
         context_asset_string: 'course_1'
         GRADEBOOK_OPTIONS: {
           students_url: '/api/v1/enrollments'
+          students_url_with_concluded_enrollments: '/api/v1/concluded_enrollments'
           assignment_groups_url: '/api/v1/assignment_groups'
           submissions_url: '/api/v1/submissions'
           sections_url: '/api/v1/sections'
@@ -496,6 +518,11 @@ define [
 
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.students_url,
       response: clone students
+      jqXHR: { getResponseHeader: -> {} }
+      textStatus: ''
+
+    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.students_url_with_concluded_enrollments,
+      response: clone concludedStudents
       jqXHR: { getResponseHeader: -> {} }
       textStatus: ''
 

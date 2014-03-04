@@ -166,7 +166,7 @@ class MessageableUser
     def count_messageable_users_in_scope(scope)
       if scope
         # convert the group by into a select distinct
-        group_as_select = scope.scope(:find, :group)
+        group_as_select = scope.group_values
         scope.except(:select, :group, :order).select(group_as_select).uniq.count
       else
         0
@@ -486,8 +486,8 @@ class MessageableUser
 
     def search_scope(scope, search, global_exclude_ids)
       if global_exclude_ids.present?
-        target_shard = scope.scope(:find, :shard)
-        exclude_ids = global_exclude_ids.map{ |id| Shard.relative_id_for(id, target_shard) }
+        target_shard = scope.shard_value
+        exclude_ids = global_exclude_ids.map{ |id| Shard.relative_id_for(id, Shard.current, target_shard) }
         scope = scope.where(["users.id NOT IN (?)", exclude_ids])
       end
 

@@ -62,7 +62,7 @@ describe ContentZipper do
       Zip::File.foreach(attachment.full_filename) do |f|
         if f.file?
           f.name.should =~ /some-999----1234-guy/
-          f.get_input_stream.read.should match(%r{This submission was a url, we&#39;re taking you to the url link now.})
+          f.get_input_stream.read.should match(%r{This submission was a url, we&#x27;re taking you to the url link now.})
           f.get_input_stream.read.should be_include("http://www.instructure.com/")
         end
       end
@@ -329,7 +329,7 @@ describe ContentZipper do
     it "delegates to a QuizSubmissionZipper" do
       course_with_teacher_logged_in(active_all: true)
       attachment = Attachment.new(:display_name => 'download.zip')
-      quiz = Quiz.new(:context => @course)
+      quiz = Quizzes::Quiz.new(:context => @course)
       zipper_stub = stub
       zipper_stub.expects(:zip!).once
       attachment.context = quiz

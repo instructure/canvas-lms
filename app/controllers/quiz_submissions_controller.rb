@@ -83,7 +83,7 @@ class QuizSubmissionsController < ApplicationController
         if @submission.present? && !@submission.valid_token?(params[:validation_token])
           if params[:action] == 'record_answer'
             flash[:error] = t('errors.invalid_submissions', "This quiz submission could not be verified as belonging to you.  Please try again.")
-            return redirect_to polymorphic_path([@context, @quiz])
+            return redirect_to course_quiz_path(@context, @quiz)
           else
             return render_json_unauthorized
           end
@@ -123,7 +123,7 @@ class QuizSubmissionsController < ApplicationController
     if request.get?
       @quiz = @context.quizzes.find(params[:quiz_id])
       user_id = @current_user && @current_user.id
-      redirect_to polymorphic_url([@context, @quiz, :take], :user_id => user_id)
+      redirect_to course_quiz_take_url(@context, @quiz, user_id: user_id)
     else
       backup
     end

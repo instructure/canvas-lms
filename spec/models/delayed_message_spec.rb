@@ -28,20 +28,20 @@ describe DelayedMessage do
     it "should have scope for :daily" do
       DelayedMessage.delete_all
       delayed_message_model(:frequency => 'daily')
-      DelayedMessage.for(:daily).should eql([@delayed_message])
+      DelayedMessage.for(:daily).should == [@delayed_message]
     end
     
     it "should scope for :weekly" do
       DelayedMessage.delete_all
       delayed_message_model(:frequency => 'weekly')
-      DelayedMessage.for(:weekly).should eql([@delayed_message])
+      DelayedMessage.for(:weekly).should == [@delayed_message]
     end
     
     it "should scope for notification" do
       DelayedMessage.delete_all
       notification_model
       delayed_message_model
-      DelayedMessage.for(@notification).should eql([@delayed_message])
+      DelayedMessage.for(@notification).should == [@delayed_message]
     end
     
     it "should scope for notification_policy" do
@@ -49,7 +49,7 @@ describe DelayedMessage do
       notification_policy_model
       delayed_message_model(:notification_policy_id => @notification_policy.id)
       @notification_policy.should be_is_a(NotificationPolicy)
-      DelayedMessage.for(@notification_policy).should eql([@delayed_message])
+      DelayedMessage.for(@notification_policy).should == [@delayed_message]
     end
     
     it "should scope for communication_channel" do
@@ -57,14 +57,14 @@ describe DelayedMessage do
       communication_channel_model
       delayed_message_model(:communication_channel_id => @communication_channel.id)
       @communication_channel.should be_is_a(CommunicationChannel)
-      DelayedMessage.for(@communication_channel).should eql([@delayed_message])
+      DelayedMessage.for(@communication_channel).should == [@delayed_message]
     end
     
     it "should scope for context" do
       delayed_message_model
       @delayed_message.context = assignment_model
       @delayed_message.save!
-      DelayedMessage.for(@assignment).should eql([@delayed_message])
+      DelayedMessage.for(@assignment).should == [@delayed_message]
     end
 
     it "should have a scope to order the messages by a field" do

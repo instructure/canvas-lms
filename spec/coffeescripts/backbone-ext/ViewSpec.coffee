@@ -1,6 +1,13 @@
-define ['Backbone', 'compiled/util/mixin'], ({View}, mixing) ->
-
-  module 'View'
+define [
+  'Backbone'
+  'compiled/util/mixin'
+  'helpers/fakeENV'
+], ({View}, mixing, fakeENV) -> 
+  module 'View',
+    setup: ->
+      fakeENV.setup()
+    teardown: ->
+      fakeENV.teardown()
 
   test 'defaults', ->
     class SomeView extends Backbone.View

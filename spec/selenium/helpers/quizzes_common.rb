@@ -166,7 +166,7 @@ shared_examples_for "quizzes selenium tests" do
     click_questions_tab
     click_new_question_button
     wait_for_ajaximations
-    Quiz.last
+    Quizzes::Quiz.last
   end
 
   def take_quiz

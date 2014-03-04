@@ -107,7 +107,7 @@
       <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
       <div class="header-group-right">
         <% if can_do(@quiz, @current_user, :update) %>
-        <a href="<%= edit_polymorphic_path([@context, @quiz]) %>" class='btn edit_assignment_link quiz-edit-button'>
+        <a href="<%= edit_course_quiz_path(@context, @quiz) %>" class='btn edit_assignment_link quiz-edit-button'>
           <i class="icon-edit"><span class="screenreader-only"><%= admin_edit_title %></span></i> <%= admin_edit_title %>
         </a>
         <% end %>
@@ -130,7 +130,7 @@
 
           <% if can_do(@quiz, @current_user, :update) && !needs_unpublished_warning? %>
             <li role="presentation">
-              <a href="<%= polymorphic_path([@context, @quiz, :take], :preview => 1) %>" class="preview_link" data-method="post" tabindex="-1" role="menuitem">
+              <a href="<%= course_quiz_take_path(@context, @quiz, preview: 1) %>" class="preview_link" data-method="post" tabindex="-1" role="menuitem">
                 <i class="icon-quiz"><span class="screenreader-only"><%= admin_preview_title %></span></i>
                 <%= admin_preview_title %>
               </a>
@@ -284,7 +284,7 @@
       <div class='span4' style="text-align: right;line-height: 36px">
         <div class="admin-link-hover-area">
           <% if can_do(@quiz, @current_user, :update) %>
-            <a href="<%= edit_polymorphic_path([@context, @quiz]) %>" class='btn edit_assignment_link quiz-edit-button'>
+            <a href="<%= edit_course_quiz_path(@context, @quiz) %>" class='btn edit_assignment_link quiz-edit-button'>
               <i class="icon-edit"><span class="screenreader-only"><%= admin_edit_title %></span></i> <%= admin_edit_title %>
             </a>
           <% end %>
@@ -310,7 +310,7 @@
 
                 <% if can_do(@quiz, @current_user, :update) && !needs_unpublished_warning? %>
                   <li>
-                    <a href="<%= polymorphic_path([@context, @quiz, :take], :preview => 1) %>" class="preview_link" data-method="post">
+                    <a href="<%= course_quiz_take_path(@context, @quiz, preview: 1) %>" class="preview_link" data-method="post">
                       <i class="icon-quiz"><span class="screenreader-only"><%= admin_preview_title %></span></i>
                       <%= admin_preview_title %>
                     </a>

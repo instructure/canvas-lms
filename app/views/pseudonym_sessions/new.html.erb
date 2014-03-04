@@ -2,40 +2,6 @@
   <%= t :page_title, "Log In to Canvas" %>
 <% end %>
 
-<% js_block do %>
-<script type="text/javascript">
-require([
-  'i18nObj' /* I18n.t */,
-  'jquery' /* $ */,
-  'jquery.ajaxJSON' /* ajaxJSON */
-], function(I18n, $) {
-
-$(document).ready(function() {
-  $(".re_send_confirmation_link").click(function(event) {
-    event.preventDefault();
-    var $link = $(this);
-    $link.text(<%= jt('#pseudonym_sessions.messages.resending', "Re-Sending...") %>);
-    $.ajaxJSON($link.attr('href'), 'POST', {}, function(data) {
-      $link.text(<%= jt('#pseudonym_sessions.messages.sent', "Sent! It may take a few minutes for the message to arrive.") %>);
-    }, function(data) {
-      $link.text(<%= jt('#pseudonym_sessions.errors.request_failed', "Request failed. Try again.") %>);
-    });
-  });
-});
-});
-</script>
-<% end %>
-<% if @pre_registered %>
-  <div style="width: 600px; margin-left: auto; margin-right: auto; margin-top: 10px;">
-    <h2><%= t 'titles.registration_complete', "Registration Incomplete" %></h2>
-    <%= t :details, "Before you can log in you need to finish the registration process.  You should have
-    received an email with a confirmation link back to Canvas.  Follow that link
-    to complete the process.  Make sure to check your spam box." %>
-    <div style="text-align: center; margin: 20px;">
-      <b><a href="<%= re_send_confirmation_url(@pre_registered.id, @pre_registered.communication_channel.id) %>" class="re_send_confirmation_link"><%= t 'links.resend_email', "Re-Send the Email" %></a></b>
-    </div>
-  </div>
-<% end %>
 <%= render :partial => "shared/login" %>
 <% if flash[:logged_out] && HostUrl.file_host(@domain_root_account, @request.host_with_port) %>
   <img class="hidden-readable" src="//<%= HostUrl.file_host(@domain_root_account, @request.host_with_port) %>/file_session/clear"/>

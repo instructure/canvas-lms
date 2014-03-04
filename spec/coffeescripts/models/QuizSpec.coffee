@@ -127,7 +127,7 @@ define [
   module "Quiz#allDates"
 
   test "gets the due dates from the assignment overrides", ->
-    dueAt = new Date("2013-08-20 11:13:00")
+    dueAt = new Date("2013-08-20T11:13:00Z")
     dates = [
       new DateGroup due_at: dueAt, title: "Everyone"
     ]
@@ -146,7 +146,7 @@ define [
   # single section due date
 
   test "gets the due date for section instead of null", ->
-    dueAt = new Date("2013-11-27 11:01:00")
+    dueAt = new Date("2013-11-27T11:01:00Z")
     quiz = new Quiz all_dates: [
       {due_at: null, title: "Everyone"},
       {due_at: dueAt, title: "Summer"}
@@ -203,7 +203,7 @@ define [
     equal json.allDates.length, 2
 
   test "includes singleSectionDueDate", ->
-    dueAt = new Date("2013-11-27 11:01:00")
+    dueAt = new Date("2013-11-27T11:01:00Z")
     quiz = new Quiz all_dates: [
       {due_at: null, title: "Everyone"},
       {due_at: dueAt, title: "Summer"}

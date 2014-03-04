@@ -6,11 +6,10 @@ define [
   'compiled/views/assignments/AssignmentGroupListItemView'
   'compiled/views/assignments/AssignmentListItemView'
   'jquery'
+  'helpers/fakeENV'
   'helpers/jquery.simulate'
   'compiled/behaviors/elementToggler'
-  'helpers/fakeENV'
-], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, AssignmentGroupListItemView, AssignmentListItemView, $) ->
-
+], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, AssignmentGroupListItemView, AssignmentListItemView, $, fakeENV) ->
   fixtures = $('#fixtures')
 
   assignment1 = ->
@@ -113,10 +112,11 @@ define [
 
   module 'AssignmentGroupListItemView',
     setup: ->
+      fakeENV.setup()
       @model = createAssignmentGroup()
 
     teardown: ->
-      ENV.PERMISSIONS = {}
+      fakeENV.teardown()
       AssignmentGroupListItemView.prototype.currentUserId.restore()
       $('#fixtures').empty()
 

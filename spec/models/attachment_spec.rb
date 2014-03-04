@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -379,6 +379,17 @@ describe Attachment do
       att.scribd_doc = doc
       att.save!
       att
+    end
+
+    describe "clones with scribd" do
+      it 'should not copy scribd info on clone' do
+        a = attachment_with_scribd_doc(fake_scribd_doc('zero'))
+        course
+        new_a = a.clone_for(@course)
+        new_a.save!
+        new_a.read_attribute(:scribd_doc).should be_nil
+        new_a.scribd_doc.id.should == a.scribd_doc.id
+      end
     end
 
     describe "related_attachments" do
@@ -1171,7 +1182,7 @@ describe Attachment do
   end
 
   context "dynamic thumbnails" do
-    let(:sz) { CollectionItemData::THUMBNAIL_SIZE }
+    let(:sz) { "640x>" }
 
     before do
       attachment_model(:uploaded_data => stub_png_data)
@@ -1580,6 +1591,14 @@ describe Attachment do
         @attachment.grants_right?(@s1, :attach_to_submission_comment).should be_true
         @attachment.grants_right?(@s2, :attach_to_submission_comment).should be_false
       end
+    end
+  end
+
+  describe "#full_path" do
+    it "shouldn't puke for things that don't have folders" do
+      attachment_obj_with_context(Account.default.default_enrollment_term)
+      @attachment.folder = nil
+      @attachment.full_path.should == "/#{@attachment.display_name}"
     end
   end
 end

@@ -24,7 +24,7 @@ describe SubmissionCommentsController do
     it "should delete the comment" do
       course_with_teacher_logged_in(:active_all => true)
       submission_comment_model(:author => @user)
-      delete 'destroy', :id => @submission_comment.id
+      delete 'destroy', :id => @submission_comment.id, :format => "json"
       response.should be_success      
     end
 

@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe QuizQuestionsController, :type => :integration do
+describe QuizQuestionsController, type: :request do
 
   context 'as a teacher' do
     before do

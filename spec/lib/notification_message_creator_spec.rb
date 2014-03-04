@@ -39,7 +39,7 @@ def create_user_with_cc(opts = {})
 
   if @notification
     communication_channel_model
-    @communication_channel.notification_policies.create!(:notification => @notification)
+    @communication_channel.notification_policies.create!(notification: @notification, frequency: Notification::FREQ_DAILY)
   else
     communication_channel_model
   end
@@ -97,7 +97,7 @@ describe NotificationMessageCreator do
       a.should 
       
       @n = Notification.create(:name => "New Notification")
-      a.notification_policies.create!(:notification => @n)
+      a.notification_policies.create!(:notification => @n, :frequency => Notification::FREQ_IMMEDIATELY)
       messages = NotificationMessageCreator.new(@n, @assignment, :to_list => @user).create_message
       messages.count.should eql(1)
       messages.first.communication_channel.should eql(@user.communication_channel)
@@ -337,7 +337,7 @@ describe NotificationMessageCreator do
     it "should respect browser locales" do
       I18n.backend.store_translations :piglatin, {:messages => {:test_name => {:email => {:subject => "Isthay isay ivefay!"}}}}
       @user.browser_locale = 'piglatin'
-      @user.save(false) # the validation was declared before :piglatin was added, so we skip it
+      @user.save(validate: false) # the validation was declared before :piglatin was added, so we skip it
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
       messages.each {|m| m.subject.should eql("Isthay isay ivefay!")}
       I18n.locale.should eql(:en)
@@ -346,7 +346,7 @@ describe NotificationMessageCreator do
     it "should respect user locales" do
       I18n.backend.store_translations :shouty, {:messages => {:test_name => {:email => {:subject => "THIS IS *5*!!!!?!11eleventy1"}}}}
       @user.locale = 'shouty'
-      @user.save(false)
+      @user.save(validate: false)
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
       messages.each {|m| m.subject.should eql("THIS IS *5*!!!!?!11eleventy1")}
       I18n.locale.should eql(:en)
@@ -386,6 +386,21 @@ describe NotificationMessageCreator do
         messages.length.should >= 1
         messages.each { |m| m.shard.should == @shard1 }
       end
+    end
+
+    it "should create policies and summary messages on the user's shard" do
+      @shard1.activate do
+        @user = User.create!
+        @cc = @user.communication_channels.create!(path: "user@example.com")
+        @cc.confirm!
+      end
+      notification_model(category: 'TestWeekly')
+      Message.any_instance.stubs(:get_template).returns('template')
+      @cc.notification_policies.should be_empty
+      @cc.delayed_messages.should be_empty
+      NotificationMessageCreator.new(@notification, @user, :to_list => @user).create_message
+      @cc.notification_policies.should_not be_empty
+      @cc.delayed_messages.reload.should_not be_empty
     end
   end
 end

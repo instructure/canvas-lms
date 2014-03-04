@@ -903,14 +903,16 @@ class Enrollment < ActiveRecord::Base
   def self.order_by_sortable_name
     clause = User.sortable_name_order_by_clause('users')
     scope = self.order(clause)
-    if scope.scope(:find, :select)
+    if scope.select_values.present?
       scope = scope.select(clause)
+    elsif !CANVAS_RAILS2
+      scope = scope.select(self.arel_table[Arel.star])
     end
     scope
   end
 
   def self.top_enrollment_by(key, rank_order = :default)
-    raise "top_enrollment_by_user must be scoped" unless scoped?(:find, :conditions)
+    raise "top_enrollment_by_user must be scoped" unless scoped.where_values.present?
     key = key.to_s
     distinct_on(key, :order => "#{key}, #{type_rank_sql(rank_order)}")
   end
@@ -986,7 +988,7 @@ class Enrollment < ActiveRecord::Base
 
   # similar to above, but used on a scope or association (e.g. User#enrollments)
   def self.remove_duplicates!
-    raise "remove_duplicates! needs to be scoped" unless scoped?(:find, :conditions)
+    raise "remove_duplicates! needs to be scoped" unless scoped.where_values.present?
 
     where(["workflow_state NOT IN (?)", ['deleted', 'inactive', 'rejected']]).
       group_by{ |e| [e.user_id, e.course_id, e.course_section_id, e.associated_user_id] }.

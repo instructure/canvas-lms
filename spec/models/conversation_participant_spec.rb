@@ -206,7 +206,7 @@ describe ConversationParticipant do
       Account.site_admin.stubs(:grants_right?).with(@admin_user, :become_user).returns(false)
       convos = @target_user.conversations.for_masquerading_user(@admin_user)
       convos.size.should eql 4
-      convos.should eql @target_user.conversations.to_a
+      convos.should == @target_user.conversations.to_a
     end
 
     it "should limit others to their associated root accounts" do
@@ -414,7 +414,7 @@ describe ConversationParticipant do
       ConversationParticipant.send :with_scope, :find => {:conditions => ["user_id = ?", @user1.id]} do
         c.move_to_user @user2
       end
-  
+
       lambda{ c.reload }.should raise_error # deleted
       lambda{ Conversation.find(c.conversation_id) }.should raise_error # deleted
 

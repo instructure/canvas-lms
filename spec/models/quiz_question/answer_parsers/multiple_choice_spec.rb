@@ -50,7 +50,7 @@ describe QuizQuestion::AnswerParsers::MultipleChoice do
     let(:question_params) { Hash.new }
     let(:parser_class) { QuizQuestion::AnswerParsers::MultipleChoice }
 
-    it_should_behave_like "All answer parsers"
+    include_examples "All answer parsers"
 
   end
 end

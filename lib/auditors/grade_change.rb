@@ -154,8 +154,10 @@ class Auditors::GradeChange
 
   def self.record(submission, event_type=nil)
     return unless submission
-    record = Auditors::GradeChange::Record.generate(submission, event_type)
-    Auditors::GradeChange::Stream.insert(record)
+    submission.shard.activate do
+      record = Auditors::GradeChange::Record.generate(submission, event_type)
+      Auditors::GradeChange::Stream.insert(record)
+    end
   end
 
   def self.for_root_account_student(account, student, options={})

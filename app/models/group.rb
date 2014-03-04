@@ -20,7 +20,6 @@ class Group < ActiveRecord::Base
   include Context
   include Workflow
   include CustomValidations
-  include UserFollow::FollowedItem
 
   attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment, :storage_quota_mb
   validates_presence_of :context_id, :context_type, :account_id, :root_account_id, :workflow_state
@@ -57,10 +56,7 @@ class Group < ActiveRecord::Base
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_many :media_objects, :as => :context
   has_many :zip_file_imports, :as => :context
-  has_many :collections, :as => :context
   belongs_to :avatar_attachment, :class_name => "Attachment"
-  has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
-  has_many :user_follows, :foreign_key => 'following_user_id'
 
   before_validation :ensure_defaults
   before_save :maintain_category_attribute
@@ -254,7 +250,6 @@ class Group < ActiveRecord::Base
     user_ids = users.map(&:id)
     old_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids).all
     bulk_insert_group_memberships(users, options)
-    bulk_insert_group_user_follows(users, options)
     all_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids)
     new_group_memberships = all_group_memberships - old_group_memberships
     new_group_memberships.sort_by!(&:user_id)
@@ -285,15 +280,6 @@ class Group < ActiveRecord::Base
     }.merge(options)
     GroupMembership.bulk_insert(users.map{ |user|
       options.merge({:user_id => user.id, :uuid => AutoHandle.generate_securish_uuid})
-    })
-  end
-
-  def bulk_insert_group_user_follows(users, options = {})
-    options = {
-        :followed_item_id => self.id
-    }.merge(options)
-    UserFollow.bulk_insert(users.map{ |user|
-      options.merge({:following_user_id => user.id})
     })
   end
 
@@ -387,7 +373,6 @@ class Group < ActiveRecord::Base
     can :read_roster and
     can :send_messages and
     can :send_messages_all and
-    can :follow and
     can :view_unpublished_items
 
     # if I am a member of this group and I can moderate_forum in the group's context
@@ -429,9 +414,6 @@ class Group < ActiveRecord::Base
 
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
     can :read and can :read_roster
-
-    given { |user| user && self.is_public? }
-    can :follow
 
     # Participate means the user is connected to the group somehow and can be  
     given { |user| user && can_participate?(user) }
@@ -606,10 +588,6 @@ class Group < ActiveRecord::Base
       ["parent_context_auto_join", "Auto join"],
       ["parent_context_request", "Request to join"]
     ]
-  end
-
-  def default_collection_name
-    t "#group.default_collection_name", "%{group_name}'s Collection", :group_name => self.name
   end
 
   def associated_shards

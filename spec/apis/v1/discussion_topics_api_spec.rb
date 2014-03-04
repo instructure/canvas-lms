@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
-class TestCourseApi
+class DiscussionTopicsTestCourseApi
   include Api
   include Api::V1::DiscussionTopics
   def feeds_topic_format_path(topic_id, code, format); "feeds_topic_format_path(#{topic_id.inspect}, #{code.inspect}, #{format.inspect})"; end
@@ -29,7 +29,7 @@ end
 
 describe Api::V1::DiscussionTopics do
   before do
-    @test_api = TestCourseApi.new
+    @test_api = DiscussionTopicsTestCourseApi.new
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @me = @user
     student_in_course(:active_all => true, :course => @course)
@@ -72,7 +72,7 @@ describe Api::V1::DiscussionTopics do
   end
 end
 
-describe DiscussionTopicsController, :type => :integration do
+describe DiscussionTopicsController, type: :request do
   include Api::V1::User
 
   context 'locked api item' do
@@ -90,7 +90,7 @@ describe DiscussionTopicsController, :type => :integration do
       )
     end
 
-    it_should_behave_like 'a locked api item'
+    include_examples 'a locked api item'
   end
 
   before(:each) do
@@ -1514,13 +1514,13 @@ describe DiscussionTopicsController, :type => :integration do
     it "should set the read state for a topic" do
       student_in_course(:active_all => true)
       call_mark_topic_read(@course, @topic)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_true
       @topic.unread_count(@user).should == 2
 
       call_mark_topic_unread(@course, @topic)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_false
       @topic.unread_count(@user).should == 2
@@ -1529,13 +1529,13 @@ describe DiscussionTopicsController, :type => :integration do
     it "should be idempotent for setting topic read state" do
       student_in_course(:active_all => true)
       call_mark_topic_read(@course, @topic)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_true
       @topic.unread_count(@user).should == 2
 
       call_mark_topic_read(@course, @topic)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_true
       @topic.unread_count(@user).should == 2
@@ -1556,19 +1556,19 @@ describe DiscussionTopicsController, :type => :integration do
     it "should set the read state for a entry" do
       student_in_course(:active_all => true)
       call_mark_entry_read(@course, @topic, @entry)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @entry.read?(@user).should be_true
       @entry.find_existing_participant(@user).should_not be_forced_read_state
       @topic.unread_count(@user).should == 1
 
       call_mark_entry_unread(@course, @topic, @entry)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @entry.read?(@user).should be_false
       @entry.find_existing_participant(@user).should be_forced_read_state
       @topic.unread_count(@user).should == 2
 
       call_mark_entry_read(@course, @topic, @entry)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @entry.read?(@user).should be_true
       @entry.find_existing_participant(@user).should be_forced_read_state
       @topic.unread_count(@user).should == 1
@@ -1577,12 +1577,12 @@ describe DiscussionTopicsController, :type => :integration do
     it "should be idempotent for setting entry read state" do
       student_in_course(:active_all => true)
       call_mark_entry_read(@course, @topic, @entry)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @entry.read?(@user).should be_true
       @topic.unread_count(@user).should == 1
 
       call_mark_entry_read(@course, @topic, @entry)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @entry.read?(@user).should be_true
       @topic.unread_count(@user).should == 1
     end
@@ -1604,7 +1604,7 @@ describe DiscussionTopicsController, :type => :integration do
       @entry.change_read_state('read', @user, :forced => true)
 
       call_mark_all_as_read_state('read')
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_true
 
@@ -1621,7 +1621,7 @@ describe DiscussionTopicsController, :type => :integration do
       [@topic, @entry].each { |e| e.change_read_state('read', @user) }
 
       call_mark_all_as_read_state('unread', :forced => true)
-      response.status.should == '204 No Content'
+      assert_status(204)
       @topic.reload
       @topic.read?(@user).should be_false
 
@@ -1646,14 +1646,12 @@ describe DiscussionTopicsController, :type => :integration do
       @user = user
       raw_api_call(:put, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/subscribed",
                    { :controller => "discussion_topics_api", :action => "subscribe_topic", :format => "json", :course_id => course.id.to_s, :topic_id => topic.id.to_s})
-      response.status.to_i
     end
 
     def call_unsubscribe(topic, user, course=@course)
       @user = user
       raw_api_call(:delete, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/subscribed",
                    { :controller => "discussion_topics_api", :action => "unsubscribe_topic", :format => "json", :course_id => course.id.to_s, :topic_id => topic.id.to_s})
-      response.status.to_i
     end
 
     it "should allow subscription" do
@@ -1978,89 +1976,6 @@ describe DiscussionTopicsController, :type => :integration do
           'user_id' => @teacher.id,
         },
       ]
-    end
-  end
-
-  context "collection items" do
-    before(:each) do
-      @collection = @user.collections.create!(:name => 'test1', :visibility => 'private')
-      @item = collection_item_model(:user_comment => "item 1", :user => @collection.context, :collection => @collection, :collection_item_data => collection_item_data_model(:link_url => "http://www.example.com/one"))
-    end
-
-    it "should return a discussion topic for an item" do
-      json = api_call(:get, "/api/v1/collection_items/#{@item.id}/discussion_topics/self",
-        { :collection_item_id => "#{@item.id}", :controller => "discussion_topics_api", :format => "json", :action => "show", :topic_id => "self"})
-      json["discussion_subentry_count"].should == 0
-      json["posted_at"].should be_nil
-    end
-
-    it "should return an empty discussion view for an item" do
-      json = api_call(:get, "/api/v1/collection_items/#{@item.id}/discussion_topics/self/view",
-        { :collection_item_id => "#{@item.id}", :controller => "discussion_topics_api", :format => "json", :action => "view", :topic_id => "self"})
-      json.should == { "participants" => [], "unread_entries" => [], "forced_entries" => [], "view" => [], "new_entries" => [] }
-      @item.discussion_topic.should be_new_record
-    end
-
-    it "should create a discussion topic when someone attempts to comment" do
-      message = "oh that is awesome"
-      json = nil
-      expect {
-        json = api_call(
-          :post, "/api/v1/collection_items/#{@item.id}/discussion_topics/self/entries.json",
-          { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
-            :collection_item_id => @item.id.to_s, :topic_id => "self" },
-          { :message => message })
-      }.to change(DiscussionTopic, :count).by(1)
-      json.should_not be_nil
-      json['id'].should_not be_nil
-      @entry = DiscussionEntry.find_by_id(json['id'])
-      @entry.should_not be_nil
-      @entry.message.should == message
-      @entry.user.should == @user
-      @entry.parent_entry.should be_nil
-    end
-
-    it "should return a discussion's details for a collection item after there are posts" do
-      @topic = @item.discussion_topic
-      @topic.save!
-      @entry1 = create_entry(@topic, :message => "loved it")
-      @entry2 = create_entry(@topic, :message => "ditto")
-      @topic.create_materialized_view
-      json = api_call(:get, "/api/v1/collection_items/#{@item.id}/discussion_topics/self/view",
-        { :collection_item_id => "#{@item.id}", :controller => "discussion_topics_api", :format => "json", :action => "view", :topic_id => "self"})
-      json['participants'].length.should == 1
-      json['unread_entries'].length.should == 0
-      json['new_entries'].length.should == 0
-      json['view'].should == [{
-          "created_at" => @entry1.created_at.as_json,
-          "updated_at" => @entry1.updated_at.as_json,
-          "id" => @entry1.id,
-          "user_id" => @user.id,
-          "parent_id" => nil,
-          "message" => "loved it"
-        }, {
-          "created_at" => @entry2.created_at.as_json,
-          "updated_at" => @entry2.updated_at.as_json,
-          "id" => @entry2.id,
-          "user_id" => @user.id,
-          "parent_id" => nil,
-          "message" => "ditto"
-      }]
-    end
-
-    it "should mark entries as read on a collection item" do
-      Collection.where(:id => @collection).update_all(:visibility => 'public')
-      @collection.reload
-      topic = @item.discussion_topic
-      topic.save!
-      entry = create_entry(topic, :message => "loved it")
-
-      student_in_course(:course => @course, :user => user_with_pseudonym)
-      entry.read?(@user).should be_false
-      json = raw_api_call(:put, "/api/v1/collection_items/#{@item.id}/discussion_topics/self/entries/#{entry.id}/read.json",
-                { :controller => 'discussion_topics_api', :action => 'mark_entry_read', :format => 'json',
-                  :collection_item_id => @item.id.to_s, :topic_id => "self", :entry_id => entry.id.to_s })
-      entry.reload.read?(@user).should be_true
     end
   end
 end

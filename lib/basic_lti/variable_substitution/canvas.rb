@@ -8,6 +8,7 @@ module BasicLTI
       end
 
       class Assignment < AbstractSubstitutor
+        # $Canvas.assignment.id
         def id
           assignment.id if assignment
         end

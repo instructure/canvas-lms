@@ -2,9 +2,29 @@
   "name": "canvas-lms",
   "version": "0.0.0",
   "devDependencies": {
-    "requirejs": "1.0.8",
+    "requirejs": "~2.1.10",
     "loom": "~2.0.0",
     "fleck": "~0.5.1",
-    "testem": "~0.3.30"
+    "testem": "~0.3.30",
+    "karma-qunit": "~0.1.1",
+    "karma": "~0.10.9",
+    "karma-safari-launcher": "~0.1.1",
+    "karma-opera-launcher": "~0.1.0",
+    "karma-coverage": "~0.1.4",
+    "karma-ie-launcher": "~0.1.1",
+    "napa": "~0.3.0",
+    "karma-osx-reporter": "0.0.4",
+    "karma-firework-reporter": "~0.2.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/instructure/canvas-lms.git"
+  },
+  "napa": {
+    "rjs-old": "https://github.com/jrburke/r.js/archive/1.0.8.tar.gz"
+  },
+  "scripts": {
+    "install": "./node_modules/napa/bin/napa",
+    "test": "./node_modules/karma/bin/karma start --browsers Chrome,Firefox,Safari --single-run"
   }
 }

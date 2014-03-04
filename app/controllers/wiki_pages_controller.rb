@@ -47,10 +47,11 @@ class WikiPagesController < ApplicationController
       redirect_to polymorphic_url([@context, :named_page], :wiki_page_id => @page)
       return
     end
-    hash = { :CONTEXT_ACTION_SOURCE => :wiki }
+    @editing = true if Canvas::Plugin.value_to_boolean(params[:edit])
+    hash = { :CONTEXT_ACTION_SOURCE => :wiki,
+             :WIKI_PAGE_EDITING => @editing}
     append_sis_data(hash)
     js_env(hash)
-    @editing = true if Canvas::Plugin.value_to_boolean(params[:edit])
 
     unless is_authorized_action?(@page, @current_user, [:update, :update_content]) || @page.is_front_page?
       wiki_page = @wiki.wiki_pages.deleted_last.find_by_url(@page.url) if @page.new_record?

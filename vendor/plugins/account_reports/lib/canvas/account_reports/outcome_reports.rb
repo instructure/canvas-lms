@@ -190,7 +190,7 @@ module Canvas::AccountReports
                  c.name                                      AS "course name",
                  c.id                                        AS "course id",
                  c.sis_source_id                             AS "course sis id",
-            CASE WHEN r.association_type = 'Quiz' THEN 'quiz'
+            CASE WHEN r.association_type IN ('Quiz', 'Quizzes::Quiz') THEN 'quiz'
                  WHEN ct.content_type = 'Assignment' THEN 'assignment'
                  END                                         AS "assessment type"}).
         joins("INNER JOIN learning_outcomes ON content_tags.content_id = learning_outcomes.id
@@ -201,7 +201,7 @@ module Canvas::AccountReports
                INNER JOIN pseudonyms p on p.user_id = r.user_id
                INNER JOIN courses c ON r.context_id = c.id
                LEFT OUTER JOIN quizzes q ON q.id = r.association_id
-                 AND r.association_type = 'Quiz'
+                 AND r.association_type IN ('Quiz', 'Quizzes::Quiz')
                LEFT OUTER JOIN assignments a ON a.id = ct.content_id
                  AND ct.content_type = 'Assignment'
                LEFT OUTER JOIN submissions subs ON subs.assignment_id = a.id

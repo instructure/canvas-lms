@@ -71,7 +71,18 @@ define([
       cantGoBack: $("#submit_quiz_form").hasClass("cant_go_back"),
       finalSubmitButtonClicked: false,
       clockInterval: 500,
+      backupsDisabled: document.location.search.search(/backup=false/) > -1,
       updateSubmission: function(repeat, beforeLeave, autoInterval) {
+        /**
+         * Transient: CNVS-9844
+         * Disable auto-backups if backup=true was passed as a query parameter.
+         *
+         * This is required to test updating questions via the API.
+         */
+        if (quizSubmission.backupsDisabled) {
+          return;
+        }
+
         if(quizSubmission.submitting && !repeat) { return; }
         var now = new Date();
         if((now - quizSubmission.lastSubmissionUpdate) < 1000 && !autoInterval) {

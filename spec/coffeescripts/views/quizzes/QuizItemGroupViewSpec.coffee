@@ -4,8 +4,9 @@ define [
   'compiled/collections/QuizCollection'
   'compiled/views/quizzes/QuizItemGroupView'
   'jquery'
+  'helpers/fakeENV'
   'helpers/jquery.simulate'
-], (Backbone, Quiz, QuizCollection, QuizItemGroupView, $) ->
+], (Backbone, Quiz, QuizCollection, QuizItemGroupView, $, fakeENV) ->
 
   fixtures = $('#fixtures')
 
@@ -16,6 +17,8 @@ define [
     view.render()
 
   module 'QuizItemGroupView',
+    setup: -> fakeENV.setup()
+    teardown: -> fakeENV.teardown()
 
   test '#isEmpty is false if any items arent hidden', ->
     collection = new QuizCollection([{id: 1, title: 'Foo'}, {id: 2, title: 'Bar'}])

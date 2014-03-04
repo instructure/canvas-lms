@@ -152,11 +152,8 @@ class EnrollmentsApiController < ApplicationController
 
     enrollments = enrollments.joins(:user).select("enrollments.*").
       order("enrollments.type, #{User.sortable_name_order_by_clause("users")}")
-    if CANVAS_RAILS2
-      has_courses = enrollments.scope(:find, :conditions) =~ /courses\./
-    else
-      has_courses = enrollments.where_values.any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
-    end
+
+    has_courses = enrollments.where_values.any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
     enrollments = enrollments.joins(:course) if has_courses
 
     enrollments = Api.paginate(

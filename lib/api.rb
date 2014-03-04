@@ -42,6 +42,25 @@ module Api
         end
       end
     end
+    if collection.table_name == EnrollmentTerm.table_name
+      current_term = nil
+      ids = ids.map do |id|
+        case id
+        when 'default'
+          @domain_root_account.default_enrollment_term
+        when 'current'
+          if !current_term
+            current_terms = @domain_root_account.enrollment_terms.active.
+                where("(start_at<=? OR start_at IS NULL) AND (end_at >=? OR end_at IS NULL) AND NOT (start_at IS NULL AND end_at IS NULL)", Time.now.utc, Time.now.utc).
+                limit(2).to_a
+            current_term = current_terms.length == 1 ? current_terms.first : :nil
+          end
+          current_term == :nil ? nil : current_term
+        else
+          id
+        end
+      end
+    end
 
     find_params = Api.sis_find_params_for_collection(collection, ids, options[:account] || @domain_root_account)
     return [] if find_params == :not_found
@@ -323,7 +342,7 @@ module Api
   end
 
   # a hash of allowed html attributes that represent urls, like { 'a' => ['href'], 'img' => ['src'] }
-  UrlAttributes = Instructure::SanitizeField::SANITIZE[:protocols].inject({}) { |h,(k,v)| h[k] = v.keys; h }
+  UrlAttributes = CanvasSanitize::SANITIZE[:protocols].inject({}) { |h,(k,v)| h[k] = v.keys; h }
 
   def api_bulk_load_user_content_attachments(htmls, context = @context, user = @current_user)
     rewriter = UserContent::HtmlRewriter.new(context, user)
@@ -534,7 +553,7 @@ module Api
                     "WikiPage" => "Page",
                     "DiscussionTopic" => "Discussion",
                     "Assignment" => "Assignment",
-                    "Quiz" => "Quiz",
+                    "Quizzes::Quiz" => "Quiz",
                     "ContextModuleSubHeader" => "SubHeader",
                     "ExternalUrl" => "ExternalUrl",
                     "ContextExternalTool" => "ExternalTool",
@@ -653,12 +672,12 @@ module Api
   # Reject the API request by halting the execution of the current handler
   # and returning a helpful error message (and HTTP status code).
   #
-  # @param [Fixnum] status
-  #   HTTP status code.
   # @param [String] cause
   #   The reason the request is rejected for.
-  def reject!(status, cause)
-    raise Api::V1::ApiError.new(status, cause)
+  # @param [Optional, Fixnum|Symbol, Default :bad_request] status
+  #   HTTP status code or symbol.
+  def reject!(cause, status=:bad_request)
+    raise Api::V1::ApiError.new(cause, status)
   end
 
   # Return a template url that follows the root links key for the jsonapi.org

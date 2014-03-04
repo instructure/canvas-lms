@@ -46,7 +46,7 @@ describe "settings tabs" do
   end
 
   describe "site admin" do
-    it_should_behave_like "external tools tests"
+    include_examples "external tools tests"
     before(:each) do
       # course_with_
       site_admin_logged_in
@@ -85,7 +85,7 @@ describe "settings tabs" do
   end
 
   describe "admin" do
-    it_should_behave_like "external tools tests"
+    include_examples "external tools tests"
     before(:each) do
       course_with_admin_logged_in
       get "/accounts/#{Account.default.id}/settings"
@@ -194,6 +194,6 @@ describe 'shared settings specs' do
     let(:account) { Account.default }
     let(:account_settings_url) { "/accounts/#{Account.default.id}/settings" }
     let(:admin_tab_url) { "/accounts/#{Account.default.id}/settings#tab-users" }
-    it_should_behave_like "settings basic tests"
+    include_examples "settings basic tests"
   end
 end

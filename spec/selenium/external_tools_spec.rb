@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/external_tools_common')
 
 describe "external tools" do
-  it_should_behave_like "external tools tests"
+  include_examples "external tools tests"
 
   describe "app center" do
     before (:each) do
@@ -97,7 +97,7 @@ describe "external tools" do
   end
 
   describe "editing external tools" do
-    it_should_behave_like "external tools tests"
+    include_examples "external tools tests"
 
     before (:each) do
       course_with_teacher_logged_in

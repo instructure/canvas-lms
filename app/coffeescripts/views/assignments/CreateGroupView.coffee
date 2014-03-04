@@ -1,4 +1,5 @@
 define [
+  'compiled/util/round'
   'i18n!assignments'
   'underscore'
   'compiled/models/AssignmentGroup'
@@ -7,7 +8,7 @@ define [
   'compiled/views/DialogFormView'
   'jst/assignments/CreateGroup'
   'jst/EmptyDialogFormWrapper'
-], (I18n, _, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
+], (round, I18n, _, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
 
   class CreateGroupView extends DialogFormView
     defaults:
@@ -16,6 +17,7 @@ define [
 
     events: _.extend({}, @::events,
       'click .dialog_closer': 'close'
+      'blur .group_weight': 'roundWeight'
     )
 
     els:
@@ -106,6 +108,10 @@ define [
         @never_drops.reset rules.never_drop,
           parse: true
 
+    roundWeight: (e) ->
+      value = $(e.target).val()
+      rounded_value = round(parseFloat(value), 2)
+      $(e.target).val(rounded_value)
 
     toJSON: ->
       data = @model.toJSON()
