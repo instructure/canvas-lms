@@ -224,7 +224,7 @@ define([
             $context_module_item = $("#context_module_item_" + id);
             var data = {};
             if (info["points_possible"] != null) {
-              data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', { 'points': "<span class='points_possible_block'>" + info["points_possible"] + "</span>" });
+              data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', { 'points': "" + info["points_possible"]});
             }
             if (info["due_date"] != null) {
               data["due_date_display"] = $.parseFromISO(info["due_date"]).date_formatted
@@ -693,9 +693,7 @@ define([
       var $option = $(this).parents(".completion_criterion_option");
       $option.find(".min_score_box").showIf($(this).val() == 'min_score');
       var id = $option.find(".id").val();
-      var points_possible = $.trim($("#context_module_item_" + id + " .points_possible").text()) ||
-          // for some reason the previous did not have anything in it sometimes (noticed when you are dealing with a newly added module)
-          $.trim($("#context_module_item_" + id + " .points_possible_block").text());
+      var points_possible = $.trim($("#context_module_item_" + id + " .points_possible_display").text().split(' ')[0]);
       if(points_possible.length > 0) {
         $option.find(".points_possible").text(points_possible);
         $option.find(".points_possible_parent").show();
