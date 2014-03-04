@@ -62,4 +62,21 @@ describe UserContent do
       UserContent.css_size('100-x').should == '100'
     end
   end
+
+  describe 'HtmlRewriter' do
+    let(:rewriter) do
+      course_with_teacher
+      UserContent::HtmlRewriter.new(@course, @teacher)
+    end
+
+    it "should not grant public access to locked files" do
+      course
+      att1 = attachment_model(context: @course)
+      att2 = attachment_model(context: @course)
+      att2.update_attribute(:locked, true)
+      rewriter = UserContent::HtmlRewriter.new(@course, nil)
+      rewriter.user_can_view_content?(att1).should be_true
+      rewriter.user_can_view_content?(att2).should be_false
+    end
+  end
 end
