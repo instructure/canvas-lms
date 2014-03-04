@@ -291,9 +291,7 @@ class CoursesController < ApplicationController
 
         hash = []
         enrollments_by_course = enrollments.group_by(&:course_id).values
-        # TODO temporary! remove this default_per_page parameter once dependent
-        # applications have had a chance to start honoring the pagination
-        enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url, default_per_page: Api.max_per_page) if api_request?
+        enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url) if api_request?
         enrollments_by_course.each do |course_enrollments|
           course = course_enrollments.first.course
           hash << course_json(course, @current_user, session, includes, course_enrollments)
