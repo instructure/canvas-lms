@@ -208,3 +208,33 @@
 .avatar-preview-wrapper {
   padding: 8px 0;
 }
+
+.webcam-live-preview {
+  background: url(/images/webcam_preview.png) center center;
+  display: block;
+  margin: 0 auto;
+  max-height: 350px;
+  max-width: 350px;
+  position: relative;
+
+  &.pending {
+    height: 250px;
+    width: 250px;
+  }
+}
+
+.webcam-clip {
+  margin: 0 auto 16px auto;
+  overflow: hidden;
+}
+
+.webcam-preview {
+  display: block;
+  margin: 0 auto 16px auto;
+  max-height: 350px;
+  max-width: 350px;
+}
+
+.webcam-preview-wrapper {
+  display: none;
+}

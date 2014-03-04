@@ -22,9 +22,10 @@ define [
   'underscore'
   'compiled/views/DialogBaseView'
   'compiled/views/profiles/UploadFileView'
+  'compiled/views/profiles/TakePictureView'
   'jst/profiles/avatarDialog'
   'jst/profiles/avatar'
-], (I18n, $, _, DialogBaseView, UploadFileView, template, avatarTemplate) ->
+], (I18n, $, _, DialogBaseView, UploadFileView, TakePictureView, template, avatarTemplate) ->
 
   class AvatarDialogView extends DialogBaseView
 
@@ -34,7 +35,8 @@ define [
       h: 128
       w: 128
 
-    @child 'uploadFileView', '#upload-picture'
+    @child 'uploadFileView',  '#upload-picture'
+    @child 'takePictureView', '#take-picture'
 
     dialogOptions: ->
       buttons: [
@@ -60,6 +62,7 @@ define [
 
     initialize: () ->
       @uploadFileView = new UploadFileView(avatarSize: @AVATAR_SIZE)
+      @takePictureView = new TakePictureView(avatarSize: @AVATAR_SIZE)
       super
 
     show: ->
@@ -176,8 +179,8 @@ define [
       @currentView = $content.data('view')
       $('.select_button').prop('disabled', true)
 
-    onReady: ->
-      $('.select_button').prop('disabled', false)
+    onReady: (ready = true) ->
+      $('.select_button').prop('disabled', !ready)
 
     teardown: ->
       _.each(@children, (child) -> child.teardown())
