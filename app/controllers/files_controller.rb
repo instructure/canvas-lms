@@ -661,11 +661,6 @@ class FilesController < ApplicationController
   def s3_success
     if params[:id].present?
       @attachment = Attachment.find_by_id_and_workflow_state_and_uuid(params[:id], 'unattached', params[:uuid])
-      if bucket = @attachment.try_rescue(:bucket)
-        prefix = request.ssl? ? 'https' : 'http'
-        response.headers['Access-Control-Allow-Origin']  = "#{prefix}://#{bucket.name}.#{bucket.config.s3_endpoint}/"
-        response.headers['Access-Control-Allow-Methods'] = 'GET'
-      end
     end
     details = @attachment.s3object.head rescue nil
     if @attachment && details

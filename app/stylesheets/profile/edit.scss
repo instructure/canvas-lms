@@ -1,5 +1,6 @@
 @import 'environment';
 @import 'feature_flags';
+@import '/stylesheets/vendor/jquery.jcrop.css';
 
 .profile_table {
   td {
@@ -134,4 +135,76 @@
       font-size: 0.8em;
     }
   }
+}
+
+.avatar-nav {
+  text-align: center;
+
+  .nav-pills {
+    display: inline-block;
+  }
+
+  .nav-pills a:focus {
+    background: #eee;
+    outline: none;
+    text-decoration: none;
+  }
+
+  .nav-pills .active a:focus {
+    background: #0088cc;
+  }
+}
+
+.avatar-content > div {
+  display: none;
+}
+
+.avatar-content .active {
+  display: block;
+}
+
+.select-photo-link {
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 0 0 16px 0;
+  text-align: center;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &.over {
+    outline: 5px dashed #eee;
+  }
+}
+
+.icon-select-photo {
+  display: block !important;
+  height: 256px !important;
+  margin: 0 auto 16px auto;
+  width: 256px !important;
+
+  &:before {
+    color: #c5c5c5;
+    display: block !important;
+    font-size: 256px !important;
+  }
+}
+
+.avatar-preview {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.fullsize {
+  height: auto;
+  max-height: none;
+  max-width: none;
+  width: auto;
+}
+
+.avatar-preview-wrapper {
+  padding: 8px 0;
 }

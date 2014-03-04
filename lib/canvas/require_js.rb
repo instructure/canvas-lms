@@ -144,7 +144,13 @@ module Canvas
               deps: ['jquery'],
               attach: '$'
             },
+
             'vendor/bootstrap-select/bootstrap-select' : {
+              deps: ['jquery'],
+              attach: '$'
+            },
+
+            'vendor/jquery.jcrop': {
               deps: ['jquery'],
               attach: '$'
             }

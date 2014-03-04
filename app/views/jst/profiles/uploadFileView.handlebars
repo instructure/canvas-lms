@@ -1,0 +1,29 @@
+{{#if hasPreview}}
+  <div class="row-fluid">
+    <div class="span6">
+      <p>
+        {{#t "crop_instructions"}}To crop image, drag the selection and then click the "set as profile" button below.{{/t}}
+      </p>
+    </div>
+    <div class="span6 text-center avatar-preview-wrapper">
+      <img src="{{previewURL}}" alt="" class="avatar-preview" />
+    </div>
+  </div>
+{{else}}
+  <a class="select-photo-link" href="#">
+    <i class="icon-image icon-select-photo"></i>
+    {{#t "select_a_photo"}}select a photo{{/t}}
+  </a>
+
+  <input id="selected-photo" type="file" class="hidden" accept="image/*" />
+{{/if}}
+
+<img src="{{previewURL}}"
+     alt=""
+     id="upload-fullsize-preview"
+     class="hidden fullsize" />
+
+<canvas id="upload-canvas"
+        class="hidden"
+        height="128"
+        width="128"></canvas>

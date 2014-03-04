@@ -1,28 +1,27 @@
-<div id="profile_pic_dialog">
-  <a href="#" class="profile_pics_url" style="display: none;">&nbsp;</a>
+<div class="avatar-nav">
+  <ul class="nav nav-pills">
+    {{#if hasFileReader}}
+      <li class="active">
+        <a href="#upload-picture">{{#t "upload_a_picture"}}Upload a Picture{{/t}}</a>
+      </li>
+    {{/if}}
+    {{#if hasGetUserMedia}}
+      <li>
+        <a href="#take-picture">{{#t "take_a_picture"}}Take a Picture{{/t}}</a>
+      </li>
+    {{/if}}
+    <li>
+      <a href="#from-url">{{#t "from_a_url"}}From a URL{{/t}}</a>
+    </li>
+    <li>
+      <a href="#from-gravatar">{{#t "from_gravatar"}}From Gravatar{{/t}}</a>
+    </li>
+  </ul>
+</div>
 
-  {{#t "profile_pictures"}}Select the image you would like to use as your profile, or upload a new image:{{/t}}
-
-  <div class="profile_pic_list"
-       style="background: #eee; padding: 5px; -moz-border-radius: 5px; margin: 5px 10px;">
-    <h3 style="padding-left: 10px; padding-top: 10px;">
-      {{#t "headers.loading_images"}}Loading Images...{{/t}}
-    </h3>
-    <div class="clear"></div>
-  </div>
-
-  <a href="#" class="add_pic_link add">{{#t "links.upload_new_image"}}Upload a new Image{{/t}}</a>
-
-  <form id="add_pic_form" method="POST" action="#" style="display: none;">
-    <input type="hidden" name="format" value="text" />
-
-    <input id="attachment_uploaded_data"
-           name="attachment[uploaded_data]"
-           size="30"
-           type="file" />
-
-    <button type="submit" class="btn btn-small">
-      {{#t "butons.add_picture_file"}}Add File{{/t}}
-    </button>
-  </form>
+<div class="avatar-content">
+  <div class="active" id="upload-picture"></div>
+  <div id="take-picture"></div>
+  <div id="from-url"></div>
+  <div id="from-gravatar"></div>
 </div>
