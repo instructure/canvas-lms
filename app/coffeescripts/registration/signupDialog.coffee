@@ -50,7 +50,10 @@ define [
       open: ->
         $(this).find('a').eq(0).blur()
         $(this).find(':input').eq(0).focus()
-      close: -> $('.error_box').filter(':visible').remove()
+        signupDialog.afterRender?()
+      close: ->
+        signupDialog.teardown?()
+        $('.error_box').filter(':visible').remove()
     $node.fixDialogButtons()
     unless ENV.ACCOUNT.terms_required # term verbiage has a link to PP, so this would be redundant
       addPrivacyLinkToDialog($node)

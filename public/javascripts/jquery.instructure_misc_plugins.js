@@ -18,12 +18,28 @@
 define([
   'i18n!instructure',
   'jquery' /* $ */,
+  'str/htmlEscape',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jqueryui/dialog',
   'jquery.scrollToVisible' /* scrollToVisible */,
   'vendor/jquery.ba-hashchange' /* hashchange */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(I18n, $) {
+], function(I18n, $, htmlEscape) {
+
+  $.fn.setOptions = function(prompt, options) {
+    var result = prompt ? "<option value=''>" + htmlEscape(prompt) + "</option>" : "";
+
+    if (options == null) {
+      options = [];
+    }
+
+    options.forEach( function(opt) {
+      escOpt = htmlEscape(opt);
+      result += "<option value=\"" + escOpt + "\">" + escOpt + "</option>";
+    });
+
+    return this.html(result);
+  }
 
   // this function is to prevent you from doing all kinds of expesive operations on a
   // jquery object that doesn't actually have any elements in it
