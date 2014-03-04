@@ -88,5 +88,15 @@ describe UserContent do
       rewriter.translate_content("<a href=\"/courses/#{rewriter.context.id}/pages/1234-numbered-page\">test</a>")
       called.should be_true
     end
+
+    it "should not grant public access to locked files" do
+      course
+      att1 = attachment_model(context: @course)
+      att2 = attachment_model(context: @course)
+      att2.update_attribute(:locked, true)
+      rewriter = UserContent::HtmlRewriter.new(@course, nil)
+      rewriter.user_can_view_content?(att1).should be_true
+      rewriter.user_can_view_content?(att2).should be_false
+    end
   end
 end

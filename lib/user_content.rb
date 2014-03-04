@@ -182,6 +182,7 @@ module UserContent
 
     # if content is nil, it'll query the block for the content if needed (lazy content load)
     def user_can_view_content?(content = nil, &get_content)
+      return false if user.blank? && content.respond_to?(:locked?) && content.locked?
       return true unless user
       # if user given, check that the user is allowed to manage all
       # context content, or read that specific item (and it's not locked)
