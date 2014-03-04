@@ -18,6 +18,8 @@
 
 if CANVAS_RAILS2
 class Shard
+  IDS_PER_SHARD = 10_000_000_000_000
+
   def self.stubbed?
     true
   end
