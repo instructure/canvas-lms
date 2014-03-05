@@ -1,12 +1,17 @@
 {{#unless column.hidden}}
-<label class="h5" {{bind-attr for=id}}>
-  {{column.title}}
-</label>
-{{
-  textarea
-  value=value
-  name=id
-  id=id
-  disabled=column.isLoading
-}}
+  <div class="custom-column-cell padding-top">
+    <label {{bind-attr for=id}}>
+      <h4>
+        {{column.title}}
+      </h4>
+    </label>
+    {{
+      textarea
+      value=value
+      name=id
+      id=id
+      disabled=column.isLoading
+      class="span8"
+    }}
+  </div>
 {{/unless}}

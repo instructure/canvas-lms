@@ -236,7 +236,6 @@ define [
         false
     ).property().volatile()
 
-
     shouldCreateNotes: (->
       !@get('teacherNotes') and @get('showNotesColumn')
     ).property('teacherNotes', 'showNotesColumn', 'custom_columns.@each')
