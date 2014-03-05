@@ -9,10 +9,27 @@ describe "handlebars" do
     get "/"
   end
 
+  def set_translations(translations)
+    driver.execute_script <<-JS
+      define('translations/test', ['i18nObj', 'jquery'], function(I18n, $) {
+        $.extend(true, I18n, {translations: #{translations.to_json}});
+      });
+    JS
+  end
+
+  def run_template(template, context, locale = 'en')
+    compiled = Handlebars.compile_template(template, 'test')
+    driver.execute_script compiled
+    require_exec 'jst/test', <<-CS
+      I18n.locale = '#{locale}'
+      test(#{context.to_json})
+    CS
+  end
+
   it "should render templates correctly" do
 
     # need to inject the translation file onto the page because the compiled template requires it
-    driver.execute_script "define('translations/test', function(){ return {} });"
+    set_translations({})
 
     template = <<-HTML
       <h1>{{title}}</h1>
@@ -28,20 +45,17 @@ describe "handlebars" do
       <p>{{#t "unescapage"}}this is {{{unescaped}}}{{/t}}</p>
       {{#t "bye"}}welp, see you l8r! dont forget 2 <a href="{{url}}">like us</a> on facebook lol{{/t}}
     HTML
-    compiled = Handlebars.compile_template(template, 'test')
-    driver.execute_script compiled
 
-    result = require_exec 'jst/test', <<-CS
-      test
-        title: 'greetings'
-        name: 'katie'
-        type: 'yoga'
-        items: ['dont forget to stretch!!!']
-        input: '<input>'
-        url: 'http://foo.bar'
-        escaped: '<b>escaped</b>'
-        unescaped: '<b>unescaped</b>'
-    CS
+    result = run_template(template, {
+      title: 'greetings',
+      name: 'katie',
+      type: 'yoga',
+      items: ['dont forget to stretch!!!'],
+      input: '<input>',
+      url: 'http://foo.bar',
+      escaped: '<b>escaped</b>',
+      unescaped: '<b>unescaped</b>'
+    })
 
     result.should == <<-RESULT
       <h1>greetings</h1>
@@ -76,13 +90,7 @@ describe "handlebars" do
         }
       }
     }
-
-    # get our translations into js-land
-    driver.execute_script <<-JS
-      define('translations/test', ['i18nObj', 'jquery'], function(I18n, $) {
-        $.extend(true, I18n, {translations: #{translations.to_json}});
-      });
-    JS
+    set_translations(translations)
 
     template = <<-HTML
       <p>{{#t "#sup"}}sup{{/t}}</p>
@@ -90,18 +98,40 @@ describe "handlebars" do
       <p>{{#t "not_yet_translated"}}but this shouldn't be{{/t}}</p>
     HTML
 
-    compiled = Handlebars.compile_template(template, 'test')
-    driver.execute_script compiled
-
-    result = require_exec 'jst/test', <<-CS
-      I18n.locale = 'pigLatin'
-      test()
-    CS
-
-    result.should == <<-HTML
+    run_template(template, {}, 'pigLatin').should == <<-HTML
       <p>#{translations[:pigLatin][:sup]}</p>
       <p>#{translations[:pigLatin][:test][:it_should_work]}</p>
       <p>but this shouldn't be</p>
+    HTML
+  end
+
+  it "should properly apply wrappers for both defaults and translations" do
+    set_translations({fr: {croissant: "*Je voudrais un croissant*"}})
+
+    template = <<-HTML
+      <p>
+        {{#t "#croissant"}}
+          <b>
+            I'd like a croissant, please
+          </b>
+        {{/t}}
+      </p>
+      <p>
+        {{#t "#not_translated"}}
+          <i>
+            Yes, that's true, he would
+          </i>
+        {{/t}}
+      </p>
+    HTML
+
+    run_template(template, {}, 'fr').should == <<-HTML
+      <p>
+        <b> Je voudrais un croissant</b>
+      </p>
+      <p>
+        <i> Yes, that's true, he would </i>
+      </p>
     HTML
   end
 end

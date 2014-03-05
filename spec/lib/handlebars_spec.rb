@@ -39,6 +39,17 @@ describe Handlebars do
         should eql('{{{t "test" "*%{person}* is *so* **cool**" scope="test" w0="<b>$1</b>" w1="<b title=\\"%{definition}\\"><i>$1</i></b>"}}}')
     end
 
+    it "should remove extraneous whitespace from the translation and wrappers" do
+      Handlebars.prepare_i18n(<<-HBS, 'test')[:content].strip.
+        {{#t "test"}}
+          <b>
+            ohai
+          </b>
+        {{/t}}
+      HBS
+        should eql('{{{t "test" "*ohai *" scope="test" w0="<b> $1</b>"}}}')
+    end
+
     it "should not allow nested helper calls" do
       lambda {
         Handlebars.prepare_i18n('{{#t "test"}}{{call a helper}}{{/t}}', 'test')
