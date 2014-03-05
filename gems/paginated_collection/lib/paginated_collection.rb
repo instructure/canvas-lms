@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012-2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -48,47 +48,15 @@
 #
 # Note that the block needs to edit the AR collection in-place, because it's a
 # subclass of Array with paging information, rather than just a raw array.
+
+require 'folio'
+
 module PaginatedCollection
+  require 'paginated_collection/proxy'
+  require 'paginated_collection/collection'
+
   def self.build(&block)
     raise(ArgumentError, "block required") unless block
-    Proxy.new(block)
-  end
-
-  class Collection < Array
-    include Folio::Page
-  end
-
-  class Proxy
-    attr_accessor :block
-
-    def initialize(block)
-      @block = block
-    end
-
-    def paginate(options = {})
-      execute_pager(configure_pager(new_pager, options))
-    end
-
-    def new_pager
-      PaginatedCollection::Collection.new
-    end
-
-    def configure_pager(pager, options)
-      raise(ArgumentError, "per_page required") unless options[:per_page] && options[:per_page] > 0
-      current_page = options.fetch(:page) { nil }
-      current_page = pager.first_page if current_page.nil?
-      pager.current_page = current_page
-      pager.per_page = options[:per_page]
-      pager.total_entries = options[:total_entries]
-      pager
-    end
-
-    def execute_pager(pager)
-      pager = @block.call(pager)
-      if !pager.respond_to?(:current_page)
-        raise(ArgumentError, "The PaginatedCollection block needs to return a WillPaginate-style object")
-      end
-      return pager
-    end
+    PaginatedCollection::Proxy.new(block)
   end
 end
