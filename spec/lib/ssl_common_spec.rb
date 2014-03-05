@@ -20,58 +20,30 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe SSLCommon do
   it "should work with http basic auth, username and password" do
-    server, server_thread, post_lines = start_test_http_server
-    SSLCommon.post_data("http://theusername:thepassword@localhost:#{server.addr[1]}/endpoint",
+    Net::HTTP::Post.any_instance.expects(:basic_auth).with("theusername", "thepassword")
+    Net::HTTP.any_instance.expects(:start)
+    SSLCommon.post_data("http://theusername:thepassword@localhost/endpoint",
         "somedata", "application/x-jt-is-so-cool")
-    server_thread.join
-    verify_post_matches(post_lines,
-    [
-        "POST /endpoint HTTP/1.1",
-        "Accept: */*",
-        "Content-Type: application/x-jt-is-so-cool",
-        "Authorization: Basic #{Base64.encode64("theusername:thepassword").strip}",
-        "",
-        "somedata"])
   end
 
   it "should work with http basic auth, username and password, with encoded characters" do
-    server, server_thread, post_lines = start_test_http_server
-    SSLCommon.post_data("http://theusername%40theuseremail.tld:thepassword@localhost:#{server.addr[1]}/endpoint",
+    Net::HTTP::Post.any_instance.expects(:basic_auth).with("theusername@theuseremail.tld", "thepassword")
+    Net::HTTP.any_instance.expects(:start)
+    SSLCommon.post_data("http://theusername%40theuseremail.tld:thepassword@localhost/endpoint",
         "somedata", "application/x-jt-is-so-cool")
-    server_thread.join
-    verify_post_matches(post_lines, [
-        "POST /endpoint HTTP/1.1",
-        "Accept: */*",
-        "Content-Type: application/x-jt-is-so-cool",
-        "Authorization: Basic #{Base64.encode64("theusername@theuseremail.tld:thepassword").strip}",
-        "",
-        "somedata"])
   end
 
   it "should work with http basic auth, just username" do
-    server, server_thread, post_lines = start_test_http_server
-    SSLCommon.post_data("http://theusername@localhost:#{server.addr[1]}/endpoint",
+    Net::HTTP::Post.any_instance.expects(:basic_auth).with("theusername", "")
+    Net::HTTP.any_instance.expects(:start)
+    SSLCommon.post_data("http://theusername@localhost/endpoint",
         "somedata", "application/x-jt-is-so-cool")
-    server_thread.join
-    verify_post_matches(post_lines, [
-        "POST /endpoint HTTP/1.1",
-        "Accept: */*",
-        "Content-Type: application/x-jt-is-so-cool",
-        "Authorization: Basic #{Base64.encode64("theusername:").strip}",
-        "",
-        "somedata"])
   end
 
   it "should work with no auth" do
-    server, server_thread, post_lines = start_test_http_server
-    SSLCommon.post_data("http://localhost:#{server.addr[1]}/endpoint",
+    Net::HTTP::Post.any_instance.expects(:basic_auth).never
+    Net::HTTP.any_instance.expects(:start)
+    SSLCommon.post_data("http://localhost/endpoint",
         "somedata", "application/x-jt-is-so-cool")
-    server_thread.join
-    verify_post_matches(post_lines, [
-        "POST /endpoint HTTP/1.1",
-        "Accept: */*",
-        "Content-Type: application/x-jt-is-so-cool",
-        "",
-        "somedata"])
   end
 end

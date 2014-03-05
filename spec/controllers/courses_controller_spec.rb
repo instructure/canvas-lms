@@ -998,13 +998,12 @@ describe CoursesController do
         enrollment.save!
       end
 
-      server, server_thread, post_lines = start_test_http_server
       @plugin = Canvas::Plugin.find!('grade_export')
       @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
       @ps.posted_settings = @plugin.default_settings.merge({
           :format_type => "instructure_csv",
           :wait_for_success => "no",
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
+          :publish_endpoint => "http://localhost/endpoint"
         })
       @ps.save!
 
@@ -1018,9 +1017,8 @@ describe CoursesController do
       a1.grade_student(students[1].user, { :grade => "6", :grader => @teacher })
       a2.grade_student(students[1].user, { :grade => "7", :grader => @teacher })
 
+      SSLCommon.expects(:post_data).once
       post "publish_to_sis", :course_id => @course.id
-
-      server_thread.join
 
       response.should be_success
       response_body = json_parse(response.body)

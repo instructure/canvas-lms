@@ -2209,7 +2209,7 @@ describe Course, 'grade_publishing' do
   end
 
   context 'integration suite' do
-    def quick_sanity_check(user)
+    def quick_sanity_check(user, expect_success = true)
       Course.valid_grade_export_types["test_export"] = {
           :name => "test export",
           :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
@@ -2220,26 +2220,22 @@ describe Course, 'grade_publishing' do
           },
           :requires_grading_standard => false, :requires_publishing_pseudonym => true}
 
-      server, server_thread, post_lines = start_test_http_server
-
       @plugin = Canvas::Plugin.find!('grade_export')
       @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
       @ps.posted_settings = @plugin.default_settings.merge({
           :format_type => "test_export",
           :wait_for_success => "no",
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
+          :publish_endpoint => "http://localhost/endpoint"
         })
       @ps.save!
 
       @course.grading_standard_id = 0
+      if expect_success
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "test-jt-data", "application/jtmimetype", {})
+      else
+        SSLCommon.expects(:post_data).never
+      end
       @course.publish_final_grades(user)
-      server_thread.join
-      verify_post_matches(post_lines, [
-          "POST /endpoint HTTP/1.1",
-          "Accept: */*",
-          "Content-Type: application/jtmimetype",
-          "",
-          "test-jt-data"])
     end
 
     it 'should pass a quick sanity check' do
@@ -2252,7 +2248,7 @@ describe Course, 'grade_publishing' do
 
     it 'should not allow grade publishing for a user that is disallowed' do
       @user = User.new
-      (lambda { quick_sanity_check(@user) }).should raise_error("publishing disallowed for this publishing user")
+      (lambda { quick_sanity_check(@user, false) }).should raise_error("publishing disallowed for this publishing user")
     end
 
     it 'should not allow grade publishing for a user with a pseudonym in the wrong account' do
@@ -2260,7 +2256,7 @@ describe Course, 'grade_publishing' do
       @pseudonym.account = account_model
       @pseudonym.sis_user_id = "U1"
       @pseudonym.save!
-      (lambda { quick_sanity_check(@user) }).should raise_error("publishing disallowed for this publishing user")
+      (lambda { quick_sanity_check(@user, false) }).should raise_error("publishing disallowed for this publishing user")
     end
 
     it 'should not allow grade publishing for a user with a pseudonym without a sis id' do
@@ -2268,7 +2264,7 @@ describe Course, 'grade_publishing' do
       @pseudonym.account_id = @course.root_account_id
       @pseudonym.sis_user_id = nil
       @pseudonym.save!
-      (lambda { quick_sanity_check(@user) }).should raise_error("publishing disallowed for this publishing user")
+      (lambda { quick_sanity_check(@user, false) }).should raise_error("publishing disallowed for this publishing user")
     end
 
     it 'should publish csv' do
@@ -2277,27 +2273,20 @@ describe Course, 'grade_publishing' do
       @pseudonym.account_id = @course.root_account_id
       @pseudonym.save!
 
-      server, server_thread, post_lines = start_test_http_server
-
       @plugin = Canvas::Plugin.find!('grade_export')
       @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
       @ps.posted_settings = @plugin.default_settings.merge({
           :format_type => "instructure_csv",
           :wait_for_success => "no",
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
+          :publish_endpoint => "http://localhost/endpoint"
         })
       @ps.save!
 
       @course.grading_standard_id = 0
+      csv = "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
+          "student_sis_id,enrollment_id,enrollment_status,score,grade\n"
+      SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
       @course.publish_final_grades(@user)
-      server_thread.join
-      verify_post_matches(post_lines, [
-          "POST /endpoint HTTP/1.1",
-          "Accept: */*",
-          "Content-Type: text/csv",
-          "",
-          "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
-          "student_sis_id,enrollment_id,enrollment_status,score,grade\n"])
     end
 
     it 'should publish grades' do
@@ -2393,24 +2382,16 @@ describe Course, 'grade_publishing' do
       teacher = Pseudonym.find_by_sis_user_id("T1")
       teacher.should_not be_nil
 
-      server, server_thread, post_lines = start_test_http_server
-
       @plugin = Canvas::Plugin.find!('grade_export')
       @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
       @ps.posted_settings = @plugin.default_settings.merge({
           :format_type => "instructure_csv",
           :wait_for_success => "no",
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
+          :publish_endpoint => "http://localhost/endpoint"
         })
       @ps.save!
 
-      @course.publish_final_grades(teacher.user)
-      server_thread.join
-      verify_post_matches(post_lines, [
-          "POST /endpoint HTTP/1.1",
-          "Accept: */*",
-          "Content-Type: text/csv",
-          "",
+      csv =
           "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
           "student_sis_id,enrollment_id,enrollment_status,score\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S1").user.id},S1,#{getenroll("S1", "S1").id},active,70\n" +
@@ -2418,22 +2399,14 @@ describe Course, 'grade_publishing' do
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,85\n" +
-          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90\n"])
+          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90\n"
+      SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
+      @course.publish_final_grades(teacher.user)
 
       @course.grading_standard_id = 0
       @course.save
-      server, server_thread, post_lines = start_test_http_server
-      @ps.posted_settings = @plugin.default_settings.merge({
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
-        })
-      @ps.save!
-      @course.publish_final_grades(teacher.user)
-      server_thread.join
-      verify_post_matches(post_lines, [
-          "POST /endpoint HTTP/1.1",
-          "Accept: */*",
-          "Content-Type: text/csv",
-          "",
+
+      csv =
           "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
           "student_sis_id,enrollment_id,enrollment_status,score,grade\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S1").user.id},S1,#{getenroll("S1", "S1").id},active,70,C-\n" +
@@ -2441,20 +2414,13 @@ describe Course, 'grade_publishing' do
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80,B-\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0,F\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,85,B\n" +
-          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"])
+          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"
+      SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
+      @course.publish_final_grades(teacher.user)
+
       admin = user_model
-      server, server_thread, post_lines = start_test_http_server
-      @ps.posted_settings = @plugin.default_settings.merge({
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
-        })
-      @ps.save!
-      @course.publish_final_grades(admin)
-      server_thread.join
-      verify_post_matches(post_lines, [
-          "POST /endpoint HTTP/1.1",
-          "Accept: */*",
-          "Content-Type: text/csv",
-          "",
+
+      csv =
           "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
           "student_sis_id,enrollment_id,enrollment_status,score,grade\n" +
           "#{admin.id},,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S1").user.id},S1,#{getenroll("S1", "S1").id},active,70,C-\n" +
@@ -2462,11 +2428,11 @@ describe Course, 'grade_publishing' do
           "#{admin.id},,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80,B-\n" +
           "#{admin.id},,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0,F\n" +
           "#{admin.id},,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,85,B\n" +
-          "#{admin.id},,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"])
+          "#{admin.id},,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"
+      SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
+      @course.publish_final_grades(admin)
     end
-
   end
-
 
 end
 
