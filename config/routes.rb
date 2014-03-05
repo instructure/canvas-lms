@@ -480,7 +480,7 @@ routes.draw do
 
   resources :groups do
     concerns :users
-    match 'remove_user/:id' => 'groups#remove_user', :as => :remove_user, :via => :delete
+    match 'remove_user/:user_id' => 'groups#remove_user', :as => :remove_user, :via => :delete
     match 'add_user' => 'groups#add_user', :as => :add_user
     match 'accept_invitation/:uuid' => 'groups#accept_invitation', :as => :accept_invitation, :via => :get
     match 'members.:format' => 'groups#context_group_members', :as => :members, :via => :get

@@ -169,7 +169,7 @@
     </div>
   <% else %>
     <% js_env :add_user_url                => group_add_user_url("{{ id }}"),
-              :remove_user_url             => group_remove_user_url("{{ id }}"),
+              :remove_user_url             => group_remove_user_url("{{ id }}", "{{ user_id }}"),
               :list_users_url              => group_members_url("{{ id }}") ,
               :list_unassigned_users_url   => context_url(@context, :context_group_unassigned_members_url),
               :assign_unassigned_users_url => api_v1_group_category_assign_unassigned_members_url(:group_category_id => "{{ category_id }}"),
