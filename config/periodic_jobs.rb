@@ -37,7 +37,7 @@ end
 
 Delayed::Periodic.cron 'SummaryMessageConsolidator.process', '*/15 * * * *' do
   Shard.with_each_shard do
-    SummaryMessageConsolidator.send_later_enqueue_args(:process, strand: "SummaryMessageConsolidator.process:#{Shard.current.database_server.id}")
+    SummaryMessageConsolidator.send_later_enqueue_args(:process, strand: "SummaryMessageConsolidator.process:#{Shard.current.database_server.id}", max_attempts: 1)
   end
 end
 
