@@ -491,6 +491,7 @@ define([
         }
 
         if (tagName == "TEXTAREA") {
+          tinyMCE.triggerSave();
           val = $this.editorBox('get_code');
         } else if ($this.attr('type') == "text" || $this.attr('type') == 'hidden') {
           val = $this.val();
