@@ -16,18 +16,25 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require 'spec_helper'
 
 describe BookmarkedCollection::SimpleBookmarker do
 
   before do
-    @bookmarker = BookmarkedCollection::SimpleBookmarker.new(User, :name, :id)
-    @bob = user(name: "bob")
-    @bob2 = user(name: "Bob")
-    @joe = user(name: "joe")
-    @bobby = user(name: "bobby")
-    @bill = user(name: "BILL!")
-    @in_order = [@bill, @bob, @bob2, @bobby, @joe]
+    @example_class = Class.new(ActiveRecord::Base) do
+      self.table_name = 'examples'
+    end
+
+    BookmarkedCollection.best_unicode_collation_key_proc = lambda { |col|
+      return "lower(#{col})"
+    }
+
+    @bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class, :name, :id)
+    @bob = @example_class.create!(name: "bob")
+    @bob2 = @example_class.create!(name: "Bob")
+    @joe = @example_class.create!(name: "joe")
+    @bobby = @example_class.create!(name: "bobby")
+    @bill = @example_class.create!(name: "BILL!")
   end
 
   context "#bookmark_for" do
@@ -51,22 +58,22 @@ describe BookmarkedCollection::SimpleBookmarker do
 
   context "#restrict_scope" do
     it "should order correctly" do
-      pager = stub(current_bookmark: nil)
-      @bookmarker.restrict_scope(User, pager).should ==
+      pager = double(current_bookmark: nil)
+      @bookmarker.restrict_scope(@example_class, pager).should ==
         [@bill, @bob, @bob2, @bobby, @joe]
     end
 
     it "should start after the bookmark" do
       bookmark = @bookmarker.bookmark_for(@bob2)
-      pager = stub(current_bookmark: bookmark, include_bookmark: false)
-      @bookmarker.restrict_scope(User, pager).should ==
+      pager = double(current_bookmark: bookmark, include_bookmark: false)
+      @bookmarker.restrict_scope(@example_class, pager).should ==
         [@bobby, @joe]
     end
 
     it "should include the bookmark iff include_bookmark" do
       bookmark = @bookmarker.bookmark_for(@bob2)
-      pager = stub(current_bookmark: bookmark, include_bookmark: true)
-      @bookmarker.restrict_scope(User, pager).should ==
+      pager = double(current_bookmark: bookmark, include_bookmark: true)
+      @bookmarker.restrict_scope(@example_class, pager).should ==
         [@bob2, @bobby, @joe]
     end
   end

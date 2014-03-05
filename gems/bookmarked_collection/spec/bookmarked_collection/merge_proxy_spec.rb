@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require 'spec_helper'
 
 describe "BookmarkedCollection::MergeProxy" do
   class MyBookmarker
@@ -30,16 +30,21 @@ describe "BookmarkedCollection::MergeProxy" do
 
     def self.restrict_scope(scope, pager)
       if bookmark = pager.current_bookmark
-        comparison = (pager.include_bookmark ? 'courses.id >= ?' : 'courses.id > ?')
+        comparison = (pager.include_bookmark ? 'id >= ?' : 'id > ?')
         scope = scope.where(comparison, bookmark)
       end
-      scope.order("courses.id ASC")
+      scope.order("id ASC")
     end
   end
 
   describe "#paginate" do
     before :each do
-      @scope = Course.order(:id)
+      @example_class = Class.new(ActiveRecord::Base) do
+        self.table_name = 'examples'
+      end
+
+      @scope = @example_class.order(:id)
+
       3.times{ @scope.create! }
       @collection = BookmarkedCollection.wrap(MyBookmarker, @scope)
       @proxy = BookmarkedCollection::MergeProxy.new([['label', @collection]])
@@ -58,8 +63,8 @@ describe "BookmarkedCollection::MergeProxy" do
       value2 = ['label', 0]
       bookmark1 = 1
       bookmark2 = "bookmark:W1td" # base64 of '[[]' which should fail to parse
-      bookmark3 = "bookmark:#{JSONToken.encode(value1)}"
-      bookmark4 = "bookmark:#{JSONToken.encode(value2)}"
+      bookmark3 = "bookmark:#{::JSONToken.encode(value1)}"
+      bookmark4 = "bookmark:#{::JSONToken.encode(value2)}"
       @proxy.paginate(:page => bookmark1, :per_page => 5).current_bookmark.should be_nil
       @proxy.paginate(:page => bookmark2, :per_page => 5).current_bookmark.should be_nil
       @proxy.paginate(:page => bookmark3, :per_page => 5).current_bookmark.should be_nil
@@ -85,11 +90,10 @@ describe "BookmarkedCollection::MergeProxy" do
 
     describe "with multiple collections" do
       before :each do
-        @created_scope = Course.where(:workflow_state => 'created')
-        @deleted_scope = Course.where(:workflow_state => 'deleted')
 
-        CourseAccountAssociation.delete_all
-        Course.delete_all
+        @created_scope = @example_class.where(:state => 'created')
+        @deleted_scope = @example_class.where(:state => 'deleted')
+
         @courses = [
           @created_scope.create!,
           @created_scope.create!,
@@ -160,38 +164,36 @@ describe "BookmarkedCollection::MergeProxy" do
 
     describe "with a merge proc" do
       before :each do
-        #set @domain_root_account
-        @domain_root_account = Account.create!
-
-        @courses = 6.times.map{ @domain_root_account.courses.create! }
-        @scope1 = @domain_root_account.courses.select("id, '1' as scope").where("id<?", @courses[4].id).order(:id)
-        @scope2 = @domain_root_account.courses.select("id, '2' as scope").where("id>?", @courses[1].id).order(:id)
+        @example_class.delete_all
+        @courses = 6.times.map{ @example_class.create! }
+        @scope1 = @example_class.select("id, '1' as scope").where("id<?", @courses[4].id).order(:id)
+        @scope2 = @example_class.select("id, '2' as scope").where("id>?", @courses[1].id).order(:id)
 
         @collection1 = BookmarkedCollection.wrap(MyBookmarker, @scope1)
         @collection2 = BookmarkedCollection.wrap(MyBookmarker, @scope2)
         collections = [['1', @collection1], ['2', @collection2]]
 
-        @yield = stub(:tally => nil)
+        @yield = double(:tally => nil)
         @proxy = BookmarkedCollection::MergeProxy.new(collections) do |c1, c2|
           @yield.tally(c1, c2)
         end
       end
 
       it "should yield each pair of duplicates" do
-        @yield.expects(:tally).once.with(@scope1.all[2], @scope2.all[0])
-        @yield.expects(:tally).once.with(@scope1.all[3], @scope2.all[1])
+        expect(@yield).to receive(:tally).once.with(@scope1.all[2], @scope2.all[0])
+        expect(@yield).to receive(:tally).once.with(@scope1.all[3], @scope2.all[1])
         @proxy.paginate(:per_page => 6)
       end
 
       it "should yield duplicates of the last element" do
-        @yield.expects(:tally).once.with(@scope1.all[2], @scope2.first)
+        expect(@yield).to receive(:tally).once.with(@scope1.all[2], @scope2.first)
         @proxy.paginate(:per_page => 3)
       end
 
       it "should keep the first of each pair of duplicates" do
         results = @proxy.paginate(:per_page => 6)
-        results.should == @courses
-        results.map(&:scope).should == ['1', '1', '1', '1', '2', '2']
+        expect(results).to eq(@courses)
+        expect(results.map(&:scope)).to eq(['1', '1', '1', '1', '2', '2'])
       end
 
       it "should indicate the first collection to provide the last value in the bookmark" do

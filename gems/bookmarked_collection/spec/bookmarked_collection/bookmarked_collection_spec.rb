@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require 'spec_helper'
 
 describe "BookmarkedCollection" do
   class IDBookmarker
@@ -58,8 +58,11 @@ describe "BookmarkedCollection" do
 
   describe ".wrap" do
     before :each do
-      @scope = Course
-      3.times{ @scope.create! }
+      example_class = Class.new(ActiveRecord::Base) do
+        self.table_name = 'examples'
+      end
+      3.times{ example_class.create! }
+      @scope = example_class
     end
 
     it "should return a WrapProxy" do
@@ -72,24 +75,24 @@ describe "BookmarkedCollection" do
     end
 
     it "should use the bookmarker's bookmark generator to produce bookmarks" do
-      bookmark = stub
-      IDBookmarker.stubs(:bookmark_for).returns(bookmark)
+      bookmark = double
+      allow(IDBookmarker).to receive(:bookmark_for) { bookmark }
 
       collection = BookmarkedCollection.wrap(IDBookmarker, @scope)
       collection.paginate(:per_page => 1).next_bookmark.should == bookmark
     end
 
     it "should use the bookmarker's bookmark applicator to restrict by bookmark" do
-      bookmark = @scope.order("courses.id").first.id
-      bookmarked_scope = @scope.order("courses.id").where("courses.id>?", bookmark)
-      IDBookmarker.stubs(:restrict_scope).returns(bookmarked_scope)
+      bookmark = @scope.order(:id).first.id
+      bookmarked_scope = @scope.order(:id).where("id>?", bookmark)
+      allow(IDBookmarker).to receive(:restrict_scope) { bookmarked_scope }
 
       collection = BookmarkedCollection.wrap(IDBookmarker, @scope)
       collection.paginate(:per_page => 1).should == [bookmarked_scope.first]
     end
 
     it "should apply any restriction block given to the scope" do
-      course = @scope.order("courses.id").last
+      course = @scope.order(:id).last
       course.update_attributes(:name => 'Matching Name')
 
       collection = BookmarkedCollection.wrap(IDBookmarker, @scope) do |scope|
@@ -102,14 +105,17 @@ describe "BookmarkedCollection" do
 
   describe ".merge" do
     before :each do
-      account = Account.create!
-      @created_scope = account.courses.where(:workflow_state => 'created')
-      @deleted_scope = account.courses.where(:workflow_state => 'deleted')
+      example_class = Class.new(ActiveRecord::Base) do
+        self.table_name = 'examples'
+      end
 
-      @created_course1 = @created_scope.create!
-      @deleted_course1 = @deleted_scope.create!
-      @created_course2 = @created_scope.create!
-      @deleted_course2 = @deleted_scope.create!
+      @created_course1 = example_class.create!(state: 'created')
+      @deleted_course1 = example_class.create!(state: 'deleted')
+      @created_course2 = example_class.create!(state: 'created')
+      @deleted_course2 = example_class.create!(state: 'deleted')
+
+      @created_scope = example_class.where(:state => 'created')
+      @deleted_scope = example_class.where(:state => 'deleted')
 
       @created_collection = BookmarkedCollection.wrap(IDBookmarker, @created_scope)
       @deleted_collection = BookmarkedCollection.wrap(IDBookmarker, @deleted_scope)
@@ -145,10 +151,8 @@ describe "BookmarkedCollection" do
 
     context "with a merge proc" do
       before :each do
-        (@created_scope.to_a + @deleted_scope.to_a).each do |c|
-          c.course_account_associations.scoped.delete_all
-          c.destroy!
-        end
+        @created_scope.delete_all
+        @deleted_scope.delete_all
 
         # the name bookmarker will generate the same bookmark for both of the
         # courses.
@@ -170,10 +174,8 @@ describe "BookmarkedCollection" do
 
     context "with ties across collections" do
       before :each do
-        (@created_scope.to_a + @deleted_scope.to_a).each do |c|
-          c.course_account_associations.scoped.delete_all
-          c.destroy!
-        end
+        @created_scope.delete_all
+        @deleted_scope.delete_all
 
         # the name bookmarker will generate the same bookmark for both of the
         # courses.
@@ -206,9 +208,12 @@ describe "BookmarkedCollection" do
 
   describe ".concat" do
     before :each do
-      account = Account.create!
-      @created_scope = account.courses.where(:workflow_state => 'created')
-      @deleted_scope = account.courses.where(:workflow_state => 'deleted')
+      example_class = Class.new(ActiveRecord::Base) do
+        self.table_name = 'examples'
+      end
+
+      @created_scope = example_class.where(:state => 'created')
+      @deleted_scope = example_class.where(:state => 'deleted')
 
       @created_course1 = @created_scope.create!
       @deleted_course1 = @deleted_scope.create!
@@ -262,15 +267,22 @@ describe "BookmarkedCollection" do
 
   describe "nested compositions" do
     before :each do
-      account = Account.create!
-      @created_scope = account.courses.where(:workflow_state => 'created')
-      @deleted_scope = account.courses.where(:workflow_state => 'deleted')
+      example_class = Class.new(ActiveRecord::Base) do
+        self.table_name = 'examples'
+      end
+
+      user_class = Class.new(ActiveRecord::Base) do
+        self.table_name = 'users'
+      end
+
+      @created_scope = example_class.where(:state => 'created')
+      @deleted_scope = example_class.where(:state => 'deleted')
 
       # user's names are so it sorts Created X < Creighton < Deanne < Deleted
       # X when using NameBookmarks
-      @user1 = User.create!(:name => "Creighton")
-      @user2 = User.create!(:name => "Deanne")
-      @user_scope = User.where(id: [@user1, @user2])
+      @user1 = user_class.create!(:name => "Creighton")
+      @user2 = user_class.create!(:name => "Deanne")
+      @user_scope = user_class.where(id: [@user1, @user2])
       @created_course1 = @created_scope.create!(:name => "Created 1")
       @deleted_course1 = @deleted_scope.create!(:name => "Deleted 1")
       @created_course2 = @created_scope.create!(:name => "Created 2")
@@ -362,6 +374,21 @@ describe "BookmarkedCollection" do
           ['users', @user_collection],
           ['courses', @course_collection])
       }.to raise_exception ArgumentError
+    end
+  end
+
+  describe ".best_unicode_collation_key" do
+    it 'should return col if proc is not set' do
+      BookmarkedCollection.best_unicode_collation_key_proc = nil
+      expect(BookmarkedCollection.best_unicode_collation_key('key_name')).to eq('key_name')
+    end
+
+    it 'should use proc to calculate key' do
+      BookmarkedCollection.best_unicode_collation_key_proc = lambda { |col|
+        return "lower(#{col})"
+      }
+
+      expect(BookmarkedCollection.best_unicode_collation_key('key_name')).to eq('lower(key_name)')
     end
   end
 end

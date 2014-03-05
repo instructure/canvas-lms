@@ -57,7 +57,40 @@
 # from that, next_page.
 #
 
+require 'folio/rails'
+require 'folio/page'
+require 'paginated_collection'
+require 'json_token'
+
+if CANVAS_RAILS3
+  require 'will_paginate/active_record'
+else
+  require 'fake_arel'
+end
+
 module BookmarkedCollection
+  require 'bookmarked_collection/collection'
+  require 'bookmarked_collection/composite_collection'
+  require 'bookmarked_collection/proxy'
+  require 'bookmarked_collection/composite_proxy'
+  require 'bookmarked_collection/concat_collection'
+  require 'bookmarked_collection/concat_proxy'
+  require 'bookmarked_collection/merge_proxy'
+  require 'bookmarked_collection/simple_bookmarker'
+  require 'bookmarked_collection/wrap_proxy'
+
+  def self.best_unicode_collation_key(col)
+    if @best_unicode_collation_key_proc
+      @best_unicode_collation_key_proc.call(col)
+    else
+      col
+    end
+  end
+
+  def self.best_unicode_collation_key_proc=(value)
+    @best_unicode_collation_key_proc = value
+  end
+
   # Analogous to PaginatedCollection.build. The provided bookmarker object
   # must respond to bookmark_for and validate:
   #
@@ -229,32 +262,5 @@ module BookmarkedCollection
   #
   def self.concat(*collections)
     BookmarkedCollection::ConcatProxy.new(collections)
-  end
-
-  # Given an association (+HasManyAssociation+ or +HasManyThroughAssociation+),
-  # automatically creates bookmarked collections for the shard-restricted
-  # versions of that association (using wrap) and then merges those
-  # collections. For parity with the association's +with_each_shard+ methods,
-  # you can also provide additional ActiveRecord find options or a scope
-  # refinement block.
-  #
-  # Example:
-  #
-  #   BookmarkedCollection.with_each_shard(UserBookmarker, @user.courses)
-  #
-  #   BookmarkedCollection.with_each_shard(UserBookmarker, @user.courses) do |scope|
-  #     scope.active
-  #   end
-  #
-  def self.with_each_shard(bookmarker, association)
-    # not the result of association.with_each_shard because we don't want it to
-    # flatten our list of pairs
-    collections = []
-    association.with_each_shard do |sharded_association|
-      sharded_association = yield sharded_association if block_given?
-      collections << [Shard.current.id, self.wrap(bookmarker, sharded_association)]
-      nil
-    end
-    self.merge(*collections)
   end
 end

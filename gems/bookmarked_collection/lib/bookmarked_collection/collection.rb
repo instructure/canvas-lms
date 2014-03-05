@@ -74,7 +74,7 @@ class BookmarkedCollection::Collection < Array
   attr_accessor :include_bookmark
 
   def bookmark_to_page(bookmark)
-    bookmark && "bookmark:#{JSONToken.encode(bookmark)}"
+    bookmark && "bookmark:#{::JSONToken.encode(bookmark)}"
   end
 
   def page_to_bookmark(page)
@@ -84,7 +84,7 @@ class BookmarkedCollection::Collection < Array
     else
       if page =~ /^bookmark:/
         begin
-          JSONToken.decode(page.gsub(/^bookmark:/, ''))
+          ::JSONToken.decode(page.gsub(/^bookmark:/, ''))
         rescue
           # bookmark value could not be decoded
           nil

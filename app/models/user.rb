@@ -2545,7 +2545,7 @@ class User < ActiveRecord::Base
   end
 
   def all_paginatable_accounts
-    BookmarkedCollection.with_each_shard(Account::Bookmarker, self.accounts)
+    ShardedBookmarkedCollection.build(Account::Bookmarker, self.accounts)
   end
 
   def all_pseudonyms

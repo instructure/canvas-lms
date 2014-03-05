@@ -16,12 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require 'spec_helper'
 
 describe "BookmarkedCollection::Collection" do
   before :each do
-    @bookmark = stub
-    @bookmarker = stub(:validate => true, :bookmark_for => @bookmark)
+    @bookmark = double('bookmark')
+    @bookmarker = double('bookmarker', :validate => true, :bookmark_for => @bookmark)
     @collection = BookmarkedCollection::Collection.new(@bookmarker)
   end
 
@@ -143,14 +143,13 @@ describe "BookmarkedCollection::Collection" do
 
   describe "#has_more!" do
     before :each do
-      @item = stub
+      @item = double('item')
       @collection << @item
-      @bookmark = stub
-      @bookmarker.stubs(:bookmark_for => @bookmark)
+      @bookmark = double('bookmark')
     end
 
     it "should use the bookmarker on the last item" do
-      @bookmarker.expects(:bookmark_for).once.with(@item).returns(@bookmark)
+      expect(@bookmarker).to receive(:bookmark_for).once.with(@item).and_return(@bookmark)
       @collection.has_more!
       @collection.next_bookmark.should == @bookmark
     end

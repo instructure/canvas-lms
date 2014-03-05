@@ -70,7 +70,7 @@ module BookmarkedCollection
       col = @model.columns_hash[col_name]
       col_name = placeholder || "#{@model.table_name}.#{col_name}"
       if col.type == :string
-        col_name = ActiveRecord::Base.best_unicode_collation_key(col_name)
+        col_name = BookmarkedCollection.best_unicode_collation_key(col_name)
       end
       col_name
     end
