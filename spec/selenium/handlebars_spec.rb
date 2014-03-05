@@ -67,18 +67,6 @@ describe "handlebars" do
     result.should == "outside partial hi from inside partial"
   end
 
-  # Can't do this anymore :( see https://github.com/wycats/handlebars.js/issues/565
-  #it "should make ENV available" do
-    #user_id = @user.id
-    #str = "zomg %s your user id is %s"
-    #driver.execute_script Handlebars.compile_template(str % ["{{name}}", "{{ENV.current_user_id}}"], "env_test")
-    #driver.execute_script "window.origContext = {name: 'guy'};"
-    #result = require_exec "jst/env_test", "env_test(window.origContext)"
-    #result.should == str % ["guy", user_id]
-    ## original context should remain unchanged
-    #driver.execute_script("return window.origContext").should == {'name' => 'guy'}
-  #end
-
   it "should translate the content" do
     translations = {
       :pigLatin => {
