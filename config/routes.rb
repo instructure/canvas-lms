@@ -72,7 +72,6 @@ routes.draw do
     resources :groups
     resources :group_categories, :only => [:create, :update, :destroy]
     match 'group_unassigned_members' => 'groups#unassigned_members', :as => :group_unassigned_members, :via => :get
-    match 'group_unassigned_members.:format' => 'groups#unassigned_members', :as => :group_unassigned_members, :via => :get
   end
 
   concern :files do
