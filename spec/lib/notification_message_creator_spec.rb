@@ -399,7 +399,7 @@ describe NotificationMessageCreator do
       @cc.notification_policies.should be_empty
       @cc.delayed_messages.should be_empty
       NotificationMessageCreator.new(@notification, @user, :to_list => @user).create_message
-      @cc.notification_policies.should_not be_empty
+      @cc.notification_policies.reload.should_not be_empty
       @cc.delayed_messages.reload.should_not be_empty
     end
   end
