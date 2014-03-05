@@ -58,7 +58,7 @@ module Guard
           UI.info "Compiling: #{path}"
           Handlebars.compile_file path, "#{prefix}app/views/jst", "#{prefix}#{@options[:output]}"
         rescue Exception => e
-          ::Guard::Notifier.notify(e.to_s, :title => path.sub('app/views/jst/', ''), :image => :failed)
+          ::Guard::UI.error(e.to_s, :title => path.sub('app/views/jst/', ''), :image => :failed)
         end
       end
     end
