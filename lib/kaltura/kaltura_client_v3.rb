@@ -331,6 +331,8 @@ module Kaltura
     def postRequest(service, action, params)
       requestParams = "service=#{service}&action=#{action}"
       multipart_body, headers = Multipart::Post.new.prepare_query(params)
+      # since we're not using Rack, translate 'CONTENT_TYPE' back to 'Content-Type'
+      headers = headers.dup.tap { |h| h['Content-Type'] ||= h.delete('CONTENT_TYPE') }
       response = sendRequest(
         Net::HTTP::Post.new("#{@endpoint}/?#{requestParams}", headers),
         multipart_body
