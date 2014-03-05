@@ -1,5 +1,5 @@
 require 'fileutils'
-require 'lib/i18n_extraction/handlebars_extractor'
+require 'i18n_extraction'
 
 # Precompiles handlebars templates into JavaScript function strings
 class EmberHbs

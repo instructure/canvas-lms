@@ -14,8 +14,10 @@ require 'rake/testtask'
 require 'rdoc/task'
 
 if CANVAS_RAILS2
+  Dir["#{RAILS_ROOT}/gems/**/lib/tasks/*.rake"].sort.each { |ext| load ext }
   require 'tasks/rails'
 else
+  Dir["#{Rails.root}/gems/**/lib/tasks/*.rake"].sort.each { |ext| load ext }
   CanvasRails::Application.load_tasks
 end
 begin; require 'parallelized_specs/lib/parallelized_specs/tasks'; rescue LoadError; end

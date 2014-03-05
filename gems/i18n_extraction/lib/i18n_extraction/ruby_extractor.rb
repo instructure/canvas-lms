@@ -1,8 +1,7 @@
-require 'lib/i18n_extraction/abstract_extractor'
-
 module I18nExtraction
   class RubyExtractor < SexpProcessor
     include AbstractExtractor
+    
     attr_accessor :in_html_view
 
     def process_defn(exp)
@@ -69,27 +68,27 @@ module I18nExtraction
       default = process_default_translation(args.shift, key)
 
       options = if args.first.is_a?(Sexp)
-        if method == :jt
-          if args.first.sexp_type != :str
-            raise "jt options must be a javascript string: #{key.inspect} on line #{line}"
-          end
-          str = args.shift.last
-          str.scan(/['"]?(\w+)['"]?:/).flatten.map(&:to_sym)
-        else
-          if args.first.sexp_type != :hash
-            raise "translate options must be a hash: #{key.inspect} on line #{line}"
-          end
-          hash = args.shift
-          hash.shift
-          (0...(hash.size/2)).map{ |i|
-            process hash[i * 2 + 1]
-            raise "option keys must be strings or symbols on line #{line}" unless [:lit, :str].include?(hash[i * 2].sexp_type)
-            hash[i * 2].last.to_sym
-          }
-        end
-      else
-        []
-      end
+                  if method == :jt
+                    if args.first.sexp_type != :str
+                      raise "jt options must be a javascript string: #{key.inspect} on line #{line}"
+                    end
+                    str = args.shift.last
+                    str.scan(/['"]?(\w+)['"]?:/).flatten.map(&:to_sym)
+                  else
+                    if args.first.sexp_type != :hash
+                      raise "translate options must be a hash: #{key.inspect} on line #{line}"
+                    end
+                    hash = args.shift
+                    hash.shift
+                    (0...(hash.size/2)).map { |i|
+                      process hash[i * 2 + 1]
+                      raise "option keys must be strings or symbols on line #{line}" unless [:lit, :str].include?(hash[i * 2].sexp_type)
+                      hash[i * 2].last.to_sym
+                    }
+                  end
+                else
+                  []
+                end
 
       # single word count/pluralization fu
       if default.is_a?(String) && default =~ /\A[\w\-]+\z/ && options.include?(:count)
@@ -121,12 +120,12 @@ module I18nExtraction
       inferred = false
       default = nil
       key_arg = if args.size == 1 || args[1] && args[1].is_a?(Sexp) && args[1].sexp_type == :hash
-        inferred = true
-        args.shift
-      elsif args[1].is_a?(Sexp)
-        args.shift
-        args.shift
-      end
+                  inferred = true
+                  args.shift
+                elsif args[1].is_a?(Sexp)
+                  args.shift
+                  args.shift
+                end
       if args.first.is_a?(Sexp) && args.first.sexp_type == :hash
         hash_args = args.shift
         hash_args.shift
@@ -175,18 +174,18 @@ module I18nExtraction
       raise "invalid en default #{exp.inspect}" unless exp.is_a?(Sexp)
       if exp.sexp_type == :hash
         exp.shift
-        hash = Hash[*exp.map{ |e| process_possible_string_concat(e, :allow_symbols => true) }]
+        hash = Hash[*exp.map { |e| process_possible_string_concat(e, :allow_symbols => true) }]
         pluralization_keys = hash.keys
         if (pluralization_keys - allowed_pluralization_keys).size > 0
           raise "invalid :count sub-key(s) #{exp.inspect} on line #{exp.line}"
         elsif required_pluralization_keys & pluralization_keys != required_pluralization_keys
           raise "not all required :count sub-key(s) provided on line #{exp.line} (expected #{required_pluralization_keys.join(', ')})"
-        elsif hash.values.any?{ |v| !v.is_a?(String) }
+        elsif hash.values.any? { |v| !v.is_a?(String) }
           raise "invalid en count default(s) #{exp.inspect} on line #{exp.line}"
         end
         hash
       else
-        process_possible_string_concat(exp, :top_level_error => lambda{ |exp| "invalid en default #{exp.inspect} on line #{exp.line}" })
+        process_possible_string_concat(exp, :top_level_error => lambda { |exp| "invalid en default #{exp.inspect} on line #{exp.line}" })
       end
     rescue
       raise "#{$!} (#{key.inspect})"

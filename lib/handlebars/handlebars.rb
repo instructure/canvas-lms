@@ -1,7 +1,7 @@
 require 'fileutils'
-require 'lib/i18n_extraction/handlebars_extractor'
 require 'compass'
 require 'sass/plugin'
+require 'i18n_extraction'
 
 # Precompiles handlebars templates into JavaScript function strings
 class Handlebars

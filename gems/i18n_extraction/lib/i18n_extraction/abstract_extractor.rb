@@ -58,5 +58,3 @@ module I18nExtraction
     end
   end
 end
-
-

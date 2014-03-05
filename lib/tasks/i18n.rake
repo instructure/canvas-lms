@@ -162,7 +162,7 @@ namespace :i18n do
 
     require 'i18n'
     require 'i18nema'
-    require 'lib/i18n_extraction/js_extractor.rb'
+    require 'i18n_extraction'
     require 'lib/i18n/utils'
 
     I18n.backend = I18nema::Backend.new

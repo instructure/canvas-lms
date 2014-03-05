@@ -1,5 +1,3 @@
-require 'lib/i18n_extraction/abstract_extractor'
-
 module I18nExtraction
   class JsExtractor
     include AbstractExtractor
@@ -55,8 +53,8 @@ module I18nExtraction
     I18N_CALL_START = /I18n\.(t|translate|beforeLabel)\(/
     I18N_KEY_OR_SIMPLE_EXPRESSION = /(#{I18N_KEY}|([\w\.]+|\(['"][\w.]+['"]\))+)/
     I18N_CALL = /
-      #{I18N_CALL_START}
-        #{I18N_KEY_OR_SIMPLE_EXPRESSION}
+    #{I18N_CALL_START}
+    #{I18N_KEY_OR_SIMPLE_EXPRESSION}
         (,\s*
           ( #{STRING_CONCATENATION} | #{REALLY_SIMPLE_HASH_LITERAL} ) # default
           (,\s*
@@ -93,7 +91,7 @@ module I18nExtraction
         end
       end
       matches = []
-      source.scan(full_pattern){ |args| matches << [$&] + args }
+      source.scan(full_pattern) { |args| matches << [$&] + args }
       raise "expected/actual mismatch (probably a bug)" if expected.size < matches.size
       expected.each_index do |i|
         expected_string = expected[i].first.strip

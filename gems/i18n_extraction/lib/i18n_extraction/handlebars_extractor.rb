@@ -1,5 +1,3 @@
-require 'lib/i18n_extraction/abstract_extractor'
-
 module I18nExtraction
   class HandlebarsExtractor
     include AbstractExtractor
@@ -14,7 +12,7 @@ module I18nExtraction
       \}\}
     /x
     I18N_CALL = /
-      #{I18N_CALL_START}
+    #{I18N_CALL_START}
       (?<content> .*?)
       \{\{\/t\}\}
     /mx
@@ -39,7 +37,7 @@ module I18nExtraction
 
     def scan(source, options={})
       options = {
-        :method => :scan
+          :method => :scan
       }.merge(options)
 
       method = options[:method]
@@ -67,10 +65,10 @@ module I18nExtraction
         content.gsub!(/\s+/, ' ')
         content.strip!
         yield :key => key,
-              :value => content,
-              :options => opts,
-              :wrappers => wrappers,
-              :line_number => line_number
+            :value => content,
+            :options => opts,
+            :wrappers => wrappers,
+            :line_number => line_number
       end
       raise "possibly unterminated #t call (line #{block_line_numbers.shift} or earlier)" unless block_line_numbers.empty?
       result
@@ -107,7 +105,7 @@ module I18nExtraction
 
     def balanced_tags?(open, close)
       open.scan(TAG_START).map { |tag| tag.match(TAG_NAME).to_s } ==
-      close.scan(TAG_END).map { |tag| tag.match(TAG_NAME).to_s }.reverse
+          close.scan(TAG_END).map { |tag| tag.match(TAG_NAME).to_s }.reverse
     end
 
     def check_html(source, base_line_number)
