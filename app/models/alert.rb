@@ -170,6 +170,7 @@ class Alert < ActiveRecord::Base
           group("submissions.user_id").
           where(:user_id => student_ids).
           where(Submission.needs_grading_conditions).
+          except(:order).
           count
       ungraded_counts.each do |user_id, count|
         student = data[user_id]
@@ -181,6 +182,7 @@ class Alert < ActiveRecord::Base
           group("submissions.user_id").
           where(:user_id => student_ids).
           where(Submission.needs_grading_conditions).
+          except(:order).
           minimum(:submitted_at)
       ungraded_timespans.each do |user_id, timespan|
         student = data[user_id]
