@@ -1873,17 +1873,17 @@ describe Quizzes::QuizSubmission do
 
     describe "#versions" do
       it "finds the versions with both namespaced and non-namespaced quizzes" do
-      qs = @quiz.generate_submission(@student)
-      qs.submission_data = { "question_1" => "2405" }
-      qs.grade_submission
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "2405" }
+        qs.grade_submission
 
-      qs = @quiz.generate_submission(@student)
-      qs.submission_data = { "question_1" => "8544" }
-      qs.grade_submission
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "8544" }
+        qs.grade_submission
 
-      qs.versions.count.should == 2
-      Version.update_all("versionable_type='QuizSubmission'","versionable_id=#{qs.id} AND versionable_type='Quizzes::QuizSubmission'")
-      Quizzes::QuizSubmission.find(qs).versions.count.should == 2
+        qs.versions.count.should == 2
+        Version.update_all("versionable_type='QuizSubmission'","versionable_id=#{qs.id} AND versionable_type='Quizzes::QuizSubmission'")
+        Quizzes::QuizSubmission.find(qs).versions.count.should == 2
       end
     end
   end

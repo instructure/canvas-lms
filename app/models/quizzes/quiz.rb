@@ -81,10 +81,20 @@ class Quizzes::Quiz < ActiveRecord::Base
     :dependent => :destroy,
     :inverse_of => :versionable,
     :extend => SoftwareHeretics::ActiveRecord::SimplyVersioned::VersionsProxyMethods do
-      def construct_sql
-        @finder_sql = @counter_sql =
-          "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_id = #{owner_quoted_id} AND " +
-        "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_type IN ('Quiz', #{@owner.class.quote_value(@owner.class.base_class.name.to_s)})"
+      if CANVAS_RAILS2
+        def construct_sql
+          @finder_sql = @counter_sql =
+            "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_id = #{owner_quoted_id} AND " +
+          "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_type IN ('Quiz', #{@owner.class.quote_value(@owner.class.base_class.name.to_s)})"
+        end
+      else
+        def where(*args)
+          if args.length == 1 && args.first.is_a?(Arel::Nodes::Equality) && args.first.left.name == 'versionable_type'
+            super(args.first.left.in(['Quiz', 'Quizzes::Quiz']))
+          else
+            super
+          end
+        end
       end
     end
 
