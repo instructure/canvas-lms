@@ -1136,8 +1136,8 @@ unless CANVAS_RAILS2
   ActiveRecord::Associations::CollectionProxy.class_eval do
     delegate :with_each_shard, :to => :scoped
 
-    def respond_to?(*args)
-      return super if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(args.first)
+    def respond_to?(name, include_private = false)
+      return super if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(name)
       super ||
         (load_target && target.respond_to?(name, include_private)) ||
         proxy_association.klass.respond_to?(name, include_private)
