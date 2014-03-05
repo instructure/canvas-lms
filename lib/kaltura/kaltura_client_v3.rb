@@ -256,6 +256,12 @@ module Kaltura
                            :conversionProfileId => -1,
                            :csvFileData => KalturaStringIO.new(csv, "bulk_data.csv")
                        )
+      unless result.css('logFileUrl').any?
+        code = result.css('error > code').first.try(:content)
+        message = result.css('error > message').first.try(:content)
+        message ||= result.to_xml
+        raise "kaltura bulkUpload failed: #{message} (#{code})"
+      end
       parseBulkUpload(result)
       # results will have entryId values -- do we get them right away?
     end

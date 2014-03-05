@@ -1947,7 +1947,12 @@ class Course < ActiveRecord::Base
         process_migration_files(data, migration); migration.update_import_progress(18)
         Attachment.process_migration(data, migration); migration.update_import_progress(20)
         mo_attachments = self.imported_migration_items.find_all { |i| i.is_a?(Attachment) && i.media_entry_id.present? }
-        import_media_objects(mo_attachments, migration)
+        begin
+          import_media_objects(mo_attachments, migration)
+        rescue => e
+          er = ErrorReport.log_exception(:import_media_objects, e)
+          migration.add_error(t(:failed_import_media_objects, %{Failed to import media objects}), error_report_id: er.id)
+        end
       end
     end
 
