@@ -52,6 +52,7 @@ describe 'Submissions API', type: :request do
             :format => 'json', :course_id => @course.id.to_s,
             :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
           { :include => %w(submission_history submission_comments rubric_assessment) })
+    json.delete('id').should == nil
     json.should == {
       "assignment_id" => @assignment.id,
       "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}?preview=1",
