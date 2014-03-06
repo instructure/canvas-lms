@@ -93,7 +93,6 @@ tr:
         login_handle_name: "Oturum Açma Etiketi"
       login_handle_name_description: "Etiket herkese özel oturum açma tanımlamaları için kullanılır. Örneğin: Oturum Aç, Kullanıcı Adı, Öğrenci ID, vs."
       save_button: "Kimlik Doğrulama Ayarlarını Kaydet"
-    deprecated_fail: "Aynı anda hem eski hem de oluşturulan güncel versiyon kullanılamaz."
     index: 
       add_auth_desc: "Bu hesaba bir kimlik sağlayıcı ekleyin:"
       canvas_login_tip: |-
@@ -176,11 +175,8 @@ tr:
       last_ldap_timeout_failure: "Son zaman aşımı hatası"
       ldap_timeout_failure_help2: "LDAP sunucusu ile iletişimdeyken Canvas çok fazla zaman aşımı hata verirse bu durum gelecekteki oturum açma denemelerini bu LDAP sunucusundan %{time} süreliğine engelleyecektir."
     login_required: sağlanmalıdır
-    no_auth_mixing: "Kimlik doğrulama türleri karıştırılamaz"
     no_changing_auth_types: "İzin verme yapılandırma türü değiştirilemiyor, lütfen silip yeni yapılandırma oluşturun."
-    no_config_sent: "auth_type belirlemeli"
     no_discovery_url: Ayarlanmadı
-    only_one_cas: "Çoklu CAS ayarları oluşturulamıyor"
     password_required: sağlanmalıdır
     saml_required: "SAML konfigürasyonunu test etmek için, SAML gereklidir"
     saml_settings: 
@@ -276,6 +272,11 @@ tr:
     sis_exporter: 
       deleted: "Silinen Nesneleri İçer: doğru;"
       reports: "Raporlar: %{files}"
+    student: 
+      enrollment_state: "Kayıt Durumunu İçer: doğru;"
+      enrollment_states: "Kayıt Durumları: %{states};"
+    usu: 
+      enrollment_types: "Kayıt türleri: %{types}"
   account_settings: 
     account: Hesap
     account_name_too_long: "Kullanıcı İsmi çok uzun"
@@ -368,6 +369,28 @@ tr:
         messages_viewed: "Bildirimler *%{user}* kullanıcısına *%{start_date}* ile *%{end_date} arası* gönderildi."
       comm_messages_search_results: 
         no_messages_found: "Hiç mesaj bulunamadı"
+      course_logging_content: 
+        course_activity: "Ders Etkinliği"
+        find: Ara
+      course_logging_details: 
+        Field: Alan
+        From: Kimden
+        To: Kime
+        Value: Değer
+        date: Tarih
+        event_id: "Olay Id"
+        event_type_label: Tür
+        time: Zaman
+        user: Kullanıcı
+      course_logging_item: 
+        view_event_details: "Ayrıntıları Göster"
+      course_logging_results: 
+        date: Tarih
+        event_details: "Olay Ayrıntıları"
+        event_type: Tür
+        no_item_found: "Hiçbir öğe bulunamadı"
+        time: Zaman
+        user: Kullanıcı
       course_search_form: 
         labels: 
           find_deleted_course: "Silinmiş derslerde bul"
@@ -397,8 +420,8 @@ tr:
         message_date_from: "Kimden Tarihi"
         message_date_to: "Kime Tarihi"
       grade_change_logging_content: 
-        auth_logging: "Not Değiştirme Etkinliği"
         find: Ara
+        grade_change_activity: "Not Değiştirme Etkinliği"
         message_assignment_id: "Ödev Id"
         message_course_id: "Ders Id"
       grade_change_logging_results: 
@@ -413,6 +436,7 @@ tr:
         time: Zaman
       logging_content_pane: 
         authentication: "Giriş / Çıkış Etkinliği"
+        course: "Ders Etkinliği"
         grade_change: "Not Değiştirme Etkinliği"
         select_default: "Log türü seçiniz"
         select_label: "Aramak için bir log türü seçin."
@@ -785,7 +809,7 @@ tr:
       enabled_web_serices_title: "Etkinleştirilmiş Web Servisleri"
       equall_endpoint_help: "Bu equella hizmet URL'sidir. Muhtemelen \"%{sample_url}\" gibi bir şey olacaktır."
       equella_settings_title: "Equella Ayarları"
-      feature_options: "Özellik seçenekleri"
+      feature_options: "Özellik Seçenekleri"
       features_title: Özellikler
       global_announcements_description: "Genel duyurular, hesabınızdaki tüm kullanıcıların panosunda yapışkan mesaj oluşturma yöntemidir. Bu mesajlar her kullanıcının panosunda mesaj için belirlenmiş süre sonuna kadar ya da kullanıcı uyarıyı yoksaymak için \"kapat\"(×) ı tıklayana kadar görünecektir. **Bu duyurular dikkatli bir şekilde gerektiğinde kullanılmalıdır.**"
       global_announcements_title: "Genel Duyurular"
@@ -844,6 +868,8 @@ tr:
         restrict_student_future_view: "Başlangıç zamanından önce öğrencilerin dersi görmesini engelle"
         self_enrollment: "Kendi kendine Kayda İzin Ver"
         self_registration: "Ön Kayıt"
+        self_registration_type_all: "Tüm Hesap Türleri"
+        self_registration_type_observer: "Yalnızca Gözlemci Hesapları"
         show_scheduler: "Zamanlayıcıyı Etkinleştir"
         sis_source_id: "SIS ID"
         start_at: Başlangıç
@@ -1059,7 +1085,7 @@ tr:
           description: 
             header: Örnek
           student_activity: 
-            text: "Bu raporda belirli dönemde belirli bir ders ya da tüm dersler için kayıtlı öğrencilerin etkinlikleri görülmektedir. Oluşturulan csv dosyasında her öğrenci etkinliği için şu başlıklarla bir satır bulunmaktadır; bölüm id, bölüm sis id, bölüm adı, ders id, ders sis id, ders adı, kullanıcı id, kullanıcı sis id, içerik türü, içerik, görülen süreler, katılınan süreler, en son ne zaman görüldü. Görülen ve katılınan süreler dersin başlangıcından bu rapor oluşturulana kadar ki değerlerdir."
+            text: "Bu raporda belirli dönemde belirli bir ders ya da tüm dersler için kayıtlı öğrencilerin etkinlikleri görülmektedir. Oluşturulan csv dosyasında her öğrenci etkinliği için şu başlıklarla bir satır bulunmaktadır; bölüm id, bölüm sis id, bölüm adı, ders id, ders sis id, ders adı, kullanıcı id, kullanıcı sis id, içerik türü, içerik, kaç kere görüldü, katılınan süreler, en son ne zaman görüldü. Görülen ve katılınan süreler dersin başlangıcından bu rapor oluşturulana kadar ki değerlerdir."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -1115,6 +1141,15 @@ tr:
             description: 
               header: Örnek
             text: "Bu raporda belirli dönemde bir derste kayıtlı ve verilen zaman aralığında ödev göndermemiş tüm öğrenciler görülmektedir. Raporda kriteri karşılayan her öğrenci kaydı için bir satır bulunmaktadır. Tarih aralığı iki haftadan uzun olamaz."
+    students_with_no_submissions_csv_parameters: 
+      account_reports: 
+        default: 
+          enrollment_state: 
+            header: "Kayıt Durumu"
+          include_enrollment_state: 
+            check_box: "Kayıt Durumunu Dahil Et"
+      active: "Aktif Kayıtlar"
+      all: "Tüm Kayıtlar"
     submission_data_csv_description: 
       account_reports: 
         submission_data: 
@@ -1162,6 +1197,24 @@ tr:
           main: 
             text: "Bu rapor, şu öğelerden hiçbirini içermeyen tüm dersler içindir: ödevler, duyurular, tartışmalar, dosyalar, modüller, sayfalar veya kısa sınavlar."
     update_failed_notice: "Hesap ayarları güncellenemedi"
+    user_access_csv_description: 
+      account_reports: 
+        usu: 
+          description: 
+            header: Örnek
+          user_activity: 
+            text: "Bu raporda belirli dönemde belirli bir ders ya da tüm dersler için kayıtlı kullanıcıların etkinlikleri görülmektedir. Oluşturulan csv dosyasında her öğrenci etkinliği için şu başlıklarla bir satır bulunmaktadır; kayıt türü, bölüm id, bölüm sis id, bölüm adı, ders id, ders sis id, ders adı, kullanıcı id, kullanıcı sis id, içerik türü, içerik, kaç kere izlendi, katılınan süreler, en son ne zaman görüldü. Kaç kere izlendiği ve katılınan süreler dersin başlangıcından bu rapor oluşturulana kadar ki değerlerdir."
+    user_access_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: "Kayıt Türü"
+      all: "Tüm Kayıtlar"
+      designer: "Tasarımcı Kayıtları"
+      observer: "Gözlemci Kayıtları"
+      students: "Öğrenci Kayıtları"
+      ta: "Asistan Öğretmen Kayıtları"
+      teachers: "Öğretmen Kayıtları"
     user_add_failed_message: "Kullanıcı ekleme başarısız, lütfen tekrar deneyin"
     user_deleted_message: "%{username} başarıyla silindi"
     user_inactivity_csv_description: 
@@ -1395,7 +1448,6 @@ tr:
     default_title: "İsim Yok - %{course}"
     default_unfiled_title: "Dosyalanmamış Sorular"
   assignment: 
-    advanced_options_errors: "Gelişmiş ayarlarda bir veya daha fazla hata meydana geldi"
     assignment_group_must_have_group: "Lütfen ödev için bir ödev grubu seçiniz"
     at_least_one_file_type: "Lütfen izin verilen bir dosya tipi seçiniz"
     at_least_one_submission_type: "Lütfen bir gönderim tipi seçiniz"
@@ -1413,7 +1465,6 @@ tr:
     feed_entry_title: "Ödev: %{assignment}"
     feed_entry_title_with_course: "Ödev, %{course}: %{assignment}"
     group_assignment_must_have_group_set: "Bu ödev için bir grup seçiniz"
-    hide_advanced_options: "İleri Düzey Ayarları Gizle"
     imported_assignments_group: "İçe Aktarılan Ödevler"
     labels: 
       due: Bitiş
@@ -1421,7 +1472,6 @@ tr:
     percentage_points_possible: "Yüzde olarak notlamak için olası puanlar 0'dan büyük olmalı"
     points_possible_number: "Olası puanlar bir sayı değeri olmalı"
     select_external_tool_dialog_title: "Harici Araçları Ayarla"
-    show_advanced_options: "İleri Düzey Ayarları Göster"
     submission_action_take_quiz: "%{title} al"
     submission_action_turn_in_assignment: "%{title} teslim et"
     submission_types: 
@@ -1714,11 +1764,9 @@ tr:
       buttons: 
         update: "Ödev Güncelle"
       description: Açıklama
-      due_date: "Bitiş Tarihi"
       freeze_properties: "Kopyalandığında ödev ayarlarını kitlitle"
       notify_content_change: "Bu içerik değişiminden kullanıcıları bilgilendir"
       points_possible: Puanlar
-      show_advanced_options: "İleri Düzey Ayarları Göster"
       warnings: 
         assignment_is_frozen: "Bazı ayarlar yönetici tarafından kilitlendi."
     errors: 
@@ -1757,7 +1805,7 @@ tr:
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "Not: %{grade}%"
     grading_type_selector: 
-      grading_type: "Notlandırma Tipi"
+      display_grade_as: "Notu şu olarak Göster"
       grading_type_options: 
         letter_grade: "Harf Notu"
         not_graded: Notlandırılmamış
@@ -1767,6 +1815,7 @@ tr:
       view_grading_levels: "Değerlendirme Kademesini Gör"
     group_category_selector: 
       grade_group_students_individually: "Her öğrenciye aynı değerlendirme notu ata"
+      group_assignment_header: "Grup Ödevi"
       group_category_options: "Yeni Kategori Grubu"
       group_set: "Grup Seti"
       is_group_assignment: "Bu bir Grup Ödevidir"
@@ -1846,6 +1895,8 @@ tr:
       submitting: Gönderiliyor...
     multiple_due_dates: "Çoklu Bitiş Tarihleri"
     name_is_required: "İsim zorunludur!"
+    name_too_long: "İsim çok uzun"
+    name_too_long_error: "İsim çok uzun"
     never_drop: 
       remove_rule: "Kuralı Sil"
     never_drop_collection: 
@@ -1904,12 +1955,14 @@ tr:
         remind: "%{assessor}'a Ödevini hatırlat, son hatırlatma %{time}"
         reminder: "%{assessor}'a Ödevini hatırlat, son hatırlatma %{time}"
     peer_reviews_selector: 
+      how_to_peer_review: "Akran Değerlendirmeleri Nasıl Ayarlansın"
       labels: 
         automatically_assign_peer_reviews: "Akran Değerlendirmelerini Otomatik Ata"
         manually_assign_peer_reviews: "Akran Değerlendirmelerini Elle Ata"
         require_peer_reviews: "Akran Değerlendirmesi Gerekli"
       locked_until: "Ödev Değerlendirmeleri"
       peer_reviews_assign_at_explanation: "Bitiş tarihinden sonra olmalıdır. Boş bırakırsanız, bitiş tarihi kullanılacaktır."
+      peer_reviews_header: "Akran Değerlendirmeleri"
       reviews_per_user: "Kullanıcı Başına Değerlendirme"
     points_possible_number: "Olası puanlar bir sayı değeri olmalı"
     positive_number: "Pozitif bir sayı kullanmalısınız"
@@ -1992,17 +2045,19 @@ tr:
       advanced_turnitin_settings: "Gelişmiş Turnitin Ayarları"
       descriptions: 
         allowed_extensions: "Kabul edilen eklentileri listeye giriniz, örneğin : doc,xls,txt"
+      external_tool_options: "Harici Araç Seçenekleri"
       label: 
         external_tool_new_tab: "Bu aracı yeni bir sekmede yükle"
         external_tool_url: "Harici Araç URL'i"
         turnitin_enabled: "Turnitin Gönderilerini Etkinleştir"
       labels: 
-        allow_file_uploads: "Dosya Yüklemeye İzin Ver"
-        allow_media_recordings: "Medya Kaydetmeye İzin Ver"
-        allow_text_entry: "Metin Girişine İzin Ver"
-        allow_url: "Web Sayfası URL'sine İzin Ver"
+        allow_file_uploads: "Dosya Yüklemeleri"
+        allow_media_recordings: "Medya Dosyası Kayıtları"
+        allow_text_entry: "Metin Girişi"
+        allow_url: "Web Sayfası URL"
         allowed_extensions: "İzin Verilen Dosya Uzantıları"
         restrict_file_extensions: "Yüklenecek Dosya Tiplerini Kısıtla"
+      online_entry_options: "Çevrimiçi Yazı yazma Seçenekleri"
       submission_type: "Gönderi Türü"
       submission_types: 
         external_tool: "Harici Araç"
@@ -3131,6 +3186,7 @@ tr:
     select_content: 
       cancel_btn: İptal
       select_content_btn: "İçerik Seçiniz"
+      select_content_label: "İçerik seçin, gezinmek için aşağı ve yukarı ok tuşlarını kullanın. Klasörleri genişletmek için sağ, daraltmak için sol ok tuşlarına basın"
     select_course: "Ders Seçimi"
     show_issues: "Sorunları Göster"
     subviews: 
@@ -3269,8 +3325,9 @@ tr:
         conclude_student: "Bu öğrencinin kaydını sonlandırmak istediğinize emin misiniz?"
         delete_enrollment: "Bu öğrencinin kaydını silmek istediğinize emin misiniz?"
       enrolled_as: "%{enrollment_type} olarak derse kaydedildi"
-      enrollment_change_failed: "Derse kayıt ayrıcalık değişikliği başarısız oldu, lütfen tekrar deneyin"
       enrollment_linked_to: "*%{linked_user}* ile ilişkilendirildi"
+      error: 
+        enrollment_change_failed: "Derse kayıt ayrıcalık değişikliği başarısız oldu, lütfen tekrar deneyin"
       labels: 
         user_privileges: Ayrıcalıklar
       legends: 
@@ -3576,10 +3633,10 @@ tr:
         description: 
           delete: "Geçerli Modülü/Öğeyi Sil"
           edit: "Modülü/Öğeyi Düzenle"
-          indent: "Geçerli Öğeyi İçerden başlat"
+          indent: "İçerden başlatma sınırını artır"
           new: "Yeni Modül"
           next: "Sonraki Modül/Öğe"
-          outdent: "Mevcut Öğeyi Dışardan başlat"
+          outdent: "İçerden başlatma sınırını azalt"
           previous: "Önceki Modül/Öğe"
       keycode_descriptions: 
         next_module_item: "Sonraki modülü yada modül öğesi seçiniz"
@@ -3731,10 +3788,10 @@ tr:
       links: 
         edit_item: "Öğe ayrıntılarını düzenle"
         edit_item_details_label: "Öğe ayrıntılarını düzenle"
-        indent: "Öğeyi içerden başlat"
-        indent_label: "Öğeyi içerden başlat"
-        outdent: "Öğeyi dışardan başlat"
-        outdent_label: "Öğeyi dışardan başlat"
+        indent: "İçerden başlatma sınırını artır"
+        indent_label: "İçerden başlatma sınırını artır"
+        outdent: "İçerden başlatma sınırını azalt"
+        outdent_label: "İçerden başlatma sınırını azalt"
         remove_item: "Bu öğeyi modülden çıkar"
         remove_item_label: "Bu öğeyi modülden çıkar"
       max_score: 
@@ -3772,10 +3829,10 @@ tr:
       links: 
         edit_item: Düzenle
         edit_item_details: "Öğe ayrıntılarını düzenle"
-        indent: "İçeriden başlat"
-        indent_item: "Öğeyi içerden başlat"
-        outdent: "Dışardan başlat"
-        outdent_item: "Öğeyi dışardan başlat"
+        indent: "İçerden başlatma sınırını artır"
+        indent_item: "İçerden başlatma sınırını artır"
+        outdent: "İçerden başlatma sınırını azalt"
+        outdent_item: "İçerden başlatma sınırını azalt"
         remove_item: Kaldır
         remove_item_from_module: "Bu öğeyi modülden çıkar"
       max_score: 
@@ -4234,6 +4291,62 @@ tr:
     wrapper: 
       close_course_menu_title: kapat
       reset_course_menu: Sıfırla
+  course_logging: 
+    event_type: 
+      concluded: Sonlandırıldı
+      created: Oluşturuldu
+      updated: Güncellendi
+    field_label: 
+      abstract_course_id: "Özet Ders Id"
+      account_id: "Hesap Id"
+      allow_student_discussion_editing: "Öğrenciler Tartışmayı Düzenleyebilsin"
+      allow_student_discussion_topics: "Öğrenciler Tartışma Konularına Erişebilsin"
+      allow_student_forum_attachments: "Öğrenciler Forumlara Dosya Ekleyebilsin"
+      allow_student_organized_groups: "Öğrencilerin Organize Ettikleri Gruplara İzin ver"
+      allow_student_wiki_edits: "Öğrenciler Wiki Düzenleyebilsin"
+      allow_wiki_comments: "Wiki Yorumlarına İzin Ver"
+      conclude_at: "Şu tarihte Sonlandırıldı"
+      course_code: "Ders Kodu"
+      created_at: "Şu tarihte Oluşturuldu"
+      default_view: "Varsayılan Görünüm"
+      default_wiki_editing_roles: "Varsayılan Wiki Düzenleme Rolleri"
+      enrollment_term_id: "Kayıt Dönem Id"
+      grading_standard_id: "Notlandırma Standardı Idsi"
+      group_weighting_scheme: "Grup Ağırlık Şeması"
+      hide_distribution_graphs: "Dağılım Grafiklerini Gizle"
+      hide_final_grade: "Final Notunu Gizle"
+      indexed: İndekslenmiş
+      integration_id: "Entegrasyon Id"
+      is_public: "Herkese Açık"
+      large_roster: "Büyük Liste"
+      license: Lisans
+      locale: Yerel
+      lock_all_announcements: "Tüm Duyuruları Kilitle"
+      name: İsim
+      old_account_id: "Eski Hesap Idsi"
+      open_enrollment: "Açık Kayıt"
+      public_description: "Herkesin Gördüğü Açıklama"
+      public_syllabus: "Herkesin Gördüğü İzlence"
+      replacement_course_id: "Yerine konulan Ders Id"
+      restrict_enrollments_to_course_dates: "Kayıtları Ders Tarihleri ile Sınırla"
+      root_account_id: "Root Hesap Idsi"
+      self_enrollment: "Kendi kendine Kayıt"
+      self_enrollment_code: "Kendi kendine Kayıt Kodu"
+      self_enrollment_limit: "Kendi kendine Kayıt Limiti"
+      show_all_discussion_entries: "Tüm Tartışma Yazılarını Göster"
+      show_public_context_messages: "Herkesin Gördüğü Bağlam Mesajını Göster"
+      sis_batch_id: "SIS Toplu İş Idsi"
+      sis_source_id: "SIS Kaynak Idsi"
+      start_at: "Şu Tarihte Başlat"
+      storage_quota: "Depolama Kotası"
+      syllabus_body: izlence_gövdesi
+      tab_configuration: "Sekme Konfügürasyonu"
+      template_course_id: "Şablon Ders Idsi"
+      turnitin_comments: "Turnitin Yorumları"
+      updated_at: "Şu Tarihte Güncellendi"
+      uuid: UUID
+      wiki_id: "Wiki Idsi"
+      workflow_state: "İş akış Durumu"
   course_restore: 
     restore_error: "Ders onarımı denemesi başarısız oldu. Ders onarılamıyor."
   course_search: 
@@ -4274,7 +4387,7 @@ tr:
     invitation_sent_now: Şimdi
     link_students_placeholder: "Öğrenci ismi giriniz"
     links: 
-      less_options: "daha az seçenek"
+      fewer_options: "daha az seçenek"
       more_options: "daha fazla seçenek"
       publish: "Notları SIS'te Yayınla"
       publishing: "Notlar SIS'te Yayınlanıyor..."
@@ -4679,7 +4792,7 @@ tr:
       tabs: 
         alerts: Uyarılar
         details: "Ders Detayları"
-        feature_options: "Özellik seçenekleri"
+        feature_options: "Özellik Seçenekleri"
         grade_publishing: "Not Yayınlama"
         navigation: Gezinme
         sections: Bölümler
@@ -5172,6 +5285,9 @@ tr:
     cancel: İptal
     save_settings: "Ayarları Kaydet"
     saving: Kaydediliyor...
+  differentiated_assignments_description: |-
+      Farklılaşmış Ödevler ödevin hangi bölüm(ler) için geçerli olacağını seçmeyi sağlayan *beta* bir özelliktir.
+      Ödev içermeyen bölümlerde ders içeriğinde bu görünmez ve finla notları bu notlar olmadan hesaplanır.
   discussion_entries: 
     created_entry_notice: "Girdi başarıyla oluşturuldu."
     deleted_entry_notice: "Bu girdi silindi"
@@ -5451,6 +5567,10 @@ tr:
     unsubscribe: "Bu başlığı artık takip etmiyorsunuz"
     unsubscribed: "Takip Edilmiyor"
     unsubscribed_hint: "Bu başlığı takip etmiyorsunuz. Takip etmek için tıklayınız."
+  draft_state: 
+    cant_unpublish_when_students_submit: "Öğrenci gönderileri varsa yayından kaldırılamaz"
+    publish: Yayınla
+    unpublish: "Yayından kaldır"
   draft_state_description: |-
       Bu beta özellik Canvas'ın birçok bölümünü yeniden yapılandırır ve içeriğin öğrenciler
       tarafından görülmeyen yayınlanmamış yeni bir durumda kalmasını sağlar ve not
@@ -6032,9 +6152,10 @@ tr:
       release_notes: "kararlı sürüm notları"
       toggle_feature_details: "Özellik seçeneklerini değiştir"
     feature_flag_admin_view: 
-      feature_options: "Özellik seçenekleri"
+      feature_options: "Özellik Seçenekleri"
       no_features_available: "Şu anda kullanılabilir özellik yok"
   features: 
+    differentiated_assignments: "Farklılaşmış Ödevler"
     draft_state: "Taslak Durum"
     draft_state_account_disable_warning: |-
         Bu özelliği devre dışı bırakmak varolan dersleri etkileyecektir. Bu özelliğin devre dışı bırakılmasında yardım
@@ -6045,6 +6166,7 @@ tr:
     google_docs_domain_restriction: "Google Docs Alan Adı Kısıtlamaları"
     outcome_gradebook: "Öğrenme Çıktısı Not Defteri"
     screenreader_gradebook: "Ekran okuyucu Not defteri"
+    student_outcome_gradebook: "Öğrenci Çıktısı Not Defteri"
   file_browser_view: 
     folder_tree_instructions: "Ağaç üzerinde gezinmek için aşağı ve yukarı ok tuşlarını kullanın. Klasörleri genişletmek için sağ oka, daraltmak için sol oka ve görsel seçmek için enter tuşuna basın."
   filebrowserview: 
@@ -6458,6 +6580,7 @@ tr:
       set_group_weights: "Grup Ağırlıklarını Ayarla"
       show_attendance_columns: "Devam Sütununu Göster"
       show_concluded_enrollments: "Kaydı Sonlandırılmışları Göster"
+      srgb_gradebook: "not defterleri arasında geçiş yap"
       upload_scores: "Notları Yükle (.csv'den)"
       view_grading_history: "Notlandırma Geçmişini Göster"
     show_notes: "Notlar Sütununu Göster"
@@ -6599,6 +6722,7 @@ tr:
       muted: Bekletiliyor
     grade_summary: 
       assessment_by: "Ödevi yapan %{name}"
+      assignments: Ödevler
       buttons: 
         show_what_if: "Kaydedilmiş \"... olsaydı Ne Olurdu? \" Puanlarını Göster"
       change_score_instructions: "Değişikliğin toplamı nasıl etkilediğini görmek için herhangi bir puana tıklayı yeni bir değer girin."
@@ -6635,6 +6759,7 @@ tr:
         only_graded: "Yalnızca notlandırılmış ödevler üzerine hesapla"
         total: Toplam
         your_score: Puanınız
+      learning_outcomes: "Öğrenme Yeterliği"
       links: 
         click_to_view: "görmek için buraya tıklayın"
         download: "%{attachment}'i indir"
@@ -6919,6 +7044,7 @@ tr:
     grade_incomplete: Eksik
     grade_ungraded: Notlandırılmamış
     out_of: "(%{points} üzerinden)"
+    out_of_nil: "Olası puan yok"
     out_of_with_score: "(%{points} üzerinden %{score})"
   grading_standard: 
     unknown_grading_details: "Bilinmeyen Ayrıntılar"
@@ -8455,10 +8581,10 @@ tr:
           audio_comment: "Bu mesaj medya yorumu içermektedir. Dinlemek veya cevaplamak için, bağlantıya tıklayınız:"
           body: "%{user_name} kullanıcısı Canvas'ta sizlere mesaj yolladı:"
           download: indir
-          reply_message: "Mesaja cevap vermek için, bağlantıya tıklayınız:"
+          reply_to_conversation_message: "Bu epostaya doğrudan cevap yazarak Canvas içinde bu mesajı yanıtlayabilirsiniz."
           subject: "%{user_name} kullanıcısı Canvas'ta sizlere mesaj yolladı."
           unknown_user: "Bilinmeyen Kullanıcı"
-        reply_message: "Mesaja cevap vermek için, bağlantıya tıklayınız:"
+        reply_to_conversation_message: "Bu epostaya doğrudan cevap yazarak Canvas içinde bu mesajı yanıtlayabilirsiniz."
         subject: "%{user_name} kullanıcısı Canvas'ta sizlere mesaj yolladı."
         unknown_user: "Bilinmeyen Kullanıcı"
       facebook: 
@@ -9073,10 +9199,10 @@ tr:
     new_discussion_entry: 
       email: 
         body: "%{course} dersindeki %{discussion_topic} başlığına %{user} yeni bir yorum yazdı:"
-        details: "Tartışmaya buradan katılın:"
+        discussion_entry_reply_message: "Aşağıdaki bağlantıyı kullanarak tatrışmaya katılın veya bu mesajı yanıtlayarak yorum yapın."
         html: 
           body: "%{course} dersindeki %{discussion_topic} başlığına %{user} yeni bir yorum yazdı:"
-          details: "Bu konuşmaya katılmak için tıklayınız"
+          discussion_entry_link_message: "[Tartışmaya katılmak için buraya tıklayın ](%{url}), veya bu mesajı yanıtlayarak yorum yapın."
           subject: "Yeni Yorum %{discussion_topic}: %{course}"
         subject: "Yeni Yorum %{discussion_topic}: %{course}"
       facebook: 
@@ -9376,9 +9502,9 @@ tr:
         body: "%{author} %{user}'nın %{assignment} ödevine bir yorum yaptı"
         html: 
           body: "%{author} %{user}'nın %{assignment} ödevine bir yorum yaptı"
-          link_message: "Gönderi ayrıntılarını burada inceleyebilirsiniz:"
           someone: Birisi
           subject: "Gönderi Yorumu: %{user}, %{assignment}, %{context}"
+          submission_comment_link_message: "Aşağıdaki bağlantıyı kullanarak gönderi ayrıntılarını yeniden inceleyebilir veya bu mesajı yanıtlayarak bu yoruma cevap yazabilirsiniz."
         link_message: "Gönderi ayrıntılarını burada inceleyebilirsiniz:"
         someone: Birisi
         subject: "Gönderi Yorumu: %{user}, %{assignment}, %{context}"
@@ -9402,9 +9528,9 @@ tr:
           link_message: "Gönderi ayrıntılarını burada inceleyebilirsiniz:"
           someone: Birisi
           subject: "Gönderi Yorumu: %{user}, %{assignment}, %{context}"
-        link_message: "Gönderi ayrıntılarını burada inceleyebilirsiniz:"
         someone: Birisi
         subject: "Gönderi Yorumu: %{user}, %{assignment}, %{context}"
+        submission_comment_link_message: "Aşağıdaki bağlantıyı kullanarak gönderi ayrıntılarını yeniden inceleyebilir veya bu mesajı yanıtlayarak bu yoruma cevap yazabilirsiniz."
       facebook: 
         body: "*%{author}*, **%{user} for %{assignment}** gönderisi için az önce yeni bir yorum yaptı."
         someone: Birisi
@@ -9610,7 +9736,7 @@ tr:
       course_not_found: "ECollege dersi bulunamadı."
     external_feed_type: "Dış Kaynak"
     file_type: Dosya
-    grading_standard_type: "Değerlendirme Standartı"
+    grading_standard_type: "Notlandırma Standardı"
     group_type: Grup
     learning_outcome_type: "Öğrenme Çıktıları"
     module_type: Modül
@@ -9901,7 +10027,7 @@ tr:
   outcome_gradebook_description: |-
       Öğrenme Çıktısı Not Defteri öğretmenlerin dersin öğrenme çıktılarına göre öğrencileri ve 
       ders ilerleme durumunu hızlı bir şekilde incelemelerini sağlar. Öğrenme çıktıları Not defterine
-      benzer bir formatta sunulur öğrenci ilerlemesi hem sayısal değer hem de yeterli/yeterli
+      benzer bir formatta sunulur ve öğrenci ilerlemesi hem sayısal değer hem de yeterli/yeterli
       sayılır/telafi olarak gösterilir.
   outcome_groups: 
     invalid_file: "Geçersiz öğrenme çıktısı grubu dosyası"
@@ -10145,14 +10271,6 @@ tr:
       description: "Dim Dim sunucusuna erişim gerekiyor."
       labels: 
         domain: Alan
-    embedly: 
-      description: "Koleksiyonlar için Embedly bilgisini Al"
-      name: "Embedly Entegrasyonu"
-    embedly_settings: 
-      description: "Bu eklenti, koleksiyon öğeleri ile bilgilerin önceden girilmesi için Embedly hizmeti ile entegredir. Ücretli versiyonu ücretsiz olana göre ekstra özellik sağlamaktadır: sayfada bulunan çoklu resimlerden seçebilirsiniz ve satır arasında ön izleme için (youtube videolarını oynatmak vb.) yerleştirme bilgisi verir."
-      labels: 
-        api_key: "Embedly API Key"
-        plan_type: "Embedly plan türü"
     error_reporting: 
       description: "Varsayılan hata raporlama mekanizmaları"
       name: "Hata Raporlama"
@@ -10330,6 +10448,7 @@ tr:
       labels: 
         download_url: "LockDown Tarayıcı İndirme Bağlantısı"
         plugin_enabled: Etkin
+        use_lti_tool: "LockDown Tarayıcı Kısa Sınav Ayarlarını Yönetmek için LTI Aracını kullanın (İzlemek için Gerekli)"
     med_cornell_export: 
       labels: 
         password: "Şifre doğrulama"
@@ -10521,7 +10640,7 @@ tr:
       diigo_description: "Diigo, özellikle araştırma ve eğitim için tasarlanmış bir sosyal yer imi oluşturma aracıdır. Canvas'ın zengin içerik editörü sayesinde Canvas içinden yararlı bulduğunuz diğer kaynaklara bağlantı eklemek için Diigo etiketleriniz içinde arama yapabilirsiniz."
       error_loading_token_details: "Token Ayrıntılarını Yüklemede Hata"
       facebook_description: "Eğer Facebook hesabına sahipseniz, Canvas uygulamasını yükleyin ve ders bildirimlerini profilinizde alın. Gönderilecek bildirim türünü ve sıklığını siz belirtebilirsiniz."
-      feature_options: "Özellik seçenekleri"
+      feature_options: "Özellik Seçenekleri"
       generate_access_token_description: |-
           Access token'ları, sizin adınıza Canvas kaynaklarına erişim için üçüncü parti
           uygulamalara izin verirler. Bu token'lar normalde ihtiyaç oldukça uygulamalar
@@ -10993,14 +11112,6 @@ tr:
       regrade_options: "*(bu soruyu daha önce cevaplamış öğrenciler için)* Yeniden Notlandırma Seçenekleri:"
       some_scores_reduced: "Yalnızca doğru cevaba ödül puan ver (*bazı öğrencilerin notları azalabilir*)"
       update_question_without_regrading: "Tekrar değerlendirme olmadan soruyu güncelle"
-  quiz_group: 
-    errors: 
-      no_bank: "Kısa sınav grubu %{group_name} için soru bankası bulunamadı"
-      no_permissions: "Kullanıcının %{group_name} quiz grubundaki soru bankasına ilişkin izni yoktu"
-    question_group: "Soru Grubu"
-  quiz_question: 
-    defaults: 
-      question_name: Soru
   quiz_reports: 
     quiz_report_generator: 
       download_report_name: "%{report_name} indir"
@@ -11008,27 +11119,10 @@ tr:
       generated_at_date_time: "%{dateAndTime} yaratıldı"
       generating_report_name: "%{report_name} yaratılıyor..."
       item_analysis_not_available: "Anketler için Öğe Analizi kullanılamaz"
-  quiz_statistics: 
-    statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} Raporu"
-    types: 
-      item_analysis: "Öğe Analizi"
-      student_analysis: "Öğrenci Analizi"
   quiz_submissions: 
-    errors: 
-      invalid_submissions: "Bu kısa sınav gönderiminin sizden gönderildiği doğrulanamadı. Lütfen tekrar deneyin."
-      late_quiz: "Bu kısa sınavın gönderiminde geç kalındı ve cevaplarınız sisteme kaydedilmemiş olabilir."
-      protected_quiz: "Bu kısa sınav korumalıdır ve sadece belirli coğrafyalarda açık olabilir. Bilgisayarınız şu anda bu coğrafyaların dışında gözüktüğünden kısa sınavı alamamış olabilirsiniz."
     show: 
       score_out_of: "%{points_possible} üzerinden %{score} aldınız"
-    still_zipping: "Dosya sıkıştırma süreci devam ediyor..."
   quizzes: 
-    access_code: 
-      buttons: 
-        submit: Gönder
-      labels: 
-        access_code: "Erişim Kodu"
-      quiz_restricted: "Bu kısa sınava erişim şifresi gerektirmektedir. Erişim şifresi sizlere yazılı veya sözlü olarak öğretmen tarafından iletilmektedir. Bilmiyorsanız öğretmeniniz ile iletişime geçiniz."
-      survey_restricted: "Bu anket erişim şifresi gerektirmektedir. Erişim şifresi sizlere yazılı veya sözlü olarak öğretmen tarafından iletilmektedir. Bilmiyorsanız öğretmeniniz ile iletişime geçiniz."
     after_last_attempt: "Son Girişten Sonra"
     alerts: 
       no_valid_combinations: "Sistem verilen parametreler için geçerli herhangi bir kombinasyon üretemedi"
@@ -11038,6 +11132,7 @@ tr:
     always: "Her zaman"
     answer_comments: "Yorumlara cevap ver"
     answer_text: "Cevap metni"
+    assignment: Ödev
     assignment_points_possible: 
       one: "1 puan"
       other: "%{count} puan"
@@ -11070,67 +11165,13 @@ tr:
     default_answer_comments: "Öğrenciniz bu cevabı seçtiyse cevabınız"
     default_answer_comments_on_match: "Öğrenciniz bu cevabı eşleştirdiyse cevabınız"
     default_comments_on_wrong_match: "Öğrencinizin eşleştirmesi eksikse cevabınız"
-    default_history_crumb: Geçmiş
     default_quesiton_name: Soru
     default_question_name: Soru
     default_quiz_title: "Kısa Sınav"
     default_response_to_essay: "Öğrenci cevabını gönderdikten sonra gösterilecek yanıt"
     default_response_to_file_upload: "Öğrenci cevabını gönderdikten sonra gösterilecek yanıt"
-    default_title: "Yeni Kısa Sınav"
-    display_answer: 
-      labels: 
-        answer_with_margin: marjinli
-        your_answer: "Sizin Cevabınız"
-      margin_of_error: "hata marjı"
-      plus_or_minus: +/-
-      range_answer: "%{lower_bound} ve %{upper_bound} arasında"
-      you_left_this_blank: "(Boş bıraktınız)"
-    display_question: 
-      default_question_answer: "[ Seçiniz ]"
-      flag_this_question: "Bu Soruyu İşaretle"
-      headers: 
-        formulas: Formüller
-        possible_solutions: "Mümkün Çözüm Yolları"
-        solution_answer: Cevap
-        variable_maximum: Maksimum
-        variable_minimum: Minimum
-        variable_name: Değişken
-        variable_precision: "Ondalıklı Alanlar"
-        variables: Değişkenler
-      labels: 
-        additional_comments: "Ek Yorumlar"
-        for_answer_number: "Cevap %{answer_number}"
-        warning_icon: Uyarı
-      links: 
-        delete_question: "Soruyu Sil"
-        edit_question: "Soruyu Düzenle"
-        move_copy_question: "soruları farklı bir bankaya kopyala/taşı"
-      not_yet_graded: Notlandırılmadı
-      original_score: "Orjinal Puan:"
-      points_possible: "%{points_possible} puan"
-      regraded_score: "Tekrar Değerlendirilen Puan:"
-      show_ansers_for_variable: "%{variable} için Cevapları Göster"
-      skip_question_text: "Soru metnini geçin."
-      submission_was_regraded: "Bu soru yeniden notlandırıldı."
-      titles: 
-        question_correct_comment: "Öğrenciler doğru cevap verirlerse yorumu göreceklerdir"
-        question_incorrect_comment: "Öğrenciler yanlış cevap verirlerse yorumu göreceklerdir"
-        question_neutral_comment: "Öğrenciler yorumu görebilmeleri için önce soruyu cevaplamalıdır"
-      unsupported_question_type: "Bu soru dış kaynaktan içeri aktarılmıştır. '%{question_type}' tipindeki soru kısa sınav araçları desteklememektedir."
-      you_left_this_blank: "(Boş bıraktınız)"
     download_all_quiz_file_upload_submissions: "Gönderilen Tüm Kısa Sınav Dosyalarını İndir"
-    download_file_upload_submissions: 
-      links: 
-        download_submissions: "Tüm Dosyaları İndir"
     enter_answer_variable_above: "[ Cevap Değişkenlerini Yukarıya Girin ]"
-    equations_help: 
-      equation_functions: "Değişkenlere ek olarak faydalı değerler üretmekte kullanmanız için çok sayıda yardımcı işlevler de var. Örneğin: %{example} Verilmiş yardımcı işlevin açıklamasını görmek için aşağıdaki listeden seçin:"
-      equation_intro: "Hesaplanmış sorular sıralı bir şekilde hesaplanan bir veya daha fazla formül kümesini temel alır. Bu formüllerde ara değişkenleri tanımlayabilirsiniz fakat, son formülün sayısal sonucu doğru cevap için kullanılandır. Örneğin: %{example} Bu formül seti için son cevap 71'dir. Fakat, ön tanımlı değişkenler olmadığı için tüm öğrenciler aynı cevap ile aynı soruyu görecektir. Değişkenler hakkında daha fazla bilgi için \"değişkenler\" sekmesine tıklayın."
-      equation_variables2: "Soru metninizde köşeli parantezler kullanarak değişkenler belirleyebilirsiniz (\"[a] + [b] Nedir?\"). Her değişken için, değişken ayarına bağlı olarak bir \"Örnek Değer\" göreceksiniz. Bu sayede matematik hesabınız kontrol edilip formülün çalıştığından emin olunur. Örneğin, sorunuz \"[a] + 5 Nedir?\" ise \"a\" değişkenini tanımlamanız istenir. \"a\" için örnek değer 5.2 ise %{example} yazabilirsiniz. Bu formül ile, her kümede \"a\"nın farklı bir değeri ile herhangi bir sayıda çözüm kümeleri oluşturabilirsiniz. Öğrencinin biri soruyu \"5.2 + 5 Nedir?\" olarak görürken diğeri \"9 + 5 Nedir?\" olarak görür."
-      links: 
-        functions: Fonksiyonlar
-        intro: Giriş
-        variables: Değişkenler
     errors: 
       adding_questions_failed: "Soruları ekleme başarısız, lütfen tekrar deneyin"
       creating_group_failed: "Grup Oluşturma Başarısız, Lütfen Tekrar Deneyin"
@@ -11144,16 +11185,11 @@ tr:
       missing_ip_filter: "Geçerli bir IP Adresi girmelisiniz"
       no_answer: "Lütfen en az bir yanıt veriniz"
       no_correct_answer: "Lütfen doğru cevabı işaretleyiniz"
-      no_more_attempts: "Kısa sınava giriş hakkınız kalmadı"
       no_possible_solution: "Lütfen en az bir mümkün çözüm yolu üretin"
-      quiz_deleted: "Kısa sınav silindi"
       quiz_score_not_a_number: "Puan, 0 ile 2,000,000,000 arasında bir sayı olmalı."
       quiz_score_too_long: "Puan  2,000,000,000'den az olmalı."
       quiz_score_too_short: "Puan 0'dan büyük olmalı"
-      quiz_update_failed: "Kısa sınavı güncellemede hata"
       retrieving_filters_failed: "Filtrelerin Alınması Başarısız"
-    fabulous_quizzes: 
-      page_titles: "Kısa sınavlar"
     ? "false"
     : Yanlış
     file_uploaded_or_removed: 
@@ -11161,134 +11197,6 @@ tr:
         file_successfully_uploaded: "Dosyanız başarıyla yüklendi."
         files_removed: "%{display_name} silindi."
     final_answer: "Final Cevabı"
-    find_question_from_bank: 
-      already_added: "bu soru zaten kısa sınavda mevcut"
-      bank_description: "%{bank_name}, %{n} soru"
-      buttons: 
-        add_questions: "Soru Ekle"
-        create_group: "Grup Oluştur"
-        select_bank: "Soru Bankası Seç"
-      group_pick_count: "%{pick_count} soru"
-      group_points: "%{points} her soru"
-      headers: 
-        bank_name: "Soru Bankası İsmi"
-      hints: 
-        group_pick_count: "Şu ana kadar %{pick_count} seçildi"
-      labels: 
-        add_questions_to_group: "Bu kısa sınav grubu için soru ekle"
-        group_name: "Grup Adı"
-        group_pick_count: Seç
-        group_points: Puanlar
-      links: 
-        clear_all_banks: "Tümünü Sil"
-        manage_question_banks: "Ders Soru Bankalarını Yönet"
-        more_questions: "daha fazla soru"
-        select_all_banks: "Tümünü Seç"
-      options: 
-        new_group: "[ Yeni Grup ]"
-        no_group: "[ Grup Yok ]"
-      select_a_question_bank: "Kısa sınavı soru bankasıyla gruplamak için listeden bir soru bankası seçiniz."
-      titles: 
-        add_new_question_group: "Yeni Soru Grubu Ekle"
-    form_answer: 
-      answer_in_range_accessible: "*range start* ile #range end# arasında olmalıdır"
-      answer_text: "Cevap Metni"
-      answer_weight: "Cevap Ağırlığı"
-      exact_answer_with_error_margin_accessible: "#error margin# hata marjini ile *tam  cevap*"
-      labels: 
-        answer_comments: "Öğrenciniz bu şıkkı cevapladıysa, yorumunuz"
-        answer_in_range: "Sıra ile Cevapla"
-        exact_answer: "Tam Cevap"
-      matching_left: "Sol tarafı eşleştir"
-      matching_right: "Sağ tarafı eşleştir"
-      numerical_answer: "Sayısal Cevap"
-      possible_answer: "Muhtemel Cevap"
-      titles: 
-        click_to_enter_answer_comments: "Öğrencinin bu cevabı seçerse, yorum girmek için tıklayın"
-        click_to_set_as_correct: "Doğru cevabı işaretlemek için tıklayınız"
-        delete_answer: "Bu cevabı sil"
-        edit_as_html: "Metin olan cevap düzenlemesini HTML düzenleyiciye çevir"
-    form_question: 
-      allow_tolerance: "+/- %{tolerance} hata toleransına izin ver "
-      buttons: 
-        create_update_question: "Soru Ekle/Düzenle"
-        generate: Oluştur
-        recompute: "Tekrar Hesapla"
-      correct_answer_comments: "Doğru cevap yorumları"
-      distractor_instructions: "her şıkkı ilgili satıra yazın"
-      equation_example: "Örn: \"5 artı [x] nedir?\""
-      explanation: 
-        generate_possible_solutions: "Son olarak, kısa sınavınız için birçok değişik çözüm yollarına ihtiyacınız olabilir."
-      explanations: 
-        calculated: "Sorunuzu girin, formülünüzü yazın ve olası cevap kombinasyon setlerini oluşturun. Öğrenciler soruyu rasgele seçilmiş değişkenlere göre görüp doğru sayısal cevabı yazmak durumunda olacaklar."
-        equations: "Değişkenleri tanımlamak için köşeli ayraç içerisinde ismi yazınız"
-        essay: "Öğrencilere cevaplarını yazmaları için bir metin alanı verilecektir."
-        file_upload: "Öğrenciler bu cevap için dosya gönderimi yapabilirler."
-        fill_in_multiple_blanks: "Her boşluğun nereye geleceğini belirterek sorunuzu girin. Sonra her boşluk için olası doğru cevabı belirleyin. Öğrencilerin her boşluktaki metin kutularına doğru cevabı yazmaları gerekiyor."
-        formula_definition: "Sonra doğru cevabı hesaplamada kullanılan formül ya da formülleri yazmalısınız. Sadece aşağıda listelenmiş aynı değişken adlarını kullanın."
-        matching: "Eşleştirme çiftleri oluşturun. Öğrenciler sol tarafta değerleri görüp sağ tarafta sarkık menüden eşleşen değeri seçecekler. Birden fazla satır için aynı cevap olabilir ve sağ tarafa fazladan çeldiriciler ekleyebilirsiniz."
-        missing_word: "Sarkık menünün önüne ve arkasına gelecek metni açıklayın. Olası cevaplar kümesi oluşturup bir tane doğru cevap seçin."
-        multi_answer_sets: "Aşağıdaki kutuda cevap kutusu koymak istediğiniz her yere köşeli parantez içinde bir referans kelimesi yazın (boşluk olmadan)"
-        multiple_answers: "Bu soruda her cevabın yanında bir kontrol kutusu vardır ve öğrenci sizin doğru olarak işaretlediğiniz TÜM cevapları seçmeli."
-        multiple_choice: "Sorunuzu ve çoklu cevaplarınızı giriniz ardından doğru cevabı seçiniz."
-        multiple_dropdowns: "Her sarkık menünün nerede olacağını belirterek sorunuzu girin. Sonra her sarkık menü için olası cevapları her birinin yanında bir doğru cevap olacak şekilde belirleyin."
-        numerical: "Doğru cevabı bir aralık dahilinde herhangi bir sayı ya da sayı artı veya eksi hata marjini olarak belirleyin. Öğrenciler sayısal cevaplarını yazmaları için boş bir metin kutusu görecekler."
-        short_answer: |-
-            Soru metninizi girip boşluk için tüm olası doğru cevapları belirleyin.
-            Öğrenciler sorudan hemen sonra cevaplarını girebilecekleri küçük bir metin kutusu görecekler.
-        text_only: "Bu \"soru\" notlandırılmayacak fakat benzer soruları görmeniz açısından yararlı olabilir."
-        true_false: "Soru metninizi giriniz ve ardından Doğru veya Yanlış seçenekleri seçiniz."
-        variable_definitions: "Öncelikle değişkenleri girmelisiniz, daha sonrasından bu listede görüntülenecektir. Mümkün olan her bir değeri daha sonrasından belirtebilirsiniz."
-      general_answer_comments: "Genel cevap yorumları"
-      headers: 
-        formula_definition: "Formül Tanımlaması"
-        generate_possible_solutions: "Mümkün Çözüm Yolları Üret"
-        variable_definitions: "Değişken Tanımlamaları"
-        variable_example_value: "Örnek Değer"
-        variable_maximum: Maksimum
-        variable_minimum: Minimum
-        variable_name: Değişken
-        variable_precision: "Ondalıklı Alanlar"
-      label: 
-        question: 
-          name: "Soru ismi"
-          points: "Soru puanı"
-          type: "Soru türü"
-      labels: 
-        answers: Cevaplar
-        distractors: "Ek Eşleştirme Olasılıkları (şıklar)"
-        missing_word_after: "Cevaplar sonrası gidilecek metin"
-        points: not
-        question: Soru
-      links: 
-        add_another_answer: "Farklı Cevap Ekle"
-        need_help: "Yardıma mı ihtiyacınız var?"
-      multi_answer_sets_example: "Örn: \"Güller [color1] rengindedir, menekşeler [color2] rengindedir\""
-      offer_combinations: "%{how_many} olası değer kombinasyonları öner (maksimum %{max_combinations})"
-      options: 
-        only_one_correct: "Sadece Bir Doğru Cevap"
-        students_select_multiple: "Çoklu Cevap Seçen Öğrenciler"
-      question_type: 
-        calculated: "Formül Sorusu"
-        essay: "Açık Uçlu Soru"
-        file_upload: "Dosya Yükleme Sorusu"
-        fill_in_multiple_blanks: "Çoklu Boşluk Doldurma"
-        matching: Eşleştirme
-        missing_word: "Kelime Tamamlama"
-        multiple_answers: "Çoklu Cevap"
-        multiple_choice: "Çoktan Seçmeli"
-        multiple_dropdowns: "Çoklu Açılır Menü"
-        numerical: "Sayısal Cevap"
-        short_answer: "Boşluk Doldurma"
-        text_only: "Metin (soru yok)"
-        true_false: Doğru/Yanlış
-      show_possible_answers: "%{question} Sorusu İçin Muhtemel Cevapları Göster"
-      show_possible_answers_no_question: "Muhtemel Cevapları Göster"
-      titles: 
-        click_to_enter_correct_answer_comments: "Doğru cevap için tıklayın ve yorum yazın"
-        click_to_enter_general_answer_comments: "Genel yorum girmek için tıklayın"
-        click_to_enter_wrong_answer_comments: "Yanlış cevap için tıklayın ve yorum yazın"
-      wrong_answer_comments: "Yanlış cevap yorumları"
     graded_quiz: "Değerlendirilmiş Kısa Sınav"
     graded_survey: "Değerlendirilmiş Anket"
     headers: 
@@ -11317,68 +11225,14 @@ tr:
         other: "%{count} dakika"
         zero: "1 dakikadan daha az"
       score_out_of_points_possible: "%{points_possible} üzerinden %{score}"
-    history: 
-      anonymous_username: Öğrenci
-      buttons: 
-        allow_extra_attempt: "bu kullanıcıya daha fazla hak tanı"
-      count_attempts_left: 
-        one: "%{user} kullanıcısının 1 hakkı kaldı"
-        other: "%{user} kullanıcısının %{count} hakkı kaldı"
-      default_quiz_name: "%{course_name} Kısa Sınavı"
-      default_survey_name: "%{course_name} Anketi"
-      grade_by_question_warning: "Soruya göre notlandır özelliği bir grup içinde karıştırılan sorulardan etkilenir."
-      headers: 
-        quiz_submissions: "Kısa Sınav Gönderileri"
-        survey_submissions: "Anket Gönderileri"
-      latest_quiz_results: "%{user} kullanıcısının son kısa sınav sonuçları gösterilmektedir. Herhangi bir soru için puan değiştirmek ve daha fazla yorum ekleyebilirsiniz, daha sonra sayfanın alt kısmında bulunan \"Puanları Güncelle\" butonuna tıklayın."
-      latest_survey_results: "%{user} kullanıcısının son anket sonuçları gösterilmektedir. Herhangi bir soru için puan değiştirmek ve daha fazla yorum ekleyebilirsiniz, daha sonra sayfanın alt kısmında bulunan \"Puanları Güncelle\" butonuna tıklayın."
-      links: 
-        back_to_quiz: "Kısa Sınava Geri Dön"
-        back_to_survey: "Ankete Geri Dön"
-      logged_out_user: "Çıkış Yapan Kullanıcı %{index}"
-      named_quiz_results: "%{user}'ın %{quiz_name} Sonuçları"
-      next_questions_arrow_title: "Sonraki soru"
-      no_more_attempts: "%{user}'ın hiç giriş hakkı kalmadı"
-      page_title_quiz: "%{user}'ın Kısa Sınav Geçmişi"
-      page_title_survey: "%{user}'ın Anket Geçmişi"
-      prev_questions_arrow_title: "Önceki soru"
-      quiz_not_yet_taken: "Kısa sınava henüz giriş yapılmadı."
-      quiz_not_yet_taken_or_in_progress: "Kısa sınava henüz giriş yapılmadı veya şuanda işlem görüyor"
-      quiz_unlimited_attempts: "Kısa sınav için sınırsız giriş hakkı vardır"
-      score_for_attempt: "%{attempt_number}. giriş hakkı: %{score}"
-      survey_not_yet_taken: "Bu ankete henüz giriş yapılmadı."
-      survey_not_yet_taken_or_in_progress: "Ankete henüz giriş yapılmadı veya şuanda işlem görüyor"
-      survey_unlimited_attempts: "Bu anket için sınırsız giriş hakkı vardır"
-      titles: 
-        score_pending_review: "Bu puan şuanda incelede ve değişiklik yapılabilir"
-        submission_needs_review: "Bu gönderinin gözden geçirilmesi gerekiyor"
-      unnamed_quiz_results: "%{user}'ın Kısa Sınav Sonuçları"
-      unnamed_survey_results: "%{user}'ın Anket Sonuçları"
+    highest: "en yüksek"
     index: 
       buttons: 
-        publish_quizzes: "Kısa Sınavı Yayınla"
         publishing_quizzes: "Kısa Sınav Yayınlanıyor..."
       confirms: 
         delete_quiz: "Kısa sınavı silmek istediğinize emin misiniz?"
       default_title: "İsimsiz Kısa Sınav"
-      headers: 
-        assignment_quizzes: "Ödev İçin Kısa Sınavlar"
-        course_quizzes: "Ders İçin Kısa Sınavlar"
-        practice_quizzes: "Pratik için Kısa Sınavlar"
-        publish_multiple_quizzes: "Çoklu Kısa Sınavları Yayınla"
-        surveys: Anketler
-        unpublished_quizzes: "Yayınlanmayan Kısa Sınavlar"
-      labels: 
-        publish_multiple_quizzes: "Bu zamanlarda yayınlamak istediğiniz kısa sınavları seçiniz"
-      links: 
-        create_new_quiz: "Yeni Kısa Sınav Oluştur"
-        manage_question_banks: "Soru Bankalarını Yönet"
-        publish_multiple_quizzes: "Çoklu Kısa Sınavları Yayınla"
       multiple_due_dates: "Çoklu Tarih"
-      no_quizzes: "Kısa sınav bulunamadı"
-      page_titles: "Kısa sınavlar"
-      titles: 
-        this_quiz_is_locked: "Bu kısa sınav kilitlidir. Ayrıntılı bilgi için tıklayınız."
     index_view: 
       add_quiz: "Kısa Sınav"
       links: 
@@ -11387,11 +11241,8 @@ tr:
         settings: Ayarlar
       search_for_quiz: "Kısa Sınav Ara"
       title_add_quiz: "Kısa Sınav Ekle"
-    invalid_ip: 
-      quiz_protected: "Bu kısa sınav korumalıdır ve sadece belirli coğrafyalarda açık olabilir. Bilgisayarınız şu anda bu coğrafyaların dışında gözüktüğünden kısa sınavı alamamış olabilirsiniz."
-      survey_protected: "Bu kısa sınav korumalıdır ve sadece belirli coğrafyalarda açık olabilir. Bilgisayarınız şu anda bu coğrafyaların dışında gözüktüğünden kısa sınavı alamamış olabilirsiniz."
     keep_highest: "En Yüksek"
-    keep_latest: "En Düşük"
+    keep_latest: "En Son"
     label: 
       answer: 
         text: "Cevap metni, zengin metin alanı"
@@ -11408,6 +11259,14 @@ tr:
       multiple_blanks_question: "Çevreleyen metni okuyun , boşluğu doldurun"
       other_incorrect_matches: "Diğer Yanlış Eşleştirme Ayarları"
       possible_answer: "Muhtemel Cevap"
+    latest: "en son"
+    ldb_login_popup: 
+      email: Eposta
+      log_in: "Oturum Aç"
+      logged_out_of_canvas: "*Canvas'taki oturumunuz sonlandı.* Devam etmek için lütfen oturum açınız."
+      password: Şifre
+      titles: 
+        log_in: "Lütfen Oturum Açın"
     links: 
       resume_quiz: "Kısa Sınava Devam Et"
       resume_survey: "Ankete Devam Et"
@@ -11421,19 +11280,6 @@ tr:
     loading_question: "Soru Yükleniyor..."
     loading_question_banks: "Soru Bankaları Yükleniyor..."
     loading_questions: "Sorular Yükleniyor..."
-    lockdown_browser_required: 
-      headers: 
-        requires_lockdown: "Respondus LockDown Tarayıcı Gerekiyor"
-      labels: 
-        download_lockdown: "Eğer tarayıcınızda henüz kurulu değilse, lütfen buradan indiriniz"
-      links: 
-        download_lockdown: "[Respondus LockDown Tarayıcı İndir]"
-      requires_lockdown: "Bu kısa sınav Respondus LockDown Tarayıcı gerektirmektedir. Lütfen Respondus LockDown Tarayıcıyı kısa sınava giriş esnasında veya kısa sınav sonuçlarınızı görmek istediğiniz zaman çalıştırınız."
-    managed_quiz_data: 
-      anonymous_student: "%{user_counter} öğrenci"
-      logged_out_user: "Çıkış Yapan Kullanıcı %{user_counter}"
-      titles: 
-        submission_needs_review: "Bu gönderinin gözden geçirilmesi gerekiyor"
     message_students: "Öğrencilere mesaj"
     message_students_for_context: "%{context} için Öğrencilere Mesaj"
     messages: 
@@ -11442,9 +11288,7 @@ tr:
       no_unsubmitted_students_quiz: "Tüm öğrenciler bu kısa sınavı aldı"
       no_unsubmitted_students_survey: "Tüm öğrenciler bu anketi aldı"
     moderate: 
-      add_time: "Zaman Ekle"
       buttons: 
-        change_extensions_for_selected_students: "%{n} Seçilmiş Öğrenci için Eklentileri Değiştir"
         extend_time: "Zamanı Uzat"
         extending_time: "Zaman Uzatılıyor..."
         save: Kaydet
@@ -11454,9 +11298,6 @@ tr:
         time_extension_failed: "Zaman genişletme başarısız, lütfen tekrar deneyin"
       confirms: 
         taking_time_away: "Öğrencinin şu anda sahip olduğu zamandan daha az zamanı olacaktır. Devam edilsin mi ?"
-      end_quiz_reference_time_current_end: "şu anki bitiş saati"
-      end_quiz_reference_time_now: şimdi
-      end_quiz_when: "%{reference_time}'dan %{n} dakika önce kısa sınavı bitir."
       errors: 
         quiz_submission_extra_attempts_not_a_number: "Ek haklar numara belirtilmek zorundadır."
         quiz_submission_extra_attempts_too_long: "Fazladan hak 1000'den az olmalı"
@@ -11465,194 +11306,32 @@ tr:
         quiz_submission_extra_time_too_long: "Fazladan süre 10080'den az olmalı"
         quiz_submission_extra_time_too_short: "Fazladan süre 0'dan büyük olmalı"
         server_communication_failed: "Sunucu ile ilişimde problem meydana geldi. 5 dakika sonra tekrar deneyin veya sayfayı yeniden yüklemeyi deneyin"
-      extended_quiz_time_explanation: "Bu kısa sınav için öğrencilere ek süre vermek istediniz. Ne kadar ek süre vermek istersiniz?"
       extensions_for_student: "%{student}'ın Eklentileri"
       extensions_for_students: 
         one: "1 Öğrenci Eklentileri"
         other: "%{count} Öğrencinin Eklentileri"
-      finished_in: "%{duration} sürede tamamlandı"
       finished_in_duration: "%{duration} sürede tamamlandı"
-      global_extra_attempts: "herkes zaten %{n} alır"
-      headers: 
-        attempt: "Giriş Hakkı"
-        attempts_left: "Giriş Hakkı Kaldı"
-        extended_quiz_time: "Kısa Sınav İçin Ek Süre"
-        score: Puan
-        student: Öğrenci
-        student_extensions: "Öğrenci Eklentileri"
-        time: Zaman
-      in_progress: işleniyor
-      labels: 
-        ending: Sonlandırılıyor
-        extra_attempts: "Ek Giriş Hakları"
-        extra_time_per_attempt: "Her Giriş Hakkı için Ek Süre"
-        manually_unlock: "bir sonraki giriş hakkı için kısa sınavı elle aç"
-        started: Başladı
-      minutes: dakika
-      page_title: "Kısa Sınavı Yönet"
-      student_gets_extra_time: "*%{student_name}* **her bir giriş hakkı için %{extra_time} istiyor**"
-      student_n: "%{n} Öğrenci"
       time_up: "Süre Bitti!"
       titles: 
-        change_user_extensions: "Kullanıcı eklentilerini değiştir"
         extend_quiz_time: "Kısa Sınav İçin Ek Süre"
-        manually_unlocked: "Manuel olarak Kilitlendi"
-        minutes_to_add: "eklenecek dakikalar"
-        select_deselect_all: "Hepsini Seç/Kaldır"
-        select_user: "%{user}'ı seç"
         student_extensions: "Öğrenci Eklentileri"
     more_questions: "daha fazla soru"
-    multi_answer: 
-      choose_answer: Seçin
-    muted: 
-      muted_quiz_description: "Kısa sınav sonucunuz gösterilemiyor çünkü eğitmeniniz henüz değerlendirmeyi tamamlamadı. Eğitmeniniz değerlendirmeyi tamamladığında, puanınız bu sayfada gösterilecektir."
-      muted_quiz_header: "Kısa sınavınız sonlandırıldı"
-    new: 
-      allowed_attempts: "Maksimum giriş hakkı sayısı"
-      anonymous_submissions: "Gönderilerin İsimsiz Olmasını Sağla"
-      buttons: 
-        not_published: Yayınlanmadı
-        published: Yayınlandı
-        save: Kaydet
-      cant_go_back: "Cevaplandırma sonrası soruları kilitle"
-      default_page_title: "Yeni Kısa Sınav"
-      group: "Ödev Grubu"
-      headers: 
-        ip_filters: "Kısa Sınav IP Filtreleri Nelerdir?"
-      hide_correct_answers_at: "Doğru Cevapları Şu zamanda Gizle"
-      hints: 
-        question_detail_disabled: "NOT: %{question_count} soru sayısından fazlası olduğunda soru ayrıntıları gösterilemez."
-        quiz_score: "anketi aldıktan sonra öğrenciler otomatik olarak full krediyi alırlar"
-      ip_filters: "Kısa sınav IP filtreleri, kısa sınavlara belirli IP aralığındaki bilgisayarlar tarafından erişimi sağlama yöntemidir.  Filtreler virgül ile ayrılmış IP adresleri ya da IP adresinden sonra belirtilen bir ağ maskesi şeklinde olabilir  (\"192.168.217.1\", \"192.168.217.1/24\" or \"192.168.217.1/255.255.255.0\")."
-      label: 
-        time_limit: "Zaman Limiti"
-      labels: 
-        allow_multiple_attempts: "Çoklu Giriş Hakkına İzin Ver"
-        hide_results_only_after_last: "Yalnızca Son Haklarından Sonra"
-        ip_filter: "IP Adreslerini Filtrele"
-        never_hide_results: "Öğrencilerin Kendi Cevaplarını Görmesine İzin Ver"
-        quiz_instructions: "Kısa Sınav Yönergeleri"
-        quiz_notify: "Kısa sınav değişikliğinden kullanıcıları bilgilendir"
-        quiz_score: Puan
-        require_access_code: "Erişim kodu gereklidir"
-        restrict_quiz: "Quiz Sınırlamaları"
-        show_question_details: "Soru Ayrıntılarını Göster"
-      limited_attempts: "İzin Verilen Giriş Hakları"
-      links: 
-        cancel: İptal
-        find_questions: "Soruları Ara"
-        new_question: "Yeni Soru"
-        new_question_group: "Yeni Soru Grubu"
-        show_assignment_rubric: "Değerlendirme Listesini Göster"
-      manage: Yönet
-      minutes: Dakika
-      new_assignment: "Yeni Ödev"
-      new_discussion: "Yeni Tartışma"
-      one_question_at_a_time: "Her seferinde bi soru göster"
-      points_possible: "%{n} puan"
-      quiz_title: "Kısa Sınav Başlığı"
-      quiz_type: "Kısa Sınav Türü"
-      require_lockdown_browser: "Respondus LockDown Tarayıcı Gerekmektedir"
-      require_lockdown_browser_for_results: "Kısa sınav sonuçları görmek için gereklidir"
-      retrieving_filters: "Filtreler Alınıyor..."
-      score_to_keep: "Kısa Sınav Puanını Sakla"
-      show_correct_answers: "Öğrenciler Doğru Cevapları Görebilsinler"
-      show_correct_answers_at: "Doğru Cevapları Şu zamanda Göster"
-      shuffle_answers: "Karışık Cevaplar"
-      students_cannot_view_responses_after_course_concludes: "Ders sonladırıldıktan sonra öğrenciler kısa sınava verdikleri cevapları göremezler"
-      time_limit: "Kaç dakika?"
-      titles: 
-        click_to_select_filter: "Lütfen bir filtre seçiniz"
-        delete: Sil
-        find_ip_address_filter: "IP Adresine Göre Filtrele"
-      warnings: 
-        has_student_submissions: "Öğrenciler zaten bu kısa sınavı aldılar yada yapmaya başladılar, bu yüzden düzenlerken dikkat etmelisiniz. Eğer kısa sınav soruları üzerinde temelde değişiklikler yapacaksanız, bu kısa sınavın eski versiyonunu yapan öğrencilerin tekrardan değerlendirilmesini göz önünde bulundurmalısınız."
     no_filters_found: "Filtre bulunamadı"
     no_quizzes_view: 
       headers: 
         course_quizzes: "Ders İçin Kısa Sınavlar"
       no_quizzes: "Kısa sınav bulunamadı"
     notices: 
-      cant_view_submission_while_muted: "Kısa sınav sonlandırıldığı sürece kısa sınav geçmişinde göremezsiniz."
-      has_submissions_already: "Aklınızda bulunsun, çoğu öğrenciler bu kısa sınavı yeni almış yada tamamlamış olabilirler"
-      less_than_allotted_time: "Kısa sınavın bitişine yakın başladığından dolayı bu kısa sınavda tam zamandan faydalanamayacaksın. "
       message_sent: "Mesaj Gönderildi!"
-      no_submission_for_user: "Bu kullanıcı için hiçbir gönderi bulunamadı"
-      quiz_updated: "Kısa sınav başarıyla güncellendi"
-      quizzes_published: 
-        one: "1 kısa sınav başarıyla yayınlandı!"
-        other: "%{count} kısa sınav başarıyla yayınlandı!"
-      quizzes_unpublished: 
-        one: "1 kısa sınav başarıyla yayından kaldırıldı!"
-        other: "%{count} kısa sınav başarıyla yayından kaldırıldı!"
     practice_quiz: "Kısa Sınav Pratiği"
     practices_label: "Pratik Kısa Sınavının görünürlüğünü değiştir"
     question_colon: "Soru:"
     question_count: 
       one: "1 Soru"
       other: "%{count} Soru"
-    question_group: 
-      buttons: 
-        update: Güncelle
-      default_group_name: Grup
-      edit_questions_and_points: "*%{num_questions}* soru seç, her soru #%{num_points}# puan"
-      labels: 
-        group_name: "Grup Adı"
-        number_of_questions: "Soru Sayısı"
-        points_per_question: "Her Soru Değeri"
-        question_bank: "Sorular bankadan çekilecektir"
-      links: 
-        link_to_a_question_bank: "Soru Bankasına Bağlantı"
-      show_questions_and_points: "*%{num_questions}* soru seç, her soru #%{num_points}# puan"
-      titles: 
-        add_question_to_group: "Bu kısa sınav grubu için soru ekle"
-        collapse_group: "Grubu Daralt"
-        delete_group: "Grubu Sil"
-        edit_group_details: "Grup Ayrıntılarını Düzenle"
-        expand_group: "Grubu Genişlet"
     question_limit_reached: "Kısa sınav için izin verilen maksimum soru sayısına ulaştın  (%{count}/%{limit}).\\n\\n Konuları birçok kısa sınav arasına yaymayı göz önünde bulundurunuz."
-    question_list_right_side: 
-      headers: 
-        questions: Sorular
-    question_statistic: 
-      attempts: 
-        one: "%{count} hak"
-        other: "%{count} hak"
-      empty_response: "Boş Yanıt"
-      labels: 
-        other_answers: "Diğer Cevaplar"
-      no_data: "Veri Yok"
-      no_responses: "Bu soru için hiçbir cevap kaydı bulunamadı"
-      percent_of_responses: "%{percent}% of %{total}'ı bu cevabı işaretledi"
-      response_count: 
-        one: "1 öğrenciye bu soru verildi"
-        other: "%{count} öğrenciye bu soru verildi"
-    question_teaser: 
-      titles: 
-        click_to_show_details: "Tüm soru detaylarını göstermek için tıklayın"
-        delete_this_question: "Soruyu Sil"
-        edit_this_question: "Soruyu Düzenle"
     quiz_attempts_length_error: "Kısa sınav hakkı 3 hane ile sınırlıdır, öğrencilerenize sınırsız hak vermek isterseniz sol taraftaki Çoklu Teşebbüse İzin Ver kutusuna tik atmayın"
     quiz_attempts_nan_error: "Kısa sınav için giriş hakları sadece sayı belirtilebilir"
-    quiz_details: 
-      allowed_attempts: "Çoklu Giriş Hakkına İzin Ver"
-      headers: 
-        available: Mevcut
-        due: "Bitiş Tarihi"
-        points: Puanlar
-        questions: Sorular
-        time_limit: "Zaman Limiti"
-      multiple_due_dates: "Çoklu Bitiş Tarihi"
-      no_due_date: "Bitiş tarihi yok."
-      none: Yok
-      quiz_availabile_through: "%{start_time} - %{end_time}"
-      quiz_available_after: "%{start_time} sonra"
-      quiz_available_until: "%{end_time}'e kadar"
-      requires_lockdown: "Respondus LockDown Tarayıcı Gerekmektedir"
-      time_limit: 
-        one: "1 Dakika"
-        other: "%{count} Dakika"
-      unlimited: Limitsiz
     quiz_item_group_view: 
       no_quizzes: "Kısa sınav bulunamadı"
       no_surveys: "Anket bulunamadı"
@@ -11663,125 +11342,687 @@ tr:
       settings: Ayarlar
       title_delete: "Kısa Sınavı Sil"
       title_edit: "Kısa Sınavı Düzenle"
-    quiz_right_side: 
-      attempts_left: 
-        one: "1 giriş hakkınız daha mevcut"
-        other: "%{count} giriş hakkınız daha mevcut"
-      attempts_so_far: 
-        one: "Şu ana kadar 1 Teşebbüs"
-        other: "Şu ana kadar %{count} Teşebbüs"
-      labels: 
-        current_score: "Güncel Puan"
-        kept_score: "Puanı Sakla"
-        last_attempt_details: "Son Deneme Ayrıntıları"
-        submission_details: "Ödev Gönderme Ayrıntıları"
-        time: Zaman
-      links: 
-        preview_quiz_again: "Kısa Sınavı Tekrar Görüntüle"
-        preview_survey_again: "Anketi Tekrar Görüntüle"
-      no_more_attempts: "Daha fazla giriş hakkınız bulunmamaktadır"
-      questions_not_graded: "Bazı sorular henüz notlandırılmadı"
-      score_set_manually: "Bu puan öğretmen tarafından verildi"
-      unlimited_attempts: "Sınırsız Giriş Hakkı"
-      view_previous_attempts: "Önceki Giriş Hakkını Görüntüle"
-    quiz_show_teacher: 
-      anonymous_submissions: "Misafir Gönderiler"
-      attempts: Girişimler
-      available_from: Kullanılabilir
-      cant_go_back: "Cevaplandırma Sonrası Soruları Kilitle"
-      code: "Erişim Kodu"
-      due: Bitiş
-      filter: "IP Filtresi"
-      for: "Kim için"
-      group: "Ödev Grubu"
-      label: 
-        time_limit: "Zaman Limiti"
-      multiple_attempts: "Çoklu Giriş Hakları"
-      no_time_limit: "Zaman Limiti Yok"
-      one_question_at_a_time: "Her seferinde bir soru"
-      points: Puanlar
-      quiz_type: "Kısa Sınav Türü"
-      require_lockdown_browser: "Respondus LockDown Tarayıcı Gerekmektedir"
-      require_lockdown_browser_for_results: "Kısa Sınav Sonuçlarını Görmek için Gereklidir"
-      score_to_keep: "Puanı Sakla"
-      show_correct_answers: "Doğru Cevapları Göster"
-      shuffle_answers: "Karışık Cevaplar"
-      time_limit: 
-        one: "1 Dakika"
-        other: "%{count} Dakika"
-      until: "Şu zamana kadar"
-      view_responses: "Yanıtları Görüntüle"
     quiz_submission: 
-      attempt_duration: "Bu etkinlik %{duration} devam etti."
-      buttons: 
-        update_scores: "Notu Güncelle"
-      labels: 
-        final_score: "Final Puanı"
-        fudge_points: "Ekstra Puan"
-        fudge_points_changed_points_quiz: "%{user} bu kısa sınavı aldığı için olası puanların sayısı %{difference} kadar değişti. Bu değişikliği ayarlayabilir ve bu kutuyu kullanarak manuel olarak artı ya da eksi puanlar ekleyebilirsiniz."
-        fudge_points_changed_points_survey: "%{user} bu ankete katıldığı için olası puanların sayısı %{difference} kadar değişti. Bu değişikliği ayarlayabilir ve bu kutuyu kullanarak manuel olarak artı ya da eksi puanlar ekleyebilirsiniz."
-        fudge_points_generic_explanation: "Kutucuğa negatif veya pozitif puan ekleyerek puanda oynamalar yapabilirsiniz."
-        questions_need_review: "Bu soruların gözden geçirilmesi gerekiyor"
-        quiz_score: "Kısa Sınav Puanı"
-        score_for_attempt: "Bu denemenin puanı"
-        score_for_quiz: "Bu kısa sınavın puanı"
-        score_for_survey: "Bu anketin puanı"
-        survey_score: "Anket Puanı"
-      links: 
-        click_to_view_results: "Sonuçları görmek için tıklayınız."
-      questions_not_graded: "Bazı sorular henüz notlandırılmadı"
-      quiz_fudged_negative: "Bu kısa sınavda manuel olarak %{fudge} puan ayarlama yapılmıştır."
-      quiz_fudged_positive: "Bu kısa sınavda manuel olarak +%{fudge} puan ayarlama yapılmıştır."
-      quiz_not_yet_taken: "Kısa sınava henüz giriş yapılmadı."
-      quiz_results_protected: "Kısa sınav sonuçları korumalıdır ve öğrencilere gösterilmemektedir."
-      quiz_results_protected_until_last_attempt: "Kısa sınav sonuçları korumalıdır ve öğrenciler son giriş haklarını kullanana kadar puanlarını göremeyeceklerdir."
-      quiz_submission_needs_review: "Bu kısa sınavı yaparken sınav önemli ölçüde yapısı değiştirildi. Bu nedenle tekrar yapmanız gerekmektedir."
-      requires_lockdown: "Kısa sınav sonuçlarınızı görebilmeniz için Respondus LockDown Tarayıcı gerekiyor."
-      submitted_at: "%{when}'ta gönderildi"
-      survey_fudged_negative: "Bu anket puanında manuel olarak %{fudge} puan ayarlama yapılmıştır."
-      survey_fudged_positive: "Bu anket puanında manuel olarak +%{fudge} puan ayarlama yapılmıştır."
-      survey_not_yet_taken: "Kısa sınava henüz giriş yapılmadı."
       titles: 
         this_is_an_external_element: "Bu bir dış kaynak nesnesidir, metin değildir ve öğrenciler gönderdiğinden beri değişmiş olabilir"
         this_is_an_external_frame: "Bu bir metin olmayan dış kaynak çevçevesidir ve öğrenciler gönderdiğinden beri değişmiş olabilir"
         this_is_an_image: "Bu bir resimdir, metin değildir ve öğrenciler gönderdiğinden beri değişmiş olabilir"
-    quiz_summary: 
-      assignment_points_possible: 
-        one: "1 puan"
-        other: "%{count} puan"
-      labels: 
-        allowed_attempts: "Çoklu Giriş Hakkına İzin Ver"
-        attempts_left: "Kalan Giriş Hakkı"
-        attempts_so_far: "Önceki Giriş Hakları"
-        latest_submission: "Son Gönderi"
-        quiz_details: "Kısa Sınav Ayrıntıları"
-        quiz_due: Bitiş
-        quiz_time_limit: "Zaman Limiti"
-        survey_details: "Anket Detayları"
-      no_details: "Ayrıntı Yok"
-      points_possible: "olası %{points_possible} puan"
-      question_count: 
-        one: "1 Soru"
-        other: "%{count} Soru"
-      quiz_multiple_due_dates: "Çoklu Tarih"
-      quiz_no_points: "Puan Yok"
-      quiz_points_possible: 
-        one: "1 Puan"
-        other: "%{count} Puan"
-      student_mute_notification: "Öğretim elemanı notlar üzerinde çalışıyor"
-      unlimited_attempts: "Sınırsız Giriş Hakkı"
-    read_only: 
-      default_page_title: "Yeni Kısa Sınav"
-      headers: 
-        quiz_details: "Kısa Sınav Ayrıntıları"
-      labels: 
-        question_details: "Soru Ayrıntılarını Göster"
+    quiz_submissions: 
+      errors: 
+        invalid_submissions: "Bu kısa sınav gönderiminin size ait olduğu doğrulanamadı. Lütfen tekrar deneyin."
+        late_quiz: "Bu kısa sınavın gönderiminde geç kalındı ve cevaplarınız sisteme kaydedilmemiş olabilir."
+        protected_quiz: "Bu kısa sınav korumalıdır ve sadece belirli bölgeler için açık olabilir. Bilgisayarınız şu anda bu bölgelerin dışında gözüktüğünden kısa sınavı alamamış olabilirsiniz."
+      still_zipping: "Dosya sıkıştırma süreci devam ediyor..."
+    quizzes: 
+      access_code: 
+        buttons: 
+          submit: Gönder
+        labels: 
+          access_code: "Erişim Kodu"
+        quiz_restricted: "Bu kısa sınava erişim şifre gerektirmektedir. Erişim şifresi sizlere yazılı veya sözlü olarak öğretmen tarafından iletilmektedir. Bilmiyorsanız öğretmeniniz ile iletişime geçiniz."
+        survey_restricted: "Bu anket erişim şifresi gerektirmektedir. Erişim şifresi sizlere yazılı veya sözlü olarak öğretmen tarafından iletilmektedir. Bilmiyorsanız öğretmeniniz ile iletişime geçiniz."
+      default_history_crumb: Geçmiş
+      default_title: "Yeni Kısa Sınav"
+      display_answer: 
+        labels: 
+          answer_with_margin: marjinli
+          your_answer: "Sizin Cevabınız"
+        margin_of_error: "hata marjı"
+        plus_or_minus: +/-
+        range_answer: "%{lower_bound} ve %{upper_bound} arasında"
+        you_left_this_blank: "(Boş bıraktınız)"
+      display_question: 
+        default_question_answer: "[ Seçiniz ]"
+        flag_this_question: "Bu Soruya İşaret Koy"
+        headers: 
+          formulas: Formüller
+          possible_solutions: "Olası Çözümler"
+          solution_answer: Cevap
+          variable_maximum: Maksimum
+          variable_minimum: Minimum
+          variable_name: Değişken
+          variable_precision: "Ondalıklı Alanlar"
+          variables: Değişkenler
+        labels: 
+          additional_comments: "Ek Yorumlar"
+          for_answer_number: "Cevap %{answer_number}"
+          warning_icon: Uyarı
+        links: 
+          delete_question: "Bu Soruyu Sil"
+          edit_question: "Bu Soruyu Düzenle"
+          move_copy_question: "soruyu farklı bir soru bankasına kopyala/taşı"
+        not_yet_graded: "Henüz Notlandırılmadı"
+        original_score: "Orjinal Puan:"
+        points_possible: "%{points_possible} puan"
+        regraded_score: "Tekrar Değerlendirilen Puan:"
+        show_ansers_for_variable: "%{variable} için Cevapları Göster"
+        skip_question_text: "Soru metnine geçin."
+        submission_was_regraded: "Bu soru yeniden notlandırıldı."
+        titles: 
+          question_correct_comment: "Öğrenciler doğru cevap verirlerse bu yorumu göreceklerdir"
+          question_incorrect_comment: "Öğrenciler yanlış cevap verirlerse bu yorumu göreceklerdir"
+          question_neutral_comment: "Öğrenciler yorumu görebilmeleri için önce soruyu cevaplamalıdır"
+        unsupported_question_type: "Bu soru dış kaynaktan içeri aktarılmıştır. '%{question_type}' türündeki soru bu kısa sınav aracında desteklememektedir."
+        you_left_this_blank: "(Boş bıraktınız)"
+      download_file_upload_submissions: 
+        links: 
+          download_submissions: "Tüm Dosyaları İndir"
+      equations_help: 
+        equation_functions: "Değişkenlere ek olarak faydalı değerler üretmekte kullanmanız için çok sayıda yardımcı işlevler de var. Örneğin: %{example} Verilmiş yardımcı işlevin açıklamasını görmek için aşağıdaki listeden seçin:"
+        equation_intro: "Hesaplanmış sorular sıralı bir şekilde hesaplanan bir veya daha fazla formül kümesini temel alır. Bu formüllerde ara değişkenleri tanımlayabilirsiniz fakat, son formülün sayısal sonucu doğru cevap için kullanılandır. Örneğin: %{example} Bu formül seti için son cevap 71'dir. Fakat, ön tanımlı değişkenler olmadığı için tüm öğrenciler aynı cevap ile aynı soruyu görecektir. Değişkenler hakkında daha fazla bilgi için \"değişkenler\" sekmesine tıklayın."
+        equation_variables2: "Soru metninizde köşeli parantezler kullanarak değişkenler belirleyebilirsiniz (\"[a] + [b] Nedir?\"). Her değişken için, değişken ayarına bağlı olarak bir \"Örnek Değer\" göreceksiniz. Bu sayede matematik hesabınız kontrol edilip formülün çalıştığından emin olunur. Örneğin, sorunuz \"[a] + 5 Nedir?\" ise \"a\" değişkenini tanımlamanız istenir. \"a\" için örnek değer 5.2 ise %{example} yazabilirsiniz. Bu formül ile, her kümede \"a\"nın farklı bir değeri ile herhangi bir sayıda çözüm kümeleri oluşturabilirsiniz. Öğrencinin biri soruyu \"5.2 + 5 Nedir?\" olarak görürken diğeri \"9 + 5 Nedir?\" olarak görür."
+        links: 
+          functions: İşlevler
+          intro: Giriş
+          variables: Değişkenler
+      errors: 
+        no_more_attempts: "Kısa sınava giriş hakkınız kalmadı"
+        quiz_deleted: "Kısa sınav silindi"
+        quiz_update_failed: "Kısa sınavı güncellemede hata"
+      fabulous_quizzes: 
+        page_titles: "Kısa sınavlar"
+      find_question_from_bank: 
+        already_added: "bu soru zaten kısa sınavda mevcut"
+        bank_description: "%{bank_name}, %{n} soru"
+        buttons: 
+          add_questions: "Soru Ekle"
+          create_group: "Grup Oluştur"
+          select_bank: "Soru Bankası Seç"
+        group_pick_count: "%{pick_count} soru"
+        group_points: "her soru %{points}"
+        headers: 
+          bank_name: "Soru Bankası İsmi"
+        hints: 
+          group_pick_count: "Şu ana kadar %{pick_count} seçildi"
+        labels: 
+          add_questions_to_group: "Bu kısa sınav grubu için soru ekle"
+          group_name: "Grup İsmi"
+          group_pick_count: Seç
+          group_points: Puanlar
+        links: 
+          clear_all_banks: "Tümünü Temizle"
+          manage_question_banks: "Ders Soru Bankalarını Yönet"
+          more_questions: "daha fazla soru"
+          select_all_banks: "Tümünü Seç"
+        options: 
+          new_group: "[ Yeni Grup ]"
+          no_group: "[ Grup Yok ]"
+        select_a_question_bank: "Kısa sınavı soru bankasıyla gruplamak için listeden bir soru bankası seçiniz."
+        titles: 
+          add_new_question_group: "Yeni Soru Grubu Ekle"
+      form_answer: 
+        answer_in_range_accessible: "*range start* ile #range end# arasında olmalıdır"
+        answer_text: "Cevap Metni"
+        answer_weight: "Cevap Ağırlığı"
+        exact_answer_with_error_margin_accessible: "#error margin# hata marjini ile *tam  cevap*"
+        labels: 
+          answer_comments: "Öğrenciniz bu şıkkı cevapladıysa, yorumunuz"
+          answer_in_range: "Sıra ile Cevapla"
+          exact_answer: "Tam Cevap"
+        matching_left: "Sol tarafı eşleştir"
+        matching_right: "Sağ tarafı eşleştir"
+        numerical_answer: "Sayısal Cevap"
+        possible_answer: "Olası Cevap"
+        titles: 
+          click_to_enter_answer_comments: "Öğrenci bu cevabı seçerse, yorum girmek için tıklayın"
+          click_to_set_as_correct: "Bu cevabı doğru cevap olarak belirlemek için tıklayın"
+          delete_answer: "Bu cevabı sil"
+          edit_as_html: "Cevap metnini HTML olarak düzenlemeye geçiş yap"
+      form_question: 
+        allow_tolerance: "+/- %{tolerance} hata toleransına izin ver "
+        buttons: 
+          create_update_question: "Soru Oluştur/Güncelle"
+          generate: Oluştur
+          recompute: "Tekrar Hesapla"
+        correct_answer_comments: "Doğru cevap yorumları"
+        distractor_instructions: "her çeldirici şıkkı ilgili satıra yazın"
+        equation_example: "Örn: \"5 artı [x] nedir?\""
+        explanation: 
+          generate_possible_solutions: "Son olarak, kısa sınavınız için ihtiyacınız kadar birçok değişken-çözüm kombinasyonları oluşturun."
+        explanations: 
+          calculated: "Sorunuzu girin, formülünüzü yazın ve olası cevap kombinasyon setlerini oluşturun. Öğrenciler soruyu rasgele seçilmiş değişkenlere göre görüp doğru sayısal cevabı yazmak durumunda olacaklar."
+          equations: "Değişkenleri tanımlamak için köşeli ayraç içerisinde değişken adlarını yazınız"
+          essay: "Öğrencilere cevaplarını yazmaları için bir metin alanı verilecektir."
+          file_upload: "Öğrenciler bu cevap için dosya gönderimi yapabilirler."
+          fill_in_multiple_blanks: "Her boşluğun nereye geleceğini belirterek sorunuzu girin. Sonra her boşluk için olası doğru cevabı belirleyin. Öğrencilerin her boşluktaki metin kutularına doğru cevabı yazmaları gerekiyor."
+          formula_definition: "Sonra doğru cevabı hesaplamada kullanılan formül ya da formülleri yazmalısınız. Sadece aşağıda listelenmiş aynı değişken adlarını kullanın."
+          matching: "Eşleştirme çiftleri oluşturun. Öğrenciler sol tarafta değerleri görüp sağ tarafta sarkık menüden eşleşen değeri seçecekler. Birden fazla satır için aynı cevap olabilir ve sağ tarafa fazladan çeldiriciler ekleyebilirsiniz."
+          missing_word: "Sarkık menünün önüne ve arkasına gelecek metni açıklayın. Olası cevaplar kümesi oluşturup bir tane doğru cevap seçin."
+          multi_answer_sets: "Aşağıdaki kutuda cevap kutusu koymak istediğiniz her yere köşeli parantez içinde bir referans kelimesi yazın (boşluk olmadan)"
+          multiple_answers: "Bu soruda her cevabın yanında bir kontrol kutusu vardır ve öğrenci sizin doğru olarak işaretlediğiniz TÜM cevapları seçmeli."
+          multiple_choice: "Sorunuzu ve çoklu cevaplarınızı giriniz ardından doğru cevabı seçiniz."
+          multiple_dropdowns: "Her sarkık menünün nerede olacağını belirterek sorunuzu girin. Sonra her sarkık menü için olası cevapları her birinin yanında bir doğru cevap olacak şekilde belirleyin."
+          numerical: "Doğru cevabı bir aralık dahilinde herhangi bir sayı ya da sayı artı veya eksi hata marjini olarak belirleyin. Öğrenciler sayısal cevaplarını yazmaları için boş bir metin kutusu görecekler."
+          short_answer: |-
+              Soru metninizi girip boşluk için tüm olası doğru cevapları belirleyin.
+              Öğrenciler sorudan hemen sonra cevaplarını girebilecekleri küçük bir metin kutusu görecekler.
+          text_only: "Bu \"soru\" notlandırılmayacak fakat benzer soruları görmeniz açısından yararlı olabilir."
+          true_false: "Soru metninizi giriniz ve ardından Doğru veya Yanlış seçenekleri seçiniz."
+          variable_definitions: "Değişkenleri aşağıda girdiğinizde burada liste şeklinde göreceksiniz. Aşağıdaki her değişken için olası değer aralıklarını belirtebilirsiniz."
+        general_answer_comments: "Genel cevap yorumları"
+        headers: 
+          formula_definition: "Formül Tanımlaması"
+          generate_possible_solutions: "Olası Çözüm Yolları Oluştur"
+          variable_definitions: "Değişken Tanımlamaları"
+          variable_example_value: "Örnek Değer"
+          variable_maximum: Maksimum
+          variable_minimum: Minimum
+          variable_name: Değişken
+          variable_precision: "Ondalıklı Alanlar"
+        label: 
+          question: 
+            name: "Soru ismi"
+            points: "Soru puan değeri"
+            type: "Soru türü"
+        labels: 
+          answers: Cevaplar
+          distractors: "Ek Eşleştirme Olasılıkları (çeldirici şıklar)"
+          missing_word_after: "Cevaplar sonrası gidilecek metin"
+          points: not
+          question: Soru
+        links: 
+          add_another_answer: "Başka bir Cevap Ekle"
+          need_help: "Yardıma mı ihtiyacınız var?"
+        multi_answer_sets_example: "Örn: \"Güller [color1] rengindedir, menekşeler [color2] rengindedir\""
+        offer_combinations: "%{how_many} olası değer kombinasyonları öner (maksimum %{max_combinations})"
+        options: 
+          only_one_correct: "Sadece Bir Doğru Cevap"
+          students_select_multiple: "Öğrenciler Birden fazla Cevap İşaretleyebilir"
+        question_type: 
+          calculated: "Formül Sorusu"
+          essay: "Açık Uçlu Soru"
+          file_upload: "Dosya Yüklemeli Soru"
+          fill_in_multiple_blanks: "Çoklu Boşluk Doldurma"
+          matching: Eşleştirme
+          missing_word: "Kelime Tamamlama"
+          multiple_answers: "Birden Fazla Cevap"
+          multiple_choice: "Çoktan Seçmeli"
+          multiple_dropdowns: "Çoklu Açılır Menü"
+          numerical: "Sayısal Cevap"
+          short_answer: "Boşluk Doldurma"
+          text_only: "Metin (soru yok)"
+          true_false: Doğru/Yanlış
+        show_possible_answers: "%{question} Sorusu için Olası Cevapları Göster"
+        show_possible_answers_no_question: "Şunun için Olası Cevapları Göster"
+        titles: 
+          click_to_enter_correct_answer_comments: "Doğru cevaba yorum yazmak için tıklayın"
+          click_to_enter_general_answer_comments: "Genel yorum girmek için tıklayın"
+          click_to_enter_wrong_answer_comments: "Yanlış cevaba yorum girmek için tıklayın"
+        wrong_answer_comments: "Yanlış cevap yorumları"
+      history: 
+        anonymous_username: Öğrenci
+        buttons: 
+          allow_extra_attempt: "bu kullanıcıya daha fazla hak ver"
+        count_attempts_left: 
+          one: "%{user} kullanıcısının 1 hakkı kaldı"
+          other: "%{user} kullanıcısının %{count} hakkı kaldı"
+        default_quiz_name: "%{course_name} Kısa Sınavı"
+        default_survey_name: "%{course_name} Anketi"
+        grade_by_question_warning: "Soruya göre notlandır özelliği bir grup içinde karıştırılan sorulardan etkilenir."
+        headers: 
+          quiz_submissions: "Kısa Sınav Gönderileri"
+          survey_submissions: "Anket Gönderileri"
+        latest_quiz_results: "%{user} kullanıcısının son kısa sınav sonuçları gösterilmektedir. Herhangi bir soru için notları değiştirebilir ve daha fazla yorum ekleyebilirsiniz. Daha sonra sayfanın alt kısmında bulunan \"Notları Güncelle\" butonuna tıklayın."
+        latest_survey_results: "%{user} kullanıcısının son anket sonuçları gösterilmektedir. Herhangi bir soru için notları değiştirebilir ve daha fazla yorum ekleyebilirsiniz. Daha sonra sayfanın alt kısmında bulunan \"Notları Güncelle\" butonuna tıklayın."
+        links: 
+          back_to_quiz: "Kısa Sınava Geri Dön"
+          back_to_survey: "Ankete Geri Dön"
+        logged_out_user: "Çıkış Yapan Kullanıcı %{index}"
+        named_quiz_results: "%{user}'ın %{quiz_name} Sonuçları"
+        next_questions_arrow_title: "Sonraki sorular"
+        no_more_attempts: "%{user}'ın hiç hakkı kalmadı"
+        page_title_quiz: "%{user}'ın Kısa Sınav Geçmişi"
+        page_title_survey: "%{user}'ın Anket Geçmişi"
+        prev_questions_arrow_title: "Önceki sorular"
+        quiz_not_yet_taken: "Kısa sınava henüz giriş yapılmadı."
+        quiz_not_yet_taken_or_in_progress: "Kısa sınava henüz giriş yapılmadı veya şuanda işlem görüyor"
+        quiz_unlimited_attempts: "Bu Kısa sınav için sınırsız hak var"
+        score_for_attempt: "%{attempt_number} Hak: %{score}"
+        survey_not_yet_taken: "Bu ankete henüz giriş yapılmadı."
+        survey_not_yet_taken_or_in_progress: "Ankete henüz giriş yapılmadı veya şu anda işlem görüyor"
+        survey_unlimited_attempts: "Bu anket için sınırsız hak var"
+        titles: 
+          score_pending_review: "Bu puan şu anda inceleme bekliyor ve değişiklik yapılabilir"
+          submission_needs_review: "Bu gönderinin gözden geçirilmesi gerekiyor"
+        unnamed_quiz_results: "%{user}'ın Kısa Sınav Sonuçları"
+        unnamed_survey_results: "%{user}'ın Anket Sonuçları"
+      index: 
+        buttons: 
+          publish_quizzes: "Kısa Sınavları Yayınla"
+        headers: 
+          assignment_quizzes: "Ödev Kısa Sınavları"
+          course_quizzes: "Ders Kısa Sınavları"
+          practice_quizzes: "Deneme Kısa Sınavları"
+          publish_multiple_quizzes: "Çoklu Kısa Sınavları Yayınla"
+          surveys: Anketler
+          unpublished_quizzes: "Yayınlanmamış Kısa Sınavlar"
+        labels: 
+          publish_multiple_quizzes: "Bu zamanlarda yayınlamak istediğiniz kısa sınavları seçiniz"
+        links: 
+          create_new_quiz: "Yeni Kısa Sınav Oluştur"
+          manage_question_banks: "Soru Bankalarını Yönet"
+          publish_multiple_quizzes: "Çoklu Kısa Sınavları Yayınla"
+        no_quizzes: "Kısa sınav bulunamadı"
+        page_titles: "Kısa sınavlar"
+        titles: 
+          this_quiz_is_locked: "Bu kısa sınav şu anda kilitlidir. Ayrıntılı bilgi için tıklayınız."
+      invalid_ip: 
+        quiz_protected: "Bu kısa sınav korumalıdır ve sadece belirli bölgeler için açık olabilir. Bilgisayarınız şu anda bu bölgelerin dışında gözüktüğünden kısa sınavı alamamış olabilirsiniz."
+        survey_protected: "Bu kısa sınav korumalıdır ve sadece belirli bölgeler için açık olabilir. Bilgisayarınız şu anda bu bölgelerin dışında gözüktüğünden kısa sınavı alamamış olabilirsiniz."
+      lockdown_browser_required: 
+        headers: 
+          requires_lockdown: "Respondus LockDown Tarayıcı Gerekiyor"
+        labels: 
+          download_lockdown: "Respondus LockDown Tarayıcıyı henüz kurmadıysanız, lütfen buradan indiriniz"
+        links: 
+          download_lockdown: "[Respondus LockDown Tarayıcıyı İndir]"
+        requires_lockdown: "Bu kısa sınav Respondus LockDown Tarayıcı gerektirmektedir. Lütfen Respondus LockDown Tarayıcıyı kısa sınava giriş esnasında veya kısa sınav sonuçlarınızı görmek istediğiniz zaman çalıştırınız."
+      managed_quiz_data: 
+        anonymous_student: "%{user_counter} öğrenci"
+        logged_out_user: "Çıkış Yapan Kullanıcı %{user_counter}"
+        titles: 
+          submission_needs_review: "Bu gönderinin gözden geçirilmesi gerekiyor"
+      moderate: 
+        add_time: "Süre Ekle"
+        buttons: 
+          change_extensions_for_selected_students: "%{n} Seçilmiş Öğrenciler için Uzatmaları Değiştir"
+          extend_time: "Süreyi Uzat"
+          save: Kaydet
+        end_quiz_reference_time_current_end: "şu anki bitiş saati"
+        end_quiz_reference_time_now: şimdi
+        end_quiz_when: "%{reference_time}'dan %{n} dakika önce kısa sınavı bitir."
+        extended_quiz_time_explanation: "Bu kısa sınav için öğrencilere mevcut hakları üzerinden ek süre verebilirsiniz. Ne kadar ek süre vermek istersiniz?"
+        finished_in: "%{duration} sürede tamamlandı"
+        global_extra_attempts: "herkes zaten %{n} alır"
+        headers: 
+          attempt: Hak
+          attempts_left: "Kalan Hak"
+          extended_quiz_time: "Kısa Sınav Süresini Uzat"
+          score: Puan
+          student: Öğrenci
+          student_extensions: "Öğrenci Uzatmaları"
+          time: Süre
+        in_progress: işleniyor
+        labels: 
+          ending: Sonlandırılıyor
+          extra_attempts: "Ek Haklar"
+          extra_time_per_attempt: "Her Hak için Ek Süre"
+          manually_unlock: "Bir sonraki giriş hakkı için kısa sınavın kilidini manuel kaldır"
+          started: Başladı
+        minutes: dakika
+        page_title: "Kısa Sınavı Esnet"
+        student_gets_extra_time: "*%{student_name}* **her bir hak için %{extra_time} ek süre alacak**"
+        student_n: "%{n} Öğrenci"
+        titles: 
+          change_user_extensions: "Kullanıcı uzatmalarını değiştir"
+          manually_unlocked: "Manuel olarak Kilitlendi"
+          minutes_to_add: "eklenecek dakikalar"
+          select_deselect_all: "Tümünü Seç/Seçimi Kaldır"
+          select_user: "%{user}'ı seç"
+      multi_answer: 
+        choose_answer: Seçin
+      muted: 
+        muted_quiz_description: "Kısa sınav sonucunuz gösterilemiyor çünkü eğitmeniniz henüz değerlendirmeyi tamamlamadı. Eğitmeniniz değerlendirmeyi tamamladığında, puanınız bu sayfada gösterilecektir."
+        muted_quiz_header: "Kısa sınavınız askıya alındı"
+      new: 
+        allowed_attempts: "İzin verilen hak sayısı"
+        anonymous_submissions: "Gönderilerin İsimsiz Olmasını Sağla"
+        buttons: 
+          not_published: Yayınlanmadı
+          published: Yayınlandı
+          save: Kaydet
+        cant_go_back: "Cevaplandırma sonrası soruları kilitle"
+        default_page_title: "Yeni Kısa Sınav"
+        group: "Ödev Grubu"
+        headers: 
+          ip_filters: "Kısa Sınav IP Filtreleri Nelerdir?"
+        hide_correct_answers_at: "Doğru Cevapları Şu zamanda Gizle"
+        hints: 
+          question_detail_disabled: "NOT: %{question_count} soru sayısından fazlası olduğunda soru ayrıntıları gösterilemez."
+          quiz_score: "anketi aldıktan sonra öğrenciler otomatik olarak tam kredi alırlar"
+        ip_filters: "Kısa sınav IP filtreleri, kısa sınavlara belirli IP aralığındaki bilgisayarlar tarafından erişimi sağlama yöntemidir.  Filtreler virgül ile ayrılmış IP adresleri ya da IP adresinden sonra belirtilen bir ağ maskesi şeklinde olabilir  (\"192.168.217.1\", \"192.168.217.1/24\" or \"192.168.217.1/255.255.255.0\")."
+        label: 
+          time_limit: "Süre Sınırı"
+        labels: 
+          allow_multiple_attempts: "Çoklu Giriş Hakkına İzin Ver"
+          hide_results_only_after_last: "Yalnızca Son Haklarından Sonra"
+          ip_filter: "IP Adreslerini Filtrele"
+          never_hide_results: "Öğrencilerin Kendi Cevaplarını Görmesine İzin Ver"
+          quiz_instructions: "Kısa Sınav Yönergeleri"
+          quiz_notify: "Kısa sınav değişikliği ile ilgili kullanıcıları bilgilendir"
+          quiz_score: Puan
+          require_access_code: "Erişim kodu gereklidir"
+          restrict_quiz: "Quiz Sınırlamaları"
+          show_question_details: "Soru Ayrıntılarını Göster"
+        limited_attempts: "İzin Verilen Hak"
+        links: 
+          cancel: İptal
+          find_questions: "Soru Ara"
+          new_question: "Yeni Soru"
+          new_question_group: "Yeni Soru Grubu"
+          show_assignment_rubric: "Değerlendirme Listesini Göster"
+        manage: Yönet
+        minutes: Dakika
+        new_assignment: "Yeni Ödev"
+        new_discussion: "Yeni Tartışma"
+        one_question_at_a_time: "Her seferinde bi soru göster"
+        points_possible: "%{n} puan"
+        quiz_title: "Kısa Sınav Başlığı"
+        quiz_type: "Kısa Sınav Türü"
+        require_lockdown_browser: "Respondus LockDown Tarayıcı Gerekli Olsun"
+        require_lockdown_browser_for_results: "Kısa sınav sonuçları görmek için gereklidir"
+        retrieving_filters: "Filtreler Alınıyor..."
+        score_to_keep: "Saklanacak Kısa Sınav Puanı"
+        show_correct_answers: "Öğrenciler Doğru Cevapları Görebilsinler"
+        show_correct_answers_at: "Doğru Cevapları Şu zamanda Göster"
+        shuffle_answers: "Cevapları Karıştır"
+        students_cannot_view_responses_after_course_concludes: "Ders sonladırıldıktan sonra öğrenciler kısa sınava verdikleri cevapları göremezler"
+        time_limit: "Kaç dakika?"
+        titles: 
+          click_to_select_filter: "Bu filtreyi seçmek için tıklayın"
+          delete: Sil
+          find_ip_address_filter: "IP Adresi Fitresi Ara"
+        warnings: 
+          has_student_submissions: "Öğrenciler zaten bu kısa sınavı aldılar yada yapmaya başladılar, bu yüzden düzenlerken dikkat etmelisiniz. Eğer kısa sınav soruları üzerinde belirgin değişiklikler yapacaksanız, bu kısa sınavın eski versiyonunu yapan öğrencilerin tekrardan değerlendirilmesini göz önünde bulundurmalısınız."
+      notices: 
+        cant_view_submission_while_muted: "Kısa sınav askıya alınmışken kısa sınav geçmişinde göremezsiniz."
+        has_submissions_already: "Aklınızda bulunsun, bazı öğrenciler bu kısa sınavı yeni almış yada tamamlamış olabilirler"
+        less_than_allotted_time: "Kısa sınavın bitişine yakın başladığından dolayı bu kısa sınavda tam zamandan faydalanamayacaksınız. "
+        no_submission_for_user: "Bu kullanıcı için hiçbir gönderi bulunamadı"
+        quiz_updated: "Kısa sınav başarıyla güncellendi"
+        quizzes_published: 
+          one: "1 kısa sınav başarıyla yayınlandı!"
+          other: "%{count} kısa sınav başarıyla yayınlandı!"
+        quizzes_unpublished: 
+          one: "kısa sınav başarıyla yayından kaldırıldı!"
+          other: "%{count} kısa sınav başarıyla yayından kaldırıldı!"
+      question_group: 
+        buttons: 
+          update: Güncelle
+        default_group_name: Grup
+        edit_questions_and_points: "*%{num_questions}* soru seç, her soru #%{num_points}# puan"
+        labels: 
+          group_name: "Grup İsmi"
+          number_of_questions: "Soru Sayısı"
+          points_per_question: "Her Soru Değeri"
+          question_bank: "Sorular soru bankasından çekilecektir"
+        links: 
+          link_to_a_question_bank: "Bir Soru Bankasına Bağla"
+        show_questions_and_points: "*%{num_questions}* soru seç, her soru #%{num_points}# puan"
+        titles: 
+          add_question_to_group: "Soruyu bu Gruba Ekle"
+          collapse_group: "Grubu Daralt"
+          delete_group: "Grubu Sil"
+          edit_group_details: "Grup Ayrıntılarını Düzenle"
+          expand_group: "Grubu Genişlet"
+      question_list_right_side: 
+        headers: 
+          questions: Sorular
+      question_statistic: 
+        attempts: 
+          one: "1 hak"
+          other: "%{count} hak"
+        empty_response: "Boş Yanıt"
+        labels: 
+          other_answers: "Diğer Cevaplar"
+        no_data: "Veri Yok"
+        no_responses: "Bu soru için hiçbir cevap kaydı bulunamadı"
+        percent_of_responses: "%{percent}% of %{total}'ı bu cevabı işaretledi"
+        response_count: 
+          one: "1 öğrenciye bu soru verildi"
+          other: "%{count} öğrenciye bu soru verildi"
+      question_teaser: 
+        titles: 
+          click_to_show_details: "Tüm soru detaylarını göstermek için tıklayın"
+          delete_this_question: "Bu Soruyu Sil"
+          edit_this_question: "Bu Soruyu Düzenle"
+      quiz_details: 
+        allowed_attempts: "İzin Verilen Hak"
+        headers: 
+          available: Kullanılabilir
+          due: Bitiş
+          points: Puanlar
+          questions: Sorular
+          time_limit: "Süre Sınırı"
+        multiple_due_dates: "Çoklu Bitiş Tarihleri"
+        no_due_date: "Bitiş tarihi yok"
+        none: Yok
+        quiz_availabile_through: "%{start_time} - %{end_time}"
+        quiz_available_after: "%{start_time}'dan sonra"
+        quiz_available_until: "%{end_time}'e kadar"
+        requires_lockdown: "Respondus LockDown Tarayıcı Gerekmektedir"
+        time_limit: 
+          one: "1 Dakika"
+          other: "%{count} Dakika"
+        unlimited: Sınırsız
+      quiz_right_side: 
+        attempts_left: 
+          one: "1 Giriş Hakkınız daha var"
+          other: "%{count} Giriş Hakkınız daha var"
+        attempts_so_far: 
+          one: "Şu ana kadar 1 Teşebbüs"
+          other: "Şu ana kadar %{count} Teşebbüs"
+        labels: 
+          current_score: "Güncel Puan"
+          kept_score: "Saklanan Puan"
+          last_attempt_details: "Son Deneme Ayrıntıları"
+          submission_details: "Gönderi Ayrıntıları"
+          time: Süre
+        links: 
+          preview_quiz_again: "Kısa Sınavı Tekrar Önizle"
+          preview_survey_again: "Anket Tekrar Önizle"
+        no_more_attempts: "Daha fazla giriş hakkı yok"
+        questions_not_graded: "Bazı sorular henüz notlandırılmadı"
+        score_set_manually: "Bu puan öğretmen tarafından ayarlandır"
+        unlimited_attempts: "Sınırsız Hak"
+        view_previous_attempts: "Önceki Teşebbüsleri Göster"
+      quiz_show_teacher: 
+        anonymous_submissions: "İsimsiz Gönderiler"
+        attempts: Girişimler
+        available_from: "Tarihinden itibaren kullanılabilir"
+        cant_go_back: "Cevaplandırma Sonrası Soruları Kilitle"
+        code: "Erişim Kodu"
+        due: Bitiş
+        filter: "IP Filtresi"
+        for: "Kim için"
+        group: "Ödev Grubu"
+        label: 
+          time_limit: "Süre Sınırı"
+        multiple_attempts: "Çoklu Giriş Hakları"
+        no_time_limit: "Süre Sınırı Yok"
+        one_question_at_a_time: "Her seferde bir soru"
+        points: Puanlar
+        quiz_type: "Kısa Sınav Türü"
+        require_lockdown_browser: "Respondus LockDown Tarayıcı Gerekli Olsun"
+        require_lockdown_browser_for_results: "Kısa Sınav Sonuçlarını Görmek için Gereklidir"
+        require_lockdown_browser_monitor: "Web Kamerası Gerekli"
+        score_to_keep: "Saklanacak Puan"
+        show_correct_answers: "Doğru Cevapları Göster"
+        shuffle_answers: "Cevapları Karıştır"
+        time_limit: 
+          one: "1 Dakika"
+          other: "%{count} Dakika"
+        until: "Şu zamana kadar"
+        view_responses: "Yanıtları Göster"
+      quiz_submission: 
+        attempt_duration: "Bu etkinlik %{duration} devam etti."
+        buttons: 
+          update_scores: "Notları Güncelle"
+        labels: 
+          final_score: "Final Puanı"
+          fudge_points: "Puanları Uydur"
+          fudge_points_changed_points_quiz: "%{user} bu kısa sınavı aldığı için olası puanların sayısı %{difference} kadar değişti. Bu değişikliği ayarlayabilir ve bu kutuyu kullanarak manuel olarak artı ya da eksi puanlar ekleyebilirsiniz."
+          fudge_points_changed_points_survey: "%{user} bu ankete katıldığı için olası puanların sayısı %{difference} kadar değişti. Bu değişikliği ayarlayabilir ve bu kutuyu kullanarak manuel olarak artı ya da eksi puanlar ekleyebilirsiniz."
+          fudge_points_generic_explanation: "Kutucuğa negatif veya pozitif puan ekleyerek puanı manuel ayarlayabilirsiniz."
+          questions_need_review: "Aşağıdaki soruların gözden geçirilmesi gerekiyor"
+          quiz_score: "Kısa Sınav Puanı"
+          score_for_attempt: "Bu denemenin puanı"
+          score_for_quiz: "Bu kısa sınavın puanı"
+          score_for_survey: "Bu anketin puanı"
+          survey_score: "Anket Puanı"
+        links: 
+          click_to_view_results: "Sonuçları görmek için tıklayınız."
+        questions_not_graded: "Bazı sorular henüz notlandırılmadı"
+        quiz_fudged_negative: "Bu kısa sınavda manuel olarak %{fudge} puan ayarlama yapılmıştır."
+        quiz_fudged_positive: "Bu kısa sınavda manuel olarak +%{fudge} puan ayarlama yapılmıştır."
+        quiz_not_yet_taken: "Kısa sınava henüz giriş yapılmadı."
+        quiz_results_protected: "Bu kısa sınav sonuçları korumalıdır ve öğrencilere gösterilmemektedir."
+        quiz_results_protected_until_last_attempt: "Bu kısa sınav sonuçları korumalıdır ve öğrenciler son giriş haklarını kullanana kadar puanlarını göremeyeceklerdir."
+        quiz_submission_needs_review: "Bu gönderi yapıldıktan sonra bu kısa sınavın yapısı önemli ölçüde değiştirildi. Bu gönderinin yeniden notlandırılması gerekebilir."
+        requires_lockdown: "Kısa sınav sonuçlarınızı görebilmeniz için Respondus LockDown Tarayıcı gerekiyor."
+        submitted_at: "%{when}'ta gönderildi"
+        survey_fudged_negative: "Bu anket puanında manuel olarak %{fudge} puan ayarlama yapılmıştır."
+        survey_fudged_positive: "Bu anket puanında manuel olarak +%{fudge} puan ayarlama yapılmıştır."
+        survey_not_yet_taken: "Kısa sınava henüz giriş yapılmadı."
+      quiz_summary: 
+        assignment_points_possible: 
+          one: "1 puan"
+          other: "%{count} puan"
+        labels: 
+          allowed_attempts: "İzin Verilen Hak"
+          attempts_left: "Kalan Hak"
+          attempts_so_far: "Şu ana kadarki Teşebbüsler"
+          latest_submission: "Son Gönderi"
+          quiz_details: "Kısa Sınav Ayrıntıları"
+          quiz_due: Bitiş
+          quiz_time_limit: "Süre Sınırı"
+          survey_details: "Anket Detayları"
+        no_details: "Ayrıntı Yok"
+        points_possible: "%{points_possible} olası puan"
+        question_count: 
+          one: "1 Soru"
+          other: "%{count} Soru"
+        quiz_multiple_due_dates: "Çoklu Tarih"
+        quiz_no_points: "Puan Yok"
+        quiz_points_possible: 
+          one: "1 Puan"
+          other: "%{count} Puan"
+        student_mute_notification: "Öğretim elemanı notlar üzerinde çalışıyor"
+        unlimited_attempts: "Sınırsız Hak"
+      read_only: 
+        default_page_title: "Yeni Kısa Sınav"
+        headers: 
+          quiz_details: "Kısa Sınav Ayrıntıları"
+        labels: 
+          question_details: "Soru Ayrıntılarını Göster"
+          quiz_instructions: "Kısa Sınav Yönergeleri"
+        links: 
+          back_to_quiz_page: "Kısa Sınav Sayfasına Geri Dön"
+      refresh_quiz_after_popup: 
+        headers: 
+          loading_in_lockdown: "Kısa Sınav Respondus LockDown Tarayıcısında yükleniyor"
+      show: 
+        buttons: 
+          lock_quiz: "Kısa Sınavı Şimdi Kilitle"
+          lock_survey: "Anketi Şimdi Kilitle"
+          publish: Yayınla
+          republish: "Tekrar Yayınla"
+          unlock_quiz: "Öğrenciler bu Kısa Sınavı Şimdi Yapabilsinler"
+          unlock_survey: "Öğrenciler Anketi Şimdi Alabilsin"
+        labels: 
+          available_until: "Şu zamana kadar"
+          no_time_limit: "Süre sınırı yok"
+          warning_icon: Uyarı
+        links: 
+          edit: Düzenle
+          keep_editing_this_quiz: "Kısa Sınavı Düzenlemeye Devam Et"
+          keep_editing_this_survey: "Anketi Düzenlemeye Devam Et"
+          message_students_who: "... Yapan Öğrencileri Göster"
+          moderate_this_quiz: "Kısa Sınavı Yönet"
+          moderate_this_survey: "Anketi Esnet"
+          preview: "Ön İzleme"
+          quiz_statistics: "Kısa Sınav İstatistikleri"
+          see_full_quiz: "Kısa Sınavın Tamamını Gör"
+          show_assignment_rubric: "Değerlendirme Listesini Göster"
+          show_student_quiz_results: "Kısa Sınav İçin Öğrenci Cevaplarını Göster"
+          show_student_survey_results: "Öğrenci Anket Sonuçlarını Göster"
+          survey_statistics: "Anket İstatistikleri"
+        manage: Yönet
+        only_registered_users: "Sadece kayıtlı kullanıcılar bu notlandırılmış kısa sınavları alabilirler"
+        quiz_regraded_your_score_affected: 
+          one: "Bu kısa sınav tekrar değerlendirildi; yeni puanınız etkilendi."
+          other: "Bu kısa sınav tekrar değerlendirildi; yeni puanınız %{count} sorudan etkilendi."
+        quiz_regraded_your_score_not_affected: "Bu kısa sınav tekrar değerlendirildi; puanınız değişmedi."
+        speed_grader: SpeedGrader™
+        students_submitted_so_far: 
+          one: "Şimdiye kadar 1 öğrenci gönderdi"
+          other: "Şimdiye kadar %{count} öğrenci gönderdi"
+        titles: 
+          delete: Sil
+          related_items: "İlişkili Öğeler"
+          unlock_for_how_long: "Kısa sınavı ne kadar süreliğine açmak istersiniz?"
+        warnings: 
+          draft_version: "Kısa sınavın taslak versiyonunun ön izlemesi"
+      single_answer: 
+        upload: Yükle
+      statistics: 
+        class_too_large: "Bu ders istatistikleri görüntülemek için çok büyük. Yine de sağ kenar çubuğunda indirilebilir."
+        headers: 
+          for_question: "%{question_name} için"
+          quiz_statistics: "Kısa Sınav İstatistikleri"
+          survey_statistics: "Anket İstatistikleri"
+          users_have_taken_this_quiz: "%{count} kullanıcı kısa sınavı yaptı"
+          users_have_taken_this_survey: "%{count} kullanıcı bu anketi yaptı"
+        labels: 
+          average_correct: "Doğru Ortalaması"
+          average_incorrect: "Yanlış Ortalaması"
+          average_time: "Ortalama Süre"
+          high_score: "Yüksek Puan"
+          low_score: "Düşük Puan"
+          mean_score: "Ortalama Puan"
+          standard_deviation: "Standart Sapma"
+          users_selected_the_answer: "Aşağıdaki kullanıcılar %{answer_text} seçeneğini seçti"
+        links: 
+          count_all_attempts: "**Tüm** Teşebbüsleri Say"
+          count_only_latest_attempts: "Sadece Her Son Giriş Hakkını Say"
+        page_title: İstatistikler
+        quiz_all_version_disclaimer: "Bu rapor, tüm kullanıcılar için tüm giriş haklarına dayalı kısa sınav istatistiklerini göstermektedir."
+        quiz_latest_version_disclaimer: "Bu rapor, her bir kullanıcı için son giriş haklarına dayalı kısa sınav istatistiklerini göstermektedir."
+        student_n: "%{student_counter} öğrenci"
+        survey_all_version_disclaimer: "Bu rapor, tüm kullanıcılar için tüm giriş haklarına dayalı anket istatistiklerini göstermektedir."
+        survey_latest_version_disclaimer: "Bu rapor, her bir öğrenci için tüm giriş haklarına dayalı anket istatistiklerini göstermektedir."
+      statistics_crumb: İstatistikler
+      submission_version: 
+        attempt_number: "%{att_no}. hak"
+        kept: SAKLANDI
+        latest: "EN SON"
+      submission_versions: 
+        attempt: Hak
+        attempt_history: "Hak Geçmişi"
+        quiz_attempt_history_description: "Bu tabloda kısa sınav giriş geçmişiniz gösterilmektedir. Her teşebbüs sol taraftadır. Teşebbüs, süre ve puan üst bölümde yer almaktadır."
+        regraded: "Yeniden notladırıldı"
+        score: Puan
+        time: Süre
+      take_quiz: 
+        buttons: 
+          next: Sonraki
+          out_of_time_submit: "Tamam, güzel"
+          previous: Önceki
+          submit_quiz: "Kısa Sınavı Gönder"
+        headers: 
+          draft_preview: "Kısa sınavın taslak versiyonunun ön izlemesi"
+        labels: 
+          started: Başladı
+          times_up: "Süreniz Doldu! Sonuçlar gönderiliyor"
+        logged_out_of_canvas: "*Canvas'taki oturumunuz sonlandı.* Devam etmek için lütfen oturum açınız"
+        login_required: "Oturum Açmak Gerekiyor"
+        not_saved: Kaydedilmedi
         quiz_instructions: "Kısa Sınav Yönergeleri"
-      links: 
-        back_to_quiz_page: "Kısa Sınav Sayfasına Geri Dön"
-    refresh_quiz_after_popup: 
-      headers: 
-        loading_in_lockdown: "Kısa Sınav Resoındus LockDown Tarayıcısında yükleniyor"
+      take_quiz_in_popup: 
+        headers: 
+          loading_in_lockdown: "Kısa Sınav Resoındus LockDown Tarayıcısında yükleniyor"
+        links: 
+          return_to_quiz_page: "Kısa sınav sayfasına dönmek için [buraya tıklayınız](%{url})"
+      take_quiz_right_side: 
+        labels: 
+          attempt_due: "Hak bitiş tarihi"
+          score: Puan
+          time_elapsed: "Geçen Süre"
+          time_running: "İşleyen Süre"
+        links: 
+          hide_time_running: Gizle
+          keep_editing_quiz: "Kısa Sınavı Düzenlemeye Devam Et"
+          keep_editing_survey: "Anketi Düzenlemeye Devam Et"
     retrieving_filters: "Filtreler Alınıyor..."
     rubric: 
       loading: Yükleniyor...
@@ -11799,114 +12040,35 @@ tr:
         you_answered: "Sizin Cevabınız"
       buttons: 
         already_published: Yayınlandı!
-        lock_quiz: "Kısa Sınavı Şimdi Kilitle"
-        lock_survey: "Anketi Kilitle"
-        publish: Yayınla
         publishing: Yayınlanıyor...
-        republish: "Tekrar Yayınla"
-        unlock_quiz: "Öğrenciler bu Kısa Sınavı Şimdi Yapabilsinler"
-        unlock_survey: "Anketi Öğrencilerin Almasına İzin Ver"
       confirms: 
         delete_quiz: "Kısa sınavı silmek istediğinize emin misiniz?"
         delete_quiz_submissions_warning: 
           one: "Uyarı : 1 öğrenci zaten bu kısa sınava giriş yaptı. Eğer silerseniz , tamamlanmış gönderiler silinecek ve notlar kısmında gözükmeyecektir."
           other: "Uyarı : %{count} öğrenci zaten bu kısa sınava giriş yaptı. Eğer silerseniz , tamamlanmış gönderiler silinecek ve notlar kısmında gözükmeyecektir."
-      labels: 
-        available_until: "Şu zamana kadar"
-        no_time_limit: "Zaman limiti yok"
-        warning_icon: Uyarı
       links: 
-        edit: Düzenle
         hide_student_quiz_results: "Öğrenci Kısa Sınav Sonuçlarını Gizle"
         hide_student_survey_results: "Öğrenci Anket Sonuçlarını Gizle"
-        keep_editing_this_quiz: "Kısa Sınavı Düzenlemeye Devam Et"
-        keep_editing_this_survey: "Anketi Düzenlemeye Devam Et"
-        message_students_who: "... Yapan Öğrencileri Göster"
-        moderate_this_quiz: "Kısa Sınavı Yönet"
-        moderate_this_survey: "Anketi Yönet"
-        preview: "Ön izleme"
-        quiz_statistics: "Kısa Sınav İstatistikleri"
-        see_full_quiz: "Kısa Sınavın Tamamını Gör"
-        show_assignment_rubric: "Değerlendirme Listesini Göster"
         show_student_quiz_results: "Kısa Sınav İçin Öğrenci Cevaplarını Göster"
         show_student_survey_results: "Öğrenci Anket Sonuçlarını Göster"
-        survey_statistics: "Anket İstatistikleri"
-      manage: Yönet
-      only_registered_users: "Sadece kayıtlı kullanıcılar bu notlandırılmış kısa sınavlarını alabilirler"
-      quiz_regraded_your_score_affected: 
-        one: "Bu kısa sınav tekrar değerlendirildi; puanınız değişmedi."
-        other: "Bu kısa sınav tekrar değerlendirildi; yeni puanınız %{count} sorudan etkilendi."
-      quiz_regraded_your_score_not_affected: "Bu kısa sınav tekrar değerlendirildi; puanınız değişmedi."
-      speed_grader: SpeedGrader™
-      students_submitted_so_far: 
-        one: "Şimdiye kadar 1 öğrenci gönderdi"
-        other: "Şimdiye kadar %{count} öğrenci gönderdi"
       students_who_have_not_taken_the_quiz: "Kısa sınavı ALMAYAN öğrenciler"
       students_who_have_taken_the_quiz: "Kısa sınavı alan öğrenciler"
-      titles: 
-        delete: Sil
-        related_items: "İlişkili Öğeler"
-        unlock_for_how_long: "Kısa sınavı ne kadar süre açmak istersiniz?"
-      warnings: 
-        draft_version: "Kısa sınavın taslak versiyonunun ön izlemesi"
     show_and_hide_correct_answers: "%{from}'dan %{to}'a"
     show_correct_answers_after: "%{date}'dan sonra"
     show_correct_answers_immediately: Hemen
     show_correct_answers_until: "%{date}'e kadar"
-    single_answer: 
-      upload: Yükle
     statistics: 
-      class_too_large: "Bu ders istatistiklerini görüntülemek için çok büyük. Sağ kenar çubuğunda hala indirilmektedir."
       count_attempts: 
         one: "1 hak"
         other: "%{count} hak"
-      headers: 
-        for_question: "%{question_name} için"
-        quiz_statistics: "Kısa Sınav İstatistikleri"
-        survey_statistics: "Anket İstatistikleri"
-        users_have_taken_this_quiz: "%{count} kullanıcı kısa sınavı yaptı"
-        users_have_taken_this_survey: "%{count} kullanıcı bu anketi yaptı"
-      labels: 
-        average_correct: "Doğru Ortalaması"
-        average_incorrect: "Yanlış Ortalaması"
-        average_time: "Ortalama Zaman"
-        high_score: "Yüksek Puan"
-        low_score: "Düşük Puan"
-        mean_score: "Ortalama Puan"
-        standard_deviation: "Standart Sapma"
-        users_selected_the_answer: "Aşağıdaki kullanıcılar %{answer_text} seçeneğini seçti"
-      links: 
-        count_all_attempts: "**Tüm** Giriş Hakları Sayısı"
-        count_only_latest_attempts: "Sadece Her Son Giriş Hakkını Say"
-      page_title: İstatistikler
-      quiz_all_version_disclaimer: "Bu rapor, tüm kullanıcılar için tüm giriş haklarına dayalı kısa sınav istatistiklerini göstermektedir."
-      quiz_latest_version_disclaimer: "Bu rapor, her bir kullanıcı için son giriş haklarına dayalı kısa sınav istatistiklerini göstermektedir."
-      survey_all_version_disclaimer: "Bu rapor, tüm kullanıcılar için tüm giriş haklarına dayalı anket istatistiklerini göstermektedir."
-      survey_latest_version_disclaimer: "Bu rapor, her bir öğrenci için tüm giriş haklarına dayalı anket istatistiklerini göstermektedir."
       titles: 
         submitted_users_for_quesiton: "%{user} için Gönderilen Kullanıcılar"
       uncounted_submissions: 
         one: "1 diğer gönderi"
         other: "%{count} diğer gönderi"
-    statistics_crumb: İstatistikler
-    submission_version: 
-      attempt_number: "%{att_no}. hak"
-      kept: KEPT
-      latest: "EN SON"
-    submission_versions: 
-      attempt: "Giriş Hakkı"
-      attempt_history: "Giriş Hakkı Geçmişi"
-      quiz_attempt_history_description: "Bu tabloda kısa sınav giriş geçmişiniz gösterilmektedir. Her girişiniz sol taraftadır. Giriş zamanı ve puanları üzerinde yer almaktadır."
-      regraded: "Tekrar Değerlendir"
-      score: Puan
-      time: Zaman
+    survey: Anket
     surveys_label: "Anket görünürlüğünü değiştir"
     take_quiz: 
-      buttons: 
-        next: Sonraki
-        out_of_time_submit: "Tamam, güzel"
-        previous: Önceki
-        submit_quiz: "Kısa Sınavı Gönder"
       confirms: 
         cant_go_back_blank: "Bu soruda geri gidemezsiniz, öncelikle ileriyi tıklamalısınız. Boş bırakmak istediğinize emin misiniz?"
         navigate_away: "Sayfadan ayrılmak üzeresiniz. Devam etmek istiyormusunuz?"
@@ -11923,25 +12085,20 @@ tr:
       errors: 
         connection_lost: "%{host} sunucusuna bağlantı kayboldu. Internet'e bağlı olduğunuzdan emin olun ve tekrar deneyin."
         only_numerical_values: "sadece sayısal değerler kabul edilir"
-      headers: 
-        draft_preview: "Kısa sınavın taslak versiyonunun ön izlemesi"
       hide_time_link: Gizle
       hours_count: 
         one: "1 Saat"
         other: "%{count} Saat"
       labels: 
-        started: Başladı
         time_elapsed: "Geçen Zaman"
-        times_up: "Süreniz Doldu! Sonuç için gönderiliyor"
-      logged_out_of_canvas: "*Canvas'taki oturumunuz sonlandı.* Devam etmek için lütfen oturum açınız"
-      login_required: "Oturum Açmak Gerekiyor"
+      login_failed: "Oturum açma başarısız."
+      login_successful: "Oturum açma başarılı"
       minutes_count: 
         one: "1 Dakika"
         other: "%{count} Dakika"
       months_count: 
         one: "1 Ay"
         other: "%{count} Ay"
-      not_saved: Kaydedilmedi
       notices: 
         extra_time: "Bu giriş hakkı için ek süre hakkı tanı"
         five_minutes_left: "Beş Dakika Kaldı"
@@ -11951,7 +12108,6 @@ tr:
         twelve_hours_left: "Yirmi Saat Kaldı"
       question_answered: Cevaplandı
       question_unanswered: "Henüz Cevaplanmadı"
-      quiz_instructions: "Kısa Sınav Yönergeleri"
       saved_at: "%{t} saatinde kısa sınavınız kaydedildi"
       saving: Kaydediliyor...
       saving_not_needed: "Yeni veri kaydedilmedi. En son temas %{t}"
@@ -11965,21 +12121,6 @@ tr:
       years_count: 
         one: "1 Yıl"
         other: "%{count} Yıl"
-    take_quiz_in_popup: 
-      headers: 
-        loading_in_lockdown: "Kısa Sınav Resoındus LockDown Tarayıcısında yükleniyor"
-      links: 
-        return_to_quiz_page: "Kısa sınav sayfasına dönmek için [tıklayınız](%{url})"
-    take_quiz_right_side: 
-      labels: 
-        attempt_due: "Hak bitiş tarihi"
-        score: Puan
-        time_elapsed: "Geçen Zaman"
-        time_running: "Zaman İşliyor"
-      links: 
-        hide_time_running: Gizle
-        keep_editing_quiz: "Kısa Sınavı Düzenlemeye Devam Et"
-        keep_editing_survey: "Anketi Düzenlemeye Devam Et"
     timing: 
       labels: 
         time_elapsed: "Geçen Zaman"
@@ -12016,6 +12157,19 @@ tr:
     types: 
       quiz: "Kısa Sınav"
       survey: Anket
+  quizzes/quiz_group: 
+    errors: 
+      no_bank: "Kısa sınav grubu %{group_name} için soru bankası bulunamadı"
+      no_permissions: "Kullanıcının %{group_name} quiz grubundaki soru bankasına ilişkin izni yoktu"
+    question_group: "Soru Grubu"
+  quizzes/quiz_question: 
+    defaults: 
+      question_name: Soru
+  quizzes/quiz_statistics: 
+    statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} Raporu"
+    types: 
+      item_analysis: "Öğe Analizi"
+      student_analysis: "Öğrenci Analizi"
   quizzes_model: 
     cant_unpublish_when_students_submit: "Öğrenci gönderileri varsa yayından kaldırılamaz"
     confirms: 
@@ -12424,16 +12578,6 @@ tr:
         go: Git
       titles: 
         find_user: "Kullanıcı Bul"
-    accounts_secondary_content: 
-      buttons: 
-        go: Git
-      links: 
-        manage_permissions: "Rol İzinlerini Yönet"
-        manage_subaccounts: "Alt Hesapları Yönet"
-        manage_terms: "Dönemleri Yönet"
-        view_statistics: "İstatistikleri göster"
-      titles: 
-        find_user: "Kullanıcı Bul"
     add_assignment: 
       buttons: 
         add_assignment: "Ödev Ekle"
@@ -12534,6 +12678,9 @@ tr:
         unenroll_user_section: "Kullanıcıyı Bölümden Sil"
       titles: 
         course_section: "Ders Bölümü"
+    error_form: 
+      message_failed: "Rapor gönderilemedi. Tekrar deneyin."
+      message_sent: "Yardımlarınız için teşekkürler! Hemen bakıyoruz."
     errors: 
       400_message: 
         description: "Huh. Görünüşe göre sayfanın yükleme isteğinde bir problem meydana geldi."
@@ -12560,8 +12707,6 @@ tr:
           submit: "Yorumları Gönder"
         labels: 
           email: "E-Posta (opsiyonel)"
-        message_failed: "Rapor yollanamadı. Tekrar deneyin."
-        message_sent: "Yardımlarınız için teşekkürler! Elimizden geleni yapacağız."
     event_list: 
       at_least_more_events: "en az %{count_of_events} daha"
       at_least_more_events_one_week: "gelecek hafta en az %{count_of_events} daha"
@@ -13110,6 +13255,13 @@ tr:
     columns: 
       date: Tarih
       value: Değer
+    domain_not_found: 
+      body_description: "Lütfen URL'yi kontrol edip tekrar deneyin ya da yardım için kurum veya öğretmen ile iletişime geçin."
+      body_reference: "Belirli bir kuruma bağlı olmadan ücretsiz bir Canvas hesabını burada oluşturabilirsiniz"
+      links: 
+        canvas_instructure: canvas.instructure.com
+      page_title: "Oops, Canvasınızı bulamadık."
+      you_typed: Yazdınız
     institution_suspended: 
       body: "Okulunuzun Canvas hesabı geçici olarak donduruldu. Lütfen Canvas yöneticisi ile iletişime geçiniz."
       links: 
@@ -13140,8 +13292,12 @@ tr:
     assignment_order_assignment_groups: "Ödev Grubu ve Durumuna Göre"
     assignment_order_due_date: "Bitiş Tarihine Göre"
     assignment_unmuted: "Devre dışı bırakmak için tıklayın."
+    invalid_group_warning: 
+      one: "Not: Olası puanları olmadığı için not %{list_of_group_names} grubundan ödevler içermiyor."
+      other: "Not: Olası puanları olmadığı için not %{list_of_group_names} gruplarından ödevler içermiyor."
     no_assignment: "Seçili Ödev Yok"
     no_student: "Seçili Öğrenci Yok"
+    notes: Notlar
     student_hidden_name: "Öğrenci %{position}"
   statistics: 
     csv_columns: 
@@ -13168,6 +13324,11 @@ tr:
     not_available: "Şu tarihte kullanılabilir"
     pending: "Şu zamana kadar kullanılamaz"
   step: Adım
+  student_outcome_gradebook_description: |-
+      Öğrenme Çıktısı Not Defteri öğrencilerin dersin öğrenme çıktılarına göre ders ilerleme 
+      durumunu hızlı bir şekilde incelemelerini sağlar. Öğrenme çıktıları Not defterine
+      benzer bir formatta sunulur ve öğrenci ilerlemesi hem sayısal değer hem de yeterli/yeterli
+      sayılır/telafi olarak gösterilir.
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "İçinde dersler bulunan bir alt hesabı silemezsiniz"
@@ -13405,6 +13566,10 @@ tr:
         term_start: "dönem başı"
         unspecified: "olduğu her zaman"
       timespan: "%{start_at} *ile* %{end_at} arası"
+  text_helper: 
+    time: 
+      ranges: 
+        different_days: "%{start_date_and_time} ile %{end_date_and_time} arası"
   time: 
     am: am
     count_hours_ago: 
