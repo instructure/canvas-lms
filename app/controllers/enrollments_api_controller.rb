@@ -376,7 +376,7 @@ class EnrollmentsApiController < ApplicationController
   #
   # @returns Enrollment
   def destroy
-    @enrollment = Enrollment.find(params[:id])
+    @enrollment = @context.enrollments.find(params[:id])
     task = %w{conclude delete}.include?(params[:task]) ? params[:task] : 'conclude'
 
     unless @enrollment.send("can_be_#{task}d_by", @current_user, @context, session)
