@@ -62,9 +62,7 @@ routes.draw do
       match 'reorder' => 'question_banks#reorder', :as => :reorder
       match 'questions' => 'question_banks#questions', :as => :questions
       match 'move_questions' => 'question_banks#move_questions', :as => :move_questions
-      resources :assessment_questions do
-        match 'move' => 'assessment_questions#move', :as => :move_question
-      end
+      resources :assessment_questions
     end
   end
 
@@ -596,9 +594,7 @@ routes.draw do
       match 'reorder' => 'question_banks#reorder', :as => :reorder
       match 'questions' => 'question_banks#questions', :as => :questions
       match 'move_questions' => 'question_banks#move_questions', :as => :move_questions
-      resources :assessment_questions do
-        match 'move' => 'assessment_questions#move', :as => :move_question
-      end
+      resources :assessment_questions
     end
 
     resources :user_lists, :only => :create
