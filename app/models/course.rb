@@ -1197,15 +1197,15 @@ class Course < ActiveRecord::Base
     return [] unless user
     @associated_account_ids ||= (self.associated_accounts + [Account.site_admin]).map { |a| a.active? ? a.id : nil }.compact
     @account_users ||= {}
-    @account_users[user] ||= Shard.partition_by_shard(@associated_account_ids) do |account_chain_ids|
+    @account_users[user.global_id] ||= Shard.partition_by_shard(@associated_account_ids) do |account_chain_ids|
       if account_chain_ids == [Account.site_admin.id]
         Account.site_admin.account_users_for(user)
       else
         AccountUser.where(:account_id => account_chain_ids, :user_id => user).all
       end
     end
-    @account_users[user] ||= []
-    @account_users[user]
+    @account_users[user.global_id] ||= []
+    @account_users[user.global_id]
   end
 
   def account_membership_allows(user, session, permission = nil)
