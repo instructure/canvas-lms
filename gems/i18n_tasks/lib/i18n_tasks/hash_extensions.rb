@@ -1,6 +1,5 @@
-module I18n
+module I18nTasks
   module HashExtensions
-
     def flatten_keys(result={}, prefix='')
       each_pair do |k, v|
         if v.is_a?(Hash)
@@ -16,7 +15,7 @@ module I18n
       each_pair do |k, v|
         parts = k.split('.')
         last = parts.pop
-        parts.inject(result){ |h, k2| h[k2] ||= {}}[last] = v
+        parts.inject(result) { |h, k2| h[k2] ||= {} }[last] = v
       end
       result
     end
@@ -29,5 +28,6 @@ module I18n
       end
     end
 
+    Hash.send(:include, HashExtensions)
   end
 end

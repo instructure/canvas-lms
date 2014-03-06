@@ -1,4 +1,4 @@
-module I18n
+module I18nTasks
   module Lolcalize
     def translate_with_lols(key, options = {})
       if options[:default]

@@ -1,5 +1,5 @@
-require 'i18n/hash_extensions'
-require 'json'
+require 'i18n_tasks'
+require 'i18n_extraction'
 
 namespace :i18n do
   def infer_scope(filename)
@@ -23,7 +23,8 @@ namespace :i18n do
 
   desc "Verifies all translation calls"
   task :check => :environment do
-    Bundler.require :i18n_tools
+    require 'ya2yaml'
+
     only = if ENV['ONLY']
       ENV['ONLY'].split(',').map{ |path|
         path = '**/' + path if path =~ /\*/
@@ -160,16 +161,13 @@ namespace :i18n do
     require 'active_record'
     I18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}')]
 
-    require 'i18n'
     require 'i18nema'
-    require 'i18n_extraction'
-    require 'lib/i18n/utils'
 
     I18n.backend = I18nema::Backend.new
     I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
     I18n.backend.init_translations
 
-    Hash.send :include, I18n::HashExtensions
+    Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
     file_translations = {}
 
@@ -219,7 +217,7 @@ namespace :i18n do
 
     dump_translations = lambda do |translation_name, translations|
       file = "public/javascripts/translations/#{translation_name}.js"
-      content = I18n::Utils.dump_js(translations, locales)
+      content = I18nTasks::Utils.dump_js(translations, locales)
       if !File.exist?(file) || File.read(file) != content
         File.open(file, "w"){ |f| f.write content }
       end
@@ -232,14 +230,14 @@ namespace :i18n do
     # in addition to getting the non-en stuff into each scope_file, we need to get the core
     # formats and stuff for all languages (en included) into the common scope_file
     core_translations = I18n.available_locales.inject({}) { |h1, locale|
-      h1[locale.to_s] = all_translations[locale].slice(*I18n::Utils::CORE_KEYS)
+      h1[locale.to_s] = all_translations[locale].slice(*I18nTasks::Utils::CORE_KEYS)
       h1
     }
     dump_translations.call('_core_en', {'en' => core_translations.delete('en')})
     dump_translations.call('_core', core_translations)
   end
 
-  desc 'Generate the pseudo-translation file lolz'
+  desc "Generate the pseudo-translation file lolz"
   task :generate_lolz => [:generate, :environment] do
     strings_processed = 0
     process_lolz = Proc.new do |val|
@@ -264,7 +262,7 @@ namespace :i18n do
     t = Time.now
     translations = YAML.safe_load(open('config/locales/generated/en.yml'))
 
-    I18n.send :extend, I18n::Lolcalize
+    I18n.send :extend, I18nTasks::Lolcalize
     lolz_translations = Hash.new
     lolz_translations['lolz'] = process_lolz.call(translations['en'])
     puts
@@ -294,7 +292,7 @@ namespace :i18n do
 
   desc "Exports new/changed English strings to be translated"
   task :export => :environment do
-    Hash.send :include, I18n::HashExtensions
+    Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
     begin
       base_filename = "config/locales/generated/en.yml"
@@ -399,7 +397,7 @@ namespace :i18n do
   task :import, [:source_file, :translated_file] => :environment do |t, args|
     require 'ya2yaml'
     require 'open-uri'
-    Hash.send(:include, I18n::HashExtensions) unless Hash.new.kind_of?(I18n::HashExtensions)
+    Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
     if args[:source_file]
       source_translations = YAML.safe_load(open(args[:source_file]))
@@ -421,7 +419,7 @@ namespace :i18n do
       end until new_translations
     end
 
-    import = I18nImport.new(source_translations, new_translations)
+    import = I18nTasks::I18nImport.new(source_translations, new_translations)
 
     complete_translations = import.compile_complete_translations do |error_items, description|
       begin
@@ -449,6 +447,7 @@ namespace :i18n do
   desc "Imports new translations, ignores missing or unexpected keys"
   task :autoimport, [:translated_file, :source_file] => :environment do |t, args|
     require 'open-uri'
+    
     if args[:source_file].present?
       source_translations = YAML.safe_load(open(args[:source_file]))
     else
@@ -460,12 +459,12 @@ namespace :i18n do
 
   def autoimport(source_translations, new_translations)
     require 'ya2yaml'
-    Hash.send(:include, I18n::HashExtensions) unless Hash.new.kind_of?(I18n::HashExtensions)
+    Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
     raise "Need source translations" unless source_translations
     raise "Need translated_file" unless new_translations
 
-    import = I18nImport.new(source_translations, new_translations)
+    import = I18nTasks::I18nImport.new(source_translations, new_translations)
 
     puts import.language
     complete_translations = import.compile_complete_translations do |error_items, description|
@@ -494,6 +493,8 @@ namespace :i18n do
   end
 
   def transifex_download(user, password, languages)
+    require 'json'
+
     transifex_url = "http://www.transifex.com/api/2/project/canvas-lms/"
     translation_url = transifex_url + "resource/canvas-lms/translation"
     userpass = "#{user}:#{password}"
@@ -531,6 +532,4 @@ namespace :i18n do
       autoimport(source_translations, new_translations)
     end
   end
-
 end
-

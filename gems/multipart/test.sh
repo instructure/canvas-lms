@@ -2,6 +2,7 @@
 result=0
 
 
+
 bundle install
 bundle exec rspec spec
 result+=$?

@@ -1,10 +1,8 @@
-module I18n
+module I18nTasks
   module Utils
     CORE_KEYS = [:date, :time, :number, :datetime, :support]
 
     def self.dump_js(translations, locales = I18n.available_locales)
-      Hash.send :include, I18n::HashExtensions unless Hash.new.kind_of?(I18n::HashExtensions)
-
       # include all locales (even if untranslated) to avoid js errors
       locales.each { |locale| translations[locale.to_s] ||= {} }
 

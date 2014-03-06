@@ -11,7 +11,7 @@ I18n.backend.init_translations
 
 I18n.enforce_available_locales = true
 
-I18n.send :extend, I18n::Lolcalize if ENV['LOLCALIZE']
+I18n.send :extend, I18nTasks::Lolcalize if ENV['LOLCALIZE']
 
 module I18nUtilities
   def before_label(text_or_key, default_value = nil, *args)

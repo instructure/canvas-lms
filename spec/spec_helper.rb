@@ -195,6 +195,8 @@ require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
 require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 
+require 'i18n_tasks'
+
 # if mocha was initialized before rails (say by another spec), CollectionProxy would have
 # undef_method'd them; we need to restore them
 unless CANVAS_RAILS2

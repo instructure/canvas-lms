@@ -1,3 +1,5 @@
+load 'gems/i18n_tasks/lib/tasks/i18n.rake'
+
 $canvas_tasks_loaded ||= false
 unless $canvas_tasks_loaded
 $canvas_tasks_loaded = true
