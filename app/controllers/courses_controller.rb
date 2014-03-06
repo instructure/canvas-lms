@@ -1325,6 +1325,7 @@ class CoursesController < ApplicationController
         end
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
+        set_urls_and_permissions_for_assignment_index
         get_sorted_assignments
       when 'modules'
         add_crumb(t('#crumbs.modules', "Modules"))
@@ -1928,4 +1929,16 @@ class CoursesController < ApplicationController
     changes
   end
 
+  def set_urls_and_permissions_for_assignment_index
+    permissions = {manage: false}
+    js_env({
+      :URLS => {
+        :new_assignment_url => new_polymorphic_url([@context, :assignment]),
+        :course_url => api_v1_course_url(@context),
+        :context_modules_url => api_v1_course_context_modules_path(@context),
+        :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
+      },
+      :PERMISSIONS => permissions,
+    })
+  end
 end

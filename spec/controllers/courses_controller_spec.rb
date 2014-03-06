@@ -363,6 +363,15 @@ describe CoursesController do
         assigns(:recent_feedback).first.assignment_id.should == @a1.id
       end
 
+      it "should disable management and set env urls on assignment homepage" do
+        @course1.default_view = "assignments"
+        @course1.save!
+        @course1.account.enable_feature!(:draft_state)
+        get 'show', :id => @course1.id
+        controller.js_env[:URLS][:new_assignment_url].should_not be_nil
+        controller.js_env[:PERMISSIONS][:manage].should be_false
+      end
+
       it "should not show unpublished assignments to students" do
         @course1.default_view = "assignments"
         @course1.save!
