@@ -1036,6 +1036,25 @@ describe EnrollmentsApiController, type: :request do
           }
         end
 
+        it "should not be able to delete an enrollment for other courses" do
+          @account = Account.default
+          @sub_account = Account.create(:parent_account => @account,:name => 'English')
+          @sub_account.save!
+          @user = user_with_pseudonym(:username => 'sub_admin@example.com')
+          @sub_account.add_user(@user)
+          @course = @sub_account.courses.create(name: 'sub')
+          @course.account_id = @sub_account.id
+          @course.save!
+
+          @path = "/api/v1/courses/#{@course.id}/enrollments/#{@enrollment.id}"
+          @params = { :controller => 'enrollments_api', :action => 'destroy', :course_id => @course.id.to_param,
+                      :id => @enrollment.id.to_param, :format => 'json' }
+
+          raw_api_call(:delete, "#{@path}?task=delete", @params.merge(:task => 'delete'))
+          response.code.should eql '404'
+          JSON.parse(response.body)['errors'].should == [{ 'message' => 'The specified resource does not exist.' }]
+        end
+
         it "should be able to delete an enrollment" do
           json = api_call(:delete, "#{@path}?task=delete", @params.merge(:task => 'delete'))
           @enrollment.reload
