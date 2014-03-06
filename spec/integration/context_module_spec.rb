@@ -151,13 +151,10 @@ describe ContextModule do
 
         @quiz_submission = @quiz.generate_submission(@student)
         @quiz_submission.grade_submission
-        @quiz_submission.workflow_state = 'completed'
+        @quiz_submission.workflow_state = 'complete'
+        @quiz_submission.manually_scored = true
         @quiz_submission.kept_score = 1
         @quiz_submission.save!
-
-        #emulate settings on progression if the user took the quiz but background jobs haven't run yet
-        p1.requirements_met = [{:type=>"min_score", :min_score=>"1", :max_score=>nil, :id=>@quiz.id}]
-        p1.save!
 
         # navigate to the second item (forcing update to progression)
         next_link = progress_by_item_link ? 

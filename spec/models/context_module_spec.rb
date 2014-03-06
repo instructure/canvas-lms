@@ -555,7 +555,34 @@ describe ContextModule do
       p.requirements_met.should == [{:type=>"min_score", :min_score=>5, :id=>tag.id}]
       p.workflow_state.should == 'completed'
     end
+
+    it "should not fulfill 'must_submit' requirement with 'untaken' quiz submission" do
+      course_module
+      student_in_course course: @course, active_all: true
+      @quiz = @course.quizzes.create!(title: "some quiz")
+      @tag = @module.add_item({id: @quiz.id, type: 'quiz'})
+      @module.completion_requirements = {@tag.id => {type: 'must_submit'}}
+      @module.save!
+      @submission = @quiz.generate_submission(@student)
+      @module.evaluate_for(@student).should be_locked
+      @submission.update_attribute(:workflow_state, 'complete')
+      @module.evaluate_for(@student).should be_completed
+    end
+
+    it "should not fulfill 'must_submit' requirement with 'unsubmitted' assignment submission" do
+      course_module
+      student_in_course course: @course, active_all: true
+      @assign = @course.assignments.create!(title: 'how many roads must a man walk down?', submission_types: 'online_text_entry')
+      @submission = @assign.submit_homework(@student)
+      @tag = @module.add_item({id: @assign.id, type: 'assignment'})
+      @module.completion_requirements = {@tag.id => {type: 'must_submit'}}
+      @module.save!
+      @module.evaluate_for(@student).should be_locked
+      @submission = @assign.submit_homework(@student, submission_type: 'online_text_entry', body: '42')
+      @module.evaluate_for(@student, true).should be_completed
+    end
   end
+
   describe "require_sequential_progress" do
     it "should update progression status on grading and view events" do
       course_module

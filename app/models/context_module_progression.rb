@@ -144,7 +144,8 @@ class ContextModuleProgression < ActiveRecord::Base
       elsif req[:type] == 'must_contribute'
         calc.requirement_met(req, false)
       elsif req[:type] == 'must_submit'
-        calc.requirement_met(req, !!get_submission_or_quiz_submission(tag))
+        sub = get_submission_or_quiz_submission(tag)
+        calc.requirement_met(req, sub && %w(submitted graded complete pending_review).include?(sub.workflow_state))
       elsif req[:type] == 'min_score' || req[:type] == 'max_score'
         calc.requirement_met(req, evaluate_score_requirement_met(req, tag)) if tag.scoreable?
       end
