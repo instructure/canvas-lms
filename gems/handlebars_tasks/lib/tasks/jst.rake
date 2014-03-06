@@ -1,8 +1,7 @@
-require 'lib/handlebars/handlebars'
-
 namespace :jst do
   desc 'precompile handlebars templates from app/views/jst to public/javascripts/jst'
   task :compile do
+    require 'handlebars_tasks'
     require 'config/initializers/plugin_symlinks'
 
     all_paths = []
@@ -12,15 +11,15 @@ namespace :jst do
       output_path = "public/plugins/#{plugin}/javascripts/jst"
       all_paths << [input_path, output_path, plugin]
     end
-    Handlebars.compile *all_paths
+    HandlebarsTasks::Handlebars.compile *all_paths
   end
 
   desc 'precompile ember templates'
   task :ember do
-    require 'lib/handlebars/ember'
+    require 'handlebars_tasks'
     files = Dir.glob("app/coffeescripts/**/*.hbs")
     files.each do |file|
-      EmberHbs::compile_file(file)
+      HandlebarsTasks::EmberHbs.compile_file(file)
     end
   end
 end
