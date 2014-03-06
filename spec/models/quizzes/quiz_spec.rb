@@ -1514,4 +1514,17 @@ describe Quizzes::Quiz do
       end
     end
   end
+
+  describe '#context_module_tags' do
+    it "finds both namespaced and non-namespaced content tags" do
+      quiz = @course.quizzes.create! title: 'Test Quiz'
+      mod = @course.context_modules.create! name: 'Test Module'
+      tag1 = mod.add_item id: quiz.id, type: 'quiz'
+      tag2 = mod.add_item id: quiz.id, type: 'quiz'
+      tag3 = mod.add_item id: quiz.id, type: 'quiz'
+      ContentTag.where(id: tag2).update_all(content_type: 'Quiz')
+      tag3.destroy
+      quiz.context_module_tags.pluck(:id).sort.should eql [tag1.id, tag2.id].sort
+    end
+  end
 end
