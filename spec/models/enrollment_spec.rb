@@ -2328,31 +2328,40 @@ describe Enrollment do
   describe '#can_be_deleted_by' do
 
     describe 'on a student enrollment' do
-      let(:enrollment) { StudentEnrollment.new }
+      let(:course) { Course.new(id: 99) }
+      let(:enrollment) { StudentEnrollment.new(course_id: course.id) }
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
       it 'is true for a user who has been granted :manage_students' do
-        context = Object.new
+        context = course
         allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
         allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
       end
 
       it 'is false for a user without :manage_students' do
-        context = double(:grants_right? => false)
+        context = course
+        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
       end
 
       it 'is false for someone with :manage_admin_users but without :manage_students' do
-        context = Object.new
+        context = course
         allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
         allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
       end
 
+      it 'is false for someone with :manage_admin_users in other context' do
+        context = CourseSection.new(id: 10)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
+        expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
+      end
+
       it 'is false if a user is trying to remove their own enrollment' do
-        context = Object.new
+        context = course
         allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
         allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
         allow(context).to receive_messages(:account => context)
@@ -2362,26 +2371,27 @@ describe Enrollment do
     end
 
     describe 'on an observer enrollment' do
-      let(:enrollment) { ObserverEnrollment.new }
+      let(:course) { Course.new(id: 99) }
+      let(:enrollment) { ObserverEnrollment.new(course_id: course.id) }
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
       it 'is true with :manage_students' do
-        context = Object.new
+        context = course
         allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
         allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
       end
 
       it 'is true with :manage_admin_users' do
-        context = Object.new
+        context = course
         allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
         allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(true)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
       end
 
       it 'is false otherwise' do
-        context = Object.new
+        context = course
         allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
         allow(context).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
