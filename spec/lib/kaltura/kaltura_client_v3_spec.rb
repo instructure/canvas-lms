@@ -161,6 +161,22 @@ describe "Kaltura::ClientV3" do
               {:fileExt => 'mp4', :bitrate => '100', :isOriginal => '0', :hasWarnings => true},
           ]).first[:isOriginal].should_not == '1'
     end
+
+    it "should sort by descending bitrate but deprioritize sources with suspiciously high bitrates" do
+      @kaltura.sort_source_list(
+          [
+              {:fileExt => 'mp4', :bitrate => '180', :isOriginal => '1'},
+              {:fileExt => 'mp4', :bitrate => '120', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '5000', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '0'},
+          ]).should ==
+          [
+              {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '120', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '5000', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '180', :isOriginal => '1'},
+          ]
+    end
   end
 
   describe 'media_sources' do
