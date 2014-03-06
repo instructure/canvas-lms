@@ -167,7 +167,7 @@ if CANVAS_RAILS2
   gem 'folio-pagination-legacy', '0.0.3', :require => 'folio/rails'
   gem 'will_paginate', '2.3.15', :require => false
 else
-  gem 'folio-pagination', '0.0.6', :require => 'folio/rails'
+  gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
   gem 'will_paginate', '3.0.4', :require => false
 end
 gem 'xml-simple', '1.0.12', :require => 'xmlsimple'
