@@ -708,6 +708,22 @@ describe ContextModule do
       @quiz.locked_for?(@user).should be_false
       @assignment.locked_for?(@user).should be_false
     end
+
+    it "should progress on pre-refactor quiz tags" do
+      course_module
+      student_in_course course: @course, active_all: true
+      @quiz = @course.quizzes.build(title: "some quiz")
+      @quiz.workflow_state = 'available'
+      @quiz.save!
+      @tag = @module.add_item({id: @quiz.id, type: 'quiz'})
+      ContentTag.where(id: @tag).update_all(content_type: 'Quiz')
+      @module.completion_requirements = {@tag.id => {type: 'must_submit'}}
+      @module.save!
+      @submission = @quiz.generate_submission(@student)
+      @submission.workflow_state = 'complete'
+      @submission.save!
+      @module.evaluate_for(@student).requirements_met.should be_include({id: @tag.id, type: 'must_submit'})
+    end
   end
 
   context 'unpublished completion requirements' do

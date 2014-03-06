@@ -98,6 +98,10 @@ class Quizzes::Quiz < ActiveRecord::Base
       end
     end
 
+  def context_module_tags
+    ContentTag.where("content_id=? AND content_type IN ('Quiz', 'Quizzes::Quiz') AND tag_type='context_module' AND workflow_state<>'deleted'", self.id).includes(:context_module => [:content_tags])
+  end
+
   # This callback is listed here in order for the :link_assignment_overrides
   # method to be called after the simply_versioned callbacks. We want the
   # overrides to reflect the most recent version of the quiz.
