@@ -247,7 +247,7 @@ namespace :db do
   desc "Useful initial setup task"
   task :initial_setup => [:generate_security_key, :migrate] do
     load 'app/models/pseudonym.rb'
-    ActiveRecord::Base.connection.schema_cache.clear!
+    ActiveRecord::Base.connection.schema_cache.clear! unless CANVAS_RAILS2
     ActiveRecord::Base.all_models.reject{ |m| m == Shard }.each(&:reset_column_information)
     Rake::Task['db:load_initial_data'].invoke
   end
