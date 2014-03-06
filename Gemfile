@@ -235,8 +235,6 @@ group :test do
   gem 'selenium-webdriver', '2.39.0'
     gem 'childprocess', '0.4.0'
     gem 'websocket', '1.0.7'
-  gem 'webrat', '0.7.3'
-    gem 'rack-test', '0.6.2', :require => false
   gem 'webmock', '1.16.1', :require => false
     gem 'addressable', '2.3.5'
     gem 'crack', '0.4.1'

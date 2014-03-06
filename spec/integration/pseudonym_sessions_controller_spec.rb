@@ -133,6 +133,8 @@ describe PseudonymSessionsController do
         Canvas.redis.get("cas_session:ST-abcd").should == nil
 
         back_channel = open_session
+        # it starts out as a clone of the current session
+        back_channel.reset!
 
         # single-sign-out from CAS server has no effect now
         back_channel.post cas_logout_url, :logoutRequest => <<-SAML

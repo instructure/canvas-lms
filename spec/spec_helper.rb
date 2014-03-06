@@ -155,7 +155,6 @@ else
     end
   end
 end
-require 'webrat'
 require 'mocha/api'
 require 'action_controller_test_process'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
@@ -363,7 +362,6 @@ end
 
   ((config.debug = true) rescue nil) unless CANVAS_RAILS2
 
-  config.include Webrat::Matchers, :type => :views
   config.include Helpers
 
   config.before :all do
