@@ -41,6 +41,7 @@ define [
     @child 'gravatarView', '#from-gravatar'
 
     dialogOptions: ->
+      title: @messages.selectAvatar
       buttons: [
         text: @messages.cancel
         click: @cancel
@@ -53,6 +54,7 @@ define [
       width: 600
 
     messages:
+      selectAvatar:    I18n.t('buttons.select_avatar', 'Select Avatar')
       cancel:         I18n.t('#buttons.cancel', 'Cancel')
       selectImage:    I18n.t('buttons.select_image', 'Select Image')
       selectingImage: I18n.t('buttons.selecting_image', 'Selecting Image...')
