@@ -114,6 +114,25 @@ class FilesController < ApplicationController
     end
   end
 
+  # @API Get quota information
+  # Returns the total and used storage quota for the course, group, or user.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/1/files/quota' \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #
+  #  { "quota": 524288000, "quota_used": 402653184 }
+  #
+  def api_quota
+    if authorized_action(@context.attachments.build, @current_user, :create)
+      get_quota
+      render json: {quota: @quota, quota_used: @quota_used}
+    end
+  end
+
   def check_file_access_flags
     if params[:user_id] && params[:ts] && params[:sf_verifier]
       user = User.find_by_id(params[:user_id]) if params[:user_id].present?

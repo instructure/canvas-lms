@@ -540,4 +540,47 @@ describe "Files API", type: :request do
       api_call(:put, @file_path, @file_path_options, {:parent_folder_id => user_root.id.to_param}, {}, :expected_status => 404)
     end
   end
+
+  describe "quota" do
+    let(:t_course) do
+      course_with_teacher_logged_in active_all: true
+      @course.storage_quota = 111.megabytes
+      @course.save
+      attachment_model context: @course, size: 33.megabytes
+      @course
+    end
+
+    let(:t_teacher) do
+      t_course.teachers.first
+    end
+
+    it "should return total and used quota" do
+      json = api_call_as_user(t_teacher, :get, "/api/v1/courses/#{t_course.id}/files/quota", controller: 'files',
+                              action: 'api_quota', format: 'json', course_id: t_course.to_param)
+      json.should eql({"quota" => 111.megabytes, "quota_used" => 33.megabytes})
+    end
+
+    it "should require manage_files permissions" do
+      student_in_course course: t_course, active_all: true
+      api_call_as_user(@student, :get, "/api/v1/courses/#{t_course.id}/files/quota",
+                       {controller: 'files', action: 'api_quota', format: 'json', course_id: t_course.to_param},
+                       {}, {}, { expected_status: 401 })
+    end
+
+    it "should operate on groups" do
+      group = Account.default.groups.create!
+      attachment_model context: group, size: 13.megabytes
+      account_admin_user
+      json = api_call(:get, "/api/v1/groups/#{group.id}/files/quota", controller: 'files', action: 'api_quota',
+                      format: 'json', group_id: group.to_param)
+      json.should eql({"quota" => group.quota, "quota_used" => 13.megabytes})
+    end
+
+    it "should operate on users" do
+      course_with_student active_all: true
+      json = api_call(:get, "/api/v1/users/self/files/quota", controller: 'files', action: 'api_quota',
+                      format: 'json', user_id: 'self')
+      json.should eql({"quota" => @student.quota, "quota_used" => 0})
+    end
+  end
 end

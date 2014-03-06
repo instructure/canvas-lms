@@ -1246,6 +1246,9 @@ routes.draw do
       delete 'files/:id', :action => :destroy
       put 'files/:id', :action => :api_update
       get 'files/:id/:uuid/status', :action => :api_file_status, :path_name => 'file_status'
+      %w(course group user).each do |context|
+        get "#{context}s/:#{context}_id/files/quota", :action => :api_quota
+      end
     end
 
     scope(:controller => :folders) do
