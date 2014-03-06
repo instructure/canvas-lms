@@ -1635,7 +1635,16 @@ class ActiveRecord::Migration
     def has_postgres_proc?(procname)
       connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='#{procname}'").to_i != 0
     end
+  end
 
+  unless CANVAS_RAILS2
+    def connection
+      if self.class.respond_to?(:connection)
+        return self.class.connection
+      else
+        @connection || ActiveRecord::Base.connection
+      end
+    end
   end
 
   def transactional?

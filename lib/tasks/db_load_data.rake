@@ -226,12 +226,12 @@ namespace :db do
       if !Rails.env.test?
         name = ask("What do you want users to see as the account name? This should probably be the name of your organization. > ") { |q| q.echo = true }
 
-        a = Account.default
+        a = Account.default.reload
         a.name = name
         a.save!
       end
     else
-      a = Account.default
+      a = Account.default.reload
       a.name = ENV['CANVAS_LMS_ACCOUNT_NAME']
       a.save!
     end
@@ -247,6 +247,8 @@ namespace :db do
   desc "Useful initial setup task"
   task :initial_setup => [:generate_security_key, :migrate] do
     load 'app/models/pseudonym.rb'
+    ActiveRecord::Base.connection.schema_cache.clear!
+    ActiveRecord::Base.all_models.reject{ |m| m == Shard }.each(&:reset_column_information)
     Rake::Task['db:load_initial_data'].invoke
   end
   
