@@ -44,6 +44,29 @@ require 'set'
 #       }
 #     }
 #
+# @model CourseProgress
+#     {
+#       "id": "CourseProgress",
+#       "description": "",
+#       "properties": {
+#         "requirement_count": {
+#           "description": "total number of requirements from all modules",
+#           "example": 10,
+#           "type": "integer"
+#         },
+#         "requirement_completed_count": {
+#           "description": "total number of requirements the user has completed from all modules",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "next_requirement_url": {
+#           "description": "url to next module item that has an unmet requirement. null if the user has completed the course or the current module does not require sequential progress",
+#           "example": "http://localhost/courses/1/modules/items/2",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
 # @model Course
 #     {
 #       "id": "Course",
@@ -138,6 +161,10 @@ require 'set'
 #           "description": "optional: the enrollment term object for the course returned only if include[]=term",
 #           "$ref": "Term"
 #         },
+#         "course_progress": {
+#           "description": "optional (beta): information on progress through the course returned only if include[]=course_progress",
+#           "$ref": "CourseProgress"
+#         },
 #         "apply_assignment_group_weights": {
 #           "description": "weight final grade based on assignment group percentages",
 #           "example": true,
@@ -225,7 +252,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -247,6 +274,17 @@ class CoursesController < ApplicationController
   #   - "term": Optional information to include with each Course. When
   #     term is given, the information for the enrollment term for each course
   #     is returned.
+  #   - "course_progress": Optional information to include with each Course.
+  #     When course_progress is given, each course will include a
+  #     'course_progress' object with the fields: 'requirement_count', an integer
+  #     specifying the total number of requirements in the course,
+  #     'requirement_completed_count', an integer specifying the total number of
+  #     requirements in this course that have been completed, and
+  #     'next_requirement_url', a string url to the next requirement item.
+  #     'next_requirement_url' will be null if all requirements have been
+  #     completed or the current module does not require sequential progress.
+  #     "course_progress" will return an error message unless the course is
+  #     module based.
   #
   # @argument state[] [Optional, String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).

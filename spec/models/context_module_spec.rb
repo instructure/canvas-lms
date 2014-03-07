@@ -192,7 +192,7 @@ describe ContextModule do
       end
     end
   end
-  
+
   describe "completion_requirements=" do
     it "should assign completion requirements" do
       course_module
