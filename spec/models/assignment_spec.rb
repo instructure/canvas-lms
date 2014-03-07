@@ -636,6 +636,7 @@ describe Assignment do
       @course.enroll_student(@user).update_attribute(:workflow_state, 'accepted')
       @assignment.context.reload
 
+      @assignment.submissions.scoped.delete_all
       real_sub = @assignment.submissions.build(user: @user)
 
       @assignment.submissions.expects(:where).once.returns(Submission.none)
