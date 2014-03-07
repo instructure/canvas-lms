@@ -1,3 +1,5 @@
+class RespondusAPIPort; end # defining the class prevents $SAFE level problems when we use class_eval later on
+
 class RespondusAPIMiddleware
   if CANVAS_RAILS2
     class_inheritable_accessor :servant
