@@ -361,7 +361,7 @@ class ContextModulesApiController < ApplicationController
       ContextModule.send(:preload_associations, modules, {:content_tags => :content}) if includes.include?('items')
 
       if @student
-        modules_and_progressions = modules.map { |m| [m, m.evaluate_for(@student, true)] }
+        modules_and_progressions = modules.map { |m| [m, m.evaluate_for(@student)] }
       else
         modules_and_progressions = modules.map { |m| [m, nil] }
       end
@@ -404,7 +404,7 @@ class ContextModulesApiController < ApplicationController
       mod = @context.modules_visible_to(@student || @current_user).find(params[:id])
       includes = Array(params[:include])
       ContextModule.send(:preload_associations, mod, {:content_tags => :content}) if includes.include?('items')
-      prog = @student ? mod.evaluate_for(@student, true) : nil
+      prog = @student ? mod.evaluate_for(@student) : nil
       render :json => module_json(mod, @student || @current_user, session, prog, includes)
     end
   end

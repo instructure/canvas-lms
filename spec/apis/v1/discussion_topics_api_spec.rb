@@ -931,7 +931,7 @@ describe DiscussionTopicsController, type: :request do
     @module.save!
     course_with_student(:course => @course)
 
-    @module.evaluate_for(@user, true).should be_unlocked
+    @module.evaluate_for(@user).should be_unlocked
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read",
                  { :controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
                    :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
@@ -950,7 +950,7 @@ describe DiscussionTopicsController, type: :request do
     @module.completion_requirements = { tag.id => {:type => 'must_view'} }
     @module.save!
 
-    @module.evaluate_for(@user, true).should be_unlocked
+    @module.evaluate_for(@user).should be_unlocked
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read",
                  { :controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
                    :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
@@ -965,7 +965,7 @@ describe DiscussionTopicsController, type: :request do
     @module.save!
     course_with_student(:course => @course)
 
-    @module.evaluate_for(@user, true).should be_unlocked
+    @module.evaluate_for(@user).should be_unlocked
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all",
                  { :controller => 'discussion_topics_api', :action => 'mark_all_read', :format => 'json',
                    :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })

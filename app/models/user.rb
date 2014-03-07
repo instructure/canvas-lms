@@ -1143,29 +1143,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  # only used by ContextModuleProgression#evaluate_uncompleted_requirements
-  def submitted_submission_for(assignment_id)
-    @submissions ||= self.submissions.having_submission.except(:includes).select([:id, :score, :assignment_id]).all
-    @submissions.detect{|s| s.assignment_id == assignment_id }
-  end
-
-  # only used by ContextModuleProgression#evaluate_uncompleted_requirements
-  def attempted_quiz_submission_for(quiz_id)
-    @quiz_submissions ||= self.quiz_submissions.select([:id, :kept_score, :quiz_id, :workflow_state]).select{|s| !s.settings_only? }
-    @quiz_submissions.detect{|qs| qs.quiz_id == quiz_id }
-  end
-
-  def module_progression_for(module_id)
-    @module_progressions ||= self.context_module_progressions.to_a
-    @module_progressions.detect{|p| p.context_module_id == module_id }
-  end
-
-  def clear_cached_lookups
-    @module_progressions = nil
-    @quiz_submissions = nil
-    @submissions = nil
-  end
-
   def update_avatar_image(force_reload=false)
     if !self.avatar_image_url || force_reload
       if self.avatar_image_source == 'facebook'
@@ -1714,19 +1691,6 @@ class User < ActiveRecord::Base
       self.enrollments.with_each_shard { |scope| scope.admin.select(:course_id) }
     end
     @current_admin_enrollments.map(&:course_id)
-  end
-
-  # TODO: this smells, I really don't get it (anymore... I wrote it :-( )
-  def self.module_progression_job_queued(user_id, time_string=nil)
-    time_string ||= Time.now.utc.iso8601
-    @@user_jobs ||= {}
-    @@user_jobs[user_id] ||= time_string
-  end
-
-  def self.module_progression_jobs_queued?(user_id)
-    recent = 1.minute.ago.utc.iso8601
-    @@user_jobs ||= {}
-    !!(@@user_jobs && @@user_jobs[user_id] && @@user_jobs[user_id] > recent)
   end
 
   def submissions_for_context_codes(context_codes, opts={})

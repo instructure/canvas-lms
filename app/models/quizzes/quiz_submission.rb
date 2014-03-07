@@ -40,6 +40,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   before_save :sanitize_responses
   before_save :update_assignment_submission
   after_save :save_assignment_submission
+  after_save :context_module_action
   before_create :assign_validation_token
 
   has_many :attachments, :as => :context, :dependent => :destroy do
@@ -652,7 +653,6 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       self.without_versioning(&:save)
     end
     self.reload
-    self.context_module_action
     Quizzes::SubmissionGrader.new(self).track_outcomes(version.model.attempt)
     true
   end

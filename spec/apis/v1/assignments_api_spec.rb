@@ -1409,7 +1409,7 @@ describe AssignmentsApiController, type: :request do
                    :format => 'json',
                    :course_id => @course.id.to_s
                  })
-        mod.evaluate_for(@user, true).should be_unlocked
+        mod.evaluate_for(@user).should be_unlocked
 
         # show should count as a view
         json = api_get_assignment_in_course(@assignment,@course)
@@ -1482,7 +1482,7 @@ describe AssignmentsApiController, type: :request do
         mod.save!
         json = api_get_assignment_in_course(@assignment,@course)
         json['description'].should be_nil
-        mod.evaluate_for(@user, true).should be_unlocked
+        mod.evaluate_for(@user).should be_unlocked
       end
 
       it "includes submission info when requested with include flag" do

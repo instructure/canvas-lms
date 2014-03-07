@@ -1100,7 +1100,7 @@ class Assignment < ActiveRecord::Base
       end
     end
     homeworks.each do |homework|
-      context_module_action(homework.student, :submitted)
+      context_module_action(homework.student, homework.workflow_state.to_sym)
       if comment && (group_comment || homework == primary_homework)
         hash = {:comment => comment, :author => original_student}
         hash[:group_comment_id] = CanvasUuid::Uuid.generate_securish_uuid if group_comment && group

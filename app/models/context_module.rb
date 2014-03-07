@@ -31,7 +31,24 @@ class ContextModule < ActiveRecord::Base
   before_save :validate_prerequisites
   before_save :confirm_valid_requirements
   after_save :touch_context
+  after_save :invalidate_progressions
   validates_presence_of :workflow_state, :context_id, :context_type
+
+  def invalidate_progressions
+    connection.after_transaction_commit do
+      context_module_progressions.update_all(current: false)
+      send_later_if_production(:evaluate_all_progressions)
+    end
+  end
+  private :invalidate_progressions
+
+  def evaluate_all_progressions
+    current_column = '"context_module_progressions"."current"'
+    current_scope = context_module_progressions.where("#{current_column} IS NULL OR #{current_column} = ?", false)
+    current_scope.find_each(batch_size: 100) do |progression|
+      progression.evaluate!
+    end
+  end
 
   def self.module_positions(context)
     # Keep a cached hash of all modules for a given context and their
@@ -128,18 +145,6 @@ class ContextModule < ActiveRecord::Base
     end
   end
 
-  def update_student_progressions(user=nil)
-    # modules are ordered by position, so running through them in order will
-    # automatically handle issues with dependencies loading in the correct
-    # order
-    modules = ContextModule.order(:position).where(
-        :context_type => self.context_type, :context_id => self.context_id, :workflow_state => 'active')
-    students = user ? [user] : self.context.students
-    modules.each do |mod|
-      mod.re_evaluate_for(students)
-    end
-  end
-  
   set_policy do
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_content) }
     can :read and can :create and can :update and can :delete
@@ -173,7 +178,7 @@ class ContextModule < ActiveRecord::Base
       res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
     end
     if !res && opts[:deep_check_if_needed]
-      progression = self.evaluate_for(user, true)
+      progression = self.evaluate_for(user)
       if tag && tag.context_module_id == self.id && self.require_sequential_progress
         res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
       end
@@ -372,29 +377,50 @@ class ContextModule < ActiveRecord::Base
   end
   
   def update_for(user, action, tag, points=nil)
-    return nil unless self.context.users.include?(user)
-    return nil unless ContextModuleProgression.prerequisites_satisfied?(user, self)
-    progression = self.find_or_create_progression(user)
-    return unless progression
-    progression.requirements_met ||= []
-    requirement = self.completion_requirements.to_a.find{|p| p[:id] == tag.local_id}
-    return if !requirement || progression.requirements_met.include?(requirement)
-    met = false
-    met = true if requirement[:type] == 'must_view' && (action == :read || action == :contributed)
-    met = true if requirement[:type] == 'must_contribute' && action == :contributed
-    met = true if requirement[:type] == 'must_submit' && action == :scored
-    met = true if requirement[:type] == 'must_submit' && action == :submitted
-    met = true if requirement[:type] == 'min_score' && action == :scored && points && points >= requirement[:min_score].to_f
-    met = true if requirement[:type] == 'max_score' && action == :scored && points && points <= requirement[:max_score].to_f
-    if met
-      progression.requirements_met << requirement
+    retry_count = 0
+    begin
+      return nil unless self.context.users.include?(user)
+      return nil unless ContextModuleProgression.prerequisites_satisfied?(user, self)
+      return nil unless progression = self.find_or_create_progression(user)
+
+      progression.requirements_met ||= []
+      if progression.update_requirement_met(action, tag, points)
+        # not sure if this save is necessary
+        # leaving it for now as it saves the default requirements_met (set above)
+        progression.save!
+        progression.send_later_if_production(:evaluate)
+      end
+
+      progression
+
+    rescue ActiveRecord::StaleObjectError
+      raise if retry_count > 10
+      retry_count += 1
+      retry
     end
-    progression.save!
-    User.module_progression_job_queued(user.id)
-    send_later_if_production :update_student_progressions, user
-    progression
   end
-  
+
+  def completion_requirement_for(action, tag)
+    self.completion_requirements.to_a.find do |requirement|
+      next false unless requirement[:id] == tag.local_id
+
+      case requirement[:type]
+      when 'must_view'
+        action == :read || action == :contributed
+      when 'must_contribute'
+        action == :contributed
+      when 'must_submit'
+        action == :scored || action == :submitted
+      when 'min_score'
+        action == :scored
+      when 'max_score'
+        action == :scored
+      else
+        false
+      end
+    end
+  end
+
   def self.requirement_description(req)
     case req[:type]
     when 'must_view'
@@ -430,16 +456,6 @@ class ContextModule < ActiveRecord::Base
 
   def cached_active_tags
     @cached_active_tags ||= self.content_tags.active
-  end
-  
-  def re_evaluate_for(users)
-    users = Array(users)
-    users.each{|u| u.clear_cached_lookups }
-    progressions = self.find_or_create_progressions(users)
-    progressions.each(&:mark_as_dirty)
-    progressions.each do |progression|
-      self.evaluate_for(progression, true)
-    end
   end
   
   def confirm_valid_requirements(do_save=false)
@@ -483,22 +499,18 @@ class ContextModule < ActiveRecord::Base
     progression
   end
   
-  def find_or_create_progression_with_multiple_lookups(user)
-    user.module_progression_for(self.id) || self.find_or_create_progression(user)
-  end
-
-  def evaluate_for(user_or_progression, force_evaluate_requirements=false)
+  def evaluate_for(user_or_progression)
     if user_or_progression.is_a?(ContextModuleProgression)
       progression, user = [user_or_progression, user_or_progression.user]
     else
-      progression, user = [self.find_or_create_progression_with_multiple_lookups(user_or_progression), user_or_progression] if user_or_progression
+      progression, user = [self.find_or_create_progression(user_or_progression), user_or_progression] if user_or_progression
     end
     return nil unless progression && user
 
     progression.context_module = self if progression.context_module_id == self.id
     progression.user = user if progression.user_id == user.id
-    progression.evaluate(force_evaluate_requirements)
-    progression
+
+    progression.evaluate!
   end
 
   def to_be_unlocked

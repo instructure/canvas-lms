@@ -67,13 +67,13 @@ describe ContextModule do
       @module.completion_requirements = { @tag.id => { :type => 'must_contribute' } }
       @module.save!
 
-      @progression = @module.evaluate_for(@user, true)
+      @progression = @module.evaluate_for(@user)
       @progression.should_not be_nil
       @progression.should_not be_completed
       @progression.should be_unlocked
       @progression.current_position.should eql(@tag.position)
       yield
-      @progression = @module.evaluate_for(@user, true)
+      @progression = @module.evaluate_for(@user)
       @progression.should be_completed
       @progression.current_position.should eql(@tag.position)
     end
@@ -146,7 +146,7 @@ describe ContextModule do
         html.css('#test_content').length.should == (@test_content_length || 0)
 
         # complete first module's requirements
-        p1 = @mod1.evaluate_for(@student, true)
+        p1 = @mod1.evaluate_for(@student)
         p1.workflow_state.should == 'unlocked'
 
         @quiz_submission = @quiz.generate_submission(@student)
@@ -164,7 +164,7 @@ describe ContextModule do
         response.should be_redirect
         response.location.ends_with?(@test_url + "?module_item_id=#{@tag2.id}").should be_true
 
-        # verify the second item is no accessible
+        # verify the second item is accessible
         get @test_url
         response.should be_success
         html = Nokogiri::HTML(response.body)
