@@ -263,6 +263,7 @@ describe "content migrations" do
 
   context "course copy" do
     before :all do
+      Account.clear_special_account_cache!
       @copy_from = course
       @copy_from.update_attribute(:name, 'copy from me')
       data = File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip')
@@ -288,6 +289,10 @@ describe "content migrations" do
     before :each do
       course_with_teacher_logged_in(:active_all => true)
       @copy_from.enroll_teacher(@user).accept
+    end
+
+    after :all do
+      truncate_all_tables
     end
 
     it "should select by drop-down or by search box" do
