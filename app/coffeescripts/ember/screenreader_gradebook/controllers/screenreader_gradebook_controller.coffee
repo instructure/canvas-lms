@@ -114,20 +114,28 @@ define [
         @updateSubmissionsFromExternal submissions
 
       selectItem: (property, goTo) ->
-        list = @getListFor(property)
+        list = @getList(property)
         currentIndex = list.indexOf(@get(property))
-        item = list.objectAt(currentIndex - 1) if goTo == 'previous'
-        item = list.objectAt(currentIndex + 1) if goTo == 'next'
+
+        if goTo == 'previous'
+          item = list.objectAt(currentIndex - 1)
+          unless list.objectAt(currentIndex - 2)
+            $("#next_#{@getButton(property)}").focus()
+        if goTo == 'next'
+          item = list.objectAt(currentIndex + 1)
+          unless list.objectAt(currentIndex + 2)
+            $("#prev_#{@getButton(property)}").focus()
+
         @announce property, item
         @set property, item
 
     announce: (prop, item) ->
       Ember.run.next =>
         if prop is 'selectedStudent' and @get('hideStudentNames')
-          name = get item, 'hiddenName'
+          text_to_announce = get item, 'hiddenName'
         else
-          name = get item, 'name'
-        @set 'ariaAnnounced', name
+          text_to_announce = get item, 'name'
+        @set 'ariaAnnounced', text_to_announce
 
     hideStudentNamesChanged: (->
       @set 'ariaAnnounced', null
@@ -577,9 +585,13 @@ define [
 
     # Next/Previous Student/Assignment
 
-    getListFor: (property) ->
+    getList: (property) ->
       return @get('studentsInSelectedSection') if property == 'selectedStudent'
       return @get('assignments') if property == 'selectedAssignment'
+
+    getButton: (property) ->
+      return 'student' if property == 'selectedStudent'
+      return 'assignment' if property == 'selectedAssignment'
 
     assignmentIndex: (->
       selected = @get('selectedAssignment')
