@@ -100,7 +100,7 @@ module SIS
                 next
               end
               if pseudo_by_login && (pseudo != pseudo_by_login && status_is_active ||
-                !(ActiveRecord::Base.connection.select_value("SELECT 1 WHERE #{Pseudonym.to_lower_column(Pseudonym.sanitize(pseudo.unique_id))}=#{Pseudonym.to_lower_column(Pseudonym.sanitize(login_id))}")))
+                !(ActiveRecord::Base.connection.select_value("SELECT 1 FROM pseudonyms WHERE #{Pseudonym.to_lower_column(Pseudonym.sanitize(pseudo.unique_id))}=#{Pseudonym.to_lower_column(Pseudonym.sanitize(login_id))} LIMIT 1")))
                 @messages << "user #{pseudo_by_login.sis_user_id || pseudo_by_login.user_id} has already claimed #{user_id}'s requested login information, skipping"
                 next
               end
