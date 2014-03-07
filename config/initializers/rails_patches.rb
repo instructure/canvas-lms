@@ -235,4 +235,14 @@ if CANVAS_RAILS2
       end
     end
   end
+
+else
+  ActiveSupport::Cache::Entry.class_eval do
+    def value_with_untaint
+      @value.untaint if @value
+      value_without_untaint
+    end
+    alias_method_chain :value, :untaint
+  end
+
 end
