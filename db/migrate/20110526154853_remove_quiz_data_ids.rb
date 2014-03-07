@@ -1,6 +1,7 @@
 # some cloned quiz questions mistakenly have the old question id saved to the data hash, causing issues when trying to edit.
 class RemoveQuizDataIds < ActiveRecord::Migration
   class QuizQuestionDataMigrationARShim < ActiveRecord::Base;
+    attr_accessible
     if CANVAS_RAILS2
       set_table_name "quiz_questions"
     else
