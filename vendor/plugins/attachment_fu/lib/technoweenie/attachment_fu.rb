@@ -170,7 +170,7 @@ module Technoweenie # :nodoc:
         base.after_destroy :destroy_file
         base.after_validation :process_attachment
         if CANVAS_RAILS2
-          base.define_callbacks :after_resize, :before_attachment_saved, :after_attachment_saved, :before_thumbnail_saved, :after_save_and_attachment_processing
+          base.define_callbacks :before_attachment_saved, :after_attachment_saved, :before_thumbnail_saved, :after_save_and_attachment_processing
         else
           base.define_model_callbacks :resize, :attachment_saved, :save_and_attachment_processing, only: [:after]
           base.define_model_callbacks :attachment_saved, :thumbnail_saved, only: [:before]
@@ -178,18 +178,6 @@ module Technoweenie # :nodoc:
       end
 
       unless defined?(::ActiveSupport::Callbacks)
-        # Callback after an image has been resized.
-        #
-        #   class Foo < ActiveRecord::Base
-        #     acts_as_attachment
-        #     after_resize do |record, img|
-        #       record.aspect_ratio = img.columns.to_f / img.rows.to_f
-        #     end
-        #   end
-        def after_resize(&block)
-          write_inheritable_array(:after_resize, [block])
-        end
-
         # Callback after an attachment has been saved either to the file system or the DB.
         # Only called if the file has been changed, not necessarily if the record is updated.
         #
@@ -246,7 +234,7 @@ module Technoweenie # :nodoc:
       require 'rack'
 
       def self.included(base)
-        base.define_callbacks *[:after_resize, :after_attachment_saved, :before_thumbnail_saved] if CANVAS_RAILS2 && base.respond_to?(:define_callbacks)
+        base.define_callbacks *[:after_attachment_saved, :before_thumbnail_saved] if CANVAS_RAILS2 && base.respond_to?(:define_callbacks)
       end
 
       # Checks whether the attachment's content type is an image content type
