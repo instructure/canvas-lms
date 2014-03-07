@@ -460,7 +460,7 @@ describe 'Student reports' do
       p1b.sis_user_id = 'secondSIS'
       p1b.last_login_at = @last_login_time
       p1b.last_request_at = @last_login_time
-      p1b.save!
+      p1b.save_without_session_maintenance
       param = {}
       param['enrollment_term'] = term1.id
 
