@@ -230,3 +230,15 @@
   }
 
 }
+// Dialogs - Put outside the #quiz_show scope because jQueryUI puts
+// it in the body.
+
+#message-students-dialog {
+  textarea {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    width: 100%;
+  }
+}
+

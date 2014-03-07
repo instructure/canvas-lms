@@ -45,26 +45,24 @@ define [
     ok text.match 'submission html!'
 
   testShowPage 'allows user to delete a quiz', ->
-
     quiz = null
 
-    click('ic-menu-trigger')
-      .then -> click('ic-menu-item.js-delete')
-      .then ->
-        stop()
-        store.find('quiz', 1).then (_quiz) ->
-          quiz = _quiz
-      .then ->
-        start()
-        ajax.defineFixture '/api/v1/courses/1/quizzes/1',
-          response: {}
-          jqXHR:
-            statusCode: 204
-          textStatus: 'success'
-        click($ '.confirm-dialog-confirm-btn')
-      .then -> wait()
-      .then ->
-          ok quiz.get('isDeleted'), 'quiz deleted'
+    click('ic-menu-trigger').then ->
+      click('ic-menu-item.js-delete')
+    .then ->
+      stop()
+      store.find('quiz', 1).then (_quiz) ->
+        quiz = _quiz
+    .then ->
+      start()
+      ajax.defineFixture '/api/v1/courses/1/quizzes/1',
+        response: {}
+        jqXHR:
+          statusCode: 204
+        textStatus: 'success'
+      click($ '.confirm-dialog-confirm-btn')
+    .then ->
+      ok quiz.get('isDeleted'), 'quiz deleted'
 
   testShowPage 'allows locking/unlocking from the dropdown menu', ->
 
@@ -87,6 +85,25 @@ define [
     .then ->
       ok !quiz.get('lockAt'), 'can unlock quiz'
 
+  testShowPage 'allows sending messages to students', ->
+    server = sinon.fakeServer.create()
+    server.respondWith 'POST',
+      'http://localhost:3000/courses/1/quizzes/1/submission_users/message',
+      JSON.stringify status: 'created'
+    server.autoRespond = true
+    click('ic-menu-trigger').then ->
+      click '.js-message-students'
+    .then ->
+      fillIn '#message-body', 'Ohi'
+      sinon.spy($, 'ajax')
+    .then ->
+      click '.ui-dialog .btn.btn-primary'
+    .then ->
+      firstCall = $.ajax.getCall(0).args[0]
+      {url} = firstCall
+      equal url, "http://localhost:3000/courses/1/quizzes/1/submission_users/message"
+      server.restore()
+      $.ajax.restore()
 
   module "Quiz Show Integration for Students",
     setup: ->

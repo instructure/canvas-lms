@@ -2,10 +2,12 @@ define [
   'ember'
   'i18n!quizzes'
   'jquery'
+  '../shared/environment'
   'compiled/jquery.rails_flash_notifications'
-], (Ember, I18n, $) ->
+], (Ember, I18n, $, env) ->
 
   {RSVP, K} = Ember
+  {equal} = Ember.computed
 
   updateAllDates = (field) ->
     date = new Date()
@@ -58,8 +60,28 @@ define [
     ).property('timeLimit')
 
     recipientGroups: (->
-      [@get('submittedStudents'), @get('unsubmittedStudents')]
+      [
+        Ember.Object.create({
+          id: 'submitted'
+          name: I18n.t('students_who_have_taken_the_quiz', 'Students Who Have Taken the Quiz'),
+        })
+        Ember.Object.create({
+          id: 'unsubmitted'
+          name: I18n.t('student_who_have_not_taken_the_quiz', 'Students Who Have Not Taken the Quiz')
+        })
+      ]
     ).property('submittedStudents', 'unsubmittedStudents')
+
+    recipients: (->
+      if @get('selectedRecipientGroup') is 'submitted'
+        @get('submittedStudents')
+      else
+        @get('unsubmittedStudents')
+    ).property('selectedRecipientGroup', 'submittedStudents', 'unsubmittedStudents')
+
+    showUnsubmitted: equal 'selectedRecipientGroup', 'unsubmitted'
+
+    noRecipients: equal 'recipients.length', 0
 
     actions:
       takeQuiz: ->
@@ -100,6 +122,20 @@ define [
         model.deleteRecord()
         model.save().then =>
           @transitionToRoute 'quizzes'
+
+      sendMessageToStudents: ->
+        $.ajax
+          url: @get('messageStudentsUrl')
+          data: JSON.stringify(
+            conversations: [
+              recipients: @get('selectedRecipientGroup')
+              body: @get('messageBody')
+            ]
+          )
+          type: 'POST'
+          dataType: 'json'
+          contentType: 'application/json'
+        $.flashMessage I18n.t 'message_sent', 'Message Sent'
 
       # For modal, just do nothing.
       cancel: K

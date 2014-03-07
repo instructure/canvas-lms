@@ -42,7 +42,7 @@ define [
 
   test "closes when confirm button clicked", ->
     confirmButton.click()
-    ok stub.calledWith 'on-confirm'
+    ok stub.calledWith 'on-submit'
     assertDialogClosed()
 
   test "closes when cancel button clicked", ->
@@ -57,7 +57,7 @@ define [
 
   test "closes when confirm button clicked by keyPress", ->
     confirmButton.simulate 'keypress', keyCode: $.ui.keyCode.ENTER
-    ok stub.calledWith 'on-confirm'
+    ok stub.calledWith 'on-submit'
     assertDialogClosed()
 
   test "throws an error unless you provide a title", ->
@@ -74,5 +74,5 @@ define [
     equal component.get('cancel-text'), I18n.t('cancel', 'Cancel'), 'default cancel-text'
 
   test "default actions", ->
-    equal component.get('on-confirm'), 'confirm', 'default on-confirm'
+    equal component.get('on-submit'), 'submit', 'default on-submit'
     equal component.get('on-cancel'), 'cancel', 'dfeault on-cancel'

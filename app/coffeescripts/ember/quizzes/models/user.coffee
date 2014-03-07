@@ -11,3 +11,10 @@ define [
     name: attr()
     shortName: attr()
     sortableName: attr()
+    sisUserID: attr()
+    sisLoginID: attr()
+    loginID: attr()
+    email: attr()
+    locale: attr()
+    lastLogin: attr 'date'
+    timeZone: attr()

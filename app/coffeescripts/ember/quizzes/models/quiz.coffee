@@ -117,6 +117,9 @@ define [
 
       Ember.A(dates.concat(overrides))
     ).property('lockAt', 'unlockAt', 'dueAt', 'sectionCount', 'assignmentOverrides.[]')
+    submittedStudents: hasMany 'user', polymporphic: true, async: true
+    unsubmittedStudents: hasMany 'user', polymorphic: true, async: true
+    messageStudentsUrl: attr()
 
   Quiz.SORT_LAST = 'ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ'
 

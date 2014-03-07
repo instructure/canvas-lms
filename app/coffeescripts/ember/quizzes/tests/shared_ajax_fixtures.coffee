@@ -61,6 +61,7 @@ define [
           "title":"Alt practice test",
           "html_url":"http://localhost:3000/courses/1/quizzes/1",
           "mobile_url":"http://localhost:3000/courses/1/quizzes/1?force_user=1&persist_headless=1",
+          "message_students_url": "http://localhost:3000/courses/1/quizzes/1/submission_users/message",
           "question_count":0,
           "published":false,
           "unpublishable":true,
@@ -105,6 +106,7 @@ define [
           "quiz_submission_html_url": "/courses/1/quizzes/2/submission_html"
           "html_url":"http://localhost:3000/courses/1/quizzes/2",
           "mobile_url":"http://localhost:3000/courses/1/quizzes/2?force_user=1&persist_headless=1",
+          "message_students_url": "http://localhost:3000/courses/1/quizzes/2/submission_users/message",
           "question_count":0,
           "published":false,
           "unpublishable":true,
@@ -297,6 +299,14 @@ define [
 
       ajax.defineFixture '/api/v1/courses/1/quizzes/1/reports',
         response: JSON.parse(JSON.stringify quizReportsResponse),
+
+      ajax.defineFixture '/api/v1/courses/1/quizzes/1/statistics?include=quiz_questions',
+        response: quizStatisticsResponse,
+        jqXHR: {}
+        testStatus: '200'
+
+      ajax.defineFixture '/api/v1/courses/1/quizzes/1/reports?includes_all_versions=true',
+        response: quizReportsResponse,
         jqXHR: {}
         testStatus: '200'
 
@@ -311,6 +321,18 @@ define [
 
       ajax.defineFixture '/api/v1/courses/1/quizzez/1/submission_users?include[]=quiz_submissions',
         response: submissionUsers
+
+      ajax.defineFixture '/api/v1/courses/1/quizzes/1/submission_users?submitted=true',
+
+        response:
+          users: [
+            {
+              id: '1'
+              name: 'roxette'
+              short_name: 'roxette'
+              sortable_name: 'roxette'
+            }
+          ]
         testStatus: '200'
         jqXHR: {}
   }
