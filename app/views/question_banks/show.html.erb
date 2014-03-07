@@ -59,7 +59,6 @@
   <div id="bank_urls" style="display: none;">
     <a href="<%= context_url(@context, :context_question_bank_questions_url, @bank, :page => "{{ page }}") %>" class="more_questions_url">&nbsp;</a>
     <a href="<%= context_url(@context, :context_question_bank_assessment_questions_url, @bank) %>" class="add_question_url">&nbsp;</a>
-    <a href="<%= context_url(@context, :context_question_bank_assessment_question_move_question_url, "{{ id }}") %>" class="move_question_url">&nbsp;</a>
     <a href="<%= context_url(@context, :context_question_bank_move_questions_url, @bank.id) %>" class="move_questions_url">&nbsp;</a>
     <a href="<%= context_url(@context, :context_question_banks_url) %>" class="assessment_question_banks_url">&nbsp;</a>
     <a href="<%= context_url(@context, :context_question_banks_url, :managed => '1') %>" class="managed_banks_url">&nbsp;</a>
