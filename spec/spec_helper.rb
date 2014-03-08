@@ -888,7 +888,7 @@ end
         :criteria => {
             "0" => {
                 :points => 3,
-                :mastery_points => 0,
+                :mastery_points => opts[:mastery_points] || 0,
                 :description => "Outcome row",
                 :long_description => @outcome.description,
                 :ratings => {

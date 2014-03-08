@@ -101,6 +101,8 @@ define [
     _attachEvents: ->
       view.on('togglestate', @_createFilter(name)) for name, view of @checkboxes
       $.subscribe('currentSection/change', Grid.Events.sectionChangeFunction(@grid))
+      $.subscribe('currentSection/change', @updateExportLink)
+      @updateExportLink(@gradebook.sectionToShow)
 
     # Internal: Listen for events on grid.
     #
@@ -218,3 +220,8 @@ define [
         else
           _.reject(Grid.filter, (o) -> o == name)
         @grid.invalidate()
+
+    updateExportLink: (section) =>
+      url = "#{ENV.GRADEBOOK_OPTIONS.context_url}/outcome_rollups.csv"
+      url += "?section_id=#{section}" if section
+      $('.export-content').attr('href', url)

@@ -126,6 +126,17 @@ class ApplicationController < ActionController::Base
   end
   helper_method :js_env
 
+  # Reject the request by halting the execution of the current handler
+  # and returning a helpful error message (and HTTP status code).
+  #
+  # @param [String] cause
+  #   The reason the request is rejected for.
+  # @param [Optional, Fixnum|Symbol, Default :bad_request] status
+  #   HTTP status code or symbol.
+  def reject!(cause, status=:bad_request)
+    raise RequestError.new(cause, status)
+  end
+
   protected
 
   def assign_localizer
@@ -871,7 +882,8 @@ class ApplicationController < ActionController::Base
 
   # Custom error catching and message rendering.
   def rescue_action_in_public(exception)
-    response_code = response_code_for_rescue(exception)
+    response_code = exception.response_status if exception.respond_to?(:response_status)
+    response_code ||= response_code_for_rescue(exception) || 500
     begin
       status_code = interpret_status(response_code)
       status = status_code
@@ -892,7 +904,7 @@ class ApplicationController < ActionController::Base
       end
 
       if api_request?
-        rescue_action_in_api(exception, error)
+        rescue_action_in_api(exception, error, response_code)
       else
         render_rescue_action(exception, error, status, status_code)
       end
@@ -916,17 +928,20 @@ class ApplicationController < ActionController::Base
         :status => status
       }
     else
+      request.format = :html
       erbfile = "#{status.to_s[0,3]}_message.html.erb"
       erbpath = File.join('app', 'views', 'shared', 'errors', erbfile)
       erbfile = "500_message.html.erb" unless File.exists?(erbpath)
       @status_code = status_code
+      message = exception.is_a?(RequestError) ? exception.message : nil
       render :template => "shared/errors/#{erbfile}", 
         :layout => 'application',
         :status => status,
         :locals => {
           :error => error,
           :exception => exception,
-          :status => status
+          :status => status,
+          :message => message,
         }
     end
   end
@@ -937,18 +952,15 @@ class ApplicationController < ActionController::Base
     ActionDispatch::ShowExceptions.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
   end
 
-  def rescue_action_in_api(exception, error_report)
-    status_code = exception.response_status if exception.respond_to?(:response_status)
-    status_code ||= response_code_for_rescue(exception) || 500
-
+  def rescue_action_in_api(exception, error_report, response_code)
     data = exception.error_json if exception.respond_to?(:error_json)
-    data ||= api_error_json(exception, status_code)
+    data ||= api_error_json(exception, response_code)
 
     if error_report.try(:id)
       data[:error_report_id] = error_report.id
     end
 
-    render :json => data, :status => status_code
+    render :json => data, :status => response_code
   end
 
   def api_error_json(exception, status_code)
@@ -980,7 +992,7 @@ class ApplicationController < ActionController::Base
   end
 
   def rescue_action_locally(exception)
-    if api_request?
+    if api_request? or exception.is_a? RequestError
       # we want api requests to behave the same on error locally as in prod, to
       # ease testing and development. you can still view the backtrace, etc, in
       # the logs.

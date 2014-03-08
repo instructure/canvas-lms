@@ -809,6 +809,10 @@ routes.draw do
   #   resources :collection_items, :only => [:show, :index]
   # end
 
+  scope(:controller => :outcome_results) do
+    get 'courses/:course_id/outcome_rollups', :action => :rollups, :path_name => 'course_outcome_rollups'
+  end
+
   ### API routes ###
 
   # TODO: api routes can't yet take advantage of concerns for DRYness, because of

@@ -128,13 +128,43 @@
 #           "type": "string"
 #         },
 #         "name": {
-#           "description": "",
+#           "description": "The name of this alignment",
 #           "example": "Big mid-term test",
 #           "type": "string"
 #         },
 #         "html_url": {
 #           "description": "(Optional) A URL for details about this alignment",
 #           "type": "string"
+#         }
+#       }
+#     }
+#
+# @model OutcomePath
+#     {
+#       "id": "OutcomePath",
+#       "description": "The full path to an outcome",
+#       "properties": {
+#         "id": {
+#           "example": "42",
+#           "type": "integer",
+#           "description": "A unique identifier for this outcome"
+#         },
+#         "parts": {
+#           "description": "an array of OutcomePathPart objects",
+#           "$ref": "OutcomePathPart"
+#         }
+#       }
+#     }
+#
+# @model OutcomePathPart
+#     {
+#       "id": "OutcomePathPart",
+#       "description": "An outcome or outcome group",
+#       "properties": {
+#         "name": {
+#           "example": "Spelling out numbers",
+#           "type": "string",
+#           "description": "The title of the outcome or outcome group"
 #         }
 #       }
 #     }
@@ -166,7 +196,7 @@ class OutcomeResultsController < ApplicationController
   #   results. it is an error to specify an id for an outcome which is not linked
   #   to the context.
   #
-  # @argument include[] [Optional, String, "alignments"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"users"]
+  # @argument include[] [Optional, String, "alignments"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"outcome_paths"|"users"]
   #   Specify additional collections to be side loaded with the result.
   #   "alignments" includes only the alignments referenced by the returned
   #   results.
@@ -206,7 +236,7 @@ class OutcomeResultsController < ApplicationController
   #   results. it is an error to specify an id for an outcome which is not linked
   #   to the context.
   #
-  # @argument include[] [Optional, String, "courses"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"users"]
+  # @argument include[] [Optional, String, "courses"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"outcome_paths"|"users"]
   #   Specify additional collections to be side loaded with the result.
   #
   # @example_response
@@ -228,35 +258,50 @@ class OutcomeResultsController < ApplicationController
   #        // (Optional) Included if include[] has outcome_links
   #        "outcome_links": [OutcomeLink]
   #
+  #        // (Optional) Included if include[] has outcome_paths
+  #        "outcome_paths": [OutcomePath]
+  #
   #        // (Optional) Included if include[] has outcomes.alignments
   #        "outcomes.alignments": [OutcomeAlignment]
   #      }
   #    }
   def rollups
-    json = case params[:aggregate]
-      when 'course' then aggregate_rollups
-      else user_rollups
+    respond_to do |format|
+      format.json do
+        json = case params[:aggregate]
+          when 'course' then aggregate_rollups_json
+          else user_rollups_json
+        end
+        json[:linked] = linked_include_collections if params[:include].present?
+        render json: json if json
+      end
+      format.csv do
+        build_outcome_paths
+        send_data(
+          outcome_results_rollups_csv(user_rollups, @outcomes, @outcome_paths),
+          :type => "text/csv",
+          :filename => t('outcomes_filename', "Outcomes").gsub(/ /, "_") + "-" + @context.name.to_s.gsub(/ /, "_") + ".csv",
+          :disposition => "attachment"
+        )
+      end
     end
-    json[:linked] = linked_include_collections if params[:include].present?
-    render json: json if json
   end
 
-  # Internal: Renders rollups for each user.
-  #
-  # Returns nothing.
-  def user_rollups
-    @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
+  private
+
+  def user_rollups(opts = {})
     @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes)
-    rollups = outcome_results_rollups(@results, @users)
-    json = outcome_results_rollups_json(rollups)
+    outcome_results_rollups(@results, @users)
+  end
+
+  def user_rollups_json
+    @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
+    json = outcome_results_rollups_json(user_rollups)
     json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
     json
   end
 
-  # Internal: Renders the aggregate rollups for the context.
-  #
-  # Returns nothing.
-  def aggregate_rollups
+  def aggregate_rollups_json
     # calculating averages for all users in the context and only returning one
     # rollup, so don't paginate users in ths method.
     @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes)
@@ -266,12 +311,6 @@ class OutcomeResultsController < ApplicationController
     json
   end
 
-  # Internal: Adds linked collections to rollup json result based on the
-  # include[] parameter
-  #
-  # json - the Hash to add a linked field to.
-  #
-  # Returns a result Hash that should be merged into the linked section.
   def linked_include_collections
     linked = {}
     includes = Api.value_to_array(params[:include])
@@ -281,66 +320,41 @@ class OutcomeResultsController < ApplicationController
     linked
   end
 
-  # Internal: Serialize courses for the context.
-  #
-  # currently the only course we ever need is @context itself.
-  #
-  # Returns an Array of serialized courses.
   def include_courses
     outcome_results_linked_courses_json([@context])
   end
 
-  # Internal: Serialize @outcomes for the context.
-  #
-  # Returns an Array of serialized outcomes.
   def include_outcomes
     outcome_results_include_outcomes_json(@outcomes)
   end
 
-  # Internal: Query and serialize outcome groups for the context.
-  #
-  # Returns an Array of serialized outcome groups.
   def include_outcome_groups
-    groups = @context.learning_outcome_groups
-    outcome_results_include_outcome_groups_json(groups)
+    outcome_results_include_outcome_groups_json(@outcome_groups)
   end
 
-  # Internal: Query and serialize outcome links for the context.
-  #
-  # Returns an Array of serialized outcome links.
   def include_outcome_links
-    links = @context.learning_outcome_links
-    outcome_results_include_outcome_links_json(links)
+    outcome_results_include_outcome_links_json(@outcome_links)
   end
 
-  # Internal: Serialize users for the context.
-  #
-  # Returns an Array of serialized users.
+  def include_outcome_paths
+    build_outcome_paths
+    @outcome_paths
+  end
+
   def include_users
     outcome_results_linked_users_json(@users)
   end
 
-  # Internal: Query and serialize alignments for @results
-  #
-  # Returns an Array of serialized alignments
   def include_alignments
     alignments = @results.map(&:alignment).map(&:content).uniq
     outcome_results_include_alignments_json(alignments)
   end
 
-  # Internal: Query and serialize alignments for @outcomes
-  #
-  # Returns an Array of serialized alignments
   def include_outcomes_alignments
     alignments = @outcomes.map(&:alignments).flatten.map(&:content).uniq
     outcome_results_include_alignments_json(alignments)
   end
 
-  # Internal: Makes sure the context is a valid context for outcome_results and
-  #   the current_user has appropriate permissions. This method is meant to be
-  #   used as a before_filter.
-  #
-  # Returns nothing. May raise if current_user does not have permissions.
   def require_outcome_context
     reject! "invalid context type" unless @context.is_a?(Course)
 
@@ -354,20 +368,12 @@ class OutcomeResultsController < ApplicationController
     end
   end
 
-  # Internal: Verifies the aggregate parameter.
-  #
-  # Raises an ApiError error if the aggregate parameter is invalid.
-  #   Returns true otherwise.
   def verify_aggregate_parameter
     aggregate = params[:aggregate]
     reject! "invalid aggregate parameter value" if aggregate && !%w(course).include?(aggregate)
     true
   end
 
-  # Internal: Verifies the include[] parameter
-  #
-  # Raises an ApiError if the include parameter is invalid
-  #  Returns true otherwise
   def verify_include_parameter
     Api.value_to_array(params[:include]).each do |include_name|
       case include_name
@@ -376,39 +382,46 @@ class OutcomeResultsController < ApplicationController
       when 'users'
         reject! "can't include users unless aggregate is not set" if params[:aggregate].present?
       else
-        reject! "invalid include: #{include_name}" unless self.respond_to? include_method_name(include_name)
+        reject! "invalid include: #{include_name}" unless self.respond_to? include_method_name(include_name), :include_private
       end
     end
     true
   end
 
-  # Internal: Returns the potential method name for the include parameter value.
   def include_method_name(include_name)
     "include_#{include_name.parameterize.underscore}"
   end
 
-  # Internal: Finds context outcomes
-  #
-  # Returns an outcome scope
   def require_outcomes
-    @outcomes = @context.linked_learning_outcomes
+    @outcome_groups = @context.learning_outcome_groups.includes(:child_outcome_links => :content)
+    @outcome_links = @outcome_groups.map{|x| x.child_outcome_links.active}.flatten
+    @outcomes = @outcome_links.map(&:content)
     reject! "can't filter by both outcome_ids and outcome_group_id" if params[:outcome_ids] && params[:outcome_group_id]
     if params[:outcome_ids]
       outcome_ids = Api.value_to_array(params[:outcome_ids]).map(&:to_i).uniq
-      @outcomes = @outcomes.where(id: outcome_ids)
+      @outcomes = @outcomes.select{|x| outcome_ids.include?(x.id)}
       reject! "can only include id's of outcomes in the outcome context" if @outcomes.count != outcome_ids.count
     elsif params[:outcome_group_id]
-      outcome_group = @context.learning_outcome_groups.where(id: params[:outcome_group_id].to_i).first
+      outcome_group = @outcome_groups.where(id: params[:outcome_group_id].to_i).first
       reject! "can only include an outcome group id in the outcome context" unless outcome_group
-      @outcomes = outcome_group.child_outcome_links.map(&:content)
+      @outcomes = outcome_group.child_outcome_links.active.map(&:content)
     end
   end
 
-  # Internal: Filter context users by user_ids param (if provided), ensuring
-  #  that user_ids does not include users not in the context.
-  #
-  # Raises an ApiError if user_ids includes a user outside the
-  #  context. Returns a User scope otherwise.
+  def build_outcome_paths
+    @outcome_paths = @outcome_links.map do |link|
+      parts = outcome_group_prefix(link.associated_asset).push({name: link.content.title})
+      {id: link.content.id, parts: parts}
+    end
+  end
+
+  def outcome_group_prefix(group)
+    if !group.parent_outcome_group
+      return []
+    end
+    outcome_group_prefix(group.parent_outcome_group).push({name: group.title})
+  end
+
   def require_users
     reject! "cannot specify both user_ids and section_id" if params[:user_ids] && params[:section_id]
 
@@ -425,10 +438,6 @@ class OutcomeResultsController < ApplicationController
     @users = @users.order(:id)
   end
 
-  # Internal: Gets a list of users that should have results returned based on
-  #   @context. For courses, this will only return students.
-  #
-  # Returns a User scope.
   def users_for_outcome_context
     # this only works for courses; when other context types are added, this will
     # need to treat them differently.

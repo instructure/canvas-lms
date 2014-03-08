@@ -672,17 +672,6 @@ module Api
     !!(/application\/vnd\.api\+json/ =~ request.headers['Accept'].to_s)
   end
 
-  # Reject the API request by halting the execution of the current handler
-  # and returning a helpful error message (and HTTP status code).
-  #
-  # @param [String] cause
-  #   The reason the request is rejected for.
-  # @param [Optional, Fixnum|Symbol, Default :bad_request] status
-  #   HTTP status code or symbol.
-  def reject!(cause, status=:bad_request)
-    raise Api::V1::ApiError.new(cause, status)
-  end
-
   # Return a template url that follows the root links key for the jsonapi.org
   # standard.
   #

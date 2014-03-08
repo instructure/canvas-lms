@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'csv'
+
 module Api::V1::OutcomeResults
   include Api::V1::Outcome
 
@@ -169,5 +171,30 @@ module Api::V1::OutcomeResults
       score: score.score,
       links: {outcome: score.outcome.id.to_s},
     }
+  end
+
+  def outcome_results_rollups_csv(rollups, outcomes, outcome_paths)
+    CSV.generate do |csv|
+      row = []
+      row << I18n.t(:student_name, 'Student name')
+      row << I18n.t(:student_id, 'Student ID')
+      outcomes.each do |outcome|
+        pathParts = outcome_paths.find{|x| x[:id] == outcome.id}[:parts]
+        path = pathParts.map{|x| x[:name]}.join(' > ')
+        row << I18n.t(:outcome_path_result, "%{path} result", :path => path)
+        row << I18n.t(:outcome_path_mastery_points, "%{path} mastery points", :path => path)
+      end
+      csv << row
+      rollups.each do |rollup|
+        row = [rollup.context.name, rollup.context.id]
+        outcomes.each do |outcome|
+          score = rollup.scores.find{|x| x.outcome == outcome}
+          criterion = outcome.data && outcome.data[:rubric_criterion]
+          row << (score ? score.score : nil)
+          row << (criterion ? criterion[:mastery_points] : nil)
+        end
+        csv << row
+      end
+    end
   end
 end
