@@ -353,15 +353,15 @@ describe "discussions" do
         end
 
         it "should allow a teacher to unpin a topic" do
-          topic.pinned = true
-          topic.save!
+          assignment_topic.pinned = true
+          assignment_topic.save!
           get(url)
           wait_for_ajaximations
 
           f('.pinned.discussion-list .al-trigger').click
           fj('.icon-pin:visible').click
           wait_for_ajaximations
-          topic.reload.should_not be_pinned
+          assignment_topic.reload.should_not be_pinned
           ffj('.open.discussion-list li.discussion:visible').length.should == 1
         end
 

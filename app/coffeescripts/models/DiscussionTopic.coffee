@@ -32,18 +32,20 @@ define [
 
     initialize: ->
       @participants = new ParticipantCollection
-
       @entries = new DiscussionEntriesCollection
       @entries.url = => "#{_.result this, 'url'}/entries"
       @entries.participants = @participants
 
-      @set 'set_assignment', @get('assignment')?
-      assign_attributes = @get('assignment') or {}
+    parse: (json) ->
+      json.set_assignment = json.assignment?
+      assign_attributes = json.assignment || {}
       assign_attributes.assignment_overrides or= []
       assign_attributes.turnitin_settings or= {}
-      @set 'assignment', @createAssignment(assign_attributes)
-      @set 'publishable',  @get('can_unpublish')
-      @set 'unpublishable', @get('can_unpublish')
+      json.assignment = @createAssignment(assign_attributes)
+      json.publishable = json.can_publish
+      json.unpublishable = json.can_unpublish
+
+      json
 
     createAssignment: (attributes) ->
       assign = new Assignment(attributes)
