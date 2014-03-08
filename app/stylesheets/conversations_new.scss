@@ -8,7 +8,8 @@
 
 #main {
   position: absolute;
-  bottom: 40px;
+  bottom: 0;
+  margin-bottom: 0;
   display: none;
   width: 100%;
   -moz-box-sizing: border-box;
@@ -16,8 +17,7 @@
 }
 
 #footer {
-  position: absolute;
-  bottom: 0;
+  display: none;
 }
 
 #content {
