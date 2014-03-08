@@ -348,6 +348,7 @@ describe "discussions" do
           fj('.icon-pin:visible').click
           wait_for_ajaximations
           topic.reload.should be_pinned
+          topic.position.should_not be_nil
           ffj('.pinned.discussion-list li.discussion:visible').length.should == 1
         end
 

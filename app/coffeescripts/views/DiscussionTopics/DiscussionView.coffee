@@ -74,7 +74,7 @@ define [
       key    = if @model.get('locked') then 'lock' else 'unlock'
       locked = !@model.get('locked')
       pinned = if locked then false else @model.get('pinned')
-      @model.save(locked: locked, pinned: pinned)
+      @model.updateBucket(locked: locked, pinned: pinned)
       $(e.target).text(@messages[key])
 
     # Public: Confirm a request to delete and then complete it if needed.
@@ -101,7 +101,7 @@ define [
     togglePinned: (e) =>
       e.preventDefault()
       key = if @model.get('pinned') then 'pin' else 'unpin'
-      @model.updateOneAttribute('pinned', !@model.get('pinned'))
+      @model.updateBucket(pinned: !@model.get('pinned'))
       $(e.target).text(@messages[key])
 
     # Public: Treat the whole <li /> as a link.
