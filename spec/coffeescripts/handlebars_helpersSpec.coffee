@@ -2,7 +2,9 @@ define [
   'compiled/handlebars_helpers'
   'jquery'
   'underscore'
-], ({helpers}, $, _) ->
+  'timezone'
+  'vendor/timezone/America/Detroit'
+], ({helpers}, $, _, tz, detroit) ->
 
   module 'handlebars_helpers'
 
@@ -66,3 +68,23 @@ define [
     text = "going to the store"
     truncText = helpers.truncate_left text, 15
     equal truncText, "...to the store", "Reverse truncates"
+
+  module 'friendlyDatetime',
+    setup: -> @snapshot = tz.snapshot()
+    teardown: -> tz.restore(@snapshot)
+
+  test 'can take an ISO string', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    # the datetime attribute in the output element is (for now) inappropriately
+    # fudged, so we need to cover that in the spec. we'll correct it in a later
+    # commit where we can manage all the ramifications
+    datetime = $.fudgeDateForProfileTimezone(new Date(0)).toISOString()
+    equal helpers.friendlyDatetime('1970-01-01 00:00:00Z', hash: {pubDate: false}).string,
+      "<time title='Dec 31, 1969 at 7pm' datetime='#{datetime}' undefined>Dec 31, 1969</time>"
+
+  test 'can take a date object', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    # ditto
+    datetime = $.fudgeDateForProfileTimezone(new Date(0)).toISOString()
+    equal helpers.friendlyDatetime(new Date(0), hash: {pubDate: false}).string,
+      "<time title='Dec 31, 1969 at 7pm' datetime='#{datetime}' undefined>Dec 31, 1969</time>"
