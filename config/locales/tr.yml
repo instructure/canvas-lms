@@ -786,7 +786,7 @@ tr:
       alert_icon_information_option: bilgi
       alert_icon_question_option: soru
       alert_icon_warning_option: uyarı
-      alert_timespan: "%{start_at} ile %{end_at} arası"
+      alert_timespan: "%{start_at} ile %{end_at}"
       alerts_title: Uyarılar
       announcement_blank_to_all: "(Eğer kimse seçili değilse herkese gönder)"
       announcement_sent_to_roles: "Yalnızca şu tür kullanıcılara gönder:"
@@ -867,7 +867,7 @@ tr:
         restrict_quiz_questions: "Ders bitim tarihinden sonra öğrencilerin kısa sınav sorularını görmelerini engelle"
         restrict_student_future_view: "Başlangıç zamanından önce öğrencilerin dersi görmesini engelle"
         self_enrollment: "Kendi kendine Kayda İzin Ver"
-        self_registration: "Ön Kayıt"
+        self_registration: "Kendi Kendine Kayıt"
         self_registration_type_all: "Tüm Hesap Türleri"
         self_registration_type_observer: "Yalnızca Gözlemci Hesapları"
         show_scheduler: "Zamanlayıcıyı Etkinleştir"
@@ -2690,7 +2690,7 @@ tr:
       tabs: 
         assignment: Ödev
         event: Olay
-      timespan: "%{start_time} *ile* %{end_time} arası"
+      timespan: "%{start_time} *ile* %{end_time}"
     default_title: olay
     event: 
       due: bitiş
@@ -8873,10 +8873,10 @@ tr:
     event_date_changed: 
       email: 
         email_body: "%{course_name} dersi içerisindeki %{event_title} isimli olayın zamanı değiştirildi. Şu anda:"
-        from_to_time: "%{start_date_time} ile %{end_date_time} arası"
+        from_to_time: "%{start_date_time} ile %{end_date_time}"
         html: 
           email_body: "%{course_name} dersi içerisindeki %{event_title} isimli olayın zamanı değiştirildi. Şu anda:"
-          from_to_time: "%{start_date_time} ile %{end_date_time} arası"
+          from_to_time: "%{start_date_time} ile %{end_date_time}"
           no_time_set: "Zaman Ayarlanmadı"
           see_details: "Buradan ayrıntıyı görebilirsiniz"
           subject: "Olay Tarihi Değişti: %{event_title}, %{course_name}"
@@ -8885,21 +8885,21 @@ tr:
         no_time_set: "Zaman Ayarlanmadı"
         subject: "Olay Tarihi Değişti: %{event_title}, %{course_name}"
       facebook: 
-        from_to_time: "%{start_date_time} ile %{end_date_time} arası"
+        from_to_time: "%{start_date_time} ile %{end_date_time}"
         no_time_set: "Zaman Ayarlanmadı"
         subject: "%{course_name} dersi için [%{event_title}](%{link_to_event}) olayının zamanı değiştirildi. Şu anda:"
       sms: 
-        from_to_time: "%{start_date_time} ile %{end_date_time} arası"
+        from_to_time: "%{start_date_time} ile %{end_date_time}"
         more_info: "Daha fazla bilgi için %{web_link}"
         no_time_set: "Zaman Ayarlanmadı"
         subject: "%{course_name} içerisindeki %{event_title} olay şöyle değiştirildi:"
       summary: 
-        from_to_time: "%{start_date_time} ile %{end_date_time} arası"
+        from_to_time: "%{start_date_time} ile %{end_date_time}"
         no_time_set: "Zaman Ayarlanmadı"
         subject: "Olay Tarihi Değişti: %{event_title}, %{course_name}"
       twitter: 
         email_body: "%{course_name} dersi %{course_name} olayının zamanı değiştirildi. Şu anda: %{new_time}"
-        from_to_time: "%{start_date_time} ile %{end_date_time} arası"
+        from_to_time: "%{start_date_time} ile %{end_date_time}"
         no_time_set: "Zaman Ayarlanmadı"
     file_locked: "Bu dosya kilitli."
     file_locked_at: "Bu dosya %{at} tarihinde kilitlendi."
@@ -9239,10 +9239,10 @@ tr:
     new_event_created: 
       email: 
         body: "%{course_name} dersi için haberdar olmanız gereken planlanmış yeni bir olay var:"
-        from_to_time: "%{start_date_time} ile %{end_date_time} arası"
+        from_to_time: "%{start_date_time} ile %{end_date_time}"
         html: 
           body: "%{course_name} dersi için haberdar olmanız gereken planlanmış yeni bir olay var:"
-          from_to_time: "%{start_date_time} ile %{end_date_time} arası"
+          from_to_time: "%{start_date_time} ile %{end_date_time}"
           no_time_set: "Zaman Ayarlanmadı"
           see_details: "Ayrıntıyı buradan görebilirsiniz"
           subject: "Yeni Olay - %{event_title}, %{course_name}"
@@ -9252,19 +9252,19 @@ tr:
         subject: "Yeni Olay - %{event_title}, %{course_name}"
       facebook: 
         body: "%{course_name} dersi için planlanmış yeni bir olay var:"
-        from_to_time: "%{start_date_time} ile %{end_date_time} arası"
+        from_to_time: "%{start_date_time} ile %{end_date_time}"
         no_time_set: "Zaman Ayarlanmadı"
       sms: 
-        from_to_time: "%{start_date_time} ile %{end_date_time} arası"
+        from_to_time: "%{start_date_time} ile %{end_date_time}"
         more_info: "Daha fazla bilgi için %{web_address}"
         no_time_set: "Zaman Ayarlanmadı"
         subject: "%{course_name} dersi için yeni olay:"
       summary: 
-        from_to_time: "%{start_date_time} ile %{end_date_time} arası"
+        from_to_time: "%{start_date_time} ile %{end_date_time}"
         no_time_set: "Zaman Ayarlanmadı"
         subject: "Yeni Olay - %{event_title}, %{course_name}"
       twitter: 
-        from_to_time: "%{start_date_time} ile %{end_date_time} arası"
+        from_to_time: "%{start_date_time} ile %{end_date_time}"
         no_time_set: "Zaman Ayarlanmadı"
         subject: "Canvas Uyarısı - Olay: %{event_title}, %{course_name}"
     new_file_added: 
@@ -10995,6 +10995,7 @@ tr:
   qti_display: QTI
   qti_file_description: "QTI .zip dosyası"
   qti_name: "QTI Dönüştürücü"
+  qualified_locale: tr-TR
   question_answered: Cevaplandı
   question_bank: 
     align_outcomes: "Çıktıları Sırala"
@@ -13537,11 +13538,11 @@ tr:
         one: "1 Ders"
         other: "%{count} Ders"
       labels: 
-        designers_can_access_from: "**Tasarımcılar** şunlara erişebilir"
+        designers_can_access_from: "**Tasarımcılar** erişimi"
         sis_id: "SIS ID"
-        students_can_access_from: "**Öğrenciler** şunlara erişebilir"
-        tas_can_access_from: "**Asistan öğretmenler** şunlara erişebilir"
-        teachers_can_access_from: "**Öğretmenler** şunlara erişebilir"
+        students_can_access_from: "**Öğrenciler** erişimi"
+        tas_can_access_from: "**Asistan öğretmenler** erişimi"
+        teachers_can_access_from: "**Öğretmenler** erişimi"
       name: "Dönem Adı :"
       sis_source_id: "SIS ID:"
       term_runs_from: "den **Dönem Başlıyor**"
@@ -13569,7 +13570,7 @@ tr:
   text_helper: 
     time: 
       ranges: 
-        different_days: "%{start_date_and_time} ile %{end_date_and_time} arası"
+        different_days: "%{start_date_and_time} ile %{end_date_and_time}"
   time: 
     am: am
     count_hours_ago: 
@@ -13589,9 +13590,9 @@ tr:
     less_than_a_minute_ago: "bir dakikadan daha az"
     pm: pm
     ranges: 
-      different_days: "%{start_date_and_time} ile %{end_date_and_time} arası"
-      same_day: "%{date} tarihi %{start_time} ile %{end_time} arası"
-      times: "%{start_time} ile %{end_time} arası"
+      different_days: "%{start_date_and_time} ile %{end_date_and_time}"
+      same_day: "%{date} tarihi %{start_time} ile %{end_time}"
+      times: "%{start_time} ile %{end_time}"
     unknown_date: "Bilinmeyen tarih"
     with_ago: "%{time} önce"
   tinymce: 
@@ -13972,7 +13973,7 @@ tr:
       privacy_policy: "Gizlilik Sözleşmesi"
       terms_of_use: "Kullanım Koşulları"
     no_deleting_sis_user: "Sistem tarafından oluşturulan kullanıcıyı silemezsiniz"
-    no_self_registration: "Hızlı kayıt işlemi bu hesap için aktif değildir"
+    no_self_registration: "Kendi kendine kayıt işlemi bu hesap için aktif değildir"
     oauth_fail: "OAuth isteği başarısız. Geçerli istek bulunamadı"
     recaptcha_settings: 
       labels: 
