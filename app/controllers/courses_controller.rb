@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -135,7 +135,7 @@ require 'set'
 #           "type": "integer"
 #         },
 #         "term": {
-#           "description": "optional: the name of the enrollment term for the course returned only if include[]=term",
+#           "description": "optional: the enrollment term object for the course returned only if include[]=term",
 #           "$ref": "Term"
 #         },
 #         "apply_assignment_group_weights": {
@@ -365,6 +365,9 @@ class CoursesController < ApplicationController
   # @argument course[enroll_me] [Optional, Boolean]
   #   Set to true to enroll the current user as the teacher.
   #
+  # @argument course[term_id] [Optional, Integer]
+  #   The unique ID of the term to create to course in.
+  #
   # @argument course[sis_course_id] [Optional, String]
   #   The unique SIS identifier.
   #
@@ -396,9 +399,8 @@ class CoursesController < ApplicationController
         @sub_account = @account.find_child(sub_account_id) || raise(ActiveRecord::RecordNotFound)
       end
 
-      if enrollment_term_id = params[:course].delete(:enrollment_term_id)
-        params[:course][:enrollment_term] = api_find(@account.root_account.enrollment_terms, enrollment_term_id)
-      end
+      term_id = params[:course].delete(:term_id).presence || params[:course].delete(:enrollment_term_id).presence
+      params[:course][:enrollment_term] = api_find(@account.root_account.enrollment_terms, term_id) if term_id
 
       sis_course_id = params[:course].delete(:sis_course_id)
       apply_assignment_group_weights = params[:course].delete(:apply_assignment_group_weights)
@@ -641,13 +643,13 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read_roster)
       users = @context.users_visible_to(@current_user)
-      users = users.where(:users => { :id => params[:id]})
+      users = users.where(:users => {:id => params[:id]})
       includes = Array(params[:include])
       user_json_preloads(users, includes.include?('email'))
       if includes.include?('enrollments')
         # not_ended_enrollments for enrollment_json
         # enrollments course for has_grade_permissions?
-        User.send(:preload_associations, users, { :not_ended_enrollments => :course },
+        User.send(:preload_associations, users, {:not_ended_enrollments => :course},
                   :conditions => ['enrollments.course_id = ?', @context.id],
                   :shard => @context.shard)
       end
@@ -1512,9 +1514,8 @@ class CoursesController < ApplicationController
       return unless authorized_action(account, @current_user, [:create_courses, :manage_courses])
       if account.grants_rights?(@current_user, session, :manage_courses)
         root_account = account.root_account
-        args[:enrollment_term] = if params[:course][:enrollment_term_id].present?
-          root_account.enrollment_terms.find_by_id(params[:course][:enrollment_term_id])
-        end
+        enrollment_term_id = params[:course].delete(:term_id).presence || params[:course].delete(:enrollment_term_id).presence
+        args[:enrollment_term] = root_account.enrollment_terms.find_by_id(enrollment_term_id) if enrollment_term_id
       end
       args[:enrollment_term] ||= @context.enrollment_term
       args[:abstract_course] = @context.abstract_course
@@ -1591,12 +1592,12 @@ class CoursesController < ApplicationController
           account = api_find(Account, params[:course].delete(:account_id))
           @course.account = account if account != @course.account && account.grants_right?(@current_user, session, :manage)
         end
-        if params[:course][:enrollment_term_id]
-          enrollment_term = api_find(@course.root_account.enrollment_terms.active, params[:course].delete(:enrollment_term_id))
-          @course.enrollment_term = enrollment_term if enrollment_term != @course.enrollment_term
-        end
+        enrollment_term_id = params[:course].delete(:term_id).presence || params[:course].delete(:enrollment_term_id).presence
+        enrollment_term = api_find(@course.root_account.enrollment_terms, enrollment_term_id) if enrollment_term_id
+        @course.enrollment_term = enrollment_term if enrollment_term && enrollment_term != @course.enrollment_term
       else
         params[:course].delete :account_id
+        params[:course].delete :term_id
         params[:course].delete :enrollment_term_id
       end
       unless @course.account.grants_right? @current_user, session, :manage_storage_quotas
