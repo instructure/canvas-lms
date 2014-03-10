@@ -29,6 +29,24 @@ end
 
 require File.expand_path("../config/canvas_rails3", __FILE__)
 
+# force a different lockfile for rails 3
+if CANVAS_RAILS3
+  Bundler::SharedHelpers.class_eval do
+    class << self
+      def default_lockfile
+        Pathname.new("#{Bundler.default_gemfile}.lock3")
+      end
+    end
+  end
+
+  Bundler::Dsl.class_eval do
+    def to_definition(lockfile, unlock)
+      @sources << @rubygems_source unless @sources.include?(@rubygems_source)
+      Definition.new(Bundler.default_lockfile, @dependencies, @sources, unlock, @ruby_version)
+    end
+  end
+end
+
 # patch bundler to do github over https
 unless Bundler::Dsl.private_instance_methods.include?(:_old_normalize_options)
   class Bundler::Dsl

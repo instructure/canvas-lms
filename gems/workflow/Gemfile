@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in canvas_workflow.gemspec
 gemspec
 
-CANVAS_RAILS3 = !!ENV['CANVAS_RAILS3'] || File.exist?(File.expand_path("../../RAILS3", __FILE__))
+require File.expand_path("../../../config/canvas_rails3", __FILE__)
 
 if CANVAS_RAILS3
   gem 'rails', '3.2.15'
