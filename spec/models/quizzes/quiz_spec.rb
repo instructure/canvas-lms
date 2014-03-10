@@ -1526,5 +1526,10 @@ describe Quizzes::Quiz do
       tag3.destroy
       quiz.context_module_tags.pluck(:id).sort.should eql [tag1.id, tag2.id].sort
     end
+
+    it "should act like an association" do
+      quiz = @course.quizzes.create! title: 'Test Quiz'
+      lambda { quiz.context_module_tags.loaded? }.should_not raise_error
+    end
   end
 end
