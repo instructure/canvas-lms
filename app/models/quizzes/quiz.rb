@@ -98,8 +98,24 @@ class Quizzes::Quiz < ActiveRecord::Base
       end
     end
 
-  def context_module_tags
-    ContentTag.where("content_id=? AND content_type IN ('Quiz', 'Quizzes::Quiz') AND tag_type='context_module' AND workflow_state<>'deleted'", self.id).includes(:context_module => [:content_tags])
+  has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => "content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'", :include => {:context_module => [:content_tags]} do
+    if CANVAS_RAILS2
+      def construct_sql
+        @finder_sql = @counter_sql =
+            "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_id = #{owner_quoted_id} AND " +
+            "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_type IN ('Quiz', #{@owner.class.quote_value(@owner.class.base_class.name.to_s)}) AND " +
+            "#{@reflection.quoted_table_name}.tag_type='context_module' AND " +
+            "#{@reflection.quoted_table_name}.workflow_state<>'deleted'"
+      end
+    else
+      def where(*args)
+        if args.length == 1 && args.first.is_a?(Arel::Nodes::Equality) && args.first.left.name == 'content_type'
+          super(args.first.left.in(['Quiz', 'Quizzes::Quiz']))
+        else
+          super
+        end
+      end
+    end
   end
 
   # This callback is listed here in order for the :link_assignment_overrides
