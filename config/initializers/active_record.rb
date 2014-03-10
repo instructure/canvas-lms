@@ -1860,6 +1860,37 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
 
 end
 
+# shims so that AR objects serialized under rails 2 function under rail s3
+unless CANVAS_RAILS2
+  ActiveRecord::AttributeMethods::Serialization::ClassMethods.class_eval do
+    def attribute_cast_code(attr_name)
+      if serialized_attributes.include?(attr_name)
+        "(ActiveRecord::AttributeMethods::Serialization::Attribute === v ? v.unserialized_value : ActiveRecord::AttributeMethods::Serialization.object_from_yaml(v))"
+      else
+        super
+      end
+    end
+  end
+
+  ActiveRecord::AttributeMethods::Serialization.class_eval do
+    def self.object_from_yaml(string)
+      return string unless string.is_a?(String) && string =~ /^---/
+      YAML::load(string) rescue string
+    end
+  end
+
+  ActiveRecord::Associations.class_eval do
+    def association_instance_get(name)
+      (@association_cache || {})[name.to_sym]
+    end
+
+    def association_instance_set(name, association)
+      @association_cache ||= {}
+      @association_cache[name] = association
+    end
+  end
+end
+
 unless CANVAS_RAILS2
   ActiveRecord::AttributeMethods::Serialization::Attribute.class_eval do
     def unserialize
