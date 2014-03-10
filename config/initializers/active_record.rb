@@ -28,7 +28,7 @@ class ActiveRecord::Base
     # See ActiveModel#serializable_add_includes
     def serializable_add_includes(options = {}, &block)
       super(options) do |association, records, opts|
-        yield association, records, opts.merge(:include_root => options[:include_root])
+        yield association, records, opts.reverse_merge(:include_root => options[:include_root])
       end
     end
   end

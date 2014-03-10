@@ -128,7 +128,7 @@ class QuestionBanksController < ApplicationController
     if authorized_action(@bank, @current_user, :update)
       if @bank.update_attributes(params[:assessment_question_bank])
         @bank.reload
-        render :json => @bank.as_json(:include => {:learning_outcome_alignments => {:include => :learning_outcome}})
+        render :json => @bank.as_json(:include => {:learning_outcome_alignments => {:include => {:learning_outcome => {:include_root => false}}}})
       else
         render :json => @bank.errors, :status => :bad_request
       end
