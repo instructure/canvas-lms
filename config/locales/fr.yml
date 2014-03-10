@@ -93,7 +93,6 @@ fr:
         login_handle_name: "Libellé de connexion"
       login_handle_name_description: "Libellé utilisé pour les identifiants de connexion uniques. Exemples : Nom de connexion, Nom d’utilisateur, ID d’étudiant, etc."
       save_button: "Enregistrer les paramètres d’authentification"
-    deprecated_fail: "Impossible d’utiliser en même temps l’ancienne version et l’actuelle version de create."
     index: 
       add_auth_desc: "Ajouter un fournisseur d’identités à ce compte :"
       canvas_login_tip: |-
@@ -176,11 +175,8 @@ fr:
       last_ldap_timeout_failure: "Dernière expiration de délai"
       ldap_timeout_failure_help2: "En cas de fréquentes expirations de délai alors que Canvas communique avec le serveur LDAP, toutes les autres tentatives d’utilisation de ce serveur seront bloquées pendant %{time}."
     login_required: "est obligatoire"
-    no_auth_mixing: "Impossible de mélanger les types d’authentification"
     no_changing_auth_types: "Impossible de changer le type de configuration des autorisations. Veuillez supprimer celle-ci et créer une nouvelle configuration."
-    no_config_sent: "auth_type doit être spécifié."
     no_discovery_url: Aucune
-    only_one_cas: "Impossible de créer plusieurs configurations CAS "
     password_required: "est obligatoire"
     saml_required: "Une configuration SAML est nécessaire pour tester SAML."
     saml_settings: 
@@ -276,6 +272,11 @@ fr:
     sis_exporter: 
       deleted: "Inclure les objets supprimés : true;"
       reports: "Rapports : %{files}"
+    student: 
+      enrollment_state: "Inclure l’état de l’inscription : true;"
+      enrollment_states: "États d’inscription : %{states};"
+    usu: 
+      enrollment_types: "Types d’inscription : %{types}"
   account_settings: 
     account: Compte
     account_name_too_long: "Nom du compte trop long"
@@ -368,6 +369,28 @@ fr:
         messages_viewed: "Notifications envoyées à *%{user}* du *%{start_date}* au *%{end_date}*."
       comm_messages_search_results: 
         no_messages_found: "Aucun message trouvé"
+      course_logging_content: 
+        course_activity: "Activité du cours"
+        find: Rechercher
+      course_logging_details: 
+        Field: Champ
+        From: De
+        To: À
+        Value: Valeur
+        date: Date
+        event_id: "ID d’événement"
+        event_type_label: Type
+        time: Heure
+        user: Utilisateur
+      course_logging_item: 
+        view_event_details: "Afficher les détails"
+      course_logging_results: 
+        date: Date
+        event_details: "Détails de l’événement"
+        event_type: Type
+        no_item_found: "Recherche infructueuse"
+        time: Heure
+        user: Utilisateur
       course_search_form: 
         labels: 
           find_deleted_course: "Trouver un cours supprimé"
@@ -397,8 +420,8 @@ fr:
         message_date_from: Du
         message_date_to: Au
       grade_change_logging_content: 
-        auth_logging: "Activité de modification des notes"
         find: Rechercher
+        grade_change_activity: "Activité de modification des notes"
         message_assignment_id: "ID de travail "
         message_course_id: "ID de cours"
       grade_change_logging_results: 
@@ -413,6 +436,7 @@ fr:
         time: Heure
       logging_content_pane: 
         authentication: Connexions/déconnexions
+        course: "Activité du cours"
         grade_change: "Activité de modification des notes"
         select_default: "Sélectionner un type de journal"
         select_label: "Sélectionnez un type de journal à rechercher."
@@ -844,6 +868,8 @@ fr:
         restrict_student_future_view: "Empêcher les étudiants de voir les cours avant la date de début"
         self_enrollment: "Autoriser l’auto-inscription"
         self_registration: Auto-inscription
+        self_registration_type_all: "Tous les types de compte"
+        self_registration_type_observer: "Comptes d’observateur uniquement"
         show_scheduler: "Activer l’outil de planification"
         sis_source_id: "ID SIS"
         start_at: "Débute à"
@@ -1117,6 +1143,15 @@ fr:
             description: 
               header: Exemple
             text: "Ce rapport répertorie tous les étudiants inscrits à un cours d’un trimestre donné et n’ayant rendu aucun travail pendant la période indiquée. Il contient une ligne par inscription répondant aux critères. La période ne peut pas excéder deux semaines."
+    students_with_no_submissions_csv_parameters: 
+      account_reports: 
+        default: 
+          enrollment_state: 
+            header: "État d’inscription"
+          include_enrollment_state: 
+            check_box: "Inclure l’état de l’inscription"
+      active: "Inscriptions actives"
+      all: "Toutes les inscriptions"
     submission_data_csv_description: 
       account_reports: 
         submission_data: 
@@ -1164,6 +1199,24 @@ fr:
           main: 
             text: "Ce rapport répertorie tous les cours ne contenant aucun des éléments suivants : travaux, annonces, discussions, fichiers, modules, pages ou questionnaires."
     update_failed_notice: "Échec de la mise à jour des paramètres du compte"
+    user_access_csv_description: 
+      account_reports: 
+        usu: 
+          description: 
+            header: Exemple
+          user_activity: 
+            text: "Ce rapport affiche toutes les activités des utilisateurs inscrits à un cours ou à tous les cours d’un trimestre. Le fichier CSV résultant contient une ligne par activité avec les intitulés suivants : type d’inscription, ID de section, ID SIS de section, nom de la section, ID de cours, ID SIS de cours, nom du cours, ID d’utilisateur, ID SIS d’utilisateur, type de contenu, contenu, nombre de consultations, nombre de participations, date de la dernière consultation. Le nombre de consultations et de participations sont comptés du début de la période jusqu’à la génération du rapport."
+    user_access_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: "Type d’inscription"
+      all: "Toutes les inscriptions"
+      designer: "Inscriptions de concepteur"
+      observer: "Inscriptions d’observateur"
+      students: "Inscriptions d’étudiant"
+      ta: "Inscriptions AE"
+      teachers: "Inscriptions d’enseignant"
     user_add_failed_message: "Échec de l’ajout du cours, veuillez réessayer"
     user_deleted_message: "%{username} a été supprimé"
     user_inactivity_csv_description: 
@@ -1397,7 +1450,6 @@ fr:
     default_title: "Pas de nom - %{course}"
     default_unfiled_title: "Questions non classées"
   assignment: 
-    advanced_options_errors: "Des erreurs se sont produites sur une ou plusieurs options avancées"
     assignment_group_must_have_group: "Sélectionnez un groupe pour cette tâche."
     at_least_one_file_type: "Spécifiez au moins un type de fichier autorisé"
     at_least_one_submission_type: "Choisissez au moins un type d’envoi"
@@ -1415,7 +1467,6 @@ fr:
     feed_entry_title: "Tâcher : %{assignment}"
     feed_entry_title_with_course: "Tâche, %{course} : %{assignment}"
     group_assignment_must_have_group_set: "Sélectionnez un ensemble de groupes pour cette tâche"
-    hide_advanced_options: "Masquer les options avancées"
     imported_assignments_group: "Tâches importées"
     labels: 
       due: Échéance
@@ -1423,7 +1474,6 @@ fr:
     percentage_points_possible: "Les points possibles doivent être supérieurs à 0 pour la valeur en pourcentage"
     points_possible_number: "Les points possibles doivent être spécifiés par un nombre "
     select_external_tool_dialog_title: "Configurer un outil externe"
-    show_advanced_options: "Afficher les options avancées"
     submission_action_take_quiz: "Prendre %{title}"
     submission_action_turn_in_assignment: "Remettre %{title}"
     submission_types: 
@@ -1715,11 +1765,9 @@ fr:
       buttons: 
         update: "Mettre à jour une tâche"
       description: Description
-      due_date: "Date d’échéance"
       freeze_properties: "Verrouiller les propriétés de la tâche lors de la copie"
       notify_content_change: "Informer les utilisateurs que ce contenu a changé"
       points_possible: Points
-      show_advanced_options: "Afficher les options avancées"
       warnings: 
         assignment_is_frozen: "Certains paramètres ont été verrouillés par l’administrateur."
     errors: 
@@ -1756,7 +1804,7 @@ fr:
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "Note : %{grade}%"
     grading_type_selector: 
-      grading_type: "Type de notation"
+      display_grade_as: "Afficher la note en tant que"
       grading_type_options: 
         letter_grade: "Notation par lettre"
         not_graded: "Non noté"
@@ -1766,6 +1814,7 @@ fr:
       view_grading_levels: "Afficher les niveaux de notation"
     group_category_selector: 
       grade_group_students_individually: "Attribuer les notes individuellement à chaque étudiant"
+      group_assignment_header: "Travail de groupe"
       group_category_options: "Nouvelle catégorie de groupe"
       group_set: "Ensemble de groupes"
       is_group_assignment: "Ceci est une tâche pour un groupe"
@@ -1845,6 +1894,8 @@ fr:
       submitting: "Envoi en cours…"
     multiple_due_dates: "Plusieurs dates d’échéance"
     name_is_required: "Le nom doit être spécifié."
+    name_too_long: "Nom trop long"
+    name_too_long_error: "Nom trop long"
     never_drop: 
       remove_rule: "Supprimer la règle"
     never_drop_collection: 
@@ -1903,12 +1954,14 @@ fr:
         remind: "Rappeler à %{assessor} les évaluations, notifiées la dernière fois le %{time}"
         reminder: "Rappeler les évaluations à %{assessor}. Dernière notification envoyée à %{time}"
     peer_reviews_selector: 
+      how_to_peer_review: "Comment attribuer des révisions aux pairs"
       labels: 
         automatically_assign_peer_reviews: "Attribuer automatiquement des révisions aux pairs"
         manually_assign_peer_reviews: "Attribuer manuellement des révisions aux pairs"
         require_peer_reviews: "Demander la révision par les pairs"
       locked_until: "Attribuer des révisions"
       peer_reviews_assign_at_explanation: "Doit être ultérieure à la date d’échéance. Si ce paramètre est omis, la date d’échéance est utilisée."
+      peer_reviews_header: "Révisions par les pairs"
       reviews_per_user: "Révisions par utilisateur"
     points_possible_number: "Les points possibles doivent être spécifiés par un nombre "
     positive_number: "Vous devez utiliser un nombre positif"
@@ -1991,17 +2044,19 @@ fr:
       advanced_turnitin_settings: "Paramètres Turnitin avancés"
       descriptions: 
         allowed_extensions: "Entrez une liste d’extensions acceptées, par exemple : doc,xls,txt."
+      external_tool_options: "Options d’outil externe"
       label: 
         external_tool_new_tab: "Charger cet outil dans un nouvel onglet"
         external_tool_url: "URL d’outil externe"
         turnitin_enabled: "Activer les envois Turnitin"
       labels: 
-        allow_file_uploads: "Autoriser l’envoi de fichiers"
-        allow_media_recordings: "Autoriser l’enregistrement de fichiers multimédias"
-        allow_text_entry: "Autoriser la saisie de texte"
-        allow_url: "Autoriser les URL de site Web"
+        allow_file_uploads: "Téléchargements de fichiers"
+        allow_media_recordings: "Enregistrements multimédias"
+        allow_text_entry: "Saisie de texte"
+        allow_url: "URL de site Web"
         allowed_extensions: "Extensions de fichiers autorisées"
         restrict_file_extensions: "Limiter les types de fichiers pour les envois"
+      online_entry_options: "Options d’entrée en ligne"
       submission_type: "Type d’envoi"
       submission_types: 
         external_tool: "Outil externe"
@@ -3123,6 +3178,7 @@ fr:
     select_content: 
       cancel_btn: Annuler
       select_content_btn: "Sélectionner du contenu"
+      select_content_label: "Sélectionnez un contenu, utilisez les flèches vers le bas et vers le haut pour vous déplacer dans l’arborescence. La flèche droite permet de développer l’arborescence, la gauche de la réduire."
     select_course: "Sélectionner un cours"
     show_issues: "Afficher les incidents"
     subviews: 
@@ -3261,8 +3317,9 @@ fr:
         conclude_student: "Voulez-vous vraiment terminer l’inscription de cet étudiant ?"
         delete_enrollment: "Voulez-vous vraiment supprimer l’inscription de cet étudiant ?"
       enrolled_as: "Inscrit comme %{enrollment_type}"
-      enrollment_change_failed: "Échec de la modification des autorisations d’inscription, veuillez réessayer"
       enrollment_linked_to: "liée à *%{linked_user}*"
+      error: 
+        enrollment_change_failed: "Échec de la modification des autorisations d’inscription. Veuillez réessayer."
       labels: 
         user_privileges: Autorisations
       legends: 
@@ -3568,10 +3625,10 @@ fr:
         description: 
           delete: "Supprimer le module/élément actuel"
           edit: "Modifier le module/élément"
-          indent: "Mettre en retrait l’élément actuel"
+          indent: "Augmenter le retrait"
           new: "Nouveau module"
           next: "Module/élément suivant"
-          outdent: "Appliquer un retrait négatif à l’élément actuel"
+          outdent: "Diminuer le retrait"
           previous: "Module/élément précédent"
       keycode_descriptions: 
         next_module_item: "Sélectionner le module ou l’élément de module suivant"
@@ -3723,10 +3780,10 @@ fr:
       links: 
         edit_item: "Modifier les informations de l’élément"
         edit_item_details_label: "Modifier les informations de l’élément"
-        indent: "Retrait positif de l’élément"
-        indent_label: "Retrait positif de l’élément"
-        outdent: "Retrait négatif de l’élément"
-        outdent_label: "Retrait négatif de l’élément"
+        indent: "Augmenter le retrait"
+        indent_label: "Augmenter le retrait"
+        outdent: "Diminuer le retrait"
+        outdent_label: "Diminuer le retrait"
         remove_item: "Supprimer cet élément du module"
         remove_item_label: "Supprimer cet élément du module"
       max_score: 
@@ -3764,10 +3821,10 @@ fr:
       links: 
         edit_item: Modifier
         edit_item_details: "Modifier les détails de l’élément"
-        indent: Retrait
-        indent_item: "Mettre l’élément en retrait"
+        indent: "Augmenter le retrait"
+        indent_item: "Augmenter le retrait"
         outdent: "Diminuer le retrait"
-        outdent_item: "Diminuer le retrait de l’élément"
+        outdent_item: "Diminuer le retrait"
         remove_item: Supprimer
         remove_item_from_module: "Supprimer cet élément du module"
       max_score: 
@@ -4226,6 +4283,62 @@ fr:
     wrapper: 
       close_course_menu_title: fermer
       reset_course_menu: Réinitialiser
+  course_logging: 
+    event_type: 
+      concluded: Terminé
+      created: Créé
+      updated: Actualisé
+    field_label: 
+      abstract_course_id: "ID de cours abstrait"
+      account_id: "ID de compte"
+      allow_student_discussion_editing: "Autoriser la modification de la discussion des étudiants"
+      allow_student_discussion_topics: "Autoriser les sujets de discussion des étudiants"
+      allow_student_forum_attachments: "Autoriser les pièces joints dans le forum des étudiants"
+      allow_student_organized_groups: "Autoriser les groupes organisés par les étudiants"
+      allow_student_wiki_edits: "Autoriser les modifications des Wikis des étudiants "
+      allow_wiki_comments: "Autoriser les commentaires Wikis"
+      conclude_at: "Terminé à"
+      course_code: "Code du cours"
+      created_at: "Créé à"
+      default_view: "Vue par défaut"
+      default_wiki_editing_roles: "Rôles de modification Wiki par défaut"
+      enrollment_term_id: "ID de trimestre d’inscription"
+      grading_standard_id: "ID de critère de notation"
+      group_weighting_scheme: "Système de pondération des groupes"
+      hide_distribution_graphs: "Masquer les graphiques de répartition"
+      hide_final_grade: "Masquer la note finale "
+      indexed: Indexé
+      integration_id: "ID d’intégration"
+      is_public: "Est public"
+      large_roster: "Grande liste"
+      license: Licence
+      locale: Lieu
+      lock_all_announcements: "Verrouiller toutes les annonces"
+      name: Nom
+      old_account_id: "ID d’ancien compte"
+      open_enrollment: "Ouvrir l’inscription"
+      public_description: "Description publique"
+      public_syllabus: "Programme public"
+      replacement_course_id: "ID de cours de remplacement"
+      restrict_enrollments_to_course_dates: "Restreindre les inscriptions aux dates de cours"
+      root_account_id: "ID de compte racine"
+      self_enrollment: Auto-inscription
+      self_enrollment_code: "Code d’auto-inscription"
+      self_enrollment_limit: "Limite d’auto-inscription"
+      show_all_discussion_entries: "Afficher toutes les entrées de discussion"
+      show_public_context_messages: "Afficher le message contextuel public"
+      sis_batch_id: "ID de lot SIS"
+      sis_source_id: "ID de source SIS"
+      start_at: "Début à"
+      storage_quota: "Quota de stockage"
+      syllabus_body: syllabus_body
+      tab_configuration: "Configuration d’onglet"
+      template_course_id: "ID de cours modèle"
+      turnitin_comments: "Commentaires Turnitin "
+      updated_at: "Actualisé à"
+      uuid: UUID
+      wiki_id: "ID de Wiki"
+      workflow_state: "État du flux de travail"
   course_restore: 
     restore_error: "Une erreur s’est produite lors de la restauration du cours. Celui-ci n’a pas été restauré."
   course_search: 
@@ -4266,7 +4379,7 @@ fr:
     invitation_sent_now: "Vient d’être envoyée"
     link_students_placeholder: "Saisissez un nom d’étudiant"
     links: 
-      less_options: "moins d’options"
+      fewer_options: "moins d’options"
       more_options: "autres options"
       publish: "Publier les notes sur SIS"
       publishing: "Publication des notes sur SIS..."
@@ -5165,6 +5278,10 @@ fr:
     cancel: Annuler
     save_settings: "Enregistrer les paramètres"
     saving: Enregistrement...
+  differentiated_assignments_description: |-
+      Les travaux différenciés sont une fonction *bêta* qui permet de choisir à quelle(s) section(s) un travail s’applique.
+      Les sections auxquelles aucun travail n’est attribué n’en afficheront pas dans le contenu du cours et la note finale sera calculée
+      sans ces points
   discussion_entries: 
     created_entry_notice: "L’entrée a été créée."
     deleted_entry_notice: "Cette entrée a été supprimée"
@@ -5444,6 +5561,10 @@ fr:
     unsubscribe: "Se désabonner de ce sujet"
     unsubscribed: Désabonné
     unsubscribed_hint: "Vous n’êtes pas abonné à ce sujet. Cliquez pour vous abonner."
+  draft_state: 
+    cant_unpublish_when_students_submit: "Impossible de retirer la publication s’il y a des envois d’étudiants"
+    publish: Publier
+    unpublish: "Annuler la publication"
   draft_state_description: |-
       Cette fonction bêta remanie de nombreuses parties de Canvas et permet de mettre le contenu
       dans un nouveau mode, Non publié, ce qui le rend invisible pour les étudiants et l'exclut du calcul des
@@ -6024,9 +6145,10 @@ fr:
       release_notes: "notes de publication"
       toggle_feature_details: "Alterner entre les détails de la fonction"
     feature_flag_admin_view: 
-      feature_options: "Options de la fonction"
+      feature_options: "Options de la fonction "
       no_features_available: "Il n’y a aucune fonctionnalité disponible actuellement."
   features: 
+    differentiated_assignments: "Travaux différenciés"
     draft_state: "État du brouillon"
     draft_state_account_disable_warning: |-
         La désactivation de cette fonctionnalité aura un impact sur les cours existants. Pour en savoir plus sur la manière de la désactiver, contactez votre 
@@ -6037,6 +6159,7 @@ fr:
     google_docs_domain_restriction: "Restriction de domaine pour Google Docs"
     outcome_gradebook: "Carnet d’évaluation des acquis"
     screenreader_gradebook: "Relevé de notes pour lecteur d’écran"
+    student_outcome_gradebook: "Carnet d’évaluation des acquis des étudiants"
   file_browser_view: 
     folder_tree_instructions: "Utilisez les flèches vers le bas et vers le haut pour vous déplacer dans l’arborescence. La flèche droite permet de développer les dossiers, la gauche de les réduire et la touche Entrée de choisir une image."
   filebrowserview: 
@@ -6447,6 +6570,7 @@ fr:
       set_group_weights: "Définir les coefficients de groupe"
       show_attendance_columns: "Afficher les colonnes de participation"
       show_concluded_enrollments: "Afficher les inscriptions closes"
+      srgb_gradebook: "changer de relevé de notes"
       upload_scores: "Télécharger les notes (d’un .csv)"
       view_grading_history: "Afficher l’historique de notation"
     show_notes: "Afficher la colonne des remarques"
@@ -6588,6 +6712,7 @@ fr:
       muted: "Mode silencieux"
     grade_summary: 
       assessment_by: "Évaluation par %{name}"
+      assignments: Travaux
       buttons: 
         show_what_if: "Afficher les notes \"hypothétiques\" enregistrées"
       change_score_instructions: "Cliquez sur une note et entrez une nouvelle valeur pour voir comment le changement affectera votre total."
@@ -6624,6 +6749,7 @@ fr:
         only_graded: "Calcul basé uniquement sur les tâches notées"
         total: Total
         your_score: "Votre note"
+      learning_outcomes: "Maîtrise de l’apprentissage"
       links: 
         click_to_view: "cliquez ici pour afficher"
         download: "Télécharger %{attachment}"
@@ -6909,6 +7035,7 @@ fr:
     grade_incomplete: "Non terminé"
     grade_ungraded: "Non noté"
     out_of: "(sur %{points})"
+    out_of_nil: "Aucun point possible"
     out_of_with_score: "(%{score} sur %{points})"
   grading_standard: 
     unknown_grading_details: "Informations inconnues"
@@ -8439,10 +8566,10 @@ fr:
           audio_comment: "Ce message inclut des commentaires multimédias. Pour les écouter ou y répondre, cliquez sur le lien ci-dessous :"
           body: "%{user_name} vient de vous envoyer un message dans Canvas :"
           download: télécharger
-          reply_message: "Pour répondre à ce message, cliquez sur le lien ci-dessous :"
+          reply_to_conversation_message: "Vous pouvez répondre à ce message dans Canvas en répondant directement à cet e-mail."
           subject: "%{user_name} vient de vous envoyer un message dans Canvas."
           unknown_user: "Utilisateur inconnu"
-        reply_message: "Pour répondre à ce message, cliquez sur le lien ci-dessous :"
+        reply_to_conversation_message: "Vous pouvez répondre à ce message dans Canvas en répondant directement à cet e-mail."
         subject: "%{user_name} vient de vous envoyer un message sur Canvas."
         unknown_user: "Utilisateur inconnu"
       facebook: 
@@ -9058,10 +9185,10 @@ fr:
     new_discussion_entry: 
       email: 
         body: "%{user} a publié un nouveau commentaire sur le fil de discussion %{discussion_topic} pour %{course} :"
-        details: "Rejoignez la conversation ici :"
+        discussion_entry_reply_message: "Prenez part à la conversation en utilisant le lien ci-dessous ou ajoutez un commentaire en répondant à ce message."
         html: 
           body: "%{user} a publié un nouveau commentaire sur le fil de discussion %{discussion_topic} pour %{course} :"
-          details: "Cliquez ici pour prendre part à la conversation"
+          discussion_entry_link_message: "[Cliquez ici pour prendre part à la conversation](%{url}) ou ajoutez un commentaire en répondant à ce message."
           subject: "Nouveau commentaire sur %{discussion_topic} : %{course}"
         subject: "Nouveau commentaire pour %{discussion_topic} : %{course}"
       facebook: 
@@ -9361,9 +9488,9 @@ fr:
         body: "%{author} vient d’ajouter un commentaire sur l’envoi de %{user} pour %{assignment}."
         html: 
           body: "%{author} vient d’ajouter un commentaire sur l’envoi du travail %{assignment} par %{user}."
-          link_message: "Vous pouvez consulter les détails de l’envoi ici :"
           someone: Quelqu’un
           subject: "Commentaire sur le travail envoyé : %{user}, %{assignment}, %{context}"
+          submission_comment_link_message: "Vous pouvez voir les détails de l’envoi en utilisant le lien ci-dessous ou répondre à ce commentaire en répondant à ce message."
         link_message: "Vous pouvez consulter les informations de l’envoi ici :"
         someone: Quelqu’un
         subject: "Commentaire sur l’envoi : %{user}, %{assignment}, %{context}"
@@ -9387,9 +9514,9 @@ fr:
           link_message: "Vous pouvez consulter les détails de l’envoi ici :"
           someone: Quelqu’un
           subject: "Commentaire sur le travail envoyé : %{user}, %{assignment}, %{context}"
-        link_message: "Vous pouvez consulter les informations de l’envoi ici :"
         someone: Quelqu’un
         subject: "Commentaire sur l’envoi : %{user}, %{assignment}, %{context}"
+        submission_comment_link_message: "Vous pouvez voir les détails de l’envoi en utilisant le lien ci-dessous ou répondre à ce commentaire en répondant à ce message."
       facebook: 
         body: "*%{author}* vient d’ajouter un commentaire sur l’envoi de **%{user} pour %{assignment}**."
         someone: Quelqu’un
@@ -9884,9 +10011,10 @@ fr:
     ? "yes"
     : Oui
   outcome_gradebook_description: |-
-      Le carnet d’évaluation des acquis permet aux enseignants de voir rapidement la progression des étudiants et du cours
-      dans les différents apprentissages. Les acquis sont présentés comme un relevé de notes
-      et les progrès des étudiants sont exprimés à la fois sous la forme d’une valeur numérique et avec les appréciations maîtrisé/presque maîtrisé/soutien.
+      Le carnet d’évaluation des acquis permet aux enseignants de voir rapidement la progression
+      des étudiants et du cours dans les différents apprentissages. Les acquis sont présentés comme un relevé de notes
+      et les progrès des étudiants sont exprimés à la fois sous la forme d’une valeur numérique et avec les appréciations
+      maîtrisé/presque maîtrisé/soutien.
   outcome_groups: 
     invalid_file: "Fichier de groupe de résultat non valide"
   outcome_groups_api: 
@@ -10131,14 +10259,6 @@ fr:
       description: "Vous devrez avoir accès à une instance DimDim."
       labels: 
         domain: Domaine
-    embedly: 
-      description: "Récupérer les infos Embedly pour les collections"
-      name: "Intégration Embedly"
-    embedly_settings: 
-      description: "Ce plug-in s’intègre au service Embedly pour pré-remplir les informations relatives aux éléments de collection. Le programme payé renvoie des informations supplémentaires par rapport au programme gratuit : de nombreuses images peuvent être sélectionnées sur la page, et les informations incorporées sont renvoyées pour un aperçu en ligne (lecture de vidéos youtube, etc.)."
-      labels: 
-        api_key: "Clé API Embedly"
-        plan_type: "Type de programme Embedly"
     error_reporting: 
       description: "Mécanismes des rapports d’erreurs par défaut"
       name: "Rapport d’erreur"
@@ -10314,6 +10434,7 @@ fr:
       labels: 
         download_url: "URL de téléchargement de LockDown Browser"
         plugin_enabled: Activés
+        use_lti_tool: "Utilisez l’outil LTI pour gérer les paramètres de questionnaire dans le navigateur LockDown Browser (obligatoire pour le contrôle)"
     med_cornell_export: 
       labels: 
         password: "Mot de passe pour l’authentification"
@@ -10503,7 +10624,7 @@ fr:
       diigo_description: "Diigo est un outil de création de signets sociaux adapté plus particulièrement à la recherche et à l’éducation. L’éditeur de contenu enrichi Canvas permet d’effectuer une recherche dans les étiquettes Diigo afin d’obtenir des liens rapides de Canvas vers d’autres sources d’informations utiles."
       error_loading_token_details: "Erreur de chargement des informations de jeton"
       facebook_description: "Si vous avez un compte Facebook, vous pouvez installer l’application Canvas et recevoir des notifications du cours sur votre profil. Vous pouvez spécifier les types de notifications souhaitées et la périodicité des envois."
-      feature_options: "Options de la fonction"
+      feature_options: "Options de la fonction "
       full_token_warning: |-
           **Copiez ce jeton maintenant**. Après avoir quitté cette page, vous ne pourrez plus
           récupérer le jeton complet et devrez regénérer le jeton pour obtenir une nouvelle
@@ -10860,6 +10981,7 @@ fr:
   qti_display: QTI
   qti_file_description: "Fichier .zip QTI"
   qti_name: "Convertisseur QTI"
+  qualified_locale: fr-FR
   question_answered: "Réponse donnée"
   question_bank: 
     align_outcomes: "Aligner les résultats"
@@ -10977,14 +11099,6 @@ fr:
       regrade_options: "Options de recalcul de la note *(pour les étudiants qui ont déjà répondu à cette question) :*"
       some_scores_reduced: "Attribuez des points uniquement pour la réponse correcte (*la note de certains étudiants pourra baisser*)"
       update_question_without_regrading: "Actualiser la question sans reclassement"
-  quiz_group: 
-    errors: 
-      no_bank: "Impossible de trouver la banque de questions pour le groupe de quizz %{group_name}."
-      no_permissions: "L’utilisateur ne disposait pas des droits nécessaires pour référencer la banque de questions dans le groupe de quizz %{group_name}."
-    question_group: "Groupe de questions"
-  quiz_question: 
-    defaults: 
-      question_name: Question
   quiz_reports: 
     quiz_report_generator: 
       download_report_name: "Télécharger %{report_name}"
@@ -10992,27 +11106,10 @@ fr:
       generated_at_date_time: "Généré le %{dateAndTime}"
       generating_report_name: "Génération de %{report_name}..."
       item_analysis_not_available: "L’analyse des éléments n’est pas possible pour les enquêtes"
-  quiz_statistics: 
-    statistics_filename: "Rapport %{quiz_title} %{quiz_type} %{report_type} "
-    types: 
-      item_analysis: "Analyse - élément"
-      student_analysis: "Analyse - étudiant"
   quiz_submissions: 
-    errors: 
-      invalid_submissions: "Cet envoi de questionnaire n’a pas pu être identifié comme vous appartenant. Veuillez recommencer."
-      late_quiz: "Vous avez envoyé ce questionnaire en retard, par conséquent vos réponses n’ont peut-être pas été enregistrées."
-      protected_quiz: "Ce questionnaire est protégé et ne peut être utilisé que dans certaines régions. L’ordinateur que vous utilisez ne semble pas être situé dans une zone géographique valide permettant d’utiliser ce questionnaire."
     show: 
       score_out_of: "Vous avez obtenu %{score} sur %{points_possible}"
-    still_zipping: "Compression des fichiers toujours en cours..."
   quizzes: 
-    access_code: 
-      buttons: 
-        submit: Envoyer
-      labels: 
-        access_code: "Code d’accès"
-      quiz_restricted: "L’accès à ce questionnaire est limité par un code. Demandez à votre enseignant ou à votre superviseur d’entrer, ou de vous indiquer, le code d’accès vous permettant de compléter ce questionnaire."
-      survey_restricted: "L’accès à cette enquête est limité par un code. Demandez à votre enseignant ou à votre superviseur d’entrer, ou de vous indiquer, le code d’accès vous permettant de compléter cette enquête."
     after_last_attempt: "Après la dernière tentative"
     alerts: 
       no_valid_combinations: "Le système ne parvient pas à générer une combinaison valide pour les paramètres donnés."
@@ -11022,6 +11119,7 @@ fr:
     always: Toujours
     answer_comments: "Commentaires de réponse"
     answer_text: "Texte de la réponse"
+    assignment: Travail
     assignment_points_possible: 
       one: "%{count} point"
       other: "%{count} points"
@@ -11054,83 +11152,13 @@ fr:
     default_answer_comments: "Réponse si l’étudiant choisi cette réponse"
     default_answer_comments_on_match: "Réponse si l’étudiant trouve cette réponse"
     default_comments_on_wrong_match: "Réponse si l’utilisateur ne trouve pas cette correspondance"
-    default_history_crumb: Historique
     default_quesiton_name: Question
     default_question_name: Question
     default_quiz_title: Questionnaire
     default_response_to_essay: "Réponse à afficher après l’envoi d’une réponse par l’étudiant."
     default_response_to_file_upload: "Réponse à afficher après l’envoi d’une réponse par l’étudiant"
-    default_title: "Nouveau questionnaire"
-    display_answer: 
-      labels: 
-        answer_with_margin: "avec marge"
-        your_answer: "Votre réponse"
-      margin_of_error: "marge d’erreur"
-      plus_or_minus: +/-
-      range_answer: "Entre %{lower_bound} et %{upper_bound}."
-      you_left_this_blank: "Cette réponse est vide."
-    display_question: 
-      default_question_answer: "[ Choisir ]"
-      flag_this_question: "Signaler cette question"
-      headers: 
-        formulas: Formules
-        possible_solutions: "Solutions possibles"
-        solution_answer: Réponse
-        variable_maximum: Max.
-        variable_minimum: Min.
-        variable_name: Variable
-        variable_precision: Décimales
-        variables: Variables
-      labels: 
-        additional_comments: "Commentaires supplémentaires"
-        for_answer_number: "Pour la réponse %{answer_number}"
-        warning_icon: Avertissement
-      links: 
-        delete_question: "Supprimer cette question"
-        edit_question: "Modifier cette question"
-        move_copy_question: "déplacer/copier la question vers une autre banque"
-      not_yet_graded: "Pas encore noté"
-      original_score: "Note initiale :"
-      points_possible: "%{points_possible} points"
-      regraded_score: "Note recalculée :"
-      show_ansers_for_variable: "Afficher les réponses pour %{variable}"
-      skip_question_text: "Passer au texte de la question."
-      submission_was_regraded: "La note de cette question a été recalculée. "
-      titles: 
-        question_correct_comment: "Les étudiants verront ce commentaire si leur réponse est correcte"
-        question_incorrect_comment: "Les étudiants verront ce commentaire si leur réponse est incorrecte"
-        question_neutral_comment: "Les étudiants verront ce commentaire après avoir répondu à la question"
-      unsupported_question_type: "Cette question a été importée d’une source externe. C’était une question dont le type « %{question_type} » n’est pas pris en charge dans ce questionnaire."
-      you_left_this_blank: "Cette réponse est vide."
     download_all_quiz_file_upload_submissions: "Télécharger tous les envois de chargement de fichiers de questionnaire"
-    download_file_upload_submissions: 
-      links: 
-        download_submissions: "Télécharger tous les fichiers"
     enter_answer_variable_above: "[ Entrez ci-dessus les variables de réponses ]"
-    equations_help: 
-      equation_functions: |-
-          Outre les variables, vous disposez également d’un ensemble de fonctions auxiliaires          qui permettent de générer des valeurs utiles. Par exemple :
-          
-          %{example}
-          
-          Pour afficher l’explication d’une fonction auxiliaire donnée, sélectionnez celle-ci dans la liste.
-          below:
-      equation_intro: |-
-          Les questions calculées sont basées sur un ensemble d’une ou plusieurs formules calculées 
-          dans l’ordre.  Vous pouvez définir des variables intermédiaires dans ces formules, mais le
-          résultat numérique de la dernière formule sera utilisé pour générer la
-           réponse correcte. Par exemple :
-          
-          %{example}
-          
-          Pour cet ensemble de formules, la réponse finale est 71. Toutefois,
-          il n’y a pas de variables prédéfinies, par conséquent tous les étudiants auront la
-          même question avec la même réponse. Pour plus d’informations sur les variables, voir l’onglet « variables ».
-      equation_variables2: "Vous pouvez également définir des variables dans le texte de votre question à l’aide de crochets (« Combien font [a] + [b] ? »). Pour chaque variable, vous verrez une « valeur exemple » basée sur les paramètres de variables. Cela vous permet de vérifier la formule mathématique et de vous assurer qu’elle fonctionne. Par exemple, si votre question est « Combien font [a] + 5 ? », alors vous devez définir la variable « a ». Si la valeur exemple de « a » est 5,2, vous pourriez écrire : %{example}. Avec cette formule, vous pouvez générer autant de jeux de solutions que vous voulez, avec une valeur « a » différente à chaque fois. Un étudiant pourrait voir la question « Combien font 5,2 + 5 ? » quand l’autre verrait « Combien font 9 + 5 ? »."
-      links: 
-        functions: Fonctions
-        intro: Intro
-        variables: Variables
     errors: 
       adding_questions_failed: "L’ajout des questions a échoué, veuillez réessayer"
       creating_group_failed: "Échec de création du groupe, veuillez réessayer"
@@ -11144,16 +11172,11 @@ fr:
       missing_ip_filter: "Vous devez entrer une adresse IP valide"
       no_answer: "Ajoutez au moins une réponse"
       no_correct_answer: "Veuillez choisir une réponse correcte"
-      no_more_attempts: "Vous avez épuisé le nombre de tentatives autorisées pour ce questionnaire"
       no_possible_solution: "Veuillez générer au moins une solution possible"
-      quiz_deleted: "Ce questionnaire a été supprimé"
       quiz_score_not_a_number: "Le résultat doit être un nombre compris entre 0 et 2 000 000 000."
       quiz_score_too_long: "Le résultat doit être inférieur à 2 000 000 000."
       quiz_score_too_short: "Le résultat doit être supérieur à 0."
-      quiz_update_failed: "Échec de la mise à jour du questionnaire"
       retrieving_filters_failed: "Échec de récupération des filtres"
-    fabulous_quizzes: 
-      page_titles: Questionnaires
     ? "false"
     : Faux
     file_uploaded_or_removed: 
@@ -11161,134 +11184,6 @@ fr:
         file_successfully_uploaded: "Votre fichier a été chargé."
         files_removed: "%{display_name} a été supprimé."
     final_answer: "Réponse finale"
-    find_question_from_bank: 
-      already_added: "cette question figure déjà dans le questionnaire"
-      bank_description: "%{bank_name}, %{n} questions"
-      buttons: 
-        add_questions: "Ajouter des questions"
-        create_group: "Créer un groupe"
-        select_bank: "Sélectionner une banque"
-      group_pick_count: "%{pick_count} questions"
-      group_points: "%{points} par question"
-      headers: 
-        bank_name: "Nom de la banque"
-      hints: 
-        group_pick_count: "%{pick_count} sélections jusqu’ici"
-      labels: 
-        add_questions_to_group: "Ajouter les questions au groupe du questionnaire"
-        group_name: "Nom du groupe"
-        group_pick_count: Choisir
-        group_points: Points
-      links: 
-        clear_all_banks: "Effacer tout"
-        manage_question_banks: "Gérer les banques de questions du cours"
-        more_questions: "questions supplémentaires"
-        select_all_banks: "Sélectionner tout"
-      options: 
-        new_group: "[ Nouveau groupe ]"
-        no_group: "[ Aucun groupe ]"
-      select_a_question_bank: "Sélectionnez une banque de questions dans la liste ci-dessous afin de la lier au questionnaire comme groupe de questions."
-      titles: 
-        add_new_question_group: "Ajouter un nouveau groupe de questions"
-    form_answer: 
-      answer_in_range_accessible: "entre *début de la plage* et #range end#"
-      answer_text: "Texte de la réponse"
-      answer_weight: "Valeur de la réponse"
-      exact_answer_with_error_margin_accessible: "*réponse exacte* avec une marge d’erreur de #error margin#"
-      labels: 
-        answer_comments: "Commentaire si l’étudiant choisi cette réponse"
-        answer_in_range: "Réponse dans la fourchette"
-        exact_answer: "Réponse exacte"
-      matching_left: "Correspond au côté gauche"
-      matching_right: "Correspond au côté droit"
-      numerical_answer: "Réponse numérique"
-      possible_answer: "Réponse possible"
-      titles: 
-        click_to_enter_answer_comments: "Cliquez pour ajouter un commentaire si l’étudiant choisi cette réponse"
-        click_to_set_as_correct: "Cliquez pour définir cette réponse comme correcte."
-        delete_answer: "Supprimer cette réponse"
-        edit_as_html: "Passer en mode HTML pour le texte de réponse"
-    form_question: 
-      allow_tolerance: "autoriser une marge d’erreur de +/- %{tolerance}"
-      buttons: 
-        create_update_question: "Créer/Mettre à jour la question"
-        generate: Générer
-        recompute: Recalculer
-      correct_answer_comments: "Commentaires de réponse correcte"
-      distractor_instructions: "tapez chaque distracteur sur sa propre ligne"
-      equation_example: "c.-à-d., \"Combien font 5 plus [x] ?\""
-      explanation: 
-        generate_possible_solutions: "Enfin, créez autant de combinaisons de solution-variable que nécessaires pour votre questionnaire."
-      explanations: 
-        calculated: "Entrez une question, créez une formule et générez un ensemble de combinaisons de réponses possibles. Les étudiants verront une question accompagnée d’un ensemble de variables sélectionnées de manière aléatoire, et devront taper le numéro de la réponse correcte."
-        equations: "Vous pouvez définir des variables en tapant le nom des variables entre crochets."
-        essay: "Les étudiants recevront une zone de texte pour écrire leur réponse."
-        file_upload: "Les étudiants pourront charger un fichier de réponse."
-        fill_in_multiple_blanks: "Entrez votre question en spécifiant chaque emplacement vide. Puis, définissez la réponse correcte possible pour chaque emplacement vide. Les étudiants doivent entrer les réponses correctes dans les zones de texte de chaque emplacement vide."
-        formula_definition: "Ensuite, vous devez écrire la ou les formules utilisées pour calculer la réponse correcte. Pour cela, utilisez simplement les noms de variables énumérés plus haut."
-        matching: "Créez des paires de valeurs correspondantes. Les étudiants verront les valeurs affichées à gauche, et devront sélectionner la valeur correspondante à droite dans une liste déroulante. Plusieurs lignes peuvent avoir la même réponse, et vous pouvez ajouter des distracteurs supplémentaires à droite."
-        missing_word: "Définissez le texte qui doit s’afficher avant et après la liste déroulante. Créez un ensemble de réponses possibles et sélectionnez une réponse correcte."
-        multi_answer_sets: "Dans la zone ci-dessous, pour chaque emplacement où vous souhaitez afficher une zone de réponse, tapez un mot de référence (sans espaces) entre crochets."
-        multiple_answers: "Cette question affiche une case à cocher près de chaque réponse, et l’étudiant doit sélectionner TOUTES les réponses que vous marquez comme correcte."
-        multiple_choice: "Entrez votre question et plusieurs réponses, puis sélectionnez la réponse correcte."
-        multiple_dropdowns: "Entrez votre question en spécifiant l’emplacement de chaque liste déroulante. Puis définissez les réponses possibles pour chaque liste déroulante, avec une réponse correcte par liste."
-        numerical: "Pour la réponse correcte, définissez un nombre dans une plage de nombres, ou un nombre avec une marge d’erreur inférieure ou supérieure. L’étudiant verra une zone de texte vide dans laquelle taper le numéro de sa réponse."
-        short_answer: |-
-            Entrez le texte de votre question, puis définissez toutes les réponses correctes possibles pour l’emplacement vide. 
-            Les étudiants verront une question suivie d’une zone de texte dans laquelle entrer leur réponse.
-        text_only: "Cette \"question\" n’est pas notée, mais peut s’avérer utile pour présenter un ensemble de questions connexes."
-        true_false: "Entrez le texte de votre question, puis sélectionnez la valeur Vrai ou Faux comme réponse correcte."
-        variable_definitions: "Après avoir entré vos variables ci-dessus, elles doivent apparaître ici. Pour chaque variable ci-dessous, vous pouvez spécifier une plage de valeurs possibles."
-      general_answer_comments: "Commentaires de réponse généraux"
-      headers: 
-        formula_definition: "Définition de formule"
-        generate_possible_solutions: "Générer les solutions possibles"
-        variable_definitions: "Définitions de variables"
-        variable_example_value: "Valeur exemple"
-        variable_maximum: Max.
-        variable_minimum: Min.
-        variable_name: Variable
-        variable_precision: Décimales
-      label: 
-        question: 
-          name: "Nom de la question "
-          points: "Valeur de la question en points"
-          type: "Type de question"
-      labels: 
-        answers: Réponses
-        distractors: "Possibilités de correspondances supplémentaires (distracteurs)"
-        missing_word_after: "Texte affiché après les réponses"
-        points: points
-        question: Question
-      links: 
-        add_another_answer: "Ajouter une autre réponse"
-        need_help: "Besoin d’aide ?"
-      multi_answer_sets_example: "c.-à-d., \"Les roses sont [color1], les violettes [color2]\""
-      offer_combinations: "Proposer %{how_many} combinaisons de valeurs possibles (max. %{max_combinations})"
-      options: 
-        only_one_correct: "Une seule réponse correcte"
-        students_select_multiple: "Plusieurs réponses sélectionnées par l’étudiant"
-      question_type: 
-        calculated: "Question formule"
-        essay: "Question essai"
-        file_upload: "Question avec chargement de fichier"
-        fill_in_multiple_blanks: "Champs multiples à compléter"
-        matching: Correspondance
-        missing_word: "Mot manquant"
-        multiple_answers: "Choix multiple (plusieurs réponses)"
-        multiple_choice: "Choix multiple (une seule réponse)"
-        multiple_dropdowns: "Listes déroulantes"
-        numerical: "Réponse numérique"
-        short_answer: "Champ à compléter"
-        text_only: "Texte (pas de question)"
-        true_false: Vrai/Faux
-      show_possible_answers: "Afficher les réponses possibles pour %{question}"
-      show_possible_answers_no_question: "Afficher les réponses possibles pour "
-      titles: 
-        click_to_enter_correct_answer_comments: "Cliquez pour entrer un commentaire pour une réponse correcte"
-        click_to_enter_general_answer_comments: "Cliquez pour entrer un commentaire général"
-        click_to_enter_wrong_answer_comments: "Cliquez pour entrer un commentaire pour une réponse incorrecte"
-      wrong_answer_comments: "Commentaire de réponse incorrecte"
     graded_quiz: "Questionnaire noté"
     graded_survey: "Enquête notée"
     headers: 
@@ -11317,68 +11212,14 @@ fr:
         other: "%{count} minutes"
         zero: "moins d’1 minute"
       score_out_of_points_possible: "%{score} sur %{points_possible}"
-    history: 
-      anonymous_username: Étudiant
-      buttons: 
-        allow_extra_attempt: "accorder une tentative supplémentaire à cet étudiant"
-      count_attempts_left: 
-        one: "%{user} bénéficie encore d’une tentative"
-        other: "%{user} bénéficie encore de %{count} tentatives"
-      default_quiz_name: "Questionnaire %{course_name}"
-      default_survey_name: "Enquête %{course_name}"
-      grade_by_question_warning: "La fonction Note par question est affectée par la nature aléatoire des questions dans un groupe."
-      headers: 
-        quiz_submissions: "Envois de questionnaire"
-        survey_submissions: "Envois d’enquête"
-      latest_quiz_results: "Voici les derniers résultats du questionnaire pour %{user}. Vous pouvez modifier les points de chaque question et ajouter des commentaires supplémentaires, puis cliquer sur \"Mettre à jour les notes\" en bas de la page."
-      latest_survey_results: "Voici les derniers résultats de l’enquête pour %{user}. Vous pouvez modifier les points de chaque question et ajouter des commentaires supplémentaires, puis cliquer sur \"Mettre à jour les notes\" en bas de la page."
-      links: 
-        back_to_quiz: "Revenir au questionnaire"
-        back_to_survey: "Revenir à l’enquête"
-      logged_out_user: "Utilisateur déconnecté %{index}"
-      named_quiz_results: "%{quiz_name} Résultats pour %{user}"
-      next_questions_arrow_title: "Questions suivantes"
-      no_more_attempts: "%{user} ne bénéficie plus d’aucune tentative"
-      page_title_quiz: "Historique de questionnaires pour %{user}"
-      page_title_survey: "Historique d’enquêtes pour %{user}"
-      prev_questions_arrow_title: "Questions précédentes"
-      quiz_not_yet_taken: "Le questionnaire n’a pas encore été complété."
-      quiz_not_yet_taken_or_in_progress: "Le questionnaire n’a pas encore été complété ou est en cours"
-      quiz_unlimited_attempts: "Ce questionnaire accepte un nombre illimité de tentatives"
-      score_for_attempt: "Tentative %{attempt_number} : %{score}"
-      survey_not_yet_taken: "L’enquête n’a pas encore été complétée"
-      survey_not_yet_taken_or_in_progress: "L’enquête n’a pas encore été complétée ou est en cours"
-      survey_unlimited_attempts: "Cette enquête accepte un nombre illimité de tentatives"
-      titles: 
-        score_pending_review: "Cette note est en attente d’une révision et peut encore changer"
-        submission_needs_review: "Cet envoi doit être révisé"
-      unnamed_quiz_results: "Résultats du questionnaire pour %{user}"
-      unnamed_survey_results: "Résultats de l’enquête pour %{user}"
+    highest: "le plus élevé"
     index: 
       buttons: 
-        publish_quizzes: "Publier les questionnaires"
         publishing_quizzes: "Publication des questionnaires..."
       confirms: 
         delete_quiz: "Voulez-vous vraiment supprimer ce questionnaire ?"
       default_title: "Questionnaire sans titre"
-      headers: 
-        assignment_quizzes: "Questionnaires sur les tâches"
-        course_quizzes: "Questionnaires de cours"
-        practice_quizzes: "Questionnaires d’entraînement"
-        publish_multiple_quizzes: "Publier plusieurs questionnaires"
-        surveys: Enquêtes
-        unpublished_quizzes: "Questionnaires non publiés"
-      labels: 
-        publish_multiple_quizzes: "Sélectionnez les questionnaires que vous souhaitez publier pour l’instant"
-      links: 
-        create_new_quiz: "Créer un nouveau questionnaire"
-        manage_question_banks: "Gérer les banques de questions"
-        publish_multiple_quizzes: "Publier plusieurs questionnaires"
       multiple_due_dates: "Plusieurs dates"
-      no_quizzes: "Aucun questionnaire disponible"
-      page_titles: Questionnaires
-      titles: 
-        this_quiz_is_locked: "Ce questionnaire est verrouillé. Cliquez pour obtenir plus d’informations."
     index_view: 
       add_quiz: Questionnaire
       links: 
@@ -11387,9 +11228,6 @@ fr:
         settings: Paramètres
       search_for_quiz: "Rechercher un questionnaire"
       title_add_quiz: "Ajouter un questionnaire"
-    invalid_ip: 
-      quiz_protected: "Ce questionnaire est protégé et ne peut être utilisé que dans certaines régions. L’ordinateur que vous utilisez ne semble pas être situé dans une zone géographique valide permettant d’utiliser ce questionnaire."
-      survey_protected: "Cette enquête est protégée et ne peut être utilisée que dans certaines régions. L’ordinateur que vous utilisez ne semble pas être situé dans une zone géographique valide permettant d’utiliser cette enquête."
     keep_highest: "La plus élevée"
     keep_latest: "La dernière"
     label: 
@@ -11408,6 +11246,14 @@ fr:
       multiple_blanks_question: "Remplissez les espaces vides en vous aidant du texte autour"
       other_incorrect_matches: "Autres options de correspondance incorrecte"
       possible_answer: "Réponse possible"
+    latest: "le dernier"
+    ldb_login_popup: 
+      email: E-mail
+      log_in: Connexion
+      logged_out_of_canvas: "*Vous avez été déconnecté de Canvas.* Pour continuer, veuillez vous reconnecter."
+      password: "Mot de passe"
+      titles: 
+        log_in: "Veuillez vous connecter"
     links: 
       resume_quiz: "Reprendre le questionnaire"
       resume_survey: "Reprendre l’enquête"
@@ -11421,19 +11267,6 @@ fr:
     loading_question: "Chargement de la question..."
     loading_question_banks: "Chargement des banques de questions..."
     loading_questions: "Chargement des questions..."
-    lockdown_browser_required: 
-      headers: 
-        requires_lockdown: "Respondus LockDown Browser requis"
-      labels: 
-        download_lockdown: "Si vous n’avez pas encore installé ce navigateur, veuillez le télécharger ici"
-      links: 
-        download_lockdown: "[Télécharger Respondus LockDown Browser]"
-      requires_lockdown: "Ce questionnaire nécessite Respondus LockDown Browser. Lancez Respondus LockDown Browser pour compléter ce questionnaire ou pour afficher les résultats d’un questionnaire."
-    managed_quiz_data: 
-      anonymous_student: "Étudiant %{user_counter}"
-      logged_out_user: "Utilisateur déconnecté %{user_counter}"
-      titles: 
-        submission_needs_review: "Cet envoi doit être révisé"
     message_students: "Envoyer un message aux étudiants"
     message_students_for_context: "Envoyer un message aux étudiants pour %{context}"
     messages: 
@@ -11442,9 +11275,7 @@ fr:
       no_unsubmitted_students_quiz: "Tous les étudiants ont répondu au questionnaire"
       no_unsubmitted_students_survey: "Tous les étudiants ont répondu à l’enquête"
     moderate: 
-      add_time: Prolonger
       buttons: 
-        change_extensions_for_selected_students: "Modifier les prolongations pour les %{n} étudiants sélectionnés"
         extend_time: "Prolonger la durée"
         extending_time: "Prolongation de la durée..."
         save: Enregistrer
@@ -11454,9 +11285,6 @@ fr:
         time_extension_failed: "La prolongation a échoué, veuillez réessayer"
       confirms: 
         taking_time_away: "L’étudiant disposera de moins de temps qu’il n’a actuellement. Voulez-vous continuer ?"
-      end_quiz_reference_time_current_end: "heure de fin actuelle"
-      end_quiz_reference_time_now: maintenant
-      end_quiz_when: "Terminer le questionnaire %{n} minutes après %{reference_time}."
       errors: 
         quiz_submission_extra_attempts_not_a_number: "Les tentatives supplémentaires doivent être spécifiées avec un nombre."
         quiz_submission_extra_attempts_too_long: "Les tentatives supplémentaires doivent être inférieures à 1000."
@@ -11465,196 +11293,32 @@ fr:
         quiz_submission_extra_time_too_long: "Le temps supplémentaire doit être inférieur à 10080."
         quiz_submission_extra_time_too_short: "Le temps supplémentaire doit être supérieur à 0."
         server_communication_failed: "Un problème de communication s’est produit avec le serveur. Le système fera une nouvelle tentative dans 5 minutes, ou vous pouvez retélécharger la page."
-      extended_quiz_time_explanation: "Vous pouvez accorder du temps supplémentaire à cet étudiant pour sa tentative actuelle sur le questionnaire. Combien de temps souhaitez-vous lui accorder ?"
       extensions_for_student: "Prolongation pour %{student}"
       extensions_for_students: 
         one: "Prolongation pour 1 étudiant"
         other: "Prolongation pour %{count} étudiants"
-      finished_in: "interruption dans %{duration}"
       finished_in_duration: "interruption dans %{duration}"
-      global_extra_attempts: "tout le monde obtient déjà %{n}"
-      headers: 
-        attempt: Tentative
-        attempts_left: "Tentatives restantes"
-        extended_quiz_time: "Prolonger la durée du questionnaire"
-        score: Note
-        student: Étudiant
-        student_extensions: "Prolongations de l’étudiant"
-        time: Durée
-      in_progress: "en cours"
-      labels: 
-        ending: Fin
-        extra_attempts: "Tentatives supplémentaires"
-        extra_time_per_attempt: "Durée supplémentaire sur chaque tentative"
-        manually_unlock: "Déverrouiller manuellement le questionnaire pour la prochaine tentative"
-        started: Début
-      minutes: minutes
-      page_title: "Questionnaire modéré"
-      student_gets_extra_time: "*%{student_name}* **obtient %{extra_time} minutes supplémentaires par tentative**"
-      student_n: "Étudiant %{n}"
       time_up: Terminé !
       titles: 
-        change_user_extensions: "Modifier les prolongations pour l’utilisateur"
         extend_quiz_time: "Prolonger la durée du questionnaire"
-        manually_unlocked: "Déverrouillé manuellement"
-        minutes_to_add: "minutes à ajouter"
-        select_deselect_all: "Sélectionner/Désélectionner tout"
-        select_user: "Sélectionner %{user}"
         student_extensions: "Prolongations pour l’étudiant"
     more_questions: "questions supplémentaires"
-    multi_answer: 
-      choose_answer: Choisir
-    muted: 
-      muted_quiz_description: "La note de votre questionnaire est indisponible car votre formateur n’a pas terminé sa notation. Lorsque votre formateur aura terminé la notation de ce questionnaire, votre note sera disponible dans cette page."
-      muted_quiz_header: "Votre questionnaire est en mode silencieux"
-    new: 
-      allowed_attempts: "Nombre de tentatives autorisées"
-      anonymous_submissions: "Envois anonymes"
-      buttons: 
-        not_published: "Non publié"
-        published: "Date de publication"
-        save: Enregistrer
-      cant_go_back: "Verrouiller les questions après les réponses"
-      default_page_title: "Nouveau questionnaire"
-      group: "Groupe de tâches"
-      headers: 
-        ip_filters: "Que sont les filtres IP de questionnaire ?"
-      hide_correct_answers_at: "Masquer les réponses correctes à"
-      hints: 
-        question_detail_disabled: "REMARQUE : les informations relatives aux questions ne sont pas disponibles lorsque le nombre de questions est supérieur à %{question_count}."
-        quiz_score: "les étudiants recevront automatiquement tous les points après avoir répondu à l’enquête"
-      ip_filters: "Les filtres IP de questionnaire permettent de limiter l’accès aux questionnaires des ordinateurs appartenant à une plage IP spécifiée. Les filtres peuvent être une liste d’adresses séparées par des virgules, ou une adresse suivie d’un masque (\"192.168.217.1\", \"192.168.217.1/24\" ou \"192.168.217.1/255.255.255.0\")."
-      label: 
-        time_limit: "Limite de durée"
-      labels: 
-        allow_multiple_attempts: "Autoriser plusieurs tentatives"
-        hide_results_only_after_last: "Uniquement après la dernière tentative"
-        ip_filter: "Filtrer les adresses IP"
-        never_hide_results: "Laisser les étudiants voir les résultats de leur questionnaire"
-        quiz_instructions: "Instructions du questionnaire"
-        quiz_notify: "Informer les utilisateurs que ce quizz a changé"
-        quiz_score: Note
-        require_access_code: "Nécessite un code d’accès"
-        restrict_quiz: "Restrictions liées aux questionnaires"
-        show_question_details: "Afficher les informations de la question"
-      limited_attempts: "Tentatives autorisées"
-      links: 
-        cancel: Annuler
-        find_questions: "Chercher des questions"
-        new_question: "Nouvelle question"
-        new_question_group: "Nouveau groupe de questions"
-        show_assignment_rubric: "Afficher le barème"
-      manage: Gérer
-      minutes: Minutes
-      new_assignment: "Nouvelle activité"
-      new_discussion: "Nouvelle discussion"
-      one_question_at_a_time: "Afficher une question à la fois"
-      points_possible: "%{n} points"
-      quiz_title: "Titre du questionnaire"
-      quiz_type: "Type de questionnaire"
-      require_lockdown_browser: "Nécessite Respondus LockDown Browser"
-      require_lockdown_browser_for_results: "Requis pour afficher les résultats du questionnaire"
-      retrieving_filters: "Récupération des filtres..."
-      score_to_keep: "Note de questionnaire à conserver"
-      show_correct_answers: "Laisser les étudiants voir les réponses correctes"
-      show_correct_answers_at: "Afficher les réponses correctes à"
-      shuffle_answers: "Permuter les réponses"
-      students_cannot_view_responses_after_course_concludes: "Les étudiants ne peuvent pas voir les questions des questionnaires après la fin du cours"
-      time_limit: "Combien de minutes ?"
-      titles: 
-        click_to_select_filter: "Cliquez pour sélectionner ce filtre"
-        delete: Supprimer
-        find_ip_address_filter: "Chercher un filtre d’adresses IP"
-      warnings: 
-        has_student_submissions: "Des étudiants ont déjà terminé ce questionnaire ou l’ont commencé, aussi soyez prudent avec vos modifications. Si vous changez notablement des questions, pensez éventuellement à réévaluer les étudiants qui ont utilisé l’ancienne version du questionnaire."
     no_filters_found: "Aucun filtre trouvé"
     no_quizzes_view: 
       headers: 
         course_quizzes: "Questionnaires de cours"
       no_quizzes: "Aucun questionnaire disponible"
     notices: 
-      cant_view_submission_while_muted: "Impossible d’afficher l’historique du questionnaire lorsque celui-ci est en mode silencieux."
-      has_submissions_already: "Gardez à l’esprit que certains étudiants ont déjà complété ou commencé ce questionnaire."
-      less_than_allotted_time: "Vous avez commencé ce questionnaire peu avant son échéance, par conséquent vous ne disposez pas de toute la durée nécessaire pour le compléter."
       message_sent: "Message envoyé !"
-      no_submission_for_user: "Aucun envoi disponible pour cet utilisateur"
-      quiz_updated: "Le questionnaire a été mis à jour"
-      quizzes_published: 
-        one: "1 questionnaire a été publié"
-        other: "%{count} questionnaires ont été publiés"
-      quizzes_unpublished: 
-        one: "La publication d’un questionnaire a bien été annulée !"
-        other: "La publication de %{count} questionnaires a bien été annulée !"
     practice_quiz: "Questionnaire d’entraînement"
     practices_label: "Questionnaires d’entraînement – Afficher/masquer les questionnaires"
     question_colon: "Question :"
     question_count: 
       one: "%{count} question"
       other: "%{count} questions"
-    question_group: 
-      buttons: 
-        update: "Mettre à jour"
-      default_group_name: Groupe
-      edit_questions_and_points: "Choisissez *%{num_questions}* questions ; #%{num_points}# points sont accordés à chaque question"
-      labels: 
-        group_name: "Nom du groupe"
-        number_of_questions: "Nombre de questions"
-        points_per_question: "Points par question"
-        question_bank: "Les questions seront extraites de la banque"
-      links: 
-        link_to_a_question_bank: "Liaison avec une banque de questions"
-      show_questions_and_points: "Choisissez *%{num_questions}* questions ; #%{num_points}# points sont accordés à chaque question"
-      titles: 
-        add_question_to_group: "Ajouter une question à ce groupe"
-        collapse_group: "Réduire le groupe"
-        delete_group: "Supprimer le groupe"
-        edit_group_details: "Modifier les informations du groupe"
-        expand_group: "Développer le groupe"
     question_limit_reached: "Vous avez atteint le nombre maximum de questions autorisées pour un quizz (%{count}/%{limit}).\\n\\nPour contourner ce problème, vous pouvez répartir le contenu sur plusieurs quizz."
-    question_list_right_side: 
-      headers: 
-        questions: Questions
-    question_statistic: 
-      attempts: 
-        one: 1 tentative
-        other: "%{count} tentatives"
-      empty_response: "Réponse vide"
-      labels: 
-        other_answers: "Autres réponses"
-      no_data: "Aucune donnée"
-      no_responses: "Aucune réponse enregistrée pour cette question"
-      percent_of_responses: "%{percent}% sur %{total} tentatives ont sélectionné cette réponse"
-      response_count: 
-        one: "1 étudiant a reçu cette question"
-        other: "%{count} étudiants ont reçu cette question"
-    question_teaser: 
-      titles: 
-        click_to_show_details: "Cliquez pour afficher toutes les informations de la question"
-        delete_this_question: "Supprimer cette question"
-        edit_this_question: "Modifier cette question"
     quiz_attempts_length_error: "Pour un quiz, les tentatives sont limitées à 3 chiffres. Si vous souhaitez accorder aux élèves des tentatives illimitées, ne cochez pas la case Autoriser plusieurs tentatives proposée sur la gauche."
     quiz_attempts_nan_error: "Les tentatives relatives aux quiz ne peuvent être spécifiées qu’avec des nombres."
-    quiz_details: 
-      allowed_attempts: "Tentatives autorisées"
-      headers: 
-        available: Disponible
-        due: "Date d’échéance"
-        points: Points
-        questions: Questions
-        time_limit: "Limite de durée"
-      multiple_due_dates: "Plusieurs dates d’échéance"
-      no_due_date: "Pas d’échéance"
-      none: Aucun
-      quiz_availabile_through: |-
-          %{start_time} à  
-          %{end_time}
-      quiz_available_after: "après %{start_time}"
-      quiz_available_until: "jusqu’à %{end_time}"
-      requires_lockdown: "Nécessite Respondus LockDown Browser"
-      time_limit: 
-        one: 1 minute
-        other: "%{count} minutes"
-      unlimited: "Sans limite"
     quiz_item_group_view: 
       no_quizzes: "Aucun questionnaire trouvé"
       no_surveys: "Aucune enquête trouvée"
@@ -11665,125 +11329,702 @@ fr:
       settings: Paramètres
       title_delete: "Supprimer un questionnaire"
       title_edit: "Modifier un questionnaire"
-    quiz_right_side: 
-      attempts_left: 
-        one: "1 tentative supplémentaire accordée"
-        other: "%{count} tentatives supplémentaires accordées"
-      attempts_so_far: 
-        one: "1 tentative jusqu’ici"
-        other: "%{count} tentatives jusqu’ici"
-      labels: 
-        current_score: "Note actuelle"
-        kept_score: "Note conservée"
-        last_attempt_details: "Informations de la dernière tentative"
-        submission_details: "Informations de l’envoi"
-        time: Durée
-      links: 
-        preview_quiz_again: "Afficher un nouvel aperçu du questionnaire"
-        preview_survey_again: "Afficher un nouvel aperçu de l’enquête"
-      no_more_attempts: "Plus de tentatives accordées"
-      questions_not_graded: "Certaines questions n’ont pas encore été notées."
-      score_set_manually: "Cette note a été attribuée par l'enseignant."
-      unlimited_attempts: "Nombre de tentatives illimité"
-      view_previous_attempts: "Afficher les tentatives précédentes"
-    quiz_show_teacher: 
-      anonymous_submissions: "Envois anonymes"
-      attempts: Tentatives
-      available_from: "Disponible depuis"
-      cant_go_back: "Verrouiller les questions après les réponses"
-      code: "Code d’accès"
-      due: Échéance
-      filter: "Filtre IP"
-      for: Pour
-      group: "Groupe de tâches"
-      label: 
-        time_limit: "Limite de durée"
-      multiple_attempts: "Plusieurs tentatives"
-      no_time_limit: "Aucune limite de temps"
-      one_question_at_a_time: "Une question à la fois"
-      points: Points
-      quiz_type: "Type de questionnaire"
-      require_lockdown_browser: "Nécessite Respondus LockDown Browser"
-      require_lockdown_browser_for_results: "Requis pour afficher les résultats du questionnaire"
-      score_to_keep: "Note à conserver"
-      show_correct_answers: "Afficher les réponses correctes"
-      shuffle_answers: "Permuter les réponses"
-      time_limit: 
-        one: "1 minute"
-        other: "%{count} minutes"
-      until: Jusqu’au
-      view_responses: "Afficher les réponses"
     quiz_submission: 
-      attempt_duration: "Cette tentative a duré %{duration}."
-      buttons: 
-        update_scores: "Actualiser les résultats"
-      labels: 
-        final_score: "Note finale"
-        fudge_points: "Points de dernière minute"
-        fudge_points_changed_points_quiz: "Depuis que %{user} a répondu à ce questionnaire, les points possibles ont changé de %{difference} points. Vous pouvez rectifier en fonction de cette modification en ajoutant manuellement des points positifs ou négatifs dans cette zone."
-        fudge_points_changed_points_survey: "Depuis que %{user} a répondu à cette enquête, les points possibles ont changé de %{difference} points. Vous pouvez rectifier en fonction de cette modification en ajoutant manuellement des points positifs ou négatifs dans cette zone."
-        fudge_points_generic_explanation: "Vous pouvez rectifier manuellement le résultat en ajoutant des points positifs ou négatifs dans cette zone."
-        questions_need_review: "Les questions suivantes doivent être révisées"
-        quiz_score: "Note du questionnaire"
-        score_for_attempt: "Note pour cette tentative"
-        score_for_quiz: "Note pour ce questionnaire"
-        score_for_survey: "Note pour cette enquête"
-        survey_score: "Note de l’enquête"
-      links: 
-        click_to_view_results: "Cliquez ici pour afficher les résultats."
-      questions_not_graded: "Certaines questions n’ont pas encore été notées."
-      quiz_fudged_negative: "La note de ce questionnaire a été corrigée manuellement de %{fudge} points."
-      quiz_fudged_positive: "La note de ce questionnaire a été corrigée manuellement de +%{fudge} points."
-      quiz_not_yet_taken: "Le questionnaire n’a pas encore été complété."
-      quiz_results_protected: "Les résultats de ce questionnaire sont protégés et invisibles pour les étudiants."
-      quiz_results_protected_until_last_attempt: "Les résultats du questionnaire sont protégés et invisibles pour les étudiants jusqu’à l’envoi de leur dernière tentative."
-      quiz_submission_needs_review: "Le quizz a énormément changé depuis son envoi. Il se peut que cet envoi requière une nouvelle notation."
-      requires_lockdown: "Respondus LockDown Browser est requis pour afficher les résultats du questionnaire."
-      submitted_at: "Envoyé le %{when}"
-      survey_fudged_negative: "La note de cette enquête a été corrigée manuellement de %{fudge} points."
-      survey_fudged_positive: "La note de cette enquête a été corrigée manuellement de +%{fudge} points."
-      survey_not_yet_taken: "L’enquête n’a pas encore été complétée."
       titles: 
         this_is_an_external_element: "Ceci est un élément externe et non du texte, et il peut avoir été modifié depuis que l’étudiant l’a envoyé."
         this_is_an_external_frame: "Ceci est un cadre externe et non du texte, et il peut avoir été modifié depuis que l’étudiant l’a envoyé."
         this_is_an_image: "Ceci est une image et non du texte, et elle peut avoir été modifiée depuis que l’étudiant l’a envoyée."
-    quiz_summary: 
-      assignment_points_possible: 
-        one: 1 point
-        other: "%{count} points"
-      labels: 
+    quiz_submissions: 
+      errors: 
+        invalid_submissions: "Cet envoi de questionnaire n’a pas pu être identifié comme vous appartenant. Veuillez recommencer."
+        late_quiz: "Vous avez envoyé ce questionnaire en retard. Il se peut donc que vos réponses n’aient pas été enregistrées."
+        protected_quiz: "Ce questionnaire est protégé et ne peut être utilisé que dans certaines régions. L’ordinateur que vous utilisez ne semble pas être situé dans une zone géographique valide permettant d’utiliser ce questionnaire."
+      still_zipping: "Compression des fichiers toujours en cours..."
+    quizzes: 
+      access_code: 
+        buttons: 
+          submit: Envoyer
+        labels: 
+          access_code: "Code d’accès"
+        quiz_restricted: "L’accès à ce questionnaire nécessite un code. Demandez à votre enseignant ou à votre superviseur d’entrer, ou de vous indiquer, le code d’accès vous permettant de compléter ce questionnaire."
+        survey_restricted: "L’accès à cette enquête nécessite un code. Demandez à votre enseignant ou à votre superviseur d’entrer, ou de vous indiquer, le code d’accès vous permettant de répondre à cette enquête."
+      default_history_crumb: Historique
+      default_title: "Nouveau questionnaire"
+      display_answer: 
+        labels: 
+          answer_with_margin: "avec marge d’erreur"
+          your_answer: "Votre réponse"
+        margin_of_error: "marge d’erreur"
+        plus_or_minus: +/-
+        range_answer: "Entre %{lower_bound} et %{upper_bound}"
+        you_left_this_blank: "(Vous n’avez pas fourni de réponse)"
+      display_question: 
+        default_question_answer: "[ Choisir ]"
+        flag_this_question: "Signaler cette question"
+        headers: 
+          formulas: Formules
+          possible_solutions: "Solutions possibles"
+          solution_answer: Réponse
+          variable_maximum: Max.
+          variable_minimum: Min.
+          variable_name: Variable
+          variable_precision: Décimales
+          variables: Variables
+        labels: 
+          additional_comments: "Commentaires supplémentaires"
+          for_answer_number: "Réponse %{answer_number}"
+          warning_icon: Avertissement
+        links: 
+          delete_question: "Supprimer cette question"
+          edit_question: "Modifier cette question"
+          move_copy_question: "déplacer/copier la question vers une autre banque"
+        not_yet_graded: "Pas encore noté"
+        original_score: "Note initiale :"
+        points_possible: "%{points_possible} points"
+        regraded_score: "Note recalculée :"
+        show_ansers_for_variable: "Afficher les réponses pour %{variable}"
+        skip_question_text: "Passer au texte de la question."
+        submission_was_regraded: "La note de cette question a été recalculée. "
+        titles: 
+          question_correct_comment: "Les étudiants verront ce commentaire si leur réponse est correcte"
+          question_incorrect_comment: "Les étudiants verront ce commentaire si leur réponse est incorrecte"
+          question_neutral_comment: "Les étudiants verront ce commentaire après avoir répondu à la question"
+        unsupported_question_type: "Cette question a été importée d’une source externe. C’était une question dont le type « %{question_type} » n’est pas pris en charge dans ce questionnaire."
+        you_left_this_blank: "(Vous n’avez pas fourni de réponse)"
+      download_file_upload_submissions: 
+        links: 
+          download_submissions: "Télécharger tous les fichiers"
+      equations_help: 
+        equation_functions: |-
+            Outre les variables, vous disposez également d’un ensemble de fonctions auxiliaires qui permettent de générer des valeurs utiles. Par exemple :
+            
+            %{example}
+            
+            Pour afficher une explication pour une fonction auxiliaire donnée, sélectionnez celle-ci dans la liste ci-dessous :
+        equation_intro: |-
+            Les questions calculées sont basées sur un ensemble d’une ou plusieurs formules calculées 
+            dans l’ordre.  Vous pouvez définir des variables intermédiaires dans ces formules, mais le
+            résultat numérique de la dernière formule sera utilisé pour générer la
+             réponse correcte. Par exemple :
+            
+            %{example}
+            
+            Pour cet ensemble de formules, la réponse finale est 71. Toutefois,
+            il n’y a pas de variables prédéfinies, par conséquent tous les étudiants auront la
+            même question avec la même réponse. Pour plus d’informations sur les variables, voir l’onglet « variables ».
+        equation_variables2: "Vous pouvez également définir des variables dans le texte de votre question à l’aide de crochets (« Combien font [a] + [b] ? »). Pour chaque variable, vous verrez une « valeur exemple » basée sur les paramètres de variables. Cela vous permet de vérifier la formule mathématique et de vous assurer qu’elle fonctionne. Par exemple, si votre question est « Combien font [a] + 5 ? », alors vous devez définir la variable « a ». Si la valeur exemple de « a » est 5,2, vous pourriez écrire : %{example}. Avec cette formule, vous pouvez générer autant de jeux de solutions que vous voulez, avec une valeur « a » différente à chaque fois. Un étudiant pourrait voir la question « Combien font 5,2 + 5 ? » quand l’autre verrait « Combien font 9 + 5 ? »."
+        links: 
+          functions: Fonctions
+          intro: Intro
+          variables: Variables
+      errors: 
+        no_more_attempts: "Vous avez épuisé le nombre de tentatives autorisées pour ce questionnaire"
+        quiz_deleted: "Ce questionnaire a été supprimé"
+        quiz_update_failed: "Échec de la mise à jour du questionnaire"
+      fabulous_quizzes: 
+        page_titles: Questionnaires
+      find_question_from_bank: 
+        already_added: "cette question figure déjà dans le questionnaire"
+        bank_description: "%{bank_name}, %{n} questions"
+        buttons: 
+          add_questions: "Ajouter des questions"
+          create_group: "Créer un groupe"
+          select_bank: "Sélectionner une banque"
+        group_pick_count: "%{pick_count} questions"
+        group_points: "%{points} par question"
+        headers: 
+          bank_name: "Nom de la banque"
+        hints: 
+          group_pick_count: "%{pick_count} sélections jusqu’ici"
+        labels: 
+          add_questions_to_group: "Ajouter les questions au groupe du questionnaire"
+          group_name: "Nom du groupe"
+          group_pick_count: Choisir
+          group_points: Points
+        links: 
+          clear_all_banks: "Effacer tout"
+          manage_question_banks: "Gérer les banques de questions du cours"
+          more_questions: "questions supplémentaires"
+          select_all_banks: "Sélectionner tout"
+        options: 
+          new_group: "[ Nouveau groupe ]"
+          no_group: "[ Aucun groupe ]"
+        select_a_question_bank: "Sélectionnez une banque de questions dans la liste ci-dessous afin de la lier au questionnaire comme groupe de questions."
+        titles: 
+          add_new_question_group: "Ajouter un nouveau groupe de questions"
+      form_answer: 
+        answer_in_range_accessible: "entre *début de la plage* et #range end#"
+        answer_text: "Texte de la réponse"
+        answer_weight: "Valeur de la réponse"
+        exact_answer_with_error_margin_accessible: "*réponse exacte* avec une marge d’erreur de #error margin#"
+        labels: 
+          answer_comments: "Commentaire si l’étudiant choisi cette réponse"
+          answer_in_range: "Réponse dans la fourchette"
+          exact_answer: "Réponse exacte"
+        matching_left: "Correspond au côté gauche"
+        matching_right: "Correspond au côté droit"
+        numerical_answer: "Réponse numérique"
+        possible_answer: "Réponse possible"
+        titles: 
+          click_to_enter_answer_comments: "Cliquez pour ajouter un commentaire si l’étudiant choisi cette réponse"
+          click_to_set_as_correct: "Cliquez pour définir cette réponse comme correcte"
+          delete_answer: "Supprimer cette réponse"
+          edit_as_html: "Passer en mode HTML pour le texte de réponse"
+      form_question: 
+        allow_tolerance: "autoriser une marge d’erreur de +/- %{tolerance}"
+        buttons: 
+          create_update_question: "Créer/Mettre à jour la question"
+          generate: Générer
+          recompute: Recalculer
+        correct_answer_comments: "Commentaires de réponse correcte"
+        distractor_instructions: "tapez chaque distracteur sur sa propre ligne"
+        equation_example: "c.-à-d., \"Combien font 5 plus [x] ?\""
+        explanation: 
+          generate_possible_solutions: "Enfin, créez autant de combinaisons de solution-variable que nécessaires pour votre questionnaire."
+        explanations: 
+          calculated: "Entrez une question, créez une formule et générez un ensemble de combinaisons de réponses possibles. Les étudiants verront une question accompagnée d’un ensemble de variables sélectionnées de manière aléatoire, et devront taper le numéro de la réponse correcte."
+          equations: "Vous pouvez définir des variables en tapant le nom des variables entre crochets."
+          essay: "Les étudiants recevront une zone de texte pour écrire leur réponse."
+          file_upload: "Les étudiants pourront charger un fichier de réponse."
+          fill_in_multiple_blanks: "Entrez votre question en spécifiant chaque emplacement vide. Puis, définissez la réponse correcte possible pour chaque emplacement vide. Les étudiants doivent entrer les réponses correctes dans les zones de texte de chaque emplacement vide."
+          formula_definition: "Ensuite, vous devez écrire la ou les formules utilisées pour calculer la réponse correcte. Pour cela, utilisez simplement les noms de variables énumérés plus haut."
+          matching: "Créez des paires de valeurs correspondantes. Les étudiants verront les valeurs affichées à gauche, et devront sélectionner la valeur correspondante à droite dans une liste déroulante. Plusieurs lignes peuvent avoir la même réponse, et vous pouvez ajouter des distracteurs supplémentaires à droite."
+          missing_word: "Définissez le texte qui doit s’afficher avant et après la liste déroulante. Créez un ensemble de réponses possibles et sélectionnez une réponse correcte."
+          multi_answer_sets: "Dans la zone ci-dessous, pour chaque emplacement où vous souhaitez afficher une zone de réponse, tapez un mot de référence (sans espaces) entre crochets."
+          multiple_answers: "Cette question affiche une case à cocher près de chaque réponse, et l’étudiant doit sélectionner TOUTES les réponses que vous marquez comme correcte."
+          multiple_choice: "Entrez votre question et plusieurs réponses, puis sélectionnez la réponse correcte."
+          multiple_dropdowns: "Entrez votre question en spécifiant l’emplacement de chaque liste déroulante. Puis définissez les réponses possibles pour chaque liste déroulante, avec une réponse correcte par liste."
+          numerical: "Pour la réponse correcte, définissez un nombre dans une plage de nombres, ou un nombre avec une marge d’erreur inférieure ou supérieure. L’étudiant verra une zone de texte vide dans laquelle taper le numéro de sa réponse."
+          short_answer: |-
+              Entrez le texte de votre question, puis définissez toutes les réponses correctes possibles pour l’emplacement vide. 
+              Les étudiants verront une question suivie d’une zone de texte dans laquelle entrer leur réponse.
+          text_only: "Cette \"question\" n’est pas notée, mais peut s’avérer utile pour présenter un ensemble de questions connexes."
+          true_false: "Entrez le texte de votre question, puis sélectionnez la valeur Vrai ou Faux comme réponse correcte."
+          variable_definitions: "Après avoir entré vos variables ci-dessus, elles doivent apparaître ici. Pour chaque variable ci-dessous, vous pouvez spécifier une plage de valeurs possibles."
+        general_answer_comments: "Commentaires de réponse généraux"
+        headers: 
+          formula_definition: "Définition de formule"
+          generate_possible_solutions: "Générer les solutions possibles"
+          variable_definitions: "Définitions de variables"
+          variable_example_value: "Valeur exemple"
+          variable_maximum: Max.
+          variable_minimum: Min.
+          variable_name: Variable
+          variable_precision: Décimales
+        label: 
+          question: 
+            name: "Nom de la question "
+            points: "Valeur de la question en points"
+            type: "Type de question"
+        labels: 
+          answers: Réponses
+          distractors: "Possibilités de correspondances supplémentaires (distracteurs)"
+          missing_word_after: "Texte affiché après les réponses"
+          points: points
+          question: Question
+        links: 
+          add_another_answer: "Ajouter une autre réponse"
+          need_help: "Besoin d’aide ?"
+        multi_answer_sets_example: "c.-à-d., \"Les roses sont [color1], les violettes [color2]\""
+        offer_combinations: "Proposer %{how_many} combinaisons de valeurs possibles (max. %{max_combinations})"
+        options: 
+          only_one_correct: "Une seule réponse correcte"
+          students_select_multiple: "Plusieurs réponses sélectionnées par l’étudiant"
+        question_type: 
+          calculated: "Question formule"
+          essay: "Question essai"
+          file_upload: "Question avec chargement de fichier"
+          fill_in_multiple_blanks: "Champs multiples à compléter"
+          matching: Correspondance
+          missing_word: "Mot manquant"
+          multiple_answers: "Choix multiple (plusieurs réponses)"
+          multiple_choice: "Choix multiple (une seule réponse)"
+          multiple_dropdowns: "Listes déroulantes"
+          numerical: "Réponse numérique"
+          short_answer: "Champ à compléter"
+          text_only: "Texte (pas de question)"
+          true_false: Vrai/Faux
+        show_possible_answers: "Afficher les réponses possibles pour %{question}"
+        show_possible_answers_no_question: "Afficher les réponses possibles pour "
+        titles: 
+          click_to_enter_correct_answer_comments: "Cliquez pour entrer un commentaire pour une réponse correcte"
+          click_to_enter_general_answer_comments: "Cliquez pour entrer un commentaire général"
+          click_to_enter_wrong_answer_comments: "Cliquez pour entrer un commentaire pour une réponse incorrecte"
+        wrong_answer_comments: "Commentaire de réponse incorrecte"
+      history: 
+        anonymous_username: Étudiant
+        buttons: 
+          allow_extra_attempt: "accorder une tentative supplémentaire à cet étudiant"
+        count_attempts_left: 
+          one: "%{user} bénéficie encore de 1 tentative"
+          other: "%{user} bénéficie encore de %{count} tentatives"
+        default_quiz_name: "Questionnaire %{course_name}"
+        default_survey_name: "Enquête %{course_name}"
+        grade_by_question_warning: "La fonction Note par question est affectée par la nature aléatoire des questions dans un groupe."
+        headers: 
+          quiz_submissions: "Envois de questionnaire"
+          survey_submissions: "Envois d’enquête"
+        latest_quiz_results: "Voici les derniers résultats du questionnaire pour %{user}. Vous pouvez modifier les points de chaque question et ajouter des commentaires supplémentaires, puis cliquer sur \"Mettre à jour les notes\" en bas de la page."
+        latest_survey_results: "Voici les derniers résultats de l’enquête pour %{user}. Vous pouvez modifier les points de chaque question et ajouter des commentaires supplémentaires, puis cliquer sur \"Mettre à jour les notes\" en bas de la page."
+        links: 
+          back_to_quiz: "Revenir au questionnaire"
+          back_to_survey: "Revenir à l’enquête"
+        logged_out_user: "Utilisateur déconnecté %{index}"
+        named_quiz_results: "%{quiz_name} Résultats pour %{user}"
+        next_questions_arrow_title: "Questions suivantes"
+        no_more_attempts: "%{user} ne bénéficie plus d’aucune tentative"
+        page_title_quiz: "Historique de questionnaires pour %{user}"
+        page_title_survey: "Historique d’enquêtes pour %{user}"
+        prev_questions_arrow_title: "Questions précédentes"
+        quiz_not_yet_taken: "Le questionnaire n’a pas encore été complété."
+        quiz_not_yet_taken_or_in_progress: "Le questionnaire n’a pas encore été complété ou est en cours"
+        quiz_unlimited_attempts: "Ce questionnaire accepte un nombre illimité de tentatives"
+        score_for_attempt: "Tentative %{attempt_number} : %{score}"
+        survey_not_yet_taken: "L’enquête n’a pas encore été complétée"
+        survey_not_yet_taken_or_in_progress: "L’enquête n’a pas encore été complétée ou est en cours"
+        survey_unlimited_attempts: "Cette enquête accepte un nombre illimité de tentatives"
+        titles: 
+          score_pending_review: "Cette note est en attente d’une révision et peut encore changer"
+          submission_needs_review: "Cet envoi doit être révisé"
+        unnamed_quiz_results: "Résultats du questionnaire pour %{user}"
+        unnamed_survey_results: "Résultats de l’enquête pour %{user}"
+      index: 
+        buttons: 
+          publish_quizzes: "Publier les questionnaires"
+        headers: 
+          assignment_quizzes: "Questionnaires pour un travail"
+          course_quizzes: "Questionnaires de cours"
+          practice_quizzes: "Questionnaires d’entraînement"
+          publish_multiple_quizzes: "Publier plusieurs questionnaires"
+          surveys: Enquêtes
+          unpublished_quizzes: "Questionnaires non publiés"
+        labels: 
+          publish_multiple_quizzes: "Sélectionnez les questionnaires que vous souhaitez publier pour l’instant"
+        links: 
+          create_new_quiz: "Créer un nouveau questionnaire"
+          manage_question_banks: "Gérer les banques de questions"
+          publish_multiple_quizzes: "Publier plusieurs questionnaires"
+        no_quizzes: "Aucun questionnaire disponible"
+        page_titles: Questionnaires
+        titles: 
+          this_quiz_is_locked: "Ce questionnaire est verrouillé. Cliquez pour obtenir plus d’informations."
+      invalid_ip: 
+        quiz_protected: "Ce questionnaire est protégé et ne peut être utilisé que dans certaines régions. L’ordinateur que vous utilisez ne semble pas être situé dans une zone géographique valide permettant d’utiliser ce questionnaire."
+        survey_protected: "Cette enquête est protégée et ne peut être utilisée que dans certaines régions. L’ordinateur que vous utilisez ne semble pas être situé dans une zone géographique valide permettant d’utiliser cette enquête."
+      lockdown_browser_required: 
+        headers: 
+          requires_lockdown: "Respondus LockDown Browser requis"
+        labels: 
+          download_lockdown: "Si vous n’avez pas encore installé ce navigateur, veuillez le télécharger ici"
+        links: 
+          download_lockdown: "[Télécharger Respondus LockDown Browser]"
+        requires_lockdown: "Ce questionnaire nécessite Respondus LockDown Browser. Lancez Respondus LockDown Browser pour compléter ce questionnaire ou pour afficher les résultats d’un questionnaire."
+      managed_quiz_data: 
+        anonymous_student: "Étudiant %{user_counter}"
+        logged_out_user: "Utilisateur déconnecté %{user_counter}"
+        titles: 
+          submission_needs_review: "Cet envoi doit être révisé"
+      moderate: 
+        add_time: Prolonger
+        buttons: 
+          change_extensions_for_selected_students: "Modifier les prolongations pour les %{n} étudiants sélectionnés"
+          extend_time: "Prolonger la durée"
+          save: Enregistrer
+        end_quiz_reference_time_current_end: "heure de fin actuelle"
+        end_quiz_reference_time_now: maintenant
+        end_quiz_when: "Terminer le questionnaire %{n} minutes après %{reference_time}."
+        extended_quiz_time_explanation: "Vous pouvez accorder du temps supplémentaire à cet étudiant pour sa tentative actuelle sur le questionnaire. Combien de temps souhaitez-vous lui accorder ?"
+        finished_in: "interruption dans %{duration}"
+        global_extra_attempts: "tout le monde obtient déjà %{n}"
+        headers: 
+          attempt: Tentative
+          attempts_left: "Tentatives restantes"
+          extended_quiz_time: "Prolonger la durée du questionnaire"
+          score: Note
+          student: Étudiant
+          student_extensions: "Prolongations pour l’étudiant"
+          time: Heure
+        in_progress: "en cours"
+        labels: 
+          ending: Fin
+          extra_attempts: "Tentatives supplémentaires"
+          extra_time_per_attempt: "Durée supplémentaire sur chaque tentative"
+          manually_unlock: "Déverrouiller manuellement le questionnaire pour la prochaine tentative"
+          started: Début
+        minutes: minutes
+        page_title: "Questionnaire modéré"
+        student_gets_extra_time: "*%{student_name}* **obtient %{extra_time} minutes supplémentaires par tentative**"
+        student_n: "Étudiant %{n}"
+        titles: 
+          change_user_extensions: "Modifier les prolongations pour l’utilisateur"
+          manually_unlocked: "Déverrouillé manuellement"
+          minutes_to_add: "minutes à ajouter"
+          select_deselect_all: "Sélectionner/Désélectionner tout"
+          select_user: "Sélectionner %{user}"
+      multi_answer: 
+        choose_answer: Choisir
+      muted: 
+        muted_quiz_description: "La note de votre questionnaire est indisponible car votre formateur n’a pas terminé sa notation. Lorsque votre formateur aura terminé la notation de ce questionnaire, votre note sera disponible dans cette page."
+        muted_quiz_header: "Votre questionnaire est en mode silencieux"
+      new: 
+        allowed_attempts: "Nombre de tentatives autorisées"
+        anonymous_submissions: "Envois anonymes"
+        buttons: 
+          not_published: "Non publiée"
+          published: Publiée
+          save: Enregistrer
+        cant_go_back: "Verrouiller les questions après les réponses"
+        default_page_title: "Nouveau questionnaire"
+        group: "Groupe de travaux"
+        headers: 
+          ip_filters: "Que sont les filtres IP de questionnaire ?"
+        hide_correct_answers_at: "Masquer les réponses correctes à"
+        hints: 
+          question_detail_disabled: "REMARQUE : les informations relatives aux questions ne sont pas disponibles lorsque le nombre de questions est supérieur à %{question_count}."
+          quiz_score: "les étudiants recevront automatiquement tous les points après avoir répondu à l’enquête"
+        ip_filters: "Les filtres IP de questionnaire permettent de limiter l’accès aux questionnaires des ordinateurs appartenant à une plage IP spécifiée. Les filtres peuvent être une liste d’adresses séparées par des virgules, ou une adresse suivie d’un masque (\"192.168.217.1\", \"192.168.217.1/24\" ou \"192.168.217.1/255.255.255.0\")."
+        label: 
+          time_limit: "Limite de durée"
+        labels: 
+          allow_multiple_attempts: "Autoriser plusieurs tentatives"
+          hide_results_only_after_last: "Uniquement après la dernière tentative"
+          ip_filter: "Filtrer les adresses IP"
+          never_hide_results: "Laisser les étudiants voir les résultats de leur questionnaire"
+          quiz_instructions: "Instructions du questionnaire"
+          quiz_notify: "Informer les utilisateurs que ce quizz a changé"
+          quiz_score: Note
+          require_access_code: "Nécessite un code d’accès"
+          restrict_quiz: "Restrictions liées aux questionnaires"
+          show_question_details: "Afficher les informations de la question"
+        limited_attempts: "Tentatives autorisées"
+        links: 
+          cancel: Annuler
+          find_questions: "Chercher des questions"
+          new_question: "Nouvelle question"
+          new_question_group: "Nouveau groupe de questions"
+          show_assignment_rubric: "Afficher le barème"
+        manage: Gérer
+        minutes: Minutes
+        new_assignment: "Nouvelle activité"
+        new_discussion: "Nouvelle discussion"
+        one_question_at_a_time: "Afficher une question à la fois"
+        points_possible: "%{n} points"
+        quiz_title: "Titre du questionnaire"
+        quiz_type: "Type de questionnaire"
+        require_lockdown_browser: "Nécessite Respondus LockDown Browser"
+        require_lockdown_browser_for_results: "Requis pour afficher les résultats du questionnaire"
+        retrieving_filters: "Récupération des filtres..."
+        score_to_keep: "Note de questionnaire à conserver"
+        show_correct_answers: "Laisser les étudiants voir les réponses correctes"
+        show_correct_answers_at: "Afficher les réponses correctes à"
+        shuffle_answers: "Permuter les réponses"
+        students_cannot_view_responses_after_course_concludes: "Les étudiants ne peuvent pas voir les questions des questionnaires après la fin du cours"
+        time_limit: "Combien de minutes ?"
+        titles: 
+          click_to_select_filter: "Cliquez pour sélectionner ce filtre"
+          delete: Supprimer
+          find_ip_address_filter: "Chercher un filtre d’adresses IP"
+        warnings: 
+          has_student_submissions: "Des étudiants ont déjà terminé ce questionnaire ou l’ont commencé, aussi soyez prudent avec vos modifications. Si vous changez notablement des questions, pensez éventuellement à réévaluer les étudiants qui ont utilisé l’ancienne version du questionnaire."
+      notices: 
+        cant_view_submission_while_muted: "Impossible d’afficher l’historique du questionnaire lorsque celui-ci est en mode silencieux."
+        has_submissions_already: "Gardez à l’esprit que certains étudiants ont déjà complété ou commencé ce questionnaire."
+        less_than_allotted_time: "Vous avez commencé ce questionnaire peu avant son échéance, par conséquent vous ne disposez pas de toute la durée nécessaire pour le compléter."
+        no_submission_for_user: "Aucun envoi disponible pour cet utilisateur"
+        quiz_updated: "Le questionnaire a été mis à jour"
+        quizzes_published: 
+          one: "1 questionnaire a été publié"
+          other: "%{count} questionnaires ont été publiés"
+        quizzes_unpublished: 
+          one: "La publication de 1 questionnaire a bien été annulée !"
+          other: "La publication de %{count} questionnaires a bien été annulée !"
+      question_group: 
+        buttons: 
+          update: "Mettre à jour"
+        default_group_name: Groupe
+        edit_questions_and_points: "Choisissez *%{num_questions}* questions ; #%{num_points}# points sont accordés à chaque question"
+        labels: 
+          group_name: "Nom du groupe"
+          number_of_questions: "Nombre de questions"
+          points_per_question: "Points par question"
+          question_bank: "Les questions seront extraites de la banque"
+        links: 
+          link_to_a_question_bank: "Liaison avec une banque de questions"
+        show_questions_and_points: "Choisissez *%{num_questions}* questions ; #%{num_points}# points sont accordés à chaque question"
+        titles: 
+          add_question_to_group: "Ajouter une question à ce groupe"
+          collapse_group: "Réduire le groupe"
+          delete_group: "Supprimer le groupe"
+          edit_group_details: "Modifier les informations du groupe"
+          expand_group: "Développer le groupe"
+      question_list_right_side: 
+        headers: 
+          questions: Questions
+      question_statistic: 
+        attempts: 
+          one: "1 tentative"
+          other: "%{count} tentatives"
+        empty_response: "Réponse vide"
+        labels: 
+          other_answers: "Autres réponses"
+        no_data: "Aucune donnée"
+        no_responses: "Aucune réponse enregistrée pour cette question"
+        percent_of_responses: "%{percent}% sur %{total} tentatives ont sélectionné cette réponse"
+        response_count: 
+          one: "1 étudiant a reçu cette question"
+          other: "%{count} étudiants ont reçu cette question"
+      question_teaser: 
+        titles: 
+          click_to_show_details: "Cliquez pour afficher toutes les informations de la question"
+          delete_this_question: "Supprimer cette question"
+          edit_this_question: "Modifier cette question"
+      quiz_details: 
         allowed_attempts: "Tentatives autorisées"
-        attempts_left: "Tentatives restantes"
-        attempts_so_far: "Tentatives jusqu’ici"
-        latest_submission: "Dernier envoi"
-        quiz_details: "Informations du questionnaire"
-        quiz_due: Échéance
-        quiz_time_limit: "Limite de durée"
-        survey_details: "Informations sur l’enquête"
-      no_details: "Aucune information"
-      points_possible: "%{points_possible} points possibles"
-      question_count: 
-        one: 1 question
-        other: "%{count} questions"
-      quiz_multiple_due_dates: "Plusieurs dates"
-      quiz_no_points: "Aucun point"
-      quiz_points_possible: 
-        one: 1 point
-        other: "%{count} points"
-      student_mute_notification: "Le formateur travaille sur les notes"
-      unlimited_attempts: "Nombre de tentatives illimité"
-    read_only: 
-      default_page_title: "Nouveau questionnaire"
-      headers: 
-        quiz_details: "Informations du questionnaire"
-      labels: 
-        question_details: "Afficher les informations de la question"
+        headers: 
+          available: Disponible
+          due: Échéance
+          points: Points
+          questions: Questions
+          time_limit: "Limite de durée"
+        multiple_due_dates: "Plusieurs dates d’échéance"
+        no_due_date: "Pas d’échéance"
+        none: Aucun
+        quiz_availabile_through: "%{start_time} - %{end_time}"
+        quiz_available_after: "après %{start_time}"
+        quiz_available_until: "jusqu’à %{end_time}"
+        requires_lockdown: "Nécessite Respondus LockDown Browser"
+        time_limit: 
+          one: "1 minute"
+          other: "%{count} minutes"
+        unlimited: "Sans limite"
+      quiz_right_side: 
+        attempts_left: 
+          one: "1 tentative supplémentaire possible"
+          other: "%{count} tentatives supplémentaires possibles"
+        attempts_so_far: 
+          one: "1 tentative jusqu’ici"
+          other: "%{count} tentatives jusqu’ici"
+        labels: 
+          current_score: "Note actuelle"
+          kept_score: "Note conservée"
+          last_attempt_details: "Informations de la dernière tentative"
+          submission_details: "Informations de l’envoi"
+          time: Heure
+        links: 
+          preview_quiz_again: "Afficher un nouvel aperçu du questionnaire"
+          preview_survey_again: "Afficher un nouvel aperçu de l’enquête"
+        no_more_attempts: "Plus de tentatives accordées"
+        questions_not_graded: "Certaines questions n’ont pas encore été notées."
+        score_set_manually: "Cette note a été attribuée par l'enseignant."
+        unlimited_attempts: "Nombre de tentatives illimité"
+        view_previous_attempts: "Afficher les tentatives précédentes"
+      quiz_show_teacher: 
+        anonymous_submissions: "Envois anonymes"
+        attempts: Tentatives
+        available_from: "Disponible depuis"
+        cant_go_back: "Verrouiller les questions après les réponses"
+        code: "Code d’accès"
+        due: Échéance
+        filter: "Filtre IP"
+        for: Pour
+        group: "Groupe de travaux"
+        label: 
+          time_limit: "Limite de durée"
+        multiple_attempts: "Plusieurs tentatives"
+        no_time_limit: "Aucune limite de temps"
+        one_question_at_a_time: "Une question à la fois"
+        points: Points
+        quiz_type: "Type de questionnaire"
+        require_lockdown_browser: "Nécessite Respondus LockDown Browser"
+        require_lockdown_browser_for_results: "Requis pour afficher les résultats du questionnaire"
+        require_lockdown_browser_monitor: "Webcam requise"
+        score_to_keep: "Note à conserver"
+        show_correct_answers: "Afficher les réponses correctes"
+        shuffle_answers: "Permuter les réponses"
+        time_limit: 
+          one: "1 minute"
+          other: "%{count} minutes"
+        until: Jusqu’au
+        view_responses: "Afficher les réponses"
+      quiz_submission: 
+        attempt_duration: "Cette tentative a duré %{duration}."
+        buttons: 
+          update_scores: "Actualiser les résultats"
+        labels: 
+          final_score: "Note finale"
+          fudge_points: "Points de dernière minute"
+          fudge_points_changed_points_quiz: "Depuis que %{user} a répondu à ce questionnaire, les points possibles ont changé de %{difference} points. Vous pouvez rectifier en fonction de cette modification en ajoutant manuellement des points positifs ou négatifs dans cette zone."
+          fudge_points_changed_points_survey: "Depuis que %{user} a répondu à cette enquête, les points possibles ont changé de %{difference} points. Vous pouvez rectifier en fonction de cette modification en ajoutant manuellement des points positifs ou négatifs dans cette zone."
+          fudge_points_generic_explanation: "Vous pouvez rectifier manuellement le résultat en ajoutant des points positifs ou négatifs dans cette zone."
+          questions_need_review: "Les questions suivantes doivent être révisées"
+          quiz_score: "Note du questionnaire"
+          score_for_attempt: "Note pour cette tentative"
+          score_for_quiz: "Note pour ce questionnaire"
+          score_for_survey: "Note pour cette enquête"
+          survey_score: "Note de l’enquête"
+        links: 
+          click_to_view_results: "Cliquez ici pour afficher les résultats."
+        questions_not_graded: "Certaines questions n’ont pas encore été notées."
+        quiz_fudged_negative: "La note de ce questionnaire a été corrigée manuellement de %{fudge} points."
+        quiz_fudged_positive: "La note de ce questionnaire a été corrigée manuellement de +%{fudge} points."
+        quiz_not_yet_taken: "Le questionnaire n’a pas encore été complété."
+        quiz_results_protected: "Les résultats de ce questionnaire sont protégés et invisibles pour les étudiants."
+        quiz_results_protected_until_last_attempt: "Les résultats du questionnaire sont protégés et invisibles pour les étudiants jusqu’à l’envoi de leur dernière tentative."
+        quiz_submission_needs_review: "Le quizz a énormément changé depuis son envoi. Il se peut que cet envoi requière une nouvelle notation."
+        requires_lockdown: "Respondus LockDown Browser est requis pour afficher les résultats du questionnaire."
+        submitted_at: "Envoyé le %{when}"
+        survey_fudged_negative: "La note de cette enquête a été corrigée manuellement de %{fudge} points."
+        survey_fudged_positive: "La note de cette enquête a été corrigée manuellement de +%{fudge} points."
+        survey_not_yet_taken: "L’enquête n’a pas encore été complétée."
+      quiz_summary: 
+        assignment_points_possible: 
+          one: "1 pt"
+          other: "%{count} pts"
+        labels: 
+          allowed_attempts: "Tentatives autorisées"
+          attempts_left: "Tentatives restantes"
+          attempts_so_far: "Tentatives jusqu’ici"
+          latest_submission: "Dernier envoi"
+          quiz_details: "Informations du questionnaire"
+          quiz_due: Échéance
+          quiz_time_limit: "Limite de durée"
+          survey_details: "Informations sur l’enquête"
+        no_details: "Aucune information"
+        points_possible: "%{points_possible} points possibles"
+        question_count: 
+          one: "1 question"
+          other: "%{count} questions"
+        quiz_multiple_due_dates: "Plusieurs dates"
+        quiz_no_points: "Aucun point"
+        quiz_points_possible: 
+          one: "1 point"
+          other: "%{count} points"
+        student_mute_notification: "Le formateur travaille sur les notes"
+        unlimited_attempts: "Nombre de tentatives illimité"
+      read_only: 
+        default_page_title: "Nouveau questionnaire"
+        headers: 
+          quiz_details: "Informations du questionnaire"
+        labels: 
+          question_details: "Afficher les informations de la question"
+          quiz_instructions: "Instructions du questionnaire"
+        links: 
+          back_to_quiz_page: "Revenir à la page du questionnaire"
+      refresh_quiz_after_popup: 
+        headers: 
+          loading_in_lockdown: "Chargement du questionnaire dans Respondus LockDown Browser"
+      show: 
+        buttons: 
+          lock_quiz: "Verrouiller ce questionnaire"
+          lock_survey: "Verrouiller cette enquête"
+          publish: Publier
+          republish: Republier
+          unlock_quiz: "Autoriser les étudiants à compléter ce questionnaire"
+          unlock_survey: "Autoriser les étudiants à compléter cette enquête"
+        labels: 
+          available_until: Jusqu’au
+          no_time_limit: "Aucune limite de temps"
+          warning_icon: Avertissement
+        links: 
+          edit: Modifier
+          keep_editing_this_quiz: "Continuer de modifier ce questionnaire"
+          keep_editing_this_survey: "Continuer de modifier cette enquête"
+          message_students_who: "Envoyer un message aux étudiants qui..."
+          moderate_this_quiz: "Modérer ce questionnaire"
+          moderate_this_survey: "Modérer cette enquête"
+          preview: Aperçu
+          quiz_statistics: "Statistiques du questionnaire"
+          see_full_quiz: "Voir le questionnaire complet"
+          show_assignment_rubric: "Afficher le barème"
+          show_student_quiz_results: "Afficher les résultats du questionnaire pour l’étudiant"
+          show_student_survey_results: "Afficher les résultats de l’enquête pour l’étudiant"
+          survey_statistics: "Statistiques de l’enquête"
+        manage: Gérer
+        only_registered_users: "Seuls les utilisateurs inscrits et enregistrés peuvent compléter les questionnaires qui sont notés"
+        quiz_regraded_your_score_affected: 
+          one: "La note de ce questionnaire a été recalculée, mais cela n’a pas changé le total."
+          other: "La note de ce questionnaire a été recalculée. Votre nouveau résultat tient compte des %{count} questions concernées."
+        quiz_regraded_your_score_not_affected: "La note de ce questionnaire a été recalculée, mais cela n’a pas changé le total."
+        speed_grader: SpeedGrader™
+        students_submitted_so_far: 
+          one: "1 étudiant a effectué un envoi jusqu’ici"
+          other: "%{count} étudiants ont effectué un envoi jusqu’ici"
+        titles: 
+          delete: Supprimer
+          related_items: "Éléments apparentés"
+          unlock_for_how_long: "Pour quelle durée souhaitez-vous déverrouiller le questionnaire ?"
+        warnings: 
+          draft_version: "Ceci est un aperçu de la version brouillon du questionnaire"
+      single_answer: 
+        upload: Charger
+      statistics: 
+        class_too_large: "Ce cours est trop volumineux pour l’affichage des statistiques. Celles-ci peuvent néanmoins être téléchargées depuis la barre latérale à droite."
+        headers: 
+          for_question: "Pour %{question_name}"
+          quiz_statistics: "Statistiques du questionnaire"
+          survey_statistics: "Statistiques de l’enquête"
+          users_have_taken_this_quiz: "%{count} utilisateurs ont complété ce questionnaire"
+          users_have_taken_this_survey: "%{count} utilisateurs ont complété cette enquête"
+        labels: 
+          average_correct: "Moyenne correcte"
+          average_incorrect: "Moyenne incorrecte"
+          average_time: "Temps moyen"
+          high_score: "Note élevée"
+          low_score: "Note basse"
+          mean_score: "Note moyenne"
+          standard_deviation: Écart-type
+          users_selected_the_answer: "Les utilisateurs suivants ont sélectionné la réponse %{answer_text}"
+        links: 
+          count_all_attempts: "Compter **toutes** les tentatives"
+          count_only_latest_attempts: "Compter uniquement chaque dernière tentative"
+        page_title: Statistiques
+        quiz_all_version_disclaimer: "Ce rapport affiche les statistiques du questionnaire en fonction des tentatives de tous les utilisateurs."
+        quiz_latest_version_disclaimer: "Ce rapport affiche les statistiques du questionnaire en fonction de la dernière tentative de chaque utilisateur."
+        student_n: "Étudiant %{student_counter}"
+        survey_all_version_disclaimer: "Ce rapport affiche les statistiques de l’enquête en fonction des tentatives de tous les utilisateurs."
+        survey_latest_version_disclaimer: "Ce rapport affiche les statistiques de l’enquête en fonction de la dernière tentative de chaque utilisateur."
+      statistics_crumb: Statistiques
+      submission_version: 
+        attempt_number: "Tentative %{att_no}"
+        kept: CONSERVÉE
+        latest: DERNIÈRE
+      submission_versions: 
+        attempt: Tentative
+        attempt_history: "Historique des tentatives"
+        quiz_attempt_history_description: "Un tableau qui récapitule vos tentatives pour les questionnaires. Chaque essai est indiqué à gauche, avec l’heure et le résultat en haut."
+        regraded: "Note recalculée"
+        score: Note
+        time: Heure
+      take_quiz: 
+        buttons: 
+          next: Suivant
+          out_of_time_submit: OK
+          previous: Précédent
+          submit_quiz: "Envoyer le questionnaire"
+        headers: 
+          draft_preview: "Ceci est un aperçu de la version brouillon du questionnaire"
+        labels: 
+          started: Début
+          times_up: "Terminé ! Envoi des résultats dans"
+        logged_out_of_canvas: "*Vous avez été déconnecté de Canvas.* Pour continuer, veuillez vous reconnecter."
+        login_required: "Connexion requise"
+        not_saved: "Non enregistré"
         quiz_instructions: "Instructions du questionnaire"
-      links: 
-        back_to_quiz_page: "Revenir à la page du questionnaire"
-    refresh_quiz_after_popup: 
-      headers: 
-        loading_in_lockdown: "Chargement du questionnaire dans Respondus LockDown Browser"
+      take_quiz_in_popup: 
+        headers: 
+          loading_in_lockdown: "Chargement du questionnaire dans Respondus LockDown Browser"
+        links: 
+          return_to_quiz_page: "[Cliquez ici](%{url}) pour revenir à la page du questionnaire."
+      take_quiz_right_side: 
+        labels: 
+          attempt_due: "Tentative échue"
+          score: Note
+          time_elapsed: "Temps écoulé"
+          time_running: Chronomètre
+        links: 
+          hide_time_running: Masquer
+          keep_editing_quiz: "Continuer de modifier ce questionnaire"
+          keep_editing_survey: "Continuer de modifier cette enquête"
     retrieving_filters: "Récupération des filtres..."
     rubric: 
       loading: Chargement...
@@ -11801,114 +12042,35 @@ fr:
         you_answered: "Vous avez répondu"
       buttons: 
         already_published: "Publication terminée."
-        lock_quiz: "Verrouiller ce questionnaire"
-        lock_survey: "Verrouiller cette enquête"
-        publish: Publier
         publishing: "Publication en cours..."
-        republish: Republier
-        unlock_quiz: "Autoriser les étudiants à compléter ce questionnaire"
-        unlock_survey: "Autoriser les étudiants à compléter cette enquête"
       confirms: 
         delete_quiz: "Voulez-vous vraiment supprimer ce questionnaire ?"
         delete_quiz_submissions_warning: 
           one: "Avertissement: 1 étudiant a déjà complété ce questionnaire. Si vous le supprimez, tous les envois complétés seront supprimés et n’apparaîtront plus dans le relevé de notes."
           other: "Avertissement : %{count} étudiants ont déjà complété ce questionnaire. Si vous le supprimez, tous les envois complétés seront supprimés et n’apparaîtront plus dans le relevé de notes."
-      labels: 
-        available_until: Jusqu’au
-        no_time_limit: "Aucune limite de temps"
-        warning_icon: Avertissement
       links: 
-        edit: Modifier
         hide_student_quiz_results: "Masquer les résultats du questionnaire pour l’étudiant"
         hide_student_survey_results: "Masquer les résultats de l’enquête pour l’étudiant"
-        keep_editing_this_quiz: "Continuer de modifier ce questionnaire"
-        keep_editing_this_survey: "Continuer de modifier cette enquête"
-        message_students_who: "Envoyer un message aux étudiants qui..."
-        moderate_this_quiz: "Modérer ce questionnaire"
-        moderate_this_survey: "Modérer cette enquête"
-        preview: "Afficher un aperçu"
-        quiz_statistics: "Statistiques du questionnaire"
-        see_full_quiz: "Voir le questionnaire complet"
-        show_assignment_rubric: "Afficher le barème"
         show_student_quiz_results: "Afficher les résultats du questionnaire pour l’étudiant"
         show_student_survey_results: "Afficher les résultats de l’enquête pour l’étudiant"
-        survey_statistics: "Statistiques de l’enquête"
-      manage: Gérer
-      only_registered_users: "Seuls les utilisateurs inscrits et enregistrés peuvent compléter les questionnaires qui sont notés"
-      quiz_regraded_your_score_affected: 
-        one: "La note de ce questionnaire a été recalculée et le total a changé."
-        other: "La note de ce questionnaire a été recalculée. Votre nouveau résultat tient compte des %{count} questions concernées."
-      quiz_regraded_your_score_not_affected: "La note de ce questionnaire a été recalculée, mais cela n’a pas changé le total."
-      speed_grader: SpeedGrader™
-      students_submitted_so_far: 
-        one: "envoi d’1 étudiant jusqu’ici"
-        other: "envois de %{count} étudiants jusqu’ici"
       students_who_have_not_taken_the_quiz: "Étudiants qui n’ont PAS complété le questionnaire"
       students_who_have_taken_the_quiz: "Étudiants qui ont complété le questionnaire"
-      titles: 
-        delete: Supprimer
-        related_items: "Éléments apparentés"
-        unlock_for_how_long: "Pour quelle durée souhaitez-vous déverrouiller le questionnaire ?"
-      warnings: 
-        draft_version: "Ceci est un aperçu de la version brouillon du questionnaire"
     show_and_hide_correct_answers: "Du %{from} au %{to}"
     show_correct_answers_after: "Après le %{date}"
     show_correct_answers_immediately: Immédiatement
     show_correct_answers_until: "Jusqu’au %{date}"
-    single_answer: 
-      upload: Charger
     statistics: 
-      class_too_large: "Ce cours est trop volumineux pour l’affichage des statistiques. Celles-ci peuvent néanmoins être téléchargées depuis la barre latérale à droite."
       count_attempts: 
         one: 1 tentative
         other: "%{count} tentatives"
-      headers: 
-        for_question: "Pour %{question_name}"
-        quiz_statistics: "Statistiques du questionnaire"
-        survey_statistics: "Statistiques de l’enquête"
-        users_have_taken_this_quiz: "%{count} utilisateurs ont complété ce questionnaire"
-        users_have_taken_this_survey: "%{count} utilisateurs ont complété cette enquête"
-      labels: 
-        average_correct: "Moyenne correcte"
-        average_incorrect: "Moyenne incorrecte"
-        average_time: "Temps moyen"
-        high_score: "Note élevée"
-        low_score: "Note basse"
-        mean_score: "Note moyenne"
-        standard_deviation: "Déviation standard"
-        users_selected_the_answer: "Les utilisateurs suivants ont sélectionné la réponse %{answer_text}"
-      links: 
-        count_all_attempts: "Compter **toutes** les tentatives"
-        count_only_latest_attempts: "Compter uniquement chaque dernière tentative"
-      page_title: Statistiques
-      quiz_all_version_disclaimer: "Ce rapport affiche les statistiques du questionnaire en fonction des tentatives de tous les utilisateurs."
-      quiz_latest_version_disclaimer: "Ce rapport affiche les statistiques du questionnaire en fonction de la dernière tentative de chaque utilisateur."
-      survey_all_version_disclaimer: "Ce rapport affiche les statistiques de l’enquête en fonction des tentatives de tous les utilisateurs."
-      survey_latest_version_disclaimer: "Ce rapport affiche les statistiques de l’enquête en fonction de la dernière tentative de chaque utilisateur."
       titles: 
         submitted_users_for_quesiton: "Utilisateurs envoyés pour %{user}"
       uncounted_submissions: 
         one: "1 autre envoi"
         other: "%{count} autres envois"
-    statistics_crumb: Statistiques
-    submission_version: 
-      attempt_number: "Tentative %{att_no}"
-      kept: CONSERVÉE
-      latest: DERNIÈRE
-    submission_versions: 
-      attempt: Tentative
-      attempt_history: "Historique des tentatives"
-      quiz_attempt_history_description: "Un tableau qui récapitule vos tentatives pour les questionnaires. Chaque essai est indiqué à gauche, avec l’heure et le résultat en haut."
-      regraded: "Note recalculée"
-      score: Note
-      time: Heure
+    survey: Enquête
     surveys_label: "Enquêtes – Afficher/masquer les questionnaires"
     take_quiz: 
-      buttons: 
-        next: Suivant
-        out_of_time_submit: OK
-        previous: Précédent
-        submit_quiz: "Envoyer le questionnaire"
       confirms: 
         cant_go_back_blank: "Vous ne pouvez pas revenir à cette question avant d’avoir cliqué sur Suivant. Voulez-vous vraiment laisser le champ vide ?"
         navigate_away: "Vous êtes sur le point de quitter cette page. Voulez-vous continuer ?"
@@ -11925,25 +12087,20 @@ fr:
       errors: 
         connection_lost: "La connexion à %{host} a été perdue. Veuillez vérifier que vous êtes connecté à Internet avant de continuer."
         only_numerical_values: "seules les valeurs numériques sont acceptées"
-      headers: 
-        draft_preview: "Ceci est un aperçu de la version brouillon du questionnaire"
       hide_time_link: Masquer
       hours_count: 
         one: 1 heure
         other: "%{count} heures"
       labels: 
-        started: Début
         time_elapsed: "Temps écoulé"
-        times_up: "Terminé ! Envoi des résultats dans"
-      logged_out_of_canvas: "*Vous avez été déconnecté de Canvas.* Pour continuer, veuillez vous reconnecter."
-      login_required: "Connexion requise"
+      login_failed: "Échec de la connexion."
+      login_successful: "Connexion réussie"
       minutes_count: 
         one: 1 minute
         other: "%{count} minutes"
       months_count: 
         one: 1 mois
         other: "%{count} mois"
-      not_saved: "Non enregistré"
       notices: 
         extra_time: "Vous avez reçu du temps supplémentaire pour cette tentative"
         five_minutes_left: "Cinq dernières minutes"
@@ -11953,7 +12110,6 @@ fr:
         twelve_hours_left: "Douze dernières heures"
       question_answered: "Réponse donnée"
       question_unanswered: "Pas encore de réponse"
-      quiz_instructions: "Instructions du questionnaire"
       saved_at: "Questionnaire enregistré à %{t}"
       saving: Enregistrement...
       saving_not_needed: "Pas de nouvelle donnée à enregistrer. Dernière vérification à %{t}"
@@ -11967,21 +12123,6 @@ fr:
       years_count: 
         one: 1 an
         other: "%{count} années"
-    take_quiz_in_popup: 
-      headers: 
-        loading_in_lockdown: "Chargement du questionnaire dans Respondus LockDown Browser"
-      links: 
-        return_to_quiz_page: "[Cliquez ici](%{url}) pour revenir à la page du questionnaire."
-    take_quiz_right_side: 
-      labels: 
-        attempt_due: "Tentative échue"
-        score: Note
-        time_elapsed: "Temps écoulé"
-        time_running: Chronomètre
-      links: 
-        hide_time_running: Masquer
-        keep_editing_quiz: "Continuer de modifier ce questionnaire"
-        keep_editing_survey: "Continuer de modifier cette enquête"
     timing: 
       labels: 
         time_elapsed: "Temps écoulé"
@@ -12018,6 +12159,19 @@ fr:
     types: 
       quiz: Questionnaire
       survey: Enquête
+  quizzes/quiz_group: 
+    errors: 
+      no_bank: "Impossible de trouver la banque de questions pour le groupe de quizz %{group_name}."
+      no_permissions: "L’utilisateur ne disposait pas des droits nécessaires pour référencer la banque de questions dans le groupe de quizz %{group_name}."
+    question_group: "Groupe de questions"
+  quizzes/quiz_question: 
+    defaults: 
+      question_name: Question
+  quizzes/quiz_statistics: 
+    statistics_filename: "Rapport %{quiz_title} %{quiz_type} %{report_type} "
+    types: 
+      item_analysis: "Analyse - élément"
+      student_analysis: "Analyse - étudiant"
   quizzes_model: 
     cant_unpublish_when_students_submit: "Impossible de retirer la publication s’il y a des envois d’étudiants"
     confirms: 
@@ -12426,16 +12580,6 @@ fr:
         go: Ok
       titles: 
         find_user: "Chercher un utilisateur"
-    accounts_secondary_content: 
-      buttons: 
-        go: Ok
-      links: 
-        manage_permissions: "Gérer les autorisations des rôles"
-        manage_subaccounts: "Gérer les sous-comptes"
-        manage_terms: "Gérer les trimestres"
-        view_statistics: "Afficher les statistiques"
-      titles: 
-        find_user: "Chercher un utilisateur"
     add_assignment: 
       buttons: 
         add_assignment: "Ajouter une tâche"
@@ -12536,6 +12680,9 @@ fr:
         unenroll_user_section: "Retirer l’utilisateur de la section"
       titles: 
         course_section: "Section du cours"
+    error_form: 
+      message_failed: "Échec de l’envoi du rapport. Veuillez réessayer."
+      message_sent: "Merci de votre aide ! Nous nous en occupons."
     errors: 
       400_message: 
         description: "Erreur : Une erreur s’est produite lors du chargement de la page demandée."
@@ -12562,8 +12709,6 @@ fr:
           submit: "Envoyer les commentaires"
         labels: 
           email: "E-mail (facultatif)"
-        message_failed: "Échec de l’envoi du rapport. Veuillez réessayer."
-        message_sent: "Merci de votre collaboration ! Nous nous en occupons."
     event_list: 
       at_least_more_events: "au moins %{count_of_events} supplémentaires"
       at_least_more_events_one_week: "au moins %{count_of_events} supplémentaires dans la semaine à venir"
@@ -13111,6 +13256,13 @@ fr:
     columns: 
       date: Date
       value: Valeur
+    domain_not_found: 
+      body_description: "Vérifiez l’URL et réessayez, ou demandez de l’aide à votre établissement ou à votre enseignant."
+      body_reference: "Si un compte Canvas gratuit et sans lien avec un établissement particulier vous intéresse, vous pouvez vous inscrire à"
+      links: 
+        canvas_instructure: canvas.instructure.com
+      page_title: "Nous n’avons pas pu trouver votre instance de Canvas."
+      you_typed: "Vous avez saisi"
     institution_suspended: 
       body: "Le compte Canvas de votre établissement scolaire est suspendu temporairement. Veuillez contacter votre administrateur Canvas."
       links: 
@@ -13141,8 +13293,12 @@ fr:
     assignment_order_assignment_groups: "Par groupe de travaux et position"
     assignment_order_due_date: "Par échéance"
     assignment_unmuted: "Cliquez pour couper le son."
+    invalid_group_warning: 
+      one: "Remarque : le résultat n’inclut pas les travaux du groupe %{list_of_group_names}, parce qu’il n’a pas de points possibles."
+      other: "Remarque : le résultat n’inclut pas les travaux des groupes %{list_of_group_names}, parce qu’ils n’ont pas de points possibles."
     no_assignment: "Aucun travail sélectionné"
     no_student: "Aucun étudiant sélectionné"
+    notes: Remarques
     student_hidden_name: "Étudiant %{position}"
   statistics: 
     csv_columns: 
@@ -13169,6 +13325,11 @@ fr:
     not_available: "Disponible le"
     pending: "Pas disponible jusqu’au"
   step: Étape
+  student_outcome_gradebook_description: |-
+      Le carnet d’évaluation des acquis permet aux étudiants de voir rapidement leur progression
+      dans les différents apprentissages. Les acquis sont présentés comme un relevé de notes
+      et les progrès des étudiants sont exprimés à la fois sous la forme d’une valeur numérique et avec les appréciations
+      maîtrisé/presque maîtrisé/soutien.
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "Vous ne pouvez pas supprimer un sous-compte contenant des cours"
@@ -13406,6 +13567,10 @@ fr:
         term_start: "début du trimestre"
         unspecified: "peu importe"
       timespan: "%{start_at} *à* %{end_at}"
+  text_helper: 
+    time: 
+      ranges: 
+        different_days: "%{start_date_and_time} jusqu’au %{end_date_and_time}"
   time: 
     am: matin
     count_hours_ago: 
