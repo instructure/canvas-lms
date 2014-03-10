@@ -86,21 +86,21 @@ define [
     equal +tz.parse('1969-07-20 21:56'), +moonwalk
     equal tz.format(moonwalk, '%c'), "Sun 20 Jul 1969 09:56:00 PM EST"
 
-  # test 'changeZone(...) should asynchronously curry in a zone by name', ->
-  #   calledBack = false
-  #   tz.changeZone('America/Detroit').then ->
-  #     calledBack = true
-  #     equal +tz.parse('1969-07-20 21:56'), +moonwalk
-  #     equal tz.format(moonwalk, '%c'), "Sun 20 Jul 1969 09:56:00 PM EST"
-  #   equal calledBack, true
+  test 'changeZone(...) should asynchronously curry in a zone by name', ->
+    expect(2)
+    stop()
+    tz.changeZone('America/Detroit').then ->
+      start()
+      equal +tz.parse('1969-07-20 21:56'), +moonwalk
+      equal tz.format(moonwalk, '%c'), "Sun 20 Jul 1969 09:56:00 PM EST"
 
   test 'changeLocale(...) should synchronously curry in a loaded locale', ->
     tz.changeLocale(french, 'fr_FR')
     equal tz.format(moonwalk, '%c'), "lun. 21 juil. 1969 02:56:00 UTC"
 
-  # test 'changeLocale(...) should asynchronously curry in a locale by name', ->
-  #   calledBack = false
-  #   tz.changeZone('fr_FR').then ->
-  #     calledBack = true
-  #     equal tz.format(moonwalk, '%c'), "lun. 21 juil. 1969 02:56:00 UTC"
-  #   equal calledBack, true
+  test 'changeLocale(...) should asynchronously curry in a locale by name', ->
+    expect(1)
+    stop()
+    tz.changeLocale('fr_FR').then ->
+      start()
+      equal tz.format(moonwalk, '%c'), "lun. 21 juil. 1969 02:56:00 UTC"
