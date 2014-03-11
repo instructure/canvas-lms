@@ -30,7 +30,7 @@ module DataFixup
     def self.other_namespace(attachment)
       account_id = attachment.namespace.sub('account_', '').to_i
       if account_id.to_s.length > 8
-        namespace_account_id = Account.find(account_id).local_id
+        namespace_account_id = Account.find_by_id(account_id).try(:local_id)
       else
         namespace_account_id = attachment.shard.global_id_for(account_id)
       end

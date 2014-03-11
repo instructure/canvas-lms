@@ -281,7 +281,8 @@ class ContextModulesController < ApplicationController
 
   def item_details  
     if authorized_action(@context, @current_user, :read)
-      code = params[:id].split("_")
+      # namespaced models are separated by : in the url
+      code = params[:id].gsub(":", "/").split("_")
       id = code.pop.to_i
       type = code.join("_").classify
       @modules = @context.modules_visible_to(@current_user)
