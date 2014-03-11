@@ -132,7 +132,7 @@ gem 'jammit', '0.6.6'
   gem 'cssmin', '1.0.3'
   gem 'jsmin', '1.0.1'
 gem 'json', '1.8.1'
-gem 'oj', '2.1.7'
+gem 'oj', '2.5.5'
 unless CANVAS_RAILS2
   gem 'rails-patch-json-encode', '0.0.1'
 end

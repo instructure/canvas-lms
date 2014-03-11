@@ -117,6 +117,7 @@ if CANVAS_RAILS2
 else
   # In rails 3.2, this calls MultiJson.use(:oj)
   ActiveSupport::JSON.backend = :oj
+  MultiJson.dump_options = {:escape_mode => :xss_safe}
 
   # Rails4 gives an option to opt out of encoding BigDecimal json as a string
   if ActiveSupport.respond_to?(:encode_big_decimal_as_string)
