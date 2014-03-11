@@ -46,6 +46,10 @@ class Shard
     default
   end
 
+  def self.lookup(id)
+    default
+  end
+
   def self.partition_by_shard(array, partition_proc = nil)
     return [] if array.empty?
     Array(yield array)
