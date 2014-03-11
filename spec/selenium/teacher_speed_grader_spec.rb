@@ -419,7 +419,7 @@ describe "speed grader" do
   end
 
   it "should be able to change sorting and hide student names" do
-    student_submission
+    student_submission(name: 'student@example.com')
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
