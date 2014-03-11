@@ -17,6 +17,16 @@
 #
 
 if CANVAS_RAILS2
+class DatabaseServer
+  def id
+    'default'
+  end
+
+  def self.default
+    @default ||= DatabaseServer.new
+  end
+end
+
 class Shard
   IDS_PER_SHARD = 10_000_000_000_000
 
@@ -47,6 +57,10 @@ class Shard
 
   def self.shard_for(object)
     default
+  end
+
+  def database_server
+    DatabaseServer.default
   end
 
   def activate
