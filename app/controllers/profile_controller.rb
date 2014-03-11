@@ -352,7 +352,7 @@ class ProfileController < ApplicationController
         unless pseudonymed
           flash[:notice] = t('notices.updated_profile', "Settings successfully updated")
           format.html { redirect_to user_profile_url(@current_user) }
-          format.json { render :json => @user.as_json(:methods => :avatar_url, :include => {:communication_channel => {:only => [:id, :path]}, :pseudonym => {:only => [:id, :unique_id]} }) }
+          format.json { render :json => @user.as_json(:methods => :avatar_url, :include => {:communication_channel => {:only => [:id, :path], :include_root => false}, :pseudonym => {:only => [:id, :unique_id], :include_root => false} }) }
         end
       else
         format.html
