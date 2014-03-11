@@ -83,5 +83,24 @@ describe "/quizzes/quizzes/show" do
     response.should have_tag "#quiz-publish-link"
   end
 
+  it "should show unpublished quiz changes to instructors with draft state" do
+    course_with_teacher_logged_in(:active_all => true)
+    Account.default.enable_feature!(:draft_state)
+
+    @quiz = @course.quizzes.create!
+    @quiz.workflow_state = "available"
+    @quiz.save!
+    @quiz.publish!
+    Quizzes::Quiz.mark_quiz_edited(@quiz.id)
+    @quiz.reload
+    assigns[:quiz] = @quiz
+
+    view_context
+    render "quizzes/quizzes/show"
+
+    response.should have_tag ".unsaved_quiz_warning"
+    response.should_not have_tag ".unpublished_quiz_warning"
+  end
+
 end
 

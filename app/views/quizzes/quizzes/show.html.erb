@@ -229,12 +229,29 @@
 
   <% if @context.feature_enabled?(:draft_state) %>
     <% if needs_unpublished_warning?(@quiz) %>
-    <div class="alert unpublished_warning">
-      <% if !@quiz.available? %>
-        <%= unpublished_quiz_warning %>
-      <% else %>
-        <%= unpublished_changes_warning %>
-      <% end %>
+    <div class="alert">
+      <div class="row-fluid">
+        <div class="span8 unpublished_warning">
+          <%= quiz_published_state_warning %>
+        </div>
+        <div class="span4 actions">
+          <% if display_save_button? %>
+            <div>
+
+              <%= form_for @quiz,
+                           url: course_quizzes_publish_path(@context),
+                           style: 'display: inline',
+                           method: :put do |f| %>
+
+                <%= hidden_field_tag 'quizzes[]', @quiz.id %>
+                <img src='/images/ajax-loader-black-on-white.gif' class='hidden loading' />
+                <%= f.submit 'Save It Now', class: 'btn btn-primary' %>
+              <% end %>
+
+            </div>
+          <% end %>
+        </div>
+      </div>
     </div>
     <% end %>
 
