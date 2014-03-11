@@ -2,6 +2,7 @@ define [
   'ember'
   '../start_app'
   '../shared_ajax_fixtures'
+  '../environment_setup'
 ], (Ember, startApp, fixtures) ->
   App = null
 
