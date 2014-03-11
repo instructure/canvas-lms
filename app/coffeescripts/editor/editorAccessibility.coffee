@@ -37,4 +37,4 @@ define [
         @$el.find("##{@id_prepend}_instructure_record img").attr('alt') + ", " + I18n.t('accessibles.record', 'This feature is inaccessible for screen readers.'));
 
     _addTitles: ->
-      @$iframe.attr 'title', I18n.t('titles.rte_help', 'Rich Text Area. Press ALT F10 for toolbar. Press ALT 0 for help.')
+      @$iframe.attr 'title', I18n.t('titles.rte_help', 'Rich Text Area. Press ALT F10 for toolbar. Press ALT F8 for help.')

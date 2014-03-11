@@ -8,7 +8,7 @@
  * Contributing: http://tinymce.moxiecode.com/contributing
  */
 
-(function(tinymce) {
+define(['tinymce/jscripts/tiny_mce/tiny_mce_src'], function(tinymce) {
 	var DOM = tinymce.DOM, Event = tinymce.dom.Event, extend = tinymce.extend, each = tinymce.each, Cookie = tinymce.util.Cookie, lastExtID, explode = tinymce.explode;
 
 	// Generates a preview for a format
@@ -726,7 +726,10 @@
 			});
 
 			// alt+0 is the UK recommended shortcut for accessing the list of access controls.
-			ed.addShortcut('alt+0', '', 'mceShortcuts', t);
+			// Instructure:
+			// Unfortunately, it creates a conflict with a foreign character on the Mac.
+			// Also, this standard has really failed to catch on, so we use something else.
+			ed.addShortcut('alt+f8', '', 'mceShortcuts', t);
 
 			return {
 				iframeContainer : ic,
@@ -1487,4 +1490,4 @@
 	});
 
 	tinymce.ThemeManager.add('advanced', tinymce.themes.AdvancedTheme);
-}(tinymce));
+});

@@ -4,7 +4,7 @@ define [
   'tinymce/jscripts/tiny_mce/tiny_mce_src'
   'tinymce/jscripts/tiny_mce/langs/en'
   'tinymce/jscripts/tiny_mce/themes/advanced/langs/en'
-  'tinymce/jscripts/tiny_mce/themes/advanced/editor_template'
+  'tinymce/jscripts/tiny_mce/themes/advanced/editor_template_src'
   'tinymce/jscripts/tiny_mce/plugins/media/editor_plugin_src'
   'tinymce/jscripts/tiny_mce/plugins/paste/editor_plugin_src'
   'tinymce/jscripts/tiny_mce/plugins/paste/langs/en_dlg'
