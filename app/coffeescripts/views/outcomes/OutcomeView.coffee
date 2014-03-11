@@ -119,6 +119,7 @@ define [
 
     render: ->
       data = @model.toJSON()
+      data.html_url = ENV.CONTEXT_URL_ROOT+'/outcomes/'+data.id
       switch @state
         when 'edit'
           @$el.html outcomeFormTemplate data
