@@ -133,17 +133,45 @@
             .appendTo('body');
     });
 
-    // Alphabetize course drop-down list (Import Content page only)
-    // NOTE: This is no longer needed when XHR results are pre-sorted by Canvas
+    // CANVAS-244 1/2 Add enrollment term to course autocomplete
+    utils.onPage(/accounts\/\d+(\/courses)?$/, function () {
+        // Override the method that renders the autocomplete item
+        var autocompleteData = $('#course_name').data('ui-autocomplete');
+        if (autocompleteData) {
+            autocompleteData._renderItem = function (ul, item) {
+                return $('<li>')
+                    .append('<a><div>' + item.label + '</div><div><small><em>' + item.term + '</em></small></div></a>')
+                    .appendTo(ul);
+            };
+        }
+    });
+    // END CANVAS-244 1/2
+
+    // Fixes for Import Content page only
     utils.onPage(/courses\/\d+\/content_migrations/, function() {
+        // The fixes are for elements that are dynamically generated when a specific XHR call completes
         $(document).ajaxComplete(function (event, XMLHttpRequest, ajaxOptions) {
-            // Sort <option>s inside each <optgroup> when the relevant XHR call completes
             if (ajaxOptions.url && ajaxOptions.url.match(/users\/\d+\/manageable_courses/)) {
+                // Alphabetize course drop-down list, by sorting <option>s inside each <optgroup>
+                // NOTE: This is no longer needed when XHR results are pre-sorted by Canvas
                 $('optgroup', $('#courseSelect')).each(function (i, termGroup) {
                     $('option', termGroup)
                         .sort(function (a, b) { return $(a).text().localeCompare($(b).text()); })
                         .appendTo(termGroup);
                 });
+                // END Alphabetize course drop-down list
+
+                // CANVAS-244 2/2 Add enrollment term to course autocomplete
+                // Override the method that renders the autocomplete item
+                var autocompleteData = $('#courseSearchField').data('ui-autocomplete');
+                if (autocompleteData) {
+                    autocompleteData._renderItem = function (ul, item) {
+                        return $('<li>')
+                            .append('<a><div>' + item.label + '</div><div><small><em>' + item.term + '</em></small></div></a>')
+                            .appendTo(ul);
+                    };
+                }
+                // END CANVAS-244 2/2
             }
         });
     });
