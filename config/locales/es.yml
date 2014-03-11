@@ -93,7 +93,6 @@ es:
         login_handle_name: "Etiqueta de Ingreso"
       login_handle_name_description: "La etiqueta usada para identificadores de inicio de sesión únicos. Ejemplos: Inicio de sesión, Nombre de usuario, ID del alumno, etc."
       save_button: "Guardar las configuraciones de autentificación"
-    deprecated_fail: "No se pueden utilizar al mismo tiempo las versiones obsoletas y las actuales."
     index: 
       add_auth_desc: "Agregue un proveedor de identidad para esta cuenta: "
       canvas_login_tip: |-
@@ -175,11 +174,8 @@ es:
       last_ldap_timeout_failure: "Fallo del último tiempo de espera"
       ldap_timeout_failure_help2: "Si el tiempo de espera en las comunicaciones entre Canvas y el servidor LDAP se ha agotado en diversas ocasiones, Canvas bloqueará cualquier otro intento de inicio de sesión a través de ese servidor LDAP durante %{time}."
     login_required: "debe ser suministrado"
-    no_auth_mixing: "No se pueden mezclar los tipos de autenticación"
     no_changing_auth_types: "No se puede cambiar el tipo de configuración de la autorización, elimínelo y cree una configuración nueva."
-    no_config_sent: "Debe especificar auth_type"
     no_discovery_url: "Ninguna establecida"
-    only_one_cas: "No se pueden crear varias configuraciones CAS"
     password_required: "debe ser suministrado"
     saml_required: "Una configuración SAML es necesaria para probar SAML"
     saml_settings: 
@@ -275,6 +271,11 @@ es:
     sis_exporter: 
       deleted: "Incluir objetos eliminados: verdadero;"
       reports: "Informes: %{files}"
+    student: 
+      enrollment_state: "Incluir Estado de inscripción: verdadero;"
+      enrollment_states: "Estados de inscripción: %{states};"
+    usu: 
+      enrollment_types: "Tipos de inscripción: %{types}"
   account_settings: 
     account: Cuenta
     account_name_too_long: "El nombre de la cuenta es demasiado largo"
@@ -367,6 +368,28 @@ es:
         messages_viewed: "Notificaciones enviadas a *%{user}* desde el *%{start_date}* hasta el *%{end_date}*."
       comm_messages_search_results: 
         no_messages_found: "No se han encontrado mensajes"
+      course_logging_content: 
+        course_activity: "Actividad del curso"
+        find: Buscar
+      course_logging_details: 
+        Field: Campo
+        From: De
+        To: A
+        Value: Valor
+        date: Fecha
+        event_id: "Id. evento"
+        event_type_label: Tipo
+        time: Tiempo
+        user: Usuario
+      course_logging_item: 
+        view_event_details: "Ver detalles"
+      course_logging_results: 
+        date: Fecha
+        event_details: "Detalles del Evento"
+        event_type: Tipo
+        no_item_found: "No se ha encontrado ningún elemento"
+        time: Tiempo
+        user: Usuario
       course_search_form: 
         labels: 
           find_deleted_course: "Buscar un curso eliminado"
@@ -396,8 +419,8 @@ es:
         message_date_from: "Desde la fecha"
         message_date_to: "Hasta la fecha"
       grade_change_logging_content: 
-        auth_logging: "Actividad de cambio de calificaciones"
         find: Buscar
+        grade_change_activity: "Actividad de cambio de calificaciones"
         message_assignment_id: "ID de la tarea"
         message_course_id: "ID del curso"
       grade_change_logging_results: 
@@ -412,6 +435,7 @@ es:
         time: Tiempo
       logging_content_pane: 
         authentication: "Actividad de inicio/fin de sesión "
+        course: "Actividad del curso"
         grade_change: "Actividad de cambio de calificaciones"
         select_default: "Seleccione un tipo de registro"
         select_label: "Seleccione el tipo de registro que desea buscar"
@@ -843,6 +867,8 @@ es:
         restrict_student_future_view: "Restringir que los alumnos vean los cursos antes de la fecha de inicio"
         self_enrollment: "Permitir la Auto-Inscripción"
         self_registration: Autorregistro
+        self_registration_type_all: "Todos los tipos de cuentas"
+        self_registration_type_observer: "Solo cuentas de observador"
         show_scheduler: "Habilitar Scheduler"
         sis_source_id: "Identificación de SIS"
         start_at: Comienza
@@ -1118,6 +1144,15 @@ es:
             description: 
               header: Ejemplo
             text: "Este infome muestra todos los alumnos inscritos en un curso en un determinado período que no han enviado tareas en un intervalo de tiempo determinado en el curso. Este informe incluye una fila por alumno inscrito que cumpla los criterios. El intervalo de tiempo no puede ser mayor de dos semanas."
+    students_with_no_submissions_csv_parameters: 
+      account_reports: 
+        default: 
+          enrollment_state: 
+            header: "Estado de inscripción"
+          include_enrollment_state: 
+            check_box: "Incluir Estado de inscripción"
+      active: "Inscripciones activas"
+      all: "Todas las inscripciones"
     submission_data_csv_description: 
       account_reports: 
         submission_data: 
@@ -1165,6 +1200,24 @@ es:
           main: 
             text: "Este informe muestra todos los cursos que no tienen ninguno de los siguientes elementos: tareas, anuncios, debates, archivos, módulos, páginas o cuestionarios."
     update_failed_notice: "Configuraciones de actualización de cuenta falló"
+    user_access_csv_description: 
+      account_reports: 
+        usu: 
+          description: 
+            header: Ejemplo
+          user_activity: 
+            text: "Este informe muestra toda la actividad de los usuarios inscritos en un curso concreto o en todos los cursos de un período determinado. El archivo csv resultante tendrá una fila por cada actividad del alumno y tendrá los siguientes encabezados: tipo_inscripción, id sección, id sis sección, nombre sección, id curso, id sis curso, nombre curso, id usuario, id sis usuario, tipo contenido, contenido, veces visto, veces participado, visto por última vez. Las veces visto y las veces participado son contadores que miden desde el principio hasta el momento en que se generó el informe."
+    user_access_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: "Tipo de Inscripción"
+      all: "Todas las inscripciones"
+      designer: "Inscripciones de diseñador"
+      observer: "Inscripciones de observador"
+      students: "Inscripciones de alumno"
+      ta: "Inscripciones de ta"
+      teachers: "Inscripciones de profesor"
     user_add_failed_message: "La adición del usuario falló, intente de nuevo"
     user_added_message: "%{user} corectamente agregado"
     user_added_message_sent_message: "¡%{user} ha sido agregado! En breve recibirá una confirmación por correo electrónico."
@@ -1400,7 +1453,6 @@ es:
     default_title: "Sin Nombre - %{course}"
     default_unfiled_title: "Preguntas sin archivar"
   assignment: 
-    advanced_options_errors: "Se han producido errores en una o más opciones avanzadas"
     assignment_group_must_have_group: "Seleccione un grupo de tareas para esta tarea"
     at_least_one_file_type: "Especifique al menos un tipo de archivo permitido"
     at_least_one_submission_type: "Escoja al menos un tipo de envío"
@@ -1418,7 +1470,6 @@ es:
     feed_entry_title: "Tarea: %{assignment}"
     feed_entry_title_with_course: "Tarea, %{course}: %{assignment}"
     group_assignment_must_have_group_set: "Seleccione un grupo para esta tarea"
-    hide_advanced_options: "Ocultar opciones  avanzadas"
     imported_assignments_group: "Tareas Importadas"
     labels: 
       due: "Fecha límite"
@@ -1426,7 +1477,6 @@ es:
     percentage_points_possible: "Puntos posibles debe ser mayor que 0 si la calificación es porcentual"
     points_possible_number: "Puntos posibles debe ser un número"
     select_external_tool_dialog_title: "Configurar herramienta externa"
-    show_advanced_options: "Mostrar opciones avanzadas"
     submission_action_take_quiz: "Realizar %{title}"
     submission_action_turn_in_assignment: "Enviar %{title}"
     submission_types: 
@@ -1719,11 +1769,9 @@ es:
       buttons: 
         update: "Actualizar tarea"
       description: Descripción
-      due_date: "Fecha de vencimiento"
       freeze_properties: "Bloquear las propiedades de la tarea al copiarla"
       notify_content_change: "Notificar a los usuarios que este contenido ha cambiado"
       points_possible: Puntos
-      show_advanced_options: "Mostrar opciones avanzadas"
       warnings: 
         assignment_is_frozen: "El administrador ha bloqueado algunas configuraciones."
     errors: 
@@ -1761,7 +1809,7 @@ es:
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "Nota: %{grade}%"
     grading_type_selector: 
-      grading_type: "Tipo de calificación"
+      display_grade_as: "Mostrar calificación como"
       grading_type_options: 
         letter_grade: "Calificación por letras"
         not_graded: "No calificado"
@@ -1771,6 +1819,7 @@ es:
       view_grading_levels: "Ver niveles de calificación"
     group_category_selector: 
       grade_group_students_individually: "Asignar calificaciones a cada alumno individualmente"
+      group_assignment_header: "Tarea de grupo"
       group_category_options: "Nueva categoría de grupo"
       group_set: "Grupo establecido"
       is_group_assignment: "Esta es una tarea de grupo"
@@ -1850,6 +1899,8 @@ es:
       submitting: Enviando...
     multiple_due_dates: "Muchas fechas de vencimiento"
     name_is_required: "Es obligatorio escribir un nombre"
+    name_too_long: "El nombre es demasiado largo"
+    name_too_long_error: "El nombre es demasiado largo"
     never_drop: 
       remove_rule: "Eliminar regla"
     never_drop_collection: 
@@ -1908,12 +1959,14 @@ es:
         remind: "Recuerde a %{assessor} acerca de la tarea, ultima notificación en %{time}"
         reminder: "Recuérdele a %{assessor} la tarea, ultima notificación en %{time}"
     peer_reviews_selector: 
+      how_to_peer_review: "Cómo asignar revisión por pares"
       labels: 
         automatically_assign_peer_reviews: "Asignar revisiones por pares automáticamente"
         manually_assign_peer_reviews: "Asignar revisiones por pares manualmente"
         require_peer_reviews: "Hacer que las revisiones por pares sean obligatorias"
       locked_until: "Asignar revisiones"
       peer_reviews_assign_at_explanation: "Debe seguir después de la fecha de vencimiento. Si está en blanco, usar la fecha de vencimiento."
+      peer_reviews_header: "Revisión por pares"
       reviews_per_user: "Revisiones por usuario"
     points_possible_number: "Puntos posibles debe ser un número"
     positive_number: "Debe utilizar un número positivo"
@@ -1996,17 +2049,19 @@ es:
       advanced_turnitin_settings: "Configuraciones avanzadas de Turnitin"
       descriptions: 
         allowed_extensions: "Introduzca una lista de extensiones válidas, por ejemplo: doc,xls,txt"
+      external_tool_options: "Opciones de herramientas externas"
       label: 
         external_tool_new_tab: "Cargar esta herramienta en una pestaña nueva"
         external_tool_url: "URL de herramienta externa"
         turnitin_enabled: "Permitir envíos de Turnitin"
       labels: 
-        allow_file_uploads: "Permitir cargas de archivos"
-        allow_media_recordings: "Permitir grabaciones de contenido audiovisual"
-        allow_text_entry: "Permitir entrada de texto"
-        allow_url: "Permitir URL de la página web"
+        allow_file_uploads: "Cargas de archivos"
+        allow_media_recordings: "Grabaciones de contenido audiovisual"
+        allow_text_entry: "Introducción de texto"
+        allow_url: "URL de la Página Web"
         allowed_extensions: "Extensiones de archivo permitidas"
         restrict_file_extensions: "Restringir la carga de tipos de archivos "
+      online_entry_options: "Opciones de entrada en línea"
       submission_type: "Tipo de envío"
       submission_types: 
         external_tool: "Herramienta externa"
@@ -3120,6 +3175,7 @@ es:
     select_content: 
       cancel_btn: Cancelar
       select_content_btn: "Seleccionar contenido"
+      select_content_label: "Seleccione el contenido. Utilice las teclas de dirección hacia arriba o hacia abajo para navegar a través del árbol. Presione la flecha derecha para expandir y la izquierda para contraer."
     select_course: "Seleccionar curso"
     show_issues: "Mostrar incidencias"
     subviews: 
@@ -3258,8 +3314,9 @@ es:
         conclude_student: "¿Esta seguro que quiere terminar la inscripción del estudiante?"
         delete_enrollment: "¿Esta seguro que quiere borrar la inscripción del estudiante?"
       enrolled_as: "Inscrito como %{enrollment_type}"
-      enrollment_change_failed: "Cambio del Privilegio de Inscripción falló, intente de nuevo"
       enrollment_linked_to: "enlazado a *%{linked_user}*"
+      error: 
+        enrollment_change_failed: "Cambio del Privilegio de Inscripción falló, intente de nuevo"
       labels: 
         user_privileges: Privilegios
       legends: 
@@ -3562,10 +3619,10 @@ es:
         description: 
           delete: "Borrar el Módulo Actual/Elemento"
           edit: "Editar el Módulo/Elemento"
-          indent: "Agregar sangría al elemento actual"
+          indent: "Aumentar sangría"
           new: "Módulo Nuevo"
           next: "Siguiente Módulo/Elemento"
-          outdent: "Anular sangría del Elemento Actual"
+          outdent: "Reducir sangría"
           previous: "Módulo/Elemento Previo"
       keycode_descriptions: 
         next_module_item: "Seleccionar el módulo o elemento de módulo siguiente"
@@ -3717,10 +3774,10 @@ es:
       links: 
         edit_item: "Editar los detalles del elemento"
         edit_item_details_label: "Editar los detalles del elemento"
-        indent: "Agregar sangría al elemento"
-        indent_label: "Agregar sangría al elemento"
-        outdent: "Eliminar sangría del elemento"
-        outdent_label: "Eliminar sangría del elemento"
+        indent: "Aumentar sangría"
+        indent_label: "Aumentar sangría"
+        outdent: "Reducir sangría"
+        outdent_label: "Reducir sangría"
         remove_item: "Remover este elemento del modulo"
         remove_item_label: "Eliminar este elemento del módulo"
       max_score: 
@@ -3758,10 +3815,10 @@ es:
       links: 
         edit_item: Editar
         edit_item_details: "Editar los detalles del elemento"
-        indent: Sangría
-        indent_item: "Agregar sangría al elemento"
-        outdent: Alargar
-        outdent_item: "Eliminar sangría del elemento"
+        indent: "Aumentar sangría"
+        indent_item: "Aumentar sangría"
+        outdent: "Reducir sangría"
+        outdent_item: "Reducir sangría"
         remove_item: Remover
         remove_item_from_module: "Eliminar este elemento del módulo"
       max_score: 
@@ -4220,6 +4277,62 @@ es:
     wrapper: 
       close_course_menu_title: cerrar
       reset_course_menu: Restablecer
+  course_logging: 
+    event_type: 
+      concluded: Finalizado
+      created: Creado
+      updated: Actualizado
+    field_label: 
+      abstract_course_id: "ID del resumen del curso"
+      account_id: "ID de cuenta"
+      allow_student_discussion_editing: "Permitir la edición del debate del alumno"
+      allow_student_discussion_topics: "Permitir los temas de debate de los alumnos"
+      allow_student_forum_attachments: "Permitir los archivos adjuntos en el foro de alumnos"
+      allow_student_organized_groups: "Permitir los grupos organizados por alumnos"
+      allow_student_wiki_edits: "Permitir la edición del Wiki del alumno"
+      allow_wiki_comments: "Permitir los comentarios de Wiki"
+      conclude_at: "Finalizado el"
+      course_code: "Código del curso"
+      created_at: "Creado el"
+      default_view: "Vista predeterminada"
+      default_wiki_editing_roles: "Funciones de edición de Wiki predeterminadas"
+      enrollment_term_id: "ID del período de inscripción"
+      grading_standard_id: "ID del estándar de calificación"
+      group_weighting_scheme: "Esquema de ponderación del grupo"
+      hide_distribution_graphs: "Ocultar los gráficos de distribución"
+      hide_final_grade: "Ocultar la calificación final"
+      indexed: Indexado
+      integration_id: "ID integración"
+      is_public: "Es público"
+      large_roster: "Lista grande"
+      license: Licencia
+      locale: Lugar
+      lock_all_announcements: "Bloquear todos los anuncios"
+      name: Nombre
+      old_account_id: "ID de la cuenta antigua"
+      open_enrollment: "Abrir inscripción"
+      public_description: "Descripción pública"
+      public_syllabus: "Plan de estudios público"
+      replacement_course_id: "ID del curso de sustitución"
+      restrict_enrollments_to_course_dates: "Restringir inscripciones a las fechas del curso"
+      root_account_id: "ID de la cuenta principal"
+      self_enrollment: Autoinscripción
+      self_enrollment_code: "Código de autoinscripción"
+      self_enrollment_limit: "Límite de autoinscripción"
+      show_all_discussion_entries: "Mostrar todas las entradas en el debate"
+      show_public_context_messages: "Mostrar mensaje de contexto público"
+      sis_batch_id: "ID lote SIS"
+      sis_source_id: "ID fuente SIS"
+      start_at: "Comienza el"
+      storage_quota: "Cuota de almacenamiento"
+      syllabus_body: cuerpo_plan_de_estudios
+      tab_configuration: "Configuración de pestañas"
+      template_course_id: "ID del curso modelo"
+      turnitin_comments: "Comentarios en Turnitin"
+      updated_at: "Actualizado el"
+      uuid: "ID única universal"
+      wiki_id: "ID de Wiki"
+      workflow_state: "Estado del flujo de trabajo"
   course_restore: 
     restore_error: "Se ha producido un error al intentar restaurar el curso. No se ha podido restaurar el curso."
   course_search: 
@@ -4260,7 +4373,7 @@ es:
     invitation_sent_now: "Hace poco"
     link_students_placeholder: "Introduzca el nombre del alumno"
     links: 
-      less_options: "menos opciones"
+      fewer_options: "menos opciones"
       more_options: "más opciones"
       publish: "Publicar calificaciones a SIS"
       publishing: "Publicando las calificaciones a SIS..."
@@ -5155,6 +5268,10 @@ es:
     cancel: Cancelar
     save_settings: "Guardar las configuraciones"
     saving: Guardando...
+  differentiated_assignments_description: |-
+      Tareas diferenciadas es una función *beta* que permite elegir las secciones a las que se aplica una tarea.
+      Las secciones a las que no se les asigne una tarea no la verán en el contenido de su curso y su calificación final se
+      calculará sin esos puntos.
   discussion_entries: 
     created_entry_notice: "Contribución creada con éxito."
     deleted_entry_notice: "Contribución ha sido borrada"
@@ -5434,6 +5551,10 @@ es:
     unsubscribe: "Cancelar la suscripción a este tema"
     unsubscribed: "No suscrito"
     unsubscribed_hint: "No está suscrito a este tema. Haga clic aquí para suscribirse."
+  draft_state: 
+    cant_unpublish_when_students_submit: "No se puede ocultar la publicación si hay envíos de alumnos"
+    publish: Publicar
+    unpublish: Ocultar
   draft_state_description: "En esta función beta se han rediseñado muchas de las secciones de Canvas y permite que el contenido aparezca en un nuevo estado sin publicar que está visible pra los alumnos y excluido de los cálculos de las calificaciones. Atención: si deshabilita esta función, es posible que borre contenido creado o editado recientemente de la vista del profesor."
   due_dates: 
     due_at: "fecha límite: %{assignment_due_date_time}"
@@ -6012,12 +6133,14 @@ es:
       feature_options: "Opciones de características"
       no_features_available: "No hay funciones disponibles actualmente"
   features: 
+    differentiated_assignments: "Tareas diferenciadas"
     draft_state: "Estado borrador"
     draft_state_account_disable_warning: "Deshabilitar esta función afectará a los cursos existentes. Para obtener asistencia para deshabilitar esta función, póngase en contacto con su Canvas Success Manager."
     draft_state_course_disable_warning: "Desactivar esta función hará que se publiquen TODOS los objetos existentes en su curso. Por favor, asegúrese de que todo el contenido del borrador está listo para ser publicado y disponible para todos los usuarios del curso antes de continuar."
     google_docs_domain_restriction: "Restricción de dominio de Google Docs"
     outcome_gradebook: "Libro de calificaciones de resultados"
     screenreader_gradebook: "Libro de calificaciones del lector de pantalla"
+    student_outcome_gradebook: "Libro de calificaciones de resultados del alumno"
   file_browser_view: 
     folder_tree_instructions: "Utilice la tecla de dirección hacia arriba o hacia abajo para navegar a través del árbol. Presione la flecha derecha para expandir las carpetas, la izquierda para contraerlas y la tecla Intro para elegir una imagen."
   filebrowserview: 
@@ -6425,6 +6548,7 @@ es:
       set_group_weights: "Establezca Peso por Grupo"
       show_attendance_columns: "Ver Columnas de Asistencia"
       show_concluded_enrollments: "Mostrar matrículas concluidas"
+      srgb_gradebook: "alternar libros de calificaciones"
       upload_scores: "Actualizar Calificaciones (desde .csv)"
       view_grading_history: "Ver el Historial de Calificación"
     show_notes: "Mostrar columna de notas"
@@ -6566,6 +6690,7 @@ es:
       muted: Obviada
     grade_summary: 
       assessment_by: "Evaluación para %{name}"
+      assignments: Tareas
       buttons: 
         show_what_if: "Mostrar las Calificaciones \"What-If\""
       change_score_instructions: "Haga click en cualquier calificación e ingrese un nuevo valor para ver como el cambio afectará su total."
@@ -6602,6 +6727,7 @@ es:
         only_graded: "Calcular basado sólo en las tareas calificadas"
         total: Total
         your_score: "Su Calificación"
+      learning_outcomes: "Dominio de aprendizaje"
       links: 
         click_to_view: "haga click aquí para verlo"
         download: "Descargar %{attachment}"
@@ -6887,6 +7013,7 @@ es:
     grade_incomplete: Incompleto
     grade_ungraded: "Sin calificación"
     out_of: "(de %{points})"
+    out_of_nil: "Sin puntos posibles"
     out_of_with_score: "(%{score} de %{points})"
   grading_standard: 
     unknown_grading_details: "Detalles Desconocidos"
@@ -8411,10 +8538,10 @@ es:
           audio_comment: "Este mensaje incluye comentarios con contenido audiovisual. Para reproducirlos o responder a ellos, haga clic en el enlace que aparece a continuación:"
           body: "%{user_name} acaba de enviarle un mensaje en Canvas:"
           download: descargar
-          reply_message: "Para responder a este mensaje, haga clic en el enlace que aparece a continuación:"
+          reply_to_conversation_message: "Puede responder a este mensaje en Canvas respondiendo directamente a este mensaje de correo electrónico."
           subject: "%{user_name} acaba de enviarle un mensaje en Canvas:"
           unknown_user: "Usuario desconocido"
-        reply_message: "Para responder a este mensaje, haga click en el enlace a continuación:"
+        reply_to_conversation_message: "Puede responder a este mensaje en Canvas respondiendo directamente a este mensaje de correo electrónico."
         subject: "%{user_name} le acaba de enviar un mensaje en Canvas."
         unknown_user: "Usuario Desconocido"
       facebook: 
@@ -9033,10 +9160,10 @@ es:
     new_discussion_entry: 
       email: 
         body: "%{user} publicó un comentario nuevo en el subproceso %{discussion_topic} para %{course}:"
-        details: "Únase a la conversación aquí:"
+        discussion_entry_reply_message: "Únase a la conversación utilizando el enlace siguiente o haga un comentario respondiendo a este mensaje."
         html: 
           body: "%{user} ha publicado un comentario nuevo en la conversación %{discussion_topic} para %{course}:"
-          details: "Haga clic aquí para participar en la conversación"
+          discussion_entry_link_message: "[Haga clic aquí para unirse a la conversación](%{url}), o haga un comentario respondiendo a este mensaje."
           subject: "Nuevo comentario para %{discussion_topic}: %{course}"
         subject: "Comentario Nuevo para %{discussion_topic}: %{course}"
       facebook: 
@@ -9336,9 +9463,9 @@ es:
         body: "%{author} acaba de comentar en el envío para %{user} para %{assignment}"
         html: 
           body: "%{author} acaba de comentar el envío para %{user} para %{assignment}"
-          link_message: "Puede revisar los detalles del envío aquí:"
           someone: Alguien
           subject: "Comentario sobre el envío: %{user}, %{assignment}, %{context}"
+          submission_comment_link_message: "Puede revisar los datos de envío utilizando el enlace siguiente o puede responder a este comentario respondiendo a este mensaje."
         link_message: "Puede revisar los detalles del envío aquí:"
         someone: Alguien
         subject: "Comentario del Envío: %{user}, %{assignment}, %{context}"
@@ -9362,9 +9489,9 @@ es:
           link_message: "Puede revisar los detalles del envío aquí:"
           someone: Alguien
           subject: "Comentario sobre el envío: %{user}, %{assignment}, %{context}"
-        link_message: "Puede revisar los detalles del envío aquí:"
         someone: Alguien
         subject: "Comentario para el Envío: %{user}, %{assignment}, %{context}"
+        submission_comment_link_message: "Puede revisar los datos de envío utilizando el enlace siguiente o puede responder a este comentario respondiendo a este mensaje."
       facebook: 
         body: "*%{author}* acaba de hacer un comentario nuevo en el envío para **%{user} para %{assignment}**."
         someone: Alguien
@@ -9858,7 +9985,11 @@ es:
     : "No"
     ? "yes"
     : Sí
-  outcome_gradebook_description: "El libro de calificaciones de resultados ofrece a los profesores un modo de ver rápidamente el progreso del curso y de los alumnos en los resultados de aprendizaje de los cursos. Los resultados se presentan en un formato similar al de los libros de calificaciones y el progreso del alumno aparece tanto en formato de puntuación numérica como clasificado como dominio/casi dominio/medidas correctoras."
+  outcome_gradebook_description: |-
+      El libro de calificaciones de resultados representa el modo en el que los profesores pueden ver de un vistazo
+      el progreso del curso y de los alumnos en los resultados de aprendizaje de los cursos. Los resultados se presentan en un
+      formato similar al de los libros de calificaciones y el progreso del alumno aparece tanto en el formato de puntuación numérica
+      como clasificado como dominado/casi dominio/medidas correctoras.
   outcome_groups: 
     invalid_file: "Resultado de grupo de archivos inválido"
   outcome_groups_api: 
@@ -10101,14 +10232,6 @@ es:
       description: "Necesitara acceso a Dim Dim."
       labels: 
         domain: Dominio
-    embedly: 
-      description: "Obtener información de Embedly para las Colecciones"
-      name: "Integración Embedly"
-    embedly_settings: 
-      description: "Este complemento se integra con el servicio de Embedly para completar información de elementos de una colección. El plan de pago incluye más información que el plan gratuito: le permite seleccionar varias imagenes en la página, y devuelve la información incorporada para su previsualización online (reproducción de videos de youtube, etc)."
-      labels: 
-        api_key: "Clave API de Embedly  "
-        plan_type: "Tipo de plan de Embedly"
     error_reporting: 
       description: "Error predeterminado reportando los mecanismos"
       name: "Error Reportando"
@@ -10277,6 +10400,7 @@ es:
       labels: 
         download_url: "URL de descarga del navegador LockDown Browser"
         plugin_enabled: Activado
+        use_lti_tool: "Utilice la herramienta LTI para gestionar la configuración de la prueba del explorador LockDown (necesario para el monitor)"
     med_cornell_export: 
       labels: 
         password: "Contraseña para autenticación"
@@ -10811,6 +10935,7 @@ es:
   qti_display: QTI
   qti_file_description: "archivo .zip QTI "
   qti_name: "Conversor de QTI"
+  qualified_locale: es-ES
   question_answered: Contestado
   question_bank: 
     align_outcomes: "Asignar Resultados"
@@ -10928,14 +11053,6 @@ es:
       regrade_options: "Opciones de cambio de calificación *(para los alumnos que ya hayan respondido a esta pregunta):*"
       some_scores_reduced: "Solo conceder puntos a la respuesta correcta (*las puntuaciones de algunos estudiantes serán menores*)"
       update_question_without_regrading: "Actualizar pregunta sin cambio de calificación"
-  quiz_group: 
-    errors: 
-      no_bank: "No se pudo encontrar el grupo de preguntas para el grupo de evaluación %{group_name}"
-      no_permissions: "El usuario no tenía permiso para hacer referencia al grupo de preguntas en el grupo de evaluación %{group_name}"
-    question_group: "Grupo de Preguntas"
-  quiz_question: 
-    defaults: 
-      question_name: Pregunta
   quiz_reports: 
     quiz_report_generator: 
       download_report_name: "Descargar %{report_name}"
@@ -10943,27 +11060,10 @@ es:
       generated_at_date_time: "Generado %{dateAndTime}"
       generating_report_name: "Generando %{report_name}..."
       item_analysis_not_available: "El análisis de elementos no está disponible para las encuestas"
-  quiz_statistics: 
-    statistics_filename: "Informe de %{quiz_title} %{quiz_type} %{report_type}"
-    types: 
-      item_analysis: "Análisis de elementos"
-      student_analysis: "Análisis de alumnos"
   quiz_submissions: 
-    errors: 
-      invalid_submissions: "No se ha podido verificar que este envío de evaluación le pertenezca. Por favor, inténtelo de nuevo."
-      late_quiz: "Envió esta evaluación tarde, y sus preguntas pueden no haber sido grabadas."
-      protected_quiz: "Esta evaluación está protegida y solo está disponible para ciertos lugares. La computadora que está usando no parece ser un lugar válido para tomar esta evaluación."
     show: 
       score_out_of: "Obtuvo %{score} de %{points_possible}"
-    still_zipping: "La compresión del archivo todavía está en proceso..."
   quizzes: 
-    access_code: 
-      buttons: 
-        submit: Enviar
-      labels: 
-        access_code: "Código de Acceso"
-      quiz_restricted: "Esta evaluación está restringida por un código de acceso. Deberá preguntarle a su profesor o procurador que lo ingrese o le diga el código de acceso para poder tomar esta evaluación."
-      survey_restricted: "Esta encuesta está restringida por un código de acceso. Deberá preguntarle a su profesor o procurador que lo ingrese o le diga el código de acceso para poder participar en la encuesta."
     after_last_attempt: "Después del último intento"
     alerts: 
       no_valid_combinations: "The system could not generate any valid combinations for the parameters given"
@@ -10973,6 +11073,7 @@ es:
     always: Siempre
     answer_comments: "Contestar comentarios"
     answer_text: "Texto de respuesta"
+    assignment: Tarea
     assignment_points_possible: 
       one: "1 pto"
       other: "%{count} pts"
@@ -11005,76 +11106,13 @@ es:
     default_answer_comments: "Respuesta si el estudiante escoge esta respuesta"
     default_answer_comments_on_match: "Respuesta si el estudiante coincide con esta respuesta"
     default_comments_on_wrong_match: "Respuesta si el usuario falla este apareo"
-    default_history_crumb: Historia
     default_quesiton_name: Pregunta
     default_question_name: Pregunta
     default_quiz_title: Evaluación
     default_response_to_essay: "Respuesta que mostrar al estudiante después de enviar su respuesta"
     default_response_to_file_upload: "Respuesta para mostrar a los alumnos después de que envíen una respuesta"
-    default_title: "Evaluación Nueva"
-    display_answer: 
-      labels: 
-        answer_with_margin: "con margen"
-        your_answer: "Su Respuesta"
-      margin_of_error: "margen de error"
-      plus_or_minus: +/-
-      range_answer: "Entre %{lower_bound} y %{upper_bound}"
-      you_left_this_blank: "Dejó esto en Blanco"
-    display_question: 
-      default_question_answer: "[ Escoger ]"
-      flag_this_question: "Marcar esta pregunta"
-      headers: 
-        formulas: Formulas
-        possible_solutions: "Soluciones Posibles"
-        solution_answer: Respuesta
-        variable_maximum: Max
-        variable_minimum: Min
-        variable_name: Variable
-        variable_precision: Decimales
-        variables: Variables
-      labels: 
-        additional_comments: "Comentarios Adicionales"
-        for_answer_number: "Para la respuesta %{answer_number}"
-        warning_icon: Aviso
-      links: 
-        delete_question: "Borrar esta Pregunta"
-        edit_question: "Editar esta Pregunta"
-        move_copy_question: "mover/copiar la pregunta a otro grupo de preguntas"
-      not_yet_graded: "Sin calificar"
-      original_score: "Puntuación original:"
-      points_possible: "%{points_possible} pts"
-      regraded_score: "Puntuación con cambio de calificación:"
-      show_ansers_for_variable: "Mostrar Respuestas para %{variable}"
-      skip_question_text: "Saltar al texto de la pregunta."
-      submission_was_regraded: "Esta pregunta se ha calificado de nuevo."
-      titles: 
-        question_correct_comment: "Los estudiantes verán este comentario si la respuesta es correcta"
-        question_incorrect_comment: "Los estudiantes ven este comentario si su respuesta es errónea"
-        question_neutral_comment: "Los estudiantes verán este comentario una vez que han contestado la pregunta"
-      unsupported_question_type: " Esta pregunta fue importada de una fuente externa. Fue una pregunta '%{question_type}', que no está soportada en esta herramienta de evaluación. "
-      you_left_this_blank: "Dejó esto en Blanco"
     download_all_quiz_file_upload_submissions: "Descargar todos los envíos de cargas de archivo de evaluaciones"
-    download_file_upload_submissions: 
-      links: 
-        download_submissions: "Descargar todos los archivos"
     enter_answer_variable_above: "[ Ingresar Variables de la Respuesta Arriba ]"
-    equations_help: 
-      equation_functions: |
-          Ademas de variables, también hay una colección de funciones auxiliares
-          que puede ayudar para generar valores útiles. Por ejemplo: %{example}
-          
-          Para ver una explicación de una función auxiliar, seleccionela de la lista debajo:
-      equation_intro: |
-          Preguntas calculadas estan basadas en una serie de una o más formulas computadas en orden. Puede definir variables intermedias en estas fórmulas, pero el
-          resultado numérico de la última formula que se usó para generar la respuesta correcta. Por ejemplo: %{example}
-          
-          Para esta serie de formulas, la respuesta final es 71. No obstante, no hay variables predefinidas, entonces todos los estudiantes tendrían la misma pregunta con la misma respuesta. 
-          Vear la etiqueta de "variables" para más información sobre las variables.
-      equation_variables2: "También puede definir variables en el texto de su pregunta usando corchetes (\"¿Cuánto es [a] + [b]?\"). Para cada variable, verá un \"Valor de ejemplo\" basado en las configuraciones de la variable. Esto le ayudará a revisar su trabajo y asegurarse que las formulas funcionan. Por ejemplo, si su pregunta es \"¿Cuánto es [a] + 5?\" luego se le pediría que definiera la variable \"a\". Si el valor de ejemplo para \"a\" fue de 5,2, podría escribir: %{example} Con esta formula puede generar cualquier cantidad de conjuntos de soluciones, con un valor diferente de \"a\" en cada conjunto. Un estudiante puede ver la pregunta, \"¿Cuánto es 5,2 + 5?\" y otro podrá ver \"¿Cuánto es 9 + 5?\". "
-      links: 
-        functions: Funciones
-        intro: Intro
-        variables: Variables
     errors: 
       adding_questions_failed: "No se pudieron agregar preguntas, intente de nuevo"
       creating_group_failed: "No se pudo crear el grupo, intente de nuevo"
@@ -11088,16 +11126,11 @@ es:
       missing_ip_filter: "Debe escribir una dirección IP válida"
       no_answer: "Agregar al menos una respuesta"
       no_correct_answer: "Seleccionar una respuesta correcta"
-      no_more_attempts: "Ya no tiene intentos para tomar esta evaluación"
       no_possible_solution: "Genere al menos una solución posible"
-      quiz_deleted: "Esa evaluación ha sido borrada"
       quiz_score_not_a_number: "La puntuación debe ser un número entre 0 y 2 000 000 000."
       quiz_score_too_long: "La puntuación debe ser menor que 2 000 000 000."
       quiz_score_too_short: "La puntuación debe ser mayor que 0."
-      quiz_update_failed: "Falló la actualización de la evaluación"
       retrieving_filters_failed: "No se pudieron recuperar los filtros"
-    fabulous_quizzes: 
-      page_titles: Evaluaciones
     ? "false"
     : Falso
     file_uploaded_or_removed: 
@@ -11105,134 +11138,6 @@ es:
         file_successfully_uploaded: "Su archivo se ha cargado correctamente."
         files_removed: "Se ha eliminado %{display_name}."
     final_answer: "Respuesta Final"
-    find_question_from_bank: 
-      already_added: "esta pregunta ya está en la evaluación"
-      bank_description: "%{bank_name}, %{n} preguntas"
-      buttons: 
-        add_questions: "Agregar Preguntas"
-        create_group: "Crear Grupo"
-        select_bank: "Seleccionar un Grupo"
-      group_pick_count: "%{pick_count} preguntas"
-      group_points: "%{points} por pregunta"
-      headers: 
-        bank_name: "Nombre del Grupo"
-      hints: 
-        group_pick_count: "%{pick_count} seleccionados hasta ahora"
-      labels: 
-        add_questions_to_group: "Agregar preguntas a este grupo de evaluaciones"
-        group_name: "Nombre del Grupo"
-        group_pick_count: Escoger
-        group_points: Puntos
-      links: 
-        clear_all_banks: "Borrar Todo"
-        manage_question_banks: "Administrar los Grupos de Preguntas del Curso"
-        more_questions: "más preguntas"
-        select_all_banks: "Seleccionar Todo"
-      options: 
-        new_group: "[ Grupo Nuevo ]"
-        no_group: "[ Sin Grupo ]"
-      select_a_question_bank: "Seleccione un grupo de preguntas de la siguiente lista para enlazarla a esta evaluación como un grupo de preguntas."
-      titles: 
-        add_new_question_group: "Agregar un Grupo Nuevo de Preguntas"
-    form_answer: 
-      answer_in_range_accessible: "entre *range start* y #range end#"
-      answer_text: "Texto de respuesta"
-      answer_weight: "Ponderación de respuestas"
-      exact_answer_with_error_margin_accessible: "*exact answer* con margen de error #error margin#"
-      labels: 
-        answer_comments: "Comentarios, si el estudiante escoge esta respuesta"
-        answer_in_range: "Respuesta en el Rango"
-        exact_answer: "Respuesta Exacta"
-      matching_left: "Coincide con el lado izquierdo"
-      matching_right: "Coincide con el lado derecho"
-      numerical_answer: "Respuesta Numérica"
-      possible_answer: "Respuesta Posible"
-      titles: 
-        click_to_enter_answer_comments: "Haga click para ingresar comentarios, si el estudiante escoge esta respuesta"
-        click_to_set_as_correct: "Haga click para establecer esta respuesta como la correcta"
-        delete_answer: "Borrar esta Respuesta"
-        edit_as_html: "Editar HTML"
-    form_question: 
-      allow_tolerance: "permitir un márgen de error de +/- %{tolerance}"
-      buttons: 
-        create_update_question: "Crear/Actualizar la Pregunta"
-        generate: Generar
-        recompute: Recalcular
-      correct_answer_comments: "Comentarios de Respuestas Correctas"
-      distractor_instructions: "Ingrese cada distractor en su propia línea"
-      equation_example: "i.e. \"¿Qué es 5 más [x]?\""
-      explanation: 
-        generate_possible_solutions: "Finalmente, construya la mayor cantidad de combinaciones de variables-soluciones que puede necesitar para su evaluación."
-      explanations: 
-        calculated: "Ingrese su pregunta, construya una formula y genere una serie de combinaciones posibles para la respuesta. Los estudiantes verán la pregunta con una serie de variables seleccionadas al azar completadas y tienen que incluír la respuesta numérica correcta."
-        equations: "Puede definir las variables ingresando los nombres de las variables rodeados por corchetes."
-        essay: "Los estudiantes tendrán un espacio en blanco para escribir su respuesta."
-        file_upload: "Los alumnos podrán cargar un archivo como respuesta."
-        fill_in_multiple_blanks: "Ingrese su pregunta, especificando donde debería ir cada espacio en blanco. Luego defina la respuesta correcta para cada espacio. Los estudiantes deben ingresar las respuestas correctas en los espacios provistos."
-        formula_definition: "Después tendrá que escribir la fórmula o fórmulas usadas para calcular la respuesta correcta. Solo tendrá que utilizar los mismos nombres de variables que aparecen más arriba."
-        matching: "Construya pares de valores coincidentes. Los estudiantes verán valores en la izquierda y tienen que seleccionar el valor coincidente a la derecha de una lista. Filas múltiples pueden tener la misma respuesta, y puede agregar distractores adicionales en la derecha."
-        missing_word: "Defina el texto que puede ir antes y después de la lista desplegable. Construya una serie de respuestas posibles y seleccione una respuesta correcta."
-        multi_answer_sets: "En el espacio de abajo, en cada lugar que quiere mostrar un espacio para respuesta, ingrese una palabra de referencia (sin espacios) rodeada por corchetes."
-        multiple_answers: "Esta pregunta mostrará una casilla al lado de la respuesta, y el estudiante debe seleccionar TODAS las respuestas que usted marque como correctas."
-        multiple_choice: "Ingrese su pregunta y respuestas múltiples, luego seleccione la respuesta correcta."
-        multiple_dropdowns: "Ingrese su pregunta, especificando donde debe ir cada lista desplegable. Luego defina respuestas posibles de cada lista desplegable, con una respuesta correcta en cada una."
-        numerical: "Defina la respuesta correcta como cualquier número dentro de un rango, o un número más o menos un márgen de error. Los estudiantes tendrán un espacio en blanco para ingresar su respuesta numérica."
-        short_answer: |-
-            Ingrese el texto de la pregunta, luego defina todas las respuestas correctas para el espacio en blanco.
-            Los estudiantes verán la pregunta seguida por una casilla de texto para escribir su respuesta.
-        text_only: "Esta \"pregunta\" no será calificada, pero puede ser útil para introducir una serie de preguntas relacionadas."
-        true_false: "Ingrese el texto de la pregunta, luego seleccione is Verdadero o Falso es la respuesta correcta."
-        variable_definitions: "Once you have entered your variables above, you should see them listed here. You can specify the range of possible values for each variable below."
-      general_answer_comments: "Comentarios de Respuesta General"
-      headers: 
-        formula_definition: "Definición de Formula"
-        generate_possible_solutions: "Generar Soluciones Posibles"
-        variable_definitions: "Definiciones Variables"
-        variable_example_value: "Valor de Ejemplo"
-        variable_maximum: Max
-        variable_minimum: Min
-        variable_name: Variable
-        variable_precision: Decimales
-      label: 
-        question: 
-          name: "Nombre de la pregunta"
-          points: "Valor en puntos de la pregunta"
-          type: "Tipo de pregunta"
-      labels: 
-        answers: Respuestas
-        distractors: "Posibilidades Adicionales para Apareo (distractores)"
-        missing_word_after: "Texto a seguir a las respuestas"
-        points: pts
-        question: Pregunta
-      links: 
-        add_another_answer: "Agregue Otra Respuesta"
-        need_help: "¿Necesita ayuda?"
-      multi_answer_sets_example: "i.e. \"Las rosas son [color1], violetas son [color2]\""
-      offer_combinations: "Ofrecer %{how_many} combinaciones posibles de valor (max %{max_combinations})"
-      options: 
-        only_one_correct: "Sólo Una Respuesta Correcta"
-        students_select_multiple: "Estudiantes Seleccionan Respuestas Múltiples"
-      question_type: 
-        calculated: "Pregunta de Formula"
-        essay: "Pregunta de Ensayo"
-        file_upload: "Pregunta con carga de archivo"
-        fill_in_multiple_blanks: "Completar los Espacios en Blanco"
-        matching: Apareo
-        missing_word: "Palabra Faltante"
-        multiple_answers: "Respuestas Múltiples"
-        multiple_choice: "Selección Múltiple"
-        multiple_dropdowns: "Listas Desplegables Múltiples"
-        numerical: "Respuesta Numérica"
-        short_answer: "Rellenar el Blanco"
-        text_only: "Texto (sin pregunta)"
-        true_false: Verdadero/Falso
-      show_possible_answers: "Mostrar Respuestas Posibles para %{question}"
-      show_possible_answers_no_question: "Mostrar posibles respuestas para"
-      titles: 
-        click_to_enter_correct_answer_comments: "Haga click para ingresar comentarios para una respuesta correcta"
-        click_to_enter_general_answer_comments: "Haga click para ingresar comentarios generales"
-        click_to_enter_wrong_answer_comments: "Haga click para ingresar comentarios para una respuesta errónea"
-      wrong_answer_comments: "Comentarios de respuestas erróneas"
     graded_quiz: "Cuestionario calificado"
     graded_survey: "Encuesta calificada"
     headers: 
@@ -11261,68 +11166,14 @@ es:
         other: "%{count} minutos"
         zero: "menos de 1 minuto"
       score_out_of_points_possible: "%{score} de %{points_possible}"
-    history: 
-      anonymous_username: Estudiante
-      buttons: 
-        allow_extra_attempt: "permitir que este estudiante tenga un intento extra"
-      count_attempts_left: 
-        one: "%{user} aún tiene 1 intento"
-        other: "%{user} aún tiene %{count} intentos"
-      default_quiz_name: "Evaluación para %{course_name}"
-      default_survey_name: "Encuesta %{course_name}"
-      grade_by_question_warning: "Las preguntas que aparecen de forma aleatoria en un grupo afectan a la función de nota por pregunta "
-      headers: 
-        quiz_submissions: "Envíos de la Evaluación"
-        survey_submissions: "Envíos de la Encuesta"
-      latest_quiz_results: "Estos son los resultados de las últimas evaluaciones para %{user}. Puede modificar los puntos para cualquier pregunta y agregar más comentarios, luego haga click en \"Actualizar Resultados\" en el fondo de la página."
-      latest_survey_results: "Aquí están los resultados de la última encuesta para %{user}. Puede modificar los puntos para cualquier pregunta y agregar más comentarios, luego haga click en \"Actualizar Calificaciones\" en el fondo de la página."
-      links: 
-        back_to_quiz: "Regresar a la evaluación"
-        back_to_survey: "Regresar a la encuesta"
-      logged_out_user: "Usuario desconectado %{index}"
-      named_quiz_results: "Resultados de %{quiz_name} para %{user}"
-      next_questions_arrow_title: "Preguntas siguientes"
-      no_more_attempts: "%{user} no tiene más intentos"
-      page_title_quiz: "Historial de Evaluación para %{user}"
-      page_title_survey: "Historial de Encuestas para %{user}"
-      prev_questions_arrow_title: "Preguntas anteriores"
-      quiz_not_yet_taken: "La evaluación aún no se ha completado."
-      quiz_not_yet_taken_or_in_progress: "La evaluación no se ha completado o está en progreso"
-      quiz_unlimited_attempts: "Esta evaluación tiene intentos ilimitados"
-      score_for_attempt: "Intento %{attempt_number}: %{score}"
-      survey_not_yet_taken: "La encuesta aún no se ha completado"
-      survey_not_yet_taken_or_in_progress: "Encuesta no ha sido completada o está en progreso"
-      survey_unlimited_attempts: "Esta encuesta tiene intentos ilimitados"
-      titles: 
-        score_pending_review: "Esta calificación necesita revisión, y puede cambiar"
-        submission_needs_review: "Este envío requiere revisión"
-      unnamed_quiz_results: "Resultados de la Evaluación para %{user}"
-      unnamed_survey_results: "Resultados de la Encuesta para %{user}"
+    highest: "más alto"
     index: 
       buttons: 
-        publish_quizzes: "Publicar Evaluaciones"
         publishing_quizzes: "Publicando Evaluaciones..."
       confirms: 
         delete_quiz: "¿Seguro que quiere borrar esa evaluación?"
       default_title: "Evaluación Sin Nombre"
-      headers: 
-        assignment_quizzes: "Evaluaciones para Tareas"
-        course_quizzes: "Evaluaciones del Curso"
-        practice_quizzes: "Evaluaciones de Práctica"
-        publish_multiple_quizzes: "Publicar Varias Evaluaciones"
-        surveys: Encuestas
-        unpublished_quizzes: "Evaluaciones No Publicadas"
-      labels: 
-        publish_multiple_quizzes: "Seleccione las evaluaciones que le gustaría publicar en este momento"
-      links: 
-        create_new_quiz: "Crear una Evaluación Nueva"
-        manage_question_banks: "Manejar Grupos de Preguntos"
-        publish_multiple_quizzes: "Publicar Varias Evaluaciones"
       multiple_due_dates: "Varias fechas"
-      no_quizzes: "No hay evaluaciones disponibles"
-      page_titles: Evaluaciones
-      titles: 
-        this_quiz_is_locked: "Esta evaluación está bloqueada. Haga click para más detalles."
     index_view: 
       add_quiz: Evaluación
       links: 
@@ -11331,9 +11182,6 @@ es:
         settings: Configuraciones
       search_for_quiz: "Buscar evaluación"
       title_add_quiz: "Agregar evaluación"
-    invalid_ip: 
-      quiz_protected: "Esta evaluación está protegida y sólo está disponible de ciertas localidades. La computadora que está usando no aparece estar en una localidad válida para tomar esa evaluación."
-      survey_protected: "Esta encuesta está protegida y sólo está disponible de ciertas localidades. La computadora que está usando no aparece estar en una localidad válida para tomar esa encuesta."
     keep_highest: "Más alta"
     keep_latest: "Más reciente"
     label: 
@@ -11352,6 +11200,14 @@ es:
       multiple_blanks_question: "Rellene el espacio en blanco, lea el texto que lo acompaña"
       other_incorrect_matches: "Otras Opciones Incorrectas de Apareo"
       possible_answer: "Respuesta Posible"
+    latest: "más reciente"
+    ldb_login_popup: 
+      email: "Correo electrónico"
+      log_in: "Iniciar sesión"
+      logged_out_of_canvas: "*Ha cerrado su sesión en Canvas.* Para continuar, inicie sesión."
+      password: Contraseña
+      titles: 
+        log_in: "Porfavor Inicie la Sesión"
     links: 
       resume_quiz: "Resumir la evaluación"
       resume_survey: "Resumir la encuesta"
@@ -11365,19 +11221,6 @@ es:
     loading_question: "Cargando Pregunta..."
     loading_question_banks: "Cargando los Grupos de Preguntas..."
     loading_questions: "Cargando Preguntas..."
-    lockdown_browser_required: 
-      headers: 
-        requires_lockdown: "Se requiere el Buscador de Respondus"
-      labels: 
-        download_lockdown: "Si todavía no ha instalado el motor de búsqueda, por favor descarguelo desde aquí."
-      links: 
-        download_lockdown: "[Descargar el Buscador de Respondus]"
-      requires_lockdown: "Esta evaluación requiere el Buscador de Respondus. Por favor poner en operación el Buscador de Respondus para comenzar esta evaluación o ver los resultados de sus evaluaciones."
-    managed_quiz_data: 
-      anonymous_student: "Alumno %{user_counter}"
-      logged_out_user: "Usuario desconectado %{user_counter}"
-      titles: 
-        submission_needs_review: "Este envío necesita revisión"
     message_students: "Enviar un mensaje a los alumnos"
     message_students_for_context: "Enviar un mensaje a los alumnos para %{context}"
     messages: 
@@ -11386,9 +11229,7 @@ es:
       no_unsubmitted_students_quiz: "Todos los alumnos han realizado el cuestionario"
       no_unsubmitted_students_survey: "Todos los alumnos han realizado la encuesta"
     moderate: 
-      add_time: "Agregar Tiempo"
       buttons: 
-        change_extensions_for_selected_students: "Cambiar Extensiones para %{n} Estudiantes Seleccionados"
         extend_time: "Extender el Tiempo"
         extending_time: "Extendiendo el Tiempo..."
         save: Guardar
@@ -11398,9 +11239,6 @@ es:
         time_extension_failed: "No se pudo Extender el Tiempo, intente de nuevo"
       confirms: 
         taking_time_away: "Eso sería menos tiempo del que el estudiante tiene actualmente. ¿Continuar?"
-      end_quiz_reference_time_current_end: "el tiempo límite"
-      end_quiz_reference_time_now: ahora
-      end_quiz_when: "Terminar la evaluación %{n} minutos desde %{reference_time}."
       errors: 
         quiz_submission_extra_attempts_not_a_number: "Intentos adicionales debe ser un número."
         quiz_submission_extra_attempts_too_long: "Intentos adicionales debe ser menor que 1000."
@@ -11409,194 +11247,32 @@ es:
         quiz_submission_extra_time_too_long: "Tiempo adicional debe ser menor que 10080."
         quiz_submission_extra_time_too_short: "Tiempo adicional debe ser mayor que 0."
         server_communication_failed: "Ocurrió un problema al comunicarse con el servidor. El sistema intentará de nuevo en cinco minutos, o puede recargar la página"
-      extended_quiz_time_explanation: "Puede darle más tiempo a este estudiante en este intento. ¿Cuánto tiempo extra desea darle para completar la evaluación?"
       extensions_for_student: "Extensiones para %{student}"
       extensions_for_students: 
         one: "Extensiones para 1 estudiante"
         other: "Extensiones para %{count} estudiantes"
-      finished_in: "completado en %{duration}"
       finished_in_duration: "terminó en %{duration}"
-      global_extra_attempts: "todos reciben %{n}"
-      headers: 
-        attempt: Intento
-        attempts_left: "Intentos Restantes"
-        extended_quiz_time: "Extender el Tiempo de la Evaluación"
-        score: Calificación
-        student: Estudiante
-        student_extensions: "Extensiones del Estudiante"
-        time: Tiempo
-      in_progress: "en marcha"
-      labels: 
-        ending: Finalizando
-        extra_attempts: "Intentos Extras"
-        extra_time_per_attempt: "Tiempo Extra en Cada Intento"
-        manually_unlock: "Desbloquear manualmente la evaluación para el siguiente intento"
-        started: Comenzado
-      minutes: minutos
-      page_title: "Arbitrar Evaluación"
-      student_gets_extra_time: "*%{student_name}* **obtiene %{extra_time} minutos extras en cada intento**"
-      student_n: "Student %{n}"
       time_up: "¡Se ha acabado el Tiempo!"
       titles: 
-        change_user_extensions: "Cambiar las extensiones del usuario"
         extend_quiz_time: "Extender el Tiempo de la Evaluación"
-        manually_unlocked: "Desbloqueado Manualmente"
-        minutes_to_add: "minutos que agregar"
-        select_deselect_all: "Seleccionar/Deseleccionar Todo"
-        select_user: "Seleccionar %{user}"
         student_extensions: "Extensiones de Estudiantes"
     more_questions: "mas preguntas"
-    multi_answer: 
-      choose_answer: Escoger
-    muted: 
-      muted_quiz_description: "La calificación de la evaluación no está disponible porque su instructor no ha terminado de calificarla. Cuando su instructor finalice, su calificación estará disponible en esta página."
-      muted_quiz_header: "Su evaluación ha sido silenciado"
-    new: 
-      allowed_attempts: "Cantidad de intentos permitidos"
-      anonymous_submissions: "Mantener como anónimos los envíos "
-      buttons: 
-        not_published: Oculto
-        published: Publicado
-        save: Guardar
-      cant_go_back: "Bloquear las preguntas después de contestar"
-      default_page_title: "Evaluación Nueva"
-      group: "Grupo de tarea"
-      headers: 
-        ip_filters: "¿Qué son Filtros IP para las Evaluaciones?"
-      hide_correct_answers_at: "Ocultar las respuestas correctas el"
-      hints: 
-        question_detail_disabled: "Aviso: la información sobre las preguntas no está disponible cuando hay más de %{question_count}."
-        quiz_score: "estudiantes recibirán crédito completo una vez que completen la encuesta"
-      ip_filters: " Filtros de IP para Evaluaciones son una forma de limitar el acceso a evaluaciones a computadoras en un rango especificado de IP. Los filtros pueden ser una lista de direcciones separadas por comas, o una dirección seguida por una máscara (\"192.168.217.1\", \"192.168.217.1/24\" ó \"192.168.217.1/255.255.255.0\"). "
-      label: 
-        time_limit: "Tiempo límite"
-      labels: 
-        allow_multiple_attempts: "Permitir Varios Intentos"
-        hide_results_only_after_last: "Solo después del último intento"
-        ip_filter: "Filtrar Direcciones IP"
-        never_hide_results: "Permitir que los alumnos vean sus respuestas a los cuestionarios"
-        quiz_instructions: "Instrucciones de la Evaluación"
-        quiz_notify: "Informar a los usuarios de que esta evaluación ha cambiado"
-        quiz_score: Calificación
-        require_access_code: "Requiere un código de acceso"
-        restrict_quiz: "Limitaciones de la evaluación"
-        show_question_details: "Mostrar Detalles de la Pregunta"
-      limited_attempts: "Intentos permitidos"
-      links: 
-        cancel: Cancelar
-        find_questions: "Encontrar Preguntas"
-        new_question: "Pregunta Nueva"
-        new_question_group: "Grupo Nuevo de Preguntas"
-        show_assignment_rubric: "Mostrar rúbrica"
-      manage: Manejar
-      minutes: Minutos
-      new_assignment: "Nueva tarea"
-      new_discussion: "Nuevo debate"
-      one_question_at_a_time: "Mostrar una pregunta de cada vez"
-      points_possible: "Puntos %{n} "
-      quiz_title: "Título de la evaluación"
-      quiz_type: "Tipo de cuestionario"
-      require_lockdown_browser: "Es obligatorio utilizar el navegador Respondus LockDown Browser"
-      require_lockdown_browser_for_results: "Obligatorio para ver los resultados del cuestionario"
-      retrieving_filters: "Recuperando Filtros..."
-      score_to_keep: "Calificación del cuestionario para guardar"
-      show_correct_answers: "Permitir que los alumnos vean las respuestas correctas"
-      show_correct_answers_at: "Mostrar las respuestas correctas el"
-      shuffle_answers: " Seleccionar aleatoriamente las respuestas"
-      students_cannot_view_responses_after_course_concludes: "Los alumnos no pueden ver las respuestas de las evaluaciones hasta que finalice el curso"
-      time_limit: "¿Cuántos minutos?"
-      titles: 
-        click_to_select_filter: "Haga click para seleccionar este filtro"
-        delete: Borrar
-        find_ip_address_filter: "Encontrar Filtro para la Dirección IP"
-      warnings: 
-        has_student_submissions: "Los alumnos ya han realizado esta evaluación o la han comenzado, por lo que deberá tener cuidado al editarla. Si cambia cualquier pregunta importante, es posible que deba volver a calificar a los alumnos que realizaron la versión anterior de la evaluación."
     no_filters_found: "No se encontraron filtros"
     no_quizzes_view: 
       headers: 
         course_quizzes: "Evaluaciones del curso"
       no_quizzes: "No hay evaluaciones disponibles"
     notices: 
-      cant_view_submission_while_muted: "No puede ver el historial de la evaluación mientras esté bloqueada."
-      has_submissions_already: "Recuerde, algunos estudiantes ya han completado o han comenzado esta evaluación"
-      less_than_allotted_time: "Comenzó esta evaluación cerca de la fecha límite, entonces no tendrá la cantidad completa de tiempo para completar la evaluación."
       message_sent: "Mensaje enviado"
-      no_submission_for_user: "No hay envíos disponibles para ese usuario"
-      quiz_updated: "Evaluación actualizada con éxito"
-      quizzes_published: 
-        one: "¡1 evaluación fue publicada!"
-        other: "¡%{count} evaluaciones fueron publicadas!"
-      quizzes_unpublished: 
-        one: "1 evaluación se ha ocultado correctamente"
-        other: "%{count} evaluaciones se han ocultado correctamente"
     practice_quiz: "Cuestionario de práctica"
     practices_label: "Las evaluaciones de práctica modifican la visibilidad de la evaluación"
     question_colon: "Pregunta:"
     question_count: 
       one: "1 pregunta"
       other: "%{count} preguntas"
-    question_group: 
-      buttons: 
-        update: Actualizar
-      default_group_name: Grupo
-      edit_questions_and_points: "Escoja *%{num_questions}* preguntas, #%{num_points}# puntos por pregunta"
-      labels: 
-        group_name: "Nombre del grupo"
-        number_of_questions: "Número de preguntas"
-        points_per_question: "Puntos por pregunta"
-        question_bank: "Preguntas serán tomadas del Grupo de Preguntas"
-      links: 
-        link_to_a_question_bank: "Enlazar a un Grupo de Preguntas"
-      show_questions_and_points: "Escoja *%{num_questions}* preguntas, #%{num_points}# puntos por pregunta"
-      titles: 
-        add_question_to_group: "Agregar Pregunta a este Grupo"
-        collapse_group: "Colapsar el Grupo"
-        delete_group: "Borrar el Grupo"
-        edit_group_details: "Editar los Detalles del Grupo"
-        expand_group: "Expandir el Grupo"
     question_limit_reached: "Ha alcanzado el número máximo de preguntas permitidas en una evaluación (%{count}/%{limit}).\\n\\nComo solución, pruebe a separar el material en varias evaluaciones."
-    question_list_right_side: 
-      headers: 
-        questions: Preguntas
-    question_statistic: 
-      attempts: 
-        one: "1 intento"
-        other: "%{count} intentos"
-      empty_response: "Respuesta Vacía"
-      labels: 
-        other_answers: "Otras Respuestas"
-      no_data: "Sin Información"
-      no_responses: "No se registraron respuestas para esta pregunta"
-      percent_of_responses: "%{percent}% de %{total} intentos seleccionaron esta respuesta"
-      response_count: 
-        one: "1 estudiante recibió esta pregunta"
-        other: "%{count} estudiantes recibieron esta pregunta"
-    question_teaser: 
-      titles: 
-        click_to_show_details: "Haga click para mostrar los detalles de las preguntas"
-        delete_this_question: "Borrar esta Pregunta"
-        edit_this_question: "Editar esta Pregunta"
     quiz_attempts_length_error: "Los intentos de la prueba están limitados a 3 dígitos. Si desea concederle a sus alumnos un número de intentos ilimitado, no marque la casilla Allow Multiple Attempts (Permitir muchos intentos) que se encuentra a la izquierda"
     quiz_attempts_nan_error: "Los intentos de la prueba solo se pueden especificar en números"
-    quiz_details: 
-      allowed_attempts: "Intentos permitidos"
-      headers: 
-        available: Disponible
-        due: Vencimiento
-        points: Puntos
-        questions: Preguntas
-        time_limit: "Tiempo límite"
-      multiple_due_dates: "Varias fechas de vencimiento"
-      no_due_date: "No hay fecha de vencimiento"
-      none: Ninguno
-      quiz_availabile_through: "%{start_time} - %{end_time}"
-      quiz_available_after: "después de %{start_time}"
-      quiz_available_until: "hasta %{end_time}"
-      requires_lockdown: "Requiere el Buscador de Respondus"
-      time_limit: 
-        one: "1 Minuto"
-        other: "%{count} Minutos"
-      unlimited: Ilimitado
     quiz_item_group_view: 
       no_quizzes: "No se han encontrado evaluaciones"
       no_surveys: "No se han encontrado encuestas"
@@ -11607,125 +11283,696 @@ es:
       settings: Configuraciones
       title_delete: "Borrar la evaluación"
       title_edit: "Editar la evaluación"
-    quiz_right_side: 
-      attempts_left: 
-        one: "1 intento extra disponible"
-        other: "%{count} intentos extras disponibles"
-      attempts_so_far: 
-        one: "1 intento hasta ahora"
-        other: "%{count} intentos hasta ahora"
-      labels: 
-        current_score: "Calificación Actual"
-        kept_score: "se mantuvo la calificación"
-        last_attempt_details: "Detalles del Último Intento"
-        submission_details: "Detalles del Envío"
-        time: Tiempo
-      links: 
-        preview_quiz_again: "Ver la Evaluación de nuevo"
-        preview_survey_again: "Ver la Encuesta de nuevo"
-      no_more_attempts: "Ya no hay intentos disponibles"
-      questions_not_graded: "Algunas preguntas no han sido calificadas"
-      score_set_manually: "Esta puntuación ha sido establecida por el profesor."
-      unlimited_attempts: "Intentos ilimitados"
-      view_previous_attempts: "Ver Intentos Previos"
-    quiz_show_teacher: 
-      anonymous_submissions: "Envíos anónimos"
-      attempts: Intentos
-      available_from: "Disponible desde"
-      cant_go_back: "Bloquear preguntas después de responderlas"
-      code: "Código de acceso"
-      due: Vencimiento
-      filter: "Filtro IP"
-      for: Para
-      group: "Grupo de tarea"
-      label: 
-        time_limit: "Tiempo límite"
-      multiple_attempts: "Intentos múltiples"
-      no_time_limit: "Sin límite de tiempo"
-      one_question_at_a_time: "Una pregunta cada vez"
-      points: Puntos
-      quiz_type: "Tipo de cuestionario"
-      require_lockdown_browser: "Es obligatorio utilizar el navegador Respondus LockDown Browser"
-      require_lockdown_browser_for_results: "Obligatorio para ver los resultados del cuestionario"
-      score_to_keep: "Calificación para guardar"
-      show_correct_answers: "Mostrar las respuestas correctas"
-      shuffle_answers: "Seleccionar aleatoriamente las respuestas"
-      time_limit: 
-        one: "1 minuto"
-        other: "%{count} minutos"
-      until: Hasta
-      view_responses: "Ver respuestas"
     quiz_submission: 
-      attempt_duration: "Este intento tomó %{duration}."
-      buttons: 
-        update_scores: "Actualizar calificaciones"
-      labels: 
-        final_score: "Calificación Final"
-        fudge_points: "Puntos Indecisos"
-        fudge_points_changed_points_quiz: "%{user} realizó esta evaluación y, por este motivo, el número de puntos posibles ha cambiado en %{difference}. Puede adaptar este cambio y añadir de forma manual puntos positivos o negativos utilizando este cuadro."
-        fudge_points_changed_points_survey: "%{user} realizó esta evaluación y, por este motivo, el número de puntos posibles se ha alterado en %{difference}. Puede adaptar este cambio y añadir de forma manual puntos positivos o negativos utilizando este cuadro."
-        fudge_points_generic_explanation: "Puede adaptar la puntuación de forma manual añadiendo puntos positivos o negativos con este cuadro."
-        questions_need_review: "Las siguientes preguntas necesitan revisión"
-        quiz_score: "Calificación de la Evaluación"
-        score_for_attempt: "Calificación para esta intento"
-        score_for_quiz: "Calificación para esta evaluación"
-        score_for_survey: "Calificación para esta encuesta"
-        survey_score: "Calificación de la Encuesta"
-      links: 
-        click_to_view_results: "Haga click aquí para ver los resultados."
-      questions_not_graded: "Algunas preguntas no han sido calificadas"
-      quiz_fudged_negative: "Esta evaluación ha sido ajustada manualmente por %{fudge} puntos."
-      quiz_fudged_positive: "La calificación de la evaluación ha sido ajustada manualmente por +%{fudge} puntos."
-      quiz_not_yet_taken: "La evaluación no ha sido completada."
-      quiz_results_protected: "Los resultados de la evaluación están protegidos para esta evaluación, y no son visibles a los estudiantes."
-      quiz_results_protected_until_last_attempt: "Los resultados de evaluaciones estan protegidos, y no son visibles a estudiantes hasta que hayan enviado su último intento."
-      quiz_submission_needs_review: "La evaluación ha cambiado desde que se hizo el envío. Puede ser que este envío necesite ser calificado de nuevo."
-      requires_lockdown: "Se requiere el Buscador de Respondus para ver los resultados de la evaluación."
-      submitted_at: "Enviado %{when}"
-      survey_fudged_negative: "Esta encuesta ha sido ajustada manualmente por %{fudge} puntos."
-      survey_fudged_positive: "Este resultado de encuesta ha sido ajustada manualmente por +%{fudge} puntos."
-      survey_not_yet_taken: "La encuesta no ha sido completada."
       titles: 
         this_is_an_external_element: "Este es un elemento externo, no es texto, y pudo haber cambiado desde que el estudiante lo envió"
         this_is_an_external_frame: "Esta es un marco externo, no es texto, y pudo haber cambiado desde que el estudiante lo envió."
         this_is_an_image: "Esta es una imagen, no es texto, y pudo haber cambiado desde que el estudiante lo envió"
-    quiz_summary: 
-      assignment_points_possible: 
-        one: "1 pt"
-        other: "%{count} pts"
-      labels: 
-        allowed_attempts: "Intentos Permitidos"
-        attempts_left: "Intentos Restantes"
-        attempts_so_far: "Intentos hasta Ahora"
-        latest_submission: "Envíos más Recientes"
-        quiz_details: "Detalles de la Evaluación"
-        quiz_due: "Fecha Límite"
-        quiz_time_limit: "Tiempo Límite"
-        survey_details: "Detalles de la Encuesta"
-      no_details: "Sin Detalles"
-      points_possible: "%{points_possible} puntos posibles"
-      question_count: 
-        one: "1 Pregunta"
-        other: "%{count} Preguntas"
-      quiz_multiple_due_dates: "Varias fechas"
-      quiz_no_points: "Sin Puntos"
-      quiz_points_possible: 
-        one: "1 Punto"
-        other: "%{count} Puntos"
-      student_mute_notification: "El instructor está calificando"
-      unlimited_attempts: "Intentos Ilimitados"
-    read_only: 
-      default_page_title: "Evaluación Nueva"
-      headers: 
-        quiz_details: "Detalles de la Evaluación"
-      labels: 
-        question_details: "Mostrar Detalles de la Pregunta"
-        quiz_instructions: "Instrucciones de la Evaluación"
-      links: 
-        back_to_quiz_page: "Regresar a la Página de la Evaluación"
-    refresh_quiz_after_popup: 
-      headers: 
-        loading_in_lockdown: "Cargando el cuestionario en el navegador Respondus LockDown"
+    quiz_submissions: 
+      errors: 
+        invalid_submissions: "No se ha podido verificar que este envío de evaluación le pertenezca. Por favor, inténtelo de nuevo."
+        late_quiz: "Envió esta evaluación tarde, y sus preguntas pueden no haber sido grabadas."
+        protected_quiz: "Esta evaluación está protegida y solo está disponible para ciertos lugares. La computadora que está usando no parece ser un lugar válido para tomar esta evaluación."
+      still_zipping: "La compresión del archivo todavía está en proceso..."
+    quizzes: 
+      access_code: 
+        buttons: 
+          submit: Enviar
+        labels: 
+          access_code: "Código de acceso"
+        quiz_restricted: "Esta evaluación está restringida por un código de acceso. Deberá preguntarle a su profesor o procurador que lo ingrese o le diga el código de acceso para poder tomar esta evaluación."
+        survey_restricted: "Esta encuesta está restringida por un código de acceso. Deberá preguntarle a su profesor o procurador que lo ingrese o le diga el código de acceso para poder participar en la encuesta."
+      default_history_crumb: Historia
+      default_title: "Nueva evaluación"
+      display_answer: 
+        labels: 
+          answer_with_margin: "con margen"
+          your_answer: "Su Respuesta"
+        margin_of_error: "margen de error"
+        plus_or_minus: +/-
+        range_answer: "Entre %{lower_bound} y %{upper_bound}"
+        you_left_this_blank: "Dejó esto en Blanco"
+      display_question: 
+        default_question_answer: "[ Escoger ]"
+        flag_this_question: "Marcar esta pregunta"
+        headers: 
+          formulas: Formulas
+          possible_solutions: "Soluciones Posibles"
+          solution_answer: Respuesta
+          variable_maximum: Max
+          variable_minimum: Min
+          variable_name: Variable
+          variable_precision: Decimales
+          variables: Variables
+        labels: 
+          additional_comments: "Comentarios adicionales"
+          for_answer_number: "Respuesta %{answer_number}"
+          warning_icon: Aviso
+        links: 
+          delete_question: "Borrar esta Pregunta"
+          edit_question: "Editar esta Pregunta"
+          move_copy_question: "mover/copiar la pregunta a otro grupo de preguntas"
+        not_yet_graded: "Sin calificar"
+        original_score: "Puntuación original:"
+        points_possible: "%{points_possible} pts"
+        regraded_score: "Puntuación con cambio de calificación:"
+        show_ansers_for_variable: "Mostrar Respuestas para %{variable}"
+        skip_question_text: "Saltar al texto de la pregunta."
+        submission_was_regraded: "Esta pregunta se ha calificado de nuevo."
+        titles: 
+          question_correct_comment: "Los estudiantes verán este comentario si la respuesta es correcta"
+          question_incorrect_comment: "Los estudiantes ven este comentario si su respuesta es errónea"
+          question_neutral_comment: "Los estudiantes verán este comentario una vez que han contestado la pregunta"
+        unsupported_question_type: " Esta pregunta fue importada de una fuente externa. Fue una pregunta '%{question_type}', que no está soportada en esta herramienta de evaluación. "
+        you_left_this_blank: "Dejó esto en Blanco"
+      download_file_upload_submissions: 
+        links: 
+          download_submissions: "Descargar todos los archivos"
+      equations_help: 
+        equation_functions: |
+            Ademas de variables, también hay una colección de funciones auxiliares
+            que puede ayudar para generar valores útiles. Por ejemplo: %{example}
+            
+            Para ver una explicación de una función auxiliar, seleccionela de la lista debajo:
+        equation_intro: |
+            Preguntas calculadas estan basadas en una serie de una o más formulas computadas en orden. Puede definir variables intermedias en estas fórmulas, pero el
+            resultado numérico de la última formula que se usó para generar la respuesta correcta. Por ejemplo: %{example}
+            
+            Para esta serie de formulas, la respuesta final es 71. No obstante, no hay variables predefinidas, entonces todos los estudiantes tendrían la misma pregunta con la misma respuesta. 
+            Vear la etiqueta de "variables" para más información sobre las variables.
+        equation_variables2: "También puede definir variables en el texto de su pregunta usando corchetes (\"¿Cuánto es [a] + [b]?\"). Para cada variable, verá un \"Valor de ejemplo\" basado en las configuraciones de la variable. Esto le ayudará a revisar su trabajo y asegurarse que las formulas funcionan. Por ejemplo, si su pregunta es \"¿Cuánto es [a] + 5?\" luego se le pediría que definiera la variable \"a\". Si el valor de ejemplo para \"a\" fue de 5,2, podría escribir: %{example} Con esta formula puede generar cualquier cantidad de conjuntos de soluciones, con un valor diferente de \"a\" en cada conjunto. Un estudiante puede ver la pregunta, \"¿Cuánto es 5,2 + 5?\" y otro podrá ver \"¿Cuánto es 9 + 5?\". "
+        links: 
+          functions: Funciones
+          intro: Intro
+          variables: Variables
+      errors: 
+        no_more_attempts: "Ya no tiene intentos para tomar esta evaluación"
+        quiz_deleted: "Esa evaluación ha sido borrada"
+        quiz_update_failed: "Falló la actualización de la evaluación"
+      fabulous_quizzes: 
+        page_titles: Evaluaciones
+      find_question_from_bank: 
+        already_added: "esta pregunta ya está en la evaluación"
+        bank_description: "%{bank_name}, %{n} preguntas"
+        buttons: 
+          add_questions: "Agregar Preguntas"
+          create_group: "Crear Grupo"
+          select_bank: "Seleccionar un Grupo"
+        group_pick_count: "%{pick_count} preguntas"
+        group_points: "%{points} por pregunta"
+        headers: 
+          bank_name: "Nombre del Grupo"
+        hints: 
+          group_pick_count: "%{pick_count} seleccionados hasta ahora"
+        labels: 
+          add_questions_to_group: "Agregar preguntas a este grupo de evaluaciones"
+          group_name: "Nombre del grupo"
+          group_pick_count: Escoger
+          group_points: Puntos
+        links: 
+          clear_all_banks: "Borrar Todo"
+          manage_question_banks: "Administrar los Grupos de Preguntas del Curso"
+          more_questions: "más preguntas"
+          select_all_banks: "Seleccionar todo"
+        options: 
+          new_group: "[ Grupo Nuevo ]"
+          no_group: "[ Sin Grupo ]"
+        select_a_question_bank: "Seleccione un grupo de preguntas de la siguiente lista para enlazarla a esta evaluación como un grupo de preguntas."
+        titles: 
+          add_new_question_group: "Agregar un Grupo Nuevo de Preguntas"
+      form_answer: 
+        answer_in_range_accessible: "entre *range start* y #range end#"
+        answer_text: "Texto de respuesta"
+        answer_weight: "Ponderación de respuestas"
+        exact_answer_with_error_margin_accessible: "*exact answer* con margen de error #error margin#"
+        labels: 
+          answer_comments: "Comentarios, si el estudiante escoge esta respuesta"
+          answer_in_range: "Respuesta en el Rango"
+          exact_answer: "Respuesta Exacta"
+        matching_left: "Coincide con el lado izquierdo"
+        matching_right: "Coincide con el lado derecho"
+        numerical_answer: "Respuesta Numérica"
+        possible_answer: "Respuesta Posible"
+        titles: 
+          click_to_enter_answer_comments: "Haga click para ingresar comentarios, si el estudiante escoge esta respuesta"
+          click_to_set_as_correct: "Haga click para marcar esta respuesta como la correcta"
+          delete_answer: "Borrar esta Respuesta"
+          edit_as_html: "Editar HTML"
+      form_question: 
+        allow_tolerance: "permitir un márgen de error de +/- %{tolerance}"
+        buttons: 
+          create_update_question: "Crear/Actualizar la Pregunta"
+          generate: Generar
+          recompute: Recalcular
+        correct_answer_comments: "Comentarios de Respuestas Correctas"
+        distractor_instructions: "Ingrese cada distractor en su propia línea"
+        equation_example: "i.e. \"¿Qué es 5 más [x]?\""
+        explanation: 
+          generate_possible_solutions: "Finalmente, construya la mayor cantidad de combinaciones de variables-soluciones que puede necesitar para su evaluación."
+        explanations: 
+          calculated: "Ingrese su pregunta, construya una formula y genere una serie de combinaciones posibles para la respuesta. Los estudiantes verán la pregunta con una serie de variables seleccionadas al azar completadas y tienen que incluír la respuesta numérica correcta."
+          equations: "Puede definir las variables ingresando los nombres de las variables rodeados por corchetes."
+          essay: "Los estudiantes tendrán un espacio en blanco para escribir su respuesta."
+          file_upload: "Los alumnos podrán cargar un archivo como respuesta."
+          fill_in_multiple_blanks: "Ingrese su pregunta, especificando donde debería ir cada espacio en blanco. Luego defina la respuesta correcta para cada espacio. Los estudiantes deben ingresar las respuestas correctas en los espacios provistos."
+          formula_definition: "Después tendrá que escribir la fórmula o fórmulas usadas para calcular la respuesta correcta. Solo tendrá que utilizar los mismos nombres de variables que aparecen más arriba."
+          matching: "Construya pares de valores coincidentes. Los estudiantes verán valores en la izquierda y tienen que seleccionar el valor coincidente a la derecha de una lista. Filas múltiples pueden tener la misma respuesta, y puede agregar distractores adicionales en la derecha."
+          missing_word: "Defina el texto que puede ir antes y después de la lista desplegable. Construya una serie de respuestas posibles y seleccione una respuesta correcta."
+          multi_answer_sets: "En el espacio de abajo, en cada lugar que quiere mostrar un espacio para respuesta, ingrese una palabra de referencia (sin espacios) rodeada por corchetes."
+          multiple_answers: "Esta pregunta mostrará una casilla al lado de la respuesta, y el estudiante debe seleccionar TODAS las respuestas que usted marque como correctas."
+          multiple_choice: "Ingrese su pregunta y respuestas múltiples, luego seleccione la respuesta correcta."
+          multiple_dropdowns: "Ingrese su pregunta, especificando donde debe ir cada lista desplegable. Luego defina respuestas posibles de cada lista desplegable, con una respuesta correcta en cada una."
+          numerical: "Defina la respuesta correcta como cualquier número dentro de un rango, o un número más o menos un márgen de error. Los estudiantes tendrán un espacio en blanco para ingresar su respuesta numérica."
+          short_answer: |-
+              Ingrese el texto de la pregunta, luego defina todas las respuestas correctas para el espacio en blanco.
+              Los estudiantes verán la pregunta seguida por una casilla de texto para escribir su respuesta.
+          text_only: "Esta \"pregunta\" no será calificada, pero puede ser útil para introducir una serie de preguntas relacionadas."
+          true_false: "Ingrese el texto de la pregunta, luego seleccione is Verdadero o Falso es la respuesta correcta."
+          variable_definitions: "Once you have entered your variables above, you should see them listed here. You can specify the range of possible values for each variable below."
+        general_answer_comments: "Comentarios de Respuesta General"
+        headers: 
+          formula_definition: "Definición de Formula"
+          generate_possible_solutions: "Generar Soluciones Posibles"
+          variable_definitions: "Definiciones Variables"
+          variable_example_value: "Valor de Ejemplo"
+          variable_maximum: Max
+          variable_minimum: Min
+          variable_name: Variable
+          variable_precision: Decimales
+        label: 
+          question: 
+            name: "Nombre de la pregunta"
+            points: "Valor en puntos de la pregunta"
+            type: "Tipo de pregunta"
+        labels: 
+          answers: Respuestas
+          distractors: "Posibilidades Adicionales para Apareo (distractores)"
+          missing_word_after: "Texto a seguir a las respuestas"
+          points: pts
+          question: Pregunta
+        links: 
+          add_another_answer: "Agregue Otra Respuesta"
+          need_help: "¿Necesita ayuda?"
+        multi_answer_sets_example: "i.e. \"Las rosas son [color1], violetas son [color2]\""
+        offer_combinations: "Ofrecer %{how_many} combinaciones posibles de valor (max %{max_combinations})"
+        options: 
+          only_one_correct: "Sólo Una Respuesta Correcta"
+          students_select_multiple: "Estudiantes Seleccionan Respuestas Múltiples"
+        question_type: 
+          calculated: "Pregunta de Formula"
+          essay: "Pregunta de Ensayo"
+          file_upload: "Pregunta con carga de archivo"
+          fill_in_multiple_blanks: "Completar los Espacios en Blanco"
+          matching: Apareo
+          missing_word: "Palabra Faltante"
+          multiple_answers: "Respuestas Múltiples"
+          multiple_choice: "Selección Múltiple"
+          multiple_dropdowns: "Listas Desplegables Múltiples"
+          numerical: "Respuesta Numérica"
+          short_answer: "Rellenar el Blanco"
+          text_only: "Texto (sin pregunta)"
+          true_false: Verdadero/Falso
+        show_possible_answers: "Mostrar Respuestas Posibles para %{question}"
+        show_possible_answers_no_question: "Mostrar posibles respuestas para"
+        titles: 
+          click_to_enter_correct_answer_comments: "Haga click para ingresar comentarios para una respuesta correcta"
+          click_to_enter_general_answer_comments: "Haga click para ingresar comentarios generales"
+          click_to_enter_wrong_answer_comments: "Haga click para ingresar comentarios para una respuesta errónea"
+        wrong_answer_comments: "Comentarios de respuestas erróneas"
+      history: 
+        anonymous_username: Alumno
+        buttons: 
+          allow_extra_attempt: "permitir que este estudiante tenga un intento extra"
+        count_attempts_left: 
+          one: "%{user} aún tiene 1 intento"
+          other: "%{user} aún tiene %{count} intentos"
+        default_quiz_name: "Evaluación para %{course_name}"
+        default_survey_name: "Encuesta %{course_name}"
+        grade_by_question_warning: "Las preguntas que aparecen de forma aleatoria en un grupo afectan a la función de nota por pregunta "
+        headers: 
+          quiz_submissions: "Envíos de la Evaluación"
+          survey_submissions: "Envíos de la Encuesta"
+        latest_quiz_results: "Estos son los resultados de las últimas evaluaciones para %{user}. Puede modificar los puntos para cualquier pregunta y agregar más comentarios, luego haga click en \"Actualizar Resultados\" en el fondo de la página."
+        latest_survey_results: "Aquí están los resultados de la última encuesta para %{user}. Puede modificar los puntos para cualquier pregunta y agregar más comentarios, luego haga click en \"Actualizar Calificaciones\" en el fondo de la página."
+        links: 
+          back_to_quiz: "Regresar a la evaluación"
+          back_to_survey: "Regresar a la encuesta"
+        logged_out_user: "Usuario desconectado %{index}"
+        named_quiz_results: "Resultados de %{quiz_name} para %{user}"
+        next_questions_arrow_title: "Preguntas siguientes"
+        no_more_attempts: "%{user} no tiene más intentos"
+        page_title_quiz: "Historial de Evaluación para %{user}"
+        page_title_survey: "Historial de Encuestas para %{user}"
+        prev_questions_arrow_title: "Preguntas anteriores"
+        quiz_not_yet_taken: "La evaluación aún no se ha completado."
+        quiz_not_yet_taken_or_in_progress: "La evaluación no se ha completado o está en progreso"
+        quiz_unlimited_attempts: "Esta evaluación tiene intentos ilimitados"
+        score_for_attempt: "Intento %{attempt_number}: %{score}"
+        survey_not_yet_taken: "La encuesta aún no se ha completado"
+        survey_not_yet_taken_or_in_progress: "Encuesta no ha sido completada o está en progreso"
+        survey_unlimited_attempts: "Esta encuesta tiene intentos ilimitados"
+        titles: 
+          score_pending_review: "Este valor tiene una revisión pendiente, y puede cambiar"
+          submission_needs_review: "Este envío necesita revisión"
+        unnamed_quiz_results: "Resultados de la Evaluación para %{user}"
+        unnamed_survey_results: "Resultados de la Encuesta para %{user}"
+      index: 
+        buttons: 
+          publish_quizzes: "Publicar Evaluaciones"
+        headers: 
+          assignment_quizzes: "Evaluaciones para tareas"
+          course_quizzes: "Evaluaciones del curso"
+          practice_quizzes: "Evaluaciones de prácticas"
+          publish_multiple_quizzes: "Publicar varias evaluaciones"
+          surveys: Encuestas
+          unpublished_quizzes: "Evaluaciones No Publicadas"
+        labels: 
+          publish_multiple_quizzes: "Seleccione las evaluaciones que le gustaría publicar en este momento"
+        links: 
+          create_new_quiz: "Crear una Evaluación Nueva"
+          manage_question_banks: "Gestionar grupos de preguntas"
+          publish_multiple_quizzes: "Publicar varias evaluaciones"
+        no_quizzes: "No hay evaluaciones disponibles"
+        page_titles: Evaluaciones
+        titles: 
+          this_quiz_is_locked: "Esta evaluación está bloqueada. Haga click para más detalles."
+      invalid_ip: 
+        quiz_protected: "Esta evaluación está protegida y sólo está disponible de ciertas localidades. La computadora que está usando no aparece estar en una localidad válida para tomar esa evaluación."
+        survey_protected: "Esta encuesta está protegida y sólo está disponible de ciertas localidades. La computadora que está usando no aparece estar en una localidad válida para tomar esa encuesta."
+      lockdown_browser_required: 
+        headers: 
+          requires_lockdown: "Se requiere el Buscador de Respondus"
+        labels: 
+          download_lockdown: "Si todavía no ha instalado el motor de búsqueda, por favor descarguelo desde aquí."
+        links: 
+          download_lockdown: "[Descargar el Buscador de Respondus]"
+        requires_lockdown: "Esta evaluación requiere el Buscador de Respondus. Por favor poner en operación el Buscador de Respondus para comenzar esta evaluación o ver los resultados de sus evaluaciones."
+      managed_quiz_data: 
+        anonymous_student: "Alumno %{user_counter}"
+        logged_out_user: "Usuario desconectado %{user_counter}"
+        titles: 
+          submission_needs_review: "Este envío necesita revisión"
+      moderate: 
+        add_time: "Agregar Tiempo"
+        buttons: 
+          change_extensions_for_selected_students: "Cambiar Extensiones para %{n} Estudiantes Seleccionados"
+          extend_time: "Extender el Tiempo"
+          save: Guardar
+        end_quiz_reference_time_current_end: "el tiempo límite"
+        end_quiz_reference_time_now: ahora
+        end_quiz_when: "Terminar la evaluación %{n} minutos desde %{reference_time}."
+        extended_quiz_time_explanation: "Puede darle más tiempo a este estudiante en este intento. ¿Cuánto tiempo extra desea darle para completar la evaluación?"
+        finished_in: "terminó en %{duration}"
+        global_extra_attempts: "todos reciben %{n}"
+        headers: 
+          attempt: Intento
+          attempts_left: "Intentos Restantes"
+          extended_quiz_time: "Extender el Tiempo de la Evaluación"
+          score: Calificación
+          student: Alumno
+          student_extensions: "Extensiones de Estudiantes"
+          time: Tiempo
+        in_progress: "en marcha"
+        labels: 
+          ending: Finalizando
+          extra_attempts: "Intentos Extras"
+          extra_time_per_attempt: "Tiempo Extra en Cada Intento"
+          manually_unlock: "Desbloquear manualmente la evaluación para el siguiente intento"
+          started: Comenzado
+        minutes: minutos
+        page_title: "Arbitrar Evaluación"
+        student_gets_extra_time: "*%{student_name}* **obtiene %{extra_time} minutos extras en cada intento**"
+        student_n: "Alumno %{n}"
+        titles: 
+          change_user_extensions: "Cambiar las extensiones del usuario"
+          manually_unlocked: "Desbloqueado Manualmente"
+          minutes_to_add: "minutos que agregar"
+          select_deselect_all: "Seleccionar/Deseleccionar Todo"
+          select_user: "Seleccionar %{user}"
+      multi_answer: 
+        choose_answer: Escoger
+      muted: 
+        muted_quiz_description: "La calificación de la evaluación no está disponible porque su instructor no ha terminado de calificarla. Cuando su instructor finalice, su calificación estará disponible en esta página."
+        muted_quiz_header: "Su evaluación ha sido silenciado"
+      new: 
+        allowed_attempts: "Cantidad de intentos permitidos"
+        anonymous_submissions: "Mantener como anónimos los envíos "
+        buttons: 
+          not_published: "No publicado"
+          published: Publicado
+          save: Guardar
+        cant_go_back: "Bloquear las preguntas después de contestar"
+        default_page_title: "Nueva evaluación"
+        group: "Grupo de trabajo"
+        headers: 
+          ip_filters: "¿Qué son Filtros IP para las Evaluaciones?"
+        hide_correct_answers_at: "Ocultar las respuestas correctas el"
+        hints: 
+          question_detail_disabled: "Aviso: la información sobre las preguntas no está disponible cuando hay más de %{question_count}."
+          quiz_score: "estudiantes recibirán crédito completo una vez que completen la encuesta"
+        ip_filters: " Filtros de IP para Evaluaciones son una forma de limitar el acceso a evaluaciones a computadoras en un rango especificado de IP. Los filtros pueden ser una lista de direcciones separadas por comas, o una dirección seguida por una máscara (\"192.168.217.1\", \"192.168.217.1/24\" ó \"192.168.217.1/255.255.255.0\"). "
+        label: 
+          time_limit: "Tiempo límite"
+        labels: 
+          allow_multiple_attempts: "Permitir Varios Intentos"
+          hide_results_only_after_last: "Solo después del último intento"
+          ip_filter: "Filtrar Direcciones IP"
+          never_hide_results: "Permitir que los alumnos vean sus respuestas a los cuestionarios"
+          quiz_instructions: "Instrucciones de la evaluación"
+          quiz_notify: "Informar a los usuarios de que esta evaluación ha cambiado"
+          quiz_score: Calificación
+          require_access_code: "Requiere un código de acceso"
+          restrict_quiz: "Limitaciones de la evaluación"
+          show_question_details: "Mostrar Detalles de la Pregunta"
+        limited_attempts: "Intentos permitidos"
+        links: 
+          cancel: Cancelar
+          find_questions: "Encontrar Preguntas"
+          new_question: "Pregunta Nueva"
+          new_question_group: "Grupo Nuevo de Preguntas"
+          show_assignment_rubric: "Mostrar rúbrica"
+        manage: Manejar
+        minutes: Minutos
+        new_assignment: "Nueva tarea"
+        new_discussion: "Nuevo debate"
+        one_question_at_a_time: "Mostrar una pregunta de cada vez"
+        points_possible: "Puntos %{n} "
+        quiz_title: "Título de la evaluación"
+        quiz_type: "Tipo de cuestionario"
+        require_lockdown_browser: "Es obligatorio utilizar el navegador Respondus LockDown Browser"
+        require_lockdown_browser_for_results: "Obligatorio para ver los resultados del cuestionario"
+        retrieving_filters: "Recuperando Filtros..."
+        score_to_keep: "Calificación del cuestionario para guardar"
+        show_correct_answers: "Permitir que los alumnos vean las respuestas correctas"
+        show_correct_answers_at: "Mostrar las respuestas correctas el"
+        shuffle_answers: "Seleccionar aleatoriamente las respuestas"
+        students_cannot_view_responses_after_course_concludes: "Los alumnos no pueden ver las respuestas de las evaluaciones hasta que finalice el curso"
+        time_limit: "¿Cuántos minutos?"
+        titles: 
+          click_to_select_filter: "Haga click para seleccionar este filtro"
+          delete: Borrar
+          find_ip_address_filter: "Encontrar Filtro para la Dirección IP"
+        warnings: 
+          has_student_submissions: "Los alumnos ya han realizado esta evaluación o la han comenzado, por lo que deberá tener cuidado al editarla. Si cambia cualquier pregunta importante, es posible que deba volver a calificar a los alumnos que realizaron la versión anterior de la evaluación."
+      notices: 
+        cant_view_submission_while_muted: "No puede ver el historial de la evaluación mientras esté bloqueada."
+        has_submissions_already: "Recuerde, algunos estudiantes ya han completado o han comenzado esta evaluación"
+        less_than_allotted_time: "Comenzó esta evaluación cerca de la fecha límite, entonces no tendrá la cantidad completa de tiempo para completar la evaluación."
+        no_submission_for_user: "No hay envíos disponibles para ese usuario"
+        quiz_updated: "Evaluación actualizada con éxito"
+        quizzes_published: 
+          one: "1 evaluación publicada correctamente"
+          other: "¡%{count} evaluaciones fueron publicadas!"
+        quizzes_unpublished: 
+          one: "1 evaluación se ha ocultado correctamente"
+          other: "%{count} evaluaciones se han ocultado correctamente"
+      question_group: 
+        buttons: 
+          update: Actualizar
+        default_group_name: Grupo
+        edit_questions_and_points: "Escoja *%{num_questions}* preguntas, #%{num_points}# puntos por pregunta"
+        labels: 
+          group_name: "Nombre del grupo"
+          number_of_questions: "Número de preguntas"
+          points_per_question: "Puntos por pregunta"
+          question_bank: "Preguntas serán tomadas del Grupo de Preguntas"
+        links: 
+          link_to_a_question_bank: "Enlazar a un Grupo de Preguntas"
+        show_questions_and_points: "Escoja *%{num_questions}* preguntas, #%{num_points}# puntos por pregunta"
+        titles: 
+          add_question_to_group: "Agregar Pregunta a este Grupo"
+          collapse_group: "Colapsar grupo"
+          delete_group: "Borrar grupo"
+          edit_group_details: "Editar los Detalles del Grupo"
+          expand_group: "Expandir grupo"
+      question_list_right_side: 
+        headers: 
+          questions: Preguntas
+      question_statistic: 
+        attempts: 
+          one: "1 intento"
+          other: "%{count} intentos"
+        empty_response: "Respuesta Vacía"
+        labels: 
+          other_answers: "Otras Respuestas"
+        no_data: "Sin Información"
+        no_responses: "No se registraron respuestas para esta pregunta"
+        percent_of_responses: "%{percent}% de %{total} intentos seleccionaron esta respuesta"
+        response_count: 
+          one: "1 alumno recibió esta pregunta"
+          other: "%{count} alumnos recibieron esta pregunta"
+      question_teaser: 
+        titles: 
+          click_to_show_details: "Haga click para mostrar los detalles de las preguntas"
+          delete_this_question: "Borrar esta Pregunta"
+          edit_this_question: "Editar esta Pregunta"
+      quiz_details: 
+        allowed_attempts: "Intentos permitidos"
+        headers: 
+          available: Disponible
+          due: "Fecha límite"
+          points: Puntos
+          questions: Preguntas
+          time_limit: "Tiempo límite"
+        multiple_due_dates: "Varias fechas de vencimiento"
+        no_due_date: "No hay fecha de vencimiento"
+        none: Ninguno
+        quiz_availabile_through: "%{start_time} - %{end_time}"
+        quiz_available_after: "después de %{start_time}"
+        quiz_available_until: "hasta %{end_time}"
+        requires_lockdown: "Requiere el Buscador de Respondus"
+        time_limit: 
+          one: "1 minuto"
+          other: "%{count} minutos"
+        unlimited: Ilimitado
+      quiz_right_side: 
+        attempts_left: 
+          one: "1 intento más disponible"
+          other: "%{count} intentos más disponibles"
+        attempts_so_far: 
+          one: "1 intento hasta ahora"
+          other: "%{count} intentos hasta ahora"
+        labels: 
+          current_score: "Calificación Actual"
+          kept_score: "se mantuvo la calificación"
+          last_attempt_details: "Detalles del Último Intento"
+          submission_details: "Detalles del Envío"
+          time: Tiempo
+        links: 
+          preview_quiz_again: "Ver la Evaluación de nuevo"
+          preview_survey_again: "Ver la Encuesta de nuevo"
+        no_more_attempts: "Ya no hay intentos disponibles"
+        questions_not_graded: "Algunas preguntas no han sido calificadas"
+        score_set_manually: "Esta puntuación ha sido establecida por el profesor."
+        unlimited_attempts: "Intentos Ilimitados"
+        view_previous_attempts: "Ver Intentos Previos"
+      quiz_show_teacher: 
+        anonymous_submissions: "Envíos anónimos"
+        attempts: Intentos
+        available_from: "Disponible desde"
+        cant_go_back: "Bloquear preguntas después de responderlas"
+        code: "Código de acceso"
+        due: "Fecha límite"
+        filter: "Filtro IP"
+        for: Para
+        group: "Grupo de trabajo"
+        label: 
+          time_limit: "Tiempo límite"
+        multiple_attempts: "Intentos múltiples"
+        no_time_limit: "Sin límite de tiempo"
+        one_question_at_a_time: "Una pregunta cada vez"
+        points: Puntos
+        quiz_type: "Tipo de cuestionario"
+        require_lockdown_browser: "Es obligatorio utilizar el navegador Respondus LockDown Browser"
+        require_lockdown_browser_for_results: "Obligatorio para ver los resultados del cuestionario"
+        require_lockdown_browser_monitor: "Se requiere webcam"
+        score_to_keep: "Calificación para guardar"
+        show_correct_answers: "Mostrar las respuestas correctas"
+        shuffle_answers: "Seleccionar aleatoriamente las respuestas"
+        time_limit: 
+          one: "1 minuto"
+          other: "%{count} minutos"
+        until: Hasta
+        view_responses: "Ver respuestas"
+      quiz_submission: 
+        attempt_duration: "Este intento tomó %{duration}."
+        buttons: 
+          update_scores: "Actualizar calificaciones"
+        labels: 
+          final_score: "Calificación Final"
+          fudge_points: "Puntos Indecisos"
+          fudge_points_changed_points_quiz: "%{user} realizó esta evaluación y, por este motivo, el número de puntos posibles ha cambiado en %{difference}. Puede adaptar este cambio y añadir de forma manual puntos positivos o negativos utilizando este cuadro."
+          fudge_points_changed_points_survey: "%{user} realizó esta evaluación y, por este motivo, el número de puntos posibles se ha alterado en %{difference}. Puede adaptar este cambio y añadir de forma manual puntos positivos o negativos utilizando este cuadro."
+          fudge_points_generic_explanation: "Puede adaptar la puntuación de forma manual añadiendo puntos positivos o negativos con este cuadro."
+          questions_need_review: "Las siguientes preguntas necesitan revisión"
+          quiz_score: "Calificación de la Evaluación"
+          score_for_attempt: "Calificación para esta intento"
+          score_for_quiz: "Calificación para esta evaluación"
+          score_for_survey: "Calificación para esta encuesta"
+          survey_score: "Calificación de la Encuesta"
+        links: 
+          click_to_view_results: "Haga click aquí para ver los resultados."
+        questions_not_graded: "Algunas preguntas no han sido calificadas"
+        quiz_fudged_negative: "Esta evaluación ha sido ajustada manualmente por %{fudge} puntos."
+        quiz_fudged_positive: "La calificación de la evaluación ha sido ajustada manualmente por +%{fudge} puntos."
+        quiz_not_yet_taken: "La evaluación no ha sido completada."
+        quiz_results_protected: "Los resultados de la evaluación están protegidos para esta evaluación, y no son visibles a los estudiantes."
+        quiz_results_protected_until_last_attempt: "Los resultados de evaluaciones estan protegidos, y no son visibles a estudiantes hasta que hayan enviado su último intento."
+        quiz_submission_needs_review: "La evaluación ha cambiado desde que se hizo el envío. Puede ser que este envío necesite ser calificado de nuevo."
+        requires_lockdown: "Se requiere el Buscador de Respondus para ver los resultados de la evaluación."
+        submitted_at: "Enviado %{when}"
+        survey_fudged_negative: "Esta encuesta ha sido ajustada manualmente por %{fudge} puntos."
+        survey_fudged_positive: "Este resultado de encuesta ha sido ajustada manualmente por +%{fudge} puntos."
+        survey_not_yet_taken: "La encuesta no ha sido completada."
+      quiz_summary: 
+        assignment_points_possible: 
+          one: "1 pto."
+          other: "%{count} ptos."
+        labels: 
+          allowed_attempts: "Intentos permitidos"
+          attempts_left: "Intentos Restantes"
+          attempts_so_far: "Intentos hasta Ahora"
+          latest_submission: "Envíos más Recientes"
+          quiz_details: "Detalles de la Evaluación"
+          quiz_due: "Fecha límite"
+          quiz_time_limit: "Tiempo límite"
+          survey_details: "Detalles de la Encuesta"
+        no_details: "Sin Detalles"
+        points_possible: "%{points_possible} puntos posibles"
+        question_count: 
+          one: "1 pregunta"
+          other: "%{count} preguntas"
+        quiz_multiple_due_dates: "Varias fechas"
+        quiz_no_points: "Sin Puntos"
+        quiz_points_possible: 
+          one: "1 punto"
+          other: "%{count} puntos"
+        student_mute_notification: "El instructor está calificando"
+        unlimited_attempts: "Intentos Ilimitados"
+      read_only: 
+        default_page_title: "Nueva evaluación"
+        headers: 
+          quiz_details: "Detalles de la Evaluación"
+        labels: 
+          question_details: "Mostrar Detalles de la Pregunta"
+          quiz_instructions: "Instrucciones de la evaluación"
+        links: 
+          back_to_quiz_page: "Regresar a la Página de la Evaluación"
+      refresh_quiz_after_popup: 
+        headers: 
+          loading_in_lockdown: "Cargando el cuestionario en el navegador Respondus LockDown"
+      show: 
+        buttons: 
+          lock_quiz: "Bloquear esta Evaluación Ahora"
+          lock_survey: "Bloquear esta Encuesta Ahora"
+          publish: Publicar
+          republish: "Volver a publicar"
+          unlock_quiz: "Permitir que Estudiantes tomen la Evaluación Ahora"
+          unlock_survey: "Permitir que Estudiantes participen en la Encuesta Ahora"
+        labels: 
+          available_until: Hasta
+          no_time_limit: "Sin tiempo límite"
+          warning_icon: Aviso
+        links: 
+          edit: Editar
+          keep_editing_this_quiz: "Seguir editando esta evaluación"
+          keep_editing_this_survey: "Seguir editando esta encuesta"
+          message_students_who: "Enviar Mensajes a Estudiantes que..."
+          moderate_this_quiz: "Arbitrar esta Evaluación"
+          moderate_this_survey: "Arbitrar esta Encuesta"
+          preview: "Vista previa"
+          quiz_statistics: "Estadísticas de la Evaluación"
+          see_full_quiz: "Ver toda la Evaluación"
+          show_assignment_rubric: "Mostrar rúbrica"
+          show_student_quiz_results: "Mostrar los Resultados de Evaluaciones de Estudiantes"
+          show_student_survey_results: "Mostrar los Resultados de la Encuesta de Estudiantes"
+          survey_statistics: "Estadísticas de la Encuesta"
+        manage: Manejar
+        only_registered_users: "Sólo usuarios registrados e inscritos pueden tomar evaluaciones calificadas"
+        quiz_regraded_your_score_affected: 
+          one: "Esta evaluación se ha calificado de nuevo y su puntuación ha cambiado."
+          other: "Esta evaluación se ha calificado de nuevo y su nueva puntuación muestra las %{count} preguntas que han cambiado."
+        quiz_regraded_your_score_not_affected: "Esta evaluación se ha calificado de nuevo, pero su puntuación no ha cambiado."
+        speed_grader: SpeedGrader™
+        students_submitted_so_far: 
+          one: "1 alumno la ha enviado hasta ahora"
+          other: "%{count} alumnos la han enviado hasta ahora"
+        titles: 
+          delete: Borrar
+          related_items: "Elementos relacionados"
+          unlock_for_how_long: "¿Por cuanto tiempo quiere desbloquear la evaluación?"
+        warnings: 
+          draft_version: "Esta es una vista previa del borrador de esta evaluación"
+      single_answer: 
+        upload: Cargar
+      statistics: 
+        class_too_large: "Este curso es demasiado largo para que se puedan mostrar las estadísticas. Aun así, puede descargarlas en la parte derecha de la barra lateral."
+        headers: 
+          for_question: "Para %{question_name}"
+          quiz_statistics: "Estadísticas de la Evaluación"
+          survey_statistics: "Estadísticas de la Encuesta"
+          users_have_taken_this_quiz: "%{count} usuarios ya han tomado esta evaluación"
+          users_have_taken_this_survey: "%{count} usuarios han participado en esta encuesta"
+        labels: 
+          average_correct: "Promedio de Correctas"
+          average_incorrect: "Promedio de Incorrectas"
+          average_time: "Tiempo Promedio"
+          high_score: "Calificación Alta"
+          low_score: "Calificación Baja"
+          mean_score: "Calificación Promedio"
+          standard_deviation: "Desviación estándar"
+          users_selected_the_answer: "Los siguientes usuarios seleccionaron la respuesta, %{answer_text}"
+        links: 
+          count_all_attempts: "Contar **Todos** los Intentos"
+          count_only_latest_attempts: "Contar sólo los Intentos más Recientes"
+        page_title: Estadísticas
+        quiz_all_version_disclaimer: "Este reporte muestra las estadísticas de la evaluación basado en todos los intentos para todos los usuarios."
+        quiz_latest_version_disclaimer: "Este reporte muestra las estadísticas de la evaluación basado en el último intento de cada usuario."
+        student_n: "Alumno %{student_counter}"
+        survey_all_version_disclaimer: "Este reporte muestra las estadísticas basadas en todos los intentos por todos los usuarios."
+        survey_latest_version_disclaimer: "Este reporte muestra las estadísticas de la encuesta basado en el último intento de cada usuario."
+      statistics_crumb: Estadísticas
+      submission_version: 
+        attempt_number: "Intento %{att_no}"
+        kept: MANTENER
+        latest: "EL ÚLTIMO"
+      submission_versions: 
+        attempt: Intento
+        attempt_history: "Historial de intentos"
+        quiz_attempt_history_description: "Una tabla que muestra su historial de intentos de realizar la evaluación. Cada intento se encuentra en la parte izquierda. EL intento, hora y puntuación están a lo largo de la parte superior."
+        regraded: "Calificada de nuevo"
+        score: Calificación
+        time: Tiempo
+      take_quiz: 
+        buttons: 
+          next: Siguiente
+          out_of_time_submit: "Ok, muy bien"
+          previous: Anterior
+          submit_quiz: "Enviar prueba"
+        headers: 
+          draft_preview: "Esta es una vista previa del borrador de esta evaluación"
+        labels: 
+          started: Comenzado
+          times_up: "¡Se acabó el tiempo! Enviando resultados en"
+        logged_out_of_canvas: "*Ha cerrado su sesión en Canvas.* Para continuar, inicie sesión"
+        login_required: "Inicio de sesión obligatorio"
+        not_saved: "No guardado"
+        quiz_instructions: "Instrucciones de la evaluación"
+      take_quiz_in_popup: 
+        headers: 
+          loading_in_lockdown: "Cargando el cuestionario en el navegador Respondus LockDown"
+        links: 
+          return_to_quiz_page: "[Haga click aquí](%{url}) para regresar a la página de la evaluación."
+      take_quiz_right_side: 
+        labels: 
+          attempt_due: "Intento vencido"
+          score: Calificación
+          time_elapsed: "Tiempo transcurrido"
+          time_running: "Tiempo de ejecución"
+        links: 
+          hide_time_running: Esconder
+          keep_editing_quiz: "Seguir editando esta evaluación"
+          keep_editing_survey: "Seguir editando esta encuesta"
     retrieving_filters: "Recuperando Filtros..."
     rubric: 
       loading: Cargando...
@@ -11743,114 +11990,35 @@ es:
         you_answered: Respondido
       buttons: 
         already_published: ¡Publicado!
-        lock_quiz: "Bloquear esta Evaluación Ahora"
-        lock_survey: "Bloquear esta Encuesta Ahora"
-        publish: Publicar
         publishing: Publicando...
-        republish: "Volver a publicar"
-        unlock_quiz: "Permitir que Estudiantes tomen la Evaluación Ahora"
-        unlock_survey: "Permitir que Estudiantes participen en la Encuesta Ahora"
       confirms: 
         delete_quiz: "¿Seguro que quiere borrar esta evaluación?"
         delete_quiz_submissions_warning: 
           one: "Aviso: 1 estudiante ya ha tomado esta evaluación. Si lo borra, cualquier envío completo será borrado y no aparecerá en su libro de calificaciones."
           other: "Aviso: %{count} estudiantes ya han tomado esta evaluación. Si lo borra, cualquier envíos completos serán borrados y no aparecerán en su libro de calificaciones."
-      labels: 
-        available_until: Hasta
-        no_time_limit: "Sin tiempo límite"
-        warning_icon: Aviso
       links: 
-        edit: "Editar "
         hide_student_quiz_results: "Ocultar los resultados de las evaluaciones de los alumnos"
         hide_student_survey_results: "Ocultar los resultados de la encuesta de los alumnos"
-        keep_editing_this_quiz: "Seguir Editando esta Evaluación"
-        keep_editing_this_survey: "Seguir Editando esta Encuesta"
-        message_students_who: "Enviar Mensajes a Estudiantes que..."
-        moderate_this_quiz: "Arbitrar esta Evaluación"
-        moderate_this_survey: "Arbitrar esta Encuesta"
-        preview: "Vista previa"
-        quiz_statistics: "Estadísticas de la Evaluación"
-        see_full_quiz: "Ver toda la Evaluación"
-        show_assignment_rubric: "Mostrar rúbrica"
         show_student_quiz_results: "Mostrar los Resultados de Evaluaciones de Estudiantes"
         show_student_survey_results: "Mostrar los Resultados de la Encuesta de Estudiantes"
-        survey_statistics: "Estadísticas de la Encuesta"
-      manage: Administrar
-      only_registered_users: "Sólo usuarios registrados e inscritos pueden tomar evaluaciones calificadas"
-      quiz_regraded_your_score_affected: 
-        one: "Esta evaluación se ha calificado de nuevo y su puntuación ha cambiado."
-        other: "Esta evaluación se ha calificado de nuevo y su nueva puntuación muestra las %{count} preguntas que cambiaron."
-      quiz_regraded_your_score_not_affected: "Esta evaluación se ha calificado de nuevo, pero su puntuación no ha cambiado."
-      speed_grader: "Calificador Rápido™"
-      students_submitted_so_far: 
-        one: "1 estudiante ha enviado hasta ahora"
-        other: "%{count} estudiantes han enviado hasta ahora"
       students_who_have_not_taken_the_quiz: "Alumnos que NO han realizado la evaluación"
       students_who_have_taken_the_quiz: "Alumnos que han realizado la evaluación"
-      titles: 
-        delete: Borrar
-        related_items: "Elementos relacionados"
-        unlock_for_how_long: "¿Por cuanto tiempo quiere desbloquear la evaluación?"
-      warnings: 
-        draft_version: "Esta es una vista previa del borrador de la evaluación"
     show_and_hide_correct_answers: "De %{from} a %{to}"
     show_correct_answers_after: "Después del %{date}"
     show_correct_answers_immediately: Inmediatamente
     show_correct_answers_until: "Hasta el %{date}"
-    single_answer: 
-      upload: Cargar
     statistics: 
-      class_too_large: "Este curso es demasiado largo para que se puedan mostrar las estadísticas. Aun así, puede descargarlas en la parte derecha de la barra lateral."
       count_attempts: 
         one: "1 intento"
         other: "%{count} intentos"
-      headers: 
-        for_question: "Para %{question_name}"
-        quiz_statistics: "Estadísticas de la Evaluación"
-        survey_statistics: "Estadísticas de la Encuesta"
-        users_have_taken_this_quiz: "%{count} usuarios ya han tomado esta evaluación"
-        users_have_taken_this_survey: "%{count} usuarios han participado en esta encuesta"
-      labels: 
-        average_correct: "Promedio de Correctas"
-        average_incorrect: "Promedio de Incorrectas"
-        average_time: "Tiempo Promedio"
-        high_score: "Calificación Alta"
-        low_score: "Calificación Baja"
-        mean_score: "Calificación Promedio"
-        standard_deviation: "Desviación Estandar"
-        users_selected_the_answer: "Los siguientes usuarios seleccionaron la respuesta, %{answer_text}"
-      links: 
-        count_all_attempts: "Contar **Todos** los Intentos"
-        count_only_latest_attempts: "Contar sólo los Intentos más Recientes"
-      page_title: Estadísticas
-      quiz_all_version_disclaimer: "Este reporte muestra las estadísticas de la evaluación basado en todos los intentos para todos los usuarios."
-      quiz_latest_version_disclaimer: "Este reporte muestra las estadísticas de la evaluación basado en el último intento de cada usuario."
-      survey_all_version_disclaimer: "Este reporte muestra las estadísticas basadas en todos los intentos por todos los usuarios."
-      survey_latest_version_disclaimer: "Este reporte muestra las estadísticas de la encuesta basado en el último intento de cada usuario."
       titles: 
         submitted_users_for_quesiton: "Preguntas Presentadas para %{user}"
       uncounted_submissions: 
         one: "1 envío extra"
         other: "%{count} envíos extras"
-    statistics_crumb: Estadísticas
-    submission_version: 
-      attempt_number: "Intento %{att_no}"
-      kept: MANTENER
-      latest: "EL ÚLTIMO"
-    submission_versions: 
-      attempt: Intento
-      attempt_history: "Historial de intentos"
-      quiz_attempt_history_description: "Una tabla que muestra su historial de intentos de realizar la evaluación. Cada intento se encuentra en la parte izquierda. EL intento, hora y puntuación están a lo largo de la parte superior."
-      regraded: "Calificada de nuevo"
-      score: Calificación
-      time: Tiempo
+    survey: Encuesta
     surveys_label: "Las encuestas modifican la visibilidad de la evaluación"
     take_quiz: 
-      buttons: 
-        next: Siguiente
-        out_of_time_submit: "Ok, muy bien"
-        previous: Anterior
-        submit_quiz: "Enviar prueba"
       confirms: 
         cant_go_back_blank: "No puede volver a esta pregunta una vez que haga clic en siguiente. ¿Está seguro de que desea dejarla en blanco?"
         navigate_away: "Está a punto de navegar hacia otra página. ¿Desea Continuar?"
@@ -11867,25 +12035,20 @@ es:
       errors: 
         connection_lost: "Se perdió la conexión a %{host} . Asegúrese que está conectado al internet antes de continuar."
         only_numerical_values: "Sólo se aceptan valores numéricos"
-      headers: 
-        draft_preview: "Esta es una vista previa del borrador de esta evaluación"
       hide_time_link: Esconder
       hours_count: 
         one: "1 Hora"
         other: "%{count} Horas"
       labels: 
-        started: Comenzado
         time_elapsed: "Tiempo transcurrido"
-        times_up: "¡Se acabó el tiempo! Enviando resultados en"
-      logged_out_of_canvas: "*Ha cerrado su sesión en Canvas.* Para continuar, inicie sesión"
-      login_required: "Inicio de sesión obligatorio"
+      login_failed: "Fallo al iniciar sesión."
+      login_successful: "Ingreso exitoso."
       minutes_count: 
         one: "1 Minuto"
         other: "%{count} Minutos"
       months_count: 
         one: "1 Mes"
         other: "%{count} Meses"
-      not_saved: "No guardado"
       notices: 
         extra_time: "Ha recibido tiempo extra en este intento"
         five_minutes_left: "Cinco Minutos Restantes"
@@ -11895,7 +12058,6 @@ es:
         twelve_hours_left: "Doce Horas Restantes"
       question_answered: Contestado
       question_unanswered: "No han respondido todavía"
-      quiz_instructions: "Instrucciones de la evaluación"
       saved_at: "Evaluación guardada en %{t}"
       saving: Guardando...
       saving_not_needed: "No hay datos nuevos para guardar. Última comprobación a las %{t}"
@@ -11909,21 +12071,6 @@ es:
       years_count: 
         one: "1 Año"
         other: "%{count} Años"
-    take_quiz_in_popup: 
-      headers: 
-        loading_in_lockdown: "Cargando la Evaluación en el Buscador Respondus"
-      links: 
-        return_to_quiz_page: "[Haga click aquí](%{url}) para regresar a la página de la evaluación."
-    take_quiz_right_side: 
-      labels: 
-        attempt_due: "Intento vencido"
-        score: Calificación
-        time_elapsed: "Tiempo transcurrido"
-        time_running: "Tiempo de ejecución"
-      links: 
-        hide_time_running: Esconder
-        keep_editing_quiz: "Seguir editando esta evaluación"
-        keep_editing_survey: "Seguir editando esta encuesta"
     timing: 
       labels: 
         time_elapsed: "Tiempo Transcurrido"
@@ -11960,6 +12107,19 @@ es:
     types: 
       quiz: Evaluación
       survey: Encuesta
+  quizzes/quiz_group: 
+    errors: 
+      no_bank: "No se pudo encontrar el grupo de preguntas para el grupo de evaluación %{group_name}"
+      no_permissions: "El usuario no tenía permiso para hacer referencia al grupo de preguntas en el grupo de evaluación %{group_name}"
+    question_group: "Grupo de Preguntas"
+  quizzes/quiz_question: 
+    defaults: 
+      question_name: Pregunta
+  quizzes/quiz_statistics: 
+    statistics_filename: "Informe de %{quiz_title} %{quiz_type} %{report_type}"
+    types: 
+      item_analysis: "Análisis de elementos"
+      student_analysis: "Análisis de alumnos"
   quizzes_model: 
     cant_unpublish_when_students_submit: "No se puede ocultar la publicación si hay envíos de alumnos"
     confirms: 
@@ -12368,16 +12528,6 @@ es:
         go: Ir
       titles: 
         find_user: "Encontrar un Usuario"
-    accounts_secondary_content: 
-      buttons: 
-        go: Ir
-      links: 
-        manage_permissions: "Manejar los Permisos de las Funciones"
-        manage_subaccounts: "Manejar las Subcuentas"
-        manage_terms: "Manejar los Términos"
-        view_statistics: "Ver las Estadísticas"
-      titles: 
-        find_user: "Encontrar un Usuario"
     add_assignment: 
       buttons: 
         add_assignment: "Agregar Tarea"
@@ -12478,6 +12628,9 @@ es:
         unenroll_user_section: "Eliminar usuario de la sección"
       titles: 
         course_section: "Sección del Curso"
+    error_form: 
+      message_failed: "No se envió el informe. Inténtelo de nuevo."
+      message_sent: "¡Gracias por su ayuda! Trabajaremos en esto inmediatamente."
     errors: 
       400_message: 
         description: "Hmmm. Parece que ocurrió un error cargando la página que buscaba."
@@ -12504,8 +12657,6 @@ es:
           submit: "Enviar Comentarios"
         labels: 
           email: "Correo Electrónico (opcional)"
-        message_failed: "El reporte no se envió. Intente de Nuevo."
-        message_sent: "¡Gracias por su ayuda! Trabajaremos en esto inmediatamente."
     event_list: 
       at_least_more_events: "al menos %{count_of_events} más"
       at_least_more_events_one_week: "al menos %{count_of_events} más en la siguiente semana"
@@ -13050,6 +13201,13 @@ es:
     columns: 
       date: Fecha
       value: Valor
+    domain_not_found: 
+      body_description: "Compruebe la URL e inténtelo de nuevo o póngase en contacto con su institución o profesor para solicitar ayuda."
+      body_reference: "Si le interesa una cuenta gratuita de Canvas no vinculada a una institución específica, puede registrarse en"
+      links: 
+        canvas_instructure: canvas.instructure.com
+      page_title: "Ups, no hemos podido encontrar su instancia de Canvas."
+      you_typed: Escribió
     institution_suspended: 
       body: "La cuenta de Canvas de su escuela está suspendida temporalmente. Póngase en contacto con su administrador de Canvas."
       links: 
@@ -13080,8 +13238,12 @@ es:
     assignment_order_assignment_groups: "Por grupo de trabajo y posición"
     assignment_order_due_date: "Por fecha límite"
     assignment_unmuted: "Haga clic para desactivar audio"
+    invalid_group_warning: 
+      one: "Nota: la puntuación no incluye tareas del grupo %{list_of_group_names} porque no tiene puntos asociados."
+      other: "Nota: la puntuación no incluye tareas de los grupos %{list_of_group_names} porque no tienen puntos asociados."
     no_assignment: "No se ha seleccionado ninguna tarea"
     no_student: "No se seleccionó ningún alumno"
+    notes: Notas
     student_hidden_name: "Alumno %{position}"
   statistics: 
     csv_columns: 
@@ -13108,6 +13270,7 @@ es:
     not_available: "Disponible en"
     pending: "No disponible hasta"
   step: Paso
+  student_outcome_gradebook_description: "El libro de calificaciones de resultados del alumno representa el modo en el que los alumnos pueden ver de un vistazo el progreso en los resultados de aprendizaje de los cursos. Los resultados se presentan en un formato similar al de los libros de calificaciones y el progreso aparece tanto en el formato de puntuación numérica como clasificado como dominado/casi dominio/medidas correctoras."
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "No puede borrar una sub-cuenta que contiene cursos"
@@ -13345,6 +13508,10 @@ es:
         term_start: "comienzo del período"
         unspecified: "siempre que"
       timespan: "%{start_at} *a* %{end_at}"
+  text_helper: 
+    time: 
+      ranges: 
+        different_days: "%{start_date_and_time} hasta %{end_date_and_time}"
   time: 
     am: am
     count_hours_ago: 
