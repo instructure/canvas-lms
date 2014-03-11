@@ -135,7 +135,7 @@ class FilesController < ApplicationController
 
   def check_file_access_flags
     if params[:user_id] && params[:ts] && params[:sf_verifier]
-      user = User.find_by_id(params[:user_id]) if params[:user_id].present?
+      user = api_find(User, params[:user_id]) if params[:user_id].present?
       if user && user.valid_access_verifier?(params[:ts], params[:sf_verifier])
         # attachment.rb checks for this session attribute when determining 
         # permissions, but it should be ignored by the rest of the models' 
@@ -547,7 +547,7 @@ class FilesController < ApplicationController
 
   def send_stored_file(attachment, inline=true, redirect_to_s3=false)
     user = @current_user
-    user ||= User.find_by_id(params[:user_id]) if params[:user_id].present?
+    user ||= api_find(User, params[:user_id]) if params[:user_id].present?
     attachment.context_module_action(user, :read) if user && !params[:preview]
     log_asset_access(@attachment, "files", "files") unless params[:preview]
     set_cache_header(attachment)
