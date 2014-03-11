@@ -77,6 +77,11 @@ define [
       "#{get(window, 'ENV.GRADEBOOK_OPTIONS.change_gradebook_version_url')}"
     ).property()
 
+    showDownloadSubmissionsButton: (->
+      @get('selectedAssignment.has_submitted_submissions') and
+      @get('selectedAssignment.submission_types').match(/(online_upload|online_text_entry|online_url)/)
+    ).property('selectedAssignment')
+
     hideStudentNames: false
 
     showConcludedEnrollments: false

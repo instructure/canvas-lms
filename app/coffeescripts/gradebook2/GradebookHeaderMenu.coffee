@@ -52,7 +52,7 @@ define [
             messageStudentsWho:    @allSubmissionsLoaded
             setDefaultGrade:       @allSubmissionsLoaded
             curveGrades:           @allSubmissionsLoaded && @assignment.grading_type != 'pass_fail' && @assignment.points_possible
-            downloadSubmissions:   "#{@assignment.submission_types}".match(/(online_upload|online_text_entry|online_url)/)
+            downloadSubmissions:   "#{@assignment.submission_types}".match(/(online_upload|online_text_entry|online_url)/) && @assignment.has_submitted_submissions
             reuploadSubmissions:   @assignment.submissions_downloads > 0
           }
         )

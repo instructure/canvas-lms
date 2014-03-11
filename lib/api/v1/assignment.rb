@@ -68,6 +68,7 @@ module Api::V1::Assignment
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title
     hash['submission_types'] = assignment.submission_types_array
+    hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
 
     if assignment.context && assignment.context.turnitin_enabled?
       hash['turnitin_enabled'] = assignment.turnitin_enabled
