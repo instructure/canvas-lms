@@ -363,7 +363,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def publish
     if authorized_action(@context, @current_user, :manage_assignments)
-      @quizzes = @context.quizzes.active.find_all_by_id(params[:quizzes]).compact.select{|q| !q.available? }
+      @quizzes = @context.quizzes.active.find_all_by_id(params[:quizzes]).compact
       @quizzes.each(&:publish!)
 
       flash[:notice] = t('notices.quizzes_published',
