@@ -577,11 +577,7 @@ describe Enrollment do
 
     context 'dates change' do
       before do
-        Rails.force_cache!
-      end
-
-      after do
-        Rails.unforce_cache!
+        enable_cache
       end
 
       it "should return the right state based on availability dates on enrollment" do

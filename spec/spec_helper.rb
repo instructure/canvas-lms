@@ -1039,7 +1039,30 @@ end
   end
 
   def enable_cache(new_cache=:memory_store)
-    Rails.force_cache(new_cache) { yield }
+    new_cache ||= :null_store
+    if CANVAS_RAILS2 && new_cache == :null_store
+      require 'nil_store'
+      new_cache = NilStore.new
+    end
+    new_cache = ActiveSupport::Cache.lookup_store(new_cache)
+    previous_cache = Rails.cache
+    Rails.stubs(:cache).returns(new_cache)
+    ActionController::Base.stubs(:cache_store).returns(new_cache)
+    ActionController::Base.any_instance.stubs(:cache_store).returns(new_cache)
+    previous_perform_caching = ActionController::Base.perform_caching
+    ActionController::Base.stubs(:perform_caching).returns(true)
+    ActionController::Base.any_instance.stubs(:perform_caching).returns(true)
+    if block_given?
+      begin
+        yield
+      ensure
+        Rails.stubs(:cache).returns(previous_cache)
+        ActionController::Base.stubs(:cache_store).returns(previous_cache)
+        ActionController::Base.any_instance.stubs(:cache_store).returns(previous_cache)
+        ActionController::Base.stubs(:perform_caching).returns(previous_perform_caching)
+        ActionController::Base.any_instance.stubs(:perform_caching).returns(previous_perform_caching)
+      end
+    end
   end
 
   # enforce forgery protection, so we can verify usage of the authenticity token
