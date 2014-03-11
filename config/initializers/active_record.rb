@@ -18,11 +18,20 @@ class ActiveRecord::Base
     alias :clone :dup
 
     def serializable_hash(options = nil)
-      if options && options[:include_root]
-        {self.class.base_ar_class.model_name.element => super(options)}
-      else
-        super
+      result = super
+      if result.present?
+        result = result.with_indifferent_access
+        user_content_fields = options[:user_content] || []
+        result.keys.each do |name|
+          if user_content_fields.include?(name.to_s)
+            result[name] = UserContent.escape(result[name])
+          end
+        end
       end
+      if options && options[:include_root]
+        result = {self.class.base_ar_class.model_name.element => result}
+      end
+      result
     end
 
     # See ActiveModel#serializable_add_includes
@@ -1433,6 +1442,7 @@ unless CANVAS_RAILS2
   end
 end
 
+if CANVAS_RAILS2
 class ActiveRecord::Serialization::Serializer
   def serializable_record
     hash = HashWithIndifferentAccess.new.tap do |serializable_record|
@@ -1460,7 +1470,6 @@ class ActiveRecord::Serialization::Serializer
   end
 end
 
-if CANVAS_RAILS2
 # We need to have 64-bit ids and foreign keys.
 if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::NATIVE_DATABASE_TYPES[:primary_key] = "bigserial primary key".freeze
