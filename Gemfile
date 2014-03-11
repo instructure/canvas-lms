@@ -259,7 +259,9 @@ group :test do
   gem 'yard', '0.8.0'
   gem 'yard-appendix', '>=0.1.8'
   gem 'timecop', '0.6.3'
-  gem 'test-unit', '1.2.3'
+  if CANVAS_RAILS2
+    gem 'test-unit', '1.2.3'
+  end
   gem 'bullet', '4.5.0', :require => false
     gem 'uniform_notifier', '1.4.0'
 end
