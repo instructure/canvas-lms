@@ -11117,7 +11117,7 @@ fr:
         one: "Le système a pu générer une seule combinaison valide pour les paramètres donnés."
         other: "Le système a généré seulement %{count} combinaisons valides pour les paramètres donnés."
     always: Toujours
-    answer_comments: "Commentaires de réponse"
+    answer_comments: "Commentaires pour la réponse"
     answer_text: "Texte de la réponse"
     assignment: Travail
     assignment_points_possible: 
@@ -11239,9 +11239,9 @@ fr:
         instructions: "Instructions pour les quiz , zone de texte enrichi"
     labels: 
       answer_text: "Texte de la réponse"
-      comments_on_answer: "Commentaire si l’étudiant choisi cette réponse"
-      comments_on_question: "Commentaire pour cette question"
-      comments_on_wrong_match: "Commentaire si l’utilisateur se trompe de correspondance"
+      comments_on_answer: "Commentaires si l’étudiant choisit cette réponse"
+      comments_on_question: "Commentaires pour cette question"
+      comments_on_wrong_match: "Commentaires si l’utilisateur utilise cette mauvaise correspondance"
       message_text: "Texte du message"
       multiple_blanks_question: "Remplissez les espaces vides en vous aidant du texte autour"
       other_incorrect_matches: "Autres options de correspondance incorrecte"
@@ -11418,7 +11418,7 @@ fr:
           intro: Intro
           variables: Variables
       errors: 
-        no_more_attempts: "Vous avez épuisé le nombre de tentatives autorisées pour ce questionnaire"
+        no_more_attempts: "Il ne vous reste plus aucune tentative pour ce questionnaire"
         quiz_deleted: "Ce questionnaire a été supprimé"
         quiz_update_failed: "Échec de la mise à jour du questionnaire"
       fabulous_quizzes: 
@@ -11437,7 +11437,7 @@ fr:
         hints: 
           group_pick_count: "%{pick_count} sélections jusqu’ici"
         labels: 
-          add_questions_to_group: "Ajouter les questions au groupe du questionnaire"
+          add_questions_to_group: "Ajouter les questions au groupe de questionnaires"
           group_name: "Nom du groupe"
           group_pick_count: Choisir
           group_points: Points
@@ -11458,15 +11458,15 @@ fr:
         answer_weight: "Valeur de la réponse"
         exact_answer_with_error_margin_accessible: "*réponse exacte* avec une marge d’erreur de #error margin#"
         labels: 
-          answer_comments: "Commentaire si l’étudiant choisi cette réponse"
-          answer_in_range: "Réponse dans la fourchette"
+          answer_comments: "Commentaires si l’étudiant choisit cette réponse"
+          answer_in_range: "Réponse dans la plage"
           exact_answer: "Réponse exacte"
         matching_left: "Correspond au côté gauche"
         matching_right: "Correspond au côté droit"
         numerical_answer: "Réponse numérique"
         possible_answer: "Réponse possible"
         titles: 
-          click_to_enter_answer_comments: "Cliquez pour ajouter un commentaire si l’étudiant choisi cette réponse"
+          click_to_enter_answer_comments: "Cliquez pour ajouter des commentaires si l’étudiant choisit cette réponse"
           click_to_set_as_correct: "Cliquez pour définir cette réponse comme correcte"
           delete_answer: "Supprimer cette réponse"
           edit_as_html: "Passer en mode HTML pour le texte de réponse"
@@ -11476,32 +11476,32 @@ fr:
           create_update_question: "Créer/Mettre à jour la question"
           generate: Générer
           recompute: Recalculer
-        correct_answer_comments: "Commentaires de réponse correcte"
-        distractor_instructions: "tapez chaque distracteur sur sa propre ligne"
-        equation_example: "c.-à-d., \"Combien font 5 plus [x] ?\""
+        correct_answer_comments: "Commentaires pour une réponse correcte"
+        distractor_instructions: "taper chaque réponse piège sur sa propre ligne"
+        equation_example: "c.-à-d., « Combien font 5 plus [x] ? »"
         explanation: 
-          generate_possible_solutions: "Enfin, créez autant de combinaisons de solution-variable que nécessaires pour votre questionnaire."
+          generate_possible_solutions: "Enfin, créez autant de combinaisons solution-variable que nécessaires pour votre questionnaire."
         explanations: 
-          calculated: "Entrez une question, créez une formule et générez un ensemble de combinaisons de réponses possibles. Les étudiants verront une question accompagnée d’un ensemble de variables sélectionnées de manière aléatoire, et devront taper le numéro de la réponse correcte."
-          equations: "Vous pouvez définir des variables en tapant le nom des variables entre crochets."
-          essay: "Les étudiants recevront une zone de texte pour écrire leur réponse."
-          file_upload: "Les étudiants pourront charger un fichier de réponse."
-          fill_in_multiple_blanks: "Entrez votre question en spécifiant chaque emplacement vide. Puis, définissez la réponse correcte possible pour chaque emplacement vide. Les étudiants doivent entrer les réponses correctes dans les zones de texte de chaque emplacement vide."
+          calculated: "Entrez une question, créez une formule et générez un ensemble de combinaisons de réponses possibles. Les étudiants verront une question accompagnée d’un ensemble de variables sélectionnées de manière aléatoire, et ils devront taper le numéro de la réponse correcte."
+          equations: "Vous pouvez définir des variables en tapant des noms de variables entre crochets."
+          essay: "Les étudiants auront à leur disposition une zone de texte pour leur réponse."
+          file_upload: "Les étudiants pourront charger un fichier pour leur réponse."
+          fill_in_multiple_blanks: "Entrez votre question en spécifiant la place de chaque emplacement vide. Ensuite, définissez la réponse correcte possible pour chaque emplacement vide. Les étudiants doivent taper les réponses correctes dans les zones de texte à chaque emplacement vide."
           formula_definition: "Ensuite, vous devez écrire la ou les formules utilisées pour calculer la réponse correcte. Pour cela, utilisez simplement les noms de variables énumérés plus haut."
-          matching: "Créez des paires de valeurs correspondantes. Les étudiants verront les valeurs affichées à gauche, et devront sélectionner la valeur correspondante à droite dans une liste déroulante. Plusieurs lignes peuvent avoir la même réponse, et vous pouvez ajouter des distracteurs supplémentaires à droite."
+          matching: "Créez des paires de valeurs concordantes. Les étudiants verront les valeurs affichées à gauche, et devront sélectionner la valeur correspondante à droite dans une liste déroulante. Plusieurs lignes peuvent avoir la même réponse, et vous pouvez ajouter des réponses pièges supplémentaires à droite."
           missing_word: "Définissez le texte qui doit s’afficher avant et après la liste déroulante. Créez un ensemble de réponses possibles et sélectionnez une réponse correcte."
           multi_answer_sets: "Dans la zone ci-dessous, pour chaque emplacement où vous souhaitez afficher une zone de réponse, tapez un mot de référence (sans espaces) entre crochets."
-          multiple_answers: "Cette question affiche une case à cocher près de chaque réponse, et l’étudiant doit sélectionner TOUTES les réponses que vous marquez comme correcte."
+          multiple_answers: "Cette question affiche une case à cocher près de chaque réponse, et l’étudiant doit sélectionner TOUTES les réponses que vous marquez comme correctes."
           multiple_choice: "Entrez votre question et plusieurs réponses, puis sélectionnez la réponse correcte."
-          multiple_dropdowns: "Entrez votre question en spécifiant l’emplacement de chaque liste déroulante. Puis définissez les réponses possibles pour chaque liste déroulante, avec une réponse correcte par liste."
-          numerical: "Pour la réponse correcte, définissez un nombre dans une plage de nombres, ou un nombre avec une marge d’erreur inférieure ou supérieure. L’étudiant verra une zone de texte vide dans laquelle taper le numéro de sa réponse."
+          multiple_dropdowns: "Entrez votre question en spécifiant l’emplacement de chaque liste déroulante. Ensuite, définissez les réponses possibles pour chaque liste déroulante, avec une réponse correcte par liste."
+          numerical: "Pour la réponse correcte, définissez un nombre dans une plage de nombres, ou un nombre avec une marge d’erreur inférieure ou supérieure. L’étudiant verra une zone de texte vide dans laquelle il pourra taper le numéro de sa réponse."
           short_answer: |-
               Entrez le texte de votre question, puis définissez toutes les réponses correctes possibles pour l’emplacement vide. 
-              Les étudiants verront une question suivie d’une zone de texte dans laquelle entrer leur réponse.
-          text_only: "Cette \"question\" n’est pas notée, mais peut s’avérer utile pour présenter un ensemble de questions connexes."
+              Les étudiants verront une question suivie d’une petite zone de texte dans laquelle entrer leur réponse.
+          text_only: "Cette « question » n’est pas notée, mais peut se révéler utile pour présenter un ensemble de questions connexes."
           true_false: "Entrez le texte de votre question, puis sélectionnez la valeur Vrai ou Faux comme réponse correcte."
-          variable_definitions: "Après avoir entré vos variables ci-dessus, elles doivent apparaître ici. Pour chaque variable ci-dessous, vous pouvez spécifier une plage de valeurs possibles."
-        general_answer_comments: "Commentaires de réponse généraux"
+          variable_definitions: "Une fois que vous avez fourni vos variables ci-dessus, celles-ci doivent apparaître ici. Pour chaque variable ci-dessous, vous pouvez spécifier une plage de valeurs possibles."
+        general_answer_comments: "Commentaires généraux pour une réponse"
         headers: 
           formula_definition: "Définition de formule"
           generate_possible_solutions: "Générer les solutions possibles"
@@ -11518,14 +11518,14 @@ fr:
             type: "Type de question"
         labels: 
           answers: Réponses
-          distractors: "Possibilités de correspondances supplémentaires (distracteurs)"
-          missing_word_after: "Texte affiché après les réponses"
-          points: points
+          distractors: "Autres correspondances possibles (réponses pièges)"
+          missing_word_after: "Texte à afficher après les réponses"
+          points: pts
           question: Question
         links: 
           add_another_answer: "Ajouter une autre réponse"
           need_help: "Besoin d’aide ?"
-        multi_answer_sets_example: "c.-à-d., \"Les roses sont [color1], les violettes [color2]\""
+        multi_answer_sets_example: "c.-à-d., « Les roses sont [color1], les violettes [color2] »"
         offer_combinations: "Proposer %{how_many} combinaisons de valeurs possibles (max. %{max_combinations})"
         options: 
           only_one_correct: "Une seule réponse correcte"
@@ -11537,9 +11537,9 @@ fr:
           fill_in_multiple_blanks: "Champs multiples à compléter"
           matching: Correspondance
           missing_word: "Mot manquant"
-          multiple_answers: "Choix multiple (plusieurs réponses)"
-          multiple_choice: "Choix multiple (une seule réponse)"
-          multiple_dropdowns: "Listes déroulantes"
+          multiple_answers: "Plusieurs réponses"
+          multiple_choice: "Choix multiples"
+          multiple_dropdowns: "Plusieurs listes déroulantes"
           numerical: "Réponse numérique"
           short_answer: "Champ à compléter"
           text_only: "Texte (pas de question)"
@@ -11547,10 +11547,10 @@ fr:
         show_possible_answers: "Afficher les réponses possibles pour %{question}"
         show_possible_answers_no_question: "Afficher les réponses possibles pour "
         titles: 
-          click_to_enter_correct_answer_comments: "Cliquez pour entrer un commentaire pour une réponse correcte"
-          click_to_enter_general_answer_comments: "Cliquez pour entrer un commentaire général"
-          click_to_enter_wrong_answer_comments: "Cliquez pour entrer un commentaire pour une réponse incorrecte"
-        wrong_answer_comments: "Commentaire de réponse incorrecte"
+          click_to_enter_correct_answer_comments: "Cliquez pour entrer des commentaires pour une réponse correcte"
+          click_to_enter_general_answer_comments: "Cliquez pour entrer des commentaires généraux"
+          click_to_enter_wrong_answer_comments: "Cliquez pour entrer des commentaires pour une réponse incorrecte"
+        wrong_answer_comments: "Commentaires pour une réponse incorrecte"
       history: 
         anonymous_username: Étudiant
         buttons: 
@@ -11564,17 +11564,17 @@ fr:
         headers: 
           quiz_submissions: "Envois de questionnaire"
           survey_submissions: "Envois d’enquête"
-        latest_quiz_results: "Voici les derniers résultats du questionnaire pour %{user}. Vous pouvez modifier les points de chaque question et ajouter des commentaires supplémentaires, puis cliquer sur \"Mettre à jour les notes\" en bas de la page."
-        latest_survey_results: "Voici les derniers résultats de l’enquête pour %{user}. Vous pouvez modifier les points de chaque question et ajouter des commentaires supplémentaires, puis cliquer sur \"Mettre à jour les notes\" en bas de la page."
+        latest_quiz_results: "Voici les derniers résultats du questionnaire pour %{user}. Vous pouvez modifier les points de chaque question et ajouter des commentaires supplémentaires, puis cliquer sur « Mettre à jour les notes » en bas de la page."
+        latest_survey_results: "Voici les derniers résultats de l’enquête pour %{user}. Vous pouvez modifier les points de chaque question et ajouter des commentaires supplémentaires, puis cliquer sur « Mettre à jour les notes » en bas de la page."
         links: 
           back_to_quiz: "Revenir au questionnaire"
           back_to_survey: "Revenir à l’enquête"
         logged_out_user: "Utilisateur déconnecté %{index}"
         named_quiz_results: "%{quiz_name} Résultats pour %{user}"
         next_questions_arrow_title: "Questions suivantes"
-        no_more_attempts: "%{user} ne bénéficie plus d’aucune tentative"
-        page_title_quiz: "Historique de questionnaires pour %{user}"
-        page_title_survey: "Historique d’enquêtes pour %{user}"
+        no_more_attempts: "%{user} n’a plus aucune tentative possible"
+        page_title_quiz: "Historique des questionnaires pour %{user}"
+        page_title_survey: "Historique des enquêtes pour %{user}"
         prev_questions_arrow_title: "Questions précédentes"
         quiz_not_yet_taken: "Le questionnaire n’a pas encore été complété."
         quiz_not_yet_taken_or_in_progress: "Le questionnaire n’a pas encore été complété ou est en cours"
@@ -11632,9 +11632,9 @@ fr:
           save: Enregistrer
         end_quiz_reference_time_current_end: "heure de fin actuelle"
         end_quiz_reference_time_now: maintenant
-        end_quiz_when: "Terminer le questionnaire %{n} minutes après %{reference_time}."
+        end_quiz_when: "Terminez le questionnaire %{n} minutes après %{reference_time}."
         extended_quiz_time_explanation: "Vous pouvez accorder du temps supplémentaire à cet étudiant pour sa tentative actuelle sur le questionnaire. Combien de temps souhaitez-vous lui accorder ?"
-        finished_in: "interruption dans %{duration}"
+        finished_in: "fin dans %{duration}"
         global_extra_attempts: "tout le monde obtient déjà %{n}"
         headers: 
           attempt: Tentative
@@ -11664,14 +11664,14 @@ fr:
       multi_answer: 
         choose_answer: Choisir
       muted: 
-        muted_quiz_description: "La note de votre questionnaire est indisponible car votre formateur n’a pas terminé sa notation. Lorsque votre formateur aura terminé la notation de ce questionnaire, votre note sera disponible dans cette page."
+        muted_quiz_description: "La note de votre questionnaire est indisponible, car votre instructeur n’a pas fini de l’évaluer. Lorsqu’il aura terminé, votre note sera disponible dans cette page."
         muted_quiz_header: "Votre questionnaire est en mode silencieux"
       new: 
         allowed_attempts: "Nombre de tentatives autorisées"
         anonymous_submissions: "Envois anonymes"
         buttons: 
-          not_published: "Non publiée"
-          published: Publiée
+          not_published: "Non publiés"
+          published: Publiés
           save: Enregistrer
         cant_go_back: "Verrouiller les questions après les réponses"
         default_page_title: "Nouveau questionnaire"
@@ -11682,7 +11682,7 @@ fr:
         hints: 
           question_detail_disabled: "REMARQUE : les informations relatives aux questions ne sont pas disponibles lorsque le nombre de questions est supérieur à %{question_count}."
           quiz_score: "les étudiants recevront automatiquement tous les points après avoir répondu à l’enquête"
-        ip_filters: "Les filtres IP de questionnaire permettent de limiter l’accès aux questionnaires des ordinateurs appartenant à une plage IP spécifiée. Les filtres peuvent être une liste d’adresses séparées par des virgules, ou une adresse suivie d’un masque (\"192.168.217.1\", \"192.168.217.1/24\" ou \"192.168.217.1/255.255.255.0\")."
+        ip_filters: "Les filtres IP de questionnaire permettent de limiter l’accès aux questionnaires des ordinateurs appartenant à une plage IP spécifiée. Les filtres peuvent être une liste d’adresses séparées par des virgules, ou une adresse suivie d’un masque (192.168.217.1, 192.168.217.1/24 ou 192.168.217.1/255.255.255.0)."
         label: 
           time_limit: "Limite de durée"
         labels: 
@@ -11691,11 +11691,11 @@ fr:
           ip_filter: "Filtrer les adresses IP"
           never_hide_results: "Laisser les étudiants voir les résultats de leur questionnaire"
           quiz_instructions: "Instructions du questionnaire"
-          quiz_notify: "Informer les utilisateurs que ce quizz a changé"
+          quiz_notify: "Informer les utilisateurs que ce questionnaire a changé"
           quiz_score: Note
-          require_access_code: "Nécessite un code d’accès"
+          require_access_code: "Code d’accès obligatoire"
           restrict_quiz: "Restrictions liées aux questionnaires"
-          show_question_details: "Afficher les informations de la question"
+          show_question_details: "Afficher les détails de la question"
         limited_attempts: "Tentatives autorisées"
         links: 
           cancel: Annuler
@@ -11705,13 +11705,13 @@ fr:
           show_assignment_rubric: "Afficher le barème"
         manage: Gérer
         minutes: Minutes
-        new_assignment: "Nouvelle activité"
+        new_assignment: "Nouveau travail"
         new_discussion: "Nouvelle discussion"
         one_question_at_a_time: "Afficher une question à la fois"
         points_possible: "%{n} points"
         quiz_title: "Titre du questionnaire"
         quiz_type: "Type de questionnaire"
-        require_lockdown_browser: "Nécessite Respondus LockDown Browser"
+        require_lockdown_browser: "Respondus LockDown Browser obligatoire"
         require_lockdown_browser_for_results: "Requis pour afficher les résultats du questionnaire"
         retrieving_filters: "Récupération des filtres..."
         score_to_keep: "Note de questionnaire à conserver"
@@ -11729,9 +11729,9 @@ fr:
       notices: 
         cant_view_submission_while_muted: "Impossible d’afficher l’historique du questionnaire lorsque celui-ci est en mode silencieux."
         has_submissions_already: "Gardez à l’esprit que certains étudiants ont déjà complété ou commencé ce questionnaire."
-        less_than_allotted_time: "Vous avez commencé ce questionnaire peu avant son échéance, par conséquent vous ne disposez pas de toute la durée nécessaire pour le compléter."
+        less_than_allotted_time: "Vous avez commencé ce questionnaire peu avant son échéance, par conséquent vous ne disposez pas de toute la durée pour le compléter."
         no_submission_for_user: "Aucun envoi disponible pour cet utilisateur"
-        quiz_updated: "Le questionnaire a été mis à jour"
+        quiz_updated: "Le questionnaire a bien été mis à jour"
         quizzes_published: 
           one: "1 questionnaire a été publié"
           other: "%{count} questionnaires ont été publiés"
@@ -11742,7 +11742,7 @@ fr:
         buttons: 
           update: "Mettre à jour"
         default_group_name: Groupe
-        edit_questions_and_points: "Choisissez *%{num_questions}* questions ; #%{num_points}# points sont accordés à chaque question"
+        edit_questions_and_points: "Choisissez *%{num_questions}* questions ; #%{num_points}# points par question"
         labels: 
           group_name: "Nom du groupe"
           number_of_questions: "Nombre de questions"
@@ -11750,12 +11750,12 @@ fr:
           question_bank: "Les questions seront extraites de la banque"
         links: 
           link_to_a_question_bank: "Liaison avec une banque de questions"
-        show_questions_and_points: "Choisissez *%{num_questions}* questions ; #%{num_points}# points sont accordés à chaque question"
+        show_questions_and_points: "Choisissez *%{num_questions}* questions ; #%{num_points}# points par question"
         titles: 
           add_question_to_group: "Ajouter une question à ce groupe"
           collapse_group: "Réduire le groupe"
           delete_group: "Supprimer le groupe"
-          edit_group_details: "Modifier les informations du groupe"
+          edit_group_details: "Modifier les détails du groupe"
           expand_group: "Développer le groupe"
       question_list_right_side: 
         headers: 
@@ -11775,13 +11775,13 @@ fr:
           other: "%{count} étudiants ont reçu cette question"
       question_teaser: 
         titles: 
-          click_to_show_details: "Cliquez pour afficher toutes les informations de la question"
+          click_to_show_details: "Cliquez pour afficher tous les détails de la question"
           delete_this_question: "Supprimer cette question"
           edit_this_question: "Modifier cette question"
       quiz_details: 
         allowed_attempts: "Tentatives autorisées"
         headers: 
-          available: Disponible
+          available: Disponibles
           due: Échéance
           points: Points
           questions: Questions
@@ -11807,21 +11807,21 @@ fr:
         labels: 
           current_score: "Note actuelle"
           kept_score: "Note conservée"
-          last_attempt_details: "Informations de la dernière tentative"
-          submission_details: "Informations de l’envoi"
+          last_attempt_details: "Détails sur la dernière tentative"
+          submission_details: "Informations sur l’envoi"
           time: Heure
         links: 
-          preview_quiz_again: "Afficher un nouvel aperçu du questionnaire"
-          preview_survey_again: "Afficher un nouvel aperçu de l’enquête"
-        no_more_attempts: "Plus de tentatives accordées"
+          preview_quiz_again: "Nouvel aperçu du questionnaire"
+          preview_survey_again: "Nouvel aperçu de l’enquête"
+        no_more_attempts: "Plus aucune tentative disponible"
         questions_not_graded: "Certaines questions n’ont pas encore été notées."
-        score_set_manually: "Cette note a été attribuée par l'enseignant."
+        score_set_manually: "Cette note a été attribuée par l’enseignant."
         unlimited_attempts: "Nombre de tentatives illimité"
-        view_previous_attempts: "Afficher les tentatives précédentes"
+        view_previous_attempts: "Voir les tentatives précédentes"
       quiz_show_teacher: 
         anonymous_submissions: "Envois anonymes"
         attempts: Tentatives
-        available_from: "Disponible depuis"
+        available_from: "Disponibles depuis"
         cant_go_back: "Verrouiller les questions après les réponses"
         code: "Code d’accès"
         due: Échéance
@@ -11835,7 +11835,7 @@ fr:
         one_question_at_a_time: "Une question à la fois"
         points: Points
         quiz_type: "Type de questionnaire"
-        require_lockdown_browser: "Nécessite Respondus LockDown Browser"
+        require_lockdown_browser: "Respondus LockDown Browser obligatoire"
         require_lockdown_browser_for_results: "Requis pour afficher les résultats du questionnaire"
         require_lockdown_browser_monitor: "Webcam requise"
         score_to_keep: "Note à conserver"
@@ -11845,7 +11845,7 @@ fr:
           one: "1 minute"
           other: "%{count} minutes"
         until: Jusqu’au
-        view_responses: "Afficher les réponses"
+        view_responses: "Voir les réponses"
       quiz_submission: 
         attempt_duration: "Cette tentative a duré %{duration}."
         buttons: 
@@ -11870,7 +11870,7 @@ fr:
         quiz_not_yet_taken: "Le questionnaire n’a pas encore été complété."
         quiz_results_protected: "Les résultats de ce questionnaire sont protégés et invisibles pour les étudiants."
         quiz_results_protected_until_last_attempt: "Les résultats du questionnaire sont protégés et invisibles pour les étudiants jusqu’à l’envoi de leur dernière tentative."
-        quiz_submission_needs_review: "Le quizz a énormément changé depuis son envoi. Il se peut que cet envoi requière une nouvelle notation."
+        quiz_submission_needs_review: "Le questionnaire a énormément changé depuis son envoi. Il se peut que cet envoi requière une nouvelle notation."
         requires_lockdown: "Respondus LockDown Browser est requis pour afficher les résultats du questionnaire."
         submitted_at: "Envoyé le %{when}"
         survey_fudged_negative: "La note de cette enquête a été corrigée manuellement de %{fudge} points."
@@ -11885,11 +11885,11 @@ fr:
           attempts_left: "Tentatives restantes"
           attempts_so_far: "Tentatives jusqu’ici"
           latest_submission: "Dernier envoi"
-          quiz_details: "Informations du questionnaire"
+          quiz_details: "Détails sur le questionnaire"
           quiz_due: Échéance
           quiz_time_limit: "Limite de durée"
-          survey_details: "Informations sur l’enquête"
-        no_details: "Aucune information"
+          survey_details: "Détails sur l’enquête"
+        no_details: "Pas de détails"
         points_possible: "%{points_possible} points possibles"
         question_count: 
           one: "1 question"
@@ -11899,14 +11899,14 @@ fr:
         quiz_points_possible: 
           one: "1 point"
           other: "%{count} points"
-        student_mute_notification: "Le formateur travaille sur les notes"
+        student_mute_notification: "L’instructeur travaille sur les notes"
         unlimited_attempts: "Nombre de tentatives illimité"
       read_only: 
         default_page_title: "Nouveau questionnaire"
         headers: 
-          quiz_details: "Informations du questionnaire"
+          quiz_details: "Détails sur le questionnaire"
         labels: 
-          question_details: "Afficher les informations de la question"
+          question_details: "Afficher les détails de la question"
           quiz_instructions: "Instructions du questionnaire"
         links: 
           back_to_quiz_page: "Revenir à la page du questionnaire"
@@ -11952,9 +11952,9 @@ fr:
         titles: 
           delete: Supprimer
           related_items: "Éléments apparentés"
-          unlock_for_how_long: "Pour quelle durée souhaitez-vous déverrouiller le questionnaire ?"
+          unlock_for_how_long: "Pendant combien de temps souhaitez-vous déverrouiller le questionnaire ?"
         warnings: 
-          draft_version: "Ceci est un aperçu de la version brouillon du questionnaire"
+          draft_version: "Ceci est un aperçu de la version provisoire du questionnaire"
       single_answer: 
         upload: Charger
       statistics: 
@@ -11966,11 +11966,11 @@ fr:
           users_have_taken_this_quiz: "%{count} utilisateurs ont complété ce questionnaire"
           users_have_taken_this_survey: "%{count} utilisateurs ont complété cette enquête"
         labels: 
-          average_correct: "Moyenne correcte"
-          average_incorrect: "Moyenne incorrecte"
+          average_correct: "Moyenne des réponses correctes"
+          average_incorrect: "Moyenne des réponses incorrectes"
           average_time: "Temps moyen"
-          high_score: "Note élevée"
-          low_score: "Note basse"
+          high_score: "Bonne note"
+          low_score: "Note faible"
           mean_score: "Note moyenne"
           standard_deviation: Écart-type
           users_selected_the_answer: "Les utilisateurs suivants ont sélectionné la réponse %{answer_text}"
@@ -11978,11 +11978,11 @@ fr:
           count_all_attempts: "Compter **toutes** les tentatives"
           count_only_latest_attempts: "Compter uniquement chaque dernière tentative"
         page_title: Statistiques
-        quiz_all_version_disclaimer: "Ce rapport affiche les statistiques du questionnaire en fonction des tentatives de tous les utilisateurs."
-        quiz_latest_version_disclaimer: "Ce rapport affiche les statistiques du questionnaire en fonction de la dernière tentative de chaque utilisateur."
+        quiz_all_version_disclaimer: "Ce rapport affiche les statistiques du questionnaire en tenant compte de toutes les tentatives de tous les utilisateurs."
+        quiz_latest_version_disclaimer: "Ce rapport affiche les statistiques du questionnaire en tenant compte de la dernière tentative de chaque utilisateur."
         student_n: "Étudiant %{student_counter}"
-        survey_all_version_disclaimer: "Ce rapport affiche les statistiques de l’enquête en fonction des tentatives de tous les utilisateurs."
-        survey_latest_version_disclaimer: "Ce rapport affiche les statistiques de l’enquête en fonction de la dernière tentative de chaque utilisateur."
+        survey_all_version_disclaimer: "Ce rapport affiche les statistiques de l’enquête en tenant compte de toutes les tentatives de tous les utilisateurs."
+        survey_latest_version_disclaimer: "Ce rapport affiche les statistiques de l’enquête en tenant compte de la dernière tentative de chaque utilisateur."
       statistics_crumb: Statistiques
       submission_version: 
         attempt_number: "Tentative %{att_no}"
@@ -12002,7 +12002,7 @@ fr:
           previous: Précédent
           submit_quiz: "Envoyer le questionnaire"
         headers: 
-          draft_preview: "Ceci est un aperçu de la version brouillon du questionnaire"
+          draft_preview: "Ceci est un aperçu de la version provisoire du questionnaire"
         labels: 
           started: Début
           times_up: "Terminé ! Envoi des résultats dans"
@@ -12130,7 +12130,7 @@ fr:
     title_add_quiz: "Ajouter un questionnaire"
     titles: 
       add_questions_as_group: "Ajouter des questions dans un groupe"
-      click_to_enter_comments_on_answer: "Cliquez pour ajouter un commentaire si l’étudiant choisi cette réponse"
+      click_to_enter_comments_on_answer: "Cliquez pour ajouter un commentaire si l’étudiant choisit cette réponse"
       click_to_enter_comments_on_wrong_match: "Cliquez pour ajouter un commentaire si l’étudiant ne trouve pas la correspondance"
       click_to_set_as_correct: "Cliquez pour définir cette réponse comme correcte"
       click_to_unset_as_correct: "Cliquez pour désactiver cette réponse définie comme correcte"
@@ -12161,8 +12161,8 @@ fr:
       survey: Enquête
   quizzes/quiz_group: 
     errors: 
-      no_bank: "Impossible de trouver la banque de questions pour le groupe de quizz %{group_name}."
-      no_permissions: "L’utilisateur ne disposait pas des droits nécessaires pour référencer la banque de questions dans le groupe de quizz %{group_name}."
+      no_bank: "Impossible de trouver la banque de questions pour le groupe de questionnaires %{group_name}."
+      no_permissions: "L’utilisateur ne disposait pas des droits nécessaires pour référencer la banque de questions dans le groupe de questionnaires %{group_name}."
     question_group: "Groupe de questions"
   quizzes/quiz_question: 
     defaults: 
