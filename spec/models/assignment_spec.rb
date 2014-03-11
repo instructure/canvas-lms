@@ -639,8 +639,9 @@ describe Assignment do
       @assignment.submissions.scoped.delete_all
       real_sub = @assignment.submissions.build(user: @user)
 
-      @assignment.submissions.expects(:where).once.returns(Submission.none)
-      @assignment.submissions.expects(:build).once.returns(real_sub)
+      mock_submissions = Submission.none
+      mock_submissions.stubs(:build).returns(real_sub).once
+      @assignment.stubs(:submissions).returns(mock_submissions)
 
       sub = nil
       lambda {
