@@ -291,7 +291,7 @@ describe ApplicationHelper do
 
         output = include_account_js
         output.should have_tag 'script'
-        output.should match %r{/path/to/js}
+        output.should match %r{\\?/path\\?/to\\?/js}
       end
 
       it "should include site admin javascript" do
@@ -301,7 +301,7 @@ describe ApplicationHelper do
 
         output = include_account_js
         output.should have_tag 'script'
-        output.should match %r{/path/to/js}
+        output.should match %r{\\?/path\\?/to\\?/js}
       end
 
       it "should include both site admin and root account javascript, site admin first" do
@@ -315,7 +315,7 @@ describe ApplicationHelper do
 
         output = include_account_js
         output.should have_tag 'script'
-        output.scan(%r{/path/to/(admin/|root/)?js}).should eql [['admin/'], ['root/']]
+        output.scan(%r{\\?/path\\?/to\\?/(admin|root)?\\?/?js}).should eql [['admin'], ['root']]
       end
     end
   end
@@ -325,7 +325,7 @@ describe ApplicationHelper do
       @site_admin = Account.site_admin
       @site_admin.expects(:global_includes_hash).once.returns({:css => "/path/to/css", :js => "/path/to/js"})
       include_account_css.should match %r{/path/to/css}
-      include_account_js.should match %r{/path/to/js}
+      include_account_js.should match %r{\\?/path\\?/to\\?/js}
     end
 
     it "should only compute includes once, with includes" do
