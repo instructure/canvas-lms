@@ -1008,18 +1008,33 @@ class User < ActiveRecord::Base
     @courses_with_grades ||= self.available_courses.with_each_shard.select{|c| c.grants_right?(self, nil, :participate_as_student)}
   end
 
-  def sis_pseudonym_for(context)
+  def sis_pseudonym_for(context, include_trusted = false)
     root_account = context.root_account
     raise "could not resolve root account" unless root_account.is_a?(Account)
-    if self.pseudonyms.loaded? && self.shard == root_account.shard
-      self.pseudonyms.detect { |p| p.active? && p.sis_user_id && p.account_id == root_account.id }
-    else
-      root_account.shard.activate do
-        root_account.pseudonyms.active.
-          where("sis_user_id IS NOT NULL AND user_id=?", self).
-          first
+    result = if self.pseudonyms.loaded? && self.shard == root_account.shard
+        self.pseudonyms.detect { |p| p.active? && p.sis_user_id && p.account_id == root_account.id }
+      else
+        root_account.shard.activate do
+          root_account.pseudonyms.active.
+            where("sis_user_id IS NOT NULL AND user_id=?", self).
+            first
+        end
       end
+    if !result && include_trusted
+      result = Shard.partition_by_shard(root_account.trusted_account_ids) do |trusted_ids|
+        next if result
+        result = if self.pseudonyms.loaded? && self.shard == Shard.current
+            self.pseudonyms.detect { |p| p.active? && p.sis_user_id && trusted_ids.include?(p.account_id) }
+          else
+            Pseudonym.where(account_id: trusted_ids).active.
+                where("sis_user_id IS NOT NULL AND user_id=?", self).first
+          end
+      end.first
     end
+    if result
+      result.account = root_account if result.account_id == root_account.id
+    end
+    result
   end
 
   set_policy do

@@ -1472,21 +1472,27 @@ class Course < ActiveRecord::Base
     assignments = calc.assignments
     groups = calc.groups
 
+
     read_only = t('csv.read_only_field', '(read only)')
     t 'csv.student', 'Student'
     t 'csv.id', 'ID'
     t 'csv.sis_user_id', 'SIS User ID'
     t 'csv.sis_login_id', 'SIS Login ID'
+    t 'csv.root_account', 'Root Acount'
     t 'csv.section', 'Section'
     t 'csv.comments', 'Comments'
     t 'csv.current_score', 'Current Score'
     t 'csv.final_score', 'Final Score'
     t 'csv.final_grade', 'Final Grade'
     t 'csv.points_possible', 'Points Possible'
+    include_root_account = self.root_account.trust_exists?
     CSV.generate do |csv|
       #First row
       row = ["Student", "ID"]
-      row << "SIS User ID" << "SIS Login ID" if options[:include_sis_id]
+      if options[:include_sis_id]
+        row << "SIS User ID" << "SIS Login ID"
+        row << "Root Account" if include_root_account
+      end
       row << "Section"
       row.concat assignments.map(&:title_with_id)
       include_points = !apply_group_weights?
@@ -1519,6 +1525,7 @@ class Course < ActiveRecord::Base
       #Second Row
       row = ["    Points Possible", nil, nil]
       row << nil << nil if options[:include_sis_id]
+      row << nil if options[:include_sis_id] && include_root_account
       row.concat assignments.map(&:points_possible)
       row.concat([read_only] * group_filler_length)
       row << read_only << read_only if include_points
@@ -1536,10 +1543,11 @@ class Course < ActiveRecord::Base
         #Last Row
         row = [student.last_name_first, student.id]
         if options[:include_sis_id]
-          pseudonym = student.sis_pseudonym_for(self.root_account)
+          pseudonym = student.sis_pseudonym_for(self.root_account, include_root_account)
           row << pseudonym.try(:sis_user_id)
-          pseudonym ||= student.find_pseudonym_for_account(self.root_account, true)
+          pseudonym ||= student.find_pseudonym_for_account(self.root_account, include_root_account)
           row << pseudonym.try(:unique_id)
+          row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_root_account
         end
 
         row << student_sections

@@ -98,6 +98,27 @@ describe Api::V1::User do
         }
     end
 
+    it 'should use an sis pseudonym from another account if necessary' do
+      @user = User.create!(:name => 'User')
+      @account2 = Account.create!
+      @user.pseudonyms.create!(:unique_id => 'abc', :account => @account2) { |p| p.sis_user_id = 'a'}
+      Account.default.any_instantiation.stubs(:trust_exists?).returns(true)
+      Account.default.any_instantiation.stubs(:trusted_account_ids).returns([@account2.id])
+      HostUrl.expects(:context_host).with(@account2).returns('school1')
+      @user.stubs(:find_pseudonym_for_account).with(Account.default).returns(@pseudonym)
+      @test_api.user_json(@user, @admin, {}, [], Account.default).should == {
+          'name' => 'User',
+          'sortable_name' => 'User',
+          'id' => @user.id,
+          'short_name' => 'User',
+          'login_id' => 'abc',
+          'sis_login_id' => 'abc',
+          'sis_user_id' => 'a',
+          'root_account' => 'school1',
+          'sis_import_id' => nil,
+      }
+    end
+
     it 'should use the correct pseudonym' do
       @user = User.create!(:name => 'User')
       @account2 = Account.create!

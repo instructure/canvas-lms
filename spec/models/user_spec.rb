@@ -1562,6 +1562,17 @@ describe User do
       (lambda {User.create!.sis_pseudonym_for(context)}).should raise_error("could not resolve root account")
     end
 
+    it "should include a pseudonym from a trusted account" do
+      account1 = account_model
+      account2 = account_model
+      u = User.create!
+      p = account2.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
+      account1.stubs(:trust_exists?).returns(true)
+      account1.stubs(:trusted_account_ids).returns([account2.id])
+      u.sis_pseudonym_for(account1).should be_nil
+      u.sis_pseudonym_for(account1, true).should == p
+    end
+
     context "sharding" do
       specs_require_sharding
 

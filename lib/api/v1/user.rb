@@ -40,7 +40,8 @@ module Api::V1::User
     includes ||= []
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
       if user_json_is_admin?(context, current_user)
-        if sis_pseudonym = user.sis_pseudonym_for(@domain_root_account)
+        include_root_account = @domain_root_account.trust_exists?
+        if sis_pseudonym = user.sis_pseudonym_for(@domain_root_account, include_root_account)
           # the sis fields on pseudonym are poorly named -- sis_user_id is
           # the id in the SIS import data, where on every other table
           # that's called sis_source_id.
@@ -49,6 +50,7 @@ module Api::V1::User
                       # TODO: don't send sis_login_id; it's garbage data
                       :sis_login_id => sis_pseudonym.unique_id if @domain_root_account.grants_rights?(current_user, :read_sis, :manage_sis).values.any?
           json[:sis_import_id] = sis_pseudonym.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
+          json[:root_account] = HostUrl.context_host(sis_pseudonym.account) if include_root_account
         end
         if pseudonym = (sis_pseudonym || user.find_pseudonym_for_account(@domain_root_account))
           json[:login_id] = pseudonym.unique_id

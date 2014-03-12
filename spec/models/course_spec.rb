@@ -889,6 +889,52 @@ describe Course, "gradebook_to_csv" do
     rows[4][3].should be_nil
   end
 
+  it "should include primary domain if a trust exists" do
+    course(:active_all => true)
+    @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
+    student_in_course(:user => @user1)
+    account2 = account_model
+    @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com', :account => account2)
+    student_in_course(:user => @user2)
+    @user3 = user(:active_all => true, :name => 'JT')
+    student_in_course(:user => @user3)
+    @user1.pseudonym.sis_user_id = "SISUSERID"
+    @user1.pseudonym.save!
+    @user2.pseudonym.sis_user_id = "SISUSERID"
+    @user2.pseudonym.save!
+    @course.reload
+    @course.root_account.stubs(:trust_exists?).returns(true)
+    @course.root_account.any_instantiation.stubs(:trusted_account_ids).returns([account2.id])
+    HostUrl.expects(:context_host).with(@course.root_account).returns('school1')
+    HostUrl.expects(:context_host).with(account2).returns('school2')
+
+    csv = @course.gradebook_to_csv(:include_sis_id => true)
+    csv.should_not be_nil
+    rows = CSV.parse(csv)
+    rows.length.should == 5
+    rows[0][1].should == 'ID'
+    rows[0][2].should == 'SIS User ID'
+    rows[0][3].should == 'SIS Login ID'
+    rows[0][4].should == 'Root Account'
+    rows[0][5].should == 'Section'
+    rows[1][2].should == nil
+    rows[1][3].should == nil
+    rows[1][4].should == nil
+    rows[1][5].should == nil
+    rows[2][1].should == @user1.id.to_s
+    rows[2][2].should == 'SISUSERID'
+    rows[2][3].should == @user1.pseudonym.unique_id
+    rows[2][4].should == 'school1'
+    rows[3][1].should == @user2.id.to_s
+    rows[3][2].should == 'SISUSERID'
+    rows[3][3].should == @user2.pseudonym.unique_id
+    rows[3][4].should == 'school2'
+    rows[4][1].should == @user3.id.to_s
+    rows[4][2].should be_nil
+    rows[4][3].should be_nil
+    rows[4][4].should be_nil
+  end
+
   context "accumulated points" do
     before do
       student_in_course(:active_all => true)

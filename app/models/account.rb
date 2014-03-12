@@ -1350,6 +1350,10 @@ class Account < ActiveRecord::Base
     [ Account.site_admin.id ]
   end
 
+  def trust_exists?
+    false
+  end
+
   def user_list_search_mode_for(user)
     return :preferred if self.root_account.open_registration?
     return :preferred if self.root_account.grants_right?(user, :manage_user_logins)
