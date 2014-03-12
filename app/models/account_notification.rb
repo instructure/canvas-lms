@@ -36,7 +36,7 @@ class AccountNotification < ActiveRecord::Base
           # announcements intended for users not enrolled in any courses have the NilEnrollment role type
           user_role_types[announcement.account_id] = ["NilEnrollment"] if user_role_types[announcement.account_id].empty?
           # roles user holds with respect to accounts
-          user_role_types[announcement.account_id] |= user.account_users.with_each_shard{ |scope| scope.select(:membership_type).uniq.map(&:type) }.uniq
+          user_role_types[announcement.account_id] |= user.account_users.with_each_shard{ |scope| scope.select(:membership_type).uniq.map(&:membership_type) }.uniq
         else #if announcement.account == account
           # roles user holds with respect to courses
           user_role_types[account.id] = user.enrollments_for_account_and_sub_accounts(account).map(&:type)
