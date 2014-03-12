@@ -272,7 +272,7 @@ es:
       deleted: "Incluir objetos eliminados: verdadero;"
       reports: "Informes: %{files}"
     student: 
-      enrollment_state: "Incluir Estado de inscripción: verdadero;"
+      enrollment_state: "Incluir estado de inscripción: verdadero;"
       enrollment_states: "Estados de inscripción: %{states};"
     usu: 
       enrollment_types: "Tipos de inscripción: %{types}"
@@ -385,7 +385,7 @@ es:
         view_event_details: "Ver detalles"
       course_logging_results: 
         date: Fecha
-        event_details: "Detalles del Evento"
+        event_details: "Detalles del evento"
         event_type: Tipo
         no_item_found: "No se ha encontrado ningún elemento"
         time: Tiempo
@@ -1150,7 +1150,7 @@ es:
           enrollment_state: 
             header: "Estado de inscripción"
           include_enrollment_state: 
-            check_box: "Incluir Estado de inscripción"
+            check_box: "Incluir estado de inscripción"
       active: "Inscripciones activas"
       all: "Todas las inscripciones"
     submission_data_csv_description: 
@@ -1206,18 +1206,18 @@ es:
           description: 
             header: Ejemplo
           user_activity: 
-            text: "Este informe muestra toda la actividad de los usuarios inscritos en un curso concreto o en todos los cursos de un período determinado. El archivo csv resultante tendrá una fila por cada actividad del alumno y tendrá los siguientes encabezados: tipo_inscripción, id sección, id sis sección, nombre sección, id curso, id sis curso, nombre curso, id usuario, id sis usuario, tipo contenido, contenido, veces visto, veces participado, visto por última vez. Las veces visto y las veces participado son contadores que miden desde el principio hasta el momento en que se generó el informe."
+            text: "Este informe muestra toda la actividad de los usuarios inscritos en un curso concreto o en todos los cursos de un período determinado. El archivo csv resultante tendrá una fila por cada actividad del alumno y tendrá los siguientes encabezados: tipo_inscripción, id sección, id sis sección, nombre sección, id curso, id sis curso, nombre curso, id usuario, id sis usuario, tipo contenido, contenido, veces visto, veces participado, visto por última vez. Los indicadores veces visto y veces participado son contadores que miden desde el principio hasta el momento en que se generó el informe."
     user_access_csv_parameters: 
       account_reports: 
         usu: 
           enrollment_type: 
-            header: "Tipo de Inscripción"
+            header: "Tipo de inscripción"
       all: "Todas las inscripciones"
-      designer: "Inscripciones de diseñador"
-      observer: "Inscripciones de observador"
-      students: "Inscripciones de alumno"
+      designer: "Inscripciones de diseñadores"
+      observer: "Inscripciones de observadores"
+      students: "Inscripciones de alumnos"
       ta: "Inscripciones de ta"
-      teachers: "Inscripciones de profesor"
+      teachers: "Inscripciones de profesores"
     user_add_failed_message: "La adición del usuario falló, intente de nuevo"
     user_added_message: "%{user} corectamente agregado"
     user_added_message_sent_message: "¡%{user} ha sido agregado! En breve recibirá una confirmación por correo electrónico."
@@ -1959,14 +1959,14 @@ es:
         remind: "Recuerde a %{assessor} acerca de la tarea, ultima notificación en %{time}"
         reminder: "Recuérdele a %{assessor} la tarea, ultima notificación en %{time}"
     peer_reviews_selector: 
-      how_to_peer_review: "Cómo asignar revisión por pares"
+      how_to_peer_review: "Cómo asignar revisiones por pares"
       labels: 
         automatically_assign_peer_reviews: "Asignar revisiones por pares automáticamente"
         manually_assign_peer_reviews: "Asignar revisiones por pares manualmente"
         require_peer_reviews: "Hacer que las revisiones por pares sean obligatorias"
       locked_until: "Asignar revisiones"
       peer_reviews_assign_at_explanation: "Debe seguir después de la fecha de vencimiento. Si está en blanco, usar la fecha de vencimiento."
-      peer_reviews_header: "Revisión por pares"
+      peer_reviews_header: "Revisiones por pares"
       reviews_per_user: "Revisiones por usuario"
     points_possible_number: "Puntos posibles debe ser un número"
     positive_number: "Debe utilizar un número positivo"
@@ -2058,10 +2058,10 @@ es:
         allow_file_uploads: "Cargas de archivos"
         allow_media_recordings: "Grabaciones de contenido audiovisual"
         allow_text_entry: "Introducción de texto"
-        allow_url: "URL de la Página Web"
+        allow_url: "URL de la página Web"
         allowed_extensions: "Extensiones de archivo permitidas"
         restrict_file_extensions: "Restringir la carga de tipos de archivos "
-      online_entry_options: "Opciones de entrada en línea"
+      online_entry_options: "Opciones de introducción online"
       submission_type: "Tipo de envío"
       submission_types: 
         external_tool: "Herramienta externa"
@@ -3175,7 +3175,7 @@ es:
     select_content: 
       cancel_btn: Cancelar
       select_content_btn: "Seleccionar contenido"
-      select_content_label: "Seleccione el contenido. Utilice las teclas de dirección hacia arriba o hacia abajo para navegar a través del árbol. Presione la flecha derecha para expandir y la izquierda para contraer."
+      select_content_label: "Seleccione el contenido. Utilice las teclas de dirección hacia arriba o hacia abajo para navegar a través del árbol. Pulse la flecha derecha para expandir y la izquierda para contraer."
     select_course: "Seleccionar curso"
     show_issues: "Mostrar incidencias"
     subviews: 
@@ -3316,7 +3316,7 @@ es:
       enrolled_as: "Inscrito como %{enrollment_type}"
       enrollment_linked_to: "enlazado a *%{linked_user}*"
       error: 
-        enrollment_change_failed: "Cambio del Privilegio de Inscripción falló, intente de nuevo"
+        enrollment_change_failed: "Se produjo un fallo en el cambio del privilegio de inscripción, intente de nuevo"
       labels: 
         user_privileges: Privilegios
       legends: 
@@ -4285,11 +4285,11 @@ es:
     field_label: 
       abstract_course_id: "ID del resumen del curso"
       account_id: "ID de cuenta"
-      allow_student_discussion_editing: "Permitir la edición del debate del alumno"
-      allow_student_discussion_topics: "Permitir los temas de debate de los alumnos"
+      allow_student_discussion_editing: "Permitir la edición de los debates entre alumnos"
+      allow_student_discussion_topics: "Permitir los temas de debate entre alumnos"
       allow_student_forum_attachments: "Permitir los archivos adjuntos en el foro de alumnos"
       allow_student_organized_groups: "Permitir los grupos organizados por alumnos"
-      allow_student_wiki_edits: "Permitir la edición del Wiki del alumno"
+      allow_student_wiki_edits: "Permitir la edición de Wiki del alumno"
       allow_wiki_comments: "Permitir los comentarios de Wiki"
       conclude_at: "Finalizado el"
       course_code: "Código del curso"
@@ -4302,7 +4302,7 @@ es:
       hide_distribution_graphs: "Ocultar los gráficos de distribución"
       hide_final_grade: "Ocultar la calificación final"
       indexed: Indexado
-      integration_id: "ID integración"
+      integration_id: "ID de integración"
       is_public: "Es público"
       large_roster: "Lista grande"
       license: Licencia
@@ -4314,15 +4314,15 @@ es:
       public_description: "Descripción pública"
       public_syllabus: "Plan de estudios público"
       replacement_course_id: "ID del curso de sustitución"
-      restrict_enrollments_to_course_dates: "Restringir inscripciones a las fechas del curso"
+      restrict_enrollments_to_course_dates: "Restringir las inscripciones a las fechas del curso"
       root_account_id: "ID de la cuenta principal"
       self_enrollment: Autoinscripción
       self_enrollment_code: "Código de autoinscripción"
       self_enrollment_limit: "Límite de autoinscripción"
-      show_all_discussion_entries: "Mostrar todas las entradas en el debate"
+      show_all_discussion_entries: "Mostrar todas las entradas del debate"
       show_public_context_messages: "Mostrar mensaje de contexto público"
-      sis_batch_id: "ID lote SIS"
-      sis_source_id: "ID fuente SIS"
+      sis_batch_id: "ID de lote SIS"
+      sis_source_id: "ID de fuente SIS"
       start_at: "Comienza el"
       storage_quota: "Cuota de almacenamiento"
       syllabus_body: cuerpo_plan_de_estudios
@@ -8538,10 +8538,10 @@ es:
           audio_comment: "Este mensaje incluye comentarios con contenido audiovisual. Para reproducirlos o responder a ellos, haga clic en el enlace que aparece a continuación:"
           body: "%{user_name} acaba de enviarle un mensaje en Canvas:"
           download: descargar
-          reply_to_conversation_message: "Puede responder a este mensaje en Canvas respondiendo directamente a este mensaje de correo electrónico."
+          reply_to_conversation_message: "Puede contestar este mensaje en Canvas respondiendo directamente a este mensaje de correo electrónico."
           subject: "%{user_name} acaba de enviarle un mensaje en Canvas:"
           unknown_user: "Usuario desconocido"
-        reply_to_conversation_message: "Puede responder a este mensaje en Canvas respondiendo directamente a este mensaje de correo electrónico."
+        reply_to_conversation_message: "Puede contestar este mensaje en Canvas respondiendo directamente a este mensaje de correo electrónico."
         subject: "%{user_name} le acaba de enviar un mensaje en Canvas."
         unknown_user: "Usuario Desconocido"
       facebook: 
@@ -9160,10 +9160,10 @@ es:
     new_discussion_entry: 
       email: 
         body: "%{user} publicó un comentario nuevo en el subproceso %{discussion_topic} para %{course}:"
-        discussion_entry_reply_message: "Únase a la conversación utilizando el enlace siguiente o haga un comentario respondiendo a este mensaje."
+        discussion_entry_reply_message: "Participe en la conversación utilizando el enlace siguiente o haga un comentario respondiendo a este mensaje."
         html: 
           body: "%{user} ha publicado un comentario nuevo en la conversación %{discussion_topic} para %{course}:"
-          discussion_entry_link_message: "[Haga clic aquí para unirse a la conversación](%{url}), o haga un comentario respondiendo a este mensaje."
+          discussion_entry_link_message: "[Haga clic aquí para participar en la conversación](%{url}), o haga un comentario respondiendo a este mensaje."
           subject: "Nuevo comentario para %{discussion_topic}: %{course}"
         subject: "Comentario Nuevo para %{discussion_topic}: %{course}"
       facebook: 
