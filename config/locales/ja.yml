@@ -94,7 +94,6 @@ ja:
         login_handle_name: "ログイン ラベル"
       login_handle_name_description: "一意のログイン ID に使用されるラベル。例:ログイン、ユーザ名、受講生 ID、など。"
       save_button: 認証設定の保存
-    deprecated_fail: 古いバージョンと新しいバージョンの作成を同時に使用することはできません。
     index: 
       add_auth_desc: "このアカウントに ID プロバイダーを追加:"
       canvas_login_tip: |-
@@ -177,11 +176,8 @@ ja:
       last_ldap_timeout_failure: 前回のタイムアウト
       ldap_timeout_failure_help2: "Canvas は、特定の LDAP サーバーとの通信が一定回数以上タイムアウトした場合、それ以降の %{time} 間は、ログイン試行の際にその LDAP サーバーを使用しなくなります。"
     login_required: 入力が必要です
-    no_auth_mixing: 複数の認証の種類を組み合わせることはできません
     no_changing_auth_types: 認証設定の種類は変更できません。削除した後、新しい設定を作成してください。
-    no_config_sent: "auth_type を指定する必要があります"
     no_discovery_url: 何も設定されていません
-    only_one_cas: "複数の CAS 設定は作成できません"
     password_required: 入力が必要です
     saml_required: "SAML をテストするには SAML の設定が必要です"
     saml_settings: 
@@ -277,6 +273,11 @@ ja:
     sis_exporter: 
       deleted: "削除されたオブジェクトを含む: true;"
       reports: "レポート: %{files}"
+    student: 
+      enrollment_state: "登録状態を含む: true;"
+      enrollment_states: "登録状態: %{states};"
+    usu: 
+      enrollment_types: "登録タイプ: %{types}"
   account_settings: 
     account: アカウント
     account_name_too_long: アカウント名が長すぎます
@@ -369,6 +370,28 @@ ja:
         messages_viewed: "*%{start_date}* から *%{end_date}* の期間に *%{user}* に送信されたお知らせ。"
       comm_messages_search_results: 
         no_messages_found: メッセージが見つかりません
+      course_logging_content: 
+        course_activity: コースのアクティビティ
+        find: 検索
+      course_logging_details: 
+        Field: フィールド
+        From: 変更前
+        To: 変更後
+        Value: 値
+        date: 日付
+        event_id: "イベント ID"
+        event_type_label: タイプ
+        time: 時刻
+        user: ユーザ
+      course_logging_item: 
+        view_event_details: 詳細を表示
+      course_logging_results: 
+        date: 日付
+        event_details: イベントの詳細
+        event_type: タイプ
+        no_item_found: アイテムが見つかりません
+        time: 時刻
+        user: ユーザ
       course_search_form: 
         labels: 
           find_deleted_course: 削除されたコースを検索
@@ -398,8 +421,8 @@ ja:
         message_date_from: 開始日付
         message_date_to: 終了日付
       grade_change_logging_content: 
-        auth_logging: 成績変更アクティビティ
         find: 検索
+        grade_change_activity: 成績変更アクティビティ
         message_assignment_id: "課題 ID"
         message_course_id: "コース ID"
       grade_change_logging_results: 
@@ -414,6 +437,7 @@ ja:
         time: 時刻
       logging_content_pane: 
         authentication: "ログイン/ログアウト アクティビティ"
+        course: コースのアクティビティ
         grade_change: 成績変更アクティビティ
         select_default: ログの種類の選択
         select_label: 検索するログの種類を選択します。
@@ -845,6 +869,8 @@ ja:
         restrict_student_future_view: 開始日前のコースは受講生に表示しない
         self_enrollment: セルフ登録を許可する
         self_registration: 自己登録
+        self_registration_type_all: "すべてのアカウント タイプ"
+        self_registration_type_observer: "オブザーバ アカウントのみ"
         show_scheduler: スケジューラの有効化
         sis_source_id: "SIS ID"
         start_at: 開始日時
@@ -1115,6 +1141,15 @@ ja:
             description: 
               header: 例
             text: "これは、指定した期間のコースに登録しているすべての受講生のうち、コースの指定の日付範囲内に課題を提出しなかった受講生を示すレポートです。このレポートでは、基準を満たす登録受講生がそれぞれ 1 行ずつ示されます。2 週間以内の日付範囲を指定できます。"
+    students_with_no_submissions_csv_parameters: 
+      account_reports: 
+        default: 
+          enrollment_state: 
+            header: 登録状態
+          include_enrollment_state: 
+            check_box: 登録状態を含む
+      active: アクティブな登録
+      all: すべての登録
     submission_data_csv_description: 
       account_reports: 
         submission_data: 
@@ -1162,6 +1197,24 @@ ja:
           main: 
             text: "これは、課題、アナウンス、ディスカッション、ファイル、モジュール、ページ、またはクイズを 1 つも含まないすべてのコースを示すレポートです。"
     update_failed_notice: アカウント設定の更新に失敗しました
+    user_access_csv_description: 
+      account_reports: 
+        usu: 
+          description: 
+            header: 例
+          user_activity: 
+            text: "このレポートでは、指定した期間の指定のコースまたはすべてのコースに登録しているユーザのすべてのアクティビティが示されます。生成される csv ファイルでは、受講生のアクティビティがそれぞれ 1 行ずつ示され、section id、section sis id、section name、course id、course sis id、course name、user id、user sis id、content type、content、times viewed、times participated、last viewed というヘッダが含まれます。times viewed および times participated は、開始時点からレポート生成時点までの数を示します。"
+    user_access_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: 登録タイプ
+      all: すべての登録
+      designer: 設計者登録
+      observer: オブザーバ登録
+      students: 受講生登録
+      ta: "TA 登録"
+      teachers: 講師登録
     user_add_failed_message: ユーザの追加に失敗しました。もう一度やり直してください
     user_added_message: "%{user} は正常に追加されました!"
     user_added_message_sent_message: "%{user} は正常に追加されました! 追加されたユーザには、間もなく確認の電子メールが送信されます。"
@@ -1397,7 +1450,6 @@ ja:
     default_title: "名称なし - %{course}"
     default_unfiled_title: 未整理の問題
   assignment: 
-    advanced_options_errors: "1 つ以上の詳細オプションにエラーがありました"
     assignment_group_must_have_group: この課題に対する課題グループを選択してください
     at_least_one_file_type: "少なくとも 1 つのファイル タイプを指定してください"
     at_least_one_submission_type: "少なくとも 1 つの提出タイプを選択してください"
@@ -1415,7 +1467,6 @@ ja:
     feed_entry_title: "課題: %{assignment}"
     feed_entry_title_with_course: "課題、%{course}: %{assignment}"
     group_assignment_must_have_group_set: "この課題に対するグループ セットを選択してください"
-    hide_advanced_options: 詳細オプションを非表示
     imported_assignments_group: インポートされた課題
     labels: 
       due: 期限
@@ -1423,7 +1474,6 @@ ja:
     percentage_points_possible: "パーセント方式の採点の場合は、配点を 0 より大きくする必要があります。"
     points_possible_number: 配点は数値で入力してください
     select_external_tool_dialog_title: 外部ツールの設定
-    show_advanced_options: 詳細オプションを表示
     submission_action_take_quiz: "%{title} を受ける"
     submission_action_turn_in_assignment: "%{title} を提出"
     submission_types: 
@@ -1717,11 +1767,9 @@ ja:
       buttons: 
         update: 課題の更新
       description: 説明
-      due_date: 期日
       freeze_properties: コピーされるときに課題のプロパティをロック
       notify_content_change: この内容が変更になったことをユーザに通知する
       points_possible: 点数
-      show_advanced_options: 詳細オプションを表示
       warnings: 
         assignment_is_frozen: 一部の設定は管理上の理由でロックされています。
     errors: 
@@ -1759,7 +1807,7 @@ ja:
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "成績: %{grade}%"
     grading_type_selector: 
-      grading_type: 採点タイプ
+      display_grade_as: 成績の表示方法
       grading_type_options: 
         letter_grade: 成績
         not_graded: 未採点
@@ -1769,6 +1817,7 @@ ja:
       view_grading_levels: 採点レベルの表示
     group_category_selector: 
       grade_group_students_individually: それぞれの受講生を個別に採点
+      group_assignment_header: グループ課題
       group_category_options: "新しいグループ カテゴリ"
       group_set: "グループ セット"
       is_group_assignment: これはグループ課題です
@@ -1848,6 +1897,8 @@ ja:
       submitting: 提出しています...
     multiple_due_dates: 複数の期日
     name_is_required: 名前は必須項目です
+    name_too_long: 名前が長すぎます
+    name_too_long_error: 名前が長すぎます
     never_drop: 
       remove_rule: ルールの削除
     never_drop_collection: 
@@ -1906,12 +1957,14 @@ ja:
         remind: "アセスメントについて %{assessor} に念押しする。最終通知日: %{time}"
         reminder: "アセスメントについて %{assessor} に念押しする。最終通知日: %{time}"
     peer_reviews_selector: 
+      how_to_peer_review: "ピア レビューの割り当て方法"
       labels: 
         automatically_assign_peer_reviews: "ピア レビューの自動割り当て"
         manually_assign_peer_reviews: "ピア レビューの手動割り当て"
         require_peer_reviews: "ピア レビューが必要"
       locked_until: レビューの割り当て
       peer_reviews_assign_at_explanation: 期日以降の日付を指定してください。空白の場合は、期日を使用します。
+      peer_reviews_header: "ピア レビュー"
       reviews_per_user: ユーザごとのレビュー
     points_possible_number: 配点は数値で入力してください
     positive_number: 正の数字を使用する必要があります
@@ -1994,17 +2047,19 @@ ja:
       advanced_turnitin_settings: "Turnitin の詳細設定"
       descriptions: 
         allowed_extensions: "受け入れられる拡張子のリストを入力します。例: doc,xls,txt"
+      external_tool_options: "外部ツール オプション"
       label: 
         external_tool_new_tab: このツールを新しいタブに読み込む
         external_tool_url: "外部ツールの URL"
         turnitin_enabled: "Turnitin の提出物を有効にする"
       labels: 
-        allow_file_uploads: ファイルのアップロードを許可
-        allow_media_recordings: メディアに記録されたデータを許可
-        allow_text_entry: テキスト入力を許可
-        allow_url: "Web サイトの URL を許可"
+        allow_file_uploads: ファイルのアップロード
+        allow_media_recordings: メディアの記録
+        allow_text_entry: テキスト入力
+        allow_url: "Web サイトの URL"
         allowed_extensions: 許可されるファイル拡張子
         restrict_file_extensions: "アップロードするファイル タイプを制限"
+      online_entry_options: オンライン入力オプション
       submission_type: 提出物のタイプ
       submission_types: 
         external_tool: 外部ツール
@@ -3123,6 +3178,7 @@ ja:
     select_content: 
       cancel_btn: キャンセル
       select_content_btn: コンテンツの選択
+      select_content_label: コンテンツの選択。上および下方向キーを使用して、ツリー内をナビゲートします。展開するには右方向キーを、折りたたむには左方向キーを押します。
     select_course: コースの選択
     show_issues: 問題の表示
     subviews: 
@@ -3261,8 +3317,9 @@ ja:
         conclude_student: この受講生の登録を完了してもよろしいですか?
         delete_enrollment: この受講生の登録を削除してもよろしいですか?
       enrolled_as: "登録のタイプ: %{enrollment_type}"
-      enrollment_change_failed: 登録権限の変更に失敗しました。もう一度やり直してください
       enrollment_linked_to: "リンク先: %{linked_user}"
+      error: 
+        enrollment_change_failed: 登録権限の変更に失敗しました。もう一度やり直してください
       labels: 
         user_privileges: 特権
       legends: 
@@ -3566,10 +3623,10 @@ ja:
         description: 
           delete: 現在のモジュール/アイテムを削除
           edit: モジュール/アイテムを編集
-          indent: 現在のアイテムをインデント
+          indent: インデント
           new: 新しいモジュール
           next: 次のモジュール/アイテム
-          outdent: 現在のアイテムのインデントを戻す
+          outdent: インデントを戻す
           previous: 前のモジュール/アイテム
       keycode_descriptions: 
         next_module_item: "次のモジュールまたはモジュール アイテムを選択してください"
@@ -3721,10 +3778,10 @@ ja:
       links: 
         edit_item: アイテムの詳細情報を編集
         edit_item_details_label: アイテムの詳細情報を編集
-        indent: アイテムをインデント
-        indent_label: アイテムをインデント
-        outdent: アイテムを逆インデント
-        outdent_label: アイテムを逆インデント
+        indent: インデント
+        indent_label: インデント
+        outdent: インデントを戻す
+        outdent_label: インデントを戻す
         remove_item: このアイテムをモジュールから削除
         remove_item_label: このアイテムをモジュールから削除
       max_score: 
@@ -3763,9 +3820,9 @@ ja:
         edit_item: 編集
         edit_item_details: アイテムの詳細情報を編集
         indent: インデント
-        indent_item: アイテムをインデント
-        outdent: 逆インデント
-        outdent_item: アイテムを逆インデント
+        indent_item: インデント
+        outdent: インデントを戻す
+        outdent_item: インデントを戻す
         remove_item: 削除
         remove_item_from_module: このアイテムをモジュールから削除
       max_score: 
@@ -4224,6 +4281,62 @@ ja:
     wrapper: 
       close_course_menu_title: 閉じる
       reset_course_menu: リセット
+  course_logging: 
+    event_type: 
+      concluded: 完了
+      created: 作成日時
+      updated: 更新
+    field_label: 
+      abstract_course_id: "抽象コース ID"
+      account_id: "アカウント ID"
+      allow_student_discussion_editing: 受講生のディスカッションの編集を許可
+      allow_student_discussion_topics: "受講生のディスカッション トピックを許可"
+      allow_student_forum_attachments: 受講生のフォーラム添付ファイルを許可
+      allow_student_organized_groups: 受講生が組織したグループを許可
+      allow_student_wiki_edits: "受講生の Wiki の編集を許可"
+      allow_wiki_comments: "Wiki のコメントを許可"
+      conclude_at: 終了日時
+      course_code: "コース コード"
+      created_at: 作成日時
+      default_view: デフォルトのビュー
+      default_wiki_editing_roles: "デフォルトの Wiki 編集役割"
+      enrollment_term_id: "登録期間 ID"
+      grading_standard_id: "採点基準 ID"
+      group_weighting_scheme: 採点重み付けスキーム
+      hide_distribution_graphs: 分布グラフを非表示
+      hide_final_grade: 最終的な成績を非表示
+      indexed: インデックス作成済み
+      integration_id: "統合 ID"
+      is_public: 公開
+      large_roster: 大きな名簿
+      license: 使用許諾
+      locale: ロケール
+      lock_all_announcements: すべてのアナウンスをロック
+      name: 名前
+      old_account_id: "古いアカウント ID"
+      open_enrollment: 登録を開く
+      public_description: 公開の説明
+      public_syllabus: 公開の要綱
+      replacement_course_id: "置換コース ID"
+      restrict_enrollments_to_course_dates: 登録をコース日付に制限
+      root_account_id: "ルート アカウント ID"
+      self_enrollment: セルフ登録
+      self_enrollment_code: セルフ登録コード
+      self_enrollment_limit: セルフ登録制限
+      show_all_discussion_entries: "すべてのディスカッション エントリを表示"
+      show_public_context_messages: "公開コンテキスト メッセージの表示"
+      sis_batch_id: "SIS バッチ ID"
+      sis_source_id: "SIS ソース ID"
+      start_at: 開始日
+      storage_quota: 記憶域のクォータ
+      syllabus_body: 要綱本文
+      tab_configuration: タブ設定
+      template_course_id: "テンプレート コース ID"
+      turnitin_comments: "Turnitin コメント"
+      updated_at: 更新日
+      uuid: UUID
+      wiki_id: "Wiki ID"
+      workflow_state: ワークフロー状態
   course_restore: 
     restore_error: コースを復元する際にエラーが発生しました。コースは復元されませんでした。
   course_search: 
@@ -4264,7 +4377,7 @@ ja:
     invitation_sent_now: 今すぐ
     link_students_placeholder: 受講生名を入力する
     links: 
-      less_options: 少ないオプション
+      fewer_options: 少ないオプション
       more_options: その他のオプション
       publish: "成績表を SIS に公開"
       publishing: "成績表を SIS に公開しています..."
@@ -5161,6 +5274,10 @@ ja:
     cancel: キャンセル
     save_settings: 設定の保存
     saving: 保存しています...
+  differentiated_assignments_description: |-
+      分化課題とは、課題が適用されるセクションを選択できる *ベータ* 機能です。
+      課題が割り当てられていないセクションでは、コースの内容に課題が表示されず、
+      最終的な成績は課題の点数なしで計算されます。
   discussion_entries: 
     created_entry_notice: エントリは正常に作成されました。
     deleted_entry_notice: そのエントリは削除されました
@@ -5441,6 +5558,10 @@ ja:
     unsubscribe: このトピックの購読を中止
     unsubscribed: 購読中止済み
     unsubscribed_hint: このトピックを購読していません。購読するにはクリックします。
+  draft_state: 
+    cant_unpublish_when_students_submit: 受講生の提出物がある場合は、未公開にできません
+    publish: 公開
+    unpublish: 未公開
   draft_state_description: |-
       このベータ機能では、Canvas の多くの部分を再設計し、コンテンツを新しい未公開の状態に
       することができます。この状態では、コンテンツは受講生に表示されず、成績の計算からも除外され
@@ -6025,6 +6146,7 @@ ja:
       feature_options: 機能オプション
       no_features_available: 現在利用できる機能はありません。
   features: 
+    differentiated_assignments: 分化課題
     draft_state: ドラフト状態
     draft_state_account_disable_warning: |-
         この機能をオフにすると、既存のコースに影響があります。この機能を無効にする場合は、Canvas サクセス マネージャに
@@ -6035,6 +6157,7 @@ ja:
     google_docs_domain_restriction: "Google ドキュメントのドメイン制限"
     outcome_gradebook: 成果成績表
     screenreader_gradebook: "スクリーン リーダー用成績表"
+    student_outcome_gradebook: 受講生成果成績表
   file_browser_view: 
     folder_tree_instructions: "上および下方向キーを使用して、ツリー内をナビゲートします。フォルダを展開するには右方向キーを、折りたたむには左方向キーを、画像を選択するには Enter キーを押します。"
   filebrowserview: 
@@ -6448,6 +6571,7 @@ ja:
       set_group_weights: グループの重み付けの設定
       show_attendance_columns: 出席者列の表示
       show_concluded_enrollments: 完了した登録の表示
+      srgb_gradebook: 成績表の切り替え
       upload_scores: "スコアのアップロード (.csv から)"
       view_grading_history: 採点履歴の表示
     show_notes: メモ列を表示
@@ -6588,6 +6712,7 @@ ja:
       muted: ミュートになっています
     grade_summary: 
       assessment_by: "アセスメント担当者: %{name}"
+      assignments: 課題
       buttons: 
         show_what_if: "保存済みの \"What-If\" スコアを表示"
       change_score_instructions: 任意のスコアをクリックして別の値を入力すると、変更後の合計がどうなるかを確認できます。
@@ -6624,6 +6749,7 @@ ja:
         only_graded: 採点済みの課題のみに基づいて計算する
         total: 合計
         your_score: ご自分のスコア
+      learning_outcomes: 学習の達成度
       links: 
         click_to_view: ここをクリックして表示
         download: "%{attachment} のダウンロード"
@@ -6909,6 +7035,7 @@ ja:
     grade_incomplete: 未完了
     grade_ungraded: 未採点
     out_of: "(配点: %{points})"
+    out_of_nil: 配点なし
     out_of_with_score: "(スコア: %{score} / 配点: %{points})"
   grading_standard: 
     unknown_grading_details: 不明の詳細
@@ -8425,10 +8552,10 @@ ja:
           audio_comment: "このメッセージにはメディア コメントが含まれています。再生または返信するには、次のリンクをクリックしてください:"
           body: "たった今、Canvas で %{user_name} さんからメッセージが送信されました:"
           download: ダウンロード
-          reply_message: "このメッセージに返信するには、次のリンクをクリックしてください:"
+          reply_to_conversation_message: "この電子メールに直接返信して、Canvas  でこのメッセージに返信できます。"
           subject: "たった今、Canvas で %{user_name} さんからメッセージが送信されました。"
           unknown_user: 不明なユーザ
-        reply_message: "このメッセージに返信するには、下のリンクをクリックしてください:"
+        reply_to_conversation_message: "この電子メールに直接返信して、Canvas  でこのメッセージに返信できます。"
         subject: "たった今、Canvas で %{user_name} さんからメッセージが送信されました。"
         unknown_user: 不明なユーザ
       facebook: 
@@ -9048,10 +9175,10 @@ ja:
     new_discussion_entry: 
       email: 
         body: "%{user} は、%{course} のスレッド「%{discussion_topic}」について、新しいコメントを投稿しました:"
-        details: "会話に参加する場合はここにアクセスしてください:"
+        discussion_entry_reply_message: 以下のリンクを使用して会話に参加するか、またはこのメッセージに返信してコメントします。
         html: 
           body: "%{user} は、「%{course}」のスレッド「%{discussion_topic}」について、新しいコメントを投稿しました:"
-          details: 会話に参加するにはここをクリック
+          discussion_entry_link_message: "[ここをクリックして会話に参加する](%{url}) か、またはこのメッセージに返信してコメントします。"
           subject: "「%{discussion_topic}」への新しいコメント: %{course}"
         subject: "%{discussion_topic} への新しいコメント: %{course}"
       facebook: 
@@ -9351,9 +9478,9 @@ ja:
         body: "%{author} は、たった今、%{assignment} への提出物について %{user} に新しいコメントを書きました"
         html: 
           body: "%{author} は、たった今、%{assignment} に関する %{user} の提出物について新しいコメントを書きました"
-          link_message: "提出物の詳細はここでレビューできます:"
           someone: 名前未登録ユーザ
           subject: "提出コメント: %{user}、%{assignment}、%{context}"
+          submission_comment_link_message: 以下のリンクを使用して提出物の詳細を確認できます。または、このメッセージに応答してこのコメントに返信できます。
         link_message: "提出物の詳細はここでレビューできます:"
         someone: 名前未登録ユーザ
         subject: "提出コメント: %{user}、%{assignment}、%{context}"
@@ -9376,9 +9503,9 @@ ja:
           link_message: "提出物の詳細はここでレビューできます:"
           someone: 名前未登録ユーザ
           subject: "提出コメント: %{user}、%{assignment}、%{context}"
-        link_message: "提出物の詳細はここでレビューできます:"
         someone: 名前未登録ユーザ
         subject: "提出コメント: %{user}、%{assignment}、%{context}"
+        submission_comment_link_message: 以下のリンクを使用して提出物の詳細を確認できます。または、このメッセージに応答してこのコメントに返信できます。
       facebook: 
         body: "*%{author}* は、たった今、**%{assignment} への提出物について %{user}** に新しいコメントを書きました。"
         someone: 名前未登録ユーザ
@@ -9871,8 +9998,8 @@ ja:
     : はい
   outcome_gradebook_description: |-
       講師は、成果成績表を使用して、コース学習成果の受講生およびコース進捗を簡単に表示
-      できます。成果は成績表のような形式で表示され、受講生の進捗が数字のスコアおよび達成/
-      ほぼ達成/補習として表示されます。
+      できます。成果は成績表のような形式で表示され、受講生の進捗が数字のスコアおよび達成/ほぼ
+      達成/補習として表示されます。
   outcome_groups: 
     invalid_file: "無効な成果グループ ファイルです"
   outcome_groups_api: 
@@ -10114,14 +10241,6 @@ ja:
       description: "Dimdim インスタンスへのアクセスが必要になります。"
       labels: 
         domain: ドメイン
-    embedly: 
-      description: "コレクションの Embedly 情報を取得する"
-      name: "Embedly の統合"
-    embedly_settings: 
-      description: "このプラグインは Embedly サービスと統合し、コレクション アイテムの情報を事前に設定します。有料プランでは無料プランより多くの情報が返されます。ページの複数の画像から選択でき、インライン プレビューについての埋め込み情報が返されます (YouTube ビデオの再生など)。"
-      labels: 
-        api_key: "Embedly API 鍵"
-        plan_type: "Embedly プラン タイプ"
     error_reporting: 
       description: デフォルトのエラー報告メカニズム
       name: エラー報告
@@ -10297,6 +10416,7 @@ ja:
       labels: 
         download_url: "LockDown ブラウザのダウンロード URL"
         plugin_enabled: 使用可能
+        use_lti_tool: "LTI ツールを使用して、LockDown Browser のクイズ設定を管理する (監視に必要)"
     med_cornell_export: 
       labels: 
         password: 認証用パスワード
@@ -10834,6 +10954,7 @@ ja:
   qti_display: QTI
   qti_file_description: "QTI .zip ファイル"
   qti_name: "QTI コンバータ"
+  qualified_locale: ja-JP
   question_answered: 解答済み
   question_bank: 
     align_outcomes: 成果の整列
@@ -10951,14 +11072,6 @@ ja:
       regrade_options: "再評価オプション *(すでにこの問題に回答した受講生用):*"
       some_scores_reduced: "正しい回答に対してのみポイントを与える (*一部の受講生は減点される場合があります*)"
       update_question_without_regrading: 再評価せずに問題を更新する
-  quiz_group: 
-    errors: 
-      no_bank: "クイズ グループ %{group_name} の問題バンクが見つかりませんでした"
-      no_permissions: "ユーザにはクイズ グループ %{group_name} の問題バンクを参照する権限がありませんでした"
-    question_group: 問題グループ
-  quiz_question: 
-    defaults: 
-      question_name: 問題
   quiz_reports: 
     quiz_report_generator: 
       download_report_name: "%{report_name} のダウンロード"
@@ -10966,27 +11079,10 @@ ja:
       generated_at_date_time: "作成日: %{dateAndTime}"
       generating_report_name: "%{report_name}を生成しています..."
       item_analysis_not_available: サーベイではアイテム分析は利用できません
-  quiz_statistics: 
-    statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} レポート"
-    types: 
-      item_analysis: アイテム分析
-      student_analysis: 受講生分析
   quiz_submissions: 
-    errors: 
-      invalid_submissions: このクイズへの提出物は、提出者のものであると確認できませんでした。もう一度やり直してください。
-      late_quiz: このクイズへの提出が遅れました。解答は記録されていない可能性があります。
-      protected_quiz: このクイズは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このクイズに参加できる正当な場所ではないようです。
     show: 
       score_out_of: "配点 %{points_possible} のうち、スコアは %{score} でした。"
-    still_zipping: まだファイルの圧縮が進行中です...
   quizzes: 
-    access_code: 
-      buttons: 
-        submit: 提出
-      labels: 
-        access_code: "アクセス コード"
-      quiz_restricted: "このクイズはアクセス コードで制限されています。クイズに回答するためには、アクセス コードを打ち込んでくれるよう、またはアクセス コードを教えてくれるよう、講師または試験監督官に依頼する必要があります。"
-      survey_restricted: "このサーベイはアクセス コードで制限されています。サーベイに回答するためには、アクセス コードを打ち込んでくれるよう、またはアクセス コードを教えてくれるよう、講師または試験監督官に依頼する必要があります。"
     after_last_attempt: 前回の試行以降
     alerts: 
       no_valid_combinations: システムは、指定されたパラメータに対して有効な組み合わせを生成できませんでした
@@ -10996,6 +11092,7 @@ ja:
     always: 常に
     answer_comments: 解答コメント
     answer_text: 解答テキスト
+    assignment: 課題
     assignment_points_possible: 
       one: "%{count} 点"
       other: "%{count} 点"
@@ -11028,85 +11125,13 @@ ja:
     default_answer_comments: 受講生がこの解答を選択した場合の応答
     default_answer_comments_on_match: 受講生の解答がこの解答と一致した場合の応答
     default_comments_on_wrong_match: ユーザの解答が一致しなかった場合の応答
-    default_history_crumb: 履歴
     default_quesiton_name: 問題
     default_question_name: 問題
     default_quiz_title: クイズ
     default_response_to_essay: 受講生が解答を提出した後、受講生に表示する応答
     default_response_to_file_upload: 受講生が解答を提出した後、受講生に表示する応答
-    default_title: 新しいクイズ
-    display_answer: 
-      labels: 
-        answer_with_margin: 誤差
-        your_answer: 解答
-      margin_of_error: 誤差
-      plus_or_minus: +/-
-      range_answer: "%{lower_bound} と %{upper_bound} の間"
-      you_left_this_blank: 空白のままになっています
-    display_question: 
-      default_question_answer: "[ 選択 ]"
-      flag_this_question: この問題にフラグを設定
-      headers: 
-        formulas: 数式
-        possible_solutions: 可能な解
-        solution_answer: 解答
-        variable_maximum: 最大
-        variable_minimum: 最小
-        variable_name: 可変
-        variable_precision: 小数点以下の桁数
-        variables: 変数
-      labels: 
-        additional_comments: 追加コメント
-        for_answer_number: "解答 %{answer_number} の場合"
-        warning_icon: 警告
-      links: 
-        delete_question: この問題を削除
-        edit_question: この問題を編集
-        move_copy_question: 問題を別のバンクに移動/コピー
-      not_yet_graded: まだ採点されていません
-      original_score: "元のスコア:"
-      points_possible: "%{points_possible} 点"
-      regraded_score: "再評価スコア:"
-      show_ansers_for_variable: "%{variable} の解答を表示"
-      skip_question_text: 問題文までスキップします。
-      submission_was_regraded: この問題は再評価されました。
-      titles: 
-        question_correct_comment: 受講生の解答が正解だった場合に、このコメントを表示
-        question_incorrect_comment: 受講生の解答が不正解だった場合に、このコメントを表示
-        question_neutral_comment: 受講生が問題に解答した時点で、このコメントを表示
-      unsupported_question_type: "この問題は、外部ソースからインポートされました。'%{question_type}'の問題でしたが、これはこのクイズ ツールでサポートされていません。"
-      you_left_this_blank: 空白のままになっています
     download_all_quiz_file_upload_submissions: "すべてのクイズのファイル アップロードによる提出物のダウンロード"
-    download_file_upload_submissions: 
-      links: 
-        download_submissions: すべてのファイルのダウンロード
     enter_answer_variable_above: "[ 上記に解答の変数を入力 ]"
-    equations_help: 
-      equation_functions: |-
-          変数に加え、ヘルパ関数のコレクションもあり、
-          これを使用して有用な値を生成することができます。例: 
-          
-          %{example}
-          
-          所定のヘルパ関数の説明を表示するには、下のリストから関数を
-          選択します:
-      equation_intro: |-
-          計算後の問題は、１ つ以上の数式のセットを順番に計算した結果に 
-          基づきます。これらの式に中間媒介変数を定義できますが、
-          最後の式の計算結果が正解を生成するために使用される
-          ものです。例: 
-          
-          %{example}
-          
-          この数式のセットの場合、最終的な答えは 71 です。しかし、
-          事前定義された変数がないので、すべての受講生に対する問題が
-          同じになり、答えも同じになります。変数の詳細については "変数" タブ
-          を参照してください。
-      equation_variables2: "問題文の中で括弧を使用して、変数を定義することもできます (\" [a] + [b] は何ですか?\")。どの変数にも、変数設定に基づいて \"値の例\" が表示されます。これで、演算を確認し、数式が機能することを確認できます。例えば、問題が \"[a] + 5 は何ですか?\" の場合、変数 \"a\" を定義するよう求められます。\"a\" の値の例が 5.2 であれば、次のようになります: %{example}。この数式を使用すれば、解のセットをいくらでも生成し、セットごとに \"a\" の値を変えることができます。ある受講生に表示される問題は \"5.2 + 5 は何ですか?\" となり、別の受講生には \"9 + 5 は何ですか?\" となります。"
-      links: 
-        functions: 関数
-        intro: はじめに
-        variables: 変数
     errors: 
       adding_questions_failed: 問題の追加に失敗しました。もう一度やり直してください
       creating_group_failed: グループの作成に失敗しました。もう一度、試してください。
@@ -11120,16 +11145,11 @@ ja:
       missing_ip_filter: "有効な IP アドレスを入力する必要があります"
       no_answer: "解答を少なくとも 1 つ追加してください"
       no_correct_answer: 正解を選択してください
-      no_more_attempts: 試行回数の残りのクイズはありません
       no_possible_solution: "可能な解を少なくとも 1 つ生成してください"
-      quiz_deleted: そのクイズは削除されました
       quiz_score_not_a_number: "スコアは 0 ～ 2,000,000,000 の数字で指定してください。"
       quiz_score_too_long: "スコアは 2,000,000,000 未満の数字で指定してください。"
       quiz_score_too_short: "スコアは 0 より大きい数字で指定してください。"
-      quiz_update_failed: クイズの更新が失敗しました
       retrieving_filters_failed: フィルタの取得に失敗しました
-    fabulous_quizzes: 
-      page_titles: クイズ
     ? "false"
     : "False"
     file_uploaded_or_removed: 
@@ -11137,134 +11157,6 @@ ja:
         file_successfully_uploaded: ファイルがアップロードされました。
         files_removed: "%{display_name} は削除されました。"
     final_answer: 最終的な答え
-    find_question_from_bank: 
-      already_added: この問題は既にクイズに含まれています
-      bank_description: "%{bank_name}、%{n} 件の問題"
-      buttons: 
-        add_questions: 問題の追加
-        create_group: グループの作成
-        select_bank: バンクの選択
-      group_pick_count: "%{pick_count} 件の問題"
-      group_points: "%{points} / 問題"
-      headers: 
-        bank_name: バンク名
-      hints: 
-        group_pick_count: "今までのところ %{pick_count} 件が選択されました"
-      labels: 
-        add_questions_to_group: "クイズ グループに問題を追加"
-        group_name: グループ名
-        group_pick_count: 選択
-        group_points: 点数
-      links: 
-        clear_all_banks: すべてをクリア
-        manage_question_banks: コースの問題バンクの管理
-        more_questions: その他の問題
-        select_all_banks: すべて選択
-      options: 
-        new_group: "[ 新しいグループ ]"
-        no_group: "[ グループなし ]"
-      select_a_question_bank: 下のリストから問題バンクを選択し、このクイズに問題グループとしてリンクします。
-      titles: 
-        add_new_question_group: 新しい問題グループの追加
-    form_answer: 
-      answer_in_range_accessible: "*範囲開始* と #範囲終了# の間"
-      answer_text: 解答テキスト
-      answer_weight: 回答の重み
-      exact_answer_with_error_margin_accessible: "許容誤差 #許容誤差# のある *厳密な解答*"
-      labels: 
-        answer_comments: 受講生がこの解答を選択した場合のコメント
-        answer_in_range: 範囲内での解答
-        exact_answer: 正確な解答
-      matching_left: 左側と照合
-      matching_right: 右側と照合
-      numerical_answer: 数値による解答
-      possible_answer: 考えられる解答
-      titles: 
-        click_to_enter_answer_comments: 受講生がこの解答を選択した場合のコメントを、クリックして入力
-        click_to_set_as_correct: クリックして、この解答を正解として設定
-        delete_answer: この解答を削除
-        edit_as_html: "回答テキストを HTML として編集するかどうか"
-    form_question: 
-      allow_tolerance: "+/- %{tolerance} の誤差を許容"
-      buttons: 
-        create_update_question: 問題の作成/更新
-        generate: 生成
-        recompute: 再計算
-      correct_answer_comments: 正解コメント
-      distractor_instructions: デストラクタをそれぞれの線上に入力
-      equation_example: "つまり、\"5 プラス [x] は何ですか?\""
-      explanation: 
-        generate_possible_solutions: 最後に、変数と解の組をクイズに必要な数だけ作ります。
-      explanations: 
-        calculated: 問題を入力し、数式を組み立て、考えられる解答の組み合わせのセットを生成します。受講生には、無作為に選択された変数のセットが埋め込まれた問題が出題されます。受講生は、数値による正しい答えを入力する必要があります。
-        equations: 変数は、変数名を括弧で囲んで入力することによって定義できます。
-        essay: "受講生は、与えられたテキスト フィールドに答えを書きます。"
-        file_upload: 受講生が自分の回答ファイルをアップロードできます。
-        fill_in_multiple_blanks: "問題を入力し、どの部分を空白にするか指定します。次に、それぞれの空白箇所に対して、考えられる答えを定義します。受講生は、それぞれの空白箇所にあるテキスト ボックスに正解を入力しなければなりません。"
-        formula_definition: "次に、正解を計算するために使用される数式 (1 つまたは複数) を書く必要があります。上記にリストされている変数名と同じ変数名だけを使用してください。"
-        matching: 一致する値の対を組み立てます。受講生は、表示された左側の値を見て、右側に入る値をドロップダウンから選択する必要があります。複数の行が同じ答えでも構わず、また、右側に追加のデストラクタを追加することもできます。
-        missing_word: "ドロップダウンの前後に入るテキストを定義します。考えられる答えのセットを組み立てて、正解を 1 つ選択します。"
-        multi_answer_sets: "下のボックスで、解答ボックスを表示するすべての場所に、基準語 (スペースなし) を括弧で囲んで入力します。"
-        multiple_answers: この問題では、それぞれの答えの横にチェックボックスが表示されます。受講生は、正解とマークされている答えを「すべて」選択しなければなりません。
-        multiple_choice: "問題と複数の答えを入力し、正解を 1 つ選択します。"
-        multiple_dropdowns: "問題を入力し、どの部分をドロップダウンにするかを指定します。次に、それぞれのドロップダウンに対して考えられる答えを定義し、ドロップダウン 1 つにつき、正解を 1 つ設けます。"
-        numerical: "ある範囲内の任意の数値で、または、ある数値からの増減の誤差で正解を定義します。受講生は、表示された空のテキスト ボックスに数値で答えを入力します。"
-        short_answer: |-
-            問題文を入力し、空白箇所に対して考えられる正解をすべて定義します。  
-            受講生は、問題文の後ろに表示されている小さなテキスト ボックスに答えを入力します。
-        text_only: "この \"問題\" には点数は付かず、関連のある問題のセットを紹介するのに役立ちます。"
-        true_false: 問題文を入力し、真または偽のどちらが正解であるかを選択します。
-        variable_definitions: 上で変数を入力してあれば、ここにリストされます。下のそれぞれの変数に対して、考えられる値の範囲を指定できます。
-      general_answer_comments: 解答についての全般的なコメント
-      headers: 
-        formula_definition: 数式の定義
-        generate_possible_solutions: 全般的な可能な解
-        variable_definitions: 変数定義
-        variable_example_value: 値の例
-        variable_maximum: 最大
-        variable_minimum: 最小
-        variable_name: 可変
-        variable_precision: 小数点以下の桁数
-      label: 
-        question: 
-          name: 問題名
-          points: 問題の点数の値
-          type: 問題の種類
-      labels: 
-        answers: 解答
-        distractors: "付加的な一致の可能性 (デストラクタ)"
-        missing_word_after: 解答の後ろにくるテキスト
-        points: 点
-        question: 問題
-      links: 
-        add_another_answer: 別の解答を追加
-        need_help: ヘルプが必要ですか?
-      multi_answer_sets_example: "つまり、\"バラは [color1]、スミレは [color2]\""
-      offer_combinations: "考えられる値の組み合わせを %{how_many} 組、提供する (最大 %{max_combinations} 組)"
-      options: 
-        only_one_correct: "正解は 1 つのみ"
-        students_select_multiple: 受講生は複数の解答を選択
-      question_type: 
-        calculated: 数式問題
-        essay: 小論文問題
-        file_upload: "ファイル アップロード問題"
-        fill_in_multiple_blanks: 複数穴埋め
-        matching: 整合
-        missing_word: 適語補充
-        multiple_answers: 複数解答
-        multiple_choice: 複数選択
-        multiple_dropdowns: 複数ドロップダウン
-        numerical: 数値による解答
-        short_answer: 穴埋め
-        text_only: "テキスト (問題ではない)"
-        true_false: 真/偽
-      show_possible_answers: "%{question} に対する考えられる解答を表示"
-      show_possible_answers_no_question: 考えられる解答を表示
-      titles: 
-        click_to_enter_correct_answer_comments: クリックして、正解に対するコメントを入力
-        click_to_enter_general_answer_comments: クリックして、全般的なコメントを入力
-        click_to_enter_wrong_answer_comments: クリックして、不正解に対するコメントを入力
-      wrong_answer_comments: 不正解時のコメント
     graded_quiz: 採点済みのクイズ
     graded_survey: 採点済みのサーベイ
     headers: 
@@ -11293,68 +11185,14 @@ ja:
         other: "%{count} 分"
         zero: "1 分未満"
       score_out_of_points_possible: "%{score} / 配点: %{points_possible}"
-    history: 
-      anonymous_username: 受講生
-      buttons: 
-        allow_extra_attempt: この受講生に追加の試行を許可
-      count_attempts_left: 
-        one: "%{user} はあと %{count} 回試行できます"
-        other: "%{user} はあと %{count} 回試行できます"
-      default_quiz_name: "クイズ %{course_name}"
-      default_survey_name: "サーベイ %{course_name}"
-      grade_by_question_warning: グループ内で問題をシャッフルした場合は、問題ごとの成績機能に影響があります。
-      headers: 
-        quiz_submissions: クイズへの提出物
-        survey_submissions: サーベイへの提出物
-      latest_quiz_results: "ここに示すのは、%{user} の直近のクイズ結果です。任意の問題について点数を変更したり、コメントを追加したりできます。その後、ページの下の \"スコアの更新\" をクリックしてください。"
-      latest_survey_results: "ここに示すのは、%{user} の直近のサーベイ結果です。任意の問題について点数を変更したり、コメントを追加したりできます。その後、ページの下の \"スコアの更新\" をクリックしてください。"
-      links: 
-        back_to_quiz: クイズに戻る
-        back_to_survey: サーベイに戻る
-      logged_out_user: "ログアウトしたユーザ %{index}"
-      named_quiz_results: "%{quiz_name} 対象ユーザ: %{user}"
-      next_questions_arrow_title: 次の問題
-      no_more_attempts: "%{user} は試行回数の残りがありません"
-      page_title_quiz: "%{user} さんのクイズ履歴"
-      page_title_survey: "%{user} さんのサーベイ履歴"
-      prev_questions_arrow_title: 前の問題
-      quiz_not_yet_taken: クイズにまだ回答していません。
-      quiz_not_yet_taken_or_in_progress: クイズにまだ回答していないか、または現在進行中です
-      quiz_unlimited_attempts: このクイズには試行回数の制限がありません
-      score_for_attempt: "試行回数 %{attempt_number}: %{score}"
-      survey_not_yet_taken: サーベイにまだ回答していません。
-      survey_not_yet_taken_or_in_progress: サーベイにまだ回答していないか、または現在進行中です
-      survey_unlimited_attempts: このサーベイには試行回数の制限がありません
-      titles: 
-        score_pending_review: このスコアはレビューが保留になっているため、変更の可能性あり
-        submission_needs_review: この提出物はレビューが必要
-      unnamed_quiz_results: "%{user} さんのクイズ結果"
-      unnamed_survey_results: "%{user} さんのサーベイ結果"
+    highest: 最高
     index: 
       buttons: 
-        publish_quizzes: クイズの公開
         publishing_quizzes: クイズを公開しています...
       confirms: 
         delete_quiz: このクイズを削除してもよろしいですか?
       default_title: 名前の付いていないクイズ
-      headers: 
-        assignment_quizzes: 課題クイズ
-        course_quizzes: "コース クイズ"
-        practice_quizzes: 練習クイズ
-        publish_multiple_quizzes: 複数のクイズの公開
-        surveys: サーベイ
-        unpublished_quizzes: 未公開のクイズ
-      labels: 
-        publish_multiple_quizzes: 現段階で公開するクイズを選択してください
-      links: 
-        create_new_quiz: 新しいクイズの作成
-        manage_question_banks: 問題バンクの管理
-        publish_multiple_quizzes: 複数のクイズの公開
       multiple_due_dates: 複数の日付
-      no_quizzes: 利用できるクイズはありません
-      page_titles: クイズ
-      titles: 
-        this_quiz_is_locked: このクイズは現在ロックされています。詳細を表示するにはクリック
     index_view: 
       add_quiz: クイズ
       links: 
@@ -11363,9 +11201,6 @@ ja:
         settings: 設定
       search_for_quiz: クイズの検索
       title_add_quiz: クイズを追加
-    invalid_ip: 
-      quiz_protected: このクイズは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このクイズに参加できる正当な場所ではないようです。
-      survey_protected: このサーベイは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このサーベイに参加できる正当な場所ではないようです。
     keep_highest: 最高
     keep_latest: 前回
     label: 
@@ -11384,6 +11219,14 @@ ja:
       multiple_blanks_question: 周りのテキストを読み、空白を埋めてください
       other_incorrect_matches: 不正解となる他の整合選択肢
       possible_answer: 考えられる解答
+    latest: 直近
+    ldb_login_popup: 
+      email: "電子メール アドレス"
+      log_in: ログイン
+      logged_out_of_canvas: "*Canvas からログアウトしています。*続行するにはログインしてください。"
+      password: パスワード
+      titles: 
+        log_in: ログインしてください
     links: 
       resume_quiz: クイズの再開
       resume_survey: サーベイの再開
@@ -11397,19 +11240,6 @@ ja:
     loading_question: 問題を読み込んでいます...
     loading_question_banks: 問題バンクを読み込んでいます...
     loading_questions: 問題を読み込んでいます...
-    lockdown_browser_required: 
-      headers: 
-        requires_lockdown: "Respondus LockDown Browser が必要"
-      labels: 
-        download_lockdown: このブラウザをまだインストールしていない場合は、ここからダウンロードしてください
-      links: 
-        download_lockdown: "[Respondus LockDown Browser をダウンロード]"
-      requires_lockdown: "このクイズを実行するには、Respondus LockDown Browser が必要です。このクイズに回答する、またはクイズの結果を表示するには、Respondus LockDown Browser を起動します。"
-    managed_quiz_data: 
-      anonymous_student: "受講生 %{user_counter}"
-      logged_out_user: "ログアウトしたユーザ %{user_counter}"
-      titles: 
-        submission_needs_review: この提出物はレビューが必要
     message_students: 受講生にメッセージを送る
     message_students_for_context: "%{context} に関して受講生にメッセージを送る"
     messages: 
@@ -11418,9 +11248,7 @@ ja:
       no_unsubmitted_students_quiz: すべての受講生がクイズに回答しました。
       no_unsubmitted_students_survey: すべての受講生がサーベイに回答しました。
     moderate: 
-      add_time: 時間の追加
       buttons: 
-        change_extensions_for_selected_students: "%{n} 名の選ばれた受講生に対する延長時間の変更"
         extend_time: 時間の延長
         extending_time: 時間を延長しています...
         save: 保存
@@ -11430,9 +11258,6 @@ ja:
         time_extension_failed: 時間延長に失敗しました。もう一度やり直してください
       confirms: 
         taking_time_away: その設定では、受講生の現在の持ち時間より少なくなってしまいます。続行しますか?
-      end_quiz_reference_time_current_end: 現在の終了時刻
-      end_quiz_reference_time_now: 今すぐ
-      end_quiz_when: "%{reference_time} から %{n} 分でクイズを終了します。"
       errors: 
         quiz_submission_extra_attempts_not_a_number: 追加の試行回数は数字で指定してください。
         quiz_submission_extra_attempts_too_long: "追加の試行回数は 1000 未満で指定してください。"
@@ -11441,196 +11266,32 @@ ja:
         quiz_submission_extra_time_too_long: "延長時間は 10080 未満で指定してください。"
         quiz_submission_extra_time_too_short: "延長時間は 0 より大きい数字で指定してください。"
         server_communication_failed: "サーバとの通信で問題が発生しました。5 分後に再試行されます。またはページを再読み込みしてください"
-      extended_quiz_time_explanation: この受講生に対して、現在行われているクイズの制限時間を延長することができます。どのくらい延長しますか?
       extensions_for_student: "%{student} に対する延長時間"
       extensions_for_students: 
         one: "%{count} 人の受講生に対する延長"
         other: "%{count} 人の受講生に対する延長"
-      finished_in: "%{duration} で完了しました"
       finished_in_duration: "%{duration} で完了しました"
-      global_extra_attempts: "全員が既に %{n} を獲得しています"
-      headers: 
-        attempt: 試行回数
-        attempts_left: 残りの試行回数
-        extended_quiz_time: クイズの時間延長
-        score: スコア
-        student: 受講生
-        student_extensions: 受講生の延長時間
-        time: 時刻
-      in_progress: 進行中
-      labels: 
-        ending: 終了
-        extra_attempts: 追加の試行回数
-        extra_time_per_attempt: すべての試行に対する延長時間
-        manually_unlock: 次回試行に備え、このクイズを手動でロック解除する
-        started: 開始しました
-      minutes: 分
-      page_title: クイズの管理
-      student_gets_extra_time: "*%{student_name}* は **試行 1 回につき %{extra_time} 分の延長時間を獲得しました**"
-      student_n: "受講生 %{n}"
       time_up: 制限時間になりました!
       titles: 
-        change_user_extensions: ユーザの延長時間の変更
         extend_quiz_time: クイズの時間延長
-        manually_unlocked: 手動でロック解除済み
-        minutes_to_add: "追加時間 (分)"
-        select_deselect_all: すべて選択/選択解除
-        select_user: "%{user} の選択"
         student_extensions: 受講生の延長時間
     more_questions: その他の問題
-    multi_answer: 
-      choose_answer: 選択
-    muted: 
-      muted_quiz_description: クイズのスコアは、インストラクタがまだ採点を完了していないため、入手できません。インストラクタが採点を完了した時点で、このページからスコアを入手できます。
-      muted_quiz_header: クイズはミュートになっています
-    new: 
-      allowed_attempts: 許可された試行の回数
-      anonymous_submissions: 提出物の匿名状態を維持
-      buttons: 
-        not_published: 未公開
-        published: 公開済み
-        save: 保存
-      cant_go_back: 回答の後で問題をロックする
-      default_page_title: 新しいクイズ
-      group: 課題グループ
-      headers: 
-        ip_filters: "クイズ IP フィルタとは何ですか?"
-      hide_correct_answers_at: 正解を非表示
-      hints: 
-        question_detail_disabled: "注: %{question_count} より多い場合は、問題の詳細を使用できません。"
-        quiz_score: 受講生は、このサーベイに回答すると、自動的に全単位を取得します
-      ip_filters: "クイズ IP フィルタは、クイズへのアクセスを、指定の IP 範囲内にあるコンピュータに制限するための一手段です。フィルタは、カンマ区切りのアドレス リストとして指定するか、任意のアドレスに続けてマスクを指定します (\"192.168.217.1\"、\"192.168.217.1/24\"、または \"192.168.217.1/255.255.255.0\")。"
-      label: 
-        time_limit: 制限時間
-      labels: 
-        allow_multiple_attempts: 複数回の試行を許可
-        hide_results_only_after_last: 最終試行後のみ
-        ip_filter: "フィルタの IP アドレス"
-        never_hide_results: 受講生にクイズの結果を表示
-        quiz_instructions: クイズの指示
-        quiz_notify: この問題が変更されたことをユーザに通知します
-        quiz_score: スコア
-        require_access_code: "アクセス コードを要求"
-        restrict_quiz: クイズの制限
-        show_question_details: 問題の詳細情報の表示
-      limited_attempts: 許可されている試行回数
-      links: 
-        cancel: キャンセル
-        find_questions: 問題の検索
-        new_question: 新しい問題
-        new_question_group: 新しい問題グループ
-        show_assignment_rubric: 注釈の表示
-      manage: 管理
-      minutes: 分
-      new_assignment: 新しい課題
-      new_discussion: 新しいディスカッション
-      one_question_at_a_time: "一度に 1 つの問題を表示する"
-      points_possible: "配点 %{n} "
-      quiz_title: "クイズ タイトル"
-      quiz_type: "クイズ タイプ"
-      require_lockdown_browser: "Respondus LockDown Browser を要求"
-      require_lockdown_browser_for_results: クイズの結果を表示するために必要
-      retrieving_filters: フィルタを取得しています...
-      score_to_keep: "保持するクイズ スコア"
-      show_correct_answers: 受講生に正解を表示
-      show_correct_answers_at: 正解を表示
-      shuffle_answers: 解答のシャッフル
-      students_cannot_view_responses_after_course_concludes: 受講生は、コース終了後はクイズの回答を表示できません
-      time_limit: 何分ですか?
-      titles: 
-        click_to_select_filter: クリックでこのフィルタを選択
-        delete: 削除
-        find_ip_address_filter: "IP アドレス フィルタの検索"
-      warnings: 
-        has_student_submissions: 受講生は既にこのクイズに回答したか、回答を始めています。編集は慎重に行ってください。大幅に変更したクイズ問題がある場合は、古いバージョンのクイズに回答した受講生の採点をやり直すことを検討してください。
     no_filters_found: フィルタが見つかりません
     no_quizzes_view: 
       headers: 
         course_quizzes: "コース クイズ"
       no_quizzes: 利用できるクイズはありません
     notices: 
-      cant_view_submission_while_muted: クイズがミュートになっている間は、そのクイズの履歴を表示できません。
-      has_submissions_already: 一部の受講生は既にこのクイズに回答したか、または回答し始めていることを、忘れないでください。
-      less_than_allotted_time: このクイズを期限間近になって開始したため、制限時間をフルに使えないかもしれません。
       message_sent: メッセージが送信されました!
-      no_submission_for_user: このユーザが利用できる提出物がありません
-      quiz_updated: クイズは正常に更新されました
-      quizzes_published: 
-        one: "%{count} 個のクイズが正常に公開されました!"
-        other: "%{count} 個のクイズが正常に公開されました!"
-      quizzes_unpublished: 
-        one: "%{count} 個のクイズが正常に公開中止されました!"
-        other: "%{count} 個のクイズが正常に公開中止されました!"
     practice_quiz: 練習クイズ
     practices_label: "練習クイズ: クイズの表示/非表示の切り替え"
     question_colon: "問題:"
     question_count: 
       one: "%{count} 件の問題"
       other: "%{count} 件の問題"
-    question_group: 
-      buttons: 
-        update: 更新
-      default_group_name: グループ
-      edit_questions_and_points: "*%{num_questions}* 問選択、1 問 #%{num_points}# 点"
-      labels: 
-        group_name: グループ名
-        number_of_questions: 問題数
-        points_per_question: 問題ごとの点数
-        question_bank: 問題はこのバンクから出されます
-      links: 
-        link_to_a_question_bank: 問題バンクへのリンク
-      show_questions_and_points: "*%{num_questions}* 問選択、1 問 #%{num_points}# 点"
-      titles: 
-        add_question_to_group: 問題をこのグループに追加
-        collapse_group: グループの折りたたみ
-        delete_group: グループの削除
-        edit_group_details: グループの詳細情報の編集
-        expand_group: グループの展開
     question_limit_reached: "クイズの最大問題数に達しました (%{count}/%{limit})。\\n\\n問題数の制限を避けるには、複数のクイズに分けてください。"
-    question_list_right_side: 
-      headers: 
-        questions: 質問
-    question_statistic: 
-      attempts: 
-        one: "%{count} 回の試行"
-        other: "%{count} 回の試行"
-      empty_response: 空の応答
-      labels: 
-        other_answers: 他の解答
-      no_data: データなし
-      no_responses: この問題には応答が記録されていません
-      percent_of_responses: "%{total} 試行のうち %{percent}% がこの答えを選択しました"
-      response_count: 
-        one: "%{count} 人の受講生にこの問題が提供されました"
-        other: "%{count} 人の受講生にこの問題が提供されました"
-    question_teaser: 
-      titles: 
-        click_to_show_details: クリックして、問題の完全な詳細を表示
-        delete_this_question: この問題を削除
-        edit_this_question: この問題を編集
     quiz_attempts_length_error: "クイズの試行は 3 桁に制限されています。受講生に無制限の試行を許可する場合は、左側の [複数回の試行を許可] ボックスをオンにしないでください"
     quiz_attempts_nan_error: クイズの試行は数値でのみ指定できます
-    quiz_details: 
-      allowed_attempts: 許可されている試行回数
-      headers: 
-        available: 使用可能
-        due: 期日
-        points: 点数
-        questions: 質問
-        time_limit: 制限時間
-      multiple_due_dates: 複数の期日
-      no_due_date: 期日なし
-      none: なし
-      quiz_availabile_through: |-
-          %{start_time} ～  
-          %{end_time}
-      quiz_available_after: "%{start_time} 以後"
-      quiz_available_until: "%{end_time} まで"
-      requires_lockdown: "Respondus LockDown Browser を要求"
-      time_limit: 
-        one: "%{count} 分"
-        other: "%{count} 分"
-      unlimited: 無制限
     quiz_item_group_view: 
       no_quizzes: クイズが見つかりません
       no_surveys: サーベイが見つかりません
@@ -11641,125 +11302,705 @@ ja:
       settings: 設定
       title_delete: クイズの削除
       title_edit: クイズの編集
-    quiz_right_side: 
-      attempts_left: 
-        one: "あと %{count} 回試行できます"
-        other: "あと %{count} 回試行できます"
-      attempts_so_far: 
-        one: "これまでに %{count} 回試行しました"
-        other: "これまでに %{count} 回試行しました"
-      labels: 
-        current_score: 現在のスコア
-        kept_score: 保持しているスコア
-        last_attempt_details: 前回の試行の詳細
-        submission_details: 提出物の詳細
-        time: 時刻
-      links: 
-        preview_quiz_again: クイズをもう一度プレビュー
-        preview_survey_again: サーベイをもう一度プレビュー
-      no_more_attempts: それ以上試行できません
-      questions_not_graded: 未採点の問題があります
-      score_set_manually: このスコアは講師によって設定されました
-      unlimited_attempts: 試行回数の制限なし
-      view_previous_attempts: 前の試行を表示
-    quiz_show_teacher: 
-      anonymous_submissions: 匿名での提出
-      attempts: 試行回数
-      available_from: 次から使用可能
-      cant_go_back: 解答の後で問題をロックする
-      code: "アクセス コード"
-      due: 期限
-      filter: "IP フィルタ"
-      for: 対象
-      group: 課題グループ
-      label: 
-        time_limit: 制限時間
-      multiple_attempts: 複数回の試行
-      no_time_limit: 時間制限なし
-      one_question_at_a_time: "一度に 1 つの問題"
-      points: 点数
-      quiz_type: "クイズ タイプ"
-      require_lockdown_browser: "Respondus LockDown Browser を要求"
-      require_lockdown_browser_for_results: クイズの結果を表示するために必要
-      score_to_keep: 保持するスコア
-      show_correct_answers: 正解を表示
-      shuffle_answers: 解答のシャッフル
-      time_limit: 
-        one: "%{count} 分"
-        other: "%{count} 分"
-      until: 次の日時まで
-      view_responses: 応答を表示
     quiz_submission: 
-      attempt_duration: "今回の試行は %{duration} かかりました。"
-      buttons: 
-        update_scores: スコアの更新
-      labels: 
-        final_score: 最終的なスコア
-        fudge_points: 調整点
-        fudge_points_changed_points_quiz: "%{user} がこのクイズに回答した後に、クイズの配点が %{difference} 変更されました。この変更分を調整するために、このボックスに手動で正または負の点数を指定できます。"
-        fudge_points_changed_points_survey: "%{user} がこのサーベイに回答した後に、サーベイの配点が %{difference} 変更されました。この変更分を調整するために、このボックスに手動で正または負の点数を指定できます。"
-        fudge_points_generic_explanation: このボックスに正または負の点数を指定することで、スコアを手動で調整できます。
-        questions_need_review: 次の問題はレビューが必要です
-        quiz_score: クイズのスコア
-        score_for_attempt: この試行のスコア
-        score_for_quiz: このクイズのスコア
-        score_for_survey: このサーベイのスコア
-        survey_score: サーベイのスコア
-      links: 
-        click_to_view_results: 結果を表示するには、ここをクリックしてください。
-      questions_not_graded: 未採点の問題があります
-      quiz_fudged_negative: "このクイズのスコアは、%{fudge} 点、手動で調整されました。"
-      quiz_fudged_positive: "このクイズのスコアは、+%{fudge} 点、手動で調整されました。"
-      quiz_not_yet_taken: まだこのクイズに回答していません。
-      quiz_results_protected: このクイズの結果は保護されており、受講生は表示できません。
-      quiz_results_protected_until_last_attempt: このクイズの結果は保護されており、受講生は、最終試行を提出するまで表示できません。
-      quiz_submission_needs_review: このクイズは回答提出後に大幅に変更されました。採点の見直しが必要な可能性があります。
-      requires_lockdown: "クイズの結果を表示するには、Respondus LockDown Browser が必要です。"
-      submitted_at: "提出済み %{when}"
-      survey_fudged_negative: "このサーベイのスコアは、%{fudge} 点、手動で調整されました。"
-      survey_fudged_positive: "このサーベイのスコアは、+%{fudge} 点、手動で調整されました。"
-      survey_not_yet_taken: まだこのサーベイに回答していません。
       titles: 
         this_is_an_external_element: これはテキストではなく、外部要素であり、受講生が提出したときから変更されている可能性があります。
         this_is_an_external_frame: これはテキストではなく、外部フレームであり、受講生が提出したときから変更されている可能性があります。
         this_is_an_image: これはテキストではなく、画像であり、受講生が提出したときから変更されている可能性があります。
-    quiz_summary: 
-      assignment_points_possible: 
-        one: "%{count} 点"
-        other: "%{count} 点"
-      labels: 
+    quiz_submissions: 
+      errors: 
+        invalid_submissions: このクイズへの提出物は、提出者のものであると確認できませんでした。もう一度やり直してください。
+        late_quiz: このクイズへの提出が遅れました。解答は記録されていない可能性があります。
+        protected_quiz: このクイズは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このクイズに参加できる正当な場所ではないようです。
+      still_zipping: まだファイルの圧縮が進行中です...
+    quizzes: 
+      access_code: 
+        buttons: 
+          submit: 提出
+        labels: 
+          access_code: "アクセス コード"
+        quiz_restricted: "このクイズはアクセス コードで制限されています。クイズに回答するためには、アクセス コードを打ち込んでくれるよう、またはアクセス コードを教えてくれるよう、講師または試験監督官に依頼する必要があります。"
+        survey_restricted: "このサーベイはアクセス コードで制限されています。サーベイに回答するためには、アクセス コードを打ち込んでくれるよう、またはアクセス コードを教えてくれるよう、講師または試験監督官に依頼する必要があります。"
+      default_history_crumb: 履歴
+      default_title: 新しいクイズ
+      display_answer: 
+        labels: 
+          answer_with_margin: 誤差
+          your_answer: 解答
+        margin_of_error: 誤差
+        plus_or_minus: +/-
+        range_answer: "%{lower_bound} と %{upper_bound} の間"
+        you_left_this_blank: 空白のままになっています
+      display_question: 
+        default_question_answer: "[ 選択 ]"
+        flag_this_question: この問題にフラグを設定
+        headers: 
+          formulas: 数式
+          possible_solutions: 可能な解
+          solution_answer: 解答
+          variable_maximum: 最大
+          variable_minimum: 最小
+          variable_name: 可変
+          variable_precision: 小数点以下の桁数
+          variables: 変数
+        labels: 
+          additional_comments: 追加コメント
+          for_answer_number: "解答 %{answer_number}"
+          warning_icon: 警告
+        links: 
+          delete_question: この問題を削除
+          edit_question: この問題を編集
+          move_copy_question: 問題を別のバンクに移動/コピー
+        not_yet_graded: まだ採点されていません
+        original_score: "元のスコア:"
+        points_possible: "%{points_possible} 点"
+        regraded_score: "再評価スコア:"
+        show_ansers_for_variable: "%{variable} の解答を表示"
+        skip_question_text: 問題文までスキップします。
+        submission_was_regraded: この問題は再評価されました。
+        titles: 
+          question_correct_comment: 受講生の解答が正解だった場合に、このコメントを表示
+          question_incorrect_comment: 受講生の解答が不正解だった場合に、このコメントを表示
+          question_neutral_comment: 受講生が問題に解答した時点で、このコメントを表示
+        unsupported_question_type: "この問題は、外部ソースからインポートされました。'%{question_type}'の問題でしたが、これはこのクイズ ツールでサポートされていません。"
+        you_left_this_blank: 空白のままになっています
+      download_file_upload_submissions: 
+        links: 
+          download_submissions: すべてのファイルのダウンロード
+      equations_help: 
+        equation_functions: |-
+            変数に加え、ヘルパ関数のコレクションもあり、
+            これを使用して有用な値を生成することができます。例: 
+            
+            %{example}
+            
+            所定のヘルパ関数の説明を表示するには、下のリストから関数を
+            選択します:
+        equation_intro: |-
+            計算後の問題は、１ つ以上の数式のセットを順番に計算した結果に 
+            基づきます。これらの式に中間媒介変数を定義できますが、
+            最後の式の計算結果が正解を生成するために使用される
+            ものです。例: 
+            
+            %{example}
+            
+            この数式のセットの場合、最終的な答えは 71 です。しかし、
+            事前定義された変数がないので、すべての受講生に対する問題が
+            同じになり、答えも同じになります。変数の詳細については "変数" タブ
+            を参照してください。
+        equation_variables2: "問題文の中で括弧を使用して、変数を定義することもできます (\" [a] + [b] は何ですか?\")。どの変数にも、変数設定に基づいて \"値の例\" が表示されます。これで、演算を確認し、数式が機能することを確認できます。例えば、問題が \"[a] + 5 は何ですか?\" の場合、変数 \"a\" を定義するよう求められます。\"a\" の値の例が 5.2 であれば、次のようになります: %{example}。この数式を使用すれば、解のセットをいくらでも生成し、セットごとに \"a\" の値を変えることができます。ある受講生に表示される問題は \"5.2 + 5 は何ですか?\" となり、別の受講生には \"9 + 5 は何ですか?\" となります。"
+        links: 
+          functions: 関数
+          intro: はじめに
+          variables: 変数
+      errors: 
+        no_more_attempts: 試行回数の残りのクイズはありません
+        quiz_deleted: そのクイズは削除されました
+        quiz_update_failed: クイズの更新が失敗しました
+      fabulous_quizzes: 
+        page_titles: クイズ
+      find_question_from_bank: 
+        already_added: この問題は既にクイズに含まれています
+        bank_description: "%{bank_name}、%{n} 件の問題"
+        buttons: 
+          add_questions: 問題の追加
+          create_group: グループの作成
+          select_bank: バンクの選択
+        group_pick_count: "%{pick_count} 件の問題"
+        group_points: "%{points} / 問題"
+        headers: 
+          bank_name: バンク名
+        hints: 
+          group_pick_count: "今までのところ %{pick_count} 件が選択されました"
+        labels: 
+          add_questions_to_group: "クイズ グループに問題を追加"
+          group_name: グループ名
+          group_pick_count: 選択
+          group_points: 点数
+        links: 
+          clear_all_banks: すべてをクリア
+          manage_question_banks: コースの問題バンクの管理
+          more_questions: その他の問題
+          select_all_banks: すべて選択
+        options: 
+          new_group: "[ 新しいグループ ]"
+          no_group: "[ グループなし ]"
+        select_a_question_bank: 下のリストから問題バンクを選択し、このクイズに問題グループとしてリンクします。
+        titles: 
+          add_new_question_group: 新しい問題グループの追加
+      form_answer: 
+        answer_in_range_accessible: "*範囲開始* と #範囲終了# の間"
+        answer_text: 解答テキスト
+        answer_weight: 回答の重み
+        exact_answer_with_error_margin_accessible: "許容誤差 #許容誤差# のある *厳密な解答*"
+        labels: 
+          answer_comments: 受講生がこの解答を選択した場合のコメント
+          answer_in_range: 範囲内での解答
+          exact_answer: 正確な解答
+        matching_left: 左側と照合
+        matching_right: 右側と照合
+        numerical_answer: 数値による解答
+        possible_answer: 考えられる解答
+        titles: 
+          click_to_enter_answer_comments: 受講生がこの解答を選択した場合のコメントを、クリックして入力
+          click_to_set_as_correct: クリックして、この解答を正解として設定
+          delete_answer: この解答を削除
+          edit_as_html: "回答テキストを HTML として編集するかどうか"
+      form_question: 
+        allow_tolerance: "+/- %{tolerance} の誤差を許容"
+        buttons: 
+          create_update_question: 問題の作成/更新
+          generate: 生成
+          recompute: 再計算
+        correct_answer_comments: 正解コメント
+        distractor_instructions: デストラクタをそれぞれの線上に入力
+        equation_example: "つまり、\"5 プラス [x] は何ですか?\""
+        explanation: 
+          generate_possible_solutions: 最後に、変数と解の組をクイズに必要な数だけ作ります。
+        explanations: 
+          calculated: 問題を入力し、数式を組み立て、考えられる解答の組み合わせのセットを生成します。受講生には、無作為に選択された変数のセットが埋め込まれた問題が出題されます。受講生は、数値による正しい答えを入力する必要があります。
+          equations: 変数は、変数名を括弧で囲んで入力することによって定義できます。
+          essay: "受講生は、与えられたテキスト フィールドに答えを書きます。"
+          file_upload: 受講生が自分の回答ファイルをアップロードできます。
+          fill_in_multiple_blanks: "問題を入力し、どの部分を空白にするか指定します。次に、それぞれの空白箇所に対して、考えられる答えを定義します。受講生は、それぞれの空白箇所にあるテキスト ボックスに正解を入力しなければなりません。"
+          formula_definition: "次に、正解を計算するために使用される数式 (1 つまたは複数) を書く必要があります。上記にリストされている変数名と同じ変数名だけを使用してください。"
+          matching: 一致する値の対を組み立てます。受講生は、表示された左側の値を見て、右側に入る値をドロップダウンから選択する必要があります。複数の行が同じ答えでも構わず、また、右側に追加のデストラクタを追加することもできます。
+          missing_word: "ドロップダウンの前後に入るテキストを定義します。考えられる答えのセットを組み立てて、正解を 1 つ選択します。"
+          multi_answer_sets: "下のボックスで、解答ボックスを表示するすべての場所に、基準語 (スペースなし) を括弧で囲んで入力します。"
+          multiple_answers: この問題では、それぞれの答えの横にチェックボックスが表示されます。受講生は、正解とマークされている答えを「すべて」選択しなければなりません。
+          multiple_choice: "問題と複数の答えを入力し、正解を 1 つ選択します。"
+          multiple_dropdowns: "問題を入力し、どの部分をドロップダウンにするかを指定します。次に、それぞれのドロップダウンに対して考えられる答えを定義し、ドロップダウン 1 つにつき、正解を 1 つ設けます。"
+          numerical: "ある範囲内の任意の数値で、または、ある数値からの増減の誤差で正解を定義します。受講生は、表示された空のテキスト ボックスに数値で答えを入力します。"
+          short_answer: |-
+              問題文を入力し、空白箇所に対して考えられる正解をすべて定義します。  
+              受講生は、問題文の後ろに表示されている小さなテキスト ボックスに答えを入力します。
+          text_only: "この \"問題\" には点数は付かず、関連のある問題のセットを紹介するのに役立ちます。"
+          true_false: 問題文を入力し、真または偽のどちらが正解であるかを選択します。
+          variable_definitions: 上で変数を入力してあれば、ここにリストされます。下のそれぞれの変数に対して、考えられる値の範囲を指定できます。
+        general_answer_comments: 解答についての全般的なコメント
+        headers: 
+          formula_definition: 数式の定義
+          generate_possible_solutions: 全般的な可能な解
+          variable_definitions: 変数定義
+          variable_example_value: 値の例
+          variable_maximum: 最大
+          variable_minimum: 最小
+          variable_name: 可変
+          variable_precision: 小数点以下の桁数
+        label: 
+          question: 
+            name: 問題名
+            points: 問題の点数の値
+            type: 問題の種類
+        labels: 
+          answers: 解答
+          distractors: "付加的な一致の可能性 (デストラクタ)"
+          missing_word_after: 解答の後ろにくるテキスト
+          points: 点
+          question: 問題
+        links: 
+          add_another_answer: 別の解答を追加
+          need_help: ヘルプが必要ですか?
+        multi_answer_sets_example: "つまり、\"バラは [color1]、スミレは [color2]\""
+        offer_combinations: "考えられる値の組み合わせを %{how_many} 組、提供する (最大 %{max_combinations} 組)"
+        options: 
+          only_one_correct: "正解は 1 つのみ"
+          students_select_multiple: 受講生は複数の解答を選択
+        question_type: 
+          calculated: 数式問題
+          essay: 小論文問題
+          file_upload: "ファイル アップロード問題"
+          fill_in_multiple_blanks: 複数穴埋め
+          matching: 整合
+          missing_word: 適語補充
+          multiple_answers: 複数解答
+          multiple_choice: 複数選択
+          multiple_dropdowns: 複数ドロップダウン
+          numerical: 数値による解答
+          short_answer: 穴埋め
+          text_only: "テキスト (問題ではない)"
+          true_false: 真/偽
+        show_possible_answers: "%{question} に対する考えられる解答を表示"
+        show_possible_answers_no_question: 考えられる解答を表示
+        titles: 
+          click_to_enter_correct_answer_comments: クリックして、正解に対するコメントを入力
+          click_to_enter_general_answer_comments: クリックして、全般的なコメントを入力
+          click_to_enter_wrong_answer_comments: クリックして、不正解に対するコメントを入力
+        wrong_answer_comments: 不正解時のコメント
+      history: 
+        anonymous_username: 受講生
+        buttons: 
+          allow_extra_attempt: この受講生に追加の試行を許可
+        count_attempts_left: 
+          one: "%{user} には %{count} 回の試行が残っています"
+          other: "%{user} には %{count} 回の試行が残っています"
+        default_quiz_name: "クイズ %{course_name}"
+        default_survey_name: "サーベイ %{course_name}"
+        grade_by_question_warning: グループ内で問題をシャッフルした場合は、問題ごとの成績機能に影響があります。
+        headers: 
+          quiz_submissions: クイズへの提出物
+          survey_submissions: サーベイへの提出物
+        latest_quiz_results: "ここに示すのは、%{user} の直近のクイズ結果です。任意の問題について点数を変更したり、コメントを追加したりできます。その後、ページの下の \"スコアの更新\" をクリックしてください。"
+        latest_survey_results: "ここに示すのは、%{user} の直近のサーベイ結果です。任意の問題について点数を変更したり、コメントを追加したりできます。その後、ページの下の \"スコアの更新\" をクリックしてください。"
+        links: 
+          back_to_quiz: クイズに戻る
+          back_to_survey: サーベイに戻る
+        logged_out_user: "ログアウトしたユーザ %{index}"
+        named_quiz_results: "%{quiz_name} 対象ユーザ: %{user}"
+        next_questions_arrow_title: 次の問題
+        no_more_attempts: "%{user} は試行回数の残りがありません"
+        page_title_quiz: "%{user} さんのクイズ履歴"
+        page_title_survey: "%{user} さんのサーベイ履歴"
+        prev_questions_arrow_title: 前の問題
+        quiz_not_yet_taken: クイズにまだ回答していません。
+        quiz_not_yet_taken_or_in_progress: クイズにまだ回答していないか、または現在進行中です
+        quiz_unlimited_attempts: このクイズには試行回数の制限がありません
+        score_for_attempt: "試行回数 %{attempt_number}: %{score}"
+        survey_not_yet_taken: サーベイにまだ回答していません。
+        survey_not_yet_taken_or_in_progress: サーベイにまだ回答していないか、または現在進行中です
+        survey_unlimited_attempts: このサーベイには試行回数の制限がありません
+        titles: 
+          score_pending_review: このスコアはレビューが保留になっているため、変更の可能性あり
+          submission_needs_review: この提出物はレビューが必要
+        unnamed_quiz_results: "%{user} さんのクイズ結果"
+        unnamed_survey_results: "%{user} さんのサーベイ結果"
+      index: 
+        buttons: 
+          publish_quizzes: クイズの公開
+        headers: 
+          assignment_quizzes: 課題クイズ
+          course_quizzes: "コース クイズ"
+          practice_quizzes: 練習クイズ
+          publish_multiple_quizzes: 複数のクイズの公開
+          surveys: サーベイ
+          unpublished_quizzes: 未公開のクイズ
+        labels: 
+          publish_multiple_quizzes: 現段階で公開するクイズを選択してください
+        links: 
+          create_new_quiz: 新しいクイズの作成
+          manage_question_banks: 問題バンクの管理
+          publish_multiple_quizzes: 複数のクイズの公開
+        no_quizzes: 利用できるクイズはありません
+        page_titles: クイズ
+        titles: 
+          this_quiz_is_locked: このクイズは現在ロックされています。詳細を表示するにはクリック
+      invalid_ip: 
+        quiz_protected: このクイズは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このクイズに参加できる正当な場所ではないようです。
+        survey_protected: このサーベイは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このサーベイに参加できる正当な場所ではないようです。
+      lockdown_browser_required: 
+        headers: 
+          requires_lockdown: "Respondus LockDown Browser が必要"
+        labels: 
+          download_lockdown: このブラウザをまだインストールしていない場合は、ここからダウンロードしてください
+        links: 
+          download_lockdown: "[Respondus LockDown Browser をダウンロード]"
+        requires_lockdown: "このクイズを実行するには、Respondus LockDown Browser が必要です。このクイズに回答する、またはクイズの結果を表示するには、Respondus LockDown Browser を起動します。"
+      managed_quiz_data: 
+        anonymous_student: "受講生 %{user_counter}"
+        logged_out_user: "ログアウトしたユーザ %{user_counter}"
+        titles: 
+          submission_needs_review: この提出物はレビューが必要
+      moderate: 
+        add_time: 時間の追加
+        buttons: 
+          change_extensions_for_selected_students: "%{n} 名の選ばれた受講生に対する延長時間の変更"
+          extend_time: 時間の延長
+          save: 保存
+        end_quiz_reference_time_current_end: 現在の終了時刻
+        end_quiz_reference_time_now: 今すぐ
+        end_quiz_when: "%{reference_time} から %{n} 分でクイズを終了します。"
+        extended_quiz_time_explanation: この受講生に対して、現在行われているクイズの制限時間を延長することができます。どのくらい延長しますか?
+        finished_in: "%{duration} で完了しました"
+        global_extra_attempts: "全員が既に %{n} を獲得しています"
+        headers: 
+          attempt: 試行回数
+          attempts_left: 残りの試行回数
+          extended_quiz_time: クイズの時間延長
+          score: スコア
+          student: 受講生
+          student_extensions: 受講生の延長時間
+          time: 時刻
+        in_progress: 進行中
+        labels: 
+          ending: 終了
+          extra_attempts: 追加の試行回数
+          extra_time_per_attempt: すべての試行に対する延長時間
+          manually_unlock: 次回試行に備え、このクイズを手動でロック解除する
+          started: 開始しました
+        minutes: 分
+        page_title: クイズの管理
+        student_gets_extra_time: "*%{student_name}* は **試行 1 回につき %{extra_time} 分の延長時間を獲得しました**"
+        student_n: "受講生 %{n}"
+        titles: 
+          change_user_extensions: ユーザの延長時間の変更
+          manually_unlocked: 手動でロック解除済み
+          minutes_to_add: "追加時間 (分)"
+          select_deselect_all: すべて選択/選択解除
+          select_user: "%{user} の選択"
+      multi_answer: 
+        choose_answer: 選択
+      muted: 
+        muted_quiz_description: クイズのスコアは、インストラクタがまだ採点を完了していないため、入手できません。インストラクタが採点を完了した時点で、このページからスコアを入手できます。
+        muted_quiz_header: クイズはミュートになっています
+      new: 
+        allowed_attempts: 許可された試行の回数
+        anonymous_submissions: 提出物の匿名状態を維持
+        buttons: 
+          not_published: 未公開
+          published: 公開済み
+          save: 保存
+        cant_go_back: 回答の後で問題をロックする
+        default_page_title: 新しいクイズ
+        group: 課題グループ
+        headers: 
+          ip_filters: "クイズ IP フィルタとは何ですか?"
+        hide_correct_answers_at: 正解を非表示
+        hints: 
+          question_detail_disabled: "注: %{question_count} より多い場合は、問題の詳細を使用できません。"
+          quiz_score: 受講生は、このサーベイに回答すると、自動的に全単位を取得します
+        ip_filters: "クイズ IP フィルタは、クイズへのアクセスを、指定の IP 範囲内にあるコンピュータに制限するための一手段です。フィルタは、カンマ区切りのアドレス リストとして指定するか、任意のアドレスに続けてマスクを指定します (\"192.168.217.1\"、\"192.168.217.1/24\"、または \"192.168.217.1/255.255.255.0\")。"
+        label: 
+          time_limit: 制限時間
+        labels: 
+          allow_multiple_attempts: 複数回の試行を許可
+          hide_results_only_after_last: 最終試行後のみ
+          ip_filter: "フィルタの IP アドレス"
+          never_hide_results: 受講生にクイズの回答を表示
+          quiz_instructions: クイズの指示
+          quiz_notify: この問題が変更されたことをユーザに通知します
+          quiz_score: スコア
+          require_access_code: "アクセス コードを要求"
+          restrict_quiz: クイズの制限
+          show_question_details: 問題の詳細情報の表示
+        limited_attempts: 許可されている試行回数
+        links: 
+          cancel: キャンセル
+          find_questions: 問題の検索
+          new_question: 新しい問題
+          new_question_group: 新しい問題グループ
+          show_assignment_rubric: 注釈の表示
+        manage: 管理
+        minutes: 分
+        new_assignment: 新しい課題
+        new_discussion: 新しいディスカッション
+        one_question_at_a_time: "一度に 1 つの問題を表示する"
+        points_possible: "点数 %{n}"
+        quiz_title: "クイズ タイトル"
+        quiz_type: "クイズ タイプ"
+        require_lockdown_browser: "Respondus LockDown Browser を要求"
+        require_lockdown_browser_for_results: クイズの結果を表示するために必要
+        retrieving_filters: フィルタを取得しています...
+        score_to_keep: "保持するクイズ スコア"
+        show_correct_answers: 受講生に正解を表示
+        show_correct_answers_at: 正解を表示
+        shuffle_answers: 解答のシャッフル
+        students_cannot_view_responses_after_course_concludes: 受講生は、コース終了後はクイズの回答を表示できません
+        time_limit: 何分ですか?
+        titles: 
+          click_to_select_filter: クリックでこのフィルタを選択
+          delete: 削除
+          find_ip_address_filter: "IP アドレス フィルタの検索"
+        warnings: 
+          has_student_submissions: 受講生は既にこのクイズに回答したか、回答を始めています。編集は慎重に行ってください。大幅に変更したクイズ問題がある場合は、古いバージョンのクイズに回答した受講生の採点をやり直すことを検討してください。
+      notices: 
+        cant_view_submission_while_muted: クイズがミュートになっている間は、そのクイズの履歴を表示できません。
+        has_submissions_already: 一部の受講生は既にこのクイズに回答したか、または回答し始めていることを、忘れないでください。
+        less_than_allotted_time: このクイズを期限間近になって開始したため、制限時間をフルに使えないかもしれません。
+        no_submission_for_user: このユーザが利用できる提出物がありません
+        quiz_updated: クイズは正常に更新されました
+        quizzes_published: 
+          one: "%{count} 個のクイズが正常に公開されました!"
+          other: "%{count} 個のクイズが正常に公開されました!"
+        quizzes_unpublished: 
+          one: "%{count} 個のクイズが正常に公開中止されました!"
+          other: "%{count} 個のクイズが正常に公開中止されました!"
+      question_group: 
+        buttons: 
+          update: 更新
+        default_group_name: グループ
+        edit_questions_and_points: "*%{num_questions}* 問選択、1 問 #%{num_points}# 点"
+        labels: 
+          group_name: グループ名
+          number_of_questions: 問題数
+          points_per_question: 問題ごとの点数
+          question_bank: 問題はこのバンクから出されます
+        links: 
+          link_to_a_question_bank: 問題バンクへのリンク
+        show_questions_and_points: "*%{num_questions}* 問選択、1 問 #%{num_points}# 点"
+        titles: 
+          add_question_to_group: 問題をこのグループに追加
+          collapse_group: グループの折りたたみ
+          delete_group: グループの削除
+          edit_group_details: グループの詳細情報の編集
+          expand_group: グループの展開
+      question_list_right_side: 
+        headers: 
+          questions: 質問
+      question_statistic: 
+        attempts: 
+          one: "%{count} 回の試行"
+          other: "%{count} 回の試行"
+        empty_response: 空の応答
+        labels: 
+          other_answers: 他の解答
+        no_data: データなし
+        no_responses: この問題には応答が記録されていません
+        percent_of_responses: "%{total} 試行のうち %{percent}% がこの答えを選択しました"
+        response_count: 
+          one: "%{count} 人の受講生にこの問題が提供されました"
+          other: "%{count} 人の受講生にこの問題が提供されました"
+      question_teaser: 
+        titles: 
+          click_to_show_details: クリックして、問題の完全な詳細を表示
+          delete_this_question: この問題を削除
+          edit_this_question: この問題を編集
+      quiz_details: 
         allowed_attempts: 許可されている試行回数
-        attempts_left: 残りの試行回数
-        attempts_so_far: 現在までの試行回数
-        latest_submission: 直近の提出
-        quiz_details: クイズの詳細情報
-        quiz_due: 期限
-        quiz_time_limit: 制限時間
-        survey_details: サーベイの詳細情報
-      no_details: 詳細情報なし
-      points_possible: "/ 配点: %{points_possible}"
-      question_count: 
-        one: "%{count} 件の問題"
-        other: "%{count} 件の問題"
-      quiz_multiple_due_dates: 複数の日付
-      quiz_no_points: 点数なし
-      quiz_points_possible: 
-        one: "%{count} 点"
-        other: "%{count} 点"
-      student_mute_notification: インストラクタが採点中です
-      unlimited_attempts: 試行回数の制限なし
-    read_only: 
-      default_page_title: 新しいクイズ
-      headers: 
-        quiz_details: クイズの詳細情報
-      labels: 
-        question_details: 問題の詳細情報の表示
+        headers: 
+          available: 使用可能
+          due: 期限
+          points: 点数
+          questions: 質問
+          time_limit: 制限時間
+        multiple_due_dates: 複数の期日
+        no_due_date: 期日なし
+        none: なし
+        quiz_availabile_through: "%{start_time} ～ %{end_time}"
+        quiz_available_after: "%{start_time} 以後"
+        quiz_available_until: "%{end_time} まで"
+        requires_lockdown: "Respondus LockDown Browser を要求"
+        time_limit: 
+          one: "%{count} 分"
+          other: "%{count} 分"
+        unlimited: 無制限
+      quiz_right_side: 
+        attempts_left: 
+          one: "あと %{count} 回試行できます"
+          other: "あと %{count} 回試行できます"
+        attempts_so_far: 
+          one: "これまでに %{count} 回試行しました"
+          other: "これまでに %{count} 回試行しました"
+        labels: 
+          current_score: 現在のスコア
+          kept_score: 保持しているスコア
+          last_attempt_details: 前回の試行の詳細
+          submission_details: 提出物の詳細
+          time: 時刻
+        links: 
+          preview_quiz_again: クイズをもう一度プレビュー
+          preview_survey_again: サーベイをもう一度プレビュー
+        no_more_attempts: それ以上試行できません
+        questions_not_graded: 未採点の問題があります
+        score_set_manually: このスコアは講師によって設定されました
+        unlimited_attempts: 試行回数の制限なし
+        view_previous_attempts: 前の試行を表示
+      quiz_show_teacher: 
+        anonymous_submissions: 匿名での提出
+        attempts: 試行回数
+        available_from: 次から使用可能
+        cant_go_back: 解答の後で問題をロックする
+        code: "アクセス コード"
+        due: 期限
+        filter: "IP フィルタ"
+        for: 対象
+        group: 課題グループ
+        label: 
+          time_limit: 制限時間
+        multiple_attempts: 複数回の試行
+        no_time_limit: 時間制限なし
+        one_question_at_a_time: "一度に 1 つの問題"
+        points: 点数
+        quiz_type: "クイズ タイプ"
+        require_lockdown_browser: "Respondus LockDown Browser を要求"
+        require_lockdown_browser_for_results: クイズの結果を表示するために必要
+        require_lockdown_browser_monitor: "Web カメラが必要です"
+        score_to_keep: 保持するスコア
+        show_correct_answers: 正解を表示
+        shuffle_answers: 解答のシャッフル
+        time_limit: 
+          one: "%{count} 分"
+          other: "%{count} 分"
+        until: 次の日時まで
+        view_responses: 応答を表示
+      quiz_submission: 
+        attempt_duration: "今回の試行は %{duration} かかりました。"
+        buttons: 
+          update_scores: スコアの更新
+        labels: 
+          final_score: 最終的なスコア
+          fudge_points: 調整点
+          fudge_points_changed_points_quiz: "%{user} がこのクイズに回答した後に、クイズの配点が %{difference} 変更されました。この変更分を調整するために、このボックスに手動で正または負の点数を指定できます。"
+          fudge_points_changed_points_survey: "%{user} がこのサーベイに回答した後に、サーベイの配点が %{difference} 変更されました。この変更分を調整するために、このボックスに手動で正または負の点数を指定できます。"
+          fudge_points_generic_explanation: このボックスに正または負の点数を指定することで、スコアを手動で調整できます。
+          questions_need_review: 次の問題はレビューが必要です
+          quiz_score: クイズのスコア
+          score_for_attempt: この試行のスコア
+          score_for_quiz: このクイズのスコア
+          score_for_survey: このサーベイのスコア
+          survey_score: サーベイのスコア
+        links: 
+          click_to_view_results: 結果を表示するには、ここをクリックしてください。
+        questions_not_graded: 未採点の問題があります
+        quiz_fudged_negative: "このクイズのスコアは、%{fudge} 点、手動で調整されました。"
+        quiz_fudged_positive: "このクイズのスコアは、+%{fudge} 点、手動で調整されました。"
+        quiz_not_yet_taken: まだこのクイズに回答していません。
+        quiz_results_protected: このクイズの結果は保護されており、受講生は表示できません。
+        quiz_results_protected_until_last_attempt: このクイズの結果は保護されており、受講生は、最終試行を提出するまで表示できません。
+        quiz_submission_needs_review: このクイズは回答提出後に大幅に変更されました。採点の見直しが必要な可能性があります。
+        requires_lockdown: "クイズの結果を表示するには、Respondus LockDown Browser が必要です。"
+        submitted_at: "提出済み %{when}"
+        survey_fudged_negative: "このサーベイのスコアは、%{fudge} 点、手動で調整されました。"
+        survey_fudged_positive: "このサーベイのスコアは、+%{fudge} 点、手動で調整されました。"
+        survey_not_yet_taken: まだこのサーベイに回答していません。
+      quiz_summary: 
+        assignment_points_possible: 
+          one: "%{count} 点"
+          other: "%{count} 点"
+        labels: 
+          allowed_attempts: 許可されている試行回数
+          attempts_left: 残りの試行回数
+          attempts_so_far: 現在までの試行回数
+          latest_submission: 直近の提出
+          quiz_details: クイズの詳細情報
+          quiz_due: 期限
+          quiz_time_limit: 制限時間
+          survey_details: サーベイの詳細情報
+        no_details: 詳細情報なし
+        points_possible: "/ 配点: %{points_possible}"
+        question_count: 
+          one: "%{count} 件の問題"
+          other: "%{count} 件の問題"
+        quiz_multiple_due_dates: 複数の日付
+        quiz_no_points: 点数なし
+        quiz_points_possible: 
+          one: "%{count} 点"
+          other: "%{count} 点"
+        student_mute_notification: インストラクタが採点中です
+        unlimited_attempts: 試行回数の制限なし
+      read_only: 
+        default_page_title: 新しいクイズ
+        headers: 
+          quiz_details: クイズの詳細情報
+        labels: 
+          question_details: 問題の詳細情報の表示
+          quiz_instructions: クイズの指示
+        links: 
+          back_to_quiz_page: クイズのページに戻る
+      refresh_quiz_after_popup: 
+        headers: 
+          loading_in_lockdown: "Respondus LockDown Browser でのクイズの読み込み"
+      show: 
+        buttons: 
+          lock_quiz: 今すぐこのクイズをロックする
+          lock_survey: 今すぐこのサーベイをロックする
+          publish: 公開
+          republish: 再公開
+          unlock_quiz: 今すぐ受講生にこのクイズを受けさせる
+          unlock_survey: 今すぐ受講生にこのサーベイを受けさせる
+        labels: 
+          available_until: 次の日時まで
+          no_time_limit: 時間制限なし
+          warning_icon: 警告
+        links: 
+          edit: 編集
+          keep_editing_this_quiz: このクイズの編集を続行
+          keep_editing_this_survey: このサーベイの編集を続行
+          message_students_who: 次の状態の受講生にメッセージを送る...
+          moderate_this_quiz: このクイズの管理
+          moderate_this_survey: このサーベイの管理
+          preview: プレビュー
+          quiz_statistics: クイズの統計情報
+          see_full_quiz: クイズ全体の表示
+          show_assignment_rubric: 注釈の表示
+          show_student_quiz_results: 受講生のクイズの結果を表示
+          show_student_survey_results: 受講生のサーベイの結果を表示
+          survey_statistics: サーベイの統計情報
+        manage: 管理
+        only_registered_users: 登録手続きをし、名前が登録されているユーザのみが、採点対象のクイズに回答することができます。
+        quiz_regraded_your_score_affected: 
+          one: "このクイズが再評価されました。新しいスコアには、変更された %{count} 個の問題が反映されています。"
+          other: "このクイズが再評価されました。新しいスコアには、変更された %{count} 個の問題が反映されています。"
+        quiz_regraded_your_score_not_affected: このクイズが再評価されましたが、スコアが変更されていません。
+        speed_grader: SpeedGrader™
+        students_submitted_so_far: 
+          one: "%{count} 人の受講生が既に提出しました"
+          other: "%{count} 人の受講生が既に提出しました"
+        titles: 
+          delete: 削除
+          related_items: 関連アイテム
+          unlock_for_how_long: どのくらいの期間、このクイズをロック解除しますか?
+        warnings: 
+          draft_version: これは、クイズのドラフト版のプレビューです
+      single_answer: 
+        upload: アップロード
+      statistics: 
+        class_too_large: このコースは、統計を表示するには大きすぎます。右側のサイドバーからダウンロードできます。
+        headers: 
+          for_question: "対象: %{question_name}"
+          quiz_statistics: クイズの統計情報
+          survey_statistics: サーベイの統計情報
+          users_have_taken_this_quiz: "%{count} 名のユーザがこのクイズに回答しました"
+          users_have_taken_this_survey: "%{count} 名のユーザがこのサーベイに回答しました"
+        labels: 
+          average_correct: 平均正解率
+          average_incorrect: 平均不正解率
+          average_time: 平均時間
+          high_score: 高スコア
+          low_score: 低スコア
+          mean_score: 平均スコア
+          standard_deviation: 標準偏差
+          users_selected_the_answer: "次のユーザは、答えとして「%{answer_text}」を選択しました"
+        links: 
+          count_all_attempts: "**すべての** 試行をカウントする"
+          count_only_latest_attempts: それぞれの直近の試行のみをカウントする
+        page_title: 統計
+        quiz_all_version_disclaimer: このレポートには、全ユーザの全試行に基づくクイズ統計情報が示されています。
+        quiz_latest_version_disclaimer: このレポートには、それぞれのユーザの直近の試行に基づくクイズ統計情報が示されています。
+        student_n: "受講生 %{student_counter}"
+        survey_all_version_disclaimer: このレポートには、全ユーザの全試行に基づくサーベイ統計情報が示されています。
+        survey_latest_version_disclaimer: このレポートには、それぞれのユーザの直近の試行に基づくサーベイ統計情報が示されています。
+      statistics_crumb: 統計
+      submission_version: 
+        attempt_number: "試行回数 %{att_no}"
+        kept: 維持
+        latest: 最新
+      submission_versions: 
+        attempt: 試行回数
+        attempt_history: 試行履歴
+        quiz_attempt_history_description: クイズの試行履歴を表示する表です。各試行が左側に表示されています。表には、試行、時刻、スコアの列があります。
+        regraded: 再評価
+        score: スコア
+        time: 時刻
+      take_quiz: 
+        buttons: 
+          next: 次へ
+          out_of_time_submit: OK、結構です。
+          previous: 前へ
+          submit_quiz: クイズの提出
+        headers: 
+          draft_preview: これは、クイズのドラフト版のプレビューです
+        labels: 
+          started: 開始しました
+          times_up: 制限時間になりました!結果を提出しています
+        logged_out_of_canvas: "*Canvas からログアウトしています。*続行するにはログインしてください"
+        login_required: ログインが必要
+        not_saved: 保存されていません
         quiz_instructions: クイズの指示
-      links: 
-        back_to_quiz_page: クイズのページに戻る
-    refresh_quiz_after_popup: 
-      headers: 
-        loading_in_lockdown: "Respondus LockDown Browser でのクイズの読み込み"
+      take_quiz_in_popup: 
+        headers: 
+          loading_in_lockdown: "Respondus LockDown Browser でのクイズの読み込み"
+        links: 
+          return_to_quiz_page: "[ここをクリック](%{url}) して、クイズのページに戻ります。"
+      take_quiz_right_side: 
+        labels: 
+          attempt_due: 試行期限
+          score: スコア
+          time_elapsed: 経過時間
+          time_running: 経過時間
+        links: 
+          hide_time_running: 非表示
+          keep_editing_quiz: このクイズの編集を続行
+          keep_editing_survey: このサーベイの編集を続行
     retrieving_filters: フィルタを取得しています...
     rubric: 
       loading: 読み込んでいます...
@@ -11777,114 +12018,35 @@ ja:
         you_answered: 解答済み
       buttons: 
         already_published: 公開されました!
-        lock_quiz: 今すぐこのクイズをロックする
-        lock_survey: 今すぐこのサーベイをロックする
-        publish: 公開
         publishing: 公開しています...
-        republish: 再公開
-        unlock_quiz: 今すぐ受講生にこのクイズを受けさせる
-        unlock_survey: 今すぐ受講生にこのサーベイを受けさせる
       confirms: 
         delete_quiz: このクイズを削除してもよろしいですか?
         delete_quiz_submissions_warning: 
           one: "警告: %{count} 人の受講生が既にこのクイズに答えています。このクイズを削除すると、提出記録が削除され、成績表に表示されなくなります。"
           other: "警告: %{count} 人の受講生が既にこのクイズに答えています。このクイズを削除すると、提出記録が削除され、成績表に表示されなくなります。"
-      labels: 
-        available_until: 次の日時まで
-        no_time_limit: 時間制限なし
-        warning_icon: 警告
       links: 
-        edit: 編集
         hide_student_quiz_results: 受講生のクイズの結果を非表示
         hide_student_survey_results: 受講生のサーベイの結果を非表示
-        keep_editing_this_quiz: このクイズの編集を続行
-        keep_editing_this_survey: このサーベイの編集を続行
-        message_students_who: 次の状態の受講生にメッセージを送る...
-        moderate_this_quiz: このクイズの管理
-        moderate_this_survey: このサーベイの管理
-        preview: プレビュー
-        quiz_statistics: クイズの統計情報
-        see_full_quiz: クイズ全体の表示
-        show_assignment_rubric: 注釈の表示
         show_student_quiz_results: 受講生のクイズの結果を表示
         show_student_survey_results: 受講生のサーベイの結果を表示
-        survey_statistics: サーベイの統計情報
-      manage: 管理
-      only_registered_users: 登録手続きをし、名前が登録されているユーザのみが、採点対象のクイズに回答することができます。
-      quiz_regraded_your_score_affected: 
-        one: "このクイズが再評価されました。新しいスコアには、変更された %{count} 個の問題が反映されています。"
-        other: "このクイズが再評価されました。新しいスコアには、変更された %{count} 個の問題が反映されています。"
-      quiz_regraded_your_score_not_affected: このクイズが再評価されましたが、スコアが変更されていません。
-      speed_grader: SpeedGrader™
-      students_submitted_so_far: 
-        one: "%{count} 人の受講生が既に提出しました"
-        other: "%{count} 人の受講生が既に提出しました"
       students_who_have_not_taken_the_quiz: まだこのクイズを受けていない受講生
       students_who_have_taken_the_quiz: すでにこのクイズを受けた受講生
-      titles: 
-        delete: 削除
-        related_items: 関連アイテム
-        unlock_for_how_long: どのくらいの期間、このクイズをロック解除しますか?
-      warnings: 
-        draft_version: これは、クイズのドラフト版のプレビューです
     show_and_hide_correct_answers: "%{from} ～ %{to}"
     show_correct_answers_after: "%{date} 以降"
     show_correct_answers_immediately: 即時
     show_correct_answers_until: "%{date} まで"
-    single_answer: 
-      upload: アップロード
     statistics: 
-      class_too_large: このコースは、統計を表示するには大きすぎます。右側のサイドバーからダウンロードできます。
       count_attempts: 
         one: "%{count} 回の試行"
         other: "%{count} 回の試行"
-      headers: 
-        for_question: "対象: %{question_name}"
-        quiz_statistics: クイズの統計情報
-        survey_statistics: サーベイの統計情報
-        users_have_taken_this_quiz: "%{count} 名のユーザがこのクイズに回答しました"
-        users_have_taken_this_survey: "%{count} 名のユーザがこのサーベイに回答しました"
-      labels: 
-        average_correct: 平均正解率
-        average_incorrect: 平均不正解率
-        average_time: 平均時間
-        high_score: 高スコア
-        low_score: 低スコア
-        mean_score: 平均スコア
-        standard_deviation: 標準偏差
-        users_selected_the_answer: "次のユーザは、答えとして「%{answer_text}」を選択しました"
-      links: 
-        count_all_attempts: "**すべての** 試行をカウントする"
-        count_only_latest_attempts: それぞれの直近の試行のみをカウントする
-      page_title: 統計
-      quiz_all_version_disclaimer: このレポートには、全ユーザの全試行に基づくクイズ統計情報が示されています。
-      quiz_latest_version_disclaimer: このレポートには、それぞれのユーザの直近の試行に基づくクイズ統計情報が示されています。
-      survey_all_version_disclaimer: このレポートには、全ユーザの全試行に基づくサーベイ統計情報が示されています。
-      survey_latest_version_disclaimer: このレポートには、それぞれのユーザの直近の試行に基づくサーベイ統計情報が示されています。
       titles: 
         submitted_users_for_quesiton: "%{user} のために提出したユーザ"
       uncounted_submissions: 
         one: "%{count} 件の他の提出物"
         other: "%{count} 件の他の提出物"
-    statistics_crumb: 統計
-    submission_version: 
-      attempt_number: "試行回数 %{att_no}"
-      kept: 維持
-      latest: 最新
-    submission_versions: 
-      attempt: 試行回数
-      attempt_history: 試行履歴
-      quiz_attempt_history_description: クイズの試行履歴を表示する表です。各試行が左側に表示されています。表には、試行、時刻、スコアの列があります。
-      regraded: 再評価
-      score: スコア
-      time: 時刻
+    survey: サーベイ
     surveys_label: "サーベイ: クイズの表示/非表示の切り替え"
     take_quiz: 
-      buttons: 
-        next: 次へ
-        out_of_time_submit: OK、結構です。
-        previous: 前へ
-        submit_quiz: クイズの提出
       confirms: 
         cant_go_back_blank: 次に移動した後は、この問題に戻れません。空白のままにしてもよろしいですか?
         navigate_away: 別のページに移動しようとしています。続行しますか?
@@ -11901,25 +12063,20 @@ ja:
       errors: 
         connection_lost: "%{host} への接続が失われました。続行する前に、インターネットに接続していることを確認してください。"
         only_numerical_values: 数値のみで入力してください
-      headers: 
-        draft_preview: これは、クイズのドラフト版のプレビューです
       hide_time_link: 非表示
       hours_count: 
         one: "%{count} 時間"
         other: "%{count} 時間"
       labels: 
-        started: 開始しました
         time_elapsed: 経過時間
-        times_up: 制限時間になりました!結果を提出しています
-      logged_out_of_canvas: "*Canvas からログアウトしています。*続行するにはログインしてください"
-      login_required: ログインが必要
+      login_failed: ログインに失敗しました。
+      login_successful: ログインが成功しました。
       minutes_count: 
         one: "%{count} 分"
         other: "%{count} 分"
       months_count: 
         one: "%{count} か月"
         other: "%{count} か月"
-      not_saved: 保存されていません
       notices: 
         extra_time: この試行には、延長時間が与えられています
         five_minutes_left: "残り 5 分"
@@ -11929,7 +12086,6 @@ ja:
         twelve_hours_left: "残り 12 時間"
       question_answered: 解答済み
       question_unanswered: まだ解答していない
-      quiz_instructions: クイズの指示
       saved_at: "クイズの保存場所: %{t}"
       saving: 保存しています...
       saving_not_needed: "保存する新しいデータはありません。最終確認時刻: %{t}"
@@ -11943,21 +12099,6 @@ ja:
       years_count: 
         one: "%{count} 年"
         other: "%{count} 年"
-    take_quiz_in_popup: 
-      headers: 
-        loading_in_lockdown: "Respondus LockDown Browser でのクイズの読み込み"
-      links: 
-        return_to_quiz_page: "[ここをクリック](%{url}) して、クイズのページに戻ります。"
-    take_quiz_right_side: 
-      labels: 
-        attempt_due: 試行期限
-        score: スコア
-        time_elapsed: 経過時間
-        time_running: 経過時間
-      links: 
-        hide_time_running: 非表示
-        keep_editing_quiz: このクイズの編集を続行
-        keep_editing_survey: このサーベイの編集を続行
     timing: 
       labels: 
         time_elapsed: 経過時間
@@ -11994,6 +12135,19 @@ ja:
     types: 
       quiz: クイズ
       survey: サーベイ
+  quizzes/quiz_group: 
+    errors: 
+      no_bank: "クイズ グループ %{group_name} の問題バンクが見つかりませんでした"
+      no_permissions: "ユーザにはクイズ グループ %{group_name} の問題バンクを参照する権限がありませんでした"
+    question_group: 問題グループ
+  quizzes/quiz_question: 
+    defaults: 
+      question_name: 問題
+  quizzes/quiz_statistics: 
+    statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} レポート"
+    types: 
+      item_analysis: アイテム分析
+      student_analysis: 受講生分析
   quizzes_model: 
     cant_unpublish_when_students_submit: 受講生の提出物がある場合は、未公開にできません
     confirms: 
@@ -12401,16 +12555,6 @@ ja:
         go: 検索
       titles: 
         find_user: ユーザの検索
-    accounts_secondary_content: 
-      buttons: 
-        go: 検索
-      links: 
-        manage_permissions: 役割の権限の管理
-        manage_subaccounts: サブアカウントの管理
-        manage_terms: 期間の管理
-        view_statistics: 統計情報の表示
-      titles: 
-        find_user: ユーザの検索
     add_assignment: 
       buttons: 
         add_assignment: 課題の追加
@@ -12511,6 +12655,9 @@ ja:
         unenroll_user_section: セクションからユーザを削除
       titles: 
         course_section: "コース セクション"
+    error_form: 
+      message_failed: レポートが送信されませんでした。もう一度、試してください。
+      message_sent: ご協力ありがとうございます!すぐに取り掛かります。
     errors: 
       400_message: 
         description: ふむ。要求されたページを読み込む際に、問題が発生したようです。
@@ -12537,8 +12684,6 @@ ja:
           submit: コメントの送信
         labels: 
           email: "電子メール (任意)"
-        message_failed: レポートが送信されませんでした。もう一度、試してください。
-        message_sent: ご協力ありがとうございます!すぐに取り掛かります。
     event_list: 
       at_least_more_events: "少なくともさらに %{count_of_events} 回"
       at_least_more_events_one_week: "次の 1 週間、少なくともさらに %{count_of_events} 回"
@@ -13087,6 +13232,13 @@ ja:
     columns: 
       date: 日付
       value: 値
+    domain_not_found: 
+      body_description: "URL を確認してからもう一度試すか、自身の教育機関または講師に連絡してサポートを受けてください。"
+      body_reference: "特定の教育機関に関連付けられていない無料の Canvas アカウントをご希望の場合は、次の URL からサインアップできます:"
+      links: 
+        canvas_instructure: canvas.instructure.com
+      page_title: "Canvas のインスタンスが見つかりませんでした。"
+      you_typed: "入力内容:"
     institution_suspended: 
       body: "学校の Canvas アカウントが一時停止されています。Canvas 管理者に連絡してください。"
       links: 
@@ -13117,8 +13269,12 @@ ja:
     assignment_order_assignment_groups: 課題グループおよび職位順
     assignment_order_due_date: 期日ごと
     assignment_unmuted: クリックしてミュートします
+    invalid_group_warning: 
+      one: "注: 配点がないため、スコアにはグループ %{list_of_group_names} の課題は含まれません。"
+      other: "注: 配点がないため、スコアにはグループ %{list_of_group_names} の課題は含まれません。"
     no_assignment: 課題が選択されていません
     no_student: 受講生が選択されていません
+    notes: メモ
     student_hidden_name: "受講生 %{position}"
   statistics: 
     csv_columns: 
@@ -13145,6 +13301,10 @@ ja:
     not_available: 次の日付で利用可能
     pending: 次の日付まで利用不可
   step: 手順
+  student_outcome_gradebook_description: |-
+      受講生は、受講生成果成績表を使用して、コース学習成果の進捗を簡単に表示できます。
+      成果は成績表のような形式で表示され、進捗が数字のスコアおよび達成/ほぼ達成/
+      補習として表示されます。
   sub_accounts: 
     alerts: 
       subaccount_has_courses: コースが含まれているサブアカウントは削除できません
@@ -13382,6 +13542,10 @@ ja:
         term_start: 期間の開始日
         unspecified: 指定なし
       timespan: "%{start_at} *至* %{end_at}"
+  text_helper: 
+    time: 
+      ranges: 
+        different_days: "%{start_date_and_time} ～ %{end_date_and_time}"
   time: 
     am: 午前
     count_hours_ago: 
