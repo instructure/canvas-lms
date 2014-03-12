@@ -246,7 +246,7 @@ describe CoursesController, type: :request do
           'default_view' => 'feed',
           'storage_quota_mb' => @account.default_storage_quota_mb
         })
-        json = api_call(:post, @resource_path, @resource_params, post_params) rescue debugger
+        json = api_call(:post, @resource_path, @resource_params, post_params)
         new_course = Course.find(json['id'])
         [:name, :course_code, :start_at, :end_at,
         :is_public, :public_syllabus, :allow_wiki_comments,
