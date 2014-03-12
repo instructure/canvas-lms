@@ -8561,7 +8561,7 @@ zh:
           audio_comment: "此邮件包括媒体评论。要收听或回复，单击下面的链接:"
           body: "%{user_name} 刚刚在 Canvas 中向您发送了一封邮件:"
           download: 下载
-          reply_to_conversation_message: "您可以直接回复此电子邮件，以在 Canvas 中回复此消息。"
+          reply_to_conversation_message: "您可以在 Canvas 中回复此消息，直接回复此电子邮件。"
           subject: "%{user_name} 刚刚在 Canvas 中向您发送了一封邮件。"
           unknown_user: 未知用户
         reply_to_conversation_message: "您可以直接回复此电子邮件，以在 Canvas 中回复此消息。"
@@ -11587,7 +11587,7 @@ zh:
         buttons: 
           publish_quizzes: 发布测验
         headers: 
-          assignment_quizzes: 测验
+          assignment_quizzes: 作业测验
           course_quizzes: 课程测验
           practice_quizzes: 练习测验
           publish_multiple_quizzes: 发布多个测验
@@ -11632,7 +11632,7 @@ zh:
         finished_in: "在 %{duration} 内完成"
         global_extra_attempts: "所有人均已获得 %{n}"
         headers: 
-          attempt: 已尝试次数
+          attempt: 尝试
           attempts_left: 剩余尝试次数
           extended_quiz_time: 延长测验时间
           score: 分数
@@ -11645,7 +11645,7 @@ zh:
           extra_attempts: 额外尝试次数
           extra_time_per_attempt: 每次尝试的额外时间
           manually_unlock: 手动解锁测验以进行下次尝试
-          started: 开始时间
+          started: 已开始
         minutes: 分钟
         page_title: 调整测验
         student_gets_extra_time: "*%{student_name}* **每次尝试获取 %{extra_time} 分钟的额外时间**"
@@ -11659,7 +11659,7 @@ zh:
       multi_answer: 
         choose_answer: 选择
       muted: 
-        muted_quiz_description: 您的测验分数不可用，因为教师还没有完成评分。教师完成此测验的评分后，您的分数将在此页面上提供。
+        muted_quiz_description: 您的测验分数无法提供，因为教师还没有完成评分。教师完成此测验的评分后，您的分数将在此页面上提供。
         muted_quiz_header: 您的测验已静音
       new: 
         allowed_attempts: 允许尝试的次数
