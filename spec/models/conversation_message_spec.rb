@@ -135,12 +135,11 @@ describe ConversationMessage do
       course_with_teacher
       student = student_in_course.user
       conversation = @teacher.initiate_conversation([student])
-      ConversationMessage.any_instance.stubs(:current_time_from_proper_timezone).returns(Time.at(0))
       conversation.add_message("reprimanded!", :generate_user_note => true)
       student.user_notes.size.should be(1)
       note = student.user_notes.first
       note.creator.should eql(@teacher)
-      note.title.should eql("Private message, Jan 1, 1970")
+      note.title.should eql("Private message")
       note.note.should eql("reprimanded!")
     end
 

@@ -228,7 +228,7 @@ class ConversationMessage < ActiveRecord::Base
     recipient = recipients.first
     return unless recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }
 
-    title = t(:subject, "Private message, %{timestamp}", :timestamp => date_string(created_at))
+    title = t(:subject, "Private message")
     note = format_message(body).first
     recipient.user_notes.create(:creator => author, :title => title, :note => note)
   end
