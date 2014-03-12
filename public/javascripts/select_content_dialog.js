@@ -20,17 +20,49 @@ define([
   'INST' /* INST */,
   'i18n!select_content_dialog',
   'jquery' /* $ */,
+  'compiled/legacy/add_assignment' /* attachAddAssignment */,
+  'jquery.instructure_date_and_time' /* datetime_field */,
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_forms' /* ajaxJSONFiles, getFormData, errorBox */,
+  'jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.instructure_misc_helpers' /* replaceTags, getUserServices, findLinkForService */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
-  'jquery.templateData' /* fillTemplateData */,
-  'compiled/bundles/legacy/add_assignment'
-], function(INST, I18n, $) {
+  'jquery.templateData' /* fillTemplateData */
+], function(INST, I18n, $, attachAddAssignment) {
+
+  $(document).ready(function() {
+    $(".add_assignment_inline:not(:first)").remove();
+    $("#add_assignment_inline_form .datetime_field").not(".datetime_field_enabled").datetime_field();
+    $("#add_assignment_inline_form").formSubmit({
+      beforeSubmit: function(data) {
+        $("#add_assignment_inline").loadingImage();
+      },
+      success: function(data) {
+        $("#add_assignment_inline").loadingImage("remove");
+        var assignment = data.assignment;
+        var $group = $("#add_assignment_inline_form").data("group_select");
+        var selector = $("#add_assignment_inline_form").data("group_selector");
+        var $groups = $group;
+        if (selector) $groups = $groups.add(selector);
+        $groups.each(function() {
+          var $option = $(document.createElement("option"));
+          $option.val(assignment.id).text(assignment.title);
+          if ($(this).children("#assignment_group_optgroup_" + assignment.assignment_group_id).length > 0)
+            $(this).children("#assignment_group_optgroup_" + assignment.assignment_group_id).append($option);
+          else
+            $(this).children("option:last").before($option);
+        });
+        $group.val(assignment.id).change();
+        $("#add_assignment_inline").dialog("close");
+      }
+    });
+    $("#add_assignment_inline .cancel_button").click(function(event) {
+      $("#add_assignment_inline").dialog("close");
+    });
+  });
 
 $(document).ready(function() {
   var external_services = null;
