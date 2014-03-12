@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -77,6 +77,10 @@ class Shard
 
   def id
     "default"
+  end
+
+  def self.local_id_for(any_id)
+    [any_id, Shard.default]
   end
 
   def self.global_id_for(any_id)
