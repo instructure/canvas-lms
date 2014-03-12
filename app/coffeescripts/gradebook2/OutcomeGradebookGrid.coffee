@@ -222,6 +222,11 @@ define [
           result
         , {})
 
+      saveOutcomePaths: (outcomePaths) ->
+        outcomePaths.forEach (path) ->
+          pathString = _.pluck(path.parts, 'name').join(' > ')
+          Grid.outcomes["outcome_#{path.id}"].path = pathString
+
       # Public: Look up an outcome in the current outcome list.
       #
       # name - The name of the outcome to look for.
