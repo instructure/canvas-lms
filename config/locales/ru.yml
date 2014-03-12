@@ -95,7 +95,6 @@ ru:
         login_handle_name: "Метка входа"
       login_handle_name_description: "Метка используется для уникальных идентификаторов входа. Примеры: Вход, имя пользователя, идентификатор учащегося и т.д."
       save_button: "Сохранить настройки аутентификации"
-    deprecated_fail: "Нельзя одновременно использовать устаревшую версию и текущую."
     index: 
       add_auth_desc: "Добавить провайдера идентификации к этой учетной записи:"
       canvas_login_tip: |-
@@ -178,11 +177,8 @@ ru:
       last_ldap_timeout_failure: "Последняя неудача из-за истечения времени"
       ldap_timeout_failure_help2: "Если Canvas слишком часто прерывает соединение с LDAP-сервером, он будет блокировать дальнейшие попытки входа в систему с использованием LDAP-сервера в течение %{time}."
     login_required: "должно быть указано"
-    no_auth_mixing: "Нельзя смешивать типы аутентификации"
     no_changing_auth_types: "Нельзя сменить тип конфигурации аутентификации. Удалите и создайте новую конфигурацию."
-    no_config_sent: "Необходимо указать auth_type"
     no_discovery_url: "Ничего не установлено"
-    only_one_cas: "Невозможно создать несколько конфигураций CAS"
     password_required: "должно быть указано"
     saml_required: "Конфигурация SAML необходима для тестрирования SAML"
     saml_settings: 
@@ -278,6 +274,11 @@ ru:
     sis_exporter: 
       deleted: "Включить удаленные объекты: true;"
       reports: "Отчеты: %{files}"
+    student: 
+      enrollment_state: "Включить состояние регистрации: true;"
+      enrollment_states: "Состояния регистрации: %{states};"
+    usu: 
+      enrollment_types: "Типы регистрации: %{types}"
   account_settings: 
     account: "Учетная запись"
     account_name_too_long: "Слишком длинное название учетной записи"
@@ -370,6 +371,28 @@ ru:
         messages_viewed: "Уведомление отправлено *%{user}* с *%{start_date}* по *%{end_date}*."
       comm_messages_search_results: 
         no_messages_found: "Сообщения не найдены"
+      course_logging_content: 
+        course_activity: "Действие курса"
+        find: Найти
+      course_logging_details: 
+        Field: Поле
+        From: От
+        To: Кому
+        Value: Значение
+        date: Дата
+        event_id: "Идентификатор события"
+        event_type_label: Тип
+        time: Время
+        user: Пользователь
+      course_logging_item: 
+        view_event_details: "Просмотреть сведения"
+      course_logging_results: 
+        date: Дата
+        event_details: "Сведения о мероприятии"
+        event_type: Тип
+        no_item_found: "Элементы не найдены"
+        time: Время
+        user: Пользователь
       course_search_form: 
         labels: 
           find_deleted_course: "Найти удаленный курс"
@@ -399,8 +422,8 @@ ru:
         message_date_from: "Дата начала"
         message_date_to: "Дата завершения"
       grade_change_logging_content: 
-        auth_logging: "Действия по изменению оценки"
         find: Найти
+        grade_change_activity: "Действия по изменению оценки"
         message_assignment_id: "Идентификатор задания"
         message_course_id: "Идентификатор курса"
       grade_change_logging_results: 
@@ -415,6 +438,7 @@ ru:
         time: Время
       logging_content_pane: 
         authentication: "Активность входов/выходов"
+        course: "Действие курса"
         grade_change: "Действия по изменению оценки"
         select_default: "Выберите тип журнала"
         select_label: "Выберите тип журнала для поиска."
@@ -848,6 +872,8 @@ ru:
         restrict_student_future_view: "Ограничить просмотр курсов для студентов до даты начала"
         self_enrollment: "Разрешить самостоятельную регистрацию"
         self_registration: "Самостоятельная регистрация"
+        self_registration_type_all: "Все типы учетных записей"
+        self_registration_type_observer: "Только учетные записи наблюдателя"
         show_scheduler: "Включить планировщик"
         sis_source_id: "Идентификатор SIS"
         start_at: Начало
@@ -1124,6 +1150,15 @@ ru:
             description: 
               header: Пример
             text: "Это отчет обо всех студентах, зарегистрированных на курсе в данном семестре, которые не отправили задание в заданные на данном курсе временные рамки. Данный отчет содержит по одной строке на каждого зарегистрированного студента, который соответствует критерию. Диапазон дат не может превышать двух недель."
+    students_with_no_submissions_csv_parameters: 
+      account_reports: 
+        default: 
+          enrollment_state: 
+            header: "Состояние регистрации"
+          include_enrollment_state: 
+            check_box: "Включить состояние регистрации"
+      active: "Действующие регистрации"
+      all: "Все регистрации"
     submission_data_csv_description: 
       account_reports: 
         submission_data: 
@@ -1171,6 +1206,24 @@ ru:
           main: 
             text: "Это отчет обо всех курсах, которые не имеют ни одного из следующих элементов: задания, объявления, обсуждения, файлы, модули, страницы или контрольные работы."
     update_failed_notice: "Ошибка обновления настроек учетной записи"
+    user_access_csv_description: 
+      account_reports: 
+        usu: 
+          description: 
+            header: Пример
+          user_activity: 
+            text: "Данный отчет отображает все действия пользователей, зарегистрированных на данном курсе или всех курсах в данном семестре. Полученный файл .csv содержит по одной строке на каждое действие студента и будет иметь следующие заголовки: тип_регистрации, идентификатор раздела, sis идентификатор раздела, название раздела, идентификатор курса, sis идентификатор курса, название курса, идентификатор пользователя, sis идентификатор пользователя, тип содержимого, содержимое, количество просмотров, количество участий, просмотренные. Количество просмотров и количество участий считаются от момента начала и до момента составления отчета."
+    user_access_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: "Тип регистрации"
+      all: "Все регистрации"
+      designer: "Регистрации дизайнеров"
+      observer: "Регистрации наблюдателей"
+      students: "Регистрации студентов"
+      ta: "Регистрации ассистентов"
+      teachers: "Регистрации учителей"
     user_add_failed_message: "Ошибка добавления пользователя, повторите попытку"
     user_added_message_sent_message: "%{user} успешно добавлен! В скором времени они должны получить подтверждение по электронной почте."
     user_deleted_message: "%{username} успешно удален"
@@ -1407,7 +1460,6 @@ ru:
     default_title: "Нет имени - %{course}"
     default_unfiled_title: "Неотвеченные вопросы"
   assignment: 
-    advanced_options_errors: "Для одной или нескольких дополнительных опций произошла ошибка"
     assignment_group_must_have_group: "Выберите группу заданий для данного задания"
     at_least_one_file_type: "Укажите хотя бы один разрешенный тип файла"
     at_least_one_submission_type: "Укажите хотя бы один тип отправки"
@@ -1426,7 +1478,6 @@ ru:
     feed_entry_title: "Задание: %{assignment}"
     feed_entry_title_with_course: "Задание, %{course}: %{assignment}"
     group_assignment_must_have_group_set: "Выберите набор групп для данного задания"
-    hide_advanced_options: "Скрыть дополнительные опции"
     imported_assignments_group: "Импортированные задания"
     labels: 
       due: До
@@ -1434,7 +1485,6 @@ ru:
     percentage_points_possible: "Для процентной оценки возможные баллы должны быть больше 0"
     points_possible_number: "Значение возможных баллов должно быть числом"
     select_external_tool_dialog_title: "Настройка внешних инструментов"
-    show_advanced_options: "Отобразить дополнительные опции"
     submission_action_take_quiz: "Использовать %{title}"
     submission_action_turn_in_assignment: "Включить в %{title}"
     submission_types: 
@@ -1731,11 +1781,9 @@ ru:
       buttons: 
         update: "Обновить задание"
       description: Описание
-      due_date: "Дата выполнения"
       freeze_properties: "Блокировка свойств задания при копировании"
       notify_content_change: "Уведомлять пользователей об изменении этого содержания"
       points_possible: Баллы
-      show_advanced_options: "Отобразить дополнительные опции"
       warnings: 
         assignment_is_frozen: "Некоторые настройки были заблокированы администратором."
     errors: 
@@ -1774,7 +1822,7 @@ ru:
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "Оценка: %{grade}%"
     grading_type_selector: 
-      grading_type: "Тип оценки"
+      display_grade_as: "Отобразить оценку в виде"
       grading_type_options: 
         letter_grade: "Буквенная оценка"
         not_graded: "Нет оценки"
@@ -1784,6 +1832,7 @@ ru:
       view_grading_levels: "Просмотр уровней оценок"
     group_category_selector: 
       grade_group_students_individually: "Назначить оценки каждому студенту по отдельности"
+      group_assignment_header: "Группа заданий"
       group_category_options: "Новая категория группы"
       group_set: "Набор групп"
       is_group_assignment: "Это группа заданий"
@@ -1863,6 +1912,8 @@ ru:
       submitting: "Идет отправка..."
     multiple_due_dates: "Несколько сроков выполнения"
     name_is_required: "Необходимо указать имя!"
+    name_too_long: "Слишком длинное имя"
+    name_too_long_error: "Слишком длинное имя"
     never_drop: 
       remove_rule: "Удалить правило"
     never_drop_collection: 
@@ -1922,12 +1973,14 @@ ru:
         remind: "Напомнить %{assessor} об проверке знаний, последнее уведомление %{time}"
         reminder: "Напомнить %{assessor} о проверке знаний, последнее уведомление %{time}"
     peer_reviews_selector: 
+      how_to_peer_review: "Как назначить рассмотрение коллегами"
       labels: 
         automatically_assign_peer_reviews: "Автоматически назначать рассмотрение коллегами"
         manually_assign_peer_reviews: "Назначить рассмотрение коллегами вручную"
         require_peer_reviews: "Требуется рассмотрение коллегами"
       locked_until: "Назначить рассмотрение"
       peer_reviews_assign_at_explanation: "Должно быть после даты выполнения. Если пустое, используется дата выполнения."
+      peer_reviews_header: "Рассмотрение коллегами"
       reviews_per_user: "Оценки для пользователя"
     points_possible_number: "Значение возможных баллов должно быть числом"
     positive_number: "Вы должны использовать положительное число"
@@ -2011,17 +2064,19 @@ ru:
       advanced_turnitin_settings: "Дополнительные настройки Turnitin"
       descriptions: 
         allowed_extensions: "Введите список принятых расширений, например: doc, xls, txt"
+      external_tool_options: "Опции внешних инструментов"
       label: 
         external_tool_new_tab: "Загрузить этот инструмент в новой вкладке"
         external_tool_url: "URL-адрес внешнего инструмента"
         turnitin_enabled: "Разрешить отправки Turnitin"
       labels: 
-        allow_file_uploads: "Разрешить загрузку файлов"
-        allow_media_recordings: "Разрешить запись мультимедийных данных"
-        allow_text_entry: "Разрешить ввод текста"
-        allow_url: "Разрешить URL-адрес веб-сайта"
+        allow_file_uploads: "Загрузки файла"
+        allow_media_recordings: "Записи мультимедийных данных"
+        allow_text_entry: "Текстовая запись"
+        allow_url: "URL-адрес веб-сайта"
         allowed_extensions: "Разрешенные расширения файлов"
         restrict_file_extensions: "Ограничить перечень типов файлов для загрузки"
+      online_entry_options: "Опции интерактивной записи"
       submission_type: "Тип отправки"
       submission_types: 
         external_tool: "Внешний инструмент"
@@ -3146,6 +3201,7 @@ ru:
     select_content: 
       cancel_btn: Отменить
       select_content_btn: "Выбрать содержимое"
+      select_content_label: "Выбрать содержимое, Используйте клавиши со стрелками вверх и вниз для перемещения по дереву. Нажмите клавишу со стрелкой вправо, чтобы развернуть, и со стрелкой влево, чтобы свернуть."
     select_course: "Выбрать курс"
     show_issues: "Показать проблемы"
     subviews: 
@@ -3284,8 +3340,9 @@ ru:
         conclude_student: "Завершить регистрацию этого студента?"
         delete_enrollment: "Удалить регистрацию этого студента?"
       enrolled_as: "Зарегистрировано как %{enrollment_type}"
-      enrollment_change_failed: "Ошибка изменения прав на регистрацию, повторите попытку"
       enrollment_linked_to: "связано с *%{linked_user}*"
+      error: 
+        enrollment_change_failed: "Ошибка изменения прав на регистрацию, повторите попытку"
       labels: 
         user_privileges: Полномочия
       legends: 
@@ -3591,10 +3648,10 @@ ru:
         description: 
           delete: "Удалить текущий модуль/элемент"
           edit: "Редактировать модуль/элемент"
-          indent: "Отступ текущего элемента"
+          indent: "Увеличить отступ"
           new: "Новый модуль"
           next: "Следующий модуль/элемент"
-          outdent: "Сместить текущий элемент"
+          outdent: "Уменьшить отступ"
           previous: "Предыдущий модуль/элемент"
       keycode_descriptions: 
         next_module_item: "Выберите следующий модуль или элемент модуля"
@@ -3746,10 +3803,10 @@ ru:
       links: 
         edit_item: "Редактировать сведения об элементе"
         edit_item_details_label: "Редактировать сведения об элементе"
-        indent: "Отступ элемента"
-        indent_label: "Отступ элемента"
-        outdent: "Смещение элемента"
-        outdent_label: "Смещение элемента"
+        indent: "Увеличить отступ"
+        indent_label: "Увеличить отступ"
+        outdent: "Уменьшить отступ"
+        outdent_label: "Уменьшить отступ"
         remove_item: "Удалить этот элемент из модуля"
         remove_item_label: "Удалить этот элемент из модуля"
       max_score: 
@@ -3787,10 +3844,10 @@ ru:
       links: 
         edit_item: Редактировать
         edit_item_details: "Редактировать сведения об элементе"
-        indent: Отступ
-        indent_item: "Отступ элемента"
-        outdent: Смещение
-        outdent_item: "Смещение элемента"
+        indent: "Увеличить отступ"
+        indent_item: "Увеличить отступ"
+        outdent: "Уменьшить отступ"
+        outdent_item: "Уменьшить отступ"
         remove_item: Удалить
         remove_item_from_module: "Удалить этот элемент из модуля"
       max_score: 
@@ -4256,6 +4313,62 @@ ru:
     wrapper: 
       close_course_menu_title: закрыть
       reset_course_menu: Сброс
+  course_logging: 
+    event_type: 
+      concluded: Завершено
+      created: Создано
+      updated: Обновлено
+    field_label: 
+      abstract_course_id: "Идентификатор краткого обзора курса"
+      account_id: "Идентификатор учетной записи"
+      allow_student_discussion_editing: "Разрешить студентам редактирование обсуждений"
+      allow_student_discussion_topics: "Разрешить студентам создавать темы обсуждений"
+      allow_student_forum_attachments: "Разрешить студентам добавлять вложения на форуме"
+      allow_student_organized_groups: "Разрешить студентам организовывать группы"
+      allow_student_wiki_edits: "Разрешить студентам редактировать вики-страницы"
+      allow_wiki_comments: "Разрешить комментарии на вики-странице"
+      conclude_at: Завершено
+      course_code: "Код курса"
+      created_at: Создано
+      default_view: "Вид по умолчанию"
+      default_wiki_editing_roles: "Роли с разрешением на редактирование вики-страниц по умолчанию"
+      enrollment_term_id: "Идентификатор условия регистрации"
+      grading_standard_id: "Идентификатор стандарта оценки"
+      group_weighting_scheme: "Схема весов в группе"
+      hide_distribution_graphs: "Скрыть графики распределения"
+      hide_final_grade: "Скрыть итоговую оценку"
+      indexed: "Включено в индекс"
+      integration_id: "Идентификатор интеграции"
+      is_public: Общедоступный
+      large_roster: "Большой список"
+      license: Лицензия
+      locale: Место
+      lock_all_announcements: "Заблокировать все объявления"
+      name: Имя
+      old_account_id: "Идентификатор старой учетной записи"
+      open_enrollment: "Открыть регистрацию"
+      public_description: "Общедоступное описание"
+      public_syllabus: "Общедоступная программа обучения"
+      replacement_course_id: "Идентификатор заменяющего курса"
+      restrict_enrollments_to_course_dates: "Ограничение регистрации датами проведения курса"
+      root_account_id: "Идентификатор корневой учетной записи"
+      self_enrollment: "Самостоятельная регистрация"
+      self_enrollment_code: "Код самостоятельной регистрации"
+      self_enrollment_limit: "Ограничение самостоятельной регистрации"
+      show_all_discussion_entries: "Показать все записи обсуждения"
+      show_public_context_messages: "Показать общедоступное содержимое сообщения"
+      sis_batch_id: "Идентификатор SIS партии"
+      sis_source_id: "Идентификатор SIS источника"
+      start_at: Начато
+      storage_quota: "Квота хранилища"
+      syllabus_body: syllabus_body
+      tab_configuration: "Конфигурация вкладки"
+      template_course_id: "Идентификатор шаблона курса"
+      turnitin_comments: "Комментарии Turnitin"
+      updated_at: Обновлено
+      uuid: UUID
+      wiki_id: "Идентификатор вики"
+      workflow_state: "Состояние рабочего процесса"
   course_restore: 
     restore_error: "Произошла ошибка при попытке восстановить курс. Курс не был восстановлен."
   course_search: 
@@ -4296,7 +4409,7 @@ ru:
     invitation_sent_now: Сейчас
     link_students_placeholder: "Введите имя студента"
     links: 
-      less_options: "меньше опций"
+      fewer_options: "меньше опций"
       more_options: "дополнительные опции"
       publish: "Публикация оценок в SIS"
       publishing: "Выполняется публикация оценок в SIS..."
@@ -5211,6 +5324,10 @@ ru:
     cancel: Отменить
     save_settings: "Сохранить настройки"
     saving: Сохранение...
+  differentiated_assignments_description: |-
+      Дифференцированные задания — это *бета* функция, позволяющая выбирать, какие разделы задания применимы.
+      Разделы, которым не назначены задания, не будут видны в содержимом курса, и их итоговая оценка будет
+      рассчитываться без этих баллов.
   discussion_entries: 
     created_entry_notice: "Запись успешно создана."
     deleted_entry_notice: "Эта запись удалена"
@@ -5496,6 +5613,10 @@ ru:
     unsubscribe: "Отменить подписку на данную тему"
     unsubscribed: "Подписка отменена"
     unsubscribed_hint: "Вы не подписаны на данную тему. Щелкните, чтобы подписаться"
+  draft_state: 
+    cant_unpublish_when_students_submit: "Невозможно отменить публикацию, если есть отправленные студентами задания"
+    publish: Опубликовать
+    unpublish: "Отменить публикацию"
   draft_state_description: |-
       Эта бета-функция перестраивает многие части Canvas и позволяет хранить содержимое
       в новом неопубликованном виде, который невидим для студентов и не учитывается при расчете
@@ -6082,6 +6203,7 @@ ru:
       feature_options: "Опции функции"
       no_features_available: "На данный момент доступные функции отсутствуют."
   features: 
+    differentiated_assignments: "Дифференцированные задания"
     draft_state: "Статус черновой версии"
     draft_state_account_disable_warning: |-
         Отключение этой функции повлияет на существующие курсы. Для получения помощи в отключении этой функции, пожалуйста, свяжитесь
@@ -6092,6 +6214,7 @@ ru:
     google_docs_domain_restriction: "Ограничение домена Google Docs"
     outcome_gradebook: "Табель успеваемости по результатам"
     screenreader_gradebook: "Табель успеваемости для программ для чтения с экрана"
+    student_outcome_gradebook: "Табель успеваемости по результатам студентов"
   file_browser_view: 
     folder_tree_instructions: "Используйте клавиши со стрелками вверх и вниз для перемещения по дереву. Нажмите клавишу со стрелкой вправо, чтобы развернуть папки, со стрелкой влево, чтобы свернуть, и клавишу ВВОД, чтобы выбрать изображение."
   filebrowserview: 
@@ -6512,6 +6635,7 @@ ru:
       set_group_weights: "Установить весовые критерии для группы"
       show_attendance_columns: "Показать столбцы участников"
       show_concluded_enrollments: "Показать завершенные регистрации"
+      srgb_gradebook: "переключить табели успеваемости"
       upload_scores: "Загрузка оценок (из .csv)"
       view_grading_history: "Просмотр истории оценок"
     show_notes: "Показать столбец заметок"
@@ -6654,6 +6778,7 @@ ru:
       muted: "Звук отключен"
     grade_summary: 
       assessment_by: "Проверено %{name}"
+      assignments: Задания
       buttons: 
         show_what_if: "Показать сохраненные оценки \"Что если\""
       change_score_instructions: "Щелкните какую-либо оценку и введите новое значение, чтобы посмотреть, как изменение повлияет на общий результат."
@@ -6691,6 +6816,7 @@ ru:
         only_graded: "Подсчитать только на основе заданий с оценками"
         total: Всего
         your_score: "Ваш результат"
+      learning_outcomes: "Усвоение обучения"
       links: 
         click_to_view: "щелкните здесь для просмотра"
         download: "Загрузить %{attachment}"
@@ -6981,6 +7107,7 @@ ru:
     grade_incomplete: "Не завершено"
     grade_ungraded: "Без оценки"
     out_of: "(из %{points})"
+    out_of_nil: "Нет возможных баллов"
     out_of_with_score: "(%{score} из %{points})"
   grading_standard: 
     unknown_grading_details: "Неизвестные сведения"
@@ -8532,10 +8659,10 @@ ru:
           audio_comment: "Это сообщение включает мультимедийные комментарии. Для прослушивания или ответа щелкните ссылку ниже:"
           body: "%{user_name} только что отправил вам сообщение в Canvas:"
           download: скачать
-          reply_message: "Чтобы ответить на это сообщение, щелкните ссылку ниже:"
+          reply_to_conversation_message: "Вы можете ответить на это сообщение в Canvas, ответив непосредственно на это сообщение электронной почты."
           subject: "%{user_name} только что отправил вам сообщение в Canvas."
           unknown_user: "Неизвестный пользователь"
-        reply_message: "Чтобы ответить на сообщение, щелкните ссылку ниже:"
+        reply_to_conversation_message: "Вы можете ответить на эту сообщение в Canvas, ответив непосредственно на это сообщение электронной почты."
         subject: "%{user_name} только что отправил вам сообщение в Canvas."
         unknown_user: "Неизвестный пользователь"
       facebook: 
@@ -9157,10 +9284,10 @@ ru:
     new_discussion_entry: 
       email: 
         body: "%{user} разместил новый комментарий в теме %{discussion_topic} для %{course}:"
-        details: "Присоединитесь к разговору здесь:"
+        discussion_entry_reply_message: "Присоединяйтесь к разговору, перейдя по ссылке ниже, или комментируйте, отвечая на это сообщение."
         html: 
           body: "%{user} разместил новый комментарий в цепочке %{discussion_topic} для %{course}:"
-          details: "Щелкните здесь, чтобы присоединиться к разговору"
+          discussion_entry_link_message: "[Щелкните здесь, чтобы присоединится к разговору](%{url}), или комментируйте, отвечая на это сообщение."
           subject: "Новый комментарий для %{discussion_topic}: %{course}"
         subject: "Новый комментарий для %{discussion_topic}: %{course}"
       facebook: 
@@ -9460,9 +9587,9 @@ ru:
         body: "%{author} только что создал новый комментарий к отправке для %{user} для %{assignment}"
         html: 
           body: "%{author} только что создал новый комментарий к отправке для %{user} для %{assignment}"
-          link_message: "Сведения об отправке можно просмотреть здесь:"
           someone: Кто-либо
           subject: "Комментарий к отправке: %{user}, %{assignment}, %{context}"
+          submission_comment_link_message: "Вы можете просмотреть подробные сведения об отправке, перейдя по ссылке ниже, или можете ответить на этот комментарий, ответив непосредственно на это сообщение."
         link_message: "Сведения об отправке можно просмотреть здесь:"
         someone: Кто-либо
         subject: "Комментарий отправки: %{user}, %{assignment}, %{context}"
@@ -9486,9 +9613,9 @@ ru:
           link_message: "Сведения об отправке можно просмотреть здесь:"
           someone: Кто-либо
           subject: "Комментарий к отправке: %{user}, %{assignment}, %{context}"
-        link_message: "Сведения об отправке можно просмотреть здесь:"
         someone: Кто-либо
         subject: "Комментарий отправки: %{user}, %{assignment}, %{context}"
+        submission_comment_link_message: "Вы можете просмотреть подробные сведения об отправке, перейдя по ссылке ниже, или можете ответить на этот комментарий, ответив непосредственно на это сообщение."
       facebook: 
         body: "*%{author}* только что создал новый комментарий к отправке для **%{user} для %{assignment}**."
         someone: Кто-либо
@@ -9984,7 +10111,7 @@ ru:
     ? "yes"
     : Да
   outcome_gradebook_description: |-
-      Табель успеваемости по результатам позволяет учителям быстро просматривать прогресс студентов
+      Табель успеваемости по результатам позволяет учителям быстро просматривать прогресс студента
       и курса по результатам обучения. Результаты представлены в формате табеля успеваемости,
       и прогресс студента отображается как в виде числовой оценки, так и по шкале усвоено/
       почти усвоено/коррекция.
@@ -10232,14 +10359,6 @@ ru:
       description: "Потребуется доступ к экземпляру Dim Dim."
       labels: 
         domain: Домен
-    embedly: 
-      description: "Переместить информацию Embedly в Коллекции"
-      name: "Интеграция Embedly"
-    embedly_settings: 
-      description: "Данный плагин интегрируется с Embedly сервисом для предварительного заполнения информации о наборе предметов. Оплаченный план предоставляет дополнительную информацию по сравнению с бесплатным планом: вы можете выбрать из нескольких изображений на странице, и вам будет возвращена вставленная информация для предварительного просмотра (просмотр YouTube видео и т.д.)."
-      labels: 
-        api_key: "Ключ API Embedly"
-        plan_type: "Тип плана Embedly"
     error_reporting: 
       description: "Механизмы сообщения об ошибках по умолчанию"
       name: "Отчеты об ошибках"
@@ -10414,6 +10533,7 @@ ru:
       labels: 
         download_url: "URL для скачивания браузера LockDown"
         plugin_enabled: Включено
+        use_lti_tool: "Используйте инструмент LTI для управления настройками контрольной работы в браузере LockDown (требуется для контроля)"
     med_cornell_export: 
       labels: 
         password: "Пароль для аутентификации"
@@ -10961,6 +11081,7 @@ ru:
   qti_display: QTI
   qti_file_description: "ZIP-файл QTI"
   qti_name: "Конвертер QTI"
+  qualified_locale: ru-RU
   question_answered: "Получен ответ"
   question_bank: 
     align_outcomes: "Согласовать результаты"
@@ -11083,14 +11204,6 @@ ru:
       regrade_options: "Опции повторной оценки *(для студентов, уже ответивших на данные вопросы):*"
       some_scores_reduced: "Присуждать баллы только за верный ответ (*некоторые оценки студентов могут понизиться*)"
       update_question_without_regrading: "Обновить вопросы без повторной оценки"
-  quiz_group: 
-    errors: 
-      no_bank: "Не удалось найти вопросы для теста группы %{group_name}"
-      no_permissions: "У пользователя отсутствует разрешение для обращения к банку вопросов в группе контрольной работы %{group_name}"
-    question_group: "Группа вопросов"
-  quiz_question: 
-    defaults: 
-      question_name: Вопрос
   quiz_reports: 
     quiz_report_generator: 
       download_report_name: "Скачать %{report_name}"
@@ -11098,27 +11211,10 @@ ru:
       generated_at_date_time: "Создан %{dateAndTime}"
       generating_report_name: "Создание %{report_name}…"
       item_analysis_not_available: "Анализ элемента недоступен для опросов"
-  quiz_statistics: 
-    statistics_filename: "Отчет %{quiz_title} %{quiz_type} %{report_type}"
-    types: 
-      item_analysis: "Анализ элемента"
-      student_analysis: "Анализ студента"
   quiz_submissions: 
-    errors: 
-      invalid_submissions: "Данная отправленная контрольная работа не может быть определена как принадлежащая вам. Повторите попытку."
-      late_quiz: "Эта контрольная работа отправлена поздно, и ваши ответы могли не быть записаны."
-      protected_quiz: "Эта контрольная работа защищена и доступна только в некоторых местоположениях.  Используемый компьютер не находится в допустимом местоположении для выполнения этой контрольной работы."
     show: 
       score_out_of: "Вы получите %{score} из %{points_possible}"
-    still_zipping: "Выполняется архивация файла..."
   quizzes: 
-    access_code: 
-      buttons: 
-        submit: Отправить
-      labels: 
-        access_code: "Код доступа"
-      quiz_restricted: "Эта контрольная работа ограничена кодом доступа. Для выполнения контрольной работы необходимо обратиться к учителю или инспектору, чтобы он сообщили или ввели код доступа."
-      survey_restricted: "Этот опрос ограничен кодом доступа. Для выполнения опроса необходимо обратиться к учителю или инспектору, чтобы он сообщили или ввели код доступа."
     after_last_attempt: "После последней попытки"
     alerts: 
       no_valid_combinations: "Система не может создать допустимые сочетания для указанных параметров"
@@ -11129,6 +11225,7 @@ ru:
     always: Всегда
     answer_comments: "Комментарии к ответу"
     answer_text: "Текст ответа"
+    assignment: Задание
     assignment_points_possible: 
       few: "%{count} балла"
       one: "1 балл"
@@ -11162,84 +11259,13 @@ ru:
     default_answer_comments: "Ответить при выборе студентом этого ответа"
     default_answer_comments_on_match: "Ответить, если студент отвечает на этот вопрос"
     default_comments_on_wrong_match: "Ответить, если пользователь пропускает этот вариант"
-    default_history_crumb: История
     default_quesiton_name: Вопрос
     default_question_name: Вопрос
     default_quiz_title: "Контрольная работа"
     default_response_to_essay: "Ответ для показа студенту после отправки ответа"
     default_response_to_file_upload: "Ответ для показа студенту после отправки им ответа"
-    default_title: "Новая контрольная работа"
-    display_answer: 
-      labels: 
-        answer_with_margin: "с большинством"
-        your_answer: "Ваш ответ"
-      margin_of_error: " допустимая погрешность"
-      plus_or_minus: +/-
-      range_answer: "От %{lower_bound} до %{upper_bound}"
-      you_left_this_blank: "Вы оставили это пустым"
-    display_question: 
-      default_question_answer: "[ Выбрать ]"
-      flag_this_question: "Отметить этот вопрос флажком"
-      headers: 
-        formulas: Формулы
-        possible_solutions: "Возможные решения"
-        solution_answer: Ответ
-        variable_maximum: Макс.
-        variable_minimum: Мин.
-        variable_name: Переменная
-        variable_precision: "Десятичные знаки"
-        variables: Переменные
-      labels: 
-        additional_comments: "Дополнительные комментарии"
-        for_answer_number: "Для ответа %{answer_number}"
-        warning_icon: Предупреждение
-      links: 
-        delete_question: "Удалить этот вопрос"
-        edit_question: "Редактировать этот вопрос"
-        move_copy_question: "переместить/копировать вопрос в другой банк"
-      not_yet_graded: "Еще не оценено"
-      original_score: "Исходная оценка:"
-      points_possible: "%{points_possible} pts"
-      regraded_score: "Оценка после повторной оценки:"
-      show_ansers_for_variable: "Показать ответы для %{variable}"
-      skip_question_text: "Перейти к тексту вопроса."
-      submission_was_regraded: "Данный вопрос был оценен повторно."
-      titles: 
-        question_correct_comment: "Студенты увидят этот комментарий, если правильно ответят на вопрос"
-        question_incorrect_comment: "Студенты увидят этот комментарий, если неправильно ответят на вопрос"
-        question_neutral_comment: "Студенты увидят этот комментарий после ответа на вопрос"
-      unsupported_question_type: "Этот вопрос был импортирован из внешнего источника. Это был вопрос '%{question_type}', который не поддерживается этим инструментом работы с контрольными работами."
-      you_left_this_blank: "Вы оставили это пустым"
     download_all_quiz_file_upload_submissions: "Скачать файл со всеми отправками контрольных работ"
-    download_file_upload_submissions: 
-      links: 
-        download_submissions: "Скачать все файлы"
     enter_answer_variable_above: "[ Введите переменные ответа выше ]"
-    equations_help: 
-      equation_functions: |-
-          Помимо переменных также доступен набор полезных функций,
-          которые можно использовать для создания полезных значений.  Например:
-          
-          %{example}
-          
-          Для просмотра объяснения определенной вспомогательной функции выберите ее в списке
-          below:
-      equation_intro: |-
-          Вычисленные вопросы основаны на наборе одной или нескольких формул, вычисленных 
-          последовательно.  Можно определить промежуточные значения в этих формулах, но
-          цифровой результат последней формулы используется для создания          правильного ответа.  Например:
-          
-          %{example}
-          
-          Итоговый ответ для этого набора формул — 71.  Однако
-          предварительно определенные переменные отсутствуют, поэтому у всех студентов будет
-          один вопрос с одним ответом. См. вкладку "переменные" для получения дополнительной
-          информации о переменных.
-      equation_variables2: "Вы также можете определять переменные в тексте вопроса, используя скобки (\"Чему равно [a] + [b]?\"). Для каждой переменной будет отображаться \"Пример значения\" на основе параметров переменной. Это позволит проверить вычисления и убедиться в правильности формул. Например, если был определен вопрос \"Чему равно [a] + 5?\", вас попросят определить переменную \"a\". Если пример значения переменной \"a\" был равен 5,2, вы можете записать: %{example}. С помощью этой формулы можно создавать любое количество наборов решения с различным значением переменной \"a\" в каждом наборе. Один студен может увидеть вопрос: \"Чему равно 5,2 + 5?\", а другой — \"Чему равно 9 + 5?\"."
-      links: 
-        functions: Функции
-        intro: Введение
-        variables: Переменные
     errors: 
       adding_questions_failed: "Ошибка добавления вопросов, повторите попытку"
       creating_group_failed: "Ошибка создания группы, повторите попытку"
@@ -11253,16 +11279,11 @@ ru:
       missing_ip_filter: "Вы должны ввести допустимый IP-адрес"
       no_answer: "Добавьте хотя бы один ответ"
       no_correct_answer: "Выберите правильный ответ"
-      no_more_attempts: "Не осталось попыток контрольной работы"
       no_possible_solution: "Создайте хотя бы одно возможное решение"
-      quiz_deleted: "Эта контрольная работа удалена"
       quiz_score_not_a_number: "Оценка должно быть числом в диапазоне от 0 до 2 000 000 000."
       quiz_score_too_long: "Оценка не должна превышать 2 000 000 000."
       quiz_score_too_short: "Оценка должна быть больше 0."
-      quiz_update_failed: "Ошибка обновления контрольной работы"
       retrieving_filters_failed: "Ошибка получения фильтров"
-    fabulous_quizzes: 
-      page_titles: "Контрольные работы"
     ? "false"
     : Ложь
     file_uploaded_or_removed: 
@@ -11270,134 +11291,6 @@ ru:
         file_successfully_uploaded: "Ваш файл был успешно загружен."
         files_removed: "%{display_name} было удалено."
     final_answer: "Итоговый ответ"
-    find_question_from_bank: 
-      already_added: "этот вопрос уже присутствует в контрольной работе"
-      bank_description: "%{bank_name}, %{n} вопросов"
-      buttons: 
-        add_questions: "Добавить вопросы"
-        create_group: "Создать группу"
-        select_bank: "Выбрать банк"
-      group_pick_count: "%{pick_count} вопросов"
-      group_points: "%{points} на один вопрос"
-      headers: 
-        bank_name: "Название банка"
-      hints: 
-        group_pick_count: "пока выбрано %{pick_count}"
-      labels: 
-        add_questions_to_group: "Добавить вопросы к группе контрольных работ"
-        group_name: "Имя группы"
-        group_pick_count: Выбрать
-        group_points: Баллы
-      links: 
-        clear_all_banks: "Очистить все"
-        manage_question_banks: "Управление банками вопросов курса"
-        more_questions: "другие вопросы"
-        select_all_banks: "Выбрать все"
-      options: 
-        new_group: "[ Новая группа ]"
-        no_group: "[ Нет группы ]"
-      select_a_question_bank: "Выберите банк вопросов в списке ниже, чтобы связать его с этой контрольной работой как группу вопросов."
-      titles: 
-        add_new_question_group: "Добавить новую группу вопросов"
-    form_answer: 
-      answer_in_range_accessible: "между *начало диапазона* и #range end#"
-      answer_text: "Текст ответа"
-      answer_weight: "Вес ответа"
-      exact_answer_with_error_margin_accessible: "*точный ответ* с допустимой погрешностью #error margin#"
-      labels: 
-        answer_comments: "Комментарии, если студент выбрал этот ответ"
-        answer_in_range: "Ответ в диапазоне"
-        exact_answer: "Точный ответ"
-      matching_left: "Совпадающая левая часть"
-      matching_right: "Совпадающая правая часть"
-      numerical_answer: "Числовой ответ"
-      possible_answer: "Возможный ответ"
-      titles: 
-        click_to_enter_answer_comments: "Щелкните для ввода комментариев, если студент выбирает этот ответ"
-        click_to_set_as_correct: "Щелкните, чтобы установить этот ответ как правильный"
-        delete_answer: "Удалить этот ответ"
-        edit_as_html: "Показать редактируемый текст ответа в HTML"
-    form_question: 
-      allow_tolerance: "разрешить допустимый предел ошибки +/- %{tolerance}"
-      buttons: 
-        create_update_question: "Создать/обновить вопрос"
-        generate: Создать
-        recompute: "Вычислить повторно"
-      correct_answer_comments: "Комментарии к правильному ответу"
-      distractor_instructions: "введите каждый дистрактор на новой строке"
-      equation_example: "например, \"Сколько будет 5 плюс [x]?\""
-      explanation: 
-        generate_possible_solutions: "Наконец, создайте необходимое число сочетаний переменная-решение для вашей контрольной работы."
-      explanations: 
-        calculated: "Введите вопрос, создайте формулу и набор возможных сочетаний ответа. Студенты увидят этот вопрос вместе со случайно выбранным набором переменных, и им потребуется ввести правильный числовой ответ."
-        equations: "Можно определить переменные, введя имена переменных, заключенные в скобки"
-        essay: "Студенты должны будут ввести ответ в текстовое поле."
-        file_upload: "Студенты смогут загрузить файл со своими ответами."
-        fill_in_multiple_blanks: "Введите вопрос, указав местоположения пустых мест. Затем определите возможный правильный ответ для всех пустых мест. Студенты должны ввести правильные ответы в текстовые поля во всех пустых местах."
-        formula_definition: "Далее необходимо написать формулу или формулы, используемые для вычисления правильного ответа. Используйте имена переменных, указанные выше."
-        matching: "Создайте пары соответствующих значений. Студенты увидят значения слева и должны будут выбрать соответствующее значение в раскрывающемся списке справа. Несколько строк могут иметь один ответ, и можно добавить дополнительные дистракторы справа."
-        missing_word: "Определите текст перед и после раскрывающегося списка. Создайте набор возможных ответов и выберите один правильный ответ."
-        multi_answer_sets: "В поле ниже, в каждом месте для отображения поля с ответом, введите справочное слово (без пробелов) в скобках"
-        multiple_answers: "Для всех ответов на этот вопрос будут указаны флажки, и студент должен выбрать ВСЕ ответы, указанные вами как правильные."
-        multiple_choice: "Введите вопрос и несколько ответов, затем выберите один правильный ответ."
-        multiple_dropdowns: "Введите вопрос, указав место для всех раскрывающихся списков. Затем определите возможные ответы для каждого раскрывающегося списка с одним правильным ответом в каждом из них."
-        numerical: "Определите правильный ответ как любое число в диапазоне или число с учетом определенного предела ошибки. Студенты должны будут ввести числовой ответ в пустое текстовое поле."
-        short_answer: |-
-            Введите текст вопроса, затем определите все возможные правильные ответы для пустого места.  
-            Студенты увидят вопрос и небольшое текстовое поле для ввода ответа.
-        text_only: "Этот \"вопрос\" не будет оценен, но может быть полезен для представления набора связанных вопросов."
-        true_false: "Введите текст вопроса, затем выберите правильный ответ как True или False."
-        variable_definitions: "После ввода переменных выше они должны быть перечислены здесь. Можно указать диапазон возможных значений для каждой переменной ниже."
-      general_answer_comments: "Общие комментарии к ответу"
-      headers: 
-        formula_definition: "Определение формулы"
-        generate_possible_solutions: "Создание возможных решений"
-        variable_definitions: "Определения переменных"
-        variable_example_value: "Пример значения"
-        variable_maximum: Макс.
-        variable_minimum: Мин.
-        variable_name: Переменная
-        variable_precision: "Десятичные знаки"
-      label: 
-        question: 
-          name: "Имя вопроса"
-          points: "Значение балла вопроса"
-          type: "Тип вопроса"
-      labels: 
-        answers: Ответы
-        distractors: "Дополнительные возможные варианты (дистракторы)"
-        missing_word_after: "Текст для отображения после ответов"
-        points: баллы
-        question: Вопрос
-      links: 
-        add_another_answer: "Добавить другой ответ"
-        need_help: "Требуется помощь?"
-      multi_answer_sets_example: "например, \"Розы [color1], фиалки [color2]\""
-      offer_combinations: "Предложить %{how_many} возможные сочетания значений (макс. %{max_combinations})"
-      options: 
-        only_one_correct: "Только один правильный ответ"
-        students_select_multiple: "Студенты выбирают несколько ответов"
-      question_type: 
-        calculated: "Вопрос с формулой"
-        essay: "Вопрос с эссе"
-        file_upload: "Вопрос по загрузке файла"
-        fill_in_multiple_blanks: "Заполните несколько пустых мест"
-        matching: Совпадение
-        missing_word: "Отсутствующее слово"
-        multiple_answers: "Несколько ответов"
-        multiple_choice: "Несколько вариантов выбора"
-        multiple_dropdowns: "Несколько раскрывающихся списков"
-        numerical: "Числовой ответ"
-        short_answer: "Заполните пустое место"
-        text_only: "Текст (нет вопроса)"
-        true_false: True/False
-      show_possible_answers: "Показать возможные ответы для %{question}"
-      show_possible_answers_no_question: "Показать возможные ответы для"
-      titles: 
-        click_to_enter_correct_answer_comments: "Щелкните, чтобы ввести комментарии для правильного ответа"
-        click_to_enter_general_answer_comments: "Щелкните, чтобы ввести общие комментарии"
-        click_to_enter_wrong_answer_comments: "Щелкните, чтобы ввести комментарии для неправильного ответа"
-      wrong_answer_comments: "Комментарии к неправильному ответу"
     graded_quiz: "Оцененная контрольная работа"
     graded_survey: "Оцененный опрос"
     headers: 
@@ -11426,69 +11319,14 @@ ru:
         other: "%{count} минут(ы)"
         zero: "менее 1 минуты"
       score_out_of_points_possible: "%{score} из %{points_possible}"
-    history: 
-      anonymous_username: Студент
-      buttons: 
-        allow_extra_attempt: "разрешить этому студенту выполнить дополнительную попытку"
-      count_attempts_left: 
-        few: "У %{user} осталось %{count} попытки"
-        one: "У %{user} осталась 1 попытка"
-        other: "У %{user} осталось %{count} попыток"
-      default_quiz_name: "Контрольная работа %{course_name}"
-      default_survey_name: "Опрос %{course_name}"
-      grade_by_question_warning: "Оценка по особенностям вопроса зависит от вопросов, которые перемешиваются в группе."
-      headers: 
-        quiz_submissions: "Отправки контрольной работы"
-        survey_submissions: "Отправки опросов"
-      latest_quiz_results: "Вот последние результаты контрольной работы для %{user}. Можно изменить баллы для любого вопроса и добавить дополнительные комментарии, затем щелкнуть \"Обновить результаты\" в нижней части страницы."
-      latest_survey_results: "Вот последние результаты опроса для %{user}. Можно изменить баллы для любого вопроса и добавить дополнительные комментарии, затем щелкнуть \"Обновить результаты\" в нижней части страницы."
-      links: 
-        back_to_quiz: "Вернуться к контрольной работе"
-        back_to_survey: "Вернуться к опросу"
-      logged_out_user: "Вышедший из системы пользователь %{index}"
-      named_quiz_results: "%{quiz_name} Результаты для %{user}"
-      next_questions_arrow_title: "Следующие вопросы"
-      no_more_attempts: "У %{user} не осталось попыток"
-      page_title_quiz: "История контрольных работ %{user}"
-      page_title_survey: "История опросов %{user}"
-      prev_questions_arrow_title: "Предыдущие вопросы"
-      quiz_not_yet_taken: "Контрольная работа еще не начата."
-      quiz_not_yet_taken_or_in_progress: "Контрольная работа еще не начата или выполняется"
-      quiz_unlimited_attempts: "Эта контрольная работа имеет неограниченное число попыток"
-      score_for_attempt: "Попытка %{attempt_number}: %{score}"
-      survey_not_yet_taken: "Опрос еще не начат."
-      survey_not_yet_taken_or_in_progress: "Опрос еще не начат или выполняется"
-      survey_unlimited_attempts: "Этот опрос имеет неограниченное число попыток"
-      titles: 
-        score_pending_review: "Эта оценка ожидает рассмотрения и может измениться"
-        submission_needs_review: "Требуется проверка этой отправки"
-      unnamed_quiz_results: "Результаты контрольной работы для %{user}"
-      unnamed_survey_results: "Результаты опроса для %{user}"
+    highest: наивысший
     index: 
       buttons: 
-        publish_quizzes: "Опубликовать контрольные работы"
         publishing_quizzes: "Публикация контрольных работ..."
       confirms: 
         delete_quiz: "Действительно хотите удалить эту контрольную работу?"
       default_title: "Контрольная работа без названия"
-      headers: 
-        assignment_quizzes: "Контрольные работы задания"
-        course_quizzes: "Контрольные работы курса"
-        practice_quizzes: "Практические контрольные работы"
-        publish_multiple_quizzes: "Опубликовать несколько контрольных работ"
-        surveys: Опросы
-        unpublished_quizzes: "Неопубликованные контрольные работы"
-      labels: 
-        publish_multiple_quizzes: "Выберите контрольные работы для публикации"
-      links: 
-        create_new_quiz: "Создать новую контрольную работу"
-        manage_question_banks: "Управление банками вопросов"
-        publish_multiple_quizzes: "Опубликовать несколько контрольных работ"
       multiple_due_dates: "Несколько дат"
-      no_quizzes: "Нет доступных контрольных работ"
-      page_titles: "Контрольные работы"
-      titles: 
-        this_quiz_is_locked: "Эта контрольная работа в настоящий момент заблокирована. Щелкните, чтобы получить дополнительную информацию."
     index_view: 
       add_quiz: "Контрольная работа"
       links: 
@@ -11497,9 +11335,6 @@ ru:
         settings: Настройки
       search_for_quiz: "Поиск контрольной работы"
       title_add_quiz: "Добавить контрольную работу"
-    invalid_ip: 
-      quiz_protected: "Эта контрольная работа защищена и доступна только в некоторых местоположениях. Используемый компьютер не находится в допустимом местоположении для выполнения этой контрольной работы."
-      survey_protected: "Этот опрос защищен и доступен только в некоторых местоположениях. Используемый компьютер не находится в допустимом местоположении для выполнения этого опроса."
     keep_highest: Наивысший
     keep_latest: Последний
     label: 
@@ -11518,6 +11353,14 @@ ru:
       multiple_blanks_question: "Заполните пустые места, прочтите окружающий текст"
       other_incorrect_matches: "Другие варианты неправильных ответов"
       possible_answer: "Возможный ответ"
+    latest: последний
+    ldb_login_popup: 
+      email: "Электронная почта"
+      log_in: "Вход в систему"
+      logged_out_of_canvas: "*Вы вышли из системы canvas.* Для продолжения войдите в систему."
+      password: Пароль
+      titles: 
+        log_in: "Войдите в систему"
     links: 
       resume_quiz: "Возобновить контрольную работу"
       resume_survey: "Возобновить опрос"
@@ -11531,19 +11374,6 @@ ru:
     loading_question: "Загрузка вопроса..."
     loading_question_banks: "Загрузка банка вопросов..."
     loading_questions: "Загрузка вопросов..."
-    lockdown_browser_required: 
-      headers: 
-        requires_lockdown: "Требуется браузер Respondus LockDown"
-      labels: 
-        download_lockdown: "Если браузер еще не установлен, загрузите его отсюда"
-      links: 
-        download_lockdown: "[Загрузка браузера Respondus LockDown]"
-      requires_lockdown: "Для этой контрольной работы требуется браузер Respondus LockDown. Запустите браузер Respondus LockDown для начала выполнения этой контрольной работы или просмотра ее результатов."
-    managed_quiz_data: 
-      anonymous_student: "Студент %{user_counter}"
-      logged_out_user: "Вышедший из системы пользователь %{user_counter}"
-      titles: 
-        submission_needs_review: "Требуется проверка этой отправки"
     message_students: "Отправить сообщения студентам"
     message_students_for_context: "Отправить сообщения студентам о %{context}"
     messages: 
@@ -11552,9 +11382,7 @@ ru:
       no_unsubmitted_students_quiz: "Все студенты взяли контрольную работу"
       no_unsubmitted_students_survey: "Все студенты взяли опрос"
     moderate: 
-      add_time: "Добавить время"
       buttons: 
-        change_extensions_for_selected_students: "Изменить расширения для %{n} выбранных студентов"
         extend_time: "Добавить время"
         extending_time: "Добавление времени..."
         save: Сохранить
@@ -11564,9 +11392,6 @@ ru:
         time_extension_failed: "Ошибка добавления времени, повторите попытку"
       confirms: 
         taking_time_away: "Это будет меньшим временем, чем сейчас имеется у студента.  Продолжить?"
-      end_quiz_reference_time_current_end: "текущее время окончания"
-      end_quiz_reference_time_now: сейчас
-      end_quiz_when: "Завершить контрольную работу через %{n} минут после %{reference_time}."
       errors: 
         quiz_submission_extra_attempts_not_a_number: "Значение дополнительных попыток должно быть числом."
         quiz_submission_extra_attempts_too_long: "Значение дополнительных попыток должно быть меньше 1000."
@@ -11575,129 +11400,24 @@ ru:
         quiz_submission_extra_time_too_long: "Дополнительное время должно быть меньше 10080."
         quiz_submission_extra_time_too_short: "Дополнительное время должно быть больше 0."
         server_communication_failed: "Произошел сбой связи с сервером.  Система повторит попытку через пять минут, или можно перезагрузить страницу"
-      extended_quiz_time_explanation: "Можно дать этому студенту дополнительное время для текущей попытки выполнения контрольной работы. Сколько времени им предоставить?"
       extensions_for_student: "Расширения для %{student}"
       extensions_for_students: 
         few: "Расширения для %{count} студентов"
         one: "Расширения для 1 студента"
         other: "Расширения для %{count} студентов"
-      finished_in: "завершено в %{duration}"
       finished_in_duration: "завершено в %{duration}"
-      global_extra_attempts: "все уже получили %{n}"
-      headers: 
-        attempt: Попытка
-        attempts_left: "Осталось попыток"
-        extended_quiz_time: "Увеличить время на контрольную работу"
-        score: Результат
-        student: Студент
-        student_extensions: "Расширения студента"
-        time: Время
-      in_progress: выполняется
-      labels: 
-        ending: Завершение
-        extra_attempts: "Дополнительные попытки"
-        extra_time_per_attempt: "Дополнительное время на каждую попытку"
-        manually_unlock: "Вручную разблокировать контрольную работу для следующей попытки"
-        started: Начало
-      minutes: мин.
-      page_title: "Модерация контрольной работы"
-      student_gets_extra_time: "*%{student_name}* **получает %{extra_time} дополнительных минут для каждой попытки**"
-      student_n: "Студент %{n}"
       time_up: "Время истекло!"
       titles: 
-        change_user_extensions: "Изменить расширения пользователя"
         extend_quiz_time: "Увеличить время на контрольную работу"
-        manually_unlocked: "Разблокировано вручную"
-        minutes_to_add: "минуты для добавления"
-        select_deselect_all: "Выбрать/отменить выбор"
-        select_user: "Выберите %{user}"
         student_extensions: "Расширения студента"
     more_questions: "другие вопросы"
-    multi_answer: 
-      choose_answer: Выберите
-    muted: 
-      muted_quiz_description: "Оценка за контрольную работу недоступна, поскольку инструктор еще не завершил оценку. Когда инструктор закончит проверку этой контрольной работы, ваша оценка появится на этой странице."
-      muted_quiz_header: "Звук контрольной работы отключен"
-    new: 
-      allowed_attempts: "Число разрешенных попыток"
-      anonymous_submissions: "Сохранить отправки анонимными"
-      buttons: 
-        not_published: "Не опубликовано"
-        published: Опубликовано
-        save: Сохранить
-      cant_go_back: "Блокировать вопросы после ответа на них"
-      default_page_title: "Новая контрольная работа"
-      group: "Группа заданий"
-      headers: 
-        ip_filters: "Что такое IP-фильтры Quiz?"
-      hide_correct_answers_at: "Скрыть правильные ответы с"
-      hints: 
-        question_detail_disabled: "ПРИМЕЧАНИЕ: Детали вопросов недоступны в случае наличия более чем %{question_count}."
-        quiz_score: "студенты будут автоматически полностью засчитаны после начала опроса"
-      ip_filters: "IP-фильтры Quiz используются для ограничения доступа к упражнениям на компьютерах в указанном диапазоне IP-адресов. Фильтры могут быть списками адресов, разделенными запятыми, или адресом с маской (\"192.168.217.1\", \"192.168.217.1/24\" или \"192.168.217.1/255.255.255.0\")."
-      label: 
-        time_limit: "Ограничение времени"
-      labels: 
-        allow_multiple_attempts: "Разрешить несколько попыток"
-        hide_results_only_after_last: "Только после их последней попытки"
-        ip_filter: "Фильтрация IP-адресов"
-        never_hide_results: "Разрешить студентам просматривать их ответы по контрольной работе"
-        quiz_instructions: "Инструкции к контрольной работе"
-        quiz_notify: "Уведомить пользователей об изменениях в тесте"
-        quiz_score: Результат
-        require_access_code: "Требуется код доступа"
-        restrict_quiz: "Ограничения контрольной работы"
-        show_question_details: "Показать сведения о вопросе"
-      limited_attempts: "Разрешенные попытки"
-      links: 
-        cancel: Отменить
-        find_questions: "Поиск вопросов"
-        new_question: "Новый вопрос"
-        new_question_group: "Новая группа вопросов"
-        show_assignment_rubric: "Показать рубрику"
-      manage: Управлять
-      minutes: Минуты
-      new_assignment: "Новое задание"
-      new_discussion: "Новое обсуждение"
-      one_question_at_a_time: "Показывать по одному вопросу за раз"
-      points_possible: "%{n} баллов"
-      quiz_title: "Заголовок контрольной работы"
-      quiz_type: "Тип контрольной работы"
-      require_lockdown_browser: "Требуется браузер Respondus LockDown"
-      require_lockdown_browser_for_results: "Необходимо для просмотра результатов контрольной работы"
-      retrieving_filters: "Получение фильтров..."
-      score_to_keep: "Оценка контрольной работы для сохранения"
-      show_correct_answers: "Разрешить студентам просматривать правильные ответы"
-      show_correct_answers_at: "Показать правильные ответы с"
-      shuffle_answers: "Изменить порядок ответов"
-      students_cannot_view_responses_after_course_concludes: "Студенты не могут просматривать ответы в контрольной работе после завершения курса"
-      time_limit: "Сколько минут?"
-      titles: 
-        click_to_select_filter: "Щелкните, чтобы установить этот фильтр"
-        delete: Удалить
-        find_ip_address_filter: "Поиск фильтра IP-адресов"
-      warnings: 
-        has_student_submissions: "Студенты уже выполнили или начали выполнять эту контрольную работу, поэтому будьте осторожны, редактируя ее. Если вы значительно измените какие-либо вопросы в контрольной работе, вы, возможно, захотите повторно оценить студентов, которые выполняли старую версию данной контрольной работы."
     no_filters_found: "Фильтры не найдены"
     no_quizzes_view: 
       headers: 
         course_quizzes: "Контрольные работы курса"
       no_quizzes: "Нет доступных контрольных работ"
     notices: 
-      cant_view_submission_while_muted: "Невозможно просмотреть историю контрольной работы, если ее звук отключен."
-      has_submissions_already: "Имейте в виду, что некоторые студенты уже выполнили или начали выполнять эту контрольную работу"
-      less_than_allotted_time: "Вы начали выполнять эту контрольную работу незадолго до срока окончания, поэтому у вас не будет достаточно времени на выполнение работы."
       message_sent: "Сообщение отправлено!"
-      no_submission_for_user: "Для этого пользователя нет доступных отправок"
-      quiz_updated: "Контрольная работа успешно обновлена"
-      quizzes_published: 
-        few: "%{count} теста(ов) успешно опубликованы!"
-        one: "1 тест успешно опубликован!"
-        other: "%{count} теста(ов) успешно опубликованы!"
-      quizzes_unpublished: 
-        few: "%{count} контрольные работы успешно сняты с публикации!"
-        one: "1 контрольная работа успешно снята с публикации!"
-        other: "%{count} контрольных работ успешно сняты с публикации!"
     practice_quiz: "Практическая контрольная работа"
     practices_label: "Переключить видимость контрольной работы в практических контрольных работах"
     question_colon: "Вопрос:"
@@ -11705,70 +11425,9 @@ ru:
       few: "%{count} вопроса"
       one: "1 вопрос"
       other: "%{count} вопросов"
-    question_group: 
-      buttons: 
-        update: Обновить
-      default_group_name: Группа
-      edit_questions_and_points: "Выберите *%{num_questions}* вопроса(-ов), #%{num_points}# балла(-ов) за вопрос"
-      labels: 
-        group_name: "Имя группы"
-        number_of_questions: "Количество вопросов"
-        points_per_question: "Баллов за вопрос"
-        question_bank: "Вопросы будут извлечены из банка"
-      links: 
-        link_to_a_question_bank: "Ссылка на банк вопросов"
-      show_questions_and_points: "Выберите *%{num_questions}* вопроса(-ов), #%{num_points}# балла(-ов) за вопрос"
-      titles: 
-        add_question_to_group: "Добавить вопрос к этой группе"
-        collapse_group: "Свернуть группу"
-        delete_group: "Удалить группу"
-        edit_group_details: "Редактировать сведения о группе"
-        expand_group: "Развернуть группу"
     question_limit_reached: "Вы достигли максимального количества вопросов, доступных для данного теста (%{count}/%{limit}).\\n\\nВ качестве решения проблемы, подумайте о раскидывании материала по нескольким тестам."
-    question_list_right_side: 
-      headers: 
-        questions: Вопросы
-    question_statistic: 
-      attempts: 
-        few: "%{count} попытки(ок)"
-        one: "1 попытка"
-        other: "%{count} попытки(ок)"
-      empty_response: "Пустой ответ"
-      labels: 
-        other_answers: "Другие ответы"
-      no_data: "Нет данных"
-      no_responses: "Для этого вопроса не записаны ответы"
-      percent_of_responses: "%{percent}% из %{total} попыток выбрано для этого ответа"
-      response_count: 
-        few: "%{count} студентам был задан этот вопрос"
-        one: "1 студенту был задан этот вопрос"
-        other: "%{count} студентам был задан этот вопрос"
-    question_teaser: 
-      titles: 
-        click_to_show_details: "Щелкните для отображения полных сведений о вопросе"
-        delete_this_question: "Удалить этот вопрос"
-        edit_this_question: "Редактировать этот вопрос"
     quiz_attempts_length_error: "Попытки выполнения контрольной работы ограничены 3 цифрами. Если вы хотите предоставить студентам неограниченное число попыток, не ставьте флажок ''Разрешить несколько попыток'', который находится слева"
     quiz_attempts_nan_error: "Попытки выполнения контрольной работы могут быть выражены только числами"
-    quiz_details: 
-      allowed_attempts: "Разрешенные попытки"
-      headers: 
-        available: Доступно
-        due: Срок
-        points: Баллы
-        questions: Вопросы
-        time_limit: "Ограничение времени"
-      multiple_due_dates: "Несколько дат выполнения"
-      no_due_date: "Нет даты выполнения"
-      none: Нет
-      quiz_available_after: "после %{start_time}"
-      quiz_available_until: "до %{end_time}"
-      requires_lockdown: "Требуется браузер Respondus LockDown"
-      time_limit: 
-        few: "%{count} минут(ы)"
-        one: "1 минута"
-        other: "%{count} минут(ы)"
-      unlimited: "Не ограничено"
     quiz_item_group_view: 
       no_quizzes: "Контрольные работы не найдены"
       no_surveys: "Опросы не найдены"
@@ -11779,131 +11438,701 @@ ru:
       settings: Настройки
       title_delete: "Удалить контрольную работу"
       title_edit: "Редактировать контрольную работу"
-    quiz_right_side: 
-      attempts_left: 
-        few: "Ещё %{count} попытки(ок) доступно"
-        one: "Ещё 1 попытка доступна"
-        other: "Ещё %{count} попытки(ок) доступно"
-      attempts_so_far: 
-        few: "Осталось  %{count} попытки(ок)"
-        one: "Осталась 1 попытка"
-        other: "Осталось  %{count} попытки(ок)"
-      labels: 
-        current_score: "Текущая оценка"
-        kept_score: "Сохраненная оценка"
-        last_attempt_details: "Сведения о последней попытке"
-        submission_details: "Сведения об отправке"
-        time: Время
-      links: 
-        preview_quiz_again: "Снова просмотреть контрольную работу"
-        preview_survey_again: "Снова просмотреть опрос"
-      no_more_attempts: "Нет доступных попыток"
-      questions_not_graded: "Некоторые вопросы еще не оценены"
-      score_set_manually: "Этот результат был установлен учителем"
-      unlimited_attempts: "Неограниченное число попыток"
-      view_previous_attempts: "Просмотреть предыдущие попытки"
-    quiz_show_teacher: 
-      anonymous_submissions: "Анонимные отправки"
-      attempts: Попытки
-      available_from: "Доступно с"
-      cant_go_back: "Блокировать вопросы после ответов"
-      code: "Код доступа"
-      due: Срок
-      filter: IP-фильтр
-      for: Для
-      group: "Группа заданий"
-      label: 
-        time_limit: "Ограничение времени"
-      multiple_attempts: "Несколько попыток"
-      no_time_limit: "Нет ограничения времени"
-      one_question_at_a_time: "По одному вопросу за раз"
-      points: Баллы
-      quiz_type: "Тип контрольной работы"
-      require_lockdown_browser: "Требуется браузер Respondus LockDown"
-      require_lockdown_browser_for_results: "Необходимо для просмотра результатов контрольной работы"
-      score_to_keep: "Оценки для сохранения"
-      show_correct_answers: "Показать правильные ответы"
-      shuffle_answers: "Изменить порядок ответов"
-      time_limit: 
-        few: "%{count} минуты"
-        one: "1 минута"
-        other: "%{count} минут"
-      until: До
-      view_responses: "Просмотр ответов"
     quiz_submission: 
-      attempt_duration: "Эта попытка длилась %{duration}."
-      buttons: 
-        update_scores: "Обновить оценки"
-      labels: 
-        final_score: "Итоговая оценка"
-        fudge_points: "Экстренные баллы"
-        fudge_points_changed_points_quiz: "Поскольку %{user} взял эту контрольную работу, количество возможных баллов изменилось на %{difference}. Можно отрегулировать это изменение и вручную добавить положительные или отрицательные баллы, используя это поле."
-        fudge_points_changed_points_survey: "Поскольку %{user} взял этот опрос, количество возможных баллов изменилось на %{difference}. Можно отрегулировать это изменение и вручную добавить положительные или отрицательные баллы, используя это поле."
-        fudge_points_generic_explanation: "Можно вручную отрегулировать оценку, добавив положительные или отрицательные баллы в это поле."
-        questions_need_review: "Следующие вопросы ожидают рассмотрения"
-        quiz_score: "Оценка контрольной работы"
-        score_for_attempt: "Оценка для этой попытки"
-        score_for_quiz: "Оценка для этой контрольной работы"
-        score_for_survey: "Оценка для этого опроса"
-        survey_score: "Оценка опроса"
-      links: 
-        click_to_view_results: "Щелкните здесь для просмотра результатов."
-      questions_not_graded: "Некоторые вопросы еще не оценены"
-      quiz_fudged_negative: "Результат этой контрольной работы был изменен вручную на %{fudge} баллов."
-      quiz_fudged_positive: "Результат этой контрольной работы был изменен вручную на +%{fudge} баллов."
-      quiz_not_yet_taken: "Контрольная работа еще не начата."
-      quiz_results_protected: "Результаты контрольной работы защищены для этой контрольной работы и не отображаются студентам."
-      quiz_results_protected_until_last_attempt: "Результаты контрольной работы защищены для этой контрольной работы и не отображаются студентам до отправки их последних попыток."
-      quiz_submission_needs_review: "Тест был значительно изменен после того, как это задание было отправлено. Возможно, требуется пересмотреть оценку этого задания."
-      requires_lockdown: "Для просмотра результатов контрольной работы требуется браузер Respondus LockDown."
-      submitted_at: "Отправлено %{when}"
-      survey_fudged_negative: "Результат этого опроса был изменен вручную на %{fudge} баллов."
-      survey_fudged_positive: "Результат этого опроса был изменен вручную на +%{fudge} баллов."
-      survey_not_yet_taken: "Опрос еще не начат."
       titles: 
         this_is_an_external_element: "Это внешний элемент, не текст, который мог быть изменен после отправки студента"
         this_is_an_external_frame: "Это внешний кадр, не текст, который мог быть изменен после отправки студента"
         this_is_an_image: "Это изображение, не текст, которое могло быть изменено после отправки студента"
-    quiz_summary: 
-      assignment_points_possible: 
-        few: "%{count} балла(ов)"
-        one: "1 балл"
-        other: "%{count} балла(ов)"
-      labels: 
+    quiz_submissions: 
+      errors: 
+        invalid_submissions: "Данная отправленная контрольная работа не может быть определена как принадлежащая вам. Повторите попытку."
+        late_quiz: "Эта контрольная работа отправлена поздно, и ваши ответы могли не быть записаны."
+        protected_quiz: "Эта контрольная работа защищена и доступна только в определенных местоположениях. Кажется, используемый компьютер не находится в допустимом местоположении для выполнения этой контрольной работы."
+      still_zipping: "Выполняется архивация файла..."
+    quizzes: 
+      access_code: 
+        buttons: 
+          submit: Отправить
+        labels: 
+          access_code: "Код доступа"
+        quiz_restricted: "Эта контрольная работа ограничена кодом доступа. Для выполнения контрольной работы необходимо обратиться к учителю или инспектору, чтобы он сообщил или ввел код доступа."
+        survey_restricted: "Этот опрос ограничен кодом доступа. Для выполнения опроса необходимо обратиться к учителю или инспектору, чтобы он сообщил или ввел код доступа."
+      default_history_crumb: История
+      default_title: "Новая контрольная работа"
+      display_answer: 
+        labels: 
+          answer_with_margin: "с большинством"
+          your_answer: "Ваш ответ"
+        margin_of_error: " допустимая погрешность"
+        plus_or_minus: +/-
+        range_answer: "От %{lower_bound} до %{upper_bound}"
+        you_left_this_blank: "(Вы оставили это пустым)"
+      display_question: 
+        default_question_answer: "[ Выбрать ]"
+        flag_this_question: "Отметить этот вопрос флажком"
+        headers: 
+          formulas: Формулы
+          possible_solutions: "Возможные решения"
+          solution_answer: Ответ
+          variable_maximum: Макс.
+          variable_minimum: Мин.
+          variable_name: Переменная
+          variable_precision: "Десятичные знаки"
+          variables: Переменные
+        labels: 
+          additional_comments: "Дополнительные комментарии"
+          for_answer_number: "Ответ %{answer_number}"
+          warning_icon: Предупреждение
+        links: 
+          delete_question: "Удалить этот вопрос"
+          edit_question: "Редактировать этот вопрос"
+          move_copy_question: "переместить/копировать вопрос в другой банк"
+        not_yet_graded: "Еще не оценено"
+        original_score: "Исходная оценка:"
+        points_possible: "%{points_possible} балла (-ов)"
+        regraded_score: "Оценка после повторной оценки:"
+        show_ansers_for_variable: "Показать ответы для %{variable}"
+        skip_question_text: "Перейти к тексту вопроса."
+        submission_was_regraded: "Данный вопрос был оценен повторно."
+        titles: 
+          question_correct_comment: "Студенты увидят этот комментарий, если правильно ответят на вопрос"
+          question_incorrect_comment: "Студенты увидят этот комментарий, если неправильно ответят на вопрос"
+          question_neutral_comment: "Студенты увидят этот комментарий после ответа на вопрос"
+        unsupported_question_type: "Этот вопрос был импортирован из внешнего источника. Это был вопрос '%{question_type}', который не поддерживается этим инструментом работы с контрольными работами."
+        you_left_this_blank: "(Вы оставили это пустым)"
+      download_file_upload_submissions: 
+        links: 
+          download_submissions: "Скачать все файлы"
+      equations_help: 
+        equation_functions: "Помимо переменных также доступна коллекция вспомогательных функций, которые можно использовать для создания полезных значений. Например: %{example}. Для просмотра объяснения данной вспомогательной функции выберите ее в списке ниже:"
+        equation_intro: "Вопросы с формулами основаны на наборе одной или нескольких формул, вычисленных последовательно. Можно определить промежуточные переменные в этих формулах, но цифровой результат последней формулы используется для создания правильного ответа. Например: %{example}. Итоговый ответ для этого набора формул — 71. Однако предварительно определенные переменные отсутствуют, поэтому у всех студентов будет один и тот же вопрос с одним и тем же ответом. См. вкладку \"переменные\" для получения дополнительной информации о переменных."
+        equation_variables2: "Вы также можете определять переменные в тексте вопроса, используя скобки (\"Чему равно [a] + [b]?\"). Для каждой переменной будет отображаться \"Пример значения\" на основе параметров переменной. Это позволит проверить вычисления и убедиться в правильности формул. Например, если вопрос — \"Чему равно [a] + 5?\", вас попросят определить переменную \"a\". Если пример значения переменной \"a\" был равен 5,2, вы можете записать: %{example}. С помощью этой формулы можно создавать любое количество наборов решения с различным значением переменной \"a\" в каждом наборе. Один студент может увидеть вопрос: \"Чему равно 5,2 + 5?\", а другой — \"Чему равно 9 + 5?\"."
+        links: 
+          functions: Функции
+          intro: Введение
+          variables: Переменные
+      errors: 
+        no_more_attempts: "Не осталось попыток контрольной работы"
+        quiz_deleted: "Эта контрольная работа удалена"
+        quiz_update_failed: "Ошибка обновления контрольной работы"
+      fabulous_quizzes: 
+        page_titles: "Контрольные работы"
+      find_question_from_bank: 
+        already_added: "этот вопрос уже присутствует в контрольной работе"
+        bank_description: "%{bank_name}, %{n} вопроса (-ов)"
+        buttons: 
+          add_questions: "Добавить вопросы"
+          create_group: "Создать группу"
+          select_bank: "Выбрать банк"
+        group_pick_count: "%{pick_count} вопроса (-ов)"
+        group_points: "%{points} на один вопрос"
+        headers: 
+          bank_name: "Название банка"
+        hints: 
+          group_pick_count: "пока выбрано %{pick_count}"
+        labels: 
+          add_questions_to_group: "Добавить вопросы к группе контрольных работ"
+          group_name: "Имя группы"
+          group_pick_count: Выбрать
+          group_points: Баллы
+        links: 
+          clear_all_banks: "Очистить все"
+          manage_question_banks: "Управление банками вопросов курса"
+          more_questions: "другие вопросы"
+          select_all_banks: "Выбрать все"
+        options: 
+          new_group: "[ Новая группа ]"
+          no_group: "[ Нет группы ]"
+        select_a_question_bank: "Выберите банк вопросов в списке ниже, чтобы связать его с этой контрольной работой как группу вопросов."
+        titles: 
+          add_new_question_group: "Добавить новую группу вопросов"
+      form_answer: 
+        answer_in_range_accessible: "между *началом диапазона* и #range end#"
+        answer_text: "Текст ответа"
+        answer_weight: "Вес ответа"
+        exact_answer_with_error_margin_accessible: "*точный ответ* с допустимой погрешностью #error margin#"
+        labels: 
+          answer_comments: "Комментарии, если студент выбрал этот ответ"
+          answer_in_range: "Ответ в диапазоне"
+          exact_answer: "Точный ответ"
+        matching_left: "Совпадающая левая часть"
+        matching_right: "Совпадающая правая часть"
+        numerical_answer: "Числовой ответ"
+        possible_answer: "Возможный ответ"
+        titles: 
+          click_to_enter_answer_comments: "Щелкните для ввода комментариев, если студент выбирает этот ответ"
+          click_to_set_as_correct: "Щелкните, чтобы установить этот ответ как правильный"
+          delete_answer: "Удалить этот ответ"
+          edit_as_html: "Показать редактируемый текст ответа в HTML"
+      form_question: 
+        allow_tolerance: "разрешить допустимую погрешность +/- %{tolerance}"
+        buttons: 
+          create_update_question: "Создать/обновить вопрос"
+          generate: Создать
+          recompute: "Вычислить повторно"
+        correct_answer_comments: "Комментарии к правильному ответу"
+        distractor_instructions: "введите каждый дистрактор на отдельной строке"
+        equation_example: "т. е. \"Чему равно 5 плюс [x]?\""
+        explanation: 
+          generate_possible_solutions: "И, наконец, создайте необходимое число сочетаний переменная-решение для вашей контрольной работы."
+        explanations: 
+          calculated: "Введите вопрос, создайте формулу и набор возможных сочетаний ответа. Студенты увидят этот вопрос вместе со случайно выбранным набором переменных, и им потребуется ввести правильный числовой ответ."
+          equations: "Можно определить переменные, введя имена переменных, заключенные в скобки"
+          essay: "Студенты должны будут ввести ответ в текстовое поле."
+          file_upload: "Студенты смогут загрузить файл со своими ответами."
+          fill_in_multiple_blanks: "Введите вопрос, указав местоположения пустых мест. Затем определите возможный правильный ответ для всех пустых мест. Студенты должны ввести правильные ответы в текстовые поля во всех пустых местах."
+          formula_definition: "Далее необходимо написать формулу или формулы, используемые для вычисления правильного ответа. Используйте имена переменных, указанные выше."
+          matching: "Создайте пары соответствующих значений. Студенты увидят значения слева и должны будут выбрать соответствующее значение в раскрывающемся списке справа. Несколько строк могут иметь один и тот же ответ, а также можно добавить дополнительные дистракторы справа."
+          missing_word: "Определите текст перед раскрывающимся списком и после него. Создайте набор возможных ответов и выберите один правильный ответ."
+          multi_answer_sets: "В поле ниже в каждом месте для отображения поля с ответом, введите справочное слово (без пробелов), заключив его в скобки"
+          multiple_answers: "Для каждого ответа на этот вопрос будут показаны поля для установки флажка, и студент должен выбрать ВСЕ ответы, указанные вами как правильные."
+          multiple_choice: "Введите вопрос и несколько ответов, затем выберите один правильный ответ."
+          multiple_dropdowns: "Введите вопрос, указав место для каждого раскрывающегося списка. Затем определите возможные ответы для каждого раскрывающегося списка с одним правильным ответом в каждом из них."
+          numerical: "Определите правильный ответ как любое число в диапазоне или число с учетом определенной допустимой погрешности. Студенты должны будут ввести числовой ответ в пустое текстовое поле."
+          short_answer: |-
+              Введите текст вопроса, затем определите все возможные правильные ответы для пустого места.  
+              Студенты увидят вопрос и небольшое текстовое поле для ввода ответа.
+          text_only: "Этот \"вопрос\" не будет оценен, но может быть полезен для представления набора связанных вопросов."
+          true_false: "Введите текст вопроса, затем выберите правильный ответ как True или False."
+          variable_definitions: "После ввода переменных выше они должны быть перечислены здесь. Можно указать диапазон возможных значений для каждой переменной ниже."
+        general_answer_comments: "Общие комментарии к ответу"
+        headers: 
+          formula_definition: "Определение формулы"
+          generate_possible_solutions: "Создание возможных решений"
+          variable_definitions: "Определения переменных"
+          variable_example_value: "Пример значения"
+          variable_maximum: Макс.
+          variable_minimum: Мин.
+          variable_name: Переменная
+          variable_precision: "Десятичные знаки"
+        label: 
+          question: 
+            name: "Имя вопроса"
+            points: "Значение балла вопроса"
+            type: "Тип вопроса"
+        labels: 
+          answers: Ответы
+          distractors: "Дополнительные возможные варианты (дистракторы)"
+          missing_word_after: "Текст для отображения после ответов"
+          points: баллы
+          question: Вопрос
+        links: 
+          add_another_answer: "Добавить другой ответ"
+          need_help: "Требуется помощь?"
+        multi_answer_sets_example: "т. е. \"Розы [color1], фиалки [color2]\""
+        offer_combinations: "Предложить %{how_many} возможных сочетания (-ий) значений (макс. %{max_combinations})"
+        options: 
+          only_one_correct: "Только один правильный ответ"
+          students_select_multiple: "Студенты выбирают несколько ответов"
+        question_type: 
+          calculated: "Вопрос с формулой"
+          essay: "Вопрос с эссе"
+          file_upload: "Вопрос с загрузкой файла"
+          fill_in_multiple_blanks: "Заполните несколько пустых мест"
+          matching: Совпадение
+          missing_word: "Отсутствующее слово"
+          multiple_answers: "Несколько ответов"
+          multiple_choice: "Несколько вариантов выбора"
+          multiple_dropdowns: "Несколько раскрывающихся списков"
+          numerical: "Числовой ответ"
+          short_answer: "Заполните пустое место"
+          text_only: "Текст (нет вопроса)"
+          true_false: True/False
+        show_possible_answers: "Показать возможные ответы для %{question}"
+        show_possible_answers_no_question: "Показать возможные ответы для"
+        titles: 
+          click_to_enter_correct_answer_comments: "Щелкните, чтобы ввести комментарии для правильного ответа"
+          click_to_enter_general_answer_comments: "Щелкните, чтобы ввести общие комментарии"
+          click_to_enter_wrong_answer_comments: "Щелкните, чтобы ввести комментарии для неправильного ответа"
+        wrong_answer_comments: "Комментарии к неправильному ответу"
+      history: 
+        anonymous_username: Студент
+        buttons: 
+          allow_extra_attempt: "разрешить этому студенту дополнительную попытку"
+        count_attempts_left: 
+          few: "У %{user} осталось %{count} попытки"
+          one: "У %{user} осталась 1 попытка"
+          other: "У %{user} осталось %{count} попыток"
+        default_quiz_name: "Контрольная работа %{course_name}"
+        default_survey_name: "Опрос %{course_name}"
+        grade_by_question_warning: "Оценка по особенностям вопроса зависит от вопросов, которые перемешиваются в группе."
+        headers: 
+          quiz_submissions: "Отправки контрольной работы"
+          survey_submissions: "Отправки опроса"
+        latest_quiz_results: "Вот последние результаты контрольной работы для %{user}. Можно изменить баллы для любого вопроса и добавить дополнительные комментарии, затем щелкнуть \"Обновить оценки\" в нижней части страницы."
+        latest_survey_results: "Вот последние результаты опроса для %{user}. Можно изменить баллы для любого вопроса и добавить дополнительные комментарии, затем щелкнуть \"Обновить оценки\" в нижней части страницы."
+        links: 
+          back_to_quiz: "Вернуться к контрольной работе"
+          back_to_survey: "Вернуться к опросу"
+        logged_out_user: "Вышедший из системы пользователь %{index}"
+        named_quiz_results: "%{quiz_name} Результаты для %{user}"
+        next_questions_arrow_title: "Следующие вопросы"
+        no_more_attempts: "У %{user} не осталось попыток"
+        page_title_quiz: "История контрольных работ %{user}"
+        page_title_survey: "История опросов %{user}"
+        prev_questions_arrow_title: "Предыдущие вопросы"
+        quiz_not_yet_taken: "Контрольная работа еще не начата."
+        quiz_not_yet_taken_or_in_progress: "Контрольная работа еще не начата или выполняется в настоящий момент"
+        quiz_unlimited_attempts: "Эта контрольная работа имеет неограниченное число попыток"
+        score_for_attempt: "Попытка %{attempt_number}: %{score}"
+        survey_not_yet_taken: "Опрос еще не начат."
+        survey_not_yet_taken_or_in_progress: "Опрос еще не начат или выполняется в настоящий момент"
+        survey_unlimited_attempts: "Этот опрос имеет неограниченное число попыток"
+        titles: 
+          score_pending_review: "Эта оценка ожидает рассмотрения и может измениться"
+          submission_needs_review: "Требуется рассмотрение этой отправки"
+        unnamed_quiz_results: "Результаты контрольной работы для %{user}"
+        unnamed_survey_results: "Результаты опроса для %{user}"
+      index: 
+        buttons: 
+          publish_quizzes: "Опубликовать контрольные работы"
+        headers: 
+          assignment_quizzes: "Контрольные работы задания"
+          course_quizzes: "Контрольные работы курса"
+          practice_quizzes: "Практические контрольные работы"
+          publish_multiple_quizzes: "Опубликовать несколько контрольных работ"
+          surveys: Опросы
+          unpublished_quizzes: "Неопубликованные контрольные работы"
+        labels: 
+          publish_multiple_quizzes: "Выберите контрольные работы для публикации на данном этапе"
+        links: 
+          create_new_quiz: "Создать новую контрольную работу"
+          manage_question_banks: "Управление банками вопросов"
+          publish_multiple_quizzes: "Опубликовать несколько контрольных работ"
+        no_quizzes: "Нет доступных контрольных работ"
+        page_titles: "Контрольные работы"
+        titles: 
+          this_quiz_is_locked: "Эта контрольная работа в настоящий момент заблокирована. Щелкните, чтобы получить дополнительную информацию."
+      invalid_ip: 
+        quiz_protected: "Эта контрольная работа защищена и доступна только в определенных местоположениях. Кажется, используемый компьютер не находится в допустимом местоположении для выполнения этой контрольной работы."
+        survey_protected: "Этот опрос защищен и доступен только в определенных местоположениях. Кажется, используемый компьютер не находится в допустимом местоположении для выполнения этого опроса."
+      lockdown_browser_required: 
+        headers: 
+          requires_lockdown: "Требуется браузер Respondus LockDown"
+        labels: 
+          download_lockdown: "Если браузер еще не установлен, загрузите его отсюда"
+        links: 
+          download_lockdown: "[Загрузить браузер Respondus LockDown]"
+        requires_lockdown: "Для этой контрольной работы требуется браузер Respondus LockDown. Запустите браузер Respondus LockDown для начала выполнения этой контрольной работы или просмотра ее результатов."
+      managed_quiz_data: 
+        anonymous_student: "Студент %{user_counter}"
+        logged_out_user: "Вышедший из системы пользователь %{user_counter}"
+        titles: 
+          submission_needs_review: "Требуется рассмотрение этой отправки"
+      moderate: 
+        add_time: "Добавить время"
+        buttons: 
+          change_extensions_for_selected_students: "Изменить расширения для %{n} выбранных студентов"
+          extend_time: "Увеличить время выполнения"
+          save: Сохранить
+        end_quiz_reference_time_current_end: "текущее время окончания"
+        end_quiz_reference_time_now: сейчас
+        end_quiz_when: "Завершить контрольную работу через %{n} минут(ы) после %{reference_time}."
+        extended_quiz_time_explanation: "Можно дать этому студенту дополнительное время для текущей попытки выполнения контрольной работы. Сколько времени им предоставить?"
+        finished_in: "завершено в %{duration}"
+        global_extra_attempts: "все уже получили %{n}"
+        headers: 
+          attempt: Попытка
+          attempts_left: "Осталось попыток"
+          extended_quiz_time: "Увеличить время на выполнение контрольной работы"
+          score: Оценка
+          student: Студент
+          student_extensions: "Расширения студента"
+          time: Время
+        in_progress: выполняется
+        labels: 
+          ending: Завершение
+          extra_attempts: "Дополнительные попытки"
+          extra_time_per_attempt: "Дополнительное время на каждую попытку"
+          manually_unlock: "Вручную разблокировать контрольную работу для следующей попытки"
+          started: Начато
+        minutes: минуты
+        page_title: "Модерирование контрольной работы"
+        student_gets_extra_time: "*%{student_name}* **получает %{extra_time} дополнительных (-ые) минут(ы) для каждой попытки**"
+        student_n: "Студент %{n}"
+        titles: 
+          change_user_extensions: "Изменить расширения пользователя"
+          manually_unlocked: "Разблокировано вручную"
+          minutes_to_add: "минуты для добавления"
+          select_deselect_all: "Выбрать все/отменить выбор всего"
+          select_user: "Выбрать %{user}"
+      multi_answer: 
+        choose_answer: Выбрать
+      muted: 
+        muted_quiz_description: "Оценка за контрольную работу недоступна, поскольку инструктор еще не завершил оценку. Когда инструктор завершит оценку этой контрольной работы, ваша оценка появится на этой странице."
+        muted_quiz_header: "Звук контрольной работы отключен"
+      new: 
+        allowed_attempts: "Число разрешенных попыток"
+        anonymous_submissions: "Сохранить отправки анонимными"
+        buttons: 
+          not_published: "Не опубликовано"
+          published: Опубликовано
+          save: Сохранить
+        cant_go_back: "Заблокировать вопросы после ответа на них"
+        default_page_title: "Новая контрольная работа"
+        group: "Группа заданий"
+        headers: 
+          ip_filters: "Что такое IP-фильтры контрольной работы?"
+        hide_correct_answers_at: "Скрыть правильные ответы с"
+        hints: 
+          question_detail_disabled: "ПРИМЕЧАНИЕ. Сведения о вопросах недоступны в случае наличия более чем %{question_count}."
+          quiz_score: "студенты автоматически получат все зачетные единицы после начала опроса"
+        ip_filters: "IP-фильтры контрольной работы используются для ограничения доступа к контрольным работам на компьютерах в указанном диапазоне IP-адресов. Фильтры могут быть списками адресов, разделенными запятыми, или адресом с маской (\"192.168.217.1\", \"192.168.217.1/24\" или \"192.168.217.1/255.255.255.0\")."
+        label: 
+          time_limit: "Ограничение времени"
+        labels: 
+          allow_multiple_attempts: "Разрешить несколько попыток"
+          hide_results_only_after_last: "Только после их последней попытки"
+          ip_filter: "Фильтр IP-адресов"
+          never_hide_results: "Позволить студентам просматривать их ответы по контрольной работе"
+          quiz_instructions: "Инструкции к контрольной работе"
+          quiz_notify: "Уведомить пользователей об изменениях в контрольной работе"
+          quiz_score: Оценка
+          require_access_code: "Требуется код доступа"
+          restrict_quiz: "Ограничения контрольной работы"
+          show_question_details: "Показать сведения о вопросе"
+        limited_attempts: "Разрешенные попытки"
+        links: 
+          cancel: Отменить
+          find_questions: "Поиск вопросов"
+          new_question: "Новый вопрос"
+          new_question_group: "Новая группа вопросов"
+          show_assignment_rubric: "Показать рубрику"
+        manage: Управлять
+        minutes: Минуты
+        new_assignment: "Новое задание"
+        new_discussion: "Новое обсуждение"
+        one_question_at_a_time: "Показывать по одному вопросу за раз"
+        points_possible: "%{n} балла (-ов)"
+        quiz_title: "Заголовок контрольной работы"
+        quiz_type: "Тип контрольной работы"
+        require_lockdown_browser: "Требуется браузер Respondus LockDown"
+        require_lockdown_browser_for_results: "Необходимо для просмотра результатов контрольной работы"
+        retrieving_filters: "Получение фильтров..."
+        score_to_keep: "Оценка контрольной работы для сохранения"
+        show_correct_answers: "Позволить студентам просматривать правильные ответы"
+        show_correct_answers_at: "Показать правильные ответы с"
+        shuffle_answers: "Изменить порядок ответов"
+        students_cannot_view_responses_after_course_concludes: "Студенты не могут просматривать ответы в контрольной работе после завершения курса"
+        time_limit: "Сколько минут?"
+        titles: 
+          click_to_select_filter: "Щелкните, чтобы выбрать этот фильтр"
+          delete: Удалить
+          find_ip_address_filter: "Поиск фильтра IP-адресов"
+        warnings: 
+          has_student_submissions: "Студенты уже выполнили или начали выполнять эту контрольную работу, поэтому будьте осторожны, редактируя ее. Если вы значительно измените какие-либо вопросы в контрольной работе, вы, возможно, захотите повторно оценить студентов, которые выполняли старую версию данной контрольной работы."
+      notices: 
+        cant_view_submission_while_muted: "Невозможно просмотреть историю контрольной работы, если ее звук отключен."
+        has_submissions_already: "Имейте в виду, что некоторые студенты уже выполнили или начали выполнять эту контрольную работу"
+        less_than_allotted_time: "Вы начали выполнять эту контрольную работу незадолго до срока окончания, поэтому у вас не будет достаточно времени на выполнение работы."
+        no_submission_for_user: "Для этого пользователя нет доступных отправок"
+        quiz_updated: "Контрольная работа успешно обновлена"
+        quizzes_published: 
+          few: "%{count} контрольные работы успешно опубликованы!"
+          one: "1 контрольная работа успешно опубликована!"
+          other: "%{count} контрольных работ успешно опубликованы!"
+        quizzes_unpublished: 
+          few: "%{count} контрольные работы успешно сняты с публикации!"
+          one: "1 контрольная работа успешно снята с публикации!"
+          other: "%{count} контрольных работ успешно сняты с публикации!"
+      question_group: 
+        buttons: 
+          update: Обновить
+        default_group_name: Группа
+        edit_questions_and_points: "Выберите *%{num_questions}* вопроса (-ов), #%{num_points}# балла (-ов) за вопрос"
+        labels: 
+          group_name: "Имя группы"
+          number_of_questions: "Количество вопросов"
+          points_per_question: "Баллов за вопрос"
+          question_bank: "Вопросы будут извлечены из банка"
+        links: 
+          link_to_a_question_bank: "Ссылка на банк вопросов"
+        show_questions_and_points: "Выберите *%{num_questions}* вопроса (-ов), #%{num_points}# балла (-ов) за вопрос"
+        titles: 
+          add_question_to_group: "Добавить вопрос к этой группе"
+          collapse_group: "Свернуть группу"
+          delete_group: "Удалить группу"
+          edit_group_details: "Редактировать сведения о группе"
+          expand_group: "Развернуть группу"
+      question_list_right_side: 
+        headers: 
+          questions: Вопросы
+      question_statistic: 
+        attempts: 
+          few: "%{count} попытки"
+          one: "1 попытка"
+          other: "%{count} попыток"
+        empty_response: "Пустой ответ"
+        labels: 
+          other_answers: "Другие ответы"
+        no_data: "Нет данных"
+        no_responses: "Для этого вопроса не записаны ответы"
+        percent_of_responses: "%{percent}% из %{total} попыток выбрано для этого ответа"
+        response_count: 
+          few: "Этот вопрос задан %{count} студентам"
+          one: "Этот вопрос задан 1 студенту"
+          other: "Этот вопрос задан %{count} студентам"
+      question_teaser: 
+        titles: 
+          click_to_show_details: "Щелкните для отображения полных сведений о вопросе"
+          delete_this_question: "Удалить этот вопрос"
+          edit_this_question: "Редактировать этот вопрос"
+      quiz_details: 
         allowed_attempts: "Разрешенные попытки"
-        attempts_left: "Осталось попыток"
-        attempts_so_far: "Пока выполнено попыток"
-        latest_submission: "Последняя отправка"
-        quiz_details: "Сведения о контрольной работе"
-        quiz_due: Срок
-        quiz_time_limit: "Ограничение времени"
-        survey_details: "Сведения об опросе"
-      no_details: "Нет сведений"
-      points_possible: "%{points_possible} возможных баллов"
-      question_count: 
-        few: "%{count} вопроса(ов)"
-        one: "1 вопрос"
-        other: "%{count} вопроса(ов)"
-      quiz_multiple_due_dates: "Несколько дат"
-      quiz_no_points: "Нет баллов"
-      quiz_points_possible: 
-        few: "%{count} балла(ов)"
-        one: "1 балл"
-        other: "%{count} балла(ов)"
-      student_mute_notification: "Инструктор выполняет оценку"
-      unlimited_attempts: "Неограниченное число попыток"
-    read_only: 
-      default_page_title: "Новая контрольная работа"
-      headers: 
-        quiz_details: "Сведения о контрольной работе"
-      labels: 
-        question_details: "Показать сведения о вопросе"
+        headers: 
+          available: Доступно
+          due: Срок
+          points: Баллы
+          questions: Вопросы
+          time_limit: "Ограничение времени"
+        multiple_due_dates: "Несколько сроков выполнения"
+        no_due_date: "Нет срока выполнения"
+        none: Нет
+        quiz_availabile_through: "%{start_time} — {end_time}"
+        quiz_available_after: "после %{start_time}"
+        quiz_available_until: "до %{end_time}"
+        requires_lockdown: "Требуется браузер Respondus LockDown"
+        time_limit: 
+          few: "%{count} минуты"
+          one: "1 минута"
+          other: "%{count} минут"
+        unlimited: "Не ограничено"
+      quiz_right_side: 
+        attempts_left: 
+          few: "Доступно еще %{count} попытки"
+          one: "Доступна еще 1 попытка"
+          other: "Доступно еще %{count} попыток"
+        attempts_so_far: 
+          few: "%{count} %{count} попытки на данный момент"
+          one: "1 %{count} попытка на данный момент"
+          other: "%{count} %{count} попыток на данный момент"
+        labels: 
+          current_score: "Текущая оценка"
+          kept_score: "Сохраненная оценка"
+          last_attempt_details: "Сведения о последней попытке"
+          submission_details: "Сведения об отправке"
+          time: Время
+        links: 
+          preview_quiz_again: "Снова просмотреть контрольную работу"
+          preview_survey_again: "Снова просмотреть опрос"
+        no_more_attempts: "Больше нет доступных попыток"
+        questions_not_graded: "Некоторые вопросы еще не оценены"
+        score_set_manually: "Эта оценка была установлена учителем"
+        unlimited_attempts: "Неограниченное число попыток"
+        view_previous_attempts: "Просмотреть предыдущие попытки"
+      quiz_show_teacher: 
+        anonymous_submissions: "Анонимные отправки"
+        attempts: Попытки
+        available_from: "Доступно с"
+        cant_go_back: "Заблокировать вопросы после ответа на них"
+        code: "Код доступа"
+        due: Срок
+        filter: "Фильтр по IP"
+        for: Для
+        group: "Группа заданий"
+        label: 
+          time_limit: "Ограничение времени"
+        multiple_attempts: "Несколько попыток"
+        no_time_limit: "Нет ограничения времени"
+        one_question_at_a_time: "По одному вопросу за раз"
+        points: Баллы
+        quiz_type: "Тип контрольной работы"
+        require_lockdown_browser: "Требуется браузер Respondus LockDown"
+        require_lockdown_browser_for_results: "Необходимо для просмотра результатов контрольной работы"
+        require_lockdown_browser_monitor: "Необходима веб-камера"
+        score_to_keep: "Оценка для сохранения"
+        show_correct_answers: "Показать правильные ответы"
+        shuffle_answers: "Изменить порядок ответов"
+        time_limit: 
+          few: "%{count} минуты"
+          one: "1 минута"
+          other: "%{count} минут"
+        until: До
+        view_responses: "Просмотреть ответы"
+      quiz_submission: 
+        attempt_duration: "Эта попытка длилась %{duration}."
+        buttons: 
+          update_scores: "Обновить оценки"
+        labels: 
+          final_score: "Итоговая оценка"
+          fudge_points: "Экстренные баллы"
+          fudge_points_changed_points_quiz: "Поскольку %{user} выполнил эту контрольную работу, количество возможных баллов изменилось на %{difference}. Можно откорректировать это изменение и вручную добавить положительные или отрицательные баллы, используя это поле."
+          fudge_points_changed_points_survey: "Поскольку %{user} выполнил этот опрос, количество возможных баллов изменилось на %{difference}. Можно откорректировать это изменение и вручную добавить положительные или отрицательные баллы, используя это поле."
+          fudge_points_generic_explanation: "Можно вручную откорректировать оценку, добавив положительные или отрицательные баллы в это поле."
+          questions_need_review: "Следующие вопросы ожидают рассмотрения"
+          quiz_score: "Оценка контрольной работы"
+          score_for_attempt: "Оценка за эту попытку"
+          score_for_quiz: "Оценка за эту контрольную работу"
+          score_for_survey: "Оценка за этот опрос"
+          survey_score: "Оценка опроса"
+        links: 
+          click_to_view_results: "Щелкните здесь для просмотра результатов."
+        questions_not_graded: "Некоторые вопросы еще не оценены"
+        quiz_fudged_negative: "Оценка этой контрольной работы была откорректирована вручную на %{fudge} балла (-ов)."
+        quiz_fudged_positive: "Оценка этой контрольной работы была отрегулирована вручную на +%{fudge} балла (-ов)."
+        quiz_not_yet_taken: "Контрольная работа еще не начата."
+        quiz_results_protected: "Для данной контрольной работы результаты защищены и не видны студентам."
+        quiz_results_protected_until_last_attempt: "Для данной контрольной работы результаты защищены и не видны студентам до отправки их последней попытки."
+        quiz_submission_needs_review: "Контрольная работа была значительно изменена после того, как это задание было отправлено. Возможно, необходимо повторно оценить  данную отправку."
+        requires_lockdown: "Для просмотра результатов контрольной работы требуется браузер Respondus LockDown."
+        submitted_at: "Отправлено %{when}"
+        survey_fudged_negative: "Оценка этого опроса была откорректирована вручную на %{fudge} балла (-ов)."
+        survey_fudged_positive: "Оценка этого опроса была откорректирована вручную на +%{fudge} балла (-ов)."
+        survey_not_yet_taken: "Опрос еще не начат."
+      quiz_summary: 
+        assignment_points_possible: 
+          few: "%{count} балла"
+          one: "1 балл"
+          other: "%{count} баллов"
+        labels: 
+          allowed_attempts: "Разрешенные попытки"
+          attempts_left: "Осталось попыток"
+          attempts_so_far: "Попыток на данный момент"
+          latest_submission: "Последняя отправка"
+          quiz_details: "Сведения о контрольной работе"
+          quiz_due: Срок
+          quiz_time_limit: "Ограничение времени"
+          survey_details: "Сведения об опросе"
+        no_details: "Нет сведений"
+        points_possible: "%{points_possible} возможных балла (-ов)"
+        question_count: 
+          few: "%{count} вопроса"
+          one: "1 вопрос"
+          other: "%{count} вопросов"
+        quiz_multiple_due_dates: "Несколько дат"
+        quiz_no_points: "Нет баллов"
+        quiz_points_possible: 
+          few: "%{count} балла"
+          one: "1 балл"
+          other: "%{count} баллов"
+        student_mute_notification: "Инструктор выполняет оценку"
+        unlimited_attempts: "Неограниченное число попыток"
+      read_only: 
+        default_page_title: "Новая контрольная работа"
+        headers: 
+          quiz_details: "Сведения о контрольной работе"
+        labels: 
+          question_details: "Показать сведения о вопросе"
+          quiz_instructions: "Инструкции к контрольной работе"
+        links: 
+          back_to_quiz_page: "Вернуться к странице контрольной работы"
+      refresh_quiz_after_popup: 
+        headers: 
+          loading_in_lockdown: "Загрузка контрольной работы в браузере Respondus LockDown"
+      show: 
+        buttons: 
+          lock_quiz: "Заблокировать эту контрольную работу сейчас"
+          lock_survey: "Заблокировать этот опрос сейчас"
+          publish: Опубликовать
+          republish: "Опубликовать заново"
+          unlock_quiz: "Позволить студентам начать эту контрольную работу сейчас"
+          unlock_survey: "Позволить студентам начать этот опрос сейчас"
+        labels: 
+          available_until: До
+          no_time_limit: "Нет ограничения времени"
+          warning_icon: Предупреждение
+        links: 
+          edit: Редактировать
+          keep_editing_this_quiz: "Продолжить редактирование этой контрольной работы"
+          keep_editing_this_survey: "Продолжить редактирование этого опроса"
+          message_students_who: "Отправить сообщения студентам, которые..."
+          moderate_this_quiz: "Модерирование этой контрольной работы"
+          moderate_this_survey: "Модерирование этого опроса"
+          preview: "Предварительный просмотр"
+          quiz_statistics: "Статистика контрольной работы"
+          see_full_quiz: "См. полную контрольную работу"
+          show_assignment_rubric: "Показать рубрику"
+          show_student_quiz_results: "Показать результаты контрольной работы студента"
+          show_student_survey_results: "Показать результаты опроса студента"
+          survey_statistics: "Статистика опроса"
+        manage: Управлять
+        only_registered_users: "Только зарегистрированные пользователи могут принимать оцененные контрольные работы"
+        quiz_regraded_your_score_affected: 
+          few: "Данная контрольная работа была оценена повторно. Новая оценка отражает %{count} вопроса, которые повлияли на вашу оценку."
+          one: "Данная контрольная работа была оценена повторно. Это повлияло на вашу оценку."
+          other: "Данная контрольная работа была оценена повторно. Новая оценка отражает %{count} вопросов, которые повлияли на вашу оценку."
+        quiz_regraded_your_score_not_affected: "Данная контрольная работа была оценена повторно. Это не повлияло на вашу оценку."
+        speed_grader: SpeedGrader™
+        students_submitted_so_far: 
+          few: "%{count} студента отправили на данный момент"
+          one: "1 студент отправил на данный момент"
+          other: "%{count} студентов отправили на данный момент"
+        titles: 
+          delete: Удалить
+          related_items: "Связанные элементы"
+          unlock_for_how_long: "На какой период времени необходимо разблокировать контрольную работу?"
+        warnings: 
+          draft_version: "Это предварительный просмотр черновой версии контрольной работы"
+      single_answer: 
+        upload: Загрузить
+      statistics: 
+        class_too_large: "Этот курс слишком большой для отображения статистики. Она все еще может быть скачана на боковой панели справа."
+        headers: 
+          for_question: "Для %{question_name}"
+          quiz_statistics: "Статистика контрольной работы"
+          survey_statistics: "Статистика опроса"
+          users_have_taken_this_quiz: "%{count} пользователя (-ей) приняли эту контрольную работу"
+          users_have_taken_this_survey: "%{count} пользователя (-ей) приняли этот опрос"
+        labels: 
+          average_correct: "Среднее число правильных ответов"
+          average_incorrect: "Среднее число неправильных ответов"
+          average_time: "Средняя продолжительность"
+          high_score: "Высокая оценка"
+          low_score: "Низкая оценка"
+          mean_score: "Средняя оценка"
+          standard_deviation: "Стандартное отклонение"
+          users_selected_the_answer: "Следующие пользователи выбрали ответ, %{answer_text}"
+        links: 
+          count_all_attempts: "Считать **все** попытки"
+          count_only_latest_attempts: "Считать только каждую последнюю попытку"
+        page_title: Статистика
+        quiz_all_version_disclaimer: "В этом отчете содержится статистика контрольной работы на основе всех попыток всех пользователей."
+        quiz_latest_version_disclaimer: "В этом отчете содержится статистика контрольной работы на основе последней попытки каждого пользователя."
+        student_n: "Студент %{student_counter}"
+        survey_all_version_disclaimer: "В этом отчете содержится статистика опроса на основе всех попыток всех пользователей."
+        survey_latest_version_disclaimer: "В этом отчете содержится статистика опроса на основе последней попытки каждого пользователя."
+      statistics_crumb: Статистика
+      submission_version: 
+        attempt_number: "Попытка %{att_no}"
+        kept: СОХРАНЕННАЯ
+        latest: ПОСЛЕДНЯЯ
+      submission_versions: 
+        attempt: Попытка
+        attempt_history: "История попыток"
+        quiz_attempt_history_description: "Таблица, показывающая вашу историю попыток выполнения контрольной работы. Каждая попытка находится слева. Попытка, время и оценка находятся сверху."
+        regraded: "Оценена повторно"
+        score: Оценка
+        time: Время
+      take_quiz: 
+        buttons: 
+          next: Далее
+          out_of_time_submit: Хорошо
+          previous: Назад
+          submit_quiz: "Отправить контрольную работу"
+        headers: 
+          draft_preview: "Это предварительный просмотр черновой версии контрольной работы"
+        labels: 
+          started: Начато
+          times_up: "Время истекло! Отправка результатов через"
+        logged_out_of_canvas: "*Вы вышли из системы canvas.* Для продолжения войдите в систему"
+        login_required: "Требуется войти в систему"
+        not_saved: "Не сохранено"
         quiz_instructions: "Инструкции к контрольной работе"
-      links: 
-        back_to_quiz_page: "Вернуться к странице контрольной работы"
-    refresh_quiz_after_popup: 
-      headers: 
-        loading_in_lockdown: "Загрузка контрольной работы в браузере Respondus LockDown"
+      take_quiz_in_popup: 
+        headers: 
+          loading_in_lockdown: "Загрузка контрольной работы в браузере Respondus LockDown"
+        links: 
+          return_to_quiz_page: "[Щелкните здесь](%{url}) для возврата к странице контрольной работы."
+      take_quiz_right_side: 
+        labels: 
+          attempt_due: "Срок выполнения попытки"
+          score: Оценка
+          time_elapsed: "Прошло времени"
+          time_running: "Время идет"
+        links: 
+          hide_time_running: Скрыть
+          keep_editing_quiz: "Продолжить редактирование этой контрольной работы"
+          keep_editing_survey: "Продолжить редактирование этого опроса"
     retrieving_filters: "Получение фильтров..."
     rubric: 
       loading: Загрузка...
@@ -11921,119 +12150,38 @@ ru:
         you_answered: "Ваш ответ"
       buttons: 
         already_published: Опубликовано!
-        lock_quiz: "Заблокировать эту контрольную работу"
-        lock_survey: "Заблокировать этот опрос"
-        publish: Опубликовать
         publishing: Публикация...
-        republish: "Опубликовать заново"
-        unlock_quiz: "Разрешить студентам начинать эту контрольную работу"
-        unlock_survey: "Разрешить студентам начинать этот опрос"
       confirms: 
         delete_quiz: "Действительно хотите удалить эту контрольную работу?"
         delete_quiz_submissions_warning: 
           few: "Предупреждение: %{count} студента/ов уже прошли данный тест. Если вы удалите его, любое завершенное задание будет удалено и не будет отображаться в зачетной книжке."
           one: "Предупреждение: 1 студент уже прошел данный тест. Если вы удалите его, любое завершенное задание будет удалено и не будет отображаться в зачетной книжке."
           other: "Предупреждение: %{count} студента/ов уже прошли данный тест. Если вы удалите его, любое завершенное задание будет удалено и не будет отображаться в зачетной книжке."
-      labels: 
-        available_until: До
-        no_time_limit: "Нет лимита времени"
-        warning_icon: Предупреждение
       links: 
-        edit: Редактировать
         hide_student_quiz_results: "Скрыть результаты контрольной работы студента"
         hide_student_survey_results: "Скрыть результаты опроса студента"
-        keep_editing_this_quiz: "Продолжить редактирование этой контрольной работы"
-        keep_editing_this_survey: "Продолжить редактирование этого опроса"
-        message_students_who: "Отправить сообщения студентам, которые..."
-        moderate_this_quiz: "Модерирование этой контрольной работы"
-        moderate_this_survey: "Модерирование этого опроса"
-        preview: "Предварительный просмотр"
-        quiz_statistics: "Статистика контрольной работы"
-        see_full_quiz: "См. полную контрольную работу"
-        show_assignment_rubric: "Показать рубрику"
         show_student_quiz_results: "Показать результаты контрольной работы студента"
         show_student_survey_results: "Показать результаты опроса студента"
-        survey_statistics: "Статистика опроса"
-      manage: Управлять
-      only_registered_users: "Только зарегистрированные пользователи могут принимать оцененные контрольные работы"
-      quiz_regraded_your_score_affected: 
-        few: "Данная контрольная работа была оценена повторно. Ваша новая оценка отражает %{count} вопроса, которые были изменены."
-        one: "Данная контрольная работа была оценена повторно. Это повлияло на вашу оценку."
-        other: "Данная контрольная работа была оценена повторно. Ваша новая оценка отражает  %{count} вопросов, которые были изменены."
-      quiz_regraded_your_score_not_affected: "Данная контрольная работа была оценена повторно. Это не повлияло на вашу оценку."
-      speed_grader: SpeedGrader™
-      students_submitted_so_far: 
-        few: " %{count} студента(ов) отправили на данный момент"
-        one: "1 студент отправил на данный момент"
-        other: " %{count} студента(ов) отправили на данный момент"
       students_who_have_not_taken_the_quiz: "Студенты, НЕ взявшие контрольную работу"
       students_who_have_taken_the_quiz: "Студенты, взявшие контрольную работу"
-      titles: 
-        delete: Удалить
-        related_items: "Связанные элементы"
-        unlock_for_how_long: "На сколько времени необходимо разблокировать контрольную работу?"
-      warnings: 
-        draft_version: "Это предварительный просмотр черновой версии контрольной работы"
     show_and_hide_correct_answers: "С %{from} по %{to}"
     show_correct_answers_after: "После %{date}"
     show_correct_answers_immediately: Немедленно
     show_correct_answers_until: "До %{date}"
-    single_answer: 
-      upload: Загрузить
     statistics: 
-      class_too_large: "Этот курс слишком большой для отображения статистики. Она может быть скачана на правой боковой панели."
       count_attempts: 
         few: "%{count} попытки(ок)"
         one: "1 попытка"
         other: "%{count} попытки(ок)"
-      headers: 
-        for_question: "Для %{question_name}"
-        quiz_statistics: "Статистика контрольной работы"
-        survey_statistics: "Статистика опроса"
-        users_have_taken_this_quiz: "%{count} пользователей приняли эту контрольную работу"
-        users_have_taken_this_survey: "%{count} пользователей приняли этот опрос"
-      labels: 
-        average_correct: "Среднее число правильных ответов"
-        average_incorrect: "Среднее число неправильных ответов"
-        average_time: "Средняя продолжительность"
-        high_score: "Высокая оценка"
-        low_score: "Низкая оценка"
-        mean_score: "Средняя оценка"
-        standard_deviation: "Стандартное отклонение"
-        users_selected_the_answer: "Следующие пользователи выбрали ответ, %{answer_text}"
-      links: 
-        count_all_attempts: "Считать **Все** попытки"
-        count_only_latest_attempts: "Считать только все последние попытки"
-      page_title: Статистика
-      quiz_all_version_disclaimer: "В этом отчете содержится статистика контрольной работы на основе всех попыток всех пользователей."
-      quiz_latest_version_disclaimer: "В этом отчете содержится статистика контрольной работы на основе последней попытки каждого пользователя."
-      survey_all_version_disclaimer: "В этом отчете содержится статистика опроса на основе всех попыток всех пользователей."
-      survey_latest_version_disclaimer: "В этом отчете содержится статистика опроса на основе последней попытки каждого пользователя."
       titles: 
         submitted_users_for_quesiton: "Отправленные пользователи для %{user}"
       uncounted_submissions: 
         few: " %{count} другие отправки"
         one: "1 другая отправка"
         other: " %{count} других отправок"
-    statistics_crumb: Статистика
-    submission_version: 
-      attempt_number: "Попытка %{att_no}"
-      kept: СОХРАНЕННАЯ
-      latest: ПОСЛЕДНЯЯ
-    submission_versions: 
-      attempt: Попытка
-      attempt_history: "История попыток"
-      quiz_attempt_history_description: "Таблица, показывающая вашу историю попыток выполнения контрольной работы. Каждая попытка находится на левой стороне. Попытка, время и оценки находятся вверху."
-      regraded: "Оценена повторно"
-      score: Оценка
-      time: Время
+    survey: Опрос
     surveys_label: "Переключить видимость контрольной работы в опросах"
     take_quiz: 
-      buttons: 
-        next: Далее
-        out_of_time_submit: Хорошо
-        previous: Назад
-        submit_quiz: "Отправить контрольную работу"
       confirms: 
         cant_go_back_blank: "Вы не сможете вернуться к этому вопросу, если вы нажмете ''далее''. Вы уверены, что хотите оставить его незаполненным?"
         navigate_away: "Вы собираетесь покинуть эту страницу.  Продолжить?"
@@ -12053,19 +12201,15 @@ ru:
       errors: 
         connection_lost: "Подключение к %{host} было потеряно.  Перед продолжением убедитесь, что вы подключены к Интернету."
         only_numerical_values: "принимаются только числовые значения"
-      headers: 
-        draft_preview: "Это предварительный просмотр черновой версии контрольной работы"
       hide_time_link: Скрыть
       hours_count: 
         few: "%{count} часа(ов)"
         one: "1 час "
         other: "%{count} часа(ов)"
       labels: 
-        started: Начало
         time_elapsed: "Прошло времени"
-        times_up: "Время истекло! Отправка результатов через"
-      logged_out_of_canvas: "*Вы вышли из системы canvas.* Пожалуйста, войдите в систему, для продолжения"
-      login_required: "Требуется войти в систему"
+      login_failed: "Ошибка входа в систему."
+      login_successful: "Вход в систему успешно выполнен."
       minutes_count: 
         few: "%{count} минут(ы)"
         one: "1 минута"
@@ -12074,7 +12218,6 @@ ru:
         few: "%{count} месяца(ев)"
         one: "1 месяц"
         other: "%{count} месяца(ев)"
-      not_saved: "Не сохранено"
       notices: 
         extra_time: "Вам предоставлено дополнительное время на эту попытку"
         five_minutes_left: "Осталось пять минут"
@@ -12084,7 +12227,6 @@ ru:
         twelve_hours_left: "Осталось двенадцать часов"
       question_answered: "Получен ответ"
       question_unanswered: "Еще не отвечено"
-      quiz_instructions: "Инструкции к контрольной работе"
       saved_at: "Контрольная работа сохранена в %{t}"
       saving: Сохранение...
       saving_not_needed: "Нет новых данных для сохранения. Последняя проверка была %{t}"
@@ -12100,21 +12242,6 @@ ru:
         few: "%{count} года(лет)"
         one: "1 год"
         other: "%{count} года(лет)"
-    take_quiz_in_popup: 
-      headers: 
-        loading_in_lockdown: "Загрузка контрольной работы в браузере Respondus LockDown"
-      links: 
-        return_to_quiz_page: "[Щелкните здесь](%{url}) для возврата к странице контрольной работы."
-    take_quiz_right_side: 
-      labels: 
-        attempt_due: "Срок выполнения попытки"
-        score: Оценка
-        time_elapsed: "Прошло времени"
-        time_running: "Время идет"
-      links: 
-        hide_time_running: Скрыть
-        keep_editing_quiz: "Продолжить редактирование этой контрольной работы"
-        keep_editing_survey: "Продолжить редактирование этого опроса"
     timing: 
       labels: 
         time_elapsed: "Прошло времени"
@@ -12151,6 +12278,19 @@ ru:
     types: 
       quiz: "Контрольная работа"
       survey: Опрос
+  quizzes/quiz_group: 
+    errors: 
+      no_bank: "Не удалось найти банк вопросов для группы контрольной работы %{group_name}"
+      no_permissions: "У пользователя отсутствует разрешение для обращения к банку вопросов в группе контрольной работы %{group_name}"
+    question_group: "Группа вопросов"
+  quizzes/quiz_question: 
+    defaults: 
+      question_name: Вопрос
+  quizzes/quiz_statistics: 
+    statistics_filename: "Отчет %{quiz_title} %{quiz_type} %{report_type}"
+    types: 
+      item_analysis: "Анализ элемента"
+      student_analysis: "Анализ студента"
   quizzes_model: 
     cant_unpublish_when_students_submit: "Невозможно отменить публикацию, если есть отправленные студентами задания"
     confirms: 
@@ -12569,16 +12709,6 @@ ru:
         go: Переход
       titles: 
         find_user: "Найти пользователя"
-    accounts_secondary_content: 
-      buttons: 
-        go: Переход
-      links: 
-        manage_permissions: "Управление разрешениями роли"
-        manage_subaccounts: "Управление дополнительными учетными записями"
-        manage_terms: "Управление периодами"
-        view_statistics: "Просмотр статистики"
-      titles: 
-        find_user: "Найти пользователя"
     add_assignment: 
       buttons: 
         add_assignment: "Добавить задание"
@@ -12680,6 +12810,9 @@ ru:
         unenroll_user_section: "Удалить пользователя из секции"
       titles: 
         course_section: "Раздел курса"
+    error_form: 
+      message_failed: "Отчет не отправлен. Пожалуйста, повторите попытку."
+      message_sent: "Спасибо за помощь! Мы проследим за этим."
     errors: 
       400_message: 
         description: "Да. Возникла проблема загрузки запрошенной страницы."
@@ -12706,8 +12839,6 @@ ru:
           submit: "Отправить комментарии"
         labels: 
           email: "Электронная почта (дополнительно)"
-        message_failed: "Отчет не был отправлен. Повторите попытку."
-        message_sent: "Спасибо за вашу помощь! Мы проследим за этим."
     event_list: 
       at_least_more_events: "не менее %{count_of_events}"
       at_least_more_events_one_week: "не менее %{count_of_events} на следующей неделе"
@@ -13259,6 +13390,13 @@ ru:
     columns: 
       date: Дата
       value: Значение
+    domain_not_found: 
+      body_description: "Пожалуйста, проверьте, URL-адрес и повторите попытку позже или обратитесь за помощью в свою организацию или к учителю."
+      body_reference: "Если Вас интересует бесплатная учетная запись Canvas без привязки к организации, Вы можете зарегистрироваться по адресу"
+      links: 
+        canvas_instructure: canvas.instructure.com
+      page_title: "Ой, мы не можем найти ваш экземпляр Canvas."
+      you_typed: "Вы ввели"
     institution_suspended: 
       body: "Ваша учетная запись школы Canvas временно отключена. Пожалуйста, свяжитесь с администратором Canvas."
       links: 
@@ -13289,8 +13427,13 @@ ru:
     assignment_order_assignment_groups: "По группе задания и позиции"
     assignment_order_due_date: "К сроку  выполнения"
     assignment_unmuted: "Щелкните, чтобы выключить звук."
+    invalid_group_warning: 
+      few: "Примечание. Оценка не включает задания от групп %{list_of_group_names}, так как у них нет возможных баллов."
+      one: "Примечание. Оценка не включает задания от группы %{list_of_group_names}, так как у них нет возможных баллов."
+      other: "Примечание. Оценка не включает задания от групп %{list_of_group_names}, так как у них нет возможных баллов."
     no_assignment: "Нет выбранных заданий"
     no_student: "Нет выбранных студентов"
+    notes: Заметки
     student_hidden_name: "Студент %{position}"
   statistics: 
     csv_columns: 
@@ -13317,6 +13460,11 @@ ru:
     not_available: "Доступно с"
     pending: "Недоступно до"
   step: Шаг
+  student_outcome_gradebook_description: |-
+      Табель успеваемости по результатам позволяет студентам быстро просматривать прогресс 
+      курса по результатам обучения. Результаты представлены в формате табеля успеваемости,
+      и прогресс отображается как в виде числовой оценки, так и по шкале усвоено/
+      почти усвоено/коррекция.
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "Невозможно удалить дополнительную учетную запись с курсами"
@@ -13560,6 +13708,10 @@ ru:
         term_start: "начало периода"
         unspecified: "в любое время"
       timespan: "%{start_at} *до* %{end_at}"
+  text_helper: 
+    time: 
+      ranges: 
+        different_days: "%{start_date_and_time} — %{end_date_and_time}"
   time: 
     am: am
     count_hours_ago: 
