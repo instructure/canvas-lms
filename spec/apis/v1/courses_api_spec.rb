@@ -1470,7 +1470,7 @@ describe CoursesController, type: :request do
       describe "as a student" do
         append_before do
           @other_user = user_with_pseudonym(:name => 'Waldo', :username => 'dontfindme@example.com')
-          @other_user.pseudonym.update_attribute(:sis_user_id, '8675309')
+          @other_user.pseudonym.update_attribute(:sis_user_id, 'mysis_8675309')
           @course1.enroll_student(@other_user).accept!
 
           @user = user
@@ -1512,7 +1512,7 @@ describe CoursesController, type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course1.to_param}/users",
                           { :controller => 'courses', :action => 'users',
                             :course_id => @course1.to_param, :format => 'json' },
-                          { :search_term => '867' })
+                          { :search_term => 'mysis' })
           json.should be_empty
         end
       end
