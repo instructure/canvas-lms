@@ -232,14 +232,14 @@ describe "One Question at a Time Quizzes" do
     end
 
     context "on a OQAAT quiz" do
-      it "displays one question at a time" do
-        take_the_quiz
-        back_and_forth_flow
-      end
-
       it "saves answers and grades the quiz" do
         take_the_quiz
         answers_flow
+      end
+
+      it "displays one question at a time" do
+        take_the_quiz
+        back_and_forth_flow
       end
 
       it "warns you about submitting unanswered questions" do
@@ -331,14 +331,14 @@ describe "One Question at a Time Quizzes" do
     end
 
     context "on a OQAAT quiz" do
-      it "displays one question at a time" do
-        preview_the_quiz
-        back_and_forth_flow
-      end
-
       it "saves answers and grades the quiz" do
         preview_the_quiz
         answers_flow
+      end
+
+      it "displays one question at a time" do
+        preview_the_quiz
+        back_and_forth_flow
       end
     end
 

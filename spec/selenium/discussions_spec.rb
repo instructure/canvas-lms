@@ -333,17 +333,6 @@ describe "discussions" do
       end
 
       describe "gear menu" do
-        it "should delete a topic" do
-          topic
-          get url
-
-          f('.al-trigger').click
-          fj('.icon-trash:visible').click
-          driver.switch_to.alert.accept
-          wait_for_ajaximations
-          topic.reload.workflow_state.should == 'deleted'
-          f('.discussion-list li.discussion').should be_nil
-        end
 
         it "should give the teacher delete/lock permissions on all topics" do
           student_topic
@@ -408,6 +397,18 @@ describe "discussions" do
 
           f('.locked.discussion-list .al-trigger').click
           ffj('.icon-pin:visible').length.should == 1
+        end
+
+        it "should delete a topic" do
+          topic
+          get url
+
+          f('.al-trigger').click
+          fj('.icon-trash:visible').click
+          driver.switch_to.alert.accept
+          wait_for_ajaximations
+          topic.reload.workflow_state.should == 'deleted'
+          f('.discussion-list li.discussion').should be_nil
         end
       end
     end

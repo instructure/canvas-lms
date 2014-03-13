@@ -87,6 +87,28 @@ describe "content migrations" do
       @filename = 'cc_full_test.zip'
     end
 
+    it "should import all content immediately by default" do
+      pending unless Qti.qti_enabled?
+      visit_page
+      fill_migration_form
+      ff('[name=selective_import]')[0].click
+      submit
+      run_migration
+
+      keep_trying_until do
+        visit_page
+        f('.migrationProgressItem .progressStatus').should include_text("Completed")
+      end
+
+      # From spec/lib/cc/importer/common_cartridge_converter_spec.rb
+      @course.attachments.count.should == 10
+      @course.discussion_topics.count.should == 2
+      @course.context_modules.count.should == 3
+      @course.context_external_tools.count.should == 2
+      @course.quizzes.count.should == 1
+      @course.quizzes.first.quiz_questions.count.should == 11
+    end
+
     it "should show each form" do
       visit_page
 
@@ -140,28 +162,6 @@ describe "content migrations" do
       @course.content_migrations.each do |cm|
         hrefs.find { |href| href.include?("/files/#{cm.attachment.id}/download") }.should_not be_nil
       end
-    end
-
-    it "should import all content immediately by default" do
-      pending unless Qti.qti_enabled?
-      visit_page
-      fill_migration_form
-      ff('[name=selective_import]')[0].click
-      submit
-      run_migration
-
-      keep_trying_until do
-        visit_page
-        f('.migrationProgressItem .progressStatus').should include_text("Completed")
-      end
-
-      # From spec/lib/cc/importer/common_cartridge_converter_spec.rb
-      @course.attachments.count.should == 10
-      @course.discussion_topics.count.should == 2
-      @course.context_modules.count.should == 3
-      @course.context_external_tools.count.should == 2
-      @course.quizzes.count.should == 1
-      @course.quizzes.first.quiz_questions.count.should == 11
     end
 
     it "should import selective content" do
