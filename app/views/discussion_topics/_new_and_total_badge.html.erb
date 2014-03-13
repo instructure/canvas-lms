@@ -1,17 +1,34 @@
 <div class="new-and-total-badge">
   <span class="new-items"
+        aria-hidden="true"
         data-tooltip
         data-bind='{"title":"unreadText", "text":"unreadCount"}'
         title="<%= t('unread_count_tooltip', { 
-                     :zero => 'No unread replies',
-                     :one => '1 unread reply',
-                     :other => '%{count} unread replies'
+                     :zero => 'No unread replies.',
+                     :one => '1 unread reply.',
+                     :other => '%{count} unread replies.'
                     }, :count => unread_count) %>"><%= unread_count if unread_count > 0 %></span>
+  <span class="screenreader-only"
+        data-bind='{"text":"unreadText"}'>
+    <%= t('unread_count_tooltip', { 
+           :zero => 'No unread replies.',
+           :one => '1 unread reply.',
+           :other => '%{count} unread replies.'
+          }, :count => unread_count) %>
+  </span>
   <span class="total-items"
+        aria-hidden="true"
         data-tooltip
         title="<%= t('reply_count_tooltip', {
-                     :zero => 'No replies',
-                     :one => '1 reply',
-                     :other => '%{count} replies'
+                     :zero => 'No replies.',
+                     :one => '1 reply.',
+                     :other => '%{count} replies.'
                     }, :count => reply_count) %>"><%= reply_count if reply_count > 0 %></span>
+  <span class="screenreader-only">
+    <%= t('reply_count_tooltip', {
+           :zero => 'No replies.',
+           :one => '1 reply.',
+           :other => '%{count} replies.'
+          }, :count => reply_count) %>
+  </span>
 </div>
