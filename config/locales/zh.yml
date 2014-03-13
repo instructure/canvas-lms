@@ -11675,7 +11675,7 @@ zh:
           ip_filters: "什么是测验 IP 过滤器?"
         hide_correct_answers_at: 隐藏正确答案
         hints: 
-          question_detail_disabled: "注意: 超出 %{question_count} 时问题详细信息不可用。"
+          question_detail_disabled: "注意: 超出 %{question_count} 个时问题详细信息不可用。"
           quiz_score: 一旦进行调查，学生将自动获得满分
         ip_filters: "可以使用测验 IP 过滤器，只允许指定 IP 范围的计算机访问测验。过滤器可以是逗号分隔的地址列表，或者地址后面接掩码（\"192.168.217.1\"、\"192.168.217.1/24\"或\"192.168.217.1/255.255.255.0\"）。"
         label: 
@@ -11747,7 +11747,7 @@ zh:
           link_to_a_question_bank: 链接至题库
         show_questions_and_points: "挑选 *%{num_questions}* 个问题，每个问题 #%{num_points}# 分"
         titles: 
-          add_question_to_group: 添加问题到该组
+          add_question_to_group: 添加问题到该小组
           collapse_group: 折叠小组
           delete_group: 删除小组
           edit_group_details: 编辑小组详细信息
@@ -11786,7 +11786,7 @@ zh:
         none: 无
         quiz_availabile_through: "%{start_time} 至 %{end_time}"
         quiz_available_after: "%{start_time} 之后"
-        quiz_available_until: "结束时间 %{end_time}"
+        quiz_available_until: "直到 %{end_time}"
         requires_lockdown: "需要 Respondus LockDown Browser"
         time_limit: 
           one: "%{count} 分钟"
@@ -11812,7 +11812,7 @@ zh:
         questions_not_graded: 有些问题尚未计分
         score_set_manually: 教师已设定此分数
         unlimited_attempts: 无限尝试次数
-        view_previous_attempts: 查看上次尝试
+        view_previous_attempts: 查看以前的尝试
       quiz_show_teacher: 
         anonymous_submissions: 匿名提交
         attempts: 已尝试次数
@@ -11839,7 +11839,7 @@ zh:
         time_limit: 
           one: "%{count} 分钟"
           other: "%{count} 分钟"
-        until: 结束时间
+        until: 直到
         view_responses: 查看答题结果
       quiz_submission: 
         attempt_duration: "此尝试进行了 %{duration}。"
@@ -11848,8 +11848,8 @@ zh:
         labels: 
           final_score: 最终分数
           fudge_points: 虚假得分
-          fudge_points_changed_points_quiz: "由于 %{user} 进行了此测验，因此最高得分已通过 %{difference} 更改。您可以调整此更改并使用此框手动添加正负得分。"
-          fudge_points_changed_points_survey: "由于 %{user} 进行了此调查，因此最高得分已通过 %{difference} 更改。您可以调整此更改并使用此框手动添加正负得分。"
+          fudge_points_changed_points_quiz: "由于 %{user} 进行了此测验，因此最高得分已更改 %{difference}。您可以调整此更改并使用此框手动添加正负得分。"
+          fudge_points_changed_points_survey: "由于 %{user} 进行了此调查，因此最高得分已更改 %{difference}。您可以调整此更改并使用此框手动添加正负得分。"
           fudge_points_generic_explanation: 您可以通过将正负得分添加到此框手动调整分数。
           questions_need_review: 以下问题需要审阅
           quiz_score: 测验分数
@@ -11917,7 +11917,7 @@ zh:
           unlock_quiz: 立即允许学生进行此测验
           unlock_survey: 立即允许学生进行此调查
         labels: 
-          available_until: 结束时间
+          available_until: 直到
           no_time_limit: 无时间限制
           warning_icon: 警告
         links: 
@@ -11937,8 +11937,8 @@ zh:
         manage: 管理
         only_registered_users: 只有注册的登记用户才能进行计分测验
         quiz_regraded_your_score_affected: 
-          one: "此测验已重新评分; 您的新分数反映受到影响的 %{count} 个问题。"
-          other: "此测验已重新评分; 您的新分数反映受到影响的 %{count} 个问题。"
+          one: "此测验已重新计分; 您的新分数反映受到影响的 %{count} 个问题。"
+          other: "此测验已重新计分; 您的新分数反映受到影响的 %{count} 个问题。"
         quiz_regraded_your_score_not_affected: "此测验已重新计分; 您的分数未受影响。"
         speed_grader: 快速评分器™
         students_submitted_so_far: 
@@ -11984,7 +11984,7 @@ zh:
         kept: 保留
         latest: 最新
       submission_versions: 
-        attempt: 已尝试次数
+        attempt: 尝试
         attempt_history: 尝试历史记录
         quiz_attempt_history_description: 显示您的测验尝试历史记录的表。每次尝试都列在左侧。尝试、时间和分数列在顶部。
         regraded: 已重新计分
@@ -11999,7 +11999,7 @@ zh:
         headers: 
           draft_preview: 这是测验草拟版本的预览
         labels: 
-          started: 开始时间
+          started: 已开始
           times_up: 时间到！提交结果
         logged_out_of_canvas: "*您已注销 Canvas。*若要继续，请登录"
         login_required: 需要登录
