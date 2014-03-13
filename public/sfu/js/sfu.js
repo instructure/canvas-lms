@@ -116,6 +116,23 @@
     }
     // END no-flash upload FIX
 
+    // Add copyright compliance notice under the Publish Course button
+    utils.onPage(/^\/courses\/\d+$/, function() {
+        // The Publish Course button ID attribute contains the course ID
+        var $publishButton = $('#' + location.pathname.replace('/courses/', 'edit_course_'));
+        var $readMoreLink = $('<a href="/sfu/copyright/disclaimer" class="element_toggler" aria-controls="copyright_dialog" target="_blank">Read more.</a>');
+        var $disclaimer = $('<iframe src="/sfu/copyright/disclaimer" seamless="seamless" width="100%" height="100%">').css('border', 'none');
+        $("<p>I confirm that the use of copyright protected materials in this course complies with <em>Canada's Copyright Act and SFU Policy R30.04 - Copyright Compliance and Administration</em>. </p>")
+            .append($readMoreLink)
+            .insertAfter($publishButton);
+        // Use a modal dialog to display the full disclaimer
+        $('<form id="copyright_dialog" title="Copyright Disclaimer">')
+            .attr('data-turn-into-dialog', '{"width":600,"height":500,"modal":true}')
+            .append($disclaimer)
+            .hide()
+            .appendTo('body');
+    });
+
     // Alphabetize course drop-down list (Import Content page only)
     // NOTE: This is no longer needed when XHR results are pre-sorted by Canvas
     utils.onPage(/courses\/\d+\/content_migrations/, function() {

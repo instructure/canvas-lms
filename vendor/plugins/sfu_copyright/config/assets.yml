@@ -1,0 +1,3 @@
+stylesheets:
+  standalone:
+    - public/stylesheets/standalone.scss
