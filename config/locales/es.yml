@@ -11207,7 +11207,7 @@ es:
       logged_out_of_canvas: "*Ha cerrado su sesión en Canvas.* Para continuar, inicie sesión."
       password: Contraseña
       titles: 
-        log_in: "Porfavor Inicie la Sesión"
+        log_in: "Por favor, inicie sesión"
     links: 
       resume_quiz: "Resumir la evaluación"
       resume_survey: "Resumir la encuesta"
@@ -11291,8 +11291,8 @@ es:
     quiz_submissions: 
       errors: 
         invalid_submissions: "No se ha podido verificar que este envío de evaluación le pertenezca. Por favor, inténtelo de nuevo."
-        late_quiz: "Envió esta evaluación tarde, y sus preguntas pueden no haber sido grabadas."
-        protected_quiz: "Esta evaluación está protegida y solo está disponible para ciertos lugares. La computadora que está usando no parece ser un lugar válido para tomar esta evaluación."
+        late_quiz: "Envió esta evaluación tarde, y sus preguntas pueden no haberse grabado."
+        protected_quiz: "Esta evaluación está protegida y solo está disponible desde algunas ubicaciones. El equipo que está usando no parece ser un dispositivo válido para realizar esta evaluación."
       still_zipping: "La compresión del archivo todavía está en proceso..."
     quizzes: 
       access_code: 
@@ -11300,27 +11300,27 @@ es:
           submit: Enviar
         labels: 
           access_code: "Código de acceso"
-        quiz_restricted: "Esta evaluación está restringida por un código de acceso. Deberá preguntarle a su profesor o procurador que lo ingrese o le diga el código de acceso para poder tomar esta evaluación."
-        survey_restricted: "Esta encuesta está restringida por un código de acceso. Deberá preguntarle a su profesor o procurador que lo ingrese o le diga el código de acceso para poder participar en la encuesta."
+        quiz_restricted: "Esta evaluación está restringida por un código de acceso. Deberá pedirle a su profesor o supervisor que lo escriba o le diga el código de acceso para poder realizar esta evaluación."
+        survey_restricted: "Esta encuesta está restringida por un código de acceso. Deberá pedirle a su profesor o supervisor que lo escriba o le diga el código de acceso para poder participar en la encuesta."
       default_history_crumb: Historia
       default_title: "Nueva evaluación"
       display_answer: 
         labels: 
           answer_with_margin: "con margen"
-          your_answer: "Su Respuesta"
+          your_answer: "Su respuesta"
         margin_of_error: "margen de error"
         plus_or_minus: +/-
         range_answer: "Entre %{lower_bound} y %{upper_bound}"
-        you_left_this_blank: "Dejó esto en Blanco"
+        you_left_this_blank: "(Dejó esto en blanco)"
       display_question: 
         default_question_answer: "[ Escoger ]"
         flag_this_question: "Marcar esta pregunta"
         headers: 
-          formulas: Formulas
-          possible_solutions: "Soluciones Posibles"
+          formulas: Fórmulas
+          possible_solutions: "Soluciones posibles"
           solution_answer: Respuesta
-          variable_maximum: Max
-          variable_minimum: Min
+          variable_maximum: Máx
+          variable_minimum: Mín
           variable_name: Variable
           variable_precision: Decimales
           variables: Variables
@@ -11329,22 +11329,22 @@ es:
           for_answer_number: "Respuesta %{answer_number}"
           warning_icon: Aviso
         links: 
-          delete_question: "Borrar esta Pregunta"
-          edit_question: "Editar esta Pregunta"
+          delete_question: "Borrar esta pregunta"
+          edit_question: "Editar esta pregunta"
           move_copy_question: "mover/copiar la pregunta a otro grupo de preguntas"
         not_yet_graded: "Sin calificar"
         original_score: "Puntuación original:"
         points_possible: "%{points_possible} pts"
         regraded_score: "Puntuación con cambio de calificación:"
-        show_ansers_for_variable: "Mostrar Respuestas para %{variable}"
+        show_ansers_for_variable: "Mostrar respuestas para %{variable}"
         skip_question_text: "Saltar al texto de la pregunta."
         submission_was_regraded: "Esta pregunta se ha calificado de nuevo."
         titles: 
-          question_correct_comment: "Los estudiantes verán este comentario si la respuesta es correcta"
-          question_incorrect_comment: "Los estudiantes ven este comentario si su respuesta es errónea"
-          question_neutral_comment: "Los estudiantes verán este comentario una vez que han contestado la pregunta"
-        unsupported_question_type: " Esta pregunta fue importada de una fuente externa. Fue una pregunta '%{question_type}', que no está soportada en esta herramienta de evaluación. "
-        you_left_this_blank: "Dejó esto en Blanco"
+          question_correct_comment: "Los alumnos verán este comentario si la respuesta es correcta"
+          question_incorrect_comment: "Los alumnos verán este comentario si su respuesta es errónea"
+          question_neutral_comment: "Los alumnos verán este comentario una vez que hayan contestado la pregunta"
+        unsupported_question_type: " Esta pregunta se importó desde una fuente externa. Se trataba de una pregunta '%{question_type}', que no es válida en esta herramienta de evaluación. "
+        you_left_this_blank: "(Dejó esto en blanco)"
       download_file_upload_submissions: 
         links: 
           download_submissions: "Descargar todos los archivos"
@@ -11360,15 +11360,15 @@ es:
             
             Para esta serie de formulas, la respuesta final es 71. No obstante, no hay variables predefinidas, entonces todos los estudiantes tendrían la misma pregunta con la misma respuesta. 
             Vear la etiqueta de "variables" para más información sobre las variables.
-        equation_variables2: "También puede definir variables en el texto de su pregunta usando corchetes (\"¿Cuánto es [a] + [b]?\"). Para cada variable, verá un \"Valor de ejemplo\" basado en las configuraciones de la variable. Esto le ayudará a revisar su trabajo y asegurarse que las formulas funcionan. Por ejemplo, si su pregunta es \"¿Cuánto es [a] + 5?\" luego se le pediría que definiera la variable \"a\". Si el valor de ejemplo para \"a\" fue de 5,2, podría escribir: %{example} Con esta formula puede generar cualquier cantidad de conjuntos de soluciones, con un valor diferente de \"a\" en cada conjunto. Un estudiante puede ver la pregunta, \"¿Cuánto es 5,2 + 5?\" y otro podrá ver \"¿Cuánto es 9 + 5?\". "
+        equation_variables2: "También puede definir variables en el texto de su pregunta usando corchetes (\"¿Cuánto es [a] + [b]?\"). Para cada variable, verá un \"Valor de ejemplo\" basado en las configuraciones de la variable. Esto le ayudará a revisar su trabajo y asegurarse de que las fórmulas funcionan. Por ejemplo, si su pregunta es \"¿Cuánto es [a] + 5?\" luego se le pediría que definiera la variable \"a\". Si el valor de ejemplo para \"a\" fue de 5,2, podría escribir: %{example} Con esta fórmula puede generar cualquier número de conjuntos de soluciones, con un valor diferente de \"a\" en cada conjunto. Un alumno puede ver la pregunta, \"¿Cuánto es 5,2 + 5?\" y otro podrá ver \"¿Cuánto es 9 + 5?\". "
         links: 
           functions: Funciones
           intro: Intro
           variables: Variables
       errors: 
-        no_more_attempts: "Ya no tiene intentos para tomar esta evaluación"
-        quiz_deleted: "Esa evaluación ha sido borrada"
-        quiz_update_failed: "Falló la actualización de la evaluación"
+        no_more_attempts: "No le quedan más intentos para realizar esta evaluación"
+        quiz_deleted: "Esta evaluación se ha borrado"
+        quiz_update_failed: "Se produjo un fallo en la actualización de la evaluación"
       fabulous_quizzes: 
         page_titles: Evaluaciones
       find_question_from_bank: 
@@ -11376,12 +11376,12 @@ es:
         bank_description: "%{bank_name}, %{n} preguntas"
         buttons: 
           add_questions: "Agregar Preguntas"
-          create_group: "Crear Grupo"
-          select_bank: "Seleccionar un Grupo"
+          create_group: "Crear grupo"
+          select_bank: "Seleccionar un grupo"
         group_pick_count: "%{pick_count} preguntas"
         group_points: "%{points} por pregunta"
         headers: 
-          bank_name: "Nombre del Grupo"
+          bank_name: "Nombre del grupo"
         hints: 
           group_pick_count: "%{pick_count} seleccionados hasta ahora"
         labels: 
@@ -11390,45 +11390,45 @@ es:
           group_pick_count: Escoger
           group_points: Puntos
         links: 
-          clear_all_banks: "Borrar Todo"
-          manage_question_banks: "Administrar los Grupos de Preguntas del Curso"
+          clear_all_banks: "Borrar todo"
+          manage_question_banks: "Administrar los grupos de preguntas del curso"
           more_questions: "más preguntas"
           select_all_banks: "Seleccionar todo"
         options: 
-          new_group: "[ Grupo Nuevo ]"
-          no_group: "[ Sin Grupo ]"
-        select_a_question_bank: "Seleccione un grupo de preguntas de la siguiente lista para enlazarla a esta evaluación como un grupo de preguntas."
+          new_group: "[ Nuevo grupo ]"
+          no_group: "[ Sin grupo ]"
+        select_a_question_bank: "Seleccione un grupo de preguntas de la siguiente lista para vincularlo como grupo de preguntas a esta evaluación."
         titles: 
-          add_new_question_group: "Agregar un Grupo Nuevo de Preguntas"
+          add_new_question_group: "Agregar un nuevo grupo de preguntas"
       form_answer: 
         answer_in_range_accessible: "entre *range start* y #range end#"
         answer_text: "Texto de respuesta"
         answer_weight: "Ponderación de respuestas"
         exact_answer_with_error_margin_accessible: "*exact answer* con margen de error #error margin#"
         labels: 
-          answer_comments: "Comentarios, si el estudiante escoge esta respuesta"
-          answer_in_range: "Respuesta en el Rango"
-          exact_answer: "Respuesta Exacta"
+          answer_comments: "Comentarios, si el alumno escoge esta respuesta"
+          answer_in_range: "Respuesta en el rango"
+          exact_answer: "Respuesta exacta"
         matching_left: "Coincide con el lado izquierdo"
         matching_right: "Coincide con el lado derecho"
-        numerical_answer: "Respuesta Numérica"
-        possible_answer: "Respuesta Posible"
+        numerical_answer: "Respuesta numérica"
+        possible_answer: "Respuesta posible"
         titles: 
-          click_to_enter_answer_comments: "Haga click para ingresar comentarios, si el estudiante escoge esta respuesta"
-          click_to_set_as_correct: "Haga click para marcar esta respuesta como la correcta"
-          delete_answer: "Borrar esta Respuesta"
-          edit_as_html: "Editar HTML"
+          click_to_enter_answer_comments: "Haga clic para escribir comentarios, en caso de que el alumno elija esta respuesta"
+          click_to_set_as_correct: "Haga clic para marcar esta respuesta como la correcta"
+          delete_answer: "Borrar esta respuesta"
+          edit_as_html: "Cambiar a editar el texto de respuesta como HTML"
       form_question: 
         allow_tolerance: "permitir un márgen de error de +/- %{tolerance}"
         buttons: 
-          create_update_question: "Crear/Actualizar la Pregunta"
+          create_update_question: "Crear/actualizar la pregunta"
           generate: Generar
           recompute: Recalcular
-        correct_answer_comments: "Comentarios de Respuestas Correctas"
-        distractor_instructions: "Ingrese cada distractor en su propia línea"
-        equation_example: "i.e. \"¿Qué es 5 más [x]?\""
+        correct_answer_comments: "Comentarios de respuestas correctas"
+        distractor_instructions: "Escriba cada distractor en su propia línea"
+        equation_example: "p. ej. \"¿Qué es 5 más [x]?\""
         explanation: 
-          generate_possible_solutions: "Finalmente, construya la mayor cantidad de combinaciones de variables-soluciones que puede necesitar para su evaluación."
+          generate_possible_solutions: "Por último, cree tantas combinaciones de variables-soluciones como necesite para su evaluación."
         explanations: 
           calculated: "Ingrese su pregunta, construya una formula y genere una serie de combinaciones posibles para la respuesta. Los estudiantes verán la pregunta con una serie de variables seleccionadas al azar completadas y tienen que incluír la respuesta numérica correcta."
           equations: "Puede definir las variables ingresando los nombres de las variables rodeados por corchetes."
