@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= polymorphic_url asset_context.course %>
+  <%= course_url asset_context.course_id %>
 <% end %>
 <% define_content :subject do %>
   <%= t('subject', 'Alert: %{user_name}', :user_name => asset_context.user.name) %>

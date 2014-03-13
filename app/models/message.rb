@@ -210,28 +210,9 @@ class Message < ActiveRecord::Base
   # Public: Helper to generate a URI for the given subject. Overrides Rails'
   # built-in ActionController::PolymorphicRoutes#polymorphic_url method because
   # it forces option defaults for protocol and host.
-  #
-  # Differs from the built-in method in that it doesn't accept a hash as a
-  # subject; only ActiveRecord objects and arrays.
-  #
-  # subject - An ActiveRecord object, or an array of ActiveRecord objects.
-  # options - A hash of URI options (default: {}):
-  #           :protocol - HTTP protocol string. Either 'http' or 'https'.
-  #           :host - A host string (e.g. 'canvas.instructure.com').
-  #
-  # Returns a URL string.
-  def polymorphic_url_with_context_host(subject, options = {})
-    # Force options
-    options[:protocol] = HostUrl.protocol
-    options[:host]     = if subject.is_a?(Array)
-                           HostUrl.context_host(subject.first)
-                         else
-                           HostUrl.context_host(subject)
-                         end
-
-    polymorphic_url_without_context_host(subject, options)
+  def default_url_options
+    { protocol: HostUrl.protocol, host: HostUrl.context_host(link_root_account) }
   end
-  alias_method_chain :polymorphic_url, :context_host
 
   # Public: Helper to generate JSON suitable for publishing via Amazon SNS
   #
@@ -258,12 +239,27 @@ class Message < ActiveRecord::Base
     end
   end
 
-  # the hostname for user-specific links (e.g. setting notification prefs).
-  # may be different from the asset/context host
-  def primary_host
-    primary_context = user.pseudonym.try(:account)
-    primary_context ||= context.respond_to?(:context) ? context.context : context
-    HostUrl.context_host primary_context
+  # infer a root account associated with the context that the user can log in to
+  def link_root_account
+    @root_account ||= begin
+      context = self.context
+      context = context.assignment if context.respond_to?(:assignment) && context.assignment
+      context = context.rubric_association.context if context.respond_to?(:rubric_association) && context.rubric_association
+      context = context.appointment_group.contexts.first if context.respond_to?(:appointment_group) && context.appointment_group
+      context = context.context if context.respond_to?(:context)
+      context = context.account if context.respond_to?(:account)
+      context = context.root_account if context.respond_to?(:root_account)
+      if context
+        p = user.sis_pseudonym_for(context)
+        p ||= user.find_pseudonym_for_account(context, true)
+        context = p.account if p
+      else
+        # nothing? okay, just something the user can log in to
+        context = user.pseudonym.try(:account)
+        context ||= self.context
+      end
+      context
+    end
   end
 
   # Internal: Store any transmission errors in the database to help with later
@@ -432,7 +428,7 @@ class Message < ActiveRecord::Base
   # _binding              - Message binding
   #
   # Returns message body
-  def populate_body(message_body_template, path_type, _binding)
+  def populate_body(message_body_template, path_type, _binding, filename)
     # Build the body content based on the path type
 
     if path_type == 'facebook'
@@ -441,7 +437,7 @@ class Message < ActiveRecord::Base
       self.body = ActionView::Template::Handlers::Erubis.new(message_body_template).result(_binding)
     else
       self.body = Erubis::Eruby.new(message_body_template,
-        :bufvar => '@output_buffer').result(_binding)
+        bufvar: '@output_buffer', filename: filename).result(_binding)
       self.html_body = apply_html_template(_binding) if path_type == 'email'
     end
 
@@ -494,18 +490,20 @@ class Message < ActiveRecord::Base
     context, asset, user, delayed_messages, asset_context, data = [self.context,
       self.context, self.user, @delayed_messages, self.asset_context, @data]
 
-    if message_body_template.present? && path_type.present?
-      populate_body(message_body_template, path_type, binding)
+    link_root_account.shard.activate do
+      if message_body_template.present? && path_type.present?
+        populate_body(message_body_template, path_type, binding, filename)
 
-      # Set the subject and url
-      self.subject = @message_content_subject || t('#message.default_subject', 'Canvas Alert')
-      self.url     = @message_content_link || nil
-    else
-      # Message doesn't exist so we flag the message as an error
-      main_link    = Erubis::Eruby.new(self.notification.main_link || "").result(binding)
-      self.subject = Erubis::Eruby.new(subject).result(binding)
-      self.body    = Erubis::Eruby.new(body).result(binding)
-      self.transmission_errors = "couldn't find #{Canvas::MessageHelper.find_message_path(filename)}"
+        # Set the subject and url
+        self.subject = @message_content_subject || t('#message.default_subject', 'Canvas Alert')
+        self.url     = @message_content_link || nil
+      else
+        # Message doesn't exist so we flag the message as an error
+        main_link    = Erubis::Eruby.new(self.notification.main_link || "").result(binding)
+        self.subject = Erubis::Eruby.new(subject).result(binding)
+        self.body    = Erubis::Eruby.new(body).result(binding)
+        self.transmission_errors = "couldn't find #{Canvas::MessageHelper.find_message_path(filename)}"
+      end
     end
 
     self.body

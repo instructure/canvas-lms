@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/courses/<%= asset.id %>
+  <%= course_url(asset) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -22,7 +22,7 @@
     <ul style="padding: 0; list-style: none;">
       <% asset.teachers.each do |teacher| %>
         <li>
-          <a href="<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/users/<%= teacher.id %>"><%= teacher.name %></a>
+          <a href="<%= course_user_url(asset, teacher) %>"><%= teacher.name %></a>
           <% if teacher.email %>(<%= teacher.email %>)<% end %>
         </li>
       <% end %>

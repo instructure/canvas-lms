@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups/<%= asset.group_id %>
+ <%= polymorphic_url([asset.group.context, asset.group]) %>
 <% end %>
 
 <% define_content :subject do %>

@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment.id %>
+  <%= polymorphic_url([asset.assignment.context, asset.assignment]) %>
 <% end %>
 
 <%= t('assignment_due_date_changed_sentence', 'The due date for the assignment *%{assignment_name}* for %{course_name} (%{override}) has changed to:', :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name, :override => asset.title, :wrapper => "<b><a href=\"#{content :link}\">\\1</a></b>") %>

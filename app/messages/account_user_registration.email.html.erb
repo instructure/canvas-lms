@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.account) %>/register/<%= asset.user.communication_channel.confirmation_code %>
+  <%= registration_confirmation_url(asset.user.communication_channel.confirmation_code) %>
 <% end %>
 
 <% define_content :subject do %>

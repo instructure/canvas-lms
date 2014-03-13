@@ -1,4 +1,4 @@
 <% define_content :link do -%>
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment_id %>
+  <%= polymorphic_url([asset.assignment.context, asset.assignment]) %>
 <% end -%>
 <%= t('subject', 'Canvas Alert - Late Group Submission: %{group_name}, %{assignment_name}', :group_name => asset.group.name, :assignment_name => asset.assignment.title) %>
