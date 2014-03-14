@@ -11375,7 +11375,7 @@ es:
         already_added: "esta pregunta ya está en la evaluación"
         bank_description: "%{bank_name}, %{n} preguntas"
         buttons: 
-          add_questions: "Agregar Preguntas"
+          add_questions: "Agregar preguntas"
           create_group: "Crear grupo"
           select_bank: "Seleccionar un grupo"
         group_pick_count: "%{pick_count} preguntas"
@@ -11430,32 +11430,32 @@ es:
         explanation: 
           generate_possible_solutions: "Por último, cree tantas combinaciones de variables-soluciones como necesite para su evaluación."
         explanations: 
-          calculated: "Ingrese su pregunta, construya una formula y genere una serie de combinaciones posibles para la respuesta. Los estudiantes verán la pregunta con una serie de variables seleccionadas al azar completadas y tienen que incluír la respuesta numérica correcta."
-          equations: "Puede definir las variables ingresando los nombres de las variables rodeados por corchetes."
-          essay: "Los estudiantes tendrán un espacio en blanco para escribir su respuesta."
+          calculated: "Escriba su pregunta, cree una fórmula y genere una serie de combinaciones posibles para la respuesta. Los alumnos verán la pregunta con una serie de variables seleccionadas al azar ya rellenadas y tendrán que incluír la respuesta numérica correcta."
+          equations: "Puede definir las variables escribiendo sus nombres entre corchetes."
+          essay: "Los alumnos dispondrán de un espacio en blanco para escribir su respuesta."
           file_upload: "Los alumnos podrán cargar un archivo como respuesta."
-          fill_in_multiple_blanks: "Ingrese su pregunta, especificando donde debería ir cada espacio en blanco. Luego defina la respuesta correcta para cada espacio. Los estudiantes deben ingresar las respuestas correctas en los espacios provistos."
+          fill_in_multiple_blanks: "Escriba su pregunta, especificando dónde debería ir cada espacio en blanco. Luego defina la respuesta correcta para cada espacio. Los alumnos deberán escribir las respuestas correctas en los espacios provistos."
           formula_definition: "Después tendrá que escribir la fórmula o fórmulas usadas para calcular la respuesta correcta. Solo tendrá que utilizar los mismos nombres de variables que aparecen más arriba."
-          matching: "Construya pares de valores coincidentes. Los estudiantes verán valores en la izquierda y tienen que seleccionar el valor coincidente a la derecha de una lista. Filas múltiples pueden tener la misma respuesta, y puede agregar distractores adicionales en la derecha."
+          matching: "Cree pares de valores coincidentes. Los alumnos verán valores en la izquierda y deberán seleccionar de la lista de la derecha el valor que coincida. Varias filas pueden tener la misma respuesta, y puede agregar distractores adicionales en la derecha."
           missing_word: "Defina el texto que puede ir antes y después de la lista desplegable. Construya una serie de respuestas posibles y seleccione una respuesta correcta."
           multi_answer_sets: "En el espacio de abajo, en cada lugar que quiere mostrar un espacio para respuesta, ingrese una palabra de referencia (sin espacios) rodeada por corchetes."
           multiple_answers: "Esta pregunta mostrará una casilla al lado de la respuesta, y el estudiante debe seleccionar TODAS las respuestas que usted marque como correctas."
-          multiple_choice: "Ingrese su pregunta y respuestas múltiples, luego seleccione la respuesta correcta."
-          multiple_dropdowns: "Ingrese su pregunta, especificando donde debe ir cada lista desplegable. Luego defina respuestas posibles de cada lista desplegable, con una respuesta correcta en cada una."
-          numerical: "Defina la respuesta correcta como cualquier número dentro de un rango, o un número más o menos un márgen de error. Los estudiantes tendrán un espacio en blanco para ingresar su respuesta numérica."
+          multiple_choice: "Escriba su pregunta y las respuestas múltiples, luego seleccione la respuesta correcta."
+          multiple_dropdowns: "Escriba su pregunta, especificando dónde debe ir cada lista desplegable. Luego defina las respuestas posibles de cada lista desplegable, con una respuesta correcta en cada una."
+          numerical: "Defina la respuesta correcta como cualquier número dentro de un rango, o un número más o menos un márgen de error. Los alumnos dispondrán de un espacio en blanco para escribir su respuesta numérica."
           short_answer: |-
-              Ingrese el texto de la pregunta, luego defina todas las respuestas correctas para el espacio en blanco.
-              Los estudiantes verán la pregunta seguida por una casilla de texto para escribir su respuesta.
-          text_only: "Esta \"pregunta\" no será calificada, pero puede ser útil para introducir una serie de preguntas relacionadas."
-          true_false: "Ingrese el texto de la pregunta, luego seleccione is Verdadero o Falso es la respuesta correcta."
-          variable_definitions: "Once you have entered your variables above, you should see them listed here. You can specify the range of possible values for each variable below."
-        general_answer_comments: "Comentarios de Respuesta General"
+              Escriba el texto de la pregunta, luego defina todas las respuestas correctas para el espacio en blanco.
+              Los alumnos verán la pregunta seguida por una casilla de texto para escribir su respuesta.
+          text_only: "Esta \"pregunta\" no se calificará, pero puede ser útil para introducir una serie de preguntas relacionadas."
+          true_false: "Escriba el texto de la pregunta, luego seleccione si la respuesta correcta es verdadero o falso."
+          variable_definitions: "Una vez que haya introducido las variables que aparecen más arriba, deberá poder verlas aquí en forma de lista. Puede especificar el rango de valores posibles para cada variable que aparece a continuación."
+        general_answer_comments: "Comentarios de respuesta generales"
         headers: 
-          formula_definition: "Definición de Formula"
-          generate_possible_solutions: "Generar Soluciones Posibles"
-          variable_definitions: "Definiciones Variables"
-          variable_example_value: "Valor de Ejemplo"
-          variable_maximum: Max
+          formula_definition: "Definición de fórmula"
+          generate_possible_solutions: "Generar soluciones posibles"
+          variable_definitions: "Definiciones variables"
+          variable_example_value: "Valor de ejemplo"
+          variable_maximum: Máx
           variable_minimum: Min
           variable_name: Variable
           variable_precision: Decimales
