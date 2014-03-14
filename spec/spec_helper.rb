@@ -173,11 +173,21 @@ else
     end
   end
 end
-require 'mocha/api'
 require 'action_controller_test_process'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
 require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
+
+# if mocha was initialized before rails (say by another spec), CollectionProxy would have
+# undef_method'd them; we need to restore them
+unless CANVAS_RAILS2
+  Mocha::ObjectMethods.instance_methods.each do |m|
+    ActiveRecord::Associations::CollectionProxy.class_eval <<-RUBY
+      def #{m}; end
+      remove_method #{m.inspect}
+RUBY
+  end
+end
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
