@@ -438,7 +438,7 @@ class SubmissionsApiController < ApplicationController
   end
 
   def map_user_ids(user_ids)
-    Api.map_ids(user_ids, User, @domain_root_account)
+    Api.map_ids(user_ids, User, @domain_root_account, @current_user)
   end
 
   def get_user_considering_section(user_id)

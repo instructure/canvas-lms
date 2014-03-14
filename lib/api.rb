@@ -64,7 +64,7 @@ module Api
       end
     end
 
-    find_params = Api.sis_find_params_for_collection(collection, ids, options[:account] || @domain_root_account)
+    find_params = Api.sis_find_params_for_collection(collection, ids, options[:account] || @domain_root_account, @current_user)
     return [] if find_params == :not_found
     find_params[:limit] = options[:limit] unless options[:limit].nil?
     return collection.all(find_params)
@@ -74,9 +74,9 @@ module Api
   # sis ids that can't be found in the db won't appear in the result, however
   # AR object ids aren't verified to exist in the db so they'll still be
   # returned in the result.
-  def self.map_ids(ids, collection, root_account)
+  def self.map_ids(ids, collection, root_account, current_user = nil)
     sis_mapping = sis_find_sis_mapping_for_collection(collection)
-    columns = sis_parse_ids(ids, sis_mapping[:lookups])
+    columns = sis_parse_ids(ids, sis_mapping[:lookups], current_user)
     result = columns.delete(sis_mapping[:lookups]["id"]) || []
     unless columns.empty?
       find_params = sis_make_params_for_sis_mapping_and_columns(columns, sis_mapping, root_account)
@@ -123,7 +123,7 @@ module Api
   MAX_ID_LENGTH = 18
   ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}
 
-  def self.sis_parse_id(id, lookups)
+  def self.sis_parse_id(id, lookups, current_user = nil)
     # returns column_name, column_value
     return lookups['id'], id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
     id = id.to_s.strip
@@ -144,11 +144,11 @@ module Api
     return column, sis_id
   end
 
-  def self.sis_parse_ids(ids, lookups)
+  def self.sis_parse_ids(ids, lookups, current_user = nil)
     # returns {column_name => [column_value,...].uniq, ...}
     columns = {}
     ids.compact.each do |id|
-      column, sis_id = sis_parse_id(id, lookups)
+      column, sis_id = sis_parse_id(id, lookups, current_user)
       next unless column && sis_id
       columns[column] ||= []
       columns[column] << sis_id
@@ -171,12 +171,12 @@ module Api
         raise(ArgumentError, "need to add support for table name: #{collection.table_name}")
   end
 
-  def self.sis_find_params_for_collection(collection, ids, sis_root_account)
-    return sis_find_params_for_sis_mapping(sis_find_sis_mapping_for_collection(collection), ids, sis_root_account)
+  def self.sis_find_params_for_collection(collection, ids, sis_root_account, current_user = nil)
+    return sis_find_params_for_sis_mapping(sis_find_sis_mapping_for_collection(collection), ids, sis_root_account, current_user)
   end
 
-  def self.sis_find_params_for_sis_mapping(sis_mapping, ids, sis_root_account)
-    return sis_make_params_for_sis_mapping_and_columns(sis_parse_ids(ids, sis_mapping[:lookups]), sis_mapping, sis_root_account)
+  def self.sis_find_params_for_sis_mapping(sis_mapping, ids, sis_root_account, current_user = nil)
+    return sis_make_params_for_sis_mapping_and_columns(sis_parse_ids(ids, sis_mapping[:lookups], current_user), sis_mapping, sis_root_account)
   end
 
   def self.sis_make_params_for_sis_mapping_and_columns(columns, sis_mapping, sis_root_account)
@@ -194,11 +194,26 @@ module Api
       columns.keys.sort.each do |column|
         if not_scoped_to_account.include?(column)
           query << "#{column} IN (?)"
+          args << columns[column]
         else
           raise ArgumentError, "missing scope for collection" unless sis_mapping[:scope]
-          query << "(#{sis_mapping[:scope]} = #{sis_root_account.id} AND #{column} IN (?))"
+          ids = columns[column]
+          if ids.any? { |id| id.is_a?(Array) }
+            ids_hash = {}
+            ids.each do |id|
+              id = Array(id)
+              account = id.last || sis_root_account
+              ids_hash[account] ||= []
+              ids_hash[account] << id.first
+            end
+          else
+            ids_hash = { sis_root_account => ids }
+          end
+          ids_hash.each do |root_account, ids|
+            query << "(#{sis_mapping[:scope]} = #{root_account.id} AND #{column} IN (?))"
+            args << ids
+          end
         end
-        args << columns[column]
       end
 
       args.unshift(query.join(" OR "))

@@ -247,12 +247,12 @@ class AccountsController < ApplicationController
     end
 
     if params[:by_teachers].is_a?(Array)
-      teacher_ids = Api.map_ids(params[:by_teachers], User, @domain_root_account).map(&:to_i)
+      teacher_ids = Api.map_ids(params[:by_teachers], User, @domain_root_account, @current_user).map(&:to_i)
       @courses = @courses.by_teachers(teacher_ids)
     end
 
     if params[:by_subaccounts].is_a?(Array)
-      account_ids = Api.map_ids(params[:by_subaccounts], Account, @domain_root_account).map(&:to_i)
+      account_ids = Api.map_ids(params[:by_subaccounts], Account, @domain_root_account, @current_user).map(&:to_i)
       @courses = @courses.by_associated_accounts(account_ids)
     end
 
