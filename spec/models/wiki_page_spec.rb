@@ -472,4 +472,19 @@ describe WikiPage do
       mod2.evaluate_for(@student).requirements_met.detect { |rm| rm[:id] == tag2.id && rm[:type] == 'must_view' }.should_not be_nil
     end
   end
+
+  describe "locked_for?" do
+    it "should lock by preceding item and sequential progress" do
+      course_with_student_logged_in active_all: true
+      pageB = @course.wiki.wiki_pages.create! title: 'B'
+      pageC = @course.wiki.wiki_pages.create! title: 'C'
+      mod = @course.context_modules.create name: 'teh module'
+      tagB = mod.add_item type: 'wiki_page', id: pageB.id
+      tagC = mod.add_item type: 'wiki_page', id: pageC.id
+      mod.completion_requirements = { tagB.id => { type: 'must_view' } }
+      mod.require_sequential_progress = true
+      mod.save
+      pageC.reload.should be_locked_for @student
+    end
+  end
 end
