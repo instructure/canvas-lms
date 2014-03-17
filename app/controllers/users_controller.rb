@@ -1178,7 +1178,7 @@ class UsersController < ApplicationController
   end
 
   def media_download
-    asset = Kaltura::ClientV3.new.media_sources(params[:entryId]).find{|a| a[:fileExt] == params[:type] }
+    asset = CanvasKaltura::ClientV3.new.media_sources(params[:entryId]).find{|a| a[:fileExt] == params[:type] }
     url = asset && asset[:url]
     if url
       if params[:redirect] == '1'

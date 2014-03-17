@@ -4,8 +4,8 @@ require File.expand_path(File.dirname(__FILE__) + '/cc_spec_helper')
 describe CC::CCHelper do
   describe CC::CCHelper::HtmlContentExporter do
     before do
-      @kaltura = mock('Kaltura::ClientV3')
-      Kaltura::ClientV3.stubs(:new).returns(@kaltura)
+      @kaltura = mock('CanvasKaltura::ClientV3')
+      CanvasKaltura::ClientV3.stubs(:new).returns(@kaltura)
       @kaltura.stubs(:startSession)
       @kaltura.stubs(:flavorAssetGetByEntryId).with('abcde').returns([
       {

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -22,10 +22,12 @@ require 'net/http'
 require 'uri'
 require 'nokogiri'
 require 'libxml'
+require 'multipart'
+
 
 # Test Console and API Documentation at:
 # http://www.kaltura.com/api_v3/testmeDoc/index.php
-module Kaltura
+module CanvasKaltura
 
   class SessionType
     USER = 0;
@@ -36,7 +38,7 @@ module Kaltura
     attr_accessor :endpoint, :ks
 
     def initialize
-      config = Kaltura::ClientV3.config
+      config = CanvasKaltura::ClientV3.config
       @host = config['domain']
       @resource_domain = config['resource_domain']
       @endpoint = config['endpoint']
@@ -52,7 +54,7 @@ module Kaltura
     end
 
     def self.config
-      res = Canvas::Plugin.find(:kaltura).try(:settings)
+      res = CanvasKaltura.plugin_settings.try(:settings)
       return nil unless res && res['partner_id'] && res['subpartner_id']
 
       # default settings
@@ -89,23 +91,26 @@ module Kaltura
     }
 
     def media_sources(entryId)
-      cache_key = ['media_sources2', entryId, @cache_play_list_seconds].cache_key
-      sources = Rails.cache.read(cache_key)
+      cache_key = ['media_sources2', entryId, @cache_play_list_seconds].join('/')
+      sources = CanvasKaltura.cache.read(cache_key)
+
       unless sources
-        startSession(Kaltura::SessionType::ADMIN)
+        startSession(CanvasKaltura::SessionType::ADMIN)
         assets = flavorAssetGetByEntryId(entryId)
         sources = []
         all_assets_are_done_converting = true
         assets.each do |asset|
           if ASSET_STATUSES[asset[:status]] == :READY
-            hash = asset.slice :containerFormat, :width, :fileExt, :size, :bitrate, :height, :isOriginal
+            keys = [:containerFormat, :width, :fileExt, :size, :bitrate, :height, :isOriginal]
+            hash = asset.select{|k| keys.member?(k)}
+
             hash[:url] = flavorAssetGetPlaylistUrl(entryId, asset[:id])
             if hash[:content_type] = CONTENT_TYPES[asset[:fileExt]]
               hash[:url] ||= flavorAssetGetDownloadUrl(asset[:id])
             end
 
-            if hash[:url].blank? || hash[:content_type].blank?
-              Rails.logger.warn "kaltura entry (#{entryId}) has an invalid asset (#{asset[:id]})"
+            if hash[:url].nil? || hash[:url].strip.empty? || hash[:content_type].nil? || hash[:content_type].strip.empty?
+              CanvasKaltura.logger.warn "kaltura entry (#{entryId}) has an invalid asset (#{asset[:id]})"
               next
             end
 
@@ -124,11 +129,11 @@ module Kaltura
         # only cache if all the sources are done converting
         # @cache_play_list_seconds of 0 means don't cache
         # @cache_play_list_seconds of nil means cache indefinitely
-        if @cache_play_list_seconds != 0 && sources.present? && all_assets_are_done_converting
+        if @cache_play_list_seconds != 0 && !sources.empty? && all_assets_are_done_converting
           if @cache_play_list_seconds
-            Rails.cache.write(cache_key, sources, :expires_in => @cache_play_list_seconds)
+            CanvasKaltura.cache.write(cache_key, sources, :expires_in => @cache_play_list_seconds)
           else
-            Rails.cache.write(cache_key, sources)
+            CanvasKaltura.cache.write(cache_key, sources)
           end
         end
       end
@@ -338,7 +343,7 @@ module Kaltura
     end
 
     def assetSwfUrl(assetId)
-      config = Kaltura::ClientV3.config
+      config = CanvasKaltura::ClientV3.config
       return nil unless config
       "https://#{config['domain']}/kwidget/wid/_#{config['partner_id']}/uiconf_id/#{config['player_ui_conf']}/entry_id/#{assetId}"
     end
@@ -370,7 +375,7 @@ module Kaltura
     # the first pass
     def sendRequest(request, body=nil)
       response = nil
-      Canvas.timeout_protection("kaltura", fallback_timeout_length: 30) do
+      CanvasKaltura.with_timeout_protector(fallback_timeout_length: 30) do
         http = Net::HTTP.new(@host, Net::HTTP.https_default_port)
         http.use_ssl = true
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -381,4 +386,3 @@ module Kaltura
     end
   end
 end
-

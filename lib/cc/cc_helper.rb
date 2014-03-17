@@ -289,8 +289,8 @@ module CCHelper
 
   def self.media_object_info(obj, client = nil, flavor = nil)
     unless client
-      client = Kaltura::ClientV3.new
-      client.startSession(Kaltura::SessionType::ADMIN)
+      client = CanvasKaltura::ClientV3.new
+      client.startSession(CanvasKaltura::SessionType::ADMIN)
     end
     if flavor
       assets = client.flavorAssetGetByEntryId(obj.media_id)

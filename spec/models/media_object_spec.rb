@@ -156,8 +156,8 @@ describe MediaObject do
       stub_kaltura
       user
       attachment_obj_with_context(@user, user: @user)
-      Kaltura::ClientV3.any_instance.stubs(:startSession).returns(nil)
-      Kaltura::ClientV3.any_instance.stubs(:bulkUploadAdd).returns({})
+      CanvasKaltura::ClientV3.any_instance.stubs(:startSession).returns(nil)
+      CanvasKaltura::ClientV3.any_instance.stubs(:bulkUploadAdd).returns({})
       MediaObject.add_media_files(@attachment, false)
     end
   end

@@ -16,11 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require 'spec_helper'
 
-describe Kaltura::KalturaStringIO do
+describe CanvasKaltura::KalturaStringIO do
   it "should set path" do
-    io = Kaltura::KalturaStringIO.new("hey there", "custom_path.csv")
+    io = CanvasKaltura::KalturaStringIO.new("hey there", "custom_path.csv")
     io.path.should == "custom_path.csv"
   end
 

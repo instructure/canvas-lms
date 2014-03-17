@@ -221,7 +221,7 @@ describe "conversations" do
   context "media comments" do
     it "should add audio and video comments to the message form" do
       # don't have a good way to test kaltura here, so we just fake it up
-      Kaltura::ClientV3.expects(:config).at_least(1).returns({})
+      CanvasKaltura::ClientV3.expects(:config).at_least(1).returns({})
 
       ['audio', 'video'].each_with_index do |media_comment_type, index|
         mo = MediaObject.new

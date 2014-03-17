@@ -54,9 +54,9 @@ class ContextController < ApplicationController
   def media_object_redirect
     mo = MediaObject.by_media_id(params[:id]).first
     mo.viewed! if mo
-    config = Kaltura::ClientV3.config
+    config = CanvasKaltura::ClientV3.config
     if config
-      redirect_to Kaltura::ClientV3.new.assetSwfUrl(params[:id])
+      redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
     else
       render :text => t(:media_objects_not_configured, "Media Objects not configured")
     end
@@ -72,9 +72,9 @@ class ContextController < ApplicationController
     width = params[:width]
     height = params[:height]
     type = (params[:type].presence || 2).to_i
-    config = Kaltura::ClientV3.config
+    config = CanvasKaltura::ClientV3.config
     if config
-      redirect_to Kaltura::ClientV3.new.thumbnail_url(mo.try(:media_id) || media_id,
+      redirect_to CanvasKaltura::ClientV3.new.thumbnail_url(mo.try(:media_id) || media_id,
                                                       :width => width,
                                                       :height => height,
                                                       :type => type),
@@ -96,7 +96,7 @@ class ContextController < ApplicationController
     request_params.each do |k, v|
       str += k.to_s + v.to_s
     end
-    hash = Digest::MD5.hexdigest(Kaltura::ClientV3.config['secret_key'] + str)
+    hash = Digest::MD5.hexdigest(CanvasKaltura::ClientV3.config['secret_key'] + str)
     if hash == params[:sig]
       notifications = {}
       if params[:multi_notification] != 'true'

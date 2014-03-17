@@ -1,4 +1,4 @@
-module Kaltura
+module CanvasKaltura
   class KalturaStringIO < StringIO
     attr_accessor :path
 

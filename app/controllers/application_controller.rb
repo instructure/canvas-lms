@@ -1272,7 +1272,7 @@ class ApplicationController < ActionController::Base
       elsif feature == :etherpad
         !!EtherpadCollaboration.config
       elsif feature == :kaltura
-        !!Kaltura::ClientV3.config
+        !!CanvasKaltura::ClientV3.config
       elsif feature == :web_conferences
         !!WebConference.config
       elsif feature == :scribd
