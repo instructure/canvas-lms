@@ -114,6 +114,13 @@ TEXT
       <td colspan="2" style="font-size: 0.8em;"><%= t(:kaltura_path_example, "e.g.")%><code>(#{domain}/api_v3/index.php?service=stats&action=collect&...)</code></td>
     </tr>
     <tr>
+      <td><%= f.label :hide_rte_button, :en => "Hide the video icon in Rich Content Editor." %></td>
+      <td><%= f.check_box :hide_rte_button, {}, 'yes', 'no' %></td>
+    </tr>
+    <tr>
+      <td colspan="2" style="font-size: 0.8em;"><%= t(:hide_rte_button_note, "(still there for conversations/SpeedGrader/Media Recordings homework submissions)")%></td>
+    </tr>
+    <tr>
       <td><%= f.label :do_flash_var_test, :en => "Enable experimental flash settings" %></td>
       <td><%= f.check_box :do_flash_var_test, {}, 'yes', 'no' %></td>
     </tr>
