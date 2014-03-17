@@ -85,11 +85,19 @@
                   <span><%= number_to_human_size(attachment.size) %></span>
                 </div>
                 <% preview_url = context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>
-                <% preview_document = t('preview_document', 'Preview the document') %>
+                <% if attachment.crocodoc_available? %>
+                  <% preview_document = t('preview_crocodoc_document', 'Preview your submission and view teacher feedback, if available')
+                     button_text = t('view_feedback_button', 'View Feedback')
+                  %>
+                <% elsif attachment.scribdable? %>
+                  <% preview_document = t('preview_scribd_document', 'Preview your submission')
+                     button_text = t('view_preview_button', 'Preview')
+                  %>
+                <% end %>
                 <% if attachment.crocodoc_available? || attachment.scribdable? %>
-                <div class="ui-listview-text ui-listview-right" style="padding-left:5px; padding-right:5px;">
-                  <a href=<%= preview_url %> title="<%= preview_document %>" class="modal_preview_link" aria-hidden="true" tabindex="-1" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-dialog-title="<%= attachment.display_name %>" <%= doc_preview_attributes(attachment) %>><%= image_tag('preview.png') %></a>
-                </div>
+                  <div class="ui-listview-text ui-listview-right" style="padding: 4px 5px 0px 5px;">
+                    <a href=<%= preview_url %> data-tooltip title="<%= preview_document %>" class="modal_preview_link btn" role="button" aria-hidden="true" tabindex="-1" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-dialog-title="<%= attachment.display_name %>" <%= doc_preview_attributes(attachment) %>><%= button_text %></a>
+                  </div>
                 <% end %>
                 <a href="<%= preview_url %>" class="ui-listview-text comment_attachment_link <%= attachment.mime_class %>">
                   <%= attachment.display_name %>
