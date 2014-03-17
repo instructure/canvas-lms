@@ -229,18 +229,20 @@ class ConversationsController < ApplicationController
       render :json => @conversations_json
     else
       return redirect_to conversations_path(:scope => params[:redirect_scope]) if params[:redirect_scope]
+      load_all_contexts :permissions => [:manage_user_notes]
+      notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
+      can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
       if @current_user.use_new_conversations?
         js_env(:CONVERSATIONS => {
                  :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id,
                  :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
+                 :CONTEXTS => @contexts,
+                 :NOTES_ENABLED => notes_enabled,
+                 :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
                })
         return render :template => 'conversations/index_new'
       else
         @current_user.reset_unread_conversations_counter
-        load_all_contexts :permissions => [:manage_user_notes]
-        notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
-        can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
-
         current_user_json = conversation_user_json(@current_user, @current_user, session, :include_participant_avatars => true)
         current_user_json[:id] = current_user_json[:id].to_s
         hash = {:CONVERSATIONS => {
