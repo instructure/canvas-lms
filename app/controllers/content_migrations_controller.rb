@@ -150,7 +150,7 @@ class ContentMigrationsController < ApplicationController
     if api_request?
       render :json => content_migration_json_hash
     else
-      @plugins = ContentMigration.migration_plugins(true).sort_by {|p| [p.metadata(:sort_order) || SortLast, p.metadata(:select_text)]}
+      @plugins = ContentMigration.migration_plugins(true).sort_by {|p| [p.metadata(:sort_order) || CanvasSort::Last, p.metadata(:select_text)]}
 
       options = @plugins.map{|p| {:label => p.metadata(:select_text), :id => p.id}}
 

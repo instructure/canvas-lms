@@ -730,7 +730,7 @@ class Conversation < ActiveRecord::Base
     if shards.length > 1
       participants.each do |key, value|
         participants[key] = value.uniq(&:id).sort_by do |user|
-          [user.last_authored_at ? -user.last_authored_at.to_f : SortLast, Canvas::ICU.collation_key(user.short_name || user.name)]
+          [user.last_authored_at ? -user.last_authored_at.to_f : CanvasSort::Last, Canvas::ICU.collation_key(user.short_name || user.name)]
         end
       end
     end

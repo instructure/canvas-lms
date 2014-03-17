@@ -257,7 +257,7 @@ class CommunicationChannelsController < ApplicationController
           @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
         end
       end
-      @merge_opportunities.sort_by! { |a| [a.first == @current_user ? SortFirst : SortLast, Canvas::ICU.collation_key(a.first.name)] }
+      @merge_opportunities.sort_by! { |a| [a.first == @current_user ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.first.name)] }
 
       js_env :PASSWORD_POLICY => @domain_root_account.password_policy
 

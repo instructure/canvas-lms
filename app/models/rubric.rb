@@ -245,7 +245,7 @@ class Rubric < ActiveRecord::Base
         rating[:id] = unique_item_id(rating_data[:id])
         ratings[jdx.to_i] = rating
       end
-      criterion[:ratings] = ratings.select{|r| r}.sort_by{|r| [-1 * (r[:points] || 0), r[:description] || SortFirst]}
+      criterion[:ratings] = ratings.select{|r| r}.sort_by{|r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First]}
       criterion[:points] = criterion[:ratings].map{|r| r[:points]}.max || 0
       points_possible += criterion[:points] unless criterion[:ignore_for_scoring]
       criteria[idx.to_i] = criterion

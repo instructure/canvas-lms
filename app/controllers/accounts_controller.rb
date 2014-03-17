@@ -484,7 +484,7 @@ class AccountsController < ApplicationController
       @account.available_account_roles.each_with_index do |type, idx|
         order_hash[type] = idx
       end
-      @account_users = @account_users.select(&:user).sort_by{|au| [order_hash[au.membership_type] || SortLast, Canvas::ICU.collation_key(au.user.sortable_name)] }
+      @account_users = @account_users.select(&:user).sort_by{|au| [order_hash[au.membership_type] || CanvasSort::Last, Canvas::ICU.collation_key(au.user.sortable_name)] }
       @alerts = @account.alerts
       @role_types = RoleOverride.account_membership_types(@account)
       @enrollment_types = RoleOverride.enrollment_types

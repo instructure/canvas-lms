@@ -235,7 +235,7 @@ class SubmissionsController < ApplicationController
     if @assignment.muted? && !@submission.grants_right?(@current_user, :read_grade)
       @visible_rubric_assessments = []
     else
-      @visible_rubric_assessments = @submission.rubric_assessments.select{|a| a.grants_rights?(@current_user, session, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? SortFirst : SortLast, Canvas::ICU.collation_key(a.assessor_name)] }
+      @visible_rubric_assessments = @submission.rubric_assessments.select{|a| a.grants_rights?(@current_user, session, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
     end
 
     @assessment_request = @submission.assessment_requests.find_by_assessor_id(@current_user.id) rescue nil

@@ -114,7 +114,7 @@
           <span class="course_form">
             <% if can_do(@context.root_account, @current_user, :manage_courses) %>
               <select name="course[enrollment_term_id]" id="course_enrollment_term_id">
-                <% @context.root_account.enrollment_terms.active.sort_by{|t| t.start_at || SortFirst}.each do |term| %>
+                <% @context.root_account.enrollment_terms.active.sort_by{|t| t.start_at || CanvasSort::First}.each do |term| %>
                   <option value="<%= term.id %>" <%= 'selected' if term.id == @context.enrollment_term_id %>><%= term.name %></option>
                 <% end %>
               </select>

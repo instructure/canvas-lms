@@ -460,7 +460,7 @@ class ContextExternalTool < ActiveRecord::Base
       return preferred_tool
     end
 
-    sorted_external_tools = contexts.collect{|context| context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? SortFirst : SortLast] }}.flatten(1)
+    sorted_external_tools = contexts.collect{|context| context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? CanvasSort::First : CanvasSort::Last] }}.flatten(1)
 
     res = sorted_external_tools.detect{|tool| tool.url && tool.matches_url?(url) }
     return res if res

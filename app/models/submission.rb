@@ -552,7 +552,7 @@ class Submission < ActiveRecord::Base
       end
     end
     res = self.versions.to_a[0,1].map(&:model) if res.empty?
-    res.sort_by{ |s| s.submitted_at || SortFirst }
+    res.sort_by{ |s| s.submitted_at || CanvasSort::First }
   end
 
   def check_url_changed
