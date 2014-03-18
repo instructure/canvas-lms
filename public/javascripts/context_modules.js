@@ -954,7 +954,8 @@ define([
       moduleId: data.context_module_id,
       courseId: data.context_id,
       published: data.published,
-      publishable: data.publishable
+      publishable: data.publishable,
+      unpublishable: data.unpublishable
     };
     initPublishButton($item.find('.publish-icon'), publishData);
   }

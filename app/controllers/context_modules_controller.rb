@@ -331,6 +331,7 @@ class ContextModulesController < ApplicationController
       @tag[:publishable] = module_item_publishable?(@tag)
       @tag[:published] = module_item_published?(@tag)
       @tag[:publishable_id] = module_item_publishable_id(@tag)
+      @tag[:unpublishable] = module_item_unpublishable?(@tag)
       render :json => @tag
     end
   end
