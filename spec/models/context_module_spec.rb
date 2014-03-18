@@ -150,6 +150,12 @@ describe ContextModule do
       @mod2.content_tags.should == [@tag3]
     end
 
+    it "should add a header as published" do
+      course_module
+      tag = @module.add_item(type: 'context_module_sub_header', title: 'published header')
+      tag.published?.should be_true
+    end
+
     context "when draft state is enabled" do
       before do
         Course.any_instance.stubs(:feature_enabled?).with(:draft_state).returns(true)
@@ -177,6 +183,12 @@ describe ContextModule do
         course_module
         @tag = @module.add_item(:type => 'external_url', :url => 'http://example.com/lolcats', :title => 'pls view', :indent => 1)
         @tag.unpublished?.should be_true
+      end
+
+      it "should add a header as unpublished" do
+        course_module
+        tag = @module.add_item(type: 'context_module_sub_header', title: 'unpublished header')
+        tag.unpublished?.should be_true
       end
     end
   end

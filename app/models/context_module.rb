@@ -339,7 +339,7 @@ class ContextModule < ActiveRecord::Base
       added_item.content_type = 'ContextModuleSubHeader'
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = workflow_state
+      added_item.workflow_state = (self.context.feature_enabled?(:draft_state) ? 'unpublished' : 'active')
       added_item.save
       added_item
     else
