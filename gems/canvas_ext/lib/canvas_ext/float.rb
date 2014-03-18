@@ -16,24 +16,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
-describe "Object#try_rescue" do
-  it "should return nil when nil is the receiver" do
-    nil.try_rescue(:asdf).should be_nil
-    nil.try_rescue(:asdf){}.should be_nil
+class Float
+  # pass me a number and if it is something like 1.0 i will give you back "1" (but 1.1 stays as "1.1")
+  def to_s_with_round_whole
+    begin
+      if !self.nan? && self.to_i == self
+        self.to_i.to_s
+      else
+        self.to_s_without_round_whole
+      end
+    rescue
+      self.to_s_without_round_whole
+    end
   end
 
-  it "should call the method" do
-    "1".try_rescue(:to_i).should eql 1
-  end
-
-  it "should pass along the block" do
-    [1, 2, 3].try_rescue(:map){|i|i+1}.should eql [2, 3, 4]
-  end
-
-  it "should rescue nil" do
-    "1".try_rescue(:asdf).should be_nil
-    [1, 2, 3].try_rescue(:asdf){|i|i+1}.should be_nil
-  end
+  alias_method :to_s_without_round_whole, :to_s
+  alias_method :to_s, :to_s_with_round_whole
 end

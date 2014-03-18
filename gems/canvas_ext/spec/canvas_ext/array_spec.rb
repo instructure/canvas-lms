@@ -16,18 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Float
-  # pass me a number and if it is something like 1.0 i will give you back "1" (but 1.1 stays as "1.1")
-  def to_s_with_round_whole
-    begin
-      if !self.nan? && self.to_i == self
-        self.to_i.to_s
-      else
-        self.to_s_without_round_whole
-      end
-    rescue
-      self.to_s_without_round_whole
-    end
+require 'spec_helper'
+
+describe "Array#cache_key" do
+  it "should work with frozen arrays" do
+    array = [1, 2, 3]
+    array.freeze
+    expect(array.cache_key).to eq '1/2/3'
   end
-  alias_method_chain :to_s, :round_whole
 end

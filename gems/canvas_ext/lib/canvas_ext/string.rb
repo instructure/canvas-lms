@@ -16,14 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# TODO: Remove this file for CANVAS_RAILS3
+
 class String # :nodoc:
-  if CANVAS_RAILS2
-    # Backporting this from rails3 because I think it's nice
-    unless method_defined?(:strip_heredoc)
-      def strip_heredoc
-        indent = scan(/^[ \t]*(?=\S)/).min.try(:size) || 0
-        gsub(/^[ \t]{#{indent}}/, '')
-      end
+  # Backporting this from rails3 because I think it's nice
+  unless method_defined?(:strip_heredoc)
+    def strip_heredoc
+      indent = scan(/^[ \t]*(?=\S)/).min.try(:size) || 0
+      gsub(/^[ \t]{#{indent}}/, '')
     end
   end
 end

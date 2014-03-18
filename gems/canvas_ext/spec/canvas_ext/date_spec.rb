@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require 'spec_helper'
 
 describe "Date#in_time_zone" do
   before do
@@ -32,10 +32,10 @@ describe "Date#in_time_zone" do
     @dates.each do |date|
       @zones.each do |tz|
         time_in_tz = date.in_time_zone(tz.name)
-        time_in_tz.hour.should       == 0
-        time_in_tz.min.should        == 0
-        time_in_tz.sec.should        == 0
-        time_in_tz.utc_offset.should == tz.tzinfo.period_for_local(time_in_tz).utc_total_offset
+        expect(time_in_tz.hour).to eq 0
+        expect(time_in_tz.min).to eq 0
+        expect(time_in_tz.sec).to eq 0
+        expect(time_in_tz.utc_offset).to eq tz.tzinfo.period_for_local(time_in_tz).utc_total_offset
       end
     end
   end
@@ -44,10 +44,10 @@ describe "Date#in_time_zone" do
     @dates.each do |date|
       @zones.each do |tz|
         time_in_tz = date.in_time_zone(tz.name)
-        time_in_tz.year.should       == date.year
-        time_in_tz.month.should      == date.month
-        time_in_tz.day.should        == date.day
-        time_in_tz.utc_offset.should == tz.tzinfo.period_for_local(time_in_tz).utc_total_offset
+        expect(time_in_tz.year).to eq date.year
+        expect(time_in_tz.month).to eq date.month
+        expect(time_in_tz.day).to eq date.day
+        expect(time_in_tz.utc_offset).to eq tz.tzinfo.period_for_local(time_in_tz).utc_total_offset
       end
     end
   end
@@ -57,10 +57,10 @@ describe "Date#in_time_zone" do
       tz = @zones.first
       Time.use_zone(tz) do
         time_in_tz = date.in_time_zone
-        time_in_tz.hour.should       == 0
-        time_in_tz.min.should        == 0
-        time_in_tz.sec.should        == 0
-        time_in_tz.utc_offset.should == tz.tzinfo.period_for_local(time_in_tz).utc_total_offset
+        expect(time_in_tz.hour).to eq 0
+        expect(time_in_tz.min).to eq 0
+        expect(time_in_tz.sec).to eq 0
+        expect(time_in_tz.utc_offset).to eq tz.tzinfo.period_for_local(time_in_tz).utc_total_offset
       end
     end
   end
