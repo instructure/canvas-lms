@@ -130,18 +130,17 @@ class ContextModulesController < ApplicationController
   
   def content_tag_assignment_data
     if authorized_action(@context, @current_user, :read)
-      result = Rails.cache.fetch([ @context, @current_user, "content_tag_assignment_info_all" ].cache_key) do
-        info = {}
-        @context.context_module_tags.not_deleted.map do |tag|
+      info = {}
+      @context.context_module_tags.not_deleted.each do |tag|
+        info[tag.id] = Rails.cache.fetch([tag, @current_user, "content_tag_assignment_info"].cache_key) do
           if tag.assignment
-            info[tag.id] = tag.assignment.context_module_tag_info(@current_user)
+            tag.assignment.context_module_tag_info(@current_user)
           else
-            info[tag.id] = {:points_possible => nil, :due_date => (tag.content.due_at.utc.iso8601 rescue nil)}
+            {:points_possible => nil, :due_date => (tag.content.due_at.utc.iso8601 rescue nil)}
           end
         end
-        info
       end
-      render :json => result
+      render :json => info
     end
   end
 
