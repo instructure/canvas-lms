@@ -212,7 +212,7 @@ TEXT
 </div>
 
 <%= render :partial => 'context_modules/context_module_next', :object => nil %>
-<%= render :partial => 'context_modules/module_item_next', :object => nil %>
+<%= render :partial => 'context_modules/module_item_next', :object => nil, :locals => {:editable => editable} %>
 
 <% if can_do(@context, @current_user, :manage_content) %>
   <% form_for :context_module, :url => context_url(@context, :context_context_modules_url), :html => {:id => "add_context_module_form", :style => "display: none;"} do |f| %>
