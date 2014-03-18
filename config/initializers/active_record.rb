@@ -202,7 +202,6 @@ class ActiveRecord::Base
   end
 
   def cached_context_grants_right?(user, session, *permissions)
-    @@cached_contexts = nil if Rails.env.test?
     @@cached_contexts ||= {}
     context_key = "#{self.context_type}_#{self.context_id}" if self.respond_to?(:context_type)
     context_key ||= "Course_#{self.course_id}"
@@ -210,7 +209,6 @@ class ActiveRecord::Base
     @@cached_contexts[context_key] ||= self.course
     @@cached_permissions ||= {}
     key = [context_key, (user ? user.id : nil)].cache_key
-    @@cached_permissions[key] = nil if Rails.env.test?
     @@cached_permissions[key] = nil if session && session[:session_affects_permissions]
     @@cached_permissions[key] ||= @@cached_contexts[context_key].grants_rights?(user, session, nil).keys
     (@@cached_permissions[key] & Array(permissions).flatten).any?
