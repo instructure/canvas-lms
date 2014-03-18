@@ -250,7 +250,8 @@ def truncate_all_tables
       table_names = connection.tables & models.map(&:table_name)
       connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
     else
-      models.each { |model| truncate_table(model) }
+      table_names = connection.tables
+      models.each { |model| truncate_table(model) if table_names.include?(model.table_name) }
     end
   end
 end
