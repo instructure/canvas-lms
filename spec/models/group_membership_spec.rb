@@ -110,7 +110,8 @@ describe GroupMembership do
     @course.enroll_student(student).accept!
     Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
     Notification.create!(name: 'New Context Group Membership Invitation', category: 'TestImmediately')
-    membership.sis_batch_id = '12345'
+    batch = @course.root_account.sis_batches.create!
+    membership.sis_batch_id = batch.id
     membership.save!
     membership.messages_sent.should be_empty
   end

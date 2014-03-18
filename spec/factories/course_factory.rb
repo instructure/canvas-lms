@@ -44,7 +44,6 @@ def course_valid_attributes
     :conclude_at => Time.now + 100,
     :is_public => true,
     :allow_student_wiki_edits => true,
-    :sis_batch_id => 1,
   }
 end
 

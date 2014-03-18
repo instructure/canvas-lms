@@ -224,16 +224,17 @@ describe "Default Account Reports" do
   def create_some_group_memberships_n_stuff()
     create_some_users_with_pseudonyms()
     create_some_groups()
+    batch = @group1.root_account.sis_batches.create!
     @gm1 = GroupMembership.create(:group => @group1,:user => @user1,:workflow_state => "accepted")
-    @gm1.sis_batch_id = 1
+    @gm1.sis_batch_id = batch.id
     @gm1.save!
     @gm2 = GroupMembership.create(:group => @group2,:user => @user2,:workflow_state => "accepted")
-    @gm2.sis_batch_id = 1
+    @gm2.sis_batch_id = batch.id
     @gm2.save!
     @gm3 = GroupMembership.create(:group => @group3,:user => @user3,:workflow_state => "accepted")
     @gm3.save!
     @gm4 = GroupMembership.create(:group => @group2,:user => @user3,:workflow_state => "accepted")
-    @gm4.sis_batch_id = 1
+    @gm4.sis_batch_id = batch.id
     @gm4.save!
     @gm4.destroy
   end
