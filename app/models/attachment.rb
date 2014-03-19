@@ -356,10 +356,10 @@ class Attachment < ActiveRecord::Base
   def delete_scribd_doc
     # we no longer do scribd docs on child attachments, but the migration
     # moving them up to root attachments might still be running
-    return true if root_attachment_id
     return true unless ScribdAPI.enabled? && scribd_doc
 
-    scribd_doc = self.scribd_doc
+    scribd_doc = self.read_attribute(:scribd_doc)
+    return true unless scribd_doc
     Scribd::API.instance.user = scribd_user
     self.scribd_doc = nil
     self.scribd_attempts = 0
@@ -1346,7 +1346,6 @@ class Attachment < ActiveRecord::Base
     self.deleted_at = Time.now.utc
     ContentTag.delete_for(self)
     MediaObject.update_all({:attachment_id => nil, :updated_at => Time.now.utc}, {:attachment_id => self.id})
-    send_later_if_production(:delete_scribd_doc) if scribd_doc
     save!
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
     # then clear the avatar_image_url value.
