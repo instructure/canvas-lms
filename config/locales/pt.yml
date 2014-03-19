@@ -11516,19 +11516,19 @@ pt:
           students_select_multiple: "Os alunos escolhem várias respostas"
         question_type: 
           calculated: "Pergunta de fórmula"
-          essay: "Pergunta de ensaio"
+          essay: "Pergunta de composição"
           file_upload: "Pergunta de carregamento de ficheiro"
-          fill_in_multiple_blanks: "Preencher múltiplas lacunas"
+          fill_in_multiple_blanks: "Preencher vários espaços em branco"
           matching: Correspondência
-          missing_word: "Palavra faltante"
-          multiple_answers: "Múltiplas respostas"
-          multiple_choice: "Múltipla escolha"
-          multiple_dropdowns: "Múltiplos menus suspensos"
+          missing_word: "Palavra em falta"
+          multiple_answers: "Respostas múltiplas"
+          multiple_choice: "Escolha múltipla"
+          multiple_dropdowns: "Vários menus pendentes"
           numerical: "Reposta numérica"
-          short_answer: "Preencher a lacuna"
+          short_answer: "Preencher espaço em branco"
           text_only: "Texto (sem pergunta)"
           true_false: Verdadeiro/Falso
-        show_possible_answers: "Exibir possíveis respostas para %{question}"
+        show_possible_answers: "Mostrar respostas possíveis para %{question}"
         show_possible_answers_no_question: "Mostrar respostas possíveis para"
         titles: 
           click_to_enter_correct_answer_comments: "Clique para inserir comentários para uma resposta correta"
@@ -11548,17 +11548,17 @@ pt:
         headers: 
           quiz_submissions: "Teste enviados"
           survey_submissions: "Questionários enviados"
-        latest_quiz_results: "Aqui estão os resultados de teste mais recentes de %{user}. É possível modificar os pontos de qualquer pergunta e adicionar mais comentários, depois clicar em \"Atualizar pontuações\" na parte inferior da página."
-        latest_survey_results: "Aqui estão os resultados de questionário mais recentes de %{user}. É possível modificar os pontos de qualquer pergunta e adicionar mais comentários, depois clicar em \"Atualizar pontuações\" na parte inferior da página."
+        latest_quiz_results: "Aqui estão os resultados de teste mais recentes de %{user}. Pode modificar os pontos de qualquer pergunta e adicionar mais comentários, e depois clicar em \"Atualizar pontuações\" na parte inferior da página."
+        latest_survey_results: "Aqui estão os resultados de questionário mais recentes de %{user}. Pode modificar os pontos de qualquer pergunta e adicionar mais comentários, e depois clicar em \"Atualizar pontuações\" na parte inferior da página."
         links: 
-          back_to_quiz: "Voltar para o teste"
+          back_to_quiz: "Voltar ao teste"
           back_to_survey: "Voltar ao questionário"
         logged_out_user: "Utilizador %{index} com sessão terminada"
-        named_quiz_results: "%{quiz_name} Resultados para %{user}"
+        named_quiz_results: "Resultados de %{quiz_name} para %{user}"
         next_questions_arrow_title: "Perguntas seguintes"
         no_more_attempts: "%{user} não tem mais tentativas"
-        page_title_quiz: "%{user}, histórico de teste"
-        page_title_survey: "%{user}, histórico de questionário"
+        page_title_quiz: "Histórico de testes de %{user}"
+        page_title_survey: "Histórico de questionários de %{user}"
         prev_questions_arrow_title: "Perguntas anteriores"
         quiz_not_yet_taken: "O teste ainda não foi feito."
         quiz_not_yet_taken_or_in_progress: "O teste ainda não foi realizado ou está a ser realizado"
@@ -11568,7 +11568,7 @@ pt:
         survey_not_yet_taken_or_in_progress: "O questionário ainda não foi realizado ou está a ser realizado"
         survey_unlimited_attempts: "Este questionário não tem limite de tentativas"
         titles: 
-          score_pending_review: "Esta pontuação está aguardando revisão e pode ser alterada"
+          score_pending_review: "Esta pontuação está a aguardar revisão e pode ser alterada"
           submission_needs_review: "Este envio precisa de revisão"
         unnamed_quiz_results: "Resultados de teste de %{user}"
         unnamed_survey_results: "Resultados de questionário de %{user}"
@@ -11597,12 +11597,12 @@ pt:
         survey_protected: "Este questionário está protegido e só está disponível a partir de determinados locais. O computador que está a utilizar parece não estar num local válido para a realização deste questionário."
       lockdown_browser_required: 
         headers: 
-          requires_lockdown: "É necessário Respondus LockDown Browser"
+          requires_lockdown: "É necessário o Respondus LockDown Browser"
         labels: 
           download_lockdown: "Se ainda não instalou o browser, transfira-o aqui"
         links: 
-          download_lockdown: "[Baixar Respondus LockDown Browser]"
-        requires_lockdown: "Este teste exige Respondus LockDown Browser. Inicie o Respondus LockDown Browser para fazer este teste ou exibir os resultados do teste."
+          download_lockdown: "[Transferir Respondus LockDown Browser]"
+        requires_lockdown: "É necessário o Respondus LockDown Browser para realizar este teste. Inicie o Respondus LockDown Browser para realizar o teste ou para ver os resultados do teste."
       managed_quiz_data: 
         anonymous_student: "Aluno %{user_counter}"
         logged_out_user: "Utilizador %{user_counter} com sessão terminada"
@@ -11612,31 +11612,31 @@ pt:
         add_time: "Adicionar tempo"
         buttons: 
           change_extensions_for_selected_students: "Alterar extensões para %{n} alunos selecionados"
-          extend_time: "Estender tempo"
+          extend_time: "Prolongar tempo"
           save: Guardar
-        end_quiz_reference_time_current_end: "a hora de término atual"
+        end_quiz_reference_time_current_end: "a hora de fim atual"
         end_quiz_reference_time_now: agora
-        end_quiz_when: "Finalizar o teste %{n} minutos a partir das %{reference_time}."
+        end_quiz_when: "Terminar o teste %{n} minutos depois das %{reference_time}."
         extended_quiz_time_explanation: "Pode dar mais tempo a este aluno na tentativa de teste atual. Quanto tempo pretende dar?"
-        finished_in: "finalizado em %{duration}"
+        finished_in: "terminado em %{duration}"
         global_extra_attempts: "todos recebem já %{n}"
         headers: 
           attempt: Tentativa
           attempts_left: "Tentativas restantes"
-          extended_quiz_time: "Estender o tempo do teste"
+          extended_quiz_time: "Prolongar o tempo do teste"
           score: Pontuação
           student: Aluno
           student_extensions: "Extensões do aluno"
           time: Hora
-        in_progress: "em andamento"
+        in_progress: "em curso"
         labels: 
-          ending: Finalizando
+          ending: Termina
           extra_attempts: "Tentativas extra"
           extra_time_per_attempt: "Tempo extra em cada tentativa"
-          manually_unlock: "Destravar manualmente o questionário para a próxima tentativa"
+          manually_unlock: "Desbloquear manualmente o teste para a próxima tentativa"
           started: Iniciado
         minutes: minutos
-        page_title: "Teste moderado"
+        page_title: "Moderar teste"
         student_gets_extra_time: "*%{student_name}* **obtém %{extra_time} minutos extra em cada tentativa**"
         student_n: "Aluno %{n}"
         titles: 
@@ -11648,8 +11648,8 @@ pt:
       multi_answer: 
         choose_answer: Escolher
       muted: 
-        muted_quiz_description: "A pontuação do seu teste está indisponível, pois seu instrutor não terminou de avaliá-lo. Quando o instrutor terminar de avaliar este teste, sua pontuação estará disponível nesta página."
-        muted_quiz_header: "Seu teste foi silenciado"
+        muted_quiz_description: "A pontuação do seu teste não está disponível porque o seu instrutor ainda não acabou a avaliação. Quando o instrutor acabar de avaliar este teste, a sua pontuação ficará disponível nesta página."
+        muted_quiz_header: "O seu teste foi silenciado"
       new: 
         allowed_attempts: "Número de tentativas permitidas"
         anonymous_submissions: "Manter os envios anónimos"
@@ -11661,12 +11661,12 @@ pt:
         default_page_title: "Novo teste"
         group: "Grupo de tarefa"
         headers: 
-          ip_filters: "O que são filtros de IP de teste?"
+          ip_filters: "O que são filtros de IP de testes?"
         hide_correct_answers_at: "Ocultar respostas corretas em"
         hints: 
           question_detail_disabled: "NOTA: os detalhes das perguntas não ficam disponíveis quando há mais de %{question_count} perguntas."
           quiz_score: "alunos receberão automaticamente crédito total assim que fizerem este questionário"
-        ip_filters: "Os filtros IP de testes são uma forma de limitar o acesso aos testes aos computadores em uma série de IPs especificados. Os filtros podem ser uma lista de endereços separados por vírgula ou um endereço seguido por uma máscara (\"192.168.217.1\", \"192.168.217.1/24\" ou \"192.168.217.1/255.255.255.0\")."
+        ip_filters: "Os filtros de IP de testes são uma forma de limitar o acesso aos testes a computadores incluídos num intervalo de endereços IP especificados. Os filtros podem ser uma lista de endereços separados por vírgula ou um endereço seguido de uma máscara (\"192.168.217.1\", \"192.168.217.1/24\" ou \"192.168.217.1/255.255.255.0\")."
         label: 
           time_limit: "Limite de tempo"
         labels: 
@@ -11679,7 +11679,7 @@ pt:
           quiz_score: Pontuação
           require_access_code: "Código de acesso exigido"
           restrict_quiz: "Restrições de teste"
-          show_question_details: "Exibir detalhes da pergunta"
+          show_question_details: "Mostrar detalhes da pergunta"
         limited_attempts: "Tentativas permitidas"
         links: 
           cancel: Cancelar
@@ -11695,14 +11695,14 @@ pt:
         points_possible: "Pontos %{n}"
         quiz_title: "Título do teste"
         quiz_type: "Tipo de teste"
-        require_lockdown_browser: "É necessário Respondus LockDown Browser"
+        require_lockdown_browser: "É necessário o Respondus LockDown Browser"
         require_lockdown_browser_for_results: "Necessário para ver os resultados do teste"
-        retrieving_filters: "Recuperando filtros..."
+        retrieving_filters: "A obter os filtros..."
         score_to_keep: "Pontuação do teste para manter"
         show_correct_answers: "Permitir que os alunos vejam as respostas corretas"
         show_correct_answers_at: "Mostrar respostas corretas em"
-        shuffle_answers: "Embaralhar as respostas"
-        students_cannot_view_responses_after_course_concludes: "Os alunos não podem ver perguntas de testes após a conclusão da disciplina"
+        shuffle_answers: "Baralhar as respostas"
+        students_cannot_view_responses_after_course_concludes: "Os alunos não podem ver respostas de testes após a conclusão da disciplina"
         time_limit: "Quantos minutos?"
         titles: 
           click_to_select_filter: "Clique para selecionar este filtro"
@@ -11711,8 +11711,8 @@ pt:
         warnings: 
           has_student_submissions: "Os alunos já fizeram ou já iniciaram este teste, por isso tenha cuidado ao editá-lo. Se alterar qualquer pergunta do teste de forma significativa, considere reavaliar os alunos que fizeram a versão antiga do teste."
       notices: 
-        cant_view_submission_while_muted: "Não é possível exibir o histórico do teste enquanto ele estiver silenciado."
-        has_submissions_already: "Saiba que alguns alunos já fizeram ou iniciaram este teste"
+        cant_view_submission_while_muted: "Não é possível ver o histórico do teste enquanto este estiver silenciado."
+        has_submissions_already: "Tenha em consideração que alguns alunos já fizeram ou já iniciaram este teste"
         less_than_allotted_time: "Iniciou este teste perto do prazo de entrega, por isso não terá o tempo total para realizar o teste."
         no_submission_for_user: "Não há nenhum envio disponível para esse utilizador"
         quiz_updated: "Teste atualizado com sucesso"
@@ -11733,7 +11733,7 @@ pt:
           points_per_question: "Pontos por pergunta"
           question_bank: "As perguntas serão retiradas do banco"
         links: 
-          link_to_a_question_bank: "Vincular a um banco de perguntas"
+          link_to_a_question_bank: "Associar a um banco de perguntas"
         show_questions_and_points: "Escolher *%{num_questions}* perguntas, #%{num_points}# pts por pergunta"
         titles: 
           add_question_to_group: "Adicionar uma pergunta a este grupo"
@@ -11759,8 +11759,8 @@ pt:
           other: "%{count} alunos receberam esta pergunta"
       question_teaser: 
         titles: 
-          click_to_show_details: "Clique para exibir os detalhes completos da pergunta"
-          delete_this_question: "Excluir esta pergunta"
+          click_to_show_details: "Clique para mostrar os detalhes completos da pergunta"
+          delete_this_question: "Eliminar esta pergunta"
           edit_this_question: "Editar esta pergunta"
       quiz_details: 
         allowed_attempts: "Tentativas permitidas"
@@ -11774,9 +11774,9 @@ pt:
         no_due_date: "Sem data de entrega"
         none: Nenhum
         quiz_availabile_through: "%{start_time} - %{end_time}"
-        quiz_available_after: "depois %{start_time}"
+        quiz_available_after: "após %{start_time}"
         quiz_available_until: "até %{end_time}"
-        requires_lockdown: "É necessário Respondus LockDown Browser"
+        requires_lockdown: "É necessário o Respondus LockDown Browser"
         time_limit: 
           one: "1 minuto"
           other: "%{count} minutos"
@@ -11795,13 +11795,13 @@ pt:
           submission_details: "Detalhes do envio"
           time: Hora
         links: 
-          preview_quiz_again: "Visualizar o teste novamente"
-          preview_survey_again: "Visualizar o questionário novamente"
-        no_more_attempts: "Nenhuma tentativa restante disponível"
+          preview_quiz_again: "Pré-visualizar o teste novamente"
+          preview_survey_again: "Pré-visualizar o questionário novamente"
+        no_more_attempts: "Não estão disponíveis mais tentativas"
         questions_not_graded: "Algumas perguntas ainda sem nota"
         score_set_manually: "Esta pontuação foi definida pelo professor"
         unlimited_attempts: "Tentativas ilimitadas"
-        view_previous_attempts: "Exibir tentativas anteriores"
+        view_previous_attempts: "Ver tentativas anteriores"
       quiz_show_teacher: 
         anonymous_submissions: "Envios anónimos"
         attempts: Tentativas
@@ -11819,43 +11819,43 @@ pt:
         one_question_at_a_time: "Uma pergunta de cada vez"
         points: Pontos
         quiz_type: "Tipo de teste"
-        require_lockdown_browser: "É necessário Respondus LockDown Browser"
+        require_lockdown_browser: "É necessário o Respondus LockDown Browser"
         require_lockdown_browser_for_results: "Necessário para ver os resultados do teste"
         require_lockdown_browser_monitor: "Webcam necessária"
         score_to_keep: "Pontuação para manter"
         show_correct_answers: "Mostrar respostas corretas"
-        shuffle_answers: "Embaralhar as respostas"
+        shuffle_answers: "Baralhar as respostas"
         time_limit: 
           one: "1 minuto"
           other: "%{count} minutos"
         until: Até
         view_responses: "Ver respostas"
       quiz_submission: 
-        attempt_duration: "Esta tentativa levou %{duration}."
+        attempt_duration: "Esta tentativa demorou %{duration}."
         buttons: 
           update_scores: "Atualizar pontuações"
         labels: 
           final_score: "Pontuação final"
-          fudge_points: "Pontos onde ainda é possível corrigir o exame"
+          fudge_points: "Pontos de correção"
           fudge_points_changed_points_quiz: "Desde que %{user} realizou este teste, o número de pontos possíveis foi alterado em %{difference}. É possível fazer ajustes tendo em conta essa alteração e adicionar pontos positivos ou negativos manualmente, utilizando esta caixa."
           fudge_points_changed_points_survey: "Desde que %{user} realizou este questionário, o número de pontos possíveis foi alterado em %{difference}. É possível fazer ajustes tendo em conta essa alteração e adicionar pontos positivos ou negativos manualmente, utilizando esta caixa."
           fudge_points_generic_explanation: "É possível ajustar manualmente a pontuação adicionando pontos positivos ou negativos a esta caixa."
-          questions_need_review: "As seguintes perguntas precisam ser revisadas"
+          questions_need_review: "As seguintes perguntas precisam de revisão"
           quiz_score: "Pontuação do teste"
           score_for_attempt: "Pontuação desta tentativa"
           score_for_quiz: "Pontuação deste teste"
           score_for_survey: "Pontuação deste questionário"
           survey_score: "Pontuação do questionário"
         links: 
-          click_to_view_results: "Clique aqui para exibir os resultados."
+          click_to_view_results: "Clique aqui para ver os resultados."
         questions_not_graded: "Algumas perguntas ainda sem nota"
         quiz_fudged_negative: "A pontuação deste teste foi ajustada manualmente em %{fudge} pontos."
         quiz_fudged_positive: "A pontuação deste teste foi ajustada manualmente em +%{fudge} pontos."
         quiz_not_yet_taken: "O teste ainda não foi feito."
-        quiz_results_protected: "Os resultados deste teste estão protegidos e não serão visíveis aos alunos."
-        quiz_results_protected_until_last_attempt: "Os resultados deste teste estão protegidos e não serão visíveis aos alunos, até que eles enviem sua última tentativa."
+        quiz_results_protected: "Os resultados deste teste estão protegidos e não serão visíveis para os alunos."
+        quiz_results_protected_until_last_attempt: "Os resultados deste teste estão protegidos e não serão visíveis para os alunos até estes enviarem a sua última tentativa."
         quiz_submission_needs_review: "O teste foi alterado significativamente desde que este envio foi efetuado. É possível que seja necessário reavaliar este envio."
-        requires_lockdown: "Para exibir os resultados do teste é necessário o Respondus LockDown Browser."
+        requires_lockdown: "É necessário o Respondus LockDown Browser para ver os resultados do teste."
         submitted_at: "Enviado %{when}"
         survey_fudged_negative: "A pontuação deste questionário foi ajustada manualmente em %{fudge} pontos."
         survey_fudged_positive: "A pontuação deste questionário foi ajustada manualmente em +%{fudge} pontos."
@@ -11867,7 +11867,7 @@ pt:
         labels: 
           allowed_attempts: "Tentativas permitidas"
           attempts_left: "Tentativas restantes"
-          attempts_so_far: "Tentativas até o momento"
+          attempts_so_far: "Tentativas até ao momento"
           latest_submission: "Envio mais recente"
           quiz_details: "Detalhes do teste"
           quiz_due: Prazo
@@ -11883,14 +11883,14 @@ pt:
         quiz_points_possible: 
           one: "1 ponto"
           other: "%{count} pontos"
-        student_mute_notification: "O instrutor está trabalhando na avaliação"
+        student_mute_notification: "O instrutor está a trabalhar na avaliação"
         unlimited_attempts: "Tentativas ilimitadas"
       read_only: 
         default_page_title: "Novo teste"
         headers: 
           quiz_details: "Detalhes do teste"
         labels: 
-          question_details: "Exibir detalhes da pergunta"
+          question_details: "Mostrar detalhes da pergunta"
           quiz_instructions: "Instruções do teste"
         links: 
           back_to_quiz_page: "Voltar à página do teste"
@@ -11899,8 +11899,8 @@ pt:
           loading_in_lockdown: "A carregar teste no Respondus LockDown Browser"
       show: 
         buttons: 
-          lock_quiz: "Travar este teste agora"
-          lock_survey: "Travar este questionário agora"
+          lock_quiz: "Bloquear este teste agora"
+          lock_survey: "Bloquear este questionário agora"
           publish: Publicar
           republish: "Publicar novamente"
           unlock_quiz: "Permitir que os alunos façam este teste agora"
@@ -11920,11 +11920,11 @@ pt:
           quiz_statistics: "Estatísticas do teste"
           see_full_quiz: "Ver todo o teste"
           show_assignment_rubric: "Mostrar protocolo"
-          show_student_quiz_results: "Exibir resultados do teste do aluno"
-          show_student_survey_results: "Exibir resultados do questionário do aluno"
+          show_student_quiz_results: "Mostrar resultados do teste do aluno"
+          show_student_survey_results: "Mostrar resultados do questionário do aluno"
           survey_statistics: "Estatísticas do questionário"
         manage: Gerir
-        only_registered_users: "Apenas utilizadores registados e inscritos podem realizar os testes avaliados"
+        only_registered_users: "Apenas utilizadores registados e inscritos podem realizar testes avaliados"
         quiz_regraded_your_score_affected: 
           one: "Este teste foi reavaliado; a sua pontuação foi afetada."
           other: "Este teste foi reavaliado; a sua nova pontuação reflete %{count} perguntas que foram afetadas."
@@ -11938,7 +11938,7 @@ pt:
           related_items: "Itens relacionados"
           unlock_for_how_long: "Por quanto tempo pretende desbloquear o teste?"
         warnings: 
-          draft_version: "Esta é uma visualização da versão preliminar do teste"
+          draft_version: "Esta é uma pré-visualização da versão de rascunho do teste"
       single_answer: 
         upload: Carregar
       statistics: 
@@ -11950,8 +11950,8 @@ pt:
           users_have_taken_this_quiz: "%{count} utilizadores realizaram este teste"
           users_have_taken_this_survey: "%{count} utilizadores realizaram este questionário"
         labels: 
-          average_correct: "Média de acertos"
-          average_incorrect: "Média de erros"
+          average_correct: "Média de respostas corretas"
+          average_incorrect: "Média de respostas incorretas"
           average_time: "Tempo médio"
           high_score: "Pontuação mais alta"
           low_score: "Pontuação mais baixa"
@@ -11960,7 +11960,7 @@ pt:
           users_selected_the_answer: "Os seguintes utilizadores selecionaram a resposta, %{answer_text}"
         links: 
           count_all_attempts: "Contar **todas** as tentativas"
-          count_only_latest_attempts: "Contar apenas as tentativas mais recentes"
+          count_only_latest_attempts: "Contar apenas cada tentativa mais recente"
         page_title: Estatísticas
         quiz_all_version_disclaimer: "Este relatório está a mostrar as estatísticas do teste com base em todas as tentativas de todos os utilizadores."
         quiz_latest_version_disclaimer: "Este relatório está a mostrar as estatísticas do teste com base na tentativa mais recente de cada utilizador."
@@ -11986,13 +11986,13 @@ pt:
           previous: Anterior
           submit_quiz: "Enviar teste"
         headers: 
-          draft_preview: "Esta é uma visualização da versão preliminar do teste"
+          draft_preview: "Esta é uma pré-visualização da versão de rascunho do teste"
         labels: 
           started: Iniciado
-          times_up: "O tempo acabou! Enviando resultados em"
-        logged_out_of_canvas: "*Terminou a sessão no Canvas.* Para continuar, inicie sessão"
-        login_required: "Início de sessão obrigatório"
-        not_saved: "Não salvo"
+          times_up: "Acabou o tempo! Envio de resultados em"
+        logged_out_of_canvas: "*A sua sessão no Canvas terminou.* Inicie sessão para continuar"
+        login_required: "É necessário iniciar sessão"
+        not_saved: "Não guardado"
         quiz_instructions: "Instruções do teste"
       take_quiz_in_popup: 
         headers: 
@@ -12078,7 +12078,7 @@ pt:
       labels: 
         time_elapsed: "Tempo decorrido"
       login_failed: "Falha no início de sessão."
-      login_successful: "Login realizado com sucesso."
+      login_successful: "Início de sessão efetuado com sucesso."
       minutes_count: 
         one: "1 minuto"
         other: "%{count} Minutos"
@@ -12147,7 +12147,7 @@ pt:
     errors: 
       no_bank: "Não foi encontrado o banco de perguntas para o grupo de testes %{group_name}"
       no_permissions: "O utilizador não tinha permissão para referenciar o banco de perguntas no grupo de testes %{group_name}"
-    question_group: "Grupo de pergunta"
+    question_group: "Grupo de perguntas"
   quizzes/quiz_question: 
     defaults: 
       question_name: Pergunta
@@ -13278,8 +13278,8 @@ pt:
     assignment_order_due_date: "Por data de entrega"
     assignment_unmuted: "Clique para desativar."
     invalid_group_warning: 
-      one: "Nota: a pontuação não inclui tarefas do grupo %{list_of_group_names} porque não tem pontos possíveis."
-      other: "Nota: a pontuação não inclui tarefas dos grupos %{list_of_group_names} porque não têm pontos possíveis."
+      one: "Nota: a pontuação não inclui tarefas do grupo %{list_of_group_names} porque o grupo não tem pontos possíveis."
+      other: "Nota: a pontuação não inclui tarefas dos grupos %{list_of_group_names} porque os grupos não têm pontos possíveis."
     no_assignment: "Nenhuma tarefa selecionada"
     no_student: "Nenhum aluno selecionado"
     notes: Notas
@@ -13554,7 +13554,7 @@ pt:
   text_helper: 
     time: 
       ranges: 
-        different_days: "%{start_date_and_time} para %{end_date_and_time}"
+        different_days: "%{start_date_and_time} a %{end_date_and_time}"
   time: 
     am: am
     count_hours_ago: 
