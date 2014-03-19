@@ -108,6 +108,9 @@ class ImportedHtmlConverter
             # For course copies don't try to fix relative urls. Any url we can
             # correctly alter was changed during the 'export' step
             new_url = node[attr]
+          elsif val.start_with?('#')
+            # It's just a link to an anchor, leave it alone
+            new_url = node[attr]
           else
             begin
               if relative_url?(node[attr])
