@@ -560,11 +560,7 @@ class FilesController < ApplicationController
       redirect_to(inline ? attachment.cacheable_s3_inline_url : attachment.cacheable_s3_download_url)
     else
       send_file_headers!( :length=> attachment.s3object.content_length, :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type_with_encoding)
-      render :status => 200, :text => Proc.new { |response, output|
-        attachment.s3object.read do |chunk|
-         output.write chunk
-        end
-      }
+      render :status => 200, :text => attachment.s3object.read
     end
   end
   protected :send_stored_file
