@@ -27,7 +27,7 @@ define [
     baseUrl: -> "/api/v1/courses/#{@get('course_id')}"
 
     urls:
-      generic:          -> "#{@baseUrl()}/modules/#{@get('module_id')}/items/#{@get('id')}"
+      generic:          -> "#{@baseUrl()}/modules/#{@get('module_id')}/items/#{@get('module_item_id') || @get('id')}"
       #attachment:       -> "/api/v1/files/#{@get('id')}"
       wiki_page:        -> "#{@baseUrl()}/pages/#{@get('id')}"
       assignment:       -> "#{@baseUrl()}/assignments/#{@get('id')}"

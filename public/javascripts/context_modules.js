@@ -972,8 +972,10 @@ define([
     data = data || $el.data();
     var model = new PublishableModuleItem({
       module_type: data.moduleType,
+      content_id: data.contentId,
       id: data.id,
       module_id: data.moduleId,
+      module_item_id: data.moduleItemId,
       course_id: data.courseId,
       published: data.published,
       publishable: data.publishable,
@@ -983,19 +985,109 @@ define([
     var row = $el.closest('.ig-row');
     if (data.published) { row.addClass('ig-published'); }
     // TODO: need to go find this item in other modules and update their state
-    view.on('publish', function() {
-      this.$el.closest('.ig-row').addClass('ig-published');
+    model.on('change:published', function() {
+      view.$el.closest('.ig-row').toggleClass('ig-published', model.get('published'));
+      view.render();
     });
-    view.on('unpublish', function() {
-      this.$el.closest('.ig-row').removeClass('ig-published');
-    });
-    view.render()
+    view.render();
+    return view;
   }
+
+  var content_type_map = {
+    'page': 'wiki_page',
+    'discussion': 'discussion_topic',
+    'external_tool': 'context_external_tool',
+    'sub_header': 'context_module_sub_header'
+  };
+  function itemContentKey(model) {
+    if (model === null)
+      return null;
+
+    var attrs = model.attributes || model,
+        content_type = $.underscore(attrs['module_type'] || attrs['type']),
+        content_id = attrs['content_id'] || attrs['id'];
+
+    content_type = content_type_map[content_type] || content_type;
+
+    if (!content_type || content_type === 'module') {
+      return null;
+    } else {
+      if (content_type == 'wiki_page') {
+        content_type = 'wiki_page';
+        content_id = attrs['page_url'] || attrs['id'];
+      } else if (content_type === 'context_module_sub_header' || content_type === 'external_url' || content_type == 'context_external_tool') {
+        content_id = attrs['id'];
+      }
+
+      return content_type + '_' + content_id;
+    }
+  }
+
+  var moduleItems = {};
+  var updateModuleItem = function(attrs, model) {
+    var i, items, item, parsedAttrs;
+    items = moduleItems[itemContentKey(attrs) || itemContentKey(model)];
+    if (items) {
+      for (i = 0; i < items.length; i++) {
+        item = items[i];
+        parsedAttrs = item.model.parse(attrs);
+        item.model.set({published: parsedAttrs.published});
+      }
+    }
+  };
+
+  var overrideModuleModel = function(model) {
+    var publish = model.publish, unpublish = model.unpublish;
+    model.publish = function() {
+      return publish.apply(model, arguments).done(function() {
+        model
+          .fetch({data: {include: 'items'}})
+          .done(function(attrs) {
+            for (var i = 0; i < attrs.items.length; i++)
+              updateModuleItem(attrs.items[i], model);
+          });
+      });
+    };
+    model.unpublish = function() {
+      return unpublish.apply(model, arguments).done(function() {
+        model
+          .fetch({data: {include: 'items'}})
+          .done(function(attrs) {
+            for (var i = 0; i < attrs.items.length; i++)
+              updateModuleItem(attrs.items[i], model);
+          });
+      });
+    };
+  };
+  var overrideItemModel = function(model) {
+    var publish = model.publish, unpublish = model.unpublish;
+    model.publish = function() {
+      return publish.apply(model, arguments).done(function(attrs) {
+        updateModuleItem($.extend({published:true}, attrs), model);
+      });
+    };
+    model.unpublish = function() {
+      return unpublish.apply(model, arguments).done(function(attrs) {
+        updateModuleItem($.extend({published:false}, attrs), model);
+      });
+    };
+  };
+  var overrideModel = function(model, view) {
+    var contentKey = itemContentKey(model);
+    if (contentKey === null)
+      overrideModuleModel(model);
+    else
+      overrideItemModel(model);
+
+    moduleItems[contentKey] || (moduleItems[contentKey] = []);
+    moduleItems[contentKey].push({model: model, view: view});
+  };
 
   $(document).ready(function() {
     if (ENV.ENABLE_DRAFT) {
       $('.publish-icon:visible').each(function(index, el) {
-        initPublishButton($(el));
+        var view = initPublishButton($(el));
+        overrideModel(view.model, view);
       });
     }
 

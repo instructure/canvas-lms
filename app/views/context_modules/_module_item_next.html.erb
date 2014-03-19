@@ -108,9 +108,11 @@
       <div class="ig-admin">
         <span
           data-module-type="<%= module_item && module_item.content_type_class %>"
+          data-content-id="<%= module_item && module_item.content_id %>"
           data-id="<%= module_item_publishable_id(module_item) %>"
           data-course-id="<%= module_item && module_item.context_id %>"
           data-module-id="<%= module_item && module_item.context_module_id %>"
+          data-module-item-id="<%= module_item && module_item.id %>"
           data-published="<%= module_item && published_status == 'published' %>"
           data-publishable="<%= module_item_publishable?(module_item) %>"
           data-unpublishable="<%= module_item_unpublishable?(module_item) %>"
