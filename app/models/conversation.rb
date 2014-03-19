@@ -76,7 +76,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.initiate(users, private, options = {})
-    users = users.uniq_by(&:id)
+    users = users.uniq(&:id)
     user_ids = users.map(&:id)
     private_hash = private ? private_hash_for(users) : nil
     transaction do
@@ -729,7 +729,7 @@ class Conversation < ActiveRecord::Base
     # post-sort and -uniq in Ruby
     if shards.length > 1
       participants.each do |key, value|
-        participants[key] = value.uniq_by(&:id).sort_by do |user|
+        participants[key] = value.uniq(&:id).sort_by do |user|
           [user.last_authored_at ? -user.last_authored_at.to_f : SortLast, Canvas::ICU.collation_key(user.short_name || user.name)]
         end
       end

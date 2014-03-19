@@ -978,7 +978,7 @@ class ConversationsController < ApplicationController
       MessageableUser.context_recipients(recipient_ids).map do |context|
         @recipients.concat @current_user.messageable_users_in_context(context)
       end
-      @recipients = @recipients.uniq_by(&:id)
+      @recipients = @recipients.uniq(&:id)
     end
   end
 
