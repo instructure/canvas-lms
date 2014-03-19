@@ -177,6 +177,11 @@ describe ImportedHtmlConverter do
 <embed name="tag" src="/courses/#{@course.id}/file_contents/course%20files/test.mp3" loop="false" autostart="false" controller="true" controls="CONSOLE"></embed></object>
     HTML
     end
+
+    it "should leave an anchor tag alone" do
+      test_string = '<p><a href="#anchor_ref">ref</a></p>'
+      ImportedHtmlConverter.convert(test_string, @course).should == test_string
+    end
     
   end
   
