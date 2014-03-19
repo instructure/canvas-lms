@@ -11630,11 +11630,11 @@ es:
         hints: 
           question_detail_disabled: "Aviso: La información sobre las preguntas no está disponible cuando hay más de %{question_count}."
           quiz_score: "los alumnos recibirán los créditos completos automáticamente una vez que finalicen la encuesta"
-        ip_filters: " Filtros de IP para Evaluaciones son una forma de limitar el acceso a evaluaciones a computadoras en un rango especificado de IP. Los filtros pueden ser una lista de direcciones separadas por comas, o una dirección seguida por una máscara (\"192.168.217.1\", \"192.168.217.1/24\" ó \"192.168.217.1/255.255.255.0\"). "
+        ip_filters: " lOS filtros IP para evaluaciones son una forma de limitar el acceso a evaluaciones a los equipos que estén en un rango especificado de IP. Los filtros pueden ser una lista de direcciones separadas por comas o una dirección seguida por una máscara (\"192.168.217.1\", \"192.168.217.1/24\" ó \"192.168.217.1/255.255.255.0\"). "
         label: 
-          time_limit: "Tiempo límite"
+          time_limit: "Límite de tiempo"
         labels: 
-          allow_multiple_attempts: "Permitir Varios Intentos"
+          allow_multiple_attempts: "Permitir varios intentos"
           hide_results_only_after_last: "Solo después del último intento"
           ip_filter: "Filtrar Direcciones IP"
           never_hide_results: "Permitir que los alumnos vean sus respuestas a los cuestionarios"
@@ -11643,19 +11643,19 @@ es:
           quiz_score: Calificación
           require_access_code: "Requiere un código de acceso"
           restrict_quiz: "Limitaciones de la evaluación"
-          show_question_details: "Mostrar Detalles de la Pregunta"
+          show_question_details: "Mostrar detalles de la pregunta"
         limited_attempts: "Intentos permitidos"
         links: 
           cancel: Cancelar
-          find_questions: "Encontrar Preguntas"
-          new_question: "Pregunta Nueva"
-          new_question_group: "Grupo Nuevo de Preguntas"
+          find_questions: "Encontrar preguntas"
+          new_question: "Nueva pregunta"
+          new_question_group: "Nuevo grupo de preguntas"
           show_assignment_rubric: "Mostrar rúbrica"
-        manage: Manejar
+        manage: Gestionar
         minutes: Minutos
         new_assignment: "Nueva tarea"
         new_discussion: "Nuevo debate"
-        one_question_at_a_time: "Mostrar una pregunta de cada vez"
+        one_question_at_a_time: "Mostrar una pregunta cada vez"
         points_possible: "Puntos %{n} "
         quiz_title: "Título de la evaluación"
         quiz_type: "Tipo de cuestionario"
