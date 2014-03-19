@@ -24,7 +24,7 @@ module SIS
       courses_to_update_sis_batch_id = []
       course_ids_to_update_associations = [].to_set
 
-      importer = Work.new(@batch_id, @root_account, @logger, courses_to_update_sis_batch_id, course_ids_to_update_associations, messages, @batch_user)
+      importer = Work.new(@batch, @root_account, @logger, courses_to_update_sis_batch_id, course_ids_to_update_associations, messages, @batch_user)
       Course.suspend_callbacks(:update_enrollments_later) do
         Course.process_as_sis(@sis_options) do
           Course.skip_updating_account_associations do
@@ -35,8 +35,8 @@ module SIS
 
       Course.update_account_associations(course_ids_to_update_associations.to_a) unless course_ids_to_update_associations.empty?
       courses_to_update_sis_batch_id.in_groups_of(1000, false) do |batch|
-        Course.where(:id => batch).update_all(:sis_batch_id => @batch_id)
-      end if @batch_id
+        Course.where(:id => batch).update_all(:sis_batch_id => @batch)
+      end if @batch
       @logger.debug("Courses took #{Time.now - start} seconds")
       return importer.success_count
     end
@@ -46,8 +46,8 @@ module SIS
     class Work
       attr_accessor :success_count
 
-      def initialize(batch_id, root_account, logger, a1, a2, m, batch_user)
-        @batch_id = batch_id
+      def initialize(batch, root_account, logger, a1, a2, m, batch_user)
+        @batch = batch
         @batch_user = batch_user
         @root_account = root_account
         @courses_to_update_sis_batch_id = a1
@@ -166,7 +166,7 @@ module SIS
               templated_course.conclude_at = course.conclude_at
               templated_course.restrict_enrollments_to_course_dates = course.restrict_enrollments_to_course_dates
             end
-            templated_course.sis_batch_id = @batch_id if @batch_id
+            templated_course.sis_batch_id = @batch.id if @batch
             @course_ids_to_update_associations.add(templated_course.id) if templated_course.account_id_changed? || templated_course.root_account_id_changed?
             if templated_course.valid?
               changes = templated_course.changes
@@ -179,7 +179,7 @@ module SIS
               raise ImportError, msg
             end
           end
-          course.sis_batch_id = @batch_id if @batch_id
+          course.sis_batch_id = @batch.id if @batch
           if course.valid?
             course_changes = course.changes
             course.save_without_broadcasting!
@@ -191,7 +191,7 @@ module SIS
             raise ImportError, msg
           end
           @course_ids_to_update_associations.add(course.id) if update_account_associations
-        elsif @batch_id
+        elsif @batch
           @courses_to_update_sis_batch_id << course.id
         end
 

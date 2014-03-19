@@ -344,6 +344,11 @@ enrollments.csv
 <td><b>Required field if section_id is missing</b>. The course identifier from courses.csv</td>
 </tr>
 <tr>
+<td>root_account</td>
+<td>text</td>
+<td>The domain of the account to search for the user.</td>
+</tr>
+<tr>
 <td>user_id</td>
 <td>text</td>
 <td><b>Required field</b>. The User identifier from users.csv</td>

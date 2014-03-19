@@ -21,7 +21,7 @@ module SIS
 
     def process(updates_every, messages)
       start = Time.now
-      importer = Work.new(@batch_id, @root_account, @logger, updates_every, messages)
+      importer = Work.new(@batch, @root_account, @logger, updates_every, messages)
       User.skip_updating_account_associations do
         User.process_as_sis(@sis_options) do
           Pseudonym.process_as_sis(@sis_options) do
@@ -35,7 +35,7 @@ module SIS
       User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
       User.update_account_associations(importer.users_to_update_account_associations)
       importer.pseudos_to_set_sis_batch_ids.in_groups_of(1000, false) do |batch|
-        Pseudonym.where(:id => batch).update_all(:sis_batch_id => @batch_id)
+        Pseudonym.where(:id => batch).update_all(:sis_batch_id => @batch)
       end if @batch
       @logger.debug("Users took #{Time.now - start} seconds")
       return importer.success_count
@@ -47,8 +47,8 @@ module SIS
           :pseudos_to_set_sis_batch_ids, :users_to_add_account_associations,
           :users_to_update_account_associations
 
-      def initialize(batch_id, root_account, logger, updates_every, messages)
-        @batch_id = batch_id
+      def initialize(batch, root_account, logger, updates_every, messages)
+        @batch = batch
         @root_account = root_account
         @logger = logger
         @updates_every = updates_every
@@ -168,12 +168,12 @@ module SIS
                 if user.changed?
                   user_touched = true
                   raise ImportError, user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
-                elsif @batch_id
+                elsif @batch
                   @users_to_set_sis_batch_ids << user.id
                 end
                 pseudo.user_id = user.id
                 if pseudo.changed?
-                  pseudo.sis_batch_id = @batch_id if @batch_id
+                  pseudo.sis_batch_id = @batch.id if @batch
                   raise ImportError, pseudo.errors.first.join(" ") if !pseudo.save_without_broadcasting && pseudo.errors.size > 0
                 end
               end
@@ -239,7 +239,7 @@ module SIS
             end
 
             if pseudo.changed?
-              pseudo.sis_batch_id = @batch_id if @batch_id
+              pseudo.sis_batch_id = @batch.id if @batch
               if pseudo.valid?
                 pseudo.save_without_broadcasting
                 @success_count += 1
@@ -249,7 +249,7 @@ module SIS
                 msg += pseudo.errors.full_messages.join(", ") + ")"
                 raise ImportError, msg
               end
-            elsif @batch_id && pseudo.sis_batch_id != @batch_id
+            elsif @batch && pseudo.sis_batch_id != @batch.id
               @pseudos_to_set_sis_batch_ids << pseudo.id
               @success_count += 1
             end
