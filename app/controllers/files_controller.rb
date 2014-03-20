@@ -160,6 +160,8 @@ class FilesController < ApplicationController
   protected :check_file_access_flags
 
   def index
+    return ember_app if (@context.feature_enabled?(:better_file_browsing))
+
     if request.format == :json
       if authorized_action(@context.attachments.build, @current_user, :read)
         @current_folder = Folder.find_folder(@context, params[:folder_id])
@@ -308,6 +310,15 @@ class FilesController < ApplicationController
       render :partial => "shared/wiki_image", :collection => @images
     end
   end
+
+  def ember_app
+    raise ActiveRecord::RecordNotFound unless tab_enabled?(@context.class::TAB_FILES) && @context.feature_enabled?(:better_file_browsing)
+    clear_crumbs
+    js_bundle :files
+    jammit_css :ember_files
+    render :text => "".html_safe, :layout => true
+  end
+
 
   def full_index
     get_context

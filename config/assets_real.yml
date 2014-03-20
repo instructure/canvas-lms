@@ -14,6 +14,8 @@ css_compressor: 'sass'
 
 
 stylesheets:
+  ember_files:
+    - public/stylesheets/compiled/ember_files.css
   instructure_eportfolio:
     - public/stylesheets/compiled/instructure_eportfolio.css
   course_show: 

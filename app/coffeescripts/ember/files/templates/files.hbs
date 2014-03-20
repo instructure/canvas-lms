@@ -1,0 +1,117 @@
+<header class="ef-header">
+  <div class="ef-search-container">
+    <i class="icon-search"></i>
+    <input type="search" name="ef[search]" />
+  </div>
+
+  <div class="ef-main-buttons">
+    <button class="btn"><i class="icon-plus"></i>Folder</button>
+    <button class="btn btn-primary"><i class="icon-plus"></i>Files</button>
+
+    <a class="ef-admin-cog al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" aria-label="Settings" href="#">
+      <i class="icon-settings"></i>
+      <i class="icon-mini-arrow-down"></i>
+    </a>
+    <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
+      <li role="presentation">
+      <a href="#" class="icon-edit" id="toolbar-2" tabindex="-1" role="menuitem">Edit</a>
+      </li>
+      <li role="presentation">
+      <a href="#" class="icon-trash" id="toolbar-3" tabindex="-1" role="menuitem">Delete</a>
+      </li>
+      <li role="presentation">
+      <a href="#" class="icon-lock" id="toolbar-4" tabindex="-1" role="menuitem">Lock</a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<nav aria-label="breadcrumbs" role="navigation" class="ef-breadcrumb">
+  {{#each breadcrumbs}}
+    {{#link-to "folder" breadcrumb}} <span class="ellipsible">{{name}}</span> {{/link-to}}
+  {{/each}}
+</nav>
+
+<div class="ef-main">
+  <aside class="visible-desktop ef-folder-content">
+    <div class="ef-folder-list">
+      <ul role="tree">
+        <li role="treeitem" aria-expanded="true">
+          <header class="ef-folder-header">
+            <a href="#"><i class="icon-arrow-down"></i></a>
+            <a href="#">
+              <span class="ef-folder-name">SEE 510B</span>
+            </a>
+          </header>
+          <ul role="group">
+            <li role="treeitem">
+              <header class="ef-folder-header" style="padding-left: 18px">
+                <a href="#"><i class="icon-arrow-right"></i></a>
+                <a href="#">
+                  <span class="ef-folder-name">Assignments</span>
+                </a>
+              </header>
+            </li>
+            <li role="treeitem" aria-expanded="true" aria-selected="true">
+              <header class="ef-folder-header" style="padding-left: 18px">
+                <a href="#"><i class="icon-arrow-down"></i></a>
+                <a href="#">
+                  <span class="ef-folder-name">Calculus</span>
+                </a>
+              </header>
+              <ul role="group">
+                <li role="treeitem">
+                  <header class="ef-folder-header" style="padding-left: 36px">
+                    <a href="#"><i class="icon-arrow-right"></i></a>
+                    <a href="#">
+                      <span class="ef-folder-name">1010 Introduction into Calculus</span>
+                    </a>
+                  </header>
+                </li>
+                <li role="treeitem">
+                  <header class="ef-folder-header" style="padding-left: 36px">
+                    <a href="#"><i class="icon-arrow-right"></i></a>
+                    <a href="#">
+                      <span class="ef-folder-name">1020 Advanced Calclulus - The amazing adventure begines here</span>
+                    </a>
+                  </header>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li role="treeitem">
+          <header class="ef-folder-header">
+            <a href="#"><i class="icon-arrow-right"></i></a>
+            <a href="#">
+              <span class="ef-folder-name">Outcomes</span>
+            </a>
+          </header>
+        </li>
+        <li role="treeitem">
+          <header class="ef-folder-header">
+            <a href="#"><i class="icon-arrow-right"></i></a>
+            <a href="#">
+              <span class="ef-folder-name">Quizzes</span>
+            </a>
+          </header>
+        </li>
+        <li role="treeitem">
+          <header class="ef-folder-header">
+            <a href="#"><i class="icon-arrow-right"></i></a>
+            <a href="#">
+              <span class="ef-folder-name">Pages</span>
+            </a>
+          </header>
+        </li>
+      </ul>
+    </div><!-- end of folder list -->
+
+    <div class="ef-folder-totals">
+      185 MB of 250 MB
+    </div><!-- end of folder totals -->
+  </aside>
+
+  {{outlet}}
+
+</div>

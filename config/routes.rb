@@ -13,6 +13,8 @@ else
   routes = CanvasRails::Application.routes
 end
 
+full_path_glob = CANVAS_RAILS2 ? '/*full_path' : '(/*full_path)'
+
 routes.draw do
   resources :submission_comments, :only => :destroy
 
@@ -77,11 +79,12 @@ routes.draw do
       match 'inline_view' => 'files#show', :as => :inline_view, :inline => '1'
       match 'scribd_render' => 'files#scribd_render', :as => :scribd_render
       match 'contents' => 'files#attachment_content', :as => :attachment_content
-      match ':file_path' => 'files#show_relative', :as => :relative_path, :file_path => /.+/
       collection do
+        get "folder#{full_path_glob}", :controller => :files, :action => :ember_app, :format => false
         get :quota
         post :reorder
       end
+      match ':file_path' => 'files#show_relative', :as => :relative_path, :file_path => /.+/ #needs to stay below ember_app route
     end
   end
 
@@ -725,7 +728,8 @@ routes.draw do
   match 'calendar2' => 'calendars#show2', :as => :calendar2, :via => :get
   match 'course_sections/:course_section_id/calendar_events/:id' => 'calendar_events#show', :as => :course_section_calendar_event, :via => :get
   match 'switch_calendar/:preferred_calendar' => 'calendars#switch_calendar', :as => :switch_calendar, :via => :post
-  match 'files' => 'files#full_index', :as => :files, :via => :get
+  match 'files' => 'files#index', :as => :files, :via => :get
+  get "files/folder#{full_path_glob}", :controller => :files, :action => :ember_app, :format => false
   match 'files/s3_success/:id' => 'files#s3_success', :as => :s3_success
   match 'files/:id/public_url' => 'files#public_url', :as => :public_url
   match 'files/preflight' => 'files#preflight', :as => :file_preflight
