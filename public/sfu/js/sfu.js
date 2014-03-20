@@ -122,7 +122,7 @@
         var $publishButton = $('#' + location.pathname.replace('/courses/', 'edit_course_'));
         var $readMoreLink = $('<a href="/sfu/copyright/disclaimer" class="element_toggler" aria-controls="copyright_dialog" target="_blank">Read more.</a>');
         var $disclaimer = $('<iframe src="/sfu/copyright/disclaimer" seamless="seamless" width="100%" height="100%">').css('border', 'none');
-        $("<p>I confirm that the use of copyright protected materials in this course complies with <em>Canada's Copyright Act and SFU Policy R30.04 - Copyright Compliance and Administration</em>. </p>")
+        $("<p>I confirm that the use of copyright protected materials in this course complies with Canada's <em>Copyright Act</em> and SFU Policy R30.04 - <em>Copyright Compliance and Administration</em>. </p>")
             .append($readMoreLink)
             .insertAfter($publishButton);
         // Use a modal dialog to display the full disclaimer
