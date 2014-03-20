@@ -313,8 +313,9 @@ describe "account" do
         ui_auto_complete.should be_displayed
       end
 
-      element = ff('.ui-autocomplete li a').first
-      element.text.should == @course_name
+      elements = ff('.ui-autocomplete li:first-child a div')
+      elements[0].text.should == @course_name
+      elements[1].text.should == 'Default Term'
       keep_trying_until do
         driver.execute_script("$('.ui-autocomplete li a').hover().click()")
         driver.current_url.should include("/courses/#{@course.id}")
