@@ -518,7 +518,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def restore(from=nil)
-    self.workflow_state = self.context.feature_enabled?(:draft_state) ? 'unpublished' : 'published'
+    if !self.context.feature_enabled?(:draft_state) || self.has_student_submissions?
+      self.workflow_state = "published"
+    elsif self.context.feature_enabled?(:draft_state)
+      self.workflow_state = "unpublished"
+    end
     self.save
     self.discussion_topic.restore if self.discussion_topic && from != :discussion_topic
     self.quiz.restore if self.quiz && from != :quiz
