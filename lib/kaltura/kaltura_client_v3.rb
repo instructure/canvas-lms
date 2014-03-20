@@ -244,7 +244,7 @@ module Kaltura
       data = {}
       data[:result] = result
       url = result.css('logFileUrl')[0].content
-      csv = CSV.parse(Canvas::HTTP.get(url).body)
+      csv = CSV.parse(CanvasHttp.get(url).body)
       data[:entries] = []
       csv.each do |row|
         data[:entries] << {

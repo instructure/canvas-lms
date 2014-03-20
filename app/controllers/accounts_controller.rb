@@ -763,7 +763,7 @@ class AccountsController < ApplicationController
 
   def validated_turnitin_host(input_host)
     if input_host.present?
-      _, turnitin_uri = CustomValidations.validate_url(input_host)
+      _, turnitin_uri = CanvasHttp.validate_url(input_host)
       turnitin_uri.host
     else
       nil

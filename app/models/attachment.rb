@@ -1749,7 +1749,7 @@ class Attachment < ActiveRecord::Base
 
   def clone_url(url, duplicate_handling, check_quota, opts={})
     begin
-      Canvas::HTTP.clone_url_as_attachment(url, :attachment => self)
+      Attachment.clone_url_as_attachment(url, :attachment => self)
 
       if check_quota
         self.save! # save to calculate attachment size, otherwise self.size is nil
@@ -1765,11 +1765,11 @@ class Attachment < ActiveRecord::Base
       self.file_state = 'errored'
       self.workflow_state = 'errored'
       case e
-      when Canvas::HTTP::TooManyRedirectsError
+      when CanvasHttp::TooManyRedirectsError
         self.upload_error_message = t :upload_error_too_many_redirects, "Too many redirects"
-      when Canvas::HTTP::InvalidResponseCodeError
+      when CanvasHttp::InvalidResponseCodeError
         self.upload_error_message = t :upload_error_invalid_response_code, "Invalid response code, expected 200 got %{code}", :code => e.code
-      when CustomValidations::RelativeUriError
+      when CanvasHttp::RelativeUriError
         self.upload_error_message = t :upload_error_relative_uri, "No host provided for the URL: %{url}", :url => url
       when URI::InvalidURIError, ArgumentError
         # assigning all ArgumentError to InvalidUri may be incorrect
@@ -1824,5 +1824,39 @@ class Attachment < ActiveRecord::Base
 
   def can_unpublish?
     false
+  end
+
+  # Download a URL using a GET request and return a new un-saved Attachment
+  # with the data at that URL. Tries to detect the correct content_type as
+  # well.
+  #
+  # This handles large files well.
+  #
+  # Pass an existing attachment in opts[:attachment] to use that, rather than
+  # creating a new attachment.
+  def self.clone_url_as_attachment(url, opts = {})
+    _, uri = CanvasHttp.validate_url(url)
+
+    CanvasHttp.get(url) do |http_response|
+      if http_response.code.to_i == 200
+        tmpfile = CanvasHttp.tempfile_for_uri(uri)
+        # net/http doesn't make this very obvious, but read_body can take any
+        # object that responds to << as the destination of the body, and it'll
+        # stream in chunks rather than reading the whole body into memory (as
+        # long as you use the block form of http.request, which
+        # CanvasHttp.get does)
+        http_response.read_body(tmpfile)
+        tmpfile.rewind
+        attachment = opts[:attachment] || Attachment.new(:filename => File.basename(uri.path))
+        attachment.filename ||= File.basename(uri.path)
+        attachment.uploaded_data = tmpfile
+        if attachment.content_type.blank? || attachment.content_type == "unknown/unknown"
+          attachment.content_type = http_response.content_type
+        end
+        return attachment
+      else
+        raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i)
+      end
+    end
   end
 end

@@ -99,7 +99,7 @@ class ContextExternalTool < ActiveRecord::Base
   def validate_vendor_help_link
     return if self.vendor_help_link.blank?
     begin
-      value, uri = CustomValidations.validate_url(self.vendor_help_link)
+      value, uri = CanvasHttp.validate_url(self.vendor_help_link)
       self.vendor_help_link = uri.to_s
     rescue URI::InvalidURIError, ArgumentError
       self.vendor_help_link = nil
