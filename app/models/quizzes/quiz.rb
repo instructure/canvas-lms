@@ -279,10 +279,10 @@ class Quizzes::Quiz < ActiveRecord::Base
     res
   end
 
-  def restore
+  def restore(from=nil)
     self.workflow_state = self.context.feature_enabled?(:draft_state) ? 'unpublished' : 'edited'
     self.save
-    self.assignment.restore(:quiz)
+    self.assignment.restore(:quiz) if self.for_assignment?
   end
 
   def unlink_from(type)

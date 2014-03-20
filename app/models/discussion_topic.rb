@@ -636,11 +636,11 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def restore
+  def restore(from=nil)
     self.workflow_state = self.context.feature_enabled?(:draft_state) ? 'post_delayed' : 'active'
     self.save
 
-    if self.for_assignment? && self.root_topic_id.blank?
+    if from != :assignment && self.for_assignment? && self.root_topic_id.blank?
       self.assignment.restore(:discussion_topic)
     end
 

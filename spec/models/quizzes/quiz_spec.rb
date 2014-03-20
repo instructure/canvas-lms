@@ -1473,6 +1473,13 @@ describe Quizzes::Quiz do
       @quiz.restore
       @quiz.reload.should be_unpublished
     end
+
+    it "works for practice quizzes" do
+      @quiz = @course.quizzes.create!(title: 'Test Quiz', quiz_type: 'practice_quiz')
+      @quiz.destroy
+      @quiz.restore
+      @quiz.reload.should be_unpublished
+    end
   end
 
   describe '#generate_submission_for_participant' do

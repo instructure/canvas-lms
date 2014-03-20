@@ -524,8 +524,8 @@ class Assignment < ActiveRecord::Base
       self.workflow_state = "unpublished"
     end
     self.save
-    self.discussion_topic.restore if self.discussion_topic && from != :discussion_topic
-    self.quiz.restore if self.quiz && from != :quiz
+    self.discussion_topic.restore(:assignment) if from != :discussion_topic && self.discussion_topic
+    self.quiz.restore(:assignment) if from != :quiz && self.quiz
   end
 
   def participants
