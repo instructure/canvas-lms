@@ -318,7 +318,9 @@ describe "content migrations" do
       end
 
       el = f('.ui-autocomplete li a')
-      el.text.should == @copy_from.name
+      divs = ff('div', el)
+      divs[0].text.should == @copy_from.name
+      divs[1].text.should == @copy_from.enrollment_term.name
       el.click
 
       ff('[name=selective_import]')[0].click
