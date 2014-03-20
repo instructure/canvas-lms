@@ -108,7 +108,7 @@ end
 if CANVAS_RAILS2
   gem 'encrypted_cookie_store-instructure', '1.0.5', :require => 'encrypted_cookie_store'
 else
-  gem 'encrypted_cookie_store-instructure', '1.1.1', :require => 'encrypted_cookie_store'
+  gem 'encrypted_cookie_store-instructure', '1.1.2', :require => 'encrypted_cookie_store'
 end
 if CANVAS_RAILS2
   gem 'erubis', '2.7.0'
