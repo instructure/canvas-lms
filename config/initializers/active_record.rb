@@ -1869,116 +1869,31 @@ end
 
 # shims so that AR objects serialized under rails 2 function under rail s3
 if CANVAS_RAILS2
-  class ActiveSupport::Cache::Entry
-    def value
-      Marshal.load(@compressed ? Zlib::Inflate.inflate(@value) : @value) if @value
-    end
-  end
-
   ActiveSupport::Cache::Store.subclasses.map(&:constantize).each do |subclass|
     subclass.class_eval do
-      def read_with_rails3_shim(*args)
-        result = read_without_rails3_shim(*args)
-        result = result.value if ActiveSupport::Cache::Entry === result
-        result
+      def delete_with_rails3_shim(key, options = nil)
+        r1 = delete_without_rails3_shim(key, options)
+        r2 = delete_without_rails3_shim("rails3:#{key}", options)
+        r1 || r2
       end
-      alias_method_chain :read, :rails3_shim
-    end
-  end
-
-  module ActiveRecord::AttributeMethods::Serialization; end
-
-  class ActiveRecord::AttributeMethods::Serialization::Attribute < Struct.new(:coder, :value, :state)
-    def unserialize
-      return nil if self.value.nil?
-      self.value = self.coder.load(self.value)
-    end
-  end
-
-  module ActiveRecord::Coders; end
-  class ActiveRecord::Coders::YAMLColumn
-    def load(yaml)
-      return @object_class.new if @object_class != Object && yaml.nil?
-      return yaml unless yaml.is_a?(String) && yaml =~ /^---/
-      begin
-        obj = YAML.load(yaml)
-
-        unless obj.is_a?(@object_class) || obj.nil?
-          raise SerializationTypeMismatch,
-                "Attribute was supposed to be a #{object_class}, but was a #{obj.class}"
-        end
-        obj ||= @object_class.new if @object_class != Object
-
-        obj
-      rescue ArgumentError
-        yaml
-      end
-    end
-  end
-
-  class ActiveRecord::Base
-    def unserialize_attribute_with_rails3_shim(attr_name)
-      @attributes[attr_name] = @attributes[attr_name].unserialize if ActiveRecord::AttributeMethods::Serialization::Attribute === @attributes[attr_name]
-      unserialize_attribute_without_rails3_shim(attr_name)
-    end
-    alias_method_chain :unserialize_attribute, :rails3_shim
-  end
-
-  class ActiveRecord::Relation
-
-  end
-
-  module Arel; end
-  class Arel::TreeManager; end
-  class Arel::SelectManager < Arel::TreeManager; end
-  class Arel::Table; end
-  module Arel::Attributes; end
-  class Arel::Attributes::Attribute < Struct.new :relation, :name; end
-  module Arel::Nodes; end
-  class Arel::Nodes::Node; end
-  class Arel::Nodes::And < Arel::Nodes::Node; end
-  class Arel::Nodes::Binary < Arel::Nodes::Node; end
-  class Arel::Nodes::Equality < Arel::Nodes::Binary; end
-  class Arel::Nodes::JoinSource < Arel::Nodes::Binary; end
-  class Arel::Nodes::SelectCore < Arel::Nodes::Node; end
-  class Arel::Nodes::SelectStatement < Arel::Nodes::Node; end
-  class Arel::Nodes::SqlLiteral < String; end
-
-
-  module Switchman; end
-  class Switchman::Shard < ActiveRecord::Base
-    attr_accessible
-    def self._load(str)
-      Shard.lookup(str.to_i)
+      alias_method_chain :delete, :rails3_shim
     end
   end
 else
-  ActiveRecord::AttributeMethods::Serialization::ClassMethods.class_eval do
-    def attribute_cast_code(attr_name)
-      if serialized_attributes.include?(attr_name)
-        "(ActiveRecord::AttributeMethods::Serialization::Attribute === v ? v.unserialized_value : ActiveRecord::AttributeMethods::Serialization.object_from_yaml(v))"
-      else
-        super
-      end
+  ActiveSupport::Cache::Store.class_eval do
+    def namespaced_key_with_rails2_shim(key, options)
+      result = namespaced_key_without_rails2_shim(key, options)
+      result = "rails3:#{result}" if !(result =~ /^rails3/) && !options[:no_rails3]
+      result
     end
-  end
+    alias_method_chain :namespaced_key, :rails2_shim
 
-  ActiveRecord::AttributeMethods::Serialization.class_eval do
-    def self.object_from_yaml(string)
-      return string unless string.is_a?(String) && string =~ /^---/
-      YAML::load(string) rescue string
+    def delete_with_rails2_shim(key, options = nil)
+      r1 = delete_without_rails2_shim(key, options)
+      r2 = delete_without_rails2_shim(key, (options || {}).merge(no_rails3: true))
+      r1 || r2
     end
-  end
-
-  ActiveRecord::Associations.class_eval do
-    def association_instance_get(name)
-      (@association_cache || {})[name.to_sym]
-    end
-
-    def association_instance_set(name, association)
-      @association_cache ||= {}
-      @association_cache[name] = association
-    end
+    alias_method_chain :delete, :rails2_shim
   end
 end
 
