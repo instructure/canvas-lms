@@ -93,7 +93,6 @@ class AppointmentGroup < ActiveRecord::Base
   end
   attr_accessor :validation_event_override
   attr_accessor :cancel_reason
-  attr_accessor :context
 
   def reload
     remove_instance_variable :@new_appointments if @new_appointments
