@@ -9,12 +9,16 @@
     <div class="discussion-type">
       {{#if assignment}}
         <i class="icon-assignment" aria-hidden="true"></i>
-        <span class="screenreader-only">{{#t "graded_discussion"}}Graded discussion{{/t}}</span>
       {{/if}}
     </div>
 
     <div class="discussion-title">
-      <a href="{{html_url}}" class="title">{{title}}</a>
+      <div role="heading">
+        {{#if assignment}}
+          <span class="screenreader-only">{{#t "graded_discussion"}}Graded discussion: {{/t}}</span>
+        {{/if}}
+        <a href="{{html_url}}" class="title">{{title}}</a>
+      </div>
       <small>{{#t "last_post_date"}}Last post {{display_last_reply_at}}{{/t}}</small>
     </div>
 
