@@ -33,8 +33,7 @@
                    name="course[name]"
                    style="z-index:10"
                    value="<%= @query %>"
-                   data-behaviors="autocomplete"
-                   data-autocomplete-options="<%= { :minLength => 4, :delay => 150, :source => account_courses_path(@account) }.to_json  %>"
+                   data-autocomplete-source="<%= account_courses_path(@account) %>"
                    />
             <button class='btn'><%= t(:go_button, "Go") %></button>
           </fieldset>

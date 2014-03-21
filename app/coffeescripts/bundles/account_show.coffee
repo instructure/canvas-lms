@@ -4,11 +4,17 @@ require [
   'compiled/behaviors/autocomplete'
 ], ($, autocompleteItemTemplate) ->
   $(document).ready ->
-    # Add an on-select event to the course name autocomplete.
-    $('#course_name').on 'autocompleteselect', (e, ui) ->
-      path = $(this).data('autocomplete-options')['source'].replace(/\?.+$/, '')
-      window.location = "#{path}/#{ui.item.id}"
-    # Customize autocomplete (if any) to show the term for each matched course.
-    autocompleteData = $('#course_name').data('ui-autocomplete')
-    autocompleteData && autocompleteData._renderItem = (ul, item) ->
-      $(autocompleteItemTemplate(item)).appendTo(ul)
+    $courseSearchField = $('#course_name')
+    if $courseSearchField.length
+      autocompleteSource = $courseSearchField.data('autocomplete-source')
+      $courseSearchField.autocomplete
+        minLength: 4
+        delay: 150
+        source: autocompleteSource
+        select: (e, ui) ->
+          # When selected, go to the course page.
+          path = autocompleteSource.replace(/\?.+$/, '')
+          window.location = "#{path}/#{ui.item.id}"
+      # Customize autocomplete to show the enrollment term for each matched course.
+      $courseSearchField.data('ui-autocomplete')._renderItem = (ul, item) ->
+        $(autocompleteItemTemplate(item)).appendTo(ul)
