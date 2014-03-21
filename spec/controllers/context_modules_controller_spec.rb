@@ -485,10 +485,12 @@ describe ContextModulesController do
 
   describe "GET assignment_info" do
     it "should return updated due dates/points possible" do
-      course_with_student_logged_in active_all: true
-      @mod = @course.context_modules.create!
-      @assign = @course.assignments.create! title: "WHAT", points_possible: 123
-      @tag = @mod.add_item(type: 'assignment', id: @assign.id)
+      Timecop.freeze(1.minute.ago) do
+        course_with_student_logged_in active_all: true
+        @mod = @course.context_modules.create!
+        @assign = @course.assignments.create! title: "WHAT", points_possible: 123
+        @tag = @mod.add_item(type: 'assignment', id: @assign.id)
+      end
       enable_cache do
         get 'content_tag_assignment_data', course_id: @course.id, format: 'json' # precache
         @assign.points_possible = 456
