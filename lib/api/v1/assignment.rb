@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -287,11 +287,18 @@ module Api::V1::Assignment
     end
   end
 
+  def temp_invalid_time_stamp_error(attribute, temp_message)
+    ErrorReport.log_error('invalid_iso8601_date_time',
+                          message: "invalid #{attribute}",
+                          exception_message: temp_message)
+  end
+
   def update_from_params(assignment, assignment_params)
     update_params = assignment_params.slice(*API_ALLOWED_ASSIGNMENT_INPUT_FIELDS)
 
     if update_params.has_key?('peer_reviews_assign_at')
       update_params['peer_reviews_due_at'] = update_params['peer_reviews_assign_at']
+      update_params.delete('peer_reviews_assign_at')
     end
 
     if update_params["submission_types"].is_a? Array
@@ -327,9 +334,32 @@ module Api::V1::Assignment
       assignment.muted = value_to_boolean(assignment_params.delete("muted"))
     end
 
+    temp_message = ["invalid due_at",
+                    "assignment_params: #{assignment_params}",
+                    "user: #{@current_user.attributes}",
+                    "account: #{assignment.context.root_account.attributes}",
+                    "course: #{assignment.context.attributes}",
+                    "assignment: #{assignment.attributes}"].join(",\n")
+
     # do some fiddling with due_at for fancy midnight and add to update_params
-    if update_params.has_key?("due_at")
-      update_params["time_zone_edited"] = Time.zone.name
+    # validate that date and times are iso8601 otherwise ignore them, but still
+    # allow clearing them when set to nil
+    if update_params['due_at'].present? && !valid_iso8601?(update_params['due_at'])
+      temp_invalid_time_stamp_error('due_at', temp_message)
+    elsif update_params.has_key?('due_at')
+      update_params['time_zone_edited'] = Time.zone.name
+    end
+
+    if update_params['lock_at'].present? && !valid_iso8601?(update_params['lock_at'])
+      temp_invalid_time_stamp_error('lock_at', temp_message)
+    end
+
+    if update_params['unlock_at'].present? && !valid_iso8601?(update_params['unlock_at'])
+      temp_invalid_time_stamp_error('unlock_at', temp_message)
+    end
+
+    if update_params['peer_reviews_due_at'].present? && !valid_iso8601?(update_params['peer_reviews_due_at'])
+      temp_invalid_time_stamp_error('peer_reviews_due_at', temp_message)
     end
 
     if !assignment.context.try(:turnitin_enabled?)

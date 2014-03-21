@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -546,6 +546,18 @@ module Api
   # takes a comma separated string, an array, or nil and returns an array
   def self.value_to_array(value)
     value.is_a?(String) ? value.split(',') : (value || [])
+  end
+
+  def valid_iso8601?(date_time)
+    iso8601 = /^(?<year>-?[0-9]{4})-
+                (?<month>1[0-2]|0[1-9])-
+                (?<day>3[0-1]|0[1-9]|[1-2][0-9])T
+                (?<hour>2[0-3]|[0-1][0-9]):
+                (?<minute>[0-5][0-9]):
+                (?<second>60|[0-5][0-9])
+                (?<fraction>\.[0-9]+)?
+                (?<timezone>Z|[+-](?:2[0-3]|[0-1][0-9]):[0-5][0-9])?$/x
+    date_time.to_s =~ iso8601
   end
 
   # regex for shard-aware ID
