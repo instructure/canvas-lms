@@ -115,7 +115,11 @@ define [
     # use this method to process any user content fields returned in api responses
     # this is important to handle object/embed tags safely, and to properly display audio/video tags
     convertApiUserContent: (html, {hash}) ->
-      new Handlebars.SafeString convertApiUserContent(html, hash)
+      content = convertApiUserContent(html, hash)
+      # if the content is going to get picked up by tinymce, do not mark as safe
+      # because we WANT it to be escaped again.
+      content = new Handlebars.SafeString content unless hash and hash.forEditing
+      content
 
     newlinesToBreak : (string) ->
       # Convert a null to an empty string so it doesn't blow up.

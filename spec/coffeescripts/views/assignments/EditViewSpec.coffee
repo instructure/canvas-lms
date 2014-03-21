@@ -97,6 +97,11 @@ define [
     view.$('#assignment_has_group_category').click()
     equal view.getFormData()['groupCategoryId'], null
 
+  test 'renders escaped angle brackets properly', ->
+    desc = "<p>&lt;E&gt;</p>"
+    view = editView description: "<p>&lt;E&gt;</p>"
+    equal view.$description.val().match(desc), desc
+
   # fragile spec
   checkWarning = (view, showsWarning) ->
     view.$("#assignment_toggle_advanced_options").click()
