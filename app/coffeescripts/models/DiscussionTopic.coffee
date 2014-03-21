@@ -86,16 +86,16 @@ define [
 
     unreadTooltip: ->
       I18n.t 'unread_count_tooltip', {
-        zero:  'No unread replies'
-        one:   '1 unread reply'
-        other: '%{count} unread replies'
+        zero:  'No unread replies.'
+        one:   '1 unread reply.'
+        other: '%{count} unread replies.'
       }, count: @get('unread_count')
 
     replyTooltip: ->
       I18n.t 'reply_count_tooltip', {
-        zero:  'No replies'
-        one:   '1 reply'
-        other: '%{count} replies'
+        zero:  'No replies.'
+        one:   '1 reply.'
+        other: '%{count} replies.'
       }, count: @get('discussion_subentry_count')
 
     ##
