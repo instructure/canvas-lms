@@ -788,7 +788,8 @@ class DiscussionTopic < ActiveRecord::Base
     p.to { active_participants - [user] }
     p.whenever { |record|
       record.context.available? and
-      ((record.just_created && record.active?) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
+      ((record.just_created && record.active?) || record.changed_state(:active, :post_delayed) || 
+        (record.draft_state_enabled? and record.changed_state(:active, :unpublished)))
     }
   end
 
@@ -863,7 +864,7 @@ class DiscussionTopic < ActiveRecord::Base
     # topic is not published
     if !published?
       false
-    elsif !draft_state_enabled? && unlock_at = available_from_for(user)
+    elsif unlock_at = available_from_for(user)
     # unlock date exists and has passed
       unlock_at < Time.now.utc
     # everything else
