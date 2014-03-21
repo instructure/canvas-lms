@@ -117,11 +117,13 @@ define [
     onReadStateChange: (msg) ->
       @hideMarkUnreadBtn(!msg || msg.unread())
       @hideMarkReadBtn(!msg || !msg.unread())
+      @refreshMenu()
 
     onStarStateChange: (msg) ->
       if msg
         key = if msg.starred() then 'unstar' else 'star'
         @$starToggleBtn.text(@messages[key])
+      @refreshMenu()
 
     onArchivedStateChange: (msg) ->
       return if !msg
@@ -130,6 +132,10 @@ define [
       @$archiveBtn.attr('title', if archived then @messages['unarchive'] else @messages['archive'])
       @$archiveBtn.find('.screenreader-only')
         .text(if archived then @messages['unarchive_conversation'] else @messages['archive_conversation'])
+      @refreshMenu()
+
+    refreshMenu: ->
+      @$adminMenu.menu('refresh') if @$adminMenu.is('.ui-menu')
 
     filterObj: (obj) -> _.object(_.filter(_.pairs(obj), (x) -> !!x[1]))
 
