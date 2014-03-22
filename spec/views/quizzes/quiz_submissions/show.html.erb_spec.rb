@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quiz_submissions/show" do
   it "should render" do
@@ -34,7 +34,7 @@ describe "/quiz_submissions/show" do
     assigns[:quiz] = @quiz
     assigns[:submission] = @submission
     
-    render "quiz_submissions/show"
+    render "quizzes/quiz_submissions/show"
     response.should_not be_nil
   end
 end
