@@ -24,7 +24,6 @@ module Quizzes
       :api_v1_course_quiz_submissions_url
 
     has_one :assignment_group, embed: :ids, root: :assignment_group
-    has_many :quiz_submissions, embed: :ids, root: :quiz_submissions
 
     def speed_grader_url
       return nil unless show_speedgrader?
@@ -42,6 +41,11 @@ module Quizzes
           nil
         end
       end
+    end
+
+    def quiz_submissions
+      # this can't be a has_many :quiz_submissions association, because that
+      # approach loads in every submission at once 
     end
 
     def html_url
