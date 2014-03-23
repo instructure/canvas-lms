@@ -23,11 +23,17 @@ class QuizSerializer < Canvas::APISerializer
     :api_v1_course_quiz_submissions_url
 
   has_one :assignment_group, embed: :ids, key: :assignment_group
-  has_many :quiz_submissions, embed: :ids, key: :quiz_submissions
+  #has_many :quiz_submissions, embed: :ids, key: :quiz_submissions
 
   def speed_grader_url
     return nil unless show_speedgrader?
     speed_grader_course_gradebook_url(quiz.context, assignment_id: quiz.assignment.id)
+  end
+
+  def quiz_submissions
+    # this was previously loading too many quiz submissions into memory.
+    # temporary fix until we figure out how to do stuff without loading
+    # models into memory.
   end
 
   def quiz_submissions_url
