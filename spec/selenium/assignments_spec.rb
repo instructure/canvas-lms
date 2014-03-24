@@ -175,6 +175,7 @@ describe "assignments" do
         if grading_option == "percent"
           replace_content f('#assignment_points_possible'), ('1')
         end
+        click_option('#assignment_submission_type', 'No Submission')
         submit_assignment_form
         f('.title').should include_text(assignment_title)
         Assignment.find_by_title(assignment_title).grading_type.should == grading_option
@@ -225,6 +226,7 @@ describe "assignments" do
         f('.add_assignment_link').click
         wait_for_ajaximations
         expect_new_page_load { f('.more_options_link').click }
+        click_option('#assignment_submission_type', 'No Submission')
         submit_assignment_form
         @course.assignments.count.should == 1
         get "/courses/#{@course.id}/assignments"
@@ -278,6 +280,7 @@ describe "assignments" do
         f('.add_assignment_link').click
         wait_for_ajaximations
         expect_new_page_load { f('.more_options_link').click }
+        click_option('#assignment_submission_type', 'No Submission')
         submit_assignment_form
         @course.assignments.count.should == 1
         get "/courses/#{@course.id}/assignments"

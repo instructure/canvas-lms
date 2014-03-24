@@ -97,7 +97,8 @@ define [
 
     submissionType: =>
       submissionTypes = @_submissionTypes()
-      if _.include(submissionTypes, 'none') || submissionTypes.length == 0 then 'none'
+      if this.isNew() then 'online'
+      else if _.include(submissionTypes, 'none') || submissionTypes.length == 0 then 'none'
       else if _.include submissionTypes, 'on_paper' then 'on_paper'
       else if _.include submissionTypes, 'external_tool' then 'external_tool'
       else 'online'
@@ -127,6 +128,7 @@ define [
       !! _.include @_submissionTypes(), 'online_text_entry'
 
     isOnlineSubmission: =>
+      return true if this.isNew()
       _.any @_submissionTypes(), (thing) ->
           thing in ['online', 'online_text_entry',
             'media_recording', 'online_url', 'online_upload']

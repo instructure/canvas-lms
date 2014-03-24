@@ -215,18 +215,22 @@ define [
   module "Assignment#submissionType"
 
   test "returns 'none' if record's submission_types is ['none']", ->
-    assignment = new Assignment name: 'foo'
+    assignment = new Assignment name: 'foo', id: '12'
     assignment.set 'submission_types', [ 'none' ]
     deepEqual assignment.submissionType(), 'none'
 
   test "returns 'on_paper' if record's submission_types includes on_paper", ->
-    assignment = new Assignment name: 'foo'
+    assignment = new Assignment name: 'foo', id: '13'
     assignment.set 'submission_types', [ 'on_paper' ]
     deepEqual assignment.submissionType(), 'on_paper'
 
   test "returns online submission otherwise", ->
-    assignment = new Assignment name: 'foo'
+    assignment = new Assignment name: 'foo', id: '14'
     assignment.set 'submission_types', [ 'online_upload' ]
+    deepEqual assignment.submissionType(), 'online'
+
+  test "returns online for new records", ->
+    assignment = new Assignment name: 'foo'
     deepEqual assignment.submissionType(), 'online'
 
   module "Assignment#expectsSubmission"
@@ -496,7 +500,7 @@ define [
     deepEqual json.acceptsMediaRecording, true
 
   test "includes submissionType", ->
-    assignment = new Assignment name: 'foo'
+    assignment = new Assignment name: 'foo', id: '16'
     assignment.set 'submission_types', [ 'on_paper' ]
     json = assignment.toView()
     deepEqual json.submissionType, 'on_paper'
@@ -512,6 +516,11 @@ define [
     assignment.set 'submission_types', [ 'online_url' ]
     json = assignment.toView()
     deepEqual json.acceptsOnlineURL, true
+
+  test "returns online for new records", ->
+    assignment = new Assignment name: 'foo'
+    json = assignment.toView()
+    deepEqual json.isOnlineSubmission, true
 
   test "includes allowedExtensions", ->
     assignment = new Assignment name: 'foo'
