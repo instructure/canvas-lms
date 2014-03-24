@@ -25,7 +25,8 @@ class Attachment < ActiveRecord::Base
   attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data, :hidden
 
   include PolymorphicTypeOverride
-  override_polymorphic_types context_type: {'QuizStatistics' => 'Quizzes::QuizStatistics'}
+  override_polymorphic_types context_type: {'QuizStatistics' => 'Quizzes::QuizStatistics',
+                                            'QuizSubmission' => 'Quizzes::QuizSubmission'}
 
   include HasContentTags
   include ContextModuleItem
