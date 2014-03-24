@@ -35,7 +35,7 @@ describe "account_authorization_configs/index" do
 
   it "should display the last_timeout_failure" do
     assigns[:context] = assigns[:account] = Account.default
-    assigns[:account_configs] = [ factory_with_protected_attributes(Account.default.account_authorization_configs, :last_timeout_failure => 1.minute.ago),
+    assigns[:account_configs] = [ factory_with_protected_attributes(Account.default.account_authorization_configs, :last_timeout_failure => 1.minute.ago, :auth_type => 'ldap'),
                                   Account.default.account_authorization_configs.build ]
     assigns[:current_user] = user_model
     assigns[:saml_identifiers] = []

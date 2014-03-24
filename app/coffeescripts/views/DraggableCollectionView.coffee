@@ -1,8 +1,9 @@
 define [
   'Backbone'
+  'jquery'
   'underscore'
   'compiled/views/CollectionView'
-], (Backbone, _, CollectionView) ->
+], (Backbone, $, _, CollectionView) ->
 
   class DraggableCollectionView extends CollectionView
 

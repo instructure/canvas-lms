@@ -63,12 +63,17 @@ if CANVAS_RAILS2
   gem 'authlogic', '2.1.3'
 else
   # just to be clear, Canvas is NOT READY to run under Rails 3 in production
-  gem 'rails', '3.2.15'
+  gem 'rails', '3.2.17'
   gem 'active_model_serializers', '0.9.0pre',
     :github => 'rails-api/active_model_serializers', :ref => '99fa399ae6dc071b97b15e1ef2b42f0d23c492ec'
-  gem 'authlogic', '3.2.0'
+  gem 'authlogic', '3.3.0'
 end
 
+if CANVAS_RAILS2
+  gem 'instructure-active_model-better_errors', '1.6.5.rails2.3', :require => 'active_model/better_errors'
+else
+  gem 'active_model-better_errors', '1.6.7', :require => 'active_model/better_errors'
+end
 gem "aws-sdk", '1.21.0'
   gem 'uuidtools', '2.1.4'
 gem 'barby', '0.5.0'
@@ -79,12 +84,17 @@ gem 'canvas_connect', '0.3.2'
 gem 'canvas_webex', '0.12'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
+unless CANVAS_RAILS2
+  gem 'dynamic_form', '1.1.4'
+end
 if CANVAS_RAILS2
   gem 'encrypted_cookie_store-instructure', '1.0.5', :require => 'encrypted_cookie_store'
 else
   gem 'encrypted_cookie_store-instructure', '1.1.1', :require => 'encrypted_cookie_store'
 end
-gem 'erubis', '2.7.0'
+if CANVAS_RAILS2
+  gem 'erubis', '2.7.0'
+end
 if CANVAS_RAILS2
   gem 'fake_arel', '1.4.0'
   gem 'fake_rails3_routes', '1.0.4'
@@ -138,7 +148,7 @@ gem 'rotp', '1.4.1'
 gem 'rqrcode', '0.4.2'
 gem 'rscribd', '1.2.0'
 gem 'net-ldap', '0.3.1', :require => 'net/ldap'
-gem 'ruby-saml-mod', '0.1.24'
+gem 'ruby-saml-mod', '0.1.25'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip', '1.0.0', :require => 'zip'
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace
@@ -157,7 +167,7 @@ if CANVAS_RAILS2
   gem 'folio-pagination-legacy', '0.0.3', :require => 'folio/rails'
   gem 'will_paginate', '2.3.15', :require => false
 else
-  gem 'folio-pagination', '0.0.3', :require => 'folio/rails'
+  gem 'folio-pagination', '0.0.6', :require => 'folio/rails'
   gem 'will_paginate', '3.0.4', :require => false
 end
 gem 'xml-simple', '1.0.12', :require => 'xmlsimple'
@@ -169,14 +179,19 @@ gem 'regru-premailer', :require => 'premailer', :github => "regru/premailer", :r
   gem 'css_parser', '1.3.5'
   gem 'htmlentities', '4.3.1'
 
+gem 'activesupport-suspend_callbacks', :path => 'gems/activesupport-suspend_callbacks'
 gem 'adheres_to_policy', :path => 'gems/adheres_to_policy'
 gem 'canvas_breach_mitigation', :path => 'gems/canvas_breach_mitigation'
+gem 'canvas_color', :path => 'gems/canvas_color'
 gem 'canvas_crummy', :path => 'gems/canvas_crummy'
 gem 'canvas_mimetype_fu', :path => 'gems/canvas_mimetype_fu'
 gem 'canvas_sanitize', :path => 'gems/canvas_sanitize'
 gem 'canvas_stringex', :path => 'gems/canvas_stringex'
-gem 'lti_outbound', :path => 'gems/lti_outbound'
+gem 'canvas_uuid', :path => 'gems/canvas_uuid'
 gem 'html_text_helper', :path => 'gems/html_text_helper'
+gem 'lti_outbound', :path => 'gems/lti_outbound'
+gem 'multipart', :path => 'gems/multipart'
+gem 'workflow', :path => 'gems/workflow'
 
 group :assets do
   gem 'compass-rails', '1.0.3'
@@ -279,13 +294,6 @@ group :cassandra do
     gem 'thrift', '0.8.0'
     gem 'thrift_client', '0.8.4'
   gem "canvas_cassandra", path: "gems/canvas_cassandra"
-end
-
-group :embedly do
-  gem 'embedly', '1.5.5'
-    gem 'oauth', '0.4.7'
-    gem 'querystring', '0.1.0'
-    gem 'typhoeus', '0.3.3'
 end
 
 group :statsd do

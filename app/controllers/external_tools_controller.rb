@@ -111,7 +111,7 @@ class ExternalToolsController < ApplicationController
       @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
       @tool_settings = @launch.generate
 
-      @tool_launch_type = 'self'
+      @tool_launch_type = 'self' if params['borderless']
       render :template => 'external_tools/tool_show'
     end
   end

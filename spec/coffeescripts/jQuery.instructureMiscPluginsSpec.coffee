@@ -2,6 +2,7 @@ define [
   'jquery'
   'jquery.instructure_misc_plugins'
 ], (jQuery) ->
+  $ = jQuery
 
   module 'instructure misc plugins'
 

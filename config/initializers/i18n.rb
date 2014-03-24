@@ -93,7 +93,7 @@ I18n.class_eval do
         string = ERB::Util.h(string) unless string.html_safe?
       end
       if string.is_a?(ActiveSupport::SafeBuffer) && string.html_safe?
-        ActiveSupport::SafeBuffer.new(interpolate_hash_without_html_safety_awareness(string.to_str, values))
+        string.class.new(interpolate_hash_without_html_safety_awareness(string.to_str, values))
       else
         interpolate_hash_without_html_safety_awareness(string, values)
       end

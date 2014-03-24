@@ -868,6 +868,54 @@ XML
     a.discussion_topic.should == dt_2
     a.assignment_group.id.should == ag1.id
   end
+
+  it "should not fail when importing discussion topic when both group_id and assignment are specified" do
+    body = "<p>What do you think about the stuff?</p>"
+    group = @copy_from.groups.create!(:name => "group")
+    dt = group.discussion_topics.new
+    dt.title = "Topic"
+    dt.message = body
+    dt.posted_at = 1.day.ago
+    dt.save!
+
+    assignment = @copy_from.assignments.build
+    assignment.submission_types = 'discussion_topic'
+    assignment.assignment_group = @copy_from.assignment_groups.find_or_create_by_name("Stupid Group")
+    assignment.title = dt.title
+    assignment.points_possible = 13.37
+    assignment.due_at = 1.week.from_now
+    assignment.saved_by = :discussion_topic
+    assignment.save
+
+    dt.assignment = assignment
+    dt.save
+
+    #export to xml
+    migration_id = CC::CCHelper.create_key(dt)
+    cc_topic_builder = Builder::XmlMarkup.new(:indent=>2)
+    cc_topic_builder.topic("identifier" => migration_id) {|t| @resource.create_cc_topic(t, dt)}
+    canvas_topic_builder = Builder::XmlMarkup.new(:indent=>2)
+    canvas_topic_builder.topicMeta {|t| @resource.create_canvas_topic(t, dt)}
+    #convert to json
+    cc_doc = Nokogiri::XML(cc_topic_builder.target!)
+    meta_doc = Nokogiri::XML(canvas_topic_builder.target!)
+    hash = @converter.convert_topic(cc_doc, meta_doc)
+    hash = hash.with_indifferent_access
+    @copy_to.groups.create!(:name => "whatevs")
+
+    group2 = @copy_to.groups.create!(:name => "group")
+    group2.migration_id = CC::CCHelper.create_key(group)
+    group2.save!
+    hash[:group_id] = group2.migration_id
+
+    cm = ContentMigration.new(:context => @copy_to, :copy_options => {:everything => "1"})
+    DiscussionTopic.process_discussion_topics_migration([hash], cm)
+
+    dt_2 = group2.discussion_topics.find_by_migration_id(migration_id)
+    dt_2.title.should == dt.title
+    dt_2.message.should == body
+    dt_2.type.should == dt.type
+  end
   
   it "should import quizzes into correct assignment group" do
     quiz_hash = {"lock_at"=>nil,

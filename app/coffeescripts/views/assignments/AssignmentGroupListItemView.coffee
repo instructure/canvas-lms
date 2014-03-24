@@ -1,5 +1,6 @@
 define [
   'i18n!assignments'
+  'jquery'
   'underscore'
   'compiled/class/cache'
   'compiled/views/DraggableCollectionView'
@@ -11,7 +12,7 @@ define [
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentGroupListItem'
   'compiled/views/assignments/AssignmentKeyBindingsMixin'
-], (I18n, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template, AssignmentKeyBindingsMixin) ->
+], (I18n, $, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template, AssignmentKeyBindingsMixin) ->
 
   class AssignmentGroupListItemView extends DraggableCollectionView
     @mixin AssignmentKeyBindingsMixin

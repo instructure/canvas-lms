@@ -18,11 +18,12 @@
 
 define [
   'i18n!conversations'
+  'jquery'
   'underscore'
   'jst/conversations/MessageProgressBarText'
   'compiled/str/TextHelper'
   'jquery.ajaxJSON'
-], (I18n, _, messageProgressBarTextTemplate, {truncateText}) ->
+], (I18n, $, _, messageProgressBarTextTemplate, {truncateText}) ->
 
   class MessageProgressBar
     constructor: (@tracker, @data) ->

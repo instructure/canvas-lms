@@ -108,8 +108,8 @@ class CalendarEvent < ActiveRecord::Base
   scope :order_by_start_at, order(:start_at)
 
   scope :active, where("calendar_events.workflow_state<>'deleted'")
-  scope :locked, where(:workflow_state => 'locked')
-  scope :unlocked, where("calendar_events.workflow_state NOT IN ('deleted', 'locked')")
+  scope :are_locked, where(:workflow_state => 'locked')
+  scope :are_unlocked, where("calendar_events.workflow_state NOT IN ('deleted', 'locked')")
 
   # controllers/apis/etc. should generally use for_user_and_context_codes instead
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
@@ -262,8 +262,8 @@ class CalendarEvent < ActiveRecord::Base
   def sync_child_events
     locked_changes = LOCKED_ATTRIBUTES.select { |attr| send("#{attr}_changed?") }
     cascaded_changes = CASCADED_ATTRIBUTES.select { |attr| send("#{attr}_changed?") }
-    child_events.locked.update_all Hash[locked_changes.map{ |attr| [attr, send(attr)] }] if locked_changes.present?
-    child_events.unlocked.update_all Hash[cascaded_changes.map{ |attr| [attr, send(attr)] }] if cascaded_changes.present?
+    child_events.are_locked.update_all Hash[locked_changes.map{ |attr| [attr, send(attr)] }] if locked_changes.present?
+    child_events.are_unlocked.update_all Hash[cascaded_changes.map{ |attr| [attr, send(attr)] }] if cascaded_changes.present?
   end
 
   attr_writer :skip_sync_parent_event

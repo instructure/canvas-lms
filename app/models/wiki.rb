@@ -87,7 +87,7 @@ class Wiki < ActiveRecord::Base
 
     # return an implicitly created page if a page could not be found
     unless page
-      page = self.wiki_pages.new(:title => url.titleize, :url => url)
+      page = self.wiki_pages.scoped.new(:title => url.titleize, :url => url)
       page.wiki = self
     end
     page

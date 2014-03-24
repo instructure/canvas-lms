@@ -227,7 +227,7 @@ describe "quizzes question creation" do
     fj('button.save_formula_button').click
     # normally it's capped at 200 (to keep the yaml from getting crazy big)...
     # since selenium tests take forever, let's make the limit much lower
-    driver.execute_script("window.maxCombinations = 10")
+    driver.execute_script("ENV.quiz_max_combination_count = 10")
     fj('.combination_count:visible').send_keys('20') # over the limit
     button = fj('button.compute_combinations:visible')
     button.click

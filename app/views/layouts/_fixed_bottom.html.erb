@@ -28,7 +28,7 @@
     <div id="masquerade_bar" class="ui-widget ui-state-default">
       <% if service_enabled?(:avatars) %>
         <div class="masquerading_avatar">
-          <%= avatar_image(@current_user, 32) %>
+          <%= avatar(@current_user, url: nil) %>
         </div>
       <% end %>
       <b><%= t('masquerading.warning_title', "You are currently masquerading as %{user_name}", :user_name => @current_user.short_name) %></b>

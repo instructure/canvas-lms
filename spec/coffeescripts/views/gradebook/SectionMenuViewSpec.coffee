@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'underscore',
   'compiled/views/gradebook/SectionMenuView',
   'vendor/jquery.ba-tinypubsub'
-], (_, SectionMenuView) ->
+], ($, _, SectionMenuView) ->
 
   sections = [{id: 1, name: 'Section One', checked: true},
               {id: 2, name: 'Section Two', checked: false}]

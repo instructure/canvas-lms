@@ -30,7 +30,7 @@
   </div>
   <div class="content">
     <div class="inner_content">
-    <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar(inbox_item.try_rescue(:sender_id), inbox_item.try_rescue(:context_code)) %></div>
+    <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar(inbox_item.try_rescue(:sender_id), context_code: inbox_item.try_rescue(:context_code)) %></div>
     <div style="float: right; display: none;">
       <a href="<%= inbox_item_path(inbox_item ? inbox_item.id : "{{ id }}") %>" class="btn btn-small delete_inbox_item_link"><%= t('links.remove', %{Remove}) %></a>
     </div>

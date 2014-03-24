@@ -16,6 +16,7 @@ define [
       App = startApp()
       visit('/').then =>
         @controller = App.__container__.lookup('controller:screenreader_gradebook')
+        @controller.set 'hideStudentNames', false
     teardown: ->
       Ember.run App, 'destroy'
 
@@ -29,13 +30,16 @@ define [
 
   test 'secondary id says hidden', ->
     Ember.run =>
-      @controller.set('selectedStudent', @controller.get('students').objectAt(0))
+      student = @controller.get('students.firstObject')
+      Ember.setProperties student,
+        isLoaded: true
+        isLoading: false
+      @controller.set('selectedStudent', student)
 
-    reg = /^\s*$/ #all whitespace
-    ok reg.test $("#secondary_id").text()
-    click("#hide_names_checkbox").then =>
-      reg = /hidden/
-      ok reg.test $("#secondary_id").text()
+    equal Ember.$.trim(find("#secondary_id").text()), ''
+    click("#hide_names_checkbox")
+    andThen =>
+      equal $.trim(find("#secondary_id").text()), 'hidden'
 
   test 'view concluded enrollments', ->
     enrollments = @controller.get('enrollments')

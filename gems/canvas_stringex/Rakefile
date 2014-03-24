@@ -5,7 +5,7 @@ require 'rake/testtask'
 require 'rdoc/task'
 
 desc 'Default: run unit tests.'
-task :default => [:refresh_db, :test]
+task :default => [:test, :refresh_db]
 
 desc 'Remove old sqlite file'
 task :refresh_db do

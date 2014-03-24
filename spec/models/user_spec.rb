@@ -161,7 +161,7 @@ describe User do
       course_with_teacher(:active_all => true)
       course_with_student(:active_all => true, :course => @course)
       assignment = @course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
-      sub = bare_submission_model assignment, @student, :submission_type => "online_text_entry", :body => "submission"
+      sub = assignment.submit_homework @student, body: "submission"
       sub.add_comment :author => @teacher, :comment => "lol"
       item = StreamItem.last
       item.asset.should == sub
@@ -1105,10 +1105,15 @@ describe User do
         "https://#{HostUrl.default_host}/images/messages/avatar-50.png"
       User.avatar_fallback_url("/somepath").should ==
         "https://#{HostUrl.default_host}/somepath"
+      HostUrl.expects(:default_host).returns('somedomain:3000')
+      User.avatar_fallback_url("/path").should ==
+        "https://somedomain:3000/path"
       User.avatar_fallback_url("//somedomain/path").should ==
         "https://somedomain/path"
       User.avatar_fallback_url("http://somedomain/path").should ==
         "http://somedomain/path"
+      User.avatar_fallback_url("http://somedomain:3000/path").should ==
+        "http://somedomain:3000/path"
       User.avatar_fallback_url(nil, OpenObject.new(:host => "foo", :protocol => "http://")).should ==
         "http://foo/images/messages/avatar-50.png"
       User.avatar_fallback_url("/somepath", OpenObject.new(:host => "bar", :protocol => "https://")).should ==
@@ -1461,10 +1466,10 @@ describe User do
 
   describe "email_channel" do
     it "should not return retired channels" do
-      u = User.new
-      retired = u.communication_channels.build(:path => 'retired@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired'}
+      u = User.create!
+      retired = u.communication_channels.create!(:path => 'retired@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired'}
       u.email_channel.should be_nil
-      active = u.communication_channels.build(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
+      active = u.communication_channels.create!(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
       u.email_channel.should == active
     end
   end
@@ -2068,7 +2073,7 @@ describe User do
       [@course1, @course2].each do |course|
         assignment = course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
         [@studentA, @studentB].each do |student|
-          bare_submission_model assignment, student, :submission_type => "online_text_entry", :body => "submission for #{student.name}"
+          assignment.submit_homework student, body: "submission for #{student.name}"
         end
       end
     end
@@ -2116,9 +2121,9 @@ describe User do
     it "should limit the number of returned assignments" do
       20.times do |x|
         assignment = @course1.assignments.create!(:title => "excess assignment #{x}", :submission_types => ['online_text_entry'])
-        bare_submission_model assignment, @studentB
+        assignment.submit_homework @studentB, body: "hello"
       end
-      @teacher.assignments_needing_grading.size.should < 22
+      @teacher.assignments_needing_grading.size.should == 15
     end
 
     context "sharding" do
@@ -2133,7 +2138,7 @@ describe User do
           @course3.enroll_student(@studentA).accept!
           @course3.enroll_student(@studentB).accept!
           @assignment3 = @course3.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
-          bare_submission_model @assignment3, @studentA, :submission_type => "online_text_entry", :body => "submission for A"
+          @assignment3.submit_homework @studentA, body: "submission for A"
         end
       end
 
@@ -2225,7 +2230,11 @@ describe User do
 
   describe "prefers_gradebook2?" do
     let(:user) { User.new }
-    subject { user.prefers_gradebook2? }
+    subject { user.prefers_gradebook2?(@ctx) }
+    before {
+      @ctx = mock()
+      @ctx.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+    }
 
     context "by default" do
       it { should be_true }
@@ -2244,6 +2253,27 @@ describe User do
     context "with an explicit preference for gradebook 1" do
       before { user.stubs(:preferences => { :use_gradebook2 => false }) }
       it { should be_false }
+    end
+
+    context "with screenreader_gradebook enabled" do
+      before {
+        @ctx.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+      }
+
+      context "prefers gb2" do
+        before { user.stubs(:preferences => { :gradebook_version => '2' }) }
+        it {should be_true}
+      end
+
+      context "prefers srgb" do
+        before { user.stubs(:preferences => { :gradebook_version => 'srgb' }) }
+        it {should be_false}
+      end
+
+      context "nil preference" do
+        before { user.stubs(:preferences => { :gradebook_version => nil }) }
+        it {should be_true}
+      end
     end
   end
 

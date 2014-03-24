@@ -91,7 +91,7 @@ module GoogleDocs
       :service => 'google_docs',
       :token => request_token.token,
       :secret => request_token.secret,
-      :user_secret => AutoHandle.generate(nil, 16),
+      :user_secret => CanvasUuid::Uuid.generate(nil, 16),
       :return_url => return_to,
       :user => google_docs_user,
       :original_host_with_port => request.host_with_port

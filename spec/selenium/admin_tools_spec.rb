@@ -21,7 +21,9 @@ describe "admin_tools" do
     set_value f(field_sel), search_term
     sleep 0.5
     wait_for_ajaximations
-    fj(".ui-autocomplete.ui-menu > .ui-menu-item:nth(#{click_row}) > a").click
+    autocomplete_value = fj(".ui-autocomplete.ui-menu > .ui-menu-item:nth(#{click_row}) > a")
+    autocomplete_value.click
+    autocomplete_value
   end
 
   def setup_users
@@ -84,7 +86,7 @@ describe "admin_tools" do
         perform_user_search("#commMessagesSearchForm", @student.id)
         f('#commMessagesSearchForm .userDateRangeSearchBtn').click
         wait_for_ajaximations
-        f('#commMessagesSearchResults .message-body').text.should contain('this is my message')
+        f('#commMessagesSearchResults .message-body').text.should include('this is my message')
       end
     end
 
@@ -97,7 +99,7 @@ describe "admin_tools" do
           perform_user_search("#commMessagesSearchForm", @student.id)
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          f('#commMessagesSearchResults .message-body').text.should contain('nice body')
+          f('#commMessagesSearchResults .message-body').text.should include('nice body')
         end
 
         it "should display nothing found" do
@@ -108,7 +110,7 @@ describe "admin_tools" do
           set_value f('#commMessagesSearchForm .dateEndSearchField'), 2.months.ago
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          f('#commMessagesSearchResults .alert').text.should contain('No messages found')
+          f('#commMessagesSearchResults .alert').text.should include('No messages found')
           f('#commMessagesSearchResults .message-body').should be_nil
         end
 
@@ -120,21 +122,21 @@ describe "admin_tools" do
           perform_user_search("#commMessagesSearchForm", @student.id)
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          f('#commMessagesSearchOverview').text.should contain("Notifications sent to #{@student.name} from the beginning to now.")
+          f('#commMessagesSearchOverview').text.should include("Notifications sent to #{@student.name} from the beginning to now.")
           # Search with begin date and end date - should show time actually being used
           perform_user_search("#commMessagesSearchForm", @student.id)
           set_value f('#commMessagesSearchForm .dateStartSearchField'), 'Mar 3, 2001'
           set_value f('#commMessagesSearchForm .dateEndSearchField'), 'Mar 9, 2001'
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          f('#commMessagesSearchOverview').text.should contain("Notifications sent to #{@student.name} from Mar 3, 2001 at 12am to Mar 9, 2001 at 12am.")
+          f('#commMessagesSearchOverview').text.should include("Notifications sent to #{@student.name} from Mar 3, 2001 at 12am to Mar 9, 2001 at 12am.")
           # Search with begin date/time and end date/time - should use and show given time
           perform_user_search("#commMessagesSearchForm", @student.id)
           set_value f('#commMessagesSearchForm .dateStartSearchField'), 'Mar 3, 2001 1:05p'
           set_value f('#commMessagesSearchForm .dateEndSearchField'), 'Mar 9, 2001 3p'
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          f('#commMessagesSearchOverview').text.should contain("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3pm.")
+          f('#commMessagesSearchOverview').text.should include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3pm.")
         end
 
         it "should display search params used when given invalid input data" do
@@ -146,7 +148,7 @@ describe "admin_tools" do
           set_value f('#commMessagesSearchForm .dateEndSearchField'), 'pillow'
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          f('#commMessagesSearchOverview').text.should contain("Notifications sent to #{@student.name} from the beginning to now.")
+          f('#commMessagesSearchOverview').text.should include("Notifications sent to #{@student.name} from the beginning to now.")
         end
 
         it "should hide tab if account setting disabled" do
@@ -385,6 +387,31 @@ describe "admin_tools" do
       cols[2].text.should == @teacher.name
       cols[3].text.should == "Updated"
       cols[4].text.should == "View Details"
+    end
+
+    it "should search by course id" do
+      @course.name = "Course Updated"
+      @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
+
+      set_value f("#course_id-autocompleteField"), @course.id
+      f('#loggingCourse button[name=course_submit]').click
+      wait_for_ajaximations
+      cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
+      cols.size.should == 5
+    end
+
+    it "should find courses in any workflow state" do
+      @event = Auditors::Course.record_concluded(@course, @teacher)
+      @course.destroy
+
+      autocomplete_value = perform_autocomplete_search("#course_id-autocompleteField", @course.name)
+      autocomplete_value.should_not be_nil
+
+      f('#loggingCourse button[name=course_submit]').click
+      wait_for_ajaximations
+
+      cols = ffj('#courseLoggingSearchResults table tbody tr:last td')
+      cols.size.should == 5
     end
 
     it "should show created event details" do

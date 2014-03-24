@@ -12,10 +12,10 @@ define [
   originalIsDraft = null
   originalWeightingScheme = null
 
-  fixtures.create()
   clone = (obj) ->
     Em.copy obj, true
 
+  fixtures.create()
   setup = (isDraftState=false) ->
     window.ENV.GRADEBOOK_OPTIONS.draft_state_enabled = isDraftState
     originalWeightingScheme =  window.ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
@@ -68,6 +68,18 @@ define [
     @srgb.set('hideStudentNames', false)
     equal @srgb.get('displayName'), "name"
 
+  test 'displayPointTotals is false when groups are weighted even if showTotalAsPoints is true', ->
+    @srgb.set('showTotalAsPoints', true)
+    @srgb.set('groupsAreWeighted', true)
+    equal @srgb.get('displayPointTotals'), false
+
+  test 'displayPointTotals is toggled by showTotalAsPoints when groups are unweighted', ->
+    @srgb.set('groupsAreWeighted', false)
+    @srgb.set('showTotalAsPoints', true)
+    equal @srgb.get('displayPointTotals'), true
+    @srgb.set('showTotalAsPoints', false)
+    equal @srgb.get('displayPointTotals'), false
+
   test 'updateSubmission attaches the submission to the student', ->
     student = clone fixtures.students[0].user
     submission = clone fixtures.submissions[student.id].submissions[0]
@@ -106,16 +118,12 @@ define [
   test 'correctly determines if prev/next student exists on load', ->
     equal @srgb.get('studentIndex'), -1
     equal @srgb.get('disablePrevStudentButton'), true
-    equal @srgb.get('ariaDisabledPrevStudent'), 'true'
     equal @srgb.get('disableNextStudentButton'), false
-    equal @srgb.get('ariaDisabledNextStudent'), 'false'
 
   test 'correctly determines if prev/next assignment exists on load', ->
     equal @srgb.get('assignmentIndex'), -1
     equal @srgb.get('disablePrevAssignmentButton'), true
-    equal @srgb.get('ariaDisabledPrevAssignment'), 'true'
     equal @srgb.get('disableNextAssignmentButton'), false
-    equal @srgb.get('ariaDisabledNextAssignment'), 'false'
 
   test 'updates assignment groups and weightingScheme when event is triggered', ->
     window.ENV.GRADEBOOK_OPTIONS.group_weighting_scheme = 'whoa'
@@ -140,9 +148,7 @@ define [
   test 'correctly determines index and if prev/next student exists for first student', ->
     equal @srgb.get('studentIndex'), 0
     equal @srgb.get('disablePrevStudentButton'), true
-    equal @srgb.get('ariaDisabledPrevStudent'), 'true'
     equal @srgb.get('disableNextStudentButton'), false
-    equal @srgb.get('ariaDisabledNextStudent'), 'false'
 
   test 'correctly determines index and if prev/next student exists for second student', ->
     Ember.run =>
@@ -150,9 +156,7 @@ define [
       @srgb.set('selectedStudent', students.objectAt(1))
     equal @srgb.get('studentIndex'), 1
     equal @srgb.get('disablePrevStudentButton'), false
-    equal @srgb.get('ariaDisabledPrevStudent'), 'false'
     equal @srgb.get('disableNextStudentButton'), false
-    equal @srgb.get('ariaDisabledNextStudent'), 'false'
 
   test 'correctly determines index and if prev/next student exists for last student', ->
     Ember.run =>
@@ -160,9 +164,7 @@ define [
       @srgb.set('selectedStudent', student)
     equal @srgb.get('studentIndex'), 9
     equal @srgb.get('disableNextStudentButton'), true
-    equal @srgb.get('ariaDisabledNextStudent'), 'true'
     equal @srgb.get('disablePrevStudentButton'), false
-    equal @srgb.get('ariaDisabledPrevStudent'), 'false'
 
   module 'screenreader_gradebook_controller: with selected student and selected assignment',
     setup: ->
@@ -202,9 +204,7 @@ define [
   test 'correctly determines if prev/next assignment exists for first assignment', ->
     equal @srgb.get('assignmentIndex'), 0
     equal @srgb.get('disablePrevAssignmentButton'), true
-    equal @srgb.get('ariaDisabledPrevAssignment'), 'true'
     equal @srgb.get('disableNextAssignmentButton'), false
-    equal @srgb.get('ariaDisabledNextAssignment'), 'false'
 
   test 'correctly determines if prev/next assignment exists for second assignment', ->
     Ember.run =>
@@ -212,9 +212,7 @@ define [
       @srgb.set('selectedAssignment', assignments.objectAt(1))
     equal @srgb.get('assignmentIndex'), 1
     equal @srgb.get('disablePrevAssignmentButton'), false
-    equal @srgb.get('ariaDisabledPrevAssignment'), 'false'
     equal @srgb.get('disableNextAssignmentButton'), false
-    equal @srgb.get('ariaDisabledNextAssignment'), 'false'
 
   test 'correctly determines if prev/next assignment exists for last assignment', ->
     Ember.run =>
@@ -222,9 +220,7 @@ define [
       @srgb.set('selectedAssignment', assignment)
     equal @srgb.get('assignmentIndex'), 6
     equal @srgb.get('disablePrevAssignmentButton'), false
-    equal @srgb.get('ariaDisabledPrevAssignment'), 'false'
     equal @srgb.get('disableNextAssignmentButton'), true
-    equal @srgb.get('ariaDisabledNextAssignment'), 'true'
 
   module 'screenreader_gradebook_controller:draftState',
     setup: ->
@@ -326,7 +322,7 @@ define [
         sections: Ember.ArrayProxy.create(content: clone fixtures.sections)
       })
 
-  module 'grade calc',
+  module 'screenreader_gradebook_controller: grade calc',
     setup: ->
       calculationSetup.call this
 
@@ -339,3 +335,108 @@ define [
 
   test 'calculates final grade', ->
     equal @srgb.get('students.firstObject.total_percent'), 0
+
+
+  module 'screenreader_gradebook_controller: notes computed props',
+    setup: ->
+      ENV.GRADEBOOK_OPTIONS.custom_column_url = '/here/is/an/:id'
+      ENV.GRADEBOOK_OPTIONS.teacher_notes = id:'42'
+      @server = sinon.fakeServer.create()
+      setup.call this
+      Ember.run =>
+        #@srgb.set('custom_columns', [{teacher_notes: true, id: '42'}])
+        @srgb.reopen
+          updateOrCreateNotesColumn: ->
+    teardown: ->
+      ENV.GRADEBOOK_OPTIONS.custom_column_url = null
+      ENV.GRADEBOOK_OPTIONS.teacher_notes = null
+      @server.restore()
+      teardown.call this
+
+  test 'computes showNotesColumn correctly', ->
+    ENV.GRADEBOOK_OPTIONS.teacher_notes =
+      hidden: false
+    equal @srgb.get('showNotesColumn'), true
+
+    ENV.GRADEBOOK_OPTIONS.teacher_notes =
+      hidden: true
+    equal @srgb.get('showNotesColumn'), false
+
+    ENV.GRADEBOOK_OPTIONS.teacher_notes = null
+    equal @srgb.get('showNotesColumn'), false
+
+  test 'shouldCreateNotes, no notes in ENV', ->
+    ENV.GRADEBOOK_OPTIONS.teacher_notes = null
+    Ember.run =>
+      @srgb.set('showNotesColumn', true)
+    equal @srgb.get('shouldCreateNotes'), true, 'true if no teacher_notes and showNotesColumns is true'
+
+  test 'shouldCreateNotes, notes in ENV, hidden', ->
+    ENV.GRADEBOOK_OPTIONS.teacher_notes =
+      hidden: true
+    Ember.run =>
+      @srgb.set('showNotesColumn', true)
+    actual = @srgb.get('shouldCreateNotes')
+    equal actual, false, 'does not create if there is a teacher_notes object in the ENV'
+
+  test 'shouldCreateNotes, notes in ENV, shown', ->
+    ENV.GRADEBOOK_OPTIONS.teacher_notes =
+      hidden: false
+    Ember.run =>
+      @srgb.set('showNotesColumn', true)
+    equal @srgb.get('shouldCreateNotes'), false, 'does not create if there is a teacher_notes object in the ENV'
+
+  test 'notesURL, no notes object in ENV', ->
+    Ember.run =>
+      @srgb.set('shouldCreateNotes', true)
+    equal @srgb.get('notesURL'), ENV.GRADEBOOK_OPTIONS.custom_columns_url, 'computes properly when creating'
+    Ember.run =>
+      @srgb.set('shouldCreateNotes', false)
+    equal @srgb.get('notesURL'), '/here/is/an/42', 'computes properly when showing'
+
+  test 'notesParams', ->
+    Ember.run =>
+      @srgb.set('showNotesColumn', true)
+      @srgb.set('shouldCreateNotes', false)
+    deepEqual @srgb.get('notesParams'), "column[hidden]": false
+
+    Ember.run =>
+      @srgb.set('showNotesColumn', false)
+      @srgb.set('shouldCreateNotes', false)
+    deepEqual @srgb.get('notesParams'), "column[hidden]": true
+
+    Ember.run =>
+      @srgb.set('showNotesColumn', true)
+      @srgb.set('shouldCreateNotes', true)
+    deepEqual @srgb.get('notesParams'),
+        "column[title]": "Notes"
+        "column[position]": 1
+        "column[teacher_notes]": true
+
+  test 'notesVerb', ->
+    Ember.run =>
+      @srgb.set('shouldCreateNotes', true)
+    equal @srgb.get('notesVerb'), 'POST'
+
+    Ember.run =>
+      @srgb.set('shouldCreateNotes', false)
+    equal @srgb.get('notesVerb'), 'PUT'
+
+  module 'screenreader_gradebook_controller:invalidGroups',
+    setup: ->
+      setup.call this, true
+      Em.run =>
+        @srgb.set('assignment_groups',Ember.ArrayProxy.create(content: clone fixtures.assignment_groups))
+    teardown: ->
+      teardown.call this
+
+  test 'calculates invalidGroupsWarningPhrases properly', ->
+    equal @srgb.get('invalidGroupsWarningPhrases'), "Note: Score does not include assignments from the group Invalid AG because it has no points possible."
+
+  test 'sets showInvalidGroupWarning to false if groups are not weighted', ->
+    @srgb.set('weightingScheme', "equal")
+    equal @srgb.get('showInvalidGroupWarning'), false
+    @srgb.set('weightingScheme', "percent")
+    equal @srgb.get('showInvalidGroupWarning'), true
+
+

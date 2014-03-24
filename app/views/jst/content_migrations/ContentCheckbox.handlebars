@@ -1,23 +1,29 @@
 {{#if hasSubCheckboxes }}
-<a href="#" id="carrot-{{cid}}" data-type="{{type}}" data-state="closed" class="checkbox-carrot"><i class="icon-forward"></i></a>
+  <div class="treeitem-heading">
+    <a href="#" id="caret-{{cid}}" tabindex="-1" class="checkbox-caret"><i class="icon-arrow-down"></i><i class="icon-forward"></i></a>
 
-  <label class="checkbox">
-    <input type="checkbox" name="{{property}}" value="1" id="checkbox-{{cid}}"/>
-    <i class="{{iconClass}}"></i>
-    <span data-bind="title" class="checkbox-title">{{title}}</span>
+    <label class="checkbox">
+      <input type="checkbox" tabindex="-1" name="{{property}}" value="1" id="checkbox-{{cid}}"/>
+      <i class="{{iconClass}}"></i>
+      <span data-bind="title" class="checkbox-title">{{title}}</span>
+      <span class="screenreader-only">({{screenreaderType}})</span>
 
-    {{#if count}}
-    <span data-bind="count">({{count}})</span>
-    {{/if}}
-  </label>
+      {{#if count}}
+      <span data-bind="count">({{count}})</span>
+      {{/if}}
+    </label>
+  </div>
 
-  <ul role="group" data-state="closed" style="display: none">
+  <ul role="group">
     <li data-content="sublevelCheckboxes">
   </ul>
 {{else}}
-  <label class="checkbox no-carrot">
-    <input type="checkbox" name="{{property}}" value="1" id="checkbox-{{cid}}" />
-    {{#if isTopLevel}}<i class="{{iconClass}}"></i>{{/if}}
-    <span data-bind="title" class="checkbox-title">{{title}}</span>
-  </label>
+  <div class="treeitem-heading">
+    <label class="checkbox no-caret">
+      <input tabindex="-1" type="checkbox" name="{{property}}" value="1" id="checkbox-{{cid}}" />
+      {{#if isTopLevel}}<i class="{{iconClass}}"></i>{{/if}}
+      <span data-bind="title" class="checkbox-title">{{title}}</span>
+      <span class="screenreader-only">({{screenreaderType}})</span>
+    </label>
+  </div>
 {{/if}}

@@ -29,7 +29,7 @@ class AnnouncementsController < ApplicationController
       respond_to do |format|
         format.html do
           add_crumb(t(:announcements_crumb, "Announcements"))
-          can_create = @context.announcements.new.grants_right?(@current_user, session, :create)
+          can_create = @context.announcements.scoped.new.grants_right?(@current_user, session, :create)
           js_env :permissions => {
             :create => can_create,
             :moderate => can_create

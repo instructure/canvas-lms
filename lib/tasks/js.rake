@@ -3,9 +3,10 @@ require 'json'
 
 namespace :js do
 
-  desc 'run testem as you develop, can use `rake js:dev <ember app name>`'
+  desc 'run testem as you develop, can use `rake js:dev <ember app name> <browser>`'
   task :dev do
     app = ARGV[1]
+    browsers = ARGV[2] || 'Firefox,Chrome,Safari'
     if app
       ENV['JS_SPEC_MATCHER'] = matcher_for_ember_app app
       unless File.exists?("app/coffeescripts/ember/#{app}")
@@ -14,7 +15,7 @@ namespace :js do
       end
     end
     Rake::Task['js:generate_runner'].invoke
-    exec('karma start --browsers Firefox,Chrome,Safari')
+    exec("karma start --browsers #{browsers}")
   end
 
   def matcher_for_ember_app app_name

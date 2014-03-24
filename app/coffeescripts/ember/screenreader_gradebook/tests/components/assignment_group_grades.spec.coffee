@@ -40,7 +40,6 @@ define [
           student: @student
           ag: @assignment_group
 
-        @component.append()
 
     teardown: ->
       run =>

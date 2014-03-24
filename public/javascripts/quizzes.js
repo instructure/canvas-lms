@@ -2593,7 +2593,10 @@ define([
         data.answer_text = $answer.find("input[name='answer_text']:visible").val();
         data.answer_html = $answer.find(".answer_html").html();
         if (questionData.question_type == "true_false_question") {
-          data.answer_text = (i == 0) ? I18n.t('true', "True") : I18n.t('false', "False");
+          data.answer_text = $answer.find(".fixed_answer .answer_text").text();
+          if (data.answer_text.length == 0) {
+            data.answer_text = (i == 0) ? I18n.t('true', "True") : I18n.t('false', "False");
+          }
         }
         if ($answer.hasClass('correct_answer')) {
           data.answer_weight = 100;
@@ -3023,7 +3026,7 @@ define([
       if ($(this).closest('.group_top').length == 0) { return; }
       event.preventDefault();
       $(this).parents(".group_top").find(".collapse_link").addClass('hidden').end()
-        .find(".expand_link").removeClass('hidden');
+        .find(".expand_link").removeClass('hidden').focus();
       var $obj = $(this).parents(".group_top").next();
       while($obj.length > 0 && $obj.hasClass('question_holder')) {
         $obj.hide();
@@ -3032,7 +3035,7 @@ define([
     }).delegate(".expand_link", 'click', function(event) {
       if ($(this).closest('.group_top').length == 0) { return; }
       event.preventDefault();
-      $(this).parents(".group_top").find(".collapse_link").removeClass('hidden').end()
+      $(this).parents(".group_top").find(".collapse_link").removeClass('hidden').focus().end()
         .find(".expand_link").addClass('hidden');
       var $obj = $(this).parents(".group_top").next();
       while($obj.length > 0 && $obj.hasClass('question_holder')) {
@@ -3240,8 +3243,8 @@ define([
       var cnt = parseInt($question.find(".combination_count").val(), 10) || 10;
       if (cnt < 0) {
         cnt = 10;
-      } else if (cnt > maxCombinations) {
-        cnt = maxCombinations;
+      } else if (cnt > ENV.quiz_max_combination_count) {
+        cnt = ENV.quiz_max_combination_count;
       }
       $question.find(".combination_count").val(cnt);
       var succeeded = 0;

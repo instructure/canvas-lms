@@ -49,6 +49,8 @@ define [
         labelProperty: $.proxy(@autoCompleteItemLabel, @)
         fieldName: 'course_id'
         placeholder: 'Course'
+        sourceParameters:
+          "state[]": "all"
       @resultsView = new PaginatedCollectionView
         template: courseLoggingResultsTemplate
         itemView: CourseLoggingItemView

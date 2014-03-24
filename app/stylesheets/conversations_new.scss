@@ -376,11 +376,8 @@
 
   .user-info {
     .avatar {
-      border: 2px solid #eee;
-      border-radius: 30px;
-      height: 50px;
+      float: left;
       margin-right: 8px;
-      width: 50px;
     }
 
     .context {

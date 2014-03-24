@@ -35,7 +35,7 @@ describe AuditorApiController do
     it 'should return not_found if database is not configured' do
       Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).returns(false)
       audits_controller.expects(:not_found).once
-      audits_controller.check_configured.should raise_error
+      audits_controller.check_configured
 
       Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).returns(true)
       audits_controller.check_configured.should be_nil

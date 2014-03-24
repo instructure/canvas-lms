@@ -16,14 +16,31 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # @API Favorites
-# @object Favorite
-#     {
-#       // The ID of the object the Favorite refers to
-#       "context_id": 1170,
 #
-#       // The type of the object the Favorite refers to (currently, only "Course" is supported)
-#       "context_type": "Course"
+# @model Favorite
+#     {
+#       "id": "Favorite",
+#       "description": "",
+#       "required": [""],
+#       "properties": {
+#         "context_id": {
+#           "description": "The ID of the object the Favorite refers to",
+#           "example": 1170,
+#           "type": "integer"
+#         },
+#         "context_type": {
+#           "description": "The type of the object the Favorite refers to (currently, only 'Course' is supported)",
+#           "example": "Course",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "Course"
+#             ]
+#           }
+#         }
+#       }
 #     }
+#
 class FavoritesController < ApplicationController
 
   before_filter :require_user

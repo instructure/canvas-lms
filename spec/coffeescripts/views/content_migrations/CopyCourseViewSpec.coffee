@@ -1,9 +1,10 @@
 define [
+  'jquery'
   'Backbone'
   'compiled/models/ContentMigration'
   'compiled/views/content_migrations/CopyCourseView'
   'compiled/views/content_migrations/subviews/DateShiftView'
-], (Backbone, ContentMigration, CopyCourseView, DateShiftView) ->
+], ($, Backbone, ContentMigration, CopyCourseView, DateShiftView) ->
   module 'CopyCourseView: Initializer'
   test 'after init, calls updateNewDates when @courseFindSelect.triggers "course_changed" event', ->
 

@@ -25,7 +25,7 @@ describe "/shared/_identity" do
     course_with_student
     view_context
     render :partial => "shared/identity"
-    response.should be_success
+    @controller.response.should be_success
   end
 
   it "should render without a current user" do
@@ -34,7 +34,7 @@ describe "/shared/_identity" do
     view_context
     assigns.delete(:current_user)
     render :partial => "shared/identity"
-    response.should be_success
+    @controller.response.should be_success
   end
 end
 

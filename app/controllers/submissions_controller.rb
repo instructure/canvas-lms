@@ -20,80 +20,168 @@ require 'action_controller_test_process'
 
 # @API Submissions
 #
-# @object Submission
+# @model MediaComment
 #     {
-#       // The submission's assignment id
-#       "assignment_id": 23,
-#
-#       // The submission's assignment (see the assignments API) (optional)
-#       "assignment": "Assignment",
-#
-#       // The submission's course (see the course API) (optional)
-#       "course": "Course",
-#
-#       // This is the submission attempt number.
-#       "attempt": 1,
-#
-#       // The content of the submission, if it was submitted directly in a
-#       // text field.
-#       "body": "There are three factors too...",
-#
-#       // The grade for the submission, translated into the assignment grading
-#       // scheme (so a letter grade, for example).
-#       "grade": "A-",
-#
-#       // A boolean flag which is false if the student has re-submitted since
-#       // the submission was last graded.
-#       "grade_matches_current_submission": true,
-#
-#       // URL to the submission. This will require the user to log in.
-#       "html_url": "http://example.com/courses/255/assignments/543/submissions/134",
-#
-#       // URL to the submission preview. This will require the user to log in.
-#       "preview_url": "http://example.com/courses/255/assignments/543/submissions/134?preview=1",
-#
-#       // The raw score
-#       "score": 13.5,
-#
-#       // Associated comments for a submission (optional)
-#       "submission_comments": [
-#         {
-#           "id": 37,
-#           "author_id": 134,
-#           "author_name": "Toph Beifong",
-#           "comment": "Well here's the thing...",
-#           "created_at": "2012-01-01T01:00:00Z",
-#           "media_comment": {
-#             "content-type": "audio/mp4",
-#             "display_name": "something",
-#             "media_id": "3232",
-#             "media_type": "audio",
-#             "url":  "http://example.com/media_url"
-#           }
+#       "id": "MediaComment",
+#       "description": "",
+#       "properties": {
+#         "content-type": {
+#           "example": "audio/mp4",
+#           "type": "string"
+#         },
+#         "display_name": {
+#           "example": "something",
+#           "type": "string"
+#         },
+#         "media_id": {
+#           "example": "3232",
+#           "type": "string"
+#         },
+#         "media_type": {
+#           "example": "audio",
+#           "type": "string"
+#         },
+#         "url": {
+#           "example": "http://example.com/media_url",
+#           "type": "string"
 #         }
-#       ],
+#       }
+#     }
 #
-#       // The types of submission
-#       // ex: ("online_text_entry"|"online_url"|"online_upload"|"media_recording")
-#       "submission_type": "online_text_entry",
+# @model SubmissionComment
+#     {
+#       "id": "SubmissionComment",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "example": 37,
+#           "type": "integer"
+#         },
+#         "author_id": {
+#           "example": 134,
+#           "type": "integer"
+#         },
+#         "author_name": {
+#           "example": "Toph Beifong",
+#           "type": "string"
+#         },
+#         "comment": {
+#           "example": "Well here's the thing...",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "example": "2012-01-01T01:00:00Z",
+#           "type": "datetime"
+#         },
+#         "media_comment": {
+#           "$ref": "MediaComment"
+#         }
+#       }
+#     }
 #
-#       // The timestamp when the assignment was submitted
-#       "submitted_at": "2012-01-01T01:00:00Z",
-#
-#       // The URL of the submission (for "online_url" submissions).
-#       "url": null,
-#
-#       // The id of the user who created the submission
-#       "user_id": 134,
-#
-#       // The id of the user who graded the submission
-#       "grader_id": 86,
-#
-#       // The submissions user (see user API) (optional)
-#       "user": "User",
-#
-#       // Whether the submission was made after the applicable due date
-#       "late": false
+# @model Submission
+#     {
+#       "id": "Submission",
+#       "description": "",
+#       "properties": {
+#         "assignment_id": {
+#           "description": "The submission's assignment id",
+#           "example": 23,
+#           "type": "integer"
+#         },
+#         "assignment": {
+#           "description": "The submission's assignment (see the assignments API) (optional)",
+#           "example": "Assignment",
+#           "type": "string"
+#         },
+#         "course": {
+#           "description": "The submission's course (see the course API) (optional)",
+#           "example": "Course",
+#           "type": "string"
+#         },
+#         "attempt": {
+#           "description": "This is the submission attempt number.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "body": {
+#           "description": "The content of the submission, if it was submitted directly in a text field.",
+#           "example": "There are three factors too...",
+#           "type": "string"
+#         },
+#         "grade": {
+#           "description": "The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example).",
+#           "example": "A-",
+#           "type": "string"
+#         },
+#         "grade_matches_current_submission": {
+#           "description": "A boolean flag which is false if the student has re-submitted since the submission was last graded.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "html_url": {
+#           "description": "URL to the submission. This will require the user to log in.",
+#           "example": "http://example.com/courses/255/assignments/543/submissions/134",
+#           "type": "string"
+#         },
+#         "preview_url": {
+#           "description": "URL to the submission preview. This will require the user to log in.",
+#           "example": "http://example.com/courses/255/assignments/543/submissions/134?preview=1",
+#           "type": "string"
+#         },
+#         "score": {
+#           "description": "The raw score",
+#           "example": 13.5,
+#           "type": "float"
+#         },
+#         "submission_comments": {
+#           "description": "Associated comments for a submission (optional)",
+#           "type": "array",
+#           "items": { "$ref": "SubmissionComment" }
+#         },
+#         "submission_type": {
+#           "description": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording')",
+#           "example": "online_text_entry",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "online_text_entry",
+#               "online_url",
+#               "online_upload",
+#               "media_recording"
+#             ]
+#           }
+#         },
+#         "submitted_at": {
+#           "description": "The timestamp when the assignment was submitted",
+#           "example": "2012-01-01T01:00:00Z",
+#           "type": "datetime"
+#         },
+#         "url": {
+#           "description": "The URL of the submission (for 'online_url' submissions).",
+#           "type": "string"
+#         },
+#         "user_id": {
+#           "description": "The id of the user who created the submission",
+#           "example": 134,
+#           "type": "integer"
+#         },
+#         "grader_id": {
+#           "description": "The id of the user who graded the submission",
+#           "example": 86,
+#           "type": "integer"
+#         },
+#         "user": {
+#           "description": "The submissions user (see user API) (optional)",
+#           "example": "User",
+#           "type": "string"
+#         },
+#         "late": {
+#           "description": "Whether the submission was made after the applicable due date",
+#           "example": false,
+#           "type": "boolean"
+#         }
+#       }
 #     }
 #
 class SubmissionsController < ApplicationController

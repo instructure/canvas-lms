@@ -1,0 +1,136 @@
+@import "compass/css3/border-radius";
+
+#quiz-show {
+  background-color: #FFF;
+  font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+
+  //===== Action Buttons In the Top Right Corner ===
+
+  .teacher-action-buttons {
+    // Makes ICPublishButtonComponent render inline-block
+    div {
+      display: inline-block
+    }
+
+    text-align: right;
+    display: table-cell;
+    vertical-align: bottom;
+    min-height: 60px;
+    padding-top: 15px;
+  }
+
+  .tabs-content {
+    border-top: 1px solid #CAD0D7;
+    z-index: 1;
+    position: relative;
+    padding-top: 10px;
+    width: 100%;
+  }
+
+  #quiz-show-tabs {
+    position: relative;
+    z-index: 5;
+    top: 1px;
+
+    ol li {
+      background: white;
+      position: relative;
+      display: inline-block;
+      list-style-type: none;
+      min-width: 105px;
+      text-align: center;
+      font-size: 14px;
+
+      a {
+        padding: 10px 5px 10px 5px;
+        display: block;
+        color: #5B6369;
+      }
+
+      &.active {
+        font-weight: bold;
+        border: 1px solid #CAD0D7;
+        color: black;
+        @include border-top-left-radius(3px);
+        @include border-top-right-radius(3px);
+        border-bottom: 1px solid white;
+      }
+
+    }
+
+    ol {
+      width: 100%;
+      margin-bottom: 0;
+    }
+  }
+
+  .quiz-description {
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+  }
+ 
+  #quiz-attribute-table {
+    overflow: hidden;
+    dl dt, dl dd {
+      float: left;
+      margin: 0 0.5em 10px 0;
+    }
+
+    dl dd + dt, dl dd + dd {
+      clear: left
+    }
+
+    dl dd + dd {
+      float: none
+    }
+
+    dl dt {
+      font-weight: bold;
+    }
+
+    dl dd {
+      position: relative;
+      top: 1px;
+    }
+
+    .quiz-attribute-column {
+      text-align: center;
+      border-right: 1px solid #F1F2F2;
+      margin-bottom: -99999px;
+      padding-bottom: 99999px;
+
+      &:last-of-type {
+        border-right: none;
+      }
+    }
+
+  }
+
+  #due-dates-table {
+    margin-top: 20px;
+
+    thead {
+      background-color: #F4F5F6;
+      font-weight: bold;
+    }
+
+    tr {
+      border-bottom: 1px solid #E1E2E3;
+
+      td {
+        width: 20%;
+      }
+
+      td:nth-of-type(2) {
+        text-align: center;
+        width: 60%;
+      }
+
+    }
+
+    tbody {
+      font-family: "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, sans-serif;
+    }
+
+  }
+}

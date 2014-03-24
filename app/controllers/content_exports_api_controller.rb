@@ -21,29 +21,62 @@
 #
 # API for exporting courses and course content
 #
-# @object ContentExport
-#   {
-#       // the unique identifier for the export
-#       "id": 101,
-#
-#       // the date and time this export was requested
-#       "created_at": "2014-01-01T00:00:00Z",
-#
-#       // the type of content migration: "common_cartridge" or "qti"
-#       "export_type": "common_cartridge",
-#
-#       // attachment api object for the export package (not present until the export completes)
-#       "attachment": {"url":"https://example.com/api/v1/attachments/789?download_frd=1&verifier=bG9sY2F0cyEh"},
-#
-#       // The api endpoint for polling the current progress
-#       "progress_url": "https://example.com/api/v1/progress/4",
-#
-#       // The ID of the user who started the export
-#       "user_id": 4,
-#
-#       // Current state of the content migration: created exporting exported failed
-#       "workflow_state": "exported"
-#   }
+# @model ContentExport
+#     {
+#       "id": "ContentExport",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the unique identifier for the export",
+#           "example": 101,
+#           "type": "integer"
+#         },
+#         "created_at": {
+#           "description": "the date and time this export was requested",
+#           "example": "2014-01-01T00:00:00Z",
+#           "type": "datetime"
+#         },
+#         "export_type": {
+#           "description": "the type of content migration: 'common_cartridge' or 'qti'",
+#           "example": "common_cartridge",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "common_cartridge",
+#               "qti"
+#             ]
+#           }
+#         },
+#         "attachment": {
+#           "description": "attachment api object for the export package (not present until the export completes)",
+#           "example": "{\"url\"=>\"https://example.com/api/v1/attachments/789?download_frd=1&verifier=bG9sY2F0cyEh\"}",
+#           "$ref": "File"
+#         },
+#         "progress_url": {
+#           "description": "The api endpoint for polling the current progress",
+#           "example": "https://example.com/api/v1/progress/4",
+#           "type": "string"
+#         },
+#         "user_id": {
+#           "description": "The ID of the user who started the export",
+#           "example": 4,
+#           "type": "integer"
+#         },
+#         "workflow_state": {
+#           "description": "Current state of the content migration: created exporting exported failed",
+#           "example": "exported",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "created",
+#               "exporting",
+#               "exported",
+#               "failed"
+#             ]
+#           }
+#         }
+#       }
+#     }
 #
 class ContentExportsApiController < ApplicationController
   include Api::V1::ContentExport

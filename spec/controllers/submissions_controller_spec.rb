@@ -346,7 +346,7 @@ describe SubmissionsController do
 
       get 'index', { :course_id => @course.id, :assignment_id => @assignment.id, :zip => '1' }, 'HTTP_ACCEPT' => '*/*'
       response.should be_success
-      response['content-type'].should == 'test/file'
+      response.content_type.should == 'test/file'
     end
   end
 

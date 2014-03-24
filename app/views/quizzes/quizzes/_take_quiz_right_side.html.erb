@@ -1,0 +1,36 @@
+<div class="rs-margin-lr rs-margin-top">
+  <% if @submission && params[:preview] %>
+    <% keep_editing_title = @quiz.survey? ? t('links.keep_editing_survey', "Keep Editing This Survey") : t('links.keep_editing_quiz', "Keep Editing This Quiz") %>
+    <a id="preview_mode_link" href="<%= context_url(@context, :edit_context_quiz_url, @quiz) %>" class="btn button-sidebar-wide"><i class="icon-edit"><span class="screenreader-only"><%= keep_editing_title %></span></i> <%= keep_editing_title %></a><br/>
+  <% end %>
+
+  <%= render "question_list_right_side" %>
+
+  <% if @submission.finished_at %>
+    <div class="quiz_score">
+      <%= before_label(:score, "Score") %>
+      <%= score_out_of_points_possible(@submission.score, @quiz.points_possible, :class => 'score_value') %>
+    </div>
+  <% end %>
+  <div id="quiz-time-elapsed">
+    <span class="time_header">
+      <% if @quiz.time_limit %>
+        <%= before_label(:time_running, "Time Running") %>
+      <% else %>
+        <%= before_label(:time_elapsed, "Time Elapsed") %>
+      <% end %>
+    </span>
+    <span style="font-size: 0.8em; padding-left: 10px;">
+      <a href="#" class="hide_time_link"><%= t('links.hide_time_running', "Hide") %></a>
+    </span>
+    <% if @submission.end_at %>
+      <div style="font-size: 0.8em;">
+        <%= before_label(:attempt_due, "Attempt due") %>
+        <%= datetime_string(@submission.end_at) %>
+      </div>
+    <% end %>
+    <div class="clear"></div>
+    <div class="time_running"></div>
+  </div>
+</div>
+

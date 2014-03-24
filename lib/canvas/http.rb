@@ -89,10 +89,13 @@ module Canvas::HTTP
   def self.tempfile_for_uri(uri)
     basename = File.basename(uri.path)
     basename, ext = basename.split(".", 2)
-    if ext
+    tmpfile = if ext
       Tempfile.new([basename, ext])
     else
       Tempfile.new(basename)
     end
+    tmpfile.set_encoding(Encoding::BINARY) if tmpfile.respond_to?(:set_encoding)
+    tmpfile.binmode
+    tmpfile
   end
 end

@@ -17,6 +17,123 @@
 #
 
 # @API Users
+#
+# @model Profile
+#     {
+#       "id": "Profile",
+#       "description": "Profile details for a Canvas user.",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the user.",
+#           "example": 1234,
+#           "type": "integer"
+#         },
+#         "name": {
+#           "description": "Sample User",
+#           "example": "Sample User",
+#           "type": "string"
+#         },
+#         "short_name": {
+#           "description": "Sample User",
+#           "example": "Sample User",
+#           "type": "string"
+#         },
+#         "sortable_name": {
+#           "description": "user, sample",
+#           "example": "user, sample",
+#           "type": "string"
+#         },
+#         "title": {
+#           "type": "string"
+#         },
+#         "bio": {
+#           "type": "string"
+#         },
+#         "primary_email": {
+#           "description": "sample_user@example.com",
+#           "example": "sample_user@example.com",
+#           "type": "string"
+#         },
+#         "login_id": {
+#           "description": "sample_user@example.com",
+#           "example": "sample_user@example.com",
+#           "type": "string"
+#         },
+#         "sis_user_id": {
+#           "description": "sis1",
+#           "example": "sis1",
+#           "type": "string"
+#         },
+#         "sis_login_id": {
+#           "description": "sis1-login",
+#           "example": "sis1-login",
+#           "type": "string"
+#         },
+#         "avatar_url": {
+#           "description": "The avatar_url can change over time, so we recommend not caching it for more than a few hours",
+#           "example": "..url..",
+#           "type": "string"
+#         },
+#         "calendar": {
+#           "$ref": "CalendarLink"
+#         },
+#         "time_zone": {
+#           "description": "Optional: This field is only returned in certain API calls, and will return the IANA time zone name of the user's preferred timezone.",
+#           "example": "America/Denver",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
+# @model Avatar
+#     {
+#       "id": "Avatar",
+#       "description": "Possible avatar for a user.",
+#       "required": ["type", "url", "token", "display_name"],
+#       "properties": {
+#         "type": {
+#           "description": "['gravatar'|'attachment'|'no_pic'] The type of avatar record, for categorization purposes.",
+#           "example": "gravatar",
+#           "type": "string"
+#         },
+#         "url": {
+#           "description": "The url of the avatar",
+#           "example": "https://secure.gravatar.com/avatar/2284...",
+#           "type": "string"
+#         },
+#         "token": {
+#           "description": "A unique representation of the avatar record which can be used to set the avatar with the user update endpoint. Note: this is an internal representation and is subject to change without notice. It should be consumed with this api endpoint and used in the user update endpoint, and should not be constructed by the client.",
+#           "example": "<opaque_token>",
+#           "type": "string"
+#         },
+#         "display_name": {
+#           "description": "A textual description of the avatar record.",
+#           "example": "user, sample",
+#           "type": "string"
+#         },
+#         "id": {
+#           "description": "['attachment' type only] the internal id of the attachment",
+#           "example": 12,
+#           "type": "integer"
+#         },
+#         "content-type": {
+#           "description": "['attachment' type only] the content-type of the attachment.",
+#           "example": "image/jpeg",
+#           "type": "string"
+#         },
+#         "filename": {
+#           "description": "['attachment' type only] the filename of the attachment",
+#           "example": "profile.jpg",
+#           "type": "string"
+#         },
+#         "size": {
+#           "description": "['attachment' type only] the size of the attachment",
+#           "example": 32649,
+#           "type": "integer"
+#         }
+#       }
+#     }
+#
 class ProfileController < ApplicationController
   before_filter :require_registered_user, :except => [:show, :settings, :communication, :communication_update]
   before_filter :require_user, :only => [:settings, :communication, :communication_update]
@@ -64,22 +181,7 @@ class ProfileController < ApplicationController
   # When requesting the profile for the user accessing the API, the user's
   # calendar feed URL will be returned as well.
   #
-  # @example_response
-  #
-  #   {
-  #     'id': 1234,
-  #     'name': 'Sample User',
-  #     'short_name': 'Sample User'
-  #     'sortable_name': 'user, sample',
-  #     'primary_email': 'sample_user@example.com',
-  #     'login_id': 'sample_user@example.com',
-  #     'sis_user_id': 'sis1',
-  #     'sis_login_id': 'sis1-login',
-  #     // The avatar_url can change over time, so we recommend not caching it for more than a few hours
-  #     'avatar_url': '..url..',
-  #     'calendar': { 'ics' => '..url..' },
-  #     'time_zone': 'America/Denver'
-  #   }
+  # @returns Profile
   def settings
     if api_request?
       # allow querying this basic profile data for the current user, or any
@@ -187,6 +289,7 @@ class ProfileController < ApplicationController
   #       "display_name":"no pic"
   #     }
   #   ]
+  # @returns [Avatar]
   def profile_pics
     @user = if api_request? then api_find(User, params[:user_id]) else @current_user end
     if authorized_action(@user, @current_user, :update_avatar)

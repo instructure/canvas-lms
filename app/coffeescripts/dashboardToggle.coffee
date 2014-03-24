@@ -1,9 +1,10 @@
 define [
   'i18n!dashboard'
+  'jquery'
   'compiled/fn/preventDefault'
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
-], (I18n, preventDefault) ->
+], (I18n, $, preventDefault) ->
 
   dashboardToggle = (action) ->
     $a = $('<a />')

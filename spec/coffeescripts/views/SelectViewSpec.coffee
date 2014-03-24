@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'Backbone'
   'compiled/views/SelectView'
   'helpers/jquery.simulate'
-], (Backbone, SelectView) ->
+], ($, Backbone, SelectView) ->
 
   view = null
 

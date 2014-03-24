@@ -21,6 +21,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper'
 
 describe 'Submissions API', type: :request do
 
+  before {
+    HostUrl.stubs(:file_host_with_shard).returns(["www.example.com", Shard.default])
+  }
+
   def submit_homework(assignment, student, opts = {:body => "test!"})
     @submit_homework_time ||= Time.zone.at(0)
     @submit_homework_time += 1.hour
@@ -405,7 +409,7 @@ describe 'Submissions API', type: :request do
       "id" => @student.id,
       "display_name" => "User",
       "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}",
-      "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png"
+      "avatar_image_url" => User.avatar_fallback_url
     }
   end
 
@@ -502,7 +506,7 @@ describe 'Submissions API', type: :request do
               "id" => @teacher.id,
               "display_name" => "User",
               "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png"
+              "avatar_image_url" => User.avatar_fallback_url
            },
            "author_name"=>"User",
            "id" => comment.id,
@@ -763,7 +767,7 @@ describe 'Submissions API', type: :request do
              "id" => @teacher.id,
              "display_name" => "User",
              "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-             "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png"
+             "avatar_image_url" => User.avatar_fallback_url
            },
            "author_name"=>"User",
            "id"=>comment.id,

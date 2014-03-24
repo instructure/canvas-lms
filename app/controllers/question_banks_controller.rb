@@ -88,12 +88,15 @@ class QuestionBanksController < ApplicationController
       else
         @questions.update_all(:assessment_question_bank_id => @new_bank)
       end
+
+      [ @bank, @new_bank ].each(&:touch)
+
       render :json => {}
     end
   end
   
   def create
-    if authorized_action(@context.assessment_question_banks.new, @current_user, :create)
+    if authorized_action(@context.assessment_question_banks.scoped.new, @current_user, :create)
       @bank = @context.assessment_question_banks.build(params[:assessment_question_bank])
       respond_to do |format|
         if @bank.save

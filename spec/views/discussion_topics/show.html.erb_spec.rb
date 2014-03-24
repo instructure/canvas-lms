@@ -23,7 +23,7 @@ describe "/discussion_topics/show" do
   it "should render" do
     course_with_teacher
     view_context(@course, @user)
-    @topic = @course.discussion_topics.create!(:title => "some topic")
+    @topic = @course.discussion_topics.create!(:title => "some topic", :user => @user)
     @entry = @topic.discussion_entries.create!(:message => "some message")
     @topic.discussion_entries.create!(:message => "another message")
     assigns[:topic] = @topic
@@ -41,6 +41,8 @@ describe "/discussion_topics/show" do
     group_model
     view_context(@group, @user)
     @topic = @assignment.discussion_topic
+    @topic.user = @user
+    @topic.save!
     @entry = @topic.discussion_entries.create!(:message => "some message")
     @topic.discussion_entries.create!(:message => "another message")
     assigns[:topic] = @topic

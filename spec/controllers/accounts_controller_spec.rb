@@ -451,4 +451,17 @@ describe AccountsController do
       end
     end
   end
+
+  describe "#settings" do
+    it "should load account report details" do
+      account_with_admin_logged_in
+      report_type = AccountReport.available_reports(@account).keys.first
+      report = @account.account_reports.create!(report_type: report_type, user: @admin)
+
+      get 'settings', account_id: @account
+      response.should be_success
+
+      assigns[:last_reports].first.last.should == report
+    end
+  end
 end

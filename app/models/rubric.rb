@@ -125,7 +125,7 @@ class Rubric < ActiveRecord::Base
   def touch_associations
     if alignments_need_update?
       # associations might need to update their alignments also
-      rubric_associations.bookmarked.each &:touch
+      rubric_associations.bookmarked.each &:save
     end
   end
 

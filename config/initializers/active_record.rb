@@ -1,3 +1,5 @@
+require 'active_support/callbacks/suspension'
+
 class ActiveRecord::Base
   # XXX: Rails3 There are lots of issues with these patches in Rails3 still
 
@@ -17,7 +19,9 @@ class ActiveRecord::Base
 
     def serializable_hash(options = nil)
       if options && options[:include_root]
-        {self.class.base_ar_class.model_name.element => super}
+        options = options.dup
+        options.delete(:include_root)
+        {self.class.base_ar_class.model_name.element => super(options)}
       else
         super
       end
@@ -676,11 +680,15 @@ class ActiveRecord::Base
     # take a lock (e.g. when we create a submission).
     retries.times do
       begin
-        return transaction(:requires_new => true) { uncached { yield } }
+        result = transaction(:requires_new => true) { uncached { yield } }
+        connection.clear_query_cache
+        return result
       rescue UniqueConstraintViolation
       end
     end
-    transaction(:requires_new => true) { uncached { yield } }
+    result = transaction(:requires_new => true) { uncached { yield } }
+    connection.clear_query_cache
+    result
   end
 
   # returns batch_size ids at a time, working through the primary key from
@@ -873,6 +881,17 @@ class ActiveRecord::Base
     end
   end
 
+  include ActiveSupport::Callbacks::Suspension
+
+  # saves the record with all its save callbacks suspended.
+  def save_without_callbacks
+    if CANVAS_RAILS2
+      new_record? ? create_without_callbacks : update_without_callbacks
+    else
+      suspend_callbacks(kind: [:validation, :save, (new_record? ? :create : :update)]) { save }
+    end
+  end
+
   if Rails.version < '4'
     if CANVAS_RAILS2
       named_scope :none, lambda { where("?", false) }
@@ -1055,23 +1074,43 @@ unless CANVAS_RAILS2
       delete_all_without_limit(conditions)
     end
     alias_method_chain :delete_all, :limit
-  end
 
-  def with_each_shard(*args)
-    scope = self
-    if (owner = self.try(:proxy_association).try(:owner)) && self.shard_category != :explicit
-      scope = scope.shard(owner)
-    end
-    scope = scope.shard(args) if args.any?
-    if block_given?
-      scope.activate{|rel| yield(rel) }
-    else
-      scope.to_a
+    def with_each_shard(*args)
+      scope = self
+      if self.respond_to?(:proxy_association) && (owner = self.proxy_association.try(:owner)) && self.shard_category != :explicit
+        scope = scope.shard(owner)
+      end
+      scope = scope.shard(args) if args.any?
+      if block_given?
+        ret = scope.activate{ |rel|
+          yield(rel)
+        }
+        Array(ret)
+      else
+        scope.to_a
+      end
     end
   end
 
   ActiveRecord::Associations::CollectionProxy.class_eval do
     delegate :with_each_shard, :to => :scoped
+
+    def respond_to?(*args)
+      return super if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(args.first)
+      super ||
+        (load_target && target.respond_to?(name, include_private)) ||
+        proxy_association.klass.respond_to?(name, include_private)
+    end
+  end
+
+  ActiveRecord::Associations::CollectionAssociation.class_eval do
+    def scoped
+      scope = super
+      proxy_association = self
+      scope.extending do
+        define_method(:proxy_association) { proxy_association }
+      end
+    end
   end
 end
 
@@ -1343,6 +1382,18 @@ if CANVAS_RAILS2
   end
 end
 
+unless CANVAS_RAILS2
+  ActiveRecord::Associations::Builder::HasMany.valid_options << :joins
+
+  ActiveRecord::Associations::HasOneAssociation.class_eval do
+    def create_scope
+      scope = scoped.scope_for_create.stringify_keys
+      scope = scope.except(klass.primary_key) unless klass.primary_key.to_s == reflection.foreign_key.to_s
+      scope
+    end
+  end
+end
+
 class ActiveRecord::Serialization::Serializer
   def serializable_record
     hash = HashWithIndifferentAccess.new.tap do |serializable_record|
@@ -1368,44 +1419,6 @@ class ActiveRecord::Serialization::Serializer
     hash = { @record.class.base_ar_class.model_name.element => hash }.with_indifferent_access if options[:include_root]
     hash
   end
-
-end
-
-if CANVAS_RAILS2
-
-class ActiveRecord::Errors
-  def as_json(*a)
-    {:errors => @errors}.as_json(*a)
-  end
-end
-
-# We are currently using the ActiveRecord::Errors modification above to return
-# the errors to our javascript in a specific expected format. however, this
-# format was returning the @base attribute of each ActiveRecord::Error, which
-# is a data leakage issue since that's the full json representation of the AR object.
-#
-# This modification removes the @base attribute from the json, which
-# fortunately wasn't being used by our javascript.
-# further development will eventually remove these two modifications
-# completely, and switch our javascript to use the default json formatting of
-# ActiveRecord::Errors
-# See #6733
-class ActiveRecord::Error
-  def as_json(*a)
-    super.slice('attribute', 'type', 'message')
-  end
-end
-
-else
-
-class ActiveModel::Errors
-  alias :length :size
-
-  def as_json(*a)
-    {:errors => Hash[to_hash.map{|k,v| [k, v.map{|m| {:attribute => k, :message => m, :type => m}}]}]}.as_json(*a)
-  end
-end
-
 end
 
 if CANVAS_RAILS2
@@ -1818,6 +1831,19 @@ unless CANVAS_RAILS2
 
     def serialize
       serialized_value
+    end
+  end
+
+  ActiveRecord::Associations::CollectionAssociation.class_eval do
+    # CollectionAssociation implements uniq for :uniq option, in its
+    # own special way. re-implement, but as a relation if it's not an
+    # internal use of it
+    def uniq(records = true)
+      if records.is_a?(Array)
+        records.uniq
+      else
+        scoped.uniq(records)
+      end
     end
   end
 end

@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'underscore'
   'Backbone'
   'jst/wiki/WikiPageRevision'
-], (_, Backbone, template) ->
+], ($, _, Backbone, template) ->
 
   class WikiPageRevisionView extends Backbone.View
     tagName: 'li'

@@ -25,5 +25,6 @@
     background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
     background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
     background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
-
-<p><a href="<%= content :link %>"><%= t :details, "Click here to join the conversation" %></a></p>
+<p>
+<%= mt(:discussion_entry_link_message, "[Click here to join the conversation](%{url}), or comment by replying to this message.", url: content(:link)) %>
+</p>

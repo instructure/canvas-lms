@@ -8,12 +8,14 @@
     data-view="inputFilter"
     placeholder='{{#t "search_people"}}Search people{{/t}}'
     aria-label='{{#t "search"}}Search{{/t}}'
+    maxlength="255"
   >
 
   <input
     type="hidden"
     class="userIdField"
     name="user_id"
+    maxlength="255"
   >
 </div>
 
@@ -29,13 +31,13 @@
   <div class="control-group">
     <label class="control-label" for="{{formName}}-dateStartSearchField">{{#t "message_date_from"}}From Date{{/t}}</label>
     <div class="controls">
-      <input type="text" id="{{formName}}-dateStartSearchField" class="dateStartSearchField" name="start_time" placeholder="{{#t "message_date_from"}}From Date{{/t}}" />
+      <input type="text" id="{{formName}}-dateStartSearchField" class="dateStartSearchField" name="start_time" placeholder="{{#t "message_date_from"}}From Date{{/t}}" maxlength="50" />
     </div>
   </div>
   <div class="control-group">
     <label class="control-label" for="{{formName}}-dateEndSearchField">{{#t "message_date_to"}}To Date{{/t}}</label>
     <div class="controls">
-      <input type="text" id="{{formName}}-dateEndSearchField" class="dateEndSearchField" name="end_time" placeholder="{{#t "message_date_to"}}To Date{{/t}}" />
+      <input type="text" id="{{formName}}-dateEndSearchField" class="dateEndSearchField" name="end_time" placeholder="{{#t "message_date_to"}}To Date{{/t}}" maxlength="50" />
     </div>
   </div>
 

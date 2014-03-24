@@ -40,7 +40,9 @@ describe EnrollmentsApiController, type: :request do
               :type                               => 'StudentEnrollment',
               :enrollment_state                   => 'active',
               :course_section_id                  => @section.id,
-              :limit_privileges_to_course_section => true
+              :limit_privileges_to_course_section => true,
+              :start_at                           => nil,
+              :end_at                             => nil
             }
           }
         new_enrollment = Enrollment.find(json['id'])
@@ -52,6 +54,7 @@ describe EnrollmentsApiController, type: :request do
           'limit_privileges_to_course_section' => false,
           'enrollment_state'                   => 'active',
           'course_id'                          => @course.id,
+          'sis_import_id'                       => nil,
           'type'                               => 'StudentEnrollment',
           'role'                               => 'StudentEnrollment',
           'html_url'                           => course_user_url(@course, @unenrolled_user),
@@ -65,6 +68,8 @@ describe EnrollmentsApiController, type: :request do
           'associated_user_id'                 => nil,
           'updated_at'                         => new_enrollment.updated_at.xmlschema,
           'created_at'                         => new_enrollment.created_at.xmlschema,
+          'start_at'                           => nil,
+          'end_at'                             => nil,
           'last_activity_at'                   => nil
         }
         new_enrollment.root_account_id.should eql @course.account.id
@@ -403,6 +408,8 @@ describe EnrollmentsApiController, type: :request do
           'associated_user_id'                 => nil,
           'updated_at'                         => new_enrollment.updated_at.xmlschema,
           'created_at'                         => new_enrollment.created_at.xmlschema,
+          'start_at'                           => nil,
+          'end_at'                             => nil,
           'last_activity_at'                   => nil
         }
         new_enrollment.root_account_id.should eql @course.account.id
@@ -519,6 +526,11 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should list all of a user's enrollments in an account" do
+        e = @student.current_enrollments.first
+        sis_batch = e.root_account.sis_batches.create
+        SisBatch.where(id: sis_batch).update_all(workflow_state: 'imported')
+        e.sis_batch_id = sis_batch.id
+        e.save!
         json = api_call(:get, @user_path, @user_params)
         enrollments = @student.current_enrollments.includes(:user).order("users.sortable_name ASC")
         json.should == enrollments.map { |e|
@@ -532,6 +544,7 @@ describe EnrollmentsApiController, type: :request do
             'role' => e.role,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
+            'sis_import_id' => sis_batch.id,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -550,6 +563,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
             'created_at'  => e.created_at.xmlschema,
+            'start_at'  => nil,
+            'end_at'  => nil,
             'last_activity_at' => nil
           }
         }
@@ -571,6 +586,7 @@ describe EnrollmentsApiController, type: :request do
             'role' => e.role,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
+            'sis_import_id' => nil,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -587,9 +603,11 @@ describe EnrollmentsApiController, type: :request do
               'current_grade' => nil,
             },
             'associated_user_id' => nil,
-            'updated_at' => e.updated_at.xmlschema,
-            'created_at' => e.created_at.xmlschema,
-            'last_activity_at' => e.last_activity_at.xmlschema
+            'updated_at'         => e.updated_at.xmlschema,
+            'created_at'         => e.created_at.xmlschema,
+            'start_at'           => nil,
+            'end_at'             => nil,
+            'last_activity_at'   => e.last_activity_at.xmlschema
           }
         }
       end
@@ -710,7 +728,7 @@ describe EnrollmentsApiController, type: :request do
         @user = current_user
         json = api_call(:get, @path, @params)
         enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
-          res = res + @course.send("#{type}_enrollments").includes(:user).order(User.sortable_name_order_by_clause("users"))
+          res + @course.send("#{type}_enrollments").includes(:user).order(User.sortable_name_order_by_clause("users"))
         end
         json.should == enrollments.map { |e|
           h = {
@@ -727,6 +745,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
             'created_at' => e.created_at.xmlschema,
+            'start_at' => nil,
+            'end_at' => nil,
             'last_activity_at' => nil,
             'user' => {
               'name' => e.user.name,
@@ -788,9 +808,11 @@ describe EnrollmentsApiController, type: :request do
               'current_grade' => nil,
             },
             'associated_user_id' => nil,
-            'updated_at' => e.updated_at.xmlschema,
-            'created_at' => e.created_at.xmlschema,
-            'last_activity_at' => nil
+            'updated_at'         => e.updated_at.xmlschema,
+            'created_at'         => e.created_at.xmlschema,
+            'start_at'           => nil,
+            'end_at'             => nil,
+            'last_activity_at'   => nil
           }
         }
       end
@@ -848,7 +870,7 @@ describe EnrollmentsApiController, type: :request do
       it "should include users' sis and login ids" do
         json = api_call(:get, @path, @params)
         enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
-          res = res + @course.send("#{type}_enrollments").includes(:user)
+          res + @course.send("#{type}_enrollments").includes(:user)
         end
         json.should == enrollments.map do |e|
           user_json = {
@@ -877,6 +899,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
             'created_at' => e.created_at.xmlschema,
+            'start_at' => nil,
+            'end_at' => nil,
             'last_activity_at' => nil
           }
           h['grades'] = {
@@ -933,6 +957,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
             'created_at' => e.created_at.xmlschema,
+            'start_at' => nil,
+            'end_at' => nil,
             'last_activity_at' => nil
           }
           h['grades'] = {
@@ -1004,6 +1030,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id'                 => @enrollment.associated_user_id,
             'updated_at'                         => @enrollment.updated_at.xmlschema,
             'created_at'                         => @enrollment.created_at.xmlschema,
+            'start_at'                           => nil,
+            'end_at'                             => nil,
             'last_activity_at'                   => nil
           }
         end
@@ -1051,6 +1079,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id'                 => @enrollment.associated_user_id,
             'updated_at'                         => @enrollment.updated_at.xmlschema,
             'created_at'                         => @enrollment.created_at.xmlschema,
+            'start_at'                           => nil,
+            'end_at'                             => nil,
             'last_activity_at'                   => nil
           }
         end
@@ -1065,7 +1095,7 @@ describe EnrollmentsApiController, type: :request do
 
           response.code.should eql '401'
           JSON.parse(response.body).should == {
-            'errors' => { 'message' => 'user not authorized to perform that action' },
+            'errors' => [{ 'message' => 'user not authorized to perform that action' }],
             'status'  => 'unauthorized'
           }
         end
@@ -1108,6 +1138,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
             'created_at' => e.created_at.xmlschema,
+            'start_at'   => nil,
+            'end_at'     => nil,
             'last_activity_at' => nil,
             'user' => {
               'name' => e.user.name,
@@ -1142,6 +1174,8 @@ describe EnrollmentsApiController, type: :request do
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
             'created_at' => e.created_at.xmlschema,
+            'start_at'   => nil,
+            'end_at'     => nil,
             'last_activity_at' => nil,
             'user' => {
               'name' => e.user.name,

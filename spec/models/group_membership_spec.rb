@@ -60,7 +60,7 @@ describe GroupMembership do
     # expect
     membership = group.group_memberships.build(:user => user_model, :workflow_state => 'accepted')
     membership.should_not be_valid
-    membership.errors[:group_id].should == "The group is full."
+    membership.errors[:group_id].should == ["The group is full."]
   end
 
   context "section homogeneity" do
@@ -79,7 +79,7 @@ describe GroupMembership do
       membership.stubs(:has_common_section_with_me?).returns(false)
       membership.save.should_not be_true
       membership.errors.size.should == 1
-      membership.errors.on(:user_id).should match(/test user does not share a section/)
+      membership.errors[:user_id].to_s.should match(/test user does not share a section/)
     end
 
     it "should pass validation on update" do

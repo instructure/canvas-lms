@@ -18,12 +18,13 @@
 
 define [
   'i18n!profile'
+  'jquery'
   'underscore'
   'compiled/views/DialogBaseView'
   'jst/profiles/avatarDialog'
   'jst/profiles/avatar'
   'compiled/util/BackoffPoller'
-], (I18n, _, DialogBaseView, template, avatarTemplate, BackoffPoller) ->
+], (I18n, $, _, DialogBaseView, template, avatarTemplate, BackoffPoller) ->
 
   # NOTE: This class was pulled (almost) wholesale from profile.js, bugs
   # and all. Notable changes include:

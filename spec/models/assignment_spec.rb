@@ -52,10 +52,7 @@ describe Assignment do
     group = @course.assignment_groups.create!(:name => "Assignments")
     AssignmentGroup.where(:id => group).update_all(:updated_at => 1.hour.ago)
     orig_time = group.reload.updated_at.to_i
-    a = @course.assignments.build(
-                                          "title"=>"test",
-                                          "external_tool_tag_attributes"=>{"url"=>"", "new_tab"=>""}
-                                  )
+    a = @course.assignments.build("title"=>"test")
     a.assignment_group = group
     a.save!
     @course.assignments.count.should == 1
@@ -82,7 +79,7 @@ describe Assignment do
       @assignment.should_not be_can_unpublish
       @assignment.unpublish
       @assignment.should_not be_valid
-      @assignment.errors['workflow_state'].should == "Can't unpublish if there are student submissions"
+      @assignment.errors['workflow_state'].should == ["Can't unpublish if there are student submissions"]
     end
 
     it "does allow itself to be unpublished if it has nil submissions" do
@@ -648,9 +645,9 @@ describe Assignment do
       lambda {
         sub = yield(@assignment, @user)
       }.should_not raise_error
+      
       sub.should_not be_new_record
-      sub.user.should eql real_sub.user
-      sub.assignment.should eql real_sub.assignment
+      sub.should eql real_sub
     end
 
     it "should handle them gracefully in find_or_create_submission" do
@@ -1978,7 +1975,7 @@ describe Assignment do
         @asmnt.description = "new description"
         @asmnt.save
         @asmnt.valid?.should == false
-        @asmnt.errors["description"].should == "You don't have permission to edit the locked attribute description"
+        @asmnt.errors["description"].should == ["You don't have permission to edit the locked attribute description"]
       end
 
       it "should allow teacher to edit unlocked attributes" do
@@ -1996,7 +1993,7 @@ describe Assignment do
         @asmnt.save
 
         @asmnt.valid?.should == false
-        @asmnt.errors["description"].should == "You don't have permission to edit the locked attribute description"
+        @asmnt.errors["description"].should == ["You don't have permission to edit the locked attribute description"]
 
         @asmnt.reload
         @asmnt.description.should_not == "new title"

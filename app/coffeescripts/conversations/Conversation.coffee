@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'Backbone'
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
-], (Backbone) ->
+], ($, Backbone) ->
 
   class Conversation extends Backbone.Model
 

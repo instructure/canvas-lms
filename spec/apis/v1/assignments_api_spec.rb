@@ -262,6 +262,25 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
+    describe "differentiated assignments" do
+      before do
+        course_with_teacher(:active_all => true)
+        @assignment = @course.assignments.create :name => 'differentiated assignment'
+      end
+
+      it "should exclude the only_visible_to_overrides flag if differentiated assignments is off" do
+        @json = api_get_assignment_in_course(@assignment, @course)
+        @json.has_key?('only_visible_to_overrides').should be_false
+      end
+
+      it "should include the only_visible_to_overrides flag if differentiated assignments is on" do
+        @course.account.enable_feature!(:differentiated_assignments)
+        @json = api_get_assignment_in_course(@assignment, @course)
+        @json.has_key?('only_visible_to_overrides').should be_true
+        @json['only_visible_to_overrides'].should be_false
+      end
+    end
+
     it "includes submission info with include flag" do
       course_with_student_logged_in(:active_all => true)
       assignment,submission = create_submitted_assignment_with_user(@user)
@@ -1024,6 +1043,29 @@ describe AssignmentsApiController, type: :request do
         })
         @assignment.title.should == "This changes!"
         response.code.to_i.should eql 201
+      end
+    end
+
+    context "differentiated assignments" do
+      before do
+        course_with_teacher(:active_all => true)
+        @assignment = @course.assignments.create(:name => 'test', :only_visible_to_overrides => false)
+        @flag_before = @assignment.only_visible_to_overrides
+      end
+
+      it "should not update the only_visible_to_overrides flag if differentiated assignments is off" do
+        raw_api_update_assignment(@course,@assignment,{
+          :only_visible_to_overrides => !@flag_before
+        })
+        @assignment.reload.only_visible_to_overrides.should == @flag_before
+      end
+
+      it "should update the only_visible_to_overrides flag if differentiated assignments is on" do
+        @course.account.enable_feature!(:differentiated_assignments)
+        raw_api_update_assignment(@course,@assignment,{
+          :only_visible_to_overrides => !@flag_before
+        })
+        @assignment.reload.only_visible_to_overrides.should == !@flag_before
       end
     end
   end

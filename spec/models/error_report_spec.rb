@@ -76,16 +76,18 @@ describe ErrorReport do
   end
 
   it "should filter params" do
-    req = mock(
+    mock_attrs = {
       :env => {
-        "QUERY_STRING" => "access_token=abcdef&pseudonym[password]=zzz",
-        "REQUEST_URI" => "https://www.instructure.example.com?access_token=abcdef&pseudonym[password]=zzz",
+          "QUERY_STRING" => "access_token=abcdef&pseudonym[password]=zzz",
+          "REQUEST_URI" => "https://www.instructure.example.com?access_token=abcdef&pseudonym[password]=zzz",
       },
       :remote_ip => "",
       :path_parameters => { :api_key => "1" },
       :query_parameters => { "access_token" => "abcdef", "pseudonym[password]" => "zzz" },
       :request_parameters => { "client_secret" => "xoxo" }
-    )
+    }
+    mock_attrs[:url] = mock_attrs[:env]["REQUEST_URI"] unless CANVAS_RAILS2
+    req = mock(mock_attrs)
     report = ErrorReport.new
     report.assign_data(ErrorReport.useful_http_env_stuff_from_request(req))
     report.data["QUERY_STRING"].should == "?access_token=[FILTERED]&pseudonym[password]=[FILTERED]"

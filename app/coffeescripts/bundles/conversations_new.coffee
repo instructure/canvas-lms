@@ -1,5 +1,6 @@
 require [
   'i18n!conversations'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/models/Message'
@@ -13,7 +14,7 @@ require [
   'compiled/collections/CourseCollection'
   'compiled/collections/FavoriteCourseCollection'
   'jquery.disableWhileLoading'
-], (I18n, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog,
+], (I18n, $, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog,
  InboxHeaderView, deparam, CourseCollection, FavoriteCourseCollection) ->
 
   class ConversationsRouter extends Backbone.Router

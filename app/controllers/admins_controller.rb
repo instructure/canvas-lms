@@ -18,22 +18,32 @@
 # @API Admins
 # Manage account role assignments
 #
-# @object Admin
-#     {
-#       // The unique identifier for the account role/user assignment
-#       "id": 1023,
-#
-#       // The account role assigned. This can be 'AccountAdmin' or a
-#       // user-defined role created by the Roles API.
-#       "role": "AccountAdmin",
-#
-#       // The user the role is assigned to. See the Users API for details.
-#       "user": {
-#         "id": 8191,
-#         "name": "A. A. Dinwiddie",
-#         "login_id": "bursar@uu.example.edu"
+# @model Admin
+#    {
+#       "id": "Admin",
+#       "required": ["id"],
+#       "properties": {
+#         "id": {
+#           "description": "The unique identifier for the account role/user assignment.",
+#           "example": 1023,
+#           "type": "integer"
+#         },
+#         "role": {
+#           "description": "The account role assigned. This can be 'AccountAdmin' or a user-defined role created by the Roles API.",
+#           "example": "AccountAdmin",
+#           "type": "string"
+#         },
+#         "user": {
+#           "description": "The user the role is assigned to. See the Users API for details.",
+#           "$ref": "User"
+#         },
+#         "status": {
+#           "description": "The status of the account role/user assignment.",
+#           "type": "string",
+#           "example": "deleted"
+#         }
 #       }
-#     }
+#    }
 class AdminsController < ApplicationController
   before_filter :require_user
   before_filter :get_context

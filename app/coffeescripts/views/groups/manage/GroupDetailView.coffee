@@ -1,10 +1,11 @@
 define [
   'i18n!GroupDetailView'
+  'jquery'
   'Backbone'
   'compiled/views/groups/manage/GroupEditView'
   'jst/groups/manage/groupDetail'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, {View}, GroupEditView, template) ->
+], (I18n, $, {View}, GroupEditView, template) ->
 
   class GroupDetailView extends View
 

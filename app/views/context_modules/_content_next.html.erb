@@ -182,7 +182,7 @@
 <div class="item-group-container" id="context_modules_sortable_container">
 
   <div id="no_context_modules_message" style="display:none; clear: both;">
-    <% if can_do(@context.context_modules.new, @current_user, :create) %>
+    <% if can_do(@context.context_modules.scoped.new, @current_user, :create) %>
       <%= mt 'help.create', <<TEXT, :button => t('#context_modules.buttons.add_module_first', 'Add a New Module')
   Course modules let you organize your assignments, pages, files, etc. into smaller sections or units. Modules could be centered around a theme, focused on a specific topic, or even just grouped chronologically.
 
@@ -202,7 +202,7 @@ TEXT
     class="ig-list <%= 'editable' if can_do(@context, @current_user, :manage_content) %>"
   >
     <% editable = can_do(@context, @current_user, :manage_content) %>
-    <% cache([@context.cache_key, editable, 'all_context_modules_draft', collection_cache_key(@modules)].join('/')) do %>
+    <% cache([@context.cache_key, editable, 'all_context_modules_draft_2', collection_cache_key(@modules)].join('/')) do %>
       <% ContextModule.send(:preload_associations, @modules, :content_tags => :content) %>
       <% @modules.each do |m| %>
         <%= render :partial => 'context_modules/context_module_next', :object => m, :locals => {:editable => editable } %>
@@ -212,7 +212,7 @@ TEXT
 </div>
 
 <%= render :partial => 'context_modules/context_module_next', :object => nil %>
-<%= render :partial => 'context_modules/module_item_next', :object => nil %>
+<%= render :partial => 'context_modules/module_item_next', :object => nil, :locals => {:editable => editable} %>
 
 <% if can_do(@context, @current_user, :manage_content) %>
   <% form_for :context_module, :url => context_url(@context, :context_context_modules_url), :html => {:id => "add_context_module_form", :style => "display: none;"} do |f| %>
@@ -538,12 +538,12 @@ TEXT
     <li>
       <span class="keycode"><%= t('keycodes.indent', %{i}) %></span>
       <span class="colon">:</span>
-      <span class="description"><%= t('key.description.indent', %{Indent Current Item}) %></span>
+      <span class="description"><%= t('key.description.indent', %{Increase Indent}) %></span>
     </li>
     <li>
       <span class="keycode"><%= t('keycodes.outdent', %{o}) %></span>
       <span class="colon">:</span>
-      <span class="description"><%= t('key.description.outdent', %{Outdent Current Item}) %></span>
+      <span class="description"><%= t('key.description.outdent', %{Decrease Indent}) %></span>
     </li>
     <li>
       <span class="keycode"><%= t('keycodes.new', %{n}) %></span>

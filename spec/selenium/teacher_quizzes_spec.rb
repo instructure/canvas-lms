@@ -471,12 +471,12 @@ describe "quizzes" do
       # QuizSubmissions#extensions when a moderator extends a student's
       # quiz time.
 
-      quiz_original_end_time = QuizSubmission.last.end_at
+      quiz_original_end_time = Quizzes::QuizSubmission.last.end_at
       keep_trying_until do
-        submission = QuizSubmission.last
+        submission = Quizzes::QuizSubmission.last
         submission.end_at = Time.now + 20.minutes
         submission.save!
-        quiz_original_end_time < QuizSubmission.last.end_at
+        quiz_original_end_time < Quizzes::QuizSubmission.last.end_at
         f('.time_running').text.should match /19 Minutes/
       end
     end
@@ -587,13 +587,13 @@ describe "quizzes" do
       # quiz time.
 
 
-      quiz_original_end_time = QuizSubmission.last.end_at
+      quiz_original_end_time = Quizzes::QuizSubmission.last.end_at
 
 
-      submission = QuizSubmission.last
+      submission = Quizzes::QuizSubmission.last
       submission.end_at = Time.now + 20.minutes
       submission.save!
-      quiz_original_end_time < QuizSubmission.last.end_at
+      quiz_original_end_time < Quizzes::QuizSubmission.last.end_at
       assert_flash_notice_message /You have been given extra time on this attempt/
       f('.time_running').text.should match /19 Minutes/
     end

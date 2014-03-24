@@ -1,7 +1,8 @@
 define [
+  'jquery'
   'Backbone'
   'jst/content_migrations/subviews/SelectContentCheckbox'
-], (Backbone, template) -> 
+], ($, Backbone, template) -> 
   class SelectContentCheckbox extends Backbone.View
     template: template
 

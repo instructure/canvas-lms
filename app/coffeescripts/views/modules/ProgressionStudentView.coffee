@@ -27,6 +27,7 @@ define [
     afterRender: ->
       super
       @showProgressions() if !@model.collection.currentStudentView
+      @syncHeight()
 
     createProgressions: ->
       studentId = @model.get('id')
@@ -70,5 +71,7 @@ define [
     syncHeight: =>
       setTimeout =>
         @$students.height(@$modules.height())
+        @$students.find('.collectionViewItems').
+          height((@$students.height() || 0) - (@$students.find('.header').height() || 16) - 16)
       , 0
 

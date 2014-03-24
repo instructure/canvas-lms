@@ -1,11 +1,13 @@
 define [
   'i18n!gradebook2'
+  'jquery'
   'underscore'
   'compiled/views/gradebook/HeaderFilterView'
   'compiled/views/gradebook/OutcomeColumnView'
+  'compiled/gradebook2/NumberCompare'
   'jst/gradebook2/outcome_gradebook_cell'
   'jst/gradebook2/outcome_gradebook_student_cell'
-], (I18n, _, HeaderFilterView, OutcomeColumnView, cellTemplate, studentCellTemplate) ->
+], (I18n, $, _, HeaderFilterView, OutcomeColumnView, numberCompare, cellTemplate, studentCellTemplate) ->
 
   Grid =
     filter: ['mastery', 'near-mastery', 'remedial']
@@ -107,9 +109,9 @@ define [
       #
       # Returns a number used to sort with.
       _sortResults: (a, b, sortAsc, field) ->
-        scoreA = a[field] or 0
-        scoreB = b[field] or 0
-        val = if sortAsc then scoreA - scoreB else scoreB - scoreA
+        scoreA = a[field]
+        scoreB = b[field]
+        val = numberCompare(scoreA, scoreB, sortAsc)
         if val == 0
           Grid.Events._sortStudents(a, b, sortAsc)
         else
@@ -184,7 +186,14 @@ define [
       # Returns an object.
       _toRow: (rollup, section) ->
         return null unless Grid.Util.sectionFilter(section, rollup)
-        row = { student: Grid.Util.lookupStudent(rollup.links.user), section: rollup.links.section }
+        student = Grid.Util.lookupStudent(rollup.links.user)
+        section = Grid.Util.lookupSection(rollup.links.section)
+        row =
+          student: _.extend(
+            grades_html_url: "/courses/#{section.course_id}/grades/#{student.id}#tab-outcomes" # probably should get this from the enrollment api
+            section: if _.keys(Grid.sections).length > 1 then section else null
+            student)
+          section: rollup.links.section
         _.each rollup.scores, (score) ->
           row["outcome_#{score.links.outcome}"] = score.score
         row
@@ -234,11 +243,30 @@ define [
 
       # Public: Look up a student in the current student list.
       #
-      # name - The id for the student to look for.
+      # id - The id for the student to look for.
       #
-      # Returns an student or null.
+      # Returns a student or null.
       lookupStudent: (id) ->
         Grid.students[id]
+
+      # Public: Parse and store a list of section from the outcome rollups API (actually just from the gradebook's list for now)
+      #
+      # sections - An array of section objects.
+      #
+      # Returns nothing.
+      saveSections: (sections) ->
+        Grid.sections = _.reduce(sections, (result, section) ->
+          result[section.id] = section
+          result
+        , {})
+
+      # Public: Look up a section in the current section list.
+      #
+      # id - The id for the section to look for.
+      #
+      # Returns a section or null.
+      lookupSection: (id) ->
+        Grid.sections[id]
 
     Math:
       mean: (values, round = false) ->
@@ -292,7 +320,7 @@ define [
       # Returns cell HTML
       cellHtml: (value, columnDef, shouldFilter) ->
         outcome     = Grid.Util.lookupOutcome(columnDef.field)
-        return unless outcome and !(_.isNull(value) or _.isUndefined(value))
+        return unless outcome and _.isNumber(value)
         className   = Grid.View.masteryClassName(value, outcome)
         return '' if shouldFilter and !_.include(Grid.filter, className)
         cellTemplate(score: value, className: className, masteryScore: outcome.mastery_points)
@@ -316,7 +344,7 @@ define [
       getColumnResults: (data, column) ->
         _.chain(data)
           .pluck(column.field)
-          .reject((value) -> _.isNull(value) or _.isUndefined(value))
+          .filter(_.isNumber)
           .value()
 
       headerRowCell: ({node, column, grid}, fn = Grid.averageFn) ->

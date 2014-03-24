@@ -13,7 +13,7 @@
 <% if asset.media_comment? %>
 <%= t "#messages.conversation_message.email.audio_comment", "This message includes media comments. To listen or reply, click the link below:" %>
 <% else %>
-<%= t :link_message, "You can review the submission details here:" %>
+<%= t :submission_comment_link_message, "You can review the submission details using the link below, or can reply to this comment by responding to this message." %>
 <% end %>
 
 <%= content :link %>

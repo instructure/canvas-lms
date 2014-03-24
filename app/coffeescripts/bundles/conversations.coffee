@@ -1,7 +1,8 @@
 require [
+  'jquery'
   'compiled/conversations/Inbox'
   'jquery.google-analytics'
-], (Inbox) ->
+], ($, Inbox) ->
   new Inbox(ENV.CONVERSATIONS)
 
   # Google Analytics

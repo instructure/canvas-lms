@@ -15,14 +15,14 @@ define ['ember'], (Ember) ->
     canUpdate: ( ->
       return false unless @permissionsAvailable()
       @get('env').PERMISSIONS.update
-    ).property('env')
+    ).property('env.PERMISSIONS.update')
 
     canManage: ( ->
       return false unless @permissionsAvailable()
       @get('env').PERMISSIONS.manage
-    ).property('env')
+    ).property('env.PERMISSIONS.manage')
 
     permissionsAvailable: ->
       !!(@get('env') && @get('env').PERMISSIONS)
 
-  Environment.create()
+  Environment.create(env: window.ENV)

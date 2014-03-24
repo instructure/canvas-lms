@@ -17,14 +17,6 @@
 #
 
 class String # :nodoc:
-  def to_css_class
-    self.downcase.replace_whitespace("-")
-  end
-
-  def to_cased_title
-    self.gsub(/[^\w]+/, " ").gsub(/\b('?[a-z])/){$1.capitalize}.strip
-  end
-
   if CANVAS_RAILS2
     # Backporting this from rails3 because I think it's nice
     unless method_defined?(:strip_heredoc)

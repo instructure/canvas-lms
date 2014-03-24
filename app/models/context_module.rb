@@ -249,7 +249,7 @@ class ContextModule < ActiveRecord::Base
 
   def add_item(params, added_item=nil, opts={})
     params[:type] = params[:type].underscore if params[:type]
-    position = opts[:position] || (self.content_tags.active.maximum(:position) || 0) + 1
+    position = opts[:position] || (self.content_tags.not_deleted.maximum(:position) || 0) + 1
     if params[:type] == "wiki_page" || params[:type] == "page"
       item = opts[:wiki_page] || self.context.wiki.wiki_pages.find_by_id(params[:id])
     elsif params[:type] == "attachment" || params[:type] == "file"
@@ -261,7 +261,7 @@ class ContextModule < ActiveRecord::Base
     elsif params[:type] == "quiz"
       item = opts[:quiz] || self.context.quizzes.active.find_by_id(params[:id])
     end
-    workflow_state = item.workflow_state if item && item.respond_to?(:workflow_state) && ['active', 'unpublished'].include?(item.workflow_state)
+    workflow_state = ContentTag.asset_workflow_state(item) if item
     workflow_state ||= 'active'
     if params[:type] == 'external_url'
       title = params[:title]
@@ -315,7 +315,7 @@ class ContextModule < ActiveRecord::Base
       added_item.content_type = 'ContextModuleSubHeader'
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = workflow_state
+      added_item.workflow_state = (self.context.feature_enabled?(:draft_state) ? 'unpublished' : 'active')
       added_item.save
       added_item
     else
@@ -547,7 +547,7 @@ class ContextModule < ActiveRecord::Base
               if req[:type] == 'min_score'
                 progression.requirements_met = progression.requirements_met.select{|r| r[:id] != req[:id] || r[:type] != req[:type]}
                 if tag.content_type_quiz?
-                  submission = QuizSubmission.find_by_quiz_id_and_user_id(tag.content_id, user.id)
+                  submission = Quizzes::QuizSubmission.find_by_quiz_id_and_user_id(tag.content_id, user.id)
                   score = submission.try(:kept_score)
                 elsif tag.content_type == "DiscussionTopic"
                   if tag.content
