@@ -312,7 +312,7 @@ define [
       @_eventDrop(event, minuteDelta, allDay, revertFunc)
 
     _eventDrop: (event, minuteDelta, allDay, revertFunc) ->
-      if event.eventType == "assignment" && allDay
+      if @currentView == 'week' && allDay && event.eventType == "assignment"
         revertFunc()
         return
 
