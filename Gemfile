@@ -174,7 +174,7 @@ gem 'safe_yaml', '0.9.7', :require => false
 gem 'safe_yaml-instructure', '0.8.0', :require => false
   gem 'hashie', '2.0.5'
 gem 'sanitize', '2.0.3'
-gem 'shackles', '1.0.2'
+gem 'shackles', '1.0.3'
 unless CANVAS_RAILS2
   gem 'switchman', '1.1.0'
 end
