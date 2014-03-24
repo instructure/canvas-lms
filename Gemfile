@@ -221,7 +221,11 @@ group :assets do
 end
 
 group :mysql do
-  gem 'mysql2', '0.2.18'
+  if CANVAS_RAILS3
+    gem 'mysql2', '0.3.15'
+  else
+    gem 'mysql2', '0.2.18'
+  end
 end
 
 group :postgres do
