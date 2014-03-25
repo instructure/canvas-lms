@@ -20,6 +20,8 @@ define [
   helpDialog =
     defaultTitle: I18n.t 'Help', "Help"
 
+    showEmail: -> not ENV.current_user_id
+
     initDialog: ->
       @$dialog = $('<div style="padding:0; overflow: visible;" />').dialog
         resizable: false
@@ -39,7 +41,7 @@ define [
             role is 'user' or
             (ENV.current_user_roles and role in ENV.current_user_roles)
         locals =
-          showEmail: ENV.current_user_id
+          showEmail: @showEmail()
           helpLinks: links
           url: window.location
           contextAssetString: ENV.context_asset_string
@@ -55,9 +57,9 @@ define [
     initTicketForm: ->
       $form = @$dialog.find('#create_ticket').formSubmit
         disableWhileLoading: true
-        required: ->
+        required: =>
           requiredFields = ['error[subject]', 'error[comments]', 'error[user_perceived_severity]']
-          requiredFields.push 'error[email]' if ENV.current_user_id
+          requiredFields.push 'error[email]' if @showEmail()
           requiredFields
         success: =>
           @$dialog.dialog('close')
