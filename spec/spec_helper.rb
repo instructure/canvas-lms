@@ -1245,6 +1245,15 @@ end
   def send_multipart(url, post_params = {}, http_headers = {}, method = :post)
     mp = Multipart::Post.new
     query, headers = mp.prepare_query(post_params)
+
+    # A bug in the testing adapter in Rails 3-2-stable doesn't corretly handle
+    # translating this header to the Rack/CGI compatible version:
+    # (https://github.com/rails/rails/blob/3-2-stable/actionpack/lib/action_dispatch/testing/integration.rb#L289)
+    #
+    # This issue is fixed in Rails 4-0 stable, by using a newer version of
+    # ActionDispatch Http::Headers which correctly handles the merge
+    headers = headers.dup.tap { |h| h['CONTENT_TYPE'] ||= h.delete('Content-type') }
+
     send(method, url, query, headers.merge(http_headers))
   end
 
