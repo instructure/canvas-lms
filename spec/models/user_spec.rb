@@ -1449,6 +1449,34 @@ describe User do
     end
   end
 
+  describe "can_be_enrolled_in_course?" do
+    before do
+      course active_all: true
+    end
+
+    it "should allow a user with a pseudonym in the course's root account" do
+      user_with_pseudonym account: @course.root_account, active_all: true
+      @user.can_be_enrolled_in_course?(@course).should be_true
+    end
+
+    it "should allow a temporary user with an existing enrollment but no pseudonym" do
+      @user = User.create! { |u| u.workflow_state = 'creation_pending' }
+      @course.enroll_student(@user)
+      @user.can_be_enrolled_in_course?(@course).should be_true
+    end
+
+    it "should not allow a registered user with an existing enrollment but no pseudonym" do
+      user active_all: true
+      @course.enroll_student(@user)
+      @user.can_be_enrolled_in_course?(@course).should be_false
+    end
+
+    it "should not allow a user with neither an enrollment nor a pseudonym" do
+      user active_all: true
+      @user.can_be_enrolled_in_course?(@course).should be_false
+    end
+  end
+
   describe "email_channel" do
     it "should not return retired channels" do
       u = User.create!
