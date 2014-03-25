@@ -219,6 +219,7 @@ describe UserMerge do
       user1.observers << observer1 << observer2
       user2.observers << observer2
       ObserverEnrollment.count.should eql 3
+      Enrollment.where(user_id: observer2, associated_user_id: user1).update_all(workflow_state: 'completed')
 
       UserMerge.from(user1).into(user2)
       user1.observee_enrollments.size.should eql 1 #deleted
