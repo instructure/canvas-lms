@@ -73,7 +73,11 @@ module Api::V1
     def extract_enrollments( enrollments )
       if enrollments
         enrollments.map do |e|
-          h = { :type => e.readable_type.downcase, :role => e.role }
+          h = {
+            :type => e.readable_type.downcase,
+            :role => e.role,
+            :enrollment_state => e.workflow_state
+          }
           if include_total_scores && e.student?
             h.merge!(
               :computed_current_score => e.computed_current_score,
