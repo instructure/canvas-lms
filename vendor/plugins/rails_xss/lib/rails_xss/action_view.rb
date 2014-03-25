@@ -1,3 +1,4 @@
+if CANVAS_RAILS2
 module ActionView
   class Base
     def self.xss_safe?
@@ -22,7 +23,7 @@ module ActionView
         instance_variable_set(ivar, "#{instance_variable_get(ivar)}#{ERB::Util.h(content)}".html_safe)
         nil
       end
-    end    
+    end
 
     module TextHelper
       def concat(string, unused_binding = nil)
@@ -94,3 +95,4 @@ module RailsXss
 end
 
 Module.class_eval { include RailsXss::SafeHelpers }
+end

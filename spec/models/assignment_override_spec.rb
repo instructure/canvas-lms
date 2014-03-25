@@ -668,6 +668,7 @@ describe AssignmentOverride do
     let(:due_at) { Time.utc(2013,1,10,12,30) }
     let(:unlock_at) { Time.utc(2013,1,9,12,30) }
     let(:lock_at) { Time.utc(2013,1,11,12,30) }
+    let(:id) { 1 }
     let(:title) { "My Wonderful VDD" }
     let(:override) do
       override = AssignmentOverride.new
@@ -677,6 +678,7 @@ describe AssignmentOverride do
       override.all_day_date = due_at.to_date
       override.lock_at = lock_at
       override.unlock_at = unlock_at
+      override.id = id
       override
     end
 
@@ -704,6 +706,10 @@ describe AssignmentOverride do
 
     it "includes the lock_at" do
       hash[:lock_at].should == lock_at
+    end
+
+    it "includes the id" do
+      hash[:id].should == id
     end
   end
 end

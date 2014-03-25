@@ -76,7 +76,7 @@ module Api::V1::QuizSubmissionQuestion
   #     answer: 123
   #   }
   def quiz_submission_question_json(qq, submission_data)
-    answer_serializer = QuizQuestion::AnswerSerializers.serializer_for(qq)
+    answer_serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(qq)
 
     data = {}
     data[:id] = qq.id

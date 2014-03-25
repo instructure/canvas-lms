@@ -1,7 +1,8 @@
 define [
+  'jquery'
   'underscore'
   'compiled/xhr/RemoteSelect'
-], (_, RemoteSelect) ->
+], ($, _, RemoteSelect) ->
   module 'RemoteSelect',
     setup: ->
       @response = [200, { 'Content-Type': 'application/json' }, '[{ "label": "one", "value": 1 }, {"label": "two", "value": 2 }]']

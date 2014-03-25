@@ -57,7 +57,7 @@
       <li><a href="#tab-alerts" id="tab-alerts-link"><%= t(:tab_alerts, "Alerts") %></a></li>
     <% end %>
     <% if can_do(@context, @current_user, :manage_feature_flags) %>
-      <li><a href="#tab-features" id="tab-features-link"><%= t(:feature_options, "Feature options") %></a></li>
+      <li><a href="#tab-features" id="tab-features-link"><%= t(:feature_options, "Feature Options") %></a></li>
     <% end %>
   </ul>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
@@ -267,6 +267,15 @@ TEXT
                 <div>
                   <%= settings.check_box :self_registration, :checked => @account.self_registration? %>
                   <%= settings.label :self_registration, :en => "Self Registration" %>
+                </div>
+                <div id="self_registration_type_radios">
+                  <%= settings.radio_button :self_registration_type, 'all',
+                                            :checked => !(@account.settings[:self_registration_type] == 'observer') %>
+                  <%= settings.label :self_registration_type_all, :en => "All Account Types" %>
+                  <br/>
+                  <%= settings.radio_button :self_registration_type, 'observer',
+                                            :checked => @account.settings[:self_registration_type] == 'observer' %>
+                  <%= settings.label :self_registration_type_observer, :en => "Observer Accounts Only" %>
                 </div>
                 <div>
                   <%= settings.check_box :open_registration, :checked => @account.open_registration? %>

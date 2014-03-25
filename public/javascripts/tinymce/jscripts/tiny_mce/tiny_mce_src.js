@@ -12115,7 +12115,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 				plugins : '',
 				document_base_url : tinymce.documentBaseURL,
 				add_form_submit_trigger : TRUE,
-				submit_patch : false, // This was for JavaScript errors in IE7
+				submit_patch : TRUE,
 				add_unload_trigger : TRUE,
 				convert_urls : TRUE,
 				relative_urls : TRUE,

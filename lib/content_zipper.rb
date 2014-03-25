@@ -299,7 +299,7 @@ class ContentZipper
   end
 
   def zip_quiz(zip_attachment, quiz)
-    QuizSubmissionZipper.new(
+    Quizzes::QuizSubmissionZipper.new(
       quiz: quiz,
       zip_attachment: zip_attachment).zip!
   end

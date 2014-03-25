@@ -223,6 +223,21 @@ describe NotificationPolicy do
       n1.frequency.should == Notification::FREQ_IMMEDIATELY
       n2.frequency.should == Notification::FREQ_IMMEDIATELY
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should create records on the correct shard" do
+        user_with_pseudonym(active_all: true)
+        NotificationPolicy.delete_all
+        notification_model
+        @shard1.activate do
+          @user.notification_policies.scoped.exists?.should be_false
+          NotificationPolicy.setup_for(@user, channel_id: @cc.id, frequency: Notification::FREQ_IMMEDIATELY, category: 'test_immediately')
+          @user.notification_policies.scoped.exists?.should be_true
+        end
+      end
+    end
   end
 
   describe "setup_with_default_policies" do

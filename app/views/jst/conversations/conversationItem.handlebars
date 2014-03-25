@@ -1,5 +1,5 @@
 <li data-id="{{id}}" class="{{classes}} admin-link-hover-area">
-  {{#if avatar_url}}<img src="{{avatar_url}}" class="avatar" />{{/if}}
+  {{>avatar}}
   <a href="/conversations/{{id}}?conversation[workflow_state]=unread"
      class="action_mark_as_unread standard_action"
      data-track-category="Thread Actions"

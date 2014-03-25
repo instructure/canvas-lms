@@ -333,7 +333,7 @@ describe ContentZipper do
       zipper_stub = stub
       zipper_stub.expects(:zip!).once
       attachment.context = quiz
-      QuizSubmissionZipper.expects(:new).with(
+      Quizzes::QuizSubmissionZipper.expects(:new).with(
         quiz: quiz,
         zip_attachment: attachment
       ).returns zipper_stub

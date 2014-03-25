@@ -139,7 +139,7 @@ module ActiveRecord::Associations
   %w{HasManyAssociation HasManyThroughAssociation}.each do |klass|
     const_get(klass).class_eval do
       def with_each_shard(*shards)
-        scope = self
+        scope = self.scoped
         scope = yield(scope) if block_given?
         Array(scope)
       end

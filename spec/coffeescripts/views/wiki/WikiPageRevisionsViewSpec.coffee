@@ -1,7 +1,8 @@
 define [
+  'jquery'
   'compiled/collections/WikiPageRevisionsCollection'
   'compiled/views/wiki/WikiPageRevisionsView'
-], (WikiPageRevisionsCollection, WikiPageRevisionsView) ->
+], ($, WikiPageRevisionsCollection, WikiPageRevisionsView) ->
 
   module 'WikiPageRevisionsView'
 

@@ -21,11 +21,14 @@ define [
       @delete() if confirm(@messages.confirm)
 
     delete: ->
-        disablingDfd = new $.Deferred()
-        destroyDfd = @model.destroy()
+      disablingDfd = new $.Deferred()
+      if destroyDfd = @model.destroy()
         destroyDfd.then(@onSaveSuccess)
         destroyDfd.fail -> disablingDfd.reject()
         $('#content').disableWhileLoading disablingDfd
+      else
+        # .destroy() returns false if model isNew
+        @onDeleteSuccess()
 
     onDeleteSuccess: ->
       location.href = ENV.ASSIGNMENT_INDEX_URL

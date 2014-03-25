@@ -1,7 +1,8 @@
 define [
+  'jquery'
   'Backbone'
   'jst/wiki/WikiPageContent'
-], (Backbone, template) ->
+], ($, Backbone, template) ->
 
   class WikiPageContentView extends Backbone.View
     tagName: 'article'

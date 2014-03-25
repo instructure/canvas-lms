@@ -925,7 +925,7 @@ shared_examples_for "all selenium tests" do
     driver.execute_script("return $('.error_text:visible').filter(function(){ return $(this).offset().left >= 0 }).length > 0")
   end
 
-  append_after(:each) do
+  after(:each) do
     begin
       wait_for_ajax_requests
     rescue Selenium::WebDriver::Error::WebDriverError
@@ -934,13 +934,31 @@ shared_examples_for "all selenium tests" do
     truncate_all_tables unless self.use_transactional_fixtures
   end
 
+  unless CANVAS_RAILS2 || EncryptedCookieStore.respond_to?(:test_secret)
+    EncryptedCookieStore.class_eval do
+      cattr_accessor :test_secret
+
+      def call_with_test_secret(env)
+        @secret = self.class.test_secret
+        @encryption_key = unhex(@secret)
+        call_without_test_secret(env)
+      end
+      alias_method_chain :call, :test_secret
+    end
+  end
+
   append_before (:each) do
     #the driver sometimes gets in a hung state and this if almost always the first line of code to catch it
     begin
       tries ||= 3
       driver.manage.timeouts.implicit_wait = 3
       driver.manage.timeouts.script_timeout = 60
-      EncryptedCookieStore.any_instance.stubs(:secret).returns(SecureRandom.hex(64))
+      if CANVAS_RAILS2
+        EncryptedCookieStore.any_instance.stubs(:secret).returns(SecureRandom.hex(64))
+      else
+        EncryptedCookieStore.test_secret = SecureRandom.hex(64)
+      end
+
       enable_forgery_protection
     rescue
       if ENV['PARALLEL_EXECS'] != nil
@@ -973,7 +991,7 @@ shared_examples_for "all selenium tests" do
     end
   end
 
-  append_after(:each) do
+  after(:each) do
     clear_timers!
   end
 
@@ -1092,16 +1110,18 @@ shared_examples_for "in-process server selenium tests" do
       @db_connection = ActiveRecord::Base.connection
       @dj_connection = Delayed::Backend::ActiveRecord::Job.connection
 
-      # synchronize the execute method for a modicum of thread safety
+      # synchronize db connection methods for a modicum of thread safety
+      methods_to_sync = CANVAS_RAILS2 ? %w{execute} : %w{execute exec_cache exec_no_cache query}
       [@db_connection, @dj_connection].each do |conn|
-        if !conn.respond_to?(:execute_without_synchronization)
-          conn.class.class_eval do
-            def execute_with_synchronization(*args)
-              @mutex ||= Mutex.new
-              @mutex.synchronize { execute_without_synchronization(*args) }
-            end
-
-            alias_method_chain :execute, :synchronization
+        methods_to_sync.each do |method_name|
+          if conn.respond_to?(method_name, true) && !conn.respond_to?("#{method_name}_with_synchronization", true)
+            conn.class.class_eval <<-RUBY
+              def #{method_name}_with_synchronization(*args)
+                @mutex ||= Mutex.new
+                @mutex.synchronize { #{method_name}_without_synchronization(*args) }
+              end
+              alias_method_chain :#{method_name}, :synchronization
+            RUBY
           end
         end
       end

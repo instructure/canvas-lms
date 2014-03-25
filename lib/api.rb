@@ -17,6 +17,8 @@
 #
 
 module Api
+  include Api::Errors::ControllerMethods
+
   # find id in collection, by either id or sis_*_id
   # if the collection is over the users table, `self` is replaced by @current_user.id
   def api_find(collection, id, options = {account: nil})
@@ -541,8 +543,9 @@ module Api
     Canvas::Plugin.value_to_boolean(value)
   end
 
+  # takes a comma separated string, an array, or nil and returns an array
   def self.value_to_array(value)
-    value.is_a?(String) ? value.split(',') : value
+    value.is_a?(String) ? value.split(',') : (value || [])
   end
 
   # regex for shard-aware ID

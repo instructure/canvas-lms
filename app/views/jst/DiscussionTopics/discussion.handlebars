@@ -18,6 +18,14 @@
       <small>{{#t "last_post_date"}}Last post {{display_last_reply_at}}{{/t}}</small>
     </div>
 
+    <div class="discussion-date-available">
+      {{#with defaultDates}}
+        {{#unless closed}}
+          {{>[assignments/available_date_description]}}
+        {{/unless}}
+      {{/with}}
+    </div>
+
     <div class="discussion-due-date">
       {{#if assignment}}
         {{#if assignment.due_at}}

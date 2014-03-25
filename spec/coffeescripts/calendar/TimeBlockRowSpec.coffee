@@ -1,7 +1,8 @@
 require [
+  'jquery'
   'compiled/calendar/TimeBlockList'
   'compiled/calendar/TimeBlockRow'
-], (TimeBlockList, TimeBlockRow) ->
+], ($, TimeBlockList, TimeBlockRow) ->
 
   nextYear = new Date().getFullYear() + 1
   start    = new Date("2/3/#{nextYear} 5:32")

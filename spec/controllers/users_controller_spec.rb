@@ -102,7 +102,7 @@ describe UsersController do
       managed_pseudonym @student
       get 'delete', :user_id => @student.id
       flash[:error].should =~ /cannot delete a system-generated user/
-      response.redirected_to.should == user_profile_url(@student)
+      response.should redirect_to(user_profile_url(@student))
     end
 
     it "should succeed when the current user has enough permissions to delete any system-generated pseudonyms" do
@@ -139,15 +139,17 @@ describe UsersController do
       course_with_student_logged_in
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      response.redirected_to.should == root_url
+      response.should redirect_to(root_url)
       @student.reload.workflow_state.should == 'deleted'
     end
 
     it "should fail when the current user won't be able to delete managed pseudonyms" do
+      rescue_action_in_public! if CANVAS_RAILS2
       course_with_student_logged_in
       managed_pseudonym @student
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
-      lambda { post 'destroy', :id => @student.id }.should raise_error
+      post 'destroy', :id => @student.id
+      assert_status(500)
       @student.reload.workflow_state.should_not == 'deleted'
     end
 
@@ -158,7 +160,7 @@ describe UsersController do
       managed_pseudonym @student
       PseudonymSession.find(1).stubs(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      response.redirected_to.should == users_url
+      response.should redirect_to(users_url)
       @student.reload.workflow_state.should == 'deleted'
     end
 
@@ -168,7 +170,7 @@ describe UsersController do
       managed_pseudonym @admin
       PseudonymSession.find(1).expects(:destroy).returns(nil)
       post 'destroy', :id => @admin.id
-      response.redirected_to.should == root_url
+      response.should redirect_to(root_url)
       @admin.reload.workflow_state.should == 'deleted'
     end
 
@@ -176,7 +178,7 @@ describe UsersController do
       course_with_student_logged_in
       PseudonymSession.find(1).expects(:destroy).returns(nil)
       post 'destroy', :id => @student.id
-      response.redirected_to.should == root_url
+      response.should redirect_to(root_url)
       @student.reload.workflow_state.should == 'deleted'
     end
   end
@@ -446,8 +448,6 @@ describe UsersController do
       end
 
       it "should notify the user if a merge opportunity arises" do
-        notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
-
         account = Account.create!
         user_with_pseudonym(:account => account)
         account.add_user(@user)
@@ -457,10 +457,9 @@ describe UsersController do
         u = User.create! { |u| u.workflow_state = 'registered' }
         u.communication_channels.create!(:path => 'jacob@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
         u.pseudonyms.create!(:unique_id => 'jon@instructure.com')
+        CommunicationChannel.any_instance.expects(:send_merge_notification!)
         post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :send_confirmation => '0' }, :user => { :name => 'Jacob Fugal' }
         response.should be_success
-        p = Pseudonym.find_by_unique_id('jacob@instructure.com')
-        Message.where(:communication_channel_id => p.user.email_channel, :notification_id => notification).first.should_not be_nil
       end
 
       it "should not notify the user if the merge opportunity can't log in'" do

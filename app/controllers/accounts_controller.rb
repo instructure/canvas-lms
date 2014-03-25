@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,7 +16,75 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'csv'
+
 # @API Accounts
+#
+# API for accessing account data.
+#
+# @model Account
+#     {
+#       "id": "Account",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the ID of the Account object",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "name": {
+#           "description": "The display name of the account",
+#           "example": "Canvas Account",
+#           "type": "string"
+#         },
+#         "parent_account_id": {
+#           "description": "The account's parent ID, or null if this is the root account",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "root_account_id": {
+#           "description": "The ID of the root account, or null if this is the root account",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "default_storage_quota_mb": {
+#           "description": "The storage quota for the account in megabytes, if not otherwise specified",
+#           "example": 500,
+#           "type": "integer"
+#         },
+#         "default_user_storage_quota_mb": {
+#           "description": "The storage quota for a user in the account in megabytes, if not otherwise specified",
+#           "example": 50,
+#           "type": "integer"
+#         },
+#         "default_group_storage_quota_mb": {
+#           "description": "The storage quota for a group in the account in megabytes, if not otherwise specified",
+#           "example": 50,
+#           "type": "integer"
+#         },
+#         "default_time_zone": {
+#           "description": "The default time zone of the account. Allowed time zones are {http://www.iana.org/time-zones IANA time zones} or friendlier {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.",
+#           "example": "America/Denver",
+#           "type": "string"
+#         },
+#         "sis_account_id": {
+#           "description": "The account's identifier in the Student Information System. Only included if the user has permission to view SIS information.",
+#           "example": "123xyz",
+#           "type": "string"
+#         },
+#         "sis_import_id": {
+#           "description": "The id of the SIS import if created through SIS. Only included if the user has permission to manage SIS information.",
+#           "example": "12",
+#           "type": "integer"
+#         },
+#         "workflow_state": {
+#           "description": "The state of the account. Can be 'active' or 'deleted'.",
+#           "example": "active",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
 class AccountsController < ApplicationController
   before_filter :require_user, :only => [:index]
   before_filter :reject_student_view_student
@@ -30,6 +98,8 @@ class AccountsController < ApplicationController
   # List accounts that the current user can view or manage.  Typically,
   # students and even teachers will get an empty list in response, only
   # account admins can view the accounts that they are in.
+  #
+  # @returns [Account]
   def index
     respond_to do |format|
       format.html do
@@ -49,6 +119,8 @@ class AccountsController < ApplicationController
   # @API Get a single account
   # Retrieve information on an individual account, given by id or sis
   # sis_account_id.
+  #
+  # @returns Account
   def show
     return unless authorized_action(@account, @current_user, :read)
     respond_to do |format|
@@ -57,6 +129,7 @@ class AccountsController < ApplicationController
         js_env(:ACCOUNT_COURSES_PATH => account_courses_path(@account, :format => :json))
         load_course_right_side
         @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
+        Course.send(:preload_associations, @courses, :enrollment_term)
         build_course_stats
       end
       format.json { render :json => account_json(@account, @current_user, session, params[:includes] || []) }
@@ -74,6 +147,8 @@ class AccountsController < ApplicationController
   # @example_request
   #     curl https://<canvas>/api/v1/accounts/<account_id>/sub_accounts \
   #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Account]
   def sub_accounts
     return unless authorized_action(@account, @current_user, :read)
     recursive = value_to_boolean(params[:recursive])
@@ -131,7 +206,7 @@ class AccountsController < ApplicationController
   #   If present, only return courses that have at least one enrollment.
   #   Equivalent to 'with_enrollments=true'; retained for compatibility.
   #
-  # @argument state[] [Optional, "created"|"claimed"|"available"|"completed"|"deleted"]
+  # @argument state[] [Optional, "created"|"claimed"|"available"|"completed"|"deleted"|"all"]
   #   If set, only return courses that are in the given state(s). By default,
   #   all states but "deleted" are returned.
   #
@@ -146,6 +221,7 @@ class AccountsController < ApplicationController
     return unless authorized_action(@account, @current_user, :read)
 
     params[:state] ||= %w{created claimed available completed}
+    params[:state] = %w{created claimed available completed deleted} if Array(params[:state]).include?('all')
     if value_to_boolean(params[:published])
       params[:state] -= %w{created claimed completed deleted}
     elsif !params[:published].nil? && !value_to_boolean(params[:published])
@@ -288,17 +364,7 @@ class AccountsController < ApplicationController
   #     -d 'account[default_time_zone]=Mountain Time (US & Canada)' \
   #     -d 'account[default_storage_quota_mb]=450'
   #
-  # @example_response
-  #   {
-  #     "id": "1",
-  #     "name": "New account name",
-  #     "default_time_zone": "America/Denver",
-  #     "parent_account_id": null,
-  #     "root_account_id": null,
-  #     "default_storage_quota_mb": 500,
-  #     "default_user_storage_quota_mb": 50
-  #     "default_group_storage_quota_mb": 50
-  #   }
+  # @returns Account
   def update
     return update_api if api_request?
 
@@ -400,13 +466,19 @@ class AccountsController < ApplicationController
       if @available_reports
         @last_complete_reports = {}
         @last_reports = {}
-        @available_reports.keys.each do |report|
-          @last_complete_reports[report] = @account.account_reports.last_complete_of_type(report).first
-          @last_reports[report] = @account.account_reports.last_of_type(report).first
+        if AccountReport.connection.adapter_name == 'PostgreSQL'
+          scope = @account.account_reports.select("DISTINCT ON (report_type) account_reports.*").order(:report_type)
+          @last_complete_reports = scope.last_complete_of_type(@available_reports.keys, nil).includes(:attachment).index_by(&:report_type)
+          @last_reports = scope.last_of_type(@available_reports.keys, nil).index_by(&:report_type)
+        else
+          @available_reports.keys.each do |report|
+            @last_complete_reports[report] = @account.account_reports.last_complete_of_type(report).first
+            @last_reports[report] = @account.account_reports.last_of_type(report).first
+          end
         end
       end
       load_course_right_side
-      @account_users = @account.account_users
+      @account_users = @account.account_users.includes(:user)
       order_hash = {}
       @account.available_account_roles.each_with_index do |type, idx|
         order_hash[type] = idx

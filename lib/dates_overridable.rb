@@ -57,8 +57,8 @@ module DatesOverridable
   # flag (value true).
   #
   # TODO: only used externally by app/controllers/calendar_events_api_controller.rb,
-  # and internally by multiple_due_dates_apply_to?.  This would be a good
-  # candidate to refactor away.
+  # app/serializers/quiz_serializer.rb, and internally by
+  # multiple_due_dates_apply_to?.  This would be a good candidate to refactor away.
   def due_dates_for(user)
     as_student, as_admin = nil, nil
     return nil, nil if context.nil?
@@ -121,18 +121,16 @@ module DatesOverridable
       all_dates.delete_if {|d| d[:base] }
     end
 
-    all_dates = all_dates.sort_by do |date|
+    formatted_dates_hash(all_dates)
+  end
+
+  def formatted_dates_hash(dates)
+    dates = dates.sort_by do |date|
       due_at = date[:due_at]
       [ due_at.present? ? SortFirst : SortLast, due_at.presence || SortFirst ]
     end
 
-    all_dates.map do |dates|
-      dates.keep_if do |k, v|
-        [:due_at, :unlock_at, :lock_at, :title, :base].include?(k)
-      end
-    end
-
-    all_dates
+    dates.map { |h| h.slice(:due_at, :unlock_at, :lock_at, :title, :base) }
   end
 
   def observed_student_due_dates(user)

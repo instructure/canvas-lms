@@ -13,7 +13,6 @@ describe "assignments turn it in" do
 
   def change_turnitin_settings
     keep_trying_until {
-      f('#assignment_toggle_advanced_options').click
       f('#assignment_submission_type').should be_displayed
     }
     click_option('#assignment_submission_type', 'Online')

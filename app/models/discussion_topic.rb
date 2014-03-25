@@ -901,6 +901,12 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  def clear_locked_cache(user)
+    super
+    Rails.cache.delete(assignment.locked_cache_key(user)) if assignment
+    Rails.cache.delete(root_topic.locked_cache_key(user)) if root_topic
+  end
+
   def self.process_migration(data, migration)
     process_announcements_migration(Array(data['announcements']), migration)
     process_discussion_topics_migration(Array(data['discussion_topics']), migration)
@@ -924,7 +930,8 @@ class DiscussionTopic < ActiveRecord::Base
     discussion_topics.each do |topic|
       context = Group.where(context_id: migration.context.id,
         context_type: migration.context.class.to_s,
-        migration_id: topic['group_id']).first || migration.context
+        migration_id: topic['group_id']).first if topic['group_id']
+      context ||= migration.context
       next unless context && can_import_topic?(topic, migration)
       begin
         import_from_migration(topic.merge(topic_entries_to_import: topic_entries_to_import), context)
@@ -969,7 +976,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
     media_objects = media_object_ids.empty? ? [] : MediaObject.find_all_by_media_id(media_object_ids)
     media_objects += media_object_ids.map{|id| MediaObject.new(:media_id => id) }
-    media_objects = media_objects.once_per(&:media_id)
+    media_objects = media_objects.uniq(&:media_id)
     media_objects = media_objects.map do |media_object|
       if media_object.new_record?
         media_object.context = context

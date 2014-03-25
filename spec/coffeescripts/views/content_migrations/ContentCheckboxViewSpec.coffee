@@ -90,7 +90,7 @@ define [
       @server.respondWith('GET', @url, CheckboxHelper.serverResponse())
 
       CheckboxHelper.renderView(sub_items_url: @url)
-      CheckboxHelper.$carrot().trigger 'fetchCheckboxes'
+      CheckboxHelper.checkboxView.$el.trigger 'fetchCheckboxes'
 
       @server.respond()
       @clock.tick 15

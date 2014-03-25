@@ -23,7 +23,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   has_many :assessment_questions, :order => 'name, position, created_at'
   has_many :assessment_question_bank_users
   has_many :learning_outcome_alignments, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
-  has_many :quiz_groups
+  has_many :quiz_groups, class_name: 'Quizzes::QuizGroup'
   before_save :infer_defaults
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   

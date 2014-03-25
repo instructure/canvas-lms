@@ -47,7 +47,7 @@ describe CalendarEventsController do
       get 'show', :course_id => @course.id, :id => @event.id
       assigns[:event].should_not be_nil
       # make sure that the show.html.erb template is rendered
-      response.rendered[:template].should eql 'calendar_events/show.html.erb'
+      response.should render_template('calendar_events/show')
     end
 
   end

@@ -58,7 +58,7 @@ describe "quiz statistics" do
 
     def generate_item_analysis
       @quiz.reload
-      QuizStatistics::ItemAnalysis::Summary.new(@quiz)
+      Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz)
     end
 
     def answer_question

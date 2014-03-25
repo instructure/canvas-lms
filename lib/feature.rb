@@ -109,8 +109,22 @@ END
       description:  -> { I18n.t('outcome_gradebook_description', <<-END) },
 Outcome Gradebook provides a way for teachers to quickly view student and course
 progress on course learning outcomes. Outcomes are presented in a Gradebook-like
-format and student progress is displayed both as a numerical score and as mastered/
-near mastery/remedial.
+format and student progress is displayed both as a numerical score and as mastered/near
+mastery/remedial.
+END
+      applies_to: 'Course',
+      state: 'allowed',
+      root_opt_in: false,
+      development: false
+    },
+    'student_outcome_gradebook' =>
+    {
+      display_name: -> { I18n.t('features.student_outcome_gradebook', 'Student Outcome Gradebook') },
+      description:  -> { I18n.t('student_outcome_gradebook_description', <<-END) },
+Student Outcome Gradebook provides a way for students to quickly view progress
+on course learning outcomes. Outcomes are presented in a Gradebook-like
+format and progress is displayed both as a numerical score and as mastered/near
+mastery/remedial.
 END
       applies_to: 'Course',
       state: 'allowed',
@@ -122,6 +136,19 @@ END
       display_name: -> { I18n.t('features.screenreader_gradebook', 'Screenreader Gradebook') },
       description:  -> { I18n.t('screenreader_gradebook_description', <<-END) },
 Screenreader Gradebook provides an interface to gradebook that is designed for accessibility.
+END
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true,
+      development: true
+    },
+    'differentiated_assignments' =>
+    {
+      display_name: -> { I18n.t('features.differentiated_assignments', 'Differentiated Assignments') },
+      description:  -> { I18n.t('differentiated_assignments_description', <<-END) },
+Differentiated Assignments is a *beta* feature that enables choosing which section(s) an assignment applies to.
+Sections that are not given an assignment will not see it in their course content and their final grade will be
+calculated without those points.
 END
       applies_to: 'Course',
       state: 'hidden',

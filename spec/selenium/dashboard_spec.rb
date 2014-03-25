@@ -491,7 +491,11 @@ describe "dashboard" do
         driver.execute_script("$('#menu .customListOpen:first').click()")
         wait_for_ajaximations
 
-        UsersController.filter_chain.pop
+        if CANVAS_RAILS2
+          UsersController.filter_chain.pop
+        else
+          UsersController._process_action_callbacks.pop
+        end
 
         course_menu.should include_text('My Courses')
         course_menu.should include_text('View all courses')

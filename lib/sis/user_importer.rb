@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -94,13 +94,13 @@ module SIS
             pseudo ||= @root_account.pseudonyms.active.by_unique_id(email).first if email.present?
 
             status_is_active = !(status =~ /\Adeleted/i)
-
             if pseudo
               if pseudo.sis_user_id && pseudo.sis_user_id != user_id
                 @messages << "user #{pseudo.sis_user_id} has already claimed #{user_id}'s requested login information, skipping"
                 next
               end
-              if pseudo_by_login && (pseudo.unique_id != login_id || pseudo != pseudo_by_login && status_is_active)
+              if pseudo_by_login && (pseudo != pseudo_by_login && status_is_active ||
+                !(ActiveRecord::Base.connection.select_value("SELECT 1 WHERE #{Pseudonym.to_lower_column(Pseudonym.sanitize(pseudo.unique_id))}=#{Pseudonym.to_lower_column(Pseudonym.sanitize(login_id))}")))
                 @messages << "user #{pseudo_by_login.sis_user_id || pseudo_by_login.user_id} has already claimed #{user_id}'s requested login information, skipping"
                 next
               end

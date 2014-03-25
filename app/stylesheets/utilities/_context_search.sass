@@ -8,7 +8,7 @@
   li, li.active.expanded
     height: 32px
     cursor: pointer
-    a
+    a.toggle, a.expand
       position: relative
       padding: 1px
       background: transparent
@@ -28,11 +28,17 @@
         width: 16px
         height: 16px
         margin: 7px
-    img.avatar
+    .avatar
       width: 32px
       height: 32px
       float: left
-      margin-right: 6px
+      margin-right: 4px
+      margin-top: -2px
+    .avatar-box
+      width: 32px
+      height: 32px
+      float: left
+      margin-right: 4px
       background: transparent url(/images/messages/avatar-sprites.png) 0 0 no-repeat
     span.name, span.details
       white-space: nowrap
@@ -52,11 +58,11 @@
       padding-left: 6px
   li.toggleable a.toggle i
     background: transparent url(/images/messages/checkbox-sprite.png) no-repeat 0 0
-  li.context img.avatar, li.context.active.expanded img.avatar
+  li.context .avatar-box, li.context.active.expanded .avatar-box
     background-position: 0 -64px
-  li.user.active img.avatar
+  li.user.active .avatar-box
     background-position: 0 -32px
-  li.context.active img.avatar
+  li.context.active .avatar-box
     background-position: 0 -96px
   li.active
     a.expand
@@ -73,9 +79,9 @@
       color: #e1edf0
     a.toggle i
       background-position: 0 -48px
-    img.user.avatar
+    .user.avatar-box
       background-position: 0 -32px
-    img.context.avatar
+    .context.avatar-box
       background-position: 0 -96px
   li.toggleable.on a.toggle i
     background-position: 0 -32px
@@ -100,5 +106,5 @@
       display: block
     li.expanded, li.active.expanded
       padding-left: 11px
-      img.avatar
+      .avatar-box
         margin: 0 14px 0 0

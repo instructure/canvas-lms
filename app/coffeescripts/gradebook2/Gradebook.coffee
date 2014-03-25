@@ -18,6 +18,7 @@ define [
   'compiled/gradebook2/AssignmentGroupWeightsDialog'
   'compiled/gradebook2/SubmissionCell'
   'compiled/gradebook2/GradebookHeaderMenu'
+  'compiled/gradebook2/NumberCompare'
   'str/htmlEscape'
   'compiled/gradebook2/UploadDialog'
   'jst/gradebook2/column_header'
@@ -36,7 +37,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, UploadDialog, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
+], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
 
   class Gradebook
     columnWidths =
@@ -118,21 +119,24 @@ define [
           gotAllStudents.resolve()
 
       gotCustomColumns = @getCustomColumns()
-      $.when(gotCustomColumns, gotAllStudents).done @doSlickgridStuff
+      @gotAllData = $.when(gotCustomColumns, gotAllStudents)
 
       @allSubmissionsLoaded.done =>
         for c in @customColumns
           url = @options.custom_column_data_url.replace /:id/, c.id
           @getCustomColumnData(c.id)
 
-      @spinner = new Spinner()
+      @showCustomColumnDropdownOption()
+
+    onShow: ->
+      @spinner = new Spinner() unless @spinner
       $(@spinner.spin().el).css(
         opacity: 0.5
         top: '55px'
         left: '50%'
       ).addClass('use-css-transitions-for-show-hide').appendTo('#main')
-
-      @showCustomColumnDropdownOption()
+      $('#gradebook-grid-wrapper').hide()
+      @gotAllData.done @doSlickgridStuff
 
     getCustomColumns: ->
       # not going to support pagination because that would be crazy
@@ -213,9 +217,9 @@ define [
             mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
             sectionNames = $.toSentence(mySections.sort())
           student.display_name = rowStudentNameTemplate
-            avatar_image_url: student.avatar_url
+            avatar_url: student.avatar_url
             display_name: student.name
-            url: student.enrollment.grades.html_url
+            url: student.enrollment.grades.html_url+'#tab-assignments'
             sectionNames: sectionNames
             alreadyEscaped: true
 
@@ -666,7 +670,7 @@ define [
     onGridInit: () ->
       tooltipTexts = {}
       $(@spinner.el).remove()
-      $('#gradebook_wrapper').show()
+      $('#gradebook-grid-wrapper').show()
       @uid = @grid.getUID()
       @$grid = grid = $('#gradebook_grid')
         .fillWindowWithMe({
@@ -796,7 +800,7 @@ define [
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
       userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
-      @buildRows()
+      @buildRows() if @grid
 
     initHeader: =>
       @drawSectionSelectButton() if @sections_enabled
@@ -1070,9 +1074,7 @@ define [
           @sortRowsBy (a, b) ->
             aScore = a[data.sortCol.field]?.score
             bScore = b[data.sortCol.field]?.score
-            aScore = -99999999999 if not aScore and aScore != 0
-            bScore = -99999999999 if not bScore and bScore != 0
-            if data.sortAsc then aScore - bScore else bScore - aScore
+            numberCompare(aScore, bScore, data.sortAsc)
 
       @grid.onKeyDown.subscribe ->
         # TODO: start editing automatically when a number or letter is typed

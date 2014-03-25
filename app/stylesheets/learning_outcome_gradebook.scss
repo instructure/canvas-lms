@@ -78,7 +78,6 @@ $page-dark: #ebeff2;
   border-top: 1px solid $border-dark;
   box-sizing: border-box;
   color: $font-color;
-  min-height: 450px;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   padding-left: 22px;
@@ -91,7 +90,7 @@ $page-dark: #ebeff2;
 .outcome-gradebook-wrapper, .outcome-gradebook-sidebar {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
-  min-height: 450px;
+  height: 100%;
 }
 
 .outcome-gradebook-sidebar {
@@ -290,22 +289,24 @@ $page-dark: #ebeff2;
 
   .outcome-student-cell.slick-cell {
     font-size: 14px;
-  }
-
-  .avatar-circle {
-    border: 1px solid $border-light;
-    border-radius: 25px;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    float: left;
-    height: 25px;
-    margin: 5px 8px 0 -4px;
-    width: 25px;
+    line-height: 21px;
+    .student-section {
+      color: $font-color;
+    }
   }
 
   .outcome-student-cell-content {
     padding-left: 8px;
     margin-top: 1px;
+    .avatar {
+      width: 25px;
+      height: 25px;
+      margin-top: 3px;
+      margin-right: 4px;
+      float: left;
+      position: relative;
+      z-index: 1;
+    }
   }
 }
 

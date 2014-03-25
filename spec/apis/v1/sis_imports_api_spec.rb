@@ -407,7 +407,7 @@ describe SisImportsApiController, type: :request do
             :format => 'json', :account_id => @account.id.to_s,
             :import_type => 'instructure_csv' },
           {},
-          { 'content-type' => 'text/csv' })
+          { 'CONTENT_TYPE' => 'text/csv' })
     batch = SisBatch.last
     batch.attachment.filename.should == "sis_import.csv"
     batch.attachment.content_type.should == "text/csv"
@@ -420,7 +420,7 @@ describe SisImportsApiController, type: :request do
             :format => 'json', :account_id => @account.id.to_s,
             :import_type => 'instructure_csv' },
           {},
-          { 'content-type' => 'text/csv; charset=utf-8' })
+          { 'CONTENT_TYPE' => 'text/csv; charset=utf-8' })
     batch = SisBatch.last
     batch.attachment.filename.should == "sis_import.csv"
     batch.attachment.content_type.should == "text/csv"
@@ -433,7 +433,7 @@ describe SisImportsApiController, type: :request do
             :format => 'json', :account_id => @account.id.to_s,
             :import_type => 'instructure_csv' },
           {},
-          { 'content-type' => 'text/csv; charset=ISO-8859-1-Windows-3.0-Latin-1' })
+          { 'CONTENT_TYPE' => 'text/csv; charset=ISO-8859-1-Windows-3.0-Latin-1' })
     assert_status(400)
     SisBatch.count.should == 0
   end

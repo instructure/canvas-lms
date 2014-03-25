@@ -51,16 +51,18 @@ describe "Migration package importers" do
   end
   
   context "migrator" do
-    file = File.new(File.dirname(__FILE__) + "/../../fixtures/migration/whatthebackslash.zip")
-    cm = ContentMigration.create!(:context => course)
-    
-    mig = Canvas::Migration::Migrator.new({:archive_file => file, :content_migration => cm}, "test")
-    mig.unzip_archive
-    
-    cm.old_warnings_format.length.should == 1
-    cm.old_warnings_format.first.tap do |w|
-      w.first.should == "The content package unzipped successfully, but with a warning"
-      w.last.should =~ /backslashes as path separators/
+    it "should do something" do
+      file = File.new(File.dirname(__FILE__) + "/../../fixtures/migration/whatthebackslash.zip")
+      cm = ContentMigration.create!(:context => course)
+
+      mig = Canvas::Migration::Migrator.new({:archive_file => file, :content_migration => cm}, "test")
+      mig.unzip_archive
+
+      cm.old_warnings_format.length.should == 1
+      cm.old_warnings_format.first.tap do |w|
+        w.first.should == "The content package unzipped successfully, but with a warning"
+        w.last.should =~ /backslashes as path separators/
+      end
     end
   end
   

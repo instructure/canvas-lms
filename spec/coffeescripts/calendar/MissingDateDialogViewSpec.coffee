@@ -1,6 +1,7 @@
 define [
+  'jquery'
   'compiled/views/calendar/MissingDateDialogView'
-], (MissingDateDialogView) ->
+], ($, MissingDateDialogView) ->
 
   module 'MissingDateDialogView',
     setup: ->

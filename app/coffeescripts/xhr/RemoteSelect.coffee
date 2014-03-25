@@ -21,12 +21,13 @@
 # The first is a <select> element, the second is an options hash 
 
 define [
+  'jquery'
   'underscore'
   'compiled/class/cache'
   'vendor/spin'
   'jst/util/select/optgroups'
   'jst/util/select/options'
-], (_, cache, Spinner, optGroupTpl, optsTpl) ->
+], ($, _, cache, Spinner, optGroupTpl, optsTpl) ->
 
   class RemoteSelect
     ##

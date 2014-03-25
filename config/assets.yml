@@ -100,6 +100,9 @@ stylesheets:
   gradebook2:
     - public/stylesheets/compiled/message_students.css
     - public/stylesheets/compiled/gradebook2.css
+  screenreader_gradebook:
+    - public/stylesheets/compiled/message_students.css
+    - public/stylesheets/compiled/screenreader_gradebook.css
   attendance:
     - public/stylesheets/compiled/attendance.css
   quizzes:
@@ -115,6 +118,8 @@ stylesheets:
     - public/stylesheets/compiled/assignments.css
     - public/stylesheets/compiled/grading_standards.css
     - public/stylesheets/static/embed_content.css
+  assignments_edit:
+    - public/stylesheets/compiled/assignments_edit.css
   new_assignments:
     - public/stylesheets/compiled/new_assignments.css
   grading_standards:

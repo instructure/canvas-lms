@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'vendor/usher/usher'
   'Backbone'
   'jquery.ajaxJSON'
-], (Usher, Backbone, template) ->
+], ($, Usher, Backbone, template) ->
 
   ##
   # Base class for all tours. A tour with the ruby name

@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'csv'
+
 class GradebookImporter
   
   class NegativeId
@@ -72,7 +75,7 @@ class GradebookImporter
     @missing_students = @all_students.values - @students if @missing_student
 
     # look up existing score for everything that was provided
-    @original_submissions = @context.submissions.except(:includes).
+    @original_submissions = @context.submissions.
         select([:assignment_id, :user_id, :score]).
         where(:assignment_id => (@missing_assignment ? @all_assignments.values : @assignments),
               :user_id => (@missing_student ? @all_students.values : @students)).

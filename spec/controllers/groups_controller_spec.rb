@@ -189,7 +189,7 @@ describe GroupsController do
       @group = Account.default.groups.create!(:name => "some group")
       @user = user(:active_all => true)
       @group.add_user(@user)
-      delete 'remove_user', :group_id => @group.id, :user_id => @user.id
+      delete 'remove_user', :group_id => @group.id, :user_id => @user.id, :id => @user.id
       assert_unauthorized
     end
 
@@ -197,7 +197,7 @@ describe GroupsController do
       course_with_teacher_logged_in(:active_all => true)
       @group = @course.groups.create!(:name => "PG 1", :group_category => @category)
       @group.add_user(@user)
-      delete 'remove_user', :group_id => @group.id, :user_id => @user.id
+      delete 'remove_user', :group_id => @group.id, :user_id => @user.id, :id => @user.id
       response.should be_success
       @group.reload
       @group.users.should be_empty

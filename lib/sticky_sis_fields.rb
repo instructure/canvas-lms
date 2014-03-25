@@ -16,8 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'skip_callback'
-
 module StickySisFields
 
   module InstanceMethods
@@ -123,7 +121,7 @@ module StickySisFields
         if opts[:add_sis_stickiness] || opts[:clear_sis_stickiness]
           yield
         else
-          self.skip_callback(:set_sis_stickiness) do
+          self.suspend_callbacks(:set_sis_stickiness) do
             yield
           end
         end

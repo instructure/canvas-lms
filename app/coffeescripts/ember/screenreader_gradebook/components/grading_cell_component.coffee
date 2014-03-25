@@ -15,6 +15,7 @@ define [
     isPercent: Ember.computed.equal('assignment.grading_type', 'percent')
     isLetterGrade: Ember.computed.equal('assignment.grading_type', 'letter_grade')
     isPassFail: Ember.computed.equal('assignment.grading_type', 'pass_fail')
+    nilPointsPossible: Ember.computed.none('assignment.points_possible')
 
     passFailGrades: [
         {
@@ -36,6 +37,8 @@ define [
         I18n.t "out_of_with_score", "(%{score} out of %{points})",
           points: @assignment.points_possible
           score: @get('score')
+      else if @get('nilPointsPossible')
+        I18n.t "out_of_nil", "No points possible"
       else
         I18n.t "out_of", "(out of %{points})", points: @assignment.points_possible
     ).property('submission.score', 'assignment')

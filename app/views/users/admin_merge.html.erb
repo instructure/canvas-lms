@@ -103,33 +103,7 @@
           </td>
         </tr>
       </table>
-      <% js_block do %>
-        <script type="text/javascript">
-          jQuery(function(){
-            var $select_name   = $("#select_name"),
-                $selected_name = $("#selected_name");
-            $("#account_select").change(function() {
-              $(".account_search").hide();
-              $("#account_search_" + $(this).val()).show();
-            }).change();
-            $(".account_search .user_name").each(function() {
-              var $input = $(this);
-              $input.autocomplete({
-                minLength: 4,
-                source: $input.data('autocompleteSource')
-              });
-              $input.bind('autocompleteselect autocompletechange', function(event, ui){
-                if (ui.item) {
-                  $selected_name.text(ui.item.label);
-                  $select_name.show().attr('href', $.replaceTags($("#select_name").attr('rel'), 'id', ui.item.id));
-                } else {
-                  $select_name.hide();
-                }
-              });
-            });
-          });
-        </script>
-      <% end %>
+      <% js_bundle 'legacy/users_admin_merge' %>
     <% end %>
   <% end %>
 </div>

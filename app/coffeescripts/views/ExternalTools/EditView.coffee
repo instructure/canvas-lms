@@ -1,9 +1,10 @@
 define [
   'i18n!external_tools'
+  'jquery'
   'jst/ExternalTools/EditView'
   'compiled/views/ValidatedFormView'
   'compiled/jquery/fixDialogButtons'
-], (I18n, template, ValidatedFormView) ->
+], (I18n, $, template, ValidatedFormView) ->
 
   class EditView extends ValidatedFormView
     template: template

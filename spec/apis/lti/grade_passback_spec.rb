@@ -40,7 +40,7 @@ describe LtiApiController, type: :request do
     req.body = opts['body'] if opts['body']
     post "https://www.example.com#{req.path}",
       req.body,
-      { "content-type" => opts['content-type'], "Authorization" => req['Authorization'] }
+      { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
   end
 
   it "should respond 'unsupported' for any unknown xml body" do
@@ -81,7 +81,7 @@ describe LtiApiController, type: :request do
       result_data_xml += "\n</resultData>\n"
     end
     
-    body = %{
+    body = <<-XML
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
   <imsx_POXHeader>
@@ -104,12 +104,12 @@ describe LtiApiController, type: :request do
     </replaceResultRequest>
   </imsx_POXBody>
 </imsx_POXEnvelopeRequest>
-    }
+XML
   end
 
   def read_result(sourceid = nil)
     sourceid ||= BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @student)
-    body = %{
+    body = <<-XML
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
   <imsx_POXHeader>
@@ -128,12 +128,12 @@ describe LtiApiController, type: :request do
     </readResultRequest>
   </imsx_POXBody>
 </imsx_POXEnvelopeRequest>
-    }
+    XML
   end
 
   def delete_result(sourceid = nil)
     sourceid ||= BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @student)
-    body = %{
+    body = <<-XML
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
   <imsx_POXHeader>
@@ -152,7 +152,7 @@ describe LtiApiController, type: :request do
     </deleteResultRequest>
   </imsx_POXBody>
 </imsx_POXEnvelopeRequest>
-    }
+    XML
   end
 
   def check_failure(failure_type = 'unsupported')
@@ -386,7 +386,7 @@ to because the assignment has no points possible.
 
   it "should reject if the assignment is no longer a tool assignment" do
     @assignment.update_attributes(:submission_types => 'online_upload')
-    @assignment.external_tool_tag.destroy!
+    @assignment.reload.external_tool_tag.destroy!
     make_call('body' => replace_result('0.5'))
     check_failure
   end
@@ -422,7 +422,7 @@ to because the assignment has no points possible.
       req = consumer.create_signed_request(:post, opts['path'], nil, { :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'] }, opts['body'])
       post "https://www.example.com#{req.path}",
         req.body,
-        { 'content-type' => 'application/x-www-form-urlencoded', "Authorization" => req['Authorization'] }
+        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded', "HTTP_AUTHORIZATION" => req['Authorization'] }
     end
 
     it "should require the correct shared secret" do
@@ -587,7 +587,7 @@ to because the assignment has no points possible.
 
     it "should reject if the assignment is no longer a tool assignment" do
       @assignment.update_attributes(:submission_types => 'online_upload')
-      @assignment.external_tool_tag.destroy!
+      @assignment.reload.external_tool_tag.destroy!
       make_call('body' => update_result('0.5'))
       check_failure
     end

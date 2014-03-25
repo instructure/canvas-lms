@@ -1,5 +1,6 @@
 define [
   'i18n!conversations'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/views/conversations/SearchableSubmenuView'
@@ -7,7 +8,7 @@ define [
   'jquery.instructure_date_and_time'
   'use!vendor/bootstrap/bootstrap-dropdown'
   'use!vendor/bootstrap-select/bootstrap-select'
-], (I18n, _, {View, Collection}, SearchableSubmenuView, template) ->
+], (I18n, $, _, {View, Collection}, SearchableSubmenuView, template) ->
 
   class CourseSelectionView extends View
     events:

@@ -49,8 +49,111 @@ if CANVAS_RAILS2
   end
   alias :describe_without_rspec2_types :describe
   alias :describe :describe_with_rspec2_types
+
+  ActionController::TestProcess.module_eval do
+    def process_with_use_route_shim(action, parameters = nil, session = nil, flash = nil, http_method = 'GET')
+      if parameters.is_a?(Hash)
+        parameters.delete(:use_route)
+      end
+      process_without_use_route_shim(action, parameters, session, flash, http_method)
+    end
+    alias_method_chain :process, :use_route_shim
+  end
+
+  Spec::Rails::Example::ViewExampleGroup.class_eval do
+    alias :view :template
+
+    def content_for(name)
+      response.capture(name)
+    end
+  end
 else
   require 'rspec/rails'
+
+  ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
+
+  module RSpec::Rails
+    module ViewExampleGroup
+      module ExampleMethods
+        # normally in rspec 2, assigns returns a newly constructed hash
+        # which means that 'assigns[:key] = value' in view specs does nothing
+        def assigns
+          @assigns ||= super
+        end
+        alias :view_assigns :assigns
+
+        delegate :content_for, :to => :view
+
+        def render_with_helpers(*args)
+          controller_class = ("#{@controller.controller_path.camelize}Controller".constantize rescue nil) || ApplicationController
+
+          # this extends the controller's helper methods to the view
+          # however, these methods are delegated to the test controller
+          view.singleton_class.class_eval do
+            include controller_class._helpers unless included_modules.include?(controller_class._helpers)
+          end
+
+          # so create a "real_controller"
+          # and delegate the helper methods to it
+          @controller.singleton_class.class_eval do
+            attr_accessor :real_controller
+
+            controller_class._helper_methods.each do |helper|
+              delegate helper, :to => :real_controller
+            end
+          end
+
+          real_controller = controller_class.new
+          real_controller.instance_variable_set(:@_request, @controller.request)
+          @controller.real_controller = real_controller
+
+          # just calling "render 'path/to/view'" by default looks for a partial
+          if args.first && args.first.is_a?(String)
+            file = args.shift
+            args = [{:template => file}] + args
+          end
+          render_without_helpers(*args)
+        end
+        alias_method_chain :render, :helpers
+      end
+    end
+
+    module Matchers
+      class HaveTag
+        include ActionDispatch::Assertions::SelectorAssertions
+        include Test::Unit::Assertions
+
+        def initialize(expected)
+          @expected = expected
+        end
+
+        def matches?(html, &block)
+          @selected = [HTML::Document.new(html).root]
+          assert_select(*@expected, &block)
+          return !@failed
+        end
+
+        def assert(val, msg=nil)
+          unless !!val
+            @msg = msg
+            @failed = true
+          end
+        end
+
+        def failure_message_for_should
+          @msg
+        end
+
+        def failure_message_for_should_not
+          @msg
+        end
+      end
+
+      def have_tag(*args)
+        HaveTag.new(args)
+      end
+    end
+  end
 end
 require 'webrat'
 require 'mocha/api'
@@ -62,7 +165,7 @@ require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
 def pend_with_bullet
-  if Bullet.enable?
+  if defined?(Bullet) && Bullet.enable?
     pending ('PENDING: Bullet')
   end
 end
@@ -139,7 +242,7 @@ end
 truncate_all_tables
 
 # Make AR not puke if MySQL auto-commits the transaction
-class ActiveRecord::ConnectionAdapters::MysqlAdapter < ActiveRecord::ConnectionAdapters::AbstractAdapter
+module MysqlOutsideTransaction
   def outside_transaction?
     # MySQL ignores creation of savepoints outside of a transaction; so if we can create one
     # and then can't release it because it doesn't exist, we're not in a transaction
@@ -148,6 +251,14 @@ class ActiveRecord::ConnectionAdapters::MysqlAdapter < ActiveRecord::ConnectionA
   end
 end
 
+module ActiveRecord::ConnectionAdapters
+  if defined?(MysqlAdapter)
+    MysqlAdapter.send(:include, MysqlOutsideTransaction)
+  end
+  if defined?(Mysql2Adapter)
+    Mysql2Adapter.send(:include, MysqlOutsideTransaction)
+  end
+end
 
 # Be sure to actually test serializing things to non-existent caches,
 # but give Mocks a pass, since they won't exist in dev/prod
@@ -249,6 +360,8 @@ end
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures = false
   config.fixture_path = Rails.root+'spec/fixtures/'
+
+  ((config.debug = true) rescue nil) unless CANVAS_RAILS2
 
   config.include Webrat::Matchers, :type => :views
   config.include Helpers
@@ -448,6 +561,7 @@ end
     @course = opts[:course] || course(opts)
     @user = opts[:user] || @course.shard.activate { user(opts) }
     @enrollment = @course.enroll_user(@user, enrollment_type, opts)
+    @user.save!
     @enrollment.course = @course # set the reverse association
     if opts[:active_enrollment] || opts[:active_all]
       @enrollment.workflow_state = 'active'
@@ -482,6 +596,7 @@ end
   def student_in_section(section, opts={})
     user
     enrollment = section.course.enroll_user(@user, 'StudentEnrollment', :section => section)
+    @user.save!
     enrollment.workflow_state = 'active'
     enrollment.save!
     @user
@@ -640,7 +755,7 @@ end
                       "pseudonym_session[unique_id]" => username,
                       "pseudonym_session[password]" => password
     assert_response :success
-    path.should eql("/?login_success=1")
+    request.fullpath.should eql("/?login_success=1")
   end
 
   def assignment_quiz(questions, opts={})
@@ -915,11 +1030,15 @@ end
   def enable_forgery_protection(enable = true)
     old_value = ActionController::Base.allow_forgery_protection
     ActionController::Base.stubs(:allow_forgery_protection).returns(enable)
+    ActionController::Base.any_instance.stubs(:allow_forgery_protection).returns(enable)
 
     yield if block_given?
 
   ensure
-    ActionController::Base.stubs(:allow_forgery_protection).returns(old_value) if block_given?
+    if block_given?
+      ActionController::Base.stubs(:allow_forgery_protection).returns(old_value)
+      ActionController::Base.any_instance.stubs(:allow_forgery_protection).returns(old_value)
+    end
   end
 
   def start_test_http_server(requests=1)
@@ -1100,7 +1219,7 @@ end
   # an array of [k,v] params so that the order of the params can be
   # defined
   def send_multipart(url, post_params = {}, http_headers = {}, method = :post)
-    mp = Multipart::MultipartPost.new
+    mp = Multipart::Post.new
     query, headers = mp.prepare_query(post_params)
     send(method, url, query, headers.merge(http_headers))
   end
@@ -1148,7 +1267,11 @@ end
         compare_json(a, e)
       end
     else
-      actual.to_json.should == expected.to_json
+      if actual.is_a?(Fixnum) || actual.is_a?(Float)
+        actual.should == expected
+      else
+        actual.to_json.should == expected.to_json
+      end
     end
   end
 

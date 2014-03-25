@@ -138,7 +138,7 @@ describe PseudonymsController do
 
   describe "destroy" do
     it "should not destroy if for the wrong user" do
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       user_model
       @other_user = @user
       @other_pseudonym = @user.pseudonyms.create!(:unique_id => "test@test.com", :password => "password", :password_confirmation => "password")
@@ -184,7 +184,7 @@ describe PseudonymsController do
     end
 
     it "should not destroy if for the current user and it's a system-generated pseudonym" do
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       user_with_pseudonym(:active_all => true)
       user_session(@user, @pseudonym)
       @p2 = @user.pseudonyms.create!(:unique_id => "another_one@test.com",:password => 'password', :password_confirmation => 'password')
@@ -198,7 +198,7 @@ describe PseudonymsController do
     end
 
     it "should destroy if authorized to delete pseudonyms" do
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       user_with_pseudonym(:active_all => true)
       Account.site_admin.add_user(@user)
       user_session(@user, @pseudonym)

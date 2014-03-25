@@ -52,4 +52,20 @@ describe Progress do
       progress.reload.should be_failed
     end
   end
+
+  describe '.context_type' do
+    it 'returns the correct representation of a quiz statistics relation' do
+      stats = Quizzes::QuizStatistics.create!(report_type: 'student_analysis')
+
+      progress = Progress.create!(tag: "test", context: stats)
+      progress.context = stats
+      progress.save
+
+      progress.context_type.should == "Quizzes::QuizStatistics"
+
+      Progress.where(id: progress).update_all(context_type: 'QuizStatistics')
+
+      Progress.find(progress.id).context_type.should == 'Quizzes::QuizStatistics'
+    end
+  end
 end

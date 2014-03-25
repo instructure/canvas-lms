@@ -70,7 +70,7 @@
 <div id="questions" class="<%= 'uneditable' unless can_do(@bank, @current_user, :manage) %> question_editing brief question_bank">
   <% if @questions.total_pages <= 1 %>
     <% @questions.each do |question| %>
-      <%= render :partial => "quizzes/display_question", :object => question.data, :locals => {:question_bank_id => @bank.id, :editing => true, :asset_string => question.asset_string} %>
+      <%= render :partial => "quizzes/quizzes/display_question", :object => question.data, :locals => {:question_bank_id => @bank.id, :editing => true, :asset_string => question.asset_string} %>
     <% end %>
   <% else %>
     <%= render :partial => "question_teaser", :collection => @questions %>
@@ -85,10 +85,10 @@
 
 <%= render :partial => "question_teaser" %>
 <%= render :partial => "question_bank" %>
-<%= render :partial => "quizzes/display_question", :object => nil, :locals => {:question_bank_id => @bank.id, :editing => true} %>
-<%= render :partial => "quizzes/display_answer", :object => nil %>
-<%= render :partial => "quizzes/form_answer", :object => nil %>
-<%= render :partial => "quizzes/form_question", :object => nil, :locals => {:question_bank_id => @bank.id} %>
+<%= render :partial => "quizzes/quizzes/display_question", :object => nil, :locals => {:question_bank_id => @bank.id, :editing => true} %>
+<%= render :partial => "quizzes/quizzes/display_answer", :object => nil %>
+<%= render :partial => "quizzes/quizzes/form_answer", :object => nil %>
+<%= render :partial => "quizzes/quizzes/form_question", :object => nil, :locals => {:question_bank_id => @bank.id} %>
 <span class="question_bank_id" style="display: none;"><%= @bank.id %></span>
 <div style="display: none;">
   <div id="move_question_dialog">
@@ -200,4 +200,4 @@
 }
 </style>
 <% end %>
-<%= render :partial => 'quizzes/equations_help' %>
+<%= render :partial => 'quizzes/quizzes/equations_help' %>

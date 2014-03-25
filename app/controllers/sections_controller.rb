@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,30 +20,52 @@
 #
 # API for accessing section information.
 #
-# @object Section
+# @model Section
 #     {
-#       // The unique identifier for the section.
-#       "id": 1,
-#
-#       // The name of the section.
-#       "name": "Section A",
-#
-#       // The sis id of the section.
-#       // Ignored if the calling user does not have permission to manage SIS.
-#       "sis_section_id": null,
-#
-#       // The unique identifier for the course the section belongs to
-#       "course_id": 7,
-#
-#       // the start date for the section, if applicable
-#       "start_at": "2012-06-01T00:00:00-06:00",
-#
-#       // the end date for the section, if applicable
-#       "end_at": null,
-#
-#       // The unique identifier of the original course of a cross-listed section
-#       "nonxlist_course_id": null
+#       "id": "Section",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The unique identifier for the section.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "name": {
+#           "description": "The name of the section.",
+#           "example": "Section A",
+#           "type": "string"
+#         },
+#         "sis_section_id": {
+#           "description": "The sis id of the section. This field is only included if the user has permission to view SIS information.",
+#           "example": "s34643",
+#           "type": "string"
+#         },
+#         "sis_import_id": {
+#           "description": "The unique identifier for the SIS import if created through SIS. This field is only included if the user has permission to manage SIS information.",
+#           "example": 47,
+#           "type": "integer"
+#         },
+#         "course_id": {
+#           "description": "The unique identifier for the course the section belongs to",
+#           "example": 7,
+#           "type": "integer"
+#         },
+#         "start_at": {
+#           "description": "the start date for the section, if applicable",
+#           "example": "2012-06-01T00:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "end_at": {
+#           "description": "the end date for the section, if applicable",
+#           "type": "datetime"
+#         },
+#         "nonxlist_course_id": {
+#           "description": "The unique identifier of the original course of a cross-listed section",
+#           "type": "integer"
+#         }
+#       }
 #     }
+#
 class SectionsController < ApplicationController
   before_filter :require_context
   before_filter :require_section, :except => [:index, :create]
@@ -89,7 +111,7 @@ class SectionsController < ApplicationController
   #
   # @returns Section
   def create
-    if authorized_action(@context.course_sections.new, @current_user, :create)
+    if authorized_action(@context.course_sections.scoped.new, @current_user, :create)
       sis_section_id = params[:course_section].try(:delete, :sis_section_id)
       @section = @context.course_sections.build(params[:course_section])
       @section.sis_source_id = sis_section_id if api_request? && sis_section_id.present? && @context.root_account.grants_right?(@current_user, session, :manage_sis)
@@ -112,11 +134,7 @@ class SectionsController < ApplicationController
     case @context
       when Course
         section_id = params[:section_id] || params[:id]
-        if api_request?
-          @section = api_find(@context.active_course_sections, section_id)
-        else
-          @section = @context.active_course_sections.find(section_id)
-        end
+        @section = api_find(@context.active_course_sections, section_id)
       when CourseSection
         @section = @context
         raise ActiveRecord::RecordNotFound if @section.deleted? || @section.course.try(:deleted?)
@@ -147,11 +165,7 @@ class SectionsController < ApplicationController
   #
   # @returns Section
   def crosslist
-    if api_request?
-      @new_course = api_find(@section.root_account.all_courses.not_deleted, params[:new_course_id])
-    else
-      @new_course = @section.root_account.all_courses.not_deleted.find(params[:new_course_id])
-    end
+    @new_course = api_find(@section.root_account.all_courses.not_deleted, params[:new_course_id])
     if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage)
       @section.crosslist_to_course @new_course
       respond_to do |format|

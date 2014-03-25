@@ -1,9 +1,10 @@
 define [
+  'jquery'
   'use!vendor/backbone'
   'underscore'
   'str/htmlEscape'
   'compiled/util/mixin'
-], (Backbone, _, htmlEscape, mixin) ->
+], ($, Backbone, _, htmlEscape, mixin) ->
 
   ##
   # Extends Backbone.View on top of itself to be 100X more useful

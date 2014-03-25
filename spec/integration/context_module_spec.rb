@@ -112,7 +112,8 @@ describe ContextModule do
         @is_attachment = false
         course_with_student_logged_in(:active_all => true)
         @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
-    
+        @quiz.publish!
+
         # separate timestamps so touch_context will actually invalidate caches
         Timecop.freeze(4.seconds.ago) do
           @mod1 = @course.context_modules.create!(:name => "some module")
@@ -129,33 +130,44 @@ describe ContextModule do
           @mod2.save!
         end
 
+        # all modules, tags, etc need to be published
+        @mod1.should be_published
+        @mod2.should be_published
+        @quiz.should be_published
+        @tag1.should be_published
+
         yield '<div id="test_content">yay!</div>'
-        
+        @tag2.should be_published
+
+        # verify the second item is locked (doesn't display)
         get @test_url
         response.should be_success
         html = Nokogiri::HTML(response.body)
         html.css('#test_content').length.should == (@test_content_length || 0)
-    
-        p1 = @mod1.evaluate_for(@user, true, true)
-    
-        @quiz_submission = @quiz.generate_submission(@user)
+
+        # complete first module's requirements
+        p1 = @mod1.evaluate_for(@student, true, true)
+        p1.workflow_state.should == 'unlocked'
+
+        @quiz_submission = @quiz.generate_submission(@student)
         @quiz_submission.grade_submission
         @quiz_submission.workflow_state = 'completed'
         @quiz_submission.kept_score = 1
         @quiz_submission.save!
-    
+
         #emulate settings on progression if the user took the quiz but background jobs haven't run yet
         p1.requirements_met = [{:type=>"min_score", :min_score=>"1", :max_score=>nil, :id=>@quiz.id}]
         p1.save!
-    
+
+        # navigate to the second item (forcing update to progression)
         next_link = progress_by_item_link ? 
           "/courses/#{@course.id}/modules/items/#{@tag2.id}" :
           "/courses/#{@course.id}/modules/#{@mod2.id}/items/first"
-
         get next_link
         response.should be_redirect
         response.location.ends_with?(@test_url + "?module_item_id=#{@tag2.id}").should be_true
-            
+
+        # verify the second item is no accessible
         get @test_url
         response.should be_success
         html = Nokogiri::HTML(response.body)
@@ -173,6 +185,7 @@ describe ContextModule do
           asmnt = @course.assignments.create!(:title => 'assignment', :description => content)
           @test_url = "/courses/#{@course.id}/assignments/#{asmnt.id}"
           @tag2 = @mod2.add_item(:type => 'assignment', :id => asmnt.id)
+          @tag2.should be_published
         end
       end
     end
@@ -183,6 +196,7 @@ describe ContextModule do
           discussion = @course.discussion_topics.create!(:title => "topic", :message => content)
           @test_url = "/courses/#{@course.id}/discussion_topics/#{discussion.id}"
           @tag2 = @mod2.add_item(:type => 'discussion_topic', :id => discussion.id)
+          @tag2.should be_published
           @test_content_length = 1
         end
       end
@@ -192,8 +206,10 @@ describe ContextModule do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
           quiz = @course.quizzes.create!(:title => "quiz", :description => content)
+          quiz.publish!
           @test_url = "/courses/#{@course.id}/quizzes/#{quiz.id}"
           @tag2 = @mod2.add_item(:type => 'quiz', :id => quiz.id)
+          @tag2.should be_published
         end
       end
     end
@@ -204,6 +220,7 @@ describe ContextModule do
           page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => content)
           @test_url = "/courses/#{@course.id}/wiki/#{page.url}"
           @tag2 = @mod2.add_item(:type => 'wiki_page', :id => page.id)
+          @tag2.should be_published
         end
       end
     end
@@ -215,6 +232,7 @@ describe ContextModule do
           att = Attachment.create!(:filename => 'test.html', :display_name => "test.html", :uploaded_data => StringIO.new(content), :folder => Folder.unfiled_folder(@course), :context => @course)
           @test_url = "/courses/#{@course.id}/files/#{att.id}"
           @tag2 = @mod2.add_item(:type => 'attachment', :id => att.id)
+          @tag2.should be_published
         end
       end
     end

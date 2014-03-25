@@ -16,15 +16,7 @@ describe "jquery" do
     checkbox.click
     driver.execute_script("return $('#checkbox_test').attr('checked');").should be_nil
   end
-  
-  it "should handle $.attr(disabled, true/false) by toggling class too" do
-    get('/logout')
-    driver.execute_script("return $('button').attr('disabled', true).hasClass('disabled')").should be_true
-  end
-  it "should handle $.prop(disabled, true/false) by toggling class too" do
-    get('/logout')
-    driver.execute_script("return $('button').prop('disabled', true).hasClass('disabled')").should be_true
-  end
+
   it "should handle $.attr(method, post|delete|put|get) by adding a hidden input" do
     get('/logout')
     driver.execute_script("return $('form').attr('method', 'delete').attr('method')").downcase.should  == "post"

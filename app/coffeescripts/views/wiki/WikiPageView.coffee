@@ -1,4 +1,5 @@
 define [
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/str/splitAssetString'
@@ -8,7 +9,7 @@ define [
   'compiled/views/wiki/WikiPageReloadView'
   'compiled/views/PublishButtonView'
   'i18n!pages'
-], (_, Backbone, splitAssetString, template, StickyHeaderMixin, WikiPageDeleteDialog, WikiPageReloadView, PublishButtonView, I18n) ->
+], ($, _, Backbone, splitAssetString, template, StickyHeaderMixin, WikiPageDeleteDialog, WikiPageReloadView, PublishButtonView, I18n) ->
 
   class WikiPageView extends Backbone.View
 

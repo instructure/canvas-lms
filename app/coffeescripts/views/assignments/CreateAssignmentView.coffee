@@ -97,10 +97,13 @@ define [
 
     _validateTitle: (data, errors) ->
       frozenTitle = _.contains(@model.frozenAttributes(), "title")
-
       if !frozenTitle and (!data.name or $.trim(data.name.toString()).length == 0)
         errors["name"] = [
           message: I18n.t 'name_is_required', 'Name is required!'
+        ]
+      if $.trim(data.name.toString()).length > 255
+        errors["name"] = [
+          message: I18n.t 'name_too_long', 'Name is too long'
         ]
       errors
 

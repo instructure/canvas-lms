@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'compiled/util/round'
   'Backbone'
   'jst/assignments/AssignmentGroupWeights'
-], (round, Backbone, AssignmentGroupWeightsTemplate) ->
+], ($, round, Backbone, AssignmentGroupWeightsTemplate) ->
 
   class AssignmentGroupWeightsView extends Backbone.View
     template: AssignmentGroupWeightsTemplate

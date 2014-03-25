@@ -27,7 +27,7 @@ describe Attachment do
     end
 
     it "should require a context" do
-      lambda{attachment_model(:context => nil)}.should raise_error(ActiveRecord::RecordInvalid, /Validation failed: Context can't be blank/)
+      lambda{attachment_model(:context => nil)}.should raise_error(ActiveRecord::RecordInvalid, /Context/)
     end
 
   end
@@ -681,17 +681,17 @@ describe Attachment do
       @attachment.file_state = 'available'
       @attachment.save!
     end
-    
+
     it "should disassociate but not delete the associated media object" do
       @attachment.media_entry_id = '0_feedbeef'
       @attachment.save!
-      
+
       media_object = @course.media_objects.build :media_id => '0_feedbeef'
       media_object.attachment_id = @attachment.id
       media_object.save!
-      
+
       @attachment.destroy
-      
+
       media_object.reload
       media_object.should_not be_deleted
       media_object.attachment_id.should be_nil
@@ -1164,17 +1164,32 @@ describe Attachment do
       @root = attachment_model
       @child = attachment_model(:root_attachment => @root)
       @new_account = account_model
+
+      @old_object = mock('old object')
+      @new_object = mock('new object')
+      new_full_filename = @root.full_filename.sub(@root.namespace, @new_account.file_namespace)
+      @objects = { @root.full_filename => @old_object, new_full_filename => @new_object }
+      @root.bucket.stubs(:objects).returns(@objects)
     end
 
     it "should fail for non-root attachments" do
-      AWS::S3::S3Object.any_instance.expects(:rename_to).never
+      @old_object.expects(:copy_to).never
       expect { @child.change_namespace(@new_account.file_namespace) }.to raise_error
       @root.reload.namespace.should == @old_account.file_namespace
       @child.reload.namespace.should == @root.reload.namespace
     end
 
+    it "should not copy if the destination exists" do
+      @new_object.expects(:exists?).returns(true)
+      @old_object.expects(:copy_to).never
+      @root.change_namespace(@new_account.file_namespace)
+      @root.namespace.should == @new_account.file_namespace
+      @child.reload.namespace.should == @root.namespace
+    end
+
     it "should rename root attachments and update children" do
-      AWS::S3::S3Object.any_instance.expects(:rename_to).with(@root.full_filename.sub(@old_account.id.to_s, @new_account.id.to_s), anything)
+      @new_object.expects(:exists?).returns(false)
+      @old_object.expects(:copy_to).with(@root.full_filename.sub(@old_account.id.to_s, @new_account.id.to_s), anything)
       @root.change_namespace(@new_account.file_namespace)
       @root.namespace.should == @new_account.file_namespace
       @child.reload.namespace.should == @root.namespace
@@ -1601,6 +1616,21 @@ describe Attachment do
       @attachment.full_path.should == "/#{@attachment.display_name}"
     end
   end
+
+  describe '.context_type' do
+    it 'returns the correct representation of a quiz statistics relation' do
+      stats = Quizzes::QuizStatistics.create!(report_type: 'student_analysis')
+      attachment = attachment_obj_with_context(Account.default.default_enrollment_term)
+      attachment.context = stats
+      attachment.save
+      attachment.context_type.should == "Quizzes::QuizStatistics"
+
+      Attachment.where(id: attachment).update_all(context_type: 'QuizStatistics')
+
+      Attachment.find(attachment.id).context_type.should == 'Quizzes::QuizStatistics'
+    end
+  end
+
 end
 
 def processing_model

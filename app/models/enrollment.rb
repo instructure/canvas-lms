@@ -47,7 +47,7 @@ class Enrollment < ActiveRecord::Base
   after_save :update_cached_due_dates
 
   attr_accessor :already_enrolled
-  attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled
+  attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
 
   def self.active_student_conditions(prefix = 'enrollments')
     "(#{prefix}.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND #{prefix}.workflow_state = 'active')"
@@ -920,13 +920,13 @@ class Enrollment < ActiveRecord::Base
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it
     # doesn't already exist
-    self.uuid = AutoHandle.generate_securish_uuid if !read_attribute(:uuid)
+    self.uuid = CanvasUuid::Uuid.generate_securish_uuid if !read_attribute(:uuid)
   end
   protected :assign_uuid
 
   def uuid
     if !read_attribute(:uuid)
-      self.update_attribute(:uuid, AutoHandle.generate_securish_uuid)
+      self.update_attribute(:uuid, CanvasUuid::Uuid.generate_securish_uuid)
     end
     read_attribute(:uuid)
   end

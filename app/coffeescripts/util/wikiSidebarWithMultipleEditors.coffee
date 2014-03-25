@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'wikiSidebar'
   'tinymce.editor_box'
   'compiled/tinymce'
-], (wikiSidebar) ->
+], ($, wikiSidebar) ->
 
   $.subscribe 'editorBox/focus', ($editor) ->
     wikiSidebar.init() unless wikiSidebar.inited

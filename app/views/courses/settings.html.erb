@@ -33,7 +33,7 @@
       <li id="alerts_tab"><a href="#tab-alerts" id="tab-alerts-link"><%= t('tabs.alerts', %{Alerts}) %></a></li>
     <% end %>
     <% if can_do @context, @current_user, :manage_feature_flags %>
-      <li id="feature_flags_tab"><a href="#tab-features" id="tab-features-link"><%= t('tabs.feature_options', %{Feature options}) %></a></li>
+      <li id="feature_flags_tab"><a href="#tab-features" id="tab-features-link"><%= t('tabs.feature_options', %{Feature Options}) %></a></li>
     <% end %>
   </ul>
   <div id="tab-details">
@@ -367,7 +367,7 @@ TEXT
         </span>
         <div class="clear"></div>
       </li>
-      <% if can_do(@context.course_sections.new, @current_user, :create) %>
+      <% if can_do(@context.course_sections.scoped.new, @current_user, :create) %>
         <li>
           <%= form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
             <h3><%= f.blabel :name, :course_section_name, :en => "Add a New Section" %></h3>

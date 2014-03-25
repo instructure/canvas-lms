@@ -32,7 +32,7 @@ class Submission < ActiveRecord::Base
   has_many :hidden_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :hidden => true }
   has_many :assessment_requests, :as => :asset
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
-  belongs_to :quiz_submission
+  belongs_to :quiz_submission, :class_name => 'Quizzes::QuizSubmission'
   has_one :rubric_assessment, :as => :artifact, :conditions => {:assessment_type => "grading"}
   has_many :rubric_assessments, :as => :artifact
   has_many :attachment_associations, :as => :context
@@ -222,7 +222,7 @@ class Submission < ActiveRecord::Base
   end
 
   def update_quiz_submission
-    return true if @saved_by == :quiz_submission || !self.quiz_submission || self.score == self.quiz_submission.kept_score
+    return true if @saved_by == :quiz_submission || !self.quiz_submission_id || self.score == self.quiz_submission.kept_score
     self.quiz_submission.set_final_score(self.score)
     true
   end
@@ -477,7 +477,7 @@ class Submission < ActiveRecord::Base
       self.context_code = assignment.context_code
     end
     self.submitted_at ||= Time.now if self.has_submission? || (self.submission_type && !self.submission_type.empty?)
-    self.quiz_submission.reload if self.quiz_submission
+    self.quiz_submission.reload if self.quiz_submission_id
     self.workflow_state = 'unsubmitted' if self.submitted? && !self.has_submission?
     self.workflow_state = 'graded' if self.grade && self.score && self.grade_matches_current_submission
     self.workflow_state = 'pending_review' if self.submission_type == 'online_quiz' && self.quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
@@ -499,8 +499,8 @@ class Submission < ActiveRecord::Base
       raise "Can't create media submission without media object"
     end
     if self.submission_type == 'online_quiz'
-      self.quiz_submission ||= QuizSubmission.find_by_submission_id(self.id) rescue nil
-      self.quiz_submission ||= QuizSubmission.find_by_user_id_and_quiz_id(self.user_id, self.assignment.quiz.id) rescue nil
+      self.quiz_submission ||= Quizzes::QuizSubmission.find_by_submission_id(self.id) rescue nil
+      self.quiz_submission ||= Quizzes::QuizSubmission.find_by_user_id_and_quiz_id(self.user_id, self.assignment.quiz.id) rescue nil
     end
     @just_submitted = self.submitted? && self.submission_type && (self.new_record? || self.workflow_state_changed?)
     if score_changed?
@@ -685,7 +685,7 @@ class Submission < ActiveRecord::Base
 
   def update_if_pending
     @attachments = nil
-    if self.submission_type == 'online_quiz' && self.quiz_submission && self.score && self.score == self.quiz_submission.score
+    if self.submission_type == 'online_quiz' && self.quiz_submission_id && self.score && self.score == self.quiz_submission.score
       self.workflow_state = self.quiz_submission.complete? ? 'graded' : 'pending_review'
     end
     true
@@ -818,7 +818,7 @@ class Submission < ActiveRecord::Base
   end
 
   def add_comment(opts={})
-    opts.symbolize_keys!
+    opts = opts.symbolize_keys
     opts[:author] = opts.delete(:commenter) || opts.delete(:author) || self.user
     opts[:comment] = opts[:comment].try(:strip) || ""
     opts[:attachments] ||= opts.delete :comment_attachments
@@ -828,11 +828,6 @@ class Submission < ActiveRecord::Base
       elsif opts[:attachments].try(:length)
         opts[:comment] = t('attached_files_comment', "See attached files.")
       end
-    end
-    if self.group
-      # this is a bit icky, as it assumes the same opts hash will be passed in to each add_comment call for the group
-      # s|a bit icky|milk-curdling/vomit-inducing/baby-punching|
-      opts[:group_comment_id] ||= AutoHandle.generate_securish_uuid
     end
     self.save! if self.new_record?
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type,

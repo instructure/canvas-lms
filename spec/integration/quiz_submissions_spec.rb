@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe QuizSubmissionsController do
+describe Quizzes::QuizSubmissionsController do
   before do
     course_with_student_logged_in(:active_all => true)
     quiz_model(:course => @course)
