@@ -263,6 +263,8 @@ tr:
       section_text: "Bölüm: %{section};"
       start_text: "Başlangıç : %{start_at};"
       term_text: "Koşul : %{term_name};"
+    galen: 
+      no_term: "Dönem seçebilmek için belirli bir dönemin olması gereklidir"
     grades: 
       deleted: "Silinen Nesneleri İçer: doğru;"
     mississippi: 
@@ -544,6 +546,17 @@ tr:
       teachers_label: Öğretmenler
     course_add_failed_message: "Ders ekleme başarısız, lütfen tekrar deneyin"
     course_added_message: "%{course} başarıyla eklendi!"
+    course_enrollment_csv_description: 
+      account_reports: 
+        cedar_rapids: 
+          course_status: 
+            text: |-
+                Bu raporda belirli dönemde tüm derslerin durumu görülmektedir. 
+                Oluşturulan CSV dosyasında her ders bölümü için bir satır 
+                bulunmaktadır ve ders, ders durumu, dönem etkin başlama ve bitiş 
+                tarihleri, kayıt sayısı, bölüm ve hesap gösterilecektir
+          description: 
+            header: Örnek
     course_status_csv_description: 
       account_reports: 
         auburn: 
@@ -588,6 +601,14 @@ tr:
         edison: 
           outcome: 
             text: "outcome_id:"
+    cv_non_graded_data_csv_description: 
+      account_reports: 
+        galen: 
+          cv: 
+            non_graded: 
+              text: "Bu raporda kısa sınavlar, anketler ve tartışmalar için derse göre notlandırılmamış gönderiler gösterilmektedir."
+          description: 
+            header: Örnek
     cv_submission_data_csv_description: 
       account_reports: 
         galen: 
@@ -1113,20 +1134,6 @@ tr:
             header: Örnek
           student_login: 
             text: "Bu raporda belirli dönemde belirli dersler ya da tüm derslerde kayıtlı tüm öğrenciler görülmektedir. Oluşturulan csv dosyasında her öğrenci kaydı için bir satır bulunmaktadır."
-    student_login_csv_description: 
-      account_reports: 
-        bucks: 
-          description: 
-            header: Örnek
-          student_login: 
-            text: "Bu raporda belirli bir tarihten beri oturum açmamış öğrenciler görülmektedir."
-    student_login_csv_parameters: 
-      account_reports: 
-        bucks: 
-          login: 
-            check_box: "Giriş yapmamış kullanıcıları içersin mi?"
-          parameters: 
-            note: "Bu rapor canvastaki en son etkinlikten ziyade kullanıcının en son oturum açtığı tarihi yansıtmaktadır."
     student_submissions_csv_description: 
       account_reports: 
         vilas: 
@@ -1497,7 +1504,7 @@ tr:
     no_one_scored_lower: "%{min}'den daha düşük puan yok"
     scores_higher_than_the_average: "%{average} ortalamasından büyük puanlar"
     scores_lower_than_the_average: "%{average} ortalamasından düşük puanlar"
-    total_submitted: "Toplam Gönderilen:"
+    total_graded_submissions: "Toplam Notlandırılmış Gönderiler:"
   assignment_group: 
     default_name: Ödevler
     default_title: Ödevler
@@ -1668,6 +1675,10 @@ tr:
       assignment_groups_wrapper: "(%{number_of_groups} içinde)"
       links: 
         add_assignment_group: "Ödev Grubu Ekle"
+    available_date_description: 
+      available_until: "Şu zamana kadar kullanılabilir"
+      closed: Kapalı
+      not_available_until: "Şu zamana kadar kullanılamaz"
     buttons: 
       add_group: "Grup Ekle"
       delete_group: "Grubu Sil"
@@ -1709,11 +1720,7 @@ tr:
     create_new_crumb: "Yeni oluştur"
     date_available_column_view: 
       available: Mevcut
-      available_on: Kullanılabilir
-      available_until: "Şu zamana kadar kullanılabilir"
-      closed: Kapalı
       multiple_dates: "Çoklu Tarih"
-      not_available_until: "Şu zamana kadar kullanılamaz"
     date_due_column_view: 
       due: Bitiş
       due_date: Bitiş
@@ -1757,6 +1764,7 @@ tr:
       buttons: 
         not_published: Yayınlanmadı
         published: Yayınlandı
+      manage: Yönet
       titles: 
         delete: Sil
     edit_view: 
@@ -2052,7 +2060,7 @@ tr:
         turnitin_enabled: "Turnitin Gönderilerini Etkinleştir"
       labels: 
         allow_file_uploads: "Dosya Yüklemeleri"
-        allow_media_recordings: "Medya Dosyası Kayıtları"
+        allow_media_recordings: "Medya Kayıtları"
         allow_text_entry: "Metin Girişi"
         allow_url: "Web Sayfası URL"
         allowed_extensions: "İzin Verilen Dosya Uzantıları"
@@ -2246,7 +2254,7 @@ tr:
     no_credentials_found: "%{user_name} kullanıcı ismi için kimlik bilgileri bulunamadı"
     no_credentials_given: "%{course_identifier} dersi için belirlenmiş kullanıcı adı yoktu"
     no_lcid_found: "Satır için belirlenmiş bb_lcid yoktu"
-    queue_error: "Göçlerin sıraya dizilmesi sırasında hata meydana geldi."
+    queue_error: "Taşıma işlemlerinin sıraya konması sırasında hata meydana geldi."
   bulk_course_migrations: 
     bulk_course_migration: 
       exporting: "Blackboard'tan dışarı aktar"
@@ -2256,9 +2264,9 @@ tr:
       migration_cancelled_on: "%{date} tarihinde iptal edildi"
       migration_failed_on: "%{date} tarihinde başarısız"
       migration_finished_on: "%{date} tarihinde tamamlandı"
-      migration_queueing: "Ders göç işlemi çalıştırmak üzere sıraya alındı."
-      migration_started_at: "Toplu göç %{time}'ta başladı"
-      migration_waiting: "Toplu göç çalıştırmak için bekliyor."
+      migration_queueing: "Ders taşıma işlemi çalıştırılmak üzere sıraya alındı."
+      migration_started_at: "Toplu taşıma %{time}'ta başladı"
+      migration_waiting: "Toplu taşıma işlemi çalıştırmak için bekliyor."
       see_results: "Sonuçları görüntüle"
       show_warnings: "Uyarıları görüntüle"
       waiting_to_export: "Blackboard'un dışarı aktarımı bekleniyor"
@@ -2274,7 +2282,7 @@ tr:
       credential_description: "Bu araç bir Blackboard Vista/CE sisteminden aynı anda çoklu ders aktarmanıza yardım eder. Derslerinizi aktarmak için Blackboard sisteminizle ilgili bilgileri girip verilen CSV şablonuna Canvas ders belirleyicilerini girin."
       csv_description: "Diğer sütunlar eklenebilir fakat bunlar yok sayılacak. \"ece\" kullanıcı adı için hesabındaki 3 ders için basit bir CSV örneği:"
       csv_template: "CSV Yapısı"
-      current_migration_batch: "Varolan Göç Serisi"
+      current_migration_batch: "Mevcut Taşıma Serisi"
       description: Açıklama
       errors: 
         choose_file: "Yüklenecek bir .csv dosyasını seçmelisiniz"
@@ -2285,15 +2293,15 @@ tr:
         user_name: "Kullanıcı Adı"
       lcid_description: "Blackboard sistemindeki dersin lcid'i."
       login_credentials: "Blackboard oturum açma kimlik bilgileri"
-      page_title: "Toplu Ders Göçü"
-      previous_migration_batches: "Önceki Göç Serileri"
+      page_title: "Toplu Ders Taşıma"
+      previous_migration_batches: "Önceki Taşıma Serileri"
       school: Okul
       school_not_supported: "Lütfen okulunuzun destek almasında yardım için yöneticinizin Instructure ile iletişime geçmesini sağlayın."
       sis_id_description: "İçine aktarılacak canvas dersinin SIS ID'si."
-      upload_migration_csv: "CSV Göçü Dosyası Yükle"
+      upload_migration_csv: "CSV Taşıma Dosyası Yükle"
       user_name: "Kullanıcı Adı"
       user_name_description: "Satır için derse öğretmen/tasarımcı erişimi olan kullanıcının kullanıcı adı. Bu isim yukarıdaki Blackboard oturum açma bilgilerinde listelenen isimlerden biri olmalı."
-    only_one_bulk_migration: "Tek seferde sadece bir toplu ders göçü çalıştırılabilir."
+    only_one_bulk_migration: "Tek seferde sadece bir toplu ders taşıma çalıştırılabilir."
   button: 
     submit_assignment: "Ödevi Gönder"
   buttons: 
@@ -3141,19 +3149,22 @@ tr:
     blackboard_export: 
       options: Seçenekler
     canvas_export: 
+      content: İçerik
       options: Seçenekler
     common_cartridge: 
+      content: İçerik
       options: Seçenekler
     content_migration: "İçerik Geçişi"
     content_migration_issue: 
       error_report: "Hata Raporu"
     copy_course: 
+      content: İçerik
       options: Seçenekler
     course_list_error: "Dersler yüklenemiyor. Internete bağlı mısınız?"
     d2_l_export: 
       options: Seçenekler
     file_required: "İçeriğini aktarmak istediğiniz dosyayı seçmelisiniz"
-    file_too_large: "Göçünüz %{file_size}'ı aşamaz"
+    file_too_large: "Taşıma işleminiz %{file_size}'ı aşamaz"
     hide_issues: "Sorunları Gizle"
     index: 
       page_title: "İçeriği İçeri Aktar"
@@ -3166,6 +3177,7 @@ tr:
       import_from_label: "İçerik Tipi"
       import_migration: "İçeri Aktar"
     moodle_zip: 
+      content: İçerik
       options: Seçenekler
     must_upload_file: "Dosya yükleme veya URL gereklidir"
     no_content_selected: "İçeri aktarılacak hiçbir içerik seçmediniz."
@@ -3241,7 +3253,8 @@ tr:
         question_bank_title: "Yeni soru bankası ismi"
         select_question_bank: "Soru bankası seçiniz"
       select_content_checkbox: 
-        select_migration_label: "Göç etmek istediğiniz içeriği seçiniz"
+        select_all_content: "Tüm içerik"
+        select_specific_content: "Belirli bir içerik seçin"
     upload_warning: "Başka bir sayfaya yönlenmenizde bu yükleme işlemini sonlandıracaktır."
     uploading: Yükleniyor...
     web_ct: 
@@ -3892,7 +3905,6 @@ tr:
     no_course: "Ders yok"
     select_course: "Ders seçiniz"
   conversation_message: 
-    subject: "Özel mesaj, %{timestamp}"
     users_added: 
       one: "%{user}, %{current_user} tarafından tartışmaya eklendi"
       other: "%{list_of_users}, %{current_user} tarafından tartışmaya eklendi"
@@ -4025,6 +4037,7 @@ tr:
       forward: Yönlendir
       help: Yardım
       inbox: "Gelen Kutusu"
+      mark_as_read: "Okundu olarak işaretle"
       mark_as_unread: "Okunmadı olarak işaretle"
       more_options: "Daha fazla seçenek"
       reply: Yanıtla
@@ -4074,7 +4087,7 @@ tr:
       media_comment: "Çoklu Ortam Yorumu"
       titles: 
         add_attachment: "Bir dosya ekle"
-        media_comment: "Medya kayıdı yorumları"
+        media_comment: "Kaydedilmiş medya yorumları"
         record_media_comment: "Ses veya video yorumu kaydet"
         remove_media_comment: "Medya yorumunu sil"
     message_form_dialog: 
@@ -4099,7 +4112,7 @@ tr:
       search_names_groups_courses: "İsim, grup ve derse göre ara"
       send_individual_messages: "Bireysel mesajlar gönderin"
       titles: 
-        media_comment: "Medya kayıdı yorumları"
+        media_comment: "Kaydedilmiş medya yorumu"
         record_media_comment: "Ses veya video yorumu kaydet"
         remove_media_comment: "Medya yorumunu sil"
     message_item: 
@@ -4216,6 +4229,7 @@ tr:
     default_short_name: Ders-101
     errors: 
       sis_in_use: "SIS ID \"%{sis_id}\" zaten kullanılıyor"
+    failed_import_media_objects: "Ortam nesnelerinin içe aktarımı başarısız"
     file_copy_error: "\"%{name}\" dosyası kopyalanamıyor"
     grade_export_types: 
       instructure_csv: "Instructure formatında CSV"
@@ -4449,14 +4463,16 @@ tr:
     copy: 
       buttons: 
         create_course: "Dersi Oluştur"
-      choose_content: "Kopyalamak istediğiniz öğeleri seçin"
       conclude_at: "Bitiş Tarihi"
+      content_label: İçerik
       course_code: "Ders Kodu"
       details: "Lütfen yeni dersin detaylarını girin."
       enrollment_term_id: Dönem
       headings: 
         copy_course: "%{course} Kopyala"
       name: İsim
+      select_all_content: "Tüm içerik"
+      select_specific_content: "Belirli bir içerik seçin"
       start_at: "Başlangıç Tarihi"
       titles: 
         copy_course: "Dersi Kopyala"
@@ -5415,13 +5431,13 @@ tr:
       your_search_did_not_match_any_discussion_topics: "Aramanızla eşleşen tartışma başlıkları bulunamadı."
     new_and_total_badge: 
       reply_count_tooltip: 
-        one: "1 cevap"
-        other: "%{count} cevap"
-        zero: "Cevap yok"
+        one: "1 yanıt."
+        other: "%{count} yanıt."
+        zero: "Yanıt yok."
       unread_count_tooltip: 
-        one: "%{count} okunmamış cevap"
-        other: "%{count} okunmamış cevap"
-        zero: "Okunmamış cevap yok"
+        one: "%{count} okunmamış cevap."
+        other: "%{count} okunmamış cevap."
+        zero: "Okunmamış yanıt yok."
     page_nav: 
       Page: Sayfa
       current_page: Güncel
@@ -5647,7 +5663,7 @@ tr:
     titles: 
       font_size: "Yazı büyüklüğü, aşağı tuşa basın ve seçin"
       formatting: "Format, aşağı tuşa basın ve seçin"
-      rte_help: "Zengin Metin Alanı. ALT+F10 tuşlarıyla araç çubuğuna; ALT+0 tuşlarıyla yardıma ulaş."
+      rte_help: "Zengin Metin Alanı. Araç çubuğu için ALT+F10 tuşlarına; yardım için ALT+F8 tuşlarına basın."
   email: 
     default_from_name: "Instructure Canvas"
   enrollment: 
@@ -5962,6 +5978,7 @@ tr:
     registration_incomplete: "Bu sayfayı görebilmek için e-posta adresinizi onaylamalısınız"
     required: Zorunlu
     sis_id_in_use: "SIS ID \"%{sis_id}\" zaten kullanılıyor"
+    unsaved_changes: "Kaydedilmemiş değişiklikler var."
   external_content: 
     cancel: 
       canceling: "İptal ediliyor..."
@@ -6668,6 +6685,7 @@ tr:
     leaving_id_will_match_better_can_add_new_assignment: "ID'yi olduğu gibi bırakmak (bu durumda \"(581)\" bölümü) daha iyi eşleştirme sağlayacaktır. Doğaçlama oluşturulan yeni bir ödev de ekleyebilirsiniz."
     new_assignment_example: "Yeni Ödev"
     optional_ignored: "İsteğe bağlı, yok sayıldı."
+    screenreader_csv_explainer: "CSV Dosyamda neler olmalı? Yükleyeceğiniz dosyada şu sütunlar olmalı: \"Student\", \"ID\" ve \"Existing Assignment (#)\". Öğrenci sütununda her öğrencinin adı Soyadı, Adı şeklinde olmalıdır. Örneğin, ''Aydemir, Ece''. Varolan ödev sütunlarında ise ödev adı ve sonrasında parantez içinde ödev ID'si olmalıdır. Örneğin, Bölüm 01 Ödev (201)''. SIS kullanıyorsanız, şu sütunları da dahil edin: \"SIS User ID\" ve \"SIS Login ID\" Yeni ödev oluşturmak isterseniz, ödevin adının olduğu yeni bir sütun ekleyin. Örneğin, ''Türevler Çalışma Sayfası''. Şu sütunlar isteğe bağlıdır: \"Section\", \"Current Score\", \"Final Score\"."
     titles: 
       upload_form: "Yüklenecek bir CSV dosyası seçin"
     what_should_csv_look_like: "CSV dosyası nasıl olmalı?"
@@ -6820,7 +6838,7 @@ tr:
         send_comment: "Öğrenciye Yorum Gönder"
         sort_columns: "Not Defteri Sütunlarını Sırala"
         sort_rows: "Not Defteri Satırlarını Sırala"
-        total_submitted: "Toplam Gönderilen"
+        total_grade_subs: "Toplam Notlandırılmış Gönderiler"
       links: 
         add_assignments: "Ödev Ekle"
         add_students: "Derse Öğrenci Ekle"
@@ -7799,6 +7817,8 @@ tr:
       save_failed: "Kaydetme başarısız. Lütfen bu uyarıyı kapatıp tekrar deneyin."
       save_failed_try_again: "Girişin kaydedilmesi başarısız. Lütfen tekrar deneyin."
       upload_failed: "Dosya yükleme başarısız:"
+    file_size_error: "%{file} boyutu, izin verilen maksimum %{max} boyuttan büyük."
+    file_type_error: "%{file} dosyası kabul edilebilir %{type} bir dosya türü değil."
     links: 
       minimize_embedded_kaltura_content: "Bölümü içeriği küçült"
     loading: "Medya yükleniyor..."
@@ -9818,7 +9838,7 @@ tr:
     sure_you_want_to_mute: "Bu ödevi askıya almak istediğinize emin misiniz? Bu ödev askıdayken öğenciler yeni bildirim almayacak ve şunları göremeyecekler:"
   name: "Academic Benchmark İçeri Aktarıcı"
   new_facebook_message: "Canvas'tan yeni bir mesajınız var"
-  no_migration_file: "İçerik göçü için dosya gereklidir."
+  no_migration_file: "İçerik taşıma için dosya gereklidir."
   not_a_number: "pozitif bir sayı olmalı"
   not_applicable: Yok
   notification: 
@@ -9921,9 +9941,9 @@ tr:
       group_membership_accepted: "Grup Üyeliğiniz Onaylandı"
       group_membership_rejected: "Grup Üyeliğiniz Reddedildi"
       merge_email_communication_channel: "E-Posta İletişim Kanalı Birleştirme"
-      migration_export_ready: "Göç İçin Dışarı Aktarmaya Hazır"
-      migration_import_failed: "Göç İçin İçeri Aktarma Başarısız"
-      migration_import_finished: "Göç İçin İçeri Aktarma Tamamlandı"
+      migration_export_ready: "Taşımak için Dışa Aktarım Hazır"
+      migration_import_failed: "Taşımak için İçe Aktarım Başarısız"
+      migration_import_finished: "Taşımak için İçeri Aktarım Tamamlandı"
       new_account_user: "Yeni Kullanıcı Hesabı"
       new_announcement: "Yeni Duyuru"
       new_context_group_membership: "Yeni Bağlam Grup Üyeliği"
@@ -10570,12 +10590,11 @@ tr:
       titles: 
         delete_this_token: "Bu token'ı sil"
     buttons: 
-      add_file: "Dosya Ekle"
-      adding_file: "Dosya Ekleniyor..."
       generate_token: "Token Üret"
       generating_token: "Token Üretiliyor..."
       regenerate_token: "Yeniden Token Üret"
       regenerating_token: "Yeniden Token Üretiliyor"
+      select_avatar: "Avatar Seçiniz"
       select_image: "Resim Seçiniz"
       selecting_image: "Görsel Seçildi..."
     communication: 
@@ -10599,7 +10618,6 @@ tr:
       default_email_option: "[E-Posta Seçin]"
       new_email_option: "Yeni Eposta Adresi"
     errors: 
-      adding_file_failed: "Dosya Eklemede Hata"
       confirmation_failed: "Onaylama başarısız. Lütfen tekrar deneyin."
       generating_token_failed: "Token Üretiminde Hata"
       invalid_old_passowrd: "%{pseudonym} oturumu için geçersiz eski şifre"
@@ -10775,7 +10793,6 @@ tr:
       contact_not_confirmed: "İletişim onaylanmadı. Daha fazla ayrıntı için adrese tıklayınız"
       email_not_confirmed: "Bu eposta adresi onaylanmadı. Daha fazla ayrıntı için adrese tıklayın"
       register_communication: "İletişim Kaydı"
-      select_profile_pic: "Profil Resmi Seçiniz"
       unconfirmed_click_to_confirm: "Onaylanmadı. Onaylamak için tıklayınız"
     token_never_expires: asla
     twitter_select: 
@@ -10831,13 +10848,13 @@ tr:
     you_have_no_services: "Herhangi bir hizmet kayıtlı değil, ayarlar sayfasından ekleyebilirsiniz."
   profiles: 
     avatar_dialog: 
-      butons: 
-        add_picture_file: "Dosya Ekle"
-      headers: 
-        loading_images: "Görseller yükleniyor..."
-      links: 
-        upload_new_image: "Yeni bir resim yükle"
-      profile_pictures: "Profil fotoğrafı yapmak istediğiniz resimi seçin veya yeni bir resim yükleyin:"
+      from_gravatar: "Gravatar'dan al"
+      take_a_picture: "Bilgisayardan Fotoğraf Çek"
+      upload_a_picture: "Fotoğraf yükle"
+    gravatar_view: 
+      button: 
+        preview: "Ön İzleme"
+      enter_gravatar_email_below: "*Gravatar* eposta adresinizi aşağıya girin"
     notification_preferences: 
       captions: 
         notification_preferences: "%{name} bildirim olayları ve ayarları"
@@ -10846,6 +10863,12 @@ tr:
         ok: Tamam
         privacy_notice: "Not: Bazı bildirimler gizli bilgiler içerebilir. Bildirimleri kurum tarafından sağlanan bir adres yerine başka bir eposta adresi üzerinden almayı seçmek önemli Canvas ders ve grup bilgilerini kurumsal sistem dışına gönderebilir."
         privacy_notice_title: "Gizlilik Bildirimi"
+    take_picture_view: 
+      retry: Tekrar
+      take_snapshot: "Ekranı Yakala"
+    upload_file_view: 
+      crop_instructions: "Resmi kırpmak için seçimi sürükleyin ve aşağıdaki ''Resmi Seç'' butonuna tıklayın."
+      select_a_photo: "bir fotoğraf seçiniz"
   pseudonym: 
     errors: 
       bad_credentials: "Geçersiz kullanıcı adı ve şifre"
@@ -10995,7 +11018,7 @@ tr:
   qti_display: QTI
   qti_file_description: "QTI .zip dosyası"
   qti_name: "QTI Dönüştürücü"
-  qualified_locale: tr-TR
+  qualified_locale: en-US
   question_answered: Cevaplandı
   question_bank: 
     align_outcomes: "Çıktıları Sırala"
@@ -11120,9 +11143,6 @@ tr:
       generated_at_date_time: "%{dateAndTime} yaratıldı"
       generating_report_name: "%{report_name} yaratılıyor..."
       item_analysis_not_available: "Anketler için Öğe Analizi kullanılamaz"
-  quiz_submissions: 
-    show: 
-      score_out_of: "%{points_possible} üzerinden %{score} aldınız"
   quizzes: 
     after_last_attempt: "Son Girişten Sonra"
     alerts: 
@@ -11353,6 +11373,8 @@ tr:
         invalid_submissions: "Bu kısa sınav gönderiminin size ait olduğu doğrulanamadı. Lütfen tekrar deneyin."
         late_quiz: "Bu kısa sınavın gönderiminde geç kalındı ve cevaplarınız sisteme kaydedilmemiş olabilir."
         protected_quiz: "Bu kısa sınav korumalıdır ve sadece belirli bölgeler için açık olabilir. Bilgisayarınız şu anda bu bölgelerin dışında gözüktüğünden kısa sınavı alamamış olabilirsiniz."
+      show: 
+        score_out_of: "%{points_possible} üzerinden %{score} aldınız"
       still_zipping: "Dosya sıkıştırma süreci devam ediyor..."
     quizzes: 
       access_code: 
@@ -12143,6 +12165,7 @@ tr:
     : Doğru
     ungraded_survey: "Değerlendirilmemiş Kısa Sınav"
     warnings: 
+      draft_state_unsaved_changes: "*Bu kısa sınavdaki sorularda değişiklikler yaptınız.* Siz kısa sınavı kaydedene kadar bu değişiklikler öğrenciler tarafından görülemeyecek."
       unpublished_changes: "*Kısa sınav üzerinde yapmış olduğunuz değişiklikler yayınlanmadı.* Yapmış olduğunuz değişiklikleri yayınlayana yada tekrar yayınlayana dek öğrenciler tarafından görülemeyecektir."
       unpublished_quiz: "*Bu kısa sınav yayınlanmadı* Sadece öğretmenler bu kısa sınav yayınlanana kadar görebilirler."
   quizzes/quiz: 
@@ -12251,6 +12274,7 @@ tr:
       create_accounts: "Yeni ana hesap oluştur"
       create_collaborations: "Öğrenci işbirlikleri oluştur"
       create_conferences: "Web konferansı oluştur"
+      generate_data_exports: "Veri Dışa Aktarımları Oluştur"
       manage_account_memberships: "Bu hesap için diğer yöneticileri ekle/sil"
       manage_account_settings: "Hesap düzeyi ayarlarını yönet"
       manage_admin_users: "Bu ders için diğer öğretmenleri, ders tasarımcıları veya asistan öğretmenleri ekle/sil"
@@ -12497,6 +12521,8 @@ tr:
         current_enrollments: "Varolan Kayıtlar"
         decrosslist_section: "Bu Bölümü Çarpraz Listeden Kaldır"
   select_content: "İçerik Seçiniz"
+  select_content_checkbox: 
+    select_content_error: "Bir içerik seçeneği seçmelisiniz"
   select_content_dialog: 
     buttons: 
       add_item: "Öğe Ekle"
@@ -13293,12 +13319,21 @@ tr:
     assignment_order_assignment_groups: "Ödev Grubu ve Durumuna Göre"
     assignment_order_due_date: "Bitiş Tarihine Göre"
     assignment_unmuted: "Devre dışı bırakmak için tıklayın."
+    discussion_topic: "Tartışma başlığı"
+    external_tool: "Harici araç"
     invalid_group_warning: 
       one: "Not: Olası puanları olmadığı için not %{list_of_group_names} grubundan ödevler içermiyor."
       other: "Not: Olası puanları olmadığı için not %{list_of_group_names} gruplarından ödevler içermiyor."
+    media_recordin: "Medya kaydı"
     no_assignment: "Seçili Ödev Yok"
     no_student: "Seçili Öğrenci Yok"
+    none: Yok
     notes: Notlar
+    on_paper: "Kağıt üzerinde"
+    online_quiz: "Çevrimiçi kısa sınav"
+    online_text_entry: "Çevrimiçi metin girişi"
+    online_upload: "Çevrimiçi yükleme"
+    online_url: "Çevrimiçi URL"
     student_hidden_name: "Öğrenci %{position}"
   statistics: 
     csv_columns: 
