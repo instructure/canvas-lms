@@ -411,6 +411,24 @@ describe "discussions" do
           topic.reload.workflow_state.should == 'deleted'
           f('.discussion-list li.discussion').should be_nil
         end
+
+        it "should allow moving a topic" do
+          topics = 3.times.map do |n|
+            DiscussionTopic.create!(context: course, user: teacher,
+              title: "Discussion Topic #{n+1}", pinned: true)
+          end
+          topics.map(&:position).should == [1, 2, 3]
+          topic = topics[0]
+          get url
+
+          fj("[data-id=#{topic.id}] .al-trigger").click
+          fj('.icon-updown:visible').click
+          click_option '.ui-dialog:visible select', topics[2].title
+          fj('.ui-dialog:visible .btn-primary').click
+          wait_for_ajaximations
+          topics.each &:reload
+          topics.map(&:position).should == [2, 1, 3]
+        end
       end
     end
 

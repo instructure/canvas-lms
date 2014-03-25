@@ -285,13 +285,14 @@ module ActiveRecord
         # reassign positions to be contiguous, and begin at 1
         alias_method :compact_list, :fix_position_conflicts
 
+        # before_create callback
+        def add_to_list_bottom
+          return unless in_scope?
+          return if in_list?
+          self[self.class.position_column] = bottom_position.to_i + 1
+        end
+
         private
-          # before_create callback
-          def add_to_list_bottom
-            return unless in_scope?
-            return if in_list?
-            self[self.class.position_column] = bottom_position.to_i + 1
-          end
 
           def remove_from_list_for_destroy
             list_scope.where("#{self.class.position_column}>?", position).

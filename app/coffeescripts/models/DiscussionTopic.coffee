@@ -84,6 +84,10 @@ define [
         assignment: json.assignment?.toJSON()
         defaultDates: @defaultDates().toJSON()
 
+    toView: ->
+      _.extend @toJSON(),
+        name: @get('title')
+
     unreadTooltip: ->
       I18n.t 'unread_count_tooltip', {
         zero:  'No unread replies.'
@@ -160,8 +164,5 @@ define [
       _.defaults data,
         pinned: @get('pinned')
         locked: @get('locked')
-      @updatePartial(data).done =>
-        # it would be cleaner to actually set position: null in the update,
-        # but it doesn't look to me like the controller allows it
-        @set('position', null)
-        @collection.trigger('addSync')
+      @set('position', null)
+      @updatePartial(data)

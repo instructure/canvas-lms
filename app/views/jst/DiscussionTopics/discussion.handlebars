@@ -109,6 +109,13 @@
                 {{/if}}
               </a>
             </li>
+            {{#if pinned}}
+              <li>
+                <a href="#"
+                  class="move_item icon-updown"
+                >{{#t "move"}}Move To&hellip;{{/t}}</a>
+              </li>
+            {{/if}}
           {{/if}}
         </ul>
       {{/if}}

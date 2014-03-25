@@ -6,7 +6,8 @@ define [
   'jst/DiscussionTopics/discussion'
   'compiled/views/PublishIconView'
   'compiled/views/ToggleableSubscriptionIconView'
-], (I18n, $, _, {View}, template, PublishIconView, ToggleableSubscriptionIconView) ->
+  'compiled/views/MoveDialogView'
+], (I18n, $, _, {View}, template, PublishIconView, ToggleableSubscriptionIconView, MoveDialogView) ->
 
   class DiscussionView extends View
     # Public: View template (discussion).
@@ -42,6 +43,7 @@ define [
     els:
       '.screenreader-only': '$title'
       '.discussion-row': '$row'
+      '.move_item': '$moveItemButton'
 
     # Public: Topic is able to be locked/unlocked.
     @optionProperty 'lockable'
@@ -57,11 +59,16 @@ define [
       @attachModel()
       options.publishIcon = new PublishIconView(model: @model) if ENV.permissions.publish
       options.toggleableSubscriptionIcon = new ToggleableSubscriptionIconView(model: @model)
+      @moveItemView = new MoveDialogView
+        model: @model
+        nested: true
+        saveURL: -> @model.collection.reorderURL()
       super
 
     render: ->
       super
       @$el.attr('data-id', @model.get('id'))
+      @moveItemView.setTrigger @$moveItemButton
       this
 
     # Public: Lock or unlock the model and update it on the server.
