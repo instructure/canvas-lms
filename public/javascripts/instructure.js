@@ -841,6 +841,16 @@ define([
           $(window).resize(); //this will be helpful for things like $.fn.fillWindowWithMe so that it knows the dimensions of the page have changed.
         }
       });
+    } else {
+      var draft_state_msf = $('#sequence_footer.draft_state_enabled')
+      if (draft_state_msf.length) {
+        var el = $(draft_state_msf[0]);
+        el.moduleSequenceFooter({
+          courseID: el.attr("data-course-id"),
+          assetType: el.attr("data-asset-type"),
+          assetID: el.attr("data-asset-id")
+        });
+      }
     }
 
     var $wizard_box = $("#wizard_box");
