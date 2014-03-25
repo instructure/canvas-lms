@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,23 +19,17 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-describe "/quiz_submissions/show" do
-  it "should render" do
-    course_with_student
-    view_context
-    @submission = mock('Quizzes::QuizSubmission')
-    @submission.stubs(:score).returns(10)
-    @submission.stubs(:data).returns([])
-    @quiz = mock('Quizzes::Quiz')
-    @quiz.stubs(:questions).returns([])
-    @quiz.stubs(:points_possible).returns(10)
-    @quiz.stubs(:stored_questions).returns([])
-    @quiz.stubs(:show_correct_answers?).returns(true)
-    assigns[:quiz] = @quiz
-    assigns[:submission] = @submission
-    
-    render "quiz_submissions/show"
-    response.should_not be_nil
+describe "context/undelete_index.html.erb" do
+  before do
+    course_with_teacher(:active_all => true)
+    assigns[:context] = @course
+  end
+
+  it "should render the undelete link correctly for quizzes" do
+    quiz = @course.quizzes.create!
+    assigns[:deleted_items] = [quiz]
+    render
+    response.body.should_not =~ /quizzes:quiz/
+    response.body.should =~ /quiz_#{quiz.id}/
   end
 end
-

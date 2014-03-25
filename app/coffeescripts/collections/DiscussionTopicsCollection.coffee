@@ -1,7 +1,8 @@
 define [
   'compiled/collections/PaginatedCollection'
   'compiled/models/DiscussionTopic'
-], (PaginatedCollection, DiscussionTopic) ->
+  'compiled/util/NumberCompare'
+], (PaginatedCollection, DiscussionTopic, numberCompare) ->
 
   class DiscussionTopicsCollection extends PaginatedCollection
 
@@ -23,10 +24,4 @@ define [
     @positionComparator: (a, b) ->
       aPosition = a.get('position')
       bPosition = b.get('position')
-
-      if aPosition < bPosition
-        -1
-      else if aPosition is bPosition
-        0
-      else
-        1
+      numberCompare(aPosition, bPosition)

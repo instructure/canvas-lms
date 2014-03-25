@@ -3,7 +3,7 @@
 <div class="clearfix <%= 'read' if message_read %> <%= inbox_item.try_rescue(:item_asset_string) %> communication_message inbox_item <%= inbox_item.try_rescue(:asset_type).try_rescue(:underscore) %>" style="<%= hidden unless inbox_item %>" id="inbox_item_<%= inbox_item ? inbox_item.id : "blank" %>">
   <div class="header">
     <div class="post_date">
-      <span class="time_ago_date created_at" style="padding-right: 45px;"><%= datetime_string(inbox_item.try_rescue(:created_at)) || nbsp %></span>
+      <span class="time_ago_date created_at" data-timestamp="<%= inbox_item.try_rescue(:created_at).try_rescue(:iso8601) %>" style="padding-right: 45px;"><%= datetime_string(inbox_item.try_rescue(:created_at)) || nbsp %></span>
       <a href="<%= inbox_item_path(inbox_item ? inbox_item.id : "{{ id }}") %>" class="delete_inbox_item_link no-hover" title="<%= t('links.title.remove_message', %{Remove this Message}) %>"><%= image_tag "delete_circle.png" %></a>
     </div>
     <div>

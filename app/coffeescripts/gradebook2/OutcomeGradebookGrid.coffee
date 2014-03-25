@@ -4,7 +4,7 @@ define [
   'underscore'
   'compiled/views/gradebook/HeaderFilterView'
   'compiled/views/gradebook/OutcomeColumnView'
-  'compiled/gradebook2/NumberCompare'
+  'compiled/util/NumberCompare'
   'jst/gradebook2/outcome_gradebook_cell'
   'jst/gradebook2/outcome_gradebook_student_cell'
 ], (I18n, $, _, HeaderFilterView, OutcomeColumnView, numberCompare, cellTemplate, studentCellTemplate) ->
@@ -111,7 +111,7 @@ define [
       _sortResults: (a, b, sortAsc, field) ->
         scoreA = a[field]
         scoreB = b[field]
-        val = numberCompare(scoreA, scoreB, sortAsc)
+        val = numberCompare(scoreA, scoreB, descending: !sortAsc)
         if val == 0
           Grid.Events._sortStudents(a, b, sortAsc)
         else
@@ -215,7 +215,7 @@ define [
       # Returns nothing.
       saveOutcomes: (outcomes) ->
         [type, id] = ENV.context_asset_string.split('_')
-        url = "/#{type}s/#{id}/outcomes/"
+        url = "/#{type}s/#{id}/outcomes"
         Grid.outcomes = _.reduce(outcomes, (result, outcome) ->
           outcome.url = url
           result["outcome_#{outcome.id}"] = outcome

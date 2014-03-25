@@ -42,7 +42,23 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   after_save :save_assignment_submission
   before_create :assign_validation_token
 
-  has_many :attachments, :as => :context, :dependent => :destroy
+  has_many :attachments, :as => :context, :dependent => :destroy do
+    if CANVAS_RAILS2
+      def construct_sql
+        @finder_sql = @counter_sql =
+          "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_id = #{owner_quoted_id} AND " +
+        "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_type IN ('QuizSubmission', #{@owner.class.quote_value(@owner.class.base_class.name.to_s)})"
+      end
+    else
+      def where(*args)
+        if args.length == 1 && args.first.is_a?(Arel::Nodes::Equality) && args.first.left.name == 'context_type'
+          super(args.first.left.in(['QuizSubmission', 'Quizzes::QuizSubmission']))
+        else
+          super
+        end
+      end
+    end
+  end
 
   # update the QuizSubmission's Submission to 'graded' when the QuizSubmission is marked as 'complete.' this
   # ensures that quiz submissions with essay questions don't show as graded in the SpeedGrader until the instructor

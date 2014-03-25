@@ -32,18 +32,20 @@ define [
 
     initialize: ->
       @participants = new ParticipantCollection
-
       @entries = new DiscussionEntriesCollection
       @entries.url = => "#{_.result this, 'url'}/entries"
       @entries.participants = @participants
 
-      @set 'set_assignment', @get('assignment')?
-      assign_attributes = @get('assignment') or {}
+    parse: (json) ->
+      json.set_assignment = json.assignment?
+      assign_attributes = json.assignment || {}
       assign_attributes.assignment_overrides or= []
       assign_attributes.turnitin_settings or= {}
-      @set 'assignment', @createAssignment(assign_attributes)
-      @set 'publishable',  @get('can_unpublish')
-      @set 'unpublishable', @get('can_unpublish')
+      json.assignment = @createAssignment(assign_attributes)
+      json.publishable = json.can_publish
+      json.unpublishable = json.can_unpublish
+
+      json
 
     createAssignment: (attributes) ->
       assign = new Assignment(attributes)
@@ -117,13 +119,17 @@ define [
     updateOneAttribute: (key, value, options = {}) ->
       data = {}
       data[key] = value
+      @updatePartial(data, options)
+
+    updatePartial: (data, options = {}) ->
+      @set(data) unless options.wait
       options = _.defaults options,
         data: JSON.stringify(data)
         contentType: 'application/json'
       @save {}, options
 
     positionAfter: (otherId) ->
-      @updateOneAttribute 'position_after', otherId
+      @updateOneAttribute 'position_after', otherId, wait: true
       collection = @collection
       otherIndex = collection.indexOf collection.get(otherId)
       collection.remove this, silent: true
@@ -149,3 +155,13 @@ define [
       if lock_at = @get('assignment')?.get('lock_at')
         return lock_at
       @get('lock_at')
+
+    updateBucket: (data) ->
+      _.defaults data,
+        pinned: @get('pinned')
+        locked: @get('locked')
+      @updatePartial(data).done =>
+        # it would be cleaner to actually set position: null in the update,
+        # but it doesn't look to me like the controller allows it
+        @set('position', null)
+        @collection.trigger('addSync')

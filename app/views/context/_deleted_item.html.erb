@@ -1,7 +1,16 @@
-<% item = deleted_item %>
+<%
+  item = deleted_item
+  url_asset_string = item.asset_string
+
+  # This is pretty hacky, but the controller expects an asset string that it
+  # can split into a scope and an id, and it expects the scope to be a method
+  # it can call on the context (in this case a course).  I'm fixing it here so
+  # we don't have a colon in the url.  See ContextController#undelete
+  url_asset_string = url_asset_string.gsub('quizzes:', '')
+%>
 <li class="item">
   <div class="links">
-    <a class="restore_link btn" href="<%= context_url(@context, :context_undelete_item_url, item.asset_string) %>"><%= t('links.restore', %{restore}) %></a>
+    <a class="restore_link btn" href="<%= context_url(@context, :context_undelete_item_url, url_asset_string) %>"><%= t('links.restore', %{restore}) %></a>
   </div>
   <div class="name">
     <% if item.is_a?(Enrollment) %>

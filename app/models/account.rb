@@ -180,6 +180,7 @@ class Account < ActiveRecord::Base
   add_setting :enable_fabulous_quizzes, :boolean => true, :root_only => true, :default => false
   add_setting :js_kaltura_uploader, :boolean => true, :root_only => true, :default => false
   add_setting :google_docs_domain, root_only: true
+  add_setting :dashboard_url, root_only: true
 
   def settings=(hash)
     if hash.is_a?(Hash)

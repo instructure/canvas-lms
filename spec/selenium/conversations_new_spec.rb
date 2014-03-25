@@ -82,6 +82,15 @@ describe "conversations new" do
     end
   end
 
+  def click_read_toggle_menu_item
+    keep_trying_until do
+      driver.execute_script(%q{$('#admin-btn').hover().click()})
+      sleep 1
+      driver.execute_script(%q{$('#mark-read-btn').hover().click()})
+      wait_for_ajaximations
+    end
+  end
+
   def select_message_course(new_course)
     new_course = new_course.name if new_course.respond_to? :name
     fj('.dropdown-toggle', get_message_course).click
@@ -459,6 +468,14 @@ describe "conversations new" do
       select_all_conversations
       click_unread_toggle_menu_item
       keep_trying_until { ffj('.read-state[aria-checked=false]').count.should == 2 }
+    end
+
+    it "should mark multiple conversations as unread" do
+      pending('breaks b/c jenkins is weird')
+      get_conversations
+      select_all_conversations
+      click_read_toggle_menu_item
+      keep_trying_until { ffj('.read-state[aria-checked=true]').count.should == 2 }
     end
 
     it "should star multiple conversations" do

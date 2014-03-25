@@ -18,11 +18,20 @@ class ActiveRecord::Base
     alias :clone :dup
 
     def serializable_hash(options = nil)
-      if options && options[:include_root]
-        {self.class.base_ar_class.model_name.element => super(options)}
-      else
-        super
+      result = super
+      if result.present?
+        result = result.with_indifferent_access
+        user_content_fields = options[:user_content] || []
+        result.keys.each do |name|
+          if user_content_fields.include?(name.to_s)
+            result[name] = UserContent.escape(result[name])
+          end
+        end
       end
+      if options && options[:include_root]
+        result = {self.class.base_ar_class.model_name.element => result}
+      end
+      result
     end
 
     # See ActiveModel#serializable_add_includes
@@ -193,7 +202,6 @@ class ActiveRecord::Base
   end
 
   def cached_context_grants_right?(user, session, *permissions)
-    @@cached_contexts = nil if Rails.env.test?
     @@cached_contexts ||= {}
     context_key = "#{self.context_type}_#{self.context_id}" if self.respond_to?(:context_type)
     context_key ||= "Course_#{self.course_id}"
@@ -201,7 +209,6 @@ class ActiveRecord::Base
     @@cached_contexts[context_key] ||= self.course
     @@cached_permissions ||= {}
     key = [context_key, (user ? user.id : nil)].cache_key
-    @@cached_permissions[key] = nil if Rails.env.test?
     @@cached_permissions[key] = nil if session && session[:session_affects_permissions]
     @@cached_permissions[key] ||= @@cached_contexts[context_key].grants_rights?(user, session, nil).keys
     (@@cached_permissions[key] & Array(permissions).flatten).any?
@@ -1433,6 +1440,7 @@ unless CANVAS_RAILS2
   end
 end
 
+if CANVAS_RAILS2
 class ActiveRecord::Serialization::Serializer
   def serializable_record
     hash = HashWithIndifferentAccess.new.tap do |serializable_record|
@@ -1460,7 +1468,6 @@ class ActiveRecord::Serialization::Serializer
   end
 end
 
-if CANVAS_RAILS2
 # We need to have 64-bit ids and foreign keys.
 if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::NATIVE_DATABASE_TYPES[:primary_key] = "bigserial primary key".freeze
@@ -1862,116 +1869,31 @@ end
 
 # shims so that AR objects serialized under rails 2 function under rail s3
 if CANVAS_RAILS2
-  class ActiveSupport::Cache::Entry
-    def value
-      Marshal.load(@compressed ? Zlib::Inflate.inflate(@value) : @value) if @value
-    end
-  end
-
   ActiveSupport::Cache::Store.subclasses.map(&:constantize).each do |subclass|
     subclass.class_eval do
-      def read_with_rails3_shim(*args)
-        result = read_without_rails3_shim(*args)
-        result = result.value if ActiveSupport::Cache::Entry === result
-        result
+      def delete_with_rails3_shim(key, options = nil)
+        r1 = delete_without_rails3_shim(key, options)
+        r2 = delete_without_rails3_shim("rails3:#{key}", options)
+        r1 || r2
       end
-      alias_method_chain :read, :rails3_shim
-    end
-  end
-
-  module ActiveRecord::AttributeMethods::Serialization; end
-
-  class ActiveRecord::AttributeMethods::Serialization::Attribute < Struct.new(:coder, :value, :state)
-    def unserialize
-      return nil if self.value.nil?
-      self.value = self.coder.load(self.value)
-    end
-  end
-
-  module ActiveRecord::Coders; end
-  class ActiveRecord::Coders::YAMLColumn
-    def load(yaml)
-      return @object_class.new if @object_class != Object && yaml.nil?
-      return yaml unless yaml.is_a?(String) && yaml =~ /^---/
-      begin
-        obj = YAML.load(yaml)
-
-        unless obj.is_a?(@object_class) || obj.nil?
-          raise SerializationTypeMismatch,
-                "Attribute was supposed to be a #{object_class}, but was a #{obj.class}"
-        end
-        obj ||= @object_class.new if @object_class != Object
-
-        obj
-      rescue ArgumentError
-        yaml
-      end
-    end
-  end
-
-  class ActiveRecord::Base
-    def unserialize_attribute_with_rails3_shim(attr_name)
-      @attributes[attr_name] = @attributes[attr_name].unserialize if ActiveRecord::AttributeMethods::Serialization::Attribute === @attributes[attr_name]
-      unserialize_attribute_without_rails3_shim(attr_name)
-    end
-    alias_method_chain :unserialize_attribute, :rails3_shim
-  end
-
-  class ActiveRecord::Relation
-
-  end
-
-  module Arel; end
-  class Arel::TreeManager; end
-  class Arel::SelectManager < Arel::TreeManager; end
-  class Arel::Table; end
-  module Arel::Attributes; end
-  class Arel::Attributes::Attribute < Struct.new :relation, :name; end
-  module Arel::Nodes; end
-  class Arel::Nodes::Node; end
-  class Arel::Nodes::And < Arel::Nodes::Node; end
-  class Arel::Nodes::Binary < Arel::Nodes::Node; end
-  class Arel::Nodes::Equality < Arel::Nodes::Binary; end
-  class Arel::Nodes::JoinSource < Arel::Nodes::Binary; end
-  class Arel::Nodes::SelectCore < Arel::Nodes::Node; end
-  class Arel::Nodes::SelectStatement < Arel::Nodes::Node; end
-  class Arel::Nodes::SqlLiteral < String; end
-
-
-  module Switchman; end
-  class Switchman::Shard < ActiveRecord::Base
-    attr_accessible
-    def self._load(str)
-      Shard.lookup(str.to_i)
+      alias_method_chain :delete, :rails3_shim
     end
   end
 else
-  ActiveRecord::AttributeMethods::Serialization::ClassMethods.class_eval do
-    def attribute_cast_code(attr_name)
-      if serialized_attributes.include?(attr_name)
-        "(ActiveRecord::AttributeMethods::Serialization::Attribute === v ? v.unserialized_value : ActiveRecord::AttributeMethods::Serialization.object_from_yaml(v))"
-      else
-        super
-      end
+  ActiveSupport::Cache::Store.class_eval do
+    def namespaced_key_with_rails2_shim(key, options)
+      result = namespaced_key_without_rails2_shim(key, options)
+      result = "rails3:#{result}" if !(result =~ /^rails3/) && !options[:no_rails3]
+      result
     end
-  end
+    alias_method_chain :namespaced_key, :rails2_shim
 
-  ActiveRecord::AttributeMethods::Serialization.class_eval do
-    def self.object_from_yaml(string)
-      return string unless string.is_a?(String) && string =~ /^---/
-      YAML::load(string) rescue string
+    def delete_with_rails2_shim(key, options = nil)
+      r1 = delete_without_rails2_shim(key, options)
+      r2 = delete_without_rails2_shim(key, (options || {}).merge(no_rails3: true))
+      r1 || r2
     end
-  end
-
-  ActiveRecord::Associations.class_eval do
-    def association_instance_get(name)
-      (@association_cache || {})[name.to_sym]
-    end
-
-    def association_instance_set(name, association)
-      @association_cache ||= {}
-      @association_cache[name] = association
-    end
+    alias_method_chain :delete, :rails2_shim
   end
 end
 

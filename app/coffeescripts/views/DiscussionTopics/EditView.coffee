@@ -47,7 +47,9 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
     initialize: (options) ->
       @assignment = @model.get("assignment")
       @dueDateOverrideView = options.views['js-assignment-overrides']
-      @model.on 'sync', -> window.location = @get 'html_url'
+      @model.on 'sync', =>
+        @unwatchUnload()
+        window.location = @model.get 'html_url'
       super
 
     isTopic: => @model.constructor is DiscussionTopic
@@ -66,7 +68,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         canModerate: @permissions.CAN_MODERATE
         isLargeRoster: ENV?.IS_LARGE_ROSTER || false
         threaded: data.discussion_type is "threaded"
-        draftStateEnabled: ENV.DRAFT_STATE
+        draftStateEnabled: ENV.DRAFT_STATE && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE
       json.assignment = json.assignment.toView()
       json
 
@@ -96,8 +98,10 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       _.defer(@renderGradingTypeOptions)
       _.defer(@renderGroupCategoryOptions)
       _.defer(@renderPeerReviewOptions)
+      _.defer(@watchUnload)
 
       @$(".datetime_field").datetime_field()
+
 
       this
 

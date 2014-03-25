@@ -75,7 +75,7 @@
         </td>
         <td class="view_score"><%= access.corrected_view_score %></td>
         <td class="participate_score"><%= access.participate_score %></td>
-        <td class="last_viewed time_ago_date"><%= datetime_string(access.last_access) %></td>
+        <td class="last_viewed time_ago_date" data-timestamp="<%= access.last_access.try_rescue(:iso8601) %>"><%= datetime_string(access.last_access) %></td>
       </tr>
     <% end %>
     <tr class="access blank" style="display: none;">

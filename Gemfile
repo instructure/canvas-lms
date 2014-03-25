@@ -99,7 +99,7 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
 gem 'canvas_connect', '0.3.2'
   gem 'adobe_connect', '1.0.0'
-gem 'canvas_webex', '0.12'
+gem 'canvas_webex', '0.13'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
 unless CANVAS_RAILS2
@@ -108,7 +108,7 @@ end
 if CANVAS_RAILS2
   gem 'encrypted_cookie_store-instructure', '1.0.5', :require => 'encrypted_cookie_store'
 else
-  gem 'encrypted_cookie_store-instructure', '1.1.1', :require => 'encrypted_cookie_store'
+  gem 'encrypted_cookie_store-instructure', '1.1.2', :require => 'encrypted_cookie_store'
 end
 if CANVAS_RAILS2
   gem 'erubis', '2.7.0'
@@ -166,7 +166,7 @@ gem 'rotp', '1.4.1'
 gem 'rqrcode', '0.4.2'
 gem 'rscribd', '1.2.0'
 gem 'net-ldap', '0.3.1', :require => 'net/ldap'
-gem 'ruby-saml-mod', '0.1.24'
+gem 'ruby-saml-mod', '0.1.25'
 gem 'rubycas-client', '2.2.1'
 gem 'rubyzip', '1.1.0', :require => 'zip', :github => 'rubyzip/rubyzip', :ref => '2697c7ea4fba6dca66acd4793965501b06ea8df6'
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace
@@ -176,7 +176,7 @@ gem 'safe_yaml-instructure', '0.8.0', :require => false
 gem 'sanitize', '2.0.3'
 gem 'shackles', '1.0.2'
 unless CANVAS_RAILS2
-  gem 'switchman', '1.0.0'
+  gem 'switchman', '1.1.0'
 end
 gem 'tzinfo', '0.3.35'
 gem 'useragent', '0.4.16'
@@ -221,7 +221,11 @@ group :assets do
 end
 
 group :mysql do
-  gem 'mysql2', '0.2.18'
+  if CANVAS_RAILS3
+    gem 'mysql2', '0.3.15'
+  else
+    gem 'mysql2', '0.2.18'
+  end
 end
 
 group :postgres do

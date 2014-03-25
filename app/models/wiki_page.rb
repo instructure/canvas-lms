@@ -223,13 +223,9 @@ class WikiPage < ActiveRecord::Base
   def locked_for?(user, opts={})
     return false unless self.could_be_locked
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
-      context = opts[:context]
-      context ||= self.context if self.respond_to?(:context)
-      m = context_module_tag_for(context).context_module rescue nil
-
       locked = false
-      if (m && !m.available_for?(user))
-        locked = {:asset_string => self.asset_string, :context_module => m.attributes}
+      if item = locked_by_module_item?(user, opts[:deep_check_if_needed])
+        locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
         locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"]
       end
       locked

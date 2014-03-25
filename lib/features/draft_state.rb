@@ -49,9 +49,9 @@ calculations. Caution--disabling this feature may delete newly created or edited
 content from the teacher's view.
 END
     applies_to: 'Course',
-    state: 'hidden',
+    state: 'allowed',
     root_opt_in: true,
-    development: true,
+    development: false,
 
     custom_transition_proc: ->(user, context, from_state, transitions) do
       if context.is_a?(Course) && from_state == 'on'

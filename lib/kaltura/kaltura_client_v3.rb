@@ -137,10 +137,19 @@ module Kaltura
 
     # Given an array of sources, it will sort them putting preferred file types at the front,
     # preferring converted assets over the original (since they're likely to stream better)
-    # and sorting by descending bitrate for identical file types.
+    # and sorting by descending bitrate for identical file types, discounting
+    # suspiciously high bitrates.
     def sort_source_list(sources)
+      original_source = sources.detect{ |s| s[:isOriginal].to_i != 0 }
+      # CNVS-11227 features broken conversions at 20x+ the original source's bitrate
+      # (in addition to working conversions at bitrates comparable to the original)
+      suspicious_bitrate_threshold = original_source ? original_source[:bitrate].to_i * 5 : 0
       sources = sources.sort_by do |a|
-        [a[:hasWarnings] || a[:isOriginal] != '0' ? SortLast : SortFirst, a[:isOriginal] == '0' ? SortFirst : SortLast, PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1, 0 - a[:bitrate].to_i]
+        [a[:hasWarnings] || a[:isOriginal] != '0' ? SortLast : SortFirst,
+         a[:isOriginal] == '0' ? SortFirst : SortLast,
+         PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1,
+         a[:bitrate].to_i < suspicious_bitrate_threshold ? SortFirst : SortLast,
+         0 - a[:bitrate].to_i]
       end
       sources.each{|a| a.delete(:hasWarnings)}
       sources
@@ -256,6 +265,12 @@ module Kaltura
                            :conversionProfileId => -1,
                            :csvFileData => KalturaStringIO.new(csv, "bulk_data.csv")
                        )
+      unless result.css('logFileUrl').any?
+        code = result.css('error > code').first.try(:content)
+        message = result.css('error > message').first.try(:content)
+        message ||= result.to_xml
+        raise "kaltura bulkUpload failed: #{message} (#{code})"
+      end
       parseBulkUpload(result)
       # results will have entryId values -- do we get them right away?
     end

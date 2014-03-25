@@ -68,40 +68,48 @@ class DueDateCacher
       Assignment.transaction do
         # Create overridden due date submissions
         create_overridden_submissions
+        overrides = AssignmentOverride.active.overriding_due_at.where(:assignment_id => @assignments)
+        if overrides.exists?
+          # create temporary table
+          cast = Submission.connection.adapter_name == 'Mysql2' ? 'UNSIGNED INTEGER' : 'BOOL'
+          Assignment.connection.execute("CREATE TEMPORARY TABLE calculated_due_ats AS (#{submissions.select([
+            "submissions.id AS submission_id",
+            "submissions.user_id",
+            "submissions.assignment_id",
+            "assignments.due_at",
+            "CAST(#{Submission.sanitize(false)} AS #{cast}) AS overridden"
+          ]).joins(:assignment).where(assignments: { id: @assignments }).to_sql})")
 
-        # create temporary table
-        cast = Submission.connection.adapter_name == 'Mysql2' ? 'UNSIGNED INTEGER' : 'BOOL'
-        Assignment.connection.execute("CREATE TEMPORARY TABLE calculated_due_ats AS (#{submissions.select([
-          "submissions.id AS submission_id",
-          "submissions.user_id",
-          "submissions.assignment_id",
-          "assignments.due_at",
-          "CAST(#{Submission.sanitize(false)} AS #{cast}) AS overridden"
-        ]).joins(:assignment).where(assignments: { id: @assignments }).to_sql})")
+          # create an ActiveRecord class around that temp table for the update_all
+          scope = Class.new(ActiveRecord::Base) do
+            self.table_name = :calculated_due_ats
+            self.primary_key = :submission_id
+          end
 
-        # create an ActiveRecord class around that temp table for the update_all
-        scope = Class.new(ActiveRecord::Base) do
-          self.table_name = :calculated_due_ats
-          self.primary_key = :submission_id
+          # for each override, narrow to the affected subset of the table, and
+          # apply
+          overrides.each do |override|
+            override_scope(scope, override).update_all(
+              :due_at => override.due_at,
+              :overridden => true)
+          end
+
+          # copy the results back to the submission table
+          submissions.
+            joins("INNER JOIN calculated_due_ats ON calculated_due_ats.submission_id=submissions.id").
+            where("cached_due_date<>calculated_due_ats.due_at OR (cached_due_date IS NULL)<>(calculated_due_ats.due_at IS NULL)").
+            update_all("cached_due_date=calculated_due_ats.due_at")
+
+          # clean up
+          temporary = "TEMPORARY " if Assignment.connection.adapter_name == 'Mysql2'
+          Assignment.connection.execute("DROP #{temporary}TABLE calculated_due_ats")
+        else
+          # just copy the assignment due dates to the submissions
+          submissions.
+            joins("INNER JOIN assignments ON assignments.id=submissions.assignment_id").
+            where("cached_due_date<>assignments.due_at OR (cached_due_date IS NULL)<>(assignments.due_at IS NULL)").
+            update_all("cached_due_date=assignments.due_at")
         end
-
-        # for each override, narrow to the affected subset of the table, and
-        # apply
-        AssignmentOverride.active.overriding_due_at.where(:assignment_id => @assignments).each do |override|
-          override_scope(scope, override).update_all(
-            :due_at => override.due_at,
-            :overridden => true)
-        end
-
-        # copy the results back to the submission table
-        submissions.
-          joins("INNER JOIN calculated_due_ats ON calculated_due_ats.submission_id=submissions.id").
-          where("cached_due_date<>calculated_due_ats.due_at OR (cached_due_date IS NULL)<>(calculated_due_ats.due_at IS NULL)").
-          update_all("cached_due_date=calculated_due_ats.due_at")
-
-        # clean up
-        temporary = "TEMPORARY " if Assignment.connection.adapter_name == 'Mysql2'
-        Assignment.connection.execute("DROP #{temporary}TABLE calculated_due_ats")
       end
     end
   end

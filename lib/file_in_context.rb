@@ -54,6 +54,8 @@ class FileInContext
       destroy_files(@attachment.handle_duplicates(allow_rename ? :rename : :overwrite, :caller_will_destroy => true))
 
       @attachment
+    ensure
+      uploaded_data.close if uploaded_data
     end
     
   end

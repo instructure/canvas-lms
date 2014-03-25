@@ -103,6 +103,7 @@ define [
     attachCollection: ->
       @collection.on('change:hidden', @_toggleNoContentMessage)
       @collection.on('fetched:last',  @_onFetchedLast)
+      @collection.on('addSync', @_onAddSync) # custom event after saving pinned and locked
       super
 
     # Internal: Handle clicks on admin gear menu.
@@ -170,8 +171,8 @@ define [
     _updateSort: (e, ui) =>
       model = @collection.get(ui.item.data('id'))
       return unless model?.get('pinned')
-      model.updateOneAttribute('position_at', ui.item.index() + 1)
-      @_updatePositions()
+      @_fixNullPositions().done =>
+        @_moveToAfter(model, @collection.at(ui.item.index() - 1))
 
       # FF 15+ will also fire a click event on the dropped object,
       # and we want to eat that. This is hacky.
@@ -181,12 +182,43 @@ define [
         model.set('preventClick', false)
       , 0
 
-    # Internal: Update the position attributes of all models in the collection
-    # to match their DOM position. Do not mirror changes to server.
-    #
-    # Returns nothing.
-    _updatePositions: ->
-      @collection.each((model, index) -> model.set('position', index + 1))
+    # We have a lot of null positions on prod, and they're null when first dragged in.
+    _fixNullPositions: () ->
+      dfd = $.Deferred().resolve()
+      # This chains the updates so they're sent serially, then resolves when the last completes.
+      @collection.reduce((dfd, model) =>
+        return dfd if model.get('position')?
+        dfd.pipe(_.partial(@_moveToBottom, model))
+      , dfd)
+
+    _moveToBottom: (model) =>
+      last = _.last(@collection.filter((x) -> x.get('position')?))
+      return if model == last
+      @_moveToAfter(model, last)
+
+    _moveToAfter: (model, sibling) ->
+      position = if sibling then sibling.get('position') + 1 else 1
+      @_insertAtPosition(model, position)
+      model.updateOneAttribute('position_at', position, wait: true)
+
+    # this applies server-side logic to neighboring models
+    # see https://github.com/swanandp/acts_as_list/blob/master/lib/acts_as_list/active_record/acts/list.rb
+    _insertAtPosition: (model, position) ->
+      oldPosition = model.get('position')
+      addToPosition = (number, model) ->
+        model.set('position', model.get('position') + number)
+      incr = _.partial(addToPosition, 1)
+      decr = _.partial(addToPosition, -1)
+
+      if oldPosition
+        if oldPosition < position # moving model forward
+          @collection.filter((x) -> oldPosition < x.get('position') <= position).forEach(decr)
+        else if position < oldPosition # moving model backward
+          @collection.filter((x) -> position <= x.get('position') < oldPosition).forEach(incr)
+      else
+        @collection.filter((x) -> x.get('position') >= position).forEach(incr)
+      model.set('position', position)
+      @collection.sort()
 
     # Internal: Enable drag/drop on a list item and the list given in
     # @options.destination.
@@ -214,4 +246,8 @@ define [
       [newGroup, currentGroup] = [$(e.currentTarget).data('view'), this]
       pinned = !!newGroup.options.pinned
       locked = !!newGroup.options.locked
-      model.save(pinned: pinned, locked: locked)
+      model.updateBucket(pinned: pinned, locked: locked)
+
+    _onAddSync: (model) =>
+      return unless @options.sortable
+      @_fixNullPositions()

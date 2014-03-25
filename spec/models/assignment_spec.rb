@@ -2526,13 +2526,31 @@ describe Assignment do
     end
   end
 
-  describe "restore" do
-    it "should restore to unpublished state if draft_state is enabled" do
-      course(draft_state: true)
+  describe "#restore" do
+    it "should restore assignments with draft state disabled" do
+      course
       assignment_model course: @course
       @a.destroy
       @a.restore
+      @a.reload.should be_published
+    end
+
+    it "should restore to unpublished if draft state w/ no submissions" do
+      course(draft_state: true)
+      assignment_model course: @course
+      @a.context.root_account.enable_feature!(:draft_state)
+      @a.destroy
+      @a.restore
       @a.reload.should be_unpublished
+    end
+
+    it "should restore to published if draft state w/ submissions" do
+      course(draft_state: true)
+      setup_assignment_with_homework
+      @assignment.context.root_account.enable_feature!(:draft_state)
+      @assignment.destroy
+      @assignment.restore
+      @assignment.reload.should be_published
     end
   end
 

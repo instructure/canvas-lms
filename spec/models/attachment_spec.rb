@@ -414,19 +414,29 @@ describe Attachment do
     end
 
     describe "delete_scribd_doc" do
-      it "should delete the scribd doc" do
+      it "should not delete the scribd doc when the attachment is destroyed" do
         @att = attachment_with_scribd_doc(fake_scribd_doc('zero'))
-        @att.scribd_doc.expects(:destroy).once.returns(true)
+        @att.scribd_doc.expects(:destroy).never
         @att.destroy
-        @att.reload.workflow_state.should eql 'deleted'
-        @att.read_attribute(:scribd_doc).should be_nil
+        @att.file_state.should eql 'deleted'
+        @att.workflow_state.should eql 'pending_upload'
+        @att.read_attribute(:scribd_doc).should_not be_nil
       end
 
       it "should do nothing for non-root attachments" do
         @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
-        @child = attachment_with_scribd_doc(fake_scribd_doc('one'), :root_attachment => @root)
+        @child = attachment_model(root_attachment: @root)
         @child.scribd_doc.expects(:destroy).never
+        @child.scribd_doc.should == @root.scribd_doc
         @child.delete_scribd_doc
+      end
+
+      it "should delete scribd_doc" do
+        @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
+        @root.scribd_doc.expects(:destroy).once.returns(true)
+        @root.read_attribute(:scribd_doc).should_not be_nil
+        @root.delete_scribd_doc
+        @root.read_attribute(:scribd_doc).should be_nil
       end
     end
 

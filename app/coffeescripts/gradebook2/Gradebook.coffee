@@ -18,7 +18,7 @@ define [
   'compiled/gradebook2/AssignmentGroupWeightsDialog'
   'compiled/gradebook2/SubmissionCell'
   'compiled/gradebook2/GradebookHeaderMenu'
-  'compiled/gradebook2/NumberCompare'
+  'compiled/util/NumberCompare'
   'str/htmlEscape'
   'compiled/gradebook2/UploadDialog'
   'jst/gradebook2/column_header'
@@ -1057,7 +1057,7 @@ define [
           @sortRowsBy (a, b) ->
             aScore = a[data.sortCol.field]?.score
             bScore = b[data.sortCol.field]?.score
-            numberCompare(aScore, bScore, data.sortAsc)
+            numberCompare(aScore, bScore, descending: !data.sortAsc)
 
       @grid.onKeyDown.subscribe ->
         # TODO: start editing automatically when a number or letter is typed

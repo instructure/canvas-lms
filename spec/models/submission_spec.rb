@@ -925,9 +925,33 @@ describe Submission do
       @submission.should_not be_missing
     end
 
-    it "should be true if not submitted and past due" do
+    it "should be true if not submitted, past due, and expects a submission" do
+      @submission.assignment.submission_types = "online_quiz"
       @submission.submission_type = nil # forces submitted_at to be nil
       @submission.cached_due_date = 1.day.ago
+
+      # Regardless of score
+      @submission.score = 0.00000001
+      @submission.graded_at = Time.zone.now + 1.day
+
+      @submission.should be_missing
+    end
+
+    it "should be true if not submitted, score of zero, and does not expect a submission" do
+      @submission.assignment.submission_types = "on_paper"
+      @submission.submission_type = nil # forces submitted_at to be nil
+      @submission.cached_due_date = 1.day.ago
+      @submission.score = 0
+      @submission.graded_at = Time.zone.now + 1.day
+      @submission.should be_missing
+    end
+
+    it "should be false if not submitted, score greater than zero, and does not expect a submission" do
+      @submission.assignment.submission_types = "on_paper"
+      @submission.submission_type = nil # forces submitted_at to be nil
+      @submission.cached_due_date = 1.day.ago
+      @submission.score = 0.00000001
+      @submission.graded_at = Time.zone.now + 1.day
       @submission.should be_missing
     end
   end

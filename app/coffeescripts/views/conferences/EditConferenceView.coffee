@@ -36,6 +36,9 @@ define [
         success: (data) =>
           @model.set(data)
           @model.trigger('sync')
+        error: =>
+          @show(@model)
+          alert('Save failed.')
       )
 
     show: (model) ->

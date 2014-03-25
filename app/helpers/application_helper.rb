@@ -870,4 +870,12 @@ module ApplicationHelper
       }
     )
   end
+
+  def dashboard_url(opts={})
+    @domain_root_account.settings[:dashboard_url] || super(opts)
+  end
+
+  def dashboard_path(opts={})
+    @domain_root_account.settings[:dashboard_url] || super(opts)
+  end
 end

@@ -299,6 +299,9 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
+    if custom_dash = @domain_root_account.settings[:dashboard_url]
+      return redirect_to custom_dash
+    end
     check_incomplete_registration
     get_context
 

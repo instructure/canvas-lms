@@ -709,6 +709,92 @@ describe "Users API", type: :request do
     end
   end
 
+  describe "user custom_data" do
+    let(:namespace_a) { 'com.awesome-developer.mobile' }
+    let(:namespace_b) { 'org.charitable-developer.generosity' }
+    let(:scope) { 'nice/scope' }
+    let(:scope2) { 'something-different' }
+    let(:path) { "/api/v1/users/#{@student.to_param}/custom_data/#{scope}" }
+    let(:path2) { "/api/v1/users/#{@student.to_param}/custom_data/#{scope2}" }
+    let(:path_opts_put) { {controller: 'custom_data',
+                              action: 'set_data',
+                              format: 'json',
+                              user_id: @student.to_param,
+                              scope: scope} }
+    let(:path_opts_get) { path_opts_put.merge({action: 'get_data'}) }
+    let(:path_opts_del) { path_opts_put.merge({action: 'delete_data'}) }
+    let(:path_opts_put2) { path_opts_put.merge({scope: scope2}) }
+    let(:path_opts_get2) { path_opts_put2.merge({action: 'get_data'}) }
+
+    it "scopes storage by namespace and a *scope glob" do
+      data = 'boom shaka-laka'
+      other_data = 'whoop there it is'
+      data2 = 'whatevs'
+      other_data2 = 'totes'
+      api_call(:put, path,  path_opts_put,  {ns: namespace_a, data: data})
+      api_call(:put, path2, path_opts_put2, {ns: namespace_a, data: data2})
+      api_call(:put, path,  path_opts_put,  {ns: namespace_b, data: other_data})
+      api_call(:put, path2, path_opts_put2, {ns: namespace_b, data: other_data2})
+
+      body = api_call(:get, path, path_opts_get, {ns: namespace_a})
+      body.should == {'data'=>data}
+
+      body = api_call(:get, path, path_opts_get, {ns: namespace_b})
+      body.should == {'data'=>other_data}
+
+      body = api_call(:get, path2, path_opts_get2, {ns: namespace_a})
+      body.should == {'data'=>data2}
+
+      body = api_call(:get, path2, path_opts_get2, {ns: namespace_b})
+      body.should == {'data'=>other_data2}
+    end
+
+    it "turns JSON hashes into scopes" do
+      data = JSON.parse '{"a":"nice JSON","b":"dont you think?"}'
+      get_path = path + '/b'
+      get_scope = scope + '/b'
+      api_call(:put, path, path_opts_put, {ns: namespace_a, data: data})
+      body = api_call(:get, get_path, path_opts_get.merge({scope: get_scope}), {ns: namespace_a})
+      body.should == {'data'=>'dont you think?'}
+    end
+
+    it "is deleteable" do
+      data = JSON.parse '{"a":"nice JSON","b":"dont you think?"}'
+      del_path = path + '/b'
+      del_scope = scope + '/b'
+      api_call(:put, path, path_opts_put, {ns: namespace_a, data: data})
+      body = api_call(:delete, del_path, path_opts_del.merge({scope: del_scope}), {ns: namespace_a})
+      body.should == {'data'=>'dont you think?'}
+
+      body = api_call(:get, path, path_opts_get, {ns: namespace_a})
+      body.should == {'data'=>{'a'=>'nice JSON'}}
+    end
+
+    context "without a namespace" do
+      it "responds 400 to GET" do
+        api_call(:get, path, path_opts_get, {}, {}, {expected_status: 400})
+      end
+
+      it "responds 400 to PUT" do
+        api_call(:put, path, path_opts_put, {data: 'whatevs'}, {}, {expected_status: 400})
+      end
+
+      it "responds 400 to DELETE" do
+        api_call(:delete, path, path_opts_del, {}, {}, {expected_status: 400})
+      end
+    end
+
+    context "PUT" do
+      it "responds 409 when the requested scope is invalid" do
+        deeper_path = path + '/whoa'
+        deeper_scope = scope + '/whoa'
+        api_call(:put, path, path_opts_put, {ns: namespace_a, data: 'ohai!'})
+        raw_api_call(:put, deeper_path, path_opts_put.merge({scope: deeper_scope}), {ns: namespace_a, data: 'dood'})
+        response.code.should eql '409'
+      end
+    end
+  end
+
   describe "user deletion" do
     before do
       @admin = account_admin_user

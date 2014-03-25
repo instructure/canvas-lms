@@ -997,7 +997,8 @@ class Submission < ActiveRecord::Base
   alias_method :late, :late?
 
   def missing?
-    submitted_at.nil? && past_due?
+    return false if !past_due? || submitted_at.present?
+    assignment.expects_submission? || !(self.graded? && self.score > 0)
   end
   alias_method :missing, :missing?
 
