@@ -1160,18 +1160,10 @@ class Assignment < ActiveRecord::Base
                   .includes(:submission_comments,
                             :attachments,
                             :versions,
-                            {:quiz_submission => :versions})
+                            :quiz_submission)
 
-    # quiz submission versions are too expensive to de-serialize so we have to
-    # cap the number we will do
-    qs_threshold = Setting.get("too_many_quiz_submission_versions", "150").to_i
-    too_many_qs_versions = qs_threshold <= submissions.inject(0) { |sum,s|
-      if s.quiz_submission
-        sum + s.quiz_submission.versions.size
-      else
-        sum
-      end
-    }
+    too_many = too_many_qs_versions?(submissions)
+    qs_versions = quiz_submission_versions(submissions, too_many)
 
     res[:submissions] = submissions.map do |sub|
       json = sub.as_json(:include_root => false,
@@ -1187,7 +1179,7 @@ class Assignment < ActiveRecord::Base
         :methods => [:scribdable?, :scribd_doc, :submission_history, :late],
         :only => submission_fields
       )
-      json['submission_history'] = if json['submission_history'] && (quiz.nil? || too_many_qs_versions)
+      json['submission_history'] = if json['submission_history'] && (quiz.nil? || too_many)
                                      json['submission_history'].map do |version|
                                        version.as_json(
                                          :include => {
@@ -1207,8 +1199,7 @@ class Assignment < ActiveRecord::Base
                                        end
                                      end
                                    elsif quiz && sub.quiz_submission
-                                     quiz_submission_versions = sub.quiz_submission.versions.reverse
-                                     quiz_submission_versions.map do |v|
+                                     qs_versions[sub.quiz_submission.id].map do |v|
                                        qs = v.model
                                        {submission: {
                                          grade: qs.score,
@@ -1225,6 +1216,34 @@ class Assignment < ActiveRecord::Base
     res
   ensure
     Attachment.skip_thumbnails = nil
+  end
+
+  # quiz submission versions are too expensive to de-serialize so we have to
+  # cap the number we will do
+  def too_many_qs_versions?(student_submissions)
+    qs_threshold = Setting.get("too_many_quiz_submission_versions", "150").to_i
+    qs_threshold <= student_submissions.inject(0) do |sum, s|
+      s.quiz_submission ? sum + s.quiz_submission.versions.size : sum
+    end
+  end
+
+  # :including quiz submission versions won't work for records in the
+  # database before namespace changes. This does a bulk pre-query to prevent
+  # n+1 queries. replace this with an :include again after namespaced
+  # polymorphic data is migrated
+  def quiz_submission_versions(student_submissions, too_many_qs_versions)
+    submissions_with_qs = student_submissions.select do |sub|
+      quiz && sub.quiz_submission && !too_many_qs_versions
+    end
+    qs_versions = Version.where(
+      "versionable_type IN ('QuizSubmission', 'Quizzes::QuizSubmission') AND versionable_id IN (?)",
+      submissions_with_qs.map {|submission| submission.quiz_submission.id }
+    ).order("number")
+
+    qs_versions.each_with_object({}) do |version, hash|
+      hash[version.versionable_id] ||= []
+      hash[version.versionable_id] << version
+    end
   end
 
   def grade_as_group?

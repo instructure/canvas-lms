@@ -2259,6 +2259,53 @@ describe Assignment do
       json = @assignment.speed_grader_json(@teacher)
       json[:submissions].first['submission_history'].first[:submission]['late'].should be_true
     end
+
+    it "returns quiz history for records before and after namespace change" do
+      course_with_teacher(:active_all => true)
+      student_in_course
+      quiz_with_graded_submission([], { :course => @course, :user => @student })
+      @quiz.save!
+
+      json = @assignment.speed_grader_json(@teacher)
+      json[:submissions].first['submission_history'].size.should == 1
+
+      Version.update_all("versionable_type = 'QuizSubmission'", "versionable_type = 'Quizzes::QuizSubmission'")
+      json = @assignment.reload.speed_grader_json(@teacher)
+      json[:submissions].first['submission_history'].size.should == 1
+    end
+  end
+
+  describe "#too_many_qs_versions" do
+    it "returns if there are too many versions to load at once" do
+      course_with_teacher :active_all => true
+      student_in_course
+      quiz_with_graded_submission [], :course => @course, :user => @student
+      submissions = @quiz.assignment.submissions
+
+      Setting.set('too_many_quiz_submission_versions', 3)
+      1.times { @quiz_submission.versions.create! }
+      @quiz.assignment.too_many_qs_versions?(submissions).should be_false
+
+      2.times { @quiz_submission.versions.create! }
+      @quiz.reload.assignment.too_many_qs_versions?(submissions).should be_true
+    end
+  end
+
+  describe "#quiz_submission_versions" do
+    it "finds quiz submission versions for submissions" do
+      course_with_teacher(:active_all => true)
+      student_in_course
+      quiz_with_graded_submission([], { :course => @course, :user => @student })
+      @quiz.save!
+
+      assignment  = @quiz.assignment
+      submissions = assignment.submissions
+      too_many    = assignment.too_many_qs_versions?(submissions)
+
+      versions = assignment.quiz_submission_versions(submissions, too_many)
+
+      versions[@quiz_submission.id].size.should == 1
+    end
   end
 
   describe "update_student_submissions" do
