@@ -2314,6 +2314,11 @@ class User < ActiveRecord::Base
     can_add
   end
 
+  def can_be_enrolled_in_course?(course)
+    !!find_pseudonym_for_account(course.root_account, true) ||
+        (self.creation_pending? && self.enrollments.where(course_id: course).exists?)
+  end
+
   def group_member_json(context)
     h = { :user_id => self.id, :name => self.last_name_first, :display_name => self.short_name }
     if context && context.is_a?(Course)
