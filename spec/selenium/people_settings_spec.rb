@@ -90,7 +90,7 @@ describe "course people" do
     end
 
     def add_user_to_second_section(role_name=nil)
-      student_in_course(:role_name => role_name)
+      student_in_course(:user => user_with_pseudonym, :role_name => role_name)
       section_name = 'Another Section'
       add_section(section_name)
       # open tab
@@ -150,7 +150,7 @@ describe "course people" do
 
     it "should deal with observers linked to multiple students" do
       students = []
-      obs = user_model(:name => "The Observer")
+      obs = user_with_pseudonym(:name => "The Observer")
       2.times do |i|
         student_in_course(:name => "Student #{i}")
         students << @student
@@ -211,7 +211,7 @@ describe "course people" do
         send "custom_#{et}_role", "custom"
         send "course_with_#{et}", :course => @course, :active_all => true, :custom_role => 'custom'
         user_session @user
-        student_in_course :course => @course, :role_name => 'custom stu'
+        student_in_course :user => user_with_pseudonym, :course => @course, :role_name => 'custom stu'
 
         go_to_people_page
 
@@ -232,7 +232,7 @@ describe "course people" do
     context "multiple enrollments" do
       it "should link an observer enrollment when other enrollment types exist" do
         course_with_student :course => @course, :active_all => true, :name => 'teh student'
-        course_with_ta :course => @course, :active_all => true
+        course_with_ta :user => user_with_pseudonym, :course => @course, :active_all => true
         course_with_observer :course => @course, :active_all => true, :user => @ta
 
         go_to_people_page
