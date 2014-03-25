@@ -427,7 +427,6 @@ class AssignmentsController < ApplicationController
         @assignment.assignment_group = group if group
         if @assignment.update_attributes(params[:assignment])
           log_asset_access(@assignment, "assignments", @assignment_group, 'participate')
-          generate_new_page_view
           @assignment.context_module_action(@current_user, :contributed)
           @assignment.reload
           flash[:notice] = t 'notices.updated', "Assignment was successfully updated."

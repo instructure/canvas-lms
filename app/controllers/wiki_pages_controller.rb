@@ -120,7 +120,6 @@ class WikiPagesController < ApplicationController
       end
 
       log_asset_access(@page, "wiki", @wiki, 'participate')
-      generate_new_page_view
       @page.context_module_action(@current_user, @context, :contributed)
       flash[:notice] = t('notices.page_updated', 'Page was successfully updated.')
       respond_to do |format|

@@ -422,7 +422,6 @@ class FilesController < ApplicationController
       # a user views an inline preview of a file instead of downloading
       # it, since this should also count as an access.
       elsif params[:inline]
-        generate_new_page_view
         @attachment.context_module_action(@current_user, :read) if @current_user
         log_asset_access(@attachment, 'files', 'files')
         @attachment.record_inline_view

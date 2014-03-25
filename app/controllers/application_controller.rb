@@ -822,6 +822,10 @@ class ApplicationController < ActionController::Base
         access_context = @context.is_a?(UserProfile) ? @context.user : @context
         @access.log access_context, @accessed_asset
 
+        if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
+          generate_page_view
+        end
+
         if @page_view
           @page_view.participated = %w{participate submit}.include?(@accessed_asset[:level])
           @page_view.asset_user_access = @access

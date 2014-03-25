@@ -473,7 +473,6 @@ class SubmissionsController < ApplicationController
       respond_to do |format|
         if @submission.save
           log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
-          generate_new_page_view
           format.html {
             flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
             redirect_to course_assignment_url(@context, @assignment)
