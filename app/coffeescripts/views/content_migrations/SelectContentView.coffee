@@ -10,11 +10,11 @@ define [
   'compiled/views/CollectionView'
   'compiled/collections/content_migrations/ContentCheckboxCollection'
   'compiled/views/content_migrations/ContentCheckboxView'
-  'compiled/views/content_migrations/KeyboardNavigationForTree'
+  'compiled/views/content_migrations/NavigationForTree'
   'compiled/views/content_migrations/ExpandCollapseContentSelectTreeItems'
   'compiled/views/content_migrations/CheckingCheckboxesForTree'
   'compiled/views/content_migrations/ScrollPositionForTree'
-], (Backbone, $, _, I18n, template, wrapperTemplate, checkboxCollectionTemplate, DialogFormView, CollectionView , CheckboxCollection, CheckboxView, KeyboardNavigationForTree, ExpandCollapseContentSelectTreeItems, CheckingCheckboxesForTree, ScrollPositionForTree) ->
+], (Backbone, $, _, I18n, template, wrapperTemplate, checkboxCollectionTemplate, DialogFormView, CollectionView , CheckboxCollection, CheckboxView, NavigationForTree, ExpandCollapseContentSelectTreeItems, CheckingCheckboxesForTree, ScrollPositionForTree) ->
   class SelectContentView extends DialogFormView
 
     els:
@@ -71,17 +71,12 @@ define [
       @$el.disableWhileLoading dfd
 
       dfd.done =>
-        @$tree = @$el.find('ul[role=tree]')
-
-        new KeyboardNavigationForTree(@$tree)
-        new ExpandCollapseContentSelectTreeItems(@$tree)
-        new CheckingCheckboxesForTree(@$tree)
-        new ScrollPositionForTree(@$tree, @$formDialogContent)
-
-        @$el.on 'click', "#cancelSelect", => @close()
-        @$el.on "change", "input[type=checkbox]", @setSubmitButtonState
+        @maintainTheTree(@$el.find('ul[role=tree]'))
+        @selectContentDialogEvents()
 
       @checkboxCollectionView.render()
+
+    # Private Methods
 
     # You must have at least one checkbox selected in order to submit the form. Disable the submit
     # button if there are not items selected.
@@ -94,3 +89,18 @@ define [
 
       @$selectContentBtn.prop('disabled', buttonState)
 
+    # Add SelectContent dialog box events. These events are general to the whole box.
+    # Keeps everything in one place
+
+    selectContentDialogEvents: =>
+      @$el.on 'click', "#cancelSelect", => @close()
+      @$el.on "change", "input[type=checkbox]", @setSubmitButtonState
+
+    # These are the classes that help modify the tree. These methods will add events to the 
+    # tree and keep things like scroll position correct as well as ensuring focus is being mantained.
+
+    maintainTheTree: ($tree) =>
+      new NavigationForTree($tree)
+      new ExpandCollapseContentSelectTreeItems($tree)
+      new CheckingCheckboxesForTree($tree)
+      new ScrollPositionForTree($tree, @$formDialogContent)
