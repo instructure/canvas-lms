@@ -839,6 +839,9 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   #
   # @throw ArgumentError If the submission does not have an end_at timestamp set.
   def grade_when_overdue
+    # disable grading in background until we figure out potential race condition issues
+    return
+
     unless self.end_at.present?
       raise ArgumentError,
         'QuizSubmission is not applicable for overdue enforced grading!'
@@ -855,6 +858,9 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   # don't use this directly, see #grade_when_overdue
   def grade_if_untaken
+    # disable grading in background until we figure out potential race condition issues
+    return
+
     # We can skip the needs_grading? test because we know that the submission
     # is overdue since the job will be processed after submission.end_at ...
     # so we simply test its workflow state.
