@@ -89,10 +89,24 @@ class Attachment < ActiveRecord::Base
     rv
   end
 
+  def self.store_type
+    if s3_storage?
+      Attachments::S3Storage
+    elsif local_storage?
+      Attachments::LocalStorage
+    else
+      raise "Unknown storage system configured"
+    end
+  end
+
+  def store
+    @store ||= Attachment.store_type.new(self)
+  end
+
   # Haaay... you're changing stuff here? Don't forget about the Thumbnail model
   # too, it cares about local vs s3 storage.
   has_attachment(
-      :storage => (local_storage? ? :file_system : :s3),
+      :storage => self.store_type.key,
       :path_prefix => file_store_config['path_prefix'],
       :s3_access => :private,
       :thumbnails => { :thumb => '128x128' },
@@ -153,7 +167,6 @@ class Attachment < ActiveRecord::Base
   def self.relative_context?(context_class)
     RELATIVE_CONTEXT_TYPES.include?(context_class.to_s)
   end
-
 
   def touch_context_if_appropriate
     unless context_type == 'ConversationMessage'
@@ -471,6 +484,8 @@ class Attachment < ActiveRecord::Base
       self.write_attribute(:filename, self.filename + ext) unless ext == '.unknown'
     end
   end
+
+
   def extension
     res = (self.filename || "").match(/(\.[^\.]*)\z/).to_s
     res = nil if res == ""
@@ -573,28 +588,15 @@ class Attachment < ActiveRecord::Base
   end
 
   def change_namespace(new_namespace)
-    if self.root_attachment
-      raise "change_namespace must be called on a root attachment"
-    end
+    raise "change_namespace must be called on a root attachment" if self.root_attachment
+    return if new_namespace == self.namespace
 
-    old_namespace = self.namespace
-    return if new_namespace == old_namespace
     old_full_filename = self.full_filename
     write_attribute(:namespace, new_namespace)
 
-    if Attachment.s3_storage?
-      # copying rather than moving to avoid unhappy accidents
-      # note that GC of the S3 bucket isn't yet implemented,
-      # so there's a bit of a cost here
-      if !s3object.exists?
-        bucket.objects[old_full_filename].copy_to(self.full_filename,
-                                                  :acl => attachment_options[:s3_access])
-      end
-    else
-      FileUtils.mv old_full_filename, full_filename
-    end
-
+    self.store.change_namespace(old_full_filename)
     self.save
+
     Attachment.where(:root_attachment_id => self).update_all(:namespace => new_namespace)
   end
 
@@ -642,24 +644,6 @@ class Attachment < ActiveRecord::Base
   S3_EXPIRATION_TIME = 30.minutes
 
   def ajax_upload_params(pseudonym, local_upload_url, s3_success_url, options = {})
-    if Attachment.s3_storage?
-      res = {
-        :upload_url => "#{options[:ssl] ? "https" : "http"}://#{bucket.name}.#{bucket.config.s3_endpoint}/",
-        :file_param => 'file',
-        :success_url => s3_success_url,
-        :upload_params => {
-          'AWSAccessKeyId' => bucket.config.access_key_id
-        }
-      }
-    elsif Attachment.local_storage?
-      res = {
-        :upload_url => local_upload_url,
-        :file_param => options[:file_param] || 'attachment[uploaded_data]', #uploadify ignores this and uses 'file',
-        :upload_params => options[:upload_params] || {}
-      }
-    else
-      raise "Unknown storage system configured"
-    end
 
     # Build the data that will be needed for the user to upload to s3
     # without us being the middle-man
@@ -673,9 +657,10 @@ class Attachment < ActiveRecord::Base
         ['content-length-range', 1, (options[:max_size] || CONTENT_LENGTH_RANGE)]
       ]
     }
-    if Attachment.s3_storage?
-      policy['conditions'].unshift({'bucket' => bucket.name})
-    end
+
+    res = self.store.initialize_ajax_upload_params(local_upload_url, s3_success_url, options)
+    policy = self.store.amend_policy_conditions(policy, pseudonym)
+
     if res[:upload_params]['folder'].present?
       policy['conditions'] << ['starts-with', '$folder', '']
     end
@@ -690,12 +675,6 @@ class Attachment < ActiveRecord::Base
       extras << {'content-type' => content_type}
     end
     policy['conditions'] += extras
-    # flash won't send the session cookie, so for local uploads we put the user id in the signed
-    # policy so we can mock up the session for FilesController#create
-    if Attachment.local_storage?
-      policy['conditions'] << { 'pseudonym_id' => pseudonym.id }
-      policy['attachment_id'] = self.id
-    end
 
     policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
     signature = Base64.encode64(
@@ -805,7 +784,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def shared_secret
-    self.class.s3_storage? ? bucket.config.secret_access_key : self.class.shared_secret
+    store.shared_secret
   end
 
   def downloadable?
@@ -841,37 +820,7 @@ class Attachment < ActiveRecord::Base
   # path will be used instead of the default system temporary path. It'll be
   # created if necessary.
   def open(opts = {}, &block)
-    if Attachment.local_storage?
-      if block
-        File.open(self.full_filename, 'rb') { |file|
-          chunk = file.read(4096)
-          while chunk
-            yield chunk
-            chunk = file.read(4096)
-          end
-        }
-      else
-        File.open(self.full_filename, 'rb')
-      end
-    elsif block
-      s3object.read(&block)
-    else
-      # TODO: !need_local_file -- net/http and thus AWS::S3::S3Object don't
-      # natively support streaming the response, except when a block is given.
-      # so without Fibers, there's not a great way to return an IO-like object
-      # that streams the response. A separate thread, I guess. Bleck. Need to
-      # investigate other options.
-      if opts[:temp_folder].present? && !File.exist?(opts[:temp_folder])
-        FileUtils.mkdir_p(opts[:temp_folder])
-      end
-      tempfile = Tempfile.new(["attachment_#{self.id}", self.extension],
-                              opts[:temp_folder].presence || Dir::tmpdir)
-      s3object.read do |chunk|
-        tempfile.write(chunk)
-      end
-      tempfile.rewind
-      tempfile
-    end
+    store.open(opts, &block)
   end
 
   # you should be able to pass an optional width, height, and page_number/video_seconds to this method
