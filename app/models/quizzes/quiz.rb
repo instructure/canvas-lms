@@ -1376,6 +1376,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def current_regrade
     Quizzes::QuizRegrade.where(quiz_id: id, quiz_version: version_number).
+      where("quiz_question_regrades.regrade_option != 'disabled'").
       includes(:quiz_question_regrades => :quiz_question).first
   end
 
@@ -1385,8 +1386,8 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def questions_regraded_since(created_at)
     question_regrades = Set.new
-    quiz_regrades.where("created_at > ?", created_at)
-    .includes(:quiz_question_regrades).each do |regrade|
+    quiz_regrades.where("quiz_regrades.created_at > ? AND quiz_question_regrades.regrade_option != 'disabled'", created_at)
+                 .includes(:quiz_question_regrades).each do |regrade|
       ids = regrade.quiz_question_regrades.map { |qqr| qqr.quiz_question_id }
       question_regrades.merge(ids)
     end
