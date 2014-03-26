@@ -16,12 +16,8 @@ end
 routes.draw do
   resources :submission_comments, :only => :destroy
 
-  match 'inbox' => 'context#mark_inbox_as_read', :as => :mark_inbox_as_read, :via => :delete
   match 'inbox' => 'context#inbox', :as => :inbox
-  match 'inbox/:id' => 'context#destroy_inbox_item', :as => :destroy_inbox_item, :via => :delete
-  match 'inbox/:id' => 'context#inbox_item', :as => :inbox_item
 
-  match 'conversations/discussion_replies' => 'context#discussion_replies', :as => :discussion_replies
   match 'conversations/unread' => 'conversations#index', :as => :conversations_unread, :redirect_scope => 'unread'
   match 'conversations/starred' => 'conversations#index', :as => :conversations_starred, :redirect_scope => 'starred'
   match 'conversations/sent' => 'conversations#index', :as => :conversations_sent, :redirect_scope => 'sent'

@@ -19,9 +19,9 @@
 class ContextController < ApplicationController
   include SearchHelper
 
-  before_filter :require_context, :except => [:inbox, :inbox_item, :destroy_inbox_item, :mark_inbox_as_read, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet, :discussion_replies]
-  before_filter :require_user, :only => [:inbox, :inbox_item, :report_avatar_image, :discussion_replies]
-  before_filter :reject_student_view_student, :only => [:inbox, :inbox_item, :discussion_replies]
+  before_filter :require_context, :except => [:inbox, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet]
+  before_filter :require_user, :only => [:inbox, :report_avatar_image]
+  before_filter :reject_student_view_student, :only => [:inbox]
   protect_from_forgery :except => [:kaltura_notifications, :object_snippet]
 
   def create_media_object
@@ -176,82 +176,8 @@ class ContextController < ApplicationController
     render :layout => false
   end
 
-  def inbox_item
-    @item = @current_user.inbox_items.find_by_id(params[:id]) if params[:id].present?
-    if !@item
-      flash[:error] = t(:message_removed, "The message you were trying to view has been removed")
-      redirect_to inbox_url
-      return
-    else
-      @item.mark_as_read
-      @asset = @item.asset
-    end
-    respond_to do |format|
-      format.html do
-        if @asset.is_a?(DiscussionEntry)
-          redirect_to named_context_url(@asset.discussion_topic.context, :context_discussion_topic_url, @asset.discussion_topic_id, :discussion_entry_id => @asset.id)
-        elsif @asset.is_a?(SubmissionComment)
-          redirect_to named_context_url(@asset.submission.context, :context_assignment_submission_url, @asset.submission.assignment_id, @asset.submission.user_id)
-        elsif @asset.nil?
-          flash[:notice] = t(:message_deleted, "This message has been deleted")
-          redirect_to inbox_url
-        else
-          flash[:notice] = t(:bad_message, "This message could not be displayed")
-          redirect_to inbox_url
-        end
-      end
-      format.json do
-        json_params = {
-          :include => [:attachments, :users],
-          :methods => :formatted_body,
-          :user_content => %w(formatted_body),
-        }
-        @asset[:is_student] = !!@item.context.enrollments.all_student.find_by_user_id(@item.sender_id) rescue false
-        render :json => @asset.as_json(json_params)
-      end
-    end
-  end
-
-  def destroy_inbox_item
-    @item = @current_user.inbox_items.find_by_id(params[:id]) if params[:id].present?
-    @asset = @item && @item.asset
-    @item && @item.destroy
-    render :json => @item
-  end
-
   def inbox
     redirect_to conversations_url, :status => :moved_permanently
-  end
-
-  def discussion_replies
-    add_crumb(t('#crumb.conversations', "Conversations"), conversations_url)
-    add_crumb(t('#crumb.discussion_replies', "Discussion Replies"), discussion_replies_url)
-    @messages = @current_user.inbox_items.active
-    log_asset_access("inbox:#{@current_user.asset_string}", "inbox", 'other')
-    respond_to do |format|
-      format.html do
-        @messages = @messages.paginate(page: params[:page], per_page: 15)
-        js_env(discussion_replies_path: discussion_replies_path(:format => :json),
-               total_pages: @messages.size)
-        render :action => :inbox
-      end
-      format.json do
-        @messages = Api.paginate(@messages, self, discussion_replies_url, default_per_page: 15)
-        render :json => @messages.map{ |m| m.as_json(methods: [:sender_name]) }
-      end
-    end
-  end
-
-  def mark_inbox_as_read
-    flash[:notice] = t(:all_marked_read, "Inbox messages all marked as read")
-    if @current_user
-      InboxItem.where(:user_id => @current_user).update_all(:workflow_state => 'read')
-      User.where(:id => @current_user).update_all(:unread_inbox_items_count => (@current_user.inbox_items.unread.count rescue 0))
-    end
-    respond_to do |format|
-      format.html { redirect_to inbox_url }
-      format.json { render :json => {:marked_as_read => true} }
-    end
   end
 
   def roster

@@ -26,7 +26,6 @@ stylesheets:
     - public/stylesheets/static/mediaelementplayer.css
     - public/stylesheets/compiled/g_instructure.css
     - public/stylesheets/compiled/g_assignments.css
-    - public/stylesheets/compiled/g_context_inbox.css
     - public/stylesheets/compiled/g_groups.css # TODO: remove me when new manage_groups lands
     - public/stylesheets/compiled/g_media_comments.css
     - public/stylesheets/compiled/g_context_modules.css
