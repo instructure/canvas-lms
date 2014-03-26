@@ -1887,4 +1887,23 @@ describe Quizzes::QuizSubmission do
       end
     end
   end
+
+  context "with attachments" do
+    before(:each) do
+      course_with_student_logged_in :active_all => true
+      course_quiz !!:active
+      @qs = @quiz.generate_submission @user
+      create_attachment_for_file_upload_submission!(@qs)
+    end
+
+    describe "#attachments" do
+      it "finds the attachment with both namespaced and non-namespaced quizzes" do
+        Quizzes::QuizSubmission.find(@qs).attachments.count.should == 1
+
+        Attachment.update_all("context_type='QuizSubmission'","context_id=#{@qs.id} AND context_type='Quizzes::QuizSubmission'")
+        Quizzes::QuizSubmission.find(@qs).attachments.count.should == 1
+      end
+    end
+  end
+
 end
