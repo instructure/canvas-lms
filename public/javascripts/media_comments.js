@@ -339,17 +339,6 @@ define([
           partner_data: $.mediaComment.partnerData(),
           entryName:temporaryName
         };
-        if ( INST.kalturaSettings.do_flash_var_test ) {
-          // It's not supposed to have the protocol
-          recordVars.host = INST.kalturaSettings.domain;
-          // these are deprecated
-          delete recordVars['subpid']
-          delete recordVars['uid']
-          // these are stability experiments
-          recordVars.maxUploads = 5;
-          recordVars.detectionDelay = 500;
-          recordVars.timePerMic = 5000;
-        }
 
         var params = {
           "align": "middle",
@@ -362,12 +351,20 @@ define([
           "wmode": "opaque"
         };
         $("#audio_record").text(I18n.t('messages.flash_required_record_audio', "Flash required for recording audio."));
-        swfobject.embedSWF("/media_record/KRecord.swf", "audio_record", "400", "300", "9.0.0", false, recordVars, params);
+        if (INST.kalturaSettings.use_alt_record_widget) {
+          swfobject.embedSWF("/media_record/KRecord_alt.swf", "audio_record", "400", "300", "9.0.0", false, recordVars, params);
+        } else {
+          swfobject.embedSWF("/media_record/KRecord.swf", "audio_record", "400", "300", "9.0.0", false, recordVars, params);
+        }
 
         var params = $.extend({}, params, {name: 'KRecordVideo'});
         var recordVars = $.extend({}, recordVars, {useCamera: '1'});
         $("#video_record").html("Flash required for recording video.");
-        swfobject.embedSWF("/media_record/KRecord.swf", "video_record", "400", "300", "9.0.0", false, recordVars, params);
+        if (INST.kalturaSettings.use_alt_record_widget) {
+          swfobject.embedSWF("/media_record/KRecord_alt.swf", "video_record", "400", "300", "9.0.0", false, recordVars, params);
+        } else {
+          swfobject.embedSWF("/media_record/KRecord.swf", "video_record", "400", "300", "9.0.0", false, recordVars, params);
+        }
 
         // give the dialog time to initialize or the recorder will
         // render funky in ie
@@ -392,12 +389,7 @@ define([
         uiConfId: INST.kalturaSettings.upload_ui_conf,
         jsDelegate: "$.mediaComment.audio_delegate"
       };
-      if ( INST.kalturaSettings.do_flash_var_test ) {
-        // deprecated
-        delete flashVars['uid']
-        // stability experiments
-        flashVars.maxUploads = 5;
-      }
+
       var params = {
         "align": "middle",
         "quality": "high",
@@ -521,9 +513,7 @@ define([
       // **********************************************************************
       $.ajaxJSON('/api/v1/services/kaltura_session', 'POST', {}, function(data) {
         $div.data('ks', data.ks);
-        if ( !INST.kalturaSettings.do_flash_var_test ) {
-          $div.data('uid', data.uid);
-        }
+        $div.data('uid', data.uid);
       }, function(data) {
         if(data.logged_in == false) {
           $div.data('ks-error', I18n.t('errors.must_be_logged_in', "You must be logged in to record media."));
@@ -648,3 +638,19 @@ define([
     }
   }
 });
+
+// Debugging methods for kaltura record widget. If These exist they'll be called.
+//function deviceDetected(){
+//    console.log('detected');
+//}
+//
+//function connected(){
+//    console.log('connected');
+//}
+//function workingMicFound(){
+//    console.log('mic found');
+//}
+//
+//function noMicsFound(){
+//    console.log('no mics found');
+//}
