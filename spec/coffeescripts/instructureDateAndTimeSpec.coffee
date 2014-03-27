@@ -2,8 +2,9 @@ define [
   'jquery'
   'timezone'
   'vendor/timezone/America/Detroit'
+  'vendor/timezone/America/Juneau'
   'jquery.instructure_date_and_time'
-], ($, tz, detroit) ->
+], ($, tz, detroit, juneau) ->
   module 'parseFromISO'
 
   expectedTimestamp = Date.UTC(2013, 8, 1) / 1000
@@ -69,3 +70,75 @@ define [
     parsed = $.parseFromISO('1970-01-01T00:00:00Z')
     equal parsed.timestamp, 0
     tz.restore(snapshot)
+
+  module 'fudgeDateForProfileTimezone',
+    setup: ->
+      @snapshot = tz.snapshot()
+      @original = new Date(expectedTimestamp = Date.UTC(2013, 8, 1))
+
+    teardown: ->
+      tz.restore(@snapshot)
+
+  test 'should produce a date that formats via toString same as the original formats via tz', ->
+    fudged = $.fudgeDateForProfileTimezone(@original)
+    equal fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(@original, '%F %T')
+
+  test 'should work on non-date date-like values', ->
+    fudged = $.fudgeDateForProfileTimezone(+@original)
+    equal fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(@original, '%F %T')
+
+    fudged = $.fudgeDateForProfileTimezone(@original.toISOString())
+    equal fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(@original, '%F %T')
+
+  test 'should return null for invalid values', ->
+    equal $.fudgeDateForProfileTimezone(null), null
+    equal $.fudgeDateForProfileTimezone(''), null
+    equal $.fudgeDateForProfileTimezone('bogus'), null
+
+  test 'should not return treat 0 as invalid', ->
+    equal +$.fudgeDateForProfileTimezone(0), +$.fudgeDateForProfileTimezone(new Date(0))
+
+  test 'should be sensitive to profile time zone', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    fudged = $.fudgeDateForProfileTimezone(@original)
+    equal fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(@original, '%F %T')
+
+    tz.changeZone(juneau, 'America/Juneau')
+    fudged = $.fudgeDateForProfileTimezone(@original)
+    equal fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(@original, '%F %T')
+
+  module 'unfudgeDateForProfileTimezone',
+    setup: ->
+      @snapshot = tz.snapshot()
+      @original = new Date(expectedTimestamp = Date.UTC(2013, 8, 1))
+
+    teardown: ->
+      tz.restore(@snapshot)
+
+  test 'should produce a date that formats via tz same as the original formats via toString()', ->
+    unfudged = $.unfudgeDateForProfileTimezone(@original)
+    equal tz.format(unfudged, '%F %T'), @original.toString('yyyy-MM-dd HH:mm:ss')
+
+  test 'should work on non-date date-like values', ->
+    unfudged = $.unfudgeDateForProfileTimezone(+@original)
+    equal tz.format(unfudged, '%F %T'), @original.toString('yyyy-MM-dd HH:mm:ss')
+
+    unfudged = $.unfudgeDateForProfileTimezone(@original.toISOString())
+    equal tz.format(unfudged, '%F %T'), @original.toString('yyyy-MM-dd HH:mm:ss')
+
+  test 'should return null for invalid values', ->
+    equal $.unfudgeDateForProfileTimezone(null), null
+    equal $.unfudgeDateForProfileTimezone(''), null
+    equal $.unfudgeDateForProfileTimezone('bogus'), null
+
+  test 'should not return treat 0 as invalid', ->
+    equal +$.unfudgeDateForProfileTimezone(0), +$.unfudgeDateForProfileTimezone(new Date(0))
+
+  test 'should be sensitive to profile time zone', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    unfudged = $.unfudgeDateForProfileTimezone(@original)
+    equal tz.format(unfudged, '%F %T'), @original.toString('yyyy-MM-dd HH:mm:ss')
+
+    tz.changeZone(juneau, 'America/Juneau')
+    unfudged = $.unfudgeDateForProfileTimezone(@original)
+    equal tz.format(unfudged, '%F %T'), @original.toString('yyyy-MM-dd HH:mm:ss')
