@@ -125,7 +125,10 @@ class Rubric < ActiveRecord::Base
   def touch_associations
     if alignments_need_update?
       # associations might need to update their alignments also
-      rubric_associations.bookmarked.each &:save
+      rubric_associations.bookmarked.each { |ra|
+        ra.skip_updating_points_possible = @skip_updating_points_possible
+        ra.save
+      }
     end
   end
 
@@ -152,7 +155,7 @@ class Rubric < ActiveRecord::Base
   def criteria
     self.data
   end
-  
+
   def associate_with(association, context, opts={})
     if opts[:purpose] == "grading"
       res = self.rubric_associations.find_by_association_id_and_association_type_and_purpose(association.id, association.class.to_s, 'grading')
@@ -162,17 +165,23 @@ class Rubric < ActiveRecord::Base
       return res if res
     end
     purpose = opts[:purpose] || "unknown"
-    self.rubric_associations.create(:association_object => association, :context => context, :use_for_grading => !!opts[:use_for_grading], :purpose => purpose)
+    ra = rubric_associations.build :association_object => association,
+                                   :context => context,
+                                   :use_for_grading => !!opts[:use_for_grading],
+                                   :purpose => purpose
+    ra.skip_updating_points_possible = @skip_updating_points_possible
+    ra.tap &:save
   end
 
   def update_with_association(current_user, rubric_params, context, association_params)
     self.free_form_criterion_comments = rubric_params[:free_form_criterion_comments] == '1' if rubric_params[:free_form_criterion_comments]
     self.user ||= current_user
     rubric_params[:hide_score_total] ||= association_params[:hide_score_total]
+    @skip_updating_points_possible = association_params[:skip_updating_points_possible]
     self.update_criteria(rubric_params)
     RubricAssociation.generate(current_user, self, context, association_params) if association_params[:association_object] || association_params[:url]
   end
-  
+
   def unique_item_id(id=nil)
     @used_ids ||= {}
     while !id || @used_ids[id]
