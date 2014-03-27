@@ -13,9 +13,9 @@ define [
     key.icon_image_url = key.icon_url || "/images/blank.png"
     key.name ||= I18n.t('unnamed_tool', "Unnamed Tool")
     key.user_name ||= I18n.t('no_user', "No User")
-    key.created = $.parseFromISO(key.created_at).datetime_formatted
-    key.last_auth = $.parseFromISO(key.last_auth_at).datetime_formatted
-    key.last_access = $.parseFromISO(key.last_access_at).datetime_formatted
+    key.created = $.datetimeString(key.created_at)
+    key.last_auth = $.datetimeString(key.last_auth_at)
+    key.last_access = $.datetimeString(key.last_access_at)
     $key = $(developer_key(key));
     $key.data('key', key)
     

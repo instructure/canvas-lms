@@ -18,7 +18,7 @@ require [
   'jquery.loadingImg' # loadingImage
   'compiled/jquery.rails_flash_notifications'
   'jquery.templateData' # fillTemplateData, getTemplateData
-  'jquery.instructure_date_and_time' # parseFromISO, date_field
+  'jquery.instructure_date_and_time' # date_field
 ], (INST, I18n, $, _, Backbone, CollectionView, ConferenceCollection, Conference, ConferenceView, ConcludedConferenceView, EditConferenceView) ->
   class ConferencesRouter extends Backbone.Router
     routes:

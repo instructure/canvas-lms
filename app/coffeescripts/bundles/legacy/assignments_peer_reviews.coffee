@@ -2,7 +2,7 @@ require [
   "i18n!assignments.peer_reviews",
   "jquery",
   "jquery.ajaxJSON",
-  "jquery.instructure_date_and_time",
+  "jquery.instructure_date_and_time", # $.datetimeString
   "jquery.instructure_forms",
   "jquery.instructure_misc_helpers",
   "jquery.instructure_misc_plugins",
@@ -60,7 +60,7 @@ require [
         $(this).parents(".student_reviews").find(".no_requests_message").slideUp().end().find(".peer_reviews").append $review
         $review.slideDown()
         assessor_name = $(this).parents(".student_reviews").find(".assessor_name").text()
-        time = $.parseFromISO(data.assessment_request.updated_at).datetime_formatted
+        time = $.datetimeString(data.assessment_request.updated_at)
         $review.find(".reminder_peer_review_link").attr "title", I18n.t("titles.reminder", "Remind %{assessor} about Assessment, last notified %{time}", { assessor: assessor_name, time: time })
         $(this).slideUp ->
           $(this).remove()
@@ -75,7 +75,7 @@ require [
       $.ajaxJSON $link.attr("href"), "POST", {}, (data) ->
         $link.parents(".peer_review").loadingImage "remove"
         assessor_name = $link.parents(".student_reviews").find(".assessor_name").text()
-        time = $.parseFromISO(data.assessment_request.updated_at).datetime_formatted
+        time = $.datetimeString(data.assessment_request.updated_at)
         $link.attr "title", I18n.t("titles.remind", "Remind %{assessor} about Assessment, last notified %{time}", { assessor: assessor_name, time: time })
 
     $(".remind_peer_reviews_link").click (event) ->

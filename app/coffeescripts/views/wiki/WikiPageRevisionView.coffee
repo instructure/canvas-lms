@@ -30,7 +30,7 @@ define [
           SELECTED: !!@model.get('selected')
           LOADED: !!@model.get('title') && !!@model.get('body')
       json.IS.SAME_AS_LATEST = json.IS.LOADED && (@model.get('title') == latest?.get('title')) && (@model.get('body') == latest?.get('body'))
-      json.updated_at = $.parseFromISO(json.updated_at).datetime_formatted
+      json.updated_at = $.datetimeString(json.updated_at)
       json.edited_by = json.edited_by?.display_name
       json
 

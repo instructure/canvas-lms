@@ -44,10 +44,10 @@ define [
     endDate: () -> @originalEndDate
 
     parseStartDate: () ->
-      if @calendarEvent.start_at then $.parseFromISO(@calendarEvent.start_at).time else null
+      if @calendarEvent.start_at then $.fudgeDateForProfileTimezone(@calendarEvent.start_at) else null
 
     parseEndDate: () ->
-      if @calendarEvent.end_at then $.parseFromISO(@calendarEvent.end_at).time else null
+      if @calendarEvent.end_at then $.fudgeDateForProfileTimezone(@calendarEvent.end_at) else null
 
     fullDetailsURL: () ->
       if @isAppointmentGroupEvent()
@@ -57,8 +57,8 @@ define [
 
     displayTimeString: () ->
         if @calendarEvent.all_day
-          date = this.startDate()
-          "<time datetime='#{date.toISOString()}'>#{$.dateString(date)}</time>"
+          datetime = $.unfudgeDateForProfileTimezone(@startDate())
+          "<time datetime='#{datetime.toISOString()}'>#{$.dateString(datetime)}</time>"
         else
           semanticDateRange(@calendarEvent.start_at, @calendarEvent.end_at)
 
@@ -67,8 +67,8 @@ define [
 
     saveDates: (success, error) =>
       @save {
-        'calendar_event[start_at]': if @start then $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(@start)) else ''
-        'calendar_event[end_at]': if @end then $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(@end)) else ''
+        'calendar_event[start_at]': if @start then $.unfudgeDateForProfileTimezone(@start).toISOString() else ''
+        'calendar_event[end_at]': if @end then $.unfudgeDateForProfileTimezone(@end).toISOString() else ''
         'calendar_event[all_day]': @allDay
       }, success, error
 

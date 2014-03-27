@@ -10,4 +10,4 @@ define ['ember', 'i18nObj', 'jquery', 'jquery.instructure_date_and_time'], (Embe
 
   Ember.Handlebars.helper 'friendlyDatetimeFromString', (time) ->
     return '' unless time
-    $.friendlyDatetime $.parseFromISO(time).datetime
+    $.friendlyDatetime $.fudgeDateForProfileTimezone time

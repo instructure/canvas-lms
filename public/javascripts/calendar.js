@@ -20,11 +20,13 @@ define([
   'INST' /* INST */,
   'i18n!calendars',
   'jquery' /* $ */,
+  'underscore',
+  'timezone',
   'compiled/userSettings',
   'calendar_move' /* calendarMonths */,
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* parseDateTime, formatDateTime, parseFromISO, dateString, datepicker, date_field, time_field, datetime_field, /\$\.datetime/ */,
+  'jquery.instructure_date_and_time' /* parseDateTime, formatDateTime, timeString, dateString, datepicker, date_field, time_field, datetime_field, /\$\.datetime/ */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, hideErrors */,
   'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* encodeToHex, decodeFromHex, replaceTags */,
@@ -38,7 +40,7 @@ define([
   'jqueryui/resizable' /* /\.resizable/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(INST, I18n, $, userSettings, calendarMonths) {
+], function(INST, I18n, $, _, tz, userSettings, calendarMonths) {
 
   window.calendar = {
     activateEventId: ENV.CALENDAR.ACTIVE_EVENT,
@@ -515,15 +517,16 @@ define([
     var details_url = null;
     if(data.calendar_event) {
       event = $.extend({}, data.calendar_event);
-      var start_date_data = $.parseFromISO(event.start_at);
-      var end_date_data = $.parseFromISO(event.end_at);
-      event.datetime = (start_date_data && start_date_data.datetime);
-      event.start_time_string = start_date_data.time_string;
-      event.end_time_string = end_date_data.time_string;
-      event.start_time_formatted = start_date_data.time_formatted;
-      event.start_date_string = start_date_data.date_formatted;
-      event.end_time_formatted = end_date_data.time_formatted;
-      event.time_sortable = start_date_data.time_sortable;
+
+      var start_at = tz.parse(event.start_at);
+      var end_at = tz.parse(event.end_at);
+      event.datetime = tz.format(start_at, '%Y_%m_%d');
+      event.start_time_string = $.timeString(start_at);
+      event.end_time_string = $.timeString(end_at);
+      event.start_time_formatted = $.timeString(start_at);
+      event.start_date_string = $.dateString(start_at);
+      event.end_time_formatted = $.timeString(end_at);
+      event.time_sortable = tz.format(start_at, '%R');
       event.event_type = "calendar_event";
       id = "calendar_event_" + event.id;
       updateEvent.details_urls = updateEvent.details_urls || {};
@@ -536,14 +539,14 @@ define([
       }
       details_url = updateEvent.details_urls[key];
     } else {
-      var date_data = $.parseFromISO(event.due_at, 'due_date');
-      event.datetime = (date_data && date_data.datetime);
-      event.start_time_string = date_data.time_string;
-      event.end_time_string = date_data.time_string;
-      event.start_time_formatted = date_data.time_formatted;
-      event.start_date_string = date_data.date_formatted;
-      event.end_time_formatted = date_data.time_formatted;
-      event.time_sortable = date_data.time_sortable;
+      var due_at = tz.parse(event.due_at);
+      event.datetime = tz.format(due_at, '%Y_%m_%d');
+      event.start_time_string = $.timeString(due_at);
+      event.end_time_string = $.timeString(due_at);
+      event.start_time_formatted = $.timeString(due_at);
+      event.start_date_string = $.dateString(due_at);
+      event.end_time_formatted = $.timeString(due_at);
+      event.time_sortable = tz.format(due_at, '%R');
       event.start_at = event.due_at;
       event.event_type = "assignment";
       id = "assignment_" + event.id;
@@ -577,10 +580,10 @@ define([
     }
     $event = $("#event_" + id);
     if(event.all_day) {
-      var all_day_date = $.parseFromISO(event.all_day_date);
-      if(all_day_date.valid) {
-        event.all_day_date = all_day_date.date_formatted;
-        event.start_at = all_day_date.date_sortable.substring(0, 10);
+      var all_day_date = tz.parse(event.all_day_date);
+      if (_.isDate(all_day_date)) {
+        event.all_day_date = $.dateString(all_day_date);
+        event.start_at = tz.format(all_day_date, '%F');
       } else {
         event.all_day_date = '';
         event.start_at = '';
@@ -630,11 +633,7 @@ define([
     $event.addClass('event_' + id);
     var $day = $(".calendar_undated");
     if(event.datetime) {
-      var dayID = ['#day'];
-      dayID.push(event.datetime.getFullYear());
-      dayID.push(pad(event.datetime.getMonth() + 1, 2));
-      dayID.push(pad(event.datetime.getDate(), 2));
-      $day = $(dayID.join('_'));
+      $day = $('#day_' + event.datetime);
     }
     if(!$event.hasClass('event_pending')) {
       addEventToDay($event, $day, batch);
@@ -690,10 +689,10 @@ define([
       }
     }
     if(data.all_day == 'true') {
-      date = Date.parse(date_string);
+      date = tz.parse(date_string);
       data.time_string = $.dateString(date);
     } else if(data.start_time_string) {
-      date = Date.parse(date_string);
+      date = tz.parse(date_string);
       data.time_string = $.dateString(date);
     } else {
       data.time_string = "No Date Set";

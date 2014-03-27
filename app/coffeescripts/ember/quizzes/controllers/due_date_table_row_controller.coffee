@@ -2,7 +2,7 @@ define [
   'ember'
   'jquery'
   'i18n!text_helper'
-  'jquery.instructure_date_and_time'
+  'jquery.instructure_date_and_time' # fudgeDateForProfileTimezone, friendlyDatetime
 ], ({ObjectController, computed}, $, I18n) ->
 
   DueDateTableRowController = ObjectController.extend
@@ -12,12 +12,12 @@ define [
 
     friendlyLockAt: (->
       return '' unless lockAt = @get 'lock_at'
-      $.friendlyDatetime $.parseFromISO(lockAt).datetime
+      $.friendlyDatetime $.fudgeDateForProfileTimezone(lockAt)
     ).property 'lock_at'
 
     friendlyUnlockAt: (->
       return '' unless unlockAt = @get 'unlock_at'
-      $.friendlyDatetime $.parseFromISO(unlockAt).datetime
+      $.friendlyDatetime $.fudgeDateForProfileTimezone(unlockAt)
     ).property 'unlock_at'
 
     friendlyDateRangeString: (->

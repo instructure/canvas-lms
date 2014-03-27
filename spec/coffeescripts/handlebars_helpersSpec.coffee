@@ -2,7 +2,9 @@ define [
   'compiled/handlebars_helpers'
   'jquery'
   'underscore'
-], ({helpers}, $, _) ->
+  'timezone'
+  'vendor/timezone/America/Detroit'
+], ({helpers}, $, _, tz, detroit) ->
 
   module 'handlebars_helpers'
 
@@ -66,3 +68,31 @@ define [
     text = "going to the store"
     truncText = helpers.truncate_left text, 15
     equal truncText, "...to the store", "Reverse truncates"
+
+  module 'friendlyDatetime',
+    setup: -> @snapshot = tz.snapshot()
+    teardown: -> tz.restore(@snapshot)
+
+  test 'can take an ISO string', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    equal helpers.friendlyDatetime('1970-01-01 00:00:00Z', hash: {pubDate: false}).string,
+      "<time title='Dec 31, 1969 at  7:00pm' datetime='1970-01-01T00:00:00.000Z' undefined>Dec 31, 1969</time>"
+
+  test 'can take a date object', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    equal helpers.friendlyDatetime(new Date(0), hash: {pubDate: false}).string,
+      "<time title='Dec 31, 1969 at  7:00pm' datetime='1970-01-01T00:00:00.000Z' undefined>Dec 31, 1969</time>"
+
+  test 'should parse non-qualified string relative to profile timezone', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    equal helpers.friendlyDatetime('1970-01-01 00:00:00', hash: {pubDate: false}).string,
+      "<time title='Jan 1, 1970 at 12:00am' datetime='1970-01-01T05:00:00.000Z' undefined>Jan 1, 1970</time>"
+
+  module 'datetimeFormatted',
+    setup: -> @snapshot = tz.snapshot()
+    teardown: -> tz.restore(@snapshot)
+
+  test 'should parse and format relative to profile timezone', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    equal helpers.datetimeFormatted('1970-01-01 00:00:00', hash: {pubDate: false}),
+      "Jan 1, 1970 at 12:00am"
