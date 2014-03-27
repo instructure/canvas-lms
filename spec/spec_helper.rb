@@ -25,13 +25,25 @@ if CANVAS_RAILS2
   end
 end
 
-unless CANVAS_RAILS2
+unless CANVAS_RAILS2 || ENV['NO_RERUN']
   require 'timeout'
   RSpec.configure do |c|
     c.around(:each) do |example|
-      Timeout::timeout(300) {
-        example.run
-      }
+      attempts = 0
+      begin
+        Timeout::timeout(180) {
+          example.run
+        }
+        e = @example.instance_variable_get('@exception')
+        if !e.nil? && (attempts += 1) < 2
+          puts "FAILURE: #{@example.description} \n #{e}".red
+          puts "RETRYING: #{@example.description}".yellow
+          @example.instance_variable_set('@exception', nil)
+          redo
+        elsif e.nil? && attempts != 0
+          puts "SUCCESS: retry passed for \n #{@example.description}".green
+        end
+      end until true
     end
   end
 end
@@ -185,7 +197,7 @@ unless CANVAS_RAILS2
     ActiveRecord::Associations::CollectionProxy.class_eval <<-RUBY
       def #{m}; end
       remove_method #{m.inspect}
-RUBY
+    RUBY
   end
 end
 
@@ -1419,6 +1431,17 @@ end
     @page_view.save!
     @page_view
   end
+end
+
+class String
+  def red; colorize(self, "\e[1m\e[31m"); end
+  def green; colorize(self, "\e[1m\e[32m"); end
+  def dark_green; colorize(self, "\e[32m"); end
+  def yellow; colorize(self, "\e[1m\e[33m"); end
+  def blue; colorize(self, "\e[1m\e[34m"); end
+  def dark_blue; colorize(self, "\e[34m"); end
+  def pur; colorize(self, "\e[1m\e[35m"); end
+  def colorize(text, color_code)  "#{color_code}#{text}\e[0m" end
 end
 
 Dir[Rails.root+'vendor/plugins/*/spec_canvas/spec_helper.rb'].each do |f|

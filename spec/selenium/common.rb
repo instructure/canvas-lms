@@ -78,6 +78,9 @@ module SeleniumTestsHelperMethods
         tries ||= 3
         puts "Thread: provisioning selenium driver"
         driver = nil
+        client = Selenium::WebDriver::Remote::Http::Default.new
+        client.timeout = 300 ##upping this very high so we catch timeouts in rspec around filter rather than selenium blowing up
+        options[:http_client] = client
         driver = Selenium::WebDriver.for(browser, options)
       rescue Exception => e
         puts "Thread #{THIS_ENV}\n try ##{tries}\nError attempting to start remote webdriver: #{e}"
@@ -97,7 +100,7 @@ module SeleniumTestsHelperMethods
       end
       raise('error with how selenium is being setup')
     end
-    driver.manage.timeouts.implicit_wait = 10
+    driver.manage.timeouts.implicit_wait = 3
     driver
   end
 
@@ -958,7 +961,6 @@ shared_examples_for "all selenium tests" do
       else
         EncryptedCookieStore.test_secret = SecureRandom.hex(64)
       end
-
       enable_forgery_protection
     rescue
       if ENV['PARALLEL_EXECS'] != nil
