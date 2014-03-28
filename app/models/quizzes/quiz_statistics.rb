@@ -45,7 +45,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   end
 
   def generate_csv
-    display_name = t(:statistics_filename, "%{quiz_title} %{quiz_type} %{report_type} Report",
+    display_name = t('#quizzes.quiz_statistics.statistics_filename', "%{quiz_title} %{quiz_type} %{report_type} Report",
                      :quiz_title => quiz.title,
                      :quiz_type => quiz.readable_type,
                      :report_type => readable_type
@@ -92,9 +92,9 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   def readable_type
     case report_type
     when 'item_analysis' then
-      t('types.item_analysis', 'Item Analysis')
+      t('#quizzes.quiz_statistics.types.item_analysis', 'Item Analysis')
     when 'student_analysis' then
-      t('types.student_analysis', 'Student Analysis')
+      t('#quizzes.quiz_statistics.types.student_analysis', 'Student Analysis')
     end
   end
 
