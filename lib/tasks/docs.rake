@@ -15,7 +15,7 @@ namespace :doc do
   YARD::Rake::YardocTask.new(:api) do |t|
     t.before = proc { FileUtils.rm_rf(API_DOC_DIR) }
     t.files = %w[
-      app/controllers/*.rb
+      app/controllers/**/*.rb
       vendor/plugins/*/app/controllers/*.rb
       vendor/plugins/*/lib/*.rb
     ]
