@@ -96,8 +96,6 @@ var speakMessage = function ($this, message) {
   };  
   
   $.parseFromISO = function(iso, datetime_type) {
-    var user_offset = tz.currentOffset() / 3600;
-    var today = new Date();
     datetime_type = datetime_type || 'event';
     try {
       var result = {};
@@ -129,20 +127,14 @@ var speakMessage = function ($this, message) {
       if (isNaN(hour) || isNaN(minute) || isNaN(second) || isNaN(offset)) { throw 'invalid'; }
 
       // combine them into an accurate unfudged timestamp
-      var date_timestamp = Date.UTC(year, month - 1, day);
-      var time_timestamp = (((hour - offset) * 60 + minute) * 60 + second) * 1000;
-      result.timestamp = (time_timestamp + date_timestamp) / 1000;
+      var timestamp = Date.UTC(year, month - 1, day) + (((hour - offset) * 60 + minute) * 60 + second) * 1000;
+      result.timestamp = timestamp / 1000;
       result.minute_timestamp = result.timestamp - (result.timestamp % 60);
 
-      if(result.date.getTimezoneOffset() != today.getTimezoneOffset()) {
-        user_offset = user_offset - ((result.date.getTimezoneOffset() - today.getTimezoneOffset()) / 60);
-      }
-      // NOTE: This value is a literal parsing of the date
-      // passed in and may technically be incorrect if there
-      // is shifting due to time zones.
-      // result.date = $.datepicker.parseDate("yy-mm-dd", iso.substring(0, 10));
-      var tz_offset = result.date.getTimezoneOffset() * 60000;
-      var time = new Date(date_timestamp + time_timestamp + user_offset * 3600000 + tz_offset);
+      // fudged time for display
+      var time = $.fudgeDateForProfileTimezone(new Date(timestamp));
+      result.time = time;
+      result.datetime = time;
 
       // format date fields
       result.date_sortable = iso.substring(0, 10);
@@ -180,8 +172,6 @@ var speakMessage = function ($this, message) {
       time_formatted += ampm;
       result.time_formatted = time_formatted;
       result.time_string = hours + time_tail + ampm;
-      result.time = time;
-      result.datetime = time;
       result.date_formatted = $.dateString(result.datetime);
       result.datetime_formatted = result.date_formatted + time_for_date_formatted;
 
@@ -197,30 +187,22 @@ var speakMessage = function ($this, message) {
   // difference between the user's configured timezone in their profile, and the timezone
   // of the browser. We want to display times in the timezone of their profile. Use
   // unfudgeDateForProfileTimezone to remove the correction before sending dates back to the server.
-  $.fudgeDateForProfileTimezone = function(date, unfudge) {
-    var today, user_offset, minutes_shift, time, newDate;
-
+  $.fudgeDateForProfileTimezone = function(date) {
+    date = tz.parse(date);
     if (!date) return null;
-    today = new Date();
-    user_offset = tz.currentOffset() / 60;
-    if (date.getTimezoneOffset() != today.getTimezoneOffset()) {
-      user_offset = user_offset - (date.getTimezoneOffset() - today.getTimezoneOffset());
-    }
-    minutes_shift = user_offset + date.getTimezoneOffset();
-
-    if (minutes_shift == 0) {
-      return date;
-    }
-
-    time = date.getTime(); // in ms
-    time += minutes_shift * 60 * 1000 * (unfudge === true ? -1 : 1);
-    newDate = new Date();
-    newDate.setTime(time);
-    return newDate;
+    // format true date into profile timezone without tz-info, then parse in
+    // browser timezone. then, as desired:
+    // output.toString('yyyy-MM-dd hh:mm:ss') == tz.format(input, '%Y-%m-%d %H:%M:%S')
+    return Date.parse(tz.format(date, '%F %T'));
   }
 
   $.unfudgeDateForProfileTimezone = function(date) {
-    return $.fudgeDateForProfileTimezone(date, true);
+    date = tz.parse(date);
+    if (!date) return null;
+    // format fudged date into browser timezone without tz-info, then parse in
+    // profile timezone. then, as desired:
+    // tz.format(output, '%Y-%m-%d %H:%M:%S') == input.toString('yyyy-MM-dd hh:mm:ss')
+    return tz.parse(date.toString('yyyy-MM-dd HH:mm:ss'));
   }
 
   // The following method is simply a helper to use the logic from $.parseFromISO on
