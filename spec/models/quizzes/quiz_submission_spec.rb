@@ -1665,6 +1665,73 @@ describe Quizzes::QuizSubmission do
     end
   end
 
+  describe "#needs_grading?" do
+    before do
+      student_in_course
+      assignment_quiz([])
+      qd = multiple_choice_question_data
+      @quiz.quiz_data = [qd]
+      @quiz.points_possible = qd[:points_possible]
+      @quiz.save!
+    end
+
+    context "with strict passed as true" do
+      it "returns true if it's overdue" do
+        @quiz.due_at = 3.hours.ago
+        @quiz.save!
+
+        submission = @quiz.generate_submission(@student)
+        submission.end_at = @quiz.due_at
+        submission.needs_grading?(true).should be_true
+      end
+
+      it "returns false if it isn't overdue" do
+        @quiz.due_at = Time.now + 1.hour
+        @quiz.save!
+
+        submission = @quiz.generate_submission(@student)
+        submission.needs_grading?(true).should be_false
+      end
+    end
+
+    context "with strict passed as false" do
+      it "returns true if it's untaken and has passed its time limit" do
+        @quiz.time_limit = 1
+        @quiz.save!
+
+        submission = nil
+        Timecop.freeze(5.minutes.ago) do
+          submission = @quiz.generate_submission(@student)
+        end
+
+        submission.needs_grading?.should be_true
+      end
+
+      it "returns true if it's completed and has an ungraded submission_data" do
+        submission = @quiz.generate_submission(@student)
+        submission.stubs(:completed?).returns(true)
+        submission.needs_grading?.should be_true
+      end
+
+      it "returns false if it has already been graded" do
+        submission = @quiz.generate_submission(@student)
+        submission.grade_submission
+        submission.save!
+
+        submission.needs_grading?.should be_false
+      end
+
+      it "returns false if it's untaken and hasn't passed its time limit" do
+        @quiz.time_limit = 60
+        @quiz.save!
+
+        submission = @quiz.generate_submission(@student)
+        submission.needs_grading?.should be_false
+      end
+    end
+
+  end
+
   describe "#questions_regraded_since_last_attempt" do
     before do
       @quiz = @course.quizzes.create! title: 'Test Quiz'
