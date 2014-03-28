@@ -154,7 +154,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     if !self.available? && !self.survey?
       self.points_possible = self.current_points_possible
     end
-    self.title = t(:default_title, "Unnamed Quiz") if self.title.blank?
+    self.title = t('#quizzes.quiz.default_title', "Unnamed Quiz") if self.title.blank?
     self.quiz_type ||= "assignment"
     self.last_assignment_id = self.assignment_id_was if self.assignment_id_was
     if (!graded? && self.assignment_id) || (self.assignment_id_was && self.assignment_id != self.assignment_id_was)
@@ -216,7 +216,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def readable_type
-    self.survey? ? t('types.survey', "Survey") : t('types.quiz', "Quiz")
+    self.survey? ? t('#quizzes.quiz.types.survey', "Survey") : t('#quizzes.quiz.types.quiz', "Quiz")
   end
 
   def valid_ip?(ip)
@@ -573,9 +573,9 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def generate_submission_question(q)
     @idx ||= 1
-    q[:name] = t :question_name_counter, "Question %{question_number}", :question_number => @idx
+    q[:name] = t '#quizzes.quiz.question_name_counter', "Question %{question_number}", :question_number => @idx
     if q[:question_type] == 'text_only_question'
-      q[:name] = t :default_text_only_question_name, "Spacer"
+      q[:name] = t '#quizzes.quiz.default_text_only_question_name', "Spacer"
       @idx -= 1
     elsif q[:question_type] == 'fill_in_multiple_blanks_question'
       text = q[:question_text]
@@ -594,7 +594,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         variable_id = ::AssessmentQuestion.variable_id(variable)
         variable_answers = q[:answers].select { |a| a[:blank_id] == variable }
         options = variable_answers.map { |a| "<option value='#{a[:id]}'>#{CGI::escapeHTML(a[:text])}</option>" }
-        select = "<select class='question_input' name='question_#{q[:id]}_#{variable_id}'><option value=''>#{ERB::Util.h(t(:default_question_input, "[ Select ]"))}</option>#{options}</select>"
+        select = "<select class='question_input' name='question_#{q[:id]}_#{variable_id}'><option value=''>#{ERB::Util.h(t('#quizzes.quiz.default_question_input', "[ Select ]"))}</option>#{options}</select>"
         re = Regexp.new("\\[#{variable}\\]")
         text = text.sub(re, select)
       end
@@ -783,7 +783,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def quiz_title
     result = self.title
-    result = t(:default_title, "Unnamed Quiz") if result == "undefined" || !result
+    result = t('#quizzes.quiz.default_title', "Unnamed Quiz") if result == "undefined" || !result
     result = self.assignment.title if self.assignment
     result
   end
@@ -915,7 +915,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def validate_quiz_type
     return if self.quiz_type.blank?
     unless valid_quiz_type_values.include?(self.quiz_type)
-      errors.add(:invalid_quiz_type, t('errors.invalid_quiz_type', "Quiz type is not valid"))
+      errors.add(:invalid_quiz_type, t('#quizzes.quiz.errors.invalid_quiz_type', "Quiz type is not valid"))
     end
   end
 
@@ -929,14 +929,14 @@ class Quizzes::Quiz < ActiveRecord::Base
     begin
       self.ip_filter.split(/,/).each { |filter| ::IPAddr.new(filter) }
     rescue
-      errors.add(:invalid_ip_filter, t('errors.invalid_ip_filter', "IP filter is not valid"))
+      errors.add(:invalid_ip_filter, t('#quizzes.quiz.errors.invalid_ip_filter', "IP filter is not valid"))
     end
   end
 
   def validate_hide_results
     return if self.hide_results.blank?
     unless valid_hide_results_values.include?(self.hide_results)
-      errors.add(:invalid_hide_results, t('errors.invalid_hide_results', "Hide results is not valid"))
+      errors.add(:invalid_hide_results, t('#quizzes.quiz.errors.invalid_hide_results', "Hide results is not valid"))
     end
   end
 
@@ -1416,7 +1416,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     if self.ip_filter.present?
       filters << {
-        name: t(:current_filter, 'Current Filter'),
+        name: t('#quizzes.quiz.current_filter', 'Current Filter'),
         account: self.title,
         filter: self.ip_filter
       }
