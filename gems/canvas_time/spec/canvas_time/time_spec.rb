@@ -50,4 +50,26 @@ describe CanvasTime do
     end
   end
 
+  describe ".try_parse" do
+    it "converts a string into a time" do
+      parsed_time = Time.zone.parse("2012-12-12 12:12:12 -0600")
+      CanvasTime.try_parse("2012-12-12 12:12:12 -0600").should == parsed_time
+    end
+
+    it "uses Time.zone.parse for proper timezone handling" do
+      parsed_time = Time.zone.parse("2012-12-12 12:12:12")
+      CanvasTime.try_parse("2012-12-12 12:12:12").should == parsed_time
+    end
+
+    it "returns nil when no default is provided and time does not parse" do
+      CanvasTime.try_parse("NOT A TIME").should be_nil
+      CanvasTime.try_parse("-45-45-45 12:12:12").should be_nil
+    end
+
+    it "returns the provided default if it is provided and the time does not parse" do
+      CanvasTime.try_parse("NOT A TIME", :default).should == :default
+      CanvasTime.try_parse("-45-45-45 12:12:12", :default).should == :default
+    end
+  end
+
 end

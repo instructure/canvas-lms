@@ -646,8 +646,8 @@ class CalendarEventsApiController < ApplicationController
       end
 
       today = Time.zone.now
-      @start_date ||= TimeHelper.try_parse(params[:start_date], today).beginning_of_day
-      @end_date ||= TimeHelper.try_parse(params[:end_date], today).end_of_day
+      @start_date ||= CanvasTime.try_parse(params[:start_date], today).beginning_of_day
+      @end_date ||= CanvasTime.try_parse(params[:end_date], today).end_of_day
       @end_date = @start_date.end_of_day if @end_date < @start_date
     end
 

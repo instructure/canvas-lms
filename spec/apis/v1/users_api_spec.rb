@@ -266,7 +266,7 @@ describe "Users API", type: :request do
         json = api_call(:get, "/api/v1/users/#{@student.id}/page_views?start_time=#{start_time}",
                            { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :start_time => start_time })
         json.size.should == 2
-        json.each { |j| TimeHelper.try_parse(j['created_at']).to_i.should be >= @timestamp.to_i }
+        json.each { |j| CanvasTime.try_parse(j['created_at']).to_i.should be >= @timestamp.to_i }
       end
 
       it "should recognize end_time parameter" do
@@ -275,7 +275,7 @@ describe "Users API", type: :request do
         json = api_call(:get, "/api/v1/users/#{@student.id}/page_views?end_time=#{end_time}",
                            { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :end_time => end_time })
         json.size.should == 2
-        json.each { |j| TimeHelper.try_parse(j['created_at']).to_i.should be <= @timestamp.to_i }
+        json.each { |j| CanvasTime.try_parse(j['created_at']).to_i.should be <= @timestamp.to_i }
       end
     end
   end
