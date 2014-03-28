@@ -3,6 +3,34 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 describe "equation editor" do
   include_examples "quizzes selenium tests"
 
+  it "should remove bookmark when clicking close" do
+    course_with_teacher_logged_in
+    get "/courses/#{@course.id}/quizzes"
+    f('.new-quiz-link').click
+
+    wait_for_tiny(f("#quiz_description"))
+    type_in_tiny 'textarea#quiz_description', 'foo'
+
+    equation_editor = keep_trying_until do
+      f('.mce_instructure_equation').click
+      wait_for_ajaximations
+      equation_editor = fj(".mathquill-editor:visible")
+      equation_editor.should_not be_nil
+      equation_editor
+    end
+
+    f('.ui-dialog-titlebar-close').click
+    type_in_tiny 'textarea#quiz_description', 'bar'
+    f('.save_quiz_button').click
+
+    description = keep_trying_until do
+      f('.description')
+    end
+
+    description.text.should == 'foobar'
+
+  end
+
   it "should support multiple equation editors on the same page" do
     pending("193")
     course_with_teacher_logged_in
