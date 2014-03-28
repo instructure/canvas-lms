@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -249,7 +249,7 @@ class RoleOverridesController < ApplicationController
   #     moderate_forum                   -- [sTADo] Moderate discussions (delete/edit others' posts, lock topics)
   #     post_to_forum                    -- [STADo] Post to discussions
   #     read_question_banks              -- [ TADo] View and link to question banks
-  #     read_reports                     -- [sTAD ] View usage reports for the course
+  #     read_reports                     -- [ TAD ] View usage reports for the course
   #     read_roster                      -- [STADo] See the list of users
   #     read_sis                         -- [sTa  ] Read SIS data
   #     send_messages                    -- [STADo] Send messages to individual course members

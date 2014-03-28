@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -556,7 +556,6 @@ class RoleOverride < ActiveRecord::Base
       :read_reports => {
         :label => lambda { t('permissions.read_reports', "View usage reports for the course") },
         :available_to => [
-          'StudentEnrollment',
           'TaEnrollment',
           'DesignerEnrollment',
           'TeacherEnrollment',
