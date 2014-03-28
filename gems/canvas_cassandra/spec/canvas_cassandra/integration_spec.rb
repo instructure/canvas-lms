@@ -50,14 +50,14 @@ describe "execute and update" do
     db.execute("drop table page_views") if cassandra_configured?
   end
 
-  it "should return the result from execute" do
-    db.execute("select count(*) from page_views").fetch['count'].should == 0
-    db.select_value("select count(*) from page_views").should == 0
-    db.execute("insert into page_views (request_id, user_id) values (?, ?)", "test", 0).should == nil
+  it "returns the result from execute" do
+    expect(db.execute("select count(*) from page_views").fetch['count']).to eq 0
+    expect(db.select_value("select count(*) from page_views")).to eq 0
+    expect(db.execute("insert into page_views (request_id, user_id) values (?, ?)", "test", 0)).to eq nil
   end
 
-  it "should return nothing from update" do
-    db.update("select count(*) from page_views").should == nil
-    db.update("insert into page_views (request_id, user_id) values (?, ?)", "test", 0).should == nil
+  it "returns nothing from update" do
+    expect(db.update("select count(*) from page_views")).to eq nil
+    expect(db.update("insert into page_views (request_id, user_id) values (?, ?)", "test", 0)).to eq nil
   end
 end
