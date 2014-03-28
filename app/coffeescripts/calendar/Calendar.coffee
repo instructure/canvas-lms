@@ -555,7 +555,7 @@ define [
       @setCurrentDate(start)
 
     setCurrentDate: (d) ->
-      @updateFragment view_start: $.dateToISO8601UTC(d)
+      @updateFragment view_start: d.toISOString()
       $.publish('Calendar/currentDate', d)
 
     getCurrentDate: () ->

@@ -22,6 +22,7 @@ define([
   'INST' /* INST */,
   'i18n!gradebook',
   'jquery' /* $ */,
+  'timezone',
   'compiled/userSettings',
   'str/htmlEscape',
   'rubric_assessment',
@@ -32,7 +33,7 @@ define([
   'jquery.ajaxJSON' /* getJSON, ajaxJSON */,
   'jquery.instructure_forms' /* ajaxJSONFiles */,
   'jquery.doc_previews' /* loadDocPreview */,
-  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_date_and_time' /* datetimeString */,
   'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags */,
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */,
@@ -49,7 +50,7 @@ define([
   'vendor/scribd.view' /* scribd */,
   'vendor/spin' /* new Spinner */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(round, _, INST, I18n, $, userSettings, htmlEscape, rubricAssessment, turnitinInfoTemplate, turnitinScoreTemplate) {
+], function(round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, turnitinInfoTemplate, turnitinScoreTemplate) {
 
   // fire off the request to get the jsonData
   window.jsonData = {};
@@ -214,8 +215,7 @@ define([
       jsonData.studentsWithSubmissions.sort(compareBy(function(student){
         return student &&
           student.submission &&
-          student.submission.submitted_at &&
-          $.parseFromISO(student.submission.submitted_at).timestamp;
+          +tz.parse(student.submission.submitted_at);
       }));
     } else if (userSettings.get("eg_sort_by") == "submission_status") {
       var states = {
@@ -249,7 +249,7 @@ define([
     var raw = submissionStateName(student.submission);
     var formatted = raw.replace("_", " ");
     if (raw === "resubmitted") {
-      formatted = I18n.t('graded_then_resubmitted', "graded, then resubmitted (%{when})", {'when': $.parseFromISO(student.submission.submitted_at).datetime_formatted});
+      formatted = I18n.t('graded_then_resubmitted', "graded, then resubmitted (%{when})", {'when': $.datetimeString(student.submission.submitted_at)});
     }
     return {raw: raw, formatted: formatted};
   }
@@ -1116,12 +1116,10 @@ define([
                           this.currentStudent.submission.submission_history[currentSelectedIndex] &&
                           this.currentStudent.submission.submission_history[currentSelectedIndex].submission
                           || {},
-            submittedAt = submission.submitted_at && $.parseFromISO(submission.submitted_at),
-            gradedAt    = submission.graded_at && $.parseFromISO(submission.graded_at),
             inlineableAttachments = [],
             browserableAttachments = [];
 
-        $single_submission_submitted_at.html(submittedAt && submittedAt.datetime_formatted);
+        $single_submission_submitted_at.html($.datetimeString(submission.submitted_at));
 
         var $turnitinScoreContainer = $grade_container.find(".turnitin_score_container").empty(),
             $turnitinInfoContainer = $grade_container.find(".turnitin_info_container").empty(),
@@ -1214,13 +1212,12 @@ define([
 
         _(submissionHistory).each(function(o, i) {
           var s           = o.submission;
-              submittedAt = s.submitted_at && $.parseFromISO(s.submitted_at),
               late        = s.late,
               value       = s.version || i;
 
           innerHTML += "<option " + (late ? "class='late'" : "") + " value='" + value + "' " +
                         (o == submissionToSelect ? "selected='selected'" : "") + ">" +
-                        (submittedAt ? submittedAt.datetime_formatted : I18n.t('no_submission_time', 'no submission time')) +
+                        ($.datetimeString(s.submitted_at) || I18n.t('no_submission_time', 'no submission time')) +
                         (late ? " " + I18n.t('loud_late', "LATE") : "") +
                         (s.grade && (s.grade_matches_current_submission || s.show_grade_in_dropdown) ? " (" + I18n.t('grade', "grade: %{grade}", {'grade': s.grade}) + ')' : "") +
                        "</option>";
@@ -1437,7 +1434,7 @@ define([
         $.each(this.currentStudent.submission.submission_comments, function(i, comment){
           // Serialization seems to have changed... not sure if it's changed everywhere, though...
           if(comment.submission_comment) { comment = comment.submission_comment; }
-          comment.posted_at = $.parseFromISO(comment.created_at).datetime_formatted;
+          comment.posted_at = $.datetimeString(comment.created_at);
 
           var hideStudentName = hideStudentNames && jsonData.studentMap[comment.author_id];
           if (hideStudentName) { comment.author_name = I18n.t('student', "Student"); }

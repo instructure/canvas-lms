@@ -17,10 +17,11 @@
  */
 
 define([
+  'timezone',
   'i18n!calendar_events',
   'jquery' /* jQuery, $ */,
   'wikiSidebar',
-  'jquery.instructure_date_and_time' /* parseFromISO, date_field, time_field, /\$\.datetime/ */,
+  'jquery.instructure_date_and_time' /* dateString, timeString, date_field, time_field, /\$\.datetime/ */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
   'jquery.instructure_misc_helpers' /* encodeToHex, scrollSidebar */,
   'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
@@ -29,7 +30,7 @@ define([
   'compiled/tinymce',
   'tinymce.editor_box' /* editorBox */,
   'vendor/date' /* Date.parse */
-], function(I18n, $, wikiSidebar) {
+], function(tz, I18n, $, wikiSidebar) {
 
   var noContentText = I18n.t('no_content', "No Content");
 
@@ -128,15 +129,13 @@ $(function($) {
     },
     success: function(data) {
       var calendar_event = data.calendar_event,
-          start_at       = $.parseFromISO(calendar_event.start_at),
-          end_at         = $.parseFromISO(calendar_event.end_at),
-          parsedDate     = Date.parse(calendar_event.all_day_date).toString("MMM dd, yyyy");
+          start_at       = tz.parse(calendar_event.start_at);
 
       
-      calendar_event.start_at_date_string = start_at.date_formatted;
-      calendar_event.start_at_time_string = start_at.time_formatted;
-      calendar_event.end_at_time_string = end_at.time_formatted;
-      calendar_event.all_day_date = parsedDate || '';
+      calendar_event.start_at_date_string = $.dateString(start_at);
+      calendar_event.start_at_time_string = $.timeString(start_at);
+      calendar_event.end_at_time_string = $.timeString(calendar_event.end_at);
+      calendar_event.all_day_date = $.dateString(calendar_event.all_day_date);
       
       $full_calendar_event_holder.find(".from_string,.to_string,.end_at_time_string").showIf(calendar_event.end_at && calendar_event.end_at != calendar_event.start_at);
       $full_calendar_event_holder.find(".at_string").showIf(!calendar_event.end_at || calendar_event.end_at == calendar_event.start_at);

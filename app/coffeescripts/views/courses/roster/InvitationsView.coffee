@@ -25,7 +25,7 @@ define [
       @showDialogButtons()
 
       data = @model.toJSON()
-      data.time = $.parseFromISO(_.last(@model.get('enrollments')).updated_at).datetime_formatted
+      data.time = $.datetimeString(_.last(@model.get('enrollments')).updated_at)
       @$el.html invitationsViewTemplate data
 
       pending = @model.pending()

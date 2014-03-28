@@ -22,6 +22,7 @@ define([
   'i18n!instructure',
   'jquery' /* $ */,
   'underscore',
+  'timezone',
   'compiled/userSettings',
   'str/htmlEscape',
   'wikiSidebar',
@@ -31,7 +32,7 @@ define([
   'jquery.doc_previews' /* filePreviewsEnabled, loadDocPreview */,
   'jquery.dropdownList' /* dropdownList */,
   'jquery.google-analytics' /* trackEvent */,
-  'jquery.instructure_date_and_time' /* parseFromISO, dateString, fudgeDateForProfileTimezone */,
+  'jquery.instructure_date_and_time' /* datetimeString, dateString, fudgeDateForProfileTimezone */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
   'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags, youTubeID */,
@@ -53,7 +54,7 @@ define([
   'compiled/badge_counts',
   'vendor/scribd.view' /* scribd */,
   'vendor/jquery.placeholder'
-], function(KeyboardNavDialog, INST, I18n, $, _, userSettings, htmlEscape, wikiSidebar) {
+], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, wikiSidebar) {
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
@@ -450,9 +451,9 @@ define([
 
     $(".zone_cached_datetime").each(function() {
       if($(this).attr('title')) {
-        var dt = $.parseFromISO($(this).attr('title'));
-        if(dt.timestamp) {
-          $(this).text(dt.datetime_formatted);
+        var datetime = tz.parse($(this).attr('title'));
+        if (datetime) {
+          $(this).text($.datetimeString(datetime));
         }
       }
     });
@@ -560,7 +561,7 @@ define([
         message_data = data.messages[0];
         $message.fillTemplateData({
           data: {
-            post_date: $.parseFromISO(message_data.created_at).datetime_formatted,
+            post_date: $.datetimeString(message_data.created_at),
             message: message_data.body
           },
           htmlValues: ['message']
@@ -605,7 +606,7 @@ define([
           }
           if(submission) {
             var comment = submission.submission_comments[submission.submission_comments.length - 1].submission_comment;
-            comment.post_date = $.parseFromISO(comment.created_at).datetime_formatted;
+            comment.post_date = $.datetimeString(comment.created_at);
             comment.message = comment.formatted_body || comment.comment;
             $message.fillTemplateData({
               data: comment,
@@ -614,7 +615,7 @@ define([
           }
         } else {
           var entry = data.discussion_entry;
-          entry.post_date = $.parseFromISO(entry.created_at).datetime_formatted;
+          entry.post_date = $.datetimeString(entry.created_at);
           $message.find(".content > .message_html").val(entry.message);
           $message.fillTemplateData({
             data: entry,
@@ -712,7 +713,7 @@ define([
             var topic = data.discussion_topic;
             topic.context_code = context_name;
             topic.user_name = $("#identity .user_name").text();
-            topic.post_date = $.parseFromISO(topic.created_at).datetime_formatted;
+            topic.post_date = $.datetimeString(topic.created_at);
             topic.topic_id = topic.id;
             var $template = $(this).parents(".communication_message").find(".template");
             var $message = $template.find(".communication_message").clone(true);

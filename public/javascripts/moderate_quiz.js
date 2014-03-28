@@ -21,7 +21,7 @@ define([
   'jquery' /* $ */,
   'quiz_timing',
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_date_and_time' /* datetimeString */,
   'jquery.instructure_forms' /* fillFormData, getFormData */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
@@ -321,8 +321,8 @@ define([
     $(".extend_time_link").live('click', function(event) {
       event.preventDefault();
       var $row = $(event.target).parents(".student");
-      var end_at = $.parseFromISO($row.attr('data-end-at')).datetime_formatted;
-      var started_at = $.parseFromISO($row.attr('data-started-at')).datetime_formatted;
+      var end_at = $.datetimeString($row.attr('data-end-at'));
+      var started_at = $.datetimeString($row.attr('data-started-at'));
       var $dialog = $("#extend_time_dialog");
       $dialog.data('row', $row);
       $dialog.fillTemplateData({
