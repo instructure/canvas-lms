@@ -59,6 +59,7 @@ define [
         title: I18n.t('equation_editor_title', 'Use the toolbars here, or Switch View to Advanced to type/paste in LaTeX')
         dialogClass: 'math-dialog'
         open: @initialRender
+        close: @onClose
         buttons: [
           {
             class: 'btn-primary'
@@ -66,6 +67,10 @@ define [
             click: @onSubmit
           }
         ]
+
+
+    onClose: (e, ui) =>
+      @restoreCaret()
 
     initialRender: =>
       nodes = $('<span>').html @editor.selection.getContent()
