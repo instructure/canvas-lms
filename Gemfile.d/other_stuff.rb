@@ -114,6 +114,7 @@ gem 'foreigner', '0.9.2'
 gem 'crocodoc-ruby', '0.0.1', :require => 'crocodoc'
 
 gem 'activesupport-suspend_callbacks', :path => 'gems/activesupport-suspend_callbacks'
+gem 'acts_as_list', :path => 'gems/acts_as_list'
 gem 'adheres_to_policy', :path => 'gems/adheres_to_policy'
 gem 'canvas_breach_mitigation', :path => 'gems/canvas_breach_mitigation'
 gem 'canvas_color', :path => 'gems/canvas_color'
