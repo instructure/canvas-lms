@@ -6,13 +6,11 @@ module CodepointTestHelper
     encode_mes.each do |encode_me|
       encoded = encode(encode_me)
       actual = encoded.to_ascii
-      if expected == actual
-        # Let's not retest it
-        assert true
-      else
+      if expected != actual
         message = "<#{expected.inspect}> expected but was\n<#{actual.inspect}>\n"
         message << "  defined in #{LuckySneaks::Unidecoder.in_yaml_file(encoded)}"
-        raise Test::Unit::AssertionFailedError.new(message)
+        fail message
+        #raise Test::Unit::AssertionFailedError.new(message)
       end
     end
   end

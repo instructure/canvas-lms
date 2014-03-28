@@ -1,15 +1,13 @@
 # encoding: UTF-8
 
-require "test/unit"
-
-require 'canvas_stringex'
+require "spec_helper"
 
 if RUBY_VERSION >= '2.0.0'
   require 'syck'
 end
 YAML::ENGINE.yamler = 'syck' if defined?(YAML::ENGINE)
 
-class UnidecoderTest < Test::Unit::TestCase
+describe "Unidecoder" do
   # Silly phrases courtesy of Frank da Cruz
   # http://www.columbia.edu/kermit/utf8.html
   DONT_CONVERT = [
@@ -55,42 +53,42 @@ class UnidecoderTest < Test::Unit::TestCase
       "Si hagarasuwoShi beraremasu. sorehaSi woShang tukemasen. "
   }
   
-  def test_unidecoder_decode
+  it "unidecoder_decode" do
     DONT_CONVERT.each do |ascii|
-      assert_equal ascii, LuckySneaks::Unidecoder.decode(ascii)
+      expect(ascii).to eq LuckySneaks::Unidecoder.decode(ascii)
     end
     CONVERT_PAIRS.each do |unicode, ascii|
-      assert_equal ascii, LuckySneaks::Unidecoder.decode(unicode)
+      expect(ascii).to eq LuckySneaks::Unidecoder.decode(unicode)
     end
   end
   
-  def test_to_ascii
+  it "to_ascii" do
     DONT_CONVERT.each do |ascii|
-      assert_equal ascii, ascii.to_ascii
+      expect(ascii).to eq ascii.to_ascii
     end
     CONVERT_PAIRS.each do |unicode, ascii|
-      assert_equal ascii, unicode.to_ascii
+      expect(ascii).to eq unicode.to_ascii
     end
   end
   
-  def test_unidecoder_encode
+  it "unidecoder_encode" do
     {
       # Strings
       "0041" => "A",
       "00e6" => "æ",
       "042f" => "Я"
     }.each do |codepoint, unicode|
-      assert_equal unicode, LuckySneaks::Unidecoder.encode(codepoint)
+      expect(unicode).to eq LuckySneaks::Unidecoder.encode(codepoint)
     end
   end
   
-  def test_unidecoder_in_yaml_file
+  it "unidecoder_in_yaml_file" do
     {
       "A" => "x00.yml (line 67)",
       "π" => "x03.yml (line 194)",
       "Я" => "x04.yml (line 49)"
     }.each do |character, output|
-      assert_equal output, LuckySneaks::Unidecoder.in_yaml_file(character)
+      expect(output).to eq LuckySneaks::Unidecoder.in_yaml_file(character)
     end
   end
 end

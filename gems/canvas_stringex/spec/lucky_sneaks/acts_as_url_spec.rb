@@ -1,9 +1,8 @@
-require 'test/unit'
+require 'spec_helper'
 
-require 'active_record'
-require 'canvas_stringex'
+#require 'canvas_stringex'
 
-ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => "test/acts_as_url.sqlite3")
+ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => "spec/acts_as_url.sqlite3")
 
 ActiveRecord::Migration.verbose = false
 ActiveRecord::Schema.define(:version => 1) do
@@ -53,95 +52,95 @@ class Blankument < ActiveRecord::Base
   acts_as_url :title, :only_when_blank => true
 end
 
-class ActsAsUrlTest < Test::Unit::TestCase
-  def test_should_create_url
+describe "ActsAsUrl" do
+  it "should_create_url" do
     @doc = Document.create(:title => "Let's Make a Test Title, <em>Okay</em>?")
-    assert_equal "lets-make-a-test-title-okay", @doc.url
+    expect("lets-make-a-test-title-okay").to eq @doc.url
   end
 
-  def test_should_create_unique_url
+  it "should_create_unique_url" do
     @doc = Document.create!(:title => "Unique")
     @other_doc = Document.create!(:title => "Unique")
-    assert_equal "unique-1", @other_doc.url
+    expect("unique-1").to eq @other_doc.url
   end
 
-  def test_should_not_succ_on_repeated_saves
+  it "should_not_succ_on_repeated_saves" do
     @doc = Document.new(:title => "Continuous or Constant")
     5.times do
       @doc.save!
-      assert_equal "continuous-or-constant", @doc.url
+      expect("continuous-or-constant").to eq @doc.url
     end
   end
 
-  def test_should_scope_uniqueness
+  it "should_scope_uniqueness" do
     @moc = Mocument.create!(:title => "Mocumentary", :other => "I dunno why but I don't care if I'm unique")
     @other_moc = Mocument.create!(:title => "Mocumentary")
-    assert_equal @moc.url, @other_moc.url
+    expect(@moc.url).to eq @other_moc.url
   end
 
-  def test_should_still_create_unique_if_in_same_scope
+  it "should_still_create_unique_if_in_same_scope" do
     @moc = Mocument.create!(:title => "Mocumentary", :other => "Suddenly, I care if I'm unique")
     @other_moc = Mocument.create!(:title => "Mocumentary", :other => "Suddenly, I care if I'm unique")
-    assert_not_equal @moc.url, @other_moc.url
+    expect(@moc.url).to_not eq @other_moc.url
   end
 
-  def test_should_use_alternate_field_name
+  it "should_use_alternate_field_name" do
     @perm = Permument.create!(:title => "Anything at This Point")
-    assert_equal "anything-at-this-point", @perm.permalink
+    expect("anything-at-this-point").to eq @perm.permalink
   end
 
-  def test_should_not_update_url_by_default
+  it "should_not_update_url_by_default" do
     @doc = Document.create!(:title => "Stable as Stone")
     @original_url = @doc.url
     @doc.update_attributes :title => "New Unstable Madness"
-    assert_equal @original_url, @doc.url
+    expect(@original_url).to eq @doc.url
   end
 
-  def test_should_update_url_if_asked
+  it "should_update_url_if_asked" do
     @moc = Mocument.create!(:title => "Original")
     @original_url = @moc.url
     @moc.update_attributes :title => "New and Improved"
-    assert_not_equal @original_url, @moc.url
+    expect(@original_url).to_not eq @moc.url
   end
 
-  def test_should_update_url_only_when_blank_if_asked
+  it "should_update_url_only_when_blank_if_asked" do
     @original_url = 'the-url-of-concrete'
     @blank = Blankument.create!(:title => "Stable as Stone", :url => @original_url)
-    assert_equal @original_url, @blank.url
+    expect(@original_url).to eq @blank.url
     @blank = Blankument.create!(:title => "Stable as Stone")
-    assert_equal 'stable-as-stone', @blank.url
+    expect('stable-as-stone').to eq @blank.url
   end
 
-  def test_should_mass_initialize_urls
+  it "should_mass_initialize_urls" do
     @doc_1 = Document.create!(:title => "Initial")
     @doc_2 = Document.create!(:title => "Subsequent")
     @doc_1.update_attribute :url, nil
     @doc_2.update_attribute :url, nil
-    assert_nil @doc_1.url
-    assert_nil @doc_2.url
+    expect(@doc_1.url).to be_nil
+    expect(@doc_2.url).to be_nil
     Document.initialize_urls
     @doc_1.reload
     @doc_2.reload
-    assert_equal "initial", @doc_1.url
-    assert_equal "subsequent", @doc_2.url
+    expect("initial").to eq @doc_1.url
+    expect("subsequent").to eq @doc_2.url
   end
 
-  def test_should_mass_initialize_urls_with_custom_url_attribute
+  it "should_mass_initialize_urls_with_custom_url_attribute" do
     @doc_1 = Permument.create!(:title => "Initial")
     @doc_2 = Permument.create!(:title => "Subsequent")
     @doc_1.update_attribute :permalink, nil
     @doc_2.update_attribute :permalink, nil
-    assert_nil @doc_1.permalink
-    assert_nil @doc_2.permalink
+    expect(@doc_1.permalink).to be_nil
+    expect(@doc_2.permalink).to be_nil
     Permument.initialize_urls
     @doc_1.reload
     @doc_2.reload
-    assert_equal "initial", @doc_1.permalink
-    assert_equal "subsequent", @doc_2.permalink
+    expect("initial").to eq @doc_1.permalink
+    expect("subsequent").to eq @doc_2.permalink
   end
 
-  def test_should_utilize_block_if_given
+  it "should_utilize_block_if_given" do
     @doc = Procument.create!(:title => "Title String")
-    assert_equal "title-string-got-massaged", @doc.url
+    expect("title-string-got-massaged").to eq @doc.url
   end
 end

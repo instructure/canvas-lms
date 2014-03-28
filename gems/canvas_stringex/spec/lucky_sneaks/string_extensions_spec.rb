@@ -1,11 +1,9 @@
 # encoding: UTF-8
 
-require "test/unit"
+require "spec_helper"
 
-require 'canvas_stringex'
-
-class StringExtensionsTest < Test::Unit::TestCase
-  def test_to_html
+describe "StringExtensions" do
+  it "to_html" do
     require "RedCloth"
     {
       "h1. A Solution" => "<h1>A Solution</h1>",
@@ -14,25 +12,21 @@ class StringExtensionsTest < Test::Unit::TestCase
       "I think _this_ is awesome" => "<p>I think <em>this</em> is awesome</p>",
       "Um... _*really*_, man" => "<p>Um&#8230; <em><strong>really</strong></em>, man</p>"
     }.each do |plain, html|
-      assert_equal html, plain.to_html
+      expect(html).to eq plain.to_html
     end
-  rescue LoadError
-    puts "\n>> Could not load RedCloth. String#to_html was not tested.\n>> Please gem install RedCloth if you'd like to use this functionality."
   end
   
-  def test_to_html_lite
+  it "to_html_lite" do
     require "RedCloth"
     {
       "I have no pee on me" => "I have no pee on me",
       "But I _do_ get Textile!" => "But I <em>do</em> get Textile!"
     }.each do |plain, html|
-      assert_equal html, plain.to_html(:lite)
+      expect(html).to eq plain.to_html(:lite)
     end
-  rescue LoadError
-    puts "\n>> Could not load RedCloth. String#to_html (with :lite argument) was not tested.\n>> Please gem install RedCloth if you'd like to use this functionality."
   end
   
-  def test_to_url
+  it "to_url" do
     {
       "<p>This has 100% too much    <em>formatting</em></p>" =>
         "this-has-100-percent-too-much-formatting",
@@ -45,22 +39,22 @@ class StringExtensionsTest < Test::Unit::TestCase
       "I'm just making sure there's nothing wrong with things!" =>
         "im-just-making-sure-theres-nothing-wrong-with-things"
     }.each do |html, plain|
-      assert_equal plain, html.to_url
+      expect(plain).to eq html.to_url
     end
   end
   
-  def test_remove_formatting
+  it "remove_formatting" do
     {
       "<p>This has 100% too much    <em>formatting</em></p>" =>
         "This has 100 percent too much formatting",
       "Tea   &amp; crumpets &amp; <strong>cr&ecirc;pes</strong> for me!" => 
         "Tea and crumpets and crepes for me"
     }.each do |html, plain|
-      assert_equal plain, html.remove_formatting
+      expect(plain).to eq html.remove_formatting
     end
   end
   
-  def test_strip_html_tags
+  it "strip_html_tags" do
     {
       "<h1><em>This</em> is good but <strong>that</strong> is better</h1>" =>
         "This is good but that is better",
@@ -70,11 +64,11 @@ class StringExtensionsTest < Test::Unit::TestCase
       "<ol>This is completely invalid and just plain wrong</p>" =>
         "This is completely invalid and just plain wrong"
     }.each do |html, plain|
-      assert_equal plain, html.strip_html_tags
+      expect(plain).to eq html.strip_html_tags
     end
   end
   
-  def test_convert_accented_entities
+  it "convert_accented_entities" do
     {
       "&aring;"  => "a",
       "&egrave;" => "e",
@@ -84,11 +78,11 @@ class StringExtensionsTest < Test::Unit::TestCase
       "&Ntilde;" => "N",
       "&ccedil;" => "c"
     }.each do |entitied, plain|
-      assert_equal plain, entitied.convert_accented_entities
+      expect(plain).to eq entitied.convert_accented_entities
     end
   end
   
-  def test_convert_misc_entities
+  it "convert_misc_entities" do
     {
       "America&#8482;" => "America(tm)",
       "Tea &amp; Sympathy" => "Tea and Sympathy",
@@ -98,11 +92,11 @@ class StringExtensionsTest < Test::Unit::TestCase
       "&frac12; a dollar" => "half a dollar",
       "35&deg;" => "35 degrees"
     }.each do |entitied, plain|
-      assert_equal plain, entitied.convert_misc_entities
+      expect(plain).to eq entitied.convert_misc_entities
     end
   end
   
-  def test_convert_misc_characters
+  it "convert_misc_characters" do
     {
       "Foo & bar make foobar" => "Foo and bar make foobar",
       "Breakdown #9" => "Breakdown number 9",
@@ -112,30 +106,30 @@ class StringExtensionsTest < Test::Unit::TestCase
       "That CD is £3.25 plus tax" => "That CD is 3 pounds 25 pence plus tax",
       "This CD is ¥1000 instead" => "This CD is 1000 yen instead"
     }.each do |misc, plain|
-      assert_equal plain, misc.convert_misc_characters
+      expect(plain).to eq misc.convert_misc_characters
     end
   end
   
-  def test_replace_whitespace
+  it "replace_whitespace" do
     {
       "this has     too much space" => "this has too much space",
       "\t\tThis is merely formatted with superfluous whitespace\n" =>
         " This is merely formatted with superfluous whitespace "
     }.each do |whitespaced, plain|
-      assert_equal plain, whitespaced.replace_whitespace
+      expect(plain).to eq whitespaced.replace_whitespace
     end
     
-    assert_equal "now-with-more-hyphens", "now with more hyphens".replace_whitespace("-")
+    expect("now-with-more-hyphens").to eq "now with more hyphens".replace_whitespace("-")
   end
   
-  def test_collapse
+  it "collapse" do
     {
       "too      much space" => "too much space",
       "  at the beginning" => "at the beginning"
     }.each do |uncollapsed, plain|
-      assert_equal plain, uncollapsed.collapse
+      expect(plain).to eq uncollapsed.collapse
     end
     
-    assert_equal "now-with-hyphens", "----now---------with-hyphens--------".collapse("-")
+    expect("now-with-hyphens").to eq "----now---------with-hyphens--------".collapse("-")
   end
 end

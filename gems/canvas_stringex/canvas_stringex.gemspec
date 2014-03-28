@@ -27,4 +27,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "sqlite3"
   spec.add_development_dependency "RedCloth"
+  spec.add_development_dependency "rspec"
 end
