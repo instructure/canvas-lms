@@ -54,9 +54,9 @@ define [
       width: 600
 
     messages:
-      selectAvatar:    I18n.t('buttons.select_avatar', 'Select Avatar')
+      selectAvatar:    I18n.t('buttons.select_profile_picture', 'Select Profile Picture')
       cancel:         I18n.t('#buttons.cancel', 'Cancel')
-      selectImage:    I18n.t('buttons.select_image', 'Select Image')
+      selectImage:    I18n.t('buttons.save', 'Save')
       selectingImage: I18n.t('buttons.selecting_image', 'Selecting Image...')
 
     events:
@@ -110,12 +110,12 @@ define [
 
     preflightRequest: ->
       $.post('/files/pending', {
-        name: 'avatar.jpg'
+        name: 'profile.jpg'
         format: 'text'
         no_redirect: true
         'attachment[duplicate_handling]': 'overwrite'
         'attachment[folder_id]': ENV.folder_id
-        'attachment[filename]': 'avatar.jpg'
+        'attachment[filename]': 'profile.jpg'
         'attachment[context_code]': ENV.context_asset_string
       })
 
@@ -131,7 +131,7 @@ define [
       delete @image
 
       req.append(k, v) for k, v of preflightResponse.upload_params
-      req.append(preflightResponse.file_param, image, 'avatar.jpg')
+      req.append(preflightResponse.file_param, image, 'profile.jpg')
       dataType = if preflightResponse.success_url then 'xml' else 'json'
       $.ajax(preflightResponse.upload_url, {
         contentType: false
