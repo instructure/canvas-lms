@@ -19,7 +19,7 @@ define [
     events:
       'click .create-report': ->
         @autoDownload = true # if they refresh the page, we don't want to auto-download once the progress bar completes
-        @model.save()
+        @model.save({}, {type: 'POST'})
 
     reportReady: =>
       @render()
