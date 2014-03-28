@@ -94,7 +94,7 @@
 #             "type": "integer"
 #           },
 #           "type": {
-#             "description": "The enrollment role, for course-level permissions.",
+#             "description": "The enrollment type. One of 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'ObserverEnrollment'.",
 #             "example": "StudentEnrollment",
 #             "type": "string"
 #           },
@@ -108,8 +108,8 @@
 #             "type": "integer"
 #           },
 #           "role": {
-#             "description": "The enrollment role, for course-level permissions",
-#             "example": null,
+#             "description": "The enrollment role, for course-level permissions. This field will match `type` if the enrollment role has not been customized.",
+#             "example": "StudentEnrollment",
 #             "type": "string"
 #           },
 #           "updated_at": {

@@ -74,7 +74,7 @@ module Api::V1
       if enrollments
         enrollments.map do |e|
           h = {
-            :type => e.readable_type.downcase,
+            :type => e.sis_type,
             :role => e.role,
             :enrollment_state => e.workflow_state
           }
