@@ -51,13 +51,14 @@ define [
     teardown: ->
       delete @img
       delete @preview
+      @stream?.stop()
 
     startMedia: ->
       @getUserMedia(video: true, @displayMedia, $.noop)
 
-    displayMedia: (stream) =>
+    displayMedia: (@stream) =>
       @$video.removeClass('pending')
-      @$video.attr('src', window.URL.createObjectURL(stream))
+      @$video.attr('src', window.URL.createObjectURL(@stream))
       @$video.on('onloadedmetadata loadedmetadata', _.once(@onMediaMetadata).bind(this))
 
     onMediaMetadata: (e) ->
