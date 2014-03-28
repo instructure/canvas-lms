@@ -3,10 +3,10 @@
 <% only ||= nil # only is an optimization, so that tabs that aren't going to be used won't have their data loaded %>
 <% cache([@context, 'select_context_content_dialog', only].cache_key) do %>
   <div id="select_context_content_dialog" style="display: none;">
-    <div style="<%= hidden if only && only.size == 1 %>">
+    <div style="margin-bottom: 5px; <%= hidden if only && only.size == 1 %>">
       <a href="<%= context_url(@context, :context_external_tool_resource_selection_url, "{{ id }}") %>" id="select_content_resource_selection_url" style="display: none;">&nbsp;</a>
       <% ot :add_to_module, "Add %{item} to *module*", :item => capture { %>
-      <select id="add_module_item_select">
+      <select style="margin-bottom: 0px" id="add_module_item_select">
         <% if !only || only.include?(:assignments) %>
         <option value="assignment"><%= t :assignment_item, "Assignment" %></option>
         <% end %>
@@ -34,9 +34,8 @@
       </select>
       <% }, :wrapper => '<span class="holder_name">\1</span>' %>
     </div>
-    <div style="margin: 10px 20px;">
       <% if !only || only.include?(:sub_headers) %>
-      <div id="context_module_sub_headers_select" class="module_item_option" style="margin: 5px 20px;">
+      <div id="context_module_sub_headers_select" class="module_item_option">
         <div style="font-size: 0.8em;">
           <%= t :sub_header_notice, "Type the text you'd like to add as a *module* sub-header", :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
@@ -49,7 +48,7 @@
       </div>
       <% end %>
       <% if !only || only.include?(:external_urls) %>
-      <div id="external_urls_select" class="module_item_option" style="margin: 5px 20px;">
+      <div id="external_urls_select" class="module_item_option">
         <div style="font-size: 0.8em;">
           <i class="icon-link"></i>
           <%= t :external_url_notice, "Enter a URL and page name to add a link to any website URL to this *module*.", :wrapper => '<span class="holder_type">\1</span>' %>
@@ -72,7 +71,7 @@
       </div>
       <% end %>
       <% if !only || only.include?(:external_tools) %>
-      <div id="context_external_tools_select" class="module_item_option" style="margin: 5px 20px;">
+      <div id="context_external_tools_select" class="module_item_option">
         <div style="font-size: 0.8em;">
           <i class="icon-link"></i>
           <%= t :external_tool_notice, "Select a tool from the list below, or enter a URL for an external tool you already know is configured with Basic LTI to add a link to it to this *module*.", :wrapper => '<span class="holder_type">\1</span>' %>
@@ -113,7 +112,7 @@
       </div>
       <% end %>
       <% if !only || only.include?(:wiki_pages) %>
-      <div id="wiki_pages_select" class="module_item_option" style="margin: 5px 20px;">
+      <div id="wiki_pages_select" class="module_item_option">
         <div style="font-size: 0.8em;">
           <i class="icon-document"></i>
           <%= t :wiki_page_notice, 'Select the wiki page you want to associate with this *module*, or add a new page by selecting "New Page".', :wrapper => '<span class="holder_type">\1</span>' %>
@@ -139,7 +138,7 @@
       </div>
       <% end %>
       <% if !only || only.include?(:attachments) %>
-      <div id="attachments_select" class="module_item_option" style="margin: 5px 20px;">
+      <div id="attachments_select" class="module_item_option">
         <div style="font-size: 0.8em;">
           <i class="icon-download"></i>
           <%= t :file_notice, 'Select the file you want to associate with this *module*, or add a file by selecting "New File".', :wrapper => '<span class="holder_type">\1</span>' %>
@@ -180,7 +179,7 @@
       </div>
       <% end %>
       <% if !only || only.include?(:quizzes) %>
-      <div id="quizs_select" class="module_item_option" style="margin: 5px 20px;">
+      <div id="quizs_select" class="module_item_option">
         <div style="font-size: 0.8em;">
           <i class="icon-quiz"></i>
           <%= t :quiz_notice, 'Select the quiz you want to associate with this *module*, or add a new one by selecting "New Quiz".', :wrapper => '<span class="holder_type">\1</span>' %>
@@ -222,7 +221,7 @@
       </div>
       <% end %>
       <% if !only || only.include?(:assignments) %>
-      <div id="assignments_select" class="module_item_option" style="margin: 5px 20px;">
+      <div id="assignments_select" class="module_item_option">
         <div style="font-size: 0.8em;">
           <i class="icon-assignment"></i>
           <%= t :assignment_notice, 'Select the assignment you want to associate with this *module*, or add an assignment by selecting "New Assignment".', :wrapper => '<span class="holder_type">\1</span>' %>
@@ -243,13 +242,13 @@
         </div>
         <div class="new" style="margin-top: 5px;">
           <%= before_label :assignment_name, "Assignment Name" %>
-          <input type="text" name="assignment[title]" class="item_title"/>
+          <input type="text" name="assignment[title]" class="item_title" style="margin-bottom: 5px;"/>
           <a href="<%= context_url(@context, :context_assignments_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
       </div>
       <% end %>
       <% if !only || only.include?(:discussion_topics) %>
-      <div id="discussion_topics_select" class="module_item_option" style="margin: 5px 20px;">
+      <div id="discussion_topics_select" class="module_item_option">
         <div style="font-size: 0.8em;">
           <i class="icon-discussion"></i>
           <%= t :topic_notice, 'Select the topic you want to associate with this *module*, or add a topic by selecting "New Topic".', :wrapper => '<span class="holder_type">\1</span>' %>
@@ -273,7 +272,7 @@
       </div>
       <% end %>
       <% if !only || only.include?(:indentation) %>
-      <div style="margin: 0px 20px 5px;" class="context_module_content">
+      <div class="context_module_content">
         <%= before_label :indentation, "Indentation" %>
         <select name="content_tag[indent]" id="content_tag_indent">
           <% (0..3).each do |level| %>
@@ -282,7 +281,6 @@
         </select>
       </div>
       <% end %>
-    </div>
     <div class="button-container">
       <button type="button" class="cancel_button btn"><%= t "#buttons.cancel", "Cancel" %></button>
       <button type="button" class="add_item_button btn btn-primary"><%= t "#buttons.add_item", "Add Item" %></button>

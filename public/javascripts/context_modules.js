@@ -827,6 +827,8 @@ define([
         var options = {for_modules: true};
         options.select_button_text = I18n.t('buttons.add_item', "Add Item");
         options.holder_name = module.name;
+        options.height = 550;
+        options.width = 770;
         options.dialog_title = I18n.t('titles.add_item', "Add Item to %{module}", {'module': module.name});
         options.submit = function(item_data) {
           var $module = $("#context_module_" + module.id);
