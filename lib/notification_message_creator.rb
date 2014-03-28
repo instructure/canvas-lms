@@ -227,8 +227,8 @@ class NotificationMessageCreator
   
   def message_options_for(user)
     user_asset = asset_filtered_by_user(user)
-    
-    user_asset_context = user_asset.context(user) rescue user_asset
+
+    user_asset_context = %w{ContentMigration Submission WikiPage}.include?(user_asset.class.name) ? user_asset.context(user) : user_asset
     
     message_options = {
       :subject => @notification.subject,

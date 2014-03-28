@@ -24,30 +24,59 @@
 # In this API, the `:user_id` parameter can always be replaced with `self` if
 # the requesting user is asking for his/her own information.
 #
-# @object CommunicationChannel
+# @model CommunicationChannel
 #     {
-#       // The ID of the communication channel.
-#       "id": 16,
-#
-#       // The address, or path, of the communication channel.
-#       "address": "sheldon@caltech.example.com",
-#
-#       // The type of communcation channel being described. Possible values
-#       // are: "email", "sms", "facebook" or "twitter". This field
-#       // determines the type of value seen in "address".
-#       "type": "email",
-#
-#       // The position of this communication channel relative to the user's
-#       // other channels when they are ordered.
-#       "position": 1,
-#
-#       // The ID of the user that owns this communication channel.
-#       "user_id": 1,
-#
-#       // The current state of the communication channel. Possible values are:
-#       // "unconfirmed" or "active".
-#       "workflow_state": "active"
+#       "id": "CommunicationChannel",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the communication channel.",
+#           "example": 16,
+#           "type": "integer"
+#         },
+#         "address": {
+#           "description": "The address, or path, of the communication channel.",
+#           "example": "sheldon@caltech.example.com",
+#           "type": "string"
+#         },
+#         "type": {
+#           "description": "The type of communcation channel being described. Possible values are: 'email', 'sms', 'chat', 'facebook' or 'twitter'. This field determines the type of value seen in 'address'.",
+#           "example": "email",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "email",
+#               "sms",
+#               "chat",
+#               "facebook",
+#               "twitter"
+#             ]
+#           }
+#         },
+#         "position": {
+#           "description": "The position of this communication channel relative to the user's other channels when they are ordered.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "user_id": {
+#           "description": "The ID of the user that owns this communication channel.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "workflow_state": {
+#           "description": "The current state of the communication channel. Possible values are: 'unconfirmed' or 'active'.",
+#           "example": "active",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "unconfirmed",
+#               "active"
+#             ]
+#           }
+#         }
+#       }
 #     }
+#
 class CommunicationChannelsController < ApplicationController
   before_filter :require_user, :only => [:create, :destroy]
   before_filter :reject_student_view_student

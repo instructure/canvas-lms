@@ -21,7 +21,7 @@
       <% if @context.user_is_instructor?(@user) && can_do(@user, @current_user, :read_reports) %>
         <%= link_to(t('links.teacher_activity', 'Student Interactions Report'), user_course_teacher_activity_url(@user, @context)) %>
       <% elsif @context.user_has_been_student?(@user) && @context.user_is_instructor?(@current_user) && can_do(@context, @current_user, :read_reports) %>
-        <% link_to(user_student_teacher_activity_url(@current_user, @user)) do %>
+        <%= link_to(user_student_teacher_activity_url(@current_user, @user)) do %>
           <i class="icon-peer-review"></i>
           <%= t('links.student_teacher_activity', 'Interactions with You') %>
         <% end %>
@@ -153,7 +153,7 @@
 <div style="margin-bottom: 10px;">&nbsp;</div>
 <% elsif service_enabled?(:avatars) %>
   <div style="margin-bottom: 20px;">
-    <span class="avatar_image"><%= avatar_image(@user) %></span>
+    <%= avatar(@user) %>
     <% if can_do(@user, @current_user, :remove_avatar) %>
       <a href="#" class="remove_avatar_picture_link"><%= t('links.remove_avatar', %{Remove avatar picture}) %></a>
     <% else %>

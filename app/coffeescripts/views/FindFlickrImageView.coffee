@@ -1,10 +1,11 @@
 define [
   'Backbone'
+  'jquery'
   'underscore'
   'str/htmlEscape'
   'jst/FindFlickrImageView'
   'jst/FindFlickrImageResult'
-], (Backbone, _, h, template, resultTemplate) ->
+], (Backbone, $, _, h, template, resultTemplate) ->
 
   class FindFlickrImageView extends Backbone.View
 

@@ -1,3 +1,5 @@
+@import "bootstrap/variables.scss"
+
 [type=radio].styled-radio
   margin: 4px 7px 2px 2px
   float: left
@@ -53,39 +55,80 @@ hr
   height: 30px
 
 .selectContentDialog ul
-  margin: 15px 9px 0px 15px
-
-  li
-    margin: 10px 0px 15px 0px
-    list-style: none
-
-    &:last-child
-      margin-bottom: 10px
-
-  li.small-spacing
-    margin: 5px 0px 5px 0px
+  margin: 0
+  list-style: none
 
   .checkbox-title
     padding-left: 5px
 
-  .checkbox-carrot
+  .checkbox-caret
     color: black
+
+  .no-caret
+    margin-left: 20px
+
+  .treeitem-heading
+    min-height: 22px
 
   input[type=checkbox]
     margin: 0 10px 3px 0px
     float: none
     padding-right: 5px
 
-  .no-carrot
-    margin-left: 20px
-
   label.checkbox
     display: inline
     padding-left: 0px
 
-  .top-level-treeitem
+  li.top-level-treeitem
+    margin: 10px 0px 10px 0px
     border: 1px solid lightgray
     border-radius: 5px
-    margin-bottom: 15px
-    padding: 5px
+
+    > .treeitem-heading
+      padding: 5px
+
+  li.normal-treeitem
+    min-height: 32px
+
+  li
+    list-style: none
+
+    > .treeitem-heading
+      padding: 5px
+      padding-left: 33px
+
+  li li li li li
+    > .treeitem-heading
+      padding: 5px
+      padding-left: 63px
+
+  li.small-spacing
+    margin: 5px 0px 5px 0px
+
+  li[aria-selected=true]
+    border-radius: 5px
+
+    > .treeitem-heading
+      background-color: $blueDark
+      label, a
+        color: white
+
+  li[aria-expanded=true]
+    .icon-forward
+      display: none
+    .icon-arrow-down
+      display: inline-block
+
+    > ul
+      display: block
+
+  li[aria-expanded=false]
+    .icon-forward
+      display: inline-block
+
+    .icon-arrow-down
+      display: none
+
+    > ul
+      display: none
 

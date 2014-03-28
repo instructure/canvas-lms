@@ -53,9 +53,7 @@ class CrocodocSessionsController < ApplicationController
       crocodoc = attachment.crocodoc_document
       session_url = crocodoc.session_url :user => @current_user,
                                          :annotations => annotations
-      respond_to do |format|
-        format.json { render :json => {:session_url => session_url} }
-      end
+      render :json => { :session_url => session_url }
     else
       raise ActiveRecord::RecordNotFound
     end

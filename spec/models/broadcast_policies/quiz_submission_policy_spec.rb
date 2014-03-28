@@ -37,7 +37,7 @@ module BroadcastPolicies
       end
     end
     let(:quiz_submission) do
-      mock("QuizSubmission").tap do |qs|
+      mock("Quizzes::QuizSubmission").tap do |qs|
         qs.stubs(:quiz).returns(quiz)
         qs.stubs(:submission).returns(submission)
         qs.stubs(:user).returns(user)

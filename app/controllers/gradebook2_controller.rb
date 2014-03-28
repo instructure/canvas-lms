@@ -43,6 +43,8 @@ class Gradebook2Controller < ApplicationController
       :gradebook_is_editable => @gradebook_is_editable,
       :setting_update_url => api_v1_course_settings_url(@context),
       :show_total_grade_as_points => @context.settings[:show_total_grade_as_points],
+      :publish_to_sis_enabled => @context.allows_grade_publishing_by(@current_user) && @gradebook_is_editable,
+      :publish_to_sis_url => context_url(@context, :context_details_url, :anchor => 'tab-grade-publishing'),
       :speed_grader_enabled => @context.allows_speed_grader?,
       :draft_state_enabled => @context.feature_enabled?(:draft_state),
       :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook),
@@ -52,6 +54,7 @@ class Gradebook2Controller < ApplicationController
       :custom_column_datum_url => api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
       :reorder_custom_columns_url => api_v1_custom_gradebook_columns_reorder_url(@context),
       :teacher_notes => teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
+      :change_gradebook_version_url => context_url(@context, :change_gradebook_version_context_gradebook_url, :version => 2)
     }
   end
 end

@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'Backbone'
   'compiled/models/AssignmentGroup'
   'underscore'
   'i18n!assignments'
   'compiled/collections/SubmissionCollection'
-], (Backbone, AssignmentGroup, _, I18n, SubmissionCollection) ->
+], ($, Backbone, AssignmentGroup, _, I18n, SubmissionCollection) ->
 
   PER_PAGE_LIMIT = 50
 

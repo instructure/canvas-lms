@@ -1,9 +1,10 @@
 define [
+  'jquery'
   'compiled/models/Assignment'
   'compiled/models/User'
   'compiled/SubmissionDetailsDialog'
   'jst/SubmissionDetailsDialog'
-], (Assignment, User, SubmissionDetailsDialog) ->
+], ($, Assignment, User, SubmissionDetailsDialog) ->
 
   module 'SubmissionDetailsDialog',
 

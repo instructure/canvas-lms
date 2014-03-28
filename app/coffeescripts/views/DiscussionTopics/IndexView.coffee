@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'underscore'
   'Backbone'
   'jst/DiscussionTopics/IndexView'
   'compiled/views/DiscussionTopics/DiscussionsSettingsView'
   'compiled/views/DiscussionTopics/UserSettingsView'
-], (_, {View}, template, DiscussionsSettingsView, UserSettingsView) ->
+], ($, _, {View}, template, DiscussionsSettingsView, UserSettingsView) ->
 
   class IndexView extends View
     template: template

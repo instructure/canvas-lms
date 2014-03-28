@@ -384,6 +384,7 @@ describe "Kaltura::ClientV3" do
       log_file_url = "https://www.instructuremedia.com/bulk_uploads/12345.log"
       bulk_upload_add_stub = stub_request(:post, "https://www.instructuremedia.com/api_v3/").
         with(:query => hash_including(:service => 'bulkUpload', :action => 'add')).
+        with{ |request| request.headers['Content-Type'] =~ /\Amultipart\/form-data/ }.
         to_return(:body => <<-XML)
           <result>
             <id>batch_job_12345</id>

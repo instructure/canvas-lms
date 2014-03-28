@@ -1,5 +1,5 @@
 # requires $.parseFromISO and $.dateString
-define ['i18n!dates'], (I18n) ->
+define ['i18n!dates', 'jquery'], (I18n, $) ->
   semanticDateRange = (startISO, endISO) ->
     unless startISO
       return """

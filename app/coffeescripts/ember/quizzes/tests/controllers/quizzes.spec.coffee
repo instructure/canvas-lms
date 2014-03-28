@@ -3,26 +3,34 @@ define [
   'ember',
   'ic-ajax',
   '../../controllers/quizzes_controller',
+  '../../models/quiz',
+  'ember-data'
   '../environment_setup',
-], (startApp, Ember, ajax, QuizzesController) ->
+], (startApp, Ember, ajax, QuizzesController, Quiz, DS) ->
 
-  App = null
+  App   = null
+  store = null
+  {run} = Ember
 
   module 'quizzes_controller',
     setup: ->
       App = startApp()
-      @qc = new QuizzesController()
-      quizzes = Em.A [
-          {quiz_type: 'survey', title: 'Test Quiz'},
-          {quiz_type: 'graded_survey', title: 'Test survey'},
-          {quiz_type: 'practice_quiz', title: 'Test practice quiz'},
-          {quiz_type: 'practice_quiz', title: 'Other practice'},
-          {quiz_type: 'assignment', title: 'Assignment test'}
-        ]
+      run => @qc = QuizzesController.create()
+      container = App.__container__
+      store = container.lookup 'store:main'
+      quizzes = null
+      run ->
+        quizzes = Em.A [
+            store.createRecord('quiz', {quizType: 'survey', title: 'Test Quiz'}),
+            store.createRecord('quiz', {quizType: 'graded_survey', title: 'Test survey'}),
+            store.createRecord('quiz', {quizType: 'practice_quiz', title: 'Test practice quiz'}),
+            store.createRecord('quiz', {quizType: 'practice_quiz', title: 'Other practice'}),
+            store.createRecord('quiz', {quizType: 'assignment', title: 'Assignment test'})
+          ]
       @qc.set('model', quizzes)
 
     teardown: ->
-      Ember.run App, 'destroy'
+      run App, 'destroy'
 
   test 'raw quiz types counts calculated correctly', ->
     equal(@qc.get('rawSurveys').length, 2)

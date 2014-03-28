@@ -17,6 +17,9 @@
 #
 
 class Progress < ActiveRecord::Base
+  include PolymorphicTypeOverride
+  override_polymorphic_types context_type: {'QuizStatistics' => 'Quizzes::QuizStatistics'}
+
   belongs_to :context, :polymorphic => true
   belongs_to :user
   attr_accessible :context, :tag, :completion, :message

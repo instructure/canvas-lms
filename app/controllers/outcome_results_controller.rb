@@ -21,42 +21,123 @@
 #
 # API for accessing learning outcome results
 #
-# @object OutcomeRollupScore
+# @model OutcomeResult
 #     {
-#       // The rollup score for the outcome, based on the student assessment
-#       // scores related to the outcome. This could be null if the student has
-#       // no related scores.
-#       "score": 3,
-#
-#       "links": {
-#         // The id of the related outcome
-#         "outcome": "42"
+#       "id": "OutcomeResult",
+#       "description": "A student's result for an outcome",
+#       "properties": {
+#         "id": {
+#           "example": "42",
+#           "type": "integer",
+#           "description": "A unique identifier for this result"
+#         },
+#         "score": {
+#           "example": 6,
+#           "type": "integer",
+#           "description": "The student's score"
+#         },
+#         "links": {
+#           "example": "{\"user\"=>\"3\", \"learning_outcome\"=>\"97\", \"alignment\"=>\"53\"}",
+#           "description": "Unique identifiers of objects associated with this result"
+#         }
 #       }
 #     }
 #
-# @object OutcomeRollup
+# @model OutcomeRollupScoreLinks
 #     {
-#       // an array of OutcomeRollupScore objects
-#       "scores": ["OutcomeRollupScore"],
-#
-#       // The name of the resource for this rollup. For example, the user name.
-#       "name": "John Doe",
-#
-#       "links": {
-#         // If an aggregate result was requested, the course field will be present
-#         // Otherwise, the user and section field will be present
-#
-#         // (Optional) The id of the course that this rollup applies to
-#         "course": "42",
-#
-#         // (Optional) The id of the user that this rollup applies to
-#         "user": "42",
-#
-#         // (Optional) The id of the section the user is in
-#         "section": "57"
+#       "id": "OutcomeRollupScoreLinks",
+#       "description": "",
+#       "properties": {
+#         "outcome": {
+#           "description": "The id of the related outcome",
+#           "example": 42,
+#           "type": "integer"
+#         }
 #       }
 #     }
 #
+# @model OutcomeRollupScore
+#     {
+#       "id": "OutcomeRollupScore",
+#       "description": "",
+#       "properties": {
+#         "score": {
+#           "description": "The rollup score for the outcome, based on the student assessment scores related to the outcome. This could be null if the student has no related scores.",
+#           "example": 3,
+#           "type": "integer"
+#         },
+#         "links": {
+#           "example": "{\"outcome\"=>\"42\"}",
+#           "$ref": "OutcomeRollupScoreLinks"
+#         }
+#       }
+#     }
+#
+# @model OutcomeRollupLinks
+#     {
+#       "id": "OutcomeRollupLinks",
+#       "description": "",
+#       "properties": {
+#         "course": {
+#           "description": "If an aggregate result was requested, the course field will be present Otherwise, the user and section field will be present (Optional) The id of the course that this rollup applies to",
+#           "example": 42,
+#           "type": "integer"
+#         },
+#         "user": {
+#           "description": "(Optional) The id of the user that this rollup applies to",
+#           "example": 42,
+#           "type": "integer"
+#         },
+#         "section": {
+#           "description": "(Optional) The id of the section the user is in",
+#           "example": 57,
+#           "type": "integer"
+#         }
+#       }
+#     }
+#
+# @model OutcomeRollup
+#     {
+#       "id": "OutcomeRollup",
+#       "description": "",
+#       "properties": {
+#         "scores": {
+#           "description": "an array of OutcomeRollupScore objects",
+#           "$ref": "OutcomeRollupScore"
+#         },
+#         "name": {
+#           "description": "The name of the resource for this rollup. For example, the user name.",
+#           "example": "John Doe",
+#           "type": "string"
+#         },
+#         "links": {
+#           "example": "{\"course\"=>42, \"user\"=>42, \"section\"=>57}",
+#           "$ref": "OutcomeRollupLinks"
+#         }
+#       }
+#     }
+#
+# @model OutcomeAlignment
+#     {
+#       "id": "OutcomeAlignment",
+#       "description": "An asset aligned with this outcome",
+#       "properties": {
+#         "id": {
+#           "description": "A unique identifier for this alignment",
+#           "example": "quiz_3",
+#           "type": "string"
+#         },
+#         "name": {
+#           "description": "",
+#           "example": "Big mid-term test",
+#           "type": "string"
+#         },
+#         "html_url": {
+#           "description": "(Optional) A URL for details about this alignment",
+#           "type": "string"
+#         }
+#       }
+#     }
 
 class OutcomeResultsController < ApplicationController
   include Api::V1::OutcomeResults
@@ -65,10 +146,44 @@ class OutcomeResultsController < ApplicationController
   before_filter :require_user
   before_filter :require_context
   before_filter :require_outcome_context
-  before_filter :verify_aggregate_parameter
+  before_filter :verify_aggregate_parameter, only: :rollups
   before_filter :verify_include_parameter
   before_filter :require_outcomes
   before_filter :require_users
+
+  # @API Get outcome results
+  # @beta
+  #
+  # Gets the outcome results for users and outcomes in the specified context.
+  #
+  # @argument user_ids[] [Optional, Integer]
+  #   If specified, only the users whose ids are given will be included in the
+  #   results. it is an error to specify an id for a user who is not a student in
+  #   the context
+  #
+  # @argument outcome_ids[] [Optional, Integer]
+  #   If specified, only the outcomes whose ids are given will be included in the
+  #   results. it is an error to specify an id for an outcome which is not linked
+  #   to the context.
+  #
+  # @argument include[] [Optional, String, "alignments"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"users"]
+  #   Specify additional collections to be side loaded with the result.
+  #   "alignments" includes only the alignments referenced by the returned
+  #   results.
+  #   "outcomes.alignments" includes all alignments referenced by outcomes in the
+  #   context.
+  #
+  # @example_response
+  #    {
+  #      outcome_results: [OutcomeResult]
+  #    }
+  def index
+    @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes)
+    @results = Api.paginate(@results, self, api_v1_course_outcome_results_url)
+    json = outcome_results_json(@results)
+    json[:linked] = linked_include_collections if params[:include].present?
+    render json: json
+  end
 
   # @API Get outcome result rollups
   # @beta
@@ -91,7 +206,7 @@ class OutcomeResultsController < ApplicationController
   #   results. it is an error to specify an id for an outcome which is not linked
   #   to the context.
   #
-  # @argument include[] [Optional, String, "courses"|"outcomes"|"outcome_groups"|"outcome_links"|"users"]
+  # @argument include[] [Optional, String, "courses"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"users"]
   #   Specify additional collections to be side loaded with the result.
   #
   # @example_response
@@ -112,6 +227,9 @@ class OutcomeResultsController < ApplicationController
   #
   #        // (Optional) Included if include[] has outcome_links
   #        "outcome_links": [OutcomeLink]
+  #
+  #        // (Optional) Included if include[] has outcomes.alignments
+  #        "outcomes.alignments": [OutcomeAlignment]
   #      }
   #    }
   def rollups
@@ -156,7 +274,7 @@ class OutcomeResultsController < ApplicationController
   # Returns a result Hash that should be merged into the linked section.
   def linked_include_collections
     linked = {}
-    includes = params[:include]
+    includes = Api.value_to_array(params[:include])
     includes.uniq.each do |include_name|
       linked[include_name] = self.send(include_method_name(include_name))
     end
@@ -202,6 +320,22 @@ class OutcomeResultsController < ApplicationController
     outcome_results_linked_users_json(@users)
   end
 
+  # Internal: Query and serialize alignments for @results
+  #
+  # Returns an Array of serialized alignments
+  def include_alignments
+    alignments = @results.map(&:alignment).map(&:content).uniq
+    outcome_results_include_alignments_json(alignments)
+  end
+
+  # Internal: Query and serialize alignments for @outcomes
+  #
+  # Returns an Array of serialized alignments
+  def include_outcomes_alignments
+    alignments = @outcomes.map(&:alignments).flatten.map(&:content).uniq
+    outcome_results_include_alignments_json(alignments)
+  end
+
   # Internal: Makes sure the context is a valid context for outcome_results and
   #   the current_user has appropriate permissions. This method is meant to be
   #   used as a before_filter.
@@ -210,7 +344,14 @@ class OutcomeResultsController < ApplicationController
   def require_outcome_context
     reject! "invalid context type" unless @context.is_a?(Course)
 
-    authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+    return true if is_authorized_action?(@context, @current_user, [:manage_grades, :view_all_grades])
+    reject! "users not specified and no access to all grades", :forbidden unless params[:user_ids]
+    user_ids = Api.value_to_array(params[:user_ids]).map(&:to_i).uniq
+    enrollments = @context.enrollments.where(user_id: user_ids)
+    reject! "specified users not enrolled" unless enrollments.length == user_ids.length
+    reject! "not authorized to read grades for specified users", :forbidden unless enrollments.all? do |e|
+      is_authorized_action?(e, @current_user, :read_grades)
+    end
   end
 
   # Internal: Verifies the aggregate parameter.
@@ -228,8 +369,7 @@ class OutcomeResultsController < ApplicationController
   # Raises an ApiError if the include parameter is invalid
   #  Returns true otherwise
   def verify_include_parameter
-    params[:include] ||= []
-    params[:include].each do |include_name|
+    Api.value_to_array(params[:include]).each do |include_name|
       case include_name
       when 'courses'
         reject! "can't include courses unless aggregate is 'course'" if params[:aggregate] != 'course'
@@ -244,7 +384,7 @@ class OutcomeResultsController < ApplicationController
 
   # Internal: Returns the potential method name for the include parameter value.
   def include_method_name(include_name)
-    "include_#{include_name}"
+    "include_#{include_name.parameterize.underscore}"
   end
 
   # Internal: Finds context outcomes

@@ -1,11 +1,12 @@
 define [
   'i18n!assignments'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/class/cache'
   'compiled/models/AssignmentGroup'
   'jst/assignments/ToggleShowBy'
-], (I18n, _, Backbone, Cache, AssignmentGroup, template) ->
+], (I18n, $, _, Backbone, Cache, AssignmentGroup, template) ->
 
   class ToggleShowByView extends Backbone.View
     @optionProperty 'course'

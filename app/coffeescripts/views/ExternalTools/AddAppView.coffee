@@ -1,10 +1,11 @@
 define [
   'Backbone'
   'i18n!external_tools'
+  'jquery'
   'underscore'
   'jst/ExternalTools/AddAppView'
   'jquery.disableWhileLoading'
-], (Backbone, I18n, _, template, disableWhileLoading) ->
+], (Backbone, I18n, $, _, template, disableWhileLoading) ->
 
   class AddAppView extends Backbone.View
     template: template

@@ -23,6 +23,11 @@ class Attachment < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
   attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data, :hidden
+
+  include PolymorphicTypeOverride
+  override_polymorphic_types context_type: {'QuizStatistics' => 'Quizzes::QuizStatistics',
+                                            'QuizSubmission' => 'Quizzes::QuizSubmission'}
+
   include HasContentTags
   include ContextModuleItem
   include SearchTermHelper
@@ -157,6 +162,19 @@ class Attachment < ActiveRecord::Base
   end
 
   def before_attachment_saved
+    run_before_attachment_saved
+  end
+
+  def after_attachment_saved
+    run_after_attachment_saved
+  end
+
+  unless CANVAS_RAILS2
+    before_attachment_saved :run_before_attachment_saved
+    after_attachment_saved :run_after_attachment_saved
+  end
+
+  def run_before_attachment_saved
     @after_attachment_saved_workflow_state = self.workflow_state
     self.workflow_state = 'unattached'
   end
@@ -167,7 +185,7 @@ class Attachment < ActiveRecord::Base
   # It blocks and makes the user wait.  The good thing is that sending
   # it to scribd from that point does not make the user wait since that
   # does happen asynchronously and the data goes directly from s3 to scribd.
-  def after_attachment_saved
+  def run_after_attachment_saved
     if workflow_state == 'unattached' && @after_attachment_saved_workflow_state
       self.workflow_state = @after_attachment_saved_workflow_state
       @after_attachment_saved_workflow_state = nil
@@ -565,8 +583,13 @@ class Attachment < ActiveRecord::Base
     write_attribute(:namespace, new_namespace)
 
     if Attachment.s3_storage?
-      bucket.objects[old_full_filename].rename_to(self.full_filename,
+      # copying rather than moving to avoid unhappy accidents
+      # note that GC of the S3 bucket isn't yet implemented,
+      # so there's a bit of a cost here
+      if !s3object.exists?
+        bucket.objects[old_full_filename].copy_to(self.full_filename,
                                                   :acl => attachment_options[:s3_access])
+      end
     else
       FileUtils.mv old_full_filename, full_filename
     end
@@ -584,35 +607,35 @@ class Attachment < ActiveRecord::Base
     self.content_type = details[:content_type]
     self.size = details[:content_length]
 
-    if existing_attachment = find_existing_attachment_for_md5
-      if existing_attachment.s3object.exists?
-        # deduplicate. the existing attachment's s3object should be the same as
-        # that just uploaded ('cuz md5 match). delete the new copy and just
-        # have this attachment inherit from the existing attachment.
-        s3object.delete rescue nil
-        self.root_attachment = existing_attachment
-        write_attribute(:filename, nil)
-        clear_cached_urls
-      else
-        # it looks like we had a duplicate, but the existing attachment doesn't
-        # actually have an s3object (probably from an earlier bug). update it
-        # and all its inheritors to inherit instead from this attachment.
-        existing_attachment.root_attachment = self
-        existing_attachment.write_attribute(:filename, nil)
-        existing_attachment.clear_cached_urls
-        existing_attachment.save!
-        Attachment.where(root_attachment_id: existing_attachment).update_all(
-          root_attachment_id: self,
-          filename: nil,
-          cached_scribd_thumbnail: nil,
-          updated_at: Time.zone.now)
+    self.shard.activate do
+      if existing_attachment = find_existing_attachment_for_md5
+        if existing_attachment.s3object.exists?
+          # deduplicate. the existing attachment's s3object should be the same as
+          # that just uploaded ('cuz md5 match). delete the new copy and just
+          # have this attachment inherit from the existing attachment.
+          s3object.delete rescue nil
+          self.root_attachment = existing_attachment
+          write_attribute(:filename, nil)
+          clear_cached_urls
+        else
+          # it looks like we had a duplicate, but the existing attachment doesn't
+          # actually have an s3object (probably from an earlier bug). update it
+          # and all its inheritors to inherit instead from this attachment.
+          existing_attachment.root_attachment = self
+          existing_attachment.write_attribute(:filename, nil)
+          existing_attachment.clear_cached_urls
+          existing_attachment.save!
+          Attachment.where(root_attachment_id: existing_attachment).update_all(
+            root_attachment_id: self,
+            filename: nil,
+            cached_scribd_thumbnail: nil,
+            updated_at: Time.zone.now)
+        end
       end
+      save!
+      # normally this would be called by attachment_fu after it had uploaded the file to S3.
+      after_attachment_saved
     end
-
-    save!
-
-    # normally this would be called by attachment_fu after it had uploaded the file to S3.
-    after_attachment_saved
   end
 
   CONTENT_LENGTH_RANGE = 10.gigabytes
@@ -768,7 +791,7 @@ class Attachment < ActiveRecord::Base
 
   before_save :assign_uuid
   def assign_uuid
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
   end
   protected :assign_uuid
 
@@ -1661,7 +1684,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def filter_attributes_for_user(hash, user, session)
-    hash.delete(:scribd_doc) unless grants_right?(user, session, :download)
+    hash.delete('scribd_doc') unless grants_right?(user, session, :download)
   end
 
   def self.process_scribd_conversion_statuses

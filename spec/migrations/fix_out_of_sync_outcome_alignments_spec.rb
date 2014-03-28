@@ -74,7 +74,8 @@ describe DataFixup::FixOutOfSyncOutcomeAlignments do
 
   it "should delete alignments to assignments with rubrics without matching alignments" do
     align = @rubric_association_object.learning_outcome_alignments.first
-    @rubric.learning_outcome_alignments.update_all(:learning_outcome_id => 0)
+    lo = LearningOutcome.create!(short_description: 's')
+    @rubric.learning_outcome_alignments.update_all(:learning_outcome_id => lo)
 
     align.reload.should_not be_deleted
     DataFixup::FixOutOfSyncOutcomeAlignments.run

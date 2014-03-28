@@ -945,7 +945,7 @@ describe Submission do
   end
 
   describe "update_attachment_associations" do
-    begin
+    before do
       course_with_student active_all: true
       @assignment = @course.assignments.create!
     end

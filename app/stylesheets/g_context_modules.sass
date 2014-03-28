@@ -117,6 +117,12 @@ $context_module_bg_color: #f2f3f4
 
 .context_module_item 
   border-bottom: 1px dotted #e0e0e0
+  &.indent_0
+    .outdent_item_link
+      display: none !important
+    .indent_item_link
+      border-top-left-radius: 8px
+      border-top-right-radius: 8px
   &.indent_1
     .type_icon
       padding-right: 20px
@@ -132,6 +138,8 @@ $context_module_bg_color: #f2f3f4
   &.indent_5
     .type_icon
       padding-right: 100px
+    .indent_item_link
+      display: none !important
   .type_icon
     display: inline-block
     i

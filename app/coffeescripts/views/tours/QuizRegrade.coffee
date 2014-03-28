@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'compiled/views/TourView'
   'jst/tours/QuizRegrade'
   'vendor/usher/usher'
-], (TourView, template, Usher) ->
+], ($, TourView, template, Usher) ->
 
   class QuizRegrade extends TourView
 

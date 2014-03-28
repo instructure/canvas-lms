@@ -1,11 +1,12 @@
 define [
   'i18n!discussions'
+  'jquery'
   'underscore'
   'Backbone'
   'jst/DiscussionTopics/discussion'
   'compiled/views/PublishIconView'
   'compiled/views/ToggleableSubscriptionIconView'
-], (I18n, _, {View}, template, PublishIconView, ToggleableSubscriptionIconView) ->
+], (I18n, $, _, {View}, template, PublishIconView, ToggleableSubscriptionIconView) ->
 
   class DiscussionView extends View
     # Public: View template (discussion).

@@ -20,31 +20,74 @@
 # An API for managing files and folders
 # See the File Upload Documentation for details on the file upload workflow.
 #
-# @object File
+# @model File
 #     {
-#       "size": 4,
-#       "content-type": "text/plain",
-#       "url": "http://www.example.com/files/569/download?download_frd=1\u0026verifier=c6HdZmxOZa0Fiin2cbvZeI8I5ry7yqD7RChQzb6P",
-#       "id": 569,
-#       "display_name": "file.txt",
-#       "created_at": "2012-07-06T14:58:50Z",
-#       "updated_at": "2012-07-06T14:58:50Z",
-#       "unlock_at": null,
-#       "locked": false,
-#       "hidden": false,
-#       "lock_at": null,
-#       "locked_for_user": false,
-#       "lock_info": {
-#         "asset_string": "file_569",
-#         "unlock_at": "2013-01-01T00:00:00-06:00",
-#         "lock_at": "2013-02-01T00:00:00-06:00",
-#         "context_module": {},
-#         "manually_locked": true
-#       },
-#       "lock_explanation": "This assignment is locked until September 1 at 12:00am",
-#       "hidden_for_user": false,
-#       "thumbnail_url": null
+#       "id": "File",
+#       "description": "",
+#       "properties": {
+#         "size": {
+#           "example": 4,
+#           "type": "integer"
+#         },
+#         "content-type": {
+#           "example": "text/plain",
+#           "type": "string"
+#         },
+#         "url": {
+#           "example": "http://www.example.com/files/569/download?download_frd=1&verifier=c6HdZmxOZa0Fiin2cbvZeI8I5ry7yqD7RChQzb6P",
+#           "type": "string"
+#         },
+#         "id": {
+#           "example": 569,
+#           "type": "integer"
+#         },
+#         "display_name": {
+#           "example": "file.txt",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "example": "2012-07-06T14:58:50Z",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "example": "2012-07-06T14:58:50Z",
+#           "type": "datetime"
+#         },
+#         "unlock_at": {
+#           "type": "datetime"
+#         },
+#         "locked": {
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "hidden": {
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "lock_at": {
+#           "type": "datetime"
+#         },
+#         "locked_for_user": {
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "lock_info": {
+#           "$ref": "LockInfo"
+#         },
+#         "lock_explanation": {
+#           "example": "This assignment is locked until September 1 at 12:00am",
+#           "type": "string"
+#         },
+#         "hidden_for_user": {
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "thumbnail_url": {
+#           "type": "string"
+#         }
+#       }
 #     }
+#
 class FilesController < ApplicationController
   before_filter :require_user, :only => :create_pending
   before_filter :require_context, :except => [:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success,:api_show,:api_index,:destroy,:api_update,:api_file_status]
@@ -59,7 +102,7 @@ class FilesController < ApplicationController
 
   def quota
     get_quota
-    if authorized_action(@context.attachments.new, @current_user, :create)
+    if authorized_action(@context.attachments.scoped.new, @current_user, :create)
       h = ActionView::Base.new
       h.extend ActionView::Helpers::NumberHelper
       result = {
@@ -196,7 +239,7 @@ class FilesController < ApplicationController
   end
 
   def images
-    if authorized_action(@context.attachments.new, @current_user, :read)
+    if authorized_action(@context.attachments.scoped.new, @current_user, :read)
       if Folder.root_folders(@context).first.grants_right?(@current_user, session, :read_contents)
         if @context.grants_right?(@current_user, session, :manage_files)
           @images = @context.active_images.paginate :page => params[:page]
@@ -273,19 +316,15 @@ class FilesController < ApplicationController
 
   # this is used for the google docs preview of a document
   def public_url
-    respond_to do |format|
-      format.json do
-        @attachment = Attachment.find(params[:id])
-        # if the attachment is part of a submisison, its 'context' will be the student that submmited the assignment.  so if  @current_user is a 
-        # teacher authorized_action(@attachment, @current_user, :download) will be false, we need to actually check if they have perms to see the 
-        # submission.
-        @submission = Submission.find(params[:submission_id]) if params[:submission_id]
-        # verify that the requested attachment belongs to the submission
-        return render_unauthorized_action if @submission && !@submission.attachments.where(:id => params[:id]).any?
-        if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
-          render :json  => { :public_url => @attachment.authenticated_s3_url(:secure => request.ssl?) }
-        end
-      end
+    @attachment = Attachment.find(params[:id])
+    # if the attachment is part of a submisison, its 'context' will be the student that submmited the assignment.  so if  @current_user is a
+    # teacher authorized_action(@attachment, @current_user, :download) will be false, we need to actually check if they have perms to see the
+    # submission.
+    @submission = Submission.find(params[:submission_id]) if params[:submission_id]
+    # verify that the requested attachment belongs to the submission
+    return render_unauthorized_action if @submission && !@submission.attachments.where(:id => params[:id]).any?
+    if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
+      render :json  => { :public_url => @attachment.authenticated_s3_url(:secure => request.ssl?) }
     end
   end
 
@@ -570,7 +609,7 @@ class FilesController < ApplicationController
       @check_quota = false
       @attachment.submission_attachment = true
     elsif @context && intent == 'attach_discussion_file'
-      permission_object = @context.discussion_topics.new
+      permission_object = @context.discussion_topics.scoped.new
       permission = :attach
     elsif @context && intent == 'message'
       permission_object = @context

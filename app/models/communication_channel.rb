@@ -187,7 +187,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def send_otp!(code)
-    m = self.messages.new
+    m = self.messages.scoped.new
     m.to = self.path
     m.body = t :body, "Your Canvas verification code is %{verification_code}", :verification_code => code
     Mailer.create_message(m).deliver rescue nil # omg! just ignore delivery failures
@@ -200,9 +200,9 @@ class CommunicationChannel < ActiveRecord::Base
   def set_confirmation_code(reset=false)
     self.confirmation_code = nil if reset
     if self.path_type == TYPE_EMAIL or self.path_type.nil?
-      self.confirmation_code ||= AutoHandle.generate(nil, 25)
+      self.confirmation_code ||= CanvasUuid::Uuid.generate(nil, 25)
     else
-      self.confirmation_code ||= AutoHandle.generate
+      self.confirmation_code ||= CanvasUuid::Uuid.generate
     end
     true
   end

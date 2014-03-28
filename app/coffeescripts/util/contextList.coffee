@@ -1,9 +1,10 @@
 define [
+  'jquery'
   'underscore'
   'str/htmlEscape'
   'compiled/util/listWithOthers'
   'jquery.instructure_misc_helpers'
-], (_, h, listWithOthers) ->
+], ($, _, h, listWithOthers) ->
 
   prepare = (context, filters) ->
     context = _.clone(context)

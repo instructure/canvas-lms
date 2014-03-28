@@ -18,6 +18,7 @@
 
 define [
   'i18n!conversation_dialog'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/views/DialogBaseView'
@@ -32,7 +33,7 @@ define [
   'compiled/views/conversations/ContextMessagesView'
   'compiled/widget/ContextSearch'
   'vendor/jquery.elastic'
-], (I18n, _, {Collection}, DialogBaseView, template, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, Message, AutocompleteView, CourseSelectionView, ContextMessagesView) ->
+], (I18n, $, _, {Collection}, DialogBaseView, template, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, Message, AutocompleteView, CourseSelectionView, ContextMessagesView) ->
 
   ##
   # reusable message composition dialog

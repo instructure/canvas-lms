@@ -6,7 +6,6 @@ require 'canvas_stringex'
 
 class StringExtensionsTest < Test::Unit::TestCase
   def test_to_html
-    require "rubygems"
     require "RedCloth"
     {
       "h1. A Solution" => "<h1>A Solution</h1>",
@@ -22,7 +21,6 @@ class StringExtensionsTest < Test::Unit::TestCase
   end
   
   def test_to_html_lite
-    require "rubygems"
     require "RedCloth"
     {
       "I have no pee on me" => "I have no pee on me",

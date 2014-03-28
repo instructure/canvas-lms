@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -66,6 +66,7 @@ describe Api::V1::User do
           'name' => 'User',
           'sortable_name' => 'User',
           'sis_user_id' => 'xyz',
+          'sis_import_id' => nil,
           'id' => @user.id,
           'short_name' => 'User',
           'login_id' => 'xyz',
@@ -77,11 +78,15 @@ describe Api::V1::User do
       @user = User.create!(:name => 'User')
       @account2 = Account.create!
       @user.pseudonyms.create!(:unique_id => 'abc', :account => Account.default)
-      @user.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
+      p = @user.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
+      sis_batch = p.account.sis_batches.create
+      SisBatch.where(id: sis_batch).update_all(workflow_state: 'imported')
+      Pseudonym.where(id: p.id).update_all(sis_batch_id: sis_batch.id)
       @test_api.user_json(@user, @admin, {}, [], Account.default).should == {
           'name' => 'User',
           'sortable_name' => 'User',
           'sis_user_id' => 'xyz',
+          'sis_import_id' => sis_batch.id,
           'id' => @user.id,
           'short_name' => 'User',
           'login_id' => 'xyz',
@@ -144,6 +149,7 @@ describe Api::V1::User do
                       "id"=>@student.id,
                       "short_name"=>"Student",
                       "login_id"=>"pvuser@example.com",
+                      "sis_import_id"=>@student.pseudonym.sis_batch_id,
                       "sis_login_id"=>"pvuser@example.com"}
     end
 
@@ -319,6 +325,7 @@ describe "Users API", type: :request do
           'name' => user.name,
           'sortable_name' => user.sortable_name,
           'sis_user_id' => user.pseudonym.sis_user_id,
+          'sis_import_id' => nil,
           'id' => user.id,
           'short_name' => user.short_name,
           'login_id' => user.pseudonym.unique_id,
@@ -412,6 +419,7 @@ describe "Users API", type: :request do
         "sortable_name" => "User, T.",
         "id"            => user.id,
         "sis_user_id"   => "12345",
+        "sis_import_id" => user.pseudonym.sis_batch_id,
         "login_id"      => "test@example.com",
         "sis_login_id"  => "test@example.com",
         "locale"        => "en"
@@ -566,6 +574,7 @@ describe "Users API", type: :request do
           'name' => 'Tobias Funke',
           'sortable_name' => 'Funke, Tobias',
           'sis_user_id' => 'sis-user-id',
+          'sis_import_id' => nil,
           'id' => user.id,
           'short_name' => 'Tobias',
           'login_id' => 'student@example.com',

@@ -201,7 +201,7 @@ class SubmissionsApiController < ApplicationController
         result << hash
       end
     else
-      submissions = @context.submissions.except(:includes, :order).where(:user_id => student_ids).includes(:user).order(:id)
+      submissions = @context.submissions.except(:order).where(:user_id => student_ids).includes(:user).order(:id)
       submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
       Submission.bulk_load_versioned_attachments(submissions)
@@ -257,6 +257,21 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
+  # @model RubricAssessment
+  #  {
+  #     "id" : "RubricAssessment",
+  #     "required": ["criterion_id"],
+  #     "properties": {
+  #       "criterion_id": {
+  #         "description": "The ID of the quiz question.",
+  #         "example": 1,
+  #         "type": "integer",
+  #         "format": "int64"
+  #       },
+  #     }
+  #  }
+  #
+  #
   # @API Grade or comment on a submission
   #
   # Comment on and/or update the grading for a student's assignment submission.
@@ -371,7 +386,7 @@ class SubmissionsApiController < ApplicationController
         @submissions = @assignment.grade_student(@user, submission)
         @submission = @submissions.first
       else
-        @submission = @assignment.find_or_create_submission(@user)
+        @submission = @assignment.find_or_create_submission(@user) if @submission.new_record?
         @submissions ||= [@submission]
       end
 

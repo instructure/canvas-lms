@@ -30,7 +30,7 @@ describe "admin avatars" do
       f(opts.keys[0]).click
     end
     f("#avatars .name").should include_text user.name
-    f(".avatar img").attribute('src').should_not be_nil
+    f(".avatar").attribute('style').should match(/http/)
   end
 
   def lock_avatar(user, element)

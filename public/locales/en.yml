@@ -94,7 +94,6 @@ en:
         login_handle_name: "Login Label"
       login_handle_name_description: "The label used for unique login identifiers. Examples: Login, Username, Student ID, etc."
       save_button: "Save Authentication Settings"
-    deprecated_fail: "Can't use both deprecated and current version of create at the same time."
     index: 
       add_auth_desc: "Add an identity provider to this account:"
       canvas_login_tip: |-
@@ -177,11 +176,8 @@ en:
       last_ldap_timeout_failure: "Last timeout failure"
       ldap_timeout_failure_help2: "If Canvas times out too many times communicating with the LDAP server, it will block further login attempts from using that LDAP server for %{time}."
     login_required: "must be supplied"
-    no_auth_mixing: "Can not mix authentication types"
     no_changing_auth_types: "Can not change type of authorization config, please delete and create new config."
-    no_config_sent: "Must specify auth_type"
     no_discovery_url: "None set"
-    only_one_cas: "Can not create multiple CAS configurations"
     password_required: "must be supplied"
     saml_required: "A SAML configuration is required to test SAML"
     saml_settings: 
@@ -277,6 +273,11 @@ en:
     sis_exporter: 
       deleted: "Include Deleted Objects: true;"
       reports: "Reports: %{files}"
+    student: 
+      enrollment_state: "Include Enrollment State: true;"
+      enrollment_states: "Enrollment States: %{states};"
+    usu: 
+      enrollment_types: "Enrollment types: %{types}"
   account_settings: 
     account: Account
     account_name_too_long: "Account Name is too long"
@@ -369,6 +370,28 @@ en:
         messages_viewed: "Notifications sent to *%{user}* from *%{start_date}* to *%{end_date}*."
       comm_messages_search_results: 
         no_messages_found: "No messages found"
+      course_logging_content: 
+        course_activity: "Course Activity"
+        find: Find
+      course_logging_details: 
+        Field: Field
+        From: From
+        To: To
+        Value: Value
+        date: Date
+        event_id: "Event Id"
+        event_type_label: Type
+        time: Time
+        user: User
+      course_logging_item: 
+        view_event_details: "View Details"
+      course_logging_results: 
+        date: Date
+        event_details: "Event Details"
+        event_type: Type
+        no_item_found: "No items found"
+        time: Time
+        user: User
       course_search_form: 
         labels: 
           find_deleted_course: "Find a deleted course"
@@ -398,8 +421,8 @@ en:
         message_date_from: "From Date"
         message_date_to: "To Date"
       grade_change_logging_content: 
-        auth_logging: "Grade Change Activity"
         find: Find
+        grade_change_activity: "Grade Change Activity"
         message_assignment_id: "Assignment Id"
         message_course_id: "Course Id"
       grade_change_logging_results: 
@@ -414,6 +437,7 @@ en:
         time: Time
       logging_content_pane: 
         authentication: "Login / Logout Activity"
+        course: "Course Activity"
         grade_change: "Grade Change Activity"
         select_default: "Select a Log type"
         select_label: "Select a log type to search."
@@ -786,7 +810,7 @@ en:
       enabled_web_serices_title: "Enabled Web Services"
       equall_endpoint_help: "This is the URL to your equella service. It will probably look something like \"%{sample_url}\"."
       equella_settings_title: "Equella Settings"
-      feature_options: "Feature options"
+      feature_options: "Feature Options"
       features_title: Features
       global_announcements_description: "Global announcements are a way for you to post sticky messages on the dashboard of all users in your account.  They will appear on each user's dashboard for the given time period or until the user clicks the \"close\"(×) link to ignore the alert. **These announcements should be used sparingly.**"
       global_announcements_title: "Global Announcements"
@@ -845,6 +869,8 @@ en:
         restrict_student_future_view: "Restrict students from viewing courses before start date"
         self_enrollment: "Allow Self-Enrollment"
         self_registration: "Self Registration"
+        self_registration_type_all: "All Account Types"
+        self_registration_type_observer: "Observer Accounts Only"
         show_scheduler: "Enable Scheduler"
         sis_source_id: "SIS ID"
         start_at: Starts
@@ -1118,6 +1144,15 @@ en:
             description: 
               header: Example
             text: "This is a report of all students enrolled in a course in a given term that have not submitted an assignment between the given date range in a course. This report contains one row per student enrollment that meet the criteria. The date range can be no larger than two weeks."
+    students_with_no_submissions_csv_parameters: 
+      account_reports: 
+        default: 
+          enrollment_state: 
+            header: "Enrollment State"
+          include_enrollment_state: 
+            check_box: "Include Enrollment State"
+      active: "Active Enrollments"
+      all: "All Enrollments"
     submission_data_csv_description: 
       account_reports: 
         submission_data: 
@@ -1165,6 +1200,24 @@ en:
           main: 
             text: "This is a report of all courses that have none of the following items: assignments, announcements, discussions, files, modules, pages, or quizzes."
     update_failed_notice: "Account settings update failed"
+    user_access_csv_description: 
+      account_reports: 
+        usu: 
+          description: 
+            header: Example
+          user_activity: 
+            text: "This report shows all the activity from users enrolled in a given course or all courses in a given term. Resulting csv file will have one row per student activity and will have the following headers; enrollment_type, section id, section sis id, section name, course id, course sis id, course name, user id, user sis id, content type, content, times viewed, times participated, last viewed. The times viewed and times participated are counters from the beginning of time until the time the report was generated."
+    user_access_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: "Enrollment Type"
+      all: "All Enrollments"
+      designer: "Designer Enrollments"
+      observer: "Observer Enrollments"
+      students: "Student Enrollments"
+      ta: "Ta Enrollments"
+      teachers: "Teacher Enrollments"
     user_add_failed_message: "Adding User Failed, please try again"
     user_added_message: "*%{user}* successfully added!"
     user_added_message_sent_message: "*%{user}* successfully added! They should receive an email confirmation shortly."
@@ -1400,7 +1453,6 @@ en:
     default_title: "No Name - %{course}"
     default_unfiled_title: "Unfiled Questions"
   assignment: 
-    advanced_options_errors: "There were errors on one or more advanced options"
     assignment_group_must_have_group: "Please select an assignment group for this assignment"
     at_least_one_file_type: "Please specify at least one allowed file type"
     at_least_one_submission_type: "Please choose at least one submission type"
@@ -1418,7 +1470,6 @@ en:
     feed_entry_title: "Assignment: %{assignment}"
     feed_entry_title_with_course: "Assignment, %{course}: %{assignment}"
     group_assignment_must_have_group_set: "Please select a group set for this assignment"
-    hide_advanced_options: "Hide Advanced Options"
     imported_assignments_group: "Imported Assignments"
     labels: 
       due: Due
@@ -1426,7 +1477,6 @@ en:
     percentage_points_possible: "Points possible must be more than 0 for percentage grading"
     points_possible_number: "Points possible must be a number"
     select_external_tool_dialog_title: "Configure External Tool"
-    show_advanced_options: "Show Advanced Options"
     submission_action_take_quiz: "Take %{title}"
     submission_action_turn_in_assignment: "Turn in %{title}"
     submission_types: 
@@ -1720,11 +1770,9 @@ en:
       buttons: 
         update: "Update Assignment"
       description: Description
-      due_date: "Due Date"
       freeze_properties: "Lock assignment properties when copied"
       notify_content_change: "Notify users that this content has changed"
       points_possible: Points
-      show_advanced_options: "Show Advanced Options"
       warnings: 
         assignment_is_frozen: "Some settings have been administratively locked."
     errors: 
@@ -1762,7 +1810,7 @@ en:
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "Grade: %{grade}%"
     grading_type_selector: 
-      grading_type: "Grading Type"
+      display_grade_as: "Display Grade as"
       grading_type_options: 
         letter_grade: "Letter Grade"
         not_graded: "Not Graded"
@@ -1772,6 +1820,7 @@ en:
       view_grading_levels: "View Grading Levels"
     group_category_selector: 
       grade_group_students_individually: "Assign Grades to Each Student Individually"
+      group_assignment_header: "Group Assignment"
       group_category_options: "New Group Category"
       group_set: "Group Set"
       is_group_assignment: "This is a Group Assignment"
@@ -1851,6 +1900,8 @@ en:
       submitting: Submitting...
     multiple_due_dates: "Multiple Due Dates"
     name_is_required: "Name is required!"
+    name_too_long: "Name is too long"
+    name_too_long_error: "Name is too long"
     never_drop: 
       remove_rule: "Remove Rule"
     never_drop_collection: 
@@ -1909,12 +1960,14 @@ en:
         remind: "Remind %{assessor} about Assessment, last notified %{time}"
         reminder: "Remind %{assessor} about Assessment, last notified %{time}"
     peer_reviews_selector: 
+      how_to_peer_review: "How to Assign Peer Reviews"
       labels: 
         automatically_assign_peer_reviews: "Automatically Assign Peer Reviews"
         manually_assign_peer_reviews: "Manually Assign Peer Reviews"
         require_peer_reviews: "Require Peer Reviews"
       locked_until: "Assign Reviews"
       peer_reviews_assign_at_explanation: "Must come after due date. If blank, uses due date."
+      peer_reviews_header: "Peer Reviews"
       reviews_per_user: "Reviews Per User"
     points_possible_number: "Points possible must be a number"
     positive_number: "You must use a positive number"
@@ -1997,17 +2050,19 @@ en:
       advanced_turnitin_settings: "Advanced Turnitin Settings"
       descriptions: 
         allowed_extensions: "Enter a list of accepted extensions, for example: doc,xls,txt"
+      external_tool_options: "External Tool Options"
       label: 
         external_tool_new_tab: "Load This Tool In A New Tab"
         external_tool_url: "External Tool URL"
         turnitin_enabled: "Enable Turnitin Submissions"
       labels: 
-        allow_file_uploads: "Allow File Uploads"
-        allow_media_recordings: "Allow Media Recordings"
-        allow_text_entry: "Allow Text Entry"
-        allow_url: "Allow Website URL"
+        allow_file_uploads: "File Uploads"
+        allow_media_recordings: "Media Recordings"
+        allow_text_entry: "Text Entry"
+        allow_url: "Website URL"
         allowed_extensions: "Allowed File Extensions"
         restrict_file_extensions: "Restrict Upload File Types"
+      online_entry_options: "Online Entry Options"
       submission_type: "Submission Type"
       submission_types: 
         external_tool: "External Tool"
@@ -3142,6 +3197,7 @@ en:
     select_content: 
       cancel_btn: Cancel
       select_content_btn: "Select Content"
+      select_content_label: "Select content, Use the up and down arrow keys to navigate through the tree. Press right to expand and left to collapse."
     select_course: "Select Course"
     show_issues: "Show Issues"
     subviews: 
@@ -3280,8 +3336,9 @@ en:
         conclude_student: "Are you sure you want to conclude this student's enrollment?"
         delete_enrollment: "Are you sure you want to delete this student's enrollment?"
       enrolled_as: "Enrolled as a %{enrollment_type}"
-      enrollment_change_failed: "Enrollment privilege change failed, please try again"
       enrollment_linked_to: "linked to *%{linked_user}*"
+      error: 
+        enrollment_change_failed: "Enrollment privilege change failed, please try again"
       labels: 
         user_privileges: Privileges
       legends: 
@@ -3595,10 +3652,10 @@ en:
         description: 
           delete: "Delete Current Module/Item"
           edit: "Edit Module/Item"
-          indent: "Indent Current Item"
+          indent: "Increase Indent"
           new: "New Module"
           next: "Next Module/Item"
-          outdent: "Outdent Current Item"
+          outdent: "Decrease Indent"
           previous: "Previous Module/Item"
       keycode_descriptions: 
         next_module_item: "Select next module or module item"
@@ -3750,10 +3807,10 @@ en:
       links: 
         edit_item: "Edit item details"
         edit_item_details_label: "Edit item details"
-        indent: "Indent item"
-        indent_label: "Indent item"
-        outdent: "Outdent item"
-        outdent_label: "Outdent item"
+        indent: "Increase indent"
+        indent_label: "Increase indent"
+        outdent: "Decrease indent"
+        outdent_label: "Decrease indent"
         remove_item: "Remove this item from the module"
         remove_item_label: "Remove this item from the module"
       max_score: 
@@ -3791,10 +3848,10 @@ en:
       links: 
         edit_item: Edit
         edit_item_details: "Edit item details"
-        indent: Indent
-        indent_item: "Indent item"
-        outdent: Outdent
-        outdent_item: "Outdent item"
+        indent: "Increase indent"
+        indent_item: "Increase indent"
+        outdent: "Decrease indent"
+        outdent_item: "Decrease indent"
         remove_item: Remove
         remove_item_from_module: "Remove this item from the module"
       max_score: 
@@ -4253,6 +4310,62 @@ en:
     wrapper: 
       close_course_menu_title: close
       reset_course_menu: Reset
+  course_logging: 
+    event_type: 
+      concluded: Concluded
+      created: Created
+      updated: Updated
+    field_label: 
+      abstract_course_id: "Abstract Course Id"
+      account_id: "Account Id"
+      allow_student_discussion_editing: "Allow Student Discussion Editing"
+      allow_student_discussion_topics: "Allow Student Discussion Topics"
+      allow_student_forum_attachments: "Allow Student Forum Attachments"
+      allow_student_organized_groups: "Allow Student Organized Groups"
+      allow_student_wiki_edits: "Allow Student Wiki Edit"
+      allow_wiki_comments: "Allow Wiki Comments"
+      conclude_at: "Concluded At"
+      course_code: "Course Code"
+      created_at: "Created At"
+      default_view: "Default View"
+      default_wiki_editing_roles: "Default Wiki Editing Roles"
+      enrollment_term_id: "Enrollment Term Id"
+      grading_standard_id: "Grading Standard Id"
+      group_weighting_scheme: "Group Weighting Scheme"
+      hide_distribution_graphs: "Hide Distribution Graphs"
+      hide_final_grade: "Hide Final Grade"
+      indexed: Indexed
+      integration_id: "Integration Id"
+      is_public: "Is Public"
+      large_roster: "Large Roster"
+      license: License
+      locale: Locale
+      lock_all_announcements: "Lock All Announcements"
+      name: Name
+      old_account_id: "Old Account Id"
+      open_enrollment: "Open Enrollment"
+      public_description: "Public Description"
+      public_syllabus: "Public Syllabus"
+      replacement_course_id: "Replacement Course Id"
+      restrict_enrollments_to_course_dates: "Restrict Enrollments To Course Dates"
+      root_account_id: "Root Account Id"
+      self_enrollment: "Self Enrollment"
+      self_enrollment_code: "Self Enrollment Code"
+      self_enrollment_limit: "Self Enrollment Limit"
+      show_all_discussion_entries: "Show All Discussion Entries"
+      show_public_context_messages: "Show Public Context Message"
+      sis_batch_id: "SIS Batch Id"
+      sis_source_id: "SIS Source Id"
+      start_at: "Start At"
+      storage_quota: "Storage Quota"
+      syllabus_body: syllabus_body
+      tab_configuration: "Tab Configuration"
+      template_course_id: "Template Course Id"
+      turnitin_comments: "Turnitin Comments"
+      updated_at: "Updated At"
+      uuid: UUID
+      wiki_id: "Wiki Id"
+      workflow_state: "Workflow State"
   course_restore: 
     restore_error: "There was an error attempting to restore the course. Course was not restored."
   course_search: 
@@ -4293,7 +4406,7 @@ en:
     invitation_sent_now: "Just Now"
     link_students_placeholder: "Enter a student name"
     links: 
-      less_options: "less options"
+      fewer_options: "fewer options"
       more_options: "more options"
       publish: "Publish grades to SIS"
       publishing: "Publishing grades to SIS..."
@@ -4699,7 +4812,7 @@ en:
       tabs: 
         alerts: Alerts
         details: "Course Details"
-        feature_options: "Feature options"
+        feature_options: "Feature Options"
         grade_publishing: "Grade Publishing"
         navigation: Navigation
         sections: Sections
@@ -5194,6 +5307,10 @@ en:
     cancel: Cancel
     save_settings: "Save Settings"
     saving: Saving...
+  differentiated_assignments_description: |-
+      Differentiated Assignments is a *beta* feature that enables choosing which section(s) an assignment applies to.
+      Sections that are not given an assignment will not see it in their course content and their final grade will be
+      calculated without those points.
   discussion_entries: 
     created_entry_notice: "Entry was successfully created."
     deleted_entry_notice: "That entry has been deleted"
@@ -5475,6 +5592,10 @@ en:
     unsubscribe: "Unsubscribe from this topic"
     unsubscribed: Unsubscribed
     unsubscribed_hint: "You are not subscribed to this topic. Click to subscribe."
+  draft_state: 
+    cant_unpublish_when_students_submit: "Can't unpublish if there are student submissions"
+    publish: Publish
+    unpublish: Unpublish
   draft_state_description: |-
       This beta feature redesigns many parts of Canvas and allows content to exist in
       a new unpublished state that is invisible to students and excluded from grade
@@ -6056,9 +6177,10 @@ en:
       release_notes: "release notes"
       toggle_feature_details: "Toggle feature details"
     feature_flag_admin_view: 
-      feature_options: "Feature options"
+      feature_options: "Feature Options"
       no_features_available: "No features are currently available."
   features: 
+    differentiated_assignments: "Differentiated Assignments"
     draft_state: "Draft State"
     draft_state_account_disable_warning: |-
         Turning this feature off will impact existing courses. For assistance in disabling this feature, please contact
@@ -6069,6 +6191,7 @@ en:
     google_docs_domain_restriction: "Google Docs Domain Restriction"
     outcome_gradebook: "Outcome Gradebook"
     screenreader_gradebook: "Screenreader Gradebook"
+    student_outcome_gradebook: "Student Outcome Gradebook"
   file_browser_view: 
     folder_tree_instructions: "Use the up and down arrow keys to navigate through the tree. Press right to expand folders, left to collapse, and enter to choose an image."
   filebrowserview: 
@@ -6483,6 +6606,7 @@ en:
       set_group_weights: "Set Group Weights"
       show_attendance_columns: "Show Attendance Columns"
       show_concluded_enrollments: "Show Concluded Enrollments"
+      srgb_gradebook: "switch gradebooks"
       upload_scores: "Upload Scores (from .csv)"
       view_grading_history: "View Grading History"
     show_notes: "Show Notes Column"
@@ -6624,6 +6748,7 @@ en:
       muted: Muted
     grade_summary: 
       assessment_by: "Assessment by %{name}"
+      assignments: Assignments
       buttons: 
         show_what_if: "Show Saved \"What-If\" Scores"
       change_score_instructions: "Click any score and enter a new value to see how the change will affect your total."
@@ -6660,6 +6785,7 @@ en:
         only_graded: "Calculate based only on graded assignments"
         total: Total
         your_score: "Your Score"
+      learning_outcomes: "Learning Mastery"
       links: 
         click_to_view: "click here to view"
         download: "Download %{attachment}"
@@ -6945,6 +7071,7 @@ en:
     grade_incomplete: Incomplete
     grade_ungraded: Ungraded
     out_of: "(out of %{points})"
+    out_of_nil: "No points possible"
     out_of_with_score: "(%{score} out of %{points})"
   grading_standard: 
     unknown_grading_details: "Unknown Details"
@@ -8481,10 +8608,10 @@ en:
           audio_comment: "This message includes media comments. To listen or reply, click the link below:"
           body: "%{user_name} just sent you a message in Canvas:"
           download: download
-          reply_message: "To reply to this message, click the link below:"
+          reply_to_conversation_message: "You can reply to this message in Canvas by replying directly to this email."
           subject: "%{user_name} just sent you a message in Canvas."
           unknown_user: "Unknown User"
-        reply_message: "To reply to this message, click the link below:"
+        reply_to_conversation_message: "You can reply to this message in Canvas by replying directly to this email."
         subject: "%{user_name} just sent you a message in Canvas."
         unknown_user: "Unknown User"
       facebook: 
@@ -9107,10 +9234,10 @@ en:
     new_discussion_entry: 
       email: 
         body: "%{user} posted a new comment on the thread %{discussion_topic} for %{course}:"
-        details: "Join the conversation here:"
+        discussion_entry_reply_message: "Join the conversation using the link below, or comment by replying to this message."
         html: 
           body: "%{user} posted a new comment on the thread %{discussion_topic} for %{course}:"
-          details: "Click here to join the conversation"
+          discussion_entry_link_message: "[Click here to join the conversation](%{url}), or comment by replying to this message."
           subject: "New Comment for %{discussion_topic}: %{course}"
         subject: "New Comment for %{discussion_topic}: %{course}"
       facebook: 
@@ -9410,9 +9537,9 @@ en:
         body: "%{author} just made a new comment on the submission for %{user} for %{assignment}"
         html: 
           body: "%{author} just made a new comment on the submission for %{user} for %{assignment}"
-          link_message: "You can review the submission details here:"
           someone: Someone
           subject: "Submission Comment: %{user}, %{assignment}, %{context}"
+          submission_comment_link_message: "You can review the submission details using the link below, or can reply to this comment by responding to this message."
         link_message: "You can review the submission details here:"
         someone: Someone
         subject: "Submission Comment: %{user}, %{assignment}, %{context}"
@@ -9436,9 +9563,9 @@ en:
           link_message: "You can review the submission details here:"
           someone: Someone
           subject: "Submission Comment: %{user}, %{assignment}, %{context}"
-        link_message: "You can review the submission details here:"
         someone: Someone
         subject: "Submission Comment: %{user}, %{assignment}, %{context}"
+        submission_comment_link_message: "You can review the submission details using the link below, or can reply to this comment by responding to this message."
       facebook: 
         body: "*%{author}* just made a new comment on the submission for **%{user} for %{assignment}**."
         someone: Someone
@@ -9995,8 +10122,8 @@ en:
   outcome_gradebook_description: |-
       Outcome Gradebook provides a way for teachers to quickly view student and course
       progress on course learning outcomes. Outcomes are presented in a Gradebook-like
-      format and student progress is displayed both as a numerical score and as mastered/
-      near mastery/remedial.
+      format and student progress is displayed both as a numerical score and as mastered/near
+      mastery/remedial.
   outcome_groups: 
     invalid_file: "Invalid outcome group file"
   outcome_groups_api: 
@@ -10241,14 +10368,6 @@ en:
       description: "You will need access to a Dim Dim instance."
       labels: 
         domain: Domain
-    embedly: 
-      description: "Pull Embedly info for Collections"
-      name: "Embedly Integration"
-    embedly_settings: 
-      description: "This plugin integrates with the Embedly service to pre-fill information on collection items. The paid plan returns extra information over the free plan: you can select from multiple images on the page, and it returns the embed information for in-line previewing (playing youtube videos, etc)."
-      labels: 
-        api_key: "Embedly API Key"
-        plan_type: "Embedly plan type"
     error_reporting: 
       description: "Default error reporting mechanisms"
       name: "Error Reporting"
@@ -10424,6 +10543,7 @@ en:
       labels: 
         download_url: "LockDown Browser Download URL"
         plugin_enabled: Enabled
+        use_lti_tool: "Use LTI Tool to Manage LockDown Browser Quiz Settings (Required for Monitor)"
     med_cornell_export: 
       labels: 
         password: "Password for authentication"
@@ -10613,7 +10733,7 @@ en:
       diigo_description: "Diigo is a social bookmarking tool tailored specifically to research and education. Canvas's rich content editor will let you search your Diigo tags to easily link from within Canvas to other resources you find useful."
       error_loading_token_details: "Error Loading Token Details"
       facebook_description: "If you have a Facebook account, you can install the Canvas app and receive course notifications on your profile. You can specify which types of notifications you want and how often you'd like them sent."
-      feature_options: "Feature options"
+      feature_options: "Feature Options"
       full_token_warning: |-
           **Copy this token down now**. Once you leave this page you won't be able to
           retrieve the full token anymore, you'll have to regenerate it to get a new
@@ -11087,14 +11207,6 @@ en:
       regrade_options: "Regrade Options *(for students who have already answered this question):*"
       some_scores_reduced: "Only award points for the correct answer (*some students' scores may be reduced*)"
       update_question_without_regrading: "Update question without regrading"
-  quiz_group: 
-    errors: 
-      no_bank: "Couldn't find the question bank for quiz group %{group_name}"
-      no_permissions: "User didn't have permission to reference question bank in quiz group %{group_name}"
-    question_group: "Question Group"
-  quiz_question: 
-    defaults: 
-      question_name: Question
   quiz_reports: 
     quiz_report_generator: 
       download_report_name: "Download %{report_name}"
@@ -11102,27 +11214,10 @@ en:
       generated_at_date_time: "Generated %{dateAndTime}"
       generating_report_name: "Generating %{report_name}..."
       item_analysis_not_available: "Item Analysis is not available for Surveys"
-  quiz_statistics: 
-    statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} Report"
-    types: 
-      item_analysis: "Item Analysis"
-      student_analysis: "Student Analysis"
   quiz_submissions: 
-    errors: 
-      invalid_submissions: "This quiz submission could not be verified as belonging to you.  Please try again."
-      late_quiz: "You submitted this quiz late, and your answers may not have been recorded."
-      protected_quiz: "This quiz is protected and is only available from certain locations.  The computer you are currently using does not appear to be at a valid location for taking this quiz."
     show: 
       score_out_of: "You got %{score} out of %{points_possible}"
-    still_zipping: "File zipping still in process..."
   quizzes: 
-    access_code: 
-      buttons: 
-        submit: Submit
-      labels: 
-        access_code: "Access Code"
-      quiz_restricted: "This quiz is restricted by an access code. You'll need to ask your teacher or proctor to type in or tell you the access code in order to take the quiz."
-      survey_restricted: "This survey is restricted by an access code. You'll need to ask your teacher or proctor to type in or tell you the access code in order to take the survey."
     after_last_attempt: "After Last Attempt"
     alerts: 
       no_valid_combinations: "The system could not generate any valid combinations for the parameters given"
@@ -11132,6 +11227,7 @@ en:
     always: Always
     answer_comments: "Answer comments"
     answer_text: "Answer text"
+    assignment: Assignment
     assignment_points_possible: 
       one: "1 pt"
       other: "%{count} pts"
@@ -11164,67 +11260,13 @@ en:
     default_answer_comments: "Response if the student chooses this answer"
     default_answer_comments_on_match: "Response if the student matches this answer"
     default_comments_on_wrong_match: "Response if the user misses this match"
-    default_history_crumb: History
     default_quesiton_name: Question
     default_question_name: Question
     default_quiz_title: Quiz
     default_response_to_essay: "Response to show student after they submit an answer"
     default_response_to_file_upload: "Response to show student after they submit an answer"
-    default_title: "New Quiz"
-    display_answer: 
-      labels: 
-        answer_with_margin: "with margin"
-        your_answer: "Your Answer"
-      margin_of_error: "margin of error"
-      plus_or_minus: +/-
-      range_answer: "Between %{lower_bound} and %{upper_bound}"
-      you_left_this_blank: "(You left this blank)"
-    display_question: 
-      default_question_answer: "[ Choose ]"
-      flag_this_question: "Flag this Question"
-      headers: 
-        formulas: Formulas
-        possible_solutions: "Possible Solutions"
-        solution_answer: Answer
-        variable_maximum: Max
-        variable_minimum: Min
-        variable_name: Variable
-        variable_precision: "Decimal Places"
-        variables: Variables
-      labels: 
-        additional_comments: "Additional Comments"
-        for_answer_number: "Answer %{answer_number}"
-        warning_icon: Warning
-      links: 
-        delete_question: "Delete this Question"
-        edit_question: "Edit this Question"
-        move_copy_question: "move/copy question to another bank"
-      not_yet_graded: "Not yet graded"
-      original_score: "Original Score:"
-      points_possible: "%{points_possible} pts"
-      regraded_score: "Regraded Score:"
-      show_ansers_for_variable: "Show Answers for %{variable}"
-      skip_question_text: "Skip to question text."
-      submission_was_regraded: "This question has been regraded."
-      titles: 
-        question_correct_comment: "Students will see this comment if they get the question correct"
-        question_incorrect_comment: "Students will see this comment if they get the question wrong"
-        question_neutral_comment: "Students will see this comment once they've answered the question"
-      unsupported_question_type: "This question was imported from an external source. It was a '%{question_type}' question, which is not supported in this quiz tool."
-      you_left_this_blank: "(You left this blank)"
     download_all_quiz_file_upload_submissions: "Download All Quiz File Upload Submissions"
-    download_file_upload_submissions: 
-      links: 
-        download_submissions: "Download All Files"
     enter_answer_variable_above: "[ Enter Answer Variables Above ]"
-    equations_help: 
-      equation_functions: "In addition to variables, there are also a collection of helper functions you can use to generate useful values. For example: %{example} To see an exaplanation of a given helper function, select it from the list below:"
-      equation_intro: "Calculated questions are based on a set of one or more formulas computed in order. You can define intermediate variables in these formulas, but the numerical result of the last formula is what is used to generate the correct answer. For example: %{example} For this set of formulas, the final answer is 71. However, there are no predefined variables, so all students would have the same question with the same answer. See the \"variables\" tab for more information on variables."
-      equation_variables2: "You can also define variables in your question text using brackets (\"What is [a] + [b]?\"). For every variable, you'll see an \"Example Value\" based on the variable settings. This allows you to check your math and make sure the formulas work. For example, if your question was \"What is [a] + 5?\" then you'd be asked to define the variable \"a\". If the example value for \"a\" were 5.2, you could write: %{example} With this formula you can generate any number of solution sets, with a different value of \"a\" in each set. One student might see the question, \"What is 5.2 + 5?\" and another might see \"What is 9 + 5?\"."
-      links: 
-        functions: Functions
-        intro: Intro
-        variables: Variables
     errors: 
       adding_questions_failed: "Adding Questions Failed, please try again"
       creating_group_failed: "Create Group Failed, Please Try Again"
@@ -11238,16 +11280,11 @@ en:
       missing_ip_filter: "You must enter a valid IP Address"
       no_answer: "Please add at least one answer"
       no_correct_answer: "Please choose a correct answer"
-      no_more_attempts: "You have no quiz attempts left"
       no_possible_solution: "Please generate at least one possible solution"
-      quiz_deleted: "That quiz has been deleted"
       quiz_score_not_a_number: "Score must be a number between 0 and 2,000,000,000."
       quiz_score_too_long: "Score must be less than 2,000,000,000."
       quiz_score_too_short: "Score must be greater than 0."
-      quiz_update_failed: "Quiz failed to update"
       retrieving_filters_failed: "Retrieving Filters Failed"
-    fabulous_quizzes: 
-      page_titles: Quizzes
     ? "false"
     : "False"
     file_uploaded_or_removed: 
@@ -11255,134 +11292,6 @@ en:
         file_successfully_uploaded: "Your file has been successfully uploaded."
         files_removed: "%{display_name} has been removed."
     final_answer: "Final Answer"
-    find_question_from_bank: 
-      already_added: "this question is already on the quiz"
-      bank_description: "%{bank_name}, %{n} questions"
-      buttons: 
-        add_questions: "Add Questions"
-        create_group: "Create Group"
-        select_bank: "Select Bank"
-      group_pick_count: "%{pick_count} questions"
-      group_points: "%{points} per question"
-      headers: 
-        bank_name: "Bank Name"
-      hints: 
-        group_pick_count: "%{pick_count} selected so far"
-      labels: 
-        add_questions_to_group: "Add questions to the quiz group"
-        group_name: "Group Name"
-        group_pick_count: Pick
-        group_points: Points
-      links: 
-        clear_all_banks: "Clear All"
-        manage_question_banks: "Manage Course Question Banks"
-        more_questions: "more questions"
-        select_all_banks: "Select All"
-      options: 
-        new_group: "[ New Group ]"
-        no_group: "[ No Group ]"
-      select_a_question_bank: "Select a question bank from the list below to link it to the this quiz as a question group."
-      titles: 
-        add_new_question_group: "Add a New Question Group"
-    form_answer: 
-      answer_in_range_accessible: "between *range start* and #range end#"
-      answer_text: "Answer Text"
-      answer_weight: "Answer Weight"
-      exact_answer_with_error_margin_accessible: "*exact answer* with error margin #error margin#"
-      labels: 
-        answer_comments: "Comments, if the student chooses this answer"
-        answer_in_range: "Answer in the Range"
-        exact_answer: "Exact Answer"
-      matching_left: "Matching left side"
-      matching_right: "Matching right side"
-      numerical_answer: "Numerical Answer"
-      possible_answer: "Possible Answer"
-      titles: 
-        click_to_enter_answer_comments: "Click to enter comments, if the student chooses this answer"
-        click_to_set_as_correct: "Click to set this answer as correct"
-        delete_answer: "Delete this Answer"
-        edit_as_html: "Toggle editing answer text as HTML"
-    form_question: 
-      allow_tolerance: "allow an error margin of +/- %{tolerance}"
-      buttons: 
-        create_update_question: "Create/Update Question"
-        generate: Generate
-        recompute: Recompute
-      correct_answer_comments: "Correct answer comments"
-      distractor_instructions: "type each distractor on its own line"
-      equation_example: "i.e. \"What is 5 plus [x]?\""
-      explanation: 
-        generate_possible_solutions: "Finally, build as many variable-solution combinations as you need for your quiz."
-      explanations: 
-        calculated: "Enter your question, build a formula, and generate a set of possible answer combinations. Students will see the question with a randomly selected set of variables filled in and have to type the correct numerical answer."
-        equations: "You can define variables by typing variable names surrounded by brackets"
-        essay: "Students will be given a text field to compose their answer."
-        file_upload: "Students will be able to upload a file for their answer."
-        fill_in_multiple_blanks: "Enter your question, specifying where each blank should go. Then define the possible correct answer for each blank. Students must type correct answers into text boxes at each blank."
-        formula_definition: "Next you'll need to write the formula or formulas used to compute the correct answer. Just use the same variable names listed above."
-        matching: "Build pairs of matching values. Students will see values on the left and have to select the matching value on the right from a dropdown. Multiple rows can have the same answer, and you can add additional distractors to the right side."
-        missing_word: "Define text to go before and after the dropdown. Build a set of possible answers and select one correct answer."
-        multi_answer_sets: "In the box below, every place you want to show an answer box, type a reference word (no spaces) surrounded by brackets"
-        multiple_answers: "This question will show a checkbox next to each answer, and the student must select ALL the answers you mark as correct."
-        multiple_choice: "Enter your question and multiple answers, then select the one correct answer."
-        multiple_dropdowns: "Enter your question, specifying where each dropdown should go. Then define possible answers for each dropdown, with one correct answer per dropdown."
-        numerical: "Define the correct answer as any number within a range, or a number plus or minus some error margin. Student will be given an empty text box to type their numerical answer."
-        short_answer: |-
-            Enter your question text, then define all possible correct answers for the blank.  
-            Students will see the question followed by a small text box to type their answer.
-        text_only: "This \"question\" will not be scored, but can be useful for introducing a set of related questions."
-        true_false: "Enter your question text, then select if True or False is the correct answer."
-        variable_definitions: "Once you have entered your variables above, you should see them listed here. You can specify the range of possible values for each variable below."
-      general_answer_comments: "General answer comments"
-      headers: 
-        formula_definition: "Formula Definition"
-        generate_possible_solutions: "Generate Possible Solutions"
-        variable_definitions: "Variable Definitions"
-        variable_example_value: "Example Value"
-        variable_maximum: Max
-        variable_minimum: Min
-        variable_name: Variable
-        variable_precision: "Decimal Places"
-      label: 
-        question: 
-          name: "Question name"
-          points: "Question point value"
-          type: "Question type"
-      labels: 
-        answers: Answers
-        distractors: "Additional Match Possibilities (distractors)"
-        missing_word_after: "Text to go after answers"
-        points: pts
-        question: Question
-      links: 
-        add_another_answer: "Add Another Answer"
-        need_help: "Need help?"
-      multi_answer_sets_example: "i.e. \"Roses are [color1], violets are [color2]\""
-      offer_combinations: "Offer %{how_many} possible value combinations (max %{max_combinations})"
-      options: 
-        only_one_correct: "Only One Correct Answer"
-        students_select_multiple: "Students Select Multiple Answers"
-      question_type: 
-        calculated: "Formula Question"
-        essay: "Essay Question"
-        file_upload: "File Upload Question"
-        fill_in_multiple_blanks: "Fill In Multiple Blanks"
-        matching: Matching
-        missing_word: "Missing Word"
-        multiple_answers: "Multiple Answers"
-        multiple_choice: "Multiple Choice"
-        multiple_dropdowns: "Multiple Dropdowns"
-        numerical: "Numerical Answer"
-        short_answer: "Fill In the Blank"
-        text_only: "Text (no question)"
-        true_false: True/False
-      show_possible_answers: "Show Possible Answers for %{question}"
-      show_possible_answers_no_question: "Show Possible Answers for"
-      titles: 
-        click_to_enter_correct_answer_comments: "Click to enter comments for a correct answer"
-        click_to_enter_general_answer_comments: "Click to enter general comments"
-        click_to_enter_wrong_answer_comments: "Click to enter comments for a wrong answer"
-      wrong_answer_comments: "Wrong answer comments"
     graded_quiz: "Graded Quiz"
     graded_survey: "Graded Survey"
     headers: 
@@ -11411,68 +11320,14 @@ en:
         other: "%{count} minutes"
         zero: "less than 1 minute"
       score_out_of_points_possible: "%{score} out of %{points_possible}"
-    history: 
-      anonymous_username: Student
-      buttons: 
-        allow_extra_attempt: "allow this student an extra attempt"
-      count_attempts_left: 
-        one: "%{user} has 1 attempt left"
-        other: "%{user} has %{count} attempts left"
-      default_quiz_name: "Quiz %{course_name}"
-      default_survey_name: "Survey %{course_name}"
-      grade_by_question_warning: "The grade by question feature is affected by questions that are shuffled in a group."
-      headers: 
-        quiz_submissions: "Quiz Submissions"
-        survey_submissions: "Survey Submissions"
-      latest_quiz_results: "Here's the latest quiz results for %{user}. You can modify the points for any question and add more comments, then click \"Update Scores\" at the bottom of the page."
-      latest_survey_results: "Here's the latest survey results for %{user}. You can modify the points for any question and add more comments, then click \"Update Scores\" at the bottom of the page."
-      links: 
-        back_to_quiz: "Back to Quiz"
-        back_to_survey: "Back to Survey"
-      logged_out_user: "Logged Out User %{index}"
-      named_quiz_results: "%{quiz_name} Results for %{user}"
-      next_questions_arrow_title: "Next questions"
-      no_more_attempts: "%{user} has no attempts left"
-      page_title_quiz: "%{user}'s Quiz History"
-      page_title_survey: "%{user}'s Survey History"
-      prev_questions_arrow_title: "Previous questions"
-      quiz_not_yet_taken: "Quiz hasn't been taken yet."
-      quiz_not_yet_taken_or_in_progress: "Quiz hasn't been taken yet or is currently in progress"
-      quiz_unlimited_attempts: "This quiz has unlimited attempts"
-      score_for_attempt: "Attempt %{attempt_number}: %{score}"
-      survey_not_yet_taken: "Survey hasn't been taken yet."
-      survey_not_yet_taken_or_in_progress: "Survey hasn't been taken yet or is currently in progress"
-      survey_unlimited_attempts: "This survey has unlimited attempts"
-      titles: 
-        score_pending_review: "This score is pending review, and may change"
-        submission_needs_review: "This submission needs review"
-      unnamed_quiz_results: "Quiz Results for %{user}"
-      unnamed_survey_results: "Survey Results for %{user}"
+    highest: highest
     index: 
       buttons: 
-        publish_quizzes: "Publish Quizzes"
         publishing_quizzes: "Publishing Quizzes..."
       confirms: 
         delete_quiz: "Are you sure you want to delete this quiz?"
       default_title: "Unnamed Quiz"
-      headers: 
-        assignment_quizzes: "Assignment Quizzes"
-        course_quizzes: "Course Quizzes"
-        practice_quizzes: "Practice Quizzes"
-        publish_multiple_quizzes: "Publish Multiple Quizzes"
-        surveys: Surveys
-        unpublished_quizzes: "Unpublished Quizzes"
-      labels: 
-        publish_multiple_quizzes: "Select the quizzes you would like to publish at this time"
-      links: 
-        create_new_quiz: "Create a New Quiz"
-        manage_question_banks: "Manage Question Banks"
-        publish_multiple_quizzes: "Publish Multiple Quizzes"
       multiple_due_dates: "Multiple Dates"
-      no_quizzes: "No quizzes available"
-      page_titles: Quizzes
-      titles: 
-        this_quiz_is_locked: "This quiz is currently locked. Click for more details."
     index_view: 
       add_quiz: Quiz
       links: 
@@ -11481,9 +11336,6 @@ en:
         settings: Settings
       search_for_quiz: "Search for Quiz"
       title_add_quiz: "Add Quiz"
-    invalid_ip: 
-      quiz_protected: "This quiz is protected and is only available from certain locations. The computer you are currently using does not appear to be at a valid location for taking this quiz."
-      survey_protected: "This survey is protected and is only available from certain locations. The computer you are currently using does not appear to be at a valid location for taking this survey."
     keep_highest: Highest
     keep_latest: Latest
     label: 
@@ -11502,6 +11354,14 @@ en:
       multiple_blanks_question: "Fill in the blank, read surrounding text"
       other_incorrect_matches: "Other Incorrect Match Options"
       possible_answer: "Possible Answer"
+    latest: latest
+    ldb_login_popup: 
+      email: Email
+      log_in: "Log In"
+      logged_out_of_canvas: "*You have been logged out of canvas.* To continue please log in."
+      password: Password
+      titles: 
+        log_in: "Please Log In"
     links: 
       resume_quiz: "Resume Quiz"
       resume_survey: "Resume Survey"
@@ -11515,19 +11375,6 @@ en:
     loading_question: "Loading Question..."
     loading_question_banks: "Loading Question Banks..."
     loading_questions: "Loading Questions..."
-    lockdown_browser_required: 
-      headers: 
-        requires_lockdown: "Respondus LockDown Browser Required"
-      labels: 
-        download_lockdown: "If you have not already installed the browser, please download it from here"
-      links: 
-        download_lockdown: "[Download Respondus LockDown Browser]"
-      requires_lockdown: "This quiz requires Respondus LockDown Browser. Please launch Respondus LockDown Browser to take this quiz or view your quiz results."
-    managed_quiz_data: 
-      anonymous_student: "Student %{user_counter}"
-      logged_out_user: "Logged Out User %{user_counter}"
-      titles: 
-        submission_needs_review: "This submission needs review"
     message_students: "Message students"
     message_students_for_context: "Message students for %{context}"
     messages: 
@@ -11536,9 +11383,7 @@ en:
       no_unsubmitted_students_quiz: "All Students have taken the quiz"
       no_unsubmitted_students_survey: "All Students have taken the survey"
     moderate: 
-      add_time: "Add Time"
       buttons: 
-        change_extensions_for_selected_students: "Change Extensions for %{n} Selected Students"
         extend_time: "Extend Time"
         extending_time: "Extending Time..."
         save: Save
@@ -11548,9 +11393,6 @@ en:
         time_extension_failed: "Extend Time Failed, please try again"
       confirms: 
         taking_time_away: "That would be less time than the student currently has.  Continue anyway?"
-      end_quiz_reference_time_current_end: "the current end time"
-      end_quiz_reference_time_now: now
-      end_quiz_when: "End the quiz %{n} minutes from %{reference_time}."
       errors: 
         quiz_submission_extra_attempts_not_a_number: "Extra attempts must be a number."
         quiz_submission_extra_attempts_too_long: "Extra attempts must be less than than 1000."
@@ -11559,194 +11401,32 @@ en:
         quiz_submission_extra_time_too_long: "Extra time must be less than than 10080."
         quiz_submission_extra_time_too_short: "Extra time must be greater than 0."
         server_communication_failed: "There was a problem communicating with the server.  The system will try again in five minutes, or you can reload the page"
-      extended_quiz_time_explanation: "You can give this student extra time on their current quiz attempt. How much time would you like to give them?"
       extensions_for_student: "Extensions for %{student}"
       extensions_for_students: 
         one: "Extensions for 1 Student"
         other: "Extensions for %{count} Students"
-      finished_in: "finished in %{duration}"
       finished_in_duration: "finished in %{duration}"
-      global_extra_attempts: "everyone gets %{n} already"
-      headers: 
-        attempt: Attempt
-        attempts_left: "Attempts Left"
-        extended_quiz_time: "Extend Quiz Time"
-        score: Score
-        student: Student
-        student_extensions: "Student Extensions"
-        time: Time
-      in_progress: "in progress"
-      labels: 
-        ending: Ending
-        extra_attempts: "Extra Attempts"
-        extra_time_per_attempt: "Extra Time on Every Attempt"
-        manually_unlock: "Manually unlock the quiz for the next attempt"
-        started: Started
-      minutes: minutes
-      page_title: "Moderate Quiz"
-      student_gets_extra_time: "*%{student_name}* **gets %{extra_time} extra minutes on each attempt**"
-      student_n: "Student %{n}"
       time_up: "Time Up!"
       titles: 
-        change_user_extensions: "Change user extensions"
         extend_quiz_time: "Extend Quiz Time"
-        manually_unlocked: "Manually Unlocked"
-        minutes_to_add: "minutes to add"
-        select_deselect_all: "Select/Deselect All"
-        select_user: "Select %{user}"
         student_extensions: "Student Extensions"
     more_questions: "more questions"
-    multi_answer: 
-      choose_answer: Choose
-    muted: 
-      muted_quiz_description: "Your quiz score is unavailable because your instructor has not finished grading it. When your instructor finishes grading this quiz, your score will be available on this page."
-      muted_quiz_header: "Your quiz has been muted"
-    new: 
-      allowed_attempts: "Number of allowed attempts"
-      anonymous_submissions: "Keep Submissions Anonymous"
-      buttons: 
-        not_published: "Not Published"
-        published: Published
-        save: Save
-      cant_go_back: "Lock questions after answering"
-      default_page_title: "New Quiz"
-      group: "Assignment Group"
-      headers: 
-        ip_filters: "What are Quiz IP Filters?"
-      hide_correct_answers_at: "Hide Correct Answers at"
-      hints: 
-        question_detail_disabled: "NOTE: Question details not available when more than %{question_count}."
-        quiz_score: "students will automatically receive full credit once they take the survey"
-      ip_filters: "Quiz IP filters are a way to limit access to quizzes to computers in a specified IP range. Filters can be a comma-separated list of addresses, or an address followed by a mask (\"192.168.217.1\", \"192.168.217.1/24\" or \"192.168.217.1/255.255.255.0\")."
-      label: 
-        time_limit: "Time Limit"
-      labels: 
-        allow_multiple_attempts: "Allow Multiple Attempts"
-        hide_results_only_after_last: "Only After Their Last Attempt"
-        ip_filter: "Filter IP Addresses"
-        never_hide_results: "Let Students See Their Quiz Responses"
-        quiz_instructions: "Quiz Instructions"
-        quiz_notify: "Notify users this quiz has changed"
-        quiz_score: Score
-        require_access_code: "Require an access code"
-        restrict_quiz: "Quiz Restrictions"
-        show_question_details: "Show Question Details"
-      limited_attempts: "Allowed Attempts"
-      links: 
-        cancel: Cancel
-        find_questions: "Find Questions"
-        new_question: "New Question"
-        new_question_group: "New Question Group"
-        show_assignment_rubric: "Show Rubric"
-      manage: Manage
-      minutes: Minutes
-      new_assignment: "New Assignment"
-      new_discussion: "New Discussion"
-      one_question_at_a_time: "Show one question at a time"
-      points_possible: "Points %{n}"
-      quiz_title: "Quiz Title"
-      quiz_type: "Quiz Type"
-      require_lockdown_browser: "Require Respondus LockDown Browser"
-      require_lockdown_browser_for_results: "Required to view quiz results"
-      retrieving_filters: "Retrieving Filters..."
-      score_to_keep: "Quiz Score to Keep"
-      show_correct_answers: "Let Students See The Correct Answers"
-      show_correct_answers_at: "Show Correct Answers at"
-      shuffle_answers: "Shuffle Answers"
-      students_cannot_view_responses_after_course_concludes: "Students cannot view quiz responses after course concludes"
-      time_limit: "How many minutes?"
-      titles: 
-        click_to_select_filter: "Click to select this filter"
-        delete: Delete
-        find_ip_address_filter: "Find IP Address Filter"
-      warnings: 
-        has_student_submissions: "Students have either already taken or started taking this quiz, so be careful about editing it. If you change any quiz questions in a significant way, you may want to consider regrading students who took the old version of the quiz."
     no_filters_found: "No filters found"
     no_quizzes_view: 
       headers: 
         course_quizzes: "Course Quizzes"
       no_quizzes: "No quizzes available"
     notices: 
-      cant_view_submission_while_muted: "You cannot view the quiz history while the quiz is muted."
-      has_submissions_already: "Keep in mind, some students have already taken or started taking this quiz"
-      less_than_allotted_time: "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz."
       message_sent: "Message Sent!"
-      no_submission_for_user: "There is no submission available for that user"
-      quiz_updated: "Quiz successfully updated"
-      quizzes_published: 
-        one: "1 quiz successfully published!"
-        other: "%{count} quizzes successfully published!"
-      quizzes_unpublished: 
-        one: "1 quiz successfully unpublished!"
-        other: "%{count} quizzes successfully unpublished!"
     practice_quiz: "Practice Quiz"
     practices_label: "Practice Quizzes toggle quiz visibility"
     question_colon: "Question:"
     question_count: 
       one: "1 Question"
       other: "%{count} Questions"
-    question_group: 
-      buttons: 
-        update: Update
-      default_group_name: Group
-      edit_questions_and_points: "Pick *%{num_questions}* questions, #%{num_points}# pts per question"
-      labels: 
-        group_name: "Group Name"
-        number_of_questions: "Number of Questions"
-        points_per_question: "Points per Question"
-        question_bank: "Questions will be pulled from the bank"
-      links: 
-        link_to_a_question_bank: "Link to a Question Bank"
-      show_questions_and_points: "Pick *%{num_questions}* questions, #%{num_points}# pts per question"
-      titles: 
-        add_question_to_group: "Add Question to this Group"
-        collapse_group: "Collapse Group"
-        delete_group: "Delete Group"
-        edit_group_details: "Edit Group Details"
-        expand_group: "Expand Group"
     question_limit_reached: "You have reached the maximum number of questions allowed for a quiz (%{count}/%{limit}).\\n\\nAs a workaround, consider spreading the material across multiple quizzes."
-    question_list_right_side: 
-      headers: 
-        questions: Questions
-    question_statistic: 
-      attempts: 
-        one: "1 attempt"
-        other: "%{count} attempts"
-      empty_response: "Empty Response"
-      labels: 
-        other_answers: "Other Answers"
-      no_data: "No Data"
-      no_responses: "No responses recorded for this question"
-      percent_of_responses: "%{percent}% of %{total} attempts selected this answer"
-      response_count: 
-        one: "1 student was given this question"
-        other: "%{count} students were given this question"
-    question_teaser: 
-      titles: 
-        click_to_show_details: "Click to show full question details"
-        delete_this_question: "Delete this Question"
-        edit_this_question: "Edit this Question"
     quiz_attempts_length_error: "Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left"
     quiz_attempts_nan_error: "Quiz attempts can only be specified in numbers"
-    quiz_details: 
-      allowed_attempts: "Allowed Attempts"
-      headers: 
-        available: Available
-        due: Due
-        points: Points
-        questions: Questions
-        time_limit: "Time Limit"
-      multiple_due_dates: "Multiple Due Dates"
-      no_due_date: "No due date"
-      none: None
-      quiz_availabile_through: "%{start_time} - %{end_time}"
-      quiz_available_after: "after %{start_time}"
-      quiz_available_until: "until %{end_time}"
-      requires_lockdown: "Requires Respondus LockDown Browser"
-      time_limit: 
-        one: "1 Minute"
-        other: "%{count} Minutes"
-      unlimited: Unlimited
     quiz_item_group_view: 
       no_quizzes: "No quizzes found"
       no_surveys: "No surveys found"
@@ -11757,125 +11437,687 @@ en:
       settings: Settings
       title_delete: "Delete Quiz"
       title_edit: "Edit Quiz"
-    quiz_right_side: 
-      attempts_left: 
-        one: "1 More Attempt available"
-        other: "%{count} More Attempts available"
-      attempts_so_far: 
-        one: "1 Attempt so far"
-        other: "%{count} Attempts so far"
-      labels: 
-        current_score: "Current Score"
-        kept_score: "Kept Score"
-        last_attempt_details: "Last Attempt Details"
-        submission_details: "Submission Details"
-        time: Time
-      links: 
-        preview_quiz_again: "Preview the Quiz Again"
-        preview_survey_again: "Preview the Survey Again"
-      no_more_attempts: "No More Attempts available"
-      questions_not_graded: "Some questions not yet graded"
-      score_set_manually: "This score was set by the teacher"
-      unlimited_attempts: "Unlimited Attempts"
-      view_previous_attempts: "View Previous Attempts"
-    quiz_show_teacher: 
-      anonymous_submissions: "Anonymous Submissions"
-      attempts: Attempts
-      available_from: "Available from"
-      cant_go_back: "Lock Questions After Answering"
-      code: "Access Code"
-      due: Due
-      filter: "IP Filter"
-      for: For
-      group: "Assignment Group"
-      label: 
-        time_limit: "Time Limit"
-      multiple_attempts: "Multiple Attempts"
-      no_time_limit: "No Time Limit"
-      one_question_at_a_time: "One Question at a Time"
-      points: Points
-      quiz_type: "Quiz Type"
-      require_lockdown_browser: "Require Respondus LockDown Browser"
-      require_lockdown_browser_for_results: "Required to View Quiz Results"
-      score_to_keep: "Score to Keep"
-      show_correct_answers: "Show Correct Answers"
-      shuffle_answers: "Shuffle Answers"
-      time_limit: 
-        one: "1 Minute"
-        other: "%{count} Minutes"
-      until: Until
-      view_responses: "View Responses"
     quiz_submission: 
-      attempt_duration: "This attempt took %{duration}."
-      buttons: 
-        update_scores: "Update Scores"
-      labels: 
-        final_score: "Final Score"
-        fudge_points: "Fudge Points"
-        fudge_points_changed_points_quiz: "Since %{user} took this quiz, the number of points possible has changed by %{difference}. You can adjust for this change and manually add positive or negative points using this box."
-        fudge_points_changed_points_survey: "Since %{user} took this survey, the number of points possible has changed by %{difference}. You can adjust for this change and manually add positive or negative points using this box."
-        fudge_points_generic_explanation: "You can manually adjust the score by adding positive or negative points to this box."
-        questions_need_review: "The following questions need review"
-        quiz_score: "Quiz Score"
-        score_for_attempt: "Score for this attempt"
-        score_for_quiz: "Score for this quiz"
-        score_for_survey: "Score for this survey"
-        survey_score: "Survey Score"
-      links: 
-        click_to_view_results: "Click here to view the results."
-      questions_not_graded: "Some questions not yet graded"
-      quiz_fudged_negative: "This quiz score has been manually adjusted by %{fudge} points."
-      quiz_fudged_positive: "This quiz score has been manually adjusted by +%{fudge} points."
-      quiz_not_yet_taken: "The quiz hasn't been taken yet."
-      quiz_results_protected: "Quiz results are protected for this quiz, and are not visible to students."
-      quiz_results_protected_until_last_attempt: "Quiz results are protected for this quiz, and are not visible to students until they have submitted their last attempt."
-      quiz_submission_needs_review: "The quiz has changed significantly since this submission was made. This submission may need re-grading."
-      requires_lockdown: "Respondus LockDown Browser is required to view your quiz results."
-      submitted_at: "Submitted %{when}"
-      survey_fudged_negative: "This survey score has been manually adjusted by %{fudge} points."
-      survey_fudged_positive: "This survey score has been manually adjusted by +%{fudge} points."
-      survey_not_yet_taken: "The survey hasn't been taken yet."
       titles: 
         this_is_an_external_element: "This is an external element, not text, and could have changed since the student submitted"
         this_is_an_external_frame: "This is an external frame, not text, and could have changed since the student submitted"
         this_is_an_image: "This is an image, not text, and could have changed since the student submitted"
-    quiz_summary: 
-      assignment_points_possible: 
-        one: "1 pt"
-        other: "%{count} pts"
-      labels: 
+    quiz_submissions: 
+      errors: 
+        invalid_submissions: "This quiz submission could not be verified as belonging to you.  Please try again."
+        late_quiz: "You submitted this quiz late, and your answers may not have been recorded."
+        protected_quiz: "This quiz is protected and is only available from certain locations.  The computer you are currently using does not appear to be at a valid location for taking this quiz."
+      still_zipping: "File zipping still in process..."
+    quizzes: 
+      access_code: 
+        buttons: 
+          submit: Submit
+        labels: 
+          access_code: "Access Code"
+        quiz_restricted: "This quiz is restricted by an access code. You'll need to ask your teacher or proctor to type in or tell you the access code in order to take the quiz."
+        survey_restricted: "This survey is restricted by an access code. You'll need to ask your teacher or proctor to type in or tell you the access code in order to take the survey."
+      default_history_crumb: History
+      default_title: "New Quiz"
+      display_answer: 
+        labels: 
+          answer_with_margin: "with margin"
+          your_answer: "Your Answer"
+        margin_of_error: "margin of error"
+        plus_or_minus: +/-
+        range_answer: "Between %{lower_bound} and %{upper_bound}"
+        you_left_this_blank: "(You left this blank)"
+      display_question: 
+        default_question_answer: "[ Choose ]"
+        flag_this_question: "Flag this Question"
+        headers: 
+          formulas: Formulas
+          possible_solutions: "Possible Solutions"
+          solution_answer: Answer
+          variable_maximum: Max
+          variable_minimum: Min
+          variable_name: Variable
+          variable_precision: "Decimal Places"
+          variables: Variables
+        labels: 
+          additional_comments: "Additional Comments"
+          for_answer_number: "Answer %{answer_number}"
+          warning_icon: Warning
+        links: 
+          delete_question: "Delete this Question"
+          edit_question: "Edit this Question"
+          move_copy_question: "move/copy question to another bank"
+        not_yet_graded: "Not yet graded"
+        original_score: "Original Score:"
+        points_possible: "%{points_possible} pts"
+        regraded_score: "Regraded Score:"
+        show_ansers_for_variable: "Show Answers for %{variable}"
+        skip_question_text: "Skip to question text."
+        submission_was_regraded: "This question has been regraded."
+        titles: 
+          question_correct_comment: "Students will see this comment if they get the question correct"
+          question_incorrect_comment: "Students will see this comment if they get the question wrong"
+          question_neutral_comment: "Students will see this comment once they've answered the question"
+        unsupported_question_type: "This question was imported from an external source. It was a '%{question_type}' question, which is not supported in this quiz tool."
+        you_left_this_blank: "(You left this blank)"
+      download_file_upload_submissions: 
+        links: 
+          download_submissions: "Download All Files"
+      equations_help: 
+        equation_functions: "In addition to variables, there are also a collection of helper functions you can use to generate useful values. For example: %{example} To see an exaplanation of a given helper function, select it from the list below:"
+        equation_intro: "Calculated questions are based on a set of one or more formulas computed in order. You can define intermediate variables in these formulas, but the numerical result of the last formula is what is used to generate the correct answer. For example: %{example} For this set of formulas, the final answer is 71. However, there are no predefined variables, so all students would have the same question with the same answer. See the \"variables\" tab for more information on variables."
+        equation_variables2: "You can also define variables in your question text using brackets (\"What is [a] + [b]?\"). For every variable, you'll see an \"Example Value\" based on the variable settings. This allows you to check your math and make sure the formulas work. For example, if your question was \"What is [a] + 5?\" then you'd be asked to define the variable \"a\". If the example value for \"a\" were 5.2, you could write: %{example} With this formula you can generate any number of solution sets, with a different value of \"a\" in each set. One student might see the question, \"What is 5.2 + 5?\" and another might see \"What is 9 + 5?\"."
+        links: 
+          functions: Functions
+          intro: Intro
+          variables: Variables
+      errors: 
+        no_more_attempts: "You have no quiz attempts left"
+        quiz_deleted: "That quiz has been deleted"
+        quiz_update_failed: "Quiz failed to update"
+      fabulous_quizzes: 
+        page_titles: Quizzes
+      find_question_from_bank: 
+        already_added: "this question is already on the quiz"
+        bank_description: "%{bank_name}, %{n} questions"
+        buttons: 
+          add_questions: "Add Questions"
+          create_group: "Create Group"
+          select_bank: "Select Bank"
+        group_pick_count: "%{pick_count} questions"
+        group_points: "%{points} per question"
+        headers: 
+          bank_name: "Bank Name"
+        hints: 
+          group_pick_count: "%{pick_count} selected so far"
+        labels: 
+          add_questions_to_group: "Add questions to the quiz group"
+          group_name: "Group Name"
+          group_pick_count: Pick
+          group_points: Points
+        links: 
+          clear_all_banks: "Clear All"
+          manage_question_banks: "Manage Course Question Banks"
+          more_questions: "more questions"
+          select_all_banks: "Select All"
+        options: 
+          new_group: "[ New Group ]"
+          no_group: "[ No Group ]"
+        select_a_question_bank: "Select a question bank from the list below to link it to the this quiz as a question group."
+        titles: 
+          add_new_question_group: "Add a New Question Group"
+      form_answer: 
+        answer_in_range_accessible: "between *range start* and #range end#"
+        answer_text: "Answer Text"
+        answer_weight: "Answer Weight"
+        exact_answer_with_error_margin_accessible: "*exact answer* with error margin #error margin#"
+        labels: 
+          answer_comments: "Comments, if the student chooses this answer"
+          answer_in_range: "Answer in the Range"
+          exact_answer: "Exact Answer"
+        matching_left: "Matching left side"
+        matching_right: "Matching right side"
+        numerical_answer: "Numerical Answer"
+        possible_answer: "Possible Answer"
+        titles: 
+          click_to_enter_answer_comments: "Click to enter comments, if the student chooses this answer"
+          click_to_set_as_correct: "Click to set this answer as correct"
+          delete_answer: "Delete this Answer"
+          edit_as_html: "Toggle editing answer text as HTML"
+      form_question: 
+        allow_tolerance: "allow an error margin of +/- %{tolerance}"
+        buttons: 
+          create_update_question: "Create/Update Question"
+          generate: Generate
+          recompute: Recompute
+        correct_answer_comments: "Correct answer comments"
+        distractor_instructions: "type each distractor on its own line"
+        equation_example: "i.e. \"What is 5 plus [x]?\""
+        explanation: 
+          generate_possible_solutions: "Finally, build as many variable-solution combinations as you need for your quiz."
+        explanations: 
+          calculated: "Enter your question, build a formula, and generate a set of possible answer combinations. Students will see the question with a randomly selected set of variables filled in and have to type the correct numerical answer."
+          equations: "You can define variables by typing variable names surrounded by brackets"
+          essay: "Students will be given a text field to compose their answer."
+          file_upload: "Students will be able to upload a file for their answer."
+          fill_in_multiple_blanks: "Enter your question, specifying where each blank should go. Then define the possible correct answer for each blank. Students must type correct answers into text boxes at each blank."
+          formula_definition: "Next you'll need to write the formula or formulas used to compute the correct answer. Just use the same variable names listed above."
+          matching: "Build pairs of matching values. Students will see values on the left and have to select the matching value on the right from a dropdown. Multiple rows can have the same answer, and you can add additional distractors to the right side."
+          missing_word: "Define text to go before and after the dropdown. Build a set of possible answers and select one correct answer."
+          multi_answer_sets: "In the box below, every place you want to show an answer box, type a reference word (no spaces) surrounded by brackets"
+          multiple_answers: "This question will show a checkbox next to each answer, and the student must select ALL the answers you mark as correct."
+          multiple_choice: "Enter your question and multiple answers, then select the one correct answer."
+          multiple_dropdowns: "Enter your question, specifying where each dropdown should go. Then define possible answers for each dropdown, with one correct answer per dropdown."
+          numerical: "Define the correct answer as any number within a range, or a number plus or minus some error margin. Student will be given an empty text box to type their numerical answer."
+          short_answer: |-
+              Enter your question text, then define all possible correct answers for the blank.  
+              Students will see the question followed by a small text box to type their answer.
+          text_only: "This \"question\" will not be scored, but can be useful for introducing a set of related questions."
+          true_false: "Enter your question text, then select if True or False is the correct answer."
+          variable_definitions: "Once you have entered your variables above, you should see them listed here. You can specify the range of possible values for each variable below."
+        general_answer_comments: "General answer comments"
+        headers: 
+          formula_definition: "Formula Definition"
+          generate_possible_solutions: "Generate Possible Solutions"
+          variable_definitions: "Variable Definitions"
+          variable_example_value: "Example Value"
+          variable_maximum: Max
+          variable_minimum: Min
+          variable_name: Variable
+          variable_precision: "Decimal Places"
+        label: 
+          question: 
+            name: "Question name"
+            points: "Question point value"
+            type: "Question type"
+        labels: 
+          answers: Answers
+          distractors: "Additional Match Possibilities (distractors)"
+          missing_word_after: "Text to go after answers"
+          points: pts
+          question: Question
+        links: 
+          add_another_answer: "Add Another Answer"
+          need_help: "Need help?"
+        multi_answer_sets_example: "i.e. \"Roses are [color1], violets are [color2]\""
+        offer_combinations: "Offer %{how_many} possible value combinations (max %{max_combinations})"
+        options: 
+          only_one_correct: "Only One Correct Answer"
+          students_select_multiple: "Students Select Multiple Answers"
+        question_type: 
+          calculated: "Formula Question"
+          essay: "Essay Question"
+          file_upload: "File Upload Question"
+          fill_in_multiple_blanks: "Fill In Multiple Blanks"
+          matching: Matching
+          missing_word: "Missing Word"
+          multiple_answers: "Multiple Answers"
+          multiple_choice: "Multiple Choice"
+          multiple_dropdowns: "Multiple Dropdowns"
+          numerical: "Numerical Answer"
+          short_answer: "Fill In the Blank"
+          text_only: "Text (no question)"
+          true_false: True/False
+        show_possible_answers: "Show Possible Answers for %{question}"
+        show_possible_answers_no_question: "Show Possible Answers for"
+        titles: 
+          click_to_enter_correct_answer_comments: "Click to enter comments for a correct answer"
+          click_to_enter_general_answer_comments: "Click to enter general comments"
+          click_to_enter_wrong_answer_comments: "Click to enter comments for a wrong answer"
+        wrong_answer_comments: "Wrong answer comments"
+      history: 
+        anonymous_username: Student
+        buttons: 
+          allow_extra_attempt: "allow this student an extra attempt"
+        count_attempts_left: 
+          one: "%{user} has 1 attempt left"
+          other: "%{user} has %{count} attempts left"
+        default_quiz_name: "Quiz %{course_name}"
+        default_survey_name: "Survey %{course_name}"
+        grade_by_question_warning: "The grade by question feature is affected by questions that are shuffled in a group."
+        headers: 
+          quiz_submissions: "Quiz Submissions"
+          survey_submissions: "Survey Submissions"
+        latest_quiz_results: "Here's the latest quiz results for %{user}. You can modify the points for any question and add more comments, then click \"Update Scores\" at the bottom of the page."
+        latest_survey_results: "Here's the latest survey results for %{user}. You can modify the points for any question and add more comments, then click \"Update Scores\" at the bottom of the page."
+        links: 
+          back_to_quiz: "Back to Quiz"
+          back_to_survey: "Back to Survey"
+        logged_out_user: "Logged Out User %{index}"
+        named_quiz_results: "%{quiz_name} Results for %{user}"
+        next_questions_arrow_title: "Next questions"
+        no_more_attempts: "%{user} has no attempts left"
+        page_title_quiz: "%{user}'s Quiz History"
+        page_title_survey: "%{user}'s Survey History"
+        prev_questions_arrow_title: "Previous questions"
+        quiz_not_yet_taken: "Quiz hasn't been taken yet."
+        quiz_not_yet_taken_or_in_progress: "Quiz hasn't been taken yet or is currently in progress"
+        quiz_unlimited_attempts: "This quiz has unlimited attempts"
+        score_for_attempt: "Attempt %{attempt_number}: %{score}"
+        survey_not_yet_taken: "Survey hasn't been taken yet."
+        survey_not_yet_taken_or_in_progress: "Survey hasn't been taken yet or is currently in progress"
+        survey_unlimited_attempts: "This survey has unlimited attempts"
+        titles: 
+          score_pending_review: "This score is pending review, and may change"
+          submission_needs_review: "This submission needs review"
+        unnamed_quiz_results: "Quiz Results for %{user}"
+        unnamed_survey_results: "Survey Results for %{user}"
+      index: 
+        buttons: 
+          publish_quizzes: "Publish Quizzes"
+        headers: 
+          assignment_quizzes: "Assignment Quizzes"
+          course_quizzes: "Course Quizzes"
+          practice_quizzes: "Practice Quizzes"
+          publish_multiple_quizzes: "Publish Multiple Quizzes"
+          surveys: Surveys
+          unpublished_quizzes: "Unpublished Quizzes"
+        labels: 
+          publish_multiple_quizzes: "Select the quizzes you would like to publish at this time"
+        links: 
+          create_new_quiz: "Create a New Quiz"
+          manage_question_banks: "Manage Question Banks"
+          publish_multiple_quizzes: "Publish Multiple Quizzes"
+        no_quizzes: "No quizzes available"
+        page_titles: Quizzes
+        titles: 
+          this_quiz_is_locked: "This quiz is currently locked. Click for more details."
+      invalid_ip: 
+        quiz_protected: "This quiz is protected and is only available from certain locations. The computer you are currently using does not appear to be at a valid location for taking this quiz."
+        survey_protected: "This survey is protected and is only available from certain locations. The computer you are currently using does not appear to be at a valid location for taking this survey."
+      lockdown_browser_required: 
+        headers: 
+          requires_lockdown: "Respondus LockDown Browser Required"
+        labels: 
+          download_lockdown: "If you have not already installed the browser, please download it from here"
+        links: 
+          download_lockdown: "[Download Respondus LockDown Browser]"
+        requires_lockdown: "This quiz requires Respondus LockDown Browser. Please launch Respondus LockDown Browser to take this quiz or view your quiz results."
+      managed_quiz_data: 
+        anonymous_student: "Student %{user_counter}"
+        logged_out_user: "Logged Out User %{user_counter}"
+        titles: 
+          submission_needs_review: "This submission needs review"
+      moderate: 
+        add_time: "Add Time"
+        buttons: 
+          change_extensions_for_selected_students: "Change Extensions for %{n} Selected Students"
+          extend_time: "Extend Time"
+          save: Save
+        end_quiz_reference_time_current_end: "the current end time"
+        end_quiz_reference_time_now: now
+        end_quiz_when: "End the quiz %{n} minutes from %{reference_time}."
+        extended_quiz_time_explanation: "You can give this student extra time on their current quiz attempt. How much time would you like to give them?"
+        finished_in: "finished in %{duration}"
+        global_extra_attempts: "everyone gets %{n} already"
+        headers: 
+          attempt: Attempt
+          attempts_left: "Attempts Left"
+          extended_quiz_time: "Extend Quiz Time"
+          score: Score
+          student: Student
+          student_extensions: "Student Extensions"
+          time: Time
+        in_progress: "in progress"
+        labels: 
+          ending: Ending
+          extra_attempts: "Extra Attempts"
+          extra_time_per_attempt: "Extra Time on Every Attempt"
+          manually_unlock: "Manually unlock the quiz for the next attempt"
+          started: Started
+        minutes: minutes
+        page_title: "Moderate Quiz"
+        student_gets_extra_time: "*%{student_name}* **gets %{extra_time} extra minutes on each attempt**"
+        student_n: "Student %{n}"
+        titles: 
+          change_user_extensions: "Change user extensions"
+          manually_unlocked: "Manually Unlocked"
+          minutes_to_add: "minutes to add"
+          select_deselect_all: "Select/Deselect All"
+          select_user: "Select %{user}"
+      multi_answer: 
+        choose_answer: Choose
+      muted: 
+        muted_quiz_description: "Your quiz score is unavailable because your instructor has not finished grading it. When your instructor finishes grading this quiz, your score will be available on this page."
+        muted_quiz_header: "Your quiz has been muted"
+      new: 
+        allowed_attempts: "Number of allowed attempts"
+        anonymous_submissions: "Keep Submissions Anonymous"
+        buttons: 
+          not_published: "Not Published"
+          published: Published
+          save: Save
+        cant_go_back: "Lock questions after answering"
+        default_page_title: "New Quiz"
+        group: "Assignment Group"
+        headers: 
+          ip_filters: "What are Quiz IP Filters?"
+        hide_correct_answers_at: "Hide Correct Answers at"
+        hints: 
+          question_detail_disabled: "NOTE: Question details not available when more than %{question_count}."
+          quiz_score: "students will automatically receive full credit once they take the survey"
+        ip_filters: "Quiz IP filters are a way to limit access to quizzes to computers in a specified IP range. Filters can be a comma-separated list of addresses, or an address followed by a mask (\"192.168.217.1\", \"192.168.217.1/24\" or \"192.168.217.1/255.255.255.0\")."
+        label: 
+          time_limit: "Time Limit"
+        labels: 
+          allow_multiple_attempts: "Allow Multiple Attempts"
+          hide_results_only_after_last: "Only After Their Last Attempt"
+          ip_filter: "Filter IP Addresses"
+          never_hide_results: "Let Students See Their Quiz Responses"
+          quiz_instructions: "Quiz Instructions"
+          quiz_notify: "Notify users this quiz has changed"
+          quiz_score: Score
+          require_access_code: "Require an access code"
+          restrict_quiz: "Quiz Restrictions"
+          show_question_details: "Show Question Details"
+        limited_attempts: "Allowed Attempts"
+        links: 
+          cancel: Cancel
+          find_questions: "Find Questions"
+          new_question: "New Question"
+          new_question_group: "New Question Group"
+          show_assignment_rubric: "Show Rubric"
+        manage: Manage
+        minutes: Minutes
+        new_assignment: "New Assignment"
+        new_discussion: "New Discussion"
+        one_question_at_a_time: "Show one question at a time"
+        points_possible: "Points %{n}"
+        quiz_title: "Quiz Title"
+        quiz_type: "Quiz Type"
+        require_lockdown_browser: "Require Respondus LockDown Browser"
+        require_lockdown_browser_for_results: "Required to view quiz results"
+        retrieving_filters: "Retrieving Filters..."
+        score_to_keep: "Quiz Score to Keep"
+        show_correct_answers: "Let Students See The Correct Answers"
+        show_correct_answers_at: "Show Correct Answers at"
+        shuffle_answers: "Shuffle Answers"
+        students_cannot_view_responses_after_course_concludes: "Students cannot view quiz responses after course concludes"
+        time_limit: "How many minutes?"
+        titles: 
+          click_to_select_filter: "Click to select this filter"
+          delete: Delete
+          find_ip_address_filter: "Find IP Address Filter"
+        warnings: 
+          has_student_submissions: "Students have either already taken or started taking this quiz, so be careful about editing it. If you change any quiz questions in a significant way, you may want to consider regrading students who took the old version of the quiz."
+      notices: 
+        cant_view_submission_while_muted: "You cannot view the quiz history while the quiz is muted."
+        has_submissions_already: "Keep in mind, some students have already taken or started taking this quiz"
+        less_than_allotted_time: "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz."
+        no_submission_for_user: "There is no submission available for that user"
+        quiz_updated: "Quiz successfully updated"
+        quizzes_published: 
+          one: "1 quiz successfully published!"
+          other: "%{count} quizzes successfully published!"
+        quizzes_unpublished: 
+          one: "1 quiz successfully unpublished!"
+          other: "%{count} quizzes successfully unpublished!"
+      question_group: 
+        buttons: 
+          update: Update
+        default_group_name: Group
+        edit_questions_and_points: "Pick *%{num_questions}* questions, #%{num_points}# pts per question"
+        labels: 
+          group_name: "Group Name"
+          number_of_questions: "Number of Questions"
+          points_per_question: "Points per Question"
+          question_bank: "Questions will be pulled from the bank"
+        links: 
+          link_to_a_question_bank: "Link to a Question Bank"
+        show_questions_and_points: "Pick *%{num_questions}* questions, #%{num_points}# pts per question"
+        titles: 
+          add_question_to_group: "Add Question to this Group"
+          collapse_group: "Collapse Group"
+          delete_group: "Delete Group"
+          edit_group_details: "Edit Group Details"
+          expand_group: "Expand Group"
+      question_list_right_side: 
+        headers: 
+          questions: Questions
+      question_statistic: 
+        attempts: 
+          one: "1 attempt"
+          other: "%{count} attempts"
+        empty_response: "Empty Response"
+        labels: 
+          other_answers: "Other Answers"
+        no_data: "No Data"
+        no_responses: "No responses recorded for this question"
+        percent_of_responses: "%{percent}% of %{total} attempts selected this answer"
+        response_count: 
+          one: "1 student was given this question"
+          other: "%{count} students were given this question"
+      question_teaser: 
+        titles: 
+          click_to_show_details: "Click to show full question details"
+          delete_this_question: "Delete this Question"
+          edit_this_question: "Edit this Question"
+      quiz_details: 
         allowed_attempts: "Allowed Attempts"
-        attempts_left: "Attempts Left"
-        attempts_so_far: "Attempts So Far"
-        latest_submission: "Latest Submission"
-        quiz_details: "Quiz Details"
-        quiz_due: Due
-        quiz_time_limit: "Time Limit"
-        survey_details: "Survey Details"
-      no_details: "No Details"
-      points_possible: "%{points_possible} points possible"
-      question_count: 
-        one: "1 Question"
-        other: "%{count} Questions"
-      quiz_multiple_due_dates: "Multiple Dates"
-      quiz_no_points: "No Points"
-      quiz_points_possible: 
-        one: "1 Point"
-        other: "%{count} Points"
-      student_mute_notification: "Instructor is working on grades"
-      unlimited_attempts: "Unlimited Attempts"
-    read_only: 
-      default_page_title: "New Quiz"
-      headers: 
-        quiz_details: "Quiz Details"
-      labels: 
-        question_details: "Show Question Details"
+        headers: 
+          available: Available
+          due: Due
+          points: Points
+          questions: Questions
+          time_limit: "Time Limit"
+        multiple_due_dates: "Multiple Due Dates"
+        no_due_date: "No due date"
+        none: None
+        quiz_availabile_through: "%{start_time} - %{end_time}"
+        quiz_available_after: "after %{start_time}"
+        quiz_available_until: "until %{end_time}"
+        requires_lockdown: "Requires Respondus LockDown Browser"
+        time_limit: 
+          one: "1 Minute"
+          other: "%{count} Minutes"
+        unlimited: Unlimited
+      quiz_right_side: 
+        attempts_left: 
+          one: "1 More Attempt available"
+          other: "%{count} More Attempts available"
+        attempts_so_far: 
+          one: "1 Attempt so far"
+          other: "%{count} Attempts so far"
+        labels: 
+          current_score: "Current Score"
+          kept_score: "Kept Score"
+          last_attempt_details: "Last Attempt Details"
+          submission_details: "Submission Details"
+          time: Time
+        links: 
+          preview_quiz_again: "Preview the Quiz Again"
+          preview_survey_again: "Preview the Survey Again"
+        no_more_attempts: "No More Attempts available"
+        questions_not_graded: "Some questions not yet graded"
+        score_set_manually: "This score was set by the teacher"
+        unlimited_attempts: "Unlimited Attempts"
+        view_previous_attempts: "View Previous Attempts"
+      quiz_show_teacher: 
+        anonymous_submissions: "Anonymous Submissions"
+        attempts: Attempts
+        available_from: "Available from"
+        cant_go_back: "Lock Questions After Answering"
+        code: "Access Code"
+        due: Due
+        filter: "IP Filter"
+        for: For
+        group: "Assignment Group"
+        label: 
+          time_limit: "Time Limit"
+        multiple_attempts: "Multiple Attempts"
+        no_time_limit: "No Time Limit"
+        one_question_at_a_time: "One Question at a Time"
+        points: Points
+        quiz_type: "Quiz Type"
+        require_lockdown_browser: "Require Respondus LockDown Browser"
+        require_lockdown_browser_for_results: "Required to View Quiz Results"
+        require_lockdown_browser_monitor: "Webcam Required"
+        score_to_keep: "Score to Keep"
+        show_correct_answers: "Show Correct Answers"
+        shuffle_answers: "Shuffle Answers"
+        time_limit: 
+          one: "1 Minute"
+          other: "%{count} Minutes"
+        until: Until
+        view_responses: "View Responses"
+      quiz_submission: 
+        attempt_duration: "This attempt took %{duration}."
+        buttons: 
+          update_scores: "Update Scores"
+        labels: 
+          final_score: "Final Score"
+          fudge_points: "Fudge Points"
+          fudge_points_changed_points_quiz: "Since %{user} took this quiz, the number of points possible has changed by %{difference}. You can adjust for this change and manually add positive or negative points using this box."
+          fudge_points_changed_points_survey: "Since %{user} took this survey, the number of points possible has changed by %{difference}. You can adjust for this change and manually add positive or negative points using this box."
+          fudge_points_generic_explanation: "You can manually adjust the score by adding positive or negative points to this box."
+          questions_need_review: "The following questions need review"
+          quiz_score: "Quiz Score"
+          score_for_attempt: "Score for this attempt"
+          score_for_quiz: "Score for this quiz"
+          score_for_survey: "Score for this survey"
+          survey_score: "Survey Score"
+        links: 
+          click_to_view_results: "Click here to view the results."
+        questions_not_graded: "Some questions not yet graded"
+        quiz_fudged_negative: "This quiz score has been manually adjusted by %{fudge} points."
+        quiz_fudged_positive: "This quiz score has been manually adjusted by +%{fudge} points."
+        quiz_not_yet_taken: "The quiz hasn't been taken yet."
+        quiz_results_protected: "Quiz results are protected for this quiz, and are not visible to students."
+        quiz_results_protected_until_last_attempt: "Quiz results are protected for this quiz, and are not visible to students until they have submitted their last attempt."
+        quiz_submission_needs_review: "The quiz has changed significantly since this submission was made. This submission may need re-grading."
+        requires_lockdown: "Respondus LockDown Browser is required to view your quiz results."
+        submitted_at: "Submitted %{when}"
+        survey_fudged_negative: "This survey score has been manually adjusted by %{fudge} points."
+        survey_fudged_positive: "This survey score has been manually adjusted by +%{fudge} points."
+        survey_not_yet_taken: "The survey hasn't been taken yet."
+      quiz_summary: 
+        assignment_points_possible: 
+          one: "1 pt"
+          other: "%{count} pts"
+        labels: 
+          allowed_attempts: "Allowed Attempts"
+          attempts_left: "Attempts Left"
+          attempts_so_far: "Attempts So Far"
+          latest_submission: "Latest Submission"
+          quiz_details: "Quiz Details"
+          quiz_due: Due
+          quiz_time_limit: "Time Limit"
+          survey_details: "Survey Details"
+        no_details: "No Details"
+        points_possible: "%{points_possible} points possible"
+        question_count: 
+          one: "1 Question"
+          other: "%{count} Questions"
+        quiz_multiple_due_dates: "Multiple Dates"
+        quiz_no_points: "No Points"
+        quiz_points_possible: 
+          one: "1 Point"
+          other: "%{count} Points"
+        student_mute_notification: "Instructor is working on grades"
+        unlimited_attempts: "Unlimited Attempts"
+      read_only: 
+        default_page_title: "New Quiz"
+        headers: 
+          quiz_details: "Quiz Details"
+        labels: 
+          question_details: "Show Question Details"
+          quiz_instructions: "Quiz Instructions"
+        links: 
+          back_to_quiz_page: "Back to Quiz Page"
+      refresh_quiz_after_popup: 
+        headers: 
+          loading_in_lockdown: "Loading Quiz in Respondus LockDown Browser"
+      show: 
+        buttons: 
+          lock_quiz: "Lock this Quiz Now"
+          lock_survey: "Lock this Survey Now"
+          publish: Publish
+          republish: Republish
+          unlock_quiz: "Let Students Take this Quiz Now"
+          unlock_survey: "Let Students Take this Survey Now"
+        labels: 
+          available_until: Until
+          no_time_limit: "No time limit"
+          warning_icon: Warning
+        links: 
+          edit: Edit
+          keep_editing_this_quiz: "Keep Editing This Quiz"
+          keep_editing_this_survey: "Keep Editing This Survey"
+          message_students_who: "Message Students Who..."
+          moderate_this_quiz: "Moderate This Quiz"
+          moderate_this_survey: "Moderate This Survey"
+          preview: Preview
+          quiz_statistics: "Quiz Statistics"
+          see_full_quiz: "See Full Quiz"
+          show_assignment_rubric: "Show Rubric"
+          show_student_quiz_results: "Show Student Quiz Results"
+          show_student_survey_results: "Show Student Survey Results"
+          survey_statistics: "Survey Statistics"
+        manage: Manage
+        only_registered_users: "Only registered, enrolled users can take graded quizzes"
+        quiz_regraded_your_score_affected: 
+          one: "This quiz has been regraded; your score was affected."
+          other: "This quiz has been regraded; your new score reflects %{count} questions that were affected."
+        quiz_regraded_your_score_not_affected: "This quiz has been regraded; your score was not affected."
+        speed_grader: SpeedGrader™
+        students_submitted_so_far: 
+          one: "1 student submitted so far"
+          other: "%{count} students submitted so far"
+        titles: 
+          delete: Delete
+          related_items: "Related Items"
+          unlock_for_how_long: "How long would you like to unlock the quiz for?"
+        warnings: 
+          draft_version: "This is a preview of the draft version of the quiz"
+      single_answer: 
+        upload: Upload
+      statistics: 
+        class_too_large: "This course is too large to display statistics. They can still be downloaded from the right hand sidebar."
+        headers: 
+          for_question: "For %{question_name}"
+          quiz_statistics: "Quiz Statistics"
+          survey_statistics: "Survey Statistics"
+          users_have_taken_this_quiz: "%{count} users have taken this quiz"
+          users_have_taken_this_survey: "%{count} users have taken this survey"
+        labels: 
+          average_correct: "Average Correct"
+          average_incorrect: "Average Incorrect"
+          average_time: "Average Time"
+          high_score: "High Score"
+          low_score: "Low Score"
+          mean_score: "Mean Score"
+          standard_deviation: "Standard Deviation"
+          users_selected_the_answer: "The following users selected the answer, %{answer_text}"
+        links: 
+          count_all_attempts: "Count **All** Attempts"
+          count_only_latest_attempts: "Count Only Each Latest Attempt"
+        page_title: Statistics
+        quiz_all_version_disclaimer: "This report is showing quiz statistics based on all attempts for all users."
+        quiz_latest_version_disclaimer: "This report is showing quiz statistics based on the latest attempt for each user."
+        student_n: "Student %{student_counter}"
+        survey_all_version_disclaimer: "This report is showing survey statistics based on all attempts for all users."
+        survey_latest_version_disclaimer: "This report is showing survey statistics based on the latest attempt for each user."
+      statistics_crumb: Statistics
+      submission_version: 
+        attempt_number: "Attempt %{att_no}"
+        kept: KEPT
+        latest: LATEST
+      submission_versions: 
+        attempt: Attempt
+        attempt_history: "Attempt History"
+        quiz_attempt_history_description: "A table that shows your quiz attempt history. Each attempt is on the left side. The attempt, time, and score are across the top."
+        regraded: Regraded
+        score: Score
+        time: Time
+      take_quiz: 
+        buttons: 
+          next: Next
+          out_of_time_submit: "Ok, fine"
+          previous: Previous
+          submit_quiz: "Submit Quiz"
+        headers: 
+          draft_preview: "This is a preview of the draft version of the quiz"
+        labels: 
+          started: Started
+          times_up: "Time's Up! Submitting results in"
+        logged_out_of_canvas: "*You have been logged out of canvas.* To continue please log in"
+        login_required: "Login Required"
+        not_saved: "Not saved"
         quiz_instructions: "Quiz Instructions"
-      links: 
-        back_to_quiz_page: "Back to Quiz Page"
-    refresh_quiz_after_popup: 
-      headers: 
-        loading_in_lockdown: "Loading Quiz in Respondus LockDown Browser"
+      take_quiz_in_popup: 
+        headers: 
+          loading_in_lockdown: "Loading Quiz in Respondus LockDown Browser"
+        links: 
+          return_to_quiz_page: "[Click here](%{url}) to return to the quiz page."
+      take_quiz_right_side: 
+        labels: 
+          attempt_due: "Attempt due"
+          score: Score
+          time_elapsed: "Time Elapsed"
+          time_running: "Time Running"
+        links: 
+          hide_time_running: Hide
+          keep_editing_quiz: "Keep Editing This Quiz"
+          keep_editing_survey: "Keep Editing This Survey"
     retrieving_filters: "Retrieving Filters..."
     rubric: 
       loading: Loading...
@@ -11893,115 +12135,35 @@ en:
         you_answered: "You Answered"
       buttons: 
         already_published: Published!
-        lock_quiz: "Lock this Quiz Now"
-        lock_survey: "Lock this Survey Now"
-        publish: Publish
         publishing: Publishing...
-        republish: Republish
-        unlock_quiz: "Let Students Take this Quiz Now"
-        unlock_survey: "Let Students Take this Survey Now"
       confirms: 
         delete_quiz: "Are you sure you want to delete this quiz?"
         delete_quiz_submissions_warning: 
           one: "Warning: 1 student has already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook."
           other: "Warning: %{count} students have already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook."
-      labels: 
-        available_until: Until
-        no_time_limit: "No time limit"
-        warning_icon: Warning
       links: 
-        edit: Edit
         hide_student_quiz_results: "Hide Student Quiz Results"
         hide_student_survey_results: "Hide Student Survey Results"
-        keep_editing_this_quiz: "Keep Editing This Quiz"
-        keep_editing_this_survey: "Keep Editing This Survey"
-        message_students_who: "Message Students Who..."
-        moderate_this_quiz: "Moderate This Quiz"
-        moderate_this_survey: "Moderate This Survey"
-        preview: Preview
-        quiz_statistics: "Quiz Statistics"
-        see_full_quiz: "See Full Quiz"
-        show_assignment_rubric: "Show Rubric"
         show_student_quiz_results: "Show Student Quiz Results"
         show_student_survey_results: "Show Student Survey Results"
-        survey_statistics: "Survey Statistics"
-      manage: Manage
-      only_registered_users: "Only registered, enrolled users can take graded quizzes"
-      quiz_regraded_your_score_affected: 
-        one: "This quiz has been regraded; your score was affected."
-        other: "This quiz has been regraded; your new score reflects %{count} questions that were affected."
-      quiz_regraded_your_score_not_affected: "This quiz has been regraded; your score was not affected."
-      speed_grader: SpeedGrader™
-      students_submitted_so_far: 
-        one: "1 student submitted so far"
-        other: "%{count} students submitted so far"
       students_who_have_not_taken_the_quiz: "Students who have NOT taken the quiz"
       students_who_have_taken_the_quiz: "Students who have taken the quiz"
-      titles: 
-        delete: Delete
-        related_items: "Related Items"
-        unlock_for_how_long: "How long would you like to unlock the quiz for?"
-      warnings: 
-        draft_version: "This is a preview of the draft version of the quiz"
     show_and_hide_correct_answers: "From %{from} to %{to}"
     show_correct_answers_after: "After %{date}"
     show_correct_answers_immediately: Immediately
     show_correct_answers_until: "Until %{date}"
-    single_answer: 
-      upload: Upload
     statistics: 
-      class_too_large: "This course is too large to display statistics. They can still be downloaded from the right hand sidebar."
       count_attempts: 
         one: "1 attempt"
         other: "%{count} attempts"
-      headers: 
-        for_question: "For %{question_name}"
-        quiz_statistics: "Quiz Statistics"
-        survey_statistics: "Survey Statistics"
-        users_have_taken_this_quiz: "%{count} users have taken this quiz"
-        users_have_taken_this_survey: "%{count} users have taken this survey"
-      labels: 
-        average_correct: "Average Correct"
-        average_incorrect: "Average Incorrect"
-        average_time: "Average Time"
-        high_score: "High Score"
-        low_score: "Low Score"
-        mean_score: "Mean Score"
-        standard_deviation: "Standard Deviation"
-        users_selected_the_answer: "The following users selected the answer, %{answer_text}"
-      links: 
-        count_all_attempts: "Count **All** Attempts"
-        count_only_latest_attempts: "Count Only Each Latest Attempt"
-      page_title: Statistics
-      quiz_all_version_disclaimer: "This report is showing quiz statistics based on all attempts for all users."
-      quiz_latest_version_disclaimer: "This report is showing quiz statistics based on the latest attempt for each user."
-      student_n: "Student %{student_counter}"
-      survey_all_version_disclaimer: "This report is showing survey statistics based on all attempts for all users."
-      survey_latest_version_disclaimer: "This report is showing survey statistics based on the latest attempt for each user."
       titles: 
         submitted_users_for_quesiton: "Submitted Users for %{user}"
       uncounted_submissions: 
         one: "1 other submission"
         other: "%{count} other submissions"
-    statistics_crumb: Statistics
-    submission_version: 
-      attempt_number: "Attempt %{att_no}"
-      kept: KEPT
-      latest: LATEST
-    submission_versions: 
-      attempt: Attempt
-      attempt_history: "Attempt History"
-      quiz_attempt_history_description: "A table that shows your quiz attempt history. Each attempt is on the left side. The attempt, time, and score are across the top."
-      regraded: Regraded
-      score: Score
-      time: Time
+    survey: Survey
     surveys_label: "Surveys toggle quiz visibility"
     take_quiz: 
-      buttons: 
-        next: Next
-        out_of_time_submit: "Ok, fine"
-        previous: Previous
-        submit_quiz: "Submit Quiz"
       confirms: 
         cant_go_back_blank: "You can't come back to this question once you hit next. Are you sure you want to leave it blank?"
         navigate_away: "You're about to navigate away from this page.  Continue anyway?"
@@ -12018,25 +12180,20 @@ en:
       errors: 
         connection_lost: "Connection to %{host} was lost.  Please make sure you're connected to the Internet before continuing."
         only_numerical_values: "only numerical values are accepted"
-      headers: 
-        draft_preview: "This is a preview of the draft version of the quiz"
       hide_time_link: Hide
       hours_count: 
         one: "1 Hour"
         other: "%{count} Hours"
       labels: 
-        started: Started
         time_elapsed: "Time Elapsed"
-        times_up: "Time's Up! Submitting results in"
-      logged_out_of_canvas: "*You have been logged out of canvas.* To continue please log in"
-      login_required: "Login Required"
+      login_failed: "Login failed."
+      login_successful: "Login successful."
       minutes_count: 
         one: "1 Minute"
         other: "%{count} Minutes"
       months_count: 
         one: "1 Month"
         other: "%{count} Months"
-      not_saved: "Not saved"
       notices: 
         extra_time: "You have been given extra time on this attempt"
         five_minutes_left: "Five Minutes Left"
@@ -12046,7 +12203,6 @@ en:
         twelve_hours_left: "Twelve Hours Left"
       question_answered: Answered
       question_unanswered: "Haven't Answered Yet"
-      quiz_instructions: "Quiz Instructions"
       saved_at: "Quiz saved at %{t}"
       saving: Saving...
       saving_not_needed: "No new data to save. Last checked at %{t}"
@@ -12060,21 +12216,6 @@ en:
       years_count: 
         one: "1 Year"
         other: "%{count} Years"
-    take_quiz_in_popup: 
-      headers: 
-        loading_in_lockdown: "Loading Quiz in Respondus LockDown Browser"
-      links: 
-        return_to_quiz_page: "[Click here](%{url}) to return to the quiz page."
-    take_quiz_right_side: 
-      labels: 
-        attempt_due: "Attempt due"
-        score: Score
-        time_elapsed: "Time Elapsed"
-        time_running: "Time Running"
-      links: 
-        hide_time_running: Hide
-        keep_editing_quiz: "Keep Editing This Quiz"
-        keep_editing_survey: "Keep Editing This Survey"
     timing: 
       labels: 
         time_elapsed: "Time Elapsed"
@@ -12111,6 +12252,19 @@ en:
     types: 
       quiz: Quiz
       survey: Survey
+  quizzes/quiz_group: 
+    errors: 
+      no_bank: "Couldn't find the question bank for quiz group %{group_name}"
+      no_permissions: "User didn't have permission to reference question bank in quiz group %{group_name}"
+    question_group: "Question Group"
+  quizzes/quiz_question: 
+    defaults: 
+      question_name: Question
+  quizzes/quiz_statistics: 
+    statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} Report"
+    types: 
+      item_analysis: "Item Analysis"
+      student_analysis: "Student Analysis"
   quizzes_model: 
     cant_unpublish_when_students_submit: "Can't unpublish if there are student submissions"
     confirms: 
@@ -12519,16 +12673,6 @@ en:
         go: Go
       titles: 
         find_user: "Find A User"
-    accounts_secondary_content: 
-      buttons: 
-        go: Go
-      links: 
-        manage_permissions: "Manage Role Permissions"
-        manage_subaccounts: "Manage Sub-Accounts"
-        manage_terms: "Manage Terms"
-        view_statistics: "View Statistics"
-      titles: 
-        find_user: "Find A User"
     add_assignment: 
       buttons: 
         add_assignment: "Add Assignment"
@@ -12629,6 +12773,9 @@ en:
         unenroll_user_section: "Remove User from Section"
       titles: 
         course_section: "Course Section"
+    error_form: 
+      message_failed: "Report didn't send.  Please try again."
+      message_sent: "Thank you for your help!  We'll get right on this."
     errors: 
       400_message: 
         description: "Huh. Looks like there was a problem loading the page you requested."
@@ -12655,8 +12802,6 @@ en:
           submit: "Send Comments"
         labels: 
           email: "Email (optional)"
-        message_failed: "Report didn't send. Please try again."
-        message_sent: "Thank you for your help! We'll get right on this."
     event_list: 
       at_least_more_events: "at least %{count_of_events} more"
       at_least_more_events_one_week: "at least %{count_of_events} more in the next week"
@@ -13205,6 +13350,13 @@ en:
     columns: 
       date: Date
       value: Value
+    domain_not_found: 
+      body_description: "Please check the URL and try again or contact your institution or teacher for assistance."
+      body_reference: "If you're interested in a free Canvas account not tied to a speciﬁc institution you can sign up at"
+      links: 
+        canvas_instructure: canvas.instructure.com
+      page_title: "Oops, we couldn't ﬁnd your instance of Canvas."
+      you_typed: "You typed"
     institution_suspended: 
       body: "Your school's Canvas account is temporarily suspended. Please contact your Canvas administrator."
       links: 
@@ -13235,8 +13387,12 @@ en:
     assignment_order_assignment_groups: "By Assignment Group and Position"
     assignment_order_due_date: "By Due Date"
     assignment_unmuted: "Click to mute."
+    invalid_group_warning: 
+      one: "Note: Score does not include assignments from the group %{list_of_group_names} because it has no points possible."
+      other: "Note: Score does not include assignments from the groups %{list_of_group_names} because they have no points possible."
     no_assignment: "No Assignment Selected"
     no_student: "No Student Selected"
+    notes: Notes
     student_hidden_name: "Student %{position}"
   statistics: 
     csv_columns: 
@@ -13263,6 +13419,11 @@ en:
     not_available: "Available on"
     pending: "Not available until"
   step: Step
+  student_outcome_gradebook_description: |-
+      Student Outcome Gradebook provides a way for students to quickly view progress
+      on course learning outcomes. Outcomes are presented in a Gradebook-like
+      format and progress is displayed both as a numerical score and as mastered/near
+      mastery/remedial.
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "You can't delete a sub-account that has courses in it"
@@ -13500,6 +13661,10 @@ en:
         term_start: "term start"
         unspecified: whenever
       timespan: "%{start_at} *to* %{end_at}"
+  text_helper: 
+    time: 
+      ranges: 
+        different_days: "%{start_date_and_time} to %{end_date_and_time}"
   time: 
     am: am
     count_hours_ago: 

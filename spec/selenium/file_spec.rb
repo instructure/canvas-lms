@@ -122,7 +122,8 @@ describe "shared files tests" do
 
       it "should validate adding a bold line changes the html" do
         click_edit_link
-        fj('.switch_views:visible').click
+        wait_for_ajaximations
+        switch_html_edit_views
         f('.mce_bold').click
         type_in_tiny('#edit_content_textarea', 'this is bold')
         fj('.switch_views:visible').click

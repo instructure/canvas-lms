@@ -23,6 +23,7 @@ class User < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
+
   include Context
 
   attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use, :self_enrollment_code, :initial_enrollment_type
@@ -126,21 +127,41 @@ class User < ActiveRecord::Base
         enrollment_conditions(:active, strict_course_state, course_workflow_state) +
         " OR " +
         enrollment_conditions(:invited, strict_course_state, course_workflow_state)
+      when :current_and_concluded
+        enrollment_conditions(:active, strict_course_state, course_workflow_state) +
+        " OR " +
+        enrollment_conditions(:completed, strict_course_state, course_workflow_state)
     end
   end
 
   has_many :communication_channels, :order => 'communication_channels.position ASC', :dependent => :destroy
+  has_many :notification_policies, through: :communication_channels
   has_one :communication_channel, :conditions => ["workflow_state<>'retired'"], :order => 'position'
   has_many :enrollments, :dependent => :destroy
 
-  has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:active), :order => 'enrollments.created_at'
-  has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:invited), :order => 'enrollments.created_at'
-  has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course], :order => 'enrollments.created_at',
-           :conditions => enrollment_conditions(:current_and_invited)
-  has_many :current_and_future_enrollments, :class_name => 'Enrollment', :include => [:course], :order => 'enrollments.created_at',
-           :conditions => enrollment_conditions(:current_and_invited, false)
+  if CANVAS_RAILS2
+    has_many :current_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:active), :order => 'enrollments.created_at'
+    has_many :invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:invited), :order => 'enrollments.created_at'
+    has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :order => 'enrollments.created_at',
+            :conditions => enrollment_conditions(:current_and_invited)
+    has_many :current_and_future_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :order => 'enrollments.created_at',
+            :conditions => enrollment_conditions(:current_and_invited, false)
+    has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at'
+    has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section],
+            :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at'
+  else
+    has_many :current_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:active), :order => 'enrollments.created_at', :readonly => false
+    has_many :invited_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:invited), :order => 'enrollments.created_at', :readonly => false
+    has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
+            :conditions => enrollment_conditions(:current_and_invited), :readonly => false
+    has_many :current_and_future_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
+            :conditions => enrollment_conditions(:current_and_invited, false), :readonly => false
+    has_many :concluded_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at', :readonly => false
+    has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :joins => [:course],
+            :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at', :readonly => false
+  end
+
   has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')", :order => 'enrollments.created_at'
-  has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at'
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
   has_many :user_observers, :dependent => :delete_all
@@ -151,8 +172,6 @@ class User < ActiveRecord::Base
   has_many :current_and_invited_courses, :source => :course, :through => :current_and_invited_enrollments
   has_many :concluded_courses, :source => :course, :through => :concluded_enrollments, :uniq => true
   has_many :all_courses, :source => :course, :through => :enrollments
-  has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section],
-           :conditions => [enrollment_conditions(:active), enrollment_conditions(:completed)].join(' OR '), :order => 'enrollments.created_at'
   has_many :current_and_concluded_courses, :source => :course, :through => :current_and_concluded_enrollments
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
@@ -184,7 +203,7 @@ class User < ActiveRecord::Base
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :calendar_events, :as => 'context', :dependent => :destroy, :include => [:parent_event]
   has_many :eportfolios, :dependent => :destroy
-  has_many :quiz_submissions, :dependent => :destroy
+  has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
   has_many :dashboard_messages, :class_name => 'Message', :conditions => {:to => "dashboard", :workflow_state => 'dashboard'}, :order => 'created_at DESC', :dependent => :destroy
   has_many :collaborations, :order => 'created_at DESC'
   has_many :user_services, :order => 'created_at', :dependent => :destroy
@@ -373,8 +392,8 @@ class User < ActiveRecord::Base
     # enrollments are always on the course's shard
     # and courses are always on the root account's shard
     account.shard.activate do
-      Enrollment.where(user_id: self).active.joins(:course).where("courses.account_id=? OR courses.root_account_id=?",account,account) 
-    end 
+      Enrollment.where(user_id: self).active.joins(:course).where("courses.account_id=? OR courses.root_account_id=?",account,account)
+    end
   end
 
   def self.add_to_account_chain_cache(account_id, account_chain_cache)
@@ -613,7 +632,7 @@ class User < ActiveRecord::Base
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it
     # doesn't already exist
-    self.uuid = AutoHandle.generate_securish_uuid if !read_attribute(:uuid)
+    self.uuid = CanvasUuid::Uuid.generate_securish_uuid if !read_attribute(:uuid)
   end
   protected :assign_uuid
 
@@ -756,7 +775,11 @@ class User < ActiveRecord::Base
 
   def email_channel
     # It's already ordered, so find the first one, if there's one.
-    communication_channels.to_a.find{|cc| cc.path_type == 'email' && cc.workflow_state != 'retired' }
+    if communication_channels.loaded?
+      communication_channels.to_a.find { |cc| cc.path_type == 'email' && cc.workflow_state != 'retired' }
+    else
+      communication_channels.email.unretired.first
+    end
   end
 
   def email
@@ -884,7 +907,7 @@ class User < ActiveRecord::Base
   # avoid extraneous callbacks when enrolled in multiple sections
   def delete_enrollments
     courses_to_update = self.enrollments.active.select(:course_id).uniq.map(&:course_id)
-    Enrollment.skip_callback(:update_cached_due_dates) do
+    Enrollment.suspend_callbacks(:update_cached_due_dates) do
       self.enrollments.each { |e| e.destroy }
     end
     courses_to_update.each do |course|
@@ -1308,7 +1331,8 @@ class User < ActiveRecord::Base
         uri.host = request.host
         uri.port = request.port if ![80, 443].include?(request.port)
       elsif !uri.host
-        uri.host, uri.port = HostUrl.default_host.split(/:/)
+        uri.host, port = HostUrl.default_host.split(/:/)
+        uri.port = Integer(port) if port
       end
       uri.to_s
     else
@@ -1491,7 +1515,7 @@ class User < ActiveRecord::Base
 
   def uuid
     if !read_attribute(:uuid)
-      self.update_attribute(:uuid, AutoHandle.generate_securish_uuid)
+      self.update_attribute(:uuid, CanvasUuid::Uuid.generate_securish_uuid)
     end
     read_attribute(:uuid)
   end
@@ -1605,12 +1629,12 @@ class User < ActiveRecord::Base
     @courses_with_primary_enrollment ||= {}
     @courses_with_primary_enrollment.fetch(cache_key) do
       res = self.shard.activate do
-        Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options].cache_key, :expires_in => 15.minutes) do
+        result = Rails.cache.fetch([self, 'courses_with_primary_enrollment', association, options].cache_key, :expires_in => 15.minutes) do
 
           # Set the actual association based on if its asking for favorite courses or not.
           actual_association = association == :favorite_courses ? :current_and_invited_courses : association
-
-          send(actual_association).with_each_shard do |scope|
+          relation = CANVAS_RAILS2 ? send(actual_association) : association(actual_association).scoped
+          relation.with_each_shard do |scope|
 
             # Limit favorite courses based on current shard.
             if association == :favorite_courses
@@ -1632,10 +1656,10 @@ class User < ActiveRecord::Base
               date_restricted_ids = enrollments.select{ |e| e.completed? || e.inactive? }.map(&:id)
               courses.reject! { |course| date_restricted_ids.include?(course.primary_enrollment_id.to_i) }
             end
-
             courses
           end
-        end.dup
+        end
+        result.dup
       end
 
       if association == :current_and_invited_courses
@@ -2027,7 +2051,7 @@ class User < ActiveRecord::Base
               all)
 
       concluded_courses.concat(
-          Enrollment.
+          Enrollment.joins(:course).
               where(enrollment_conditions(:completed)).
               where(user_id: users).
               select([:user_id, :course_id]).
@@ -2573,8 +2597,18 @@ class User < ActiveRecord::Base
     @all_active_pseudonyms ||= self.pseudonyms.with_each_shard { |scope| scope.active }
   end
 
-  def prefers_gradebook2?
-    preferences[:use_gradebook2] != false
+  #when screenreader_gradebook is enabled by default, we won't need to pass in context anymore
+  def prefers_gradebook2?(context)
+    if context.feature_enabled?(:screenreader_gradebook)
+      return true if preferences[:gradebook_version].nil?
+      preferences[:gradebook_version] == '2'
+    else
+      preferences[:use_gradebook2] != false
+    end
+  end
+
+  def gradebook_preference
+    preferences[:gradebook_version]
   end
 
   def stamp_logout_time!

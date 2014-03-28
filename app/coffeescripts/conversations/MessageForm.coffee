@@ -18,11 +18,12 @@
 
 define [
   'i18n!conversations'
+  'jquery'
   'underscore'
   'compiled/util/shortcut'
   'jst/conversations/MessageForm'
   'jst/conversations/addAttachment'
-], (I18n, _, shortcut, messageFormTemplate, addAttachmentTemplate) ->
+], (I18n, $, _, shortcut, messageFormTemplate, addAttachmentTemplate) ->
 
   class MessageForm
     shortcut this, 'pane',

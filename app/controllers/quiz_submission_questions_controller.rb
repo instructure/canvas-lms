@@ -45,8 +45,7 @@
 #
 class QuizSubmissionQuestionsController < ApplicationController
   include Api::V1::QuizSubmissionQuestion
-  include Api::V1::Helpers::QuizzesApiHelper
-  include Api::V1::Helpers::QuizSubmissionsApiHelper
+  include Filters::QuizSubmissions
 
   before_filter :require_user, :require_quiz_submission, :export_scopes
   before_filter :require_question, except: [ :index ]
@@ -141,7 +140,7 @@ class QuizSubmissionQuestionsController < ApplicationController
       reject! 'missing required parameter :answer', 400
     end
 
-    serializer = QuizQuestion::AnswerSerializers.serializer_for @question
+    serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for @question
     serialization_rc = serializer.serialize(params[:answer])
 
     unless serialization_rc.valid?

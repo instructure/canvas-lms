@@ -38,7 +38,7 @@ class DiscussionEntriesController < ApplicationController
     @topic = @context.discussion_topics.active.find(params[:discussion_entry].delete(:discussion_topic_id))
     params[:discussion_entry].delete :remove_attachment rescue nil
     parent_id = params[:discussion_entry].delete(:parent_id)
-    @entry = @topic.discussion_entries.new(params[:discussion_entry])
+    @entry = @topic.discussion_entries.scoped.new(params[:discussion_entry])
     @entry.current_user = @current_user
     @entry.user_id = @current_user ? @current_user.id : nil
     @entry.parent_id = parent_id
@@ -149,9 +149,8 @@ class DiscussionEntriesController < ApplicationController
     @topic = @context.discussion_topics.active.find(params[:discussion_topic_id])
     if !@topic.podcast_enabled && request.format == :rss
       @problem = t :disabled_podcasts_notice, "Podcasts have not been enabled for this topic."
-      @template_format = 'html'
-      @template.template_format = 'html'
-      render :text => @template.render(:file => "shared/unauthorized_feed", :layout => "layouts/application"), :status => :bad_request # :template => "shared/unauthorized_feed", :status => :bad_request
+      params[:format] = 'html' if CANVAS_RAILS2
+      render :template => "shared/unauthorized_feed", :layout => "layouts/application", :status => :bad_request, :formats => [:html] # :template => "shared/unauthorized_feed", :status => :bad_request
       return
     end
     if authorized_action(@topic, @current_user, :read)

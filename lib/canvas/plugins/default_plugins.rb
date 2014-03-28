@@ -224,16 +224,6 @@ Canvas::Plugin.register('assignment_freezer', nil, {
   :settings => nil
 })
 
-Canvas::Plugin.register('embedly', nil, {
-  :name => lambda{ t :name, 'Embedly Integration' },
-  :description => lambda{ t :description, 'Pull Embedly info for Collections' },
-  :website => 'http://embed.ly/',
-  :author => 'Instructure',
-  :author_website => 'http://www.instructure.com',
-  :version => '1.0.0',
-  :settings_partial => 'plugins/embedly_settings',
-  :settings => nil
-})
 Canvas::Plugin.register('crocodoc', :previews, {
   :name => lambda { t :name, 'Crocodoc' },
   :description => lambda { t :description, 'Enabled Crocodoc as a document preview option' },

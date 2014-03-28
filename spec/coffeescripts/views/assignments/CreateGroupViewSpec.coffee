@@ -86,6 +86,7 @@ define [
   test 'it should only allow positive numbers for drop rules', ->
     view = createView()
     data =
+      name: "Assignments"
       rules:
         drop_lowest: "tree"
         drop_highest: -1
@@ -100,6 +101,7 @@ define [
     assignments = view.assignmentGroup.get('assignments')
 
     data =
+      name: "Assignments"
       rules:
         drop_highest: 5
 
@@ -117,7 +119,6 @@ define [
     errors = view.validateFormData(data)
     ok errors
     equal _.keys(errors).length, 1
-
 
   test 'it should trigger a render event on save success when editing', ->
     triggerSpy = sinon.spy(AssignmentGroupCollection::, 'trigger')

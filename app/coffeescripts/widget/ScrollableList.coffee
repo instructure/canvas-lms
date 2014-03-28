@@ -17,11 +17,12 @@
 #
 
 define [
+  'jquery'
   'compiled/util/ScrollableListDataSource'
   'compiled/util/shortcut'
   'compiled/jquery/scrollIntoView'
   'jquery.disableWhileLoading'
-], (ScrollableListDataSource, shortcut) ->
+], ($, ScrollableListDataSource, shortcut) ->
 
   class
     shortcut this, 'ds',

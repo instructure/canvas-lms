@@ -21,8 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe DiscussionTopicsController do
   def course_topic(opts={})
     @topic = @course.discussion_topics.build(:title => "some topic")
-    if @user && !opts[:skip_set_user]
-      @topic.user = @user
+    user = @user || opts[:user]
+    if user && !opts[:skip_set_user]
+      @topic.user = user
     end
 
     if opts[:with_assignment]
@@ -76,8 +77,8 @@ describe DiscussionTopicsController do
       integrate_views
 
       before do
-        course(:course_name => "I <3 Discussions")
-        course_topic(:with_assignment => true)
+        course(:course_name => "I <3 Discussions", :active_all => 1)
+        course_topic(:with_assignment => true, :user => @teacher)
         @section = @course.course_sections.create!(:name => "I <3 Discusions")
         @override = assignment_override_model(:assignment => @topic.assignment,
                                   :due_at => Time.now,

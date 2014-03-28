@@ -70,9 +70,9 @@ class ZipExtractor
   alias :dirname :make_safe_haven
 
   def safe_haven_name
-    dirname = "/tmp/#{AutoHandle.generate}"
+    dirname = "/tmp/#{CanvasUuid::Uuid.generate}"
     while File.exist?(dirname)
-      dirname = "/tmp/#{AutoHandle.generate}"
+      dirname = "/tmp/#{CanvasUuid::Uuid.generate}"
     end
     dirname
   end

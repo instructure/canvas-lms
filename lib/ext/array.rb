@@ -16,23 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
-
 class Array
-  def to_csv(options = {})
-    if all? { |e| e.respond_to?(:to_row) }
-      header_row = first.export_columns(options[:format]).to_csv
-      content_rows = map { |e| e.to_row(options[:format]) }.map(&:to_csv)
-      ([header_row] + content_rows).join
-    else
-      CSV.generate_line(self, options)
-    end
-  end
-
-  def to_atom
-    self.map {|item| item.to_atom}
-  end
-  
   def cache_key
     if @cache_key
       @cache_key
@@ -41,69 +25,6 @@ class Array
       @cache_key = value unless self.frozen?
       value
     end
-  end
-  
-  def once_per(&block)
-    finds = {}
-    self.inject([]) do |array, item|
-      mapped = block.call(item)
-      found = finds[mapped]
-      finds[mapped] = true
-      array << item unless found
-      array
-    end
-  end
-  
-  def clump_per(&block)
-    self.inject({}) do |hash, item|
-      mapped = block.call(item)
-      hash[mapped] ||= []
-      hash[mapped] << item
-      hash
-    end
-  end
-  
-  def count_per(&block)
-    self.inject({}) do |hash, item|
-      mapped = block.call(item)
-      hash[mapped] ||= 0
-      hash[mapped] += 1
-      hash
-    end
-  end
-  
-  def to_ics(name="", desc="")
-    cal = Icalendar::Calendar.new
-    # to appease Outlook
-    cal.custom_property("METHOD","PUBLISH")
-    cal.custom_property("X-WR-CALNAME",name)
-    cal.custom_property("X-WR-CALDESC",desc)
-    
-    self.each do |item|
-      event = item.to_ics(false)
-      cal.add_event(event) if event
-    end
-    cal.to_ical
-  end
-  
-  # Returns the tail of the array from +position+.
-  #
-  #   %w( a b c d ).from(0)  # => %w( a b c d )
-  #   %w( a b c d ).from(2)  # => %w( c d )
-  #   %w( a b c d ).from(10) # => nil
-  #   %w().from(0)           # => nil
-  def from(position)
-    self[position..-1]
-  end
-  
-  # Returns the beginning of the array up to +position+.
-  #
-  #   %w( a b c d ).to(0)  # => %w( a )
-  #   %w( a b c d ).to(2)  # => %w( a b c )
-  #   %w( a b c d ).to(10) # => %w( a b c d )
-  #   %w().to(0)           # => %w()
-  def to(position)
-    self[0..position]
   end
 
   # backport from ActiveSupport 3.x

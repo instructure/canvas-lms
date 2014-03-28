@@ -1,17 +1,18 @@
+{{!-- same markup as ApplicationHelper#avatar, essensially --}}
 {{#if this}}
-  {{#if avatar_image_url}}
+  {{#ifAny avatar_url avatar_image_url}}
     {{#if alreadyEscaped}}
       <a
-        {{#if url}}href="{{{url}}}"{{/if}}
+        {{#ifAny url html_url}}href="{{{or url html_url}}}"{{/ifAny}}
         class="avatar"
-        {{#if display_name}}title="{{{display_name}}}"{{/if}}
-      ><img src="{{{avatar_image_url}}}" alt="{{{display_name}}}"></a>
+        style="background-image: url({{{or avatar_url avatar_image_url}}})">
+        <span class="screenreader-only">{{{or display_name short_name}}}</span></a>
     {{else}}
       <a
-        {{#if url}}href="{{url}}"{{/if}}
+        {{#ifAny url html_url}}href="{{or url html_url}}"{{/ifAny}}
         class="avatar"
-        {{#if display_name}}title="{{display_name}}"{{/if}}
-      ><img src="{{avatar_image_url}}" alt="{{display_name}}"></a>
+        style="background-image: url({{or avatar_url avatar_image_url}})"
+        ><span class="screenreader-only">{{or display_name short_name}}</span></a>
     {{/if}}
-  {{/if}}
+  {{/ifAny}}
 {{/if}}

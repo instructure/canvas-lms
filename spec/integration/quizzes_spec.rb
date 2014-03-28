@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe QuizzesController do
+describe Quizzes::QuizzesController do
   def create_section_override(section, due_at)
     override = assignment_override_model(:quiz => @quiz)
     override.set = section

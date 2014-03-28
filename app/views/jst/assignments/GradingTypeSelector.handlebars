@@ -1,7 +1,10 @@
-<label for="assignment_grading_type" class="control-label">
-  {{#t "grading_type"}}Grading Type{{/t}}
-</label>
-<div class="controls">
+<div class="form-column-left no-group">
+  <label for="assignment_grading_type">
+    {{#t "display_grade_as"}}Display Grade as{{/t}}
+  </label>
+</div>
+
+<div class="form-column-right">
   <select id="assignment_grading_type"
     name="{{#if nested}}assignment[grading_type]{{else}}grading_type{{/if}}"
     aria-controls="graded_assignment_fields view-grading-levels"
@@ -33,7 +36,6 @@
       {{#t "view_grading_levels"}}View Grading Levels{{/t}}
     </a>
   </p>
-
   <input name="{{#if nested}}assignment[grading_standard_id]{{else}}grading_standard_id{{/if}}"
     class=grading_standard_id
     value="{{gradingStandardId}}"

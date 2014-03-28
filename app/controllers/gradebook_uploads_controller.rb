@@ -90,8 +90,8 @@ class GradebookUploadsController < ApplicationController
 
         all_submissions = {}
         @context.submissions.where(:assignment_id => assignment_map.keys,
-                                   :user_id => @students.map { |s| s['previous_id'].to_i }).
-            except(:includes).each do |s|
+                                   :user_id => @students.map { |s| s['previous_id'].to_i })
+            .each do |s|
           all_submissions[[s.assignment_id, s.user_id]] = s
         end
       

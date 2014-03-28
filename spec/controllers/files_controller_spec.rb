@@ -144,7 +144,7 @@ describe FilesController do
 
       f2 = course_folder
       a2 = folder_file
-      get 'index', :course_id => @course.id, :folder_id => f2.id
+      get 'index', :course_id => @course.id, :folder_id => f2.id, :format => 'json'
       response.should be_success
       assigns[:current_folder].should eql(f2)
       assigns[:current_attachments].should_not be_nil
@@ -683,7 +683,7 @@ describe FilesController do
       # based completely on the policy signature
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
       @attachment = factory_with_protected_attributes(Attachment, :context => @course, :file_state => 'deleted', :workflow_state => 'unattached', :filename => 'test.txt', :content_type => 'text')
-      @content = StringIO.new("test file")
+      @content = Rack::Test::UploadedFile.new(File.join(ActionController::TestCase.fixture_path, 'courses.yml'), '')
       request.env['CONTENT_TYPE'] = 'multipart/form-data'
       enable_forgery_protection
     end
@@ -693,10 +693,9 @@ describe FilesController do
       post "api_create", params[:upload_params].merge(:file => @content)
       response.should be_redirect
       @attachment.reload
-      @attachment.workflow_state.should == 'processed'
       # the file is not available until the third api call is completed
       @attachment.file_state.should == 'deleted'
-      @attachment.open.read.should == "test file"
+      @attachment.open.read.should == File.read(File.join(ActionController::TestCase.fixture_path, 'courses.yml'))
     end
 
     it "should reject a blank policy" do

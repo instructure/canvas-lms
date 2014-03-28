@@ -409,6 +409,16 @@ define [
       backboneView.render()
       onNextFrame(replace)
       new Handlebars.SafeString("<span id=\"#{id}\">pk</span>")
+
+    # Public: yields the first non-nil argument
+    #
+    # Examples
+    #   Name: {{or display_name short_name 'Unknown'}}
+    #
+    # Returns the first non-null argument or null
+    or: (args..., options) ->
+      for arg in args when arg
+        return arg
   }
 
   return Handlebars

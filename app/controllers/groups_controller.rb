@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -30,68 +30,105 @@
 # context for many other types of functionality and interaction, such as
 # collections, discussions, wikis, and shared files.
 #
-# @object Group
+# @model Group
 #     {
-#       // The ID of the group.
-#       "id": 17,
-#
-#       // The display name of the group.
-#       "name": "Math Group 1",
-#
-#       // A description of the group. This is plain text.
-#       "description": null,
-#
-#       // Whether or not the group is public.  Currently only community groups
-#       // can be made public.  Also, once a group has been set to public, it
-#       // cannot be changed back to private.
-#       "is_public": false,
-#
-#       // How people are allowed to join the group.  For all groups except for
-#       // community groups, the user must share the group's parent course or
-#       // account.  For student organized or community groups, where a user
-#       // can be a member of as many or few as they want, the applicable
-#       // levels are "parent_context_auto_join", "parent_context_request", and
-#       // "invitation_only".  For class groups, where students are divided up
-#       // and should only be part of one group of the category, this value
-#       // will always be "invitation_only", and is not relevant.
-#       //
-#       // * If "parent_context_auto_join", anyone can join and will be
-#       //   automatically accepted.
-#       // * If "parent_context_request", anyone  can request to join, which
-#       //   must be approved by a group moderator.
-#       // * If "invitation_only", only those how have received an
-#       //   invitation my join the group, by accepting that invitation.
-#       "join_level": "invitation_only",
-#
-#       // The number of members currently in the group
-#       "members_count": 0,
-#
-#       // The url of the group's avatar
-#       "avatar_url": "https://<canvas>/files/avatar_image.png",
-#
-#       // The course or account that the group belongs to. The pattern here is
-#       // that whatever the context_type is, there will be an _id field named
-#       // after that type. So if instead context_type was "account", the
-#       // course_id field would be replaced by an account_id field.
-#       "context_type": "Course",
-#       "course_id": 3,
-#
-#       // Certain types of groups have special role designations. Currently,
-#       // these include: "communities", "student_organized", and "imported".
-#       // Regular course/account groups have a role of null.
-#       "role": null,
-#
-#       // The ID of the group's category.
-#       "group_category_id": 4,
-#
-#       // the storage quota for the group, in megabytes
-#       "storage_quota_mb": 50,
-#
-#       // optional: the permissions the user has for the group.
-#       // returned only for a single group and include[]=permissions
-#       "permissions": {
-#          "create_discussion_topic": true
-#        }
+#       "id": "Group",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the group.",
+#           "example": 17,
+#           "type": "integer"
+#         },
+#         "name": {
+#           "description": "The display name of the group.",
+#           "example": "Math Group 1",
+#           "type": "string"
+#         },
+#         "description": {
+#           "description": "A description of the group. This is plain text.",
+#           "type": "string"
+#         },
+#         "is_public": {
+#           "description": "Whether or not the group is public.  Currently only community groups can be made public.  Also, once a group has been set to public, it cannot be changed back to private.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "followed_by_user": {
+#           "description": "Whether or not the current user is following this group.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "join_level": {
+#           "description": "How people are allowed to join the group.  For all groups except for community groups, the user must share the group's parent course or account.  For student organized or community groups, where a user can be a member of as many or few as they want, the applicable levels are 'parent_context_auto_join', 'parent_context_request', and 'invitation_only'.  For class groups, where students are divided up and should only be part of one group of the category, this value will always be 'invitation_only', and is not relevant. * If 'parent_context_auto_join', anyone can join and will be automatically accepted. * If 'parent_context_request', anyone  can request to join, which must be approved by a group moderator. * If 'invitation_only', only those how have received an invitation my join the group, by accepting that invitation.",
+#           "example": "invitation_only",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "parent_context_auto_join",
+#               "parent_context_request",
+#               "invitation_only"
+#             ]
+#           }
+#         },
+#         "members_count": {
+#           "description": "The number of members currently in the group",
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "avatar_url": {
+#           "description": "The url of the group's avatar",
+#           "example": "https://<canvas>/files/avatar_image.png",
+#           "type": "string"
+#         },
+#         "context_type": {
+#           "description": "The course or account that the group belongs to. The pattern here is that whatever the context_type is, there will be an _id field named after that type. So if instead context_type was 'account', the course_id field would be replaced by an account_id field.",
+#           "example": "Course",
+#           "type": "string"
+#         },
+#         "course_id": {
+#           "example": 3,
+#           "type": "integer"
+#         },
+#         "role": {
+#           "description": "Certain types of groups have special role designations. Currently, these include: 'communities', 'student_organized', and 'imported'. Regular course/account groups have a role of null.",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "communities",
+#               "student_organized",
+#               "imported"
+#             ]
+#           }
+#         },
+#         "group_category_id": {
+#           "description": "The ID of the group's category.",
+#           "example": 4,
+#           "type": "integer"
+#         },
+#         "sis_group_id": {
+#           "description": "The SIS ID of the group. Only included if the user has permission to view SIS information.",
+#           "example": "group4a",
+#           "type": "string"
+#         },
+#         "sis_import_id": {
+#           "description": "The id of the SIS import if created through SIS. Only included if the user has permission to manage SIS information.",
+#           "example": 14,
+#           "type": "integer"
+#         },
+#         "storage_quota_mb": {
+#           "description": "the storage quota for the group, in megabytes",
+#           "example": 50,
+#           "type": "integer"
+#         },
+#         "permissions": {
+#           "description": "optional: the permissions the user has for the group. returned only for a single group and include[]=permissions",
+#           "example": "{\"create_discussion_topic\"=>true}",
+#           "type": "map",
+#           "key": { "type": "string" },
+#           "value": { "type": "boolean" }
+#         }
+#       }
 #     }
 #
 class GroupsController < ApplicationController
@@ -109,9 +146,7 @@ class GroupsController < ApplicationController
   def context_group_members
     @group = @context
     if authorized_action(@group, @current_user, :read_roster)
-      respond_to do |format|
-        format.json { render :json => @group.members_json_cached }
-      end
+      render :json => @group.members_json_cached
     end
   end
 
@@ -136,20 +171,16 @@ class GroupsController < ApplicationController
     end
 
     if authorized_action(@context, @current_user, :manage)
-      respond_to do |format|
-        format.json {
-          json = {
-            :pages => users.total_pages,
-            :current_page => users.current_page,
-            :next_page => users.next_page,
-            :previous_page => users.previous_page,
-            :total_entries => users.total_entries,
-            :users => users.map { |u| u.group_member_json(@context) }
-          }
-          json[:pagination_html] = render_to_string(:partial => 'user_pagination', :locals => { :users => users }) unless params[:no_html]
-          render :json => json
-        }
-      end
+      json = {
+        :pages => users.total_pages,
+        :current_page => users.current_page,
+        :next_page => users.next_page,
+        :previous_page => users.previous_page,
+        :total_entries => users.total_entries,
+        :users => users.map { |u| u.group_member_json(@context) }
+      }
+      json[:pagination_html] = render_to_string(:partial => 'user_pagination', :locals => { :users => users }) unless params[:no_html]
+      render :json => json
     end
   end
 
@@ -253,7 +284,7 @@ class GroupsController < ApplicationController
         end
       end
 
-      format.atom { render :xml => @groups.to_atom.to_xml }
+      format.atom { render :xml => @groups.map { |group| group.to_atom }.to_xml }
 
       format.json do
         path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
@@ -394,7 +425,7 @@ class GroupsController < ApplicationController
 
     attrs = api_request? ? params : params[:group]
     attrs.delete :storage_quota_mb unless @context.grants_right? @current_user, session, :manage_storage_quotas
-    @group = @context.groups.new(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
+    @group = @context.groups.scoped.new(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
 
     if authorized_action(@group, @current_user, :create)
       respond_to do |format|
@@ -712,7 +743,7 @@ class GroupsController < ApplicationController
       @group = api_find(Group.active, params[:group_id])
     else
       @group = @context if @context.is_a?(Group)
-      @group ||= (@context ? @context.groups : Group).find(params[:id])
+      @group ||= api_find(@context ? @context.groups : Group, params[:id])
     end
   end
 

@@ -27,13 +27,15 @@ describe "Importing Assignment Groups" do
         context = get_import_context(system)
 
         data[:assignment_groups_to_import] = {}
-        AssignmentGroup.import_from_migration(data, context).should be_nil
-        AssignmentGroup.count.should == 0
+        expect {
+          AssignmentGroup.import_from_migration(data, context).should be_nil
+        }.to change(AssignmentGroup, :count).by(0)
 
         data[:assignment_groups_to_import][data[:migration_id]] = true
-        AssignmentGroup.import_from_migration(data, context)
-        AssignmentGroup.import_from_migration(data, context)
-        AssignmentGroup.count.should == 1
+        expect {
+          AssignmentGroup.import_from_migration(data, context)
+          AssignmentGroup.import_from_migration(data, context)
+        }.to change(AssignmentGroup, :count).by(1)
         g = AssignmentGroup.find_by_migration_id(data[:migration_id])
 
         g.name.should == data[:title]
@@ -44,13 +46,14 @@ describe "Importing Assignment Groups" do
   it "should get attached to an assignment" do
     data = get_import_data('bb8', 'assignment_group')
     context = get_import_context('bb8')
-    AssignmentGroup.import_from_migration(data, context)
-    AssignmentGroup.count.should == 1
-    
-    ass = Assignment.import_from_migration(get_import_data('bb8', 'assignment'), context)
-    Assignment.count.should == 1
-    
-    ass.assignment_group.name.should == data[:title]
+    expect {
+      AssignmentGroup.import_from_migration(data, context)
+    }.to change(AssignmentGroup, :count).by(1)
+
+    expect {
+      ass = Assignment.import_from_migration(get_import_data('bb8', 'assignment'), context)
+      ass.assignment_group.name.should == data[:title]
+    }.to change(AssignmentGroup, :count).by(0)
   end
 
 end

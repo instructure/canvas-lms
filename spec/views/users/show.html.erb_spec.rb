@@ -33,6 +33,6 @@ describe "/users/show" do
 
     render "users/show"
     response.should_not be_nil
-    response.capture(:right_side).should include "Message #{@user.name}" # regardless of permissions
+    content_for(:right_side).should include "Message #{@user.name}" # regardless of permissions
   end
 end

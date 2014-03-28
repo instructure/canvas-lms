@@ -1,9 +1,10 @@
 define [
   'i18n!roster'
+  'jquery'
   'Backbone'
   'jst/courses/roster/index'
   'compiled/views/ValidatedMixin'
-], (I18n, Backbone, template, ValidatedMixin) ->
+], (I18n, $, Backbone, template, ValidatedMixin) ->
 
   class RosterView extends Backbone.View
 

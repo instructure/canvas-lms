@@ -1,9 +1,10 @@
 define [
   'i18n!images'
+  'jquery'
   'underscore'
   'compiled/models/File'
   'use!vendor/FileAPI/FileAPI.min'
-], (I18n, _, File, FileAPI) ->
+], (I18n, $, _, File, FileAPI) ->
 
   class ImageFile extends File
     initialize: (attrs = {}, options = {}) ->

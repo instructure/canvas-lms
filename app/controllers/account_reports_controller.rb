@@ -234,7 +234,7 @@ class AccountReportsController < ApplicationController
 #
 # @argument [parameters] The parameters will vary for each report
 #
-# @returns report
+# @returns Report
 #
   def create
     if authorized_action(@context, @current_user, :read_reports)

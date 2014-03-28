@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'underscore'
   'compiled/views/DialogBaseView'
   'compiled/util/deparam'
   'jst/conferences/editConferenceForm'
   'jst/conferences/userSettingOptions'
-], (_, DialogBaseView, deparam, template, userSettingOptionsTemplate) ->
+], ($, _, DialogBaseView, deparam, template, userSettingOptionsTemplate) ->
 
   class EditConferenceView extends DialogBaseView
 

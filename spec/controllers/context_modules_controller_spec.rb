@@ -104,19 +104,19 @@ describe ContextModulesController do
       assignmentTag2 = @module.add_item :type => 'assignment', :id => assignment2.id
       header2 = @module.add_item :type => 'context_module_sub_header'
 
-      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1, :use_route => :course_context_module_first_redirect
       response.should redirect_to course_assignment_url(@course.id, assignment1.id, :module_item_id => assignmentTag1.id)
 
-      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1, :use_route => :course_context_module_last_redirect
       response.should redirect_to course_assignment_url(@course.id, assignment2.id, :module_item_id => assignmentTag2.id)
 
       assignmentTag1.destroy
       assignmentTag2.destroy
 
-      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1, :use_route => :course_context_module_first_redirect
       response.should redirect_to course_context_modules_url(@course.id, :anchor => "module_#{@module.id}")
 
-      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1, :use_route => :course_context_module_last_redirect
       response.should redirect_to course_context_modules_url(@course.id, :anchor => "module_#{@module.id}")
     end
   end
@@ -233,6 +233,7 @@ describe ContextModulesController do
       
       @module = @course.context_modules.create!
       quiz = @course.quizzes.create!
+      quiz.publish!
 
       tag = @module.add_item :type => 'quiz', :id => quiz.id
       
@@ -342,7 +343,7 @@ describe ContextModulesController do
         tags << make_content_tag(assign, @course, mod)
       end
 
-      ContextModule.expects(:update_all).once
+      ContentTag.expects(:touch_context_modules).once
       order = tags.reverse.map(&:id)
       post 'reorder_items', :course_id => @course.id, :context_module_id => mod.id, :order => order.join(",")
       mod.reload.content_tags.map(&:id).should == order
@@ -478,6 +479,25 @@ describe ContextModulesController do
         get 'progressions', :course_id => @course.id, :format => "json"
         json = JSON.parse response.body.gsub("while(1);",'')
         json.length.should == 0
+      end
+    end
+  end
+
+  describe "GET assignment_info" do
+    it "should return updated due dates/points possible" do
+      Timecop.freeze(1.minute.ago) do
+        course_with_student_logged_in active_all: true
+        @mod = @course.context_modules.create!
+        @assign = @course.assignments.create! title: "WHAT", points_possible: 123
+        @tag = @mod.add_item(type: 'assignment', id: @assign.id)
+      end
+      enable_cache do
+        get 'content_tag_assignment_data', course_id: @course.id, format: 'json' # precache
+        @assign.points_possible = 456
+        @assign.save!
+        get 'content_tag_assignment_data', course_id: @course.id, format: 'json'
+        json = JSON.parse response.body.gsub("while(1);",'')
+        json[@tag.id.to_s]["points_possible"].to_i.should eql 456
       end
     end
   end

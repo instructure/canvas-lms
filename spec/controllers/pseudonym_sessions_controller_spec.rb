@@ -42,7 +42,7 @@ describe PseudonymSessionsController do
 
     it "should render normal layout if not iphone/ipod" do
       get 'new'
-      response.should render_template("pseudonym_sessions/new.html.erb")
+      response.should render_template('new')
     end
 
     it "should render special iPhone/iPod layout if coming from one of those" do
@@ -236,10 +236,10 @@ describe PseudonymSessionsController do
       get 'saml_consume', :SAMLResponse => "foo"
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:saml_unique_id].should == unique_id
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user1.pseudonyms.first
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user1.pseudonyms.first
 
       (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each{ |var| controller.send :remove_instance_variable, var }
-      session.reset
+      CANVAS_RAILS2 ? session.reset : session.clear
 
       controller.stubs(:saml_response).returns(
         stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
@@ -249,7 +249,7 @@ describe PseudonymSessionsController do
       get 'saml_consume', :SAMLResponse => "bar"
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:saml_unique_id].should == unique_id
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user2.pseudonyms.first
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
 
       Setting.set_config("saml", nil)
     end
@@ -701,10 +701,10 @@ describe PseudonymSessionsController do
       get 'new', :ticket => 'ST-abcd'
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:cas_session].should == 'ST-abcd'
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user1.pseudonyms.first
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user1.pseudonyms.first
 
       (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each{ |var| controller.send :remove_instance_variable, var }
-      session.reset
+      CANVAS_RAILS2 ? session.reset : session.clear
 
       stubby("yes\n#{unique_id}\n")
 
@@ -712,7 +712,7 @@ describe PseudonymSessionsController do
       get 'new', :ticket => 'ST-efgh'
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:cas_session].should == 'ST-efgh'
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user2.pseudonyms.first
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
     end
   end
 
@@ -964,8 +964,8 @@ describe PseudonymSessionsController do
           session[:pending_otp_communication_channel_id] = @cc.id
           code = ROTP::TOTP.new(@secret_key).now
           # make sure we get 5 minutes of drift
-          ROTP::TOTP.any_instance.expects(:verify_with_drift).with(code, 300).once.returns(true)
-          post 'otp_login', :otp_login => { :verification_code => code }
+          ROTP::TOTP.any_instance.expects(:verify_with_drift).with(code.to_s, 300).once.returns(true)
+          post 'otp_login', :otp_login => { :verification_code => code.to_s }
           response.should redirect_to settings_profile_url
           @user.reload.otp_secret_key.should == @secret_key
           @user.otp_communication_channel.should == @cc

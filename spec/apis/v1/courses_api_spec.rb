@@ -670,6 +670,7 @@ describe CoursesController, type: :request do
       it "should deal gracefully with an invalid course id" do
         @course2.enrollments.scoped.delete_all
         @course2.course_account_associations.scoped.delete_all
+        @course2.course_sections.scoped.delete_all
         @course2.destroy!
         json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course1.id}&course_ids[]=#{@course2.id}",
                         @params.merge(:event => 'offer', :course_ids => [@course1.id.to_s, @course2.id.to_s]))
@@ -728,6 +729,7 @@ describe CoursesController, type: :request do
       it "should report a failure if no updates succeeded" do
         @course2.enrollments.scoped.delete_all
         @course2.course_account_associations.scoped.delete_all
+        @course2.course_sections.scoped.delete_all
         @course2.destroy!
         json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course2.id}",
                         @params.merge(:event => 'offer', :course_ids => [@course2.id.to_s]))
@@ -1225,7 +1227,7 @@ describe CoursesController, type: :request do
         test_student = @course1.student_view_student
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
-        json.map{ |s| s["name"] }.should_not contain("Test Student")
+        json.map{ |s| s["name"] }.should_not include("Test Student")
       end
 
       it "includes the test student if told to do so" do
@@ -1233,7 +1235,7 @@ describe CoursesController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json'},
                           :include => ['test_student'] )
-        json.map{ |s| s["name"] }.should contain("Test Student")
+        json.map{ |s| s["name"] }.should include("Test Student")
       end
 
       it "returns a list of users with emails" do

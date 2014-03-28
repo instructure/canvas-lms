@@ -1,10 +1,11 @@
 require [
+  'jquery'
   'underscore'
   'compiled/views/calendar/AgendaView'
   'compiled/calendar/EventDataSource'
   'helpers/ajax_mocks/api/v1/calendarEvents'
   'helpers/ajax_mocks/api/v1/calendarAssignments'
-], (_, AgendaView, EventDataSource, eventResponse, assignmentResponse) ->
+], ($, _, AgendaView, EventDataSource, eventResponse, assignmentResponse) ->
   loadEventPage = (server, includeNext = false) ->
     sendCustomEvents(server, eventResponse, assignmentResponse, includeNext)
 

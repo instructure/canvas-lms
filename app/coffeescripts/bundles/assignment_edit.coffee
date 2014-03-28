@@ -55,6 +55,6 @@ require [
         model: dueDateList
         views:
           'due-date-overrides': new DueDateListView(model: dueDateList)
-      
+
   editHeaderView.render()
   editView.render()

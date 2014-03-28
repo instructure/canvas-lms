@@ -1083,6 +1083,9 @@ describe ContentMigration do
       topic.assignment = assignment
       topic.save
 
+      # Should not fail if the destination has a group
+      @copy_to.groups.create!(:name => 'some random group of people')
+
       @cm.copy_options = {
               :assignments => {mig_id(assignment) => "1"},
               :discussion_topics => {mig_id(topic) => "0"},

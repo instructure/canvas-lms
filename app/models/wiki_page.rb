@@ -48,12 +48,13 @@ class WikiPage < ActiveRecord::Base
 
   def ensure_unique_title
     return if deleted?
-    self.title ||= (self.url || "page").to_cased_title
+    to_cased_title = ->(string) { string.gsub(/[^\w]+/, " ").gsub(/\b('?[a-z])/){$1.capitalize}.strip }
+    self.title ||= to_cased_title.call(self.url || "page")
     return unless self.wiki
     # TODO i18n (see wiki.rb)
     if self.title == "Front Page" && self.new_record?
       baddies = self.wiki.wiki_pages.not_deleted.find_all_by_title("Front Page").select{|p| p.url != "front-page" }
-      baddies.each{|p| p.title = p.url.to_cased_title; p.save_without_broadcasting! }
+      baddies.each{|p| p.title = to_cased_title.call(p.url); p.save_without_broadcasting! }
     end
     if existing = self.wiki.wiki_pages.not_deleted.find_by_title(self.title)
       return if existing == self
@@ -222,13 +223,9 @@ class WikiPage < ActiveRecord::Base
   def locked_for?(user, opts={})
     return false unless self.could_be_locked
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
-      context = opts[:context]
-      context ||= self.context if self.respond_to?(:context)
-      m = context_module_tag_for(context).context_module rescue nil
-
       locked = false
-      if (m && !m.available_for?(user))
-        locked = {:asset_string => self.asset_string, :context_module => m.attributes}
+      if item = locked_by_module_item?(user, opts[:deep_check_if_needed])
+        locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
         locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"]
       end
       locked
@@ -256,7 +253,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def context_module_tag_for(context)
-    @tag ||= self.context_module_tags.find_by_context_id_and_context_type(context.id, context.class.to_s)
+    @tag ||= self.context_module_tags.where(context_id: context, context_type: context.class.base_ar_class.name).first
   end
 
   def context_module_action(user, context, action)
