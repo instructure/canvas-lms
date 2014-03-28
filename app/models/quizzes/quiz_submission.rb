@@ -290,7 +290,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def needs_grading?(strict=false)
     if strict && self.untaken? && self.overdue?(true)
       true
-    elsif self.untaken? && self.end_at && self.end_at < Time.now && !self.extendable?
+    elsif self.untaken? && self.end_at && self.end_at < Time.now
       true
     elsif self.completed? && self.submission_data && self.submission_data.is_a?(Hash)
       true
