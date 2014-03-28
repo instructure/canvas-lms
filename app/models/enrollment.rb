@@ -222,6 +222,10 @@ class Enrollment < ActiveRecord::Base
     SIS_TYPES[type] || SIS_TYPES['StudentEnrollment']
   end
 
+  def sis_type
+    Enrollment.sis_type(self.type)
+  end
+
   def sis_role
     self.role_name || Enrollment.sis_type(self.type)
   end
