@@ -209,6 +209,18 @@ describe Api::V1::Course do
             next_requirement_url: nil
         }
       end
+
+      it "treats a nil requirements_met as an incomplete requirement" do
+        # create a progression with requirements_met uninitialized (nil)
+        ContextModuleProgression.create!(user: @user, context_module: @module)
+
+        progress = api.course_progress_json(@course, @user)
+        progress.should == {
+            requirement_count: 5,
+            requirement_completed_count: 0,
+            next_requirement_url: "course_context_modules_item_redirect_url(:course_id => #{@course.id}, :id => #{@tag.id}, :host => HostUrl.context_host(Course.find(#{@course.id}))"
+        }
+      end
     end
   end
 
