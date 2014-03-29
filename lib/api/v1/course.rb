@@ -92,9 +92,10 @@ module Api::V1::Course
 
     mods = course.modules_visible_to(user)
     requirement_count = mods.flat_map(&:completion_requirements).size
+
     requirement_completed_count = user.context_module_progressions
                                       .where("context_module_id IN (?)", mods.map(&:id))
-                                      .flat_map { |cmp| cmp.requirements_met.uniq { |r| r[:id] } }
+                                      .flat_map { |cmp| cmp.requirements_met.to_a.uniq { |r| r[:id] } }
                                       .size
 
     course_progress = {
