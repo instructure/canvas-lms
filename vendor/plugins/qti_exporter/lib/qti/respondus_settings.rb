@@ -23,6 +23,7 @@ class RespondusSettings
       assessment[:available] = true
       assessment[:assignment] = {
         :title => assessment[:title],
+        :submission_types => "online_quiz"
       }
     end
 
