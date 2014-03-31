@@ -78,9 +78,9 @@ module SeleniumTestsHelperMethods
         tries ||= 3
         puts "Thread: provisioning selenium driver"
         driver = nil
-        client = Selenium::WebDriver::Remote::Http::Default.new
-        client.timeout = 300 ##upping this very high so we catch timeouts in rspec around filter rather than selenium blowing up
-        options[:http_client] = client
+        #client = Selenium::WebDriver::Remote::Http::Default.new
+        #client.timeout = 300 ##upping this very high so we catch timeouts in rspec around filter rather than selenium blowing up
+        #options[:http_client] = client
         driver = Selenium::WebDriver.for(browser, options)
       rescue Exception => e
         puts "Thread #{THIS_ENV}\n try ##{tries}\nError attempting to start remote webdriver: #{e}"
