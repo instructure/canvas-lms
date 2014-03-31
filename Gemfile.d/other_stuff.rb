@@ -2,7 +2,7 @@ if CANVAS_RAILS2
   # If you have a license to rails lts, you can create a vendor/plugins/*/RAILS_LTS yaml file
   # with the Gemfile `gem` command to use (pointing to the private repo with your username/password).
   # Otherwise, the free community version of rails lts will be used.
-  lts_file = Dir.glob(File.expand_path("../vendor/plugins/*/RAILS_LTS", __FILE__)).first
+  lts_file = Dir.glob(File.expand_path("../../vendor/plugins/*/RAILS_LTS", __FILE__)).first
   if lts_file
     eval(File.read(lts_file))
   else
