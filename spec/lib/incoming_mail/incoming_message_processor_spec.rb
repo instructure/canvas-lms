@@ -53,6 +53,21 @@ describe IncomingMail::IncomingMessageProcessor do
     @new_message.should be_sent
   end
 
+  let(:message_handler) { MockMessageHandler.new }
+
+  class MockMessageHandler
+    attr_reader :account, :body, :html_body, :incoming_message, :message_id, :secure_id
+
+    def handle(account, body, html_body, incoming_message, message_id, secure_id)
+      @account = account
+      @body = body
+      @html_body = html_body
+      @incoming_message = incoming_message
+      @message_id = message_id
+      @secure_id = secure_id
+    end
+  end
+
   before(:all) do
     setup_test_outgoing_mail
 
@@ -130,42 +145,31 @@ describe IncomingMail::IncomingMessageProcessor do
 
   describe "#process_single" do
     before(:each) do
-      IncomingMessageProcessor.configure({})
-
-      DiscussionTopic.incoming_replies = []
-      DiscussionTopic.reply_from_result = DiscussionEntry.new
-
-      discussion_topic_model
-      @cc = @user.communication_channels.build(:path_type => 'email', :path => "user@example.com")
-      @cc.confirm
-      @cc.save!
       @notification = Notification.create!
       @message = Message.create(:context => @topic, :user => @user, :notification => @notification)
-      @previous_message_count = Message.count
-      @previous_message_count.should == 1
     end
 
     it "should not choke on invalid UTF-8" do
-      IncomingMessageProcessor.new.process_single(Mail.new { body "he\xffllo" }, ReplyToAddress.new(@message).secure_id, @message.id)
-      DiscussionTopic.incoming_replies.length.should == 1
-      DiscussionTopic.incoming_replies[0][:text].should == 'hello'
-      DiscussionTopic.incoming_replies[0][:html].should == 'hello'
+      IncomingMessageProcessor.new(message_handler).process_single(Mail.new { body "he\xffllo" }, ReplyToAddress.new(@message).secure_id, @message.id)
+
+      message_handler.body.should == "hello"
+      message_handler.html_body.should == "hello"
     end
 
     it "should convert another charset to UTF-8" do
-      IncomingMessageProcessor.new.process_single(Mail.new {
+      IncomingMessageProcessor.new(message_handler).process_single(Mail.new {
           content_type 'text/plain; charset=Shift-JIS'
           body "\x83\x40"
         }, ReplyToAddress.new(@message).secure_id, @message.id)
-      DiscussionTopic.incoming_replies.length.should == 1
+
       comparison_string = "\xe3\x82\xa1"
       comparison_string.force_encoding("UTF-8")
-      DiscussionTopic.incoming_replies[0][:text].should == comparison_string
-      DiscussionTopic.incoming_replies[0][:html].should == comparison_string
+      message_handler.body.should == comparison_string
+      message_handler.html_body.should == comparison_string
     end
 
     it "should pick up html from a multipart" do
-      IncomingMessageProcessor.new.process_single(Mail.new {
+      IncomingMessageProcessor.new(message_handler).process_single(Mail.new {
           text_part do
             body 'This is plain text'
           end
@@ -174,93 +178,25 @@ describe IncomingMail::IncomingMessageProcessor do
             body '<h1>This is HTML</h1>'
           end
         }, ReplyToAddress.new(@message).secure_id, @message.id)
-      DiscussionTopic.incoming_replies.length.should == 1
-      DiscussionTopic.incoming_replies[0][:text].should == 'This is plain text'
-      DiscussionTopic.incoming_replies[0][:html].should == '<h1>This is HTML</h1>'
+      message_handler.body.should == 'This is plain text'
+      message_handler.html_body.should == '<h1>This is HTML</h1>'
     end
 
-    it "should not try to load messages with invalid IDs" do
-      account, message = [mock, mock]
-      account.expects(:address).returns('user@example.com')
-      message.expects(:to).returns(['user@example.com'])
-      result = IncomingMessageProcessor.find_matching_to_address(message, account)
-      result.should == [false, false]
-    end
+    it "should not send a bounce reply when the incoming message is an auto-response" do
+      user_model
+      @cc = @user.communication_channels.build(:path_type => 'email', :path => "user@example.com")
+      @cc.confirm
+      @cc.save!
+      @message.context = nil # potentially bounce
+      @message.save!
+      incoming_bounce_mail = simple_mail_from_user
+      incoming_bounce_mail['Auto-Submitted'] = 'auto-generated' # but don't bounce with this header
 
-    describe "when data is not found" do
-      it "should not send a bounce reply sent a bogus message id" do
-        expect {
-          IncomingMessageProcessor.new.process_single(simple_mail_from_user,
-            ReplyToAddress.new(@message).secure_id, -1)
-        }.to change { ActionMailer::Base.deliveries.size }.by(0)
-        Message.count.should eql @previous_message_count
-      end
+      message_handler.expects(:handle).never
 
-      it "should not send a bounce reply when sent a bogus secure_id" do
-        expect {
-          IncomingMessageProcessor.new.process_single(simple_mail_from_user,
-            "deadbeef", @message.id)
-        }.to change { ActionMailer::Base.deliveries.size }.by(0)
-        Message.count.should eql @previous_message_count
-      end
-
-      it "should not send a bounce reply when the original message does not have a notification" do
-        @message.context = nil # potentially bounce
-        @message.notification = nil # but don't bounce this
-        @message.save!
-        expect {
-          IncomingMessageProcessor.new.process_single(simple_mail_from_user,
-            ReplyToAddress.new(@message).secure_id, @message.id)
-        }.to change { ActionMailer::Base.deliveries.size }.by(0)
-        Message.count.should eql @previous_message_count
-      end
-
-      it "should not send a bounce reply when the incoming message is an auto-response" do
-        @message.context = nil # potentially bounce
-        @message.save!
-        incoming_bounce_mail = simple_mail_from_user
-        incoming_bounce_mail['Auto-Submitted'] = 'auto-generated' # but don't bounce with this header
-        expect {
-          IncomingMessageProcessor.new.process_single(incoming_bounce_mail,
-            ReplyToAddress.new(@message).secure_id, @message.id)
-        }.to change { ActionMailer::Base.deliveries.size }.by(0)
-        Message.count.should eql @previous_message_count
-      end
-
-      it "should send a bounce reply when user is not found" do
-        @message.user = nil
-        @message.save!
-        IncomingMessageProcessor.new.process_single(simple_mail_from_user,
-          ReplyToAddress.new(@message).secure_id, @message.id)
-        check_new_message(:unknown)
-      end
-
-      it "should send a bounce reply when context is not found" do
-        @message.context = nil
-        @message.save!
-        IncomingMessageProcessor.new.process_single(simple_mail_from_user,
-          ReplyToAddress.new(@message).secure_id, @message.id)
-        check_new_message(:unknown)
-      end
-
-      it "should send a bounce reply directly if no communication channel is found" do
-        @message.context = nil # to make it bounce
-        @message.save!
-        expect {
-          IncomingMessageProcessor.new.process_single(Mail.new(:body => "body", :from => "bogus_email@example.com"),
-          ReplyToAddress.new(@message).secure_id, @message.id)
-        }.to change { ActionMailer::Base.deliveries.size }.by(1)
-        Message.count.should eql @previous_message_count
-      end
-    end
-
-    it "should send a bounce reply when reply_from raises ReplyToLockedTopicError" do
-      DiscussionTopic.reply_from_result = IncomingMessageProcessor::ReplyToLockedTopicError
-      IncomingMessageProcessor.new.process_single(simple_mail_from_user,
+      IncomingMessageProcessor.new(message_handler).process_single(incoming_bounce_mail,
         ReplyToAddress.new(@message).secure_id, @message.id)
-      check_new_message(:locked)
     end
-
   end
 
   describe "#process" do
@@ -292,7 +228,7 @@ describe IncomingMail::IncomingMessageProcessor do
       @mock_mailbox.expects(:connect)
       @mock_mailbox.expects(:each_message)
       @mock_mailbox.expects(:disconnect)
-      IncomingMessageProcessor.new.process
+      IncomingMessageProcessor.new(message_handler).process
     end
 
     it "should process incoming_mail configuration with multiple accounts" do
@@ -312,7 +248,7 @@ describe IncomingMail::IncomingMessageProcessor do
 
       seq = sequence('create_mailbox')
       imp = IncomingMessageProcessor
-      imp.expects(:create_mailbox).in_sequence(seq).returns(@mock_mailbox).with do |account| 
+      imp.expects(:create_mailbox).in_sequence(seq).returns(@mock_mailbox).with do |account|
         account.protocol == :imap &&
         account.config == { :server => 'fake', :username => 'user1@fake.fake', :password => 'pass1'}
       end
@@ -330,7 +266,7 @@ describe IncomingMail::IncomingMessageProcessor do
       @mock_mailbox.expects(:disconnect).times(3)
 
       IncomingMessageProcessor.configure(config)
-      IncomingMessageProcessor.new.process
+      IncomingMessageProcessor.new(message_handler).process
     end
 
     it "should extract special values from account settings" do
@@ -374,7 +310,7 @@ describe IncomingMail::IncomingMessageProcessor do
         @mock_mailbox.expects(:delete_message).with(:baz)
         @mock_mailbox.expects(:each_message).multiple_yields([:foo, foo], [:bar, bar], [:baz, baz])
         @mock_mailbox.expects(:disconnect)
-        imp = IncomingMessageProcessor.new
+        imp = IncomingMessageProcessor.new(message_handler)
         imp.expects(:process_single).with(kind_of(Mail::Message), "123", 1, anything)
         imp.expects(:process_single).with(kind_of(Mail::Message), "456", 2, anything)
         imp.expects(:process_single).with(kind_of(Mail::Message), "abc", 3, anything)
@@ -391,7 +327,7 @@ describe IncomingMail::IncomingMessageProcessor do
         @mock_mailbox.expects(:delete_message).with(:foo)
         @mock_mailbox.expects(:each_message).yields(:foo, foo)
         @mock_mailbox.expects(:disconnect)
-        imp = IncomingMessageProcessor.new
+        imp = IncomingMessageProcessor.new(message_handler)
         imp.expects(:process_single).with(kind_of(Mail::Message), "123", 1, anything)
 
         imp.process
@@ -408,7 +344,7 @@ describe IncomingMail::IncomingMessageProcessor do
         ErrorReport.expects(:log_error).
           with(IncomingMessageProcessor.error_report_category, kind_of(Hash))
 
-        IncomingMessageProcessor.new.process
+        IncomingMessageProcessor.new(message_handler).process
       end
 
       it "should move aside messages that raise errors" do
@@ -424,7 +360,7 @@ describe IncomingMail::IncomingMessageProcessor do
         ErrorReport.expects(:log_exception).
           with(IncomingMessageProcessor.error_report_category, kind_of(StandardError), anything)
 
-        IncomingMessageProcessor.new.process
+        IncomingMessageProcessor.new(message_handler).process
       end
 
       it "should abort account processing on exception, but continue processing other accounts" do
@@ -446,14 +382,14 @@ describe IncomingMail::IncomingMessageProcessor do
         ErrorReport.expects(:log_exception).
           with(IncomingMessageProcessor.error_report_category, kind_of(StandardError), anything)
 
-        IncomingMessageProcessor.new.process
+        IncomingMessageProcessor.new(message_handler).process
       end
     end
 
     it "should accept multiple account types with overrides" do
       config = {
         'imap' => {
-          'server' => 'fake', 
+          'server' => 'fake',
           'accounts' => [
             {'username' => 'foo'},
             {'username' => 'bar'},
@@ -473,6 +409,16 @@ describe IncomingMail::IncomingMessageProcessor do
       usernames.count('foo').should eql 1
       usernames.count('bar').should eql 1
       usernames.count(nil).should eql 1
+    end
+
+    it "should not try to load messages with invalid IDs" do
+      # this should be tested through the public "process" method
+      # rather than calling the private "find_matching_to_address" directly
+      account, message = [mock, mock]
+      account.expects(:address).returns('user@example.com')
+      message.expects(:to).returns(['user@example.com'])
+      result = IncomingMessageProcessor.find_matching_to_address(message, account)
+      result.should == [false, false]
     end
   end
 
@@ -513,7 +459,7 @@ describe IncomingMail::IncomingMessageProcessor do
       end
 
       ErrorReport.expects(:log_exception)
-      IncomingMessageProcessor.new.process
+      IncomingMessageProcessor.new(message_handler).process
       processed_second.should be_true
     end
   end

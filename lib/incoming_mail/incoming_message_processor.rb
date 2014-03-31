@@ -40,6 +40,10 @@ module IncomingMail
       attr_accessor :mailbox_accounts, :settings, :deprecated_settings
     end
 
+    def initialize(message_handler)
+      @message_handler = message_handler
+    end
+
     # See config/incoming_mail.yml.example for documentation on how to configure incoming mail
     def self.configure(config)
       configure_settings(config.except(*mailbox_keys))
@@ -62,9 +66,17 @@ module IncomingMail
       end
     end
 
-    def process_single(incoming_message, secure_id, message_id, account = IncomingMail::MailboxAccount.new)
+    def process_single(incoming_message, secure_id, message_id, mailbox_account = IncomingMail::MailboxAccount.new)
       return if self.class.bounce_message?(incoming_message)
 
+      body, html_body = extract_body(incoming_message)
+
+      @message_handler.handle(mailbox_account.address, body, html_body, incoming_message, message_id, secure_id)
+    end
+
+    private
+
+    def extract_body(incoming_message)
       if incoming_message.multipart? && part = incoming_message.parts.find { |p| p.content_type.try(:match, %r{^text/html(;|$)}) }
         html_body = self.class.utf8ify(part.body.decoded, part.charset)
       end
@@ -76,34 +88,8 @@ module IncomingMail
       if !html_body
         html_body = self.class.format_message(body).first
       end
-
-      begin
-        original_message = Message.find_by_id(message_id)
-        # This prevents us from rebouncing users that have auto-replies setup -- only bounce something
-        # that was sent out because of a notification.
-        raise IncomingMessageProcessor::SilentIgnoreError unless original_message && original_message.notification_id
-        raise IncomingMessageProcessor::SilentIgnoreError unless secure_id == ReplyToAddress.new(original_message).secure_id
-
-        original_message.shard.activate do
-          context = original_message.context
-          user = original_message.user
-          raise IncomingMessageProcessor::UnknownAddressError unless user && context && context.respond_to?(:reply_from)
-          context.reply_from({
-            :purpose => 'general',
-            :user => user,
-            :subject => self.class.utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
-            :html => html_body,
-            :text => body
-          })
-        end
-      rescue IncomingMessageProcessor::ReplyFromError => error
-        IncomingMessageProcessor.ndr(original_message, incoming_message, error, account)
-      rescue IncomingMessageProcessor::SilentIgnoreError
-        # ignore it
-      end
+      return body, html_body
     end
-
-    private
 
     def self.mailbox_keys
       MailboxClasses.keys.map(&:to_s)
@@ -283,73 +269,5 @@ module IncomingMail
       # so that self.process message stops processing.
       [false, false]
     end
-
-    def self.ndr(original_message, incoming_message, error, account)
-      incoming_from = incoming_message.from.try(:first)
-      incoming_subject = incoming_message.subject
-      return unless incoming_from
-
-      ndr_subject, ndr_body = IncomingMessageProcessor.ndr_strings(incoming_subject, error)
-      outgoing_message = Message.new({
-        :to => incoming_from,
-        :from => account.address,
-        :subject => ndr_subject,
-        :body => ndr_body,
-        :delay_for => 0,
-        :context => nil,
-        :path_type => 'email',
-        :from_name => "Instructure",
-      })
-
-      outgoing_message_delivered = false
-      if original_message
-        original_message.shard.activate do
-          comch = CommunicationChannel.active.find_by_path_and_path_type(incoming_from, 'email')
-          outgoing_message.communication_channel = comch
-          outgoing_message.user = comch.try(:user)
-          if outgoing_message.communication_channel && outgoing_message.user
-            outgoing_message.save
-            outgoing_message.deliver
-            outgoing_message_delivered = true
-          end
-        end
-      end
-
-      unless outgoing_message_delivered
-        # Can't use our usual mechanisms, so just try to send it once now
-        begin
-          res = Mailer.create_message(outgoing_message).deliver
-        rescue => e
-          # TODO: put some kind of error logging here?
-        end
-      end
-    end
-
-    def self.ndr_strings(subject, error)
-      ndr_subject = ""
-      ndr_body = ""
-      case error
-      when IncomingMessageProcessor::ReplyToLockedTopicError
-        ndr_subject = I18n.t('lib.incoming_message_processor.locked_topic.subject', "Message Reply Failed: %{subject}", :subject => subject)
-        ndr_body = I18n.t('lib.incoming_message_processor.locked_topic.body', <<-BODY, :subject => subject).strip_heredoc
-          The message titled "%{subject}" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
-
-          Thank you,
-          Canvas Support
-        BODY
-      else # including IncomingMessageProcessor::UnknownAddressError
-        ndr_subject = I18n.t('lib.incoming_message_processor.failure_message.subject', "Message Reply Failed: %{subject}", :subject => subject)
-        ndr_body = I18n.t('lib.incoming_message_processor.failure_message.body', <<-BODY, :subject => subject).strip_heredoc
-          The message titled "%{subject}" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
-
-          Thank you,
-          Canvas Support
-        BODY
-      end
-
-      [ndr_subject, ndr_body]
-    end
-
   end
-
 end

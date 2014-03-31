@@ -3,4 +3,4 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'config', 'environment'))
 require 'incoming_mail/incoming_message_processor'
 
-IncomingMail::IncomingMessageProcessor.new.process
+IncomingMail::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new).process

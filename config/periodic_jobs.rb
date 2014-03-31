@@ -75,7 +75,7 @@ end
 
 if IncomingMail::IncomingMessageProcessor.run_periodically?
   Delayed::Periodic.cron 'IncomingMessageProcessor.process', '*/1 * * * *' do
-    IncomingMail::IncomingMessageProcessor.new.process
+    IncomingMail::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new).process
   end
 end
 
