@@ -77,7 +77,7 @@ def test_selective_content(source_course=nil)
   @course.assignments.count.should == 1
 end
 
-describe "content migrations" do
+describe "content migrations", :non_parallel do
   include_examples "in-process server selenium tests"
 
   context "common cartridge importing" do

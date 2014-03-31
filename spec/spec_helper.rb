@@ -26,7 +26,10 @@ if CANVAS_RAILS2
 end
 
 unless CANVAS_RAILS2 || ENV['NO_RERUN']
-  require 'timeout'
+  Spec.configure do |c|
+   c.treat_symbols_as_metadata_keys_with_true_values = true
+  end 
+
   RSpec.configure do |c|
     c.around(:each) do |example|
       attempts = 0

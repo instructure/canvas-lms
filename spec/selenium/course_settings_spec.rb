@@ -165,7 +165,7 @@ describe "course settings" do
   end
 
   context "right sidebar" do
-    it "should allow entering student view from the right sidebar" do
+    it "should allow entering student view from the right sidebar", :non_parallel do
       @fake_student = @course.student_view_student
       get "/courses/#{@course.id}/settings"
       f(".student_view_button").click
