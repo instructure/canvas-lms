@@ -1484,14 +1484,6 @@ routes.draw do
       get "#{prefix}/:id", :action => :show
     end
 
-    scope(:controller => :data_exports_api, :module => :data_exports_api) do
-      prefix = "accounts/:account_id/data_exports"
-      get prefix, :action => :index, :path_name => "data_exports"
-      post prefix, :action => :create
-      get '#{prefix}/:id', :action => :show, :path_name => "data_export"
-      delete '#{prefix}/:id', :action => :cancel
-    end
-
     scope(:controller => :grading_standards_api) do
       post 'accounts/:account_id/grading_standards', :action => :create
       post 'courses/:course_id/grading_standards', :action => :create
