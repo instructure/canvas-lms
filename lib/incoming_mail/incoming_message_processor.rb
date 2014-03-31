@@ -55,26 +55,26 @@ module IncomingMail
       end
     end
 
-    def self.process
-      self.mailbox_accounts.each do |account|
-        mailbox = self.create_mailbox(account)
+    def process
+      self.class.mailbox_accounts.each do |account|
+        mailbox = self.class.create_mailbox(account)
         process_mailbox(mailbox, account)
       end
     end
 
-    def self.process_single(incoming_message, secure_id, message_id, account = IncomingMail::MailboxAccount.new)
-      return if IncomingMessageProcessor.bounce_message?(incoming_message)
+    def process_single(incoming_message, secure_id, message_id, account = IncomingMail::MailboxAccount.new)
+      return if self.class.bounce_message?(incoming_message)
 
       if incoming_message.multipart? && part = incoming_message.parts.find { |p| p.content_type.try(:match, %r{^text/html(;|$)}) }
-        html_body = utf8ify(part.body.decoded, part.charset)
+        html_body = self.class.utf8ify(part.body.decoded, part.charset)
       end
-      html_body = utf8ify(incoming_message.body.decoded, incoming_message.charset) if !incoming_message.multipart? && incoming_message.content_type.try(:match, %r{^text/html(;|$)})
+      html_body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset) if !incoming_message.multipart? && incoming_message.content_type.try(:match, %r{^text/html(;|$)})
       if incoming_message.multipart? && part = incoming_message.parts.find { |p| p.content_type.try(:match, %r{^text/plain(;|$)}) }
-        body = utf8ify(part.body.decoded, part.charset)
+        body = self.class.utf8ify(part.body.decoded, part.charset)
       end
-      body ||= utf8ify(incoming_message.body.decoded, incoming_message.charset)
+      body ||= self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)
       if !html_body
-        html_body = format_message(body).first
+        html_body = self.class.format_message(body).first
       end
 
       begin
@@ -91,7 +91,7 @@ module IncomingMail
           context.reply_from({
             :purpose => 'general',
             :user => user,
-            :subject => utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
+            :subject => self.class.utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
             :html => html_body,
             :text => body
           })
@@ -210,19 +210,19 @@ module IncomingMail
     end
 
 
-    def self.process_mailbox(mailbox, account)
+    def process_mailbox(mailbox, account)
       addr, domain = account.address.split(/@/)
       error_folder = account.error_folder
       mailbox.connect
       mailbox.each_message do |message_id, raw_contents|
-        message, errors = parse_message(raw_contents)
+        message, errors = self.class.parse_message(raw_contents)
         if message && !errors.present?
           process_message(message, account)
           mailbox.delete_message(message_id)
         else
           mailbox.move_message(message_id, error_folder)
           if message
-            ErrorReport.log_error(error_report_category, {
+            ErrorReport.log_error(self.class.error_report_category, {
               :message => "Error parsing email",
               :backtrace => message.errors.flatten.map(&:to_s).join("\n"),
               :from => message.from.try(:first),
@@ -235,7 +235,7 @@ module IncomingMail
     rescue => e
       # any exception that makes it here probably means the connection is broken
       # skip this account, but the rest of the accounts should still be tried
-      ErrorReport.log_exception(error_report_category, e)
+      ErrorReport.log_exception(self.class.error_report_category, e)
     end
 
     def self.parse_message(raw_contents)
@@ -259,13 +259,13 @@ module IncomingMail
       end
     end
 
-    def self.process_message(message, account)
-      secure_id, outgoing_message_id = find_matching_to_address(message, account)
+    def process_message(message, account)
+      secure_id, outgoing_message_id = self.class.find_matching_to_address(message, account)
       # TODO: Add bounce processing and handling of other email to the default notification address.
       return unless secure_id && outgoing_message_id
-      self.process_single(message, secure_id, outgoing_message_id, account)
+      process_single(message, secure_id, outgoing_message_id, account)
     rescue => e
-      ErrorReport.log_exception(error_report_category, e,
+      ErrorReport.log_exception(self.class.error_report_category, e,
         :from => message.from.try(:first),
         :to => message.to.to_s)
     end
