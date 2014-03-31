@@ -191,6 +191,7 @@ class ProfileController < ApplicationController
     else
       @user = @current_user
     end
+    @user_data = profile_data(@user.profile, @current_user, session, [])
     @channels = @user.communication_channels.unretired
     @email_channels = @channels.select{|c| c.path_type == "email"}
     @sms_channels = @channels.select{|c| c.path_type == 'sms'}
