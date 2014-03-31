@@ -25,7 +25,8 @@ describe "i18n js" do
   context "locales" do
     it "should pull in core translations for all locales" do
       pending('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
-      driver.execute_script(<<-JS).sort.should == I18n.available_locales.map(&:to_s).sort
+      keep_trying_until do
+        driver.execute_script(<<-JS).sort.should == I18n.available_locales.map(&:to_s).sort
         var ary = [];
         _.each(I18n.translations, function(translations, locale) {
           if (_.all(['date', 'time', 'number', 'datetime', 'support'], function(k) { return translations[k] })) {
@@ -33,7 +34,8 @@ describe "i18n js" do
           }
         })
         return ary;
-      JS
+        JS
+      end
     end
   end
 
@@ -44,7 +46,7 @@ describe "i18n js" do
       (I18n.available_locales - [:en]).each do |locale|
         exec_cs("I18n.locale = '#{locale}'")
         require_exec('i18n!conferences', "i18n.t('confirm.delete')").should ==
-          I18n.t('conferences.confirm.delete', :locale => locale)
+            I18n.t('conferences.confirm.delete', :locale => locale)
       end
     end
   end
