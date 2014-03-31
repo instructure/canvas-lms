@@ -921,6 +921,7 @@ define [
         sortable: true
         editor: LongTextEditor
         autoEdit: false
+        maxLength: 255
 
     initGrid: =>
       #this is used to figure out how wide to make each column
