@@ -20,7 +20,7 @@ if CANVAS_RAILS2
   gem 'erubis', '2.7.0'
   gem 'fake_arel', '1.5.0'
   gem 'fake_rails3_routes', '1.0.4'
-  gem 'journey', '1.0.4'
+    gem 'journey', '1.0.4'
   gem 'rack', '1.1.3'
   gem 'folio-pagination-legacy', '0.0.3', :require => 'folio/rails'
   gem 'will_paginate', '2.3.15', :require => false
@@ -42,19 +42,19 @@ else
 end
 
 gem "aws-sdk", '1.21.0'
-gem 'uuidtools', '2.1.4'
+  gem 'uuidtools', '2.1.4'
 gem 'barby', '0.5.0'
 gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
 gem 'canvas_connect', '0.3.2'
-gem 'adobe_connect', '1.0.0'
+  gem 'adobe_connect', '1.0.0'
 gem 'canvas_webex', '0.13'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
 
 gem 'ffi', '1.1.5'
 gem 'hairtrigger', '0.2.3'
-gem 'ruby2ruby', '2.0.7'
+  gem 'ruby2ruby', '2.0.7'
 gem 'sass', '3.2.3'
 gem 'hashery', '1.3.0', :require => 'hashery/dictionary'
 gem 'highline', '1.6.1'
@@ -63,8 +63,8 @@ gem 'i18n', '0.6.8'
 gem 'i18nema', '0.0.7'
 gem 'icalendar', '1.1.5'
 gem 'jammit', '0.6.6'
-gem 'cssmin', '1.0.3'
-gem 'jsmin', '1.0.1'
+  gem 'cssmin', '1.0.3'
+  gem 'jsmin', '1.0.1'
 gem 'json', '1.8.1'
 gem 'oj', '2.5.5'
 
@@ -72,14 +72,14 @@ gem 'oj', '2.5.5'
 gem 'libxml-ruby', '2.6.0', :require => 'xml/libxml'
 gem 'macaddr', '1.0.0' # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
 gem 'mail', '2.5.4'
-gem 'treetop', '1.4.15'
-gem 'polyglot', '0.3.3'
+  gem 'treetop', '1.4.15'
+    gem 'polyglot', '0.3.3'
 gem 'marginalia', '1.1.3', :require => false
 gem 'mime-types', '1.17.2', :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
 # with mini_magick 3.1
 gem 'mini_magick', '1.3.2'
-gem 'subexec', '0.0.4'
+  gem 'subexec', '0.0.4'
 gem 'multi_json', '1.8.2'
 gem 'netaddr', '1.5.0'
 gem 'nokogiri', '1.5.6'
@@ -101,7 +101,7 @@ gem 'rubyzip', '1.1.0', :require => 'zip', :github => 'rubyzip/rubyzip', :ref =>
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace
 gem 'safe_yaml', '0.9.7', :require => false
 gem 'safe_yaml-instructure', '0.8.0', :require => false
-gem 'hashie', '2.0.5'
+  gem 'hashie', '2.0.5'
 gem 'sanitize', '2.0.3'
 gem 'shackles', '1.0.3'
 
