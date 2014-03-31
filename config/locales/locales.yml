@@ -34,6 +34,10 @@ pt:
   locales:
     pt: Português
   qualified_locale: pt-PT
+pt-BR:
+  locales:
+    pt: Português do Brasil
+  qualified_locale: pt-BR
 ja:
   locales:
     ja: 日本語
