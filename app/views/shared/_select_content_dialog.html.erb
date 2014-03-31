@@ -120,6 +120,7 @@
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
           <%# cache on the context.wiki instead of just the context because even though it will require a db query, we will get a much better cache hit rate %>
+          <option value="new"><%= t :new_page_option, "[ New Page ]" %></option>
           <% cache([@context.wiki, 'non_deleted_wiki_pages']) do  %>
             <% @context.wiki.wiki_pages.not_deleted.select([:id, :title]).each do |page| %>
               <% if page && !page.new_record? %>
@@ -127,7 +128,6 @@
               <% end %>
             <% end %>
           <% end %>
-          <option value="new"><%= t :new_page_option, "[ New Page ]" %></option>
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
@@ -145,6 +145,7 @@
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
+          <option value="new"><%= t :new_file_option, "[ New File ]" %></option>
           <% includes = @context.grants_right?(@current_user, session, :manage_files) ? :active_file_attachments : :visible_file_attachments %>
           <% Canvas::ICU.collate_by(@context.folders.active.limit(200).includes(includes), &:full_name).each do |folder| %>
             <optgroup label="<%= folder.full_name %>">
@@ -153,7 +154,6 @@
               <% end %>
             </optgroup>
           <% end %>
-          <option value="new"><%= t :new_file_option, "[ New File ]" %></option>
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
@@ -186,11 +186,11 @@
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
-          <% @context.quizzes.active.limit(400).each do |quiz| %>
-            <option value="<%= quiz.id %>"><%= quiz.title %></option>
-          <% end %>
           <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
             <option value="new"><%= t :new_quiz_option, "[ New Quiz ]" %></option>
+          <% end %>
+          <% @context.quizzes.active.limit(400).each do |quiz| %>
+            <option value="<%= quiz.id %>"><%= quiz.title %></option>
           <% end %>
         </select>
         </div>
@@ -229,14 +229,14 @@
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
           <% @context.assignment_groups.active.include_active_assignments.each do |group| %>
+            <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
+              <option value="new"><%= t :new_assignment_option, "[ New Assignment ]" %></option>
+            <% end %>
             <optgroup label="<%= group.name %>">
             <% group.active_assignments.no_graded_quizzes_or_topics.limit(200).each do |assignment| %>
               <option value="<%= assignment.id %>"><%= assignment.title %></option>
             <% end %>
             </optgroup>
-          <% end %>
-          <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
-            <option value="new"><%= t :new_assignment_option, "[ New Assignment ]" %></option>
           <% end %>
         </select>
         </div>
@@ -255,10 +255,10 @@
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
+          <option value="new"><%= t :new_topic_option, "[ New Topic ]" %></option>
           <% @context.discussion_topics.active.only_discussion_topics.scoped({:limit => 200}).each do |topic| %>
             <option value="<%= topic.id %>"><%= topic.title %></option>
           <% end %>
-          <option value="new"><%= t :new_topic_option, "[ New Topic ]" %></option>
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">

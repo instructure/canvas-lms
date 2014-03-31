@@ -30,8 +30,8 @@ describe "/shared/_select_content_dialog" do
     response.should_not be_nil
     page = Nokogiri(response.body)
     options = page.css("#attachments_select .module_item_select option")
-    options[0].text.should == "a"
-    options[1].text.should == "b"
+    options[1].text.should == "a"
+    options[2].text.should == "b"
   end
 
   it "should include unpublished wiki pages" do
