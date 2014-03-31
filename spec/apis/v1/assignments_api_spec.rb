@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -401,8 +401,12 @@ describe AssignmentsApiController, type: :request do
 
 
   describe "POST /courses/:course_id/assignments (#create)" do
-    it "allows authenticated users to create assignments" do
+
+    before do
       course_with_teacher(:active_all => true)
+    end
+
+    it "allows authenticated users to create assignments" do
       @course.assignment_groups.create!({:name => "first group"})
       @group = @course.assignment_groups.create!({:name => "some group"})
       @course.assignment_groups.create!({:name => "last group",
@@ -414,9 +418,9 @@ describe AssignmentsApiController, type: :request do
             { 'name' => 'some assignment',
               'position' => '1',
               'points_possible' => '12',
-              'due_at' => '2011-01-01',
-              'lock_at' => '2011-01-03',
-              'unlock_at' => '2011-12-31',
+              'due_at' => '2011-01-01T00:00:00Z',
+              'lock_at' => '2011-01-03T00:00:00Z',
+              'unlock_at' => '2011-12-31T00:00:00Z',
               'description' => 'assignment description',
               'assignment_group_id' => @group.id,
               'submission_types' => [
@@ -429,7 +433,7 @@ describe AssignmentsApiController, type: :request do
               'grade_group_students_individually' => true,
               'automatic_peer_reviews' => true,
               'peer_reviews' => true,
-              'peer_reviews_assign_at' => '2011-01-01',
+              'peer_reviews_assign_at' => '2011-01-02T00:00:00Z',
               'peer_review_count' => 2,
               'group_category_id' => @group_category.id,
               'turnitin_enabled' => true,
@@ -489,7 +493,6 @@ describe AssignmentsApiController, type: :request do
 
     it "should not allow assignment titles longer than 255 characters" do
       name_too_long = greater_than_255
-      course_with_teacher(:active_all => true)
       #not create an assignment with a name too long
       lambda{
         raw_api_call(:post,
@@ -508,7 +511,6 @@ describe AssignmentsApiController, type: :request do
 
     it "should not allow updating an assignment title to longer than 255 characters" do
       name_too_long = greater_than_255
-      course_with_teacher(:active_all => true)
       #create an assignment
       @json = api_create_assignment_in_course(@course, {'name' => 'some name'})
       @assignment = Assignment.find @json['id']
@@ -533,7 +535,6 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "does not allow modifying turnitin_enabled when not enabled on the context" do
-      course_with_teacher(:active_all => true)
       Course.any_instance.expects(:turnitin_enabled?).at_least_once.returns false
       response = api_create_assignment_in_course(@course,
             { 'name' => 'some assignment',
@@ -546,8 +547,6 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "should process html content in description on create" do
-      course_with_teacher(:active_all => true)
-
       should_process_incoming_user_content(@course) do |content|
         api_create_assignment_in_course(@course, { 'description' => content })
 
@@ -558,7 +557,6 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "allows creating an assignment with overrides via the API" do
-      course_with_teacher(:active_all => true)
       student_in_course(:course => @course, :active_enrollment => true)
 
       @adhoc_due_at = 5.days.from_now
@@ -602,7 +600,6 @@ describe AssignmentsApiController, type: :request do
 
     it "takes overrides into account in the assignment-created notification " +
       "for assignments created with overrides" do
-      course_with_teacher(:active_all => true)
       student_in_course(:course => @course, :active_enrollment => true)
       course_with_ta(:course => @course, :active_enrollment => true)
       @course.course_sections.create!
@@ -648,7 +645,6 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "should not allow an assignment_group_id that is not a number" do
-      course_with_teacher(:active_all => true)
       student_in_course(:course => @course, :active_enrollment => true)
       @user = @teacher
 
@@ -670,7 +666,6 @@ describe AssignmentsApiController, type: :request do
     end
 
   end
-
 
   describe "PUT /courses/:course_id/assignments/:id (#update)" do
 
@@ -716,6 +711,55 @@ describe AssignmentsApiController, type: :request do
         should == "Can't unpublish if there are student submissions"
     end
 
+    it "should 400 with invalid date times" do
+      course_with_teacher(:active_all => true)
+      the_date = 1.day.ago
+      @assignment = @course.assignments.create({
+        :name => "some assignment",
+        :points_possible => 15
+      })
+      @assignment.due_at = the_date
+      @assignment.lock_at = the_date
+      @assignment.unlock_at = the_date
+      @assignment.peer_reviews_assign_at = the_date
+      @assignment.save!
+
+      raw_api_update_assignment(@course, @assignment,
+                                {'peer_reviews_assign_at' => '1/1/2013' })
+      response.should_not be_success
+      response.code.should eql '400'
+      json = JSON.parse response.body
+      json['errors']['assignment[peer_reviews_assign_at]'].first['message'].
+        should == 'Invalid datetime for peer_reviews_assign_at'
+    end
+
+    it "should allow clearing dates" do
+      course_with_teacher(:active_all => true)
+      the_date = 1.day.ago
+      @assignment = @course.assignments.create({
+        :name => "some assignment",
+        :points_possible => 15
+      })
+      @assignment.due_at = the_date
+      @assignment.lock_at = the_date
+      @assignment.unlock_at = the_date
+      @assignment.peer_reviews_assign_at = the_date
+      @assignment.save!
+
+      api_update_assignment_call(@course, @assignment,
+                                 {'due_at' => nil,
+                                  'lock_at' => '',
+                                  'unlock_at' => nil,
+                                  'peer_reviews_assign_at' => nil })
+      response.should be_success
+      @assignment.reload
+
+      @assignment.due_at.should be_nil
+      @assignment.lock_at.should be_nil
+      @assignment.unlock_at.should be_nil
+      @assignment.peer_reviews_assign_at.should be_nil
+    end
+
     context "without overrides or frozen attributes" do
       before do
         course_with_teacher(:active_all => true)
@@ -746,7 +790,7 @@ describe AssignmentsApiController, type: :request do
           'group_category_id' => nil,
           'description' => 'assignment description',
           'grading_type' => 'letter_grade',
-          'due_at' => '2011-01-01',
+          'due_at' => '2011-01-01T00:00:00Z',
           'position' => 1,
           'muted' => true
         })

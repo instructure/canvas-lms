@@ -262,6 +262,7 @@ module Api::V1::Assignment
     return if overrides && !overrides.is_a?(Array)
 
     return false unless valid_assignment_group_id?(assignment, assignment_params)
+    return false unless valid_assignment_dates?(assignment, assignment_params)
 
     assignment = update_from_params(assignment, assignment_params)
 
@@ -278,6 +279,20 @@ module Api::V1::Assignment
     return true
   rescue ActiveRecord::RecordInvalid
     return false
+  end
+
+  # validate that date and times are iso8601
+  def valid_assignment_dates?(assignment, assignment_params)
+    errors = ['due_at', 'lock_at', 'unlock_at', 'peer_reviews_assign_at'].map do |v|
+      if assignment_params[v].present? && assignment_params[v] !~ Api::ISO8601_REGEX
+        assignment.errors.add("assignment[#{v}]",
+                              I18n.t("assignments_api.invalid_date_time",
+                                     'Invalid datetime for %{attribute}',
+                                     attribute: v))
+      end
+    end
+
+    errors.compact.empty?
   end
 
   def valid_assignment_group_id?(assignment, assignment_params)
@@ -334,40 +349,9 @@ module Api::V1::Assignment
       assignment.muted = value_to_boolean(assignment_params.delete("muted"))
     end
 
-    exception_message = ["invalid due_at",
-                         "assignment_params: #{assignment_params}",
-                         "user: #{@current_user.attributes}",
-                         "account: #{assignment.context.root_account.attributes}",
-                         "course: #{assignment.context.attributes}",
-                         "assignment: #{assignment.attributes}"].join(",\n")
-
     # do some fiddling with due_at for fancy midnight and add to update_params
-    # validate that date and times are iso8601 otherwise ignore them, but still
-    # allow clearing them when set to nil
-    if update_params['due_at'].present? && update_params['due_at'] !~ Api::ISO8601_REGEX
-      Api.invalid_time_stamp_error('due_at', exception_message)
-      # todo stop logging and delete invalid dates
-      # update_params.delete(:due_at)
-    elsif update_params.has_key?('due_at')
+    if update_params['due_at'].present? && update_params['due_at'] =~ Api::ISO8601_REGEX
       update_params['time_zone_edited'] = Time.zone.name
-    end
-
-    if update_params['lock_at'].present? && update_params['lock_at'] !~ Api::ISO8601_REGEX
-      Api.invalid_time_stamp_error('lock_at', exception_message)
-      # todo stop logging and delete invalid dates
-      # update_params.delete(:lock_at)
-    end
-
-    if update_params['unlock_at'].present? && update_params['unlock_at'] !~ Api::ISO8601_REGEX
-      Api.invalid_time_stamp_error('unlock_at', exception_message)
-      # todo stop logging and delete invalid dates
-      # update_params.delete(:unlock_at)
-    end
-
-    if update_params['peer_reviews_due_at'].present? && update_params['peer_reviews_due_at'] !~ Api::ISO8601_REGEX
-      Api.invalid_time_stamp_error('peer_reviews_due_at', exception_message)
-      # todo stop logging and delete invalid dates
-      # update_params.delete(:peer_reviews_due_at)
     end
 
     if !assignment.context.try(:turnitin_enabled?)
