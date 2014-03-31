@@ -380,50 +380,97 @@ describe "Users API", type: :request do
   end
 
   describe "user account creation" do
-    it "should allow site admins to create users" do
-      json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
-        { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
-        {
-          :user => {
-            :name          => "Test User",
-            :short_name    => "Test",
-            :sortable_name => "User, T.",
-            :time_zone     => "Mountain Time (US & Canada)",
-            :locale        => 'en'
-          },
-          :pseudonym => {
-            :unique_id         => "test@example.com",
-            :password          => "password123",
-            :sis_user_id       => "12345",
-            :send_confirmation => 0
-          }
-        }
+    def create_user_skip_cc_confirm(admin_user)
+      json = api_call(:post, "/api/v1/accounts/#{admin_user.account.id}/users",
+                      { :controller => 'users', :action => 'create', :format => 'json', :account_id => admin_user.account.id.to_s },
+                      {
+                          :user => {
+                              :name          => "Test User",
+                              :short_name    => "Test",
+                              :sortable_name => "User, T.",
+                              :time_zone     => "Mountain Time (US & Canada)",
+                              :locale        => 'en'
+                          },
+                          :pseudonym => {
+                              :unique_id         => "test@example.com",
+                              :password          => "password123",
+                              :sis_user_id       => "12345",
+                              :send_confirmation => 0
+                          },
+                          :communication_channel => {
+                              :type => "sms",
+                              :address => '8018888888',
+                              :skip_confirmation => 1
+                          }
+                      }
       )
       users = User.find_all_by_name "Test User"
       users.length.should eql 1
       user = users.first
-      user.name.should eql "Test User"
-      user.short_name.should eql "Test"
-      user.sortable_name.should eql "User, T."
-      user.time_zone.name.should eql "Mountain Time (US & Canada)"
-      user.locale.should eql 'en'
+      user.sms_channel.workflow_state.should == 'active'
+    end
 
-      user.pseudonyms.count.should eql 1
-      pseudonym = user.pseudonyms.first
-      pseudonym.unique_id.should eql "test@example.com"
-      pseudonym.sis_user_id.should eql "12345"
+    context 'as a site admin' do
+      before do
+        @site_admin = user_with_pseudonym
+        Account.site_admin.add_user(@site_admin)
+      end
 
-      JSON.parse(response.body).should == {
-        "name"          => "Test User",
-        "short_name"    => "Test",
-        "sortable_name" => "User, T.",
-        "id"            => user.id,
-        "sis_user_id"   => "12345",
-        "sis_import_id" => user.pseudonym.sis_batch_id,
-        "login_id"      => "test@example.com",
-        "sis_login_id"  => "test@example.com",
-        "locale"        => "en"
-      }
+      it "should allow site admins to create users" do
+        json = api_call(:post, "/api/v1/accounts/#{@site_admin.account.id}/users",
+          { :controller => 'users', :action => 'create', :format => 'json', :account_id => @site_admin.account.id.to_s },
+          {
+            :user => {
+              :name          => "Test User",
+              :short_name    => "Test",
+              :sortable_name => "User, T.",
+              :time_zone     => "Mountain Time (US & Canada)",
+              :locale        => 'en'
+            },
+            :pseudonym => {
+              :unique_id         => "test@example.com",
+              :password          => "password123",
+              :sis_user_id       => "12345",
+              :send_confirmation => 0
+            }
+          }
+        )
+        users = User.find_all_by_name "Test User"
+        users.length.should eql 1
+        user = users.first
+        user.name.should eql "Test User"
+        user.short_name.should eql "Test"
+        user.sortable_name.should eql "User, T."
+        user.time_zone.name.should eql "Mountain Time (US & Canada)"
+        user.locale.should eql 'en'
+
+        user.pseudonyms.count.should eql 1
+        pseudonym = user.pseudonyms.first
+        pseudonym.unique_id.should eql "test@example.com"
+        pseudonym.sis_user_id.should eql "12345"
+
+        JSON.parse(response.body).should == {
+          "name"          => "Test User",
+          "short_name"    => "Test",
+          "sortable_name" => "User, T.",
+          "id"            => user.id,
+          "sis_user_id"   => "12345",
+          "sis_import_id" => user.pseudonym.sis_batch_id,
+          "login_id"      => "test@example.com",
+          "sis_login_id"  => "test@example.com",
+          "locale"        => "en"
+        }
+      end
+
+      it "should allow site admins to create users and auto-validate communication channel" do
+        create_user_skip_cc_confirm(@site_admin)
+      end
+    end
+
+    context 'as an account admin' do
+      it "should allow account admins to create users and auto-validate communication channel" do
+        create_user_skip_cc_confirm(@admin)
+      end
     end
 
     context "as a non-administrator" do
@@ -825,8 +872,7 @@ describe "Users API", type: :request do
 
         path = "/api/v1/accounts/#{Account.default.id}/users/#{id_param}"
         path_options = @path_options.merge(:id => id_param)
-
-        json = api_call(:delete, path, path_options)
+        api_call(:delete, path, path_options)
         response.code.should eql '200'
         @student.reload.should be_deleted
       end
@@ -857,7 +903,7 @@ describe "Users API", type: :request do
     before :each do
       @context = @user
     end
-    
+
     include_examples "file uploads api with folders"
     include_examples "file uploads api with quotas"
 
@@ -870,7 +916,7 @@ describe "Users API", type: :request do
     def has_query_exemption?
       false
     end
-      
+
     def context
       @user
     end

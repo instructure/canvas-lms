@@ -881,6 +881,12 @@ class UsersController < ApplicationController
   # @argument communication_channel[address] [Optional, String]
   #   The communication channel address, e.g. the user's email address.
   #
+  # @argument skip_confirmation [Optional, Boolean]
+  #   Only valid for site admins and account admins making requests; If true, the channel is
+  #   automatically validated and no confirmation email or SMS is sent.
+  #   Otherwise, the user must respond to a confirmation message to confirm the
+  #   channel.
+  #
   # @returns User
   def create
     # Look for an incomplete registration with this pseudonym
@@ -900,6 +906,8 @@ class UsersController < ApplicationController
     if params[:communication_channel]
       cc_type = params[:communication_channel][:type] || CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:communication_channel][:address]
+      skip_confirmation = value_to_boolean(params[:communication_channel][:skip_confirmation]) &&
+          (Account.site_admin.grants_right?(@current_user, :manage_students) || Account.default.grants_right?(@current_user, :manage_students))
     else
       cc_type = CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
@@ -967,7 +975,7 @@ class UsersController < ApplicationController
       @user.communication_channels.where(:path_type => cc_type).by_path(cc_addr).first ||
       @user.communication_channels.build(:path_type => cc_type, :path => cc_addr)
     @cc.user = @user
-    @cc.workflow_state = 'unconfirmed' unless @cc.workflow_state == 'confirmed'
+    @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
 
     if @user.valid? && @pseudonym.valid? && @observee.nil?
       # saving the user takes care of the @pseudonym and @cc, so we can't call
