@@ -80,46 +80,15 @@ describe IncomingMail::IncomingMessageProcessor do
 
   before(:all) do
     setup_test_outgoing_mail
-
-    DiscussionTopic.class_eval {
-      alias_method :old_reply_from, :reply_from
-      def reply_from(opts)
-        DiscussionTopic.incoming_replies ||= []
-        DiscussionTopic.incoming_replies << opts
-        result = DiscussionTopic.reply_from_result
-        if result.kind_of?(Class) && result.ancestors.include?(Exception)
-          raise result
-        else
-          result
-        end
-      end
-
-      def self.reply_from_result
-        @reply_from_result
-      end
-
-      def self.reply_from_result=(value)
-        @reply_from_result = value
-      end
-
-      def self.incoming_replies
-        @incoming_replies
-      end
-
-      def self.incoming_replies=(replies)
-        @incoming_replies = replies
-      end
-    }
   end
 
   before(:each) do
-    ErrorReport.expects(:log_exception).never
-    ErrorReport.expects(:log_error).never
+    error_reporter.expects(:log_exception).never
+    error_reporter.expects(:log_error).never
   end
 
   after(:all) do
     restore_original_outgoing_mail
-    DiscussionTopic.class_eval { alias_method :reply_from, :old_reply_from }
   end
 
   describe ".configure" do
