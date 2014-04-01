@@ -523,7 +523,38 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  
+
+  <xs:element name="media_tracks">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="media">
+          <xs:complexType>
+            <xs:attribute name="identifierref" type="xs:ID" use="required"/>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="track">
+                <xs:complexType>
+                  <xs:attribute name="identifierref" type="xs:ID" use="required"/>
+                  <xs:attribute name="kind" type="xs:string" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="subtitles"/>
+                        <xs:enumeration value="captions"/>
+                        <xs:enumeration value="descriptions"/>
+                        <xs:enumeration value="chapters"/>
+                        <xs:enumeration value="metadata"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="locale" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="fileMeta">
     <xs:complexType>
       <xs:all minOccurs="0" maxOccurs="1">

@@ -1926,7 +1926,7 @@ class Course < ActiveRecord::Base
   private :process_migration_files
 
   def import_media_objects(mo_attachments, migration)
-    wait_for_completion = (migration && migration.migration_settings[:worker_class] == CC::Importer::Canvas::Converter.name)
+    wait_for_completion = migration && migration.canvas_import?
     unless mo_attachments.blank?
       MediaObject.add_media_files(mo_attachments, wait_for_completion)
     end
@@ -1957,6 +1957,10 @@ class Course < ActiveRecord::Base
           er = ErrorReport.log_exception(:import_media_objects, e)
           migration.add_error(t(:failed_import_media_objects, %{Failed to import media objects}), error_report_id: er.id)
         end
+      end
+      if migration.canvas_import?
+        migration.update_import_progress(30)
+        MigrationImport::MediaTrack.process_migration(data[:media_tracks], migration)
       end
     end
 

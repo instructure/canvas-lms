@@ -167,6 +167,10 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
+  def canvas_import?
+    migration_settings[:worker_class] == CC::Importer::Canvas::Converter.name
+  end
+
   # add todo/error/warning issue to the import. user_message is what will be
   # displayed to the end user.
   # type must be one of: :todo, :warning, :error

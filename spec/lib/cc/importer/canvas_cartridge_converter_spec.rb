@@ -1032,6 +1032,56 @@ XML
     a.submission_types.should == "online_quiz"
   end
 
+  it "should convert media tracks" do
+    doc = Nokogiri::XML(<<-XML)
+      <?xml version="1.0" encoding="UTF-8"?>
+      <media_tracks xmlns="http://canvas.instructure.com/xsd/cccv1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">
+        <media identifierref="xyz">
+          <track kind="subtitles" locale="en" identifierref="abc"/>
+          <track kind="subtitles" locale="tlh" identifierref="def"/>
+        </media>
+      </media_tracks>
+    XML
+    @converter.convert_media_tracks(doc).should eql({
+      "xyz"=>[{"migration_id"=>"abc", "kind"=>"subtitles", "locale"=>"en"},
+              {"migration_id"=>"def", "kind"=>"subtitles", "locale"=>"tlh"}]
+    })
+  end
+
+  it "should import media tracks" do
+    media_objects_folder = Folder.create! context: @copy_to, name: CC::CCHelper::MEDIA_OBJECTS_FOLDER, parent_folder: Folder::root_folders(@course).first
+    media_file = @copy_to.attachments.create(folder: media_objects_folder, filename: 'media.flv', uploaded_data: StringIO.new('pretend this is a media file'))
+    media_file.migration_id = 'xyz'
+    media_file.save!
+    mo = MediaObject.new
+    mo.attachment = media_file
+    mo.media_id = '0_deadbeef'
+    mo.save!
+    track_file1 = @copy_to.attachments.create(folder: media_objects_folder, filename: 'media.flv.en.subtitles', uploaded_data: StringIO.new('pretend this is a track file'))
+    track_file1.migration_id = 'abc'
+    track_file1.save!
+    track_file2 = @copy_to.attachments.create(folder: media_objects_folder, filename: 'media.flv.tlh.subtitles', uploaded_data: StringIO.new("Qapla'"))
+    track_file2.migration_id = 'def'
+    track_file2.save!
+    data = {
+      "media_tracks"=>{
+        "xyz"=>[{"migration_id"=>"abc", "kind"=>"subtitles", "locale"=>"en"},
+                {"migration_id"=>"def", "kind"=>"subtitles", "locale"=>"tlh"}]
+      }
+    }.with_indifferent_access
+
+    migration = ContentMigration.create(context: @copy_to)
+    migration.stubs(:canvas_import?).returns(true)
+    migration.migration_settings[:migration_ids_to_import] = {copy: {'everything' => 1}}
+    @copy_to.import_from_migration(data, nil, migration)
+
+    mo.media_tracks.find_by_locale('en').content.should eql('pretend this is a track file')
+    mo.media_tracks.find_by_locale('tlh').content.should eql("Qapla'")
+
+    @copy_to.attachments.find_by_migration_id('abc').should be_deleted
+    @copy_to.attachments.find_by_migration_id('def').should be_deleted
+  end
+
   context "warnings for missing links in imported html" do
     it "should add warnings for assessment questions" do
       data = {

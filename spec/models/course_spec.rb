@@ -2930,13 +2930,13 @@ describe Course, ".import_from_migration" do
   end
 
   it "should wait for media objects on canvas cartridge import" do
-    migration = mock(:migration_settings => { 'worker_class' => 'CC::Importer::Canvas::Converter' }.with_indifferent_access)
+    migration = mock(:canvas_import? => true)
     MediaObject.expects(:add_media_files).with([@attachment], true)
     @course.import_media_objects([@attachment], migration)
   end
 
   it "should not wait for media objects on other import" do
-    migration = mock(:migration_settings => { 'worker_class' => 'CC::Importer::Standard::Converter' }.with_indifferent_access)
+    migration = mock(:canvas_import? => false)
     MediaObject.expects(:add_media_files).with([@attachment], false)
     @course.import_media_objects([@attachment], migration)
   end
