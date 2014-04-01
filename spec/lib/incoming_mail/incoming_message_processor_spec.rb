@@ -68,6 +68,15 @@ describe IncomingMail::IncomingMessageProcessor do
   end
 
   let(:tag) { '123abc' }
+  let(:error_reporter) { MockErrorReporter.new }
+
+  class MockErrorReporter
+    def log_error(category, opts)
+    end
+
+    def log_exception(category, exception, opts)
+    end
+  end
 
   before(:all) do
     setup_test_outgoing_mail
@@ -151,14 +160,14 @@ describe IncomingMail::IncomingMessageProcessor do
     end
 
     it "should not choke on invalid UTF-8" do
-      IncomingMessageProcessor.new(message_handler).process_single(Mail.new { body "he\xffllo" }, tag)
+      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new { body "he\xffllo" }, tag)
 
       message_handler.body.should == "hello"
       message_handler.html_body.should == "hello"
     end
 
     it "should convert another charset to UTF-8" do
-      IncomingMessageProcessor.new(message_handler).process_single(Mail.new {
+      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
           content_type 'text/plain; charset=Shift-JIS'
           body "\x83\x40"
         }, tag)
@@ -170,7 +179,7 @@ describe IncomingMail::IncomingMessageProcessor do
     end
 
     it "should pick up html from a multipart" do
-      IncomingMessageProcessor.new(message_handler).process_single(Mail.new {
+      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
           text_part do
             body 'This is plain text'
           end
@@ -195,7 +204,7 @@ describe IncomingMail::IncomingMessageProcessor do
 
       message_handler.expects(:handle).never
 
-      IncomingMessageProcessor.new(message_handler).process_single(incoming_bounce_mail,
+      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(incoming_bounce_mail,
         tag)
     end
   end
@@ -229,7 +238,7 @@ describe IncomingMail::IncomingMessageProcessor do
       @mock_mailbox.expects(:connect)
       @mock_mailbox.expects(:each_message)
       @mock_mailbox.expects(:disconnect)
-      IncomingMessageProcessor.new(message_handler).process
+      IncomingMessageProcessor.new(message_handler, error_reporter).process
     end
 
     it "should process incoming_mail configuration with multiple accounts" do
@@ -267,7 +276,7 @@ describe IncomingMail::IncomingMessageProcessor do
       @mock_mailbox.expects(:disconnect).times(3)
 
       IncomingMessageProcessor.configure(config)
-      IncomingMessageProcessor.new(message_handler).process
+      IncomingMessageProcessor.new(message_handler, error_reporter).process
     end
 
     it "should extract special values from account settings" do
@@ -311,7 +320,7 @@ describe IncomingMail::IncomingMessageProcessor do
         @mock_mailbox.expects(:delete_message).with(:baz)
         @mock_mailbox.expects(:each_message).multiple_yields([:foo, foo], [:bar, bar], [:baz, baz])
         @mock_mailbox.expects(:disconnect)
-        imp = IncomingMessageProcessor.new(message_handler)
+        imp = IncomingMessageProcessor.new(message_handler, error_reporter)
         imp.expects(:process_single).with(kind_of(Mail::Message), "123-1", anything)
         imp.expects(:process_single).with(kind_of(Mail::Message), "456-2", anything)
         imp.expects(:process_single).with(kind_of(Mail::Message), "abc-3", anything)
@@ -328,7 +337,7 @@ describe IncomingMail::IncomingMessageProcessor do
         @mock_mailbox.expects(:delete_message).with(:foo)
         @mock_mailbox.expects(:each_message).yields(:foo, foo)
         @mock_mailbox.expects(:disconnect)
-        imp = IncomingMessageProcessor.new(message_handler)
+        imp = IncomingMessageProcessor.new(message_handler, error_reporter)
         imp.expects(:process_single).with(kind_of(Mail::Message), "123-1", anything)
 
         imp.process
@@ -342,10 +351,10 @@ describe IncomingMail::IncomingMessageProcessor do
         @mock_mailbox.expects(:move_message).with(:foo, 'errors_go_here')
         @mock_mailbox.expects(:each_message).yields(:foo, foo)
         @mock_mailbox.expects(:disconnect)
-        ErrorReport.expects(:log_error).
+        error_reporter.expects(:log_error).
           with(IncomingMessageProcessor.error_report_category, kind_of(Hash))
 
-        IncomingMessageProcessor.new(message_handler).process
+        IncomingMessageProcessor.new(message_handler, error_reporter).process
       end
 
       it "should move aside messages that raise errors" do
@@ -358,10 +367,10 @@ describe IncomingMail::IncomingMessageProcessor do
         @mock_mailbox.expects(:move_message).with(:foo, 'errors_go_here')
         @mock_mailbox.expects(:each_message).yields(:foo, foo)
         @mock_mailbox.expects(:disconnect)
-        ErrorReport.expects(:log_exception).
+        error_reporter.expects(:log_exception).
           with(IncomingMessageProcessor.error_report_category, kind_of(StandardError), anything)
 
-        IncomingMessageProcessor.new(message_handler).process
+        IncomingMessageProcessor.new(message_handler, error_reporter).process
       end
 
       it "should abort account processing on exception, but continue processing other accounts" do
@@ -380,10 +389,10 @@ describe IncomingMail::IncomingMessageProcessor do
         @mock_mailbox.expects(:connect).in_sequence(seq)
         @mock_mailbox.expects(:disconnect).in_sequence(seq)
         @mock_mailbox.expects(:each_message).once
-        ErrorReport.expects(:log_exception).
+        error_reporter.expects(:log_exception).
           with(IncomingMessageProcessor.error_report_category, kind_of(StandardError), anything)
 
-        IncomingMessageProcessor.new(message_handler).process
+        IncomingMessageProcessor.new(message_handler, error_reporter).process
       end
     end
 
@@ -459,8 +468,8 @@ describe IncomingMail::IncomingMessageProcessor do
         end
       end
 
-      ErrorReport.expects(:log_exception)
-      IncomingMessageProcessor.new(message_handler).process
+      error_reporter.expects(:log_exception)
+      IncomingMessageProcessor.new(message_handler, error_reporter).process
       processed_second.should be_true
     end
   end

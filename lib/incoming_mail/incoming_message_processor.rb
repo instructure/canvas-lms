@@ -40,8 +40,9 @@ module IncomingMail
       attr_accessor :mailbox_accounts, :settings, :deprecated_settings
     end
 
-    def initialize(message_handler)
+    def initialize(message_handler, error_reporter)
       @message_handler = message_handler
+      @error_reporter = error_reporter
     end
 
     # See config/incoming_mail.yml.example for documentation on how to configure incoming mail
@@ -201,14 +202,14 @@ module IncomingMail
       error_folder = account.error_folder
       mailbox.connect
       mailbox.each_message do |message_id, raw_contents|
-        message, errors = self.class.parse_message(raw_contents)
+        message, errors = parse_message(raw_contents)
         if message && !errors.present?
           process_message(message, account)
           mailbox.delete_message(message_id)
         else
           mailbox.move_message(message_id, error_folder)
           if message
-            ErrorReport.log_error(self.class.error_report_category, {
+            @error_reporter.log_error(self.class.error_report_category, {
               :message => "Error parsing email",
               :backtrace => message.errors.flatten.map(&:to_s).join("\n"),
               :from => message.from.try(:first),
@@ -221,10 +222,10 @@ module IncomingMail
     rescue => e
       # any exception that makes it here probably means the connection is broken
       # skip this account, but the rest of the accounts should still be tried
-      ErrorReport.log_exception(self.class.error_report_category, e)
+      @error_reporter.log_exception(self.class.error_report_category, e, {})
     end
 
-    def self.parse_message(raw_contents)
+    def parse_message(raw_contents)
       message = Mail.new(raw_contents)
       errors = select_relevant_errors(message)
 
@@ -233,11 +234,11 @@ module IncomingMail
 
       return message, errors
     rescue => e
-      ErrorReport.log_exception(error_report_category, e)
+      @error_reporter.log_exception(self.class.error_report_category, e, {})
       nil
     end
 
-    def self.select_relevant_errors(message)
+    def select_relevant_errors(message)
       # message.errors is an array of arrays containing header parsing errors:
       # [["header-name", "header-value", parser_exception], ...]
       message.errors.select do |error|
@@ -251,7 +252,7 @@ module IncomingMail
       return unless tag
       process_single(message, tag, account)
     rescue => e
-      ErrorReport.log_exception(self.class.error_report_category, e,
+      @error_reporter.log_exception(self.class.error_report_category, e,
         :from => message.from.try(:first),
         :to => message.to.to_s)
     end
