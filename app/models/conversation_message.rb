@@ -264,7 +264,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    raise IncomingMail::IncomingMessageProcessor::UnknownAddressError if self.context.try(:root_account).try(:deleted?)
+    raise IncomingMail::UnknownAddressError if self.context.try(:root_account).try(:deleted?)
     # If this is from conversations 2, only reply to the author.
     recipients = conversation.context ? [author] : nil
     conversation.reply_from(opts.merge(:root_account_id => self.root_account_id, :only_users => recipients))

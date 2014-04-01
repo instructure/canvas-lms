@@ -18,7 +18,7 @@
 
 require 'timeout'
 
-module IncomingMail
+module IncomingMailProcessor
 
   # Internal: A helper mixin for Mailbox implementation to properly implement
   # a configurable timeout. This keeps the Mailbox classes from directly

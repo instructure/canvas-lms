@@ -16,11 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path('../../../../lib/incoming_mail/imap_mailbox', __FILE__)
+require File.expand_path('../../../../lib/incoming_mail_processor/imap_mailbox', __FILE__)
 require File.expand_path('../../../mocha_rspec_adapter', __FILE__)
 require File.expand_path('../mailbox_spec_helper', __FILE__)
 
-describe IncomingMail::ImapMailbox do
+describe IncomingMailProcessor::ImapMailbox do
   include_examples 'Mailbox'
 
   def default_config
@@ -34,7 +34,7 @@ describe IncomingMail::ImapMailbox do
   def mock_net_imap
     @imap_mock = Object.new
     class <<@imap_mock
-      IncomingMail::ImapMailbox::UsedImapMethods.each do |method_name|
+      IncomingMailProcessor::ImapMailbox::UsedImapMethods.each do |method_name|
         define_method(method_name) { |*args, &block| }
       end
     end
@@ -47,12 +47,12 @@ describe IncomingMail::ImapMailbox do
 
   before do
     mock_net_imap
-    @mailbox = IncomingMail::ImapMailbox.new(default_config)
+    @mailbox = IncomingMailProcessor::ImapMailbox.new(default_config)
   end
 
   describe "#initialize" do
     it "should accept existing mailman imap configuration" do
-      @mailbox = IncomingMail::ImapMailbox.new({
+      @mailbox = IncomingMailProcessor::ImapMailbox.new({
         :server => "imap.server.com",
         :port => 1234,
         :ssl => "truthy-value",
@@ -70,13 +70,13 @@ describe IncomingMail::ImapMailbox do
     end
 
     it "should accept non-array filter" do
-      @mailbox = IncomingMail::ImapMailbox.new(:filter => "BLAH")
+      @mailbox = IncomingMailProcessor::ImapMailbox.new(:filter => "BLAH")
       @mailbox.filter.should eql ["BLAH"]
     end
 
     it "should accept folder parameter" do
       # this isn't necessary for gmail, but just in case
-      @mailbox = IncomingMail::ImapMailbox.new(:folder => "inbox")
+      @mailbox = IncomingMailProcessor::ImapMailbox.new(:folder => "inbox")
       @mailbox.folder.should eql "inbox"
     end
 

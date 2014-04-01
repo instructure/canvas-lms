@@ -18,10 +18,10 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-describe IncomingMail::IncomingMessageProcessor do
+describe IncomingMailProcessor::IncomingMessageProcessor do
 
   # Import this one constant
-  IncomingMessageProcessor = IncomingMail::IncomingMessageProcessor
+  IncomingMessageProcessor = IncomingMailProcessor::IncomingMessageProcessor
 
   def setup_test_outgoing_mail
     @original_delivery_method = ActionMailer::Base.delivery_method
@@ -258,7 +258,7 @@ describe IncomingMail::IncomingMessageProcessor do
         },
       }
 
-      IncomingMail::MailboxAccount.expects(:new).with({
+      IncomingMailProcessor::MailboxAccount.expects(:new).with({
         :protocol => :imap,
         :address => 'user@fake.fake',
         :error_folder => 'broken',
@@ -403,7 +403,7 @@ describe IncomingMail::IncomingMessageProcessor do
 
   describe "timeouts" do
     class TimeoutMailbox
-      include IncomingMail::ConfigurableTimeout
+      include IncomingMailProcessor::ConfigurableTimeout
 
       def initialize(config)
         @config = config

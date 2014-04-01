@@ -16,6 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module IncomingMail
+module IncomingMailProcessor
   Settings = Struct.new(:run_periodically)
 end

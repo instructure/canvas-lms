@@ -3,5 +3,5 @@
 config = Setting.from_config("incoming_mail") || {}
 
 Rails.configuration.to_prepare do
-  IncomingMail::IncomingMessageProcessor.configure(config)
+  IncomingMailProcessor::IncomingMessageProcessor.configure(config)
 end

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module IncomingMail
+module IncomingMailProcessor
   class MailboxAccount
     attr_accessor :protocol, :config, :address, :error_folder
 

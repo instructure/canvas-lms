@@ -1,6 +1,6 @@
 <li class="message list-view border border-trbl"
     data-message-id="<%= message.id %>"
-    data-secure-id="<%= ReplyToAddress.new(message).secure_id %>">
+    data-secure-id="<%= IncomingMail::ReplyToAddress.new(message).secure_id %>">
     <header>
         <span class="h6"><%= message.subject %></span>
 
@@ -38,7 +38,7 @@
                 </tr>
                 <tr>
                     <td class="td-label"><div><%= t('titles.reply_to', 'Reply to') %></div></td>
-                    <td><span class="message-reply"><%= ReplyToAddress.new(message).address %></span>
+                    <td><span class="message-reply"><%= IncomingMail::ReplyToAddress.new(message).address %></span>
                         (<a class="reply-button" href="#" role="button"><%= t('actions.reply', 'Reply') %></a>)</td>
                 </tr>
                 <tr>

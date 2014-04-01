@@ -16,12 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path('../../../../lib/incoming_mail/configurable_timeout', __FILE__)
+require File.expand_path('../../../../lib/incoming_mail_processor/configurable_timeout', __FILE__)
 require File.expand_path('../../../mocha_rspec_adapter', __FILE__)
 
-describe IncomingMail::ConfigurableTimeout do
+describe IncomingMailProcessor::ConfigurableTimeout do
   class TimeoutTester
-    include IncomingMail::ConfigurableTimeout
+    include IncomingMailProcessor::ConfigurableTimeout
     def default_timeout_duration
       0.0001
     end

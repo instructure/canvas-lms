@@ -73,9 +73,9 @@ Delayed::Periodic.cron 'StreamItem.destroy_stream_items', '45 11 * * *' do
   end
 end
 
-if IncomingMail::IncomingMessageProcessor.run_periodically?
-  Delayed::Periodic.cron 'IncomingMessageProcessor.process', '*/1 * * * *' do
-    IncomingMail::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new).process
+if IncomingMailProcessor::IncomingMessageProcessor.run_periodically?
+  Delayed::Periodic.cron 'IncomingMailProcessor::IncomingMessageProcessor.process', '*/1 * * * *' do
+    IncomingMailProcessor::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new).process
   end
 end
 

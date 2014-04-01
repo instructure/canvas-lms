@@ -19,7 +19,7 @@
 require 'net/imap'
 require File.expand_path('../configurable_timeout', __FILE__)
 
-module IncomingMail
+module IncomingMailProcessor
 
   class ImapMailbox
     include ConfigurableTimeout

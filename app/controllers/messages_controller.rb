@@ -36,7 +36,7 @@ class MessagesController < ApplicationController
     message['From']         = params[:from]
     message.body            = params[:message]
 
-    IncomingMail::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new).process_single(message, "#{secure_id}-#{message_id}")
+    IncomingMailProcessor::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new).process_single(message, "#{secure_id}-#{message_id}")
     render :nothing => true
   end
 

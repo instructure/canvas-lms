@@ -16,6 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module IncomingMail
+module IncomingMailProcessor
   DeprecatedSettings = Struct.new(:poll_interval, :ignore_stdin, :graceful_death)
 end

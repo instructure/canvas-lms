@@ -16,11 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path '../../../../lib/incoming_mail/pop3_mailbox', __FILE__
+require File.expand_path '../../../../lib/incoming_mail_processor/pop3_mailbox', __FILE__
 require File.expand_path '../../../mocha_rspec_adapter', __FILE__
 require File.expand_path '../mailbox_spec_helper', __FILE__
 
-describe IncomingMail::Pop3Mailbox do
+describe IncomingMailProcessor::Pop3Mailbox do
   include_examples 'Mailbox'
 
   def default_config
@@ -36,7 +36,7 @@ describe IncomingMail::Pop3Mailbox do
   def mock_net_pop
     @pop_mock = Object.new
     class <<@pop_mock
-      IncomingMail::Pop3Mailbox::UsedPopMethods.each do |method_name|
+      IncomingMailProcessor::Pop3Mailbox::UsedPopMethods.each do |method_name|
         define_method(method_name) { |*args, &block| }
       end
     end
@@ -46,7 +46,7 @@ describe IncomingMail::Pop3Mailbox do
 
   describe "#initialize" do
     it "should accept existing mailman pop3 configuration" do
-      @mailbox = IncomingMail::Pop3Mailbox.new({
+      @mailbox = IncomingMailProcessor::Pop3Mailbox.new({
         :server => "pop3.server.com",
         :port => 1234,
         :ssl => "truthy-value",
@@ -72,7 +72,7 @@ describe IncomingMail::Pop3Mailbox do
       Net::POP3.expects(:new).with(config[:server], config[:port]).returns(@pop_mock)
       @pop_mock.expects(:start).with(config[:username], config[:password])
 
-      @mailbox = IncomingMail::Pop3Mailbox.new(config)
+      @mailbox = IncomingMailProcessor::Pop3Mailbox.new(config)
       @mailbox.connect
     end
 
@@ -83,7 +83,7 @@ describe IncomingMail::Pop3Mailbox do
       @pop_mock.expects(:enable_ssl).with(OpenSSL::SSL::VERIFY_NONE)
       @pop_mock.expects(:start).with(config[:username], config[:password])
 
-      @mailbox = IncomingMail::Pop3Mailbox.new(config)
+      @mailbox = IncomingMailProcessor::Pop3Mailbox.new(config)
       @mailbox.connect
     end
   end
@@ -93,7 +93,7 @@ describe IncomingMail::Pop3Mailbox do
       mock_net_pop
       @pop_mock.expects(:finish)
 
-      @mailbox = IncomingMail::Pop3Mailbox.new(default_config)
+      @mailbox = IncomingMailProcessor::Pop3Mailbox.new(default_config)
       @mailbox.connect
       @mailbox.disconnect
     end
@@ -102,7 +102,7 @@ describe IncomingMail::Pop3Mailbox do
   describe "#each_message" do
     before do
       mock_net_pop
-      @mailbox = IncomingMail::Pop3Mailbox.new(default_config)
+      @mailbox = IncomingMailProcessor::Pop3Mailbox.new(default_config)
       @mailbox.connect
     end
 

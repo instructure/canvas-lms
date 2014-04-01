@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'config', 'environment'))
-require 'incoming_mail/incoming_message_processor'
+require 'lib/incoming_mail_processor/incoming_message_processor'
 
-IncomingMail::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new).process
+IncomingMailProcessor::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new).process

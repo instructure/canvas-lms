@@ -18,7 +18,7 @@ Rails.configuration.to_prepare do
   HostUrl.outgoing_email_domain = config[:domain]
   HostUrl.outgoing_email_default_name = config[:default_name]
 
-  ReplyToAddress.address_pool = config[:reply_to_addresses] ||
+  IncomingMail::ReplyToAddress.address_pool = config[:reply_to_addresses] ||
     Array(HostUrl.outgoing_email_address)
 end
 

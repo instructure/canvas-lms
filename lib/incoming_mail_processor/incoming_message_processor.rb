@@ -17,21 +17,16 @@
 #
 require 'iconv'
 
-module IncomingMail
+module IncomingMailProcessor
 
   class IncomingMessageProcessor
 
     extend HtmlTextHelper
 
-    class SilentIgnoreError < StandardError; end
-    class ReplyFromError < StandardError; end
-    class UnknownAddressError < ReplyFromError; end
-    class ReplyToLockedTopicError < ReplyFromError; end
-
     MailboxClasses = {
-      :imap => IncomingMail::ImapMailbox,
-      :directory => IncomingMail::DirectoryMailbox,
-      :pop3 => IncomingMail::Pop3Mailbox,
+      :imap => IncomingMailProcessor::ImapMailbox,
+      :directory => IncomingMailProcessor::DirectoryMailbox,
+      :pop3 => IncomingMailProcessor::Pop3Mailbox,
     }.freeze
 
     ImportantHeaders = %w(To From Subject Content-Type)
@@ -67,7 +62,7 @@ module IncomingMail
       end
     end
 
-    def process_single(incoming_message, tag, mailbox_account = IncomingMail::MailboxAccount.new)
+    def process_single(incoming_message, tag, mailbox_account = IncomingMailProcessor::MailboxAccount.new)
       return if self.class.bounce_message?(incoming_message)
 
       body, html_body = extract_body(incoming_message)
@@ -114,13 +109,13 @@ module IncomingMail
     end
 
     def self.configure_settings(config)
-      @settings = IncomingMail::Settings.new
-      @deprecated_settings = IncomingMail::DeprecatedSettings.new
+      @settings = IncomingMailProcessor::Settings.new
+      @deprecated_settings = IncomingMailProcessor::DeprecatedSettings.new
 
       config.symbolize_keys.each do |key, value|
-        if IncomingMail::Settings.members.map(&:to_sym).include?(key)
+        if IncomingMailProcessor::Settings.members.map(&:to_sym).include?(key)
           self.settings.send("#{key}=", value)
-        elsif IncomingMail::DeprecatedSettings.members.map(&:to_sym).include?(key)
+        elsif IncomingMailProcessor::DeprecatedSettings.members.map(&:to_sym).include?(key)
           Rails.logger.warn("deprecated setting sent to IncomingMessageProcessor: #{key}")
           self.deprecated_settings.send("#{key}=", value)
         else
@@ -134,7 +129,7 @@ module IncomingMail
       self.mailbox_accounts = flat_account_configs.map do |mailbox_protocol, mailbox_config|
         error_folder = mailbox_config.delete(:error_folder)
         address = mailbox_config[:username]
-        IncomingMail::MailboxAccount.new({
+        IncomingMailProcessor::MailboxAccount.new({
           :protocol => mailbox_protocol.to_sym,
           :config => mailbox_config,
           :address => address,

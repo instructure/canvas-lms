@@ -18,14 +18,14 @@
 
 
 # Public: Represents a reply-to address for a message.
-class ReplyToAddress
+class IncomingMail::ReplyToAddress
   attr_reader :message
 
-  # Public: Error thrown when ReplyToAddress is used with an empty address pool.
+  # Public: Error thrown when IncomingMail::ReplyToAddress is used with an empty address pool.
   class EmptyReplyAddressPool < StandardError
   end
 
-  # Public: Create a new ReplyToAddress.
+  # Public: Create a new IncomingMail::ReplyToAddress.
   #
   # message - A Message object.
   def initialize(message)

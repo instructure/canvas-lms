@@ -19,7 +19,7 @@
 require 'net/pop'
 require File.expand_path('../configurable_timeout', __FILE__)
 
-module IncomingMail
+module IncomingMailProcessor
 
   class Pop3Mailbox
     include ConfigurableTimeout

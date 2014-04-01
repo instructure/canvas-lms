@@ -56,7 +56,7 @@ describe IncomingMail::MessageHandler do
   let(:original_message) { stub("original message", original_message_attributes) }
 
   before do
-    ReplyToAddress.any_instance.stubs(:secure_id).returns(secure_id)
+    IncomingMail::ReplyToAddress.any_instance.stubs(:secure_id).returns(secure_id)
   end
 
   describe "#route" do
@@ -88,7 +88,7 @@ describe IncomingMail::MessageHandler do
         end
 
         it "silenty fails on invalid secure id" do
-          ReplyToAddress.any_instance.stubs(:secure_id).returns("deadbeef") # non-matching secure-id
+          IncomingMail::ReplyToAddress.any_instance.stubs(:secure_id).returns("deadbeef") # non-matching secure-id
 
           Mailer.expects(:create_message).never
           original_message.context.expects(:reply_from).never
@@ -180,7 +180,7 @@ describe IncomingMail::MessageHandler do
         context "with a locked discussion topic generic_error" do
           it "constructs the message correctly" do
             Message.stubs(:find_by_id).with(original_message_id).returns(original_message)
-            context.expects(:reply_from).raises(IncomingMail::IncomingMessageProcessor::ReplyToLockedTopicError.new)
+            context.expects(:reply_from).raises(IncomingMail::ReplyToLockedTopicError.new)
 
             email_subject = "Message Reply Failed: some subject"
             body = <<-BODY.strip_heredoc
@@ -210,7 +210,7 @@ describe IncomingMail::MessageHandler do
         context "with a generic reply to error" do
           it "constructs the message correctly" do
             Message.stubs(:find_by_id).with(original_message_id).returns(original_message)
-            context.expects(:reply_from).raises(IncomingMail::IncomingMessageProcessor::UnknownAddressError.new)
+            context.expects(:reply_from).raises(IncomingMail::UnknownAddressError.new)
 
             email_subject = "Message Reply Failed: some subject"
             body = <<-BODY.strip_heredoc
@@ -240,7 +240,7 @@ describe IncomingMail::MessageHandler do
         context "when there is no communication channel" do
           it "bounces the message back to the incoming from address" do
             Message.stubs(:find_by_id).with(original_message_id).returns(original_message)
-            context.expects(:reply_from).raises(IncomingMail::IncomingMessageProcessor::ReplyToLockedTopicError.new)
+            context.expects(:reply_from).raises(IncomingMail::ReplyToLockedTopicError.new)
 
             Message.any_instance.expects(:deliver).never
             Mailer.expects(:create_message)
