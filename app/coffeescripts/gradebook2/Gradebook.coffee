@@ -11,6 +11,7 @@ define [
   'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
   'jquery'
   'underscore'
+  'Backbone'
   'timezone'
   'compiled/grade_calculator'
   'compiled/userSettings'
@@ -23,6 +24,8 @@ define [
   'compiled/util/NumberCompare'
   'str/htmlEscape'
   'compiled/gradebook2/UploadDialog'
+  'compiled/gradebook2/PostGradesDialog'
+  'compiled/gradebook2/PostGradesModel'
   'jst/gradebook2/column_header'
   'jst/gradebook2/group_total_cell'
   'jst/gradebook2/row_student_name'
@@ -39,7 +42,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
+], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, PostGradesDialog, PostGradesModel, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
 
   class Gradebook
     columnWidths =
@@ -164,6 +167,16 @@ define [
         @grid.render()
 
 
+    initPostGrades: () ->
+      postGradesModel = new PostGradesModel({gradebook: ENV.GRADEBOOK_OPTIONS, assignments: @assignments, section_id: @sectionToShow})
+      postGradesDialog = new PostGradesDialog(postGradesModel)
+
+      $("#publish").click (event) =>
+        event.preventDefault()
+        postGradesModel.reset_ignored_assignments()
+        postGradesDialog.render().show()
+        open = $('#post-grades-container').dialog('isOpen')
+
     doSlickgridStuff: =>
       @initGrid()
       @buildRows()
@@ -187,6 +200,8 @@ define [
           assignment.assignment_group = group
           assignment.due_at = tz.parse(assignment.due_at)
           @assignments[assignment.id] = assignment
+
+      @initPostGrades()
 
     gotSections: (sections) =>
       @sections = {}

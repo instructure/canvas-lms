@@ -221,6 +221,11 @@ define [
       return 'discussion' if @isDiscussionTopic()
       return 'assignment'
 
+    objectType: =>
+      return 'Quiz' if @isQuiz()
+      return 'Discussion' if @isDiscussionTopic()
+      return 'Assignment'
+
     htmlUrl: =>
       @get 'html_url'
 

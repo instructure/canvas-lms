@@ -1,0 +1,119 @@
+<style>
+    #passback-form {
+        margin:0;
+        margin-bottom: 25px;
+        padding: 0;
+    }
+
+    #passback-form .assignment-info {
+        padding-right: 3px;
+        padding-right: 4px \9;
+        padding-left: 3px;
+        padding-left: 4px \9;
+        /* IE7-8 doesn't have border-radius, so don't indent the padding */
+
+        /*margin-bottom: 20px;*/
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+    }
+
+    #passback-form button {
+        border: 0;
+        background: none;
+        /** belows styles are working good */
+        padding: 2px 5px;
+        margin-top: 2px;
+        position: relative;
+        left: -28px;
+        /* IE7-8 doesn't have border-radius, so don't indent the padding */
+        margin-bottom: 0;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+    }
+
+    .assignment-info:focus + button {
+        z-index: 3;
+    }
+
+    .data-circle-error{
+        margin-top: 12px;
+        margin-right: -20px;
+        border-radius: 50%;
+        width: 4px;
+        height: 4px;
+        background: #f00;
+        border: 1px solid #f00;
+    }
+    .data-circle-success{
+        margin-top: 12px;
+        margin-right: 0px;
+        border-radius: 50%;
+        width: 4px;
+        height: 4px;
+        background: green;
+        border: 1px solid green;
+    }
+    .lead{
+        margin-bottom: 20px;
+        /*font-size: 21px;*/
+        font-weight: 200;
+        line-height: 30px;
+    }
+    @media (min-width: 0 ) {
+    .row {
+        margin-left: -30px;
+        overflow: hidden;
+        *zoom: 1; }
+
+    [class*="span"] {
+        float: left;
+        min-height: 1px;
+        margin-left: 30px; }
+
+    #post-grades-container .span4 {
+        width: 370px; }
+
+    #post-grades-container .span3 {
+        width: 270px; }
+
+    #post-grades-container .span2 {
+        width: 170px; }
+
+    #post-grades-container .span1 {
+        width: 70px; }
+
+</style>
+<div id="assignment-errors">
+   <legend class="lead" style><span class="assignment-error-count">{{missing_not_unique.length}}</span> Assignments with Errors</legend>
+   <div class="assignment-errors-list">
+       <div class="row">
+           <h5 class="muted span4" style="margin-left: 50px">Assignment Name</h5>
+           <span class="span1"></span>
+           <h5 class="muted span2" style="margin-left: -60px;">Due Date</h5>
+       </div>
+       {{#each missing_not_unique}}
+           <div class="row">
+               <div id="assignment-error-{{id}}">
+                   <div class="span1 data-circle-error" style="width: 4px"></div>
+                   <form id="passback-form" class="form-inline">
+                       <div class="span4">
+                           <input type="text" class="input-xlarge" style="padding-right: 100px" placeholder="{{name}}" value="{{name}}">
+                       </div>
+
+                       {{#if due_at}}
+                           <div class="span1 data-circle-error" style="width: 4px"></div><div class="span2 date_field_container">
+                           <input type="text" class="input-medium date_field assignment-info" value="{{datetimeFormatted due_at}}">
+                       {{else}}
+                           <div class="span1 data-circle-error" style="width: 4px"></div><div class="span2 date_field_container">
+                           <input type="text" class="input-medium date_field assignment-info" placeholder="No Due Date">
+                       {{/if}}
+                       </div>
+                       <button style="left: 0px;" data-assignment-id="{{id}}" class="btn ignore-assignment assignment-info">X</button>
+                   </form>
+               </div>
+           </div>
+       {{/each}}
+   </div>
+</div>

@@ -803,7 +803,7 @@ describe "gradebook2" do
     it "should be visible when enabled" do
       Account.default.set_feature_flag!('outcome_gradebook', 'on')
       get "/courses/#{@course.id}/gradebook2"
-      ff('.gradebook-navigation').length.should == 1
+      ff('.gradebook-navigation').length.should == 2
 
       f('a[data-id=outcome]').click
       wait_for_ajaximations

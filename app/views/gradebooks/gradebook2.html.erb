@@ -15,22 +15,31 @@
 <div id="gradebook_wrapper">
 
   <% if @context.feature_enabled?(:outcome_gradebook) %>
-    <div class="gradebook-header">
-      <nav class="gradebook-navigation">
-        <ul class="nav nav-pills gradebook-navigation-pills">
-          <li class="active">
-            <a href="#"
-               data-id="assignment"><%= t(:grades, "Grades") %></a>
-          </li>
-          <li>
-            <a href="#"
-               data-id="outcome"><%= t(:learning_mastery, "Learning Mastery") %></a>
-          </li>
-        </ul>
-      </nav>
-
-      <div class="section-button-placeholder"></div>
-    </div>
+      <div class="gradebook-header">
+        <nav class="gradebook-navigation">
+          <ul class="nav nav-pills gradebook-navigation-pills">
+            <li class="active">
+              <a href="#"
+                 data-id="assignment"><%= t(:grades, "Grades") %></a>
+            </li>
+            <li>
+              <a href="#"
+                 data-id="outcome"><%= t(:learning_mastery, "Learning Mastery") %></a>
+            </li>
+          </ul>
+        </nav>
+        <div class="section-button-placeholder"></div>
+        <div class="pull-right">
+          <nav class="gradebook-navigation">
+            <ul class="nav nav-pills gradebook-navigation-pills pull-right">
+              <li>
+                <a class="btn-outline" href="#"
+                   id="publish"><%= t(:post_grades, "Post Grades") %></a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
   <% end %>
 
   <div class="assignment-gradebook-container hidden">
