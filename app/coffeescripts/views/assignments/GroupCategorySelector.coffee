@@ -32,12 +32,6 @@ define [
     @optionProperty 'groupCategories'
     @optionProperty 'nested'
 
-    initialize: ->
-      super
-
-      # delete this after Ifa654f7d853fd167d5bfbaee6184657209d58272 hits prod
-      gc.id = gc.id.toString() for gc in @groupCategories
-
     showGroupCategoryCreateDialog: =>
       if @$groupCategoryID.val() == 'new'
         # TODO: Yikes, we need to pull the javascript out of manage_groups.js
