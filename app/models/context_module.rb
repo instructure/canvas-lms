@@ -44,6 +44,16 @@ class ContextModule < ActiveRecord::Base
     end
   end
 
+  def remove_completion_requirement(id)
+    if completion_requirements.present?
+      new_requirements = completion_requirements.delete_if do |requirement|
+        requirement[:id] == id
+      end
+
+      update_attribute :completion_requirements, new_requirements
+    end
+  end
+
   def infer_position
     if !self.position
       positions = ContextModule.module_positions(self.context)

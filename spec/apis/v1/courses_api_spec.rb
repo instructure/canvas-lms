@@ -221,6 +221,24 @@ describe Api::V1::Course do
             next_requirement_url: "course_context_modules_item_redirect_url(:course_id => #{@course.id}, :id => #{@tag.id}, :host => HostUrl.context_host(Course.find(#{@course.id}))"
         }
       end
+
+      it "does not count obsolete requirements" do
+        # turn in first two assignments
+        @module.update_for(@user, :submitted, @tag)
+        @module.update_for(@user, :submitted, @tag2)
+
+        # remove assignment 2 from the list of requirements
+        @module.completion_requirements = [{id: @tag.id, type: 'must_submit'}]
+        @module.save
+
+        progress = api.course_progress_json(@course, @user)
+
+        # assert that assignment 2 is no longer a requirement (5 -> 4)
+        progress[:requirement_count].should == 4
+
+        # assert that assignment 2 doesn't count toward the total (2 -> 1)
+        progress[:requirement_completed_count].should == 1
+      end
     end
   end
 
