@@ -91,11 +91,13 @@ module Api::V1::Course
     return unless course.module_based? && course.user_is_student?(user)
 
     mods = course.modules_visible_to(user)
-    requirement_count = mods.flat_map(&:completion_requirements).size
+    requirements = mods.flat_map(&:completion_requirements).map { |req| req[:id] }
+    requirement_count = requirements.size
 
     requirement_completed_count = user.context_module_progressions
                                       .where("context_module_id IN (?)", mods.map(&:id))
                                       .flat_map { |cmp| cmp.requirements_met.to_a.uniq { |r| r[:id] } }
+                                      .select { |req| requirements.include?(req[:id]) }
                                       .size
 
     course_progress = {
