@@ -3,6 +3,6 @@
   
 
   <% if params[:login_warning] %>
-    <p><%= t :switch_users, "You are currently signed in as *%{user}*. **Sign in as another user**.", :user => @current_user.name, :wrapper => {'*' => '<b>\1</b>', '**' => link_to('\1', "/logout", :id => 'logout_link')} %></p>
+    <p><%= t :switch_users, "You are currently signed in as *%{user}*. **Sign in as another user**.", :user => @current_user.name, :wrapper => {'*' => '<b>\1</b>', '**' => link_to('\1', "/logout", :method => :delete, :id => 'logout_link')} %></p>
   <% end %>
 </div>

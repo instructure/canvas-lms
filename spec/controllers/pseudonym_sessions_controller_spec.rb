@@ -286,7 +286,7 @@ describe PseudonymSessionsController do
         controller.request.env['canvas.domain_root_account'] = @account
         get 'saml_logout', :SAMLResponse => "foo", :RelayState => "/courses"
 
-        response.should redirect_to(:action => :destroy)
+        response.should redirect_to(login_url)
       end
     end
 
@@ -411,7 +411,7 @@ describe PseudonymSessionsController do
 
         context '/destroy' do
           it "should forward to correct IdP" do
-            get 'destroy'
+            delete 'destroy'
 
             response.headers['Location'].starts_with?(@aac2.log_out_url + "?SAMLRequest=").should be_true
           end
@@ -419,7 +419,7 @@ describe PseudonymSessionsController do
           it "should fail gracefully if AAC id gone" do
             session[:saml_aac_id] = 0
 
-            get 'destroy'
+            delete 'destroy'
             flash[:message].should == "Canvas was unable to log you out at your identity provider"
             response.should redirect_to(login_url(:no_auto=>'true'))
           end
@@ -437,21 +437,19 @@ describe PseudonymSessionsController do
 
           it "should find the correct AAC" do
             @aac1.any_instantiation.expects(:saml_settings).never
-            @aac2.any_instantiation.expects(:saml_settings)
+            @aac2.any_instantiation.expects(:saml_settings).at_least_once
+            controller.expects(:logout_user_action)
 
             get_saml_consume
-
-            response.should redirect_to(:action => :destroy)
           end
 
           it "should still logout if AAC config not found" do
             @aac1.any_instantiation.expects(:saml_settings).never
             @aac2.any_instantiation.expects(:saml_settings).never
+            controller.expects(:logout_user_action)
 
             @stub_hash[:issuer] = "nobody eh"
             get_saml_consume
-
-            response.should redirect_to(:action => :destroy)
           end
         end
       end

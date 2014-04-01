@@ -203,6 +203,10 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def destroy
+    logout_user_action
+  end
+
+  def logout_user_action
     # the saml message has to survive a couple redirects and reset_session calls
     message = session[:delegated_message]
 
@@ -374,7 +378,7 @@ class PseudonymSessionsController < ApplicationController
             aac.debug_set(:canvas_login_fail_message, message) if debugging
             # the saml message has to survive a couple redirects
             session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => unique_id
-            redirect_to :action => :destroy
+            logout_user_action
           end
         elsif response.auth_failure?
           increment_saml_stat("normal.login_failure")
@@ -438,7 +442,7 @@ class PseudonymSessionsController < ApplicationController
         end
       end
     end
-    redirect_to :action => :destroy
+    logout_user_action
   end
 
   def cas_client(account = @domain_root_account)

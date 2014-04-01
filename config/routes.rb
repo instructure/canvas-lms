@@ -608,7 +608,7 @@ routes.draw do
   match 'grades' => 'users#grades', :as => :grades
   match 'login' => 'pseudonym_sessions#new', :as => :login, :via => :get
   match 'login' => 'pseudonym_sessions#create', :via => :post
-  match 'logout' => 'pseudonym_sessions#destroy', :as => :logout
+  match 'logout' => 'pseudonym_sessions#destroy', :as => :logout, :via => :delete
   match 'login/cas' => 'pseudonym_sessions#new', :as => :cas_login, :via => :get
   match 'login/cas' => 'pseudonym_sessions#cas_logout', :as => :cas_logout, :via => :post
   match 'login/otp' => 'pseudonym_sessions#otp_login', :as => :otp_login, :via => [:get, :post]

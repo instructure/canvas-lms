@@ -6,7 +6,8 @@ describe "help dialog" do
   context "no user logged in" do
     it "should work with no logged in user" do
       Setting.set('show_feedback_link', 'true')
-      get "/logout"
+      destroy_session(true)
+      get("/login")
       f('#footer .help_dialog_trigger').click
       wait_for_ajaximations
       f("#help-dialog-options").should be_displayed
@@ -14,7 +15,8 @@ describe "help dialog" do
 
     it "should no longer show a browser warning for IE" do
       Setting.set('show_feedback_link', 'true')
-      get "/logout"
+      destroy_session(true)
+      get("/login")
       driver.execute_script("window.INST.browser = {ie: true, version: 8}")
       f('#footer .help_dialog_trigger').click
       wait_for_ajaximations

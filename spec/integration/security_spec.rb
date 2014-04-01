@@ -313,7 +313,7 @@ describe "security" do
       c.should be_present
 
       expect {
-        get "/logout"
+        delete "/logout"
       }.to change(SessionPersistenceToken, :count).by(-1)
       cookies['pseudonym_credentials'].should_not be_present
       SessionPersistenceToken.find_by_pseudonym_credentials(CGI.unescape(c)).should be_nil
@@ -338,7 +338,7 @@ describe "security" do
       s3.https!
       s3.get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{c1}"
       s3.response.should be_success
-      s3.get "/logout"
+      s3.delete "/logout"
       # make sure c2 can still work
       s4 = open_session
       s4.https!

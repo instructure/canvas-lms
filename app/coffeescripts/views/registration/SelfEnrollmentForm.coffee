@@ -102,7 +102,7 @@ define [
       @$el.submit()
 
     logOut: (refresh = false) =>
-      $.ajaxJSON '/logout', 'POST', {}, ->
+      $.ajaxJSON '/logout', 'DELETE', {}, ->
         location.reload true if refresh
 
     logOutAndRefresh: (e) =>
