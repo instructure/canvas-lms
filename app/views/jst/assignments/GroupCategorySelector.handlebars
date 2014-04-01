@@ -4,31 +4,25 @@
 
 <div class="form-column-right">
   <div class="border border-trbl border-round">
-
     {{!-- Group Assignment selection --}}
     <label class="checkbox flush">
       {{checkbox "has_group_category"
         id="assignment_has_group_category"
         prefix=prefix
         checked=groupCategoryId
-        disabled=groupCategoryIdFrozen}}
+        disabled=hasGroupCategoryDisabled}}
       {{#t "is_group_assignment"}}This is a Group Assignment{{/t}}
     </label>
 
     {{!-- Individual grading? --}}
     <div class="nested">
-      <div class="group_submission_warning alert" style="display:none">
-        {{#t "students_already_submitted_warning"}}Prior individual submissions will
-        not be counted as group submissions and will show incorrectly in
-        speedgrader.{{/t}}
-      </div>
       <div id="group_category_options" style="{{hiddenUnless groupCategoryId}}">
         <label class="checkbox" >
           {{checkbox "grade_group_students_individually"
             id=null
             prefix=prefix
             checked=gradeGroupStudentsIndividually
-            disabled=groupCategoryIdFrozen}}
+            disabled=gradeIndividuallyDisabled}}
           {{#t "grade_group_students_individually"}}
             Assign Grades to Each Student Individually
           {{/t}}
@@ -40,7 +34,7 @@
         </label>
         <select id="assignment_group_category_id"
           name="{{#if nested}}assignment[group_category_id]{{else}}group_category_id{{/if}}"
-          {{disabledIfIncludes frozenAttributes "group_category_id"}}>
+          {{disabledIf groupCategoryIdDisabled}}>
           {{#each groupCategories}}
             <option value="{{id}}" {{selectedIf ../groupCategoryId this.id}}>
               {{name}}
@@ -52,5 +46,14 @@
         </select>
       </div>
     </div>
+
+    {{#if groupCategoryLocked}}
+      <div class="group_category_locked_explanation alert"
+           style="margin: 15px 20px 0">
+        {{#t "group_category_locked_explanation"}}Students have already
+        submitted homework on this assignment, so group settings cannot be
+        changed.{{/t}}
+      </div>
+    {{/if}}
   </div>
 </div>
