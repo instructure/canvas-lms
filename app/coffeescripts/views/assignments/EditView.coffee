@@ -6,6 +6,7 @@ define [
   'jquery'
   'wikiSidebar'
   'jst/assignments/EditView'
+  'compiled/userSettings'
   'compiled/models/TurnitinSettings'
   'compiled/views/assignments/TurnitinSettingsDialog'
   'compiled/fn/preventDefault'
@@ -19,7 +20,7 @@ define [
   'jquery.toJSON'
   'compiled/jquery.rails_flash_notifications'
 ], (INST, I18n, ValidatedFormView, _, $, wikiSidebar, template,
-TurnitinSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
+userSettings, TurnitinSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
 AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
 
   class EditView extends ValidatedFormView
@@ -90,6 +91,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     initialize: (options) ->
       super
       @assignment = @model
+      @setDefaultsIfNew()
       @dueDateOverrideView = options.views['js-assignment-overrides']
       @model.on 'sync', -> window.location = @get 'html_url'
       @gradingTypeSelector.on 'change:gradingType', @handleGradingTypeChange
@@ -97,6 +99,29 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     handleCancel: (ev) =>
       ev.preventDefault()
       window.location = ENV.CANCEL_TO if ENV.CANCEL_TO?
+
+    settingsToCache:() =>
+      ["assignment_group_id","grading_type","submission_type","submission_types",
+       "points_possible","allowed_extensions","peer_reviews","peer_review_count",
+       "automatic_peer_reviews","group_category_id","grade_group_students_individually",
+       "turnitin_enabled"]
+
+    setDefaultsIfNew: =>
+      if @assignment.isNew()
+        if userSettings.contextGet('new_assignment_settings')
+          _.each(@settingsToCache(), (setting) =>
+            setting_from_cache = userSettings.contextGet('new_assignment_settings')[setting]
+            if setting_from_cache == "1" || setting_from_cache == "0"
+              setting_from_cache = parseInt setting_from_cache
+            if setting_from_cache then @assignment.set(setting, setting_from_cache)
+          )
+        else
+          @assignment.set('submission_type','online')
+          @assignment.set('submission_types',['online'])
+
+    cacheAssignmentSettings: =>
+      new_assignment_settings = _.pick(@getFormData(), @settingsToCache()...)
+      userSettings.contextSet('new_assignment_settings', new_assignment_settings)
 
     showTurnitinDialog: (ev) =>
       ev.preventDefault()
@@ -183,6 +208,9 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     submit: (event) =>
       event.preventDefault()
       event.stopPropagation()
+
+      @cacheAssignmentSettings()
+
       @dueDateOverrideView.updateOverrides()
       if @dueDateOverrideView.containsSectionsWithoutOverrides()
         sections = @dueDateOverrideView.sectionsWithoutOverrides()

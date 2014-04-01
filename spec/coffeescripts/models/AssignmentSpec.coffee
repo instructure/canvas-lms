@@ -229,10 +229,6 @@ define [
     assignment.set 'submission_types', [ 'online_upload' ]
     deepEqual assignment.submissionType(), 'online'
 
-  test "returns online for new records", ->
-    assignment = new Assignment name: 'foo'
-    deepEqual assignment.submissionType(), 'online'
-
   module "Assignment#expectsSubmission"
 
   test "returns false if assignment submission type is not online", ->
@@ -516,11 +512,6 @@ define [
     assignment.set 'submission_types', [ 'online_url' ]
     json = assignment.toView()
     deepEqual json.acceptsOnlineURL, true
-
-  test "returns online for new records", ->
-    assignment = new Assignment name: 'foo'
-    json = assignment.toView()
-    deepEqual json.isOnlineSubmission, true
 
   test "includes allowedExtensions", ->
     assignment = new Assignment name: 'foo'
