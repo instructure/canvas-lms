@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:batch="http://schemas.google.com/gdata/batch" xmlns:gAcl="http://schemas.google.com/acl/2007">
   <entry xmlns:batch="http://schemas.google.com/gdata/batch" xmlns:gAcl="http://schemas.google.com/acl/2007">
-    <id>https://docs.google.com/feeds/acl/private/full/document%3A1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA/user%3Auser%40example.com</id>
-    <batch:operation type="delete"/>
+    <batch:id>192</batch:id>
+    <batch:operation type="insert"/>
     <gAcl:role value="writer"/>
-    <gAcl:scope type="user" value="user@example.com"/>
+    <gAcl:scope type="user" value="u_id"/>
   </entry>
   <category scheme="http://schemas.google.com/g/2005#kind" term="http://schemas.google.com/acl/2007#accessRule"/>
 </feed>

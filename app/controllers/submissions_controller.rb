@@ -185,7 +185,6 @@ require 'action_controller_test_process'
 #     }
 #
 class SubmissionsController < ApplicationController
-  include GoogleDocs
   include KalturaHelper
   before_filter :get_course_from_section, :only => :create
   before_filter :require_context
@@ -500,7 +499,8 @@ class SubmissionsController < ApplicationController
   # Internal: Submit a Google Doc.
   def submit_google_doc(document_id)
     # fetch document from google
-    document_response, display_name, file_extension = google_docs_download(document_id)
+    google_docs = GoogleDocs.new(google_docs_user, session)
+    document_response, display_name, file_extension = google_docs.google_docs_download(document_id)
 
     # error handling
     unless document_response.try(:is_a?, Net::HTTPOK)

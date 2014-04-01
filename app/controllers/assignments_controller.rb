@@ -24,7 +24,6 @@ class AssignmentsController < ApplicationController
   include Api::V1::AssignmentGroup
   include Api::V1::Outcome
 
-  include GoogleDocs
   include KalturaHelper
   before_filter :require_context
   add_crumb(proc { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
@@ -134,8 +133,9 @@ class AssignmentsController < ApplicationController
       end
 
       begin
-        @google_docs_token = google_docs_retrieve_access_token
-      rescue NoTokenError
+        google_docs = GoogleDocs.new(google_docs_user, session)
+        @google_docs_token = google_docs.google_docs_retrieve_access_token
+      rescue GoogleDocs::NoTokenError
         #do nothing
       end
 
@@ -165,7 +165,8 @@ class AssignmentsController < ApplicationController
     if assignment.allow_google_docs_submission? && @real_current_user.blank?
       docs = {}
       begin
-        docs = google_docs_list_with_extension_filter(assignment.allowed_extensions)
+        google_docs = GoogleDocs.new(google_docs_user, session)
+        docs = google_docs.google_docs_list_with_extension_filter(assignment.allowed_extensions)
       rescue NoTokenError
         #do nothing
       rescue => e

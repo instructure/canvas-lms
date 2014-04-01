@@ -48,7 +48,7 @@ describe "collaborations" do
         driver.execute_script 'window.confirm = function(msg) { return true; }'
       end
       keep_trying_until {
-        form_visible?.should == form_visible  
+        form_visible?.should == form_visible
       }
     end
   end
@@ -85,7 +85,7 @@ describe "collaborations" do
           course_with_teacher_logged_in
 
           if type == 'google_docs'
-            CollaborationsController.any_instance.
+            GoogleDocs.any_instance.
               stubs(:google_docs_verify_access_token).
               returns(true)
 
@@ -218,7 +218,7 @@ describe "collaborations" do
           wait_for_ajaximations
           fj('.available-users:visible a').click
           keep_trying_until {
-            ffj('.members-list li').length.should == 1  
+            ffj('.members-list li').length.should == 1
           }
         end
 

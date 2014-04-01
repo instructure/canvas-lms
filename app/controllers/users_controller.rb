@@ -104,9 +104,6 @@
 #       }
 #     }
 class UsersController < ApplicationController
-
-
-  include GoogleDocs
   include Twitter
   include LinkedIn
   include DeliciousDiigo
@@ -147,7 +144,7 @@ class UsersController < ApplicationController
     end
     return_to_url = params[:return_to] || user_profile_url(@current_user)
     if params[:service] == "google_docs"
-      redirect_to google_docs_request_token_url(return_to_url)
+      redirect_to GoogleDocs.google_docs_request_token_url(return_to_url, session, google_docs_user, request.host_with_port, oauth_success_url(:service => 'google_docs'))
     elsif params[:service] == "twitter"
       redirect_to twitter_request_token_url(return_to_url)
     elsif params[:service] == "linked_in"
@@ -188,7 +185,7 @@ class UsersController < ApplicationController
         end
       elsif params[:service] == "google_docs"
         begin
-          google_docs_get_access_token(oauth_request, params[:oauth_verifier])
+          GoogleDocs.google_docs_get_access_token(oauth_request, params[:oauth_verifier], session, google_docs_user)
           flash[:notice] = t('google_docs_added', "Google Docs access authorized!")
         rescue => e
           ErrorReport.log_exception(:oauth, e)
