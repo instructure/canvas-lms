@@ -3601,6 +3601,27 @@ describe Course do
       @course.enrollments.count.should == enrollment_count
     end
 
+    context "unique enrollments" do
+      before do
+        course(active_all: true)
+        user
+        @section2 = @course.course_sections.create!
+        @course.enroll_user(@user, 'StudentEnrollment', section: @course.default_section).reject!
+        @course.enroll_user(@user, 'StudentEnrollment', section: @section2, allow_multiple_enrollments: true).reject!
+        @user.enrollments.count.should == 2
+      end
+
+      it "should not cause problems moving a user between sections (s1)" do
+        # this should not cause a unique constraint violation
+        @course.enroll_user(@user, 'StudentEnrollment', section: @course.default_section)
+      end
+
+      it "should not cause problems moving a user between sections (s2)" do
+        # this should not cause a unique constraint violation
+        @course.enroll_user(@user, 'StudentEnrollment', section: @section2)
+      end
+    end
+
     describe "already_enrolled" do
       before do
         course

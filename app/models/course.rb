@@ -1570,7 +1570,11 @@ class Course < ActiveRecord::Base
     if opts[:allow_multiple_enrollments]
       e = self.all_enrollments.where(user_id: user, type: type, role_name: role_name, associated_user_id: associated_user_id, course_section_id: section.id).first
     else
-      e = self.all_enrollments.where(user_id: user, type: type, role_name: role_name, associated_user_id: associated_user_id).first
+      # order by course_section_id<>section.id so that if there *is* an existing enrollment for this section, we get it (false orders before true)
+      e = self.all_enrollments.
+          where(user_id: user, type: type, role_name: role_name, associated_user_id: associated_user_id).
+          order("course_section_id<>#{section.id}").
+          first
     end
     if e
       e.already_enrolled = true
@@ -1616,9 +1620,9 @@ class Course < ActiveRecord::Base
     self.claim if self.created? && e && e.admin?
     unless opts[:skip_touch_user]
       e.associated_user.try(:touch)
-      user.try(:touch)
+      user.touch
     end
-    user.try(:reload)
+    user.reload
     e
   end
 
