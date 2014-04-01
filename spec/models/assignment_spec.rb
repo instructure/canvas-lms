@@ -2638,6 +2638,44 @@ describe Assignment do
       @assignment.save!
     end
   end
+
+  describe "group category validation" do
+    before do
+      student_in_course active_all: true
+      @group_category = @course.group_categories.create! name: "groups"
+      @groups = 2.times.map { |i|
+        @group_category.groups.create! name: "group #{i}", context: @course
+      }
+    end
+
+    def assignment(group_category = nil)
+      a = @course.assignments.build name: "test"
+      a.group_category = group_category
+      a.tap &:save!
+    end
+
+    it "lets you change group category attributes before homework is submitted" do
+      a1 = assignment
+      a1.group_category = @group_category
+      a1.should be_valid
+
+      a2 = assignment(@group_category)
+      a2.group_category = nil
+      a2.should be_valid
+    end
+
+    it "doesn't let you change group category attributes after homework is submitted" do
+      a1 = assignment
+      a1.submit_homework @student, body: "hello, world"
+      a1.group_category = @group_category
+      a1.should_not be_valid
+
+      a2 = assignment(@group_category)
+      a2.submit_homework @student, body: "hello, world"
+      a2.group_category = nil
+      a2.should_not be_valid
+    end
+  end
 end
 
 def setup_assignment_with_group

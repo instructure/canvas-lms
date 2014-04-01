@@ -61,6 +61,7 @@ class Assignment < ActiveRecord::Base
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :validate_draft_state_change, :if => :workflow_state_changed?
+  validate :group_category_changes_ok?
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
     # only accept the url and new_tab params, the other accessible
@@ -80,6 +81,15 @@ class Assignment < ActiveRecord::Base
       end
     end
     true
+  end
+
+  def group_category_changes_ok?
+    return if new_record?
+    return unless has_submitted_submissions?
+    if group_category_id_changed?
+      errors.add :group_category_id, I18n.t("group_category_locked",
+                                            "The group category can't be changed because students have already submitted on this assignment")
+    end
   end
 
   API_NEEDED_FIELDS = %w(
