@@ -263,19 +263,21 @@ class UserMerge
     [:associated_user_id, :user_id].each do |column|
       users = [from_user, target_user]
       Shard.with_each_shard(from_user.associated_shards) do
-        conflict_scope(column).where(column => users).find_each do |e|
+        Enrollment.transaction do
+          conflict_scope(column).where(column => users).find_each do |e|
 
-          scope = enrollment_conflicts(e, column, users)
-          keeper = enrollment_keeper(scope)
+            scope = enrollment_conflicts(e, column, users)
+            keeper = enrollment_keeper(scope)
 
-          # delete all conflicts from target user
-          scope.where("id<>?", keeper).where(column => target_user).delete_all
+            # delete all conflicts from target user
+            scope.where("id<>?", keeper).where(column => target_user).delete_all
 
-          # mark all conflicts on from_user as deleted so they will be left
-          scope.active.where("id<>?", keeper).where(column => from_user).destroy_all
+            # mark all conflicts on from_user as deleted so they will be left
+            scope.active.where("id<>?", keeper).where(column => from_user).destroy_all
+          end
+          # move all the enrollments that are not marked as deleted to the target user
+          Enrollment.active.where(column => from_user).update_all(column => target_user)
         end
-        # move all the enrollments that are not marked as deleted to the target user
-        Enrollment.active.where(column => from_user).update_all(column => target_user)
       end
     end
   end
