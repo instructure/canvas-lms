@@ -3,6 +3,10 @@ $highlightColor: #3cb878;
 #quiz-statistics {
   header {
     line-height: 34px;
+
+    &.padded {
+      padding: 20px 0;
+    }
   }
 
   .inline {
@@ -13,7 +17,20 @@ $highlightColor: #3cb878;
     line-height: 1;
     font-weight: bold;
   }
- }
+}
+
+#question-statistics-section {
+  // The sorting <ic-menu />
+  header ic-menu {
+    position: relative;
+
+    ic-menu-list {
+      top: auto;
+      right: auto;
+      z-index: 1;
+    }
+  }
+}
 
 .question-statistics {
   border: 1px solid #CAD0D7;
@@ -36,5 +53,215 @@ $highlightColor: #3cb878;
     margin-top: -5px;
     margin-bottom: 20px;
     font-size: 1.25em;
+  }
+
+  aside {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease-in-out 0.1s;
+  }
+
+  &:hover, &.with-details {
+    background-color: #f4f4f4;
+
+    aside {
+      opacity: 1;
+      pointer-events: inherit;
+    }
+  }
+
+  .correct-answer-ratio-section {
+    .chart, .auxiliary {
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .chart {
+      width: 80px;
+      height: 80px;
+
+      .background {
+        fill: #ddd;
+      }
+
+      .foreground {
+        fill: $highlightColor;
+      }
+
+      text {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 125%;
+        font-weight: bold;
+      }
+    }
+
+    .auxiliary {
+      margin-left: 20px;
+      width: 160px;
+    }
+  }
+
+  .answer-distribution-section {
+    height: 120px;
+    margin-bottom: -1px;
+
+    .chart {
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+
+      .bar {
+        fill: #2a333b;
+
+        &.bar-highlighted {
+          fill: $highlightColor;
+        }
+
+        &.bar-striped {
+          pointer-events: none;
+        }
+
+        &:hover {
+          fill: orangered;
+        }
+      }
+
+      pattern#diagonalStripes {
+        g {
+          stroke: rgba(255,255,255,0.25);
+          stroke-width: 5;
+        }
+      }
+
+      .x.axis path {
+        display: none;
+      }
+
+      .y.axis {
+        fill: #aaa;
+
+        path {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .discrimination-index-section {
+    width: 270px;
+
+    .index {
+      font-size: 24px;
+      font-weight: bold;
+      font-style: normal;
+
+      &.negative {
+        color: red;
+      }
+
+      &.positive {
+        .sign {
+          color: $highlightColor;
+        }
+      }
+    }
+
+    .chart {
+      .bar {
+        fill: #2a333b;
+      }
+      .bar.correct {
+        fill: $highlightColor;
+      }
+    }
+  }
+
+  .answer-drilldown {
+    list-style-type: none;
+    margin: 0;
+    padding: 20px 0;
+    border-top: 1px solid #ddd;
+
+    li {
+      display: inline-block;
+      width: 45%;
+      margin-bottom: 20px;
+      min-height: 40px;
+      vertical-align: top;
+
+      &.correct .answer-response-ratio {
+        background-color: $highlightColor;
+      }
+
+      &:nth-of-type(2n) {
+        margin-left: 5%;
+      }
+    }
+    
+    .answer-text {
+      margin-left: 55px; /* for the answer response ratio label */
+    }
+
+    .answer-response-ratio {
+      background-color: #2a333b;
+      display: inline-block;
+      position: absolute;
+      background: #2a333b;
+      color: white;
+      border-radius: 50% 0 50% 50%;
+      width: 40px;
+      line-height: 40px;
+      text-align: center;
+      font-weight: bold;
+      z-index: 0; /* otherwise selecting the answer text gets crazy */
+
+      sup {
+        font-size: 0.6em;
+        position: absolute;
+        font-weight: normal;
+        top: auto;
+        margin-top: 12px;
+        line-height: 1;
+      }
+    }
+  }
+
+  .detail-section {
+    display: none;
+  }
+
+  &.with-details .detail-section {
+    display: block;
+  }
+}
+
+// Needs to be in global scope because it's placed inside a tooltip
+.answer-distribution-tooltip-content {
+  text-align: center;
+
+  .answer-response-ratio {
+    font-size: 1.5em;
+    line-height: 2em;
+    font-weight: bold;
+    display: block;
+  }
+
+  .answer-response-count {
+    display: block;
+    font-size: 1.25em;
+  }
+
+  // This might go away if design decides not to embed the answer text in the
+  // tooltip content.
+  hr {
+    height: 1px;
+    line-height: 1px;
+    margin: -5px 0 5px 0;
+    background: none;
+    border: none;
+    box-shadow: 0 1px 0 #333;
   }
 }

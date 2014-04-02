@@ -1,0 +1,23 @@
+<svg class="chart"></svg>
+<div title class="inspector"></div>
+
+<div class="auxiliary">
+  {{#each answer in controller.model.answers}}
+    <div {{bind-attr data-answer="answer.id"}} class="answer-distribution-tooltip-content">
+      <p>
+        <span class="answer-response-ratio">{{answer.ratio}}%</span>
+        <span class="answer-response-count">
+          {{#with answer}}
+            {{#t 'response_student_count'}} {{responses}} students {{/t}}
+          {{/with}}
+        </span>
+      </p>
+
+      <hr />
+
+      <div class="answer-text">
+        {{{answer.text}}}
+      </div>
+    </div>
+  {{/each}}
+</div>

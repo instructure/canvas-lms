@@ -1,0 +1,37 @@
+<header>
+  <span class="question-attempts">{{attemptsLabel}}</span>
+  <aside class="pull-right">
+    <button {{action "showDetails"}} class="btn">
+      <i {{bind-attr class="detailsVisible:icon-collapse:icon-expand"}}></i>
+    </button>
+  </aside>
+
+  <div class="question-text">
+    {{{questionText}}}
+  </div>
+</header>
+
+<div>
+  <section class="correct-answer-ratio-section">
+    {{render "quiz/statistics/questions/multiple_choice/correct_pie" controller}}
+  </section>
+
+  <section class="answer-distribution-section">
+    {{render "quiz/statistics/questions/multiple_choice/answer_bars" controller}}
+  </section>
+
+  <section class="discrimination-index-section">
+    {{render "quiz/statistics/questions/multiple_choice/discrimination_index" controller}}
+  </section>
+</div>
+
+<ol class="answer-drilldown detail-section">
+  {{#each answer in answers}}
+    <li {{bind-attr class="answer.correct"}}>
+      <span class="answer-response-ratio">{{answer.ratio}}<sup>%</sup></span>
+      <div class="answer-text">
+        {{{answer.text}}}
+      </div>
+    </li>
+  {{/each}}
+</ol>
