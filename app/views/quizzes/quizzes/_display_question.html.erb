@@ -23,6 +23,8 @@
     right_answers = hash_get(question, :answers, {})
     right_answers = (hash_get(question, :matches) || hash_get(question, :answers).sort_by{|a| rand }) if question_type.entry_type == "matching" rescue {}
   end
+  # If this question is being rendered on its own, only the teacher should be viewing it.
+  display_question_counter ||= nil
 %>
 <div class="question_holder <%= "group" if in_group %>" id="<%= "question_template" unless question %>" style="<%= hidden unless question %>">
   <div style="display: block; height: 1px; overflow: hidden;">&nbsp;</div>
@@ -36,7 +38,11 @@
       </div>
     <% end %>
     <div class="header" <%= hidden(true) if (assessing || assessment_results) && question_type && question_type.entry_type == "none" %>>
-      <span class="name question_name" tabindex="0" role="heading"><%= hash_get(question, :question_name) %></span>
+      <% if !display_question_counter || can_do(@quiz, @current_user, :grade) %>
+        <span class="name question_name" tabindex="0" role="heading"><%= hash_get(question, :question_name) %></span>
+      <% else %>
+        <span class="name question_name" tabindex="0" role="heading"><%= t :question_number, "Question %{question_number}", :question_number => (display_question_counter + 1) %></span>
+      <% end %>
       <span class="question_points_holder" style="<%= hidden if question_type && question_type.entry_type == "none" %>">
       <% if user_answer %>
         <div class="user_points" <%= hidden(true) if (assessing || assessment_results) && question_type && question_type.entry_type == "none" %>>
