@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -94,11 +94,16 @@ class FilesController < ApplicationController
   before_filter :check_file_access_flags, :only => [:show_relative, :show]
   prepend_around_filter :load_pseudonym_from_policy, :only => :create
   skip_before_filter :verify_authenticity_token, :only => :api_create
+  before_filter :verify_api_id, only: [:api_show, :api_create_success, :api_file_status, :api_update, :destroy]
 
   include Api::V1::Attachment
   include Api::V1::Avatar
 
   before_filter { |c| c.active_tab = "files" }
+
+  def verify_api_id
+    raise ActiveRecord::RecordNotFound unless params[:id] =~ Api::ID_REGEX
+  end
 
   def quota
     get_quota
@@ -219,6 +224,7 @@ class FilesController < ApplicationController
       raise ActiveRecord::RecordNotFound unless folder
       context_index = true
     else
+      verify_api_id
       folder = Folder.find(params[:id])
     end
 
@@ -353,7 +359,7 @@ class FilesController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'https://<canvas>/api/v1/files/<file_id>' \ 
+  #   curl 'https://<canvas>/api/v1/files/<file_id>' \
   #         -H 'Authorization: Bearer <token>'
   #
   # @returns File
@@ -520,7 +526,7 @@ class FilesController < ApplicationController
       stream = @attachment.open
       json = { :body => stream.read.force_encoding(Encoding::ASCII_8BIT) }
       render json: json
-     end
+    end
   end
 
   def send_attachment(attachment)
@@ -675,6 +681,7 @@ class FilesController < ApplicationController
 
   def s3_success
     if params[:id].present?
+      verify_api_id
       @attachment = Attachment.find_by_id_and_workflow_state_and_uuid(params[:id], 'unattached', params[:uuid])
     end
     details = @attachment.s3object.head rescue nil
@@ -914,8 +921,8 @@ class FilesController < ApplicationController
 
   # @API Delete file
   # Remove the specified file
-  # 
-  #   curl -XDELETE 'https://<canvas>/api/v1/files/<file_id>' \ 
+  #
+  #   curl -XDELETE 'https://<canvas>/api/v1/files/<file_id>' \
   #        -H 'Authorization: Bearer <token>'
   def destroy
     @attachment = Attachment.find(params[:id])
