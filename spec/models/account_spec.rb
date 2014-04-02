@@ -1036,4 +1036,43 @@ describe Account do
     end
   end
 
+  describe "default_time_zone" do
+    context "root account" do
+      before do
+        @account = Account.create!
+      end
+
+      it "should use provided value when set" do
+        @account.default_time_zone = 'America/New_York'
+        @account.default_time_zone.should == ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+      end
+
+      it "should default to Mountain if not set" do
+        @account.default_time_zone.should == ActiveSupport::TimeZone['Mountain Time (US & Canada)']
+      end
+    end
+
+    context "sub account" do
+      before do
+        @root_account = Account.create!
+        @account = @root_account.sub_accounts.create!
+        @account.root_account = @root_account
+      end
+
+      it "should use provided value when set, regardless of root account setting" do
+        @root_account.default_time_zone = 'America/Chicago'
+        @account.default_time_zone = 'America/New_York'
+        @account.default_time_zone.should == ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+      end
+
+      it "should default to root account value if not set" do
+        @root_account.default_time_zone = 'America/Chicago'
+        @account.default_time_zone.should == ActiveSupport::TimeZone['Central Time (US & Canada)']
+      end
+
+      it "should default to Mountain if neither is set" do
+        @account.default_time_zone.should == ActiveSupport::TimeZone['Mountain Time (US & Canada)']
+      end
+    end
+  end
 end
