@@ -130,6 +130,9 @@ define [
       @showCustomColumnDropdownOption()
 
     onShow: ->
+      return if @startedInitializing
+      @startedInitializing = true
+
       @spinner = new Spinner() unless @spinner
       $(@spinner.spin().el).css(
         opacity: 0.5
@@ -832,19 +835,22 @@ define [
         event.preventDefault()
         new UploadDialog(@options.context_url)
 
-      $settingsMenu.find('.student_names_toggle').click (e) ->
-        $wrapper = $('.grid-canvas')
-        $wrapper.toggleClass('hide-students')
-
-        if $wrapper.hasClass('hide-students')
-          $(this).text I18n.t('show_student_names', 'Show Student Names')
-        else
-          $(this).text I18n.t('hide_student_names', 'Hide Student Names')
+      $settingsMenu.find('.student_names_toggle').click(@studentNamesToggle)
 
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
 
       @renderTotalHeader()
+
+    studentNamesToggle: (e) =>
+      e.preventDefault()
+      $wrapper = @$grid.find('.grid-canvas')
+      $wrapper.toggleClass('hide-students')
+
+      if $wrapper.hasClass('hide-students')
+        $(e.currentTarget).text I18n.t('show_student_names', 'Show Student Names')
+      else
+        $(e.currentTarget).text I18n.t('hide_student_names', 'Hide Student Names')
 
     weightedGroups: =>
       @options.group_weighting_scheme == "percent"
