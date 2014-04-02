@@ -11,10 +11,10 @@
       <div class="bar" style="width:{{progress.completion}}%;"></div>
     </div>
   {{else}}
-    <a href="javascript:void(0)" class="btn button-sidebar-wide {{#if report_disabled}}disabled{{else}}create-report{{/if}}"
-       {{#if report_disabled}}
+    <a href="javascript:void(0)" class="btn button-sidebar-wide {{#if generatable}}create-report{{else}}disabled{{/if}}"
+       {{#unless generatable}}
          data-tooltip title="{{#t "item_analysis_not_available"}}Item Analysis is not available for Surveys{{/t}}"
-       {{/if}}>
+       {{/unless}}>
       <i class="icon-ms-excel"></i>
       {{#t "generate_report_name"}}Generate {{report_name}}{{/t}}
     </a>

@@ -20,6 +20,14 @@ require 'csv'
 
 class Quizzes::QuizStatistics::ItemAnalysis < Quizzes::QuizStatistics::Report
 
+  def generatable?
+    !self.quiz.survey?
+  end
+
+  def readable_type
+    t('#quizzes.quiz_statistics.types.item_analysis', 'Item Analysis')
+  end
+
   def filename
     "quiz-item-analysis-#{Time.now.to_i}.csv"
   end

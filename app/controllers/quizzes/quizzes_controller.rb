@@ -18,7 +18,6 @@
 
 class Quizzes::QuizzesController < ApplicationController
   include Api::V1::Quiz
-  include Api::V1::QuizReport
   include Api::V1::AssignmentOverride
   include KalturaHelper
   include Filters::Quizzes
@@ -416,14 +415,17 @@ class Quizzes::QuizzesController < ApplicationController
               ]
             end
 
-            js_env :quiz_reports => Quizzes::QuizStatistics::REPORTS.map { |report_type|
-              report = @quiz.current_statistics_for(report_type, :includes_all_versions => all_versions)
-              json = quiz_report_json(report, @current_user, session, :include => ['file'])
-              json[:course_id] = @context.id
-              json[:report_disabled] = @quiz.survey? && report_type == "item_analysis"
-              json[:report_name] = report.readable_type
-              json[:progress] = progress_json(report.progress, @current_user, session) if report.progress
-              json
+            js_env quiz_reports: Quizzes::QuizStatistics::REPORTS.map { |report_type|
+              report = @quiz.current_statistics_for(report_type, {
+                includes_all_versions: all_versions
+              })
+
+              Quizzes::QuizReportSerializer.new(report, {
+                controller: self,
+                scope: @current_user,
+                root: false,
+                includes: %w[ file progress ]
+              }).as_json
             }
           }
         end

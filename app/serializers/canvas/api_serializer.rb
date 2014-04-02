@@ -4,6 +4,24 @@ module Canvas
     include Canvas::APISerialization
 
     attr_reader :controller, :session
+
+    # Array of strings that can be passed by the controller to signal which
+    # associations to embed in the serializer output. You can test this array
+    # in your own serializer to figure out what to include, e.g
+    #
+    #   has_one :post, embed: :object
+    #
+    #   def filter(keys)
+    #     case keys
+    #     # ...
+    #     when :post then @sideloads.include?('post')
+    #     end
+    #   end
+    #
+    # The strings are parsed from options[:includes] when initializing the
+    # serializer.
+    attr_reader :sideloads
+
     alias_method :user, :scope
     alias_method :current_user, :user
     def_delegators :@controller, :stringify_json_ids?, :polymorphic_url,
@@ -29,6 +47,7 @@ module Canvas
     def initialize(object, options={})
       super(object, options)
       @controller = options[:controller]
+      @sideloads = options.fetch(:includes, []).map(&:to_s)
       unless controller
         raise ArgumentError.new("You must pass a controller to APISerializer!")
       end
@@ -46,6 +65,8 @@ module Canvas
           if association.embed_ids?
             hash['links'] ||= {}
             hash['links'][association.name] = serialize_ids association
+          elsif association.embed_objects? && association.embed_in_root?
+            hash[association.embedded_key] = build_serializer(association).serializable_object
           elsif association.embed_objects?
             hash['links'] ||= {}
             hash['links'][association.embedded_key] = serialize association
@@ -77,6 +98,23 @@ module Canvas
       super(klass)
       resource_name = klass.name.demodulize.underscore.downcase.split('_serializer').first
       klass.send(:alias_method, resource_name.to_sym, :object)
+    end
+
+    # Overriding to pass the controller and required context to association
+    # serializers. Necessary when embedding objects as opposed to IDs only.
+    #
+    # You can specify an association option :wrap_in_array to tell whether
+    # the embedded object should be wrapped in an array or not in has_one
+    # assocs (AMS defaults to true).
+    def build_serializer(association)
+      object = send(association.name)
+      options = { controller: @controller, scope: scope }
+      association.build_serializer(object, options).tap do |serializer|
+        if association.options.has_key?(:wrap_in_array)
+          serializer.instance_variable_set('@wrap_in_array',
+            association.options[:wrap_in_array])
+        end
+      end
     end
 
     private

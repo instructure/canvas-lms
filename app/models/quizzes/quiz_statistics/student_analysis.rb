@@ -21,6 +21,10 @@ require 'csv'
 class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   include HtmlTextHelper
 
+  def readable_type
+    t('#quizzes.quiz_statistics.types.student_analysis', 'Student Analysis')
+  end
+
   class TemporaryUser < Struct.new(:id, :short_name)
   end
 

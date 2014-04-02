@@ -15,13 +15,14 @@ module Quizzes
                 :hide_correct_answers_at, :all_dates, :can_unpublish, :can_update,
                 :require_lockdown_browser, :require_lockdown_browser_for_results,
                 :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
-                :speed_grader_url, :permissions
+                :speed_grader_url, :permissions, :quiz_reports_url
 
     def_delegators :@controller,
       :api_v1_course_assignment_group_url,
       :speed_grader_course_gradebook_url,
       :api_v1_course_quiz_submission_url,
-      :api_v1_course_quiz_submissions_url
+      :api_v1_course_quiz_submissions_url,
+      :api_v1_course_quiz_reports_url
 
     has_one :assignment_group, embed: :ids, root: :assignment_group
     has_many :quiz_submissions, embed: :ids, root: :quiz_submissions
@@ -113,12 +114,18 @@ module Quizzes
         links = hash.delete('links')
         id = hash['assignment_group']
         hash['assignment_group_id'] = quiz.assignment_group.try(:id)
+      else
+        hash['links']['quiz_reports'] = hash.delete(:quiz_reports_url)
       end
       hash
     end
 
     def assignment_group_url
       api_v1_course_assignment_group_url(quiz.context, quiz.assignment_group.id)
+    end
+
+    def quiz_reports_url
+      api_v1_course_quiz_reports_url(quiz.context, quiz)
     end
 
     def stringify_ids?

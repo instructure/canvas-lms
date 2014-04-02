@@ -8,6 +8,8 @@ require [
   $container = $('.quiz-reports')
   for report in ENV.quiz_reports
     el = $('<div>').appendTo($container)
+    # need to alias this attribute to preserve the translations
+    report.report_name = report.readable_type
     model = new QuizReport(report)
     new QuizReportGenerator({el, model}).render()
 

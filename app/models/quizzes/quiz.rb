@@ -980,7 +980,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     ).report.generate
   end
 
-  # finds or initializes a QuizStatistics for the given report_type and
+  # finds or creates a QuizStatistics for the given report_type and
   # options
   def current_statistics_for(report_type, options = {})
     # item analysis always takes the first attempt (not necessarily the
@@ -1001,20 +1001,31 @@ class Quizzes::Quiz < ActiveRecord::Base
     candidate_stats = quiz_statistics.report_type(report_type).where(quiz_stats_opts).last
 
     if candidate_stats.nil? || candidate_stats.created_at < last_quiz_activity
-      quiz_statistics.build(quiz_stats_opts)
+      quiz_statistics.create(quiz_stats_opts)
     else
       candidate_stats
     end
   end
 
-  # returns the QuizStatistics object that will ultimately contain the csv
-  # (it may be generating in the background)
+  # Generate the CSV attachment of the current statistics for a given report
+  # type.
+  #
+  # @param [Hash] options
+  #   Options to pass to Quiz#current_statistics_for.
+  #
+  # @param [Boolean] [options.async=false]
+  #   Pass true to generate the CSV in the background, otherwise this blocks.
+  #
+  # @return [Quizzes::QuizStatistics::Report]
+  #   The QuizStatistics object that will ultimately contain the csv.
   def statistics_csv(report_type, options = {})
-    stats = current_statistics_for(report_type, options)
-    return stats unless stats.new_record?
-    stats.save!
-    options[:async] ? stats.generate_csv_in_background : stats.generate_csv
-    stats
+    current_statistics_for(report_type, options).tap do |stats|
+      if options[:async]
+        stats.generate_csv_in_background
+      else
+        stats.generate_csv
+      end
+    end
   end
 
   def unpublished_changes?

@@ -72,45 +72,51 @@ describe Quizzes::QuizStatistics do
   end
 
   it 'generates a new quiz_statistics if the quiz changed' do
-    Quizzes::QuizStatistics.any_instance.expects(:generate_csv).twice
-    Timecop.freeze(5.minutes.ago) do
-      @quiz.statistics_csv('student_analysis') # once
-      run_jobs
+    stats1 = @quiz.current_statistics_for('student_analysis') # once
+
+    stats2 = Timecop.freeze(2.minutes.from_now) do
+      @quiz.one_question_at_a_time = true
+      @quiz.published_at = Time.now
+      @quiz.save!
+      @quiz.reload
+      @quiz.current_statistics_for('student_analysis') # twice
     end
-    @quiz.one_question_at_a_time = true
-    @quiz.published_at = Time.now
-    @quiz.save!
-    @quiz.reload
-    @quiz.statistics_csv('student_analysis') # twice
-    run_jobs
-    Timecop.freeze(5.minutes.from_now) do
+
+    stats3 = Timecop.freeze(5.minutes.from_now) do
       @quiz.update_attribute(:one_question_at_a_time, false)
-      @quiz.statistics_csv('student_analysis') # unpublished changes don't matter
-      run_jobs
+      @quiz.current_statistics_for('student_analysis') # unpublished changes don't matter
     end
+
+    stats2.should_not == stats1
+    stats3.should == stats2
   end
 
   it 'generates a new quiz_statistics if new submissions are in' do
-    Quizzes::QuizStatistics.any_instance.expects(:generate_csv).twice
-    @quiz.statistics_csv('student_analysis')
-    run_jobs
-    Timecop.freeze(5.minutes.from_now) do
-      qs = @quiz.quiz_submissions.build
+    stats = @quiz.current_statistics_for('student_analysis')
+
+    @quiz.quiz_submissions.build.tap do |qs|
       qs.save!
       qs.mark_completed
-      @quiz.statistics_csv('student_analysis')
-      run_jobs
     end
+
+    @quiz.current_statistics_for('student_analysis').should_not == stats
   end
 
   it 'uses the previously generated quiz_statistics if possible' do
-    Quizzes::QuizStatistics.any_instance.expects(:generate_csv).once
-    @quiz.reload
-    @quiz.statistics_csv('student_analysis')
-    run_jobs
+    stats = @quiz.current_statistics_for 'student_analysis'
+
     Timecop.freeze(5.minutes.from_now) do
-      @quiz.statistics_csv('student_analysis')
-      run_jobs
-    end
+      @quiz.current_statistics_for('student_analysis')
+    end.should == stats
+  end
+
+  it 'does not generate its CSV attachment more than necessary' do
+    stats = @quiz.current_statistics_for 'student_analysis'
+    attachment = stats.generate_csv
+    stats.reload
+    stats.csv_attachment.should be_present
+
+    stats.expects(:build_csv_attachment).never
+    stats.generate_csv.should == attachment
   end
 end

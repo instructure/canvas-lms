@@ -213,6 +213,21 @@ describe Quizzes::QuizSerializer do
         serializer.as_json[:quiz]['links']['quiz_submissions'].should be_nil
       end
     end
+
+    describe 'quiz_reports' do
+      it 'sends the url' do
+        quiz.stubs(context: Course.new.tap { |c| c.id = 3 })
+        serializer.as_json[:quiz]['links']['quiz_reports'].should ==
+          controller.send(:api_v1_course_quiz_reports_url, 3, quiz.id)
+      end
+
+      it 'sends the url as quiz_reports_url' do
+        controller.expects(:accepts_jsonapi?).at_least_once.returns false
+        quiz.stubs(context: Course.new.tap { |c| c.id = 3 })
+        serializer.as_json[:quiz][:quiz_reports_url].should ==
+          controller.send(:api_v1_course_quiz_reports_url, 3, quiz.id)
+      end
+    end
   end
 
   describe "permissions" do
