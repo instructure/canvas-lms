@@ -1,7 +1,7 @@
 define [
   '../questions_controller'
   'underscore'
-  'i18n!quizzes_model'
+  'i18n!quiz_statistics'
 ], (Base, _, I18n) ->
   Base.extend
     correctStudentRatioLabel: (->

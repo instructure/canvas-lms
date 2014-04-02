@@ -15,6 +15,7 @@ define [
   Ember.Inflector.inflector.irregular('quizStatistics', 'quizStatistics')
   Ember.Inflector.inflector.irregular('questionStatistics', 'questionStatistics')
   Ember.Inflector.inflector.irregular('progress', 'progress')
+  Ember.Inflector.inflector.irregular('summaryStatistics', 'summaryStatistics')
 
   Ember.$.ajaxPrefilter 'json', (options, originalOptions, xhr) ->
     options.dataType = 'json'

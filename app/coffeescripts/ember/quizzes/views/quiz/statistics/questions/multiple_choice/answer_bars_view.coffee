@@ -27,18 +27,21 @@ define [
       @inspectionContent = @$('.auxiliary').detach()
     ).on('didInsertElement')
 
+    cleanup: (->
+      if @inspector
+        @inspector.destroy()
+        @inspector = null
+
+      if @svg
+        @svg.remove()
+    ).on('willDestroyElement')
+
     buildInspector: ->
       @inspector = @$('.inspector').tooltip({
         tooltipClass: 'center bottom vertical',
         show: false,
         hide: false
       }).data('tooltip')
-
-      @on 'willDestroyElement', this, ->
-        @inspector.destroy()
-        @inspector = null
-
-      @inspector
 
     inspect: (datapoint, target) ->
       content = @inspectionContent.find("[data-answer='#{datapoint.id}']")
@@ -122,8 +125,7 @@ define [
             .attr('y', (d) -> y(d.y + visibilityThreshold) + 1)
             .attr('height', (d) -> height - y(d.y + visibilityThreshold) - 2)
 
-      @on 'willDestroyElement', this, ->
-        svg.remove()
+      @svg = svg # for cleanup
     ).on('didInsertElement')
 
     renderStripePattern: (svg) ->

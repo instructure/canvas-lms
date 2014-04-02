@@ -1,7 +1,7 @@
 define [
   'ember'
   'underscore'
-  'i18n!quizzes_model'
+  'i18n!quiz_statistics'
 ], (Ember, _, I18n) ->
   Ember.ObjectController.extend
     needs: [ 'quizStatistics' ],

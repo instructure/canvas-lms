@@ -1,6 +1,6 @@
 define [
   'ember'
-  'i18n!quizzes'
+  'i18n!quiz_statistics'
 ], (Ember, I18n) ->
   # This is the top-level statistics controller. It's mainly concerned with
   # keeping a sortable set of question statistics and accepts actions that are

@@ -12,12 +12,10 @@ define [
 
       data = @get('controller.chartData')
 
-      window.data = data
-
       x = d3.scale.linear().range([ 0, midPoint ])
       x.domain([ data.maxPoint, 0])
 
-      svg = d3.select(@$('svg')[0])
+      svg = @svg = d3.select(@$('svg')[0])
         .attr('width', w)
         .attr('height', h)
         .append('g')
@@ -41,7 +39,8 @@ define [
             .attr('width', (d) -> midPoint - x(d))
             .attr('y', (d, i) -> i*barHeight)
             .attr('height', (d) -> barHeight-1)
-
-      @on 'willDestroyElement', this, ->
-        svg.remove()
     ).on('didInsertElement')
+
+    removeChart: (->
+      @svg.remove()
+    ).on('willDestroyElement')
