@@ -73,17 +73,21 @@ module ApplicationHelper
       image_tag "messages/avatar-50.png"
     else
       avatar_settings = @domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'
-      image_url, alt_tag = Rails.cache.fetch(Cacher.inline_avatar_cache_key(user_id, avatar_settings)) do
-        if !user && user_id.to_i > 0
-          user = User.find(user_id)
+      user_id, user_shard = Shard.local_id_for(user_id)
+      user_shard ||= Shard.current
+      image_url, alt_tag = user_shard.activate do
+        Rails.cache.fetch(Cacher.inline_avatar_cache_key(user_id, avatar_settings)) do
+          if !user && user_id.to_i > 0
+            user = User.find(user_id)
+          end
+          if user
+            url = avatar_url_for_user(user)
+          else
+            url = "messages/avatar-50.png"
+          end
+          alt = user ? user.short_name : ''
+          [url, alt]
         end
-        if user
-          url = avatar_url_for_user(user)
-        else
-          url = "messages/avatar-50.png"
-        end
-        alt = user ? user.short_name : ''
-        [url, alt]
       end
       image_tag(image_url,
         :style => "width: #{width}px; min-height: #{(width/1.6).to_i}px; max-height: #{(width*1.6).to_i}px",
