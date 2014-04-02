@@ -16,58 +16,27 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
+require 'spec_helper'
 describe IncomingMailProcessor::IncomingMessageProcessor do
 
   # Import this one constant
   IncomingMessageProcessor = IncomingMailProcessor::IncomingMessageProcessor
 
-  def setup_test_outgoing_mail
-    @original_delivery_method = ActionMailer::Base.delivery_method
-    @original_perform_deliveries = ActionMailer::Base.perform_deliveries
-    ActionMailer::Base.delivery_method = :test
-    ActionMailer::Base.perform_deliveries = true
-  end
-
-  def restore_original_outgoing_mail
-    ActionMailer::Base.delivery_method = @original_delivery_method if @original_delivery_method
-    ActionMailer::Base.perform_deliveries = @original_perform_deliveries if @original_perform_deliveries
-  end
-
-  def simple_mail_from_user
-    Mail.new(:body => "body", :from => @user.email_channel.path)
-  end
-
-  def check_new_message(bounce_type)
-    Message.count.should == @previous_message_count + 1
-    @new_message = Message.order("created_at DESC, id DESC").first
-    @new_message.subject.should match(/Reply Failed/)
-    @new_message.body.should match(case bounce_type
-      when :unknown then /unknown mailbox/
-      when :locked then /topic is locked/
-      end)
-    # new checks to make sure these messages are getting sent
-    @new_message.user_id.should == @user.id
-    @new_message.communication_channel_id.should == @user.email_channel.id
-    @new_message.should be_sent
-  end
-
+  let(:logger) { stub('logger').tap{|l| l.expects(:warn).at_least(1).with(kind_of(String))} }
   let(:message_handler) { MockMessageHandler.new }
 
   class MockMessageHandler
-    attr_reader :account, :body, :html_body, :incoming_message, :tag
+    attr_reader :account, :body, :html_body, :incoming_message, :address_tag
 
     def handle(account, body, html_body, incoming_message, tag)
       @account = account
       @body = body
       @html_body = html_body
       @incoming_message = incoming_message
-      @tag = tag
+      @address_tag = tag
     end
   end
 
-  let(:tag) { '123abc' }
   let(:error_reporter) { MockErrorReporter.new }
 
   class MockErrorReporter
@@ -78,17 +47,9 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     end
   end
 
-  before(:all) do
-    setup_test_outgoing_mail
-  end
-
   before(:each) do
     error_reporter.expects(:log_exception).never
     error_reporter.expects(:log_error).never
-  end
-
-  after(:all) do
-    restore_original_outgoing_mail
   end
 
   describe ".configure" do
@@ -97,12 +58,14 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     end
 
     it "should accept legacy mailman configurations" do
+      IncomingMessageProcessor.logger = logger
       IncomingMessageProcessor.configure('poll_interval' => 42, 'ignore_stdin' => true)
     end
   end
 
   describe ".run_periodically?" do
     it "should consult .poll_interval and .ignore_stdin for backwards compatibility" do
+      IncomingMessageProcessor.logger = logger
       IncomingMessageProcessor.configure('poll_interval' => 0, 'ignore_stdin' => true)
       IncomingMessageProcessor.run_periodically?.should be_true
 
@@ -123,13 +86,8 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
   end
 
   describe "#process_single" do
-    before(:each) do
-      @notification = Notification.create!
-      @message = Message.create(:context => @topic, :user => @user, :notification => @notification)
-    end
-
     it "should not choke on invalid UTF-8" do
-      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new { body "he\xffllo" }, tag)
+      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new { body "he\xffllo" }, '')
 
       message_handler.body.should == "hello"
       message_handler.html_body.should == "hello"
@@ -139,7 +97,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
           content_type 'text/plain; charset=Shift-JIS'
           body "\x83\x40"
-        }, tag)
+        }, '')
 
       comparison_string = "\xe3\x82\xa1"
       comparison_string.force_encoding("UTF-8")
@@ -156,25 +114,18 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
             content_type 'text/html; charset=UTF-8'
             body '<h1>This is HTML</h1>'
           end
-        }, tag)
+        }, '')
       message_handler.body.should == 'This is plain text'
       message_handler.html_body.should == '<h1>This is HTML</h1>'
     end
 
     it "should not send a bounce reply when the incoming message is an auto-response" do
-      user_model
-      @cc = @user.communication_channels.build(:path_type => 'email', :path => "user@example.com")
-      @cc.confirm
-      @cc.save!
-      @message.context = nil # potentially bounce
-      @message.save!
-      incoming_bounce_mail = simple_mail_from_user
-      incoming_bounce_mail['Auto-Submitted'] = 'auto-generated' # but don't bounce with this header
+      incoming_bounce_message = Mail.new
+      incoming_bounce_message['Auto-Submitted'] = 'auto-generated' # but don't bounce with this header
 
       message_handler.expects(:handle).never
 
-      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(incoming_bounce_mail,
-        tag)
+      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(incoming_bounce_message, '')
     end
   end
 
@@ -185,6 +136,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     end
 
     it "should support original incoming_mail configuration format for a single inbox" do
+      IncomingMessageProcessor.logger = logger
       config = {
         'poll_interval' => 42,
         'ignore_stdin' => true,
@@ -211,6 +163,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     end
 
     it "should process incoming_mail configuration with multiple accounts" do
+      IncomingMessageProcessor.logger = logger
       config = {
         'poll_interval' => 0,
         'ignore_stdin' => true,
@@ -308,7 +261,6 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
         @mock_mailbox.expects(:disconnect)
         imp = IncomingMessageProcessor.new(message_handler, error_reporter)
         imp.expects(:process_single).with(kind_of(Mail::Message), "123-1", anything)
-
         imp.process
       end
 
@@ -390,9 +342,9 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       usernames.count(nil).should eql 1
     end
 
-    it "should not try to load messages with invalid address tags" do
+    it "should not try to load messages with invalid address tag" do
       # this should be tested through the public "process" method
-      # rather than calling the private "extract_address_tag" directly
+      # rather than calling the private "find_matching_to_address" directly
       account, message = [mock, mock]
       account.expects(:address).returns('user@example.com')
       message.expects(:to).returns(['user@example.com'])

@@ -290,7 +290,7 @@ describe ConversationMessage do
         :subject => "an email reply",
         :html => "body",
         :text => "body"
-      }) }.should raise_error(IncomingMail::UnknownAddressError)
+      }) }.should raise_error(IncomingMail::Errors::UnknownAddress)
     end
 
     it "should reply only to the message author on conversations2 conversations" do

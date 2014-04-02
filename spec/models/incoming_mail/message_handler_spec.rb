@@ -186,7 +186,7 @@ describe IncomingMail::MessageHandler do
         context "with a locked discussion topic generic_error" do
           it "constructs the message correctly" do
             Message.stubs(:find_by_id).with(original_message_id).returns(original_message)
-            context.expects(:reply_from).raises(IncomingMail::ReplyToLockedTopicError.new)
+            context.expects(:reply_from).raises(IncomingMail::Errors::ReplyToLockedTopic.new)
 
             email_subject = "Message Reply Failed: some subject"
             body = <<-BODY.strip_heredoc
@@ -216,7 +216,7 @@ describe IncomingMail::MessageHandler do
         context "with a generic reply to error" do
           it "constructs the message correctly" do
             Message.stubs(:find_by_id).with(original_message_id).returns(original_message)
-            context.expects(:reply_from).raises(IncomingMail::UnknownAddressError.new)
+            context.expects(:reply_from).raises(IncomingMail::Errors::UnknownAddress.new)
 
             email_subject = "Message Reply Failed: some subject"
             body = <<-BODY.strip_heredoc
@@ -246,7 +246,7 @@ describe IncomingMail::MessageHandler do
         context "when there is no communication channel" do
           it "bounces the message back to the incoming from address" do
             Message.stubs(:find_by_id).with(original_message_id).returns(original_message)
-            context.expects(:reply_from).raises(IncomingMail::ReplyToLockedTopicError.new)
+            context.expects(:reply_from).raises(IncomingMail::Errors::ReplyToLockedTopic.new)
 
             Message.any_instance.expects(:deliver).never
             Mailer.expects(:create_message)

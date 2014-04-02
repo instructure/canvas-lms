@@ -123,7 +123,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    raise IncomingMail::UnknownAddressError if self.context.root_account.deleted?
+    raise IncomingMail::Errors::UnknownAddress if self.context.root_account.deleted?
     user = opts[:user]
     message = opts[:text].strip
     user = nil unless user && self.context.users.include?(user)

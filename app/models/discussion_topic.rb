@@ -591,7 +591,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    raise IncomingMail::UnknownAddressError if self.context.root_account.deleted?
+    raise IncomingMail::Errors::UnknownAddress if self.context.root_account.deleted?
     user = opts[:user]
     if opts[:html]
       message = opts[:html].strip
@@ -613,7 +613,7 @@ class DiscussionTopic < ActiveRecord::Base
         :user => user,
       })
       if !entry.grants_right?(user, :create)
-        raise IncomingMail::ReplyToLockedTopicError
+        raise IncomingMail::Errors::ReplyToLockedTopic
       else
         entry.save!
         entry

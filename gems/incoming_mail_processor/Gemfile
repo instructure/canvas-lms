@@ -1,0 +1,6 @@
+source 'https://rubygems.org'
+
+gemspec
+
+gem 'html_text_helper', path: '../html_text_helper'
+gem 'utf8_cleaner', path: '../utf8_cleaner'

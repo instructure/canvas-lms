@@ -4,4 +4,5 @@ config = Setting.from_config("incoming_mail") || {}
 
 Rails.configuration.to_prepare do
   IncomingMailProcessor::IncomingMessageProcessor.configure(config)
+  IncomingMailProcessor::IncomingMessageProcessor.logger = Rails.logger
 end

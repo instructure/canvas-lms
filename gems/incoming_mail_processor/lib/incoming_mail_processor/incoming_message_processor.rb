@@ -32,7 +32,7 @@ module IncomingMailProcessor
     ImportantHeaders = %w(To From Subject Content-Type)
 
     class << self
-      attr_accessor :mailbox_accounts, :settings, :deprecated_settings
+      attr_accessor :mailbox_accounts, :settings, :deprecated_settings, :logger
     end
 
     def initialize(message_handler, error_reporter)
@@ -116,7 +116,7 @@ module IncomingMailProcessor
         if IncomingMailProcessor::Settings.members.map(&:to_sym).include?(key)
           self.settings.send("#{key}=", value)
         elsif IncomingMailProcessor::DeprecatedSettings.members.map(&:to_sym).include?(key)
-          Rails.logger.warn("deprecated setting sent to IncomingMessageProcessor: #{key}")
+          logger.warn("deprecated setting sent to IncomingMessageProcessor: #{key}") if logger
           self.deprecated_settings.send("#{key}=", value)
         else
           raise "unrecognized setting sent to IncomingMessageProcessor: #{key}"
@@ -193,7 +193,6 @@ module IncomingMailProcessor
 
 
     def process_mailbox(mailbox, account)
-      addr, domain = account.address.split(/@/)
       error_folder = account.error_folder
       mailbox.connect
       mailbox.each_message do |message_id, raw_contents|

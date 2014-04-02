@@ -661,7 +661,7 @@ This text has a http://www.google.com link in it...
       comment.reload
       lambda { 
         comment.reply_from(:user => @student, :text => "some reply") 
-      }.should raise_error(IncomingMail::UnknownAddressError)
+      }.should raise_error(IncomingMail::Errors::UnknownAddress)
     end
   end
 

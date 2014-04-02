@@ -20,6 +20,7 @@ Rails.configuration.to_prepare do
 
   IncomingMail::ReplyToAddress.address_pool = config[:reply_to_addresses] ||
     Array(HostUrl.outgoing_email_address)
+  IncomingMailProcessor::MailboxAccount.default_outgoing_email = HostUrl.outgoing_email_address
 end
 
 # delivery_method can be :smtp, :sendmail or :test

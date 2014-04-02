@@ -20,19 +20,19 @@ module IncomingMail
   class MessageHandler
     def handle(outgoing_from_address, body, html_body, incoming_message, tag)
       secure_id, original_message_id = parse_tag(tag)
-      raise IncomingMail::SilentIgnoreError unless original_message_id
+      raise IncomingMail::Errors::SilentIgnore unless original_message_id
 
       original_message = Message.find_by_id(original_message_id)
       # This prevents us from rebouncing users that have auto-replies setup -- only bounce something
       # that was sent out because of a notification.
-      raise IncomingMail::SilentIgnoreError unless original_message && original_message.notification_id
-      raise IncomingMail::SilentIgnoreError unless valid_secure_id?(original_message, secure_id)
+      raise IncomingMail::Errors::SilentIgnore unless original_message && original_message.notification_id
+      raise IncomingMail::Errors::SilentIgnore unless valid_secure_id?(original_message, secure_id)
 
       original_message.shard.activate do
 
         context = original_message.context
         user = original_message.user
-        raise IncomingMail::UnknownAddressError unless valid_user_and_context?(context, user)
+        raise IncomingMail::Errors::UnknownAddress unless valid_user_and_context?(context, user)
         context.reply_from({
                                :purpose => 'general',
                                :user => user,
@@ -41,9 +41,9 @@ module IncomingMail
                                :text => body
                            })
       end
-    rescue IncomingMail::ReplyFromError => error
+    rescue IncomingMail::Errors::ReplyFrom => error
       bounce_message(original_message, incoming_message, error, outgoing_from_address)
-    rescue IncomingMail::SilentIgnoreError
+    rescue IncomingMail::Errors::SilentIgnore
       #do nothing
     end
 
@@ -93,7 +93,7 @@ module IncomingMail
       ndr_subject = ""
       ndr_body = ""
       case error
-        when IncomingMail::ReplyToLockedTopicError
+        when IncomingMail::Errors::ReplyToLockedTopic
           ndr_subject = I18n.t('lib.incoming_message_processor.locked_topic.subject', "Message Reply Failed: %{subject}", :subject => subject)
           ndr_body = I18n.t('lib.incoming_message_processor.locked_topic.body', <<-BODY, :subject => subject).strip_heredoc
           The message titled "%{subject}" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.

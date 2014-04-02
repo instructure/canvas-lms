@@ -20,17 +20,20 @@ module IncomingMailProcessor
   class MailboxAccount
     attr_accessor :protocol, :config, :address, :error_folder
 
+    class << self
+      attr_accessor :default_outgoing_email
+    end
+
+
     def initialize(options = {})
       self.protocol     = options[:protocol]
       self.config       = options[:config] || {}
-      self.address      = options[:address] 
+      self.address      = options[:address]
       self.error_folder = options[:error_folder] || "errors"
     end
 
     def address
-      # have to delay checking HostUrl until after rails initialization
-      @address ||= HostUrl.outgoing_email_address
+      @address ||= self.class.default_outgoing_email
     end
-
   end
 end

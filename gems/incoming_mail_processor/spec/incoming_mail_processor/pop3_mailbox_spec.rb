@@ -16,9 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path '../../../../lib/incoming_mail_processor/pop3_mailbox', __FILE__
-require File.expand_path '../../../mocha_rspec_adapter', __FILE__
-require File.expand_path '../mailbox_spec_helper', __FILE__
+require 'spec_helper'
 
 describe IncomingMailProcessor::Pop3Mailbox do
   include_examples 'Mailbox'

@@ -15,9 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
-require File.expand_path('../../../../lib/incoming_mail_processor/configurable_timeout', __FILE__)
-require File.expand_path('../../../mocha_rspec_adapter', __FILE__)
+require 'spec_helper'
 
 describe IncomingMailProcessor::ConfigurableTimeout do
   class TimeoutTester
