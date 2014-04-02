@@ -23,33 +23,34 @@
         speedgrader.{{/t}}
       </div>
       <div id="group_category_options" style="{{hiddenUnless groupCategoryId}}">
-      <label class="checkbox" >
-        {{checkbox "grade_group_students_individually"
-          id=null
-          prefix=prefix
-          checked=gradeGroupStudentsIndividually
-          disabled=groupCategoryIdFrozen}}
-        {{#t "grade_group_students_individually"}}
-          Assign Grades to Each Student Individually
-        {{/t}}
-      </label>
+        <label class="checkbox" >
+          {{checkbox "grade_group_students_individually"
+            id=null
+            prefix=prefix
+            checked=gradeGroupStudentsIndividually
+            disabled=groupCategoryIdFrozen}}
+          {{#t "grade_group_students_individually"}}
+            Assign Grades to Each Student Individually
+          {{/t}}
+        </label>
 
-      {{!-- Group selection --}}
-      <label for="group_category_id">
-        {{#t "group_set"}}Group Set{{/t}}
-      </label>
-      <select id="assignment_group_category_id"
-        name="{{#if nested}}assignment[group_category_id]{{else}}group_category_id{{/if}}"
-        {{disabledIfIncludes frozenAttributes "group_category_id"}}>
-        {{#each groupCategories}}
-          <option value="{{id}}" {{selectedIf ../groupCategoryId this.id}}>
-            {{name}}
+        {{!-- Group selection --}}
+        <label for="group_category_id">
+          {{#t "group_set"}}Group Set{{/t}}
+        </label>
+        <select id="assignment_group_category_id"
+          name="{{#if nested}}assignment[group_category_id]{{else}}group_category_id{{/if}}"
+          {{disabledIfIncludes frozenAttributes "group_category_id"}}>
+          {{#each groupCategories}}
+            <option value="{{id}}" {{selectedIf ../groupCategoryId this.id}}>
+              {{name}}
+            </option>
+          {{/each}}
+          <option value="new">
+            [ {{#t "group_category_options"}}New Group Category{{/t}} ]
           </option>
-        {{/each}}
-        <option value="new">
-          [ {{#t "group_category_options"}}New Group Category{{/t}} ]
-        </option>
-      </select>
+        </select>
+      </div>
     </div>
   </div>
 </div>
