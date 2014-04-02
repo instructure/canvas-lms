@@ -2247,7 +2247,7 @@ class Course < ActiveRecord::Base
     result[:new_end_date] = Date.parse(options[:new_end_date]) rescue self.real_end_date
     result[:day_substitutions] = options[:day_substitutions]
     result[:time_zone] = options[:time_zone]
-    result[:time_zone] ||= course.account.default_time_zone unless course.account.nil?
+    result[:time_zone] ||= course.root_account.default_time_zone unless course.root_account.nil?
 
     result[:default_start_at] = DateTime.parse(options[:new_start_date]) rescue self.real_start_date
     result[:default_conclude_at] = DateTime.parse(options[:new_end_date]) rescue self.real_end_date

@@ -2990,6 +2990,17 @@ describe Course, ".import_from_migration" do
     end
   end
 
+  describe "shift_date_options" do
+    it "should default options[:time_zone] to the root account's time zone" do
+      account = Account.default.sub_accounts.create!
+      course_with_teacher(account: account)
+      @course.root_account.default_time_zone = 'America/New_York'
+      @course.start_at = 1.month.ago
+      @course.conclude_at = 1.month.from_now
+      options = @course.shift_date_options(@course, {})
+      options[:time_zone].should == ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+    end
+  end
 end
 
 describe Course, "enrollments" do
