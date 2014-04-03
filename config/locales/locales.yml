@@ -36,7 +36,7 @@ pt:
   qualified_locale: pt-PT
 pt-BR:
   locales:
-    pt: Português do Brasil
+    pt-BR: Português do Brasil
   qualified_locale: pt-BR
 ja:
   locales:
