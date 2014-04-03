@@ -32,4 +32,3 @@ when :smtp
 when :sendmail
   ActionMailer::Base.sendmail_settings.merge!(config)
 end
-

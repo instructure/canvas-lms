@@ -18,8 +18,11 @@
 
 module IncomingMail
   class MessageHandler
-    def handle(outgoing_from_address, body, html_body, incoming_message, message_id, secure_id)
-      original_message = Message.find_by_id(message_id)
+    def handle(outgoing_from_address, body, html_body, incoming_message, tag)
+      secure_id, original_message_id = parse_tag(tag)
+      raise IncomingMail::IncomingMessageProcessor::SilentIgnoreError unless original_message_id
+
+      original_message = Message.find_by_id(original_message_id)
       # This prevents us from rebouncing users that have auto-replies setup -- only bounce something
       # that was sent out because of a notification.
       raise IncomingMail::IncomingMessageProcessor::SilentIgnoreError unless original_message && original_message.notification_id
@@ -125,6 +128,11 @@ module IncomingMail
       encoding = encoding.upcase
       # change encoding; if it throws an exception (i.e. unrecognized encoding), just strip invalid UTF-8
       Iconv.conv('UTF-8//TRANSLIT//IGNORE', encoding, string) rescue TextHelper.strip_invalid_utf8(string)
+    end
+
+    def parse_tag(tag)
+      match = tag.match /^(\h+)-(\d+)$/
+      return match[1], match[2].to_i if match
     end
   end
 end

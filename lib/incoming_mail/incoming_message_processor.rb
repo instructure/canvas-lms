@@ -66,12 +66,12 @@ module IncomingMail
       end
     end
 
-    def process_single(incoming_message, secure_id, message_id, mailbox_account = IncomingMail::MailboxAccount.new)
+    def process_single(incoming_message, tag, mailbox_account = IncomingMail::MailboxAccount.new)
       return if self.class.bounce_message?(incoming_message)
 
       body, html_body = extract_body(incoming_message)
 
-      @message_handler.handle(mailbox_account.address, body, html_body, incoming_message, message_id, secure_id)
+      @message_handler.handle(mailbox_account.address, body, html_body, incoming_message, tag)
     end
 
     private
@@ -246,28 +246,28 @@ module IncomingMail
     end
 
     def process_message(message, account)
-      secure_id, outgoing_message_id = self.class.find_matching_to_address(message, account)
+      tag = self.class.extract_address_tag(message, account)
       # TODO: Add bounce processing and handling of other email to the default notification address.
-      return unless secure_id && outgoing_message_id
-      process_single(message, secure_id, outgoing_message_id, account)
+      return unless tag
+      process_single(message, tag, account)
     rescue => e
       ErrorReport.log_exception(self.class.error_report_category, e,
         :from => message.from.try(:first),
         :to => message.to.to_s)
     end
 
-    def self.find_matching_to_address(message, account)
+    def self.extract_address_tag(message, account)
       addr, domain = account.address.split(/@/)
-      regex = Regexp.new("#{Regexp.escape(addr)}\\+([0-9a-f]+)-(\\d+)@#{Regexp.escape(domain)}")
+      regex = Regexp.new("#{Regexp.escape(addr)}\\+([^@]+)@#{Regexp.escape(domain)}")
       message.to.each do |address|
         if match = regex.match(address)
-          return [match[1], match[2].to_i]
+          return match[1]
         end
       end
 
-      # if no match is found, return false secure_id and outgoing_message_id
+      # if no match is found, return false
       # so that self.process message stops processing.
-      [false, false]
+      false
     end
   end
 end

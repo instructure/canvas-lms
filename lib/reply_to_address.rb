@@ -16,12 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Public: Error thrown when ReplyToAddress is used with an empty address pool.
-class EmptyReplyAddressPool < StandardError; end
 
 # Public: Represents a reply-to address for a message.
 class ReplyToAddress
   attr_reader :message
+
+  # Public: Error thrown when ReplyToAddress is used with an empty address pool.
+  class EmptyReplyAddressPool < StandardError
+  end
 
   # Public: Create a new ReplyToAddress.
   #
@@ -37,7 +39,7 @@ class ReplyToAddress
     return nil if message.path_type == 'sms'
     return message.from if message.context_type == 'ErrorReport'
 
-    address, domain = ReplyToAddress.address_from_pool(message).split('@')
+    address, domain = self.class.address_from_pool(message).split('@')
     "#{address}+#{secure_id}-#{message.global_id}@#{domain}"
   end
 

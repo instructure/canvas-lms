@@ -19,14 +19,11 @@
 require File.expand_path('../spec_helper.rb', File.dirname(__FILE__))
 
 describe ReplyToAddress do
-  describe 'initialize' do
-    it 'should require a message argument' do
-      lambda { ReplyToAddress.new }.should raise_error(ArgumentError)
-    end
+  expect_secure_id = Canvas::Security.hmac_sha1("1000001")
 
+  describe 'initialize' do
     it 'should persist the message argument' do
-      message = Message.new
-      ReplyToAddress.new(message).message.should == message
+      ReplyToAddress.new("some message").message.should == "some message"
     end
   end
 
@@ -49,7 +46,6 @@ describe ReplyToAddress do
 
     it 'should generate a reply-to address for email messages' do
       message = mock()
-      secure_id = Canvas::Security.hmac_sha1(1000001.to_s)
 
       message.expects(:path_type).returns('email')
       message.expects(:context_type).returns('Course')
@@ -57,17 +53,16 @@ describe ReplyToAddress do
       message.expects(:global_id).twice.returns(1000001)
       ReplyToAddress.address_pool = %w{canvas@example.com}
 
-      ReplyToAddress.new(message).address.should == "canvas+#{secure_id}-1000001@example.com"
+      ReplyToAddress.new(message).address.should == "canvas+#{expect_secure_id}-1000001@example.com"
     end
   end
 
   describe 'secure_id' do
     it 'should generate a unique hash for the message' do
       message       = mock()
-      expected_hash = Canvas::Security.hmac_sha1(1000001.to_s)
       message.expects(:global_id).returns(1000001)
 
-      ReplyToAddress.new(message).secure_id.should == expected_hash
+      ReplyToAddress.new(message).secure_id.should == expect_secure_id
     end
   end
 
@@ -98,7 +93,7 @@ describe ReplyToAddress do
 
       lambda {
         ReplyToAddress.address_from_pool(message)
-      }.should raise_error(EmptyReplyAddressPool)
+      }.should raise_error(ReplyToAddress::EmptyReplyAddressPool)
     end
 
     it 'should randomly select a pool address if the message has no id' do

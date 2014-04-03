@@ -24,6 +24,7 @@ describe IncomingMail::MessageHandler do
   let(:html_body) { "Hello" }
   let(:message_id) { 1 }
   let(:secure_id) { "123abc" }
+  let(:tag) { "#{secure_id}-#{message_id}" }
   let(:shard) do
     stub("shard").tap do |shard|
       shard.stubs(:activate).yields
@@ -72,7 +73,7 @@ describe IncomingMail::MessageHandler do
       ReplyToAddress.any_instance.stubs(:secure_id).returns(secure_id)
       shard.expects(:activate)
 
-      subject.handle(outgoing_from_address, body, html_body, incoming_message, message_id, secure_id)
+      subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
     end
 
     it "calls reply from on the message's context" do
@@ -87,7 +88,7 @@ describe IncomingMail::MessageHandler do
                                             :text => body
                                         })
 
-      subject.handle(outgoing_from_address, body, html_body, incoming_message, message_id, secure_id)
+      subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
     end
 
     context "when a reply from error occurs" do
@@ -107,24 +108,24 @@ describe IncomingMail::MessageHandler do
           Mailer.expects(:create_message).never
           message.context.expects(:reply_from).never
 
-          subject.handle(outgoing_from_address, body, html_body, message, message_id, secure_id)
+          subject.handle(outgoing_from_address, body, html_body, message, tag)
         end
 
         it "silenty fails on invalid secure id" do
           message = stub("message", :notification_id => 1, :global_id => 2, :context => context)
+          ReplyToAddress.any_instance.stubs(:secure_id).returns("deadbeef") # non-matching secure-id
           Message.stubs(:find_by_id).with(message_id).returns(message)
-          ReplyToAddress.any_instance.stubs(:secure_id).returns("non-matching-secure-id")
 
           Mailer.expects(:create_message).never
           message.context.expects(:reply_from).never
-          subject.handle(outgoing_from_address, body, html_body, incoming_message, message_id, secure_id)
+          subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
         end
 
         it "silenty fails if the original message is missing" do
-          Message.expects(:find_by_id).with("unknown-message-id").returns(nil)
+          Message.expects(:find_by_id).with(42).returns(nil)
           Message.any_instance.expects(:deliver).never
 
-          subject.handle(outgoing_from_address, body, html_body, incoming_message, "unknown-message-id", secure_id)
+          subject.handle(outgoing_from_address, body, html_body, incoming_message, "#{secure_id}-42")
         end
       end
 
@@ -138,7 +139,7 @@ describe IncomingMail::MessageHandler do
           Message.any_instance.expects(:deliver).never
           Mailer.expects(:create_message)
 
-          subject.handle(outgoing_from_address, body, html_body, incoming_message, message_id, secure_id)
+          subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
         end
 
         it "bounces the message on invalid context" do
@@ -148,7 +149,7 @@ describe IncomingMail::MessageHandler do
           Message.any_instance.expects(:deliver).never
           Mailer.expects(:create_message)
 
-          subject.handle(outgoing_from_address, body, html_body, invalid_context_message, message_id, secure_id)
+          subject.handle(outgoing_from_address, body, html_body, invalid_context_message, tag)
         end
 
         it "saves and delivers the message with proper input" do
@@ -161,7 +162,7 @@ describe IncomingMail::MessageHandler do
           Message.any_instance.expects(:save)
           Message.any_instance.expects(:deliver)
 
-          subject.handle(outgoing_from_address, body, html_body, incoming_message, message_id, secure_id)
+          subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
         end
 
         it "does not send a message if the incoming message has no from" do
@@ -169,12 +170,12 @@ describe IncomingMail::MessageHandler do
 
           Message.any_instance.expects(:deliver).never
 
-          subject.handle(outgoing_from_address, body, html_body, invalid_incoming_message, message_id, secure_id)
+          subject.handle(outgoing_from_address, body, html_body, invalid_incoming_message, tag)
         end
 
         context "with a generic generic_error" do
           it "constructs the message correctly" do
-            Message.expects(:find_by_id).with("bad-user-message").returns(invalid_user_message)
+            Message.expects(:find_by_id).with(message_id).returns(invalid_user_message)
 
             email_subject = "Message Reply Failed: sorry"
             body = <<-BODY.strip_heredoc
@@ -197,7 +198,7 @@ describe IncomingMail::MessageHandler do
             message = Message.new(message_attributes)
             Message.expects(:new).with(message_attributes).returns(message)
 
-            subject.handle(outgoing_from_address, body, html_body, incoming_message, "bad-user-message", secure_id)
+            subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
           end
         end
 
@@ -226,7 +227,7 @@ describe IncomingMail::MessageHandler do
             message = Message.new(message_attributes)
             Message.expects(:new).with(message_attributes).returns(message)
 
-            subject.handle(outgoing_from_address, body, html_body, incoming_message, message_id, secure_id)
+            subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
           end
         end
 
@@ -235,7 +236,7 @@ describe IncomingMail::MessageHandler do
             Message.any_instance.expects(:deliver).never
             Mailer.expects(:create_message)
 
-            subject.handle(outgoing_from_address, body, html_body, valid_message, message_id, secure_id)
+            subject.handle(outgoing_from_address, body, html_body, valid_message, tag)
           end
         end
       end

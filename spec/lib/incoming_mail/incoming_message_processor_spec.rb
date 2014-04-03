@@ -34,7 +34,7 @@ describe IncomingMail::IncomingMessageProcessor do
     ActionMailer::Base.delivery_method = @original_delivery_method if @original_delivery_method
     ActionMailer::Base.perform_deliveries = @original_perform_deliveries if @original_perform_deliveries
   end
-  
+
   def simple_mail_from_user
     Mail.new(:body => "body", :from => @user.email_channel.path)
   end
@@ -56,17 +56,18 @@ describe IncomingMail::IncomingMessageProcessor do
   let(:message_handler) { MockMessageHandler.new }
 
   class MockMessageHandler
-    attr_reader :account, :body, :html_body, :incoming_message, :message_id, :secure_id
+    attr_reader :account, :body, :html_body, :incoming_message, :tag
 
-    def handle(account, body, html_body, incoming_message, message_id, secure_id)
+    def handle(account, body, html_body, incoming_message, tag)
       @account = account
       @body = body
       @html_body = html_body
       @incoming_message = incoming_message
-      @message_id = message_id
-      @secure_id = secure_id
+      @tag = tag
     end
   end
+
+  let(:tag) { '123abc' }
 
   before(:all) do
     setup_test_outgoing_mail
@@ -150,7 +151,7 @@ describe IncomingMail::IncomingMessageProcessor do
     end
 
     it "should not choke on invalid UTF-8" do
-      IncomingMessageProcessor.new(message_handler).process_single(Mail.new { body "he\xffllo" }, ReplyToAddress.new(@message).secure_id, @message.id)
+      IncomingMessageProcessor.new(message_handler).process_single(Mail.new { body "he\xffllo" }, tag)
 
       message_handler.body.should == "hello"
       message_handler.html_body.should == "hello"
@@ -160,7 +161,7 @@ describe IncomingMail::IncomingMessageProcessor do
       IncomingMessageProcessor.new(message_handler).process_single(Mail.new {
           content_type 'text/plain; charset=Shift-JIS'
           body "\x83\x40"
-        }, ReplyToAddress.new(@message).secure_id, @message.id)
+        }, tag)
 
       comparison_string = "\xe3\x82\xa1"
       comparison_string.force_encoding("UTF-8")
@@ -177,7 +178,7 @@ describe IncomingMail::IncomingMessageProcessor do
             content_type 'text/html; charset=UTF-8'
             body '<h1>This is HTML</h1>'
           end
-        }, ReplyToAddress.new(@message).secure_id, @message.id)
+        }, tag)
       message_handler.body.should == 'This is plain text'
       message_handler.html_body.should == '<h1>This is HTML</h1>'
     end
@@ -195,7 +196,7 @@ describe IncomingMail::IncomingMessageProcessor do
       message_handler.expects(:handle).never
 
       IncomingMessageProcessor.new(message_handler).process_single(incoming_bounce_mail,
-        ReplyToAddress.new(@message).secure_id, @message.id)
+        tag)
     end
   end
 
@@ -311,9 +312,9 @@ describe IncomingMail::IncomingMessageProcessor do
         @mock_mailbox.expects(:each_message).multiple_yields([:foo, foo], [:bar, bar], [:baz, baz])
         @mock_mailbox.expects(:disconnect)
         imp = IncomingMessageProcessor.new(message_handler)
-        imp.expects(:process_single).with(kind_of(Mail::Message), "123", 1, anything)
-        imp.expects(:process_single).with(kind_of(Mail::Message), "456", 2, anything)
-        imp.expects(:process_single).with(kind_of(Mail::Message), "abc", 3, anything)
+        imp.expects(:process_single).with(kind_of(Mail::Message), "123-1", anything)
+        imp.expects(:process_single).with(kind_of(Mail::Message), "456-2", anything)
+        imp.expects(:process_single).with(kind_of(Mail::Message), "abc-3", anything)
 
         imp.process
       end
@@ -328,7 +329,7 @@ describe IncomingMail::IncomingMessageProcessor do
         @mock_mailbox.expects(:each_message).yields(:foo, foo)
         @mock_mailbox.expects(:disconnect)
         imp = IncomingMessageProcessor.new(message_handler)
-        imp.expects(:process_single).with(kind_of(Mail::Message), "123", 1, anything)
+        imp.expects(:process_single).with(kind_of(Mail::Message), "123-1", anything)
 
         imp.process
       end
@@ -411,14 +412,14 @@ describe IncomingMail::IncomingMessageProcessor do
       usernames.count(nil).should eql 1
     end
 
-    it "should not try to load messages with invalid IDs" do
+    it "should not try to load messages with invalid address tags" do
       # this should be tested through the public "process" method
-      # rather than calling the private "find_matching_to_address" directly
+      # rather than calling the private "extract_address_tag" directly
       account, message = [mock, mock]
       account.expects(:address).returns('user@example.com')
       message.expects(:to).returns(['user@example.com'])
-      result = IncomingMessageProcessor.find_matching_to_address(message, account)
-      result.should == [false, false]
+      result = IncomingMessageProcessor.extract_address_tag(message, account)
+      result.should == false
     end
   end
 
