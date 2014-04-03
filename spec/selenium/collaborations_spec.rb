@@ -86,7 +86,7 @@ describe "collaborations" do
 
           if type == 'google_docs'
             GoogleDocs.any_instance.
-              stubs(:google_docs_verify_access_token).
+              stubs(:verify_access_token).
               returns(true)
 
             GoogleDocsCollaboration.any_instance.

@@ -28,7 +28,7 @@ class GoogleDocsCollaboration < Collaboration
   def delete_document
     if !self.document_id && self.user
       google_docs = GoogleDocs.new(user, {})
-      google_docs.google_docs_delete_doc(GoogleDocEntry.new(self.data))
+      google_docs.delete_doc(GoogleDocEntry.new(self.data))
     end
   end
   
@@ -40,7 +40,7 @@ class GoogleDocsCollaboration < Collaboration
       name ||= I18n.t('lib.google_docs.default_document_name', "Instructure Doc")
 
       google_docs = GoogleDocs.new(user, {})
-      file = google_docs.google_docs_create_doc(name)
+      file = google_docs.create_doc(name)
       self.document_id = file.document_id
       self.data = file.entry.to_xml
       self.url = file.alternate_url.to_s
@@ -63,15 +63,15 @@ class GoogleDocsCollaboration < Collaboration
     collaborator = self.collaborators.find_by_user_id(user.id)
     if collaborator && collaborator.authorized_service_user_id != service_user_id
       google_docs = GoogleDocs.new(user, {})
-      google_docs.google_docs_acl_remove(self.document_id, [collaborator.authorized_service_user_id]) if collaborator.authorized_service_user_id
-      google_docs.google_docs_acl_add(self.document_id, [user])
+      google_docs.acl_remove(self.document_id, [collaborator.authorized_service_user_id]) if collaborator.authorized_service_user_id
+      google_docs.acl_add(self.document_id, [user])
       collaborator.update_attributes(:authorized_service_user_id => service_user_id)
     end
   end
   
   def remove_users_from_document(users_to_remove)
     google_docs = GoogleDocs.new(user, {})
-    google_docs.google_docs_acl_remove(self.document_id, users_to_remove) if self.document_id
+    google_docs.acl_remove(self.document_id, users_to_remove) if self.document_id
   end
 
   def add_users_to_document(new_users)
@@ -82,7 +82,7 @@ class GoogleDocsCollaboration < Collaboration
              end
     if document_id
       google_docs = GoogleDocs.new(user, {})
-      google_docs.google_docs_acl_add(self.document_id, new_users, domain)
+      google_docs.acl_add(self.document_id, new_users, domain)
     end
   end
 

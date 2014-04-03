@@ -50,11 +50,11 @@ describe GoogleDocs do
     )
   end
 
-  describe "#google_docs_retrieve_access_token" do
+  describe "#retrieve_access_token" do
     it "should not error out if the google plugin is not configured" do
       GoogleDocs.stubs(:config).returns nil
       google_docs = GoogleDocs.new(@user, {})
-      google_docs.google_docs_retrieve_access_token.should be_nil
+      google_docs.retrieve_access_token.should be_nil
     end
 
     it "should use the current_user" do
@@ -67,7 +67,7 @@ describe GoogleDocs do
       access_token = new_mock_access_token(consumer, 'u_token_from_service', 'u_secret_from_service')
 
       google_docs = GoogleDocs.new(@user, {})
-      google_docs.google_docs_retrieve_access_token.should eql access_token
+      google_docs.retrieve_access_token.should eql access_token
     end
 
     it "should use the session data if no user" do
@@ -78,7 +78,7 @@ describe GoogleDocs do
         :oauth_gdocs_access_token_secret => 'u_secret_from_session'
       }
       @google_docs = GoogleDocs.new(nil, session)
-      @google_docs.google_docs_retrieve_access_token.should == access_token
+      @google_docs.retrieve_access_token.should == access_token
     end
 
     it "raises NoTokenError if user does not have google_docs service" do
@@ -92,23 +92,23 @@ describe GoogleDocs do
 
       google_docs = GoogleDocs.new(@user, {})
       expect do
-        google_docs.google_docs_retrieve_access_token
+        google_docs.retrieve_access_token
       end.to raise_error(GoogleDocs::NoTokenError)
     end
   end
 
-  describe "#google_docs_list_with_extension_filter" do
+  describe "#list_with_extension_filter" do
     context "with an empty list" do
       before do
         prepare_mock_get xml_doc_list_empty
         @google_docs = GoogleDocs.new(@user, {})
       end
       it "handles an empty list" do
-        document_id_list = @google_docs.google_docs_list_with_extension_filter(nil).files.map(&:document_id)
+        document_id_list = @google_docs.list_with_extension_filter(nil).files.map(&:document_id)
         document_id_list.should == []
       end
       it "handles an empty list with extensions" do
-        document_id_list = @google_docs.google_docs_list_with_extension_filter(["jpg"]).files.map(&:document_id)
+        document_id_list = @google_docs.list_with_extension_filter(["jpg"]).files.map(&:document_id)
         document_id_list.should == []
       end
     end
@@ -119,27 +119,27 @@ describe GoogleDocs do
       end
       it "and nil filter" do
         prepare_mock_get xml_doc_list_one
-        list = @google_docs.google_docs_list_with_extension_filter(nil)
+        list = @google_docs.list_with_extension_filter(nil)
         document_id_list = list.files.map(&:document_id)
         document_id_list.should == ["document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA"]
       end
       it "and an empty filter" do
         prepare_mock_get xml_doc_list_one
-        list = @google_docs.google_docs_list_with_extension_filter([])
+        list = @google_docs.list_with_extension_filter([])
         document_id_list = list.files.map(&:document_id)
         document_id_list.should == ["document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA"]
       end
 
       it "returns matches" do
         prepare_mock_get xml_doc_list_one
-        list = @google_docs.google_docs_list_with_extension_filter(['doc'])
+        list = @google_docs.list_with_extension_filter(['doc'])
         document_id_list = list.files.map(&:document_id)
         document_id_list.should == ["document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA"]
       end
 
       it "rejects non matching documents" do
         prepare_mock_get xml_doc_list_one
-        list = @google_docs.google_docs_list_with_extension_filter(['xls'])
+        list = @google_docs.list_with_extension_filter(['xls'])
         document_id_list = list.files.map(&:document_id)
         document_id_list.should == []
       end
@@ -152,7 +152,7 @@ describe GoogleDocs do
       end
       it "returns filesystem view of results" do
         prepare_mock_get xml_doc_list_many
-        root_folder = @google_docs.google_docs_list_with_extension_filter(nil)
+        root_folder = @google_docs.list_with_extension_filter(nil)
 
         root_folder.should be_a(GoogleDocs::Folder)
         root_folder.name.should == '/'
@@ -165,14 +165,14 @@ describe GoogleDocs do
 
       it "rejects non matches" do
         prepare_mock_get xml_doc_list_many
-        root_folder = @google_docs.google_docs_list_with_extension_filter(['ppt', 'doc'])
+        root_folder = @google_docs.list_with_extension_filter(['ppt', 'doc'])
         root_folder.files.size.should == 6
         document_id_list = root_folder.files.map(&:document_id)
         document_id_list.should == ["document:15OmhdkR46iZnjFycN8__s6jVKcemzAxAGiFkr6UFxgw", "document:10jp_7QYXSN90iC6iKj_JieUiE72AuJOzLhfEvs0VGrU", "document:135mk8IhGEusw3-nG-GCHNefnlhzW8wH35ytT3EiytLo", "document:1Ohs0PlPbVsDVB0J-nJM7cSC6kvDnz8xRwH70xor4-W4", "document:1dMP-0Cr8xiuBVo86TBikxdv8uM4MOaN5ssYmNMx_xUc", "document:1yzywXxOorojl6mm0RQpgdwsX9B0K0IIn-efXhrVZVFI"]
       end
       it "accepts any of the extensions" do
         prepare_mock_get xml_doc_list_many
-        list = @google_docs.google_docs_list_with_extension_filter(['xls', 'doc'])
+        list = @google_docs.list_with_extension_filter(['xls', 'doc'])
         document_id_list = list.files.map(&:document_id)
         document_id_list.should == ["spreadsheet:0AiN8C_VHrPxkdEF6YmQyc3p2Qm02ODhJWGJnUmJYY2c", "spreadsheet:0AqsakWbfzwqRdDN1RDhNQ1hDWXpiVXNKN3VMb2Zlamc", "spreadsheet:0AsOXCUtn3LUxdEh6RC1KZEhoMXNqSHczeDdsc3VyYUE", "document:15OmhdkR46iZnjFycN8__s6jVKcemzAxAGiFkr6UFxgw", "document:10jp_7QYXSN90iC6iKj_JieUiE72AuJOzLhfEvs0VGrU", "document:135mk8IhGEusw3-nG-GCHNefnlhzW8wH35ytT3EiytLo", "document:1Ohs0PlPbVsDVB0J-nJM7cSC6kvDnz8xRwH70xor4-W4", "document:1dMP-0Cr8xiuBVo86TBikxdv8uM4MOaN5ssYmNMx_xUc", "spreadsheet:0AsZU1aOHX2kSdGhQVG9CWWdWcTdVZVdBMXh6V0xlVUE", "document:1yzywXxOorojl6mm0RQpgdwsX9B0K0IIn-efXhrVZVFI"]
       end
@@ -180,7 +180,7 @@ describe GoogleDocs do
   end
 
 
-  describe "#google_docs_download" do
+  describe "#download" do
     it "pulls the document out that matches the provided id" do
       doc_id = 'spreadsheet:0AiN8C_VHrPxkdEF6YmQyc3p2Qm02ODhJWGJnUmJYY2c'
       token = mock_access_token
@@ -191,7 +191,7 @@ describe GoogleDocs do
       token.expects(:get).with(xml_schema_id).returns(response)
 
       google_docs = GoogleDocs.new(@user, {})
-      doc_array = google_docs.google_docs_download(doc_id)
+      doc_array = google_docs.download(doc_id)
       doc_array[0].should == document_response
       doc_array[1].should == 'Sprint Teams'
       doc_array[2].should == 'xls'
@@ -212,7 +212,7 @@ describe GoogleDocs do
       token.expects(:get).with(xml_schema_id).returns(response)
 
       google_docs = GoogleDocs.new(@user, {})
-      doc_array = google_docs.google_docs_download(doc_id)
+      doc_array = google_docs.download(doc_id)
       doc_array[0].should == document_response
       doc_array[1].should == 'Sprint Teams'
       doc_array[2].should == 'xls'
@@ -227,7 +227,7 @@ describe GoogleDocs do
       token.expects(:get).with(xml_schema_id).returns(response)
 
       google_docs = GoogleDocs.new(@user, {})
-      doc_array = google_docs.google_docs_download(doc_id)
+      doc_array = google_docs.download(doc_id)
       doc_array.should == [nil, nil, nil]
     end
   end
@@ -238,7 +238,7 @@ describe GoogleDocs do
 
       google_docs = GoogleDocs.new(@user, {})
 
-      new_document = google_docs.google_docs_create_doc "test document"
+      new_document = google_docs.create_doc "test document"
       new_document.document_id.should == 'document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA'
       new_document.extension.should == 'doc'
       new_document.display_name.should == 'test document'
@@ -251,7 +251,7 @@ describe GoogleDocs do
       prepare_mock_post('https://docs.google.com/feeds/acl/private/full/document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA/batch', xml_remove_doc_request, xml_remove_doc_response)
 
       google_docs = GoogleDocs.new(@user, {})
-      result = google_docs.google_docs_acl_remove 'document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA', ['user@example.com']
+      result = google_docs.acl_remove 'document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA', ['user@example.com']
       result.should == []
     end
 
@@ -259,14 +259,14 @@ describe GoogleDocs do
       prepare_mock_post(xml_schema_id, xml_create_doc_request, xml_create_doc_response)
 
       google_docs = GoogleDocs.new(@user, {})
-      new_document = google_docs.google_docs_create_doc "test document"
+      new_document = google_docs.create_doc "test document"
 
       prepare_mock_delete "#{xml_schema_id}/document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA"
-      google_docs.google_docs_delete_doc new_document
+      google_docs.delete_doc new_document
     end
   end
 
-  describe "#google_docs_acl_add" do
+  describe "#acl_add" do
     let(:doc_response) { mock }
     let(:doc_id) { "12345" }
     let(:url) { "https://docs.google.com/feeds/acl/private/full/#{doc_id}/batch" }
@@ -279,7 +279,7 @@ describe GoogleDocs do
       mock_user.stubs(:id).returns(192)
       mock_user.stubs(:google_docs_address).returns('u_id')
 
-      google_docs.google_docs_acl_add('12345', [mock_user], nil)
+      google_docs.acl_add('12345', [mock_user], nil)
     end
 
     it "should optionally filter by domain" do
@@ -291,7 +291,7 @@ describe GoogleDocs do
       mock_user.stubs(:id).returns(192)
       mock_user.stubs(:google_docs_address).returns('u_id')
 
-      google_docs.google_docs_acl_add('12345', [mock_user], 'does-not-match.com')
+      google_docs.acl_add('12345', [mock_user], 'does-not-match.com')
     end
   end
 

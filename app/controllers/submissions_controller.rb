@@ -500,7 +500,7 @@ class SubmissionsController < ApplicationController
   def submit_google_doc(document_id)
     # fetch document from google
     google_docs = GoogleDocs.new(google_docs_user, session)
-    document_response, display_name, file_extension = google_docs.google_docs_download(document_id)
+    document_response, display_name, file_extension = google_docs.download(document_id)
 
     # error handling
     unless document_response.try(:is_a?, Net::HTTPOK)
