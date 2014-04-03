@@ -119,6 +119,13 @@ Section, SectionList, _ ) ->
     strictEqual @dueDateList.sections.length, 4
     strictEqual @dueDateList.sections.shift().id,Section.defaultDueDateSectionID
 
+  test """
+  constructor adds a default due date section if the section list passed
+  is empty
+  """, ->
+    @dueDateList = new DueDateList @overrides, new SectionList([]), @assignment
+    strictEqual @dueDateList.sections.length, 1
+
   test "constructor does not add a section if no assignment given", ->
     strictEqual @dueDateList.sections.length, 3
 
