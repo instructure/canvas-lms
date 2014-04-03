@@ -1,5 +1,7 @@
 require 'fileutils'
 require 'lib/i18n_extraction/handlebars_extractor'
+require 'compass'
+require 'sass/plugin'
 
 # Precompiles handlebars templates into JavaScript function strings
 class Handlebars
@@ -115,8 +117,20 @@ JS
     end
 
     def get_css(file_path)
-      css_file_name = "public/stylesheets/compiled/jst/#{file_path}.css"
-      File.read(css_file_name) if File.exists?(css_file_name)
+      if sass_file = Dir.glob("app/stylesheets/jst/#{file_path}.s[ac]ss").first
+        @compiler = begin
+          Compass.reset_configuration!
+          config = Compass.add_project_configuration
+          # for now we're going to punt and say these magic JST stylesheets are just
+          # for legacy normal_contrast
+          config.add_import_path "app/stylesheets/variants/legacy_normal_contrast"
+          config.cache_dir = "/tmp/sassc_jst"
+          config.output_style = :compressed
+          config.line_comments = false
+          Compass.compiler
+        end
+        @compiler.engine(sass_file, file_path).render
+      end
     end
 
     protected

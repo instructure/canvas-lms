@@ -103,6 +103,30 @@ END
       state: 'hidden',
       root_opt_in: true
     },
+    'new_styles' =>
+    {
+      display_name: -> { I18n.t('features.new_styles', 'Use New Styles') },
+      description: -> { I18n.t('new_styles_description', <<-END) },
+We are working on a UI facelift to Canvas. Turn this on to opt-in to seeing the
+updated, simplified look and feel of the Canvas interface.
+END
+      applies_to: 'RootAccount',
+      state: 'allowed',
+      beta: true,
+      development: true
+    },
+    'high_contrast' =>
+    {
+      display_name: -> { I18n.t('features.high_contrast', 'Use High Contrast Styles') },
+      description: -> { I18n.t('high_contrast_description', <<-END) },
+If you would prefer a higher-contrast version of the Canvas user interface, enable this.
+This might be useful for people with impaired vision or dificulty reading.
+END
+      applies_to: 'User',
+      state: 'allowed',
+      beta: true,
+      development: true
+    },
     'outcome_gradebook' =>
     {
       display_name: -> { I18n.t('features.outcome_gradebook', 'Outcome Gradebook') },

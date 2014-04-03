@@ -1408,6 +1408,10 @@ class User < ActiveRecord::Base
     save
   end
 
+  def prefers_high_contrast?
+    feature_enabled?(:high_contrast)
+  end
+
   def manual_mark_as_read?
     !!preferences[:manual_mark_as_read]
   end

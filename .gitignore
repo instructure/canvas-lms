@@ -31,7 +31,7 @@ Gemfile.lock3
 /public/javascripts/jst/
 /public/javascripts/translations/
 /public/optimized/
-/public/stylesheets/compiled/
+/public/stylesheets_compiled/
 /config/RAILS3
 /spec/javascripts/runner.html
 /spec/javascripts/tests.js

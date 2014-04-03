@@ -322,14 +322,25 @@ module ApplicationHelper
 
   def include_css_bundles
     unless jammit_css_bundles.empty?
-      bundles = jammit_css_bundles.map{ |(bundle,plugin)| plugin ? "plugins_#{plugin}_#{bundle}" : bundle }
+      bundles = jammit_css_bundles.map do |(bundle,plugin)|
+        bundle = variant_name_for(bundle)
+        plugin ? "plugins_#{plugin}_#{bundle}" : bundle
+      end
       bundles << {:media => 'all'}
       include_stylesheets(*bundles)
     end
   end
 
+  def variant_name_for(bundle_name)
+    use_new_styles = @domain_root_account.feature_enabled?(:new_styles)
+    use_high_contrast = @current_user && @current_user.prefers_high_contrast?
+    variant = use_new_styles ? '_new_styles' : '_legacy'
+    variant += use_high_contrast ? '_high_contrast' : '_normal_contrast'
+    "#{bundle_name}#{variant}"
+  end
+
   def include_common_stylesheets
-    include_stylesheets :vendor, :common, media: "all"
+    include_stylesheets variant_name_for(:vendor), variant_name_for(:common), media: "all"
   end
 
   def section_tabs
