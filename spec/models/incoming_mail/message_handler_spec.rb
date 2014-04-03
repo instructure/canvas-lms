@@ -87,7 +87,7 @@ describe IncomingMail::MessageHandler do
           subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
         end
 
-        it "silenty fails on invalid secure id" do
+        it "silently fails on invalid secure id" do
           IncomingMail::ReplyToAddress.any_instance.stubs(:secure_id).returns("deadbeef") # non-matching secure-id
 
           Mailer.expects(:create_message).never
@@ -96,11 +96,17 @@ describe IncomingMail::MessageHandler do
           subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
         end
 
-        it "silenty fails if the original message is missing" do
+        it "silently fails if the original message is missing" do
           Message.expects(:find_by_id).with(42).returns(nil)
           Message.any_instance.expects(:deliver).never
 
           subject.handle(outgoing_from_address, body, html_body, incoming_message, "#{secure_id}-42")
+        end
+
+        it "silently fails if the address tag is invalid" do
+          Message.expects(:find_by_id).never
+          Message.any_instance.expects(:deliver).never
+          subject.handle(outgoing_from_address, body, html_body, incoming_message, "#{secure_id}-not-an-id")
         end
       end
 
