@@ -24,8 +24,6 @@ require [
   assignment.urlRoot = ENV.URL_ROOT
 
   sectionList = new SectionCollection ENV.SECTION_LIST
-  if !sectionList.length
-    sectionList.add Section.defaultDueDateSection()
   dueDateList = new DueDateList assignment.get('assignment_overrides'), sectionList, assignment
 
   assignmentGroupSelector = new AssignmentGroupSelector
