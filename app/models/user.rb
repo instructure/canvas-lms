@@ -1378,14 +1378,6 @@ class User < ActiveRecord::Base
     read_attribute(:preferences) || write_attribute(:preferences, {})
   end
 
-  def enabled_theme
-    preferences[:enabled_theme] ||= "default"
-  end
-
-  def enabled_theme=(value)
-    preferences[:enabled_theme] = value
-  end
-
   def watched_conversations_intro?
     preferences[:watched_conversations_intro] == true
   end

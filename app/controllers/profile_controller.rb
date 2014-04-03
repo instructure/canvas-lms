@@ -301,10 +301,6 @@ class ProfileController < ApplicationController
   def update
     @user = @current_user
 
-    if params[:user] && params[:user][:enabled_theme]
-      @user.enabled_theme = params[:user].delete(:enabled_theme)
-    end
-
     if params[:privacy_notice].present?
       @user.preferences[:read_notification_privacy_info] = Time.now.utc.to_s
       @user.save

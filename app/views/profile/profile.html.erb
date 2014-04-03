@@ -93,15 +93,6 @@
       <span class="edit_data"><%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, :model => I18nTimeZone, :default => ((@domain_root_account && @domain_root_account.default_time_zone.name) || "Mountain Time (US & Canada)") %><%# that default time zone is a value, not text %></span>
     </td>
   </tr>
-  <tr>
-    <td><%= f.blabel :enabled_theme, :en => "Enabled Theme" %></td>
-    <td>
-      <span class="display_data"><%= @user.enabled_theme.titleize %></span>
-      <span class="edit_data">
-        <%= f.select :enabled_theme, [["Default", "default"], ["High Contrast (Beta)", "high_contrast"]], :selected => @user.enabled_theme %>
-      </span>
-    </td>
-  </tr>
   <% if @domain_root_account == Account.default %>
     <tr>
       <td colspan="2">

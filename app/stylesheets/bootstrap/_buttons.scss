@@ -111,8 +111,13 @@ listen to the "click" and "keyclick" events and add tabindex="0" and role="butto
   // Active state
   &.active,
   &:active {
-    background-color: darken($white, 10%);
-    background-color: darken($white, 15%) \9;
+    @if $use_high_contrast {
+      background-color: #555;
+      color: #fff;
+      text-shadow: none;
+    } @else {
+      background-color: darken($white, 10%);
+    }
     background-image: none;
     outline: 0;
     @include box-shadow(inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05));
