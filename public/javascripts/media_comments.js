@@ -269,7 +269,7 @@ define([
     var defaultTitle = opts.defaultTitle || user_name || I18n.t('titles.media_contribution', "Media Contribution");
     var mediaCommentReady = function() {
       var ks, uid;
-      if (INST.kalturaSettings.js_kaltura_uploader) {
+      if (INST.kalturaSettings.js_uploader) {
         ks = jsUploader.getKs()
         uid = jsUploader.getUid();
       } else {
@@ -484,7 +484,7 @@ define([
     } // END mediaCommentReady function
 
     // Do JS uploader is appropriate
-    if (INST.kalturaSettings.js_kaltura_uploader) {
+    if (INST.kalturaSettings.js_uploader) {
       jsUploader = new JsUploader(mediaType, opts);
       jsUploader.onReady = mediaCommentReady
       jsUploader.addEntry = addEntry
@@ -497,7 +497,7 @@ define([
     lastInit = now;
 
     var $dialog = $("#media_comment_dialog");
-    if($dialog.length == 0 && !INST.kalturaSettings.js_kaltura_uploader) {
+    if($dialog.length == 0 && !INST.kalturaSettings.js_uploader) {
       var $div = $("<div/>").attr('id', 'media_comment_dialog');
       $div.text(I18n.t('messages.loading', "Loading..."));
       $div.dialog({
@@ -540,7 +540,7 @@ define([
         $dialog = $("#media_comment_dialog");
       });
       $dialog = $div;
-    } else if (!INST.kalturaSettings.js_kaltura_uploader) {
+    } else if (!INST.kalturaSettings.js_uploader) {
       // only call mediaCommentReady if we are not doing js uploader
       mediaCommentReady();
     }

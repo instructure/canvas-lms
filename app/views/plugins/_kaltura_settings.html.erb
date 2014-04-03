@@ -124,5 +124,9 @@ TEXT
       <td><%= f.label :use_alt_record_widget, :en => "Use alternative flash recording widget" %></td>
       <td><%= f.check_box :use_alt_record_widget, {}, 'yes', 'no' %></td>
     </tr>
+    <tr>
+      <td><%= f.label :js_uploader, :en => "Use html5 (accessible) uploader" %></td>
+      <td><%= f.check_box :js_uploader, {}, 'yes', 'no' %></td>
+    </tr>
   </table>
 <% end %>
