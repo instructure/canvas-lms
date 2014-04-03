@@ -664,6 +664,13 @@ en:
       page_title: Accounts
       title: "Accounts I Manage"
     integer_required: "An integer value is required"
+    last_submission_activity_csv_description: 
+      account_reports: 
+        concorde: 
+          description: 
+            header: Example
+          last_submission: 
+            text: "This report shows students last activity for submissions."
     last_user_access_csv_description: 
       account_reports: 
         default: 
@@ -3155,9 +3162,11 @@ en:
     upload_timeout_error: "The file upload process timed out."
   content_migrations: 
     angel_exporter: 
+      content: Content
       options: Options
     bad_migration_type: "Invalid migration_type"
     blackboard_export: 
+      content: Content
       options: Options
     canvas_export: 
       content: Content
@@ -3173,6 +3182,7 @@ en:
       options: Options
     course_list_error: "Could not retrieve courses. Are you connected to the internet?"
     d2_l_export: 
+      content: Content
       options: Options
     file_required: "You must select a file to import content from"
     file_too_large: "Your migration cannot exceed %{file_size}"
@@ -4019,7 +4029,6 @@ en:
       inbox_view: VIEW
       inbox_views: 
         archived_messages: Archived
-        discussion_replies: "Discussion Replies"
         inbox: Inbox
         sent_messages: Sent
         starred_messages: Starred
@@ -7810,7 +7819,7 @@ en:
   locales: 
     en: English
   logged_out_user: "Logged Out User %{user_counter}"
-  m2c_file_description: "Moodle 1.9 .zip file"
+  m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle Importer"
   manage_avatars: 
     errors: 
@@ -10521,6 +10530,7 @@ en:
         domain_settings: "Domain Settings"
         misc_settings: "Misc. Settings"
         ui_conf_ids: "UI Conf IDs"
+      hide_rte_button_note: "(still there for conversations/SpeedGrader/Media Recordings homework submissions)"
       hints: 
         domain: "For hosted accounts, use \"www.kaltura.com\""
         resource_domain: "For hosted accounts, use \"cdn.kaltura.com\""
@@ -10530,8 +10540,8 @@ en:
       labels: 
         cache_play_list_seconds: "Seconds to cache playlist URL"
         do_analytics: "Send analytics events"
-        do_flash_var_test: "Enable experimental flash settings"
         domain: Domain
+        hide_rte_button: "Hide the video icon in Rich Content Editor."
         kaltura_sis: "Write SIS data to Kaltura"
         kcw_ui_conf: "KCW UI Conf ID"
         partner_id: "Partner ID"
@@ -10541,6 +10551,7 @@ en:
         secret_key: "Administrator Secret"
         subpartner_id: "Sub Partner ID"
         upload_ui_conf: "Uploader UI Conf ID"
+        use_alt_record_widget: "Use alternative flash recording widget"
         user_secret_key: "User Secret"
       ui_conf_ids: "For Kaltura-hosted customers, you can ask Kaltura to provide you with these ids. Self-hosted instances can find these values in the ui_confs table."
     linked_in: 
@@ -10688,8 +10699,8 @@ en:
       generating_token: "Generating Token..."
       regenerate_token: "Regenerate Token"
       regenerating_token: "Regenerating token..."
-      select_avatar: "Select Avatar"
-      select_image: "Select Image"
+      save: Save
+      select_profile_picture: "Select Profile Picture"
       selecting_image: "Selecting Image..."
     communication: 
       confirm_email_instructions: "Before you can receive any notifications, you need to verify your email address (%{email}) by clicking the link in the email we sent you. If you don't see it, *click to re-send the email*, and make sure to check your spam box."
@@ -10962,10 +10973,10 @@ en:
         privacy_notice_title: "Privacy Notice"
     take_picture_view: 
       retry: Retry
-      take_snapshot: "Take Snapshot"
+      take_picture: "Take Picture"
     upload_file_view: 
-      crop_instructions: "To crop image, drag the selection and then click the \"Select Image\" button below."
-      select_a_photo: "select a photo"
+      choose_a_picture: "choose a picture"
+      crop_instructions: "To crop image, drag the selection and then click the \"Save\" button below."
   pseudonym: 
     errors: 
       bad_credentials: "Invalid username or password"
@@ -11447,8 +11458,26 @@ en:
       one: "1 Question"
       other: "%{count} Questions"
     question_limit_reached: "You have reached the maximum number of questions allowed for a quiz (%{count}/%{limit}).\\n\\nAs a workaround, consider spreading the material across multiple quizzes."
+    quiz: 
+      current_filter: "Current Filter"
+      default_question_input: "[ Select ]"
+      default_text_only_question_name: Spacer
+      default_title: "Unnamed Quiz"
+      errors: 
+        invalid_hide_results: "Hide results is not valid"
+        invalid_ip_filter: "IP filter is not valid"
+        invalid_quiz_type: "Quiz type is not valid"
+      question_name_counter: "Question %{question_number}"
+      types: 
+        quiz: Quiz
+        survey: Survey
     quiz_attempts_length_error: "Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left"
     quiz_attempts_nan_error: "Quiz attempts can only be specified in numbers"
+    quiz_group: 
+      errors: 
+        no_bank: "Couldn't find the question bank for quiz group %{group_name}"
+        no_permissions: "User didn't have permission to reference question bank in quiz group %{group_name}"
+      question_group: "Question Group"
     quiz_item_group_view: 
       no_quizzes: "No quizzes found"
       no_surveys: "No surveys found"
@@ -11459,6 +11488,14 @@ en:
       settings: Settings
       title_delete: "Delete Quiz"
       title_edit: "Edit Quiz"
+    quiz_question: 
+      defaults: 
+        question_name: Question
+    quiz_statistics: 
+      statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} Report"
+      types: 
+        item_analysis: "Item Analysis"
+        student_analysis: "Student Analysis"
     quiz_submission: 
       titles: 
         this_is_an_external_element: "This is an external element, not text, and could have changed since the student submitted"
@@ -12264,32 +12301,6 @@ en:
       draft_state_unsaved_changes: "*You have made changes to the questions in this quiz.* These changes will not appear for students until you save the quiz."
       unpublished_changes: "*You have made unpublished changes to this quiz.* These changes will not appear for students until you publish or republish the quiz."
       unpublished_quiz: "*This quiz is unpublished* Only teachers can see the quiz until it is published."
-  quizzes/quiz: 
-    current_filter: "Current Filter"
-    default_question_input: "[ Select ]"
-    default_text_only_question_name: Spacer
-    default_title: "Unnamed Quiz"
-    errors: 
-      invalid_hide_results: "Hide results is not valid"
-      invalid_ip_filter: "IP filter is not valid"
-      invalid_quiz_type: "Quiz type is not valid"
-    question_name_counter: "Question %{question_number}"
-    types: 
-      quiz: Quiz
-      survey: Survey
-  quizzes/quiz_group: 
-    errors: 
-      no_bank: "Couldn't find the question bank for quiz group %{group_name}"
-      no_permissions: "User didn't have permission to reference question bank in quiz group %{group_name}"
-    question_group: "Question Group"
-  quizzes/quiz_question: 
-    defaults: 
-      question_name: Question
-  quizzes/quiz_statistics: 
-    statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} Report"
-    types: 
-      item_analysis: "Item Analysis"
-      student_analysis: "Student Analysis"
   quizzes_model: 
     cant_unpublish_when_students_submit: "Can't unpublish if there are student submissions"
     confirms: 
@@ -13026,6 +13037,8 @@ en:
       service_contact: "contact %{user} with %{service}"
       social_instructions: "Check the contact methods you'd like to be visible to others on your profile."
       title: Title
+      titles: 
+        click_to_change_profile_pic: "Click to change profile pic"
       user_has_no_bio: "%{user} hasn't added a bio"
       ways_to_contact_user: "Ways to contact %{name}"
     recent_activity: 
@@ -13379,11 +13392,11 @@ en:
       date: Date
       value: Value
     domain_not_found: 
-      body_description: "Please check the URL and try again or contact your institution or teacher for assistance."
-      body_reference: "If you're interested in a free Canvas account not tied to a speciﬁc institution you can sign up at"
+      body_description: "Please check your Canvas URL and try again. If you do not know your Canvas URL, please contact your institution or course instructor."
+      body_reference: "If you're interested in a free Canvas account not tied to a specific institution you can sign up at"
       links: 
         canvas_instructure: canvas.instructure.com
-      page_title: "Oops, we couldn't ﬁnd your instance of Canvas."
+      page_title: "Oops, Canvas can’t find your login page."
       you_typed: "You typed"
     institution_suspended: 
       body: "Your school's Canvas account is temporarily suspended. Please contact your Canvas administrator."
@@ -13587,13 +13600,16 @@ en:
       no_submission: "No Submission"
       paper_view: "Paper View"
       plain_view: "Plain Text View"
-      preview_document: "Preview the document"
+      preview_crocodoc_document: "Preview your submission and view teacher feedback, if available"
+      preview_scribd_document: "Preview your submission"
       preview_title: "Preview of %{title}"
       quiz_submission: "This submission was a quiz submission. Redirecting to quiz page."
       show_entire_discussion: "Show the Entire Discussion"
       student: Student
       url_preview: "URL Preview"
+      view_feedback_button: "View Feedback"
       view_original_submission: "View the Original Submission for %{user}"
+      view_preview_button: Preview
     still_zipping: "File zipping still in process..."
     submission_download: 
       download_message: "**Your student submissions are being gathered** and compressed into a zip file. This may take some time, depending on the size and number of submission files."
