@@ -288,8 +288,10 @@ define [
       attributes = for key, val of inputProps when val?
         "#{htmlEscape key}=\"#{htmlEscape val}\""
 
+      hiddenDisabled = if inputProps.disabled then "disabled" else ""
+
       new Handlebars.SafeString """
-        <input name="#{htmlEscape inputProps.name}" type="hidden" value="0" />
+        <input name="#{htmlEscape inputProps.name}" type="hidden" value="0" #{hiddenDisabled}>
         <input #{attributes.join ' '} />
       """
 
