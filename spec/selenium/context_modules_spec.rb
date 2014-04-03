@@ -3,7 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_comm
 describe "context_modules" do
   include_examples "in-process server selenium tests"
   context "as a teacher" do
-
     before (:each) do
       course_with_teacher_logged_in
 
@@ -553,6 +552,29 @@ describe "context_modules" do
       @assignment.reload.title.should == 'again'
       run_jobs
       @assignment.context_module_tags.each { |tag| tag.title.should == 'again' }
+    end
+
+    it "should truncate long text headers to 98 characters" do
+      set_course_draft_state
+      mod = @course.context_modules.create! name: 'TestModule'
+      tag1 = mod.add_item(title: 'This is a really long module text header that should be truncated to exactly 98 characters plus the ... part so 101 characters really', type: 'sub_header')
+
+      get "/courses/#{@course.id}/modules"
+      locked_title = ff("#context_module_item_#{tag1.id} .locked_title")
+
+      locked_title[0].text.length.should == 98
+    end
+
+    it "should add a title attribute to the text header" do
+      set_course_draft_state
+      text_header = 'This is a really long module text header that should be truncated to exactly 98 characters plus the ... part so 101 characters really'
+      mod = @course.context_modules.create! name: 'TestModule'
+      tag1 = mod.add_item(title: text_header, type: 'sub_header')
+
+      get "/courses/#{@course.id}/modules"
+      locked_title = ff("#context_module_item_#{tag1.id} .locked_title[title]")
+
+      locked_title[0].attribute(:title).should == text_header
     end
 
     it "should not rename every text header when you rename one" do
