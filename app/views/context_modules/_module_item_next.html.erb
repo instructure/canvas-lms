@@ -50,8 +50,8 @@
       </span>
 
       <span class="item_name">
-        <a class="title <%= '_explicit_external_link' if tag && tag.content_type == 'ExternalUrl' %>" href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>"><%= tag && tag.title %></a>
-        <span class="title locked_title"><%= tag && tag.title %></span>
+        <a title="<%= tag && tag.title %>" class="title <%= '_explicit_external_link' if tag && tag.content_type == 'ExternalUrl' %>" href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>"><%= truncate_text(tag && tag.title, :max_length => 98) %></a>
+        <span title="<%= tag && tag.title %>" class="title locked_title"><%= truncate_text(tag && tag.title, :max_length => 98) %></span>
         <span class="points_possible" style="display: none;"><%= tag.try_rescue(:assignment).try_rescue(:points_possible) || nbsp %></span>
         <span class="requirement" style="display: none;">&nbsp;</span>
         <span class="completion_requirement" style="display: none;">&nbsp;</span>
