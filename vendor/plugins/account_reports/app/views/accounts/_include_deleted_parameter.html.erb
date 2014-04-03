@@ -1,7 +1,9 @@
 <!--Select to run with deleted users, courses, enrollments-->
 <tr>
   <td>
-    <%= check_box_tag "parameters[include_deleted]"   %>
-    <%= label_tag(:include_deleted, t('account_reports.default.include_deleted.check_box','Include Deleted Objects'), "for" => 'parameters_include_deleted') %>
+    <label class="checkbox">
+      <%= check_box_tag "parameters[include_deleted]"   %>
+      <%= t('account_reports.default.include_deleted.check_box','Include Deleted Objects') %>
+    </label>
   </td>
 </tr>

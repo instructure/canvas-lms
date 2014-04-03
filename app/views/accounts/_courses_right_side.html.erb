@@ -17,7 +17,7 @@
         <% if @query.present? %><input name="course[name]" type="hidden" value="<%= @query %>" /><% end %>
         <input name="hide_enrollmentless_courses" type="hidden" value="0" />
         <input id="enroll_filter_checkbox" name="hide_enrollmentless_courses" type="checkbox" value="1" <% if params[:hide_enrollmentless_courses] == "1" %>checked="checked"<% end %>/>
-        <label for="hide_enrollmentless_courses"><%= t(:hide_enrollmentless_courses, "Hide enrollmentless courses") %></label>
+        <label for="enroll_filter_checkbox"><%= t(:hide_enrollmentless_courses, "Hide enrollmentless courses") %></label>
         <br />
         <button class='btn filter_button'><%= t("#buttons.filter", "Filter") %></button>
       </form>

@@ -1192,6 +1192,14 @@ describe "discussions" do
         confirm(:off)
       end
 
+      it "should toggle checkboxes when clicking their labels" do
+        get url
+        wait_for_ajaximations
+        is_checked('input[type=checkbox][name=threaded]').should_not be_true
+        driver.execute_script(%{$('input[type=checkbox][name=threaded]').parent().click()})
+        is_checked('input[type=checkbox][name=threaded]').should be_true
+      end
+
       context "locking" do
         it "should set as active when removing existing delayed_post_at and lock_at dates" do
           topic.delayed_post_at = 10.days.ago
