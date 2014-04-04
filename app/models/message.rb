@@ -340,6 +340,7 @@ class Message < ActiveRecord::Base
     setter.call(inner_html)
 
     layout_path = Canvas::MessageHelper.find_message_path('_layout.email.html.erb')
+    @output_buffer = nil
     RailsXss::Erubis.new(File.read(layout_path)).result(_binding)
   ensure
     @i18n_scope = orig_i18n_scope
