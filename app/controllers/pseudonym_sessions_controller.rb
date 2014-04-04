@@ -681,6 +681,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def oauth2_logout
+    logout_current_user if params[:expire_sessions]
     return render :json => { :message => "can't delete OAuth access token when not using an OAuth access token" }, :status => 400 unless @access_token
     @access_token.destroy
     render :json => {}
