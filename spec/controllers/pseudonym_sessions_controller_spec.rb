@@ -807,6 +807,55 @@ describe PseudonymSessionsController do
         assigns[:cc].should == cc
       end
     end
+
+    context "oauth" do
+      before do
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+
+        redis = stub('Redis')
+        redis.stubs(:setex)
+        redis.stubs(:hmget)
+        redis.stubs(:del)
+        Canvas.stubs(:redis => redis)
+      end
+
+      let(:key) { DeveloperKey.create! :redirect_uri => 'https://example.com' }
+      let(:params) { {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' } } }
+
+      it 'should redirect to the confirm url if the user has no token' do
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'should redirect to the redirect uri if the user already has remember-me token' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, ['/auth/userinfo'], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
+      end
+
+      it 'should not reuse userinfo tokens for other scopes' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'should redirect to the redirect uri if the developer key is trusted' do
+        key.trusted = true
+        key.save!
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
+      end
+    end
   end
 
   describe 'otp_login' do
@@ -1086,11 +1135,16 @@ describe PseudonymSessionsController do
     end
 
     context 'with a user logged in' do
-      before :each do
-        user_session user
+      before do
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+        user_session(@user)
+
+        redis = stub('Redis')
+        redis.stubs(:setex)
+        Canvas.stubs(:redis => redis)
       end
 
-      it 'prompts the user to authorize this access' do
+      it 'should redirect to the confirm url if the user has no token' do
         get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI
         response.should redirect_to(oauth2_auth_confirm_url)
       end
@@ -1098,6 +1152,27 @@ describe PseudonymSessionsController do
       it 'redirects to login_url with ?force_login=1' do
         get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI, :force_login => 1
         response.should redirect_to(login_url(:force_login => 1))
+      end
+
+      it 'should redirect to the redirect uri if the user already has remember-me token' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => 'https://example.com', :scopes => '/auth/userinfo'
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
+      end
+
+      it 'should not reuse userinfo tokens for other scopes' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => 'https://example.com'
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'should redirect to the redirect uri if the developer key is trusted' do
+        key.trusted = true
+        key.save!
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => 'https://example.com', :scopes => '/auth/userinfo'
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
       end
     end
   end

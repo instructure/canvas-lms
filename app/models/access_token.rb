@@ -97,6 +97,10 @@ class AccessToken < ActiveRecord::Base
 
   #Scoped token convenience method
   def scoped_to?(req_scopes)
+    self.class.scopes_match?(scopes, req_scopes)
+  end
+
+  def self.scopes_match?(scopes, req_scopes)
     return req_scopes.size == 0 if scopes.nil?
 
     scopes.size == req_scopes.size &&
