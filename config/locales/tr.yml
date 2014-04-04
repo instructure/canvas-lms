@@ -663,6 +663,13 @@ tr:
       page_title: Hesaplar
       title: "Yönettiğim Hesaplar"
     integer_required: "Bir tamsayı değeri gerekiyor"
+    last_submission_activity_csv_description: 
+      account_reports: 
+        concorde: 
+          description: 
+            header: Örnek
+          last_submission: 
+            text: "Bu raporda öğrenci gönderileri için son etkinlik gösterilmektedir."
     last_user_access_csv_description: 
       account_reports: 
         default: 
@@ -3144,9 +3151,11 @@ tr:
     upload_timeout_error: "Dosya yükleme işlemi zaman aşımına uğradı."
   content_migrations: 
     angel_exporter: 
+      content: İçerik
       options: Seçenekler
     bad_migration_type: "Geçersiz migration_type"
     blackboard_export: 
+      content: İçerik
       options: Seçenekler
     canvas_export: 
       content: İçerik
@@ -3162,6 +3171,7 @@ tr:
       options: Seçenekler
     course_list_error: "Dersler yüklenemiyor. Internete bağlı mısınız?"
     d2_l_export: 
+      content: İçerik
       options: Seçenekler
     file_required: "İçeriğini aktarmak istediğiniz dosyayı seçmelisiniz"
     file_too_large: "Taşıma işleminiz %{file_size}'ı aşamaz"
@@ -3999,7 +4009,6 @@ tr:
       inbox_view: GÖSTER
       inbox_views: 
         archived_messages: Arşivlenmiş
-        discussion_replies: "Tartışmaya Gelen Cevaplar"
         inbox: "Gelen Kutusu"
         sent_messages: Gönderildi
         starred_messages: "Yıldız konulmuş"
@@ -7782,7 +7791,7 @@ tr:
     en: İngilizce
     tr: "Türkçe (crowd-sourced)"
   logged_out_user: "Oturum Kapatan Kullanıcı %{user_counter}"
-  m2c_file_description: "Moodle 1.9 .zip dosyası"
+  m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle İçe Aktarma"
   manage_avatars: 
     errors: 
@@ -10425,6 +10434,7 @@ tr:
         domain_settings: "Alan Adı Ayarları"
         misc_settings: "Karışık Ayarlar"
         ui_conf_ids: "UI Conf ID'leri"
+      hide_rte_button_note: "(karşılıklı konuşma/SpeedGrader/Medya Kayıtları ev ödevi gönderileri için hala orada)"
       hints: 
         domain: "Barındırılan hesaplar için \"www.kaltura.com\"'u kullan"
         resource_domain: "Barındırılan hesaplar için \"cdn.kaltura.com\"'u kullan"
@@ -10434,8 +10444,8 @@ tr:
       labels: 
         cache_play_list_seconds: "Oynatma listesi URL önbelleği için saniye"
         do_analytics: "Olay analizlerini yolla"
-        do_flash_var_test: "Deneysel flash ayarlarını etkinleştir"
         domain: Alan
+        hide_rte_button: "Zengin Metin Editöründe video simgesini gizle."
         kaltura_sis: "Kaltura'ya SIS verisi yazdır"
         kcw_ui_conf: "KCW UI Conf ID"
         partner_id: "Partner ID"
@@ -10445,6 +10455,7 @@ tr:
         secret_key: "Administrator Secret"
         subpartner_id: "Sub Partner ID"
         upload_ui_conf: "UI Conf ID Yükleyicisi"
+        use_alt_record_widget: "Alternatif flash kayıt bileşeni kullanın"
         user_secret_key: "User Secret"
       ui_conf_ids: "Kaltura'da hesabı olan müşterile için, Kaltura'dan size bu id'leri vermesini isteyebilirsiniz. Kendi kaltura sunucusu olanlar bu değerleri ui_confs tablosunda bulabilirler."
     linked_in: 
@@ -10594,8 +10605,8 @@ tr:
       generating_token: "Token Üretiliyor..."
       regenerate_token: "Yeniden Token Üret"
       regenerating_token: "Yeniden Token Üretiliyor"
-      select_avatar: "Avatar Seçiniz"
-      select_image: "Resim Seçiniz"
+      save: Kaydet
+      select_profile_picture: "Profil Resmi Seçiniz"
       selecting_image: "Görsel Seçildi..."
     communication: 
       confirm_email_instructions: "Herhangi bir bildirim almadan önce sizlere (%{email}) e-posta adresine yollamış olduğumuz bağlantıdan doğrulamanız gerekmektedir. Eğer e-postaya ulaşamadıysanız, gereksiz klasörünü kontrol edin veya *tekrardan e-posta gönderimi sağlamak için tıklayın* "
@@ -10865,10 +10876,10 @@ tr:
         privacy_notice_title: "Gizlilik Bildirimi"
     take_picture_view: 
       retry: Tekrar
-      take_snapshot: "Ekranı Yakala"
+      take_picture: "Bilgisayardan Fotoğraf Çek"
     upload_file_view: 
-      crop_instructions: "Resmi kırpmak için seçimi sürükleyin ve aşağıdaki ''Resmi Seç'' butonuna tıklayın."
-      select_a_photo: "bir fotoğraf seçiniz"
+      choose_a_picture: "bir resim seçin"
+      crop_instructions: "Resmi kırpmak için seçimi sürükleyin ve aşağıdaki ''Kaydet'' butonuna tıklayın."
   pseudonym: 
     errors: 
       bad_credentials: "Geçersiz kullanıcı adı ve şifre"
@@ -11351,8 +11362,26 @@ tr:
       one: "1 Soru"
       other: "%{count} Soru"
     question_limit_reached: "Kısa sınav için izin verilen maksimum soru sayısına ulaştın  (%{count}/%{limit}).\\n\\n Konuları birçok kısa sınav arasına yaymayı göz önünde bulundurunuz."
+    quiz: 
+      current_filter: "Geçerli Filtre"
+      default_question_input: "[ Seçiniz ]"
+      default_text_only_question_name: Aralayıcı
+      default_title: "İsimsiz Kısa Sınav"
+      errors: 
+        invalid_hide_results: "Sonuçları gizleme geçersiz"
+        invalid_ip_filter: "IP filtresi geçersiz"
+        invalid_quiz_type: "Kısa sınav türü geçersiz"
+      question_name_counter: "Soru %{question_number}"
+      types: 
+        quiz: "Kısa Sınav"
+        survey: Anket
     quiz_attempts_length_error: "Kısa sınav hakkı 3 hane ile sınırlıdır, öğrencilerenize sınırsız hak vermek isterseniz sol taraftaki Çoklu Teşebbüse İzin Ver kutusuna tik atmayın"
     quiz_attempts_nan_error: "Kısa sınav için giriş hakları sadece sayı belirtilebilir"
+    quiz_group: 
+      errors: 
+        no_bank: "Kısa sınav grubu %{group_name} için soru bankası bulunamadı"
+        no_permissions: "Kullanıcının %{group_name} quiz grubundaki soru bankasına ilişkin izni yoktu"
+      question_group: "Soru Grubu"
     quiz_item_group_view: 
       no_quizzes: "Kısa sınav bulunamadı"
       no_surveys: "Anket bulunamadı"
@@ -11363,6 +11392,14 @@ tr:
       settings: Ayarlar
       title_delete: "Kısa Sınavı Sil"
       title_edit: "Kısa Sınavı Düzenle"
+    quiz_question: 
+      defaults: 
+        question_name: Soru
+    quiz_statistics: 
+      statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} Raporu"
+      types: 
+        item_analysis: "Öğe Analizi"
+        student_analysis: "Öğrenci Analizi"
     quiz_submission: 
       titles: 
         this_is_an_external_element: "Bu bir dış kaynak nesnesidir, metin değildir ve öğrenciler gönderdiğinden beri değişmiş olabilir"
@@ -12168,32 +12205,6 @@ tr:
       draft_state_unsaved_changes: "*Bu kısa sınavdaki sorularda değişiklikler yaptınız.* Siz kısa sınavı kaydedene kadar bu değişiklikler öğrenciler tarafından görülemeyecek."
       unpublished_changes: "*Kısa sınav üzerinde yapmış olduğunuz değişiklikler yayınlanmadı.* Yapmış olduğunuz değişiklikleri yayınlayana yada tekrar yayınlayana dek öğrenciler tarafından görülemeyecektir."
       unpublished_quiz: "*Bu kısa sınav yayınlanmadı* Sadece öğretmenler bu kısa sınav yayınlanana kadar görebilirler."
-  quizzes/quiz: 
-    current_filter: "Geçerli Filtre"
-    default_question_input: "[ Seçiniz ]"
-    default_text_only_question_name: Aralayıcı
-    default_title: "İsimsiz Kısa Sınav"
-    errors: 
-      invalid_hide_results: "Sonuçları gizleme geçersiz"
-      invalid_ip_filter: "IP filtresi geçersiz"
-      invalid_quiz_type: "Kısa sınav tipi geçersiz"
-    question_name_counter: "Soru %{question_number}"
-    types: 
-      quiz: "Kısa Sınav"
-      survey: Anket
-  quizzes/quiz_group: 
-    errors: 
-      no_bank: "Kısa sınav grubu %{group_name} için soru bankası bulunamadı"
-      no_permissions: "Kullanıcının %{group_name} quiz grubundaki soru bankasına ilişkin izni yoktu"
-    question_group: "Soru Grubu"
-  quizzes/quiz_question: 
-    defaults: 
-      question_name: Soru
-  quizzes/quiz_statistics: 
-    statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} Raporu"
-    types: 
-      item_analysis: "Öğe Analizi"
-      student_analysis: "Öğrenci Analizi"
   quizzes_model: 
     cant_unpublish_when_students_submit: "Öğrenci gönderileri varsa yayından kaldırılamaz"
     confirms: 
@@ -12930,6 +12941,8 @@ tr:
       service_contact: "%{user} kullanıcısının %{service} hizmeti ile iletişimini sağla"
       social_instructions: "Profilinizde diğerleri tarafından görülmesini istediğiniz iletişim yöntemlerini seçin."
       title: Başlık
+      titles: 
+        click_to_change_profile_pic: "Profil resmini değiştirmek için tıklayın"
       user_has_no_bio: "%{user} biyografisini eklememiş"
       ways_to_contact_user: "%{name} ile iletişim yolları"
     recent_activity: 
@@ -13283,11 +13296,11 @@ tr:
       date: Tarih
       value: Değer
     domain_not_found: 
-      body_description: "Lütfen URL'yi kontrol edip tekrar deneyin ya da yardım için kurum veya öğretmen ile iletişime geçin."
+      body_description: "Lütfen Canvas URL'nizi kontrol edip tekrar deneyin. Canvas URL'nizi bilmiyorsanız yardım için kurumunuz veya ders öğretmeni ile iletişime geçin."
       body_reference: "Belirli bir kuruma bağlı olmadan ücretsiz bir Canvas hesabını burada oluşturabilirsiniz"
       links: 
         canvas_instructure: canvas.instructure.com
-      page_title: "Oops, Canvasınızı bulamadık."
+      page_title: "Oops, Canvas oturum açma sayfanızı bulamadı."
       you_typed: Yazdınız
     institution_suspended: 
       body: "Okulunuzun Canvas hesabı geçici olarak donduruldu. Lütfen Canvas yöneticisi ile iletişime geçiniz."
@@ -13491,13 +13504,16 @@ tr:
       no_submission: "Gönderi Yok"
       paper_view: "Kağıt Görünümü"
       plain_view: "Düz Metin Görünümü"
-      preview_document: "Bu Dosyayı Önizle"
+      preview_crocodoc_document: "Gönderilerinizi ön izleyin ve varsa öğretmen geribildirimine bakın"
+      preview_scribd_document: "Gönderinizi ön izleyin"
       preview_title: "%{title} Önizlemesi"
       quiz_submission: "Bu gönderim bir kısa sınav gönderimidir. Kısa sınav sayfasına yönlendiriliyorsunuz."
       show_entire_discussion: "Tüm Tartışmayı Göster"
       student: Öğrenci
       url_preview: "URL Görünümü"
+      view_feedback_button: "Geribildirimi Göster"
       view_original_submission: "%{user}'ın Orjinal Gönderimini Görüntüle"
+      view_preview_button: "Ön İzleme"
     still_zipping: "Dosya sıkıştırma süreci devam ediyor..."
     submission_download: 
       download_message: "**Öğrencilerinizin gönderileri toplanıp** bir zip dosyası olarak sıkıştırılıyor. Gönderi dosyalarının boyutu ve sayısına bağlı olarak bu biraz uzun sürebilir."
