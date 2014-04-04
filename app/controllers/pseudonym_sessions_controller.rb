@@ -567,8 +567,9 @@ class PseudonymSessionsController < ApplicationController
     session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(@current_user)
 
     respond_to do |format|
-      if session[:oauth2]
-        return redirect_to(oauth2_auth_confirm_url)
+      if oauth = session[:oauth2]
+        provider = Canvas::Oauth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
+        return oauth2_confirmation_redirect(provider)
       elsif session[:course_uuid] && user && (course = Course.find_by_uuid_and_workflow_state(session[:course_uuid], "created"))
         claim_session_course(course, user)
         format.html { redirect_to(course_url(course, :login_success => '1')) }
@@ -629,11 +630,7 @@ class PseudonymSessionsController < ApplicationController
     session[:oauth2][:state] = params[:state] if params.key?(:state)
 
     if @current_pseudonym && !params[:force_login]
-      if provider.authorized_token? @current_user
-        final_oauth2_redirect(session[:oauth2][:redirect_uri], final_oauth2_redirect_params)
-      elsif
-        redirect_to oauth2_auth_confirm_url
-      end
+      oauth2_confirmation_redirect(provider)
     else
       redirect_to login_url(params.slice(:canvas_login, :pseudonym_session, :force_login))
     end
@@ -685,6 +682,15 @@ class PseudonymSessionsController < ApplicationController
     return render :json => { :message => "can't delete OAuth access token when not using an OAuth access token" }, :status => 400 unless @access_token
     @access_token.destroy
     render :json => {}
+  end
+
+  def oauth2_confirmation_redirect(provider)
+    # skip the confirmation page if access is already (or automatically) granted
+    if provider.authorized_token?(@current_user)
+      final_oauth2_redirect(session[:oauth2][:redirect_uri], final_oauth2_redirect_params)
+    else
+      redirect_to oauth2_auth_confirm_url
+    end
   end
 
   def final_oauth2_redirect_params(options = {})
