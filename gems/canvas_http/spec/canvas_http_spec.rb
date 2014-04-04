@@ -18,6 +18,7 @@
 
 require 'spec_helper'
 require 'webmock'
+require 'tempfile'
 
 describe "CanvasHttp" do
 
@@ -74,4 +75,16 @@ describe "CanvasHttp" do
     end
   end
 
+  describe ".tempfile_for_url" do
+    before(:each) do
+      tempfile = double('tempfile')
+      tempfile.stub(:binmode)
+      Tempfile.stub(:new).and_return(tempfile)
+    end
+
+    it "truncates uris to 100 characters" do
+      Tempfile.should_receive(:new).with('1234567890' * 10)
+      CanvasHttp.tempfile_for_uri(URI.parse('1234567890' * 12))
+    end
+  end
 end
