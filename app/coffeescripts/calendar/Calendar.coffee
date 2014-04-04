@@ -648,16 +648,8 @@ define [
     # <style> node in ie8
     $styleContainer = $('<div />').appendTo('body')
 
-    # these represent a base hue to get color values from
-    # they are combined with standard saturations and brigness to color-code events for each contex
-    hues = [43, 5, 205, 85, 289, 63, 230, 186, 115, 330]
-
-    cssColor = (h,s,b) ->
-      rgbArray = hsvToRgb(h,s,b)
-      "rgb(#{rgbArray.join ' ,'})"
-
     colorizeContexts: =>
-      colors = colorSlicer.getColors(@contextCodes.length)
+      colors = colorSlicer.getColors(@contextCodes.length, 275)
       html = for contextCode, index in @contextCodes
         color = colors[index]
         ".group_#{contextCode}{
