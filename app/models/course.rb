@@ -2084,7 +2084,23 @@ class Course < ActiveRecord::Base
     return unless data[:course]
     settings = data[:course]
     if settings[:tab_configuration] && settings[:tab_configuration].is_a?(Array)
-      self.tab_configuration = settings[:tab_configuration]
+      tab_config = []
+      all_tools = nil
+      settings[:tab_configuration].each do |tab|
+        if tab['id'].is_a?(String) && tab['id'].start_with?('context_external_tool_')
+          tool_mig_id = tab['id'].sub('context_external_tool_', '')
+          all_tools ||= ContextExternalTool.find_all_for(self, :course_navigation)
+          if tool = (all_tools.detect{|t| t.migration_id == tool_mig_id} ||
+              all_tools.detect{|t| CC::CCHelper.create_key(t) == tool_mig_id})
+            # translate the migration_id to a real id
+            tab['id'] = "context_external_tool_#{tool.id}"
+            tab_config << tab
+          end
+        else
+          tab_config << tab
+        end
+      end
+      self.tab_configuration = tab_config
     end
     if settings[:storage_quota] && ( migration.for_course_copy? || self.account.grants_right?(migration.user, nil, :manage_courses))
       self.storage_quota = settings[:storage_quota]

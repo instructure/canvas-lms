@@ -2081,12 +2081,20 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       end
 
       it "should copy external tools" do
+        @copy_from.tab_configuration = [
+          {"id" =>0 }, {"id" => "context_external_tool_#{@tool_from.id}"}, {"id" => 14}
+        ]
+        @copy_from.save!
 
         run_course_copy
 
         @copy_to.context_external_tools.count.should == 1
-
         tool_to = @copy_to.context_external_tools.first
+
+        @copy_to.tab_configuration.should == [
+            {"id" =>0 }, {"id" => "context_external_tool_#{tool_to.id}"}, {"id" => 14}
+        ]
+
         tool_to.name.should == @tool_from.name
         tool_to.custom_fields.should == @tool_from.custom_fields
         tool_to.has_course_navigation.should == true
@@ -2186,6 +2194,23 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
         tag = @copy_to.context_modules.first.content_tags.first
         tag.content_type.should == 'ContextExternalTool'
         tag.content_id.should == @tool_from.id
+      end
+
+      it "should keep tab configuration for account-level external tools" do
+        account = @copy_from.root_account
+        @tool_from.context = account
+        @tool_from.save!
+
+        @copy_from.tab_configuration = [
+            {"id" =>0 }, {"id" => "context_external_tool_#{@tool_from.id}"}, {"id" => 14}
+        ]
+        @copy_from.save!
+
+        run_course_copy
+
+        @copy_to.tab_configuration.should == [
+            {"id" =>0 }, {"id" => "context_external_tool_#{@tool_from.id}"}, {"id" => 14}
+        ]
       end
     end
   end
