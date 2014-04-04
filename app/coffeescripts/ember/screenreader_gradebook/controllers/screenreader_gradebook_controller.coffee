@@ -85,7 +85,15 @@ define [
 
     hideStudentNames: false
 
-    showConcludedEnrollments: false
+    showConcludedEnrollments: (->
+      userSettings.contextGet('show_concluded_enrollments') or false
+    ).property().volatile()
+
+    updateshowConcludedEnrollmentsSetting: ( ->
+      isChecked = @get('showConcludedEnrollments')
+      if isChecked?
+        userSettings.contextSet 'show_concluded_enrollments', isChecked
+    ).observes('showConcludedEnrollments')
 
     selectedStudent: null
 
