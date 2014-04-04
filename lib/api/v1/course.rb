@@ -91,6 +91,8 @@ module Api::V1::Course
     return unless course.module_based? && course.user_is_student?(user)
 
     mods = course.modules_visible_to(user)
+    current_mod = mods.detect { |m| m.evaluate_for(user).completed? == false }
+
     requirements = mods.flat_map(&:completion_requirements).map { |req| req[:id] }
     requirement_count = requirements.size
 
@@ -106,15 +108,11 @@ module Api::V1::Course
         next_requirement_url: nil
     }
 
-    if requirement_completed_count < requirement_count
-      current_mod = mods.detect { |m| m.evaluate_for(user).completed? == false }
-
-      if current_mod.require_sequential_progress
-        current_position = current_mod.evaluate_for(user).current_position
-        content_tag = current_mod.content_tags.where(:position => current_position).first
-        next_requirement_url = course_context_modules_item_redirect_url(:course_id => course.id, :id => content_tag.id, :host => HostUrl.context_host(course))
-        course_progress[:next_requirement_url] = next_requirement_url
-      end
+    if current_mod && current_mod.require_sequential_progress
+      current_position = current_mod.evaluate_for(user).current_position
+      content_tag = current_mod.content_tags.where(:position => current_position).first
+      next_requirement_url = course_context_modules_item_redirect_url(:course_id => course.id, :id => content_tag.id, :host => HostUrl.context_host(course))
+      course_progress[:next_requirement_url] = next_requirement_url
     end
 
     course_progress
