@@ -274,6 +274,12 @@ class ContextModuleProgression < ActiveRecord::Base
     end
   end
 
+  # This prevents active record using optimistic locking, until the data migration is complete
+  # (once the data migration is complete, this method can simply be removed)
+  def locking_enabled?
+    false
+  end
+
   def trigger_completion_events
     if workflow_state_changed? && completed?
       context_module.completion_event_callbacks.each do |event|
