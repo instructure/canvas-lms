@@ -74,6 +74,18 @@ an authenticated request to the following endpoint:
 
 <h3 class="endpoint">DELETE /login/oauth2/token</h3>
 
+<h4>Parameters</h4>
+
+<ul class="argument">
+  <li>
+    <span class="name">expire_sessions</span>
+    <div class="inline">
+      optional.  Set this to '1' if you want to end all of the user's
+Canvas web sessions.  Without this argument, the endpoint will leave web sessions intact.
+    </div>
+  </li>
+</ul>
+
 </div>
 
 Oauth2 Based Identity Service
