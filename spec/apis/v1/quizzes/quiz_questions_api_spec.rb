@@ -106,7 +106,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
     end
 
     describe 'GET /courses/:course_id/quizzes/:quiz_id/questions (index)' do
-      it 'returns a censored version of the questions' do
+      it 'returns a censored version of multiple choice questions' do
         @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
@@ -115,11 +115,24 @@ describe Quizzes::QuizQuestionsController, type: :request do
 
         json.length.should == 1
         json.each do |question|
-          question.symbolize_keys!
-          question[:answers].class.name.should == 'Array'
-          question[:answers].each do |answer|
-            answer.has_key?(:weight).should be_false
+          question["answers"].class.name.should == 'Array'
+          question["answers"].each do |answer|
+            answer.include?("weight").should be_false
+            answer.include?("comments").should be_false
           end
+        end
+      end
+
+      it 'returns a censored version of short answer questions' do
+        @quiz.quiz_questions.create!(:question_data => short_answer_question_data)
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
+                        :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
+                        :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
+p json
+        json.length.should == 1
+        json.each do |question|
+          question.include?("answers").should be_false
         end
       end
     end
@@ -134,15 +147,15 @@ describe Quizzes::QuizQuestionsController, type: :request do
 
         json.length.should == 1
         json.each do |question|
-          question.symbolize_keys!
-          question[:answers].class.name.should == 'Array'
-          question[:answers].each do |answer|
-            answer.has_key?(:weight).should be_false
+          question["answers"].class.name.should == 'Array'
+          question["answers"].each do |answer|
+            answer.include?("weight").should be_false
+            answer.include?("comments").should be_false
           end
         end
       end
 
-      it 'censors both the question and its assessment question' do
+      it 'censors both the question and its assessment multiple choice question' do
         @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
 
         json = api_call(:get,
@@ -159,21 +172,49 @@ describe Quizzes::QuizQuestionsController, type: :request do
 
         json.length.should == 1
 
-        question = json[0].with_indifferent_access
-        question[:answers].class.name.should == 'Array'
-        question[:answers].each do |answer|
-          answer.has_key?(:weight).should be_false
+        question = json[0]
+        question["answers"].class.name.should == 'Array'
+        question["answers"].each do |answer|
+          answer.include?("weight").should be_false
+          answer.include?("comments").should be_false
         end
 
-        assessment_question = question[:assessment_question]
+        assessment_question = question["assessment_question"]
         assessment_question.should be_present
-        assessment_question[:question_data].should be_present
-        assessment_question[:question_data].should be_present
-        assessment_question[:question_data][:answers].class.name.should == 'Array'
-        assessment_question[:question_data][:answers].each do |answer|
-          answer.has_key?(:weight).should be_false
+        assessment_question["question_data"].should be_present
+        assessment_question["question_data"].should be_present
+        assessment_question["question_data"]["answers"].class.name.should == 'Array'
+        assessment_question["question_data"]["answers"].each do |answer|
+          answer.include?("weight").should be_false
         end
       end
+
+      it 'censors both the question and its assessment short answer question' do
+        @quiz.quiz_questions.create!(:question_data => short_answer_question_data)
+
+        json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
+          {
+            :controller => "quizzes/quiz_questions",
+            :action => "index",
+            :format => "json",
+            :course_id => @course.id.to_s,
+            :quiz_id => @quiz.id.to_s
+          }, {
+            :include => [ :assessment_question ]
+          })
+
+        json.length.should == 1
+
+        question = json[0]
+        question.include?("answers").should be_false
+
+        assessment_question = question["assessment_question"]
+        assessment_question.should be_present
+        assessment_question["question_data"].should be_present
+        assessment_question["question_data"].include?("answers").should be_false
+      end
+
     end
   end
 end
