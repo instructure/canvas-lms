@@ -60,14 +60,15 @@ module Api::V1::QuizQuestion
 
     if includes.include?(:assessment_question)
       hsh[:assessment_question] = api_json(question.assessment_question, user, session)
-
-      censor(hsh[:assessment_question][:question_data]) if censored
+      if censored
+        q_data = hsh[:assessment_question][:question_data]
+        hsh[:assessment_question][:question_data] = censor(q_data)
+      end
     end
 
     # Remove the answer weights if we're censoring the data for student access;
     # the answer weights denote the correct answer !!!!!
-    censor(hsh) if censored
-
+    hsh = censor(hsh) if censored
     hsh
   end
 
@@ -80,9 +81,34 @@ module Api::V1::QuizQuestion
   #   quiz_question or the question_data field in a serialized assessment
   #   question.
   def censor(question_data)
-    question_data[:answers].each do |record|
-      record.delete(:weight)
+    question_data = question_data.with_indifferent_access
+
+    # whitelist question details for students
+    attr_whitelist = %w(
+      id position quiz_group_id quiz_id assessment_question_id
+      assessment_question question_name question_type question_text answers
+    )
+    question_data.keep_if {|k, v| attr_whitelist.include?(k.to_s) }
+
+    # only include answers for types that need it to show choices
+    allow_answer_whitelist = %w(
+      multiple_choice_question
+      true_false_question
+      multiple_answers_question
+    )
+
+    unless allow_answer_whitelist.include?(question_data[:question_type])
+      question_data.delete(:answers)
     end
+
+    # need the answer text for multiple choice - only info necessary though
+    if question_data[:answers]
+      question_data[:answers].each do |record|
+        record.keep_if {|k, v| %w(id text html).include?(k.to_s) }
+      end
+    end
+
+    question_data
   end
 
 end
