@@ -19,6 +19,17 @@
 require 'bigdecimal'
 
 class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
+  class FlexRange
+    def initialize(a, b)
+      numbers = [ BigDecimal.new(a.to_s), BigDecimal.new(b.to_s) ].sort
+      @range = numbers[0]..numbers[1]
+    end
+
+    def cover?(number)
+      @range.cover?(number)
+    end
+  end
+
   def answers
     @question_data[:answers].sort_by { |a| a[:weight] || CanvasSort::First }
   end
@@ -46,7 +57,7 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
         max = val + margin
         answer_number >= min && answer_number <= max
       else
-        answer_number >= BigDecimal.new(answer[:start].to_s) && answer_number <= BigDecimal.new(answer[:end].to_s)
+        FlexRange.new(answer[:start], answer[:end]).cover?(answer_number)
       end
     end
 
