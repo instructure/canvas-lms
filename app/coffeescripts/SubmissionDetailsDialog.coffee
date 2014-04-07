@@ -11,6 +11,7 @@ define [
   'jqueryui/dialog'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.scrollTo'
+  'vendor/jquery.ba-tinypubsub'
 ], (I18n, $, submissionDetailsDialog, {extractDataFor}) ->
 
   class SubmissionDetailsDialog
@@ -22,9 +23,12 @@ define [
 
       @url = @options.change_grade_url.replace(":assignment", @assignment.id).replace(":submission", @student.id)
       @submission = $.extend {}, @student["assignment_#{@assignment.id}"],
+        inputName: 'submission[posted_grade]'
         assignment: @assignment
         speedGraderUrl: speedGraderUrl
         loading: true
+        showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"
+      @submission["assignment_grading_type_is_#{@assignment.grading_type}"] = true
       @dialog = $('<div class="use-css-transitions-for-show-hide" style="padding:0;"/>')
       @dialog.html(submissionDetailsDialog(@submission))
         .dialog
@@ -32,9 +36,18 @@ define [
           width: 600
           resizable: false
           open: @scrollCommentsToBottom
+
         .delegate 'select', 'change', (event) =>
           @dialog.find('.submission_detail').each (index) ->
             $(this).showIf(index == event.currentTarget.selectedIndex)
+        .delegate '.submission_details_grade_form', 'submit', (event) =>
+          event.preventDefault()
+          $(event.currentTarget.form).disableWhileLoading $.ajaxJSON @url, 'PUT', $(event.currentTarget).getFormData(), (data) =>
+            @update(data)
+            $.publish 'submissions_updated', [@submission.all_submissions]
+            setTimeout =>
+              @dialog.dialog('close')
+            , 500
         .delegate '.submission_details_add_comment_form', 'submit', (event) =>
           event.preventDefault()
           $(event.currentTarget).disableWhileLoading $.ajaxJSON @url, 'PUT', $(event.currentTarget).getFormData(), (data) =>
@@ -48,6 +61,7 @@ define [
 
     open: =>
       @dialog.dialog('open')
+      $('.submission_details_dialog .assignment-name').focus()
 
     scrollCommentsToBottom: =>
       @dialog.find('.submission_details_comments').scrollTop(999999)

@@ -715,6 +715,7 @@ define [
         .delegate '.gradebook-cell-comment', 'click.gradebook', (event) =>
           event.preventDefault()
           data = $(event.currentTarget).data()
+          $(@grid.getActiveCellNode()).removeClass('editable')
           SubmissionDetailsDialog.open @assignments[data.assignmentId], @student(data.userId.toString()), @options
         .delegate '.minimized',
           'mouseenter' : @hoverMinimizedCell,
