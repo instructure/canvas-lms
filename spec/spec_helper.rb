@@ -28,7 +28,7 @@ end
 unless CANVAS_RAILS2
   Spec.configure do |c|
    c.treat_symbols_as_metadata_keys_with_true_values = true
-  end 
+  end
 
   RSpec.configure do |c|
     c.around(:each) do |example|
@@ -39,7 +39,7 @@ unless CANVAS_RAILS2
         }
         if ENV['AUTORERUN']
           e = @example.instance_variable_get('@exception')
-          if !e.nil? && (attempts += 1) < 2
+          if !e.nil? && (attempts += 1) < 2 && !example.metadata[:no_retry]
             puts "FAILURE: #{@example.description} \n #{e}".red
             puts "RETRYING: #{@example.description}".yellow
             @example.instance_variable_set('@exception', nil)

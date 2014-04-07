@@ -1951,7 +1951,7 @@ class Course < ActiveRecord::Base
       # These only need to be processed once
       Attachment.skip_media_object_creation do
         process_migration_files(data, migration); migration.update_import_progress(18)
-        Attachment.process_migration(data, migration); migration.update_import_progress(20)
+        Importers::Attachment.new.process_migration(data, migration); migration.update_import_progress(20)
         mo_attachments = self.imported_migration_items.find_all { |i| i.is_a?(Attachment) && i.media_entry_id.present? }
         begin
           import_media_objects(mo_attachments, migration)
