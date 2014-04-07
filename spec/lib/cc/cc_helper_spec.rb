@@ -67,6 +67,15 @@ describe CC::CCHelper do
       translated.should == html
     end
 
+    it "should find media objects outside the context (because course copy)" do
+      other_course = course
+      @exporter = CC::CCHelper::HtmlContentExporter.new(other_course, @user)
+      @exporter.html_content(<<-HTML)
+      <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
+      HTML
+      @exporter.used_media_objects.map(&:media_id).should eql(['abcde'])
+    end
+
     it "should export html with a utf-8 charset" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       html = %{<div>My Title\302\240</div>}

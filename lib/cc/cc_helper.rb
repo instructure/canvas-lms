@@ -254,8 +254,8 @@ module CCHelper
       doc.css('a.instructure_inline_media_comment').each do |anchor|
         next unless anchor['id']
         media_id = anchor['id'].gsub(/^media_comment_/, '')
-        obj = course.media_objects.by_media_id(media_id).first
-        if obj && obj.context == course && migration_id = CCHelper.create_key(obj)
+        obj = MediaObject.by_media_id(media_id).first
+        if obj && migration_id = CCHelper.create_key(obj)
           @used_media_objects << obj
           info = CCHelper.media_object_info(obj, nil, media_object_flavor)
           @media_object_infos[obj.id] = info
