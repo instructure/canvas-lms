@@ -23,7 +23,7 @@ describe EnrollmentsApiController, type: :request do
   describe "enrollment creation" do
     context "an admin user" do
       before do
-        site_admin_user(:active_all => true)
+        account_admin_user(:active_all => true)
         course(:active_course => true)
         @unenrolled_user = user_with_pseudonym
         @section         = @course.course_sections.create!
@@ -240,6 +240,12 @@ describe EnrollmentsApiController, type: :request do
         }
 
         JSON.parse(response.body)['message'].should eql 'Can\'t add an enrollment to a concluded course.'
+      end
+
+      it "should not enroll a user lacking a pseudonym on the course's account" do
+        foreign_user = user
+        api_call_as_user @admin, :post, @path, @path_options, { :enrollment => { :user_id => foreign_user.id } }, {},
+                 { expected_status: 404 }
       end
 
       context "custom course-level roles" do
