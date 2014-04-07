@@ -110,7 +110,7 @@ class Alert < ActiveRecord::Base
   def self.evaluate_for_course(course, account_alerts = nil, include_user_notes = nil)
     return unless course.available?
 
-    alerts = Array(account_alerts)
+    alerts = Array.new(account_alerts || [])
     alerts.concat course.alerts.all
     return if alerts.empty?
 
