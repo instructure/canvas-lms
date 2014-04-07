@@ -26,28 +26,18 @@ class GoogleDocs
     end
   end
 
-  def initialize(user, session)
-    @user = user
-    @session = session
+  def initialize(oauth_gdocs_access_token, oauth_gdocs_access_token_secret)
+    @oauth_gdocs_access_token = oauth_gdocs_access_token
+    @oauth_gdocs_access_token_secret = oauth_gdocs_access_token_secret
   end
 
   def retrieve_access_token
     consumer = GoogleDocs.consumer
     return nil unless consumer
-    if @user
-      service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', @user].cache_key) do
-        service = @user.user_services.find_by_service("google_docs")
-        service && [service.token, service.secret]
-      end
-      raise NoTokenError unless service_token && service_secret
-      access_token = OAuth::AccessToken.new(consumer, service_token, service_secret)
-    else
-      access_token = OAuth::AccessToken.new(consumer, @session[:oauth_gdocs_access_token_token], @session[:oauth_gdocs_access_token_secret])
-    end
-    access_token
+    @access_token ||= OAuth::AccessToken.new(consumer, @oauth_gdocs_access_token, @oauth_gdocs_access_token_secret)
   end
 
-  def get_service_user(access_token)
+  def get_service_user_info(access_token)
     doc = create_doc("Temp Doc: #{Time.now.strftime("%d %b %Y, %I:%M %p")}", access_token)
     delete_doc(doc, access_token)
     service_user_id = doc.entry.authors[0].email rescue nil
@@ -55,47 +45,17 @@ class GoogleDocs
     return service_user_id, service_user_name
   end
 
-  def self.get_access_token(oauth_request, oauth_verifier, session, user)
+  def self.get_access_token(token, secret, oauth_verifier)
     consumer = GoogleDocs.consumer
     request_token = OAuth::RequestToken.new(consumer,
-                                            session.delete(:oauth_google_docs_request_token_token),
-                                            session.delete(:oauth_google_docs_request_token_secret))
-    access_token = request_token.get_access_token(:oauth_verifier => oauth_verifier)
-    google_docs = GoogleDocs.new(user, session)
-    service_user_id, service_user_name = google_docs.get_service_user(access_token)
-    session[:oauth_gdocs_access_token_token] = access_token.token
-    session[:oauth_gdocs_access_token_secret] = access_token.secret
-    if oauth_request.user
-      UserService.register(
-        :service => "google_docs",
-        :access_token => access_token,
-        :user => oauth_request.user,
-        :service_domain => "google.com",
-        :service_user_id => service_user_id,
-        :service_user_name => service_user_name
-      )
-      oauth_request.destroy
-      session.delete(:oauth_gdocs_access_token_token)
-      session.delete(:oauth_gdocs_access_token_secret)
-    end
-    access_token
+                                            token,
+                                            secret)
+    request_token.get_access_token(:oauth_verifier => oauth_verifier)
   end
 
-  def self.request_token_url(return_to, session, user, host_with_port, oauth_callback)
+  def self.request_token(oauth_callback)
     consumer = GoogleDocs.consumer
-    request_token = consumer.get_request_token({ :oauth_callback => oauth_callback}, {:scope => "https://docs.google.com/feeds/ https://spreadsheets.google.com/feeds/"})
-    session[:oauth_google_docs_request_token_token] = request_token.token
-    session[:oauth_google_docs_request_token_secret] = request_token.secret
-    OauthRequest.create(
-      :service => 'google_docs',
-      :token => request_token.token,
-      :secret => request_token.secret,
-      :user_secret => CanvasUuid::Uuid.generate(nil, 16),
-      :return_url => return_to,
-      :user => user,
-      :original_host_with_port => host_with_port
-    )
-    request_token.authorize_url
+    consumer.get_request_token({ :oauth_callback => oauth_callback}, {:scope => "https://docs.google.com/feeds/ https://spreadsheets.google.com/feeds/"})
   end
 
 
@@ -276,8 +236,7 @@ class GoogleDocs
     add_extension_namespace :gAcl, 'http://schemas.google.com/acl/2007'
   end
 
-  def create_doc(name, access_token=nil)
-    access_token ||= retrieve_access_token
+  def create_doc(name, access_token)
     url = "https://docs.google.com/feeds/documents/private/full"
     entry = Atom::Entry.new do |entry|
       entry.title = name

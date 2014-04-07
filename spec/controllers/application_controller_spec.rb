@@ -25,6 +25,80 @@ describe ApplicationController do
     controller.stubs(:request).returns(stub(:host_with_port => "www.example.com"))
   end
 
+  describe "#google_docs_connection" do
+    it "uses @real_current_user first" do
+      mock_real_current_user = mock()
+      mock_current_user = mock()
+      controller.instance_variable_set(:@real_current_user, mock_real_current_user)
+      controller.instance_variable_set(:@current_user, mock_current_user)
+      session[:oauth_gdocs_access_token_token] = "session_token"
+      session[:oauth_gdocs_access_token_secret] = "sesion_secret"
+
+      Rails.cache.expects(:fetch).with(['google_docs_tokens', mock_real_current_user].cache_key).returns(["real_current_user_token", "real_current_user_secret"])
+
+      GoogleDocs.expects(:new).with("real_current_user_token", "real_current_user_secret")
+
+      controller.send(:google_docs_connection)
+    end
+
+    it "uses @current_user second" do
+      mock_current_user = mock()
+      controller.instance_variable_set(:@real_current_user, nil)
+      controller.instance_variable_set(:@current_user, mock_current_user)
+      session[:oauth_gdocs_access_token_token] = "session_token"
+      session[:oauth_gdocs_access_token_secret] = "sesion_secret"
+
+      Rails.cache.expects(:fetch).with(['google_docs_tokens', mock_current_user].cache_key).returns(["current_user_token", "current_user_secret"])
+
+      GoogleDocs.expects(:new).with("current_user_token", "current_user_secret")
+
+      controller.send(:google_docs_connection)
+    end
+
+    it "queries user services if token isn't in the cache" do
+      mock_current_user = mock()
+      controller.instance_variable_set(:@real_current_user, nil)
+      controller.instance_variable_set(:@current_user, mock_current_user)
+      session[:oauth_gdocs_access_token_token] = "session_token"
+      session[:oauth_gdocs_access_token_secret] = "sesion_secret"
+
+      mock_user_services = mock("mock_user_services")
+      mock_current_user.expects(:user_services).returns(mock_user_services)
+      mock_user_services.expects(:find_by_service).with("google_docs").returns(mock(token: "user_service_token", secret: "user_service_secret"))
+
+      GoogleDocs.expects(:new).with("user_service_token", "user_service_secret")
+
+      controller.send(:google_docs_connection)
+    end
+
+    it "uses the session values if no users are set" do
+      controller.instance_variable_set(:@real_current_user, nil)
+      controller.instance_variable_set(:@current_user, nil)
+      session[:oauth_gdocs_access_token_token] = "session_token"
+      session[:oauth_gdocs_access_token_secret] = "sesion_secret"
+
+      GoogleDocs.expects(:new).with("session_token", "sesion_secret")
+
+      controller.send(:google_docs_connection)
+    end
+
+    it "raises a NoTokenError when the user exists but does not have a user service" do
+      mock_current_user = mock()
+      controller.instance_variable_set(:@real_current_user, nil)
+      controller.instance_variable_set(:@current_user, mock_current_user)
+      session[:oauth_gdocs_access_token_token] = "session_token"
+      session[:oauth_gdocs_access_token_secret] = "sesion_secret"
+
+      mock_user_services = mock("mock_user_services")
+      mock_current_user.expects(:user_services).returns(mock_user_services)
+      mock_user_services.expects(:find_by_service).with("google_docs").returns(nil)
+
+      expect {
+        controller.send(:google_docs_connection)
+      }.to raise_error(GoogleDocs::NoTokenError)
+    end
+  end
+
   describe "js_env" do
     it "should set items" do
       HostUrl.expects(:file_host).with(Account.default, "www.example.com").returns("files.example.com")
@@ -165,7 +239,7 @@ describe ApplicationController do
       @pseudonym.update_attribute(:sis_user_id, 'test1')
       controller.instance_variable_set(:@domain_root_account, Account.default)
       controller.stubs(:named_context_url).with(@user, :context_url).returns('')
-      controller.stubs(:params).returns({ :user_id => 'sis_user_id:test1' })
+      controller.stubs(:params).returns({:user_id => 'sis_user_id:test1'})
       controller.stubs(:api_request?).returns(true)
       controller.send(:get_context)
       controller.instance_variable_get(:@context).should == @user
@@ -177,7 +251,7 @@ describe ApplicationController do
       @section.update_attribute(:sis_source_id, 'test1')
       controller.instance_variable_set(:@domain_root_account, Account.default)
       controller.stubs(:named_context_url).with(@section, :context_url).returns('')
-      controller.stubs(:params).returns({ :course_section_id => 'sis_section_id:test1' })
+      controller.stubs(:params).returns({:course_section_id => 'sis_section_id:test1'})
       controller.stubs(:api_request?).returns(true)
       controller.send(:get_context)
       controller.instance_variable_get(:@context).should == @section
@@ -191,7 +265,7 @@ describe ApplicationController do
       acct = Account.default
       acct.default_locale = "es"
       acct.save!
-      controller.instance_variable_set(:@domain_root_account, acct) 
+      controller.instance_variable_set(:@domain_root_account, acct)
       req = mock()
       req.stubs(:headers).returns({})
       controller.stubs(:request).returns(req)
@@ -200,7 +274,7 @@ describe ApplicationController do
       I18n.locale.to_s.should == "es"
       course_model(:locale => "ru")
       controller.stubs(:named_context_url).with(@course, :context_url).returns('')
-      controller.stubs(:params).returns({ :course_id => @course.id })
+      controller.stubs(:params).returns({:course_id => @course.id})
       controller.stubs(:api_request?).returns(false)
       controller.stubs(:session).returns({})
       controller.stubs(:js_env).returns({})
@@ -219,7 +293,6 @@ describe ApplicationController do
       end
     end
   end
-
 end
 
 describe WikiPagesController do
@@ -233,7 +306,7 @@ describe WikiPagesController do
       get 'pages_index', :course_id => @course.id
 
       controller.js_env.should include(:WIKI_RIGHTS)
-      controller.js_env[:WIKI_RIGHTS].should == Hash[@course.wiki.check_policy(@teacher).map {|right| [right, true]}]
+      controller.js_env[:WIKI_RIGHTS].should == Hash[@course.wiki.check_policy(@teacher).map { |right| [right, true] }]
     end
   end
 end

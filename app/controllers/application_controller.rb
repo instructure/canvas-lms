@@ -1737,4 +1737,22 @@ class ApplicationController < ActionController::Base
 
     js_env hash
   end
+
+  def google_docs_connection
+    ## @real_current_user first ensures that a masquerading user never sees the
+    ## masqueradee's files, but in general you may want to block access to google
+    ## docs for masqueraders earlier in the request
+    user = @real_current_user || @current_user
+    if user
+      service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', user].cache_key) do
+        service = user.user_services.find_by_service("google_docs")
+        service && [service.token, service.secret]
+      end
+      raise GoogleDocs::NoTokenError unless service_token && service_secret
+      google_docs = GoogleDocs.new(service_token, service_secret)
+    else
+      google_docs = GoogleDocs.new(session[:oauth_gdocs_access_token_token], session[:oauth_gdocs_access_token_secret])
+    end
+    google_docs
+  end
 end

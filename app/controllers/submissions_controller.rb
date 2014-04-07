@@ -498,7 +498,7 @@ class SubmissionsController < ApplicationController
   # Internal: Submit a Google Doc.
   def submit_google_doc(document_id)
     # fetch document from google
-    google_docs = GoogleDocs.new(logged_in_user, session)
+    google_docs = google_docs_connection
     document_response, display_name, file_extension = google_docs.download(document_id)
 
     # error handling

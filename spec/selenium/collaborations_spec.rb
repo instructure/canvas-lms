@@ -84,6 +84,17 @@ describe "collaborations" do
         before(:each) do
           course_with_teacher_logged_in
 
+          UserService.register(
+            :service => "google_docs",
+            :token => "token",
+            :secret => "secret",
+            :user => @user,
+            :service_domain => "google.com",
+            :service_user_id => "service_user_id",
+            :service_user_name => "service_user_name"
+          )
+
+
           if type == 'google_docs'
             GoogleDocs.any_instance.
               stubs(:verify_access_token).

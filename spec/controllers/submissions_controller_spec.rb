@@ -184,6 +184,9 @@ describe SubmissionsController do
         flag.feature = 'google_docs_domain_restriction'
         flag.state = 'on'
         flag.save!
+        mock_user_service = mock()
+        @user.expects(:user_services).returns(mock_user_service)
+        mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
       end
 
       it "should not save if domain restriction prevents it" do

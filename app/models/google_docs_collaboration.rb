@@ -27,7 +27,7 @@ class GoogleDocsCollaboration < Collaboration
   
   def delete_document
     if !self.document_id && self.user
-      google_docs = GoogleDocs.new(user, {})
+      google_docs = google_docs_for_user
       google_docs.delete_doc(GoogleDocEntry.new(self.data))
     end
   end
@@ -39,8 +39,8 @@ class GoogleDocsCollaboration < Collaboration
       name = nil if name && name.empty?
       name ||= I18n.t('lib.google_docs.default_document_name', "Instructure Doc")
 
-      google_docs = GoogleDocs.new(user, {})
-      file = google_docs.create_doc(name)
+      google_docs = google_docs_for_user
+      file = google_docs.create_doc(name, google_docs.retrieve_access_token)
       self.document_id = file.document_id
       self.data = file.entry.to_xml
       self.url = file.alternate_url.to_s
@@ -62,7 +62,7 @@ class GoogleDocsCollaboration < Collaboration
     service_user_id = google_services.find{|s| s.service_user_id}.service_user_id rescue nil
     collaborator = self.collaborators.find_by_user_id(user.id)
     if collaborator && collaborator.authorized_service_user_id != service_user_id
-      google_docs = GoogleDocs.new(user, {})
+      google_docs = google_docs_for_user
       google_docs.acl_remove(self.document_id, [collaborator.authorized_service_user_id]) if collaborator.authorized_service_user_id
       google_docs.acl_add(self.document_id, [user])
       collaborator.update_attributes(:authorized_service_user_id => service_user_id)
@@ -70,7 +70,7 @@ class GoogleDocsCollaboration < Collaboration
   end
   
   def remove_users_from_document(users_to_remove)
-    google_docs = GoogleDocs.new(user, {})
+    google_docs = google_docs_for_user
     google_docs.acl_remove(self.document_id, users_to_remove) if self.document_id
   end
 
@@ -81,7 +81,7 @@ class GoogleDocsCollaboration < Collaboration
                nil
              end
     if document_id
-      google_docs = GoogleDocs.new(user, {})
+      google_docs = google_docs_for_user
       google_docs.acl_add(self.document_id, new_users, domain)
     end
   end
@@ -92,5 +92,15 @@ class GoogleDocsCollaboration < Collaboration
   
   def self.config
     GoogleDocs.config
+  end
+
+  private
+  def google_docs_for_user
+    service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', self.user].cache_key) do
+      service = self.user.user_services.find_by_service("google_docs")
+      service && [service.token, service.secret]
+    end
+    raise GoogleDocs::NoTokenError unless service_token && service_secret
+    GoogleDocs.new(service_token, service_secret)
   end
 end

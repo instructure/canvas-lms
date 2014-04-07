@@ -143,7 +143,17 @@ class UsersController < ApplicationController
     end
     return_to_url = params[:return_to] || user_profile_url(@current_user)
     if params[:service] == "google_docs"
-      redirect_to GoogleDocs.request_token_url(return_to_url, session, logged_in_user, request.host_with_port, oauth_success_url(:service => 'google_docs'))
+      request_token = GoogleDocs.request_token(oauth_success_url(:service => 'google_docs'))
+      OauthRequest.create(
+        :service => 'google_docs',
+        :token => request_token.token,
+        :secret => request_token.secret,
+        :user_secret => CanvasUuid::Uuid.generate(nil, 16),
+        :return_url => return_to_url,
+        :user => @real_current_user || @current_user,
+        :original_host_with_port => request.host_with_port
+      )
+      redirect_to request_token.authorize_url
     elsif params[:service] == "twitter"
       redirect_to twitter_request_token_url(return_to_url)
     elsif params[:service] == "linked_in"
@@ -199,7 +209,24 @@ class UsersController < ApplicationController
         end
       elsif params[:service] == "google_docs"
         begin
-          GoogleDocs.get_access_token(oauth_request, params[:oauth_verifier], session, logged_in_user)
+          access_token = GoogleDocs.get_access_token(oauth_request.token, oauth_request.secret, params[:oauth_verifier])
+          google_docs = GoogleDocs.new(oauth_request.token, oauth_request.secret)
+          service_user_id, service_user_name = google_docs.get_service_user_info access_token
+          if oauth_request.user
+            UserService.register(
+              :service => "google_docs",
+              :access_token => access_token,
+              :user => oauth_request.user,
+              :service_domain => "google.com",
+              :service_user_id => service_user_id,
+              :service_user_name => service_user_name
+            )
+            oauth_request.destroy
+          else
+            session[:oauth_gdocs_access_token_token] = access_token.token
+            session[:oauth_gdocs_access_token_secret] = access_token.secret
+          end
+
           flash[:notice] = t('google_docs_added', "Google Docs access authorized!")
         rescue => e
           ErrorReport.log_exception(:oauth, e)

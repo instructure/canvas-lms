@@ -41,8 +41,28 @@ describe CollaborationsController do
 
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
+      mock_user_service = mock()
+      @user.expects(:user_services).returns(mock_user_service)
+      mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
+      GoogleDocs.any_instance.expects(:verify_access_token).returns(true)
+
       get 'index', :course_id => @course.id
+
       response.should be_success
+      assigns(:google_docs_authorized).should == true
+    end
+
+    it "should assign variables when verify raises" do
+      course_with_student_logged_in(:active_all => true)
+      mock_user_service = mock()
+      @user.expects(:user_services).returns(mock_user_service)
+      mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
+      GoogleDocs.any_instance.expects(:verify_access_token).raises("Error")
+
+      get 'index', :course_id => @course.id
+
+      response.should be_success
+      assigns(:google_docs_authorized).should == false
     end
 
     it "should not allow the student view student to access collaborations" do
@@ -60,6 +80,10 @@ describe CollaborationsController do
       gc = group_category
       group = gc.groups.create!(:context => @course)
       group.add_user(@student, 'accepted')
+
+      mock_user_service = mock()
+      @user.expects(:user_services).returns(mock_user_service)
+      mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
 
       get 'index', :group_id => group.id
       response.should be_success
