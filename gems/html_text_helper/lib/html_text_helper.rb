@@ -18,7 +18,7 @@
 require 'nokogiri'
 require 'cgi'
 require 'iconv'
-require 'active_support/all'
+require 'active_support/core_ext'
 require 'sanitize'
 
 module HtmlTextHelper
