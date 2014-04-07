@@ -612,6 +612,9 @@ class GroupsController < ApplicationController
   #   The partial name or full ID of the users to match and return in the
   #   results list. Must be at least 3 characters.
   #
+  # @argument include[] [String, "avatar_url"]
+  #   - "avatar_url": Include users' avatar_urls.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/1/users \
   #          -H 'Authorization: Bearer <token>'
@@ -629,7 +632,7 @@ class GroupsController < ApplicationController
     end
 
     users = Api.paginate(users, self, api_v1_group_users_url)
-    render :json => users.map { |u| user_json(u, @current_user, session) }
+    render :json => users_json(users, @current_user, session, Array(params[:include]))
   end
 
   def edit

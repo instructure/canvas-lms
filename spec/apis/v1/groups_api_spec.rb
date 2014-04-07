@@ -679,6 +679,19 @@ describe "Groups API", type: :request do
         @community.users.map(&:id).should include(user['id'])
       end
     end
+
+    it "honors the include[avatar_url] query parameter flag" do
+      account = @community.context
+      account.set_service_availability(:avatars, true)
+      account.save!
+
+      user = @community.users.first
+      user.avatar_image_url = "http://expected_avatar_url"
+      user.save!
+
+      json = api_call(:get, api_url + "?include[]=avatar_url", api_route.merge(include: ["avatar_url"]))
+      json.first['avatar_url'].should == user.avatar_image_url
+    end
   end
 
   context "group files" do
