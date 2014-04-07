@@ -11,7 +11,7 @@ define [
   'compiled/AssignmentDetailsDialog'
   'compiled/AssignmentMuter'
   'compiled/grade_calculator'
-  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator ) ->
+  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator) ->
 
   {get, set, setProperties} = Ember
 
@@ -51,6 +51,16 @@ define [
     Ember.arrayComputed.apply(null, args)
 
   ScreenreaderGradebookController = Ember.ObjectController.extend
+
+    errors: (->
+      # this is a sad, sad hack
+      # until we can get flash notifications working app-wide for screenreaders
+      if Ember.$('#flash_message_holder li').size() > 0
+        close = Ember.$('#flash_message_holder li a').text().trim()
+        message = Ember.$('#flash_message_holder li').text().replace(close,'').trim()
+        node = Ember.$("<span role='alert'>#{message}</span>")
+        Ember.$(node).appendTo(Ember.$('#flash_screenreader_holder'))
+    ).on('init')
 
     contextUrl: get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')
 
