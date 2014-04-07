@@ -325,7 +325,9 @@ class EnrollmentsApiController < ApplicationController
     if params[:enrollment][:course_section_id].present?
       params[:enrollment][:section] = @context.course_sections.active.find params[:enrollment].delete(:course_section_id)
     end
-    user = api_find(User, params[:enrollment].delete(:user_id))
+    api_user_id = params[:enrollment].delete(:user_id)
+    user = api_find(User, api_user_id)
+    raise(ActiveRecord::RecordNotFound, "Couldn't find User with API id '#{api_user_id}'") unless user.can_be_enrolled_in_course?(@context)
     @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
     @enrollment.valid? ?
       render(:json => enrollment_json(@enrollment, @current_user, session)) :
