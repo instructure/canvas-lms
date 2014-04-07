@@ -181,3 +181,14 @@ end
 # since that could leak information (e.g. valid vs invalid username on
 # login page)
 config.action_view.field_error_proc = Proc.new { |html_tag, instance| html_tag }
+
+unless CANVAS_RAILS2
+  class ExceptionsApp
+    def call(env)
+      @app_controller ||= ActionDispatch::Routing::RouteSet::Dispatcher.new.controller(:controller => 'application')
+      @app_controller.action('rescue_action_dispatch_exception').call(env)
+    end
+  end
+
+  config.exceptions_app = ExceptionsApp.new
+end

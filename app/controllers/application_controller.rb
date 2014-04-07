@@ -137,6 +137,12 @@ class ApplicationController < ActionController::Base
     raise RequestError.new(cause, status)
   end
 
+  unless CANVAS_RAILS2
+    def rescue_action_dispatch_exception
+      rescue_action_in_public(request.env['action_dispatch.exception'])
+    end
+  end
+
   protected
 
   def assign_localizer
