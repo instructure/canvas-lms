@@ -481,8 +481,8 @@ define [
         if shouldRemoveAssignment
           assignmentGroups.findBy('id', as.assignment_group_id).assignments.removeObject as
         else
-          assignmentsProxy.pushObject as
-    ).observes('assignment_groups.@each')
+          assignmentsProxy.addObject as
+    ).observes('assignment_groups', 'assignment_groups.@each')
 
     includeUngradedAssignments: (->
       userSettings.contextGet('include_ungraded_assignments') or false
@@ -520,17 +520,29 @@ define [
         }
       ]
 
+    assignmentSort: ((key, value) ->
+      savedSortType = userSettings.contextGet('sort_grade_columns_by')
+      savedSortOption = @get('assignmentSortOptions').findBy('value', savedSortType?.sortType)
+      if value
+        userSettings.contextSet('sort_grade_columns_by', {sortType: value.value})
+        value
+      else if savedSortOption?
+        savedSortOption
+      else
+        # default to assignment group, but don't change saved setting
+        @get('assignmentSortOptions').findBy('value', 'assignment_group')
+    ).property()
+
     sortAssignments: (->
       sort = @get('assignmentSort')
       return unless sort
       sort_props = switch sort.value
-        when 'assignment_group' then ['ag_position', 'position']
+        when 'assignment_group', 'custom' then ['ag_position', 'position']
         when 'alpha' then ['sortable_name']
         when 'due_date' then ['sortable_date', 'sortable_name']
-
+        else ['ag_position', 'position']
       @get('assignments').set('sortProperties', sort_props)
-
-    ).observes('assignmentSort')
+    ).observes('assignmentSort').on('init')
 
     selectedSubmission: ((key, selectedSubmission) ->
       if arguments.length > 1

@@ -116,7 +116,6 @@ define [
         Ember.$('.ui-dialog:visible').remove()
       @alert.restore()
       @server.restore()
-
       Ember.run App, 'destroy'
 
   test 'default grade dialog updates the current students grade', ->

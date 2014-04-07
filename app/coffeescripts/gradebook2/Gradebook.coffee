@@ -289,7 +289,7 @@ define [
 
     makeColumnSortFn: (sortOrder) =>
       fn = switch sortOrder.sortType
-        when 'assignment_group' then @compareAssignmentPositions
+        when 'assignment_group', 'alpha' then @compareAssignmentPositions
         when 'due_date' then @compareAssignmentDueDates
         when 'custom' then @makeCompareAssignmentCustomOrderFn(sortOrder)
         else throw "unhandled column sort condition"

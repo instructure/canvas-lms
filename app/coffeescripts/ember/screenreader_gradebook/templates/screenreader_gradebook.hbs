@@ -51,6 +51,7 @@
       id="arrange_assignments"
       items=assignmentSortOptions
       selected=assignmentSort
+      value=assignmentSort.value
     }}
   </div>
 </div>
@@ -222,7 +223,6 @@
   </div>
 </div>
 
-
 <div class="row pad-box bottom-only">
   <div class="span4 text-right-responsive">
     <label for="assignment_select">
@@ -230,15 +230,21 @@
     </label>
   </div>
   <div class="span8">
-     {{
-      fast-select id="assignment_select"
-      class="assignment_select"
-      items=assignments
-      valuePath="id"
-      labelPath="name"
-      labelDefault=assignmentSelectDefaultLabel
-      selected=selectedAssignment
-    }}
+    {{! sad hack until fast select is fixed }}
+    {{! prevents assignments from loading in the wrong order }}
+    {{#if assignments.length}}
+      {{
+        fast-select id="assignment_select"
+        class="assignment_select"
+        items=assignments
+        valuePath="id"
+        labelPath="name"
+        labelDefault=assignmentSelectDefaultLabel
+        selected=selectedAssignment
+      }}
+    {{else}}
+      <select disabled></select>
+    {{/if}}
 
     <div id="assignment_navigation" class="row pad-box bottom-only">
       <div class="span3">

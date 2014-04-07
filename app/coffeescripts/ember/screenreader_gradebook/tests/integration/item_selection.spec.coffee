@@ -181,6 +181,9 @@ define [
       visit('/').then =>
         @controller = App.__container__.lookup('controller:screenreader_gradebook')
     teardown: ->
+      # resetting userSettings to default
+      Ember.run =>
+        @controller.set('assignmentSort', @controller.get('assignmentSortOptions').findBy('value', 'assignment_group'))
       Ember.run App, 'destroy'
 
   test 'alphabetical', ->
