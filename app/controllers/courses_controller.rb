@@ -63,6 +63,11 @@ require 'set'
 #           "description": "url to next module item that has an unmet requirement. null if the user has completed the course or the current module does not require sequential progress",
 #           "example": "http://localhost/courses/1/modules/items/2",
 #           "type": "string"
+#         },
+#         "completed_at": {
+#           "description": "date the course was completed. null if the course has not been completed by this user",
+#           "example": "2013-06-01T00:00:00-06:00",
+#           "type": "datetime"
 #         }
 #       }
 #     }
@@ -280,11 +285,12 @@ class CoursesController < ApplicationController
   #     specifying the total number of requirements in the course,
   #     'requirement_completed_count', an integer specifying the total number of
   #     requirements in this course that have been completed, and
-  #     'next_requirement_url', a string url to the next requirement item.
+  #     'next_requirement_url', a string url to the next requirement item, and
+  #     'completed_at', the date the course was completed (null if incomplete).
   #     'next_requirement_url' will be null if all requirements have been
   #     completed or the current module does not require sequential progress.
-  #     "course_progress" will return an error message unless the course is
-  #     module based.
+  #     "course_progress" will return an error message if the course is not
+  #     module based or the user is not enrolled as a student in the course.
   #
   # @argument state[] [Optional, String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
