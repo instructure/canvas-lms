@@ -63,10 +63,7 @@ module Api::V1::Course
     Api::V1::CourseJson.to_hash(course, user, includes, enrollments) do |builder, allowed_attributes, methods, permissions_to_include|
       hash = api_json(course, user, session, { :only => allowed_attributes, :methods => methods }, permissions_to_include)
       hash['term'] = enrollment_term_json(course.enrollment_term, user, session, {}) if includes.include?('term')
-      if includes.include?('course_progress')
-        hash['course_progress'] = course_progress_json(course, user) ||
-                                  { error: { message: 'no progress available because this course in not module based (has modules and module completion requirements)' } }
-      end
+      hash['course_progress'] = CourseProgress.new(course, user).to_json if includes.include?('course_progress')
       hash['apply_assignment_group_weights'] = course.apply_group_weights?
       add_helper_dependant_entries(hash, course, builder)
     end
@@ -85,37 +82,6 @@ module Api::V1::Course
 
     hash[:status_url] = api_v1_course_copy_status_url(course, import)
     hash
-  end
-
-  def course_progress_json(course, user)
-    return unless course.module_based? && course.user_is_student?(user)
-
-    mods = course.modules_visible_to(user)
-    current_mod = mods.detect { |m| m.evaluate_for(user).completed? == false }
-
-    requirements = mods.flat_map(&:completion_requirements).map { |req| req[:id] }
-    requirement_count = requirements.size
-
-    requirement_completed_count = user.context_module_progressions
-                                      .where("context_module_id IN (?)", mods.map(&:id))
-                                      .flat_map { |cmp| cmp.requirements_met.to_a.uniq { |r| r[:id] } }
-                                      .select { |req| requirements.include?(req[:id]) }
-                                      .size
-
-    course_progress = {
-        requirement_count: requirement_count,
-        requirement_completed_count: requirement_completed_count,
-        next_requirement_url: nil
-    }
-
-    if current_mod && current_mod.require_sequential_progress
-      current_position = current_mod.evaluate_for(user).current_position
-      content_tag = current_mod.content_tags.where(:position => current_position).first
-      next_requirement_url = course_context_modules_item_redirect_url(:course_id => course.id, :id => content_tag.id, :host => HostUrl.context_host(course))
-      course_progress[:next_requirement_url] = next_requirement_url
-    end
-
-    course_progress
   end
 
   def add_helper_dependant_entries(hash, course, builder)

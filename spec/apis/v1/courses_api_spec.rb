@@ -23,7 +23,6 @@ class TestCourseApi
   include Api::V1::Course
   def feeds_calendar_url(feed_code); "feed_calendar_url(#{feed_code.inspect})"; end
   def course_url(course, opts = {}); return "course_url(Course.find(#{course.id}), :host => #{HostUrl.context_host(@course1)})"; end
-  def course_context_modules_item_redirect_url(opts = {}); return "course_context_modules_item_redirect_url(:course_id => #{opts[:course_id]}, :id => #{opts[:id]}, :host => HostUrl.context_host(Course.find(#{opts[:course_id]}))"; end
   def api_user_content(syllabus, course); return "api_user_content(#{syllabus}, #{course.id})"; end
 end
 
@@ -77,12 +76,19 @@ describe Api::V1::Course do
       mod.publish
       mod.save!
 
+      class CourseProgress
+        def course_context_modules_item_redirect_url(opts = {})
+          "course_context_modules_item_redirect_url(:course_id => #{opts[:course_id]}, :id => #{opts[:id]}, :host => HostUrl.context_host(Course.find(#{opts[:course_id]}))"
+        end
+      end
+
       json = @test_api.course_json(@course2, @me, {}, ['course_progress'], [])
       json.should include('course_progress')
       json['course_progress'].should == {
         'requirement_count' => 1,
         'requirement_completed_count' => 0,
-        'next_requirement_url' => "course_context_modules_item_redirect_url(:course_id => #{@course2.id}, :id => #{tag.id}, :host => HostUrl.context_host(Course.find(#{@course2.id}))"
+        'next_requirement_url' => "course_context_modules_item_redirect_url(:course_id => #{@course2.id}, :id => #{tag.id}, :host => HostUrl.context_host(Course.find(#{@course2.id}))",
+        'completed_at' => nil
       }
     end
 
@@ -91,7 +97,7 @@ describe Api::V1::Course do
       json.should include('course_progress')
       json['course_progress'].should == {
           'error' => {
-              'message' => 'no progress available because this course in not module based (has modules and module completion requirements)'
+              'message' => 'no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course'
           }
       }
     end
@@ -115,129 +121,6 @@ describe Api::V1::Course do
           "computed_current_grade" => "A",
           "computed_final_grade" => "B"
         }]
-      end
-    end
-  end
-
-  describe '#course_progress_json' do
-    let(:api) { TestCourseApi.new }
-
-    before(:each) do
-      course_with_teacher(:active_all => true)
-    end
-
-    it "should return nil for non module_based courses" do
-      user = student_in_course(:active_all => true)
-      progress = api.course_progress_json(@course, user)
-      progress.should be_nil
-    end
-
-    it "should return nil for non student users" do
-      user = user_model
-      @course.stubs(:module_based?).returns(true)
-      progress = api.course_progress_json(@course, user)
-      progress.should be_nil
-    end
-
-    context "module based and for student" do
-      before do
-        @module = @course.context_modules.create!(:name => "some module", :require_sequential_progress => true)
-        @module2 = @course.context_modules.create!(:name => "another module", :require_sequential_progress => true)
-        @module3 = @course.context_modules.create!(:name => "another module again", :require_sequential_progress => true)
-
-        @assignment = @course.assignments.create!(:title => "some assignment")
-        @assignment2 = @course.assignments.create!(:title => "some assignment2")
-        @assignment3 = @course.assignments.create!(:title => "some assignment3")
-        @assignment4 = @course.assignments.create!(:title => "some assignment4")
-        @assignment5 = @course.assignments.create!(:title => "some assignment5")
-
-        @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
-        @tag2 = @module.add_item({:id => @assignment2.id, :type => 'assignment'})
-
-        @tag3 = @module2.add_item({:id => @assignment3.id, :type => 'assignment'})
-        @tag4 = @module2.add_item({:id => @assignment4.id, :type => 'assignment'})
-
-        @tag5 = @module3.add_item({:id => @assignment5.id, :type => 'assignment'})
-
-        @module.completion_requirements = {@tag.id => {:type => 'must_submit'},
-                                           @tag2.id => {:type => 'must_submit'}}
-        @module2.completion_requirements = {@tag3.id => {:type => 'must_submit'},
-                                            @tag4.id => {:type => 'must_submit'}}
-        @module3.completion_requirements = {@tag5.id => {:type => 'must_submit'}}
-
-        [@module, @module2, @module3].each do |m|
-          m.require_sequential_progress = true
-          m.publish
-          m.save!
-        end
-
-        student_in_course(:active_all => true)
-      end
-
-      it "should return correct progress for newly enrolled student" do
-        progress = api.course_progress_json(@course, @user)
-        progress.should == {
-            requirement_count: 5,
-            requirement_completed_count: 0,
-            next_requirement_url: "course_context_modules_item_redirect_url(:course_id => #{@course.id}, :id => #{@tag.id}, :host => HostUrl.context_host(Course.find(#{@course.id}))"
-        }
-      end
-
-      it "should return correct progress for student who has completed some requirements" do
-        # turn in first two assignments (module 1)
-        @module.update_for(@user, :submitted, @tag)
-        @module.update_for(@user, :submitted, @tag2)
-        progress = api.course_progress_json(@course, @user)
-        progress.should == {
-            requirement_count: 5,
-            requirement_completed_count: 2,
-            next_requirement_url: "course_context_modules_item_redirect_url(:course_id => #{@course.id}, :id => #{@tag3.id}, :host => HostUrl.context_host(Course.find(#{@course.id}))"
-        }
-      end
-
-      it "should return correct progress for student who has completed all requirements" do
-        # turn in all assignments
-        @module.update_for(@user, :submitted, @tag)
-        @module.update_for(@user, :submitted, @tag2)
-        @module2.update_for(@user, :submitted, @tag3)
-        @module2.update_for(@user, :submitted, @tag4)
-        @module3.update_for(@user, :submitted, @tag5)
-        progress = api.course_progress_json(@course, @user)
-        progress.should == {
-            requirement_count: 5,
-            requirement_completed_count: 5,
-            next_requirement_url: nil
-        }
-      end
-
-      it "treats a nil requirements_met as an incomplete requirement" do
-        # create a progression with requirements_met uninitialized (nil)
-        ContextModuleProgression.create!(user: @user, context_module: @module)
-
-        progress = api.course_progress_json(@course, @user)
-        progress.should == {
-            requirement_count: 5,
-            requirement_completed_count: 0,
-            next_requirement_url: "course_context_modules_item_redirect_url(:course_id => #{@course.id}, :id => #{@tag.id}, :host => HostUrl.context_host(Course.find(#{@course.id}))"
-        }
-      end
-
-      it "does not count obsolete requirements" do
-        # turn in first two assignments
-        @module.update_for(@user, :submitted, @tag)
-        @module.update_for(@user, :submitted, @tag2)
-
-        # remove assignment 2 from the list of requirements
-        @module.completion_requirements = [{id: @tag.id, type: 'must_submit'}]
-        @module.save
-
-        progress = api.course_progress_json(@course, @user)
-
-        # assert that assignment 2 is no longer a requirement (5 -> 4)
-        progress[:requirement_count].should == 4
-
-        # assert that assignment 2 doesn't count toward the total (2 -> 1)
-        progress[:requirement_completed_count].should == 1
       end
     end
   end
