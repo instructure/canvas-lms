@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
-describe QuizSubmissionQuestionsController, :type => :request do
+describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
   module Helpers
     def create_question(type, factory_options = {}, quiz=@quiz)
       factory = method(:"#{type}_question_data")
@@ -51,7 +51,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
       helper = method(options[:raw] ? :raw_api_call : :api_call)
       helper.call(:get,
         "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions",
-        { :controller => 'quiz_submission_questions',
+        { :controller => 'quizzes/quiz_submission_questions',
           :action => 'index',
           :format => 'json',
           :quiz_submission_id => @quiz_submission.id.to_s
@@ -62,7 +62,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
       helper = method(options[:raw] ? :raw_api_call : :api_call)
       helper.call(:get,
         "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}",
-        { :controller => 'quiz_submission_questions',
+        { :controller => 'quizzes/quiz_submission_questions',
           :action => 'show',
           :format => 'json',
           :quiz_submission_id => @quiz_submission.id.to_s,
@@ -79,7 +79,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
       helper = method(options[:raw] ? :raw_api_call : :api_call)
       helper.call(:put,
         "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}",
-        { :controller => 'quiz_submission_questions',
+        { :controller => 'quizzes/quiz_submission_questions',
           :action => 'answer',
           :format => 'json',
           :quiz_submission_id => @quiz_submission.id.to_s,
@@ -96,7 +96,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
       helper = method(options[:raw] ? :raw_api_call : :api_call)
       helper.call(:put,
         "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}/flag",
-        { :controller => 'quiz_submission_questions',
+        { :controller => 'quizzes/quiz_submission_questions',
           :action => 'flag',
           :format => 'json',
           :quiz_submission_id => @quiz_submission.id.to_s,
@@ -113,7 +113,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
       helper = method(options[:raw] ? :raw_api_call : :api_call)
       helper.call(:put,
         "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}/unflag",
-        { :controller => 'quiz_submission_questions',
+        { :controller => 'quizzes/quiz_submission_questions',
           :action => 'unflag',
           :format => 'json',
           :quiz_submission_id => @quiz_submission.id.to_s,
@@ -228,7 +228,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
           answer: 1658
         })
 
-        json['quiz_submission_questions'].present?.should be_true
+        json['quiz_submission_questions'].should be_present
         json['quiz_submission_questions'].length.should == 1
         json['quiz_submission_questions'][0]['answer'].should == 1658
       end
@@ -240,7 +240,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
           answer: 8403
         })
 
-        json['quiz_submission_questions'].present?.should be_true
+        json['quiz_submission_questions'].should be_present
         json['quiz_submission_questions'].length.should == 1
         json['quiz_submission_questions'][0]['answer'].should == 8403
       end
@@ -252,7 +252,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
           answer: 'Hello World!'
         })
 
-        json['quiz_submission_questions'].present?.should be_true
+        json['quiz_submission_questions'].should be_present
         json['quiz_submission_questions'].length.should == 1
         json['quiz_submission_questions'][0]['answer'].should == 'hello world!'
       end
@@ -268,7 +268,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
           }
         })
 
-        json['quiz_submission_questions'].present?.should be_true
+        json['quiz_submission_questions'].should be_present
         json['quiz_submission_questions'].length.should == 1
         json['quiz_submission_questions'][0]['answer'].should == {
           answer1: 'red',
@@ -286,7 +286,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
           answer: [ 9761, 5194 ]
         })
 
-        json['quiz_submission_questions'].present?.should be_true
+        json['quiz_submission_questions'].should be_present
         json['quiz_submission_questions'][0]['answer'].include?(9761).should be_true
         json['quiz_submission_questions'][0]['answer'].include?(5194).should be_true
       end
@@ -298,7 +298,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
           answer: 'Foobar'
         })
 
-        json['quiz_submission_questions'].present?.should be_true
+        json['quiz_submission_questions'].should be_present
         json['quiz_submission_questions'][0]['answer'].should == 'Foobar'
       end
 
@@ -312,7 +312,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
           }
         })
 
-        json['quiz_submission_questions'].present?.should be_true
+        json['quiz_submission_questions'].should be_present
         json['quiz_submission_questions'][0]['answer'].should == {
           structure1: 4390,
           event2: 599
@@ -331,7 +331,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
           ]
         })
 
-        json['quiz_submission_questions'].present?.should be_true
+        json['quiz_submission_questions'].should be_present
 
         answer = json['quiz_submission_questions'][0]['answer']
         answer
@@ -350,7 +350,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
           answer: 2.5e-3
         })
 
-        json['quiz_submission_questions'].present?.should be_true
+        json['quiz_submission_questions'].should be_present
         json['quiz_submission_questions'][0]['answer'].should == 0.0025
       end
 
@@ -361,7 +361,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
           answer: '122.1'
         })
 
-        json['quiz_submission_questions'].present?.should be_true
+        json['quiz_submission_questions'].should be_present
         json['quiz_submission_questions'][0]['answer'].should == 122.1
       end
     end
@@ -373,7 +373,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
         answer: 1658
       })
 
-      json['quiz_submission_questions'].present?.should be_true
+      json['quiz_submission_questions'].should be_present
       json['quiz_submission_questions'].length.should == 1
       json['quiz_submission_questions'][0]['answer'].should == 1658
 
@@ -383,7 +383,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
         answer: 2405
       })
 
-      json['quiz_submission_questions'].present?.should be_true
+      json['quiz_submission_questions'].should be_present
       json['quiz_submission_questions'].length.should == 1
       json['quiz_submission_questions'][0]['answer'].should == 2405
     end
@@ -405,7 +405,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
 
       json = api_update({ answer: 1659 })
 
-      json['quiz_submission_questions'].present?.should be_true
+      json['quiz_submission_questions'].should be_present
       json['quiz_submission_questions'].length.should == 1
       json['quiz_submission_questions'][0]['answer'].should == 1659
     end
@@ -450,7 +450,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
 
       json = api_flag
 
-      json['quiz_submission_questions'].present?.should be_true
+      json['quiz_submission_questions'].should be_present
       json['quiz_submission_questions'].length.should == 1
       json['quiz_submission_questions'][0]['flagged'].should == true
     end
@@ -462,7 +462,7 @@ describe QuizSubmissionQuestionsController, :type => :request do
 
       json = api_unflag
 
-      json['quiz_submission_questions'].present?.should be_true
+      json['quiz_submission_questions'].should be_present
       json['quiz_submission_questions'].length.should == 1
       json['quiz_submission_questions'][0]['flagged'].should == false
     end

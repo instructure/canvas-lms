@@ -43,7 +43,7 @@
 #       }
 #     }
 #
-class QuizSubmissionQuestionsController < ApplicationController
+class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   include Api::V1::QuizSubmissionQuestion
   include Filters::QuizSubmissions
 
