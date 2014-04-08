@@ -174,6 +174,15 @@ that domain.
       application could provide the name of the device.
     </div>
   </li>
+  <li>
+    <span class="name">force_login</span>
+    <div class="inline">
+      optional. Set to '1' if you want to force the user to enter their
+      credentials, even if they're already logged into Canvas. By default,
+      if a user already has an active Canvas web session, they will not be
+      asked to re-enter their credentials.
+    </div>
+  </li>
 </ul>
 
 </div>

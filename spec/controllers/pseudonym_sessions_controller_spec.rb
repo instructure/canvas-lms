@@ -1062,7 +1062,6 @@ describe PseudonymSessionsController do
 
   describe 'GET oauth2_auth' do
     let(:key) { DeveloperKey.create! :redirect_uri => 'https://example.com' }
-    let(:user) { User.create! }
 
     it 'renders a 400 when there is no client_id' do
       get :oauth2_auth
@@ -1084,6 +1083,22 @@ describe PseudonymSessionsController do
     it 'passes on canvas_login if provided' do
       get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI, :canvas_login => 1
       response.should redirect_to(login_url(:canvas_login => 1))
+    end
+
+    context 'with a user logged in' do
+      before :each do
+        user_session user
+      end
+
+      it 'prompts the user to authorize this access' do
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'redirects to login_url with ?force_login=1' do
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI, :force_login => 1
+        response.should redirect_to(login_url(:force_login => 1))
+      end
     end
   end
 
