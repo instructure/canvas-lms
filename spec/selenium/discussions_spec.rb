@@ -388,7 +388,10 @@ describe "discussions" do
           wait_for_ajaximations
 
           f('.pinned.discussion-list .al-trigger').click
-          ffj('.icon-lock:visible').length.should == 1
+          fj('.icon-lock:visible').click
+          wait_for_ajaximations
+          f('.locked.discussion-list .al-trigger').click
+          fj('.icon-pin:visible').should include_text('Pin')
         end
 
         it "should allow pinning a locked topic" do
@@ -397,7 +400,14 @@ describe "discussions" do
           wait_for_ajaximations
 
           f('.locked.discussion-list .al-trigger').click
-          ffj('.icon-pin:visible').length.should == 1
+          fj('.icon-pin:visible').click
+          wait_for_ajaximations
+          f('.pinned.discussion-list .al-trigger').click
+          fj('.icon-lock:visible').should include_text('Open')
+          fj('.icon-lock:visible').click
+          wait_for_ajaximations
+          f('.pinned.discussion-list .al-trigger').click
+          fj('.icon-lock:visible').should include_text('Close')
         end
 
         it "should delete a topic" do
