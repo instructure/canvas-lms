@@ -32,6 +32,7 @@ class ContextModulesController < ApplicationController
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
       end
+      js_env :course_id => @context.id
     end
   end
 

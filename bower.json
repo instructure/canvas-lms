@@ -13,8 +13,11 @@
     "k5uploader": "0.0.3",
     "ember-qunit": "~0.1.7",
     "ic-tabs": "0.1.3",
-    "ic-lazy-list": "0.2.2",
+    "ic-lazy-list": "0.2.4",
     "ic-modal": "0.1.1",
-    "react": "0.11.0"
+    "react": "0.11.0",
+    "ic-modal": "0.1.1",
+    "ic-droppable": "~0.1.0",
+    "ic-sortable": "0.0.2"
   }
 }

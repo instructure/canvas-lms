@@ -253,7 +253,17 @@ END
       applies_to: 'Course',
       state: 'hidden',
       development: true
-    }
+    },
+    'modules_next' =>
+    {
+      display_name: -> { I18n.t('features.ember_modules', 'Ember Modules') },
+      description: -> { I18n.t('ember_modules_description', <<END) },
+Modules rewritten in Ember. Uses the native drag and drop API to allow dragging from external locations.
+END
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true
+    },
   )
 
   def self.definitions

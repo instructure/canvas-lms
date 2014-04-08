@@ -1,0 +1,33 @@
+{{#ic-modal-title}}{{title}}{{/ic-modal-title}}
+
+{{#if assignmentGroups.length}}
+  <ul>
+  {{#each group in assignmentGroups}}
+    <li>
+      {{group.name}}
+      <ul>
+        {{#each assignment in group.assignments}}
+          <li>
+            <label>
+              <input type="checkbox" {{action "toggleSelected" assignment on="change"}}/>
+              {{assignment.name}}
+            </label>
+          </li>
+        {{/each}}
+      </ul>
+    </li>
+  {{/each}}
+  </ul>
+{{else}}
+  <p>{{#t "loading_assignments"}}Loading assignments...{{/t}}</p>
+{{/if}}
+
+<div class="form-controls">
+  <button type="submit" class="btn btn-primary">{{#t "add_assignments"}}Add assignments{{/t}}</button>
+  <ul>
+    {{#each model.selected}}
+      <li>{{name}}</li>
+    {{/each}}
+  </ul>
+</div>
+

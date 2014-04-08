@@ -1,0 +1,25 @@
+<form class="bootstrap-form form-inline modules-create-item-form">
+  {{c-icon type="document"}}
+
+  {{input
+    autofocus="true"
+    type="text"
+    class="span4"
+    value=model.title
+    placeholder=text.pageName
+    aria-label=text.pageName
+  }}
+
+  <button
+    class="btn btn-primary"
+    type="submit"
+    {{action "create"}}
+  >{{#t "creat_page"}}Create Page{{/t}}</button>
+
+  <button
+    class="btn"
+    type="button"
+    {{action "cancel"}}
+  >{{#t "cancel"}}Cancel{{/t}}</button>
+</form>
+

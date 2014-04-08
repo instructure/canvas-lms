@@ -30,6 +30,8 @@ stylesheets:
     - public/stylesheets/compiled/pages/context_modules.css
   context_modules2:
     - public/stylesheets/compiled/pages/context_modules2.css
+  modules_next:
+    - public/stylesheets/compiled/pages/modules_next.css
   context_module_progressions:
     - public/stylesheets/compiled/pages/context_module_progressions.css
   dashboard:
