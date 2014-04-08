@@ -44,7 +44,7 @@ describe CollaborationsController do
       mock_user_service = mock()
       @user.expects(:user_services).returns(mock_user_service)
       mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
-      GoogleDocs.any_instance.expects(:verify_access_token).returns(true)
+      GoogleDocs::Connection.any_instance.expects(:verify_access_token).returns(true)
 
       get 'index', :course_id => @course.id
 
@@ -52,12 +52,24 @@ describe CollaborationsController do
       assigns(:google_docs_authorized).should == true
     end
 
+    it "should handle users without google authorized" do
+      course_with_student_logged_in(:active_all => true)
+      mock_user_service = mock()
+      @user.expects(:user_services).returns(mock_user_service)
+      mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: nil, secret: nil))
+
+      get 'index', :course_id => @course.id
+
+      response.should be_success
+      assigns(:google_docs_authorized).should == false
+    end
+
     it "should assign variables when verify raises" do
       course_with_student_logged_in(:active_all => true)
       mock_user_service = mock()
       @user.expects(:user_services).returns(mock_user_service)
       mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
-      GoogleDocs.any_instance.expects(:verify_access_token).raises("Error")
+      GoogleDocs::Connection.any_instance.expects(:verify_access_token).raises("Error")
 
       get 'index', :course_id => @course.id
 

@@ -36,7 +36,7 @@ describe ApplicationController do
 
       Rails.cache.expects(:fetch).with(['google_docs_tokens', mock_real_current_user].cache_key).returns(["real_current_user_token", "real_current_user_secret"])
 
-      GoogleDocs.expects(:new).with("real_current_user_token", "real_current_user_secret")
+      GoogleDocs::Connection.expects(:new).with("real_current_user_token", "real_current_user_secret")
 
       controller.send(:google_docs_connection)
     end
@@ -50,7 +50,7 @@ describe ApplicationController do
 
       Rails.cache.expects(:fetch).with(['google_docs_tokens', mock_current_user].cache_key).returns(["current_user_token", "current_user_secret"])
 
-      GoogleDocs.expects(:new).with("current_user_token", "current_user_secret")
+      GoogleDocs::Connection.expects(:new).with("current_user_token", "current_user_secret")
 
       controller.send(:google_docs_connection)
     end
@@ -66,7 +66,7 @@ describe ApplicationController do
       mock_current_user.expects(:user_services).returns(mock_user_services)
       mock_user_services.expects(:find_by_service).with("google_docs").returns(mock(token: "user_service_token", secret: "user_service_secret"))
 
-      GoogleDocs.expects(:new).with("user_service_token", "user_service_secret")
+      GoogleDocs::Connection.expects(:new).with("user_service_token", "user_service_secret")
 
       controller.send(:google_docs_connection)
     end
@@ -77,7 +77,7 @@ describe ApplicationController do
       session[:oauth_gdocs_access_token_token] = "session_token"
       session[:oauth_gdocs_access_token_secret] = "sesion_secret"
 
-      GoogleDocs.expects(:new).with("session_token", "sesion_secret")
+      GoogleDocs::Connection.expects(:new).with("session_token", "sesion_secret")
 
       controller.send(:google_docs_connection)
     end

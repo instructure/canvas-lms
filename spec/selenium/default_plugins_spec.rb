@@ -67,7 +67,7 @@ describe "default plugins" do
     settings = Canvas::Plugin.find(:google_docs).try(:settings)
     settings.should be_nil
 
-    GoogleDocs.stubs(:config_check).returns("Bad check")
+    GoogleDocs::Connection.stubs(:config_check).returns("Bad check")
     get "/plugins/google_docs"
 
     multiple_accounts_select
@@ -79,7 +79,7 @@ describe "default plugins" do
 
     assert_flash_error_message /There was an error/
 
-    GoogleDocs.stubs(:config_check).returns(nil)
+    GoogleDocs::Connection.stubs(:config_check).returns(nil)
     submit_form('#new_plugin_setting')
     wait_for_ajax_requests
 

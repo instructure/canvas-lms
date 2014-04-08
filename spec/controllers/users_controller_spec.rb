@@ -806,9 +806,9 @@ describe UsersController do
       OauthRequest.expects(:find_by_token_and_service).with('token', 'google_docs').returns(mock_oauth_request)
 
       mock_access_token = stub(token: '123', secret: 'abc')
-      GoogleDocs.expects(:get_access_token).with('token', 'secret', 'oauth_verifier').returns(mock_access_token)
+      GoogleDocs::Connection.expects(:get_access_token).with('token', 'secret', 'oauth_verifier').returns(mock_access_token)
       mock_google_docs = stub()
-      GoogleDocs.expects(:new).with('token', 'secret').returns(mock_google_docs)
+      GoogleDocs::Connection.expects(:new).with('token', 'secret').returns(mock_google_docs)
       mock_google_docs.expects(:get_service_user_info).with(mock_access_token)
 
       get 'oauth_success', {oauth_token: 'token', service: 'google_docs', oauth_verifier: 'oauth_verifier'}, {host_with_port: 'test.host'}

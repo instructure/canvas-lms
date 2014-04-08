@@ -26,7 +26,7 @@ describe GoogleDocsCollaboration do
       google_docs_collaboration.title = "title"
       google_docs_collaboration.user = user
       google_doc_connection = stub(retrieve_access_token: "asdf123")
-      GoogleDocs.expects(:new).returns(google_doc_connection)
+      GoogleDocs::Connection.expects(:new).returns(google_doc_connection)
       file = stub(document_id: 1, entry: stub(to_xml: "<xml></xml>"), alternate_url: "http://google.com")
       google_doc_connection.expects(:create_doc).with("title", "asdf123").returns(file)
       Rails.cache.expects(:fetch).returns(["token", "secret"])

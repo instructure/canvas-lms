@@ -143,7 +143,7 @@ class UsersController < ApplicationController
     end
     return_to_url = params[:return_to] || user_profile_url(@current_user)
     if params[:service] == "google_docs"
-      request_token = GoogleDocs.request_token(oauth_success_url(:service => 'google_docs'))
+      request_token = GoogleDocs::Connection.request_token(oauth_success_url(:service => 'google_docs'))
       OauthRequest.create(
         :service => 'google_docs',
         :token => request_token.token,
@@ -209,8 +209,8 @@ class UsersController < ApplicationController
         end
       elsif params[:service] == "google_docs"
         begin
-          access_token = GoogleDocs.get_access_token(oauth_request.token, oauth_request.secret, params[:oauth_verifier])
-          google_docs = GoogleDocs.new(oauth_request.token, oauth_request.secret)
+          access_token = GoogleDocs::Connection.get_access_token(oauth_request.token, oauth_request.secret, params[:oauth_verifier])
+          google_docs = GoogleDocs::Connection.new(oauth_request.token, oauth_request.secret)
           service_user_id, service_user_name = google_docs.get_service_user_info access_token
           if oauth_request.user
             UserService.register(

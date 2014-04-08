@@ -1296,7 +1296,7 @@ class ApplicationController < ActionController::Base
       elsif feature == :linked_in
         !!LinkedIn::Connection.config
       elsif feature == :google_docs
-        !!GoogleDocs.config
+        !!GoogleDocs::Connection.config
       elsif feature == :etherpad
         !!EtherpadCollaboration.config
       elsif feature == :kaltura
@@ -1742,16 +1742,15 @@ class ApplicationController < ActionController::Base
     ## @real_current_user first ensures that a masquerading user never sees the
     ## masqueradee's files, but in general you may want to block access to google
     ## docs for masqueraders earlier in the request
-    user = @real_current_user || @current_user
-    if user
-      service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', user].cache_key) do
-        service = user.user_services.find_by_service("google_docs")
+    if logged_in_user
+      service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', logged_in_user].cache_key) do
+        service = logged_in_user.user_services.find_by_service("google_docs")
         service && [service.token, service.secret]
       end
       raise GoogleDocs::NoTokenError unless service_token && service_secret
-      google_docs = GoogleDocs.new(service_token, service_secret)
+      google_docs = GoogleDocs::Connection.new(service_token, service_secret)
     else
-      google_docs = GoogleDocs.new(session[:oauth_gdocs_access_token_token], session[:oauth_gdocs_access_token_secret])
+      google_docs = GoogleDocs::Connection.new(session[:oauth_gdocs_access_token_token], session[:oauth_gdocs_access_token_secret])
     end
     google_docs
   end

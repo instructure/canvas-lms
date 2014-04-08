@@ -15,23 +15,33 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+module GoogleDocs
+class Entry
+  def self.extension_looker_upper
+    @extension_looker_upper
+  end
 
-class GoogleDocEntry
+  def self.extension_looker_upper=(extension_looker_upper)
+    @extension_looker_upper=extension_looker_upper
+  end
+
   attr_reader :document_id, :folder, :entry
+
   def initialize(entry)
-    @entry = entry
     if entry.is_a?(String)
       @entry = Atom::Entry.load_entry(entry)
+    else
+      @entry = entry
     end
     set_document_id_from @entry
-    @folder = @entry.categories.find{|c| c.scheme.match(/\Ahttp:\/\/schemas.google.com\/docs\/2007\/folders/)}.label rescue nil
+    @folder = @entry.categories.find { |c| c.scheme.match(/\Ahttp:\/\/schemas.google.com\/docs\/2007\/folders/) }.label rescue nil
   end
-  
+
   def alternate_url
-    link = @entry.links.find{|link| link.rel == "alternate" && link.type == "text/html"}
+    link = @entry.links.find { |link| link.rel == "alternate" && link.type == "text/html" }
     link || "http://docs.google.com"
   end
-  
+
   def edit_url
     "https://docs.google.com/feeds/documents/private/full/#{@document_id}"
   end
@@ -43,16 +53,19 @@ class GoogleDocEntry
   def extension
     if @extension.nil?
       # first, try and chose and extension by content-types we can scribd
-      if content_type.present? && mimetype = ScribdMimeType.find_by_name(content_type)
+      if !content_type.nil? && !content_type.strip.empty? && self.class.extension_looker_upper && mimetype = self.class.extension_looker_upper.find_by_name(content_type)
         @extension = mimetype.extension
       end
       # second, look at the document id itself for any clues
-      if @document_id.present?
+      if !@document_id.nil? && !@document_id.strip.empty?
         @extension ||= case @document_id
-          when /\Aspreadsheet/ then "xls"
-          when /\Apresentation/ then "ppt"
-          when /\Adocument/ then "doc"
-          end
+                         when /\Aspreadsheet/ then
+                           "xls"
+                         when /\Apresentation/ then
+                           "ppt"
+                         when /\Adocument/ then
+                           "doc"
+                       end
       end
       # finally, just declare it unknown
       @extension ||= "unknown"
@@ -77,11 +90,11 @@ class GoogleDocEntry
     }
   end
 
-
   private
 
   def set_document_id_from(entry)
     doc_id = entry.simple_extensions["{http://schemas.google.com/g/2005,resourceId}"]
     @document_id = doc_id.first.to_s
   end
+end
 end

@@ -1126,7 +1126,7 @@ class Account < ActiveRecord::Base
       :google_docs => {
         :name => t("account_settings.google_docs", "Google Docs"), 
         :description => "",
-        :expose_to_ui => (GoogleDocs.config ? :service : false)
+        :expose_to_ui => (GoogleDocs::Connection.config ? :service : false)
       },
       :google_docs_previews => {
         :name => t("account_settings.google_docs_preview", "Google Docs Preview"), 

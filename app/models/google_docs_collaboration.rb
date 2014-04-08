@@ -91,7 +91,7 @@ class GoogleDocsCollaboration < Collaboration
   end
   
   def self.config
-    GoogleDocs.config
+    GoogleDocs::Connection.config
   end
 
   private
@@ -101,6 +101,6 @@ class GoogleDocsCollaboration < Collaboration
       service && [service.token, service.secret]
     end
     raise GoogleDocs::NoTokenError unless service_token && service_secret
-    GoogleDocs.new(service_token, service_secret)
+    GoogleDocs::Connection.new(service_token, service_secret)
   end
 end

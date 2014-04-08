@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011-2013 Instructure, Inc.
+# Copyright (C) 2011-2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require 'spec_helper'
 
 DOCS_FIXTURES_PATH = File.dirname(__FILE__) + '/../fixtures/google_docs/'
 
@@ -24,7 +24,7 @@ def load_fixture(filename)
   File.read(DOCS_FIXTURES_PATH + filename)
 end
 
-describe GoogleDocs do
+describe GoogleDocs::Connection do
   let(:xml_schema_id) { 'https://docs.google.com/feeds/documents/private/full' }
 
   let(:xml_doc_list_empty) { load_fixture("doc_list_empty.xml") }
@@ -44,22 +44,26 @@ describe GoogleDocs do
       "api_key" => "key",
       "secret_key" => "secret",
     }
-    Setting.stubs(:from_config).returns(config)
-    Canvas::Plugin.stubs(:find).returns(nil)
+    GoogleDocs::Connection.config = Proc.new do
+      config
+    end
+    #Setting.stubs(:from_config).returns(config)
+    #Canvas::Plugin.stubs(:find).returns(nil)
   end
 
   describe "#retrieve_access_token" do
     it "should not error out if the google plugin is not configured" do
-      Canvas::Plugin.stubs(:find).returns(nil)
-      Setting.stubs(:from_config).returns(nil)
-      google_docs = GoogleDocs.new(token, secret)
+      GoogleDocs::Connection.config = Proc.new do
+        nil
+      end
+      google_docs = GoogleDocs::Connection.new(token, secret)
       google_docs.retrieve_access_token.should be_nil
     end
 
     it "news up an OAuth::AccessToken" do
       access_token = mock_access_token
 
-      google_docs = GoogleDocs.new(token, secret)
+      google_docs = GoogleDocs::Connection.new(token, secret)
       google_docs.retrieve_access_token.should == access_token
     end
   end
@@ -71,7 +75,7 @@ describe GoogleDocs do
       Timecop.freeze(known_time) do
         prepare_mock_post(xml_schema_id, xml_create_temp_doc_request, xml_create_doc_response)
 
-        google_docs = GoogleDocs.new(token, secret)
+        google_docs = GoogleDocs::Connection.new(token, secret)
 
         prepare_mock_delete("#{xml_schema_id}/document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA")
 
@@ -90,7 +94,7 @@ describe GoogleDocs do
       mock_access_token = mock()
       mock_request_token.expects(:get_access_token).with(oauth_verifier: "oauth-verifier").returns(mock_access_token)
 
-      access_token = GoogleDocs.get_access_token(token, secret, "oauth-verifier")
+      access_token = GoogleDocs::Connection.get_access_token(token, secret, "oauth-verifier")
 
       access_token.should == mock_access_token
     end
@@ -101,7 +105,7 @@ describe GoogleDocs do
       consumer = mock_consumer
       mock_request_token = mock()
       consumer.expects(:get_request_token).with({:oauth_callback => "http://callback.example.com"}, {:scope => "https://docs.google.com/feeds/ https://spreadsheets.google.com/feeds/"}).returns(mock_request_token)
-      request_token = GoogleDocs.request_token("http://callback.example.com")
+      request_token = GoogleDocs::Connection.request_token("http://callback.example.com")
       request_token.should == mock_request_token
     end
   end
@@ -110,7 +114,7 @@ describe GoogleDocs do
     context "with an empty list" do
       before do
         prepare_mock_get xml_doc_list_empty
-        @google_docs = GoogleDocs.new(token, secret)
+        @google_docs = GoogleDocs::Connection.new(token, secret)
       end
       it "handles an empty list" do
         document_id_list = @google_docs.list_with_extension_filter(nil).files.map(&:document_id)
@@ -124,7 +128,7 @@ describe GoogleDocs do
 
     context "with a single document" do
       before do
-        @google_docs = GoogleDocs.new(token, secret)
+        @google_docs = GoogleDocs::Connection.new(token, secret)
       end
       it "and nil filter" do
         prepare_mock_get xml_doc_list_one
@@ -157,7 +161,7 @@ describe GoogleDocs do
 
     context "with multiple documents" do
       before do
-        @google_docs = GoogleDocs.new(token, secret)
+        @google_docs = GoogleDocs::Connection.new(token, secret)
       end
       it "returns filesystem view of results" do
         prepare_mock_get xml_doc_list_many
@@ -198,7 +202,7 @@ describe GoogleDocs do
       response.expects(:body).returns(xml_doc_list_many)
       access_token.expects(:get).with(xml_schema_id).returns(response)
 
-      google_docs = GoogleDocs.new(token, secret)
+      google_docs = GoogleDocs::Connection.new(token, secret)
       doc_array = google_docs.download(doc_id)
       doc_array[0].should == document_response
       doc_array[1].should == 'Sprint Teams'
@@ -219,7 +223,7 @@ describe GoogleDocs do
       response.expects(:body).returns(xml_doc_list_many)
       access_token.expects(:get).with(xml_schema_id).returns(response)
 
-      google_docs = GoogleDocs.new(token, secret)
+      google_docs = GoogleDocs::Connection.new(token, secret)
       doc_array = google_docs.download(doc_id)
       doc_array[0].should == document_response
       doc_array[1].should == 'Sprint Teams'
@@ -233,7 +237,7 @@ describe GoogleDocs do
       response.expects(:body).returns(xml_doc_list_many)
       access_token.expects(:get).with(xml_schema_id).returns(response)
 
-      google_docs = GoogleDocs.new(token, secret)
+      google_docs = GoogleDocs::Connection.new(token, secret)
       doc_array = google_docs.download(doc_id)
       doc_array.should == [nil, nil, nil]
     end
@@ -243,7 +247,7 @@ describe GoogleDocs do
     it "can be created" do
       prepare_mock_post(xml_schema_id, xml_create_doc_request, xml_create_doc_response)
 
-      google_docs = GoogleDocs.new(token, secret)
+      google_docs = GoogleDocs::Connection.new(token, secret)
 
       new_document = google_docs.create_doc "test document", google_docs.retrieve_access_token
       new_document.document_id.should == 'document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA'
@@ -259,7 +263,7 @@ describe GoogleDocs do
     it "can be deleted" do
       prepare_mock_post(xml_schema_id, xml_create_doc_request, xml_create_doc_response)
 
-      google_docs = GoogleDocs.new(token, secret)
+      google_docs = GoogleDocs::Connection.new(token, secret)
       new_document = google_docs.create_doc("test document", google_docs.retrieve_access_token)
 
       prepare_mock_delete "#{xml_schema_id}/document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA"
@@ -271,7 +275,7 @@ describe GoogleDocs do
     it "can be removed" do
       prepare_mock_post('https://docs.google.com/feeds/acl/private/full/document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA/batch', xml_remove_doc_request, xml_remove_doc_response)
 
-      google_docs = GoogleDocs.new(token, secret)
+      google_docs = GoogleDocs::Connection.new(token, secret)
       result = google_docs.acl_remove 'document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA', ['user@example.com']
       result.should == []
     end
@@ -285,7 +289,7 @@ describe GoogleDocs do
     it "should add users to a document" do
       prepare_mock_post(url, xml_add_user_acl, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<feed xmlns=\"http://www.w3.org/2005/Atom\"/>\n")
 
-      google_docs = GoogleDocs.new(token, secret)
+      google_docs = GoogleDocs::Connection.new(token, secret)
       mock_user = mock()
       mock_user.stubs(:id).returns(192)
       mock_user.stubs(:google_docs_address).returns('u_id')
@@ -297,7 +301,7 @@ describe GoogleDocs do
       access_token = mock_access_token
       access_token.expects(:post).never
 
-      google_docs = GoogleDocs.new(token, secret)
+      google_docs = GoogleDocs::Connection.new(token, secret)
       mock_user = mock()
       mock_user.stubs(:id).returns(192)
       mock_user.stubs(:google_docs_address).returns('u_id')
@@ -326,8 +330,8 @@ describe GoogleDocs do
   def mock_consumer
     consumer = mock()
     OAuth::Consumer.expects(:new).at_least_once.with(
-      GoogleDocs.config["api_key"],
-      GoogleDocs.config["secret_key"], {
+      GoogleDocs::Connection.config["api_key"],
+      GoogleDocs::Connection.config["secret_key"], {
       :signature_method => 'HMAC-SHA1',
       :request_token_path => '/accounts/OAuthGetRequestToken',
       :site => 'https://www.google.com',

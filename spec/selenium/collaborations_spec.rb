@@ -93,10 +93,8 @@ describe "collaborations" do
             :service_user_id => "service_user_id",
             :service_user_name => "service_user_name"
           )
-
-
           if type == 'google_docs'
-            GoogleDocs.any_instance.
+            GoogleDocs::Connection.any_instance.
               stubs(:verify_access_token).
               returns(true)
 

@@ -191,7 +191,7 @@ describe SubmissionsController do
 
       it "should not save if domain restriction prevents it" do
         google_docs = mock
-        GoogleDocs.expects(:new).returns(google_docs)
+        GoogleDocs::Connection.expects(:new).returns(google_docs)
 
         google_docs.expects(:download).returns([Net::HTTPOK.new(200, {}, ''), 'title', 'pdf'])
         post(:create, course_id: @course.id, assignment_id: @assignment.id,
