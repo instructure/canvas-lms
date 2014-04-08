@@ -565,6 +565,20 @@ describe "context_modules" do
       locked_title[0].text.length.should == 98
     end
 
+    it "should add the 'with-completion-requirements' class to rows that have requirements" do
+      set_course_draft_state
+      mod = @course.context_modules.create! name: 'TestModule'
+      tag = mod.add_item({:id => @assignment.id, :type => 'assignment'})
+
+      mod.completion_requirements = {tag.id => {:type => 'must_view'}}
+      mod.save
+
+      get "/courses/#{@course.id}/modules"
+
+      ig_rows = ff("#context_module_item_#{tag.id} .with-completion-requirements")
+      ig_rows.should_not be_empty
+    end
+
     it "should add a title attribute to the text header" do
       set_course_draft_state
       text_header = 'This is a really long module text header that should be truncated to exactly 98 characters plus the ... part so 101 characters really'

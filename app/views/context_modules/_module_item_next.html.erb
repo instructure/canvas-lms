@@ -32,7 +32,7 @@
     <%= item_class %>
   "
 >
-  <div class="ig-row <%= 'ig-published' if module_item_published?(module_item) %> <%= 'student-view' unless editable %>">
+<div class="ig-row <%= 'with-completion-requirements' if criterion%> <%= 'ig-published' if module_item_published?(module_item) %> <%= 'student-view' unless editable %>">
     <div class="ig-title ellipses">
       <% if editable || module_item.nil? %>
       <span
@@ -61,6 +61,33 @@
       </span>
     </div>
 
+    <div class="requirement-description">
+      <span class="completion_requirement">
+        <span class="requirement_type min_score_requirement">
+          <% score_display = content_tag(:span, criterion && criterion[:min_score] || nbsp, class: 'min_score') %>
+          <span class="unfulfilled"><%= t 'min_score.unfulfilled', 'must score at least a %{score}', :score => score_display %></span>
+          <span class="fulfilled"><%= t 'min_score.fulfilled', 'scored at least a %{score}', :score => score_display %></span>
+        </span>
+        <span class="requirement_type max_score_requirement">
+          <% score_display = content_tag(:span, criterion && criterion[:max_score] || nbsp, class: 'min_score') %>
+          <span class="unfulfilled"><%= t 'max_score.unfulfilled', 'must score no more than a %{score}', :score => score_display %></span>
+          <span class="fulfilled"><%= t 'max_score.fulfilled', 'scored no more than a%{score}', :score => score_display %></span>
+        </span>
+        <span class="requirement_type must_view_requirement">
+          <span class="unfulfilled"><%= t('must_view.unfulfilled', %{must view the page}) %></span>
+          <span class="fulfilled"><%= t('must_view.fulfilled', %{viewed the page}) %></span>
+        </span>
+        <span class="requirement_type must_contribute_requirement">
+          <span class="unfulfilled"><%= t('must_contribute.unfulfilled', %{must contribute to the content of the page}) %></span>
+          <span class="fulfilled"><%= t('must_contribute.fulfilled', %{contributed to the content of the page}) %></span>
+        </span>
+        <span class="requirement_type must_submit_requirement">
+          <span class="unfulfilled"><%= t('must_submit.unfulfilled', %{must submit the assignment}) %></span>
+          <span class="fulfilled"><%= t('must_submit.fulfilled', %{submitted the assignment}) %></span>
+        </span>
+      </span>
+    </div> <!-- requirement description end -->
+
     <div class="module_item_icons nobr">
       <!-- dead code? -->
       <span class="criterion <%= 'defined' if criterion %>">
@@ -73,32 +100,6 @@
     </div>
 
     <div class="ig-details row-fluid">
-      <div class="span4">
-        <span class="completion_requirement">
-          <span class="requirement_type min_score_requirement">
-            <% score_display = content_tag(:span, criterion && criterion[:min_score] || nbsp, class: 'min_score') %>
-            <span class="unfulfilled"><%= t 'min_score.unfulfilled', 'must score at least a %{score}', :score => score_display %></span>
-            <span class="fulfilled"><%= t 'min_score.fulfilled', 'scored at least a %{score}', :score => score_display %></span>
-          </span>
-          <span class="requirement_type max_score_requirement">
-            <% score_display = content_tag(:span, criterion && criterion[:max_score] || nbsp, class: 'min_score') %>
-            <span class="unfulfilled"><%= t 'max_score.unfulfilled', 'must score no more than a %{score}', :score => score_display %></span>
-            <span class="fulfilled"><%= t 'max_score.fulfilled', 'scored no more than a%{score}', :score => score_display %></span>
-          </span>
-          <span class="requirement_type must_view_requirement">
-            <span class="unfulfilled"><%= t('must_view.unfulfilled', %{must view the page}) %></span>
-            <span class="fulfilled"><%= t('must_view.fulfilled', %{viewed the page}) %></span>
-          </span>
-          <span class="requirement_type must_contribute_requirement">
-            <span class="unfulfilled"><%= t('must_contribute.unfulfilled', %{must contribute to the content of the page}) %></span>
-            <span class="fulfilled"><%= t('must_contribute.fulfilled', %{contributed to the content of the page}) %></span>
-          </span>
-          <span class="requirement_type must_submit_requirement">
-            <span class="unfulfilled"><%= t('must_submit.unfulfilled', %{must submit the assignment}) %></span>
-            <span class="fulfilled"><%= t('must_submit.fulfilled', %{submitted the assignment}) %></span>
-          </span>
-        </span>
-      </div>
       <div class="span4 due_date_display" style="text-align: right"></div>
       <div class="span4 points_possible_display"></div>
     </div>

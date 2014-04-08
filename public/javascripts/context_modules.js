@@ -530,10 +530,13 @@ define([
         .removeClass('must_contribute_requirement')
         .find('.criterion').removeClass('defined');
 
+      // Hack. Removing the class here only to re-add it a few lines later if needed.
+      $module.find('.ig-row').removeClass('with-completion-requirements');
       for(var idx in data.context_module.completion_requirements) {
         var req = data.context_module.completion_requirements[idx];
         req.criterion_type = req.type;
         var $item = $module.find("#context_module_item_" + req.id);
+        $item.find('.ig-row').addClass('with-completion-requirements');
         $item.find(".criterion").fillTemplateData({data: req});
         $item.find(".completion_requirement").fillTemplateData({data: req});
         $item.find(".criterion").addClass('defined');
