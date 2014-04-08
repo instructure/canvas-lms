@@ -24,7 +24,7 @@ class PseudonymSessionsController < ApplicationController
   skip_before_filter :require_reacceptance_of_terms
 
   def new
-    if @current_user && !params[:re_login] && !params[:confirm] && !params[:expected_user_id] && !session[:used_remember_me_token]
+    if @current_user && !params[:force_login] && !params[:confirm] && !params[:expected_user_id] && !session[:used_remember_me_token]
       redirect_to dashboard_url
       return
     end
@@ -628,14 +628,14 @@ class PseudonymSessionsController < ApplicationController
     session[:oauth2] = provider.session_hash
     session[:oauth2][:state] = params[:state] if params.key?(:state)
 
-    if @current_pseudonym
+    if @current_pseudonym && !params[:force_login]
       if provider.authorized_token? @current_user
         final_oauth2_redirect(session[:oauth2][:redirect_uri], final_oauth2_redirect_params)
       elsif
         redirect_to oauth2_auth_confirm_url
       end
     else
-      redirect_to login_url(params.slice(:canvas_login, :pseudonym_session))
+      redirect_to login_url(params.slice(:canvas_login, :pseudonym_session, :force_login))
     end
   end
 
