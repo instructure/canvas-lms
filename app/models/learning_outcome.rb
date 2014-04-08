@@ -204,6 +204,7 @@ class LearningOutcome < ActiveRecord::Base
     outcomes = data['learning_outcomes'] ? data['learning_outcomes'] : []
     migration.outcome_to_id_map = {}
     outcomes.each do |outcome|
+      next unless migration.import_object?('learning_outcomes', outcome['migration_id'])
       begin
         if outcome[:type] == 'learning_outcome_group'
           LearningOutcomeGroup.import_from_migration(outcome, migration)

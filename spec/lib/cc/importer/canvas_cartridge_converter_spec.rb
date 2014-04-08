@@ -344,9 +344,11 @@ describe "Canvas Cartridge importing" do
     @resource.create_learning_outcomes(builder)
     #convert to json
     doc = Nokogiri::XML(builder.target!)
-    hash = @converter.convert_learning_outcomes(doc)
+    data = @converter.convert_learning_outcomes(doc)
+    data = data.map{|h| h.with_indifferent_access}
+
     #import json into new course
-    LearningOutcome.process_migration({'learning_outcomes'=>hash}, @migration)
+    LearningOutcome.process_migration({'learning_outcomes'=>data}, @migration)
     @copy_to.save!
   end
   

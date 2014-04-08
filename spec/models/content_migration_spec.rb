@@ -455,40 +455,15 @@ describe ContentMigration do
       log.description = "<p>Groupage</p>"
       log.save!
       default.adopt_outcome_group(log)
-      log2 = @copy_from.learning_outcome_groups.new
-      log2.context = @copy_from
-      log2.title = "empty group"
-      log2.description = "<p>Groupage</p>"
-      log2.save!
-      default.adopt_outcome_group(log2)
-      log3 = @copy_from.learning_outcome_groups.new
-      log3.context = @copy_from
-      log3.title = "empty group"
-      log3.description = "<p>Groupage</p>"
-      log3.save!
-      default.adopt_outcome_group(log3)
+
       lo = @copy_from.created_learning_outcomes.new
       lo.context = @copy_from
       lo.short_description = "outcome1"
       lo.workflow_state = 'active'
       lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
       lo.save!
-      lo2 = @copy_from.created_learning_outcomes.new
-      lo2.context = @copy_from
-      lo2.short_description = "outcome2"
-      lo2.workflow_state = 'active'
-      lo2.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
-      lo2.save!
-      lo3 = @copy_from.created_learning_outcomes.new
-      lo3.context = @copy_from
-      lo3.short_description = "outcome3"
-      lo3.workflow_state = 'active'
-      lo3.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
-      lo3.save!
 
-      default.add_outcome(lo)
-      log.add_outcome(lo2)
-      default.add_outcome(lo3)
+      log.add_outcome(lo)
 
       # only select one of each type
       @cm.copy_options = {
@@ -498,8 +473,6 @@ describe ContentMigration do
               :attachments => {mig_id(att) => "1", mig_id(att2) => "0"},
               :wiki_pages => {mig_id(wiki) => "1", mig_id(wiki2) => "0"},
               :rubrics => {mig_id(rub1) => "1", mig_id(rub2) => "0"},
-              :learning_outcomes => {mig_id(lo) => "1", mig_id(lo2) => "1", mig_id(lo3) => "0"},
-              :learning_outcome_groups => {mig_id(log) => "1", mig_id(log2) => "1", mig_id(log3) => "0"},
       }
       @cm.save!
 
@@ -521,13 +494,37 @@ describe ContentMigration do
       @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).should_not be_nil
       @copy_to.rubrics.find_by_migration_id(mig_id(rub2)).should be_nil
 
-      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).should_not be_nil
-      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo2)).should_not be_nil
-      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo3)).should be_nil
+      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).should be_nil
+      @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log)).should be_nil
+    end
 
+    it "should copy all learning outcomes and their groups if selected" do
+      default = @copy_from.root_outcome_group
+      log = @copy_from.learning_outcome_groups.new
+      log.context = @copy_from
+      log.title = "outcome group"
+      log.description = "<p>Groupage</p>"
+      log.save!
+      default.adopt_outcome_group(log)
+
+      lo = @copy_from.created_learning_outcomes.new
+      lo.context = @copy_from
+      lo.short_description = "outcome1"
+      lo.workflow_state = 'active'
+      lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      lo.save!
+
+      log.add_outcome(lo)
+
+      @cm.copy_options = {
+          :all_learning_outcomes => "1"
+      }
+      @cm.save!
+
+      run_course_copy
+
+      @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).should_not be_nil
       @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log)).should_not be_nil
-      @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log2)).should_not be_nil
-      @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log3)).should be_nil
     end
 
     it "should re-copy deleted items" do
