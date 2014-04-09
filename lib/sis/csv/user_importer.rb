@@ -33,7 +33,7 @@ module SIS
             update_progress
 
             begin
-              importer.add_user(row['user_id'], row['login_id'], row['status'], row['first_name'], row['last_name'], row['email'], row['password'], row['ssha_password'])
+              importer.add_user(row['user_id'], row['login_id'], row['status'], row['first_name'], row['last_name'], row['short_name'], row['email'], row['password'], row['ssha_password'])
             rescue ImportError => e
               messages << "#{e}"
             end
