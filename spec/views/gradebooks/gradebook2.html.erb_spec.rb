@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-describe "/gradebook2/show" do
+describe "/gradebooks/gradebook2" do
 
   def test_grade_publishing(course_allows, permissions_allow)
     course_with_student
@@ -32,7 +32,7 @@ describe "/gradebook2/show" do
     assigns[:body_classes] = []
     @course.expects(:allows_grade_publishing_by).with(@user).returns(course_allows)
     @course.expects(:grants_rights?).with(@user, {}, nil).returns(permissions_allow ? {:manage_grades=>true} : {}) if course_allows
-    render "gradebook2/show"
+    render "/gradebooks/gradebook2"
     response.should_not be_nil
     if course_allows && permissions_allow
       response.body.should =~ /Publish grades to SIS/
@@ -66,7 +66,7 @@ describe "/gradebook2/show" do
     end
 
     it "should not allow uploading scores for large roster courses" do
-      render "gradebook2/show"
+      render "/gradebooks/gradebook2"
       response.should_not be_nil
       response.body.should =~ /Upload Scores \(from .csv\)/
     end
@@ -75,7 +75,7 @@ describe "/gradebook2/show" do
       @course.large_roster = true
       @course.save!
       @course.reload
-      render "gradebook2/show"
+      render "/gradebooks/gradebook2"
       response.should_not be_nil
       response.body.should_not =~ /Upload Scores \(from .csv\)/
     end

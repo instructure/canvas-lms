@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -22,28 +22,14 @@ module GradebooksHelper
   end
 
   def gradebook_url_for(user, context, assignment=nil)
-    if context
-      gradebook_version = get_gradebook_version(user, context)
-      gradebook_url = polymorphic_url([context, gradebook_version])
+    gradebook_version = user.try(:preferred_gradebook_version, context) || '2'
 
-      if assignment && gradebook_version == 'gradebook'
-        gradebook_url += "#assignment/#{assignment.id}"
-      end
+    if !context.feature_enabled?(:screenreader_gradebook) && (gradebook_version == "2" || !context.old_gradebook_visible?)
+      return polymorphic_url([context, 'gradebook2'])
+    elsif gradebook_version == "1" && assignment
+      return polymorphic_url([context, 'gradebook']) + "#assignment/#{assignment.id}"
     end
 
-    gradebook_url
+    polymorphic_url([context, 'gradebook'])
   end
-
-  def get_gradebook_version(user, context)
-    if user.nil? || user.prefers_gradebook2?(context)
-      'gradebook2'
-    elsif context.feature_enabled?(:screenreader_gradebook) && user.gradebook_preference == 'srgb'
-      'screenreader_gradebook'
-    elsif context.old_gradebook_visible?
-      'gradebook'
-    else
-      'gradebook2'
-    end
-  end
-
 end

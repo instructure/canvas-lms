@@ -228,8 +228,7 @@ routes.draw do
       end
     end
 
-    resource :gradebook2, :controller => :gradebook2
-    match 'screenreader_gradebook' => 'gradebook2#screenreader'
+    match 'gradebook2' => "gradebooks#gradebook2"
 
     match 'attendance' => 'gradebooks#attendance', :as => :attendance
     match 'attendance/:user_id' => 'gradebooks#attendance', :as => :attendance_user

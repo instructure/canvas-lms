@@ -22,9 +22,11 @@ class GradebooksController < ApplicationController
   include KalturaHelper
   include Api::V1::AssignmentGroup
   include Api::V1::Submission
+  include Api::V1::CustomGradebookColumn
 
   before_filter :require_context
   before_filter :require_user, only: %w(speed_grader speed_grader_settings)
+
   batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
 
   add_crumb(proc { t '#crumbs.grades', "Grades" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
@@ -156,77 +158,136 @@ class GradebooksController < ApplicationController
   end
 
   def show
+    # Check for redirect to gb2 or SRGB
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      if !@context.old_gradebook_visible? && request.format == :json
-        render :json => {:error => "gradebook is disabled for this course"},
-               :status => 404
+      if @context.feature_enabled?(:screenreader_gradebook)
+        set_js_env
+        case @current_user.preferred_gradebook_version(@context)
+        when "2"
+          render :action => "gradebook2"
+        when "srgb"
+          render :action => "screenreader"
+        end
         return
       end
-      return submissions_json if params[:updated] && request.format == :json
-      return gradebook_init_json if params[:init] && request.format == :json
+      old_gradebook
+    end
+  end
 
-      @context.require_assignment_group
+  def gradebook2
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+      set_js_env
+    end
+  end
 
-      log_asset_access("gradebook:#{@context.asset_string}", "grades", "other")
-      respond_to do |format|
-        format.html {
-          unless @context.old_gradebook_visible?
-            redirect_to polymorphic_url([@context, 'gradebook2'])
-            return
-          end
+  def set_js_env
+    @gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
+    per_page = Setting.get('api_max_per_page', '50').to_i
+    teacher_notes = @context.custom_gradebook_columns.not_deleted.where(:teacher_notes=> true).first
+    js_env  :GRADEBOOK_OPTIONS => {
+      :chunk_size => Setting.get('gradebook2.submissions_chunk_size', '35').to_i,
+      :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => [:assignments], :override_assignment_dates => "false"),
+      :sections_url => api_v1_course_sections_url(@context),
+      :students_url => api_v1_course_enrollments_url(@context, :include => [:avatar_url], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :per_page => per_page),
+      :students_url_with_concluded_enrollments => api_v1_course_enrollments_url(@context, :include => [:avatar_url], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :state => ['active', 'invited', 'completed'], :per_page => per_page),
+      :submissions_url => api_v1_course_student_submissions_url(@context, :grouped => '1'),
+      :change_grade_url => api_v1_course_assignment_submission_url(@context, ":assignment", ":submission"),
+      :context_url => named_context_url(@context, :context_url),
+      :download_assignment_submissions_url => named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", :zip => 1),
+      :re_upload_submissions_url => named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
+      :context_id => @context.id,
+      :context_code => @context.asset_string,
+      :group_weighting_scheme => @context.group_weighting_scheme,
+      :grading_standard =>  @context.grading_standard_enabled? && (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard),
+      :course_is_concluded => @context.completed?,
+      :gradebook_is_editable => @gradebook_is_editable,
+      :setting_update_url => api_v1_course_settings_url(@context),
+      :show_total_grade_as_points => @context.settings[:show_total_grade_as_points],
+      :publish_to_sis_enabled => @context.allows_grade_publishing_by(@current_user) && @gradebook_is_editable,
+      :publish_to_sis_url => context_url(@context, :context_details_url, :anchor => 'tab-grade-publishing'),
+      :speed_grader_enabled => @context.allows_speed_grader?,
+      :draft_state_enabled => @context.feature_enabled?(:draft_state),
+      :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook),
+      :custom_columns_url => api_v1_course_custom_gradebook_columns_url(@context),
+      :custom_column_url => api_v1_course_custom_gradebook_column_url(@context, ":id"),
+      :custom_column_data_url => api_v1_course_custom_gradebook_column_data_url(@context, ":id", per_page: per_page),
+      :custom_column_datum_url => api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
+      :reorder_custom_columns_url => api_v1_custom_gradebook_columns_reorder_url(@context),
+      :teacher_notes => teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
+      :change_gradebook_version_url => context_url(@context, :change_gradebook_version_context_gradebook_url, :version => 2)
+    }
+  end
 
-          Shackles.activate(:slave) do
-            @groups = @context.assignment_groups.active
-            @groups_order = {}
-            @groups.each_with_index{|group, idx| @groups_order[group.id] = idx }
-            @just_assignments = @context.assignments.active.gradeable.
-              order(:due_at, Assignment.best_unicode_collation_key('title')).
-              select{|a| @groups_order[a.assignment_group_id] }
+  def old_gradebook
+    if !@context.old_gradebook_visible? && request.format == :json
+      render :json => {:error => "gradebook is disabled for this course"},
+             :status => 404
+      return
+    end
+    return submissions_json if params[:updated] && request.format == :json
+    return gradebook_init_json if params[:init] && request.format == :json
 
-            newest = Time.parse("Jan 1 2010")
-            @just_assignments = @just_assignments.sort_by do |a|
-              [a.due_at || newest, @groups_order[a.assignment_group_id] || 0, a.position || 0]
-            end
-            if @context.feature_enabled?(:draft_state)
-              @just_assignments = @just_assignments.select(&:published?)
-            end
-            @assignments = @just_assignments.dup + groups_as_assignments(@groups)
-            @enrollments_hash = Hash.new{ |hash,key| hash[key] = [] }
-            @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{ |e| @enrollments_hash[e.user_id] << e }
-            @students = @context.students_visible_to(@current_user).order_by_sortable_name.uniq.all
-          end
+    @context.require_assignment_group
 
-          # this can't happen in the slave block because this may trigger
-          # writes in ContextModule
-          js_env :assignment_groups => assignment_groups_json({:stringify_json_ids => true}),
-                 :speed_grader_enabled => @context.allows_speed_grader?
-          set_gradebook_warnings(@groups, @just_assignments)
-          if params[:view] == "simple"
-            @headers = false
-            render :action => "show_simple"
-          else
-            render :action => "show"
+    log_asset_access("gradebook:#{@context.asset_string}", "grades", "other")
+    respond_to do |format|
+      format.html {
+        unless @context.old_gradebook_visible?
+          redirect_to polymorphic_url([@context, 'gradebook2'])
+          return
+        end
+
+        Shackles.activate(:slave) do
+          @groups = @context.assignment_groups.active
+          @groups_order = {}
+          @groups.each_with_index{|group, idx| @groups_order[group.id] = idx }
+          @just_assignments = @context.assignments.active.gradeable.
+            order(:due_at, Assignment.best_unicode_collation_key('title')).
+            select{|a| @groups_order[a.assignment_group_id] }
+
+          newest = Time.parse("Jan 1 2010")
+          @just_assignments = @just_assignments.sort_by do |a|
+            [a.due_at || newest, @groups_order[a.assignment_group_id] || 0, a.position || 0]
           end
-        }
-        format.csv {
-          cancel_cache_buster
-          Shackles.activate(:slave) do
-            send_data(
-              @context.gradebook_to_csv(:include_sis_id => @context.grants_rights?(@current_user, session, :read_sis, :manage_sis).values.any?, :user => @current_user),
-              :type => "text/csv",
-              :filename => t('grades_filename', "Grades").gsub(/ /, "_") + "-" + @context.name.to_s.gsub(/ /, "_") + ".csv",
-              :disposition => "attachment"
-            )
+          if @context.feature_enabled?(:draft_state)
+            @just_assignments = @just_assignments.select(&:published?)
           end
-        }
-        format.json  {
-          Shackles.activate(:slave) do
-            @submissions = @context.submissions.includes(:quiz_submission)
-            @new_submissions = @submissions
-            render :json => @new_submissions.map{ |s| s.as_json(include: [:quiz_submission, :submission_comments, :attachments]) }
-          end
-        }
-      end
+          @assignments = @just_assignments.dup + groups_as_assignments(@groups)
+          @enrollments_hash = Hash.new{ |hash,key| hash[key] = [] }
+          @context.enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.each{ |e| @enrollments_hash[e.user_id] << e }
+          @students = @context.students_visible_to(@current_user).order_by_sortable_name.uniq.all
+        end
+
+        # this can't happen in the slave block because this may trigger
+        # writes in ContextModule
+        js_env :assignment_groups => assignment_groups_json({:stringify_json_ids => true}),
+               :speed_grader_enabled => @context.allows_speed_grader?
+        set_gradebook_warnings(@groups, @just_assignments)
+        if params[:view] == "simple"
+          @headers = false
+          render :action => "show_simple"
+        else
+          render :action => "show"
+        end
+      }
+      format.csv {
+        cancel_cache_buster
+        Shackles.activate(:slave) do
+          send_data(
+            @context.gradebook_to_csv(:include_sis_id => @context.grants_rights?(@current_user, session, :read_sis, :manage_sis).values.any?, :user => @current_user),
+            :type => "text/csv",
+            :filename => t('grades_filename', "Grades").gsub(/ /, "_") + "-" + @context.name.to_s.gsub(/ /, "_") + ".csv",
+            :disposition => "attachment"
+          )
+        end
+      }
+      format.json  {
+        Shackles.activate(:slave) do
+          @submissions = @context.submissions.includes(:quiz_submission)
+          @new_submissions = @submissions
+          render :json => @new_submissions.map{ |s| s.as_json(include: [:quiz_submission, :submission_comments, :attachments]) }
+        end
+      }
     end
   end
 
