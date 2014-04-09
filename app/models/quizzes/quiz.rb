@@ -50,6 +50,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :assignment
   belongs_to :assignment_group
+
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :context_id
@@ -65,8 +66,10 @@ class Quizzes::Quiz < ActiveRecord::Base
   }
   sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
+
   before_save :build_assignment
   before_save :set_defaults
+  before_save :flag_columns_that_need_republish
   after_save :update_assignment
   after_save :touch_context
   after_save :regrade_if_published
@@ -166,6 +169,16 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.question_count = self.question_count(true)
     @update_existing_submissions = true if self.for_assignment? && self.quiz_type_changed?
     @stored_questions = nil
+  end
+
+  # some attributes require us to republish for non-draft state
+  # We can safely remove this when draft state is permanent
+  def flag_columns_that_need_republish
+    return if context.feature_enabled?(:draft_state)
+
+    if shuffle_answers_changed? && !shuffle_answers
+      self.last_edited_at = Time.now.utc
+    end
   end
 
   protected :set_defaults

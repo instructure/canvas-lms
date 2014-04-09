@@ -94,6 +94,26 @@ describe Quizzes::Quiz do
     end
   end
 
+  it "should flag as edited if shuffle answers changes to off" do
+    q = @course.quizzes.create!(:title => "new quiz")
+    q.quiz_questions.create!
+    q.save!
+    q.publish!
+
+    # no initial changes
+    q.unpublished_changes?.should be_false
+
+    # no need to force republish turning it on
+    q.shuffle_answers = true
+    q.save!
+    q.unpublished_changes?.should be_false
+
+    # turning it back off forces a republish
+    q.shuffle_answers = false
+    q.save!
+    q.unpublished_changes?.should be_true
+  end
+
   it "should infer the times if none given" do
     q = factory_with_protected_attributes(@course.quizzes,
                                           :title => "new quiz",
