@@ -70,6 +70,7 @@ module Canvas
           {'name' => 'ic-ajax', 'location' => 'bower/ic-ajax'},
           {'name' => 'ic-styled', 'location' => 'bower/ic-styled'},
           {'name' => 'ic-menu', 'location' => 'bower/ic-menu'},
+          {'name' => 'ember-qunit', 'location' => 'bower/ember-qunit/dist/amd'},
         ].to_json
       end
 
