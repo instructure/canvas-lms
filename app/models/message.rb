@@ -34,7 +34,6 @@ class Message < ActiveRecord::Base
   include SendToStream
   include TextHelper
   include HtmlTextHelper
-  include Twitter
   include Workflow
 
   extend TextHelper
@@ -662,7 +661,8 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def deliver_via_twitter
-    TwitterMessenger.new(self).deliver
+    twitter_service = user.user_services.find_by_service('twitter')
+    TwitterMessenger.new(self, twitter_service).deliver
     complete_dispatch
   end
 

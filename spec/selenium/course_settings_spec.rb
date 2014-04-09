@@ -175,9 +175,9 @@ describe "course settings" do
       disabled_div = f('#nav_disabled_list')
       announcements_nav = f('#nav_edit_tab_id_14')
       driver.action.click_and_hold(announcements_nav).
-          move_to(disabled_div).
-          release(disabled_div).
-          perform
+        move_to(disabled_div).
+        release(disabled_div).
+        perform
       f('#nav_disabled_list').should include_text(announcements_nav.text)
     end
   end

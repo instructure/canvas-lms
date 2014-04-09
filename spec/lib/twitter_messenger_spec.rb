@@ -5,27 +5,43 @@ describe TwitterMessenger do
   before { HostUrl.stubs(:short_host => 'host') }
 
   let(:message) { stub() }
-  let(:messenger) { TwitterMessenger.new(message) }
+  let(:twitter_service) { stub({
+                                 token: "twitter_token",
+                                 secret: "twitter_secret",
+                                 service_user_name: "twitter_name",
+                                 service_user_id: "twitter_id"
+                               }) }
+  let(:messenger) { TwitterMessenger.new(message, twitter_service) }
 
   describe '#deliver' do
 
-    let(:user) { stub(:user_services=>stub(:find_by_service=>@service)) }
-    let(:message) { stub(:body=>'body',:url=>'url',:user => user, :asset_context=>nil, :id=>0, :main_link => '') }
+    let(:user) { stub(:user_services => stub(:find_by_service => @service)) }
+    let(:message) { stub(:body => 'body', :url => 'url', :user => user, :asset_context => nil, :id => 0, :main_link => '') }
+    let(:connection_mock) { mock() }
 
-    it 'delegates to the twitter module if a service is available' do
-      @service = stub()
-      messenger.stubs(:twitter_self_dm).returns(true)
-      messenger.deliver.should be_true
+
+    context "with a twitter service" do
+      before(:each) do
+        Twitter.expects(:new).with("twitter_token", "twitter_secret").returns(connection_mock)
+      end
+
+      it 'delegates to the twitter module if a service is available' do
+        connection_mock.expects(:send_direct_message).with("twitter_name", "twitter_id", "body ").returns(true)
+        messenger.deliver.should be_true
+      end
     end
 
-    it 'sends nothing if there is no service' do
-      messenger.expects(:twitter_self_dm).times(0)
-      messenger.deliver.should be_nil
+    context "with no twitter service" do
+      let(:messenger) { TwitterMessenger.new(message, nil) }
+      it 'sends nothing if there is no service' do
+        connection_mock.expects(:send_direct_message).never
+        messenger.deliver.should be_nil
+      end
     end
   end
 
   describe '#url' do
-    let(:message) { stub(:id => 42, :asset_context=>nil, :main_link => nil, :url => nil) }
+    let(:message) { stub(:id => 42, :asset_context => nil, :main_link => nil, :url => nil) }
     subject { messenger.url }
 
     it { should =~ /host/ }
@@ -34,7 +50,7 @@ describe TwitterMessenger do
   end
 
   describe '#body' do
-    let(:message) { stub(:body=>@body, :asset_context => nil, :id => 0, :main_link => @link) }
+    let(:message) { stub(:body => @body, :asset_context => nil, :id => 0, :main_link => @link) }
 
     it 'leaves the body intact when it does not overrun the twitter length limit' do
       @body = "no need to alter"

@@ -30,6 +30,8 @@ describe integration do
       LinkedIn::Connection.expects(:config).at_least_once.returns({})
     elsif integration == "GoogleDocs"
       GoogleDocs::Connection.expects(:config).at_least_once.returns({})
+    elsif integration == "Twitter"
+      Twitter.expects(:config).at_least_once.returns({})
     else
       integration.constantize.expects(:config).at_least_once.returns({})
     end
@@ -99,6 +101,8 @@ describe integration do
         GoogleDocs::Connection.any_instance.expects(:get_service_user_info).returns(["test_user_id", "test_user_name"])
       elsif integration == "LinkedIn"
         LinkedIn::Connection.any_instance.expects(:get_service_user_info).with(instance_of(OAuth::AccessToken)).returns(["test_user_id", "test_user_name"])
+      elsif integration == "Twitter"
+        Twitter.any_instance.expects(:get_service_user).returns(["test_user_id", "test_user_name"])
       else
         UsersController.any_instance.expects("#{integration.underscore}_get_service_user").with(instance_of(OAuth::AccessToken)).returns(["test_user_id", "test_user_name"])
       end
@@ -126,6 +130,8 @@ describe integration do
         GoogleDocs::Connection.any_instance.expects(:get_service_user_info).raises(RuntimeError, "Third-party service totally like, failed")
       elsif integration == "LinkedIn"
         LinkedIn::Connection.any_instance.expects(:get_service_user_info).with(instance_of(OAuth::AccessToken)).raises(RuntimeError, "Third-party service totally like, failed")
+      elsif integration == "Twitter"
+        Twitter.any_instance.expects(:get_service_user).raises(RuntimeError, "Third-party service totally like, failed")
       else
         UsersController.any_instance.expects("#{integration.underscore}_get_service_user").with(instance_of(OAuth::AccessToken)).raises(RuntimeError, "Third-party service totally like, failed")
       end

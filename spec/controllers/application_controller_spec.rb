@@ -25,6 +25,32 @@ describe ApplicationController do
     controller.stubs(:request).returns(stub(:host_with_port => "www.example.com"))
   end
 
+  describe "#twitter_connection" do
+    it "uses current user if available" do
+      mock_current_user = mock()
+      controller.instance_variable_set(:@current_user, mock_current_user)
+      session[:oauth_gdocs_access_token_token] = "session_token"
+      session[:oauth_gdocs_access_token_secret] = "sesion_secret"
+
+      mock_user_services = mock("mock_user_services")
+      mock_current_user.expects(:user_services).returns(mock_user_services)
+      mock_user_services.expects(:find_by_service).with("twitter").returns(mock(token: "current_user_token", secret: "current_user_secret"))
+
+      Twitter.expects(:new).with("current_user_token", "current_user_secret")
+
+      controller.send(:twitter_connection)
+    end
+    it "uses session if no current user" do
+      controller.instance_variable_set(:@current_user, nil)
+      session[:oauth_twitter_access_token_token] = "session_token"
+      session[:oauth_twitter_access_token_secret] = "sesion_secret"
+
+      Twitter.expects(:new).with("session_token", "sesion_secret")
+
+      controller.send(:twitter_connection)
+    end
+  end
+
   describe "#google_docs_connection" do
     it "uses @real_current_user first" do
       mock_real_current_user = mock()

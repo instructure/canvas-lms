@@ -1,17 +1,19 @@
 class TwitterMessenger
 
-  include Twitter
   include TextHelper
 
   attr_reader :message
   delegate :asset_context, :to => :message
 
-  def initialize(message)
+  def initialize(message, twitter_service)
     @message = message
+    @twitter_service = twitter_service
   end
 
   def deliver
-    twitter_self_dm(twitter_service, "#{body}") if twitter_service
+    return unless @twitter_service
+    twitter_connection = Twitter.new(@twitter_service.token, @twitter_service.secret)
+    twitter_connection.send_direct_message(@twitter_service.service_user_name, @twitter_service.service_user_id, "#{body}")
   end
 
   def url
@@ -29,9 +31,5 @@ class TwitterMessenger
 
   def host
     HostUrl.short_host(asset_context)
-  end
-
-  def twitter_service
-    message.user.user_services.find_by_service('twitter')
   end
 end
