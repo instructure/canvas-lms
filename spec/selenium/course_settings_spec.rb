@@ -115,8 +115,11 @@ describe "course settings" do
       section_name = 'new section'
       get "/courses/#{@course.id}/settings#tab-sections"
 
-      section_input = f('#course_section_name')
-      keep_trying_until { section_input.should be_displayed }
+      section_input = nil
+      keep_trying_until do
+        section_input = f('#course_section_name')
+        section_input.should be_displayed
+      end
       replace_content(section_input, section_name)
       submit_form('#add_section_form')
       wait_for_ajaximations
@@ -127,6 +130,11 @@ describe "course settings" do
     it "should delete a section" do
       add_section('Delete Section')
       get "/courses/#{@course.id}/settings#tab-sections"
+
+      keep_trying_until do
+        body = f('body')
+        body.should include_text('Delete Section')
+      end
 
       f('.delete_section_link').click
       keep_trying_until do
@@ -143,6 +151,11 @@ describe "course settings" do
       add_section('Edit Section')
       get "/courses/#{@course.id}/settings#tab-sections"
 
+      keep_trying_until do
+        body = f('body')
+        body.should include_text('Edit Section')
+      end
+
       f('.edit_section_link').click
       section_input = f('#course_section_name')
       keep_trying_until { section_input.should be_displayed }
@@ -154,6 +167,11 @@ describe "course settings" do
 
     it "should move a nav item to disabled" do
       get "/courses/#{@course.id}/settings#tab-navigation"
+
+      keep_trying_until do
+        body = f('body')
+        body.should include_text('Drag and drop items to reorder them in the course navigation.')
+      end
       disabled_div = f('#nav_disabled_list')
       announcements_nav = f('#nav_edit_tab_id_14')
       driver.action.click_and_hold(announcements_nav).
