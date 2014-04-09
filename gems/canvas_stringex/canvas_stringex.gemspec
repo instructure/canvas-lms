@@ -18,8 +18,11 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  unless CANVAS_RAILS3
+  if CANVAS_RAILS3
+    spec.add_dependency 'rails', '~>3.2'
+  else
     spec.add_dependency 'fake_arel', '~> 1.5'
+    spec.add_dependency 'rails', '~>2.3'
   end
 
   spec.add_development_dependency "activerecord"

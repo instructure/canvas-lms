@@ -2,6 +2,10 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
+unless defined?(CANVAS_RAILS3)
+  require File.expand_path("../../../config/canvas_rails3", __FILE__)
+end
+
 Gem::Specification.new do |spec|
   spec.name          = "html_text_helper"
   spec.version       = '0.0.1'
@@ -15,8 +19,13 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'nokogiri', '1.5.6'
-  spec.add_dependency 'rails'
   spec.add_dependency 'sanitize', '2.0.3'
+
+  if CANVAS_RAILS3
+    spec.add_dependency 'rails', '~>3.2'
+  else
+    spec.add_dependency 'rails', '~>2.3'
+  end
 
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"

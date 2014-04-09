@@ -2,7 +2,7 @@
 result=0
 
 echo "################ Running tests against Rails 2 ################"
-unset  CANVAS_RAILS3
+export  CANVAS_RAILS3=0
 bundle install
 bundle exec rspec spec
 let result=$result+$?
