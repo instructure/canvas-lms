@@ -759,6 +759,12 @@ define [
         key: I18n.t 'keycodes.comment', 'c'
         desc: I18n.t 'keyboard_comment_desc', 'Comment on the active submission'
         }
+        {
+        keyCode: 84
+        handler: 'showToolTip'
+        key: I18n.t 'keycodes.tooltip', 't'
+        desc: I18n.t 'keyboard_tooltip_desc', 'Show the submission type of the active submission'
+        }
       ]
 
     getHeaderFromActiveCell: =>
@@ -778,6 +784,14 @@ define [
 
     showCommentDialog: =>
       $(@grid.getActiveCellNode()).find('.gradebook-cell-comment').click()
+
+    showToolTip: =>
+      node = $(@grid.getActiveCellNode())
+      if node.parent().css('top') == '0px'
+        node.find('div.gradebook-tooltip').addClass('first-row')
+      else
+        node.find('div.gradebook-tooltip').removeClass('first-row')
+      node.toggleClass("hover")
 
     handleKeys: (e) =>
       # makes sure the focus sink elements are currently active
