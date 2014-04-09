@@ -19,6 +19,7 @@ module Api::V1::ContextModule
   include Api::V1::Json
   include Api::V1::User
   include Api::V1::ExternalTools::UrlHelpers
+  include Api::V1::Locked
 
   MODULE_JSON_ATTRS = %w(id position name unlock_at)
 
@@ -148,6 +149,23 @@ module Api::V1::ContextModule
         details[attr] = val
       end
     end
+
+    item_type = case content_tag.content_type
+      when 'Quiz', 'Quizzes::Quiz'
+        'quiz'
+      when 'Assignment'
+        'assignment'
+      when 'DiscussionTopic'
+        'topic'
+      when 'Attachment'
+        'file'
+      when 'WikiPage'
+        'page'
+      else
+        ''
+    end
+    locked_json(details, item, current_user, item_type)
+
     details
   end
 end

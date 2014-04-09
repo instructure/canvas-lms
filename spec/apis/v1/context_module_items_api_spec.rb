@@ -132,11 +132,20 @@ describe "Module Items API", type: :request do
       compare_json(json, expected)
     end
 
-    it "should include item content details for index" do
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?include[]=content_details",
-                      :controller => "context_module_items_api", :action => "index", :format => "json",
-                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'])
-      json.find{|h| h["id"] == @assignment_tag.id}['content_details'].should == {'points_possible' => @assignment.points_possible}
+    context 'index with content details' do
+      let(:json) do
+        api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?include[]=content_details",
+          :controller => "context_module_items_api", :action => "index", :format => "json",
+          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'])
+      end
+      let(:assignment_details) { json.find{|item| item['id'] == @assignment_tag.id }['content_details'] }
+
+      it "should include item details" do
+        assignment_details.should include(
+          'points_possible' => @assignment.points_possible,
+          'locked_for_user' => false,
+        )
+      end
     end
 
     it 'should return the url for external tool items' do
@@ -195,12 +204,21 @@ describe "Module Items API", type: :request do
       }
     end
 
-    it "should include item content details for show" do
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?include[]=content_details",
-                      :controller => "context_module_items_api", :action => "show", :format => "json",
-                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'],
-                      :id => "#{@assignment_tag.id}")
-      json['content_details'].should == {'points_possible' => @assignment.points_possible}
+    context 'show with content details' do
+      let(:json) do
+        api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?include[]=content_details",
+          :controller => "context_module_items_api", :action => "show", :format => "json",
+          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'],
+          :id => "#{@assignment_tag.id}")
+      end
+      let(:assignment_details) { json['content_details'] }
+
+      it "should include item details" do
+        assignment_details.should include(
+          'points_possible' => @assignment.points_possible,
+          'locked_for_user' => false,
+        )
+      end
     end
 
     it "should frame_external_urls" do
@@ -847,32 +865,69 @@ describe "Module Items API", type: :request do
       json.map{|item| item['id']}.sort.should == @module2.content_tags.map(&:id).sort
     end
 
-    it "should include user specific content details on index" do
-      override_assignment
+    context 'index including content details' do
+      let(:json) do
+        api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?include[]=content_details",
+          :controller => "context_module_items_api", :action => "index", :format => "json",
+          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'])
+      end
+      let(:assignment_details) { json.find{|item| item['id'] == @assignment_tag.id}['content_details'] }
 
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?include[]=content_details",
-                      :controller => "context_module_items_api", :action => "index", :format => "json",
-                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'])
+      before do
+        override_assignment
+      end
 
-      json.find{|item| item['id'] == @assignment_tag.id}['content_details'].should == {
-          'points_possible' => @assignment.points_possible, 'due_at' => @due_at.iso8601,
-          'unlock_at' => @unlock_at.iso8601, 'lock_at' => @lock_at.iso8601
-      }
+      it "should include user specific details" do
+        assignment_details.should include(
+          'points_possible' => @assignment.points_possible,
+          'due_at' => @due_at.iso8601,
+          'unlock_at' => @unlock_at.iso8601,
+          'lock_at' => @lock_at.iso8601,
+        )
+      end
+
+      it "should include lock information" do
+        assignment_details['locked_for_user'].should == true
+        assignment_details.include?('lock_explanation')
+        assignment_details.include?('lock_info')
+        assignment_details['lock_info'].should include(
+          'asset_string' => @assignment.asset_string,
+          'unlock_at' => @unlock_at.iso8601,
+        )
+      end
     end
 
-    it "should include user specific content details on show" do
-      override_assignment
+    context 'show including content details' do
+      let(:json) do
+        api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?include[]=content_details",
+          :controller => "context_module_items_api", :action => "show", :format => "json",
+          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'],
+          :id => "#{@assignment_tag.id}")
+      end
+      let(:assignment_details) { json['content_details'] }
 
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?include[]=content_details",
-                      :controller => "context_module_items_api", :action => "show", :format => "json",
-                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'],
-                      :id => "#{@assignment_tag.id}"
-      )
+      before do
+        override_assignment
+      end
 
-      json['content_details'].should == {
-          'points_possible' => @assignment.points_possible, 'due_at' => @due_at.iso8601,
-          'unlock_at' => @unlock_at.iso8601, 'lock_at' => @lock_at.iso8601
-      }
+      it "should include user specific details" do
+        assignment_details.should include(
+          'points_possible' => @assignment.points_possible,
+          'due_at' => @due_at.iso8601,
+          'unlock_at' => @unlock_at.iso8601,
+          'lock_at' => @lock_at.iso8601,
+        )
+      end
+
+      it "should include lock information" do
+        assignment_details['locked_for_user'].should == true
+        assignment_details.include?('lock_explanation')
+        assignment_details.include?('lock_info')
+        assignment_details['lock_info'].should include(
+          'asset_string' => @assignment.asset_string,
+          'unlock_at' => @unlock_at.iso8601,
+        )
+      end
     end
 
     it "should show module item completion" do
