@@ -554,10 +554,6 @@ module Api
                           exception_message: message)
   end
 
-  def valid_iso8601?(date_time)
-    date_time.to_s =~ ISO8601_REGEX
-  end
-
   # regex for valid iso8601 dates
   ISO8601_REGEX = /^(?<year>-?[0-9]{4})-
                     (?<month>1[0-2]|0[1-9])-
