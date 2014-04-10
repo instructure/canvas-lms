@@ -58,6 +58,7 @@ class Attachments::S3Storage
       end
       tempfile = Tempfile.new(["attachment_#{attachment.id}", attachment.extension],
                               opts[:temp_folder].presence || Dir::tmpdir)
+      tempfile.binmode
       attachment.s3object.read do |chunk|
         tempfile.write(chunk)
       end
