@@ -30,11 +30,11 @@ class ContextController < ApplicationController
       if params[:id] && params[:type] && @context.respond_to?(:media_objects)
         self.extend TextHelper
         @media_object = @context.media_objects.find_or_initialize_by_media_id_and_media_type(params[:id], params[:type])
-        @media_object.title = truncate_text(params[:title], :max_length => 255) if params[:title]
+        @media_object.title = CanvasTextHelper.truncate_text(params[:title], :max_length => 255) if params[:title]
         @media_object.user = @current_user
         @media_object.media_type = params[:type]
         @media_object.root_account_id = @domain_root_account.id if @domain_root_account && @media_object.respond_to?(:root_account_id)
-        @media_object.user_entered_title = truncate_text(params[:user_entered_title], :max_length => 255) if params[:user_entered_title] && !params[:user_entered_title].empty?
+        @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], :max_length => 255) if params[:user_entered_title] && !params[:user_entered_title].empty?
         @media_object.save
       end
       render :json => @media_object

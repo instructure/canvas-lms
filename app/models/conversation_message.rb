@@ -297,7 +297,7 @@ class ConversationMessage < ActiveRecord::Base
     extend ApplicationHelper
     extend ConversationsHelper
 
-    title = ERB::Util.h(truncate_text(self.body, :max_words => 8, :max_length => 80))
+    title = ERB::Util.h(CanvasTextHelper.truncate_text(self.body, :max_words => 8, :max_length => 80))
 
     # build content, should be:
     # message body

@@ -4,3 +4,8 @@ gemspec
 
 gem 'html_text_helper', path: '../html_text_helper'
 gem 'utf8_cleaner', path: '../utf8_cleaner'
+
+# TODO: this is sad because it's not a direct dependency, but rather
+# a dependency of html_text_helper that bundler doesn't know how to resolve
+# here.  I've reached out to the bundler team, but no word yet
+gem 'canvas_text_helper', path: '../canvas_text_helper'

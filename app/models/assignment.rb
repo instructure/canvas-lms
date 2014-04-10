@@ -870,7 +870,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def title_slug
-    truncate_text(title, :ellipsis => '')
+    CanvasTextHelper.truncate_text(title, :ellipsis => '')
   end
 
   def self.title_and_id(str)

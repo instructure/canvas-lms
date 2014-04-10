@@ -227,7 +227,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def add_import_warning(item_type, item_name, warning)
-    item_name = truncate_text(item_name || "", :max_length => 150)
+    item_name = CanvasTextHelper.truncate_text(item_name || "", :max_length => 150)
     add_warning(t('errors.import_error', "Import Error: ") + "#{item_type} - \"#{item_name}\"", warning)
   end
 

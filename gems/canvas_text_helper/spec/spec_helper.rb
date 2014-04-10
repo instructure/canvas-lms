@@ -9,7 +9,7 @@ require 'simplecov-rcov'
 
 SimpleCov.use_merging
 SimpleCov.merge_timeout(10000)
-SimpleCov.command_name('html-text-helper-spec-gem')
+SimpleCov.command_name('canvas-text-helper-spec-gem')
 SimpleCov.start('test_frameworks') do
   SimpleCov.coverage_dir('../../coverage')
   SimpleCov.at_exit {
@@ -18,7 +18,6 @@ SimpleCov.start('test_frameworks') do
 end
 
 require 'canvas_text_helper'
-require 'html_text_helper'
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true

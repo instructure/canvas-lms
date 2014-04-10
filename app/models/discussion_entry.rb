@@ -166,7 +166,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def summary(length=150)
-    strip_and_truncate(message, :max_length => length)
+    HtmlTextHelper.strip_and_truncate(message, :max_length => length)
   end
 
   def plaintext_message(length=250)

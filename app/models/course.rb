@@ -808,7 +808,7 @@ class Course < ActiveRecord::Base
   end
 
   def short_name_slug
-    truncate_text(short_name, :ellipsis => '')
+    CanvasTextHelper.truncate_text(short_name, :ellipsis => '')
   end
 
   # Allows the account to be set directly

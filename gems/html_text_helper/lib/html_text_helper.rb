@@ -20,6 +20,7 @@ require 'cgi'
 require 'iconv'
 require 'active_support/core_ext'
 require 'sanitize'
+require 'canvas_text_helper'
 
 module HtmlTextHelper
   def self.strip_tags(text)
@@ -254,5 +255,9 @@ module HtmlTextHelper
 
   def self.unescape_html(text)
     CGI::unescapeHTML text
+  end
+
+  def self.strip_and_truncate(text, options={})
+    CanvasTextHelper::truncate_text(strip_tags(text), options)
   end
 end
