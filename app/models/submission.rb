@@ -40,6 +40,18 @@ class Submission < ActiveRecord::Base
   has_many :conversation_messages, :as => :asset # one message per private conversation
   has_many :content_participations, :as => :content
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :body, :url, :attachment_id, :grade, :score, :submitted_at, :assignment_id, :user_id, :submission_type, :workflow_state, :created_at, :updated_at, :group_id,
+    :attachment_ids, :processed, :process_attempts, :grade_matches_current_submission, :published_score, :published_grade, :graded_at, :student_entered_score, :grader_id,
+    :media_comment_id, :media_comment_type, :quiz_submission_id, :submission_comments_count, :has_rubric_assessment, :attempt, :context_code, :media_object_id,
+    :turnitin_data, :has_admin_comment, :cached_due_date
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [
+    :attachment, :assignment, :user, :grader, :group, :media_object, :student, :submission_comments, :assessment_requests, :assigned_assessments, :quiz_submission,
+    :rubric_assessment, :rubric_assessments, :attachments, :conversation_messages, :content_participations
+  ]
+
   serialize :turnitin_data, Hash
   validates_presence_of :assignment_id, :user_id
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true

@@ -35,6 +35,13 @@ class ContentMigration < ActiveRecord::Base
   attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type
   attr_accessor :outcome_to_id_map
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :context_id, :user_id, :workflow_state, :migration_settings, :started_at, :finished_at, :created_at, :updated_at, :context_type,
+    :error_count, :error_data, :attachment_id, :overview_attachment_id, :exported_attachment_id, :source_course_id, :migration_type
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:context, :user, :attachment, :overview_attachment, :exported_attachment, :content_export]
+
   workflow do
     state :created
     #The pre_process states can be used by individual plugins as needed

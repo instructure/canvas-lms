@@ -21,6 +21,9 @@ class AssessmentQuestionBankUser < ActiveRecord::Base
   attr_accessible :assessment_question_bank, :user
   belongs_to :assessment_question_bank
   belongs_to :user
+
+  EXPORTABLE_ATTRIBUTES = [:id, :assessment_question_bank_id, :user_id, :permissions, :workflow_state, :deleted_at, :created_at, :updated_at]
+  EXPORTABLE_ASSOCIATIONS = [:assessment_question_bank, :user]
   validates_presence_of :assessment_question_bank_id, :user_id, :workflow_state
   
   workflow do

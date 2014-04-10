@@ -23,6 +23,9 @@ class Collaborator < ActiveRecord::Base
   belongs_to :group
   belongs_to :user
 
+  EXPORTABLE_ATTRIBUTES = [:id, :user_id, :collaboration_id, :created_at, :updated_at, :authorized_service_user_id, :group_id]
+  EXPORTABLE_ASSOCIATIONS = [:collaboration, :group, :user]
+
   has_a_broadcast_policy
 
   set_broadcast_policy do |p|

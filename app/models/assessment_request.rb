@@ -19,6 +19,13 @@
 class AssessmentRequest < ActiveRecord::Base
   include Workflow
   attr_accessible :rubric_assessment, :user, :asset, :assessor_asset, :comments, :rubric_association, :assessor
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :rubric_assessment_id, :user_id, :asset_id, :asset_type, :assessor_asset_id, :assessor_asset_type,
+    :comments, :workflow_state, :created_at, :updated_at, :uuid, :rubric_association_id, :assessor_id
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:user, :asset, :assessor_asset, :submission, :submission_comments, :rubric_assessment]
+
   belongs_to :user
   belongs_to :asset, :polymorphic => true
   belongs_to :assessor_asset, :polymorphic => true

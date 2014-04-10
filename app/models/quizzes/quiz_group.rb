@@ -26,6 +26,9 @@ class Quizzes::QuizGroup < ActiveRecord::Base
   belongs_to :assessment_question_bank
   has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion', :dependent => :destroy
 
+  EXPORTABLE_ATTRIBUTES = [:id, :quiz_id, :name, :pick_count, :question_points, :position, :created_at, :updated_at, :assessment_question_bank_id]
+  EXPORTABLE_ASSOCIATIONS = [:quiz, :assessment_question_bank, :quiz_questions]
+
   validates_presence_of :quiz_id
   validates_length_of :name, maximum: maximum_string_length, allow_nil: true
   validates_numericality_of :pick_count, :question_points, allow_nil: true

@@ -38,6 +38,13 @@ class ConversationMessage < ActiveRecord::Base
   delegate :subscribed_participants, :to => :conversation
   attr_accessible
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :conversation_id, :author_id, :created_at, :generated, :body, :forwarded_message_ids, :media_comment_id, :media_comment_type, :context_id, :context_type,
+    :asset_id, :asset_type, :attachment_ids, :has_attachments, :has_media_objects
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:conversation, :author, :context, :conversation_message_participants, :attachment_associations, :attachments, :asset]
+
   after_create :generate_user_note!
 
   scope :human, where("NOT generated")

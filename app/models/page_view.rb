@@ -29,6 +29,12 @@ class PageView < ActiveRecord::Base
   before_save :cap_interaction_seconds
   belongs_to :context, :polymorphic => true
 
+  EXPORTABLE_ATTRIBUTES = [
+    :request_id, :session_id, :user_id, :url, :context_id, :context_type, :asset_id, :asset_type, :controller, :action, :interaction_seconds, :created_at, :updated_at,
+    :user_request, :render_time, :user_agent, :asset_user_access_id, :participated, :summarized, :account_id, :real_user_id, :http_method, :remote_ip
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:user, :account, :real_user, :asset_user_access, :context]
   attr_accessor :generated_by_hand
   attr_accessor :is_update
 

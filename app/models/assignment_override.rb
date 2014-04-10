@@ -23,6 +23,12 @@ class AssignmentOverride < ActiveRecord::Base
   simply_versioned :keep => 10
 
   attr_accessible
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :created_at, :updated_at, :assignment_id, :assignment_version, :set_type, :set_id, :title, :workflow_state, :due_at_overridden, :due_at, :all_day,
+    :all_day_date, :unlock_at_overridden, :unlock_at, :lock_at_overridden, :lock_at, :quiz_id, :quiz_version
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:assignment, :quiz, :assignment_override_students]
 
   attr_accessor :dont_touch_assignment
 

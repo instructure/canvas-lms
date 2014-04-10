@@ -21,6 +21,10 @@ class UserNote < ActiveRecord::Base
   attr_accessible :user, :note, :title, :creator
   belongs_to :user
   belongs_to :creator, :class_name => 'User', :foreign_key => :created_by_id
+
+  EXPORTABLE_ATTRIBUTES = [:id, :user_id, :note, :title, :created_by_id, :workflow_state, :deleted_at, :created_at, :updated_at]
+  EXPORTABLE_ASSOCIATIONS = [:user, :creator]
+
   validates_presence_of :user_id, :created_by_id, :workflow_state
   validates_length_of :note, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   after_save :update_last_user_note

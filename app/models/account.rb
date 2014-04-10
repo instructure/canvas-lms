@@ -24,41 +24,55 @@ class Account < ActiveRecord::Base
     :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
     :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id
 
+  EXPORTABLE_ATTRIBUTES = [:id, :name, :created_at, :updated_at, :workflow_state, :deleted_at,
+    :membership_types, :default_time_zone, :external_status, :storage_quota,
+    :enable_user_notes, :allowed_services, :turnitin_pledge, :turnitin_comments,
+    :turnitin_account_id, :allow_sis_import, :sis_source_id, :equella_endpoint,
+    :settings, :uuid, :default_locale, :default_user_storage_quota, :turnitin_host,
+    :created_by_id, :lti_guid, :default_group_storage_quota
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [
+    :courses, :group_categories, :groups, :enrollment_terms, :enrollments, :account_users, :course_sections,
+    :users, :pseudonyms, :attachments, :folders, :active_assignments, :grading_standards, :assessment_questions,
+    :assessment_question_banks, :roles, :announcements, :alerts, :course_account_associations, :user_account_associations
+  ]
+
   include Workflow
   belongs_to :parent_account, :class_name => 'Account'
   belongs_to :root_account, :class_name => 'Account'
   authenticates_many :pseudonym_sessions
-  has_many :courses, :exportable => true
+  has_many :courses
   has_many :all_courses, :class_name => 'Course', :foreign_key => 'root_account_id'
   has_many :group_categories, :as => :context, :conditions => ['deleted_at IS NULL']
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
-  has_many :groups, :as => :context, :exportable => true
+  has_many :groups, :as => :context
   has_many :all_groups, :class_name => 'Group', :foreign_key => 'root_account_id'
-  has_many :enrollment_terms, :foreign_key => 'root_account_id', :exportable => true
-  has_many :enrollments, :foreign_key => 'root_account_id', :conditions => ["enrollments.type != 'StudentViewEnrollment'"], :exportable => true
+  has_many :enrollment_terms, :foreign_key => 'root_account_id'
+  has_many :enrollments, :foreign_key => 'root_account_id', :conditions => ["enrollments.type != 'StudentViewEnrollment'"]
   has_many :sub_accounts, :class_name => 'Account', :foreign_key => 'parent_account_id', :conditions => ['workflow_state != ?', 'deleted']
   has_many :all_accounts, :class_name => 'Account', :foreign_key => 'root_account_id', :order => 'name'
-  has_many :account_users, :dependent => :destroy, :exportable => true
-  has_many :course_sections, :foreign_key => 'root_account_id', :exportable => true
-  has_many :sis_batches, :exportable => true
+  has_many :account_users, :dependent => :destroy
+  has_many :course_sections, :foreign_key => 'root_account_id'
+  has_many :sis_batches
   has_many :abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'account_id'
   has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
-  has_many :users, :through => :account_users, :exportable => true
-  has_many :pseudonyms, :include => :user, :exportable => true
+  has_many :users, :through => :account_users
+  has_many :pseudonyms, :include => :user
   has_many :role_overrides, :as => :context
   has_many :course_account_associations
   has_many :child_courses, :through => :course_account_associations, :source => :course, :conditions => ['course_account_associations.depth = 0']
-  has_many :attachments, :as => :context, :dependent => :destroy, :exportable => true
-  has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted'], :exportable => true
-  has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name', :exportable => true
+  has_many :attachments, :as => :context, :dependent => :destroy
+  has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
+  has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name'
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :account_authorization_configs, :order => "position"
   has_many :account_reports
-  has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted'], :exportable => true
-  has_many :assessment_questions, :through => :assessment_question_banks, :exportable => true
-  has_many :assessment_question_banks, :as => :context, :include => [:assessment_questions, :assessment_question_bank_users], :exportable => true
+  has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
+  has_many :assessment_questions, :through => :assessment_question_banks
+  has_many :assessment_question_banks, :as => :context, :include => [:assessment_questions, :assessment_question_bank_users]
   has_many :roles
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
   has_many :progresses, :as => :context
@@ -80,8 +94,8 @@ class Account < ActiveRecord::Base
 
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   has_many :error_reports
-  has_many :announcements, :class_name => 'AccountNotification', :exportable => true
-  has_many :alerts, :as => :context, :include => :criteria, :exportable => true
+  has_many :announcements, :class_name => 'AccountNotification'
+  has_many :alerts, :as => :context, :include => :criteria
   has_many :user_account_associations
   has_many :report_snapshots
 

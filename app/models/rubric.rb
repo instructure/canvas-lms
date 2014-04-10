@@ -26,6 +26,13 @@ class Rubric < ActiveRecord::Base
   has_many :rubric_assessments, :through => :rubric_associations, :dependent => :destroy
   has_many :learning_outcome_alignments, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :user_id, :rubric_id, :context_id, :context_type, :data, :points_possible, :title, :description, :created_at, :updated_at, :reusable, :public, :read_only,
+    :association_count, :free_form_criterion_comments, :context_code, :hide_score_total, :workflow_state
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:user, :rubric, :context, :rubric_associations, :rubric_assessments, :learning_outcome_alignments]
+
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true

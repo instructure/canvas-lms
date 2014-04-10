@@ -19,6 +19,10 @@
 class AssessmentQuestionBank < ActiveRecord::Base
   include Workflow
   attr_accessible :context, :title, :user, :alignments
+  EXPORTABLE_ATTRIBUTES = [:id, :context_id, :context_type, :title, :workflow_state, :deleted_at, :created_at, :updated_at]
+
+  EXPORTABLE_ASSOCIATIONS = [:context, :assessment_questions, :assessment_question_bank_users, :learning_outcome_alignments, :quiz_groups]
+
   belongs_to :context, :polymorphic => true
   has_many :assessment_questions, :order => 'name, position, created_at'
   has_many :assessment_question_bank_users

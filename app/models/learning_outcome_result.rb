@@ -30,6 +30,13 @@ class LearningOutcomeResult < ActiveRecord::Base
   belongs_to :associated_asset, :polymorphic => true
   belongs_to :context, :polymorphic => true
   simply_versioned
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :context_id, :context_type, :context_code, :association_id, :association_type, :content_tag_id, :learning_outcome_id, :mastery, :user_id, :score, :created_at, :updated_at,
+    :attempt, :possible, :comments, :original_score, :original_possible, :original_mastery, :artifact_id, :artifact_type, :assessed_at, :title, :percent, :associated_asset_id, :associated_asset_type
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:user, :learning_outcome, :association_object, :artifact, :associated_asset, :context]
   before_save :infer_defaults
 
   attr_accessible :learning_outcome, :user, :association_object, :alignment, :associated_asset

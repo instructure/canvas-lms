@@ -19,6 +19,13 @@
 class AssessmentQuestion < ActiveRecord::Base
   include Workflow
   attr_accessible :name, :question_data, :form_question_data
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :name, :question_data, :context_id, :context_type, :workflow_state,
+    :created_at, :updated_at, :assessment_question_bank_id, :deleted_at, :position
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:quiz_questions, :attachments, :context, :assessment_question_bank]
+
   has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion'
   has_many :attachments, :as => :context
   delegate :context, :context_id, :context_type, :to => :assessment_question_bank

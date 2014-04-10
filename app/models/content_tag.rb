@@ -34,6 +34,13 @@ class ContentTag < ActiveRecord::Base
   # This allows doing a has_many_through relationship on ContentTags for linked LearningOutcomes. (see LearningOutcomeContext)
   belongs_to :learning_outcome_content, :class_name => 'LearningOutcome', :foreign_key => :content_id
   has_many :learning_outcome_results
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :content_id, :content_type, :context_id, :context_type, :title, :tag, :url, :created_at, :updated_at, :comments, :tag_type, :context_module_id, :position,
+    :indent, :learning_outcome_id, :context_code, :mastery_score, :rubric_association_id, :workflow_state, :cloned_item_id, :associated_asset_id, :associated_asset_type, :new_tab
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:content, :context, :associated_asset, :context_module, :learning_outcome, :learning_outcome_results, :learning_outcome_content]
   # This allows bypassing loading context for validation if we have
   # context_id and context_type set, but still allows validating when
   # context is not yet saved.

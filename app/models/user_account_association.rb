@@ -20,6 +20,9 @@ class UserAccountAssociation < ActiveRecord::Base
   belongs_to :user
   belongs_to :account
 
+  EXPORTABLE_ATTRIBUTES = [:id, :user_id, :account_id, :depth, :created_at, :updated_at]
+  EXPORTABLE_ASSOCIATIONS = [:user, :account]
+
   validates_presence_of :user_id, :account_id
 
   attr_accessible :account_id, :depth

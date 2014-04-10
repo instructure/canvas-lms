@@ -31,6 +31,9 @@ class ContentExport < ActiveRecord::Base
 
   alias_method :context, :course
 
+  EXPORTABLE_ATTRIBUTES = [:id, :user_id, :course_id, :attachment_id, :export_type, :settings, :workflow_state, :created_at, :updated_at, :content_migration_id]
+  EXPORTABLE_ASSOCIATIONS = [:course, :user, :attachment, :content_migration, :attachments]
+
   #export types
   COMMON_CARTRIDGE = 'common_cartridge'
   COURSE_COPY = 'course_copy'

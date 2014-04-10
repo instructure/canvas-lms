@@ -21,6 +21,13 @@ class AssignmentGroup < ActiveRecord::Base
   include Workflow
 
   attr_accessible :name, :rules, :assignment_weighting_scheme, :group_weight, :position, :default_assignment_name
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :name, :rules, :default_assignment_name, :assignment_weighting_scheme, :group_weight, :context_id,
+    :context_type, :workflow_state, :created_at, :updated_at, :cloned_item_id, :context_code
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:context, :assignments]
+
   attr_readonly :context_id, :context_type
   belongs_to :context, :polymorphic => true
   acts_as_list scope: { context: self, workflow_state: 'available' }

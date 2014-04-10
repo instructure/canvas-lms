@@ -30,6 +30,14 @@ class WikiPage < ActiveRecord::Base
 
   belongs_to :wiki, :touch => true
   belongs_to :user
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :wiki_id, :title, :body, :workflow_state, :recent_editors, :user_id, :created_at, :updated_at, :url, :delayed_post_at, :protected_editing, :hide_from_students,
+    :editing_roles, :view_count, :revised_at, :could_be_locked, :cloned_item_id, :wiki_page_comments_count
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:wiki, :user]
+
   acts_as_url :title, :scope => [:wiki_id, :not_deleted], :sync_url => true
 
   validate :validate_front_page_visibility

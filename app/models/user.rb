@@ -29,6 +29,24 @@ class User < ActiveRecord::Base
   attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use, :self_enrollment_code, :initial_enrollment_type
   attr_accessor :previous_id, :menu_data
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :name, :sortable_name, :workflow_state, :time_zone, :uuid, :created_at, :updated_at, :visibility, :avatar_image_url, :avatar_image_source, :avatar_image_updated_at,
+    :phone, :school_name, :school_position, :short_name, :deleted_at, :show_user_services, :gender, :page_views_count, :unread_inbox_items_count, :reminder_time_for_due_dates,
+    :reminder_time_for_grading, :storage_quota, :visible_inbox_types, :last_user_note, :subscribe_to_emails, :features_used, :preferences, :avatar_state, :locale, :browser_locale,
+    :unread_conversations_count, :public, :birthdate, :otp_communication_channel_id, :initial_enrollment_type, :crocodoc_id, :last_logged_out
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [
+    :communication_channels, :notification_policies, :communication_channel, :enrollments, :observer_enrollments, :observee_enrollments, :observers, :user_observers,
+    :user_observees, :observed_users, :courses, :group_memberships, :groups, :associated_accounts, :associated_root_accounts, :context_external_tools, :submissions,
+    :pseudonyms, :pseudonym_accounts, :pseudonym, :attachments, :folders, :calendar_events, :quiz_submissions, :eportfolios, :collaborations, :user_services,
+    :rubric_associations, :rubrics, :context_rubrics, :grading_standards, :context_module_progressions, :assessment_question_bank_users, :assessment_question_banks,
+    :learning_outcome_results, :inbox_items, :submission_comment_participants, :submission_comments, :collaborators, :assigned_assessments, :web_conference_participants,
+    :web_conferences, :account_users, :accounts, :media_objects, :user_generated_media_objects, :user_notes, :all_conversations, :conversation_batches, :favorites,
+    :messages, :profile, :otp_communication_channel
+  ]
+
+
   before_save :infer_defaults
   serialize :preferences
   include TimeZoneHelper

@@ -27,6 +27,13 @@ class SisBatch < ActiveRecord::Base
   belongs_to :batch_mode_term, :class_name => 'EnrollmentTerm'
   belongs_to :user
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :account_id, :batch_id, :ended_at, :errored_attempts, :workflow_state, :data, :created_at, :updated_at, :attachment_id, :processing_errors,
+    :processing_warnings, :batch_mode, :options, :user_id
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:account, :attachment, :user]
+
   before_save :limit_size_of_messages
 
   validates_presence_of :account_id, :workflow_state

@@ -24,7 +24,10 @@ class GroupMembership < ActiveRecord::Base
   belongs_to :user
 
   attr_accessible :group, :user, :workflow_state, :moderator
-  
+
+  EXPORTABLE_ATTRIBUTES = [:id, :group_id, :workflow_state, :created_at, :updated_at, :user_id, :uuid, :sis_batch_id, :moderator]
+  EXPORTABLE_ASSOCIATIONS = [:group, :user]
+
   before_save :assign_uuid
   before_save :auto_join
   before_save :capture_old_group_id

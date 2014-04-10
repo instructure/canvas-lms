@@ -24,6 +24,9 @@ class Alert < ActiveRecord::Base
 
   attr_accessible :context, :repetition, :criteria, :recipients
 
+  EXPORTABLE_ATTRIBUTES = [:id, :context_id, :context_type, :repetition, :recipients, :created_at, :updated_at]
+  EXPORTABLE_ASSOCIATIONS = [:context, :criteria]
+
   validates_presence_of :context_id
   validates_presence_of :context_type
   validates_presence_of :criteria

@@ -9,6 +9,14 @@ class ContextExternalTool < ActiveRecord::Base
                   :course_navigation, :account_navigation, :user_navigation,
                   :resource_selection, :editor_button, :homework_submission,
                   :config_type, :config_url, :config_xml, :tool_id
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :context_id, :context_type, :domain, :url, :name, :description, :settings, :workflow_state, :created_at, :updated_at, :has_user_navigation, :has_course_navigation,
+    :has_account_navigation, :has_resource_selection, :has_editor_button, :cloned_item_id, :tool_id, :has_homework_submission
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:content_tags, :context]
+
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_presence_of :name, :consumer_key, :shared_secret
   validates_length_of :name, :maximum => maximum_string_length

@@ -21,6 +21,10 @@ class EportfolioEntry < ActiveRecord::Base
   attr_readonly :eportfolio_id, :eportfolio_category_id
   belongs_to :eportfolio
   belongs_to :eportfolio_category
+
+  EXPORTABLE_ATTRIBUTES = [:id, :eportfolio_id, :eportfolio_category_id, :position, :name, :artifact_type, :attachment_id, :allow_comments, :show_comments, :slug, :url, :content, :created_at, :updated_at]
+  EXPORTABLE_ASSOCIATIONS = [:eportfolio, :eportfolio_category]
+
   acts_as_list :scope => :eportfolio_category
   before_save :infer_unique_slug
   before_save :infer_comment_visibility

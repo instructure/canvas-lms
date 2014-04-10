@@ -31,9 +31,12 @@ class RubricAssessment < ActiveRecord::Base
   belongs_to :artifact, :polymorphic => true, :touch => true
   has_many :assessment_requests, :dependent => :destroy
   serialize :data
-  
+
   simply_versioned
-  
+
+  EXPORTABLE_ATTRIBUTES = [:id, :user_id, :rubric_id, :rubric_association_id, :score, :data, :comments, :created_at, :updated_at, :artifact_id, :artifact_type, :assessment_type, :assessor_id, :artifact_attempt]
+  EXPORTABLE_ASSOCIATIONS = [:rubric, :rubric_association, :user, :assessor, :artifact, :assessment_requests]
+
   validates_presence_of :assessment_type, :rubric_id, :artifact_id, :artifact_type, :assessor_id
   validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   

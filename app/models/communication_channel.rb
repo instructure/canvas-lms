@@ -31,6 +31,13 @@ class CommunicationChannel < ActiveRecord::Base
   has_many :messages
   belongs_to :access_token
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :path, :path_type, :position, :user_id, :pseudonym_id, :bounce_count, :workflow_state, :confirmation_code,
+    :created_at, :updated_at, :build_pseudonym_on_confirm
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:pseudonyms, :pseudonym, :user, :notification_policies, :delayed_mesasge, :messages]
+
   before_save :consider_retiring, :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
   validates_presence_of :path, :path_type, :user, :workflow_state

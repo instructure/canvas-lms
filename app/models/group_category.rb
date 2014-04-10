@@ -27,6 +27,9 @@ class GroupCategory < ActiveRecord::Base
   has_many :progresses, :as => 'context', :dependent => :destroy
   has_one :current_progress, :as => 'context', :class_name => 'Progress', :conditions => "workflow_state IN ('queued','running')", :order => 'created_at'
 
+  EXPORTABLE_ATTRIBUTES = [:id, :context_id, :context_type, :name, :role, :deleted_at, :self_signup, :group_limit]
+  EXPORTABLE_ASSOCIATIONS = [:context, :groups, :assignments]
+
   after_save :auto_create_groups
 
   validates_each :name do |record, attr, value|

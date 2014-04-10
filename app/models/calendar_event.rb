@@ -27,6 +27,15 @@ class CalendarEvent < ActiveRecord::Base
       :participants_per_appointment, :child_event_data,
       :remove_child_events, :all_day
   attr_accessor :cancel_reason, :imported
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :title, :description, :location_name, :location_address, :start_at, :end_at, :context_id, :context_type, :workflow_state, :created_at, :updated_at,
+    :user_id, :all_day, :all_day_date, :deleted_at, :cloned_item_id, :context_code, :time_zone_edited, :parent_calendar_event_id, :effective_context_code,
+    :participants_per_appointment, :override_participants_per_appointment
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:context, :user, :child_events]
+
   sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [self.effective_context, nil] }
 

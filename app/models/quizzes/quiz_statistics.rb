@@ -26,6 +26,9 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
     :dependent => :destroy
   has_one :progress, :as => 'context', :dependent => :destroy
 
+  EXPORTABLE_ATTRIBUTES = [:id, :quiz_id, :includes_all_versions, :anonymous, :created_at, :updated_at, :report_type]
+  EXPORTABLE_ASSOCIATIONS = [:quiz, :csv_attachment]
+
   scope :report_type, lambda { |type| where(:report_type => type) }
 
   REPORTS = %w[student_analysis item_analysis].freeze

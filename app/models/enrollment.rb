@@ -29,6 +29,14 @@ class Enrollment < ActiveRecord::Base
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :user_id, :course_id, :type, :uuid, :workflow_state, :created_at, :updated_at, :associated_user_id, :sis_source_id, :sis_batch_id, :start_at, :end_at,
+    :course_section_id, :root_account_id, :computed_final_score, :completed_at, :self_enrolled, :computed_current_score, :grade_publishing_status, :last_publish_attempt_at,
+    :grade_publishing_message, :limit_privileges_to_course_section, :role_name, :last_activity_at
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:course, :course_section, :root_account, :user, :role_overrides, :pseudonyms]
+
   validates_presence_of :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state
   validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
   validates_inclusion_of :associated_user_id, :in => [nil],

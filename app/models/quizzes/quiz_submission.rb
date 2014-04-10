@@ -22,6 +22,14 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   include Workflow
   attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade
   attr_readonly :quiz_id, :user_id
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :quiz_id, :quiz_version, :user_id, :submission_data, :submission_id, :score, :kept_score, :quiz_data, :started_at, :end_at, :finished_at, :attempt, :workflow_state,
+    :created_at, :updated_at, :fudge_points, :quiz_points_possible, :extra_attempts, :temporary_user_code, :extra_time, :manually_unlocked, :manually_scored, :score_before_regrade, :was_preview
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:quiz, :user, :submission, :attachments]
+
   validates_presence_of :quiz_id
   validates_numericality_of :extra_time, greater_than_or_equal_to: 0,
     less_than_or_equal_to: 10080, # one week
