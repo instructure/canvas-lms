@@ -554,17 +554,6 @@ describe "context_modules" do
       @assignment.context_module_tags.each { |tag| tag.title.should == 'again' }
     end
 
-    it "should truncate long text headers to 98 characters" do
-      set_course_draft_state
-      mod = @course.context_modules.create! name: 'TestModule'
-      tag1 = mod.add_item(title: 'This is a really long module text header that should be truncated to exactly 98 characters plus the ... part so 101 characters really', type: 'sub_header')
-
-      get "/courses/#{@course.id}/modules"
-      locked_title = ff("#context_module_item_#{tag1.id} .locked_title")
-
-      locked_title[0].text.length.should == 98
-    end
-
     it "should add the 'with-completion-requirements' class to rows that have requirements" do
       set_course_draft_state
       mod = @course.context_modules.create! name: 'TestModule'

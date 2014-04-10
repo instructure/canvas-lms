@@ -31,11 +31,47 @@ $context_module_bg_color: #f2f3f4
     .links
       float: right
 
+  .due_date_display, .points_possible_display
+    width: 65px
+    margin-right: 5px
+
+  .ig-details
+    width: 180px
+
   .ig-row.with-completion-requirements
     height: 55px
 
-  .student-view .requirement-description
-    left: 36px
+  .module-item-title
+    min-width: 300px
+    right: 230px
+
+  h2 .name
+    display: inline
+    position: absolute
+    left: 45px
+    right: 140px
+    top: 6px
+    white-space: nowrap
+    text-overflow: ellipsis
+    overflow: hidden
+
+  &.student-view
+    h2 .name
+      left: 20px
+
+  .student-view 
+    .requirement-description
+      left: 36px
+    .module-item-title
+      right: 150px
+    .ig-details
+      width: 125px
+      right: 0px
+    .due_date_display
+      width: 65px
+    .points_possible_display
+      width: 33px
+      right: 125px
     
   .requirement-description
     position: absolute
@@ -76,6 +112,7 @@ $context_module_bg_color: #f2f3f4
   &.collapsed_module
     .expand_module_link
       display: inline
+      position: absolute
     .collapse_module_link,
     .content
       display: none
@@ -94,7 +131,7 @@ $context_module_bg_color: #f2f3f4
       .title 
         display: none
       .locked_title 
-        display: inline-block
+        display: inline
       .completion_requirement
         color: #aaa
     .completion_status
@@ -240,7 +277,7 @@ $context_module_bg_color: #f2f3f4
       .title
         display: none
       .locked_title
-        display: inline-block
+        display: inline
       .completion_requirement
         color: #aaa
   .module_item_icons
@@ -282,7 +319,7 @@ $context_module_bg_color: #f2f3f4
     .title 
       display: none
     .locked_title 
-      display: inline-block
+      display: inline
 
   &.context_module_sub_header 
     .title
@@ -292,7 +329,7 @@ $context_module_bg_color: #f2f3f4
     .criterion img
       display: none
     .locked_title
-      display: inline-block
+      display: inline
       font-weight: bold
       color: #888
   .links
@@ -392,3 +429,18 @@ body.ie
   div.completion_criterion_option
     select.assignment_picker
       width: auto
+
+@media screen and (max-width : 1024px)
+  .with-left-side.modules
+    min-width: 700px
+
+  #context_modules
+    .student-view
+      .due_date_display
+        display: block
+
+    .due_date_display
+      display: none
+    .ig-details
+      width: 115px
+
