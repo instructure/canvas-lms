@@ -9,7 +9,7 @@
 
 <div
   class="item-group-condensed context_module
-    <%= 'editable_context_module' if editable %>"
+    <%= 'editable_context_module' if editable %> <%= 'student-view' unless editable %>"
     aria-label="<%= context_module ? context_module.name : "" %>"
     data-workflow-state="<%= context_module ? context_module.workflow_state : "{{ workflow_state }}"%>"
     data-module-url="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>"
@@ -35,6 +35,7 @@
       href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse"
       class="ig-header-title collapse_module_link"
       aria-controls="context_module_content_<%= context_module && context_module.id %>"
+      title="<%= context_module.try_rescue(:name) || nbsp %>"
     >
       <i class="icon-mini-arrow-down"></i>
       <span class="name"><%= context_module.try_rescue(:name) || nbsp %></span>
@@ -43,6 +44,7 @@
       href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/collapse"
       class="ig-header-title expand_module_link"
       aria-controls="context_module_content_<%= context_module && context_module.id %>"
+      title="<%= context_module.try_rescue(:name) || nbsp %>"
     >
       <i class="icon-mini-arrow-right"></i>
       <span class="name"><%= context_module.try_rescue(:name) || nbsp %></span>
