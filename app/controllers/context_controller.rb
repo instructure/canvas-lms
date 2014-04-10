@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -290,6 +290,16 @@ class ContextController < ApplicationController
 
   def roster_user
     if authorized_action(@context, @current_user, :read_roster)
+      if params[:id] !~ Api::ID_REGEX
+        # todo stop generating an error report and fix the bad input
+        ErrorReport.log_error('invalid_user_id',
+                              {message: "invalid user_id in ContextController::roster_user",
+                               current_user_id: @current_user.id,
+                               current_user_name: @current_user.sortable_name}.
+                                merge(ErrorReport.useful_http_env_stuff_from_request(request))
+        )
+        raise ActiveRecord::RecordNotFound
+      end
       user_id = Shard.relative_id_for(params[:id], Shard.current, @context.shard)
       if @context.is_a?(Course)
         @membership = @context.enrollments.find_by_user_id(user_id)
