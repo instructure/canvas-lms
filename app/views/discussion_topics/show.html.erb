@@ -142,6 +142,9 @@
         <% if @topic.for_assignment? %>
           <%= render :partial => 'assignment_details' %>
         <% end %>
+        <% if @topic.for_group_discussion? %>
+          <%= render :partial => 'group_discussion' %>
+        <% end %>
         <header class="discussion-section clearfix">
           <%= avatar((@topic.user), context_code: @context.asset_string) if @topic.user %>
           <div class="discussion-header-content right-of-avatar">

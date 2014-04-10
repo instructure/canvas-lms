@@ -1113,7 +1113,7 @@ describe "discussions" do
           click_option("#assignment_group_category_id", group_cat.name)
 
           expect_new_page_load { f('.form-actions button[type=submit]').click }
-          topic.reload.assignment.group_category_id.should == group_cat.id
+          topic.reload.group_category_id.should == group_cat.id
         end
 
         it "should allow editing the peer review" do

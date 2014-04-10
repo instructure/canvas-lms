@@ -197,6 +197,10 @@
 #             ]
 #           }
 #         },
+#         "group_category_id": {
+#           "description": "The unique identifier of the group category if the topic is a group discussion, otherwise null.",
+#           "type": "integer"
+#         },
 #         "attachments": {
 #           "description": "Array of file attachments.",
 #           "type": "array",
@@ -348,6 +352,7 @@ class DiscussionTopicsController < ApplicationController
         hash[:ATTRIBUTES] = discussion_topic_api_json(@topic, @context, @current_user, session, override_dates: false)
       end
       (hash[:ATTRIBUTES] ||= {})[:is_announcement] = @topic.is_announcement
+      hash[:ATTRIBUTES][:can_group] = @topic.can_group?
       handle_assignment_edit_params(hash[:ATTRIBUTES])
 
       if @topic.assignment.present?
@@ -395,8 +400,8 @@ class DiscussionTopicsController < ApplicationController
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true) || @topic.locked?
       @unlock_at = @topic.available_from_for(@current_user)
       @topic.change_read_state('read', @current_user)
-      if @topic.for_group_assignment?
-        @groups = @topic.assignment.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :read) }
+      if @topic.for_group_discussion?
+        @groups = @topic.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :read) }
         topics = @topic.child_topics.to_a
         topics = topics.select{|t| @groups.include?(t.context) } unless @topic.grants_right?(@current_user, session, :update)
         @group_topics = @groups.map do |group|
@@ -430,7 +435,7 @@ class DiscussionTopicsController < ApplicationController
 
               },
               :PERMISSIONS => {
-                :CAN_REPLY      => @locked ? false : !(@topic.for_group_assignment? || @topic.locked_for?(@current_user)),     # Can reply
+                :CAN_REPLY      => @locked ? false : !(@topic.for_group_discussion? || @topic.locked_for?(@current_user)),     # Can reply
                 :CAN_ATTACH     => @locked ? false : @topic.grants_right?(@current_user, session, :attach), # Can attach files on replies
                 :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user),           # Can moderate their own topics
                 :MODERATE       => user_can_moderate                                                        # Can moderate any topic
@@ -527,6 +532,10 @@ class DiscussionTopicsController < ApplicationController
   #   By default, discussions are sorted chronologically by creation date, you
   #   can pass the id of another topic to have this one show up after the other
   #   when they are listed.
+  #
+  # @argument group_category_id [Optional, Integer]
+  #   If present, the topic will become a group discussion assigned
+  #   to the group.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
@@ -648,7 +657,8 @@ class DiscussionTopicsController < ApplicationController
   end
 
   API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at lock_at podcast_enabled
-                                podcast_has_student_posts require_initial_post is_announcement pinned)
+                                podcast_has_student_posts require_initial_post is_announcement pinned
+                                group_category_id)
   def process_discussion_topic(is_new = false)
     @errors = {}
     discussion_topic_hash = params.slice(*API_ALLOWED_TOPIC_FIELDS)
@@ -675,6 +685,7 @@ class DiscussionTopicsController < ApplicationController
       process_lock_parameters(discussion_topic_hash)
     end
     process_published_parameters(discussion_topic_hash)
+    process_group_parameters(discussion_topic_hash)
     process_pin_parameters(discussion_topic_hash)
 
     if @errors.present?
@@ -767,6 +778,21 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
+  def process_group_parameters(discussion_topic_hash)
+    if params[:assignment] && params[:assignment].has_key?(:group_category_id)
+      id = params[:assignment].delete(:group_category_id)
+      discussion_topic_hash[:group_category_id] ||= id
+    end
+    return unless params[:group_category_id].to_s != @topic.group_category_id.to_s
+    if @topic.is_announcement
+      @errors[:group] = t(:error_group_announcement, "You cannot use grouped discussion on an announcement.")
+      return
+    end
+    if !@topic.can_group?
+      @errors[:group] = t(:error_group_change, "You cannot change grouping on a discussion with replies.")
+    end
+  end
+
   # TODO: upgrade acts_as_list after rails3
   # check_scope will probably handle this
   def process_pin_parameters(discussion_topic_hash)
@@ -828,6 +854,7 @@ class DiscussionTopicsController < ApplicationController
 
       elsif (@assignment = @topic.assignment || @topic.restore_old_assignment || (@topic.assignment = @context.assignments.build)) &&
              @assignment.grants_right?(@current_user, session, :update)
+        params[:assignment][:group_category_id] = nil unless @topic.group_category_id || @assignment.has_submitted_submissions?
         update_api_assignment(@assignment, params[:assignment].merge(@topic.attributes.slice('title')))
         @assignment.submission_types = 'discussion_topic'
         @assignment.saved_by = :discussion_topic

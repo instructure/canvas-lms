@@ -1,0 +1,15 @@
+<div class="discussion-section alert alert-info">
+  <p>
+    <%= t :separated_conversation_notice, "Since this is a group discussion, each group has its own conversation for this topic. Here are the ones you have access to:" %>
+    <ul>
+      <% @group_topics.each do |group_and_topic| %>
+        <li>
+          <a href="<%= context_url(group_and_topic[:group], :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) %>"><%= group_and_topic[:group].name %></a>
+          <%= render :partial => 'new_and_total_badge', :locals => {
+                     :unread_count => group_and_topic[:topic].unread_count(@current_user),
+                     :reply_count => group_and_topic[:topic].discussion_entries.active.size } if group_and_topic[:topic] %>
+        </li>
+      <% end %>
+    </ul>
+  </p>
+</div>

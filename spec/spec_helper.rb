@@ -857,7 +857,8 @@ end
     @group2 = course.groups.create!(:name => "group 2", :group_category => group_category)
 
     @topic = course.discussion_topics.build(:title => "topic")
-    @assignment = course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group1.group_category)
+    @topic.group_category = group_category
+    @assignment = course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
     @assignment.infer_times
     @assignment.saved_by = :discussion_topic
     @topic.assignment = @assignment

@@ -3,7 +3,7 @@
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
   <div style="width: 600px; margin: 10px auto;">
     <p>
-      <% if @assignment.discussion_topic.for_group_assignment? && (group = @assignment.group_students(@submission.user)[0]) %>
+      <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>
         <%= t('group_discussion_submission_description',
                 "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}, or you can *view the full group discussion*.",
                 :user => context_user_name(@context, @submission.user),
@@ -17,7 +17,7 @@
 
     </p>
     <% @entries = @assignment.discussion_topic.discussion_entries.active.for_user(@user) %>
-    <% if @assignment.has_group_category? %>
+    <% if @assignment.discussion_topic.for_group_discussion? %>
       <% @entries = @assignment.discussion_topic.child_topics.map{|t| t.discussion_entries.active.for_user(@user) }.flatten.sort_by{|e| e.created_at} %>
     <% end %>
     <% @entries.each do |entry| %>
