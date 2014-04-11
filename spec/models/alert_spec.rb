@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -116,7 +116,7 @@ describe Alert do
 
         Alert.evaluate_for_course(@course, account_alerts, nil)
 
-        account_alerts.should be_empty
+        account_alerts.should == []
       end
     end
 

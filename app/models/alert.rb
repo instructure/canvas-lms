@@ -117,21 +117,12 @@ class Alert < ActiveRecord::Base
     student_enrollments = course.student_enrollments.active
     student_ids = student_enrollments.map(&:user_id)
     return if student_ids.empty?
-    student_ids_to_section_ids = {}
-    student_enrollments.each do |enrollment|
-      student_ids_to_section_ids[enrollment.user_id] ||= []
-      student_ids_to_section_ids[enrollment.user_id] << enrollment.course_section_id
-    end
 
     teacher_enrollments = course.instructor_enrollments.active
     teacher_ids = teacher_enrollments.map(&:user_id)
     return if teacher_ids.empty?
-    section_ids_to_teachers_list = {}
-    teacher_enrollments.each do |enrollment|
-      section_id = enrollment.limit_privileges_to_course_section ? enrollment.course_section_id : nil
-      section_ids_to_teachers_list[section_id] ||= []
-      section_ids_to_teachers_list[section_id] << enrollment.user_id
-    end
+
+    teacher_student_mapper = Courses::TeacherStudentMapper.new(student_enrollments, teacher_enrollments)
 
     criterion_types = alerts.map(&:criteria).flatten.map(&:criterion_type).uniq
     data = {}
@@ -250,12 +241,7 @@ class Alert < ActiveRecord::Base
         if matches
           Rails.cache.write(cache_key, today)
 
-          teachers = []
-          teachers.concat(section_ids_to_teachers_list[nil]) if section_ids_to_teachers_list[nil]
-          student_ids_to_section_ids[user_id].each do |section_id|
-            teachers.concat(section_ids_to_teachers_list[section_id]) if section_ids_to_teachers_list[section_id]
-          end
-          send_alert(alert, alert.resolve_recipients(user_id, teachers), student_enrollments.to_ary.find { |enrollment| enrollment.user_id == user_id } )
+          send_alert(alert, alert.resolve_recipients(user_id, teacher_student_mapper.teachers_for_student(user_id)), student_enrollments.to_ary.find { |enrollment| enrollment.user_id == user_id } )
         end
       end
     end
