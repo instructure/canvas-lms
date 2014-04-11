@@ -87,17 +87,7 @@
     <div id="rightside_inner" class="full_height">
 
       <div id="submission_details" class="content_box">
-        <div id="single_submission">
-          <label><%= before_label(:submitted, "Submitted") %></label>
-          <span id="single_submission_submitted_at">??/??/?? at ??:??PM</span>
-        </div>
-        <div id="multiple_submissions">
-          <label for="submission_to_view"><%= before_label(:submission_to_view, "Submission to view") %></label>
-          <select id="submission_to_view">
-            <option value="option1">??/??/?? at ??:??PM </option>
-            <option value="option2" class="late">??/??/?? at ??:??PM LATE (graded: ?+)</option>
-          </select>
-        </div>
+        <div id="multiple_submissions"></div>
         <div id="submission_late_notice"><%= t(:late_notice, "Note: This submission was LATE") %></div>
         <div id="submission_not_newest_notice" title='<%= t('titles.not_newest', "use the dropdown above to change which submission to look at") %>'><%= t(:not_newest_notice, "Note: This is not the most recent submission") %></div>
         <div id="submission_files_container">

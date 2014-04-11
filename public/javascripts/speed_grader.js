@@ -17,6 +17,7 @@
  */
 
 define([
+  'jst/speed_grader/submissions_dropdown',
   'compiled/util/round',
   'underscore',
   'INST' /* INST */,
@@ -50,7 +51,7 @@ define([
   'vendor/scribd.view' /* scribd */,
   'vendor/spin' /* new Spinner */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, turnitinInfoTemplate, turnitinScoreTemplate) {
+], function(submissionsDropdownTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, turnitinInfoTemplate, turnitinScoreTemplate) {
 
   // fire off the request to get the jsonData
   window.jsonData = {};
@@ -105,15 +106,12 @@ define([
       $score = $grade_container.find(".score"),
       $average_score_wrapper = $("#average_score_wrapper"),
       $submission_details = $("#submission_details"),
-      $single_submission = $("#single_submission"),
-      $single_submission_submitted_at = $("#single_submission_submitted_at"),
       $multiple_submissions = $("#multiple_submissions"),
       $submission_late_notice = $("#submission_late_notice"),
       $submission_not_newest_notice = $("#submission_not_newest_notice"),
       $submission_files_container = $("#submission_files_container"),
       $submission_files_list = $("#submission_files_list"),
       $submission_file_hidden = $("#submission_file_hidden").removeAttr('id').detach(),
-      $submission_to_view = $("#submission_to_view"),
       $assignment_submission_url = $("#assignment_submission_url"),
       $assignment_submission_turnitin_report_url = $("#assignment_submission_turnitin_report_url"),
       $assignment_submission_resubmit_to_turnitin_url = $("#assignment_submission_resubmit_to_turnitin_url"),
@@ -876,9 +874,10 @@ define([
 
       $grade.change(EG.handleGradeSubmit);
 
-      $submission_to_view.change(function(){
+      $multiple_submissions.change(function(e) {
         if (typeof EG.currentStudent.submission == 'undefined') EG.currentStudent.submission = {};
-        EG.currentStudent.submission.currentSelectedIndex = parseInt($(this).val(), 10);
+        var i = parseInt(e.target.value, 10);
+        EG.currentStudent.submission.currentSelectedIndex = i;
         EG.handleSubmissionSelectionChange();
       });
 
@@ -1100,7 +1099,8 @@ define([
 
     handleSubmissionSelectionChange: function(){
       try {
-        var submissionToViewVal = $submission_to_view.filter(":visible").val(),
+        var $submission_to_view = $("#submission_to_view");
+        var submissionToViewVal = $submission_to_view.val(),
             currentSelectedIndex = Number(submissionToViewVal) ||
                                   ( this.currentStudent &&
                                     this.currentStudent.submission &&
@@ -1118,8 +1118,6 @@ define([
                           || {},
             inlineableAttachments = [],
             browserableAttachments = [];
-
-        $single_submission_submitted_at.html($.datetimeString(submission.submitted_at));
 
         var $turnitinScoreContainer = $grade_container.find(".turnitin_score_container").empty(),
             $turnitinInfoContainer = $grade_container.find(".turnitin_info_container").empty(),
@@ -1205,36 +1203,30 @@ define([
     refreshSubmissionsToView: function(){
       var innerHTML = "";
       var s = this.currentStudent.submission;
-      var submissionHistory;
+      var submissionHistory = s.submission_history;
 
-      if ((submissionHistory = s.submission_history).length > 0) {
-        var submissionToSelect = _(submissionHistory).last();
-
-        _(submissionHistory).each(function(o, i) {
-          var s           = o.submission;
-              late        = s.late,
-              value       = s.version || i;
-
-          innerHTML += "<option " + (late ? "class='late'" : "") + " value='" + value + "' " +
-                        (o == submissionToSelect ? "selected='selected'" : "") + ">" +
-                        ($.datetimeString(s.submitted_at) || I18n.t('no_submission_time', 'no submission time')) +
-                        (late ? " " + I18n.t('loud_late', "LATE") : "") +
-                        (s.grade && (s.grade_matches_current_submission || s.show_grade_in_dropdown) ? " (" + I18n.t('grade', "grade: %{grade}", {'grade': s.grade}) + ')' : "") +
-                       "</option>";
-
+      if (submissionHistory.length > 0) {
+        var noSubmittedAt = I18n.t('no_submission_time', 'no submission time');
+        var templateSubmissions = _(submissionHistory).map(function(o, i) {
+          var s = o.submission;
+          if (s.grade && (s.grade_matches_current_submission ||
+                          s.show_grade_in_dropdown)) {
+            var grade = s.grade;
+          }
+          return {
+            value: s.version || i,
+            late: s.late,
+            submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
+            grade: grade
+          };
+        });
+        _(templateSubmissions).last().selected = true;
+        innerHTML = submissionsDropdownTemplate({
+          singleSubmission: submissionHistory.length == 1,
+          submissions: templateSubmissions
         });
       }
-      $submission_to_view.html(innerHTML);
-
-      //if there are multiple submissions
-      if (submissionHistory.length > 1) {
-        $multiple_submissions.show();
-        $single_submission.hide();
-      }
-      else { //only submitted once
-        $multiple_submissions.hide();
-        $single_submission.show();
-      }
+      $multiple_submissions.html(innerHTML);
     },
 
     showSubmissionDetails: function(){
@@ -1571,7 +1563,7 @@ define([
           EG.setOrUpdateSubmission(this.submission);
         });
         EG.refreshSubmissionsToView();
-        $submission_to_view.change();
+        $multiple_submissions.change();
         EG.showGrade();
       });
     },
