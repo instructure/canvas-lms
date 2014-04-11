@@ -48,9 +48,7 @@ class ZipExtractor
     self.zip.entries.each do |zip_entry|
       next if zip_entry.directory?
       local_name = File.join(dirname, File.split(zip_entry.name).last)
-      fp = File.open(local_name, 'w')
-      fp.puts zip.read(zip_entry.name)
-      fp.close
+      zip_entry.extract(local_name)
       self.unzipped_files << local_name
     end
     block.call(self.unzipped_files) if block
