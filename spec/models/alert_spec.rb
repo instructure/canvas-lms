@@ -19,33 +19,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Alert do
+  before do
+    @mock_notification = Notification.new
+    Notification.stubs(:by_name).returns(@mock_notification)
+  end
+
   context "Alerts" do
-    before(:all) do
-      class Alert
-        class << self
-          alias :original_send_alert :send_alert
-          def send_alert(alert, user_id, student_enrollment)
-            @sent_alerts ||= []
-            @sent_alerts << student_enrollment.user_id
-          end
-
-          attr_accessor :sent_alerts
-        end
-      end
-    end
-
-    before(:each) do
-      Alert.sent_alerts = []
-    end
-
-    after(:all) do
-      class Alert
-        class << self
-          alias :send_alert :original_send_alert
-        end
-      end
-    end
-
     context "mass assignment" do
       it "should translate string-symbols to symbols when assigning to recipients" do
         alert = Alert.new
@@ -97,31 +76,35 @@ describe Alert do
       it "should not trigger any alerts for unpublished courses" do
         course = mock('Course')
         course.stubs(:available?, false)
+        Notification.any_instance.expects(:create_message).never
+
         Alert.evaluate_for_course(course)
-        Alert.sent_alerts.should be_blank
       end
 
       it "should not trigger any alerts for courses with no alerts" do
         course = mock('Course')
         course.stubs(:available?).returns(true)
         course.stubs(:alerts).returns(stub(:all => []))
+        Notification.any_instance.expects(:create_message).never
+
         Alert.evaluate_for_course(course)
-        Alert.sent_alerts.should be_blank
       end
 
       it "should not trigger any alerts when there are no students in the class" do
         course = Account.default.courses.create!
         course.offer!
         course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+        Notification.any_instance.expects(:create_message).never
+
         Alert.evaluate_for_course(course)
-        Alert.sent_alerts.should be_blank
       end
 
       it "should not trigger any alerts when there are no teachers in the class" do
         course_with_student(:active_course => 1)
         @course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+        Notification.any_instance.expects(:create_message).never
+
         Alert.evaluate_for_course(@course)
-        Alert.sent_alerts.should be_blank
       end
 
       it "should not trigger any alerts in subsequent courses" do
@@ -130,7 +113,9 @@ describe Alert do
         @course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
         @course.start_at = Time.now - 30.days
         account_alerts = []
+
         Alert.evaluate_for_course(@course, account_alerts)
+
         account_alerts.should be_empty
       end
     end
@@ -142,10 +127,10 @@ describe Alert do
           student_in_course(:active_all => 1)
           alert = @course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
           @course.start_at = Time.now - 30.days
+          @mock_notification.expects(:create_message).with(anything, [@user.id], anything).once
+
           Alert.evaluate_for_course(@course)
-          Alert.sent_alerts.should == [ @user.id ]
           Alert.evaluate_for_course(@course)
-          Alert.sent_alerts.should == [ @user.id ]
         end
       end
 
@@ -155,10 +140,10 @@ describe Alert do
           student_in_course(:active_all => 1)
           alert = @course.alerts.create!(:recipients => [:student], :repetition => 1, :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
           @course.start_at = Time.now - 30.days
+          @mock_notification.expects(:create_message).with(anything, [@user.id], anything).once
+
           Alert.evaluate_for_course(@course)
-          Alert.sent_alerts.should == [ @user.id ]
           Alert.evaluate_for_course(@course)
-          Alert.sent_alerts.should == [ @user.id ]
         end
       end
 
@@ -168,12 +153,13 @@ describe Alert do
           student_in_course(:active_all => 1)
           alert = @course.alerts.create!(:recipients => [:student], :repetition => 1, :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
           @course.start_at = Time.now - 30.days
+
+          @mock_notification.expects(:create_message).with(anything, [@user.id], anything).twice
+
           Alert.evaluate_for_course(@course)
-          Alert.sent_alerts.should == [ @user.id ]
           # update sent_at
           Rails.cache.write([alert, @user.id].cache_key, (Time.now - 1.day).beginning_of_day)
           Alert.evaluate_for_course(@course)
-          Alert.sent_alerts.should == [ @user.id, @user.id ]
         end
       end
     end
@@ -185,8 +171,9 @@ describe Alert do
         alert = @course.alerts.build(:recipients => [:student])
         alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
         alert.save!
+        Notification.any_instance.expects(:create_message).never
+
         Alert.evaluate_for_course(@course)
-        Alert.sent_alerts.should be_blank
       end
 
       it "should alert for old courses" do
@@ -196,8 +183,9 @@ describe Alert do
         alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
         alert.save!
         @course.start_at = Time.now - 30.days
+        @mock_notification.expects(:create_message).with(anything, [@user.id], anything)
+
         Alert.evaluate_for_course(@course)
-        Alert.sent_alerts.sort.should == [ @user.id ]
       end
 
       it "should not alert for submission comments" do
@@ -215,8 +203,9 @@ describe Alert do
         alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
         alert.save!
         @course.start_at = Time.now - 30.days
+        Notification.any_instance.expects(:create_message).never
+
         Alert.evaluate_for_course(@course)
-        Alert.sent_alerts.should be_blank
       end
 
       it "should alert for old submission comments" do
@@ -236,8 +225,9 @@ describe Alert do
         alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
         alert.save!
         @course.start_at = Time.now - 30.days
+        @mock_notification.expects(:create_message).with(anything, [@user.id], anything)
+
         Alert.evaluate_for_course(@course)
-        Alert.sent_alerts.should == [ @user.id ]
       end
 
       it "should not alert for conversation messages" do
@@ -252,8 +242,9 @@ describe Alert do
         alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
         alert.save!
         @course.start_at = Time.now - 30.days
+        Notification.any_instance.expects(:create_message).never
+
         Alert.evaluate_for_course(@course)
-        Alert.sent_alerts.should be_blank
       end
 
       it "should alert for old conversation messages" do
@@ -270,19 +261,18 @@ describe Alert do
         alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
         alert.save!
         @course.start_at = Time.now - 30.days
+        Alert.expects(:send_alert).with(anything, [ @student.id ], anything).twice
+
         Alert.evaluate_for_course(@course)
-        Alert.sent_alerts.should == [ @student.id ]
 
         # create a generated message
         @conversation.add_participants([user])
         @conversation.messages.length.should == 2
 
         # it should still alert, ignoring the new message
-        Alert.sent_alerts = []
         # update sent_at so it will send again
         Rails.cache.write([alert, @student.id].cache_key, (Time.now - 5.days).beginning_of_day)
         Alert.evaluate_for_course(@course)
-        Alert.sent_alerts.should == [ @student.id ]
       end
     end
 
@@ -294,8 +284,9 @@ describe Alert do
         alert = @course.alerts.build(:recipients => [:student])
         alert.criteria.build(:criterion_type => 'UngradedCount', :threshold => 1)
         alert.save!
+        Notification.any_instance.expects(:create_message).never
+
         Alert.evaluate_for_course(@course)
-        Alert.sent_alerts.should be_blank
       end
 
       it "should alert" do
@@ -311,8 +302,9 @@ describe Alert do
         alert = @course.alerts.build(:recipients => [:student])
         alert.criteria.build(:criterion_type => 'UngradedCount', :threshold => 1)
         alert.save!
+        @mock_notification.expects(:create_message).with(anything, [@user.id], anything)
+
         Alert.evaluate_for_course(@course)
-        Alert.sent_alerts.should == [ @user.id ]
       end
     end
 
@@ -324,8 +316,9 @@ describe Alert do
         alert = @course.alerts.build(:recipients => [:student])
         alert.criteria.build(:criterion_type => 'UngradedTimespan', :threshold => 1)
         alert.save!
+        Notification.any_instance.expects(:create_message).never
+
         Alert.evaluate_for_course(@course)
-        Alert.sent_alerts.should be_blank
       end
 
       it "should not alert for submission within the threshold" do
@@ -341,8 +334,9 @@ describe Alert do
         alert = @course.alerts.build(:recipients => [:student])
         alert.criteria.build(:criterion_type => 'UngradedTimespan', :threshold => 7)
         alert.save!
+        Notification.any_instance.expects(:create_message).never
+
         Alert.evaluate_for_course(@course)
-        Alert.sent_alerts.should be_blank
       end
 
       it "should alert" do
@@ -359,8 +353,9 @@ describe Alert do
         alert = @course.alerts.build(:recipients => [:student])
         alert.criteria.build(:criterion_type => 'UngradedTimespan', :threshold => 7)
         alert.save!
+        @mock_notification.expects(:create_message).with(anything, [@user.id], anything)
+
         Alert.evaluate_for_course(@course)
-        Alert.sent_alerts.should == [ @user.id ]
       end
 
       it "should alert for multiple submissions when one matches and one doesn't" do
@@ -382,8 +377,9 @@ describe Alert do
         alert = @course.alerts.build(:recipients => [:student])
         alert.criteria.build(:criterion_type => 'UngradedTimespan', :threshold => 7)
         alert.save!
+        @mock_notification.expects(:create_message).with(anything, [@user.id], anything)
+
         Alert.evaluate_for_course(@course)
-        Alert.sent_alerts.should == [ @user.id ]
       end
     end
 
@@ -394,8 +390,9 @@ describe Alert do
         alert = @course.alerts.build(:recipients => [:student])
         alert.criteria.build(:criterion_type => 'UserNote', :threshold => 7)
         alert.save!
+        Notification.any_instance.expects(:create_message).never
+
         Alert.evaluate_for_course(@course, nil, true)
-        Alert.sent_alerts.should be_blank
       end
 
       it "should alert for old courses" do
@@ -405,8 +402,9 @@ describe Alert do
         alert.criteria.build(:criterion_type => 'UserNote', :threshold => 7)
         alert.save!
         @course.start_at = Time.now - 30.days
+        @mock_notification.expects(:create_message).with(anything, [@user.id], anything)
+
         Alert.evaluate_for_course(@course, nil, true)
-        Alert.sent_alerts.sort.should == [ @user.id ]
       end
 
       it "should not alert when a note exists" do
@@ -420,8 +418,9 @@ describe Alert do
         alert.criteria.build(:criterion_type => 'UserNote', :threshold => 7)
         alert.save!
         @course.start_at = Time.now - 30.days
+        Notification.any_instance.expects(:create_message).never
+
         Alert.evaluate_for_course(@course, nil, true)
-        Alert.sent_alerts.should be_blank
       end
 
       it "should alert when an old note exists" do
@@ -435,8 +434,9 @@ describe Alert do
         alert.criteria.build(:criterion_type => 'UserNote', :threshold => 7)
         alert.save!
         @course.start_at = Time.now - 30.days
+        @mock_notification.expects(:create_message).with(anything, [@user.id], anything)
+
         Alert.evaluate_for_course(@course, nil, true)
-        Alert.sent_alerts.should == [ @user.id ]
       end
     end
   end
@@ -464,16 +464,22 @@ describe Alert do
       alert = @course.alerts.build(:recipients => [:student])
       alert.criteria.build(:criterion_type => 'UngradedTimespan', :threshold => 7)
       alert.save!
+      @mock_notification.expects(:create_message).with do |alert, _, _|
+        alert.criteria.first.criterion_type.should == 'UngradedTimespan'
+      end
+
       Alert.evaluate_for_course(@course)
-      DelayedMessage.last.summary.should =~ /One or more submissions have been left ungraded for/
     end
 
     it "should tell you what the alert is about count" do
       alert = @course.alerts.build(:recipients => [:student])
       alert.criteria.build(:criterion_type => 'UngradedCount', :threshold => 1)
       alert.save!
+      @mock_notification.expects(:create_message).with do |alert, _, _|
+        alert.criteria.first.criterion_type.should == 'UngradedCount'
+      end
+
       Alert.evaluate_for_course(@course)
-      DelayedMessage.last.summary.should =~ /or more assignments have not been graded/
     end
 
     it "should tell you what the alert is about note" do
@@ -482,8 +488,11 @@ describe Alert do
       alert.criteria.build(:criterion_type => 'UserNote', :threshold => 7)
       alert.save!
       @course.start_at = Time.now - 30.days
+      @mock_notification.expects(:create_message).with do |alert, _, _|
+        alert.criteria.first.criterion_type.should == 'UserNote'
+      end
+
       Alert.evaluate_for_course(@course, nil, true)
-      DelayedMessage.last.summary.should =~ /No faculty journal entries for/
     end
 
     it "should tell you what the alert is about interaction" do
@@ -491,8 +500,11 @@ describe Alert do
       alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
       alert.save!
       @course.start_at = Time.now - 30.days
+      @mock_notification.expects(:create_message).with do |alert, _, _|
+        alert.criteria.first.criterion_type.should == 'Interaction'
+      end
+
       Alert.evaluate_for_course(@course)
-      DelayedMessage.last.summary.should =~ /No student\/teacher interaction for/
     end
   end
 end
