@@ -1850,8 +1850,9 @@ define([
 
       // is this the initial loado of the question type
       var loading = $(this).parents(".question.initialLoad").length > 0;
-      if ($("#student_submissions_warning").length > 0 && !loading) {
-        var holder = $(this).parents('.question_holder');
+      var holder = $(this).parents('.question_holder');
+      var isNew = $(holder).find("#question_new").length > 0;
+      if ($("#student_submissions_warning").length > 0 && !loading && !isNew) {
         disableRegrade(holder);
       }
     });
@@ -1931,6 +1932,12 @@ define([
     });
 
     function showRegradeOptions($el,questionID) {
+      var holder = $el.parents('.question_holder');
+      var isNew = holder.find("#question_new").length > 0;
+      if (isNew) {
+        return;
+      }
+
       if (!canRegradeQuestion($el)) {
         return;
       }
@@ -1951,7 +1958,6 @@ define([
         var questionType = $el.find(".question_type").val();
 
         // regrade disabled if they remove an answer after submissions made
-        var holder = $el.parents('.question_holder');
         var disabled = holder.find('input[name="regrade_disabled"]').val() == '1';
 
         $el.find('.button-container').before(regradeTemplate({
@@ -2054,7 +2060,8 @@ define([
 
       // warn they can't regrade if there are submissions
       var disabled = regradeOpt.text() == 'disabled';
-      if ($("#student_submissions_warning").length > 0 && !disabled) {
+      var isNew = holder.find("#question_new").length > 0;
+      if ($("#student_submissions_warning").length > 0 && !disabled && !isNew) {
         var msg = I18n.t('confirms.delete_answer',
           "Are you sure? Deleting answers from a question with submissions " +
           "disables the option to regrade this question.")
