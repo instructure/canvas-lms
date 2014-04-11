@@ -78,7 +78,7 @@ describe Alert do
         course.stubs(:available?, false)
         Notification.any_instance.expects(:create_message).never
 
-        Alert.evaluate_for_course(course)
+        Alert.evaluate_for_course(course, nil, nil)
       end
 
       it "should not trigger any alerts for courses with no alerts" do
@@ -87,7 +87,7 @@ describe Alert do
         course.stubs(:alerts).returns(stub(:all => []))
         Notification.any_instance.expects(:create_message).never
 
-        Alert.evaluate_for_course(course)
+        Alert.evaluate_for_course(course, nil, nil)
       end
 
       it "should not trigger any alerts when there are no students in the class" do
@@ -96,7 +96,7 @@ describe Alert do
         course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
         Notification.any_instance.expects(:create_message).never
 
-        Alert.evaluate_for_course(course)
+        Alert.evaluate_for_course(course, nil, nil)
       end
 
       it "should not trigger any alerts when there are no teachers in the class" do
@@ -104,7 +104,7 @@ describe Alert do
         @course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
         Notification.any_instance.expects(:create_message).never
 
-        Alert.evaluate_for_course(@course)
+        Alert.evaluate_for_course(@course, nil, nil)
       end
 
       it "should not trigger any alerts in subsequent courses" do
@@ -114,7 +114,7 @@ describe Alert do
         @course.start_at = Time.now - 30.days
         account_alerts = []
 
-        Alert.evaluate_for_course(@course, account_alerts)
+        Alert.evaluate_for_course(@course, account_alerts, nil)
 
         account_alerts.should be_empty
       end
@@ -129,8 +129,8 @@ describe Alert do
           @course.start_at = Time.now - 30.days
           @mock_notification.expects(:create_message).with(anything, [@user.id], anything).once
 
-          Alert.evaluate_for_course(@course)
-          Alert.evaluate_for_course(@course)
+          Alert.evaluate_for_course(@course, nil, nil)
+          Alert.evaluate_for_course(@course, nil, nil)
         end
       end
 
@@ -142,8 +142,8 @@ describe Alert do
           @course.start_at = Time.now - 30.days
           @mock_notification.expects(:create_message).with(anything, [@user.id], anything).once
 
-          Alert.evaluate_for_course(@course)
-          Alert.evaluate_for_course(@course)
+          Alert.evaluate_for_course(@course, nil, nil)
+          Alert.evaluate_for_course(@course, nil, nil)
         end
       end
 
@@ -156,10 +156,10 @@ describe Alert do
 
           @mock_notification.expects(:create_message).with(anything, [@user.id], anything).twice
 
-          Alert.evaluate_for_course(@course)
+          Alert.evaluate_for_course(@course, nil, nil)
           # update sent_at
           Rails.cache.write([alert, @user.id].cache_key, (Time.now - 1.day).beginning_of_day)
-          Alert.evaluate_for_course(@course)
+          Alert.evaluate_for_course(@course, nil, nil)
         end
       end
     end
@@ -173,7 +173,7 @@ describe Alert do
         alert.save!
         Notification.any_instance.expects(:create_message).never
 
-        Alert.evaluate_for_course(@course)
+        Alert.evaluate_for_course(@course, nil, nil)
       end
 
       it "should alert for old courses" do
@@ -185,7 +185,7 @@ describe Alert do
         @course.start_at = Time.now - 30.days
         @mock_notification.expects(:create_message).with(anything, [@user.id], anything)
 
-        Alert.evaluate_for_course(@course)
+        Alert.evaluate_for_course(@course, nil, nil)
       end
 
       it "should not alert for submission comments" do
@@ -205,7 +205,7 @@ describe Alert do
         @course.start_at = Time.now - 30.days
         Notification.any_instance.expects(:create_message).never
 
-        Alert.evaluate_for_course(@course)
+        Alert.evaluate_for_course(@course, nil, nil)
       end
 
       it "should alert for old submission comments" do
@@ -227,7 +227,7 @@ describe Alert do
         @course.start_at = Time.now - 30.days
         @mock_notification.expects(:create_message).with(anything, [@user.id], anything)
 
-        Alert.evaluate_for_course(@course)
+        Alert.evaluate_for_course(@course, nil, nil)
       end
 
       it "should not alert for conversation messages" do
@@ -244,7 +244,7 @@ describe Alert do
         @course.start_at = Time.now - 30.days
         Notification.any_instance.expects(:create_message).never
 
-        Alert.evaluate_for_course(@course)
+        Alert.evaluate_for_course(@course, nil, nil)
       end
 
       it "should alert for old conversation messages" do
@@ -263,7 +263,7 @@ describe Alert do
         @course.start_at = Time.now - 30.days
         Alert.expects(:send_alert).with(anything, [ @student.id ], anything).twice
 
-        Alert.evaluate_for_course(@course)
+        Alert.evaluate_for_course(@course, nil, nil)
 
         # create a generated message
         @conversation.add_participants([user])
@@ -272,7 +272,7 @@ describe Alert do
         # it should still alert, ignoring the new message
         # update sent_at so it will send again
         Rails.cache.write([alert, @student.id].cache_key, (Time.now - 5.days).beginning_of_day)
-        Alert.evaluate_for_course(@course)
+        Alert.evaluate_for_course(@course, nil, nil)
       end
     end
 
@@ -286,7 +286,7 @@ describe Alert do
         alert.save!
         Notification.any_instance.expects(:create_message).never
 
-        Alert.evaluate_for_course(@course)
+        Alert.evaluate_for_course(@course, nil, nil)
       end
 
       it "should alert" do
@@ -304,7 +304,7 @@ describe Alert do
         alert.save!
         @mock_notification.expects(:create_message).with(anything, [@user.id], anything)
 
-        Alert.evaluate_for_course(@course)
+        Alert.evaluate_for_course(@course, nil, nil)
       end
     end
 
@@ -318,7 +318,7 @@ describe Alert do
         alert.save!
         Notification.any_instance.expects(:create_message).never
 
-        Alert.evaluate_for_course(@course)
+        Alert.evaluate_for_course(@course, nil, nil)
       end
 
       it "should not alert for submission within the threshold" do
@@ -336,7 +336,7 @@ describe Alert do
         alert.save!
         Notification.any_instance.expects(:create_message).never
 
-        Alert.evaluate_for_course(@course)
+        Alert.evaluate_for_course(@course, nil, nil)
       end
 
       it "should alert" do
@@ -355,7 +355,7 @@ describe Alert do
         alert.save!
         @mock_notification.expects(:create_message).with(anything, [@user.id], anything)
 
-        Alert.evaluate_for_course(@course)
+        Alert.evaluate_for_course(@course, nil, nil)
       end
 
       it "should alert for multiple submissions when one matches and one doesn't" do
@@ -379,7 +379,7 @@ describe Alert do
         alert.save!
         @mock_notification.expects(:create_message).with(anything, [@user.id], anything)
 
-        Alert.evaluate_for_course(@course)
+        Alert.evaluate_for_course(@course, nil, nil)
       end
     end
 
@@ -468,7 +468,7 @@ describe Alert do
         alert.criteria.first.criterion_type.should == 'UngradedTimespan'
       end
 
-      Alert.evaluate_for_course(@course)
+      Alert.evaluate_for_course(@course, nil, nil)
     end
 
     it "should tell you what the alert is about count" do
@@ -479,7 +479,7 @@ describe Alert do
         alert.criteria.first.criterion_type.should == 'UngradedCount'
       end
 
-      Alert.evaluate_for_course(@course)
+      Alert.evaluate_for_course(@course, nil, nil)
     end
 
     it "should tell you what the alert is about note" do
@@ -504,7 +504,7 @@ describe Alert do
         alert.criteria.first.criterion_type.should == 'Interaction'
       end
 
-      Alert.evaluate_for_course(@course)
+      Alert.evaluate_for_course(@course, nil, nil)
     end
   end
 end
