@@ -9,12 +9,9 @@
   <div class="image-block">
     <div class="image-block-image profile-avatar-wrapper">
       <% if @user_data[:can_edit] %>
-        <a href="#" class="profile-link" title="<%= t('titles.click_to_change_profile_pic', "Click to change profile pic") %>">
-          <%= square_avatar_image @user_data[:id], 128 %>
-          <i class="icon-edit"></i>
-        </a>
+        <%= avatar(@user_data[:id], size: 128, url: '#', edit: true, class: "profile-link", title: t('titles.click_to_change_profile_pic', "Click to change profile pic")) %>
       <% else %>
-        <%= square_avatar_image @user_data[:id], 128 %>
+        <%= avatar(@user_data[:id], size: 128) %>
       <% end %>
     </div>
     <div class="image-block-content row-fluid">

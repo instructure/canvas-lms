@@ -28,11 +28,7 @@
 <% jammit_css :profile_edit %>
 
 <% if service_enabled?(:avatars) %>
-  <a href="#" class="profile_pic_link <%= @user.avatar_state %>" title="<%= t('titles.click_to_change_profile_pic', "Click to change profile pic") %>" style="float: left; margin-right: 5px; min-width: 50px; min-height: 50px; display: inline-block;">
-    <%= square_avatar_image(@user) %>
-
-    <i class="icon-edit"></i>
-  </a>
+  <%= avatar(@user, url: '#', edit: true, class: "profile_pic_link #{@user.avatar_state}", title: t('titles.click_to_change_profile_pic', "Click to change profile pic")) %>
 <% end %>
 <h2 style="padding-top: 0.3em;"><%= t('headers.users_profile', "%{user}'s Settings", :user => @user.short_name) %></h2>
 <div class="clear"></div>

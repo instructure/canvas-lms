@@ -43,11 +43,14 @@ module AvatarHelper
       end
     end
     link_opts = {}
-    link_opts[:class] = 'avatar'
+    link_opts[:class] = 'avatar '+opts[:class].to_s
     link_opts[:style] = "background-image: url(#{avatar_url})"
     link_opts[:style] += ";width: #{opts[:size]}px;height: #{opts[:size]}px" if opts[:size]
     link_opts[:href] = url if url
-    content_tag(:a, content_tag(:span, display_name, class: 'screenreader-only'), link_opts)
+    link_opts[:title] = opts[:title] if opts[:title]
+    content = content_tag(:span, display_name, class: 'screenreader-only') +
+      (opts[:edit] ? content_tag(:i, nil, class: 'icon-edit') : '')
+    content_tag(:a, content, link_opts)
   end
 
   def avatar_url_for(conversation, participants = conversation.participants)

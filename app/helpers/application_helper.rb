@@ -65,44 +65,6 @@ module ApplicationHelper
     end
   end
 
-  # don't use this anymore. circular avatars are the new hotness
-  def square_avatar_image(user_or_id, width=50, opts = {})
-    user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
-    user = user_or_id.is_a?(User) && user_or_id
-    if session["reported_#{user_id}"]
-      image_tag "messages/avatar-50.png"
-    else
-      avatar_settings = @domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'
-      user_id, user_shard = Shard.local_id_for(user_id)
-      user_shard ||= Shard.current
-      image_url, alt_tag = user_shard.activate do
-        Rails.cache.fetch(Cacher.inline_avatar_cache_key(user_id, avatar_settings)) do
-          if !user && user_id.to_i > 0
-            user = User.find(user_id)
-          end
-          if user
-            url = avatar_url_for_user(user)
-          else
-            url = "messages/avatar-50.png"
-          end
-          alt = user ? user.short_name : ''
-          [url, alt]
-        end
-      end
-      image_tag(image_url,
-        :style => "width: #{width}px; min-height: #{(width/1.6).to_i}px; max-height: #{(width*1.6).to_i}px",
-        :alt => alt_tag,
-        :class => Array(opts[:image_class]).join(' '))
-    end
-  end
-
-  def square_avatar(user_or_id, context_code, width=50, opts = {})
-    user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
-    if service_enabled?(:avatars)
-      link_to(square_avatar_image(user_or_id, width, opts), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;', :class => 'avatar')
-    end
-  end
-
   def slugify(text="")
     text.gsub(/[^\w]/, "_").downcase
   end

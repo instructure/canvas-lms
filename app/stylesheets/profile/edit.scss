@@ -65,10 +65,8 @@
 
 .profile_pic_link {
   position: relative;
-
-  img {
-    max-width: 50px;
-  }
+  float: left;
+  margin-right: 5px;
 
   .icon-edit {
     background: rgba(0, 0, 0, .75);
