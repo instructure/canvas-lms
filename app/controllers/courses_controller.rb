@@ -1466,7 +1466,7 @@ class CoursesController < ApplicationController
                           :root_account => @context.root_account,
                           :search_method => @context.user_list_search_mode_for(@current_user),
                           :initial_type => params[:enrollment_type])
-      if !(@context.completed? || @context.soft_concluded?) && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
+      if !@context.concluded? && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
         Enrollment.send(:preload_associations, @enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
         json = @enrollments.map { |e|
           { 'enrollment' =>

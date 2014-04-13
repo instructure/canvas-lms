@@ -1837,12 +1837,13 @@ class User < ActiveRecord::Base
     self.shard.activate do
       Shackles.activate(:slave) do
         visible_instances = visible_stream_item_instances(opts).
-            includes(:stream_item).
+            includes(:stream_item => :context).
             limit(Setting.get('recent_stream_item_limit', 100))
         visible_instances.map do |sii|
           si = sii.stream_item
           next unless si.present?
           next if si.asset_type == 'Submission'
+          next if si.context_type == "Course" && si.context.concluded?
           si.data.write_attribute(:unread, sii.unread?)
           si
         end.compact

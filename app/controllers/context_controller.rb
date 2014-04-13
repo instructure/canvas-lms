@@ -204,9 +204,9 @@ class ContextController < ApplicationController
         },
         :course => {
           :id => @context.id,
-          :completed => (completed = @context.completed?),
-          :soft_concluded => (soft_concluded = @context.soft_concluded?),
-          :concluded => completed || soft_concluded,
+          :completed => @context.completed?,
+          :soft_concluded => @context.soft_concluded?,
+          :concluded => @context.concluded?,
           :teacherless => @context.teacherless?,
           :available => @context.available?,
           :pendingInvitationsCount => @context.invited_count_visible_to(@current_user)

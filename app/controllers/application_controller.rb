@@ -474,7 +474,7 @@ class ApplicationController < ActionController::Base
       # again.
       courses = @context.current_enrollments.with_each_shard.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
       groups = opts[:include_groups] ? @context.current_groups.with_each_shard.reject{|g| g.context_type == "Course" &&
-          (g.context.completed? || g.context.soft_concluded?)} : []
+          g.context.concluded?} : []
       if only_contexts.present?
         # find only those courses and groups passed in the only_contexts
         # parameter, but still scoped by user so we know they have rights to

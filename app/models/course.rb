@@ -1159,6 +1159,10 @@ class Course < ActiveRecord::Base
     self.restrict_enrollments_to_course_dates = true
   end
 
+  def concluded?
+    completed? || soft_concluded?
+  end
+
   def state_sortable
     case state
     when :invited

@@ -156,6 +156,15 @@ describe User do
     @user.recent_stream_items.size.should == 0
   end
 
+  it "should ignore stream item instances from concluded courses" do
+    course_with_teacher(:active_all => true)
+    google_docs_collaboration_model(:user_id => @user.id)
+    @user.recent_stream_items.size.should == 1
+    @course.soft_conclude!
+    @course.save
+    @user.recent_stream_items.size.should == 0
+  end
+
   describe "#recent_stream_items" do
     it "should skip submission stream items" do
       course_with_teacher(:active_all => true)

@@ -313,7 +313,7 @@ class EnrollmentsApiController < ApplicationController
 
       errors << @@errors[:missing_user_id] unless params[:enrollment][:user_id].present?
     end
-    errors << @@errors[:concluded_course] if @context.completed? || @context.soft_concluded?
+    errors << @@errors[:concluded_course] if @context.concluded?
     return render_create_errors(errors) if errors.present?
 
     # create enrollment
