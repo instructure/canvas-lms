@@ -17,6 +17,7 @@ define [
   'vendor/spin'
   'compiled/SubmissionDetailsDialog'
   'compiled/gradebook2/AssignmentGroupWeightsDialog'
+  'compiled/gradebook2/GradeDisplayWarningDialog'
   'compiled/gradebook2/SubmissionCell'
   'compiled/gradebook2/GradebookHeaderMenu'
   'compiled/util/NumberCompare'
@@ -38,7 +39,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
+], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
 
   class Gradebook
     columnWidths =
@@ -362,11 +363,11 @@ define [
       @buildRows()
 
     renderTotalHeader: () =>
-      totalHeader = new TotalColumnHeaderView
+      @totalHeader = new TotalColumnHeaderView
         showingPoints: @displayPointTotals
         toggleShowingPoints: @togglePointsOrPercentTotals.bind(this)
         weightedGroups: @weightedGroups
-      totalHeader.render()
+      @totalHeader.render()
 
     assignmentGroupHtml: (group_name, group_weight) =>
       escaped_group_name = htmlEscape(group_name)
@@ -862,10 +863,25 @@ define [
       else
         @options.show_total_grade_as_points
 
-    togglePointsOrPercentTotals: ->
+    switch_total_display: =>
       @options.show_total_grade_as_points = not @options.show_total_grade_as_points
       $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @displayPointTotals()
       @grid.invalidate()
+      @totalHeader.render()
+
+    switch_total_display_and_mark_user_as_warned: =>
+      userSettings.contextSet('warned_about_totals_display', true)
+      @switch_total_display()
+
+    togglePointsOrPercentTotals: =>
+      if userSettings.contextGet('warned_about_totals_display')
+        @switch_total_display()
+      else
+        dialog_options =
+          showing_points: @options.show_total_grade_as_points
+          unchecked_save: @switch_total_display
+          checked_save: @switch_total_display_and_mark_user_as_warned
+        new GradeDisplayWarningDialog(dialog_options)
 
     onUserFilterInput: (term) =>
       # put rows back on the students for dropped assignments

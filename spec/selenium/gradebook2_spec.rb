@@ -657,29 +657,58 @@ describe "gradebook2" do
       end
     end
 
-    describe "Total dropdown" do
+    describe "Total points toggle" do
       def should_show_percentages
         ff(".total-column").each { |total| total.text.should =~ /%/ }
       end
 
-      def toggle_showing_points
+      def open_display_dialog
         f("#total_dropdown").click
         f(".toggle_percent").click
+      end
+
+      def close_display_dialog
+        f(".ui-icon-closethick").click
+      end
+
+      def toggle_grade_display
+        open_display_dialog
+        dialog = fj('.ui-dialog:visible')
+        submit_dialog(dialog, '.ui-button')
+      end
+
+      it "should warn the teacher that studens will see a change" do
+        get "/courses/#{@course.id}/gradebook2"
+        open_display_dialog
+        dialog = fj('.ui-dialog:visible')
+        dialog.text.should =~ /Warning/
       end
 
       it 'should allow toggling display by points or percent' do
         should_show_percentages
 
         get "/courses/#{@course.id}/gradebook2"
-        toggle_showing_points
+        toggle_grade_display
 
         expected_points = 15, 10, 10
         ff(".total-column").each { |total|
           total.text.should =~ /\A#{expected_points.shift}$/
         }
 
-        toggle_showing_points
+        toggle_grade_display
         should_show_percentages
+      end
+
+      it 'should not show the warning once dont show is checked' do
+        get "/courses/#{@course.id}/gradebook2"
+        open_display_dialog
+        dialog = fj('.ui-dialog:visible')
+        fj("#hide_warning").click
+        submit_dialog(dialog, '.ui-button')
+
+        open_display_dialog
+        dialog = fj('.ui-dialog:visible')
+        dialog.should equal nil
       end
     end
 
