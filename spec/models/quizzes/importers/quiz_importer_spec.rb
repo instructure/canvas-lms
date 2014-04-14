@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/import_helper')
+require File.expand_path(File.dirname(__FILE__) + '../../../../lib/importer/import_helper')
 
-describe "Quiz Import" do
+describe "Quizzes::QuizImporter" do
   before(:each) do
     course_model.root_account.disable_feature!(:draft_state)
   end
@@ -27,7 +27,7 @@ describe "Quiz Import" do
     context = course_model
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
-    Quizzes::Quiz.import_from_migration(data, context, question_data)
+    Quizzes::QuizImporter.import_from_migration(data, context, question_data)
     quiz = Quizzes::Quiz.find_by_migration_id data[:migration_id]
     quiz.title.should == data[:title]
     quiz.scoring_policy.should == data[:which_attempt_to_keep]
@@ -42,7 +42,7 @@ describe "Quiz Import" do
     context = course_model
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
-    Quizzes::Quiz.import_from_migration(data, context, question_data)
+    Quizzes::QuizImporter.import_from_migration(data, context, question_data)
     quiz = Quizzes::Quiz.find_by_migration_id data[:migration_id]
     quiz.quiz_questions.active.count.should == 1
     # Check if the expected question name is in there
@@ -53,7 +53,7 @@ describe "Quiz Import" do
     context = get_import_context
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'text_only_quiz_data'
-    Quizzes::Quiz.import_from_migration(data, context, question_data)
+    Quizzes::QuizImporter.import_from_migration(data, context, question_data)
     quiz = Quizzes::Quiz.find_by_migration_id data[:migration_id]
     quiz.unpublished_question_count.should == 2
     quiz.quiz_questions.active.count.should == 2
@@ -66,32 +66,32 @@ describe "Quiz Import" do
     context = get_import_context
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'group_quiz_data'
-    Quizzes::Quiz.import_from_migration(data, context, question_data)
+    Quizzes::QuizImporter.import_from_migration(data, context, question_data)
     quiz = Quizzes::Quiz.find_by_migration_id data[:migration_id]
     quiz.quiz_groups.count.should == 1
     quiz.quiz_groups.first.quiz_questions.active.count.should == 3
     quiz.quiz_groups.first.pick_count.should == data[:questions].first[:pick_count]
     quiz.quiz_groups.first.question_points.should == data[:questions].first[:question_points]
   end
-  
+
   it "should be practice if it's not for an assignment" do
     context = get_import_context
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'text_only_quiz_data'
-    Quizzes::Quiz.import_from_migration(data, context, question_data)
-    Quizzes::Quiz.import_from_migration(data, context, question_data)
+    Quizzes::QuizImporter.import_from_migration(data, context, question_data)
+    Quizzes::QuizImporter.import_from_migration(data, context, question_data)
     Quizzes::Quiz.count.should == 1
     quiz = Quizzes::Quiz.find_by_migration_id data[:migration_id]
     quiz.assignment.should be_nil
   end
-  
+
   it "should create an assignment if it is an assessment when enable_drafts is not on" do
     context = get_import_context
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
-    Quizzes::Quiz.import_from_migration(data, context, question_data)
-    Quizzes::Quiz.import_from_migration(data, context, question_data)
-    
+    Quizzes::QuizImporter.import_from_migration(data, context, question_data)
+    Quizzes::QuizImporter.import_from_migration(data, context, question_data)
+
     Assignment.count.should == 0
     Quizzes::Quiz.count.should == 1
 
@@ -105,8 +105,8 @@ describe "Quiz Import" do
     context.root_account.enable_feature!(:draft_state)
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
-    Quizzes::Quiz.import_from_migration(data, context, question_data)
-    Quizzes::Quiz.import_from_migration(data, context, question_data)
+    Quizzes::QuizImporter.import_from_migration(data, context, question_data)
+    Quizzes::QuizImporter.import_from_migration(data, context, question_data)
 
     Assignment.count.should == 1
     Quizzes::Quiz.count.should == 1
@@ -129,13 +129,13 @@ describe "Quiz Import" do
     context = get_import_context
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
-    Quizzes::Quiz.import_from_migration(data, context, question_data)
+    Quizzes::QuizImporter.import_from_migration(data, context, question_data)
     quiz = Quizzes::Quiz.find_by_migration_id data[:migration_id]
 
     quiz.quiz_questions.active.first.question_data[:question_name].should == "Rocket Bee!"
 
     question_data[:aq_data][data['questions'].first[:migration_id]]['question_name'] = "Not Rocket Bee?"
-    Quizzes::Quiz.import_from_migration(data, context, question_data)
+    Quizzes::QuizImporter.import_from_migration(data, context, question_data)
 
     quiz.quiz_questions.active.first.question_data[:question_name].should == "Not Rocket Bee?"
   end

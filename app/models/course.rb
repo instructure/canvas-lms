@@ -1978,13 +1978,13 @@ class Course < ActiveRecord::Base
     ContextExternalTool.process_migration(data, migration); migration.update_import_progress(45)
 
     #These need to be ran twice because they can reference each other
-    Quizzes::Quiz.process_migration(data, migration, question_data); migration.update_import_progress(50)
+    Quizzes::QuizImporter.process_migration(data, migration, question_data); migration.update_import_progress(50)
     DiscussionTopic.process_migration(data, migration);migration.update_import_progress(55)
     WikiPage.process_migration(data, migration);migration.update_import_progress(60)
     Assignment.process_migration(data, migration);migration.update_import_progress(65)
 
     # and second time...
-    Quizzes::Quiz.process_migration(data, migration, question_data); migration.update_import_progress(70)
+    Quizzes::QuizImporter.process_migration(data, migration, question_data); migration.update_import_progress(70)
     ContextModule.process_migration(data, migration);migration.update_import_progress(72)
     DiscussionTopic.process_migration(data, migration);migration.update_import_progress(75)
     WikiPage.process_migration(data, migration);migration.update_import_progress(80)

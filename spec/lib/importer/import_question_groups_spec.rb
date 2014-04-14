@@ -81,7 +81,7 @@ describe "Quiz Import" do
     question_data[question[:migration_id]] = context.assessment_questions.find_by_migration_id(question[:migration_id])
     
     quiz = get_import_data 'cengage', 'quiz'
-    Quizzes::Quiz.import_from_migration(quiz, context, question_data)
+    Quizzes::QuizImporter.import_from_migration(quiz, context, question_data)
     quiz = context.quizzes.find_by_migration_id(quiz[:migration_id])
     
     group = quiz.quiz_groups.first

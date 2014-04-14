@@ -115,7 +115,7 @@ describe Moodle::Converter do
       AssignmentGroup.process_migration(@course_data, @cm)
       ExternalFeed.process_migration(@course_data, @cm)
       GradingStandard.process_migration(@course_data, @cm)
-      Quizzes::Quiz.process_migration(@course_data, @cm, question_data)
+      Quizzes::QuizImporter.process_migration(@course_data, @cm, question_data)
     end
 
     it "should convert quizzes" do
