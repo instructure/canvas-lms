@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/spec_helper.rb')
 
-IMPORT_JSON_DIR = File.dirname(__FILE__) + '/../../fixtures/importer/'
+IMPORT_JSON_DIR = File.dirname(__FILE__) + '/fixtures/importer/'
 
 QUESTIONS = [
         ['calculated_complex', 'calculated_question'],

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module MigrationImport
+module Importers
   class MediaTrack
 
     def self.process_migration(data, migration)

@@ -534,7 +534,7 @@ class WikiPage < ActiveRecord::Base
       description += "\n\n<ul>\n"
       topic_count = 0
       hash[:topics].each do |topic|
-        topic = DiscussionTopic.import_from_migration(topic.merge({
+        topic = Importers::DiscussionTopic.import_from_migration(topic.merge({
           :topics_to_import => hash[:topics_to_import],
           :topic_entries_to_import => hash[:topic_entries_to_import]
         }), context)

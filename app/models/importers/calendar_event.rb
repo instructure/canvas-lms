@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module MigrationImport
+module Importers
   class CalendarEvent
 
     # forward translations to CalendarEvent; they used to live there.

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/import_helper')
+require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
 describe "Importing Groups" do
 
@@ -54,7 +54,7 @@ describe "Importing Groups" do
       topic['group_id'] = category['group_id']
       group = Group.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, topic['group_id'])
       if group
-        DiscussionTopic.import_from_migration(topic, group)
+        Importers::DiscussionTopic.import_from_migration(topic, group)
       end
     end
 

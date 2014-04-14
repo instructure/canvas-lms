@@ -1962,7 +1962,7 @@ class Course < ActiveRecord::Base
       end
       if migration.canvas_import?
         migration.update_import_progress(30)
-        MigrationImport::MediaTrack.process_migration(data[:media_tracks], migration)
+        Importers::MediaTrack.process_migration(data[:media_tracks], migration)
       end
     end
 

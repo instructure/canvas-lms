@@ -1,4 +1,4 @@
-module MigrationImport
+module Importers
   class DiscussionTopicOptions
     attr_reader :options
 

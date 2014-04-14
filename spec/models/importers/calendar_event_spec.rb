@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-describe MigrationImport::CalendarEvent do
+describe Importers::CalendarEvent do
 
   let(:migration_course) { course(active_all: true) }
 
@@ -53,7 +53,7 @@ describe MigrationImport::CalendarEvent do
   end
 
   def attachment_suffix(type, value)
-    MigrationImport::CalendarEvent.import_migration_attachment_suffix(
+    Importers::CalendarEvent.import_migration_attachment_suffix(
       {
         attachment_type: type,
         attachment_value: value,
@@ -79,7 +79,7 @@ describe MigrationImport::CalendarEvent do
         attachment_type: 'external_url',
         attachment_value: 'http://example.com'
       }
-      MigrationImport::CalendarEvent.import_from_migration(hash, migration_course, event)
+      Importers::CalendarEvent.import_from_migration(hash, migration_course, event)
       event.should_not be_new_record
       event.imported.should be_true
       event.migration_id.should == 42

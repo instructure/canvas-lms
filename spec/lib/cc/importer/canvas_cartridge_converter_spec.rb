@@ -807,8 +807,8 @@ XML
     hash = @converter.convert_topic(cc_doc, meta_doc)
     hash = hash.with_indifferent_access
     #import
-    DiscussionTopic.import_from_migration(hash, @copy_to)
-    
+    Importers::DiscussionTopic.import_from_migration(hash, @copy_to)
+
     dt_2 = @copy_to.discussion_topics.find_by_migration_id(migration_id)
     dt_2.title.should == dt.title
     dt_2.message.should == body_with_link % @copy_to.id
@@ -855,13 +855,13 @@ XML
     ag1.migration_id = CC::CCHelper.create_key(assignment.assignment_group)
     ag1.save!
     #import
-    DiscussionTopic.import_from_migration(hash, @copy_to)
-    
+    Importers::DiscussionTopic.import_from_migration(hash, @copy_to)
+
     dt_2 = @copy_to.discussion_topics.find_by_migration_id(migration_id)
     dt_2.title.should == dt.title
     dt_2.message.should == body_with_link % @copy_to.id
     dt_2.type.should == dt.type
-    
+
     a = dt_2.assignment
     a.title.should == assignment.title
     a.migration_id.should == CC::CCHelper.create_key(assignment)

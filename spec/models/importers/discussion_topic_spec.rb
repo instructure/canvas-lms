@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/import_helper')
+require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
-describe "Importing discussion topics" do
+describe Importers::DiscussionTopic do
 
   SYSTEMS.each do |system|
     if import_data_exists? system, 'discussion_topic'
@@ -27,14 +27,14 @@ describe "Importing discussion topics" do
         data = data.first
         data = data.with_indifferent_access
         context = get_import_context(system)
-        
+
         data[:topics_to_import] = {}
-        DiscussionTopic.import_from_migration(data, context).should be_nil
+        Importers::DiscussionTopic.import_from_migration(data, context).should be_nil
         DiscussionTopic.count.should == 0
-        
+
         data[:topics_to_import][data[:migration_id]] = true
-        DiscussionTopic.import_from_migration(data, context)
-        DiscussionTopic.import_from_migration(data, context)
+        Importers::DiscussionTopic.import_from_migration(data, context)
+        Importers::DiscussionTopic.import_from_migration(data, context)
         DiscussionTopic.count.should == 1
 
         topic = DiscussionTopic.find_by_migration_id(data[:migration_id])

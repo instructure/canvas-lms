@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/import_helper')
+require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
 describe "Importing announcements" do
 
@@ -26,12 +26,12 @@ describe "Importing announcements" do
         data = get_import_data(system, 'announcements')
         context = get_import_context(system)
         data[:topics_to_import] = {}
-        DiscussionTopic.import_from_migration(data, context).should be_nil
+        Importers::DiscussionTopic.import_from_migration(data, context).should be_nil
         DiscussionTopic.count.should == 0
 
         data[:topics_to_import][data[:migration_id]] = true
-        DiscussionTopic.import_from_migration(data, context)
-        DiscussionTopic.import_from_migration(data, context)
+        Importers::DiscussionTopic.import_from_migration(data, context)
+        Importers::DiscussionTopic.import_from_migration(data, context)
         DiscussionTopic.count.should == 1
 
         topic = DiscussionTopic.find_by_migration_id(data[:migration_id])

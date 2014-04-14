@@ -1,9 +1,14 @@
-module MigrationImport
+module Importers
   class DiscussionTopic
     attr_accessor :options, :context, :item
 
+    def self.import_from_migration(hash, context, item=nil)
+      importer = Importers::DiscussionTopic.new(hash, context, item)
+      importer.run
+    end
+
     def initialize(hash, context, item)
-      self.options = MigrationImport::DiscussionTopicOptions.new(hash)
+      self.options = Importers::DiscussionTopicOptions.new(hash)
       self.context = context
       self.item    = DiscussionTopic(item)
     end

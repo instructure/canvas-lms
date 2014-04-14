@@ -524,7 +524,7 @@ class CalendarEvent < ActiveRecord::Base
     item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
     item ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
     item ||= context.calendar_events.new
-    MigrationImport::CalendarEvent.import_from_migration(hash, context, item)
+    Importers::CalendarEvent.import_from_migration(hash, context, item)
   end
 
   def self.max_visible_calendars

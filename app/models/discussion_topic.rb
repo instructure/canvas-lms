@@ -950,7 +950,10 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def self.import_from_migration(hash, context, item=nil)
-    importer = MigrationImport::DiscussionTopic.new(hash, context, item)
+    # TODO: access Importers::DiscussionTopic directly
+    # this class method will eventually go away. leaving now
+    # for edge cases that may be using it.
+    importer = Importers::DiscussionTopic.new(hash, context, item)
     importer.run
   end
 
