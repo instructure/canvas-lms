@@ -10,12 +10,12 @@
           <label for="submission_to_view">{{#t "this_was_submitted_multiple_times_choose_a_submission_to_view"}}Submitted multiple times, choose which to view:{{/t}}</label>
           <select id="submission_to_view">
             {{#each submission_history}}
-              <option>{{datetimeFormatted submitted_at}} {{#if submissionWasLate}} {{#t "late"}}LATE{{/t}} {{/if}}</option>
+              <option>{{datetimeFormatted submitted_at}} {{#if late}} {{#t "late"}}LATE{{/t}} {{/if}}</option>
             {{/each}}
           </select>
         {{else}}
           {{#if submitted_at}}
-            <strong>{{#t "submitted"}}Submitted:{{/t}} {{datetimeFormatted submitted_at}} {{#if submissionWasLate}} {{#t "late"}}LATE{{/t}} {{/if}}</strong>
+            <strong>{{#t "submitted"}}Submitted:{{/t}} {{datetimeFormatted submitted_at}} {{#if late}} {{#t "late"}}LATE{{/t}} {{/if}}</strong>
           {{/if}}
         {{/if}}
       </h2>
