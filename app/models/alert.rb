@@ -157,16 +157,7 @@ class Alert < ActiveRecord::Base
       end
     end
     if criterion_types.include? 'UngradedCount'
-      ungraded_counts = course.submissions.
-          group("submissions.user_id").
-          where(:user_id => student_ids).
-          where(Submission.needs_grading_conditions).
-          except(:order).
-          count
-      ungraded_counts.each do |user_id, count|
-        student = data[user_id]
-        student[:ungraded_count] = count
-      end
+      ungraded_count_alert = Alerts::UngradedCount.new(course, student_ids)
     end
     if criterion_types.include? 'UngradedTimespan'
       ungraded_timespans = course.submissions.
@@ -212,7 +203,7 @@ class Alert < ActiveRecord::Base
               break
             end
           when 'UngradedCount'
-            if (user_data[:ungraded_count].to_i < criterion.threshold.to_i)
+            if ungraded_count_alert.should_not_receive_message?(user_id, criterion.threshold.to_i)
               matches = false
               break
             end
