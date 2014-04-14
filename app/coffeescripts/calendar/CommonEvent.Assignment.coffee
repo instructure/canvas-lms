@@ -47,7 +47,7 @@ define [
       @readableTypes[@assignmentType()]
 
     saveDates: (success, error) =>
-      @save { 'assignment[due_at]': $.unfudgeDateForProfileTimezone(@start).toISOString() }, success, error
+      @save { 'assignment[due_at]': if @start then $.unfudgeDateForProfileTimezone(@start).toISOString() else '' }, success, error
 
     save: (params, success, error) =>
       $.publish('CommonEvent/assignmentSaved', this)
