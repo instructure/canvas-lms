@@ -160,16 +160,7 @@ class Alert < ActiveRecord::Base
       ungraded_count_alert = Alerts::UngradedCount.new(course, student_ids)
     end
     if criterion_types.include? 'UngradedTimespan'
-      ungraded_timespans = course.submissions.
-          group("submissions.user_id").
-          where(:user_id => student_ids).
-          where(Submission.needs_grading_conditions).
-          except(:order).
-          minimum(:submitted_at)
-      ungraded_timespans.each do |user_id, timespan|
-        student = data[user_id]
-        student[:ungraded_timespan] = timespan
-      end
+      ungraded_timespan_alert = Alerts::UngradedTimespan.new(course, student_ids)
     end
     include_user_notes = course.root_account.enable_user_notes? if include_user_notes.nil?
     if criterion_types.include?('UserNote') && include_user_notes
@@ -208,7 +199,7 @@ class Alert < ActiveRecord::Base
               break
             end
           when 'UngradedTimespan'
-            if (!user_data[:ungraded_timespan] || user_data[:ungraded_timespan] + criterion.threshold.days > today)
+            if ungraded_timespan_alert.should_not_receive_message?(user_id, criterion.threshold.to_i)
               matches = false
               break
             end
