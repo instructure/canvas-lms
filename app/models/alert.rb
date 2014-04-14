@@ -130,31 +130,7 @@ class Alert < ActiveRecord::Base
 
     # Bulk data gathering
     if criterion_types.include? 'Interaction'
-      scope = SubmissionComment.for_context(course).
-          where(:author_id => teacher_ids, :recipient_id => student_ids)
-      last_comment_dates = CANVAS_RAILS2 ?
-          scope.maximum(:created_at, :group => [:recipient_id, :author_id]) :
-          scope.group(:recipient_id, :author_id).maximum(:created_at)
-      last_comment_dates.each do |key, date|
-        student = data[key.first]
-        (student[:last_interaction] ||= {})[key.last] = date
-      end
-      scope = ConversationMessage.
-          joins('INNER JOIN conversation_participants ON conversation_participants.conversation_id=conversation_messages.conversation_id').
-          where(:conversation_messages => { :author_id => teacher_ids, :generated => false }, :conversation_participants => { :user_id => student_ids })
-      last_message_dates = CANVAS_RAILS2 ?
-          scope.maximum(:created_at, :group => ['conversation_participants.user_id', 'conversation_messages.author_id']) :
-          scope.group('conversation_participants.user_id', 'conversation_messages.author_id').maximum(:created_at)
-      last_message_dates.each do |key, date|
-        student = data[key.first.to_i]
-        last_interaction = (student[:last_interaction] ||= {})
-        last_interaction[key.last] = [last_interaction[key.last], date].compact.max
-      end
-
-      data.each do |student_id, user_data|
-        user_data[:last_interaction] ||= {}
-        user_data[:last_interaction][:all] = user_data[:last_interaction].values.max
-      end
+      interaction_alert = Alerts::Interaction.new(course, student_ids, teacher_ids)
     end
     if criterion_types.include? 'UngradedCount'
       ungraded_count_alert = Alerts::UngradedCount.new(course, student_ids)
@@ -169,7 +145,6 @@ class Alert < ActiveRecord::Base
 
     # Evaluate all the criteria for each user for each alert
     today = Time.now.beginning_of_day
-    start_at = course.start_at || course.created_at
 
     alerts.each do |alert|
       data.each do |user_id, user_data|
@@ -177,7 +152,7 @@ class Alert < ActiveRecord::Base
         alert.criteria.each do |criterion|
           case criterion.criterion_type
           when 'Interaction'
-            if (user_data[:last_interaction][:all] || start_at) + criterion.threshold.days > today
+            if interaction_alert.should_not_receive_message?(user_id, criterion.threshold.to_i)
               matches = false
               break
             end
