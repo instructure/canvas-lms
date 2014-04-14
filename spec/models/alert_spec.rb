@@ -125,7 +125,7 @@ describe Alert do
         enable_cache do
           course_with_teacher(:active_all => 1)
           student_in_course(:active_all => 1)
-          alert = @course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+          @course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
           @course.start_at = Time.now - 30.days
           @mock_notification.expects(:create_message).with(anything, [@user.id], anything).once
 
@@ -138,7 +138,7 @@ describe Alert do
         enable_cache do
           course_with_teacher(:active_all => 1)
           student_in_course(:active_all => 1)
-          alert = @course.alerts.create!(:recipients => [:student], :repetition => 1, :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+          @course.alerts.create!(:recipients => [:student], :repetition => 1, :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
           @course.start_at = Time.now - 30.days
           @mock_notification.expects(:create_message).with(anything, [@user.id], anything).once
 
@@ -273,6 +273,30 @@ describe Alert do
         Rails.cache.write([alert, @student.id].cache_key, (Time.now - 5.days).beginning_of_day)
         Alert.evaluate_for_course(@course, nil)
       end
+    end
+
+    it "memoizes alert checker creation" do
+      course_with_teacher(:active_all => 1)
+      @teacher = @user
+      @user = nil
+      student_in_course(:active_all => 1)
+      @assignment = @course.assignments.new(:title => "some assignment")
+      @assignment.workflow_state = "published"
+      @assignment.save
+      @submission = @assignment.submit_homework(@user)
+      SubmissionComment.create!(:submission => @submission, :comment => 'some comment', :author => @teacher, :recipient => @user) do |sc|
+        sc.created_at = Time.now - 30.days
+      end
+
+      alert = @course.alerts.build(:recipients => [:student])
+      alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
+      alert.save!
+      @course.start_at = Time.now - 30.days
+
+      mock_interaction = stub(should_not_receive_message?: true)
+      Alerts::Interaction.expects(:new).once.returns(mock_interaction)
+
+      Alert.evaluate_for_course(@course, [alert])
     end
 
     context 'ungraded count' do

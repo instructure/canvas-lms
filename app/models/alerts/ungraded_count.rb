@@ -1,7 +1,7 @@
 module Alerts
   class UngradedCount
 
-    def initialize(course, student_ids)
+    def initialize(course, student_ids, _ = nil)
       @ungraded_count_for_student = {}
       ungraded_counts = course.submissions.
         group("submissions.user_id").

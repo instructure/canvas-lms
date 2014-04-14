@@ -124,54 +124,21 @@ class Alert < ActiveRecord::Base
 
     teacher_student_mapper = Courses::TeacherStudentMapper.new(student_enrollments, teacher_enrollments)
 
-    criterion_types = alerts.map(&:criteria).flatten.map(&:criterion_type).uniq
-    data = {}
-    student_enrollments.each { |e| data[e.user_id] = {} }
-
-    # Bulk data gathering
-    if criterion_types.include? 'Interaction'
-      interaction_alert = Alerts::Interaction.new(course, student_ids, teacher_ids)
-    end
-    if criterion_types.include? 'UngradedCount'
-      ungraded_count_alert = Alerts::UngradedCount.new(course, student_ids)
-    end
-    if criterion_types.include? 'UngradedTimespan'
-      ungraded_timespan_alert = Alerts::UngradedTimespan.new(course, student_ids)
-    end
-    if criterion_types.include? 'UserNote'
-      user_note_alert = Alerts::UserNote.new(course, student_ids, teacher_ids)
-    end
-
     # Evaluate all the criteria for each user for each alert
     today = Time.now.beginning_of_day
 
+    alert_checkers = {}
+
     alerts.each do |alert|
-      data.each do |user_id, user_data|
+      student_ids.each do |user_id|
         matches = true
+
         alert.criteria.each do |criterion|
-          case criterion.criterion_type
-          when 'Interaction'
-            if interaction_alert.should_not_receive_message?(user_id, criterion.threshold.to_i)
-              matches = false
-              break
-            end
-          when 'UngradedCount'
-            if ungraded_count_alert.should_not_receive_message?(user_id, criterion.threshold.to_i)
-              matches = false
-              break
-            end
-          when 'UngradedTimespan'
-            if ungraded_timespan_alert.should_not_receive_message?(user_id, criterion.threshold.to_i)
-              matches = false
-              break
-            end
-          when 'UserNote'
-            if user_note_alert.should_not_receive_message?(user_id, criterion.threshold.to_i)
-              matches = false
-              break
-            end
-          end
+          alert_checker = alert_checkers[criterion.criterion_type] ||= Alerts.const_get(criterion.criterion_type).new(course, student_ids, teacher_ids)
+          matches = !alert_checker.should_not_receive_message?(user_id, criterion.threshold.to_i)
+          break unless matches
         end
+
         cache_key = [alert, user_id].cache_key
         if matches
           last_sent = Rails.cache.fetch(cache_key)
