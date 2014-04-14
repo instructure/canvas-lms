@@ -1223,7 +1223,10 @@ define([
         _(templateSubmissions).last().selected = true;
         innerHTML = submissionsDropdownTemplate({
           singleSubmission: submissionHistory.length == 1,
-          submissions: templateSubmissions
+          submissions: templateSubmissions,
+          linkToQuizHistory: jsonData.too_many_quiz_submissions,
+          quizHistoryHref: $.replaceTags(ENV.quiz_history_url,
+                                         {user_id: this.currentStudent.id})
         });
       }
       $multiple_submissions.html(innerHTML);

@@ -402,6 +402,11 @@ class GradebooksController < ApplicationController
           :CONTEXT_ACTION_SOURCE => :speed_grader,
           :settings_url => speed_grader_settings_course_gradebook_path,
         }
+        if @assignment.quiz
+          env[:quiz_history_url] = course_quiz_history_path @context.id,
+                                                            @assignment.quiz.id,
+                                                            :user_id => "{{user_id}}"
+        end
         append_sis_data(env)
         js_env(env)
         render :action => "speed_grader"

@@ -118,34 +118,47 @@ describe "speed grader" do
     end
   end
 
-  it "lets you view previous quiz submissions" do
-    @assignment.update_attributes! points_possible: 10,
-                                   submission_types: 'online_quiz',
-                                   title: "Quiz"
-    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
+  context "quiz submissions" do
+    before do
+      @assignment.update_attributes! points_possible: 10,
+                                     submission_types: 'online_quiz',
+                                     title: "Quiz"
+      @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
 
-    student_in_course
-    2.times do |i|
-      qs = @quiz.generate_submission(@student)
-      opts = i == 0 ? {finished_at: (Date.today - 7) + 30.minutes} : {}
-      qs.grade_submission(opts)
+      student_in_course
+      2.times do |i|
+        qs = @quiz.generate_submission(@student)
+        opts = i == 0 ? {finished_at: (Date.today - 7) + 30.minutes} : {}
+        qs.grade_submission(opts)
+      end
     end
 
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    it "lets you view previous quiz submissions" do
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
-    submission_dropdown = f("#submission_to_view")
-    submission_dropdown.should be_displayed
+      submission_dropdown = f("#submission_to_view")
+      submission_dropdown.should be_displayed
 
-    submissions = submission_dropdown.find_elements(:css, "option")
-    submissions.size.should == 2
+      submissions = submission_dropdown.find_elements(:css, "option")
+      submissions.size.should == 2
 
-    submissions.each do |s|
-      s.click
-      submission_date = s.text
-      in_frame('speedgrader_iframe') do
-        wait_for_ajaximations
-        f('.quiz-submission').text.should include submission_date
+      submissions.each do |s|
+        s.click
+        submission_date = s.text
+        in_frame('speedgrader_iframe') do
+          wait_for_ajaximations
+          f('.quiz-submission').text.should include submission_date
+        end
       end
+    end
+
+    it "links to the quiz history page when there are too many quiz submissions" do
+      Setting.set("too_many_quiz_submission_versions", 2)
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      fj("#submission_to_view").should be_nil
+      uri = URI.parse(f(".see-all-attempts")[:href])
+      uri.path.should == "/courses/#{@course.id}/quizzes/#{@quiz.id}/history"
+      uri.query.should == "user_id=#{@student.id}"
     end
   end
 

@@ -1184,7 +1184,7 @@ class Assignment < ActiveRecord::Base
                             :versions,
                             :quiz_submission)
 
-    too_many = too_many_qs_versions?(submissions)
+    res[:too_many_quiz_submissions] = too_many = too_many_qs_versions?(submissions)
     qs_versions = quiz_submission_versions(submissions, too_many)
 
     res[:submissions] = submissions.map do |sub|

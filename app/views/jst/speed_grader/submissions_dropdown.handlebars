@@ -22,3 +22,9 @@
   {{/each}}
   </select>
 {{/if}}
+
+{{#if linkToQuizHistory}}
+  <a href="{{quizHistoryHref}}" class=see-all-attempts>
+    {{#t "see_all_quiz_attempts"}}See all quiz attempts{{/t}}
+  </a>
+{{/if}}
