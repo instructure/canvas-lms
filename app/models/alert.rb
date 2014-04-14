@@ -164,19 +164,7 @@ class Alert < ActiveRecord::Base
     end
     include_user_notes = course.root_account.enable_user_notes? if include_user_notes.nil?
     if criterion_types.include?('UserNote') && include_user_notes
-      scope = UserNote.active.
-          where(:created_by_id => teacher_ids, :user_id => student_ids)
-      note_dates = CANVAS_RAILS2 ?
-          scope.maximum(:created_at, :group => [:user_id, :created_by_id]) :
-          scope.group(:user_id, :created_by_id).maximum(:created_at)
-      note_dates.each do |key, date|
-        student = data[key.first]
-        (student[:last_user_note] ||= {})[key.last] = date
-      end
-      data.each do |student_id, user_data|
-        user_data[:last_user_note] ||= {}
-        user_data[:last_user_note][:all] = user_data[:last_user_note].values.max
-      end
+      user_note_alert = Alerts::UserNote.new(course, student_ids, teacher_ids)
     end
 
     # Evaluate all the criteria for each user for each alert
@@ -204,7 +192,7 @@ class Alert < ActiveRecord::Base
               break
             end
           when 'UserNote'
-            if include_user_notes && (user_data[:last_user_note][:all] || start_at) + criterion.threshold.days > today
+            if include_user_notes && user_note_alert.should_not_receive_message?(user_id, criterion.threshold.to_i)
               matches = false
               break
             end
