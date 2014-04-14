@@ -179,17 +179,25 @@ describe Attachment do
       @attachment.crocodoc_document.uuid.should == '1234567890'
     end
 
-    it "should spawn a delayed job to retry failed uploads (once)" do
+    it "should spawn delayed jobs to retry failed uploads" do
       Crocodoc::API.any_instance.stubs(:upload).returns 'error' => 'blah'
       crocodocable_attachment_model
 
-      expects_job_with_tag('Attachment#submit_to_crocodoc', 1) do
+      attempts = 3
+      Setting.set('max_crocodoc_attempts', attempts)
+
+      track_jobs do
+        # first attempt
         @attachment.submit_to_crocodoc
+
+        # nth attempt won't create more jobs
+        attempts.times {
+          Timecop.freeze(1.hour.from_now)
+          run_jobs
+        }
       end
 
-      expects_job_with_tag('Attachment#submit_to_crocodoc', 0) do
-        @attachment.submit_to_crocodoc(2)
-      end
+      created_jobs.size.should == attempts
     end
 
     it "should submit to scribd if crocodoc fails to convert" do
