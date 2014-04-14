@@ -661,7 +661,7 @@ class CalendarEventsApiController < ApplicationController
 
     # only get pertinent contexts if there is a user
     if @current_user
-      get_all_pertinent_contexts(true)
+      get_all_pertinent_contexts(include_groups: true)
     end
 
     if codes

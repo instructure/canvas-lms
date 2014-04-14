@@ -454,7 +454,7 @@ class ApplicationController < ActionController::Base
   # associated with the given context.  If the context is a user then it will
   # include all the user's current contexts.
   # Assigns it to the variable @contexts
-  def get_all_pertinent_contexts(include_groups = false)
+  def get_all_pertinent_contexts(opts = {})
     return if @already_ran_get_all_pertinent_contexts
     @already_ran_get_all_pertinent_contexts = true
 
@@ -467,7 +467,7 @@ class ApplicationController < ActionController::Base
       # the grants_right? check to avoid querying for the various memberships
       # again.
       courses = @context.current_enrollments.with_each_shard.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
-      groups = include_groups ? @context.current_groups.with_each_shard.reject{|g| g.context_type == "Course" &&
+      groups = opts[:include_groups] ? @context.current_groups.with_each_shard.reject{|g| g.context_type == "Course" &&
           (g.context.completed? || g.context.soft_concluded?)} : []
       if only_contexts.present?
         # find only those courses and groups passed in the only_contexts
@@ -476,8 +476,14 @@ class ApplicationController < ActionController::Base
         course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
         courses = course_ids.empty? ? [] : courses.select { |c| course_ids.include?(c.id) }
         group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
-        groups = group_ids.empty? ? [] : groups.select { |g| group_ids.include?(g.id) } if include_groups
+        groups = group_ids.empty? ? [] : groups.select { |g| group_ids.include?(g.id) } if opts[:include_groups]
       end
+
+      if opts[:favorites_first]
+        favorite_course_ids = @context.favorite_context_ids("Course")
+        courses = courses.sort_by {|c| [favorite_course_ids.include?(c.id) ? 0 : 1, Canvas::ICU.collation_key(c.name)]}
+      end
+
       @contexts.concat courses
       @contexts.concat groups
     end
