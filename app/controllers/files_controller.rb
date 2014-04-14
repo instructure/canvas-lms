@@ -285,7 +285,7 @@ class FilesController < ApplicationController
     add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url))
     @contexts = [@context]
     if !@context.is_a?(User) || (@context == @current_user && params[:show_all_contexts])
-      get_all_pertinent_contexts(true)
+      get_all_pertinent_contexts(include_groups: true)
     end
     @too_many_contexts = @contexts.length > 15
     @contexts = @contexts[0,15]
