@@ -8,7 +8,7 @@
 
 <%= t :body, "%{user} posted a new comment on the thread %{discussion_topic} for %{course}:", :user => asset.user.short_name, :discussion_topic => asset.title, :course => asset.context.name %>
 
-<%= html_to_simple_text(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}") %>
+<%= html_to_text(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}") %>
 
 <%= t :discussion_entry_reply_message, "Join the conversation using the link below, or comment by replying to this message." %>
 <%= content :link %>

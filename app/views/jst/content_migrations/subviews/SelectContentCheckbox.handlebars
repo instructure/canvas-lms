@@ -1,3 +1,14 @@
-<label class="checkbox" for="selectContentCheckbox">
-  <input id="selectContentCheckbox" type="checkbox" />{{#t "select_migration_label"}}Select migration content{{/t}}
-</label>
+<div class="radio">
+  <label>
+    <input type="radio" name="selective_import" value=false>
+    {{#t "select_all_content"}}All content{{/t}}
+  </label>
+</div>
+
+<div class="radio">
+  <label>
+    <input type="radio" name="selective_import" value=true>
+    {{#t "select_specific_content"}}Select specific content{{/t}}
+  </label>
+</div>
+

@@ -57,7 +57,7 @@
 #           "type": "string"
 #         },
 #         "contributed": {
-#           "description": "True if the request counted as contributing, such as editing a wiki page",
+#           "description": "This field is deprecated, and will always be false",
 #           "example": "false",
 #           "type": "boolean"
 #         },

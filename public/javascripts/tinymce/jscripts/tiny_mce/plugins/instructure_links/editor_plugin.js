@@ -17,19 +17,21 @@
  */
 
 define([
-  'require',
   'compiled/editor/stocktiny',
   'jquery',
   'vendor/scribd.view',
   'jquery.instructure_misc_helpers',
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins',
-], function(require, tinymce, $, scribd) {
+], function(tinymce, $, scribd) {
 
   var lastLookup = null;
 
-  // circular dependency
-  require(['tinymce.editor_box'], function() {
+  // hack for circular dependency
+  if (!$.fn.editorBox) {
+    console && console.log('tinymce.editor_box not loaded yet');
+    require(['tinymce.editor_box']);
+  }
 
     tinymce.create('tinymce.plugins.InstructureLinks', {
       init : function(ed, url) {
@@ -377,6 +379,5 @@ define([
     
     // Register plugin
     tinymce.PluginManager.add('instructure_links', tinymce.plugins.InstructureLinks);
-  });
 });
 

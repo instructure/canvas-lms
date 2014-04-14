@@ -178,7 +178,9 @@ class Account < ActiveRecord::Base
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
   add_setting :enable_fabulous_quizzes, :boolean => true, :root_only => true, :default => false
+  add_setting :js_kaltura_uploader, :boolean => true, :root_only => true, :default => false
   add_setting :google_docs_domain, root_only: true
+  add_setting :dashboard_url, root_only: true
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -387,7 +389,14 @@ class Account < ActiveRecord::Base
   end
 
   def associated_courses
-    Course.shard(shard).where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
+    scope = if CANVAS_RAILS2
+      Course.shard(shard)
+    else
+      shard.activate do
+        Course.scoped
+      end
+    end
+    scope.where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
   end
 
   def fast_course_base(opts)

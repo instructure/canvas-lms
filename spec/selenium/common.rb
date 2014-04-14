@@ -401,7 +401,7 @@ shared_examples_for "all selenium tests" do
 
   def check_domready
     dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
-    requirejs_resources_loaded = driver.execute_script "return require.resourcesDone"
+    requirejs_resources_loaded = driver.execute_script "return !requirejs.s.contexts._.defQueue.length"
     dom_is_ready and requirejs_resources_loaded
   end
 
@@ -421,7 +421,7 @@ shared_examples_for "all selenium tests" do
     driver.execute_async_script(<<-JS)
      var callback = arguments[arguments.length - 1];
      var pollForJqueryAndRequire = function(){
-        if (window.jQuery && window.require && window.require.resourcesDone) {
+        if (window.jQuery && window.require && !window.requirejs.s.contexts._.defQueue.length) {
           jQuery(function(){
             setTimeout(callback, 1);
           });

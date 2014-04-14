@@ -114,9 +114,28 @@ class FilesController < ApplicationController
     end
   end
 
+  # @API Get quota information
+  # Returns the total and used storage quota for the course, group, or user.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/1/files/quota' \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #
+  #  { "quota": 524288000, "quota_used": 402653184 }
+  #
+  def api_quota
+    if authorized_action(@context.attachments.build, @current_user, :create)
+      get_quota
+      render json: {quota: @quota, quota_used: @quota_used}
+    end
+  end
+
   def check_file_access_flags
     if params[:user_id] && params[:ts] && params[:sf_verifier]
-      user = User.find_by_id(params[:user_id]) if params[:user_id].present?
+      user = api_find(User, params[:user_id]) if params[:user_id].present?
       if user && user.valid_access_verifier?(params[:ts], params[:sf_verifier])
         # attachment.rb checks for this session attribute when determining 
         # permissions, but it should be ignored by the rest of the models' 
@@ -528,7 +547,7 @@ class FilesController < ApplicationController
 
   def send_stored_file(attachment, inline=true, redirect_to_s3=false)
     user = @current_user
-    user ||= User.find_by_id(params[:user_id]) if params[:user_id].present?
+    user ||= api_find(User, params[:user_id]) if params[:user_id].present?
     attachment.context_module_action(user, :read) if user && !params[:preview]
     log_asset_access(@attachment, "files", "files") unless params[:preview]
     set_cache_header(attachment)
@@ -661,11 +680,6 @@ class FilesController < ApplicationController
   def s3_success
     if params[:id].present?
       @attachment = Attachment.find_by_id_and_workflow_state_and_uuid(params[:id], 'unattached', params[:uuid])
-      if bucket = @attachment.try_rescue(:bucket)
-        prefix = request.ssl? ? 'https' : 'http'
-        response.headers['Access-Control-Allow-Origin']  = "#{prefix}://#{bucket.name}.#{bucket.config.s3_endpoint}/"
-        response.headers['Access-Control-Allow-Methods'] = 'GET'
-      end
     end
     details = @attachment.s3object.head rescue nil
     if @attachment && details

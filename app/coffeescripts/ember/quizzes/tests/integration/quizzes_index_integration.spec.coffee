@@ -9,9 +9,9 @@ define [
 
   App = null
 
-  fixtures.create()
   module 'quizzes index integration',
     setup: ->
+      fixtures.create()
       App = startApp()
 
     teardown: ->

@@ -11,6 +11,7 @@ define [
   'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
   'jquery'
   'underscore'
+  'timezone'
   'compiled/grade_calculator'
   'compiled/userSettings'
   'vendor/spin'
@@ -18,7 +19,7 @@ define [
   'compiled/gradebook2/AssignmentGroupWeightsDialog'
   'compiled/gradebook2/SubmissionCell'
   'compiled/gradebook2/GradebookHeaderMenu'
-  'compiled/gradebook2/NumberCompare'
+  'compiled/util/NumberCompare'
   'str/htmlEscape'
   'compiled/gradebook2/UploadDialog'
   'jst/gradebook2/column_header'
@@ -37,7 +38,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
+], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
 
   class Gradebook
     columnWidths =
@@ -180,7 +181,7 @@ define [
         for assignment in group.assignments
           htmlEscape(assignment)
           assignment.assignment_group = group
-          assignment.due_at = $.parseFromISO(assignment.due_at) if assignment.due_at
+          assignment.due_at = tz.parse(assignment.due_at)
           @assignments[assignment.id] = assignment
 
     gotSections: (sections) =>
@@ -300,8 +301,8 @@ define [
       return (diffOfAssignmentGroupPosition * 1000000) + diffOfAssignmentPosition
 
     compareAssignmentDueDates: (a, b) =>
-      aDate = a.object.due_at?.timestamp or Number.MAX_VALUE
-      bDate = b.object.due_at?.timestamp or Number.MAX_VALUE
+      aDate = if a.object.due_at then (+a.object.due_at / 1000) else Number.MAX_VALUE
+      bDate = if b.object.due_at then (+b.object.due_at / 1000) else Number.MAX_VALUE
       if aDate is bDate
         return 0 if a.object.name is b.object.name
         return (if a.object.name > b.object.name then 1 else -1)
@@ -435,7 +436,7 @@ define [
 
     updateSubmission: (submission) =>
       student = @student(submission.user_id)
-      submission.submitted_at = $.parseFromISO(submission.submitted_at) if submission.submitted_at
+      submission.submitted_at = tz.parse(submission.submitted_at)
       student["assignment_#{submission.assignment_id}"] = submission
 
     # this is used after the CurveGradesDialog submit xhr comes back.  it does not use the api
@@ -1057,7 +1058,7 @@ define [
           @sortRowsBy (a, b) ->
             aScore = a[data.sortCol.field]?.score
             bScore = b[data.sortCol.field]?.score
-            numberCompare(aScore, bScore, data.sortAsc)
+            numberCompare(aScore, bScore, descending: !data.sortAsc)
 
       @grid.onKeyDown.subscribe ->
         # TODO: start editing automatically when a number or letter is typed

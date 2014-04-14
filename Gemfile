@@ -29,6 +29,24 @@ end
 
 require File.expand_path("../config/canvas_rails3", __FILE__)
 
+# force a different lockfile for rails 3
+if CANVAS_RAILS3
+  Bundler::SharedHelpers.class_eval do
+    class << self
+      def default_lockfile
+        Pathname.new("#{Bundler.default_gemfile}.lock3")
+      end
+    end
+  end
+
+  Bundler::Dsl.class_eval do
+    def to_definition(lockfile, unlock)
+      @sources << @rubygems_source unless @sources.include?(@rubygems_source)
+      Definition.new(Bundler.default_lockfile, @dependencies, @sources, unlock, @ruby_version)
+    end
+  end
+end
+
 # patch bundler to do github over https
 unless Bundler::Dsl.private_instance_methods.include?(:_old_normalize_options)
   class Bundler::Dsl
@@ -59,13 +77,13 @@ if CANVAS_RAILS2
   # "ActiveModel", and aliases ActiveRecord::Errors to ActiveModel::Errors
   # so Authlogic will use the right thing when it detects that ActiveModel
   # is defined.
-  gem 'active_model_serializers_rails_2.3', '0.9.0pre2', :require => 'active_model_serializers'
+  gem 'active_model_serializers_rails_2.3', '0.9.0alpha1', :require => 'active_model_serializers'
   gem 'authlogic', '2.1.3'
 else
   # just to be clear, Canvas is NOT READY to run under Rails 3 in production
   gem 'rails', '3.2.17'
-  gem 'active_model_serializers', '0.9.0pre',
-    :github => 'rails-api/active_model_serializers', :ref => '99fa399ae6dc071b97b15e1ef2b42f0d23c492ec'
+  gem 'active_model_serializers', '0.9.0alpha1',
+    :github => 'rails-api/active_model_serializers', :ref => '61882e1e4127facfe92e49057aec71edbe981829'
   gem 'authlogic', '3.3.0'
 end
 
@@ -81,7 +99,7 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
 gem 'canvas_connect', '0.3.2'
   gem 'adobe_connect', '1.0.0'
-gem 'canvas_webex', '0.12'
+gem 'canvas_webex', '0.14'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
 unless CANVAS_RAILS2
@@ -90,13 +108,13 @@ end
 if CANVAS_RAILS2
   gem 'encrypted_cookie_store-instructure', '1.0.5', :require => 'encrypted_cookie_store'
 else
-  gem 'encrypted_cookie_store-instructure', '1.1.1', :require => 'encrypted_cookie_store'
+  gem 'encrypted_cookie_store-instructure', '1.1.2', :require => 'encrypted_cookie_store'
 end
 if CANVAS_RAILS2
   gem 'erubis', '2.7.0'
 end
 if CANVAS_RAILS2
-  gem 'fake_arel', '1.4.0'
+  gem 'fake_arel', '1.5.0'
   gem 'fake_rails3_routes', '1.0.4'
     gem 'journey', '1.0.4'
 end
@@ -114,7 +132,7 @@ gem 'jammit', '0.6.6'
   gem 'cssmin', '1.0.3'
   gem 'jsmin', '1.0.1'
 gem 'json', '1.8.1'
-gem 'oj', '2.1.7'
+gem 'oj', '2.5.5'
 unless CANVAS_RAILS2
   gem 'rails-patch-json-encode', '0.0.1'
 end
@@ -150,7 +168,7 @@ gem 'rscribd', '1.2.0'
 gem 'net-ldap', '0.3.1', :require => 'net/ldap'
 gem 'ruby-saml-mod', '0.1.25'
 gem 'rubycas-client', '2.2.1'
-gem 'rubyzip', '1.0.0', :require => 'zip'
+gem 'rubyzip', '1.1.0', :require => 'zip', :github => 'rubyzip/rubyzip', :ref => '2697c7ea4fba6dca66acd4793965501b06ea8df6'
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace
 gem 'safe_yaml', '0.9.7', :require => false
 gem 'safe_yaml-instructure', '0.8.0', :require => false
@@ -158,7 +176,7 @@ gem 'safe_yaml-instructure', '0.8.0', :require => false
 gem 'sanitize', '2.0.3'
 gem 'shackles', '1.0.2'
 unless CANVAS_RAILS2
-  gem 'switchman', '0.0.1', :github => "instructure/switchman"
+  gem 'switchman', '1.1.0'
 end
 gem 'tzinfo', '0.3.35'
 gem 'useragent', '0.4.16'
@@ -167,17 +185,12 @@ if CANVAS_RAILS2
   gem 'folio-pagination-legacy', '0.0.3', :require => 'folio/rails'
   gem 'will_paginate', '2.3.15', :require => false
 else
-  gem 'folio-pagination', '0.0.6', :require => 'folio/rails'
+  gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
   gem 'will_paginate', '3.0.4', :require => false
 end
 gem 'xml-simple', '1.0.12', :require => 'xmlsimple'
 gem 'foreigner', '0.9.2'
 gem 'crocodoc-ruby', '0.0.1', :require => 'crocodoc'
-# needs https://github.com/regru/premailer/commit/8d3ae698eff135011b19e1587a68c399ec97b185
-# we can go back to the gem once 1.7.8 is released
-gem 'regru-premailer', :require => 'premailer', :github => "regru/premailer", :ref => "08a73c70701f5d81bc4a5cf6c959a45ad94db88e"
-  gem 'css_parser', '1.3.5'
-  gem 'htmlentities', '4.3.1'
 
 gem 'activesupport-suspend_callbacks', :path => 'gems/activesupport-suspend_callbacks'
 gem 'adheres_to_policy', :path => 'gems/adheres_to_policy'
@@ -186,6 +199,7 @@ gem 'canvas_color', :path => 'gems/canvas_color'
 gem 'canvas_crummy', :path => 'gems/canvas_crummy'
 gem 'canvas_mimetype_fu', :path => 'gems/canvas_mimetype_fu'
 gem 'canvas_sanitize', :path => 'gems/canvas_sanitize'
+gem 'canvas_statsd', :path => 'gems/canvas_statsd'
 gem 'canvas_stringex', :path => 'gems/canvas_stringex'
 gem 'canvas_uuid', :path => 'gems/canvas_uuid'
 gem 'html_text_helper', :path => 'gems/html_text_helper'
@@ -207,7 +221,11 @@ group :assets do
 end
 
 group :mysql do
-  gem 'mysql2', '0.2.18'
+  if CANVAS_RAILS3
+    gem 'mysql2', '0.3.15'
+  else
+    gem 'mysql2', '0.2.18'
+  end
 end
 
 group :postgres do
@@ -240,15 +258,15 @@ group :test do
   gem 'selenium-webdriver', '2.39.0'
     gem 'childprocess', '0.4.0'
     gem 'websocket', '1.0.7'
-  gem 'webrat', '0.7.3'
-    gem 'rack-test', '0.6.2', :require => false
   gem 'webmock', '1.16.1', :require => false
     gem 'addressable', '2.3.5'
     gem 'crack', '0.4.1'
   gem 'yard', '0.8.0'
   gem 'yard-appendix', '>=0.1.8'
   gem 'timecop', '0.6.3'
-  gem 'test-unit', '1.2.3'
+  if CANVAS_RAILS2
+    gem 'test-unit', '1.2.3'
+  end
   gem 'bullet', '4.5.0', :require => false
     gem 'uniform_notifier', '1.4.0'
 end
@@ -294,10 +312,6 @@ group :cassandra do
     gem 'thrift', '0.8.0'
     gem 'thrift_client', '0.8.4'
   gem "canvas_cassandra", path: "gems/canvas_cassandra"
-end
-
-group :statsd do
-  gem 'statsd-ruby', '1.0.0', :require => 'statsd'
 end
 
 group :icu do

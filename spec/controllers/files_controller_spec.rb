@@ -51,7 +51,7 @@ describe FilesController do
     hash[@tag.id.to_s] = {:type => 'must_view'}
     @module.completion_requirements = hash
     @module.save!
-    @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+    @module.evaluate_for(@user, true).state.should eql(:unlocked)
   end
 
   def file_with_path(path)
@@ -270,7 +270,7 @@ describe FilesController do
       file_in_a_module
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1
       @module.reload
-      @module.evaluate_for(@user, true, true).state.should eql(:completed)
+      @module.evaluate_for(@user, true).state.should eql(:completed)
       @file.reload.last_inline_view.should be_nil
     end
 
@@ -280,7 +280,7 @@ describe FilesController do
       @file.save!
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1
       @module.reload
-      @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+      @module.evaluate_for(@user, true).state.should eql(:unlocked)
       @file.reload.last_inline_view.should be_nil
     end
 
@@ -290,7 +290,7 @@ describe FilesController do
       @file.save!
       get 'show', :course_id => @course.id, :id => @file.id
       @module.reload
-      @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+      @module.evaluate_for(@user, true).state.should eql(:unlocked)
       @file.reload.last_inline_view.should be_nil
     end
 
@@ -299,7 +299,7 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :inline => 1
       json_parse.should == {'ok' => true}
       @module.reload
-      @module.evaluate_for(@user, true, true).state.should eql(:completed)
+      @module.evaluate_for(@user, true).state.should eql(:completed)
       @file.reload.last_inline_view.should > 1.minute.ago
     end
 
@@ -322,7 +322,7 @@ describe FilesController do
       @file.save!
       get 'show', :course_id => @course.id, :id => @file.id, :format => :json
       @module.reload
-      @module.evaluate_for(@user, true, true).state.should eql(:completed)
+      @module.evaluate_for(@user, true).state.should eql(:completed)
       @file.reload.last_inline_view.should > 1.minute.ago
     end
 
@@ -338,7 +338,7 @@ describe FilesController do
 
       get 'show', :course_id => @course.id, :id => @file.id, :format => :json
       @module.reload
-      @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+      @module.evaluate_for(@user, true).state.should eql(:unlocked)
       @file.reload.last_inline_view.should be_nil
     end
 

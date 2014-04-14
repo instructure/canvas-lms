@@ -185,7 +185,7 @@ describe "account admin question bank" do
       new_question_bank.should be_present
       new_questions = AssessmentQuestion.where(:assessment_question_bank_id => new_question_bank).all
       new_questions.should be_present
-      new_questions.should == questions
+      new_questions.should =~ questions
     end
 
     it "should move multiple questions to a new bank" do

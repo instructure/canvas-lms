@@ -28,7 +28,7 @@
             :num_points => hash_get(group, :question_points, 1),
             :wrapper => {
               '*' => "<input name='quiz_group[pick_count]' aria-label='#{h(t('labels.number_of_questions', "Number of Questions"))}' type='text' style='width: 20px;' value='\1'/>",
-              '#' => "<input name='quiz_group[question_points]' aria-label='#{h(t('labels.points_per_question', "Points per Question"))}' type='text' style='width: 20px;' value='\1'/>"
+              '#' => "<input name='quiz_group[question_points]' class='float_value' aria-label='#{h(t('labels.points_per_question', "Points per Question"))}' type='text' style='width: 20px;' value='\1'/>"
             }) %>
     </span>
     <% if !group %>

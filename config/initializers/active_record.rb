@@ -18,19 +18,26 @@ class ActiveRecord::Base
     alias :clone :dup
 
     def serializable_hash(options = nil)
-      if options && options[:include_root]
-        options = options.dup
-        options.delete(:include_root)
-        {self.class.base_ar_class.model_name.element => super(options)}
-      else
-        super
+      result = super
+      if result.present?
+        result = result.with_indifferent_access
+        user_content_fields = options[:user_content] || []
+        result.keys.each do |name|
+          if user_content_fields.include?(name.to_s)
+            result[name] = UserContent.escape(result[name])
+          end
+        end
       end
+      if options && options[:include_root]
+        result = {self.class.base_ar_class.model_name.element => result}
+      end
+      result
     end
 
     # See ActiveModel#serializable_add_includes
     def serializable_add_includes(options = {}, &block)
       super(options) do |association, records, opts|
-        yield association, records, opts.merge(:include_root => options[:include_root])
+        yield association, records, opts.reverse_merge(:include_root => options[:include_root])
       end
     end
   end
@@ -195,7 +202,6 @@ class ActiveRecord::Base
   end
 
   def cached_context_grants_right?(user, session, *permissions)
-    @@cached_contexts = nil if Rails.env.test?
     @@cached_contexts ||= {}
     context_key = "#{self.context_type}_#{self.context_id}" if self.respond_to?(:context_type)
     context_key ||= "Course_#{self.course_id}"
@@ -203,7 +209,6 @@ class ActiveRecord::Base
     @@cached_contexts[context_key] ||= self.course
     @@cached_permissions ||= {}
     key = [context_key, (user ? user.id : nil)].cache_key
-    @@cached_permissions[key] = nil if Rails.env.test?
     @@cached_permissions[key] = nil if session && session[:session_affects_permissions]
     @@cached_permissions[key] ||= @@cached_contexts[context_key].grants_rights?(user, session, nil).keys
     (@@cached_permissions[key] & Array(permissions).flatten).any?
@@ -902,6 +907,47 @@ class ActiveRecord::Base
 end
 
 unless CANVAS_RAILS2
+  # join dependencies in AR 3 insert the conditions right away, but because we have
+  # some reflection conditions that rely on joined tables, we need to insert them later on
+
+  # e.g.: LEFT OUTER JOIN "enrollments" ON "enrollments"."user_id" = "users"."id"
+  #       AND courses.workflow_state='available'
+  #       LEFT OUTER JOIN "courses" ON "courses"."id" = "enrollments"."course_id"
+
+  # to:   LEFT OUTER JOIN "enrollments" ON "enrollments"."user_id" = "users"."id"
+  #       LEFT OUTER JOIN "courses" ON "courses"."id" = "enrollments"."course_id"
+  #       WHERE courses.workflow_state='available'
+  ActiveRecord::Associations::JoinDependency::JoinAssociation.class_eval do
+    def conditions
+      unless @conditions
+        @conditions = reflection.conditions.reverse
+        chain.reverse.each_with_index do |reflection, i|
+          if reflection.options[:joins]
+            @join_conditions ||= []
+            @join_conditions << sanitize(@conditions[i], @tables[i])
+            @conditions[i] = []
+          end
+        end
+      end
+      @conditions
+    end
+
+    def join_to_with_join_conditions(*args)
+      relation = join_to_without_join_conditions(*args)
+      relation = relation.where(@join_conditions) if @join_conditions.present?
+      @join_conditions = []
+      relation
+    end
+    alias_method_chain :join_to, :join_conditions
+  end
+
+  ActiveRecord::Associations::Preloader::Association.class_eval do
+    def build_scope_with_joins
+      build_scope_without_joins.joins(preload_options[:joins] || options[:joins])
+    end
+    alias_method_chain :build_scope, :joins
+  end
+
   ActiveRecord::Relation.class_eval do
     def find_in_batches_with_usefulness(options = {}, &block)
       # already in a transaction (or transactions don't matter); cursor is fine
@@ -1095,8 +1141,8 @@ unless CANVAS_RAILS2
   ActiveRecord::Associations::CollectionProxy.class_eval do
     delegate :with_each_shard, :to => :scoped
 
-    def respond_to?(*args)
-      return super if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(args.first)
+    def respond_to?(name, include_private = false)
+      return super if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(name)
       super ||
         (load_target && target.respond_to?(name, include_private)) ||
         proxy_association.klass.respond_to?(name, include_private)
@@ -1394,6 +1440,7 @@ unless CANVAS_RAILS2
   end
 end
 
+if CANVAS_RAILS2
 class ActiveRecord::Serialization::Serializer
   def serializable_record
     hash = HashWithIndifferentAccess.new.tap do |serializable_record|
@@ -1421,7 +1468,6 @@ class ActiveRecord::Serialization::Serializer
   end
 end
 
-if CANVAS_RAILS2
 # We need to have 64-bit ids and foreign keys.
 if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::NATIVE_DATABASE_TYPES[:primary_key] = "bigserial primary key".freeze
@@ -1594,7 +1640,16 @@ class ActiveRecord::Migration
     def has_postgres_proc?(procname)
       connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='#{procname}'").to_i != 0
     end
+  end
 
+  unless CANVAS_RAILS2
+    def connection
+      if self.class.respond_to?(:connection)
+        return self.class.connection
+      else
+        @connection || ActiveRecord::Base.connection
+      end
+    end
   end
 
   def transactional?
@@ -1810,6 +1865,36 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     end
   end
 
+end
+
+# shims so that AR objects serialized under rails 2 function under rail s3
+if CANVAS_RAILS2
+  ActiveSupport::Cache::Store.subclasses.map(&:constantize).each do |subclass|
+    subclass.class_eval do
+      def delete_with_rails3_shim(key, options = nil)
+        r1 = delete_without_rails3_shim(key, options)
+        r2 = delete_without_rails3_shim("rails3:#{key}", options)
+        r1 || r2
+      end
+      alias_method_chain :delete, :rails3_shim
+    end
+  end
+else
+  ActiveSupport::Cache::Store.class_eval do
+    def namespaced_key_with_rails2_shim(key, options)
+      result = namespaced_key_without_rails2_shim(key, options)
+      result = "rails3:#{result}" if !(result =~ /^rails3/) && !options[:no_rails3]
+      result
+    end
+    alias_method_chain :namespaced_key, :rails2_shim
+
+    def delete_with_rails2_shim(key, options = nil)
+      r1 = delete_without_rails2_shim(key, options)
+      r2 = delete_without_rails2_shim(key, (options || {}).merge(no_rails3: true))
+      r1 || r2
+    end
+    alias_method_chain :delete, :rails2_shim
+  end
 end
 
 unless CANVAS_RAILS2

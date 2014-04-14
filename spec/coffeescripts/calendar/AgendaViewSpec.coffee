@@ -1,11 +1,13 @@
 require [
   'jquery'
   'underscore'
+  'timezone'
+  'vendor/timezone/America/Denver'
   'compiled/views/calendar/AgendaView'
   'compiled/calendar/EventDataSource'
   'helpers/ajax_mocks/api/v1/calendarEvents'
   'helpers/ajax_mocks/api/v1/calendarAssignments'
-], ($, _, AgendaView, EventDataSource, eventResponse, assignmentResponse) ->
+], ($, _, tz, denver, AgendaView, EventDataSource, eventResponse, assignmentResponse) ->
   loadEventPage = (server, includeNext = false) ->
     sendCustomEvents(server, eventResponse, assignmentResponse, includeNext)
 
@@ -14,9 +16,6 @@ require [
       { 'Content-Type': 'application/json', 'Link': '</api/magic>; rel="'+(if includeNext then 'next' else 'current')+'"' }, events
     server.requests[requestIndex+1].respond 200,
       { 'Content-Type': 'application/json' }, assignments
-
-  originalFudge = $.fudgeDateForProfileTimezone
-
 
   module "AgendaView",
     setup: ->
@@ -27,12 +26,13 @@ require [
       @startDate.setYear(2001)
       @dataSource = new EventDataSource(@contexts)
       @server = sinon.fakeServer.create()
-      $.fudgeDateForProfileTimezone = (d) -> d
+      @snapshot = tz.snapshot()
+      tz.changeZone(denver, 'America/Denver')
 
     teardown: ->
       @container.remove()
       @server.restore()
-      $.fudgeDateForProfileTimezone = originalFudge
+      tz.restore(@snapshot)
 
   test 'should render results', ->
     view = new AgendaView(el: @container, dataSource: @dataSource)

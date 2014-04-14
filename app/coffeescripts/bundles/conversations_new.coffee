@@ -146,7 +146,9 @@ require [
 
     onMarkUnread: =>
       @batchUpdate('mark_as_unread', (m) -> m.toggleReadState(false))
-      @header.onReadStateChange()
+
+    onMarkRead: =>
+      @batchUpdate('mark_as_read', (m) -> m.toggleReadState(true))
 
     onForward: (message) =>
       model = if message
@@ -213,6 +215,7 @@ require [
       @header.on('filter',      @onFilter)
       @header.on('course',      @onCourse)
       @header.on('mark-unread', @onMarkUnread)
+      @header.on('mark-read', @onMarkRead)
       @header.on('forward',     @onForward)
       @header.on('star-toggle', @onStarToggle)
       @header.on('search',      @onSearch)

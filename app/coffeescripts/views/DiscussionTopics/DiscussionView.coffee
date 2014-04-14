@@ -22,10 +22,6 @@ define [
     messages:
       confirm:     I18n.t('confirm_delete_discussion_topic', 'Are you sure you want to delete this discussion topic?')
       delete:       I18n.t('delete', 'Delete')
-      lock:         I18n.t('lock', 'Lock')
-      unlock:       I18n.t('unlock', 'Unlock')
-      pin:          I18n.t('pin', 'Pin')
-      unpin:        I18n.t('unpin', 'Unpin')
       user_subscribed: I18n.t('subscribed_hint', 'You are subscribed to this topic. Click to unsubscribe.')
       user_unsubscribed: I18n.t('unsubscribed_hint', 'You are not subscribed to this topic. Click to subscribe.')
 
@@ -42,6 +38,7 @@ define [
     els:
       '.screenreader-only': '$title'
       '.discussion-row': '$row'
+      '.discussion-actions .al-trigger': '$gearButton'
 
     # Public: Topic is able to be locked/unlocked.
     @optionProperty 'lockable'
@@ -71,11 +68,11 @@ define [
     # Returns nothing.
     toggleLocked: (e) =>
       e.preventDefault()
-      key    = if @model.get('locked') then 'lock' else 'unlock'
       locked = !@model.get('locked')
       pinned = if locked then false else @model.get('pinned')
-      @model.save(locked: locked, pinned: pinned)
-      $(e.target).text(@messages[key])
+      @model.updateBucket(locked: locked, pinned: pinned)
+      @render()
+      @$gearButton.focus()
 
     # Public: Confirm a request to delete and then complete it if needed.
     #
@@ -100,9 +97,7 @@ define [
     # Returns nothing.
     togglePinned: (e) =>
       e.preventDefault()
-      key = if @model.get('pinned') then 'pin' else 'unpin'
-      @model.updateOneAttribute('pinned', !@model.get('pinned'))
-      $(e.target).text(@messages[key])
+      @model.updateBucket(pinned: !@model.get('pinned'))
 
     # Public: Treat the whole <li /> as a link.
     #

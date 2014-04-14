@@ -95,7 +95,7 @@ module I18nExtraction
         match = Regexp.last_match
 
         if balanced_tags?(match[:start], match[:end])
-          value = "#{match[:start]}#{match[:startInner]}$1#{match[:endInner]}#{match[:end]}"
+          value = "#{match[:start]}#{match[:startInner]}$1#{match[:endInner]}#{match[:end]}".gsub(/\s+/, ' ')
           delimiter = wrappers[value] ||= '*' * (wrappers.size + 1)
           "#{delimiter}#{match[:content]}#{delimiter}"
         else

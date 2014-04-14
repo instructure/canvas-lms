@@ -60,6 +60,6 @@ define [
         json.lock_info.unlock_at = if Date.parse(json.lock_info.unlock_at) < Date.now()
           null
         else
-          $.parseFromISO(json.lock_info.unlock_at).datetime_formatted
+          $.datetimeString(json.lock_info.unlock_at)
 
       json

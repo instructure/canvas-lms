@@ -9,15 +9,21 @@ define [
   class DueDateList
 
     constructor: (@overrides, @sections, @assignment) ->
-      if @assignment?
-        # if we don't have an override for each real section
-        if @overrides.length < @sections.length
-          override = AssignmentOverride.defaultDueDate
-            due_at: @assignment.get( 'due_at' )
-            lock_at: @assignment.get( 'lock_at' )
-            unlock_at: @assignment.get( 'unlock_at' )
-          @overrides.add override
+      unless @sections.length
+        # If there's no "default" section for the course already present,
+        # such as a course that has been created without one, create a fake one
+        # so that the default due date can still be rendered/updated without
+        # error.
         @sections.add Section.defaultDueDateSection()
+      # if we don't have an override for each real section
+      if @assignment? && @overrides.length < @sections.length
+        override = AssignmentOverride.defaultDueDate
+          due_at: @assignment.get( 'due_at' )
+          lock_at: @assignment.get( 'lock_at' )
+          unlock_at: @assignment.get( 'unlock_at' )
+        @overrides.add override
+        unless @findDefaultDueDateSection()
+          @sections.add Section.defaultDueDateSection()
       @updateDefaultDueDateSection()
       @overrides.on 'add', @updateDefaultDueDateSection
       @overrides.on 'remove', @updateDefaultDueDateSection
@@ -60,7 +66,7 @@ define [
 
     containsSectionsWithoutOverrides: =>
       return false if @overrides.containsDefaultDueDate()
-      @sectionsWithOverrides().length != @_sectionsLength()
+      @sectionsWithOverrides().length < @_sectionsLength()
 
     _sectionsLength: =>
       if @assignment?

@@ -5,7 +5,7 @@ gemspec
 gem 'simplecov', '0.8.2', :require => false
 gem 'simplecov-rcov', '0.2.3', :require => false
 
-CANVAS_RAILS3 = !!ENV['CANVAS_RAILS3'] || File.exist?(File.expand_path("../../RAILS3", __FILE__))
+require File.expand_path("../../../config/canvas_rails3", __FILE__)
 
 if CANVAS_RAILS3
   gem 'rails', '3.2.15'

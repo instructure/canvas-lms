@@ -1,3 +1,5 @@
+define(['jquery','vendor/slickgrid/slick.core'],function(jQuery) {
+
 /***
  * Contains basic SlickGrid editors.
  * @module Editors
@@ -510,3 +512,5 @@
     this.init();
   }
 })(jQuery);
+
+});

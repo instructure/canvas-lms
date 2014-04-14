@@ -62,14 +62,14 @@ module CC
         run_and_set_progress(:add_assignments, 35, I18n.t('course_exports.errors.assignments', "Failed to export some assignments"))
         run_and_set_progress(:add_topics, 37, I18n.t('course_exports.errors.topics', "Failed to export some topics"))
         run_and_set_progress(:add_web_links, 40, I18n.t('course_exports.errors.web_links', "Failed to export some web links"))
-        
+
         begin
           QTI::QTIGenerator.generate_qti(@manifest, resources, @html_exporter)
         rescue
           add_error(I18n.t('course_exports.errors.quizzes', "Some quizzes failed to export"), $!)
         end
         set_progress(60)
-        
+
         # these need to go last, to gather up all the references to the files
         run_and_set_progress(:add_course_files, 70, I18n.t('course_exports.errors.files', "Failed to export some files"))
         run_and_set_progress(:add_media_objects, 90, I18n.t('course_exports.errors.media_files', "Failed to export some media files"), @html_exporter)

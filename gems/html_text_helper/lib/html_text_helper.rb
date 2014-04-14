@@ -36,23 +36,84 @@ module HtmlTextHelper
   #
   # This is still a pretty basic implementation, I'm sure we'll find ways to
   # tweak and improve it as time goes on.
-  def html_to_text(html_str)
-    html_str ||= ''
-    doc = Nokogiri::HTML::DocumentFragment.parse(html_str.squeeze(" ").squeeze("\n"))
-    # translate anchor tags into a markdown-style name/link combo
-    doc.css('a').each { |node| next if node.text.strip == node['href']; node.replace("[#{node.text}](#{node['href']})") }
-    # translate img tags into just a url to the image
-    doc.css('img').each { |node| node.replace(node['src'] || '') }
-    # append a line break to br and p tags, so they retain a line break after stripping tags
-    doc.css('br, p').each { |node| node.after("\n\n") }
-    doc.text.strip
+  def html_to_text(html_str, opts = {})
+    return '' if html_str.blank?
+    doc = Nokogiri::HTML::DocumentFragment.parse(html_str)
+    text = html_node_to_text(doc, opts)
+    text.squeeze!(' ')
+    text.gsub!(/\r\n?/, "\n")
+    text.gsub!(/\n +/, "\n")
+    text.gsub!(/ +\n/, "\n")
+    text.gsub!(/\n\n\n+/, "\n\n")
+    text.strip!
+    text = word_wrap(text, line_width: opts[:line_width]) if opts[:line_width]
+    text
   end
 
-  # Converts a string of html to plain text using the Premailer gem.
-  def html_to_simple_text(html_str, opts={})
-    return "" if html_str.blank?
-    pm = Premailer.new(html_str, {:with_html_string => true, :input_encoding => 'UTF-8', :adapter => :nokogiri}.merge(opts))
-    pm.to_plain_text
+  # turns a nokogiri element, node, or fragment into text (recursively!)
+  def html_node_to_text(node, opts={})
+    if node.text?
+      text = node.text
+      text.gsub!(/\s+/, ' ') unless opts[:pre]
+      return text
+    end
+
+    text = case node.name
+           when 'link', 'script'
+             ''
+           when 'pre'
+             node.children.map{|c| html_node_to_text(c, opts.merge(pre: true))}.join
+           when 'img'
+             src = node['src']
+             src = URI.join(opts[:base_url], src) if opts[:base_url]
+             node['alt'] ? "[#{node['alt']}](#{src})" : src
+           when 'br'
+             "\n"
+           else
+             subtext = node.children.map{|c| html_node_to_text(c, opts)}.join
+             case node.name
+             when 'a'
+               href = node['href']
+               if href
+                 href = URI.join(opts[:base_url], href) if opts[:base_url]
+                 href == subtext ? subtext : "[#{subtext}](#{href})"
+               else
+                 subtext
+               end
+             when 'h1'
+               banner(subtext, char: '*', line_width: opts[:line_width])
+             when 'h2'
+               banner(subtext, char: '-', line_width: opts[:line_width])
+             when /h[3-6]/
+               banner(subtext, char: '-', underline: true, line_width: opts[:line_width])
+             when 'li'
+               "* #{subtext}"
+             else
+               subtext
+             end
+           end
+    return "\n\n#{text}\n\n" if node.description.try(:block?)
+    text
+  end
+
+  # Adds a string of characters above and below some text
+  # *******
+  # like so
+  # *******
+  def banner(text, opts={})
+    text_width = text.lines.map{|l| l.strip.length}.max
+    text_width = [text_width, opts[:line_width]].min if opts[:line_width]
+    line = opts[:char] * text_width
+    (opts[:underline] ? '' : line + "\n") + text + "\n" + line
+  end
+
+  # as seen in ActionView::Helpers::TextHelper
+  def word_wrap(text, options = {})
+    line_width = options.fetch(:line_width, 80)
+
+    text.split("\n").collect do |line|
+      line.length > line_width ? line.gsub(/(.{1,#{line_width}})(\s+|$)/, "\\1\n").strip : line
+    end * "\n"
   end
 
   # Public: Strip (most) HTML from an HTML string.

@@ -117,7 +117,7 @@
 </div>
 <div class="control-group">
   <div class="controls">
-    <a class="btn" role="button" href="{{ unbound downloadUrl }}">
+    <a class="btn" role="button" href="{{ unbound downloadCsvUrl }}">
       {{#t 'download_scores'}}Download Scores (.csv){{/t}}
     </a>
     <button
@@ -359,11 +359,10 @@
     </p>
 
     <div class="control-group">
-      {{#if assignmentDetails}}
-      {{#with assignmentDetails}}
-        <div>{{#t 'submission_count'}}{{cnt}} Submissions{{/t}}</div>
-        {{/with}}
-      {{/if}}
+      <dl>
+        <dt>{{#t 'submission_types'}}Submission types{{/t}}</dt>
+        <dd>{{assignmentSubmissionTypes}}</dd>
+      </dl>
       <dl>
         <dt>{{#t 'points_possible'}}Points possible{{/t}}</dt>
         <dd>

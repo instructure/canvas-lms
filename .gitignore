@@ -22,6 +22,7 @@
 /db/*sql
 /exports/
 Gemfile.lock
+Gemfile.lock3
 /log/
 /public/app/
 /public/assets/
@@ -31,7 +32,7 @@ Gemfile.lock
 /public/javascripts/translations/
 /public/optimized/
 /public/stylesheets/compiled/
-/RAILS3
+/config/RAILS3
 /spec/javascripts/runner.html
 /spec/javascripts/tests.js
 /spec/javascripts/compiled/

@@ -9,7 +9,7 @@ define [
     # TODO: May not be needed once timezunami hits master
     serialize: (date) ->
       if date instanceof Date
-        $.dateToISO8601UTC date
+        date.toISOString()
       else
         null
   

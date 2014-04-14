@@ -3,7 +3,7 @@ define([
   'compiled/util/processMigrationItemSelections',
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* parseFromISO, date_field */,
+  'jquery.instructure_date_and_time' /* dateString, date_field */,
   'jquery.instructure_forms' /* formSubmit, getFormData, validateForm */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'compiled/jquery.rails_flash_notifications',
@@ -39,11 +39,11 @@ define([
     };
     $.ajaxJSON(location.href, 'GET', {}, function (data) {
       if (data.start_timestamp) {
-        var date = $.parseFromISO(new Date(parseInt(data.start_timestamp, 10)).toISOString()).date_formatted;
+        var date = $.dateString(data.start_timestamp);
         $('#copy_old_start_date').val(date);
       }
       if (data.end_timestamp) {
-        var date = $.parseFromISO(new Date(parseInt(data.end_timestamp, 10)).toISOString()).date_formatted;
+        var date = $.dateString(data.end_timestamp);
         $('#copy_old_end_date').val(date);
       }
       $("#copy_quizzes_list").showIf(data.assessments && data.assessments.length > 0);

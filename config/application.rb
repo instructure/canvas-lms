@@ -1,7 +1,10 @@
 # Put this in config/application.rb
 require File.expand_path('../boot', __FILE__)
 
-require 'rails/all'
+require "active_record/railtie"
+require "action_controller/railtie"
+require "action_mailer/railtie"
+require "active_resource/railtie"
 
 Bundler.require(:default, Rails.env) if defined?(Bundler)
 
@@ -12,6 +15,12 @@ module CanvasRails
     config.encoding = 'utf-8'
     require_dependency 'logging_filter'
     config.filter_parameters.concat LoggingFilter.filtered_parameters
+
+    config.app_generators do |c|
+      c.test_framework :rspec
+      c.integration_tool :rspec
+      c.performance_tool :rspec
+    end
 
     eval(File.read(File.expand_path("../shared_boot.rb", __FILE__)), binding, "config/shared_boot.rb", 1)
   end

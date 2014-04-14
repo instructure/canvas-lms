@@ -7,7 +7,8 @@ describe PermissionsSerializer do
     session = stub
     object = stub
     policy = stub
-    thing = stub
+    klass = Class.new { include PermissionsSerializer }
+    thing = klass.new
 
     # class.policy.conditions returns an array of arrays
     # each sub array has a lambda (the code to run the check)
@@ -25,8 +26,6 @@ describe PermissionsSerializer do
     thing.expects(:object).at_least_once.returns object
 
     object.expects(:grants_right?).with(user, session, :read).returns true
-
-    thing.extend(PermissionsSerializer)
 
     thing.permissions.should == {read: true}
   end

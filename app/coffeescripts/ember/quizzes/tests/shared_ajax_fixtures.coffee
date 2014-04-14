@@ -87,17 +87,17 @@ define [
     ASSIGNMENT_GROUP: assignmentGroup
     create: ->
       ajax.defineFixture '/api/v1/courses/1/quizzes',
-        response: quizIndexResponse,
+        response: JSON.parse(JSON.stringify quizIndexResponse),
         jqXHR: {}
         testStatus: '200'
 
       ajax.defineFixture '/api/v1/courses/1/assignment_groups/1',
-        response: assignmentGroup,
+        response: JSON.parse(JSON.stringify assignmentGroup),
         jqXHR: {}
         testStatus: '200'
 
       ajax.defineFixture '/api/v1/courses/1/quizzes/1',
-        response: quizIndexResponse,
+        response: JSON.parse(JSON.stringify quizIndexResponse),
         jqXHR: {}
         testStatus: '200'
   }

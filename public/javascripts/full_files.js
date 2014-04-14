@@ -28,7 +28,7 @@ define([
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.doc_previews' /* loadDocPreview */,
   'jquery.inst_tree' /* instTree */,
-  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_date_and_time' /* datetimeString */,
   'jquery.instructure_forms' /* formSubmit, handlesHTML5Files, ajaxFileUpload, fileData, fillFormData, formErrors */,
   'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* replaceTags, /\$\.underscore/ */,
@@ -1440,8 +1440,8 @@ define([
                   $(".download_zip_link").attr('href', download_folder_url);
                   $(".upload_zip_link").attr('href', $("." + data.context_string + "_import_url").attr('href') + "?return_to=" + encodeURIComponent(location.href) + "&folder_id=" + data.id);
 
-                  data.unlock_at_string = $.parseFromISO(data.unlock_at).datetime_formatted;
-                  data.lock_at_string = $.parseFromISO(data.lock_at).datetime_formatted;
+                  data.unlock_at_string = $.datetimeString(data.unlock_at);
+                  data.lock_at_string = $.datetimeString(data.lock_at);
                   $panel.find(".lock_after").showIf(data.lock_at);
                   $panel.find(".lock_until").showIf(data.unlock_at);
                   $panel.find(".currently_locked_box").showIf(data.currently_locked);
@@ -1526,8 +1526,8 @@ define([
                 // show a file control panel with file size, download link, etc.
                 var $panel = $("#file_panel");
                 var $preview = null;
-                data.unlock_at_string = $.parseFromISO(data.unlock_at).datetime_formatted;
-                data.lock_at_string = $.parseFromISO(data.lock_at).datetime_formatted;
+                data.unlock_at_string = $.datetimeString(data.unlock_at);
+                data.lock_at_string = $.datetimeString(data.lock_at);
                 $panel.find(".lock_after").showIf(data.lock_at);
                 $panel.find(".lock_until").showIf(data.unlock_at);
                 $panel.find(".currently_locked_box").showIf(data.currently_locked);
@@ -2026,8 +2026,8 @@ define([
         $("#lock_item_dialog form").hide();
 
         $form.show();
-        data.lock_at = $.parseFromISO(data.last_lock_at).datetime_formatted;
-        data.unlock_at = $.parseFromISO(data.last_unlock_at).datetime_formatted;
+        data.lock_at = $.datetimeString(data.last_lock_at);
+        data.unlock_at = $.datetimeString(data.last_unlock_at);
         data.locked = (!data.lock_at && !data.unlock_at) ? '1' : '0';
         $("#lock_item_dialog").fillTemplateData({data: {name: data.name}});
 

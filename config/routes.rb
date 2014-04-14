@@ -62,9 +62,7 @@ routes.draw do
       match 'reorder' => 'question_banks#reorder', :as => :reorder
       match 'questions' => 'question_banks#questions', :as => :questions
       match 'move_questions' => 'question_banks#move_questions', :as => :move_questions
-      resources :assessment_questions do
-        match 'move' => 'assessment_questions#move', :as => :move_question
-      end
+      resources :assessment_questions
     end
   end
 
@@ -72,7 +70,6 @@ routes.draw do
     resources :groups
     resources :group_categories, :only => [:create, :update, :destroy]
     match 'group_unassigned_members' => 'groups#unassigned_members', :as => :group_unassigned_members, :via => :get
-    match 'group_unassigned_members.:format' => 'groups#unassigned_members', :as => :group_unassigned_members, :via => :get
   end
 
   concern :files do
@@ -481,7 +478,7 @@ routes.draw do
 
   resources :groups do
     concerns :users
-    match 'remove_user/:id' => 'groups#remove_user', :as => :remove_user, :via => :delete
+    match 'remove_user/:user_id' => 'groups#remove_user', :as => :remove_user, :via => :delete
     match 'add_user' => 'groups#add_user', :as => :add_user
     match 'accept_invitation/:uuid' => 'groups#accept_invitation', :as => :accept_invitation, :via => :get
     match 'members.:format' => 'groups#context_group_members', :as => :members, :via => :get
@@ -597,9 +594,7 @@ routes.draw do
       match 'reorder' => 'question_banks#reorder', :as => :reorder
       match 'questions' => 'question_banks#questions', :as => :questions
       match 'move_questions' => 'question_banks#move_questions', :as => :move_questions
-      resources :assessment_questions do
-        match 'move' => 'assessment_questions#move', :as => :move_question
-      end
+      resources :assessment_questions
     end
 
     resources :user_lists, :only => :create
@@ -1251,6 +1246,9 @@ routes.draw do
       delete 'files/:id', :action => :destroy
       put 'files/:id', :action => :api_update
       get 'files/:id/:uuid/status', :action => :api_file_status, :path_name => 'file_status'
+      %w(course group user).each do |context|
+        get "#{context}s/:#{context}_id/files/quota", :action => :api_quota
+      end
     end
 
     scope(:controller => :folders) do
@@ -1472,6 +1470,14 @@ routes.draw do
       get prefix, :action => :index, :path_name => "course_content_exports"
       post prefix, :action => :create
       get "#{prefix}/:id", :action => :show
+    end
+
+    scope(:controller => :data_exports_api, :module => :data_exports_api) do
+      prefix = "accounts/:account_id/data_exports"
+      get prefix, :action => :index, :path_name => "data_exports"
+      post prefix, :action => :create
+      get '#{prefix}/:id', :action => :show, :path_name => "data_export"
+      delete '#{prefix}/:id', :action => :cancel
     end
   end
 

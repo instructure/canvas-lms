@@ -30,6 +30,7 @@ module Api::V1::PageView
   def page_view_json(page_view, current_user, session)
     json_hash = api_json(page_view, current_user, session, API_PAGE_VIEW_JSON_OPTS)
     json_hash[:id] = json_hash.delete(:request_id)
+    json_hash[:contributed] = false # for backwards compatibility
     json_hash[:links] = {
       :user => json_hash.delete(:user_id),
       :context => json_hash.delete(:context_id),

@@ -19,11 +19,11 @@
           <p>
             <% if export.export_type == 'common_cartridge' %>
               <%= t 'links.download', "Course Export from %{date}: *Click here to download*",
-                      :date => "<span class=\"created_at time_ago_date\">#{datetime_string export.created_at}</span>".html_safe,
+                      :date => "<span class=\"created_at time_ago_date\" data-timestamp=\"#{export.created_at.iso8601}\">#{datetime_string export.created_at}</span>".html_safe,
                       :wrapper => link_to('\1', export.attachment ? verified_file_download_url(export.attachment) : nil) %>
             <% else %>
               <%= t 'links.download_qti', "QTI Export from %{date}: *Click here to download*",
-                      :date => "<span class=\"created_at time_ago_date\">#{datetime_string export.created_at}</span>".html_safe,
+                      :date => "<span class=\"created_at time_ago_date\" data-timestamp=\"#{export.created_at.iso8601}\">#{datetime_string export.created_at}</span>".html_safe,
                       :wrapper => link_to('\1', export.attachment ? verified_file_download_url(export.attachment) : nil) %>
             <% end %>
           </p>

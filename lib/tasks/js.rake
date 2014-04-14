@@ -62,6 +62,10 @@ namespace :js do
     # run test for each ember app individually
     matcher = ENV['JS_SPEC_MATCHER']
 
+    if matcher
+      puts "--> Matcher: #{matcher}"
+    end
+
     if !matcher || matcher.to_s =~ %r{app/coffeescripts/ember}
       ignored_embers = ['shared','modules'] #,'quizzes','screenreader_gradebook'
       Dir.entries('app/coffeescripts/ember').reject { |d|
@@ -213,12 +217,19 @@ namespace :js do
         result(Canvas::RequireJs.get_binding)
     File.open("#{Rails.root}/config/build.js", 'w') { |f| f.write(output) }
 
-    puts "--> Optimizing canvas-lms"
+    puts "--> Concatenating JavaScript bundles with r.js"
     optimize_time = Benchmark.realtime do
-      output = `node #{Rails.root}/node_modules/rjs-old/r.js-1.0.8/dist/r.js -o #{Rails.root}/config/build.js 2>&1`
+      output = `node #{Rails.root}/node_modules/requirejs/bin/r.js -o #{Rails.root}/config/build.js 2>&1`
       raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
     end
-    puts "--> Optimized canvas-lms in #{optimize_time}"
+    puts "--> Concatenated JavaScript bundles in #{optimize_time}"
+
+    puts "--> Compressing JavaScript with UglifyJS"
+    optimize_time = Benchmark.realtime do
+      output = `npm run compress 2>&1`
+      raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
+    end
+    puts "--> Compressed JavaScript in #{optimize_time}"
   end
 
   desc "creates ember app bundles"

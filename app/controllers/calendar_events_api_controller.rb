@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -631,6 +631,20 @@ class CalendarEventsApiController < ApplicationController
     @all_events = value_to_boolean(params[:all_events])
     @undated = value_to_boolean(params[:undated])
     if !@all_events && !@undated
+      if params[:start_date].present? && params[:start_date] !~ Api::DATE_REGEX
+        Api.invalid_time_stamp_error('start_date', @current_user.attributes.to_s +
+          ErrorReport.useful_http_env_stuff_from_request(request).to_s)
+        # todo stop logging and delete invalid dates
+        # params.delete(:start_date)
+      end
+
+      if params[:end_date].present? && params[:end_date] !~ Api::DATE_REGEX
+        Api.invalid_time_stamp_error('end_date', @current_user.attributes.to_s +
+          ErrorReport.useful_http_env_stuff_from_request(request).to_s)
+        # todo stop logging and delete invalid dates
+        # params.delete(:end_date)
+      end
+
       today = Time.zone.now
       @start_date ||= TimeHelper.try_parse(params[:start_date], today).beginning_of_day
       @end_date ||= TimeHelper.try_parse(params[:end_date], today).end_of_day

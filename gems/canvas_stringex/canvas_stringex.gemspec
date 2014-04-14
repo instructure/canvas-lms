@@ -3,7 +3,7 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 unless defined?(CANVAS_RAILS3)
-  CANVAS_RAILS3 = !!ENV['CANVAS_RAILS3'] || File.exist?(File.expand_path("../../RAILS3", __FILE__))
+  require File.expand_path("../../../config/canvas_rails3", __FILE__)
 end
 
 Gem::Specification.new do |spec|
@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   unless CANVAS_RAILS3
-    spec.add_dependency 'fake_arel', '1.4.0'
+    spec.add_dependency 'fake_arel', '~> 1.5'
   end
 
   spec.add_development_dependency "activerecord"

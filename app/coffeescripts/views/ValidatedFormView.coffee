@@ -176,6 +176,7 @@ define [
     translations:
       required: I18n.t "required", "Required"
       blank: I18n.t "blank", "Required"
+      unsaved: I18n.t "unsaved_changes", "You have unsaved changes."
 
     ##
     # Errors are displayed relative to the field to which they belong. If
@@ -204,3 +205,23 @@ define [
       if $el.length > 1 # e.g. hidden input + checkbox, show it by the checkbox
         $el = $el.not('[type=hidden]')
       $el
+
+    castJSON: (obj) ->
+      return obj unless _.isObject(obj)
+      return obj.toJSON() if obj.toJSON?
+      clone = _.clone(obj)
+      _.each clone, (val, key) => clone[key] = @castJSON(val)
+      clone
+
+    original: null
+    watchUnload: =>
+      @original = @castJSON(@getFormData())
+      @unwatchUnload()
+      $(window).on 'beforeunload', @checkUnload
+
+    unwatchUnload: ->
+      $(window).off 'beforeunload', @checkUnload
+
+    checkUnload: =>
+      current = @castJSON(@getFormData())
+      @translations.unsaved unless _.isEqual(@original, current)

@@ -22,6 +22,7 @@ define([
   'i18n!gradebook',
   'jquery' /* $ */,
   'underscore',
+  'timezone',
   'compiled/userSettings',
   'datagrid',
   'compiled/grade_calculator',
@@ -29,7 +30,7 @@ define([
   'compiled/gradebook2/Turnitin',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.dropdownList' /* dropdownList */,
-  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_date_and_time' /* datetimeString */,
   'jquery.instructure_forms' /* ajaxJSONFiles, formSubmit, getFormData, formErrors, errorBox */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
@@ -43,7 +44,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/position' /* /\.position\(/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */
-], function(round, INST, I18n, $, _, userSettings, datagrid, GradeCalculator, htmlEscape, Turnitin) {
+], function(round, INST, I18n, $, _, tz, userSettings, datagrid, GradeCalculator, htmlEscape, Turnitin) {
 
   var grading_scheme = ENV.grading_scheme;
   var readOnlyGradebook = window.readOnlyGradebook;
@@ -1461,6 +1462,12 @@ define([
     }
   }
 
+  var minute_timestamp = function(value) {
+    var datetime = tz.parse(value);
+    var timestamp = +datetime / 1000;
+    return timestamp - (timestamp % 60);
+  }
+
   function updateSubmission(submission) {
     if(!submission) { return; }
     var $submission = null;
@@ -1481,8 +1488,8 @@ define([
     submission.student_id = submission.user_id;
     $submission = $submission || $("#submission_" + submission.student_id + "_" + submission.assignment_id);
     $submission.css('visibility', '');
-    var submission_stamp = submission && $.parseFromISO(submission.submitted_at).minute_timestamp;
-    var assignment_stamp = assignment && $.parseFromISO(assignment.due_at).minute_timestamp;
+    var submission_stamp = submission && minute_timestamp(submission.submitted_at);
+    var assignment_stamp = assignment && minute_timestamp(assignment.due_at);
     $submission.parent().toggleClass('late', !!(submission && submission.late));
     if(submission.grade !== "" && submission.grade == 0) {
       submission.grade = "0";
@@ -1695,7 +1702,7 @@ define([
     submission.id = submission.id || "";
     var late = submission.late;
     $submission_information.find(".submitted_at_box").showIf(submission.submitted_at).toggleClass('late_submission', !!late);
-    submission.submitted_at_string = $.parseFromISO(submission.submitted_at).datetime_formatted;
+    submission.submitted_at_string = $.datetimeString(submission.submitted_at);
     $submission_information.fillTemplateData({
       data: submission,
       except: ['created_at', 'submission_comments', 'submission_comment', 'comment', 'attachments', 'attachment']
@@ -1703,7 +1710,7 @@ define([
     for(var idx in submission.submission_comments) {
       var comment = submission.submission_comments[idx].submission_comment;
       var $comment = $("#submission_comment_blank").clone(true).removeAttr('id');
-      comment.posted_at = $.parseFromISO(comment.created_at).datetime_formatted;
+      comment.posted_at = $.datetimeString(comment.created_at);
       $comment.fillTemplateData({
         data: comment,
         except: ['attachments']

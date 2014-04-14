@@ -1019,9 +1019,7 @@ define([
 
         if ($field.val().length) {
           date = $field.data().date;
-          data['quiz[' + key + ']'] = $.dateToISO8601UTC(
-            $.unfudgeDateForProfileTimezone(date)
-          );
+          data['quiz[' + key + ']'] = $.unfudgeDateForProfileTimezone(date).toISOString();
         } else {
           resetField(key);
         }

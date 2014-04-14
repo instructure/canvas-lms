@@ -69,6 +69,26 @@ describe UserContent do
       UserContent::HtmlRewriter.new(@course, @teacher)
     end
 
+    it "handler should not convert id to integer for 'wiki' matches" do
+      called = false
+      rewriter.set_handler('wiki') do |match|
+        called = true
+        match.obj_id.class.should == String
+      end
+      rewriter.translate_content("<a href=\"/courses/#{rewriter.context.id}/wiki/1234-numbered-page\">test</a>")
+      called.should be_true
+    end
+
+    it "handler should not convert id to integer for 'pages' matches" do
+      called = false
+      rewriter.set_handler('pages') do |match|
+        called = true
+        match.obj_id.class.should == String
+      end
+      rewriter.translate_content("<a href=\"/courses/#{rewriter.context.id}/pages/1234-numbered-page\">test</a>")
+      called.should be_true
+    end
+
     it "should not grant public access to locked files" do
       course
       att1 = attachment_model(context: @course)

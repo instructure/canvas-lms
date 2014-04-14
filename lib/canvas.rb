@@ -61,6 +61,17 @@ module Canvas
       require_dependency 'app/models/setting'
       @cache_stores = {}
       configs = Setting.from_config('cache_store', nil) || {}
+
+      # sanity check the file
+      unless configs.is_a?(Hash)
+        raise "Invalid config/cache_store.yml: Root is not a hash. See comments in config/cache_store.yml.example"
+      end
+
+      unless configs.values.all? { |cfg| cfg.is_a?(Hash) }
+        broken = configs.keys.select{ |k| !configs[k].is_a?(Hash) }.map(&:to_s).join(', ')
+        raise "Invalid config/cache_store.yml: Some keys are not hashes: #{broken}. See comments in config/cache_store.yml.example"
+      end
+
       configs.each do |env, config|
         config = {'cache_store' => 'mem_cache_store'}.merge(config)
         case config.delete('cache_store')

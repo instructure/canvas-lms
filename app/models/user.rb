@@ -1141,13 +1141,13 @@ class User < ActiveRecord::Base
     end
   end
 
-  # only used by ContextModuleProgression#deep_evaluate
+  # only used by ContextModuleProgression#evaluate_uncompleted_requirements
   def submitted_submission_for(assignment_id)
     @submissions ||= self.submissions.having_submission.except(:includes).select([:id, :score, :assignment_id]).all
     @submissions.detect{|s| s.assignment_id == assignment_id }
   end
 
-  # only used by ContextModuleProgression#deep_evaluate
+  # only used by ContextModuleProgression#evaluate_uncompleted_requirements
   def attempted_quiz_submission_for(quiz_id)
     @quiz_submissions ||= self.quiz_submissions.select([:id, :kept_score, :quiz_id, :workflow_state]).select{|s| !s.settings_only? }
     @quiz_submissions.detect{|qs| qs.quiz_id == quiz_id }
@@ -1562,30 +1562,6 @@ class User < ActiveRecord::Base
     @self_enrolling = true
     @self_enrollment = @self_enrollment_course.self_enroll_student(self, :skip_pseudonym => @just_created, :skip_touch_user => true)
     @self_enrolling = false
-  end
-
-  def time_difference_from_date(hash)
-    n = hash[:number].to_i
-    n = nil if n == 0
-    if hash[:metric] == "weeks"
-      (n || 1).weeks.to_i
-    elsif hash[:metric] == "days"
-      (n || 1).days.to_i
-    elsif hash[:metric] == "hours"
-      (n || 1).hours.to_i
-    elsif hash[:metric] == "never"
-      0
-    else
-      nil
-    end
-  end
-
-  def remind_for_due_dates=(hash)
-    self.reminder_time_for_due_dates = time_difference_from_date(hash)
-  end
-
-  def remind_for_grading=(hash)
-    self.reminder_time_for_grading = time_difference_from_date(hash)
   end
 
   def is_a_context?
@@ -2228,28 +2204,6 @@ class User < ActiveRecord::Base
 
   def messageable_groups
     messageable_user_calculator.messageable_groups
-  end
-
-  def short_name_with_shared_contexts(user)
-    if (contexts = shared_contexts(user)).present?
-      "#{short_name} (#{contexts[0, 2].to_sentence})"
-    else
-      short_name
-    end
-  end
-
-  def shared_contexts(user)
-    contexts = []
-    if info = load_messageable_user(user)
-      if CANVAS_RAILS2
-        contexts += Course.find(:all, :conditions => {:id => info.common_courses.keys}) if info.common_courses.present?
-        contexts += Group.find(:all, :conditions => {:id => info.common_groups.keys}) if info.common_groups.present?
-      else
-        contexts += Course.where(:id => info.common_courses.keys).all if info.common_courses.present?
-        contexts += Group.where(:id => info.common_groups.keys).all if info.common_groups.present?
-      end
-    end
-    Canvas::ICU.collate(contexts.map(&:name))
   end
 
   def mark_all_conversations_as_read!

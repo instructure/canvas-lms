@@ -154,7 +154,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   def data
     res = (self.question_data || self.assessment_question.question_data) rescue Quizzes::QuizQuestion::QuestionData.new(HashWithIndifferentAccess.new)
     res[:assessment_question_id] = self.assessment_question_id
-    res[:question_name] = t('defaults.question_name', "Question") if res[:question_name].blank?
+    res[:question_name] = t('#quizzes.quiz_question.defaults.question_name', "Question") if res[:question_name].blank?
     res[:id] = self.id
 
     res.to_hash

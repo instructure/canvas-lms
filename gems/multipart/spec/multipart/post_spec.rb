@@ -20,7 +20,7 @@ require 'spec_helper.rb'
 
 describe Multipart::Post do
   def parse_params(query, header)
-    Rack::Utils::Multipart.parse_multipart({ 'CONTENT_TYPE' => header['CONTENT_TYPE'], 'CONTENT_LENGTH' => query.size, 'rack.input' => StringIO.new(query) })
+    Rack::Utils::Multipart.parse_multipart({ 'CONTENT_TYPE' => header['Content-type'], 'CONTENT_LENGTH' => query.size, 'rack.input' => StringIO.new(query) })
   end
 
   it "should prepare_query with a File" do

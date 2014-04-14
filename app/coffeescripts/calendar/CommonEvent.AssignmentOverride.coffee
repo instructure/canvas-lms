@@ -44,15 +44,15 @@ define [
       @assignment.html_url
 
     parseStartDate: () ->
-      if @assignment.due_at then $.parseFromISO(@assignment.due_at, 'due_date').time else null
+      if @assignment.due_at then $.fudgeDateForProfileTimezone(@assignment.due_at) else null
 
     displayTimeString: () ->
-      unless date = @originalStart
+      unless datetime = @originalStart
         return "No Date" # TODO: i18n
 
       # TODO: i18n
-      time_string = "#{$.dateString(date)} at #{$.timeString(date)}"
-      "Due: <time datetime='#{date.toISOString()}'>#{time_string}</time>"
+      datetime = $.unfudgeDateForProfileTimezone(datetime)
+      "Due: <time datetime='#{datetime.toISOString()}'>#{$.datetimeString(datetime)}</time>"
 
     readableType: () ->
       @readableTypes[@assignmentType()]
@@ -63,7 +63,7 @@ define [
       @title = "#{title} #{titleContext}"
 
     saveDates: (success, error) =>
-      @save { 'assignment_override[due_at]': $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(@start)) }, success, error
+      @save { 'assignment_override[due_at]': $.unfudgeDateForProfileTimezone(@start).toISOString() }, success, error
 
     methodAndURLForSave: () ->
       url = $.replaceTags(@contextInfo.assignment_override_url,

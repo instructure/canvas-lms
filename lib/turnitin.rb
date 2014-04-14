@@ -350,8 +350,6 @@ module Turnitin
       if post
         mp = Multipart::Post.new
         query, headers = mp.prepare_query(params)
-        # since we're not using Rack, translate 'CONTENT_TYPE' back to 'Content-type'
-        headers = headers.dup.tap { |h| h['Content-type'] ||= h.delete('CONTENT_TYPE') }
         puts query if @testing
         http = Net::HTTP.new(@host, 443)
         http.use_ssl = true

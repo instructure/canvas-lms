@@ -47,8 +47,8 @@ module Canvas::Redis
     return failure_retval if redis_failure?(redis_name)
     yield
   rescue Redis::BaseConnectionError => e
-    Canvas::Statsd.increment("redis.errors.all")
-    Canvas::Statsd.increment("redis.errors.#{Canvas::Statsd.escape(redis_name)}")
+    CanvasStatsd::Statsd.increment("redis.errors.all")
+    CanvasStatsd::Statsd.increment("redis.errors.#{CanvasStatsd::Statsd.escape(redis_name)}")
     Rails.logger.error "Failure handling redis command on #{redis_name}: #{e.inspect}"
     if self.ignore_redis_failures?
       ErrorReport.log_exception(:redis, e)

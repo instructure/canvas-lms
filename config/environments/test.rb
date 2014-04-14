@@ -28,7 +28,7 @@ if ENV['BULLET']
 
 elsif ENV['BULLET_GEM']
   puts "Bullet enabled"
-  require 'bullet-instructure'
+  require 'bullet_instructure'
 
   config.after_initialize do
     Bullet.enable = true

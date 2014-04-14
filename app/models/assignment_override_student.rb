@@ -53,8 +53,10 @@ class AssignmentOverrideStudent < ActiveRecord::Base
 
   def context_id
     if quiz
+      quiz.reload if quiz.id != quiz_id
       quiz.context_id
     elsif assignment
+      assignment.reload if assignment.id != assignment_id
       assignment.context_id
     end
   end
@@ -63,7 +65,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   def default_values
     if assignment_override
       self.assignment_id = assignment_override.assignment_id
-      self.quiz_id       = assignment_override.quiz_id
+      self.quiz_id = assignment_override.quiz_id
     end
   end
   protected :default_values

@@ -1,5 +1,5 @@
-# requires $.parseFromISO and $.dateString
-define ['i18n!dates', 'jquery'], (I18n, $) ->
+# requires $.sameDate, $.dateString, $.timeString, $.datetimeString
+define ['i18n!dates', 'jquery', 'timezone', 'jquery.instructure_date_and_time'], (I18n, $, tz) ->
   semanticDateRange = (startISO, endISO) ->
     unless startISO
       return """
@@ -8,39 +8,36 @@ define ['i18n!dates', 'jquery'], (I18n, $) ->
         </span>
       """
 
-    startAt = $.parseFromISO startISO
-    endAt = $.parseFromISO endISO
-    startDay = startAt.date_formatted
-    if startAt.timestamp != endAt.timestamp
-      endDay = endAt.date_formatted
-      # TODO: i18n
-      if startDay != endDay
+    startAt = tz.parse(startISO)
+    endAt = tz.parse(endISO)
+    if +startAt != +endAt
+      if !$.sameDate(startAt, endAt)
         """
         <span class="date-range">
-          <time datetime='#{startAt.time.toISOString()}'>
-            #{startDay} at #{startAt.time_formatted}
+          <time datetime='#{startAt.toISOString()}'>
+            #{$.datetimeString(startAt)}
           </time> -
-          <time datetime='#{endAt.time.toISOString()}'>
-            #{endDay} at #{endAt.time_formatted}
+          <time datetime='#{endAt.toISOString()}'>
+            #{$.datetimeString(endAt)}
           </time>
         </span>
         """
       else
         """
         <span class="date-range">
-          <time datetime='#{startAt.time.toISOString()}'>
-            #{startDay}, #{startAt.time_formatted}
+          <time datetime='#{startAt.toISOString()}'>
+            #{$.dateString(startAt)}, #{$.timeString(startAt)}
           </time> -
-          <time datetime='#{endAt.time.toISOString()}'>
-            #{endAt.time_formatted}
+          <time datetime='#{endAt.toISOString()}'>
+            #{$.timeString(endAt)}
           </time>
         </span>
         """
     else
       """
       <span class="date-range">
-        <time datetime='#{startAt.time.toISOString()}'>
-          #{startDay} at #{startAt.time_formatted}
+        <time datetime='#{startAt.toISOString()}'>
+          #{$.datetimeString(startAt)}
         </time>
       </span>
       """

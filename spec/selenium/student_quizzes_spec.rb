@@ -24,8 +24,6 @@ describe "quizzes" do
     context "resume functionality" do
       def update_quiz_lock(lock_at, unlock_at)
         @quiz.update_attributes(:lock_at => lock_at, :unlock_at => unlock_at)
-        @quiz.reload
-        @quiz.save!
       end
 
       # This feature doesn't exist for draft state yet
@@ -45,19 +43,19 @@ describe "quizzes" do
         end
 
         it "should show the resume quiz link if quiz unlock_at date is < now" do
-          update_quiz_lock(Time.now - 1.day.ago, Time.now - 10.minutes.ago)
+          update_quiz_lock(nil, 10.minutes.ago)
           get "/courses/#{@course.id}/quizzes"
           f('.description').should include_text('Resume Quiz')
         end
 
         it "should not show the resume link if the quiz is locked" do
-          update_quiz_lock(Time.now - 5.minutes, nil)
+          update_quiz_lock(5.minutes.ago, nil)
           get "/courses/#{@course.id}/quizzes"
           f('.description').should_not include_text('Resume Quiz')
         end
 
         it "should grade any submission that needs grading" do
-          @qsub.end_at = Time.now - 5.minutes
+          @qsub.end_at = 5.minutes.ago
           @qsub.save!
           get "/courses/#{@course.id}/quizzes"
           f('.description').should_not include_text('Resume Quiz')
@@ -80,15 +78,13 @@ describe "quizzes" do
         end
 
         it "should show the resume quiz button if the quiz unlock_at date is < now" do
-          pending('193')
-          update_quiz_lock(Time.now - 1.day.ago, Time.now - 10.minutes.ago)
+          update_quiz_lock(nil, 10.minutes.ago)
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
           validate_resume_button_text(@resume_text)
         end
 
         it "should not show the resume quiz button if quiz is locked" do
-          pending('193')
-          update_quiz_lock(Time.now - 5.minutes, nil)
+          update_quiz_lock(5.minutes.ago, nil)
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
           f('#not_right_side .take_quiz_button').should_not be_present
         end
@@ -100,7 +96,7 @@ describe "quizzes" do
 
         it "should not see unpublished warning" do
           # set to unpublished state
-          @quiz.last_edited_at = Time.now
+          @quiz.last_edited_at = Time.now.utc
           @quiz.published_at   = 1.hour.ago
           @quiz.save!
 

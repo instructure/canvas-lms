@@ -1,0 +1,33 @@
+{
+    "name":             "timezone",
+    "description":      "Small, elegant, Olson educated, timezone aware date math and `strftime` date formatting in pure JavaScript with no dependendcies for Node.js and the browser. Timezone uses the Olson/IANA timezone database. Timezone is aware of every clock transition in the Olson database. Timezones supports the full compilment of `strftime` format specifiers defined by GNU `date`. Timezone can perform date math and adjust for daylight savings time. Timezone works in the browser too where it is less than 3K minified and gzipped.",
+    "version":              "0.0.28",
+    "author":               "Alan Gutierrez <alan@prettyrobots.com>",
+    "keywords":         [   "time", "timezone", "date", "clock", "wall-clock",
+                            "tzdata", "utc", "gmt", "datetime", "tz", "format",
+                            "events", "calendar", "strftime"
+                        ],
+    "homepage":             "http://bigeasy.github.io/timezone",
+    "bugs":                 "https://github.com/bigeasy/timezone/issues",
+    "licenses":
+                        [{
+                            "type": "MIT",
+                            "url": "http://github.com/bigeasy/skip/raw/master/LICENSE"
+                        }],
+    "repository":       {
+                            "type": "git",
+                            "url": "git://github.com/bigeasy/timezone.git"
+                        },
+    "contributors" :    [
+                            "Eero Ränik <eeror@eeror.com> (http://www.eeror.com/)"
+                        ],
+    "dependencies" :    {
+                        },
+    "devDependencies":  {
+                            "proof": "0.0.42",
+                            "uglify-js": "~1.3"
+                        },
+    "scripts" :         {
+                            "test": "NODE_PATH=build util/test"
+                        }
+}

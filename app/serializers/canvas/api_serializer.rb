@@ -75,7 +75,7 @@ module Canvas
     # use object if you don't want to.
     def self.inherited(klass)
       super(klass)
-      resource_name = klass.name.underscore.downcase.split('_serializer').first
+      resource_name = klass.name.demodulize.underscore.downcase.split('_serializer').first
       klass.send(:alias_method, resource_name.to_sym, :object)
     end
 

@@ -55,7 +55,7 @@ module Api::V1::Quiz
   end
 
   def quiz_json(quiz, context, user, session)
-    QuizSerializer.new(quiz,
+    Quizzes::QuizSerializer.new(quiz,
                        scope: user,
                        session: session,
                        root: false,
@@ -73,7 +73,7 @@ module Api::V1::Quiz
                           controller: self,
                           root: :quizzes,
                           meta: meta,
-                          each_serializer: QuizSerializer,
+                          each_serializer: Quizzes::QuizSerializer,
                           include_root: false).as_json
   end
 

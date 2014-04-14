@@ -617,6 +617,7 @@ describe DiscussionTopic do
       # enroll as a student.
       course_with_student(:course => @course, :user => @ta, :active_enrollment => true)
       @topic.reload
+      DiscussionTopic.clear_cached_contexts
       @topic.user_can_see_posts?(@ta).should == false
     end
 

@@ -127,13 +127,21 @@ describe 'CommunicationChannels API', type: :request do
         }
       end
 
-      it 'should not be able to auto-validate channels' do
-        json = api_call(:post, @path, @path_options, @post_params.merge({
-          :skip_confirmation => 1 }))
+      it 'should be able to create new channels for other users and auto confirm' do
+        json = api_call(:post, @path, @path_options, @post_params.merge({:skip_confirmation => 1}))
 
         @channel = CommunicationChannel.find(json['id'])
-        @channel.should be_unconfirmed
+
+        json.should == {
+          'id' => @channel.id,
+          'address' => 'new+api@example.com',
+          'type' => 'email',
+          'workflow_state' => 'active',
+          'user_id' => @someone.id,
+          'position' => 2
+        }
       end
+
     end
 
     context 'a user' do

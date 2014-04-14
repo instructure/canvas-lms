@@ -6,7 +6,11 @@ define [
   './date_transform'
 ], (Ember, env) ->
 
-  env.setEnv(window.ENV)
+  Ember.onLoad 'Ember.Application', (Application) ->
+    Application.initializer
+      name: 'env'
+      initialize: (container, application) ->
+        env.setEnv(window.ENV)
 
   Ember.$.ajaxPrefilter (options, originalOptions, xhr) ->
     options.dataType = 'json'

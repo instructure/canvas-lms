@@ -126,7 +126,7 @@ class ContextModule < ActiveRecord::Base
         :context_type => self.context_type, :context_id => self.context_id, :workflow_state => 'active')
     students = user ? [user] : self.context.students
     modules.each do |mod|
-      mod.re_evaluate_for(students, true)
+      mod.re_evaluate_for(students)
     end
   end
   
@@ -149,7 +149,7 @@ class ContextModule < ActiveRecord::Base
   def available_for?(user, opts={})
     return true if self.active? && !self.to_be_unlocked && self.prerequisites.blank? && !self.require_sequential_progress
     if self.grants_right?(user, nil, :update)
-     return true
+      return true
     elsif !self.active?
       return false
     end
@@ -163,7 +163,7 @@ class ContextModule < ActiveRecord::Base
       res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
     end
     if !res && opts[:deep_check_if_needed]
-      progression = self.evaluate_for(user, true, true)
+      progression = self.evaluate_for(user, true)
       if tag && tag.context_module_id == self.id && self.require_sequential_progress
         res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
       end
@@ -217,18 +217,42 @@ class ContextModule < ActiveRecord::Base
       val = hash
     end
     if val.is_a?(Hash)
-      res = []
-      tag_ids = self.content_tags.active.pluck(:id)
-      val.each do |id, opts|
-        if tag_ids.include?(id.to_i)
-          res << {:id => id.to_i, :type => opts[:type], :min_score => opts[:min_score] && opts[:min_score].to_f, :max_score => opts[:max_score] && opts[:max_score].to_f}
+      # requirements hash can contain invalid data (e.g. {"none"=>"none"}) from the ui,
+      # filter & manipulate the data to something more reasonable
+      val = val.map do |id, req|
+        if req.is_a?(Hash)
+          req[:id] = id unless req[:id]
+          req
         end
       end
-      val = res
+      val = validate_completion_requirements(val.compact)
     else
       val = nil
     end
     write_attribute(:completion_requirements, val)
+  end
+
+  def validate_completion_requirements(requirements)
+    requirements = requirements.map do |req|
+      new_req = {
+        id: req[:id].to_i,
+        type: req[:type],
+      }
+      new_req[:min_score] = req[:min_score].to_f if req[:type] == 'min_score' && req[:min_score]
+      new_req[:max_score] = req[:max_score].to_f if req[:type] == 'max_score' && req[:max_score]
+      new_req
+    end
+
+    tags = self.content_tags.not_deleted.index_by(&:id)
+    requirements.select do |req|
+      if req[:id] && tag = tags[req[:id]]
+        if %w(must_view must_contribute).include?(req[:type])
+          true
+        elsif %w(must_submit min_score max_score).include?(req[:type])
+          true if tag.scoreable?
+        end
+      end
+    end
   end
 
   def content_tags_visible_to(user)
@@ -339,7 +363,7 @@ class ContextModule < ActiveRecord::Base
   
   def update_for(user, action, tag, points=nil)
     return nil unless self.context.users.include?(user)
-    return nil unless self.prerequisites_satisfied?(user)
+    return nil unless ContextModuleProgression.prerequisites_satisfied?(user, self)
     progression = self.find_or_create_progression(user)
     return unless progression
     progression.requirements_met ||= []
@@ -377,30 +401,6 @@ class ContextModule < ActiveRecord::Base
       nil
     end
   end
-  
-
-  def prerequisites_satisfied?(user, recursive_check=false)
-    unlocked = (self.active_prerequisites || []).all? do |pre|
-      if pre[:type] == 'context_module'
-        prog = user.module_progression_for(pre[:id])
-        if prog
-          prog.completed?
-        elsif pre[:id].present?
-          if prereq = self.context.context_modules.active.find_by_id(pre[:id])
-            prog = prereq.evaluate_for(user, true)
-            prog.completed?
-          else
-            true
-          end
-        else
-          true
-        end
-      else
-        true
-      end
-    end
-    unlocked
-  end
 
   def active_prerequisites
     return [] unless self.prerequisites.any?
@@ -408,48 +408,37 @@ class ContextModule < ActiveRecord::Base
     active_ids = self.context.context_modules.active.where(:id => prereq_ids).pluck(:id)
     self.prerequisites.select{|pre| pre[:type] == 'context_module' && active_ids.member?(pre[:id])}
   end
-  
-  def clear_cached_lookups
-    @cached_tags = nil
+
+  def reload
+    clear_cached_lookups
+    super
   end
   
-  def re_evaluate_for(users, skip_confirm_valid_requirements=false)
+  def clear_cached_lookups
+    @cached_active_tags = nil
+  end
+
+  def cached_active_tags
+    @cached_active_tags ||= self.content_tags.active
+  end
+  
+  def re_evaluate_for(users)
     users = Array(users)
     users.each{|u| u.clear_cached_lookups }
     progressions = self.find_or_create_progressions(users)
-    progressions.each{|p| p.workflow_state = 'locked' }
-    @already_confirmed_valid_requirements = true if skip_confirm_valid_requirements
+    progressions.each(&:mark_as_dirty)
     progressions.each do |progression|
-      self.evaluate_for(progression, true, true)
+      self.evaluate_for(progression, true)
     end
   end
   
   def confirm_valid_requirements(do_save=false)
     return if @already_confirmed_valid_requirements
     @already_confirmed_valid_requirements = true
-    tags = self.content_tags.active
-    new_reqs = []
-    changed = false
-    (self.completion_requirements || []).each do |req|
-      added = false
-      if !req[:id]
-        
-      elsif req[:type] == 'must_view'
-        new_reqs << req if tags.any?{|t| t.id == req[:id].to_i }
-        added = true
-      elsif req[:type] == 'must_contribute'
-        new_reqs << req if tags.any?{|t| t.id == req[:id].to_i }
-        added = true
-      elsif req[:type] == 'must_submit' || req[:type] == 'min_score' || req[:type] == 'max_score'
-        tag = tags.detect{|t| t.id == req[:id].to_i }
-        new_reqs << req if tag && tag.scoreable?
-        added = true
-      end
-      changed = true if !added
-    end
-    self.completion_requirements = new_reqs
-    self.save if do_save && changed
-    new_reqs
+    # the write accessor validates for us
+    self.completion_requirements = self.completion_requirements || []
+    self.save if do_save && self.completion_requirements_changed?
+    self.completion_requirements
   end
   
   def find_or_create_progressions(users)
@@ -487,121 +476,18 @@ class ContextModule < ActiveRecord::Base
   def find_or_create_progression_with_multiple_lookups(user)
     user.module_progression_for(self.id) || self.find_or_create_progression(user)
   end
-  
-  def content_tags_hash
-    return @tags_hash if @tags_hash
-    @tags_hash = {}
-    self.content_tags.each{|t| @tags_hash[t.id] = t }
-    @tags_hash
-  end
-  
-  def evaluate_for(user, recursive_check=false, deep_check=false)
-    progression = nil
-    if user.is_a?(ContextModuleProgression)
-      progression = user
-      user = progression.user
+
+  def evaluate_for(user_or_progression, force_evaluate_requirements=false)
+    if user_or_progression.is_a?(ContextModuleProgression)
+      progression, user = [user_or_progression, user_or_progression.user]
+    else
+      progression, user = [self.find_or_create_progression_with_multiple_lookups(user_or_progression), user_or_progression] if user_or_progression
     end
-    return nil unless user
-    progression ||= self.find_or_create_progression_with_multiple_lookups(user)
-    return unless progression
-    if self.unpublished?
-      progression.workflow_state = 'locked'
-      Shackles.activate(:master) do
-        progression.save if progression.workflow_state_changed?
-      end
-      return progression
-    end
-    requirements_met_changed = false
-    if User.module_progression_jobs_queued?(user.id)
-      progression.workflow_state = 'locked'
-    end
-    if deep_check
-      confirm_valid_requirements(true) rescue nil
-    end
-    @cached_tags ||= self.content_tags.active
-    tags = @cached_tags
-    if recursive_check || progression.new_record? || progression.updated_at < self.updated_at || User.module_progression_jobs_queued?(user.id)
-      if self.completion_requirements.blank? && active_prerequisites.empty?
-        progression.workflow_state = 'completed'
-        Shackles.activate(:master) do
-          progression.save
-        end
-      end
-      progression.workflow_state = 'locked'
-      if !self.to_be_unlocked
-        progression.requirements_met ||= []
-        if progression.locked?
-          progression.workflow_state = 'unlocked' if self.prerequisites_satisfied?(user, recursive_check)
-        end
-        if progression.unlocked? || progression.started?
-          orig_reqs = (progression.requirements_met || []).map{|r| "#{r[:id]}_#{r[:type]}" }.sort
-          completes = (self.completion_requirements || []).map do |req|
-            tag = tags.detect{|t| t.id == req[:id].to_i}
-            if !tag
-              res = true
-            elsif ['min_score', 'max_score', 'must_submit'].include?(req[:type]) && !tag.scoreable?
-              res = true
-            else
-              progression.deep_evaluate(self) if deep_check
-              res = progression.requirements_met.any?{|r| r[:id] == req[:id] && r[:type] == req[:type] } #include?(req)
-              if req[:type] == 'min_score'
-                progression.requirements_met = progression.requirements_met.select{|r| r[:id] != req[:id] || r[:type] != req[:type]}
-                if tag.content_type_quiz?
-                  submission = Quizzes::QuizSubmission.find_by_quiz_id_and_user_id(tag.content_id, user.id)
-                  score = submission.try(:kept_score)
-                elsif tag.content_type == "DiscussionTopic"
-                  if tag.content
-                    submission = Submission.find_by_assignment_id_and_user_id(tag.content.assignment_id, user.id)
-                    score = submission.try(:score)
-                  else
-                    score = nil
-                  end
-                else
-                  submission = Submission.find_by_assignment_id_and_user_id(tag.content_id, user.id)
-                  score = submission.try(:score)
-                end
-                if score && score >= req[:min_score].to_f
-                  progression.requirements_met << req
-                  res = true
-                else
-                  res = false
-                end
-              end
-            end
-            res
-          end
-          new_reqs = (progression.requirements_met || []).map{|r| "#{r[:id]}_#{r[:type]}" }.sort
-          requirements_met_changed = new_reqs != orig_reqs
-          progression.workflow_state = 'started' if completes.any?
-          progression.workflow_state = 'completed' if completes.all?
-        end
-      end
-    end
-    position = nil
-    found_failure = false
-    if self.require_sequential_progress
-      tags.each do |tag|
-        requirements_for_tag = (self.completion_requirements || []).select{|r| r[:id] == tag.id }.sort_by{|r| r[:id]}
-        next if found_failure
-        if requirements_for_tag.empty?
-          position = tag.position
-        else
-          all_met = requirements_for_tag.all? do |req|
-            (progression.requirements_met || []).any?{|r| r[:id] == req[:id] && r[:type] == req[:type] }
-          end
-          if all_met
-            position = tag.position if tag.position && all_met
-          else
-            position = tag.position
-            found_failure = true
-          end
-        end
-      end
-    end
-    progression.current_position = position
-    Shackles.activate(:master) do
-      progression.save if progression.workflow_state_changed? || requirements_met_changed
-    end
+    return nil unless progression && user
+
+    progression.context_module = self if progression.context_module_id == self.id
+    progression.user = user if progression.user_id == user.id
+    progression.evaluate(force_evaluate_requirements)
     progression
   end
 

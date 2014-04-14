@@ -20,7 +20,7 @@ define([
   'i18n!question_banks',
   'jquery' /* $ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_date_and_time' /* datetimeString */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */,
   'jquery.instructure_misc_plugins' /* confirmDelete */,
   'jquery.keycodes' /* keycodes */,
@@ -111,7 +111,7 @@ $(document).ready(function() {
       $bank.loadingImage('remove');
       $bank.removeClass('save_in_progress')
       var bank = data.assessment_question_bank;
-      bank.last_updated_at = $.parseFromISO(bank.updated_at).datetime_formatted;
+      bank.last_updated_at = $.datetimeString(bank.updated_at);
       $bank.fillTemplateData({
         data: bank,
         hrefValues: ['id']

@@ -186,7 +186,7 @@ define [
       [userName, htmlName] = @userNames user
       $message.prepend avatarPartial avatar_url: user.avatar_url, display_name: userName if user
       $message.find('.audience').html htmlName
-      $message.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
+      $message.find('span.date').text $.datetimeString(data.created_at)
       $message.find('p').html TextHelper.formatMessage(data.body)
       $message.find("a.show_quoted_text_link").click (e) =>
         $target = $(e.currentTarget)
@@ -261,7 +261,7 @@ define [
       [userName, htmlName] = @userNames user
       $header.find('.title').html h(data.assignment.name)
       $header.find('span.date').text(if data.submitted_at
-        $.parseFromISO(data.submitted_at).datetime_formatted
+        $.datetimeString(data.submitted_at)
       else
         I18n.t('not_applicable', 'N/A')
       )
@@ -312,7 +312,7 @@ define [
       [userName, htmlName] = @userNames user
       $comment.prepend avatarPartial avatar_url: user.avatar_url, display_name: userName if user
       $comment.find('.audience').html htmlName
-      $comment.find('span.date').text $.parseFromISO(data.created_at).datetime_formatted
+      $comment.find('span.date').text $.datetimeString(data.created_at)
       $comment.find('p').html h(data.comment).replace(/\n/g, '<br />')
       $comment
 
