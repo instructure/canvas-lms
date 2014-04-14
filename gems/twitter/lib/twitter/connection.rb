@@ -16,7 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Twitter
+module Twitter
+class Connection
   def initialize(oauth_access_token, oauth_access_token_secret)
     @oauth_access_token = oauth_access_token
     @oauth_access_token_secret = oauth_access_token_secret
@@ -90,10 +91,10 @@ class Twitter
   def self.twitter_consumer(key=nil, secret=nil)
     require 'oauth'
     require 'oauth/consumer'
-    twitter_config = Twitter.config
+    twitter_config = Twitter::Connection.config
     key ||= twitter_config['api_key']
     secret ||= twitter_config['secret_key']
-    consumer = OAuth::Consumer.new(key, secret, {
+    OAuth::Consumer.new(key, secret, {
       :site => "https://api.twitter.com",
       :request_token_path => "/oauth/request_token",
       :access_token_path => "/oauth/access_token",
@@ -108,7 +109,15 @@ class Twitter
     token ? nil : "Configuration check failed, please check your settings"
   end
 
-  def self.config
-    Canvas::Plugin.find(:twitter).try(:settings) || Setting.from_config('twitter')
+  def self.config=(config)
+    if !config.is_a?(Proc)
+      raise "Config must be a Proc"
+    end
+    @config = config
   end
+
+  def self.config
+    @config.call()
+  end
+end
 end

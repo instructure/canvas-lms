@@ -155,7 +155,7 @@ class UsersController < ApplicationController
       redirect_to request_token.authorize_url
     elsif params[:service] == "twitter"
       success_url = oauth_success_url(:service => 'twitter')
-      request_token = Twitter.request_token(success_url)
+      request_token = Twitter::Connection.request_token(success_url)
       OauthRequest.create(
         :service => 'twitter',
         :token => request_token.token,
@@ -271,7 +271,7 @@ class UsersController < ApplicationController
         end
       else
         begin
-          twitter = Twitter.new(oauth_request.token, oauth_request.secret)
+          twitter = Twitter::Connection.new(oauth_request.token, oauth_request.secret)
           access_token = twitter.get_access_token(oauth_request.token, oauth_request.secret, params[:oauth_verifier])
           service_user_id, service_user_name = twitter.get_service_user(access_token)
           if oauth_request.user

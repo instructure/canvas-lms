@@ -1,9 +1,6 @@
-require File.expand_path('../spec_helper', File.dirname(__FILE__))
+require 'spec_helper'
 
-describe TwitterMessenger do
-
-  before { HostUrl.stubs(:short_host => 'host') }
-
+describe Twitter::Messenger do
   let(:message) { stub() }
   let(:twitter_service) { stub({
                                  token: "twitter_token",
@@ -11,7 +8,8 @@ describe TwitterMessenger do
                                  service_user_name: "twitter_name",
                                  service_user_id: "twitter_id"
                                }) }
-  let(:messenger) { TwitterMessenger.new(message, twitter_service) }
+  let(:id) { "ABC123" }
+  let(:messenger) { Twitter::Messenger.new(message, twitter_service, 'host', id) }
 
   describe '#deliver' do
 
@@ -22,7 +20,7 @@ describe TwitterMessenger do
 
     context "with a twitter service" do
       before(:each) do
-        Twitter.expects(:new).with("twitter_token", "twitter_secret").returns(connection_mock)
+        Twitter::Connection.expects(:new).with("twitter_token", "twitter_secret").returns(connection_mock)
       end
 
       it 'delegates to the twitter module if a service is available' do
@@ -32,7 +30,7 @@ describe TwitterMessenger do
     end
 
     context "with no twitter service" do
-      let(:messenger) { TwitterMessenger.new(message, nil) }
+      let(:messenger) { Twitter::Messenger.new(message, nil, 'host', id) }
       it 'sends nothing if there is no service' do
         connection_mock.expects(:send_direct_message).never
         messenger.deliver.should be_nil
@@ -45,7 +43,7 @@ describe TwitterMessenger do
     subject { messenger.url }
 
     it { should =~ /host/ }
-    it { should =~ /#{AssetSignature.generate(message)}$/ }
+    it { should =~ /#{id}$/ }
     it { should =~ /^http:\/\// }
   end
 
@@ -64,15 +62,4 @@ describe TwitterMessenger do
       messenger.body.should == "An extremely long body that might need to be cut down a bit if w... http://learn.canvas.net/super/long/url/which/will/be/minified/by/twitter"
     end
   end
-
-  describe '#host' do
-    let(:context) { stub }
-    let(:message) { stub(:asset_context => context) }
-
-    it 'delegates to the HostUrl lib' do
-      HostUrl.expects(:short_host).with(context)
-      messenger.host
-    end
-  end
-
 end

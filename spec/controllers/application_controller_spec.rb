@@ -36,7 +36,7 @@ describe ApplicationController do
       mock_current_user.expects(:user_services).returns(mock_user_services)
       mock_user_services.expects(:find_by_service).with("twitter").returns(mock(token: "current_user_token", secret: "current_user_secret"))
 
-      Twitter.expects(:new).with("current_user_token", "current_user_secret")
+      Twitter::Connection.expects(:new).with("current_user_token", "current_user_secret")
 
       controller.send(:twitter_connection)
     end
@@ -45,7 +45,7 @@ describe ApplicationController do
       session[:oauth_twitter_access_token_token] = "session_token"
       session[:oauth_twitter_access_token_secret] = "sesion_secret"
 
-      Twitter.expects(:new).with("session_token", "sesion_secret")
+      Twitter::Connection.expects(:new).with("session_token", "sesion_secret")
 
       controller.send(:twitter_connection)
     end

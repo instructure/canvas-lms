@@ -1160,7 +1160,7 @@ class Account < ActiveRecord::Base
       :twitter => {
         :name => t("account_settings.twitter", "Twitter"), 
         :description => "",
-        :expose_to_ui => (Twitter.config ? :service : false)
+        :expose_to_ui => (Twitter::Connection.config ? :service : false)
       },
       :delicious => {
         :name => t("account_settings.delicious", "Delicious"), 

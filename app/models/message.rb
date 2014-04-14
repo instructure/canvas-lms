@@ -662,7 +662,9 @@ class Message < ActiveRecord::Base
   # Returns nothing.
   def deliver_via_twitter
     twitter_service = user.user_services.find_by_service('twitter')
-    TwitterMessenger.new(self, twitter_service).deliver
+    host = HostUrl.short_host(self.asset_context)
+    msg_id = AssetSignature.generate(self)
+    Twitter::Messenger.new(self, twitter_service, host, msg_id).deliver
     complete_dispatch
   end
 

@@ -140,6 +140,7 @@ gem 'linked_in', :path => 'gems/linked_in'
 gem 'lti_outbound', :path => 'gems/lti_outbound'
 gem 'multipart', :path => 'gems/multipart'
 gem 'paginated_collection', :path => 'gems/paginated_collection'
+gem 'twitter', :path => 'gems/twitter'
 gem 'utf8_cleaner', :path => 'gems/utf8_cleaner'
 gem 'workflow', :path => 'gems/workflow'
 

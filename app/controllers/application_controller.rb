@@ -1290,7 +1290,7 @@ class ApplicationController < ActionController::Base
       if [:question_banks].include?(feature)
         true
       elsif feature == :twitter
-        !!Twitter.config
+        !!Twitter::Connection.config
       elsif feature == :facebook
         !!Facebook.config
       elsif feature == :linked_in
@@ -1760,9 +1760,9 @@ class ApplicationController < ActionController::Base
   def twitter_connection
     if @current_user
       service = @current_user.user_services.find_by_service("twitter")
-      return Twitter.new(service.token, service.secret)
+      return Twitter::Connection.new(service.token, service.secret)
     else
-      return Twitter.new(session[:oauth_twitter_access_token_token], session[:oauth_twitter_access_token_secret])
+      return Twitter::Connection.new(session[:oauth_twitter_access_token_token], session[:oauth_twitter_access_token_secret])
     end
   end
 end
