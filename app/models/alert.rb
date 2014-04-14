@@ -103,11 +103,11 @@ class Alert < ActiveRecord::Base
     alerts_cache = {}
     account.associated_courses.where(:workflow_state => 'available').find_each do |course|
       alerts_cache[course.account_id] ||= course.account.account_chain.map { |a| a.alerts.all }.flatten
-      self.evaluate_for_course(course, alerts_cache[course.account_id], account.enable_user_notes?)
+      self.evaluate_for_course(course, alerts_cache[course.account_id])
     end
   end
 
-  def self.evaluate_for_course(course, account_alerts, include_user_notes)
+  def self.evaluate_for_course(course, account_alerts)
     return unless course.available?
 
     alerts = Array.new(account_alerts || [])
@@ -138,8 +138,7 @@ class Alert < ActiveRecord::Base
     if criterion_types.include? 'UngradedTimespan'
       ungraded_timespan_alert = Alerts::UngradedTimespan.new(course, student_ids)
     end
-    include_user_notes = course.root_account.enable_user_notes? if include_user_notes.nil?
-    if criterion_types.include?('UserNote') && include_user_notes
+    if criterion_types.include? 'UserNote'
       user_note_alert = Alerts::UserNote.new(course, student_ids, teacher_ids)
     end
 
@@ -167,7 +166,7 @@ class Alert < ActiveRecord::Base
               break
             end
           when 'UserNote'
-            if include_user_notes && user_note_alert.should_not_receive_message?(user_id, criterion.threshold.to_i)
+            if user_note_alert.should_not_receive_message?(user_id, criterion.threshold.to_i)
               matches = false
               break
             end

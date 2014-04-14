@@ -31,9 +31,23 @@ module Alerts
 
       before(:each) do
         course_with_teacher(:active_all => 1)
+        root_account = @course.root_account
+        root_account.enable_user_notes = true
+        root_account.save!
         @teacher = @user
         @user = nil
         student_in_course(:active_all => 1)
+      end
+
+      it 'returns true when the course root account has user notes disabled' do
+        root_account = @course.root_account
+        root_account.enable_user_notes = false
+        root_account.save!
+
+        ::UserNote.create!(:creator => @teacher, :user => @user) { |un| un.created_at = Time.now - 30.days }
+
+        user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
+        user_note_alert.should_not_receive_message?(@student.id, 29).should == true
       end
 
       it 'returns true when the student has received a note less than threshold days ago' do
