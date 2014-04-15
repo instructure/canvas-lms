@@ -114,6 +114,18 @@ module LtiOutbound
       hash['tool_consumer_info_product_family_code'] = 'canvas'
       hash['tool_consumer_info_version'] = 'cloud'
       tool.set_custom_fields(hash, resource_type)
+      set_resource_type_keys()
+      hash['oauth_callback'] = 'about:blank'
+
+      variable_substitutor = VariableSubstitutor.new
+      variable_substitutor.substitute_all!(hash, user, assignment, context, consumer_instance)
+
+      self.class.generate_params(hash, url, tool.consumer_key, tool.shared_secret)
+    end
+
+    private
+
+    def set_resource_type_keys
       if resource_type == 'editor_button'
         hash['selection_directive'] = 'embed_content' #backwards compatibility
         hash['ext_content_intended_use'] = 'embed'
@@ -127,16 +139,13 @@ module LtiOutbound
       elsif resource_type == 'homework_submission'
         hash['ext_content_intended_use'] = 'homework'
         hash['ext_content_return_url'] = return_url
+      elsif resource_type == 'migration_selection'
+        hash['ext_content_intended_use'] = 'content_package'
+        hash['ext_content_return_types'] = 'file'
+        hash['ext_content_file_extensions'] = 'zip,imscc'
+        hash['ext_content_return_url'] = return_url
       end
-      hash['oauth_callback'] = 'about:blank'
-
-      variable_substitutor = VariableSubstitutor.new
-      variable_substitutor.substitute_all!(hash, user, assignment, context, consumer_instance)
-
-      self.class.generate_params(hash, url, tool.consumer_key, tool.shared_secret)
     end
-
-    private
 
     def self.generate_params(params, url, key, secret)
       uri = URI.parse(url)

@@ -36,7 +36,7 @@ class ContextExternalTool < ActiveRecord::Base
     can :read and can :update and can :delete
   end
   
-  EXTENSION_TYPES = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button, :homework_submission]
+  EXTENSION_TYPES = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button, :homework_submission, :migration_selection]
   def url_or_domain_is_set
     setting_types = EXTENSION_TYPES
     # url or domain (or url on canvas lti extension) is required
@@ -232,6 +232,14 @@ class ContextExternalTool < ActiveRecord::Base
     extension_setting(:homework_submission, setting)
   end
 
+  def migration_selection=(hash)
+    tool_setting(:migration_selection, hash, :selection_width, :selection_height, :icon_url)
+  end
+
+  def migration_selection(setting = nil)
+    extension_setting(:migration_selection, setting)
+  end
+
   def icon_url=(i_url)
     settings[:icon_url] = i_url
   end
@@ -278,7 +286,7 @@ class ContextExternalTool < ActiveRecord::Base
     settings[:selection_width] = settings[:selection_width].to_i if settings[:selection_width]
     settings[:selection_height] = settings[:selection_height].to_i if settings[:selection_height]
 
-    [:resource_selection, :editor_button, :homework_submission].each do |type|
+    EXTENSION_TYPES.each do |type|
       if settings[type]
         settings[type][:selection_width] = settings[type][:selection_width].to_i if settings[type][:selection_width]
         settings[type][:selection_height] = settings[type][:selection_height].to_i if settings[type][:selection_height]

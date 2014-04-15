@@ -133,7 +133,7 @@ describe ExternalToolsController, type: :request do
                     {:controller => 'external_tools', :action => 'show', :format => 'json',
                      :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s})
 
-    json.diff(example_json(et)).should == {}
+    HashDiff.diff(json, example_json(et)).should == []
   end
 
   def not_found_call(context, type="course")
@@ -151,7 +151,7 @@ describe ExternalToolsController, type: :request do
                      :"#{type}_id" => context.id.to_s})
 
     json.size.should == 1
-    json.first.diff(example_json(et)).should == {}
+    HashDiff.diff(json.first, example_json(et)).should == []
   end
 
   def search_call(context, type="course")
@@ -174,7 +174,7 @@ describe ExternalToolsController, type: :request do
     context.context_external_tools.count.should == 1
 
     et = context.context_external_tools.last
-    json.diff(example_json(et)).should == {}
+    HashDiff.diff(json, example_json(et)).should == []
   end
 
   def update_call(context, type="course")
@@ -184,7 +184,7 @@ describe ExternalToolsController, type: :request do
                     {:controller => 'external_tools', :action => 'update', :format => 'json',
                      :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s}, post_hash)
     et.reload
-    json.diff(example_json(et)).should == {}
+    HashDiff.diff(json, example_json(et)).should == []
   end
   
   def destroy_call(context, type="course")
@@ -258,6 +258,7 @@ describe ExternalToolsController, type: :request do
     et.editor_button = {:url=>"http://www.example.com/ims/lti/editor", :icon_url=>"/images/delete.png", :selection_width=>50, :selection_height=>50, :text=>"editor button"}
     et.homework_submission = {:url=>"http://www.example.com/ims/lti/editor", :selection_width=>50, :selection_height=>50, :text=>"homework submission"}
     et.resource_selection = {:url=>"http://www.example.com/ims/lti/resource", :text => "", :selection_width=>50, :selection_height=>50}
+    et.migration_selection = {:url=>"http://www.example.com/ims/lti/resource", :text => "migration selection", :selection_width=>42, :selection_height=>24}
     et.save!
     et
   end
@@ -319,6 +320,7 @@ describe ExternalToolsController, type: :request do
      "url"=>"http://www.example.com/ims/lti",
      "id"=>et ? et.id : nil,
      "workflow_state"=>"public",
+     "vendor_help_link"=>nil,
      "resource_selection"=>
              {"text"=>"",
               "url"=>"http://www.example.com/ims/lti/resource",
@@ -361,6 +363,12 @@ describe ExternalToolsController, type: :request do
               "custom_fields"=>{"key"=>"value"},
               "label"=>"Account nav",
               "selection_height"=>400,
-              "selection_width"=>800}}
+              "selection_width"=>800},
+     "migration_selection"=>
+             {"text"=>"migration selection",
+              "label"=>"migration selection",
+              "url"=>"http://www.example.com/ims/lti/resource",
+              "selection_height"=>24,
+              "selection_width"=>42}}
   end
 end
