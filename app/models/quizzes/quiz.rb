@@ -51,6 +51,10 @@ class Quizzes::Quiz < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :assignment_group
 
+  def self.polymorphic_names
+    [self.base_class.name, "Quiz"]
+  end
+
   EXPORTABLE_ATTRIBUTES = [
     :id, :title, :description, :quiz_data, :points_possible, :context_id, :context_type, :assignment_id, :workflow_state, :shuffle_answers, :show_correct_answers, :time_limit,
     :allowed_attempts, :scoring_policy, :quiz_type, :created_at, :updated_at, :lock_at, :unlock_at, :deleted_at, :could_be_locked, :cloned_item_id, :unpublished_question_count,
@@ -87,48 +91,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   simply_versioned
 
-  has_many :versions,
-    :order => 'number DESC',
-    :as => :versionable,
-    :dependent => :destroy,
-    :inverse_of => :versionable,
-    :extend => SoftwareHeretics::ActiveRecord::SimplyVersioned::VersionsProxyMethods do
-      if CANVAS_RAILS2
-        def construct_sql
-          @finder_sql = @counter_sql =
-            "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_id = #{owner_quoted_id} AND " +
-          "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_type IN ('Quiz', #{@owner.class.quote_value(@owner.class.base_class.name.to_s)})"
-        end
-      else
-        def where(*args)
-          if args.length == 1 && args.first.is_a?(Arel::Nodes::Equality) && args.first.left.name == 'versionable_type'
-            super(args.first.left.in(['Quiz', 'Quizzes::Quiz']))
-          else
-            super
-          end
-        end
-      end
-    end
-
-  has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => "content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'", :include => {:context_module => [:content_tags]} do
-    if CANVAS_RAILS2
-      def construct_sql
-        @finder_sql = @counter_sql =
-            "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_id = #{owner_quoted_id} AND " +
-            "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_type IN ('Quiz', #{@owner.class.quote_value(@owner.class.base_class.name.to_s)}) AND " +
-            "#{@reflection.quoted_table_name}.tag_type='context_module' AND " +
-            "#{@reflection.quoted_table_name}.workflow_state<>'deleted'"
-      end
-    else
-      def where(*args)
-        if args.length == 1 && args.first.is_a?(Arel::Nodes::Equality) && args.first.left.name == 'content_type'
-          super(args.first.left.in(['Quiz', 'Quizzes::Quiz']))
-        else
-          super
-        end
-      end
-    end
-  end
+  has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => "content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'", :include => {:context_module => [:content_tags]}
 
   # This callback is listed here in order for the :link_assignment_overrides
   # method to be called after the simply_versioned callbacks. We want the
