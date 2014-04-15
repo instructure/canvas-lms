@@ -275,6 +275,23 @@ describe ContentMigrationsController, type: :request do
       
     end
 
+    context "by LTI extension" do
+      it "should queue migration with LTI url sent" do
+        post_params = {migration_type: "context_external_tool", settings: {file_url: 'http://example.com/oi.imscc'}}
+        json = api_call(:post, @migration_url, @params, post_params)
+        migration = ContentMigration.find json['id']
+        migration.attachment.should be_nil
+        migration.migration_settings[:file_url].should == post_params[:settings][:file_url]
+        migration.workflow_state.should == "exporting"
+        migration.job_progress.workflow_state.should == 'queued'
+      end
+
+      it "should require a file upload" do
+        post_params = {migration_type: "context_external_tool", settings: {course_course_id: 42}}
+        api_call(:post, @migration_url, @params, post_params, {}, :expected_status => 400)
+      end
+    end
+
   end
 
   describe 'update' do

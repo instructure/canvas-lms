@@ -286,11 +286,11 @@ class ContentMigration < ActiveRecord::Base
     p
   end
 
-  def queue_migration
+  def queue_migration(plugin=nil)
     reset_job_progress
 
     set_default_settings
-    plugin = Canvas::Plugin.find(migration_type)
+    plugin ||= Canvas::Plugin.find(migration_type)
     if plugin
       queue_opts = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1}
       if self.strand
