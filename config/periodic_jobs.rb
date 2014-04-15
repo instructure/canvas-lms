@@ -94,9 +94,9 @@ if Delayed::Stats.enabled?
   end
 end
 
-Delayed::Periodic.cron 'Alert.process', '30 11 * * *', :priority => Delayed::LOW_PRIORITY do
+Delayed::Periodic.cron 'Alerts::DelayedAlertSender.process', '30 11 * * *', :priority => Delayed::LOW_PRIORITY do
   Shard.with_each_shard do
-    Alert.process
+    Alerts::DelayedAlertSender.process
   end
 end
 
