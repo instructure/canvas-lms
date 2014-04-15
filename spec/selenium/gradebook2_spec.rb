@@ -803,11 +803,30 @@ describe "gradebook2" do
     it "should be visible when enabled" do
       Account.default.set_feature_flag!('outcome_gradebook', 'on')
       get "/courses/#{@course.id}/gradebook2"
-      ff('.gradebook-navigation').length.should == 2
+      ff('.gradebook-navigation').length.should == 1
 
       f('a[data-id=outcome]').click
       wait_for_ajaximations
       f('.outcome-gradebook-container').should_not be_nil
+    end
+  end
+
+  describe "post_grades" do
+    before(:each) { data_setup }
+
+    it "should not be visible by default" do
+      get "/courses/#{@course.id}/gradebook2"
+      ff('.gradebook-navigation').length.should == 0
+    end
+
+    it "should be visible when enabled" do
+      Account.default.set_feature_flag!('post_grades', 'on')
+      get "/courses/#{@course.id}/gradebook2"
+      ff('.gradebook-navigation').length.should == 2
+
+      f('#publish').click
+      wait_for_ajaximations
+      f('#post-grades-container').should_not be_nil
     end
   end
 end

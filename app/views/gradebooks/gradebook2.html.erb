@@ -14,7 +14,7 @@
 <div id="keyboard_navigation"></div>
 <div id="gradebook_wrapper">
 
-  <% if @context.feature_enabled?(:outcome_gradebook) %>
+  <% if @context.feature_enabled?(:outcome_gradebook) || @context.feature_enabled?(:post_grades) %>
       <div class="gradebook-header">
         <nav class="gradebook-navigation">
           <ul class="nav nav-pills gradebook-navigation-pills">
@@ -22,13 +22,16 @@
               <a href="#"
                  data-id="assignment"><%= t(:grades, "Grades") %></a>
             </li>
+            <% if @context.feature_enabled?(:outcome_gradebook) %>
             <li>
               <a href="#"
                  data-id="outcome"><%= t(:learning_mastery, "Learning Mastery") %></a>
             </li>
+             <% end %>
           </ul>
         </nav>
         <div class="section-button-placeholder"></div>
+        <% if @context.feature_enabled?(:post_grades) %>
         <div class="pull-right">
           <nav class="gradebook-navigation">
             <ul class="nav nav-pills gradebook-navigation-pills pull-right">
@@ -39,12 +42,13 @@
             </ul>
           </nav>
         </div>
+        <% end %>
       </div>
   <% end %>
 
   <div class="assignment-gradebook-container hidden">
     <div id="gradebook-toolbar" class="toolbar">
-      <% if !@context.feature_enabled?(:outcome_gradebook) %>
+      <% if !@context.feature_enabled?(:outcome_gradebook) && !@context.feature_enabled?(:post_grades)%>
         <span class="section-button-placeholder"></span>
       <% end %>
       <button id="gradebook_settings"><i class="icon-settings"></i></button>

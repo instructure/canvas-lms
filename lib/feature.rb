@@ -141,6 +141,19 @@ END
       root_opt_in: false,
       development: false
     },
+  'post_grades' =>
+      {
+          display_name: -> { I18n.t('features.post_grades', 'Post Grades to SIS') },
+          description:  -> { I18n.t('post_grades_description', <<-END) },
+Post Grades allows teachers to post grades back to enabled SIS systems: Powerschool,
+Aspire (SIS2000), JMC, and any other SIF-enabled SIS that accepts the SIF elements GradingCategory,
+ GradingAssignment, GradingAssignmentScore.
+          END
+          applies_to: 'Course',
+          state: 'hidden',
+          root_opt_in: true,
+          development: true
+      },
     'student_outcome_gradebook' =>
     {
       display_name: -> { I18n.t('features.student_outcome_gradebook', 'Student Outcome Gradebook') },
