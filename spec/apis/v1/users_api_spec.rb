@@ -137,7 +137,7 @@ describe Api::V1::User do
 
     def test_context(mock_context, context_to_pass)
       mock_context.expects(:account).returns(mock_context)
-      mock_context.expects(:id).returns(42)
+      mock_context.expects(:global_id).returns(42)
       mock_context.expects(:grants_right?).with(@admin, :manage_students).returns(true)
       if context_to_pass
         @test_api.user_json(@student, @admin, {}, [], context_to_pass)
@@ -168,7 +168,7 @@ describe Api::V1::User do
 
     it 'should support manually passing the current user' do
       @test_api.context = mock()
-      @test_api.context.expects(:id).returns(42)
+      @test_api.context.expects(:global_id).returns(42)
       @test_api.context.expects(:account).returns(@test_api.context)
       @test_api.context.expects(:grants_right?).with(@admin, :manage_students).returns(true)
       @test_api.current_user = @admin
@@ -177,7 +177,7 @@ describe Api::V1::User do
 
     it 'should support loading the current user as a member var' do
       mock_context = mock()
-      mock_context.expects(:id).returns(42)
+      mock_context.expects(:global_id).returns(42)
       mock_context.expects(:account).returns(mock_context)
       mock_context.expects(:grants_right?).with(@admin, :manage_students).returns(true)
       @test_api.current_user = @admin
