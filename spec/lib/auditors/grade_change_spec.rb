@@ -34,7 +34,7 @@ describe GradeChangeAuditApiController do
 
     @assignment = @course.assignments.create!(:title => 'Assignment', :points_possible => 10)
     @submission = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
-    @event_time = Time.parse('2014-04-15T10:37:20Z')
+    @event_time = Time.at(1.hour.ago.to_i) # cassandra doesn't remember microseconds
     Timecop.freeze(@event_time) { @event = Auditors::GradeChange.record(@submission) }
   end
 
