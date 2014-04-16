@@ -17,38 +17,6 @@
 #
 
 module LinkedIn
-
-  def linked_in_retrieve_access_token
-    consumer = linked_in_consumer
-    if @current_user
-      service = @current_user.user_services.find_by_service("linked_in")
-      access_token = OAuth::AccessToken.new(consumer, service.token, service.secret)
-    elsif @linked_in_service
-      access_token = OAuth::AccessToken.new(consumer, @linked_in_service.token, @linked_in_service.secret)
-    else
-      access_token = OAuth::AccessToken.new(consumer, session[:oauth_linked_in_access_token_token], session[:oauth_linked_in_access_token_secret])
-    end
-    access_token
-  end
-  
-  def linked_in_generate_token(token, secret)
-    OAuth::AccessToken.new(linked_in_consumer, token, secret)
-  end
-  
-  def linked_in_profile
-    access_token ||= linked_in_retrieve_access_token
-    body = access_token.get('/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)').body
-    data = Nokogiri::XML(body)
-    res = {}.with_indifferent_access
-    res[:id] = data.css('id')[0].content
-    res[:first_name] = data.css('first-name')[0].content
-    res[:last_name] = data.css('last-name')[0].content
-    res[:profile_url] = data.css('public-profile-url')[0].content
-    # see https://developer.linkedin.com/forum/ssl-profile-picture-url-https
-    res[:picture_url] = data.css('picture-url')[0].content.gsub('http://media.linkedin.com', 'https://m1.licdn.com') rescue nil
-    res
-  end
-
   def linked_in_get_service_user(access_token)
     body = access_token.get('/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)').body
     data = Nokogiri::XML(body)
@@ -99,48 +67,13 @@ module LinkedIn
     request_token.authorize_url
   end
   
-  def linked_in_send(message, access_token=nil)
-    access_token ||= linked_in_retrieve_access_token
-    response = access_token.post("/statuses/update.json", {:status => message})
-    res = ActiveSupport::JSON.decode(response.body)
-    res
-  end
-  
-  def linked_in_list(access_token=nil, since_id=nil)
-    access_token ||= linked_in_retrieve_access_token
-    url = "/statuses/user_timeline.json"
-    url += "?since_id=#{since_id}" if since_id
-    response = access_token.get(url)
-    case response
-    when Net::HTTPSuccess
-      return ActiveSupport::JSON.decode(response.body) rescue []
-    else
-      data = ActiveSupport::JSON.decode(response.body) rescue nil
-      if data && data['errors'] && data['errors'].match(/requires authentication/)
-        @service.destroy if @service
-        @linked_in_service.destroy if @linked_in_service
-      end
-      ErrorReport.log_error(:processing, {
-        :backtrace => "Retrieving linked_in list for #{@linked_in_service.inspect}",
-        :response => response.inspect,
-        :body => response.body,
-        :message => response['X-RateLimit-Reset'],
-        :url => url
-      })
-      retry_after = (response['X-RateLimit-Reset'].to_i - Time.now.utc.to_i) rescue 0
-      raise "Retry After #{retry_after}"
-    end
-    res
-  end
-  
   def linked_in_consumer(key=nil, secret=nil)
     require 'oauth'
     require 'oauth/consumer'
     config = LinkedIn.config
     key ||= config['api_key']
     secret ||= config['secret_key']
-    req = request || nil rescue nil
-    consumer = OAuth::Consumer.new(key, secret, {
+    OAuth::Consumer.new(key, secret, {
       :site => "https://api.linkedin.com",
       :request_token_path => "/uas/oauth/requestToken",
       :access_token_path => "/uas/oauth/accessToken",
