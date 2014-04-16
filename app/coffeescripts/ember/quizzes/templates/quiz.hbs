@@ -15,7 +15,7 @@
         on-unpublish='unpublish'
       }}
 
-      <a href="#" class="btn">
+      <a {{bind-attr href="editURL"}} class="btn">
         <i class="icon-edit"></i>{{#t 'edit'}}Edit{{/t}}
       </a>
       {{#ic-menu}}

@@ -15,6 +15,10 @@ define [
     title: attr()
     quizType: attr()
     htmlURL: attr()
+    # editURL is temporary until we have a real ember route for it
+    editURL: (->
+      "#{@get('htmlURL')}/edit"
+    ).property('htmlURL')
     allDates: attr()
     mobileURL: attr()
     description: attr()
