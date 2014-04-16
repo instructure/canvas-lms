@@ -93,7 +93,7 @@
                    class="datetime_field input-medium"
                    name="delayed_post_at"
                    {{! TODO: what would be the best way to get this formatted right? }}
-                   value="{{datetimeFormatted delayed_post_at}}">
+                   value="{{datetimeFormatted delayed_post_at false}}">
           </label>
         {{/if}}
         <label class="checkbox" for="require_initial_post">
@@ -144,7 +144,7 @@
                    class="datetime_field input-medium"
                    name="delayed_post_at"
                    {{! TODO: what would be the best way to get this formatted right? }}
-                   value="{{datetimeFormatted delayed_post_at}}">
+                   value="{{datetimeFormatted delayed_post_at false}}">
           </div>
         </div>
       </fieldset>
@@ -158,7 +158,7 @@
                      class="datetime_field input-medium"
                      name="lock_at"
                      {{! TODO: what would be the best way to get this formatted right? }}
-                     value="{{datetimeFormatted lock_at}}">
+                     value="{{datetimeFormatted lock_at false}}">
             </div>
           </div>
         </fieldset>
