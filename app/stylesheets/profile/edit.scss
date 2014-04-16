@@ -244,3 +244,11 @@
   width: 200px;
 
 }
+
+.jcrop-holder > div > div {
+  border-radius: 100%;
+  border: 2px solid #D3D9D9;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  margin: -2px;
+}
