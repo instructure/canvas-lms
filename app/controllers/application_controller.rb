@@ -1707,7 +1707,7 @@ class ApplicationController < ActionController::Base
     js_env hash
   end
 
-  ## @real_current_user first ensures that a masquerading user never sees the
+  ## having @real_current_user first ensures that a masquerading user never sees the
   ## masqueradee's files, but in general you may want to block access to google
   ## docs for masqueraders earlier in the request
   def google_docs_user
